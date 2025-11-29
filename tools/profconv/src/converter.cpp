@@ -177,8 +177,8 @@ QString ZDSimConverter::fileToQString(const std::string &path)
     }
 
     QByteArray data = file.readAll();
-    auto toUtf8 = QStringDecoder(QStringConverter::System);
-    QString new_data = toUtf8(data);
+    auto fromUtf8 = QStringDecoder(QStringConverter::System);
+    QString new_data = fromUtf8(data);
 //    QString new_data(data);
     file.close();
 

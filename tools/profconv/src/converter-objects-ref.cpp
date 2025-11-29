@@ -41,7 +41,9 @@ bool ZDSimConverter::readObjectsRef(QTextStream &stream, zds_objects_ref_data_t 
             continue;
 
         // Разделяем строку по табуляции: имя, путь к модели, путь к текстуре
-        QStringList tokens = line.split('\t');
+        QStringList tokens = line.split(RE_zds_separartors);
+        //QStringList tokens = line.split('\t');
+
         if (tokens.size() < 3)
             continue;
 

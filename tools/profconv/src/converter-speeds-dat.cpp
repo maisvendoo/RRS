@@ -40,7 +40,8 @@ bool ZDSimConverter::readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speed
         if (line.isEmpty())
             continue;
 
-        QStringList tokens = line.split('\t');
+        QStringList tokens = line.split(RE_zds_separartors);
+        //QStringList tokens = line.split('\t');
 
         if (tokens.size() < 3)
             continue;

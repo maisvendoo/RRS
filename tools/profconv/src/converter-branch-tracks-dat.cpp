@@ -40,7 +40,8 @@ bool ZDSimConverter::readBranchTracksDAT(QTextStream &stream, const int &dir)
         if (line.at(0) == ';')
             continue;
 
-        QStringList tokens = line.split('\t');
+        QStringList tokens = line.split(RE_zds_separartors);
+        //QStringList tokens = line.split('\t');
 
         bool is_valid_value = false;
         int id_value = tokens[0].toInt(&is_valid_value);

@@ -39,7 +39,9 @@ bool ZDSimConverter::readStartKilometersDAT(QTextStream &stream,
         if (line.isEmpty())
             continue;
 
-        QStringList tokens = line.split(' ');
+        QStringList tokens = line.split(RE_zds_separartors);
+        //QStringList tokens = line.split(' ');
+
         if (tokens.size() < 2)
             continue;
 

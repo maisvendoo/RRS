@@ -33,6 +33,7 @@
 
 #include    <fstream>
 #include    <QTextStream>
+#include    <QRegularExpression>
 
 #define     DIR_TOPOLOGY     std::string("topology")
 #define     DIR_TRAJECTORIES std::string("trajectories")
@@ -54,6 +55,9 @@
 #define     CONFIGNODE_TRAJ_3LVL  std::string("Name")
 #define     DELIMITER_SYMBOL char('\t')
 #define     ADD_ZDS_TRACK_NUMBER_TO_FILENAME bool(true)
+
+/// Регулярное выражение Perl \s+ - один или более пробельных символов (пробелов или табуляций)
+const QRegularExpression RE_zds_separartors = QRegularExpression("\\s+");
 
 //------------------------------------------------------------------------------
 //
