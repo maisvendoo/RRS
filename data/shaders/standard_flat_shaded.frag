@@ -47,26 +47,26 @@ layout(set = MATERIAL_DESCRIPTOR_SET, binding = 11) uniform TexCoordIndices
 } texCoordIndices;
 
 layout(location = 2) in vec4 vertexColor;
-#ifndef VSG_POINT_SPRITE
-layout(location = 3) in vec2 texCoord[VSG_TEXCOORD_COUNT];
-#endif
+layout(location = 4) in vec2 texCoord[VSG_TEXCOORD_COUNT];
 
 layout(location = 0) out vec4 outColor;
 
 void main()
 {
 #ifdef VSG_POINT_SPRITE
-    vec2 texCoord[1] = { gl_PointCoord.xy };
+    const vec2 texCoordDiffuse = gl_PointCoord.xy;
+#else
+    const vec2 texCoordDiffuse = texCoord[texCoordIndices.diffuseMap].st;
 #endif
 
     vec4 diffuseColor = vertexColor * material.diffuseColor;
 
 #ifdef VSG_DIFFUSE_MAP
     #ifdef VSG_GREYSCALE_DIFFUSE_MAP
-        float v = texture(diffuseMap, texCoord[texCoordIndices.diffuseMap].st).s;
-        diffuseColor *= vec4(v, v, v, 1.texCoordIndices.diffuseMap);
+        float v = texture(diffuseMap, texCoordDiffuse);
+        diffuseColor *= vec4(v, v, v, 1);
     #else
-        diffuseColor *= texture(diffuseMap, texCoord[texCoordIndices.diffuseMap].st);
+        diffuseColor *= texture(diffuseMap, texCoordDiffuse);
     #endif
 #endif
 

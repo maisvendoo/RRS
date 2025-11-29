@@ -1,6 +1,6 @@
 #version 450
 #extension GL_ARB_separate_shader_objects : enable
-#pragma import_defines (VSG_TEXTURECOORD_0, VSG_TEXTURECOORD_1, VSG_TEXTURECOORD_2, VSG_TEXTURECOORD_3, , VSG_POINT_SPRITE, VSG_DIFFUSE_MAP, VSG_GREYSCALE_DIFFUSE_MAP, VSG_DETAIL_MAP, VSG_EMISSIVE_MAP, VSG_LIGHTMAP_MAP, VSG_NORMAL_MAP, VSG_METALLROUGHNESS_MAP, VSG_SPECULAR_MAP, VSG_TWO_SIDED_LIGHTING, VSG_WORKFLOW_SPECGLOSS, VSG_SHADOWS_PCSS, VSG_SHADOWS_SOFT, VSG_SHADOWS_HARD, SHADOWMAP_DEBUG, VSG_ALPHA_TEST)
+#pragma import_defines (VSG_TEXTURECOORD_0, VSG_TEXTURECOORD_1, VSG_TEXTURECOORD_2, VSG_TEXTURECOORD_3, VSG_POINT_SPRITE, VSG_DIFFUSE_MAP, VSG_GREYSCALE_DIFFUSE_MAP, VSG_DETAIL_MAP, VSG_EMISSIVE_MAP, VSG_LIGHTMAP_MAP, VSG_NORMAL_MAP, VSG_METALLROUGHNESS_MAP, VSG_SPECULAR_MAP, VSG_TWO_SIDED_LIGHTING, VSG_WORKFLOW_SPECGLOSS, VSG_SHADOWS_PCSS, VSG_SHADOWS_SOFT, VSG_SHADOWS_HARD, SHADOWMAP_DEBUG, VSG_ALPHA_TEST)
 
 // define by default for backwards compatibility
 #define VSG_SHADOWS_HARD
@@ -86,10 +86,8 @@ layout(set = VIEW_DESCRIPTOR_SET, binding = 0) uniform LightData
 layout(location = 0) in vec3 eyePos;
 layout(location = 1) in vec3 normalDir;
 layout(location = 2) in vec4 vertexColor;
-#ifndef VSG_POINT_SPRITE
-layout(location = 3) in vec2 texCoord[VSG_TEXCOORD_COUNT];
-#endif
-layout(location = 6) in vec3 viewDir;
+layout(location = 3) in vec3 viewDir;
+layout(location = 4) in vec2 texCoord[VSG_TEXCOORD_COUNT];
 
 layout(location = 0) out vec4 outColor;
 
@@ -324,7 +322,9 @@ void main()
     float intensityMinimum = 0.001;
 
 #ifdef VSG_POINT_SPRITE
-    vec2 texCoord[1] = { gl_PointCoord.xy };
+    const vec2 texCoordDiffuse = gl_PointCoord.xy;
+#else
+    const vec2 texCoordDiffuse = texCoord[texCoordIndices.diffuseMap].st;
 #endif
 
     float perceptualRoughness = 0.0;
@@ -338,10 +338,10 @@ void main()
 
 #ifdef VSG_DIFFUSE_MAP
     #ifdef VSG_GREYSCALE_DIFFUSE_MAP
-        float v = texture(diffuseMap, texCoord[texCoordIndices.diffuseMap].st).s * pbr.baseColorFactor;
+        float v = texture(diffuseMap, texCoordDiffuse).s * pbr.baseColorFactor;
         baseColor = vertexColor * vec4(v, v, v, 1.0);
     #else
-        baseColor = vertexColor * texture(diffuseMap, texCoord[texCoordIndices.diffuseMap]) * pbr.baseColorFactor;
+        baseColor = vertexColor * texture(diffuseMap, texCoordDiffuse) * pbr.baseColorFactor;
     #endif
 #else
     baseColor = vertexColor * pbr.baseColorFactor;
