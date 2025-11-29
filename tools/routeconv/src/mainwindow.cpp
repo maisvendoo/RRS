@@ -93,6 +93,30 @@ bool MainWindow::createDescriptionFile(QString title, QString description)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool MainWindow::loadDescriptionFile(QString route_dir)
+{
+    CfgReader cfg;
+    if (cfg.load(route_dir + QDir::separator() + "description.xml"))
+    {
+        QString secName = "Route";
+        QString fieldName = "";
+        QString fieldValue = "";
+
+        fieldName = "Title";
+        cfg.getString(secName, fieldName, fieldValue);
+        ui->leRouteTitle->setText(fieldValue);
+
+        fieldName = "Description";
+        cfg.getString(secName, fieldName, fieldValue);
+        ui->teRouteDescription->setText(fieldValue);
+        return true;
+    }
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::startPathConverter()
 {
     FileSystem &fs = FileSystem::getInstance();
@@ -245,20 +269,10 @@ void MainWindow::slotOpenRoute()
     outputDir = routeDir;
     ui->lOutputPath->setText(relPath);
 
-    CfgReader cfg;
-    if (cfg.load(routeDir + QDir::separator() + "description.xml"))
+    if (!loadDescriptionFile(routeDir))
     {
-        QString secName = "Route";
-        QString fieldName = "";
-        QString fieldValue = "";
-
-        fieldName = "Title";
-        cfg.getString(secName, fieldName, fieldValue);
-        ui->leRouteTitle->setText(fieldValue);
-
-        fieldName = "Description";
-        cfg.getString(secName, fieldName, fieldValue);
-        ui->teRouteDescription->setText(fieldValue);
+        ui->leRouteTitle->setText("");
+        ui->teRouteDescription->setText("");
     }
 }
 
@@ -294,6 +308,9 @@ void MainWindow::slotSelectOutputPath()
     QDir dir(routesRootDir);
     QString relPath = dir.relativeFilePath(outputDir);
     ui->lOutputPath->setText(relPath);
+
+    if (ui->leRouteTitle->text().isEmpty() && ui->teRouteDescription->toPlainText().isEmpty())
+        loadDescriptionFile(outputDir);
 }
 
 //------------------------------------------------------------------------------
@@ -331,6 +348,7 @@ void MainWindow::slotConvert()
         return;
     }
 
+    ui->lStatus->setText(tr("Conversion..."));
     startPathConverter();
 }
 

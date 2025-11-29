@@ -314,7 +314,6 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_light_animation(
         const auto animation = ProcLightAnimation::create(vsg::ref_ptr(light_ptr));
         if (animation && animation->load(cfg))
         {
-            LOG_INFO("Loaded light config");
             const std::scoped_lock pdo_lock(pdo->mutex);
             pdo->tag(light_ptr);
             deferred_animations.emplace_back(DeferredAnimation{light_ptr, animation});

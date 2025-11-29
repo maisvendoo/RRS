@@ -48,6 +48,8 @@ private:
 
     bool createDescriptionFile(QString title, QString description);
 
+    bool loadDescriptionFile(QString route_dir);
+
     void startPathConverter();
 
     void startProfConverter();

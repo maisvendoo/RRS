@@ -223,7 +223,7 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
     display->setConfigDir(QString(cfgdir_path.c_str()));
     display->setAnimationSignalID(signal_id);
     display->init();
-    LOG_INFO("Config's directory %s for loaded display module %s ", cfgdir_path.c_str(), module_path.c_str());
+    LOG_INFO("Config's directory %s for loaded display module %s", cfgdir_path.c_str(), module_path.c_str());
 
     // Рендер дисплея, чтобы перерисовать текстуру на нужный размер до компиляции модели
     qimage = QImage(display->size(), QImage::Format_RGBA8888_Premultiplied);
