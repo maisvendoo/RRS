@@ -8,12 +8,17 @@
 int main(int argc, char* argv[])
 {
     {
-        FileSystem& fs = FileSystem::getInstance();
-        std::string log_filename = "dmd2gltf.log";
-        std::string log_backup = "~previous-" + log_filename;
+        const FileSystem& fs = FileSystem::getInstance();
 
-        Logger::instance().openFile((fs.getLogsDir() + fs.separator() + log_filename),
-                                    (fs.getLogsDir() + fs.separator() + log_backup));
+        constexpr const char* log_filename = "dmd2gltf.log";
+
+        char log_backup[64];
+        std::sprintf(log_backup, "~previous-%s", log_filename);
+
+        const std::string new_log_file = fs.getLogsDir() + fs.separator() + log_filename;
+        const std::string old_log_file = fs.getLogsDir() + fs.separator() + log_backup;
+
+        Logger::instance().openFile(new_log_file.c_str(), old_log_file.c_str());
         LOG_INFO("================================================================================");
         LOG_INFO("Logger initialized succesfully");
     }

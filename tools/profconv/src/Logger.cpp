@@ -1,74 +1,63 @@
 #include "Logger.h"
 
+#include <cstdarg>
 #include <cstdio>
-#include <map>
-#include <string>
 
-Logger& Logger::instance()
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Logger& Logger::instance() noexcept
 {
     static Logger logger;
     return logger;
 }
 
-Logger::~Logger()
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Logger::~Logger() noexcept
 {
-    if (file)
+    if (streams[1])
     {
-        fclose(file);
+        fclose(streams[1]);
     }
 }
 
-void Logger::log_message(LogLevel level, const char* file, int line, const char* message)
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Logger::openFile(const char* path, const char* backup_path)
+{
+    std::remove(backup_path);
+    std::rename(path, backup_path);
+    streams[1] = std::fopen(path, "w");
+
+    if (streams[1])
+        streams_count = 2;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Logger::log_message(LogLevel level, const char* file, int line, const char* format, ...) const
 {
     if (this->level > level)
     {
         return;
     }
 
-    print_ansi_escape_code(level);
-
-    std::fprintf(stderr, "%s", message);
-
-    if (level > LOG_LEVEL_WARN)
+    for (int i = 0; i < streams_count; ++i)
     {
-        std::fprintf(stderr, " | %s (%d)\033[0m\n", file, line);
-    }
-    else
-    {
-        std::fprintf(stderr, "\033[0m\n");
-    }
-
-    std::fprintf(this->file, "%s", message);
-
-    if (level > LOG_LEVEL_WARN)
-    {
-        std::fprintf(this->file, " | %s (%d)\n", file, line);
-    }
-    else
-    {
-        std::fprintf(this->file, "\n");
-    }
-}
-
-void Logger::openFile(const std::string& path, const std::string &backup_path)
-{
-    std::remove(backup_path.c_str());
-    std::rename(path.c_str(), backup_path.c_str());
-    file = fopen(path.c_str(), "w");
-}
-
-void Logger::print_ansi_escape_code(LogLevel level)
-{
-    const std::map<LogLevel, const char*> level_map = {
-        {LOG_LEVEL_DEBUG, ANSI_ESCAPE_CODE_GREEN},
-        {LOG_LEVEL_INFO, ANSI_ESCAPE_CODE_BLUE},
-        {LOG_LEVEL_WARN, ANSI_ESCAPE_CODE_YELLOW},
-        {LOG_LEVEL_ERROR, ANSI_ESCAPE_CODE_RED},
-        {LOG_LEVEL_FATAL, ANSI_ESCAPE_CODE_RED}
-    };
-
-    if (level_map.count(level))
-    {
-        std::fprintf(stderr, "%s", level_map.at(level));
+        std::va_list args;
+        va_start(args, format);
+        std::vfprintf(streams[i], format, args);
+        va_end(args);
+/*
+        if (level > LOG_LEVEL_INFO)
+        {
+            std::fprintf(streams[i], " | %s (%d)", file, line);
+        }
+*/
+        std::fputs("\n", streams[i]);
     }
 }

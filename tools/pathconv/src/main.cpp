@@ -19,6 +19,8 @@ int main(int argc, char *argv[])
         const std::string old_log_file = fs.getLogsDir() + fs.separator() + log_backup;
 
         Logger::instance().openFile(new_log_file.c_str(), old_log_file.c_str());
+        LOG_INFO("================================================================================");
+        LOG_INFO("Logger initialized succesfully");
     }
 
     {
