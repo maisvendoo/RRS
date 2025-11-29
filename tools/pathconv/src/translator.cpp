@@ -5,9 +5,7 @@
 #include    <QStringConverter>
 #include    <QTextStream>
 
-#include    <QDebug>
-
-#include    <path-funcs.h>
+#include    <Logger.h>
 
 //------------------------------------------------------------------------------
 //
@@ -100,7 +98,7 @@ void Translator::process(const QString& routeDir)
 
     if (!QDir(routeDirectory).exists())
     {
-        qDebug() << "Route directory is't found\n";
+        LOG_WARN("Warn: failed to found route directory: %s", routeDirectory.toStdString().c_str());
         return;
     }
 
@@ -135,10 +133,15 @@ bool Translator::translateFileContent(const QString& path, std::function<bool(QS
 
     if (old_file.open(QIODevice::ReadOnly))
     {
+        LOG_INFO("Info: opened file: %s", path.toStdString().c_str());
         QByteArray data = old_file.readAll();
         auto fromUtf8 = QStringDecoder(QStringConverter::System);
         content = fromUtf8(data);
         old_file.close();
+    }
+    else
+    {
+        LOG_WARN("Warn: failed to open file: %s", path.toStdString().c_str());
     }
 
     QString backup_path = path + ".bak";
@@ -146,6 +149,7 @@ bool Translator::translateFileContent(const QString& path, std::function<bool(QS
     {
         if (!old_file.rename(backup_path))
         {
+            LOG_WARN("Warn: failed to create backup file: %s", backup_path.toStdString().c_str());
             return false;
         }
     }
@@ -153,6 +157,7 @@ bool Translator::translateFileContent(const QString& path, std::function<bool(QS
     QFile new_file(path);
     if (!new_file.open(QIODevice::WriteOnly))
     {
+        LOG_WARN("Warn: failed to write transliterated file: %s", path.toStdString().c_str());
         old_file.rename(path);
         return false;
     }
@@ -161,8 +166,10 @@ bool Translator::translateFileContent(const QString& path, std::function<bool(QS
     QTextStream new_stream(&new_file);
     new_stream.setEncoding(QStringConverter::System);
 
+    int line_num = 0;
     while (!old_stream.atEnd())
     {
+        ++line_num;
         QString line = old_stream.readLine();
 
         if (line.isEmpty())
@@ -180,6 +187,8 @@ bool Translator::translateFileContent(const QString& path, std::function<bool(QS
         QString new_line = latin(line);
         if (line != new_line)
         {
+            LOG_WARN("Warn: line %u with non-latin symbols: %s", line_num, line.toStdString().c_str());
+            LOG_WARN("      rewrite to latin symbols only: %s", line.toStdString().c_str());
             new_stream << new_line << "\n";
         }
         else
@@ -215,7 +224,8 @@ bool Translator::translateFiles(const QString& routeDir)
 
         if (file.rename(new_path))
         {
-            qDebug() << "Renamed " << old_path << " to " << new_path << "\n";
+            LOG_WARN("Warn: renamed 3d-model file: %s", old_path.toStdString().c_str());
+            LOG_WARN("      to latin symbols only: %s", new_path.toStdString().c_str());
         }
     }
 
@@ -234,7 +244,8 @@ bool Translator::translateFiles(const QString& routeDir)
 
         if (file.rename(new_path))
         {
-            qDebug() << "Renamed " << old_path << " to " << new_path << "\n";
+            LOG_WARN("Warn: renamed texture file: %s", old_path.toStdString().c_str());
+            LOG_WARN("     to latin symbols only: %s", new_path.toStdString().c_str());
         }
     }
 
