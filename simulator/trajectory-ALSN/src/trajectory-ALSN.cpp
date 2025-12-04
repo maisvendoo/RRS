@@ -42,7 +42,7 @@ void TrajectoryALSN::step(double t, double dt)
     // так как он зашунтирован колёсными парами ПЕ
     double busy_begin_coord;
     double busy_end_coord;
-    trajectory->getBusyCoords(busy_end_coord, busy_begin_coord);
+    trajectory->getBusyCoords(busy_begin_coord, busy_end_coord);
 
     // Задаём приёмным катушкам информацию о следующем светофоре,
     // а возле начала и конца занятого участка - и код АЛСН
@@ -74,7 +74,7 @@ void TrajectoryALSN::step(double t, double dt)
             }
 
             // Проверяем координату с запасом в 1 метр
-            if ((busy_begin_coord - device.coord) < 1.0)
+            if ((busy_end_coord - device.coord) < 1.0)
             {
                 // Несущая частота сигнала, Гц
                 device.device->setInputSignal(CoilALSN::INPUT_FREQUENCY, frequency);
@@ -114,7 +114,7 @@ void TrajectoryALSN::step(double t, double dt)
             }
 
             // Проверяем координату с запасом в 1 метр
-            if ((busy_end_coord - device.coord) > -1.0)
+            if ((busy_begin_coord - device.coord) > -1.0)
             {
                 // Несущая частота сигнала, Гц
                 device.device->setInputSignal(CoilALSN::INPUT_FREQUENCY, frequency);

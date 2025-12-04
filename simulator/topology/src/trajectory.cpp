@@ -314,13 +314,13 @@ void Trajectory::getBusyCoords(double &busy_begin_coord, double &busy_end_coord)
     busy_end_coord = 0.0;
     if (is_busy)
     {
-        for (auto vehicle_coord : vehicles_coords)
+        for (const auto& vehicle_coord : vehicles_coords)
         {
-            if (busy_begin_coord > vehicle_coord[1])
-                busy_begin_coord = vehicle_coord[1];
+            if (busy_begin_coord > vehicle_coord[0])
+                busy_begin_coord = vehicle_coord[0];
 
-            if (busy_end_coord < vehicle_coord[0])
-                busy_end_coord = vehicle_coord[0];
+            if (busy_end_coord < vehicle_coord[1])
+                busy_end_coord = vehicle_coord[1];
         }
     }
 }
