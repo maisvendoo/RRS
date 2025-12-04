@@ -15,6 +15,7 @@ SpeedMap::SpeedMap(QObject *parent) : Device(parent)
     output_signals[OUTPUT_SEARCH_DIRECTION] = 1.0;
     output_signals[OUTPUT_CUR_SEARCH_DISTANCE] = 50.0;
     output_signals[OUTPUT_NEXT_SEARCH_DISTANCE] = 5000.0;
+    output_signals[OUTPUT_BRAKE_ACCELERATION] = 0.7;
     input_signals[INPUT_CURRENT_LIMIT] = 300.0;
     input_signals[INPUT_NEXT_LIMIT] = 300.0;
     input_signals[INPUT_NEXT_DISTANCE] = 5000.0;
