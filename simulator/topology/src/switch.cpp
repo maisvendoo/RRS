@@ -263,7 +263,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 
         // Настраиваем связи модулей траекторий и коннектора,
         // параллельно топологии
-        bool no_plus;
+        bool no_plus = true;
         if (bwdPlusTraj != nullptr)
         {
             no_plus = false;
@@ -278,10 +278,6 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
                 }
             }
         }
-        else
-        {
-            no_plus = true;
-        }
 
         if (bwdMinusTraj != nullptr)
         {
@@ -290,7 +286,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
                 QString bwd_name = device_bwd->getName();
                 if (device_name == bwd_name)
                 {
-                    if (no_plus)
+                    if (no_plus || (state_bwd == -1))
                         module->setBwdTrajectoryDevice(device_bwd);
                     device_bwd->setFwdConnectorDevice(module);
                     break;
@@ -298,6 +294,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
             }
         }
 
+        no_plus = true;
         if (fwdPlusTraj != nullptr)
         {
             no_plus = false;
@@ -312,10 +309,6 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
                 }
             }
         }
-        else
-        {
-            no_plus = true;
-        }
 
         if (fwdMinusTraj != nullptr)
         {
@@ -324,7 +317,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
                 QString fwd_name = device_fwd->getName();
                 if (device_name == fwd_name)
                 {
-                    if (no_plus)
+                    if (no_plus || (state_fwd == -1))
                         module->setFwdTrajectoryDevice(device_fwd);
                     device_fwd->setBwdConnectorDevice(module);
                     break;
