@@ -6,13 +6,7 @@
 //
 //------------------------------------------------------------------------------
 AirDist483::AirDist483() : AirDistributor ()
-  , switchProfile(1)
-  , switchPayload(1)
 {
-    v[RK] = 0.006;
-    v[ZK] = 0.0045;
-    v[KDR] = 0.0005;
-    Q.fill(0.0);
     k.fill(0.0);
     A.fill(0.0);
     p.fill(0.0);
@@ -21,22 +15,25 @@ AirDist483::AirDist483() : AirDistributor ()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AirDist483::~AirDist483()
+void AirDist483::init(double pBP, double pFL)
 {
+    (void) pFL;
 
+    setY(RK, pBP);
+    setY(ZK, pBP);
+    setY(KDR, 0.0);
 }
 
+#ifndef NDEBUG
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AirDist483::init(double pBP, double pFL)
+QString AirDist483::getDebugMsg() const
 {
-    Q_UNUSED(pFL)
-
-    y[RK] = pBP;
-    y[ZK] = pBP;
-    y[KDR] = 0.0;
+    is_upd = false;
+    return DebugMsg;
 }
+#endif
 
 //------------------------------------------------------------------------------
 //
@@ -82,7 +79,7 @@ void AirDist483::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void AirDist483::preStep(state_vector_t &Y, double t)
 {
-    Q_UNUSED(t)
+    (void) t;
 
     // Y[0] - Давление в рабочей камере (РК)
     // Y[1] - Давление в золотниковой камере (ЗК)
@@ -161,16 +158,11 @@ void AirDist483::preStep(state_vector_t &Y, double t)
     QSR = Q_bp_sr - Q_sr_bc_fast - Q_sr_bc_slow;
     // Расход воздуха в ТМ
     QBP = - Q_bp_sr - Q_mk_zk_pl - Q_mk_zk_km - Q_mk_rk_pd - Q_mk_kdr_dop;
-/*
-    DebugMsg = QString("483:RK%1|ZK%2|KDR%3|poz_d%4|poz_gp%5|poz_up:%6")
-            .arg(10.0 * Y[RK], 6, 'f', 3)
-            .arg(10.0 * Y[ZK], 6, 'f', 3)
-            .arg(10.0 * Y[KDR], 6, 'f', 3)
-            .arg(poz_d, 6, 'f', 3)
-            .arg(poz_gp, 6, 'f', 3)
-            .arg(poz_up, 6, 'f', 3);
-*/
-/*
+
+#ifndef NDEBUG
+    if (is_upd)
+        return;
+
 //    QString("  time  ; pBP   ; pBC   ; pSR   ; pRK   ; pZK   ; pKDR  ; pBCref; BPsr   ; MKzk km; MKzk pl; ZKrk gp; ZKrk pd; MKrk pd; ZKkdr  ; ZKkdr d; MKkdr d; KDRbc  ; KDRatm ; KDRatmd; SRbc f ; SRbc s ; BCatm  ; poz d ; poz gp; poz up");
     DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16;%17;%18;%19;%20;%21;%22;%23;%24;%25;26")
                    .arg(t, 8, 'f', 3)
@@ -199,7 +191,8 @@ void AirDist483::preStep(state_vector_t &Y, double t)
                    .arg(poz_d, 7, 'f', 4)            //%24
                    .arg(poz_gp, 7, 'f', 4)
                    .arg(poz_up, 7, 'f', 4);
-*/
+    is_upd = true;
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -209,8 +202,8 @@ void AirDist483::ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
                             double t)
 {
-    Q_UNUSED(t)
-    Q_UNUSED(Y)
+    (void) t;
+    (void) Y;
 
     // Изменение давления в РК
     dYdt[RK] = Q[RK] / v[RK];

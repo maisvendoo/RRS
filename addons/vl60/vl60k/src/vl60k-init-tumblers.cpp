@@ -6,6 +6,7 @@
 #include    "pneumo-brake-lock.h"
 #include    "pneumo-anglecock.h"
 #include    "pneumo-hose.h"
+#include    "kme-60-044.h"
 //#include    "shield-223.h"
 //#include    "shield-225.h"
 //#include    "shield-229.h"
@@ -106,6 +107,9 @@ void VL60k::initControl(const QString& modules_dir, const QString& custom_cfg_di
 
     for (auto cab_idx : {CAB1, CAB2})
     {
+        // Контроллер машиниста
+        controller[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
+
         // Устройство блокировки тормозов усл.№ 367
         brake_lock[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
 
