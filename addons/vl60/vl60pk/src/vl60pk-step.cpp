@@ -55,7 +55,8 @@ void VL60pk::slotAutoStart()
         start_count = 0;
         controller[autostart_cab]->setReversHandlePos(REVERS_FORWARD);
 
-        controller[autostart_cab]->setControl(&pressed_keys_by_cabine[autostart_cab]);
+        controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        controller[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
         brake_lock[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
         brake_lock[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
         epk[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
