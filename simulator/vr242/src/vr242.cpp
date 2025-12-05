@@ -6,16 +6,6 @@
 //
 //------------------------------------------------------------------------------
 AirDist242::AirDist242() : AirDistributor ()
-  , long_train_mode(false)
-  , emergency_mode(false)
-  , Vuk(1.0e-3)
-  , Quk(0.0)
-  , pu2(0.039)
-  , pbv(0.15)
-  , psv(0.025)
-  , pwv(0.48)
-  , s1_min(-0.015)
-  , s1_max(0.015)
 {
     K.fill(0.0);
     A.fill(0.0);
@@ -24,28 +14,30 @@ AirDist242::AirDist242() : AirDistributor ()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AirDist242::~AirDist242()
+void AirDist242::init(double pBP, double pFL)
 {
+    (void) pFL;
 
+    setY(UK, pBP);
 }
 
+#ifndef NDEBUG
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AirDist242::init(double pBP, double pFL)
+QString AirDist242::getDebugMsg() const
 {
-    Q_UNUSED(pFL)
-
-    setY(0, pBP);
+    is_upd = false;
+    return DebugMsg;
 }
+#endif
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void AirDist242::preStep(state_vector_t &Y, double t)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(t)
+    (void) t;
 
     // Перемещение главного поршня
     double s1 = dead_zone((pSR - pBP), s1_min, s1_max);
@@ -66,7 +58,7 @@ void AirDist242::preStep(state_vector_t &Y, double t)
     double vb = static_cast<double>((!long_train_mode) || (pBC < pbv));
 
     // Срывной клапан ускорения экстренного торможения
-    double vs = static_cast<double>(emergency_mode && ((Y[0] - pBP) > psv));
+    double vs = static_cast<double>(emergency_mode && ((Y[UK] - pBP) > psv));
 
     // Клапан широкого канала ускорительной камеры при сверхзарядном давлении
     double vw = hs_p(pBP - pwv);
@@ -75,7 +67,7 @@ void AirDist242::preStep(state_vector_t &Y, double t)
     double Q_bp_sr = K[1] * v2 * (pBP - pSR);
 
     // Поток из тормозной магистрали в ускорительную камеру
-    double Q_bp_uk = (K[2] + K[3] * vw) * (pBP - Y[0]);
+    double Q_bp_uk = (K[2] + K[3] * vw) * (pBP - Y[UK]);
 
     // Поток из запасного резервуара в магистраль тормозных цилиндров
     double Q_sr_bc = (K[4] + K[5] * vb) * v11 * (pSR - pBC);
@@ -103,22 +95,17 @@ void AirDist242::preStep(state_vector_t &Y, double t)
     // Поток в ускорительную камеру
     Quk = Q_bp_uk;
 
-/*
-    DebugMsg = QString("242:UK%1|vBC+:%2|vTM-:%3|vBC-:%4|vY2:%5|")
-            .arg(10.0 * Y[0], 6, 'f', 3)
-            .arg(v11, 4, 'f', 2)
-            .arg(v12, 4, 'f', 2)
-            .arg(v1, 4, 'f', 2)
-            .arg(v2, 4, 'f', 2);
-*/
-/*
+#ifndef NDEBUG
+    if (is_upd)
+        return;
+
 //    QString("  time  ; pBP   ; pBC   ; pSR   ; pUK   ; BPsr   ; BPuk   ; SRbc   ; BCatm  ; BPbc   ; BPatm  ; v11; v12; v1 ; v2 ; vb ; vs ; vw ");
     DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16;%17;%18")
             .arg(t, 8, 'f', 3)
             .arg(10*pBP, 7, 'f', 5)
             .arg(10*pBC, 7, 'f', 5)         //%3
             .arg(10*pSR, 7, 'f', 5)
-            .arg(10*Y[0], 7, 'f', 5)
+            .arg(10*Y[UK], 7, 'f', 5)
             .arg(10000*Q_bp_sr, 8, 'f', 5)  //%6
             .arg(10000*Q_bp_uk, 8, 'f', 5)
             .arg(10000*Q_sr_bc, 8, 'f', 5)
@@ -132,7 +119,8 @@ void AirDist242::preStep(state_vector_t &Y, double t)
             .arg(vb, 4, 'f', 1)
             .arg(vs, 4, 'f', 1)
             .arg(vw, 4, 'f', 1);            //%18
-*/
+    is_upd = true;
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -142,9 +130,10 @@ void AirDist242::ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
                             double t)
 {
-    Q_UNUSED(t)
-    Q_UNUSED(Y)
-    dYdt[0] = Quk / Vuk;
+    (void) t;
+    (void) Y;
+
+    dYdt[UK] = Quk / Vuk;
 }
 
 //------------------------------------------------------------------------------

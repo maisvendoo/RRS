@@ -6,12 +6,6 @@
 //
 //------------------------------------------------------------------------------
 AirDist292::AirDist292() : AirDistributor ()
-  , long_train_mode(0)
-  , Vkd(1.0e-3)
-  , Qkd(0.0)
-  , disjunction_z_pos(0.0)
-  , main_z_pos(0.0)
-  , main_z_eps(0.015)
 {
     p.fill(0.0);
     K.fill(0.0);
@@ -21,27 +15,29 @@ AirDist292::AirDist292() : AirDistributor ()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AirDist292::~AirDist292()
+void AirDist292::init(double pBP, double pFL)
 {
-
+    (void) pBP;
+    (void) pFL;
 }
 
+#ifndef NDEBUG
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AirDist292::init(double pBP, double pFL)
+QString AirDist292::getDebugMsg() const
 {
-    Q_UNUSED(pBP)
-    Q_UNUSED(pFL)
+    is_upd = false;
+    return DebugMsg;
 }
+#endif
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void AirDist292::preStep(state_vector_t &Y, double t)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(t)
+    (void) t;
 
     // Условное положение магистрального поршня и отсекательного золотника
     // с учётом трения
@@ -153,7 +149,11 @@ void AirDist292::preStep(state_vector_t &Y, double t)
 
     // Поток в камеру дополнительной разрядки ТМ
     Qkd = Q_bp_kd - Q_kd_atm;
-/*
+
+#ifndef NDEBUG
+    if (is_upd)
+        return;
+
 //    QString("  time  ; pBP   ; pBC   ; pSR   ; pKDR  ; BPsr   ; BPkdr  ; KDRatm ; SRbc   ; BCatm  ; BPatm  ; mainS  ; disjZ  ; zdiff  ; zdA2 ; dopSR; vemrg");
     DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16;%17")
             .arg(t, 8, 'f', 3)
@@ -173,7 +173,8 @@ void AirDist292::preStep(state_vector_t &Y, double t)
             .arg(std::clamp(A[2] * (disjunction_z_pos - main_z_pos), -1.0, 1.0), 6, 'f', 3) //%15
             .arg(std::clamp(A[1] * (disjunction_z_pos - p[2]), 0.0, 1.0), 6, 'f', 3)
             .arg((main_z_pos > p[4])*std::clamp(A[0] * (pBP - pBC - p[0]), 0.0, 1.0), 6, 'f', 3);
-*/
+    is_upd = true;
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -183,8 +184,9 @@ void AirDist292::ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
                             double t)
 {
-    Q_UNUSED(t)
-    Q_UNUSED(Y)
+    (void) Y;
+    (void) t;
+
     dYdt[KDR] = Qkd / Vkd;
 }
 
