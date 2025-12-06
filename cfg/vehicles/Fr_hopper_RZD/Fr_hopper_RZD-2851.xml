@@ -38,5 +38,7 @@
 
 		<BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
 
+		<DriverPos>2 -7.5 1.5</DriverPos>
+		
 	</Vehicle>
 </Config>
