@@ -36,6 +36,8 @@
 		<BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
 
 		<GenReductorCoeff>2.96</GenReductorCoeff>
-
+		
+		<DriverPos>2 -9 1.5</DriverPos>
+		
 	</Vehicle>
 </Config>
