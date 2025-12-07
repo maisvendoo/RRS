@@ -37,7 +37,11 @@
 
 		<GenReductorCoeff>2.96</GenReductorCoeff>
 
-		<DriverPos>2 -9 1.5</DriverPos>
-		
 	</Vehicle>
+
+	<Cabine>
+		<DriverPos>2.5 -13 1.5</DriverPos>
+		<DriverDir>10.0</DriverDir>
+	</Cabine>
+
 </Config>
