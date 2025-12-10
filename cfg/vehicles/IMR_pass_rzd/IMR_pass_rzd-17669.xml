@@ -40,8 +40,8 @@
 	</Vehicle>
 
 	<Cabine>
-		<DriverPos>2.0 11.8 2.5</DriverPos>
-		<DriverDir>10.0</DriverDir>
+		<DriverPos>2.0 12.0 2.5</DriverPos>
+		<DriverDir>30.0</DriverDir>
 	</Cabine>
 
 </Config>

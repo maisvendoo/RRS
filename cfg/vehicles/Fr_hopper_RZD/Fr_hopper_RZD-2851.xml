@@ -42,7 +42,7 @@
 
 	<Cabine>
 		<DriverPos>2 5.4 2.5</DriverPos>
-		<DriverDir>10.0</DriverDir>
+		<DriverDir>30.0</DriverDir>
 	</Cabine>
 
 </Config>
