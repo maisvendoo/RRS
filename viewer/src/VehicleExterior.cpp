@@ -71,11 +71,37 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
     }
 
     // Camera positions in vehicle cabines
+    load_cabine_positions(cfg_path, cfg);
+
+    // Vehicle sounds
+    load_sounds(cfg_path, cfg, sm);
+
+    // Reading data about body's 3D-model
+    load_body_model(cfg_path, cfg, options);
+
+    // Reading data about cabine's 3D-model
+    load_cabine_model(cfg_path, cfg, options);
+
+    transform->setValue("name", cfg_file);
+    return (transform->children.size() > 0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VehicleExterior::load_cabine_positions(const std::string &cfg_path, CfgReader &cfg)
+{
+    QDomNode secNode = cfg.getFirstSection("Cabine");
+    if (secNode.isNull())
+    {
+        LOG_WARN("Fail to find section <Cabine> in config file: %s", cfg_path.c_str());
+        return false;
+    }
+
     driver_pos.clear();
     driver_dir.clear();
 
-    QDomNode secNode = cfg.getFirstSection("Cabine");
-    while (!secNode.isNull())
+    while (true)
     {
         vsg::dvec3 dp = {0.0, 0.0, 0.0};
         QString DriverPos = "";
@@ -91,26 +117,46 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
         driver_dir.push_back(vsg::radians(dd));
 
         secNode = cfg.getNextSection();
+        if (secNode.isNull())
+            return true;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VehicleExterior::load_sounds(const std::string &cfg_path, CfgReader &cfg, SoundManager* sm)
+{
+    QString soundsDir = "";
+    cfg.getString("Vehicle", "SoundDir", soundsDir);
+    if (soundsDir.isEmpty())
+    {
+        LOG_WARN("Fail to read parameter <SoundDir> in config file: %s", cfg_path.c_str());
+        return false;
     }
 
-    const QString sec_name = "Vehicle";
-
-    // Vehicle sounds
-    QString soundsDir = "";
-    cfg.getString(sec_name, "SoundDir", soundsDir);
     const std::string sounds_dir = soundsDir.toStdString();
-    load_sounds(sounds_dir, sm);
+    sounds_id = sm->loadVehicleSounds(sounds_dir);
+    LOG_INFO("Loaded %u sounds from %s", sounds_id.size(), sounds_dir.c_str());
+    return true;
+}
 
-    // Reading data about body's 3D-model
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VehicleExterior::load_body_model(const std::string &cfg_path, CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
+{
+    const QString section_name = "Vehicle";
     QString modelName = "";
 
-    cfg.getString(sec_name, "ExtModelName", modelName);
+    cfg.getString(section_name, "ExtModelName", modelName);
     if (modelName.isEmpty())
     {
         LOG_WARN("Fail to read parameter <ExtModelName> in config file: %s", cfg_path.c_str());
         return false;
     }
 
+    FileSystem& fs = FileSystem::getInstance();
     std::string model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), modelName.toStdString());
     if (!vsg::fileExists(model_filename_path))
     {
@@ -119,12 +165,12 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
     }
 
     QString animationsDir = "";
-    cfg.getString(sec_name, "AnimationsConfigDir", animationsDir);
+    cfg.getString(section_name, "AnimationsConfigDir", animationsDir);
     const std::string animations_dir = animationsDir.toStdString();
 
     QString modelShift = "";
     vsg::dvec3 shift(0.0, 0.0, 0.0);
-    if (cfg.getString(sec_name, "ModelShift", modelShift))
+    if (cfg.getString(section_name, "ModelShift", modelShift))
     {
         std::istringstream ss(modelShift.toStdString());
         ss >> shift.x >> shift.y >> shift.z;
@@ -144,59 +190,57 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
     vehicle_node->addChild(vehicle_pagedLOD);
     animated_nodes.push_back(vehicle_pagedLOD);
 
-    // Reading data about cabine's 3D-model
-    modelName = "";
-
-    cfg.getString(sec_name, "CabineModel", modelName);
-
-    if (!modelName.isEmpty())
-    {
-        model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), modelName.toStdString());
-
-        if (vsg::fileExists(model_filename_path))
-        {
-            modelShift = "";
-            shift = {0.0, 0.0, 0.0};
-            if (cfg.getString(sec_name, "CabineShift", modelShift))
-            {
-                std::istringstream ss(modelShift.toStdString());
-                ss >> shift.x >> shift.y >> shift.z;
-            }
-
-            auto cabine_node = vsg::MatrixTransform::create();
-            cabine_node->matrix = vsg::translate(shift);
-            cabine_node->setValue("name", "cabine");
-            transform->addChild(cabine_node);
-            transform->setValue("name", "vehicle + cabine");
-
-            vsg::ref_ptr<AnimatedPagedLOD> cabine_pagedLOD = AnimatedPagedLOD::create();
-            cabine_pagedLOD->animations_dir = animations_dir;
-            cabine_pagedLOD->filename = model_filename_path;
-            cabine_pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-            cabine_pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
-            cabine_pagedLOD->options = options;
-            cabine_node->addChild(cabine_pagedLOD);
-            animated_nodes.push_back(cabine_pagedLOD);
-        }
-        else
-        {
-            LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
-            transform->setValue("name", "only vehicle");
-        }
-    }
-    else
-    {
-        transform->setValue("name", "only vehicle");
-    }
-
     return true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleExterior::load_sounds(const std::string& sounds_dir, SoundManager* sm)
+bool VehicleExterior::load_cabine_model(const std::string &cfg_path, CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
 {
-    sounds_id = sm->loadVehicleSounds(sounds_dir);
-    LOG_INFO("Loaded %u sounds from %s", sounds_id.size(), sounds_dir.c_str());
+    const QString section_name = "Vehicle";
+    QString modelName = "";
+
+    cfg.getString(section_name, "CabineModel", modelName);
+    if (modelName.isEmpty())
+    {
+        //LOG_WARN("Fail to read parameter <CabineModel> in config file: %s", cfg_path.c_str());
+        return false;
+    }
+
+    FileSystem& fs = FileSystem::getInstance();
+    std::string model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), modelName.toStdString());
+    if (!vsg::fileExists(model_filename_path))
+    {
+        LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
+        return false;
+    }
+
+    QString animationsDir = "";
+    cfg.getString(section_name, "AnimationsConfigDir", animationsDir);
+    const std::string animations_dir = animationsDir.toStdString();
+
+    QString modelShift = "";
+    vsg::dvec3 shift(0.0, 0.0, 0.0);
+    if (cfg.getString(section_name, "CabineShift", modelShift))
+    {
+        std::istringstream ss(modelShift.toStdString());
+        ss >> shift.x >> shift.y >> shift.z;
+    }
+
+    vsg::ref_ptr<vsg::MatrixTransform> cabine_node = vsg::MatrixTransform::create();
+    cabine_node->matrix = vsg::translate(shift);
+    cabine_node->setValue("name", "cabine");
+    transform->addChild(cabine_node);
+
+    vsg::ref_ptr<AnimatedPagedLOD> cabine_pagedLOD = AnimatedPagedLOD::create();
+    cabine_pagedLOD->animations_dir = animations_dir;
+    cabine_pagedLOD->filename = model_filename_path;
+    cabine_pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
+    cabine_pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
+    cabine_pagedLOD->options = options;
+    cabine_node->addChild(cabine_pagedLOD);
+    animated_nodes.push_back(cabine_pagedLOD);
+
+    return true;
 }

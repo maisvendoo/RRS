@@ -55,7 +55,13 @@ public:
                      vsg::ref_ptr<vsg::Options> options);
 
 private:
-    void load_sounds(const std::string& sounds_dir, SoundManager* sm);
+
+    bool load_cabine_positions(const std::string& cfg_path, CfgReader& cfg);
+
+    bool load_sounds(const std::string& cfg_path, CfgReader& cfg, SoundManager* sm);
+
+    bool load_body_model(const std::string& cfg_path, CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
+    bool load_cabine_model(const std::string& cfg_path, CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
 };
 
 #endif // VEHICLE_EXTERIOR_H
