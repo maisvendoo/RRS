@@ -13,6 +13,20 @@ void FreightCar::initControl(const QString& modules_dir, const QString& custom_c
     (void) modules_dir;
     (void) custom_cfg_dir;
 
+    // Сигнальный диск "Хвост грузового поезда" на переднем буферном брусе
+    disk_end_of_train_fwd.setKeySymbolOn(KEY_G);
+    disk_end_of_train_fwd.setKeyModifierOn(MODIFIER_OnlyShift);
+    disk_end_of_train_fwd.setKeySymbolOff(KEY_G);
+    disk_end_of_train_fwd.setKeyModifierOff(MODIFIER_OnlyControl);
+    disk_end_of_train_fwd.setControl(&pressed_keys);
+
+    // Сигнальный диск "Хвост грузового поезда" на заднем буферном брусе
+    disk_end_of_train_bwd.setKeySymbolOn(KEY_J);
+    disk_end_of_train_bwd.setKeyModifierOn(MODIFIER_OnlyShift);
+    disk_end_of_train_bwd.setKeySymbolOff(KEY_J);
+    disk_end_of_train_bwd.setKeyModifierOff(MODIFIER_OnlyControl);
+    disk_end_of_train_bwd.setControl(&pressed_keys);
+
     // Расцепные рычаги
     oper_rod_fwd->setKeySymbol(KEY_X);
     oper_rod_fwd->setControl(&pressed_keys);

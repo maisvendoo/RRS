@@ -35,6 +35,10 @@ void FreightCar::initBrakeDevices(double p0, double pBP, double pFL)
     hose_bp_fwd->setPressure(pBP);
     hose_bp_bwd->setPressure(pBP);
 
+    // Сигнальные диски "Хвост грузового поезда"
+    disk_end_of_train_fwd.setInitState(prev_vehicle == nullptr);
+    disk_end_of_train_bwd.setInitState(next_vehicle == nullptr);
+
     // Состояние рукавов и концевых кранов тормозной магистрали
     if (hose_bp_fwd->isLinked())
     {

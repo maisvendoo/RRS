@@ -2,6 +2,7 @@
 #define     FREIGHTCAR_H
 
 #include "vehicle.h"
+#include "trigger-control.h"
 
 #include <QString>
 
@@ -30,6 +31,11 @@ public:
     void initBrakeDevices(double p0, double pBP, double pFL) override;
 
 private:
+
+    /// Сигнальный диск "Хвост грузового поезда" на переднем буферном брусе
+    TriggerControl disk_end_of_train_fwd;
+    /// Сигнальный диск "Хвост грузового поезда" на заднем буферном брусе
+    TriggerControl disk_end_of_train_bwd;
 
     /// Сцепка спереди
     Coupling *coupling_fwd = nullptr;
