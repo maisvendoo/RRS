@@ -8,8 +8,8 @@
 		<WheelDiameter>0.95</WheelDiameter>
 		<MainResist>default</MainResist>
 		<NumAxis>4</NumAxis>
-		<SoundDir>freight</SoundDir>
 		<WheelInertia>100.0</WheelInertia>
+		<SoundDir>freight</SoundDir>
 
 		<BrakepipeLeak>3e-6</BrakepipeLeak>
 
@@ -39,12 +39,12 @@
 
 
 	<Cabine>
-		<DriverPos>2 5.4 2.5</DriverPos>
+		<DriverPos>2.0 5.4 2.5</DriverPos>
 		<DriverDir>30.0</DriverDir>
 	</Cabine>
 
 	<Cabine>
-		<DriverPos>-2 -5.4 2.5</DriverPos>
+		<DriverPos>-2.0 -5.4 2.5</DriverPos>
 		<DriverDir>-150.0</DriverDir>
 	</Cabine>
 

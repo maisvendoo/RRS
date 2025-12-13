@@ -8,11 +8,8 @@
 		<WheelDiameter>0.95</WheelDiameter>
 		<MainResist>passcar</MainResist>
 		<NumAxis>4</NumAxis>
-		<SoundDir>pass</SoundDir>
 		<WheelInertia>100.0</WheelInertia>
-
-		<ExtModelName>IMR_pass_rzd/Pass_CupAmm4.gltf</ExtModelName>
-		<AnimationsConfigDir>passcar-oy</AnimationsConfigDir>
+		<SoundDir>pass</SoundDir>
 
 		<BrakepipeLeak>3e-6</BrakepipeLeak>
 
@@ -39,9 +36,21 @@
 
 	</Vehicle>
 
+
 	<Cabine>
 		<DriverPos>2.0 12.0 2.5</DriverPos>
 		<DriverDir>30.0</DriverDir>
 	</Cabine>
+
+	<Cabine>
+		<DriverPos>-2.0 -12.0 2.5</DriverPos>
+		<DriverDir>-150.0</DriverDir>
+	</Cabine>
+
+
+	<Model>
+		<ModelName>IMR_pass_rzd/Pass_CupAmm4.gltf</ModelName>
+		<AnimationsConfigDir>passcar-oy</AnimationsConfigDir>
+	</Model>
 
 </Config>

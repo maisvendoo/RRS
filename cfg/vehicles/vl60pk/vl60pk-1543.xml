@@ -10,15 +10,8 @@
 		<NumAxis>6</NumAxis>
 		<WheelInertia>100.0</WheelInertia>
 		<SoundDir>vl60</SoundDir>
-		<AnimationsConfigDir>vl60</AnimationsConfigDir>
 
 		<ReductorCoeff>2.73</ReductorCoeff>
-
-		<ExtModelName>VL60pk-1543/VL60pk-1543.gltf</ExtModelName>
-		<ModelShift>0.0 0.0 0.312</ModelShift>
-
-		<CabineModel>VL60pk-1543/VL60pk-cabview.gltf</CabineModel>
-		<CabineShift>0.0 0.0 0.317</CabineShift>
 
 		<CouplingModule>sa3</CouplingModule>
 		<CouplingConfig>sa3</CouplingConfig>
@@ -36,6 +29,7 @@
 		<ElectroAirDistConfig>evr305</ElectroAirDistConfig>
 	</Vehicle>
 
+
 	<Cabine>
 		<DriverPos>0.8 8.4 3.6</DriverPos>
 		<DriverDir>0.0</DriverDir>
@@ -45,5 +39,18 @@
 		<DriverPos>-0.8 -8.4 3.6</DriverPos>
 		<DriverDir>180.0</DriverDir>
 	</Cabine>
+
+
+	<Model>
+		<ModelName>VL60pk-1543/VL60pk-1543.gltf</ModelName>
+		<ModelShift>0.0 0.0 0.312</ModelShift>
+		<AnimationsConfigDir>vl60</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>VL60pk-1543/VL60pk-cabview.gltf</ModelName>
+		<ModelShift>0.0 0.0 0.317</ModelShift>
+		<AnimationsConfigDir>vl60</AnimationsConfigDir>
+	</Model>
 
 </Config>

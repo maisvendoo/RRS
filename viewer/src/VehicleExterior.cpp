@@ -180,7 +180,7 @@ bool VehicleExterior::load_models(const std::string &cfg_path, CfgReader &cfg, v
 
         FileSystem& fs = FileSystem::getInstance();
         const std::string model_filename = tmp_qstring.toStdString();
-        const std::string model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), tmp_qstring.toStdString());
+        const std::string model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), model_filename);
         if (!vsg::fileExists(model_filename_path))
         {
             LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
