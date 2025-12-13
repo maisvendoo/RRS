@@ -14,7 +14,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>11</SignalID>
+		<SignalID>13</SignalID>
 		<Filename>10-20.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -25,7 +25,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>12</SignalID>
+		<SignalID>14</SignalID>
 		<Filename>20-30.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -36,7 +36,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>13</SignalID>
+		<SignalID>15</SignalID>
 		<Filename>30-40.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -47,7 +47,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>14</SignalID>
+		<SignalID>16</SignalID>
 		<Filename>40-50.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -58,7 +58,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>15</SignalID>
+		<SignalID>17</SignalID>
 		<Filename>50-60.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -69,7 +69,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>16</SignalID>
+		<SignalID>18</SignalID>
 		<Filename>60-70.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -80,7 +80,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>17</SignalID>
+		<SignalID>19</SignalID>
 		<Filename>70-80.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
