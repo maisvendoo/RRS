@@ -177,7 +177,7 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
             return animation;
         }
 
-                animation = create_material_animation<FindMaterialAnimationVisitor>("MaterialAnimation", cfg, &group, name);
+        animation = create_material_animation<FindMaterialAnimationVisitor>("MaterialAnimation", cfg, &group, name);
         if (animation)
         {
             return animation;

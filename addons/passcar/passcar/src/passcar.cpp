@@ -85,6 +85,9 @@ void PassCar::initialization()
 //------------------------------------------------------------------------------
 void PassCar::process(const simulator_time_t& t, const double& dt)
 {
+    red_lamps_end_of_train_fwd.step();
+    red_lamps_end_of_train_bwd.step();
+
     if (needDebugMsg)
         debugPrint(t, dt);
 
