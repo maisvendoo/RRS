@@ -12,6 +12,8 @@
 		<WheelInertia>100.0</WheelInertia>
 
 		<ExtModelName>FrWag_hopper_1/Fr_hopper-1.gltf</ExtModelName>
+		<CabineModel>default-objects/Disk_end_of_train_bwd.gltf</CabineModel>
+		<CabineShift>1.05 -6.74 1.492</CabineShift>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 
 		<BrakepipeLeak>3e-6</BrakepipeLeak>
