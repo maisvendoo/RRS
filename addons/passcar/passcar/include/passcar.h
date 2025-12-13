@@ -8,6 +8,7 @@
 #define     PASSCAR_H
 
 #include "vehicle.h"
+#include "trigger-control.h"
 
 #include <QString>
 
@@ -35,6 +36,11 @@ public:
     void initBrakeDevices(double p0, double pTM, double pFL) override;
 
 private:
+
+    /// Включение трёх красных огней на передней торцевой стенке
+    TriggerControl red_lamps_end_of_train_fwd;
+    /// Включение трёх красных огней на задней торцевой стенке
+    TriggerControl red_lamps_end_of_train_bwd;
 
     /// Сцепка спереди
     Coupling *coupling_fwd = nullptr;
