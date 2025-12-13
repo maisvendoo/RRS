@@ -11,11 +11,6 @@
 		<SoundDir>freight</SoundDir>
 		<WheelInertia>100.0</WheelInertia>
 
-		<ExtModelName>FrWag_hopper_1/Fr_hopper-1.gltf</ExtModelName>
-		<CabineModel>default-objects/Disk_end_of_train_bwd.gltf</CabineModel>
-		<CabineShift>1.05 -6.74 1.492</CabineShift>
-		<AnimationsConfigDir>freight</AnimationsConfigDir>
-
 		<BrakepipeLeak>3e-6</BrakepipeLeak>
 
 		<CouplingModule>sa3</CouplingModule>
@@ -42,9 +37,33 @@
 
 	</Vehicle>
 
+
 	<Cabine>
 		<DriverPos>2 5.4 2.5</DriverPos>
 		<DriverDir>30.0</DriverDir>
 	</Cabine>
+
+	<Cabine>
+		<DriverPos>-2 -5.4 2.5</DriverPos>
+		<DriverDir>-150.0</DriverDir>
+	</Cabine>
+
+
+	<Model>
+		<ModelName>FrWag_hopper_1/Fr_hopper-1.gltf</ModelName>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/Disk_end_of_train_fwd.gltf</ModelName>
+		<ModelShift>-1.05 6.74 1.492</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/Disk_end_of_train_bwd.gltf</ModelName>
+		<ModelShift>1.05 -6.74 1.492</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
 
 </Config>

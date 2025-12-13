@@ -76,11 +76,15 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
     // Vehicle sounds
     load_sounds(cfg_path, cfg, sm);
 
-    // Reading data about body's 3D-model
-    load_body_model(cfg_path, cfg, options);
+    // Vehicle 3d-models
+    load_models(cfg_path, cfg, options);
 
-    // Reading data about cabine's 3D-model
-    load_cabine_model(cfg_path, cfg, options);
+    // Check old config format
+    if (transform->children.size() == 0)
+    {
+        load_body_model(cfg_path, cfg, options);
+        load_cabine_model(cfg_path, cfg, options);
+    }
 
     transform->setValue("name", cfg_file);
     return (transform->children.size() > 0);
@@ -120,6 +124,7 @@ bool VehicleExterior::load_cabine_positions(const std::string &cfg_path, CfgRead
         if (secNode.isNull())
             return true;
     }
+    return true;
 }
 
 //------------------------------------------------------------------------------
@@ -139,6 +144,104 @@ bool VehicleExterior::load_sounds(const std::string &cfg_path, CfgReader &cfg, S
     sounds_id = sm->loadVehicleSounds(sounds_dir);
     LOG_INFO("Loaded %u sounds from %s", sounds_id.size(), sounds_dir.c_str());
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VehicleExterior::load_models(const std::string &cfg_path, CfgReader &cfg, vsg::ref_ptr<vsg::Options> options)
+{
+    QDomNode section_node = cfg.getFirstSection("Model");
+    if (section_node.isNull())
+    {
+        LOG_WARN("Fail to find section <Model> in config file: %s", cfg_path.c_str());
+        return false;
+    }
+
+    transform->children.clear();
+
+    auto next_model_section = [&]() -> bool {
+        section_node = cfg.getNextSection();
+        return !section_node.isNull();
+    };
+
+    while (true)
+    {
+        QString tmp_qstring = "";
+        cfg.getString(section_node, "ModelName", tmp_qstring);
+
+        if (tmp_qstring.isEmpty())
+        {
+            LOG_WARN("Fail to read parameter <ModelName> in config file: %s", cfg_path.c_str());
+            if (next_model_section())
+                continue;
+            break;
+        }
+
+        FileSystem& fs = FileSystem::getInstance();
+        const std::string model_filename = tmp_qstring.toStdString();
+        const std::string model_filename_path = fs.combinePath(fs.getVehicleModelsDir(), tmp_qstring.toStdString());
+        if (!vsg::fileExists(model_filename_path))
+        {
+            LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
+            if (next_model_section())
+                continue;
+            break;
+        }
+
+        tmp_qstring = "";
+        cfg.getString(section_node, "AnimationsConfigDir", tmp_qstring);
+        const std::string animations_dir = tmp_qstring.toStdString();
+
+        vsg::ref_ptr<AnimatedPagedLOD> model_pagedLOD = AnimatedPagedLOD::create();
+        model_pagedLOD->animations_dir = animations_dir;
+        model_pagedLOD->filename = model_filename_path;
+        model_pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
+        model_pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
+        model_pagedLOD->options = options;
+        animated_nodes.push_back(model_pagedLOD);
+
+        tmp_qstring = "";
+        vsg::dvec3 rotate(0.0, 0.0, 0.0);
+        if (cfg.getString(section_node, "ModelRotate", tmp_qstring))
+        {
+            std::istringstream ss(tmp_qstring.toStdString());
+            ss >> rotate.x >> rotate.y >> rotate.z;
+        }
+
+        tmp_qstring = "";
+        vsg::dvec3 shift(0.0, 0.0, 0.0);
+        if (cfg.getString(section_node, "ModelShift", tmp_qstring))
+        {
+            std::istringstream ss(tmp_qstring.toStdString());
+            ss >> shift.x >> shift.y >> shift.z;
+        }
+
+        if (shift || rotate)
+        {
+            vsg::ref_ptr<vsg::MatrixTransform> model_node = vsg::MatrixTransform::create();
+            model_node->matrix = vsg::translate(shift) *
+                                 vsg::rotate(rotate.x, vsg::dvec3(1.0, 0.0, 0.0)) *
+                                 vsg::rotate(rotate.y, vsg::dvec3(0.0, 1.0, 0.0)) *
+                                 vsg::rotate(rotate.z, vsg::dvec3(0.0, 0.0, 1.0));
+            model_node->setValue("name", model_filename);
+            model_node->addChild(model_pagedLOD);
+            transform->addChild(model_node);
+        }
+        else
+        {
+            vsg::ref_ptr<vsg::Group> model_node = vsg::Group::create();
+            model_node->setValue("name", model_filename);
+            model_node->addChild(model_pagedLOD);
+            transform->addChild(model_node);
+        }
+
+        if (next_model_section())
+            continue;
+        break;
+    }
+
+    return (transform->children.size() > 0);
 }
 
 //------------------------------------------------------------------------------

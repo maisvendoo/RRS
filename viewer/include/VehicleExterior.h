@@ -56,10 +56,16 @@ public:
 
 private:
 
+    /// Загрузка положения камеры в кабинах
     bool load_cabine_positions(const std::string& cfg_path, CfgReader& cfg);
 
+    /// Загрузка звуков
     bool load_sounds(const std::string& cfg_path, CfgReader& cfg, SoundManager* sm);
 
+    /// Загрузка моделей
+    bool load_models(const std::string& cfg_path, CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
+
+    /// Методы под старый формат конфига с параметрами <ExtModelName> и <CabineModel>
     bool load_body_model(const std::string& cfg_path, CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
     bool load_cabine_model(const std::string& cfg_path, CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
 };
