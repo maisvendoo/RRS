@@ -433,7 +433,6 @@
 	],
 	"materials":[
 		{
-			"doubleSided":true,
 			"extensions":{
 				"KHR_materials_specular":{
 					"specularFactor":0
@@ -444,12 +443,26 @@
 				"baseColorTexture":{
 					"index":0
 				},
-				"roughnessFactor":0.5
+				"roughnessFactor":0.75
+			}
+		},
+		{
+			"doubleSided":true,
+			"extensions":{
+				"KHR_materials_specular":{
+					"specularFactor":0
+				}
+			},
+			"name":"Material_pass_16733_two_sided",
+			"pbrMetallicRoughness":{
+				"baseColorTexture":{
+					"index":1
+				},
+				"roughnessFactor":0.75
 			}
 		},
 		{
 			"alphaMode":"BLEND",
-			"doubleSided":true,
 			"extensions":{
 				"KHR_materials_specular":{
 					"specularFactor":0
@@ -464,13 +477,12 @@
 					0.25
 				],
 				"baseColorTexture":{
-					"index":1
+					"index":2
 				},
 				"roughnessFactor":0.125
 			}
 		},
 		{
-			"doubleSided":true,
 			"extensions":{
 				"KHR_materials_specular":{
 					"specularFactor":0
@@ -479,16 +491,15 @@
 			"name":"Material_pass_16733_rezina",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
-					"index":2
+					"index":3
 				},
 				"metallicFactor":0.0625,
 				"roughnessFactor":0.875
 			}
 		},
 		{
-			"doubleSided":true,
 			"emissiveTexture":{
-				"index":3
+				"index":4
 			},
 			"extensions":{
 				"KHR_materials_specular":{
@@ -574,7 +585,7 @@
 						"TEXCOORD_0":18
 					},
 					"indices":19,
-					"material":0
+					"material":1
 				}
 			]
 		},
@@ -807,7 +818,7 @@
 						"TEXCOORD_0":84
 					},
 					"indices":85,
-					"material":1
+					"material":2
 				}
 			]
 		},
@@ -821,7 +832,7 @@
 						"TEXCOORD_0":88
 					},
 					"indices":89,
-					"material":2
+					"material":3
 				}
 			]
 		},
@@ -835,7 +846,7 @@
 						"TEXCOORD_0":92
 					},
 					"indices":93,
-					"material":2
+					"material":3
 				}
 			]
 		},
@@ -849,7 +860,7 @@
 						"TEXCOORD_0":96
 					},
 					"indices":93,
-					"material":2
+					"material":3
 				}
 			]
 		},
@@ -891,7 +902,7 @@
 						"TEXCOORD_0":107
 					},
 					"indices":108,
-					"material":2
+					"material":3
 				}
 			]
 		},
@@ -905,7 +916,7 @@
 						"TEXCOORD_0":111
 					},
 					"indices":108,
-					"material":2
+					"material":3
 				}
 			]
 		},
@@ -1017,7 +1028,7 @@
 						"TEXCOORD_0":139
 					},
 					"indices":140,
-					"material":2
+					"material":3
 				}
 			]
 		},
@@ -1199,7 +1210,7 @@
 						"TEXCOORD_0":189
 					},
 					"indices":85,
-					"material":3
+					"material":4
 				}
 			]
 		},
@@ -1213,12 +1224,16 @@
 						"TEXCOORD_0":192
 					},
 					"indices":85,
-					"material":3
+					"material":4
 				}
 			]
 		}
 	],
 	"textures":[
+		{
+			"sampler":0,
+			"source":0
+		},
 		{
 			"sampler":0,
 			"source":0
