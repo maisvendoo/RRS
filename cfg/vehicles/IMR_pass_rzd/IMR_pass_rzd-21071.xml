@@ -50,7 +50,7 @@
 
 	<Model>
 		<ModelName>IMR_pass_rzd/Pass_TVZ_62-425_1.gltf</ModelName>
-		<AnimationsConfigDir>passcar-ox</AnimationsConfigDir>
+		<AnimationsConfigDir>passcar</AnimationsConfigDir>
 	</Model>
 
 </Config>
