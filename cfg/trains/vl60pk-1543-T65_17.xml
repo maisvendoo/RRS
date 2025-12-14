@@ -102,4 +102,14 @@
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-21071</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
 </Config>
