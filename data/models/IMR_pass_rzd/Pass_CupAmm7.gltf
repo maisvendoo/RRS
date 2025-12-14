@@ -299,7 +299,7 @@
 		},
 		{
 			"mesh":44,
-			"name":"Yashik_3000Kv"
+			"name":"Yashik_3kV"
 		},
 		{
 			"mesh":45,
@@ -1145,7 +1145,7 @@
 			]
 		},
 		{
-			"name":"Yashik_3000Kv",
+			"name":"Yashik_3kV",
 			"primitives":[
 				{
 					"attributes":{
