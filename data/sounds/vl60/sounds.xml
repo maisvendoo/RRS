@@ -1763,9 +1763,21 @@
 		<LocalPosition>1.05 -9.25 2.90</LocalPosition>
 	</Sound>
 
-	<!-- Ключ ЭПК вкл. -->
+	<!-- TODO Ключ ЭПК вставить -->
 	<Sound>
 		<SignalID>354</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -8.2 2.6</LocalPosition>
+	</Sound>
+
+	<!-- Ключ ЭПК вкл. -->
+	<Sound>
+		<SignalID>355</SignalID>
 		<Filename>epk_vkl.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -2186,9 +2198,21 @@
 		<LocalPosition>1.05 -9.25 2.90</LocalPosition>
 	</Sound>
 
-	<!-- Ключ ЭПК выкл. -->
+	<!-- TODO Ключ ЭПК извлечь -->
 	<Sound>
 		<SignalID>394</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -8.2 2.6</LocalPosition>
+	</Sound>
+
+	<!-- Ключ ЭПК выкл. -->
+	<Sound>
+		<SignalID>395</SignalID>
 		<Filename>epk_vkl.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
