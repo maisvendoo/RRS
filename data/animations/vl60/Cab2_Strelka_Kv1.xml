@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<AnalogRotation>
-		<SignalID>143</SignalID>
+		<SignalID>142</SignalID>
 		<Duration>4.0</Duration>
 		<Axis>0.0 1.0 0.0</Axis>
 	</AnalogRotation>

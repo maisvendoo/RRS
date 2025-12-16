@@ -8,38 +8,32 @@
 
 	<KeyPoint>
 		<Param>0.0</Param>
-		<Value>-119.0</Value>
-	</KeyPoint>
-
-	<KeyPoint>
-		<Param>0.167</Param>
-		<Value>-108.0</Value>
+		<Value>-119.15</Value>
 	</KeyPoint>
 
 	<KeyPoint>
 		<Param>0.333</Param>
-		<Value>-85.0</Value>
+		<Value>-69.27</Value>
 	</KeyPoint>
 
 	<KeyPoint>
 		<Param>0.5</Param>
-		<Value>-48.0</Value>
+		<Value>-20.48</Value>
 	</KeyPoint>
 
 	<KeyPoint>
 		<Param>0.667</Param>
-		<Value>0.0</Value>
+		<Value>23.69</Value>
 	</KeyPoint>
 
 	<KeyPoint>
 		<Param>0.833</Param>
-		<Value>62</Value>
+		<Value>71.74</Value>
 	</KeyPoint>
 
 	<KeyPoint>
 		<Param>1.0</Param>
-		<Value>117.0</Value>
+		<Value>117.06</Value>
 	</KeyPoint>
-
 
 </Config>
