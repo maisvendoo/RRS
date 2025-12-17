@@ -853,7 +853,7 @@
 		},
 		{
 			"mesh":51,
-			"name":"Cab1_Strelka_Kv1",
+			"name":"Cab1_Strelka_kV_input",
 			"rotation":[
 				-0.8343309760093689,
 				0,
@@ -868,7 +868,7 @@
 		},
 		{
 			"mesh":52,
-			"name":"Cab1_Strelka_Kv2",
+			"name":"Cab1_Strelka_kV_engine",
 			"rotation":[
 				-0.8343309760093689,
 				0,
@@ -2316,7 +2316,7 @@
 		},
 		{
 			"mesh":171,
-			"name":"Cab2_Strelka_Kv2",
+			"name":"Cab2_Strelka_kV_input",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -2331,7 +2331,7 @@
 		},
 		{
 			"mesh":172,
-			"name":"Cab2_Strelka_Kv1",
+			"name":"Cab2_Strelka_kV_engine",
 			"rotation":[
 				0,
 				-0.5512638688087463,
@@ -4665,7 +4665,7 @@
 			]
 		},
 		{
-			"name":"Strelka_Kv1",
+			"name":"Strelka_kV_input",
 			"primitives":[
 				{
 					"attributes":{
@@ -4679,7 +4679,7 @@
 			]
 		},
 		{
-			"name":"Strelka_Kv2",
+			"name":"Strelka_kV_engine",
 			"primitives":[
 				{
 					"attributes":{
@@ -6353,7 +6353,7 @@
 			]
 		},
 		{
-			"name":"Strelka_Kv1.003",
+			"name":"Strelka_kV_input.003",
 			"primitives":[
 				{
 					"attributes":{
@@ -6367,7 +6367,7 @@
 			]
 		},
 		{
-			"name":"Strelka_Kv2.003",
+			"name":"Strelka_kV_engine.003",
 			"primitives":[
 				{
 					"attributes":{
