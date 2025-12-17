@@ -84,8 +84,7 @@ xcopy /Y /S %DATA_PATH%\animations\vl60\*.* %RRS_DEV_ROOT%\data\animations\vl60\
 
 rem Пассажирские вагоны
 xcopy /Y /S %DATA_PATH%\models\IMR_pass_rzd\*.* %RRS_DEV_ROOT%\data\models\IMR_pass_rzd\
-xcopy /Y /S %DATA_PATH%\animations\passcar-ox\*.* %RRS_DEV_ROOT%\data\animations\passcar-ox\
-xcopy /Y /S %DATA_PATH%\animations\passcar-oy\*.* %RRS_DEV_ROOT%\data\animations\passcar-oy\
+xcopy /Y /S %DATA_PATH%\animations\passcar-ox\*.* %RRS_DEV_ROOT%\data\animations\passcar\
 xcopy /Y /S %DATA_PATH%\sounds\pass\*.* %RRS_DEV_ROOT%\data\sounds\pass\
 
 rem Вагоны-хоперы
