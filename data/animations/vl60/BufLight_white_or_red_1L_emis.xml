@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<MaterialAnimation>
+		<SignalID>8</SignalID>
+		<SignalID2>9</SignalID2>
+		<Duration>10.0</Duration>
+		<EmissionColor>1.0 1.0 1.0</EmissionColor>
+		<EmissionColor2>1.0 0.0 0.0</EmissionColor2>
+	</MaterialAnimation>
+</Config>
