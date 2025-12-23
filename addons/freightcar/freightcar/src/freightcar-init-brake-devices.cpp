@@ -67,16 +67,8 @@ void FreightCar::initBrakeDevices(double p0, double pBP, double pFL)
     {
         BrakeShoes *bs = new BrakeShoes;
         bs->read_config("brake-shoes");
-
-        if (is_brake_shoes)
-        {
-            bs->set();
-        }
-        else
-        {
-            bs->reset();
-        }
-
         brake_shoes.push_back(bs);
     }
+
+    is_brake_shoes ? brake_shoes_set.set() : brake_shoes_set.reset();
 }

@@ -99,6 +99,12 @@ private:
     /// Башмаки
     std::vector<BrakeShoes *> brake_shoes;
 
+    /// Триггер управления установкой башмаков
+    TriggerControl brake_shoes_set;
+
+    /// Суммарное усилие от башмаков
+    double shoesForce = 0.0;
+
     /// Чтение конфигурационного файла
     void loadConfig(QString cfg_path) override;
 

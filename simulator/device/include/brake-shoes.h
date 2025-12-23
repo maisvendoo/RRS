@@ -24,15 +24,10 @@ public:
         return brake_force;
     }
 
-    void set()
+    void setState(bool state)
     {
-        state = true;
-    }
-
-    void reset()
-    {
-        state = false;
-    }
+        this->state = state;
+    }    
 
 protected:
 

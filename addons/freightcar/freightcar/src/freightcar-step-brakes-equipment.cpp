@@ -85,17 +85,25 @@ void FreightCar::stepBrakesEquipment(const double& t, const double& dt)
     // Тормозная рычажная передача
     brake_mech->setBCflow(ad_bc_flow);
     brake_mech->step(t, dt);
+
+    shoesForce = 0.0;
+
     for (size_t i = 0; i < num_axis; ++i)
     {
         brake_mech->setAngularVelocity(i, wheel_omega[i]);
 
         // Тормозные башмаки
-        brake_shoes[i]->setAxisLoad(full_mass / num_axis);
+        brake_shoes[i]->setAxisLoad(full_mass * Physics::g / num_axis);
+        brake_shoes[i]->setState(brake_shoes_set.getState());
         brake_shoes[i]->step(t, dt);
 
+        shoesForce += brake_shoes[i]->getForce();
+
         Q_r[i + 1] = brake_mech->getBrakeTorque(i) +
-                     brake_shoes[i]->getForce() * wheel_diameter[i] / 2.0;
-    }
+                     brake_shoes[i]->getForce() * wheel_diameter[0] / 2.0;
+    }    
+
+    brake_shoes_set.step(t, dt);
 
     // Концевые краны тормозной магистрали
     anglecock_bp_fwd->setPipePressure(brakepipe->getPressure());

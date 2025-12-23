@@ -48,4 +48,11 @@ void FreightCar::debugPrint(const simulator_time_t& t, const double& dt)
                     .arg(anglecock_bp_bwd->isOpened() ? "\\" : "|")
                     .arg(hose_bp_bwd->isConnected() ? "_" : " ")
                     .arg(hose_bp_bwd->isLinked() ? "/" : " ");
+
+    if (brake_shoes_set.getState())
+    {
+        DebugMsg += QString("  |  ");
+        DebugMsg += QString("!!! УСТАНОВЛЕНЫ БАШМАКИ !!! Торм. усил.: %1 кН")
+                        .arg(shoesForce / 1000.0, 6, 'f', 2);
+    }
 }
