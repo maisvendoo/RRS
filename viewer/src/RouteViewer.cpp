@@ -57,6 +57,8 @@
 #include <cstdlib>
 #include <string>
 
+#include <AltSoundLocker.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -322,6 +324,7 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
     try
     {
         window = vsg::Window::create(windowTraits);
+        lockAltSound(window.get());
     }
     catch (const vsg::Exception& exception)
     {
