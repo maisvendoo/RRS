@@ -2,7 +2,8 @@
 #include    <CfgReader.h>
 #include    <QTcpSocket>
 #include    <QNetworkProxy>
-#include <QBuffer>
+#include    <QBuffer>
+#define SHOW_SERVER_ADDRESS 1
 
 //------------------------------------------------------------------------------
 //
@@ -249,12 +250,13 @@ void TcpClient::slotOnConnectionTimeout()
 {
     this->connectToServer(tcp_config);
     //Journal::instance()->info("Try connect to server...");
-
-    /*emit sendLogMessage("Try connect to server..." +
+#if SHOW_SERVER_ADDRESS
+    emit sendLogMessage("Try connect to " +
                         tcp_config.host_addr + ":" +
-                        QString::number(tcp_config.port));*/
-
+                        QString::number(tcp_config.port) + " server...");
+#else
     emit sendLogMessage("Try connect to server...");
+#endif
 }
 
 //------------------------------------------------------------------------------
