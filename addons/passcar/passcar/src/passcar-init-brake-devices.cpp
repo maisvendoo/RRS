@@ -5,7 +5,7 @@
 #include "pneumo-anglecock.h"
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"
-
+#include <brake-shoes.h>
 
 //------------------------------------------------------------------------
 //
@@ -60,4 +60,14 @@ void PassCar::initBrakeDevices(double p0, double pBP, double pFL)
     {
         anglecock_bp_bwd->close();
     }
+
+    // Инициализация тормозных башмаков
+    for (size_t i = 0; i < num_axis; ++i)
+    {
+        BrakeShoes *bs = new BrakeShoes;
+        bs->read_config("brake-shoes");
+        brake_shoes.push_back(bs);
+    }
+
+    is_brake_shoes ? brake_shoes_set.set() : brake_shoes_set.reset();
 }

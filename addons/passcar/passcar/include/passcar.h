@@ -21,6 +21,7 @@ class PneumoAngleCock;
 class PneumoHoseEPB;
 class Registrator;
 class Reservoir;
+class BrakeShoes;
 
 //------------------------------------------------------------------------------
 //
@@ -98,6 +99,14 @@ private:
     /// Признак включения регистрации
     bool is_Registrator_on = false;
 
+    /// Тормозные башмаки
+    std::vector<BrakeShoes *> brake_shoes;
+
+    /// Триггер, управляющий установкой башмаков
+    TriggerControl brake_shoes_set;
+
+    /// Суммарное усилие от башмаков
+    double shoesForce = 0.0;
 
     /// Чтение конфигурационного файла
     void loadConfig(QString cfg_path) override;
