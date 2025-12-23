@@ -58,6 +58,7 @@ struct cmd_line_t
 {
     option_t<std::string> input_route_path;
     option_t<bool> input_only_used_at_map;
+    option_t<bool> input_lights_at_map;
 
     option_t<std::string> output_route_path;
 
