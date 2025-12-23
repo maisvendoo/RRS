@@ -190,6 +190,8 @@ public:
 
     feedback_signals_t& getFeedBackSignals();
 
+    void setBrakeShoesState(bool state);
+
 protected:
 
     /// Vehicle configuration file directory
@@ -296,6 +298,9 @@ protected:
     state_vector_t  Q_a = {0.0, 0.0, 0.0, 0.0, 0.0};
     /// Reactive common forces
     state_vector_t  Q_r = {0.0, 0.0, 0.0, 0.0, 0.0};
+
+    /// Brake shoes state
+    bool is_brake_shoes = false;
 
     /// Keyboard state
     std::set<uint16_t> pressed_keys = {KEY_Undefined};

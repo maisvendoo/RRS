@@ -1106,6 +1106,13 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
                 payload_coeff = 0;
             }
 
+            // Brake shoes state of vehicles group
+            bool is_brake_shoes = false;
+            if (!cfg.getBool(vehicle_node, "IsBrakeShoes", is_brake_shoes))
+            {
+                is_brake_shoes = false;
+            }
+
             for (int i = 0; i < n_vehicles; i++)
             {
                 Journal::instance()->info("==== Vehicle loading ====");
@@ -1136,6 +1143,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
                 }
                 vehicle->setStateIndex(ode_order);
                 vehicle->setPayloadCoeff(payload_coeff);
+                vehicle->setBrakeShoesState(is_brake_shoes);
                 vehicle->setDirection(dir);
                 vehicle->setOrientation(orient);
 
