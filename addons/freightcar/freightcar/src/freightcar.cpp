@@ -2,6 +2,8 @@
 #include    "freightcar-signals.h"
 #include    "filesystem.h"
 
+#include    <brake-shoes.h>
+
 #include "CfgReader.h"
 
 //------------------------------------------------------------------------------

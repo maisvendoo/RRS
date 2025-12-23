@@ -16,6 +16,7 @@ class PneumoAngleCock;
 class PneumoHoseEPB;
 class Registrator;
 class Reservoir;
+class BrakeShoes;
 
 //------------------------------------------------------------------------------
 //
@@ -95,6 +96,8 @@ private:
     /// Признак включения регистрации
     bool is_Registrator_on = false;
 
+    /// Башмаки
+    std::vector<BrakeShoes *> brake_shoes;
 
     /// Чтение конфигурационного файла
     void loadConfig(QString cfg_path) override;

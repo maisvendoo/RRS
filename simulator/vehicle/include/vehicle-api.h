@@ -47,5 +47,6 @@
 #include    "traction-controller.h"
 #include    "train-horn.h"
 #include    "registrator.h"
+#include    <brake-shoes.h>
 
 #endif // VEHICLE_API_H

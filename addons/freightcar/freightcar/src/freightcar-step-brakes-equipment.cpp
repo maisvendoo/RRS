@@ -8,6 +8,8 @@
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"
 
+#include    <brake-shoes.h>
+
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
@@ -86,7 +88,13 @@ void FreightCar::stepBrakesEquipment(const double& t, const double& dt)
     for (size_t i = 0; i < num_axis; ++i)
     {
         brake_mech->setAngularVelocity(i, wheel_omega[i]);
-        Q_r[i + 1] = brake_mech->getBrakeTorque(i);
+
+        // Тормозные башмаки
+        brake_shoes[i]->setAxisLoad(full_mass / num_axis);
+        brake_shoes[i]->step(t, dt);
+
+        Q_r[i + 1] = brake_mech->getBrakeTorque(i) +
+                     brake_shoes[i]->getForce() * wheel_diameter[i] / 2.0;
     }
 
     // Концевые краны тормозной магистрали
@@ -105,5 +113,5 @@ void FreightCar::stepBrakesEquipment(const double& t, const double& dt)
     hose_bp_bwd->setFlowCoeff(anglecock_bp_bwd->getFlowCoeff());
     hose_bp_bwd->setCoord(train_coord - dir * orient * (length / 2.0 - anglecock_bp_bwd->getShiftCoord()));
     hose_bp_bwd->setShiftSide(anglecock_bp_bwd->getShiftSide());
-    hose_bp_bwd->step(t, dt);
+    hose_bp_bwd->step(t, dt);    
 }

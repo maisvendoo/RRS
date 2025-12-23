@@ -6,6 +6,8 @@
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"
 
+#include    <brake-shoes.h>
+
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
@@ -58,5 +60,23 @@ void FreightCar::initBrakeDevices(double p0, double pBP, double pFL)
     else
     {
         anglecock_bp_bwd->close();
+    }
+
+    // Инициализация тормозных башмаков
+    for (size_t i = 0; i < num_axis; ++i)
+    {
+        BrakeShoes *bs = new BrakeShoes;
+        bs->read_config("brake-shoes");
+
+        if (is_brake_shoes)
+        {
+            bs->set();
+        }
+        else
+        {
+            bs->reset();
+        }
+
+        brake_shoes.push_back(bs);
     }
 }
