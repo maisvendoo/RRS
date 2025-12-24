@@ -113,6 +113,7 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
             params->hour = params->sim_time->time.hour();
             params->minute = params->sim_time->time.minute();
             params->sec = params->sim_time->time.sec();
+            params->msec = params->sim_time->time.msec();
         }
         else
         {
@@ -146,15 +147,16 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     }
 
     simulator_time_t datetime({static_cast<int16_t>(params->year), static_cast<uint8_t>(params->month), static_cast<uint8_t>(params->day)},
-                              {static_cast<uint8_t>(params->hour), static_cast<uint8_t>(params->minute), static_cast<uint8_t>(params->sec)});
+                              {static_cast<uint8_t>(params->hour), static_cast<uint8_t>(params->minute), static_cast<uint8_t>(params->sec), static_cast<uint8_t>(params->msec)});
+
+    params->sun->update(datetime, 3.0);
+    double sun_azimuth_degrees;
+    double sun_altitude_degrees;
+    params->sun->getSunDirection(sun_azimuth_degrees, sun_altitude_degrees);
+
     // params->skybox->setDateTime(datetime);
     params->new_skybox->set_date_time(datetime);
-    params->year = datetime.date.year();
-    params->month = datetime.date.month();
-    params->day = datetime.date.day();
-    params->hour = datetime.time.hour();
-    params->minute = datetime.time.minute();
-    params->sec = datetime.time.sec();
+    params->new_skybox->set_sun_direction(sun_azimuth_degrees, sun_altitude_degrees);
 
     if (params->is_show_debug_msg)
     {
@@ -304,11 +306,6 @@ void MyGui::showSettings() const
     }
 
     ImGui::RadioButton("Задать время вручную:", &(params->use_server_time), 0);
-    params->sun->use_gui_time = !params->use_server_time;
-    if (params->sun->use_gui_time)
-    {
-        params->sun->gui_time = {server_date_t(params->year, params->month, params->day), server_time_t(params->hour, params->minute, params->sec)};
-    }
 
     ImGuiInputTextFlags flags = params->use_server_time ? ImGuiInputTextFlags_ReadOnly : 0;
     ImGui::PushItemWidth((ImGui::CalcItemWidth() - 2 * ImGui::GetStyle().ItemSpacing.x) / 3);
@@ -374,34 +371,7 @@ void MyGui::showSettings() const
         }
     }
 
-    // if (params->skybox_textures.size() > 0)
-    // {
-    //     ImGui::SliderInt("Skybox texture", &params->skybox_texture_index, 1, params->skybox_textures.size());
-    // }
-
     ImGui::End();
-
-    if (params->prev_skybox_texture_index == params->skybox_texture_index)
-    {
-        return;
-    }
-
-    // params->prev_skybox_texture_index = params->skybox_texture_index;
-    // if ((params->skybox_textures.size() > 0)
-    //     && (params->skybox_texture_index > 0)
-    //     && (params->skybox_texture_index <= params->skybox_textures.size()))
-    // {
-    //     vsg::ref_ptr<vsg::ubvec4Array2D> selected_data = params->skybox_textures[params->skybox_texture_index - 1];
-    //     auto selected_data_pixel = selected_data->begin();
-    //     auto texture_pixel = params->skybox_texture_data->begin();
-    //     while (texture_pixel != params->skybox_texture_data->end())
-    //     {
-    //         *texture_pixel = *selected_data_pixel;
-    //         ++selected_data_pixel;
-    //         ++texture_pixel;
-    //     }
-    //     params->skybox_texture_data->dirty();
-    // }
 }
 
 //------------------------------------------------------------------------------
@@ -498,6 +468,8 @@ void MyGui::showNoCabineControl() const
 //------------------------------------------------------------------------------
 void MyGui::check_date_time() const
 {
+    params->msec = 0;
+
     if (params->sec > 59)
     {
         ++params->minute;
@@ -508,6 +480,7 @@ void MyGui::check_date_time() const
         --params->minute;
         params->sec = 59;
     }
+
     if (params->minute > 59)
     {
         ++params->hour;
@@ -518,6 +491,7 @@ void MyGui::check_date_time() const
         --params->hour;
         params->minute = 59;
     }
+
     if (params->hour > 23)
     {
         ++params->day;
@@ -528,6 +502,7 @@ void MyGui::check_date_time() const
         --params->day;
         params->hour = 23;
     }
+
     if (params->day > (server_date_t::isLeapYear(params->year) ?
                            days_in_month_leap[std::clamp(params->month, int16_t(1), int16_t(12)) - 1] :
                            days_in_month_nleap[std::clamp(params->month, int16_t(1), int16_t(12)) - 1]))
@@ -542,6 +517,7 @@ void MyGui::check_date_time() const
                            days_in_month_leap[std::clamp(params->month, int16_t(1), int16_t(12)) - 1] :
                            days_in_month_nleap[std::clamp(params->month, int16_t(1), int16_t(12)) - 1]);
     }
+
     if (params->month > 12)
     {
         ++params->year;

@@ -73,7 +73,7 @@ NewSkybox::NewSkybox(const std::string& skybox_config_filepath, vsg::ref_ptr<vsg
     }
 }
 
-vsg::ref_ptr<vsg::StateGroup> NewSkybox::get_state_group() const
+vsg::ref_ptr<vsg::Node> NewSkybox::getNode() const
 {
     return state_group;
 }
@@ -156,6 +156,12 @@ void NewSkybox::set_date_time(const simulator_time_t& sim_time)
             stt.state = season_time_texture_t::State::INACTIVE;
         }
     }
+}
+
+void NewSkybox::set_sun_direction(double azimuth_degrees, [[maybe_unused]] double altitude_degrees)
+{
+    transform->matrix = vsg::rotate(vsg::radians(90.0), vsg::dvec3{1.0, 0.0, 0.0}) *
+                        vsg::rotate(vsg::radians(90.0 + azimuth_degrees), vsg::dvec3{0.0, -1.0, 0.0});
 }
 
 class FindArraysVisitor : public vsg::Visitor
@@ -339,7 +345,7 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
     draw_commands->addChild(vsg::BindIndexBuffer::create(fav.get_indices()));
     draw_commands->addChild(vsg::DrawIndexed::create(fav.get_indices_size(), 1, 0, 0, 0));
 
-    auto transform = vsg::MatrixTransform::create();
+    transform = vsg::MatrixTransform::create();
     transform->matrix = vsg::rotate(vsg::radians(90.0), vsg::dvec3{1.0, 0.0, 0.0});
 
     transform->addChild(draw_commands);

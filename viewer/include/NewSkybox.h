@@ -18,7 +18,9 @@ namespace vsg
 
 class Data;
 class Options;
+class Node;
 class StateGroup;
+class MatrixTransform;
 
 }
 
@@ -27,9 +29,10 @@ class NewSkybox
 public:
     NewSkybox(const std::string& skybox_config_filepath, vsg::ref_ptr<vsg::Options> options = {});
 
-    vsg::ref_ptr<vsg::StateGroup> get_state_group() const;
+    vsg::ref_ptr<vsg::Node> getNode() const;
 
     void set_date_time(const simulator_time_t& sim_time);
+    void set_sun_direction(double azimuth_degrees, double altitude_degrees);
 
 private:
     void init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
@@ -61,6 +64,7 @@ private:
 
     std::vector<season_time_texture_t> textures;
     vsg::ref_ptr<vsg::StateGroup> state_group;
+    vsg::ref_ptr<vsg::MatrixTransform> transform;
     vsg::ref_ptr<vsg::Data> texture1_data;
     vsg::ref_ptr<vsg::Data> texture2_data;
     vsg::ref_ptr<vsg::floatValue> mix_value;
