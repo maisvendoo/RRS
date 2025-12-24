@@ -48,7 +48,8 @@ bool Application::convert()
     {
         return convert_route(cmd_line.input_route_path.value,
                              cmd_line.output_route_path.value,
-                             cmd_line.input_only_used_at_map.value);
+                             cmd_line.input_only_used_at_map.value,
+                             cmd_line.input_lights_at_map.value);
     }
 
     if (convert_mode == CONVERT_MODEL)
@@ -66,7 +67,8 @@ bool Application::convert()
 //------------------------------------------------------------------------------
 bool Application::convert_route(std::string &in_dmd_route_path,
                                 std::string &out_gltf_route_path,
-                                bool only_used_at_map)
+                                bool only_used_at_map,
+                                bool lights_at_map)
 {
     // Преобразуем пути к платформоспецифичному виду
     path_to_native_separator(in_dmd_route_path);
@@ -162,6 +164,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
     // Список моделей, и списки сокращённых имён и текстур к этим моделям
     std::map<RelativeModelPath, std::map<Label, RelativeTexturePath>> objects;
     std::set<Label> unique_refs;
+    bool light_found = false;
 
     while (std::getline(objects_ref, line_buffer))
     {
@@ -200,6 +203,13 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         {
             LOG_WARN("Warn: ref \"%s\":", line_buffer.c_str());
             LOG_WARN("      name \"%s\" does not used at map. Model will not be converted", label.c_str());
+            continue;
+        }
+
+        // Запоминаем, что нашли модель, на которую ZDS вешает источник света
+        if (label == "light")
+        {
+            light_found = true;
             continue;
         }
 
@@ -247,7 +257,13 @@ bool Application::convert_route(std::string &in_dmd_route_path,
     // Создаем каталог под текстуры
     fs::create_directory(combine_path(out_gltf_route_path, "textures"));
 
+    // Новый список ссылок на файлы моделей
     std::map<Label, RelativeModelPath> new_objects;
+    // Добавляем модель с источником света вместо костыльной модели для ZDS
+    if (lights_at_map && light_found)
+    {
+        new_objects.insert({"light", "/../../data/models/default-objects/light.gltf"});
+    }
 
     for (const auto& [relative_model_path, labels_textures] : objects)
     {
@@ -891,6 +907,10 @@ void Application::configure_parser(cli::Parser &parser)
                               false,
                               "Convert only models used at map");
 
+    parser.set_optional<bool>("l", "lights",
+                              false,
+                              "Convert lights at map");
+
     parser.set_optional<std::string>("o", "output-route",
                                      "",
                                      "Output GLTF route path");
@@ -918,6 +938,7 @@ void Application::parse_command_line(cli::Parser &parser, cmd_line_t &cmd_line)
     parser.run_and_exit_if_error();
     cmd_line.input_route_path = parser.get<std::string>("i");
     cmd_line.input_only_used_at_map = parser.get<bool>("u");
+    cmd_line.input_lights_at_map = parser.get<bool>("l");
     cmd_line.output_route_path = parser.get<std::string>("o");
     cmd_line.input_model_path = parser.get<std::string>("m");
     cmd_line.input_texture_path = parser.get<std::string>("t");

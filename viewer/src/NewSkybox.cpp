@@ -48,6 +48,7 @@
 #include <QString>
 #include <QStringList>
 
+#include <cstddef>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -180,13 +181,39 @@ public:
             }
         }
 
-        indices = vid.indices->data->cast<vsg::uintArray>();
+        ushort_indices = vid.indices->data->cast<vsg::ushortArray>();
+        uint_indices = vid.indices->data->cast<vsg::uintArray>();
+    }
+
+    vsg::ref_ptr<vsg::Data> get_indices() const
+    {
+        if (ushort_indices)
+        {
+            return ushort_indices;
+        }
+        else
+        {
+            return uint_indices;
+        }
+    }
+
+    std::size_t get_indices_size() const
+    {
+        if (ushort_indices)
+        {
+            return ushort_indices->size();
+        }
+        else
+        {
+            return uint_indices->size();
+        }
     }
 
 public:
     vsg::ref_ptr<vsg::vec3Array> positions;
     vsg::ref_ptr<vsg::vec2Array> tex_coords;
-    vsg::ref_ptr<vsg::uintArray> indices;
+    vsg::ref_ptr<vsg::ushortArray> ushort_indices;
+    vsg::ref_ptr<vsg::uintArray> uint_indices;
 };
 
 void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
@@ -309,8 +336,8 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
 
     auto draw_commands = vsg::Commands::create();
     draw_commands->addChild(vsg::BindVertexBuffers::create(0, vsg::DataList{fav.positions, fav.tex_coords}));
-    draw_commands->addChild(vsg::BindIndexBuffer::create(fav.indices));
-    draw_commands->addChild(vsg::DrawIndexed::create(fav.indices->size(), 1, 0, 0, 0));
+    draw_commands->addChild(vsg::BindIndexBuffer::create(fav.get_indices()));
+    draw_commands->addChild(vsg::DrawIndexed::create(fav.get_indices_size(), 1, 0, 0, 0));
 
     auto transform = vsg::MatrixTransform::create();
     transform->matrix = vsg::rotate(vsg::radians(90.0), vsg::dvec3{1.0, 0.0, 0.0});
