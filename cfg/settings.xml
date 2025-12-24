@@ -14,6 +14,8 @@
         <VehicleControlledUpdateInterval>70</VehicleControlledUpdateInterval>
         <!-- Дополнительная задержка клиента для сглаживания неравномерного приёма сетевых пакетов, мс -->
         <ClientDelay>100</ClientDelay>
+        <!-- Разрешение показывать IP-адрес сервера -->
+        <ShowServerAddr>1</ShowServerAddr>
     </Client>
     <Viewer>
         <!-- Запись в лог-файл: INFO - все сообщения, WARN - только ошибки, FATAL - только критические ошибки -->

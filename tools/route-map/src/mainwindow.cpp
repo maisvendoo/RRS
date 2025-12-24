@@ -99,6 +99,8 @@ void MainWindow::load_config(const QString &cfg_name)
         tcp_config.port = static_cast<quint16>(tmp);
     }
 
+    cfg.getBool(secName, "ShowServerAddr", tcp_config.show_server_addr);
+
     cfg.getInt(secName, "ReconnectInteval", tcp_config.reconnect_interval);
     cfg.getInt(secName, "VehiclesPosUpdateInterval", vehicles_pos_update_interval);
     cfg.getInt(secName, "PlayersUpdateInterval", players_update_interval);
