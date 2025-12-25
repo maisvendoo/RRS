@@ -221,9 +221,9 @@ bool VehicleExterior::load_models(const std::string &cfg_path, CfgReader &cfg, v
         {
             vsg::ref_ptr<vsg::MatrixTransform> model_node = vsg::MatrixTransform::create();
             model_node->matrix = vsg::translate(shift) *
-                                 vsg::rotate(rotate.x, vsg::dvec3(1.0, 0.0, 0.0)) *
-                                 vsg::rotate(rotate.y, vsg::dvec3(0.0, 1.0, 0.0)) *
-                                 vsg::rotate(rotate.z, vsg::dvec3(0.0, 0.0, 1.0));
+                                 vsg::rotate(vsg::radians(rotate.x), vsg::dvec3(1.0, 0.0, 0.0)) *
+                                 vsg::rotate(vsg::radians(rotate.y), vsg::dvec3(0.0, 1.0, 0.0)) *
+                                 vsg::rotate(vsg::radians(rotate.z), vsg::dvec3(0.0, 0.0, 1.0));
             model_node->setValue("name", model_filename);
             model_node->addChild(model_pagedLOD);
             transform->addChild(model_node);
