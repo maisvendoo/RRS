@@ -17,23 +17,24 @@ class Sun : public vsg::Inherit<vsg::Group, Sun>
 public:
     Sun(const vsg::dvec3& camera_pos, double ambient_intensity, double sun_intensity);
 
-    void update(simulator_time_t time, double timezone);
-
-    void getSunDirection(double& azimuth_degrees, double& altitude_degrees);
+    void update(simulator_time_t time, double timezone,
+                double latitude, double longitude);
 
     bool use_gui_sun_direction = false;
-    float azimuth_deg = 0.0;
-    float altitude_deg = 0.0;
 
     bool use_gui_ambient_intensity = false;
 
     bool use_gui_sun_intensity = false;
 
+    float azimuth_deg = 0.0;
+    float altitude_deg = 0.0;
+
     vsg::ref_ptr<vsg::DirectionalLight> sun = vsg::DirectionalLight::create();
-    vsg::ref_ptr<vsg::AmbientLight>     ambient = vsg::AmbientLight::create();
+    vsg::ref_ptr<vsg::AmbientLight> ambient = vsg::AmbientLight::create();
 
 private:
-    void update_sun_direction_degrees(simulator_time_t time, double timezone);
+    void update_sun_direction_degrees(simulator_time_t time, double timezone,
+                                      double latitude, double longitude);
 
     void ecef_to_latlong(
         double x, double y, double z,

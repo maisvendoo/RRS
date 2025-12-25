@@ -3,5 +3,7 @@
 	<Route>
 		<Title>Испытательный полигон (.gltf)</Title>
 		<Description>Тестовый маршрут для обкатки ПС. Автор: Роман Бирюков</Description>
+		<Latitude>47.2</Latitude>
+		<Longitude>39.7</Longitude>
 	</Route>
 </Config>

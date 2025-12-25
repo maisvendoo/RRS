@@ -82,6 +82,8 @@ bool MainWindow::createDescriptionFile(QString title, QString description)
     FieldsDataList flist;
     flist.append(QPair<QString, QString>("Title", title));
     flist.append(QPair<QString, QString>("Description", description));
+    flist.append(QPair<QString, double>("Latitude", latitude));
+    flist.append(QPair<QString, double>("Longitude", longitude));
 
     editor.writeFile("Route", flist);
 
@@ -109,6 +111,12 @@ bool MainWindow::loadDescriptionFile(QString route_dir)
         fieldName = "Description";
         cfg.getString(secName, fieldName, fieldValue);
         ui->teRouteDescription->setText(fieldValue);
+
+        fieldName = "Latitude";
+        cfg.getDouble(secName, fieldName, latitude);
+
+        fieldName = "Longitude";
+        cfg.getDouble(secName, fieldName, longitude);
         return true;
     }
     return false;

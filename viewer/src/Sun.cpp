@@ -23,10 +23,6 @@ static spa_data default_spa()
     spa.azm_rotation = 0.0;
     spa.atmos_refract = 0.5667;
     spa.function = SPA_ZA;
-
-    // Ростов-на-дону
-    spa.latitude = 47.2;
-    spa.longitude = 39.7;
     spa.elevation = 0.0;
 
     return spa;
@@ -47,7 +43,7 @@ Sun::Sun(const vsg::dvec3& camera_pos, double ambient_intensity, double sun_inte
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Sun::update(simulator_time_t time, double timezone)
+void Sun::update(simulator_time_t time, double timezone, double latitude, double longitude)
 {
     if (!use_gui_ambient_intensity)
     {
@@ -66,11 +62,11 @@ void Sun::update(simulator_time_t time, double timezone)
 
     if (!use_gui_sun_direction)
     {
-        update_sun_direction_degrees(time, timezone);
+        update_sun_direction_degrees(time, timezone, latitude, longitude);
     }
 
-    const double azimuth_rad = vsg::radians(azimuth_deg - 90.0);
-    const double altitude_rad = vsg::radians(altitude_deg);
+    const float azimuth_rad = vsg::radians(azimuth_deg - 90.0f);
+    const float altitude_rad = vsg::radians(altitude_deg);
 
     sun->direction.x = -std::cos(altitude_rad) * std::sin(azimuth_rad);
     sun->direction.y = -std::cos(altitude_rad) * std::cos(azimuth_rad);
@@ -81,18 +77,13 @@ void Sun::update(simulator_time_t time, double timezone)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Sun::getSunDirection(double& azimuth_degrees, double& altitude_degrees)
-{
-    azimuth_degrees = azimuth_deg;
-    altitude_degrees = altitude_deg;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Sun::update_sun_direction_degrees(simulator_time_t time, double timezone)
+void Sun::update_sun_direction_degrees(simulator_time_t time, double timezone,
+                                       double latitude, double longitude)
 {
     static spa_data spa = default_spa();
+    spa.latitude = latitude;
+    spa.longitude = longitude;
+
     spa.year = time.date.year();
     spa.month = time.date.month();
     spa.day = time.date.day();

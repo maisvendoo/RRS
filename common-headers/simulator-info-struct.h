@@ -11,6 +11,8 @@
 //------------------------------------------------------------------------------
 struct simulator_route_info_t final
 {
+    double latitude = 47.2;
+    double longitude = 39.7;
     QString route_dir_name;
 
     QByteArray serialize() const
@@ -20,6 +22,8 @@ struct simulator_route_info_t final
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
+        stream << latitude;
+        stream << longitude;
         stream << route_dir_name;
 
         return buff.data();
@@ -31,6 +35,8 @@ struct simulator_route_info_t final
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
+        stream >> latitude;
+        stream >> longitude;
         stream >> route_dir_name;
     }
 };

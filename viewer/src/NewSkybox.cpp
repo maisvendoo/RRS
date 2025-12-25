@@ -495,23 +495,6 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
 
     transform->addChild(draw_commands);
     state_group->addChild(transform);
-/*    //debug
-    for (int i = -60; i < 60; ++i)
-    {
-        is_sun_rise = (i < 0);
-        int d = is_sun_rise ? (30 + i) : (30 - i);
-        set_sun_direction(0.0, d);
-
-        std::string log = std::to_string(d) + " " + std::to_string(mix_value->value());
-        for (texture_t& tt : textures)
-        {
-            log += " | " + tt.filename
-                   + "(" + std::to_string(tt.use_id)
-                   + ")=" + std::to_string(tt.mix_value);
-        }
-        LOG_INFO("%s", log.c_str());
-    }
-    exit(0);*/
 }
 
 void NewSkybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)

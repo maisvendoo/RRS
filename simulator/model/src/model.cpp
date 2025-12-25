@@ -91,7 +91,19 @@ bool Model::init(const simulator_command_line_t &command_line)
     sim_time.simulation_seconds = start_time;
 
     Journal::instance()->info("==== Info to server ====");
-    simulator_route_info_t route_info;
+    simulator_route_info_t route_info = simulator_route_info_t();
+
+    FileSystem &fs = FileSystem::getInstance();
+    QString cfg_path = QString(fs.getRouteRootDir().c_str()) +
+                       QDir::separator() + init_data.route_dir_name +
+                       QDir::separator() + "description.xml";
+    CfgReader cfg;
+    if (cfg.load(cfg_path))
+    {
+        cfg.getDouble("Route", "Latitude", route_info.latitude);
+        cfg.getDouble("Route", "Longitude", route_info.longitude);
+    }
+
     route_info.route_dir_name = init_data.route_dir_name;
     tcp_server->setRouteInfo(route_info.serialize());
     Journal::instance()->info("Ready route info for server");

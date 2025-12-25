@@ -44,6 +44,9 @@ private:
     QProcess    parallelGenProc;
     QProcess    splineGenProc;
 
+    double latitude = 47.2;
+    double longitude = 39.7;
+
     bool createRouteTypeFile();
 
     bool createDescriptionFile(QString title, QString description);

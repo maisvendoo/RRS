@@ -149,14 +149,12 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     simulator_time_t datetime({static_cast<int16_t>(params->year), static_cast<uint8_t>(params->month), static_cast<uint8_t>(params->day)},
                               {static_cast<uint8_t>(params->hour), static_cast<uint8_t>(params->minute), static_cast<uint8_t>(params->sec), static_cast<uint8_t>(params->msec)});
 
-    params->sun->update(datetime, 3.0);
-    double sun_azimuth_degrees;
-    double sun_altitude_degrees;
-    params->sun->getSunDirection(sun_azimuth_degrees, sun_altitude_degrees);
+    params->sun->update(datetime, 3.0, params->latitude, params->longitude);
 
     // params->skybox->setDateTime(datetime);
     params->new_skybox->set_date_time(datetime);
-    params->new_skybox->set_sun_direction(sun_azimuth_degrees, sun_altitude_degrees);
+    params->new_skybox->set_sun_direction(params->sun->azimuth_deg,
+                                          params->sun->altitude_deg);
 
     if (params->is_show_debug_msg)
     {

@@ -31,6 +31,9 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 
     vsg::ref_ptr<Sun> sun;
 
+    double latitude = 47.2;
+    double longitude = 39.7;
+
     int use_server_time = true;
     int16_t year = 2000;
     int16_t month = 1;
