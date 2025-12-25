@@ -80,6 +80,8 @@ vsg::ref_ptr<vsg::Node> NewSkybox::getNode() const
 
 void NewSkybox::set_date_time(const simulator_time_t& sim_time)
 {
+    is_sun_rise = sim_time.time.hour() < 13;
+    return;/*
     for (season_time_texture_t& stt : textures)
     {
         // Проверяем, что дата попадет в сезон применения текстуры
@@ -155,13 +157,156 @@ void NewSkybox::set_date_time(const simulator_time_t& sim_time)
         {
             stt.state = season_time_texture_t::State::INACTIVE;
         }
-    }
+    }*/
 }
 
-void NewSkybox::set_sun_direction(double azimuth_degrees, [[maybe_unused]] double altitude_degrees)
+void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degrees)
 {
+    // Поворот модели скайбокса в используемую систему координат,
+    // и поворот для отрисовки солнца в той же стороне, где источник солнечного света
     transform->matrix = vsg::rotate(vsg::radians(90.0), vsg::dvec3{1.0, 0.0, 0.0}) *
                         vsg::rotate(vsg::radians(90.0 + azimuth_degrees), vsg::dvec3{0.0, -1.0, 0.0});
+
+    // Выбор текстур по углу возвышения солнца над/под горизонтом
+    if (std::abs(altitude_degrees) > 90.0)
+    {
+        return;
+    }
+
+    auto angle_in_interval = [](const double& begin,
+                                const double& end,
+                                const double& cur_angle,
+                                const double& cur_angle_rise) -> float
+    {
+        if ((begin < end) == cur_angle_rise)
+        {
+            const float mix_value = (cur_angle - begin) / (end - begin);
+            return std::clamp(mix_value, 0.0f, 1.0f);
+        }
+        return 0.0f;
+    };
+
+    float max1 = 0.0f;
+    float max2 = 0.0f;
+    int texture1_id = -1;
+    int texture2_id = -1;
+    int id = 0;
+    for (texture_t& tt : textures)
+    {
+        // Проверям, с какой интенсивностью должна отображаться текстура
+        float mix_value_appear =
+            angle_in_interval(tt.angle_appear_begin, tt.angle_appear_end, altitude_degrees, is_sun_rise);
+        float mix_value_disappear =
+            angle_in_interval(tt.angle_disappear_begin, tt.angle_disappear_end, altitude_degrees, is_sun_rise);
+
+        // Корректируем полученное значение в случае перехода через полдень
+        if ((tt.angle_appear_begin < tt.angle_appear_end) &&
+            (tt.angle_disappear_begin > tt.angle_disappear_end))
+        {
+            mix_value_appear += static_cast<float>(!is_sun_rise);
+        }
+
+        // Корректируем полученное значение в случае перехода через полночь
+        if ((tt.angle_appear_begin > tt.angle_appear_end) &&
+            (tt.angle_disappear_begin < tt.angle_disappear_end))
+        {
+            mix_value_appear += static_cast<float>(is_sun_rise);
+        }
+
+        tt.mix_value = mix_value_appear - mix_value_disappear;
+
+        // Сохраняем id двух текстур с максимальным значением
+        if (max1 < tt.mix_value)
+        {
+            if (max2 < max1)
+            {
+                max2 = max1;
+                texture2_id = texture1_id;
+            }
+            max1 = tt.mix_value;
+            texture1_id = id;
+        }
+        else
+        {
+            if (max2 < tt.mix_value)
+            {
+                max2 = tt.mix_value;
+                texture2_id = id;
+            }
+        }
+        ++id;
+    }
+
+    if (texture2_id < 0)
+    {
+        if (texture1_id < 0)
+        {
+            // Нет активных текстур
+            for (auto tt : textures)
+            {
+                tt.use_id = 0;
+            }
+            return;
+        }
+
+        // Активна только одна текстура, передаём её в первую текстуру шейдера
+        if (textures[texture1_id].use_id != 1)
+        {
+            std::memcpy(texture1_data->dataPointer(),
+                        textures[texture1_id].texture->dataPointer(),
+                        textures[texture1_id].texture->dataSize());
+            texture1_data->dirty();
+        }
+
+        // Передаём в шейдер отображение первой текстуры полностью
+        if (mix_value->value() != 0.0f)
+        {
+            mix_value->set(0.0f);
+            mix_value->dirty();
+        }
+
+        for (auto tt : textures)
+        {
+            tt.use_id = 0;
+        }
+        textures[texture1_id].use_id = 1;
+    }
+    else
+    {
+        // Активны две текстуры, передаём их в шейдер
+        if (textures[texture1_id].use_id != 1)
+        {
+            std::memcpy(texture1_data->dataPointer(),
+                        textures[texture1_id].texture->dataPointer(),
+                        textures[texture1_id].texture->dataSize());
+            texture1_data->dirty();
+        }
+
+        if (textures[texture2_id].use_id != 2)
+        {
+            std::memcpy(texture2_data->dataPointer(),
+                        textures[texture2_id].texture->dataPointer(),
+                        textures[texture2_id].texture->dataSize());
+            texture2_data->dirty();
+        }
+
+        // Передаём в шейдер смешение текстур
+        const float sum = max1 + max2;
+        const float mix = max2 / sum;
+        constexpr float eps = 1.0f / 256.0f;
+        if (std::abs(mix_value->value() - mix) > eps)
+        {
+            mix_value->set(mix);
+            mix_value->dirty();
+        }
+
+        for (auto tt : textures)
+        {
+            tt.use_id = 0;
+        }
+        textures[texture1_id].use_id = 1;
+        textures[texture2_id].use_id = 2;
+    }
 }
 
 class FindArraysVisitor : public vsg::Visitor
@@ -174,7 +319,7 @@ public:
 
     void apply(vsg::VertexIndexDraw& vid) override
     {
-        for (auto buffer_info : vid.arrays)
+        for (auto& buffer_info : vid.arrays)
         {
             auto data = buffer_info->data;
             if (auto array = data.cast<vsg::vec3Array>())
@@ -350,6 +495,23 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
 
     transform->addChild(draw_commands);
     state_group->addChild(transform);
+/*    //debug
+    for (int i = -60; i < 60; ++i)
+    {
+        is_sun_rise = (i < 0);
+        int d = is_sun_rise ? (30 + i) : (30 - i);
+        set_sun_direction(0.0, d);
+
+        std::string log = std::to_string(d) + " " + std::to_string(mix_value->value());
+        for (texture_t& tt : textures)
+        {
+            log += " | " + tt.filename
+                   + "(" + std::to_string(tt.use_id)
+                   + ")=" + std::to_string(tt.mix_value);
+        }
+        LOG_INFO("%s", log.c_str());
+    }
+    exit(0);*/
 }
 
 void NewSkybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
@@ -409,85 +571,36 @@ void NewSkybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options
 
         LOG_INFO("Loaded skybox texture from file: %s", texture_path.c_str());
 
-        season_time_texture_t stt{};
-        stt.texture = data;
-        stt.filename = texture_filename.toStdString();
+        texture_t tt{};
+        tt.texture = data;
+        tt.filename = texture_filename.toStdString();
 
-        auto read_season_date = [](CfgReader& cfg, QDomNode& sec_node, const char* section,
-                                   season_time_texture_t::season_date_t& sd) -> bool
+        if (!cfg.getDouble(sec_node, "SunAltitudeAngleAppearBegin", tt.angle_appear_begin) ||
+            !cfg.getDouble(sec_node, "SunAltitudeAngleAppearEnd", tt.angle_appear_end) ||
+            !cfg.getDouble(sec_node, "SunAltitudeAngleDisappearBegin", tt.angle_disappear_begin) ||
+            !cfg.getDouble(sec_node, "SunAltitudeAngleDisappearEnd", tt.angle_disappear_end))
         {
-            QString tmp;
-            if (!cfg.getString(sec_node, section, tmp))
-            {
-                return false;
-            }
-
-            QStringList tokens = tmp.split("-");
-            if (tokens.size() != 2)
-            {
-                return false;
-            }
-
-            sd.month = tokens[0].toInt();
-            if ((sd.month < 1) || (sd.month > 12))
-            {
-                return false;
-            }
-
-            sd.day = tokens[1].toInt();
-            if ((sd.day < 1) || (sd.day > 31))
-            {
-                return false;
-            }
-
-            return true;
-        };
-
-        auto read_time = [](CfgReader& cfg, QDomNode& sec_node, const char* section, server_time_t& st) -> bool
-        {
-            QString tmp;
-            if (!cfg.getString(sec_node, section, tmp))
-            {
-                return false;
-            }
-
-            QStringList tokens = tmp.split(":");
-            if (tokens.size() != 3)
-            {
-                return false;
-            }
-
-            st = server_time_t(tokens[0].toInt(), tokens[1].toInt(), tokens[2].toInt());
-            return true;
-        };
-
-        if (!read_season_date(cfg, sec_node, "SeasonBegin", stt.date_season_begin)
-            || !read_season_date(cfg, sec_node, "SeasonEnd", stt.date_season_end)
-            || !read_time(cfg, sec_node, "TimeAppearBegin", stt.time_appear_begin)
-            || !read_time(cfg, sec_node, "TimeAppearEnd", stt.time_appear_end)
-            || !read_time(cfg, sec_node, "TimeDisappearBegin", stt.time_disappear_begin)
-            || !read_time(cfg, sec_node, "TimeDisappearEnd", stt.time_disappear_end))
-        {
-            LOG_WARN("Failed to read season or time from config for skybox texture: %s", texture_path.c_str());
+            LOG_WARN("Failed to read sun altitude angles from config for skybox texture: %s", texture_path.c_str());
 
             sec_node = cfg.getNextSection();
             continue;
         }
 
-        int through_midnight_count = (stt.time_appear_begin > stt.time_appear_end)
-                                     + (stt.time_appear_end > stt.time_disappear_begin)
-                                     + (stt.time_disappear_begin > stt.time_disappear_end);
-        if (through_midnight_count > 1)
+        if ((std::abs(tt.angle_appear_begin) > 90.0) ||
+            (std::abs(tt.angle_appear_end) > 90.0) ||
+            (std::abs(tt.angle_disappear_begin) > 90.0) ||
+            (std::abs(tt.angle_disappear_end) > 90.0) ||
+            (tt.angle_appear_begin == tt.angle_appear_end) ||
+            (tt.angle_disappear_begin == tt.angle_disappear_end))
         {
-            LOG_WARN("Invalid time for skybox texture: %s", texture_path.c_str());
+            LOG_WARN("Invalid sun altitude angles for skybox texture: %s", texture_path.c_str());
 
             sec_node = cfg.getNextSection();
             continue;
         }
 
-        stt.state = season_time_texture_t::State::INACTIVE;
-        textures.emplace_back(stt);
-
+        LOG_INFO("Loaded skybox texture: %s", texture_path.c_str());
+        textures.emplace_back(tt);
         sec_node = cfg.getNextSection();
     }
 }

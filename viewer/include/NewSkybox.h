@@ -7,7 +7,6 @@
 #include <vsg/core/Value.h>
 #include <vsg/core/ref_ptr.h>
 
-#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -39,30 +38,22 @@ private:
     void init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
 
 private:
-    struct season_time_texture_t
+    bool is_sun_rise = false;
+
+    struct texture_t
     {
-        enum class State
-        {
-            ACTIVE,
-            INACTIVE,
-            APPEARING,
-            DISAPPEARING
-        } state;
-
-        struct season_date_t {std::uint8_t month; std::uint8_t day;};
-        season_date_t date_season_begin = {1, 1};       ///< День начала сезона применения данной текстуры (включительно)
-        season_date_t date_season_end = {12, 31};       ///< День окончания сезона применения данной текстуры (включительно)
-
-        server_time_t time_appear_begin = {0, 0, 0};    ///< Время начала плавного появления данной текстуры
-        server_time_t time_appear_end = {0, 0, 0};      ///< Время окончания плавного появления данной текстуры
-        server_time_t time_disappear_begin = {0, 0, 0}; ///< Время начала плавного исчезновения данной текстуры
-        server_time_t time_disappear_end = {0, 0, 0};   ///< Время окончания плавного исчезновения данной текстуры
+        double angle_appear_begin = 0.0f;    ///< Возвышение солнца в начале плавного появления данной текстуры
+        double angle_appear_end = 0.0f;      ///< Возвышение солнца в конце плавного появления данной текстуры
+        double angle_disappear_begin = 0.0f; ///< Возвышение солнца в начале плавного исчезновения данной текстуры
+        double angle_disappear_end = 0.0f;   ///< Возвышение солнца в конце плавного исчезновения данной текстуры
+        float mix_value = 0.0f;
+        int use_id = 0;
 
         vsg::ref_ptr<vsg::ubvec4Array2D> texture;       ///< Указатель на загруженную текстуру
         std::string filename;                           ///< Имя файла текстуры
     };
 
-    std::vector<season_time_texture_t> textures;
+    std::vector<texture_t> textures;
     vsg::ref_ptr<vsg::StateGroup> state_group;
     vsg::ref_ptr<vsg::MatrixTransform> transform;
     vsg::ref_ptr<vsg::Data> texture1_data;
