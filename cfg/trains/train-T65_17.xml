@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Common>
+		<!-- Зарядное давление, МПа -->
+		<ChargingPressure>0.5</ChargingPressure>
+		<!-- Начальное давление в ГР, МПа -->
+		<InitMainResPressure>0.9</InitMainResPressure>
+		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
+		<NoAir>1</NoAir>
+
+		<Title>Состав поезда 65 (без воздуха)</Title>
+		<Description>Состав из 17 вагонов и вагона-бара. ВНИМАНИЕ!!! Снять башмаки под первым и последним вагоном до начала движения!</Description>
+	</Common>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>3</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+		<IsBrakeShoes>1</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>2</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+		<IsBrakeShoes>0</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>3</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+		<IsBrakeShoes>0</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-16733</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+		<IsBrakeShoes>0</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-17669</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+		<IsBrakeShoes>0</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>2</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+		<IsBrakeShoes>0</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+		<IsBrakeShoes>0</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-25924</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>3</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+		<IsBrakeShoes>1</IsBrakeShoes>
+	</Vehicle>
+
+</Config>

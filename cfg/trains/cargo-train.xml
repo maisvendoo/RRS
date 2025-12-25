@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Common>
+		<!-- Зарядное давление, МПа -->
+		<ChargingPressure>0.52</ChargingPressure>
+		<!-- Начальное давление в ГР, МПа -->
+		<InitMainResPressure>0.9</InitMainResPressure>
+		<!-- Поезд без воздуха (1 - без воздуха, 0 - полностью заряженный) -->
+		<NoAir>1</NoAir>
+
+		<Title>Грузовой порожний состав (без воздуха)</Title>
+		<Description>50 порожних хопперов. ВНИМАНИЕ!!! Перед началом движения убрать башмаки под первым и последним вагоном!</Description>
+	</Common>
+
+	<Vehicle>
+		<ModuleDir>freightcar</ModuleDir>
+		<Module>freightcar</Module>
+		<ModuleConfigDir>Fr_hopper_RZD</ModuleConfigDir>
+		<ModuleConfig>Fr_hopper_RZD-2851</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>0</PayloadCoeff>
+		<IsBrakeShoes>1</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>freightcar</ModuleDir>
+		<Module>freightcar</Module>
+		<ModuleConfigDir>Fr_hopper_RZD</ModuleConfigDir>
+		<ModuleConfig>Fr_hopper_RZD-2851</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>48</Count>
+		<PayloadCoeff>0</PayloadCoeff>
+		<IsBrakeShoes>0</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>freightcar</ModuleDir>
+		<Module>freightcar</Module>
+		<ModuleConfigDir>Fr_hopper_RZD</ModuleConfigDir>
+		<ModuleConfig>Fr_hopper_RZD-2851</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>0</PayloadCoeff>
+		<IsBrakeShoes>1</IsBrakeShoes>
+	</Vehicle>
+
+</Config>

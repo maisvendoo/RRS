@@ -67,6 +67,8 @@ xcopy /Y ..\cfg\trains\vl60pk-1543.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy /Y ..\cfg\trains\VL60k-1737.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy /Y ..\cfg\trains\vl60k-1737-frEmpties.xml %RRS_DEV_ROOT%\cfg\trains\
 xcopy /Y ..\cfg\trains\vl60k-1737-frLoads.xml %RRS_DEV_ROOT%\cfg\trains\
+xcopy /Y ..\cfg\trains\train-T65_17.xml %RRS_DEV_ROOT%\cfg\trains\
+xcopy /Y ..\cfg\trains\cargo-train.xml %RRS_DEV_ROOT%\cfg\trains\
 rem Копируем прочие необходимые DLL
 
 xcopy /Y %OPENAL_BIN%\*.dll %RRS_DEV_ROOT%\bin\
