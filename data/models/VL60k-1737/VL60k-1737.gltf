@@ -4265,14 +4265,19 @@
 		},
 		{
 			"sampler":0,
-			"source":0
+			"source":1
 		},
 		{
 			"sampler":0,
-			"source":1
+			"source":2
 		}
 	],
 	"images":[
+		{
+			"mimeType":"image/png",
+			"name":"kuzov_emis",
+			"uri":"textures/kuzov_emis.png"
+		},
 		{
 			"mimeType":"image/png",
 			"name":"kuzov",

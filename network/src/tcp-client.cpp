@@ -3,7 +3,6 @@
 #include    <QTcpSocket>
 #include    <QNetworkProxy>
 #include    <QBuffer>
-#define SHOW_SERVER_ADDRESS 1
 
 //------------------------------------------------------------------------------
 //

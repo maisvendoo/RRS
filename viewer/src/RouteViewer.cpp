@@ -11,7 +11,6 @@
 // #include "Skybox.h"
 #include "Sun.h"
 #include "TrafficLightsHandler.h"
-#include "UpdateLightingHandler.h"
 #include "UpdateControlToServerHandler.h"
 #include "UpdateSoundManagerHandler.h"
 #include "UpdateStatisticsHandler.h"
@@ -394,9 +393,9 @@ void RouteViewer::initScenegraph()
     NewSkybox* nsb = new NewSkybox(cfg_path, options);
     GUIparams->new_skybox = nsb;
 
-    if (nsb->get_state_group())
+    if (nsb->getNode())
     {
-        root->addChild(nsb->get_state_group());
+        root->addChild(nsb->getNode());
     }
 }
 
@@ -643,14 +642,11 @@ void RouteViewer::initViewer()
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
     close_viewer_handler->closeKey = vsg::KEY_Undefined;
 
-    auto upd_lighting_handler = UpdateLightingHandler::create(sun, vehicles_handler);
-
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
     viewer->addEventHandler(upd_sound_manager_handler);
     viewer->addEventHandler(upd_statistis_handler);
-    viewer->addEventHandler(upd_lighting_handler);
     viewer->addEventHandler(close_viewer_handler);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});

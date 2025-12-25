@@ -23,23 +23,22 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     vsg::observer_ptr<vsg::Viewer> viewer;
     simulator_time_t* sim_time = nullptr;
 
-    // TODO: Нигде не используется
-    simulator_time_t* local_time = nullptr;
-
     // Skybox *skybox = nullptr;
     NewSkybox* new_skybox = nullptr;
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
     UpdateControlToServerHandler *controls_handler = nullptr;
 
+    vsg::ref_ptr<Sun> sun;
+
     int use_server_time = true;
-    bool was_server_time_unavailable = true;
     int16_t year = 2000;
     int16_t month = 1;
     int16_t day = 1;
     int16_t hour = 0;
     int16_t minute = 0;
     int16_t sec = 0;
+    int16_t msec = 0;
 
     bool prev_Esc = false;
     bool is_show_quit_dialog = false;
@@ -58,13 +57,6 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool is_no_cabine_control = false;
 
     QString status = "";
-
-    vsg::ref_ptr<Sun> sun;
-
-    int skybox_texture_index = 1;
-    int prev_skybox_texture_index = 1;
-    vsg::ref_ptr<vsg::ubvec4Array2D> skybox_texture_data;
-    std::vector<vsg::ref_ptr<vsg::ubvec4Array2D>> skybox_textures;
 };
 
 //------------------------------------------------------------------------------

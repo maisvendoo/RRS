@@ -9,6 +9,9 @@
 
 using Meters = double;
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 static spa_data default_spa()
 {
     spa_data spa;
@@ -21,12 +24,12 @@ static spa_data default_spa()
     spa.atmos_refract = 0.5667;
     spa.function = SPA_ZA;
 
-    return spa;
-}
+    // Ростов-на-дону
+    spa.latitude = 47.2;
+    spa.longitude = 39.7;
+    spa.elevation = 0.0;
 
-static double rad_to_deg(double rad)
-{
-    return rad * 180.0 / M_PI;
+    return spa;
 }
 
 //------------------------------------------------------------------------------
@@ -44,11 +47,7 @@ Sun::Sun(const vsg::dvec3& camera_pos, double ambient_intensity, double sun_inte
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Sun::update(
-    int year, int month, int day,
-    int hour, int minute, double second,
-    double timezone
-)
+void Sun::update(simulator_time_t time, double timezone)
 {
     if (!use_gui_ambient_intensity)
     {
@@ -67,10 +66,10 @@ void Sun::update(
 
     if (!use_gui_sun_direction)
     {
-        update_sun_direction_degrees(year, month, day, hour, minute, second, timezone);
+        update_sun_direction_degrees(time, timezone);
     }
 
-    const double azimuth_rad = vsg::radians(azimuth_deg);
+    const double azimuth_rad = vsg::radians(azimuth_deg - 90.0);
     const double altitude_rad = vsg::radians(altitude_deg);
 
     sun->direction.x = -std::cos(altitude_rad) * std::sin(azimuth_rad);
@@ -82,33 +81,26 @@ void Sun::update(
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Sun::update_sun_direction_degrees(int year, int month, int day, int hour, int minute, double second, double timezone)
+void Sun::getSunDirection(double& azimuth_degrees, double& altitude_degrees)
 {
-    constexpr Meters ecef_x0 = 2'849'494.463'270'107;
-    constexpr Meters ecef_y0 = 2'196'239.724'320'043;
-    constexpr Meters ecef_z0 = 5'248'968.407'733'058;
+    azimuth_degrees = azimuth_deg;
+    altitude_degrees = altitude_deg;
+}
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Sun::update_sun_direction_degrees(simulator_time_t time, double timezone)
+{
     static spa_data spa = default_spa();
-    if (use_gui_time)
-    {
-        spa.year = gui_time.date.year();
-        spa.month = gui_time.date.month();
-        spa.day = gui_time.date.day();
-        spa.hour = gui_time.time.hour();
-        spa.minute = gui_time.time.minute();
-        spa.second = gui_time.time.sec() + gui_time.time.msec();
-    }
-    else
-    {
-        spa.year = year;
-        spa.month = month;
-        spa.day = day;
-        spa.hour = hour;
-        spa.minute = minute;
-        spa.second = second;
-    }
+    spa.year = time.date.year();
+    spa.month = time.date.month();
+    spa.day = time.date.day();
+    spa.hour = time.time.hour();
+    spa.minute = time.time.minute();
+    spa.second = static_cast<double>(time.time.sec()) +
+                 static_cast<double>(time.time.msec()) / 1000.0;
     spa.timezone = timezone;
-    ecef_to_latlong(camera_pos.x + ecef_x0, camera_pos.y + ecef_y0, camera_pos.z + ecef_z0, spa.latitude, spa.longitude, spa.elevation);
 
     spa_calculate(&spa);
 
@@ -146,8 +138,8 @@ void Sun::ecef_to_latlong(
     double lon_rad = std::atan2(y, x);
 
     elevation = U * (1.0 - (b * b) / (a * V));
-    latitude = rad_to_deg(lat_rad);
-    longitude = rad_to_deg(lon_rad);
+    latitude = vsg::degrees(lat_rad);
+    longitude = vsg::degrees(lon_rad);
 }
 
 //------------------------------------------------------------------------------
