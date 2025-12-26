@@ -19,7 +19,7 @@
 		<ModuleConfig>vl60pk-1543</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
 		<Count>1</Count>
-		<PayloadCoeff>1</PayloadCoeff>		
+		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
 	<Vehicle>

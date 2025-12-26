@@ -18,9 +18,20 @@
 		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
-		<Count>3</Count>
+		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 		<IsBrakeShoes>1</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>2</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+		<IsBrakeShoes>0</IsBrakeShoes>
 	</Vehicle>
 
 	<Vehicle>
@@ -96,6 +107,17 @@
 		<ModuleConfig>IMR_pass_rzd-25924</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
 		<Count>3</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+		<IsBrakeShoes>0</IsBrakeShoes>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
+		<ModuleConfig>IMR_pass_rzd-21071</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
 		<PayloadCoeff>1</PayloadCoeff>
 		<IsBrakeShoes>1</IsBrakeShoes>
 	</Vehicle>
