@@ -53,4 +53,30 @@
 		<AnimationsConfigDir>passcar</AnimationsConfigDir>
 	</Model>
 
+	<Model>
+		<ModelName>default-objects/Brake_show.gltf</ModelName>
+		<ModelShift>0.8 -9.72 0.312</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/Brake_show.gltf</ModelName>
+		<ModelShift>0.8 7.27 0.312</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/Brake_show.gltf</ModelName>
+		<ModelShift>-0.8 9.72 0.312</ModelShift>
+		<ModelRotate>0.0 0.0 180.0</ModelRotate>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/Brake_show.gltf</ModelName>
+		<ModelShift>-0.8 -7.27 0.312</ModelShift>
+		<ModelRotate>0.0 0.0 180.0</ModelRotate>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
 </Config>
