@@ -66,11 +66,4 @@ void FreightCar::initControl(const QString& modules_dir, const QString& custom_c
     brake_shoes_set.setKeySymbolOff(KEY_Insert);
     brake_shoes_set.setKeyModifierOff(MODIFIER_OnlyControl);
     brake_shoes_set.setControl(&pressed_keys);
-
-    // Управление башмаками
-    brake_shoes_set.setKeySymbolOn(KEY_Insert);
-    brake_shoes_set.setKeyModifierOn(MODIFIER_OnlyShift);
-    brake_shoes_set.setKeySymbolOff(KEY_Insert);
-    brake_shoes_set.setKeyModifierOff(MODIFIER_OnlyControl);
-    brake_shoes_set.setControl(&pressed_keys);
 }

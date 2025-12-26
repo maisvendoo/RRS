@@ -14,6 +14,7 @@
 
 class AirDistributor;
 class BrakeMech;
+class BrakeShoes;
 class Coupling;
 class ElectroAirDistributor;
 class OperatingRod;
@@ -21,7 +22,6 @@ class PneumoAngleCock;
 class PneumoHoseEPB;
 class Registrator;
 class Reservoir;
-class BrakeShoes;
 
 //------------------------------------------------------------------------------
 //
