@@ -915,14 +915,20 @@ void ZDSimConverter::writeSplitsForDebug(const route_connectors_t &connectors, c
             }
             case split_zds_trajectory_t::SPLIT_TO_SIDE_NO_BRANCH:
             {
-                stream << DELIMITER_SYMBOL
-                       << "splitbyside2_!!_NO_BRANCH_!!_" << (*it)->fwd_side_traj.c_str();
+                stream << DELIMITER_SYMBOL;
+                    if ((*it)->fwd_side_traj.empty())
+                        stream << "splitbyside2_!!_NO_BRANCH_!!_";
+                    else
+                        stream << "splitbyside2!_" << (*it)->fwd_side_traj.c_str();
                 break;
             }
             case split_zds_trajectory_t::SPLIT_FROM_SIDE_NO_BRANCH:
             {
-                stream << DELIMITER_SYMBOL
-                       << "splitbyside1_!!_NO_BRANCH_!!_" << (*it)->bwd_side_traj.c_str();
+                stream << DELIMITER_SYMBOL;
+                if ((*it)->bwd_side_traj.empty())
+                    stream << "splitbyside1_!!_NO_BRANCH_!!_";
+                else
+                    stream << "splitbyside1!_" << (*it)->bwd_side_traj.c_str();
                 break;
             }
             case split_zds_trajectory_t::SPLIT_SIGNAL_FWD:
@@ -940,7 +946,7 @@ void ZDSimConverter::writeSplitsForDebug(const route_connectors_t &connectors, c
             case split_zds_trajectory_t::SPLIT_NEW_RAILWAY_COORD:
             {
                 stream << DELIMITER_SYMBOL
-                       << "splitnewrailwaycoord" << (*it)->signal_bwd_liter.c_str();
+                       << "splitnewrailwaycoord" << (*it)->railway_coord;
                 break;
             }
             default: stream << DELIMITER_SYMBOL << "WARN_" << type_it;
