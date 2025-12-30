@@ -589,8 +589,8 @@ void ZDSimConverter::addOrCreateSplit(route_connectors_t &split_data, const spli
                 (*exist_it)->split_type.push_back(type_it);
                 if (type_it == split_zds_trajectory_t::SPLIT_SIGNAL_FWD)
                 {
-                    (*exist_it)->signal_bwd_type = split_point.signal_fwd_type;
-                    (*exist_it)->signal_bwd_liter = split_point.signal_fwd_liter;
+                    (*exist_it)->signal_fwd_type = split_point.signal_fwd_type;
+                    (*exist_it)->signal_fwd_liter = split_point.signal_fwd_liter;
                 }
                 if (type_it == split_zds_trajectory_t::SPLIT_SIGNAL_BWD)
                 {
