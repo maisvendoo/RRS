@@ -41,6 +41,8 @@
 
 #include    <tcp-server.h>
 
+#include    <scenario-manager.h>
+
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
 #else
@@ -154,6 +156,9 @@ private:
 
     /// TCP-server
     TcpServer   *tcp_server = new TcpServer;
+
+    /// Менеджер сценариев
+    ScenarioManager *scnmgr = new ScenarioManager;
 
     /// Вектор данных о нескольких поездах
     std::vector<init_data_t> init_datas;

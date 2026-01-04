@@ -10,6 +10,7 @@ add_subdirectory (euler)
 add_subdirectory (vehicle)
 add_subdirectory (train)
 add_subdirectory (topology)
+add_subdirectory (scenario-manager)
 add_subdirectory (model)
 add_subdirectory (simulator)
 

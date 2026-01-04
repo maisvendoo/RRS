@@ -40,6 +40,7 @@ target_include_directories (${TARGET} PRIVATE ../../network/include)
 target_include_directories (${TARGET} PRIVATE ../train/include)
 target_include_directories (${TARGET} PRIVATE ../model/include)
 target_include_directories (${TARGET} PRIVATE ../topology/include)
+target_include_directories (${TARGET} PRIVATE ../scenario-manager/include)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Core)
@@ -56,4 +57,5 @@ target_link_libraries (${TARGET} solver)
 target_link_libraries (${TARGET} train)
 target_link_libraries (${TARGET} network)
 target_link_libraries (${TARGET} topology)
+target_link_libraries (${TARGET} scenario-manager)
 target_link_libraries (${TARGET} model)
