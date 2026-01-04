@@ -190,7 +190,8 @@ private:
     void initTopology(const init_data_t &init_data);
 
     /// Инициализация движка сценариев
-    void initScenarioManager();
+    void initScenarioManager(const init_data_t &init_data,
+                             const simulator_command_line_t &command_line);
 
     /// Инициализация TCP-сервера
     void initTcpServer();

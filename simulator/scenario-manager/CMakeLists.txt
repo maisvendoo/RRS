@@ -20,7 +20,10 @@ file (GLOB SOURCES "./src/*.cpp")
 add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
 target_include_directories (${TARGET} PRIVATE ./include/)
+target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 
 target_link_libraries(${TARGET} Qt6::Core)
 target_link_libraries(${TARGET} lua::lua)
 target_link_libraries(${TARGET} sol2)
+
+target_link_libraries (${TARGET} Journal)
