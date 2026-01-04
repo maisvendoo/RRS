@@ -189,6 +189,9 @@ private:
     /// Инициализация топологии
     void initTopology(const init_data_t &init_data);
 
+    /// Инициализация движка сценариев
+    void initScenarioManager();
+
     /// Инициализация TCP-сервера
     void initTcpServer();
 

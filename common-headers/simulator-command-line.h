@@ -24,6 +24,8 @@ struct simulator_command_line_t final
     option_t<std::vector<int>>       direction;
     /// Initial trajectory
     option_t<std::vector<QString>>   trajectory_name;
+    /// Scenario name
+    option_t<QString>   scenario;
 };
 
 #endif // SIMULATOR_COMMAND_LINE

@@ -178,6 +178,12 @@ CommandLineParserResult AppCore::parseCommandLine(QCommandLineParser &parser,
 
     parser.addOption(trajectory_name);
 
+    QCommandLineOption scenario(QStringList() << "c" << "scenario",
+                                QCoreApplication::translate("main", "Scenarion name"),
+                                QCoreApplication::translate("main", "scenario"));
+
+    parser.addOption(scenario);
+
     // Parse command line arguments
     if (!parser.parse(this->arguments()))
     {
@@ -266,6 +272,12 @@ CommandLineParserResult AppCore::parseCommandLine(QCommandLineParser &parser,
 
             command_line.trajectory_name.value.push_back(token);
         }
+    }
+
+    if (parser.isSet(scenario))
+    {
+        command_line.scenario.is_present = true;
+        command_line.scenario.value = parser.value(scenario);
     }
 
     return CommandLineOk;
