@@ -104,8 +104,7 @@ void ScenarioManager::setTime(const std::string &time)
         {
             Journal::instance()->error("setTime: Invalid seconds format: " + tokens[2]);
         }
-
-        if (sec > 59)
+        else if (sec > 59)
         {
             Journal::instance()->error(QString("setTime: Seconds out of range: %1").arg(sec, 2));
             sec = 0;
@@ -150,6 +149,86 @@ void ScenarioManager::setTime(const std::string &time)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::setDate(const std::string &date)
+{
+    QStringList tokens = QString(date.c_str()).split('.');
+
+    if (tokens.size() < 2)
+    {
+        Journal::instance()->error(QString("setDate: Invalid date format: %1").arg(date.c_str()));
+        return;
+    }
+
+    bool isOk = false;
+    uint16_t year = 0;
+    simulator_time_t sim_time = simulator_time_t(launch_init_data.start_datetime);
+
+    if (tokens.size() > 2)
+    {
+        year = static_cast<uint16_t>(tokens[2].toInt(&isOk));
+
+        if (!isOk)
+        {
+            Journal::instance()->error("setDate: Invalid year format: " + tokens[2]);
+        }
+        else if (year == 0)
+        {
+            Journal::instance()->error(QString("setDate: Year out of range: %1").arg(year, 4));
+            year = sim_time.date.year();
+        }
+    }
+
+    // Дешифруем и проверяем корректность месяца
+    uint8_t month = static_cast<uint8_t>(tokens[1].toInt(&isOk));
+
+    if (!isOk)
+    {
+        Journal::instance()->error("setDate: Invalid month format: " + tokens[1]);
+        return;
+    }
+
+    if ( (month < 1) || (month > 12) )
+    {
+        Journal::instance()->error(QString("setDate: Month out of range: %1").arg(month, 2));
+        return;
+    }
+
+    // Дешифруем и проверяем корректность дня
+    uint8_t day = static_cast<uint8_t>(tokens[0].toInt(&isOk));
+
+    if (!isOk)
+    {
+        Journal::instance()->error("setDate: Invalid day format: " + tokens[2]);
+        return;
+    }
+
+    uint8_t max_day = 0;
+
+    // Проверяем максимальное число дней в том месяце, что пытаемся задать
+    if (server_date_t().isLeapYear(year))
+    {
+        max_day = days_in_month_leap[month];
+    }
+    else
+    {
+        max_day = days_in_month_nleap[month];
+    }
+
+    if ( (day < 1) || (day > max_day))
+    {
+        Journal::instance()->error(QString("setDate: day out of range: %1").arg(day, 2));
+        return;
+    }
+
+    server_date_t start_date = server_date_t(year, month, day);
+    launch_init_data.start_datetime = simulator_time_t(start_date, sim_time.time).data();
+
+    Journal::instance()->info("setDate: Time initialized at " + start_date.getString());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::types_registration()
 {
     lua.open_libraries(sol::lib::base);
@@ -170,6 +249,10 @@ void ScenarioManager::types_registration()
 
     lua["setTime"] = [this](const std::string &time) {
         this->setTime(time);
+    };
+
+    lua["setDate"] = [this](const std::string &date) {
+        this->setDate(date);
     };
 
     Journal::instance()->info("setTrain method binding...OK");
