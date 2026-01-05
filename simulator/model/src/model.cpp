@@ -717,6 +717,11 @@ bool Model::initScenarioManager(const init_data_t &init_data,
         return false;
     }
 
+    // Увязываем управляющие сигналы с топологией
+    connect(scnmgr, &ScenarioManager::setSwitchState, topology, &Topology::getSwitchState);
+    connect(scnmgr, &ScenarioManager::openSignal, topology, &Topology::slotOpenSignal);
+    connect(scnmgr, &ScenarioManager::closeSignal, topology, &Topology::slotCloseSignal);
+
     return true;
 }
 

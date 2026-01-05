@@ -36,6 +36,14 @@ public:
         return launch_init_data.start_datetime;
     }
 
+signals:
+
+    void setSwitchState(QByteArray &switch_data);
+
+    void openSignal(QByteArray signal_data);
+
+    void closeSignal(QByteArray signal_data);
+
 private:
 
     /// Контекст интерпретатора Lua
