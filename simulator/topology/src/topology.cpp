@@ -1111,7 +1111,7 @@ void Topology::slotSetSwitchState(QByteArray &switch_data)
     }
 
     sw->setRefStateFwd(sw_state.state_fwd);
-    sw->setRefStateBwd(sw_state.state_bwd);
+    sw->setRefStateBwd(sw_state.state_bwd);    
 }
 
 //------------------------------------------------------------------------------
@@ -1119,7 +1119,20 @@ void Topology::slotSetSwitchState(QByteArray &switch_data)
 //------------------------------------------------------------------------------
 void Topology::slotGetSwitchState(QByteArray &switch_data)
 {
+    switch_state_t sw_state;
+    sw_state.deserialize(switch_data);
 
+    Switch *sw = dynamic_cast<Switch *>(switches.value(sw_state.name, nullptr));
+
+    if (sw == nullptr)
+    {
+        return;
+    }
+
+    sw_state.state_fwd = sw->getStateFwd();
+    sw_state.state_bwd = sw->getStateBwd();
+
+    switch_data = sw_state.serialize();
 }
 
 //------------------------------------------------------------------------------

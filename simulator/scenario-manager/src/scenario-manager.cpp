@@ -251,6 +251,25 @@ void ScenarioManager::setDateTime(const std::string &date_time)
 void ScenarioManager::switchFwd(const std::string &switch_name)
 {
     switch_state_t sw_state;
+    sw_state.name = QString(switch_name.c_str());
+
+    // Запрашиваем текущее состояние стрелки
+    QByteArray switch_data = sw_state.serialize();
+    emit getSwitchState(switch_data);
+
+    sw_state.deserialize(switch_data);
+
+    Journal::instance()->info(QString("switchFwd: switch %1 state: %2")
+                                  .arg(sw_state.name)
+                                  .arg(sw_state.state_fwd, 2));
+
+    if (sw_state.state_fwd != 0)
+    {
+        sw_state.state_fwd = -sw_state.state_fwd;
+
+        switch_data = sw_state.serialize();
+        emit setSwitchState(switch_data);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -294,4 +313,10 @@ void ScenarioManager::types_registration()
     };
 
     Journal::instance()->info("setDateTime method binding...OK");
+
+    lua["switchFwd"] = [this](const std::string &switch_name) {
+        this->switchFwd(switch_name);
+    };
+
+    Journal::instance()->info("switchFwd method binding...OK");
 }
