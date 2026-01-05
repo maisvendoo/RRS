@@ -10,3 +10,8 @@ train1.coord = 785.0
 train1.dir = 1
 
 setTrain(train1)
+
+-- Установка стрелок по маршруту
+switchBwd("00071")
+switchFwd("00072")
+switchBwd("00026")

@@ -62,10 +62,14 @@ bool ScenarioManager::run(const std::string &script_path)
 //------------------------------------------------------------------------------
 void ScenarioManager::step(double t, double dt)
 {
+    // Если очередь задач не пуста
     if (!taskQueue.empty())
     {
+        // Получаем очередную задачу
         auto task = std::move(taskQueue.front());
+        // Удаляем её из очереди
         taskQueue.pop();
+        // Исполняем
         task();
     }
 }
@@ -296,6 +300,41 @@ void ScenarioManager::taskSwitchFwd(const std::string &switch_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::switchBwd(const std::string &switch_name)
+{
+    switch_state_t sw_state;
+    sw_state.name = QString(switch_name.c_str());
+
+    // Запрашиваем текущее состояние стрелки
+    QByteArray switch_data = sw_state.serialize();
+    emit getSwitchState(switch_data);
+
+    sw_state.deserialize(switch_data);
+
+    Journal::instance()->info(QString("switchBwd: switch %1 state: %2")
+                                  .arg(sw_state.name)
+                                  .arg(sw_state.state_fwd, 2));
+
+    if (sw_state.state_bwd != 0)
+    {
+        sw_state.state_bwd = -sw_state.state_bwd;
+
+        switch_data = sw_state.serialize();
+        emit setSwitchState(switch_data);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::taskSwitchBwd(const std::string &switch_name)
+{
+    setTask([switch_name, this]{ this->switchBwd(switch_name); });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::setTask(task_t task)
 {
     taskQueue.push(std::move(task));
@@ -348,4 +387,10 @@ void ScenarioManager::types_registration()
     };
 
     Journal::instance()->info("switchFwd method binding...OK");
+
+    lua["switchBwd"] = [this](const std::string &switch_name) {
+        this->taskSwitchBwd(switch_name);
+    };
+
+    Journal::instance()->info("switchBwd method binding...OK");
 }

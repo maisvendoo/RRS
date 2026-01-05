@@ -42,6 +42,7 @@ public:
         return launch_init_data.start_datetime;
     }
 
+    /// Шаг симуляции (выполнение очереди задач)
     void step(double t, double dt);
 
 signals:
@@ -62,7 +63,11 @@ private:
     /// Данные инициализации, полученные от лаунчера
     init_data_t launch_init_data;
 
+    /// Очередь задач
     std::queue<task_t> taskQueue;
+
+    /// Поставить задачу в очередь
+    void setTask(task_t task);
 
     /// Регистрация всех доступных типов данных, их параметров и методов
     void types_registration();
@@ -82,9 +87,15 @@ private:
     /// Переключить стрелку спереди
     void switchFwd(const std::string &switch_name);
 
+    /// Установка задачи на переключение стрелки спереди
     void taskSwitchFwd(const std::string &switch_name);
 
-    void setTask(task_t task);
+    /// Переключить стрелку сзади
+    void switchBwd(const std::string &switch_name);
+
+    /// Установка задачи на переключение стрелки сзади
+    void taskSwitchBwd(const std::string &switch_name);
+
 };
 
 #endif
