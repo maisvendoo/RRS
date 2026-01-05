@@ -1,5 +1,6 @@
-setTime("06:10")
-setDate("06.06.2025")
+-- setTime("06:10")
+-- setDate("06.06.2025")
+setDateTime("06.06.1982 17:30")
 
 train1 = TrainData.new()
 train1.name = "vl60pk-1543"

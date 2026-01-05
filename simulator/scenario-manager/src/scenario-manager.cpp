@@ -229,6 +229,24 @@ void ScenarioManager::setDate(const std::string &date)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::setDateTime(const std::string &date_time)
+{
+    QStringList tokens = QString(date_time.c_str()).split(" ");
+
+    if (tokens.size() < 2)
+    {
+        Journal::instance()->error(QString("setDateTime: Invalid date and time string format: %1").arg(date_time.c_str()));
+        return;
+    }
+
+    setDate(tokens[0].toStdString());
+
+    setTime(tokens[1].toStdString());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::types_registration()
 {
     lua.open_libraries(sol::lib::base);
@@ -260,4 +278,10 @@ void ScenarioManager::types_registration()
     };
 
     Journal::instance()->info("setDate method binding...OK");
+
+    lua["setDateTime"] = [this](const std::string &date_time) {
+        this->setDateTime(date_time);
+    };
+
+    Journal::instance()->info("setDateTime method binding...OK");
 }

@@ -55,6 +55,9 @@ private:
 
     /// Установить дату сервера (формат строки "dd.mm.yyyy")
     void setDate(const std::string &date);
+
+    /// Установить дату и время сервера (формат строки "dd.mm.yyyy hh:mm:ss")
+    void setDateTime(const std::string &date_time);
 };
 
 #endif
