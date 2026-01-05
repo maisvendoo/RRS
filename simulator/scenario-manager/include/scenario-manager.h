@@ -2,12 +2,18 @@
 #define     SCENARIO_MANAGER_H
 
 #include    <QObject>
+#include    <queue>
 #include    <sol/sol.hpp>
 
 #include    <scenario-manager-export.h>
 #include    <scenario-train-data.h>
 
 #include    <init_data.h>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+using task_t = std::function<void()>;
 
 //------------------------------------------------------------------------------
 //
@@ -36,6 +42,8 @@ public:
         return launch_init_data.start_datetime;
     }
 
+    void step(double t, double dt);
+
 signals:
 
     void setSwitchState(QByteArray &switch_data);
@@ -54,6 +62,8 @@ private:
     /// Данные инициализации, полученные от лаунчера
     init_data_t launch_init_data;
 
+    std::queue<task_t> taskQueue;
+
     /// Регистрация всех доступных типов данных, их параметров и методов
     void types_registration();
 
@@ -71,6 +81,10 @@ private:
 
     /// Переключить стрелку спереди
     void switchFwd(const std::string &switch_name);
+
+    void taskSwitchFwd(const std::string &switch_name);
+
+    void setTask(task_t task);
 };
 
 #endif

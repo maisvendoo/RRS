@@ -60,6 +60,19 @@ bool ScenarioManager::run(const std::string &script_path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::step(double t, double dt)
+{
+    if (!taskQueue.empty())
+    {
+        auto task = std::move(taskQueue.front());
+        taskQueue.pop();
+        task();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 {
     init_data_t id = launch_init_data;
@@ -275,6 +288,22 @@ void ScenarioManager::switchFwd(const std::string &switch_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::taskSwitchFwd(const std::string &switch_name)
+{
+    setTask([switch_name, this]{ this->switchFwd(switch_name); });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setTask(task_t task)
+{
+    taskQueue.push(std::move(task));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::types_registration()
 {
     lua.open_libraries(sol::lib::base);
@@ -315,7 +344,7 @@ void ScenarioManager::types_registration()
     Journal::instance()->info("setDateTime method binding...OK");
 
     lua["switchFwd"] = [this](const std::string &switch_name) {
-        this->switchFwd(switch_name);
+        this->taskSwitchFwd(switch_name);
     };
 
     Journal::instance()->info("switchFwd method binding...OK");

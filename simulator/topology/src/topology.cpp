@@ -1111,7 +1111,7 @@ void Topology::slotSetSwitchState(QByteArray &switch_data)
     }
 
     sw->setRefStateFwd(sw_state.state_fwd);
-    sw->setRefStateBwd(sw_state.state_bwd);    
+    sw->setRefStateBwd(sw_state.state_bwd);
 }
 
 //------------------------------------------------------------------------------
