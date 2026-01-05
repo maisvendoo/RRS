@@ -62,7 +62,7 @@ bool ScenarioManager::run(const std::string &script_path)
 void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 {
     init_data_t id = launch_init_data;
-    id.train_config = QString(train_data.train_file.c_str());
+    id.train_config = QString(train_data.train_config.c_str());
     id.trajectory_name = QString(train_data.traj_name.c_str());
     id.init_coord = train_data.traj_coord;
     id.direction = train_data.direction;
@@ -70,7 +70,7 @@ void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
     init_datas.push_back(id);
 
     QString msg = QString("setTrain: %1 at traj=%2 coord=%3 dir=%4")
-                      .arg(train_data.train_file.c_str())
+                      .arg(train_data.train_config.c_str())
                       .arg(train_data.traj_name.c_str())
                       .arg(train_data.traj_coord, 10, 'f', 3)
                       .arg(train_data.direction);
@@ -253,7 +253,8 @@ void ScenarioManager::types_registration()
 
     // Регистрируем структуру данных о поездах
     lua.new_usertype<scenario_train_data_t>("TrainData",
-                                            "name", &scenario_train_data_t::train_file,
+                                            "name", &scenario_train_data_t::name,
+                                            "config", &scenario_train_data_t::train_config,
                                             "traj", &scenario_train_data_t::traj_name,
                                             "coord", &scenario_train_data_t::traj_coord,
                                             "dir", &scenario_train_data_t::direction);
