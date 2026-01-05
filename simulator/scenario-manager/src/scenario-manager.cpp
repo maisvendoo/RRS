@@ -247,13 +247,17 @@ void ScenarioManager::types_registration()
         this->setTrain(train_data);
     };
 
+    Journal::instance()->info("setTrain method binding...OK");
+
     lua["setTime"] = [this](const std::string &time) {
         this->setTime(time);
     };
+
+    Journal::instance()->info("setTime method binding...OK");
 
     lua["setDate"] = [this](const std::string &date) {
         this->setDate(date);
     };
 
-    Journal::instance()->info("setTrain method binding...OK");
+    Journal::instance()->info("setDate method binding...OK");
 }
