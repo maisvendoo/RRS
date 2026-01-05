@@ -1098,7 +1098,7 @@ Connector *Topology::deserialize_traj_connectors(QDataStream &stream, conn_list_
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::getSwitchState(QByteArray &switch_data)
+void Topology::slotSetSwitchState(QByteArray &switch_data)
 {
     switch_state_t sw_state;
     sw_state.deserialize(switch_data);
@@ -1112,6 +1112,14 @@ void Topology::getSwitchState(QByteArray &switch_data)
 
     sw->setRefStateFwd(sw_state.state_fwd);
     sw->setRefStateBwd(sw_state.state_bwd);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::slotGetSwitchState(QByteArray &switch_data)
+{
+
 }
 
 //------------------------------------------------------------------------------

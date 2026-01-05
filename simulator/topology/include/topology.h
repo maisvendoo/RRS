@@ -132,7 +132,9 @@ private:
 
 public slots:
 
-    void getSwitchState(QByteArray &switch_data);
+    void slotSetSwitchState(QByteArray &switch_data);
+
+    void slotGetSwitchState(QByteArray &switch_data);
 
     void slotOpenSignal(QByteArray signal_data);
 

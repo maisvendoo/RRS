@@ -718,7 +718,7 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     }
 
     // Увязываем управляющие сигналы с топологией
-    connect(scnmgr, &ScenarioManager::setSwitchState, topology, &Topology::getSwitchState);
+    connect(scnmgr, &ScenarioManager::setSwitchState, topology, &Topology::slotSetSwitchState);
     connect(scnmgr, &ScenarioManager::openSignal, topology, &Topology::slotOpenSignal);
     connect(scnmgr, &ScenarioManager::closeSignal, topology, &Topology::slotCloseSignal);
 
@@ -739,7 +739,7 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::requestTopologyData, this, &Model::slotGetTopologyData);
 
-    connect(tcp_server, &TcpServer::setSwitchState, topology, &Topology::getSwitchState);
+    connect(tcp_server, &TcpServer::setSwitchState, topology, &Topology::slotSetSwitchState);
     connect(topology, &Topology::sendSwitchState, tcp_server, &TcpServer::slotSendSwitchState);
 
     connect(topology, &Topology::sendTrajBusyState, tcp_server, &TcpServer::slotSendTrajBusyState);
