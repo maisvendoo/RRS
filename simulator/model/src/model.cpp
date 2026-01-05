@@ -52,17 +52,18 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Override init data by command line
     overrideByCommandLine(init_data, command_line);
 
-    if (initScenarioManager(init_data, command_line))
-    {
-        init_datas = scnmgr->init_datas;
-        init_data.start_datetime = scnmgr->getStartDateTime();
-    }
-
     // Read solver configuration
     configSolver(init_data.solver_config);
 
     // Load route topology
     initTopology(init_data);
+
+    // Init scenario's manager
+    if (initScenarioManager(init_data, command_line))
+    {
+        init_datas = scnmgr->init_datas;
+        init_data.start_datetime = scnmgr->getStartDateTime();
+    }
 
     // Create all trains
     for (size_t i = 0; i < init_datas.size(); ++i)
