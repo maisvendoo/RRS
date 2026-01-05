@@ -7,6 +7,8 @@
 #include    <scenario-manager-export.h>
 #include    <scenario-train-data.h>
 
+#include    <init_data.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -20,22 +22,36 @@ public:
 
     ~ScenarioManager();
 
-    void init();
+    /// Общая инициализация интерпретатора и окружения
+    void init(const init_data_t &init_data);
 
-    bool run(const std::string &script_path);
+    /// Запуск на исполнение скрипта сценария
+    bool run(const std::string &script_path);    
 
-    std::vector<scenario_train_data_t> trains_data;
+    /// Данные инициализации симулятора
+    std::vector<init_data_t> init_datas;
+
+    std::int64_t getStartDateTime() const
+    {
+        return launch_init_data.start_datetime;
+    }
 
 private:
 
     /// Контекст интерпретатора Lua
     sol::state lua;
 
+    /// Данные инициализации, полученные от лаунчера
+    init_data_t launch_init_data;
+
     /// Регистрация всех доступных типов данных, их параметров и методов
     void types_registration();
 
     /// Создать поезд игрока
     void setTrain(const scenario_train_data_t &train_data);
+
+    /// Установить время сервера (формат строки "hh:mm:ss"
+    void setTime(const std::string &time);
 };
 
 #endif

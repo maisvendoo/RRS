@@ -52,7 +52,11 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Override init data by command line
     overrideByCommandLine(init_data, command_line);
 
-    initScenarioManager(init_data, command_line);
+    if (initScenarioManager(init_data, command_line))
+    {
+        init_datas = scnmgr->init_datas;
+        init_data.start_datetime = scnmgr->getStartDateTime();
+    }
 
     // Read solver configuration
     configSolver(init_data.solver_config);
@@ -688,44 +692,31 @@ void Model::initTopology(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::initScenarioManager(const init_data_t &init_data,
+bool Model::initScenarioManager(const init_data_t &init_data,
                                 const simulator_command_line_t &command_line)
 {
-    scnmgr->init();
-
+    // Проверяем, есть ли вообще сценарий для исполнения
     if (!command_line.scenario.is_present)
     {
-        return;
+        return false;
     }
 
+    // Инициализируем менеджер сценариев
+    scnmgr->init(init_data);
+
+    // Полный путь к скрипту сценария
     FileSystem &fs = FileSystem::getInstance();
     std::string script_path = fs.getRouteRootDir() + fs.separator()
                           + init_data.route_dir_name.toStdString() + fs.separator()
                           + "scenarios" + fs.separator() + command_line.scenario.value.toStdString() + ".lua";
 
+    // Пытаемся выполнить скрипт
     if (!scnmgr->run(script_path))
     {
-        return;
+        return false;
     }
 
-    Journal::instance()->info("Init train's list by scenario...");
-
-    if (!scnmgr->trains_data.empty())
-    {
-        init_data_t id;
-        init_datas.clear();
-
-        for (size_t i = 0; i < scnmgr->trains_data.size(); ++i)
-        {
-            id.route_dir_name = init_data.route_dir_name;
-            id.train_config = QString(scnmgr->trains_data[i].train_file.c_str());
-            id.trajectory_name = QString(scnmgr->trains_data[i].traj_name.c_str());
-            id.init_coord = scnmgr->trains_data[i].traj_coord;
-            id.direction = scnmgr->trains_data[i].direction;
-
-            init_datas.push_back(id);
-        }
-    }
+    return true;
 }
 
 //------------------------------------------------------------------------------

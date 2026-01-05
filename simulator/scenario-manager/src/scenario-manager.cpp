@@ -20,8 +20,11 @@ ScenarioManager::~ScenarioManager()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::init()
+void ScenarioManager::init(const init_data_t &init_data)
 {
+    // Запоминаем данные инициализации, полученные от лаунчера
+    launch_init_data = init_data;
+
     try
     {
         Journal::instance()->info("==== Lua Scenarios manager initialization ====");
@@ -57,7 +60,13 @@ bool ScenarioManager::run(const std::string &script_path)
 //------------------------------------------------------------------------------
 void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 {
-    trains_data.push_back(train_data);
+    init_data_t id = launch_init_data;
+    id.train_config = QString(train_data.train_file.c_str());
+    id.trajectory_name = QString(train_data.traj_name.c_str());
+    id.init_coord = train_data.traj_coord;
+    id.direction = train_data.direction;
+
+    init_datas.push_back(id);
 
     QString msg = QString("Set train: %1 at traj=%2 coord=%3 dir=%4")
                       .arg(train_data.train_file.c_str())
@@ -66,6 +75,14 @@ void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
                       .arg(train_data.direction);
 
     Journal::instance()->info(msg);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setTime(const std::string &time)
+{
+
 }
 
 //------------------------------------------------------------------------------
@@ -84,9 +101,13 @@ void ScenarioManager::types_registration()
 
     Journal::instance()->info("TrainData => scenario_train_data_t binding...OK");
 
-    // Пробраcываем наш метод, чтобы вызывался из Lua
+    // Пробраcываем наши методы
     lua["setTrain"] = [this](const scenario_train_data_t &train_data) {
         this->setTrain(train_data);
+    };
+
+    lua["setTime"] = [this](const std::string &time) {
+        this->setTime(time);
     };
 
     Journal::instance()->info("setTrain method binding...OK");

@@ -21,6 +21,7 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
+target_include_directories (${TARGET} PRIVATE ../../common-headers)
 
 target_link_libraries(${TARGET} Qt6::Core)
 target_link_libraries(${TARGET} lua::lua)
