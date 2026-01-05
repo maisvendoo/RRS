@@ -1,3 +1,5 @@
+setTime("06:10")
+
 train1 = TrainData.new()
 train1.name = "vl60pk-1543"
 train1.traj = "branch1_0003_2_x246_x259"

@@ -1,5 +1,6 @@
 #include    <scenario-manager.h>
 #include    <Journal.h>
+#include    <datetime.h>
 
 //------------------------------------------------------------------------------
 //
@@ -68,7 +69,7 @@ void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 
     init_datas.push_back(id);
 
-    QString msg = QString("Set train: %1 at traj=%2 coord=%3 dir=%4")
+    QString msg = QString("setTrain: %1 at traj=%2 coord=%3 dir=%4")
                       .arg(train_data.train_file.c_str())
                       .arg(train_data.traj_name.c_str())
                       .arg(train_data.traj_coord, 10, 'f', 3)
@@ -82,7 +83,68 @@ void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 //------------------------------------------------------------------------------
 void ScenarioManager::setTime(const std::string &time)
 {
+    QStringList tokens = QString(time.c_str()).split(':');
 
+    // Если число параметров менее двух - ошибка
+    if (tokens.size() < 2)
+    {
+        Journal::instance()->error(QString("setTime: Invalid time format: %1").arg(time.c_str()));
+        return;
+    }
+
+    bool isOk = false;
+    uint8_t sec = 0;
+
+    // Если число параметров более двух - заданы секунды, обрабатываем
+    if (tokens.size() > 2)
+    {
+        sec = static_cast<uint8_t>(tokens[2].toInt(&isOk));
+
+        if (!isOk)
+        {
+            Journal::instance()->error("setTime: Invalid seconds format: " + tokens[2]);
+        }
+
+        if (sec > 59)
+        {
+            Journal::instance()->error(QString("setTime: Seconds out of range: %1").arg(sec, 2));
+            sec = 0;
+        }
+    }
+
+    uint8_t hour = static_cast<uint8_t>(tokens[0].toInt(&isOk));
+
+    if (!isOk)
+    {
+        Journal::instance()->error("setTime: Invalid hour format: " + tokens[0]);
+        return;
+    }
+
+    if (hour > 23)
+    {
+        Journal::instance()->error(QString("setTime: Hour out of range: %1").arg(hour, 2));
+        return;
+    }
+
+    uint8_t min = static_cast<uint8_t>(tokens[1].toInt(&isOk));
+
+    if (!isOk)
+    {
+        Journal::instance()->error("setTime: Invalid minutes format: " + tokens[1]);
+        return;
+    }
+
+    if (min > 59)
+    {
+        Journal::instance()->error(QString("setTime: Minutes out of range: %1").arg(min, 2));
+        return;
+    }
+
+    simulator_time_t sim_time = simulator_time_t(launch_init_data.start_datetime);
+    server_time_t start_time = server_time_t(hour, min, sec, 0);
+    launch_init_data.start_datetime = simulator_time_t(sim_time.date, start_time).data();
+
+    Journal::instance()->info("setTime: Time initialized at " + start_time.getString());
 }
 
 //------------------------------------------------------------------------------
