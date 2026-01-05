@@ -1,6 +1,7 @@
 #include    <scenario-manager.h>
 #include    <Journal.h>
 #include    <datetime.h>
+#include    <switch-state.h>
 
 //------------------------------------------------------------------------------
 //
@@ -242,6 +243,14 @@ void ScenarioManager::setDateTime(const std::string &date_time)
     setDate(tokens[0].toStdString());
 
     setTime(tokens[1].toStdString());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::switchFwd(const std::string &switch_name)
+{
+    switch_state_t sw_state;
 }
 
 //------------------------------------------------------------------------------

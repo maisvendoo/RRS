@@ -40,6 +40,8 @@ signals:
 
     void setSwitchState(QByteArray &switch_data);
 
+    void getSwitchState(QByteArray &switch_data);
+
     void openSignal(QByteArray signal_data);
 
     void closeSignal(QByteArray signal_data);
@@ -65,7 +67,10 @@ private:
     void setDate(const std::string &date);
 
     /// Установить дату и время сервера (формат строки "dd.mm.yyyy hh:mm:ss")
-    void setDateTime(const std::string &date_time);    
+    void setDateTime(const std::string &date_time);
+
+    /// Переключить стрелку спереди
+    void switchFwd(const std::string &switch_name);
 };
 
 #endif
