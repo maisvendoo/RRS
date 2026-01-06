@@ -9,6 +9,7 @@
 #include    <scenario-train-data.h>
 
 #include    <init_data.h>
+#include    <timer.h>
 
 //------------------------------------------------------------------------------
 //
@@ -66,6 +67,9 @@ private:
     /// Очередь задач
     std::queue<task_t> taskQueue;
 
+    /// Таймер задержки исполнения очереди задач
+    Timer *delayTimer = new Timer(0.1, false);
+
     /// Поставить задачу в очередь
     void setTask(task_t task);
 
@@ -101,6 +105,13 @@ private:
 
     /// Установка задачи открытия сигнала
     void taskOpenSignal(const std::string &conn_name, int dir);
+
+    /// Установка задержки исполнения очереди
+    void taskSetDelay(double timeout);
+
+private slots:
+
+    void slotDelayTimer();
 };
 
 #endif

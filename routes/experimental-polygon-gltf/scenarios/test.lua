@@ -12,8 +12,13 @@ train1.dir = 1
 setTrain(train1)
 
 -- Установка стрелок по маршруту
+delay(10.0)
 switchBwd("00071")
+delay(10.0)
 switchFwd("00072")
+delay(10.0)
 switchBwd("00026")
 
+-- Открываем выходной сигнал Ч4 на станции Б
+delay(10.0)
 openSignal("00098", 1)

@@ -27,6 +27,8 @@ void ScenarioManager::init(const init_data_t &init_data)
     // Запоминаем данные инициализации, полученные от лаунчера
     launch_init_data = init_data;
 
+    connect(delayTimer, &Timer::process, this, &ScenarioManager::slotDelayTimer);
+
     try
     {
         Journal::instance()->info("==== Lua Scenarios manager initialization ====");
@@ -65,13 +67,18 @@ void ScenarioManager::step(double t, double dt)
     // Если очередь задач не пуста
     if (!taskQueue.empty())
     {
-        // Получаем очередную задачу
-        auto task = std::move(taskQueue.front());
-        // Удаляем её из очереди
-        taskQueue.pop();
-        // Исполняем
-        task();
+        if (!delayTimer->isStarted())
+        {
+            // Получаем очередную задачу
+            auto task = std::move(taskQueue.front());
+            // Удаляем её из очереди
+            taskQueue.pop();
+            // Исполняем
+            task();
+        }
     }
+
+    delayTimer->step(t, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -359,6 +366,25 @@ void ScenarioManager::taskOpenSignal(const std::string &conn_name, int dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::taskSetDelay(double timeout)
+{
+    setTask([timeout, this]{
+        this->delayTimer->setTimeout(timeout);
+        this->delayTimer->start();
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::slotDelayTimer()
+{
+    delayTimer->stop();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::setTask(task_t task)
 {
     taskQueue.push(std::move(task));
@@ -423,4 +449,10 @@ void ScenarioManager::types_registration()
     };
 
     Journal::instance()->info("openSignal method binding...OK");
+
+    lua["delay"] = [this](double timeout) {
+        this->taskSetDelay(timeout);
+    };
+
+    Journal::instance()->info("delay method binding...OK");
 }
