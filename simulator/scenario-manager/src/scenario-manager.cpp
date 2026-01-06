@@ -468,15 +468,27 @@ void ScenarioManager::types_registration()
 
     Journal::instance()->info("switchBwd method binding...OK");
 
-    lua["openSignal"] = [this](const std::string &conn_name, int dir) {
-        this->taskOpenSignal(conn_name, dir);
-    };
+    lua.set_function("openSignal",
+                     sol::overload(
+                         [this](const std::string &conn_name, int dir) {
+                             this->taskOpenSignal(conn_name, dir);
+                         },
+                         [this](const std::string &conn_name) {
+                             this->taskOpenSignal(conn_name);
+                         }
+                         ));
 
     Journal::instance()->info("openSignal method binding...OK");
 
-    lua["closeSignal"] = [this](const std::string &conn_name, int dir) {
-        this->taskCloseSignal(conn_name, dir);
-    };
+    lua.set_function("closeSignal",
+                     sol::overload(
+                         [this](const std::string &conn_name, int dir) {
+                             this->taskCloseSignal(conn_name, dir);
+                         },
+                         [this](const std::string &conn_name) {
+                             this->taskCloseSignal(conn_name);
+                         }
+                         ));
 
     Journal::instance()->info("closeSignal method binding...OK");
 

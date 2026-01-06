@@ -104,13 +104,13 @@ private:
     void openSignal(const std::string &conn_name, int dir);
 
     /// Установка задачи открытия сигнала
-    void taskOpenSignal(const std::string &conn_name, int dir);
+    void taskOpenSignal(const std::string &conn_name, int dir = 1);
 
     /// Открыть сигнал
     void closeSignal(const std::string &conn_name, int dir);
 
     /// Установка задачи открытия сигнала
-    void taskCloseSignal(const std::string &conn_name, int dir);
+    void taskCloseSignal(const std::string &conn_name, int dir = 1);
 
     /// Установка задержки исполнения очереди
     void taskSetDelay(double timeout);
