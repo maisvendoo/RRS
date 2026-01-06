@@ -366,6 +366,30 @@ void ScenarioManager::taskOpenSignal(const std::string &conn_name, int dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::closeSignal(const std::string &conn_name, int dir)
+{
+    QByteArray signal_data;
+    QBuffer buff(&signal_data);
+    buff.open(QIODevice::WriteOnly);
+    QDataStream stream(&buff);
+
+    stream << QString(conn_name.c_str());
+    stream << dir;
+
+    emit sigCloseSignal(signal_data);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::taskCloseSignal(const std::string &conn_name, int dir)
+{
+    setTask([conn_name, dir, this]{ this->closeSignal(conn_name, dir); });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::taskSetDelay(double timeout)
 {
     setTask([timeout, this]{
@@ -449,6 +473,12 @@ void ScenarioManager::types_registration()
     };
 
     Journal::instance()->info("openSignal method binding...OK");
+
+    lua["closeSignal"] = [this](const std::string &conn_name, int dir) {
+        this->taskCloseSignal(conn_name, dir);
+    };
+
+    Journal::instance()->info("closeSignal method binding...OK");
 
     lua["delay"] = [this](double timeout) {
         this->taskSetDelay(timeout);
