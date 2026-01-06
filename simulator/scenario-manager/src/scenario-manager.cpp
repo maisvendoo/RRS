@@ -33,7 +33,7 @@ void ScenarioManager::init(const init_data_t &init_data)
     try
     {
         Journal::instance()->info("==== Lua Scenarios manager initialization ====");
-        types_registration();
+        lua_init();
     }
     catch (const sol::error &error)
     {
@@ -427,10 +427,8 @@ void ScenarioManager::setTask(task_t task)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::types_registration()
+void ScenarioManager::cpp_types_registration()
 {
-    lua.open_libraries(sol::lib::base);
-
     // Регистрируем структуру данных о поездах
     lua.new_usertype<scenario_train_data_t>("TrainData",
                                             "name", &scenario_train_data_t::name,
@@ -440,8 +438,13 @@ void ScenarioManager::types_registration()
                                             "dir", &scenario_train_data_t::direction);
 
     Journal::instance()->info("TrainData => scenario_train_data_t binding...OK");
+}
 
-    // Пробраcываем наши методы
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::sys_functions_registration()
+{
     lua["setTrain"] = [this](const scenario_train_data_t &train_data) {
         this->setTrain(train_data);
     };
@@ -507,4 +510,18 @@ void ScenarioManager::types_registration()
     };
 
     Journal::instance()->info("delay method binding...OK");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::lua_init()
+{
+    lua.open_libraries(sol::lib::base, sol::lib::package);
+
+    // Регистрация C++ типов в интерпретаторе
+    cpp_types_registration();
+
+    // Регистрация системных функций
+    sys_functions_registration();
 }

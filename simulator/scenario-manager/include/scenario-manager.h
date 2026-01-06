@@ -73,8 +73,14 @@ private:
     /// Поставить задачу в очередь
     void setTask(task_t task);
 
-    /// Регистрация всех доступных типов данных, их параметров и методов
-    void types_registration();
+    /// Инициализация интерпретатора Lua
+    void lua_init();
+
+    /// Регистрация типов C++
+    void cpp_types_registration();
+
+    /// Регистрация системных функций
+    void sys_functions_registration();
 
     /// Создать поезд игрока
     void setTrain(const scenario_train_data_t &train_data);
