@@ -212,17 +212,14 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
-             <spacer name="verticalSpacer_6">
+             <spacer name="verticalSpacer_2">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
                 <width>20</width>
-                <height>70</height>
+                <height>40</height>
                </size>
               </property>
              </spacer>
@@ -242,20 +239,13 @@
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
+             <widget class="QLabel" name="lStartDate">
+              <property name="maximumSize">
                <size>
-                <width>20</width>
-                <height>40</height>
+                <width>16777215</width>
+                <height>20</height>
                </size>
               </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="lStartDate">
               <property name="text">
                <string>Start date</string>
               </property>
@@ -266,6 +256,12 @@
             </item>
             <item>
              <widget class="QCheckBox" name="cbStartDateManually">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>20</height>
+               </size>
+              </property>
               <property name="text">
                <string>Manually</string>
               </property>
@@ -274,7 +270,7 @@
             <item>
              <widget class="QDateEdit" name="dteStartDate">
               <property name="currentSection">
-               <enum>QDateTimeEdit::MonthSection</enum>
+               <enum>QDateTimeEdit::YearSection</enum>
               </property>
               <property name="displayFormat">
                <string>yyyy.MM.dd</string>
@@ -282,23 +278,13 @@
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer_7">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
+             <widget class="QLabel" name="lStartTime">
+              <property name="maximumSize">
                <size>
-                <width>20</width>
-                <height>10</height>
+                <width>16777215</width>
+                <height>20</height>
                </size>
               </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="lStartTime">
               <property name="text">
                <string>Start time</string>
               </property>
@@ -309,6 +295,12 @@
             </item>
             <item>
              <widget class="QCheckBox" name="cbStartTimeManually">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>20</height>
+               </size>
+              </property>
               <property name="text">
                <string>Manually</string>
               </property>
@@ -321,22 +313,6 @@
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="verticalSpacer_8">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>10</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
            </layout>
           </item>
           <item>
@@ -346,12 +322,12 @@
               <item>
                <widget class="QLabel" name="label_22">
                 <property name="text">
-                 <string>Saved start configurations:</string>
+                 <string>Scenarios</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="cbStartConfigs">
+               <widget class="QComboBox" name="cbScenario">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -363,21 +339,24 @@
              </layout>
             </item>
             <item>
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Scenario description</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout_18">
               <item>
-               <widget class="QLabel" name="label_23">
-                <property name="text">
-                 <string>Start configuration:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="leStartConfigName"/>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_15">
-                <property name="text">
-                 <string>.xml</string>
+               <widget class="QPlainTextEdit" name="ptScenarioDescription">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>160</height>
+                 </size>
                 </property>
                </widget>
               </item>
@@ -396,19 +375,6 @@
                  </size>
                 </property>
                </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pbSaveStartConfig">
-                <property name="minimumSize">
-                 <size>
-                  <width>120</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Save</string>
-                </property>
-               </widget>
               </item>
              </layout>
             </item>

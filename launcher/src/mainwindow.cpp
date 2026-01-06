@@ -46,14 +46,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->lwRoutes, &QListWidget::itemSelectionChanged,
             this, &MainWindow::slotRouteSelection);
 
-    connect(ui->cbStartConfigs, &QComboBox::currentIndexChanged,
+    /*connect(ui->cbStartConfigs, &QComboBox::currentIndexChanged,
             this, &MainWindow::slotSelectSavedStartConfig);
 
     connect(ui->leStartConfigName, &QLineEdit::textChanged,
             this, &MainWindow::slotChangeStartConfig);
 
     connect(ui->pbSaveStartConfig, &QPushButton::pressed,
-            this, &MainWindow::slotSaveStartConfig);
+            this, &MainWindow::slotSaveStartConfig);*/
 
     connect(ui->lwTrains, &QListWidget::itemSelectionChanged,
             this, &MainWindow::slotTrainSelection);
@@ -179,7 +179,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     ui->dteStartTime->setEnabled(false);
     ui->pbAddTrain->setEnabled(false);
     ui->pbDeleteTrain->setEnabled(false);
-    ui->pbSaveStartConfig->setEnabled(false);
+    //ui->pbSaveStartConfig->setEnabled(false);
     ui->pbStartViewer->setEnabled(false);
     ui->pbStartMap->setEnabled(false);
     ui->pbStartServer->setEnabled(false);
@@ -456,7 +456,7 @@ void MainWindow::loadStartConfigs(route_info_t &route_info)
 //------------------------------------------------------------------------------
 void MainWindow::saveActiveTrainsList()
 {
-    if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
+    /*if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
     {
         return;
     }
@@ -478,7 +478,7 @@ void MainWindow::saveActiveTrainsList()
         {
             routes_info[selected_route_idx].last_train_waypoints.push_back(tww);
         }
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------
@@ -510,7 +510,7 @@ void MainWindow::clearActiveTrainsList()
 //------------------------------------------------------------------------------
 void MainWindow::loadActiveTrainsList()
 {
-    if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
+    /*if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
     {
         return;
     }
@@ -553,7 +553,7 @@ void MainWindow::loadActiveTrainsList()
         }
     }
 
-    slotUpdateActiveTrains();
+    slotUpdateActiveTrains();*/
 }
 
 //------------------------------------------------------------------------------
@@ -561,7 +561,7 @@ void MainWindow::loadActiveTrainsList()
 //------------------------------------------------------------------------------
 void MainWindow::loadSelectedTrainsList()
 {
-    if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
+    /*if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
     {
         return;
     }
@@ -664,7 +664,7 @@ void MainWindow::loadSelectedTrainsList()
     }
 
     bool reset_start_config = false;
-    slotUpdateActiveTrains(reset_start_config);
+    slotUpdateActiveTrains(reset_start_config);*/
 }
 
 //------------------------------------------------------------------------------
@@ -970,7 +970,7 @@ void MainWindow::slotSelectSavedStartConfig(int idx)
 //------------------------------------------------------------------------------
 void MainWindow::slotChangeStartConfig()
 {
-    QString file_name = ui->leStartConfigName->text();
+    /*QString file_name = ui->leStartConfigName->text();
     if (file_name.isEmpty())
     {
         ui->pbSaveStartConfig->setText(tr("Save"));
@@ -989,7 +989,7 @@ void MainWindow::slotChangeStartConfig()
         }
 
         ui->pbSaveStartConfig->setEnabled(!active_trains.empty());
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------
@@ -997,7 +997,7 @@ void MainWindow::slotChangeStartConfig()
 //------------------------------------------------------------------------------
 void MainWindow::slotSaveStartConfig()
 {
-    QString file_name = ui->leStartConfigName->text();
+    /*QString file_name = ui->leStartConfigName->text();
     if (file_name.isEmpty())
         return;
 
@@ -1054,7 +1054,7 @@ void MainWindow::slotSaveStartConfig()
         editor.writeFile("Train", flist);
     }
 
-    editor.closeFileAfterWrite();
+    editor.closeFileAfterWrite();*/
 }
 
 //------------------------------------------------------------------------------
@@ -1084,7 +1084,7 @@ void MainWindow::slotTrainConfigChanged()
 //------------------------------------------------------------------------------
 void MainWindow::slotUpdateActiveTrains(bool reset_start_config)
 {
-    if (reset_start_config)
+    /*if (reset_start_config)
         ui->cbStartConfigs->setCurrentIndex(0);
 
     active_trains.clear();
@@ -1122,7 +1122,7 @@ void MainWindow::slotUpdateActiveTrains(bool reset_start_config)
     if (!is_start_button_to_stop_server)
         ui->pbStartServer->setEnabled(!active_trains.empty());
 
-    slotChangeStartConfig();
+    slotChangeStartConfig();*/
 }
 
 //------------------------------------------------------------------------------
