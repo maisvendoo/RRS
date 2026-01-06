@@ -21,6 +21,7 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
+target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 target_include_directories (${TARGET} PRIVATE ../topology/include)
 target_include_directories (${TARGET} PRIVATE ../device/include)
@@ -30,4 +31,5 @@ target_link_libraries(${TARGET} lua::lua)
 target_link_libraries(${TARGET} sol2)
 
 target_link_libraries (${TARGET} Journal)
+target_link_libraries (${TARGET} filesystem)
 target_link_libraries (${TARGET} device)

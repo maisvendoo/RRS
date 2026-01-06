@@ -33,7 +33,7 @@ public:
     void init(const init_data_t &init_data);
 
     /// Запуск на исполнение скрипта сценария
-    bool run(const std::string &script_path);    
+    bool run(const std::string &route_dir, const std::string &script_path);
 
     /// Данные инициализации симулятора
     std::vector<init_data_t> init_datas;

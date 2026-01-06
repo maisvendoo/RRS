@@ -1,5 +1,6 @@
 #include    <scenario-manager.h>
 #include    <Journal.h>
+#include    <filesystem.h>
 #include    <datetime.h>
 #include    <switch-state.h>
 
@@ -43,8 +44,17 @@ void ScenarioManager::init(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ScenarioManager::run(const std::string &script_path)
+bool ScenarioManager::run(const std::string &route_dir,
+                          const std::string &scenario_name)
 {
+    // Полный путь к скрипту сценария
+    FileSystem &fs = FileSystem::getInstance();
+    std::string script_path = fs.getRouteRootDir() + fs.separator()
+                              + route_dir + fs.separator()
+                              + "scenarios" + fs.separator()
+                              + scenario_name + fs.separator()
+                              + "main.lua";
+
     try
     {
         Journal::instance()->info(QString("Starting script: %1...").arg(script_path.c_str()));

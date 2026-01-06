@@ -703,16 +703,11 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     }
 
     // Инициализируем менеджер сценариев
-    scnmgr->init(init_data);
-
-    // Полный путь к скрипту сценария
-    FileSystem &fs = FileSystem::getInstance();
-    std::string script_path = fs.getRouteRootDir() + fs.separator()
-                          + init_data.route_dir_name.toStdString() + fs.separator()
-                          + "scenarios" + fs.separator() + command_line.scenario.value.toStdString() + ".lua";
+    scnmgr->init(init_data);    
 
     // Пытаемся выполнить скрипт
-    if (!scnmgr->run(script_path))
+    if (!scnmgr->run(init_data.route_dir_name.toStdString(),
+                     command_line.scenario.value.toStdString()))
     {
         return false;
     }
