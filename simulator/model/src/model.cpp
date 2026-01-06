@@ -718,10 +718,10 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     }
 
     // Увязываем управляющие сигналы с топологией
-    connect(scnmgr, &ScenarioManager::setSwitchState, topology, &Topology::slotSetSwitchState);
-    connect(scnmgr, &ScenarioManager::getSwitchState, topology, &Topology::slotGetSwitchState);
-    connect(scnmgr, &ScenarioManager::openSignal, topology, &Topology::slotOpenSignal);
-    connect(scnmgr, &ScenarioManager::closeSignal, topology, &Topology::slotCloseSignal);
+    connect(scnmgr, &ScenarioManager::sigSetSwitchState, topology, &Topology::slotSetSwitchState);
+    connect(scnmgr, &ScenarioManager::sigGetSwitchState, topology, &Topology::slotGetSwitchState);
+    connect(scnmgr, &ScenarioManager::sigOpenSignal, topology, &Topology::slotOpenSignal);
+    connect(scnmgr, &ScenarioManager::sigCloseSignal, topology, &Topology::slotCloseSignal);
 
     return true;
 }

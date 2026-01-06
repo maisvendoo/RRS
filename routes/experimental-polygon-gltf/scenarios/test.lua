@@ -6,7 +6,7 @@ train1 = TrainData.new()
 train1.name = "VL60pk"
 train1.config = "vl60pk-1543"
 train1.traj = "branch1_0003_2_x246_x259"
-train1.coord = 785.0
+train1.coord = 1085.0
 train1.dir = 1
 
 setTrain(train1)
@@ -15,3 +15,5 @@ setTrain(train1)
 switchBwd("00071")
 switchFwd("00072")
 switchBwd("00026")
+
+openSignal("00098", 1)

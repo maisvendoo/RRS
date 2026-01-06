@@ -47,13 +47,13 @@ public:
 
 signals:
 
-    void setSwitchState(QByteArray &switch_data);
+    void sigSetSwitchState(QByteArray &switch_data);
 
-    void getSwitchState(QByteArray &switch_data);
+    void sigGetSwitchState(QByteArray &switch_data);
 
-    void openSignal(QByteArray signal_data);
+    void sigOpenSignal(QByteArray signal_data);
 
-    void closeSignal(QByteArray signal_data);
+    void sigCloseSignal(QByteArray signal_data);
 
 private:
 
@@ -96,6 +96,11 @@ private:
     /// Установка задачи на переключение стрелки сзади
     void taskSwitchBwd(const std::string &switch_name);
 
+    /// Открыть сигнал
+    void openSignal(const std::string &conn_name, int dir);
+
+    /// Установка задачи открытия сигнала
+    void taskOpenSignal(const std::string &conn_name, int dir);
 };
 
 #endif

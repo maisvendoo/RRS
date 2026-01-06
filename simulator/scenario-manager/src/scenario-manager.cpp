@@ -272,7 +272,7 @@ void ScenarioManager::switchFwd(const std::string &switch_name)
 
     // Запрашиваем текущее состояние стрелки
     QByteArray switch_data = sw_state.serialize();
-    emit getSwitchState(switch_data);
+    emit sigGetSwitchState(switch_data);
 
     sw_state.deserialize(switch_data);
 
@@ -285,7 +285,7 @@ void ScenarioManager::switchFwd(const std::string &switch_name)
         sw_state.state_fwd = -sw_state.state_fwd;
 
         switch_data = sw_state.serialize();
-        emit setSwitchState(switch_data);
+        emit sigSetSwitchState(switch_data);
     }
 }
 
@@ -307,20 +307,20 @@ void ScenarioManager::switchBwd(const std::string &switch_name)
 
     // Запрашиваем текущее состояние стрелки
     QByteArray switch_data = sw_state.serialize();
-    emit getSwitchState(switch_data);
+    emit sigGetSwitchState(switch_data);
 
     sw_state.deserialize(switch_data);
 
     Journal::instance()->info(QString("switchBwd: switch %1 state: %2")
                                   .arg(sw_state.name)
-                                  .arg(sw_state.state_fwd, 2));
+                                  .arg(sw_state.state_bwd, 2));
 
     if (sw_state.state_bwd != 0)
     {
         sw_state.state_bwd = -sw_state.state_bwd;
 
         switch_data = sw_state.serialize();
-        emit setSwitchState(switch_data);
+        emit sigSetSwitchState(switch_data);
     }
 }
 
@@ -330,6 +330,30 @@ void ScenarioManager::switchBwd(const std::string &switch_name)
 void ScenarioManager::taskSwitchBwd(const std::string &switch_name)
 {
     setTask([switch_name, this]{ this->switchBwd(switch_name); });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::openSignal(const std::string &conn_name, int dir)
+{
+    QByteArray signal_data;
+    QBuffer buff(&signal_data);
+    buff.open(QIODevice::WriteOnly);
+    QDataStream stream(&buff);
+
+    stream << QString(conn_name.c_str());
+    stream << dir;
+
+    emit sigOpenSignal(signal_data);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::taskOpenSignal(const std::string &conn_name, int dir)
+{
+    setTask([conn_name, dir, this]{ this->openSignal(conn_name, dir); });
 }
 
 //------------------------------------------------------------------------------
@@ -393,4 +417,10 @@ void ScenarioManager::types_registration()
     };
 
     Journal::instance()->info("switchBwd method binding...OK");
+
+    lua["openSignal"] = [this](const std::string &conn_name, int dir) {
+        this->taskOpenSignal(conn_name, dir);
+    };
+
+    Journal::instance()->info("openSignal method binding...OK");
 }
