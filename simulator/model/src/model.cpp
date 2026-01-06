@@ -61,7 +61,11 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Init scenario's manager
     if (initScenarioManager(init_data, command_line))
     {
-        init_datas = scnmgr->init_datas;
+        if (!scnmgr->init_datas.empty())
+        {
+            init_datas = scnmgr->init_datas;
+        }
+
         init_data.start_datetime = scnmgr->getStartDateTime();
     }
 
