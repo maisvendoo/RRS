@@ -685,7 +685,7 @@ void MainWindow::startSimulator()
 
     bool reset_start_config = false;
     slotUpdateActiveTrains(reset_start_config);
-    if (active_trains.empty())
+    if (active_trains.empty() && selected_scenario_idx < 0)
     {
         return;
     }
@@ -1096,6 +1096,7 @@ void MainWindow::slotTrainConfigChanged()
 void MainWindow::slotUpdateActiveTrains(bool reset_start_config)
 {
     active_trains.clear();
+
     int active_trains_count = tbActiveTrains->count();
     if (active_trains_count <= 0)
     {
@@ -1128,7 +1129,7 @@ void MainWindow::slotUpdateActiveTrains(bool reset_start_config)
     }
 
     if (!is_start_button_to_stop_server)
-        ui->pbStartServer->setEnabled(!active_trains.empty());
+        ui->pbStartServer->setEnabled(!active_trains.empty() || selected_scenario_idx >= 0);
 
     slotChangeStartConfig();
 }
@@ -1475,6 +1476,7 @@ void MainWindow::slotApplyGraphSettings()
 void MainWindow::slotOnScenarioSelection(int cur_idx)
 {
     ui->tbScenarioDescription->clear();
+    selected_scenario_idx = -1;
 
     if (cur_idx == 0)
         return;
@@ -1483,6 +1485,8 @@ void MainWindow::slotOnScenarioSelection(int cur_idx)
     ui->tbScenarioDescription->setMarkdown(desc);
 
     selected_scenario_idx = cur_idx - 1;
+
+    ui->pbStartServer->setEnabled(true);
 }
 
 //------------------------------------------------------------------------------
