@@ -54,26 +54,31 @@
 	</Model>
 
 	<Model>
-		<ModelName>default-objects/railskid.gltf</ModelName>
+		<ModelName>IMR_pass_rzd/Pass_CupAmmBar1_windows.gltf</ModelName>
+		<AnimationsConfigDir>passcar</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
 		<ModelShift>0.8 -9.905 0.312</ModelShift>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
 
 	<Model>
-		<ModelName>default-objects/railskid.gltf</ModelName>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
 		<ModelShift>0.8 7.495 0.312</ModelShift>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
 
 	<Model>
-		<ModelName>default-objects/railskid.gltf</ModelName>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
 		<ModelShift>-0.8 9.905 0.312</ModelShift>
 		<ModelRotate>0.0 0.0 180.0</ModelRotate>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
 
 	<Model>
-		<ModelName>default-objects/railskid.gltf</ModelName>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
 		<ModelShift>-0.8 -7.495 0.312</ModelShift>
 		<ModelRotate>0.0 0.0 180.0</ModelRotate>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
