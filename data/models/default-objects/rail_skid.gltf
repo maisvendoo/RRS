@@ -15,7 +15,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Railskid"
+			"name":"Rail_skid"
 		}
 	],
 	"materials":[
@@ -67,25 +67,25 @@
 	"images":[
 		{
 			"mimeType":"image/jpeg",
-			"name":"railskid_n",
-			"uri":"textures/railskid_n.jpg"
+			"name":"rail_skid_n",
+			"uri":"textures/rail_skid_n.jpg"
 		},
 		{
 			"mimeType":"image/jpeg",
-			"name":"railskid_ao",
-			"uri":"textures/railskid_ao.jpg"
+			"name":"rail_skid_ao",
+			"uri":"textures/rail_skid_ao.jpg"
 		},
 		{
 			"mimeType":"image/jpeg",
-			"name":"railskid_d",
-			"uri":"textures/railskid_d.jpg"
+			"name":"rail_skid_d",
+			"uri":"textures/rail_skid_d.jpg"
 		}
 	],
 	"accessors":[
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":2546,
+			"count":3142,
 			"max":[
 				0.046499982476234436,
 				0.13099999725818634,
@@ -101,45 +101,45 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":2546,
+			"count":3142,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":2546,
+			"count":3142,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":4200,
+			"count":4272,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":30552,
+			"byteLength":37704,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":30552,
-			"byteOffset":30552,
+			"byteLength":37704,
+			"byteOffset":37704,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":20368,
-			"byteOffset":61104,
+			"byteLength":25136,
+			"byteOffset":75408,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":8400,
-			"byteOffset":81472,
+			"byteLength":8544,
+			"byteOffset":100544,
 			"target":34963
 		}
 	],
@@ -151,8 +151,8 @@
 	],
 	"buffers":[
 		{
-			"byteLength":89872,
-			"uri":"railskid.bin"
+			"byteLength":109088,
+			"uri":"rail_skid.bin"
 		}
 	]
 }
