@@ -233,7 +233,7 @@ void ScenarioManager::setDate(const std::string &date)
 
     if (!isOk)
     {
-        Journal::instance()->error("setDate: Invalid day format: " + tokens[2]);
+        Journal::instance()->error("setDate: Invalid day format: " + tokens[0]);
         return;
     }
 
