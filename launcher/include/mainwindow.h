@@ -142,17 +142,11 @@ private:
     /// Load scenario description
     QString loadScenarioDescription(QString path);
 
-    /// Save list with all trains and their waypoints to previous selected route
-    void saveActiveTrainsList();
-
     /// Clear all trains and their waypoints
     void clearActiveTrainsList();
 
     /// Load route's last list with trains and their waypoints
     void loadActiveTrainsList();
-
-    /// Load route's selected list with trains and their waypoints
-    void loadSelectedTrainsList();
 
     /// Save servers list
     void saveServersList();
@@ -192,10 +186,6 @@ private slots:
     void slotDeleteActiveTrain();
 
     void slotSelectSavedStartConfig(int idx);
-
-    void slotChangeStartConfig();
-
-    void slotSaveStartConfig();
 
     void slotTrainConfigChanged();
 
