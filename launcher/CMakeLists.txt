@@ -21,6 +21,8 @@ find_package(Qt6 COMPONENTS Xml REQUIRED)
 find_package(Qt6 COMPONENTS Gui REQUIRED)
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
+find_package(Qt6 REQUIRED COMPONENTS Core LinguistTools)
+
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
