@@ -13,6 +13,13 @@ void PassCar::initControl(const QString& modules_dir, const QString& custom_cfg_
     (void) modules_dir;
     (void) custom_cfg_dir;
 
+    // Включение освещения в вагоне
+    interior_light.setKeySymbolOn(KEY_H);
+    interior_light.setKeyModifierOn(MODIFIER_OnlyShift);
+    interior_light.setKeySymbolOff(KEY_H);
+    interior_light.setKeyModifierOff(MODIFIER_OnlyControl);
+    interior_light.setControl(&pressed_keys);
+
     // Включение трёх красных огней на передней торцевой стенке
     red_lamps_end_of_train_fwd.setKeySymbolOn(KEY_G);
     red_lamps_end_of_train_fwd.setKeyModifierOn(MODIFIER_OnlyShift);
