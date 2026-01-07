@@ -176,6 +176,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     is_start_button_to_stop_server = false;
 
     connect(ui->cbScenario, &QComboBox::currentIndexChanged, this, &MainWindow::slotOnScenarioSelection);
+
+    ui->tbScenarioDescription->setTextInteractionFlags(Qt::NoTextInteraction);
+    ui->tbScenarioDescription->setFocusPolicy(Qt::NoFocus);
 }
 
 //------------------------------------------------------------------------------
