@@ -53,16 +53,9 @@ int main(int argc, char *argv[])
 
     QTranslator translator;
 
-    const QStringList uiLanguages = QLocale::system().uiLanguages();
-
-    for (const QString &locale : uiLanguages)
+    if (translator.load("route-map.ru_RU.qm", ":/translations/translations"))
     {
-        const QString baseName = "route-map_" + QLocale(locale).name();
-        if (translator.load(":/i18n/" + baseName))
-        {
-            a.installTranslator(&translator);
-            break;
-        }
+        a.installTranslator(&translator);
     }
 
     MainWindow w(cmd_line);
