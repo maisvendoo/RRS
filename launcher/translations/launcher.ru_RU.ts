@@ -240,4 +240,46 @@
         <translation>Перезаписать сервер</translation>
     </message>
 </context>
+<context>
+    <name>TrainWaypointWidget</name>
+    <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="46"/>
+        <source>Train selection:</source>
+        <translation>Выбор поезда</translation>
+    </message>
+    <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="65"/>
+        <source>Route&apos;s predefined start waypoints:</source>
+        <translation>Точки старта, заданные в маршруте</translation>
+    </message>
+    <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="88"/>
+        <source>Configuration of the start point:</source>
+        <translation>Стартовая траектория</translation>
+    </message>
+    <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="101"/>
+        <source>Trajectory coordinate:</source>
+        <translation>Координата</translation>
+    </message>
+    <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="359"/>
+        <location filename="../src/train-waypoint-widget.cpp" line="364"/>
+        <source>Forward</source>
+        <translation>Туда</translation>
+    </message>
+    <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="360"/>
+        <location filename="../src/train-waypoint-widget.cpp" line="365"/>
+        <source>Backward</source>
+        <translation>Обратно</translation>
+    </message>
+    <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="375"/>
+        <location filename="../src/train-waypoint-widget.cpp" line="396"/>
+        <location filename="../src/train-waypoint-widget.cpp" line="422"/>
+        <source>&lt;Not selected&gt;</source>
+        <translation>&lt;Не выбрано&gt;</translation>
+    </message>
+</context>
 </TS>
