@@ -17,6 +17,9 @@ void PassCar::signalsOutput(const simulator_time_t& t, const double& dt)
     // Наличие тормозных колодок
     analogSignal[IS_BRAKE_SHOWS] = static_cast<float>(brake_shoes_set.getState());
 
+    // Освещение в вагоне
+    analogSignal[INTERIOR_LIGHT] = static_cast<float>(interior_light.getState());
+
     // Сигнальные диски "Хвост грузового поезда"
     analogSignal[RED_LAMPS_END_OF_TRAIN_FWD] = static_cast<float>(red_lamps_end_of_train_fwd.getState());
     analogSignal[RED_LAMPS_END_OF_TRAIN_BWD] = static_cast<float>(red_lamps_end_of_train_bwd.getState());

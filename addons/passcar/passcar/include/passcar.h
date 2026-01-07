@@ -38,6 +38,9 @@ public:
 
 private:
 
+    /// Включение освещения в вагоне
+    TriggerControl interior_light;
+
     /// Включение трёх красных огней на передней торцевой стенке
     TriggerControl red_lamps_end_of_train_fwd;
     /// Включение трёх красных огней на задней торцевой стенке
