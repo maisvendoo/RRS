@@ -11,13 +11,10 @@ int main(int argc, char *argv[])
 
     QTranslator translator;
 
-    if (translator.load(QLocale(),
-                        QLatin1String("routeconv"),
-                        QLatin1String("."),
-                        QLatin1String(":/translations/translations"),
-                        QLatin1String(".qm")))
-
+    if (translator.load("routeconv.ru_RU.qm", ":/translations/translations"))
+    {
         a.installTranslator(&translator);
+    }
 
     MainWindow w;
     w.show();
