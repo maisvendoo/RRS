@@ -234,7 +234,7 @@ void MainWindow::loadRoutesList(const std::string &routesDir)
 
         loadTrajectories(route_info);
         loadTrainPositions(route_info);
-        loadStartConfigs(route_info);
+        loadScenarios(route_info);
 
         routes_info.push_back(route_info);
     }
@@ -394,59 +394,39 @@ void MainWindow::loadTrainPositions(route_info_t &route_info)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::loadStartConfigs(route_info_t &route_info)
+void MainWindow::loadScenarios(route_info_t &route_info)
 {
-    route_info.start_configs.clear();
+    route_info.scenarios.clear();
 
-    QString start_cfg_dir_path = route_info.route_dir_full_path + QDir::separator() +
-                                 "topology" + QDir::separator() +
-                                 "start-configurations";
+    QString scenarios_path = route_info.route_dir_full_path + QDir::separator()
+                             + "scenarios";
 
-    QDir start_cfg_dir(start_cfg_dir_path);
-    if (!start_cfg_dir.exists())
-        return;
+    scenarios_path = QDir::toNativeSeparators(scenarios_path);
 
-    QDirIterator start_cfg_files(start_cfg_dir.path(), QStringList() << "*.xml", QDir::NoDotAndDotDot | QDir::Files);
-    while (start_cfg_files.hasNext())
+    QDir scenarios_dir(scenarios_path);
+
+    if (!scenarios_dir.exists())
     {
-        QString fullPath = start_cfg_files.next();
-        CfgReader cfg;
-        if (cfg.load(fullPath))
+        return;
+    }
+
+    // Перебираем все подкаталоги в папке scenarios данного маршрута
+    QDirIterator it(scenarios_path, QDir::Dirs | QDir::NoDotAndDotDot);
+
+    while (it.hasNext())
+    {
+        scenario_t scn;
+
+        // Проверяем наличие в найденном подкаталоге файла main.lua
+        QString main_path = QDir::toNativeSeparators(it.next() + QDir::separator() + "main.lua");
+        QFile main_file(main_path);
+
+        if (main_file.exists())
         {
-            start_config_t sc = start_config_t();
-            QFileInfo fileInfo(fullPath);
-            sc.start_config_name = fileInfo.baseName();
-
-            QDomNode train_node = cfg.getFirstSection("Train");
-            while (!train_node.isNull())
-            {
-                active_train_t at = active_train_t();
-                at.is_active = true;
-
-                at.is_active &=
-                    cfg.getString(train_node, "TrainConfig", at.train_info.train_config_path);
-                at.is_active &=
-                    (!at.train_info.train_config_path.isEmpty());
-
-                cfg.getString(train_node, "Waypoint", at.train_position.name);
-
-                at.is_active &=
-                    cfg.getString(train_node, "TrajectoryName", at.train_position.trajectory_name);
-                at.is_active &=
-                    (!at.train_position.trajectory_name.isEmpty());
-
-                at.is_active &=
-                    cfg.getInt(train_node, "Direction", at.train_position.direction);
-                at.is_active &=
-                    cfg.getDouble(train_node, "InitCoord", at.train_position.traj_coord);
-
-                if (at.is_active)
-                    sc.trains.push_back(at);
-
-                train_node = cfg.getNextSection();
-            }
-
-            route_info.start_configs.push_back(sc);
+            // И только в случае наличия такового - добавляем каталог в список
+            // доступных сценариев
+            scn.scenario_name = scenarios_dir.relativeFilePath(it.next());
+            route_info.scenarios.push_back(scn);
         }
     }
 }
@@ -510,19 +490,19 @@ void MainWindow::clearActiveTrainsList()
 //------------------------------------------------------------------------------
 void MainWindow::loadActiveTrainsList()
 {
-    /*if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
+    if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
     {
         return;
     }
 
-    ui->cbStartConfigs->clear();
-    ui->cbStartConfigs->addItem("<Not_selected>");
-    for (auto& sc : routes_info[selected_route_idx].start_configs)
+    ui->cbScenario->clear();
+    ui->cbScenario->addItem("<Not_selected>");
+    for (auto& sc : routes_info[selected_route_idx].scenarios)
     {
-        ui->cbStartConfigs->addItem(sc.start_config_name);
+        ui->cbScenario->addItem(sc.scenario_name);
     }
 
-    int prev_sc_idx = routes_info[selected_route_idx].last_start_config;
+    /*int prev_sc_idx = routes_info[selected_route_idx].last_start_config;
     if ((prev_sc_idx > 0) &&
         (prev_sc_idx < ui->cbStartConfigs->count()))
     {

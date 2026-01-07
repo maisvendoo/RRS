@@ -42,7 +42,7 @@ struct route_info_t
     /// Info about trajectories in route
     std::vector<trajectory_info_t>   trajectrories;
     /// Info about start configurations in route
-    std::vector<start_config_t>   start_configs;
+    std::vector<scenario_t>   scenarios;
 
     /// Saved last start config index
     int last_start_config = 0;

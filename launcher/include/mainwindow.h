@@ -135,7 +135,7 @@ private:
     void loadTrainPositions(route_info_t &route_info);
 
     /// Loading of waypoints list at current selected route
-    void loadStartConfigs(route_info_t &route_info);
+    void loadScenarios(route_info_t &route_info);
 
     /// Save list with all trains and their waypoints to previous selected route
     void saveActiveTrainsList();

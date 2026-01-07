@@ -6,12 +6,13 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct start_config_t
+struct scenario_t
 {
-    QString start_config_name = "<Not_selected>";
-    std::vector<active_train_t> trains = {};
+    QString scenario_name = "<Not_selected>";
 
-    start_config_t()
+    //std::vector<active_train_t> trains = {};
+
+    scenario_t()
     {
 
     }
