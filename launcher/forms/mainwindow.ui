@@ -351,14 +351,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_18">
               <item>
-               <widget class="QPlainTextEdit" name="ptScenarioDescription">
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>160</height>
-                 </size>
-                </property>
-               </widget>
+               <widget class="QTextBrowser" name="tbScenarioDescription"/>
               </item>
               <item>
                <spacer name="horizontalSpacer_5">

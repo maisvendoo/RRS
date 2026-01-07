@@ -65,6 +65,8 @@ private:
     QToolBox *tbActiveTrains;
     int selected_route_idx = -1;
 
+    int selected_scenario_idx = -1;
+
     /// Info about installed trains
     std::vector<train_info_t>   trains_info;
     /// Info about installed routes
@@ -136,6 +138,9 @@ private:
 
     /// Loading of waypoints list at current selected route
     void loadScenarios(route_info_t &route_info);
+
+    /// Load scenario description
+    QString loadScenarioDescription(QString path);
 
     /// Save list with all trains and their waypoints to previous selected route
     void saveActiveTrainsList();
@@ -239,6 +244,8 @@ private slots:
     void slotCancelGraphSettings();
 
     void slotApplyGraphSettings();
+
+    void slotOnScenarioSelection(int cur_idx);
 };
 
 

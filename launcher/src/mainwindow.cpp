@@ -184,6 +184,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     ui->pbStartMap->setEnabled(false);
     ui->pbStartServer->setEnabled(false);
     is_start_button_to_stop_server = false;
+
+    connect(ui->cbScenario, &QComboBox::currentIndexChanged, this, &MainWindow::slotOnScenarioSelection);
 }
 
 //------------------------------------------------------------------------------
@@ -418,17 +420,40 @@ void MainWindow::loadScenarios(route_info_t &route_info)
         scenario_t scn;
 
         // Проверяем наличие в найденном подкаталоге файла main.lua
-        QString main_path = QDir::toNativeSeparators(it.next() + QDir::separator() + "main.lua");
+        QString abs_path = it.next();
+        QString main_path = QDir::toNativeSeparators(abs_path + QDir::separator() + "main.lua");
         QFile main_file(main_path);
 
         if (main_file.exists())
         {
             // И только в случае наличия такового - добавляем каталог в список
             // доступных сценариев
-            scn.scenario_name = scenarios_dir.relativeFilePath(it.next());
+            scn.scenario_name = scenarios_dir.relativeFilePath(abs_path);
+
+            // Читаем описание сценария из README.md
+            QString desc_path = QDir::toNativeSeparators(abs_path + QDir::separator() + "README.md");
+            scn.scenario_description = loadScenarioDescription(desc_path);
+
             route_info.scenarios.push_back(scn);
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString MainWindow::loadScenarioDescription(QString path)
+{
+    QString desc = "";
+
+    QFile file(path);
+
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        desc = QString::fromUtf8(file.readAll());
+    }
+
+    return desc;
 }
 
 //------------------------------------------------------------------------------
@@ -497,9 +522,10 @@ void MainWindow::loadActiveTrainsList()
 
     ui->cbScenario->clear();
     ui->cbScenario->addItem("<Not_selected>");
+
     for (auto& sc : routes_info[selected_route_idx].scenarios)
     {
-        ui->cbScenario->addItem(sc.scenario_name);
+        ui->cbScenario->addItem(sc.scenario_name);        
     }
 
     /*int prev_sc_idx = routes_info[selected_route_idx].last_start_config;
@@ -531,9 +557,9 @@ void MainWindow::loadActiveTrainsList()
             connect(tww, &TrainWaypointWidget::trainConfigChanged,
                     this, &MainWindow::slotTrainConfigChanged);
         }
-    }
+    }*/
 
-    slotUpdateActiveTrains();*/
+    slotUpdateActiveTrains();
 }
 
 //------------------------------------------------------------------------------
@@ -703,6 +729,11 @@ void MainWindow::startSimulator()
     args << "--traj-name=" + traj_names;
     args << "--direction=" + directions;
     args << "--init-coord=" + init_coords;
+
+    if (selected_scenario_idx >= 0)
+    {
+        args << "--scenario=" + routes_info[selected_route_idx].scenarios[selected_scenario_idx].scenario_name;
+    }
 
     FileSystem &fs = FileSystem::getInstance();
     QString simPath = SIMULATOR_NAME + EXE_EXP;
@@ -1064,9 +1095,6 @@ void MainWindow::slotTrainConfigChanged()
 //------------------------------------------------------------------------------
 void MainWindow::slotUpdateActiveTrains(bool reset_start_config)
 {
-    /*if (reset_start_config)
-        ui->cbStartConfigs->setCurrentIndex(0);
-
     active_trains.clear();
     int active_trains_count = tbActiveTrains->count();
     if (active_trains_count <= 0)
@@ -1102,7 +1130,7 @@ void MainWindow::slotUpdateActiveTrains(bool reset_start_config)
     if (!is_start_button_to_stop_server)
         ui->pbStartServer->setEnabled(!active_trains.empty());
 
-    slotChangeStartConfig();*/
+    slotChangeStartConfig();
 }
 
 //------------------------------------------------------------------------------
@@ -1439,6 +1467,22 @@ void MainWindow::slotApplyGraphSettings()
     saveGraphSettings(fd_list);
 
     ui->pbApply->setEnabled(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotOnScenarioSelection(int cur_idx)
+{
+    ui->tbScenarioDescription->clear();
+
+    if (cur_idx == 0)
+        return;
+
+    QString desc = routes_info[selected_route_idx].scenarios[cur_idx - 1].scenario_description;
+    ui->tbScenarioDescription->setMarkdown(desc);
+
+    selected_scenario_idx = cur_idx - 1;
 }
 
 //------------------------------------------------------------------------------

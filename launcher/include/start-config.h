@@ -9,6 +9,7 @@
 struct scenario_t
 {
     QString scenario_name = "<Not_selected>";
+    QString scenario_description = "";
 
     //std::vector<active_train_t> trains = {};
 
