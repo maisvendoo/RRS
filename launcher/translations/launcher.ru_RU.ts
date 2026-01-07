@@ -88,12 +88,12 @@
         <location filename="../forms/mainwindow.ui" line="427"/>
         <location filename="../forms/mainwindow.ui" line="760"/>
         <source>Start viewer</source>
-        <translation>Запуск графики</translation>
+        <translation>Запуск вьювера</translation>
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="434"/>
         <source>Start viewer automatically</source>
-        <translation>Запуск графики автоматически</translation>
+        <translation>Запуск вьювера автоматически</translation>
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="463"/>

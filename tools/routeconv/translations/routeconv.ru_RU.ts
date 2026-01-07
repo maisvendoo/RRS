@@ -11,7 +11,7 @@
     <message>
         <location filename="../forms/mainwindow.ui" line="25"/>
         <source>Current route path:</source>
-        <translation>Текущий путь к маршруту</translation>
+        <translation>Путь к маршруту ZDSimulator</translation>
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="52"/>
