@@ -40,6 +40,7 @@ xcopy /Y ..\..\modules\vl60k\*.dll %RRS_DEV_ROOT%\modules\vl60k\
 xcopy /Y ..\..\modules\vl60pk\*.dll %RRS_DEV_ROOT%\modules\vl60pk\
 xcopy /Y ..\..\modules\passcar\*.dll %RRS_DEV_ROOT%\modules\passcar\
 xcopy /Y ..\..\modules\freightcar\*.dll %RRS_DEV_ROOT%\modules\freightcar\
+xcopy /Y ..\lua\*.lua %RRS_DEV_ROOT%\modules\lua\
 
 rem Копируем плагины
 

@@ -15,14 +15,14 @@ train1.dir = 1
 setTrain(train1)
 
 -- Устанавливаем поезд игрока на 3 путь станции Б
-train2 = TrainData.new()
+--[[train2 = TrainData.new()
 train2.name = "VL60pk"
 train2.config = "vl60pk-1543"
 train2.traj = "branch1_0004_2_246_259"
 train2.coord = 1085.0
 train2.dir = 1
 
-setTrain(train2)
+setTrain(train2)--]]
 
 -- Устанавливаем поезд игрока на 2 путь станции Б
 train3 = TrainData.new()
@@ -45,3 +45,5 @@ train4.dir = 1
 setTrain(train4)--]]
 
 buildRoute("route1_0001_1", "route2_0047_497", 1)
+delay(1.0)
+buildRoute("route1_0047_497", "route2_0001_1", -1)

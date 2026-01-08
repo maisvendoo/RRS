@@ -462,6 +462,15 @@ void Trajectory::step(double t, double dt)
         emit sendTrajBusyState(new_state.serialize());
     }
 
+    if (prev_in_route != in_route)
+    {
+        traj_busy_state_t new_state;
+        new_state.name = name;
+        new_state.is_busy = is_busy;
+        new_state.in_route = in_route;
+        emit sendTrajBusyState(new_state.serialize());
+    }
+
     for (auto traj_device : devices)
     {
         traj_device->step(t, dt);

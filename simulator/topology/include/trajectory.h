@@ -127,6 +127,7 @@ public:
     {
         if (!is_busy)
         {
+            prev_in_route = in_route;
             in_route = true;
         }
     }
@@ -151,6 +152,8 @@ private:
 
     /// признак включения траектории в маршрут ДЦ
     bool in_route = false;
+
+    bool prev_in_route = false;
 
     QMap<size_t, std::array<double, 2>> vehicles_coords;
 
