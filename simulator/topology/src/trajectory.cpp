@@ -445,35 +445,43 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 //------------------------------------------------------------------------------
 void Trajectory::step(double t, double dt)
 {
+    // Необходимость рассылки состояния траектории
+    bool send = false;
+
+    // Обновляем занятость подвижным составом
     if (is_busy == vehicles_coords.empty())
     {
         is_busy = !vehicles_coords.empty();
+        send = true;
 
         // Занятая траектория исключается из маршрута ДЦ
         if (is_busy)
         {
             in_route = false;
         }
-
-        traj_busy_state_t new_state;
-        new_state.name = name;
-        new_state.is_busy = is_busy;
-        new_state.in_route = in_route;
-        emit sendTrajBusyState(new_state.serialize());
     }
 
+    // Обновляем занятость диспетчерскими маршрутами
     if (prev_in_route != in_route)
     {
-        traj_busy_state_t new_state;
-        new_state.name = name;
-        new_state.is_busy = is_busy;
-        new_state.in_route = in_route;
-        emit sendTrajBusyState(new_state.serialize());
+        prev_in_route = in_route;
+        send = true;
     }
 
+    // Симуляция модулей путевой инфраструктуры
     for (auto traj_device : devices)
     {
         traj_device->step(t, dt);
+    }
+
+    // Рассылка нового состояния траектории
+    if (send)
+    {
+        traj_busy_state_t new_state;
+        new_state.name = name;
+        new_state.is_busy = is_busy;
+        new_state.in_route = in_route;
+        emit sendTrajBusyState(new_state.serialize());
     }
 }
 

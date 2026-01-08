@@ -127,7 +127,6 @@ public:
     {
         if (!is_busy)
         {
-            prev_in_route = in_route;
             in_route = true;
         }
     }
