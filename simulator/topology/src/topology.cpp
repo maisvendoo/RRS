@@ -478,7 +478,7 @@ bool Topology::set_switchs_by_route(const std::vector<route_segment_t> &route, i
             // Следующая траектория, соответсвующая текущему положению стрелки
             Trajectory *next_traj = (dir == 1) ? sw->getFwdTraj() : sw->getBwdTraj();
 
-            // Ожидаемая траектория, исходя из мостроения маршрута
+            // Ожидаемая траектория, исходя из построения маршрута
             Trajectory *expc_traj = route[i+1].traj;
 
             // Если траектории совпадают - ничего не переключаем
@@ -579,78 +579,40 @@ bool Topology::set_switchs_by_route(const std::vector<route_segment_t> &route, i
 //------------------------------------------------------------------------------
 bool Topology::open_route_signals(const std::vector<route_segment_t> &route, int dir, QStringList &conn_list)
 {
-    // При движении "туда"
-    if (dir == 1)
+    for (size_t i = 0; i < route.size() - 1; ++i)
     {
-        for (size_t i = 0; i < route.size() - 1; ++i)
+        // Берём сегмент маршрута
+        const route_segment_t& seg = route[i];
+
+        // Берем коннектор у траектории в направлении построенного маршрута
+        Connector *conn = (dir == 1) ? seg.traj->getFwdConnector() : seg.traj->getBwdConnector();
+
+        if (conn == nullptr)
         {
-            auto seg = route[i];
+            Journal::instance()->error(QString("Open route signals: %1 conn of [%2]%3 is null")
+                                           .arg((dir == 1) ? "Fwd" : "Bwd").arg(i).arg(seg.traj->getName()));
+            return false;
+        }
 
-            // Берем коннектор в конце траектории
-            Connector *conn = seg.traj->getFwdConnector();
+        // Проверяем есть ли на нем сигнал
+        Signal *signal = (dir == 1) ? conn->getSignalFwd() : conn->getSignalBwd();
 
-            if (conn == nullptr)
-            {
-                return false;
-            }
+        if (signal == nullptr)
+        {
+            // нет, и открывать нечего, идем дальше
+            continue;
+        }
 
-            // Проверяем есть ли на нем сигнал
-            Signal *signal = conn->getSignalFwd();
+        if (EnterSignal *enter_sig = dynamic_cast<EnterSignal *>(signal))
+        {
+            conn_list.append(conn->getName());
+        }
 
-            if (signal == nullptr)
-            {
-                // нет, и открывать нечего, идем дальше
-                continue;
-            }
-
-            if (EnterSignal *enter_sig = dynamic_cast<EnterSignal *>(signal))
-            {
-                conn_list.append(conn->getName());
-            }
-
-            if (ExitSignal *exit_sig = dynamic_cast<ExitSignal *>(signal))
-            {
-                conn_list.append(conn->getName());
-            }
+        if (ExitSignal *exit_sig = dynamic_cast<ExitSignal *>(signal))
+        {
+            conn_list.append(conn->getName());
         }
     }
-
-    // При движении "обратно"
-    if (dir == -1)
-    {
-        for (size_t i = route.size() - 1; i > 0; --i)
-        {
-            auto seg = route[i];
-
-            // Берем коннектор в конце траектории
-            Connector *conn = seg.traj->getBwdConnector();
-
-            if (conn == nullptr)
-            {
-                return false;
-            }
-
-            // Проверяем есть ли на нем сигнал
-            Signal *signal = conn->getSignalBwd();
-
-            if (signal == nullptr)
-            {
-                // нет, и открывать нечего, идем дальше
-                continue;
-            }
-
-            if (EnterSignal *enter_sig = dynamic_cast<EnterSignal *>(signal))
-            {
-                conn_list.append(conn->getName());
-            }
-
-            if (ExitSignal *exit_sig = dynamic_cast<ExitSignal *>(signal))
-            {
-                conn_list.append(conn->getName());
-            }
-        }
-    }
-
     return true;
 }
 
@@ -1606,11 +1568,18 @@ void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
 
     if (!route_opt)
     {
-        Journal::instance()->error("Build route: No topological route found!");
+        Journal::instance()->error("Build route: NO topological route from " + start_traj + " to " + target_traj);
         return;
     }
 
     auto &route = route_opt.value();
+
+    if (route.empty())
+    {
+        Journal::instance()->error("Build route: EMPTY route from " + start_traj + " to " + target_traj);
+        return;
+    }
+    Journal::instance()->info("Build route: founded from " + start_traj + " to " + target_traj + " through " + QString::number(route.size()) + "trajectories");
 
     if (!set_switchs_by_route(route, dir))
     {
