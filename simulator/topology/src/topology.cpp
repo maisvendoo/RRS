@@ -460,15 +460,15 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
             if (d == 1)
             {
                 // Если есть прямое по стрелке направление
-                // и оно не занято
-                if (sw->fwdPlusTraj && !sw->fwdPlusTraj->isBusy())
+                // и оно не занято и не включено в другой маршрут
+                if (sw->fwdPlusTraj && !sw->fwdPlusTraj->isBusy() && !sw->fwdPlusTraj->isInRoute())
                 {
                     // то это наш кандидат
                     candidates.push_back(sw->fwdPlusTraj);
                 }
 
-                // Если есть незанатое направление по отклонению
-                if (sw->fwdMinusTraj && !sw->fwdMinusTraj->isBusy())
+                // Если есть незанатое направление по отклонению не включенной в другой маршрут
+                if (sw->fwdMinusTraj && !sw->fwdMinusTraj->isBusy() && !sw->fwdMinusTraj->isInRoute())
                 {
                     // То же кандидат, надо рассмотреть!
                     candidates.push_back(sw->fwdMinusTraj);
@@ -477,12 +477,12 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
             else // при движении назад - смотрим на задние +/- хвостики стрелки
             {
                 // так же добавляя в кандидаты существующие незанятые траектории
-                if (sw->bwdPlusTraj && !sw->bwdPlusTraj->isBusy())
+                if (sw->bwdPlusTraj && !sw->bwdPlusTraj->isBusy() && !sw->bwdPlusTraj->isInRoute())
                 {
                     candidates.push_back(sw->bwdPlusTraj);
                 }
 
-                if (sw->bwdMinusTraj && !sw->bwdMinusTraj->isBusy())
+                if (sw->bwdMinusTraj && !sw->bwdMinusTraj->isBusy() && !sw->bwdMinusTraj->isInRoute())
                 {
                     candidates.push_back(sw->bwdMinusTraj);
                 }
