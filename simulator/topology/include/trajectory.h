@@ -131,7 +131,11 @@ private:
 
     double len = 0.0;
 
+    /// признак занятости траектории
     bool is_busy = false;
+
+    /// признак включения траектории в маршрут ДЦ
+    bool in_route = false;
 
     QMap<size_t, std::array<double, 2>> vehicles_coords;
 

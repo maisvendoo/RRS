@@ -463,7 +463,7 @@ QByteArray Trajectory::serialize()
     QDataStream stream(&data);
 
     // Кладем в буфер имя, длину и признак занятости
-    stream << name << len << is_busy;
+    stream << name << len << is_busy << in_route;
 
     // кладем туда же число треков
     stream << static_cast<uint32_t>(tracks.size());
@@ -490,6 +490,7 @@ void Trajectory::deserialize(QByteArray &data)
     stream >> name;
     stream >> len;
     stream >> is_busy;
+    stream >> in_route;
 
     // Восстанавливаем число треков
     uint32_t tracks_count;

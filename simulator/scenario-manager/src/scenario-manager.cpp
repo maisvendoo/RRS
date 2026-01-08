@@ -89,6 +89,8 @@ void ScenarioManager::step(double t, double dt)
     }
 
     delayTimer->step(t, dt);
+
+    curr_step = dt;
 }
 
 //------------------------------------------------------------------------------
@@ -439,9 +441,11 @@ void ScenarioManager::slotDelayTimer()
 //------------------------------------------------------------------------------
 void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir)
 {
+    const double signal_open_delay = 0.5;
+
     for (auto conn_name : conn_list)
     {
-        taskSetDelay(2.0);
+        taskSetDelay(signal_open_delay);
         taskOpenSignal(conn_name.toStdString(), dir);
     }
 }

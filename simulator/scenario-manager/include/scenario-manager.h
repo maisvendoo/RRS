@@ -72,6 +72,9 @@ private:
     /// Таймер задержки исполнения очереди задач
     Timer *delayTimer = new Timer(0.1, false);
 
+    /// Текущий шаг
+    double curr_step = 0.0;
+
     /// Поставить задачу в очередь
     void setTask(task_t task);
 
