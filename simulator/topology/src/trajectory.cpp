@@ -441,6 +441,12 @@ void Trajectory::step(double t, double dt)
     {
         is_busy = !vehicles_coords.empty();
 
+        // Занятая траектория исключается из маршрута ДЦ
+        if (is_busy)
+        {
+            in_route = false;
+        }
+
         traj_busy_state_t new_state;
         new_state.name = name;
         new_state.is_busy = is_busy;

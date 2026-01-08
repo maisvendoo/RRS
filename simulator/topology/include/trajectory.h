@@ -121,6 +121,16 @@ public:
         return tracks;
     }
 
+    void putInRoute()
+    {
+        in_route = true;
+    }
+
+    bool isInRoute() const
+    {
+        return in_route;
+    }
+
 signals:
 
     void sendTrajBusyState(QByteArray busy_data);

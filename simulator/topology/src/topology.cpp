@@ -392,6 +392,9 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
                 auto [prev_t, conn] = visited[t];
                 route_segment_t rs;
                 rs.traj = t;
+
+                rs.traj->putInRoute();
+
                 rs.dir = d;
                 rs.next_conn = conn;
 
