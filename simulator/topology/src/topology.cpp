@@ -371,6 +371,13 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
                                                                  Trajectory *target_traj,
                                                                  int dir)
 {
+    // Если целевая траектория занята, уходим сразу, ловить нечего
+    if (target_traj->isBusy())
+    {
+        Journal::instance()->error("Build route: Target trajectory is busy. Route is impossible");
+        return std::nullopt;
+    }
+
     std::queue<std::pair<Trajectory *, int>> q;
     std::unordered_map<Trajectory *, std::pair<Trajectory *, Connector *>> visited;
 
