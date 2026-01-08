@@ -391,9 +391,9 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
             {
                 auto [prev_t, conn] = visited[t];
                 route_segment_t rs;
-                rs.next_conn = conn;
-                rs.dir = d;
                 rs.traj = t;
+                rs.dir = d;
+                rs.next_conn = conn;
 
                 path.push_back(rs);
 
@@ -401,6 +401,7 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
             }
 
             std::reverse(path.begin(), path.end());
+
             return path;
         }
 
@@ -415,8 +416,6 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
 
         if (Switch *sw = dynamic_cast<Switch *>(next_conn))
         {
-            next_traj = (d == 1) ? sw->getFwdTraj() : sw->getBwdTraj();
-
             std::vector<Trajectory *> candidates;
 
             if (d == 1)
@@ -455,6 +454,123 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
 //------------------------------------------------------------------------------
 bool Topology::set_switchs_by_route(const std::vector<route_segment_t> &route, int dir)
 {
+    // Переключаем попутные остряки
+    for (size_t i = 0; i < route.size() - 1; ++i)
+    {
+        // Берем первый сегмент маршрута
+        auto seg = route[i];
+
+        // Определяем следующий коннектор в соотвествии с направлением движения
+        Connector *conn = nullptr;
+
+        if (dir == 1)
+        {
+            conn = seg.traj->getFwdConnector();
+        }
+
+        if (dir == -1)
+        {
+            conn = seg.traj->getBwdConnector();
+        }
+
+        if (Switch *sw = dynamic_cast<Switch *>(conn))
+        {
+            // Следующая траектория, соответсвующая текущему положению стрелки
+            Trajectory *next_traj = (dir == 1) ? sw->getFwdTraj() : sw->getBwdTraj();
+
+            // Ожидаемая траектория, исходя из мостроения маршрута
+            Trajectory *expc_traj = route[i+1].traj;
+
+            // Если траектории совпадают - ничего не переключаем
+            if (next_traj == expc_traj)
+            {
+                continue;
+            }
+
+            if (dir == 1)
+            {
+                if (expc_traj == sw->fwdPlusTraj)
+                {
+                    sw->setRefStateFwd(1);
+                }
+
+                if (expc_traj == sw->fwdMinusTraj)
+                {
+                    sw->setRefStateFwd(-1);
+                }
+            }
+
+            if (dir == -1)
+            {
+                if (expc_traj == sw->bwdPlusTraj)
+                {
+                    sw->setRefStateBwd(1);
+                }
+
+                if (expc_traj == sw->bwdMinusTraj)
+                {
+                    sw->setRefStateBwd(-1);
+                }
+            }
+        }
+    }
+
+    // Переключаем встречные остряки
+    for (size_t i = route.size() - 1; i > 0; --i)
+    {
+        auto seg = route[i];
+
+        Connector *conn = nullptr;
+
+        if (dir == 1)
+        {
+            conn = seg.traj->getBwdConnector();
+        }
+
+        if (dir == -1)
+        {
+            conn = seg.traj->getFwdConnector();
+        }
+
+        if (Switch *sw = dynamic_cast<Switch *>(conn))
+        {
+            Trajectory *next_traj = (dir == 1) ? sw->getBwdTraj() : sw->getFwdTraj();
+
+            Trajectory *expc_traj = route[i-1].traj;
+
+            if (next_traj == expc_traj)
+            {
+                continue;
+            }
+
+            if (dir == 1)
+            {
+                if (expc_traj == sw->bwdPlusTraj)
+                {
+                    sw->setRefStateBwd(1);
+                }
+
+                if (expc_traj == sw->bwdMinusTraj)
+                {
+                    sw->setRefStateBwd(-1);
+                }
+            }
+
+            if (dir == -1)
+            {
+                if (expc_traj == sw->fwdPlusTraj)
+                {
+                    sw->setRefStateFwd(1);
+                }
+
+                if (expc_traj == sw->fwdMinusTraj)
+                {
+                    sw->setRefStateFwd(-1);
+                }
+            }
+        }
+    }
+
     return true;
 }
 
@@ -1406,5 +1522,19 @@ void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
         return;
     }
 
-    find_route(s_traj, t_traj, dir);
+    auto route_opt = find_route(s_traj, t_traj, dir);
+
+    if (!route_opt)
+    {
+        Journal::instance()->error("Build route: No topological route found!");
+        return;
+    }
+
+    auto &route = route_opt.value();
+
+    if (!set_switchs_by_route(route, dir))
+    {
+        Journal::instance()->error("Route is occupied or switches cannot be set");
+        return;
+    }
 }
