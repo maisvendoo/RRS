@@ -515,7 +515,7 @@ bool Topology::set_switchs_by_route(const std::vector<route_segment_t> &route, i
         }
     }
 
-    // Переключаем встречные остряки
+    // Переключаем встречные остряки по тому же принципу, но наоборот
     for (size_t i = route.size() - 1; i > 0; --i)
     {
         auto seg = route[i];
