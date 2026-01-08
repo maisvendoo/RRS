@@ -8,6 +8,7 @@ mkdir %RRS_DEV_ROOT%
 mkdir %RRS_DEV_ROOT%\bin
 mkdir %RRS_DEV_ROOT%\lib
 mkdir %RRS_DEV_ROOT%\modules
+mkdir %RRS_DEV_ROOT%\modules\lua
 mkdir %RRS_DEV_ROOT%\plugins
 
 mkdir %RRS_DEV_ROOT%\cfg
