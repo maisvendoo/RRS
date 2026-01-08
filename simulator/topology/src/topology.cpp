@@ -577,6 +577,90 @@ bool Topology::set_switchs_by_route(const std::vector<route_segment_t> &route, i
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool Topology::open_route_signals(const std::vector<route_segment_t> &route, int dir)
+{
+    // При движении "туда"
+    if (dir == 1)
+    {
+        for (size_t i = 0; i < route.size() - 1; ++i)
+        {
+            auto seg = route[i];
+
+            // Берем коннектор в конце траектории
+            Connector *conn = seg.traj->getFwdConnector();
+
+            if (conn == nullptr)
+            {
+                return false;
+            }
+
+            // Проверяем есть ли на нем сигнал
+            Signal *signal = conn->getSignalFwd();
+
+            if (signal == nullptr)
+            {
+                // нет, и открывать нечего, идем дальше
+                continue;
+            }
+
+            if (EnterSignal *enter_sig = dynamic_cast<EnterSignal *>(signal))
+            {
+                // Пытаемся открыть входной/маршрутный
+                enter_sig->slotPressOpen();
+            }
+
+            if (ExitSignal *exit_sig = dynamic_cast<ExitSignal *>(signal))
+            {
+                // Пытаемся открыть выходной
+                exit_sig->slotPressOpen();
+            }
+        }
+    }
+
+    // При движении "обратно"
+    if (dir == -1)
+    {
+        for (size_t i = route.size() - 1; i > 0; --i)
+        {
+            auto seg = route[i];
+
+            // Берем коннектор в конце траектории
+            Connector *conn = seg.traj->getBwdConnector();
+
+            if (conn == nullptr)
+            {
+                return false;
+            }
+
+            // Проверяем есть ли на нем сигнал
+            Signal *signal = conn->getSignalBwd();
+
+            if (signal == nullptr)
+            {
+                // нет, и открывать нечего, идем дальше
+                continue;
+            }
+
+            if (EnterSignal *enter_sig = dynamic_cast<EnterSignal *>(signal))
+            {
+                // Пытаемся открыть входной/маршрутный
+                enter_sig->slotPressOpen();
+            }
+
+            if (ExitSignal *exit_sig = dynamic_cast<ExitSignal *>(signal))
+            {
+                // Пытаемся открыть выходной
+                exit_sig->slotPressOpen();
+            }
+        }
+    }
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::step(double t, double dt)
 {
     for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
@@ -1534,7 +1618,12 @@ void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
 
     if (!set_switchs_by_route(route, dir))
     {
-        Journal::instance()->error("Route is occupied or switches cannot be set");
+        Journal::instance()->error("Build route: Route is occupied or switches cannot be set");
         return;
+    }
+
+    if (!open_route_signals(route, dir))
+    {
+        Journal::instance()->error("Build route: Can't open route signals");
     }
 }

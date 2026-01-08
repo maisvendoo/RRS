@@ -140,6 +140,9 @@ private:
     /// Установка стрелок по маршруту
     bool set_switchs_by_route(const std::vector<route_segment_t> &route, int dir);
 
+    /// Октрытие попутных сигналов по маршруту
+    bool open_route_signals(const std::vector<route_segment_t> &route, int dir);
+
 public slots:
 
     void slotSetSwitchState(QByteArray &switch_data);
