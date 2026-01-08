@@ -87,6 +87,10 @@ void MapWidget::paintEvent(QPaintEvent *event)
 {
     (void)event;
 
+    QPainter painter(this);
+    painter.fillRect(rect(), QColor(150, 150, 150));
+    QWidget::paintEvent(event);
+
     if (traj_list == nullptr)
     {
         return;
@@ -139,8 +143,19 @@ void MapWidget::paintEvent(QPaintEvent *event)
 void MapWidget::drawTrajectory(Trajectory *traj)
 {
     QPen pen;
+
+    pen.setWidth(1);
+
     if (traj->isBusy())
+    {
+        pen.setWidth(2);
         pen.setColor(QColor(255, 0, 0));
+    }
+    else if (traj->isInRoute())
+    {
+        pen.setWidth(2);
+        pen.setColor(QColor(255, 255, 0));
+    }
 
     QPainter painter;
     painter.begin(this);
