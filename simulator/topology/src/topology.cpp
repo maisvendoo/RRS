@@ -378,84 +378,132 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
         return std::nullopt;
     }
 
+    // Очередь для обхода графа (пары текущая траектория и направление)
     std::queue<std::pair<Trajectory *, int>> q;
+    // Хеш-таблица поесещенных траекторий: ключ - текущая траектория, пара -
+    // предыдущая траектория и коннектор, через который мы пришли в текущую.
+    // Используется для восстановления пути по завершении поиска
     std::unordered_map<Trajectory *, std::pair<Trajectory *, Connector *>> visited;
 
+    // Начинаем с исходной траектории
     q.push({start_traj, dir});
+    // Метим её как посещенную из несуществующей траектории через неизвестный узел
     visited[start_traj] = {nullptr, nullptr};
 
+    // Пока очередь траекторий для посещения не пуста
     while (!q.empty())
     {
+        // извлекаем текущую траекторию и направление из очереди
         auto [curr_t, d] = q.front();
         q.pop();
 
+        // Если текущая траектория - целевая, то ура, мы нашли путь!
         if (curr_t == target_traj)
         {
+            // Построенный маршрут
             std::vector<route_segment_t> path;
+            // Начинаем с целевой траектории
             Trajectory *t = target_traj;
 
+            // Пока существует предыдущая траектория
             while (t != nullptr)
             {
+                // Извлекаем предыдущую траекторию и коннектор, который привел
+                // нас к текущей
                 auto [prev_t, conn] = visited[t];
+
+                // Формируем сегмент маршрута
                 route_segment_t rs;
                 rs.traj = t;
 
+                // Не забываем отметить что текущая траектория включена в маршрут
                 rs.traj->putInRoute();
 
                 rs.dir = d;
                 rs.next_conn = conn;
 
+                // Помещаем сегмент маршрута в путь
                 path.push_back(rs);
 
+                // Переходим к предыдущей траектории
                 t = prev_t;
             }
 
+            // Инвертируем маршрут, чтобы был от начала к концу
             std::reverse(path.begin(), path.end());
 
+            // Уходим, довольные как слон, с маршрутом под мышкой
             return path;
         }
 
+        // В зависимости от направления берем либо передний, либо задний
+        // коннектор текущей траектории
         Connector *next_conn = (d == 1) ? curr_t->getFwdConnector() : curr_t->getBwdConnector();
 
+        // Если коннектора нет - мы пришли в тупик, дальше хода нет
         if (next_conn == nullptr)
         {
+            // идем на следующую итерацию
             continue;
         }
 
+        // Смотрим, какая траектория следующая
         Trajectory *next_traj = nullptr;
 
+        // Смотрим, стрелка ли наш коннектор (Бу-гага, он всегда стрелка!)
         if (Switch *sw = dynamic_cast<Switch *>(next_conn))
         {
+            // Список траекторий кандидатов в высокое звание маршрутных
             std::vector<Trajectory *> candidates;
 
+            // Если едем вперед
             if (d == 1)
             {
+                // Если есть прямое по стрелке направление
+                // и оно не занято
                 if (sw->fwdPlusTraj && !sw->fwdPlusTraj->isBusy())
+                {
+                    // то это наш кандидат
                     candidates.push_back(sw->fwdPlusTraj);
+                }
 
+                // Если есть незанатое направление по отклонению
                 if (sw->fwdMinusTraj && !sw->fwdMinusTraj->isBusy())
+                {
+                    // То же кандидат, надо рассмотреть!
                     candidates.push_back(sw->fwdMinusTraj);
+                }
             }
-            else
+            else // при движении назад - смотрим на задние +/- хвостики стрелки
             {
+                // так же добавляя в кандидаты существующие незанятые траектории
                 if (sw->bwdPlusTraj && !sw->bwdPlusTraj->isBusy())
+                {
                     candidates.push_back(sw->bwdPlusTraj);
+                }
 
                 if (sw->bwdMinusTraj && !sw->bwdMinusTraj->isBusy())
+                {
                     candidates.push_back(sw->bwdMinusTraj);
+                }
             }
 
+            // Перебираем собранных кнадидатов
             for (Trajectory *cand : candidates)
             {
+                // Если он еще не посещен - то список посещенных вернет свой конец
                 if (visited.find(cand) == visited.end())
                 {
+                    // Помечаем кандидата ка посещенного, запониная откуда мы к нему пришли
                     visited[cand] = {curr_t, next_conn};
+                    // и помещаем его в очередь
                     q.push({cand, d});
                 }
             }
         }
     }
 
+    // Пичальнка - очередь пуста, а маршрута нет :(
     return std::nullopt;
 }
 
