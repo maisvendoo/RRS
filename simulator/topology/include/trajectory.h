@@ -77,6 +77,8 @@ public:
     /// Задать признак занятости (для работы копии топологии вне движка)
     void setBusyState(bool busy_state);
 
+    void setInRoute(bool in_route);
+
     /// Признак занятости подвижным составом
     bool isBusy() const;
 
@@ -123,7 +125,10 @@ public:
 
     void putInRoute()
     {
-        in_route = true;
+        if (!is_busy)
+        {
+            in_route = true;
+        }
     }
 
     bool isInRoute() const

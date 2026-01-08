@@ -87,6 +87,7 @@ struct traj_busy_state_t
 {
     QString name = "";
     bool is_busy = false;
+    bool in_route = false;
 
     QByteArray serialize()
     {
@@ -97,6 +98,7 @@ struct traj_busy_state_t
 
         stream << name;
         stream << is_busy;
+        stream << in_route;
 
         return buff.data();
     }
@@ -109,6 +111,7 @@ struct traj_busy_state_t
 
         stream >> name;
         stream >> is_busy;
+        stream >> in_route;
     }
 };
 

@@ -190,6 +190,14 @@ void Trajectory::setBusyState(bool busy_state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Trajectory::setInRoute(bool in_route)
+{
+    this->in_route = in_route;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool Trajectory::isBusy() const
 {
     return is_busy;
@@ -450,6 +458,7 @@ void Trajectory::step(double t, double dt)
         traj_busy_state_t new_state;
         new_state.name = name;
         new_state.is_busy = is_busy;
+        new_state.in_route = in_route;
         emit sendTrajBusyState(new_state.serialize());
     }
 

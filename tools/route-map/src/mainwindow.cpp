@@ -585,6 +585,7 @@ void MainWindow::slotGetTrajBusyState(QByteArray &busy_data)
     }
 
     traj->setBusyState(busy_state.is_busy);
+    traj->setInRoute(busy_state.in_route);
 }
 
 //------------------------------------------------------------------------------
