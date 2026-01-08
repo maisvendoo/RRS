@@ -577,7 +577,7 @@ bool Topology::set_switchs_by_route(const std::vector<route_segment_t> &route, i
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Topology::open_route_signals(const std::vector<route_segment_t> &route, int dir)
+bool Topology::open_route_signals(const std::vector<route_segment_t> &route, int dir, QStringList &conn_list)
 {
     // При движении "туда"
     if (dir == 1)
@@ -605,14 +605,12 @@ bool Topology::open_route_signals(const std::vector<route_segment_t> &route, int
 
             if (EnterSignal *enter_sig = dynamic_cast<EnterSignal *>(signal))
             {
-                // Пытаемся открыть входной/маршрутный
-                enter_sig->slotPressOpen();
+                conn_list.append(conn->getName());
             }
 
             if (ExitSignal *exit_sig = dynamic_cast<ExitSignal *>(signal))
             {
-                // Пытаемся открыть выходной
-                exit_sig->slotPressOpen();
+                conn_list.append(conn->getName());
             }
         }
     }
@@ -643,14 +641,12 @@ bool Topology::open_route_signals(const std::vector<route_segment_t> &route, int
 
             if (EnterSignal *enter_sig = dynamic_cast<EnterSignal *>(signal))
             {
-                // Пытаемся открыть входной/маршрутный
-                enter_sig->slotPressOpen();
+                conn_list.append(conn->getName());
             }
 
             if (ExitSignal *exit_sig = dynamic_cast<ExitSignal *>(signal))
             {
-                // Пытаемся открыть выходной
-                exit_sig->slotPressOpen();
+                conn_list.append(conn->getName());
             }
         }
     }
@@ -1622,8 +1618,12 @@ void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
         return;
     }
 
-    if (!open_route_signals(route, dir))
+    QStringList signals_for_open;
+
+    if (!open_route_signals(route, dir, signals_for_open))
     {
         Journal::instance()->error("Build route: Can't open route signals");
     }
+
+    emit sigSetOpenSignalsQueue(signals_for_open, dir);
 }

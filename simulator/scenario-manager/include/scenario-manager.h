@@ -132,6 +132,10 @@ private:
 private slots:
 
     void slotDelayTimer();
+
+public slots:
+
+    void slotSetOpenSignalsQueue(QStringList conn_list, int dir);
 };
 
 #endif

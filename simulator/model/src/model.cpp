@@ -722,6 +722,7 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     connect(scnmgr, &ScenarioManager::sigOpenSignal, topology, &Topology::slotOpenSignal);
     connect(scnmgr, &ScenarioManager::sigCloseSignal, topology, &Topology::slotCloseSignal);
     connect(scnmgr, &ScenarioManager::sigBuildRoute, topology, &Topology::slotBuildRoute);
+    connect(topology, &Topology::sigSetOpenSignalsQueue, scnmgr, &ScenarioManager::slotSetOpenSignalsQueue);
 
     return true;
 }

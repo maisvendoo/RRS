@@ -437,6 +437,18 @@ void ScenarioManager::slotDelayTimer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir)
+{
+    for (auto conn_name : conn_list)
+    {
+        taskSetDelay(2.0);
+        taskOpenSignal(conn_name.toStdString(), dir);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::setTask(task_t task)
 {
     taskQueue.push(std::move(task));
