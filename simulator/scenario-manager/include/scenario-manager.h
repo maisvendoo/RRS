@@ -56,6 +56,8 @@ signals:
 
     void sigCloseSignal(QByteArray signal_data);
 
+    void sigBuildRoute(QString start_traj, QString target_traj, int dir);
+
 private:
 
     /// Контекст интерпретатора Lua
@@ -120,6 +122,12 @@ private:
 
     /// Установка задержки исполнения очереди
     void taskSetDelay(double timeout);
+
+    /// Задать маршрут
+    void buildRoute(QString start_traj, QString target_traj, int dir);
+
+    /// Установка задачи задания маршрута
+    void taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir);
 
 private slots:
 

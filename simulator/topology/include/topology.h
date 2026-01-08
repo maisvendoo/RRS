@@ -2,12 +2,14 @@
 #define     TOPOLOGY_H
 
 #include    <QObject>
+#include    <optional>
 
 #include    <topology-export.h>
 #include    <topology-types.h>
 #include    <vehicle-controller.h>
 #include    <vehicle.h>
 #include    <signals-data-types.h>
+#include    <route-segment.h>
 
 /*!
  * \class
@@ -130,6 +132,14 @@ private:
 
     void exit_signals_step(double t, double dt);
 
+    /// Нахождение пути в графе траекторий
+    std::optional<std::vector<route_segment_t>> find_route(Trajectory *start_traj,
+                                                           Trajectory *target_traj,
+                                                           int dir);
+
+    /// Установка стрелок по маршруту
+    bool set_switchs_by_route(const std::vector<route_segment_t> &route, int dir);
+
 public slots:
 
     void slotSetSwitchState(QByteArray &switch_data);
@@ -139,6 +149,8 @@ public slots:
     void slotOpenSignal(QByteArray signal_data);
 
     void slotCloseSignal(QByteArray signal_data);
+
+    void slotBuildRoute(QString start_traj, QString target_traj, int dir);
 };
 
 #endif

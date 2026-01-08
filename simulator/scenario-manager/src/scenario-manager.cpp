@@ -411,6 +411,24 @@ void ScenarioManager::taskSetDelay(double timeout)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::buildRoute(QString start_traj, QString target_traj, int dir)
+{
+    emit sigBuildRoute(start_traj, target_traj, dir);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir)
+{
+    setTask([start_traj, target_traj, dir, this]{
+        this->buildRoute(QString(start_traj.c_str()), QString(target_traj.c_str()), dir);
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::slotDelayTimer()
 {
     delayTimer->stop();
@@ -510,6 +528,10 @@ void ScenarioManager::sys_functions_registration()
     };
 
     Journal::instance()->info("delay method binding...OK");
+
+    lua["buildRoute"] = [this](const std::string &start_traj, const std::string &target_traj, int dir) {
+        this->taskBuildRoute(start_traj, target_traj, dir);
+    };
 }
 
 //------------------------------------------------------------------------------

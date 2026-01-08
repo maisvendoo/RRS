@@ -12,6 +12,8 @@
 #include    <Journal.h>
 #include    <filesystem.h>
 
+#include    <queue>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -99,7 +101,7 @@ bool Topology::load(QString route_dir, bool solve_errors)
         Journal::instance()->error("Can't to load staions list");
     }
 
-    get_route_name(route_path);
+    get_route_name(route_path);    
 
     return true;
 }
@@ -360,6 +362,100 @@ void Topology::exit_signals_step(double t, double dt)
 
         signal->step(t, dt);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *start_traj,
+                                                                 Trajectory *target_traj,
+                                                                 int dir)
+{
+    std::queue<std::pair<Trajectory *, int>> q;
+    std::unordered_map<Trajectory *, std::pair<Trajectory *, Connector *>> visited;
+
+    q.push({start_traj, dir});
+    visited[start_traj] = {nullptr, nullptr};
+
+    while (!q.empty())
+    {
+        auto [curr_t, d] = q.front();
+        q.pop();
+
+        if (curr_t == target_traj)
+        {
+            std::vector<route_segment_t> path;
+            Trajectory *t = target_traj;
+
+            while (t != nullptr)
+            {
+                auto [prev_t, conn] = visited[t];
+                route_segment_t rs;
+                rs.next_conn = conn;
+                rs.dir = d;
+                rs.traj = t;
+
+                path.push_back(rs);
+
+                t = prev_t;
+            }
+
+            std::reverse(path.begin(), path.end());
+            return path;
+        }
+
+        Connector *next_conn = (d == 1) ? curr_t->getFwdConnector() : curr_t->getBwdConnector();
+
+        if (next_conn == nullptr)
+        {
+            continue;
+        }
+
+        Trajectory *next_traj = nullptr;
+
+        if (Switch *sw = dynamic_cast<Switch *>(next_conn))
+        {
+            next_traj = (d == 1) ? sw->getFwdTraj() : sw->getBwdTraj();
+
+            std::vector<Trajectory *> candidates;
+
+            if (d == 1)
+            {
+                if (sw->fwdPlusTraj && !sw->fwdPlusTraj->isBusy())
+                    candidates.push_back(sw->fwdPlusTraj);
+
+                if (sw->fwdMinusTraj && !sw->fwdMinusTraj->isBusy())
+                    candidates.push_back(sw->fwdMinusTraj);
+            }
+            else
+            {
+                if (sw->bwdPlusTraj && !sw->bwdPlusTraj->isBusy())
+                    candidates.push_back(sw->bwdPlusTraj);
+
+                if (sw->bwdMinusTraj && !sw->bwdMinusTraj->isBusy())
+                    candidates.push_back(sw->bwdMinusTraj);
+            }
+
+            for (Trajectory *cand : candidates)
+            {
+                if (visited.find(cand) == visited.end())
+                {
+                    visited[cand] = {curr_t, next_conn};
+                    q.push({cand, d});
+                }
+            }
+        }
+    }
+
+    return std::nullopt;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Topology::set_switchs_by_route(const std::vector<route_segment_t> &route, int dir)
+{
+    return true;
 }
 
 //------------------------------------------------------------------------------
@@ -1287,4 +1383,28 @@ void Topology::slotCloseSignal(QByteArray signal_data)
 
         es->slotPressClose();
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
+{
+    auto s_traj = traj_list.value(start_traj, nullptr);
+
+    if (s_traj == nullptr)
+    {
+        Journal::instance()->error("BuildRoute: Unknown start trajectory " + start_traj);
+        return;
+    }
+
+    auto t_traj = traj_list.value(target_traj, nullptr);
+
+    if (t_traj == nullptr)
+    {
+        Journal::instance()->error("BuildRoute: Unknown target trajectory " + target_traj);
+        return;
+    }
+
+    find_route(s_traj, t_traj, dir);
 }

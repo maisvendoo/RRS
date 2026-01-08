@@ -47,12 +47,7 @@ public:
 
     void setRefStateBwd(int state);
 
-signals:
-
-    void sendSwitchState(QByteArray sw_data);
-
-private:
-
+    // !!!! Временно сделал публичным, подумаю как это обойти !!!!
     Trajectory *fwdMinusTraj = nullptr;
 
     Trajectory *fwdPlusTraj = nullptr;
@@ -60,6 +55,13 @@ private:
     Trajectory *bwdMinusTraj = nullptr;
 
     Trajectory *bwdPlusTraj = nullptr;
+
+signals:
+
+    void sendSwitchState(QByteArray sw_data);
+
+private:
+
 
     /// Состояние стрелки впереди: 0 - вперёд единственная траектория,
     /// >0 - в плюсовом положении, <0 - в минусовом положении,
