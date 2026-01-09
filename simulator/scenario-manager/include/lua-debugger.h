@@ -18,17 +18,20 @@ public:
     Logger(const std::string &filename = "../logs/lua-debug.log")
         : filename(filename)
     {
-        log_file.open(filename, std::ios::out);
-        log_file.close();
+        log_file.open(filename, std::ios::app);
     }
 
-    ~Logger() = default;
+    ~Logger()
+    {
+        if (log_file.is_open())
+        {
+            log_file.close();
+        }
+    }
 
     void log_msg(const std::string &msg)
     {
-        log_file.open(filename, std::ios::app);
         log_file << msg << std::endl;
-        log_file.close();
     }
 };
 
