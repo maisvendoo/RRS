@@ -10,8 +10,8 @@
 struct switch_state_t
 {
     QString name = "";
-    std::int8_t state_fwd = 1;
-    std::int8_t state_bwd = 1;
+    int8_t state_fwd = 1;
+    int8_t state_bwd = 1;
 
     QByteArray serialize()
     {

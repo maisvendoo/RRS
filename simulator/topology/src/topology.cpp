@@ -1388,8 +1388,8 @@ void Topology::slotSetSwitchState(QByteArray &switch_data)
         return;
     }
 
-    sw->setRefStateFwd(Switch::State(sw_state.state_fwd));
-    sw->setRefStateBwd(Switch::State(sw_state.state_bwd));
+    sw->setRefStateFwd(static_cast<Switch::State>(sw_state.state_fwd));
+    sw->setRefStateBwd(static_cast<Switch::State>(sw_state.state_bwd));
 }
 
 //------------------------------------------------------------------------------
