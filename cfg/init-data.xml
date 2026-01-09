@@ -20,5 +20,7 @@
 
 		<DebugPrint>0</DebugPrint>
 
+		<LuaDebug>1</LuaDebug>
+
 	</InitData>
 </Config>

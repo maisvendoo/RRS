@@ -427,6 +427,11 @@ void Model::loadInitData(init_data_t &init_data)
             init_data.debug_print = false;
         }
 
+        if (!cfg.getBool(secName, "LuaDebug", init_data.lua_debug))
+        {
+            init_data.lua_debug = false;
+        }
+
         Journal::instance()->info("Loaded settings from: " + cfg_path);
     }
     else

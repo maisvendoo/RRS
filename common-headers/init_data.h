@@ -40,6 +40,7 @@ struct init_data_t final
     int     integration_time_interval = 15;
     int     control_time_interval = 15;
     bool    debug_print = false;
+    bool    lua_debug = false;
     solver_config_t solver_config;
 };
 
