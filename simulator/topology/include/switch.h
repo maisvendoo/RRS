@@ -2,6 +2,7 @@
 #define     SWITCH_H
 
 #include    <connector.h>
+#include    <cstdint>
 
 //------------------------------------------------------------------------------
 //
@@ -29,25 +30,34 @@ public:
 
     void deserialize(QByteArray &data, traj_list_t &traj_list) override;
 
-    int getStateFwd() const
+    enum State : std::int8_t {
+        STATE_MINUS = -1,       ///< Стрелка в минусовом положении (на бок)
+        STATE_PLUS = 1,         ///< Стрелка в плусовом положении (прямо)
+        IS_BUSY_MINUS = -2,     ///< Стрелка занята ПЕ в минусовом положении
+        IS_BUSY_PLUS = 2,       ///< Стрелка занята ПЕ в плюсовом положении
+        IN_ROUTE_MINUS = -3,    ///< Стрелка в маршруте в минусовом положении
+        IN_ROUTE_PLUS = 3,      ///< Стрелка в маршруте в плюсовом положении
+        ONE_POSSIBLE_DIRECTION = 0  ///< Единственная возможная траектория
+    };
+
+    State getStateFwd() const
     {
         return state_fwd;
     }
 
-    int getStateBwd() const
+    State getStateBwd() const
     {
         return state_bwd;
     }
 
-    void setStateFwd(int state);
+    void setStateFwd(State state);
 
-    void setStateBwd(int state);
+    void setStateBwd(State state);
 
-    void setRefStateFwd(int state);
+    void setRefStateFwd(State state);
 
-    void setRefStateBwd(int state);
+    void setRefStateBwd(State state);
 
-    // !!!! Временно сделал публичным, подумаю как это обойти !!!!
     Trajectory *fwdMinusTraj = nullptr;
 
     Trajectory *fwdPlusTraj = nullptr;
@@ -62,24 +72,17 @@ signals:
 
 private:
 
+    /// Состояние стрелки впереди
+    State state_fwd = ONE_POSSIBLE_DIRECTION;
 
-    /// Состояние стрелки впереди: 0 - вперёд единственная траектория,
-    /// >0 - в плюсовом положении, <0 - в минусовом положении,
-    /// 1 - свободна, 2 - занята ПЕ
-    int state_fwd = 0;
-
-    /// Состояние стрелки сзади: 0 - назад единственная траектория,
-    /// >0 - в плюсовом положении, <0 - в минусовом положении,
-    /// 1 - свободна, 2 - занята ПЕ
-    int state_bwd = 0;
+    /// Состояние стрелки сзади
+    State state_bwd = ONE_POSSIBLE_DIRECTION;
 
     /// Требуемое состояние стрелки впереди:
-    /// 1 - в плюсовом положении, -1 - в минусовом положении
-    int ref_state_fwd = 1;
+    State ref_state_fwd = STATE_PLUS;
 
     /// Требуемое состояние стрелки сзади:
-    /// 1 - в плюсовом положении, -1 - в минусовом положении
-    int ref_state_bwd = 1;
+    State ref_state_bwd = STATE_PLUS;
 
     /// Стрелка будет заблокирована в сторону траектории,
     /// которая занята ПЕ ближе чем в 40 метрах

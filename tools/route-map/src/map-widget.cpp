@@ -310,12 +310,22 @@ void MapWidget::drawConnector(Connector *conn)
     Switch *sw = dynamic_cast<Switch *>(conn);
     if (sw != nullptr)
     {
-        if (sw->getStateFwd() != 0)
+        if (sw->getStateFwd() != Switch::ONE_POSSIBLE_DIRECTION)
         {
             QColor color = QColor(0, 0, 128);
-            if ((sw->getStateFwd() == 2) || (sw->getStateFwd() == -2))
+            if ((sw->getStateFwd() == Switch::IS_BUSY_PLUS) || (sw->getStateFwd() == Switch::IS_BUSY_MINUS))
             {
                 color = QColor(96, 96, 96);
+
+                if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
+                    (sw_label->action_switch_fwd != nullptr))
+                {
+                    sw_label->action_switch_fwd->setEnabled(false);
+                }
+            }
+            else if ((sw->getStateFwd() == Switch::IN_ROUTE_PLUS) || (sw->getStateFwd() == Switch::IN_ROUTE_MINUS))
+            {
+                color = QColor(255, 192, 96);
 
                 if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
                     (sw_label->action_switch_fwd != nullptr))
@@ -363,12 +373,22 @@ void MapWidget::drawConnector(Connector *conn)
             painter.end();
         }
 
-        if (sw->getStateBwd() != 0)
+        if (sw->getStateBwd() != Switch::ONE_POSSIBLE_DIRECTION)
         {
             QColor color = QColor(0, 0, 128);
-            if ((sw->getStateBwd() == 2) || (sw->getStateBwd() == -2))
+            if ((sw->getStateBwd() == Switch::IS_BUSY_PLUS) || (sw->getStateBwd() == Switch::IS_BUSY_MINUS))
             {
                 color = QColor(96, 96, 96);
+
+                if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
+                    (sw_label->action_switch_bwd != nullptr))
+                {
+                    sw_label->action_switch_bwd->setEnabled(false);
+                }
+            }
+            else if ((sw->getStateBwd() == Switch::IN_ROUTE_PLUS) || (sw->getStateBwd() == Switch::IN_ROUTE_MINUS))
+            {
+                color = QColor(255, 192, 96);
 
                 if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
                     (sw_label->action_switch_bwd != nullptr))

@@ -565,8 +565,8 @@ void MainWindow::slotGetSwitchState(QByteArray &sw_state)
         return;
     }
 
-    sw->setStateFwd(switch_state.state_fwd);
-    sw->setStateBwd(switch_state.state_bwd);
+    sw->setStateFwd(Switch::State(switch_state.state_fwd));
+    sw->setStateBwd(Switch::State(switch_state.state_bwd));
 }
 
 //------------------------------------------------------------------------------

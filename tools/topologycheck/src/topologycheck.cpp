@@ -164,11 +164,11 @@ void TopologyCheck::check_trajectory(Trajectory *traj)
 //------------------------------------------------------------------------------
 void TopologyCheck::check_connector_point(Switch *sw)
 {
-    std::array<std::pair<int, int>, 4> states;
-    states[0] = {1, 1};
-    states[1] = {1, -1};
-    states[2] = {-1, 1};
-    states[3] = {-1, -1};
+    std::array<std::pair<Switch::State, Switch::State>, 4> states;
+    states[0] = {Switch::STATE_PLUS, Switch::STATE_PLUS};
+    states[1] = {Switch::STATE_PLUS, Switch::STATE_MINUS};
+    states[2] = {Switch::STATE_MINUS, Switch::STATE_PLUS};
+    states[3] = {Switch::STATE_MINUS, Switch::STATE_MINUS};
     for (auto [state_bwd, state_fwd] : states)
     {
         sw->setStateBwd(state_bwd);

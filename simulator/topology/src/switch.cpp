@@ -96,8 +96,17 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 {
     Connector::configure(cfg, secNode, traj_list);
 
-    cfg.getInt(secNode, "state_fwd", state_fwd);
-    cfg.getInt(secNode, "state_bwd", state_bwd);
+    int tmp_int = 0;
+    cfg.getInt(secNode, "state_fwd", tmp_int);
+    if (tmp_int == 1)
+        state_fwd = STATE_PLUS;
+    if (tmp_int == -1)
+        state_fwd = STATE_MINUS;
+    cfg.getInt(secNode, "state_bwd", tmp_int);
+    if (tmp_int == 1)
+        state_bwd = STATE_PLUS;
+    if (tmp_int == -1)
+        state_bwd = STATE_MINUS;
 
     Journal::instance()->info("Connector type: switch");
 
@@ -167,56 +176,40 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     if (inputs_count == 0)
     {
         Journal::instance()->error("Switch " + name + " has't incomming trajectories!!!");
-        state_bwd = 0;
-        ref_state_bwd = 0;
+        state_bwd = ONE_POSSIBLE_DIRECTION;
+        ref_state_bwd = ONE_POSSIBLE_DIRECTION;
     }
     else
     {
         Journal::instance()->info("Incommnig trajectories: " + QString("%1").arg(inputs_count));
         if (inputs_count != 2)
         {
-            state_bwd = 0;
-            ref_state_bwd = 0;
+            state_bwd = ONE_POSSIBLE_DIRECTION;
+            ref_state_bwd = ONE_POSSIBLE_DIRECTION;
         }
         else
         {
-            if (state_bwd == -1)
-            {
-                ref_state_bwd = -1;
-            }
-            else
-            {
-                state_bwd = 1;
-                ref_state_bwd = 1;
-            }
+            ref_state_bwd = state_bwd;
         }
     }
 
     if (outputs_count == 0)
     {
         Journal::instance()->error("Switch " + name + " has't outgoing trajectories!!!");
-        state_fwd = 0;
-        ref_state_fwd = 0;
+        state_fwd = ONE_POSSIBLE_DIRECTION;
+        ref_state_fwd = ONE_POSSIBLE_DIRECTION;
     }
     else
     {
         Journal::instance()->info("Outgoing trajectories: " + QString("%1").arg(outputs_count));
         if (outputs_count != 2)
         {
-            state_fwd = 0;
-            ref_state_fwd = 0;
+            state_fwd = ONE_POSSIBLE_DIRECTION;
+            ref_state_fwd = ONE_POSSIBLE_DIRECTION;
         }
         else
         {
-            if (state_fwd == -1)
-            {
-                ref_state_fwd = -1;
-            }
-            else
-            {
-                state_fwd = 1;
-                ref_state_fwd = 1;
-            }
+            ref_state_fwd = state_fwd;
         }
     }
 
@@ -342,7 +335,7 @@ void Switch::step(double t, double dt)
     // Если траектория вперёд единственная - делать дальше нечего
     if ((fwdMinusTraj == nullptr) || (fwdPlusTraj == nullptr))
     {
-        state_fwd = 0;
+        state_fwd = ONE_POSSIBLE_DIRECTION;
     }
     else
     {
@@ -350,13 +343,13 @@ void Switch::step(double t, double dt)
         // чем заданная дистанция, ставим стрелку в это направление
         if (fwdPlusTraj->isBusy(0.0, lock_by_busy_distance))
         {
-            state_fwd = 2;
+            state_fwd = IS_BUSY_PLUS;
         }
         else
         {
             if (fwdMinusTraj->isBusy(0.0, lock_by_busy_distance))
             {
-                state_fwd = -2;
+                state_fwd = IS_BUSY_MINUS;
             }
             else
             {
@@ -370,7 +363,7 @@ void Switch::step(double t, double dt)
     // Если траектория назад единственная - делать дальше нечего
     if ((bwdMinusTraj == nullptr) || (bwdPlusTraj == nullptr))
     {
-        state_bwd = 0;
+        state_bwd = ONE_POSSIBLE_DIRECTION;
     }
     else
     {
@@ -378,13 +371,13 @@ void Switch::step(double t, double dt)
         // чем заданная дистанция, ставим стрелку в это направление
         if (bwdPlusTraj->isBusy(bwdPlusTraj->getLength() - lock_by_busy_distance, bwdPlusTraj->getLength()))
         {
-            state_bwd = 2;
+            state_bwd = IS_BUSY_PLUS;
         }
         else
         {
             if (bwdMinusTraj->isBusy(bwdMinusTraj->getLength() - lock_by_busy_distance, bwdMinusTraj->getLength()))
             {
-                state_bwd = -2;
+                state_bwd = IS_BUSY_MINUS;
             }
             else
             {
@@ -495,7 +488,7 @@ QByteArray Switch::serialize()
     serialize_connected_trajectory(stream, bwdMinusTraj);
     serialize_connected_trajectory(stream, bwdPlusTraj);
 
-    // Помещаем в бувер состояние стрелки
+    // Помещаем в буФер состояние стрелки
     stream << state_fwd << state_bwd;
 
     return data.data();
@@ -581,7 +574,7 @@ Trajectory *Switch::deserialize_connected_trajectory(QDataStream &stream,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::setStateFwd(int state)
+void Switch::setStateFwd(State state)
 {
     // Задаём стрелке состояние
     state_fwd = state;
@@ -590,7 +583,7 @@ void Switch::setStateFwd(int state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::setStateBwd(int state)
+void Switch::setStateBwd(State state)
 {
     // Задаём стрелке состояние
     state_bwd = state;
@@ -599,7 +592,7 @@ void Switch::setStateBwd(int state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::setRefStateFwd(int state)
+void Switch::setRefStateFwd(State state)
 {
     // Задаём стрелке требуемое направление
     ref_state_fwd = state;
@@ -608,7 +601,7 @@ void Switch::setRefStateFwd(int state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::setRefStateBwd(int state)
+void Switch::setRefStateBwd(State state)
 {
     // Задаём стрелке требуемое направление
     ref_state_bwd = state;
