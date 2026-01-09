@@ -3,20 +3,20 @@
 
 #include    <sol/sol.hpp>
 #include    <fstream>
+#include    <Journal.h>
+
+#define LUA_DBG_LOG "../logs/lua-debug.log"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 class Logger
 {
-    std::string filename;
-
     std::ofstream log_file;
 
 public:
 
-    Logger(const std::string &filename = "../logs/lua-debug.log")
-        : filename(filename)
+    Logger(const std::string &filename = LUA_DBG_LOG)
     {
         log_file.open(filename, std::ios::app);
     }
@@ -40,7 +40,7 @@ public:
 //------------------------------------------------------------------------------
 class LuaDebugger
 {
-public:
+public:    
 
     LuaDebugger();
 
