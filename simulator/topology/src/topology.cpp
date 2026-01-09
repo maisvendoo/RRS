@@ -380,8 +380,8 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
 
     // Очередь для обхода графа (пары текущая траектория и направление)
     std::queue<std::pair<Trajectory *, int>> q;
-    // Хеш-таблица поесещенных траекторий: ключ - текущая траектория, пара -
-    // предыдущая траектория и коннектор, через который мы пришли в текущую.
+    // Хеш-таблица поесещенных траекторий: ключ - текущая траектория,
+    // значение - предыдущая траектория.
     // Используется для восстановления пути по завершении поиска
     std::unordered_map<Trajectory *, Trajectory *> visited;
 
@@ -495,13 +495,13 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
                 }
             }
 
-            // Перебираем собранных кандидатов
+            // Перебираем собранных траекторий-кандидатов
             for (Trajectory *cand : candidates)
             {
                 // Если он еще не посещён - то список посещённых вернет end()
                 if (visited.find(cand) == visited.end())
                 {
-                    // Помечаем кандидата как посещённого, запоминая откуда мы к нему пришли
+                    // Запоминаем кандидата как посещённого, и откуда мы к нему пришли
                     visited[cand] = curr_t;
                     // и помещаем его в очередь
                     q.push({cand, d});
@@ -521,7 +521,7 @@ bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
 {
     for (size_t i = 0; i < route.trajectories.size() - 1; ++i)
     {
-        // Берём сегмент маршрута
+        // Берём очередную траекторию маршрута
         Trajectory* prev_traj = route.trajectories[i];
 
         // Берем коннектор у траектории в направлении построенного маршрута
@@ -605,7 +605,7 @@ bool Topology::open_route_signals(const route_segment_t &route, int dir, QString
 {
     for (size_t i = 0; i < route.trajectories.size() - 1; ++i)
     {
-        // Берём сегмент маршрута
+        // Берём очередную траекторию маршрута
         Trajectory* traj = route.trajectories[i];
 
         // Берем коннектор у траектории в направлении построенного маршрута
