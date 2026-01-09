@@ -68,7 +68,7 @@ void TcpClient::sendRequest(StructureType stype, double update_interval)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpClient::sendSwitchState(QString conn_name, int state_fwd, int state_bwd)
+void TcpClient::sendSwitchState(QString conn_name, std::int8_t state_fwd, std::int8_t state_bwd)
 {
     network_data_t request;
     request.stype = STYPE_COMMAND_SWITCH_STATE;

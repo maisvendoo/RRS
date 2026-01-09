@@ -30,7 +30,7 @@ public:
 
     void deserialize(QByteArray &data, traj_list_t &traj_list) override;
 
-    enum State : std::int8_t {
+    enum State : int8_t {
         STATE_MINUS = -1,       ///< Стрелка в минусовом положении (на бок)
         STATE_PLUS = 1,         ///< Стрелка в плусовом положении (прямо)
         IS_BUSY_MINUS = -2,     ///< Стрелка занята ПЕ в минусовом положении
