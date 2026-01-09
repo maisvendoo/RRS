@@ -8,9 +8,8 @@
 //------------------------------------------------------------------------------
 struct route_segment_t
 {
-    Trajectory *traj = nullptr;
-    Connector *next_conn = nullptr;
-    int dir = 1;
+    std::vector<Trajectory*> trajectories; ///< Траектории, входящие в маршрут
+    int dir = 0; ///< Направление маршрута по топологии: 1 - вперёд, -1 - назад
 
     route_segment_t()
     {

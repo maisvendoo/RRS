@@ -367,15 +367,15 @@ void Topology::exit_signals_step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *start_traj,
-                                                                 Trajectory *target_traj,
-                                                                 int dir)
+route_segment_t Topology::find_route(Trajectory *start_traj,
+                                     Trajectory *target_traj,
+                                     int dir)
 {
     // Если целевая траектория занята, уходим сразу, ловить нечего
     if (target_traj->isBusy())
     {
         Journal::instance()->error("Build route: Target trajectory is busy. Route is impossible");
-        return std::nullopt;
+        return route_segment_t();
     }
 
     // Очередь для обхода графа (пары текущая траектория и направление)
@@ -383,12 +383,12 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
     // Хеш-таблица поесещенных траекторий: ключ - текущая траектория, пара -
     // предыдущая траектория и коннектор, через который мы пришли в текущую.
     // Используется для восстановления пути по завершении поиска
-    std::unordered_map<Trajectory *, std::pair<Trajectory *, Connector *>> visited;
+    std::unordered_map<Trajectory *, Trajectory *> visited;
 
     // Начинаем с исходной траектории
     q.push({start_traj, dir});
     // Метим её как посещенную из несуществующей траектории через неизвестный узел
-    visited[start_traj] = {nullptr, nullptr};
+    visited[start_traj] = nullptr;
 
     // Пока очередь траекторий для посещения не пуста
     while (!q.empty())
@@ -401,36 +401,27 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
         if (curr_t == target_traj)
         {
             // Построенный маршрут
-            std::vector<route_segment_t> path;
+            route_segment_t path;
+            path.dir = d;
+
             // Начинаем с целевой траектории
             Trajectory *t = target_traj;
 
             // Пока существует предыдущая траектория
             while (t != nullptr)
             {
-                // Извлекаем предыдущую траекторию и коннектор, который привел
-                // нас к текущей
-                auto [prev_t, conn] = visited[t];
-
-                // Формируем сегмент маршрута
-                route_segment_t rs;
-                rs.traj = t;
-
                 // Не забываем отметить что текущая траектория включена в маршрут
-                rs.traj->putInRoute();
-
-                rs.dir = d;
-                rs.next_conn = conn;
+                t->putInRoute();
 
                 // Помещаем сегмент маршрута в путь
-                path.push_back(rs);
+                path.trajectories.push_back(t);
 
-                // Переходим к предыдущей траектории
-                t = prev_t;
+                // Извлекаем предыдущую траекторию, переходим к ней
+                t = visited[t];
             }
 
             // Инвертируем маршрут, чтобы был от начала к концу
-            std::reverse(path.begin(), path.end());
+            std::reverse(path.trajectories.begin(), path.trajectories.end());
 
             // Уходим, довольные как слон, с маршрутом под мышкой
             return path;
@@ -504,14 +495,14 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
                 }
             }
 
-            // Перебираем собранных кнадидатов
+            // Перебираем собранных кандидатов
             for (Trajectory *cand : candidates)
             {
-                // Если он еще не посещен - то список посещенных вернет свой конец
+                // Если он еще не посещён - то список посещённых вернет end()
                 if (visited.find(cand) == visited.end())
                 {
-                    // Помечаем кандидата ка посещенного, запониная откуда мы к нему пришли
-                    visited[cand] = {curr_t, next_conn};
+                    // Помечаем кандидата как посещённого, запоминая откуда мы к нему пришли
+                    visited[cand] = curr_t;
                     // и помещаем его в очередь
                     q.push({cand, d});
                 }
@@ -519,19 +510,19 @@ std::optional<std::vector<route_segment_t> > Topology::find_route(Trajectory *st
         }
     }
 
-    // Пичальнка - очередь пуста, а маршрута нет :(
-    return std::nullopt;
+    // Пичалька - очередь пуста, а маршрута нет :(
+    return route_segment_t();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Topology::set_switchs_by_route(const std::vector<route_segment_t>& route, int dir)
+bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
 {
-    for (size_t i = 0; i < route.size() - 1; ++i)
+    for (size_t i = 0; i < route.trajectories.size() - 1; ++i)
     {
         // Берём сегмент маршрута
-        Trajectory* prev_traj = route[i].traj;
+        Trajectory* prev_traj = route.trajectories[i];
 
         // Берем коннектор у траектории в направлении построенного маршрута
         Connector* conn = (dir == 1) ? prev_traj->getFwdConnector() : prev_traj->getBwdConnector();
@@ -551,7 +542,7 @@ bool Topology::set_switchs_by_route(const std::vector<route_segment_t>& route, i
         }
 
         // Ожидаемая траектория, исходя из построения маршрута
-        Trajectory* next_traj = route[i + 1].traj;
+        Trajectory* next_traj = route.trajectories[i + 1];
 
         if (dir == 1)
         {
@@ -610,20 +601,20 @@ bool Topology::set_switchs_by_route(const std::vector<route_segment_t>& route, i
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Topology::open_route_signals(const std::vector<route_segment_t> &route, int dir, QStringList &conn_list)
+bool Topology::open_route_signals(const route_segment_t &route, int dir, QStringList &conn_list)
 {
-    for (size_t i = 0; i < route.size() - 1; ++i)
+    for (size_t i = 0; i < route.trajectories.size() - 1; ++i)
     {
         // Берём сегмент маршрута
-        const route_segment_t& seg = route[i];
+        Trajectory* traj = route.trajectories[i];
 
         // Берем коннектор у траектории в направлении построенного маршрута
-        Connector *conn = (dir == 1) ? seg.traj->getFwdConnector() : seg.traj->getBwdConnector();
+        Connector *conn = (dir == 1) ? traj->getFwdConnector() : traj->getBwdConnector();
 
         if (conn == nullptr)
         {
             Journal::instance()->error(QString("Open route signals: %1 conn of [%2]%3 is null")
-                                           .arg((dir == 1) ? "Fwd" : "Bwd").arg(i).arg(seg.traj->getName()));
+                                           .arg((dir == 1) ? "Fwd" : "Bwd").arg(i).arg(traj->getName()));
             return false;
         }
 
@@ -1585,7 +1576,8 @@ void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
 
     if (s_traj == nullptr)
     {
-        Journal::instance()->error("BuildRoute: Unknown start trajectory " + start_traj);
+        Journal::instance()->error("BuildRoute: Unknown start trajectory "
+                                   + start_traj);
         return;
     }
 
@@ -1593,26 +1585,22 @@ void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
 
     if (t_traj == nullptr)
     {
-        Journal::instance()->error("BuildRoute: Unknown target trajectory " + target_traj);
+        Journal::instance()->error("BuildRoute: Unknown target trajectory "
+                                   + target_traj);
         return;
     }
 
-    auto route_opt = find_route(s_traj, t_traj, dir);
+    auto route = find_route(s_traj, t_traj, dir);
 
-    if (!route_opt)
+    if ((route.dir == 0) || route.trajectories.empty())
     {
-        Journal::instance()->error("Build route: NO topological route from " + start_traj + " to " + target_traj);
+        Journal::instance()->error("Build route: No route from "
+                                   + start_traj + " to " + target_traj);
         return;
     }
-
-    auto &route = route_opt.value();
-
-    if (route.empty())
-    {
-        Journal::instance()->error("Build route: EMPTY route from " + start_traj + " to " + target_traj);
-        return;
-    }
-    Journal::instance()->info("Build route: founded from " + start_traj + " to " + target_traj + " through " + QString::number(route.size()) + "trajectories");
+    Journal::instance()->info("Build route: founded from "
+                              + start_traj + " to " + target_traj
+                              + " through " + QString::number(route.trajectories.size()) + "trajectories");
 
     if (!set_switchs_by_route(route, dir))
     {

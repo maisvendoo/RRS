@@ -135,15 +135,15 @@ private:
     void exit_signals_step(double t, double dt);
 
     /// Нахождение пути в графе траекторий
-    std::optional<std::vector<route_segment_t>> find_route(Trajectory *start_traj,
-                                                           Trajectory *target_traj,
-                                                           int dir);
+    route_segment_t find_route(Trajectory *start_traj,
+                               Trajectory *target_traj,
+                               int dir);
 
     /// Установка стрелок по маршруту
-    bool set_switchs_by_route(const std::vector<route_segment_t> &route, int dir);
+    bool set_switchs_by_route(const route_segment_t &route, int dir);
 
     /// Октрытие попутных сигналов по маршруту
-    bool open_route_signals(const std::vector<route_segment_t> &route, int dir, QStringList &conn_list);
+    bool open_route_signals(const route_segment_t &route, int dir, QStringList &conn_list);
 
 public slots:
 
