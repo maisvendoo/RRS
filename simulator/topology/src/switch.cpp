@@ -344,12 +344,14 @@ void Switch::step(double t, double dt)
         if (fwdPlusTraj->isBusy(0.0, lock_by_busy_distance))
         {
             state_fwd = IS_BUSY_PLUS;
+            ref_state_fwd = STATE_PLUS;
         }
         else
         {
             if (fwdMinusTraj->isBusy(0.0, lock_by_busy_distance))
             {
                 state_fwd = IS_BUSY_MINUS;
+                ref_state_fwd = STATE_MINUS;
             }
             else
             {
@@ -372,12 +374,14 @@ void Switch::step(double t, double dt)
         if (bwdPlusTraj->isBusy(bwdPlusTraj->getLength() - lock_by_busy_distance, bwdPlusTraj->getLength()))
         {
             state_bwd = IS_BUSY_PLUS;
+            ref_state_bwd = STATE_PLUS;
         }
         else
         {
             if (bwdMinusTraj->isBusy(bwdMinusTraj->getLength() - lock_by_busy_distance, bwdMinusTraj->getLength()))
             {
                 state_bwd = IS_BUSY_MINUS;
+                ref_state_bwd = STATE_MINUS;
             }
             else
             {
