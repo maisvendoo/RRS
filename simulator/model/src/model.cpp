@@ -73,8 +73,16 @@ bool Model::init(const simulator_command_line_t &command_line)
     for (size_t i = 0; i < init_datas.size(); ++i)
     {
         Train *train = addTrain(init_datas[i]);
+
         if (train)
         {
+            // Передаем начальные индексы поездов менеджеру сценариев
+            size_t train_idx = train->getTrainIndex();
+            scnmgr->train_datas[train_idx].setIndex(train_idx);
+
+            // Даем начальное имя поезду
+            train->setName(scnmgr->train_datas[train_idx].name);
+
             trains.push_back(train);
 
             QThread *thread = new QThread();
@@ -327,6 +335,9 @@ void Model::findNearestVehicles()
                                       .arg(reinterpret_cast<quint64>(train_threads[train_idx]), 0, 16));
 
         train_threads.erase(train_threads.begin() + train_idx);
+
+        // Удаляем поезда из контекста сценария
+        scnmgr->train_datas.erase(scnmgr->train_datas.begin() + train_idx);
     }
 
     // Назначаем новые порядковые индексы поездам после уменьшения массива
@@ -336,6 +347,9 @@ void Model::findNearestVehicles()
                                       .arg(trains[train_idx]->getTrainIndex(), 3)
                                       .arg(train_idx, 3));
         trains[train_idx]->setTrainIndex(train_idx);
+
+        // Те же индексы сообщаем менеджеру сценариев
+        scnmgr->train_datas[train_idx].setIndex(train_idx);
     }
 }
 
@@ -353,6 +367,11 @@ void Model::findFarthestVehicles()
                                           .arg(trains.size(), 3));
             uncoupled_train->setTrainIndex(trains.size());
             trains.push_back(uncoupled_train);
+
+            // Добавляем наш новый поезд в контекст менеджера сценариев
+            scenario_train_data_t scn_train;
+            scn_train.setIndex(uncoupled_train->getTrainIndex());
+            scnmgr->addNewTrain(scn_train);
 
             QThread *thread = new QThread();
             train_threads.push_back(thread);

@@ -48,6 +48,10 @@ public:
     /// Шаг симуляции (выполнение очереди задач)
     void step(double t, double dt);
 
+    std::vector<scenario_train_data_t> train_datas;
+
+    void addNewTrain(const scenario_train_data_t &train_data);
+
 signals:
 
     void sigSetSwitchState(QByteArray &switch_data);
@@ -59,6 +63,11 @@ signals:
     void sigCloseSignal(QByteArray signal_data);
 
     void sigBuildRoute(QString start_traj, QString target_traj, int dir);
+
+    /// Этот сигнал инициирует сообщение во вьювер,
+    /// о необходимости задать имя поезда
+    /// (вывесим транспарат, который будет назойтиво висеть, напоминая что надо дать имя поезду)
+    void sigSendTrainRenameRequire(int train_idx);
 
 private:
 
@@ -78,6 +87,9 @@ private:
     double curr_step = 0.0;
 
     LuaDebugger *lua_dbg = new LuaDebugger;
+
+    /// Флаг идентифицирующий исполнение сценария
+    bool is_scenario_active = false;
 
     /// Поставить задачу в очередь
     void setTask(task_t task);
@@ -138,6 +150,9 @@ private:
 
     /// Установка задачи задания маршрута
     void taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir);
+
+    /// Найти индек поезда по имени
+    int findTrain(const std::string &name);
 
 private slots:
 
