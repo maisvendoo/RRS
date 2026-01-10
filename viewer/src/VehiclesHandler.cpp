@@ -93,6 +93,14 @@ int VehiclesHandler::getControlledVehicleIndex() const noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+int VehiclesHandler::getCurrentTrainIndex() const noexcept
+{
+    return vehicles[cur_vehicle].train_id;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool VehiclesHandler::isUpdated() const noexcept
 {
     return is_pos_updated && is_state_updated;

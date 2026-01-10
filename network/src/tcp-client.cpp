@@ -126,6 +126,25 @@ void TcpClient::sendVehicleControl(QByteArray vehicle_control_by_keyboard)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendNewTrainName(int train_idx, const QString &new_name)
+{
+    network_data_t request;
+    request.stype = STYPE_RENAME_TRAIN;
+
+    QBuffer buff(&request.data);
+    buff.open(QIODevice::WriteOnly);
+    QDataStream stream(&buff);
+
+    stream << train_idx;
+    stream << new_name;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool TcpClient::isConnected() const
 {
     if (socket == nullptr)

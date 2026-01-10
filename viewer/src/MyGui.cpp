@@ -9,6 +9,7 @@
 #include "UpdateStatisticsHandler.h"
 #include "UpdateControlToServerHandler.h"
 #include "VehiclesHandler.h"
+#include <tcp-client.h>
 
 #include <vsg/io/Options.h>
 #include <vsg/maths/common.h>
@@ -516,6 +517,12 @@ void MyGui::showTrainRenameDialog() const
     if (ImGui::IsKeyPressed(ImGuiKey_Enter))
     {
         params->is_show_trane_rename_dialog = false;
+
+        if (params->tcp_client != nullptr)
+        {
+            // Здесь отправим данные серверу
+            params->tcp_client->sendNewTrainName(params->vehicles_handler->getCurrentTrainIndex(), QString(train_name));
+        }
     }
 
     ImGui::End();

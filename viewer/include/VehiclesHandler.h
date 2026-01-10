@@ -44,6 +44,7 @@ public:
     VehicleExterior* getCurrentVehicle();
     int getCurrentVehicleIndex() const noexcept;
     int getControlledVehicleIndex() const noexcept;
+    int getCurrentTrainIndex() const noexcept;
 
     bool isUpdated() const noexcept;
 

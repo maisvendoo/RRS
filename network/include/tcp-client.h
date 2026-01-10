@@ -41,6 +41,8 @@ public:
 
     void sendVehicleControl(QByteArray vehicle_control_by_keyboard);
 
+    void sendNewTrainName(int train_idx, const QString &new_name);
+
     bool isConnected() const;
 
 signals:

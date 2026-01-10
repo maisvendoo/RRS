@@ -15,6 +15,7 @@ class Sun;
 class VehiclesHandler;
 class UpdateStatisticsHandler;
 class UpdateControlToServerHandler;
+class TcpClient;
 
 struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 {
@@ -28,6 +29,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
     UpdateControlToServerHandler *controls_handler = nullptr;
+    TcpClient *tcp_client = nullptr;
 
     vsg::ref_ptr<Sun> sun;
 
