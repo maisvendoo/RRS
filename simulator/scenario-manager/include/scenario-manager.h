@@ -72,6 +72,9 @@ signals:
     /// Сообщить через вьювер, что такое имя уже есть
     void sigSendExistedNameFound(int train_idx);
 
+    /// Переименовать пеозд в модели
+    void sigRenameTrainInModel(int train_idx, QString new_name);
+
 private:
 
     /// Контекст интерпретатора Lua

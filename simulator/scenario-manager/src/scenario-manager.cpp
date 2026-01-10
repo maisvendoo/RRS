@@ -510,6 +510,8 @@ void ScenarioManager::slotRenameTrain(int train_idx, QString new_name)
             break;
         }
     }
+
+    emit sigRenameTrainInModel(train_idx, new_name);
 }
 
 //------------------------------------------------------------------------------

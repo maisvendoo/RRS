@@ -761,6 +761,7 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     connect(scnmgr, &ScenarioManager::sigBuildRoute, topology, &Topology::slotBuildRoute);
     connect(topology, &Topology::sigSetOpenSignalsQueue, scnmgr, &ScenarioManager::slotSetOpenSignalsQueue);
     connect(tcp_server, &TcpServer::sigRenameTrain, scnmgr, &ScenarioManager::slotRenameTrain);
+    connect(scnmgr, &ScenarioManager::sigRenameTrainInModel, this, &Model::slotRenameTrainInModel);
 
     // Проверяем, есть ли вообще сценарий для исполнения
     if (!command_line.scenario.is_present)
@@ -1144,4 +1145,22 @@ void Model::slotResetVehicleControlByKeyboard(int client_id)
 
         controlled_clients.remove(client_id);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotRenameTrainInModel(int train_idx, QString new_name)
+{
+    size_t t_idx = static_cast<size_t>(train_idx);
+
+    if (t_idx >= trains.size())
+    {
+        Journal::instance()->error(QString("Rename train: Train index out of range (%1)").arg(t_idx, 4));
+        return;
+    }
+
+    trains[t_idx]->setName(new_name.toStdString());
+
+    Journal::instance()->info(QString("Rename train: Train %1 has new name %2").arg(t_idx, 4).arg(new_name));
 }
