@@ -11,6 +11,8 @@
 #include    <init_data.h>
 #include    <timer.h>
 
+#include    <lua-debugger.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -75,6 +77,8 @@ private:
     /// Текущий шаг
     double curr_step = 0.0;
 
+    LuaDebugger *lua_dbg = new LuaDebugger;
+
     /// Поставить задачу в очередь
     void setTask(task_t task);
 
@@ -86,6 +90,9 @@ private:
 
     /// Регистрация системных функций
     void sys_functions_registration();
+
+    /// Инициализация отладки
+    void lua_debug_init();
 
     /// Создать поезд игрока
     void setTrain(const scenario_train_data_t &train_data);

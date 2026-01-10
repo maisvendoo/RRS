@@ -3,6 +3,7 @@
 #include    <filesystem.h>
 #include    <datetime.h>
 #include    <switch-state.h>
+#include    <filesystem>
 
 //------------------------------------------------------------------------------
 //
@@ -553,13 +554,42 @@ void ScenarioManager::sys_functions_registration()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::lua_debug_init()
+{
+    // Удаляем лог отладки, так как он создается аппендом
+    try
+    {
+        if (std::filesystem::exists(LUA_DBG_LOG))
+        {
+            std::filesystem::remove(LUA_DBG_LOG);
+        }
+    }
+    catch (const std::filesystem::filesystem_error &e)
+    {
+        Journal::instance()->error("Lua debugger: " + QString(e.what()));
+    }
+
+    lua_dbg->init(lua);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::lua_init()
 {
-    lua.open_libraries(sol::lib::base, sol::lib::package);
+    lua.open_libraries(sol::lib::base,
+                       sol::lib::package,
+                       sol::lib::debug);
 
     // Регистрация C++ типов в интерпретаторе
     cpp_types_registration();
 
     // Регистрация системных функций
     sys_functions_registration();
+
+    // Инициализация отладки
+    if (launch_init_data.lua_debug)
+    {
+        lua_debug_init();
+    }
 }
