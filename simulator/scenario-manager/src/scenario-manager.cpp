@@ -493,6 +493,21 @@ void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::slotRenameTrain(int train_idx, QString new_name)
+{
+    for (size_t i = 0; i < train_datas.size(); ++i)
+    {
+        if (train_datas[i].getIndex() == train_idx)
+        {
+            train_datas[i].name = new_name.toStdString();
+            break;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::setTask(task_t task)
 {
     taskQueue.push(std::move(task));

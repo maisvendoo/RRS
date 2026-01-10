@@ -161,6 +161,9 @@ private slots:
 public slots:
 
     void slotSetOpenSignalsQueue(QStringList conn_list, int dir);
+
+    /// Переименование поезда по команде от сервера, принявшего новое имя
+    void slotRenameTrain(int train_idx, QString new_name);
 };
 
 #endif
