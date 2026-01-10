@@ -44,7 +44,6 @@ public:
 private:
     QString connector_name = "";
     int signal_dir = 0;
-    bool is_busy = false;
     QString letter = "";
     QString signal_model = "";
 

@@ -64,7 +64,6 @@ void TrafficLight::deserialize(QByteArray& data)
 
     stream >> connector_name;
     stream >> signal_dir;
-    stream >> is_busy;
     stream >> letter;
     stream >> signal_model;
 

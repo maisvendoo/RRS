@@ -13,10 +13,6 @@ public:
     RouteSignal(QObject *parent = nullptr);
 
     ~RouteSignal();
-
-private:
-
-    void preStep(state_vector_t &Y, double t) override;
 };
 
 #endif

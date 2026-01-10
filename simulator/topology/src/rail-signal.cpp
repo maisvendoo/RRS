@@ -66,7 +66,6 @@ QByteArray Signal::serialize()
 
     stream << conn->getName();
     stream << signal_dir;
-    stream << is_busy;
     stream << letter;
     stream << signal_model;
 
@@ -96,7 +95,6 @@ void Signal::deserialize(QByteArray &data)
 
     stream >> conn_name;
     stream >> signal_dir;
-    stream >> is_busy;
     stream >> letter;
     stream >> signal_model;
 
@@ -206,22 +204,6 @@ bool Signal::getConnectorPos(Connector *conn, dvec3 &conn_pos, track_t &track)
 void Signal::alsn_reset()
 {
     std::fill(alsn_state.begin(), alsn_state.end(), false);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Signal::slotRecvLineVoltage(double U_line)
-{
-    this->U_line = U_line;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Signal::slotRecvSideVoltage(double U_side)
-{
-    this->U_side = U_side;
 }
 
 //------------------------------------------------------------------------------

@@ -64,12 +64,6 @@ public:
         return conn;
     }
 
-    /// Установить занятость блок-участка, предшествующего данному сигналу
-    void setBusy(bool is_busy)
-    {
-        this->is_busy = is_busy;
-    }
-
     /// Задать имя модели сигнала
     void setSignalModel(const QString &signal_model)
     {
@@ -91,17 +85,14 @@ public:
         return conn_name;
     }
 
+    /// Напряжение для линейного реле предыдущего светофора
     double getLineVoltage() const
     {
         return U_line_prev;
     }
 
-    double getVoltageDSR() const
-    {
-        return U_dsr;
-    }
-
-    double getVoltageSSR() const
+    /// Напряжение для бокового сигнального реле предыдущего светофора
+    double getSideVoltage() const
     {
         return U_side_prev;
     }
@@ -127,14 +118,8 @@ public:
 
 signals:
 
-    /// Послать предыдущему световору напряжение линии
-    void sendLineVoltage(double U_line);
-
     /// Послать серверу запрос на обновление данных
     void sendDataUpdate(QByteArray signal_data);
-
-    /// Послать напряжение для бокового сигнального реле
-    void sendSideVoltage(double U_side);
 
 protected:
 
@@ -144,7 +129,7 @@ protected:
     /// Предыдущее состояние ламп
     lens_state_t old_lens_state;
 
-    /// Состояние линий управления трнасмитером АСЛН
+    /// Состояние линий управления трансмитером АСЛН
     alsn_state_t alsn_state;
 
     /// Литер
@@ -153,19 +138,20 @@ protected:
     /// Имя модели сигнала
     QString signal_model = "";
 
+    /// Напряжение питания путевого реле
+    double U_way = 0.0;
+
     /// Напряжение питания линейного реле
     double U_line = 0.0;
 
+    /// Напряжение питания для линейного реле предыдущего светофора
     double U_line_prev = 0.0;
 
     /// Напряжение питания бокового сигнального реле
     double U_side = 0.0;
 
+    /// Напряжение питания для бокового сигнального реле предыдущего светофора
     double U_side_prev = 0.0;
-
-    double U_dsr = 0.0;
-
-    bool is_busy = false;
 
     int signal_dir = 0;
 
@@ -237,12 +223,6 @@ protected:
     void alsn_reset();
 
 public slots:
-
-    /// Принять от следующего светофора напряжение на линии
-    void slotRecvLineVoltage(double U_line);
-
-    /// Принять от следующего светофора напряжение для БСР
-    void slotRecvSideVoltage(double U_side);
 
     /// Включить трансмиттер АЛСН по таймеру, если нет запрета
     void slotAllowTransmit();

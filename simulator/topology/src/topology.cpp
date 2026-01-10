@@ -240,48 +240,11 @@ void Topology::line_signals_step(double t, double dt)
 {
     for (auto line_signal : signals_data.line_signals)
     {
-        bool is_busy = false;
-
-        if (line_signal->getDirection() == 1)
+        if (line_signal == nullptr)
         {
-            Connector *conn = line_signal->getConnector();
-
-            if (conn == nullptr)
-            {
-                continue;
-
-            }
-
-            Trajectory *traj = conn->getBwdTraj();
-
-            if (traj == nullptr)
-            {
-                continue;
-            }
-
-            is_busy = traj->isBusy();
+            continue;
         }
 
-        if (line_signal->getDirection() == -1)
-        {
-            Connector *conn = line_signal->getConnector();
-
-            if (conn == nullptr)
-            {
-                continue;
-            }
-
-            Trajectory *traj = conn->getFwdTraj();
-
-            if (traj == nullptr)
-            {
-                continue;
-            }
-
-            is_busy = traj->isBusy();
-        }
-
-        line_signal->setBusy(is_busy);
         line_signal->step(t, dt);
     }
 }
@@ -291,60 +254,14 @@ void Topology::line_signals_step(double t, double dt)
 //------------------------------------------------------------------------------
 void Topology::enter_signals_step(double t, double dt)
 {
-    for (auto signal : signals_data.enter_signals)
+    for (auto enter_signal : signals_data.enter_signals)
     {
-        EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
-
-        if (es == nullptr)
+        if (enter_signal == nullptr)
         {
             continue;
         }
 
-        if (es->getDirection() == 1)
-        {
-            Connector *conn = es->getConnector();
-
-            if (conn == nullptr)
-            {
-                continue;
-
-            }
-
-            Trajectory *bwd_traj = conn->getBwdTraj();
-            Trajectory *fwd_traj = conn->getFwdTraj();
-
-            if ( (bwd_traj == nullptr) || (fwd_traj == nullptr) )
-            {
-                continue;
-            }
-
-            es->setFwdBusy(fwd_traj->isBusy());
-            es->setBwdBusy(bwd_traj->isBusy());
-        }
-
-        if (es->getDirection() == -1)
-        {
-            Connector *conn = es->getConnector();
-
-            if (conn == nullptr)
-            {
-                continue;
-
-            }
-
-            Trajectory *bwd_traj = conn->getFwdTraj();
-            Trajectory *fwd_traj = conn->getBwdTraj();
-
-            if ( (bwd_traj == nullptr) || (fwd_traj == nullptr) )
-            {
-                continue;
-            }
-
-            es->setFwdBusy(fwd_traj->isBusy());
-            es->setBwdBusy(bwd_traj->isBusy());
-        }
-
-        es->step(t, dt);
+        enter_signal->step(t, dt);
     }
 }
 
@@ -353,14 +270,14 @@ void Topology::enter_signals_step(double t, double dt)
 //------------------------------------------------------------------------------
 void Topology::exit_signals_step(double t, double dt)
 {
-    for (auto signal : signals_data.exit_signals)
+    for (auto exit_signal : signals_data.exit_signals)
     {
-        if (signal == nullptr)
+        if (exit_signal == nullptr)
         {
             continue;
         }
 
-        signal->step(t, dt);
+        exit_signal->step(t, dt);
     }
 }
 
@@ -1190,9 +1107,6 @@ void Topology::line_signals_connect(std::vector<Signal *> &line_signals)
 
             if (prev_signal != nullptr)
             {
-                connect(signal, &Signal::sendLineVoltage,
-                        prev_signal, &Signal::slotRecvLineVoltage);
-
                 is_not_found = false;
             }
         }
@@ -1266,12 +1180,6 @@ void Topology::enter_signal_connect(std::vector<Signal *> &enter_signals)
 
             if (prev_signal != nullptr)
             {
-                connect(signal, &Signal::sendLineVoltage,
-                        prev_signal, &Signal::slotRecvLineVoltage);
-
-                connect(signal, &Signal::sendSideVoltage,
-                        prev_signal, &Signal::slotRecvSideVoltage);
-
                 is_not_found = false;
             }
         }
