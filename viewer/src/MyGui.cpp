@@ -20,6 +20,8 @@
 #include <vsg/app/Viewer.h>
 #include <vsgImGui/imgui.h>
 
+#define IMGUI_ENABLE_STD_STRING
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -100,6 +102,18 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     if (params->is_show_settings)
     {
         showSettings();
+    }
+
+    // Отображение диалога переименования поезда
+    if (ImGui::IsKeyPressed(ImGuiKey_F8) && !params->prev_F8 && !is_modified_key)
+    {
+        params->is_show_trane_rename_dialog = !params->is_show_trane_rename_dialog;
+    }
+    params->prev_F8 = ImGui::IsKeyPressed(ImGuiKey_F8);
+
+    if (params->is_show_trane_rename_dialog)
+    {
+        showTrainRenameDialog();
     }
 
     if (params->vehicles_handler)
@@ -458,6 +472,52 @@ void MyGui::showNoCabineControl() const
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     ImGui::Text(u8"%s", text);
     ImGui::PopStyleColor();
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::showTrainRenameDialog() const
+{
+    static char train_name[256] = "";
+
+    int w = 300;
+    int h = 70;
+
+    ImGui::SetNextWindowSize(ImVec2(w, h));
+
+    ImGuiIO &io = ImGui::GetIO();
+
+    ImVec2 content_size = io.DisplaySize;
+
+    ImGui::SetNextWindowPos(ImVec2( (content_size.x - w) / 2, (content_size.y - h) / 2));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+
+    bool open_ptr = true;
+
+    ImGui::Begin(u8"Задать имя поезда", &open_ptr, window_flags);
+
+    float tw = 280;
+    float offset_x = (w - tw) / 2.0f;
+
+    ImGui::SetCursorPosX(offset_x);
+    ImGui::SetNextItemWidth(tw);
+    ImGui::SetKeyboardFocusHere();
+
+    if (ImGui::InputText(u8"", train_name, sizeof(train_name)))
+    {
+        //params->is_show_trane_rename_dialog = false;
+    }
+
+    if (ImGui::IsKeyPressed(ImGuiKey_Enter))
+    {
+        params->is_show_trane_rename_dialog = false;
+    }
+
     ImGui::End();
 }
 
