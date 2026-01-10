@@ -708,6 +708,14 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     // Инициализируем менеджер сценариев
     scnmgr->init(init_data);
 
+    // Увязываем управляющие сигналы с топологией
+    connect(scnmgr, &ScenarioManager::sigSetSwitchState, topology, &Topology::slotSetSwitchState);
+    connect(scnmgr, &ScenarioManager::sigGetSwitchState, topology, &Topology::slotGetSwitchState);
+    connect(scnmgr, &ScenarioManager::sigOpenSignal, topology, &Topology::slotOpenSignal);
+    connect(scnmgr, &ScenarioManager::sigCloseSignal, topology, &Topology::slotCloseSignal);
+    connect(scnmgr, &ScenarioManager::sigBuildRoute, topology, &Topology::slotBuildRoute);
+    connect(topology, &Topology::sigSetOpenSignalsQueue, scnmgr, &ScenarioManager::slotSetOpenSignalsQueue);
+
     // Проверяем, есть ли вообще сценарий для исполнения
     if (!command_line.scenario.is_present)
     {
@@ -719,15 +727,7 @@ bool Model::initScenarioManager(const init_data_t &init_data,
                      command_line.scenario.value.toStdString()))
     {
         return false;
-    }
-
-    // Увязываем управляющие сигналы с топологией
-    connect(scnmgr, &ScenarioManager::sigSetSwitchState, topology, &Topology::slotSetSwitchState);
-    connect(scnmgr, &ScenarioManager::sigGetSwitchState, topology, &Topology::slotGetSwitchState);
-    connect(scnmgr, &ScenarioManager::sigOpenSignal, topology, &Topology::slotOpenSignal);
-    connect(scnmgr, &ScenarioManager::sigCloseSignal, topology, &Topology::slotCloseSignal);
-    connect(scnmgr, &ScenarioManager::sigBuildRoute, topology, &Topology::slotBuildRoute);
-    connect(topology, &Topology::sigSetOpenSignalsQueue, scnmgr, &ScenarioManager::slotSetOpenSignalsQueue);
+    }    
 
     return true;
 }
