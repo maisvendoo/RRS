@@ -84,62 +84,7 @@ private:
 
     /// Боковое сигнальное реле (желтый мигающий, если следующий с отклонением по стрелкам)
     Relay *side_signal_relay = new Relay(NUM_SSR_CONTACTS);
-/*
-    enum
-    {
-        NUM_YR_CONTACTS = 3,
-        YR_SR_CTRL = 0,
-        YR_SRS_PLUS = 1,
-        YR_ALSN_CTRL = 2
-    };
 
-    /// Реле контроля первого участка удаления
-    Relay *yellow_relay = new Relay(NUM_YR_CONTACTS);
-
-    enum
-    {
-        NUM_GR_CONTACTS = 2,
-        GR_SRS_MINUS = 0,
-        GR_SRS_PLUS = 1
-    };
-
-    /// Реле контроля второго участка удаления
-    Relay *green_relay = new Relay(NUM_GR_CONTACTS);
-
-    enum
-    {
-        NUM_FWD_WR_CONTACTS = 1,
-        FWD_BUSY = 0
-    };
-
-    /// Путевое реле стрелочного участка за светофором
-    Relay *fwd_way_relay = new Relay(NUM_FWD_WR_CONTACTS);
-
-    enum
-    {
-        NUM_AR_CONTACTS = 1,
-        AR_OPEN = 0
-    };
-
-    /// Указательное реле, для связи с предыдущим входным светофором
-    Relay *allow_relay = new Relay(NUM_AR_CONTACTS);
-
-    /// Линейное реле, для связи со следующим светофором
-    enum
-    {
-        NUM_LINE_NEUTRAL_CONTACTS = 1,
-        NUM_LINE_PLUS_CONTACTS = 1,
-        NUM_LINE_MINUS_CONTACTS = 0,
-
-        LINE_N_YELLOW = 0,
-        LINE_PLUS_GREEN = 0
-    };
-
-    CombineRelay *line_relay = new CombineRelay(NUM_LINE_NEUTRAL_CONTACTS,
-                                                NUM_LINE_PLUS_CONTACTS,
-                                                NUM_LINE_MINUS_CONTACTS);
-
-*/
     double U_bat = 12.0;
 
     /// Признак нажатия кнопки открытия
@@ -182,23 +127,6 @@ private:
 
     /// Управление состоянием линий АЛСН
     void alsn_control();
-/*
-    void lens_control();
-
-    void fwd_way_busy_control();
-
-    void removal_area_control();
-
-    void route_control(Signal **next_signal);
-
-    void relay_control();
-
-    void alsn_control();
-
-    /// Проверка занятости сигнала на участке от данного коннектора
-    /// до следующего попутного сигнала
-    Connector *check_path_free(Connector *cur_conn, bool &is_free);
-*/
 private slots:
 
     void slotOpenTimer();

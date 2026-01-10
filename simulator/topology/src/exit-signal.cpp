@@ -34,25 +34,6 @@ ExitSignal::ExitSignal(QObject *parent) : Signal(parent)
     side_signal_relay->read_config("combine-relay");
     side_signal_relay->setInitContactState(SSR_GREEN, true);
     side_signal_relay->setInitContactState(SSR_YELLOW, false);
-/*
-    yellow_relay->read_config("combine-relay");
-    yellow_relay->setInitContactState(YR_SR_CTRL, false);
-    yellow_relay->setInitContactState(YR_SRS_PLUS, false);
-    yellow_relay->setInitContactState(YR_ALSN_CTRL, false);
-
-    green_relay->read_config("combine-relay");
-    green_relay->setInitContactState(GR_SRS_MINUS, false);
-    green_relay->setInitContactState(GR_SRS_PLUS, true);
-
-    fwd_way_relay->read_config("combine-relay");
-    fwd_way_relay->setInitContactState(FWD_BUSY, false);
-
-    allow_relay->read_config("combine-relay");
-    allow_relay->setInitContactState(AR_OPEN, false);
-
-    line_relay->read_config("combine-relay");
-    line_relay->setInitContactState(LINE_N_YELLOW, false);
-    line_relay->setInitPlusContactState(LINE_PLUS_GREEN, false);*/
 }
 
 //------------------------------------------------------------------------------
@@ -84,16 +65,6 @@ void ExitSignal::step(double t, double dt)
     semaphore_signal_relay->step(t, dt);
 
     side_signal_relay->step(t, dt);
-/*
-    yellow_relay->step(t, dt);
-
-    green_relay->step(t, dt);
-
-    fwd_way_relay->step(t, dt);
-
-    allow_relay->step(t, dt);
-
-    line_relay->step(t, dt);*/
 }
 
 //------------------------------------------------------------------------------
