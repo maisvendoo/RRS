@@ -173,6 +173,32 @@ bool Model::isStarted() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+std::vector<std::size_t> Model::getControlledVehiclesInTrain(size_t train_idx)
+{
+    std::vector<std::size_t> veh_indexes;
+
+    // Просматриваем управление от всех клиентов
+    for (const auto& cc : controlled_clients)
+    {
+        // Управляемая данным клиентом ПЕ
+        std::size_t veh_idx = cc.vehicle_control_by_keyboard.controlled_vehicle;
+        if (veh_idx < vehicles.size())
+        {
+            Vehicle* veh = vehicles[veh_idx];
+
+            // Если ПЕ находится в данном поезде, сохраняем её
+            if (veh->getTrainIndex() == train_idx)
+            {
+                veh_indexes.push_back(veh_idx);
+            }
+        }
+    }
+    return veh_indexes;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::outMessage(QString msg)
 {
     fputs(qPrintable(msg + "\n"), stdout);

@@ -72,6 +72,9 @@ public:
     /// Check is simulation started
     bool isStarted() const;
 
+    /// Индексы ПЕ, управляемых какими-либо клиентами в данном поезде
+    std::vector<size_t> getControlledVehiclesInTrain(std::size_t train_idx);
+
 public slots:
 
     /// Messages output
