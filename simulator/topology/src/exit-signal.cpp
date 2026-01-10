@@ -207,12 +207,12 @@ void ExitSignal::alsn_control()
     alsn_RY_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_RY_ON));
 
     bool is_ALSN_Y_ON = semaphore_signal_relay->getContactState(SRS_N_ALLOW) &&
-                        semaphore_signal_relay->getPlusContactState(SRS_MINUS_YELLOW);
+                        semaphore_signal_relay->getMinusContactState(SRS_MINUS_YELLOW);
 
     alsn_Y_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_Y_ON));
 
-    bool is_ALSN_G_ON = lens_state[GREEN_LENS] ||
-                        side_signal_relay->getContactState(SSR_YELLOW);
+    bool is_ALSN_G_ON = semaphore_signal_relay->getContactState(SRS_N_ALLOW) &&
+                        semaphore_signal_relay->getPlusContactState(SRS_PLUS_GREEN);
 
     alsn_G_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_G_ON));
 }
