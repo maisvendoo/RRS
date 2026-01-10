@@ -69,6 +69,9 @@ signals:
     /// (вывесим транспарат, который будет назойтиво висеть, напоминая что надо дать имя поезду)
     void sigSendTrainRenameRequire(int train_idx);
 
+    /// Сообщить через вьювер, что такое имя уже есть
+    void sigSendExistedNameFound(int train_idx);
+
 private:
 
     /// Контекст интерпретатора Lua

@@ -495,6 +495,13 @@ void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir)
 //------------------------------------------------------------------------------
 void ScenarioManager::slotRenameTrain(int train_idx, QString new_name)
 {
+    // Проверяем уникальность имени поезда
+    if (findTrain(new_name.toStdString()) != -1)
+    {
+        emit sigSendExistedNameFound(train_idx);
+        return;
+    }
+
     for (size_t i = 0; i < train_datas.size(); ++i)
     {
         if (train_datas[i].getIndex() == train_idx)
