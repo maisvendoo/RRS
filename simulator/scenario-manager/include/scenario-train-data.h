@@ -9,7 +9,7 @@
 struct scenario_train_data_t
 {
     /// Имя поезда, для последующей его идентификации
-    std::string name;
+    std::string name = "";
     /// Имя конфига поезда
     std::string train_config;
     /// Имя траектории
@@ -18,6 +18,21 @@ struct scenario_train_data_t
     double traj_coord;
     /// Направление
     int direction;
+
+    void setIndex(size_t idx)
+    {
+        train_idx = static_cast<int>(idx);
+    }
+
+    int getIndex() const
+    {
+        return train_idx;
+    }
+
+private:
+
+    /// Индекс поезда умышленно знаковый (пока не знаю зачем)
+    int train_idx = -1;
 };
 
 #endif

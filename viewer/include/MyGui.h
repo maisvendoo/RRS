@@ -15,6 +15,7 @@ class Sun;
 class VehiclesHandler;
 class UpdateStatisticsHandler;
 class UpdateControlToServerHandler;
+class TcpClient;
 
 struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 {
@@ -28,6 +29,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
     UpdateControlToServerHandler *controls_handler = nullptr;
+    TcpClient *tcp_client = nullptr;
 
     vsg::ref_ptr<Sun> sun;
 
@@ -55,6 +57,9 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool prev_F9 = false;
     bool is_show_debug_msg = false;
 
+    bool prev_F8 = false;
+    bool is_show_trane_rename_dialog = false;
+
     bool is_no_controlled = false;
 
     bool is_no_cabine_control = false;
@@ -77,7 +82,7 @@ public:
 private:
     vsg::ref_ptr<GUIParams> params;
 
-    float font_size = 20.0f;
+    float font_size = 20.0f;    
 
     void showStatus() const;
 
@@ -92,6 +97,8 @@ private:
     void showNoControlled() const;
 
     void showNoCabineControl() const;
+
+    void showTrainRenameDialog() const;
 
     void printObject(const vsg::ref_ptr<vsg::Object>& object) const;
 

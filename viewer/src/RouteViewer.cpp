@@ -695,6 +695,8 @@ void RouteViewer::initTcpClient()
 
     tcp_client->init(settings.tcp_config);
 
+    GUIparams->tcp_client = tcp_client;
+
     LOG_INFO("TCP-client is initialized...OK");
 }
 

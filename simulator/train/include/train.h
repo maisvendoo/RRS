@@ -107,6 +107,16 @@ public:
 
     void setTopology(Topology* topology);
 
+    void setName(const std::string &name)
+    {
+        this->name = name;
+    }
+
+    std::string getName() const
+    {
+        return this->name;
+    }
+
 public slots:
 
     /// Integration step
@@ -118,6 +128,9 @@ signals:
     void stepDone(int idx);
 
 private:
+
+    /// Имя поезда, служащее ему уникальным идентификатором
+    std::string name = "";
 
     /// Train index
     size_t      train_idx = 0;

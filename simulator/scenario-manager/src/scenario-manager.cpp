@@ -60,6 +60,9 @@ bool ScenarioManager::run(const std::string &route_dir,
     {
         Journal::instance()->info(QString("Starting script: %1...").arg(script_path.c_str()));
         lua.script_file(script_path);
+
+        // Скрипт сработал, не вызвав исключения, поэтому мы играем сценарий
+        is_scenario_active = true;
     }
     catch (const sol::error &error)
     {
@@ -97,6 +100,24 @@ void ScenarioManager::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::addNewTrain(const scenario_train_data_t &train_data)
+{
+    // Если мы не играим по сценарию, то и незачем что-то делать
+    if (!is_scenario_active)
+    {
+        return;
+    }
+
+    train_datas.push_back(train_data);
+
+    // Сообщим вьюверу что появился новый поезд и надо
+    // потроллить его машиниста транспарантом о переименовании
+    emit sigSendTrainRenameRequire(train_data.getIndex());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 {
     init_data_t id = launch_init_data;
@@ -106,6 +127,8 @@ void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
     id.direction = train_data.direction;
 
     init_datas.push_back(id);
+
+    train_datas.push_back(train_data);
 
     QString msg = QString("setTrain: %1 at traj=%2 coord=%3 dir=%4")
                       .arg(train_data.train_config.c_str())
@@ -432,6 +455,22 @@ void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::s
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+int ScenarioManager::findTrain(const std::string &name)
+{
+    for (auto train_data : train_datas)
+    {
+        if (train_data.name == name)
+        {
+            return train_data.getIndex();
+        }
+    }
+
+    return -1;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::slotDelayTimer()
 {
     delayTimer->stop();
@@ -449,6 +488,30 @@ void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir)
         taskSetDelay(signal_open_delay);
         taskOpenSignal(conn_name.toStdString(), dir);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::slotRenameTrain(int train_idx, QString new_name)
+{
+    // Проверяем уникальность имени поезда
+    if (findTrain(new_name.toStdString()) != -1)
+    {
+        emit sigSendExistedNameFound(train_idx);
+        return;
+    }
+
+    for (size_t i = 0; i < train_datas.size(); ++i)
+    {
+        if (train_datas[i].getIndex() == train_idx)
+        {
+            train_datas[i].name = new_name.toStdString();
+            break;
+        }
+    }
+
+    emit sigRenameTrainInModel(train_idx, new_name);
 }
 
 //------------------------------------------------------------------------------

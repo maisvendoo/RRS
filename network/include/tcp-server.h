@@ -55,6 +55,8 @@ signals:
 
     void resetVehicleControl(int client_id);
 
+    void sigRenameTrain(int train_idx, QString new_name);
+
 private:
 
     quint16 port = 1992;

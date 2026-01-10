@@ -203,6 +203,35 @@ void TcpServer::process_client_request(client_data_t &client_data)
         emit setVehicleControl(client_data.received_data.data, client_data.id);
         break;
     }
+    case STYPE_RENAME_TRAIN:
+    {
+        QBuffer buff(&client_data.received_data.data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        int train_idx = -1;
+        QString new_name = "";
+
+        stream >> train_idx;
+
+        if (train_idx < 0)
+        {
+            Journal::instance()->error("Rename train: Invalide train index");
+            break;
+        }
+
+        stream >> new_name;
+
+        if (new_name.isEmpty())
+        {
+            Journal::instance()->error("Rename train: Empty new train name");
+            break;
+        }
+
+        emit sigRenameTrain(train_idx, new_name);
+
+        break;
+    }
 
     case STYPE_EMPTY_DATA:
     default:
