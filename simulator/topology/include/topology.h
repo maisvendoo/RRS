@@ -2,7 +2,7 @@
 #define     TOPOLOGY_H
 
 #include    <QObject>
-#include    <optional>
+#include    <unordered_map>
 
 #include    <topology-export.h>
 #include    <topology-types.h>
@@ -36,6 +36,10 @@ public:
 
     /// Вернуть контроллер конкретной ПЕ
     VehicleController *getVehicleController(size_t idx);
+
+    /// Хэш-таблица указателей на вайкл контроллеры по указателю на вайкл
+    /// (для удобства смены индекса поезда у контролов из поезда)
+    std::unordered_map<Vehicle *, VehicleController *> vc_table;
 
     /// Шаг симуляции
     void step(double t, double dt);

@@ -62,6 +62,16 @@ public:
     /// Шаг симуляции
     void step(double t, double dt);
 
+    void setTrainIndex(size_t train_idx)
+    {
+        this->train_idx = train_idx;
+    }
+
+    size_t getTrainIndex() const
+    {
+        return train_idx;
+    }
+
 protected:
 
     /// Индекс данной ПЕ в симуляции
@@ -81,6 +91,9 @@ protected:
 
     /// Координата, в пределах текущей траектории
     double traj_coord = 0.0;
+
+    /// Индекс поезда, которому данный контроллер соответствует
+    size_t train_idx = 0;
 
     /// Текущая траектория ПЕ
     Trajectory *current_traj = nullptr;

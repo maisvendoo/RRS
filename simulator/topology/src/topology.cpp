@@ -215,7 +215,9 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
         vc->setInitCurrentTraj(cur_traj, traj_coord);
         vc->setDirection(tp.dir);
         vc->setInitCoord((*vehicles)[i]->getTrainCoord());
+
         vehicle_control.push_back(vc);
+        vc_table[(*vehicles)[i]] = vc;
 
         Journal::instance()->info(QString("Vehcile #%1").arg(idx) +
                                   " at traj: " + cur_traj->getName() +

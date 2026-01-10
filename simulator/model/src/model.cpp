@@ -677,7 +677,7 @@ Train *Model::addTrain(const init_data_t &init_data)
     {
         Journal::instance()->info(QString("Train #%1 initialized successfully").arg(trains.size()));
 
-        train->setTrainIndex(trains.size());
+        //train->setTrainIndex(trains.size());
         for (auto vehicle : *(train->getVehicles()))
         {
             vehicle->setModelIndex(vehicles.size());
@@ -691,6 +691,7 @@ Train *Model::addTrain(const init_data_t &init_data)
 
         if (topology->addTrain(tp, train->getVehicles()))
         {
+            train->setTrainIndex(trains.size());
             Journal::instance()->info("Train added to topology successfully");
         }
         else

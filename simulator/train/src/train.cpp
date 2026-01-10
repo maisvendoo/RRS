@@ -720,6 +720,13 @@ void Train::setTrainIndex(size_t idx)
     for (auto vehicle : vehicles)
     {
         vehicle->setTrainIndex(idx);
+
+        VehicleController * vc = topology->vc_table[vehicle];
+
+        if (vc != nullptr)
+        {
+            vc->setTrainIndex(idx);
+        }
     }
 }
 
