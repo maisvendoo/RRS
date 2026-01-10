@@ -1,7 +1,7 @@
 #include    "connector-ALSN.h"
 #include    "trajectory-ALSN.h"
 #include    "connector.h"
-#include    "rail-signal.h"
+#include    "train-signal.h"
 
 //------------------------------------------------------------------------------
 //
@@ -53,13 +53,13 @@ void ConnectorALSN::step(double t, double dt)
     (void) t;
     (void) dt;
 
-    Signal *signal_fwd = connector->getSignalFwd();
+    TrainSignal* signal_fwd = dynamic_cast<TrainSignal*>(connector->getSignalFwd());
     if (signal_fwd == nullptr)
         is_signal_fwd = false;
     else
         is_signal_fwd = true;
 
-    Signal *signal_bwd = connector->getSignalBwd();
+    TrainSignal* signal_bwd = dynamic_cast<TrainSignal*>(connector->getSignalBwd());
     if (signal_bwd == nullptr)
         is_signal_bwd = false;
     else

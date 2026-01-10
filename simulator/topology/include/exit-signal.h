@@ -1,15 +1,13 @@
 #ifndef     EXIT_SIGNAL_H
 #define     EXIT_SIGNAL_H
 
-#include    <rail-signal.h>
+#include    "station-signal.h"
 #include    <combine-relay.h>
-#include    <timer.h>
-#include    "trigger.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class TOPOLOGY_EXPORT ExitSignal : public Signal
+class TOPOLOGY_EXPORT ExitSignal : public StationSignal
 {
 public:
 
@@ -19,61 +17,20 @@ public:
 
     void step(double t, double dt) override;
 
-public slots:
-
-    void slotPressOpen();
-
-    void slotPressClose();
-
 private:
 
     enum
     {
-        NUM_RCR_CONTACTS = 2,
-        NUM_SR_CONTACTS = 5,
-        NUM_DLR_CONTACTS = 1,
-        NUM_SSR_CONTACTS = 2,
-
-        RCR_SR_CTRL = 0,
-        RCR_SRS_CTRL = 1,
-
-        SR_SELF = 0,
-        SR_DLR_CTRL = 1,
-        SR_SRS_CTRL = 2,
-        SR_PLUS = 3,
-        SR_MINUS = 4,
-
-        DRL_CTRL = 0,
-
-        SSR_GREEN = 0,
-        SSR_YELLOW = 1
-    };
-
-    enum
-    {
-        NUM_SRS_NEUTRAL_CONTACTS = 3,
-        NUM_SRS_PLUS_CONTACTS = 1,
-        NUM_SRS_MINUS_CONTACTS = 1,
-
         SRS_N_RED = 0,
-        SRS_N_ALLOW = 1,
+        SRS_N_ALLOW,
+        NUM_SRS_NEUTRAL_CONTACTS,
 
         SRS_PLUS_GREEN = 0,
+        NUM_SRS_PLUS_CONTACTS,
 
-        SRS_MINUS_YELLOW = 0
+        SRS_MINUS_YELLOW = 0,
+        NUM_SRS_MINUS_CONTACTS
     };
-
-    /// Контрольное маршрутное реле:
-    /// включено, когда до следующего светофора свободно и стрелки по маршруту
-    Relay *route_control_relay = new Relay(NUM_RCR_CONTACTS);
-
-    /// Сигнальное реле:
-    /// управляется кнопками открыть/закрыть сигнал (если маршрут возможен)
-    Relay *signal_relay = new Relay(NUM_SR_CONTACTS);
-
-    /// Реле замыкания маршрута отправления:
-    /// повторяет сигнальное реле, в будущем должно блокировать стрелки от перевода
-    Relay *departure_lock_relay = new Relay(NUM_DLR_CONTACTS);
 
     /// Сигнальное реле светофора (с полярным якорем):
     /// при питании положительным напряжением переключает на зелёный,
@@ -82,36 +39,23 @@ private:
                                                             NUM_SRS_PLUS_CONTACTS,
                                                             NUM_SRS_MINUS_CONTACTS);
 
+    enum
+    {
+        SSR_GREEN = 0,
+        SSR_YELLOW,
+        NUM_SSR_CONTACTS,
+    };
+
     /// Боковое сигнальное реле (желтый мигающий, если следующий с отклонением по стрелкам)
     Relay *side_signal_relay = new Relay(NUM_SSR_CONTACTS);
-
-    double U_bat = 12.0;
-
-    /// Признак нажатия кнопки открытия
-    bool is_open_button_pressed = false;
-
-    /// Признак НЕнажатия кнопки закрытия (нормально замкнутая)
-    bool is_close_button_unpressed = true;
-
-    /// Контакт мигания
-    bool blink_contact = true;
-
-    /// Таймер выдержкм времени удержания кнопки открыть
-    Timer *open_timer = new Timer(1.0, false);
-
-    /// Таймер выдержки времени удержания кнопки закрыть
-    Timer *close_timer = new Timer(1.0, false);
 
     /// Таймер мигания желтого
     Timer *blink_timer = new Timer(0.75, false);
 
-    Signal *next_signal = nullptr;
+    /// Контакт мигания
+    bool blink_contact = true;
 
-    void preStep(state_vector_t &Y, double t) override;
-
-    void ode_system(const state_vector_t &Y,
-                    state_vector_t &dYdt,
-                    double t) override;
+    void preStep(double t) override;
 
     /// Проверка состояния стрелок и занятости по маршруту до следующего светофора
     void check_route();
@@ -127,11 +71,8 @@ private:
 
     /// Управление состоянием линий АЛСН
     void alsn_control();
+
 private slots:
-
-    void slotOpenTimer();
-
-    void slotCloseTimer();
 
     void slotBlinkTimer();
 };

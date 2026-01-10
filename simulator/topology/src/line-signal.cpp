@@ -1,9 +1,10 @@
-#include    <line-signal.h>
+#include    "line-signal.h"
+#include    "connector.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-LineSignal::LineSignal(QObject *parent) : Signal(parent)
+LineSignal::LineSignal(QObject *parent) : TrainSignal(parent)
 {
     way_relay->read_config("combine-relay");
     way_relay->setInitContactState(WR_WAY_BUSY, false);
@@ -37,7 +38,7 @@ LineSignal::~LineSignal()
 //------------------------------------------------------------------------------
 void LineSignal::step(double t, double dt)
 {
-    Signal::step(t, dt);
+    TrainSignal::step(t, dt);
 
     way_relay->step(t, dt);
 
@@ -51,9 +52,8 @@ void LineSignal::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void LineSignal::preStep(state_vector_t &Y, double t)
+void LineSignal::preStep(double t)
 {
-    (void)Y;
     (void)t;
 
     check_route();
@@ -65,16 +65,6 @@ void LineSignal::preStep(state_vector_t &Y, double t)
     lens_state_control();
 
     alsn_control();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void LineSignal::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
-{
-    (void)Y;
-    (void)dYdt;
-    (void)t;
 }
 
 //------------------------------------------------------------------------------
@@ -131,13 +121,16 @@ void LineSignal::check_route()
 
         if (signal)
         {
-            // Замыкание цепи на путевое реле в релейном шкафу следующего светофора
-            U_way = U_bat;
-            // Линейное реле питается от линии следующего светофора
-            U_line = signal->getLineVoltage();
-            // Боковое сигнальное реле питается от линии следующего светофора
-            U_side = signal->getSideVoltage();
-            return;
+            if (TrainSignal* ts = dynamic_cast<TrainSignal*>(signal))
+            {
+                // Замыкание цепи на путевое реле в релейном шкафу следующего светофора
+                U_way = U_bat;
+                // Линейное реле питается от линии следующего светофора
+                U_line = ts->getLineVoltage();
+                // Боковое сигнальное реле питается от линии следующего светофора
+                U_side = ts->getSideVoltage();
+                return;
+            }
         }
     }
 }
@@ -161,7 +154,7 @@ void LineSignal::relay_control()
     double is_line_MINUS = static_cast<double>(line_relay->getContactState(LR_NEUTRAL_LINE_MINIS));
 
     // Формируем напряжение, подаваемое на линейное реле предыдущего светофора
-    U_line_prev = U_bat * (is_line_PLUS - is_line_MINUS);
+    U_line_prev = (is_line_PLUS - is_line_MINUS) * U_bat;
 }
 
 //------------------------------------------------------------------------------
@@ -189,9 +182,6 @@ void LineSignal::yellow_blink_control()
 //------------------------------------------------------------------------------
 void LineSignal::lens_state_control()
 {
-    // Запоминаем старое состояние ламп
-    old_lens_state = lens_state;
-
     // Управляем состоянием ламп через контакты линейного реле
 
     // Красный сигнал при отпадании нейтрального якоря
@@ -208,13 +198,6 @@ void LineSignal::lens_state_control()
     lens_state[YELLOW_LENS] = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
                                (line_relay->getMinusContactState(LR_MINUS_YELLOW) ||
                                (blink_contact && side_signal_relay->getContactState(SSR_YELLOW)));
-
-    // При изменение соостояния ламп обновляем его
-    if (old_lens_state != lens_state)
-    {
-        old_lens_state = lens_state;
-        emit sendDataUpdate(this->serialize());
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -222,31 +205,21 @@ void LineSignal::lens_state_control()
 //------------------------------------------------------------------------------
 void LineSignal::alsn_control()
 {
-    if (!is_asln_transmit)
-    {
-        alsn_reset();
-        return;
-    }
-
     bool is_ALSN_RY_ON = line_relay->getContactState(LR_NEUTRAL_PROHIBITING);
 
-    alsn_RY_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_RY_ON));
+    alsn_RY_relay->setVoltage(static_cast<double>(is_ALSN_RY_ON) * U_bat);
 
-    alsn_state[ALSN_RY_LINE] = alsn_RY_relay->getContactState(ALSN_RY);
 
     bool is_ALSN_Y_ON = line_relay->getContactState(LR_NEUTRAL_ALLOW) &&
                         line_relay->getMinusContactState(LR_MINUS_YELLOW);
 
-    alsn_Y_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_Y_ON));
+    alsn_Y_relay->setVoltage(static_cast<double>(is_ALSN_Y_ON) * U_bat);
 
-    alsn_state[ALSN_Y_LINE] = alsn_Y_relay->getContactState(ALSN_Y);
 
     bool is_ALSN_G_ON = lens_state[GREEN_LENS] ||
                         side_signal_relay->getContactState(SSR_YELLOW);
 
-    alsn_G_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_G_ON));
-
-    alsn_state[ALSN_G_LINE] = alsn_G_relay->getContactState(ALSN_G);
+    alsn_G_relay->setVoltage(static_cast<double>(is_ALSN_G_ON) * U_bat);
 }
 
 //------------------------------------------------------------------------------
