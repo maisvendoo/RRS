@@ -133,7 +133,7 @@ bool Train::init(const solver_config_t& solver_config, int direction, std::vecto
     }
     dydt.resize(ode_order);
 
-    Journal::instance()->info(QString("New uncoupled train! Ыize of vehicles %1, joints %2, state_vector %3")
+    Journal::instance()->info(QString("New uncoupled train! Size of vehicles %1, joints %2, state_vector %3")
                                   .arg(this->vehicles.size(), 4)
                                   .arg(this->joints_list.size(), 4)
                                   .arg(y.size(), 4));

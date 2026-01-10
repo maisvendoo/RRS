@@ -705,14 +705,14 @@ void Model::initTopology(const init_data_t &init_data)
 bool Model::initScenarioManager(const init_data_t &init_data,
                                 const simulator_command_line_t &command_line)
 {
+    // Инициализируем менеджер сценариев
+    scnmgr->init(init_data);
+
     // Проверяем, есть ли вообще сценарий для исполнения
     if (!command_line.scenario.is_present)
     {
         return false;
-    }
-
-    // Инициализируем менеджер сценариев
-    scnmgr->init(init_data);    
+    }    
 
     // Пытаемся выполнить скрипт
     if (!scnmgr->run(init_data.route_dir_name.toStdString(),
