@@ -25,6 +25,11 @@ public:
     /// Устанавливаем индекс данной ПЕ в симуляции
     void setIndex(size_t idx);
 
+    size_t getIndex() const
+    {
+        return index;
+    }
+
     /// Устанавливаем длину данной ПЕ
     void setLength(double len);
 

@@ -81,6 +81,8 @@ signals:
 
     void sigSetOpenSignalsQueue(QStringList conn_list, int dir);
 
+    void sigChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
+
 private:
 
     /// Контейнер данных по всем траекториям на полигоне
@@ -154,6 +156,10 @@ public slots:
     void slotCloseSignal(QByteArray signal_data);
 
     void slotBuildRoute(QString start_traj, QString target_traj, int dir);
+
+private slots:
+
+    void slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name);
 };
 
 #endif

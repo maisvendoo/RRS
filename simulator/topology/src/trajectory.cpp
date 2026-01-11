@@ -451,6 +451,9 @@ void Trajectory::step(double t, double dt)
     // Обновляем занятость подвижным составом
     if (is_busy == vehicles_coords.empty())
     {
+        // Запомним предыдущее состояние занятости
+        prev_is_busy = is_busy;
+        // Обновим его
         is_busy = !vehicles_coords.empty();
         send = true;
 
@@ -458,6 +461,9 @@ void Trajectory::step(double t, double dt)
         if (is_busy)
         {
             in_route = false;
+            // Если пока еще занято, то определяем первого из списка,
+            // при освобождени траектории он же станет и последним
+            last_bused_index = vehicles_coords.firstKey();
         }
     }
 
@@ -482,6 +488,26 @@ void Trajectory::step(double t, double dt)
         new_state.is_busy = is_busy;
         new_state.in_route = in_route;
         emit sendTrajBusyState(new_state.serialize());
+    }
+
+    // Если изменилась занятость
+    if (is_busy != prev_is_busy)
+    {
+        // Если свободность сменена на занятость
+        if (is_busy)
+        {
+            // Значит какая-то ПЕ только что на нее заехала и мы
+            // определяем индекс мерзавки
+            int v_idx = vehicles_coords.firstKey();
+
+            // и шлем его топологии, чтобы разобралась из какого она поезда
+            emit sigTrajChangeState(v_idx, is_busy, name);
+        }
+        else
+        {
+            // посылаем топологии индекc последней ПЕ, занимавшей данную траекторию
+            emit sigTrajChangeState(last_bused_index, is_busy, name);
+        }
     }
 }
 

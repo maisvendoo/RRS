@@ -763,6 +763,7 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     connect(topology, &Topology::sigSetOpenSignalsQueue, scnmgr, &ScenarioManager::slotSetOpenSignalsQueue);
     connect(tcp_server, &TcpServer::sigRenameTrain, scnmgr, &ScenarioManager::slotRenameTrain);
     connect(scnmgr, &ScenarioManager::sigRenameTrainInModel, this, &Model::slotRenameTrainInModel);
+    connect(topology, &Topology::sigChangeTrajStateByTrain, scnmgr, &ScenarioManager::slotChangeTrajStateByTrain);
 
     // Проверяем, есть ли вообще сценарий для исполнения
     if (!command_line.scenario.is_present)

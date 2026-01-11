@@ -140,6 +140,9 @@ signals:
 
     void sendTrajBusyState(QByteArray busy_data);
 
+    /// Сигнал для модели, сообщающий индекс ПЕ, занявшей траекторию
+    void sigTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name);
+
 private:
 
     QString name = "";
@@ -149,10 +152,15 @@ private:
     /// признак занятости траектории
     bool is_busy = false;
 
+    bool prev_is_busy = false;
+
     /// признак включения траектории в маршрут ДЦ
     bool in_route = false;
 
     bool prev_in_route = false;
+
+    /// Индекс последней ПЕ занимавшей данную траекторию
+    int last_bused_index = 0;
 
     QMap<size_t, std::array<double, 2>> vehicles_coords;
 

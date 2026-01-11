@@ -455,7 +455,7 @@ void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::s
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int ScenarioManager::findTrain(const std::string &name)
+int ScenarioManager::findTrainByName(const std::string &name)
 {
     for (auto train_data : train_datas)
     {
@@ -466,6 +466,22 @@ int ScenarioManager::findTrain(const std::string &name)
     }
 
     return -1;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::string ScenarioManager::findTrainByIndex(int train_idx)
+{
+    for (auto train_data : train_datas)
+    {
+        if (train_data.getIndex() == train_idx)
+        {
+            return train_data.name;
+        }
+    }
+
+    return "";
 }
 
 //------------------------------------------------------------------------------
@@ -496,7 +512,7 @@ void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir)
 void ScenarioManager::slotRenameTrain(int train_idx, QString new_name)
 {
     // Проверяем уникальность имени поезда
-    if (findTrain(new_name.toStdString()) != -1)
+    if (findTrainByName(new_name.toStdString()) != -1)
     {
         emit sigSendExistedNameFound(train_idx);
         return;
@@ -512,6 +528,25 @@ void ScenarioManager::slotRenameTrain(int train_idx, QString new_name)
     }
 
     emit sigRenameTrainInModel(train_idx, new_name);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::slotChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name)
+{
+    std::string train_name = findTrainByIndex(train_idx);
+
+    if (is_busy)
+    {
+        // Для отладки
+        int a = 0;
+    }
+    else
+    {
+        // Для отладки
+        int b = 0;
+    }
 }
 
 //------------------------------------------------------------------------------

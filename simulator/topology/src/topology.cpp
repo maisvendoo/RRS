@@ -840,6 +840,12 @@ bool Topology::load_topology(QString route_dir)
         secNode = cfg.getNextSection();
     }
 
+    // Увяжем сигналы траектории со слотами топологии
+    for (auto traj : traj_list)
+    {
+        connect(traj, &Trajectory::sigTrajChangeState, this, &Topology::slotTrajChangeState);
+    }
+
     return true;
 }
 
@@ -1374,4 +1380,15 @@ void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
     }
 
     emit sigSetOpenSignalsQueue(signals_for_open, dir);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name)
+{
+    // Определяем поезд, изменивший состояние траектории
+    size_t train_idx = vehicle_control[vehicle_idx]->getTrainIndex();
+
+    emit sigChangeTrajStateByTrain(static_cast<int>(train_idx), is_busy, traj_name);
 }

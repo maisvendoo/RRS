@@ -157,8 +157,11 @@ private:
     /// Установка задачи задания маршрута
     void taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir);
 
-    /// Найти индек поезда по имени
-    int findTrain(const std::string &name);
+    /// Найти индекc поезда по имени
+    int findTrainByName(const std::string &name);
+
+    /// Найти имя поезда по индексу
+    std::string findTrainByIndex(int train_idx);
 
 private slots:
 
@@ -170,6 +173,8 @@ public slots:
 
     /// Переименование поезда по команде от сервера, принявшего новое имя
     void slotRenameTrain(int train_idx, QString new_name);
+
+    void slotChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
 };
 
 #endif
