@@ -86,6 +86,9 @@ private:
     /// Очередь задач
     std::queue<task_t> taskQueue;
 
+    /// Список триггеров
+    std::vector<sol::protected_function> triggerList;
+
     /// Таймер задержки исполнения очереди задач
     Timer *delayTimer = new Timer(0.1, false);
 
@@ -162,6 +165,11 @@ private:
 
     /// Найти имя поезда по индексу
     std::string findTrainByIndex(int train_idx);
+
+    /// Обработка позиционных триггеров
+    void process_pos_triggers(std::string train_name, std::string traj_name, bool is_busy);
+
+    void taskSetTrigger(sol::function trigger);
 
 private slots:
 

@@ -487,6 +487,65 @@ std::string ScenarioManager::findTrainByIndex(int train_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::process_pos_triggers(std::string train_name,
+                                           std::string traj_name,
+                                           bool is_busy)
+{
+    if (triggerList.empty())
+    {
+        return;
+    }
+
+    // Перебираем все имеющиеся триггеры
+    for (auto it = triggerList.begin(); it != triggerList.end(); ++it)
+    {
+        // На всякии нехорошии ситуации трай-кэтч
+        try
+        {
+            // Вызываем триггер
+            auto trigger = *it;
+
+            if (trigger.valid())
+            {
+                auto result = trigger(train_name, traj_name, is_busy);
+
+                if (result.valid())
+                {
+                    // Удаляем триггер если он попросил об этом
+                    if (result.get<bool>())
+                    {
+                        triggerList.erase(it);
+                    }
+
+                    // Если тригеров больше нет, уходит от греха
+                    if (triggerList.empty())
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+        catch (const sol::error &error)
+        {
+            Journal::instance()->error(QString("LUA: %1").arg(error.what()));
+            continue;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::taskSetTrigger(sol::function trigger)
+{
+    setTask([trigger, this]{
+        this->triggerList.push_back(trigger);
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::slotDelayTimer()
 {
     delayTimer->stop();
@@ -539,13 +598,11 @@ void ScenarioManager::slotChangeTrajStateByTrain(int train_idx, bool is_busy, QS
 
     if (is_busy)
     {
-        // Для отладки
-        int a = 0;
+        process_pos_triggers(train_name, traj_name.toStdString(), is_busy);
     }
     else
     {
-        //  Для отладки
-        int b = 0;
+        process_pos_triggers(train_name, traj_name.toStdString(), is_busy);
     }
 }
 
@@ -647,6 +704,14 @@ void ScenarioManager::sys_functions_registration()
     lua["buildRoute"] = [this](const std::string &start_traj, const std::string &target_traj, int dir) {
         this->taskBuildRoute(start_traj, target_traj, dir);
     };
+
+    Journal::instance()->info("buildRoute method binding...OK");
+
+    lua.set_function("setTrigger", [&](sol::function trigger) {
+        taskSetTrigger(trigger);
+    });
+
+    Journal::instance()->info("setTrigger method binding...OK");
 }
 
 //------------------------------------------------------------------------------
@@ -690,4 +755,11 @@ void ScenarioManager::lua_init()
     {
         lua_debug_init();
     }
+
+    // Псеводонимы для значений, возвращаемых триггерами,
+    // показвающие, отавить ли триггер в очереди, или удалить его
+    lua.script(R"(
+        TRIG_DELETE = true
+        TRIG_SAFE = false
+    )");
 }
