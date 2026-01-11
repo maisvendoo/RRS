@@ -78,14 +78,10 @@ bool Model::init(const simulator_command_line_t &command_line)
         {
             // Передаем начальные индексы поездов менеджеру сценариев
             size_t train_idx = train->getTrainIndex();
-
-            if (!scnmgr->train_datas.empty())
-            {
-                scnmgr->train_datas[train_idx].setIndex(train_idx);
-            }
+            scnmgr->setTrainIndex(train_idx);
 
             // Даем начальное имя поезду
-            train->setName(scnmgr->train_datas[train_idx].name);
+            train->setName(scnmgr->getTrainName(train_idx));
 
             trains.push_back(train);
 
@@ -379,7 +375,7 @@ void Model::findNearestVehicles()
         trains[train_idx]->setTrainIndex(train_idx);
 
         // Те же индексы сообщаем менеджеру сценариев
-        scnmgr->train_datas[train_idx].setIndex(train_idx);
+        scnmgr->setTrainIndex(train_idx);
     }
 }
 

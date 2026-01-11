@@ -118,6 +118,32 @@ void ScenarioManager::addNewTrain(const scenario_train_data_t &train_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::setTrainIndex(size_t t_idx)
+{
+    if (t_idx >= train_datas.size())
+    {
+        return;
+    }
+
+    train_datas[t_idx].setIndex(t_idx);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::string ScenarioManager::getTrainName(size_t t_idx)
+{
+    if (t_idx >= train_datas.size())
+    {
+        return "";
+    }
+
+    return train_datas[t_idx].name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 {
     init_data_t id = launch_init_data;

@@ -52,6 +52,10 @@ public:
 
     void addNewTrain(const scenario_train_data_t &train_data);
 
+    void setTrainIndex(size_t t_idx);
+
+    std::string getTrainName(size_t t_idx);
+
 signals:
 
     void sigSetSwitchState(QByteArray &switch_data);
