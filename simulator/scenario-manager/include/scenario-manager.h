@@ -175,6 +175,8 @@ private:
 
     void taskSetTrigger(sol::function trigger);
 
+    void lua_libraries_init();
+
 private slots:
 
     void slotDelayTimer();

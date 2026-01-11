@@ -770,11 +770,32 @@ void ScenarioManager::lua_debug_init()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::lua_init()
+void ScenarioManager::lua_libraries_init()
 {
     lua.open_libraries(sol::lib::base,
                        sol::lib::package,
-                       sol::lib::debug);
+                       sol::lib::debug,
+                       sol::lib::io,
+                       sol::lib::table,
+                       sol::lib::string,
+                       sol::lib::coroutine);
+
+    lua["package"]["path"] = lua["package"]["path"].get<std::string>() + ";../modules/lua/?.lua";
+
+    // Подключаем свои библиотеки
+    lua.script(R"(
+        -- Фабрика триггеров под типовые задачи
+        local trig_mod = require('triggers_fabric')
+    )");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::lua_init()
+{
+    // Инициализация библиотек Lua
+    lua_libraries_init();
 
     // Регистрация C++ типов в интерпретаторе
     cpp_types_registration();
@@ -789,7 +810,7 @@ void ScenarioManager::lua_init()
     }
 
     // Псеводонимы для значений, возвращаемых триггерами,
-    // показвающие, отавить ли триггер в очереди, или удалить его
+    // показвающие, оставить ли триггер в очереди, или удалить его
     lua.script(R"(
         TRIG_DELETE = true
         TRIG_SAFE = false

@@ -1,0 +1,22 @@
+-------------------------------------------------------------------
+--	Фабрика типовых триггеров
+-------------------------------------------------------------------
+
+-- Автоматический сквозной пропуск поезда по станции
+function autoApproach(traj_begin, traj_end, dir)
+	
+	function approach_route_build(train_name, traj_name, is_busy)
+
+		-- Если начальная траектория занята
+		if is_busy and traj_name == traj_begin then
+			-- Строим маршрут от неё до конечной в заданном 
+			-- направлении
+			buildRoute(traj_begin, traj_end, dir)			
+		end
+		
+		-- Сохраняем тригер в системе
+		return TRIG_SAFE
+	end
+
+	return approach_route_build
+end
