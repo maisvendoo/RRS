@@ -1,25 +1,18 @@
 #include    "rail-signal.h"
+#include    "filesystem.h"
+#include    "CfgReader.h"
+#include    "Journal.h"
+#include    "connector.h"
+#include    "trajectory.h"
+#include    <QBuffer>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Signal::Signal(QObject *parent) : Device(parent)
+Signal::Signal(QObject* parent) : QObject(parent)
 {
     std::fill(lens_state.begin(), lens_state.end(), false);
     old_lens_state = lens_state;
-
-    std::fill(alsn_state.begin(), alsn_state.end(), false);
-
-    alsn_RY_relay->read_config("combine-relay");
-    alsn_RY_relay->setInitContactState(ALSN_RY, false);
-
-    alsn_Y_relay->read_config("combine-relay");
-    alsn_Y_relay->setInitContactState(ALSN_Y, false);
-
-    alsn_G_relay->read_config("combine-relay");
-    alsn_G_relay->setInitContactState(ALSN_G, false);
-
-    connect(alsn_allow_timer, &Timer::process, this, &Signal::slotAllowTransmit);
 }
 
 //------------------------------------------------------------------------------
@@ -35,23 +28,81 @@ Signal::~Signal()
 //------------------------------------------------------------------------------
 void Signal::step(double t, double dt)
 {
-    Device::step(t, dt);
+    preStep(t);
 
-    alsn_RY_relay->step(t, dt);
-    alsn_Y_relay->step(t, dt);
-    alsn_G_relay->step(t, dt);
-
-    // Если АЛСН не запрещена, с задержкой по 10-секундному таймеру включаем трансмиттер
-    if (is_alsn_allow && !is_asln_transmit)
+    if (old_lens_state != lens_state)
     {
-        if (!alsn_allow_timer->isStarted())
-            alsn_allow_timer->start();
+        old_lens_state = lens_state;
+        emit sendDataUpdate(serialize());
+    }
+}
 
-        alsn_allow_timer->step(t, dt);
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Signal::read_config(const QString &filename, const QString &dir_path)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    CfgReader cfg;
+
+    // Custom config from path
+    if (dir_path != "")
+    {
+        QString cfg_path = dir_path + QDir::separator() + filename + ".xml";
+
+        if (cfg.load(cfg_path))
+        {
+            Journal::instance()->info("Loaded file: " + cfg_path);
+
+            load_config(cfg);
+            return;
+        }
+        else
+        {
+            Journal::instance()->error("File " + filename + ".xml is't found at custom path " + dir_path);
+        }
     }
 
-    // Сбрасываем запрет АЛСН
-    is_alsn_allow = true;
+    // Config from default directory
+    QString cfg_dir = fs.getDevicesDir().c_str();
+    QString cfg_path = cfg_dir + QDir::separator() + filename + ".xml";
+
+    if (cfg.load(cfg_path))
+    {
+        Journal::instance()->info("Loaded file: " + cfg_path);
+
+        load_config(cfg);
+        return;
+    }
+    Journal::instance()->error("File " + filename + ".xml is't found at default path " + cfg_dir);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Signal::getConnectorName() const
+{
+    return conn_name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Signal::setConnector(Connector* conn)
+{
+    this->conn = conn;
+    if (conn)
+        conn_name = conn->getName();
+    else
+        conn_name = "";
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Connector* Signal::getConnector() const
+{
+    return conn;
 }
 
 //------------------------------------------------------------------------------
@@ -64,7 +115,7 @@ QByteArray Signal::serialize()
     buff.open(QIODevice::WriteOnly);
     QDataStream stream(&buff);
 
-    stream << conn->getName();
+    stream << conn_name;
     stream << signal_dir;
     stream << letter;
     stream << signal_model;
@@ -74,7 +125,7 @@ QByteArray Signal::serialize()
         stream << lens;
     }
 
-    this->calcPosition(pos);
+    this->calcPosition();
 
     stream << pos.x << pos.y << pos.z;
     stream << orth.x << orth.y << orth.z;
@@ -112,16 +163,35 @@ void Signal::deserialize(QByteArray &data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Signal::calcPosition(dvec3 &pos)
+bool Signal::calcPosition()
 {
-    dvec3 conn_pos;
-    track_t track;
-
-    if (!getConnectorPos(conn, conn_pos, track))
+    // Смотрим на коннектор при светофоре
+    if (conn == nullptr)
     {
         return false;
     }
 
+    // Смотрим на траекторию перед коннектором при светофоре
+    Trajectory* traj = nullptr;
+    if (signal_dir == 1)
+    {
+        traj = conn->getBwdTraj();
+    }
+    if (signal_dir == -1)
+    {
+        traj = conn->getFwdTraj();
+    }
+
+    if (traj == nullptr)
+    {
+        return false;
+    }
+
+    // Берём за точку отсчёта участок траектории перед коннектором
+    const track_t& track = (signal_dir == 1) ? traj->getLastTrack() : traj->getFirstTrack();
+    dvec3 conn_pos = (signal_dir == 1) ? track.end_point : track.begin_point;
+
+    // Положение светофора со смещением от коннектора
     pos = conn_pos +
           track.trav * (rel_pos.x * signal_dir) +
           track.orth * (rel_pos.y * signal_dir) +
@@ -138,79 +208,14 @@ bool Signal::calcPosition(dvec3 &pos)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Signal::allowTransmitALSN(bool is_allow)
+void Signal::preStep(double t)
 {
-    is_alsn_allow = is_allow;
-    is_asln_transmit = is_allow;
+    (void)t;
 }
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void Signal::load_config(CfgReader &cfg)
 {
     (void)cfg;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Signal::getConnectorPos(Connector *conn, dvec3 &conn_pos, track_t &track)
-{
-    if (conn == nullptr)
-    {
-        return false;
-    }
-
-    Trajectory *traj = nullptr;
-    // dvec3 pos;
-
-    if (signal_dir == 1)
-    {
-        traj = conn->getBwdTraj();
-
-        if (traj == nullptr)
-        {
-            return false;
-        }
-
-        track = traj->getLastTrack();
-        conn_pos = track.end_point;
-
-        return true;
-    }
-
-    if (signal_dir == -1)
-    {
-        traj = conn->getFwdTraj();
-
-        if (traj == nullptr)
-        {
-            return false;
-        }
-
-        track = traj->getFirstTrack();
-        conn_pos = track.begin_point;
-
-        return true;
-    }
-
-    return false;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Signal::alsn_reset()
-{
-    std::fill(alsn_state.begin(), alsn_state.end(), false);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Signal::slotAllowTransmit()
-{
-    alsn_allow_timer->stop();
-    is_asln_transmit = true;
 }

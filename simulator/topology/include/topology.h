@@ -116,12 +116,6 @@ private:
     /// Загрузка сигналов (пока ограничиваюсь проходными)
     void load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn);
 
-    /// Связывание сигналов
-    void line_signals_connect(std::vector<Signal *> &line_signals);
-
-    /// Сзязывание входных сигналов с проходными на перегонах
-    void enter_signal_connect(std::vector<Signal *> &enter_signals);
-
     /// Загрузка списка станций
     bool load_stations(QString route_dir);
 

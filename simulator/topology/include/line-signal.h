@@ -1,14 +1,13 @@
 #ifndef     LINE_SIGNAL_H
 #define     LINE_SIGNAL_H
 
-#include    <rail-signal.h>
+#include    "train-signal.h"
 #include    <combine-relay.h>
-#include    <timer.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class TOPOLOGY_EXPORT LineSignal : public Signal
+class TOPOLOGY_EXPORT LineSignal : public TrainSignal
 {
 public:
 
@@ -68,12 +67,7 @@ private:
     /// Контакт мигания
     bool blink_contact = true;
 
-    /// Напряжение путевой батареи
-    double U_bat = 12.0;
-
-    void preStep(state_vector_t &Y, double t) override;
-
-    void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t) override;
+    void preStep(double t) override;
 
     /// Проверка блок-участка до следующего светофора
     void check_route();

@@ -5,27 +5,9 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-EnterSignal::EnterSignal(QObject *parent) : Signal(parent)
+EnterSignal::EnterSignal(QObject *parent) : StationSignal(parent)
 {
-    connect(open_timer, &Timer::process, this, &EnterSignal::slotOpenTimer);
-    connect(close_timer, &Timer::process, this, &EnterSignal::slotCloseTimer);
-
     connect(blink_timer, &Timer::process, this, &EnterSignal::slotOnBlinkTimer);
-
-    route_control_relay->read_config("combine-relay");
-    route_control_relay->setInitContactState(RCR_SR_CTRL, false);
-    route_control_relay->setInitContactState(RCR_MSR_SSR_CTRL, false);
-    route_control_relay->setInitContactState(RCR_DSR_CTRL, false);
-
-    signal_relay->read_config("combine-relay");
-    signal_relay->setInitContactState(SR_SELF_LOCK, false);
-    signal_relay->setInitContactState(SR_MSR_SSR_CTRL, false);
-    signal_relay->setInitContactState(SR_ALR_CTRL, false);
-    signal_relay->setInitContactState(SR_PLUS, false);
-    signal_relay->setInitContactState(SR_MINUS, true);
-
-    arrival_lock_relay->read_config("combine-relay");
-    arrival_lock_relay->setInitContactState(ALR_MSR_SSR_CTRL, false);
 
     main_signal_relay->read_config("combine-relay");
     main_signal_relay->setInitContactState(MSR_RED, true);
@@ -62,15 +44,10 @@ EnterSignal::~EnterSignal()
 //------------------------------------------------------------------------------
 void EnterSignal::step(double t, double dt)
 {
-    Signal::step(t, dt);
+    StationSignal::step(t, dt);
 
-    open_timer->step(t, dt);
-    close_timer->step(t, dt);
     blink_timer->step(t, dt);
 
-    route_control_relay->step(t, dt);
-    signal_relay->step(t, dt);
-    arrival_lock_relay->step(t, dt);
     main_signal_relay->step(t, dt);
     side_signal_relay->step(t, dt);
     direct_signal_relay->step(t, dt);
@@ -81,31 +58,8 @@ void EnterSignal::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EnterSignal::slotPressOpen()
+void EnterSignal::preStep(double t)
 {
-    is_open_button_pressed = true;
-    open_timer->start();
-
-    Journal::instance()->info("Pressed open button for signal " + letter);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void EnterSignal::slotPressClose()
-{
-    is_close_button_nopressed = false;
-    close_timer->start();
-
-    Journal::instance()->info("Pressed close button for signal " + letter);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void EnterSignal::preStep(state_vector_t &Y, double t)
-{
-    (void)Y;
     (void)t;
 
     bool is_switches_side = false;
@@ -118,18 +72,6 @@ void EnterSignal::preStep(state_vector_t &Y, double t)
     lens_control();
 
     alsn_control();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void EnterSignal::ode_system(const state_vector_t &Y,
-                             state_vector_t &dYdt,
-                             double t)
-{
-    (void)Y;
-    (void)dYdt;
-    (void)t;
 }
 
 //------------------------------------------------------------------------------
@@ -204,16 +146,19 @@ void EnterSignal::check_route(bool& is_switches_side)
 
         if (signal)
         {
-            // Замыкание цепи на путевое реле в релейном шкафу следующего светофора
-            U_way = U_bat;
-            // Линейное реле питается от линии следующего светофора
-            U_line = signal->getLineVoltage();
-            // Боковое сигнальное реле питается от линии следующего светофора
-            U_side = signal->getSideVoltage();
+            if (TrainSignal* ts = dynamic_cast<TrainSignal*>(signal))
+            {
+                // Замыкание цепи на путевое реле в релейном шкафу следующего светофора
+                U_way = U_bat;
+                // Линейное реле питается от линии следующего светофора
+                U_line = ts->getLineVoltage();
+                // Боковое сигнальное реле питается от линии следующего светофора
+                U_side = ts->getSideVoltage();
 
-            // Если сигнал закрыт, отключаем АЛСН-код от следующего светофора
-            signal->allowTransmitALSN(!lens_state[RED_LENS]);
-            return;
+                // Если сигнал закрыт, отключаем АЛСН-код от следующего светофора
+                ts->allowTransmitALSN(!lens_state[RED_LENS]);
+                return;
+            }
         }
     }
 }
@@ -223,41 +168,21 @@ void EnterSignal::check_route(bool& is_switches_side)
 //------------------------------------------------------------------------------
 void EnterSignal::relay_control(bool is_switches_side)
 {
-    // Цепь контрольного маршрутного реле
-    route_control_relay->setVoltage(U_way);
-
-
-    // Цепь сигнального реле
-    // Состояние провода кнопочного блока "Открыть/Закрыть"
-    bool is_SR_ON = is_open_button_pressed ||
-                    (is_close_button_nopressed && signal_relay->getContactState(SR_SELF_LOCK));
-
-    // Контакт контрольного маршрутного реле
-    is_SR_ON &= route_control_relay->getContactState(RCR_SR_CTRL);
-
-    signal_relay->setVoltage(U_bat * static_cast<double>(is_SR_ON));
-
-
-    // Замыкание маршрута приема
-    bool is_ALR_ON = signal_relay->getContactState(SR_ALR_CTRL);
-
-    arrival_lock_relay->setVoltage(U_bat * static_cast<double>(is_ALR_ON));
-
 
     // Цепи главного и бокового сигнальных реле
-    bool is_common_wire_ON = arrival_lock_relay->getContactState(ALR_MSR_SSR_CTRL) &&
-                             signal_relay->getContactState(SR_MSR_SSR_CTRL) &&
-                             route_control_relay->getContactState(RCR_MSR_SSR_CTRL);
+    bool is_common_wire_ON = control_relay->getContactState(CR_ALLOW_ROUTE) &&
+                             signal_relay->getContactState(SR_OPENED) &&
+                             lock_relay->getContactState(LR_ROUTE_LOCKED);
 
     bool is_MSR_ON = is_common_wire_ON && (!is_switches_side);
     bool is_SSR_ON = is_common_wire_ON && is_switches_side;
 
-    main_signal_relay->setVoltage(U_bat * static_cast<double>(is_MSR_ON));
-    side_signal_relay->setVoltage(U_bat * static_cast<double>(is_SSR_ON));
+    main_signal_relay->setVoltage(static_cast<double>(is_MSR_ON) * U_bat);
+    side_signal_relay->setVoltage(static_cast<double>(is_SSR_ON) * U_bat);
 
 
     // Цепь сигнального реле сквозного пропуска
-    bool is_DSR_ON = route_control_relay->getContactState(RCR_DSR_CTRL);
+    bool is_DSR_ON = control_relay->getContactState(CR_ALLOW_ROUTE);
 
     // Питание от следующего сигнала
     double U_line_plus = max(0.0, U_line);
@@ -265,14 +190,14 @@ void EnterSignal::relay_control(bool is_switches_side)
     direct_signal_relay->setVoltage(U_line_plus * static_cast<double>(is_DSR_ON));
 
 
-    double is_line_plus = static_cast<double>(signal_relay->getContactState(SR_PLUS));
-    double is_line_minus = static_cast<double>(signal_relay->getContactState(SR_MINUS));
+    double is_line_plus = static_cast<double>(signal_relay->getContactState(SR_OPENED));
+    double is_line_minus = static_cast<double>(signal_relay->getContactState(SR_CLOSED));
 
     // Формируем напряжение, подаваемое на линейное реле предыдущего светофора
-    U_line_prev = U_bat * (is_line_plus - is_line_minus);
+    U_line_prev = (is_line_plus - is_line_minus) * U_bat;
 
     // Формируем напряжение, подаваемое на боковое сигнальное реле предыдущего светофора
-    U_side_prev = U_bat * static_cast<double>(side_signal_relay->getContactState(SSR_SIDE));
+    U_side_prev = static_cast<double>(side_signal_relay->getContactState(SSR_SIDE)) * U_bat;
 }
 
 //------------------------------------------------------------------------------
@@ -291,7 +216,7 @@ void EnterSignal::yellow_blink_control()
         // Если маршрут с отклонением по стрелкам, питание реле мигания от реле сквозного пропуска
         bool is_blink_ON = side_signal_relay->getContactState(SSR_BLINK) &&
                            direct_signal_relay->getContactState(DSR_BLINK);
-        blink_relay->setVoltage(U_bat * static_cast<double>(is_blink_ON));
+        blink_relay->setVoltage(static_cast<double>(is_blink_ON) * U_bat);
     }
 
     // Управление таймером мигания
@@ -311,8 +236,6 @@ void EnterSignal::yellow_blink_control()
 //------------------------------------------------------------------------------
 void EnterSignal::lens_control()
 {
-    old_lens_state = lens_state;
-
     lens_state[GREEN_LENS] = direct_signal_relay->getContactState(DSR_GREEN) &&
                              main_signal_relay->getContactState(MSR_YELLOW);
 
@@ -331,12 +254,6 @@ void EnterSignal::lens_control()
                            main_signal_relay->getContactState(MSR_RED);
 
     lens_state[BOTTOM_YELLOW_LENS] = side_signal_relay->getContactState(SSR_BOTTOM_YELLOW);
-
-    if (lens_state != old_lens_state)
-    {
-        emit sendDataUpdate(this->serialize());
-        Journal::instance()->info("Signal " + letter + ": Updated lens status");
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -344,53 +261,21 @@ void EnterSignal::lens_control()
 //------------------------------------------------------------------------------
 void EnterSignal::alsn_control()
 {
-    if (!is_asln_transmit)
-    {
-        alsn_reset();
-        return;
-    }
-
     bool is_ALSN_RY_ON = lens_state[RED_LENS];
 
-    alsn_RY_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_RY_ON));
+    alsn_RY_relay->setVoltage(static_cast<double>(is_ALSN_RY_ON) * U_bat);
 
-    alsn_state[ALSN_RY_LINE] = alsn_RY_relay->getContactState(ALSN_RY);
 
     bool is_ALSN_G_ON = lens_state[GREEN_LENS] ||
                         (blink_relay->getContactState(BLINK_YELLOW) &&
-                         !side_signal_relay->getContactState(SSR_BOTTOM_YELLOW));
+                         !side_signal_relay->getContactState(SSR_BOTTOM_YELLOW) * U_bat);
 
-    alsn_G_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_G_ON));
+    alsn_G_relay->setVoltage(static_cast<double>(is_ALSN_G_ON) * U_bat);
 
-    alsn_state[ALSN_G_LINE] = alsn_G_relay->getContactState(ALSN_G);
 
     bool is_ALSN_Y_ON = is_yellow_wire_ON;
 
-    alsn_Y_relay->setVoltage(U_bat * static_cast<double>(is_ALSN_Y_ON));
-
-    alsn_state[ALSN_Y_LINE] = alsn_Y_relay->getContactState(ALSN_Y);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void EnterSignal::slotOpenTimer()
-{
-    is_open_button_pressed = false;
-    open_timer->stop();
-
-    Journal::instance()->info("Released open button for signal " + letter);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void EnterSignal::slotCloseTimer()
-{
-    is_close_button_nopressed = true;
-    close_timer->stop();
-
-    Journal::instance()->info("Released close button for signal " + letter);
+    alsn_Y_relay->setVoltage(static_cast<double>(is_ALSN_Y_ON) * U_bat);
 }
 
 //------------------------------------------------------------------------------
