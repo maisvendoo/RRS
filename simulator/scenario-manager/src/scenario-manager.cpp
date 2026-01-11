@@ -491,6 +491,7 @@ void ScenarioManager::process_pos_triggers(std::string train_name,
                                            std::string traj_name,
                                            bool is_busy)
 {
+    // Нет тригеров - нечего ловить, уходим
     if (triggerList.empty())
     {
         return;
@@ -505,10 +506,14 @@ void ScenarioManager::process_pos_triggers(std::string train_name,
             // Вызываем триггер
             auto trigger = *it;
 
+            // Если тригер валидный
             if (trigger.valid())
             {
+                // Передаем данные о траекторном событии в триггер
+                // а он там уж сам как-нибудь порешает чего делать
                 auto result = trigger(train_name, traj_name, is_busy);
 
+                // Если валидный результат работы тригер
                 if (result.valid())
                 {
                     // Удаляем триггер если он попросил об этом
@@ -517,7 +522,8 @@ void ScenarioManager::process_pos_triggers(std::string train_name,
                         triggerList.erase(it);
                     }
 
-                    // Если тригеров больше нет, уходит от греха
+                    // Если тригеров больше нет, уходим от греха, дабы
+                    // на следующей итерации цикла не схатить невалидный итератор
                     if (triggerList.empty())
                     {
                         return;
