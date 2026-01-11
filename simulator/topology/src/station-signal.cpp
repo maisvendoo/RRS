@@ -18,11 +18,11 @@ StationSignal::StationSignal(QObject* parent) : TrainSignal(parent)
     signal_relay->setInitContactState(SR_OPENED, false);
     signal_relay->setInitContactState(SR_CLOSED, true);
     signal_relay->setInitContactState(SR_SELF_CTRL, false);
-    signal_relay->setInitContactState(SR_LOCK_RELAY_CTRL, false);
+    signal_relay->setInitContactState(SR_LOCK_RELAY_CTRL, true);
 
     lock_relay->read_config("combine-relay");
-    lock_relay->setInitContactState(LR_ROUTE_LOCKED, false);
-    lock_relay->setInitContactState(LR_NO_ROUTE, true);
+    lock_relay->setInitContactState(LR_ROUTE_LOCKED, true);
+    lock_relay->setInitContactState(LR_NO_ROUTE, false);
 }
 
 //------------------------------------------------------------------------------

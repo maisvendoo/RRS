@@ -324,7 +324,7 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
             while (t != nullptr)
             {
                 // Не забываем отметить что текущая траектория включена в маршрут
-                t->putInRoute();
+                t->setInRoute(true);
 
                 // Помещаем сегмент маршрута в путь
                 path.trajectories.push_back(t);

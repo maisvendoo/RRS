@@ -3,11 +3,6 @@
 
 #include    "train-signal.h"
 
-#include    <topology-export.h>
-#include    <connector.h>
-#include    <relay.h>
-#include    <signal-types.h>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -62,22 +57,22 @@ protected:
         NUM_LR_CONTACTS,
     };
     /// Реле замыкания маршрута:
-    /// повторяет сигнальное реле, в будущем должно блокировать стрелки от перевода
+    /// при открытии сигнала отключается и блокирует стрелки по маршруту от перевода
     Relay *lock_relay = new Relay(NUM_LR_CONTACTS);
 
 private:
-
-    /// Таймер выдержки времени удержания кнопки открыть
-    Timer *open_timer = new Timer(1.0, false);
-
-    /// Таймер выдержки времени удержания кнопки закрыть
-    Timer *close_timer = new Timer(1.0, false);
 
     /// Признак нажатия кнопки открытия
     bool is_open_button_pressed = false;
 
     /// Признак НЕнажатия кнопки закрытия (нормально замкнутая)
     bool is_close_button_unpressed = true;
+
+    /// Таймер выдержки времени удержания кнопки открыть
+    Timer *open_timer = new Timer(1.0, false);
+
+    /// Таймер выдержки времени удержания кнопки закрыть
+    Timer *close_timer = new Timer(1.0, false);
 
 private slots:
 

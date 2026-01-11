@@ -11,6 +11,7 @@
 #include    <topology-trajectory-device.h>
 
 class Connector;
+class Signal;
 
 //------------------------------------------------------------------------------
 //
@@ -77,8 +78,6 @@ public:
     /// Задать признак занятости (для работы копии топологии вне движка)
     void setBusyState(bool busy_state);
 
-    void setInRoute(bool in_route);
-
     /// Признак занятости подвижным составом
     bool isBusy() const;
 
@@ -123,17 +122,30 @@ public:
         return tracks;
     }
 
-    void putInRoute()
+    /// Задать включение траектории в маршрут ДЦ
+    void setInRoute(bool is_route);
+
+    /// Включение траектории в маршрут ДЦ
+    bool isInRoute() const;
+
+    /// Светофор вперёд, включающий данную траекторию в маршрут ДЦ
+    Signal* getRouteBySignalFwd() const
     {
-        if (!is_busy)
-        {
-            in_route = true;
-        }
+        return in_route_by_signal_fwd;
+    }
+    void setRouteBySignalFwd(Signal* signal)
+    {
+        in_route_by_signal_fwd = signal;
     }
 
-    bool isInRoute() const
+    /// Светофор назад, включающий данную траекторию в маршрут ДЦ
+    Signal* getRouteBySignalBwd() const
     {
-        return in_route;
+        return in_route_by_signal_bwd;
+    }
+    void setRouteBySignalBwd(Signal* signal)
+    {
+        in_route_by_signal_bwd = signal;
     }
 
 signals:
@@ -149,6 +161,9 @@ private:
 
     double len = 0.0;
 
+    /// Индекс последней ПЕ занимавшей данную траекторию
+    int last_bused_index = 0;
+
     /// признак занятости траектории
     bool is_busy = false;
 
@@ -159,8 +174,10 @@ private:
 
     bool prev_in_route = false;
 
-    /// Индекс последней ПЕ занимавшей данную траекторию
-    int last_bused_index = 0;
+    /// Светофор вперёд, включающий данную траекторию в маршрут ДЦ
+    Signal* in_route_by_signal_fwd = nullptr;
+    /// Светофор назад, включающий данную траекторию в маршрут ДЦ
+    Signal* in_route_by_signal_bwd = nullptr;
 
     QMap<size_t, std::array<double, 2>> vehicles_coords;
 

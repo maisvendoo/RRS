@@ -1,5 +1,5 @@
 #include    <exit-signal.h>
-#include    <Journal.h>
+#include    <switch.h>
 
 //------------------------------------------------------------------------------
 //
@@ -87,13 +87,38 @@ void ExitSignal::check_route()
             return;
         }
 
-        // Занятость траектории
+        // Проверяем занятость траектории
         if (traj->isBusy())
         {
             U_way = 0.0;
             U_line = 0.0;
             U_side = 0.0;
             return;
+        }
+
+        // Проверяем включение траектории в маршрут от другого светофора
+        if (traj->isInRoute())
+        {
+            Signal* s = (signal_dir == 1) ? traj->getRouteBySignalFwd() : traj->getRouteBySignalBwd();
+            if (s != this)
+            {
+                U_way = 0.0;
+                U_line = 0.0;
+                U_side = 0.0;
+                return;
+            }
+        }
+
+        // Занимаем траекторию маршрутом от данного светофора
+        if (lock_relay->getContactState(LR_ROUTE_LOCKED))
+        {
+            traj->setInRoute(true);
+            (signal_dir == 1) ? traj->setRouteBySignalFwd(this) : traj->setRouteBySignalBwd(this);
+        }
+        else
+        {
+            traj->setInRoute(false);
+            (signal_dir == 1) ? traj->setRouteBySignalFwd(nullptr) : traj->setRouteBySignalBwd(nullptr);
         }
 
         // Смотрим следующий коннектор
@@ -116,6 +141,50 @@ void ExitSignal::check_route()
             U_line = 0.0;
             U_side = 0.0;
             return;
+        }
+
+        // Смотрим стрелочный перевод на коннекторе
+        if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+        {
+            // Блокировка стрелочных переводов в маршруте
+            if (lock_relay->getContactState(LR_ROUTE_LOCKED))
+            {
+                if (sw->getStateBwd() < 0)
+                {
+                    sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
+                }
+                if (sw->getStateBwd() > 0)
+                {
+                    sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
+                }
+                if (sw->getStateFwd() < 0)
+                {
+                    sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
+                }
+                if (sw->getStateFwd() > 0)
+                {
+                    sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
+                }
+            }
+            else
+            {
+                if (sw->getStateBwd() < 0)
+                {
+                    sw->setRefStateBwd(Switch::STATE_MINUS);
+                }
+                if (sw->getStateBwd() > 0)
+                {
+                    sw->setRefStateBwd(Switch::STATE_PLUS);
+                }
+                if (sw->getStateFwd() < 0)
+                {
+                    sw->setRefStateFwd(Switch::STATE_MINUS);
+                }
+                if (sw->getStateFwd() > 0)
+                {
+                    sw->setRefStateFwd(Switch::STATE_PLUS);
+                }
+            }
         }
 
         // Смотрим сигнал на следующем коннекторе

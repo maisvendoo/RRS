@@ -190,9 +190,26 @@ void Trajectory::setBusyState(bool busy_state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trajectory::setInRoute(bool in_route)
+void Trajectory::setInRoute(bool is_route)
 {
-    this->in_route = in_route;
+    if (is_route)
+    {
+        in_route = true;
+    }
+    else
+    {
+        in_route = false;
+        in_route_by_signal_fwd = nullptr;
+        in_route_by_signal_bwd = nullptr;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Trajectory::isInRoute() const
+{
+    return in_route;
 }
 
 //------------------------------------------------------------------------------
@@ -460,7 +477,7 @@ void Trajectory::step(double t, double dt)
         // Занятая траектория исключается из маршрута ДЦ
         if (is_busy)
         {
-            in_route = false;
+            setInRoute(false);
             // Если пока еще занято, то определяем первого из списка,
             // при освобождени траектории он же станет и последним
             last_bused_index = vehicles_coords.firstKey();
