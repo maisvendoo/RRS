@@ -323,9 +323,6 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
             // Пока существует предыдущая траектория
             while (t != nullptr)
             {
-                // Не забываем отметить что текущая траектория включена в маршрут
-                t->setInRoute(true);
-
                 // Помещаем сегмент маршрута в путь
                 path.trajectories.push_back(t);
 
@@ -462,23 +459,23 @@ bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
             // Переключаем попутные остряки
             if (next_traj == sw->fwdPlusTraj)
             {
-                sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
+                sw->setRefStateFwd(Switch::STATE_PLUS);
             }
 
             if (next_traj == sw->fwdMinusTraj)
             {
-                sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
+                sw->setRefStateFwd(Switch::STATE_MINUS);
             }
 
             // Переключаем встречные остряки
             if (prev_traj == sw->bwdPlusTraj)
             {
-                sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
+                sw->setRefStateBwd(Switch::STATE_PLUS);
             }
 
             if (prev_traj == sw->bwdMinusTraj)
             {
-                sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
+                sw->setRefStateBwd(Switch::STATE_MINUS);
             }
         }
 
@@ -487,23 +484,23 @@ bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
             // Переключаем попутные остряки
             if (next_traj == sw->bwdPlusTraj)
             {
-                sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
+                sw->setRefStateBwd(Switch::STATE_PLUS);
             }
 
             if (next_traj == sw->bwdMinusTraj)
             {
-                sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
+                sw->setRefStateBwd(Switch::STATE_MINUS);
             }
 
             // Переключаем встречные остряки
             if (prev_traj == sw->fwdPlusTraj)
             {
-                sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
+                sw->setRefStateFwd(Switch::STATE_PLUS);
             }
 
             if (prev_traj == sw->fwdMinusTraj)
             {
-                sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
+                sw->setRefStateFwd(Switch::STATE_MINUS);
             }
         }
     }
@@ -532,7 +529,7 @@ bool Topology::open_route_signals(const route_segment_t &route, int dir, QString
         }
 
         // Проверяем есть ли на нем сигнал
-        Signal *signal = (dir == 1) ? conn->getSignalFwd() : conn->getSignalBwd();
+        Signal* signal = (dir == 1) ? conn->getSignalFwd() : conn->getSignalBwd();
 
         if (signal == nullptr)
         {
@@ -540,12 +537,7 @@ bool Topology::open_route_signals(const route_segment_t &route, int dir, QString
             continue;
         }
 
-        if (EnterSignal *enter_sig = dynamic_cast<EnterSignal *>(signal))
-        {
-            conn_list.append(conn->getName());
-        }
-
-        if (ExitSignal *exit_sig = dynamic_cast<ExitSignal *>(signal))
+        if (StationSignal* station_sig = dynamic_cast<StationSignal *>(signal))
         {
             conn_list.append(conn->getName());
         }
