@@ -544,7 +544,7 @@ void ScenarioManager::slotChangeTrajStateByTrain(int train_idx, bool is_busy, QS
     }
     else
     {
-        // Для отладки
+        //  Для отладки
         int b = 0;
     }
 }
