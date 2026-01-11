@@ -508,6 +508,8 @@ void Trajectory::step(double t, double dt)
             // посылаем топологии индекc последней ПЕ, занимавшей данную траекторию
             emit sigTrajChangeState(last_bused_index, is_busy, name);
         }
+
+        prev_is_busy = is_busy;
     }
 }
 
