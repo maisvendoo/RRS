@@ -2,42 +2,42 @@
 <Config>
 	<Station>
 		<!-- Код ЕСР -->
-		<ESR>STA</ESR>
+		<ESR>STB</ESR>
 		<!-- Название станции -->
-		<Name>Станция-А</Name>			
+		<Name>Станция-Б</Name>			
 	</Station>
 
 	<!-- Нечетное направление -->
 	<OddDirection>
 		<Name>forward</Name>
 		<!-- Нечетный участок приближения 1 (НП1) -->	
-		<Appr1>route1_0001_1</Appr1>
+		<Appr1>route1_0039_461</Appr1>
 		<!-- Нечетный участок приближения 2 (НП2) -->
-		<Appr2>none</Appr2>
+		<Appr2>route1_0038_443</Appr2>
 		<!-- Нечетный участок удаления 1 (НУ1) -->	
-		<Removal1>route1_0009_26</Removal1>
+		<Removal1>route1_0047_497</Removal1>
 		<!-- Нечетный участок удаления 2 (НУ2) -->
-		<Removal2>route1_0010_42</Removal2>
+		<Removal2>none</Removal2>
 	</OddDirection>
 
 	<!-- Четное направление -->
 	<EvenDirection>
 		<Name>backward</Name>
 		<!-- Четный участок приближения 1 (ЧП1) -->	
-		<Appr1>route2_0009_26</Appr1>
+		<Appr1>route2_0047_497</Appr1>
 		<!-- Четный участок приближения 2 (ЧП2) -->
-		<Appr2>route2_0010_42</Appr2>		
+		<Appr2>none</Appr2>		
 		<!-- Четный участок удаления 1 (ЧУ1) -->	
-		<Removal1>route2_0001_1</Removal1>
+		<Removal1>route2_0039_461</Removal1>
 		<!-- Четный участок удаления 2 (ЧУ2) -->
-		<Removal2>none</Removal2>
+		<Removal2>route2_0038_443</Removal2>
 	</EvenDirection>
 
 	<Path>
 		<!-- Номер пути (строка!) -->
 		<Number>3</Number>
 		<!-- Траектория в топологии -->
-		<Traj>branch1_0002_2_12_22</Traj>
+		<Traj>branch1_0004_2_246_259</Traj>
 		<!-- Признак наличия платформы справа -->
 		<HasRightPlatform>0</HasRightPlatform>
 		<!-- Признак наличия платформы слева -->
@@ -50,7 +50,7 @@
 		<!-- Номер пути (строка!) -->
 		<Number>1</Number>
 		<!-- Траектория в топологии -->
-		<Traj>route1_0005_13</Traj>
+		<Traj>route1_0024_247</Traj>
 		<!-- Признак наличия платформы справа -->
 		<HasRightPlatform>0</HasRightPlatform>
 		<!-- Признак наличия платформы слева -->
@@ -63,7 +63,7 @@
 		<!-- Номер пути (строка!) -->
 		<Number>2</Number>
 		<!-- Траектория в топологии -->
-		<Traj>route2_0005_13</Traj>
+		<Traj>route2_0024_247</Traj>
 		<!-- Признак наличия платформы справа -->
 		<HasRightPlatform>0</HasRightPlatform>
 		<!-- Признак наличия платформы слева -->
@@ -76,7 +76,7 @@
 		<!-- Номер пути (строка!) -->
 		<Number>4</Number>
 		<!-- Траектория в топологии -->
-		<Traj>branch1_0001_2_x12_x22</Traj>
+		<Traj>branch1_0003_2_x246_x259</Traj>
 		<!-- Признак наличия платформы справа -->
 		<HasRightPlatform>0</HasRightPlatform>
 		<!-- Признак наличия платформы слева -->
