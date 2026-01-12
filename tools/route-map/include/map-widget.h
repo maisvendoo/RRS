@@ -62,11 +62,6 @@ public:
         return scale;
     }
 
-    QPoint getMousePos() const
-    {
-        return mouse_pos;
-    }
-
     void showTrajNames(bool is_show)
     {
         show_traj_names = is_show;
@@ -92,7 +87,7 @@ private:
     QPoint map_shift;
 
     /// Положение курсора в момент последнего нажатия ЛКМ
-    QPoint mouse_pos;
+    QPoint mouse_pos_LBpressed;
 
     /// Смещение координат до движения курсора с зажатой ЛКМ
     QPoint prev_map_shift;
@@ -117,15 +112,13 @@ private:
 
     void paintEvent(QPaintEvent *event);
 
-    void drawTrajectory(Trajectory *traj);
+    void drawTrajectory(Trajectory* traj, QPointF& cursor_pos, double& distance2);
 
-    void drawTrain(simulator_update_pos_t *train_data);
+    void drawTrains(simulator_update_pos_t *train_data);
 
     void drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length, QColor color);
 
-    void drawConnectors(conn_list_t *conn_list);
-
-    void drawConnector(Connector *conn);
+    void drawConnector(Connector* conn, QPointF& cursor_pos, double& distance2);
 
     void drawStations(topology_stations_list_t *stations);
 
@@ -138,6 +131,14 @@ private:
     void drawExitSignal(Signal *signal);
 
     QPoint coord_transform(dvec3 point);
+
+    double distance2_pos_to_point(const QPointF& pos, const QPointF& point);
+
+    double distance_pos_to_point(const QPointF& pos, const QPointF& point);
+
+    double distance2_pos_to_line_segment(const QPointF& pos, const QPointF& pointA, const QPointF& pointB);
+
+    double distance_pos_to_line_segment(const QPointF& pos, const QPointF& pointA, const QPointF& pointB);
 
     void wheelEvent(QWheelEvent *event);
 
