@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Station>
+		<!-- Код ЕСР -->
+		<ESR>STA</ESR>
+		<!-- Название станции -->
+		<Name>Станция-А</Name>
+
+		<!-- Нечетный участок приближения 1 (НП1) -->	
+		<OddAppr1>route1_0001_1</OddAppr1>
+		<!-- Нечетный участок приближения 2 (НП2) -->
+		<OddAppr2>none</OddAppr2>
+		<!-- Четный участок приближения 1 (ЧП1) -->	
+		<EvenAppr1>route2_0009_26</EvenAppr1>
+		<!-- Четный участок приближения 2 (ЧП2) -->
+		<EvenAppr2>route2_0010_42</EvenAppr2>
+
+		<!-- Нечетный участок удаления 1 (НУ1) -->	
+		<OddRemoval1>route1_0009_26</OddRemoval1>
+		<!-- Нечетный участок удаления 2 (НУ2) -->
+		<OddRemoval2>route1_0010_42</OddRemoval2>
+		<!-- Четный участок удаления 1 (ЧУ1) -->	
+		<EvenRemoval1>route2_0001_1</EvenRemoval1>
+		<!-- Четный участок удаления 2 (ЧУ2) -->
+		<EvenRemoval2>none</EvenRemoval2>	
+	</Station>
+
+	<Path>
+		<!-- Номер пути (строка!) -->
+		<Number>3</Number>
+		<!-- Траектория в топологии -->
+		<Traj>branch1_0002_2_12_22</Traj>
+		<!-- Признак наличия платформы справа -->
+		<HasRightPlatform>0</HasRightPlatform>
+		<!-- Признак наличия платформы слева -->
+		<HasLeftPlatform>0</HasLeftPlatform>
+		<!-- Признак главного пути -->
+		<IsMain>0</IsMain>
+	</Path>
+
+	<Path>
+		<!-- Номер пути (строка!) -->
+		<Number>1</Number>
+		<!-- Траектория в топологии -->
+		<Traj>route1_0005_13</Traj>
+		<!-- Признак наличия платформы справа -->
+		<HasRightPlatform>0</HasRightPlatform>
+		<!-- Признак наличия платформы слева -->
+		<HasLeftPlatform>0</HasLeftPlatform>
+		<!-- Признак главного пути -->
+		<IsMain>1</IsMain>
+	</Path>
+
+	<Path>
+		<!-- Номер пути (строка!) -->
+		<Number>2</Number>
+		<!-- Траектория в топологии -->
+		<Traj>route2_0005_13</Traj>
+		<!-- Признак наличия платформы справа -->
+		<HasRightPlatform>0</HasRightPlatform>
+		<!-- Признак наличия платформы слева -->
+		<HasLeftPlatform>0</HasLeftPlatform>
+		<!-- Признак главного пути -->
+		<IsMain>1</IsMain>
+	</Path>
+
+	<Path>
+		<!-- Номер пути (строка!) -->
+		<Number>4</Number>
+		<!-- Траектория в топологии -->
+		<Traj>branch1_0001_2_x12_x22</Traj>
+		<!-- Признак наличия платформы справа -->
+		<HasRightPlatform>0</HasRightPlatform>
+		<!-- Признак наличия платформы слева -->
+		<HasLeftPlatform>0</HasLeftPlatform>
+		<!-- Признак главного пути -->
+		<IsMain>0</IsMain>
+	</Path>
+
+</Config>
