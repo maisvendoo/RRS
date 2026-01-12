@@ -52,5 +52,31 @@
 		<ModelShift>0.0 0.0 0.317</ModelShift>
 		<AnimationsConfigDir>vl60</AnimationsConfigDir>
 	</Model>
+<!-- Закомментировал, пока не реализовано в коде
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>0.8 -2.95 0.312</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
 
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>0.8 7.45 0.312</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>-0.8 -7.45 0.312</ModelShift>
+		<ModelRotate>0.0 0.0 180.0</ModelRotate>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>-0.8 2.95 0.312</ModelShift>
+		<ModelRotate>0.0 0.0 180.0</ModelRotate>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+-->
 </Config>

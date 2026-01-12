@@ -54,27 +54,27 @@
 	</Model>
 
 	<Model>
-		<ModelName>default-objects/Brake_show.gltf</ModelName>
-		<ModelShift>0.8 -9.92 0.312</ModelShift>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>0.8 -9.905 0.312</ModelShift>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
 
 	<Model>
-		<ModelName>default-objects/Brake_show.gltf</ModelName>
-		<ModelShift>0.8 7.47 0.312</ModelShift>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>0.8 7.495 0.312</ModelShift>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
 
 	<Model>
-		<ModelName>default-objects/Brake_show.gltf</ModelName>
-		<ModelShift>-0.8 9.92 0.312</ModelShift>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>-0.8 9.905 0.312</ModelShift>
 		<ModelRotate>0.0 0.0 180.0</ModelRotate>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
 
 	<Model>
-		<ModelName>default-objects/Brake_show.gltf</ModelName>
-		<ModelShift>-0.8 -7.47 0.312</ModelShift>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>-0.8 -7.495 0.312</ModelShift>
 		<ModelRotate>0.0 0.0 180.0</ModelRotate>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
