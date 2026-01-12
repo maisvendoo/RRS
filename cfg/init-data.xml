@@ -20,7 +20,8 @@
 
 		<DebugPrint>0</DebugPrint>
 
-		<LuaDebug>1</LuaDebug>
+		<!-- Интегрированный отладчик Lua-скриптов -->
+		<LuaDebug>0</LuaDebug>
 
 	</InitData>
 </Config>
