@@ -1,4 +1,7 @@
 #include    <lua-debugger.h>
+#include    <filesystem.h>
+#include    <Journal.h>
+#include    <JournalFile.h>
 #include    <QString>
 
 //------------------------------------------------------------------------------
@@ -22,7 +25,30 @@ LuaDebugger::~LuaDebugger()
 //------------------------------------------------------------------------------
 void LuaDebugger::init(sol::state &lua)
 {
+    init_trace_journal();
     install_hook(lua);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void LuaDebugger::init_trace_journal()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString path = QString(fs.combinePath(fs.getLogsDir(), "lua-trace.log").c_str());
+
+    Journal::instance(LOG_INSTANCE)->addStorage( new JournalFile(path, JournalLevel::All) );
+
+    QString line = "";
+
+    for (int i = 0; i < 80; ++i)
+        line += "=";
+
+    Journal::instance(LOG_INSTANCE)->message(" ");
+    Journal::instance(LOG_INSTANCE)->message(line);
+    Journal::instance(LOG_INSTANCE)->message("Started new Lua debug session");
+    Journal::instance(LOG_INSTANCE)->message("Journal subsystem is initialized successfully");
+    Journal::instance(LOG_INSTANCE)->message(line);
 }
 
 //------------------------------------------------------------------------------
@@ -69,9 +95,7 @@ void LuaDebugger::debug_hook(lua_State *L, lua_Debug *ar)
                       .arg(ar->currentline)
                       .arg(ar->name ? ar->name : "anonymous");
 
-    Logger logger;
-
-    logger.log_msg(msg.toStdString());
+    Journal::instance(LOG_INSTANCE)->info(msg);
 
     if (ar->event == LUA_HOOKCALL)
         call_depth++;
