@@ -825,6 +825,8 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::resetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
 
+    connect(tcp_server, &TcpServer::sigRenameTrain, this, &Model::slotRenameTrainInModel);
+
     Journal::instance()->info("TCP server is initialized successfully");
 }
 
