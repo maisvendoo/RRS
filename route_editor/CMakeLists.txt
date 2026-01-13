@@ -88,7 +88,6 @@ target_link_libraries(${TARGET}
 
 target_include_directories(${TARGET}
     PRIVATE
-        ../simulator/topology/include
         ../simulator/vehicle/include
         ../common-headers
 )
