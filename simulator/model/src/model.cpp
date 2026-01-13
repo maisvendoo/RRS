@@ -317,7 +317,10 @@ void Model::findNearestVehicles()
                                               .arg(fd.from_head ? "head" : "tail")
                                               .arg(train_idx)
                                               .arg((train_dir == dir_it) ? "head" : "tail"));
+                // Новый сцеп
                 trains[fd.train_idx]->couple(current_distance, fd.from_head, (train_dir == dir_it), train);
+                // Сбрасываем имя поезда
+                trains[fd.train_idx]->setName("");
 
                 // Поезд прицеплен и больше не нужен, запоминаем его чтобы удалить
                 trains_idx_to_delete.push_back(train_idx);
