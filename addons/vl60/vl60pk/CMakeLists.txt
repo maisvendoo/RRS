@@ -25,7 +25,7 @@ file (GLOB EQP_INCLUDES "../vl60-equipment/include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 file (GLOB EQP_SOURCES "../vl60-equipment/src/*.cpp")
 
-# Компиляция библиотеке
+# Компиляция библиотеки
 add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES} ${EQP_SOURCES} ${EQP_INCLUDES})
 
 # Указываем пути поиска заголовков

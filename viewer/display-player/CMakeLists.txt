@@ -22,7 +22,7 @@ find_package(Qt6 COMPONENTS OpenGL REQUIRED)
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
-# Компиляция библиотеке
+# Компиляция библиотеки
 add_executable (${TARGET} ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков

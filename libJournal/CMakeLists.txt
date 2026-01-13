@@ -27,7 +27,7 @@ if(WIN32)
     file (GLOB C_SOURCES "./src/*.c")
 endif()
 
-# Компиляция библиотеке
+# Компиляция библиотеки
 add_library (${TARGET} SHARED ${CPP_SOURCES} ${C_SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков

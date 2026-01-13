@@ -28,7 +28,7 @@ find_package(Qt6 COMPONENTS SerialBus REQUIRED)
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
-# Компиляция библиотеке
+# Компиляция библиотеки
 add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков

@@ -28,7 +28,7 @@ find_package(OpenAL REQUIRED CONFIG)
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
-# Компиляция библиотеке
+# Компиляция библиотеки
 add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
