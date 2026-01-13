@@ -155,10 +155,19 @@ std::string FileSystem::getThemeDir() const
 //------------------------------------------------------------------------------
 std::string FileSystem::combinePath(const std::string &path1, const std::string &path2) const
 {
-    if (*(path1.end() - 1) != separator())
+    if (path1.empty())
+    {
+        return path2;
+    }
+
+    if (path1.back() != separator())
+    {
         return getNativePath(path1 + separator() + path2);
+    }
     else
+    {
         return getNativePath(path1 + path2);
+    }
 }
 
 //------------------------------------------------------------------------------
