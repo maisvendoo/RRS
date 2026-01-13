@@ -18,7 +18,9 @@ public:
 
     QMenu *menu = nullptr;
 
-    QAction *rename_train = nullptr;
+    QAction *action_rename = nullptr;
+
+    int first_vehicle_idx = 0;
 
 signals:
 

@@ -125,6 +125,8 @@ void MapWidget::paintEvent(QPaintEvent *event)
 
     drawTrain(train_data);
 
+    drawTrainNames(train_data);
+
     drawConnectors(conn_list);
 
     drawSignals(signals_data);
@@ -215,6 +217,26 @@ void MapWidget::drawTrain(simulator_update_pos_t *train_data)
             }
         }
         drawVehicle(train_data->vehicles[i], vehicles_half_length->at(i), color);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::drawTrainNames(simulator_update_pos_t *train_data)
+{
+    for (auto tl : train_labels)
+    {
+        auto vehicle = train_data->vehicles[tl->first_vehicle_idx];
+
+        dvec3 v_pos;
+        v_pos.x = vehicle.position_x;
+        v_pos.y = vehicle.position_y;
+        v_pos.z = 0.0;
+        QPoint text_point = coord_transform(v_pos);
+
+        tl->move(text_point);
+        tl->show();
     }
 }
 

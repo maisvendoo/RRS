@@ -11,6 +11,7 @@
 #include    <switch-label.h>
 #include    <signals-data-types.h>
 #include    <signal-label.h>
+#include    <train-label.h>
 
 const int link_line_height = 22;
 
@@ -48,6 +49,8 @@ public:
     QMap<QString, SignalLabel *> signal_labels_bwd;
 
     QMap<QString, QLabel *> traj_labels;
+
+    std::vector<TrainLabel *> train_labels;
 
     void resize(int width, int height);
 
@@ -120,6 +123,8 @@ private:
     void drawTrajectory(Trajectory *traj);
 
     void drawTrain(simulator_update_pos_t *train_data);
+
+    void drawTrainNames(simulator_update_pos_t *train_data);
 
     void drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length, QColor color);
 

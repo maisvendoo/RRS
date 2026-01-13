@@ -452,9 +452,8 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
                             static_cast<double>(vehicles_pos_update_interval) / 1000.0);
     ui->ptLog->appendPlainText(tr("Send request for continuous vehicles update"));
 
-    // Запрос серверу на регулярное обновление состояния ПЕ
-    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE,
-                            static_cast<double>(vehicles_pos_update_interval) / 1000.0);
+
+    //tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, 10.0);
 }
 
 //------------------------------------------------------------------------------
@@ -662,5 +661,19 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
     simulator_update_t update_data;
     update_data.deserialize(data);
 
+    for (auto tl : map->train_labels)
+    {
+        delete tl;
+    }
 
+    map->train_labels.clear();
+
+    for (size_t i = 0; i < update_data.trains.size(); ++i)
+    {
+        TrainLabel *train_label = new TrainLabel(map);
+        train_label->setText(update_data.trains[i].train_name);
+        train_label->first_vehicle_idx = update_data.trains[i].first_vehicle_id;
+
+        map->train_labels.push_back(train_label);
+    }
 }
