@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.23)
+
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET vehicle)
@@ -27,21 +29,37 @@ find_package(Qt6 COMPONENTS Xml REQUIRED)
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
-# Компиляция библиотеки
-add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
+# # Компиляция библиотеки
+# add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
+
+add_library(${TARGET} SHARED)
+
+# TODO: Separate private and public headers
+target_sources(${TARGET}
+    PRIVATE
+        ${SOURCES}
+
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS
+            include
+        FILES
+            ${INCLUDES}
+)
 
 # Указываем пути поиска заголовков
-target_include_directories (${TARGET} PRIVATE ./include/)
+# target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 
+# TODO: Could link PRIVATE?
 # Компонуемся с библиотеками Qt6
-target_link_libraries (${TARGET} Qt6::Xml)
+target_link_libraries (${TARGET} PUBLIC Qt6::Xml)
 # и со своими не забываем
-target_link_libraries (${TARGET} CfgReader)
-target_link_libraries (${TARGET} device)
-target_link_libraries (${TARGET} Journal)
-target_link_libraries (${TARGET} physics)
+target_link_libraries (${TARGET} PUBLIC CfgReader)
+target_link_libraries (${TARGET} PUBLIC device)
+target_link_libraries (${TARGET} PUBLIC Journal)
+target_link_libraries (${TARGET} PUBLIC physics)
 
 #if (WIN32)
 
