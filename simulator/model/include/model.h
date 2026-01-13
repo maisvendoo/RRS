@@ -207,6 +207,8 @@ private:
 
     void controlStep();
 
+    void server_update_trains_info();
+
 private slots:
 
     void process();

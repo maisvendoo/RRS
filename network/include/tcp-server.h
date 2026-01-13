@@ -37,7 +37,9 @@ public:
 
     void updateVehiclesState(QByteArray vehicles_state, double t);
 
-    void updateVehicleControlled(QByteArray vehicles_state, int client_id, double t);    
+    void updateVehicleControlled(QByteArray vehicles_state, int client_id, double t);
+
+    void updateTrainsInfo();
 
 signals:
 
@@ -55,7 +57,7 @@ signals:
 
     void resetVehicleControl(int client_id);
 
-    void sigRenameTrain(int train_idx, QString new_name);
+    void sigRenameTrain(int train_idx, QString new_name);    
 
 private:
 
@@ -78,6 +80,8 @@ private:
     QSet<QTcpSocket*> clients_for_vehicles_updates;
 
     QSet<QTcpSocket*> clients_for_vehicle_controlled_updates;
+
+    QSet<QTcpSocket*> clients_for_train_info_updates;
 
     QByteArray route_info;
 

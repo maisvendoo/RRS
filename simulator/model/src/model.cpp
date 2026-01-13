@@ -991,6 +991,15 @@ void Model::controlStep()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::server_update_trains_info()
+{
+    prepareFeedBack();
+    tcp_server->updateTrainsInfo();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::process()
 {
     // Проверяем, если в счётчике ещё нет отрицательного значения,
@@ -1168,4 +1177,6 @@ void Model::slotRenameTrainInModel(int train_idx, QString new_name)
     trains[t_idx]->setName(new_name.toStdString());
 
     Journal::instance()->info(QString("Rename train: Train %1 has new name %2").arg(t_idx, 4).arg(new_name));
+
+    server_update_trains_info();
 }

@@ -239,6 +239,9 @@ void TcpServer::process_client_request(client_data_t &client_data)
 
         Journal::instance()->info(QString("Received trains info request for #%1").arg(client_data.id));
 
+        // Добавляем, чтобы потом из модели разослать всем кому нужно
+        // при обновлении инфы
+        clients_for_train_info_updates.insert(client_data.socket);
         send_trains_info(client_data);
 
         break;
@@ -394,6 +397,7 @@ void TcpServer::slotClientDisconnected()
         clients_for_vehicles_pos_updates.remove(socket);
         clients_for_vehicles_updates.remove(socket);
         clients_for_vehicle_controlled_updates.remove(socket);
+        clients_for_train_info_updates.remove(socket);
 
         emit resetVehicleControl(client_data->id);
 
@@ -627,5 +631,21 @@ void TcpServer::updateVehicleControlled(QByteArray vehicles_state, int client_id
             client_socket->write(net_data.serialize());
             client_socket->flush();
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::updateTrainsInfo()
+{
+    network_data_t net_data;
+    net_data.stype = STYPE_UPDATE_TRAINS_INFO;
+    net_data.data = vehicles_state;
+
+    for (auto client_socket : clients_for_train_info_updates)
+    {
+        client_socket->write(net_data.serialize());
+        client_socket->flush();
     }
 }
