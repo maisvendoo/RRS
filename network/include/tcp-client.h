@@ -73,6 +73,8 @@ signals:
 
     void setVehiclesInfo(QByteArray &vehicles_info);
 
+    void setTrainInfo(QByteArray &data);
+
     void setVehiclesPositions(QByteArray &vehicles_pos);
 
     void setVehiclesData(QByteArray &vehicles_data);
@@ -80,8 +82,6 @@ signals:
     void setVehicleControlled(QByteArray &vehicle_controlled);
 
     void sendLogMessage(QString msg);
-
-    void sigSetTrainInfo(QByteArray &data);
 
 private:
 
