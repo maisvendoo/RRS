@@ -31,7 +31,6 @@ add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES} ${EQP_SOURCES} ${EQP_INCLUD
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../vl60-equipment/include/)
-target_include_directories (${TARGET} PRIVATE ../../../CfgReader/include)
 target_include_directories (${TARGET} PRIVATE ../../../common-headers)
 target_include_directories (${TARGET} PRIVATE ../../../simulator/solver/include)
 target_include_directories (${TARGET} PRIVATE ../../../simulator/physics/include)

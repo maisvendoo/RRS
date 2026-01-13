@@ -38,7 +38,6 @@ target_include_directories(${TARGET} PRIVATE
     ../simulator/vehicle/include
     ../common-headers
     ../filesystem/include
-    ../CfgReader/include
     ../network/include
     ../sound-manager/include
     display/include

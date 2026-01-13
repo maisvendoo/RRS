@@ -91,7 +91,6 @@ target_include_directories(${TARGET}
         ../simulator/topology/include
         ../simulator/vehicle/include
         ../simulator/solver/include
-        ../CfgReader/include
         ../filesystem/include
         ../common-headers
         ../simulator/physics/include
