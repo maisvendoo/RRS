@@ -49,7 +49,6 @@ target_sources(${TARGET}
 
 # Указываем пути поиска заголовков
 # target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../physics/include)
 target_include_directories (${TARGET} PRIVATE ../solver/include)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)

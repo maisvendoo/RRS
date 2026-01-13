@@ -33,7 +33,6 @@ add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../physics/include)
 target_include_directories (${TARGET} PRIVATE ../solver/include)
 
 # Компонуемся с библиотеками Qt6

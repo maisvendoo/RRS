@@ -30,7 +30,6 @@ add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../../common-headers)
 target_include_directories (${TARGET} PRIVATE ../../../simulator/solver/include)
-target_include_directories (${TARGET} PRIVATE ../../../simulator/physics/include)
 target_include_directories (${TARGET} PRIVATE ../../../simulator/vehicle/include)
 
 # Компонуемся с библиотеками Qt6

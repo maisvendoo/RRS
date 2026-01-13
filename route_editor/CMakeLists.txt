@@ -92,7 +92,6 @@ target_include_directories(${TARGET}
         ../simulator/vehicle/include
         ../simulator/solver/include
         ../common-headers
-        ../simulator/physics/include
 )
 
 if(MSVC)
