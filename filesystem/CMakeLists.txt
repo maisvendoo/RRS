@@ -18,7 +18,7 @@ set (LIBRARY_OUTPUT_PATH "../../lib")
 # Указываем не добавлять к имени бинарника никаких префиксов
 set (CMAKE_SHARED_LIBRARY_PREFIX "")
 
-# Опеределяем дефайн FILESYSTEM_LIB для корректного
+# Определяем дефайн FILESYSTEM_LIB для корректного
 # экспорта и импорта классов из DLL
 add_definitions(-DFILESYSTEM_LIB)
 

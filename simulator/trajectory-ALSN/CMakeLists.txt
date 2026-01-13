@@ -5,11 +5,11 @@ set (TARGET trajectory-ALSN)
 # Задаем имя проекта
 project (${TARGET})
 
-# Опеределяем дефайн TRAJECTORY_ALSN_LIB для корректного
+# Определяем дефайн TRAJECTORY_ALSN_LIB для корректного
 # экспорта и импорта классов из DLL
 add_definitions(-DTRAJECTORY_ALSN_LIB)
 
-# Qt-шное барахло для запуска метообъектного компилятора
+# Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
