@@ -649,9 +649,9 @@ void MainWindow::slotSetShowTrajStatus(bool is_show)
     map->showTrajNames(is_show);
 
     if (is_show)
-        slotRecvLogMessage("Showed traj names");
+        slotRecvLogMessage(tr("Showed traj names"));
     else
-        slotRecvLogMessage("Hided traj names");
+        slotRecvLogMessage(tr("Hided traj names"));
 }
 
 //------------------------------------------------------------------------------
