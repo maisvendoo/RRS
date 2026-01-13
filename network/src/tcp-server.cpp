@@ -637,7 +637,7 @@ void TcpServer::updateVehicleControlled(QByteArray vehicles_state, int client_id
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpServer::updateTrainsInfo()
+void TcpServer::updateTrainsInfo(QByteArray vehicles_state)
 {
     network_data_t net_data;
     net_data.stype = STYPE_UPDATE_TRAINS_INFO;

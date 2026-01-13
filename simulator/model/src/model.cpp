@@ -994,7 +994,7 @@ void Model::controlStep()
 void Model::server_update_trains_info()
 {
     prepareFeedBack();
-    tcp_server->updateTrainsInfo();
+    tcp_server->updateTrainsInfo(update_data.serialize());
 }
 
 //------------------------------------------------------------------------------

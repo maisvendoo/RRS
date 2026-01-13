@@ -39,7 +39,7 @@ public:
 
     void updateVehicleControlled(QByteArray vehicles_state, int client_id, double t);
 
-    void updateTrainsInfo();
+    void updateTrainsInfo(QByteArray vehicles_state);
 
 signals:
 
