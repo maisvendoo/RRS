@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.23)
+
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET filesystem)
@@ -5,7 +7,7 @@ set (TARGET filesystem)
 # Задаем имя проекта
 project (${TARGET})
 
-# Qt-шное барахло для запуска метообъектного компилятора
+# Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -16,25 +18,40 @@ set (LIBRARY_OUTPUT_PATH "../../lib")
 # Указываем не добавлять к имени бинарника никаких префиксов
 set (CMAKE_SHARED_LIBRARY_PREFIX "")
 
-# Опеределяем дефайн CFG_READER_LIB для корректного
-# экспорта и импорта слассов из DLL
+# Опеределяем дефайн FILESYSTEM_LIB для корректного
+# экспорта и импорта классов из DLL
 add_definitions(-DFILESYSTEM_LIB)
 
 # Ищем зависимости Qt6
 find_package(Qt6 COMPONENTS Core REQUIRED)
 
-# Пути к заголовкам и сорцам
-file (GLOB INCLUDES "./include/*.h")
-file (GLOB SOURCES "./src/*.cpp")
+# # Пути к заголовкам и сорцам
+# file (GLOB INCLUDES "./include/*.h")
+# file (GLOB SOURCES "./src/*.cpp")
 
-# Компиляция библиотеке
-add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
+# # Компиляция библиотеки
+# add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
-# Указываем пути поиска заголовков
-target_include_directories (${TARGET} PRIVATE ./include/)
+# # Указываем пути поиска заголовков
+# target_include_directories (${TARGET} PRIVATE ./include/)
 
+add_library(${TARGET} SHARED)
+
+target_sources(${TARGET}
+    PRIVATE
+        src/filesystem.cpp
+
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS
+            include
+        FILES
+            include/filesystem.h
+)
+
+# TODO: Could link PRIVATE?
 # Компонуемся с библиотеками Qt6
-target_link_libraries (${TARGET} Qt6::Core)
+target_link_libraries (${TARGET} PUBLIC Qt6::Core)
 
 #if (WIN32)
 
@@ -60,7 +77,8 @@ target_link_libraries (${TARGET} Qt6::Core)
     install(FILES "${TARGET}Config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}ConfigVersion.cmake"
         DESTINATION sdk/lib/cmake/${TARGET})
 
-    install(FILES ${INCLUDES} DESTINATION sdk/include)
+    # install(FILES ${INCLUDES} DESTINATION sdk/include)
+    install(FILES include/filesystem.h DESTINATION sdk/include)
 
 #else()
 
