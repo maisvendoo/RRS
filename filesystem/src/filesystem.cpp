@@ -153,7 +153,7 @@ std::string FileSystem::getThemeDir() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::combinePath(const std::string &path1, const std::string &path2)
+std::string FileSystem::combinePath(const std::string &path1, const std::string &path2) const
 {
     if (*(path1.end() - 1) != separator())
         return getNativePath(path1 + separator() + path2);
@@ -164,7 +164,7 @@ std::string FileSystem::combinePath(const std::string &path1, const std::string 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::toNativeSeparators(const std::string &path)
+std::string FileSystem::toNativeSeparators(const std::string &path) const
 {
     std::string tmp = path;
 
@@ -180,7 +180,7 @@ std::string FileSystem::toNativeSeparators(const std::string &path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::getNativePath(const std::string &path)
+std::string FileSystem::getNativePath(const std::string &path) const
 {
     return QDir::toNativeSeparators(QString(path.c_str())).toStdString();
 }
@@ -196,7 +196,7 @@ char FileSystem::separator() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::getLevelUpDirectory(std::string path, int num_levels)
+std::string FileSystem::getLevelUpDirectory(std::string path, int num_levels) const
 {
     QDir dir(QString(path.c_str()));
 
