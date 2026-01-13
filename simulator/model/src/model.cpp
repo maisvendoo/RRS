@@ -377,6 +377,8 @@ void Model::findNearestVehicles()
         // Те же индексы сообщаем менеджеру сценариев
         scnmgr->setTrainIndex(train_idx);
     }
+
+    server_update_trains_info();
 }
 
 //------------------------------------------------------------------------------
@@ -397,9 +399,7 @@ void Model::findFarthestVehicles()
             // Добавляем наш новый поезд в контекст менеджера сценариев
             scenario_train_data_t scn_train;
             scn_train.setIndex(uncoupled_train->getTrainIndex());
-            scnmgr->addNewTrain(scn_train);
-
-            server_update_trains_info();
+            scnmgr->addNewTrain(scn_train);            
 
             QThread *thread = new QThread();
             train_threads.push_back(thread);
@@ -412,6 +412,8 @@ void Model::findFarthestVehicles()
             thread->start();
         }
     }
+
+    server_update_trains_info();
 }
 
 //------------------------------------------------------------------------------
