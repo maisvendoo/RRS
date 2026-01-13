@@ -41,7 +41,6 @@ target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../physics/include)
 target_include_directories (${TARGET} PRIVATE ../solver/include)
 target_include_directories (${TARGET} PRIVATE ../device/include)
-target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 
 # Компонуемся с библиотеками Qt6

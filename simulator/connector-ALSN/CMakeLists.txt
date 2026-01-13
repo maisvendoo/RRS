@@ -34,7 +34,6 @@ target_include_directories (${TARGET} PRIVATE ../device/include)
 target_include_directories (${TARGET} PRIVATE ../vehicle/include)
 target_include_directories (${TARGET} PRIVATE ../topology/include)
 target_include_directories (${TARGET} PRIVATE ../trajectory-ALSN/include)
-target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 
 # Компонуемся с библиотеками Qt6

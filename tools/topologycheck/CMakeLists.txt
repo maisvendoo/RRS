@@ -27,7 +27,6 @@ add_executable (${TARGET} ${SOURCES} ${INCLUDES})
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
-target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 #target_include_directories (${TARGET} PRIVATE ../../CfgEditor/include)
 target_include_directories (${TARGET} PRIVATE ../../simulator/physics/include)
 target_include_directories (${TARGET} PRIVATE ../../simulator/vehicle/include)
