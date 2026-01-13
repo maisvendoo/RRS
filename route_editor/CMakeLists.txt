@@ -90,7 +90,6 @@ target_include_directories(${TARGET}
     PRIVATE
         ../simulator/topology/include
         ../simulator/vehicle/include
-        ../simulator/solver/include
         ../common-headers
 )
 

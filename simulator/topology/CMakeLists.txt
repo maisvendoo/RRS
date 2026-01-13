@@ -34,7 +34,6 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 target_include_directories (${TARGET} PRIVATE ../vehicle/include)
-target_include_directories (${TARGET} PRIVATE ../solver/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 
 # Компонуемся с библиотеками Qt6

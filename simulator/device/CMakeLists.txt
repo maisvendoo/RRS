@@ -49,7 +49,6 @@ target_sources(${TARGET}
 
 # Указываем пути поиска заголовков
 # target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../solver/include)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 
@@ -60,6 +59,7 @@ target_link_libraries (${TARGET} PUBLIC CfgReader)
 target_link_libraries (${TARGET} PUBLIC filesystem)
 target_link_libraries (${TARGET} PUBLIC Journal)
 target_link_libraries (${TARGET} PUBLIC physics)
+target_link_libraries (${TARGET} PUBLIC solver)
 
 #if (WIN32)
 
