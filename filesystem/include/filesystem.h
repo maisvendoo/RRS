@@ -63,6 +63,12 @@ public:
 
     std::string combinePath(const std::string &path1, const std::string &path2) const;
 
+    template <typename... Args>
+    std::string combinePath(const std::string& path1, const std::string& path2, Args&... args) const
+    {
+        return combinePath(combinePath(path1, path2), args...);
+    }
+
     std::string toNativeSeparators(const std::string &path) const;
 
     /// Get native path separator
