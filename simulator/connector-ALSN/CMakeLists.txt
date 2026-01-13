@@ -28,7 +28,6 @@ add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../vehicle/include)
 target_include_directories (${TARGET} PRIVATE ../trajectory-ALSN/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 

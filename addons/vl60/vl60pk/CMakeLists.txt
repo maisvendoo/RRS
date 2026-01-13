@@ -32,7 +32,6 @@ add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES} ${EQP_SOURCES} ${EQP_INCLUD
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../vl60-equipment/include/)
 target_include_directories (${TARGET} PRIVATE ../../../common-headers)
-target_include_directories (${TARGET} PRIVATE ../../../simulator/vehicle/include)
 target_include_directories (${TARGET} PRIVATE ../../../libJournal/include)
 
 # Компонуемся с библиотеками Qt6

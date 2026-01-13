@@ -27,7 +27,6 @@ add_executable (${TARGET} ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../../simulator/vehicle/include)
 target_include_directories (${TARGET} PRIVATE ../display/include)
 
 # Компонуемся с библиотеками Qt6

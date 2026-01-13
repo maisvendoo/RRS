@@ -35,7 +35,6 @@ target_link_libraries(${TARGET} PRIVATE
 )
 
 target_include_directories(${TARGET} PRIVATE
-    ../simulator/vehicle/include
     ../common-headers
     ../network/include
     ../sound-manager/include
