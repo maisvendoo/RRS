@@ -81,6 +81,8 @@ signals:
 
     void sendLogMessage(QString msg);
 
+    void sigSetTrainInfo(QByteArray &data);
+
 private:
 
     QTcpSocket *socket = nullptr;

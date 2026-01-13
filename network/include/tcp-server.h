@@ -37,7 +37,7 @@ public:
 
     void updateVehiclesState(QByteArray vehicles_state, double t);
 
-    void updateVehicleControlled(QByteArray vehicles_state, int client_id, double t);
+    void updateVehicleControlled(QByteArray vehicles_state, int client_id, double t);    
 
 signals:
 
@@ -85,6 +85,8 @@ private:
 
     QByteArray recvBuff;
 
+    QByteArray vehicles_state;
+
     qsizetype wait_data_size = 0;
 
     bool is_first_data = true;
@@ -104,6 +106,8 @@ private:
     //void send_signals_state(client_data_t &client_data);
 
     void send_vehicles_info(client_data_t &client_data);
+
+    void send_trains_info(client_data_t &client_data);
 
 public slots:
 

@@ -53,7 +53,7 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(ui->actionShowTrajName, &QAction::triggered,
             this, &MainWindow::slotSetShowTrajStatus);
 
-    connect(tcp_client, &TcpClient::setVehiclesData,
+    connect(tcp_client, &TcpClient::sigSetTrainInfo,
             this, &MainWindow::slotGetTrainsInfo);
 
     map = new MapWidget(ui->Map);
@@ -453,7 +453,7 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     ui->ptLog->appendPlainText(tr("Send request for continuous vehicles update"));
 
 
-    //tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, 10.0);
+    tcp_client->sendRequest(STYPE_REQUEST_UPDATE_TRAINS_INFO);
 }
 
 //------------------------------------------------------------------------------
@@ -671,6 +671,8 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
     for (size_t i = 0; i < update_data.trains.size(); ++i)
     {
         TrainLabel *train_label = new TrainLabel(map);
+        train_label->setAlignment(Qt::AlignHCenter);
+        train_label->setStyleSheet("color: white;");
         train_label->setText(update_data.trains[i].train_name);
         train_label->first_vehicle_idx = update_data.trains[i].first_vehicle_id;
 

@@ -50,7 +50,10 @@ enum StructureType
     STYPE_VEHICLES_STATE_UPDATE,
     STYPE_VEHICLE_CONTROLLED_UPDATE,
 
-    STYPE_COMMAND_RENAME_TRAIN
+    STYPE_COMMAND_RENAME_TRAIN,
+
+    STYPE_UPDATE_TRAINS_INFO,
+    STYPE_REQUEST_UPDATE_TRAINS_INFO
 };
 
 //------------------------------------------------------------------------------

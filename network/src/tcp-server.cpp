@@ -233,6 +233,17 @@ void TcpServer::process_client_request(client_data_t &client_data)
         break;
     }
 
+    case STYPE_REQUEST_UPDATE_TRAINS_INFO:
+    {
+        client_data.received_data.data.clear();
+
+        Journal::instance()->info(QString("Received trains info request for #%1").arg(client_data.id));
+
+        send_trains_info(client_data);
+
+        break;
+    }
+
     case STYPE_EMPTY_DATA:
     default:
 
@@ -293,6 +304,19 @@ void TcpServer::send_vehicles_info(client_data_t &client_data)
     network_data_t net_data;
     net_data.stype = STYPE_VEHICLES_INFO;
     net_data.data = vehicles_info;
+
+    client_data.socket->write(net_data.serialize());
+    client_data.socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::send_trains_info(client_data_t &client_data)
+{
+    network_data_t net_data;
+    net_data.stype = STYPE_UPDATE_TRAINS_INFO;
+    net_data.data = vehicles_state;
 
     client_data.socket->write(net_data.serialize());
     client_data.socket->flush();
@@ -555,6 +579,9 @@ void TcpServer::updateVehiclesState(QByteArray vehicles_state, double t)
     network_data_t net_data;
     net_data.stype = STYPE_VEHICLES_STATE_UPDATE;
     net_data.data = vehicles_state;
+
+    // Сохраняем эти данные для выдачи по запросу
+    this->vehicles_state = vehicles_state;
 
     for (auto client_socket : clients_for_vehicles_updates)
     {
