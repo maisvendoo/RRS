@@ -203,7 +203,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
         emit setVehicleControl(client_data.received_data.data, client_data.id);
         break;
     }
-    case STYPE_RENAME_TRAIN:
+    case STYPE_COMMAND_RENAME_TRAIN:
     {
         QBuffer buff(&client_data.received_data.data);
         buff.open(QIODevice::ReadOnly);

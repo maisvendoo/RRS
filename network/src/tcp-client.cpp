@@ -129,7 +129,7 @@ void TcpClient::sendVehicleControl(QByteArray vehicle_control_by_keyboard)
 void TcpClient::sendNewTrainName(int train_idx, const QString &new_name)
 {
     network_data_t request;
-    request.stype = STYPE_RENAME_TRAIN;
+    request.stype = STYPE_COMMAND_RENAME_TRAIN;
 
     QBuffer buff(&request.data);
     buff.open(QIODevice::WriteOnly);

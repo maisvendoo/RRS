@@ -53,6 +53,9 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(ui->actionShowTrajName, &QAction::triggered,
             this, &MainWindow::slotSetShowTrajStatus);
 
+    connect(tcp_client, &TcpClient::setVehiclesData,
+            this, &MainWindow::slotGetTrainsInfo);
+
     map = new MapWidget(ui->Map);
     map->stations = topology->getStationsList();
     map->traj_list = topology->getTrajectoriesList();
@@ -448,6 +451,10 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE,
                             static_cast<double>(vehicles_pos_update_interval) / 1000.0);
     ui->ptLog->appendPlainText(tr("Send request for continuous vehicles update"));
+
+    // Запрос серверу на регулярное обновление состояния ПЕ
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE,
+                            static_cast<double>(vehicles_pos_update_interval) / 1000.0);
 }
 
 //------------------------------------------------------------------------------
@@ -645,4 +652,15 @@ void MainWindow::slotSetShowTrajStatus(bool is_show)
         slotRecvLogMessage("Showed traj names");
     else
         slotRecvLogMessage("Hided traj names");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetTrainsInfo(QByteArray &data)
+{
+    simulator_update_t update_data;
+    update_data.deserialize(data);
+
+
 }

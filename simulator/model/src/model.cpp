@@ -846,6 +846,7 @@ void Model::prepareFeedBack()
     {
         update_data.trains[i].first_vehicle_id = train->getFirstVehicle()->getModelIndex();
         update_data.trains[i].last_vehicle_id = train->getLastVehicle()->getModelIndex();
+        update_data.trains[i].train_name = QString(train->getName().c_str());
 
         ++i;
     }

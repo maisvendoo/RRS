@@ -108,6 +108,8 @@ private slots:
     void slotRecvLogMessage(QString msg);
 
     void slotSetShowTrajStatus(bool is_show);
+
+    void slotGetTrainsInfo(QByteArray& data);
 };
 
 #endif // MAINWINDOW_H

@@ -263,6 +263,7 @@ struct simulator_train_update_t final
 {
     int  first_vehicle_id = 0;
     int  last_vehicle_id = 0;
+    QString train_name = "";
 
     QByteArray serialize() const
     {
@@ -273,7 +274,7 @@ struct simulator_train_update_t final
 
         stream << first_vehicle_id;
         stream << last_vehicle_id;
-        //stream << train_ID;
+        stream << train_name;
         return buff.data();
     }
 
@@ -285,7 +286,7 @@ struct simulator_train_update_t final
 
         stream >> first_vehicle_id;
         stream >> last_vehicle_id;
-        //stream >> train_ID;
+        stream >> train_name;
     }
 };
 
