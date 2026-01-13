@@ -105,6 +105,8 @@ private:
     bool        is_step_correct = true;
     /// Flag is simulation thread started
     bool        is_simulation_started = false;
+    /// Flag is trains changed since previous tcpFeedBack
+    bool        is_trains_changed = true;
     /// Delay for realtime simulation
     int         realtime_delay = 0;
     /// Minimal intergation interval
@@ -113,10 +115,12 @@ private:
     int count_trains_done_its_step = -1;
     int realtime_at_step_begin = 0;
 
+    /// Feedback with vehicles state
+    simulator_trains_update_t   update_trains = simulator_trains_update_t();
     /// Feedback with vehicles positions
     simulator_update_pos_t      update_pos_data = simulator_update_pos_t();
     /// Feedback with vehicles state
-    simulator_update_t          update_data = simulator_update_t();
+    simulator_vehicles_update_t update_vehicles = simulator_vehicles_update_t();
     /// Feedback with player's current and controlled vehicles
     simulator_update_players_t  update_players = simulator_update_players_t();
     /// Vehicle control and feedback with debug message
@@ -200,14 +204,12 @@ private:
     void initTcpServer();
 
     /// Подготовка данных перед передачей серверу для рассылки клиентам
-    void prepareFeedBack();
+    void prepareFeedBack(bool need_trains_feedback);
 
     /// TCP feedback
-    void tcpFeedBack();
+    void tcpFeedBack(bool need_trains_feedback);
 
     void controlStep();
-
-    void server_update_trains_info();
 
 private slots:
 

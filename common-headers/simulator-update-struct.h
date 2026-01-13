@@ -259,6 +259,52 @@ struct simulator_vehicle_update_t final
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct simulator_vehicles_update_t final
+{
+    std::vector<simulator_vehicle_update_t> vehicles;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QBuffer buff(&data);
+        buff.open(QIODevice::WriteOnly);
+        QDataStream stream(&buff);
+
+        stream << static_cast<std::uint32_t>(vehicles.size());
+
+        for (const auto& vehicle : vehicles)
+        {
+            stream << vehicle.serialize();
+        }
+
+        return buff.data();
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QBuffer buff(&data);
+        buff.open(QIODevice::ReadOnly);
+        QDataStream stream(&buff);
+
+        std::uint32_t num;
+        stream >> num;
+
+        vehicles.clear();
+        vehicles.resize(num);
+
+        for (auto& vehicle : vehicles)
+        {
+            QByteArray vehicle_data;
+            stream >> vehicle_data;
+
+            vehicle.deserialize(vehicle_data);
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 struct simulator_train_update_t final
 {
     int  first_vehicle_id = 0;
@@ -293,10 +339,9 @@ struct simulator_train_update_t final
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct simulator_update_t final
+struct simulator_trains_update_t final
 {
     std::vector<simulator_train_update_t> trains;
-    std::vector<simulator_vehicle_update_t> vehicles;
 
     QByteArray serialize() const
     {
@@ -310,13 +355,6 @@ struct simulator_update_t final
         for (const auto& train : trains)
         {
             stream << train.serialize();
-        }
-
-        stream << static_cast<std::uint32_t>(vehicles.size());
-
-        for (const auto& vehicle : vehicles)
-        {
-            stream << vehicle.serialize();
         }
 
         return buff.data();
@@ -340,19 +378,6 @@ struct simulator_update_t final
             stream >> train_data;
 
             train.deserialize(train_data);
-        }
-
-        stream >> num;
-
-        vehicles.clear();
-        vehicles.resize(num);
-
-        for (auto& vehicle : vehicles)
-        {
-            QByteArray vehicle_data;
-            stream >> vehicle_data;
-
-            vehicle.deserialize(vehicle_data);
         }
     }
 };

@@ -39,7 +39,7 @@ public:
 
     void updateVehicleControlled(QByteArray vehicles_state, int client_id, double t);
 
-    void updateTrainsInfo(QByteArray vehicles_state);
+    void updateTrainsInfo(QByteArray trains_state);
 
 signals:
 
@@ -75,21 +75,23 @@ private:
 
     QSet<QTcpSocket*> clients_for_signals_updates;
 
+    QSet<QTcpSocket*> clients_for_trains_updates;
+
     QSet<QTcpSocket*> clients_for_vehicles_pos_updates;
 
     QSet<QTcpSocket*> clients_for_vehicles_updates;
 
     QSet<QTcpSocket*> clients_for_vehicle_controlled_updates;
 
-    QSet<QTcpSocket*> clients_for_train_info_updates;
+    QByteArray recvBuff;
 
     QByteArray route_info;
 
     QByteArray vehicles_info;
 
-    QByteArray recvBuff;
-
     QByteArray vehicles_state;
+
+    QByteArray trains_state;
 
     qsizetype wait_data_size = 0;
 

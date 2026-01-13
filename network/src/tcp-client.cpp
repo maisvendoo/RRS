@@ -234,8 +234,8 @@ void TcpClient::process_received_data(network_data_t &net_data)
         emit setVehicleControlled(net_data.data);
         break;
 
-    case STYPE_UPDATE_TRAINS_INFO:
-        emit sigSetTrainInfo(net_data.data);
+    case STYPE_TRAINS_UPDATE:
+        emit setTrainInfo(net_data.data);
         break;
 
     default:

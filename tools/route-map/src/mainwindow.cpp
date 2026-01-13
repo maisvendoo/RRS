@@ -54,7 +54,7 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(ui->actionShowTrajName, &QAction::triggered,
             this, &MainWindow::slotSetShowTrajStatus);
 
-    connect(tcp_client, &TcpClient::sigSetTrainInfo,
+    connect(tcp_client, &TcpClient::setTrainInfo,
             this, &MainWindow::slotGetTrainsInfo);
 
     map = new MapWidget(ui->Map);
@@ -448,13 +448,15 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     // Запрос серверу на регулярное обновление игроков
     tcp_client->sendRequest(STYPE_REQUEST_PLAYERS_INFO,
                             static_cast<double>(players_update_interval) / 1000.0);
+
+    // Запрос серверу на обновление информации о поездах
+    tcp_client->sendRequest(STYPE_REQUEST_TRAINS_UPDATE);
+
     // Запрос серверу на регулярное обновление положений ПЕ
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE,
                             static_cast<double>(vehicles_pos_update_interval) / 1000.0);
     ui->ptLog->appendPlainText(tr("Send request for continuous vehicles update"));
 
-
-    tcp_client->sendRequest(STYPE_REQUEST_UPDATE_TRAINS_INFO);
 }
 
 //------------------------------------------------------------------------------
@@ -659,8 +661,8 @@ void MainWindow::slotSetShowTrajStatus(bool is_show)
 //------------------------------------------------------------------------------
 void MainWindow::slotGetTrainsInfo(QByteArray &data)
 {
-    simulator_update_t update_data;
-    update_data.deserialize(data);
+    simulator_trains_update_t update_trains;
+    update_trains.deserialize(data);
 
     for (auto tl : map->train_labels)
     {
@@ -669,20 +671,20 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
 
     map->train_labels.clear();
 
-    for (size_t i = 0; i < update_data.trains.size(); ++i)
+    for (size_t i = 0; i < update_trains.trains.size(); ++i)
     {
         TrainLabel *train_label = new TrainLabel(map);
         train_label->setAlignment(Qt::AlignHCenter);
         train_label->setStyleSheet("color: white;");
 
-        QString train_name = update_data.trains[i].train_name;
+        QString train_name = update_trains.trains[i].train_name;
 
         if (!train_name.isEmpty())
             train_label->setText(train_name);
         else
             train_label->setText("0000");
 
-        train_label->first_vehicle_idx = update_data.trains[i].first_vehicle_id;
+        train_label->first_vehicle_idx = update_trains.trains[i].first_vehicle_id;
         train_label->train_idx = i;
 
         connect(train_label, &TrainLabel::popUpMenu, this, &MainWindow::slotRenameTrainMenu);

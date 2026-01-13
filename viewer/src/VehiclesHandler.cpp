@@ -261,13 +261,13 @@ void VehiclesHandler::step(double t, double dt)
 
         if (update_state)
         {
-            vehicles[i].train_id = update_data[new_state].vehicles[i].train_id;
-            vehicles[i].orientation = update_data[new_state].vehicles[i].orientation;
-            vehicles[i].prev_vehicle = update_data[new_state].vehicles[i].prev_vehicle;
-            vehicles[i].next_vehicle = update_data[new_state].vehicles[i].next_vehicle;
+            vehicles[i].train_id = update_vehicles[new_state].vehicles[i].train_id;
+            vehicles[i].orientation = update_vehicles[new_state].vehicles[i].orientation;
+            vehicles[i].prev_vehicle = update_vehicles[new_state].vehicles[i].prev_vehicle;
+            vehicles[i].next_vehicle = update_vehicles[new_state].vehicles[i].next_vehicle;
 
             // Model animations update and step
-            vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), &(update_data[new_state].vehicles[i].analogSignal));
+            vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), &(update_vehicles[new_state].vehicles[i].analogSignal));
 
             // Sounds update
             for (auto sound_id : vehicles[i].sounds_id)
@@ -280,9 +280,9 @@ void VehiclesHandler::step(double t, double dt)
                 sound_manager->setVelocity(sound_id, vehicles[i].velocity.x, vehicles[i].velocity.y, vehicles[i].velocity.z);
 
                 const std::size_t signal_id = sound_manager->getSignalID(sound_id);
-                if (signal_id < update_data[new_state].vehicles[i].analogSignal.size())
+                if (signal_id < update_vehicles[new_state].vehicles[i].analogSignal.size())
                 {
-                    sound_manager->setSoundSignal(sound_id, update_data[new_state].vehicles[i].analogSignal[signal_id]);
+                    sound_manager->setSoundSignal(sound_id, update_vehicles[new_state].vehicles[i].analogSignal[signal_id]);
                 }
                 else
                 {
@@ -318,13 +318,13 @@ bool VehiclesHandler::selectNextTrain() noexcept
     // Переключаем на первый вагон предыдущего поезда
     if (vehicles[cur_vehicle].train_id <= 0)
     {
-        const int new_train_id = update_data[new_state].trains.size() - 1;
-        cur_vehicle = update_data[new_state].trains[new_train_id].first_vehicle_id;
+        const int new_train_id = update_trains.trains.size() - 1;
+        cur_vehicle = update_trains.trains[new_train_id].first_vehicle_id;
     }
     else
     {
         const int new_train_id = vehicles[cur_vehicle].train_id - 1;
-        cur_vehicle = update_data[new_state].trains[new_train_id].first_vehicle_id;
+        cur_vehicle = update_trains.trains[new_train_id].first_vehicle_id;
     }
 
     return (cur_vehicle != prev_cur_vehicle);
@@ -338,14 +338,14 @@ bool VehiclesHandler::selectPrevTrain() noexcept
     const int prev_cur_vehicle = cur_vehicle;
 
     // Переключаем на первый вагон следующего поезда
-    if (static_cast<std::size_t>(vehicles[cur_vehicle].train_id) >= (update_data[new_state].trains.size() - 1))
+    if (static_cast<std::size_t>(vehicles[cur_vehicle].train_id) >= (update_trains.trains.size() - 1))
     {
-        cur_vehicle = update_data[new_state].trains[0].first_vehicle_id;
+        cur_vehicle = update_trains.trains[0].first_vehicle_id;
     }
     else
     {
         const int new_train_id = vehicles[cur_vehicle].train_id + 1;
-        cur_vehicle = update_data[new_state].trains[new_train_id].first_vehicle_id;
+        cur_vehicle = update_trains.trains[new_train_id].first_vehicle_id;
     }
 
     return (cur_vehicle != prev_cur_vehicle);
@@ -367,7 +367,7 @@ bool VehiclesHandler::selectNextVehicle() noexcept
     {
         // С первого вагона переключаемся на последний
         const int cur_train_id = vehicles[cur_vehicle].train_id;
-        cur_vehicle = update_data[new_state].trains[cur_train_id].last_vehicle_id;
+        cur_vehicle = update_trains.trains[cur_train_id].last_vehicle_id;
     }
 
     return (cur_vehicle != prev_cur_vehicle);
@@ -389,7 +389,7 @@ bool VehiclesHandler::selectPrevVehicle() noexcept
     {
         // С последнего вагона переключаемся на первый
         const int cur_train_id = vehicles[cur_vehicle].train_id;
-        cur_vehicle = update_data[new_state].trains[cur_train_id].first_vehicle_id;
+        cur_vehicle = update_trains.trains[cur_train_id].first_vehicle_id;
     }
 
     return (cur_vehicle != prev_cur_vehicle);
@@ -484,6 +484,30 @@ bool VehiclesHandler::load(
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VehiclesHandler::slotGetTrainsData(QByteArray &data)
+{
+    update_trains.deserialize(data);
+
+    QString msg = "";
+    msg += "Trains(";
+    msg += QString::number(update_trains.trains.size());
+    msg += "):";
+    for (size_t i = 0; i < update_trains.trains.size(); ++i)
+    {
+        msg += "\n";
+        msg += update_trains.trains[i].train_name;
+        msg += ":";
+        msg += QString::number(update_trains.trains[i].first_vehicle_id);
+        msg += ",";
+        msg += QString::number(update_trains.trains[i].last_vehicle_id);
+    }
+    LOG_INFO("%s", msg.toStdString().c_str());
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VehiclesHandler::slotGetVehiclesPosData(QByteArray& data)
 {
     current_get_vehicles_pos_data_function(data);
@@ -499,34 +523,24 @@ void VehiclesHandler::slotGetVehiclesStateData(QByteArray& data)
         return;
     }
 
-    update_data[unused_state].deserialize(data);
-    if (update_data[unused_state].vehicles.size() == vehicles.size())
+    update_vehicles[unused_state].deserialize(data);
+    if (update_vehicles[unused_state].vehicles.size() == vehicles.size())
     {
 /*
         QString msg = "";
-        msg += "\nTrains(";
-        msg += QString::number(update_data[unused_state].trains.size());
+        msg += "Vehicles(";
+        msg += QString::number(update_vehicles[unused_state].vehicles.size());
         msg += "):";
-        for (size_t i = 0; i < update_data[unused_state].trains.size(); ++i)
-        {
-            msg += QString::number(update_data[unused_state].trains[i].first_vehicle_id);
-            msg += ",";
-            msg += QString::number(update_data[unused_state].trains[i].last_vehicle_id);
-            msg += "|";
-        }
-        msg += "\nVehicles(";
-        msg += QString::number(update_data[unused_state].vehicles.size());
-        msg += "):";
-        for (size_t i = 0; i < update_data[unused_state].vehicles.size(); ++i)
+        for (size_t i = 0; i < update_vehicles[unused_state].vehicles.size(); ++i)
         {
             msg += "\n(";
-            msg += QString::number(update_data[unused_state].vehicles[i].train_id);
+            msg += QString::number(update_vehicles[unused_state].vehicles[i].train_id);
             msg += ")";
             msg += QString::number(i);
             msg += "(";
-            msg += QString::number(update_data[unused_state].vehicles[i].analogSignal.size());
+            msg += QString::number(update_vehicles[unused_state].vehicles[i].analogSignal.size());
             msg += "):";
-            for (auto s : update_data[unused_state].vehicles[i].analogSignal)
+            for (auto s : update_vehicles[unused_state].vehicles[i].analogSignal)
             {
                 msg += QString::number(s);
                 msg += "|";
@@ -540,7 +554,7 @@ void VehiclesHandler::slotGetVehiclesStateData(QByteArray& data)
     else
     {
         LOG_WARN("Fail to update: get %u states but there are %u vehicles",
-                 update_data[unused_state].vehicles.size(),
+                 update_vehicles[unused_state].vehicles.size(),
                  vehicles.size());
 
         is_state_updated = false;
@@ -692,10 +706,10 @@ void VehiclesHandler::updateDebugString()
 
     const int current = vehicle_controlled.current_vehicle;
     if (current >= 0
-        && static_cast<std::size_t>(current) < update_data[new_state].vehicles.size()
+        && static_cast<std::size_t>(current) < update_vehicles[new_state].vehicles.size()
         && static_cast<std::size_t>(current) < update_pos_data[new_data].vehicles.size())
     {
-        const int current_train = update_data[new_state].vehicles[current].train_id;
+        const int current_train = update_vehicles[new_state].vehicles[current].train_id;
         const auto& new_pos_data = update_pos_data[new_data].vehicles[current];
         debug_message += QString("Данная ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
             .arg(current, 3)
@@ -716,10 +730,10 @@ void VehiclesHandler::updateDebugString()
 
     const int control = vehicle_controlled.controlled_vehicle;
     if (control >= 0
-        && control < update_data[new_state].vehicles.size()
+        && control < update_vehicles[new_state].vehicles.size()
         && control < update_pos_data[new_data].vehicles.size())
     {
-        const int control_train = update_data[new_state].vehicles[control].train_id;
+        const int control_train = update_vehicles[new_state].vehicles[control].train_id;
         const auto& new_pos_data = update_pos_data[new_data].vehicles[control];
         debug_message += QString("\nУправляемая ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
             .arg(control, 3)

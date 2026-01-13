@@ -139,6 +139,19 @@ void TcpServer::process_client_request(client_data_t &client_data)
         send_vehicles_info(client_data);
         break;
     }
+    case STYPE_REQUEST_TRAINS_UPDATE:
+    {
+        client_data.received_data.data.clear();
+
+        Journal::instance()->info(QString("Received trains update request for #%1").arg(client_data.id));
+
+        // Добавляем, чтобы потом из модели разослать всем кому нужно
+        // при обновлении инфы
+        clients_for_trains_updates.insert(client_data.socket);
+        send_trains_info(client_data);
+
+        break;
+    }
     case STYPE_REQUEST_VEHICLES_POS_UPDATE:
     {
         QBuffer buff(&client_data.received_data.data);
@@ -233,20 +246,6 @@ void TcpServer::process_client_request(client_data_t &client_data)
         break;
     }
 
-    case STYPE_REQUEST_UPDATE_TRAINS_INFO:
-    {
-        client_data.received_data.data.clear();
-
-        Journal::instance()->info(QString("Received trains info request for #%1").arg(client_data.id));
-
-        // Добавляем, чтобы потом из модели разослать всем кому нужно
-        // при обновлении инфы
-        clients_for_train_info_updates.insert(client_data.socket);
-        send_trains_info(client_data);
-
-        break;
-    }
-
     case STYPE_EMPTY_DATA:
     default:
 
@@ -318,8 +317,8 @@ void TcpServer::send_vehicles_info(client_data_t &client_data)
 void TcpServer::send_trains_info(client_data_t &client_data)
 {
     network_data_t net_data;
-    net_data.stype = STYPE_UPDATE_TRAINS_INFO;
-    net_data.data = vehicles_state;
+    net_data.stype = STYPE_TRAINS_UPDATE;
+    net_data.data = trains_state;
 
     client_data.socket->write(net_data.serialize());
     client_data.socket->flush();
@@ -397,7 +396,7 @@ void TcpServer::slotClientDisconnected()
         clients_for_vehicles_pos_updates.remove(socket);
         clients_for_vehicles_updates.remove(socket);
         clients_for_vehicle_controlled_updates.remove(socket);
-        clients_for_train_info_updates.remove(socket);
+        clients_for_trains_updates.remove(socket);
 
         emit resetVehicleControl(client_data->id);
 
@@ -637,13 +636,16 @@ void TcpServer::updateVehicleControlled(QByteArray vehicles_state, int client_id
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpServer::updateTrainsInfo(QByteArray vehicles_state)
+void TcpServer::updateTrainsInfo(QByteArray trains_state)
 {
     network_data_t net_data;
-    net_data.stype = STYPE_UPDATE_TRAINS_INFO;
-    net_data.data = vehicles_state;
+    net_data.stype = STYPE_TRAINS_UPDATE;
+    net_data.data = trains_state;
 
-    for (auto client_socket : clients_for_train_info_updates)
+    // Сохраняем эти данные для выдачи по запросу
+    this->trains_state = trains_state;
+
+    for (auto client_socket : clients_for_trains_updates)
     {
         client_socket->write(net_data.serialize());
         client_socket->flush();

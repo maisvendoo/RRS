@@ -381,7 +381,7 @@ void Model::findNearestVehicles()
         scnmgr->setTrainIndex(train_idx);
     }
 
-    server_update_trains_info();
+    is_trains_changed = true;
 }
 
 //------------------------------------------------------------------------------
@@ -413,10 +413,10 @@ void Model::findFarthestVehicles()
             connect(this, &Model::step, uncoupled_train, &Train::slotStep);
             connect(uncoupled_train, &Train::stepDone, this, &Model::slotTrainStepDone);
             thread->start();
+
+            is_trains_changed = true;
         }
     }
-
-    server_update_trains_info();
 }
 
 //------------------------------------------------------------------------------
@@ -840,25 +840,27 @@ void Model::initTcpServer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::prepareFeedBack()
+void Model::prepareFeedBack(bool need_trains_feedback)
 {
-    update_pos_data.vehicles.resize(vehicles.size());
-    update_data.vehicles.resize(vehicles.size());
-    update_data.trains.resize(trains.size());
-
-    update_pos_data.sim_time = sim_time;
-
     int i = 0;
-    for (auto train : trains)
+    if (need_trains_feedback)
     {
-        update_data.trains[i].first_vehicle_id = train->getFirstVehicle()->getModelIndex();
-        update_data.trains[i].last_vehicle_id = train->getLastVehicle()->getModelIndex();
-        update_data.trains[i].train_name = QString(train->getName().c_str());
+        update_trains.trains.resize(trains.size());
+        for (auto train : trains)
+        {
+            update_trains.trains[i].first_vehicle_id = train->getFirstVehicle()->getModelIndex();
+            update_trains.trains[i].last_vehicle_id = train->getLastVehicle()->getModelIndex();
+            update_trains.trains[i].train_name = QString(train->getName().c_str());
 
-        ++i;
+            ++i;
+        }
     }
 
+    update_pos_data.sim_time = sim_time;
+    update_pos_data.vehicles.resize(vehicles.size());
+    update_vehicles.vehicles.resize(vehicles.size());
     i = 0;
+
     for (auto vehicle : vehicles)
     {
         profile_point_t *pp = vehicle->getProfilePoint();
@@ -873,35 +875,35 @@ void Model::prepareFeedBack()
         update_pos_data.vehicles[i].up_y = pp->up.y;
         update_pos_data.vehicles[i].up_z = pp->up.z;
 
-        update_data.vehicles[i].train_id = vehicle->getTrainIndex();
+        update_vehicles.vehicles[i].train_id = vehicle->getTrainIndex();
         int orient = vehicle->getOrientation();
-        update_data.vehicles[i].orientation = orient;
+        update_vehicles.vehicles[i].orientation = orient;
         if (orient == -1)
         {
-            update_data.vehicles[i].next_vehicle =
+            update_vehicles.vehicles[i].next_vehicle =
                 (vehicle->getPrevVehicle() == nullptr) ?
                     -1 :
                     vehicle->getPrevVehicle()->getModelIndex();
 
-            update_data.vehicles[i].prev_vehicle =
+            update_vehicles.vehicles[i].prev_vehicle =
                 (vehicle->getNextVehicle() == nullptr) ?
                     -1 :
                     vehicle->getNextVehicle()->getModelIndex();
         }
         else
         {
-            update_data.vehicles[i].next_vehicle =
+            update_vehicles.vehicles[i].next_vehicle =
                 (vehicle->getNextVehicle() == nullptr) ?
                     -1 :
                     vehicle->getNextVehicle()->getModelIndex();
 
-            update_data.vehicles[i].prev_vehicle =
+            update_vehicles.vehicles[i].prev_vehicle =
                 (vehicle->getPrevVehicle() == nullptr) ?
                     -1 :
                     vehicle->getPrevVehicle()->getModelIndex();
         }
 
-        update_data.vehicles[i].analogSignal = *(vehicle->getAnalogSignals());
+        update_vehicles.vehicles[i].analogSignal = *(vehicle->getAnalogSignals());
 
         ++i;
     }
@@ -936,12 +938,19 @@ void Model::prepareFeedBack()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::tcpFeedBack()
+void Model::tcpFeedBack(bool need_trains_feedback)
 {
+    if (need_trains_feedback)
+    {
+        tcp_server->updateTrainsInfo(update_trains.serialize());
+        update_trains = simulator_trains_update_t();
+    }
     tcp_server->updateVehiclesPos(update_pos_data.serialize(), sim_time.simulation_seconds);
     update_pos_data = simulator_update_pos_t();
-    tcp_server->updateVehiclesState(update_data.serialize(), sim_time.simulation_seconds);
-    update_data = simulator_update_t();
+
+    tcp_server->updateVehiclesState(update_vehicles.serialize(), sim_time.simulation_seconds);
+    update_vehicles = simulator_vehicles_update_t();
+
     tcp_server->updatePlayers(update_players.serialize(), sim_time.simulation_seconds);
     update_players = simulator_update_players_t();
 
@@ -998,15 +1007,6 @@ void Model::controlStep()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::server_update_trains_info()
-{
-    prepareFeedBack();
-    tcp_server->updateTrainsInfo(update_data.serialize());
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Model::process()
 {
     // Проверяем, если в счётчике ещё нет отрицательного значения,
@@ -1031,14 +1031,17 @@ void Model::process()
 
     findFarthestVehicles();
 
-    prepareFeedBack();
+    bool need_trains_feedback = is_trains_changed;
+    is_trains_changed = false;
+
+    prepareFeedBack(need_trains_feedback);
 
     controlStep();
 
     emit step(sim_time, integration_time);
 
     // Update server feedback
-    tcpFeedBack();
+    tcpFeedBack(need_trains_feedback);
 
     sim_time.addTime(integration_time);
     //Journal::instance()->info(sim_time.getString());
@@ -1185,5 +1188,5 @@ void Model::slotRenameTrainInModel(int train_idx, QString new_name)
 
     Journal::instance()->info(QString("Rename train: Train %1 has new name %2").arg(t_idx, 4).arg(new_name));
 
-    server_update_trains_info();
+    is_trains_changed = true;
 }

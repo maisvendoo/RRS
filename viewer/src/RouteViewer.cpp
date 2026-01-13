@@ -877,6 +877,9 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
         return;
     }
 
+    connect(tcp_client, &TcpClient::setTrainInfo,
+            vehicles_handler, &VehiclesHandler::slotGetTrainsData, Qt::DirectConnection);
+
     connect(tcp_client, &TcpClient::setVehiclesPositions,
             vehicles_handler, &VehiclesHandler::slotGetVehiclesPosData, Qt::DirectConnection);
 
@@ -892,6 +895,7 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     root->addChild(vehicles_handler->getExterior());
 
     LOG_INFO("Send request for continuous vehicles update");
+    tcp_client->sendRequest(STYPE_REQUEST_TRAINS_UPDATE);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, static_cast<double>(settings.vehicles_pos_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, static_cast<double>(settings.vehicles_state_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE, static_cast<double>(settings.vehicle_controled_update_interval) * 0.001);
