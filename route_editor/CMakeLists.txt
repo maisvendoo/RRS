@@ -94,7 +94,6 @@ target_include_directories(${TARGET}
         ../common-headers
         ../simulator/physics/include
         ../simulator/device/include
-        ./include
 )
 
 if(MSVC)
