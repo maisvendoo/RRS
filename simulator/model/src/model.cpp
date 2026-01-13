@@ -399,6 +399,8 @@ void Model::findFarthestVehicles()
             scn_train.setIndex(uncoupled_train->getTrainIndex());
             scnmgr->addNewTrain(scn_train);
 
+            server_update_trains_info();
+
             QThread *thread = new QThread();
             train_threads.push_back(thread);
             uncoupled_train->moveToThread(thread);

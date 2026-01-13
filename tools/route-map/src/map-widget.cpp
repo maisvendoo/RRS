@@ -225,9 +225,14 @@ void MapWidget::drawTrain(simulator_update_pos_t *train_data)
 //------------------------------------------------------------------------------
 void MapWidget::drawTrainNames(simulator_update_pos_t *train_data)
 {
+    if (train_data->vehicles.empty())
+    {
+        return;
+    }
+
     for (auto tl : train_labels)
     {
-        auto vehicle = train_data->vehicles[tl->first_vehicle_idx];
+        simulator_vehicle_pos_update_t vehicle = train_data->vehicles[tl->first_vehicle_idx];
 
         dvec3 v_pos;
         v_pos.x = vehicle.position_x;
