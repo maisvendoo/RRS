@@ -110,6 +110,8 @@ private slots:
     void slotSetShowTrajStatus(bool is_show);
 
     void slotGetTrainsInfo(QByteArray& data);
+
+    void slotRenameTrainMenu();
 };
 
 #endif // MAINWINDOW_H

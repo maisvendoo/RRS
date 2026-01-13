@@ -22,6 +22,8 @@ public:
 
     int first_vehicle_idx = 0;
 
+    int train_idx = 0;
+
 signals:
 
     void popUpMenu();

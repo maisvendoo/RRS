@@ -6,6 +6,7 @@
 #include    <connector.h>
 #include    <QMenu>
 #include    <switch.h>
+#include    <QInputDialog>
 
 //------------------------------------------------------------------------------
 //
@@ -675,7 +676,42 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
         train_label->setStyleSheet("color: white;");
         train_label->setText(update_data.trains[i].train_name);
         train_label->first_vehicle_idx = update_data.trains[i].first_vehicle_id;
+        train_label->train_idx = i;
+
+        connect(train_label, &TrainLabel::popUpMenu, this, &MainWindow::slotRenameTrainMenu);
 
         map->train_labels.push_back(train_label);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotRenameTrainMenu()
+{
+    TrainLabel *train_label = dynamic_cast<TrainLabel *>(sender());
+
+    QMenu *menu = new QMenu(this);
+
+    QAction *rename = new QAction(tr("Rename"), this);
+    menu->addAction(rename);
+
+    connect(rename, &QAction::triggered, this, [this, train_label]{
+
+        bool ok = false;
+        QString new_name = QInputDialog::getText(
+            map,                        // родительский виджет (можно указать this, если вызывается из QWidget)
+            tr("Enter train name"),           // заголовок окна
+            "",                               // метка (label)
+            QLineEdit::Normal,                // режим ввода (Normal, Password и т.д.)
+            "",                               // начальное значение
+            &ok                              // указатель на bool: true — если нажата OK, false — если Cancel
+            );
+
+        if (ok && !new_name.isEmpty()) {
+            this->tcp_client->sendNewTrainName(train_label->train_idx, new_name);
+        }
+    });
+
+    menu->exec(QCursor::pos());
 }
