@@ -71,6 +71,7 @@ public:
     void set_camera_pos(const vsg::dvec3* camera_pos) noexcept { this->camera_pos = camera_pos; }
 
 public slots:
+    void slotGetTrainsData(QByteArray& data);
     void slotGetVehiclesPosData(QByteArray& data);
     void slotGetVehiclesStateData(QByteArray& data);
     void slotGetVehicleControlled(QByteArray& data);
@@ -103,9 +104,12 @@ private:
     double time_difference = 0.0;
     double settings_delay = 0.17;
 
-    /// Data about trains and vehicles state, received from server
+    /// Data about trains, received from server
+    simulator_trains_update_t update_trains = simulator_trains_update_t();
+
+    /// Data about vehicles state, received from server
     static constexpr int STATE_ARRAY_SIZE = 2;
-    std::array<simulator_update_t, STATE_ARRAY_SIZE> update_data;
+    std::array<simulator_vehicles_update_t, STATE_ARRAY_SIZE> update_vehicles;
     bool is_state_updated = false;
     short new_state = 0;
     short unused_state = 1;

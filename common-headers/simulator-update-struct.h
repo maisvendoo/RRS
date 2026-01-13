@@ -289,8 +289,6 @@ struct simulator_vehicles_update_t final
         std::uint32_t num;
         stream >> num;
 
-        stream >> num;
-
         vehicles.clear();
         vehicles.resize(num);
 

@@ -106,7 +106,7 @@ private:
     /// Flag is simulation thread started
     bool        is_simulation_started = false;
     /// Flag is trains changed since previous tcpFeedBack
-    bool        is_trains_changed = false;
+    bool        is_trains_changed = true;
     /// Delay for realtime simulation
     int         realtime_delay = 0;
     /// Minimal intergation interval
