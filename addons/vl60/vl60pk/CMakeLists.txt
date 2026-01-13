@@ -35,7 +35,6 @@ target_include_directories (${TARGET} PRIVATE ../../../common-headers)
 target_include_directories (${TARGET} PRIVATE ../../../simulator/solver/include)
 target_include_directories (${TARGET} PRIVATE ../../../simulator/physics/include)
 target_include_directories (${TARGET} PRIVATE ../../../simulator/vehicle/include)
-target_include_directories (${TARGET} PRIVATE ../../../simulator/device/include)
 target_include_directories (${TARGET} PRIVATE ../../../libJournal/include)
 
 # Компонуемся с библиотеками Qt6

@@ -38,7 +38,6 @@ target_include_directories (${TARGET} PRIVATE ../vehicle/include)
 target_include_directories (${TARGET} PRIVATE ../topology/include)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
-target_include_directories (${TARGET} PRIVATE ../device/include)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Xml)
