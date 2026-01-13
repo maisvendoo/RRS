@@ -487,7 +487,7 @@ bool VehiclesHandler::load(
 void VehiclesHandler::slotGetTrainsData(QByteArray &data)
 {
     update_trains.deserialize(data);
-
+/*
     QString msg = "";
     msg += "Trains(";
     msg += QString::number(update_trains.trains.size());
@@ -502,7 +502,7 @@ void VehiclesHandler::slotGetTrainsData(QByteArray &data)
         msg += QString::number(update_trains.trains[i].last_vehicle_id);
     }
     LOG_INFO("%s", msg.toStdString().c_str());
-
+*/
 }
 
 //------------------------------------------------------------------------------

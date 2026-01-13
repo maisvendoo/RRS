@@ -16,7 +16,7 @@ setTrain(train_freight)
 
 -- Устанавливаем пассажирский поезд "обратно", перед станцией В
 train_pass = TrainData.new()
-train_pass.name = "freight"
+train_pass.name = "passenger"
 train_pass.config = "vl60pk-1543-T65_17"
 train_pass.traj = "route2_0047_497"
 train_pass.coord = 15.0
