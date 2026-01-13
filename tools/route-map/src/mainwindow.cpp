@@ -674,7 +674,14 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
         TrainLabel *train_label = new TrainLabel(map);
         train_label->setAlignment(Qt::AlignHCenter);
         train_label->setStyleSheet("color: white;");
-        train_label->setText(update_data.trains[i].train_name);
+
+        QString train_name = update_data.trains[i].train_name;
+
+        if (!train_name.isEmpty())
+            train_label->setText(train_name);
+        else
+            train_label->setText("0000");
+
         train_label->first_vehicle_idx = update_data.trains[i].first_vehicle_id;
         train_label->train_idx = i;
 
