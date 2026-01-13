@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.23)
+
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
 set (TARGET CfgReader)
@@ -5,7 +7,7 @@ set (TARGET CfgReader)
 # Задаем имя проекта
 project (${TARGET})
 
-# Qt-шное барахло для запуска метообъектного компилятора
+# Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -17,30 +19,57 @@ set (LIBRARY_OUTPUT_PATH "../../lib")
 set (CMAKE_SHARED_LIBRARY_PREFIX "")
 
 # Опеределяем дефайн CFG_READER_LIB для корректного
-# экспорта и импорта слассов из DLL
+# экспорта и импорта классов из DLL
 add_definitions(-DCFG_READER_LIB)
 
 # Ищем зависимости Qt6
 find_package(Qt6 COMPONENTS Xml REQUIRED)
 
-# Пути к заголовкам и сорцам
-file (GLOB INCLUDES "./include/*.h")
-file (GLOB SOURCES "./src/*.cpp")
+# # Пути к заголовкам и сорцам
+# file (GLOB INCLUDES "./include/*.h")
+# file (GLOB SOURCES "./src/*.cpp")
 
-# Компиляция библиотеке
-add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
+# # Компиляция библиотеки
+# add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
-# Указываем пути поиска заголовков
-target_include_directories (${TARGET} PRIVATE ./include/)
+# # Указываем пути поиска заголовков
+# target_include_directories (${TARGET} PRIVATE ./include/)
+
+add_library(${TARGET} SHARED)
+
+target_sources(${TARGET}
+    PRIVATE
+        src/CfgReader.cpp
+        src/convert.cpp
+
+    # TODO: Make convert.h private if it is not used anywhere outside
+    # PRIVATE
+    #     FILE_SET private_headers
+    #     TYPE HEADERS
+    #     BASE_DIRS
+    #         include
+    #     FILES
+    #         include/convert.h
+
+    PUBLIC
+        FILE_SET public_headers
+        TYPE HEADERS
+        BASE_DIRS
+            include
+        FILES
+            include/CfgReader.h
+            include/convert.h
+)
 
 # Компонуемся с библиотеками Qt6
-target_link_libraries (${TARGET} Qt6::Xml)
+target_link_libraries (${TARGET} PUBLIC Qt6::Xml)
 
 #if (WIN32)
 
     install(TARGETS ${TARGET}
     EXPORT ${TARGET}Targets
-    FILE_SET HEADERS
+    # FILE_SET HEADERS
+    FILE_SET public_headers
     LIBRARY DESTINATION sdk/lib
     ARCHIVE DESTINATION sdk/lib
     RUNTIME DESTINATION bin
@@ -60,7 +89,8 @@ target_link_libraries (${TARGET} Qt6::Xml)
     install(FILES "${TARGET}Config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}ConfigVersion.cmake"
         DESTINATION sdk/lib/cmake/${TARGET})
 
-    install(FILES ${INCLUDES} DESTINATION sdk/include)
+    # install(FILES ${INCLUDES} DESTINATION sdk/include)
+    install(FILES include/CfgReader.h include/convert.h DESTINATION sdk/include)
 
 #else()
 
