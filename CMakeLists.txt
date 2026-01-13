@@ -16,6 +16,8 @@ add_subdirectory (simulator)
 add_subdirectory (sound-manager)
 add_subdirectory (viewer)
 
+add_subdirectory (route_editor)
+
 add_subdirectory (addons/passcar)
 add_subdirectory (addons/freightcar)
 add_subdirectory (addons/vl60)

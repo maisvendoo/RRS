@@ -1,0 +1,6 @@
+Class Outline:
+    1) Now creates absolutely new Options with
+    different shaders. When clicking on object, every time
+    reads new object and recompile viewer. Ineffective.
+
+    2) Make GUI checkboxes to enable/disable wireframe and box outlines

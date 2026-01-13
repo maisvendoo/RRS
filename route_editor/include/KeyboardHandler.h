@@ -1,0 +1,32 @@
+#ifndef KEYBOARD_HANDLER_H
+#define KEYBOARD_HANDLER_H
+
+#include "Action.h"
+#include "KeyStates.h"
+
+#include <vsg/core/Inherit.h>
+#include <vsg/core/Visitor.h>
+#include <vsg/ui/KeyEvent.h>
+
+struct settings_t;
+
+class KeyboardHandler : public vsg::Inherit<vsg::Visitor, KeyboardHandler>
+{
+public:
+    KeyboardHandler(const settings_t& settings);
+
+    void apply(vsg::KeyPressEvent& keyPress) override;
+    void apply(vsg::KeyReleaseEvent& keyRelease) override;
+
+    vsg::KeySymbol get_key_binding(Action action) const;
+    bool get_key_state(vsg::KeySymbol sym) const;
+    bool get_binding_state(Action action) const;
+
+    const vsg::KeySymbol* get_key_bindings() const;
+
+private:
+    vsg::KeySymbol key_bindings[ACTION_TOTAL_COUNT];
+    KeyStates key_states;
+};
+
+#endif // KEYBOARD_HANDLER_H
