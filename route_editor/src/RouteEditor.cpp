@@ -60,7 +60,7 @@ RouteEditor::~RouteEditor() = default;
 
 bool RouteEditor::initialize()
 {
-    FileSystem& fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
     settings.read(fs.combinePath(fs.getConfigDir(), "settings.xml"));
 
     options = vsg::Options::create();
@@ -91,7 +91,7 @@ bool RouteEditor::initialize()
 
     gui_group = vsg::Group::create();
 
-    auto editor_gui = EditorGui::create(state, keyboard_handler->get_key_bindings(), &route->directory, settings, route->get_topology(), route->get_objects_ref(), route->get_route_map(), options);
+    auto editor_gui = EditorGui::create(state, keyboard_handler->get_key_bindings(), route, settings, options);
     auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
 
     auto scene_view = vsg::View::create(camera, scene_graph);

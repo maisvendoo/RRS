@@ -35,19 +35,13 @@ static void update_selected_object_matrix(
 EditorGui::EditorGui(
     EditorState& editor_state,
     const vsg::KeySymbol* key_bindings,
-    std::filesystem::path* route_dir,
+    vsg::ref_ptr<Route> route,
     settings_t& settings,
-    const Topology& topology,
-    const StringMap& objects_ref,
-    const RouteMap& route_map,
     vsg::ref_ptr<vsg::Options> options
 )
     : editor_state(editor_state)
     , key_bindings(key_bindings)
-    , route_dir(route_dir)
-    , objects_ref(objects_ref)
-    , route_map(route_map)
-    , topology(topology)
+    , route(route)
     , settings(settings)
 {
     (void)options;
@@ -136,12 +130,12 @@ void EditorGui::select_route() const
     static std::set<std::filesystem::path> directories;
 
     auto change_route_dir = [&](const std::filesystem::path& path) -> void {
-        *route_dir = path;
+        route->directory = path;
 
         files.clear();
         directories.clear();
 
-        for (const auto& dir_entry : std::filesystem::directory_iterator(*route_dir))
+        for (const auto& dir_entry : std::filesystem::directory_iterator(route->directory))
         {
             if (dir_entry.is_directory())
             {
@@ -155,10 +149,10 @@ void EditorGui::select_route() const
     };
 
     // Вызывается при первом запуске select_route
-    if (route_dir->empty())
+    if (route->directory.empty())
     {
-        *route_dir = FileSystem::getInstance().getRouteRootDir();
-        change_route_dir(*route_dir);
+        route->directory = FileSystem::getInstance().getRouteRootDir();
+        change_route_dir(route->directory);
     }
 
     ImGui::Begin("Select Route", nullptr, window_flags);
@@ -166,7 +160,7 @@ void EditorGui::select_route() const
     ImGui::Text("Select route:");
 
     // Выводит путь к текущей выбранной папке и позволяет подтвердить ее
-    ImGui::Text("Current: %s", route_dir->string().c_str());
+    ImGui::Text("Current: %s", route->directory.string().c_str());
     ImGui::SameLine();
     if (ImGui::Button("OK"))
     {
@@ -174,11 +168,11 @@ void EditorGui::select_route() const
     }
 
     // Отдельно выводим кнопку для перехода на одну папку выше
-    if (route_dir->has_parent_path())
+    if (route->directory.has_parent_path())
     {
         if (ImGui::Button(".."))
         {
-            change_route_dir(route_dir->parent_path());
+            change_route_dir(route->directory.parent_path());
         }
     }
 
@@ -207,7 +201,7 @@ void EditorGui::show_objects_ref() const
 
     if (ImGui::BeginTable("objects_ref_table", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, relative_path] : objects_ref)
+        for (const auto& [label, relative_path] : route->get_objects_ref())
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
@@ -228,7 +222,7 @@ void EditorGui::show_route_map() const
 
     if (ImGui::BeginTable("route_map_table", 7, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, transform] : route_map)
+        for (const auto& [label, transform] : route->get_route_map())
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();

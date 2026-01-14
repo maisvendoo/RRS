@@ -44,11 +44,11 @@ private:
     vsg::ref_ptr<MouseHandler> mouse_handler;
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;
     vsg::ref_ptr<CameraHandler> camera_handler;
-    vsg::ref_ptr<vsg::ClearAttachments> clear_attachments;
     vsg::ref_ptr<SceneGraph> scene_graph;
+    vsg::ref_ptr<vsg::ClearAttachments> clear_attachments;
+    vsg::ref_ptr<ObjectSelector> object_selector;
     vsg::ref_ptr<vsg::Group> gui_group;
     vsg::ref_ptr<vsg::Viewer> viewer;
-    vsg::ref_ptr<ObjectSelector> object_selector;
 };
 
 #endif // ROUTE_EDITOR_H

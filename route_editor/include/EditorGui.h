@@ -2,10 +2,7 @@
 #define EDITOR_GUI_H
 
 #include "EditorState.h"
-#include "RouteMap.h"
-#include "StringMap.h"
-#include "topology.h"
-#include <filesystem>
+#include "Route.h"
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
@@ -28,11 +25,8 @@ public:
     EditorGui(
         EditorState& editor_state,
         const vsg::KeySymbol* key_bindings,
-        std::filesystem::path* route_dir,
+        vsg::ref_ptr<Route> route,
         settings_t& settings,
-        const Topology& topology,
-        const StringMap& objects_ref,
-        const RouteMap& route_map,
         vsg::ref_ptr<vsg::Options> options = {}
     );
 
@@ -53,12 +47,9 @@ private:
     EditorState& editor_state;
     const vsg::KeySymbol* key_bindings;
     bool show_demo_window = false;
-    std::filesystem::path* route_dir = nullptr;
-    const StringMap& objects_ref;
-    const RouteMap& route_map;
+    vsg::ref_ptr<Route> route;
     vsg::ref_ptr<vsg::MatrixTransform>* selected_object = nullptr;
     vsg::ref_ptr<vsg::Perspective> perspective = nullptr;
-    const Topology& topology;
 
     settings_t& settings;
     ImGuiWindowFlags window_flags = 0;
