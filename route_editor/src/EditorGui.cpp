@@ -47,9 +47,9 @@ EditorGui::EditorGui(
     ImGuiIO& io = ImGui::GetIO();
 
     FileSystem& fs = FileSystem::getInstance();
-    const std::filesystem::path font_path = fs.combinePath(fs.getFontsDir(), "IosevkaNerdFont-Regular.ttf");
+    const std::string font_path = fs.combinePath(fs.getFontsDir(), "JetBrainsMono-Regular.ttf");
 
-    io.Fonts->AddFontFromFileTTF(font_path.string().c_str(),
+    io.Fonts->AddFontFromFileTTF(font_path.c_str(),
                                  settings.gui_font_size,
                                  nullptr,
                                  io.Fonts->GetGlyphRangesCyrillic());
