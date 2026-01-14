@@ -33,6 +33,7 @@ CameraHandler::CameraHandler(
     , mouse_handler(mouse_handler)
     , keyboard_handler(keyboard_handler)
 {
+    assert(extent.width != 0);
     assert(extent.height != 0);
     assert(mouse_handler);
     assert(keyboard_handler);

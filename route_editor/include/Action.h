@@ -1,8 +1,6 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include <string>
-
 enum Action
 {
     ACTION_MOVE_CAMERA_FORWARD,
@@ -12,6 +10,6 @@ enum Action
     ACTION_TOTAL_COUNT
 };
 
-std::string to_string(Action action);
+const char* to_c_string(Action action);
 
 #endif // ACTION_H

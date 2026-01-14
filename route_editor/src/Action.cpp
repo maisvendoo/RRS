@@ -1,9 +1,8 @@
 #include "Action.h"
 
 #include <cassert>
-#include <string>
 
-std::string to_string(Action action)
+const char* to_c_string(Action action)
 {
     assert(action < ACTION_TOTAL_COUNT);
 
