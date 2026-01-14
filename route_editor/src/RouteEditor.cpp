@@ -2,7 +2,6 @@
 
 #include "CameraHandler.h"
 #include "EditorGui.h"
-#include "EditorParams.h"
 #include "EditorState.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
@@ -92,15 +91,7 @@ bool RouteEditor::initialize()
 
     gui_group = vsg::Group::create();
 
-    params = EditorParams::create();
-    params->editor_state = &state;
-    params->key_bindings = keyboard_handler->get_key_bindings();
-    params->objects_ref = &route->get_objects_ref();
-    params->route_map = &route->get_route_map();
-    params->perspective = camera_handler->get_perspective();
-    params->topology = &route->get_topology();
-
-    auto editor_gui = EditorGui::create(params, settings, options);
+    auto editor_gui = EditorGui::create(state, keyboard_handler->get_key_bindings(), &route->directory, settings, route->get_topology(), route->get_objects_ref(), route->get_route_map(), options);
     auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
 
     auto scene_view = vsg::View::create(camera, scene_graph);
@@ -140,9 +131,6 @@ bool RouteEditor::initialize()
 
     viewer->addEventHandler(intersection_handler);
 
-    params->selected_object = intersection_handler->get_curr_matrix_transform_ptr();
-    params->perspective = camera_handler->get_perspective();
-
     viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
     viewer->compile();
 
@@ -157,7 +145,6 @@ void RouteEditor::run()
     {
         if (state == EditorState::LOAD_ROUTE)
         {
-            route->directory = params->route_dir;
             if (route->load(settings, options, viewer))
             {
                 state = EditorState::EDIT_ROUTE;

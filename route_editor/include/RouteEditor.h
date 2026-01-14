@@ -7,7 +7,6 @@
 #include <vsg/core/ref_ptr.h>
 
 class CameraHandler;
-struct EditorParams;
 class KeyboardHandler;
 class MouseHandler;
 class ObjectSelector;
@@ -48,7 +47,6 @@ private:
     vsg::ref_ptr<vsg::ClearAttachments> clear_attachments;
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::ref_ptr<vsg::Group> gui_group;
-    vsg::ref_ptr<EditorParams> params;
     vsg::ref_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<ObjectSelector> object_selector;
 };

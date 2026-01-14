@@ -49,7 +49,6 @@ target_sources(${TARGET}
             include/Action.h
             include/CameraHandler.h
             include/EditorGui.h
-            include/EditorParams.h
             include/EditorState.h
             include/Gizmo.h
             include/IntersectionHandler.h
