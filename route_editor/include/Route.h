@@ -39,7 +39,7 @@ public:
 
     const StringMap& get_objects_ref() const;
     const RouteMap& get_route_map() const;
-    Topology& get_topology();
+    const Topology& get_topology() const;
 
 private:
     StringMap objects_ref;

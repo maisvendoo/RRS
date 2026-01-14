@@ -32,7 +32,7 @@ struct EditorParams : public vsg::Inherit<vsg::Object, EditorParams>
     const RouteMap* route_map = nullptr;
     vsg::ref_ptr<vsg::MatrixTransform>* selected_object = nullptr;
     vsg::ref_ptr<vsg::Perspective> perspective = nullptr;
-    Topology* topology = nullptr;
+    const Topology* topology = nullptr;
 };
 
 #endif // EDITOR_PARAMS_H

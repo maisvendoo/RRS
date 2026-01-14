@@ -82,14 +82,14 @@ const RouteMap& Route::get_route_map() const
     return route_map;
 }
 
-Topology& Route::get_topology()
+const Topology& Route::get_topology() const
 {
     return topology;
 }
 
 bool Route::load_objects_ref()
 {
-    FileSystem& fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
 
     const std::string objects_ref_path = fs.combinePath(
         directory.string(), "objects.ref");

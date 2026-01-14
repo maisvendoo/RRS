@@ -53,7 +53,17 @@ public:
         return &traj_list;
     }
 
+    const traj_list_t* getTrajectoriesList() const
+    {
+        return &traj_list;
+    }
+
     conn_list_t *getConnectorsList()
+    {
+        return &switches;
+    }
+
+    const conn_list_t* getConnectorsList() const
     {
         return &switches;
     }

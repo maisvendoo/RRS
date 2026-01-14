@@ -304,7 +304,7 @@ void EditorGui::show_camera_settings() const
 
 void EditorGui::show_topology() const
 {
-    Topology& topology = *editor_params->topology;
+    const Topology& topology = *editor_params->topology;
     if (topology.getRouteName().isEmpty())
     {
         return;
