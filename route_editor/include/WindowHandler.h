@@ -26,7 +26,7 @@ public:
     // TODO: Maybe remove with is_resized
     void apply(vsg::ConfigureWindowEvent& congfigureWindow) override;
 
-    const vsg::ref_ptr<vsg::Window>& get_window() const;
+    vsg::ref_ptr<vsg::Window> get_window() const;
 
 private:
     vsg::ref_ptr<vsg::Window> window;

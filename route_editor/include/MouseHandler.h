@@ -36,9 +36,9 @@ public:
 private:
     vsg::ivec2 mouse_pos = {0, 0};
     vsg::ivec2 delta_pos = {0, 0};
-    bool used_delta_pos = false;
-
     float scroll = 0.0f;
+
+    bool used_delta_pos = false;
     bool used_scroll = false;
 
     bool is_lmb_pressed = false;

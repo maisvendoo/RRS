@@ -10,6 +10,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include <cstdio>
+#include <string>
 
 vsg::ref_ptr<vsg::ShaderStage> read_shader(
     VkShaderStageFlagBits stage,
@@ -18,8 +19,8 @@ vsg::ref_ptr<vsg::ShaderStage> read_shader(
     vsg::ref_ptr<const vsg::Options> options
 )
 {
-    FileSystem& fs = FileSystem::getInstance();
-    const auto shader_path = fs.combinePath(shaders_dir, filename);
+    const FileSystem& fs = FileSystem::getInstance();
+    const std::string shader_path = fs.combinePath(shaders_dir, filename);
 
     const auto shader = vsg::ShaderStage::read(
         stage, "main", shader_path, options);

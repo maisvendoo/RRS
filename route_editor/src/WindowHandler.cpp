@@ -15,7 +15,7 @@ static VkSampleCountFlags samples_bit_flag(int samples);
 
 WindowHandler::WindowHandler(const settings_t& settings)
 {
-    auto window_traits = vsg::WindowTraits::create();
+    const auto window_traits = vsg::WindowTraits::create();
     window_traits->x = settings.window_x;
     window_traits->y = settings.window_y;
     window_traits->width = settings.window_width;
@@ -23,7 +23,11 @@ WindowHandler::WindowHandler(const settings_t& settings)
     window_traits->fullscreen = settings.fullscreen;
     window_traits->screenNum = settings.screen_number;
     window_traits->windowTitle = settings.window_title;
-    window_traits->swapchainPreferences.presentMode = settings.vsync ? VK_PRESENT_MODE_FIFO_KHR : VK_PRESENT_MODE_MAILBOX_KHR;
+
+    window_traits->swapchainPreferences.presentMode = settings.vsync
+        ? VK_PRESENT_MODE_FIFO_KHR
+        : VK_PRESENT_MODE_MAILBOX_KHR;
+
     window_traits->samples = samples_bit_flag(settings.samples);
 
     window = vsg::Window::create(window_traits);
@@ -41,7 +45,7 @@ void WindowHandler::apply(vsg::ConfigureWindowEvent& congfigureWindow)
     }
 }
 
-const vsg::ref_ptr<vsg::Window>& WindowHandler::get_window() const
+vsg::ref_ptr<vsg::Window> WindowHandler::get_window() const
 {
     return window;
 }
