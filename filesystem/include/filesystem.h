@@ -20,9 +20,9 @@ public:
     static FileSystem &getInstance();
 
     /// Get directory by num_levels levels up
-    std::string getLevelUpDirectory(std::string path, int num_levels);
+    std::string getLevelUpDirectory(std::string path, int num_levels) const;
 
-    std::string getNativePath(const std::string &path);
+    std::string getNativePath(const std::string &path) const;
 
     /// Get route directory path
     std::string getRouteRootDir() const;
@@ -61,9 +61,15 @@ public:
 
     std::string getThemeDir() const;
 
-    std::string combinePath(const std::string &path1, const std::string &path2);
+    std::string combinePath(const std::string &path1, const std::string &path2) const;
 
-    std::string toNativeSeparators(const std::string &path);
+    template <typename... Args>
+    std::string combinePath(const std::string& path1, const std::string& path2, Args&... args) const
+    {
+        return combinePath(combinePath(path1, path2), args...);
+    }
+
+    std::string toNativeSeparators(const std::string &path) const;
 
     /// Get native path separator
     char separator() const;
