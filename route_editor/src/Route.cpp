@@ -265,7 +265,7 @@ bool Route::load_topology(
 
     std::printf("Signals directory: %s\n", models_dir.c_str());
 
-    if (!topology.load(directory.stem().c_str()))
+    if (!topology.load(directory.stem().string().c_str()))
     {
         std::fputs("Failed to load topology\n", stderr);
         return false;

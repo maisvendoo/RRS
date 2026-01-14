@@ -49,7 +49,11 @@ EditorGui::EditorGui(
     FileSystem& fs = FileSystem::getInstance();
     const std::filesystem::path font_path = fs.combinePath(fs.getFontsDir(), "IosevkaNerdFont-Regular.ttf");
 
-    io.Fonts->AddFontFromFileTTF(font_path.c_str(), settings.gui_font_size, nullptr, io.Fonts->GetGlyphRangesCyrillic());
+    io.Fonts->AddFontFromFileTTF(font_path.string().c_str(),
+                                 settings.gui_font_size,
+                                 nullptr,
+                                 io.Fonts->GetGlyphRangesCyrillic());
+
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
     if (!settings.is_gui_editable)
@@ -172,7 +176,7 @@ void EditorGui::select_route() const
     // Отображаем все папки как кнопки для перемещния по ним
     for (const std::filesystem::path& directory : directories)
     {
-        if (ImGui::Button(directory.filename().c_str()))
+        if (ImGui::Button(directory.filename().string().c_str()))
         {
             change_route_dir(directory);
             break;
