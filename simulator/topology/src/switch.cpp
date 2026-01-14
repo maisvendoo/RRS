@@ -40,19 +40,14 @@ Trajectory *Switch::getFwdTraj() const
         return fwdMinusTraj;
     }
 
-    // Стрелка в плюсовом положении
-    if (state_fwd > 0)
-    {
-        return fwdPlusTraj;
-    }
-
     // Стрелка в минусовом положении
     if (state_fwd < 0)
     {
         return fwdMinusTraj;
     }
 
-    return nullptr;
+    // Стрелка в плюсовом положении
+    return fwdPlusTraj;
 }
 
 //------------------------------------------------------------------------------
@@ -74,19 +69,14 @@ Trajectory *Switch::getBwdTraj() const
         return bwdMinusTraj;
     }
 
-    // Стрелка в плюсовом положении
-    if (state_bwd > 0)
-    {
-        return bwdPlusTraj;
-    }
-
     // Стрелка в минусовом положении
     if (state_bwd < 0)
     {
         return bwdMinusTraj;
     }
 
-    return nullptr;
+    // Стрелка в плюсовом положении
+    return bwdPlusTraj;
 }
 
 //------------------------------------------------------------------------------
@@ -95,18 +85,6 @@ Trajectory *Switch::getBwdTraj() const
 void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 {
     Connector::configure(cfg, secNode, traj_list);
-
-    int tmp_int = 0;
-    cfg.getInt(secNode, "state_fwd", tmp_int);
-    if (tmp_int == 1)
-        state_fwd = STATE_PLUS;
-    if (tmp_int == -1)
-        state_fwd = STATE_MINUS;
-    cfg.getInt(secNode, "state_bwd", tmp_int);
-    if (tmp_int == 1)
-        state_bwd = STATE_PLUS;
-    if (tmp_int == -1)
-        state_bwd = STATE_MINUS;
 
     Journal::instance()->info("Connector type: switch");
 
@@ -181,14 +159,33 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     }
     else
     {
-        Journal::instance()->info("Incommnig trajectories: " + QString("%1").arg(inputs_count));
         if (inputs_count != 2)
         {
+            Journal::instance()->info(QString("Incomming trajectories: %1").arg(inputs_count));
             state_bwd = ONE_POSSIBLE_DIRECTION;
             ref_state_bwd = ONE_POSSIBLE_DIRECTION;
         }
         else
         {
+            state_bwd = STATE_PLUS;
+
+            int tmp_int = 0;
+            if (cfg.getInt(secNode, "state_bwd", tmp_int))
+            {
+                if (tmp_int < 0)
+                {
+                    state_bwd = STATE_MINUS;
+                    Journal::instance()->info(QString("Incomming trajectories: %1. Switch is set to minus direction").arg(inputs_count));
+                }
+                else
+                {
+                    Journal::instance()->info(QString("Incomming trajectories: %1. Switch is set to plus direction").arg(inputs_count));
+                }
+            }
+            else
+            {
+                Journal::instance()->info(QString("Incomming trajectories: %1. Parameter <state_bwd> not found, switch is set to plus direction").arg(inputs_count));
+            }
             ref_state_bwd = state_bwd;
         }
     }
@@ -201,14 +198,33 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     }
     else
     {
-        Journal::instance()->info("Outgoing trajectories: " + QString("%1").arg(outputs_count));
         if (outputs_count != 2)
         {
+            Journal::instance()->info(QString("Outgoing trajectories: %1").arg(outputs_count));
             state_fwd = ONE_POSSIBLE_DIRECTION;
             ref_state_fwd = ONE_POSSIBLE_DIRECTION;
         }
         else
         {
+            state_fwd = STATE_PLUS;
+
+            int tmp_int = 0;
+            if (cfg.getInt(secNode, "state_fwd", tmp_int))
+            {
+                if (tmp_int < 0)
+                {
+                    state_fwd = STATE_MINUS;
+                    Journal::instance()->info(QString("Outgoing trajectories: %1. Switch is set to minus direction").arg(inputs_count));
+                }
+                else
+                {
+                    Journal::instance()->info(QString("Outgoing trajectories: %1. Switch is set to plus direction").arg(inputs_count));
+                }
+            }
+            else
+            {
+                Journal::instance()->info(QString("Outgoing trajectories: %1. Parameter <state_fwd> not found, switch is set to plus direction").arg(inputs_count));
+            }
             ref_state_fwd = state_fwd;
         }
     }
