@@ -43,7 +43,7 @@
 		<!-- Признак наличия платформы слева -->
 		<HasLeftPlatform>0</HasLeftPlatform>
 		<!-- Признак главного пути -->
-		<IsMain>0</IsMain>
+		<Priority>1</Priority>
 	</Path>
 
 	<Path>
@@ -56,7 +56,7 @@
 		<!-- Признак наличия платформы слева -->
 		<HasLeftPlatform>0</HasLeftPlatform>
 		<!-- Признак главного пути -->
-		<IsMain>1</IsMain>
+		<Priority>0</Priority>
 	</Path>
 
 	<Path>
@@ -69,7 +69,7 @@
 		<!-- Признак наличия платформы слева -->
 		<HasLeftPlatform>0</HasLeftPlatform>
 		<!-- Признак главного пути -->
-		<IsMain>1</IsMain>
+		<Priority>0</Priority>
 	</Path>
 
 	<Path>
@@ -82,7 +82,7 @@
 		<!-- Признак наличия платформы слева -->
 		<HasLeftPlatform>0</HasLeftPlatform>
 		<!-- Признак главного пути -->
-		<IsMain>0</IsMain>
+		<Priority>1</Priority>
 	</Path>
 
 </Config>
