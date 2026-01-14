@@ -213,8 +213,8 @@ void Route::load_static_objects(
         matrix_transform->addChild(paged_lod_it->second);
         matrix_transform->setValue("properties", properties);
 
-        const vsg::CompileResult compile_result = viewer->compileManager->compile(
-            matrix_transform);
+        const vsg::CompileResult compile_result =
+            viewer->compileManager->compile(matrix_transform);
 
         this->addChild(matrix_transform);
         vsg::updateViewer(*viewer, compile_result);

@@ -36,6 +36,7 @@ target_sources(${TARGET}
         src/Outline.cpp
         src/Route.cpp
         src/RouteEditor.cpp
+        src/SceneGraph.cpp
         src/Settings.cpp
         src/shader_funcs.cpp
         src/WindowHandler.cpp

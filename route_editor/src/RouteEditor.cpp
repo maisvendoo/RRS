@@ -8,6 +8,8 @@
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
 #include "ObjectSelector.h"
+#include "Route.h"
+#include "SceneGraph.h"
 #include "Settings.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
@@ -85,12 +87,8 @@ bool RouteEditor::initialize()
 
     const auto& camera = camera_handler->get_camera();
 
-    ambient_light = vsg::AmbientLight::create();
-
-    scene_group = vsg::Group::create();
-    scene_group->addChild(ambient_light);
-    route = Route::create();
-    scene_group->addChild(route);
+    scene_graph = SceneGraph::create();
+    const auto route = scene_graph->get_route();
 
     gui_group = vsg::Group::create();
 
@@ -105,7 +103,7 @@ bool RouteEditor::initialize()
     auto editor_gui = EditorGui::create(params, settings, options);
     auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
 
-    auto scene_view = vsg::View::create(camera, scene_group);
+    auto scene_view = vsg::View::create(camera, scene_graph);
 
     VkClearValue clear_value{};
     clear_value.depthStencil = {0.0f, 0};
@@ -138,7 +136,7 @@ bool RouteEditor::initialize()
     viewer->addEventHandler(camera_handler);
 
     auto intersection_handler = IntersectionHandler::create(settings, options,
-        camera_handler->get_look_at(), camera, scene_group, gui_group, observer_viewer, object_selector);
+        camera_handler->get_look_at(), camera, scene_graph, gui_group, observer_viewer, object_selector);
 
     viewer->addEventHandler(intersection_handler);
 
@@ -153,6 +151,8 @@ bool RouteEditor::initialize()
 
 void RouteEditor::run()
 {
+    const auto route = scene_graph->get_route();
+
     while (viewer->advanceToNextFrame())
     {
         if (state == EditorState::LOAD_ROUTE)
