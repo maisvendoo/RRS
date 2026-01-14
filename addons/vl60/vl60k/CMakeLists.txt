@@ -12,7 +12,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 # Путь, куда надо сложить собранное
-set (LIBRARY_OUTPUT_PATH "../../../../modules/${TARGET}")
+set (LIBRARY_OUTPUT_PATH "../../../../modules/vl60")
 # Указываем не добавлять к имени бинарника никаких префиксов
 set (CMAKE_SHARED_MODULE_PREFIX "")
 

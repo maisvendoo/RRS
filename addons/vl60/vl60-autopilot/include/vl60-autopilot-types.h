@@ -1,41 +1,32 @@
-#ifndef     AUTOPILOT_TYPES_H
-#define     AUTOPILOT_TYPES_H
+#ifndef     VL60_AUTOPILOT_TYPES
+#define     VL60_AUTOPILOT_TYPES
 
-#include    <ALSN-struct.h>
+#include    <autopilot-types.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class auto_control_t
+class vl60_control_t : public auto_control_t
 {
 public:
 
-    auto_control_t()
+    vl60_control_t() : auto_control_t()
     {
 
     }
-
-    virtual ~auto_control_t() = default;
 };
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class auto_feedback_t
+class vl60_feedback_t : public auto_feedback_t
 {
 public:
 
-    /// Текущая скорость
-    double v_cur = 0;
-    /// Код АЛСН
-    ALSN alsn_code = NO_CODE;
-
-    auto_feedback_t()
+    vl60_feedback_t() : auto_feedback_t()
     {
 
     }
-
-    virtual ~auto_feedback_t() = default;
 };
 
 #endif
