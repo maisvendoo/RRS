@@ -9,11 +9,11 @@
 #include "filesystem.h"
 #include "rail-signal.h"
 #include "signals-data-types.h"
+#include "topology.h"
 
 #include <vsg/app/CompileManager.h>
 #include <vsg/app/Viewer.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/io/stream.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/sphere.h>
@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
-#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -217,6 +216,7 @@ void Route::load_static_objects(
             viewer->compileManager->compile(matrix_transform);
 
         this->addChild(matrix_transform);
+
         vsg::updateViewer(*viewer, compile_result);
     }
 }
@@ -272,15 +272,28 @@ bool Route::load_topology(
     PagedLodMap paged_lods;
 
     const signals_data_t* const signals_data = topology.getSignalsData();
+    if (!signals_data)
+    {
+        return false;
+    }
 
-    load_signals(settings, options, viewer, signals_data->line_signals,
-        models_dir, paged_lods);
+    enum
+    {
+        LINE,
+        ENTER,
+        EXIT,
+        TOTAL_SIGNAL_TYPES
+    };
 
-    load_signals(settings, options, viewer, signals_data->enter_signals,
-        models_dir, paged_lods);
+    const std::vector<Signal*>* _signals[TOTAL_SIGNAL_TYPES];
+    _signals[LINE] = &signals_data->line_signals;
+    _signals[ENTER] = &signals_data->enter_signals;
+    _signals[EXIT] = &signals_data->exit_signals;
 
-    load_signals(settings, options, viewer, signals_data->exit_signals,
-        models_dir, paged_lods);
+    for (int i = 0; i < TOTAL_SIGNAL_TYPES; ++i)
+    {
+        load_signals(settings, options, viewer, *_signals[i], models_dir, paged_lods);
+    }
 
     return true;
 }
@@ -366,6 +379,7 @@ void Route::load_signals(
             viewer->compileManager->compile(matrix_transform);
 
         this->addChild(matrix_transform);
+
         vsg::updateViewer(*viewer, compile_result);
     }
 }
