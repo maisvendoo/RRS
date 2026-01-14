@@ -33,8 +33,8 @@ Gizmo::Gizmo(
 )
 {
     vsg::Builder builder;
-    builder.options = options;
-    builder.sharedObjects = options->sharedObjects;
+    // builder.options = options;
+    // builder.sharedObjects = options->sharedObjects;
     builder.shaderSet = vsg::createFlatShadedShaderSet();
 
     arrow_x = create_arrow(builder, vsg::vec3(1.0f, 0.0f, 0.0f),

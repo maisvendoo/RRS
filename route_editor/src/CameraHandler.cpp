@@ -103,10 +103,10 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
         ACTION_MOVE_CAMERA_BACKWARD);
 
     const int move_left = keyboard_handler->get_binding_state(
-        ACTION_MOVE_CAMERA_RIGHT);
+        ACTION_MOVE_CAMERA_LEFT);
 
     const int move_right = keyboard_handler->get_binding_state(
-        ACTION_MOVE_CAMERA_LEFT);
+        ACTION_MOVE_CAMERA_RIGHT);
 
     const vsg::dvec3 front_movememt = front * dt * settings.camera_move_speed
         * static_cast<double>(move_forward - move_backward);
