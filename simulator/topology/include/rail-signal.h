@@ -93,6 +93,26 @@ public:
 
     bool calcPosition();
 
+    dvec3 getPos() const
+    {
+        return pos;
+    }
+
+    dvec3 getRight() const
+    {
+        return right;
+    }
+
+    dvec3 getOrth() const
+    {
+        return orth;
+    }
+
+    dvec3 getUp() const
+    {
+        return up;
+    }
+
 signals:
 
     /// Послать серверу запрос на обновление данных

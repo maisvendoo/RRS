@@ -10,6 +10,7 @@
 #include "rail-signal.h"
 #include "signals-data-types.h"
 
+#include <vsg/app/CompileManager.h>
 #include <vsg/app/Viewer.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/stream.h>
@@ -48,7 +49,7 @@ bool Route::load(
         return false;
     }
 
-    FileSystem& fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
 
     PagedLodMap paged_lods;
     for (const auto& [label, relative_path] : objects_ref)
@@ -122,11 +123,10 @@ bool Route::load_objects_ref()
 
 bool Route::load_route_map()
 {
-    FileSystem& fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
 
-    std::string route_map_path = fs.combinePath(directory.string(), "topology");
-    route_map_path = fs.combinePath(route_map_path, "map");
-    route_map_path = fs.combinePath(route_map_path, "route1.map");
+    const std::string route_map_path = fs.combinePath(directory.string(),
+        "topology", "map", "route1.map");
 
     std::ifstream route_map_file(route_map_path);
     if (!route_map_file)
@@ -174,7 +174,7 @@ void Route::load_static_objects(
 {
     assert(viewer);
 
-    for (auto& [label, transform] : route_map)
+    for (const auto& [label, transform] : route_map)
     {
         const auto paged_lod_it = paged_lods.find(label);
         if (paged_lod_it == paged_lods.cend())
@@ -213,7 +213,7 @@ void Route::load_static_objects(
         matrix_transform->addChild(paged_lod_it->second);
         matrix_transform->setValue("properties", properties);
 
-        const auto compile_result = viewer->compileManager->compile(
+        const vsg::CompileResult compile_result = viewer->compileManager->compile(
             matrix_transform);
 
         this->addChild(matrix_transform);
@@ -230,12 +230,10 @@ bool Route::load_topology(
     assert(options);
     assert(viewer);
 
-    FileSystem& fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
 
-    std::string cfg_path = fs.combinePath(directory.string(), "topology");
-    cfg_path = fs.combinePath(cfg_path, "models-config.xml");
-
-    std::string models_dir_name;
+    const std::string cfg_path = fs.combinePath(directory.string(),
+        "topology", "models-config.xml");
 
     QString tmp_qstr = cfg_path.c_str();
     CfgReader cfg;
@@ -258,10 +256,10 @@ bool Route::load_topology(
         return false;
     }
 
-    models_dir_name = tmp_qstr.toStdString();
+    const std::string models_dir_name = tmp_qstr.toStdString();
 
-    std::string models_dir = fs.combinePath(fs.getDataDir(), "models");
-    models_dir = fs.combinePath(models_dir, models_dir_name);
+    const std::string models_dir = fs.combinePath(fs.getDataDir(),
+        "models", models_dir_name);
 
     std::printf("Signals directory: %s\n", models_dir.c_str());
 
@@ -299,7 +297,7 @@ void Route::load_signals(
     assert(options);
     assert(viewer);
 
-    FileSystem& fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
 
     for (Signal* const signal : in_signals)
     {
@@ -309,8 +307,8 @@ void Route::load_signals(
             continue;
         }
 
-        const std::string signal_model_name
-            = signal->getSignalModel().toStdString();
+        const std::string signal_model_name =
+            signal->getSignalModel().toStdString();
 
         const std::string signal_model_path = fs.combinePath(
             models_dir, signal_model_name) + ".gltf";
@@ -337,35 +335,35 @@ void Route::load_signals(
             paged_lod = paged_lod_it->second;
         }
 
-        // dvec3 pos;
-        // signal->calcPosition(pos);
+        signal->calcPosition();
 
-        // const dvec3 right = signal->getRight();
-        // const dvec3 orth = signal->getOrth();
-        // const dvec3 up = signal->getUp();
+        const dvec3 pos = signal->getPos();
+        const dvec3 right = signal->getRight();
+        const dvec3 orth = signal->getOrth();
+        const dvec3 up = signal->getUp();
 
-        // const vsg::dmat4 translate = vsg::translate(pos.x, pos.y, pos.z);
-        // const vsg::dmat4 rotate = {
-        //      right.x, -orth.x,  up.x,  0.0,
-        //     -right.y,  orth.y,  up.y,  0.0,
-        //      right.z,  orth.z,  up.z,  0.0,
-        //          0.0,     0.0,   0.0,  1.0
-        // };
+        const vsg::dmat4 translate = vsg::translate(pos.x, pos.y, pos.z);
+        const vsg::dmat4 rotate = {
+             right.x, -orth.x,  up.x,  0.0,
+            -right.y,  orth.y,  up.y,  0.0,
+             right.z,  orth.z,  up.z,  0.0,
+                 0.0,     0.0,   0.0,  1.0
+        };
 
         // TODO: Maybe remove properties
         ObjectProperties properties;
         properties.name = signal_model_name;
-        // properties.translation.x = pos.x;
-        // properties.translation.y = pos.y;
-        // properties.translation.z = pos.z;
+        properties.translation.x = pos.x;
+        properties.translation.y = pos.y;
+        properties.translation.z = pos.z;
 
         const auto matrix_transform = vsg::MatrixTransform::create();
-        // matrix_transform->matrix = translate * rotate;
+        matrix_transform->matrix = translate * rotate;
         matrix_transform->addChild(paged_lod);
         matrix_transform->setValue("properties", properties);
 
-        const auto compile_result = viewer->compileManager->compile(
-            matrix_transform);
+        const vsg::CompileResult compile_result =
+            viewer->compileManager->compile(matrix_transform);
 
         this->addChild(matrix_transform);
         vsg::updateViewer(*viewer, compile_result);
