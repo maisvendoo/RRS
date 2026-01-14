@@ -1,0 +1,41 @@
+                        Action.h
+                        CameraHandler.h
+EditorGui.h
+                        EditorState.h
+Gizmo.h
+IntersectionHandler.h
+                        KeyboardHandler.h
+                        KeyStates.h
+                        MouseButton.h
+                        MouseHandler.h
+                        ObjectProperties.h
+ObjectSelector.h
+                        ObjectState.h
+Outline.h
+                        PagedLodMap.h
+                        Route.h
+RouteEditor.h
+                        RouteMap.h
+                        SceneGraph.h
+                        Settings.h
+                        shader_funcs.h
+                        StringMap.h
+                        Vec3Pair.h
+                        WindowHandler.h
+
+                        Action.cpp
+                        CameraHandler.cpp
+EditorGui.cpp
+Gizmo.cpp
+IntersectionHandler.cpp
+                        KeyboardHandler.cpp
+                        main.cpp
+                        MouseHandler.cpp
+ObjectSelector.cpp
+Outline.cpp
+                        Route.cpp
+RouteEditor.cpp
+                        SceneGraph.cpp
+                        Settings.cpp
+                        shader_funcs.cpp
+                        WindowHandler.cpp

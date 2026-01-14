@@ -2,6 +2,8 @@
 
 #include <CfgReader.h>
 
+#include <vsg/ui/KeyEvent.h>
+
 #include <QString>
 
 #include <string>
@@ -83,10 +85,13 @@ void settings_t::read(const std::string& cfg_path)
 
     cfg.getString(section, "KeyMoveCameraForward", temp_string);
     key_move_camera_forward = static_cast<vsg::KeySymbol>(temp_string.front().toLatin1());
+
     cfg.getString(section, "KeyMoveCameraBackward", temp_string);
     key_move_camera_backward = static_cast<vsg::KeySymbol>(temp_string.front().toLatin1());
+
     cfg.getString(section, "KeyMoveCameraLeft", temp_string);
     key_move_camera_left = static_cast<vsg::KeySymbol>(temp_string.front().toLatin1());
+
     cfg.getString(section, "KeyMoveCameraRight", temp_string);
     key_move_camera_right = static_cast<vsg::KeySymbol>(temp_string.front().toLatin1());
 }

@@ -10,7 +10,7 @@ struct settings_t
     std::string window_title = "Route Editor";    ///< Window title
     int window_x = 50;                            ///< Window horizontal position
     int window_y = 50;                            ///< Window vertical position
-    int window_width = 1280;                       ///< Window width
+    int window_width = 1280;                      ///< Window width
     int window_height = 720;                      ///< Window height
     int screen_number = 0;                        ///< Screen number
     bool fullscreen = false;                      ///< Fullscreen flag
