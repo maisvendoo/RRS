@@ -75,4 +75,98 @@
         <!-- Высота солнечного освещения над горизонтом, град. -->
         <SunAltitude>45</SunAltitude>
     </Viewer>
+    <Editor>
+        <!-- Заголовок окна -->
+        <WindowTitle>Route Editor</WindowTitle>
+        <!-- Положение окна, пикс. -->
+        <WindowX>50</WindowX>
+        <WindowY>50</WindowY>
+        <!-- Размер окна, пикс. -->
+        <WindowWidth>1800</WindowWidth>
+        <WindowHeight>900</WindowHeight>
+        <!-- Номер монитора; 0 для монитора по умолчанию -->
+        <ScreenNumber>0</ScreenNumber>
+        <!-- Полноэкранный режим: 1 - включен; 0 - оконный режим -->
+        <FullScreen>0</FullScreen>
+        <!-- Вертикальная синхронизация: 1 - включена; 0 - отключена -->
+        <VSync>1</VSync>
+        <!-- Двойная буферизация: 1 - включена; 0 - отключена -->
+        <DoubleBuffer>1</DoubleBuffer>
+        <!-- Мультисемплинг (сглаживание) -->
+        <Samples>8</Samples>
+
+        <!-- Ближняя плоскость отсечения, м. -->
+        <zNear>0.1</zNear>
+        <!-- Дальняя плоскость отсечения (дальность видимости), м. -->
+        <ViewDistance>2000.0</ViewDistance>
+
+        <!-- Минимальный угол поля зрения, град. -->
+        <FovYMin>30</FovYMin>
+        <!-- Максимальный угол поля зрения, град. -->
+        <FovYMax>120</FovYMax>
+        <!-- Угол поля зрения по умолчанию, град. -->
+        <FovY>90</FovY>
+
+        <!-- Длина стрелок гизмо -->
+        <GizmoArrowLength>3.0</GizmoArrowLength>
+        <!-- Толщина стрелок гизмо-->
+        <GizmoArrowThickness>0.1</GizmoArrowThickness>
+        <!-- Цвет оси X гизмо -->
+        <GizmoXAxisColorR>0.859</GizmoXAxisColorR>
+        <GizmoXAxisColorG>0.188</GizmoXAxisColorG>
+        <GizmoXAxisColorB>0.143</GizmoXAxisColorB>
+        <!-- Цвет оси Y гизмо -->
+        <GizmoYAxisColorR>0.533</GizmoYAxisColorR>
+        <GizmoYAxisColorG>0.820</GizmoYAxisColorG>
+        <GizmoYAxisColorB>0.298</GizmoYAxisColorB>
+        <!-- Цвет оси Z гизмо -->
+        <GizmoZAxisColorR>0.188</GizmoZAxisColorR>
+        <GizmoZAxisColorG>0.438</GizmoZAxisColorG>
+        <GizmoZAxisColorB>0.859</GizmoZAxisColorB>
+        <!-- Непрозрачность гизмо -->
+        <GizmoOpacity>1.0</GizmoOpacity>
+
+        <!-- Размер шрифта GUI -->
+        <GuiFontSize>24.0</GuiFontSize>
+        <!-- Можно ли перемещать и менять размер GUI -->
+        <IsGuiEditable>1</IsGuiEditable>
+        <!-- Отображать список моделей в objects.ref после загрузки маршрута -->
+        <ShowObjectsRef>1</ShowObjectsRef>
+        <!-- Отображать список объектов в route1.map после загрузки маршрута -->
+        <!-- !!!Сейчас на больших маршрутах тормозит!!! -->
+        <ShowRouteMap>0</ShowRouteMap>
+        <!-- Отображать привязки клавиш и кнопок управления -->
+        <ShowControls>1</ShowControls>
+        <!-- Отображать настройки камеры -->
+        <ShowCameraSettings>0</ShowCameraSettings>
+        <!-- Отображать топологию -->
+        <ShowTopology>0</ShowTopology>
+
+        <!-- Минимальная скорость вращения камеры -->
+        <MinCameraRotateSpeed>10.0</MinCameraRotateSpeed>
+        <!-- Максимальная скорость вращения камеры -->
+        <MaxCameraRotateSpeed>25.0</MaxCameraRotateSpeed>
+        <!-- Скорость вращения камеры -->
+        <CameraRotateSpeed>20.0</CameraRotateSpeed>
+
+        <!-- Минимальная сила приближения/отдаления камеры -->
+        <MinCameraZoomPower>50.0</MinCameraZoomPower>
+        <!-- Максимальная сила приближения/отдаления камеры -->
+        <MaxCameraZoomPower>500.0</MaxCameraZoomPower>
+        <!-- Сила приближения/отдаления камеры -->
+        <CameraZoomPower>250.0</CameraZoomPower>
+
+        <!-- Минимальная скорость перемещения камеры -->
+        <MinCameraMoveSpeed>10.0</MinCameraMoveSpeed>
+        <!-- Максимальная скорость перемещения камеры -->
+        <MaxCameraMoveSpeed>200.0</MaxCameraMoveSpeed>
+        <!-- Скорость перемещения камеры -->
+        <CameraMoveSpeed>100.0</CameraMoveSpeed>
+
+        <!-- Key bindings -->
+        <KeyMoveCameraForward>w</KeyMoveCameraForward>
+        <KeyMoveCameraBackward>s</KeyMoveCameraBackward>
+        <KeyMoveCameraLeft>a</KeyMoveCameraLeft>
+        <KeyMoveCameraRight>d</KeyMoveCameraRight>
+    </Editor>
 </Config>
