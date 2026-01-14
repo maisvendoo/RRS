@@ -85,7 +85,6 @@ bool RouteEditor::initialize()
 
     const auto& camera = camera_handler->get_camera();
 
-
     ambient_light = vsg::AmbientLight::create();
 
     scene_group = vsg::Group::create();
