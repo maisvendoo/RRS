@@ -5,7 +5,7 @@ set (TARGET freightcar)
 # Задаем имя проекта
 project (${TARGET})
 
-# Qt-шное барахло для запуска метообъектного компилятора
+# Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -23,18 +23,12 @@ find_package(Qt6 COMPONENTS Xml REQUIRED)
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
-# Компиляция библиотеке
+# Компиляция библиотеки
 add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../../../CfgReader/include)
 target_include_directories (${TARGET} PRIVATE ../../../common-headers)
-target_include_directories (${TARGET} PRIVATE ../../../simulator/solver/include)
-target_include_directories (${TARGET} PRIVATE ../../../simulator/physics/include)
-target_include_directories (${TARGET} PRIVATE ../../../simulator/vehicle/include)
-target_include_directories (${TARGET} PRIVATE ../../../simulator/device/include)
-target_include_directories (${TARGET} PRIVATE ../../../filesystem/include)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Xml)

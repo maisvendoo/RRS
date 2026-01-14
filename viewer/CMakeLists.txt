@@ -31,14 +31,11 @@ target_link_libraries(${TARGET} PRIVATE
     network
     sound-manager
     display
+    topology
 )
 
 target_include_directories(${TARGET} PRIVATE
-    ../simulator/topology/include
-    ../simulator/vehicle/include
     ../common-headers
-    ../filesystem/include
-    ../CfgReader/include
     ../network/include
     ../sound-manager/include
     display/include

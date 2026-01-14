@@ -5,7 +5,7 @@ set (TARGET simulator)
 # Задаем имя проекта
 project (${TARGET})
 
-# Qt-шное барахло для запуска метообъектного компилятора
+# Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -28,18 +28,11 @@ add_executable (${TARGET} ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../physics/include)
-target_include_directories (${TARGET} PRIVATE ../solver/include)
-target_include_directories (${TARGET} PRIVATE ../vehicle/include)
-target_include_directories (${TARGET} PRIVATE ../../CfgReader/include)
-target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
-target_include_directories (${TARGET} PRIVATE ../device/include)
 target_include_directories (${TARGET} PRIVATE ../../network/include)
 target_include_directories (${TARGET} PRIVATE ../train/include)
 target_include_directories (${TARGET} PRIVATE ../model/include)
-target_include_directories (${TARGET} PRIVATE ../topology/include)
 target_include_directories (${TARGET} PRIVATE ../scenario-manager/include)
 
 # Компонуемся с библиотеками Qt6

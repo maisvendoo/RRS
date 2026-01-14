@@ -5,11 +5,11 @@ set (TARGET trajectory-ALSN)
 # Задаем имя проекта
 project (${TARGET})
 
-# Опеределяем дефайн TRAJECTORY_ALSN_LIB для корректного
+# Определяем дефайн TRAJECTORY_ALSN_LIB для корректного
 # экспорта и импорта классов из DLL
 add_definitions(-DTRAJECTORY_ALSN_LIB)
 
-# Qt-шное барахло для запуска метообъектного компилятора
+# Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -27,18 +27,11 @@ find_package(Qt6 COMPONENTS Xml REQUIRED)
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
-# Компиляция библиотеке
+# Компиляция библиотеки
 add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../physics/include)
-target_include_directories (${TARGET} PRIVATE ../solver/include)
-target_include_directories (${TARGET} PRIVATE ../device/include)
-target_include_directories (${TARGET} PRIVATE ../topology/include)
-target_include_directories (${TARGET} PRIVATE ../vehicle/include)
-target_include_directories (${TARGET} PRIVATE ../../CfgReader/include)
-target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 
 # Компонуемся с библиотеками Qt6

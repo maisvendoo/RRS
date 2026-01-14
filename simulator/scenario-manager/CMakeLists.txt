@@ -11,7 +11,13 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 add_definitions(-DSCNMGR_LIB)
 
 find_package(Qt6 COMPONENTS Core REQUIRED)
-find_package(lua CONFIG REQUIRED)
+
+if(WIN32)
+    find_package(lua CONFIG REQUIRED)
+else()
+    find_package(Lua 5.4 REQUIRED)
+endif()
+
 find_package(sol2 REQUIRED)
 
 file (GLOB INCLUDES "./include/*.h")
@@ -21,15 +27,19 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
-target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
-target_include_directories (${TARGET} PRIVATE ../topology/include)
-target_include_directories (${TARGET} PRIVATE ../device/include)
 
 target_link_libraries(${TARGET} Qt6::Core)
-target_link_libraries(${TARGET} lua::lua)
+
+if(WIN32)
+    target_link_libraries(${TARGET} lua::lua)
+else()
+    target_link_libraries(${TARGET} ${LUA_LIBRARIES})
+endif()
+
 target_link_libraries(${TARGET} sol2)
 
 target_link_libraries (${TARGET} Journal)
 target_link_libraries (${TARGET} filesystem)
 target_link_libraries (${TARGET} device)
+target_link_libraries (${TARGET} topology)

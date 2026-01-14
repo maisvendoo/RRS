@@ -5,7 +5,7 @@ set (TARGET Journal)
 # Задаем имя проекта
 project (${TARGET})
 
-# Qt-шное барахло для запуска метообъектного компилятора
+# Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -27,7 +27,7 @@ if(WIN32)
     file (GLOB C_SOURCES "./src/*.c")
 endif()
 
-# Компиляция библиотеке
+# Компиляция библиотеки
 add_library (${TARGET} SHARED ${CPP_SOURCES} ${C_SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков

@@ -5,7 +5,7 @@ set (TARGET freejoy)
 # Задаем имя проекта
 project (${TARGET})
 
-# Qt-шное барахло для запуска метообъектного компилятора
+# Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -16,8 +16,8 @@ set (LIBRARY_OUTPUT_PATH "../../../plugins")
 # Указываем не добавлять к имени бинарника никаких префиксов
 set (CMAKE_SHARED_MODULE_PREFIX "")
 
-# Опеределяем дефайн CFG_READER_LIB для корректного
-# экспорта и импорта слассов из DLL
+# Определяем дефайн DEVICE_LIB для корректного
+# экспорта и импорта классов из DLL
 add_definitions(-DDEVICE_LIB)
 
 # Ищем зависимости Qt6
@@ -33,16 +33,11 @@ find_package(SFML COMPONENTS System Window REQUIRED)
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
-# Компиляция библиотеке
+# Компиляция библиотеки
 add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../physics/include)
-target_include_directories (${TARGET} PRIVATE ../solver/include)
-target_include_directories (${TARGET} PRIVATE ../device/include)
-target_include_directories (${TARGET} PRIVATE ../../CfgReader/include)
-target_include_directories (${TARGET} PRIVATE ../../filesystem/include)
 target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 
 # Компонуемся с библиотеками Qt6
