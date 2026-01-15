@@ -221,6 +221,6 @@ void IntersectionHandler::handle_scene_intersections(vsg::ref_ptr<vsg::LineSegme
         // object_selector->gizmo->translation = translation + center_offset;
 
         object_selector->outline->update(vsg::ref_ptr(paged_lod));
-        object_selector->outline->matrix = curr_matrix_transform->matrix;
+        // object_selector->outline->matrix = curr_matrix_transform->matrix;
     }
 }

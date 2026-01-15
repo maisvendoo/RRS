@@ -2,7 +2,7 @@
                         CameraHandler.h
 EditorGui.h
                         EditorState.h
-Gizmo.h
+                        Gizmo.h
 IntersectionHandler.h
                         KeyboardHandler.h
                         KeyStates.h
@@ -11,7 +11,7 @@ IntersectionHandler.h
                         ObjectProperties.h
 ObjectSelector.h
                         ObjectState.h
-Outline.h
+                        Outline.h
                         PagedLodMap.h
                         Route.h
 RouteEditor.h
@@ -26,13 +26,13 @@ RouteEditor.h
                         Action.cpp
                         CameraHandler.cpp
 EditorGui.cpp
-Gizmo.cpp
+                        Gizmo.cpp
 IntersectionHandler.cpp
                         KeyboardHandler.cpp
                         main.cpp
                         MouseHandler.cpp
 ObjectSelector.cpp
-Outline.cpp
+                        Outline.cpp
                         Route.cpp
 RouteEditor.cpp
                         SceneGraph.cpp
