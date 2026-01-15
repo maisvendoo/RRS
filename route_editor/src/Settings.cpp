@@ -52,15 +52,38 @@ void settings_t::read(const std::string& cfg_path)
 
     cfg.getDouble(section, "GizmoArrowLength", gizmo_arrow_length);
     cfg.getDouble(section, "GizmoArrowThickness", gizmo_arrow_thickness);
-    cfg.getDouble(section, "GizmoXAxisColorR", gizmo_x_axis_color[0]);
-    cfg.getDouble(section, "GizmoXAxisColorG", gizmo_x_axis_color[1]);
-    cfg.getDouble(section, "GizmoXAxisColorB", gizmo_x_axis_color[2]);
-    cfg.getDouble(section, "GizmoYAxisColorR", gizmo_y_axis_color[0]);
-    cfg.getDouble(section, "GizmoYAxisColorG", gizmo_y_axis_color[1]);
-    cfg.getDouble(section, "GizmoYAxisColorB", gizmo_y_axis_color[2]);
-    cfg.getDouble(section, "GizmoZAxisColorR", gizmo_z_axis_color[0]);
-    cfg.getDouble(section, "GizmoZAxisColorG", gizmo_z_axis_color[1]);
-    cfg.getDouble(section, "GizmoZAxisColorB", gizmo_z_axis_color[2]);
+
+    const char* field_names[] = {
+        "GizmoXAxisColorR",
+        "GizmoXAxisColorG",
+        "GizmoXAxisColorB",
+        "GizmoYAxisColorR",
+        "GizmoYAxisColorG",
+        "GizmoYAxisColorB",
+        "GizmoZAxisColorR",
+        "GizmoZAxisColorG",
+        "GizmoZAxisColorB"
+    };
+
+    float* color_components[] = {
+        &gizmo_arrow_x_color.r,
+        &gizmo_arrow_x_color.g,
+        &gizmo_arrow_x_color.b,
+        &gizmo_arrow_y_color.r,
+        &gizmo_arrow_y_color.g,
+        &gizmo_arrow_y_color.b,
+        &gizmo_arrow_z_color.r,
+        &gizmo_arrow_z_color.g,
+        &gizmo_arrow_z_color.b
+    };
+
+    for (int i = 0; i < 9; ++i)
+    {
+        double tmp;
+        cfg.getDouble(section, field_names[i], tmp);
+        *color_components[i] = static_cast<float>(tmp);
+    }
+
     cfg.getDouble(section, "GizmoOpacity", gizmo_opacity);
 
     cfg.getDouble(section, "GuiFontSize", gui_font_size);

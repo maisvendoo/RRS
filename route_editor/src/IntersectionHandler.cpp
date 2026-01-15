@@ -76,15 +76,15 @@ void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
         return;
     }
 
-    active_gizmo_axis = GizmoAxis::NONE;
+    // active_gizmo_axis = GizmoAxis::NONE;
 }
 
 void IntersectionHandler::apply(vsg::MoveEvent& moveEvent)
 {
-    if (active_gizmo_axis == GizmoAxis::NONE)
-    {
-        return;
-    }
+    // if (active_gizmo_axis == GizmoAxis::NONE)
+    // {
+        // return;
+    // }
 
     // TODO: Replace on real values
     constexpr int screen_width = 2980;
@@ -103,57 +103,57 @@ void IntersectionHandler::apply(vsg::MoveEvent& moveEvent)
     const vsg::dvec3 direction = vsg::normalize(vsg::dvec3(ray_world.x, ray_world.y, ray_world.z));
 
     double t;
-    switch (active_gizmo_axis)
-    {
-        case GizmoAxis::X: case GizmoAxis::Y:
-        {
-            t = (object_selector->gizmo->translation.z - look_at->eye.z) / direction.z;
-            break;
-        }
-        case GizmoAxis::Z:
-        {
-            t = (object_selector->gizmo->translation.y - look_at->eye.y) / direction.y;
-            break;
-        }
-        default:
-        {
-            t = 0.0;
-            break;
-        }
-    }
+    // switch (active_gizmo_axis)
+    // {
+    //     case GizmoAxis::X: case GizmoAxis::Y:
+    //     {
+    //         t = (object_selector->gizmo->translation.z - look_at->eye.z) / direction.z;
+    //         break;
+    //     }
+    //     case GizmoAxis::Z:
+    //     {
+    //         t = (object_selector->gizmo->translation.y - look_at->eye.y) / direction.y;
+    //         break;
+    //     }
+    //     default:
+    //     {
+    //         t = 0.0;
+    //         break;
+    //     }
+    // }
 
     const vsg::dvec3 intersection = look_at->eye + direction * t;
 
-    switch (active_gizmo_axis)
-    {
-        case GizmoAxis::X:
-        {
-            object_selector->gizmo->translation.x = intersection.x;
-            break;
-        }
-        case GizmoAxis::Y:
-        {
-            object_selector->gizmo->translation.y = intersection.y;
-            break;
-        }
-        case GizmoAxis::Z:
-        {
-            object_selector->gizmo->translation.z = intersection.z;
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
+    // switch (active_gizmo_axis)
+    // {
+    //     case GizmoAxis::X:
+    //     {
+    //         object_selector->gizmo->translation.x = intersection.x;
+    //         break;
+    //     }
+    //     case GizmoAxis::Y:
+    //     {
+    //         object_selector->gizmo->translation.y = intersection.y;
+    //         break;
+    //     }
+    //     case GizmoAxis::Z:
+    //     {
+    //         object_selector->gizmo->translation.z = intersection.z;
+    //         break;
+    //     }
+    //     default:
+    //     {
+    //         break;
+    //     }
+    // }
 }
 
 void IntersectionHandler::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
-    object_selector->gizmo->matrix = vsg::translate(object_selector->gizmo->translation)
-        * vsg::scale(vsg::length(object_selector->gizmo->translation - look_at->eye) * 0.05);
+    // object_selector->gizmo->matrix = vsg::translate(object_selector->gizmo->translation)
+        // * vsg::scale(vsg::length(object_selector->gizmo->translation - look_at->eye) * 0.05);
 }
 
 vsg::ref_ptr<vsg::MatrixTransform>* IntersectionHandler::get_curr_matrix_transform_ptr()
@@ -218,7 +218,7 @@ void IntersectionHandler::handle_scene_intersections(vsg::ref_ptr<vsg::LineSegme
 
         center_offset = (compute_bounds.bounds.min + compute_bounds.bounds.max) * 0.5;
 
-        object_selector->gizmo->translation = translation + center_offset;
+        // object_selector->gizmo->translation = translation + center_offset;
 
         object_selector->outline->update(vsg::ref_ptr(paged_lod));
         object_selector->outline->matrix = curr_matrix_transform->matrix;

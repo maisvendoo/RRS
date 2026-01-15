@@ -66,7 +66,7 @@ private:
     vsg::ref_ptr<ObjectSelector> object_selector;
     vsg::ref_ptr<vsg::MatrixTransform> curr_matrix_transform;
     vsg::dvec3 center_offset;
-    GizmoAxis active_gizmo_axis;
+    // GizmoAxis active_gizmo_axis;
 };
 
 #endif // INTERSECTION_HANDLER_H

@@ -44,7 +44,7 @@ public:
 
 private:
     vsg::ref_ptr<vsg::MatrixTransform> object;
-    GizmoAxis active_gizmo_axis = GizmoAxis::NONE;
+    // GizmoAxis active_gizmo_axis = GizmoAxis::NONE;
 
     vsg::dvec3 translation;
     vsg::dvec3 rotation;
