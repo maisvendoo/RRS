@@ -4,6 +4,7 @@
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
+#include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
@@ -20,7 +21,8 @@ static vsg::ref_ptr<vsg::Node> create_arrow(
     const vsg::vec3& color
 );
 
-Gizmo::Gizmo(const settings_t& settings)
+Gizmo::Gizmo(vsg::dmat4& outer_matrix, const settings_t& settings)
+    : outer_matrix(outer_matrix)
 {
     vsg::Builder builder;
     builder.shaderSet = vsg::createFlatShadedShaderSet();

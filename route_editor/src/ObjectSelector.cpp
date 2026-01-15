@@ -16,11 +16,11 @@ ObjectSelector::ObjectSelector(
     vsg::ref_ptr<vsg::Group> gui_group
 )
 {
-    gizmo = Gizmo::create(settings);
+    // gizmo = Gizmo::create(settings);
 
     outline = Outline::create(observer_viewer);
 
-    gui_group->addChild(gizmo);
+    // gui_group->addChild(gizmo);
     gui_group->addChild(outline);
 }
 
