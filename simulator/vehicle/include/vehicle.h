@@ -339,7 +339,7 @@ protected:
     feedback_signals_t  feedback_signals;
 
     /// Automation control module
-    std::vector<Autopilot *> autopilot = { nullptr };
+    std::vector<Autopilot *> autopilot;
 
     /// User defined initialization
     virtual void initialization();
