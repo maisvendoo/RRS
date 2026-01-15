@@ -1,9 +1,7 @@
 Unready files:
 
 EditorGui.h
-IntersectionHandler.h
 RouteEditor.h
 
 EditorGui.cpp
-IntersectionHandler.cpp
 RouteEditor.cpp

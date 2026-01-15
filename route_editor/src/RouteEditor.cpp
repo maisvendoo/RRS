@@ -126,10 +126,10 @@ bool RouteEditor::initialize()
     viewer->addEventHandler(keyboard_handler);
     viewer->addEventHandler(camera_handler);
 
-    auto intersection_handler = IntersectionHandler::create(settings, options,
-        camera_handler->get_look_at(), camera, scene_graph, gui_group, observer_viewer, object_selector);
+    // auto intersection_handler = IntersectionHandler::create(settings, options,
+        // camera_handler->get_look_at(), camera, scene_graph, gui_group, observer_viewer, object_selector);
 
-    viewer->addEventHandler(intersection_handler);
+    // viewer->addEventHandler(intersection_handler);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
     viewer->compile();
