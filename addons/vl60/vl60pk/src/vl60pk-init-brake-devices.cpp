@@ -120,3 +120,25 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
         anglecock_bp_bwd->close();
     }
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60pk::OnAutopilot()
+{
+    for (auto cab_idx : {CAB1, CAB2})
+    {
+        autopilot_switcher[cab_idx].set();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60pk::OffAutopilot()
+{
+    for (auto cab_idx : {CAB1, CAB2})
+    {
+        autopilot_switcher[cab_idx].reset();
+    }
+}

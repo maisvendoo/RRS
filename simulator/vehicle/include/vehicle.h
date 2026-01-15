@@ -194,9 +194,19 @@ public:
 
     void setBrakeShoesState(bool state);
 
-    Autopilot *getAutopilot()
+    std::vector<Autopilot *> getAutopilot()
     {
         return autopilot;
+    }
+
+    virtual void OnAutopilot()
+    {
+
+    }
+
+    virtual void OffAutopilot()
+    {
+
     }
 
 protected:
@@ -329,7 +339,7 @@ protected:
     feedback_signals_t  feedback_signals;
 
     /// Automation control module
-    Autopilot *autopilot = nullptr;
+    std::vector<Autopilot *> autopilot = { nullptr };
 
     /// User defined initialization
     virtual void initialization();

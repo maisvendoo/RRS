@@ -205,11 +205,11 @@ void VL60pk::debugPrint(const simulator_time_t& t, const double& dt)
         }
     }
 
-    if (autopilot != nullptr)
+    if (autopilot[CAB1] != nullptr)
     {
         QString auto_mode = "";
 
-        if (autopilot->isActive())
+        if (autopilot[CAB1]->isActive())
         {
             auto_mode = " | ВКЛЮЧЕНО АВТОВЕДЕНИЕ!";
         }

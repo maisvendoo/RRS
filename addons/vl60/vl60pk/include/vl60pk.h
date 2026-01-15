@@ -86,6 +86,10 @@ public:
     /// Инициализация тормозных приборов
     void initBrakeDevices(double p0, double pBP, double pFL) override;
 
+    void OnAutopilot() override;
+
+    void OffAutopilot() override;
+
 private:
 
     enum
@@ -435,11 +439,11 @@ private:
 
     SpotLight *spotlight[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
-    TriggerControl autopilot_switcher;
+    TriggerControl autopilot_switcher[CABS_NUM];
 
-    vl60_control_t *auto_control = nullptr;
+    vl60_control_t *auto_control[CABS_NUM] = {nullptr, nullptr};
 
-    vl60_feedback_t *auto_feedback = new vl60_feedback_t();
+    vl60_feedback_t *auto_feedback[CABS_NUM];
 
     /// Чтение конфигурационного файла
     void loadConfig(QString cfg_path) override;
