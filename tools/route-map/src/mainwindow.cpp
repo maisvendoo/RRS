@@ -331,6 +331,15 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         ui->ptLog->appendPlainText(QString(tr("Warning: no enter signals data")));
     }
 
+    if (signals_data->route_signals.size() != 0)
+    {
+        ui->ptLog->appendPlainText(QString(tr("Loaded %1 route signals")).arg(signals_data->route_signals.size()));
+    }
+    else
+    {
+        ui->ptLog->appendPlainText(QString(tr("Warning: no route signals data")));
+    }
+
     if (signals_data->exit_signals.size() != 0)
     {
         ui->ptLog->appendPlainText(QString(tr("Loaded %1 exit signals")).arg(signals_data->exit_signals.size()));
@@ -338,6 +347,15 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     else
     {
         ui->ptLog->appendPlainText(QString(tr("Warning: no exit signals data")));
+    }
+
+    if (signals_data->shunt_signals.size() != 0)
+    {
+        ui->ptLog->appendPlainText(QString(tr("Loaded %1 shunt signals")).arg(signals_data->shunt_signals.size()));
+    }
+    else
+    {
+        ui->ptLog->appendPlainText(QString(tr("Warning: no shunt signals data")));
     }
 
     for (auto sl : map->signal_labels_fwd)
@@ -351,98 +369,48 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     map->signal_labels_fwd.clear();
     map->signal_labels_bwd.clear();
 
-    for (auto signal : signals_data->line_signals)
+    bool is_array_with_line_signals = true;
+    for (auto& signals_array : {signals_data->line_signals,
+                                signals_data->enter_signals,
+                                signals_data->route_signals,
+                                signals_data->exit_signals,
+                                signals_data->shunt_signals})
     {
-        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), nullptr);
-
-        if (conn == nullptr)
+        for (auto& signal : signals_array)
         {
-            continue;
+            Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), nullptr);
+
+            if (conn == nullptr)
+            {
+                continue;
+            }
+
+            signal->setConnector(conn);
+
+            SignalLabel *signal_label = new SignalLabel(map);
+            signal_label->signal = signal;
+            signal_label->setText(signal->getLetter());
+
+            if (signal->getDirection() == 1)
+            {
+                conn->setSignalFwd(signal);
+
+                map->signal_labels_fwd.insert(conn->getName(), signal_label);
+            }
+
+            if (signal->getDirection() == -1)
+            {
+                conn->setSignalBwd(signal);
+
+                map->signal_labels_bwd.insert(conn->getName(), signal_label);
+            }
+
+            if (!is_array_with_line_signals)
+            {
+                connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
+            }
         }
-
-        signal->setConnector(conn);
-
-        SignalLabel *signal_label = new SignalLabel(map);
-        signal_label->signal = signal;
-        signal_label->setText(signal->getLetter());
-
-        if (signal->getDirection() == 1)
-        {
-            conn->setSignalFwd(signal);
-
-            map->signal_labels_fwd.insert(conn->getName(), signal_label);
-        }
-
-        if (signal->getDirection() == -1)
-        {
-            conn->setSignalBwd(signal);
-
-            map->signal_labels_bwd.insert(conn->getName(), signal_label);
-        }
-    }
-
-    for (auto signal : signals_data->enter_signals)
-    {
-        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), nullptr);
-
-        if (conn == nullptr)
-        {
-            continue;
-        }
-
-        signal->setConnector(conn);
-
-        SignalLabel *signal_label = new SignalLabel(map);
-        signal_label->signal = signal;
-        signal_label->setText(signal->getLetter());
-
-        if (signal->getDirection() == 1)
-        {
-            conn->setSignalFwd(signal);
-
-            map->signal_labels_fwd.insert(conn->getName(), signal_label);
-        }
-
-        if (signal->getDirection() == -1)
-        {
-            conn->setSignalBwd(signal);
-
-            map->signal_labels_bwd.insert(conn->getName(), signal_label);
-        }
-
-        connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
-    }
-
-    for (auto signal : signals_data->exit_signals)
-    {
-        Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), nullptr);
-
-        if (conn == nullptr)
-        {
-            continue;
-        }
-
-        signal->setConnector(conn);
-
-        SignalLabel *signal_label = new SignalLabel(map);
-        signal_label->signal = signal;
-        signal_label->setText(signal->getLetter());
-
-        if (signal->getDirection() == 1)
-        {
-            conn->setSignalFwd(signal);
-
-            map->signal_labels_fwd.insert(conn->getName(), signal_label);
-        }
-
-        if (signal->getDirection() == -1)
-        {
-            conn->setSignalBwd(signal);
-
-            map->signal_labels_bwd.insert(conn->getName(), signal_label);
-        }
-
-        connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
+        is_array_with_line_signals = false;
     }
 
     // Запрос серверу на регулярное обновление игроков

@@ -138,12 +138,6 @@ private:
 
     Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
 
-    void line_signals_step(double t, double dt);
-
-    void enter_signals_step(double t, double dt);
-
-    void exit_signals_step(double t, double dt);
-
     /// Нахождение пути в графе траекторий
     route_segment_t find_route(Trajectory *start_traj,
                                Trajectory *target_traj,

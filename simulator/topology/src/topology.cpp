@@ -232,54 +232,6 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::line_signals_step(double t, double dt)
-{
-    for (auto line_signal : signals_data.line_signals)
-    {
-        if (line_signal == nullptr)
-        {
-            continue;
-        }
-
-        line_signal->step(t, dt);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Topology::enter_signals_step(double t, double dt)
-{
-    for (auto enter_signal : signals_data.enter_signals)
-    {
-        if (enter_signal == nullptr)
-        {
-            continue;
-        }
-
-        enter_signal->step(t, dt);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Topology::exit_signals_step(double t, double dt)
-{
-    for (auto exit_signal : signals_data.exit_signals)
-    {
-        if (exit_signal == nullptr)
-        {
-            continue;
-        }
-
-        exit_signal->step(t, dt);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 route_segment_t Topology::find_route(Trajectory *start_traj,
                                      Trajectory *target_traj,
                                      int dir)
@@ -575,11 +527,22 @@ void Topology::step(double t, double dt)
         (*conn)->step(t, dt);
     }
 
-    line_signals_step(t, dt);
+    for (auto& signals_array : {signals_data.line_signals,
+                                signals_data.enter_signals,
+                                signals_data.route_signals,
+                                signals_data.exit_signals,
+                                signals_data.shunt_signals})
+    {
+        for (auto& signal : signals_array)
+        {
+            if (signal == nullptr)
+            {
+                continue;
+            }
 
-    enter_signals_step(t, dt);
-
-    exit_signals_step(t, dt);
+            signal->step(t, dt);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -881,6 +844,23 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         signal_dir_bwd = -1;
     }
 
+    auto configure_signal = [](Signal* signal, Connector* conn, int direction,
+                               QString signal_letter, QString signal_model,
+                               dvec3 relative_position, dvec3 relative_rotation)
+    {
+        if (direction == 1)
+            conn->setSignalFwd(signal);
+        if (direction == -1)
+            conn->setSignalFwd(signal);
+
+        signal->setConnector(conn);
+        signal->setDirection(direction);
+        signal->setLetter(signal_letter);
+        signal->setSignalModel(signal_model);
+        signal->setRelPosition(relative_position);
+        signal->setRelRotation(relative_rotation);
+    };
+
     if (signal_dir_fwd == 1)
     {
         QString tmp;
@@ -905,55 +885,51 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         if (signal_model_fwd.right(4) == "line")
         {
             LineSignal *signal = new LineSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_fwd);
-            signal->setSignalModel(signal_model_fwd);
-            signal->setConnector(conn);
-
-            conn->setSignalFwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_fwd,
+                             signal_letter, signal_model_fwd,
+                             rel_pos, rel_rot);
             signals_data.line_signals.push_back(signal);
-
             Journal::instance()->info("Loaded line signal " + signal->getLetter());
         }
 
-        if ( (signal_model_fwd.right(4) == "entr") || (signal_model_fwd.right(4) == "rout") )
+        if (signal_model_fwd.right(4) == "entr")
         {
             EnterSignal *signal = new EnterSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_fwd);
-            signal->setSignalModel(signal_model_fwd);
-            signal->setConnector(conn);
-
-            conn->setSignalFwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_fwd,
+                             signal_letter, signal_model_fwd,
+                             rel_pos, rel_rot);
             signals_data.enter_signals.push_back(signal);
-
             Journal::instance()->info("Loaded enter signal " + signal->getLetter());
+        }
+
+        if (signal_model_fwd.right(4) == "rout")
+        {
+            RouteSignal *signal = new RouteSignal;
+            configure_signal(signal, conn, signal_dir_fwd,
+                             signal_letter, signal_model_fwd,
+                             rel_pos, rel_rot);
+            signals_data.route_signals.push_back(signal);
+            Journal::instance()->info("Loaded route signal " + signal->getLetter());
         }
 
         if (signal_model_fwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_fwd);
-            signal->setSignalModel(signal_model_fwd);
-            signal->setConnector(conn);
-
-            conn->setSignalFwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_fwd,
+                             signal_letter, signal_model_fwd,
+                             rel_pos, rel_rot);
             signals_data.exit_signals.push_back(signal);
-
             Journal::instance()->info("Loaded exit signal " + signal->getLetter());
+        }
+
+        if (signal_model_fwd.right(4) == "shnt")
+        {
+            ShuntingSignal *signal = new ShuntingSignal;
+            configure_signal(signal, conn, signal_dir_fwd,
+                             signal_letter, signal_model_fwd,
+                             rel_pos, rel_rot);
+            signals_data.shunt_signals.push_back(signal);
+            Journal::instance()->info("Loaded shunting signal " + signal->getLetter());
         }
     }
 
@@ -981,55 +957,51 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         if (signal_model_bwd.right(4) == "line")
         {
             LineSignal *signal = new LineSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_bwd);
-            signal->setSignalModel(signal_model_bwd);
-            signal->setConnector(conn);
-
-            conn->setSignalBwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_bwd,
+                             signal_letter, signal_model_bwd,
+                             rel_pos, rel_rot);
             signals_data.line_signals.push_back(signal);
-
             Journal::instance()->info("Loaded line signal " + signal->getLetter());
         }
 
-        if ( (signal_model_bwd.right(4) == "entr") || (signal_model_bwd.right(4) == "rout") )
+        if (signal_model_bwd.right(4) == "entr")
         {
             EnterSignal *signal = new EnterSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_bwd);
-            signal->setSignalModel(signal_model_bwd);
-            signal->setConnector(conn);
-
-            conn->setSignalBwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_bwd,
+                             signal_letter, signal_model_bwd,
+                             rel_pos, rel_rot);
             signals_data.enter_signals.push_back(signal);
-
             Journal::instance()->info("Loaded enter signal " + signal->getLetter());
+        }
+
+        if (signal_model_bwd.right(4) == "rout")
+        {
+            RouteSignal *signal = new RouteSignal;
+            configure_signal(signal, conn, signal_dir_bwd,
+                             signal_letter, signal_model_bwd,
+                             rel_pos, rel_rot);
+            signals_data.route_signals.push_back(signal);
+            Journal::instance()->info("Loaded route signal " + signal->getLetter());
         }
 
         if (signal_model_bwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_bwd);
-            signal->setSignalModel(signal_model_bwd);
-            signal->setConnector(conn);
-
-            conn->setSignalBwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_bwd,
+                             signal_letter, signal_model_bwd,
+                             rel_pos, rel_rot);
             signals_data.exit_signals.push_back(signal);
-
             Journal::instance()->info("Loaded exit signal " + signal->getLetter());
+        }
+
+        if (signal_model_bwd.right(4) == "shnt")
+        {
+            ShuntingSignal *signal = new ShuntingSignal;
+            configure_signal(signal, conn, signal_dir_bwd,
+                             signal_letter, signal_model_bwd,
+                             rel_pos, rel_rot);
+            signals_data.shunt_signals.push_back(signal);
+            Journal::instance()->info("Loaded shunting signal " + signal->getLetter());
         }
     }
 }

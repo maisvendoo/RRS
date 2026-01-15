@@ -74,6 +74,9 @@ void ShuntingSignal::step(double t, double dt)
     // Работа таймеров удержания кнопки
     open_timer->step(t, dt);
     close_timer->step(t, dt);
+
+    lens_state[BLUE_LENS] = true;
+    lens_state[WHITE_LENS] = true;
 }
 
 //------------------------------------------------------------------------------
@@ -84,7 +87,7 @@ void ShuntingSignal::slotPressOpen()
     is_open_button_pressed = true;
     open_timer->start();
 
-    Journal::instance()->info("Pressed open button for station signal " + letter);
+    Journal::instance()->info("Pressed open button for shunting signal " + letter);
 }
 
 //------------------------------------------------------------------------------
@@ -95,7 +98,7 @@ void ShuntingSignal::slotPressClose()
     is_close_button_unpressed = false;
     close_timer->start();
 
-    Journal::instance()->info("Pressed close button for station signal " + letter);
+    Journal::instance()->info("Pressed close button for shunting signal " + letter);
 }
 
 //------------------------------------------------------------------------------
@@ -106,7 +109,7 @@ void ShuntingSignal::slotOpenTimer()
     is_open_button_pressed = false;
     open_timer->stop();
 
-    Journal::instance()->info("Released open button for station signal " + letter);
+    Journal::instance()->info("Released open button for shunting signal " + letter);
 }
 
 //------------------------------------------------------------------------------
@@ -117,7 +120,7 @@ void ShuntingSignal::slotCloseTimer()
     is_close_button_unpressed = true;
     close_timer->stop();
 
-    Journal::instance()->info("Released close button for station signal " + letter);
+    Journal::instance()->info("Released close button for shunting signal " + letter);
 }
 
 //------------------------------------------------------------------------------

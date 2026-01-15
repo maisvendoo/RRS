@@ -507,9 +507,19 @@ void MapWidget::drawSignals(signals_data_t *signals_data)
         drawEnterSignal(enter_signal);
     }
 
+    for (auto route_signal : signals_data->route_signals)
+    {
+        drawEnterSignal(route_signal);
+    }
+
     for (auto exit_signal : signals_data->exit_signals)
     {
         drawExitSignal(exit_signal);
+    }
+
+    for (auto shunt_signal : signals_data->shunt_signals)
+    {
+        drawShuntSignal(shunt_signal);
     }
 }
 
@@ -879,6 +889,113 @@ void MapWidget::drawLineSignal(Signal *signal)
     }
     painter.setBrush(r_color);
     painter.drawEllipse(red_p, r, r);
+
+    QPen pen;
+    pen.setWidth((scale > 1.0) ? 2 : 1);
+    painter.setPen(pen);
+    painter.drawLine(bottom_down, bottom_up);
+    painter.drawLine(bottom_left, bottom_right);
+
+    painter.end();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::drawShuntSignal(Signal *signal)
+{
+    if (signal == nullptr)
+    {
+        return;
+    }
+
+    Connector *conn = signal->getConnector();
+
+    if (conn == nullptr)
+    {
+        return;
+    }
+
+    dvec3 bottom_signal_pos;
+    track_t track;
+    Trajectory *traj = nullptr;
+
+    if (signal->getDirection() == 1)
+    {
+        traj = conn->getBwdTraj();
+    }
+    else
+    {
+        traj = conn->getFwdTraj();
+    }
+
+    if (traj == nullptr)
+    {
+        return;
+    }
+
+    SignalLabel *signal_label = nullptr;
+    if (signal->getDirection() == 1)
+    {
+        track = traj->getLastTrack();
+        bottom_signal_pos = track.end_point;
+        signal_label = signal_labels_fwd.value(conn->getName(), nullptr);
+    }
+    else
+    {
+        track = traj->getFirstTrack();
+        bottom_signal_pos = track.begin_point;
+        signal_label = signal_labels_bwd.value(conn->getName(), nullptr);
+    }
+
+    double radius = signal_radius;
+    double right_shift = signal_offset;
+    bottom_signal_pos += track.trav * (right_shift * signal->getDirection());
+    dvec3 b_signal_pos = bottom_signal_pos + track.orth * (2 * radius * signal->getDirection());
+    dvec3 w_signal_pos = bottom_signal_pos + track.orth * (4 * radius * signal->getDirection());
+
+    dvec3 label_pos = bottom_signal_pos + track.orth * (7 * radius * signal->getDirection());
+
+    QPainter painter;
+    painter.begin(this);
+
+    QPoint white_p = coord_transform(w_signal_pos);
+    QPoint blue_p = coord_transform(b_signal_pos);
+
+    QPoint bottom_down = coord_transform(bottom_signal_pos);
+    QPoint bottom_up = coord_transform(bottom_signal_pos + track.orth * (radius * signal->getDirection()));
+    QPoint bottom_left = coord_transform(bottom_signal_pos - track.trav * (radius * signal->getDirection()));
+    QPoint bottom_right = coord_transform(bottom_signal_pos + track.trav * (radius * signal->getDirection()));
+
+    if (signal_label != nullptr)
+    {
+        QPoint label_p = coord_transform(label_pos);
+        label_p.setX(label_p.x() - signal_label->width() / 2);
+        label_p.setY(label_p.y() - signal_label->height() / 2);
+
+        signal_label->move(label_p);
+        signal_label->show();
+    }
+
+    lens_state_t lens_state = signal->getAllLensState();
+
+    int r = radius * scale;
+
+    QColor w_color(0, 0, 0);
+    if (lens_state[WHITE_LENS])
+    {
+        w_color = QColor(255, 255, 196);
+    }
+    painter.setBrush(w_color);
+    painter.drawEllipse(white_p, r, r);
+
+    QColor b_color(0, 0, 0);
+    if (lens_state[BLUE_LENS])
+    {
+        b_color = QColor(0, 0, 255);
+    }
+    painter.setBrush(b_color);
+    painter.drawEllipse(blue_p, r, r);
 
     QPen pen;
     pen.setWidth((scale > 1.0) ? 2 : 1);

@@ -142,6 +142,8 @@ private:
 
     void drawExitSignal(Signal *signal);
 
+    void drawShuntSignal(Signal *signal);
+
     QPoint coord_transform(dvec3 point);
 
     void wheelEvent(QWheelEvent *event);
