@@ -28,6 +28,7 @@ struct settings_t
     double pitch_min = -70.0;                     ///< Vertical angle down max
     double pitch_max = 70.0;                      ///< Vertical angle up max
 
+    // TODO: Separate in struct
     double gizmo_arrow_length = 5.0;
     double gizmo_arrow_thickness = 0.1;
     vsg::vec3 gizmo_arrow_x_color = {1.0f, 0.0f, 0.0f};
