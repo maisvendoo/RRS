@@ -1,4 +1,6 @@
 #include    "station-signal.h"
+#include    "trajectory.h"
+#include    "switch.h"
 #include    "Journal.h"
 
 //------------------------------------------------------------------------------
@@ -39,6 +41,9 @@ StationSignal::~StationSignal()
 void StationSignal::step(double t, double dt)
 {
     TrainSignal::step(t, dt);
+
+    check_train_route();
+
 
     // Цепь контрольного маршрутного реле
     control_relay->setVoltage(U_way);
@@ -115,3 +120,145 @@ void StationSignal::slotCloseTimer()
     Journal::instance()->info("Released close button for station signal " + letter);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void StationSignal::check_train_route()
+{
+    // Сбрасываем состояние
+    U_way = 0.0;
+    U_line = 0.0;
+    U_side = 0.0;
+    switches_state = SWITCHES_STRAIGHT;
+
+    // Начинаем с коннектора, к которому относится светофор
+    Connector *cur_conn = conn;
+
+    if (!cur_conn)
+    {
+        return;
+    }
+
+    while (true)
+    {
+        // Смотрим траекторию за текущим коннектором
+        Trajectory* traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
+
+        if (!traj)
+        {
+            return;
+        }
+
+        // Проверяем занятость траектории
+        if (traj->isBusy())
+        {
+            return;
+        }
+
+        // Проверяем включение траектории в маршрут от другого светофора
+        if (traj->isInRoute())
+        {
+            Signal* s = (signal_dir == 1) ? traj->getRouteBySignalFwd() : traj->getRouteBySignalBwd();
+            if (s != this)
+            {
+                return;
+            }
+        }
+
+        // Занимаем траекторию маршрутом от данного светофора
+        if (lock_relay->getContactState(LR_ROUTE_LOCKED))
+        {
+            traj->setInRoute(true);
+            (signal_dir == 1) ? traj->setRouteBySignalFwd(this) : traj->setRouteBySignalBwd(this);
+        }
+        else
+        {
+            traj->setInRoute(false);
+            (signal_dir == 1) ? traj->setRouteBySignalFwd(nullptr) : traj->setRouteBySignalBwd(nullptr);
+        }
+
+        // Смотрим следующий коннектор
+        cur_conn = (signal_dir == 1) ? traj->getFwdConnector() : traj->getBwdConnector();
+
+        if (!cur_conn)
+        {
+            return;
+        }
+
+        // Контроль взреза стрелки: смотрим траекторию перед следующим коннектором
+        Trajectory* prev = (signal_dir == 1) ? cur_conn->getBwdTraj() : cur_conn->getFwdTraj();
+
+        if (traj != prev)
+        {
+            return;
+        }
+
+        // Смотрим стрелочный перевод на коннекторе
+        if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+        {
+            // Блокировка стрелочных переводов в маршруте
+            if (lock_relay->getContactState(LR_ROUTE_LOCKED))
+            {
+                if (sw->getStateBwd() < 0)
+                {
+                    sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
+                    switches_state = SWITCHES_SIDE;
+                }
+                if (sw->getStateBwd() > 0)
+                {
+                    sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
+                }
+                if (sw->getStateFwd() < 0)
+                {
+                    sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
+                    switches_state = SWITCHES_SIDE;
+                }
+                if (sw->getStateFwd() > 0)
+                {
+                    sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
+                }
+            }
+            else
+            {
+                if (sw->getStateBwd() < 0)
+                {
+                    sw->setRefStateBwd(Switch::STATE_MINUS);
+                    switches_state = SWITCHES_SIDE;
+                }
+                if (sw->getStateBwd() > 0)
+                {
+                    sw->setRefStateBwd(Switch::STATE_PLUS);
+                }
+                if (sw->getStateFwd() < 0)
+                {
+                    sw->setRefStateFwd(Switch::STATE_MINUS);
+                    switches_state = SWITCHES_SIDE;
+                }
+                if (sw->getStateFwd() > 0)
+                {
+                    sw->setRefStateFwd(Switch::STATE_PLUS);
+                }
+            }
+        }
+
+        // Смотрим сигнал на следующем коннекторе
+        Signal* signal = (signal_dir == 1) ? cur_conn->getSignalFwd() : cur_conn->getSignalBwd();
+
+        if (signal)
+        {
+            if (TrainSignal* ts = dynamic_cast<TrainSignal*>(signal))
+            {
+                // Замыкание цепи на путевое реле в релейном шкафу следующего светофора
+                U_way = U_bat;
+                // Линейное реле питается от линии следующего светофора
+                U_line = ts->getLineVoltage();
+                // Боковое сигнальное реле питается от линии следующего светофора
+                U_side = ts->getSideVoltage();
+
+                // Если сигнал закрыт, отключаем АЛСН-код от следующего светофора
+                ts->allowTransmitALSN(!lens_state[RED_LENS]);
+                return;
+            }
+        }
+    }
+}

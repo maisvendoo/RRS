@@ -72,14 +72,16 @@ void LineSignal::preStep(double t)
 //------------------------------------------------------------------------------
 void LineSignal::check_route()
 {
+    // Сбрасываем состояние
+    U_way = 0.0;
+    U_line = 0.0;
+    U_side = 0.0;
+
     // Начинаем с коннектора, к которому относится светофор
     Connector *cur_conn = conn;
 
     if (!cur_conn)
     {
-        U_way = 0.0;
-        U_line = 0.0;
-        U_side = 0.0;
         return;
     }
 
@@ -90,18 +92,12 @@ void LineSignal::check_route()
 
         if (!traj)
         {
-            U_way = 0.0;
-            U_line = 0.0;
-            U_side = 0.0;
             return;
         }
 
         // Занятость траектории
         if (traj->isBusy())
         {
-            U_way = 0.0;
-            U_line = 0.0;
-            U_side = 0.0;
             return;
         }
 
@@ -110,9 +106,6 @@ void LineSignal::check_route()
 
         if (!cur_conn)
         {
-            U_way = 0.0;
-            U_line = 0.0;
-            U_side = 0.0;
             return;
         }
 
