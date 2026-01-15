@@ -176,7 +176,8 @@ bool IntersectionHandler::handle_gui_intersections(vsg::ref_ptr<vsg::LineSegment
 
     auto& intersection = *intersector->intersections.front();
 
-    return object_selector->handle_intersection(intersection);
+    return true;
+    // return object_selector->handle_intersection(intersection);
 }
 
 void IntersectionHandler::handle_scene_intersections(vsg::ref_ptr<vsg::LineSegmentIntersector> intersector)
@@ -220,7 +221,7 @@ void IntersectionHandler::handle_scene_intersections(vsg::ref_ptr<vsg::LineSegme
 
         // object_selector->gizmo->translation = translation + center_offset;
 
-        object_selector->outline->update(vsg::ref_ptr(paged_lod));
+        // object_selector->outline->update(vsg::ref_ptr(paged_lod));
         // object_selector->outline->matrix = curr_matrix_transform->matrix;
     }
 }

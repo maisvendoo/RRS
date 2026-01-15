@@ -15,14 +15,13 @@
 #include <cmath>
 
 static vsg::ref_ptr<vsg::Node> create_arrow(
+    const settings_t& settings,
     vsg::Builder& builder,
     const vsg::vec3& direction,
-    const settings_t& settings,
     const vsg::vec3& color
 );
 
-Gizmo::Gizmo(vsg::dmat4& outer_matrix, const settings_t& settings)
-    : outer_matrix(outer_matrix)
+Gizmo::Gizmo(const settings_t& settings)
 {
     vsg::Builder builder;
     builder.shaderSet = vsg::createFlatShadedShaderSet();
@@ -52,17 +51,22 @@ Gizmo::Gizmo(vsg::dmat4& outer_matrix, const settings_t& settings)
 
     for (int i = 0; i < TOTAL_ARROWS; ++i)
     {
-        *arrows[i] = create_arrow(builder, arrow_directions[i],
-            settings, arrow_colors[i]);
+        *arrows[i] = create_arrow(settings, builder,
+            arrow_directions[i], arrow_colors[i]);
 
         this->addChild(*arrows[i]);
     }
 }
 
+void Gizmo::set_outer_matrix(vsg::dmat4* outer_matrix)
+{
+    this->outer_matrix = outer_matrix;
+}
+
 static vsg::ref_ptr<vsg::Node> create_arrow(
+    const settings_t& settings,
     vsg::Builder& builder,
     const vsg::vec3& direction,
-    const settings_t& settings,
     const vsg::vec3& color
 )
 {

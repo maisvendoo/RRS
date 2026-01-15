@@ -19,10 +19,12 @@ class Node;
 class Gizmo : public vsg::Inherit<vsg::MatrixTransform, Gizmo>
 {
 public:
-    Gizmo(vsg::dmat4& outer_matrix, const settings_t& settings);
+    Gizmo(const settings_t& settings);
+
+    void set_outer_matrix(vsg::dmat4* outer_matrix);
 
 private:
-    vsg::dmat4& outer_matrix;
+    vsg::dmat4* outer_matrix = nullptr;
     vsg::ref_ptr<vsg::Node> arrow_x;
     vsg::ref_ptr<vsg::Node> arrow_y;
     vsg::ref_ptr<vsg::Node> arrow_z;
