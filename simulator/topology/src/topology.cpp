@@ -851,7 +851,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         if (direction == 1)
             conn->setSignalFwd(signal);
         if (direction == -1)
-            conn->setSignalFwd(signal);
+            conn->setSignalBwd(signal);
 
         signal->setConnector(conn);
         signal->setDirection(direction);
