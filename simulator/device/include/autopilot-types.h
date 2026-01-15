@@ -10,6 +10,9 @@ class auto_control_t
 {
 public:
 
+    /// Активация нажатия РБ
+    bool press_RB = false;
+
     auto_control_t()
     {
 
@@ -29,6 +32,9 @@ public:
     double v_cur = 0;
     /// Код АЛСН
     ALSN alsn_code = NO_CODE;
+    /// Сигнал проверки бдидельности
+    bool is_vigilance_control = false;
+
 
     auto_feedback_t()
     {

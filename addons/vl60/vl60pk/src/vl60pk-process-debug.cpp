@@ -204,4 +204,16 @@ void VL60pk::debugPrint(const simulator_time_t& t, const double& dt)
             DebugMsg += QString("EPK:NO KEY");
         }
     }
+
+    if (autopilot != nullptr)
+    {
+        QString auto_mode = "";
+
+        if (autopilot->isActive())
+        {
+            auto_mode = " | ВКЛЮЧЕНО АВТОВЕДЕНИЕ!";
+        }
+
+        DebugMsg += auto_mode;
+    }
 }

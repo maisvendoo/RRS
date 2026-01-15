@@ -73,6 +73,8 @@ void VL60pk::initialization()
 
     initControl(modules_dir, custom_cfg_dir);
 
+    initAutopilot(modules_dir, custom_cfg_dir);
+
     autoStartTimer = new Timer(0.5, false);
     connect(autoStartTimer, &Timer::process, this, &VL60pk::slotAutoStart);
 }
@@ -132,6 +134,8 @@ void VL60pk::step(const double &t, const double &dt)
     stepOtherEquipment(t, dt);
 
     stepSafetyDevices(t, dt);
+
+    stepAutopilot(t, dt);
 
     autoStartTimer->step(t, dt);
 }

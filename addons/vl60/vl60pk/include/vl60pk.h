@@ -22,6 +22,8 @@
 
 #include <array>
 
+#include <vl60-autopilot-types.h>
+
 class ACMotorCompressor;
 class ACMotorFan;
 class AirDistributor;
@@ -433,6 +435,11 @@ private:
 
     SpotLight *spotlight[CABS_NUM] = {Q_NULLPTR, Q_NULLPTR};
 
+    TriggerControl autopilot_switcher;
+
+    vl60_control_t *auto_control = nullptr;
+
+    vl60_feedback_t *auto_feedback = new vl60_feedback_t();
 
     /// Чтение конфигурационного файла
     void loadConfig(QString cfg_path) override;
@@ -479,6 +486,7 @@ private:
 
     bool initAutostartProgram(int cab_autostart_request);
 
+    void initAutopilot(const QString& modules_dir, const QString& custom_cfg_dir);
 
     /// Процесс симуляции
     void process(const simulator_time_t& t, const double& dt) override;
@@ -539,6 +547,9 @@ private:
 
     /// Моделирование приборов безопасности
     void stepSafetyDevices(const double& t, const double& dt);
+
+    /// Автоведение
+    void stepAutopilot(double t, double dt);
 
     void lineContactorsControl(bool state);
 

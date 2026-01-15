@@ -19,11 +19,24 @@ public:
 
     void setFeedback(auto_feedback_t *feedback) override;
 
+    void step(double t, double dt) override;
+
 private:
+
+    /// Ограничение тока якоря
+    double Imax = 500.0;
+    /// Величина падения тока якоря для набора следующий позиции
+    double delta_I = 50.0;
 
     vl60_control_t *auto_control = new vl60_control_t();
 
     vl60_feedback_t *auto_feedback = nullptr;
+
+    void load_config(CfgReader &cfg) override;
+
+    void vigilance_control(double t, double dt) override;
+
+    void onPressRB_Timeout() override;
 };
 
 #endif

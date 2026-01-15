@@ -28,7 +28,9 @@
 #include    "device-list.h"
 
 #include    "physics.h"
-#include "solver-types.h"
+#include    "solver-types.h"
+
+#include    <autopilot.h>
 
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT
@@ -192,6 +194,11 @@ public:
 
     void setBrakeShoesState(bool state);
 
+    Autopilot *getAutopilot()
+    {
+        return autopilot;
+    }
+
 protected:
 
     /// Vehicle configuration file directory
@@ -320,6 +327,9 @@ protected:
     control_signals_t   control_signals;
 
     feedback_signals_t  feedback_signals;
+
+    /// Automation control module
+    Autopilot *autopilot = nullptr;
 
     /// User defined initialization
     virtual void initialization();

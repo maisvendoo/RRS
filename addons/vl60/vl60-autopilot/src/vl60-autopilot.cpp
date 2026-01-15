@@ -32,4 +32,49 @@ void VL60Autopilot::setFeedback(auto_feedback_t *feedback)
     auto_feedback = dynamic_cast<vl60_feedback_t *>(feedback);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::step(double t, double dt)
+{
+    Autopilot::step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::load_config(CfgReader &cfg)
+{
+    QString secName = "Device";
+
+    cfg.getDouble(secName, "Imax", Imax);
+    cfg.getDouble(secName, "DeltaI", delta_I);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::vigilance_control(double t, double dt)
+{
+    // Есть сигнал контроля бдительности
+    if (auto_feedback->is_vigilance_control)
+    {
+        if (!rb_timer->isStarted())
+        {
+            // Жмем РБ
+            auto_control->press_RB = true;
+            // Запускаем таймер
+            rb_timer->start();
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::onPressRB_Timeout()
+{
+    auto_control->press_RB = false;
+}
+
 GET_AUTOPILOT(VL60Autopilot)
