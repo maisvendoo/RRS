@@ -834,6 +834,9 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::sigRenameTrain, this, &Model::slotRenameTrainInModel);
 
+    prepareFeedBack(true);
+    tcpFeedBack(true);
+
     Journal::instance()->info("TCP server is initialized successfully");
 }
 
