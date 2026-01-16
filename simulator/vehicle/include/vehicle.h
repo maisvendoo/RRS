@@ -43,6 +43,8 @@
 //------------------------------------------------------------------------------
 class VEHICLE_EXPORT Vehicle : public QObject
 {
+    Q_OBJECT
+
 public:
 
     /// Constructor
@@ -208,6 +210,10 @@ public:
     {
 
     }
+
+signals:
+
+    void sigGetTrainLength(int train_idx, double &train_len);
 
 protected:
 

@@ -568,6 +568,8 @@ private:
 private slots:
 
     void slotAutoStart();
+
+    void slotInitTrainLengh();
 };
 
 #endif // VL60PK_H

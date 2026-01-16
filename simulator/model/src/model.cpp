@@ -135,6 +135,9 @@ bool Model::init(const simulator_command_line_t &command_line)
         vehicles_info.vehicles[i].vehicle_length = (*it)->getLength();
         vehicles_info.vehicles[i].vehicle_config_dir = (*it)->getConfigDir();
         vehicles_info.vehicles[i].vehicle_config_file = (*it)->getConfigName();
+
+        connect(*it, &Vehicle::sigGetTrainLength, this, &Model::slotGetTrainLength);
+
         ++i;
     }
     tcp_server->setVehiclesInfo(vehicles_info.serialize());
@@ -1189,4 +1192,24 @@ void Model::slotRenameTrainInModel(int train_idx, QString new_name)
     Journal::instance()->info(QString("Rename train: Train %1 has new name %2").arg(t_idx, 4).arg(new_name));
 
     is_trains_changed = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotGetTrainLength(int train_idx, double &train_len)
+{
+    if (train_idx >= trains.size())
+    {
+        return;
+    }
+
+    auto train  = trains[train_idx];
+
+    if (train == nullptr)
+    {
+        return;
+    }
+
+    train_len = train->getLength();
 }

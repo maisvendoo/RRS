@@ -13,6 +13,8 @@
 //------------------------------------------------------------------------------
 class DEVICE_EXPORT Autopilot : public Device
 {
+    Q_OBJECT
+
 public:
 
     Autopilot(QObject *parent = nullptr) : Device(parent)
@@ -37,13 +39,20 @@ public:
     /// Активация автоведения
     void on()
     {
-        is_active = true;
+        if (!is_active)
+        {
+            is_active = true;
+            emit sigInitTrainLength();
+        }
     }
 
     /// Деактивация автоведения
     void off()
     {
-        is_active = false;
+        if (is_active)
+        {
+            is_active = false;
+        }
     }
 
     /// Проверка активности автоведения
@@ -52,12 +61,21 @@ public:
         return is_active;
     }
 
-    void step(double t, double dt) override;        
+    void setTrainLength(double len)
+    {
+        train_length = len;
+    }
+
+    void step(double t, double dt) override;
+
+signals:
+
+    void sigInitTrainLength();
 
 protected:
 
     /// Признак активации
-    bool is_active = false;
+    bool is_active = false;    
 
     /// Выдержка РБ в нажатом положении
     const double RB_PRESS_DELAY = 1.5;
@@ -70,6 +88,9 @@ protected:
 
     /// Конструкционная скорость
     double v_constr = 0.0;
+
+    /// Длина поезда
+    double train_length = 0;
 
     /// Общая для всего автоведения структура обратной связи
     auto_feedback_t *feedback = nullptr;

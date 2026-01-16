@@ -226,6 +226,8 @@ private slots:
     void slotResetVehicleControlByKeyboard(int client_id);
 
     void slotRenameTrainInModel(int train_idx, QString new_name);
+
+    void slotGetTrainLength(int train_idx, double &train_len);
 };
 
 #endif // MODEL_H
