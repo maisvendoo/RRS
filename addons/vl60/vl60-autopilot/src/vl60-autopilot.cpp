@@ -39,6 +39,12 @@ void VL60Autopilot::step(double t, double dt)
 {
     double I_ref = 300.0;
 
+    v_ref = 40.0;
+
+    dv = v_ref - auto_feedback->v_cur;
+
+    I_ref = Imax * (Kp * dv + getY(0));
+
     I_ref = cut(I_ref, 0.0, Imax);
 
     if (auto_feedback->I_motor < I_ref - delta_I)
@@ -51,8 +57,29 @@ void VL60Autopilot::step(double t, double dt)
         minusPos();
     }
 
+    if (dv < 0)
+    {
+        minusPos();
+    }
+
     delay->step(t, dt);
     Autopilot::step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::preStep(state_vector_t &Y, double t)
+{
+    Y[0] = cut(Y[0], 0.0, 1.0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
+{
+    dYdt[0] = Ki * dv;
 }
 
 //------------------------------------------------------------------------------

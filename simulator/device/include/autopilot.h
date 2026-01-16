@@ -71,6 +71,9 @@ protected:
     /// Тамер выдержки РБ
     Timer *rb_timer = new Timer(RB_PRESS_DELAY, false);
 
+    /// Заданная скорость
+    double v_ref = 0.0;
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,

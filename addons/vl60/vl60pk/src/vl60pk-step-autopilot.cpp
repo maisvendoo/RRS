@@ -26,6 +26,7 @@ void VL60pk::stepAutopilot(double t, double dt)
         auto_feedback[cab_idx]->cur_pos = main_controller->getPosition();
         auto_feedback[cab_idx]->km_pos = controller[cab_idx]->getMainPos();
         auto_feedback[cab_idx]->I_motor = motor[0]->getIa();
+        auto_feedback[cab_idx]->v_cur = qAbs(velocity * Physics::kmh);
 
         // Принимаем сигналы обратной связи от оборудования
         autopilot[cab_idx]->setFeedback(auto_feedback[cab_idx]);

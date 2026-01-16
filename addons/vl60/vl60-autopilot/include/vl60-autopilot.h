@@ -35,9 +35,20 @@ private:
     /// Таймер выдержки КМ в промежуточном положении
     Timer *delay = new Timer(0.5, false);
 
+    double Kp = 0.02;
+    double Ki = 0.0;
+
+    double dv = 0.0;
+
     vl60_control_t *auto_control = new vl60_control_t();
 
     vl60_feedback_t *auto_feedback = nullptr;
+
+    void preStep(state_vector_t &Y, double t) override;
+
+    void ode_system(const state_vector_t &Y,
+                    state_vector_t &dYdt,
+                    double t) override;
 
     void load_config(CfgReader &cfg) override;
 
