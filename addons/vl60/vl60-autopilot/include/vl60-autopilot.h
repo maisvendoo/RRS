@@ -3,6 +3,7 @@
 
 #include    <autopilot.h>
 #include    <vl60-autopilot-types.h>
+#include    <timer.h>
 
 //------------------------------------------------------------------------------
 //
@@ -31,6 +32,9 @@ private:
     /// Предыдущая тяговая позиция
     int prev_pos = 0;
 
+    /// Таймер выдержки КМ в промежуточном положении
+    Timer *delay = new Timer(0.5, false);
+
     vl60_control_t *auto_control = new vl60_control_t();
 
     vl60_feedback_t *auto_feedback = nullptr;
@@ -46,6 +50,10 @@ private:
 
     /// Сброс одной позиции
     void minusPos();
+
+private slots:
+
+    void slotDelayTimer();
 };
 
 #endif

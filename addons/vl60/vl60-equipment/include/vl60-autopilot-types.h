@@ -11,7 +11,7 @@ class vl60_control_t : public auto_control_t
 {
 public:
 
-    int km_main_pos = POS_ZERO;
+    int km_pos_ref = POS_ZERO;
 
     vl60_control_t() : auto_control_t()
     {
@@ -29,8 +29,11 @@ public:
     /// Текущая тяговая позиция
     int cur_pos = 0;
 
-    /// Тукущая позициая рукоятки КМ
+    /// Текущая позициая рукоятки КМ
     int km_pos = POS_ZERO;
+
+    /// Текущий ток ТЭД
+    double I_motor = 0;
 
     vl60_feedback_t() : auto_feedback_t()
     {

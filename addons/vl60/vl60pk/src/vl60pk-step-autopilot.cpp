@@ -3,6 +3,7 @@
 #include    <alsn-ukbm.h>
 #include    <ekg-8g.h>
 #include    <kme-60-044.h>
+#include    <dc-motor.h>
 
 //------------------------------------------------------------------------------
 //
@@ -24,6 +25,7 @@ void VL60pk::stepAutopilot(double t, double dt)
         // Текущая позиция ЭКГ
         auto_feedback[cab_idx]->cur_pos = main_controller->getPosition();
         auto_feedback[cab_idx]->km_pos = controller[cab_idx]->getMainPos();
+        auto_feedback[cab_idx]->I_motor = motor[0]->getIa();
 
         // Принимаем сигналы обратной связи от оборудования
         autopilot[cab_idx]->setFeedback(auto_feedback[cab_idx]);
@@ -39,7 +41,7 @@ void VL60pk::stepAutopilot(double t, double dt)
         {
             auto_control[cab_idx]->press_RB ? rb[cab_idx][RBS].set() : rb[cab_idx][RBS].reset();
 
-            controller[cab_idx]->setMainHandlePos(auto_control[cab_idx]->km_main_pos);
+            controller[cab_idx]->setMainHandlePos(auto_control[cab_idx]->km_pos_ref);
         }
     }
 }
