@@ -128,7 +128,7 @@ double Autopilot::calcBrakeCurveSpeed(double v_target, double dist)
 {
     double vt = v_target / Physics::kmh;
 
-    return sqrt(vt * vt + 2*a_brake*dist) * Physics::kmh;
+    return sqrt(vt * vt + pf(2*a_brake*dist)) * Physics::kmh;
 }
 
 //------------------------------------------------------------------------------
@@ -142,13 +142,13 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code)
     {
     case RED_YELLOW:
 
-        v_lim = calcBrakeCurveSpeed(0.0, feedback->signal_dist);
+        v_lim = cut(calcBrakeCurveSpeed(0.0, feedback->signal_dist - 25.0), 0.0, 60.0);
 
         break;
 
     case YELLOW:
 
-        v_lim = calcBrakeCurveSpeed(60.0, feedback->signal_dist);
+        v_lim = calcBrakeCurveSpeed(60.0, feedback->signal_dist - 25.0);
 
         break;
 

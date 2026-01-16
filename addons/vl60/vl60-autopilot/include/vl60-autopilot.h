@@ -44,6 +44,15 @@ private:
     /// Ошибка по скорости
     double dv = 0.0;
 
+    /// Число выполенных ступеней торможения
+    uint8_t brake_step = 0;
+
+    const double BRAKE_DELAY = 5.0;
+
+    Timer *brake_delay = new Timer(BRAKE_DELAY, false);
+
+    bool lock_traction = false;
+
     /// Структура управляющих воздействий ВСЕГДА специфична
     vl60_control_t *auto_control = new vl60_control_t();
 
@@ -71,9 +80,14 @@ private:
     /// Ступень торможения
     void brakeStep(double p_charge, double dp);
 
+    /// Отпуск тормозов
+    void brakeRelease(double p_charge);
+
 private slots:
 
     void slotDelayTimer();
+
+    void slotBrakeTimer();
 };
 
 #endif

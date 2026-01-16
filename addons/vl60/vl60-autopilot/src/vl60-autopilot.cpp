@@ -6,6 +6,7 @@
 VL60Autopilot::VL60Autopilot() : Autopilot(nullptr)
 {
     connect(delay, &Timer::process, this, &VL60Autopilot::slotDelayTimer);
+    connect(brake_delay, &Timer::process, this, &VL60Autopilot::slotBrakeTimer);
 }
 
 //------------------------------------------------------------------------------
@@ -38,6 +39,7 @@ auto_control_t *VL60Autopilot::getControl()
 void VL60Autopilot::step(double t, double dt)
 {
     delay->step(t, dt);
+    brake_delay->step(t, dt);
     Autopilot::step(t, dt);
 }
 
@@ -63,8 +65,11 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     // Если ток упал ниже уставки
     if (auto_feedback->I_motor < I_ref - delta_I)
     {
-        // + позиция
-        plusPos();
+        if (!lock_traction)
+        {
+            // + позиция
+            plusPos();
+        }
     }
 
     // Если ток сильно выше уставки
@@ -75,12 +80,23 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     }
 
     // Если превышаем скорость - мотаем вниз (возможно нужно  с переходом на торможение)
-    if (dv < 0)
+    if (dv < -0.25)
     {
-        minusPos();
+        auto_control->km_pos_ref = POS_ZERO;
     }
 
-    //brakeStep(auto_feedback->p_charge, 0.06);
+    if (dv < -0.5)
+    {
+        if (!brake_delay->isStarted())
+        {
+            brakeStep(auto_feedback->p_charge, 0.06);
+        }
+    }
+
+    if (dv >= 3.0)
+    {
+        brakeRelease(auto_feedback->p_charge);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -227,13 +243,33 @@ void VL60Autopilot::minusPos()
 //------------------------------------------------------------------------------
 void VL60Autopilot::brakeStep(double p_charge, double dp)
 {
-    if (auto_feedback->pEQ > p_charge - dp)
+    lock_traction = true;
+
+    if (auto_feedback->pEQ > p_charge - brake_step * dp)
     {
-        auto_control->krm_pos = 5;
+        auto_control->krm_pos = 5;        
     }
     else
     {
         auto_control->krm_pos = 3;
+        brake_step++;
+        brake_delay->start();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::brakeRelease(double p_charge)
+{
+    if (auto_feedback->pEQ < p_charge - 0.02)
+    {
+        auto_control->krm_pos = 0;
+    }
+    else
+    {
+        auto_control->krm_pos = 1;
+        lock_traction = false;
     }
 }
 
@@ -243,6 +279,14 @@ void VL60Autopilot::brakeStep(double p_charge, double dp)
 void VL60Autopilot::slotDelayTimer()
 {
     delay->stop();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::slotBrakeTimer()
+{
+    brake_delay->stop();
 }
 
 GET_AUTOPILOT(VL60Autopilot)
