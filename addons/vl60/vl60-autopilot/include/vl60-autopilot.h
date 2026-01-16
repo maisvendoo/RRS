@@ -51,7 +51,11 @@ private:
 
     Timer *brake_delay = new Timer(BRAKE_DELAY, false);
 
+    /// Блокирование тяги тормозами
     bool lock_traction = false;
+
+    /// Блокирование тяги при постановке КМ в 0
+    bool is_zero_lock = false;
 
     /// Структура управляющих воздействий ВСЕГДА специфична
     vl60_control_t *auto_control = new vl60_control_t();

@@ -62,10 +62,25 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     // Обрезаем задание по максимальной уставке
     I_ref = cut(I_ref, 0.0, Imax);
 
+    // Блокирование тяги по давлению в ТЦ
+    if (auto_feedback->pBC > 0.04)
+    {
+        lock_traction = true;
+    }
+    else
+    {
+        lock_traction = false;
+    }
+
+    if (auto_feedback->cur_pos == 0)
+    {
+        is_zero_lock = false;
+    }
+
     // Если ток упал ниже уставки
     if (auto_feedback->I_motor < I_ref - delta_I)
     {
-        if (!lock_traction)
+        if (!lock_traction && !is_zero_lock)
         {
             // + позиция
             plusPos();
@@ -79,10 +94,11 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
         minusPos();
     }
 
-    // Если превышаем скорость - мотаем вниз (возможно нужно  с переходом на торможение)
+    // Если превышаем скорость - мотаем вниз до упора
     if (dv < -0.25)
     {
         auto_control->km_pos_ref = POS_ZERO;
+        is_zero_lock = true;
     }
 
     if (dv < -0.5)
@@ -93,7 +109,7 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
         }
     }
 
-    if (dv >= 3.0)
+    if (dv >= 5.0)
     {
         brakeRelease(auto_feedback->p_charge);
     }
@@ -245,7 +261,7 @@ void VL60Autopilot::brakeStep(double p_charge, double dp)
 {
     lock_traction = true;
 
-    if (auto_feedback->pEQ > p_charge - brake_step * dp)
+    if ( (auto_feedback->pEQ > p_charge - (brake_step + 1) * dp) && (auto_feedback->pEQ >= 0.35))
     {
         auto_control->krm_pos = 5;        
     }
@@ -262,6 +278,8 @@ void VL60Autopilot::brakeStep(double p_charge, double dp)
 //------------------------------------------------------------------------------
 void VL60Autopilot::brakeRelease(double p_charge)
 {
+    brake_step = 0;
+
     if (auto_feedback->pEQ < p_charge - 0.02)
     {
         auto_control->krm_pos = 0;
