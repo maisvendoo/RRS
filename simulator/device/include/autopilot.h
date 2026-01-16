@@ -56,7 +56,7 @@ public:
     uint8_t getActiveCabine() const
     {
         return cab_idx;
-    }
+    }    
 
 protected:
 
@@ -73,6 +73,9 @@ protected:
 
     /// Заданная скорость
     double v_ref = 0.0;
+
+    /// Конструкционная скорость
+    double v_constr = 0.0;
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
@@ -91,6 +94,8 @@ protected:
     {
 
     }
+
+    void load_config(CfgReader &cfg) override;
 
 private slots:
 

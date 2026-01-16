@@ -46,6 +46,16 @@ void Autopilot::vigilance_control(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Autopilot::load_config(CfgReader &cfg)
+{
+    QString secName = "Device";
+
+    cfg.getDouble(secName, "V_constr", v_constr);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Autopilot::slotVigilanceControl()
 {
     onPressRB_Timeout();

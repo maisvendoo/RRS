@@ -35,8 +35,8 @@ private:
     /// Таймер выдержки КМ в промежуточном положении
     Timer *delay = new Timer(0.5, false);
 
-    double Kp = 0.02;
-    double Ki = 0.0;
+    double Kp = 0.04;
+    double Ki = 0.00001;
 
     double dv = 0.0;
 

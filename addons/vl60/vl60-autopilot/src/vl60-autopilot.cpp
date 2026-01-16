@@ -37,31 +37,6 @@ void VL60Autopilot::setFeedback(auto_feedback_t *feedback)
 //------------------------------------------------------------------------------
 void VL60Autopilot::step(double t, double dt)
 {
-    double I_ref = 300.0;
-
-    v_ref = 40.0;
-
-    dv = v_ref - auto_feedback->v_cur;
-
-    I_ref = Imax * (Kp * dv + getY(0));
-
-    I_ref = cut(I_ref, 0.0, Imax);
-
-    if (auto_feedback->I_motor < I_ref - delta_I)
-    {
-        plusPos();
-    }
-
-    if (auto_feedback->I_motor > I_ref + delta_I)
-    {
-        minusPos();
-    }
-
-    if (dv < 0)
-    {
-        minusPos();
-    }
-
     delay->step(t, dt);
     Autopilot::step(t, dt);
 }
@@ -71,7 +46,39 @@ void VL60Autopilot::step(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60Autopilot::preStep(state_vector_t &Y, double t)
 {
-    Y[0] = cut(Y[0], 0.0, 1.0);
+    // Режем сигнал интегратора
+    Y[0] = cut(Y[0], -1.0, 1.0);
+
+    v_ref = min(auto_feedback->v_lim, v_constr);
+
+    // Ошибка по скорости
+    dv = v_ref - auto_feedback->v_cur;
+
+    // Вычисляем задание по току ТЭД
+    double I_ref = Imax * (Kp * dv + getY(0));
+
+    // Обрезаем задание по максимальной уставке
+    I_ref = cut(I_ref, 0.0, Imax);
+
+    // Если ток упал ниже уставки
+    if (auto_feedback->I_motor < I_ref - delta_I)
+    {
+        // + позиция
+        plusPos();
+    }
+
+    // Если ток сильно выше уставки
+    if (auto_feedback->I_motor > I_ref + delta_I)
+    {
+        // - позиция
+        minusPos();
+    }
+
+    // Если превышаем скорость - мотаем вниз (возможно нужно  с переходом на торможение)
+    if (dv < 0)
+    {
+        minusPos();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -87,6 +94,8 @@ void VL60Autopilot::ode_system(const state_vector_t &Y, state_vector_t &dYdt, do
 //------------------------------------------------------------------------------
 void VL60Autopilot::load_config(CfgReader &cfg)
 {
+    Autopilot::load_config(cfg);
+
     QString secName = "Device";
 
     cfg.getDouble(secName, "Imax", Imax);

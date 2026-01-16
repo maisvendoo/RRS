@@ -4,12 +4,32 @@
 #include    <ekg-8g.h>
 #include    <kme-60-044.h>
 #include    <dc-motor.h>
+#include    <automatic-train-stop.h>
+#include    <speedmap.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void VL60pk::stepAutopilot(double t, double dt)
 {
+    double v_lim = 0;
+    double v_lim_next = 0;
+    double limit_dist = 0;
+
+    if (epk[CAB1]->isKeyOn())
+    {
+        v_lim = speedmap_fwd->getCurrentLimit();
+        v_lim_next = speedmap_fwd->getNextLimit();
+        limit_dist = speedmap_fwd->getNextLimitDistance();
+    }
+
+    if (epk[CAB2]->isKeyOn())
+    {
+        v_lim = speedmap_bwd->getCurrentLimit();
+        v_lim_next = speedmap_bwd->getNextLimit();
+        limit_dist = speedmap_bwd->getNextLimitDistance();
+    }
+
     for (auto cab_idx : {CAB1, CAB2})
     {
         if (autopilot[cab_idx] == nullptr)
@@ -27,6 +47,9 @@ void VL60pk::stepAutopilot(double t, double dt)
         auto_feedback[cab_idx]->km_pos = controller[cab_idx]->getMainPos();
         auto_feedback[cab_idx]->I_motor = motor[0]->getIa();
         auto_feedback[cab_idx]->v_cur = qAbs(velocity * Physics::kmh);
+        auto_feedback[cab_idx]->v_lim = v_lim;
+        auto_feedback[cab_idx]->v_lim_next = v_lim_next;
+        auto_feedback[cab_idx]->limit_dist = limit_dist;
 
         // Принимаем сигналы обратной связи от оборудования
         autopilot[cab_idx]->setFeedback(auto_feedback[cab_idx]);
