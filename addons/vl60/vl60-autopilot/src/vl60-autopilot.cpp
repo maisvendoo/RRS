@@ -80,7 +80,7 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
         minusPos();
     }
 
-    brakeStep(auto_feedback->p_charge, 0.06);
+    //brakeStep(auto_feedback->p_charge, 0.06);
 }
 
 //------------------------------------------------------------------------------

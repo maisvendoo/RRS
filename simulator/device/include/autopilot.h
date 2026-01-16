@@ -92,6 +92,12 @@ protected:
     /// Длина поезда
     double train_length = 0;
 
+    /// Предыдущее ограничение скорости
+    double prev_v_lim = 0;
+
+    /// Длина "хвоста" на более строгом ограничении
+    double tail_len = 0;
+
     /// Общая для всего автоведения структура обратной связи
     auto_feedback_t *feedback = nullptr;
 
@@ -123,6 +129,8 @@ protected:
     }
 
     void load_config(CfgReader &cfg) override;
+
+    double calcCurrentSpeedLimit(double t, double dt);
 
 private slots:
 
