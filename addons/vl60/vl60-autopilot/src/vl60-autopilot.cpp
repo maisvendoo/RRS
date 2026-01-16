@@ -100,6 +100,8 @@ void VL60Autopilot::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "Imax", Imax);
     cfg.getDouble(secName, "DeltaI", delta_I);
+    cfg.getDouble(secName, "Kp", Kp);
+    cfg.getDouble(secName, "Ki", Ki);
 }
 
 //------------------------------------------------------------------------------
