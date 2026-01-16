@@ -138,11 +138,18 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code)
 {
     double v_lim = v_constr;
 
+    is_disable_release = false;
+
     switch (alsn_code)
     {
     case RED_YELLOW:
 
         v_lim = cut(calcBrakeCurveSpeed(0.0, feedback->signal_dist - 25.0), 0.0, 60.0);
+
+        if (feedback->v_cur <= 10.0)
+        {
+            is_disable_release = true;
+        }
 
         break;
 

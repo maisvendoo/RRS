@@ -103,10 +103,7 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
 
     if (dv < -0.5)
     {
-        if (!brake_delay->isStarted())
-        {
-            brakeStep(auto_feedback->p_charge, 0.06);
-        }
+        brakeStep(auto_feedback->p_charge, 0.06);
     }
 
     if (dv >= 5.0)
@@ -261,15 +258,23 @@ void VL60Autopilot::brakeStep(double p_charge, double dp)
 {
     lock_traction = true;
 
-    if ( (auto_feedback->pEQ > p_charge - (brake_step + 1) * dp) && (auto_feedback->pEQ >= 0.35))
+    double delta_pEQ = cut((brake_step + 1) * dp, 0.0, 0.15);
+
+    if ( auto_feedback->pEQ > p_charge -  delta_pEQ)
     {
-        auto_control->krm_pos = 5;        
+        if (!brake_delay->isStarted())
+        {
+            auto_control->krm_pos = 5;
+        }
     }
     else
     {
-        auto_control->krm_pos = 3;
-        brake_step++;
-        brake_delay->start();
+        if (auto_control->krm_pos == 5)
+        {
+            auto_control->krm_pos = 3;
+            brake_step++;
+            brake_delay->start();
+        }
     }
 }
 
@@ -278,7 +283,13 @@ void VL60Autopilot::brakeStep(double p_charge, double dp)
 //------------------------------------------------------------------------------
 void VL60Autopilot::brakeRelease(double p_charge)
 {
+    if (is_disable_release)
+    {
+        return;
+    }
+
     brake_step = 0;
+    brake_delay->stop();
 
     if (auto_feedback->pEQ < p_charge - 0.02)
     {
