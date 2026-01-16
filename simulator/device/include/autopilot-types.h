@@ -41,6 +41,12 @@ public:
     /// Сигнал проверки бдидельности
     bool is_vigilance_control = false;
 
+    /// Давление в уравнительном резервуаре
+    double pEQ = 0.0;
+    /// Давление в тормозных цилиндрах
+    double pBC = 0.0;
+    /// Зарядное давление ТМ
+    double p_charge = 0.0;
 
     auto_feedback_t()
     {

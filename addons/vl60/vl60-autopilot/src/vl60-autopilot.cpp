@@ -79,6 +79,8 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     {
         minusPos();
     }
+
+    brakeStep(auto_feedback->p_charge, 0.06);
 }
 
 //------------------------------------------------------------------------------
@@ -217,6 +219,21 @@ void VL60Autopilot::minusPos()
 
         if (!delay->isStarted())
             delay->start();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::brakeStep(double p_charge, double dp)
+{
+    if (auto_feedback->pEQ > p_charge - dp)
+    {
+        auto_control->krm_pos = 5;
+    }
+    else
+    {
+        auto_control->krm_pos = 3;
     }
 }
 

@@ -6,6 +6,8 @@
 #include    <dc-motor.h>
 #include    <automatic-train-stop.h>
 #include    <speedmap.h>
+#include    <brake-mech.h>
+#include    <brake-crane.h>
 
 //------------------------------------------------------------------------------
 //
@@ -50,6 +52,9 @@ void VL60pk::stepAutopilot(double t, double dt)
         auto_feedback[cab_idx]->v_lim = v_lim;
         auto_feedback[cab_idx]->v_lim_next = v_lim_next;
         auto_feedback[cab_idx]->limit_dist = limit_dist;
+        auto_feedback[cab_idx]->pBC = brake_mech[TROLLEY_FWD]->getBCpressure();
+        auto_feedback[cab_idx]->pEQ = brake_crane[cab_idx]->getERpressure();
+        auto_feedback[cab_idx]->p_charge = charge_press;
 
         // Принимаем сигналы обратной связи от оборудования
         autopilot[cab_idx]->setFeedback(auto_feedback[cab_idx]);
@@ -66,6 +71,8 @@ void VL60pk::stepAutopilot(double t, double dt)
             auto_control[cab_idx]->press_RB ? rb[cab_idx][RBS].set() : rb[cab_idx][RBS].reset();
 
             controller[cab_idx]->setMainHandlePos(auto_control[cab_idx]->km_pos_ref);
+
+            brake_crane[cab_idx]->setHandlePosition(auto_control[cab_idx]->krm_pos);
         }
     }
 }

@@ -68,6 +68,9 @@ private:
     /// Сброс одной позиции
     void minusPos();
 
+    /// Ступень торможения
+    void brakeStep(double p_charge, double dp);
+
 private slots:
 
     void slotDelayTimer();
