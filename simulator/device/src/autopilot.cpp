@@ -28,6 +28,11 @@ Autopilot *loadAutopilot(QString lib_path)
 //------------------------------------------------------------------------------
 void Autopilot::step(double t, double dt)
 {
+    if (feedback == nullptr)
+        return;
+
+    v_ref = min(feedback->v_lim, v_constr);
+
     vigilance_control(t, dt);
 
     rb_timer->step(t, dt);
@@ -40,7 +45,22 @@ void Autopilot::step(double t, double dt)
 //------------------------------------------------------------------------------
 void Autopilot::vigilance_control(double t, double dt)
 {
+    if (feedback == nullptr)
+    {
+        return;
+    }
 
+    // Есть сигнал контроля бдительности
+    if (feedback->is_vigilance_control)
+    {
+        if (!rb_timer->isStarted())
+        {
+            // Жмем РБ
+            press_RB();
+            // Запускаем таймер
+            rb_timer->start();
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

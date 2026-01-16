@@ -27,10 +27,10 @@ auto_control_t *VL60Autopilot::getControl()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60Autopilot::setFeedback(auto_feedback_t *feedback)
+/*void VL60Autopilot::setFeedback(auto_feedback_t *feedback)
 {
     auto_feedback = dynamic_cast<vl60_feedback_t *>(feedback);
-}
+}*/
 
 //------------------------------------------------------------------------------
 //
@@ -46,10 +46,10 @@ void VL60Autopilot::step(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60Autopilot::preStep(state_vector_t &Y, double t)
 {
+    auto_feedback = dynamic_cast<vl60_feedback_t *>(feedback);
+
     // Режем сигнал интегратора
     Y[0] = cut(Y[0], -1.0, 1.0);
-
-    v_ref = min(auto_feedback->v_lim, v_constr);
 
     // Ошибка по скорости
     dv = v_ref - auto_feedback->v_cur;
@@ -105,27 +105,17 @@ void VL60Autopilot::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60Autopilot::vigilance_control(double t, double dt)
+void VL60Autopilot::onPressRB_Timeout()
 {
-    // Есть сигнал контроля бдительности
-    if (auto_feedback->is_vigilance_control)
-    {
-        if (!rb_timer->isStarted())
-        {
-            // Жмем РБ
-            auto_control->press_RB = true;
-            // Запускаем таймер
-            rb_timer->start();
-        }
-    }
+    auto_control->press_RB = false;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60Autopilot::onPressRB_Timeout()
+void VL60Autopilot::press_RB()
 {
-    auto_control->press_RB = false;
+    auto_control->press_RB = true;
 }
 
 //------------------------------------------------------------------------------

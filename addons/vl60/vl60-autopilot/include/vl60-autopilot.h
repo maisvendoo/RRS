@@ -18,7 +18,7 @@ public:
 
     auto_control_t *getControl() override;
 
-    void setFeedback(auto_feedback_t *feedback) override;
+    //void setFeedback(auto_feedback_t *feedback) override;
 
     void step(double t, double dt) override;
 
@@ -50,11 +50,11 @@ private:
                     state_vector_t &dYdt,
                     double t) override;
 
-    void load_config(CfgReader &cfg) override;
-
-    void vigilance_control(double t, double dt) override;
+    void load_config(CfgReader &cfg) override;    
 
     void onPressRB_Timeout() override;
+
+    void press_RB() override;
 
     /// Набор одной позиции
     void plusPos();

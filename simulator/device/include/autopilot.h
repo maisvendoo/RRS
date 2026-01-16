@@ -29,7 +29,10 @@ public:
     virtual auto_control_t *getControl() = 0;
 
     /// Получить обратную связь от систем ПС
-    virtual void setFeedback(auto_feedback_t *feed_back) = 0;
+    virtual void setFeedback(auto_feedback_t *feedback)
+    {
+        this->feedback = feedback;
+    }
 
     void on()
     {
@@ -77,6 +80,8 @@ protected:
     /// Конструкционная скорость
     double v_constr = 0.0;
 
+    auto_feedback_t *feedback = nullptr;
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,
@@ -91,6 +96,11 @@ protected:
 
     /// Обработка РБ
     virtual void onPressRB_Timeout()
+    {
+
+    }
+
+    virtual void press_RB()
     {
 
     }
