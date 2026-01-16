@@ -211,7 +211,7 @@ void VL60pk::debugPrint(const simulator_time_t& t, const double& dt)
 
         if (autopilot[CAB1]->isActive() || autopilot[CAB2]->isActive())
         {
-            auto_mode = " | ВКЛЮЧЕНО АВТОВЕДЕНИЕ!";
+            auto_mode = QString(" | ВКЛЮЧЕНО АВТОВЕДЕНИЕ! Vзад.: %1 км/ч").arg(autopilot[CAB1]->getRefVelocity(), 4, 'f', 1);
         }
 
         DebugMsg += auto_mode;

@@ -38,6 +38,8 @@ public:
     double limit_dist = 0;
     /// Код АЛСН
     ALSN alsn_code = NO_CODE;
+    /// Дистанция до сигнала
+    double signal_dist = 0;
     /// Сигнал проверки бдидельности
     bool is_vigilance_control = false;
 

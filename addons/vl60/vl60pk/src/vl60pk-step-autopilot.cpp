@@ -8,6 +8,8 @@
 #include    <speedmap.h>
 #include    <brake-mech.h>
 #include    <brake-crane.h>
+#include    <ALSN-coil.h>
+#include    <ALSN-decoder.h>
 
 //------------------------------------------------------------------------------
 //
@@ -17,12 +19,14 @@ void VL60pk::stepAutopilot(double t, double dt)
     double v_lim = 0;
     double v_lim_next = 0;
     double limit_dist = 0;
+    double signal_dist = 0;
 
     if (epk[CAB1]->isKeyOn())
     {
         v_lim = speedmap_fwd->getCurrentLimit();
         v_lim_next = speedmap_fwd->getNextLimit();
         limit_dist = speedmap_fwd->getNextLimitDistance();
+        signal_dist = coil_ALSN_fwd->getNextSignalDistance();
     }
 
     if (epk[CAB2]->isKeyOn())
@@ -30,6 +34,7 @@ void VL60pk::stepAutopilot(double t, double dt)
         v_lim = speedmap_bwd->getCurrentLimit();
         v_lim_next = speedmap_bwd->getNextLimit();
         limit_dist = speedmap_bwd->getNextLimitDistance();
+        signal_dist = coil_ALSN_bwd->getNextSignalDistance();
     }
 
     for (auto cab_idx : {CAB1, CAB2})
@@ -52,6 +57,8 @@ void VL60pk::stepAutopilot(double t, double dt)
         auto_feedback[cab_idx]->v_lim = v_lim;
         auto_feedback[cab_idx]->v_lim_next = v_lim_next;
         auto_feedback[cab_idx]->limit_dist = limit_dist;
+        auto_feedback[cab_idx]->alsn_code = alsn_decoder[cab_idx]->getCode();
+        auto_feedback[cab_idx]->signal_dist = signal_dist;
         auto_feedback[cab_idx]->pBC = brake_mech[TROLLEY_FWD]->getBCpressure();
         auto_feedback[cab_idx]->pEQ = brake_crane[cab_idx]->getERpressure();
         auto_feedback[cab_idx]->p_charge = charge_press;

@@ -66,6 +66,11 @@ public:
         train_length = len;
     }
 
+    double getRefVelocity() const
+    {
+        return v_ref;
+    }
+
     void step(double t, double dt) override;
 
 signals:
@@ -97,6 +102,9 @@ protected:
 
     /// Длина "хвоста" на более строгом ограничении
     double tail_len = 0;
+
+    /// Ускорение на кривой снижения скорости
+    double a_brake = 0.0;
 
     /// Общая для всего автоведения структура обратной связи
     auto_feedback_t *feedback = nullptr;
@@ -131,6 +139,10 @@ protected:
     void load_config(CfgReader &cfg) override;
 
     double calcCurrentSpeedLimit(double t, double dt);
+
+    double calcBrakeCurveSpeed(double v_target, double dist);
+
+    double calcAlsnSpeed(ALSN alsn_code);
 
 private slots:
 
