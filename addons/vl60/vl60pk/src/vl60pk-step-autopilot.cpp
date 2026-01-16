@@ -1,6 +1,8 @@
 #include    <vl60pk.h>
 
 #include    <alsn-ukbm.h>
+#include    <ekg-8g.h>
+#include    <kme-60-044.h>
 
 //------------------------------------------------------------------------------
 //
@@ -19,6 +21,9 @@ void VL60pk::stepAutopilot(double t, double dt)
 
         // Сигнал контроля бдительности от цепей ламп ПСС
         auto_feedback[cab_idx]->is_vigilance_control = static_cast<bool>(safety_device[cab_idx]->getStatePSS());
+        // Текущая позиция ЭКГ
+        auto_feedback[cab_idx]->cur_pos = main_controller->getPosition();
+        auto_feedback[cab_idx]->km_pos = controller[cab_idx]->getMainPos();
 
         // Принимаем сигналы обратной связи от оборудования
         autopilot[cab_idx]->setFeedback(auto_feedback[cab_idx]);
@@ -29,10 +34,12 @@ void VL60pk::stepAutopilot(double t, double dt)
         // Получаем управляющие воздействия
         auto_control[cab_idx] = dynamic_cast<vl60_control_t *>(autopilot[cab_idx]->getControl());
 
-        // Жмем физическую РБС от втопилота
+        // Действия по управлению, только если автоведение активно
         if (autopilot[cab_idx]->isActive())
         {
             auto_control[cab_idx]->press_RB ? rb[cab_idx][RBS].set() : rb[cab_idx][RBS].reset();
+
+            controller[cab_idx]->setMainHandlePos(auto_control[cab_idx]->km_main_pos);
         }
     }
 }

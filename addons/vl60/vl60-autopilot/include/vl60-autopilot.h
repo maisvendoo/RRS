@@ -28,6 +28,9 @@ private:
     /// Величина падения тока якоря для набора следующий позиции
     double delta_I = 50.0;
 
+    /// Предыдущая тяговая позиция
+    int prev_pos = 0;
+
     vl60_control_t *auto_control = new vl60_control_t();
 
     vl60_feedback_t *auto_feedback = nullptr;
@@ -37,6 +40,12 @@ private:
     void vigilance_control(double t, double dt) override;
 
     void onPressRB_Timeout() override;
+
+    /// Набор одной позиции
+    void plusPos();
+
+    /// Сброс одной позиции
+    void minusPos();
 };
 
 #endif
