@@ -86,6 +86,9 @@ protected:
     /// Контроль бдительности
     void vigilance_control(double t, double dt);
 
+    /// Контроль скорости
+    void velocity_control(double t, double dt);
+
     /// Отпустить РБ
     virtual void release_RB()
     {

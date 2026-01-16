@@ -28,10 +28,7 @@ Autopilot *loadAutopilot(QString lib_path)
 //------------------------------------------------------------------------------
 void Autopilot::step(double t, double dt)
 {
-    if (feedback == nullptr)
-        return;
-
-    v_ref = min(feedback->v_lim, v_constr);
+    velocity_control(t, dt);
 
     vigilance_control(t, dt);
 
@@ -61,6 +58,19 @@ void Autopilot::vigilance_control(double t, double dt)
             rb_timer->start();
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::velocity_control(double t, double dt)
+{
+    if (feedback == nullptr)
+        return;
+
+    // Выбираем минимум между текущим ограничением и конструкционной скоростью
+    // (добавиться логика определения лимита по кивой торможения и по времени хода!!!)
+    v_ref = min(feedback->v_lim, v_constr);
 }
 
 //------------------------------------------------------------------------------
