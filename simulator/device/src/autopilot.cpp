@@ -78,6 +78,6 @@ void Autopilot::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void Autopilot::slotVigilanceControl()
 {
-    onPressRB_Timeout();
+    release_RB();
     rb_timer->stop();
 }

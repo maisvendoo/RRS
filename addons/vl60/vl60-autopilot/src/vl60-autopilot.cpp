@@ -105,7 +105,7 @@ void VL60Autopilot::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60Autopilot::onPressRB_Timeout()
+void VL60Autopilot::release_RB()
 {
     auto_control->press_RB = false;
 }

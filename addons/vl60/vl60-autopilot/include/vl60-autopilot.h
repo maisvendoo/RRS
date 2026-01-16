@@ -16,9 +16,7 @@ public:
 
     ~VL60Autopilot();
 
-    auto_control_t *getControl() override;
-
-    //void setFeedback(auto_feedback_t *feedback) override;
+    auto_control_t *getControl() override;    
 
     void step(double t, double dt) override;
 
@@ -32,16 +30,24 @@ private:
     /// Предыдущая тяговая позиция
     int prev_pos = 0;
 
-    /// Таймер выдержки КМ в промежуточном положении
-    Timer *delay = new Timer(0.5, false);
+    /// Выдержка рукоятки КМ
+    const double KM_DELAY = 0.5;
 
+    /// Таймер выдержки главной рукоятки КМ в заданном
+    Timer *delay = new Timer(KM_DELAY, false);
+
+    /// Коэффициент пропорциональной части регулятора скорости
     double Kp = 0.04;
+    /// Коэффициент интегральной части регулятора скорости
     double Ki = 0.00001;
 
+    /// Ошибка по скорости
     double dv = 0.0;
 
+    /// Структура управляющих воздействий ВСЕГДА специфична
     vl60_control_t *auto_control = new vl60_control_t();
 
+    /// Структура обратной связи, приводимая к нашей от общей
     vl60_feedback_t *auto_feedback = nullptr;
 
     void preStep(state_vector_t &Y, double t) override;
@@ -52,7 +58,7 @@ private:
 
     void load_config(CfgReader &cfg) override;    
 
-    void onPressRB_Timeout() override;
+    void release_RB() override;
 
     void press_RB() override;
 

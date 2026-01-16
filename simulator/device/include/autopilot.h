@@ -34,41 +34,32 @@ public:
         this->feedback = feedback;
     }
 
+    /// Активация автоведения
     void on()
     {
         is_active = true;
     }
 
+    /// Деактивация автоведения
     void off()
     {
         is_active = false;
     }
 
+    /// Проверка активности автоведения
     bool isActive() const
     {
         return is_active;
     }
 
-    void step(double t, double dt) override;
-
-    void setActiveCabine(uint8_t cab_idx)
-    {
-        this->cab_idx = cab_idx;
-    }
-
-    uint8_t getActiveCabine() const
-    {
-        return cab_idx;
-    }    
+    void step(double t, double dt) override;        
 
 protected:
 
     /// Признак активации
     bool is_active = false;
 
-    /// Номер активной кабины
-    uint8_t cab_idx = 0;
-
+    /// Выдержка РБ в нажатом положении
     const double RB_PRESS_DELAY = 1.5;
 
     /// Тамер выдержки РБ
@@ -80,6 +71,7 @@ protected:
     /// Конструкционная скорость
     double v_constr = 0.0;
 
+    /// Общая для всего автоведения структура обратной связи
     auto_feedback_t *feedback = nullptr;
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
@@ -88,18 +80,19 @@ protected:
                     state_vector_t &dYdt,
                     double t) override
     {
-
+        (void) Y; (void) dYdt; (void) t;
     }
 
     /// Контроль бдительности
-    virtual void vigilance_control(double t, double dt);
+    void vigilance_control(double t, double dt);
 
-    /// Обработка РБ
-    virtual void onPressRB_Timeout()
+    /// Отпустить РБ
+    virtual void release_RB()
     {
 
     }
 
+    /// Нажать РБ
     virtual void press_RB()
     {
 
