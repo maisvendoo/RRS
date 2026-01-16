@@ -37,7 +37,7 @@ void VL60Autopilot::setFeedback(auto_feedback_t *feedback)
 //------------------------------------------------------------------------------
 void VL60Autopilot::step(double t, double dt)
 {
-    /*double I_ref = 300.0;
+    double I_ref = 300.0;
 
     I_ref = cut(I_ref, 0.0, Imax);
 
@@ -49,9 +49,7 @@ void VL60Autopilot::step(double t, double dt)
     if (auto_feedback->I_motor > I_ref + delta_I)
     {
         minusPos();
-    }*/
-
-    plusPos();
+    }
 
     delay->step(t, dt);
     Autopilot::step(t, dt);
