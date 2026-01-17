@@ -123,6 +123,64 @@ void StationSignal::slotCloseTimer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void StationSignal::lock_switch_fwd(Switch* sw, bool lock)
+{
+    if (lock)
+    {
+        if (sw->getStateFwd() < 0)
+        {
+            sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
+        }
+        if (sw->getStateFwd() > 0)
+        {
+            sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
+        }
+    }
+    else
+    {
+        if (sw->getStateFwd() < 0)
+        {
+            sw->setRefStateFwd(Switch::STATE_MINUS);
+        }
+        if (sw->getStateFwd() > 0)
+        {
+            sw->setRefStateFwd(Switch::STATE_PLUS);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void StationSignal::lock_switch_bwd(Switch* sw, bool lock)
+{
+    if (lock)
+    {
+        if (sw->getStateBwd() < 0)
+        {
+            sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
+        }
+        if (sw->getStateBwd() > 0)
+        {
+            sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
+        }
+    }
+    else
+    {
+        if (sw->getStateBwd() < 0)
+        {
+            sw->setRefStateBwd(Switch::STATE_MINUS);
+        }
+        if (sw->getStateBwd() > 0)
+        {
+            sw->setRefStateBwd(Switch::STATE_PLUS);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void StationSignal::check_train_route()
 {
     // Сбрасываем состояние
@@ -137,6 +195,20 @@ void StationSignal::check_train_route()
     if (!cur_conn)
     {
         return;
+    }
+
+    // Смотрим стрелочный перевод на текущем коннекторе
+    if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+    {
+        // Блокировка противошёрстного стрелочного перевода за светофором в маршрут
+        if (signal_dir == 1)
+        {
+            lock_switch_fwd(sw, lock_relay->getContactState(LR_ROUTE_LOCKED));
+        }
+        else
+        {
+            lock_switch_bwd(sw, lock_relay->getContactState(LR_ROUTE_LOCKED));
+        }
     }
 
     while (true)
@@ -193,54 +265,6 @@ void StationSignal::check_train_route()
             return;
         }
 
-        // Смотрим стрелочный перевод на коннекторе
-        if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
-        {
-            // Блокировка стрелочных переводов в маршруте
-            if (lock_relay->getContactState(LR_ROUTE_LOCKED))
-            {
-                if (sw->getStateBwd() < 0)
-                {
-                    sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
-                    switches_state = SWITCHES_SIDE;
-                }
-                if (sw->getStateBwd() > 0)
-                {
-                    sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
-                }
-                if (sw->getStateFwd() < 0)
-                {
-                    sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
-                    switches_state = SWITCHES_SIDE;
-                }
-                if (sw->getStateFwd() > 0)
-                {
-                    sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
-                }
-            }
-            else
-            {
-                if (sw->getStateBwd() < 0)
-                {
-                    sw->setRefStateBwd(Switch::STATE_MINUS);
-                    switches_state = SWITCHES_SIDE;
-                }
-                if (sw->getStateBwd() > 0)
-                {
-                    sw->setRefStateBwd(Switch::STATE_PLUS);
-                }
-                if (sw->getStateFwd() < 0)
-                {
-                    sw->setRefStateFwd(Switch::STATE_MINUS);
-                    switches_state = SWITCHES_SIDE;
-                }
-                if (sw->getStateFwd() > 0)
-                {
-                    sw->setRefStateFwd(Switch::STATE_PLUS);
-                }
-            }
-        }
-
         // Смотрим сигнал на следующем коннекторе
         Signal* signal = (signal_dir == 1) ? cur_conn->getSignalFwd() : cur_conn->getSignalBwd();
 
@@ -255,10 +279,32 @@ void StationSignal::check_train_route()
                 // Боковое сигнальное реле питается от линии следующего светофора
                 U_side = ts->getSideVoltage();
 
+                // Смотрим стрелочный перевод на коннекторе
+                if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+                {
+                    // Блокировка пошёрстного стрелочного перевода перед светофором в маршрут
+                    if (signal_dir == 1)
+                    {
+                        lock_switch_bwd(sw, lock_relay->getContactState(LR_ROUTE_LOCKED));
+                    }
+                    else
+                    {
+                        lock_switch_fwd(sw, lock_relay->getContactState(LR_ROUTE_LOCKED));
+                    }
+                }
+
                 // Если сигнал закрыт, отключаем АЛСН-код от следующего светофора
                 ts->allowTransmitALSN(!lens_state[RED_LENS]);
                 return;
             }
+        }
+
+        // Смотрим стрелочный перевод на коннекторе
+        if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+        {
+            // Блокировка стрелочных переводов в маршруте
+            lock_switch_bwd(sw, lock_relay->getContactState(LR_ROUTE_LOCKED));
+            lock_switch_fwd(sw, lock_relay->getContactState(LR_ROUTE_LOCKED));
         }
     }
 }

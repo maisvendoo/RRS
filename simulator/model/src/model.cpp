@@ -824,14 +824,24 @@ void Model::initTcpServer()
         connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
     }
 
-    connect(tcp_server, &TcpServer::openSignal, topology, &Topology::slotOpenSignal);
-
-    connect(tcp_server, &TcpServer::closeSignal, topology, &Topology::slotCloseSignal);
+    for (auto signal : topology->getSignalsData()->route_signals)
+    {
+        connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
+    }
 
     for (auto signal : topology->getSignalsData()->exit_signals)
     {
         connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
     }
+
+    for (auto signal : topology->getSignalsData()->shunt_signals)
+    {
+        connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
+    }
+
+    connect(tcp_server, &TcpServer::openSignal, topology, &Topology::slotOpenSignal);
+
+    connect(tcp_server, &TcpServer::closeSignal, topology, &Topology::slotCloseSignal);
 
     connect(tcp_server, &TcpServer::setVehicleControl, this, &Model::slotGetVehicleControlByKeyboard);
 

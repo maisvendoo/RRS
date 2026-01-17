@@ -1193,28 +1193,28 @@ void Topology::slotOpenSignal(QByteArray signal_data)
         return;
     }
 
-    if ( (signal->getSignalType() == "entr") || (signal->getSignalType() == "rout") )
+    if (EnterSignal* es = dynamic_cast<EnterSignal *>(signal))
     {
-        EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
-
-        if (es == nullptr)
-        {
-            return;
-        }
-
         es->slotPressOpen();
+        return;
     }
 
-    if (signal->getSignalType() == "exit")
+    if (RouteSignal* es = dynamic_cast<RouteSignal *>(signal))
     {
-        ExitSignal *es = dynamic_cast<ExitSignal *>(signal);
-
-        if (es == nullptr)
-        {
-            return;
-        }
-
         es->slotPressOpen();
+        return;
+    }
+
+    if (ExitSignal* es = dynamic_cast<ExitSignal *>(signal))
+    {
+        es->slotPressOpen();
+        return;
+    }
+
+    if (ShuntingSignal* es = dynamic_cast<ShuntingSignal *>(signal))
+    {
+        es->slotPressOpenShunt();
+        return;
     }
 }
 
@@ -1270,28 +1270,28 @@ void Topology::slotCloseSignal(QByteArray signal_data)
         return;
     }
 
-    if ( (signal->getSignalType() == "entr") || (signal->getSignalType() == "rout") )
+    if (EnterSignal* es = dynamic_cast<EnterSignal *>(signal))
     {
-        EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
-
-        if (es == nullptr)
-        {
-            return;
-        }
-
         es->slotPressClose();
+        return;
     }
 
-    if (signal->getSignalType() == "exit")
+    if (RouteSignal* es = dynamic_cast<RouteSignal *>(signal))
     {
-        ExitSignal *es = dynamic_cast<ExitSignal *>(signal);
-
-        if (es == nullptr)
-        {
-            return;
-        }
-
         es->slotPressClose();
+        return;
+    }
+
+    if (ExitSignal* es = dynamic_cast<ExitSignal *>(signal))
+    {
+        es->slotPressClose();
+        return;
+    }
+
+    if (ShuntingSignal* es = dynamic_cast<ShuntingSignal *>(signal))
+    {
+        es->slotPressClose();
+        return;
     }
 }
 

@@ -7,6 +7,7 @@
 #include    <timer.h>
 
 class Trajectory;
+class Switch;
 
 //------------------------------------------------------------------------------
 //
@@ -26,81 +27,86 @@ public:
 
     void setRefTrajectory(Trajectory* trajectory)
     {
-        ref_trajectory = trajectory;
+        ref_trajectory_shunt = trajectory;
     }
     Trajectory* getRefTrajectory() const
     {
-        return ref_trajectory;
+        return ref_trajectory_shunt;
     }
 
 public slots:
 
-    void slotPressOpen();
+    void slotPressOpenShunt();
 
     void slotPressClose();
 
 private slots:
 
-    void slotOpenTimer();
+    void slotOpenTimerShunt();
 
     void slotCloseTimer();
 
 private:
 
     /// Целевая траектория маневрового маршрута
-    Trajectory* ref_trajectory = nullptr;
+    Trajectory* ref_trajectory_shunt = nullptr;
 
     enum
     {
-        CR_ALLOW_ROUTE = 0,
-        CR_PROHIBITED_ROUTE,
-        CR_SIGNAL_RELAY_CTRL,
-        NUM_CR_CONTACTS
+        CRS_ALLOW_ROUTE = 0,
+        CRS_PROHIBITED_ROUTE,
+        CRS_SIGNAL_RELAY_CTRL,
+        NUM_CRS_CONTACTS
     };
-    /// Контрольное маршрутное реле:
+    /// Контрольное реле маневрового маршрута:
     /// включено, когда до целевой траектории свободно и стрелки по маршруту
-    Relay *control_relay = new Relay(NUM_CR_CONTACTS);
+    Relay *control_relay_shunt = new Relay(NUM_CRS_CONTACTS);
 
     enum
     {
-        SR_OPENED = 0,
-        SR_CLOSED,
-        SR_SELF_CTRL,
-        SR_LOCK_RELAY_CTRL,
-        NUM_SR_CONTACTS,
+        SRS_OPENED = 0,
+        SRS_CLOSED,
+        SRS_SELF_CTRL,
+        SRS_LOCK_RELAY_CTRL,
+        SRS_UNLOCK_RELAY_CTRL,
+        NUM_SRS_CONTACTS,
     };
     /// Сигнальное реле:
     /// управляется кнопками открыть/закрыть сигнал (если маршрут возможен)
-    Relay *signal_relay = new Relay(NUM_SR_CONTACTS);
+    Relay *signal_relay_shunt = new Relay(NUM_SRS_CONTACTS);
 
     enum
     {
-        LR_ROUTE_LOCKED = 0,
-        LR_NO_ROUTE,
-        NUM_LR_CONTACTS,
+        LRS_ROUTE_LOCKED = 0,
+        LRS_NO_ROUTE,
+        NUM_LRS_CONTACTS,
     };
-    /// Реле замыкания маршрута:
+    /// Реле замыкания маневрового маршрута:
     /// при открытии сигнала отключается и блокирует стрелки по маршруту от перевода
-    Relay *lock_relay = new Relay(NUM_LR_CONTACTS);
-/*TODO
+    Relay *lock_relay_shunt = new Relay(NUM_LRS_CONTACTS);
+
     enum
     {
-        UR_ROUTE_LOCKED = 0,
-        UR_NO_ROUTE,
-        NUM_UR_CONTACTS,
+        URS_ROUTE_LOCKED = 0,
+        URS_ROUTE_UNLOCKED,
+        URS_SIGNAL_RELAY_CTRL,
+        NUM_URS_CONTACTS,
     };
-    /// Реле размыкания маршрута:
-    /// включается при проезде светофора всем составом и освобождении блок-участка
-    Relay *unlock_relay = new Relay(NUM_LR_CONTACTS);
-*/
+    /// Реле размыкания маневрового маршрута:
+    /// включается при освобождении участка перед или за светофором (проезде всем составом)
+    Relay *unlock_relay_shunt = new Relay(NUM_URS_CONTACTS);
+
     /// Напряжение батареи
     double U_bat = 12.0;
 
-    /// Напряжение для контрольного маршрутного реле
-    double U_ctrl = 0.0;
+    /// Напряжение для контрольного реле маневрового маршрута
+    double U_ctrl_shunt = 0.0;
+
+    /// Напряжение для реле размыкания маневрового маршрута
+    double U_unlock_shunt = 0.0;
 
     /// Признак нажатия кнопки открытия
-    bool is_open_button_pressed = false;
+    bool is_open_shunt_button_pressed = false;
 
     /// Признак НЕнажатия кнопки закрытия (нормально замкнутая)
     bool is_close_button_unpressed = true;
@@ -110,6 +116,12 @@ private:
 
     /// Таймер выдержки времени удержания кнопки закрыть
     Timer *close_timer = new Timer(1.0, false);
+
+    /// Замыкание или размыкание стрелочного перевода вперёд
+    void lock_switch_fwd(Switch* sw, bool lock);
+
+    /// Замыкание или размыкание стрелочного перевода назад
+    void lock_switch_bwd(Switch* sw, bool lock);
 
     /// Проверка состояния стрелок и занятости по маршруту
     void check_shunt_route();

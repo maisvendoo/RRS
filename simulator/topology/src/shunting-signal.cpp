@@ -1,5 +1,4 @@
 #include    "shunting-signal.h"
-#include    "enter-signal.h"
 #include    "trajectory.h"
 #include    "switch.h"
 #include    "Journal.h"
@@ -9,23 +8,29 @@
 //------------------------------------------------------------------------------
 ShuntingSignal::ShuntingSignal(QObject* parent) : Signal(parent)
 {
-    connect(open_timer, &Timer::process, this, &ShuntingSignal::slotOpenTimer);
+    connect(open_timer, &Timer::process, this, &ShuntingSignal::slotOpenTimerShunt);
     connect(close_timer, &Timer::process, this, &ShuntingSignal::slotCloseTimer);
 
-    control_relay->read_config("combine-relay");
-    control_relay->setInitContactState(CR_ALLOW_ROUTE, false);
-    control_relay->setInitContactState(CR_PROHIBITED_ROUTE, true);
-    control_relay->setInitContactState(CR_SIGNAL_RELAY_CTRL, false);
+    control_relay_shunt->read_config("combine-relay");
+    control_relay_shunt->setInitContactState(CRS_ALLOW_ROUTE, false);
+    control_relay_shunt->setInitContactState(CRS_PROHIBITED_ROUTE, true);
+    control_relay_shunt->setInitContactState(CRS_SIGNAL_RELAY_CTRL, false);
 
-    signal_relay->read_config("combine-relay");
-    signal_relay->setInitContactState(SR_OPENED, false);
-    signal_relay->setInitContactState(SR_CLOSED, true);
-    signal_relay->setInitContactState(SR_SELF_CTRL, false);
-    signal_relay->setInitContactState(SR_LOCK_RELAY_CTRL, true);
+    signal_relay_shunt->read_config("combine-relay");
+    signal_relay_shunt->setInitContactState(SRS_OPENED, false);
+    signal_relay_shunt->setInitContactState(SRS_CLOSED, true);
+    signal_relay_shunt->setInitContactState(SRS_SELF_CTRL, false);
+    signal_relay_shunt->setInitContactState(SRS_LOCK_RELAY_CTRL, true);
+    signal_relay_shunt->setInitContactState(SRS_UNLOCK_RELAY_CTRL, true);
 
-    lock_relay->read_config("combine-relay");
-    lock_relay->setInitContactState(LR_ROUTE_LOCKED, true);
-    lock_relay->setInitContactState(LR_NO_ROUTE, false);
+    lock_relay_shunt->read_config("combine-relay");
+    lock_relay_shunt->setInitContactState(LRS_ROUTE_LOCKED, true);
+    lock_relay_shunt->setInitContactState(LRS_NO_ROUTE, false);
+
+    unlock_relay_shunt->read_config("combine-relay");
+    unlock_relay_shunt->setInitContactState(URS_ROUTE_LOCKED, true);
+    unlock_relay_shunt->setInitContactState(URS_ROUTE_UNLOCKED, false);
+    unlock_relay_shunt->setInitContactState(URS_SIGNAL_RELAY_CTRL, true);
 }
 
 //------------------------------------------------------------------------------
@@ -46,45 +51,53 @@ void ShuntingSignal::step(double t, double dt)
     check_shunt_route();
 
     // Цепь контрольного маршрутного реле
-    control_relay->setVoltage(U_ctrl);
+    control_relay_shunt->setVoltage(U_ctrl_shunt);
 
 
     // Цепь сигнального реле
     // Состояние провода кнопочного блока "Открыть/Закрыть"
-    bool is_SR_ON = is_open_button_pressed ||
-                    (is_close_button_unpressed && signal_relay->getContactState(SR_SELF_CTRL));
+    bool is_SRS_ON = is_open_shunt_button_pressed ||
+                    (is_close_button_unpressed && signal_relay_shunt->getContactState(SRS_SELF_CTRL));
 
-    // Контакт контрольного маршрутного реле
-    is_SR_ON &= control_relay->getContactState(CR_SIGNAL_RELAY_CTRL);
+    // Контакты контрольного маршрутного реле или реле размыкания маршрута
+    is_SRS_ON &= (control_relay_shunt->getContactState(CRS_SIGNAL_RELAY_CTRL) ||
+                  unlock_relay_shunt->getContactState(URS_SIGNAL_RELAY_CTRL));
 
-    signal_relay->setVoltage(static_cast<double>(is_SR_ON) * U_bat);
+    signal_relay_shunt->setVoltage(static_cast<double>(is_SRS_ON) * U_bat);
 
 
     // Замыкание маршрута
-    bool is_LR_ON = signal_relay->getContactState(SR_LOCK_RELAY_CTRL);
+    bool is_LRS_ON = signal_relay_shunt->getContactState(SRS_LOCK_RELAY_CTRL);
 
-    lock_relay->setVoltage(static_cast<double>(is_LR_ON) * U_bat);
+    lock_relay_shunt->setVoltage(static_cast<double>(is_LRS_ON) * U_bat);
+
+
+    // Размыкание маршрута
+    bool is_URS_ON = signal_relay_shunt->getContactState(SRS_UNLOCK_RELAY_CTRL);
+
+    unlock_relay_shunt->setVoltage(static_cast<double>(is_URS_ON) * U_unlock_shunt);
 
 
     // Моделирование работы реле
-    control_relay->step(t, dt);
-    signal_relay->step(t, dt);
-    lock_relay->step(t, dt);
+    control_relay_shunt->step(t, dt);
+    signal_relay_shunt->step(t, dt);
+    lock_relay_shunt->step(t, dt);
+    unlock_relay_shunt->step(t, dt);
 
     // Работа таймеров удержания кнопки
     open_timer->step(t, dt);
     close_timer->step(t, dt);
 
-    lens_state[BLUE_LENS] = true;
-    lens_state[WHITE_LENS] = true;
+    lens_state[BLUE_LENS] = signal_relay_shunt->getContactState(SRS_CLOSED);
+    lens_state[WHITE_LENS] = signal_relay_shunt->getContactState(SRS_OPENED);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ShuntingSignal::slotPressOpen()
+void ShuntingSignal::slotPressOpenShunt()
 {
-    is_open_button_pressed = true;
+    is_open_shunt_button_pressed = true;
     open_timer->start();
 
     Journal::instance()->info("Pressed open button for shunting signal " + letter);
@@ -104,9 +117,9 @@ void ShuntingSignal::slotPressClose()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ShuntingSignal::slotOpenTimer()
+void ShuntingSignal::slotOpenTimerShunt()
 {
-    is_open_button_pressed = false;
+    is_open_shunt_button_pressed = false;
     open_timer->stop();
 
     Journal::instance()->info("Released open button for shunting signal " + letter);
@@ -126,10 +139,69 @@ void ShuntingSignal::slotCloseTimer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ShuntingSignal::lock_switch_fwd(Switch* sw, bool lock)
+{
+    if (lock)
+    {
+        if (sw->getStateFwd() < 0)
+        {
+            sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
+        }
+        if (sw->getStateFwd() > 0)
+        {
+            sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
+        }
+    }
+    else
+    {
+        if (sw->getStateFwd() < 0)
+        {
+            sw->setRefStateFwd(Switch::STATE_MINUS);
+        }
+        if (sw->getStateFwd() > 0)
+        {
+            sw->setRefStateFwd(Switch::STATE_PLUS);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ShuntingSignal::lock_switch_bwd(Switch* sw, bool lock)
+{
+    if (lock)
+    {
+        if (sw->getStateBwd() < 0)
+        {
+            sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
+        }
+        if (sw->getStateBwd() > 0)
+        {
+            sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
+        }
+    }
+    else
+    {
+        if (sw->getStateBwd() < 0)
+        {
+            sw->setRefStateBwd(Switch::STATE_MINUS);
+        }
+        if (sw->getStateBwd() > 0)
+        {
+            sw->setRefStateBwd(Switch::STATE_PLUS);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ShuntingSignal::check_shunt_route()
 {
     // Сбрасываем состояние
-    U_ctrl = 0.0;
+    U_ctrl_shunt = 0.0;
+    U_unlock_shunt = 0.0;
 
     // Начинаем с коннектора, к которому относится светофор
     Connector *cur_conn = conn;
@@ -139,10 +211,40 @@ void ShuntingSignal::check_shunt_route()
         return;
     }
 
+    // Смотрим траекторию перед текущим коннектором (участок приближения)
+    Trajectory* traj = (signal_dir == 1) ? cur_conn->getBwdTraj() : cur_conn->getFwdTraj();
+    if (traj && !traj->isBusy())
+    {
+        // Если траектория свободна, разрешаем размыкание маневрого маршрута
+        U_unlock_shunt = U_bat;
+    }
+
+    // Смотрим траекторию за текущим коннектором
+    traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
+    if (traj && ((traj == ref_trajectory_shunt) || !traj->isBusy()))
+    {
+        // Если траектория свободна, разрешаем размыкание маневрого маршрута
+        U_unlock_shunt = U_bat;
+    }
+
+    // Смотрим стрелочный перевод на текущем коннекторе
+    if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+    {
+        // Блокировка противошёрстного стрелочного перевода за светофором в маршрут
+        if (signal_dir == 1)
+        {
+            lock_switch_fwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED));
+        }
+        else
+        {
+            lock_switch_bwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED));
+        }
+    }
+
     while (true)
     {
         // Смотрим траекторию за текущим коннектором
-        Trajectory* traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
+        traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
 
         if (!traj)
         {
@@ -160,9 +262,10 @@ void ShuntingSignal::check_shunt_route()
         }
 
         // Нашли целевую траекторию
-        if (traj == ref_trajectory)
+        if (traj == ref_trajectory_shunt)
         {
-            U_ctrl = U_bat;
+            // Включаем реле контроля маршрута
+            U_ctrl_shunt = U_bat;
             return;
         }
 
@@ -173,7 +276,7 @@ void ShuntingSignal::check_shunt_route()
         }
 
         // Занимаем траекторию маршрутом от данного светофора
-        if (lock_relay->getContactState(LR_ROUTE_LOCKED))
+        if (lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED))
         {
             traj->setInRoute(true);
             (signal_dir == 1) ? traj->setRouteBySignalFwd(this) : traj->setRouteBySignalBwd(this);
@@ -200,57 +303,38 @@ void ShuntingSignal::check_shunt_route()
             return;
         }
 
+        // Смотрим сигнал на следующем коннекторе
+        Signal* signal = (signal_dir == 1) ? cur_conn->getSignalFwd() : cur_conn->getSignalBwd();
+
+        // Нашли маршрут до следующего светофора, заканчиваем цикл
+        if (signal)
+        {
+            // Включаем реле контроля маршрута
+            U_ctrl_shunt = U_bat;
+
+            // Смотрим стрелочный перевод на коннекторе
+            if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+            {
+                // Блокировка пошёрстного стрелочного перевода перед светофором в маршрут
+                if (signal_dir == 1)
+                {
+                    lock_switch_bwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED));
+                }
+                else
+                {
+                    lock_switch_fwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED));
+                }
+            }
+
+            return;
+        }
+
         // Смотрим стрелочный перевод на коннекторе
         if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
         {
             // Блокировка стрелочных переводов в маршруте
-            if (lock_relay->getContactState(LR_ROUTE_LOCKED))
-            {
-                if (sw->getStateBwd() < 0)
-                {
-                    sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
-                }
-                if (sw->getStateBwd() > 0)
-                {
-                    sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
-                }
-                if (sw->getStateFwd() < 0)
-                {
-                    sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
-                }
-                if (sw->getStateFwd() > 0)
-                {
-                    sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
-                }
-            }
-            else
-            {
-                if (sw->getStateBwd() < 0)
-                {
-                    sw->setRefStateBwd(Switch::STATE_MINUS);
-                }
-                if (sw->getStateBwd() > 0)
-                {
-                    sw->setRefStateBwd(Switch::STATE_PLUS);
-                }
-                if (sw->getStateFwd() < 0)
-                {
-                    sw->setRefStateFwd(Switch::STATE_MINUS);
-                }
-                if (sw->getStateFwd() > 0)
-                {
-                    sw->setRefStateFwd(Switch::STATE_PLUS);
-                }
-            }
-        }
-
-        // Смотрим сигнал на следующем коннекторе
-        Signal* signal = (signal_dir == 1) ? cur_conn->getSignalFwd() : cur_conn->getSignalBwd();
-
-        if (signal)
-        {
-            U_ctrl = U_bat;
-            return;
+            lock_switch_bwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED));
+            lock_switch_fwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED));
         }
     }
 }

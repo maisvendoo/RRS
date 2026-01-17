@@ -594,12 +594,20 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
 
     if (signal_dir == 1)
     {
-        conn->getSignalFwd()->deserialize(signal_data);
+        Signal* sig = conn->getSignalFwd();
+        if (sig)
+        {
+            sig->deserialize(signal_data);
+        }
     }
 
     if (signal_dir == -1)
     {
-        conn->getSignalBwd()->deserialize(signal_data);
+        Signal* sig = conn->getSignalBwd();
+        if (sig)
+        {
+            sig->deserialize(signal_data);
+        }
     }
 }
 
