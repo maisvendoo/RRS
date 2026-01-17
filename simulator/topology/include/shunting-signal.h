@@ -118,10 +118,10 @@ private:
     Timer *close_timer = new Timer(1.0, false);
 
     /// Замыкание или размыкание стрелочного перевода вперёд
-    void lock_switch_fwd(Switch* sw, bool lock);
+    bool check_and_lock_switch_fwd(Switch* sw, bool lock);
 
     /// Замыкание или размыкание стрелочного перевода назад
-    void lock_switch_bwd(Switch* sw, bool lock);
+    bool check_and_lock_switch_bwd(Switch* sw, bool lock);
 
     /// Проверка состояния стрелок и занятости по маршруту
     void check_shunt_route();

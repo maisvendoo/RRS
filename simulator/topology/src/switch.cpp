@@ -361,6 +361,7 @@ void Switch::step(double t, double dt)
         {
             state_fwd = IS_BUSY_PLUS;
             ref_state_fwd = STATE_PLUS;
+            in_route_by_signal_fwd = nullptr;
         }
         else
         {
@@ -368,6 +369,7 @@ void Switch::step(double t, double dt)
             {
                 state_fwd = IS_BUSY_MINUS;
                 ref_state_fwd = STATE_MINUS;
+                in_route_by_signal_fwd = nullptr;
             }
             else
             {
@@ -376,7 +378,6 @@ void Switch::step(double t, double dt)
             }
         }
     }
-
 
     // Если траектория назад единственная - делать дальше нечего
     if ((bwdMinusTraj == nullptr) || (bwdPlusTraj == nullptr))
@@ -391,6 +392,7 @@ void Switch::step(double t, double dt)
         {
             state_bwd = IS_BUSY_PLUS;
             ref_state_bwd = STATE_PLUS;
+            in_route_by_signal_bwd = nullptr;
         }
         else
         {
@@ -398,6 +400,7 @@ void Switch::step(double t, double dt)
             {
                 state_bwd = IS_BUSY_MINUS;
                 ref_state_bwd = STATE_MINUS;
+                in_route_by_signal_bwd = nullptr;
             }
             else
             {
