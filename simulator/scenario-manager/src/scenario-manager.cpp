@@ -522,45 +522,29 @@ void ScenarioManager::process_pos_triggers(std::string train_name,
         return;
     }
 
-    // Перебираем все имеющиеся триггеры
-    for (auto it = triggerList.begin(); it != triggerList.end(); ++it)
+    for (auto it = triggerList.begin(); it != triggerList.end();)
     {
-        // На всякии нехорошии ситуации трай-кэтч
         try
         {
-            // Вызываем триггер
             auto trigger = *it;
-
-            // Если тригер валидный
             if (trigger.valid())
             {
-                // Передаем данные о траекторном событии в триггер
-                // а он там уж сам как-нибудь порешает чего делать
                 auto result = trigger(train_name, traj_name, is_busy);
-
-                // Если валидный результат работы тригер
-                if (result.valid())
+                if (result.valid() && result.get<bool>())
                 {
-                    // Удаляем триггер если он попросил об этом
-                    if (result.get<bool>())
-                    {
-                        triggerList.erase(it);
-                    }
-
-                    // Если тригеров больше нет, уходим от греха, дабы
-                    // на следующей итерации цикла не схатить невалидный итератор
+                    it = triggerList.erase(it); // erase возвращает следующий итератор
                     if (triggerList.empty())
-                    {
                         return;
-                    }
+                    continue; // не делаем ++it
                 }
             }
         }
         catch (const sol::error &error)
         {
             Journal::instance()->error(QString("LUA: %1").arg(error.what()));
-            continue;
         }
+
+        ++it; // инкрементируем только если не удаляли
     }
 }
 
