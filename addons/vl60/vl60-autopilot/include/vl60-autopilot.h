@@ -87,6 +87,12 @@ private:
     /// Отпуск тормозов
     void brakeRelease(double p_charge);
 
+    /// Торможение ПТ
+    void stepPB(double dv, double t);
+
+    /// Торможение ЭПТ
+    void stepEPB(double dv, double t);
+
 private slots:
 
     void slotDelayTimer();

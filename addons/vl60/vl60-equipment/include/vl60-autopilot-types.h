@@ -38,6 +38,9 @@ public:
     /// Текущий ток ТЭД
     double I_motor = 0;
 
+    /// Состояние ЭПТ (Вкл/Выкл (или нету ЭПТ)
+    bool is_EPB_on;
+
     vl60_feedback_t() : auto_feedback_t()
     {
 

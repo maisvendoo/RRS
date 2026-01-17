@@ -48,7 +48,13 @@ void VL60Autopilot::step(double t, double dt)
 //------------------------------------------------------------------------------
 void VL60Autopilot::preStep(state_vector_t &Y, double t)
 {
+    // Приводим общую структуру обратной связи к нашему типу
     auto_feedback = dynamic_cast<vl60_feedback_t *>(feedback);
+
+    if (auto_feedback == nullptr)
+    {
+        return;
+    }
 
     // Режем сигнал интегратора
     Y[0] = cut(Y[0], -1.0, 1.0);
@@ -101,14 +107,13 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
         is_zero_lock = true;
     }
 
-    if (dv < -0.5)
+    if (auto_feedback->is_EPB_on)
     {
-        brakeStep(auto_feedback->p_charge, 0.06);
+        stepEPB(dv, t);
     }
-
-    if (dv >= 5.0)
+    else
     {
-        brakeRelease(auto_feedback->p_charge);
+        stepPB(dv, t);
     }
 }
 
@@ -299,6 +304,50 @@ void VL60Autopilot::brakeRelease(double p_charge)
     {
         auto_control->krm_pos = 1;
         lock_traction = false;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::stepPB(double dv, double t)
+{
+    if (dv < -0.5)
+    {
+        brakeStep(auto_feedback->p_charge, 0.06);
+    }
+
+    if (dv >= 5.0)
+    {
+        brakeRelease(auto_feedback->p_charge);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::stepEPB(double dv, double t)
+{
+    const double dVminus = -0.5;
+    const double dVplus = 3.0;
+
+    if (dv < dVminus)
+    {
+        auto_control->krm_pos = 4;
+        lock_traction = true;
+    }
+
+    if ( dv >= -dVminus && dv <= dVplus)
+    {
+        if (lock_traction && auto_feedback->pBC >= 0.1)
+        {
+            auto_control->krm_pos = 3;
+        }
+    }
+
+    if (dv > dVplus && !is_disable_release)
+    {
+        auto_control->krm_pos = 1;
     }
 }
 
