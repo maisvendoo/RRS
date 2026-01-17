@@ -11,6 +11,7 @@
 #include    <ALSN-coil.h>
 #include    <ALSN-decoder.h>
 #include    <epb-2line-control.h>
+#include    <relay.h>
 
 //------------------------------------------------------------------------------
 //
@@ -64,6 +65,14 @@ void VL60pk::stepAutopilot(double t, double dt)
         auto_feedback[cab_idx]->pEQ = brake_crane[cab_idx]->getERpressure();
         auto_feedback[cab_idx]->p_charge = charge_press;
         auto_feedback[cab_idx]->is_EPB_on = epb_control->stateReleaseLamp();
+
+        auto_feedback[cab_idx]->is_LC_ON = true;
+
+        for (auto lc : linear_contactor)
+        {
+            auto_feedback[cab_idx]->is_LC_ON =
+                auto_feedback[cab_idx]->is_LC_ON && lc->getContactState(LC_SELF);
+        }
 
         // Принимаем сигналы обратной связи от оборудования
         autopilot[cab_idx]->setFeedback(auto_feedback[cab_idx]);

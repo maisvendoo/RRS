@@ -75,18 +75,16 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     }
     else
     {
-        lock_traction = false;
-    }
-
-    if (auto_feedback->cur_pos == 0)
-    {
-        is_zero_lock = false;
-    }
+        if (lock_traction && dv < 10.0)
+            lock_traction = true;
+        else
+            lock_traction = false;
+    }    
 
     // Если ток упал ниже уставки
     if (auto_feedback->I_motor < I_ref - delta_I)
     {
-        if (!lock_traction && !is_zero_lock)
+        if (!lock_traction)
         {
             // + позиция
             plusPos();
@@ -103,8 +101,7 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     // Если превышаем скорость - мотаем вниз до упора
     if (dv < -0.25)
     {
-        auto_control->km_pos_ref = POS_ZERO;
-        is_zero_lock = true;
+        auto_control->km_pos_ref = POS_ZERO;        
     }
 
     if (auto_feedback->is_EPB_on)
@@ -172,6 +169,20 @@ void VL60Autopilot::plusPos()
     if (auto_feedback->cur_pos == 37)
     {
         auto_control->km_pos_ref = POS_FP;
+
+        if (!delay->isStarted())
+            delay->start();
+
+        return;
+    }
+
+    // При разомкнутых ЛК
+    if (!auto_feedback->is_LC_ON)
+    {
+        if (auto_feedback->km_pos != POS_ZERO)
+            auto_control->km_pos_ref = POS_ZERO;
+        else
+            auto_control->km_pos_ref = POS_AV;
 
         if (!delay->isStarted())
             delay->start();
@@ -345,10 +356,25 @@ void VL60Autopilot::stepEPB(double dv, double t)
         }
     }
 
-    if (dv > dVplus && !is_disable_release)
+    if (dv > dVplus && !is_disable_release && lock_traction)
     {
-        auto_control->krm_pos = 1;
+        // Последняя ступень отпуска I положением
+        if (auto_feedback->pBC <= 0.1)
+        {
+            if (auto_feedback->pEQ < auto_feedback->p_charge + 0.02)
+            {
+                auto_control->krm_pos = 0;
+            }
+            else
+            {
+                auto_control->krm_pos = 1;
+            }
+        }
+        else
+            auto_control->krm_pos = 1;
     }
+
+
 }
 
 //------------------------------------------------------------------------------

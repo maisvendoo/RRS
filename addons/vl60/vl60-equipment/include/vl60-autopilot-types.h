@@ -41,6 +41,9 @@ public:
     /// Состояние ЭПТ (Вкл/Выкл (или нету ЭПТ)
     bool is_EPB_on;
 
+    /// Контроль состояния линейных контакторов
+    bool is_LC_ON = false;
+
     vl60_feedback_t() : auto_feedback_t()
     {
 
