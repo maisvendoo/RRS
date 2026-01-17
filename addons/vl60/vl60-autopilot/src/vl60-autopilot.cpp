@@ -75,8 +75,9 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     }
     else
     {
+        // Если тяга заблокирована но скорость не упала сильно
         if (lock_traction && dv < 10.0)
-            lock_traction = true;
+            lock_traction = true; // продолжаем блокировать тягу
         else
             lock_traction = false;
     }    
@@ -179,14 +180,17 @@ void VL60Autopilot::plusPos()
     // При разомкнутых ЛК
     if (!auto_feedback->is_LC_ON)
     {
+        // Если рукоятка не в 0, то ставим её туда
         if (auto_feedback->km_pos != POS_ZERO)
             auto_control->km_pos_ref = POS_ZERO;
-        else
+        else // иначе - переводим в АВ, для замыкания ЛК
             auto_control->km_pos_ref = POS_AV;
 
+        // Задержка
         if (!delay->isStarted())
             delay->start();
 
+        // Уходим - к набору пока не готовы
         return;
     }
 
@@ -339,42 +343,56 @@ void VL60Autopilot::stepPB(double dv, double t)
 //------------------------------------------------------------------------------
 void VL60Autopilot::stepEPB(double dv, double t)
 {
+    // Максимальное превышение над программной скоростью
     const double dVminus = -0.5;
+    // Максимальное снижение скорости относительно программной
     const double dVplus = 3.0;
 
+    // Превышаем программую скорость
     if (dv < dVminus)
     {
+        // Ступень торможения
         auto_control->krm_pos = 4;
+        // Запрет тяги
         lock_traction = true;
     }
 
+    // Скорость в дупустимом коридоре
     if ( dv >= -dVminus && dv <= dVplus)
     {
+        // Ставим в перекрышу, при условии что в ТЦ минимут 1 кгс
         if (lock_traction && auto_feedback->pBC >= 0.1)
         {
             auto_control->krm_pos = 3;
         }
     }
 
+    // Скорость упала ниже коридора, нет запрета отпуска, запрещена тяга
     if (dv > dVplus && !is_disable_release && lock_traction)
     {
+        // Отпускаем
+
         // Последняя ступень отпуска I положением
-        if (auto_feedback->pBC <= 0.1)
+        if (auto_feedback->pBC < 0.1)
         {
             if (auto_feedback->pEQ < auto_feedback->p_charge + 0.02)
             {
+                // Первая ступень только нет завышения в УР
                 auto_control->krm_pos = 0;
             }
-            else
+            else // иначе - II положение
             {
                 auto_control->krm_pos = 1;
             }
         }
-        else
+        else // и если не последняя ступень отпуска - отпускаем II положением
             auto_control->krm_pos = 1;
     }
 
-
+    if (auto_feedback->pEQ >= auto_feedback->p_charge + 0.02 && auto_control->krm_pos == 0)
+    {
+        auto_control->krm_pos = 1;
+    }
 }
 
 //------------------------------------------------------------------------------
