@@ -25,6 +25,12 @@ public slots:
 
     void slotPressClose();
 
+private slots:
+
+    void slotOpenTimer();
+
+    void slotCloseTimer();
+
 protected:
 
     enum
@@ -60,6 +66,16 @@ protected:
     /// при открытии сигнала отключается и блокирует стрелки по маршруту от перевода
     Relay *lock_relay = new Relay(NUM_LR_CONTACTS);
 
+    enum Restrict : std::uint8_t {
+        SWITCHES_SIDE = 0,  ///< Маршрут с отклонением по стрелочным переводам
+        SWITCHES_SIDE_80,   ///< //TODO// Маршрут с отклонением по пологим стрелочным переводам не более 1/18 (не менее 80 км/ч)
+        SWITCHES_SIDE_120,  ///< //TODO// Маршрут с отклонением по пологим стрелочным переводам не более 1/22 (не менее 120 км/ч)
+        SWITCHES_STRAIGHT,  ///< Маршрут без отклонений по стрелочным переводам
+    };
+
+    /// Признак ограничения по положениям стрелочных переводов
+    Restrict switches_state = SWITCHES_STRAIGHT;
+
 private:
 
     /// Признак нажатия кнопки открытия
@@ -74,11 +90,8 @@ private:
     /// Таймер выдержки времени удержания кнопки закрыть
     Timer *close_timer = new Timer(1.0, false);
 
-private slots:
-
-    void slotOpenTimer();
-
-    void slotCloseTimer();
+    /// Проверка состояния стрелок и занятости по маршруту до следующего поездного светофора
+    void check_train_route();
 };
 
 #endif // STATION_SIGNAL_H

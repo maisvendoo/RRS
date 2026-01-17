@@ -1,5 +1,4 @@
-#include    <enter-signal.h>
-#include    <switch.h>
+#include    "enter-signal.h"
 
 //------------------------------------------------------------------------------
 //
@@ -61,10 +60,7 @@ void EnterSignal::preStep(double t)
 {
     (void)t;
 
-    bool is_switches_side = false;
-    check_route(is_switches_side);
-
-    relay_control(is_switches_side);
+    relay_control();
 
     yellow_blink_control();
 
@@ -76,162 +72,7 @@ void EnterSignal::preStep(double t)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void EnterSignal::check_route(bool& is_switches_side)
-{
-    // Начинаем с коннектора, к которому относится светофор
-    Connector *cur_conn = conn;
-
-    if (!cur_conn)
-    {
-        U_way = 0.0;
-        U_line = 0.0;
-        U_side = 0.0;
-        return;
-    }
-
-    while (true)
-    {
-        // Смотрим траекторию за текущим коннектором
-        Trajectory* traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
-
-        if (!traj)
-        {
-            U_way = 0.0;
-            U_line = 0.0;
-            U_side = 0.0;
-            return;
-        }
-
-        // Проверяем занятость траектории
-        if (traj->isBusy())
-        {
-            U_way = 0.0;
-            U_line = 0.0;
-            U_side = 0.0;
-            return;
-        }
-
-        // Проверяем включение траектории в маршрут от другого светофора
-        if (traj->isInRoute())
-        {
-            Signal* s = (signal_dir == 1) ? traj->getRouteBySignalFwd() : traj->getRouteBySignalBwd();
-            if (s != this)
-            {
-                U_way = 0.0;
-                U_line = 0.0;
-                U_side = 0.0;
-                return;
-            }
-        }
-
-        // Занимаем траекторию маршрутом от данного светофора
-        if (lock_relay->getContactState(LR_ROUTE_LOCKED))
-        {
-            traj->setInRoute(true);
-            (signal_dir == 1) ? traj->setRouteBySignalFwd(this) : traj->setRouteBySignalBwd(this);
-        }
-        else
-        {
-            traj->setInRoute(false);
-            (signal_dir == 1) ? traj->setRouteBySignalFwd(nullptr) : traj->setRouteBySignalBwd(nullptr);
-        }
-
-        // Смотрим следующий коннектор
-        cur_conn = (signal_dir == 1) ? traj->getFwdConnector() : traj->getBwdConnector();
-
-        if (!cur_conn)
-        {
-            U_way = 0.0;
-            U_line = 0.0;
-            U_side = 0.0;
-            return;
-        }
-
-        // Контроль взреза стрелки: смотрим траекторию перед следующим коннектором
-        Trajectory* prev = (signal_dir == 1) ? cur_conn->getBwdTraj() : cur_conn->getFwdTraj();
-
-        if (traj != prev)
-        {
-            U_way = 0.0;
-            U_line = 0.0;
-            U_side = 0.0;
-            return;
-        }
-
-        // Смотрим стрелочный перевод на коннекторе
-        if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
-        {
-            // Блокировка стрелочных переводов в маршруте
-            if (lock_relay->getContactState(LR_ROUTE_LOCKED))
-            {
-                if (sw->getStateBwd() < 0)
-                {
-                    sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
-                }
-                if (sw->getStateBwd() > 0)
-                {
-                    sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
-                }
-                if (sw->getStateFwd() < 0)
-                {
-                    sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
-                }
-                if (sw->getStateFwd() > 0)
-                {
-                    sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
-                }
-            }
-            else
-            {
-                if (sw->getStateBwd() < 0)
-                {
-                    sw->setRefStateBwd(Switch::STATE_MINUS);
-                }
-                if (sw->getStateBwd() > 0)
-                {
-                    sw->setRefStateBwd(Switch::STATE_PLUS);
-                }
-                if (sw->getStateFwd() < 0)
-                {
-                    sw->setRefStateFwd(Switch::STATE_MINUS);
-                }
-                if (sw->getStateFwd() > 0)
-                {
-                    sw->setRefStateFwd(Switch::STATE_PLUS);
-                }
-            }
-
-            // Проверяем отклонение по стрелке
-            is_switches_side |= (sw->getStateBwd() < 0);
-            is_switches_side |= (sw->getStateFwd() < 0);
-        }
-
-        // Смотрим сигнал на следующем коннекторе
-        Signal* signal = (signal_dir == 1) ? cur_conn->getSignalFwd() : cur_conn->getSignalBwd();
-
-        if (signal)
-        {
-            if (TrainSignal* ts = dynamic_cast<TrainSignal*>(signal))
-            {
-                // Замыкание цепи на путевое реле в релейном шкафу следующего светофора
-                U_way = U_bat;
-                // Линейное реле питается от линии следующего светофора
-                U_line = ts->getLineVoltage();
-                // Боковое сигнальное реле питается от линии следующего светофора
-                U_side = ts->getSideVoltage();
-
-                // Если сигнал закрыт, отключаем АЛСН-код от следующего светофора
-                ts->allowTransmitALSN(!lens_state[RED_LENS]);
-                return;
-            }
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void EnterSignal::relay_control(bool is_switches_side)
+void EnterSignal::relay_control()
 {
 
     // Цепи главного и бокового сигнальных реле
@@ -239,8 +80,8 @@ void EnterSignal::relay_control(bool is_switches_side)
                              signal_relay->getContactState(SR_OPENED) &&
                              lock_relay->getContactState(LR_ROUTE_LOCKED);
 
-    bool is_MSR_ON = is_common_wire_ON && (!is_switches_side);
-    bool is_SSR_ON = is_common_wire_ON && is_switches_side;
+    bool is_MSR_ON = is_common_wire_ON && (switches_state == SWITCHES_STRAIGHT);
+    bool is_SSR_ON = is_common_wire_ON && (switches_state == SWITCHES_SIDE);
 
     main_signal_relay->setVoltage(static_cast<double>(is_MSR_ON) * U_bat);
     side_signal_relay->setVoltage(static_cast<double>(is_SSR_ON) * U_bat);

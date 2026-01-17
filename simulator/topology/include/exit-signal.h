@@ -57,9 +57,6 @@ private:
 
     void preStep(double t) override;
 
-    /// Проверка состояния стрелок и занятости по маршруту до следующего светофора
-    void check_route();
-
     /// Управление цепями питания реле
     void relay_control();
 

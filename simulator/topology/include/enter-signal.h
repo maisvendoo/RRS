@@ -68,11 +68,8 @@ private:
 
     void preStep(double t) override;
 
-    /// Проверка состояния стрелок и занятости по маршруту до следующего светофора
-    void check_route(bool& is_switches_side);
-
     /// Управление цепями питания реле
-    void relay_control(bool is_switches_side);
+    void relay_control();
 
     /// Управление миганием желтого (на предвходном)
     void yellow_blink_control();

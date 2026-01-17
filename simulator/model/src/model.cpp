@@ -143,6 +143,11 @@ bool Model::init(const simulator_command_line_t &command_line)
     tcp_server->setVehiclesInfo(vehicles_info.serialize());
     Journal::instance()->info("Ready vehicles info for server");
 
+    prepareFeedBack(true);
+    tcpFeedBack(true);
+
+    Journal::instance()->info("Ready trains and vehicles state for server");
+
     initTcpServer();
 
     Journal::instance()->info("Simulator model and server are initialized successfully");
