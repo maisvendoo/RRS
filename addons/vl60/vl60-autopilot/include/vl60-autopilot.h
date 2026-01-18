@@ -47,9 +47,9 @@ private:
     /// Число выполенных ступеней торможения
     uint8_t brake_step = 0;
 
-    const double BRAKE_DELAY = 5.0;
+    const double KRM_HANDLE_DELAY = 0.2;
 
-    Timer *brake_delay = new Timer(BRAKE_DELAY, false);
+    Timer *krm_handle_timer = new Timer(KRM_HANDLE_DELAY, false);
 
     /// Блокирование тяги тормозами
     bool lock_traction = false;
@@ -93,11 +93,14 @@ private:
     /// Торможение ЭПТ
     void stepEPB(double dv, double t);
 
+    /// Установка позиции рукоятки крана машиниста
+    void setBrakeCranePos(int pos);
+
 private slots:
 
     void slotDelayTimer();
 
-    void slotBrakeTimer();
+    void slotBrakeCraneHandle();
 };
 
 #endif

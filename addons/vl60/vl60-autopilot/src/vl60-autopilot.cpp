@@ -6,7 +6,7 @@
 VL60Autopilot::VL60Autopilot() : Autopilot(nullptr)
 {
     connect(delay, &Timer::process, this, &VL60Autopilot::slotDelayTimer);
-    connect(brake_delay, &Timer::process, this, &VL60Autopilot::slotBrakeTimer);
+    connect(krm_handle_timer, &Timer::process, this, &VL60Autopilot::slotBrakeCraneHandle);
 }
 
 //------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ auto_control_t *VL60Autopilot::getControl()
 void VL60Autopilot::step(double t, double dt)
 {
     delay->step(t, dt);
-    brake_delay->step(t, dt);
+    krm_handle_timer->step(t, dt);
     Autopilot::step(t, dt);
 }
 
@@ -282,7 +282,7 @@ void VL60Autopilot::brakeStep(double p_charge, double dp)
 
     if ( auto_feedback->pEQ > p_charge -  delta_pEQ)
     {
-        if (!brake_delay->isStarted())
+        if (!krm_handle_timer->isStarted())
         {
             auto_control->krm_pos = 5;
         }
@@ -293,7 +293,7 @@ void VL60Autopilot::brakeStep(double p_charge, double dp)
         {
             auto_control->krm_pos = 3;
             brake_step++;
-            brake_delay->start();
+            krm_handle_timer->start();
         }
     }
 }
@@ -309,7 +309,7 @@ void VL60Autopilot::brakeRelease(double p_charge)
     }
 
     brake_step = 0;
-    brake_delay->stop();
+    krm_handle_timer->stop();
 
     if (auto_feedback->pEQ < p_charge - 0.02)
     {
@@ -352,7 +352,7 @@ void VL60Autopilot::stepEPB(double dv, double t)
     if (dv < dVminus)
     {
         // Ступень торможения
-        auto_control->krm_pos = 4;
+        setBrakeCranePos(4);
         // Запрет тяги
         lock_traction = true;
     }
@@ -363,7 +363,7 @@ void VL60Autopilot::stepEPB(double dv, double t)
         // Ставим в перекрышу, при условии что в ТЦ минимут 1 кгс
         if (lock_traction && auto_feedback->pBC >= 0.1)
         {
-            auto_control->krm_pos = 3;
+            setBrakeCranePos(3);
         }
     }
 
@@ -378,20 +378,32 @@ void VL60Autopilot::stepEPB(double dv, double t)
             if (auto_feedback->pEQ < auto_feedback->p_charge + 0.02)
             {
                 // Первая ступень только нет завышения в УР
-                auto_control->krm_pos = 0;
+                setBrakeCranePos(0);
             }
             else // иначе - II положение
             {
-                auto_control->krm_pos = 1;
+                setBrakeCranePos(1);
             }
         }
         else // и если не последняя ступень отпуска - отпускаем II положением
-            auto_control->krm_pos = 1;
+            setBrakeCranePos(1);
     }
 
     if (auto_feedback->pEQ >= auto_feedback->p_charge + 0.02 && auto_control->krm_pos == 0)
     {
-        auto_control->krm_pos = 1;
+        setBrakeCranePos(1);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::setBrakeCranePos(int pos)
+{
+    if (!krm_handle_timer->isStarted())
+    {
+        auto_control->krm_pos = pos;
+        krm_handle_timer->start();
     }
 }
 
@@ -406,9 +418,9 @@ void VL60Autopilot::slotDelayTimer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60Autopilot::slotBrakeTimer()
+void VL60Autopilot::slotBrakeCraneHandle()
 {
-    brake_delay->stop();
+    krm_handle_timer->stop();
 }
 
 GET_AUTOPILOT(VL60Autopilot)
