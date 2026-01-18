@@ -233,9 +233,16 @@ void VL60Autopilot::minusPos()
     if (delay->isStarted())
         return;
 
+    // Если рукоятка уже в нуле - не фиг её вообще дергать - мотаем до нуля
+    if (auto_feedback->km_pos == POS_ZERO)
+    {
+        return;
+    }
+
+    // Если смотаны все позиции, ставим рукоятку в ноль
     if (auto_feedback->cur_pos == 0)
     {
-        auto_control->km_pos_ref = POS_FV;
+        auto_control->km_pos_ref = POS_ZERO;
 
         if (!delay->isStarted())
             delay->start();
@@ -243,7 +250,7 @@ void VL60Autopilot::minusPos()
         return;
     }
 
-    // Если текущая позиция совпадает с предудущей - ручку в РВ
+    // Если текущая позиция совпадает с предыдущей - ручку в РВ
     if (auto_feedback->cur_pos == prev_pos)
     {
         if (auto_feedback->km_pos == POS_FV)
