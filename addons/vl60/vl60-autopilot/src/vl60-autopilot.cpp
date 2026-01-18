@@ -361,18 +361,18 @@ void VL60Autopilot::stepEPB(double dv, double t)
     if (dv < dVminus)
     {
         // Ступень торможения
-        setBrakeCranePos(4);
+        setBrakeCranePos(KRM_POS_Va);
         // Запрет тяги
         lock_traction = true;
     }
 
-    // Скорость в дупустимом коридоре
+    // Скорость в допустимом коридоре
     if ( dv >= -dVminus && dv <= dVplus)
     {
         // Ставим в перекрышу, при условии что в ТЦ минимут 1 кгс
         if (lock_traction && auto_feedback->pBC >= 0.1)
         {
-            setBrakeCranePos(3);
+            setBrakeCranePos(KRM_POS_IV);
         }
     }
 
@@ -384,23 +384,24 @@ void VL60Autopilot::stepEPB(double dv, double t)
         // Последняя ступень отпуска I положением
         if ( auto_feedback->pBC < 0.1)
         {
+            // если нет завышения в УР
             if (auto_feedback->pEQ < auto_feedback->p_charge + 0.02)
             {
-                // Первая ступень только нет завышения в УР
-                setBrakeCranePos(0);
+                // Первое
+                setBrakeCranePos(KRM_POS_I);
             }
             else // иначе - II положение
             {
-                setBrakeCranePos(1);
+                setBrakeCranePos(KRM_POS_II);
             }
         }
         else // и если не последняя ступень отпуска - отпускаем II положением
-            setBrakeCranePos(1);
+            setBrakeCranePos(KRM_POS_II);
     }
 
     if (auto_feedback->pEQ >= auto_feedback->p_charge + 0.02 && auto_control->krm_pos == 0)
     {
-        setBrakeCranePos(1);
+        setBrakeCranePos(KRM_POS_II);
     }
 }
 
@@ -419,9 +420,9 @@ void VL60Autopilot::stepKVT()
         is_disable_release = false;
 
         // отпускаем состав если кран в перекрыше
-        if (auto_control->krm_pos == 3 || auto_control->krm_pos == 2)
+        if (auto_control->krm_pos == KRM_POS_III || auto_control->krm_pos == KRM_POS_IV)
         {
-            setBrakeCranePos(0);
+            setBrakeCranePos(KRM_POS_I);
         }
     }
     else // Иначе - отпускаем

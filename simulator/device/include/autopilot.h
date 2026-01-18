@@ -3,6 +3,7 @@
 
 #include    <device.h>
 #include    <autopilot-types.h>
+#include    <autopilot-brakes-control.h>
 
 /*!
  * \class
