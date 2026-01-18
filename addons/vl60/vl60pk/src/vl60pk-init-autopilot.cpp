@@ -60,7 +60,7 @@ void VL60pk::slotInitTrainForAutopilot()
             prepareCabineForAutopilot(CAB1, CAB2);
         }
 
-        if (controller[CAB1]->isReversHandle())
+        if (controller[CAB2]->isReversHandle())
         {
             prepareCabineForAutopilot(CAB2, CAB1);
         }
