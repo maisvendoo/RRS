@@ -12,6 +12,14 @@
 		<!-- Интегральный коэффициент регулятора скорости -->
 		<Ki>0.0</Ki>
 		<!-- Ускорение кривой снижения скорости -->
-		<BrakeAccel>0.2</BrakeAccel>
+		<BrakeAccel>0.1</BrakeAccel>
+		<!-- Дистанция упреждения на КЖ -->
+		<LeadDistance_RY>0.0</LeadDistance_RY>
+		<!-- Дистанция упреждения на Ж -->
+		<LeadDistance_Y>0.0</LeadDistance_Y>
+		<!-- Ограничение скорости при КЖ -->
+		<SpeedLimit_RY>60.0</SpeedLimit_RY>
+		<!-- Скорость движения для запрета отпуска -->
+		<SpeedDisableRelease>5.0</SpeedDisableRelease>
 	</Device>
 </Config>

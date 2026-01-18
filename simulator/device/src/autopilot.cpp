@@ -88,6 +88,10 @@ void Autopilot::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "V_constr", v_constr);
     cfg.getDouble(secName, "BrakeAccel", a_brake);
+    cfg.getDouble(secName, "LeadDistance_RY", lead_dist_RY);
+    cfg.getDouble(secName, "LeadDistance_Y", lead_dist_Y);
+    cfg.getDouble(secName, "SpeedLimit_RY", v_lim_RY);
+    cfg.getDouble(secName, "SpeedDisableRelease", v_disable_release);
 }
 
 //------------------------------------------------------------------------------
@@ -144,10 +148,10 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code)
     {
     case RED_YELLOW:
 
-        v_lim = cut(calcBrakeCurveSpeed(0.0, feedback->signal_dist - 25.0), 0.0, 60.0);
+        v_lim = cut(calcBrakeCurveSpeed(0.0, feedback->signal_dist - lead_dist_RY), 0.0, v_lim_RY);
 
         // Запрещаем отпускать тормоза - остановка
-        if (feedback->v_cur <= 10.0)
+        if (feedback->v_cur <= v_disable_release)
         {
             is_disable_release = true;            
         }
@@ -162,7 +166,7 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code)
 
     case YELLOW:
 
-        v_lim = calcBrakeCurveSpeed(60.0, feedback->signal_dist - 25.0);
+        v_lim = calcBrakeCurveSpeed(v_lim_RY, feedback->signal_dist - lead_dist_RY);
         is_motion_allowed = true;
 
         break;

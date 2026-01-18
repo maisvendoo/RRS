@@ -116,6 +116,18 @@ protected:
     /// Разрешено движение
     bool is_motion_allowed = false;
 
+    /// Дистанция упреждения до КЖ
+    double lead_dist_RY = 0.0;
+
+    /// Дистанция упреждения до Ж
+    double lead_dist_Y = 0.0;
+
+    /// Ограничение скорости под КЖ
+    double v_lim_RY = 60.0;
+
+    /// Скорость для заперта отпуска
+    double v_disable_release = 5.0;
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,
