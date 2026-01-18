@@ -144,6 +144,8 @@ private:
 
     void drawShuntSignal(Signal *signal);
 
+    void drawSignal(Signal *signal, std::vector<QColor> lens_colors);
+
     QPoint coord_transform(dvec3 point);
 
     void wheelEvent(QWheelEvent *event);
