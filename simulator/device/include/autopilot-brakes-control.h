@@ -1,6 +1,9 @@
 #ifndef     AUTOPILOT_BRAKE_CONTROL_H
 #define     AUTOPILOT_BRAKE_CONTROL_H
 
+#include    <device.h>
+#include    <timer.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -34,11 +37,11 @@ struct autopilot_brake_control_state_t
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class AutopilotBrakeController
+class DEVICE_EXPORT AutopilotBrakeController : public Device
 {
 public:
 
-    AutopilotBrakeController() = default;
+    AutopilotBrakeController();
 
     ~AutopilotBrakeController() = default;
 
@@ -49,6 +52,8 @@ public:
         this->pBC = pBC;
         this->p_charge = p_charge;
     }
+
+    void step(double t, double dt) override;
 
     /// Шаг управления с учетом всех признаков
     void step_control(bool is_EPB_ON,
@@ -75,6 +80,16 @@ private:
     /// Зарядное давление
     double p_charge = 0.0;
 
+    const double KRM_HANDLE_DELAY = 0.5;
+    Timer *krm_handle_timer = new Timer(KRM_HANDLE_DELAY, false);
+
+    void ode_system(const state_vector_t &Y,
+                    state_vector_t &dYdt,
+                    double t) override
+    {
+        (void) Y; (void) dYdt; (void) t;
+    }
+
     /// Управление ЭПТ
     void stepEPB(double dv, bool &lock_traction, bool &is_disable_release);
 
@@ -83,6 +98,12 @@ private:
 
     /// Управление КВТ
     void stepKVT(bool is_motion_allowed, bool &is_disable_release);
+
+    void setBrakeCranePos(int pos);
+
+private slots:
+
+    void slotBrakeCraneHandle();
 };
 
 #endif

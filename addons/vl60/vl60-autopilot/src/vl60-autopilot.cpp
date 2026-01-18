@@ -5,8 +5,7 @@
 //------------------------------------------------------------------------------
 VL60Autopilot::VL60Autopilot() : Autopilot(nullptr)
 {
-    connect(delay, &Timer::process, this, &VL60Autopilot::slotDelayTimer);
-    connect(krm_handle_timer, &Timer::process, this, &VL60Autopilot::slotBrakeCraneHandle);
+    connect(delay, &Timer::process, this, &VL60Autopilot::slotDelayTimer);    
 }
 
 //------------------------------------------------------------------------------
@@ -28,18 +27,10 @@ auto_control_t *VL60Autopilot::getControl()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-/*void VL60Autopilot::setFeedback(auto_feedback_t *feedback)
-{
-    auto_feedback = dynamic_cast<vl60_feedback_t *>(feedback);
-}*/
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void VL60Autopilot::step(double t, double dt)
 {
     delay->step(t, dt);
-    krm_handle_timer->step(t, dt);
+    brake_control->step(t, dt);
     Autopilot::step(t, dt);
 }
 
@@ -105,16 +96,20 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
         auto_control->km_pos_ref = POS_ZERO;        
     }
 
-    if (auto_feedback->is_EPB_on)
-    {
-        stepEPB(dv, t);
-    }
-    else
-    {
-        stepPB(dv, t);
-    }
+    brake_control->setBrakePressures(auto_feedback->pEQ,
+                                     auto_feedback->pBC,
+                                     auto_feedback->p_charge);
 
-    stepKVT();
+    brake_control->step_control(auto_feedback->is_EPB_on,
+                                dv,
+                                is_motion_allowed,
+                                lock_traction,
+                                is_disable_release);
+
+    autopilot_brake_control_state_t bc_state = brake_control->getControlState();
+
+    auto_control->krm_pos = bc_state.brake_crane_pos_ref;
+    auto_control->kvt_pos = bc_state.loco_crane_pos_ref;
 }
 
 //------------------------------------------------------------------------------
@@ -283,181 +278,9 @@ void VL60Autopilot::minusPos()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60Autopilot::brakeStep(double p_charge, double dp)
-{
-    lock_traction = true;
-
-    double delta_pEQ = cut((brake_step + 1) * dp, 0.0, 0.15);
-
-    if ( auto_feedback->pEQ > p_charge -  delta_pEQ)
-    {
-        if (!krm_handle_timer->isStarted())
-        {
-            auto_control->krm_pos = 5;
-        }
-    }
-    else
-    {
-        if (auto_control->krm_pos == 5)
-        {
-            auto_control->krm_pos = 3;
-            brake_step++;
-            krm_handle_timer->start();
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VL60Autopilot::brakeRelease(double p_charge)
-{
-    if (is_disable_release)
-    {
-        return;
-    }
-
-    brake_step = 0;
-    krm_handle_timer->stop();
-
-    if (auto_feedback->pEQ < p_charge - 0.02)
-    {
-        auto_control->krm_pos = 0;
-    }
-    else
-    {
-        auto_control->krm_pos = 1;
-        lock_traction = false;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VL60Autopilot::stepPB(double dv, double t)
-{
-    if (dv < -0.5)
-    {
-        brakeStep(auto_feedback->p_charge, 0.06);
-    }
-
-    if (dv >= 5.0)
-    {
-        brakeRelease(auto_feedback->p_charge);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VL60Autopilot::stepEPB(double dv, double t)
-{
-    // Максимальное превышение над программной скоростью
-    const double dVminus = -0.5;
-    // Максимальное снижение скорости относительно программной
-    const double dVplus = 3.0;
-
-    // Превышаем программую скорость
-    if (dv < dVminus)
-    {
-        // Ступень торможения
-        setBrakeCranePos(KRM_POS_Va);
-        // Запрет тяги
-        lock_traction = true;
-    }
-
-    // Скорость в допустимом коридоре
-    if ( dv >= -dVminus && dv <= dVplus)
-    {
-        // Ставим в перекрышу, при условии что в ТЦ минимут 1 кгс
-        if (lock_traction && auto_feedback->pBC >= 0.1)
-        {
-            setBrakeCranePos(KRM_POS_IV);
-        }
-    }
-
-    // Скорость упала ниже коридора, нет запрета отпуска, запрещена тяга
-    if (dv > dVplus && !is_disable_release && lock_traction)
-    {
-        // Отпускаем
-
-        // Последняя ступень отпуска I положением
-        if ( auto_feedback->pBC < 0.1)
-        {
-            // если нет завышения в УР
-            if (auto_feedback->pEQ < auto_feedback->p_charge + 0.02)
-            {
-                // Первое
-                setBrakeCranePos(KRM_POS_I);
-            }
-            else // иначе - II положение
-            {
-                setBrakeCranePos(KRM_POS_II);
-            }
-        }
-        else // и если не последняя ступень отпуска - отпускаем II положением
-            setBrakeCranePos(KRM_POS_II);
-    }
-
-    if (auto_feedback->pEQ >= auto_feedback->p_charge + 0.02 && auto_control->krm_pos == 0)
-    {
-        setBrakeCranePos(KRM_POS_II);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VL60Autopilot::stepKVT()
-{
-    // Если движение запрещено - зажимаем КВТ на полную
-    if (!is_motion_allowed)
-    {
-        // ставим КВТ на полное торможение
-        auto_control->kvt_pos = 1.0;
-
-        // Снимаем запрет отпуска
-        is_disable_release = false;
-
-        // отпускаем состав если кран в перекрыше
-        if (auto_control->krm_pos == KRM_POS_III || auto_control->krm_pos == KRM_POS_IV)
-        {
-            setBrakeCranePos(KRM_POS_I);
-        }
-    }
-    else // Иначе - отпускаем
-    {
-        auto_control->kvt_pos = 0.0;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VL60Autopilot::setBrakeCranePos(int pos)
-{
-    if (!krm_handle_timer->isStarted())
-    {
-        // Переводим кран в новое положение с выдержкой по времени
-        auto_control->krm_pos = pos;
-        krm_handle_timer->start();
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void VL60Autopilot::slotDelayTimer()
 {
     delay->stop();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VL60Autopilot::slotBrakeCraneHandle()
-{
-    krm_handle_timer->stop();
 }
 
 GET_AUTOPILOT(VL60Autopilot)
