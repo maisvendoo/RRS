@@ -646,7 +646,7 @@ void MapWidget::drawEnterSignal(Signal *signal)
     QColor w_color(0, 0, 0);
     if (lens_state[WHITE_LENS])
     {
-        w_color = QColor(255, 255, 255);
+        w_color = QColor(255, 255, 196);
     }
     painter.setBrush(w_color);
     painter.drawEllipse(white_p, r, r);

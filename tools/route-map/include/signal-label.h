@@ -13,17 +13,22 @@ class SignalLabel : public QLabel
 
 public:
 
-    SignalLabel(QWidget *parent = nullptr);
+    SignalLabel(QWidget* parent = nullptr);
 
     ~SignalLabel();
 
-    Signal *signal;
+    Signal* signal = nullptr;
 
-    QMenu *menu = nullptr;
+    QMenu* menu = nullptr;
 
-    QAction *action_open = nullptr;
+    QAction* action_open_train = nullptr;
+    QAction* action_open_shunting = nullptr;
+    QAction* action_open_call = nullptr;
+    QAction* action_close = nullptr;
 
-    QAction *action_close = nullptr;
+    bool need_train = false;
+    bool need_shunting = false;
+    bool need_call = false;
 
 signals:
 
@@ -35,7 +40,7 @@ public slots:
 
 private:
 
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent* event);
 };
 
 #endif

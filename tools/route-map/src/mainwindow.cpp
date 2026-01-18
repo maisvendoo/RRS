@@ -369,48 +369,72 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
     map->signal_labels_fwd.clear();
     map->signal_labels_bwd.clear();
 
-    bool is_array_with_line_signals = true;
-    for (auto& signals_array : {signals_data->line_signals,
-                                signals_data->enter_signals,
-                                signals_data->route_signals,
-                                signals_data->exit_signals,
-                                signals_data->shunt_signals})
+    auto configure_signal_label = [](Signal* sig, Topology* top, MapWidget* map) -> SignalLabel*
     {
-        for (auto& signal : signals_array)
+        Connector *conn = top->getConnectorsList()->value(sig->getConnectorName(), nullptr);
+
+        if (conn == nullptr)
         {
-            Connector *conn = topology->getConnectorsList()->value(signal->getConnectorName(), nullptr);
-
-            if (conn == nullptr)
-            {
-                continue;
-            }
-
-            signal->setConnector(conn);
-
-            SignalLabel *signal_label = new SignalLabel(map);
-            signal_label->signal = signal;
-            signal_label->setText(signal->getLetter());
-
-            if (signal->getDirection() == 1)
-            {
-                conn->setSignalFwd(signal);
-
-                map->signal_labels_fwd.insert(conn->getName(), signal_label);
-            }
-
-            if (signal->getDirection() == -1)
-            {
-                conn->setSignalBwd(signal);
-
-                map->signal_labels_bwd.insert(conn->getName(), signal_label);
-            }
-
-            if (!is_array_with_line_signals)
-            {
-                connect(signal_label, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
-            }
+            return nullptr;
         }
-        is_array_with_line_signals = false;
+
+        sig->setConnector(conn);
+
+        SignalLabel* signal_label = new SignalLabel(map);
+        signal_label->signal = sig;
+        signal_label->setText(sig->getLetter());
+
+        if (sig->getDirection() == 1)
+        {
+            conn->setSignalFwd(sig);
+            map->signal_labels_fwd.insert(conn->getName(), signal_label);
+        }
+
+        if (sig->getDirection() == -1)
+        {
+            conn->setSignalBwd(sig);
+            map->signal_labels_bwd.insert(conn->getName(), signal_label);
+        }
+
+        return signal_label;
+    };
+
+    for (auto& sig : signals_data->line_signals)
+    {
+        configure_signal_label(sig, topology, map);
+    }
+
+    for (auto& sig : signals_data->enter_signals)
+    {
+        SignalLabel* sl = configure_signal_label(sig, topology, map);
+        sl->need_train = true;
+        sl->need_call = true;
+        connect(sl, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
+    }
+
+    for (auto& sig : signals_data->route_signals)
+    {
+        SignalLabel* sl = configure_signal_label(sig, topology, map);
+        sl->need_train = true;
+        sl->need_shunting = true;
+        sl->need_call = true;
+        connect(sl, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
+    }
+
+    for (auto& sig : signals_data->exit_signals)
+    {
+        SignalLabel* sl = configure_signal_label(sig, topology, map);
+        sl->need_train = true;
+        sl->need_shunting = true;
+        sl->need_call = true;
+        connect(sl, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
+    }
+
+    for (auto& sig : signals_data->shunt_signals)
+    {
+        SignalLabel* sl = configure_signal_label(sig, topology, map);
+        sl->need_shunting = true;
+        connect(sl, &SignalLabel::popUpMenu, this, &MainWindow::slotSignalControlMenu);
     }
 
     // Запрос серверу на регулярное обновление игроков
@@ -517,29 +541,74 @@ void MainWindow::slotSignalControlMenu()
 {
     // Создаём меню для текстовой метки с литером светофора
     SignalLabel* signal_label = dynamic_cast<SignalLabel *>(sender());
+
+    if (!(signal_label->need_train || signal_label->need_shunting || signal_label->need_call))
+    {
+        return;
+    }
+
     Signal* sig = signal_label->signal;
 
-    // Указатель на сетевого клиента, который отправит команду переключить стрелку
+    // Указатель на сетевого клиента, который отправит команду светофору
     TcpClient* tc = tcp_client;
 
     // Создаём меню, передаём в текстовую метку указатель для интерактивной подсветки
     QMenu* menu = new QMenu(this);
     signal_label->menu = menu;
 
-    // Создаём пункт меню для открытия сигнала
-    QAction *open = new QAction(tr("Open"), this);
-    menu->addAction(open);
+    if (signal_label->need_train)
+    {
+        // Создаём пункт меню для открытия сигнала поездным маршрутом
+        QAction *open_train = new QAction(tr("Open for train"), this);
+        menu->addAction(open_train);
 
-    signal_label->action_open = open;
-    connect(open, &QAction::triggered, signal_label, &SignalLabel::resetMenu);
+        signal_label->action_open_train = open_train;
+        connect(open_train, &QAction::triggered, signal_label, &SignalLabel::resetMenu);
 
-    // Создаём сетевой пакет с командой открытия сигнала
-    connect(open, &QAction::triggered, this, [tc, sig]{
-        std::int8_t dir = sig->getDirection();
-        signal_command_t sc = {sig->getConnector()->getName(), dir,
-                               true, true, true, false};
-        tc->sendSignalCommand(sc.serialize());
-    });
+        // Создаём сетевой пакет с командой открытия сигнала
+        connect(open_train, &QAction::triggered, this, [tc, sig]{
+            std::int8_t dir = sig->getDirection();
+            signal_command_t sc = {sig->getConnector()->getName(), dir,
+                                   true, false, false, false};
+            tc->sendSignalCommand(sc.serialize());
+        });
+    }
+
+    if (signal_label->need_shunting)
+    {
+        // Создаём пункт меню для открытия сигнала маневровым маршрутом
+        QAction *open_train = new QAction(tr("Open for shunting"), this);
+        menu->addAction(open_train);
+
+        signal_label->action_open_train = open_train;
+        connect(open_train, &QAction::triggered, signal_label, &SignalLabel::resetMenu);
+
+        // Создаём сетевой пакет с командой открытия сигнала
+        connect(open_train, &QAction::triggered, this, [tc, sig]{
+            std::int8_t dir = sig->getDirection();
+            signal_command_t sc = {sig->getConnector()->getName(), dir,
+                                   false, true, false, false};
+            tc->sendSignalCommand(sc.serialize());
+        });
+    }
+
+    if (signal_label->need_call)
+    {
+        // Создаём пункт меню для открытия пригласительного сигнала
+        QAction *open_train = new QAction(tr("Open call signal"), this);
+        menu->addAction(open_train);
+
+        signal_label->action_open_train = open_train;
+        connect(open_train, &QAction::triggered, signal_label, &SignalLabel::resetMenu);
+
+        // Создаём сетевой пакет с командой открытия сигнала
+        connect(open_train, &QAction::triggered, this, [tc, sig]{
+            std::int8_t dir = sig->getDirection();
+            signal_command_t sc = {sig->getConnector()->getName(), dir,
+                                   false, false, true, false};
+            tc->sendSignalCommand(sc.serialize());
+        });
+    }
 
     // Создаём пункт меню для закрытия сигнала
     QAction *close = new QAction(tr("Close"), this);

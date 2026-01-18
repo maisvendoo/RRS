@@ -162,7 +162,7 @@ void StationSignal::slotPressOpenTrain()
     is_open_call_button_pressed = false;
     open_timer->start();
 
-    Journal::instance()->info("Pressed open button for station signal " + letter);
+    Journal::instance()->info("Pressed open train button for station signal " + letter);
 }
 
 //------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ void StationSignal::slotPressOpenShunting()
     is_open_call_button_pressed = false;
     open_timer->start();
 
-    Journal::instance()->info("Pressed open button for station signal " + letter);
+    Journal::instance()->info("Pressed open shunting button for station signal " + letter);
 }
 
 //------------------------------------------------------------------------------
@@ -188,7 +188,7 @@ void StationSignal::slotPressOpenCall()
     is_open_call_button_pressed = true;
     open_timer->start();
 
-    Journal::instance()->info("Pressed open button for station signal " + letter);
+    Journal::instance()->info("Pressed open call button for station signal " + letter);
 }
 
 //------------------------------------------------------------------------------
