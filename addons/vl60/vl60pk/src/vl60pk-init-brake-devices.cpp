@@ -12,6 +12,7 @@
 #include "pneumo-hose.h"
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"
+#include <kme-60-044.h>
 
 //------------------------------------------------------------------------
 //
@@ -126,10 +127,22 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
 //------------------------------------------------------------------------------
 void VL60pk::OnAutopilot()
 {
-    for (auto cab_idx : {CAB1, CAB2})
+    // Делаем автозапуск
+    if (controller[CAB1]->isReversHandle())
     {
-        autopilot_switcher[cab_idx].set();
+        initAutostartProgram(CAB1);
+        autopilot_switcher[CAB1].set();
     }
+
+    if (controller[CAB2]->isReversHandle())
+    {
+        initAutostartProgram(CAB2);
+        autopilot_switcher[CAB2].set();
+    }
+
+    slotInitTrainForAutopilot();
+
+    autoStartTimer->start();
 }
 
 //------------------------------------------------------------------------------

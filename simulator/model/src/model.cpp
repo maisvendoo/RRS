@@ -85,6 +85,8 @@ bool Model::init(const simulator_command_line_t &command_line)
 
             trains.push_back(train);
 
+            buildAutostartQueue(train);
+
             QThread *thread = new QThread();
             train_threads.push_back(thread);
             train->moveToThread(thread);
@@ -244,6 +246,49 @@ void Model::receiveSignalsFromControlPanel(const control_signals_t &control_sign
 {
     if (vehicle_controlled_by_panel)
         vehicle_controlled_by_panel->setControlSignals(control_signals);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::buildAutostartQueue(Train *train)
+{
+    if (train == nullptr)
+    {
+        return;
+    }
+
+    if (scnmgr->isTrainAutostarted(train->getTrainIndex()))
+    {
+        for (auto vehicle : *(train->getVehicles()))
+        {
+            if (!vehicle->getAutopilot().empty())
+            {
+                vehicles_for_autostart.push(vehicle);
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::processAutostartQueue()
+{
+    if (vehicles_for_autostart.empty())
+    {
+        return;
+    }
+
+    Vehicle *vehicle = std::move(vehicles_for_autostart.front());
+    vehicles_for_autostart.pop();
+
+    if (vehicle == nullptr)
+    {
+        return;
+    }
+
+    vehicle->OnAutopilot();
 }
 
 //------------------------------------------------------------------------------
@@ -1034,6 +1079,9 @@ void Model::process()
     topology->step(sim_time.simulation_seconds, integration_time);
 
     scnmgr->step(sim_time.simulation_seconds, integration_time);
+
+    // Обрабатываем очередь на автозапуск
+    processAutostartQueue();
 
     findNearestVehicles();
 

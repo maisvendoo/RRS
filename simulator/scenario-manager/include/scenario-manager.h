@@ -56,6 +56,8 @@ public:
 
     std::string getTrainName(size_t t_idx);
 
+    bool isTrainAutostarted(size_t t_idx);
+
 signals:
 
     void sigSetSwitchState(QByteArray &switch_data);

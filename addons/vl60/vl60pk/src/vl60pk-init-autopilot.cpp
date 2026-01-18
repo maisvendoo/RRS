@@ -3,6 +3,7 @@
 #include    <epb-2line-control.h>
 #include    <trigger-control.h>
 #include    <automatic-train-stop.h>
+#include    <kme-60-044.h>
 
 //------------------------------------------------------------------------------
 //
@@ -26,7 +27,7 @@ void VL60pk::initAutopilot(const QString& modules_dir,
             autopilot_switcher[cab_idx].setKeySymbolOff(KEY_F);
             autopilot_switcher[cab_idx].setControl(&pressed_keys);
 
-            connect(autopilot, &Autopilot::sigInitTrainLength, this, &VL60pk::slotInitTrainLengh);
+            connect(autopilot, &Autopilot::sigInitTrainLength, this, &VL60pk::slotInitTrainForAutopilot);
         }
 
         this->autopilot.push_back(autopilot);
@@ -38,7 +39,7 @@ void VL60pk::initAutopilot(const QString& modules_dir,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60pk::slotInitTrainLengh()
+void VL60pk::slotInitTrainForAutopilot()
 {
     double train_len = 0;
 
@@ -54,14 +55,37 @@ void VL60pk::slotInitTrainLengh()
     // Если выключен ЭПТ, то включаем его
     if (!epb_control->stateReleaseLamp())
     {
-        if (epk[CAB1]->isKeyOn())
+        if (controller[CAB1]->isReversHandle())
         {
-            epb_switch[CAB1].set();
+            prepareCabineForAutopilot(CAB1, CAB2);
         }
 
-        if (epk[CAB2]->isKeyOn())
+        if (controller[CAB1]->isReversHandle())
         {
-            epb_switch[CAB2].set();
+            prepareCabineForAutopilot(CAB2, CAB1);
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60pk::prepareCabineForAutopilot(int my_cab_idx, int other_cab_idx)
+{
+    // В нашей кабине
+
+    // включаем ЭПТ
+    epb_switch[my_cab_idx].set();
+    // зажигаем белые буферные
+    P_bufferlight_L_tumbler[my_cab_idx].set();
+    P_bufferlight_R_tumbler[my_cab_idx].set();
+    // прожектор на ярко
+    spotlight_high_tumbler[my_cab_idx].set();
+    // подсветка приборов
+    P_light_devices_tumbler[my_cab_idx].set();
+
+    // В другой кабине
+
+    // левый буферный белый
+    P_bufferlight_L_tumbler[other_cab_idx].set();
 }

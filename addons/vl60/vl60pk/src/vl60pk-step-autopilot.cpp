@@ -24,20 +24,20 @@ void VL60pk::stepAutopilot(double t, double dt)
     double limit_dist = 0;
     double signal_dist = 0;
 
-    if (epk[CAB1]->isKeyOn())
+    if (controller[CAB1]->isReversHandle())
     {
         v_lim = speedmap_fwd->getCurrentLimit();
         v_lim_next = speedmap_fwd->getNextLimit();
         limit_dist = speedmap_fwd->getNextLimitDistance();
-        signal_dist = coil_ALSN_fwd->getNextSignalDistance();
+        signal_dist = coil_ALSN_fwd->getNextSignalDistance();        
     }
 
-    if (epk[CAB2]->isKeyOn())
+    if (controller[CAB2]->isReversHandle())
     {
         v_lim = speedmap_bwd->getCurrentLimit();
         v_lim_next = speedmap_bwd->getNextLimit();
         limit_dist = speedmap_bwd->getNextLimitDistance();
-        signal_dist = coil_ALSN_bwd->getNextSignalDistance();
+        signal_dist = coil_ALSN_bwd->getNextSignalDistance();        
     }
 
     for (auto cab_idx : {CAB1, CAB2})
@@ -95,5 +95,17 @@ void VL60pk::stepAutopilot(double t, double dt)
 
             loco_crane[cab_idx]->setHandlePosition(auto_control[cab_idx]->kvt_pos);
         }
+    }
+
+    if (controller[CAB1]->isReversHandle())
+    {
+        auto_control[CAB1]->spotlight_ON ? spotlight_low_tumbler[CAB1].set() :
+            spotlight_low_tumbler[CAB1].reset();
+    }
+
+    if (controller[CAB2]->isReversHandle())
+    {
+        auto_control[CAB2]->spotlight_ON ? spotlight_low_tumbler[CAB2].set() :
+            spotlight_low_tumbler[CAB2].reset();
     }
 }

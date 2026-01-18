@@ -143,6 +143,19 @@ std::string ScenarioManager::getTrainName(size_t t_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool ScenarioManager::isTrainAutostarted(size_t t_idx)
+{
+    if (t_idx >= train_datas.size())
+    {
+        return false;
+    }
+
+    return train_datas[t_idx].is_auto;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 {
     init_data_t id = launch_init_data;
@@ -640,7 +653,8 @@ void ScenarioManager::cpp_types_registration()
                                             "config", &scenario_train_data_t::train_config,
                                             "traj", &scenario_train_data_t::traj_name,
                                             "coord", &scenario_train_data_t::traj_coord,
-                                            "dir", &scenario_train_data_t::direction);
+                                            "dir", &scenario_train_data_t::direction,
+                                            "auto", &scenario_train_data_t::is_auto);
 
     Journal::instance()->info("TrainData => scenario_train_data_t binding...OK");
 }

@@ -110,6 +110,9 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
 
     auto_control->krm_pos = bc_state.brake_crane_pos_ref;
     auto_control->kvt_pos = bc_state.loco_crane_pos_ref;
+
+    // Управляем прожектором - включаем когда разрешено движение
+    auto_control->spotlight_ON = is_motion_allowed;
 }
 
 //------------------------------------------------------------------------------

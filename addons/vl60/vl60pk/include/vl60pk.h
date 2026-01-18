@@ -492,6 +492,8 @@ private:
 
     void initAutopilot(const QString& modules_dir, const QString& custom_cfg_dir);
 
+    void prepareCabineForAutopilot(int my_cab_idx, int other_cab_idx);
+
     /// Процесс симуляции
     void process(const simulator_time_t& t, const double& dt) override;
 
@@ -569,7 +571,7 @@ private slots:
 
     void slotAutoStart();
 
-    void slotInitTrainLengh();
+    void slotInitTrainForAutopilot();
 };
 
 #endif // VL60PK_H

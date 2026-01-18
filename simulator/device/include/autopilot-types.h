@@ -13,6 +13,9 @@ public:
     /// Активация нажатия РБ
     bool press_RB = false;
 
+    /// Включение прожектора
+    bool spotlight_ON = false;
+
     auto_control_t()
     {
 

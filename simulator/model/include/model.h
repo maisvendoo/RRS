@@ -170,6 +170,15 @@ private:
     /// Вектор данных о нескольких поездах
     std::vector<init_data_t> init_datas;
 
+    /// Очередь на автозапуск в поездку по данным из сценария
+    std::queue<Vehicle *> vehicles_for_autostart;
+
+    /// Построение очереди автозапуска
+    void buildAutostartQueue(Train *train);
+
+    /// Обработка очереди автозапуска
+    void processAutostartQueue();
+
     /// Find trains which are near to each other and couple them
     void findNearestVehicles();
 
