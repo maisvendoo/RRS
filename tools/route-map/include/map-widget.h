@@ -134,15 +134,7 @@ private:
 
     void drawStations(topology_stations_list_t *stations);
 
-    void drawLineSignal(Signal *signal);
-
     void drawSignals(signals_data_t *signals_data);
-
-    void drawEnterSignal(Signal *signal);
-
-    void drawExitSignal(Signal *signal);
-
-    void drawShuntSignal(Signal *signal);
 
     void drawSignal(Signal *signal, std::vector<QColor> lens_colors);
 
