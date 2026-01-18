@@ -155,12 +155,6 @@ public slots:
 
     void slotSwitchCommand(QByteArray& switch_data);
 
-    void slotSetSwitchState(QByteArray &switch_data);
-
-    void slotOpenSignal(QByteArray signal_data);
-
-    void slotCloseSignal(QByteArray signal_data);
-
     void slotSignalCommand(QByteArray& signal_data);
 
     void slotBuildRoute(QString start_traj, QString target_traj, int dir);

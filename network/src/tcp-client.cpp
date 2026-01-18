@@ -81,51 +81,6 @@ void TcpClient::sendSwitchCommand(QByteArray switch_command)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpClient::sendSwitchState(QString conn_name, std::int8_t state_fwd, std::int8_t state_bwd)
-{
-    network_data_t request;
-    request.stype = STYPE_COMMAND_SWITCH_STATE;
-
-    QBuffer buff(&request.data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
-
-    stream << conn_name << state_fwd << state_bwd;
-
-    socket->write(request.serialize());
-    socket->flush();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TcpClient::sendSignalState(QString conn_name, int sig_dir, bool open)
-{
-    network_data_t request;
-
-    if (open)
-    {
-        request.stype = STYPE_COMMAND_OPEN_SIGNAL;
-    }
-    else
-    {
-        request.stype = STYPE_COMMAND_CLOSE_SIGNAL;
-    }
-
-    QBuffer buff(&request.data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
-
-    stream << conn_name;
-    stream << sig_dir;
-
-    socket->write(request.serialize());
-    socket->flush();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void TcpClient::sendSignalCommand(QByteArray signal_command)
 {
     network_data_t request;

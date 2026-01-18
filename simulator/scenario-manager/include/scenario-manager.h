@@ -62,7 +62,7 @@ signals:
 
     void sigSwitchCommand(QByteArray& switch_command);
 
-    void sigSignalCommand(QByteArray signal_data);
+    void sigSignalCommand(QByteArray& signal_data);
 
     void sigBuildRoute(QString start_traj, QString target_traj, int dir);
 

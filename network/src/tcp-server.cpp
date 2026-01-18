@@ -195,27 +195,6 @@ void TcpServer::process_client_request(client_data_t &client_data)
         emit sigSwitchCommand(client_data.received_data.data);
         break;
     }
-    case STYPE_COMMAND_SWITCH_STATE:
-    {
-        Journal::instance()->info(QString("Received change switch state command from #%1")
-                                      .arg(client_data.id));
-        emit setSwitchState(client_data.received_data.data);
-        break;
-    }
-    case STYPE_COMMAND_OPEN_SIGNAL:
-    {
-        Journal::instance()->info(QString("Received open signal command from #%1")
-                                      .arg(client_data.id));
-        emit openSignal(client_data.received_data.data);
-        break;
-    }
-    case STYPE_COMMAND_CLOSE_SIGNAL:
-    {
-        Journal::instance()->info(QString("Received close signal command from #%1")
-                                      .arg(client_data.id));
-        emit closeSignal(client_data.received_data.data);
-        break;
-    }
     case STYPE_COMMAND_SIGNAL_CONTROL:
     {
         Journal::instance()->info(QString("Received signal command from #%1")

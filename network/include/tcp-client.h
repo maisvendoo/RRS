@@ -37,10 +37,6 @@ public:
 
     void sendSwitchCommand(QByteArray switch_command);
 
-    void sendSwitchState(QString conn_name, int8_t state_fwd, int8_t state_bwd);
-
-    void sendSignalState(QString conn_name, int sig_dir, bool open);
-
     void sendSignalCommand(QByteArray signal_command);
 
     void sendVehicleControl(QByteArray vehicle_control_by_keyboard);
