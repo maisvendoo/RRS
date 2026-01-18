@@ -4,6 +4,7 @@
 #include    <device.h>
 #include    <autopilot-types.h>
 #include    <autopilot-brakes-control.h>
+#include    <autopilot-accelerometer.h>
 
 /*!
  * \class
@@ -74,6 +75,8 @@ public:
 
     void step(double t, double dt) override;
 
+    QString getDbgMsg();
+
 signals:
 
     void sigInitTrainLength();
@@ -128,6 +131,25 @@ protected:
     /// Скорость для заперта отпуска
     double v_disable_release = 5.0;
 
+    /// Целевая скорость
+    double v_target = 0.0;
+
+    /// Целевая дистанция
+    double dist_target = 0.0;
+
+    /// Предсказанный тормозной путь
+    double dist_predict = 0.0;
+
+    /// Вычислитель текущего ускорения
+    Accelerometer *accel_meter = new Accelerometer;
+
+    enum
+    {
+        NUM_VALUES = 10
+    };
+
+    std::array<double, NUM_VALUES> v_filter = {0.0};
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,
@@ -161,7 +183,9 @@ protected:
 
     double calcBrakeCurveSpeed(double v_target, double dist);
 
-    double calcAlsnSpeed(ALSN alsn_code);
+    double calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_target);
+
+    double calcPredictVelocity(double v_cur, double dist, double accel);
 
 private slots:
 

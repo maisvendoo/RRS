@@ -32,9 +32,25 @@ void Autopilot::step(double t, double dt)
 
     vigilance_control(t, dt);
 
+    accel_meter->setVelocity(feedback->v_cur);
+    accel_meter->step(t, dt);
+
     rb_timer->step(t, dt);
 
     Device::step(t, dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Autopilot::getDbgMsg()
+{
+    double v_p = calcPredictVelocity(feedback->v_cur, dist_target, accel_meter->value());
+
+    return QString(" | ВКЛЮЧЕНО АВТОВЕДЕНИЕ | Vзад.: %1 км/ч| Уск.: %2 м/с2| Прогноз Vцел.: %3 км/ч")
+        .arg(v_ref, 4, 'f', 1)
+        .arg(accel_meter->value(), 6, 'f', 2)
+        .arg(v_p, 4, 'f', 1);
 }
 
 //------------------------------------------------------------------------------
@@ -76,7 +92,15 @@ void Autopilot::velocity_control(double t, double dt)
     v_ref = min(v_ref, calcBrakeCurveSpeed(feedback->v_lim_next, feedback->limit_dist));
 
     // Расчитываем скорость по тормозной кривой до ближайшего сигнала
-    v_ref = min(v_ref, calcAlsnSpeed(feedback->alsn_code));
+    v_ref = min(v_ref, calcAlsnSpeed(feedback->alsn_code, feedback->signal_dist, v_target));
+
+    // Минимальная целевая скорость (для предсказания тормозного пути)
+    v_target = min(feedback->v_lim_next, v_target);
+
+    if (feedback->v_lim_next < feedback->v_lim)
+        dist_target = min(feedback->v_lim_next, feedback->signal_dist);
+    else
+        dist_target = feedback->signal_dist;
 }
 
 //------------------------------------------------------------------------------
@@ -138,7 +162,7 @@ double Autopilot::calcBrakeCurveSpeed(double v_target, double dist)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Autopilot::calcAlsnSpeed(ALSN alsn_code)
+double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_target)
 {
     double v_lim = v_constr;
 
@@ -148,7 +172,9 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code)
     {
     case RED_YELLOW:
 
-        v_lim = cut(calcBrakeCurveSpeed(0.0, feedback->signal_dist - lead_dist_RY), 0.0, v_lim_RY);
+        v_target = 0.0;
+
+        v_lim = cut(calcBrakeCurveSpeed(v_target, signal_dist - lead_dist_RY), 0.0, v_lim_RY);
 
         // Запрещаем отпускать тормоза - остановка
         if (feedback->v_cur <= v_disable_release)
@@ -166,7 +192,9 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code)
 
     case YELLOW:
 
-        v_lim = calcBrakeCurveSpeed(v_lim_RY, feedback->signal_dist - lead_dist_RY);
+        v_target = v_lim_RY;
+
+        v_lim = calcBrakeCurveSpeed(v_target, signal_dist - lead_dist_RY);
         is_motion_allowed = true;
 
         break;
@@ -189,6 +217,43 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code)
     }
 
     return v_lim;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Autopilot::calcPredictVelocity(double v_cur, double dist, double accel)
+{
+    double v0 = v_cur / Physics::kmh;
+
+    double tmp = v0 * v0 + 2 * accel *dist;
+
+    double v_p = 0.0;
+
+    if (tmp < 0)
+    {
+        return v_p;
+    }
+    else
+    {
+        v_p = sqrt(tmp) * Physics::kmh;
+    }
+
+    for (size_t i = 0; i < v_filter.size() - 1; ++i)
+    {
+        v_filter[i] = v_filter[i + 1];
+    }
+
+    *(v_filter.end() - 1) = v_p;
+
+    double sum = 0.0;
+
+    for (auto v : v_filter)
+    {
+        sum += v;
+    }
+
+    return sum / v_filter.size();
 }
 
 //------------------------------------------------------------------------------

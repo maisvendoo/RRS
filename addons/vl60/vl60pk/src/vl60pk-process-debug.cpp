@@ -209,9 +209,14 @@ void VL60pk::debugPrint(const simulator_time_t& t, const double& dt)
     {
         QString auto_mode = "";
 
-        if (autopilot[CAB1]->isActive() || autopilot[CAB2]->isActive())
+        if (controller[CAB1]->isReversHandle())
         {
-            auto_mode = QString(" | ВКЛЮЧЕНО АВТОВЕДЕНИЕ! Vзад.: %1 км/ч").arg(autopilot[CAB1]->getRefVelocity(), 4, 'f', 1);
+            auto_mode = autopilot[CAB1]->getDbgMsg();
+        }
+
+        if (controller[CAB2]->isReversHandle())
+        {
+            auto_mode = autopilot[CAB2]->getDbgMsg();
         }
 
         DebugMsg += auto_mode;
