@@ -68,6 +68,19 @@ void TcpClient::sendRequest(StructureType stype, double update_interval)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendSwitchCommand(QByteArray switch_command)
+{
+    network_data_t request;
+    request.stype = STYPE_COMMAND_SWITCH_CONTROL;
+    request.data = switch_command;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpClient::sendSwitchState(QString conn_name, std::int8_t state_fwd, std::int8_t state_bwd)
 {
     network_data_t request;
@@ -105,6 +118,19 @@ void TcpClient::sendSignalState(QString conn_name, int sig_dir, bool open)
 
     stream << conn_name;
     stream << sig_dir;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpClient::sendSignalCommand(QByteArray signal_command)
+{
+    network_data_t request;
+    request.stype = STYPE_COMMAND_SIGNAL_CONTROL;
+    request.data = signal_command;
 
     socket->write(request.serialize());
     socket->flush();

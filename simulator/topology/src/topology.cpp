@@ -1104,6 +1104,41 @@ Connector *Topology::deserialize_traj_connectors(QDataStream &stream, conn_list_
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Topology::slotGetSwitchState(QByteArray &switch_data)
+{
+    // Получаем из менеджера Lua данные с запросом на состояние стрелки
+    switch_state_t sw_state;
+    sw_state.deserialize(switch_data);
+
+    // Ищем стрелку по имени из запроса
+    Switch *sw = dynamic_cast<Switch *>(switches.value(sw_state.name, nullptr));
+
+    if (sw == nullptr)
+    {
+        return;
+    }
+
+    // Заполняем в запрос состояние стрелки
+    sw_state.state_fwd = sw->getStateFwd();
+    sw_state.state_bwd = sw->getStateBwd();
+
+    // Сохраняем состояние в данные из запроса
+    switch_data = sw_state.serialize();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::slotSwitchCommand(QByteArray& switch_command)
+{
+    switch_command_t sc;
+    sc.deserialize(switch_command);
+    //TODO
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::slotSetSwitchState(QByteArray &switch_data)
 {
     switch_state_t sw_state;
@@ -1118,27 +1153,6 @@ void Topology::slotSetSwitchState(QByteArray &switch_data)
 
     sw->setRefStateFwd(static_cast<Switch::State>(sw_state.state_fwd));
     sw->setRefStateBwd(static_cast<Switch::State>(sw_state.state_bwd));
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Topology::slotGetSwitchState(QByteArray &switch_data)
-{
-    switch_state_t sw_state;
-    sw_state.deserialize(switch_data);
-
-    Switch *sw = dynamic_cast<Switch *>(switches.value(sw_state.name, nullptr));
-
-    if (sw == nullptr)
-    {
-        return;
-    }
-
-    sw_state.state_fwd = sw->getStateFwd();
-    sw_state.state_bwd = sw->getStateBwd();
-
-    switch_data = sw_state.serialize();
 }
 
 //------------------------------------------------------------------------------
@@ -1293,6 +1307,16 @@ void Topology::slotCloseSignal(QByteArray signal_data)
         es->slotPressClose();
         return;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::slotSignalCommand(QByteArray& signal_data)
+{
+    signal_command_t sc;
+    sc.deserialize(signal_data);
+    //TODO
 }
 
 //------------------------------------------------------------------------------

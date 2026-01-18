@@ -188,6 +188,13 @@ void TcpServer::process_client_request(client_data_t &client_data)
         clients_for_vehicle_controlled_updates.insert(client_data.socket);
         break;
     }
+    case STYPE_COMMAND_SWITCH_CONTROL:
+    {
+        Journal::instance()->info(QString("Received change switch state command from #%1")
+                                      .arg(client_data.id));
+        emit sigSwitchCommand(client_data.received_data.data);
+        break;
+    }
     case STYPE_COMMAND_SWITCH_STATE:
     {
         Journal::instance()->info(QString("Received change switch state command from #%1")
@@ -209,11 +216,18 @@ void TcpServer::process_client_request(client_data_t &client_data)
         emit closeSignal(client_data.received_data.data);
         break;
     }
+    case STYPE_COMMAND_SIGNAL_CONTROL:
+    {
+        Journal::instance()->info(QString("Received signal command from #%1")
+                                      .arg(client_data.id));
+        emit sigSignalCommand(client_data.received_data.data);
+        break;
+    }
     case STYPE_COMMAND_VEHICLE_CONTROL:
     {
         Journal::instance()->info(QString("Received vehicle control command from #%1")
                                       .arg(client_data.id));
-        emit setVehicleControl(client_data.received_data.data, client_data.id);
+        emit sigVehicleControl(client_data.received_data.data, client_data.id);
         break;
     }
     case STYPE_COMMAND_RENAME_TRAIN:
@@ -398,7 +412,7 @@ void TcpServer::slotClientDisconnected()
         clients_for_vehicle_controlled_updates.remove(socket);
         clients_for_trains_updates.remove(socket);
 
-        emit resetVehicleControl(client_data->id);
+        emit sigResetVehicleControl(client_data->id);
 
         Journal::instance()->info(QString("Disconnected client with id %1")
                                       .arg(client_data->id));

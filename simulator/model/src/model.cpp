@@ -807,10 +807,9 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::requestTopologyData, this, &Model::slotGetTopologyData);
 
-    connect(tcp_server, &TcpServer::setSwitchState, topology, &Topology::slotSetSwitchState);
-    connect(topology, &Topology::sendSwitchState, tcp_server, &TcpServer::slotSendSwitchState);
-
     connect(topology, &Topology::sendTrajBusyState, tcp_server, &TcpServer::slotSendTrajBusyState);
+
+    connect(topology, &Topology::sendSwitchState, tcp_server, &TcpServer::slotSendSwitchState);
 
     connect(tcp_server, &TcpServer::requestSignalsData, this, &Model::slotGetSignalsData);
 
@@ -839,13 +838,19 @@ void Model::initTcpServer()
         connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
     }
 
+    connect(tcp_server, &TcpServer::sigSwitchCommand, topology, &Topology::slotSwitchCommand);
+
+    connect(tcp_server, &TcpServer::setSwitchState, topology, &Topology::slotSetSwitchState);
+
     connect(tcp_server, &TcpServer::openSignal, topology, &Topology::slotOpenSignal);
 
     connect(tcp_server, &TcpServer::closeSignal, topology, &Topology::slotCloseSignal);
 
-    connect(tcp_server, &TcpServer::setVehicleControl, this, &Model::slotGetVehicleControlByKeyboard);
+    connect(tcp_server, &TcpServer::sigSignalCommand, topology, &Topology::slotSignalCommand);
 
-    connect(tcp_server, &TcpServer::resetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
+    connect(tcp_server, &TcpServer::sigVehicleControl, this, &Model::slotGetVehicleControlByKeyboard);
+
+    connect(tcp_server, &TcpServer::sigResetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
 
     connect(tcp_server, &TcpServer::sigRenameTrain, this, &Model::slotRenameTrainInModel);
 
