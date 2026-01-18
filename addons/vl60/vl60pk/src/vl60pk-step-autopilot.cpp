@@ -8,6 +8,7 @@
 #include    <speedmap.h>
 #include    <brake-mech.h>
 #include    <brake-crane.h>
+#include    <loco-crane.h>
 #include    <ALSN-coil.h>
 #include    <ALSN-decoder.h>
 #include    <epb-2line-control.h>
@@ -91,6 +92,8 @@ void VL60pk::stepAutopilot(double t, double dt)
             controller[cab_idx]->setMainHandlePos(auto_control[cab_idx]->km_pos_ref);
 
             brake_crane[cab_idx]->setHandlePosition(auto_control[cab_idx]->krm_pos);
+
+            loco_crane[cab_idx]->setHandlePosition(auto_control[cab_idx]->kvt_pos);
         }
     }
 }

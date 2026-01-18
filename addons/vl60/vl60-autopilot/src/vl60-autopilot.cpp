@@ -113,6 +113,8 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     {
         stepPB(dv, t);
     }
+
+    stepKVT();
 }
 
 //------------------------------------------------------------------------------
@@ -380,7 +382,7 @@ void VL60Autopilot::stepEPB(double dv, double t)
         // Отпускаем
 
         // Последняя ступень отпуска I положением
-        if (auto_feedback->pBC < 0.1)
+        if ( auto_feedback->pBC < 0.1)
         {
             if (auto_feedback->pEQ < auto_feedback->p_charge + 0.02)
             {
@@ -399,6 +401,32 @@ void VL60Autopilot::stepEPB(double dv, double t)
     if (auto_feedback->pEQ >= auto_feedback->p_charge + 0.02 && auto_control->krm_pos == 0)
     {
         setBrakeCranePos(1);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::stepKVT()
+{
+    // Если движение запрещено - зажимаем КВТ на полную
+    if (!is_motion_allowed)
+    {
+        // ставим КВТ на полное торможение
+        auto_control->kvt_pos = 1.0;
+
+        // Снимаем запрет отпуска
+        is_disable_release = false;
+
+        // отпускаем состав если кран в перекрыше
+        if (auto_control->krm_pos == 3 || auto_control->krm_pos == 2)
+        {
+            setBrakeCranePos(0);
+        }
+    }
+    else // Иначе - отпускаем
+    {
+        auto_control->kvt_pos = 0.0;
     }
 }
 

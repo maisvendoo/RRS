@@ -146,9 +146,16 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code)
 
         v_lim = cut(calcBrakeCurveSpeed(0.0, feedback->signal_dist - 25.0), 0.0, 60.0);
 
+        // Запрещаем отпускать тормоза - остановка
         if (feedback->v_cur <= 10.0)
         {
-            is_disable_release = true;
+            is_disable_release = true;            
+        }
+
+        // Если запрещен отпуск и мы остановились - запрещаем движение
+        if (feedback->v_cur < 0.1 && is_disable_release)
+        {
+            is_motion_allowed = false;
         }
 
         break;
@@ -156,16 +163,23 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code)
     case YELLOW:
 
         v_lim = calcBrakeCurveSpeed(60.0, feedback->signal_dist - 25.0);
+        is_motion_allowed = true;
 
         break;
 
     case NO_CODE:
 
+        // Тут, по идее, будет происходить торможение, а проверка бдительности
+        // не даст сорвать ЭПК
         v_lim = 40.0; // ????
+
+        is_motion_allowed = true;
 
         break;
 
     case GREEN:
+
+        is_motion_allowed = true;
 
         break;
     }

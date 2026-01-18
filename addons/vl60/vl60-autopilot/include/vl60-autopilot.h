@@ -93,6 +93,9 @@ private:
     /// Торможение ЭПТ
     void stepEPB(double dv, double t);
 
+    /// Торможение КВТ
+    void stepKVT();
+
     /// Установка позиции рукоятки крана машиниста
     void setBrakeCranePos(int pos);
 

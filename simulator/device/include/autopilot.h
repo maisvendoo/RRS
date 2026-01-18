@@ -112,6 +112,9 @@ protected:
     /// Запрет отпуска
     bool is_disable_release = false;
 
+    /// Разрешено движение
+    bool is_motion_allowed = false;
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,
