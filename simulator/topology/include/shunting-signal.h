@@ -59,7 +59,8 @@ private:
         NUM_CRS_CONTACTS
     };
     /// Контрольное реле маневрового маршрута:
-    /// включено, когда до целевой траектории свободно и стрелки по маршруту
+    /// включено, когда до целевой траектории свободно и стрелки по маршруту,
+    /// либо пока светофор открыт и заняты оба участка перед и за светофором (пока проезжает состав)
     Relay *control_relay_shunt = new Relay(NUM_CRS_CONTACTS);
 
     enum
@@ -67,8 +68,8 @@ private:
         SRS_OPENED = 0,
         SRS_CLOSED,
         SRS_SELF_CTRL,
+        SRS_LOCK_ROUTE_CTRL,
         SRS_LOCK_RELAY_CTRL,
-        SRS_UNLOCK_RELAY_CTRL,
         NUM_SRS_CONTACTS,
     };
     /// Сигнальное реле:
@@ -85,31 +86,27 @@ private:
     /// при открытии сигнала отключается и блокирует стрелки по маршруту от перевода
     Relay *lock_relay_shunt = new Relay(NUM_LRS_CONTACTS);
 
-    enum
-    {
-        URS_ROUTE_LOCKED = 0,
-        URS_ROUTE_UNLOCKED,
-        URS_SIGNAL_RELAY_CTRL,
-        NUM_URS_CONTACTS,
-    };
-    /// Реле размыкания маневрового маршрута:
-    /// включается при освобождении участка перед или за светофором (проезде всем составом)
-    Relay *unlock_relay_shunt = new Relay(NUM_URS_CONTACTS);
-
     /// Напряжение батареи
     double U_bat = 12.0;
 
-    /// Напряжение для контрольного реле маневрового маршрута
-    double U_ctrl_shunt = 0.0;
+    /// Контроль маршрута: до целевой траектории или слеующего светофора
+    /// свободно и стрелки по маршруту
+    bool is_shunt_route = false;
 
-    /// Напряжение для реле размыкания маневрового маршрута
-    double U_unlock_shunt = 0.0;
+    /// Контроль защиты от размыкания маршрута, пока светофор открыт
+    /// и заняты оба участка перед и за светофором (пока проезжает состав)
+    bool is_lock_route = true;
 
     /// Признак нажатия кнопки открытия
     bool is_open_shunt_button_pressed = false;
 
     /// Признак НЕнажатия кнопки закрытия (нормально замкнутая)
     bool is_close_button_unpressed = true;
+
+    bool old_crs = false;
+    bool old_srs = false;
+    bool old_lrs = false;
+    bool old_urs = false;
 
     /// Таймер выдержки времени удержания кнопки открыть
     Timer *open_timer = new Timer(1.0, false);

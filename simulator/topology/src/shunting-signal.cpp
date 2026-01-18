@@ -20,17 +20,12 @@ ShuntingSignal::ShuntingSignal(QObject* parent) : Signal(parent)
     signal_relay_shunt->setInitContactState(SRS_OPENED, false);
     signal_relay_shunt->setInitContactState(SRS_CLOSED, true);
     signal_relay_shunt->setInitContactState(SRS_SELF_CTRL, false);
+    signal_relay_shunt->setInitContactState(SRS_LOCK_ROUTE_CTRL, false);
     signal_relay_shunt->setInitContactState(SRS_LOCK_RELAY_CTRL, true);
-    signal_relay_shunt->setInitContactState(SRS_UNLOCK_RELAY_CTRL, true);
 
     lock_relay_shunt->read_config("combine-relay");
     lock_relay_shunt->setInitContactState(LRS_ROUTE_LOCKED, true);
     lock_relay_shunt->setInitContactState(LRS_NO_ROUTE, false);
-
-    unlock_relay_shunt->read_config("combine-relay");
-    unlock_relay_shunt->setInitContactState(URS_ROUTE_LOCKED, true);
-    unlock_relay_shunt->setInitContactState(URS_ROUTE_UNLOCKED, false);
-    unlock_relay_shunt->setInitContactState(URS_SIGNAL_RELAY_CTRL, true);
 }
 
 //------------------------------------------------------------------------------
@@ -51,7 +46,10 @@ void ShuntingSignal::step(double t, double dt)
     check_shunt_route();
 
     // Цепь контрольного маршрутного реле
-    control_relay_shunt->setVoltage(U_ctrl_shunt);
+    bool is_CRS_ON = is_shunt_route ||
+                     (is_lock_route && signal_relay_shunt->getContactState(SRS_LOCK_ROUTE_CTRL));
+
+    control_relay_shunt->setVoltage(static_cast<double>(is_CRS_ON) * U_bat);
 
 
     // Цепь сигнального реле
@@ -60,8 +58,8 @@ void ShuntingSignal::step(double t, double dt)
                     (is_close_button_unpressed && signal_relay_shunt->getContactState(SRS_SELF_CTRL));
 
     // Контакты контрольного маршрутного реле или реле размыкания маршрута
-    is_SRS_ON &= (control_relay_shunt->getContactState(CRS_SIGNAL_RELAY_CTRL) ||
-                  unlock_relay_shunt->getContactState(URS_SIGNAL_RELAY_CTRL));
+    is_SRS_ON &= (control_relay_shunt->getContactState(CRS_SIGNAL_RELAY_CTRL)/* ||
+                  unlock_relay_shunt->getContactState(URS_SIGNAL_RELAY_CTRL)*/);
 
     signal_relay_shunt->setVoltage(static_cast<double>(is_SRS_ON) * U_bat);
 
@@ -72,17 +70,20 @@ void ShuntingSignal::step(double t, double dt)
     lock_relay_shunt->setVoltage(static_cast<double>(is_LRS_ON) * U_bat);
 
 
-    // Размыкание маршрута
-    bool is_URS_ON = signal_relay_shunt->getContactState(SRS_UNLOCK_RELAY_CTRL);
-
-    unlock_relay_shunt->setVoltage(static_cast<double>(is_URS_ON) * U_unlock_shunt);
-
-
     // Моделирование работы реле
     control_relay_shunt->step(t, dt);
     signal_relay_shunt->step(t, dt);
     lock_relay_shunt->step(t, dt);
-    unlock_relay_shunt->step(t, dt);
+
+    if (old_crs != control_relay_shunt->getContactState(CRS_ALLOW_ROUTE))
+        Journal::instance()->info("Shunting signal " + letter + ": Control relay now " + (old_crs?"OFF":"ON"));
+    if (old_srs != signal_relay_shunt->getContactState(SRS_OPENED))
+        Journal::instance()->info("Shunting signal " + letter + ": Signal relay now " + (old_srs?"OFF":"ON"));
+    if (old_lrs != lock_relay_shunt->getContactState(LRS_NO_ROUTE))
+        Journal::instance()->info("Shunting signal " + letter + ": Lock relay now " + (old_lrs?"OFF":"ON"));
+    old_crs = control_relay_shunt->getContactState(CRS_ALLOW_ROUTE);
+    old_srs = signal_relay_shunt->getContactState(SRS_OPENED);
+    old_lrs = lock_relay_shunt->getContactState(LRS_NO_ROUTE);
 
     // Работа таймеров удержания кнопки
     open_timer->step(t, dt);
@@ -256,8 +257,8 @@ bool ShuntingSignal::check_and_lock_switch_bwd(Switch* sw, bool lock)
 void ShuntingSignal::check_shunt_route()
 {
     // Сбрасываем состояние
-    U_ctrl_shunt = 0.0;
-    U_unlock_shunt = 0.0;
+    is_shunt_route = false;
+    is_lock_route = true;
 
     // Начинаем с коннектора, к которому относится светофор
     Connector *cur_conn = conn;
@@ -272,7 +273,7 @@ void ShuntingSignal::check_shunt_route()
     if (traj && !traj->isBusy())
     {
         // Если траектория свободна, разрешаем размыкание маневрого маршрута
-        U_unlock_shunt = U_bat;
+        is_lock_route = false;
     }
 
     // Смотрим траекторию за текущим коннектором
@@ -280,7 +281,7 @@ void ShuntingSignal::check_shunt_route()
     if (traj && ((traj == ref_trajectory_shunt) || !traj->isBusy()))
     {
         // Если траектория свободна, разрешаем размыкание маневрого маршрута
-        U_unlock_shunt = U_bat;
+        is_lock_route = false;
     }
 
     // Смотрим стрелочный перевод на текущем коннекторе
@@ -327,7 +328,7 @@ void ShuntingSignal::check_shunt_route()
         if (traj == ref_trajectory_shunt)
         {
             // Радостно включаем реле контроля маршрута и заканчиваем
-            U_ctrl_shunt = U_bat;
+            is_shunt_route = true;
             return;
         }
 
@@ -392,7 +393,7 @@ void ShuntingSignal::check_shunt_route()
             }
 
             // Радостно включаем реле контроля маршрута и заканчиваем
-            U_ctrl_shunt = U_bat;
+            is_shunt_route = true;
             return;
         }
 
