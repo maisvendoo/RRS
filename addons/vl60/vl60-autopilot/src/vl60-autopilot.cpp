@@ -438,6 +438,7 @@ void VL60Autopilot::setBrakeCranePos(int pos)
 {
     if (!krm_handle_timer->isStarted())
     {
+        // Переводим кран в новое положение с выдержкой по времени
         auto_control->krm_pos = pos;
         krm_handle_timer->start();
     }
