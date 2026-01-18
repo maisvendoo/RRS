@@ -47,7 +47,7 @@ private:
     /// Число выполенных ступеней торможения
     uint8_t brake_step = 0;
 
-    const double KRM_HANDLE_DELAY = 0.2;
+    const double KRM_HANDLE_DELAY = 0.5;
 
     Timer *krm_handle_timer = new Timer(KRM_HANDLE_DELAY, false);
 
