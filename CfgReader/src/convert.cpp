@@ -57,7 +57,7 @@ QString EraseSpaces(QString str)
     QString result = "";
 
     const auto length = str.length();
-    for (decltype(length) i = 0; i < length; ++i)
+    for (auto i = decltype(length){0}; i < length; ++i)
     {
         if (str.at(i) != QChar(' '))
         {
