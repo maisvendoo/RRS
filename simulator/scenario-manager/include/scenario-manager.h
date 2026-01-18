@@ -58,13 +58,11 @@ public:
 
 signals:
 
-    void sigSetSwitchState(QByteArray &switch_data);
-
     void sigGetSwitchState(QByteArray &switch_data);
 
-    void sigOpenSignal(QByteArray signal_data);
+    void sigSwitchCommand(QByteArray& switch_command);
 
-    void sigCloseSignal(QByteArray signal_data);
+    void sigSignalCommand(QByteArray signal_data);
 
     void sigBuildRoute(QString start_traj, QString target_traj, int dir);
 
