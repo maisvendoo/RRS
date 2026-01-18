@@ -36,7 +36,7 @@ public:
 
 public slots:
 
-    void slotPressOpenShunt();
+    void slotPressOpenShunting();
 
     void slotPressClose();
 

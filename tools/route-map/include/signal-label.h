@@ -19,9 +19,19 @@ public:
 
     Signal *signal;
 
+    QMenu *menu = nullptr;
+
+    QAction *action_open = nullptr;
+
+    QAction *action_close = nullptr;
+
 signals:
 
     void popUpMenu();
+
+public slots:
+
+    void resetMenu();
 
 private:
 

@@ -95,7 +95,7 @@ void ShuntingSignal::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ShuntingSignal::slotPressOpenShunt()
+void ShuntingSignal::slotPressOpenShunting()
 {
     is_open_shunt_button_pressed = true;
     open_timer->start();
