@@ -298,8 +298,10 @@ void ShuntingSignal::check_shunt_route()
         // Смотрим траекторию за текущим коннектором
         traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
 
+        // Уперлись в тупик - разрешаем маневровый маршрут до тупика
         if (!traj)
         {
+            is_shunt_route = true;
             return;
         }
 
@@ -342,8 +344,10 @@ void ShuntingSignal::check_shunt_route()
         // Смотрим следующий коннектор
         cur_conn = (signal_dir == 1) ? traj->getFwdConnector() : traj->getBwdConnector();
 
+        // Уперлись в тупик - разрешаем маневровый маршрут до тупика
         if (!cur_conn)
         {
+            is_shunt_route = true;
             return;
         }
 

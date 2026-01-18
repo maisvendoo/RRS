@@ -425,14 +425,10 @@ void StationSignal::check_train_route()
         // Смотрим траекторию за текущим коннектором
         traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
 
+        // Уперлись в тупик - разрешаем маневровый маршрут до тупика
         if (!traj)
         {
-            return;
-        }
-
-        // Проверяем занятость траектории
-        if (traj->isBusy())
-        {
+            is_shunt_route = true;
             return;
         }
 
@@ -453,6 +449,12 @@ void StationSignal::check_train_route()
             is_shunt_route = true;
         }
 
+        // Проверяем занятость траектории
+        if (traj->isBusy())
+        {
+            return;
+        }
+
         // Занимаем траекторию маршрутом от данного светофора
         lock = (lock_relay->getContactState(LR_PLUS_TRAIN_LOCKED) ||
                 (!is_shunt_route && lock_relay->getContactState(LR_MINUS_SHUNT_LOCKED)));
@@ -470,8 +472,10 @@ void StationSignal::check_train_route()
         // Смотрим следующий коннектор
         cur_conn = (signal_dir == 1) ? traj->getFwdConnector() : traj->getBwdConnector();
 
+        // Уперлись в тупик - разрешаем маневровый маршрут до тупика
         if (!cur_conn)
         {
+            is_shunt_route = true;
             return;
         }
 

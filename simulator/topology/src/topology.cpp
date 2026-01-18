@@ -1180,26 +1180,7 @@ void Topology::slotSignalCommand(QByteArray& signal_data)
         return;
     }
 
-    if (EnterSignal* es = dynamic_cast<EnterSignal *>(sig))
-    {
-        if (sc.command_open_train)
-        {
-            es->slotPressOpenTrain();
-            return;
-        }
-        if (sc.command_open_call)
-        {
-            es->slotPressOpenCall();
-            return;
-        }
-        if (sc.command_close)
-        {
-            es->slotPressClose();
-            return;
-        }
-        return;
-    }
-
+    // Маршрутный сигнал сделан из входного, сперва проверяем каст к нему
     if (RouteSignal* rs = dynamic_cast<RouteSignal *>(sig))
     {
         if (sc.command_open_train)
@@ -1220,6 +1201,26 @@ void Topology::slotSignalCommand(QByteArray& signal_data)
         if (sc.command_close)
         {
             rs->slotPressClose();
+            return;
+        }
+        return;
+    }
+
+    if (EnterSignal* es = dynamic_cast<EnterSignal *>(sig))
+    {
+        if (sc.command_open_train)
+        {
+            es->slotPressOpenTrain();
+            return;
+        }
+        if (sc.command_open_call)
+        {
+            es->slotPressOpenCall();
+            return;
+        }
+        if (sc.command_close)
+        {
+            es->slotPressClose();
             return;
         }
         return;
