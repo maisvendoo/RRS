@@ -1182,34 +1182,86 @@ void Topology::slotSignalCommand(QByteArray& signal_data)
 
     if (EnterSignal* es = dynamic_cast<EnterSignal *>(sig))
     {
-        if (sc.command_open_train) es->slotPressOpen();
-        if (sc.command_open_call) es->slotPressOpen();
-        if (sc.command_close) es->slotPressClose();
+        if (sc.command_open_train)
+        {
+            es->slotPressOpenTrain();
+            return;
+        }
+        if (sc.command_open_call)
+        {
+            es->slotPressOpenCall();
+            return;
+        }
+        if (sc.command_close)
+        {
+            es->slotPressClose();
+            return;
+        }
         return;
     }
 
     if (RouteSignal* rs = dynamic_cast<RouteSignal *>(sig))
     {
-        if (sc.command_open_train) rs->slotPressOpen();
-        if (sc.command_open_shunting) rs->slotPressOpen();
-        if (sc.command_open_call) rs->slotPressOpen();
-        if (sc.command_close) rs->slotPressClose();
+        if (sc.command_open_train)
+        {
+            rs->slotPressOpenTrain();
+            return;
+        }
+        if (sc.command_open_shunting)
+        {
+            rs->slotPressOpenShunting();
+            return;
+        }
+        if (sc.command_open_call)
+        {
+            rs->slotPressOpenCall();
+            return;
+        }
+        if (sc.command_close)
+        {
+            rs->slotPressClose();
+            return;
+        }
         return;
     }
 
     if (ExitSignal* es = dynamic_cast<ExitSignal *>(sig))
     {
-        if (sc.command_open_train) es->slotPressOpen();
-        if (sc.command_open_shunting) es->slotPressOpen();
-        if (sc.command_open_call) es->slotPressOpen();
-        if (sc.command_close) es->slotPressClose();
+        if (sc.command_open_train)
+        {
+            es->slotPressOpenTrain();
+            return;
+        }
+        if (sc.command_open_shunting)
+        {
+            es->slotPressOpenShunting();
+            return;
+        }
+        if (sc.command_open_call)
+        {
+            es->slotPressOpenCall();
+            return;
+        }
+        if (sc.command_close)
+        {
+            es->slotPressClose();
+            return;
+        }
         return;
     }
 
     if (ShuntingSignal* ss = dynamic_cast<ShuntingSignal *>(sig))
     {
-        if (sc.command_open_shunting) ss->slotPressOpenShunting();
-        if (sc.command_close) ss->slotPressClose();
+        if (sc.command_open_shunting)
+        {
+            ss->slotPressOpenShunting();
+            return;
+        }
+        if (sc.command_close)
+        {
+            ss->slotPressClose();
+            return;
+        }
         return;
     }
 }

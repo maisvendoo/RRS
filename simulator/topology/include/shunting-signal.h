@@ -89,7 +89,7 @@ private:
     /// Напряжение батареи
     double U_bat = 12.0;
 
-    /// Контроль маршрута: до целевой траектории или слеующего светофора
+    /// Контроль маршрута: до целевой траектории или следующего светофора
     /// свободно и стрелки по маршруту
     bool is_shunt_route = false;
 
@@ -102,11 +102,6 @@ private:
 
     /// Признак НЕнажатия кнопки закрытия (нормально замкнутая)
     bool is_close_button_unpressed = true;
-
-    bool old_crs = false;
-    bool old_srs = false;
-    bool old_lrs = false;
-    bool old_urs = false;
 
     /// Таймер выдержки времени удержания кнопки открыть
     Timer *open_timer = new Timer(1.0, false);
