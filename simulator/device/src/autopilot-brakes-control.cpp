@@ -62,7 +62,7 @@ void AutopilotBrakeController::stepEPB(double dv,
     }
 
     // Скорость в допустимом коридоре
-    if ( dv >= -dVminus && dv <= dVplus)
+    if ( dv >= dVminus && dv <= dVplus)
     {
         // Ставим в перекрышу, при условии что в ТЦ минимут 1 кгс
         if (lock_traction && pBC >= 0.1)
@@ -108,7 +108,34 @@ void AutopilotBrakeController::stepPB(double dv,
                                       bool &lock_traction,
                                       bool &is_disable_release)
 {
+    // Максимальное превышение над программной скоростью
+    const double dVminus = -0.5;
+    // Максимальное снижение скорости относительно программной
+    double dVplus = 3.0;
 
+    if (dv < dVminus)
+    {
+        brakeStep(pEQ, p_charge, 0.04);
+        lock_traction = true;
+    }
+
+    if (dv >= dVminus && dv <= dVplus)
+    {
+        if (lock_traction && pBC >= 0.1)
+        {
+            setBrakeCranePos(KRM_POS_IV);
+        }
+    }
+
+    if (dv > dVplus && !is_disable_release && lock_traction)
+    {
+        brakeRelease(pEQ, p_charge, 0.0);
+    }
+
+    if (pEQ > p_charge)
+    {
+        setBrakeCranePos(KRM_POS_II);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -149,6 +176,36 @@ void AutopilotBrakeController::setBrakeCranePos(int pos)
         // Переводим кран в новое положение с выдержкой по времени
         bc_state.brake_crane_pos_ref = pos;
         krm_handle_timer->start();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AutopilotBrakeController::brakeStep(double pEQ, double p_charge, double dp)
+{
+    if (pEQ > p_charge - dp)
+    {
+        setBrakeCranePos(KRM_POS_V);
+    }
+    else
+    {
+        setBrakeCranePos(KRM_POS_IV);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AutopilotBrakeController::brakeRelease(double pEQ, double p_charge, double dp_over)
+{
+    if (pEQ < p_charge + dp_over)
+    {
+        setBrakeCranePos(KRM_POS_I);
+    }
+    else
+    {
+        setBrakeCranePos(KRM_POS_II);
     }
 }
 

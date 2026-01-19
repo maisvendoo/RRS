@@ -14,7 +14,7 @@
 		<!-- Ускорение кривой снижения скорости -->
 		<BrakeAccel>0.1</BrakeAccel>
 		<!-- Дистанция упреждения на КЖ -->
-		<LeadDistance_RY>0.0</LeadDistance_RY>
+		<LeadDistance_RY>10.0</LeadDistance_RY>
 		<!-- Дистанция упреждения на Ж -->
 		<LeadDistance_Y>0.0</LeadDistance_Y>
 		<!-- Ограничение скорости при КЖ -->

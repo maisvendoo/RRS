@@ -68,6 +68,12 @@ public:
         return bc_state;
     }
 
+    void setFeedback(double v_cur, double dist_target)
+    {
+        this->v_cur = v_cur;
+        this->dist_target = dist_target;
+    }
+
 private:
 
     /// Состояние органов управления тормозами
@@ -79,6 +85,10 @@ private:
     double pBC = 0.0;
     /// Зарядное давление
     double p_charge = 0.0;
+
+    double v_cur = 0.0;
+
+    double dist_target = 0.0;
 
     const double KRM_HANDLE_DELAY = 0.5;
     Timer *krm_handle_timer = new Timer(KRM_HANDLE_DELAY, false);
@@ -100,6 +110,10 @@ private:
     void stepKVT(bool is_motion_allowed, bool &is_disable_release);
 
     void setBrakeCranePos(int pos);
+
+    void brakeStep(double pEQ, double p_charge, double dp);
+
+    void brakeRelease(double pEQ, double p_charge, double dp_over);
 
 private slots:
 
