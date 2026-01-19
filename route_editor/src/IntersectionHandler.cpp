@@ -7,9 +7,12 @@
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/LineSegmentIntersector.h>
 
+#include <cassert>
+
 IntersectionHandler::IntersectionHandler(vsg::ref_ptr<vsg::Camera> camera)
     : camera(camera)
 {
+    assert(camera);
 }
 
 void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
@@ -42,6 +45,10 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
 
             break;
         }
+        default:
+        {
+            break;
+        }
     }
 }
 
@@ -67,6 +74,10 @@ void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
         case MOUSE_BUTTON_RIGHT:
         {
             rmb_intersector = nullptr;
+            break;
+        }
+        default:
+        {
             break;
         }
     }

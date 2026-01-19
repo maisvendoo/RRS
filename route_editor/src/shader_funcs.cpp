@@ -9,6 +9,7 @@
 
 #include <vulkan/vulkan_core.h>
 
+#include <cassert>
 #include <cstdio>
 #include <string>
 
@@ -19,6 +20,11 @@ vsg::ref_ptr<vsg::ShaderStage> read_shader(
     vsg::ref_ptr<const vsg::Options> options
 )
 {
+    assert(stage);
+    assert(shaders_dir);
+    assert(filename);
+    assert(options);
+
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shader_path = fs.combinePath(shaders_dir, filename);
 
@@ -43,6 +49,13 @@ void configure_shader_set(
     vsg::ref_ptr<vsg::ShaderSet> shader_set
 )
 {
+    assert(shaders_dir);
+    assert(vert_shader_filename);
+    assert(frag_shader_filename);
+    assert(options);
+    assert(shader_set_name);
+    assert(shader_set);
+
     configure_shader_set(
         read_shader(VK_SHADER_STAGE_VERTEX_BIT,
             shaders_dir, vert_shader_filename, options),
@@ -62,6 +75,13 @@ void configure_shader_set(
     vsg::ref_ptr<vsg::ShaderSet> shader_set
 )
 {
+    assert(shaders_dir);
+    assert(vert_shader_filename);
+    assert(frag_shader);
+    assert(options);
+    assert(shader_set_name);
+    assert(shader_set);
+
     configure_shader_set(
         read_shader(VK_SHADER_STAGE_VERTEX_BIT,
             shaders_dir, vert_shader_filename, options),
@@ -80,6 +100,13 @@ void configure_shader_set(
     vsg::ref_ptr<vsg::ShaderSet> shader_set
 )
 {
+    assert(shaders_dir);
+    assert(vert_shader);
+    assert(frag_shader_filename);
+    assert(options);
+    assert(shader_set_name);
+    assert(shader_set);
+
     configure_shader_set(
         vert_shader,
         read_shader(VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -96,6 +123,11 @@ void configure_shader_set(
     vsg::ref_ptr<vsg::ShaderSet> shader_set
 )
 {
+    assert(vert_shader);
+    assert(frag_shader);
+    assert(shader_set_name);
+    assert(shader_set);
+
     if (!vert_shader || !frag_shader)
     {
         std::printf("Using default %s shader set\n", shader_set_name);

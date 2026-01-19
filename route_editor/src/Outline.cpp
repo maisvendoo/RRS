@@ -28,12 +28,15 @@
 
 #include <vulkan/vulkan_core.h>
 
+#include <cassert>
 #include <cstdio>
 #include <string>
 
 Outline::Outline(vsg::observer_ptr<vsg::Viewer> observer_viewer)
     : observer_viewer(observer_viewer)
 {
+    assert(observer_viewer);
+
     options = vsg::Options::create();
     options->sharedObjects = vsg::SharedObjects::create();
     options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
@@ -111,6 +114,8 @@ Outline::Outline(vsg::observer_ptr<vsg::Viewer> observer_viewer)
 
 void Outline::update(vsg::ref_ptr<vsg::PagedLOD> paged_lod)
 {
+    assert(paged_lod);
+
     const vsg::ref_ptr<vsg::Viewer> viewer = observer_viewer;
 
     const auto wireframe_outline = vsg::read_cast<vsg::Node>(

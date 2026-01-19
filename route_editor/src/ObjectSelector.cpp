@@ -3,6 +3,8 @@
 #include "Gizmo.h"
 #include "Outline.h"
 
+#include <cassert>
+
 ObjectSelector::ObjectSelector(
     const settings_t& settings,
     vsg::observer_ptr<vsg::Viewer> observer_viewer,
@@ -10,6 +12,9 @@ ObjectSelector::ObjectSelector(
 )
     : gui_group(gui_group)
 {
+    assert(observer_viewer);
+    assert(gui_group);
+
     gizmo = Gizmo::create(settings);
     outline = Outline::create(observer_viewer);
 

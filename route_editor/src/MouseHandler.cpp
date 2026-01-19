@@ -31,6 +31,10 @@ void MouseHandler::apply(vsg::ButtonPressEvent& buttonPress)
             is_rmb_pressed = true;
             return;
         }
+        default:
+        {
+            return;
+        }
     }
 }
 
@@ -56,6 +60,10 @@ void MouseHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
         case MOUSE_BUTTON_RIGHT:
         {
             is_rmb_pressed = false;
+            return;
+        }
+        default:
+        {
             return;
         }
     }
