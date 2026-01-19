@@ -29,12 +29,12 @@ struct settings_t
     double pitch_max = 70.0;                      ///< Vertical angle up max
 
     // TODO: Separate in struct
-    double gizmo_arrow_length = 5.0;
-    double gizmo_arrow_thickness = 0.1;
+    float gizmo_arrow_length = 5.0f;
+    float gizmo_arrow_thickness = 0.1f;
     vsg::vec3 gizmo_arrow_x_color = {1.0f, 0.0f, 0.0f};
     vsg::vec3 gizmo_arrow_y_color = {0.0f, 1.0f, 0.0f};
     vsg::vec3 gizmo_arrow_z_color = {0.0f, 0.0f, 1.0f};
-    double gizmo_opacity = 1.0;
+    float gizmo_opacity = 1.0f;
 
     double gui_font_size = 20.0;
     bool is_gui_editable = false;

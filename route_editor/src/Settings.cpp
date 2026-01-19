@@ -50,8 +50,8 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getDouble(section, "PitchMin", pitch_min);
     cfg.getDouble(section, "PitchMax", pitch_max);
 
-    cfg.getDouble(section, "GizmoArrowLength", gizmo_arrow_length);
-    cfg.getDouble(section, "GizmoArrowThickness", gizmo_arrow_thickness);
+    cfg.getFloat(section, "GizmoArrowLength", gizmo_arrow_length);
+    cfg.getFloat(section, "GizmoArrowThickness", gizmo_arrow_thickness);
 
     const char* field_names[] = {
         "GizmoXAxisColorR",
@@ -79,12 +79,10 @@ void settings_t::read(const std::string& cfg_path)
 
     for (int i = 0; i < 9; ++i)
     {
-        double tmp;
-        cfg.getDouble(section, field_names[i], tmp);
-        *color_components[i] = static_cast<float>(tmp);
+        cfg.getFloat(section, field_names[i], *color_components[i]);
     }
 
-    cfg.getDouble(section, "GizmoOpacity", gizmo_opacity);
+    cfg.getFloat(section, "GizmoOpacity", gizmo_opacity);
 
     cfg.getDouble(section, "GuiFontSize", gui_font_size);
     cfg.getBool(section, "IsGuiEditable", is_gui_editable);

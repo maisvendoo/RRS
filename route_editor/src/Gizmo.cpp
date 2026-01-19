@@ -70,9 +70,9 @@ static vsg::ref_ptr<vsg::Node> create_arrow(
     const vsg::vec3& color
 )
 {
-    const float thickness = static_cast<float>(settings.gizmo_arrow_thickness);
-    const float length = static_cast<float>(settings.gizmo_arrow_length);
-    const float opacity = static_cast<float>(settings.gizmo_opacity);
+    const float thickness = settings.gizmo_arrow_thickness;
+    const float length = settings.gizmo_arrow_length;
+    const float opacity = settings.gizmo_opacity;
 
     vsg::box box = {
         vsg::vec3{-0.5f * thickness, -0.5f * thickness, 0.0f},
