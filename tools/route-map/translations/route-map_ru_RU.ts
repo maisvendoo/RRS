@@ -100,56 +100,90 @@
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="336"/>
+        <source>Loaded %1 route signals</source>
+        <translation>Занружено %1 маршрутных сигналов</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="340"/>
+        <source>Warning: no route signals data</source>
+        <translation>ПРЕДУПРЕЖДЕНИЕ: Нет информации о маршрутных сигналах</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="345"/>
         <source>Loaded %1 exit signals</source>
         <translation>Загружено %1 выходных сигналов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="340"/>
+        <location filename="../src/mainwindow.cpp" line="349"/>
         <source>Warning: no exit signals data</source>
         <translation>ПРЕДУПРЕЖДЕНИЕ: нет данных повыходным сигналам</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="454"/>
+        <location filename="../src/mainwindow.cpp" line="354"/>
+        <source>Loaded %1 shunt signals</source>
+        <translation>Загружено%1 маневровых сигналов</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="358"/>
+        <source>Warning: no shunt signals data</source>
+        <translation>ПРЕДУПРЕЖДЕНИЕ: Нет информации о маневровых сигналах</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="450"/>
         <source>Send request for continuous vehicles update</source>
         <translation>Послан запрос на периодическое обновление данных о подвижных единицах</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="502"/>
+        <location filename="../src/mainwindow.cpp" line="499"/>
         <source>Switch forward</source>
         <translation>Переключить спереди</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="516"/>
+        <location filename="../src/mainwindow.cpp" line="518"/>
         <source>Switch backward</source>
         <translation>Переключить сзади</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="543"/>
-        <source>Open</source>
-        <translation>Открыть</translation>
+        <location filename="../src/mainwindow.cpp" line="562"/>
+        <source>Open for train</source>
+        <translation>Открыть как поездой</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="550"/>
+        <location filename="../src/mainwindow.cpp" line="580"/>
+        <source>Open for shunting</source>
+        <translation>Открыть как маневровый</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="598"/>
+        <source>Open call signal</source>
+        <translation>Открыть пригласительный</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation type="vanished">Открыть</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="614"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="652"/>
+        <location filename="../src/mainwindow.cpp" line="731"/>
         <source>Showed traj names</source>
         <translation>Включено отображение имен траекторий</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="654"/>
+        <location filename="../src/mainwindow.cpp" line="733"/>
         <source>Hided traj names</source>
         <translation>Имена траекторий скрыты</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="696"/>
+        <location filename="../src/mainwindow.cpp" line="782"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="704"/>
+        <location filename="../src/mainwindow.cpp" line="790"/>
         <source>Enter train name</source>
         <translation>Введите имя поезда</translation>
     </message>
