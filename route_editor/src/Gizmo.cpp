@@ -63,6 +63,11 @@ void Gizmo::set_outer_matrix(vsg::dmat4* outer_matrix)
     this->outer_matrix = outer_matrix;
 }
 
+bool Gizmo::get_is_moving() const
+{
+    return is_moving;
+}
+
 static vsg::ref_ptr<vsg::Node> create_arrow(
     const settings_t& settings,
     vsg::Builder& builder,

@@ -23,11 +23,14 @@ public:
 
     void set_outer_matrix(vsg::dmat4* outer_matrix);
 
+    bool get_is_moving() const;
+
 private:
     vsg::dmat4* outer_matrix = nullptr;
     vsg::ref_ptr<vsg::Node> arrow_x;
     vsg::ref_ptr<vsg::Node> arrow_y;
     vsg::ref_ptr<vsg::Node> arrow_z;
+    bool is_moving = false;
 };
 
 #endif // GIZMO_H
