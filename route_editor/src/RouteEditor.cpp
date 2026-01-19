@@ -9,7 +9,6 @@
 #include "ObjectSelector.h"
 #include "Route.h"
 #include "SceneGraph.h"
-#include "Settings.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
 #include "shader_funcs.h"
@@ -19,21 +18,12 @@
 #include <vsg/app/RenderGraph.h>
 #include <vsg/app/View.h>
 #include <vsg/app/Viewer.h>
-#include <vsg/app/Window.h>
 #include <vsg/commands/ClearAttachments.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>
 #include <vsg/io/Options.h>
-#include <vsg/lighting/AmbientLight.h>
-#include <vsg/maths/common.h>
-#include <vsg/maths/mat4.h>
-#include <vsg/maths/transform.h>
-#include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
-#include <vsg/nodes/Layer.h>
-#include <vsg/nodes/MatrixTransform.h>
-#include <vsg/nodes/PagedLOD.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
 #include <vsg/state/GraphicsPipeline.h>
@@ -41,15 +31,11 @@
 #include <vsg/state/MultisampleState.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/VertexInputState.h>
-#include <vsg/state/ViewportState.h>
-#include <vsg/threading/OperationThreads.h>
 #include <vsg/utils/ShaderSet.h>
-#include <vsg/vk/DeviceFeatures.h>
+#include <vsg/utils/SharedObjects.h>
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
 #include <vsgXchange/all.h>
-
-#include <QString>
 
 #include <vulkan/vulkan_core.h>
 
@@ -72,7 +58,7 @@ bool RouteEditor::initialize()
     configure_shaders();
 
     window_handler = WindowHandler::create(settings);
-    const auto& window = window_handler->get_window();
+    const auto window = window_handler->get_window();
     if (!window)
     {
         return false;
@@ -84,52 +70,58 @@ bool RouteEditor::initialize()
     camera_handler = CameraHandler::create(settings, window->extent2D(),
         mouse_handler, keyboard_handler, 5.0);
 
-    const auto& camera = camera_handler->get_camera();
+    const auto camera = camera_handler->get_camera();
+
+    intersection_handler = IntersectionHandler::create(camera);
 
     scene_graph = SceneGraph::create();
     const auto route = scene_graph->get_route();
-
-    gui_group = vsg::Group::create();
-
-    auto editor_gui = EditorGui::create(state, keyboard_handler->get_key_bindings(), route, settings, options);
-    auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
-
-    auto scene_view = vsg::View::create(camera, scene_graph);
 
     VkClearValue clear_value{};
     clear_value.depthStencil = {0.0f, 0};
     VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clear_value};
     const VkExtent2D& extent = window->extent2D();
     VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, extent}, 0, 1};
-    clear_attachments = vsg::ClearAttachments::create(vsg::ClearAttachments::Attachments{attachment}, vsg::ClearAttachments::Rects{rect});
 
-    auto gui_view = vsg::View::create(camera, gui_group);
+    clear_attachments = vsg::ClearAttachments::create(
+        vsg::ClearAttachments::Attachments{attachment},
+        vsg::ClearAttachments::Rects{rect});
 
-    auto render_graph = vsg::RenderGraph::create(window);
+    gui_group = vsg::Group::create();
+
+    const auto scene_view = vsg::View::create(camera, scene_graph);
+    const auto gui_view = vsg::View::create(camera, gui_group);
+
+    const auto editor_gui = EditorGui::create(state,
+        keyboard_handler->get_key_bindings(), route,
+        settings, options);
+
+    const auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
+
+    render_graph = vsg::RenderGraph::create(window);
     render_graph->addChild(scene_view);
     render_graph->addChild(clear_attachments);
     render_graph->addChild(gui_view);
     render_graph->addChild(render_gui);
 
-    auto command_graph = vsg::CommandGraph::create(window, render_graph);
+    const auto command_graph = vsg::CommandGraph::create(window, render_graph);
 
     viewer = vsg::Viewer::create();
     vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
 
-    object_selector = ObjectSelector::create(settings, observer_viewer, gui_group);
+    object_selector = ObjectSelector::create(settings,
+        observer_viewer, gui_group);
 
     viewer->addWindow(window);
+
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
     viewer->addEventHandler(window_handler);
     viewer->addEventHandler(mouse_handler);
     viewer->addEventHandler(keyboard_handler);
     viewer->addEventHandler(camera_handler);
-
-    // auto intersection_handler = IntersectionHandler::create(settings, options,
-        // camera_handler->get_look_at(), camera, scene_graph, gui_group, observer_viewer, object_selector);
-
-    // viewer->addEventHandler(intersection_handler);
+    viewer->addEventHandler(intersection_handler);
+    viewer->addEventHandler(object_selector);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
     viewer->compile();
