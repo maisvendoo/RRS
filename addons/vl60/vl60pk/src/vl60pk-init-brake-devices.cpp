@@ -127,6 +127,8 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
 //------------------------------------------------------------------------------
 void VL60pk::OnAutopilot()
 {
+    Vehicle::OnAutopilot();
+
     // Делаем автозапуск
     if (controller[CAB1]->isReversHandle())
     {
@@ -139,8 +141,6 @@ void VL60pk::OnAutopilot()
         initAutostartProgram(CAB2);
         autopilot_switcher[CAB2].set();
     }
-
-    slotInitTrainForAutopilot();
 
     autoStartTimer->start();
 }

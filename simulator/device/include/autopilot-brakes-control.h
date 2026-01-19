@@ -68,10 +68,12 @@ public:
         return bc_state;
     }
 
-    void setFeedback(double v_cur, double dist_target)
+    void setFeedback(double v_cur, double dist_target, double a_ref, double a_cur)
     {
         this->v_cur = v_cur;
         this->dist_target = dist_target;
+        this->a_ref = a_ref;
+        this->a_cur = a_cur;
     }
 
 private:
@@ -92,10 +94,14 @@ private:
 
     uint8_t num_steps = 0;
 
+    double a_cur = 0.0;
+
+    double a_ref = 0.0;
+
     const double KRM_HANDLE_DELAY = 0.5;
     Timer *krm_handle_timer = new Timer(KRM_HANDLE_DELAY, false);
 
-    const double BRAKE_DELAY = 5.0;
+    const double BRAKE_DELAY = 2.0;
     Timer *brake_timer = new Timer(BRAKE_DELAY, false);
 
     void ode_system(const state_vector_t &Y,

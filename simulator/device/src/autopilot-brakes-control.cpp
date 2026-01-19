@@ -119,33 +119,33 @@ void AutopilotBrakeController::stepPB(double dv,
 
     if (dv < dVminus)
     {
-        if (bc_state.brake_crane_pos_ref == KRM_POS_IV || bc_state.brake_crane_pos_ref == KRM_POS_IV)
-        {
-            if (!brake_timer->isStarted())
-                num_steps++;
-        }
-
         brakeStep(pEQ, p_charge, 0.04);
         lock_traction = true;
     }
 
     if (dv >= dVminus && dv <= dVplus)
     {
-        if (lock_traction && pBC >= 0.1)
-        {
-            setBrakeCranePos(KRM_POS_IV);
-        }
+
     }
 
     if (dv > dVplus && !is_disable_release && lock_traction)
     {
-        brakeRelease(pEQ, p_charge, 0.0);
+        brakeRelease(pEQ, p_charge, 0.01);
         num_steps = 0;
     }
 
     if (pEQ > p_charge)
     {
         setBrakeCranePos(KRM_POS_II);
+    }
+
+    // Запрет отпуска - ступень безусловно
+    if (is_disable_release)
+    {
+        if (bc_state.loco_crane_pos_ref < 0.01)
+        {
+            brakeStep(pEQ, p_charge, 0.04);
+        }
     }
 }
 
@@ -199,7 +199,7 @@ void AutopilotBrakeController::brakeStep(double pEQ, double p_charge, double dp)
     {
         if (!brake_timer->isStarted())
         {
-            setBrakeCranePos(KRM_POS_V);
+            bc_state.brake_crane_pos_ref = KRM_POS_V;
             brake_timer->start();
         }
     }
@@ -214,13 +214,13 @@ void AutopilotBrakeController::brakeStep(double pEQ, double p_charge, double dp)
 //------------------------------------------------------------------------------
 void AutopilotBrakeController::brakeRelease(double pEQ, double p_charge, double dp_over)
 {
-    if (pEQ < p_charge + dp_over)
+    if (pEQ >= p_charge + dp_over)
     {
-        setBrakeCranePos(KRM_POS_I);
+        setBrakeCranePos(KRM_POS_II);
     }
     else
     {
-        setBrakeCranePos(KRM_POS_II);
+        setBrakeCranePos(KRM_POS_I);
     }
 }
 
@@ -235,4 +235,10 @@ void AutopilotBrakeController::slotBrakeCraneHandle()
 void AutopilotBrakeController::slotBrakeDelay()
 {
     brake_timer->stop();
+
+    // Оценка эффективности торможения
+    if (a_cur > -a_ref)
+    {
+        num_steps++;
+    }
 }

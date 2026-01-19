@@ -203,7 +203,7 @@ public:
 
     virtual void OnAutopilot()
     {
-
+        auto_start_autopilot = true;
     }
 
     virtual void OffAutopilot()
@@ -346,6 +346,9 @@ protected:
 
     /// Automation control module
     std::vector<Autopilot *> autopilot;
+
+    /// Start autopilot after autostart
+    bool auto_start_autopilot = false;
 
     /// User defined initialization
     virtual void initialization();
