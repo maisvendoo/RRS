@@ -9,6 +9,7 @@
 class Gizmo;
 class IntersectionHandler;
 class Outline;
+class Route;
 struct settings_t;
 
 namespace vsg
@@ -27,14 +28,18 @@ public:
     ObjectSelector(
         const settings_t& settings,
         vsg::ref_ptr<IntersectionHandler> intersection_handler,
+        vsg::ref_ptr<Route> route,
         vsg::ref_ptr<vsg::Group> gui_group,
         vsg::observer_ptr<vsg::Viewer> observer_viewer
     );
+
+    ~ObjectSelector();
 
     void apply(vsg::ButtonPressEvent& buttonPress) override;
 
 private:
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
+    vsg::ref_ptr<Route> route;
     vsg::ref_ptr<vsg::Group> gui_group;
     vsg::ref_ptr<vsg::MatrixTransform> object;
     vsg::ref_ptr<Gizmo> gizmo;
