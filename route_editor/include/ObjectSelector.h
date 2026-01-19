@@ -36,6 +36,8 @@ public:
     ~ObjectSelector();
 
     void apply(vsg::ButtonPressEvent& buttonPress) override;
+    void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
+    void apply(vsg::MoveEvent& moveEvent) override;
 
 private:
     vsg::ref_ptr<IntersectionHandler> intersection_handler;

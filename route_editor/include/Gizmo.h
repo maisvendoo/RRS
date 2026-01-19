@@ -12,6 +12,7 @@ struct settings_t;
 namespace vsg
 {
 
+class LineSegmentIntersector;
 class Node;
 
 }
@@ -20,6 +21,9 @@ class Gizmo : public vsg::Inherit<vsg::MatrixTransform, Gizmo>
 {
 public:
     Gizmo(const settings_t& settings);
+
+    bool handle_intersection(
+        vsg::ref_ptr<vsg::LineSegmentIntersector> intersector);
 
     void set_outer_matrix(vsg::dmat4* outer_matrix);
 

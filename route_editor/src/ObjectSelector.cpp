@@ -16,15 +16,17 @@
 // Если нажимаем на экран, возможны следующие ситуации:
 // 1) Ничего не выделено
 //    -> Выделения и соответствующего GUI нет
-// 2) Ничего не было выделено, нажали на объект
+// 2) Ничего не выделено, нажимаем на объект
 //    -> Объект нужно выделить и показать GUI
-// 3) Выделен объект, нажимаем на него же
+// 3) Ничего не выделено, нажимаем на пустоту
+//    -> Ничего не происходит
+// 4) Выделен объект, нажимаем на него же
 //    -> Выделение снимается, GUI убирается
-// 4) Выделен объект, нажимаем на другой объект
+// 5) Выделен объект, нажимаем на другой объект
 //    -> Выделяется другой объект
-// 5) Выделен объект, нажимаем на пустоту
+// 6) Выделен объект, нажимаем на пустоту
 //    -> Выделение снимается, GUI убирается
-// 6) Выделен объект, нажимаем на Gizmo
+// 7) Выделен объект, нажимаем на Gizmo
 //    -> Управляем объектом через Gizmo, пока не отпустим ЛКМ
 
 // TODO: Multiple object selection
@@ -65,6 +67,26 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     if (!lmb_intersector)
     {
         return;
+    }
+
+    if (object)
+    {
+        if (gizmo->handle_intersection(lmb_intersector))
+        {
+            return;
+        }
+
+        route->accept(*lmb_intersector);
+
+        auto& intersections = lmb_intersector->intersections;
+        if (intersections.empty())
+        {
+
+        }
+    }
+    else
+    {
+
     }
 
     route->accept(*lmb_intersector);
@@ -112,4 +134,14 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     }
 
 
+}
+
+void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
+{
+    (void)buttonRelease;
+}
+
+void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
+{
+    (void)moveEvent;
 }
