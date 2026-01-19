@@ -12,6 +12,7 @@ struct settings_t;
 namespace vsg
 {
 
+class ButtonReleaseEvent;
 class LineSegmentIntersector;
 class Node;
 
@@ -22,19 +23,18 @@ class Gizmo : public vsg::Inherit<vsg::MatrixTransform, Gizmo>
 public:
     Gizmo(const settings_t& settings);
 
-    bool handle_intersection(
+    bool handle_intersections(
         vsg::ref_ptr<vsg::LineSegmentIntersector> intersector);
 
-    void set_outer_matrix(vsg::dmat4* outer_matrix);
+    // void apply(const vsg::ButtonReleaseEvent) TODO.
 
-    bool get_is_moving() const;
+    void set_outer_matrix(vsg::dmat4* outer_matrix);
 
 private:
     vsg::dmat4* outer_matrix = nullptr;
     vsg::ref_ptr<vsg::Node> arrow_x;
     vsg::ref_ptr<vsg::Node> arrow_y;
     vsg::ref_ptr<vsg::Node> arrow_z;
-    bool is_moving = false;
 };
 
 #endif // GIZMO_H

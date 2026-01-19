@@ -71,10 +71,18 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     if (object)
     {
-        if (gizmo->handle_intersection(lmb_intersector))
+        gizmo->accept(*lmb_intersector);
+
+        if (!lmb_intersector->intersections.empty())
         {
+            // TODO...
+
+            lmb_intersector->intersections.clear();
+
             return;
         }
+
+        lmb_intersector->intersections.clear();
 
         route->accept(*lmb_intersector);
 

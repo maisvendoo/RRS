@@ -16,8 +16,10 @@ namespace vsg
 {
 
 class ButtonPressEvent;
+class ButtonReleaseEvent;
 class Group;
 class MatrixTransform;
+class MoveEvent;
 class Viewer;
 
 }
