@@ -90,8 +90,13 @@ private:
 
     double dist_target = 0.0;
 
+    uint8_t num_steps = 0;
+
     const double KRM_HANDLE_DELAY = 0.5;
     Timer *krm_handle_timer = new Timer(KRM_HANDLE_DELAY, false);
+
+    const double BRAKE_DELAY = 5.0;
+    Timer *brake_timer = new Timer(BRAKE_DELAY, false);
 
     void ode_system(const state_vector_t &Y,
                     state_vector_t &dYdt,
@@ -118,6 +123,8 @@ private:
 private slots:
 
     void slotBrakeCraneHandle();
+
+    void slotBrakeDelay();
 };
 
 #endif

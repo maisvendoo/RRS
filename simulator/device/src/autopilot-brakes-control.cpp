@@ -7,6 +7,9 @@ AutopilotBrakeController::AutopilotBrakeController()
 {
     connect(krm_handle_timer, &Timer::process,
             this, &AutopilotBrakeController::slotBrakeCraneHandle);
+
+    connect(brake_timer, &Timer::process,
+            this, &AutopilotBrakeController::slotBrakeDelay);
 }
 
 //------------------------------------------------------------------------------
@@ -15,6 +18,7 @@ AutopilotBrakeController::AutopilotBrakeController()
 void AutopilotBrakeController::step(double t, double dt)
 {
     krm_handle_timer->step(t, dt);
+    brake_timer->step(t, dt);
 
     Device::step(t, dt);
 }
@@ -115,6 +119,12 @@ void AutopilotBrakeController::stepPB(double dv,
 
     if (dv < dVminus)
     {
+        if (bc_state.brake_crane_pos_ref == KRM_POS_IV || bc_state.brake_crane_pos_ref == KRM_POS_IV)
+        {
+            if (!brake_timer->isStarted())
+                num_steps++;
+        }
+
         brakeStep(pEQ, p_charge, 0.04);
         lock_traction = true;
     }
@@ -130,6 +140,7 @@ void AutopilotBrakeController::stepPB(double dv,
     if (dv > dVplus && !is_disable_release && lock_traction)
     {
         brakeRelease(pEQ, p_charge, 0.0);
+        num_steps = 0;
     }
 
     if (pEQ > p_charge)
@@ -184,9 +195,13 @@ void AutopilotBrakeController::setBrakeCranePos(int pos)
 //------------------------------------------------------------------------------
 void AutopilotBrakeController::brakeStep(double pEQ, double p_charge, double dp)
 {
-    if (pEQ > p_charge - dp)
+    if (pEQ > p_charge - dp - num_steps * 0.02)
     {
-        setBrakeCranePos(KRM_POS_V);
+        if (!brake_timer->isStarted())
+        {
+            setBrakeCranePos(KRM_POS_V);
+            brake_timer->start();
+        }
     }
     else
     {
@@ -215,4 +230,9 @@ void AutopilotBrakeController::brakeRelease(double pEQ, double p_charge, double 
 void AutopilotBrakeController::slotBrakeCraneHandle()
 {
     krm_handle_timer->stop();
+}
+
+void AutopilotBrakeController::slotBrakeDelay()
+{
+    brake_timer->stop();
 }
