@@ -60,14 +60,7 @@ void VL60pk::slotAutoStart()
         brake_lock[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
         brake_lock[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
         epk[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
-        epk[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
-
-        // Если есть модули автоведения, включаем их
-        if (!autopilot.empty())
-        {
-            autopilot_switcher[CAB1].set();
-            autopilot_switcher[CAB2].set();
-        }
+        epk[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);        
     }
 }
 
