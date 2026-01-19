@@ -5,12 +5,13 @@
 #include "Outline.h"
 #include "Route.h"
 
+#include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
+#include <vsg/nodes/Switch.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/LineSegmentIntersector.h>
 
-#include <algorithm>
 #include <cassert>
 
 // Если нажимаем на экран, возможны следующие ситуации:
@@ -40,18 +41,23 @@ ObjectSelector::ObjectSelector(
 )
     : intersection_handler(intersection_handler)
     , route(route)
-    , gui_group(gui_group)
 {
     assert(intersection_handler);
     assert(route);
     assert(gui_group);
-    assert(observer_viewer);
 
     gizmo = Gizmo::create(settings);
     outline = Outline::create(observer_viewer);
 
-    gui_group->addChild(gizmo);
-    gui_group->addChild(outline);
+    gui_switch = vsg::Switch::create();
+    gui_switch->addChild(false, gizmo);
+    gui_switch->addChild(false, outline);
+
+    gui_group->addChild(gui_switch);
+
+    scene_switch = vsg::Switch::create();
+    scene_switch->addChild(false, gizmo);
+    scene_switch->addChild(false, outline);
 }
 
 ObjectSelector::~ObjectSelector() = default;
@@ -71,18 +77,10 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     if (object)
     {
-        gizmo->accept(*lmb_intersector);
-
-        if (!lmb_intersector->intersections.empty())
+        if (gizmo->handle_intersections(lmb_intersector))
         {
-            // TODO...
-
-            lmb_intersector->intersections.clear();
-
             return;
         }
-
-        lmb_intersector->intersections.clear();
 
         route->accept(*lmb_intersector);
 
@@ -105,12 +103,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    std::sort(intersections.begin(), intersections.end(),
-        [](const auto& lhs, const auto& rhs) -> bool
-        {
-            return (lhs->ratio) < (rhs->ratio);
-        }
-    );
+    intersection_handler->sort_intersections(lmb_intersector);
 
     const auto intersection = intersections.front();
 
@@ -152,4 +145,13 @@ void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
 void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
     (void)moveEvent;
+}
+
+void ObjectSelector::select_object(vsg::ref_ptr<vsg::MatrixTransform> object)
+{
+    this->object = object;
+}
+
+void ObjectSelector::deselect_object()
+{
 }

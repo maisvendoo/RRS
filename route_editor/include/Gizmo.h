@@ -14,6 +14,7 @@ namespace vsg
 
 class ButtonReleaseEvent;
 class LineSegmentIntersector;
+class MoveEvent;
 class Node;
 
 }
@@ -24,9 +25,11 @@ public:
     Gizmo(const settings_t& settings);
 
     bool handle_intersections(
-        vsg::ref_ptr<vsg::LineSegmentIntersector> intersector);
+        vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
+    );
 
-    // void apply(const vsg::ButtonReleaseEvent) TODO.
+    void apply(const vsg::ButtonReleaseEvent& buttonRelease);
+    void apply(const vsg::MoveEvent& moveEvent);
 
     void set_outer_matrix(vsg::dmat4* outer_matrix);
 

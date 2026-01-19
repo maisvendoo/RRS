@@ -10,6 +10,7 @@
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/utils/Builder.h>
+#include <vsg/utils/LineSegmentIntersector.h>
 #include <vsg/utils/ShaderSet.h>
 
 #include <cmath>
@@ -56,6 +57,25 @@ Gizmo::Gizmo(const settings_t& settings)
 
         this->addChild(*arrows[i]);
     }
+}
+
+bool Gizmo::handle_intersections(
+    vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
+)
+{
+    intersector->intersections.clear();
+
+    return false;
+}
+
+void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
+{
+
+}
+
+void Gizmo::apply(const vsg::MoveEvent& moveEvent)
+{
+
 }
 
 void Gizmo::set_outer_matrix(vsg::dmat4* outer_matrix)

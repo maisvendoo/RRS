@@ -7,6 +7,7 @@
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/LineSegmentIntersector.h>
 
+#include <algorithm>
 #include <cassert>
 
 IntersectionHandler::IntersectionHandler(vsg::ref_ptr<vsg::Camera> camera)
@@ -99,4 +100,21 @@ vsg::ref_ptr<vsg::LineSegmentIntersector>
 IntersectionHandler::get_rmb_intersector() const
 {
     return rmb_intersector;
+}
+
+void IntersectionHandler::sort_intersections(
+    vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
+)
+{
+    auto& intersections = intersector->intersections;
+    if (intersections.empty())
+    {
+        return;
+    }
+
+    std::sort(intersections.begin(), intersections.end(),
+        [](const auto& lhs, const auto& rhs) -> bool {
+            return (lhs->ratio) < (rhs->ratio);
+        }
+    );
 }

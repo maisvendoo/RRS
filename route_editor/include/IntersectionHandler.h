@@ -27,6 +27,10 @@ public:
     vsg::ref_ptr<vsg::LineSegmentIntersector> get_mmb_intersector() const;
     vsg::ref_ptr<vsg::LineSegmentIntersector> get_rmb_intersector() const;
 
+    static void sort_intersections(
+        vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
+    );
+
 private:
     vsg::ref_ptr<vsg::Camera> camera;
     vsg::ref_ptr<vsg::LineSegmentIntersector> lmb_intersector;

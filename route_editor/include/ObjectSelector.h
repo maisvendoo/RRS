@@ -20,6 +20,7 @@ class ButtonReleaseEvent;
 class Group;
 class MatrixTransform;
 class MoveEvent;
+class Switch;
 class Viewer;
 
 }
@@ -41,10 +42,14 @@ public:
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
     void apply(vsg::MoveEvent& moveEvent) override;
 
+    void select_object(vsg::ref_ptr<vsg::MatrixTransform> object);
+    void deselect_object();
+
 private:
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
     vsg::ref_ptr<Route> route;
-    vsg::ref_ptr<vsg::Group> gui_group;
+    vsg::ref_ptr<vsg::Switch> gui_switch;
+    vsg::ref_ptr<vsg::Switch> scene_switch;
     vsg::ref_ptr<vsg::MatrixTransform> object;
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<Outline> outline;
