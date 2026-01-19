@@ -815,10 +815,9 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     scnmgr->init(init_data);
 
     // Увязываем управляющие сигналы с топологией
-    connect(scnmgr, &ScenarioManager::sigSetSwitchState, topology, &Topology::slotSetSwitchState);
     connect(scnmgr, &ScenarioManager::sigGetSwitchState, topology, &Topology::slotGetSwitchState);
-    connect(scnmgr, &ScenarioManager::sigOpenSignal, topology, &Topology::slotOpenSignal);
-    connect(scnmgr, &ScenarioManager::sigCloseSignal, topology, &Topology::slotCloseSignal);
+    connect(scnmgr, &ScenarioManager::sigSwitchCommand, topology, &Topology::slotSwitchCommand);
+    connect(scnmgr, &ScenarioManager::sigSignalCommand, topology, &Topology::slotSignalCommand);
     connect(scnmgr, &ScenarioManager::sigBuildRoute, topology, &Topology::slotBuildRoute);
     connect(topology, &Topology::sigSetOpenSignalsQueue, scnmgr, &ScenarioManager::slotSetOpenSignalsQueue);
     connect(tcp_server, &TcpServer::sigRenameTrain, scnmgr, &ScenarioManager::slotRenameTrain);
@@ -855,10 +854,9 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::requestTopologyData, this, &Model::slotGetTopologyData);
 
-    connect(tcp_server, &TcpServer::setSwitchState, topology, &Topology::slotSetSwitchState);
-    connect(topology, &Topology::sendSwitchState, tcp_server, &TcpServer::slotSendSwitchState);
-
     connect(topology, &Topology::sendTrajBusyState, tcp_server, &TcpServer::slotSendTrajBusyState);
+
+    connect(topology, &Topology::sendSwitchState, tcp_server, &TcpServer::slotSendSwitchState);
 
     connect(tcp_server, &TcpServer::requestSignalsData, this, &Model::slotGetSignalsData);
 
@@ -872,18 +870,28 @@ void Model::initTcpServer()
         connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
     }
 
-    connect(tcp_server, &TcpServer::openSignal, topology, &Topology::slotOpenSignal);
-
-    connect(tcp_server, &TcpServer::closeSignal, topology, &Topology::slotCloseSignal);
+    for (auto signal : topology->getSignalsData()->route_signals)
+    {
+        connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
+    }
 
     for (auto signal : topology->getSignalsData()->exit_signals)
     {
         connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
     }
 
-    connect(tcp_server, &TcpServer::setVehicleControl, this, &Model::slotGetVehicleControlByKeyboard);
+    for (auto signal : topology->getSignalsData()->shunt_signals)
+    {
+        connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
+    }
 
-    connect(tcp_server, &TcpServer::resetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
+    connect(tcp_server, &TcpServer::sigSwitchCommand, topology, &Topology::slotSwitchCommand);
+
+    connect(tcp_server, &TcpServer::sigSignalCommand, topology, &Topology::slotSignalCommand);
+
+    connect(tcp_server, &TcpServer::sigVehicleControl, this, &Model::slotGetVehicleControlByKeyboard);
+
+    connect(tcp_server, &TcpServer::sigResetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
 
     connect(tcp_server, &TcpServer::sigRenameTrain, this, &Model::slotRenameTrainInModel);
 

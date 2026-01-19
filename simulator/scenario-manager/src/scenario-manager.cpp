@@ -3,6 +3,7 @@
 #include    <filesystem.h>
 #include    <datetime.h>
 #include    <switch-state.h>
+#include    <signals-data-types.h>
 
 //------------------------------------------------------------------------------
 //
@@ -363,10 +364,9 @@ void ScenarioManager::switchFwd(const std::string &switch_name)
 
     if (sw_state.state_fwd != 0)
     {
-        sw_state.state_fwd = -sw_state.state_fwd;
-
-        switch_data = sw_state.serialize();
-        emit sigSetSwitchState(switch_data);
+        std::int8_t ref_state = -sw_state.state_fwd;
+        QByteArray sc_data = switch_command_t({sw_state.name, 1, ref_state}).serialize();
+        emit sigSwitchCommand(sc_data);
     }
 }
 
@@ -398,10 +398,9 @@ void ScenarioManager::switchBwd(const std::string &switch_name)
 
     if (sw_state.state_bwd != 0)
     {
-        sw_state.state_bwd = -sw_state.state_bwd;
-
-        switch_data = sw_state.serialize();
-        emit sigSetSwitchState(switch_data);
+        std::int8_t ref_state = -sw_state.state_bwd;
+        QByteArray sc_data = switch_command_t({sw_state.name, -1, ref_state}).serialize();
+        emit sigSwitchCommand(sc_data);
     }
 }
 
@@ -418,15 +417,15 @@ void ScenarioManager::taskSwitchBwd(const std::string &switch_name)
 //------------------------------------------------------------------------------
 void ScenarioManager::openSignal(const std::string &conn_name, int dir)
 {
-    QByteArray signal_data;
-    QBuffer buff(&signal_data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
+    signal_command_t sc = signal_command_t();
+    sc.conn_name = QString(conn_name.c_str());
+    sc.sig_dir = dir;
+    sc.command_open_train = true;
+    sc.command_open_shunting = true;
+    sc.command_open_call = true;
 
-    stream << QString(conn_name.c_str());
-    stream << dir;
-
-    emit sigOpenSignal(signal_data);
+    QByteArray sc_data = sc.serialize();
+    emit sigSignalCommand(sc_data);
 }
 
 //------------------------------------------------------------------------------
@@ -442,15 +441,13 @@ void ScenarioManager::taskOpenSignal(const std::string &conn_name, int dir)
 //------------------------------------------------------------------------------
 void ScenarioManager::closeSignal(const std::string &conn_name, int dir)
 {
-    QByteArray signal_data;
-    QBuffer buff(&signal_data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
+    signal_command_t sc = signal_command_t();
+    sc.conn_name = QString(conn_name.c_str());
+    sc.sig_dir = dir;
+    sc.command_close = true;
 
-    stream << QString(conn_name.c_str());
-    stream << dir;
-
-    emit sigCloseSignal(signal_data);
+    QByteArray sc_data = sc.serialize();
+    emit sigSignalCommand(sc_data);
 }
 
 //------------------------------------------------------------------------------

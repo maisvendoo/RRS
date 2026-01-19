@@ -4,6 +4,8 @@
 #include    <connector.h>
 #include    <cstdint>
 
+class Signal;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -66,6 +68,26 @@ public:
 
     Trajectory *bwdPlusTraj = nullptr;
 
+    /// Светофор, включающий данный стрелочный перевод вперёд в маршрут ДЦ
+    Signal* getRouteBySignalFwd() const
+    {
+        return in_route_by_signal_fwd;
+    }
+    void setRouteBySignalFwd(Signal* signal)
+    {
+        in_route_by_signal_fwd = signal;
+    }
+
+    /// Светофор, включающий данный стрелочный перевод назад в маршрут ДЦ
+    Signal* getRouteBySignalBwd() const
+    {
+        return in_route_by_signal_bwd;
+    }
+    void setRouteBySignalBwd(Signal* signal)
+    {
+        in_route_by_signal_bwd = signal;
+    }
+
 signals:
 
     void sendSwitchState(QByteArray sw_data);
@@ -87,6 +109,11 @@ private:
     /// Стрелка будет заблокирована в сторону траектории,
     /// которая занята ПЕ ближе чем в 40 метрах
     const double lock_by_busy_distance = 40.0;
+
+    /// Светофор, включающий данный стрелочный перевод вперёд в маршрут ДЦ
+    Signal* in_route_by_signal_fwd = nullptr;
+    /// Светофор, включающий данный стрелочный перевод назад в маршрут ДЦ
+    Signal* in_route_by_signal_bwd = nullptr;
 
     void serialize_connected_trajectory(QDataStream &stream, Trajectory *traj);
 

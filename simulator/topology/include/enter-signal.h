@@ -20,14 +20,15 @@ private:
 
     enum
     {
-        NUM_MSR_CONTACTS = 3,
+        NUM_MSR_CONTACTS = 4,
         NUM_SSR_CONTACTS = 5,
         NUM_DSR_CONTACTS = 3,
         NUM_BLINK_CONTACTS = 2,
 
         MSR_RED = 0,
         MSR_YELLOW = 1,
-        MSR_BLINK = 2,
+        MSR_GREEN = 2,
+        MSR_BLINK = 3,
 
         SSR_RED = 0,
         SSR_TOP_YELLOW = 1,
@@ -58,13 +59,7 @@ private:
     /// Реле мигания верхнего желтого
     Relay *blink_relay = new Relay(NUM_BLINK_CONTACTS);
 
-    /// Контакт мигания
-    bool blink_contact = true;
-
     bool is_yellow_wire_ON = false;
-
-    /// Таймер мигания верхнего желтого сигнала
-    Timer *blink_timer = new Timer(0.75, false);
 
     void preStep(double t) override;
 
@@ -79,10 +74,6 @@ private:
 
     /// Управление состоянием линий АЛСН
     void alsn_control();
-
-private slots:
-
-    void slotOnBlinkTimer();
 };
 
 #endif
