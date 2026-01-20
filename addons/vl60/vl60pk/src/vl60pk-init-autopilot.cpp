@@ -84,15 +84,7 @@ void VL60pk::prepareCabineForAutopilot(int my_cab_idx, int other_cab_idx)
     // прожектор на ярко
     spotlight_high_tumbler[my_cab_idx].set();
     // подсветка приборов
-    P_light_devices_tumbler[my_cab_idx].set();
-
-    // инициализируем структуру управляющего воздействия текущим положением
-    // органов управления
-    auto_control[my_cab_idx]->press_RB = rb[my_cab_idx][RBS].getState();
-    auto_control[my_cab_idx]->spotlight_ON = spotlight_low_tumbler[my_cab_idx].getState();
-    auto_control[my_cab_idx]->km_pos_ref = controller[my_cab_idx]->getMainPos();
-    auto_control[my_cab_idx]->krm_pos = brake_crane[my_cab_idx]->getHandlePosition();
-    auto_control[my_cab_idx]->kvt_pos = loco_crane[my_cab_idx]->getHandlePosition();
+    P_light_devices_tumbler[my_cab_idx].set();    
 
     // В другой кабине
 
