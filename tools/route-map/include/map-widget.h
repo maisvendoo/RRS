@@ -32,6 +32,10 @@ public:
 
     conn_list_t *conn_list = nullptr;
 
+    Trajectory* nearest_trajectory = nullptr;
+
+    Connector* nearest_connector = nullptr;
+
     simulator_update_players_t *players_data = nullptr;
 
     simulator_update_pos_t *train_data = nullptr;
@@ -70,6 +74,10 @@ public:
         show_traj_names = is_show;
     }
 
+signals:
+
+    void sigOpenTrajectoryMenu(Trajectory* nearest_traj);
+
 public slots:
 
     void slotStationAtCenter(int idx);
@@ -95,6 +103,9 @@ private:
     /// Смещение координат до движения курсора с зажатой ЛКМ
     QPoint prev_map_shift;
 
+    /// Флаг отображения имен траекторий
+    bool show_traj_names = false;
+
     /// Перемещение вслед за игроком
     bool follow_player = true;
 
@@ -109,9 +120,6 @@ private:
 
     /// Смещение схематичного светофора вправо от оси пути, м
     double signal_offset = 2.5;
-
-    /// Флаг отображения имен траекторий
-    bool show_traj_names = false;
 
     void paintEvent(QPaintEvent *event);
 

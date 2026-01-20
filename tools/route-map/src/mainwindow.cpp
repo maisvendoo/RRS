@@ -66,6 +66,9 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     map->vehicles_half_length = &vehicles_half_length;
     map->players_data = &players_data;
 
+    connect(map, &MapWidget::sigOpenTrajectoryMenu,
+            this, &MainWindow::slotNearestTrajectoryMenu);
+
     load_config("../cfg/route-map-tcp.xml");
 
     overrideByCommandLine(cmd_line);
@@ -468,6 +471,19 @@ void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 
     // Дата-время сервера в статусной строке внизу
     ui->statusbar->showMessage(train_data.sim_time.getString());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
+{
+    if (nearest_traj == nullptr)
+    {
+        return;
+    }
+
+    ui->ptLog->appendPlainText("Pressed RMB on trajectory" + nearest_traj->getName());
 }
 
 //------------------------------------------------------------------------------

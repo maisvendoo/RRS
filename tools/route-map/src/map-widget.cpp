@@ -96,13 +96,14 @@ void MapWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
+    const double limit_dist = 4.0 * std::max(scale, 1.0);
+    double dist2_to_nearest_trajectory = limit_dist * limit_dist;
+    double dist2_to_nearest_connector = limit_dist * limit_dist;
+    nearest_trajectory = nullptr;
+    nearest_connector = nullptr;
     QPointF mouse_pos_current = mapFromGlobal(QCursor::pos());
-    double dist2_to_nearest_trajectory = std::numeric_limits<double>::max();
-    double dist2_to_nearest_connector = std::numeric_limits<double>::max();
-    Trajectory* nearest_trajectory = nullptr;
-    Connector* nearest_connector = nullptr;
 
-    for (auto traj : *traj_list)
+    for (auto& traj : *traj_list)
     {
         double distance2 = std::numeric_limits<double>::max();
         drawTrajectory(traj, mouse_pos_current, distance2);
@@ -114,7 +115,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
         }
     }
 
-    for (auto conn : *conn_list)
+    for (auto& conn : *conn_list)
     {
         double distance2 = std::numeric_limits<double>::max();
         drawConnector(conn, mouse_pos_current, distance2);
@@ -783,6 +784,12 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
     if (event->buttons() & Qt::LeftButton)
     {
         map_shift = prev_map_shift + event->pos() - mouse_pos_LBpressed;
+        return;
+    }
+    if (event->buttons() & Qt::RightButton)
+    {
+        emit sigOpenTrajectoryMenu(nearest_trajectory);
+        return;
     }
 }
 

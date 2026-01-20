@@ -95,6 +95,8 @@ private slots:
 
     void slotGetVehiclePosData(QByteArray &sim_data);
 
+    void slotNearestTrajectoryMenu(Trajectory* nearest_traj);
+
     void slotSwitchConnectorMenu();
 
     void slotSignalControlMenu();
