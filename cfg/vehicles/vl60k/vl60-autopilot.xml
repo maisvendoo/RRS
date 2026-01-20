@@ -6,7 +6,7 @@
 		<!-- Падение тока якоря от уставки, для набора следующей позиции -->
 		<DeltaI>50.0</DeltaI>
 		<!-- Конструкционная скорость -->
-		<V_constr>110.0</V_constr>
+		<V_constr>100.0</V_constr>
 		<!-- Пропорциональный коэффициент регулятора скорости -->
 		<Kp>0.32</Kp>
 		<!-- Интегральный коэффициент регулятора скорости -->
@@ -14,7 +14,7 @@
 		<!-- Ускорение кривой снижения скорости -->
 		<BrakeAccel>0.1</BrakeAccel>
 		<!-- Дистанция упреждения на КЖ -->
-		<LeadDistance_RY>10.0</LeadDistance_RY>
+		<LeadDistance_RY>20.0</LeadDistance_RY>
 		<!-- Дистанция упреждения на Ж -->
 		<LeadDistance_Y>0.0</LeadDistance_Y>
 		<!-- Ограничение скорости при КЖ -->
@@ -33,13 +33,13 @@
 		<!-- Завышение при отпуске ЭПТ -->
 		<dpEPB_over>0.02</dpEPB_over>
 		<!-- Завышение при отпуске ПТ -->
-		<dpPB_over>0.0</dpPB_over>
+		<dpPB_over>0.04</dpPB_over>
 		<!-- Глубина разрядки ТМ при первой ступени -->
-		<dpFirstStep>0.04</dpFirstStep>
+		<dpFirstStep>0.06</dpFirstStep>
 		<!-- Величина последующих ступеней -->
 		<dpOtherStep>0.02</dpOtherStep>
 		<!-- Время в перекрыше для оценки эффективности ступени -->
-		<HoldTimeout>2.0</HoldTimeout>
+		<HoldTimeout>10.0</HoldTimeout>
 		<!-- Минимальная ступень ЭПТ -->
 		<pBC_EPB>0.1</pBC_EPB>
 	</Device>

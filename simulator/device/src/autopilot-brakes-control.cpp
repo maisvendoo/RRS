@@ -155,7 +155,7 @@ void AutopilotBrakeController::stepPB(double dv,
 
     // Опустились достаточно низко под кривую снижения скорости, и если
     // отпуск не запрещен и заблокирована тяга
-    if (dv > dVplus && !is_disable_release && lock_traction)
+    if (dv > dVplus && !is_disable_release)
     {
         // полный отпуск до зарядного
         brakeRelease(pEQ, p_charge, dpPB_over);
@@ -164,7 +164,7 @@ void AutopilotBrakeController::stepPB(double dv,
     }
 
     // При давлении в УР выше зарядного
-    if (pEQ > p_charge)
+    if (pEQ > p_charge + dpPB_over)
     {
         // Ставим кран во второе положение
         setBrakeCranePos(KRM_POS_II);
