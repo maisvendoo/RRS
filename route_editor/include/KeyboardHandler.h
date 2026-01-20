@@ -20,6 +20,7 @@ public:
 
     vsg::KeySymbol get_key_binding(Action action) const;
     bool get_key_state(vsg::KeySymbol sym) const;
+    bool get_shift_state() const;
     bool get_binding_state(Action action) const;
 
     const vsg::KeySymbol* get_key_bindings() const;

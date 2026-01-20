@@ -4,29 +4,23 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/nodes/MatrixTransform.h>
-#include <vsg/utils/Builder.h>
+#include <vsg/nodes/Group.h>
 
 namespace vsg
 {
 
-class Options;
 class PagedLOD;
 class Viewer;
 
 }
 
-class Outline : public vsg::Inherit<vsg::MatrixTransform, Outline>
+class Outline : public vsg::Inherit<vsg::Group, Outline>
 {
 public:
-    Outline(vsg::observer_ptr<vsg::Viewer> observer_viewer);
-
-    void update(vsg::ref_ptr<vsg::PagedLOD> paged_lod);
-
-private:
-    vsg::observer_ptr<vsg::Viewer> observer_viewer;
-    vsg::ref_ptr<vsg::Options> options;
-    vsg::Builder builder;
+    Outline(
+        vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+        vsg::observer_ptr<vsg::Viewer> observer_viewer
+    );
 };
 
 #endif // OUTLINE_H

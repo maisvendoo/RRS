@@ -46,6 +46,11 @@ bool KeyboardHandler::get_key_state(vsg::KeySymbol sym) const
     }
 }
 
+bool KeyboardHandler::get_shift_state() const
+{
+    return get_key_state(vsg::KEY_Shift_L) || get_key_state(vsg::KEY_Shift_R);
+}
+
 bool KeyboardHandler::get_binding_state(Action action) const
 {
     assert(action < ACTION_TOTAL_COUNT);

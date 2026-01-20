@@ -4,7 +4,6 @@
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
-#include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
@@ -22,7 +21,11 @@ static vsg::ref_ptr<vsg::Node> create_arrow(
     const vsg::vec3& color
 );
 
-Gizmo::Gizmo(const settings_t& settings)
+Gizmo::Gizmo(
+    const settings_t& settings,
+    const SelectedObjectsMap& selected_objects
+)
+    : selected_objects(selected_objects)
 {
     vsg::Builder builder;
     builder.shaderSet = vsg::createFlatShadedShaderSet();
@@ -59,9 +62,7 @@ Gizmo::Gizmo(const settings_t& settings)
     }
 }
 
-bool Gizmo::handle_intersections(
-    vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
-)
+bool Gizmo::handle_intersections(IntersectorPtr intersector)
 {
     intersector->intersections.clear();
 
@@ -76,11 +77,6 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
 void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 {
     (void)moveEvent;
-}
-
-void Gizmo::set_outer_matrix(vsg::dmat4* outer_matrix)
-{
-    this->outer_matrix = outer_matrix;
 }
 
 static vsg::ref_ptr<vsg::Node> create_arrow(

@@ -32,11 +32,60 @@
 #include <cstdio>
 #include <string>
 
-Outline::Outline(vsg::observer_ptr<vsg::Viewer> observer_viewer)
-    : observer_viewer(observer_viewer)
+struct OutlineStatic
 {
+    vsg::ref_ptr<vsg::Options> options;
+    vsg::Builder builder;
+
+    OutlineStatic();
+};
+
+Outline::Outline(
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    vsg::observer_ptr<vsg::Viewer> observer_viewer
+)
+{
+    assert(paged_lod);
     assert(observer_viewer);
 
+    static OutlineStatic outline_static;
+    const auto options = outline_static.options;
+    auto& builder = outline_static.builder;
+
+    const vsg::ref_ptr<vsg::Viewer> viewer = observer_viewer;
+
+    const auto wireframe_outline = vsg::read_cast<vsg::Node>(
+        paged_lod->filename, options);
+
+    vsg::CompileResult compile_result = viewer->compileManager->compile(
+        wireframe_outline);
+
+    if (!compile_result)
+    {
+        std::fputs("Failed to compile wireframe outline\n", stderr);
+
+        return;
+    }
+
+    vsg::ComputeBounds compute_bounds;
+    compute_bounds.useNodeBounds = false;
+    wireframe_outline->accept(compute_bounds);
+
+    const vsg::GeometryInfo geometry_info(vsg::box(compute_bounds.bounds));
+
+    vsg::StateInfo state_info;
+    state_info.blending = true;
+    state_info.wireframe = true;
+
+    const auto box_outline = builder.createBox(geometry_info, state_info);
+
+    compile_result = viewer->compileManager->compile(box_outline);
+    this->children = {wireframe_outline, box_outline};
+    vsg::updateViewer(*viewer, compile_result);
+}
+
+OutlineStatic::OutlineStatic()
+{
     options = vsg::Options::create();
     options->sharedObjects = vsg::SharedObjects::create();
     options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
@@ -110,40 +159,4 @@ Outline::Outline(vsg::observer_ptr<vsg::Viewer> observer_viewer)
     builder.options = options;
     builder.sharedObjects = options->sharedObjects;
     builder.shaderSet = flat_shader;
-}
-
-void Outline::update(vsg::ref_ptr<vsg::PagedLOD> paged_lod)
-{
-    assert(paged_lod);
-
-    const vsg::ref_ptr<vsg::Viewer> viewer = observer_viewer;
-
-    const auto wireframe_outline = vsg::read_cast<vsg::Node>(
-        paged_lod->filename, options);
-
-    vsg::CompileResult compile_result = viewer->compileManager->compile(
-        wireframe_outline);
-
-    if (!compile_result)
-    {
-        std::fputs("Failed to compile wireframe outline\n", stderr);
-
-        return;
-    }
-
-    vsg::ComputeBounds compute_bounds;
-    compute_bounds.useNodeBounds = false;
-    wireframe_outline->accept(compute_bounds);
-
-    const vsg::GeometryInfo geometry_info(vsg::box(compute_bounds.bounds));
-
-    vsg::StateInfo state_info;
-    state_info.blending = true;
-    state_info.wireframe = true;
-
-    const auto box_outline = builder.createBox(geometry_info, state_info);
-
-    compile_result = viewer->compileManager->compile(box_outline);
-    this->children = {wireframe_outline, box_outline};
-    vsg::updateViewer(*viewer, compile_result);
 }

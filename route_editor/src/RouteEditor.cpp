@@ -110,8 +110,8 @@ bool RouteEditor::initialize()
     viewer = vsg::Viewer::create();
     vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
 
-    object_selector = ObjectSelector::create(settings, intersection_handler,
-        route, observer_viewer);
+    object_selector = ObjectSelector::create(settings, keyboard_handler,
+        intersection_handler, route, observer_viewer);
 
     viewer->addWindow(window);
 
