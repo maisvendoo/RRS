@@ -6,6 +6,7 @@
 #include "Outline.h"
 #include "Route.h"
 
+#include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
@@ -43,6 +44,7 @@ ObjectSelector::ObjectSelector(
 )
     : intersection_handler(intersection_handler)
     , route(route)
+    , observer_viewer(observer_viewer)
 {
     assert(intersection_handler);
     assert(route);
@@ -51,7 +53,7 @@ ObjectSelector::ObjectSelector(
     outline = Outline::create(observer_viewer);
 
     switch_group = vsg::Switch::create();
-    // switch_group->addChild(vsg::MASK_OFF, gizmo);
+    switch_group->addChild(vsg::MASK_OFF, gizmo);
     switch_group->addChild(vsg::MASK_OFF, outline);
 }
 
@@ -150,6 +152,8 @@ void ObjectSelector::select_object(vsg::ref_ptr<vsg::MatrixTransform> object)
 {
     assert(object);
 
+    const vsg::ref_ptr<vsg::Viewer> viewer = observer_viewer;
+
     if (selected_object)
     {
         deselect_object(selected_object);
@@ -163,7 +167,9 @@ void ObjectSelector::select_object(vsg::ref_ptr<vsg::MatrixTransform> object)
 
     selected_object = object;
 
+    const auto compile_result = viewer->compileManager->compile(switch_group);
     selected_object->addChild(switch_group);
+
     gizmo->set_outer_matrix(&selected_object->matrix);
 
     const auto pl_switch = selected_object->children[0].cast<vsg::Switch>();
@@ -174,6 +180,8 @@ void ObjectSelector::select_object(vsg::ref_ptr<vsg::MatrixTransform> object)
     {
         child.mask = MASK_GUI;
     }
+
+    vsg::updateViewer(*viewer, compile_result);
 }
 
 void ObjectSelector::deselect_object(vsg::ref_ptr<vsg::MatrixTransform> object)

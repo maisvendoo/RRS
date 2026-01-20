@@ -46,6 +46,7 @@ public:
 private:
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
     vsg::ref_ptr<Route> route;
+    vsg::observer_ptr<vsg::Viewer> observer_viewer;
     vsg::ref_ptr<vsg::Switch> switch_group;
     vsg::ref_ptr<vsg::MatrixTransform> selected_object;
     vsg::ref_ptr<Gizmo> gizmo;
