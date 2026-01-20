@@ -88,14 +88,19 @@ private:
     /// Зарядное давление
     double p_charge = 0.0;
 
+    /// Текущаяя скорость
     double v_cur = 0.0;
 
+    /// Дистанция до цели
     double dist_target = 0.0;
 
+    /// Число дополнительных ступеней разрядки ТМ
     uint8_t num_steps = 0;
 
+    /// Текущее ускорение поезда
     double a_cur = 0.0;
 
+    /// Ускорение поезда, задаваемое кривой снижения скорости
     double a_ref = 0.0;
 
     const double KRM_HANDLE_DELAY = 0.5;
@@ -111,6 +116,8 @@ private:
         (void) Y; (void) dYdt; (void) t;
     }
 
+    void load_config(CfgReader &cfg) override;
+
     /// Управление ЭПТ
     void stepEPB(double dv, bool &lock_traction, bool &is_disable_release);
 
@@ -120,10 +127,13 @@ private:
     /// Управление КВТ
     void stepKVT(bool is_motion_allowed, bool &is_disable_release);
 
+    /// Перевести кран в заданное положение с выдержкой в нем
     void setBrakeCranePos(int pos);
 
+    /// Выполнить ступень торможения ПТ
     void brakeStep(double pEQ, double p_charge, double dp);
 
+    /// Выполнить отпуск ПТ
     void brakeRelease(double pEQ, double p_charge, double dp_over);
 
 private slots:

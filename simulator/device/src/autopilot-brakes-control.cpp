@@ -32,16 +32,28 @@ void AutopilotBrakeController::step_control(bool is_EPB_ON,
                                             bool &lock_traction,
                                             bool &is_disable_release)
 {
+    // Управляем КВТ
+    stepKVT(is_motion_allowed, is_disable_release);
+
+    // Если включен ЭПТ
     if (is_EPB_ON)
     {
+        // Управляем им
         stepEPB(dv, lock_traction, is_disable_release);
     }
-    else
+    else // иначе - пичаль-пичалька
     {
+        // едем на превматике
         stepPB(dv, lock_traction, is_disable_release);
-    }
+    }    
+}
 
-    stepKVT(is_motion_allowed, is_disable_release);
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AutopilotBrakeController::load_config(CfgReader &cfg)
+{
+
 }
 
 //------------------------------------------------------------------------------
@@ -117,29 +129,33 @@ void AutopilotBrakeController::stepPB(double dv,
     // Максимальное снижение скорости относительно программной
     double dVplus = 3.0;
 
+    // Первысили кривую снижения скорости
     if (dv < dVminus)
     {
+        // Даем ступень
         brakeStep(pEQ, p_charge, 0.04);
+        // Запрет тяги
         lock_traction = true;
     }
 
-    if (dv >= dVminus && dv <= dVplus)
-    {
-
-    }
-
+    // Опустились достаточно низко под кривую снижения скорости, и если
+    // отпуск не запрещен и заблокирована тяга
     if (dv > dVplus && !is_disable_release && lock_traction)
     {
+        // полный отпуск до зарядного
         brakeRelease(pEQ, p_charge, 0.01);
+        // обнуляем число дополнительных ступеней торможения
         num_steps = 0;
     }
 
+    // При давлении в УР выше зарядного
     if (pEQ > p_charge)
     {
+        // Ставим кран во второе положение
         setBrakeCranePos(KRM_POS_II);
     }
 
-    // Запрет отпуска - ступень безусловно
+    // Запрет отпуска - ступень безусловно, если не задействован КВТ
     if (is_disable_release)
     {
         if (bc_state.loco_crane_pos_ref < 0.01)
@@ -199,12 +215,15 @@ void AutopilotBrakeController::brakeStep(double pEQ, double p_charge, double dp)
     {
         if (!brake_timer->isStarted())
         {
+            // Даем разрядку до заданной глубины
             bc_state.brake_crane_pos_ref = KRM_POS_V;
+            // Запускаем таймер выдержки времени на данной ступени
             brake_timer->start();
         }
     }
     else
     {
+        // Ставим в перекрышу при достаточной глубине разрядки
         setBrakeCranePos(KRM_POS_IV);
     }
 }
@@ -214,6 +233,7 @@ void AutopilotBrakeController::brakeStep(double pEQ, double p_charge, double dp)
 //------------------------------------------------------------------------------
 void AutopilotBrakeController::brakeRelease(double pEQ, double p_charge, double dp_over)
 {
+    // Отпуск первым положением до заданного давления в УР
     if (pEQ >= p_charge + dp_over)
     {
         setBrakeCranePos(KRM_POS_II);
@@ -232,13 +252,19 @@ void AutopilotBrakeController::slotBrakeCraneHandle()
     krm_handle_timer->stop();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AutopilotBrakeController::slotBrakeDelay()
 {
+    // Останавливаем таймер выдержки в ступени
     brake_timer->stop();
 
-    // Оценка эффективности торможения
+    // Оценка эффективности торможения по текущему ускорению
+    // и ускорению на кривой снижения скорости
     if (a_cur > -a_ref)
     {
+        // Добавляем дополнительную ступень разрядки
         num_steps++;
     }
 }

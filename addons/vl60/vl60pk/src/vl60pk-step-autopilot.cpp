@@ -91,16 +91,20 @@ void VL60pk::stepAutopilot(double t, double dt)
     // Действия по управлению, только если автоведение активно
     if (autopilot[cab_idx]->isActive())
     {
+        // Проверка бдительности
         auto_control[cab_idx]->press_RB ? rb[cab_idx][RBS].set() : rb[cab_idx][RBS].reset();
 
+        // Управление КМ
         controller[cab_idx]->setMainHandlePos(auto_control[cab_idx]->km_pos_ref);
 
+        // Управление КрМ
         brake_crane[cab_idx]->setHandlePosition(auto_control[cab_idx]->krm_pos);
 
+        // Управление КВТ
         loco_crane[cab_idx]->setHandlePosition(auto_control[cab_idx]->kvt_pos);
-    }
 
-
-    auto_control[cab_idx]->spotlight_ON ? spotlight_low_tumbler[cab_idx].set() :
+        // Управление прожектором
+        auto_control[cab_idx]->spotlight_ON ? spotlight_low_tumbler[cab_idx].set() :
             spotlight_low_tumbler[cab_idx].reset();
+    }    
 }
