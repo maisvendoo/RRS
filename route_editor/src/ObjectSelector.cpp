@@ -10,6 +10,7 @@
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
+#include <vsg/nodes/PagedLOD.h>
 #include <vsg/nodes/Switch.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/LineSegmentIntersector.h>
@@ -73,24 +74,10 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    if (selected_object)
+    // If we have selected object and clicked on Gizmo
+    if (selected_object && gizmo->handle_intersections(lmb_intersector))
     {
-        if (gizmo->handle_intersections(lmb_intersector))
-        {
-            return;
-        }
-
-        route->accept(*lmb_intersector);
-
-        auto& intersections = lmb_intersector->intersections;
-        if (intersections.empty())
-        {
-
-        }
-    }
-    else
-    {
-
+        return;
     }
 
     route->accept(*lmb_intersector);
@@ -98,18 +85,20 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     auto& intersections = lmb_intersector->intersections;
     if (intersections.empty())
     {
+        // If we clicked on empty space while object was selected
+        if (selected_object)
+        {
+            deselect_object(selected_object);
+            selected_object = nullptr;
+        }
+
         return;
     }
 
     intersection_handler->sort_intersections(lmb_intersector);
 
-    const auto intersection = intersections.front();
-
-    const auto& node_path = intersection->nodePath;
-    if (node_path.empty())
-    {
-        return;
-    }
+    const auto& node_path = intersections.front()->nodePath;
+    assert(!node_path.empty());
 
     for (const vsg::Node* const node : node_path)
     {
@@ -122,15 +111,21 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
             continue;
         }
 
-        selected_object = matrix_transform;
+        const auto& children = matrix_transform->children;
+        if (children.empty())
+        {
+            continue;
+        }
 
-        break;
+        const auto paged_lod = children[0].cast<vsg::PagedLOD>();
+        if (paged_lod)
+        {
+            select_object(matrix_transform);
+            break;
+        }
     }
 
-    if (!selected_object)
-    {
-        return;
-    }
+    intersections.clear();
 }
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
@@ -147,21 +142,24 @@ void ObjectSelector::select_object(vsg::ref_ptr<vsg::MatrixTransform> object)
 {
     assert(object);
 
-    const auto prev_object = selected_object;
-    selected_object = object;
-
-    if (prev_object == selected_object)
+    if (selected_object)
     {
+        deselect_object(selected_object);
+    }
+
+    if (selected_object == object)
+    {
+        selected_object = nullptr;
         return;
     }
 
-    if (prev_object)
-    {
-        deselect_object(prev_object);
-    }
+    selected_object = object;
 
     selected_object->addChild(switch_group);
     gizmo->set_outer_matrix(&selected_object->matrix);
+
+    const auto paged_lod = selected_object->children[0].cast<vsg::PagedLOD>();
+    outline->update(paged_lod);
 
     for (auto& child : switch_group->children)
     {
