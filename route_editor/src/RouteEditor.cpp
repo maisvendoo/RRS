@@ -24,7 +24,6 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>
 #include <vsg/io/Options.h>
-#include <vsg/nodes/Group.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
 #include <vsg/state/GraphicsPipeline.h>
@@ -88,12 +87,10 @@ bool RouteEditor::initialize()
         vsg::ClearAttachments::Attachments{attachment},
         vsg::ClearAttachments::Rects{rect});
 
-    gui_group = vsg::Group::create();
-
     const auto scene_view = vsg::View::create(camera, scene_graph);
     scene_view->mask = MASK_SCENE;
 
-    const auto gui_view = vsg::View::create(camera, gui_group);
+    const auto gui_view = vsg::View::create(camera, scene_graph);
     gui_view->mask = MASK_GUI;
 
     const auto editor_gui = EditorGui::create(state,
@@ -114,7 +111,7 @@ bool RouteEditor::initialize()
     vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
 
     object_selector = ObjectSelector::create(settings, intersection_handler,
-        route, gui_group, observer_viewer);
+        route, observer_viewer);
 
     viewer->addWindow(window);
 

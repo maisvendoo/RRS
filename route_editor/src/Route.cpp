@@ -1,6 +1,7 @@
 #include "Route.h"
 
 #include <CfgReader.h>
+#include "Mask.h"
 #include "ObjectProperties.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
@@ -13,6 +14,7 @@
 
 #include <vsg/app/CompileManager.h>
 #include <vsg/app/Viewer.h>
+#include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
@@ -21,6 +23,7 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/Switch.h>
 
 #include <QString>
 
@@ -207,9 +210,12 @@ void Route::load_static_objects(
 
         const vsg::mat4 translate = vsg::translate(translation);
 
+        const auto paged_lod_switch = vsg::Switch::create();
+        paged_lod_switch->addChild(vsg::Mask{MASK_SCENE}, paged_lod_it->second);
+
         const auto matrix_transform = vsg::MatrixTransform::create();
         matrix_transform->matrix = translate * rotate_z * rotate_y * rotate_x;
-        matrix_transform->addChild(paged_lod_it->second);
+        matrix_transform->addChild(paged_lod_switch);
         matrix_transform->setValue("properties", properties);
 
         const vsg::CompileResult compile_result =
@@ -370,9 +376,12 @@ void Route::load_signals(
         properties.translation.y = pos.y;
         properties.translation.z = pos.z;
 
+        const auto paged_lod_switch = vsg::Switch::create();
+        paged_lod_switch->addChild(vsg::Mask{MASK_SCENE}, paged_lod);
+
         const auto matrix_transform = vsg::MatrixTransform::create();
         matrix_transform->matrix = translate * rotate;
-        matrix_transform->addChild(paged_lod);
+        matrix_transform->addChild(paged_lod_switch);
         matrix_transform->setValue("properties", properties);
 
         const vsg::CompileResult compile_result =

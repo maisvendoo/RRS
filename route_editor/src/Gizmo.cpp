@@ -70,12 +70,12 @@ bool Gizmo::handle_intersections(
 
 void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
 {
-
+    (void)buttonRelease;
 }
 
 void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 {
-
+    (void)moveEvent;
 }
 
 void Gizmo::set_outer_matrix(vsg::dmat4* outer_matrix)

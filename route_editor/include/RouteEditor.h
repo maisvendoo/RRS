@@ -18,7 +18,6 @@ namespace vsg
 {
 
 class ClearAttachments;
-class Group;
 class Options;
 class RenderGraph;
 class Viewer;
@@ -48,7 +47,6 @@ private:
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::ref_ptr<vsg::ClearAttachments> clear_attachments;
-    vsg::ref_ptr<vsg::Group> gui_group;
     vsg::ref_ptr<vsg::RenderGraph> render_graph;
     vsg::ref_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<ObjectSelector> object_selector;

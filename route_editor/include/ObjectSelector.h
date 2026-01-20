@@ -17,7 +17,6 @@ namespace vsg
 
 class ButtonPressEvent;
 class ButtonReleaseEvent;
-class Group;
 class MatrixTransform;
 class MoveEvent;
 class Switch;
@@ -32,7 +31,6 @@ public:
         const settings_t& settings,
         vsg::ref_ptr<IntersectionHandler> intersection_handler,
         vsg::ref_ptr<Route> route,
-        vsg::ref_ptr<vsg::Group> gui_group,
         vsg::observer_ptr<vsg::Viewer> observer_viewer
     );
 

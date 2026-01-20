@@ -39,7 +39,6 @@ ObjectSelector::ObjectSelector(
     const settings_t& settings,
     vsg::ref_ptr<IntersectionHandler> intersection_handler,
     vsg::ref_ptr<Route> route,
-    vsg::ref_ptr<vsg::Group> gui_group,
     vsg::observer_ptr<vsg::Viewer> observer_viewer
 )
     : intersection_handler(intersection_handler)
@@ -47,16 +46,13 @@ ObjectSelector::ObjectSelector(
 {
     assert(intersection_handler);
     assert(route);
-    assert(gui_group);
 
     gizmo = Gizmo::create(settings);
     outline = Outline::create(observer_viewer);
 
     switch_group = vsg::Switch::create();
-    switch_group->addChild(vsg::MASK_OFF, gizmo);
+    // switch_group->addChild(vsg::MASK_OFF, gizmo);
     switch_group->addChild(vsg::MASK_OFF, outline);
-
-    gui_group->addChild(switch_group);
 }
 
 ObjectSelector::~ObjectSelector() = default;
@@ -111,13 +107,25 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
             continue;
         }
 
-        const auto& children = matrix_transform->children;
-        if (children.empty())
+        const auto& mt_children = matrix_transform->children;
+        if (mt_children.empty())
         {
             continue;
         }
 
-        const auto paged_lod = children[0].cast<vsg::PagedLOD>();
+        const auto paged_lod_switch = mt_children[0].cast<vsg::Switch>();
+        if (!paged_lod_switch)
+        {
+            continue;
+        }
+
+        const auto& pl_switch_children = paged_lod_switch->children;
+        if (pl_switch_children.empty())
+        {
+            continue;
+        }
+
+        const auto paged_lod = pl_switch_children[0].node.cast<vsg::PagedLOD>();
         if (paged_lod)
         {
             select_object(matrix_transform);
@@ -158,7 +166,8 @@ void ObjectSelector::select_object(vsg::ref_ptr<vsg::MatrixTransform> object)
     selected_object->addChild(switch_group);
     gizmo->set_outer_matrix(&selected_object->matrix);
 
-    const auto paged_lod = selected_object->children[0].cast<vsg::PagedLOD>();
+    const auto pl_switch = selected_object->children[0].cast<vsg::Switch>();
+    const auto paged_lod = pl_switch->children[0].node.cast<vsg::PagedLOD>();
     outline->update(paged_lod);
 
     for (auto& child : switch_group->children)
