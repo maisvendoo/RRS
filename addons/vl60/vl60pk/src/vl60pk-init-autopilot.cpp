@@ -52,20 +52,15 @@ void VL60pk::slotInitTrainForAutopilot()
         autopilot[cab_idx]->setTrainLength(train_len);
     }
 
-    // Кое-какие другие действия при активации автоведения
-
-    // Если выключен ЭПТ, то включаем его
-    if (!epb_control->stateReleaseLamp())
+    // Кое-какие другие действия при активации автоведения    
+    if (controller[CAB1]->isReversHandle())
     {
-        if (controller[CAB1]->isReversHandle())
-        {
-            prepareCabineForAutopilot(CAB1, CAB2);
-        }
+        prepareCabineForAutopilot(CAB1, CAB2);
+    }
 
-        if (controller[CAB2]->isReversHandle())
-        {
-            prepareCabineForAutopilot(CAB2, CAB1);
-        }
+    if (controller[CAB2]->isReversHandle())
+    {
+        prepareCabineForAutopilot(CAB2, CAB1);
     }
 }
 
@@ -77,7 +72,11 @@ void VL60pk::prepareCabineForAutopilot(int my_cab_idx, int other_cab_idx)
     // В нашей кабине
 
     // включаем ЭПТ
-    epb_switch[my_cab_idx].set();
+    if (!epb_control->stateReleaseLamp())
+    {
+        epb_switch[my_cab_idx].set();
+    }
+
     // зажигаем белые буферные
     P_bufferlight_L_tumbler[my_cab_idx].set();
     P_bufferlight_R_tumbler[my_cab_idx].set();
