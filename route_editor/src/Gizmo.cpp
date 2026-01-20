@@ -79,6 +79,11 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
     (void)moveEvent;
 }
 
+void Gizmo::update()
+{
+
+}
+
 static vsg::ref_ptr<vsg::Node> create_arrow(
     const settings_t& settings,
     vsg::Builder& builder,

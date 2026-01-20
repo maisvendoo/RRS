@@ -145,6 +145,8 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     }
 
     intersections.clear();
+
+    gizmo->update();
 }
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
@@ -172,6 +174,19 @@ void ObjectSelector::select_object(
     const auto found_it = selected_objects.find(object);
     const bool clicked_on_selected_object = (found_it != selected_objects.end());
 
+    const auto select_object_inner = [&]() -> void {
+        const auto outline = Outline::create(paged_lod, observer_viewer);
+
+        const auto outline_switch = vsg::Switch::create();
+        outline_switch->addChild(vsg::Mask{MASK_GUI}, outline);
+
+        const auto compile_result = viewer->compileManager->compile(outline_switch);
+        object->addChild(outline_switch);
+        vsg::updateViewer(*viewer, compile_result);
+
+        selected_objects[object] = outline_switch;
+    };
+
     if (is_shift)
     {
         if (clicked_on_selected_object)
@@ -181,71 +196,81 @@ void ObjectSelector::select_object(
         }
         else
         {
-            const auto outline = Outline::create(paged_lod, observer_viewer);
+            select_object_inner();
+            return;
+        }
+    }
+    else
+    {
+        if (selected_objects_were_empty)
+        {
+            select_object_inner();
+            return;
+        }
+        else if (clicked_on_selected_object)
+        {
+            if (selected_objects.size() == 1)
+            {
+                deselect_object(object);
+                return;
+            }
+            else
+            {
+                for (auto it = selected_objects.begin(); it != selected_objects.end();)
+                {
+                    if (it->first == object)
+                    {
+                        ++it;
+                    }
+                    else
+                    {
+                        it = deselect_object(it->first);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (auto it = selected_objects.begin();
+                it != selected_objects.end();
+                it = deselect_object(it->first));
 
-            const auto outline_switch = vsg::Switch::create();
-            outline_switch->addChild(vsg::Mask{MASK_GUI}, outline);
-
-            object->addChild(outline_switch);
-
-            selected_objects[object] = outline_switch;
-
+            select_object_inner();
             return;
         }
     }
 
-    // if (selected_object)
-    // {
-    //     deselect_object(selected_object);
-    // }
-
-    // if (selected_object == object)
-    // {
-    //     selected_object = nullptr;
-    //     return;
-    // }
-
-    // selected_object = object;
-
-    // const auto compile_result = viewer->compileManager->compile(switch_group);
-    // selected_object->addChild(switch_group);
-
-    // gizmo->set_outer_matrix(&selected_object->matrix);
-
-    // const auto pl_switch = selected_object->children[0].cast<vsg::Switch>();
-    // const auto paged_lod = pl_switch->children[0].node.cast<vsg::PagedLOD>();
-    // outline->update(paged_lod);
-
-    // for (auto& child : switch_group->children)
-    // {
-    //     child.mask = MASK_GUI;
-    // }
-
-    // vsg::updateViewer(*viewer, compile_result);
+    if (selected_objects_were_empty)
+    {
+        gizmo_switch->children[0].mask = MASK_GUI;
+    }
 }
 
 SelectedObjectIterator ObjectSelector::deselect_object(MatTransPtr object)
 {
     assert(object);
 
-    const bool is_shift = keyboard_handler->get_shift_state();
+    auto object_pair_it = selected_objects.find(object);
+    const auto matrix_transform = object_pair_it->first;
+    const auto outline_switch = object_pair_it->second;
 
-    // auto& children = object->children;
-    // assert(!children.empty());
+    for (auto it = matrix_transform->children.begin();
+        it != matrix_transform->children.end();
+        ++it)
+    {
+        if (*it == outline_switch)
+        {
+            matrix_transform->children.erase(it);
+            break;
+        }
+    }
 
-    // for (auto it = children.begin(); it != children.end(); ++it)
-    // {
-    //     if (*it == switch_group)
-    //     {
-    //         children.erase(it);
-    //         break;
-    //     }
-    // }
+    object_pair_it = selected_objects.erase(object_pair_it);
 
-    // gizmo->set_outer_matrix(nullptr);
+    if (selected_objects.empty())
+    {
+        gizmo_switch->children[0].mask = vsg::MASK_OFF;
+    }
 
-    // for (auto& child : switch_group->children)
-    // {
-    //     child.mask = vsg::MASK_OFF;
-    // }
+    return object_pair_it;
 }

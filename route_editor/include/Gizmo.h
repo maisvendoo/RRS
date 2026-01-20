@@ -40,6 +40,8 @@ public:
     void apply(const vsg::ButtonReleaseEvent& buttonRelease);
     void apply(const vsg::MoveEvent& moveEvent);
 
+    void update();
+
 private:
     const SelectedObjectsMap& selected_objects;
     vsg::ref_ptr<vsg::Node> arrow_x;
