@@ -16,9 +16,12 @@ public:
 
     ~VL60Autopilot();
 
-    auto_control_t *getControl() override;    
+    auto_control_t *getControl() override;
 
     void step(double t, double dt) override;
+
+    void initAutoBrakeControl(const QString& modules_dir,
+                              const QString& custom_cfg_dir) override;
 
 private:
 

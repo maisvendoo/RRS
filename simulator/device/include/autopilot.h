@@ -77,6 +77,12 @@ public:
 
     QString getDbgMsg();
 
+    virtual void initAutoBrakeControl(const QString& modules_dir,
+                                      const QString& custom_cfg_dir)
+    {
+
+    }
+
 signals:
 
     void sigInitTrainLength();

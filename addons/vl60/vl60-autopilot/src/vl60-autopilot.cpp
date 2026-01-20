@@ -37,6 +37,15 @@ void VL60Autopilot::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60Autopilot::initAutoBrakeControl(const QString &modules_dir,
+                                         const QString &custom_cfg_dir)
+{
+    brake_control->read_config("vl60-autopilot", custom_cfg_dir);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60Autopilot::preStep(state_vector_t &Y, double t)
 {
     // Приводим общую структуру обратной связи к нашему типу

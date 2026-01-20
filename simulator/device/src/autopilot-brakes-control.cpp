@@ -53,7 +53,22 @@ void AutopilotBrakeController::step_control(bool is_EPB_ON,
 //------------------------------------------------------------------------------
 void AutopilotBrakeController::load_config(CfgReader &cfg)
 {
+    QString secName = "Device";
 
+    cfg.getDouble(secName, "dVminusEPB", dVminusEPB);
+    cfg.getDouble(secName, "dVplusEPB", dVplusEPB);
+    cfg.getDouble(secName, "dVminusPB", dVminusPB);
+    cfg.getDouble(secName, "dVplusPB", dVplusPB);
+    cfg.getDouble(secName, "dpEPB_over", dpEPB_over);
+    cfg.getDouble(secName, "dpPB_over", dpPB_over);
+    cfg.getDouble(secName, "dpFirstStep", dp_first_step);
+    cfg.getDouble(secName, "dpOtherStep", dp_other_step);
+
+    cfg.getDouble(secName, "HoldTimeout", hold_timeout);
+
+    brake_timer->setTimeout(hold_timeout);
+
+    cfg.getDouble(secName, "pBC_EPB", pBC_EPB);
 }
 
 //------------------------------------------------------------------------------
@@ -64,9 +79,9 @@ void AutopilotBrakeController::stepEPB(double dv,
                                        bool &is_disable_release)
 {
     // Максимальное превышение над программной скоростью
-    const double dVminus = -0.5;
+    const double dVminus = -dVminusEPB;
     // Максимальное снижение скорости относительно программной
-    const double dVplus = 3.0;
+    const double dVplus = dVplusEPB;
 
     // Превышаем программую скорость
     if (dv < dVminus)
@@ -96,7 +111,7 @@ void AutopilotBrakeController::stepEPB(double dv,
         if ( pBC < 0.1)
         {
             // если нет завышения в УР
-            if (pEQ < p_charge + 0.02)
+            if (pEQ < p_charge + dpEPB_over)
             {
                 // Первое
                 setBrakeCranePos(KRM_POS_I);
@@ -111,7 +126,7 @@ void AutopilotBrakeController::stepEPB(double dv,
     }
 
     // Не забываем рукоятку крана в первом положении!!!
-    if (pEQ >= p_charge + 0.02 && bc_state.brake_crane_pos_ref == KRM_POS_I)
+    if (pEQ >= p_charge + dpEPB_over && bc_state.brake_crane_pos_ref == KRM_POS_I)
     {
         setBrakeCranePos(KRM_POS_II);
     }
@@ -125,15 +140,15 @@ void AutopilotBrakeController::stepPB(double dv,
                                       bool &is_disable_release)
 {
     // Максимальное превышение над программной скоростью
-    const double dVminus = -0.5;
+    const double dVminus = -dVminusPB;
     // Максимальное снижение скорости относительно программной
-    double dVplus = 3.0;
+    double dVplus = dVplusPB;
 
     // Первысили кривую снижения скорости
     if (dv < dVminus)
     {
         // Даем ступень
-        brakeStep(pEQ, p_charge, 0.04);
+        brakeStep(pEQ, p_charge, dp_first_step);
         // Запрет тяги
         lock_traction = true;
     }
@@ -143,7 +158,7 @@ void AutopilotBrakeController::stepPB(double dv,
     if (dv > dVplus && !is_disable_release && lock_traction)
     {
         // полный отпуск до зарядного
-        brakeRelease(pEQ, p_charge, 0.01);
+        brakeRelease(pEQ, p_charge, dpPB_over);
         // обнуляем число дополнительных ступеней торможения
         num_steps = 0;
     }
@@ -160,7 +175,7 @@ void AutopilotBrakeController::stepPB(double dv,
     {
         if (bc_state.loco_crane_pos_ref < 0.01)
         {
-            brakeStep(pEQ, p_charge, 0.04);
+            brakeStep(pEQ, p_charge, dp_first_step);
         }
     }
 }
@@ -240,7 +255,10 @@ void AutopilotBrakeController::brakeRelease(double pEQ, double p_charge, double 
     }
     else
     {
-        setBrakeCranePos(KRM_POS_I);
+        if (pEQ < p_charge - 0.01)
+        {
+            setBrakeCranePos(KRM_POS_I);
+        }
     }
 }
 

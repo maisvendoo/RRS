@@ -21,5 +21,26 @@
 		<SpeedLimit_RY>60.0</SpeedLimit_RY>
 		<!-- Скорость движения для запрета отпуска -->
 		<SpeedDisableRelease>5.0</SpeedDisableRelease>
+
+		<!-- Первышение скорости при торможении ЭПТ -->
+		<dVminusEPB>0.5</dVminusEPB>
+		<!-- Снижение скорости при отпуске ЭПТ -->
+		<dVplusEPB>3.0</dVplusEPB>		
+		<!-- Превышение скосрости при торможении ПТ -->
+		<dVminusPB>0.5</dVminusPB>
+		<!-- Снижение скорости при отпуске ПТ -->		
+		<dVplusPB>3.0</dVplusPB>
+		<!-- Завышение при отпуске ЭПТ -->
+		<dpEPB_over>0.02</dpEPB_over>
+		<!-- Завышение при отпуске ПТ -->
+		<dpPB_over>0.0</dpPB_over>
+		<!-- Глубина разрядки ТМ при первой ступени -->
+		<dpFirstStep>0.04</dpFirstStep>
+		<!-- Величина последующих ступеней -->
+		<dpOtherStep>0.02</dpOtherStep>
+		<!-- Время в перекрыше для оценки эффективности ступени -->
+		<HoldTimeout>2.0</HoldTimeout>
+		<!-- Минимальная ступень ЭПТ -->
+		<pBC_EPB>0.1</pBC_EPB>
 	</Device>
 </Config>
