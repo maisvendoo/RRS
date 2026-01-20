@@ -91,20 +91,42 @@ void MapWidget::paintEvent(QPaintEvent *event)
     painter.fillRect(rect(), QColor(150, 150, 150));
     QWidget::paintEvent(event);
 
-    if (traj_list == nullptr)
+    if ((traj_list == nullptr) || (conn_list == nullptr))
     {
         return;
     }
 
-    if (conn_list == nullptr)
-    {
-        return;
-    }
+    QPointF mouse_pos_current = mapFromGlobal(QCursor::pos());
+    double dist2_to_nearest_trajectory = std::numeric_limits<double>::max();
+    double dist2_to_nearest_connector = std::numeric_limits<double>::max();
+    Trajectory* nearest_trajectory = nullptr;
+    Connector* nearest_connector = nullptr;
 
     for (auto traj : *traj_list)
     {
-        drawTrajectory(traj);
+        double distance2 = std::numeric_limits<double>::max();
+        drawTrajectory(traj, mouse_pos_current, distance2);
+
+        if (dist2_to_nearest_trajectory > distance2)
+        {
+            dist2_to_nearest_trajectory = distance2;
+            nearest_trajectory = traj;
+        }
     }
+
+    for (auto conn : *conn_list)
+    {
+        double distance2 = std::numeric_limits<double>::max();
+        drawConnector(conn, mouse_pos_current, distance2);
+
+        if (dist2_to_nearest_connector > distance2)
+        {
+            dist2_to_nearest_connector = distance2;
+            nearest_connector = conn;
+        }
+    }
+
+    drawSignals(signals_data);
 
     if (train_data == nullptr)
     {
@@ -123,13 +145,9 @@ void MapWidget::paintEvent(QPaintEvent *event)
         }
     }
 
-    drawTrain(train_data);
+    drawTrains(train_data);
 
     drawTrainNames(train_data);
-
-    drawConnectors(conn_list);
-
-    drawSignals(signals_data);
 
     if (stations == nullptr)
     {
@@ -142,7 +160,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawTrajectory(Trajectory *traj)
+void MapWidget::drawTrajectory(Trajectory* traj, QPointF& cursor_pos, double& distance2)
 {
     QPen pen;
 
@@ -169,6 +187,12 @@ void MapWidget::drawTrajectory(Trajectory *traj)
         QPoint p1 = coord_transform(track.end_point);
 
         painter.drawLine(p0, p1);
+
+        double track_distance2 = distance2_pos_to_line_segment(cursor_pos, p0, p1);
+        if (distance2 > track_distance2)
+        {
+            distance2 = track_distance2;
+        }
     }
 
 
@@ -197,7 +221,7 @@ void MapWidget::drawTrajectory(Trajectory *traj)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawTrain(simulator_update_pos_t *train_data)
+void MapWidget::drawTrains(simulator_update_pos_t *train_data)
 {
     for (size_t i = 0; i < train_data->vehicles.size(); ++i)
     {
@@ -280,18 +304,7 @@ void MapWidget::drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &veh
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawConnectors(conn_list_t *conn_list)
-{
-    for (auto conn : *conn_list)
-    {
-        drawConnector(conn);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MapWidget::drawConnector(Connector *conn)
+void MapWidget::drawConnector(Connector* conn, QPointF& cursor_pos, double& distance2)
 {
     if (conn == nullptr)
     {
@@ -315,6 +328,7 @@ void MapWidget::drawConnector(Connector *conn)
     track_t bwd_track = bwd_traj->getLastTrack();
     dvec3 center = fwd_track.begin_point;
     QPoint center_point = coord_transform(center);
+    distance2 = distance2_pos_to_point(cursor_pos, center_point);
 
     QColor color = QColor(96, 96, 96);
     int r = 4 + std::floor(sqrt(scale));
@@ -690,6 +704,50 @@ QPoint MapWidget::coord_transform(dvec3 point)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+double MapWidget::distance2_pos_to_point(const QPointF& pos, const QPointF& point)
+{
+    double vec[2] = {double(point.x()) - double(pos.x()), double(point.y()) - double(pos.y())};
+    return vec[0] * vec[0] + vec[1] * vec[1];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double MapWidget::distance_pos_to_point(const QPointF& pos, const QPointF& point)
+{
+    return std::sqrt(distance2_pos_to_point(pos, point));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double MapWidget::distance2_pos_to_line_segment(const QPointF& pos, const QPointF& pointA, const QPointF& pointB)
+{
+    if (distance2_pos_to_point(pointA, pointB) < 1.0)
+    {
+        QPointF mean_point = (pointA + pointB) / 2.0;
+        return distance2_pos_to_point(pos, mean_point);
+    }
+    double vec_A_pos[2] = {double(pos.x()) - double(pointA.x()), double(pos.y()) - double(pointA.y())};
+    double vec_A_B[2] = {double(pointB.x()) - double(pointA.x()), double(pointB.y()) - double(pointA.y())};
+    double t = (vec_A_pos[0] * vec_A_B[0] + vec_A_pos[1] * vec_A_B[1])
+               / (vec_A_B[0] * vec_A_B[0] + vec_A_B[1] * vec_A_B[1]);
+    t = std::clamp(t, 0.0, 1.0);
+    double vec_pos_tAB[2] = {vec_A_B[0] * t - vec_A_pos[0], vec_A_B[1] * t - vec_A_pos[1]};
+    return vec_pos_tAB[0] * vec_pos_tAB[0] + vec_pos_tAB[1] * vec_pos_tAB[1];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double MapWidget::distance_pos_to_line_segment(const QPointF& pos, const QPointF& pointA, const QPointF& pointB)
+{
+    return std::sqrt(distance_pos_to_line_segment(pos, pointA, pointB));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MapWidget::wheelEvent(QWheelEvent *event)
 {
     // Вектор из центра карты к курсору
@@ -724,7 +782,7 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton)
     {
-        map_shift = prev_map_shift + event->pos() - mouse_pos;
+        map_shift = prev_map_shift + event->pos() - mouse_pos_LBpressed;
     }
 }
 
@@ -740,7 +798,7 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
             follow_player = false;
             prev_map_shift = map_shift;
         }
-        mouse_pos = event->pos();
+        mouse_pos_LBpressed = event->pos();
     }
 
     if (event->button() == Qt::MiddleButton)
