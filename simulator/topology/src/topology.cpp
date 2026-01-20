@@ -232,54 +232,6 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::line_signals_step(double t, double dt)
-{
-    for (auto line_signal : signals_data.line_signals)
-    {
-        if (line_signal == nullptr)
-        {
-            continue;
-        }
-
-        line_signal->step(t, dt);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Topology::enter_signals_step(double t, double dt)
-{
-    for (auto enter_signal : signals_data.enter_signals)
-    {
-        if (enter_signal == nullptr)
-        {
-            continue;
-        }
-
-        enter_signal->step(t, dt);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Topology::exit_signals_step(double t, double dt)
-{
-    for (auto exit_signal : signals_data.exit_signals)
-    {
-        if (exit_signal == nullptr)
-        {
-            continue;
-        }
-
-        exit_signal->step(t, dt);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 route_segment_t Topology::find_route(Trajectory *start_traj,
                                      Trajectory *target_traj,
                                      int dir)
@@ -575,11 +527,22 @@ void Topology::step(double t, double dt)
         (*conn)->step(t, dt);
     }
 
-    line_signals_step(t, dt);
+    for (auto& signals_array : {signals_data.line_signals,
+                                signals_data.enter_signals,
+                                signals_data.route_signals,
+                                signals_data.exit_signals,
+                                signals_data.shunt_signals})
+    {
+        for (auto& signal : signals_array)
+        {
+            if (signal == nullptr)
+            {
+                continue;
+            }
 
-    enter_signals_step(t, dt);
-
-    exit_signals_step(t, dt);
+            signal->step(t, dt);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -881,6 +844,23 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         signal_dir_bwd = -1;
     }
 
+    auto configure_signal = [](Signal* signal, Connector* conn, int direction,
+                               QString signal_letter, QString signal_model,
+                               dvec3 relative_position, dvec3 relative_rotation)
+    {
+        if (direction == 1)
+            conn->setSignalFwd(signal);
+        if (direction == -1)
+            conn->setSignalBwd(signal);
+
+        signal->setConnector(conn);
+        signal->setDirection(direction);
+        signal->setLetter(signal_letter);
+        signal->setSignalModel(signal_model);
+        signal->setRelPosition(relative_position);
+        signal->setRelRotation(relative_rotation);
+    };
+
     if (signal_dir_fwd == 1)
     {
         QString tmp;
@@ -905,55 +885,51 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         if (signal_model_fwd.right(4) == "line")
         {
             LineSignal *signal = new LineSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_fwd);
-            signal->setSignalModel(signal_model_fwd);
-            signal->setConnector(conn);
-
-            conn->setSignalFwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_fwd,
+                             signal_letter, signal_model_fwd,
+                             rel_pos, rel_rot);
             signals_data.line_signals.push_back(signal);
-
             Journal::instance()->info("Loaded line signal " + signal->getLetter());
         }
 
-        if ( (signal_model_fwd.right(4) == "entr") || (signal_model_fwd.right(4) == "rout") )
+        if (signal_model_fwd.right(4) == "entr")
         {
             EnterSignal *signal = new EnterSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_fwd);
-            signal->setSignalModel(signal_model_fwd);
-            signal->setConnector(conn);
-
-            conn->setSignalFwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_fwd,
+                             signal_letter, signal_model_fwd,
+                             rel_pos, rel_rot);
             signals_data.enter_signals.push_back(signal);
-
             Journal::instance()->info("Loaded enter signal " + signal->getLetter());
+        }
+
+        if (signal_model_fwd.right(4) == "rout")
+        {
+            RouteSignal *signal = new RouteSignal;
+            configure_signal(signal, conn, signal_dir_fwd,
+                             signal_letter, signal_model_fwd,
+                             rel_pos, rel_rot);
+            signals_data.route_signals.push_back(signal);
+            Journal::instance()->info("Loaded route signal " + signal->getLetter());
         }
 
         if (signal_model_fwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_fwd);
-            signal->setSignalModel(signal_model_fwd);
-            signal->setConnector(conn);
-
-            conn->setSignalFwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_fwd,
+                             signal_letter, signal_model_fwd,
+                             rel_pos, rel_rot);
             signals_data.exit_signals.push_back(signal);
-
             Journal::instance()->info("Loaded exit signal " + signal->getLetter());
+        }
+
+        if (signal_model_fwd.right(4) == "shnt")
+        {
+            ShuntingSignal *signal = new ShuntingSignal;
+            configure_signal(signal, conn, signal_dir_fwd,
+                             signal_letter, signal_model_fwd,
+                             rel_pos, rel_rot);
+            signals_data.shunt_signals.push_back(signal);
+            Journal::instance()->info("Loaded shunting signal " + signal->getLetter());
         }
     }
 
@@ -981,55 +957,51 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         if (signal_model_bwd.right(4) == "line")
         {
             LineSignal *signal = new LineSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_bwd);
-            signal->setSignalModel(signal_model_bwd);
-            signal->setConnector(conn);
-
-            conn->setSignalBwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_bwd,
+                             signal_letter, signal_model_bwd,
+                             rel_pos, rel_rot);
             signals_data.line_signals.push_back(signal);
-
             Journal::instance()->info("Loaded line signal " + signal->getLetter());
         }
 
-        if ( (signal_model_bwd.right(4) == "entr") || (signal_model_bwd.right(4) == "rout") )
+        if (signal_model_bwd.right(4) == "entr")
         {
             EnterSignal *signal = new EnterSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_bwd);
-            signal->setSignalModel(signal_model_bwd);
-            signal->setConnector(conn);
-
-            conn->setSignalBwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_bwd,
+                             signal_letter, signal_model_bwd,
+                             rel_pos, rel_rot);
             signals_data.enter_signals.push_back(signal);
-
             Journal::instance()->info("Loaded enter signal " + signal->getLetter());
+        }
+
+        if (signal_model_bwd.right(4) == "rout")
+        {
+            RouteSignal *signal = new RouteSignal;
+            configure_signal(signal, conn, signal_dir_bwd,
+                             signal_letter, signal_model_bwd,
+                             rel_pos, rel_rot);
+            signals_data.route_signals.push_back(signal);
+            Journal::instance()->info("Loaded route signal " + signal->getLetter());
         }
 
         if (signal_model_bwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
-            signal->setLetter(signal_letter);
-            signal->setDirection(signal_dir_bwd);
-            signal->setSignalModel(signal_model_bwd);
-            signal->setConnector(conn);
-
-            conn->setSignalBwd(signal);
-
-            signal->setRelPosition(rel_pos);
-            signal->setRelRotation(rel_rot);
-
+            configure_signal(signal, conn, signal_dir_bwd,
+                             signal_letter, signal_model_bwd,
+                             rel_pos, rel_rot);
             signals_data.exit_signals.push_back(signal);
-
             Journal::instance()->info("Loaded exit signal " + signal->getLetter());
+        }
+
+        if (signal_model_bwd.right(4) == "shnt")
+        {
+            ShuntingSignal *signal = new ShuntingSignal;
+            configure_signal(signal, conn, signal_dir_bwd,
+                             signal_letter, signal_model_bwd,
+                             rel_pos, rel_rot);
+            signals_data.shunt_signals.push_back(signal);
+            Journal::instance()->info("Loaded shunting signal " + signal->getLetter());
         }
     }
 }
@@ -1132,30 +1104,13 @@ Connector *Topology::deserialize_traj_connectors(QDataStream &stream, conn_list_
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotSetSwitchState(QByteArray &switch_data)
-{
-    switch_state_t sw_state;
-    sw_state.deserialize(switch_data);
-
-    Switch *sw = dynamic_cast<Switch *>(switches.value(sw_state.name, nullptr));
-
-    if (sw == nullptr)
-    {
-        return;
-    }
-
-    sw->setRefStateFwd(static_cast<Switch::State>(sw_state.state_fwd));
-    sw->setRefStateBwd(static_cast<Switch::State>(sw_state.state_bwd));
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Topology::slotGetSwitchState(QByteArray &switch_data)
 {
+    // Получаем из менеджера Lua данные с запросом на состояние стрелки
     switch_state_t sw_state;
     sw_state.deserialize(switch_data);
 
+    // Ищем стрелку по имени из запроса
     Switch *sw = dynamic_cast<Switch *>(switches.value(sw_state.name, nullptr));
 
     if (sw == nullptr)
@@ -1163,163 +1118,152 @@ void Topology::slotGetSwitchState(QByteArray &switch_data)
         return;
     }
 
+    // Заполняем в запрос состояние стрелки
     sw_state.state_fwd = sw->getStateFwd();
     sw_state.state_bwd = sw->getStateBwd();
 
+    // Сохраняем состояние в данные из запроса
     switch_data = sw_state.serialize();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotOpenSignal(QByteArray signal_data)
+void Topology::slotSwitchCommand(QByteArray& switch_command)
 {
-    Journal::instance()->info("Try to open signal...");
+    switch_command_t sc;
+    sc.deserialize(switch_command);
 
-    QBuffer buff(&signal_data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
-
-    QString conn_name = "";
-    int sig_dir = 0;
-    stream >> conn_name;
-    stream >> sig_dir;
-
-    if (conn_name.isEmpty())
-    {
-        Journal::instance()->error("Connector name is empty");
-        return;
-    }
-
-    if (sig_dir == 0)
-    {
-        Journal::instance()->error("Signal direction is zero");
-        return;
-    }
-
-    Connector *conn = switches.value(conn_name, nullptr);
-
-    if (conn == nullptr)
+    if (sc.conn_name.isEmpty() || (sc.switch_direction == 0))
     {
         return;
     }
 
-    Signal *signal = nullptr;
-
-    if (sig_dir == 1)
-    {
-        signal = conn->getSignalFwd();
-    }
-
-    if (sig_dir == -1)
-    {
-        signal = conn->getSignalBwd();
-    }
-
-    if (signal == nullptr)
+    Switch *sw = dynamic_cast<Switch *>(switches.value(sc.conn_name, nullptr));
+    if (sw == nullptr)
     {
         return;
     }
 
-    if ( (signal->getSignalType() == "entr") || (signal->getSignalType() == "rout") )
+    if (sc.switch_direction < 0)
     {
-        EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
-
-        if (es == nullptr)
-        {
-            return;
-        }
-
-        es->slotPressOpen();
+        sw->setRefStateBwd(static_cast<Switch::State>(sc.switch_ref_state));
     }
-
-    if (signal->getSignalType() == "exit")
+    else
     {
-        ExitSignal *es = dynamic_cast<ExitSignal *>(signal);
-
-        if (es == nullptr)
-        {
-            return;
-        }
-
-        es->slotPressOpen();
+        sw->setRefStateFwd(static_cast<Switch::State>(sc.switch_ref_state));
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotCloseSignal(QByteArray signal_data)
+void Topology::slotSignalCommand(QByteArray& signal_data)
 {
-    Journal::instance()->info("Try to close signal...");
+    signal_command_t sc;
+    sc.deserialize(signal_data);
 
-    QBuffer buff(&signal_data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
-
-    QString conn_name = "";
-    int sig_dir = 0;
-    stream >> conn_name;
-    stream >> sig_dir;
-
-    if (conn_name.isEmpty())
+    if (sc.conn_name.isEmpty() || (sc.sig_dir == 0))
     {
-        Journal::instance()->error("Connector name is empty");
         return;
     }
 
-    if (sig_dir == 0)
-    {
-        Journal::instance()->error("Signal direction is zero");
-        return;
-    }
-
-    Connector *conn = switches.value(conn_name, nullptr);
-
+    Connector* conn = switches.value(sc.conn_name, nullptr);
     if (conn == nullptr)
     {
         return;
     }
 
-    Signal *signal = nullptr;
-
-    if (sig_dir == 1)
-    {
-        signal = conn->getSignalFwd();
-    }
-
-    if (sig_dir == -1)
-    {
-        signal = conn->getSignalBwd();
-    }
-
-    if (signal == nullptr)
+    Signal* sig = (sc.sig_dir < 1) ? conn->getSignalBwd() : conn->getSignalFwd();
+    if (sig == nullptr)
     {
         return;
     }
 
-    if ( (signal->getSignalType() == "entr") || (signal->getSignalType() == "rout") )
+    // Маршрутный сигнал сделан из входного, сперва проверяем каст к нему
+    if (RouteSignal* rs = dynamic_cast<RouteSignal *>(sig))
     {
-        EnterSignal *es = dynamic_cast<EnterSignal *>(signal);
-
-        if (es == nullptr)
+        if (sc.command_open_train)
         {
+            rs->slotPressOpenTrain();
             return;
         }
-
-        es->slotPressClose();
+        if (sc.command_open_shunting)
+        {
+            rs->slotPressOpenShunting();
+            return;
+        }
+        if (sc.command_open_call)
+        {
+            rs->slotPressOpenCall();
+            return;
+        }
+        if (sc.command_close)
+        {
+            rs->slotPressClose();
+            return;
+        }
+        return;
     }
 
-    if (signal->getSignalType() == "exit")
+    if (EnterSignal* es = dynamic_cast<EnterSignal *>(sig))
     {
-        ExitSignal *es = dynamic_cast<ExitSignal *>(signal);
-
-        if (es == nullptr)
+        if (sc.command_open_train)
         {
+            es->slotPressOpenTrain();
             return;
         }
+        if (sc.command_open_call)
+        {
+            es->slotPressOpenCall();
+            return;
+        }
+        if (sc.command_close)
+        {
+            es->slotPressClose();
+            return;
+        }
+        return;
+    }
 
-        es->slotPressClose();
+    if (ExitSignal* es = dynamic_cast<ExitSignal *>(sig))
+    {
+        if (sc.command_open_train)
+        {
+            es->slotPressOpenTrain();
+            return;
+        }
+        if (sc.command_open_shunting)
+        {
+            es->slotPressOpenShunting();
+            return;
+        }
+        if (sc.command_open_call)
+        {
+            es->slotPressOpenCall();
+            return;
+        }
+        if (sc.command_close)
+        {
+            es->slotPressClose();
+            return;
+        }
+        return;
+    }
+
+    if (ShuntingSignal* ss = dynamic_cast<ShuntingSignal *>(sig))
+    {
+        if (sc.command_open_shunting)
+        {
+            ss->slotPressOpenShunting();
+            return;
+        }
+        if (sc.command_close)
+        {
+            ss->slotPressClose();
+            return;
+        }
+        return;
     }
 }
 

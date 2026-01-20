@@ -469,9 +469,9 @@ void MapWidget::drawConnector(Connector *conn)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawStations(topology_stations_list_t *stations)
+void MapWidget::drawStations(topology_stations_list_t* stations)
 {
-    for (auto station : *stations)
+    for (auto& station : *stations)
     {
         QPainter painter;
         painter.begin(this);
@@ -499,94 +499,142 @@ void MapWidget::drawSignals(signals_data_t *signals_data)
 
     for (auto line_signal : signals_data->line_signals)
     {
-        drawLineSignal(line_signal);
+        if (line_signal)
+        {
+            if (line_signal->getSignalModel() == "empty_line")
+            {
+                continue;
+            }
+            lens_state_t lens = line_signal->getAllLensState();
+
+            std::vector<QColor> lens_colors;
+            lens_colors.emplace_back(lens[RED_LENS] ? QColor(255, 0, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
+
+            drawSignal(line_signal, lens_colors);
+        }
     }
 
     for (auto enter_signal : signals_data->enter_signals)
     {
-        drawEnterSignal(enter_signal);
+        if (enter_signal)
+        {
+            if (enter_signal->getSignalModel() == "empty_entr")
+            {
+                continue;
+            }
+            lens_state_t lens = enter_signal->getAllLensState();
+
+            std::vector<QColor> lens_colors;
+            lens_colors.emplace_back(lens[WHITE_LENS] ? QColor(255, 255, 196) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[BOTTOM_YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[RED_LENS] ? QColor(255, 0, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
+
+            drawSignal(enter_signal, lens_colors);
+        }
+    }
+
+    for (auto route_signal : signals_data->route_signals)
+    {
+        if (route_signal)
+        {
+            if (route_signal->getSignalModel() == "empty_rout")
+            {
+                continue;
+            }
+            lens_state_t lens = route_signal->getAllLensState();
+
+            std::vector<QColor> lens_colors;
+            lens_colors.emplace_back(lens[WHITE_LENS] ? QColor(255, 255, 196) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[BOTTOM_YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[RED_LENS] ? QColor(255, 0, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
+
+            drawSignal(route_signal, lens_colors);
+        }
     }
 
     for (auto exit_signal : signals_data->exit_signals)
     {
-        drawExitSignal(exit_signal);
+        if (exit_signal)
+        {
+            if (exit_signal->getSignalModel() == "empty_exit")
+            {
+                continue;
+            }
+            lens_state_t lens = exit_signal->getAllLensState();
+
+            std::vector<QColor> lens_colors;
+            lens_colors.emplace_back(lens[WHITE_LENS] ? QColor(255, 255, 196) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[RED_LENS] ? QColor(255, 0, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
+
+            drawSignal(exit_signal, lens_colors);
+        }
+    }
+
+    for (auto shunt_signal : signals_data->shunt_signals)
+    {
+        if (shunt_signal)
+        {
+            if (shunt_signal->getSignalModel() == "empty_shnt")
+            {
+                continue;
+            }
+            lens_state_t lens = shunt_signal->getAllLensState();
+
+            std::vector<QColor> lens_colors;
+            lens_colors.emplace_back(lens[BLUE_LENS] ? QColor(0, 96, 255) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[WHITE_LENS] ? QColor(255, 255, 196) : QColor(0, 0, 0));
+
+            drawSignal(shunt_signal, lens_colors);
+        }
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawEnterSignal(Signal *signal)
+void MapWidget::drawSignal(Signal *signal, std::vector<QColor> lens_colors)
 {
-    if (signal == nullptr)
+    Connector *conn = signal->getConnector();
+    if ((conn == nullptr) || (signal->getDirection() == 0))
     {
         return;
     }
 
-    Connector *conn = signal->getConnector();
-
-    if (conn == nullptr)
+    Trajectory *traj = (signal->getDirection() < 0) ? conn->getFwdTraj() : conn->getBwdTraj();
+    if (traj == nullptr)
     {
         return;
     }
 
     dvec3 bottom_signal_pos;
     track_t track;
-    Trajectory *traj = nullptr;
-
-    if (signal->getDirection() == 1)
-    {
-        traj = conn->getBwdTraj();
-    }
-    else
-    {
-        traj = conn->getFwdTraj();
-    }
-
-    if (traj == nullptr)
-    {
-        return;
-    }
-
     SignalLabel *signal_label = nullptr;
-    if (signal->getDirection() == 1)
-    {
-        track = traj->getLastTrack();
-        bottom_signal_pos = track.end_point;
-        signal_label = signal_labels_fwd.value(conn->getName(), nullptr);
-    }
-    else
+    if (signal->getDirection() < 0)
     {
         track = traj->getFirstTrack();
         bottom_signal_pos = track.begin_point;
         signal_label = signal_labels_bwd.value(conn->getName(), nullptr);
     }
+    else
+    {
+        track = traj->getLastTrack();
+        bottom_signal_pos = track.end_point;
+        signal_label = signal_labels_fwd.value(conn->getName(), nullptr);
+    }
 
-    double radius = signal_radius;
-    double right_shift = signal_offset;
-    bottom_signal_pos += track.trav * (right_shift * signal->getDirection());
-    dvec3 w_signal_pos = bottom_signal_pos + track.orth * (2 * radius * signal->getDirection());
-    dvec3 by_signal_pos = bottom_signal_pos + track.orth * (4 * radius * signal->getDirection());
-    dvec3 r_signal_pos = bottom_signal_pos + track.orth * (6 * radius * signal->getDirection());
-    dvec3 g_signal_pos = bottom_signal_pos + track.orth * (8 * radius * signal->getDirection());
-    dvec3 y_signal_pos = bottom_signal_pos + track.orth * (10 * radius * signal->getDirection());
+    bottom_signal_pos += track.trav * (signal_offset * signal->getDirection());
+    double signed_r = signal_radius * signal->getDirection();
+    int r = signal_radius * scale;
 
-    dvec3 label_pos = bottom_signal_pos + track.orth * (13 * radius * signal->getDirection());
-
-    QPainter painter;
-    painter.begin(this);
-
-    QPoint green_p = coord_transform(g_signal_pos);
-    QPoint yellow_p = coord_transform(y_signal_pos);
-    QPoint red_p = coord_transform(r_signal_pos);
-    QPoint byllow_p = coord_transform(by_signal_pos);
-    QPoint white_p = coord_transform(w_signal_pos);
-
-    QPoint bottom_down = coord_transform(bottom_signal_pos);
-    QPoint bottom_up = coord_transform(bottom_signal_pos + track.orth * (radius * signal->getDirection()));
-    QPoint bottom_left = coord_transform(bottom_signal_pos - track.trav * (radius * signal->getDirection()));
-    QPoint bottom_right = coord_transform(bottom_signal_pos + track.trav * (radius * signal->getDirection()));
-
+    dvec3 label_pos = bottom_signal_pos + track.orth * ((2 * lens_colors.size() + 3) * signed_r);
     if (signal_label != nullptr)
     {
         QPoint label_p = coord_transform(label_pos);
@@ -597,288 +645,21 @@ void MapWidget::drawEnterSignal(Signal *signal)
         signal_label->show();
     }
 
-    lens_state_t lens_state = signal->getAllLensState();
-
-    int r = radius * scale;
-
-    QColor g_color(0, 0, 0);
-    if (lens_state[GREEN_LENS])
-    {
-        g_color = QColor(0, 255, 0);
-    }
-    painter.setBrush(g_color);
-    painter.drawEllipse(green_p, r, r);
-
-    QColor y_color(0, 0, 0);
-    if (lens_state[YELLOW_LENS])
-    {
-        y_color = QColor(255, 255, 0);
-    }
-    painter.setBrush(y_color);
-    painter.drawEllipse(yellow_p, r, r);
-
-    QColor r_color(0, 0, 0);
-    if (lens_state[RED_LENS])
-    {
-        r_color = QColor(255, 0, 0);
-    }
-    painter.setBrush(r_color);
-    painter.drawEllipse(red_p, r, r);
-
-    QColor by_color(0, 0, 0);
-    if (lens_state[BOTTOM_YELLOW_LENS])
-    {
-        by_color = QColor(255, 255, 0);
-    }
-    painter.setBrush(by_color);
-    painter.drawEllipse(byllow_p, r, r);
-
-    QColor w_color(0, 0, 0);
-    if (lens_state[WHITE_LENS])
-    {
-        w_color = QColor(255, 255, 255);
-    }
-    painter.setBrush(w_color);
-    painter.drawEllipse(white_p, r, r);
-
-    QPen pen;
-    pen.setWidth((scale > 1.0) ? 2 : 1);
-    painter.setPen(pen);
-    painter.drawLine(bottom_down, bottom_up);
-    painter.drawLine(bottom_left, bottom_right);
-
-    painter.end();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MapWidget::drawExitSignal(Signal *signal)
-{
-    if (signal == nullptr)
-    {
-        return;
-    }
-
-    Connector *conn = signal->getConnector();
-
-    if (conn == nullptr)
-    {
-        return;
-    }
-
-    dvec3 bottom_signal_pos;
-    track_t track;
-    Trajectory *traj = nullptr;
-
-    if (signal->getDirection() == 1)
-    {
-        traj = conn->getBwdTraj();
-    }
-    else
-    {
-        traj = conn->getFwdTraj();
-    }
-
-    if (traj == nullptr)
-    {
-        return;
-    }
-
-    SignalLabel *signal_label = nullptr;
-    if (signal->getDirection() == 1)
-    {
-        track = traj->getLastTrack();
-        bottom_signal_pos = track.end_point;
-        signal_label = signal_labels_fwd.value(conn->getName(), nullptr);
-    }
-    else
-    {
-        track = traj->getFirstTrack();
-        bottom_signal_pos = track.begin_point;
-        signal_label = signal_labels_bwd.value(conn->getName(), nullptr);
-    }
-
-    double radius = signal_radius;
-    double right_shift = signal_offset;
-    bottom_signal_pos += track.trav * (right_shift * signal->getDirection());
-    dvec3 r_signal_pos = bottom_signal_pos + track.orth * (2 * radius * signal->getDirection());
-    dvec3 g_signal_pos = bottom_signal_pos + track.orth * (4 * radius * signal->getDirection());
-    dvec3 y_signal_pos = bottom_signal_pos + track.orth * (6 * radius * signal->getDirection());
-
-    dvec3 label_pos = bottom_signal_pos + track.orth * (9 * radius * signal->getDirection());
-
     QPainter painter;
     painter.begin(this);
 
-    QPoint green_p = coord_transform(g_signal_pos);
-    QPoint yellow_p = coord_transform(y_signal_pos);
-    QPoint red_p = coord_transform(r_signal_pos);
+    for (size_t i = 1; i <= lens_colors.size(); ++i)
+    {
+        dvec3 lens_pos = bottom_signal_pos + track.orth * (2 * i * signed_r);
+        QPoint lens_point = coord_transform(lens_pos);
+        painter.setBrush(lens_colors[i - 1]);
+        painter.drawEllipse(lens_point, r, r);
+    }
 
     QPoint bottom_down = coord_transform(bottom_signal_pos);
-    QPoint bottom_up = coord_transform(bottom_signal_pos + track.orth * (radius * signal->getDirection()));
-    QPoint bottom_left = coord_transform(bottom_signal_pos - track.trav * (radius * signal->getDirection()));
-    QPoint bottom_right = coord_transform(bottom_signal_pos + track.trav * (radius * signal->getDirection()));
-
-    if (signal_label != nullptr)
-    {
-        QPoint label_p = coord_transform(label_pos);
-        label_p.setX(label_p.x() - signal_label->width() / 2);
-        label_p.setY(label_p.y() - signal_label->height() / 2);
-
-        signal_label->move(label_p);
-        signal_label->show();
-    }
-
-    lens_state_t lens_state = signal->getAllLensState();
-
-    int r = radius * scale;
-
-    QColor g_color(0, 0, 0);
-    if (lens_state[GREEN_LENS])
-    {
-        g_color = QColor(0, 255, 0);
-    }
-    painter.setBrush(g_color);
-    painter.drawEllipse(green_p, r, r);
-
-    QColor y_color(0, 0, 0);
-    if (lens_state[YELLOW_LENS])
-    {
-        y_color = QColor(255, 255, 0);
-    }
-    painter.setBrush(y_color);
-    painter.drawEllipse(yellow_p, r, r);
-
-    QColor r_color(0, 0, 0);
-    if (lens_state[RED_LENS])
-    {
-        r_color = QColor(255, 0, 0);
-    }
-    painter.setBrush(r_color);
-    painter.drawEllipse(red_p, r, r);
-
-    QPen pen;
-    pen.setWidth((scale > 1.0) ? 2 : 1);
-    painter.setPen(pen);
-    painter.drawLine(bottom_down, bottom_up);
-    painter.drawLine(bottom_left, bottom_right);
-
-    painter.end();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MapWidget::drawLineSignal(Signal *signal)
-{
-    if (signal == nullptr)
-    {
-        return;
-    }
-
-    if (signal->getSignalModel() == "empty_line")
-    {
-        return;
-    }
-
-    Connector *conn = signal->getConnector();
-
-    if (conn == nullptr)
-    {
-        return;
-    }
-
-    dvec3 bottom_signal_pos;
-    track_t track;
-    Trajectory *traj = nullptr;
-
-    if (signal->getDirection() == 1)
-    {
-        traj = conn->getBwdTraj();
-    }
-    else
-    {
-        traj = conn->getFwdTraj();
-    }
-
-    if (traj == nullptr)
-    {
-        return;
-    }
-
-    SignalLabel *signal_label = nullptr;
-    if (signal->getDirection() == 1)
-    {
-        track = traj->getLastTrack();
-        bottom_signal_pos = track.end_point;
-        signal_label = signal_labels_fwd.value(conn->getName(), nullptr);
-    }
-    else
-    {
-        track = traj->getFirstTrack();
-        bottom_signal_pos = track.begin_point;
-        signal_label = signal_labels_bwd.value(conn->getName(), nullptr);
-    }
-
-    double radius = signal_radius;
-    double right_shift = signal_offset;
-    bottom_signal_pos += track.trav * (right_shift * signal->getDirection());
-    dvec3 r_signal_pos = bottom_signal_pos + track.orth * (2 * radius * signal->getDirection());
-    dvec3 g_signal_pos = bottom_signal_pos + track.orth * (4 * radius * signal->getDirection());
-    dvec3 y_signal_pos = bottom_signal_pos + track.orth * (6 * radius * signal->getDirection());
-
-    dvec3 label_pos = bottom_signal_pos + track.orth * (9 * radius * signal->getDirection());
-
-    QPainter painter;
-    painter.begin(this);
-
-    QPoint green_p = coord_transform(g_signal_pos);
-    QPoint yellow_p = coord_transform(y_signal_pos);
-    QPoint red_p = coord_transform(r_signal_pos);
-
-    QPoint bottom_down = coord_transform(bottom_signal_pos);
-    QPoint bottom_up = coord_transform(bottom_signal_pos + track.orth * (radius * signal->getDirection()));
-    QPoint bottom_left = coord_transform(bottom_signal_pos - track.trav * (radius * signal->getDirection()));
-    QPoint bottom_right = coord_transform(bottom_signal_pos + track.trav * (radius * signal->getDirection()));
-
-    if (signal_label != nullptr)
-    {
-        QPoint label_p = coord_transform(label_pos);
-        label_p.setX(label_p.x() - signal_label->width() / 2);
-        label_p.setY(label_p.y() - signal_label->height() / 2);
-
-        signal_label->move(label_p);
-        signal_label->show();
-    }
-
-    lens_state_t lens_state = signal->getAllLensState();
-
-    int r = radius * scale;
-
-    QColor g_color(0, 0, 0);
-    if (lens_state[GREEN_LENS])
-    {
-        g_color = QColor(0, 255, 0);
-    }
-    painter.setBrush(g_color);
-    painter.drawEllipse(green_p, r, r);
-
-    QColor y_color(0, 0, 0);
-    if (lens_state[YELLOW_LENS])
-    {
-        y_color = QColor(255, 255, 0);
-    }
-    painter.setBrush(y_color);
-    painter.drawEllipse(yellow_p, r, r);
-
-    QColor r_color(0, 0, 0);
-    if (lens_state[RED_LENS])
-    {
-        r_color = QColor(255, 0, 0);
-    }
-    painter.setBrush(r_color);
-    painter.drawEllipse(red_p, r, r);
+    QPoint bottom_up = coord_transform(bottom_signal_pos + track.orth * signed_r);
+    QPoint bottom_left = coord_transform(bottom_signal_pos - track.trav * signed_r);
+    QPoint bottom_right = coord_transform(bottom_signal_pos + track.trav * signed_r);
 
     QPen pen;
     pen.setWidth((scale > 1.0) ? 2 : 1);

@@ -113,7 +113,9 @@ void TrafficLightsHandler::deserialize(QByteArray& data)
 
     deserialize_signals("Line", stream);
     deserialize_signals("Enter", stream);
+    deserialize_signals("Route", stream);
     deserialize_signals("Exit", stream);
+    deserialize_signals("Shunt", stream);
 }
 
 //------------------------------------------------------------------------------

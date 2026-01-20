@@ -47,15 +47,13 @@ signals:
 
     void requestSignalsData(QByteArray &signals_data);
 
-    void setSwitchState(QByteArray &switch_data);
+    void sigSwitchCommand(QByteArray& switch_command);
 
-    void openSignal(QByteArray signal_data);
+    void sigSignalCommand(QByteArray& signal_command);
 
-    void closeSignal(QByteArray signal_data);
+    void sigVehicleControl(QByteArray& control_data, int client_id);
 
-    void setVehicleControl(QByteArray &control_data, int client_id);
-
-    void resetVehicleControl(int client_id);
+    void sigResetVehicleControl(int client_id);
 
     void sigRenameTrain(int train_idx, QString new_name);    
 

@@ -35,9 +35,9 @@ public:
 
     void sendRequest(StructureType stype, double update_interval = 0.0);
 
-    void sendSwitchState(QString conn_name, int8_t state_fwd, int8_t state_bwd);
+    void sendSwitchCommand(QByteArray switch_command);
 
-    void sendSignalState(QString conn_name, int sig_dir, bool open);
+    void sendSignalCommand(QByteArray signal_command);
 
     void sendVehicleControl(QByteArray vehicle_control_by_keyboard);
 

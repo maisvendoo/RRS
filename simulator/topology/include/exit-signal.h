@@ -21,14 +21,14 @@ private:
 
     enum
     {
-        SRS_N_RED = 0,
-        SRS_N_ALLOW,
+        SS_N_RED = 0,
+        SS_N_ALLOW,
         NUM_SRS_NEUTRAL_CONTACTS,
 
-        SRS_PLUS_GREEN = 0,
+        SS_PLUS_GREEN = 0,
         NUM_SRS_PLUS_CONTACTS,
 
-        SRS_MINUS_YELLOW = 0,
+        SS_MINUS_YELLOW = 0,
         NUM_SRS_MINUS_CONTACTS
     };
 
@@ -49,16 +49,7 @@ private:
     /// Боковое сигнальное реле (желтый мигающий, если следующий с отклонением по стрелкам)
     Relay *side_signal_relay = new Relay(NUM_SSR_CONTACTS);
 
-    /// Таймер мигания желтого
-    Timer *blink_timer = new Timer(0.75, false);
-
-    /// Контакт мигания
-    bool blink_contact = true;
-
     void preStep(double t) override;
-
-    /// Проверка состояния стрелок и занятости по маршруту до следующего светофора
-    void check_route();
 
     /// Управление цепями питания реле
     void relay_control();
@@ -71,10 +62,6 @@ private:
 
     /// Управление состоянием линий АЛСН
     void alsn_control();
-
-private slots:
-
-    void slotBlinkTimer();
 };
 
 #endif

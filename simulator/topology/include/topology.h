@@ -138,12 +138,6 @@ private:
 
     Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
 
-    void line_signals_step(double t, double dt);
-
-    void enter_signals_step(double t, double dt);
-
-    void exit_signals_step(double t, double dt);
-
     /// Нахождение пути в графе траекторий
     route_segment_t find_route(Trajectory *start_traj,
                                Trajectory *target_traj,
@@ -157,13 +151,11 @@ private:
 
 public slots:
 
-    void slotSetSwitchState(QByteArray &switch_data);
-
     void slotGetSwitchState(QByteArray &switch_data);
 
-    void slotOpenSignal(QByteArray signal_data);
+    void slotSwitchCommand(QByteArray& switch_data);
 
-    void slotCloseSignal(QByteArray signal_data);
+    void slotSignalCommand(QByteArray& signal_data);
 
     void slotBuildRoute(QString start_traj, QString target_traj, int dir);
 

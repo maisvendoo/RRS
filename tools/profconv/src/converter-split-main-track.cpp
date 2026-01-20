@@ -328,11 +328,11 @@ void ZDSimConverter::findSplitsMainTrajectory1()
         }
 
         // Разделяем возле светофоров, раставленных на карте
-        for (auto map : {signals_line_data,
-                         signals_enter_data,
-                         signals_exit_data/*,
-                         signals_povt_data,
-                         signals_maneurous_data*/})
+        for (auto& map : {signals_line_data
+                         , signals_enter_data
+                         , signals_exit_data
+                         /*, signals_povt_data*/
+                         , signals_maneurous_data})
         {
             for (auto sig : map)
             {
@@ -340,7 +340,7 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 {
                     continue;
                 }
-                if (sig->direction == 1)
+                if ((sig->direction == 1) && split.signal_fwd_type.empty())
                 {
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
                     split.signal_fwd_type = sig->type;
@@ -348,7 +348,7 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                     if (sig->is_left)
                         split.is_signal_fwd_left = true;
                 }
-                if (sig->direction == -1)
+                if ((sig->direction == -1) && split.signal_bwd_type.empty())
                 {
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
                     split.signal_bwd_type = sig->type;
@@ -513,11 +513,11 @@ void ZDSimConverter::findSplitsMainTrajectory2()
         }
 
         // Разделяем возле светофоров, раставленных на карте
-        for (auto map : {signals_line_data,
-                         signals_enter_data,
-                         signals_exit_data/*,
-                         signals_povt_data,
-                         signals_maneurous_data*/})
+        for (auto& map : {signals_line_data
+                         , signals_enter_data
+                         , signals_exit_data
+                         /*, signals_povt_data*/
+                         , signals_maneurous_data})
         {
             for (auto sig : map)
             {
@@ -525,7 +525,7 @@ void ZDSimConverter::findSplitsMainTrajectory2()
                 {
                     continue;
                 }
-                if (sig->direction == 1)
+                if ((sig->direction == 1) && split.signal_fwd_type.empty())
                 {
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_FWD);
                     split.signal_fwd_type = sig->type;
@@ -533,7 +533,7 @@ void ZDSimConverter::findSplitsMainTrajectory2()
                     if (sig->is_left)
                         split.is_signal_fwd_left = true;
                 }
-                if (sig->direction == -1)
+                if ((sig->direction == -1) && split.signal_bwd_type.empty())
                 {
                     split.split_type.push_back(split_zds_trajectory_t::SPLIT_SIGNAL_BWD);
                     split.signal_bwd_type = sig->type;
