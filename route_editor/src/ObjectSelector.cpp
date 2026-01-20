@@ -2,9 +2,11 @@
 
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
+#include "Mask.h"
 #include "Outline.h"
 #include "Route.h"
 
+#include <vsg/core/Mask.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
@@ -49,15 +51,11 @@ ObjectSelector::ObjectSelector(
     gizmo = Gizmo::create(settings);
     outline = Outline::create(observer_viewer);
 
-    gui_switch = vsg::Switch::create();
-    gui_switch->addChild(false, gizmo);
-    gui_switch->addChild(false, outline);
+    switch_group = vsg::Switch::create();
+    switch_group->addChild(vsg::MASK_OFF, gizmo);
+    switch_group->addChild(vsg::MASK_OFF, outline);
 
-    gui_group->addChild(gui_switch);
-
-    scene_switch = vsg::Switch::create();
-    scene_switch->addChild(false, gizmo);
-    scene_switch->addChild(false, outline);
+    gui_group->addChild(switch_group);
 }
 
 ObjectSelector::~ObjectSelector() = default;
@@ -75,7 +73,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    if (object)
+    if (selected_object)
     {
         if (gizmo->handle_intersections(lmb_intersector))
         {
@@ -124,17 +122,15 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
             continue;
         }
 
-        object = matrix_transform;
+        selected_object = matrix_transform;
 
         break;
     }
 
-    if (!object)
+    if (!selected_object)
     {
         return;
     }
-
-
 }
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
@@ -149,9 +145,50 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 
 void ObjectSelector::select_object(vsg::ref_ptr<vsg::MatrixTransform> object)
 {
-    this->object = object;
+    assert(object);
+
+    const auto prev_object = selected_object;
+    selected_object = object;
+
+    if (prev_object == selected_object)
+    {
+        return;
+    }
+
+    if (prev_object)
+    {
+        deselect_object(prev_object);
+    }
+
+    selected_object->addChild(switch_group);
+    gizmo->set_outer_matrix(&selected_object->matrix);
+
+    for (auto& child : switch_group->children)
+    {
+        child.mask = MASK_GUI;
+    }
 }
 
-void ObjectSelector::deselect_object()
+void ObjectSelector::deselect_object(vsg::ref_ptr<vsg::MatrixTransform> object)
 {
+    assert(object);
+
+    auto& children = object->children;
+    assert(!children.empty());
+
+    for (auto it = children.begin(); it != children.end(); ++it)
+    {
+        if (*it == switch_group)
+        {
+            children.erase(it);
+            break;
+        }
+    }
+
+    gizmo->set_outer_matrix(nullptr);
+
+    for (auto& child : switch_group->children)
+    {
+        child.mask = vsg::MASK_OFF;
+    }
 }

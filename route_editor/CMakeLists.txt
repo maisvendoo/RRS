@@ -54,6 +54,7 @@ target_sources(${TARGET}
             include/IntersectionHandler.h
             include/KeyboardHandler.h
             include/KeyStates.h
+            include/Mask.h
             include/MouseButton.h
             include/MouseHandler.h
             include/ObjectProperties.h

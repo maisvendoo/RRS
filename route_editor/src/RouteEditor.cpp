@@ -5,6 +5,7 @@
 #include "EditorState.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
+#include "Mask.h"
 #include "MouseHandler.h"
 #include "ObjectSelector.h"
 #include "Route.h"
@@ -90,7 +91,10 @@ bool RouteEditor::initialize()
     gui_group = vsg::Group::create();
 
     const auto scene_view = vsg::View::create(camera, scene_graph);
+    scene_view->mask = MASK_SCENE;
+
     const auto gui_view = vsg::View::create(camera, gui_group);
+    gui_view->mask = MASK_GUI;
 
     const auto editor_gui = EditorGui::create(state,
         keyboard_handler->get_key_bindings(), route,
