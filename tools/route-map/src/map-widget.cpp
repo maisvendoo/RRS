@@ -1,5 +1,8 @@
 #include    <map-widget.h>
 #include    <QPainter>
+#include    <QMenu>
+#include    <QTreeWidget>
+#include    <QMouseEvent>
 #include    <QWheelEvent>
 #include    <connector.h>
 #include    <switch.h>
@@ -85,10 +88,6 @@ void MapWidget::slotPlayerAtCenter(int idx)
 //------------------------------------------------------------------------------
 void MapWidget::paintEvent(QPaintEvent *event)
 {
-    (void)event;
-
-    QPainter painter(this);
-    painter.fillRect(rect(), QColor(150, 150, 150));
     QWidget::paintEvent(event);
 
     if ((traj_list == nullptr) || (conn_list == nullptr))
@@ -96,7 +95,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
-    const double limit_dist = 4.0 * std::max(scale, 1.0);
+    const double limit_dist = 4.0 + 2.0 * scale;
     double dist2_to_nearest_trajectory = limit_dist * limit_dist;
     double dist2_to_nearest_connector = limit_dist * limit_dist;
     nearest_trajectory = nullptr;
@@ -786,11 +785,6 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
         map_shift = prev_map_shift + event->pos() - mouse_pos_LBpressed;
         return;
     }
-    if (event->buttons() & Qt::RightButton)
-    {
-        emit sigOpenTrajectoryMenu(nearest_trajectory);
-        return;
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -811,6 +805,11 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::MiddleButton)
     {
         follow_player = true;
+    }
+
+    if (event->button() == Qt::RightButton)
+    {
+        emit sigOpenTrajectoryMenu(nearest_trajectory);
     }
 }
 

@@ -57,6 +57,8 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(tcp_client, &TcpClient::setTrainInfo,
             this, &MainWindow::slotGetTrainsInfo);
 
+    bg = new BackGroundWidget(ui->Map);
+
     map = new MapWidget(ui->Map);
     map->stations = topology->getStationsList();
     map->traj_list = topology->getTrajectoriesList();
@@ -150,6 +152,12 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     map->resize(ui->Map->width(), ui->Map->height());
     map->update();
+
+    bg->resize(ui->Map->width(), ui->Map->height());
+    bg->setScale(map->getScale());
+    bg->setShift(map->getShift());
+    bg->nearest_trajectory = map->nearest_trajectory;
+    bg->update();
 }
 
 //------------------------------------------------------------------------------
@@ -482,8 +490,16 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
     {
         return;
     }
+    QPoint c = QCursor::pos();
 
-    ui->ptLog->appendPlainText("Pressed RMB on trajectory" + nearest_traj->getName());
+    QMenu* menu = new QMenu(this);
+    QAction* action_traj = new QAction(nearest_traj->getName(), this);
+    menu->addAction(action_traj);
+    connect(action_traj, &QAction::triggered, this, [this, c, nearest_traj]{
+        ui->ptLog->appendPlainText("Pressed RMB and then selected menu on trajectory: " + nearest_traj->getName());
+    });
+
+    menu->exec(c);
 }
 
 //------------------------------------------------------------------------------

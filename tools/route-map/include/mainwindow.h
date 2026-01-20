@@ -9,6 +9,7 @@
 #include    <topology.h>
 #include    <simulator-info-struct.h>
 #include    <simulator-update-struct.h>
+#include    <background-widget.h>
 #include    <map-widget.h>
 #include    <switch-label.h>
 
@@ -64,6 +65,8 @@ private:
     simulator_update_pos_t train_data;
 
     std::vector<double> vehicles_half_length;
+
+    BackGroundWidget *bg;
 
     MapWidget *map;
 

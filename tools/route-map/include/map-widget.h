@@ -1,9 +1,6 @@
 #ifndef     MAP_WIDGET_H
 #define     MAP_WIDGET_H
 
-#include    <QMenu>
-#include    <QTreeWidget>
-#include    <QMouseEvent>
 #include    <QMap>
 #include    <topology-types.h>
 #include    <trajectory.h>
@@ -12,8 +9,6 @@
 #include    <signals-data-types.h>
 #include    <signal-label.h>
 #include    <train-label.h>
-
-const int link_line_height = 22;
 
 //------------------------------------------------------------------------------
 //
@@ -67,6 +62,11 @@ public:
     double getScale() const
     {
         return scale;
+    }
+
+    QPoint getShift() const
+    {
+        return map_shift;
     }
 
     void showTrajNames(bool is_show)
@@ -158,4 +158,4 @@ private:
     void mouseReleaseEvent(QMouseEvent *event);
 };
 
-#endif
+#endif // MAP_WIDGET_H
