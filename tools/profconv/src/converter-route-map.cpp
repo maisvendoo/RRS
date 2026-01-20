@@ -205,6 +205,7 @@ void ZDSimConverter::findSignalsAtMap()
             signal->position = zds_obj->position;
             signal->attitude = zds_obj->attitude;
 
+            signal->type = "ab_shnt";
             signal->liter = zds_obj->obj_info;
             signals_maneurous_data.push_back(signal);
             continue;
@@ -215,11 +216,11 @@ void ZDSimConverter::findSignalsAtMap()
     }
 
     // Привязка к главным путям
-    for (auto map : {signals_line_data,
-                     signals_enter_data,
-                     signals_exit_data,
-                     signals_povt_data,
-                     signals_maneurous_data})
+    for (auto& map : {signals_line_data
+                     , signals_enter_data
+                     , signals_exit_data
+                     , signals_povt_data
+                     , signals_maneurous_data})
     {
         for (auto sig : map)
         {
@@ -270,11 +271,11 @@ void ZDSimConverter::writeSignalsForDebug()
     stream_n.setEncoding(QStringConverter::Utf8);
     stream_n.setRealNumberNotation(QTextStream::FixedNotation);
 
-    for (auto map : {signals_line_data,
-                     signals_enter_data,
-                     signals_exit_data/*,
-                     signals_povt_data,
-                     signals_maneurous_data*/})
+    for (auto map : {signals_line_data
+                     , signals_enter_data
+                     , signals_exit_data
+                     , signals_povt_data
+                     , signals_maneurous_data})
     {
         for (auto sig : map)
         {
