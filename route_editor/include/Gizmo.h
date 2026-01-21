@@ -48,6 +48,19 @@ private:
         const vsg::vec3& color
     );
 
+    vsg::ref_ptr<vsg::Node> create_plane(
+        const float plane_size,
+        const int zero_component_index
+    );
+
+    void add_line(
+        const float plane_size,
+        const float line_size,
+        const int plane_component_index,
+        const vsg::vec3& color,
+        vsg::Mask** line_mask
+    );
+
 private:
     const settings_t& settings;
     vsg::ref_ptr<vsg::LookAt> look_at;

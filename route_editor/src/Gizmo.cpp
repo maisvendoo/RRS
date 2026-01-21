@@ -55,87 +55,33 @@ Gizmo::Gizmo(
     arrow_colors[ARROW_Y] = settings.gizmo_arrow_y_color;
     arrow_colors[ARROW_Z] = settings.gizmo_arrow_z_color;
 
+    vsg::ref_ptr<vsg::Node>* planes[TOTAL_ARROWS];
+    planes[ARROW_X] = &plane_yz;
+    planes[ARROW_Y] = &plane_xz;
+    planes[ARROW_Z] = &plane_xy;
+
+    vsg::Mask** line_masks[TOTAL_ARROWS];
+    line_masks[ARROW_X] = &line_x_mask;
+    line_masks[ARROW_Y] = &line_y_mask;
+    line_masks[ARROW_Z] = &line_z_mask;
+
+    const float plane_size = 100.0f;
+    const float line_size = 0.01f;
+
+    const auto planes_switch = vsg::Switch::create();
+
     for (int i = 0; i < TOTAL_ARROWS; ++i)
     {
         *arrows[i] = create_arrow(arrow_directions[i], arrow_colors[i]);
-
         this->addChild(*arrows[i]);
+
+        *planes[i] = create_plane(plane_size, i);
+        planes_switch->addChild(vsg::Mask{MASK_INVISIBLE}, *planes[i]);
+
+        add_line(plane_size, line_size, i, arrow_colors[i], line_masks[i]);
     }
 
-    const float quad_width = 100.0f;
-    const float line_size = 0.01f;
-
-    vsg::GeometryInfo geometry_info;
-
-    geometry_info.set(vsg::box(vsg::vec3(0.0f, -quad_width, -quad_width),
-        vsg::vec3(0.0f, quad_width, quad_width)));
-
-    plane_yz = builder.createQuad(geometry_info);
-
-    geometry_info.set(vsg::box(vsg::vec3(-quad_width, 0.0f, -quad_width),
-        vsg::vec3(quad_width, 0.0f, quad_width)));
-
-    plane_xz = builder.createQuad(geometry_info);
-
-    geometry_info.set(vsg::box(vsg::vec3(-quad_width, -quad_width, 0.0f),
-        vsg::vec3(quad_width, quad_width, 0.0f)));
-
-    plane_xy = builder.createQuad(geometry_info);
-
-    const auto planes_switch = vsg::Switch::create();
-    planes_switch->addChild(vsg::Mask{MASK_INVISIBLE}, plane_yz);
-    planes_switch->addChild(vsg::Mask{MASK_INVISIBLE}, plane_xz);
-    planes_switch->addChild(vsg::Mask{MASK_INVISIBLE}, plane_xy);
-
     this->addChild(planes_switch);
-
-    vsg::StateInfo state_info;
-    state_info.blending = true;
-
-    geometry_info.set(vsg::box(vsg::vec3(-quad_width, -line_size, -line_size),
-        vsg::vec3(quad_width, line_size, line_size)));
-
-    geometry_info.color = {arrow_colors[ARROW_X], settings.gizmo_opacity};
-
-    const auto line_x = builder.createCylinder(geometry_info, state_info);
-
-    const auto line_x_switch = vsg::Switch::create();
-    line_x_switch->addChild(vsg::MASK_ALL, line_x);
-
-    line_x_mask = &line_x_switch->children[0].mask;
-    assert(line_x_mask);
-
-    this->addChild(line_x_switch);
-
-    geometry_info.set(vsg::box(vsg::vec3(-line_size, -quad_width, -line_size),
-        vsg::vec3(line_size, quad_width, line_size)));
-
-    geometry_info.color = {arrow_colors[ARROW_Y], settings.gizmo_opacity};
-
-    const auto line_y = builder.createCylinder(geometry_info, state_info);
-
-    const auto line_y_switch = vsg::Switch::create();
-    line_y_switch->addChild(vsg::MASK_ALL, line_y);
-
-    line_y_mask = &line_y_switch->children[0].mask;
-    assert(line_y_mask);
-
-    this->addChild(line_y_switch);
-
-    geometry_info.set(vsg::box(vsg::vec3(-line_size, -line_size, -quad_width),
-        vsg::vec3(line_size, line_size, quad_width)));
-
-    geometry_info.color = {arrow_colors[ARROW_Z], settings.gizmo_opacity};
-
-    const auto line_z = builder.createCylinder(geometry_info, state_info);
-
-    const auto line_z_switch = vsg::Switch::create();
-    line_z_switch->addChild(vsg::MASK_ALL, line_z);
-
-    line_z_mask = &line_z_switch->children[0].mask;
-    assert(line_z_mask);
-
-    this->addChild(line_z_switch);
 }
 
 bool Gizmo::handle_intersections(
@@ -227,4 +173,68 @@ vsg::ref_ptr<vsg::Node> Gizmo::create_arrow(
     arrow->addChild(cone);
 
     return arrow;
+}
+
+vsg::ref_ptr<vsg::Node> Gizmo::create_plane(
+    const float plane_size,
+    const int zero_component_index
+)
+{
+    vsg::vec3 min_vec = {0.0f, 0.0f, 0.0f};
+    vsg::vec3 max_vec = {0.0f, 0.0f, 0.0f};
+
+    for (int i = 0; i < 3; ++i)
+    {
+        if (i != zero_component_index)
+        {
+            min_vec[i] = -plane_size;
+            max_vec[i] = plane_size;
+        }
+    }
+
+    const vsg::GeometryInfo geometry_info(vsg::box(min_vec, max_vec));
+
+    return builder.createQuad(geometry_info);
+}
+
+void Gizmo::add_line(
+    const float plane_size,
+    const float line_size,
+    const int plane_component_index,
+    const vsg::vec3& color,
+    vsg::Mask** line_mask
+)
+{
+    vsg::vec3 min_vec = {0.0f, 0.0f, 0.0f};
+    vsg::vec3 max_vec = {0.0f, 0.0f, 0.0f};
+
+    for (int i = 0; i < 3; ++i)
+    {
+        if (i == plane_component_index)
+        {
+            min_vec[i] = -plane_size;
+            max_vec[i] = plane_size;
+        }
+        else
+        {
+            min_vec[i] = -line_size;
+            max_vec[i] = line_size;
+        }
+    }
+
+    vsg::GeometryInfo geometry_info(vsg::box(min_vec, max_vec));
+    geometry_info.color = {color, settings.gizmo_opacity};
+
+    vsg::StateInfo state_info;
+    state_info.blending = true;
+
+    const auto line = builder.createCylinder(geometry_info, state_info);
+
+    const auto line_switch = vsg::Switch::create();
+    line_switch->addChild(vsg::MASK_ALL, line);
+
+    *line_mask = &line_switch->children[0].mask;
+    assert(line_mask);
+
+    this->addChild(line_switch);
 }
