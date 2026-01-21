@@ -44,7 +44,13 @@ public:
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
     void apply(vsg::MoveEvent& moveEvent) override;
 
+private:
     void select_object(
+        vsg::ref_ptr<vsg::MatrixTransform> object,
+        vsg::ref_ptr<vsg::PagedLOD> paged_lod
+    );
+
+    void select_object_inner(
         vsg::ref_ptr<vsg::MatrixTransform> object,
         vsg::ref_ptr<vsg::PagedLOD> paged_lod
     );
