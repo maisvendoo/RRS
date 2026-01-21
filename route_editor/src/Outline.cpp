@@ -1,5 +1,6 @@
 #include "Outline.h"
 
+#include "Settings.h"
 #include "filesystem.h"
 #include "shader_funcs.h"
 
@@ -41,6 +42,7 @@ struct OutlineStatic
 };
 
 Outline::Outline(
+    const settings_t& settings,
     vsg::ref_ptr<vsg::PagedLOD> paged_lod,
     vsg::observer_ptr<vsg::Viewer> observer_viewer
 )
@@ -80,7 +82,14 @@ Outline::Outline(
     const auto box_outline = builder.createBox(geometry_info, state_info);
 
     compile_result = viewer->compileManager->compile(box_outline);
-    this->children = {wireframe_outline, box_outline};
+
+    if (settings.show_wireframe)
+    {
+        this->addChild(wireframe_outline);
+    }
+
+    this->addChild(box_outline);
+
     vsg::updateViewer(*viewer, compile_result);
 }
 

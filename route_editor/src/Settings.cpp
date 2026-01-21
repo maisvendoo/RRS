@@ -84,6 +84,8 @@ void settings_t::read(const std::string& cfg_path)
 
     cfg.getFloat(section, "GizmoOpacity", gizmo_opacity);
 
+    cfg.getBool(section, "ShowWireframe", show_wireframe);
+
     cfg.getDouble(section, "GuiFontSize", gui_font_size);
     cfg.getBool(section, "IsGuiEditable", is_gui_editable);
     cfg.getBool(section, "ShowObjectsRef", show_objects_ref);

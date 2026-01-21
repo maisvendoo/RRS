@@ -23,6 +23,7 @@
 #include <cassert>
 
 static void select_object_inner(
+    const settings_t& settings,
     vsg::ref_ptr<vsg::MatrixTransform> object,
     vsg::ref_ptr<vsg::PagedLOD> paged_lod,
     vsg::observer_ptr<vsg::Viewer> observer_viewer,
@@ -36,7 +37,8 @@ ObjectSelector::ObjectSelector(
     vsg::ref_ptr<Route> route,
     vsg::observer_ptr<vsg::Viewer> observer_viewer
 )
-    : keyboard_handler(keyboard_handler)
+    : settings(settings)
+    , keyboard_handler(keyboard_handler)
     , intersection_handler(intersection_handler)
     , route(route)
     , observer_viewer(observer_viewer)
@@ -188,16 +190,16 @@ void ObjectSelector::select_object(
         }
         else
         {
-            select_object_inner(object, paged_lod, observer_viewer,
-                selected_objects);
+            select_object_inner(settings, object, paged_lod,
+                observer_viewer, selected_objects);
         }
     }
     else
     {
         if (selected_objects.empty())
         {
-            select_object_inner(object, paged_lod, observer_viewer,
-                selected_objects);
+            select_object_inner(settings, object, paged_lod,
+                observer_viewer, selected_objects);
         }
         else if (clicked_on_selected_object)
         {
@@ -227,8 +229,8 @@ void ObjectSelector::select_object(
                 it != selected_objects.end();
                 it = deselect_object(it->first));
 
-            select_object_inner(object, paged_lod, observer_viewer,
-                selected_objects);
+            select_object_inner(settings, object, paged_lod,
+                observer_viewer, selected_objects);
         }
     }
 }
@@ -256,13 +258,14 @@ SelectedObjectsIterator ObjectSelector::deselect_object(
 }
 
 void select_object_inner(
+    const settings_t& settings,
     vsg::ref_ptr<vsg::MatrixTransform> object,
     vsg::ref_ptr<vsg::PagedLOD> paged_lod,
     vsg::observer_ptr<vsg::Viewer> observer_viewer,
     SelectedObjectsMap& selected_objects
 )
 {
-    const auto outline = Outline::create(paged_lod, observer_viewer);
+    const auto outline = Outline::create(settings, paged_lod, observer_viewer);
 
     const auto outline_switch = vsg::Switch::create();
     outline_switch->addChild(vsg::Mask{MASK_GUI}, outline);

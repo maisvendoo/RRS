@@ -126,6 +126,9 @@
         <!-- Непрозрачность гизмо -->
         <GizmoOpacity>1.0</GizmoOpacity>
 
+        <!-- Отображать wireframe сетку объектов при выделении -->
+        <ShowWireframe>1</ShowWireframe>
+
         <!-- Размер шрифта GUI -->
         <GuiFontSize>24.0</GuiFontSize>
         <!-- Можно ли перемещать и менять размер GUI -->

@@ -36,6 +36,8 @@ struct settings_t
     vsg::vec3 gizmo_arrow_z_color = {0.0f, 0.0f, 1.0f};
     float gizmo_opacity = 1.0f;
 
+    bool show_wireframe = false;
+
     double gui_font_size = 20.0;
     bool is_gui_editable = false;
     bool show_objects_ref = true;

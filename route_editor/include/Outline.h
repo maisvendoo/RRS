@@ -6,6 +6,8 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/Group.h>
 
+struct settings_t;
+
 namespace vsg
 {
 
@@ -18,6 +20,7 @@ class Outline : public vsg::Inherit<vsg::Group, Outline>
 {
 public:
     Outline(
+        const settings_t& settings,
         vsg::ref_ptr<vsg::PagedLOD> paged_lod,
         vsg::observer_ptr<vsg::Viewer> observer_viewer
     );

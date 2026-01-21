@@ -54,6 +54,7 @@ public:
     );
 
 private:
+    const settings_t& settings;
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
     vsg::ref_ptr<Route> route;
