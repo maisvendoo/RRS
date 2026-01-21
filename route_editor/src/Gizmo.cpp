@@ -1,14 +1,17 @@
 #include "Gizmo.h"
 
+#include "Mask.h"
 #include "SelectedObjectsMap.h"
 #include "Settings.h"
 
 #include <vsg/app/ViewMatrix.h>
+#include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/nodes/Switch.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/Builder.h>
 #include <vsg/utils/ComputeBounds.h>
@@ -65,6 +68,35 @@ Gizmo::Gizmo(
 
         this->addChild(*arrows[i]);
     }
+
+    const float quad_width = 100.0f;
+
+    vsg::StateInfo state_info;
+    state_info.blending = true;
+
+    vsg::GeometryInfo geometry_info;
+
+    geometry_info.set(vsg::box(vsg::vec3(0.0f, -quad_width, -quad_width),
+        vsg::vec3(0.0f, quad_width, quad_width)));
+
+    plane_yz = builder.createQuad(geometry_info);
+
+    geometry_info.set(vsg::box(vsg::vec3(-quad_width, 0.0f, -quad_width),
+        vsg::vec3(quad_width, 0.0f, quad_width)));
+
+    plane_xz = builder.createQuad(geometry_info);
+
+    geometry_info.set(vsg::box(vsg::vec3(-quad_width, -quad_width, 0.0f),
+        vsg::vec3(quad_width, quad_width, 0.0f)));
+
+    plane_xy = builder.createQuad(geometry_info);
+
+    const auto planes_switch = vsg::Switch::create();
+    planes_switch->addChild(vsg::Mask{MASK_INVISIBLE}, plane_yz);
+    planes_switch->addChild(vsg::Mask{MASK_INVISIBLE}, plane_xz);
+    planes_switch->addChild(vsg::Mask{MASK_INVISIBLE}, plane_xy);
+
+    this->addChild(planes_switch);
 }
 
 bool Gizmo::handle_intersections(

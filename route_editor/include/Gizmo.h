@@ -43,10 +43,13 @@ public:
 private:
     vsg::ref_ptr<vsg::LookAt> look_at;
     const SelectedObjectsMap& selected_objects;
+    vsg::vec3 position;
     vsg::ref_ptr<vsg::Node> arrow_x;
     vsg::ref_ptr<vsg::Node> arrow_y;
     vsg::ref_ptr<vsg::Node> arrow_z;
-    vsg::vec3 position;
+    vsg::ref_ptr<vsg::Node> plane_yz;
+    vsg::ref_ptr<vsg::Node> plane_xz;
+    vsg::ref_ptr<vsg::Node> plane_xy;
 };
 
 #endif // GIZMO_H
