@@ -24,6 +24,11 @@
 
 		<AirDistModule>vr483</AirDistModule>
 		<AirDistConfig>vr483</AirDistConfig>
+
+		<CustomModulesDir>vl60</CustomModulesDir>
+
+		<AutopilotModule>vl60-autopilot</AutopilotModule>
+		<AutopilotConfig>vl60k-autopilot</AutopilotConfig>
 	</Vehicle>
 
 

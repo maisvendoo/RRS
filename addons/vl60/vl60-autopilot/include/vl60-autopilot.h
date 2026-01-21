@@ -20,7 +20,7 @@ public:
 
     void step(double t, double dt) override;
 
-    void initAutoBrakeControl(const QString& modules_dir,
+    void initAutoBrakeControl(const QString& config_name,
                               const QString& custom_cfg_dir) override;
 
 private:

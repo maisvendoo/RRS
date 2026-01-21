@@ -27,6 +27,11 @@
 
 		<ElectroAirDistModule>evr305</ElectroAirDistModule>
 		<ElectroAirDistConfig>evr305</ElectroAirDistConfig>
+
+		<CustomModulesDir>vl60</CustomModulesDir>
+
+		<AutopilotModule>vl60-autopilot</AutopilotModule>
+		<AutopilotConfig>vl60pk-autopilot</AutopilotConfig>
 	</Vehicle>
 
 

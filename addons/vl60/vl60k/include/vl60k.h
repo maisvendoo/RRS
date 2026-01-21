@@ -140,6 +140,12 @@ private:
     QString airdist_module_name = "vr483";
     /// Имя конфига воздухорапределителя
     QString airdist_config_name = "vr483";
+    /// Имя модуля автоведения
+    QString autopilot_module_name = "vl60-autopilot";
+    /// Имя конфига модуля автоведения
+    QString autopilot_config_name = "vl60k-autopilot";
+    /// Каталог поиска кастомных модулей
+    QString custom_modules_dir = "vl60";
 
     /// Регистратор, для записи параметров
     Registrator *reg = nullptr;

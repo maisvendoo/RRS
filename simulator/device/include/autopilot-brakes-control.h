@@ -152,7 +152,7 @@ private:
     void stepEPB(double dv, bool &lock_traction, bool &is_disable_release);
 
     /// Управление ПТ
-    void stepPB(double dv, bool &lock_traction, bool &is_disable_release);
+    void stepPB(double dv, bool is_motion_allowed, bool &lock_traction, bool &is_disable_release);
 
     /// Управление КВТ
     void stepKVT(bool is_motion_allowed, bool &is_disable_release);

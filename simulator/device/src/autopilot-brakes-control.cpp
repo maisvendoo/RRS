@@ -44,7 +44,7 @@ void AutopilotBrakeController::step_control(bool is_EPB_ON,
     else // иначе - пичаль-пичалька
     {
         // едем на превматике
-        stepPB(dv, lock_traction, is_disable_release);
+        stepPB(dv, is_motion_allowed, lock_traction, is_disable_release);
     }    
 }
 
@@ -136,6 +136,7 @@ void AutopilotBrakeController::stepEPB(double dv,
 //
 //------------------------------------------------------------------------------
 void AutopilotBrakeController::stepPB(double dv,
+                                      bool is_motion_allowed,
                                       bool &lock_traction,
                                       bool &is_disable_release)
 {
@@ -171,7 +172,7 @@ void AutopilotBrakeController::stepPB(double dv,
     }
 
     // Запрет отпуска - ступень безусловно, если не задействован КВТ
-    if (is_disable_release)
+    if (!is_motion_allowed)
     {
         if (bc_state.loco_crane_pos_ref < 0.01)
         {

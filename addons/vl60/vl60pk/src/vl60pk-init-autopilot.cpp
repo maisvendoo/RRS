@@ -17,13 +17,13 @@ void VL60pk::initAutopilot(const QString& modules_dir,
     for (auto cab_idx : {CAB1, CAB2})
     {
         Autopilot *autopilot = loadAutopilot(modules_dir + QDir::separator()
-                                         + "vl60" + QDir::separator() +
-                                         "vl60-autopilot");
+                                         + custom_modules_dir + QDir::separator() +
+                                         autopilot_module_name);
 
         if (autopilot != nullptr)
         {
-            autopilot->read_config("vl60-autopilot", custom_cfg_dir);
-            autopilot->initAutoBrakeControl(modules_dir, custom_cfg_dir);
+            autopilot->read_config(autopilot_config_name, custom_cfg_dir);
+            autopilot->initAutoBrakeControl(autopilot_config_name, custom_cfg_dir);
             autopilot_switcher[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
             autopilot_switcher[cab_idx].setKeySymbolOn(KEY_F);
             autopilot_switcher[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);

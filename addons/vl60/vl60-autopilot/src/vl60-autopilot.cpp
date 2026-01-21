@@ -37,10 +37,10 @@ void VL60Autopilot::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60Autopilot::initAutoBrakeControl(const QString &modules_dir,
+void VL60Autopilot::initAutoBrakeControl(const QString &config_name,
                                          const QString &custom_cfg_dir)
 {
-    brake_control->read_config("vl60-autopilot", custom_cfg_dir);
+    brake_control->read_config(config_name, custom_cfg_dir);
 }
 
 //------------------------------------------------------------------------------

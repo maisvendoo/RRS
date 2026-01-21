@@ -150,6 +150,12 @@ private:
     QString electro_airdist_module_name = "evr305";
     /// Имя конфига электровоздухорапределителя
     QString electro_airdist_config_name = "evr305";
+    /// Имя модуля автоведения
+    QString autopilot_module_name = "vl60-autopilot";
+    /// Имя конфига модуля автоведения
+    QString autopilot_config_name = "vl60pk-autopilot";
+    /// Каталог поиска кастомных модулей
+    QString custom_modules_dir = "vl60";
 
     /// Регистратор, для записи параметров
     Registrator *reg = nullptr;
