@@ -41,6 +41,11 @@ public:
     /// (для удобства смены индекса поезда у контролов из поезда)
     std::unordered_map<Vehicle *, VehicleController *> vc_table;
 
+    /// Нахождение пути в графе траекторий
+    route_segment_t find_route(Trajectory *start_traj,
+                               Trajectory *target_traj,
+                               int dir);
+
     /// Шаг симуляции
     void step(double t, double dt);
 
@@ -137,11 +142,6 @@ private:
     void serialize_connector_name(QDataStream &stream, Connector *conn);
 
     Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
-
-    /// Нахождение пути в графе траекторий
-    route_segment_t find_route(Trajectory *start_traj,
-                               Trajectory *target_traj,
-                               int dir);
 
     /// Установка стрелок по маршруту
     bool set_switchs_by_route(const route_segment_t &route, int dir);
