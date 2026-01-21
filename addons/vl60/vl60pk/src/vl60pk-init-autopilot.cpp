@@ -91,3 +91,37 @@ void VL60pk::prepareCabineForAutopilot(int my_cab_idx, int other_cab_idx)
     // левый буферный белый
     P_bufferlight_L_tumbler[other_cab_idx].set();
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60pk::OnAutopilot()
+{
+    Vehicle::OnAutopilot();
+
+    // Делаем автозапуск
+    if (controller[CAB1]->isReversHandle())
+    {
+        initAutostartProgram(CAB1);
+        autopilot_switcher[CAB1].set();
+    }
+
+    if (controller[CAB2]->isReversHandle())
+    {
+        initAutostartProgram(CAB2);
+        autopilot_switcher[CAB2].set();
+    }
+
+    autoStartTimer->start();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60pk::OffAutopilot()
+{
+    for (auto cab_idx : {CAB1, CAB2})
+    {
+        autopilot_switcher[cab_idx].reset();
+    }
+}

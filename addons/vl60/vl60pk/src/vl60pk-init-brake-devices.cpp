@@ -121,37 +121,3 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
         anglecock_bp_bwd->close();
     }
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VL60pk::OnAutopilot()
-{
-    Vehicle::OnAutopilot();
-
-    // Делаем автозапуск
-    if (controller[CAB1]->isReversHandle())
-    {
-        initAutostartProgram(CAB1);
-        autopilot_switcher[CAB1].set();
-    }
-
-    if (controller[CAB2]->isReversHandle())
-    {
-        initAutostartProgram(CAB2);
-        autopilot_switcher[CAB2].set();
-    }
-
-    autoStartTimer->start();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VL60pk::OffAutopilot()
-{
-    for (auto cab_idx : {CAB1, CAB2})
-    {
-        autopilot_switcher[cab_idx].reset();
-    }
-}
