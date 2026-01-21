@@ -21,22 +21,15 @@
 #include <cassert>
 #include <cmath>
 
-static vsg::ref_ptr<vsg::Node> create_arrow(
-    const settings_t& settings,
-    vsg::Builder& builder,
-    const vsg::vec3& direction,
-    const vsg::vec3& color
-);
-
 Gizmo::Gizmo(
     const settings_t& settings,
     vsg::ref_ptr<vsg::LookAt> look_at,
     const SelectedObjectsMap& selected_objects
 )
-    : look_at(look_at)
+    : settings(settings)
+    , look_at(look_at)
     , selected_objects(selected_objects)
 {
-    vsg::Builder builder;
     builder.shaderSet = vsg::createFlatShadedShaderSet();
 
     enum
@@ -64,8 +57,7 @@ Gizmo::Gizmo(
 
     for (int i = 0; i < TOTAL_ARROWS; ++i)
     {
-        *arrows[i] = create_arrow(settings, builder,
-            arrow_directions[i], arrow_colors[i]);
+        *arrows[i] = create_arrow(arrow_directions[i], arrow_colors[i]);
 
         this->addChild(*arrows[i]);
     }
@@ -193,9 +185,7 @@ void Gizmo::update_scale()
     this->matrix = vsg::translate(position) * vsg::scale(scale);
 }
 
-vsg::ref_ptr<vsg::Node> create_arrow(
-    const settings_t& settings,
-    vsg::Builder& builder,
+vsg::ref_ptr<vsg::Node> Gizmo::create_arrow(
     const vsg::vec3& direction,
     const vsg::vec3& color
 )

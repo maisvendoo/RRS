@@ -8,6 +8,7 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
+#include <vsg/utils/Builder.h>
 
 struct settings_t;
 
@@ -42,9 +43,17 @@ public:
     void update_scale();
 
 private:
+    vsg::ref_ptr<vsg::Node> create_arrow(
+        const vsg::vec3& direction,
+        const vsg::vec3& color
+    );
+
+private:
+    const settings_t& settings;
     vsg::ref_ptr<vsg::LookAt> look_at;
     const SelectedObjectsMap& selected_objects;
     vsg::vec3 position;
+    vsg::Builder builder;
     vsg::ref_ptr<vsg::Node> arrow_x;
     vsg::ref_ptr<vsg::Node> arrow_y;
     vsg::ref_ptr<vsg::Node> arrow_z;
