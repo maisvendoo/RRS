@@ -20,6 +20,7 @@ namespace vsg
 
 class ButtonPressEvent;
 class ButtonReleaseEvent;
+class FrameEvent;
 class LookAt;
 class MatrixTransform;
 class MoveEvent;
@@ -46,6 +47,7 @@ public:
     void apply(vsg::ButtonPressEvent& buttonPress) override;
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
     void apply(vsg::MoveEvent& moveEvent) override;
+    void apply(vsg::FrameEvent& frame) override;
 
 private:
     void select_object(

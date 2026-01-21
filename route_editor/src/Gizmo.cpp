@@ -86,9 +86,9 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
     (void)moveEvent;
 }
 
-void Gizmo::update()
+void Gizmo::update_position()
 {
-    vsg::vec3 translation;
+    position = {0.0f, 0.0f, 0.0f};
 
     for (const auto& [object, _] : selected_objects)
     {
@@ -98,12 +98,20 @@ void Gizmo::update()
         object->accept(compute_bounds);
         const auto& bounds = compute_bounds.bounds;
 
-        translation += static_cast<vsg::vec3>((bounds.min + bounds.max) / 2.0);
+        position += static_cast<vsg::vec3>((bounds.min + bounds.max) / 2.0);
     }
 
-    translation /= static_cast<float>(selected_objects.size());
+    position /= static_cast<float>(selected_objects.size());
 
-    this->matrix = vsg::translate(translation);
+    this->matrix = vsg::translate(position);
+}
+
+void Gizmo::update_scale()
+{
+    const auto camera_pos = static_cast<vsg::vec3>(look_at->eye);
+    const float distance_to_camera = vsg::length(position - camera_pos);
+    const float scale = 0.075f * distance_to_camera;
+    this->matrix = vsg::translate(position) * vsg::scale(scale);
 }
 
 vsg::ref_ptr<vsg::Node> create_arrow(
