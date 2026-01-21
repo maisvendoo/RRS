@@ -14,6 +14,7 @@ namespace vsg
 
 class ButtonReleaseEvent;
 class LineSegmentIntersector;
+class LookAt;
 class MoveEvent;
 class Node;
 
@@ -24,6 +25,7 @@ class Gizmo : public vsg::Inherit<vsg::MatrixTransform, Gizmo>
 public:
     Gizmo(
         const settings_t& settings,
+        vsg::ref_ptr<vsg::LookAt> look_at,
         const SelectedObjectsMap& selected_objects
     );
 
@@ -37,6 +39,7 @@ public:
     void update();
 
 private:
+    vsg::ref_ptr<vsg::LookAt> look_at;
     const SelectedObjectsMap& selected_objects;
     vsg::ref_ptr<vsg::Node> arrow_x;
     vsg::ref_ptr<vsg::Node> arrow_y;

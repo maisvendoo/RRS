@@ -20,6 +20,7 @@ namespace vsg
 
 class ButtonPressEvent;
 class ButtonReleaseEvent;
+class LookAt;
 class MatrixTransform;
 class MoveEvent;
 class PagedLOD;
@@ -34,6 +35,7 @@ public:
     ObjectSelector(
         const settings_t& settings,
         vsg::ref_ptr<KeyboardHandler> keyboard_handler,
+        vsg::ref_ptr<vsg::LookAt> look_at,
         vsg::ref_ptr<IntersectionHandler> intersection_handler,
         vsg::ref_ptr<Route> route,
         vsg::observer_ptr<vsg::Viewer> observer_viewer

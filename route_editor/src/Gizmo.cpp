@@ -3,6 +3,7 @@
 #include "SelectedObjectsMap.h"
 #include "Settings.h"
 
+#include <vsg/app/ViewMatrix.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
 #include <vsg/maths/transform.h>
@@ -25,9 +26,11 @@ static vsg::ref_ptr<vsg::Node> create_arrow(
 
 Gizmo::Gizmo(
     const settings_t& settings,
+    vsg::ref_ptr<vsg::LookAt> look_at,
     const SelectedObjectsMap& selected_objects
 )
-    : selected_objects(selected_objects)
+    : look_at(look_at)
+    , selected_objects(selected_objects)
 {
     vsg::Builder builder;
     builder.shaderSet = vsg::createFlatShadedShaderSet();

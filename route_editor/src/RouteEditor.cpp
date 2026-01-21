@@ -70,6 +70,7 @@ bool RouteEditor::initialize()
     camera_handler = CameraHandler::create(settings, window->extent2D(),
         mouse_handler, keyboard_handler, 5.0);
 
+    const auto look_at = camera_handler->get_look_at();
     const auto camera = camera_handler->get_camera();
 
     intersection_handler = IntersectionHandler::create(camera);
@@ -111,7 +112,7 @@ bool RouteEditor::initialize()
     vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
 
     object_selector = ObjectSelector::create(settings, keyboard_handler,
-        intersection_handler, route, observer_viewer);
+        look_at, intersection_handler, route, observer_viewer);
 
     viewer->addWindow(window);
 
