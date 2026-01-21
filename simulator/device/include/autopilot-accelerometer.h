@@ -5,6 +5,36 @@
 #include    <cstddef>
 #include    <physics.h>
 #include    <device-export.h>
+#include    <median-filter.h>
+#include    <lowpass-filter.h>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+class AccelerometerFilter
+{
+public:
+
+    AccelerometerFilter(double alpha = 0.1)
+        : median_filter_{}
+        , lp_filter_(alpha)
+    {
+
+    }
+
+    double process(double raw_sample)
+    {
+        double median_out = median_filter_.process(raw_sample);
+
+        return lp_filter_.process(median_out);
+    }
+
+private:
+
+    MedianFilter<7> median_filter_;
+
+    LowPassFilter lp_filter_;
+};
 
 //------------------------------------------------------------------------------
 //
@@ -26,7 +56,7 @@ public:
 
     double value()
     {
-        return acceleration;
+        return filter.process(acceleration);
     }
 
 private:
@@ -48,6 +78,8 @@ private:
     double delta_t = 1.0;
 
     double v = 0.0;
+
+    AccelerometerFilter filter;
 };
 
 #endif
