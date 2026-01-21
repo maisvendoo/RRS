@@ -1,5 +1,6 @@
 #include "Gizmo.h"
 
+#include "SelectedObjectsMap.h"
 #include "Settings.h"
 
 #include <vsg/core/ref_ptr.h>
@@ -7,7 +8,7 @@
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
-#include <vsg/nodes/Node.h>
+#include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/Builder.h>
 #include <vsg/utils/LineSegmentIntersector.h>
 #include <vsg/utils/ShaderSet.h>
@@ -62,7 +63,9 @@ Gizmo::Gizmo(
     }
 }
 
-bool Gizmo::handle_intersections(IntersectorPtr intersector)
+bool Gizmo::handle_intersections(
+    vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
+)
 {
     intersector->intersections.clear();
 
@@ -84,7 +87,7 @@ void Gizmo::update()
 
 }
 
-static vsg::ref_ptr<vsg::Node> create_arrow(
+vsg::ref_ptr<vsg::Node> create_arrow(
     const settings_t& settings,
     vsg::Builder& builder,
     const vsg::vec3& direction,

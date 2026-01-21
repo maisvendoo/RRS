@@ -50,7 +50,7 @@ vsg::ref_ptr<vsg::Window> WindowHandler::get_window() const
     return window;
 }
 
-static VkSampleCountFlags samples_bit_flag(int samples)
+VkSampleCountFlags samples_bit_flag(int samples)
 {
     if (samples > 7)
     {

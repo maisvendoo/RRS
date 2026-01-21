@@ -6,10 +6,13 @@
 #include "Mask.h"
 #include "Outline.h"
 #include "Route.h"
+#include "SelectedObjectsMap.h"
 
+#include <vsg/app/CompileManager.h>
 #include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
-#include <vsg/nodes/Group.h>
+#include <vsg/core/observer_ptr.h>
+#include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/nodes/PagedLOD.h>
@@ -19,23 +22,12 @@
 
 #include <cassert>
 
-// Если нажимаем на экран, возможны следующие ситуации:
-// 1) Ничего не выделено
-//    -> Выделения и соответствующего GUI нет
-// 2) Ничего не выделено, нажимаем на объект
-//    -> Объект нужно выделить и показать GUI
-// 3) Ничего не выделено, нажимаем на пустоту
-//    -> Ничего не происходит
-// 4) Выделен объект, нажимаем на него же
-//    -> Выделение снимается, GUI убирается
-// 5) Выделен объект, нажимаем на другой объект
-//    -> Выделяется другой объект
-// 6) Выделен объект, нажимаем на пустоту
-//    -> Выделение снимается, GUI убирается
-// 7) Выделен объект, нажимаем на Gizmo
-//    -> Управляем объектом через Gizmo, пока не отпустим ЛКМ
-
-// TODO: Multiple object selection
+static void select_object_inner(
+    vsg::ref_ptr<vsg::MatrixTransform> object,
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    vsg::observer_ptr<vsg::Viewer> observer_viewer,
+    SelectedObjectsMap& selected_objects
+);
 
 ObjectSelector::ObjectSelector(
     const settings_t& settings,
@@ -54,7 +46,7 @@ ObjectSelector::ObjectSelector(
 
     gizmo = Gizmo::create(settings, selected_objects);
 
-    gizmo_switch = GuiSwitch::create();
+    gizmo_switch = vsg::Switch::create();
     gizmo_switch->addChild(vsg::MASK_OFF, gizmo);
 
     route->addChild(gizmo_switch);
@@ -75,11 +67,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    const bool are_selected_objects_empty = selected_objects.empty();
+    const bool selected_objects_are_empty = selected_objects.empty();
+    const bool selected_objects_were_empty = selected_objects_are_empty;
 
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
-    if (!are_selected_objects_empty &&
+    if (!selected_objects_are_empty &&
         gizmo->handle_intersections(lmb_intersector))
     {
         return;
@@ -93,7 +86,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // If we clicked on empty space without shift
         // while there were selected objects,
         // deselect them all
-        if (!are_selected_objects_empty && !keyboard_handler->get_shift_state())
+        if (!selected_objects_are_empty && !keyboard_handler->get_shift_state())
         {
             for (auto it = selected_objects.begin();
                 it != selected_objects.end();
@@ -110,8 +103,9 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     for (const vsg::Node* const node : node_path)
     {
-        const auto matrix_transform = vsg::ref_ptr(const_cast<MatTrans*>(
-            node->cast<MatTrans>()));
+        const auto matrix_transform = vsg::ref_ptr(
+            const_cast<vsg::MatrixTransform*>(
+                node->cast<vsg::MatrixTransform>()));
 
         if (!matrix_transform)
         {
@@ -140,13 +134,29 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         if (paged_lod)
         {
             select_object(matrix_transform, paged_lod);
+
             break;
         }
     }
 
     intersections.clear();
 
-    gizmo->update();
+    if (selected_objects.empty())
+    {
+        if (!selected_objects_were_empty)
+        {
+            gizmo_switch->children[0].mask = vsg::MASK_OFF;
+        }
+    }
+    else
+    {
+        if (selected_objects_were_empty)
+        {
+            gizmo_switch->children[0].mask = MASK_GUI;
+        }
+
+        gizmo->update();
+    }
 }
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
@@ -160,63 +170,45 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 }
 
 void ObjectSelector::select_object(
-    MatTransPtr object,
+    vsg::ref_ptr<vsg::MatrixTransform> object,
     vsg::ref_ptr<vsg::PagedLOD> paged_lod
 )
 {
     assert(object);
     assert(paged_lod);
 
-    const vsg::ref_ptr<vsg::Viewer> viewer = observer_viewer;
-    const bool is_shift = keyboard_handler->get_shift_state();
-    const bool selected_objects_were_empty = selected_objects.empty();
+    const bool clicked_on_selected_object = (
+        selected_objects.find(object) != selected_objects.end());
 
-    const auto found_it = selected_objects.find(object);
-    const bool clicked_on_selected_object = (found_it != selected_objects.end());
-
-    const auto select_object_inner = [&]() -> void {
-        const auto outline = Outline::create(paged_lod, observer_viewer);
-
-        const auto outline_switch = vsg::Switch::create();
-        outline_switch->addChild(vsg::Mask{MASK_GUI}, outline);
-
-        const auto compile_result = viewer->compileManager->compile(outline_switch);
-        object->addChild(outline_switch);
-        vsg::updateViewer(*viewer, compile_result);
-
-        selected_objects[object] = outline_switch;
-    };
-
-    if (is_shift)
+    if (keyboard_handler->get_shift_state())
     {
         if (clicked_on_selected_object)
         {
             deselect_object(object);
-            return;
         }
         else
         {
-            select_object_inner();
-            return;
+            select_object_inner(object, paged_lod, observer_viewer,
+                selected_objects);
         }
     }
     else
     {
-        if (selected_objects_were_empty)
+        if (selected_objects.empty())
         {
-            select_object_inner();
-            return;
+            select_object_inner(object, paged_lod, observer_viewer,
+                selected_objects);
         }
         else if (clicked_on_selected_object)
         {
             if (selected_objects.size() == 1)
             {
                 deselect_object(object);
-                return;
             }
             else
             {
-                for (auto it = selected_objects.begin(); it != selected_objects.end();)
+                for (auto it = selected_objects.begin();
+                    it != selected_objects.end();)
                 {
                     if (it->first == object)
                     {
@@ -235,42 +227,54 @@ void ObjectSelector::select_object(
                 it != selected_objects.end();
                 it = deselect_object(it->first));
 
-            select_object_inner();
-            return;
+            select_object_inner(object, paged_lod, observer_viewer,
+                selected_objects);
         }
-    }
-
-    if (selected_objects_were_empty)
-    {
-        gizmo_switch->children[0].mask = MASK_GUI;
     }
 }
 
-SelectedObjectIterator ObjectSelector::deselect_object(MatTransPtr object)
+SelectedObjectsIterator ObjectSelector::deselect_object(
+    vsg::ref_ptr<vsg::MatrixTransform> object
+)
 {
     assert(object);
+    assert(selected_objects.count(object));
 
-    auto object_pair_it = selected_objects.find(object);
-    const auto matrix_transform = object_pair_it->first;
-    const auto outline_switch = object_pair_it->second;
+    const auto outline_switch = selected_objects[object];
 
-    for (auto it = matrix_transform->children.begin();
-        it != matrix_transform->children.end();
-        ++it)
+    for (auto it = object->children.begin(); it != object->children.end(); ++it)
     {
         if (*it == outline_switch)
         {
-            matrix_transform->children.erase(it);
+            object->children.erase(it);
+
             break;
         }
     }
 
-    object_pair_it = selected_objects.erase(object_pair_it);
+    return selected_objects.erase(selected_objects.find(object));
+}
 
-    if (selected_objects.empty())
-    {
-        gizmo_switch->children[0].mask = vsg::MASK_OFF;
-    }
+void select_object_inner(
+    vsg::ref_ptr<vsg::MatrixTransform> object,
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    vsg::observer_ptr<vsg::Viewer> observer_viewer,
+    SelectedObjectsMap& selected_objects
+)
+{
+    const auto outline = Outline::create(paged_lod, observer_viewer);
 
-    return object_pair_it;
+    const auto outline_switch = vsg::Switch::create();
+    outline_switch->addChild(vsg::Mask{MASK_GUI}, outline);
+
+    const vsg::ref_ptr<vsg::Viewer> viewer = observer_viewer;
+
+    const vsg::CompileResult compile_result =
+            viewer->compileManager->compile(outline_switch);
+
+    object->addChild(outline_switch);
+
+    vsg::updateViewer(*viewer, compile_result);
+
+    selected_objects[object] = outline_switch;
 }

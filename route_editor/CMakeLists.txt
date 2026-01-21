@@ -66,6 +66,7 @@ target_sources(${TARGET}
             include/RouteEditor.h
             include/RouteMap.h
             include/SceneGraph.h
+            include/SelectedObjectsMap.h
             include/Settings.h
             include/shader_funcs.h
             include/StringMap.h
