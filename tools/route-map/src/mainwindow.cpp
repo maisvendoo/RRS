@@ -71,6 +71,9 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(map, &MapWidget::sigOpenTrajectoryMenu,
             this, &MainWindow::slotNearestTrajectoryMenu);
 
+    connect(map, &MapWidget::sigSelectNearestTrajectory,
+            this, &MainWindow::slotSelectTrajectory);
+
     load_config("../cfg/route-map-tcp.xml");
 
     overrideByCommandLine(cmd_line);
@@ -156,7 +159,46 @@ void MainWindow::paintEvent(QPaintEvent *event)
     bg->resize(ui->Map->width(), ui->Map->height());
     bg->setScale(map->getScale());
     bg->setShift(map->getShift());
+
+    Trajectory* new_nearest_trajectory = map->nearest_trajectory;
+    if (route_begin_trajectory && new_nearest_trajectory && (route_dir != 0))
+    {
+        if (new_nearest_trajectory != bg->nearest_trajectory)
+        {
+            route_segment_t route = topology->find_route(route_begin_trajectory,
+                                                         new_nearest_trajectory,
+                                                         route_dir);
+            bg->route_trajectories = route.trajectories;
+            QString msg;
+            if (bg->route_trajectories.size())
+            {
+                msg = "Founded route (" + QString::number(bg->route_trajectories.size()) + "):";
+                for (auto& traj : bg->route_trajectories)
+                {
+                    msg += " - ";
+                    if (traj)
+                        msg += traj->getName();
+                    else
+                        msg += "null";
+                }
+            }
+            else
+            {
+                msg = "No route " +
+                      route_begin_trajectory->getName() +
+                      " - " +
+                      new_nearest_trajectory->getName();
+            }
+            ui->ptLog->appendPlainText(msg);
+        }
+    }
+    else
+    {
+        bg->route_trajectories.clear();
+    }
     bg->nearest_trajectory = map->nearest_trajectory;
+    bg->route_begin_trajectory = route_begin_trajectory;
+
     bg->update();
 }
 
@@ -490,16 +532,39 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
     {
         return;
     }
-    QPoint c = QCursor::pos();
 
     QMenu* menu = new QMenu(this);
+
     QAction* action_traj = new QAction(nearest_traj->getName(), this);
     menu->addAction(action_traj);
-    connect(action_traj, &QAction::triggered, this, [this, c, nearest_traj]{
+    connect(action_traj, &QAction::triggered, this, [this, nearest_traj]{
         ui->ptLog->appendPlainText("Pressed RMB and then selected menu on trajectory: " + nearest_traj->getName());
     });
 
-    menu->exec(c);
+    QAction* route_from_traj_fwd = new QAction(tr("Build route to forward direction"), this);
+    menu->addAction(route_from_traj_fwd);
+    connect(route_from_traj_fwd, &QAction::triggered, this, [this, nearest_traj]{
+        route_begin_trajectory = nearest_traj;
+        route_dir = 1;
+    });
+
+    QAction* route_from_traj_bwd = new QAction(tr("Build route to backward direction"), this);
+    menu->addAction(route_from_traj_bwd);
+    connect(route_from_traj_bwd, &QAction::triggered, this, [this, nearest_traj]{
+        route_begin_trajectory = nearest_traj;
+        route_dir = -1;
+    });
+
+    menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
+{
+    route_begin_trajectory = nullptr;
+    route_dir = 0;
 }
 
 //------------------------------------------------------------------------------

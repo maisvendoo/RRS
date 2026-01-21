@@ -820,6 +820,13 @@ void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        prev_map_shift = map_shift;
+        if (prev_map_shift != map_shift)
+        {
+            prev_map_shift = map_shift;
+        }
+        else
+        {
+            emit sigSelectNearestTrajectory(nearest_trajectory);
+        }
     }
 }

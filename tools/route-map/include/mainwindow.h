@@ -60,6 +60,10 @@ private:
 
     Topology *topology = new Topology;
 
+    Trajectory* route_begin_trajectory = nullptr;
+
+    int route_dir = 0;
+
     simulator_update_players_t players_data;
 
     simulator_update_pos_t train_data;
@@ -99,6 +103,8 @@ private slots:
     void slotGetVehiclePosData(QByteArray &sim_data);
 
     void slotNearestTrajectoryMenu(Trajectory* nearest_traj);
+
+    void slotSelectTrajectory(Trajectory* nearest_traj);
 
     void slotSwitchConnectorMenu();
 

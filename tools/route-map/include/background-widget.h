@@ -20,6 +20,10 @@ public:
 
     Trajectory* nearest_trajectory = nullptr;
 
+    Trajectory* route_begin_trajectory = nullptr;
+
+    std::vector<Trajectory*> route_trajectories;
+
     void resize(int width, int height)
     {
         QWidget::resize(width, height);

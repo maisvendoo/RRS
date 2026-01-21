@@ -27,6 +27,8 @@ public:
 
     conn_list_t *conn_list = nullptr;
 
+    Trajectory* route_begin_trajectory = nullptr;
+
     Trajectory* nearest_trajectory = nullptr;
 
     Connector* nearest_connector = nullptr;
@@ -77,6 +79,8 @@ public:
 signals:
 
     void sigOpenTrajectoryMenu(Trajectory* nearest_traj);
+
+    void sigSelectNearestTrajectory(Trajectory* nearest_traj);
 
 public slots:
 

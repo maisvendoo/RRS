@@ -30,7 +30,21 @@ void BackGroundWidget::paintEvent(QPaintEvent *event)
     // Серый фон
     painter.fillRect(rect(), background_color);
 
-    drawTrajectoryHighlight(painter, nearest_trajectory, QColor(0, 255, 255));
+    // Траектории маршрута
+    if (route_begin_trajectory && route_trajectories.empty())
+    {
+        drawTrajectoryHighlight(painter, route_begin_trajectory, QColor(255, 0, 0));
+    }
+    for (auto& traj : route_trajectories)
+    {
+        drawTrajectoryHighlight(painter, traj, QColor(0, 255, 0));
+    }
+
+    // Ближайшая к курсору траетория
+    if (nearest_trajectory != route_begin_trajectory)
+    {
+        drawTrajectoryHighlight(painter, nearest_trajectory, QColor(0, 255, 255));
+    }
 
     painter.end();
 }
@@ -58,7 +72,7 @@ void BackGroundWidget::drawTrajectoryHighlight(QPainter &painter, Trajectory *tr
         width -= 1.0f;
     }
 
-    for (auto& track : nearest_trajectory->getTracks())
+    for (auto& track : traj->getTracks())
     {
         QPoint p0 = coord_transform(track.begin_point);
         QPoint p1 = coord_transform(track.end_point);
