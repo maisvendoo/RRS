@@ -10,6 +10,7 @@
 #include <vsg/nodes/Group.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/Builder.h>
+#include <vsg/utils/ComputeBounds.h>
 #include <vsg/utils/LineSegmentIntersector.h>
 #include <vsg/utils/ShaderSet.h>
 
@@ -84,7 +85,22 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
 void Gizmo::update()
 {
+    vsg::vec3 translation;
 
+    for (const auto& [object, _] : selected_objects)
+    {
+        vsg::ComputeBounds compute_bounds;
+        compute_bounds.useNodeBounds = false;
+
+        object->accept(compute_bounds);
+        const auto& bounds = compute_bounds.bounds;
+
+        translation += static_cast<vsg::vec3>((bounds.min + bounds.max) / 2.0);
+    }
+
+    translation /= static_cast<float>(selected_objects.size());
+
+    this->matrix = vsg::translate(translation);
 }
 
 vsg::ref_ptr<vsg::Node> create_arrow(

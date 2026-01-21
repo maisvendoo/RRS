@@ -43,6 +43,9 @@ ObjectSelector::ObjectSelector(
     gizmo_switch = vsg::Switch::create();
     gizmo_switch->addChild(vsg::MASK_OFF, gizmo);
 
+    gizmo_mask = &gizmo_switch->children[0].mask;
+    assert(gizmo_mask);
+
     route->addChild(gizmo_switch);
 }
 
@@ -62,7 +65,6 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     }
 
     const bool selected_objects_are_empty = selected_objects.empty();
-    const bool selected_objects_were_empty = selected_objects_are_empty;
 
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
@@ -86,6 +88,8 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
                 it != selected_objects.end();
                 it = deselect_object(it->first));
         }
+
+        *gizmo_mask = selected_objects.empty() ? vsg::MASK_OFF : MASK_GUI;
 
         return;
     }
@@ -137,19 +141,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     if (selected_objects.empty())
     {
-        if (!selected_objects_were_empty)
-        {
-            gizmo_switch->children[0].mask = vsg::MASK_OFF;
-        }
+        *gizmo_mask = vsg::MASK_OFF;
     }
     else
     {
-        if (selected_objects_were_empty)
-        {
-            gizmo_switch->children[0].mask = MASK_GUI;
-        }
-
         gizmo->update();
+        *gizmo_mask = MASK_GUI;
     }
 }
 

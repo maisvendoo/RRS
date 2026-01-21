@@ -4,6 +4,7 @@
 #include "SelectedObjectsMap.h"
 
 #include <vsg/core/Inherit.h>
+#include <vsg/core/Mask.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
@@ -68,6 +69,7 @@ private:
     SelectedObjectsMap selected_objects;
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<vsg::Switch> gizmo_switch;
+    vsg::Mask* gizmo_mask = nullptr;
 };
 
 #endif // OBJECT_SELECTOR_H
