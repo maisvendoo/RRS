@@ -25,7 +25,6 @@ class LookAt;
 class MatrixTransform;
 class MoveEvent;
 class PagedLOD;
-class Switch;
 class Viewer;
 
 }
@@ -72,7 +71,6 @@ private:
     vsg::observer_ptr<vsg::Viewer> observer_viewer;
     SelectedObjectsMap selected_objects;
     vsg::ref_ptr<Gizmo> gizmo;
-    vsg::ref_ptr<vsg::Switch> gizmo_switch;
     vsg::Mask* gizmo_mask = nullptr;
 };
 

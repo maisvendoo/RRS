@@ -41,7 +41,7 @@ ObjectSelector::ObjectSelector(
 
     gizmo = Gizmo::create(settings, look_at, selected_objects);
 
-    gizmo_switch = vsg::Switch::create();
+    const auto gizmo_switch = vsg::Switch::create();
     gizmo_switch->addChild(vsg::MASK_OFF, gizmo);
 
     gizmo_mask = &gizmo_switch->children[0].mask;
