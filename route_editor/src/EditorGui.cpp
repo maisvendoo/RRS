@@ -1,7 +1,6 @@
 #include "EditorGui.h"
 
 #include "Action.h"
-#include "EditorParams.h"
 #include "EditorState.h"
 #include "ObjectProperties.h"
 #include "Settings.h"
@@ -34,11 +33,15 @@ static void update_selected_object_matrix(
 );
 
 EditorGui::EditorGui(
-    vsg::ref_ptr<EditorParams> editor_params,
+    EditorState& editor_state,
+    const vsg::KeySymbol* key_bindings,
+    vsg::ref_ptr<Route> route,
     settings_t& settings,
     vsg::ref_ptr<vsg::Options> options
 )
-    : editor_params(editor_params)
+    : editor_state(editor_state)
+    , key_bindings(key_bindings)
+    , route(route)
     , settings(settings)
 {
     (void)options;
@@ -66,7 +69,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 {
     (void)command_buffer;
 
-    switch (*editor_params->editor_state)
+    switch (editor_state)
     {
         case EditorState::SELECT_ROUTE:
         {
@@ -83,7 +86,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             ImGui::Checkbox("Show topology", &settings.show_topology);
             ImGui::End();
 
-            if (editor_params->show_demo_window)
+            if (show_demo_window)
             {
                 ImGui::ShowDemoWindow();
             }
@@ -127,12 +130,12 @@ void EditorGui::select_route() const
     static std::set<std::filesystem::path> directories;
 
     auto change_route_dir = [&](const std::filesystem::path& path) -> void {
-        editor_params->route_dir = path;
+        route->directory = path;
 
         files.clear();
         directories.clear();
 
-        for (const auto& dir_entry : std::filesystem::directory_iterator(editor_params->route_dir))
+        for (const auto& dir_entry : std::filesystem::directory_iterator(route->directory))
         {
             if (dir_entry.is_directory())
             {
@@ -146,10 +149,10 @@ void EditorGui::select_route() const
     };
 
     // Вызывается при первом запуске select_route
-    if (editor_params->route_dir.empty())
+    if (route->directory.empty())
     {
-        editor_params->route_dir = FileSystem::getInstance().getRouteRootDir();
-        change_route_dir(editor_params->route_dir);
+        route->directory = FileSystem::getInstance().getRouteRootDir();
+        change_route_dir(route->directory);
     }
 
     ImGui::Begin("Select Route", nullptr, window_flags);
@@ -157,19 +160,19 @@ void EditorGui::select_route() const
     ImGui::Text("Select route:");
 
     // Выводит путь к текущей выбранной папке и позволяет подтвердить ее
-    ImGui::Text("Current: %s", editor_params->route_dir.c_str());
+    ImGui::Text("Current: %s", route->directory.string().c_str());
     ImGui::SameLine();
     if (ImGui::Button("OK"))
     {
-        *editor_params->editor_state = EditorState::LOAD_ROUTE;
+        editor_state = EditorState::LOAD_ROUTE;
     }
 
     // Отдельно выводим кнопку для перехода на одну папку выше
-    if (editor_params->route_dir.has_parent_path())
+    if (route->directory.has_parent_path())
     {
         if (ImGui::Button(".."))
         {
-            change_route_dir(editor_params->route_dir.parent_path());
+            change_route_dir(route->directory.parent_path());
         }
     }
 
@@ -198,7 +201,7 @@ void EditorGui::show_objects_ref() const
 
     if (ImGui::BeginTable("objects_ref_table", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, relative_path] : *editor_params->objects_ref)
+        for (const auto& [label, relative_path] : route->get_objects_ref())
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
@@ -219,7 +222,7 @@ void EditorGui::show_route_map() const
 
     if (ImGui::BeginTable("route_map_table", 7, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, transform] : *editor_params->route_map)
+        for (const auto& [label, transform] : route->get_route_map())
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
@@ -257,7 +260,7 @@ void EditorGui::show_key_bindings() const
             ImGui::Text("%s", to_c_string(static_cast<Action>(i)));
             ImGui::TableNextColumn();
             std::string label;
-            label += std::toupper(editor_params->key_bindings[i]);
+            label += std::toupper(key_bindings[i]);
             ImGui::Text("%s", label.c_str());
         }
 
@@ -293,10 +296,10 @@ void EditorGui::show_camera_settings() const
     }
 
     ImGui::Text("FovY:");
-    float fovy = static_cast<float>(editor_params->perspective->fieldOfViewY);
+    float fovy = static_cast<float>(perspective->fieldOfViewY);
     if (ImGui::SliderFloat("##fovy", &fovy, settings.fovy_min, settings.fovy_max))
     {
-        editor_params->perspective->fieldOfViewY = fovy;
+        perspective->fieldOfViewY = fovy;
     }
 
     ImGui::End();
@@ -304,7 +307,7 @@ void EditorGui::show_camera_settings() const
 
 void EditorGui::show_topology() const
 {
-    const Topology& topology = *editor_params->topology;
+    const Topology& topology = topology;
     if (topology.getRouteName().isEmpty())
     {
         return;
@@ -402,7 +405,12 @@ void EditorGui::show_topology() const
 
 void EditorGui::show_selected_object_properties() const
 {
-    if (auto matrix_transform = *editor_params->selected_object)
+    if (!selected_object)
+    {
+        return;
+    }
+
+    if (auto matrix_transform = *selected_object)
     {
         ObjectProperties properties;
         if (matrix_transform->getValue("properties", properties))

@@ -62,6 +62,10 @@ public:
     bool getDouble(QString section, QString filed, double &value);
     /// Get double field
     bool getDouble(QDomNode secNode, QString field, double &value);
+    /// Get float field
+    bool getFloat(QString section, QString field, float& value);
+    /// Get float field
+    bool getFloat(QDomNode secNode, QString field, float& value);
     /// Get integer field
     bool getInt(QString section, QString filed, int &value);
     /// Get integer field
@@ -80,7 +84,7 @@ private:
     /// First element in document
 	QDomElement firstElement;
     /// Current document node for parsed file
-	QDomNode curNode;	
+	QDomNode curNode;
 };
 
 #endif // CFGREADER_H

@@ -26,7 +26,7 @@ class CameraHandler : public vsg::Inherit<vsg::Visitor, CameraHandler>
 public:
     CameraHandler(
         const settings_t& settings,
-        const VkExtent2D& extent,
+        const VkExtent2D& window_extent,
         vsg::ref_ptr<MouseHandler> mouse_handler,
         vsg::ref_ptr<KeyboardHandler> keyboard_handler,
         double initial_height

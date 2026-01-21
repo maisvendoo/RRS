@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setWindowTitle("ZDS route converter");
 
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
     routesRootDir = QString(fs.getRouteRootDir().c_str());
 
     connect(ui->pbOpenRoute, &QPushButton::released, this, &MainWindow::slotOpenRoute);
@@ -127,8 +127,8 @@ bool MainWindow::loadDescriptionFile(QString route_dir)
 //------------------------------------------------------------------------------
 void MainWindow::startPathConverter()
 {
-    FileSystem &fs = FileSystem::getInstance();
-    QString pathconv_path = PATHCONV + EXE_EXP;
+    const FileSystem& fs = FileSystem::getInstance();
+    QString pathconv_path = PATHCONV EXE_EXP;
 
     QStringList args;
     args << "--route=" + routeDir;
@@ -142,8 +142,8 @@ void MainWindow::startPathConverter()
 //------------------------------------------------------------------------------
 void MainWindow::startProfConverter()
 {
-    FileSystem &fs = FileSystem::getInstance();
-    QString profconv_path = PROFCONV + EXE_EXP;
+    const FileSystem& fs = FileSystem::getInstance();
+    QString profconv_path = PROFCONV EXE_EXP;
 
     QStringList args;
     args << "--input-route" << routeDir;
@@ -158,8 +158,8 @@ void MainWindow::startProfConverter()
 //------------------------------------------------------------------------------
 void MainWindow::startDmd2gltfConverter()
 {
-    FileSystem &fs = FileSystem::getInstance();
-    QString dmd2gltf_path = DMD2GLTF + EXE_EXP;
+    const FileSystem& fs = FileSystem::getInstance();
+    QString dmd2gltf_path = DMD2GLTF EXE_EXP;
 
     QStringList args;
     args << "--input-route" << routeDir;
@@ -179,8 +179,8 @@ void MainWindow::startDmd2gltfConverter()
 //------------------------------------------------------------------------------
 void MainWindow::startTopologyChecker()
 {
-    FileSystem &fs = FileSystem::getInstance();
-    QString topologycheck_path = TOPOLOGYCHECK + EXE_EXP;
+    const FileSystem& fs = FileSystem::getInstance();
+    QString topologycheck_path = TOPOLOGYCHECK EXE_EXP;
 
     double curve_min_radius = ui->dsbMinimumRadius->value();
 
@@ -197,8 +197,8 @@ void MainWindow::startTopologyChecker()
 //------------------------------------------------------------------------------
 void MainWindow::startParallelGenerator()
 {
-    FileSystem &fs = FileSystem::getInstance();
-    QString pathconv_path = PARALLELGEN + EXE_EXP;
+    const FileSystem& fs = FileSystem::getInstance();
+    QString pathconv_path = PARALLELGEN EXE_EXP;
 
     QString filename = ui->leFileParallel->text();
     int trkfile = ui->cbDataParallel->currentIndex() + 1;
@@ -224,8 +224,8 @@ void MainWindow::startParallelGenerator()
 //------------------------------------------------------------------------------
 void MainWindow::startSplineGenerator()
 {
-    FileSystem &fs = FileSystem::getInstance();
-    QString pathconv_path = SPLINEGEN + EXE_EXP;
+    const FileSystem& fs = FileSystem::getInstance();
+    QString pathconv_path = SPLINEGEN EXE_EXP;
 
     QString filename = ui->leFileSpline->text();
     int trkfile = ui->cbDataSpline->currentIndex() + 1;

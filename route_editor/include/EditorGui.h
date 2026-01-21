@@ -1,12 +1,14 @@
 #ifndef EDITOR_GUI_H
 #define EDITOR_GUI_H
 
+#include "EditorState.h"
+#include "Route.h"
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/ui/KeyEvent.h>
 #include <vsgImGui/imgui.h>
 
-struct EditorParams;
 struct settings_t;
 
 namespace vsg
@@ -21,7 +23,9 @@ class EditorGui : public vsg::Inherit<vsg::Command, EditorGui>
 {
 public:
     EditorGui(
-        vsg::ref_ptr<EditorParams> editor_params,
+        EditorState& editor_state,
+        const vsg::KeySymbol* key_bindings,
+        vsg::ref_ptr<Route> route,
         settings_t& settings,
         vsg::ref_ptr<vsg::Options> options = {}
     );
@@ -40,7 +44,13 @@ private:
     void show_selected_object_properties() const;
 
 private:
-    vsg::ref_ptr<EditorParams> editor_params;
+    EditorState& editor_state;
+    const vsg::KeySymbol* key_bindings;
+    bool show_demo_window = false;
+    vsg::ref_ptr<Route> route;
+    vsg::ref_ptr<vsg::MatrixTransform>* selected_object = nullptr;
+    vsg::ref_ptr<vsg::Perspective> perspective = nullptr;
+
     settings_t& settings;
     ImGuiWindowFlags window_flags = 0;
 };

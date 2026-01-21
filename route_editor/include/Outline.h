@@ -12,7 +12,6 @@ namespace vsg
 
 class Options;
 class PagedLOD;
-class ShaderSet;
 class Viewer;
 
 }
