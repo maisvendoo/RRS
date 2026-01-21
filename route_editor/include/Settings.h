@@ -1,6 +1,7 @@
 #ifndef EDITOR_SETTINGS_H
 #define EDITOR_SETTINGS_H
 
+#include <vsg/maths/vec3.h>
 #include <vsg/ui/KeyEvent.h>
 
 #include <string>
@@ -10,7 +11,7 @@ struct settings_t
     std::string window_title = "Route Editor";    ///< Window title
     int window_x = 50;                            ///< Window horizontal position
     int window_y = 50;                            ///< Window vertical position
-    int window_width = 1280;                       ///< Window width
+    int window_width = 1280;                      ///< Window width
     int window_height = 720;                      ///< Window height
     int screen_number = 0;                        ///< Screen number
     bool fullscreen = false;                      ///< Fullscreen flag
@@ -27,11 +28,12 @@ struct settings_t
     double pitch_min = -70.0;                     ///< Vertical angle down max
     double pitch_max = 70.0;                      ///< Vertical angle up max
 
+    // TODO: Separate in struct
     double gizmo_arrow_length = 5.0;
     double gizmo_arrow_thickness = 0.1;
-    double gizmo_x_axis_color[3] = {1.0, 0.0, 0.0};
-    double gizmo_y_axis_color[3] = {0.0, 1.0, 0.0};
-    double gizmo_z_axis_color[3] = {0.0, 0.0, 1.0};
+    vsg::vec3 gizmo_arrow_x_color = {1.0f, 0.0f, 0.0f};
+    vsg::vec3 gizmo_arrow_y_color = {0.0f, 1.0f, 0.0f};
+    vsg::vec3 gizmo_arrow_z_color = {0.0f, 0.0f, 1.0f};
     double gizmo_opacity = 1.0;
 
     double gui_font_size = 20.0;

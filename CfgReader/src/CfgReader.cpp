@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
 //
-//		XML config reader library
-//		(с) maisvendoo 17/09/2016
-//		Developer: Dmitry Pritykin
+//      XML config reader library
+//      (с) maisvendoo 17/09/2016
+//      Developer: Dmitry Pritykin
 //
 //------------------------------------------------------------------------------
 /*!
@@ -30,7 +30,7 @@ CfgReader::CfgReader()
 //-----------------------------------------------------------------------------
 CfgReader::~CfgReader()
 {
-	
+
 }
 
 //-----------------------------------------------------------------------------
@@ -39,13 +39,13 @@ CfgReader::~CfgReader()
 bool CfgReader::load(QString path)
 {
     // Try open file
-	file_name = path;
+    file_name = path;
     QFile file(file_name);
 
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-		return false;
-	}
+        return false;
+    }
 
     // Read content of file
     domDoc.setContent(&file);
@@ -54,15 +54,15 @@ bool CfgReader::load(QString path)
     file.close();
 
     // Get root element
-	firstElement = domDoc.documentElement();
+    firstElement = domDoc.documentElement();
 
     // Check name of root element
-	if (firstElement.tagName() != "Config")
+    if (firstElement.tagName() != "Config")
     {
-		return false;
-	}	
-	
-	return true;
+        return false;
+    }
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -70,63 +70,67 @@ bool CfgReader::load(QString path)
 //-----------------------------------------------------------------------------
 bool CfgReader::getString(QString section,
                           QString field,
-                          QString &value)
+                          QString& value)
 {
-	QDomNode secNode = getFirstSection(section);
+    QDomNode secNode = getFirstSection(section);
 
-	if (secNode.isNull())
+    if (secNode.isNull())
     {
-		return false;
+        return false;
     }
 
-	QDomNode fieldNode = getField(secNode, field);
+    QDomNode fieldNode = getField(secNode, field);
 
-	if (fieldNode.isNull())
+    if (fieldNode.isNull())
     {
-		return false;
-	}
+        return false;
+    }
 
-	value = fieldNode.toElement().text();
+    value = fieldNode.toElement().text();
 
-	return true;
+    return true;
 }
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CfgReader::getDouble(QString section, QString field, double &value)
+bool CfgReader::getDouble(QString section, QString field, double& value)
 {
-	QString tmp;
+    QString tmp;
     if (!getString(section, field, tmp))
-	{
-		return false;
-	}
+    {
+        return false;
+    }
 
-    if (!TextToDouble(tmp, value))
-	{
-		return false;
-	}
-
-	return true;
+    return TextToDouble(tmp, value);
 }
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CfgReader::getInt(QString section, QString field, int &value)
+bool CfgReader::getFloat(QString section, QString field, float& value)
 {
-	QString tmp;
+    QString tmp;
     if (!getString(section, field, tmp))
-	{
-		return false;
-	}
+    {
+        return false;
+    }
 
-    if (!TextToInt(tmp, value))
-	{
-		return false;
-	}
+    return TextToFloat(tmp, value);
+}
 
-	return true;
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+bool CfgReader::getInt(QString section, QString field, int& value)
+{
+    QString tmp;
+    if (!getString(section, field, tmp))
+    {
+        return false;
+    }
+
+    return TextToInt(tmp, value);
 }
 
 //-----------------------------------------------------------------------------
@@ -134,16 +138,16 @@ bool CfgReader::getInt(QString section, QString field, int &value)
 //-----------------------------------------------------------------------------
 QDomNode CfgReader::getFirstSection(QString section)
 {
-	QDomNode node = firstElement.firstChild();
+    QDomNode node = firstElement.firstChild();
 
-	while ( (node.nodeName() != section) && (!node.isNull()) )
-	{
-		node = node.nextSibling();
-	}
+    while ( (node.nodeName() != section) && (!node.isNull()) )
+    {
+        node = node.nextSibling();
+    }
 
-	curNode = node;
+    curNode = node;
 
-	return node;
+    return node;
 }
 
 //-----------------------------------------------------------------------------
@@ -151,17 +155,17 @@ QDomNode CfgReader::getFirstSection(QString section)
 //-----------------------------------------------------------------------------
 QDomNode CfgReader::getNextSection()
 {
-	QString section = curNode.nodeName();
-	QDomNode node = curNode.nextSibling();
+    QString section = curNode.nodeName();
+    QDomNode node = curNode.nextSibling();
 
-	while ((node.nodeName() != section) && (!node.isNull()))
-	{
-		node = node.nextSibling();
-	}
+    while ((node.nodeName() != section) && (!node.isNull()))
+    {
+        node = node.nextSibling();
+    }
 
-	curNode = node;
+    curNode = node;
 
-	return node;
+    return node;
 }
 
 //-----------------------------------------------------------------------------
@@ -169,69 +173,29 @@ QDomNode CfgReader::getNextSection()
 //-----------------------------------------------------------------------------
 QDomNode CfgReader::getField(QDomNode secNode, QString field)
 {
-	QDomNode node = secNode.firstChild();
+    QDomNode node = secNode.firstChild();
 
-	while ((node.nodeName() != field) && (!node.isNull()))
-	{
-		node = node.nextSibling();
-	}
-
-	return node;
-}
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-bool CfgReader::getString(QDomNode secNode, QString field, QString &value)
-{
-	QDomNode node = getField(secNode, field);
-
-	if (node.isNull())
+    while ((node.nodeName() != field) && (!node.isNull()))
     {
-		return false;
-	}
+        node = node.nextSibling();
+    }
 
-	value = node.toElement().text();
-
-	return true;
+    return node;
 }
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CfgReader::getDouble(QDomNode secNode, QString field, double &value)
+bool CfgReader::getString(QDomNode secNode, QString field, QString& value)
 {
-	QString tmp;
+    QDomNode node = getField(secNode, field);
 
-    if (!getString(secNode, field, tmp))
-	{
-		return false;
-	}
+    if (node.isNull())
+    {
+        return false;
+    }
 
-    if (!TextToDouble(tmp, value))
-	{
-		return false;
-	}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-bool CfgReader::getInt(QDomNode secNode, QString field, int &value)
-{
-	QString tmp;
-
-    if (!getString(secNode, field, tmp))
-	{
-		return false;
-	}
-
-    if (!TextToInt(tmp, value))
-	{
-		return false;
-	}
+    value = node.toElement().text();
 
     return true;
 }
@@ -239,7 +203,52 @@ bool CfgReader::getInt(QDomNode secNode, QString field, int &value)
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CfgReader::getBool(QString section, QString field, bool &value)
+bool CfgReader::getDouble(QDomNode secNode, QString field, double& value)
+{
+    QString tmp;
+
+    if (!getString(secNode, field, tmp))
+    {
+        return false;
+    }
+
+    return TextToDouble(tmp, value);
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+bool CfgReader::getFloat(QDomNode secNode, QString field, float& value)
+{
+    QString tmp;
+
+    if (!getString(secNode, field, tmp))
+    {
+        return false;
+    }
+
+    return TextToFloat(tmp, value);
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+bool CfgReader::getInt(QDomNode secNode, QString field, int& value)
+{
+    QString tmp;
+
+    if (!getString(secNode, field, tmp))
+    {
+        return false;
+    }
+
+    return TextToInt(tmp, value);
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+bool CfgReader::getBool(QString section, QString field, bool& value)
 {
     QString tmp;
     if (!getString(section, field, tmp))
@@ -248,15 +257,22 @@ bool CfgReader::getBool(QString section, QString field, bool &value)
     }
 
     tmp = EraseSpaces(tmp);
+    tmp = tmp.toLower();
 
-    if ( (tmp == "True") || (tmp == "true") || (tmp == "1") )
+    if ( (tmp == "true") || (tmp == "1") )
+    {
         value = true;
+    }
     else
     {
-        if ( (tmp == "False") || (tmp == "false") || (tmp == "0") )
+        if ( (tmp == "false") || (tmp == "0") )
+        {
             value = false;
+        }
         else
+        {
             return false;
+        }
     }
 
     return true;
@@ -265,7 +281,7 @@ bool CfgReader::getBool(QString section, QString field, bool &value)
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CfgReader::getBool(QDomNode secNode, QString field, bool &value)
+bool CfgReader::getBool(QDomNode secNode, QString field, bool& value)
 {
     QString tmp;
 
@@ -275,15 +291,22 @@ bool CfgReader::getBool(QDomNode secNode, QString field, bool &value)
     }
 
     tmp = EraseSpaces(tmp);
+    tmp = tmp.toLower();
 
-    if ( (tmp == "True") || (tmp == "true") || (tmp == "1") )
+    if ( (tmp == "true") || (tmp == "1") )
+    {
         value = true;
+    }
     else
     {
-        if ( (tmp == "False") || (tmp == "false") || (tmp == "0") )
+        if ( (tmp == "false") || (tmp == "0") )
+        {
             value = false;
+        }
         else
+        {
             return false;
+        }
     }
 
     return true;

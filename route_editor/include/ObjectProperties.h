@@ -12,7 +12,7 @@ struct ObjectProperties
     std::string name;
     vsg::vec3 translation;
     vsg::vec3 rotation;
-    ObjectState state = ObjectState::BASE;
+    ObjectState state = ObjectState::INITIAL;
 };
 
 #endif // OBJECT_PROPERTIES_H

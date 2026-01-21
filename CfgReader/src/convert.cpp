@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
 //
-//		Strings to numbers conversion
-//		(с) maisvendoo 17/09/2016
-//		Devleloper: Dmitry Pritykin
+//      Strings to numbers conversion
+//      (с) maisvendoo 17/09/2016
+//      Devleloper: Dmitry Pritykin
 //
 //------------------------------------------------------------------------------
 /*!
@@ -13,41 +13,40 @@
  *  \date  17/09/2016
  */
 
-#include	"convert.h"
+#include "convert.h"
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool TextToDouble(QString text, double &value)
+bool TextToDouble(QString text, double& value)
 {
-    bool validate = false;	// Check data flag
+    bool validate = false; // Check data flag
 
     // Try data conversion
-	value = text.toDouble(&validate);
-	
-    // Check validate flag
-	if (!validate)
-    {
-		return false;
-	}
+    value = text.toDouble(&validate);
 
-	return true;
+    // Check validate flag
+    return validate;
 }
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool TextToInt(QString text, int &value)
+bool TextToInt(QString text, int& value)
 {
-	bool validate = false;
-	value = text.toInt(&validate);
-	
-	if (!validate)
-    {
-		return false;
-	}
+    bool validate = false;
+    value = text.toInt(&validate);
+    return validate;
+}
 
-	return true;
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+bool TextToFloat(QString text, float& value)
+{
+    bool validate = false;
+    value = text.toFloat(&validate);
+    return validate;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,10 +56,13 @@ QString EraseSpaces(QString str)
 {
     QString result = "";
 
-    for (int i = 0; i < str.length(); i++)
+    const auto length = str.length();
+    for (auto i = decltype(length){0}; i < length; ++i)
     {
         if (str.at(i) != QChar(' '))
+        {
             result += str.at(i);
+        }
     }
 
     return result;

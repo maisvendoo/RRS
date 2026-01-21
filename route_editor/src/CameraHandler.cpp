@@ -24,7 +24,7 @@
 
 CameraHandler::CameraHandler(
     const settings_t& settings,
-    const VkExtent2D& extent,
+    const VkExtent2D& window_extent,
     vsg::ref_ptr<MouseHandler> mouse_handler,
     vsg::ref_ptr<KeyboardHandler> keyboard_handler,
     double initial_height
@@ -33,13 +33,13 @@ CameraHandler::CameraHandler(
     , mouse_handler(mouse_handler)
     , keyboard_handler(keyboard_handler)
 {
-    assert(extent.width != 0);
-    assert(extent.height != 0);
+    assert(window_extent.width != 0);
+    assert(window_extent.height != 0);
     assert(mouse_handler);
     assert(keyboard_handler);
 
-    const double window_width = static_cast<double>(extent.width);
-    const double window_height = static_cast<double>(extent.height);
+    const double window_width = static_cast<double>(window_extent.width);
+    const double window_height = static_cast<double>(window_extent.height);
     const double aspect_ratio = window_width / window_height;
 
     perspective = vsg::Perspective::create(settings.fovy, aspect_ratio,
@@ -49,7 +49,7 @@ CameraHandler::CameraHandler(
     look_at->eye.z = look_at->center.z = initial_height;
 
     camera = vsg::Camera::create(perspective, look_at,
-        vsg::ViewportState::create(extent));
+        vsg::ViewportState::create(window_extent));
 }
 
 void CameraHandler::apply(vsg::FrameEvent& frame)

@@ -3,17 +3,17 @@
 
 #include    <QString>
 
-const QString PATHCONV = "pathconv";
-const QString PROFCONV = "profconv";
-const QString DMD2GLTF = "dmd2gltf";
-const QString TOPOLOGYCHECK = "topologycheck";
-const QString PARALLELGEN = "offset-parallel-gen";
-const QString SPLINEGEN = "offset-spline-gen";
+#define PATHCONV "pathconv"
+#define PROFCONV "profconv"
+#define DMD2GLTF "dmd2gltf"
+#define TOPOLOGYCHECK "topologycheck"
+#define PARALLELGEN "offset-parallel-gen"
+#define SPLINEGEN "offset-spline-gen"
 
 #ifdef __WIN32__
-    const QString EXE_EXP = ".exe";
+    #define EXE_EXP ".exe"
 #else
-    const QString EXE_EXP = "";
+    #define EXE_EXP ""
 #endif
 
 #endif // PLATFORM_H
