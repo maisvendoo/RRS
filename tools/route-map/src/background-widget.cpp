@@ -28,38 +28,47 @@ void BackGroundWidget::paintEvent(QPaintEvent *event)
     painter.begin(this);
 
     // Серый фон
-    painter.fillRect(rect(), QColor(150, 150, 150));
+    painter.fillRect(rect(), background_color);
 
-    if (nearest_trajectory == nullptr)
+    drawTrajectoryHighlight(painter, nearest_trajectory, QColor(0, 255, 255));
+
+    painter.end();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BackGroundWidget::drawTrajectoryHighlight(QPainter &painter, Trajectory *traj, QColor highlight)
+{
+    if (!traj)
     {
-        painter.end();
         return;
     }
 
-    // Подсветка фона вдоль ближайшей к курсору траектории
-    QPen pen_wide;
-    pen_wide.setWidth((scale >= 2) ? 9 : 7);
-    pen_wide.setColor(QColor(100, 196, 196));
-    QPen pen_mid;
-    pen_wide.setWidth((scale >= 2) ? 7 : 5);
-    pen_wide.setColor(QColor(50, 222, 222));
-    QPen pen_tight;
-    pen_tight.setWidth(3);
-    pen_tight.setColor(QColor(0, 255, 255));
+    float max_width = std::ceil(static_cast<float>(scale)) + 3.0f;
+    float width = max_width;
+    std::vector<QPen> higlight_pens;
+    while (width >= 0.0f)
+    {
+        QPen pen;
+        pen.setWidth(width * 2.0f + 3.0f);
+        pen.setColor(mix_color(background_color, highlight, (width / max_width)));
+        pen.setCapStyle(Qt::FlatCap);
+        higlight_pens.push_back(pen);
+        width -= 1.0f;
+    }
 
     for (auto& track : nearest_trajectory->getTracks())
     {
         QPoint p0 = coord_transform(track.begin_point);
         QPoint p1 = coord_transform(track.end_point);
 
-        painter.setPen(pen_wide);
-        painter.drawLine(p0, p1);
-        painter.setPen(pen_mid);
-        painter.drawLine(p0, p1);
-        painter.setPen(pen_tight);
-        painter.drawLine(p0, p1);
+        for (auto& pen : higlight_pens)
+        {
+            painter.setPen(pen);
+            painter.drawLine(p0, p1);
+        }
     }
-    painter.end();
 }
 
 //------------------------------------------------------------------------------
@@ -76,4 +85,26 @@ QPoint BackGroundWidget::coord_transform(dvec3 point)
     p.setY(this->height() / 2 + shift.y() + scale * point.x);
 
     return p;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QColor BackGroundWidget::mix_color(QColor color1, QColor color2, float mix_ratio)
+{
+    if (mix_ratio <= 0.0)
+    {
+        return color2;
+    }
+
+    if (mix_ratio >= 1.0)
+    {
+        return color1;
+    }
+
+    QColor result;
+    result.setRedF  (color1.redF()   * mix_ratio + color2.redF()   * (1.0f - mix_ratio));
+    result.setGreenF(color1.greenF() * mix_ratio + color2.greenF() * (1.0f - mix_ratio));
+    result.setBlueF (color1.blueF()  * mix_ratio + color2.blueF()  * (1.0f - mix_ratio));
+    return result;
 }
