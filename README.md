@@ -8,7 +8,7 @@ The game's graphics are built upon the latest [VulkanSceneGraph](https://github.
 
 Main languge for this game development is C++17. You must ensure that your C++ compiler supports this language standard. It is expected that for building on unix-like operating systems, the GCC compiler will be used, and for Windows builds, the MinGW compiler version 13.1.0 or higher will be used.
 
-The game is distributed together with an SDK containing header files, libraries, and CMake configurations for developing custom locomotive, railcar, and equipment modules. You cant find it in sdk/ directory of game.
+The game is distributed together with an SDK containing header files, libraries, and CMake configurations for developing custom locomotive, railcar, and equipment modules. You can find it in sdk/ directory of game.
 
 Dependencies:
 
