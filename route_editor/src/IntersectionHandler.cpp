@@ -113,7 +113,13 @@ void IntersectionHandler::sort_intersections(
     vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
 )
 {
-    auto& intersections = intersector->intersections;
+    sort_intersections(intersector->intersections);
+}
+
+void IntersectionHandler::sort_intersections(
+    vsg::LineSegmentIntersector::Intersections& intersections
+)
+{
     if (intersections.empty())
     {
         return;

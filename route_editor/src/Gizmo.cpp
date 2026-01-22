@@ -92,6 +92,16 @@ bool Gizmo::handle_intersections(
     vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
 )
 {
+    // this->accept(*intersector);
+
+    // auto& intersections = intersector->intersections;
+    // if (intersections.empty())
+    // {
+    //     return false;
+    // }
+
+    // IntersectionHandler::sort_intersections(intersector);
+
     vsg::ref_ptr<vsg::Node> arrows[TOTAL_ARROWS];
     arrows[ARROW_X] = arrow_x;
     arrows[ARROW_Y] = arrow_y;

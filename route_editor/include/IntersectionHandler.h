@@ -4,6 +4,7 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/utils/LineSegmentIntersector.h>
 
 namespace vsg
 {
@@ -11,7 +12,6 @@ namespace vsg
 class ButtonPressEvent;
 class ButtonReleaseEvent;
 class Camera;
-class LineSegmentIntersector;
 
 }
 
@@ -29,6 +29,10 @@ public:
 
     static void sort_intersections(
         vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
+    );
+
+    static void sort_intersections(
+        vsg::LineSegmentIntersector::Intersections& intersections
     );
 
 private:
