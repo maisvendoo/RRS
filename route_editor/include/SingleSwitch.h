@@ -19,7 +19,7 @@ class SingleSwitch : public vsg::Inherit<vsg::Node, SingleSwitch>
 {
 public:
     vsg::Mask mask = vsg::MASK_ALL;
-    vsg::ref_ptr<vsg::Node> child;
+    vsg::ref_ptr<vsg::Node> node;
 
     template <class N, class V>
     static void t_traverse(N& node, V& visitor)
@@ -27,7 +27,7 @@ public:
         if ((visitor.traversalMask & (visitor.overrideMask | node.mask))
             != vsg::MASK_OFF)
         {
-            node.child->accept(visitor);
+            node.node->accept(visitor);
         }
     }
 

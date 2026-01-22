@@ -44,7 +44,7 @@ ObjectSelector::ObjectSelector(
 
     gizmo_switch = SingleSwitch::create();
     gizmo_switch->mask = vsg::MASK_OFF;
-    gizmo_switch->child = gizmo;
+    gizmo_switch->node = gizmo;
 
     route->addChild(vsg::Mask{MASK_GUI | MASK_CLICKABLE}, gizmo_switch);
 }
