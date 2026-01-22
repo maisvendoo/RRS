@@ -4,6 +4,7 @@
 #include "SelectedObjectsMap.h"
 
 #include <vsg/core/Inherit.h>
+#include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
@@ -71,6 +72,9 @@ private:
     vsg::ref_ptr<vsg::Node> plane_yz;
     vsg::ref_ptr<vsg::Node> plane_xz;
     vsg::ref_ptr<vsg::Node> plane_xy;
+    vsg::Mask* plane_mask_yz = nullptr;
+    vsg::Mask* plane_mask_xz = nullptr;
+    vsg::Mask* plane_mask_xy = nullptr;
 };
 
 #endif // GIZMO_H

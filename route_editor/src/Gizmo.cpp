@@ -61,10 +61,16 @@ Gizmo::Gizmo(
     planes[ARROW_Y] = &plane_xz;
     planes[ARROW_Z] = &plane_xy;
 
+    vsg::Mask** plane_masks[TOTAL_ARROWS];
+    plane_masks[ARROW_X] = &plane_mask_yz;
+    plane_masks[ARROW_Y] = &plane_mask_xz;
+    plane_masks[ARROW_Z] = &plane_mask_xy;
+
     const float plane_size = 100.0f;
     const float line_size = 0.01f;
 
     const auto switch_group = vsg::Switch::create();
+    switch_group->children.reserve(2 * TOTAL_ARROWS);
 
     for (int i = 0; i < TOTAL_ARROWS; ++i)
     {
@@ -72,7 +78,8 @@ Gizmo::Gizmo(
         this->addChild(*arrows[i]);
 
         *planes[i] = create_plane(plane_size, i);
-        switch_group->addChild(vsg::Mask{MASK_CLICKABLE}, *planes[i]);
+        switch_group->addChild(vsg::MASK_OFF, *planes[i]);
+        *plane_masks[i] = &switch_group->children.back().mask;
 
         switch_group->addChild(vsg::Mask{MASK_GUI}, create_line(
             plane_size, line_size, i, arrow_colors[i]));
