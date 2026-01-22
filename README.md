@@ -22,3 +22,4 @@ Dependencies:
 * [Lua](https://github.com/maisvendoo/lua-cmake) – scripting language for writing game scenarios
 * [sol2](https://github.com/maisvendoo/sol2) – C++ binding library for Lua integration
 
+For more information, you can visit our [official website](https://rusrailsim.ru) as well as our group on the [VK social network](https://vk.com/rusrailsim) (both in Russian). They also contain a [detailed guide for building the game on Windows](https://www.rusrailsim.ru/support/developer_guide/#windows_10/11_64-bit) and include add-ons that extend the game's functionality.
