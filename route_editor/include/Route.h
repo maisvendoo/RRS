@@ -8,7 +8,7 @@
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/nodes/Group.h>
+#include <vsg/nodes/Switch.h>
 
 #include <filesystem>
 #include <string>
@@ -25,7 +25,7 @@ class Viewer;
 
 }
 
-class Route : public vsg::Inherit<vsg::Group, Route>
+class Route : public vsg::Inherit<vsg::Switch, Route>
 {
 public:
     std::filesystem::path directory;

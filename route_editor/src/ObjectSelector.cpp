@@ -44,10 +44,10 @@ ObjectSelector::ObjectSelector(
     const auto gizmo_switch = vsg::Switch::create();
     gizmo_switch->addChild(vsg::MASK_OFF, gizmo);
 
-    gizmo_mask = &gizmo_switch->children[0].mask;
+    gizmo_mask = &gizmo_switch->children.front().mask;
     assert(gizmo_mask);
 
-    route->addChild(gizmo_switch);
+    route->addChild(vsg::Mask{MASK_GUI | MASK_CLICKABLE}, gizmo_switch);
 }
 
 ObjectSelector::~ObjectSelector() = default;
@@ -119,22 +119,22 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
             continue;
         }
 
-        const auto paged_lod_switch = mt_children[0].cast<vsg::Switch>();
-        if (!paged_lod_switch)
+        const auto switch_group = mt_children.front().cast<vsg::Switch>();
+        if (!switch_group)
         {
             continue;
         }
 
-        const auto& pl_switch_children = paged_lod_switch->children;
-        if (pl_switch_children.empty())
+        const auto& sg_children = switch_group->children;
+        if (sg_children.empty())
         {
             continue;
         }
 
-        const auto paged_lod = pl_switch_children[0].node.cast<vsg::PagedLOD>();
+        const auto paged_lod = sg_children.front().node.cast<vsg::PagedLOD>();
         if (paged_lod)
         {
-            select_object(matrix_transform, paged_lod);
+            select_object(matrix_transform, switch_group, paged_lod);
 
             break;
         }
@@ -172,10 +172,12 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
 void ObjectSelector::select_object(
     vsg::ref_ptr<vsg::MatrixTransform> object,
+    vsg::ref_ptr<vsg::Switch> switch_group,
     vsg::ref_ptr<vsg::PagedLOD> paged_lod
 )
 {
     assert(object);
+    assert(switch_group);
     assert(paged_lod);
 
     const bool clicked_on_selected_object = (
@@ -189,14 +191,14 @@ void ObjectSelector::select_object(
         }
         else
         {
-            select_object_inner(object, paged_lod);
+            select_object_inner(object, switch_group, paged_lod);
         }
     }
     else
     {
         if (selected_objects.empty())
         {
-            select_object_inner(object, paged_lod);
+            select_object_inner(object, switch_group, paged_lod);
         }
         else if (clicked_on_selected_object)
         {
@@ -226,31 +228,33 @@ void ObjectSelector::select_object(
                 it != selected_objects.end();
                 it = deselect_object(it->first));
 
-            select_object_inner(object, paged_lod);
+            select_object_inner(object, switch_group, paged_lod);
         }
     }
 }
 
 void ObjectSelector::select_object_inner(
     vsg::ref_ptr<vsg::MatrixTransform> object,
+    vsg::ref_ptr<vsg::Switch> switch_group,
     vsg::ref_ptr<vsg::PagedLOD> paged_lod
 )
 {
-    const auto outline = Outline::create(settings, paged_lod, observer_viewer);
-
-    const auto outline_switch = vsg::Switch::create();
-    outline_switch->addChild(vsg::Mask{MASK_GUI}, outline);
+    assert(object);
+    assert(switch_group);
+    assert(paged_lod);
 
     const vsg::ref_ptr<vsg::Viewer> viewer = observer_viewer;
 
-    const vsg::CompileResult compile_result =
-            viewer->compileManager->compile(outline_switch);
+    const auto outline = Outline::create(settings, paged_lod, observer_viewer);
 
-    object->addChild(outline_switch);
+    const vsg::CompileResult compile_result =
+        viewer->compileManager->compile(outline);
+
+    switch_group->addChild(vsg::Mask{MASK_GUI}, outline);
 
     vsg::updateViewer(*viewer, compile_result);
 
-    selected_objects[object] = outline_switch;
+    selected_objects[object] = {switch_group, outline};
 }
 
 SelectedObjectsIterator ObjectSelector::deselect_object(
@@ -260,13 +264,16 @@ SelectedObjectsIterator ObjectSelector::deselect_object(
     assert(object);
     assert(selected_objects.count(object));
 
-    const auto outline_switch = selected_objects[object];
+    const auto switch_group = selected_objects[object].switch_group;
+    auto& sg_children = switch_group->children;
 
-    for (auto it = object->children.begin(); it != object->children.end(); ++it)
+    const auto outline = selected_objects[object].outline;
+
+    for (auto it = sg_children.begin(); it != sg_children.end(); ++it)
     {
-        if (*it == outline_switch)
+        if (it->node == outline)
         {
-            object->children.erase(it);
+            sg_children.erase(it);
 
             break;
         }

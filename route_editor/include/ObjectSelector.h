@@ -25,6 +25,7 @@ class LookAt;
 class MatrixTransform;
 class MoveEvent;
 class PagedLOD;
+class Switch;
 class Viewer;
 
 }
@@ -51,11 +52,13 @@ public:
 private:
     void select_object(
         vsg::ref_ptr<vsg::MatrixTransform> object,
+        vsg::ref_ptr<vsg::Switch> switch_group,
         vsg::ref_ptr<vsg::PagedLOD> paged_lod
     );
 
     void select_object_inner(
         vsg::ref_ptr<vsg::MatrixTransform> object,
+        vsg::ref_ptr<vsg::Switch> switch_group,
         vsg::ref_ptr<vsg::PagedLOD> paged_lod
     );
 

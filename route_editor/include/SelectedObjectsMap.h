@@ -5,6 +5,8 @@
 
 #include <map>
 
+class Outline;
+
 namespace vsg
 {
 
@@ -13,8 +15,14 @@ class Switch;
 
 }
 
+struct SelectedObjectData
+{
+    vsg::ref_ptr<vsg::Switch> switch_group;
+    vsg::ref_ptr<Outline> outline;
+};
+
 using SelectedObjectsMap = std::map<vsg::ref_ptr<vsg::MatrixTransform>,
-    vsg::ref_ptr<vsg::Switch>>;
+    SelectedObjectData>;
 
 using SelectedObjectsIterator = SelectedObjectsMap::iterator;
 

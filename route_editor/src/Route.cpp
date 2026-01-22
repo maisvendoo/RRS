@@ -64,7 +64,7 @@ bool Route::load(
         paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
             settings.view_distance);
 
-        paged_lod->children[0] = vsg::PagedLOD::Child{0.1, {}};
+        paged_lod->children.front() = vsg::PagedLOD::Child{0.1, {}};
         paged_lod->options = options;
 
         paged_lods[label] = paged_lod;
@@ -210,20 +210,20 @@ void Route::load_static_objects(
 
         const vsg::mat4 translate = vsg::translate(translation);
 
-        const auto paged_lod_switch = vsg::Switch::create();
+        const auto switch_group = vsg::Switch::create();
 
-        paged_lod_switch->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE},
+        switch_group->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE},
             paged_lod_it->second);
 
         const auto matrix_transform = vsg::MatrixTransform::create();
         matrix_transform->matrix = translate * rotate_z * rotate_y * rotate_x;
-        matrix_transform->addChild(paged_lod_switch);
+        matrix_transform->addChild(switch_group);
         matrix_transform->setValue("properties", properties);
 
         const vsg::CompileResult compile_result =
             viewer->compileManager->compile(matrix_transform);
 
-        this->addChild(matrix_transform);
+        this->addChild(vsg::MASK_ALL, matrix_transform);
 
         vsg::updateViewer(*viewer, compile_result);
     }
@@ -345,7 +345,7 @@ void Route::load_signals(
             new_paged_lod->bound.set(vsg::dvec3(0.0, 0.0, 0.0),
                 settings.view_distance);
 
-            new_paged_lod->children[0] = vsg::PagedLOD::Child{0.1, {}};
+            new_paged_lod->children.front() = vsg::PagedLOD::Child{0.1, {}};
             new_paged_lod->options = options;
 
             paged_lods[signal_model_path] = new_paged_lod;
@@ -378,20 +378,20 @@ void Route::load_signals(
         properties.translation.y = pos.y;
         properties.translation.z = pos.z;
 
-        const auto paged_lod_switch = vsg::Switch::create();
+        const auto switch_group = vsg::Switch::create();
 
-        paged_lod_switch->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE},
+        switch_group->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE},
             paged_lod);
 
         const auto matrix_transform = vsg::MatrixTransform::create();
         matrix_transform->matrix = translate * rotate;
-        matrix_transform->addChild(paged_lod_switch);
+        matrix_transform->addChild(switch_group);
         matrix_transform->setValue("properties", properties);
 
         const vsg::CompileResult compile_result =
             viewer->compileManager->compile(matrix_transform);
 
-        this->addChild(matrix_transform);
+        this->addChild(vsg::MASK_ALL, matrix_transform);
 
         vsg::updateViewer(*viewer, compile_result);
     }

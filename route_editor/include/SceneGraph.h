@@ -3,7 +3,7 @@
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/nodes/Group.h>
+#include <vsg/nodes/Switch.h>
 
 class Route;
 
@@ -14,7 +14,7 @@ class AmbientLight;
 
 }
 
-class SceneGraph : public vsg::Inherit<vsg::Group, SceneGraph>
+class SceneGraph : public vsg::Inherit<vsg::Switch, SceneGraph>
 {
 public:
     SceneGraph();
