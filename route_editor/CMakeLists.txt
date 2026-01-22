@@ -39,6 +39,7 @@ target_sources(${TARGET}
         src/SceneGraph.cpp
         src/Settings.cpp
         src/shader_funcs.cpp
+        src/SwitchGroup.cpp
         src/WindowHandler.cpp
 
     PRIVATE
@@ -70,6 +71,7 @@ target_sources(${TARGET}
             include/Settings.h
             include/shader_funcs.h
             include/StringMap.h
+            include/SwitchGroup.h
             include/Vec3Pair.h
             include/WindowHandler.h
 )
