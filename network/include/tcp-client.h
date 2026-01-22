@@ -39,6 +39,12 @@ public:
 
     void sendSignalCommand(QByteArray signal_command);
 
+    void sendBuildRouteCommand(QByteArray route_command);
+
+    void sendTrainRouteCommand(QByteArray route_command);
+
+    void sendShuntingRouteCommand(QByteArray route_command);
+
     void sendVehicleControl(QByteArray vehicle_control_by_keyboard);
 
     void sendNewTrainName(int train_idx, const QString &new_name);

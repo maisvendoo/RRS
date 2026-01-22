@@ -143,6 +143,9 @@ private:
 
     Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
 
+    /// Проверка имён траекторий в команде построения маршрута
+    std::pair<Trajectory*, Trajectory*> check_build_route_command(const route_command_t& rc);
+
     /// Установка стрелок по маршруту
     bool set_switchs_by_route(const route_segment_t &route, int dir);
 
@@ -157,7 +160,11 @@ public slots:
 
     void slotSignalCommand(QByteArray& signal_data);
 
-    void slotBuildRoute(QByteArray& route_data);
+    void slotBuildRouteCommand(QByteArray& route_data);
+
+    void slotTrainRouteCommand(QByteArray& route_data);
+
+    void slotShuntingRouteCommand(QByteArray& route_data);
 
 private slots:
 
