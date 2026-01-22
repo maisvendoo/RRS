@@ -1,86 +1,81 @@
 #include "Gizmo.h"
 
+#include "Settings.h"
+
 #include <vsg/core/ref_ptr.h>
-#include <vsg/io/Options.h>
 #include <vsg/maths/box.h>
+#include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
-#include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/Node.h>
 #include <vsg/utils/Builder.h>
-#include <vsg/utils/LineSegmentIntersector.h>
 #include <vsg/utils/ShaderSet.h>
 
 #include <cmath>
 
 static vsg::ref_ptr<vsg::Node> create_arrow(
+    const settings_t& settings,
     vsg::Builder& builder,
     const vsg::vec3& direction,
-    float length,
-    float thickness,
-    const vsg::vec3& color,
-    float opacity
+    const vsg::vec3& color
 );
 
-Gizmo::Gizmo(
-    vsg::ref_ptr<vsg::Options>& options,
-    float arrow_length,
-    float arrow_thickness,
-    vsg::vec3 x_axis_color,
-    vsg::vec3 y_axis_color,
-    vsg::vec3 z_axis_color,
-    float opacity
-)
+Gizmo::Gizmo(const settings_t& settings)
 {
     vsg::Builder builder;
-    // builder.options = options;
-    // builder.sharedObjects = options->sharedObjects;
     builder.shaderSet = vsg::createFlatShadedShaderSet();
 
-    arrow_x = create_arrow(builder, vsg::vec3(1.0f, 0.0f, 0.0f),
-        arrow_length, arrow_thickness, x_axis_color, opacity);
+    enum
+    {
+        ARROW_X,
+        ARROW_Y,
+        ARROW_Z,
+        TOTAL_ARROWS
+    };
 
-    arrow_y = create_arrow(builder, vsg::vec3(0.0f, 1.0f, 0.0f),
-        arrow_length, arrow_thickness, y_axis_color, opacity);
+    vsg::ref_ptr<vsg::Node>* arrows[TOTAL_ARROWS];
+    arrows[ARROW_X] = &arrow_x;
+    arrows[ARROW_Y] = &arrow_y;
+    arrows[ARROW_Z] = &arrow_z;
 
-    arrow_z = create_arrow(builder, vsg::vec3(0.0f, 0.0f, 1.0f),
-        arrow_length, arrow_thickness, z_axis_color, opacity);
+    vsg::vec3 arrow_directions[TOTAL_ARROWS];
+    arrow_directions[ARROW_X] = {1.0f, 0.0f, 0.0f};
+    arrow_directions[ARROW_Y] = {0.0f, 1.0f, 0.0f};
+    arrow_directions[ARROW_Z] = {0.0f, 0.0f, 1.0f};
 
-    this->children = {arrow_x, arrow_y, arrow_z};
+    vsg::vec3 arrow_colors[TOTAL_ARROWS];
+    arrow_colors[ARROW_X] = settings.gizmo_arrow_x_color;
+    arrow_colors[ARROW_Y] = settings.gizmo_arrow_y_color;
+    arrow_colors[ARROW_Z] = settings.gizmo_arrow_z_color;
+
+    for (int i = 0; i < TOTAL_ARROWS; ++i)
+    {
+        *arrows[i] = create_arrow(settings, builder,
+            arrow_directions[i], arrow_colors[i]);
+
+        this->addChild(*arrows[i]);
+    }
 }
 
-GizmoAxis Gizmo::handle_intersection(const vsg::LineSegmentIntersector::Intersection& intersection) const
+void Gizmo::set_outer_matrix(vsg::dmat4* outer_matrix)
 {
-    for (const vsg::Node* node : intersection.nodePath)
-    {
-        if (node == arrow_x)
-        {
-            return GizmoAxis::X;
-        }
-        else if (node == arrow_y)
-        {
-            return GizmoAxis::Y;
-        }
-        else if (node == arrow_z)
-        {
-            return GizmoAxis::Z;
-        }
-    }
-
-    return GizmoAxis::NONE;
+    this->outer_matrix = outer_matrix;
 }
 
 static vsg::ref_ptr<vsg::Node> create_arrow(
+    const settings_t& settings,
     vsg::Builder& builder,
     const vsg::vec3& direction,
-    float length,
-    float thickness,
-    const vsg::vec3& color,
-    float opacity
+    const vsg::vec3& color
 )
 {
+    const float thickness = static_cast<float>(settings.gizmo_arrow_thickness);
+    const float length = static_cast<float>(settings.gizmo_arrow_length);
+    const float opacity = static_cast<float>(settings.gizmo_opacity);
+
     vsg::box box = {
-        vsg::vec3{-0.5f * thickness, -0.5f * thickness, 0.0},
+        vsg::vec3{-0.5f * thickness, -0.5f * thickness, 0.0f},
         vsg::vec3{ 0.5f * thickness,  0.5f * thickness, length}
     };
 
@@ -99,15 +94,15 @@ static vsg::ref_ptr<vsg::Node> create_arrow(
     vsg::StateInfo state_info;
     state_info.blending = true;
 
-    const vsg::ref_ptr<vsg::Node> cylinder = builder.createCylinder(geometry_info, state_info);
+    const auto cylinder = builder.createCylinder(geometry_info, state_info);
 
-    box.min = vsg::vec3(-1.5f * thickness, -1.5f * thickness, length);
-    box.max = vsg::vec3( 1.5f * thickness,  1.5f * thickness, length + 7.0f * thickness);
+    box.min = {-1.5f * thickness, -1.5f * thickness, length};
+    box.max = { 1.5f * thickness,  1.5f * thickness, length + 7.0f * thickness};
     geometry_info.set(box);
 
-    const vsg::ref_ptr<vsg::Node> cone = builder.createCone(geometry_info, state_info);
+    const auto cone = builder.createCone(geometry_info, state_info);
 
-    const vsg::ref_ptr<vsg::Group> arrow = vsg::Group::create();
+    const auto arrow = vsg::Group::create();
     arrow->addChild(cylinder);
     arrow->addChild(cone);
 

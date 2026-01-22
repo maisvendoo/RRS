@@ -3,7 +3,7 @@
 
 enum class ObjectState
 {
-    BASE,
+    INITIAL,
     MOVING,
     ROTATING,
     SCALING

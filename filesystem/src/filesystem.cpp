@@ -1,4 +1,4 @@
-#include    "filesystem.h"
+#include "filesystem.h"
 
 //------------------------------------------------------------------------------
 //
@@ -14,8 +14,8 @@ FileSystem& FileSystem::getInstance()
 //------------------------------------------------------------------------------
 FileSystem::FileSystem()
 {
-    std::string workDir = QDir::currentPath().toStdString();
-    std::string tmp = getLevelUpDirectory(workDir, 1);
+    const std::string workDir = QDir::currentPath().toStdString();
+    const std::string tmp = getLevelUpDirectory(workDir, 1);
 
     setDir(binDir, workDir);
     setDir(routeRootDir, tmp + "routes");
@@ -48,7 +48,7 @@ void FileSystem::setDir(std::string& dir, const std::string& path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::getRouteRootDir() const
+const std::string& FileSystem::getRouteRootDir() const
 {
     return routeRootDir;
 }
@@ -56,7 +56,7 @@ std::string FileSystem::getRouteRootDir() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::getConfigDir() const
+const std::string& FileSystem::getConfigDir() const
 {
     return configDir;
 }
@@ -64,7 +64,7 @@ std::string FileSystem::getConfigDir() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::getLogsDir() const
+const std::string& FileSystem::getLogsDir() const
 {
     return logsDir;
 }
@@ -72,7 +72,7 @@ std::string FileSystem::getLogsDir() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::getLibraryDir() const
+const std::string& FileSystem::getLibraryDir() const
 {
     return libraryDir;
 }
@@ -80,72 +80,72 @@ std::string FileSystem::getLibraryDir() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::getTrainsDir() const
+const std::string& FileSystem::getTrainsDir() const
 {
     return trainsDir;
 }
 
-std::string FileSystem::getModulesDir() const
+const std::string& FileSystem::getModulesDir() const
 {
     return modulesDir;
 }
 
-std::string FileSystem::getVehiclesDir() const
+const std::string& FileSystem::getVehiclesDir() const
 {
     return vehiclesDir;
 }
 
-std::string FileSystem::getCouplingsDir() const
+const std::string& FileSystem::getCouplingsDir() const
 {
     return couplingsDir;
 }
 
-std::string FileSystem::getDevicesDir() const
+const std::string& FileSystem::getDevicesDir() const
 {
     return devicesDir;
 }
 
-std::string FileSystem::getBinaryDir() const
+const std::string& FileSystem::getBinaryDir() const
 {
     return binDir;
 }
 
-std::string FileSystem::getPluginsDir() const
+const std::string& FileSystem::getPluginsDir() const
 {
     return  pluginsDir;
 }
 
-std::string FileSystem::getDataDir() const
+const std::string& FileSystem::getDataDir() const
 {
     return dataDir;
 }
 
-std::string FileSystem::getVehicleModelsDir() const
+const std::string& FileSystem::getVehicleModelsDir() const
 {
     return vehicleModelsDir;
 }
 
-std::string FileSystem::getVehicleTexturesDir() const
+const std::string& FileSystem::getVehicleTexturesDir() const
 {
     return vehicleTexturesDir;
 }
 
-std::string FileSystem::getScreenshotsDir() const
+const std::string& FileSystem::getScreenshotsDir() const
 {
     return screenshotsDir;
 }
 
-std::string FileSystem::getFontsDir() const
+const std::string& FileSystem::getFontsDir() const
 {
     return fontsDir;
 }
 
-std::string FileSystem::getSoundsDir() const
+const std::string& FileSystem::getSoundsDir() const
 {
     return soundsDir;
 }
 
-std::string FileSystem::getThemeDir() const
+const std::string& FileSystem::getThemeDir() const
 {
     return themeDir;
 }
@@ -153,7 +153,8 @@ std::string FileSystem::getThemeDir() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::combinePath(const std::string &path1, const std::string &path2) const
+std::string FileSystem::combinePath(const std::string& path1,
+    const std::string& path2) const
 {
     if (path1.empty())
     {
@@ -173,7 +174,7 @@ std::string FileSystem::combinePath(const std::string &path1, const std::string 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::toNativeSeparators(const std::string &path) const
+std::string FileSystem::toNativeSeparators(const std::string& path) const
 {
     std::string tmp = path;
 
@@ -189,7 +190,7 @@ std::string FileSystem::toNativeSeparators(const std::string &path) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::getNativePath(const std::string &path) const
+std::string FileSystem::getNativePath(const std::string& path) const
 {
     return QDir::toNativeSeparators(QString(path.c_str())).toStdString();
 }
@@ -205,12 +206,15 @@ char FileSystem::separator() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::string FileSystem::getLevelUpDirectory(std::string path, int num_levels) const
+std::string FileSystem::getLevelUpDirectory(const std::string& path,
+    int num_levels) const
 {
     QDir dir(QString(path.c_str()));
 
     for (int i = 0; i < num_levels; ++i)
+    {
         dir.cdUp();
+    }
 
     QString tmp = dir.path() + QDir::separator();
 
