@@ -4,6 +4,7 @@
 #include "Mask.h"
 #include "SelectedObjectsMap.h"
 #include "Settings.h"
+#include "SingleSwitch.h"
 
 #include <vsg/app/ViewMatrix.h>
 #include <vsg/core/Mask.h>
@@ -61,16 +62,15 @@ Gizmo::Gizmo(
     planes[AXIS_Y] = &plane_xz;
     planes[AXIS_Z] = &plane_xy;
 
-    vsg::Mask** plane_masks[TOTAL_AXES];
-    plane_masks[AXIS_X] = &plane_mask_yz;
-    plane_masks[AXIS_Y] = &plane_mask_xz;
-    plane_masks[AXIS_Z] = &plane_mask_xy;
+    vsg::ref_ptr<SingleSwitch>* plane_switches[TOTAL_AXES];
+    plane_switches[AXIS_X] = &plane_yz_switch;
+    plane_switches[AXIS_Y] = &plane_xz_switch;
+    plane_switches[AXIS_Z] = &plane_xy_switch;
 
     const float plane_size = 100.0f;
     const float line_size = 0.01f;
 
     const auto switch_group = vsg::Switch::create();
-    switch_group->children.reserve(2 * TOTAL_AXES);
 
     for (int i = 0; i < TOTAL_AXES; ++i)
     {
@@ -78,8 +78,10 @@ Gizmo::Gizmo(
         this->addChild(*arrows[i]);
 
         *planes[i] = create_plane(plane_size, i);
-        switch_group->addChild(vsg::MASK_OFF, *planes[i]);
-        *plane_masks[i] = &switch_group->children.back().mask;
+        *plane_switches[i] = SingleSwitch::create();
+        (*plane_switches[i])->mask = vsg::MASK_OFF;
+        (*plane_switches[i])->node = *planes[i];
+        this->addChild(*plane_switches[i]);
 
         switch_group->addChild(vsg::Mask{MASK_GUI}, create_line(
             plane_size, line_size, i, arrow_colors[i]));
@@ -120,10 +122,10 @@ bool Gizmo::handle_intersections(
     planes[AXIS_Y] = plane_xz;
     planes[AXIS_Z] = plane_xy;
 
-    vsg::Mask* plane_masks[TOTAL_AXES];
-    plane_masks[AXIS_X] = plane_mask_yz;
-    plane_masks[AXIS_Y] = plane_mask_xz;
-    plane_masks[AXIS_Z] = plane_mask_xy;
+    vsg::ref_ptr<SingleSwitch> plane_switches[TOTAL_AXES];
+    plane_switches[AXIS_X] = plane_yz_switch;
+    plane_switches[AXIS_Y] = plane_xz_switch;
+    plane_switches[AXIS_Z] = plane_xy_switch;
 
     const auto& node_path = intersections.front()->nodePath;
     assert(!node_path.empty());
@@ -190,8 +192,8 @@ bool Gizmo::handle_intersections(
     }
 
     active_plain = planes[max_index];
-    active_plain_mask = plane_masks[max_index];
-    *active_plain_mask = MASK_CLICKABLE;
+    active_plain_switch = plane_switches[max_index];
+    active_plain_switch->mask = MASK_GUI | MASK_CLICKABLE;
 
     intersector->intersections.clear();
 

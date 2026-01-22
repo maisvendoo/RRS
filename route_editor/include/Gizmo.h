@@ -4,7 +4,6 @@
 #include "SelectedObjectsMap.h"
 
 #include <vsg/core/Inherit.h>
-#include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
@@ -13,6 +12,7 @@
 
 #include <map>
 
+class SingleSwitch;
 struct settings_t;
 
 namespace vsg
@@ -76,9 +76,9 @@ private:
     vsg::ref_ptr<vsg::Node> plane_yz;
     vsg::ref_ptr<vsg::Node> plane_xz;
     vsg::ref_ptr<vsg::Node> plane_xy;
-    vsg::Mask* plane_mask_yz = nullptr;
-    vsg::Mask* plane_mask_xz = nullptr;
-    vsg::Mask* plane_mask_xy = nullptr;
+    vsg::ref_ptr<SingleSwitch> plane_yz_switch;
+    vsg::ref_ptr<SingleSwitch> plane_xz_switch;
+    vsg::ref_ptr<SingleSwitch> plane_xy_switch;
 
     using MatrixTransformPtr = vsg::ref_ptr<vsg::MatrixTransform>;
     using MatrixMap = std::map<MatrixTransformPtr, vsg::dmat4>;
@@ -86,7 +86,7 @@ private:
     vsg::vec3 begin_position;
     MatrixMap selected_objects_begin_matrixes;
     vsg::ref_ptr<vsg::Node> active_plain;
-    vsg::Mask* active_plain_mask = nullptr;
+    vsg::ref_ptr<SingleSwitch> active_plain_switch;
 };
 
 #endif // GIZMO_H
