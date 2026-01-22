@@ -1270,39 +1270,49 @@ void Topology::slotSignalCommand(QByteArray& signal_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
+void Topology::slotBuildRoute(QByteArray &route_data)
 {
-    auto s_traj = traj_list.value(start_traj, nullptr);
+    route_command_t rc;
+    rc.deserialize(route_data);
+
+    auto s_traj = traj_list.value(rc.trajectory_begin, nullptr);
 
     if (s_traj == nullptr)
     {
         Journal::instance()->error("BuildRoute: Unknown start trajectory "
-                                   + start_traj);
+                                   + rc.trajectory_begin);
         return;
     }
 
-    auto t_traj = traj_list.value(target_traj, nullptr);
+    auto t_traj = traj_list.value(rc.trajectory_end, nullptr);
 
     if (t_traj == nullptr)
     {
         Journal::instance()->error("BuildRoute: Unknown target trajectory "
-                                   + target_traj);
+                                   + rc.trajectory_end);
         return;
     }
 
-    auto route = find_route(s_traj, t_traj, dir);
+    if ((rc.dir != 1) && (rc.dir != -1))
+    {
+        Journal::instance()->error("BuildRoute: Invalid direction of searching "
+                                   + QString::number(rc.dir));
+        return;
+    }
+
+    auto route = find_route(s_traj, t_traj, rc.dir);
 
     if ((route.dir == 0) || route.trajectories.empty())
     {
         Journal::instance()->error("Build route: No route from "
-                                   + start_traj + " to " + target_traj);
+                                   + rc.trajectory_begin + " to " + rc.trajectory_end);
         return;
     }
     Journal::instance()->info("Build route: founded from "
-                              + start_traj + " to " + target_traj
+                              + rc.trajectory_begin + " to " + rc.trajectory_end
                               + " through " + QString::number(route.trajectories.size()) + "trajectories");
 
-    if (!set_switchs_by_route(route, dir))
+    if (!set_switchs_by_route(route, rc.dir))
     {
         Journal::instance()->error("Build route: Route is occupied or switches cannot be set");
         return;
@@ -1310,12 +1320,12 @@ void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
 
     QStringList signals_for_open;
 
-    if (!open_route_signals(route, dir, signals_for_open))
+    if (!open_route_signals(route, rc.dir, signals_for_open))
     {
         Journal::instance()->error("Build route: Can't open route signals");
     }
 
-    emit sigSetOpenSignalsQueue(signals_for_open, dir);
+    emit sigSetOpenSignalsQueue(signals_for_open, rc.dir);
 }
 
 //------------------------------------------------------------------------------

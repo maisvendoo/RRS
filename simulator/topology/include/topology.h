@@ -157,7 +157,7 @@ public slots:
 
     void slotSignalCommand(QByteArray& signal_data);
 
-    void slotBuildRoute(QString start_traj, QString target_traj, int dir);
+    void slotBuildRoute(QByteArray& route_data);
 
 private slots:
 

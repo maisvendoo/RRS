@@ -2,6 +2,7 @@
 #include    <Journal.h>
 #include    <filesystem.h>
 #include    <datetime.h>
+#include    <route-segment.h>
 #include    <switch-state.h>
 #include    <signals-data-types.h>
 
@@ -461,7 +462,13 @@ void ScenarioManager::taskSetDelay(double timeout)
 //------------------------------------------------------------------------------
 void ScenarioManager::buildRoute(QString start_traj, QString target_traj, int dir)
 {
-    emit sigBuildRoute(start_traj, target_traj, dir);
+    route_command_t rc;
+    rc.trajectory_begin = start_traj;
+    rc.trajectory_end = target_traj;
+    rc.dir = (dir < 0) ? -1 : 1;
+
+    QByteArray rc_data = rc.serialize();
+    emit sigBuildRoute(rc_data);
 }
 
 //------------------------------------------------------------------------------
@@ -479,7 +486,7 @@ void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::s
 //------------------------------------------------------------------------------
 int ScenarioManager::findTrainByName(const std::string &name)
 {
-    for (auto train_data : train_datas)
+    for (auto& train_data : train_datas)
     {
         if (train_data.name == name)
         {
@@ -495,7 +502,7 @@ int ScenarioManager::findTrainByName(const std::string &name)
 //------------------------------------------------------------------------------
 std::string ScenarioManager::findTrainByIndex(int train_idx)
 {
-    for (auto train_data : train_datas)
+    for (auto& train_data : train_datas)
     {
         if (train_data.getIndex() == train_idx)
         {
@@ -586,7 +593,7 @@ void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir)
 {
     const double signal_open_delay = 0.5;
 
-    for (auto conn_name : conn_list)
+    for (auto& conn_name : conn_list)
     {
         taskSetDelay(signal_open_delay);
         taskOpenSignal(conn_name.toStdString(), dir);

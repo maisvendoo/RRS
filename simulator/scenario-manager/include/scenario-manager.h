@@ -64,7 +64,7 @@ signals:
 
     void sigSignalCommand(QByteArray& signal_data);
 
-    void sigBuildRoute(QString start_traj, QString target_traj, int dir);
+    void sigBuildRoute(QByteArray& route_data);
 
     /// Этот сигнал инициирует сообщение во вьювер,
     /// о необходимости задать имя поезда
