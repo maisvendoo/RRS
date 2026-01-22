@@ -236,7 +236,7 @@ private slots:
 
     void slotRenameTrainInModel(int train_idx, QString new_name);
 
-    void slotGetTrainLength(int train_idx, double &train_len);
+    void slotGetTrainParams(int train_idx, double &train_len, double &train_mass);
 };
 
 #endif // MODEL_H

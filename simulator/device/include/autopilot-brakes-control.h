@@ -78,10 +78,6 @@ public:
         this->a_cur = a_cur;
     }
 
-signals:
-
-    void sigSetBrakeCurveAccel(double a_brake);
-
 private:
 
     /// Состояние органов управления тормозами
