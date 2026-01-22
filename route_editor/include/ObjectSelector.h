@@ -4,7 +4,6 @@
 #include "SelectedObjectsMap.h"
 
 #include <vsg/core/Inherit.h>
-#include <vsg/core/Mask.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
@@ -13,6 +12,7 @@ class Gizmo;
 class IntersectionHandler;
 class KeyboardHandler;
 class Route;
+class SingleSwitch;
 struct settings_t;
 
 namespace vsg
@@ -74,7 +74,7 @@ private:
     vsg::observer_ptr<vsg::Viewer> observer_viewer;
     SelectedObjectsMap selected_objects;
     vsg::ref_ptr<Gizmo> gizmo;
-    vsg::Mask* gizmo_mask = nullptr;
+    vsg::ref_ptr<SingleSwitch> gizmo_switch;
 };
 
 #endif // OBJECT_SELECTOR_H

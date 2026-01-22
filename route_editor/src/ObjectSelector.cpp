@@ -7,6 +7,7 @@
 #include "Outline.h"
 #include "Route.h"
 #include "SelectedObjectsMap.h"
+#include "SingleSwitch.h"
 
 #include <vsg/app/CompileManager.h>
 #include <vsg/app/Viewer.h>
@@ -41,11 +42,9 @@ ObjectSelector::ObjectSelector(
 
     gizmo = Gizmo::create(settings, look_at, selected_objects);
 
-    const auto gizmo_switch = vsg::Switch::create();
-    gizmo_switch->addChild(vsg::MASK_OFF, gizmo);
-
-    gizmo_mask = &gizmo_switch->children.front().mask;
-    assert(gizmo_mask);
+    gizmo_switch = SingleSwitch::create();
+    gizmo_switch->mask = vsg::MASK_OFF;
+    gizmo_switch->child = gizmo;
 
     route->addChild(vsg::Mask{MASK_GUI | MASK_CLICKABLE}, gizmo_switch);
 }
@@ -90,7 +89,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
                 it = deselect_object(it->first));
         }
 
-        *gizmo_mask = selected_objects.empty()
+        gizmo_switch->mask = selected_objects.empty()
             ? vsg::MASK_OFF
             : MASK_GUI | MASK_CLICKABLE;
 
@@ -144,12 +143,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     if (selected_objects.empty())
     {
-        *gizmo_mask = vsg::MASK_OFF;
+        gizmo_switch->mask = vsg::MASK_OFF;
     }
     else
     {
         gizmo->update_position();
-        *gizmo_mask = MASK_GUI | MASK_CLICKABLE;
+        gizmo_switch->mask = MASK_GUI | MASK_CLICKABLE;
     }
 }
 
