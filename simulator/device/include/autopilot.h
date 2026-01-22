@@ -193,6 +193,10 @@ protected:
 
     double calcPredictVelocity(double v_cur, double dist, double accel);
 
+public slots:
+
+    void slotSetBrakeCurveAccel(double a_brake);
+
 private slots:
 
     void slotVigilanceControl();

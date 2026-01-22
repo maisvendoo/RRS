@@ -39,6 +39,8 @@ struct autopilot_brake_control_state_t
 //------------------------------------------------------------------------------
 class DEVICE_EXPORT AutopilotBrakeController : public Device
 {
+    Q_OBJECT
+
 public:
 
     AutopilotBrakeController();
@@ -75,6 +77,10 @@ public:
         this->a_ref = a_ref;
         this->a_cur = a_cur;
     }
+
+signals:
+
+    void sigSetBrakeCurveAccel(double a_brake);
 
 private:
 

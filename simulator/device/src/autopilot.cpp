@@ -259,6 +259,14 @@ double Autopilot::calcPredictVelocity(double v_cur, double dist, double accel)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Autopilot::slotSetBrakeCurveAccel(double a_brake)
+{
+    this->a_brake = a_brake;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Autopilot::slotVigilanceControl()
 {
     release_RB();
