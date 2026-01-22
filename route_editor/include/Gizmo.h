@@ -4,7 +4,6 @@
 #include "SelectedObjectsMap.h"
 
 #include <vsg/core/Inherit.h>
-#include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
@@ -53,12 +52,11 @@ private:
         const int zero_component_index
     );
 
-    void add_line(
+    vsg::ref_ptr<vsg::Node> create_line(
         const float plane_size,
         const float line_size,
         const int plane_component_index,
-        const vsg::vec3& color,
-        vsg::Mask** line_mask
+        const vsg::vec3& color
     );
 
 private:
@@ -73,9 +71,6 @@ private:
     vsg::ref_ptr<vsg::Node> plane_yz;
     vsg::ref_ptr<vsg::Node> plane_xz;
     vsg::ref_ptr<vsg::Node> plane_xy;
-    vsg::Mask* line_x_mask = nullptr;
-    vsg::Mask* line_y_mask = nullptr;
-    vsg::Mask* line_z_mask = nullptr;
 };
 
 #endif // GIZMO_H

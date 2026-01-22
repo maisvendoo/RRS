@@ -3,9 +3,9 @@
 
 enum Mask
 {
-    MASK_INVISIBLE = 0x01,
-    MASK_SCENE = 0x02,
-    MASK_GUI = 0x04
+    MASK_SCENE = 0x01,
+    MASK_GUI = 0x02,
+    MASK_CLICKABLE = 0x04
 };
 
 #endif // MASK_H

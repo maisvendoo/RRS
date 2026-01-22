@@ -1,5 +1,6 @@
 #include "Gizmo.h"
 
+#include "IntersectionHandler.h"
 #include "Mask.h"
 #include "SelectedObjectsMap.h"
 #include "Settings.h"
@@ -21,6 +22,14 @@
 #include <cassert>
 #include <cmath>
 
+enum ArrowEnum
+{
+    ARROW_X,
+    ARROW_Y,
+    ARROW_Z,
+    TOTAL_ARROWS
+};
+
 Gizmo::Gizmo(
     const settings_t& settings,
     vsg::ref_ptr<vsg::LookAt> look_at,
@@ -31,14 +40,6 @@ Gizmo::Gizmo(
     , selected_objects(selected_objects)
 {
     builder.shaderSet = vsg::createFlatShadedShaderSet();
-
-    enum
-    {
-        ARROW_X,
-        ARROW_Y,
-        ARROW_Z,
-        TOTAL_ARROWS
-    };
 
     vsg::ref_ptr<vsg::Node>* arrows[TOTAL_ARROWS];
     arrows[ARROW_X] = &arrow_x;
@@ -60,15 +61,10 @@ Gizmo::Gizmo(
     planes[ARROW_Y] = &plane_xz;
     planes[ARROW_Z] = &plane_xy;
 
-    vsg::Mask** line_masks[TOTAL_ARROWS];
-    line_masks[ARROW_X] = &line_x_mask;
-    line_masks[ARROW_Y] = &line_y_mask;
-    line_masks[ARROW_Z] = &line_z_mask;
-
     const float plane_size = 100.0f;
     const float line_size = 0.01f;
 
-    const auto planes_switch = vsg::Switch::create();
+    const auto switch_group = vsg::Switch::create();
 
     for (int i = 0; i < TOTAL_ARROWS; ++i)
     {
@@ -76,18 +72,48 @@ Gizmo::Gizmo(
         this->addChild(*arrows[i]);
 
         *planes[i] = create_plane(plane_size, i);
-        planes_switch->addChild(vsg::Mask{MASK_INVISIBLE}, *planes[i]);
+        switch_group->addChild(vsg::Mask{MASK_CLICKABLE}, *planes[i]);
 
-        add_line(plane_size, line_size, i, arrow_colors[i], line_masks[i]);
+        switch_group->addChild(vsg::Mask{MASK_GUI}, create_line(
+            plane_size, line_size, i, arrow_colors[i]));
     }
 
-    this->addChild(planes_switch);
+    this->addChild(switch_group);
 }
 
 bool Gizmo::handle_intersections(
     vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
 )
 {
+    vsg::ref_ptr<vsg::Node> arrows[TOTAL_ARROWS];
+    arrows[ARROW_X] = arrow_x;
+    arrows[ARROW_Y] = arrow_y;
+    arrows[ARROW_Z] = arrow_z;
+
+    vsg::ref_ptr<vsg::Node> clicked_arrow;
+    ArrowEnum clicked_arrow_enum;
+    auto& intersections = intersector->intersections;
+
+    for (int i = 0; i < TOTAL_ARROWS; ++i)
+    {
+        arrows[i]->accept(*intersector);
+
+        if (!intersections.empty())
+        {
+            clicked_arrow = arrows[i];
+            clicked_arrow_enum = static_cast<ArrowEnum>(i);
+
+            break;
+        }
+    }
+
+    if (!clicked_arrow)
+    {
+        return false;
+    }
+
+    IntersectionHandler::sort_intersections(intersector);
+
     intersector->intersections.clear();
 
     return false;
@@ -197,12 +223,11 @@ vsg::ref_ptr<vsg::Node> Gizmo::create_plane(
     return builder.createQuad(geometry_info);
 }
 
-void Gizmo::add_line(
+vsg::ref_ptr<vsg::Node> Gizmo::create_line(
     const float plane_size,
     const float line_size,
     const int plane_component_index,
-    const vsg::vec3& color,
-    vsg::Mask** line_mask
+    const vsg::vec3& color
 )
 {
     vsg::vec3 min_vec = {0.0f, 0.0f, 0.0f};
@@ -228,13 +253,5 @@ void Gizmo::add_line(
     vsg::StateInfo state_info;
     state_info.blending = true;
 
-    const auto line = builder.createCylinder(geometry_info, state_info);
-
-    const auto line_switch = vsg::Switch::create();
-    line_switch->addChild(vsg::MASK_ALL, line);
-
-    *line_mask = &line_switch->children[0].mask;
-    assert(line_mask);
-
-    this->addChild(line_switch);
+    return builder.createCylinder(geometry_info, state_info);
 }

@@ -1,5 +1,6 @@
 #include "IntersectionHandler.h"
 
+#include "Mask.h"
 #include "MouseButton.h"
 
 #include <vsg/app/Camera.h>
@@ -30,6 +31,8 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
             lmb_intersector = vsg::LineSegmentIntersector::create(
                 *camera, buttonPress.x, buttonPress.y);
 
+            lmb_intersector->traversalMask = MASK_CLICKABLE;
+
             break;
         }
         case MOUSE_BUTTON_MIDDLE:
@@ -37,12 +40,16 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
             mmb_intersector = vsg::LineSegmentIntersector::create(
                 *camera, buttonPress.x, buttonPress.y);
 
+            mmb_intersector->traversalMask = MASK_CLICKABLE;
+
             break;
         }
         case MOUSE_BUTTON_RIGHT:
         {
             rmb_intersector = vsg::LineSegmentIntersector::create(
                 *camera, buttonPress.x, buttonPress.y);
+
+            rmb_intersector->traversalMask = MASK_CLICKABLE;
 
             break;
         }

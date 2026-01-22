@@ -90,7 +90,9 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
                 it = deselect_object(it->first));
         }
 
-        *gizmo_mask = selected_objects.empty() ? vsg::MASK_OFF : MASK_GUI;
+        *gizmo_mask = selected_objects.empty()
+            ? vsg::MASK_OFF
+            : MASK_GUI | MASK_CLICKABLE;
 
         return;
     }
@@ -147,7 +149,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     else
     {
         gizmo->update_position();
-        *gizmo_mask = MASK_GUI;
+        *gizmo_mask = MASK_GUI | MASK_CLICKABLE;
     }
 }
 

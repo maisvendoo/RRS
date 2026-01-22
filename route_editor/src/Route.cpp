@@ -211,7 +211,9 @@ void Route::load_static_objects(
         const vsg::mat4 translate = vsg::translate(translation);
 
         const auto paged_lod_switch = vsg::Switch::create();
-        paged_lod_switch->addChild(vsg::Mask{MASK_SCENE}, paged_lod_it->second);
+
+        paged_lod_switch->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE},
+            paged_lod_it->second);
 
         const auto matrix_transform = vsg::MatrixTransform::create();
         matrix_transform->matrix = translate * rotate_z * rotate_y * rotate_x;
@@ -377,7 +379,9 @@ void Route::load_signals(
         properties.translation.z = pos.z;
 
         const auto paged_lod_switch = vsg::Switch::create();
-        paged_lod_switch->addChild(vsg::Mask{MASK_SCENE}, paged_lod);
+
+        paged_lod_switch->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE},
+            paged_lod);
 
         const auto matrix_transform = vsg::MatrixTransform::create();
         matrix_transform->matrix = translate * rotate;
