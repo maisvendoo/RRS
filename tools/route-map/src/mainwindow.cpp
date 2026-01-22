@@ -169,6 +169,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
                                                          new_nearest_trajectory,
                                                          route_dir);
             bg->route_trajectories = route.trajectories;
+/* Отладка
             QString msg;
             if (bg->route_trajectories.size())
             {
@@ -190,6 +191,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
                       new_nearest_trajectory->getName();
             }
             ui->ptLog->appendPlainText(msg);
+*/
         }
     }
     else
@@ -528,6 +530,13 @@ void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 //------------------------------------------------------------------------------
 void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
 {
+    if (route_begin_trajectory)
+    {
+        // Если уже строим маршрут, то заканчиваем строить маршрут
+        slotSelectTrajectory(nearest_traj);
+        return;
+    }
+
     if (nearest_traj == nullptr)
     {
         return;
@@ -535,25 +544,26 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
 
     QMenu* menu = new QMenu(this);
 
-    QAction* action_traj = new QAction(nearest_traj->getName(), this);
-    menu->addAction(action_traj);
-    connect(action_traj, &QAction::triggered, this, [this, nearest_traj]{
-        ui->ptLog->appendPlainText("Pressed RMB and then selected menu on trajectory: " + nearest_traj->getName());
-    });
+    if (!nearest_traj->isInRoute())
+    {
+        QAction* route_from_traj_fwd = new QAction(tr("Build route to forward direction"), this);
+        menu->addAction(route_from_traj_fwd);
+        connect(route_from_traj_fwd, &QAction::triggered, this, [this, nearest_traj]{
+            route_begin_trajectory = nearest_traj;
+            route_dir = 1;
+        });
 
-    QAction* route_from_traj_fwd = new QAction(tr("Build route to forward direction"), this);
-    menu->addAction(route_from_traj_fwd);
-    connect(route_from_traj_fwd, &QAction::triggered, this, [this, nearest_traj]{
-        route_begin_trajectory = nearest_traj;
-        route_dir = 1;
-    });
+        QAction* route_from_traj_bwd = new QAction(tr("Build route to backward direction"), this);
+        menu->addAction(route_from_traj_bwd);
+        connect(route_from_traj_bwd, &QAction::triggered, this, [this, nearest_traj]{
+            route_begin_trajectory = nearest_traj;
+            route_dir = -1;
+        });
+    }
 
-    QAction* route_from_traj_bwd = new QAction(tr("Build route to backward direction"), this);
-    menu->addAction(route_from_traj_bwd);
-    connect(route_from_traj_bwd, &QAction::triggered, this, [this, nearest_traj]{
-        route_begin_trajectory = nearest_traj;
-        route_dir = -1;
-    });
+    QAction* close_menu = new QAction(tr("Close menu"), this);
+    close_menu->setShortcut(QKeySequence(QKeySequence::Cancel));
+    menu->addAction(close_menu);
 
     menu->exec(QCursor::pos());
 }
@@ -563,8 +573,74 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
 //------------------------------------------------------------------------------
 void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
 {
+    if ((nearest_traj == nullptr) || (route_begin_trajectory == nullptr) || (route_dir == 0))
+    {
+        route_begin_trajectory = nullptr;
+        route_dir = 0;
+        return;
+    }
+
+    Trajectory* start_traj = route_begin_trajectory;
+    Trajectory* target_traj = nearest_traj;
+    std::int8_t dir = (route_dir < 0) ? -1 : 1;
+
     route_begin_trajectory = nullptr;
     route_dir = 0;
+
+    route_segment_t route = topology->find_route(start_traj,
+                                                 target_traj,
+                                                 dir);
+
+    QMenu* menu = new QMenu(this);
+
+    if (route.trajectories.size() < 2)
+    {
+        QAction* continue_search = new QAction(tr("Continue route search"), this);
+        menu->addAction(continue_search);
+        connect(continue_search, &QAction::triggered, this, [this, start_traj, dir]{
+            route_begin_trajectory = start_traj;
+            route_dir = dir;
+        });
+    }
+    else
+    {
+        // Указатель на сетевого клиента, который отправит команду построить маршрут
+        TcpClient* tc = tcp_client;
+
+        QAction* continue_search = new QAction(tr("Continue route search"), this);
+        menu->addAction(continue_search);
+        connect(continue_search, &QAction::triggered, this, [this, start_traj, dir]{
+            route_begin_trajectory = start_traj;
+            route_dir = dir;
+        });
+
+        QAction* build_route = new QAction(tr("Set switches for route"), this);
+        menu->addAction(build_route);
+        connect(build_route, &QAction::triggered, this, [tc, start_traj, target_traj, dir]{
+            route_command_t sc = {start_traj->getName(), target_traj->getName(), dir};
+            tc->sendBuildRouteCommand(sc.serialize());
+        });
+
+        QAction* train_route = new QAction(tr("Set switches and train signals for route"), this);
+        menu->addAction(train_route);
+        connect(train_route, &QAction::triggered, this, [tc, start_traj, target_traj, dir]{
+            route_command_t sc = {start_traj->getName(), target_traj->getName(), dir};
+            tc->sendTrainRouteCommand(sc.serialize());
+        });
+
+        QAction* shunting_route = new QAction(tr("Set switches and shunting signals for route"), this);
+        menu->addAction(shunting_route);
+        connect(shunting_route, &QAction::triggered, this, [tc, start_traj, target_traj, dir]{
+            route_command_t sc = {start_traj->getName(), target_traj->getName(), dir};
+            tc->sendBuildRouteCommand(sc.serialize());
+        });
+    }
+
+    QAction* close_menu = new QAction(tr("Close menu"), this);
+    close_menu->setShortcut(QKeySequence(QKeySequence::Cancel));
+    menu->addAction(close_menu);
+
+    menu->exec(QCursor::pos());
 }
 
 //------------------------------------------------------------------------------

@@ -236,6 +236,16 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
                                      Trajectory *target_traj,
                                      int dir)
 {
+    // Маршрут на самого себя
+    if (start_traj == target_traj)
+    {
+        route_segment_t path;
+        path.dir = 0;
+        path.trajectories = {start_traj};
+        Journal::instance()->warning("Build route: Target trajectory and start trajectory are the same");
+        return path;
+    }
+
     // Если целевая траектория занята, уходим сразу, ловить нечего
     if (target_traj->isBusy())
     {
