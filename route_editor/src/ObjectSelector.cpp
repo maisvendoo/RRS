@@ -97,7 +97,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    intersection_handler->sort_intersections(lmb_intersector);
+    intersection_handler->sort_intersections(intersections);
 
     const auto& node_path = intersections.front()->nodePath;
     assert(!node_path.empty());

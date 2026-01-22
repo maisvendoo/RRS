@@ -100,7 +100,7 @@ bool Gizmo::handle_intersections(
     //     return false;
     // }
 
-    // IntersectionHandler::sort_intersections(intersector);
+    // IntersectionHandler::sort_intersections(intersections);
 
     vsg::ref_ptr<vsg::Node> arrows[TOTAL_ARROWS];
     arrows[ARROW_X] = arrow_x;
@@ -129,7 +129,7 @@ bool Gizmo::handle_intersections(
         return false;
     }
 
-    IntersectionHandler::sort_intersections(intersector);
+    IntersectionHandler::sort_intersections(intersections);
 
     intersector->intersections.clear();
 
