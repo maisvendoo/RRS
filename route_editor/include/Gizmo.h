@@ -6,9 +6,12 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/utils/Builder.h>
+
+#include <map>
 
 struct settings_t;
 
@@ -66,6 +69,7 @@ private:
     const SelectedObjectsMap& selected_objects;
     vsg::vec3 position;
     vsg::Builder builder;
+
     vsg::ref_ptr<vsg::Node> arrow_x;
     vsg::ref_ptr<vsg::Node> arrow_y;
     vsg::ref_ptr<vsg::Node> arrow_z;
@@ -75,6 +79,14 @@ private:
     vsg::Mask* plane_mask_yz = nullptr;
     vsg::Mask* plane_mask_xz = nullptr;
     vsg::Mask* plane_mask_xy = nullptr;
+
+    using MatrixTransformPtr = vsg::ref_ptr<vsg::MatrixTransform>;
+    using MatrixMap = std::map<MatrixTransformPtr, vsg::dmat4>;
+
+    vsg::vec3 begin_position;
+    MatrixMap selected_objects_begin_matrixes;
+    vsg::ref_ptr<vsg::Node> active_plain;
+    vsg::Mask* active_plain_mask = nullptr;
 };
 
 #endif // GIZMO_H

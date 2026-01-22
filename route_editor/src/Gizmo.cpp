@@ -22,12 +22,12 @@
 #include <cassert>
 #include <cmath>
 
-enum ArrowEnum
+enum
 {
-    ARROW_X,
-    ARROW_Y,
-    ARROW_Z,
-    TOTAL_ARROWS
+    AXIS_X,
+    AXIS_Y,
+    AXIS_Z,
+    TOTAL_AXES
 };
 
 Gizmo::Gizmo(
@@ -41,38 +41,38 @@ Gizmo::Gizmo(
 {
     builder.shaderSet = vsg::createFlatShadedShaderSet();
 
-    vsg::ref_ptr<vsg::Node>* arrows[TOTAL_ARROWS];
-    arrows[ARROW_X] = &arrow_x;
-    arrows[ARROW_Y] = &arrow_y;
-    arrows[ARROW_Z] = &arrow_z;
+    vsg::ref_ptr<vsg::Node>* arrows[TOTAL_AXES];
+    arrows[AXIS_X] = &arrow_x;
+    arrows[AXIS_Y] = &arrow_y;
+    arrows[AXIS_Z] = &arrow_z;
 
-    vsg::vec3 arrow_directions[TOTAL_ARROWS];
-    arrow_directions[ARROW_X] = {1.0f, 0.0f, 0.0f};
-    arrow_directions[ARROW_Y] = {0.0f, 1.0f, 0.0f};
-    arrow_directions[ARROW_Z] = {0.0f, 0.0f, 1.0f};
+    vsg::vec3 arrow_directions[TOTAL_AXES];
+    arrow_directions[AXIS_X] = {1.0f, 0.0f, 0.0f};
+    arrow_directions[AXIS_Y] = {0.0f, 1.0f, 0.0f};
+    arrow_directions[AXIS_Z] = {0.0f, 0.0f, 1.0f};
 
-    vsg::vec3 arrow_colors[TOTAL_ARROWS];
-    arrow_colors[ARROW_X] = settings.gizmo_arrow_x_color;
-    arrow_colors[ARROW_Y] = settings.gizmo_arrow_y_color;
-    arrow_colors[ARROW_Z] = settings.gizmo_arrow_z_color;
+    vsg::vec3 arrow_colors[TOTAL_AXES];
+    arrow_colors[AXIS_X] = settings.gizmo_arrow_x_color;
+    arrow_colors[AXIS_Y] = settings.gizmo_arrow_y_color;
+    arrow_colors[AXIS_Z] = settings.gizmo_arrow_z_color;
 
-    vsg::ref_ptr<vsg::Node>* planes[TOTAL_ARROWS];
-    planes[ARROW_X] = &plane_yz;
-    planes[ARROW_Y] = &plane_xz;
-    planes[ARROW_Z] = &plane_xy;
+    vsg::ref_ptr<vsg::Node>* planes[TOTAL_AXES];
+    planes[AXIS_X] = &plane_yz;
+    planes[AXIS_Y] = &plane_xz;
+    planes[AXIS_Z] = &plane_xy;
 
-    vsg::Mask** plane_masks[TOTAL_ARROWS];
-    plane_masks[ARROW_X] = &plane_mask_yz;
-    plane_masks[ARROW_Y] = &plane_mask_xz;
-    plane_masks[ARROW_Z] = &plane_mask_xy;
+    vsg::Mask** plane_masks[TOTAL_AXES];
+    plane_masks[AXIS_X] = &plane_mask_yz;
+    plane_masks[AXIS_Y] = &plane_mask_xz;
+    plane_masks[AXIS_Z] = &plane_mask_xy;
 
     const float plane_size = 100.0f;
     const float line_size = 0.01f;
 
     const auto switch_group = vsg::Switch::create();
-    switch_group->children.reserve(2 * TOTAL_ARROWS);
+    switch_group->children.reserve(2 * TOTAL_AXES);
 
-    for (int i = 0; i < TOTAL_ARROWS; ++i)
+    for (int i = 0; i < TOTAL_AXES; ++i)
     {
         *arrows[i] = create_arrow(arrow_directions[i], arrow_colors[i]);
         this->addChild(*arrows[i]);
@@ -92,48 +92,110 @@ bool Gizmo::handle_intersections(
     vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
 )
 {
-    // this->accept(*intersector);
+    this->accept(*intersector);
 
-    // auto& intersections = intersector->intersections;
-    // if (intersections.empty())
-    // {
-    //     return false;
-    // }
-
-    // IntersectionHandler::sort_intersections(intersections);
-
-    vsg::ref_ptr<vsg::Node> arrows[TOTAL_ARROWS];
-    arrows[ARROW_X] = arrow_x;
-    arrows[ARROW_Y] = arrow_y;
-    arrows[ARROW_Z] = arrow_z;
-
-    vsg::ref_ptr<vsg::Node> clicked_arrow;
-    ArrowEnum clicked_arrow_enum;
     auto& intersections = intersector->intersections;
-
-    for (int i = 0; i < TOTAL_ARROWS; ++i)
-    {
-        arrows[i]->accept(*intersector);
-
-        if (!intersections.empty())
-        {
-            clicked_arrow = arrows[i];
-            clicked_arrow_enum = static_cast<ArrowEnum>(i);
-
-            break;
-        }
-    }
-
-    if (!clicked_arrow)
+    if (intersections.empty())
     {
         return false;
     }
 
     IntersectionHandler::sort_intersections(intersections);
 
+    vsg::ref_ptr<vsg::Node> clicked_arrow;
+    int index = -1;
+
+    vsg::ref_ptr<vsg::Node> arrows[TOTAL_AXES];
+    arrows[AXIS_X] = arrow_x;
+    arrows[AXIS_Y] = arrow_y;
+    arrows[AXIS_Z] = arrow_z;
+
+    vsg::vec3 arrow_directions[TOTAL_AXES];
+    arrow_directions[AXIS_X] = {1.0f, 0.0f, 0.0f};
+    arrow_directions[AXIS_Y] = {0.0f, 1.0f, 0.0f};
+    arrow_directions[AXIS_Z] = {0.0f, 0.0f, 1.0f};
+
+    vsg::ref_ptr<vsg::Node> planes[TOTAL_AXES];
+    planes[AXIS_X] = plane_yz;
+    planes[AXIS_Y] = plane_xz;
+    planes[AXIS_Z] = plane_xy;
+
+    vsg::Mask* plane_masks[TOTAL_AXES];
+    plane_masks[AXIS_X] = plane_mask_yz;
+    plane_masks[AXIS_Y] = plane_mask_xz;
+    plane_masks[AXIS_Z] = plane_mask_xy;
+
+    const auto& node_path = intersections.front()->nodePath;
+    assert(!node_path.empty());
+
+    for (const vsg::Node* const node : node_path)
+    {
+        for (int i = 0; i < TOTAL_AXES; ++i)
+        {
+            if (node == arrows[i])
+            {
+                clicked_arrow = arrows[i];
+                index = i;
+
+                break;
+            }
+        }
+
+        if (clicked_arrow)
+        {
+            break;
+        }
+    }
+
+    if (!clicked_arrow)
+    {
+        intersector->intersections.clear();
+
+        return false;
+    }
+
+    const auto world_intersection = static_cast<vsg::vec3>(
+        intersections.front()->worldIntersection);
+
+    begin_position = position;
+    begin_position[index] = world_intersection[index];
+
+    selected_objects_begin_matrixes.clear();
+    for (const auto& [object, _] : selected_objects)
+    {
+        selected_objects_begin_matrixes[object] = object->matrix;
+    }
+
+    const auto camera_pos = static_cast<vsg::vec3>(look_at->eye);
+    const auto camera_to_gizmo = vsg::normalize(begin_position - camera_pos);
+
+    float max_dot = -1.0f;
+    int max_index = -1;
+
+    for (int i = 0; i < TOTAL_AXES; ++i)
+    {
+        if (i == index)
+        {
+            continue;
+        }
+
+        const float dot = std::abs(vsg::dot(camera_to_gizmo,
+            arrow_directions[i]));
+
+        if (dot > max_dot)
+        {
+            max_dot = dot;
+            max_index = i;
+        }
+    }
+
+    active_plain = planes[max_index];
+    active_plain_mask = plane_masks[max_index];
+    *active_plain_mask = MASK_CLICKABLE;
+
     intersector->intersections.clear();
 
-    return false;
+    return true;
 }
 
 void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
