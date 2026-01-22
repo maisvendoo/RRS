@@ -145,6 +145,13 @@ void AutopilotBrakeController::stepPB(double dv,
     // Максимальное снижение скорости относительно программной
     double dVplus = dVplusPB;
 
+    // Обнуляем число дополнительных ступеней, если кран в отпускном положении
+    if (bc_state.brake_crane_pos_ref == KRM_POS_I ||
+        bc_state.brake_crane_pos_ref == KRM_POS_I)
+    {
+        num_steps = 0;
+    }
+
     // Первысили кривую снижения скорости
     if (dv < dVminus)
     {
@@ -155,13 +162,11 @@ void AutopilotBrakeController::stepPB(double dv,
     }
 
     // Опустились достаточно низко под кривую снижения скорости, и если
-    // отпуск не запрещен и заблокирована тяга
+    // отпуск не запрещен
     if (dv > dVplus && !is_disable_release)
     {
-        // полный отпуск до зарядного
+        // полный отпуск
         brakeRelease(pEQ, p_charge, dpPB_over);
-        // обнуляем число дополнительных ступеней торможения
-        num_steps = 0;
     }
 
     // При давлении в УР выше зарядного

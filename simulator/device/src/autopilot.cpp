@@ -183,7 +183,7 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_ta
         }
 
         // Если запрещен отпуск и мы остановились - запрещаем движение
-        if ( (feedback->v_cur <= 1.0 ||  signal_dist <= lead_dist_RY) && is_disable_release)
+        if ( (feedback->v_cur <= 1.0 || signal_dist <= lead_dist_RY) && is_disable_release)
         {
             is_motion_allowed = false;
         }
@@ -194,7 +194,7 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_ta
 
         v_target = v_lim_RY;
 
-        v_lim = calcBrakeCurveSpeed(v_target, signal_dist - lead_dist_RY);
+        v_lim = calcBrakeCurveSpeed(v_target, signal_dist - lead_dist_Y);
         is_motion_allowed = true;
 
         break;
