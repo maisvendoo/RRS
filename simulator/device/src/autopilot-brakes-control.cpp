@@ -291,4 +291,8 @@ void AutopilotBrakeController::slotBrakeDelay()
         // Добавляем дополнительную ступень разрядки
         num_steps++;
     }
+    else
+    {
+        emit sigSetBrakeAccel(qAbs(a_cur));
+    }
 }

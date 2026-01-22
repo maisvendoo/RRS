@@ -21,7 +21,7 @@ public:
 
     Autopilot(QObject *parent = nullptr) : Device(parent)
     {
-        connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);
+        connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);        
     }
 
     ~Autopilot()
@@ -192,6 +192,10 @@ protected:
     double calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_target);
 
     double calcPredictVelocity(double v_cur, double dist, double accel);
+
+public slots:
+
+    void slotSetBrakeAccel(double a_brake);
 
 private slots:
 

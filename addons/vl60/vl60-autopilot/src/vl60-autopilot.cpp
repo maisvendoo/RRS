@@ -5,7 +5,9 @@
 //------------------------------------------------------------------------------
 VL60Autopilot::VL60Autopilot() : Autopilot(nullptr)
 {
-    connect(delay, &Timer::process, this, &VL60Autopilot::slotDelayTimer);    
+    connect(delay, &Timer::process, this, &VL60Autopilot::slotDelayTimer);
+    connect(brake_control, &AutopilotBrakeController::sigSetBrakeAccel,
+            this, &VL60Autopilot::slotSetBrakeAccel);
 }
 
 //------------------------------------------------------------------------------
