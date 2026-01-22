@@ -109,7 +109,7 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
                                      auto_feedback->pBC,
                                      auto_feedback->p_charge);
 
-    brake_control->setFeedback(auto_feedback->v_cur, dist_target, a_brake_ref, accel_meter->value());
+    brake_control->setFeedback(auto_feedback->v_cur, dist_target, a_brake, accel_meter->value());
 
     brake_control->step_control(auto_feedback->is_EPB_on,
                                 dv,
