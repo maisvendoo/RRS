@@ -70,6 +70,7 @@ target_sources(${TARGET}
             include/SelectedObjectsMap.h
             include/Settings.h
             include/shader_funcs.h
+            include/SingleSwitch.h
             include/StringMap.h
             include/SwitchGroup.h
             include/Vec3Pair.h
