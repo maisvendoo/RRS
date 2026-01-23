@@ -1,5 +1,6 @@
 #include "Gizmo.h"
 
+#include "CameraHandler.h"
 #include "IntersectionHandler.h"
 #include "Mask.h"
 #include "SelectedObjectsMap.h"
@@ -10,6 +11,7 @@
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
+#include <vsg/maths/common.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
@@ -33,11 +35,11 @@ enum
 
 Gizmo::Gizmo(
     const settings_t& settings,
-    vsg::ref_ptr<vsg::LookAt> look_at,
+    vsg::ref_ptr<CameraHandler> camera_handler,
     const SelectedObjectsMap& selected_objects
 )
     : settings(settings)
-    , look_at(look_at)
+    , camera_handler(camera_handler)
     , selected_objects(selected_objects)
 {
     builder.shaderSet = vsg::createFlatShadedShaderSet();
@@ -77,7 +79,7 @@ Gizmo::Gizmo(
         *arrows[i] = create_arrow(arrow_directions[i], arrow_colors[i]);
         this->addChild(*arrows[i]);
 
-        *planes[i] = create_plane(plane_size, i);
+        *planes[i] = create_plane(plane_size, arrow_directions[i], arrow_colors[i], 0.1f);
         *plane_switches[i] = SingleSwitch::create();
         (*plane_switches[i])->mask = vsg::MASK_OFF;
         (*plane_switches[i])->node = *planes[i];
@@ -168,11 +170,13 @@ bool Gizmo::handle_intersections(
         selected_objects_begin_matrixes[object] = object->matrix;
     }
 
-    const auto camera_pos = static_cast<vsg::vec3>(look_at->eye);
-    const auto camera_to_gizmo = vsg::normalize(begin_position - camera_pos);
+    const auto camera_front = static_cast<vsg::vec3>(
+        camera_handler->get_front());
 
-    float max_dot = -1.0f;
-    int max_index = -1;
+    const auto camera_to_gizmo = vsg::normalize(begin_position - camera_front);
+
+    float min_dot = 2.0f;
+    int min_index = -1;
 
     for (int i = 0; i < TOTAL_AXES; ++i)
     {
@@ -184,15 +188,17 @@ bool Gizmo::handle_intersections(
         const float dot = std::abs(vsg::dot(camera_to_gizmo,
             arrow_directions[i]));
 
-        if (dot > max_dot)
+        // std::printf("%d: %10.3f\n", i, dot);
+
+        if (dot < min_dot)
         {
-            max_dot = dot;
-            max_index = i;
+            min_dot = dot;
+            min_index = i;
         }
     }
 
-    active_plain = planes[max_index];
-    active_plain_switch = plane_switches[max_index];
+    active_plain = planes[min_index];
+    active_plain_switch = plane_switches[min_index];
     active_plain_switch->mask = MASK_GUI | MASK_CLICKABLE;
 
     intersector->intersections.clear();
@@ -232,15 +238,17 @@ void Gizmo::update_position()
 
 void Gizmo::update_scale()
 {
-    const auto camera_pos = static_cast<vsg::vec3>(look_at->eye);
+    const auto camera_pos = static_cast<vsg::vec3>(
+        camera_handler->get_look_at()->eye);
+
     const float distance_to_camera = vsg::length(position - camera_pos);
     const float scale = 0.075f * distance_to_camera;
     this->matrix = vsg::translate(position) * vsg::scale(scale);
 }
 
 vsg::ref_ptr<vsg::Node> Gizmo::create_arrow(
-    const vsg::vec3& direction,
-    const vsg::vec3& color
+    vsg::vec3 direction,
+    vsg::vec3 color
 )
 {
     const float thickness = settings.gizmo_arrow_thickness;
@@ -283,25 +291,22 @@ vsg::ref_ptr<vsg::Node> Gizmo::create_arrow(
 }
 
 vsg::ref_ptr<vsg::Node> Gizmo::create_plane(
-    const float plane_size,
-    const int zero_component_index
+    float plane_size,
+    vsg::vec3 rotate_axis,
+    vsg::vec3 color,
+    float opacity
 )
 {
-    vsg::vec3 min_vec = {0.0f, 0.0f, 0.0f};
-    vsg::vec3 max_vec = {0.0f, 0.0f, 0.0f};
+    vsg::GeometryInfo geometry_info(vsg::box(vsg::vec3(-plane_size,
+        -plane_size, 0.0f), vsg::vec3(plane_size, plane_size, 0.0f)));
 
-    for (int i = 0; i < 3; ++i)
-    {
-        if (i != zero_component_index)
-        {
-            min_vec[i] = -plane_size;
-            max_vec[i] = plane_size;
-        }
-    }
+    geometry_info.transform = vsg::rotate(vsg::radians(90.0f), rotate_axis);
+    geometry_info.color = {color, opacity};
 
-    const vsg::GeometryInfo geometry_info(vsg::box(min_vec, max_vec));
+    vsg::StateInfo state_info;
+    state_info.blending = true;
 
-    return builder.createQuad(geometry_info);
+    return builder.createQuad(geometry_info, state_info);
 }
 
 vsg::ref_ptr<vsg::Node> Gizmo::create_line(

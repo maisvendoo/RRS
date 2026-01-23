@@ -1,5 +1,6 @@
 #include "ObjectSelector.h"
 
+#include "CameraHandler.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
@@ -26,7 +27,7 @@
 ObjectSelector::ObjectSelector(
     const settings_t& settings,
     vsg::ref_ptr<KeyboardHandler> keyboard_handler,
-    vsg::ref_ptr<vsg::LookAt> look_at,
+    vsg::ref_ptr<CameraHandler> camera_handler,
     vsg::ref_ptr<IntersectionHandler> intersection_handler,
     vsg::ref_ptr<Route> route,
     vsg::observer_ptr<vsg::Viewer> observer_viewer
@@ -40,7 +41,7 @@ ObjectSelector::ObjectSelector(
     assert(intersection_handler);
     assert(route);
 
-    gizmo = Gizmo::create(settings, look_at, selected_objects);
+    gizmo = Gizmo::create(settings, camera_handler, selected_objects);
 
     gizmo_switch = SingleSwitch::create();
     gizmo_switch->mask = vsg::MASK_OFF;

@@ -26,7 +26,7 @@ public:
     const vsg::KeySymbol* get_key_bindings() const;
 
 private:
-    vsg::KeySymbol key_bindings[ACTION_TOTAL_COUNT];
+    vsg::KeySymbol key_bindings[TOTAL_ACTIONS];
     KeyStates key_states;
 };
 

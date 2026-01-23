@@ -12,6 +12,7 @@
 
 #include <map>
 
+class CameraHandler;
 class SingleSwitch;
 struct settings_t;
 
@@ -20,7 +21,6 @@ namespace vsg
 
 class ButtonReleaseEvent;
 class LineSegmentIntersector;
-class LookAt;
 class MoveEvent;
 class Node;
 
@@ -31,7 +31,7 @@ class Gizmo : public vsg::Inherit<vsg::MatrixTransform, Gizmo>
 public:
     Gizmo(
         const settings_t& settings,
-        vsg::ref_ptr<vsg::LookAt> look_at,
+        vsg::ref_ptr<CameraHandler> camera_handler,
         const SelectedObjectsMap& selected_objects
     );
 
@@ -47,13 +47,15 @@ public:
 
 private:
     vsg::ref_ptr<vsg::Node> create_arrow(
-        const vsg::vec3& direction,
-        const vsg::vec3& color
+        vsg::vec3 direction,
+        vsg::vec3 color
     );
 
     vsg::ref_ptr<vsg::Node> create_plane(
-        const float plane_size,
-        const int zero_component_index
+        float plane_size,
+        vsg::vec3 rotate_axis,
+        vsg::vec3 color,
+        float opacity
     );
 
     vsg::ref_ptr<vsg::Node> create_line(
@@ -65,7 +67,7 @@ private:
 
 private:
     const settings_t& settings;
-    vsg::ref_ptr<vsg::LookAt> look_at;
+    vsg::ref_ptr<CameraHandler> camera_handler;
     const SelectedObjectsMap& selected_objects;
     vsg::vec3 position;
     vsg::Builder builder;

@@ -253,7 +253,7 @@ void EditorGui::show_key_bindings() const
 
     if (ImGui::BeginTable("key_bindings_table", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
     {
-        for (int i = 0; i < ACTION_TOTAL_COUNT; ++i)
+        for (int i = 0; i < TOTAL_ACTIONS; ++i)
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();

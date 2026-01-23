@@ -1,3 +1,0 @@
-Unready files:
-EditorGui.h
-EditorGui.cpp
