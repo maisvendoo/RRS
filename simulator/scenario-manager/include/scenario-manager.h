@@ -1,7 +1,7 @@
 #ifndef     SCENARIO_MANAGER_H
 #define     SCENARIO_MANAGER_H
 
-#include "datetime.h"
+#include    <datetime.h>
 #include    <QObject>
 #include    <queue>
 #include    <sol/sol.hpp>
@@ -197,6 +197,8 @@ public slots:
     /// Переименование поезда по команде от сервера, принявшего новое имя
     void slotRenameTrain(int train_idx, QString new_name);
 
+    /// Обработка события занятости или освобождения какой-либо траектории
+    /// на карте
     void slotChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
 };
 
