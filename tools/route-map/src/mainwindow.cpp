@@ -57,6 +57,8 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(tcp_client, &TcpClient::setTrainInfo,
             this, &MainWindow::slotGetTrainsInfo);
 
+    bg = new BackGroundWidget(ui->Map);
+
     map = new MapWidget(ui->Map);
     map->stations = topology->getStationsList();
     map->traj_list = topology->getTrajectoriesList();
@@ -65,6 +67,12 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     map->train_data = &train_data;
     map->vehicles_half_length = &vehicles_half_length;
     map->players_data = &players_data;
+
+    connect(map, &MapWidget::sigOpenTrajectoryMenu,
+            this, &MainWindow::slotNearestTrajectoryMenu);
+
+    connect(map, &MapWidget::sigSelectNearestTrajectory,
+            this, &MainWindow::slotSelectTrajectory);
 
     load_config("../cfg/route-map-tcp.xml");
 
@@ -147,6 +155,33 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     map->resize(ui->Map->width(), ui->Map->height());
     map->update();
+
+    bg->resize(ui->Map->width(), ui->Map->height());
+    bg->setScale(map->getScale());
+    bg->setShift(map->getShift());
+
+    if (!is_menu_shows)
+    {
+        Trajectory* new_nearest_trajectory = map->nearest_trajectory;
+        if (route_begin_trajectory && new_nearest_trajectory && (route_dir != 0))
+        {
+            if (new_nearest_trajectory != bg->nearest_trajectory)
+            {
+                route_segment_t route = topology->find_route(route_begin_trajectory,
+                                                             new_nearest_trajectory,
+                                                             route_dir);
+                bg->route_trajectories = route.trajectories;
+            }
+        }
+        else
+        {
+            bg->route_trajectories.clear();
+        }
+        bg->nearest_trajectory = map->nearest_trajectory;
+        bg->route_begin_trajectory = route_begin_trajectory;
+    }
+
+    bg->update();
 }
 
 //------------------------------------------------------------------------------
@@ -473,6 +508,147 @@ void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
+{
+    if (route_begin_trajectory)
+    {
+        // Если уже строим маршрут, то заканчиваем строить маршрут
+        slotSelectTrajectory(nearest_traj);
+        return;
+    }
+
+    if (nearest_traj == nullptr)
+    {
+        return;
+    }
+
+    QMenu* menu = new QMenu(this);
+    bool no_need_menu = true;
+
+    // Проверяем, есть ли траектория вперёд
+    if (Connector* conn_fwd = nearest_traj->getFwdConnector())
+    {
+        if (Trajectory* next_fwd = conn_fwd->getFwdTraj())
+        {
+            no_need_menu = false;
+            // Создаём пункт меню для поиска маршрута в направлении вперёд
+            QAction* route_from_traj_fwd = new QAction(tr("Build route to forward direction"), this);
+            menu->addAction(route_from_traj_fwd);
+            connect(route_from_traj_fwd, &QAction::triggered, this, [this, nearest_traj]{
+                route_begin_trajectory = nearest_traj;
+                route_dir = 1;
+            });
+        }
+    }
+
+    // Проверяем, есть ли траектория назад
+    if (Connector* conn_bwd = nearest_traj->getBwdConnector())
+    {
+        if (Trajectory* next_bwd = conn_bwd->getBwdTraj())
+        {
+            no_need_menu = false;
+            // Создаём пункт меню для поиска маршрута в направлении назад
+            QAction* route_from_traj_bwd = new QAction(tr("Build route to backward direction"), this);
+            menu->addAction(route_from_traj_bwd);
+            connect(route_from_traj_bwd, &QAction::triggered, this, [this, nearest_traj]{
+                route_begin_trajectory = nearest_traj;
+                route_dir = -1;
+            });
+        }
+    }
+
+    if (no_need_menu)
+    {
+        delete menu;
+        return;
+    }
+
+    connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
+    is_menu_shows = true;
+    menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
+{
+    if ((nearest_traj == nullptr) || (route_begin_trajectory == nullptr) || (route_dir == 0))
+    {
+        route_begin_trajectory = nullptr;
+        route_dir = 0;
+        return;
+    }
+
+    Trajectory* start_traj = route_begin_trajectory;
+    Trajectory* target_traj = nearest_traj;
+    std::int8_t dir = (route_dir < 0) ? -1 : 1;
+
+    route_begin_trajectory = nullptr;
+    route_dir = 0;
+
+    route_segment_t route = topology->find_route(start_traj,
+                                                 target_traj,
+                                                 dir);
+
+    QMenu* menu = new QMenu(this);
+
+    if (route.trajectories.size() < 2)
+    {
+        // Создаём пункт меню для продолжения поиска маршрута
+        QAction* continue_search = new QAction(tr("Continue route search"), this);
+        menu->addAction(continue_search);
+        connect(continue_search, &QAction::triggered, this, [this, start_traj, dir]{
+            route_begin_trajectory = start_traj;
+            route_dir = dir;
+        });
+    }
+    else
+    {
+        // Указатель на сетевого клиента, который отправит команду построить маршрут
+        TcpClient* tc = tcp_client;
+
+        // Создаём пункт меню для продолжения поиска маршрута
+        QAction* continue_search = new QAction(tr("Continue route search"), this);
+        menu->addAction(continue_search);
+        connect(continue_search, &QAction::triggered, this, [this, start_traj, dir]{
+            route_begin_trajectory = start_traj;
+            route_dir = dir;
+        });
+
+        // Создаём пункт меню для установки стрелок по маршруту
+        QAction* build_route = new QAction(tr("Set switches for route"), this);
+        menu->addAction(build_route);
+        connect(build_route, &QAction::triggered, this, [tc, start_traj, target_traj, dir]{
+            route_command_t sc = {start_traj->getName(), target_traj->getName(), dir};
+            tc->sendBuildRouteCommand(sc.serialize());
+        });
+
+        // Создаём пункт меню для установки стрелок и открытия поездных светофоров по маршруту
+        QAction* train_route = new QAction(tr("Set switches and train signals for route"), this);
+        menu->addAction(train_route);
+        connect(train_route, &QAction::triggered, this, [tc, start_traj, target_traj, dir]{
+            route_command_t sc = {start_traj->getName(), target_traj->getName(), dir};
+            tc->sendTrainRouteCommand(sc.serialize());
+        });
+
+        // Создаём пункт меню для установки стрелок и открытия маневровых светофоров по маршруту
+        QAction* shunting_route = new QAction(tr("Set switches and shunting signals for route"), this);
+        menu->addAction(shunting_route);
+        connect(shunting_route, &QAction::triggered, this, [tc, start_traj, target_traj, dir]{
+            route_command_t sc = {start_traj->getName(), target_traj->getName(), dir};
+            tc->sendShuntingRouteCommand(sc.serialize());
+        });
+    }
+
+    connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
+    is_menu_shows = true;
+    menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::slotSwitchConnectorMenu()
 {
     // Создаём меню для текстовой метки стрелочного перевода
@@ -531,6 +707,8 @@ void MainWindow::slotSwitchConnectorMenu()
         });
     }
 
+    connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
+    is_menu_shows = true;
     menu->exec(QCursor::pos());
 }
 
@@ -625,7 +803,17 @@ void MainWindow::slotSignalControlMenu()
         tc->sendSignalCommand(sc.serialize());
     });
 
+    connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
+    is_menu_shows = true;
     menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotMenuHide()
+{
+    is_menu_shows = false;
 }
 
 //------------------------------------------------------------------------------

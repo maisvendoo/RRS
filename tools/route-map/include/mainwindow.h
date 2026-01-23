@@ -9,6 +9,7 @@
 #include    <topology.h>
 #include    <simulator-info-struct.h>
 #include    <simulator-update-struct.h>
+#include    <background-widget.h>
 #include    <map-widget.h>
 #include    <switch-label.h>
 
@@ -59,11 +60,19 @@ private:
 
     Topology *topology = new Topology;
 
+    Trajectory* route_begin_trajectory = nullptr;
+
+    int route_dir = 0;
+
+    bool is_menu_shows = false;
+
     simulator_update_players_t players_data;
 
     simulator_update_pos_t train_data;
 
     std::vector<double> vehicles_half_length;
+
+    BackGroundWidget *bg;
 
     MapWidget *map;
 
@@ -95,9 +104,15 @@ private slots:
 
     void slotGetVehiclePosData(QByteArray &sim_data);
 
+    void slotNearestTrajectoryMenu(Trajectory* nearest_traj);
+
+    void slotSelectTrajectory(Trajectory* nearest_traj);
+
     void slotSwitchConnectorMenu();
 
     void slotSignalControlMenu();
+
+    void slotMenuHide();
 
     void slotGetSwitchState(QByteArray &sw_state);
 
