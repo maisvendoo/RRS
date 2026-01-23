@@ -24,3 +24,15 @@ function autoApproach(traj_begin, traj_end, dir)
 
 	return approach_route_build
 end
+
+-------------------------------------------------------------------
+--
+-------------------------------------------------------------------
+function actionBuildRoute(traj_begin, traj_end, dir)
+
+	function action()
+		buildRoute(traj_begin, traj_end, dir)	
+	end
+
+	return action
+end
