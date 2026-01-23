@@ -1,6 +1,7 @@
 #ifndef     SCENARIO_MANAGER_H
 #define     SCENARIO_MANAGER_H
 
+#include "datetime.h"
 #include    <QObject>
 #include    <queue>
 #include    <sol/sol.hpp>
@@ -46,7 +47,7 @@ public:
     }
 
     /// Шаг симуляции (выполнение очереди задач)
-    void step(double t, double dt);
+    void step(const simulator_time_t &sim_time, double dt);
 
     std::vector<scenario_train_data_t> train_datas;
 
@@ -120,8 +121,16 @@ private:
     /// Создать поезд игрока
     void setTrain(const scenario_train_data_t &train_data);
 
+    /// Перевести строку в структуру времени сервера
+    void strTimeToServerTime(const std::string &str_time,
+                                server_time_t &time);
+
     /// Установить время сервера (формат строки "hh:mm:ss"
     void setTime(const std::string &time);
+
+    /// Перевести строку в структуру даты сервера
+    void strDateToServerDate(const std::string &str_date,
+                             server_date_t &date);
 
     /// Установить дату сервера (формат строки "dd.mm.yyyy")
     void setDate(const std::string &date);
