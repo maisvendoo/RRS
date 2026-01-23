@@ -389,34 +389,34 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::pair<Trajectory *, Trajectory *> Topology::check_build_route_command(const route_command_t &rc)
+route_segment_t Topology::build_route(const route_command_t &rc)
 {
     if ((rc.dir != 1) && (rc.dir != -1))
     {
         Journal::instance()->error("BuildRoute: Invalid direction of searching "
                                    + QString::number(rc.dir));
-        return {nullptr, nullptr};
+        return route_segment_t();
     }
 
-    auto s_traj = traj_list.value(rc.trajectory_begin, nullptr);
+    Trajectory* s_traj = traj_list.value(rc.trajectory_begin, nullptr);
 
     if (s_traj == nullptr)
     {
         Journal::instance()->error("BuildRoute: Unknown start trajectory "
                                    + rc.trajectory_begin);
-        return {nullptr, nullptr};
+        return route_segment_t();
     }
 
-    auto t_traj = traj_list.value(rc.trajectory_end, nullptr);
+    Trajectory* t_traj = traj_list.value(rc.trajectory_end, nullptr);
 
     if (t_traj == nullptr)
     {
         Journal::instance()->error("BuildRoute: Unknown target trajectory "
                                    + rc.trajectory_end);
-        return {nullptr, nullptr};
+        return route_segment_t();
     }
 
-    return {s_traj, t_traj};
+    return find_route(s_traj, t_traj, rc.dir);
 }
 
 //------------------------------------------------------------------------------
@@ -532,10 +532,8 @@ bool Topology::open_route_signals(const route_segment_t &route, int dir, QString
             continue;
         }
 
-        if (StationSignal* station_sig = dynamic_cast<StationSignal *>(signal))
-        {
-            conn_list.append(conn->getName());
-        }
+        // Добавляем в список
+        conn_list.append(conn->getName());
     }
     return true;
 }
@@ -1318,13 +1316,7 @@ void Topology::slotBuildRouteCommand(QByteArray &route_data)
     route_command_t rc;
     rc.deserialize(route_data);
 
-    auto [s_traj, t_traj] = check_build_route_command(rc);
-    if ((s_traj == nullptr) || (t_traj == nullptr))
-    {
-        return;
-    }
-
-    auto route = find_route(s_traj, t_traj, rc.dir);
+    route_segment_t route = build_route(rc);
 
     if (route.trajectories.empty())
     {
@@ -1351,13 +1343,7 @@ void Topology::slotTrainRouteCommand(QByteArray &route_data)
     route_command_t rc;
     rc.deserialize(route_data);
 
-    auto [s_traj, t_traj] = check_build_route_command(rc);
-    if ((s_traj == nullptr) || (t_traj == nullptr))
-    {
-        return;
-    }
-
-    auto route = find_route(s_traj, t_traj, rc.dir);
+    route_segment_t route = build_route(rc);
 
     if (route.trajectories.empty())
     {
@@ -1381,7 +1367,7 @@ void Topology::slotTrainRouteCommand(QByteArray &route_data)
         Journal::instance()->error("Build route: Can't open route signals");
     }
 
-    emit sigSetOpenSignalsQueue(signals_for_open, rc.dir);
+    emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, true, false);
 }
 
 //------------------------------------------------------------------------------
@@ -1389,8 +1375,34 @@ void Topology::slotTrainRouteCommand(QByteArray &route_data)
 //------------------------------------------------------------------------------
 void Topology::slotShuntingRouteCommand(QByteArray &route_data)
 {
-    // TODO
-    slotTrainRouteCommand(route_data);
+    route_command_t rc;
+    rc.deserialize(route_data);
+
+    route_segment_t route = build_route(rc);
+
+    if (route.trajectories.empty())
+    {
+        Journal::instance()->error("Build route: No route from "
+                                   + rc.trajectory_begin + " to " + rc.trajectory_end);
+        return;
+    }
+    Journal::instance()->info("Build route: founded from "
+                              + rc.trajectory_begin + " to " + rc.trajectory_end
+                              + " through " + QString::number(route.trajectories.size()) + "trajectories");
+
+    if (!set_switchs_by_route(route, rc.dir))
+    {
+        Journal::instance()->error("Build route: Route switches cannot be set");
+        return;
+    }
+
+    QStringList signals_for_open;
+    if (!open_route_signals(route, rc.dir, signals_for_open))
+    {
+        Journal::instance()->error("Build route: Can't open route signals");
+    }
+
+    emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, false, true);
 }
 
 //------------------------------------------------------------------------------

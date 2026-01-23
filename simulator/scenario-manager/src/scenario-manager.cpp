@@ -91,6 +91,11 @@ void ScenarioManager::step(double t, double dt)
             // Исполняем
             task();
         }
+        else
+        {
+            Journal::instance()->info("Tasks: " + QString::number(taskQueue.size()) +
+                                      " | Timer: " + QString::number(delayTimer->getTimeout()));
+        }
     }
 
     delayTimer->step(t, dt);
@@ -403,14 +408,26 @@ void ScenarioManager::taskSwitchBwd(const std::string &switch_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::openSignal(const std::string &conn_name, int dir)
+void ScenarioManager::openSignal(const std::string& conn_name, int dir, bool for_train, bool for_shunting)
 {
     signal_command_t sc = signal_command_t();
     sc.conn_name = QString(conn_name.c_str());
     sc.sig_dir = dir;
-    sc.command_open_train = true;
-    sc.command_open_shunting = true;
-    sc.command_open_call = true;
+    if (for_train)
+    {
+        sc.command_open_train = true;
+    }
+    else
+    {
+        if (for_shunting)
+        {
+            sc.command_open_shunting = true;
+        }
+        else
+        {
+            sc.command_open_call = true;
+        }
+    }
 
     QByteArray sc_data = sc.serialize();
     emit sigSignalCommand(sc_data);
@@ -419,9 +436,11 @@ void ScenarioManager::openSignal(const std::string &conn_name, int dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::taskOpenSignal(const std::string &conn_name, int dir)
+void ScenarioManager::taskOpenSignal(const std::string& conn_name, int dir, bool for_train, bool for_shunting)
 {
-    setTask([conn_name, dir, this]{ this->openSignal(conn_name, dir); });
+    setTask([conn_name, dir, for_train, for_shunting, this]{
+        this->openSignal(conn_name, dir, for_train, for_shunting);
+    });
 }
 
 //------------------------------------------------------------------------------
@@ -589,14 +608,14 @@ void ScenarioManager::slotDelayTimer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir)
+void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir, bool for_train, bool for_shunting)
 {
     const double signal_open_delay = 0.5;
 
     for (auto& conn_name : conn_list)
     {
         taskSetDelay(signal_open_delay);
-        taskOpenSignal(conn_name.toStdString(), dir);
+        taskOpenSignal(conn_name.toStdString(), dir, for_train, for_shunting);
     }
 }
 

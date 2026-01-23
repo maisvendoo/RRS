@@ -94,7 +94,7 @@ signals:
 
     void sendTrajBusyState(QByteArray busy_data);
 
-    void sigSetOpenSignalsQueue(QStringList conn_list, int dir);
+    void sigSetOpenSignalsQueue(QStringList conn_list, int dir, bool for_train, bool for_shunting);
 
     void sigChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
 
@@ -143,8 +143,8 @@ private:
 
     Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
 
-    /// Проверка имён траекторий в команде построения маршрута
-    std::pair<Trajectory*, Trajectory*> check_build_route_command(const route_command_t& rc);
+    /// Команда построения маршрута
+    route_segment_t build_route(const route_command_t& rc);
 
     /// Установка стрелок по маршруту
     bool set_switchs_by_route(const route_segment_t &route, int dir);

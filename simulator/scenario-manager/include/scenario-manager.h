@@ -142,15 +142,15 @@ private:
     void taskSwitchBwd(const std::string &switch_name);
 
     /// Открыть сигнал
-    void openSignal(const std::string &conn_name, int dir);
+    void openSignal(const std::string &conn_name, int dir, bool for_train = true, bool for_shunting = true);
 
     /// Установка задачи открытия сигнала
-    void taskOpenSignal(const std::string &conn_name, int dir = 1);
+    void taskOpenSignal(const std::string &conn_name, int dir = 1, bool for_train = true, bool for_shunting = true);
 
-    /// Открыть сигнал
+    /// Закрыть сигнал
     void closeSignal(const std::string &conn_name, int dir);
 
-    /// Установка задачи открытия сигнала
+    /// Установка задачи закрытия сигнала
     void taskCloseSignal(const std::string &conn_name, int dir = 1);
 
     /// Установка задержки исполнения очереди
@@ -181,7 +181,7 @@ private slots:
 
 public slots:
 
-    void slotSetOpenSignalsQueue(QStringList conn_list, int dir);
+    void slotSetOpenSignalsQueue(QStringList conn_list, int dir, bool for_train, bool for_shunting);
 
     /// Переименование поезда по команде от сервера, принявшего новое имя
     void slotRenameTrain(int train_idx, QString new_name);

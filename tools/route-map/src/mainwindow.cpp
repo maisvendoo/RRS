@@ -546,6 +546,7 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
 
     if (!nearest_traj->isInRoute())
     {
+        // Создаём пункт меню для поиска маршрута в направлении вперёд
         QAction* route_from_traj_fwd = new QAction(tr("Build route to forward direction"), this);
         menu->addAction(route_from_traj_fwd);
         connect(route_from_traj_fwd, &QAction::triggered, this, [this, nearest_traj]{
@@ -553,6 +554,7 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
             route_dir = 1;
         });
 
+        // Создаём пункт меню для поиска маршрута в направлении назад
         QAction* route_from_traj_bwd = new QAction(tr("Build route to backward direction"), this);
         menu->addAction(route_from_traj_bwd);
         connect(route_from_traj_bwd, &QAction::triggered, this, [this, nearest_traj]{
@@ -561,6 +563,7 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
         });
     }
 
+    // Создаём пустой пункт меню
     QAction* close_menu = new QAction(tr("Close menu"), this);
     close_menu->setShortcut(QKeySequence(QKeySequence::Cancel));
     menu->addAction(close_menu);
@@ -595,6 +598,7 @@ void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
 
     if (route.trajectories.size() < 2)
     {
+        // Создаём пункт меню для продолжения поиска маршрута
         QAction* continue_search = new QAction(tr("Continue route search"), this);
         menu->addAction(continue_search);
         connect(continue_search, &QAction::triggered, this, [this, start_traj, dir]{
@@ -607,6 +611,7 @@ void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
         // Указатель на сетевого клиента, который отправит команду построить маршрут
         TcpClient* tc = tcp_client;
 
+        // Создаём пункт меню для продолжения поиска маршрута
         QAction* continue_search = new QAction(tr("Continue route search"), this);
         menu->addAction(continue_search);
         connect(continue_search, &QAction::triggered, this, [this, start_traj, dir]{
@@ -614,6 +619,7 @@ void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
             route_dir = dir;
         });
 
+        // Создаём пункт меню для установки стрелок по маршруту
         QAction* build_route = new QAction(tr("Set switches for route"), this);
         menu->addAction(build_route);
         connect(build_route, &QAction::triggered, this, [tc, start_traj, target_traj, dir]{
@@ -621,6 +627,7 @@ void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
             tc->sendBuildRouteCommand(sc.serialize());
         });
 
+        // Создаём пункт меню для установки стрелок и открытия поездных светофоров по маршруту
         QAction* train_route = new QAction(tr("Set switches and train signals for route"), this);
         menu->addAction(train_route);
         connect(train_route, &QAction::triggered, this, [tc, start_traj, target_traj, dir]{
@@ -628,14 +635,16 @@ void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
             tc->sendTrainRouteCommand(sc.serialize());
         });
 
+        // Создаём пункт меню для установки стрелок и открытия маневровых светофоров по маршруту
         QAction* shunting_route = new QAction(tr("Set switches and shunting signals for route"), this);
         menu->addAction(shunting_route);
         connect(shunting_route, &QAction::triggered, this, [tc, start_traj, target_traj, dir]{
             route_command_t sc = {start_traj->getName(), target_traj->getName(), dir};
-            tc->sendBuildRouteCommand(sc.serialize());
+            tc->sendShuntingRouteCommand(sc.serialize());
         });
     }
 
+    // Создаём пустой пункт меню
     QAction* close_menu = new QAction(tr("Close menu"), this);
     close_menu->setShortcut(QKeySequence(QKeySequence::Cancel));
     menu->addAction(close_menu);
