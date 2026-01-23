@@ -248,21 +248,7 @@ double Autopilot::calcPredictVelocity(double v_cur, double dist, double accel)
         v_p = sqrt(tmp) * Physics::kmh;
     }
 
-    for (size_t i = 0; i < v_filter.size() - 1; ++i)
-    {
-        v_filter[i] = v_filter[i + 1];
-    }
-
-    *(v_filter.end() - 1) = v_p;
-
-    double sum = 0.0;
-
-    for (auto v : v_filter)
-    {
-        sum += v;
-    }
-
-    return sum / v_filter.size();
+    return v_predict_filter.process(v_p);
 }
 
 //------------------------------------------------------------------------------

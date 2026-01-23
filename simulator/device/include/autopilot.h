@@ -166,6 +166,8 @@ protected:
     /// Вычислитель текущего ускорения
     Accelerometer *accel_meter = new Accelerometer;
 
+    MedianFilter<7> v_predict_filter;
+
     enum
     {
         NUM_VALUES = 10
