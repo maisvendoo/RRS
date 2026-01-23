@@ -4,6 +4,7 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec3.h>
 
 #include <vulkan/vulkan_core.h>
 
@@ -38,6 +39,8 @@ public:
     vsg::ref_ptr<vsg::LookAt> get_look_at() const;
     vsg::ref_ptr<vsg::Camera> get_camera() const;
 
+    vsg::dvec3 get_front() const;
+
 private:
     const settings_t& settings;
     vsg::ref_ptr<MouseHandler> mouse_handler;
@@ -49,6 +52,8 @@ private:
 
     double yaw_deg = 0.0;
     double pitch_deg = 0.0;
+    vsg::dvec3 front;
+    vsg::dvec3 right;
 };
 
 #endif // CAMERA_HANDLER_H

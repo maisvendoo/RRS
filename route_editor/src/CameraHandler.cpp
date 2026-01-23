@@ -50,6 +50,17 @@ CameraHandler::CameraHandler(
 
     camera = vsg::Camera::create(perspective, look_at,
         vsg::ViewportState::create(window_extent));
+
+    const double yaw_rad = vsg::radians(yaw_deg);
+    const double pitch_rad = vsg::radians(pitch_deg);
+
+    front = vsg::normalize(vsg::dvec3{
+        std::sin(yaw_rad) * std::cos(pitch_rad),
+        std::cos(yaw_rad) * std::cos(pitch_rad),
+        std::sin(pitch_rad)
+    });
+
+    right = vsg::cross(front, look_at->up);
 }
 
 void CameraHandler::apply(vsg::FrameEvent& frame)
@@ -58,17 +69,6 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     const double time = frame.frameStamp->simulationTime;
     const double dt = time - prev_time;
     prev_time = time;
-
-    static double yaw_rad = vsg::radians(yaw_deg);
-    static double pitch_rad = vsg::radians(pitch_deg);
-
-    static vsg::dvec3 front = vsg::normalize(vsg::dvec3{
-        std::sin(yaw_rad) * std::cos(pitch_rad),
-        std::cos(yaw_rad) * std::cos(pitch_rad),
-        std::sin(pitch_rad)
-    });
-
-    static vsg::dvec3 right = vsg::cross(front, look_at->up);
 
     if (mouse_handler->get_is_rmb_pressed())
     {
@@ -79,8 +79,8 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
         pitch_deg = std::clamp(pitch_deg, settings.pitch_min,
             settings.pitch_max);
 
-        yaw_rad = vsg::radians(yaw_deg);
-        pitch_rad = vsg::radians(pitch_deg);
+        const double yaw_rad = vsg::radians(yaw_deg);
+        const double pitch_rad = vsg::radians(pitch_deg);
 
         front.x = std::sin(yaw_rad) * std::cos(pitch_rad);
         front.y = std::cos(yaw_rad) * std::cos(pitch_rad);
@@ -132,4 +132,9 @@ vsg::ref_ptr<vsg::LookAt> CameraHandler::get_look_at() const
 vsg::ref_ptr<vsg::Camera> CameraHandler::get_camera() const
 {
     return camera;
+}
+
+vsg::dvec3 CameraHandler::get_front() const
+{
+    return front;
 }
