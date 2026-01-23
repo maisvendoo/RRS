@@ -236,6 +236,16 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
                                      Trajectory *target_traj,
                                      int dir)
 {
+    // Маршрут на самого себя
+    if (start_traj == target_traj)
+    {
+        route_segment_t path;
+        path.dir = 0;
+        path.trajectories = {start_traj};
+        Journal::instance()->warning("Build route: Target trajectory and start trajectory are the same");
+        return path;
+    }
+
     // Если целевая траектория занята, уходим сразу, ловить нечего
     if (target_traj->isBusy())
     {
@@ -379,6 +389,39 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+route_segment_t Topology::build_route(const route_command_t &rc)
+{
+    if ((rc.dir != 1) && (rc.dir != -1))
+    {
+        Journal::instance()->error("BuildRoute: Invalid direction of searching "
+                                   + QString::number(rc.dir));
+        return route_segment_t();
+    }
+
+    Trajectory* s_traj = traj_list.value(rc.trajectory_begin, nullptr);
+
+    if (s_traj == nullptr)
+    {
+        Journal::instance()->error("BuildRoute: Unknown start trajectory "
+                                   + rc.trajectory_begin);
+        return route_segment_t();
+    }
+
+    Trajectory* t_traj = traj_list.value(rc.trajectory_end, nullptr);
+
+    if (t_traj == nullptr)
+    {
+        Journal::instance()->error("BuildRoute: Unknown target trajectory "
+                                   + rc.trajectory_end);
+        return route_segment_t();
+    }
+
+    return find_route(s_traj, t_traj, rc.dir);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
 {
     for (size_t i = 0; i < route.trajectories.size() - 1; ++i)
@@ -463,7 +506,7 @@ bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Topology::open_route_signals(const route_segment_t &route, int dir, QStringList &conn_list)
+bool Topology::open_route_signals(const route_segment_t &route, int dir, QStringList &conn_list, bool for_train)
 {
     for (size_t i = 0; i < route.trajectories.size() - 1; ++i)
     {
@@ -489,8 +532,17 @@ bool Topology::open_route_signals(const route_segment_t &route, int dir, QString
             continue;
         }
 
-        if (StationSignal* station_sig = dynamic_cast<StationSignal *>(signal))
+        if (for_train)
         {
+            if (StationSignal* station_sig = dynamic_cast<StationSignal *>(signal))
+            {
+                // Добавляем в список поездной светофор
+                conn_list.append(conn->getName());
+            }
+        }
+        else
+        {
+            // Добавляем в список
             conn_list.append(conn->getName());
         }
     }
@@ -1270,52 +1322,82 @@ void Topology::slotSignalCommand(QByteArray& signal_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotBuildRoute(QString start_traj, QString target_traj, int dir)
+void Topology::slotBuildRouteCommand(QByteArray &route_data)
 {
-    auto s_traj = traj_list.value(start_traj, nullptr);
+    route_command_t rc;
+    rc.deserialize(route_data);
 
-    if (s_traj == nullptr)
-    {
-        Journal::instance()->error("BuildRoute: Unknown start trajectory "
-                                   + start_traj);
-        return;
-    }
+    route_segment_t route = build_route(rc);
 
-    auto t_traj = traj_list.value(target_traj, nullptr);
-
-    if (t_traj == nullptr)
-    {
-        Journal::instance()->error("BuildRoute: Unknown target trajectory "
-                                   + target_traj);
-        return;
-    }
-
-    auto route = find_route(s_traj, t_traj, dir);
-
-    if ((route.dir == 0) || route.trajectories.empty())
+    if (route.trajectories.empty())
     {
         Journal::instance()->error("Build route: No route from "
-                                   + start_traj + " to " + target_traj);
+                                   + rc.trajectory_begin + " to " + rc.trajectory_end);
         return;
     }
     Journal::instance()->info("Build route: founded from "
-                              + start_traj + " to " + target_traj
+                              + rc.trajectory_begin + " to " + rc.trajectory_end
                               + " through " + QString::number(route.trajectories.size()) + "trajectories");
 
-    if (!set_switchs_by_route(route, dir))
+    set_switchs_by_route(route, rc.dir);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::slotTrainRouteCommand(QByteArray &route_data)
+{
+    route_command_t rc;
+    rc.deserialize(route_data);
+
+    route_segment_t route = build_route(rc);
+
+    if (route.trajectories.empty())
     {
-        Journal::instance()->error("Build route: Route is occupied or switches cannot be set");
+        Journal::instance()->error("Build route: No route from "
+                                   + rc.trajectory_begin + " to " + rc.trajectory_end);
         return;
     }
+    Journal::instance()->info("Build route: founded from "
+                              + rc.trajectory_begin + " to " + rc.trajectory_end
+                              + " through " + QString::number(route.trajectories.size()) + "trajectories");
 
-    QStringList signals_for_open;
-
-    if (!open_route_signals(route, dir, signals_for_open))
+    if (set_switchs_by_route(route, rc.dir))
     {
-        Journal::instance()->error("Build route: Can't open route signals");
-    }
+        QStringList signals_for_open;
+        open_route_signals(route, rc.dir, signals_for_open, true);
 
-    emit sigSetOpenSignalsQueue(signals_for_open, dir);
+        emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, true, false);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::slotShuntingRouteCommand(QByteArray &route_data)
+{
+    route_command_t rc;
+    rc.deserialize(route_data);
+
+    route_segment_t route = build_route(rc);
+
+    if (route.trajectories.empty())
+    {
+        Journal::instance()->error("Build route: No route from "
+                                   + rc.trajectory_begin + " to " + rc.trajectory_end);
+        return;
+    }
+    Journal::instance()->info("Build route: founded from "
+                              + rc.trajectory_begin + " to " + rc.trajectory_end
+                              + " through " + QString::number(route.trajectories.size()) + "trajectories");
+
+    if (set_switchs_by_route(route, rc.dir))
+    {
+        QStringList signals_for_open;
+        open_route_signals(route, rc.dir, signals_for_open, false);
+
+        emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, false, true);
+    }
 }
 
 //------------------------------------------------------------------------------

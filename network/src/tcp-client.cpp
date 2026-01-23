@@ -94,6 +94,45 @@ void TcpClient::sendSignalCommand(QByteArray signal_command)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendBuildRouteCommand(QByteArray route_command)
+{
+    network_data_t request;
+    request.stype = STYPE_COMMAND_BUILD_ROUTE;
+    request.data = route_command;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpClient::sendTrainRouteCommand(QByteArray route_command)
+{
+    network_data_t request;
+    request.stype = STYPE_COMMAND_TRAIN_ROUTE;
+    request.data = route_command;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpClient::sendShuntingRouteCommand(QByteArray route_command)
+{
+    network_data_t request;
+    request.stype = STYPE_COMMAND_SHUNTING_ROUTE;
+    request.data = route_command;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpClient::sendVehicleControl(QByteArray vehicle_control_by_keyboard)
 {
     network_data_t request;

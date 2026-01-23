@@ -51,6 +51,12 @@ signals:
 
     void sigSignalCommand(QByteArray& signal_command);
 
+    void sigBuildRouteCommand(QByteArray& route_command);
+
+    void sigTrainRouteCommand(QByteArray& route_command);
+
+    void sigShuntingRouteCommand(QByteArray& route_command);
+
     void sigVehicleControl(QByteArray& control_data, int client_id);
 
     void sigResetVehicleControl(int client_id);
