@@ -523,30 +523,45 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
     }
 
     QMenu* menu = new QMenu(this);
+    bool no_need_menu = true;
 
-    if (!nearest_traj->isInRoute())
+    // Проверяем, есть ли траектория вперёд
+    if (Connector* conn_fwd = nearest_traj->getFwdConnector())
     {
-        // Создаём пункт меню для поиска маршрута в направлении вперёд
-        QAction* route_from_traj_fwd = new QAction(tr("Build route to forward direction"), this);
-        menu->addAction(route_from_traj_fwd);
-        connect(route_from_traj_fwd, &QAction::triggered, this, [this, nearest_traj]{
-            route_begin_trajectory = nearest_traj;
-            route_dir = 1;
-        });
-
-        // Создаём пункт меню для поиска маршрута в направлении назад
-        QAction* route_from_traj_bwd = new QAction(tr("Build route to backward direction"), this);
-        menu->addAction(route_from_traj_bwd);
-        connect(route_from_traj_bwd, &QAction::triggered, this, [this, nearest_traj]{
-            route_begin_trajectory = nearest_traj;
-            route_dir = -1;
-        });
+        if (Trajectory* next_fwd = conn_fwd->getFwdTraj())
+        {
+            no_need_menu = false;
+            // Создаём пункт меню для поиска маршрута в направлении вперёд
+            QAction* route_from_traj_fwd = new QAction(tr("Build route to forward direction"), this);
+            menu->addAction(route_from_traj_fwd);
+            connect(route_from_traj_fwd, &QAction::triggered, this, [this, nearest_traj]{
+                route_begin_trajectory = nearest_traj;
+                route_dir = 1;
+            });
+        }
     }
 
-    // Создаём пустой пункт меню
-    QAction* close_menu = new QAction(tr("Close menu"), this);
-    close_menu->setShortcut(QKeySequence(QKeySequence::Cancel));
-    menu->addAction(close_menu);
+    // Проверяем, есть ли траектория назад
+    if (Connector* conn_bwd = nearest_traj->getBwdConnector())
+    {
+        if (Trajectory* next_bwd = conn_bwd->getBwdTraj())
+        {
+            no_need_menu = false;
+            // Создаём пункт меню для поиска маршрута в направлении назад
+            QAction* route_from_traj_bwd = new QAction(tr("Build route to backward direction"), this);
+            menu->addAction(route_from_traj_bwd);
+            connect(route_from_traj_bwd, &QAction::triggered, this, [this, nearest_traj]{
+                route_begin_trajectory = nearest_traj;
+                route_dir = -1;
+            });
+        }
+    }
+
+    if (no_need_menu)
+    {
+        delete menu;
+        return;
+    }
 
     connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
     is_menu_shows = true;
@@ -625,11 +640,6 @@ void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
             tc->sendShuntingRouteCommand(sc.serialize());
         });
     }
-
-    // Создаём пустой пункт меню
-    QAction* close_menu = new QAction(tr("Close menu"), this);
-    close_menu->setShortcut(QKeySequence(QKeySequence::Cancel));
-    menu->addAction(close_menu);
 
     connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
     is_menu_shows = true;
