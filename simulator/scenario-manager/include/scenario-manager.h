@@ -13,6 +13,7 @@
 #include    <timer.h>
 
 #include    <lua-debugger.h>
+#include    <date-time-trigger.h>
 
 //------------------------------------------------------------------------------
 //
@@ -89,8 +90,11 @@ private:
     /// Очередь задач
     std::queue<task_t> taskQueue;
 
-    /// Список триггеров
+    /// Список позиционных триггеров
     std::vector<sol::protected_function> triggerList;
+
+    /// Очередь временных триггеров
+    std::queue<date_time_tirgger_t> timeTriggerQueue;
 
     /// Таймер задержки исполнения очереди задач
     Timer *delayTimer = new Timer(0.1, false);
@@ -180,9 +184,17 @@ private:
     /// Обработка позиционных триггеров
     void process_pos_triggers(std::string train_name, std::string traj_name, bool is_busy);
 
-    void taskSetTrigger(sol::function trigger);
+    /// Установить позиционный триггер
+    void taskSetPositionTrigger(sol::function trigger);
 
+    /// Инициализация библиотек Lua
     void lua_libraries_init();
+
+    /// Обработка очереди задач
+    void processTasksQueue();
+
+    /// Обработка очереди временных триггеров
+    void processTimeTriggersQueue(const simulator_time_t &sim_time);
 
 private slots:
 

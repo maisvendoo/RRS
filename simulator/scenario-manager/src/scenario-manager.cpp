@@ -77,7 +77,7 @@ bool ScenarioManager::run(const std::string &route_dir,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::step(const simulator_time_t &sim_time, double dt)
+void ScenarioManager::processTasksQueue()
 {
     // Если очередь задач не пуста
     if (!taskQueue.empty())
@@ -92,6 +92,26 @@ void ScenarioManager::step(const simulator_time_t &sim_time, double dt)
             task();
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::processTimeTriggersQueue(const simulator_time_t &sim_time)
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::step(const simulator_time_t &sim_time, double dt)
+{
+    // Обработка очереди задач
+    processTasksQueue();
+
+    // Обработка временных триггеров
+    processTimeTriggersQueue(sim_time);
 
     delayTimer->step(sim_time.simulation_seconds, dt);
 
@@ -610,7 +630,7 @@ void ScenarioManager::process_pos_triggers(std::string train_name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::taskSetTrigger(sol::function trigger)
+void ScenarioManager::taskSetPositionTrigger(sol::function trigger)
 {
     setTask([trigger, this]{
         this->triggerList.push_back(trigger);
@@ -784,7 +804,7 @@ void ScenarioManager::sys_functions_registration()
     Journal::instance()->info("buildRoute method binding...OK");
 
     lua.set_function("setTrigger", [&](sol::function trigger) {
-        taskSetTrigger(trigger);
+        taskSetPositionTrigger(trigger);
     });
 
     Journal::instance()->info("setTrigger method binding...OK");
