@@ -202,6 +202,27 @@ void TcpServer::process_client_request(client_data_t &client_data)
         emit sigSignalCommand(client_data.received_data.data);
         break;
     }
+    case STYPE_COMMAND_BUILD_ROUTE:
+    {
+        Journal::instance()->info(QString("Received build route command from #%1")
+                                      .arg(client_data.id));
+        emit sigBuildRouteCommand(client_data.received_data.data);
+        break;
+    }
+    case STYPE_COMMAND_TRAIN_ROUTE:
+    {
+        Journal::instance()->info(QString("Received train route command from #%1")
+                                      .arg(client_data.id));
+        emit sigTrainRouteCommand(client_data.received_data.data);
+        break;
+    }
+    case STYPE_COMMAND_SHUNTING_ROUTE:
+    {
+        Journal::instance()->info(QString("Received shunting route command from #%1")
+                                      .arg(client_data.id));
+        emit sigShuntingRouteCommand(client_data.received_data.data);
+        break;
+    }
     case STYPE_COMMAND_VEHICLE_CONTROL:
     {
         Journal::instance()->info(QString("Received vehicle control command from #%1")

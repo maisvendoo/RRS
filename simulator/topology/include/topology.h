@@ -41,6 +41,11 @@ public:
     /// (для удобства смены индекса поезда у контролов из поезда)
     std::unordered_map<Vehicle *, VehicleController *> vc_table;
 
+    /// Нахождение пути в графе траекторий
+    route_segment_t find_route(Trajectory *start_traj,
+                               Trajectory *target_traj,
+                               int dir);
+
     /// Шаг симуляции
     void step(double t, double dt);
 
@@ -89,7 +94,7 @@ signals:
 
     void sendTrajBusyState(QByteArray busy_data);
 
-    void sigSetOpenSignalsQueue(QStringList conn_list, int dir);
+    void sigSetOpenSignalsQueue(QStringList conn_list, int dir, bool for_train, bool for_shunting);
 
     void sigChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
 
@@ -138,16 +143,14 @@ private:
 
     Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
 
-    /// Нахождение пути в графе траекторий
-    route_segment_t find_route(Trajectory *start_traj,
-                               Trajectory *target_traj,
-                               int dir);
+    /// Команда построения маршрута
+    route_segment_t build_route(const route_command_t& rc);
 
     /// Установка стрелок по маршруту
     bool set_switchs_by_route(const route_segment_t &route, int dir);
 
     /// Октрытие попутных сигналов по маршруту
-    bool open_route_signals(const route_segment_t &route, int dir, QStringList &conn_list);
+    bool open_route_signals(const route_segment_t &route, int dir, QStringList &conn_list, bool for_train = true);
 
 public slots:
 
@@ -157,7 +160,11 @@ public slots:
 
     void slotSignalCommand(QByteArray& signal_data);
 
-    void slotBuildRoute(QString start_traj, QString target_traj, int dir);
+    void slotBuildRouteCommand(QByteArray& route_data);
+
+    void slotTrainRouteCommand(QByteArray& route_data);
+
+    void slotShuntingRouteCommand(QByteArray& route_data);
 
 private slots:
 

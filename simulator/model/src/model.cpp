@@ -770,7 +770,8 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     connect(scnmgr, &ScenarioManager::sigGetSwitchState, topology, &Topology::slotGetSwitchState);
     connect(scnmgr, &ScenarioManager::sigSwitchCommand, topology, &Topology::slotSwitchCommand);
     connect(scnmgr, &ScenarioManager::sigSignalCommand, topology, &Topology::slotSignalCommand);
-    connect(scnmgr, &ScenarioManager::sigBuildRoute, topology, &Topology::slotBuildRoute);
+//    connect(scnmgr, &ScenarioManager::sigBuildRoute, topology, &Topology::slotBuildRouteCommand);
+    connect(scnmgr, &ScenarioManager::sigBuildRoute, topology, &Topology::slotTrainRouteCommand);
     connect(topology, &Topology::sigSetOpenSignalsQueue, scnmgr, &ScenarioManager::slotSetOpenSignalsQueue);
     connect(tcp_server, &TcpServer::sigRenameTrain, scnmgr, &ScenarioManager::slotRenameTrain);
     connect(scnmgr, &ScenarioManager::sigRenameTrainInModel, this, &Model::slotRenameTrainInModel);
@@ -780,7 +781,7 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     if (!command_line.scenario.is_present)
     {
         return false;
-    }    
+    }
 
     // Пытаемся выполнить скрипт
     if (!scnmgr->run(init_data.route_dir_name.toStdString(),
@@ -840,6 +841,12 @@ void Model::initTcpServer()
     connect(tcp_server, &TcpServer::sigSwitchCommand, topology, &Topology::slotSwitchCommand);
 
     connect(tcp_server, &TcpServer::sigSignalCommand, topology, &Topology::slotSignalCommand);
+
+    connect(tcp_server, &TcpServer::sigBuildRouteCommand, topology, &Topology::slotBuildRouteCommand);
+
+    connect(tcp_server, &TcpServer::sigTrainRouteCommand, topology, &Topology::slotTrainRouteCommand);
+
+    connect(tcp_server, &TcpServer::sigShuntingRouteCommand, topology, &Topology::slotShuntingRouteCommand);
 
     connect(tcp_server, &TcpServer::sigVehicleControl, this, &Model::slotGetVehicleControlByKeyboard);
 

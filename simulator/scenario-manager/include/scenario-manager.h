@@ -64,7 +64,7 @@ signals:
 
     void sigSignalCommand(QByteArray& signal_data);
 
-    void sigBuildRoute(QString start_traj, QString target_traj, int dir);
+    void sigBuildRoute(QByteArray& route_data);
 
     /// Этот сигнал инициирует сообщение во вьювер,
     /// о необходимости задать имя поезда
@@ -142,22 +142,22 @@ private:
     void taskSwitchBwd(const std::string &switch_name);
 
     /// Открыть сигнал
-    void openSignal(const std::string &conn_name, int dir);
+    void openSignal(const std::string &conn_name, int dir, bool for_train = true, bool for_shunting = true);
 
     /// Установка задачи открытия сигнала
-    void taskOpenSignal(const std::string &conn_name, int dir = 1);
+    void taskOpenSignal(const std::string &conn_name, int dir = 1, bool for_train = true, bool for_shunting = true);
 
-    /// Открыть сигнал
+    /// Закрыть сигнал
     void closeSignal(const std::string &conn_name, int dir);
 
-    /// Установка задачи открытия сигнала
+    /// Установка задачи закрытия сигнала
     void taskCloseSignal(const std::string &conn_name, int dir = 1);
 
     /// Установка задержки исполнения очереди
     void taskSetDelay(double timeout);
 
     /// Задать маршрут
-    void buildRoute(QString start_traj, QString target_traj, int dir);
+    void buildRoute(const std::string &start_traj, const std::string &target_traj, int dir);
 
     /// Установка задачи задания маршрута
     void taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir);
@@ -181,7 +181,7 @@ private slots:
 
 public slots:
 
-    void slotSetOpenSignalsQueue(QStringList conn_list, int dir);
+    void slotSetOpenSignalsQueue(QStringList conn_list, int dir, bool for_train, bool for_shunting);
 
     /// Переименование поезда по команде от сервера, принявшего новое имя
     void slotRenameTrain(int train_idx, QString new_name);
