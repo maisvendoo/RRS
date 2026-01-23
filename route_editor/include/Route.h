@@ -6,8 +6,10 @@
 #include "StringMap.h"
 #include "topology.h"
 
+#include <vsg/app/Viewer.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/io/Options.h>
 #include <vsg/nodes/Switch.h>
 
 #include <filesystem>
@@ -16,14 +18,6 @@
 
 class Signal;
 struct settings_t;
-
-namespace vsg
-{
-
-class Options;
-class Viewer;
-
-}
 
 class Route : public vsg::Inherit<vsg::Switch, Route>
 {
@@ -42,6 +36,10 @@ public:
     const Topology& get_topology() const;
 
 private:
+    const settings_t* settings = nullptr;
+    vsg::ref_ptr<vsg::Options> options;
+    vsg::ref_ptr<vsg::Viewer> viewer;
+
     StringMap objects_ref;
     RouteMap route_map;
     Topology topology;
@@ -49,22 +47,11 @@ private:
 private:
     bool load_objects_ref();
     bool load_route_map();
+    void load_static_objects(const PagedLodMap& paged_lods);
 
-    void load_static_objects(
-        const PagedLodMap& paged_lods,
-        vsg::ref_ptr<vsg::Viewer> viewer
-    );
-
-    bool load_topology(
-        const settings_t& settings,
-        vsg::ref_ptr<vsg::Options> options,
-        vsg::ref_ptr<vsg::Viewer> viewer
-    );
+    bool load_topology();
 
     void load_signals(
-        const settings_t& settings,
-        vsg::ref_ptr<vsg::Options> options,
-        vsg::ref_ptr<vsg::Viewer> viewer,
         const std::vector<Signal*>& in_signals,
         const std::string& models_dir,
         PagedLodMap& paged_lods

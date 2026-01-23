@@ -45,6 +45,10 @@ bool Route::load(
     assert(options);
     assert(viewer);
 
+    this->settings = &settings;
+    this->options = options;
+    this->viewer = viewer;
+
     const bool success = load_objects_ref() && load_route_map();
     if (!success)
     {
@@ -70,9 +74,9 @@ bool Route::load(
         paged_lods[label] = paged_lod;
     }
 
-    load_static_objects(paged_lods, viewer);
+    load_static_objects(paged_lods);
 
-    return load_topology(settings, options, viewer);
+    return load_topology();
 }
 
 const StringMap& Route::get_objects_ref() const
@@ -169,13 +173,8 @@ bool Route::load_route_map()
     return true;
 }
 
-void Route::load_static_objects(
-    const PagedLodMap& paged_lods,
-    vsg::ref_ptr<vsg::Viewer> viewer
-)
+void Route::load_static_objects(const PagedLodMap& paged_lods)
 {
-    assert(viewer);
-
     for (const auto& [label, transform] : route_map)
     {
         const auto paged_lod_it = paged_lods.find(label);
@@ -229,15 +228,8 @@ void Route::load_static_objects(
     }
 }
 
-bool Route::load_topology(
-    const settings_t& settings,
-    vsg::ref_ptr<vsg::Options> options,
-    vsg::ref_ptr<vsg::Viewer> viewer
-)
+bool Route::load_topology()
 {
-    assert(options);
-    assert(viewer);
-
     const FileSystem& fs = FileSystem::getInstance();
 
     const std::string cfg_path = fs.combinePath(directory.string(),
@@ -285,39 +277,19 @@ bool Route::load_topology(
         return false;
     }
 
-    enum
-    {
-        LINE,
-        ENTER,
-        EXIT,
-        TOTAL_SIGNAL_TYPES
-    };
-
-    const std::vector<Signal*>* _signals[TOTAL_SIGNAL_TYPES];
-    _signals[LINE] = &signals_data->line_signals;
-    _signals[ENTER] = &signals_data->enter_signals;
-    _signals[EXIT] = &signals_data->exit_signals;
-
-    for (int i = 0; i < TOTAL_SIGNAL_TYPES; ++i)
-    {
-        load_signals(settings, options, viewer, *_signals[i], models_dir, paged_lods);
-    }
+    load_signals(signals_data->line_signals, models_dir, paged_lods);
+    load_signals(signals_data->enter_signals, models_dir, paged_lods);
+    load_signals(signals_data->exit_signals, models_dir, paged_lods);
 
     return true;
 }
 
 void Route::load_signals(
-    const settings_t& settings,
-    vsg::ref_ptr<vsg::Options> options,
-    vsg::ref_ptr<vsg::Viewer> viewer,
     const std::vector<Signal*>& in_signals,
     const std::string& models_dir,
     PagedLodMap& paged_lods
 )
 {
-    assert(options);
-    assert(viewer);
-
     const FileSystem& fs = FileSystem::getInstance();
 
     for (Signal* const signal : in_signals)
@@ -343,7 +315,7 @@ void Route::load_signals(
             new_paged_lod->filename = signal_model_path;
 
             new_paged_lod->bound.set(vsg::dvec3(0.0, 0.0, 0.0),
-                settings.view_distance);
+                settings->view_distance);
 
             new_paged_lod->children.front() = vsg::PagedLOD::Child{0.1, {}};
             new_paged_lod->options = options;
