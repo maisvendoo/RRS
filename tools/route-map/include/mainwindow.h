@@ -64,6 +64,8 @@ private:
 
     int route_dir = 0;
 
+    bool is_menu_shows = false;
+
     simulator_update_players_t players_data;
 
     simulator_update_pos_t train_data;
@@ -109,6 +111,8 @@ private slots:
     void slotSwitchConnectorMenu();
 
     void slotSignalControlMenu();
+
+    void slotMenuHide();
 
     void slotGetSwitchState(QByteArray &sw_state);
 

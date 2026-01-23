@@ -160,46 +160,26 @@ void MainWindow::paintEvent(QPaintEvent *event)
     bg->setScale(map->getScale());
     bg->setShift(map->getShift());
 
-    Trajectory* new_nearest_trajectory = map->nearest_trajectory;
-    if (route_begin_trajectory && new_nearest_trajectory && (route_dir != 0))
+    if (!is_menu_shows)
     {
-        if (new_nearest_trajectory != bg->nearest_trajectory)
+        Trajectory* new_nearest_trajectory = map->nearest_trajectory;
+        if (route_begin_trajectory && new_nearest_trajectory && (route_dir != 0))
         {
-            route_segment_t route = topology->find_route(route_begin_trajectory,
-                                                         new_nearest_trajectory,
-                                                         route_dir);
-            bg->route_trajectories = route.trajectories;
-/* Отладка
-            QString msg;
-            if (bg->route_trajectories.size())
+            if (new_nearest_trajectory != bg->nearest_trajectory)
             {
-                msg = "Founded route (" + QString::number(bg->route_trajectories.size()) + "):";
-                for (auto& traj : bg->route_trajectories)
-                {
-                    msg += " - ";
-                    if (traj)
-                        msg += traj->getName();
-                    else
-                        msg += "null";
-                }
+                route_segment_t route = topology->find_route(route_begin_trajectory,
+                                                             new_nearest_trajectory,
+                                                             route_dir);
+                bg->route_trajectories = route.trajectories;
             }
-            else
-            {
-                msg = "No route " +
-                      route_begin_trajectory->getName() +
-                      " - " +
-                      new_nearest_trajectory->getName();
-            }
-            ui->ptLog->appendPlainText(msg);
-*/
         }
+        else
+        {
+            bg->route_trajectories.clear();
+        }
+        bg->nearest_trajectory = map->nearest_trajectory;
+        bg->route_begin_trajectory = route_begin_trajectory;
     }
-    else
-    {
-        bg->route_trajectories.clear();
-    }
-    bg->nearest_trajectory = map->nearest_trajectory;
-    bg->route_begin_trajectory = route_begin_trajectory;
 
     bg->update();
 }
@@ -568,6 +548,8 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
     close_menu->setShortcut(QKeySequence(QKeySequence::Cancel));
     menu->addAction(close_menu);
 
+    connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
+    is_menu_shows = true;
     menu->exec(QCursor::pos());
 }
 
@@ -649,6 +631,8 @@ void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
     close_menu->setShortcut(QKeySequence(QKeySequence::Cancel));
     menu->addAction(close_menu);
 
+    connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
+    is_menu_shows = true;
     menu->exec(QCursor::pos());
 }
 
@@ -713,6 +697,8 @@ void MainWindow::slotSwitchConnectorMenu()
         });
     }
 
+    connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
+    is_menu_shows = true;
     menu->exec(QCursor::pos());
 }
 
@@ -807,7 +793,17 @@ void MainWindow::slotSignalControlMenu()
         tc->sendSignalCommand(sc.serialize());
     });
 
+    connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
+    is_menu_shows = true;
     menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotMenuHide()
+{
+    is_menu_shows = false;
 }
 
 //------------------------------------------------------------------------------
