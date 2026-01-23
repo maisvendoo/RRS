@@ -11,7 +11,7 @@ struct ObjectProperties
 {
     std::string name;
     vsg::vec3 translation;
-    vsg::vec3 rotation;
+    vsg::vec3 rotation_deg;
     ObjectState state = ObjectState::INITIAL;
 };
 

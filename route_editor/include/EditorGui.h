@@ -2,6 +2,7 @@
 #define EDITOR_GUI_H
 
 #include "EditorState.h"
+#include "KeyBindings.h"
 #include "Route.h"
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
@@ -24,7 +25,7 @@ class EditorGui : public vsg::Inherit<vsg::Command, EditorGui>
 public:
     EditorGui(
         EditorState& editor_state,
-        const vsg::KeySymbol* key_bindings,
+        const KeyBindings& key_bindings,
         vsg::ref_ptr<Route> route,
         settings_t& settings,
         vsg::ref_ptr<vsg::Options> options = {}
@@ -45,7 +46,7 @@ private:
 
 private:
     EditorState& editor_state;
-    const vsg::KeySymbol* key_bindings;
+    const KeyBindings& key_bindings;
     bool show_demo_window = false;
     vsg::ref_ptr<Route> route;
     vsg::ref_ptr<vsg::MatrixTransform>* selected_object = nullptr;

@@ -2,6 +2,7 @@
 
 #include "Action.h"
 #include "EditorState.h"
+#include "KeyBindings.h"
 #include "ObjectProperties.h"
 #include "Settings.h"
 #include "filesystem.h"
@@ -34,7 +35,7 @@ static void update_selected_object_matrix(
 
 EditorGui::EditorGui(
     EditorState& editor_state,
-    const vsg::KeySymbol* key_bindings,
+    const KeyBindings& key_bindings,
     vsg::ref_ptr<Route> route,
     settings_t& settings,
     vsg::ref_ptr<vsg::Options> options
@@ -434,15 +435,15 @@ void EditorGui::show_selected_object_properties() const
             }
 
             ImGui::Text("rotation:");
-            if (ImGui::SliderFloat("x##rotation", &properties.rotation.x, -180.0f, 180.0f))
+            if (ImGui::SliderFloat("x##rotation", &properties.rotation_deg.x, -180.0f, 180.0f))
             {
                 update_selected_object_matrix(properties, matrix_transform);
             }
-            if (ImGui::SliderFloat("y##rotation", &properties.rotation.y, -180.0f, 180.0f))
+            if (ImGui::SliderFloat("y##rotation", &properties.rotation_deg.y, -180.0f, 180.0f))
             {
                 update_selected_object_matrix(properties, matrix_transform);
             }
-            if (ImGui::SliderFloat("z##rotation", &properties.rotation.z, -180.0f, 180.0f))
+            if (ImGui::SliderFloat("z##rotation", &properties.rotation_deg.z, -180.0f, 180.0f))
             {
                 update_selected_object_matrix(properties, matrix_transform);
             }
@@ -457,7 +458,7 @@ static void update_selected_object_matrix(
     vsg::ref_ptr<vsg::MatrixTransform> matrix_transform
 )
 {
-    vsg::vec3 rotation = properties.rotation;
+    vsg::vec3 rotation = properties.rotation_deg;
 
     rotation.x = -vsg::radians(rotation.x);
     rotation.y = -vsg::radians(rotation.y);

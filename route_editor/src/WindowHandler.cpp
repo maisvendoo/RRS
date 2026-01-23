@@ -5,7 +5,6 @@
 #include <vsg/app/Window.h>
 #include <vsg/app/WindowTraits.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/ui/WindowEvent.h>
 
 #include <vulkan/vulkan_core.h>
 
@@ -24,24 +23,17 @@ WindowHandler::WindowHandler(const settings_t& settings)
     window_traits->screenNum = settings.screen_number;
     window_traits->windowTitle = settings.window_title;
 
-    window_traits->swapchainPreferences.presentMode = settings.vsync
-        ? VK_PRESENT_MODE_FIFO_KHR
-        : VK_PRESENT_MODE_MAILBOX_KHR;
+    window_traits->swapchainPreferences.presentMode =
+        settings.vsync ? VK_PRESENT_MODE_FIFO_KHR
+                       : VK_PRESENT_MODE_MAILBOX_KHR;
 
     window_traits->samples = samples_bit_flag(settings.samples);
 
     window = vsg::Window::create(window_traits);
     if (!window)
     {
+        // TODO: Replace on Journal
         std::fputs("Failed to create window", stderr);
-    }
-}
-
-void WindowHandler::apply(vsg::ConfigureWindowEvent& congfigureWindow)
-{
-    if (congfigureWindow.window == window)
-    {
-        is_resized = true;
     }
 }
 
@@ -52,15 +44,15 @@ vsg::ref_ptr<vsg::Window> WindowHandler::get_window() const
 
 VkSampleCountFlags samples_bit_flag(int samples)
 {
-    if (samples > 7)
+    if (samples >= 8)
     {
         return VK_SAMPLE_COUNT_8_BIT;
     }
-    else if (samples > 3)
+    else if (samples >= 4)
     {
         return VK_SAMPLE_COUNT_4_BIT;
     }
-    else if (samples > 1)
+    else if (samples >= 2)
     {
         return VK_SAMPLE_COUNT_2_BIT;
     }

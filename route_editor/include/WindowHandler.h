@@ -10,7 +10,6 @@ struct settings_t;
 namespace vsg
 {
 
-class ConfigureWindowEvent;
 class Window;
 
 }
@@ -18,13 +17,7 @@ class Window;
 class WindowHandler : public vsg::Inherit<vsg::Visitor, WindowHandler>
 {
 public:
-    bool is_resized = false;
-
-public:
     WindowHandler(const settings_t& settings);
-
-    // TODO: Maybe remove with is_resized
-    void apply(vsg::ConfigureWindowEvent& congfigureWindow) override;
 
     vsg::ref_ptr<vsg::Window> get_window() const;
 

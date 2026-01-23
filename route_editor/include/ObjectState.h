@@ -5,8 +5,7 @@ enum class ObjectState
 {
     INITIAL,
     MOVING,
-    ROTATING,
-    SCALING
+    ROTATING
 };
 
 #endif // OBJECT_STATE_H

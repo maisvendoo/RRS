@@ -25,7 +25,7 @@ public:
     void apply(vsg::ScrollWheelEvent& scrollWheel) override;
     void apply(vsg::FrameEvent& frame) override;
 
-    vsg::ivec2 get_mouse_pos() const;
+    vsg::ivec2 get_pos() const;
     vsg::ivec2 get_delta_pos();
     float get_scroll();
 
@@ -34,7 +34,7 @@ public:
     bool get_is_rmb_pressed() const;
 
 private:
-    vsg::ivec2 mouse_pos = {0, 0};
+    vsg::ivec2 pos = {0, 0};
     vsg::ivec2 delta_pos = {0, 0};
     float scroll = 0.0f;
 

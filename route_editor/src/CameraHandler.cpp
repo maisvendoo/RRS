@@ -54,11 +54,10 @@ CameraHandler::CameraHandler(
     const double yaw_rad = vsg::radians(yaw_deg);
     const double pitch_rad = vsg::radians(pitch_deg);
 
-    front = vsg::normalize(vsg::dvec3{
-        std::sin(yaw_rad) * std::cos(pitch_rad),
-        std::cos(yaw_rad) * std::cos(pitch_rad),
-        std::sin(pitch_rad)
-    });
+    front.x = std::sin(yaw_rad) * std::cos(pitch_rad);
+    front.y = std::cos(yaw_rad) * std::cos(pitch_rad);
+    front.z = std::sin(pitch_rad);
+    front = vsg::normalize(front);
 
     right = vsg::cross(front, look_at->up);
 }
@@ -66,16 +65,22 @@ CameraHandler::CameraHandler(
 void CameraHandler::apply(vsg::FrameEvent& frame)
 {
     static double prev_time = frame.frameStamp->simulationTime;
+
     const double time = frame.frameStamp->simulationTime;
-    const double dt = time - prev_time;
+    const double delta_time = time - prev_time;
+
     prev_time = time;
 
     if (mouse_handler->get_is_rmb_pressed())
     {
         const vsg::ivec2 delta_mouse_pos = mouse_handler->get_delta_pos();
 
-        yaw_deg += delta_mouse_pos.x * dt * settings.camera_rotate_speed;
-        pitch_deg -= delta_mouse_pos.y * dt * settings.camera_rotate_speed;
+        yaw_deg += delta_mouse_pos.x * settings.camera_rotate_speed *
+            delta_time;
+
+        pitch_deg -= delta_mouse_pos.y * settings.camera_rotate_speed *
+            delta_time;
+
         pitch_deg = std::clamp(pitch_deg, settings.pitch_min,
             settings.pitch_max);
 
@@ -90,29 +95,29 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
         right = vsg::cross(front, look_at->up);
     }
 
-    perspective->fieldOfViewY -= mouse_handler->get_scroll()
-        * dt * settings.camera_zoom_power;
+    perspective->fieldOfViewY -= mouse_handler->get_scroll() *
+        settings.camera_zoom_power * delta_time;
 
     perspective->fieldOfViewY = std::clamp(perspective->fieldOfViewY,
         settings.fovy_min, settings.fovy_max);
 
-    const int move_forward = keyboard_handler->get_binding_state(
-        ACTION_MOVE_CAMERA_FORWARD);
+    const int move_forward = static_cast<int>(
+        keyboard_handler->get_binding_state(ACTION_MOVE_CAMERA_FORWARD));
 
-    const int move_backward = keyboard_handler->get_binding_state(
-        ACTION_MOVE_CAMERA_BACKWARD);
+    const int move_backward = static_cast<int>(
+        keyboard_handler->get_binding_state(ACTION_MOVE_CAMERA_BACKWARD));
 
-    const int move_left = keyboard_handler->get_binding_state(
-        ACTION_MOVE_CAMERA_LEFT);
+    const int move_left = static_cast<int>(
+        keyboard_handler->get_binding_state(ACTION_MOVE_CAMERA_LEFT));
 
-    const int move_right = keyboard_handler->get_binding_state(
-        ACTION_MOVE_CAMERA_RIGHT);
+    const int move_right = static_cast<int>(
+        keyboard_handler->get_binding_state(ACTION_MOVE_CAMERA_RIGHT));
 
-    const vsg::dvec3 front_movememt = front * dt * settings.camera_move_speed
-        * static_cast<double>(move_forward - move_backward);
+    const vsg::dvec3 front_movememt = front * settings.camera_move_speed *
+        delta_time * static_cast<double>(move_forward - move_backward);
 
-    const vsg::dvec3 right_movement = right * dt * settings.camera_move_speed
-        * static_cast<double>(move_right - move_left);
+    const vsg::dvec3 right_movement = right * settings.camera_move_speed *
+        delta_time * static_cast<double>(move_right - move_left);
 
     look_at->eye += front_movememt;
     look_at->eye += right_movement;

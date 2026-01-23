@@ -1,7 +1,7 @@
 #include "KeyboardHandler.h"
 
 #include "Action.h"
-#include "KeyStates.h"
+#include "KeyBindings.h"
 #include "Settings.h"
 
 #include <vsg/ui/KeyEvent.h>
@@ -10,8 +10,12 @@
 
 KeyboardHandler::KeyboardHandler(const settings_t& settings)
 {
-    key_bindings[ACTION_MOVE_CAMERA_FORWARD] = settings.key_move_camera_forward;
-    key_bindings[ACTION_MOVE_CAMERA_BACKWARD] = settings.key_move_camera_backward;
+    key_bindings[ACTION_MOVE_CAMERA_FORWARD] =
+        settings.key_move_camera_forward;
+
+    key_bindings[ACTION_MOVE_CAMERA_BACKWARD] =
+        settings.key_move_camera_backward;
+
     key_bindings[ACTION_MOVE_CAMERA_LEFT] = settings.key_move_camera_left;
     key_bindings[ACTION_MOVE_CAMERA_RIGHT] = settings.key_move_camera_right;
 }
@@ -35,15 +39,9 @@ vsg::KeySymbol KeyboardHandler::get_key_binding(Action action) const
 
 bool KeyboardHandler::get_key_state(vsg::KeySymbol sym) const
 {
-    const auto& it = key_states.find(sym);
-    if (it != key_states.cend())
-    {
-        return it->second;
-    }
-    else
-    {
-        return false;
-    }
+    const auto& found_it = key_states.find(sym);
+
+    return (found_it == key_states.cend()) ? false : found_it->second;
 }
 
 bool KeyboardHandler::get_shift_state() const
@@ -58,7 +56,7 @@ bool KeyboardHandler::get_binding_state(Action action) const
     return get_key_state(get_key_binding(action));
 }
 
-const vsg::KeySymbol* KeyboardHandler::get_key_bindings() const
+const KeyBindings& KeyboardHandler::get_key_bindings() const
 {
     return key_bindings;
 }

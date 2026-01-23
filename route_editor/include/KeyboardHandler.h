@@ -2,6 +2,7 @@
 #define KEYBOARD_HANDLER_H
 
 #include "Action.h"
+#include "KeyBindings.h"
 #include "KeyStates.h"
 
 #include <vsg/core/Inherit.h>
@@ -23,10 +24,10 @@ public:
     bool get_shift_state() const;
     bool get_binding_state(Action action) const;
 
-    const vsg::KeySymbol* get_key_bindings() const;
+    const KeyBindings& get_key_bindings() const;
 
 private:
-    vsg::KeySymbol key_bindings[TOTAL_ACTIONS];
+    KeyBindings key_bindings;
     KeyStates key_states;
 };
 

@@ -3,7 +3,6 @@
 #include "filesystem.h"
 
 #include <vsg/core/ref_ptr.h>
-#include <vsg/io/Options.h>
 #include <vsg/state/ShaderStage.h>
 #include <vsg/utils/ShaderSet.h>
 
@@ -33,7 +32,9 @@ vsg::ref_ptr<vsg::ShaderStage> read_shader(
 
     if (!shader)
     {
+        // TODO: Replace on Journal
         std::printf("Failed to load shader %s\n", shader_path.c_str());
+
         return nullptr;
     }
 
@@ -130,15 +131,19 @@ void configure_shader_set(
 
     if (!vert_shader || !frag_shader)
     {
+        // TODO: Replace on Journal
         std::printf("Using default %s shader set\n", shader_set_name);
+
         return;
     }
 
     shader_set->stages.front() = vert_shader;
     shader_set->stages.back() = frag_shader;
 
+    // TODO: Rewrite in English
     // Очищаем все встроенные сохраненные варианты настроек
     shader_set->variants.clear();
 
+    // TODO: Replace on Journal
     std::printf("Shader set %s configured\n", shader_set_name);
 }

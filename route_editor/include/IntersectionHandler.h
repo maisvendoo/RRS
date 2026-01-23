@@ -15,7 +15,8 @@ class Camera;
 
 }
 
-class IntersectionHandler : public vsg::Inherit<vsg::Visitor, IntersectionHandler>
+class IntersectionHandler : public vsg::Inherit<
+    vsg::Visitor, IntersectionHandler>
 {
 public:
     IntersectionHandler(vsg::ref_ptr<vsg::Camera> camera);
@@ -37,6 +38,7 @@ public:
 
 private:
     vsg::ref_ptr<vsg::Camera> camera;
+
     vsg::ref_ptr<vsg::LineSegmentIntersector> lmb_intersector;
     vsg::ref_ptr<vsg::LineSegmentIntersector> mmb_intersector;
     vsg::ref_ptr<vsg::LineSegmentIntersector> rmb_intersector;

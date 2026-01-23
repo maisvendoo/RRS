@@ -19,16 +19,19 @@ void MouseHandler::apply(vsg::ButtonPressEvent& buttonPress)
         case MOUSE_BUTTON_LEFT:
         {
             is_lmb_pressed = true;
+
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
             is_mmb_pressed = true;
+
             return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
             is_rmb_pressed = true;
+
             return;
         }
         default:
@@ -50,16 +53,19 @@ void MouseHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
         case MOUSE_BUTTON_LEFT:
         {
             is_lmb_pressed = false;
+
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
             is_mmb_pressed = false;
+
             return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
             is_rmb_pressed = false;
+
             return;
         }
         default:
@@ -76,13 +82,13 @@ void MouseHandler::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    static vsg::ivec2 prev_mouse_pos = {moveEvent.x, moveEvent.y};
+    static vsg::ivec2 prev_pos = {moveEvent.x, moveEvent.y};
 
-    mouse_pos = {moveEvent.x, moveEvent.y};
-    delta_pos = mouse_pos - prev_mouse_pos;
+    pos = {moveEvent.x, moveEvent.y};
+    delta_pos = pos - prev_pos;
     used_delta_pos = false;
 
-    prev_mouse_pos = mouse_pos;
+    prev_pos = pos;
 }
 
 void MouseHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
@@ -111,20 +117,22 @@ void MouseHandler::apply(vsg::FrameEvent& frame)
     }
 }
 
-vsg::ivec2 MouseHandler::get_mouse_pos() const
+vsg::ivec2 MouseHandler::get_pos() const
 {
-    return mouse_pos;
+    return pos;
 }
 
 vsg::ivec2 MouseHandler::get_delta_pos()
 {
     used_delta_pos = true;
+
     return delta_pos;
 }
 
 float MouseHandler::get_scroll()
 {
     used_scroll = true;
+
     return scroll;
 }
 
