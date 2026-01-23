@@ -12,7 +12,7 @@ struct date_time_tirgger_t
     /// Момент времени активации триггера (с учетом даты!)
     simulator_time_t action_time;
     /// Функция Lua, исполняемая триггером
-    sol::protected_function atction_func;
+    sol::protected_function action_func;
 
     date_time_tirgger_t()
     {

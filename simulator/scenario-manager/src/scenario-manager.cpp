@@ -105,20 +105,28 @@ void ScenarioManager::processTimeTriggers(const simulator_time_t &sim_time)
         return;
     }
 
+    // Нечего делать - перебираем все триггеры
     for (auto it = timeTriggerList.begin(); it != timeTriggerList.end();)
     {
         try
         {
+            // Берем очередной
             auto trigger = *it;
 
+            // Если настало его время
             if (isTimeHasCome(sim_time, trigger.action_time))
             {
-                if (trigger.atction_func.valid())
+                // Проверяем валидность прикрепленной к нему функции
+                if (trigger.action_func.valid())
                 {
-                    trigger.atction_func();
+                    // Исполняем эту функцию
+                    trigger.action_func();
 
+                    // Убиваем тригер, не будет больше такого момента времени
+                    // и берем следующий
                     it = timeTriggerList.erase(it);
 
+                    // уходим если нет больше триггеров
                     if (timeTriggerList.empty())
                     {
                         return;
@@ -174,7 +182,7 @@ void ScenarioManager::taskTimeTrigger(const simulator_time_t &trig_time,
 
         date_time_tirgger_t trigger;
         trigger.action_time = trig_time;
-        trigger.atction_func = trigger_func;
+        trigger.action_func = trigger_func;
 
         this->timeTriggerList.push_back(trigger);
     });
