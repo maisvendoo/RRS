@@ -91,11 +91,6 @@ void ScenarioManager::step(double t, double dt)
             // Исполняем
             task();
         }
-        else
-        {
-            Journal::instance()->info("Tasks: " + QString::number(taskQueue.size()) +
-                                      " | Timer: " + QString::number(delayTimer->getTimeout()));
-        }
     }
 
     delayTimer->step(t, dt);
@@ -479,11 +474,11 @@ void ScenarioManager::taskSetDelay(double timeout)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::buildRoute(QString start_traj, QString target_traj, int dir)
+void ScenarioManager::buildRoute(const std::string &start_traj, const std::string &target_traj, int dir)
 {
     route_command_t rc;
-    rc.trajectory_begin = start_traj;
-    rc.trajectory_end = target_traj;
+    rc.trajectory_begin = QString(start_traj.c_str());
+    rc.trajectory_end = QString(target_traj.c_str());
     rc.dir = (dir < 0) ? -1 : 1;
 
     QByteArray rc_data = rc.serialize();
@@ -496,7 +491,7 @@ void ScenarioManager::buildRoute(QString start_traj, QString target_traj, int di
 void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir)
 {
     setTask([start_traj, target_traj, dir, this]{
-        this->buildRoute(QString(start_traj.c_str()), QString(target_traj.c_str()), dir);
+        this->buildRoute(start_traj, target_traj, dir);
     });
 }
 
@@ -610,12 +605,14 @@ void ScenarioManager::slotDelayTimer()
 //------------------------------------------------------------------------------
 void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir, bool for_train, bool for_shunting)
 {
-    const double signal_open_delay = 0.5;
+    const double signal_open_first_delay = 0.75;
+    taskSetDelay(signal_open_first_delay);
 
+    const double signal_open_delay = 0.25;
     for (auto& conn_name : conn_list)
     {
-        taskSetDelay(signal_open_delay);
         taskOpenSignal(conn_name.toStdString(), dir, for_train, for_shunting);
+        taskSetDelay(signal_open_delay);
     }
 }
 

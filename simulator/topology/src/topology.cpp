@@ -506,7 +506,7 @@ bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Topology::open_route_signals(const route_segment_t &route, int dir, QStringList &conn_list)
+bool Topology::open_route_signals(const route_segment_t &route, int dir, QStringList &conn_list, bool for_train)
 {
     for (size_t i = 0; i < route.trajectories.size() - 1; ++i)
     {
@@ -532,8 +532,19 @@ bool Topology::open_route_signals(const route_segment_t &route, int dir, QString
             continue;
         }
 
-        // Добавляем в список
-        conn_list.append(conn->getName());
+        if (for_train)
+        {
+            if (StationSignal* station_sig = dynamic_cast<StationSignal *>(signal))
+            {
+                // Добавляем в список поездной светофор
+                conn_list.append(conn->getName());
+            }
+        }
+        else
+        {
+            // Добавляем в список
+            conn_list.append(conn->getName());
+        }
     }
     return true;
 }
@@ -1328,11 +1339,7 @@ void Topology::slotBuildRouteCommand(QByteArray &route_data)
                               + rc.trajectory_begin + " to " + rc.trajectory_end
                               + " through " + QString::number(route.trajectories.size()) + "trajectories");
 
-    if (!set_switchs_by_route(route, rc.dir))
-    {
-        Journal::instance()->error("Build route: Route switches cannot be set");
-        return;
-    }
+    set_switchs_by_route(route, rc.dir);
 }
 
 //------------------------------------------------------------------------------
@@ -1355,19 +1362,13 @@ void Topology::slotTrainRouteCommand(QByteArray &route_data)
                               + rc.trajectory_begin + " to " + rc.trajectory_end
                               + " through " + QString::number(route.trajectories.size()) + "trajectories");
 
-    if (!set_switchs_by_route(route, rc.dir))
+    if (set_switchs_by_route(route, rc.dir))
     {
-        Journal::instance()->error("Build route: Route switches cannot be set");
-        return;
-    }
+        QStringList signals_for_open;
+        open_route_signals(route, rc.dir, signals_for_open, true);
 
-    QStringList signals_for_open;
-    if (!open_route_signals(route, rc.dir, signals_for_open))
-    {
-        Journal::instance()->error("Build route: Can't open route signals");
+        emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, true, false);
     }
-
-    emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, true, false);
 }
 
 //------------------------------------------------------------------------------
@@ -1390,19 +1391,13 @@ void Topology::slotShuntingRouteCommand(QByteArray &route_data)
                               + rc.trajectory_begin + " to " + rc.trajectory_end
                               + " through " + QString::number(route.trajectories.size()) + "trajectories");
 
-    if (!set_switchs_by_route(route, rc.dir))
+    if (set_switchs_by_route(route, rc.dir))
     {
-        Journal::instance()->error("Build route: Route switches cannot be set");
-        return;
-    }
+        QStringList signals_for_open;
+        open_route_signals(route, rc.dir, signals_for_open, false);
 
-    QStringList signals_for_open;
-    if (!open_route_signals(route, rc.dir, signals_for_open))
-    {
-        Journal::instance()->error("Build route: Can't open route signals");
+        emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, false, true);
     }
-
-    emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, false, true);
 }
 
 //------------------------------------------------------------------------------

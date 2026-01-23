@@ -157,7 +157,7 @@ private:
     void taskSetDelay(double timeout);
 
     /// Задать маршрут
-    void buildRoute(QString start_traj, QString target_traj, int dir);
+    void buildRoute(const std::string &start_traj, const std::string &target_traj, int dir);
 
     /// Установка задачи задания маршрута
     void taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir);
