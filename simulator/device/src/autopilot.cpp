@@ -122,6 +122,7 @@ void Autopilot::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "LeadDistance_Y", lead_dist_Y);
     cfg.getDouble(secName, "SpeedLimit_RY", v_lim_RY);
     cfg.getDouble(secName, "SpeedDisableRelease", v_disable_release);
+    cfg.getDouble(secName, "dVTractionOff", dV_traction_off);
 }
 
 //------------------------------------------------------------------------------

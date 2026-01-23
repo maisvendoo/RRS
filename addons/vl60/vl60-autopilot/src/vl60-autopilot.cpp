@@ -100,7 +100,7 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     }
 
     // Если превышаем скорость - мотаем вниз до упора
-    if (dv < -0.25)
+    if (dv < -dV_traction_off)
     {
         auto_control->km_pos_ref = POS_ZERO;        
     }

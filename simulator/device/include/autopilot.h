@@ -160,6 +160,9 @@ protected:
     /// Предсказанный тормозной путь
     double dist_predict = 0.0;
 
+    /// Превышение скорости при котором происходит отключение тяги
+    double dV_traction_off = 0.25;
+
     /// Вычислитель текущего ускорения
     Accelerometer *accel_meter = new Accelerometer;
 
