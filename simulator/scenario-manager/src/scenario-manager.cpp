@@ -97,45 +97,65 @@ void ScenarioManager::processTasksQueue()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::processTimeTriggersQueue(const simulator_time_t &sim_time)
+void ScenarioManager::processTimeTriggers(const simulator_time_t &sim_time)
 {
     // Очередь пуста - убегаем
-    if (timeTriggerQueue.empty())
+    if (timeTriggerList.empty())
     {
         return;
     }
 
-    auto trigger = std::move(timeTriggerQueue.front());
-    timeTriggerQueue.pop();
-
-    if (trigger.atction_func.valid())
+    for (auto it = timeTriggerList.begin(); it != timeTriggerList.end();)
     {
-        if (isTimeHasCome(sim_time, trigger.action_time))
+        try
         {
-            trigger.atction_func();
+            auto trigger = *it;
+
+            if (isTimeHasCome(sim_time, trigger.action_time))
+            {
+                if (trigger.atction_func.valid())
+                {
+                    trigger.atction_func();
+
+                    it = timeTriggerList.erase(it);
+
+                    if (timeTriggerList.empty())
+                    {
+                        return;
+                    }
+
+                    continue;
+                }
+            }
         }
+        catch (const sol::error &error)
+        {
+            Journal::instance()->error(QString("LUA: %1").arg(error.what()));
+        }
+
+        ++it;
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ScenarioManager::isTimeHasCome(const simulator_time_t &cur_time,
+bool ScenarioManager::isTimeHasCome(const simulator_time_t &start_time,
                                     const simulator_time_t &trig_time)
 {
-    if (cur_time.date < trig_time.date)
+    if (start_time.date < trig_time.date)
     {
         // Завтра еще не наступило
         return false;
     }
 
-    if (cur_time.date > trig_time.date)
+    if (start_time.date > trig_time.date)
     {
         // Завтра не наступит никогда
         return false;
     }
 
-    if (cur_time.time >= trig_time.time)
+    if (start_time.time >= trig_time.time)
     {
         // Время пришло
         return true;
@@ -147,13 +167,59 @@ bool ScenarioManager::isTimeHasCome(const simulator_time_t &cur_time,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::taskTimeTrigger(const simulator_time_t &trig_time,
+                                      sol::function trigger_func)
+{
+    setTask([trig_time, trigger_func, this]{
+
+        date_time_tirgger_t trigger;
+        trigger.action_time = trig_time;
+        trigger.atction_func = trigger_func;
+
+        this->timeTriggerList.push_back(trigger);
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setAbsTime(const std::string &abs_time,
+                                 sol::function trigger_func)
+{
+    // Определяем время начала игры
+    simulator_time_t start_sim_time = simulator_time_t(launch_init_data.start_datetime);
+    // Парсим заданное время
+    server_time_t trig_time;
+    strTimeToServerTime(abs_time, trig_time);
+
+    simulator_time_t trig_date_time;
+
+    // Если заданнный момент времени менее чем время старта
+    if (start_sim_time.time >= trig_time)
+    {
+        // Значит ставим событие на следующий день
+        server_date_t date = start_sim_time.date;
+        date.nextDay();
+        trig_date_time = simulator_time_t(date, trig_time);
+    }
+    else // Иначе, ставим на сегодня
+    {
+        trig_date_time = simulator_time_t(start_sim_time.date, trig_time);
+    }
+
+    taskTimeTrigger(trig_date_time, trigger_func);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::step(const simulator_time_t &sim_time, double dt)
 {
     // Обработка очереди задач
     processTasksQueue();
 
     // Обработка временных триггеров
-    processTimeTriggersQueue(sim_time);
+    processTimeTriggers(sim_time);
 
     delayTimer->step(sim_time.simulation_seconds, dt);
 
@@ -834,6 +900,12 @@ void ScenarioManager::sys_functions_registration()
     });
 
     Journal::instance()->info("setTrigger method binding...OK");
+
+    lua.set_function("setAbsTimeTrigger", [&](const std::string &abs_time, sol::function trigger_func){
+        this->setAbsTime(abs_time, trigger_func);
+    });
+
+    Journal::instance()->info("setAbsTimeTrigger method binding...OK");
 }
 
 //------------------------------------------------------------------------------

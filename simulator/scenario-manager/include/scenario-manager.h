@@ -93,8 +93,8 @@ private:
     /// Список позиционных триггеров
     std::vector<sol::protected_function> triggerList;
 
-    /// Очередь временных триггеров
-    std::queue<date_time_tirgger_t> timeTriggerQueue;
+    /// Список временных триггеров
+    std::vector<date_time_tirgger_t> timeTriggerList;
 
     /// Таймер задержки исполнения очереди задач
     Timer *delayTimer = new Timer(0.1, false);
@@ -105,7 +105,7 @@ private:
     LuaDebugger *lua_dbg = new LuaDebugger;
 
     /// Флаг идентифицирующий исполнение сценария
-    bool is_scenario_active = false;
+    bool is_scenario_active = false;    
 
     /// Поставить задачу в очередь
     void setTask(task_t task);
@@ -194,10 +194,17 @@ private:
     void processTasksQueue();
 
     /// Обработка очереди временных триггеров
-    void processTimeTriggersQueue(const simulator_time_t &sim_time);
+    void processTimeTriggers(const simulator_time_t &sim_time);
 
     /// Определение когда настало заданное в триггере время (с учетом даты)
-    bool isTimeHasCome(const simulator_time_t &cur_time, const simulator_time_t &trig_time);
+    bool isTimeHasCome(const simulator_time_t &start_time, const simulator_time_t &trig_time);
+
+    /// Установить временной триггер по абсолютным дате и времени (общая системная задача,
+    /// недоступная из Lua)
+    void taskTimeTrigger(const simulator_time_t &trig_time, sol::function trigger_func);
+
+    /// Установить триггер на абсолютное время
+    void setAbsTime(const std::string &abs_time, sol::function trigger_func);
 
 private slots:
 
