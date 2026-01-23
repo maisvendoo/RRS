@@ -77,7 +77,7 @@ bool ScenarioManager::run(const std::string &route_dir,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::step(double t, double dt)
+void ScenarioManager::step(const simulator_time_t &sim_time, double dt)
 {
     // Если очередь задач не пуста
     if (!taskQueue.empty())
@@ -93,7 +93,7 @@ void ScenarioManager::step(double t, double dt)
         }
     }
 
-    delayTimer->step(t, dt);
+    delayTimer->step(sim_time.simulation_seconds, dt);
 
     curr_step = dt;
 }
@@ -182,14 +182,15 @@ void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setTime(const std::string &time)
+void ScenarioManager::strTimeToServerTime(const std::string &str_time,
+                                             server_time_t &time)
 {
-    QStringList tokens = QString(time.c_str()).split(':');
+    QStringList tokens = QString(str_time.c_str()).split(':');
 
     // Если число параметров менее двух - ошибка
     if (tokens.size() < 2)
     {
-        Journal::instance()->error(QString("setTime: Invalid time format: %1").arg(time.c_str()));
+        Journal::instance()->error(QString("setTime: Invalid time format: %1").arg(str_time.c_str()));
         return;
     }
 
@@ -240,8 +241,19 @@ void ScenarioManager::setTime(const std::string &time)
         return;
     }
 
+    time = server_time_t(hour, min, sec, 0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setTime(const std::string &time)
+{
     simulator_time_t sim_time = simulator_time_t(launch_init_data.start_datetime);
-    server_time_t start_time = server_time_t(hour, min, sec, 0);
+    server_time_t start_time;
+
+    strTimeToServerTime(time, start_time);
+
     launch_init_data.start_datetime = simulator_time_t(sim_time.date, start_time).data();
 
     Journal::instance()->info("setTime: Time initialized at " + start_time.getString());
@@ -250,13 +262,14 @@ void ScenarioManager::setTime(const std::string &time)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setDate(const std::string &date)
+void ScenarioManager::strDateToServerDate(const std::string &str_date,
+                                          server_date_t &date)
 {
-    QStringList tokens = QString(date.c_str()).split('.');
+    QStringList tokens = QString(str_date.c_str()).split('.');
 
     if (tokens.size() < 2)
     {
-        Journal::instance()->error(QString("setDate: Invalid date format: %1").arg(date.c_str()));
+        Journal::instance()->error(QString("setDate: Invalid date format: %1").arg(str_date.c_str()));
         return;
     }
 
@@ -321,7 +334,19 @@ void ScenarioManager::setDate(const std::string &date)
         return;
     }
 
-    server_date_t start_date = server_date_t(year, month, day);
+    date = server_date_t(year, month, day);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setDate(const std::string &date)
+{
+    simulator_time_t sim_time = simulator_time_t(launch_init_data.start_datetime);
+
+    server_date_t start_date;
+    strDateToServerDate(date, start_date);
+
     launch_init_data.start_datetime = simulator_time_t(start_date, sim_time.time).data();
 
     Journal::instance()->info("setDate: Time initialized at " + start_date.getString());
