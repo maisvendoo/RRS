@@ -196,6 +196,9 @@ private:
     /// Обработка очереди временных триггеров
     void processTimeTriggersQueue(const simulator_time_t &sim_time);
 
+    /// Определение когда настало заданное в триггере время (с учетом даты)
+    bool isTimeHasCome(const simulator_time_t &cur_time, const simulator_time_t &trig_time);
+
 private slots:
 
     void slotDelayTimer();

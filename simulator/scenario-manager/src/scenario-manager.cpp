@@ -99,7 +99,49 @@ void ScenarioManager::processTasksQueue()
 //------------------------------------------------------------------------------
 void ScenarioManager::processTimeTriggersQueue(const simulator_time_t &sim_time)
 {
+    // Очередь пуста - убегаем
+    if (timeTriggerQueue.empty())
+    {
+        return;
+    }
 
+    auto trigger = std::move(timeTriggerQueue.front());
+    timeTriggerQueue.pop();
+
+    if (trigger.atction_func.valid())
+    {
+        if (isTimeHasCome(sim_time, trigger.action_time))
+        {
+            trigger.atction_func();
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ScenarioManager::isTimeHasCome(const simulator_time_t &cur_time,
+                                    const simulator_time_t &trig_time)
+{
+    if (cur_time.date < trig_time.date)
+    {
+        // Завтра еще не наступило
+        return false;
+    }
+
+    if (cur_time.date > trig_time.date)
+    {
+        // Завтра не наступит никогда
+        return false;
+    }
+
+    if (cur_time.time >= trig_time.time)
+    {
+        // Время пришло
+        return true;
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
