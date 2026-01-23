@@ -138,7 +138,7 @@ bool Model::init(const simulator_command_line_t &command_line)
         vehicles_info.vehicles[i].vehicle_config_dir = (*it)->getConfigDir();
         vehicles_info.vehicles[i].vehicle_config_file = (*it)->getConfigName();
 
-        connect(*it, &Vehicle::sigGetTrainLength, this, &Model::slotGetTrainLength);
+        connect(*it, &Vehicle::sigGetTrainParams, this, &Model::slotGetTrainParams);
 
         ++i;
     }
@@ -1258,7 +1258,7 @@ void Model::slotRenameTrainInModel(int train_idx, QString new_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::slotGetTrainLength(int train_idx, double &train_len)
+void Model::slotGetTrainParams(int train_idx, double &train_len, double &train_mass)
 {
     if (train_idx >= trains.size())
     {
@@ -1273,4 +1273,5 @@ void Model::slotGetTrainLength(int train_idx, double &train_len)
     }
 
     train_len = train->getLength();
+    train_mass = train->getMass();
 }

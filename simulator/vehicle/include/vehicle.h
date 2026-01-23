@@ -213,7 +213,7 @@ public:
 
 signals:
 
-    void sigGetTrainLength(int train_idx, double &train_len);
+    void sigGetTrainParams(int train_idx, double &train_len, double &train_mass);
 
 protected:
 

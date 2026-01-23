@@ -47,9 +47,10 @@ QString Autopilot::getDbgMsg()
 {
     double v_p = calcPredictVelocity(feedback->v_cur, dist_target, accel_meter->value());
 
-    return QString(" | ВКЛЮЧЕНО АВТОВЕДЕНИЕ | Vзад.: %1 км/ч| Уск.: %2 м/с2| Прогноз Vцел.: %3 км/ч")
+    return QString(" | ВКЛЮЧЕНО АВТОВЕДЕНИЕ | Vзад.: %1 км/ч| Уск.: %2 м/с2| Зад. уск.: %3 м/с2 | Прогноз Vцел.: %4 км/ч")
         .arg(v_ref, 4, 'f', 1)
         .arg(accel_meter->value(), 6, 'f', 2)
+        .arg(-a_brake, 6, 'f', 2)
         .arg(v_p, 4, 'f', 1);
 }
 
@@ -111,7 +112,12 @@ void Autopilot::load_config(CfgReader &cfg)
     QString secName = "Device";
 
     cfg.getDouble(secName, "V_constr", v_constr);
-    cfg.getDouble(secName, "BrakeAccel", a_brake);
+    cfg.getDouble(secName, "BrakeAccel", a_brake_ref);
+    cfg.getDouble(secName, "RefLength", ref_length);
+    cfg.getDouble(secName, "RefMass", ref_mass);
+
+    ref_mass = ref_mass * 1000.0;
+
     cfg.getDouble(secName, "LeadDistance_RY", lead_dist_RY);
     cfg.getDouble(secName, "LeadDistance_Y", lead_dist_Y);
     cfg.getDouble(secName, "SpeedLimit_RY", v_lim_RY);
@@ -156,7 +162,9 @@ double Autopilot::calcBrakeCurveSpeed(double v_target, double dist)
 {
     double vt = v_target / Physics::kmh;
 
-    return sqrt(vt * vt + pf(2*a_brake*dist)) * Physics::kmh;
+    a_brake = a_brake_ref * ref_mass * train_length / train_mass / ref_length;
+
+    return sqrt(vt * vt + pf(2 * a_brake * dist)) * Physics::kmh;
 }
 
 //------------------------------------------------------------------------------

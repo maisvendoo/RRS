@@ -31,7 +31,7 @@ void VL60k::initAutopilot(const QString& modules_dir,
             autopilot_switcher[cab_idx].setKeySymbolOff(KEY_F);
             autopilot_switcher[cab_idx].setControl(&pressed_keys);
 
-            connect(autopilot, &Autopilot::sigInitTrainLength, this, &VL60k::slotInitTrainForAutopilot);
+            connect(autopilot, &Autopilot::sigInitTrainParams, this, &VL60k::slotInitTrainForAutopilot);
         }
 
         this->autopilot.push_back(autopilot);
@@ -46,12 +46,14 @@ void VL60k::initAutopilot(const QString& modules_dir,
 void VL60k::slotInitTrainForAutopilot()
 {
     double train_len = 0;
+    double train_mass = 0;
 
-    emit sigGetTrainLength(train_idx, train_len);
+    emit sigGetTrainParams(train_idx, train_len, train_mass);
 
     for (auto cab_idx : {CAB1, CAB2})
     {
         autopilot[cab_idx]->setTrainLength(train_len);
+        autopilot[cab_idx]->setTrainMass(train_mass);
     }
 
     // Кое-какие другие действия при активации автоведения

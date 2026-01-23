@@ -44,7 +44,7 @@ public:
         if (!is_active)
         {
             is_active = true;
-            emit sigInitTrainLength();
+            emit sigInitTrainParams();
         }
     }
 
@@ -68,6 +68,11 @@ public:
         train_length = len;
     }
 
+    void setTrainMass(double mass)
+    {
+        train_mass = mass;
+    }
+
     double getRefVelocity() const
     {
         return v_ref;
@@ -85,7 +90,7 @@ public:
 
 signals:
 
-    void sigInitTrainLength();
+    void sigInitTrainParams();
 
 protected:
 
@@ -113,7 +118,16 @@ protected:
     /// Длина "хвоста" на более строгом ограничении
     double tail_len = 0;
 
+    /// Масса поезда
+    double train_mass = 0;
+
+    double ref_length = 750.0;
+
+    double ref_mass = 4700.0;
+
     /// Ускорение на кривой снижения скорости
+    double a_brake_ref = 0.0;
+
     double a_brake = 0.0;
 
     /// Общая для всего автоведения структура обратной связи
