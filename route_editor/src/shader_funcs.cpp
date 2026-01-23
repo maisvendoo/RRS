@@ -3,6 +3,7 @@
 #include "filesystem.h"
 
 #include <vsg/core/ref_ptr.h>
+#include <vsg/io/Options.h>
 #include <vsg/state/ShaderStage.h>
 #include <vsg/utils/ShaderSet.h>
 

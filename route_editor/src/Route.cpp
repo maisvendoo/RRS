@@ -191,7 +191,7 @@ void Route::load_static_objects(
         ObjectProperties properties;
         properties.name = label;
         properties.translation = translation;
-        properties.rotation = rotation_deg;
+        properties.rotation_deg = rotation_deg;
 
         vsg::vec3 rotation_rad = rotation_deg;
 
