@@ -63,7 +63,9 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     dv = v_ref - auto_feedback->v_cur;
 
     // Вычисляем задание по току ТЭД
-    double I_ref = Imax * (Kp * dv + getY(0));
+    double kp = Kp * train_mass / ref_mass;
+
+    double I_ref = Imax * (kp * dv + getY(0));
 
     // Обрезаем задание по максимальной уставке
     I_ref = cut(I_ref, 0.0, Imax);
