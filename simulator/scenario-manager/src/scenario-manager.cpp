@@ -962,7 +962,7 @@ void ScenarioManager::sys_functions_registration()
         this->setTimeTirgger(abs_time, trigger_func);
     });
 
-    Journal::instance()->info("setAbsTimeTrigger method binding...OK");
+    Journal::instance()->info("setTimeTrigger method binding...OK");
 }
 
 //------------------------------------------------------------------------------
