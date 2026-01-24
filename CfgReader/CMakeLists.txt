@@ -69,7 +69,7 @@ target_link_libraries (${TARGET} PUBLIC Qt6::Xml)
     install(TARGETS ${TARGET}
     EXPORT ${TARGET}Targets
     # FILE_SET HEADERS
-    FILE_SET public_headers
+    FILE_SET public_headers DESTINATION sdk/include
     LIBRARY DESTINATION sdk/lib
     ARCHIVE DESTINATION sdk/lib
     RUNTIME DESTINATION bin
@@ -90,7 +90,7 @@ target_link_libraries (${TARGET} PUBLIC Qt6::Xml)
         DESTINATION sdk/lib/cmake/${TARGET})
 
     # install(FILES ${INCLUDES} DESTINATION sdk/include)
-    install(FILES include/CfgReader.h include/convert.h DESTINATION sdk/include)
+    #install(FILES include/CfgReader.h include/convert.h DESTINATION sdk/include)
 
 #else()
 
