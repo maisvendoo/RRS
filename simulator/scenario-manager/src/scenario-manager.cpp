@@ -191,8 +191,30 @@ void ScenarioManager::taskTimeTrigger(const simulator_time_t &trig_time,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setAbsTime(const std::string &abs_time,
-                                 sol::function trigger_func)
+void ScenarioManager::setTimeTirgger(const std::string &time,
+                                     sol::function trigger_func)
+{
+    if (time[0] == '-')
+    {
+        Journal::instance()->error("Set time trigger: You can't set trigger on a past time " + QString(time.c_str()));
+        return;
+    }
+
+    if (time[0] != '+')
+    {
+        setAbsTimeTirgger(time, trigger_func);
+    }
+    else
+    {
+        setRelTimeTirgger(time, trigger_func);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setAbsTimeTirgger(const std::string &abs_time,
+                                        sol::function trigger_func)
 {
     // Определяем время начала игры
     simulator_time_t start_sim_time = simulator_time_t(launch_init_data.start_datetime);
@@ -215,6 +237,33 @@ void ScenarioManager::setAbsTime(const std::string &abs_time,
         trig_date_time = simulator_time_t(start_sim_time.date, trig_time);
     }
 
+    taskTimeTrigger(trig_date_time, trigger_func);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setRelTimeTirgger(const std::string &rel_time,
+                                        sol::function trigger_func)
+{
+    // Определяем время начала игры
+    simulator_time_t start_sim_time = simulator_time_t(launch_init_data.start_datetime);
+    // Парсим заданное время
+    server_time_t trig_time;
+    strTimeToServerTime(rel_time, trig_time);
+
+    simulator_time_t trig_date_time = start_sim_time;
+    // Переводим в секунды дельту времени
+    double sec = trig_time.hour() * 3600 + trig_time.minute() * 60 + trig_time.sec();
+
+    // Прибавляем эти секунды к времени старта
+    if (trig_date_time.time.addTime(sec))
+    {
+        // если надо, добавляем еще день
+        trig_date_time.date.nextDay();
+    }
+
+    // Ставим триггер
     taskTimeTrigger(trig_date_time, trigger_func);
 }
 
@@ -910,7 +959,7 @@ void ScenarioManager::sys_functions_registration()
     Journal::instance()->info("setTrigger method binding...OK");
 
     lua.set_function("setAbsTimeTrigger", [&](const std::string &abs_time, sol::function trigger_func){
-        this->setAbsTime(abs_time, trigger_func);
+        this->setTimeTirgger(abs_time, trigger_func);
     });
 
     Journal::instance()->info("setAbsTimeTrigger method binding...OK");

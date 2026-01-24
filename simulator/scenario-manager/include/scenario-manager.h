@@ -204,7 +204,11 @@ private:
     void taskTimeTrigger(const simulator_time_t &trig_time, sol::function trigger_func);
 
     /// Установить триггер на абсолютное время
-    void setAbsTime(const std::string &abs_time, sol::function trigger_func);
+    void setTimeTirgger(const std::string &time, sol::function trigger_func);
+
+    void setAbsTimeTirgger(const std::string &abs_time, sol::function trigger_func);
+
+    void setRelTimeTirgger(const std::string &rel_time, sol::function trigger_func);
 
 private slots:
 
