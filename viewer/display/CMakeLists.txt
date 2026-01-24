@@ -45,7 +45,7 @@ target_link_libraries (${TARGET} Qt6::OpenGL)
 
     install(TARGETS ${TARGET}
     EXPORT ${TARGET}Targets
-    FILE_SET HEADERS
+    FILE_SET HEADERS DESTINATION sdk/include
     LIBRARY DESTINATION sdk/lib
     ARCHIVE DESTINATION sdk/lib
     RUNTIME DESTINATION bin
@@ -65,7 +65,7 @@ target_link_libraries (${TARGET} Qt6::OpenGL)
     install(FILES "${TARGET}Config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}ConfigVersion.cmake"
         DESTINATION sdk/lib/cmake/${TARGET})
 
-    install(FILES ${INCLUDES} DESTINATION sdk/include)
+    #install(FILES ${INCLUDES} DESTINATION sdk/include)
 
 #else()
 
