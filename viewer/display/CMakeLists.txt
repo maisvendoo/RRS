@@ -32,6 +32,18 @@ file (GLOB SOURCES "./src/*.cpp")
 # Компиляция библиотеки
 add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
+target_sources(${TARGET}
+    PRIVATE
+        ${SOURCES}
+
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS
+            include
+        FILES
+            ${INCLUDES}
+)
+
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
