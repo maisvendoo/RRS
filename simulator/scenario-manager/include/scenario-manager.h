@@ -13,6 +13,7 @@
 #include    <timer.h>
 
 #include    <lua-debugger.h>
+#include    <date-time-trigger.h>
 
 //------------------------------------------------------------------------------
 //
@@ -91,8 +92,11 @@ private:
     /// Очередь задач
     std::queue<task_t> taskQueue;
 
-    /// Список триггеров
+    /// Список позиционных триггеров
     std::vector<sol::protected_function> triggerList;
+
+    /// Список временных триггеров
+    std::vector<date_time_tirgger_t> timeTriggerList;
 
     /// Таймер задержки исполнения очереди задач
     Timer *delayTimer = new Timer(0.1, false);
@@ -103,7 +107,7 @@ private:
     LuaDebugger *lua_dbg = new LuaDebugger;
 
     /// Флаг идентифицирующий исполнение сценария
-    bool is_scenario_active = false;
+    bool is_scenario_active = false;    
 
     /// Поставить задачу в очередь
     void setTask(task_t task);
@@ -182,9 +186,31 @@ private:
     /// Обработка позиционных триггеров
     void process_pos_triggers(std::string train_name, std::string traj_name, bool is_busy);
 
-    void taskSetTrigger(sol::function trigger);
+    /// Установить позиционный триггер
+    void taskSetPositionTrigger(sol::function trigger);
 
+    /// Инициализация библиотек Lua
     void lua_libraries_init();
+
+    /// Обработка очереди задач
+    void processTasksQueue();
+
+    /// Обработка очереди временных триггеров
+    void processTimeTriggers(const simulator_time_t &sim_time);
+
+    /// Определение когда настало заданное в триггере время (с учетом даты)
+    bool isTimeHasCome(const simulator_time_t &start_time, const simulator_time_t &trig_time);
+
+    /// Установить временной триггер по абсолютным дате и времени (общая системная задача,
+    /// недоступная из Lua)
+    void taskTimeTrigger(const simulator_time_t &trig_time, sol::function trigger_func);
+
+    /// Установить триггер на абсолютное время
+    void setTimeTirgger(const std::string &time, sol::function trigger_func);
+
+    void setAbsTimeTirgger(const std::string &abs_time, sol::function trigger_func);
+
+    void setRelTimeTirgger(const std::string &rel_time, sol::function trigger_func);
 
 private slots:
 
