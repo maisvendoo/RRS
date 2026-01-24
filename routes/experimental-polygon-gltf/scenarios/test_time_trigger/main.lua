@@ -22,7 +22,7 @@ train2.dir = 1
 setTrain(train2)
 
 -- Устанавливаем триггер на 00:00 игрового времени
-setAbsTimeTrigger("00:00", actionBuildRoute(train1.traj, "route1_0009_26", train1.dir))
+setTimeTrigger("00:00", actionBuildRoute(train1.traj, "route1_0009_26", train1.dir))
 
 -- Устанавливаем триггер на +00:02 от времени старта игры
-setAbsTimeTrigger("+00:02", actionBuildRoute(train2.traj, "route2_0009_26", train2.dir))
+setTimeTrigger("+00:02", actionBuildRoute(train2.traj, "route2_0009_26", train2.dir))

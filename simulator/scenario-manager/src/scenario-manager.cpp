@@ -958,7 +958,7 @@ void ScenarioManager::sys_functions_registration()
 
     Journal::instance()->info("setTrigger method binding...OK");
 
-    lua.set_function("setAbsTimeTrigger", [&](const std::string &abs_time, sol::function trigger_func){
+    lua.set_function("setTimeTrigger", [&](const std::string &abs_time, sol::function trigger_func){
         this->setTimeTirgger(abs_time, trigger_func);
     });
 
