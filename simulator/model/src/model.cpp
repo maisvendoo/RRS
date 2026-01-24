@@ -1045,7 +1045,7 @@ void Model::process()
 
     topology->step(sim_time.simulation_seconds, integration_time);
 
-    scnmgr->step(sim_time.simulation_seconds, integration_time);
+    scnmgr->step(sim_time, integration_time);
 
     findNearestVehicles();
 

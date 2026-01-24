@@ -1,6 +1,7 @@
 #ifndef     SCENARIO_MANAGER_H
 #define     SCENARIO_MANAGER_H
 
+#include    <datetime.h>
 #include    <QObject>
 #include    <queue>
 #include    <sol/sol.hpp>
@@ -12,6 +13,7 @@
 #include    <timer.h>
 
 #include    <lua-debugger.h>
+#include    <date-time-trigger.h>
 
 //------------------------------------------------------------------------------
 //
@@ -46,7 +48,7 @@ public:
     }
 
     /// Шаг симуляции (выполнение очереди задач)
-    void step(double t, double dt);
+    void step(const simulator_time_t &sim_time, double dt);
 
     std::vector<scenario_train_data_t> train_datas;
 
@@ -88,8 +90,11 @@ private:
     /// Очередь задач
     std::queue<task_t> taskQueue;
 
-    /// Список триггеров
+    /// Список позиционных триггеров
     std::vector<sol::protected_function> triggerList;
+
+    /// Список временных триггеров
+    std::vector<date_time_tirgger_t> timeTriggerList;
 
     /// Таймер задержки исполнения очереди задач
     Timer *delayTimer = new Timer(0.1, false);
@@ -100,7 +105,7 @@ private:
     LuaDebugger *lua_dbg = new LuaDebugger;
 
     /// Флаг идентифицирующий исполнение сценария
-    bool is_scenario_active = false;
+    bool is_scenario_active = false;    
 
     /// Поставить задачу в очередь
     void setTask(task_t task);
@@ -120,8 +125,16 @@ private:
     /// Создать поезд игрока
     void setTrain(const scenario_train_data_t &train_data);
 
+    /// Перевести строку в структуру времени сервера
+    void strTimeToServerTime(const std::string &str_time,
+                                server_time_t &time);
+
     /// Установить время сервера (формат строки "hh:mm:ss"
     void setTime(const std::string &time);
+
+    /// Перевести строку в структуру даты сервера
+    void strDateToServerDate(const std::string &str_date,
+                             server_date_t &date);
 
     /// Установить дату сервера (формат строки "dd.mm.yyyy")
     void setDate(const std::string &date);
@@ -171,9 +184,31 @@ private:
     /// Обработка позиционных триггеров
     void process_pos_triggers(std::string train_name, std::string traj_name, bool is_busy);
 
-    void taskSetTrigger(sol::function trigger);
+    /// Установить позиционный триггер
+    void taskSetPositionTrigger(sol::function trigger);
 
+    /// Инициализация библиотек Lua
     void lua_libraries_init();
+
+    /// Обработка очереди задач
+    void processTasksQueue();
+
+    /// Обработка очереди временных триггеров
+    void processTimeTriggers(const simulator_time_t &sim_time);
+
+    /// Определение когда настало заданное в триггере время (с учетом даты)
+    bool isTimeHasCome(const simulator_time_t &start_time, const simulator_time_t &trig_time);
+
+    /// Установить временной триггер по абсолютным дате и времени (общая системная задача,
+    /// недоступная из Lua)
+    void taskTimeTrigger(const simulator_time_t &trig_time, sol::function trigger_func);
+
+    /// Установить триггер на абсолютное время
+    void setTimeTirgger(const std::string &time, sol::function trigger_func);
+
+    void setAbsTimeTirgger(const std::string &abs_time, sol::function trigger_func);
+
+    void setRelTimeTirgger(const std::string &rel_time, sol::function trigger_func);
 
 private slots:
 
@@ -186,6 +221,8 @@ public slots:
     /// Переименование поезда по команде от сервера, принявшего новое имя
     void slotRenameTrain(int train_idx, QString new_name);
 
+    /// Обработка события занятости или освобождения какой-либо траектории
+    /// на карте
     void slotChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
 };
 
