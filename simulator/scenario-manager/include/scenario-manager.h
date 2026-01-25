@@ -70,6 +70,8 @@ signals:
 
     void sigBuildShuntingRoute(QByteArray& route_data);
 
+    void sigSetSwitchsAlongRoute(QByteArray &route_data);
+
     /// Этот сигнал инициирует сообщение во вьювер,
     /// о необходимости задать имя поезда
     /// (вывесим транспарат, который будет назойтиво висеть, напоминая что надо дать имя поезду)
@@ -173,6 +175,12 @@ private:
 
     /// Задать маршрут
     void buildRoute(const std::string &start_traj, const std::string &target_traj, int dir, bool is_train);
+
+    /// Установить стрелки по маршруту
+    void setSwitchsAlongRoute(const std::string &start_traj, const std::string &target_traj, int dir);
+
+    /// Установить стрелки по маршруту - соответсвующая задача
+    void taskSetSwitchsAlongRoute(const std::string &start_traj, const std::string &target_traj, int dir);
 
     /// Установка задачи задания маршрута
     void taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir, bool is_train);

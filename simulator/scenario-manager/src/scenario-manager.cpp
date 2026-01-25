@@ -706,6 +706,31 @@ void ScenarioManager::buildRoute(const std::string &start_traj, const std::strin
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::setSwitchsAlongRoute(const std::string &start_traj, const std::string &target_traj, int dir)
+{
+    route_command_t rc;
+    rc.trajectory_begin = QString(start_traj.c_str());
+    rc.trajectory_end = QString(target_traj.c_str());
+    rc.dir = (dir < 0) ? -1 : 1;
+
+    QByteArray rc_data = rc.serialize();
+
+    emit sigSetSwitchsAlongRoute(rc_data);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::taskSetSwitchsAlongRoute(const std::string &start_traj, const std::string &target_traj, int dir)
+{
+    setTask([&](){
+        this->setSwitchsAlongRoute(start_traj, target_traj, dir);
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir, bool is_train)
 {
     setTask([start_traj, target_traj, dir, is_train, this]{
@@ -971,6 +996,12 @@ void ScenarioManager::sys_functions_registration()
     };
 
     Journal::instance()->info("buildShuntingRoute method binding...OK");
+
+    lua["setSwitchsAlongRoute"] = [this](const std::string &start_traj, const std::string &target_traj, int dir) {
+        this->taskSetSwitchsAlongRoute(start_traj, target_traj, dir);
+    };
+
+    Journal::instance()->info("setSwitchAlongRoute method binding...OK");
 
     lua.set_function("setTrigger", [&](sol::function trigger) {
         taskSetPositionTrigger(trigger);
