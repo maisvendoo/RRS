@@ -207,24 +207,25 @@ void MapWidget::drawTrajectory(Trajectory* traj, QPainter& painter,
         }
     }
 
-
-    std::vector<track_t> tracs = traj->getTracks();
-    track_t middle_track = tracs[tracs.size() / 2];
-
-    dvec3 mp = (middle_track.begin_point + middle_track.end_point) * 0.5;
-
-    QPoint pt = coord_transform(mp);
-
     QLabel *traj_label = traj_labels.value(traj->getName());
-
     if (traj_label != nullptr)
     {
-        traj_label->move(pt);
-
         if (show_traj_names)
+        {
+            std::vector<track_t> tracs = traj->getTracks();
+            track_t middle_track = tracs[tracs.size() / 2];
+
+            dvec3 mp = (middle_track.begin_point + middle_track.end_point) * 0.5;
+
+            QPoint pt = coord_transform(mp);
+            traj_label->move(pt);
+
             traj_label->show();
+        }
         else
+        {
             traj_label->hide();
+        }
     }
 }
 
@@ -348,17 +349,23 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         {
             track_t bwd_track = bwd_traj->getLastTrack();
             track_t fwd_track = fwd_traj->getFirstTrack();
-            center = (bwd_track.end_point + fwd_track.begin_point) / 2.0;
+            center = (bwd_track.end_point + fwd_track.begin_point) * 0.5;
         }
     }
     QPoint center_point = coord_transform(center);
 
-    SwitchLabel *sw_label = switch_labels.value(conn->getName(), nullptr);
-
+    QLabel *sw_label = switch_labels.value(conn->getName(), nullptr);
     if (sw_label != nullptr)
     {
-        sw_label->move(center_point);
-        sw_label->show();
+        if (show_conn_names)
+        {
+            sw_label->move(center_point);
+            sw_label->show();
+        }
+        else
+        {
+            sw_label->hide();
+        }
     }
 
     painter.setBrush(color_connector);
@@ -559,7 +566,7 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
         if (Switch* next_sw = dynamic_cast<Switch*>(traj->getFwdConnector());
             next_sw && (next_sw->getStateBwd() != Switch::ONE_POSSIBLE_DIRECTION))
         {
-            draw_len = traj->getLength() / 2.0;
+            draw_len = traj->getLength() * 0.5;
         }
         draw_len = std::min(draw_len, switch_length);
 
@@ -591,7 +598,7 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
         if (Switch* next_sw = dynamic_cast<Switch*>(traj->getBwdConnector());
             next_sw && (next_sw->getStateFwd() != Switch::ONE_POSSIBLE_DIRECTION))
         {
-            draw_len = traj->getLength() / 2.0;
+            draw_len = traj->getLength() * 0.5;
         }
         draw_len = std::min(draw_len, switch_length);
 
@@ -787,7 +794,7 @@ void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor
 
     bottom_signal_pos += track.trav * (signal_offset * signal->getDirection());
     double signed_r = signal_radius * signal->getDirection();
-    int r = signal_radius * scale;
+    int r = std::round(signal_radius * scale);
 
     dvec3 label_pos = bottom_signal_pos + track.orth * ((2 * lens_colors.size() + 3) * signed_r);
     if (signal_label != nullptr)
@@ -800,6 +807,9 @@ void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor
         signal_label->show();
     }
 
+    QPen pen;
+    pen.setWidth((scale > 5.0) ? 2 : 1);
+    painter.setPen(pen);
     for (size_t i = 1; i <= lens_colors.size(); ++i)
     {
         dvec3 lens_pos = bottom_signal_pos + track.orth * (2 * i * signed_r);
@@ -813,8 +823,7 @@ void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor
     QPoint bottom_left = coord_transform(bottom_signal_pos - track.trav * signed_r);
     QPoint bottom_right = coord_transform(bottom_signal_pos + track.trav * signed_r);
 
-    QPen pen;
-    pen.setWidth((scale > 1.0) ? 2 : 1);
+    pen.setWidth((scale > 2.0) ? 2 : 1);
     painter.setPen(pen);
     painter.drawLine(bottom_down, bottom_up);
     painter.drawLine(bottom_left, bottom_right);

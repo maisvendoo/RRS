@@ -5,7 +5,6 @@
 #include    <topology-types.h>
 #include    <trajectory.h>
 #include    <simulator-update-struct.h>
-#include    <switch-label.h>
 #include    <signals-data-types.h>
 #include    <signal-label.h>
 #include    <train-label.h>
@@ -35,6 +34,12 @@ public:
 
     std::int8_t nearest_switch_dir = 0;
 
+    /// Флаг отображения имён траекторий
+    bool show_traj_names = false;
+
+    /// Флаг отображения имён коннекторов
+    bool show_conn_names = false;
+
     simulator_update_players_t *players_data = nullptr;
 
     simulator_update_pos_t *train_data = nullptr;
@@ -43,8 +48,6 @@ public:
 
     topology_stations_list_t *stations = nullptr;
 
-    QMap<QString, SwitchLabel *> switch_labels;
-
     signals_data_t *signals_data = nullptr;
 
     QMap<QString, SignalLabel *> signal_labels_fwd;
@@ -52,6 +55,8 @@ public:
     QMap<QString, SignalLabel *> signal_labels_bwd;
 
     QMap<QString, QLabel *> traj_labels;
+
+    QMap<QString, QLabel *> switch_labels;
 
     std::vector<TrainLabel *> train_labels;
 
@@ -78,11 +83,6 @@ public:
     QPoint getShift() const
     {
         return map_shift;
-    }
-
-    void showTrajNames(bool is_show)
-    {
-        show_traj_names = is_show;
     }
 
 signals:
@@ -139,9 +139,6 @@ private:
 
     /// Смещение координат до движения курсора с зажатой ЛКМ
     QPoint prev_map_shift;
-
-    /// Флаг отображения имен траекторий
-    bool show_traj_names = false;
 
     /// Перемещение вслед за игроком
     bool follow_player = true;

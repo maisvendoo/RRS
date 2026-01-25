@@ -135,7 +135,7 @@ bool BackGroundWidget::drawSwitchHighlight(QPainter& painter, Connector* conn, s
                 if (Switch* next_sw = dynamic_cast<Switch*>(traj->getFwdConnector());
                     next_sw && (next_sw->getStateBwd() != Switch::ONE_POSSIBLE_DIRECTION))
                 {
-                    draw_len = traj->getLength() / 2.0;
+                    draw_len = traj->getLength() * 0.5;
                 }
                 draw_len = std::min(draw_len, switch_length);
 
@@ -160,7 +160,7 @@ bool BackGroundWidget::drawSwitchHighlight(QPainter& painter, Connector* conn, s
                 if (Switch* next_sw = dynamic_cast<Switch*>(traj->getBwdConnector());
                     next_sw && (next_sw->getStateFwd() != Switch::ONE_POSSIBLE_DIRECTION))
                 {
-                    draw_len = traj->getLength() / 2.0;
+                    draw_len = traj->getLength() * 0.5;
                 }
                 draw_len = std::min(draw_len, switch_length);
 

@@ -54,6 +54,9 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(ui->actionShowTrajName, &QAction::triggered,
             this, &MainWindow::slotSetShowTrajStatus);
 
+    connect(ui->actionShowConnName, &QAction::triggered,
+            this, &MainWindow::slotSetShowConnStatus);
+
     connect(tcp_client, &TcpClient::setTrainInfo,
             this, &MainWindow::slotGetTrainsInfo);
 
@@ -340,11 +343,9 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 
     for (auto conn : *topology->getConnectorsList())
     {
-        SwitchLabel *sw_label = new SwitchLabel(map);
+        QLabel *sw_label = new QLabel(map);
         sw_label->setText(conn->getName());
-        sw_label->conn = conn;
-
-        connect(sw_label, &SwitchLabel::popUpMenu, this, &MainWindow::slotSwitchConnectorMenu);
+        sw_label->setVisible(false);
 
         map->switch_labels.insert(conn->getName(), sw_label);
     }
@@ -531,6 +532,13 @@ void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 //------------------------------------------------------------------------------
 void MainWindow::slotNearestSwitchMenu(Connector* nearest_conn, std::int8_t nearest_switch_dir)
 {
+    if (route_begin_trajectory && map->nearest_trajectory)
+    {
+        // Если уже строим маршрут, то заканчиваем строить маршрут
+        slotSelectTrajectory(map->nearest_trajectory);
+        return;
+    }
+
     // Создаём меню для стрелочного перевода
     Switch* sw = dynamic_cast<Switch *>(nearest_conn);
     if ((sw == nullptr) || (nearest_switch_dir == 0))
@@ -714,72 +722,6 @@ void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
         connect(shunting_route, &QAction::triggered, this, [tc, start_traj, target_traj, dir]{
             route_command_t sc = {start_traj->getName(), target_traj->getName(), dir};
             tc->sendShuntingRouteCommand(sc.serialize());
-        });
-    }
-
-    connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
-    is_menu_shows = true;
-    menu->exec(QCursor::pos());
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotSwitchConnectorMenu()
-{
-    // Создаём меню для текстовой метки стрелочного перевода
-    SwitchLabel* sw_label = dynamic_cast<SwitchLabel *>(sender());
-
-    Switch* sw = dynamic_cast<Switch *>(sw_label->conn);
-    int state_fwd = sw->getStateFwd();
-    int state_bwd = sw->getStateBwd();
-
-    // Если это не стрелка, меню не нужно
-    if ((state_fwd == 0) && (state_bwd == 0))
-        return;
-
-    // Указатель на сетевого клиента, который отправит команду переключить стрелку
-    TcpClient* tc = tcp_client;
-
-    // Создаём меню, передаём в текстовую метку указатель для интерактивной подсветки
-    QMenu* menu = new QMenu(this);
-    sw_label->menu = menu;
-
-    if (state_fwd != 0)
-    {
-        // Создаём пункт меню для переключения стрелки в направлении вперёд
-        QAction* action_switch_fwd = new QAction(tr("Switch forward"), this);
-        action_switch_fwd->setEnabled((sw->getStateFwd() == Switch::STATE_MINUS) ||
-                                      (sw->getStateFwd() == Switch::STATE_PLUS));
-        menu->addAction(action_switch_fwd);
-
-        sw_label->action_switch_fwd = action_switch_fwd;
-        connect(action_switch_fwd, &QAction::triggered, sw_label, &SwitchLabel::resetMenu);
-
-        // Создаём сетевой пакет с командой переключения стрелки в направлении вперёд
-        connect(action_switch_fwd, &QAction::triggered, this, [sw, tc]{
-            std::int8_t ref_state = (sw->getStateFwd() < 0) ? 1 : -1;
-            switch_command_t sc = {sw->getName(), 1, ref_state};
-            tc->sendSwitchCommand(sc.serialize());
-        });
-    }
-
-    if (state_bwd != 0)
-    {
-        // Создаём пункт меню для переключения стрелки в направлении назад
-        QAction* action_switch_bwd = new QAction(tr("Switch backward"), this);
-        action_switch_bwd->setEnabled((sw->getStateBwd() == Switch::STATE_MINUS) ||
-                                      (sw->getStateBwd() == Switch::STATE_PLUS));
-        menu->addAction(action_switch_bwd);
-
-        sw_label->action_switch_bwd = action_switch_bwd;
-        connect(action_switch_bwd, &QAction::triggered, sw_label, &SwitchLabel::resetMenu);
-
-        // Создаём сетевой пакет с командой переключения стрелки в направлении назад
-        connect(action_switch_bwd, &QAction::triggered, this, [sw, tc]{
-            std::int8_t ref_state = (sw->getStateBwd() < 0) ? 1 : -1;
-            switch_command_t sc = {sw->getName(), -1, ref_state};
-            tc->sendSwitchCommand(sc.serialize());
         });
     }
 
@@ -989,12 +931,25 @@ void MainWindow::slotRecvLogMessage(QString msg)
 //------------------------------------------------------------------------------
 void MainWindow::slotSetShowTrajStatus(bool is_show)
 {
-    map->showTrajNames(is_show);
+    map->show_traj_names = is_show;
 
     if (is_show)
         slotRecvLogMessage(tr("Showed traj names"));
     else
         slotRecvLogMessage(tr("Hided traj names"));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSetShowConnStatus(bool is_show)
+{
+    map->show_conn_names = is_show;
+
+    if (is_show)
+        slotRecvLogMessage(tr("Showed conn names"));
+    else
+        slotRecvLogMessage(tr("Hided conn names"));
 }
 
 //------------------------------------------------------------------------------
