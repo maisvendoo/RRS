@@ -31,7 +31,9 @@ public:
 
     Trajectory* nearest_trajectory = nullptr;
 
-    Connector* nearest_connector = nullptr;
+    Connector* nearest_switch = nullptr;
+
+    std::int8_t nearest_switch_dir = 0;
 
     simulator_update_players_t *players_data = nullptr;
 
@@ -90,6 +92,26 @@ public slots:
 
 private:
 
+    /// Траектория
+    static constexpr QColor color_traj_free = QColor(0, 0, 0);
+    /// Траектория занята подвижным составом
+    static constexpr QColor color_traj_busy = QColor(255, 0, 0);
+    /// Траектория включена в маршрут ДЦ
+    static constexpr QColor color_traj_route = QColor(255, 255, 0);
+
+    /// Коннектор
+    static constexpr QColor color_connector = QColor(96, 96, 96);
+    /// Стрелка
+    static constexpr QColor color_switch_free = QColor(0, 0, 128);
+    /// Стрелка занята подвижным составом
+    static constexpr QColor color_switch_busy = QColor(96, 96, 96);
+    /// Стрелка включена в маршрут ДЦ
+    static constexpr QColor color_switch_route = QColor(255, 192, 96);
+    /// Другое направление стрелки
+    static constexpr QColor color_switch_other = color_traj_free;
+    /// Другое направление стрелки при выборе пункта меню с переключением
+    static constexpr QColor color_switch_other_selected = QColor(0, 128, 255);
+
     /// Масштаб отображения карты
     double scale = 1.0;
 
@@ -127,7 +149,8 @@ private:
 
     void paintEvent(QPaintEvent *event);
 
-    void drawTrajectory(Trajectory* traj, QPointF& cursor_pos, double& distance2);
+    void drawTrajectory(Trajectory* traj,
+                        QPointF& cursor_pos, double& distance2);
 
     void drawTrains(simulator_update_pos_t *train_data);
 
@@ -135,7 +158,11 @@ private:
 
     void drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length, QColor color);
 
-    void drawConnector(Connector* conn, QPointF& cursor_pos, double& distance2);
+    void drawConnector(Connector* conn,
+                       QPointF& cursor_pos, double& distance2, std::int8_t& dir);
+
+    void drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter &painter,
+                        QPointF& cursor_pos, double& distance2, std::int8_t& dir);
 
     void drawStations(topology_stations_list_t *stations);
 

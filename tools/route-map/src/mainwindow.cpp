@@ -182,6 +182,13 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 
     bg->update();
+
+    // Отладка
+    if (map->nearest_switch)
+    {
+        ui->ptLog->appendPlainText(QString("Nearest switch (%1):").arg(map->nearest_switch_dir)
+                                   + map->nearest_switch->getName());
+    }
 }
 
 //------------------------------------------------------------------------------
