@@ -770,8 +770,9 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     connect(scnmgr, &ScenarioManager::sigGetSwitchState, topology, &Topology::slotGetSwitchState);
     connect(scnmgr, &ScenarioManager::sigSwitchCommand, topology, &Topology::slotSwitchCommand);
     connect(scnmgr, &ScenarioManager::sigSignalCommand, topology, &Topology::slotSignalCommand);
-//    connect(scnmgr, &ScenarioManager::sigBuildRoute, topology, &Topology::slotBuildRouteCommand);
-    connect(scnmgr, &ScenarioManager::sigBuildRoute, topology, &Topology::slotTrainRouteCommand);
+    connect(scnmgr, &ScenarioManager::sigSetSwitchsAlongRoute, topology, &Topology::slotBuildRouteCommand);
+    connect(scnmgr, &ScenarioManager::sigBuildTrainRoute, topology, &Topology::slotTrainRouteCommand);
+    connect(scnmgr, &ScenarioManager::sigBuildShuntingRoute, topology, &Topology::slotShuntingRouteCommand);
     connect(topology, &Topology::sigSetOpenSignalsQueue, scnmgr, &ScenarioManager::slotSetOpenSignalsQueue);
     connect(tcp_server, &TcpServer::sigRenameTrain, scnmgr, &ScenarioManager::slotRenameTrain);
     connect(scnmgr, &ScenarioManager::sigRenameTrainInModel, this, &Model::slotRenameTrainInModel);
@@ -1045,7 +1046,7 @@ void Model::process()
 
     topology->step(sim_time.simulation_seconds, integration_time);
 
-    scnmgr->step(sim_time.simulation_seconds, integration_time);
+    scnmgr->step(sim_time, integration_time);
 
     findNearestVehicles();
 

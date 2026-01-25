@@ -5,7 +5,6 @@
 #include    <topology-types.h>
 #include    <trajectory.h>
 #include    <simulator-update-struct.h>
-#include    <switch-label.h>
 #include    <signals-data-types.h>
 #include    <signal-label.h>
 #include    <train-label.h>
@@ -31,7 +30,15 @@ public:
 
     Trajectory* nearest_trajectory = nullptr;
 
-    Connector* nearest_connector = nullptr;
+    Connector* nearest_switch = nullptr;
+
+    std::int8_t nearest_switch_dir = 0;
+
+    /// Флаг отображения имён траекторий
+    bool show_traj_names = false;
+
+    /// Флаг отображения имён коннекторов
+    bool show_conn_names = false;
 
     simulator_update_players_t *players_data = nullptr;
 
@@ -41,8 +48,6 @@ public:
 
     topology_stations_list_t *stations = nullptr;
 
-    QMap<QString, SwitchLabel *> switch_labels;
-
     signals_data_t *signals_data = nullptr;
 
     QMap<QString, SignalLabel *> signal_labels_fwd;
@@ -51,7 +56,16 @@ public:
 
     QMap<QString, QLabel *> traj_labels;
 
+    QMap<QString, QLabel *> switch_labels;
+
     std::vector<TrainLabel *> train_labels;
+
+    struct switch_menu_t {
+        QMenu* menu = nullptr;
+        QAction* action = nullptr;
+        Connector* conn = nullptr;
+        std::int8_t switch_dir = 0;
+    } switch_menu;
 
     void resize(int width, int height);
 
@@ -71,12 +85,9 @@ public:
         return map_shift;
     }
 
-    void showTrajNames(bool is_show)
-    {
-        show_traj_names = is_show;
-    }
-
 signals:
+
+    void sigOpenSwitchMenu(Connector* nearest_conn, std::int8_t nearest_switch_dir);
 
     void sigOpenTrajectoryMenu(Trajectory* nearest_traj);
 
@@ -88,7 +99,29 @@ public slots:
 
     void slotPlayerAtCenter(int idx);
 
+    void resetSwitchMenu();
+
 private:
+
+    /// Траектория
+    static constexpr QColor color_traj_free = QColor(0, 0, 0);
+    /// Траектория занята подвижным составом
+    static constexpr QColor color_traj_busy = QColor(255, 0, 0);
+    /// Траектория включена в маршрут ДЦ
+    static constexpr QColor color_traj_route = QColor(255, 255, 0);
+
+    /// Коннектор
+    static constexpr QColor color_connector = QColor(96, 96, 96);
+    /// Стрелка
+    static constexpr QColor color_switch_free = QColor(0, 0, 128);
+    /// Стрелка занята подвижным составом
+    static constexpr QColor color_switch_busy = QColor(96, 96, 96);
+    /// Стрелка включена в маршрут ДЦ
+    static constexpr QColor color_switch_route = QColor(255, 192, 96);
+    /// Другое направление стрелки
+    static constexpr QColor color_switch_other = color_traj_free;
+    /// Другое направление стрелки при выборе пункта меню с переключением
+    static constexpr QColor color_switch_other_selected = QColor(0, 128, 255);
 
     /// Масштаб отображения карты
     double scale = 1.0;
@@ -107,9 +140,6 @@ private:
     /// Смещение координат до движения курсора с зажатой ЛКМ
     QPoint prev_map_shift;
 
-    /// Флаг отображения имен траекторий
-    bool show_traj_names = false;
-
     /// Перемещение вслед за игроком
     bool follow_player = true;
 
@@ -127,21 +157,27 @@ private:
 
     void paintEvent(QPaintEvent *event);
 
-    void drawTrajectory(Trajectory* traj, QPointF& cursor_pos, double& distance2);
+    void drawTrajectory(Trajectory* traj, QPainter& painter,
+                        QPointF& cursor_pos, double& distance2);
 
-    void drawTrains(simulator_update_pos_t *train_data);
+    void drawTrains(simulator_update_pos_t *train_data, QPainter& painter);
 
-    void drawTrainNames(simulator_update_pos_t *train_data);
+    void drawTrainNames(simulator_update_pos_t *train_data, QPainter& painter);
 
-    void drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length, QColor color);
+    void drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length,
+                     QPainter& painter, QColor color);
 
-    void drawConnector(Connector* conn, QPointF& cursor_pos, double& distance2);
+    void drawConnector(Connector* conn, QPainter& painter,
+                       QPointF& cursor_pos, double& distance2, std::int8_t& dir);
 
-    void drawStations(topology_stations_list_t *stations);
+    void drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& painter,
+                        QPointF& cursor_pos, double& distance2, std::int8_t& dir);
 
-    void drawSignals(signals_data_t *signals_data);
+    void drawStations(topology_stations_list_t *stations, QPainter& painter);
 
-    void drawSignal(Signal *signal, std::vector<QColor> lens_colors);
+    void drawSignals(signals_data_t *signals_data, QPainter& painter);
+
+    void drawSignal(Signal* signal, QPainter& painter, std::vector<QColor> lens_colors);
 
     QPoint coord_transform(dvec3 point);
 

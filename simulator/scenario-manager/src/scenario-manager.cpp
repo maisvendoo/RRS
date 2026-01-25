@@ -2,9 +2,9 @@
 #include    <Journal.h>
 #include    <filesystem.h>
 #include    <datetime.h>
-#include    <route-segment.h>
 #include    <switch-state.h>
-#include    <signals-data-types.h>
+#include    <signal-command.h>
+#include    <route-command.h>
 
 //------------------------------------------------------------------------------
 //
@@ -77,7 +77,7 @@ bool ScenarioManager::run(const std::string &route_dir,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::step(double t, double dt)
+void ScenarioManager::processTasksQueue()
 {
     // Если очередь задач не пуста
     if (!taskQueue.empty())
@@ -92,8 +92,193 @@ void ScenarioManager::step(double t, double dt)
             task();
         }
     }
+}
 
-    delayTimer->step(t, dt);
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::processTimeTriggers(const simulator_time_t &sim_time)
+{
+    // Очередь пуста - убегаем
+    if (timeTriggerList.empty())
+    {
+        return;
+    }
+
+    // Нечего делать - перебираем все триггеры
+    for (auto it = timeTriggerList.begin(); it != timeTriggerList.end();)
+    {
+        try
+        {
+            // Берем очередной
+            auto trigger = *it;
+
+            // Если настало его время
+            if (isTimeHasCome(sim_time, trigger.action_time))
+            {
+                // Проверяем валидность прикрепленной к нему функции
+                if (trigger.action_func.valid())
+                {
+                    // Исполняем эту функцию
+                    trigger.action_func();
+
+                    // Убиваем тригер, не будет больше такого момента времени
+                    // и берем следующий
+                    it = timeTriggerList.erase(it);
+
+                    // уходим если нет больше триггеров
+                    if (timeTriggerList.empty())
+                    {
+                        return;
+                    }
+
+                    continue;
+                }
+            }
+        }
+        catch (const sol::error &error)
+        {
+            Journal::instance()->error(QString("LUA: %1").arg(error.what()));
+        }
+
+        ++it;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ScenarioManager::isTimeHasCome(const simulator_time_t &start_time,
+                                    const simulator_time_t &trig_time)
+{
+    if (start_time.date < trig_time.date)
+    {
+        // Завтра еще не наступило
+        return false;
+    }
+
+    if (start_time.date > trig_time.date)
+    {
+        // Завтра не наступит никогда
+        return false;
+    }
+
+    if (start_time.time >= trig_time.time)
+    {
+        // Время пришло
+        return true;
+    }
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::taskTimeTrigger(const simulator_time_t &trig_time,
+                                      sol::function trigger_func)
+{
+    setTask([trig_time, trigger_func, this]{
+
+        date_time_tirgger_t trigger;
+        trigger.action_time = trig_time;
+        trigger.action_func = trigger_func;
+
+        this->timeTriggerList.push_back(trigger);
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setTimeTirgger(const std::string &time,
+                                     sol::function trigger_func)
+{
+    if (time[0] == '-')
+    {
+        Journal::instance()->error("Set time trigger: You can't set trigger on a past time " + QString(time.c_str()));
+        return;
+    }
+
+    if (time[0] != '+')
+    {
+        setAbsTimeTirgger(time, trigger_func);
+    }
+    else
+    {
+        setRelTimeTirgger(time, trigger_func);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setAbsTimeTirgger(const std::string &abs_time,
+                                        sol::function trigger_func)
+{
+    // Определяем время начала игры
+    simulator_time_t start_sim_time = simulator_time_t(launch_init_data.start_datetime);
+    // Парсим заданное время
+    server_time_t trig_time;
+    strTimeToServerTime(abs_time, trig_time);
+
+    simulator_time_t trig_date_time;
+
+    // Если заданнный момент времени менее чем время старта
+    if (start_sim_time.time >= trig_time)
+    {
+        // Значит ставим событие на следующий день
+        server_date_t date = start_sim_time.date;
+        date.nextDay();
+        trig_date_time = simulator_time_t(date, trig_time);
+    }
+    else // Иначе, ставим на сегодня
+    {
+        trig_date_time = simulator_time_t(start_sim_time.date, trig_time);
+    }
+
+    taskTimeTrigger(trig_date_time, trigger_func);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setRelTimeTirgger(const std::string &rel_time,
+                                        sol::function trigger_func)
+{
+    // Определяем время начала игры
+    simulator_time_t start_sim_time = simulator_time_t(launch_init_data.start_datetime);
+    // Парсим заданное время
+    server_time_t trig_time;
+    strTimeToServerTime(rel_time, trig_time);
+
+    simulator_time_t trig_date_time = start_sim_time;
+    // Переводим в секунды дельту времени
+    double sec = trig_time.hour() * 3600 + trig_time.minute() * 60 + trig_time.sec();
+
+    // Прибавляем эти секунды к времени старта
+    if (trig_date_time.time.addTime(sec))
+    {
+        // если надо, добавляем еще день
+        trig_date_time.date.nextDay();
+    }
+
+    // Ставим триггер
+    taskTimeTrigger(trig_date_time, trigger_func);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::step(const simulator_time_t &sim_time, double dt)
+{
+    // Обработка очереди задач
+    processTasksQueue();
+
+    // Обработка временных триггеров
+    processTimeTriggers(sim_time);
+
+    delayTimer->step(sim_time.simulation_seconds, dt);
 
     curr_step = dt;
 }
@@ -169,14 +354,15 @@ void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setTime(const std::string &time)
+void ScenarioManager::strTimeToServerTime(const std::string &str_time,
+                                             server_time_t &time)
 {
-    QStringList tokens = QString(time.c_str()).split(':');
+    QStringList tokens = QString(str_time.c_str()).split(':');
 
     // Если число параметров менее двух - ошибка
     if (tokens.size() < 2)
     {
-        Journal::instance()->error(QString("setTime: Invalid time format: %1").arg(time.c_str()));
+        Journal::instance()->error(QString("setTime: Invalid time format: %1").arg(str_time.c_str()));
         return;
     }
 
@@ -227,8 +413,19 @@ void ScenarioManager::setTime(const std::string &time)
         return;
     }
 
+    time = server_time_t(hour, min, sec, 0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setTime(const std::string &time)
+{
     simulator_time_t sim_time = simulator_time_t(launch_init_data.start_datetime);
-    server_time_t start_time = server_time_t(hour, min, sec, 0);
+    server_time_t start_time;
+
+    strTimeToServerTime(time, start_time);
+
     launch_init_data.start_datetime = simulator_time_t(sim_time.date, start_time).data();
 
     Journal::instance()->info("setTime: Time initialized at " + start_time.getString());
@@ -237,13 +434,14 @@ void ScenarioManager::setTime(const std::string &time)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setDate(const std::string &date)
+void ScenarioManager::strDateToServerDate(const std::string &str_date,
+                                          server_date_t &date)
 {
-    QStringList tokens = QString(date.c_str()).split('.');
+    QStringList tokens = QString(str_date.c_str()).split('.');
 
     if (tokens.size() < 2)
     {
-        Journal::instance()->error(QString("setDate: Invalid date format: %1").arg(date.c_str()));
+        Journal::instance()->error(QString("setDate: Invalid date format: %1").arg(str_date.c_str()));
         return;
     }
 
@@ -308,7 +506,19 @@ void ScenarioManager::setDate(const std::string &date)
         return;
     }
 
-    server_date_t start_date = server_date_t(year, month, day);
+    date = server_date_t(year, month, day);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setDate(const std::string &date)
+{
+    simulator_time_t sim_time = simulator_time_t(launch_init_data.start_datetime);
+
+    server_date_t start_date;
+    strDateToServerDate(date, start_date);
+
     launch_init_data.start_datetime = simulator_time_t(start_date, sim_time.time).data();
 
     Journal::instance()->info("setDate: Time initialized at " + start_date.getString());
@@ -406,7 +616,7 @@ void ScenarioManager::taskSwitchBwd(const std::string &switch_name)
 void ScenarioManager::openSignal(const std::string& conn_name, int dir, bool for_train, bool for_shunting)
 {
     signal_command_t sc = signal_command_t();
-    sc.conn_name = QString(conn_name.c_str());
+    sc.conn_name = QString::fromUtf8(conn_name.c_str());
     sc.sig_dir = dir;
     if (for_train)
     {
@@ -474,7 +684,7 @@ void ScenarioManager::taskSetDelay(double timeout)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::buildRoute(const std::string &start_traj, const std::string &target_traj, int dir)
+void ScenarioManager::buildRoute(const std::string &start_traj, const std::string &target_traj, int dir, bool is_train)
 {
     route_command_t rc;
     rc.trajectory_begin = QString(start_traj.c_str());
@@ -482,16 +692,49 @@ void ScenarioManager::buildRoute(const std::string &start_traj, const std::strin
     rc.dir = (dir < 0) ? -1 : 1;
 
     QByteArray rc_data = rc.serialize();
-    emit sigBuildRoute(rc_data);
+
+    if (is_train)
+    {
+        emit sigBuildTrainRoute(rc_data);
+    }
+    else
+    {
+        emit sigBuildShuntingRoute(rc_data);
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir)
+void ScenarioManager::setSwitchsAlongRoute(const std::string &start_traj, const std::string &target_traj, int dir)
 {
-    setTask([start_traj, target_traj, dir, this]{
-        this->buildRoute(start_traj, target_traj, dir);
+    route_command_t rc;
+    rc.trajectory_begin = QString(start_traj.c_str());
+    rc.trajectory_end = QString(target_traj.c_str());
+    rc.dir = (dir < 0) ? -1 : 1;
+
+    QByteArray rc_data = rc.serialize();
+
+    emit sigSetSwitchsAlongRoute(rc_data);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::taskSetSwitchsAlongRoute(const std::string &start_traj, const std::string &target_traj, int dir)
+{
+    setTask([&](){
+        this->setSwitchsAlongRoute(start_traj, target_traj, dir);
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir, bool is_train)
+{
+    setTask([start_traj, target_traj, dir, is_train, this]{
+        this->buildRoute(start_traj, target_traj, dir, is_train);
     });
 }
 
@@ -540,52 +783,36 @@ void ScenarioManager::process_pos_triggers(std::string train_name,
         return;
     }
 
-    // Перебираем все имеющиеся триггеры
-    for (auto it = triggerList.begin(); it != triggerList.end(); ++it)
+    for (auto it = triggerList.begin(); it != triggerList.end();)
     {
-        // На всякии нехорошии ситуации трай-кэтч
         try
         {
-            // Вызываем триггер
             auto trigger = *it;
-
-            // Если тригер валидный
             if (trigger.valid())
             {
-                // Передаем данные о траекторном событии в триггер
-                // а он там уж сам как-нибудь порешает чего делать
                 auto result = trigger(train_name, traj_name, is_busy);
-
-                // Если валидный результат работы тригер
-                if (result.valid())
+                if (result.valid() && result.get<bool>())
                 {
-                    // Удаляем триггер если он попросил об этом
-                    if (result.get<bool>())
-                    {
-                        triggerList.erase(it);
-                    }
-
-                    // Если тригеров больше нет, уходим от греха, дабы
-                    // на следующей итерации цикла не схатить невалидный итератор
+                    it = triggerList.erase(it); // erase возвращает следующий итератор
                     if (triggerList.empty())
-                    {
                         return;
-                    }
+                    continue; // не делаем ++it
                 }
             }
         }
         catch (const sol::error &error)
         {
             Journal::instance()->error(QString("LUA: %1").arg(error.what()));
-            continue;
         }
+
+        ++it; // инкрементируем только если не удаляли
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::taskSetTrigger(sol::function trigger)
+void ScenarioManager::taskSetPositionTrigger(sol::function trigger)
 {
     setTask([trigger, this]{
         this->triggerList.push_back(trigger);
@@ -753,16 +980,52 @@ void ScenarioManager::sys_functions_registration()
     Journal::instance()->info("delay method binding...OK");
 
     lua["buildRoute"] = [this](const std::string &start_traj, const std::string &target_traj, int dir) {
-        this->taskBuildRoute(start_traj, target_traj, dir);
+        this->taskBuildRoute(start_traj, target_traj, dir, true);
     };
 
     Journal::instance()->info("buildRoute method binding...OK");
 
+    lua["buildTrainRoute"] = [this](const std::string &start_traj, const std::string &target_traj, int dir) {
+        this->taskBuildRoute(start_traj, target_traj, dir, true);
+    };
+
+    Journal::instance()->info("buildTrainRoute method binding...OK");
+
+    lua["buildShuntingRoute"] = [this](const std::string &start_traj, const std::string &target_traj, int dir) {
+        this->taskBuildRoute(start_traj, target_traj, dir, false);
+    };
+
+    Journal::instance()->info("buildShuntingRoute method binding...OK");
+
+    lua["setSwitchsAlongRoute"] = [this](const std::string &start_traj, const std::string &target_traj, int dir) {
+        this->taskSetSwitchsAlongRoute(start_traj, target_traj, dir);
+    };
+
+    Journal::instance()->info("setSwitchAlongRoute method binding...OK");
+
     lua.set_function("setTrigger", [&](sol::function trigger) {
-        taskSetTrigger(trigger);
+        taskSetPositionTrigger(trigger);
     });
 
     Journal::instance()->info("setTrigger method binding...OK");
+
+    lua.set_function("setTimeTrigger", [&](const std::string &abs_time, sol::function trigger_func){
+        this->setTimeTirgger(abs_time, trigger_func);
+    });
+
+    Journal::instance()->info("setTimeTrigger method binding...OK");
+
+    lua["openShuntingSignal"] = [this](const std::string &conn_name, int dir){
+        this->taskOpenSignal(conn_name, dir, false, true);
+    };
+
+    Journal::instance()->info("openShuntingSignal method binding...OK");
+
+    lua["openCallSignal"] = [this](const std::string &conn_name, int dir){
+        this->taskOpenSignal(conn_name, dir, false, false);
+    };
+
+    Journal::instance()->info("openCallSignal method binding...OK");
 }
 
 //------------------------------------------------------------------------------
