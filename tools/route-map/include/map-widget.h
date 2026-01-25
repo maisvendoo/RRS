@@ -149,26 +149,27 @@ private:
 
     void paintEvent(QPaintEvent *event);
 
-    void drawTrajectory(Trajectory* traj,
+    void drawTrajectory(Trajectory* traj, QPainter& painter,
                         QPointF& cursor_pos, double& distance2);
 
-    void drawTrains(simulator_update_pos_t *train_data);
+    void drawTrains(simulator_update_pos_t *train_data, QPainter& painter);
 
-    void drawTrainNames(simulator_update_pos_t *train_data);
+    void drawTrainNames(simulator_update_pos_t *train_data, QPainter& painter);
 
-    void drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length, QColor color);
+    void drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length,
+                     QPainter& painter, QColor color);
 
-    void drawConnector(Connector* conn,
+    void drawConnector(Connector* conn, QPainter& painter,
                        QPointF& cursor_pos, double& distance2, std::int8_t& dir);
 
-    void drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter &painter,
+    void drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& painter,
                         QPointF& cursor_pos, double& distance2, std::int8_t& dir);
 
-    void drawStations(topology_stations_list_t *stations);
+    void drawStations(topology_stations_list_t *stations, QPainter& painter);
 
-    void drawSignals(signals_data_t *signals_data);
+    void drawSignals(signals_data_t *signals_data, QPainter& painter);
 
-    void drawSignal(Signal *signal, std::vector<QColor> lens_colors);
+    void drawSignal(Signal* signal, QPainter& painter, std::vector<QColor> lens_colors);
 
     QPoint coord_transform(dvec3 point);
 

@@ -118,15 +118,22 @@ void MainWindow::load_config(const QString &cfg_name)
     cfg.getInt(secName, "PlayersUpdateInterval", players_update_interval);
 
     secName = "RouteMap";
-    double tmp_value = 0;
+    double tmp_value = 0.0;
     cfg.getDouble(secName, "SwitchLength", tmp_value);
-    map->setSwitchLength(tmp_value);
+    if (tmp_value > Physics::ZERO)
+    {
+        map->setSwitchLength(tmp_value);
+        bg->setSwitchLength(tmp_value);
+    }
 
-    tmp_value = 0;
+    tmp_value = 0.0;
     cfg.getDouble(secName, "SignalRadius", tmp_value);
-    map->setSignalRadius(tmp_value);
+    if (tmp_value > Physics::ZERO)
+    {
+        map->setSignalRadius(tmp_value);
+    }
 
-    tmp_value = 0;
+    tmp_value = 0.0;
     cfg.getDouble(secName, "SignalOffset", tmp_value);
     map->setSignalOffset(tmp_value);
 }
@@ -162,6 +169,17 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     if (!is_menu_shows)
     {
+        Connector* new_nearest_switch = map->nearest_switch;
+        if (new_nearest_switch && (map->nearest_switch_dir != 0))
+        {
+            bg->nearest_switch = new_nearest_switch;
+            bg->nearest_switch_dir = map->nearest_switch_dir;
+        }
+        else
+        {
+            bg->nearest_switch = nullptr;
+            bg->nearest_switch_dir = 0;
+        }
         Trajectory* new_nearest_trajectory = map->nearest_trajectory;
         if (route_begin_trajectory && new_nearest_trajectory && (route_dir != 0))
         {
@@ -182,13 +200,6 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 
     bg->update();
-
-    // Отладка
-    if (map->nearest_switch)
-    {
-        ui->ptLog->appendPlainText(QString("Nearest switch (%1):").arg(map->nearest_switch_dir)
-                                   + map->nearest_switch->getName());
-    }
 }
 
 //------------------------------------------------------------------------------
