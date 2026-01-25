@@ -55,6 +55,13 @@ public:
 
     std::vector<TrainLabel *> train_labels;
 
+    struct switch_menu_t {
+        QMenu* menu = nullptr;
+        QAction* action = nullptr;
+        Connector* conn = nullptr;
+        std::int8_t switch_dir = 0;
+    } switch_menu;
+
     void resize(int width, int height);
 
     void setSwitchLength(double value);
@@ -80,6 +87,8 @@ public:
 
 signals:
 
+    void sigOpenSwitchMenu(Connector* nearest_conn, std::int8_t nearest_switch_dir);
+
     void sigOpenTrajectoryMenu(Trajectory* nearest_traj);
 
     void sigSelectNearestTrajectory(Trajectory* nearest_traj);
@@ -89,6 +98,8 @@ public slots:
     void slotStationAtCenter(int idx);
 
     void slotPlayerAtCenter(int idx);
+
+    void resetSwitchMenu();
 
 private:
 

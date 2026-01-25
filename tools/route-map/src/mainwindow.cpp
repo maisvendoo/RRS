@@ -68,6 +68,9 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     map->vehicles_half_length = &vehicles_half_length;
     map->players_data = &players_data;
 
+    connect(map, &MapWidget::sigOpenSwitchMenu,
+            this, &MainWindow::slotNearestSwitchMenu);
+
     connect(map, &MapWidget::sigOpenTrajectoryMenu,
             this, &MainWindow::slotNearestTrajectoryMenu);
 
@@ -521,6 +524,61 @@ void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 
     // Дата-время сервера в статусной строке внизу
     ui->statusbar->showMessage(train_data.sim_time.getString());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotNearestSwitchMenu(Connector* nearest_conn, std::int8_t nearest_switch_dir)
+{
+    // Создаём меню для стрелочного перевода
+    Switch* sw = dynamic_cast<Switch *>(nearest_conn);
+    if ((sw == nullptr) || (nearest_switch_dir == 0))
+    {
+        return;
+    }
+
+    // Если это не стрелка, меню не нужно
+    Switch::State state = (nearest_switch_dir > 0) ? sw->getStateFwd() : sw->getStateBwd();
+    if (state == Switch::ONE_POSSIBLE_DIRECTION)
+    {
+        return;
+    }
+
+    // Указатель на сетевого клиента, который отправит команду переключить стрелку
+    TcpClient* tc = tcp_client;
+
+    // Создаём меню
+    QMenu* menu = new QMenu(this);
+
+    // Создаём пункт меню для переключения стрелки
+    QAction* action_switch = new QAction(tr("Switch"), this);
+    action_switch->setEnabled((state == Switch::STATE_MINUS) ||
+                              (state == Switch::STATE_PLUS));
+    menu->addAction(action_switch);
+
+    // Сохраняем в карте указатель для интерактивной подсветки
+    map->switch_menu = {menu, action_switch, nearest_conn, nearest_switch_dir};
+    // И сбрасываем сохранённый указатель
+    connect(action_switch, &QAction::triggered, map, &MapWidget::resetSwitchMenu);
+
+    // Создаём сетевой пакет с командой переключения стрелки
+    std::int8_t switch_dir = nearest_switch_dir;
+    connect(action_switch, &QAction::triggered, this, [sw, switch_dir, tc]{
+        Switch::State cur_state = (switch_dir > 0) ? sw->getStateFwd() : sw->getStateBwd();
+        switch_command_t sc;
+        sc.conn_name = sw->getName();
+        sc.switch_direction = switch_dir;
+        sc.switch_ref_state = (cur_state < 0) ? 1 : -1;
+        tc->sendSwitchCommand(sc.serialize());
+    });
+
+    // Сброс заморозки выделения ближайших объектов
+    connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
+
+    // Заморозка выделения ближайших объектов и показ меню
+    is_menu_shows = true;
+    menu->exec(QCursor::pos());
 }
 
 //------------------------------------------------------------------------------

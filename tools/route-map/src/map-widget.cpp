@@ -86,6 +86,14 @@ void MapWidget::slotPlayerAtCenter(int idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MapWidget::resetSwitchMenu()
+{
+    switch_menu = switch_menu_t();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MapWidget::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
@@ -365,8 +373,8 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
     }
 
     QPen pen;
-    int switched_width = 3 + std::floor(sqrt(scale));
-    int other_width = (scale > 2.0) ? 3 : 1;
+    int switched_width = 2 + std::floor(sqrt(scale));
+    int other_width = 1;
     if (sw->fwdPlusTraj && sw->fwdMinusTraj)
     {
         Trajectory* fwd_other = (fwd_traj == sw->fwdPlusTraj) ?
@@ -377,10 +385,10 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         case Switch::IS_BUSY_MINUS:
         case Switch::IS_BUSY_PLUS:
         {
-            if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
-                (sw_label->action_switch_fwd != nullptr))
+            if ((switch_menu.conn == conn) && (switch_menu.switch_dir > 0) &&
+                (switch_menu.action != nullptr))
             {
-                sw_label->action_switch_fwd->setEnabled(false);
+                switch_menu.action->setEnabled(false);
             }
 
             pen.setColor(color_switch_other);
@@ -397,10 +405,10 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         case Switch::IN_ROUTE_MINUS:
         case Switch::IN_ROUTE_PLUS:
         {
-            if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
-                (sw_label->action_switch_fwd != nullptr))
+            if ((switch_menu.conn == conn) && (switch_menu.switch_dir > 0) &&
+                (switch_menu.action != nullptr))
             {
-                sw_label->action_switch_fwd->setEnabled(false);
+                switch_menu.action->setEnabled(false);
             }
 
             pen.setColor(color_switch_other);
@@ -416,11 +424,12 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         }
         default:
         {
-            if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
-                (sw_label->action_switch_fwd != nullptr))
+            if ((switch_menu.conn == conn) && (switch_menu.switch_dir > 0) &&
+                (switch_menu.action != nullptr))
             {
-                sw_label->action_switch_fwd->setEnabled(true);
-                if (sw_label->action_switch_fwd == sw_label->menu->activeAction())
+                switch_menu.action->setEnabled(true);
+                if ((switch_menu.menu) &&
+                    (switch_menu.menu->activeAction() == switch_menu.action))
                 {
                     pen.setColor(color_switch_other_selected);
                     pen.setWidth(switched_width);
@@ -436,6 +445,7 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
                 pen.setColor(color_switch_other);
                 pen.setWidth(other_width);
             }
+
             painter.setPen(pen);
             drawSwitchTraj(fwd_other, true, painter, cursor_pos, distance2, dir);
 
@@ -458,10 +468,10 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         case Switch::IS_BUSY_MINUS:
         case Switch::IS_BUSY_PLUS:
         {
-            if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
-                (sw_label->action_switch_bwd != nullptr))
+            if ((switch_menu.conn == conn) && (switch_menu.switch_dir < 0) &&
+                (switch_menu.action != nullptr))
             {
-                sw_label->action_switch_bwd->setEnabled(false);
+                switch_menu.action->setEnabled(false);
             }
 
             pen.setColor(color_switch_other);
@@ -478,10 +488,10 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         case Switch::IN_ROUTE_MINUS:
         case Switch::IN_ROUTE_PLUS:
         {
-            if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
-                (sw_label->action_switch_bwd != nullptr))
+            if ((switch_menu.conn == conn) && (switch_menu.switch_dir < 0) &&
+                (switch_menu.action != nullptr))
             {
-                sw_label->action_switch_bwd->setEnabled(false);
+                switch_menu.action->setEnabled(false);
             }
 
             pen.setColor(color_switch_other);
@@ -497,11 +507,12 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         }
         default:
         {
-            if ((sw_label != nullptr) && (sw_label->menu != nullptr) &&
-                (sw_label->action_switch_bwd != nullptr))
+            if ((switch_menu.conn == conn) && (switch_menu.switch_dir < 0) &&
+                (switch_menu.action != nullptr))
             {
-                sw_label->action_switch_bwd->setEnabled(true);
-                if (sw_label->action_switch_bwd == sw_label->menu->activeAction())
+                switch_menu.action->setEnabled(true);
+                if ((switch_menu.menu) &&
+                    (switch_menu.menu->activeAction() == switch_menu.action))
                 {
                     pen.setColor(color_switch_other_selected);
                     pen.setWidth(switched_width);
@@ -934,7 +945,14 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
 
     if (event->button() == Qt::RightButton)
     {
-        emit sigOpenTrajectoryMenu(nearest_trajectory);
+        if (nearest_switch)
+        {
+            emit sigOpenSwitchMenu(nearest_switch, nearest_switch_dir);
+        }
+        else
+        {
+            emit sigOpenTrajectoryMenu(nearest_trajectory);
+        }
     }
 }
 
