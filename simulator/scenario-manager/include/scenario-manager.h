@@ -66,7 +66,9 @@ signals:
 
     void sigSignalCommand(QByteArray& signal_data);
 
-    void sigBuildRoute(QByteArray& route_data);
+    void sigBuildTrainRoute(QByteArray& route_data);
+
+    void sigBuildShuntingRoute(QByteArray& route_data);
 
     /// Этот сигнал инициирует сообщение во вьювер,
     /// о необходимости задать имя поезда
@@ -155,7 +157,7 @@ private:
     void taskSwitchBwd(const std::string &switch_name);
 
     /// Открыть сигнал
-    void openSignal(const std::string &conn_name, int dir, bool for_train = true, bool for_shunting = true);
+    void openSignal(const std::string &conn_name, int dir, bool for_train = true, bool for_shunting = true);    
 
     /// Установка задачи открытия сигнала
     void taskOpenSignal(const std::string &conn_name, int dir = 1, bool for_train = true, bool for_shunting = true);
@@ -170,10 +172,10 @@ private:
     void taskSetDelay(double timeout);
 
     /// Задать маршрут
-    void buildRoute(const std::string &start_traj, const std::string &target_traj, int dir);
+    void buildRoute(const std::string &start_traj, const std::string &target_traj, int dir, bool is_train);
 
     /// Установка задачи задания маршрута
-    void taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir);
+    void taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir, bool is_train);
 
     /// Найти индекc поезда по имени
     int findTrainByName(const std::string &name);

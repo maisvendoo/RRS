@@ -2,9 +2,9 @@
 #include    <Journal.h>
 #include    <filesystem.h>
 #include    <datetime.h>
-#include    <route-segment.h>
 #include    <switch-state.h>
-#include    <signals-data-types.h>
+#include    <signal-command.h>
+#include    <route-command.h>
 
 //------------------------------------------------------------------------------
 //
@@ -684,7 +684,7 @@ void ScenarioManager::taskSetDelay(double timeout)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::buildRoute(const std::string &start_traj, const std::string &target_traj, int dir)
+void ScenarioManager::buildRoute(const std::string &start_traj, const std::string &target_traj, int dir, bool is_train)
 {
     route_command_t rc;
     rc.trajectory_begin = QString(start_traj.c_str());
@@ -692,16 +692,24 @@ void ScenarioManager::buildRoute(const std::string &start_traj, const std::strin
     rc.dir = (dir < 0) ? -1 : 1;
 
     QByteArray rc_data = rc.serialize();
-    emit sigBuildRoute(rc_data);
+
+    if (is_train)
+    {
+        emit sigBuildTrainRoute(rc_data);
+    }
+    else
+    {
+        emit sigBuildShuntingRoute(rc_data);
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir)
+void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir, bool is_train)
 {
-    setTask([start_traj, target_traj, dir, this]{
-        this->buildRoute(start_traj, target_traj, dir);
+    setTask([start_traj, target_traj, dir, is_train, this]{
+        this->buildRoute(start_traj, target_traj, dir, is_train);
     });
 }
 
@@ -947,10 +955,22 @@ void ScenarioManager::sys_functions_registration()
     Journal::instance()->info("delay method binding...OK");
 
     lua["buildRoute"] = [this](const std::string &start_traj, const std::string &target_traj, int dir) {
-        this->taskBuildRoute(start_traj, target_traj, dir);
+        this->taskBuildRoute(start_traj, target_traj, dir, true);
     };
 
     Journal::instance()->info("buildRoute method binding...OK");
+
+    lua["buildTrainRoute"] = [this](const std::string &start_traj, const std::string &target_traj, int dir) {
+        this->taskBuildRoute(start_traj, target_traj, dir, true);
+    };
+
+    Journal::instance()->info("buildTrainRoute method binding...OK");
+
+    lua["buildShuntingRoute"] = [this](const std::string &start_traj, const std::string &target_traj, int dir) {
+        this->taskBuildRoute(start_traj, target_traj, dir, false);
+    };
+
+    Journal::instance()->info("buildShuntingRoute method binding...OK");
 
     lua.set_function("setTrigger", [&](sol::function trigger) {
         taskSetPositionTrigger(trigger);
@@ -963,6 +983,18 @@ void ScenarioManager::sys_functions_registration()
     });
 
     Journal::instance()->info("setTimeTrigger method binding...OK");
+
+    lua["openShuntingSignal"] = [this](const std::string &conn_name, int dir){
+        this->taskOpenSignal(conn_name, dir, false, true);
+    };
+
+    Journal::instance()->info("openShuntingSignal method binding...OK");
+
+    lua["openCallSignal"] = [this](const std::string &conn_name, int dir){
+        this->taskOpenSignal(conn_name, dir, false, false);
+    };
+
+    Journal::instance()->info("openCallSignal method binding...OK");
 }
 
 //------------------------------------------------------------------------------
