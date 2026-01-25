@@ -616,7 +616,7 @@ void ScenarioManager::taskSwitchBwd(const std::string &switch_name)
 void ScenarioManager::openSignal(const std::string& conn_name, int dir, bool for_train, bool for_shunting)
 {
     signal_command_t sc = signal_command_t();
-    sc.conn_name = QString(conn_name.c_str());
+    sc.conn_name = QString::fromUtf8(conn_name.c_str());
     sc.sig_dir = dir;
     if (for_train)
     {
