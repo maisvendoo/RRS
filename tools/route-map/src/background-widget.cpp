@@ -1,4 +1,5 @@
 #include    "background-widget.h"
+#include    <switch.h>
 #include    <QPainter>
 
 //------------------------------------------------------------------------------
@@ -28,22 +29,26 @@ void BackGroundWidget::paintEvent(QPaintEvent *event)
     painter.begin(this);
 
     // Серый фон
-    painter.fillRect(rect(), background_color);
+    painter.fillRect(rect(), color_background);
 
     // Траектории маршрута
     if (route_begin_trajectory && route_trajectories.empty())
     {
-        drawTrajectoryHighlight(painter, route_begin_trajectory, QColor(255, 0, 0));
+        drawTrajectoryHighlight(painter, route_begin_trajectory, color_no_route);
     }
     for (auto& traj : route_trajectories)
     {
-        drawTrajectoryHighlight(painter, traj, QColor(0, 255, 0));
+        drawTrajectoryHighlight(painter, traj, color_route);
     }
 
-    // Ближайшая к курсору траетория
-    if (nearest_trajectory != route_begin_trajectory)
+    // Ближайшая к курсору стрелка
+    if (!drawSwitchHighlight(painter, nearest_switch, nearest_switch_dir, color_nearest))
     {
-        drawTrajectoryHighlight(painter, nearest_trajectory, QColor(0, 255, 255));
+        // Или ближайшая к курсору траетория
+        if (nearest_trajectory != route_begin_trajectory)
+        {
+            drawTrajectoryHighlight(painter, nearest_trajectory, color_nearest);
+        }
     }
 
     painter.end();
@@ -52,11 +57,11 @@ void BackGroundWidget::paintEvent(QPaintEvent *event)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void BackGroundWidget::drawTrajectoryHighlight(QPainter &painter, Trajectory *traj, QColor highlight)
+bool BackGroundWidget::drawTrajectoryHighlight(QPainter &painter, Trajectory *traj, QColor highlight)
 {
     if (!traj)
     {
-        return;
+        return false;
     }
 
     float max_width = std::ceil(static_cast<float>(scale)) + 3.0f;
@@ -66,23 +71,118 @@ void BackGroundWidget::drawTrajectoryHighlight(QPainter &painter, Trajectory *tr
     {
         QPen pen;
         pen.setWidth(width * 2.0f + 3.0f);
-        pen.setColor(mix_color(background_color, highlight, (width / max_width)));
-        pen.setCapStyle(Qt::FlatCap);
+        pen.setColor(mix_color(color_background, highlight, (width / max_width)));
+        pen.setCapStyle(Qt::RoundCap);
         higlight_pens.push_back(pen);
         width -= 1.0f;
     }
 
-    for (auto& track : traj->getTracks())
+    for (auto& pen : higlight_pens)
     {
-        QPoint p0 = coord_transform(track.begin_point);
-        QPoint p1 = coord_transform(track.end_point);
-
-        for (auto& pen : higlight_pens)
+        painter.setPen(pen);
+        for (auto& track : traj->getTracks())
         {
-            painter.setPen(pen);
+            QPoint p0 = coord_transform(track.begin_point);
+            QPoint p1 = coord_transform(track.end_point);
             painter.drawLine(p0, p1);
         }
     }
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool BackGroundWidget::drawSwitchHighlight(QPainter& painter, Connector* conn, std::int8_t dir, QColor highlight)
+{
+    Switch* sw = dynamic_cast<Switch*>(conn);
+    if (!sw || (dir == 0))
+    {
+        return false;
+    }
+
+    Trajectory* traj_plus = (dir < 0) ? sw->bwdPlusTraj : sw->fwdPlusTraj;
+    Trajectory* traj_minus = (dir < 0) ? sw->bwdMinusTraj : sw->fwdMinusTraj;
+
+    if ((traj_plus == nullptr) || (traj_minus == nullptr))
+    {
+        return false;
+    }
+
+    float max_width = std::ceil(static_cast<float>(scale)) + 3.0f;
+    float width = max_width;
+    std::vector<QPen> higlight_pens;
+    while (width >= 0.0f)
+    {
+        QPen pen;
+        pen.setWidth(width * 2.0f + 3.0f);
+        pen.setColor(mix_color(color_background, highlight, (width / max_width)));
+        pen.setCapStyle(Qt::RoundCap);
+        higlight_pens.push_back(pen);
+        width -= 1.0f;
+    }
+
+    for (auto& pen : higlight_pens)
+    {
+        painter.setPen(pen);
+
+        for (Trajectory* traj : {traj_plus, traj_minus})
+        {
+            double draw_len = traj->getLength() - 1.0;
+
+            if (dir > 0)
+            {
+                if (Switch* next_sw = dynamic_cast<Switch*>(traj->getFwdConnector());
+                    next_sw && (next_sw->getStateBwd() != Switch::ONE_POSSIBLE_DIRECTION))
+                {
+                    draw_len = traj->getLength() * 0.5;
+                }
+                draw_len = std::min(draw_len, switch_length);
+
+                size_t i = 0;
+                dvec3 fwd = (*(traj->getTracks().begin())).begin_point;
+                QPoint fwd_point = coord_transform(fwd);
+                track_t track_next;
+                while (draw_len > 0.0)
+                {
+                    track_next = *(traj->getTracks().begin() + i);
+                    fwd += track_next.orth * std::min(draw_len, track_next.len);
+                    QPoint fwd_point_next = coord_transform(fwd);
+                    painter.drawLine(fwd_point, fwd_point_next);
+
+                    fwd_point = fwd_point_next;
+                    draw_len = draw_len - track_next.len;
+                    ++i;
+                }
+            }
+            else
+            {
+                if (Switch* next_sw = dynamic_cast<Switch*>(traj->getBwdConnector());
+                    next_sw && (next_sw->getStateFwd() != Switch::ONE_POSSIBLE_DIRECTION))
+                {
+                    draw_len = traj->getLength() * 0.5;
+                }
+                draw_len = std::min(draw_len, switch_length);
+
+                size_t i = 1;
+                dvec3 bwd = (*(traj->getTracks().end() - i)).end_point;
+                QPoint bwd_point = coord_transform(bwd);
+                track_t track_next;
+                while (draw_len > 0.0)
+                {
+                    track_next = *(traj->getTracks().end() - i);
+                    bwd -= track_next.orth * std::min(draw_len, track_next.len);
+                    QPoint bwd_point_next = coord_transform(bwd);
+                    painter.drawLine(bwd_point, bwd_point_next);
+
+                    bwd_point = bwd_point_next;
+                    draw_len = draw_len - track_next.len;
+                    ++i;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 //------------------------------------------------------------------------------
