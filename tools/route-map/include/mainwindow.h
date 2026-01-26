@@ -11,7 +11,6 @@
 #include    <simulator-update-struct.h>
 #include    <background-widget.h>
 #include    <map-widget.h>
-#include    <switch-label.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -106,9 +105,9 @@ private slots:
 
     void slotNearestTrajectoryMenu(Trajectory* nearest_traj);
 
-    void slotSelectTrajectory(Trajectory* nearest_traj);
+    void slotNearestSwitchMenu(Connector* nearest_conn, std::int8_t nearest_switch_dir);
 
-    void slotSwitchConnectorMenu();
+    void slotSelectTrajectory(Trajectory* nearest_traj);
 
     void slotSignalControlMenu();
 
@@ -123,6 +122,8 @@ private slots:
     void slotRecvLogMessage(QString msg);
 
     void slotSetShowTrajStatus(bool is_show);
+
+    void slotSetShowConnStatus(bool is_show);
 
     void slotGetTrainsInfo(QByteArray& data);
 
