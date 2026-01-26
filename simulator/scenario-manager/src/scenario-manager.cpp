@@ -736,7 +736,7 @@ void ScenarioManager::setSwitchsAlongRoute(const std::string &start_traj, const 
 //------------------------------------------------------------------------------
 void ScenarioManager::taskSetSwitchsAlongRoute(const std::string &start_traj, const std::string &target_traj, int dir)
 {
-    setTask([&](){
+    setTask([start_traj, target_traj, dir, this](){
         this->setSwitchsAlongRoute(start_traj, target_traj, dir);
     });
 }
@@ -804,12 +804,24 @@ void ScenarioManager::process_pos_triggers(std::string train_name,
             if (trigger.valid())
             {
                 auto result = trigger(train_name, traj_name, is_busy);
-                if (result.valid() && result.get<bool>())
+                if (result.valid())
                 {
-                    it = triggerList.erase(it); // erase возвращает следующий итератор
-                    if (triggerList.empty())
-                        return;
-                    continue; // не делаем ++it
+                    try
+                    {
+                        if (result.get<bool>())
+                        {
+                            it = triggerList.erase(it); // erase возвращает следующий итератор
+
+                            if (triggerList.empty())
+                                return;
+
+                            continue; // не делаем ++it
+                        }
+                    }
+                    catch (const sol::error &error)
+                    {
+                        Journal::instance()->error(QString("LUA: %1").arg(error.what()));
+                    }
                 }
             }
         }
