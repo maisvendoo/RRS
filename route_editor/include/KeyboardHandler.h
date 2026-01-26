@@ -14,7 +14,7 @@ struct settings_t;
 class KeyboardHandler : public vsg::Inherit<vsg::Visitor, KeyboardHandler>
 {
 public:
-    KeyboardHandler(const settings_t& settings);
+    explicit KeyboardHandler(const settings_t& settings);
 
     void apply(vsg::KeyPressEvent& keyPress) override;
     void apply(vsg::KeyReleaseEvent& keyRelease) override;

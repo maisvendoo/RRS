@@ -6,18 +6,18 @@
 #include <map>
 
 class Outline;
+class SwitchGroup;
 
 namespace vsg
 {
 
 class MatrixTransform;
-class Switch;
 
 }
 
 struct SelectedObjectData
 {
-    vsg::ref_ptr<vsg::Switch> switch_group;
+    vsg::ref_ptr<SwitchGroup> switch_group;
     vsg::ref_ptr<Outline> outline;
 };
 

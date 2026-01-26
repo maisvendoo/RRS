@@ -33,7 +33,7 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
 
             lmb_intersector->traversalMask = MASK_CLICKABLE;
 
-            break;
+            return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
@@ -42,7 +42,7 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
 
             mmb_intersector->traversalMask = MASK_CLICKABLE;
 
-            break;
+            return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
@@ -51,11 +51,11 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
 
             rmb_intersector->traversalMask = MASK_CLICKABLE;
 
-            break;
+            return;
         }
         default:
         {
-            break;
+            return;
         }
     }
 }
@@ -73,23 +73,23 @@ void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
         {
             lmb_intersector = nullptr;
 
-            break;
+            return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
             mmb_intersector = nullptr;
 
-            break;
+            return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
             rmb_intersector = nullptr;
 
-            break;
+            return;
         }
         default:
         {
-            break;
+            return;
         }
     }
 }

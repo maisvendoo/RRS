@@ -18,6 +18,13 @@ class Visitor;
 class SingleSwitch : public vsg::Inherit<vsg::Node, SingleSwitch>
 {
 public:
+    SingleSwitch() = default;
+
+    SingleSwitch(vsg::Mask mask, vsg::ref_ptr<vsg::Node> node)
+        : mask(mask), node(node)
+    {
+    }
+
     vsg::Mask mask = vsg::MASK_ALL;
     vsg::ref_ptr<vsg::Node> node;
 

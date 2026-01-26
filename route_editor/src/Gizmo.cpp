@@ -2,36 +2,23 @@
 
 #include "CameraHandler.h"
 #include "IntersectionHandler.h"
-#include "Mask.h"
 #include "SelectedObjectsMap.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
 
-#include <vsg/app/ViewMatrix.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
-#include <vsg/maths/common.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
-#include <vsg/nodes/Switch.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/Builder.h>
 #include <vsg/utils/ComputeBounds.h>
 #include <vsg/utils/LineSegmentIntersector.h>
 #include <vsg/utils/ShaderSet.h>
 
-#include <cassert>
 #include <cmath>
-
-enum
-{
-    AXIS_X,
-    AXIS_Y,
-    AXIS_Z,
-    TOTAL_AXES
-};
 
 Gizmo::Gizmo(
     const settings_t& settings,
@@ -44,52 +31,126 @@ Gizmo::Gizmo(
 {
     builder.shaderSet = vsg::createFlatShadedShaderSet();
 
-    vsg::ref_ptr<vsg::Node>* arrows[TOTAL_AXES];
-    arrows[AXIS_X] = &arrow_x;
-    arrows[AXIS_Y] = &arrow_y;
-    arrows[AXIS_Z] = &arrow_z;
+    constexpr vsg::vec3 X_AXIS_POSITIVE = {1.0f, 0.0f, 0.0f};
+    constexpr vsg::vec3 Y_AXIS_POSITIVE = {0.0f, 1.0f, 0.0f};
+    constexpr vsg::vec3 Z_AXIS_POSITIVE = {0.0f, 0.0f, 1.0f};
 
-    vsg::vec3 arrow_directions[TOTAL_AXES];
-    arrow_directions[AXIS_X] = {1.0f, 0.0f, 0.0f};
-    arrow_directions[AXIS_Y] = {0.0f, 1.0f, 0.0f};
-    arrow_directions[AXIS_Z] = {0.0f, 0.0f, 1.0f};
+    const vsg::vec3 arrow_x_color = settings.gizmo_arrow_x_color;
+    const vsg::vec3 arrow_y_color = settings.gizmo_arrow_y_color;
+    const vsg::vec3 arrow_z_color = settings.gizmo_arrow_z_color;
 
-    vsg::vec3 arrow_colors[TOTAL_AXES];
-    arrow_colors[AXIS_X] = settings.gizmo_arrow_x_color;
-    arrow_colors[AXIS_Y] = settings.gizmo_arrow_y_color;
-    arrow_colors[AXIS_Z] = settings.gizmo_arrow_z_color;
+    const float plane_width = 100.0f;
+    const float plane_opacity = 0.1f;
+    const float line_thickness = 0.01f;
 
-    vsg::ref_ptr<vsg::Node>* planes[TOTAL_AXES];
-    planes[AXIS_X] = &plane_yz;
-    planes[AXIS_Y] = &plane_xz;
-    planes[AXIS_Z] = &plane_xy;
+    vsg::StateInfo state_info;
+    state_info.blending = true;
 
-    vsg::ref_ptr<SingleSwitch>* plane_switches[TOTAL_AXES];
-    plane_switches[AXIS_X] = &plane_yz_switch;
-    plane_switches[AXIS_Y] = &plane_xz_switch;
-    plane_switches[AXIS_Z] = &plane_xy_switch;
-
-    const float plane_size = 100.0f;
-    const float line_size = 0.01f;
-
-    const auto switch_group = vsg::Switch::create();
-
-    for (int i = 0; i < TOTAL_AXES; ++i)
+    const auto rotate_geometry_info = [&](vsg::GeometryInfo& geometry_info,
+        vsg::vec3 direction) -> void
     {
-        *arrows[i] = create_arrow(arrow_directions[i], arrow_colors[i]);
-        this->addChild(*arrows[i]);
+        if (vsg::length(vsg::cross(Z_AXIS_POSITIVE, direction)) > 0.001f)
+        {
+            const vsg::vec3 axis = vsg::cross(Z_AXIS_POSITIVE, direction);
+            const float angle = std::acos(vsg::dot(Z_AXIS_POSITIVE, direction));
+            geometry_info.transform = vsg::rotate(angle, axis);
+        }
+    };
 
-        *planes[i] = create_plane(plane_size, arrow_directions[i], arrow_colors[i], 0.1f);
-        *plane_switches[i] = SingleSwitch::create();
-        (*plane_switches[i])->mask = vsg::MASK_OFF;
-        (*plane_switches[i])->node = *planes[i];
-        this->addChild(*plane_switches[i]);
+    const auto create_arrow = [&](vsg::vec3 direction,
+        vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
+    {
+        float thickness = settings.gizmo_arrow_thickness;
+        const float length = settings.gizmo_arrow_length;
+        const float opacity = settings.gizmo_opacity;
 
-        switch_group->addChild(vsg::Mask{MASK_GUI}, create_line(
-            plane_size, line_size, i, arrow_colors[i]));
-    }
+        vsg::box box = {
+            vsg::vec3{-thickness, -thickness, 0.0f},
+            vsg::vec3{ thickness,  thickness, length}
+        };
 
-    this->addChild(switch_group);
+        vsg::GeometryInfo geometry_info(box);
+        rotate_geometry_info(geometry_info, direction);
+        geometry_info.color = {color, opacity};
+
+        const auto cylinder = builder.createCylinder(geometry_info, state_info);
+
+        thickness *= 3.0f;
+
+        box.min = {-thickness, -thickness, length};
+        box.max = { thickness,  thickness, length + thickness * 5.0f};
+
+        geometry_info.set(box);
+
+        const auto cone = builder.createCone(geometry_info, state_info);
+
+        const auto arrow = vsg::Group::create();
+        arrow->addChild(cylinder);
+        arrow->addChild(cone);
+
+        return arrow;
+    };
+
+    const auto create_plane = [&](vsg::vec3 normal,
+        vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
+    {
+        const float width = plane_width;
+        const float opacity = plane_opacity;
+
+        const vsg::box box = {
+            vsg::vec3(-width, -width, 0.0f),
+            vsg::vec3( width,  width, 0.0f)
+        };
+
+        vsg::GeometryInfo geometry_info(box);
+        rotate_geometry_info(geometry_info, normal);
+        geometry_info.color = {color, opacity};
+
+        return builder.createQuad(geometry_info, state_info);
+    };
+
+    const auto create_line = [&](vsg::vec3 direction,
+        vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
+    {
+        const float width = plane_width;
+        const float thickness = line_thickness;
+        const float opacity = settings.gizmo_opacity;
+
+        const vsg::box box = {
+            vsg::vec3(-thickness, -thickness, -width),
+            vsg::vec3( thickness,  thickness,  width)
+        };
+
+        vsg::GeometryInfo geometry_info(box);
+        rotate_geometry_info(geometry_info, direction);
+        geometry_info.color = {color, opacity};
+
+        return builder.createCylinder(geometry_info, state_info);
+    };
+
+    arrow_x = create_arrow(X_AXIS_POSITIVE, arrow_x_color);
+    arrow_y = create_arrow(Y_AXIS_POSITIVE, arrow_y_color);
+    arrow_z = create_arrow(Z_AXIS_POSITIVE, arrow_z_color);
+
+    this->addChild(arrow_x);
+    this->addChild(arrow_y);
+    this->addChild(arrow_z);
+
+    const auto plane_yz = create_plane(X_AXIS_POSITIVE, arrow_x_color);
+    const auto plane_xz = create_plane(Y_AXIS_POSITIVE, arrow_y_color);
+    const auto plane_xy = create_plane(Z_AXIS_POSITIVE, arrow_z_color);
+
+    plane_yz_switch = SingleSwitch::create(vsg::MASK_OFF, plane_yz);
+    plane_xz_switch = SingleSwitch::create(vsg::MASK_OFF, plane_xz);
+    plane_xy_switch = SingleSwitch::create(vsg::MASK_OFF, plane_xy);
+
+    this->addChild(plane_yz_switch);
+    this->addChild(plane_xz_switch);
+    this->addChild(plane_xy_switch);
+
+    this->addChild(create_line(X_AXIS_POSITIVE, arrow_x_color));
+    this->addChild(create_line(Y_AXIS_POSITIVE, arrow_y_color));
+    this->addChild(create_line(Z_AXIS_POSITIVE, arrow_z_color));
 }
 
 bool Gizmo::handle_intersections(
@@ -109,99 +170,99 @@ bool Gizmo::handle_intersections(
     vsg::ref_ptr<vsg::Node> clicked_arrow;
     int index = -1;
 
-    vsg::ref_ptr<vsg::Node> arrows[TOTAL_AXES];
-    arrows[AXIS_X] = arrow_x;
-    arrows[AXIS_Y] = arrow_y;
-    arrows[AXIS_Z] = arrow_z;
+    // vsg::ref_ptr<vsg::Node> arrows[TOTAL_AXES];
+    // arrows[AXIS_X] = arrow_x;
+    // arrows[AXIS_Y] = arrow_y;
+    // arrows[AXIS_Z] = arrow_z;
 
-    vsg::vec3 arrow_directions[TOTAL_AXES];
-    arrow_directions[AXIS_X] = {1.0f, 0.0f, 0.0f};
-    arrow_directions[AXIS_Y] = {0.0f, 1.0f, 0.0f};
-    arrow_directions[AXIS_Z] = {0.0f, 0.0f, 1.0f};
+    // vsg::vec3 arrow_directions[TOTAL_AXES];
+    // arrow_directions[AXIS_X] = {1.0f, 0.0f, 0.0f};
+    // arrow_directions[AXIS_Y] = {0.0f, 1.0f, 0.0f};
+    // arrow_directions[AXIS_Z] = {0.0f, 0.0f, 1.0f};
 
-    vsg::ref_ptr<vsg::Node> planes[TOTAL_AXES];
-    planes[AXIS_X] = plane_yz;
-    planes[AXIS_Y] = plane_xz;
-    planes[AXIS_Z] = plane_xy;
+    // vsg::ref_ptr<vsg::Node> planes[TOTAL_AXES];
+    // planes[AXIS_X] = plane_yz;
+    // planes[AXIS_Y] = plane_xz;
+    // planes[AXIS_Z] = plane_xy;
 
-    vsg::ref_ptr<SingleSwitch> plane_switches[TOTAL_AXES];
-    plane_switches[AXIS_X] = plane_yz_switch;
-    plane_switches[AXIS_Y] = plane_xz_switch;
-    plane_switches[AXIS_Z] = plane_xy_switch;
+    // vsg::ref_ptr<SingleSwitch> plane_switches[TOTAL_AXES];
+    // plane_switches[AXIS_X] = plane_yz_switch;
+    // plane_switches[AXIS_Y] = plane_xz_switch;
+    // plane_switches[AXIS_Z] = plane_xy_switch;
 
-    const auto& node_path = intersections.front()->nodePath;
-    assert(!node_path.empty());
+    // const auto& node_path = intersections.front()->nodePath;
+    // assert(!node_path.empty());
 
-    for (const vsg::Node* const node : node_path)
-    {
-        for (int i = 0; i < TOTAL_AXES; ++i)
-        {
-            if (node == arrows[i])
-            {
-                clicked_arrow = arrows[i];
-                index = i;
+    // for (const vsg::Node* const node : node_path)
+    // {
+    //     for (int i = 0; i < TOTAL_AXES; ++i)
+    //     {
+    //         if (node == arrows[i])
+    //         {
+    //             clicked_arrow = arrows[i];
+    //             index = i;
 
-                break;
-            }
-        }
+    //             break;
+    //         }
+    //     }
 
-        if (clicked_arrow)
-        {
-            break;
-        }
-    }
+    //     if (clicked_arrow)
+    //     {
+    //         break;
+    //     }
+    // }
 
-    if (!clicked_arrow)
-    {
-        intersector->intersections.clear();
+    // if (!clicked_arrow)
+    // {
+    //     intersector->intersections.clear();
 
-        return false;
-    }
+    //     return false;
+    // }
 
-    const auto world_intersection = static_cast<vsg::vec3>(
-        intersections.front()->worldIntersection);
+    // const auto world_intersection = static_cast<vsg::vec3>(
+    //     intersections.front()->worldIntersection);
 
-    begin_position = position;
-    begin_position[index] = world_intersection[index];
+    // begin_position = position;
+    // begin_position[index] = world_intersection[index];
 
-    selected_objects_begin_matrixes.clear();
-    for (const auto& [object, _] : selected_objects)
-    {
-        selected_objects_begin_matrixes[object] = object->matrix;
-    }
+    // selected_objects_begin_matrixes.clear();
+    // for (const auto& [object, _] : selected_objects)
+    // {
+    //     selected_objects_begin_matrixes[object] = object->matrix;
+    // }
 
-    const auto camera_front = static_cast<vsg::vec3>(
-        camera_handler->get_front());
+    // const auto camera_front = static_cast<vsg::vec3>(
+    //     camera_handler->get_front());
 
-    const auto camera_to_gizmo = vsg::normalize(begin_position - camera_front);
+    // const auto camera_to_gizmo = vsg::normalize(begin_position - camera_front);
 
-    float min_dot = 2.0f;
-    int min_index = -1;
+    // float min_dot = 2.0f;
+    // int min_index = -1;
 
-    for (int i = 0; i < TOTAL_AXES; ++i)
-    {
-        if (i == index)
-        {
-            continue;
-        }
+    // for (int i = 0; i < TOTAL_AXES; ++i)
+    // {
+    //     if (i == index)
+    //     {
+    //         continue;
+    //     }
 
-        const float dot = std::abs(vsg::dot(camera_to_gizmo,
-            arrow_directions[i]));
+    //     const float dot = std::abs(vsg::dot(camera_to_gizmo,
+    //         arrow_directions[i]));
 
-        // std::printf("%d: %10.3f\n", i, dot);
+    //     // std::printf("%d: %10.3f\n", i, dot);
 
-        if (dot < min_dot)
-        {
-            min_dot = dot;
-            min_index = i;
-        }
-    }
+    //     if (dot < min_dot)
+    //     {
+    //         min_dot = dot;
+    //         min_index = i;
+    //     }
+    // }
 
-    active_plain = planes[min_index];
-    active_plain_switch = plane_switches[min_index];
-    active_plain_switch->mask = MASK_GUI | MASK_CLICKABLE;
+    // active_plain = planes[min_index];
+    // active_plain_switch = plane_switches[min_index];
+    // active_plain_switch->mask = MASK_GUI | MASK_CLICKABLE;
 
-    intersector->intersections.clear();
+    intersections.clear();
 
     return true;
 }
@@ -218,22 +279,23 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
 void Gizmo::update_position()
 {
-    position = {0.0f, 0.0f, 0.0f};
+    curr_position = {0.0f, 0.0f, 0.0f};
 
     for (const auto& [object, _] : selected_objects)
     {
         vsg::ComputeBounds compute_bounds;
         compute_bounds.useNodeBounds = false;
-
         object->accept(compute_bounds);
+
         const auto& bounds = compute_bounds.bounds;
 
-        position += static_cast<vsg::vec3>((bounds.min + bounds.max) / 2.0);
+        curr_position += static_cast<vsg::vec3>(
+            (bounds.min + bounds.max) / 2.0);
     }
 
-    position /= static_cast<float>(selected_objects.size());
+    curr_position /= static_cast<float>(selected_objects.size());
 
-    this->matrix = vsg::translate(position);
+    this->matrix = vsg::translate(curr_position);
 }
 
 void Gizmo::update_scale()
@@ -241,103 +303,7 @@ void Gizmo::update_scale()
     const auto camera_pos = static_cast<vsg::vec3>(
         camera_handler->get_look_at()->eye);
 
-    const float distance_to_camera = vsg::length(position - camera_pos);
-    const float scale = 0.075f * distance_to_camera;
-    this->matrix = vsg::translate(position) * vsg::scale(scale);
-}
-
-vsg::ref_ptr<vsg::Node> Gizmo::create_arrow(
-    vsg::vec3 direction,
-    vsg::vec3 color
-)
-{
-    const float thickness = settings.gizmo_arrow_thickness;
-    const float length = settings.gizmo_arrow_length;
-    const float opacity = settings.gizmo_opacity;
-
-    vsg::box box = {
-        vsg::vec3{-0.5f * thickness, -0.5f * thickness, 0.0f},
-        vsg::vec3{ 0.5f * thickness,  0.5f * thickness, length}
-    };
-
-    vsg::GeometryInfo geometry_info(box);
-    geometry_info.color = {color, opacity};
-
-    constexpr vsg::vec3 Z_AXIS_POSITIVE = {0.0f, 0.0f, 1.0f};
-
-    if (vsg::length(vsg::cross(Z_AXIS_POSITIVE, direction)) > 0.001f)
-    {
-        const vsg::vec3 axis = vsg::cross(Z_AXIS_POSITIVE, direction);
-        const float angle = std::acos(vsg::dot(Z_AXIS_POSITIVE, direction));
-        geometry_info.transform = vsg::rotate(angle, axis);
-    }
-
-    vsg::StateInfo state_info;
-    state_info.blending = true;
-
-    const auto cylinder = builder.createCylinder(geometry_info, state_info);
-
-    box.min = {-1.5f * thickness, -1.5f * thickness, length};
-    box.max = { 1.5f * thickness,  1.5f * thickness, length + 7.0f * thickness};
-    geometry_info.set(box);
-
-    const auto cone = builder.createCone(geometry_info, state_info);
-
-    const auto arrow = vsg::Group::create();
-    arrow->addChild(cylinder);
-    arrow->addChild(cone);
-
-    return arrow;
-}
-
-vsg::ref_ptr<vsg::Node> Gizmo::create_plane(
-    float plane_size,
-    vsg::vec3 rotate_axis,
-    vsg::vec3 color,
-    float opacity
-)
-{
-    vsg::GeometryInfo geometry_info(vsg::box(vsg::vec3(-plane_size,
-        -plane_size, 0.0f), vsg::vec3(plane_size, plane_size, 0.0f)));
-
-    geometry_info.transform = vsg::rotate(vsg::radians(90.0f), rotate_axis);
-    geometry_info.color = {color, opacity};
-
-    vsg::StateInfo state_info;
-    state_info.blending = true;
-
-    return builder.createQuad(geometry_info, state_info);
-}
-
-vsg::ref_ptr<vsg::Node> Gizmo::create_line(
-    const float plane_size,
-    const float line_size,
-    const int plane_component_index,
-    const vsg::vec3& color
-)
-{
-    vsg::vec3 min_vec = {0.0f, 0.0f, 0.0f};
-    vsg::vec3 max_vec = {0.0f, 0.0f, 0.0f};
-
-    for (int i = 0; i < 3; ++i)
-    {
-        if (i == plane_component_index)
-        {
-            min_vec[i] = -plane_size;
-            max_vec[i] = plane_size;
-        }
-        else
-        {
-            min_vec[i] = -line_size;
-            max_vec[i] = line_size;
-        }
-    }
-
-    vsg::GeometryInfo geometry_info(vsg::box(min_vec, max_vec));
-    geometry_info.color = {color, settings.gizmo_opacity};
-
-    vsg::StateInfo state_info;
-    state_info.blending = true;
-
-    return builder.createCylinder(geometry_info, state_info);
+    const float distance_to_camera = vsg::length(curr_position - camera_pos);
+    const float scale = distance_to_camera * 0.075f;
+    this->matrix = vsg::translate(curr_position) * vsg::scale(scale);
 }
