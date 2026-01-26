@@ -199,7 +199,6 @@ void SafetyDevice::off_all_lamps()
 {
     // Очищаем состояние ламп
     std::fill(lamps.begin(), lamps.end(), false);
-    pss_lamp = 0.0f;
 }
 
 //------------------------------------------------------------------------------
