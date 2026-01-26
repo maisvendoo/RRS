@@ -1,5 +1,5 @@
-#ifndef WINDOW_WRAPPER_H
-#define WINDOW_WRAPPER_H
+#ifndef WINDOW_HANDLER_H
+#define WINDOW_HANDLER_H
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
@@ -25,4 +25,4 @@ private:
     vsg::ref_ptr<vsg::Window> window;
 };
 
-#endif // WINDOW_WRAPPER_H
+#endif // WINDOW_HANDLER_H

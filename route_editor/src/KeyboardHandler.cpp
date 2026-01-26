@@ -32,14 +32,15 @@ void KeyboardHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 
 vsg::KeySymbol KeyboardHandler::get_key_binding(Action action) const
 {
+    assert(action >= 0);
     assert(action < TOTAL_ACTIONS);
 
     return key_bindings[action];
 }
 
-bool KeyboardHandler::get_key_state(vsg::KeySymbol sym) const
+bool KeyboardHandler::get_key_state(vsg::KeySymbol key) const
 {
-    const auto& found_it = key_states.find(sym);
+    const auto found_it = key_states.find(key);
 
     return (found_it == key_states.cend()) ? false : found_it->second;
 }
@@ -51,6 +52,7 @@ bool KeyboardHandler::get_shift_state() const
 
 bool KeyboardHandler::get_binding_state(Action action) const
 {
+    assert(action >= 0);
     assert(action < TOTAL_ACTIONS);
 
     return get_key_state(get_key_binding(action));

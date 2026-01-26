@@ -20,7 +20,7 @@ public:
     void apply(vsg::KeyReleaseEvent& keyRelease) override;
 
     vsg::KeySymbol get_key_binding(Action action) const;
-    bool get_key_state(vsg::KeySymbol sym) const;
+    bool get_key_state(vsg::KeySymbol key) const;
     bool get_shift_state() const;
     bool get_binding_state(Action action) const;
 

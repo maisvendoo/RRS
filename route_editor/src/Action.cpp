@@ -4,6 +4,7 @@
 
 const char* to_c_string(Action action)
 {
+    assert(action >= 0);
     assert(action < TOTAL_ACTIONS);
 
     switch (action)

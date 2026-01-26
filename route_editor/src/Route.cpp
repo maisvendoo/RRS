@@ -76,7 +76,17 @@ bool Route::load(
 
     load_static_objects(paged_lods);
 
-    return load_topology();
+    if (!load_topology())
+    {
+        return false;
+    }
+
+    const vsg::CompileResult compile_result =
+        viewer->compileManager->compile(vsg::ref_ptr(this));
+
+    vsg::updateViewer(*viewer, compile_result);
+
+    return true;
 }
 
 const StringMap& Route::get_objects_ref() const
@@ -219,12 +229,7 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
         matrix_transform->addChild(switch_group);
         matrix_transform->setValue("properties", properties);
 
-        const vsg::CompileResult compile_result =
-            viewer->compileManager->compile(matrix_transform);
-
         this->addChild(vsg::MASK_ALL, matrix_transform);
-
-        vsg::updateViewer(*viewer, compile_result);
     }
 }
 
@@ -360,11 +365,6 @@ void Route::load_signals(
         matrix_transform->addChild(switch_group);
         matrix_transform->setValue("properties", properties);
 
-        const vsg::CompileResult compile_result =
-            viewer->compileManager->compile(matrix_transform);
-
         this->addChild(vsg::MASK_ALL, matrix_transform);
-
-        vsg::updateViewer(*viewer, compile_result);
     }
 }

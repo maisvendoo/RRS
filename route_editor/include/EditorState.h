@@ -5,8 +5,7 @@ enum class EditorState
 {
     SELECT_ROUTE,
     LOAD_ROUTE,
-    EDIT_ROUTE,
-    TOTAL_EDITOR_STATES
+    EDIT_ROUTE
 };
 
 #endif // EDITOR_STATE_H
