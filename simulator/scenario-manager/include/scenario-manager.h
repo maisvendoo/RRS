@@ -58,6 +58,8 @@ public:
 
     std::string getTrainName(size_t t_idx);
 
+    bool isTrainAutostarted(size_t t_idx);
+
 signals:
 
     void sigGetSwitchState(QByteArray &switch_data);
@@ -213,7 +215,7 @@ private:
     /// недоступная из Lua)
     void taskTimeTrigger(const simulator_time_t &trig_time, sol::function trigger_func);
 
-    /// Установить триггер на абсолютное время
+    /// Установить триггер на время
     void setTimeTirgger(const std::string &time, sol::function trigger_func);
 
     void setAbsTimeTirgger(const std::string &abs_time, sol::function trigger_func);
@@ -226,6 +228,7 @@ private slots:
 
 public slots:
 
+    /// Построение очереди задач на открытие сигналов
     void slotSetOpenSignalsQueue(QStringList conn_list, int dir, bool for_train, bool for_shunting);
 
     /// Переименование поезда по команде от сервера, принявшего новое имя

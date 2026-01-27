@@ -28,7 +28,9 @@
 #include    "device-list.h"
 
 #include    "physics.h"
-#include "solver-types.h"
+#include    "solver-types.h"
+
+#include    <autopilot.h>
 
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT
@@ -41,6 +43,8 @@
 //------------------------------------------------------------------------------
 class VEHICLE_EXPORT Vehicle : public QObject
 {
+    Q_OBJECT
+
 public:
 
     /// Constructor
@@ -192,6 +196,25 @@ public:
 
     void setBrakeShoesState(bool state);
 
+    std::vector<Autopilot *> getAutopilot()
+    {
+        return autopilot;
+    }
+
+    virtual void OnAutopilot()
+    {
+        auto_start_autopilot = true;
+    }
+
+    virtual void OffAutopilot()
+    {
+
+    }
+
+signals:
+
+    void sigGetTrainParams(int train_idx, double &train_len, double &train_mass);
+
 protected:
 
     /// Vehicle configuration file directory
@@ -320,6 +343,12 @@ protected:
     control_signals_t   control_signals;
 
     feedback_signals_t  feedback_signals;
+
+    /// Automation control module
+    std::vector<Autopilot *> autopilot;
+
+    /// Start autopilot after autostart
+    bool auto_start_autopilot = false;
 
     /// User defined initialization
     virtual void initialization();

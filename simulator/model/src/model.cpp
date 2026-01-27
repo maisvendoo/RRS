@@ -85,6 +85,8 @@ bool Model::init(const simulator_command_line_t &command_line)
 
             trains.push_back(train);
 
+            buildAutostartQueue(train);
+
             QThread *thread = new QThread();
             train_threads.push_back(thread);
             train->moveToThread(thread);
@@ -135,6 +137,9 @@ bool Model::init(const simulator_command_line_t &command_line)
         vehicles_info.vehicles[i].vehicle_length = (*it)->getLength();
         vehicles_info.vehicles[i].vehicle_config_dir = (*it)->getConfigDir();
         vehicles_info.vehicles[i].vehicle_config_file = (*it)->getConfigName();
+
+        connect(*it, &Vehicle::sigGetTrainParams, this, &Model::slotGetTrainParams);
+
         ++i;
     }
     tcp_server->setVehiclesInfo(vehicles_info.serialize());
@@ -241,6 +246,49 @@ void Model::receiveSignalsFromControlPanel(const control_signals_t &control_sign
 {
     if (vehicle_controlled_by_panel)
         vehicle_controlled_by_panel->setControlSignals(control_signals);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::buildAutostartQueue(Train *train)
+{
+    if (train == nullptr)
+    {
+        return;
+    }
+
+    if (scnmgr->isTrainAutostarted(train->getTrainIndex()))
+    {
+        for (auto vehicle : *(train->getVehicles()))
+        {
+            if (!vehicle->getAutopilot().empty())
+            {
+                vehicles_for_autostart.push(vehicle);
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::processAutostartQueue()
+{
+    if (vehicles_for_autostart.empty())
+    {
+        return;
+    }
+
+    Vehicle *vehicle = std::move(vehicles_for_autostart.front());
+    vehicles_for_autostart.pop();
+
+    if (vehicle == nullptr)
+    {
+        return;
+    }
+
+    vehicle->OnAutopilot();
 }
 
 //------------------------------------------------------------------------------
@@ -1048,6 +1096,9 @@ void Model::process()
 
     scnmgr->step(sim_time, integration_time);
 
+    // Обрабатываем очередь на автозапуск
+    processAutostartQueue();
+
     findNearestVehicles();
 
     findFarthestVehicles();
@@ -1210,4 +1261,25 @@ void Model::slotRenameTrainInModel(int train_idx, QString new_name)
     Journal::instance()->info(QString("Rename train: Train %1 has new name %2").arg(t_idx, 4).arg(new_name));
 
     is_trains_changed = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotGetTrainParams(int train_idx, double &train_len, double &train_mass)
+{
+    if (train_idx >= trains.size())
+    {
+        return;
+    }
+
+    auto train  = trains[train_idx];
+
+    if (train == nullptr)
+    {
+        return;
+    }
+
+    train_len = train->getLength();
+    train_mass = train->getMass();
 }

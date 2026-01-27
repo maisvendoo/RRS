@@ -11,13 +11,15 @@ struct scenario_train_data_t
     /// Имя поезда, для последующей его идентификации
     std::string name = "";
     /// Имя конфига поезда
-    std::string train_config;
+    std::string train_config = "";
     /// Имя траектории
-    std::string traj_name;
+    std::string traj_name = "";
     /// Координата на траектории
-    double traj_coord;
+    double traj_coord = 0;
     /// Направление
-    int direction;
+    int direction = 1;
+    /// Признак того, что это бот
+    bool is_auto = false;
 
     void setIndex(size_t idx)
     {

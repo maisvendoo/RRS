@@ -44,6 +44,11 @@ public:
 
     km_state_t getState() const;
 
+    int getMainPos() const
+    {
+        return main_pos;
+    }
+
     enum {
         NUM_SOUNDS = 2,
         REVERS_CHANGE_POS_SOUND = 0,    ///< Звук переключения реверсора

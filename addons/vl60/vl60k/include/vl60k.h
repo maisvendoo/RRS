@@ -22,6 +22,8 @@
 
 #include <array>
 
+#include <vl60-autopilot-types.h>
+
 class ACMotorCompressor;
 class ACMotorFan;
 class AirDistributor;
@@ -77,6 +79,10 @@ public:
 
     /// Инициализация тормозных приборов
     void initBrakeDevices(double p0, double pBP, double pFL) override;
+
+    void OnAutopilot() override;
+
+    void OffAutopilot() override;
 
 private:
 
@@ -134,6 +140,12 @@ private:
     QString airdist_module_name = "vr483";
     /// Имя конфига воздухорапределителя
     QString airdist_config_name = "vr483";
+    /// Имя модуля автоведения
+    QString autopilot_module_name = "vl60-autopilot";
+    /// Имя конфига модуля автоведения
+    QString autopilot_config_name = "vl60k-autopilot";
+    /// Каталог поиска кастомных модулей
+    QString custom_modules_dir = "vl60";
 
     /// Регистратор, для записи параметров
     Registrator *reg = nullptr;
@@ -413,6 +425,14 @@ private:
 
     SpotLight *spotlight[CABS_NUM] = {nullptr, nullptr};
 
+    vl60_control_t *auto_control[CABS_NUM] = {nullptr, nullptr};
+
+    vl60_feedback_t *auto_feedback[CABS_NUM];
+
+    TriggerControl autopilot_switcher[CABS_NUM];
+
+    /// Тумблер "Маневровый/Поездной"
+    TriggerControl tumbler_shunting_mode[CABS_NUM];
 
     /// Чтение конфигурационного файла
     void loadConfig(QString cfg_path) override;
@@ -456,6 +476,9 @@ private:
 
     bool initAutostartProgram(int cab_autostart_request);
 
+    void initAutopilot(const QString& modules_dir, const QString& custom_cfg_dir);
+
+    void prepareCabineForAutopilot(int my_cab_idx, int other_cab_idx);
 
     /// Процесс симуляции
     void process(const simulator_time_t& t, const double& dt) override;
@@ -514,6 +537,8 @@ private:
     /// Моделирование приборов безопасности
     void stepSafetyDevices(const double& t, const double& dt);
 
+    void stepAutopilot(double t, double dt);
+
     void lineContactorsControl(bool state);
 
     float isLineContactorsOff();
@@ -527,6 +552,8 @@ private:
 private slots:
 
     void slotAutoStart();
+
+    void slotInitTrainForAutopilot();
 };
 
 #endif // VL60K_H

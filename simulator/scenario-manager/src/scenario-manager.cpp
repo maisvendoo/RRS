@@ -330,6 +330,19 @@ std::string ScenarioManager::getTrainName(size_t t_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool ScenarioManager::isTrainAutostarted(size_t t_idx)
+{
+    if (t_idx >= train_datas.size())
+    {
+        return false;
+    }
+
+    return train_datas[t_idx].is_auto;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 {
     init_data_t id = launch_init_data;
@@ -723,7 +736,7 @@ void ScenarioManager::setSwitchsAlongRoute(const std::string &start_traj, const 
 //------------------------------------------------------------------------------
 void ScenarioManager::taskSetSwitchsAlongRoute(const std::string &start_traj, const std::string &target_traj, int dir)
 {
-    setTask([&](){
+    setTask([start_traj, target_traj, dir, this](){
         this->setSwitchsAlongRoute(start_traj, target_traj, dir);
     });
 }
@@ -791,12 +804,24 @@ void ScenarioManager::process_pos_triggers(std::string train_name,
             if (trigger.valid())
             {
                 auto result = trigger(train_name, traj_name, is_busy);
-                if (result.valid() && result.get<bool>())
+                if (result.valid())
                 {
-                    it = triggerList.erase(it); // erase возвращает следующий итератор
-                    if (triggerList.empty())
-                        return;
-                    continue; // не делаем ++it
+                    try
+                    {
+                        if (result.get<bool>())
+                        {
+                            it = triggerList.erase(it); // erase возвращает следующий итератор
+
+                            if (triggerList.empty())
+                                return;
+
+                            continue; // не делаем ++it
+                        }
+                    }
+                    catch (const sol::error &error)
+                    {
+                        Journal::instance()->error(QString("LUA: %1").arg(error.what()));
+                    }
                 }
             }
         }
@@ -903,7 +928,8 @@ void ScenarioManager::cpp_types_registration()
                                             "config", &scenario_train_data_t::train_config,
                                             "traj", &scenario_train_data_t::traj_name,
                                             "coord", &scenario_train_data_t::traj_coord,
-                                            "dir", &scenario_train_data_t::direction);
+                                            "dir", &scenario_train_data_t::direction,
+                                            "auto", &scenario_train_data_t::is_auto);
 
     Journal::instance()->info("TrainData => scenario_train_data_t binding...OK");
 }

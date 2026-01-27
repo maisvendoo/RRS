@@ -237,5 +237,7 @@ void VL60pk::loadConfig(QString cfg_path)
         cfg.getString(secName, "AirDistConfig", airdist_config_name);
         cfg.getString(secName, "ElectroAirDistModule", electro_airdist_module_name);
         cfg.getString(secName, "ElectroAirDistConfig", electro_airdist_config_name);
+        cfg.getString(secName, "AutopilotModule", autopilot_module_name);
+        cfg.getString(secName, "AutopilotConfig", autopilot_config_name);
     }
 }

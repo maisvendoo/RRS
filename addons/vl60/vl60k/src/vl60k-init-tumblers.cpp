@@ -330,5 +330,12 @@ void VL60k::initControl(const QString& modules_dir, const QString& custom_cfg_di
         rb[cab_idx][RBP].setKeySymbolOff(KEY_Undefined);
         rb[cab_idx][RBP].setKeyModifierOff(KEY_Undefined);
         rb[cab_idx][RBP].setControl(&pressed_keys_by_cabine[cab_idx]);
+
+        // Тумблер "Маневровый/Поездной"
+        tumbler_shunting_mode[cab_idx].setKeySymbolOn(KEY_Tilde);
+        tumbler_shunting_mode[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        tumbler_shunting_mode[cab_idx].setKeySymbolOff(KEY_Tilde);
+        tumbler_shunting_mode[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        tumbler_shunting_mode[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
     }
 }

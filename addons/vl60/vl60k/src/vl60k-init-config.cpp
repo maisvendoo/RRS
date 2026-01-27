@@ -235,5 +235,7 @@ void VL60k::loadConfig(QString cfg_path)
         cfg.getString(secName, "LocoCraneConfig", loco_crane_config_name);
         cfg.getString(secName, "AirDistModule", airdist_module_name);
         cfg.getString(secName, "AirDistConfig", airdist_config_name);
+        cfg.getString(secName, "AutopilotModule", autopilot_module_name);
+        cfg.getString(secName, "AutopilotConfig", autopilot_config_name);
     }
 }

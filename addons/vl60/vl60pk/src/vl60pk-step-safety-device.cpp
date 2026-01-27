@@ -38,6 +38,7 @@ void VL60pk::stepSafetyDevices(const double& t, const double& dt)
         safety_device[cab_idx]->setRBSstate(rb[cab_idx][RBS].getState());
         safety_device[cab_idx]->setKeyEPK(epk[cab_idx]->isKeyOn());
         safety_device[cab_idx]->setVelocity(speed_meter[cab_idx]->getVelocity());
+        safety_device[cab_idx]->setShuntingModeState(tumbler_shunting_mode[cab_idx].getState());
         safety_device[cab_idx]->step(t, dt);
 
         // Электропневматический клапан автостопа

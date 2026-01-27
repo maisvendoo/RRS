@@ -12,6 +12,7 @@
 #include "pneumo-hose.h"
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"
+#include <kme-60-044.h>
 
 //------------------------------------------------------------------------
 //
