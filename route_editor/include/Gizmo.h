@@ -13,6 +13,7 @@
 #include <map>
 
 class CameraHandler;
+class IntersectionHandler;
 class SingleSwitch;
 struct settings_t;
 
@@ -20,7 +21,6 @@ namespace vsg
 {
 
 class ButtonReleaseEvent;
-class LineSegmentIntersector;
 class MoveEvent;
 class Node;
 
@@ -32,12 +32,11 @@ public:
     Gizmo(
         const settings_t& settings,
         vsg::ref_ptr<CameraHandler> camera_handler,
+        vsg::ref_ptr<IntersectionHandler> intersection_handler,
         const SelectedObjectsMap& selected_objects
     );
 
-    bool handle_intersections(
-        vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
-    );
+    bool handle_intersections();
 
     void apply(const vsg::ButtonReleaseEvent& buttonRelease);
     void apply(const vsg::MoveEvent& moveEvent);
@@ -47,6 +46,7 @@ public:
 
 private:
     vsg::ref_ptr<CameraHandler> camera_handler;
+    vsg::ref_ptr<IntersectionHandler> intersection_handler;
     const SelectedObjectsMap& selected_objects;
 
     vsg::Builder builder;

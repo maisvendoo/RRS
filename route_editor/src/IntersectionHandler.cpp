@@ -94,6 +94,14 @@ void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
     }
 }
 
+vsg::ref_ptr<vsg::LineSegmentIntersector> IntersectionHandler::apply_(
+    vsg::MoveEvent& moveEvent
+)
+{
+    return vsg::LineSegmentIntersector::create(
+        *camera, moveEvent.x, moveEvent.y);
+}
+
 vsg::ref_ptr<vsg::LineSegmentIntersector>
 IntersectionHandler::get_lmb_intersector() const
 {

@@ -43,7 +43,8 @@ ObjectSelector::ObjectSelector(
     assert(scene_graph);
     assert(observer_viewer);
 
-    gizmo = Gizmo::create(settings, camera_handler, selected_objects);
+    gizmo = Gizmo::create(settings, camera_handler,
+        intersection_handler, selected_objects);
 
     gizmo_switch = SingleSwitch::create(vsg::MASK_OFF, gizmo);
 
@@ -57,25 +58,24 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    const auto lmb_intersector = intersection_handler->get_lmb_intersector();
-    if (!lmb_intersector)
-    {
-        return;
-    }
-
     const bool selected_objects_are_empty = selected_objects.empty();
 
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
-    if (!selected_objects_are_empty &&
-        gizmo->handle_intersections(lmb_intersector))
+    if (!selected_objects_are_empty && gizmo->handle_intersections())
     {
         return;
     }
 
-    scene_graph->accept(*lmb_intersector);
+    const auto intersector = intersection_handler->get_lmb_intersector();
+    if (!intersector)
+    {
+        return;
+    }
 
-    auto& intersections = lmb_intersector->intersections;
+    scene_graph->accept(*intersector);
+
+    auto& intersections = intersector->intersections;
     if (intersections.empty())
     {
         // If we clicked on empty space without shift

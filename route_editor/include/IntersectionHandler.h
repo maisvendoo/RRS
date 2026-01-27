@@ -12,6 +12,7 @@ namespace vsg
 class ButtonPressEvent;
 class ButtonReleaseEvent;
 class Camera;
+class MoveEvent;
 
 }
 
@@ -23,6 +24,10 @@ public:
 
     void apply(vsg::ButtonPressEvent& buttonPress) override;
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
+
+    vsg::ref_ptr<vsg::LineSegmentIntersector> apply_(
+        vsg::MoveEvent& moveEvent
+    );
 
     vsg::ref_ptr<vsg::LineSegmentIntersector> get_lmb_intersector() const;
     vsg::ref_ptr<vsg::LineSegmentIntersector> get_mmb_intersector() const;

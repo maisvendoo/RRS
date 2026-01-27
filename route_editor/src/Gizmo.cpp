@@ -31,12 +31,15 @@ static constexpr vsg::vec3 Z_AXIS_POSITIVE = {0.0f, 0.0f, 1.0f};
 Gizmo::Gizmo(
     const settings_t& settings,
     vsg::ref_ptr<CameraHandler> camera_handler,
+    vsg::ref_ptr<IntersectionHandler> intersection_handler,
     const SelectedObjectsMap& selected_objects
 )
     : camera_handler(camera_handler)
+    , intersection_handler(intersection_handler)
     , selected_objects(selected_objects)
 {
     assert(camera_handler);
+    assert(intersection_handler);
 
     builder.shaderSet = vsg::createFlatShadedShaderSet();
 
@@ -159,11 +162,13 @@ Gizmo::Gizmo(
     this->addChild(plane_xy_switch);
 }
 
-bool Gizmo::handle_intersections(
-    vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
-)
+bool Gizmo::handle_intersections()
 {
-    assert(intersector);
+    const auto intersector = intersection_handler->get_lmb_intersector();
+    if (!intersector)
+    {
+        return false;
+    }
 
     this->accept(*intersector);
 
@@ -173,7 +178,7 @@ bool Gizmo::handle_intersections(
         return false;
     }
 
-    IntersectionHandler::sort_intersections(intersections);
+    intersection_handler->sort_intersections(intersections);
 
     const auto intersection = intersections.front();
     const auto world_intersection = static_cast<vsg::vec3>(
