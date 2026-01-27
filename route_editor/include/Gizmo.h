@@ -63,6 +63,7 @@ private:
     vsg::vec3 curr_position;
     vsg::vec3 begin_position;
     MatrixMap selected_objects_begin_matrixes;
+    vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;
 };
 

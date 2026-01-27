@@ -24,6 +24,10 @@
 #include <cassert>
 #include <cmath>
 
+static constexpr vsg::vec3 X_AXIS_POSITIVE = {1.0f, 0.0f, 0.0f};
+static constexpr vsg::vec3 Y_AXIS_POSITIVE = {0.0f, 1.0f, 0.0f};
+static constexpr vsg::vec3 Z_AXIS_POSITIVE = {0.0f, 0.0f, 1.0f};
+
 Gizmo::Gizmo(
     const settings_t& settings,
     vsg::ref_ptr<CameraHandler> camera_handler,
@@ -36,16 +40,12 @@ Gizmo::Gizmo(
 
     builder.shaderSet = vsg::createFlatShadedShaderSet();
 
-    constexpr vsg::vec3 X_AXIS_POSITIVE = {1.0f, 0.0f, 0.0f};
-    constexpr vsg::vec3 Y_AXIS_POSITIVE = {0.0f, 1.0f, 0.0f};
-    constexpr vsg::vec3 Z_AXIS_POSITIVE = {0.0f, 0.0f, 1.0f};
-
     const vsg::vec3 arrow_x_color = settings.gizmo_arrow_x_color;
     const vsg::vec3 arrow_y_color = settings.gizmo_arrow_y_color;
     const vsg::vec3 arrow_z_color = settings.gizmo_arrow_z_color;
 
     const float plane_width = 100.0f;
-    const float plane_opacity = 0.1f;
+    const float plane_opacity = 0.02f;
     const float line_thickness = 0.01f;
 
     vsg::StateInfo state_info;
@@ -189,24 +189,49 @@ bool Gizmo::handle_intersections(
         }
     };
 
+    const auto camera_front = static_cast<vsg::vec3>(
+        camera_handler->get_front());
+
+    const float arrow_x_dot = std::abs(vsg::dot(camera_front, X_AXIS_POSITIVE));
+    const float arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVE));
+    const float arrow_z_dot = std::abs(vsg::dot(camera_front, Z_AXIS_POSITIVE));
+
     for (const vsg::Node* node : node_path)
     {
         if (node == arrow_x)
         {
             save_begin_positions();
-            active_plain_switch = plane_yz_switch;
+
+            active_arrow = arrow_x;
+
+            active_plain_switch = (arrow_y_dot > arrow_z_dot)
+                ? plane_xz_switch
+                : plane_xy_switch;
+
             break;
         }
         else if (node == arrow_y)
         {
             save_begin_positions();
-            active_plain_switch = plane_xz_switch;
+
+            active_arrow = arrow_y;
+
+            active_plain_switch = (arrow_x_dot > arrow_z_dot)
+                ? plane_yz_switch
+                : plane_xy_switch;
+
             break;
         }
         else if (node == arrow_z)
         {
             save_begin_positions();
-            active_plain_switch = plane_xy_switch;
+
+            active_arrow = arrow_z;
+
+            active_plain_switch = (arrow_x_dot > arrow_y_dot)
+                ? plane_yz_switch
+                : plane_xz_switch;
+
             break;
         }
     }
@@ -223,12 +248,26 @@ bool Gizmo::handle_intersections(
 
 void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
 {
-    (void)buttonRelease;
+    if (buttonRelease.handled)
+    {
+        return;
+    }
+
+    if (active_plain_switch)
+    {
+        active_arrow = nullptr;
+
+        active_plain_switch->mask = vsg::MASK_OFF;
+        active_plain_switch = nullptr;
+    }
 }
 
 void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 {
-    (void)moveEvent;
+    if (moveEvent.handled)
+    {
+        return;
+    }
 }
 
 void Gizmo::update_position()

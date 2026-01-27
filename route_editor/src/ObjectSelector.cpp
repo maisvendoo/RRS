@@ -153,12 +153,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
-    (void)buttonRelease;
+    gizmo->apply(buttonRelease);
 }
 
 void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
-    (void)moveEvent;
+    gizmo->apply(moveEvent);
 }
 
 void ObjectSelector::apply(vsg::FrameEvent& frame)
