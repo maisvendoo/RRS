@@ -87,8 +87,11 @@ bool RouteEditor::initialize()
         vsg::ClearAttachments::Attachments{attachment},
         vsg::ClearAttachments::Rects{rect});
 
-    const auto gui_view = vsg::View::create(camera, scene_graph);
-    gui_view->mask = MASK_GUI;
+    const auto gui_view1 = vsg::View::create(camera, scene_graph);
+    gui_view1->mask = MASK_GUI1;
+
+    const auto gui_view2 = vsg::View::create(camera, scene_graph);
+    gui_view2->mask = MASK_GUI2;
 
     const auto editor_gui = EditorGui::create(settings, state,
         keyboard_handler->get_key_bindings(), camera_handler->get_perspective(),
@@ -99,7 +102,10 @@ bool RouteEditor::initialize()
     render_graph = vsg::RenderGraph::create(window);
     render_graph->addChild(scene_view);
     render_graph->addChild(clear_attachments);
-    render_graph->addChild(gui_view);
+    render_graph->addChild(gui_view1);
+    render_graph->addChild(clear_attachments);
+    render_graph->addChild(gui_view2);
+    render_graph->addChild(clear_attachments);
     render_graph->addChild(render_gui);
 
     const auto command_graph = vsg::CommandGraph::create(window, render_graph);

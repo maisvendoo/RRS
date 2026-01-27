@@ -45,7 +45,7 @@ Gizmo::Gizmo(
     const vsg::vec3 arrow_z_color = settings.gizmo_arrow_z_color;
 
     const float plane_width = 100.0f;
-    const float plane_opacity = 0.02f;
+    const float plane_opacity = 0.1f;
     const float line_thickness = 0.01f;
 
     vsg::StateInfo state_info;
@@ -142,6 +142,10 @@ Gizmo::Gizmo(
     this->addChild(arrow_y);
     this->addChild(arrow_z);
 
+    this->addChild(create_line(X_AXIS_POSITIVE, arrow_x_color));
+    this->addChild(create_line(Y_AXIS_POSITIVE, arrow_y_color));
+    this->addChild(create_line(Z_AXIS_POSITIVE, arrow_z_color));
+
     const auto plane_yz = create_plane(X_AXIS_POSITIVE, arrow_x_color);
     const auto plane_xz = create_plane(Y_AXIS_POSITIVE, arrow_y_color);
     const auto plane_xy = create_plane(Z_AXIS_POSITIVE, arrow_z_color);
@@ -153,10 +157,6 @@ Gizmo::Gizmo(
     this->addChild(plane_yz_switch);
     this->addChild(plane_xz_switch);
     this->addChild(plane_xy_switch);
-
-    this->addChild(create_line(X_AXIS_POSITIVE, arrow_x_color));
-    this->addChild(create_line(Y_AXIS_POSITIVE, arrow_y_color));
-    this->addChild(create_line(Z_AXIS_POSITIVE, arrow_z_color));
 }
 
 bool Gizmo::handle_intersections(
@@ -238,7 +238,7 @@ bool Gizmo::handle_intersections(
 
     if (active_plain_switch)
     {
-        active_plain_switch->mask = MASK_GUI | MASK_CLICKABLE;
+        active_plain_switch->mask = MASK_GUI1 | MASK_CLICKABLE;
     }
 
     intersections.clear();

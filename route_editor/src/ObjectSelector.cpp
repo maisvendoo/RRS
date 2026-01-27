@@ -47,7 +47,7 @@ ObjectSelector::ObjectSelector(
 
     gizmo_switch = SingleSwitch::create(vsg::MASK_OFF, gizmo);
 
-    scene_graph->addChild(vsg::Mask{MASK_GUI | MASK_CLICKABLE}, gizmo_switch);
+    scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo_switch);
 }
 
 void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
@@ -90,7 +90,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
         gizmo_switch->mask = selected_objects.empty()
             ? vsg::MASK_OFF
-            : MASK_GUI | MASK_CLICKABLE;
+            : MASK_GUI1 | MASK_CLICKABLE;
 
         return;
     }
@@ -147,7 +147,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     else
     {
         gizmo->update_position();
-        gizmo_switch->mask = MASK_GUI | MASK_CLICKABLE;
+        gizmo_switch->mask = MASK_GUI1 | MASK_CLICKABLE;
     }
 }
 
@@ -190,7 +190,7 @@ void ObjectSelector::select_object(
 
         const auto compile_result = compile_manager->compile(outline);
 
-        switch_group->addChild(vsg::Mask{MASK_GUI}, outline);
+        switch_group->addChild(vsg::Mask{MASK_GUI2}, outline);
 
         vsg::updateViewer(*viewer, compile_result);
 
