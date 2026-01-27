@@ -431,6 +431,9 @@ private:
 
     TriggerControl autopilot_switcher[CABS_NUM];
 
+    /// Тумблер "Маневровый/Поездной"
+    TriggerControl tumbler_shunting_mode[CABS_NUM];
+
     /// Чтение конфигурационного файла
     void loadConfig(QString cfg_path) override;
 
