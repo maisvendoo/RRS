@@ -80,7 +80,7 @@ bool BackGroundWidget::drawTrajectoryHighlight(QPainter &painter, Trajectory *tr
     for (auto& pen : higlight_pens)
     {
         painter.setPen(pen);
-        for (auto& track : traj->getTracks())
+        for (const auto& track : traj->getTracks())
         {
             QPoint p0 = coord_transform(track.begin_point);
             QPoint p1 = coord_transform(track.end_point);
@@ -140,18 +140,18 @@ bool BackGroundWidget::drawSwitchHighlight(QPainter& painter, Connector* conn, s
                 draw_len = std::min(draw_len, switch_length);
 
                 size_t i = 0;
-                dvec3 fwd = (*(traj->getTracks().begin())).begin_point;
+                dvec3 fwd = traj->getTracks().begin()->begin_point;
                 QPoint fwd_point = coord_transform(fwd);
-                track_t track_next;
+                const track_t* track_next = nullptr;
                 while (draw_len > 0.0)
                 {
-                    track_next = *(traj->getTracks().begin() + i);
-                    fwd += track_next.orth * std::min(draw_len, track_next.len);
+                    track_next = &traj->getTracks().at(i);
+                    fwd += track_next->orth * std::min(draw_len, track_next->len);
                     QPoint fwd_point_next = coord_transform(fwd);
                     painter.drawLine(fwd_point, fwd_point_next);
 
                     fwd_point = fwd_point_next;
-                    draw_len = draw_len - track_next.len;
+                    draw_len = draw_len - track_next->len;
                     ++i;
                 }
             }
@@ -165,18 +165,18 @@ bool BackGroundWidget::drawSwitchHighlight(QPainter& painter, Connector* conn, s
                 draw_len = std::min(draw_len, switch_length);
 
                 size_t i = 1;
-                dvec3 bwd = (*(traj->getTracks().end() - i)).end_point;
+                dvec3 bwd = (traj->getTracks().end() - i)->end_point;
                 QPoint bwd_point = coord_transform(bwd);
-                track_t track_next;
+                const track_t* track_next = nullptr;
                 while (draw_len > 0.0)
                 {
-                    track_next = *(traj->getTracks().end() - i);
-                    bwd -= track_next.orth * std::min(draw_len, track_next.len);
+                    track_next = &traj->getTracks().at(traj->getTracks().size() - i);
+                    bwd -= track_next->orth * std::min(draw_len, track_next->len);
                     QPoint bwd_point_next = coord_transform(bwd);
                     painter.drawLine(bwd_point, bwd_point_next);
 
                     bwd_point = bwd_point_next;
-                    draw_len = draw_len - track_next.len;
+                    draw_len = draw_len - track_next->len;
                     ++i;
                 }
             }

@@ -129,11 +129,11 @@ void TopologyCheck::find_ends_without_connector(Trajectory *traj)
 void TopologyCheck::check_trajectory(Trajectory *traj)
 {
     int point_num = 1;
-    for (auto& track : traj->getTracks())
+    for (const auto& track : traj->getTracks())
     {
         if (point_num > 1)
         {
-            auto prev_track = traj->getTracks().at(point_num - 2);
+            const auto& prev_track = traj->getTracks().at(point_num - 2);
             double curvature = calcCurvature(prev_track, track);
             if (curvature > maximum_curvature)
             {

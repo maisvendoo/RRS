@@ -151,7 +151,7 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::vector<TrajectoryDevice *> Trajectory::getTrajectoryDevices()
+const std::vector<TrajectoryDevice *>& Trajectory::getTrajectoryDevices() const
 {
     return devices;
 }

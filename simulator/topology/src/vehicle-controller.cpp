@@ -364,7 +364,7 @@ void VehicleController::updateTrajectories()
         if (next_traj == nullptr)
             continue;
 
-        for (auto traj_device : next_traj->getTrajectoryDevices())
+        for (auto* traj_device : next_traj->getTrajectoryDevices())
         {
             // Связываем оборудование ПЕ и путевое оборудование
             if (veh_device.device->getName() == traj_device->getName())
