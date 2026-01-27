@@ -152,6 +152,12 @@ void SafetyDevice::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void SafetyDevice::alsn_process(int code_alsn)
 {
+    // Отрезаем сигнал с дешифратора АЛСН при маневровом режиме
+    if (is_shinting_mode)
+    {
+        code_alsn = ALSN::NO_CODE;
+    }
+
     switch (code_alsn)
     {
     case ALSN::NO_CODE:

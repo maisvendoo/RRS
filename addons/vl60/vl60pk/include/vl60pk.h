@@ -451,6 +451,9 @@ private:
 
     vl60_feedback_t *auto_feedback[CABS_NUM];
 
+    /// Тумблер "Маневровый/Поездной"
+    TriggerControl tumbler_shunting_mode[CABS_NUM];
+
     /// Чтение конфигурационного файла
     void loadConfig(QString cfg_path) override;
 

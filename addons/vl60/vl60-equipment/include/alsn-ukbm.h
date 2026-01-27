@@ -43,6 +43,12 @@ public:
     /// Прием состояния РБС
     void setRBSstate(bool state) { state_RBS = state; }
 
+    /// Прием сигнала от переключателя маневрового режима
+    void setShuntingModeState(bool is_shunting_mode)
+    {
+        this->is_shinting_mode = is_shunting_mode;
+    }
+
     /// Прием скорости от скоростемера
     void setVelocity(double v) { v_kmh = v * Physics::kmh; }
 
@@ -95,6 +101,9 @@ private:
 
     /// таймер ПСС
     Timer *pss_timer = new Timer(8.0, false);
+
+    /// Признак маневрового режима
+    bool is_shinting_mode = false;
 
     void preStep(state_vector_t &Y, double t) override;
 

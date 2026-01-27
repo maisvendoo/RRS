@@ -177,5 +177,7 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         epb_switch[cab_idx].step();
 
         autopilot_switcher[cab_idx].step();
+
+        tumbler_shunting_mode[cab_idx].step();
     }    
 }
