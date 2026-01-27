@@ -2,6 +2,7 @@
 
 #include "CameraHandler.h"
 #include "IntersectionHandler.h"
+#include "Mask.h"
 #include "SelectedObjectsMap.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
@@ -13,6 +14,7 @@
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/nodes/Node.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/Builder.h>
 #include <vsg/utils/ComputeBounds.h>
@@ -27,8 +29,7 @@ Gizmo::Gizmo(
     vsg::ref_ptr<CameraHandler> camera_handler,
     const SelectedObjectsMap& selected_objects
 )
-    : settings(settings)
-    , camera_handler(camera_handler)
+    : camera_handler(camera_handler)
     , selected_objects(selected_objects)
 {
     assert(camera_handler);
@@ -48,6 +49,7 @@ Gizmo::Gizmo(
     const float line_thickness = 0.01f;
 
     vsg::StateInfo state_info;
+    state_info.two_sided = true;
     state_info.blending = true;
 
     const auto rotate_geometry_info = [&](vsg::GeometryInfo& geometry_info,
@@ -173,7 +175,46 @@ bool Gizmo::handle_intersections(
 
     IntersectionHandler::sort_intersections(intersections);
 
-    // TODO
+    const auto& node_path = intersections.front()->nodePath;
+    assert(!node_path.empty());
+
+    const auto save_begin_positions = [&]() -> void
+    {
+        begin_position = curr_position;
+
+        selected_objects_begin_matrixes.clear();
+        for (const auto& [object, _] : selected_objects)
+        {
+            selected_objects_begin_matrixes[object] = object->matrix;
+        }
+    };
+
+    for (const vsg::Node* node : node_path)
+    {
+        if (node == arrow_x)
+        {
+            save_begin_positions();
+            active_plain_switch = plane_yz_switch;
+            break;
+        }
+        else if (node == arrow_y)
+        {
+            save_begin_positions();
+            active_plain_switch = plane_xz_switch;
+            break;
+        }
+        else if (node == arrow_z)
+        {
+            save_begin_positions();
+            active_plain_switch = plane_xy_switch;
+            break;
+        }
+    }
+
+    if (active_plain_switch)
+    {
+        active_plain_switch->mask = MASK_GUI | MASK_CLICKABLE;
+    }
 
     intersections.clear();
 

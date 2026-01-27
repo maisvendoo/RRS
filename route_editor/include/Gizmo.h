@@ -46,7 +46,6 @@ public:
     void update_scale();
 
 private:
-    const settings_t& settings;
     vsg::ref_ptr<CameraHandler> camera_handler;
     const SelectedObjectsMap& selected_objects;
 
