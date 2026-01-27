@@ -175,13 +175,15 @@ bool Gizmo::handle_intersections(
 
     IntersectionHandler::sort_intersections(intersections);
 
-    const auto& node_path = intersections.front()->nodePath;
+    const auto intersection = intersections.front();
+    const auto world_intersection = static_cast<vsg::vec3>(
+        intersection->worldIntersection);
+
+    const auto& node_path = intersection->nodePath;
     assert(!node_path.empty());
 
-    const auto save_begin_positions = [&]() -> void
+    const auto save_selected_objects_begin_matrixes = [&]() -> void
     {
-        begin_position = curr_position;
-
         selected_objects_begin_matrixes.clear();
         for (const auto& [object, _] : selected_objects)
         {
@@ -200,7 +202,10 @@ bool Gizmo::handle_intersections(
     {
         if (node == arrow_x)
         {
-            save_begin_positions();
+            begin_position = curr_position;
+            begin_position.x = world_intersection.x;
+
+            save_selected_objects_begin_matrixes();
 
             active_arrow = arrow_x;
 
@@ -212,7 +217,10 @@ bool Gizmo::handle_intersections(
         }
         else if (node == arrow_y)
         {
-            save_begin_positions();
+            begin_position = curr_position;
+            begin_position.y = world_intersection.y;
+
+            save_selected_objects_begin_matrixes();
 
             active_arrow = arrow_y;
 
@@ -224,7 +232,10 @@ bool Gizmo::handle_intersections(
         }
         else if (node == arrow_z)
         {
-            save_begin_positions();
+            begin_position = curr_position;
+            begin_position.z = world_intersection.z;
+
+            save_selected_objects_begin_matrixes();
 
             active_arrow = arrow_z;
 
@@ -248,23 +259,20 @@ bool Gizmo::handle_intersections(
 
 void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
 {
-    if (buttonRelease.handled)
+    if (buttonRelease.handled || !active_plain_switch)
     {
         return;
     }
 
-    if (active_plain_switch)
-    {
-        active_arrow = nullptr;
+    active_arrow = nullptr;
 
-        active_plain_switch->mask = vsg::MASK_OFF;
-        active_plain_switch = nullptr;
-    }
+    active_plain_switch->mask = vsg::MASK_OFF;
+    active_plain_switch = nullptr;
 }
 
 void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 {
-    if (moveEvent.handled)
+    if (moveEvent.handled || !active_plain_switch)
     {
         return;
     }
