@@ -39,7 +39,10 @@ void SafetyDevice::preStep(state_vector_t &Y, double t)
     // Ничего не делаем при выключенном ЭПК
     if (!key_epk)
     {
+        // Выключаем лампы ЛС
         off_all_lamps();
+        // Гасим лампу ПСС
+        pss_lamp = 0.0f;
         is_red.reset();
         return;
     }
