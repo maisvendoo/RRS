@@ -6,6 +6,8 @@
 
 #include <vsg/core/ref_ptr.h>
 
+#include <string>
+
 class CameraHandler;
 class IntersectionHandler;
 class KeyboardHandler;
@@ -27,6 +29,9 @@ class Viewer;
 class RouteEditor
 {
 public:
+    RouteEditor();
+    ~RouteEditor();
+
     bool initialize();
     void run();
 
@@ -47,6 +52,8 @@ private:
     vsg::ref_ptr<vsg::RenderGraph> render_graph;
     vsg::ref_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<ObjectSelector> object_selector;
+
+    std::string route_directory;
 };
 
 #endif // ROUTE_EDITOR_H

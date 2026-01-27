@@ -110,7 +110,7 @@
         <!-- Длина стрелок гизмо -->
         <GizmoArrowLength>3.0</GizmoArrowLength>
         <!-- Толщина стрелок гизмо-->
-        <GizmoArrowThickness>0.1</GizmoArrowThickness>
+        <GizmoArrowThickness>0.05</GizmoArrowThickness>
         <!-- Цвет оси X гизмо -->
         <GizmoXAxisColorR>0.859</GizmoXAxisColorR>
         <GizmoXAxisColorG>0.188</GizmoXAxisColorG>

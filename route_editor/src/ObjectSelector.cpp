@@ -1,5 +1,6 @@
 #include "ObjectSelector.h"
 
+#include "CameraHandler.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"

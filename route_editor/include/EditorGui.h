@@ -3,20 +3,23 @@
 
 #include "EditorState.h"
 #include "KeyBindings.h"
-#include "Route.h"
+
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/ui/KeyEvent.h>
 #include <vsgImGui/imgui.h>
 
+#include <string>
+
+class ObjectSelector;
+class SceneGraph;
 struct settings_t;
 
 namespace vsg
 {
 
 class CommandBuffer;
-class Options;
+class Perspective;
 
 }
 
@@ -24,11 +27,13 @@ class EditorGui : public vsg::Inherit<vsg::Command, EditorGui>
 {
 public:
     EditorGui(
+        settings_t& settings,
         EditorState& editor_state,
         const KeyBindings& key_bindings,
-        vsg::ref_ptr<Route> route,
-        settings_t& settings,
-        vsg::ref_ptr<vsg::Options> options = {}
+        vsg::ref_ptr<vsg::Perspective> perspective,
+        vsg::ref_ptr<SceneGraph> scene_graph,
+        vsg::ref_ptr<ObjectSelector> object_selector,
+        std::string& route_directory
     );
 
     void record(vsg::CommandBuffer& command_buffer) const override;
@@ -45,15 +50,15 @@ private:
     void show_selected_object_properties() const;
 
 private:
+    settings_t& settings;
     EditorState& editor_state;
     const KeyBindings& key_bindings;
-    bool show_demo_window = false;
-    vsg::ref_ptr<Route> route;
-    vsg::ref_ptr<vsg::MatrixTransform>* selected_object = nullptr;
-    vsg::ref_ptr<vsg::Perspective> perspective = nullptr;
+    vsg::ref_ptr<vsg::Perspective> perspective;
+    vsg::ref_ptr<SceneGraph> scene_graph;
+    vsg::ref_ptr<ObjectSelector> object_selector;
 
-    settings_t& settings;
-    ImGuiWindowFlags window_flags = 0;
+    ImGuiWindowFlags window_flags;
+    std::string& route_directory;
 };
 
 #endif // EDITOR_GUI_H

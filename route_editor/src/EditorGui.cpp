@@ -3,60 +3,65 @@
 #include "Action.h"
 #include "EditorState.h"
 #include "KeyBindings.h"
-#include "ObjectProperties.h"
+// #include "ObjectProperties.h"
+#include "ObjectSelector.h"
+#include "Route.h"
+#include "SceneGraph.h"
 #include "Settings.h"
 #include "filesystem.h"
-#include "rail-signal.h"
-#include "switch.h"
+// #include "rail-signal.h"
+// #include "switch.h"
 #include "topology.h"
-#include "track.h"
-#include "trajectory.h"
-#include "vec3.h"
+// #include "track.h"
+// #include "trajectory.h"
+// #include "vec3.h"
 
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/maths/common.h>
-#include <vsg/maths/mat4.h>
-#include <vsg/maths/transform.h>
+// #include <vsg/maths/common.h>
+// #include <vsg/maths/mat4.h>
+// #include <vsg/maths/transform.h>
+// #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/maths/vec3.h>
-#include <vsg/nodes/MatrixTransform.h>
 #include <vsgImGui/imgui.h>
 
+#include <cassert>
 #include <cctype>
-#include <cstddef>
+// #include <cstddef>
 #include <filesystem>
 #include <set>
 #include <string>
 
-static void update_selected_object_matrix(
-    const ObjectProperties& properties,
-    vsg::ref_ptr<vsg::MatrixTransform> matrix_transform
-);
-
 EditorGui::EditorGui(
+    settings_t& settings,
     EditorState& editor_state,
     const KeyBindings& key_bindings,
-    vsg::ref_ptr<Route> route,
-    settings_t& settings,
-    vsg::ref_ptr<vsg::Options> options
+    vsg::ref_ptr<vsg::Perspective> perspective,
+    vsg::ref_ptr<SceneGraph> scene_graph,
+    vsg::ref_ptr<ObjectSelector> object_selector,
+    std::string& route_directory
 )
-    : editor_state(editor_state)
+    : settings(settings)
+    , editor_state(editor_state)
     , key_bindings(key_bindings)
-    , route(route)
-    , settings(settings)
+    , perspective(perspective)
+    , scene_graph(scene_graph)
+    , object_selector(object_selector)
+    , route_directory(route_directory)
 {
-    (void)options;
+    assert(perspective);
+    assert(scene_graph);
 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
 
-    FileSystem& fs = FileSystem::getInstance();
-    const std::string font_path = fs.combinePath(fs.getFontsDir(), "JetBrainsMono-Regular.ttf");
+    const FileSystem& fs = FileSystem::getInstance();
 
-    io.Fonts->AddFontFromFileTTF(font_path.c_str(),
-                                 settings.gui_font_size,
-                                 nullptr,
-                                 io.Fonts->GetGlyphRangesCyrillic());
+    const char* const font_name = "JetBrainsMono-Regular.ttf";
+    const auto font_path = fs.combinePath(fs.getFontsDir(), font_name);
+
+    io.Fonts->AddFontFromFileTTF(font_path.c_str(), settings.gui_font_size,
+        nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
@@ -75,6 +80,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
         case EditorState::SELECT_ROUTE:
         {
             select_route();
+
             return;
         }
         default:
@@ -87,10 +93,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             ImGui::Checkbox("Show topology", &settings.show_topology);
             ImGui::End();
 
-            if (show_demo_window)
-            {
-                ImGui::ShowDemoWindow();
-            }
+            // ImGui::ShowDemoWindow();
 
             if (settings.show_objects_ref)
             {
@@ -101,8 +104,6 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 show_route_map();
             }
-
-            show_selected_object_properties();
 
             if (settings.show_controls)
             {
@@ -119,6 +120,8 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
                 show_topology();
             }
 
+            show_selected_object_properties();
+
             return;
         }
     }
@@ -126,17 +129,22 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 
 void EditorGui::select_route() const
 {
-    // Сеты для будущего отображения папок и файлов в алфавитном порядке
-    static std::set<std::filesystem::path> files;
-    static std::set<std::filesystem::path> directories;
+    using Path = std::filesystem::path;
+    using DirIterator = std::filesystem::directory_iterator;
 
-    auto change_route_dir = [&](const std::filesystem::path& path) -> void {
-        route->directory = path;
+    // TODO: Rewrite in English
+    // Сеты для будущего отображения папок и файлов в алфавитном порядке
+    static std::set<Path> files;
+    static std::set<Path> directories;
+
+    const auto change_route_directory = [&](const Path& path) -> void
+    {
+        route_directory = path;
 
         files.clear();
         directories.clear();
 
-        for (const auto& dir_entry : std::filesystem::directory_iterator(route->directory))
+        for (const auto& dir_entry : DirIterator(route_directory))
         {
             if (dir_entry.is_directory())
             {
@@ -149,46 +157,51 @@ void EditorGui::select_route() const
         }
     };
 
+    // TODO: Rewrite in English
     // Вызывается при первом запуске select_route
-    if (route->directory.empty())
+    if (route_directory.empty())
     {
-        route->directory = FileSystem::getInstance().getRouteRootDir();
-        change_route_dir(route->directory);
+        change_route_directory(FileSystem::getInstance().getRouteRootDir());
     }
 
     ImGui::Begin("Select Route", nullptr, window_flags);
 
     ImGui::Text("Select route:");
 
+    // TODO: Rewrite in English
     // Выводит путь к текущей выбранной папке и позволяет подтвердить ее
-    ImGui::Text("Current: %s", route->directory.string().c_str());
+    ImGui::Text("Current: %s", route_directory.c_str());
     ImGui::SameLine();
     if (ImGui::Button("OK"))
     {
         editor_state = EditorState::LOAD_ROUTE;
     }
 
+    // TODO: Rewrite in English
     // Отдельно выводим кнопку для перехода на одну папку выше
-    if (route->directory.has_parent_path())
+    if (Path(route_directory).has_parent_path())
     {
         if (ImGui::Button(".."))
         {
-            change_route_dir(route->directory.parent_path());
+            change_route_directory(Path(route_directory).parent_path());
         }
     }
 
-    // Отображаем все папки как кнопки для перемещния по ним
-    for (const std::filesystem::path& directory : directories)
+    // TODO: Rewrite in English
+    // Отображаем все папки как кнопки для перемещения по ним
+    for (const Path& directory : directories)
     {
         if (ImGui::Button(directory.filename().string().c_str()))
         {
-            change_route_dir(directory);
+            change_route_directory(directory);
+
             break;
         }
     }
 
+    // TODO: Rewrite in English
     // А все файлы просто как текст
-    for (const std::filesystem::path& file : files)
+    for (const Path& file : files)
     {
         ImGui::Text("%s", file.filename().c_str());
     }
@@ -200,9 +213,19 @@ void EditorGui::show_objects_ref() const
 {
     ImGui::Begin("objects_ref", nullptr, window_flags);
 
-    if (ImGui::BeginTable("objects_ref_table", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    if (!scene_graph->get_route())
     {
-        for (const auto& [label, relative_path] : route->get_objects_ref())
+        ImGui::Text("There is no route yet");
+        ImGui::End();
+        return;
+    }
+
+    if (ImGui::BeginTable("objects_ref_table", 2,
+        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
+        ImGuiTableFlags_RowBg))
+    {
+        const auto& objects_ref = scene_graph->get_route()->get_objects_ref();
+        for (const auto& [label, relative_path] : objects_ref)
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
@@ -219,27 +242,42 @@ void EditorGui::show_objects_ref() const
 
 void EditorGui::show_route_map() const
 {
+    assert(scene_graph->get_route());
+
     ImGui::Begin("route1.map", nullptr, window_flags);
 
-    if (ImGui::BeginTable("route_map_table", 7, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    if (!scene_graph->get_route())
     {
-        for (const auto& [label, transform] : route->get_route_map())
+        ImGui::Text("There is no route yet");
+        ImGui::End();
+        return;
+    }
+
+    if (ImGui::BeginTable("route_map_table", 7,
+        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
+        ImGuiTableFlags_RowBg))
+    {
+        const auto& route_map = scene_graph->get_route()->get_route_map();
+        for (const auto& [label, transform] : route_map)
         {
+            const vsg::vec3 translation = transform.first;
+            const vsg::vec3 rotation_deg = transform.second;
+
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             ImGui::Text("%s", label.c_str());
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", transform.first.x);
+            ImGui::Text("%.3f", translation.x);
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", transform.first.y);
+            ImGui::Text("%.3f", translation.y);
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", transform.first.z);
+            ImGui::Text("%.3f", translation.z);
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", transform.second.x);
+            ImGui::Text("%.3f", rotation_deg.x);
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", transform.second.y);
+            ImGui::Text("%.3f", rotation_deg.y);
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", transform.second.z);
+            ImGui::Text("%.3f", rotation_deg.z);
         }
 
         ImGui::EndTable();
@@ -252,7 +290,9 @@ void EditorGui::show_key_bindings() const
 {
     ImGui::Begin("Key Bindings", nullptr, window_flags);
 
-    if (ImGui::BeginTable("key_bindings_table", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    if (ImGui::BeginTable("key_bindings_table", 2,
+        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
+        ImGuiTableFlags_RowBg))
     {
         for (int i = 0; i < TOTAL_ACTIONS; ++i)
         {
@@ -260,6 +300,7 @@ void EditorGui::show_key_bindings() const
             ImGui::TableNextColumn();
             ImGui::Text("%s", to_c_string(static_cast<Action>(i)));
             ImGui::TableNextColumn();
+
             std::string label;
             label += std::toupper(key_bindings[i]);
             ImGui::Text("%s", label.c_str());
@@ -275,30 +316,36 @@ void EditorGui::show_camera_settings() const
 {
     ImGui::Begin("Camera Settings", nullptr, window_flags);
 
+    // TODO: Replace double on float
+
     ImGui::Text("Move speed:");
     float move_speed = static_cast<float>(settings.camera_move_speed);
-    if (ImGui::SliderFloat("##move_speed", &move_speed, settings.min_camera_move_speed, settings.max_camera_move_speed))
+    if (ImGui::SliderFloat("##move_speed", &move_speed,
+        settings.min_camera_move_speed, settings.max_camera_move_speed))
     {
         settings.camera_move_speed = move_speed;
     }
 
     ImGui::Text("Rotate speed:");
     float rotate_speed = static_cast<float>(settings.camera_rotate_speed);
-    if (ImGui::SliderFloat("##rotate_speed", &rotate_speed, settings.min_camera_rotate_speed, settings.max_camera_rotate_speed))
+    if (ImGui::SliderFloat("##rotate_speed", &rotate_speed,
+        settings.min_camera_rotate_speed, settings.max_camera_rotate_speed))
     {
         settings.camera_rotate_speed = rotate_speed;
     }
 
     ImGui::Text("Zoom power:");
     float zoom_power = static_cast<float>(settings.camera_zoom_power);
-    if (ImGui::SliderFloat("##zoom_power", &zoom_power, settings.min_camera_zoom_power, settings.max_camera_zoom_power))
+    if (ImGui::SliderFloat("##zoom_power", &zoom_power,
+        settings.min_camera_zoom_power, settings.max_camera_zoom_power))
     {
         settings.camera_zoom_power = zoom_power;
     }
 
     ImGui::Text("FovY:");
     float fovy = static_cast<float>(perspective->fieldOfViewY);
-    if (ImGui::SliderFloat("##fovy", &fovy, settings.fovy_min, settings.fovy_max))
+    if (ImGui::SliderFloat("##fovy", &fovy, settings.fovy_min,
+        settings.fovy_max))
     {
         perspective->fieldOfViewY = fovy;
     }
@@ -308,167 +355,158 @@ void EditorGui::show_camera_settings() const
 
 void EditorGui::show_topology() const
 {
-    const Topology& topology = topology;
-    if (topology.getRouteName().isEmpty())
+    ImGui::Begin("Topology", nullptr, window_flags);
+
+    const auto route = scene_graph->get_route();
+    if (!route)
     {
+        ImGui::Text("There is no route yet");
+        ImGui::End();
         return;
     }
 
-    ImGui::Begin("Topology", nullptr, window_flags);
-
-    ImGui::Text("Route name: %s", topology.getRouteName().toStdString().c_str());
-
-    if (ImGui::CollapsingHeader("Trajectories"))
+    const auto& topology = route->get_topology();
+    if (!topology)
     {
-        const auto& trajectories = *topology.getTrajectoriesList();
-        for (auto it = trajectories.begin(); it != trajectories.end(); ++it)
-        {
-            Trajectory* const trajectory = it.value();
-            if (ImGui::TreeNode(trajectory->getName().toStdString().c_str()))
-            {
-                ImGui::Text("%17s%12s%12s%12s%12s", "begin.x", "begin.y", "begin.z", "rail_coord", "traj_coord");
-                ImGui::Separator();
-                const auto& tracks = trajectory->getTracks();
-                for (std::size_t i = 0; i < tracks.size(); ++i)
-                {
-                    const track_t& track = tracks[i];
-                    ImGui::Text("[%2zu]:%12.3f%12.3f%12.3f%12.3f%12.3f", i, track.begin_point.x, track.begin_point.y,
-                        track.begin_point.z, track.railway_coord0, track.traj_coord);
-                }
-
-                ImGui::TreePop();
-            }
-        }
+        ImGui::Text("There is no topology yet");
+        ImGui::End();
+        return;
     }
 
-    if (ImGui::CollapsingHeader("Switches"))
-    {
-        const auto& connectors = *topology.getConnectorsList();
-        for (auto it = connectors.begin(); it != connectors.end(); ++it)
-        {
-            const Switch* const switch_ = dynamic_cast<const Switch*>(it.value());
-            if (!switch_)
-            {
-                continue;
-            }
+    const auto route_name = topology->getRouteName().toStdString();
+    ImGui::Text("Route name: %s", route_name.c_str());
 
-            if (ImGui::TreeNode(switch_->getName().toStdString().c_str()))
-            {
-                // if (const Trajectory* const bwd_plus_traj = switch_->getBwdPlusTraj())
-                // {
-                //     ImGui::Text("bwdPlusTraj: %s", bwd_plus_traj->getName().toStdString().c_str());
-                // }
+    // if (ImGui::CollapsingHeader("Trajectories"))
+    // {
+    //     const auto* trajectories = (*topology).getTrajectoriesList();
+    //     for (auto it = trajectories->begin(); it != trajectories->end(); ++it)
+    //     {
+    //         Trajectory* const trajectory = *it;
+    //         if (ImGui::TreeNode(trajectory->getName().toStdString().c_str()))
+    //         {
+    //             ImGui::Text("%17s%12s%12s%12s%12s", "begin.x", "begin.y", "begin.z", "rail_coord", "traj_coord");
+    //             ImGui::Separator();
+    //             const auto& tracks = trajectory->getTracks();
+    //             for (std::size_t i = 0; i < tracks.size(); ++i)
+    //             {
+    //                 const track_t& track = tracks[i];
+    //                 ImGui::Text("[%2zu]:%12.3f%12.3f%12.3f%12.3f%12.3f", i, track.begin_point.x, track.begin_point.y,
+    //                     track.begin_point.z, track.railway_coord0, track.traj_coord);
+    //             }
 
-                if (const Trajectory* const fwd_plus_traj = switch_->getFwdTraj())
-                {
-                    ImGui::Text("fwdPlusTraj: %s", fwd_plus_traj->getName().toStdString().c_str());
-                }
+    //             ImGui::TreePop();
+    //         }
+    //     }
+    // }
 
-                // if (const Signal* const bwd_signal = switch_->getSignalBwd())
-                // {
-                //     ImGui::Text("SignalLiterBwd: %s", bwd_signal->getLetter().toStdString().c_str());
-                //     ImGui::Text("SignalModelBwd: %s", bwd_signal->getSignalModel().toStdString().c_str());
-                //     const dvec3 rel_pos = bwd_signal->getRelPosition();
-                //     const dvec3 rel_rot = bwd_signal->getRelRotation();
-                //     ImGui::Text("RelPosVectorBwd:%8.3f%8.3f%8.3f", rel_pos.x, rel_pos.y, rel_pos.z);
-                //     ImGui::Text("RelRotVectorBwd:%8.3f%8.3f%8.3f", rel_rot.x, rel_rot.y, rel_rot.z);
-                // }
+    // if (ImGui::CollapsingHeader("Switches"))
+    // {
+    //     const auto& connectors = *topology.getConnectorsList();
+    //     for (auto it = connectors.begin(); it != connectors.end(); ++it)
+    //     {
+    //         const Switch* const switch_ = dynamic_cast<const Switch*>(it.value());
+    //         if (!switch_)
+    //         {
+    //             continue;
+    //         }
 
-                // if (const Signal* const fwd_signal = switch_->getSignalFwd())
-                // {
-                //     ImGui::Text("SignalLiterFwd: %s", fwd_signal->getLetter().toStdString().c_str());
-                //     ImGui::Text("SignalModelFwd: %s", fwd_signal->getSignalModel().toStdString().c_str());
-                //     const dvec3 rel_pos = fwd_signal->getRelPosition();
-                //     const dvec3 rel_rot = fwd_signal->getRelRotation();
-                //     ImGui::Text("RelPosVectorFwd:%8.3f%8.3f%8.3f", rel_pos.x, rel_pos.y, rel_pos.z);
-                //     ImGui::Text("RelRotVectorFwd:%8.3f%8.3f%8.3f", rel_rot.x, rel_rot.y, rel_rot.z);
-                // }
+    //         if (ImGui::TreeNode(switch_->getName().toStdString().c_str()))
+    //         {
+    //             // if (const Trajectory* const bwd_plus_traj = switch_->getBwdPlusTraj())
+    //             // {
+    //             //     ImGui::Text("bwdPlusTraj: %s", bwd_plus_traj->getName().toStdString().c_str());
+    //             // }
 
-                // if (const Trajectory* const bwd_minus_traj = switch_->getBwdMinusTraj())
-                // {
-                //     ImGui::Text("bwdMinusTraj: %s", bwd_minus_traj->getName().toStdString().c_str());
-                //     ImGui::Text("state_bwd: %d", switch_->getStateBwd());
-                // }
+    //             if (const Trajectory* const fwd_plus_traj = switch_->getFwdTraj())
+    //             {
+    //                 ImGui::Text("fwdPlusTraj: %s", fwd_plus_traj->getName().toStdString().c_str());
+    //             }
 
-                // if (const Trajectory* const fwd_minus_traj = switch_->getFwdMinusTraj())
-                // {
-                //     ImGui::Text("fwdMinusTraj: %s", fwd_minus_traj->getName().toStdString().c_str());
-                //     ImGui::Text("state_fwd: %d", switch_->getStateFwd());
-                // }
+    //             // if (const Signal* const bwd_signal = switch_->getSignalBwd())
+    //             // {
+    //             //     ImGui::Text("SignalLiterBwd: %s", bwd_signal->getLetter().toStdString().c_str());
+    //             //     ImGui::Text("SignalModelBwd: %s", bwd_signal->getSignalModel().toStdString().c_str());
+    //             //     const dvec3 rel_pos = bwd_signal->getRelPosition();
+    //             //     const dvec3 rel_rot = bwd_signal->getRelRotation();
+    //             //     ImGui::Text("RelPosVectorBwd:%8.3f%8.3f%8.3f", rel_pos.x, rel_pos.y, rel_pos.z);
+    //             //     ImGui::Text("RelRotVectorBwd:%8.3f%8.3f%8.3f", rel_rot.x, rel_rot.y, rel_rot.z);
+    //             // }
 
-                ImGui::TreePop();
-            }
-        }
-    }
+    //             // if (const Signal* const fwd_signal = switch_->getSignalFwd())
+    //             // {
+    //             //     ImGui::Text("SignalLiterFwd: %s", fwd_signal->getLetter().toStdString().c_str());
+    //             //     ImGui::Text("SignalModelFwd: %s", fwd_signal->getSignalModel().toStdString().c_str());
+    //             //     const dvec3 rel_pos = fwd_signal->getRelPosition();
+    //             //     const dvec3 rel_rot = fwd_signal->getRelRotation();
+    //             //     ImGui::Text("RelPosVectorFwd:%8.3f%8.3f%8.3f", rel_pos.x, rel_pos.y, rel_pos.z);
+    //             //     ImGui::Text("RelRotVectorFwd:%8.3f%8.3f%8.3f", rel_rot.x, rel_rot.y, rel_rot.z);
+    //             // }
+
+    //             // if (const Trajectory* const bwd_minus_traj = switch_->getBwdMinusTraj())
+    //             // {
+    //             //     ImGui::Text("bwdMinusTraj: %s", bwd_minus_traj->getName().toStdString().c_str());
+    //             //     ImGui::Text("state_bwd: %d", switch_->getStateBwd());
+    //             // }
+
+    //             // if (const Trajectory* const fwd_minus_traj = switch_->getFwdMinusTraj())
+    //             // {
+    //             //     ImGui::Text("fwdMinusTraj: %s", fwd_minus_traj->getName().toStdString().c_str());
+    //             //     ImGui::Text("state_fwd: %d", switch_->getStateFwd());
+    //             // }
+
+    //             ImGui::TreePop();
+    //         }
+    //     }
+    // }
 
     ImGui::End();
 }
 
 void EditorGui::show_selected_object_properties() const
 {
-    if (!selected_object)
-    {
-        return;
-    }
+    // if (!selected_object)
+    // {
+    //     return;
+    // }
 
-    if (auto matrix_transform = *selected_object)
-    {
-        ObjectProperties properties;
-        if (matrix_transform->getValue("properties", properties))
-        {
-            ImGui::Begin("Properties", nullptr, window_flags);
+    // if (auto matrix_transform = *selected_object)
+    // {
+    //     ObjectProperties properties;
+    //     if (matrix_transform->getValue("properties", properties))
+    //     {
+    //         ImGui::Begin("Properties", nullptr, window_flags);
 
-            ImGui::Text("name: %s", properties.name.c_str());
+    //         ImGui::Text("name: %s", properties.name.c_str());
 
-            ImGui::Text("translation:");
-            if (ImGui::SliderFloat("x##translation", &properties.translation.x, -100.0f, 100.0f))
-            {
-                update_selected_object_matrix(properties, matrix_transform);
-            }
-            if (ImGui::SliderFloat("y##translation", &properties.translation.y, -100.0f, 10000.0f))
-            {
-                update_selected_object_matrix(properties, matrix_transform);
-            }
-            if (ImGui::SliderFloat("z##translation", &properties.translation.z, -100.0f, 100.0f))
-            {
-                update_selected_object_matrix(properties, matrix_transform);
-            }
+    //         ImGui::Text("translation:");
+    //         if (ImGui::SliderFloat("x##translation", &properties.translation.x, -100.0f, 100.0f))
+    //         {
+    //             update_selected_object_matrix(properties, matrix_transform);
+    //         }
+    //         if (ImGui::SliderFloat("y##translation", &properties.translation.y, -100.0f, 10000.0f))
+    //         {
+    //             update_selected_object_matrix(properties, matrix_transform);
+    //         }
+    //         if (ImGui::SliderFloat("z##translation", &properties.translation.z, -100.0f, 100.0f))
+    //         {
+    //             update_selected_object_matrix(properties, matrix_transform);
+    //         }
 
-            ImGui::Text("rotation:");
-            if (ImGui::SliderFloat("x##rotation", &properties.rotation_deg.x, -180.0f, 180.0f))
-            {
-                update_selected_object_matrix(properties, matrix_transform);
-            }
-            if (ImGui::SliderFloat("y##rotation", &properties.rotation_deg.y, -180.0f, 180.0f))
-            {
-                update_selected_object_matrix(properties, matrix_transform);
-            }
-            if (ImGui::SliderFloat("z##rotation", &properties.rotation_deg.z, -180.0f, 180.0f))
-            {
-                update_selected_object_matrix(properties, matrix_transform);
-            }
+    //         ImGui::Text("rotation:");
+    //         if (ImGui::SliderFloat("x##rotation", &properties.rotation_deg.x, -180.0f, 180.0f))
+    //         {
+    //             update_selected_object_matrix(properties, matrix_transform);
+    //         }
+    //         if (ImGui::SliderFloat("y##rotation", &properties.rotation_deg.y, -180.0f, 180.0f))
+    //         {
+    //             update_selected_object_matrix(properties, matrix_transform);
+    //         }
+    //         if (ImGui::SliderFloat("z##rotation", &properties.rotation_deg.z, -180.0f, 180.0f))
+    //         {
+    //             update_selected_object_matrix(properties, matrix_transform);
+    //         }
 
-            ImGui::End();
-        }
-    }
-}
-
-static void update_selected_object_matrix(
-    const ObjectProperties& properties,
-    vsg::ref_ptr<vsg::MatrixTransform> matrix_transform
-)
-{
-    vsg::vec3 rotation = properties.rotation_deg;
-
-    rotation.x = -vsg::radians(rotation.x);
-    rotation.y = -vsg::radians(rotation.y);
-    rotation.z = -vsg::radians(rotation.z);
-
-    const vsg::mat4 rotate_x = vsg::rotate(rotation.x, vsg::vec3(1.0f, 0.0f, 0.0f));
-    const vsg::mat4 rotate_y = vsg::rotate(rotation.y, vsg::vec3(0.0f, 1.0f, 0.0f));
-    const vsg::mat4 rotate_z = vsg::rotate(rotation.z, vsg::vec3(0.0f, 0.0f, 1.0f));
-    const vsg::mat4 translate = vsg::translate(properties.translation);
-
-    matrix_transform->matrix = translate * rotate_z * rotate_y * rotate_x;
-    matrix_transform->setValue("properties", properties);
+    //         ImGui::End();
+    //     }
+    // }
 }

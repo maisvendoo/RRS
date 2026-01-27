@@ -8,6 +8,7 @@
 #include "Mask.h"
 #include "MouseHandler.h"
 #include "ObjectSelector.h"
+#include "Route.h"
 #include "SceneGraph.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
@@ -38,6 +39,9 @@
 
 #include <vulkan/vulkan_core.h>
 
+RouteEditor::RouteEditor() = default;
+RouteEditor::~RouteEditor() = default;
+
 bool RouteEditor::initialize()
 {
     const FileSystem& fs = FileSystem::getInstance();
@@ -64,7 +68,6 @@ bool RouteEditor::initialize()
     camera_handler = CameraHandler::create(settings, window->extent2D(),
         mouse_handler, keyboard_handler, 5.0);
 
-    const auto look_at = camera_handler->get_look_at();
     const auto camera = camera_handler->get_camera();
 
     intersection_handler = IntersectionHandler::create(camera);
@@ -87,9 +90,9 @@ bool RouteEditor::initialize()
     const auto gui_view = vsg::View::create(camera, scene_graph);
     gui_view->mask = MASK_GUI;
 
-    const auto editor_gui = EditorGui::create(state,
-        keyboard_handler->get_key_bindings(), route,
-        settings, options);
+    const auto editor_gui = EditorGui::create(settings, state,
+        keyboard_handler->get_key_bindings(), camera_handler->get_perspective(),
+        scene_graph, object_selector, route_directory);
 
     const auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
 
@@ -126,20 +129,13 @@ bool RouteEditor::initialize()
 
 void RouteEditor::run()
 {
-    const auto route = scene_graph->get_route();
-
     while (viewer->advanceToNextFrame())
     {
         if (state == EditorState::LOAD_ROUTE)
         {
-            if (route->load(settings, options, viewer))
-            {
-                state = EditorState::EDIT_ROUTE;
-            }
-            else
-            {
-                state = EditorState::SELECT_ROUTE;
-            }
+            const vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
+            scene_graph->load_route(observer_viewer, route_directory);
+            state = EditorState::EDIT_ROUTE;
         }
 
         viewer->handleEvents();
@@ -151,39 +147,25 @@ void RouteEditor::run()
 
 void RouteEditor::configure_shaders()
 {
-    enum
-    {
-        FLAT,
-        PBR,
-        PHONG,
-        TOTAL_SHADER_SETS
-    };
+    const auto flat_shader = vsg::createFlatShadedShaderSet(options);
+    const auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
+    const auto phong_shader = vsg::createPhongShaderSet(options);
 
-    const char* fragment_shader_names[TOTAL_SHADER_SETS];
-    fragment_shader_names[FLAT] = "standard_flat_shaded.frag";
-    fragment_shader_names[PBR] = "standard_pbr.frag";
-    fragment_shader_names[PHONG] = "standard_phong.frag";
-
-    const char* shader_set_names[TOTAL_SHADER_SETS];
-    shader_set_names[FLAT] = "flat";
-    shader_set_names[PBR] = "pbr";
-    shader_set_names[PHONG] = "Phong";
-
-    // За основу берем встроенные комплекты вершинного и фрагментного шейдера
-    vsg::ref_ptr<vsg::ShaderSet> shader_sets[TOTAL_SHADER_SETS];
-    shader_sets[FLAT] = vsg::createFlatShadedShaderSet(options);
-    shader_sets[PBR] = vsg::createPhysicsBasedRenderingShaderSet(options);
-    shader_sets[PHONG] = vsg::createPhongShaderSet(options);
-
-    // Загружаем свои варианты вершинного и фрагментного шейдера
-    // вместо встроенного
     const FileSystem& fs = FileSystem::getInstance();
     const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
     const auto vert_shader = read_shader(VK_SHADER_STAGE_VERTEX_BIT,
         shaders_dir.c_str(), "standard.vert", options);
 
-    // Рисуем текстуры на обеих сторонах полигонов
+    configure_shader_set(shaders_dir.c_str(), vert_shader,
+        "standard_flat_shaded.frag", options, "flat", flat_shader);
+
+    configure_shader_set(shaders_dir.c_str(), vert_shader,
+        "standard_pbr.frag", options, "pbr", pbr_shader);
+
+    configure_shader_set(shaders_dir.c_str(), vert_shader,
+        "standard_phong.frag", options, "phong", phong_shader);
+
     const auto rasterization_state = vsg::RasterizationState::create();
     rasterization_state->cullMode = VK_CULL_MODE_NONE;
 
@@ -196,18 +178,17 @@ void RouteEditor::configure_shaders()
         vsg::MultisampleState::create()
     };
 
+    flat_shader->defaultGraphicsPipelineStates =
+        default_graphics_pipeline_states;
+
+    pbr_shader->defaultGraphicsPipelineStates =
+        default_graphics_pipeline_states;
+
+    phong_shader->defaultGraphicsPipelineStates =
+        default_graphics_pipeline_states;
+
     options->shaderSets.clear();
-
-    for (int i = 0; i < TOTAL_SHADER_SETS; ++i)
-    {
-        configure_shader_set(shaders_dir.c_str(), vert_shader,
-            fragment_shader_names[i], options,
-            shader_set_names[i], shader_sets[i]);
-
-        shader_sets[i]->defaultGraphicsPipelineStates =
-            default_graphics_pipeline_states;
-
-        // Добавляем шейдеры в стандартные опции
-        options->shaderSets[shader_set_names[i]] = shader_sets[i];
-    }
+    options->shaderSets["flat"] = flat_shader;
+    options->shaderSets["pbr"] = pbr_shader;
+    options->shaderSets["phong"] = phong_shader;
 }
