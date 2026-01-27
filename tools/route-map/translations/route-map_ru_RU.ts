@@ -19,9 +19,14 @@
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="63"/>
+        <location filename="../forms/mainwindow.ui" line="64"/>
         <source>Show trajectories names</source>
         <translation>Показать имена траекторий</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="72"/>
+        <source>Show connectors names</source>
+        <translation>Показать имена стрелок и стыков</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="17"/>
@@ -29,163 +34,166 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="235"/>
+        <location filename="../src/mainwindow.cpp" line="259"/>
         <source>Send request for vehicles info...</source>
         <translation>Послан запрос информации о подвижных единицах...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="255"/>
+        <location filename="../src/mainwindow.cpp" line="279"/>
         <source>Loaded info about %1 vehicles</source>
         <translation>Загружена информация о %1 подвижных единицах</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="267"/>
+        <location filename="../src/mainwindow.cpp" line="291"/>
         <source>Send request for topology loading...</source>
         <translation>Послан запрос на загрузку топологии</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="284"/>
+        <location filename="../src/mainwindow.cpp" line="308"/>
         <source>Toplology loading FAILED!!!</source>
         <translation>ОШИБКА загрузки топологии!!!</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="290"/>
+        <location filename="../src/mainwindow.cpp" line="314"/>
         <source>Trajectories list is empty</source>
         <translation>Список траекторий пуст</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="296"/>
+        <location filename="../src/mainwindow.cpp" line="320"/>
         <source>Connectors list is empty</source>
         <translation>Список коннекторов пуст</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="331"/>
+        <location filename="../src/mainwindow.cpp" line="353"/>
         <source>Topology loaded successfully!</source>
         <translation>Топология полностью загружена!</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="333"/>
+        <location filename="../src/mainwindow.cpp" line="355"/>
         <source>Trajectories: %1</source>
         <translation>Траекторий: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="334"/>
+        <location filename="../src/mainwindow.cpp" line="356"/>
         <source>Connectors: %1</source>
         <translation>Коннекторов: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="341"/>
+        <location filename="../src/mainwindow.cpp" line="363"/>
         <source>Send request for signals data loading...</source>
         <translation>Послан запрос на загрузку данных о сигналах...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="353"/>
+        <location filename="../src/mainwindow.cpp" line="375"/>
         <source>Loaded %1 line signals</source>
         <translation>Загружено %1 проходных сигналов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="357"/>
+        <location filename="../src/mainwindow.cpp" line="379"/>
         <source>Warning: no line signals data</source>
         <translation>ПРЕДУПРЕЖДЕНИЕ: нет данных по проходным сигналам</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="362"/>
+        <location filename="../src/mainwindow.cpp" line="384"/>
         <source>Loaded %1 enter signals</source>
         <translation>Загружено %1 входных сигналов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="366"/>
+        <location filename="../src/mainwindow.cpp" line="388"/>
         <source>Warning: no enter signals data</source>
         <translation>ПРЕДУПРЕЖДЕНИЕ: нет данных по входным сигналам</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="371"/>
+        <location filename="../src/mainwindow.cpp" line="393"/>
         <source>Loaded %1 route signals</source>
-        <translation>Занружено %1 маршрутных сигналов</translation>
+        <translation>Загружено %1 маршрутных сигналов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="375"/>
+        <location filename="../src/mainwindow.cpp" line="397"/>
         <source>Warning: no route signals data</source>
         <translation>ПРЕДУПРЕЖДЕНИЕ: Нет информации о маршрутных сигналах</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="380"/>
+        <location filename="../src/mainwindow.cpp" line="402"/>
         <source>Loaded %1 exit signals</source>
         <translation>Загружено %1 выходных сигналов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="384"/>
+        <location filename="../src/mainwindow.cpp" line="406"/>
         <source>Warning: no exit signals data</source>
         <translation>ПРЕДУПРЕЖДЕНИЕ: нет данных повыходным сигналам</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="389"/>
+        <location filename="../src/mainwindow.cpp" line="411"/>
         <source>Loaded %1 shunt signals</source>
         <translation>Загружено%1 маневровых сигналов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="393"/>
+        <location filename="../src/mainwindow.cpp" line="415"/>
         <source>Warning: no shunt signals data</source>
         <translation>ПРЕДУПРЕЖДЕНИЕ: Нет информации о маневровых сигналах</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="485"/>
+        <location filename="../src/mainwindow.cpp" line="507"/>
         <source>Send request for continuous vehicles update</source>
         <translation>Послан запрос на периодическое обновление данных о подвижных единицах</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="535"/>
+        <location filename="../src/mainwindow.cpp" line="563"/>
+        <source>Switch</source>
+        <translation>Переключить</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="619"/>
         <source>Build route to forward direction</source>
         <translation>Простроить маршрут &quot;туда&quot;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="551"/>
+        <location filename="../src/mainwindow.cpp" line="635"/>
         <source>Build route to backward direction</source>
         <translation>Построить маршрут &quot;обратно&quot;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="599"/>
-        <location filename="../src/mainwindow.cpp" line="612"/>
+        <location filename="../src/mainwindow.cpp" line="683"/>
+        <location filename="../src/mainwindow.cpp" line="696"/>
         <source>Continue route search</source>
         <translation>Продолжить поиск маршрута</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="620"/>
+        <location filename="../src/mainwindow.cpp" line="704"/>
         <source>Set switches for route</source>
         <translation>Установить стрелки по маршруту</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="628"/>
+        <location filename="../src/mainwindow.cpp" line="712"/>
         <source>Set switches and train signals for route</source>
         <translation>Установить стрелки и открыть поездные сигналы по маршруту</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="636"/>
+        <location filename="../src/mainwindow.cpp" line="720"/>
         <source>Set switches and shunting signals for route</source>
         <translation>Установить стрелки и открыть маневровые сигналы по маршруту</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="675"/>
         <source>Switch forward</source>
-        <translation>Переключить спереди</translation>
+        <translation type="vanished">Переключить спереди</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="694"/>
         <source>Switch backward</source>
-        <translation>Переключить сзади</translation>
+        <translation type="vanished">Переключить сзади</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="740"/>
+        <location filename="../src/mainwindow.cpp" line="758"/>
         <source>Open for train</source>
         <translation>Открыть как поездой</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="758"/>
+        <location filename="../src/mainwindow.cpp" line="776"/>
         <source>Open for shunting</source>
         <translation>Открыть как маневровый</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="776"/>
+        <location filename="../src/mainwindow.cpp" line="794"/>
         <source>Open call signal</source>
         <translation>Открыть пригласительный</translation>
     </message>
@@ -194,27 +202,37 @@
         <translation type="vanished">Открыть</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="792"/>
+        <location filename="../src/mainwindow.cpp" line="810"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="919"/>
+        <location filename="../src/mainwindow.cpp" line="937"/>
         <source>Showed traj names</source>
         <translation>Включено отображение имен траекторий</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="921"/>
+        <location filename="../src/mainwindow.cpp" line="939"/>
         <source>Hided traj names</source>
         <translation>Имена траекторий скрыты</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="970"/>
+        <location filename="../src/mainwindow.cpp" line="950"/>
+        <source>Showed conn names</source>
+        <translation>Включено отображение имен стрелок и стыков</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="952"/>
+        <source>Hided conn names</source>
+        <translation>Скрыты имена стрелок и стыков</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="1001"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="978"/>
+        <location filename="../src/mainwindow.cpp" line="1009"/>
         <source>Enter train name</source>
         <translation>Введите имя поезда</translation>
     </message>
