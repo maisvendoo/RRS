@@ -139,7 +139,7 @@ void EditorGui::select_route() const
 
     const auto change_route_directory = [&](const Path& path) -> void
     {
-        route_directory = path;
+        route_directory = path.string();
 
         files.clear();
         directories.clear();
