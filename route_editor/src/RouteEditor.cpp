@@ -8,7 +8,6 @@
 #include "Mask.h"
 #include "MouseHandler.h"
 #include "ObjectSelector.h"
-#include "Route.h"
 #include "SceneGraph.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
@@ -38,11 +37,6 @@
 #include <vsgXchange/all.h>
 
 #include <vulkan/vulkan_core.h>
-
-#include <string>
-
-RouteEditor::RouteEditor() = default;
-RouteEditor::~RouteEditor() = default;
 
 bool RouteEditor::initialize()
 {
@@ -75,8 +69,10 @@ bool RouteEditor::initialize()
 
     intersection_handler = IntersectionHandler::create(camera);
 
-    scene_graph = SceneGraph::create();
-    const auto route = scene_graph->get_route();
+    scene_graph = SceneGraph::create(settings, options);
+
+    const auto scene_view = vsg::View::create(camera, scene_graph);
+    scene_view->mask = MASK_SCENE;
 
     VkClearValue clear_value{};
     clear_value.depthStencil = {0.0f, 0};
@@ -87,9 +83,6 @@ bool RouteEditor::initialize()
     clear_attachments = vsg::ClearAttachments::create(
         vsg::ClearAttachments::Attachments{attachment},
         vsg::ClearAttachments::Rects{rect});
-
-    const auto scene_view = vsg::View::create(camera, scene_graph);
-    scene_view->mask = MASK_SCENE;
 
     const auto gui_view = vsg::View::create(camera, scene_graph);
     gui_view->mask = MASK_GUI;
@@ -109,10 +102,10 @@ bool RouteEditor::initialize()
     const auto command_graph = vsg::CommandGraph::create(window, render_graph);
 
     viewer = vsg::Viewer::create();
-    vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
+    const vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
 
     object_selector = ObjectSelector::create(settings, keyboard_handler,
-        camera_handler, intersection_handler, route, observer_viewer);
+        camera_handler, intersection_handler, scene_graph, observer_viewer);
 
     viewer->addWindow(window);
 
@@ -185,7 +178,7 @@ void RouteEditor::configure_shaders()
     // Загружаем свои варианты вершинного и фрагментного шейдера
     // вместо встроенного
     const FileSystem& fs = FileSystem::getInstance();
-    const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
+    const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
     const auto vert_shader = read_shader(VK_SHADER_STAGE_VERTEX_BIT,
         shaders_dir.c_str(), "standard.vert", options);

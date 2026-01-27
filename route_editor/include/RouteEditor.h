@@ -27,9 +27,6 @@ class Viewer;
 class RouteEditor
 {
 public:
-    RouteEditor();
-    ~RouteEditor();
-
     bool initialize();
     void run();
 

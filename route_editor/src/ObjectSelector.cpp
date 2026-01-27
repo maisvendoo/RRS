@@ -1,16 +1,15 @@
 #include "ObjectSelector.h"
 
-#include "CameraHandler.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
 #include "Mask.h"
 #include "Outline.h"
-#include "Route.h"
+#include "SceneGraph.h"
 #include "SelectedObjectsMap.h"
 #include "SingleSwitch.h"
+#include "SwitchGroup.h"
 
-#include <vsg/app/CompileManager.h>
 #include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/observer_ptr.h>
@@ -18,7 +17,6 @@
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/nodes/PagedLOD.h>
-#include <vsg/nodes/Switch.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/LineSegmentIntersector.h>
 
@@ -29,28 +27,27 @@ ObjectSelector::ObjectSelector(
     vsg::ref_ptr<KeyboardHandler> keyboard_handler,
     vsg::ref_ptr<CameraHandler> camera_handler,
     vsg::ref_ptr<IntersectionHandler> intersection_handler,
-    vsg::ref_ptr<Route> route,
+    vsg::ref_ptr<SceneGraph> scene_graph,
     vsg::observer_ptr<vsg::Viewer> observer_viewer
 )
     : settings(settings)
     , keyboard_handler(keyboard_handler)
     , intersection_handler(intersection_handler)
-    , route(route)
+    , scene_graph(scene_graph)
     , observer_viewer(observer_viewer)
 {
+    assert(keyboard_handler);
+    assert(camera_handler);
     assert(intersection_handler);
-    assert(route);
+    assert(scene_graph);
+    assert(observer_viewer);
 
     gizmo = Gizmo::create(settings, camera_handler, selected_objects);
 
-    gizmo_switch = SingleSwitch::create();
-    gizmo_switch->mask = vsg::MASK_OFF;
-    gizmo_switch->node = gizmo;
+    gizmo_switch = SingleSwitch::create(vsg::MASK_OFF, gizmo);
 
-    route->addChild(vsg::Mask{MASK_GUI | MASK_CLICKABLE}, gizmo_switch);
+    scene_graph->addChild(vsg::Mask{MASK_GUI | MASK_CLICKABLE}, gizmo_switch);
 }
-
-ObjectSelector::~ObjectSelector() = default;
 
 void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 {
@@ -75,7 +72,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    route->accept(*lmb_intersector);
+    scene_graph->accept(*lmb_intersector);
 
     auto& intersections = lmb_intersector->intersections;
     if (intersections.empty())
@@ -119,7 +116,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
             continue;
         }
 
-        const auto switch_group = mt_children.front().cast<vsg::Switch>();
+        const auto switch_group = mt_children.front().cast<SwitchGroup>();
         if (!switch_group)
         {
             continue;
@@ -172,7 +169,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
 void ObjectSelector::select_object(
     vsg::ref_ptr<vsg::MatrixTransform> object,
-    vsg::ref_ptr<vsg::Switch> switch_group,
+    vsg::ref_ptr<SwitchGroup> switch_group,
     vsg::ref_ptr<vsg::PagedLOD> paged_lod
 )
 {
@@ -183,6 +180,22 @@ void ObjectSelector::select_object(
     const bool clicked_on_selected_object = (
         selected_objects.find(object) != selected_objects.end());
 
+    const auto select_object_inner = [&]() -> void
+    {
+        const auto viewer = observer_viewer.ref_ptr();
+        const auto compile_manager = viewer->compileManager;
+
+        const auto outline = Outline::create(settings, paged_lod);
+
+        const auto compile_result = compile_manager->compile(outline);
+
+        switch_group->addChild(vsg::Mask{MASK_GUI}, outline);
+
+        vsg::updateViewer(*viewer, compile_result);
+
+        selected_objects[object] = {switch_group, outline};
+    };
+
     if (keyboard_handler->get_shift_state())
     {
         if (clicked_on_selected_object)
@@ -191,14 +204,14 @@ void ObjectSelector::select_object(
         }
         else
         {
-            select_object_inner(object, switch_group, paged_lod);
+            select_object_inner();
         }
     }
     else
     {
         if (selected_objects.empty())
         {
-            select_object_inner(object, switch_group, paged_lod);
+            select_object_inner();
         }
         else if (clicked_on_selected_object)
         {
@@ -228,33 +241,9 @@ void ObjectSelector::select_object(
                 it != selected_objects.end();
                 it = deselect_object(it->first));
 
-            select_object_inner(object, switch_group, paged_lod);
+            select_object_inner();
         }
     }
-}
-
-void ObjectSelector::select_object_inner(
-    vsg::ref_ptr<vsg::MatrixTransform> object,
-    vsg::ref_ptr<vsg::Switch> switch_group,
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod
-)
-{
-    assert(object);
-    assert(switch_group);
-    assert(paged_lod);
-
-    const vsg::ref_ptr<vsg::Viewer> viewer = observer_viewer;
-
-    const auto outline = Outline::create(settings, paged_lod, observer_viewer);
-
-    const vsg::CompileResult compile_result =
-        viewer->compileManager->compile(outline);
-
-    switch_group->addChild(vsg::Mask{MASK_GUI}, outline);
-
-    vsg::updateViewer(*viewer, compile_result);
-
-    selected_objects[object] = {switch_group, outline};
 }
 
 SelectedObjectsIterator ObjectSelector::deselect_object(

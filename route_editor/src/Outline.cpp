@@ -4,9 +4,6 @@
 #include "filesystem.h"
 #include "shader_funcs.h"
 
-#include <vsg/app/CompileManager.h>
-#include <vsg/app/Viewer.h>
-#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>
 #include <vsg/io/Options.h>
@@ -30,44 +27,28 @@
 #include <vulkan/vulkan_core.h>
 
 #include <cassert>
-#include <cstdio>
-#include <string>
 
 struct OutlineStatic
 {
+    OutlineStatic();
+
     vsg::ref_ptr<vsg::Options> options;
     vsg::Builder builder;
-
-    OutlineStatic();
 };
 
 Outline::Outline(
     const settings_t& settings,
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
-    vsg::observer_ptr<vsg::Viewer> observer_viewer
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod
 )
 {
     assert(paged_lod);
-    assert(observer_viewer);
 
     static OutlineStatic outline_static;
     const auto options = outline_static.options;
     auto& builder = outline_static.builder;
 
-    const vsg::ref_ptr<vsg::Viewer> viewer = observer_viewer;
-
     const auto wireframe_outline = vsg::read_cast<vsg::Node>(
         paged_lod->filename, options);
-
-    vsg::CompileResult compile_result = viewer->compileManager->compile(
-        wireframe_outline);
-
-    if (!compile_result)
-    {
-        std::fputs("Failed to compile wireframe outline\n", stderr);
-
-        return;
-    }
 
     vsg::ComputeBounds compute_bounds;
     compute_bounds.useNodeBounds = false;
@@ -81,16 +62,12 @@ Outline::Outline(
 
     const auto box_outline = builder.createBox(geometry_info, state_info);
 
-    compile_result = viewer->compileManager->compile(box_outline);
-
     if (settings.show_wireframe)
     {
         this->addChild(wireframe_outline);
     }
 
     this->addChild(box_outline);
-
-    vsg::updateViewer(*viewer, compile_result);
 }
 
 OutlineStatic::OutlineStatic()
@@ -106,7 +83,7 @@ OutlineStatic::OutlineStatic()
     const auto phong_shader = vsg::createPhongShaderSet(options);
 
     const FileSystem& fs = FileSystem::getInstance();
-    const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
+    const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
     const auto vert_shader = read_shader(VK_SHADER_STAGE_VERTEX_BIT,
         shaders_dir.c_str(), "standard.vert", options);

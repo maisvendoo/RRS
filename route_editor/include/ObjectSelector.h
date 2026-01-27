@@ -12,8 +12,9 @@ class CameraHandler;
 class Gizmo;
 class IntersectionHandler;
 class KeyboardHandler;
-class Route;
+class SceneGraph;
 class SingleSwitch;
+class SwitchGroup;
 struct settings_t;
 
 namespace vsg
@@ -25,7 +26,6 @@ class FrameEvent;
 class MatrixTransform;
 class MoveEvent;
 class PagedLOD;
-class Switch;
 class Viewer;
 
 }
@@ -38,11 +38,9 @@ public:
         vsg::ref_ptr<KeyboardHandler> keyboard_handler,
         vsg::ref_ptr<CameraHandler> camera_handler,
         vsg::ref_ptr<IntersectionHandler> intersection_handler,
-        vsg::ref_ptr<Route> route,
+        vsg::ref_ptr<SceneGraph> scene_graph,
         vsg::observer_ptr<vsg::Viewer> observer_viewer
     );
-
-    ~ObjectSelector();
 
     void apply(vsg::ButtonPressEvent& buttonPress) override;
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
@@ -52,13 +50,7 @@ public:
 private:
     void select_object(
         vsg::ref_ptr<vsg::MatrixTransform> object,
-        vsg::ref_ptr<vsg::Switch> switch_group,
-        vsg::ref_ptr<vsg::PagedLOD> paged_lod
-    );
-
-    void select_object_inner(
-        vsg::ref_ptr<vsg::MatrixTransform> object,
-        vsg::ref_ptr<vsg::Switch> switch_group,
+        vsg::ref_ptr<SwitchGroup> switch_group,
         vsg::ref_ptr<vsg::PagedLOD> paged_lod
     );
 
@@ -70,8 +62,9 @@ private:
     const settings_t& settings;
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
-    vsg::ref_ptr<Route> route;
+    vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::observer_ptr<vsg::Viewer> observer_viewer;
+
     SelectedObjectsMap selected_objects;
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<SingleSwitch> gizmo_switch;

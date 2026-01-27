@@ -6,6 +6,7 @@
 #include "Settings.h"
 #include "SingleSwitch.h"
 
+#include <vsg/app/ViewMatrix.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
@@ -18,6 +19,7 @@
 #include <vsg/utils/LineSegmentIntersector.h>
 #include <vsg/utils/ShaderSet.h>
 
+#include <cassert>
 #include <cmath>
 
 Gizmo::Gizmo(
@@ -29,6 +31,8 @@ Gizmo::Gizmo(
     , camera_handler(camera_handler)
     , selected_objects(selected_objects)
 {
+    assert(camera_handler);
+
     builder.shaderSet = vsg::createFlatShadedShaderSet();
 
     constexpr vsg::vec3 X_AXIS_POSITIVE = {1.0f, 0.0f, 0.0f};
@@ -65,8 +69,8 @@ Gizmo::Gizmo(
         const float opacity = settings.gizmo_opacity;
 
         vsg::box box = {
-            vsg::vec3{-thickness, -thickness, 0.0f},
-            vsg::vec3{ thickness,  thickness, length}
+            vsg::vec3(-thickness, -thickness, 0.0f),
+            vsg::vec3( thickness,  thickness, length)
         };
 
         vsg::GeometryInfo geometry_info(box);
@@ -157,6 +161,8 @@ bool Gizmo::handle_intersections(
     vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
 )
 {
+    assert(intersector);
+
     this->accept(*intersector);
 
     auto& intersections = intersector->intersections;
@@ -167,100 +173,7 @@ bool Gizmo::handle_intersections(
 
     IntersectionHandler::sort_intersections(intersections);
 
-    vsg::ref_ptr<vsg::Node> clicked_arrow;
-    int index = -1;
-
-    // vsg::ref_ptr<vsg::Node> arrows[TOTAL_AXES];
-    // arrows[AXIS_X] = arrow_x;
-    // arrows[AXIS_Y] = arrow_y;
-    // arrows[AXIS_Z] = arrow_z;
-
-    // vsg::vec3 arrow_directions[TOTAL_AXES];
-    // arrow_directions[AXIS_X] = {1.0f, 0.0f, 0.0f};
-    // arrow_directions[AXIS_Y] = {0.0f, 1.0f, 0.0f};
-    // arrow_directions[AXIS_Z] = {0.0f, 0.0f, 1.0f};
-
-    // vsg::ref_ptr<vsg::Node> planes[TOTAL_AXES];
-    // planes[AXIS_X] = plane_yz;
-    // planes[AXIS_Y] = plane_xz;
-    // planes[AXIS_Z] = plane_xy;
-
-    // vsg::ref_ptr<SingleSwitch> plane_switches[TOTAL_AXES];
-    // plane_switches[AXIS_X] = plane_yz_switch;
-    // plane_switches[AXIS_Y] = plane_xz_switch;
-    // plane_switches[AXIS_Z] = plane_xy_switch;
-
-    // const auto& node_path = intersections.front()->nodePath;
-    // assert(!node_path.empty());
-
-    // for (const vsg::Node* const node : node_path)
-    // {
-    //     for (int i = 0; i < TOTAL_AXES; ++i)
-    //     {
-    //         if (node == arrows[i])
-    //         {
-    //             clicked_arrow = arrows[i];
-    //             index = i;
-
-    //             break;
-    //         }
-    //     }
-
-    //     if (clicked_arrow)
-    //     {
-    //         break;
-    //     }
-    // }
-
-    // if (!clicked_arrow)
-    // {
-    //     intersector->intersections.clear();
-
-    //     return false;
-    // }
-
-    // const auto world_intersection = static_cast<vsg::vec3>(
-    //     intersections.front()->worldIntersection);
-
-    // begin_position = position;
-    // begin_position[index] = world_intersection[index];
-
-    // selected_objects_begin_matrixes.clear();
-    // for (const auto& [object, _] : selected_objects)
-    // {
-    //     selected_objects_begin_matrixes[object] = object->matrix;
-    // }
-
-    // const auto camera_front = static_cast<vsg::vec3>(
-    //     camera_handler->get_front());
-
-    // const auto camera_to_gizmo = vsg::normalize(begin_position - camera_front);
-
-    // float min_dot = 2.0f;
-    // int min_index = -1;
-
-    // for (int i = 0; i < TOTAL_AXES; ++i)
-    // {
-    //     if (i == index)
-    //     {
-    //         continue;
-    //     }
-
-    //     const float dot = std::abs(vsg::dot(camera_to_gizmo,
-    //         arrow_directions[i]));
-
-    //     // std::printf("%d: %10.3f\n", i, dot);
-
-    //     if (dot < min_dot)
-    //     {
-    //         min_dot = dot;
-    //         min_index = i;
-    //     }
-    // }
-
-    // active_plain = planes[min_index];
-    // active_plain_switch = plane_switches[min_index];
-    // active_plain_switch->mask = MASK_GUI | MASK_CLICKABLE;
+    // TODO
 
     intersections.clear();
 
