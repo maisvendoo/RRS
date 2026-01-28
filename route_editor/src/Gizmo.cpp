@@ -311,54 +311,35 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
             continue;
         }
 
+        vsg::vec3 offset = {0.0f, 0.0f, 0.0f};
+
         if (active_arrow == arrow_x)
         {
-            const float offset = world_intersection.x - click_position.x;
-
-            curr_position.x = click_position.x -
-                click_position_offset.x + offset;
-
-            for (const auto& [object, begin_matrix] :
-                selected_objects_begin_matrixes)
-            {
-                object->matrix = vsg::translate(static_cast<double>(offset),
-                    0.0, 0.0) * begin_matrix;
-            }
-
-            break;
+            offset.x = world_intersection.x - click_position.x;
         }
         else if (active_arrow == arrow_y)
         {
-            const float offset = world_intersection.y - click_position.y;
-
-            curr_position.y = click_position.y -
-                click_position_offset.y + offset;
-
-            for (const auto& [object, begin_matrix] :
-                selected_objects_begin_matrixes)
-            {
-                object->matrix = vsg::translate(0.0,
-                    static_cast<double>(offset), 0.0) * begin_matrix;
-            }
-
-            break;
+            offset.y = world_intersection.y - click_position.y;
         }
         else if (active_arrow == arrow_z)
         {
-            const float offset = world_intersection.z - click_position.z;
-
-            curr_position.z = click_position.z -
-                click_position_offset.z + offset;
-
-            for (const auto& [object, begin_matrix] :
-                selected_objects_begin_matrixes)
-            {
-                object->matrix = vsg::translate(0.0, 0.0,
-                    static_cast<double>(offset)) * begin_matrix;
-            }
-
-            break;
+            offset.z = world_intersection.z - click_position.z;
         }
+        else
+        {
+            continue;
+        }
+
+        curr_position = click_position - click_position_offset + offset;
+
+        for (const auto& [object, begin_matrix] :
+            selected_objects_begin_matrixes)
+        {
+            object->matrix = vsg::translate(
+                static_cast<vsg::dvec3>(offset)) * begin_matrix;
+        }
+
+        break;
     }
 }
 
