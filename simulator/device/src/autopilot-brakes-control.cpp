@@ -94,6 +94,12 @@ void AutopilotBrakeController::stepEPB(double dv,
         num_EPB_steps = 0;
     }
 
+    // В тяге - держим рукоятку в поездном положении и нехер её дергать
+    if (!lock_traction)
+    {
+        bc_state.brake_crane_pos_ref = KRM_POS_II;
+    }
+
     // Превышаем программую скорость
     if (dv < dVminus)
     {
@@ -104,7 +110,7 @@ void AutopilotBrakeController::stepEPB(double dv,
     }
 
     // Скорость упала ниже коридора, нет запрета отпуска, запрещена тяга
-    if (dv > dVplus && !is_disable_release)
+    if (dv > dVplus && !is_disable_release && lock_traction && is_motion_allowed)
     {
         // Отпускаем
         brakeReleaseEPB(pEQ, p_charge, dpEPB_over);
