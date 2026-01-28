@@ -114,8 +114,6 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
                 show_topology();
             }
 
-            show_selected_object_properties();
-
             return;
         }
     }
@@ -456,53 +454,4 @@ void EditorGui::show_topology() const
     }
 
     ImGui::End();
-}
-
-void EditorGui::show_selected_object_properties() const
-{
-    // if (!selected_object)
-    // {
-    //     return;
-    // }
-
-    // if (auto matrix_transform = *selected_object)
-    // {
-    //     ObjectProperties properties;
-    //     if (matrix_transform->getValue("properties", properties))
-    //     {
-    //         ImGui::Begin("Properties", nullptr, window_flags);
-
-    //         ImGui::Text("name: %s", properties.name.c_str());
-
-    //         ImGui::Text("translation:");
-    //         if (ImGui::SliderFloat("x##translation", &properties.translation.x, -100.0f, 100.0f))
-    //         {
-    //             update_selected_object_matrix(properties, matrix_transform);
-    //         }
-    //         if (ImGui::SliderFloat("y##translation", &properties.translation.y, -100.0f, 10000.0f))
-    //         {
-    //             update_selected_object_matrix(properties, matrix_transform);
-    //         }
-    //         if (ImGui::SliderFloat("z##translation", &properties.translation.z, -100.0f, 100.0f))
-    //         {
-    //             update_selected_object_matrix(properties, matrix_transform);
-    //         }
-
-    //         ImGui::Text("rotation:");
-    //         if (ImGui::SliderFloat("x##rotation", &properties.rotation_deg.x, -180.0f, 180.0f))
-    //         {
-    //             update_selected_object_matrix(properties, matrix_transform);
-    //         }
-    //         if (ImGui::SliderFloat("y##rotation", &properties.rotation_deg.y, -180.0f, 180.0f))
-    //         {
-    //             update_selected_object_matrix(properties, matrix_transform);
-    //         }
-    //         if (ImGui::SliderFloat("z##rotation", &properties.rotation_deg.z, -180.0f, 180.0f))
-    //         {
-    //             update_selected_object_matrix(properties, matrix_transform);
-    //         }
-
-    //         ImGui::End();
-    //     }
-    // }
 }

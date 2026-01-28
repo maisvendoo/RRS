@@ -47,8 +47,6 @@ private:
     void show_camera_settings() const;
     void show_topology() const;
 
-    void show_selected_object_properties() const;
-
 private:
     settings_t& settings;
     EditorState& editor_state;
