@@ -113,6 +113,16 @@ public:
         return up;
     }
 
+    dvec3 getRelPos() const
+    {
+        return rel_pos;
+    }
+
+    dvec3 getRelRot() const
+    {
+        return rel_rot;
+    }
+
 signals:
 
     /// Послать серверу запрос на обновление данных
