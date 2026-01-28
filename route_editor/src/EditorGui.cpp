@@ -10,10 +10,10 @@
 #include "Settings.h"
 #include "filesystem.h"
 // #include "rail-signal.h"
-// #include "switch.h"
+#include "switch.h"
 #include "topology.h"
-// #include "track.h"
-// #include "trajectory.h"
+#include "track.h"
+#include "trajectory.h"
 // #include "vec3.h"
 
 #include <vsg/app/ProjectionMatrix.h>
@@ -376,28 +376,52 @@ void EditorGui::show_topology() const
     const auto route_name = topology->getRouteName().toStdString();
     ImGui::Text("Route name: %s", route_name.c_str());
 
-    // if (ImGui::CollapsingHeader("Trajectories"))
-    // {
-    //     const auto* trajectories = (*topology).getTrajectoriesList();
-    //     for (auto it = trajectories->begin(); it != trajectories->end(); ++it)
-    //     {
-    //         Trajectory* const trajectory = *it;
-    //         if (ImGui::TreeNode(trajectory->getName().toStdString().c_str()))
-    //         {
-    //             ImGui::Text("%17s%12s%12s%12s%12s", "begin.x", "begin.y", "begin.z", "rail_coord", "traj_coord");
-    //             ImGui::Separator();
-    //             const auto& tracks = trajectory->getTracks();
-    //             for (std::size_t i = 0; i < tracks.size(); ++i)
-    //             {
-    //                 const track_t& track = tracks[i];
-    //                 ImGui::Text("[%2zu]:%12.3f%12.3f%12.3f%12.3f%12.3f", i, track.begin_point.x, track.begin_point.y,
-    //                     track.begin_point.z, track.railway_coord0, track.traj_coord);
-    //             }
+    if (ImGui::CollapsingHeader("Trajectories"))
+    {
+        const auto* trajectories = topology->getTrajectoriesList();
+        for (const Trajectory* trajectory : *trajectories)
+        {
+            if (ImGui::TreeNode(trajectory->getName().toStdString().c_str()))
+            {
+                ImGui::Text("%17s%12s%12s%12s%12s", "begin.x", "begin.y",
+                    "begin.z", "rail_coord", "traj_coord");
 
-    //             ImGui::TreePop();
-    //         }
-    //     }
-    // }
+                ImGui::Separator();
+
+                const auto& tracks = trajectory->getTracks();
+                const auto tracks_size = tracks.size();
+
+                for (auto i = decltype(tracks_size){0}; i < tracks_size; ++i)
+                {
+                    const track_t& track = tracks[i];
+                    ImGui::Text("[%2zu]:%12.3f%12.3f%12.3f%12.3f%12.3f", i,
+                        track.begin_point.x, track.begin_point.y,
+                        track.begin_point.z, track.railway_coord0,
+                        track.traj_coord);
+                }
+
+                ImGui::TreePop();
+            }
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Switches"))
+    {
+        const auto* connectors = topology->getConnectorsList();
+        for (auto it = connectors->begin(); it != connectors->end(); ++it)
+        {
+            const Switch* const switch_ = dynamic_cast<Switch*>(*it);
+            if (!switch_)
+            {
+                continue;
+            }
+
+            // if (ImGui::TreeNode(switch_->getName().toStdString().c_str()))
+            // {
+
+            // }
+        }
+    }
 
     // if (ImGui::CollapsingHeader("Switches"))
     // {

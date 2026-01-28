@@ -29,10 +29,6 @@ Trajectory *Switch::getFwdTraj() const
     // Если траектория вперёд единственная - делать дальше нечего
     if (fwdMinusTraj == nullptr)
     {
-        if (fwdPlusTraj == nullptr)
-        {
-            return nullptr;
-        }
         return fwdPlusTraj;
     }
     if (fwdPlusTraj == nullptr)
@@ -58,10 +54,6 @@ Trajectory *Switch::getBwdTraj() const
     // Если траектория вперёд единственная - делать дальше нечего
     if (bwdMinusTraj == nullptr)
     {
-        if (bwdPlusTraj == nullptr)
-        {
-            return nullptr;
-        }
         return bwdPlusTraj;
     }
     if (bwdPlusTraj == nullptr)
