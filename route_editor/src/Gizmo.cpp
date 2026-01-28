@@ -306,7 +306,12 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
     for (const vsg::Node* node : node_path)
     {
-        if (active_arrow == arrow_x && node == active_plain_switch)
+        if (node != active_plain_switch)
+        {
+            continue;
+        }
+
+        if (active_arrow == arrow_x)
         {
             const float offset = world_intersection.x - click_position.x;
 
@@ -318,6 +323,38 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
             {
                 object->matrix = vsg::translate(static_cast<double>(offset),
                     0.0, 0.0) * begin_matrix;
+            }
+
+            break;
+        }
+        else if (active_arrow == arrow_y)
+        {
+            const float offset = world_intersection.y - click_position.y;
+
+            curr_position.y = click_position.y -
+                click_position_offset.y + offset;
+
+            for (const auto& [object, begin_matrix] :
+                selected_objects_begin_matrixes)
+            {
+                object->matrix = vsg::translate(0.0,
+                    static_cast<double>(offset), 0.0) * begin_matrix;
+            }
+
+            break;
+        }
+        else if (active_arrow == arrow_z)
+        {
+            const float offset = world_intersection.z - click_position.z;
+
+            curr_position.z = click_position.z -
+                click_position_offset.z + offset;
+
+            for (const auto& [object, begin_matrix] :
+                selected_objects_begin_matrixes)
+            {
+                object->matrix = vsg::translate(0.0, 0.0,
+                    static_cast<double>(offset)) * begin_matrix;
             }
 
             break;
