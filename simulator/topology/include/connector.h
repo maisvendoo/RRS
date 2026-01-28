@@ -55,12 +55,22 @@ public:
         return signal_fwd;
     }
 
+    const Signal* getSignalFwd() const
+    {
+        return signal_fwd;
+    }
+
     void setSignalBwd(Signal *signal)
     {
         this->signal_bwd = signal;
     }
 
     Signal *getSignalBwd()
+    {
+        return signal_bwd;
+    }
+
+    const Signal* getSignalBwd() const
     {
         return signal_bwd;
     }

@@ -3,31 +3,25 @@
 #include "Action.h"
 #include "EditorState.h"
 #include "KeyBindings.h"
-// #include "ObjectProperties.h"
 #include "ObjectSelector.h"
 #include "Route.h"
 #include "SceneGraph.h"
 #include "Settings.h"
 #include "filesystem.h"
-// #include "rail-signal.h"
+#include "rail-signal.h"
 #include "switch.h"
 #include "topology.h"
 #include "track.h"
 #include "trajectory.h"
-// #include "vec3.h"
+#include "vec3.h"
 
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/ref_ptr.h>
-// #include <vsg/maths/common.h>
-// #include <vsg/maths/mat4.h>
-// #include <vsg/maths/transform.h>
-// #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/maths/vec3.h>
 #include <vsgImGui/imgui.h>
 
 #include <cassert>
 #include <cctype>
-// #include <cstddef>
 #include <filesystem>
 #include <set>
 #include <string>
@@ -407,6 +401,36 @@ void EditorGui::show_topology() const
 
     if (ImGui::CollapsingHeader("Switches"))
     {
+        const auto print_traj = [](const char* type,
+            const Trajectory* trajectory) -> void
+        {
+            ImGui::Text("%s: %s", type, trajectory
+                ? trajectory->getName().toStdString().c_str()
+                : "nullptr");
+        };
+
+        const auto print_signal = [](const char* type,
+            const Signal* signal) -> void
+        {
+            if (signal)
+            {
+                ImGui::Text("SignalLiter%s: %s", type,
+                    signal->getLetter().toStdString().c_str());
+
+                ImGui::Text("SignalModel%s: %s", type,
+                    signal->getSignalModel().toStdString().c_str());
+
+                const dvec3 rel_pos = signal->getRelPos();
+                const dvec3 rel_rot = signal->getRelRot();
+
+                ImGui::Text("RelPos%s: %8.3f %8.3f %8.3f", type,
+                    rel_pos.x, rel_pos.y, rel_pos.z);
+
+                ImGui::Text("RelRot%s: %8.3f %8.3f %8.3f", type,
+                    rel_rot.x, rel_rot.y, rel_rot.z);
+            }
+        };
+
         const auto* connectors = topology->getConnectorsList();
         for (auto it = connectors->begin(); it != connectors->end(); ++it)
         {
@@ -416,72 +440,20 @@ void EditorGui::show_topology() const
                 continue;
             }
 
-            // if (ImGui::TreeNode(switch_->getName().toStdString().c_str()))
-            // {
+            if (ImGui::TreeNode(switch_->getName().toStdString().c_str()))
+            {
+                print_traj("bwdMinusTraj", switch_->get_bwd_minus_traj());
+                print_traj("bwdPlusTraj", switch_->get_bwd_plus_traj());
+                print_traj("fwdMinusTraj", switch_->get_fwd_minus_traj());
+                print_traj("fwdPlusTraj", switch_->get_fwd_plus_traj());
 
-            // }
+                print_signal("Bwd", switch_->getSignalBwd());
+                print_signal("Fwd", switch_->getSignalFwd());
+
+                ImGui::TreePop();
+            }
         }
     }
-
-    // if (ImGui::CollapsingHeader("Switches"))
-    // {
-    //     const auto& connectors = *topology.getConnectorsList();
-    //     for (auto it = connectors.begin(); it != connectors.end(); ++it)
-    //     {
-    //         const Switch* const switch_ = dynamic_cast<const Switch*>(it.value());
-    //         if (!switch_)
-    //         {
-    //             continue;
-    //         }
-
-    //         if (ImGui::TreeNode(switch_->getName().toStdString().c_str()))
-    //         {
-    //             // if (const Trajectory* const bwd_plus_traj = switch_->getBwdPlusTraj())
-    //             // {
-    //             //     ImGui::Text("bwdPlusTraj: %s", bwd_plus_traj->getName().toStdString().c_str());
-    //             // }
-
-    //             if (const Trajectory* const fwd_plus_traj = switch_->getFwdTraj())
-    //             {
-    //                 ImGui::Text("fwdPlusTraj: %s", fwd_plus_traj->getName().toStdString().c_str());
-    //             }
-
-    //             // if (const Signal* const bwd_signal = switch_->getSignalBwd())
-    //             // {
-    //             //     ImGui::Text("SignalLiterBwd: %s", bwd_signal->getLetter().toStdString().c_str());
-    //             //     ImGui::Text("SignalModelBwd: %s", bwd_signal->getSignalModel().toStdString().c_str());
-    //             //     const dvec3 rel_pos = bwd_signal->getRelPosition();
-    //             //     const dvec3 rel_rot = bwd_signal->getRelRotation();
-    //             //     ImGui::Text("RelPosVectorBwd:%8.3f%8.3f%8.3f", rel_pos.x, rel_pos.y, rel_pos.z);
-    //             //     ImGui::Text("RelRotVectorBwd:%8.3f%8.3f%8.3f", rel_rot.x, rel_rot.y, rel_rot.z);
-    //             // }
-
-    //             // if (const Signal* const fwd_signal = switch_->getSignalFwd())
-    //             // {
-    //             //     ImGui::Text("SignalLiterFwd: %s", fwd_signal->getLetter().toStdString().c_str());
-    //             //     ImGui::Text("SignalModelFwd: %s", fwd_signal->getSignalModel().toStdString().c_str());
-    //             //     const dvec3 rel_pos = fwd_signal->getRelPosition();
-    //             //     const dvec3 rel_rot = fwd_signal->getRelRotation();
-    //             //     ImGui::Text("RelPosVectorFwd:%8.3f%8.3f%8.3f", rel_pos.x, rel_pos.y, rel_pos.z);
-    //             //     ImGui::Text("RelRotVectorFwd:%8.3f%8.3f%8.3f", rel_rot.x, rel_rot.y, rel_rot.z);
-    //             // }
-
-    //             // if (const Trajectory* const bwd_minus_traj = switch_->getBwdMinusTraj())
-    //             // {
-    //             //     ImGui::Text("bwdMinusTraj: %s", bwd_minus_traj->getName().toStdString().c_str());
-    //             //     ImGui::Text("state_bwd: %d", switch_->getStateBwd());
-    //             // }
-
-    //             // if (const Trajectory* const fwd_minus_traj = switch_->getFwdMinusTraj())
-    //             // {
-    //             //     ImGui::Text("fwdMinusTraj: %s", fwd_minus_traj->getName().toStdString().c_str());
-    //             //     ImGui::Text("state_fwd: %d", switch_->getStateFwd());
-    //             // }
-
-    //             ImGui::TreePop();
-    //         }
-    //     }
-    // }
 
     ImGui::End();
 }
