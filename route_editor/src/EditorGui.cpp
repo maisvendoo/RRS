@@ -490,6 +490,9 @@ void EditorGui::show_selected_objects_properties() const
 
         ImGui::Text("%s: %10.3f %10.3f %10.3f", properties.name.c_str(),
             translation.x, translation.y, translation.z);
+
+        ImGui::Text("%s: %10.3f %10.3f %10.3f %10.3f", properties.name.c_str(),
+            rotation.x, rotation.y, rotation.z, rotation.w);
     }
 
     ImGui::End();
