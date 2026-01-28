@@ -267,17 +267,17 @@ void EditorGui::show_route_map() const
             ImGui::TableNextColumn();
             ImGui::Text("%s", label.c_str());
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", translation.x);
+            ImGui::Text("%10.3f", translation.x);
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", translation.y);
+            ImGui::Text("%10.3f", translation.y);
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", translation.z);
+            ImGui::Text("%10.3f", translation.z);
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", rotation_deg.x);
+            ImGui::Text("%10.3f", rotation_deg.x);
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", rotation_deg.y);
+            ImGui::Text("%10.3f", rotation_deg.y);
             ImGui::TableNextColumn();
-            ImGui::Text("%.3f", rotation_deg.z);
+            ImGui::Text("%10.3f", rotation_deg.z);
         }
 
         ImGui::EndTable();
