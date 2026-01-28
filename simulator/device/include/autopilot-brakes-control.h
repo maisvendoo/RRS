@@ -155,7 +155,7 @@ private:
     void load_config(CfgReader &cfg) override;
 
     /// Управление ЭПТ
-    void stepEPB(double dv, bool &lock_traction, bool &is_disable_release);
+    void stepEPB(double dv, bool &lock_traction, bool &is_disable_release, bool is_motion_allowed);
 
     /// Управление ПТ
     void stepPB(double dv, bool is_motion_allowed, bool &lock_traction, bool &is_disable_release);
