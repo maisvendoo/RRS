@@ -78,10 +78,6 @@ public:
         this->a_cur = a_cur;
     }
 
-signals:
-
-    void sigSetBrakeAccel(double a_brake);
-
 private:
 
     /// Состояние органов управления тормозами
@@ -101,7 +97,10 @@ private:
     double dist_target = 0.0;
 
     /// Число дополнительных ступеней разрядки ТМ
-    uint8_t num_steps = 0;
+    uint8_t num_PB_steps = 0;
+
+    /// Число дополнительных ступеней ЭПТ
+    uint8_t num_EPB_steps = 0;
 
     /// Текущее ускорение поезда
     double a_cur = 0.0;
@@ -139,11 +138,17 @@ private:
     /// Минимальная ступень ЭПТ
     double pBC_EPB = 0.1;
 
+    /// Минимальное давление в ТЦ, при котором тормоза считаются отпущенными
+    double pBC_min = 0.04;
+
     const double KRM_HANDLE_DELAY = 0.5;
     Timer *krm_handle_timer = new Timer(KRM_HANDLE_DELAY, false);
 
-    const double BRAKE_DELAY = 2.0;
-    Timer *brake_timer = new Timer(BRAKE_DELAY, false);
+    const double BRAKE_PB_DELAY = 2.0;
+    Timer *brakePB_timer = new Timer(BRAKE_PB_DELAY, false);
+
+    const double BRAKE_EPB_DELAY = 1.0;
+    Timer *brakeEPB_timer = new Timer(BRAKE_PB_DELAY, false);
 
     void ode_system(const state_vector_t &Y,
                     state_vector_t &dYdt,
@@ -170,13 +175,21 @@ private:
     void brakeStep(double pEQ, double p_charge, double dp);
 
     /// Выполнить отпуск ПТ
-    void brakeRelease(double pEQ, double p_charge, double dp_over);
+    void brakeReleasePB(double pEQ, double p_charge, double dp_over);
+
+    /// Выполнить ступень торможения ЭПТ
+    void brakeStepEPB(double pBC, double pBC_ref);
+
+    /// Выполнить отпуск ЭПТ
+    void brakeReleaseEPB(double pEQ, double pBC, double p_charge, double dp_over);
 
 private slots:
 
     void slotBrakeCraneHandle();
 
-    void slotBrakeDelay();
+    void slotBrakePBdelay();
+
+    void slotBrakeEPBdelay();
 };
 
 #endif

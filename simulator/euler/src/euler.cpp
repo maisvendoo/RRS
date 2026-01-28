@@ -32,9 +32,17 @@ bool EulerSolver::step(OdeSystem *ode_sys,
 
     ode_sys->calcDerivative(Y, dYdt, t, dt);
 
-    for (size_t i = 0; i < Y.size(); ++i)
+    // Помещаем в регистры все используемые в цикле параметры
+    const double h = dt;
+    const size_t n = Y.size();
+    double* __restrict__ y = Y.data();
+    const double* __restrict__ dydt = dYdt.data();
+
+    #pragma GCC ivdep
+    #pragma GCC unroll 4
+    for (size_t i = 0; i < n; ++i)
     {
-        Y[i] = Y[i] + dYdt[i] * dt;
+        y[i] = y[i] + dydt[i] * h;
     }
 
     return true;

@@ -11,6 +11,8 @@
 #include    <vector>
 #include    <QMetaType>
 
+#include    <state-vector-allocator.h>
+
 /*!
  * \typedef
  * \brief ODE system state vector
@@ -18,7 +20,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-typedef     std::vector<double> state_vector_t;
+using state_vector_t = std::vector<double, StateVectorAllocator<double, 64>>;
 
 Q_DECLARE_METATYPE(state_vector_t)
 
