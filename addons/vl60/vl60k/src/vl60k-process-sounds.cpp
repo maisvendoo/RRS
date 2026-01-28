@@ -149,6 +149,9 @@ void VL60k::soundsOutput(const simulator_time_t& t, const double& dt)
 
         analogSignal[CAB1_SOUND_EPK_REMOVE_KEY + d] = epk[cab_idx]->getSoundSignal(AutoTrainStop::KEY_REMOVED);
         analogSignal[CAB1_SOUND_EPK_KEY_OFF + d] = epk[cab_idx]->getSoundSignal(AutoTrainStop::KEY_STATE_OFF);
+
+        analogSignal[CAB1_SOUND_SHUNTING_MODE_TUMBLER_ON + d] = tumbler_shunting_mode[cab_idx].getSoundSignal(Trigger::ON_SOUND);
+        analogSignal[CAB1_SOUND_SHUNTING_MODE_TUMBLER_OFF + d] = tumbler_shunting_mode[cab_idx].getSoundSignal(Trigger::OFF_SOUND);
     }
 
     // Звуки в движении
