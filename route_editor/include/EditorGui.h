@@ -32,7 +32,7 @@ public:
         const KeyBindings& key_bindings,
         vsg::ref_ptr<vsg::Perspective> perspective,
         vsg::ref_ptr<SceneGraph> scene_graph,
-        vsg::ref_ptr<ObjectSelector> object_selector,
+        const vsg::ref_ptr<ObjectSelector>& object_selector,
         std::string& route_directory
     );
 
@@ -47,13 +47,15 @@ private:
     void show_camera_settings() const;
     void show_topology() const;
 
+    void show_selected_objects_properties() const;
+
 private:
     settings_t& settings;
     EditorState& editor_state;
     const KeyBindings& key_bindings;
     vsg::ref_ptr<vsg::Perspective> perspective;
     vsg::ref_ptr<SceneGraph> scene_graph;
-    vsg::ref_ptr<ObjectSelector> object_selector;
+    const vsg::ref_ptr<ObjectSelector>& object_selector;
 
     ImGuiWindowFlags window_flags;
     std::string& route_directory;

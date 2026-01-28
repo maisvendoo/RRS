@@ -3,6 +3,7 @@
 #include "Action.h"
 #include "EditorState.h"
 #include "KeyBindings.h"
+#include "ObjectProperties.h"
 #include "ObjectSelector.h"
 #include "Route.h"
 #include "SceneGraph.h"
@@ -17,7 +18,10 @@
 
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/quat.h>
+#include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/MatrixTransform.h>
 #include <vsgImGui/imgui.h>
 
 #include <cassert>
@@ -32,7 +36,7 @@ EditorGui::EditorGui(
     const KeyBindings& key_bindings,
     vsg::ref_ptr<vsg::Perspective> perspective,
     vsg::ref_ptr<SceneGraph> scene_graph,
-    vsg::ref_ptr<ObjectSelector> object_selector,
+    const vsg::ref_ptr<ObjectSelector>& object_selector,
     std::string& route_directory
 )
     : settings(settings)
@@ -113,6 +117,8 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 show_topology();
             }
+
+            show_selected_objects_properties();
 
             return;
         }
@@ -451,6 +457,39 @@ void EditorGui::show_topology() const
                 ImGui::TreePop();
             }
         }
+    }
+
+    ImGui::End();
+}
+
+void EditorGui::show_selected_objects_properties() const
+{
+    if (!object_selector)
+    {
+        return;
+    }
+
+    const auto& selected_objects = object_selector->get_selected_objects();
+    if (selected_objects.empty())
+    {
+        return;
+    }
+
+    ImGui::Begin("Selected objects", nullptr, window_flags);
+
+    for (const auto& [object, _] : selected_objects)
+    {
+        ObjectProperties properties;
+        object->getValue("properties", properties);
+
+        vsg::dvec3 translation;
+        vsg::dquat rotation;
+        vsg::dvec3 scale;
+
+        vsg::decompose(object->matrix, translation, rotation, scale);
+
+        ImGui::Text("%s: %10.3f %10.3f %10.3f", properties.name.c_str(),
+            translation.x, translation.y, translation.z);
     }
 
     ImGui::End();

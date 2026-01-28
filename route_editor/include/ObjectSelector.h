@@ -47,6 +47,8 @@ public:
     void apply(vsg::MoveEvent& moveEvent) override;
     void apply(vsg::FrameEvent& frame) override;
 
+    const SelectedObjectsMap& get_selected_objects() const;
+
 private:
     void select_object(
         vsg::ref_ptr<vsg::MatrixTransform> object,

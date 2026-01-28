@@ -168,6 +168,11 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     gizmo->update_scale();
 }
 
+const SelectedObjectsMap& ObjectSelector::get_selected_objects() const
+{
+    return selected_objects;
+}
+
 void ObjectSelector::select_object(
     vsg::ref_ptr<vsg::MatrixTransform> object,
     vsg::ref_ptr<SwitchGroup> switch_group,
