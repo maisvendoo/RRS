@@ -51,11 +51,20 @@ bool ScenarioManager::run(const std::string &route_dir,
 {
     // Полный путь к скрипту сценария
     FileSystem &fs = FileSystem::getInstance();
-    std::string script_path = fs.getRouteRootDir() + fs.separator()
-                              + route_dir + fs.separator()
-                              + "scenarios" + fs.separator()
+
+    // Каталог, где расположен сценарий
+    std::string scenario_dir = fs.getRouteRootDir() + fs.separator()
+                               + route_dir + fs.separator()
+                               + "scenarios";
+
+    std::string script_path = scenario_dir + fs.separator()
                               + scenario_name + fs.separator()
                               + "main.lua";
+
+    std::replace(scenario_dir.begin(), scenario_dir.end(), '\\', '/');
+
+    // Добавляем каталог сценария в пути поиска модулей
+    lua["package"]["path"] = lua["package"]["path"].get<std::string>() + ";" + scenario_dir + "/?.lua";
 
     try
     {

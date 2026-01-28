@@ -39,7 +39,7 @@ void AutopilotBrakeController::step_control(bool is_EPB_ON,
     if (is_EPB_ON)
     {
         // Управляем им
-        stepEPB(dv, lock_traction, is_disable_release);
+        stepEPB(dv, lock_traction, is_disable_release, is_motion_allowed);
     }
     else // иначе - пичаль-пичалька
     {
@@ -76,7 +76,8 @@ void AutopilotBrakeController::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void AutopilotBrakeController::stepEPB(double dv,
                                        bool &lock_traction,
-                                       bool &is_disable_release)
+                                       bool &is_disable_release,
+                                       bool is_motion_allowed)
 {
     // Максимальное превышение над программной скоростью
     const double dVminus = -dVminusEPB;
@@ -92,11 +93,14 @@ void AutopilotBrakeController::stepEPB(double dv,
         lock_traction = true;
     }
 
+    constexpr double pBC_hyst_low  = 0.08;  // Порог выхода из перекрыши
+    constexpr double pBC_hyst_high = 0.12;  // Порог входа в перекрышу
+
     // Скорость в допустимом коридоре
-    if ( dv >= dVminus && dv <= dVplus)
+    if ( dv >= dVminus && dv <= dVplus && is_motion_allowed)
     {
         // Ставим в перекрышу, при условии что в ТЦ минимут 1 кгс
-        if (lock_traction && pBC >= 0.1)
+        if (lock_traction && pBC >= pBC_hyst_high)
         {
             setBrakeCranePos(KRM_POS_IV);
         }
@@ -108,7 +112,7 @@ void AutopilotBrakeController::stepEPB(double dv,
         // Отпускаем
 
         // Последняя ступень отпуска I положением
-        if ( pBC < 0.1)
+        if ( pBC < pBC_hyst_low)
         {
             // если нет завышения в УР
             if (pEQ < p_charge + dpEPB_over)
