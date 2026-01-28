@@ -196,8 +196,6 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
 
         ObjectProperties properties;
         properties.name = label;
-        properties.translation = translation;
-        properties.rotation_deg = rotation_deg;
 
         const auto switch_group = SwitchGroup::create();
 
@@ -353,7 +351,6 @@ bool Route::load_topology()
 
             ObjectProperties properties;
             properties.name = signal_model_name;
-            properties.translation = pos;
 
             const auto matrix_transform = vsg::MatrixTransform::create();
             matrix_transform->addChild(switch_group);
