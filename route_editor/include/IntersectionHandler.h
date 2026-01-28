@@ -26,8 +26,8 @@ public:
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
 
     vsg::ref_ptr<vsg::LineSegmentIntersector> apply_(
-        vsg::MoveEvent& moveEvent
-    );
+        const vsg::MoveEvent& moveEvent
+    ) const;
 
     vsg::ref_ptr<vsg::LineSegmentIntersector> get_lmb_intersector() const;
     vsg::ref_ptr<vsg::LineSegmentIntersector> get_mmb_intersector() const;

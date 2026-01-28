@@ -207,8 +207,9 @@ bool Gizmo::handle_intersections()
     {
         if (node == arrow_x)
         {
-            begin_position = curr_position;
-            begin_position.x = world_intersection.x;
+            click_position = curr_position;
+            click_position.x = world_intersection.x;
+            click_position_offset = click_position - curr_position;
 
             save_selected_objects_begin_matrixes();
 
@@ -222,8 +223,9 @@ bool Gizmo::handle_intersections()
         }
         else if (node == arrow_y)
         {
-            begin_position = curr_position;
-            begin_position.y = world_intersection.y;
+            click_position = curr_position;
+            click_position.y = world_intersection.y;
+            click_position_offset = click_position - curr_position;
 
             save_selected_objects_begin_matrixes();
 
@@ -237,8 +239,9 @@ bool Gizmo::handle_intersections()
         }
         else if (node == arrow_z)
         {
-            begin_position = curr_position;
-            begin_position.z = world_intersection.z;
+            click_position = curr_position;
+            click_position.z = world_intersection.z;
+            click_position_offset = click_position - curr_position;
 
             save_selected_objects_begin_matrixes();
 
@@ -281,6 +284,45 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
     {
         return;
     }
+
+    const auto intersector = intersection_handler->apply_(moveEvent);
+
+    this->accept(*intersector);
+
+    auto& intersections = intersector->intersections;
+    if (intersections.empty())
+    {
+        return;
+    }
+
+    intersection_handler->sort_intersections(intersections);
+
+    const auto intersection = intersections.front();
+    const auto world_intersection = static_cast<vsg::vec3>(
+        intersection->worldIntersection);
+
+    const auto& node_path = intersection->nodePath;
+    assert(!node_path.empty());
+
+    for (const vsg::Node* node : node_path)
+    {
+        if (active_arrow == arrow_x && node == active_plain_switch)
+        {
+            const float offset = world_intersection.x - click_position.x;
+
+            curr_position.x = click_position.x -
+                click_position_offset.x + offset;
+
+            for (const auto& [object, begin_matrix] :
+                selected_objects_begin_matrixes)
+            {
+                object->matrix = vsg::translate(static_cast<double>(offset),
+                    0.0, 0.0) * begin_matrix;
+            }
+
+            break;
+        }
+    }
 }
 
 void Gizmo::update_position()
@@ -300,8 +342,6 @@ void Gizmo::update_position()
     }
 
     curr_position /= static_cast<float>(selected_objects.size());
-
-    this->matrix = vsg::translate(curr_position);
 }
 
 void Gizmo::update_scale()

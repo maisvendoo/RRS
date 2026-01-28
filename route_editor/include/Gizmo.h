@@ -61,7 +61,8 @@ private:
     using MatrixMap = std::map<MatrixTransformPtr, vsg::dmat4>;
 
     vsg::vec3 curr_position;
-    vsg::vec3 begin_position;
+    vsg::vec3 click_position;
+    vsg::vec3 click_position_offset;
     MatrixMap selected_objects_begin_matrixes;
     vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;
