@@ -196,7 +196,7 @@ public:
 
     void setBrakeShoesState(bool state);
 
-    std::vector<Autopilot *> getAutopilot()
+    const std::vector<Autopilot *>& getAutopilot() const
     {
         return autopilot;
     }

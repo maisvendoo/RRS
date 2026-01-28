@@ -193,7 +193,7 @@ void MapWidget::drawTrajectory(Trajectory* traj, QPainter& painter,
 
     painter.setPen(pen);
 
-    for (auto& track : traj->getTracks())
+    for (const auto& track : traj->getTracks())
     {
         QPoint p0 = coord_transform(track.begin_point);
         QPoint p1 = coord_transform(track.end_point);
@@ -212,8 +212,8 @@ void MapWidget::drawTrajectory(Trajectory* traj, QPainter& painter,
     {
         if (show_traj_names)
         {
-            std::vector<track_t> tracs = traj->getTracks();
-            track_t middle_track = tracs[tracs.size() / 2];
+            const std::vector<track_t>& tracks = traj->getTracks();
+            const track_t& middle_track = tracks[tracks.size() / 2];
 
             dvec3 mp = (middle_track.begin_point + middle_track.end_point) * 0.5;
 
@@ -326,9 +326,9 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
     dvec3 center;
     Trajectory *fwd_traj = conn->getFwdTraj();
     Trajectory *bwd_traj = conn->getBwdTraj();
-    if ((fwd_traj == nullptr) || (fwd_traj->getTracks().size() == 0))
+    if ((fwd_traj == nullptr) || (fwd_traj->getTracks().empty()))
     {
-        if ((bwd_traj == nullptr || (bwd_traj->getTracks().size() == 0)))
+        if ((bwd_traj == nullptr || (bwd_traj->getTracks().empty())))
         {
             return;
         }
@@ -340,7 +340,7 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
     }
     else
     {
-        if ((bwd_traj == nullptr || (bwd_traj->getTracks().size() == 0)))
+        if ((bwd_traj == nullptr || (bwd_traj->getTracks().empty())))
         {
             track_t fwd_track = fwd_traj->getLastTrack();
             center = fwd_track.begin_point;
@@ -571,13 +571,13 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
         draw_len = std::min(draw_len, switch_length);
 
         size_t i = 0;
-        dvec3 fwd = (*(traj->getTracks().begin())).begin_point;
+        dvec3 fwd = traj->getTracks().begin()->begin_point;
         QPoint fwd_point = coord_transform(fwd);
-        track_t track_next;
+        const track_t* track_next = nullptr;
         while (draw_len > 0.0)
         {
-            track_next = *(traj->getTracks().begin() + i);
-            fwd += track_next.orth * std::min(draw_len, track_next.len);
+            track_next = &traj->getTracks().at(i);
+            fwd += track_next->orth * std::min(draw_len, track_next->len);
             QPoint fwd_point_next = coord_transform(fwd);
             painter.drawLine(fwd_point, fwd_point_next);
 
@@ -589,7 +589,7 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
             }
 
             fwd_point = fwd_point_next;
-            draw_len = draw_len - track_next.len;
+            draw_len = draw_len - track_next->len;
             ++i;
         }
     }
@@ -603,13 +603,13 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
         draw_len = std::min(draw_len, switch_length);
 
         size_t i = 1;
-        dvec3 bwd = (*(traj->getTracks().end() - i)).end_point;
+        dvec3 bwd = (traj->getTracks().end() - i)->end_point;
         QPoint bwd_point = coord_transform(bwd);
-        track_t track_next;
+        const track_t* track_next = nullptr;
         while (draw_len > 0.0)
         {
-            track_next = *(traj->getTracks().end() - i);
-            bwd -= track_next.orth * std::min(draw_len, track_next.len);
+            track_next = &traj->getTracks().at(traj->getTracks().size() - i);
+            bwd -= track_next->orth * std::min(draw_len, track_next->len);
             QPoint bwd_point_next = coord_transform(bwd);
             painter.drawLine(bwd_point, bwd_point_next);
 
@@ -621,7 +621,7 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
             }
 
             bwd_point = bwd_point_next;
-            draw_len = draw_len - track_next.len;
+            draw_len = draw_len - track_next->len;
             ++i;
         }
     }

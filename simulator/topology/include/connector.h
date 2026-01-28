@@ -36,7 +36,7 @@ public:
     QString getName() const { return this->name; }
 
     /// Получить оборудование путевой инфраструктуры на этом коннекторе
-    std::vector<ConnectorDevice *> getConnectorDevices();
+    const std::vector<ConnectorDevice *>& getConnectorDevices() const;
 
     /// Шаг симуляции
     virtual void step(double t, double dt);

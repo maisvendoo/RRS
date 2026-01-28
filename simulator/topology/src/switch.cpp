@@ -232,12 +232,12 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     // Загружаем модули
     // Находим названия модулей, которые есть в траекториях спереди или сзади
     QStringList devices_names;
-    for (auto traj : {bwdPlusTraj, bwdMinusTraj, fwdPlusTraj, fwdMinusTraj})
+    for (auto* traj : {bwdPlusTraj, bwdMinusTraj, fwdPlusTraj, fwdMinusTraj})
     {
         if (traj == nullptr)
             continue;
 
-        for (auto device : traj->getTrajectoryDevices())
+        for (auto* device : traj->getTrajectoryDevices())
         {
             QString name = device->getName();
             if (!devices_names.contains(name))
@@ -276,7 +276,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
         if (bwdPlusTraj != nullptr)
         {
             no_plus = false;
-            for (auto device_bwd : bwdPlusTraj->getTrajectoryDevices())
+            for (auto* device_bwd : bwdPlusTraj->getTrajectoryDevices())
             {
                 QString bwd_name = device_bwd->getName();
                 if (device_name == bwd_name)
@@ -290,7 +290,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 
         if (bwdMinusTraj != nullptr)
         {
-            for (auto device_bwd : bwdMinusTraj->getTrajectoryDevices())
+            for (auto* device_bwd : bwdMinusTraj->getTrajectoryDevices())
             {
                 QString bwd_name = device_bwd->getName();
                 if (device_name == bwd_name)
@@ -307,7 +307,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
         if (fwdPlusTraj != nullptr)
         {
             no_plus = false;
-            for (auto device_fwd : fwdPlusTraj->getTrajectoryDevices())
+            for (auto* device_fwd : fwdPlusTraj->getTrajectoryDevices())
             {
                 QString fwd_name = device_fwd->getName();
                 if (device_name == fwd_name)
@@ -321,7 +321,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 
         if (fwdMinusTraj != nullptr)
         {
-            for (auto device_fwd : fwdMinusTraj->getTrajectoryDevices())
+            for (auto* device_fwd : fwdMinusTraj->getTrajectoryDevices())
             {
                 QString fwd_name = device_fwd->getName();
                 if (device_name == fwd_name)
@@ -427,7 +427,7 @@ void Switch::step(double t, double dt)
         if (change_fwd > 0)
         {
             bool no_change = true;
-            for (auto device_fwd : fwdPlusTraj->getTrajectoryDevices())
+            for (auto* device_fwd : fwdPlusTraj->getTrajectoryDevices())
             {
                 if (device->getName() == device_fwd->getName())
                 {
@@ -442,7 +442,7 @@ void Switch::step(double t, double dt)
         if (change_fwd < 0)
         {
             bool no_change = true;
-            for (auto device_fwd : fwdMinusTraj->getTrajectoryDevices())
+            for (auto* device_fwd : fwdMinusTraj->getTrajectoryDevices())
             {
                 if (device->getName() == device_fwd->getName())
                 {
@@ -458,7 +458,7 @@ void Switch::step(double t, double dt)
         if (change_bwd > 0)
         {
             bool no_change = true;
-            for (auto device_bwd : bwdPlusTraj->getTrajectoryDevices())
+            for (auto* device_bwd : bwdPlusTraj->getTrajectoryDevices())
             {
                 if (device->getName() == device_bwd->getName())
                 {
@@ -473,7 +473,7 @@ void Switch::step(double t, double dt)
         if (change_bwd < 0)
         {
             bool no_change = true;
-            for (auto device_bwd : bwdMinusTraj->getTrajectoryDevices())
+            for (auto* device_bwd : bwdMinusTraj->getTrajectoryDevices())
             {
                 if (device->getName() == device_bwd->getName())
                 {

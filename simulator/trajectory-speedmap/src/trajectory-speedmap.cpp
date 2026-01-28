@@ -311,7 +311,7 @@ double TrajectorySpeedMap::getTrajLength()
 void TrajectorySpeedMap::load_config(CfgReader &cfg)
 {
     // Треки данной траектории
-    std::vector<track_t> tracks = trajectory->getTracks();
+    const std::vector<track_t>& tracks = trajectory->getTracks();
 
     // Интервалы пикетажа данной траектории
     double railway_coord_begin = min(tracks.front().railway_coord0,
@@ -338,7 +338,7 @@ void TrajectorySpeedMap::load_config(CfgReader &cfg)
             limits.push_back(limit);
             double traj_limit_begin = 0.0;
             double traj_limit_end = trajectory->getLength();
-            for (auto track : tracks)
+            for (const auto& track : tracks)
             {
                 double track_begin = min(track.railway_coord0,
                                          track.railway_coord1);

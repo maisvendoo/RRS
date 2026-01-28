@@ -105,7 +105,7 @@ public:
     }
 
     /// Получить оборудование путевой инфраструктуры на этой траектории
-    std::vector<TrajectoryDevice *> getTrajectoryDevices();
+    const std::vector<TrajectoryDevice *>& getTrajectoryDevices() const;
 
     /// Получить положение ПЕ на траектории
     profile_point_t getPosition(double traj_coord, int direction);
@@ -117,7 +117,7 @@ public:
 
     void deserialize(QByteArray &data);
 
-    std::vector<track_t> getTracks()
+    const std::vector<track_t>& getTracks() const
     {
         return tracks;
     }

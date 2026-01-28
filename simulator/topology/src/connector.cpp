@@ -35,7 +35,7 @@ void Connector::configure(CfgReader &cfg,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-std::vector<ConnectorDevice *> Connector::getConnectorDevices()
+const std::vector<ConnectorDevice *>& Connector::getConnectorDevices() const
 {
     return devices;
 }
