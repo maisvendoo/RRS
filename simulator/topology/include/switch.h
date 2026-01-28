@@ -23,6 +23,11 @@ public:
 
     Trajectory *getBwdTraj() const override;
 
+    Trajectory* get_fwd_minus_traj() const;
+    Trajectory* get_fwd_plus_traj() const;
+    Trajectory* get_bwd_minus_traj() const;
+    Trajectory* get_bwd_plus_traj() const;
+
     void configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list) override;
 
     /// Шаг симуляции
