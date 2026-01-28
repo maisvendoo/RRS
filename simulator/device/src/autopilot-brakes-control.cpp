@@ -8,8 +8,11 @@ AutopilotBrakeController::AutopilotBrakeController()
     connect(krm_handle_timer, &Timer::process,
             this, &AutopilotBrakeController::slotBrakeCraneHandle);
 
-    connect(brake_timer, &Timer::process,
-            this, &AutopilotBrakeController::slotBrakeDelay);
+    connect(brakePB_timer, &Timer::process,
+            this, &AutopilotBrakeController::slotBrakePBdelay);
+
+    connect(brakeEPB_timer, &Timer::process,
+            this, &AutopilotBrakeController::slotBrakeEPBdelay);
 }
 
 //------------------------------------------------------------------------------
@@ -18,7 +21,8 @@ AutopilotBrakeController::AutopilotBrakeController()
 void AutopilotBrakeController::step(double t, double dt)
 {
     krm_handle_timer->step(t, dt);
-    brake_timer->step(t, dt);
+    brakePB_timer->step(t, dt);
+    brakeEPB_timer->step(t, dt);
 
     Device::step(t, dt);
 }
@@ -66,7 +70,7 @@ void AutopilotBrakeController::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "HoldTimeout", hold_timeout);
 
-    brake_timer->setTimeout(hold_timeout);
+    brakePB_timer->setTimeout(hold_timeout);
 
     cfg.getDouble(secName, "pBC_EPB", pBC_EPB);
 }
@@ -84,55 +88,42 @@ void AutopilotBrakeController::stepEPB(double dv,
     // Максимальное снижение скорости относительно программной
     const double dVplus = dVplusEPB;
 
+    if (bc_state.brake_crane_pos_ref == KRM_POS_I ||
+        bc_state.brake_crane_pos_ref == KRM_POS_II)
+    {
+        num_EPB_steps = 0;
+    }
+
     // Превышаем программую скорость
     if (dv < dVminus)
     {
         // Ступень торможения
-        setBrakeCranePos(KRM_POS_Va);
+        brakeStepEPB(pBC, pBC_EPB);
         // Запрет тяги
         lock_traction = true;
     }
 
-    constexpr double pBC_hyst_low  = 0.08;  // Порог выхода из перекрыши
-    constexpr double pBC_hyst_high = 0.12;  // Порог входа в перекрышу
-
-    // Скорость в допустимом коридоре
-    if ( dv >= dVminus && dv <= dVplus && is_motion_allowed)
-    {
-        // Ставим в перекрышу, при условии что в ТЦ минимут 1 кгс
-        if (lock_traction && pBC >= pBC_hyst_high)
-        {
-            setBrakeCranePos(KRM_POS_IV);
-        }
-    }
-
     // Скорость упала ниже коридора, нет запрета отпуска, запрещена тяга
-    if (dv > dVplus && !is_disable_release && lock_traction)
+    if (dv > dVplus && !is_disable_release)
     {
         // Отпускаем
-
-        // Последняя ступень отпуска I положением
-        if ( pBC < pBC_hyst_low)
-        {
-            // если нет завышения в УР
-            if (pEQ < p_charge + dpEPB_over)
-            {
-                // Первое
-                setBrakeCranePos(KRM_POS_I);
-            }
-            else // иначе - II положение
-            {
-                setBrakeCranePos(KRM_POS_II);
-            }
-        }
-        else // и если не последняя ступень отпуска - отпускаем II положением
-            setBrakeCranePos(KRM_POS_II);
+        brakeReleaseEPB(pEQ, p_charge, dpEPB_over);
     }
 
-    // Не забываем рукоятку крана в первом положении!!!
-    if (pEQ >= p_charge + dpEPB_over && bc_state.brake_crane_pos_ref == KRM_POS_I)
+    // При давлении в УР выше зарядного
+    if (pEQ > p_charge + dpEPB_over)
     {
+        // Ставим кран во второе положение
         setBrakeCranePos(KRM_POS_II);
+    }
+
+    // Запрет отпуска - ступень безусловно, если не задействован КВТ
+    if (!is_motion_allowed)
+    {
+        if (bc_state.loco_crane_pos_ref < 0.01)
+        {
+            brakeStepEPB(pBC, pBC_EPB);
+        }
     }
 }
 
@@ -151,9 +142,9 @@ void AutopilotBrakeController::stepPB(double dv,
 
     // Обнуляем число дополнительных ступеней, если кран в отпускном положении
     if (bc_state.brake_crane_pos_ref == KRM_POS_I ||
-        bc_state.brake_crane_pos_ref == KRM_POS_I)
+        bc_state.brake_crane_pos_ref == KRM_POS_II)
     {
-        num_steps = 0;
+        num_PB_steps = 0;
     }
 
     // Первысили кривую снижения скорости
@@ -170,7 +161,7 @@ void AutopilotBrakeController::stepPB(double dv,
     if (dv > dVplus && !is_disable_release)
     {
         // полный отпуск
-        brakeRelease(pEQ, p_charge, dpPB_over);
+        brakeReleasePB(pEQ, p_charge, dpPB_over);
     }
 
     // При давлении в УР выше зарядного
@@ -236,14 +227,14 @@ void AutopilotBrakeController::setBrakeCranePos(int pos)
 //------------------------------------------------------------------------------
 void AutopilotBrakeController::brakeStep(double pEQ, double p_charge, double dp)
 {
-    if (pEQ > p_charge - dp - num_steps * 0.02)
+    if (pEQ > p_charge - dp - num_PB_steps * 0.02)
     {
-        if (!brake_timer->isStarted())
+        if (!brakePB_timer->isStarted())
         {
             // Даем разрядку до заданной глубины
             bc_state.brake_crane_pos_ref = KRM_POS_V;
             // Запускаем таймер выдержки времени на данной ступени
-            brake_timer->start();
+            brakePB_timer->start();
         }
     }
     else
@@ -256,7 +247,7 @@ void AutopilotBrakeController::brakeStep(double pEQ, double p_charge, double dp)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutopilotBrakeController::brakeRelease(double pEQ, double p_charge, double dp_over)
+void AutopilotBrakeController::brakeReleasePB(double pEQ, double p_charge, double dp_over)
 {
     // Отпуск первым положением до заданного давления в УР
     if (pEQ >= p_charge + dp_over)
@@ -275,6 +266,40 @@ void AutopilotBrakeController::brakeRelease(double pEQ, double p_charge, double 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void AutopilotBrakeController::brakeStepEPB(double pBC, double pBC_ref)
+{
+    if (pBC < pBC_ref + num_EPB_steps * 0.02)
+    {
+        if (!brakeEPB_timer->isStarted())
+        {
+            bc_state.brake_crane_pos_ref = KRM_POS_Va;
+            brakeEPB_timer->start();
+        }
+    }
+    else
+    {
+        setBrakeCranePos(KRM_POS_IV);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AutopilotBrakeController::brakeReleaseEPB(double pEQ, double p_charge, double dp_over)
+{
+    if (pEQ < p_charge + dp_over)
+    {
+        setBrakeCranePos(KRM_POS_I);
+    }
+    else
+    {
+        setBrakeCranePos(KRM_POS_II);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AutopilotBrakeController::slotBrakeCraneHandle()
 {
     krm_handle_timer->stop();
@@ -283,20 +308,30 @@ void AutopilotBrakeController::slotBrakeCraneHandle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutopilotBrakeController::slotBrakeDelay()
+void AutopilotBrakeController::slotBrakePBdelay()
 {
     // Останавливаем таймер выдержки в ступени
-    brake_timer->stop();
+    brakePB_timer->stop();
 
     // Оценка эффективности торможения по текущему ускорению
     // и ускорению на кривой снижения скорости
     if (a_cur > -a_ref)
     {
         // Добавляем дополнительную ступень разрядки
-        num_steps++;
-    }
-    else
+        num_PB_steps++;
+    }    
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AutopilotBrakeController::slotBrakeEPBdelay()
+{
+    brakeEPB_timer->stop();
+
+    if (a_cur > -a_ref)
     {
-        emit sigSetBrakeAccel(qAbs(a_cur));
+        // Добавляем дополнительную ступень
+        num_EPB_steps++;
     }
 }
