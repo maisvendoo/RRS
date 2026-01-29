@@ -1,5 +1,10 @@
 project (simulator)
 
+add_library(optflags INTERFACE)
+
+# Подключаем флаги
+include(../cmake/OptimizationFlags.cmake)
+
 add_subdirectory (physics)
 add_subdirectory (device)
 add_subdirectory (solver)
