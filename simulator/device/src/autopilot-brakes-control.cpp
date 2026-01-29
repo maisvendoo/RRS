@@ -123,7 +123,7 @@ void AutopilotBrakeController::stepEPB(double dv,
         setBrakeCranePos(KRM_POS_II);
     }
 
-    // Запрет отпуска - ступень безусловно, если не задействован КВТ
+    // Cтупень безусловно, если не задействован КВТ
     if (!is_motion_allowed)
     {
         if (bc_state.loco_crane_pos_ref < 0.01)
@@ -202,9 +202,8 @@ void AutopilotBrakeController::stepKVT(bool is_motion_allowed,
         // Снимаем запрет отпуска
         is_disable_release = false;
 
-        // отпускаем состав если кран в перекрыше
-        if (bc_state.brake_crane_pos_ref == KRM_POS_III ||
-            bc_state.brake_crane_pos_ref == KRM_POS_IV)
+        // отпускаем состав если кран не в поездном положении
+        if (bc_state.brake_crane_pos_ref != KRM_POS_II)
         {
             setBrakeCranePos(KRM_POS_I);
         }
