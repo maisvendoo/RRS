@@ -1,8 +1,7 @@
 #ifndef GIZMO_H
 #define GIZMO_H
 
-#include "SelectedObjectsMap.h"
-
+#include "SelectedObjects.h"
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/mat4.h>
@@ -33,7 +32,7 @@ public:
         const settings_t& settings,
         vsg::ref_ptr<CameraHandler> camera_handler,
         vsg::ref_ptr<IntersectionHandler> intersection_handler,
-        const SelectedObjectsMap& selected_objects
+        const SelectedObjects& selected_objects
     );
 
     bool handle_intersections();
@@ -47,7 +46,7 @@ public:
 private:
     vsg::ref_ptr<CameraHandler> camera_handler;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
-    const SelectedObjectsMap& selected_objects;
+    const SelectedObjects& selected_objects;
 
     vsg::Builder builder;
     vsg::ref_ptr<vsg::Node> arrow_x;

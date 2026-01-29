@@ -1,7 +1,7 @@
 #ifndef OBJECT_SELECTOR_H
 #define OBJECT_SELECTOR_H
 
-#include "SelectedObjectsMap.h"
+#include "SelectedObjects.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
@@ -12,9 +12,9 @@ class CameraHandler;
 class Gizmo;
 class IntersectionHandler;
 class KeyboardHandler;
+class RouteObject;
 class SceneGraph;
 class SingleSwitch;
-class SwitchGroup;
 struct settings_t;
 
 namespace vsg
@@ -23,9 +23,7 @@ namespace vsg
 class ButtonPressEvent;
 class ButtonReleaseEvent;
 class FrameEvent;
-class MatrixTransform;
 class MoveEvent;
-class PagedLOD;
 class Viewer;
 
 }
@@ -47,18 +45,12 @@ public:
     void apply(vsg::MoveEvent& moveEvent) override;
     void apply(vsg::FrameEvent& frame) override;
 
-    const SelectedObjectsMap& get_selected_objects() const;
+    const SelectedObjects& get_selected_objects() const;
 
 private:
-    void select_object(
-        vsg::ref_ptr<vsg::MatrixTransform> object,
-        vsg::ref_ptr<SwitchGroup> switch_group,
-        vsg::ref_ptr<vsg::PagedLOD> paged_lod
-    );
+    void select_object(vsg::ref_ptr<RouteObject> object);
 
-    SelectedObjectsIterator deselect_object(
-        vsg::ref_ptr<vsg::MatrixTransform> object
-    );
+    SelectedObjectsIterator deselect_object(vsg::ref_ptr<RouteObject> object);
 
 private:
     const settings_t& settings;
@@ -67,7 +59,7 @@ private:
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::observer_ptr<vsg::Viewer> observer_viewer;
 
-    SelectedObjectsMap selected_objects;
+    SelectedObjects selected_objects;
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<SingleSwitch> gizmo_switch;
 };

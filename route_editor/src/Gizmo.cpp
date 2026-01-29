@@ -3,7 +3,7 @@
 #include "CameraHandler.h"
 #include "IntersectionHandler.h"
 #include "Mask.h"
-#include "SelectedObjectsMap.h"
+#include "RouteObject.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
 
@@ -32,7 +32,7 @@ Gizmo::Gizmo(
     const settings_t& settings,
     vsg::ref_ptr<CameraHandler> camera_handler,
     vsg::ref_ptr<IntersectionHandler> intersection_handler,
-    const SelectedObjectsMap& selected_objects
+    const SelectedObjects& selected_objects
 )
     : camera_handler(camera_handler)
     , intersection_handler(intersection_handler)
@@ -190,7 +190,7 @@ bool Gizmo::handle_intersections()
     const auto save_selected_objects_begin_matrixes = [&]() -> void
     {
         selected_objects_begin_matrixes.clear();
-        for (const auto& [object, _] : selected_objects)
+        for (const auto object : selected_objects)
         {
             selected_objects_begin_matrixes[object] = object->matrix;
         }

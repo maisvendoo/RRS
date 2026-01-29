@@ -3,9 +3,9 @@
 #include "Action.h"
 #include "EditorState.h"
 #include "KeyBindings.h"
-#include "ObjectProperties.h"
 #include "ObjectSelector.h"
 #include "Route.h"
+#include "RouteObject.h"
 #include "SceneGraph.h"
 #include "Settings.h"
 #include "filesystem.h"
@@ -477,22 +477,19 @@ void EditorGui::show_selected_objects_properties() const
 
     ImGui::Begin("Selected objects", nullptr, window_flags);
 
-    for (const auto& [object, _] : selected_objects)
+    for (const auto object : selected_objects)
     {
-        ObjectProperties properties;
-        object->getValue("properties", properties);
-
         vsg::dvec3 translation;
         vsg::dquat rotation;
         vsg::dvec3 scale;
 
         vsg::decompose(object->matrix, translation, rotation, scale);
 
-        ImGui::Text("%s: %10.3f %10.3f %10.3f", properties.name.c_str(),
-            translation.x, translation.y, translation.z);
+        // ImGui::Text("%s: %10.3f %10.3f %10.3f", properties.name.c_str(),
+        //     translation.x, translation.y, translation.z);
 
-        ImGui::Text("%s: %10.3f %10.3f %10.3f %10.3f", properties.name.c_str(),
-            rotation.x, rotation.y, rotation.z, rotation.w);
+        // ImGui::Text("%s: %10.3f %10.3f %10.3f %10.3f", properties.name.c_str(),
+        //     rotation.x, rotation.y, rotation.z, rotation.w);
     }
 
     ImGui::End();
