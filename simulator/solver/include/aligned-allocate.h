@@ -40,7 +40,7 @@ inline void *aligned_allocate(std::size_t size, std::size_t alignment)
 
     if (posix_memalign(&ptr, alignment, size) != 0 || !ptr)
     {
-        trow std::bad_alloc();
+        throw std::bad_alloc();
     }
 
     return ptr;
