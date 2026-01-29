@@ -10,6 +10,13 @@
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 {
 public:
+    enum class State
+    {
+        INITIAL,
+        MOVING,
+        ROTATING
+    };
+
     vsg::vec3 get_translation() const;
     vsg::vec3 get_rotation_deg() const;
     vsg::vec3 get_scale() const;
@@ -19,6 +26,7 @@ public:
     void set_scale(vsg::vec3 scale, bool update_matrix = true);
 
 public:
+    State state = State::INITIAL;
     std::string name;
 
 private:
