@@ -5,7 +5,6 @@
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/utils/Builder.h>
@@ -58,12 +57,10 @@ private:
     vsg::ref_ptr<SingleSwitch> plane_xz_switch;
     vsg::ref_ptr<SingleSwitch> plane_xy_switch;
 
-    using MatrixMap = std::map<vsg::ref_ptr<RouteObject>, vsg::dmat4>;
-
     vsg::vec3 curr_position;
     vsg::vec3 click_position;
     vsg::vec3 click_position_offset;
-    MatrixMap selected_objects_begin_matrixes;
+    std::map<vsg::ref_ptr<RouteObject>, vsg::vec3> selected_objects_begin_poss;
     vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;
 };

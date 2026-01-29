@@ -121,7 +121,6 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     }
     else
     {
-        gizmo->update_position();
         gizmo_switch->mask = MASK_GUI1 | MASK_CLICKABLE;
     }
 }
@@ -140,6 +139,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
+    gizmo->update_position();
     gizmo->update_scale();
 }
 

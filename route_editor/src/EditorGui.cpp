@@ -477,13 +477,31 @@ void EditorGui::show_selected_objects_properties() const
 
     ImGui::Begin("Selected objects", nullptr, window_flags);
 
+    int i = 0;
+
     for (const auto object : selected_objects)
     {
         ImGui::Text("label: %s", object->label.c_str());
-        const auto t = object->get_translation();
-        const auto r = object->get_rotation_deg();
-        ImGui::Text("translation:  %10.3f %10.3f %10.3f", t.x, t.y, t.z);
-        ImGui::Text("rotation_deg: %10.3f %10.3f %10.3f", r.x, r.y, r.z);
+
+        std::string label = "translation##";
+        label += std::to_string(i);
+
+        vsg::vec3 translation = object->get_translation();
+        if (ImGui::SliderFloat3(label.c_str(), translation.data(), -100.0f, 100.0f))
+        {
+            object->set_translation(translation);
+        }
+
+        label = "rotation##";
+        label += std::to_string(i);
+
+        vsg::vec3 rotation_deg = object->get_rotation_deg();
+        if (ImGui::SliderFloat3(label.c_str(), rotation_deg.data(), -180.0f, 180.0f))
+        {
+            object->set_rotation_deg(rotation_deg);
+        }
+
+        ++i;
     }
 
     ImGui::End();

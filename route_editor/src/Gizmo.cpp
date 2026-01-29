@@ -189,10 +189,10 @@ bool Gizmo::handle_intersections()
 
     const auto save_selected_objects_begin_matrixes = [&]() -> void
     {
-        selected_objects_begin_matrixes.clear();
+        selected_objects_begin_poss.clear();
         for (const auto object : selected_objects)
         {
-            selected_objects_begin_matrixes[object] = object->matrix;
+            selected_objects_begin_poss[object] = object->get_translation();
         }
     };
 
@@ -332,11 +332,9 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
         curr_position = click_position - click_position_offset + offset;
 
-        for (const auto& [object, begin_matrix] :
-            selected_objects_begin_matrixes)
+        for (const auto& [object, begin_pos] : selected_objects_begin_poss)
         {
-            object->matrix = vsg::translate(
-                static_cast<vsg::dvec3>(offset)) * begin_matrix;
+            object->set_translation(begin_pos + offset);
         }
 
         break;
