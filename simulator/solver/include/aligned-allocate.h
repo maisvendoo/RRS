@@ -1,5 +1,5 @@
-#ifndef     ALINGED_ALLOCATE_H
-#define     ALINGED_ALLOCATE_H
+#ifndef     ALIGNED_ALLOCATE_H
+#define     ALIGNED_ALLOCATE_H
 
 #include    <new>
 
@@ -56,4 +56,4 @@ inline void aligned_deallocate(void *ptr) noexcept
 
 #endif
 
-#endif
+#endif // ALIGNED_ALLOCATE_H
