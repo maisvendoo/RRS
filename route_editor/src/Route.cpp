@@ -1,12 +1,10 @@
 #include "Route.h"
 
-#include "Mask.h"
-#include "ObjectProperties.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
+#include "RouteObject.h"
 #include "Settings.h"
 #include "StringMap.h"
-#include "SwitchGroup.h"
 #include "filesystem.h"
 #include "rail-signal.h"
 #include "signals-data-types.h"
@@ -18,17 +16,15 @@
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
-#include <vsg/maths/mat4.h>
 #include <vsg/maths/sphere.h>
-#include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
-#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
 
 #include <QString>
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
@@ -191,42 +187,10 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
             continue;
         }
 
-        const vsg::vec3 translation = transform.first;
-        const vsg::vec3 rotation_deg = transform.second;
+        const auto object = RouteObject::create(paged_lod_it->second,
+            label, transform.first, -transform.second);
 
-        ObjectProperties properties;
-        properties.name = label;
-        properties.translation = translation;
-        properties.rotation_deg = rotation_deg;
-
-        const auto switch_group = SwitchGroup::create();
-
-        switch_group->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE},
-            paged_lod_it->second);
-
-        vsg::vec3 rotation_rad = rotation_deg;
-
-        rotation_rad.x = -vsg::radians(rotation_deg.x);
-        rotation_rad.y = -vsg::radians(rotation_deg.y);
-        rotation_rad.z = -vsg::radians(rotation_deg.z);
-
-        const vsg::mat4 rotate_x = vsg::rotate(
-            rotation_rad.x, vsg::vec3(1.0f, 0.0f, 0.0f));
-
-        const vsg::mat4 rotate_y = vsg::rotate(
-            rotation_rad.y, vsg::vec3(0.0f, 1.0f, 0.0f));
-
-        const vsg::mat4 rotate_z = vsg::rotate(
-            rotation_rad.z, vsg::vec3(0.0f, 0.0f, 1.0f));
-
-        const vsg::mat4 translate = vsg::translate(translation);
-
-        const auto matrix_transform = vsg::MatrixTransform::create();
-        matrix_transform->addChild(switch_group);
-        matrix_transform->matrix = translate * rotate_z * rotate_y * rotate_x;
-        matrix_transform->setValue("properties", properties);
-
-        this->addChild(vsg::MASK_ALL, matrix_transform);
+        this->addChild(vsg::MASK_ALL, object);
     }
 }
 
@@ -330,11 +294,6 @@ bool Route::load_topology()
                 paged_lod = paged_lod_it->second;
             }
 
-            const auto switch_group = SwitchGroup::create();
-
-            switch_group->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE},
-                paged_lod);
-
             signal->calcPosition();
 
             const auto pos = to_vsg_vec3(signal->getPos());
@@ -342,25 +301,24 @@ bool Route::load_topology()
             const auto orth = to_vsg_vec3(signal->getOrth());
             const auto up = to_vsg_vec3(signal->getUp());
 
-            const vsg::mat4 translate = vsg::translate(pos);
+            // const vsg::mat4 rotate = {
+            //      right.x, -orth.x,  up.x,  0.0,
+            //     -right.y,  orth.y,  up.y,  0.0,
+            //      right.z,  orth.z,  up.z,  0.0,
+            //         0.0,      0.0,   0.0,  1.0
+            // };
 
-            const vsg::mat4 rotate = {
-                 right.x, -orth.x,  up.x,  0.0,
-                -right.y,  orth.y,  up.y,  0.0,
-                 right.z,  orth.z,  up.z,  0.0,
-                    0.0,      0.0,   0.0,  1.0
+            const vsg::vec3 rotation_deg = {
+                vsg::degrees(std::atan2(orth.z, up.z)),
+                vsg::degrees(std::atan2(-right.z,
+                    std::sqrt(orth.z * orth.z + up.z * up.z))),
+                vsg::degrees(std::atan2(-right.y, right.x))
             };
 
-            ObjectProperties properties;
-            properties.name = signal_model_name;
-            properties.translation = pos;
+            const auto object = RouteObject::create(paged_lod,
+                signal_model_name, pos, rotation_deg);
 
-            const auto matrix_transform = vsg::MatrixTransform::create();
-            matrix_transform->addChild(switch_group);
-            matrix_transform->matrix = translate * rotate;
-            matrix_transform->setValue("properties", properties);
-
-            this->addChild(vsg::MASK_ALL, matrix_transform);
+            this->addChild(vsg::MASK_ALL, object);
         }
     };
 

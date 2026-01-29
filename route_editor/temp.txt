@@ -1,16 +1,12 @@
 EditorGui.h
 Gizmo.h
 ObjectSelector.h
-Outline.h
 PagedLodMap.h
-Route.h
 RouteEditor.h
 RouteObject.h
 --------------------------------------------------------------------------------
 EditorGui.cpp
 Gizmo.cpp
 ObjectSelector.cpp
-Outline.cpp
-Route.cpp
 RouteEditor.cpp
 RouteObject.cpp
