@@ -1,13 +1,36 @@
 #include "RouteObject.h"
 
+#include "Mask.h"
+#include "SwitchGroup.h"
+
+#include <vsg/core/Mask.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 
+#include <cassert>
+#include <string>
+
 static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Z_POSITIVE = {0.0f, 0.0f, 1.0f};
+
+RouteObject::RouteObject(vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    const std::string& name, vsg::vec3 translation, vsg::vec3 rotation_deg)
+{
+    assert(paged_lod);
+
+    this->name = name;
+    this->translation = translation;
+    this->rotation_deg = rotation_deg;
+    update_matrix();
+
+    switch_group = SwitchGroup::create();
+    switch_group->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
+
+    this->paged_lod = paged_lod;
+}
 
 vsg::vec3 RouteObject::get_translation() const
 {
@@ -68,4 +91,14 @@ void RouteObject::update_matrix()
 
     this->matrix = vsg::translate(translation) * rotate_z *
         rotate_y * rotate_x * vsg::scale(scale);
+}
+
+vsg::ref_ptr<SwitchGroup> RouteObject::get_switch_group() const
+{
+    return switch_group;
+}
+
+vsg::ref_ptr<vsg::PagedLOD> RouteObject::get_paged_lod() const
+{
+    return paged_lod;
 }
