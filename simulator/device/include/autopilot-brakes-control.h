@@ -138,6 +138,9 @@ private:
     /// Минимальная ступень ЭПТ
     double pBC_EPB = 0.1;
 
+    /// Минимальное давление в ТЦ, при котором тормоза считаются отпущенными
+    double pBC_min = 0.04;
+
     const double KRM_HANDLE_DELAY = 0.5;
     Timer *krm_handle_timer = new Timer(KRM_HANDLE_DELAY, false);
 
@@ -178,7 +181,7 @@ private:
     void brakeStepEPB(double pBC, double pBC_ref);
 
     /// Выполнить отпуск ЭПТ
-    void brakeReleaseEPB(double pEQ, double p_charge, double dp_over);
+    void brakeReleaseEPB(double pEQ, double pBC, double p_charge, double dp_over);
 
 private slots:
 

@@ -113,7 +113,7 @@ void AutopilotBrakeController::stepEPB(double dv,
     if (dv > dVplus && !is_disable_release && lock_traction && is_motion_allowed)
     {
         // Отпускаем
-        brakeReleaseEPB(pEQ, p_charge, dpEPB_over);
+        brakeReleaseEPB(pEQ, pBC, p_charge, dpEPB_over);
     }
 
     // При давлении в УР выше зарядного
@@ -291,8 +291,13 @@ void AutopilotBrakeController::brakeStepEPB(double pBC, double pBC_ref)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AutopilotBrakeController::brakeReleaseEPB(double pEQ, double p_charge, double dp_over)
+void AutopilotBrakeController::brakeReleaseEPB(double pEQ, double pBC, double p_charge, double dp_over)
 {
+    if (pBC <= pBC_min)
+    {
+        return;
+    }
+
     if (pEQ < p_charge + dp_over)
     {
         setBrakeCranePos(KRM_POS_I);
