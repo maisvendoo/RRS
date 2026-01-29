@@ -1,6 +1,7 @@
 #include "RouteObject.h"
 
 #include "Mask.h"
+#include "Outline.h"
 #include "SwitchGroup.h"
 
 #include <vsg/core/Mask.h>
@@ -8,6 +9,7 @@
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/PagedLOD.h>
 
 #include <cassert>
 #include <string>
@@ -30,6 +32,8 @@ RouteObject::RouteObject(vsg::ref_ptr<vsg::PagedLOD> paged_lod,
     switch_group->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
     this->paged_lod = paged_lod;
+
+    this->addChild(switch_group);
 }
 
 vsg::vec3 RouteObject::get_translation() const

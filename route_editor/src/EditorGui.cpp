@@ -479,17 +479,11 @@ void EditorGui::show_selected_objects_properties() const
 
     for (const auto object : selected_objects)
     {
-        vsg::dvec3 translation;
-        vsg::dquat rotation;
-        vsg::dvec3 scale;
-
-        vsg::decompose(object->matrix, translation, rotation, scale);
-
-        // ImGui::Text("%s: %10.3f %10.3f %10.3f", properties.name.c_str(),
-        //     translation.x, translation.y, translation.z);
-
-        // ImGui::Text("%s: %10.3f %10.3f %10.3f %10.3f", properties.name.c_str(),
-        //     rotation.x, rotation.y, rotation.z, rotation.w);
+        ImGui::Text("label: %s", object->label.c_str());
+        const auto t = object->get_translation();
+        const auto r = object->get_rotation_deg();
+        ImGui::Text("translation:  %10.3f %10.3f %10.3f", t.x, t.y, t.z);
+        ImGui::Text("rotation_deg: %10.3f %10.3f %10.3f", r.x, r.y, r.z);
     }
 
     ImGui::End();

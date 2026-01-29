@@ -1,5 +1,6 @@
 #include "ObjectSelector.h"
 
+#include "CameraHandler.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
@@ -164,8 +165,11 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
         const auto compile_result = compile_manager->compile(outline);
 
         object->get_switch_group()->addChild(vsg::Mask{MASK_GUI2}, outline);
+        object->outline = outline;
 
         vsg::updateViewer(*viewer, compile_result);
+
+        selected_objects.emplace_back(object);
     };
 
     if (keyboard_handler->get_shift_state())

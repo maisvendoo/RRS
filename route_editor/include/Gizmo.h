@@ -2,6 +2,7 @@
 #define GIZMO_H
 
 #include "SelectedObjects.h"
+
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/mat4.h>
@@ -13,6 +14,7 @@
 
 class CameraHandler;
 class IntersectionHandler;
+class RouteObject;
 class SingleSwitch;
 struct settings_t;
 
@@ -56,8 +58,7 @@ private:
     vsg::ref_ptr<SingleSwitch> plane_xz_switch;
     vsg::ref_ptr<SingleSwitch> plane_xy_switch;
 
-    using MatrixTransformPtr = vsg::ref_ptr<vsg::MatrixTransform>;
-    using MatrixMap = std::map<MatrixTransformPtr, vsg::dmat4>;
+    using MatrixMap = std::map<vsg::ref_ptr<RouteObject>, vsg::dmat4>;
 
     vsg::vec3 curr_position;
     vsg::vec3 click_position;

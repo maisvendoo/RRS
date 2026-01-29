@@ -347,7 +347,7 @@ void Gizmo::update_position()
 {
     curr_position = {0.0f, 0.0f, 0.0f};
 
-    for (const auto& [object, _] : selected_objects)
+    for (const auto object : selected_objects)
     {
         vsg::ComputeBounds compute_bounds;
         compute_bounds.useNodeBounds = false;
