@@ -477,6 +477,16 @@ void EditorGui::show_selected_objects_properties() const
 
     ImGui::Begin("Selected objects", nullptr, window_flags);
 
+    static float min_translation = -100.0f;
+    static float max_translation = 100.0f;
+    static float min_rotation = -180.0f;
+    static float max_rotation = 180.0f;
+
+    ImGui::InputFloat("Min translation", &min_translation);
+    ImGui::InputFloat("Max translation", &max_translation);
+    ImGui::InputFloat("Min rotation", &min_rotation);
+    ImGui::InputFloat("Max rotation", &max_rotation);
+
     int i = 0;
 
     for (const auto object : selected_objects)
@@ -487,7 +497,8 @@ void EditorGui::show_selected_objects_properties() const
         label += std::to_string(i);
 
         vsg::vec3 translation = object->get_translation();
-        if (ImGui::SliderFloat3(label.c_str(), translation.data(), -100.0f, 100.0f))
+        if (ImGui::SliderFloat3(label.c_str(), translation.data(),
+            min_translation, max_translation))
         {
             object->set_translation(translation);
         }
@@ -496,7 +507,8 @@ void EditorGui::show_selected_objects_properties() const
         label += std::to_string(i);
 
         vsg::vec3 rotation_deg = object->get_rotation_deg();
-        if (ImGui::SliderFloat3(label.c_str(), rotation_deg.data(), -180.0f, 180.0f))
+        if (ImGui::SliderFloat3(label.c_str(), rotation_deg.data(),
+            min_rotation, max_rotation))
         {
             object->set_rotation_deg(rotation_deg);
         }
