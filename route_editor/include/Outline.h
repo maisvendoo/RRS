@@ -5,22 +5,13 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/Group.h>
 
+class RouteObject;
 struct settings_t;
-
-namespace vsg
-{
-
-class PagedLOD;
-
-}
 
 class Outline : public vsg::Inherit<vsg::Group, Outline>
 {
 public:
-    Outline(
-        const settings_t& settings,
-        vsg::ref_ptr<vsg::PagedLOD> paged_lod
-    );
+    Outline(const settings_t& settings, vsg::ref_ptr<RouteObject> object);
 };
 
 #endif // OUTLINE_H

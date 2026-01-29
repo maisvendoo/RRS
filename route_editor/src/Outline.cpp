@@ -1,5 +1,6 @@
 #include "Outline.h"
 
+#include "RouteObject.h"
 #include "Settings.h"
 #include "filesystem.h"
 #include "shader_funcs.h"
@@ -36,19 +37,17 @@ struct OutlineStatic
     vsg::Builder builder;
 };
 
-Outline::Outline(
-    const settings_t& settings,
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod
-)
+Outline::Outline(const settings_t& settings, vsg::ref_ptr<RouteObject> object)
 {
-    assert(paged_lod);
+    assert(object);
 
     static OutlineStatic outline_static;
+
     const auto options = outline_static.options;
     auto& builder = outline_static.builder;
 
     const auto wireframe_outline = vsg::read_cast<vsg::Node>(
-        paged_lod->filename, options);
+        object->get_paged_lod()->filename, options);
 
     vsg::ComputeBounds compute_bounds;
     compute_bounds.useNodeBounds = false;
