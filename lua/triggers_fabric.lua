@@ -37,19 +37,14 @@ function autoApproach(traj_begin, traj_end, dir)
 
 				logMessage("Trajectory " .. traj_end .. " is busy or in other route")
 				-- Ставим триггер на освобождение и повторную попытку 
-
-				local next_traj = getNextTraj(traj_begin, dir)
-
-				logMessage("Next traj: " .. next_traj)
-
-				setTrigger(repeatAutoApproach(next_traj, traj_end, dir))				
+				setTrigger(repeatAutoApproach(getNextTraj(traj_begin, dir), traj_end, dir))				
 
 			else
 
 				logMessage("Try to build route from " .. traj_begin .. " to " .. traj_end)
 				-- Строим маршрут от неё до конечной в заданном 
 				-- направлении
-				buildRoute(traj_begin, traj_end, dir)
+				buildRoute(getNextTraj(traj_begin, dir), traj_end, dir)
 
 			end
 
