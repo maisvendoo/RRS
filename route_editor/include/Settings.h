@@ -48,6 +48,7 @@ struct settings_t
     vsg::vec3 gizmo_arrow_y_color = {0.0f, 1.0f, 0.0f};
     vsg::vec3 gizmo_arrow_z_color = {0.0f, 0.0f, 1.0f};
     float gizmo_opacity = 1.0f;
+    bool gizmo_to_center = false;
 
     bool show_wireframe = false;
 

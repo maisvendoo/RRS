@@ -45,6 +45,7 @@ public:
     void update_scale();
 
 private:
+    const settings_t& settings;
     vsg::ref_ptr<CameraHandler> camera_handler;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
     const SelectedObjects& selected_objects;

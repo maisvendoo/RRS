@@ -125,12 +125,14 @@
         <GizmoZAxisColorB>0.859</GizmoZAxisColorB>
         <!-- Непрозрачность гизмо -->
         <GizmoOpacity>1.0</GizmoOpacity>
+        <!-- Центрировать гизмо -->
+        <GizmoToCenter>0</GizmoToCenter>
 
         <!-- Отображать wireframe сетку объектов при выделении -->
-        <ShowWireframe>0</ShowWireframe>
+        <ShowWireframe>1</ShowWireframe>
 
         <!-- Размер шрифта GUI -->
-        <GuiFontSize>24.0</GuiFontSize>
+        <GuiFontSize>20.0</GuiFontSize>
         <!-- Можно ли перемещать и менять размер GUI -->
         <IsGuiEditable>1</IsGuiEditable>
         <!-- Отображать список моделей в objects.ref после загрузки маршрута -->

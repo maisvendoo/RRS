@@ -34,7 +34,8 @@ Gizmo::Gizmo(
     vsg::ref_ptr<IntersectionHandler> intersection_handler,
     const SelectedObjects& selected_objects
 )
-    : camera_handler(camera_handler)
+    : settings(settings)
+    , camera_handler(camera_handler)
     , intersection_handler(intersection_handler)
     , selected_objects(selected_objects)
 {
@@ -345,10 +346,20 @@ void Gizmo::update_position()
 {
     curr_position = {0.0f, 0.0f, 0.0f};
 
-    for (const auto& object : selected_objects)
+    if (settings.gizmo_to_center)
     {
-        const auto& bounds = object->get_bounds();
-        curr_position += (bounds.min + bounds.max) / 2.0f;
+        for (const auto& object : selected_objects)
+        {
+            const auto& bounds = object->get_bounds();
+            curr_position += (bounds.min + bounds.max) / 2.0f;
+        }
+    }
+    else
+    {
+        for (const auto& object : selected_objects)
+        {
+            curr_position += object->get_translation();
+        }
     }
 
     curr_position /= static_cast<float>(selected_objects.size());

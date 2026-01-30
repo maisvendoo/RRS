@@ -73,6 +73,7 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getFloat(section, "GizmoZAxisColorG", gizmo_arrow_z_color.g);
     cfg.getFloat(section, "GizmoZAxisColorB", gizmo_arrow_z_color.b);
     cfg.getFloat(section, "GizmoOpacity", gizmo_opacity);
+    cfg.getBool(section, "GizmoToCenter", gizmo_to_center);
 
     cfg.getBool(section, "ShowWireframe", show_wireframe);
 
