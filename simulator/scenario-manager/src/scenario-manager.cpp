@@ -1082,7 +1082,7 @@ void ScenarioManager::sys_functions_registration()
 
     Journal::instance()->info("openCallSignal method binding...OK");
 
-    lua.set_function("getTrajSate", [this](const std::string &traj_name){
+    lua.set_function("getTrajState", [this](const std::string &traj_name){
         return getTrajState(traj_name);
     });
 
