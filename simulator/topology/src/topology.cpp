@@ -1403,6 +1403,27 @@ void Topology::slotShuntingRouteCommand(QByteArray &route_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Topology::slotGetTrajState(QString traj_name, bool &is_busy, bool &in_route)
+{
+    if (traj_name.isEmpty())
+    {
+        return;
+    }
+
+    auto traj = traj_list.value(traj_name, nullptr);
+
+    if (traj == nullptr)
+    {
+        return;
+    }
+
+    is_busy = traj->isBusy();
+    in_route = traj->isInRoute();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name)
 {
     // Определяем поезд, изменивший состояние траектории

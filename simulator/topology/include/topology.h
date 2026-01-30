@@ -166,6 +166,8 @@ public slots:
 
     void slotShuntingRouteCommand(QByteArray& route_data);
 
+    void slotGetTrajState(QString traj_name, bool &is_busy, bool &in_route);
+
 private slots:
 
     void slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name);

@@ -8,6 +8,7 @@
 
 #include    <scenario-manager-export.h>
 #include    <scenario-train-data.h>
+#include    <scenario-traj-state.h>
 
 #include    <init_data.h>
 #include    <timer.h>
@@ -73,6 +74,9 @@ signals:
     void sigBuildShuntingRoute(QByteArray& route_data);
 
     void sigSetSwitchsAlongRoute(QByteArray &route_data);
+
+    /// Поверить состояние траектории
+    void sigGetTrajState(QString traj_name, bool &is_busy, bool &in_route);
 
     /// Этот сигнал инициирует сообщение во вьювер,
     /// о необходимости задать имя поезда
@@ -221,6 +225,9 @@ private:
     void setAbsTimeTirgger(const std::string &abs_time, sol::function trigger_func);
 
     void setRelTimeTirgger(const std::string &rel_time, sol::function trigger_func);
+
+    /// Получить состояние траектории
+    scenario_traj_state_t getTrajState(const std::string &traj_name);
 
 private slots:
 

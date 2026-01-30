@@ -59,9 +59,7 @@ bool ScenarioManager::run(const std::string &route_dir,
 
     std::string script_path = scenario_dir + fs.separator()
                               + scenario_name + fs.separator()
-                              + "main.lua";
-
-    //std::replace(scenario_dir.begin(), scenario_dir.end(), '\\', '/');
+                              + "main.lua";    
 
     // Добавляем каталог сценария в пути поиска модулей
     const std::string &cur_path = lua["package"]["path"].get<std::string>();
@@ -275,6 +273,20 @@ void ScenarioManager::setRelTimeTirgger(const std::string &rel_time,
 
     // Ставим триггер
     taskTimeTrigger(trig_date_time, trigger_func);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+scenario_traj_state_t ScenarioManager::getTrajState(const std::string &traj_name)
+{
+    scenario_traj_state_t traj_state;
+
+    emit sigGetTrajState(QString(traj_name.c_str()),
+                         traj_state.is_busy,
+                         traj_state.in_route);
+
+    return traj_state;
 }
 
 //------------------------------------------------------------------------------
@@ -942,6 +954,13 @@ void ScenarioManager::cpp_types_registration()
                                             "auto", &scenario_train_data_t::is_auto);
 
     Journal::instance()->info("TrainData => scenario_train_data_t binding...OK");
+
+    // Регистрируем структуру данных о состоянии траектории
+    lua.new_usertype<scenario_traj_state_t>("TrajState",
+                                            "is_busy", &scenario_traj_state_t::is_busy,
+                                            "in_route", &scenario_traj_state_t::in_route);
+
+    Journal::instance()->info("TrajState => scenario_traj_state_t binding...OK");
 }
 
 //------------------------------------------------------------------------------
@@ -1039,13 +1058,13 @@ void ScenarioManager::sys_functions_registration()
 
     Journal::instance()->info("setSwitchAlongRoute method binding...OK");
 
-    lua.set_function("setTrigger", [&](sol::function trigger) {
+    lua.set_function("setTrigger", [this](sol::function trigger) {
         taskSetPositionTrigger(trigger);
     });
 
     Journal::instance()->info("setTrigger method binding...OK");
 
-    lua.set_function("setTimeTrigger", [&](const std::string &abs_time, sol::function trigger_func){
+    lua.set_function("setTimeTrigger", [this](const std::string &abs_time, sol::function trigger_func){
         this->setTimeTirgger(abs_time, trigger_func);
     });
 
@@ -1062,6 +1081,22 @@ void ScenarioManager::sys_functions_registration()
     };
 
     Journal::instance()->info("openCallSignal method binding...OK");
+
+    lua.set_function("getTrajSate", [this](const std::string &traj_name){
+        return getTrajState(traj_name);
+    });
+
+    Journal::instance()->info("getTrajState method binding...OK");
+
+    lua["logMessage"] = [this](const std::string &msg) {
+
+        this->setTask([msg]{
+            Journal::instance()->info(QString("LUA DEBUG: %1").arg(msg.c_str()));
+        });
+
+    };
+
+    Journal::instance()->info("logMessage method binding...OK");
 }
 
 //------------------------------------------------------------------------------
