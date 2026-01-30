@@ -292,6 +292,18 @@ scenario_traj_state_t ScenarioManager::getTrajState(const std::string &traj_name
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+std::string ScenarioManager::getNextTrajName(const std::string &traj_name, int dir)
+{
+    QString next_traj_name = "";
+
+    emit sigGetNextTrajName(QString(traj_name.c_str()), dir, next_traj_name);
+
+    return next_traj_name.toStdString();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::step(const simulator_time_t &sim_time, double dt)
 {
     // Обработка очереди задач
@@ -1089,14 +1101,16 @@ void ScenarioManager::sys_functions_registration()
     Journal::instance()->info("getTrajState method binding...OK");
 
     lua["logMessage"] = [this](const std::string &msg) {
-
-        this->setTask([msg]{
-            Journal::instance()->info(QString("LUA DEBUG: %1").arg(msg.c_str()));
-        });
-
+        Journal::instance()->info(QString("LUA DEBUG: %1").arg(msg.c_str()));
     };
 
     Journal::instance()->info("logMessage method binding...OK");
+
+    lua.set_function("getNextTraj", [this](const std::string &traj_name, int dir){
+        return this->getNextTrajName(traj_name, dir);
+    });
+
+    Journal::instance()->info("getNextTraj method binding...OK");
 }
 
 //------------------------------------------------------------------------------

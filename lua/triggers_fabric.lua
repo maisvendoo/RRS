@@ -30,22 +30,28 @@ function autoApproach(traj_begin, traj_end, dir)
 		if is_busy and traj_name == traj_begin then
 
 			-- Проверяем состояние конечной траектории
-			--[[local traj_state = getTrajState(traj_end) 
+			local traj_state = getTrajState(traj_end) 
 
 			-- Если она занята, или включена в другой маршрут
 			if traj_state.is_busy or traj_state.in_route then
 
 				logMessage("Trajectory " .. traj_end .. " is busy or in other route")
 				-- Ставим триггер на освобождение и повторную попытку 
-				setTrigger(repeatAutoApproach(traj_begin, traj_end, dir))				
 
-			else--]]
+				local next_traj = getNextTraj(traj_begin, dir)
+
+				logMessage("Next traj: " .. next_traj)
+
+				setTrigger(repeatAutoApproach(next_traj, traj_end, dir))				
+
+			else
 
 				logMessage("Try to build route from " .. traj_begin .. " to " .. traj_end)
 				-- Строим маршрут от неё до конечной в заданном 
 				-- направлении
 				buildRoute(traj_begin, traj_end, dir)
-			--end
+
+			end
 
 		end
 		

@@ -78,6 +78,9 @@ signals:
     /// Поверить состояние траектории
     void sigGetTrajState(QString traj_name, bool &is_busy, bool &in_route);
 
+    /// Получить имя следующей траектории в заданном направлении
+    void sigGetNextTrajName(QString traj_name, int dir, QString &next_traj_name);
+
     /// Этот сигнал инициирует сообщение во вьювер,
     /// о необходимости задать имя поезда
     /// (вывесим транспарат, который будет назойтиво висеть, напоминая что надо дать имя поезду)
@@ -228,6 +231,9 @@ private:
 
     /// Получить состояние траектории
     scenario_traj_state_t getTrajState(const std::string &traj_name);
+
+    /// Получить имя следующей траектории в заданном направлении
+    std::string getNextTrajName(const std::string &traj_name, int dir);
 
 private slots:
 

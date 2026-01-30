@@ -1424,6 +1424,60 @@ void Topology::slotGetTrajState(QString traj_name, bool &is_busy, bool &in_route
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Topology::slotGetNextTrajName(QString traj_name, int dir, QString &next_traj_name)
+{
+    if (traj_name.isEmpty())
+    {
+        return;
+    }
+
+    auto traj = traj_list.value(traj_name, nullptr);
+
+    if (traj == nullptr)
+    {
+        return;
+    }
+
+    Connector *conn = nullptr;
+
+    if (dir == 1)
+    {
+        conn = traj->getFwdConnector();
+    }
+
+    if (dir == -1)
+    {
+        conn = traj->getBwdConnector();
+    }
+
+    if (conn == nullptr)
+    {
+        return;
+    }
+
+    Trajectory *next_traj = nullptr;
+
+    if (dir == 1)
+    {
+        next_traj = conn->getFwdTraj();
+    }
+
+    if (dir == -1)
+    {
+        next_traj = conn->getBwdTraj();
+    }
+
+    if (next_traj == nullptr)
+    {
+        return;
+    }
+
+    next_traj_name = next_traj->getName();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name)
 {
     // Определяем поезд, изменивший состояние траектории
