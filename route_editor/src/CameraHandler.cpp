@@ -60,6 +60,7 @@ CameraHandler::CameraHandler(
     front = vsg::normalize(front);
 
     right = vsg::cross(front, look_at->up);
+    right = vsg::normalize(right);
 }
 
 void CameraHandler::apply(vsg::FrameEvent& frame)
@@ -93,6 +94,7 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
         front = vsg::normalize(front);
 
         right = vsg::cross(front, look_at->up);
+        right = vsg::normalize(right);
     }
 
     perspective->fieldOfViewY -= mouse_handler->get_scroll() *
@@ -142,4 +144,9 @@ vsg::ref_ptr<vsg::Camera> CameraHandler::get_camera() const
 vsg::dvec3 CameraHandler::get_front() const
 {
     return front;
+}
+
+vsg::dvec3 CameraHandler::get_right() const
+{
+    return right;
 }

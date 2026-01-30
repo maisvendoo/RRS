@@ -1,5 +1,6 @@
 #include "ObjectSelector.h"
 
+#include "Action.h"
 #include "CameraHandler.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
@@ -15,11 +16,16 @@
 #include <vsg/core/Mask.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/common.h>
+#include <vsg/maths/transform.h>
+#include <vsg/maths/vec3.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/PointerEvent.h>
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
+#include <cstdio>
 
 ObjectSelector::ObjectSelector(
     const settings_t& settings,
@@ -31,6 +37,7 @@ ObjectSelector::ObjectSelector(
 )
     : settings(settings)
     , keyboard_handler(keyboard_handler)
+    , camera_handler(camera_handler)
     , intersection_handler(intersection_handler)
     , scene_graph(scene_graph)
     , observer_viewer(observer_viewer)
@@ -138,6 +145,96 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
+
+    static bool first_time = true;
+    if (first_time && !selected_objects.empty() &&
+        keyboard_handler->get_binding_state(ACTION_START_MOVING_OBJECT))
+    {
+        const auto print_float = [](const char* name, float value) -> void
+        {
+            std::printf("%s: %10.3f\n", name, value);
+        };
+
+        const auto print_vec3 = [](const char* name, vsg::vec3 vec) -> void
+        {
+            std::printf("%s: %10.3f %10.3f %10.3f\n",
+                name, vec.x, vec.y, vec.z);
+        };
+
+        first_time = false;
+
+        vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
+        for (const auto& object : selected_objects)
+        {
+            begin_pos += object->get_translation();
+        }
+        begin_pos /= static_cast<float>(selected_objects.size());
+        print_vec3("begin_pos", begin_pos);
+
+        const vsg::vec3 camera_pos = static_cast<vsg::vec3>(
+            camera_handler->get_look_at()->eye);
+        print_vec3("camera_pos", camera_pos);
+
+        vsg::vec3 camera_front = static_cast<vsg::vec3>(
+            camera_handler->get_front());
+        camera_front = vsg::normalize(camera_front);
+        print_vec3("camera_front", camera_front);
+
+        vsg::vec3 camera_right = static_cast<vsg::vec3>(
+            camera_handler->get_right());
+        camera_right = vsg::normalize(camera_right);
+        print_vec3("camera_right", camera_right);
+
+        vsg::vec3 camera_up = vsg::cross(camera_right, camera_front);
+        camera_up = vsg::normalize(camera_up);
+        print_vec3("camera_up", camera_up);
+
+        const vsg::vec3 camera_to_object = begin_pos - camera_pos;
+        print_vec3("camera_to_object", camera_to_object);
+
+        const float camera_to_object_dist = vsg::length(camera_to_object);
+        print_float("camera_to_object_dist", camera_to_object_dist);
+
+        const float cos_a = vsg::dot(camera_front,
+            vsg::normalize(camera_to_object));
+        print_float("cos_a", cos_a);
+
+        const float norm_length = camera_to_object_dist * cos_a;
+        print_float("norm_length", norm_length);
+
+        const vsg::vec3 norm = camera_front * norm_length;
+        print_vec3("norm", norm);
+
+        const float half_fov = static_cast<float>(vsg::radians(
+            camera_handler->get_perspective()->fieldOfViewY / 2.0));
+        print_float("half_fov", half_fov);
+
+        const float cos_b = std::cos(half_fov);
+        print_float("cos_b", cos_b);
+
+        const float dist = norm_length / cos_b;
+        print_float("dist", dist);
+
+        vsg::vec3 botton_left_dir = camera_front * vsg::rotate(
+            -half_fov, camera_up) * vsg::rotate(half_fov, camera_right);
+        botton_left_dir = vsg::normalize(botton_left_dir);
+        print_vec3("bottom_left_dir", botton_left_dir);
+
+        vsg::vec3 bottom_right_dir = camera_front * vsg::rotate(
+            half_fov, camera_up) * vsg::rotate(half_fov, camera_right);
+        bottom_right_dir = vsg::normalize(bottom_right_dir);
+        print_vec3("bottom_right_dir", bottom_right_dir);
+
+        vsg::vec3 top_left_dir = camera_front * vsg::rotate(
+            -half_fov, camera_up) * vsg::rotate(-half_fov, camera_right);
+        top_left_dir = vsg::normalize(top_left_dir);
+        print_vec3("top_left_dir", top_left_dir);
+
+        vsg::vec3 top_right_dir = camera_front * vsg::rotate(
+            half_fov, camera_up) * vsg::rotate(-half_fov, camera_right);
+        top_right_dir = vsg::normalize(top_right_dir);
+        print_vec3("top_right_dir", top_right_dir);
+    }
 
     gizmo->update_position();
     gizmo->update_scale();

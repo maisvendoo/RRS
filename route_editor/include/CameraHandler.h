@@ -40,6 +40,7 @@ public:
     vsg::ref_ptr<vsg::Camera> get_camera() const;
 
     vsg::dvec3 get_front() const;
+    vsg::dvec3 get_right() const;
 
 private:
     const settings_t& settings;
