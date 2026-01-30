@@ -13,6 +13,8 @@
 #include "SingleSwitch.h"
 
 #include <vsg/app/Viewer.h>
+#include <vsg/commands/Commands.h>
+#include <vsg/core/Array.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
@@ -20,12 +22,36 @@
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Node.h>
+#include <vsg/nodes/VertexIndexDraw.h>
 #include <vsg/ui/PointerEvent.h>
 
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
+
+static vsg::ref_ptr<vsg::Commands> createQuad(const vsg::vec3& p0,
+    const vsg::vec3& p1, const vsg::vec3& p2, const vsg::vec3& p3)
+{
+    const auto vertices = vsg::vec3Array::create({p0, p1, p2, p3});
+
+    const auto indices = vsg::ushortArray::create({
+        0, 1, 2,
+        2, 1, 3
+    });
+
+    const auto vid = vsg::VertexIndexDraw::create();
+    vid->assignArrays(vsg::DataList{vertices});
+    vid->assignIndices(indices);
+    vid->indexCount = static_cast<std::uint32_t>(indices->size());
+    vid->instanceCount = 1;
+
+    const auto commands = vsg::Commands::create();
+    commands->addChild(vid);
+
+    return commands;
+}
 
 ObjectSelector::ObjectSelector(
     const settings_t& settings,
@@ -150,17 +176,6 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     if (first_time && !selected_objects.empty() &&
         keyboard_handler->get_binding_state(ACTION_START_MOVING_OBJECT))
     {
-        const auto print_float = [](const char* name, float value) -> void
-        {
-            std::printf("%s: %10.3f\n", name, value);
-        };
-
-        const auto print_vec3 = [](const char* name, vsg::vec3 vec) -> void
-        {
-            std::printf("%s: %10.3f %10.3f %10.3f\n",
-                name, vec.x, vec.y, vec.z);
-        };
-
         first_time = false;
 
         vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
@@ -169,71 +184,58 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
             begin_pos += object->get_translation();
         }
         begin_pos /= static_cast<float>(selected_objects.size());
-        print_vec3("begin_pos", begin_pos);
 
-        const vsg::vec3 camera_pos = static_cast<vsg::vec3>(
+        const auto camera_pos = static_cast<vsg::vec3>(
             camera_handler->get_look_at()->eye);
-        print_vec3("camera_pos", camera_pos);
 
-        vsg::vec3 camera_front = static_cast<vsg::vec3>(
-            camera_handler->get_front());
-        camera_front = vsg::normalize(camera_front);
-        print_vec3("camera_front", camera_front);
+        const auto camera_front = vsg::normalize(static_cast<vsg::vec3>(
+            camera_handler->get_front()));
 
-        vsg::vec3 camera_right = static_cast<vsg::vec3>(
-            camera_handler->get_right());
-        camera_right = vsg::normalize(camera_right);
-        print_vec3("camera_right", camera_right);
+        const auto camera_right = vsg::normalize(static_cast<vsg::vec3>(
+            camera_handler->get_right()));
 
-        vsg::vec3 camera_up = vsg::cross(camera_right, camera_front);
-        camera_up = vsg::normalize(camera_up);
-        print_vec3("camera_up", camera_up);
+        const auto camera_up = vsg::normalize(vsg::cross(
+            camera_right, camera_front));
 
-        const vsg::vec3 camera_to_object = begin_pos - camera_pos;
-        print_vec3("camera_to_object", camera_to_object);
+        const auto camera_to_object = begin_pos - camera_pos;
 
-        const float camera_to_object_dist = vsg::length(camera_to_object);
-        print_float("camera_to_object_dist", camera_to_object_dist);
+        const auto camera_norm_length = vsg::length(camera_to_object) *
+            vsg::dot(camera_front, vsg::normalize(camera_to_object));
 
-        const float cos_a = vsg::dot(camera_front,
-            vsg::normalize(camera_to_object));
-        print_float("cos_a", cos_a);
+        // const auto half_fov = vsg::radians(static_cast<float>(
+        //     camera_handler->get_perspective()->fieldOfViewY) / 2.0f);
+        const auto half_fov = vsg::radians(80.0f);
 
-        const float norm_length = camera_to_object_dist * cos_a;
-        print_float("norm_length", norm_length);
+        const auto p0_dir = vsg::normalize(camera_front * vsg::rotate(
+            -half_fov, camera_up) * vsg::rotate(half_fov, camera_right));
 
-        const vsg::vec3 norm = camera_front * norm_length;
-        print_vec3("norm", norm);
+        const auto dist = camera_norm_length / vsg::dot(
+            p0_dir, camera_front);
 
-        const float half_fov = static_cast<float>(vsg::radians(
-            camera_handler->get_perspective()->fieldOfViewY / 2.0));
-        print_float("half_fov", half_fov);
+        const auto p1_dir = vsg::normalize(camera_front * vsg::rotate(
+            half_fov, camera_up) * vsg::rotate(half_fov, camera_right));
 
-        const float cos_b = std::cos(half_fov);
-        print_float("cos_b", cos_b);
+        const auto p2_dir = vsg::normalize(camera_front * vsg::rotate(
+            -half_fov, camera_up) * vsg::rotate(-half_fov, camera_right));
 
-        const float dist = norm_length / cos_b;
-        print_float("dist", dist);
+        const auto p3_dir = vsg::normalize(camera_front * vsg::rotate(
+            half_fov, camera_up) * vsg::rotate(-half_fov, camera_right));
 
-        vsg::vec3 botton_left_dir = camera_front * vsg::rotate(
-            -half_fov, camera_up) * vsg::rotate(half_fov, camera_right);
-        botton_left_dir = vsg::normalize(botton_left_dir);
-        print_vec3("bottom_left_dir", botton_left_dir);
+        const auto quad = createQuad(
+            camera_pos + p0_dir * dist,
+            camera_pos + p1_dir * dist,
+            camera_pos + p2_dir * dist,
+            camera_pos + p3_dir * dist
+        );
 
-        vsg::vec3 bottom_right_dir = camera_front * vsg::rotate(
-            half_fov, camera_up) * vsg::rotate(half_fov, camera_right);
-        bottom_right_dir = vsg::normalize(bottom_right_dir);
-        print_vec3("bottom_right_dir", bottom_right_dir);
+        const auto viewer = observer_viewer.ref_ptr();
+        const auto compile_manager = viewer->compileManager;
+        const auto compile_result = compile_manager->compile(quad);
 
-        vsg::vec3 top_left_dir = camera_front * vsg::rotate(
-            -half_fov, camera_up) * vsg::rotate(-half_fov, camera_right);
-        top_left_dir = vsg::normalize(top_left_dir);
-        print_vec3("top_left_dir", top_left_dir);
+        // TODO: Change mask
+        scene_graph->addChild(vsg::MASK_ALL, quad);
 
-        vsg::vec3 top_right_dir = camera_front * vsg::rotate(
-            half_fov, camera_up) * vsg::rotate(-half_fov, camera_right);
-        top_right_dir = vsg::normalize(top_right_dir);
-        print_vec3("top_right_dir", top_right_dir);
+        vsg::updateViewer(*viewer, compile_result);
     }
 
     gizmo->update_position();
