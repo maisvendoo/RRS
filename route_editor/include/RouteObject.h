@@ -3,6 +3,7 @@
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/box.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
 
@@ -27,12 +28,14 @@ public:
     vsg::vec3 get_translation() const;
     vsg::vec3 get_rotation_deg() const;
     vsg::vec3 get_scale() const;
+    const vsg::box& get_bounds() const;
 
     void set_translation(vsg::vec3 translation, bool update_matrix = true);
     void set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix = true);
     void set_scale(vsg::vec3 scale, bool update_matrix = true);
 
     void update_matrix();
+    void update_bounds();
 
     vsg::ref_ptr<SwitchGroup> get_switch_group() const;
     vsg::ref_ptr<vsg::PagedLOD> get_paged_lod() const;
@@ -54,6 +57,7 @@ private:
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;
     vsg::vec3 scale = {1.0f, 1.0f, 1.0f};
+    vsg::box bounds;
 
     vsg::ref_ptr<SwitchGroup> switch_group;
     vsg::ref_ptr<vsg::PagedLOD> paged_lod;

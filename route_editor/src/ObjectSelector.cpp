@@ -166,6 +166,7 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
 
         object->get_switch_group()->addChild(vsg::Mask{MASK_GUI2}, outline);
         object->outline = outline;
+        object->update_bounds();
 
         vsg::updateViewer(*viewer, compile_result);
 

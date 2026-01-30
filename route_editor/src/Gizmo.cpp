@@ -190,7 +190,7 @@ bool Gizmo::handle_intersections()
     const auto save_selected_objects_begin_matrixes = [&]() -> void
     {
         selected_objects_begin_poss.clear();
-        for (const auto object : selected_objects)
+        for (const auto& object : selected_objects)
         {
             selected_objects_begin_poss[object] = object->get_translation();
         }
@@ -345,16 +345,10 @@ void Gizmo::update_position()
 {
     curr_position = {0.0f, 0.0f, 0.0f};
 
-    for (const auto object : selected_objects)
+    for (const auto& object : selected_objects)
     {
-        vsg::ComputeBounds compute_bounds;
-        compute_bounds.useNodeBounds = false;
-        object->accept(compute_bounds);
-
-        const auto& bounds = compute_bounds.bounds;
-
-        curr_position += static_cast<vsg::vec3>(
-            (bounds.min + bounds.max) / 2.0);
+        const auto& bounds = object->get_bounds();
+        curr_position += (bounds.min + bounds.max) / 2.0f;
     }
 
     curr_position /= static_cast<float>(selected_objects.size());
