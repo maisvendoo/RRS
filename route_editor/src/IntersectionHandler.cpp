@@ -5,6 +5,7 @@
 
 #include <vsg/app/Camera.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec2.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/LineSegmentIntersector.h>
 
@@ -101,6 +102,15 @@ vsg::ref_ptr<vsg::LineSegmentIntersector> IntersectionHandler::apply_(
     return vsg::LineSegmentIntersector::create(
         *camera, moveEvent.x, moveEvent.y);
 }
+
+vsg::ref_ptr<vsg::LineSegmentIntersector> IntersectionHandler::apply_(
+    vsg::ivec2 mouse_pos
+) const
+{
+    return vsg::LineSegmentIntersector::create(
+        *camera, mouse_pos.x, mouse_pos.y);
+}
+
 
 vsg::ref_ptr<vsg::LineSegmentIntersector>
 IntersectionHandler::get_lmb_intersector() const

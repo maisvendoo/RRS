@@ -4,6 +4,7 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec2.h>
 #include <vsg/utils/LineSegmentIntersector.h>
 
 namespace vsg
@@ -27,6 +28,10 @@ public:
 
     vsg::ref_ptr<vsg::LineSegmentIntersector> apply_(
         const vsg::MoveEvent& moveEvent
+    ) const;
+
+    vsg::ref_ptr<vsg::LineSegmentIntersector> apply_(
+        vsg::ivec2 mouse_pos
     ) const;
 
     vsg::ref_ptr<vsg::LineSegmentIntersector> get_lmb_intersector() const;
