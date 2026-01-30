@@ -1,5 +1,6 @@
 #include "IntersectionHandler.h"
 
+#include "LSIntersector.h"
 #include "Mask.h"
 #include "MouseButton.h"
 
@@ -7,7 +8,6 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec2.h>
 #include <vsg/ui/PointerEvent.h>
-#include <vsg/utils/LineSegmentIntersector.h>
 
 #include <algorithm>
 #include <cassert>
@@ -29,8 +29,8 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
     {
         case MOUSE_BUTTON_LEFT:
         {
-            lmb_intersector = vsg::LineSegmentIntersector::create(
-                *camera, buttonPress.x, buttonPress.y);
+            lmb_intersector = LSIntersector::create(*camera,
+                buttonPress.x, buttonPress.y);
 
             lmb_intersector->traversalMask = MASK_CLICKABLE;
 
@@ -38,8 +38,8 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
         }
         case MOUSE_BUTTON_MIDDLE:
         {
-            mmb_intersector = vsg::LineSegmentIntersector::create(
-                *camera, buttonPress.x, buttonPress.y);
+            mmb_intersector = LSIntersector::create(*camera,
+                buttonPress.x, buttonPress.y);
 
             mmb_intersector->traversalMask = MASK_CLICKABLE;
 
@@ -47,8 +47,8 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
         }
         case MOUSE_BUTTON_RIGHT:
         {
-            rmb_intersector = vsg::LineSegmentIntersector::create(
-                *camera, buttonPress.x, buttonPress.y);
+            rmb_intersector = LSIntersector::create(*camera,
+                buttonPress.x, buttonPress.y);
 
             rmb_intersector->traversalMask = MASK_CLICKABLE;
 
@@ -95,51 +95,39 @@ void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
     }
 }
 
-vsg::ref_ptr<vsg::LineSegmentIntersector> IntersectionHandler::apply_(
+LSIntersectorRefPtr IntersectionHandler::apply_(
     const vsg::MoveEvent& moveEvent
 ) const
 {
-    return vsg::LineSegmentIntersector::create(
-        *camera, moveEvent.x, moveEvent.y);
+    return LSIntersector::create(*camera, moveEvent.x, moveEvent.y);
 }
 
-vsg::ref_ptr<vsg::LineSegmentIntersector> IntersectionHandler::apply_(
-    vsg::ivec2 mouse_pos
-) const
+LSIntersectorRefPtr IntersectionHandler::apply_(vsg::ivec2 mouse_pos) const
 {
-    return vsg::LineSegmentIntersector::create(
-        *camera, mouse_pos.x, mouse_pos.y);
+    return LSIntersector::create(*camera, mouse_pos.x, mouse_pos.y);
 }
 
-
-vsg::ref_ptr<vsg::LineSegmentIntersector>
-IntersectionHandler::get_lmb_intersector() const
+LSIntersectorRefPtr IntersectionHandler::get_lmb_intersector() const
 {
     return lmb_intersector;
 }
 
-vsg::ref_ptr<vsg::LineSegmentIntersector>
-IntersectionHandler::get_mmb_intersector() const
+LSIntersectorRefPtr IntersectionHandler::get_mmb_intersector() const
 {
     return mmb_intersector;
 }
 
-vsg::ref_ptr<vsg::LineSegmentIntersector>
-IntersectionHandler::get_rmb_intersector() const
+LSIntersectorRefPtr IntersectionHandler::get_rmb_intersector() const
 {
     return rmb_intersector;
 }
 
-void IntersectionHandler::sort_intersections(
-    vsg::ref_ptr<vsg::LineSegmentIntersector> intersector
-)
+void IntersectionHandler::sort_intersections(LSIntersectorRefPtr intersector)
 {
     sort_intersections(intersector->intersections);
 }
 
-void IntersectionHandler::sort_intersections(
-    vsg::LineSegmentIntersector::Intersections& intersections
-)
+void IntersectionHandler::sort_intersections(LSIntersections& intersections)
 {
     if (intersections.empty())
     {
