@@ -6,6 +6,7 @@
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
 #include "Mask.h"
+#include "MouseHandler.h"
 #include "Outline.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
@@ -27,9 +28,10 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cmath>
 #include <cstdint>
-#include <cstdio>
+
+static vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
+static vsg::ref_ptr<vsg::Node> quad = nullptr;
 
 static vsg::ref_ptr<vsg::Commands> createQuad(const vsg::vec3& p0,
     const vsg::vec3& p1, const vsg::vec3& p2, const vsg::vec3& p3)
@@ -55,6 +57,7 @@ static vsg::ref_ptr<vsg::Commands> createQuad(const vsg::vec3& p0,
 
 ObjectSelector::ObjectSelector(
     const settings_t& settings,
+    vsg::ref_ptr<MouseHandler> mouse_handler,
     vsg::ref_ptr<KeyboardHandler> keyboard_handler,
     vsg::ref_ptr<CameraHandler> camera_handler,
     vsg::ref_ptr<IntersectionHandler> intersection_handler,
@@ -62,6 +65,7 @@ ObjectSelector::ObjectSelector(
     vsg::observer_ptr<vsg::Viewer> observer_viewer
 )
     : settings(settings)
+    , mouse_handler(mouse_handler)
     , keyboard_handler(keyboard_handler)
     , camera_handler(camera_handler)
     , intersection_handler(intersection_handler)
@@ -166,6 +170,31 @@ void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
 void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
     gizmo->apply(moveEvent);
+
+    if (quad)
+    {
+        const auto intersector = intersection_handler->apply_(moveEvent);
+        quad->accept(*intersector);
+
+        auto& intersections = intersector->intersections;
+        if (intersections.empty())
+        {
+            return;
+        }
+
+        intersection_handler->sort_intersections(intersections);
+
+        const auto intersection = intersections.front();
+        const auto world_intersection = static_cast<vsg::vec3>(
+            intersection->worldIntersection);
+
+        for (const auto& object :selected_objects)
+        {
+            object->set_translation(world_intersection);
+        }
+
+        intersections.clear();
+    }
 }
 
 void ObjectSelector::apply(vsg::FrameEvent& frame)
@@ -178,7 +207,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     {
         first_time = false;
 
-        vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
+        begin_pos = {0.0f, 0.0f, 0.0f};
         for (const auto& object : selected_objects)
         {
             begin_pos += object->get_translation();
@@ -221,7 +250,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto p3_dir = vsg::normalize(camera_front * vsg::rotate(
             half_fov, camera_up) * vsg::rotate(-half_fov, camera_right));
 
-        const auto quad = createQuad(
+        quad = createQuad(
             camera_pos + p0_dir * dist,
             camera_pos + p1_dir * dist,
             camera_pos + p2_dir * dist,
@@ -233,7 +262,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto compile_result = compile_manager->compile(quad);
 
         // TODO: Change mask
-        scene_graph->addChild(vsg::MASK_ALL, quad);
+        scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, quad);
 
         vsg::updateViewer(*viewer, compile_result);
     }

@@ -12,6 +12,7 @@ class CameraHandler;
 class Gizmo;
 class IntersectionHandler;
 class KeyboardHandler;
+class MouseHandler;
 class RouteObject;
 class SceneGraph;
 class SingleSwitch;
@@ -33,6 +34,7 @@ class ObjectSelector : public vsg::Inherit<vsg::Visitor, ObjectSelector>
 public:
     ObjectSelector(
         const settings_t& settings,
+        vsg::ref_ptr<MouseHandler> mouse_handler,
         vsg::ref_ptr<KeyboardHandler> keyboard_handler,
         vsg::ref_ptr<CameraHandler> camera_handler,
         vsg::ref_ptr<IntersectionHandler> intersection_handler,
@@ -54,6 +56,7 @@ private:
 
 private:
     const settings_t& settings;
+    vsg::ref_ptr<MouseHandler> mouse_handler;
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;
     vsg::ref_ptr<CameraHandler> camera_handler;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
