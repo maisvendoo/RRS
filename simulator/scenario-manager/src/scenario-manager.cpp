@@ -65,7 +65,7 @@ bool ScenarioManager::run(const std::string &route_dir,
 
     // Добавляем каталог сценария в пути поиска модулей
     const std::string &cur_path = lua["package"]["path"].get<std::string>();
-    lua["package"]["path"] = cur_path + ";" + scenario_dir + fs.separator() + "?.lua";
+    lua["package"]["path"] = cur_path + ";" + scenario_dir + fs.separator() + scenario_name + fs.separator() + "?.lua";
 
     try
     {
