@@ -18,6 +18,7 @@ KeyboardHandler::KeyboardHandler(const settings_t& settings)
 
     key_bindings[ACTION_MOVE_CAMERA_LEFT] = settings.key_move_camera_left;
     key_bindings[ACTION_MOVE_CAMERA_RIGHT] = settings.key_move_camera_right;
+    key_bindings[ACTION_START_MOVING_OBJECT] = settings.key_start_moving_object;
 }
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)

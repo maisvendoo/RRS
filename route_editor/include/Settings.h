@@ -60,10 +60,11 @@ struct settings_t
     bool show_camera_settings = false;
     bool show_topology = false;
 
-    vsg::KeySymbol key_move_camera_forward = vsg::KEY_q;
-    vsg::KeySymbol key_move_camera_backward = vsg::KEY_q;
-    vsg::KeySymbol key_move_camera_left = vsg::KEY_q;
-    vsg::KeySymbol key_move_camera_right = vsg::KEY_q;
+    vsg::KeySymbol key_move_camera_forward = vsg::KEY_w;
+    vsg::KeySymbol key_move_camera_backward = vsg::KEY_s;
+    vsg::KeySymbol key_move_camera_left = vsg::KEY_a;
+    vsg::KeySymbol key_move_camera_right = vsg::KEY_d;
+    vsg::KeySymbol key_start_moving_object = vsg::KEY_q;
 };
 
 #endif // EDITOR_SETTINGS_H

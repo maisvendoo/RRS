@@ -173,5 +173,6 @@
         <KeyMoveCameraBackward>s</KeyMoveCameraBackward>
         <KeyMoveCameraLeft>a</KeyMoveCameraLeft>
         <KeyMoveCameraRight>d</KeyMoveCameraRight>
+        <KeyStartMovingObject>g</KeyStartMovingObject>
     </Editor>
 </Config>
