@@ -21,7 +21,8 @@ public:
 
     Autopilot(QObject *parent = nullptr) : Device(parent)
     {
-        connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);        
+        connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);
+        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);
     }
 
     ~Autopilot()
@@ -175,6 +176,11 @@ protected:
 
     std::array<double, NUM_VALUES> v_filter = {0.0};
 
+    /// Интервал времени подачи песка
+    const double SAND_TIME_INTERVAL = 10.0;
+
+    Timer *sand_timer = new Timer(SAND_TIME_INTERVAL, false);
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,
@@ -202,6 +208,18 @@ protected:
 
     }
 
+    /// Включить песок
+    virtual void sand_ON()
+    {
+
+    }
+
+    /// Выключить песок
+    virtual void sand_OFF()
+    {
+
+    }
+
     void load_config(CfgReader &cfg) override;
 
     double calcCurrentSpeedLimit(double t, double dt);
@@ -219,6 +237,8 @@ public slots:
 private slots:
 
     void slotVigilanceControl();
+
+    void slotSandTimer();
 };
 
 //------------------------------------------------------------------------------

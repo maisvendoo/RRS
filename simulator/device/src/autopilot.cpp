@@ -36,6 +36,7 @@ void Autopilot::step(double t, double dt)
     accel_meter->step(t, dt);
 
     rb_timer->step(t, dt);
+    sand_timer->step(t, dt);
 
     Device::step(t, dt);
 }
@@ -47,7 +48,9 @@ QString Autopilot::getDbgMsg()
 {
     double v_p = calcPredictVelocity(feedback->v_cur, dist_target, accel_meter->value());
 
-    return QString(" | ВКЛЮЧЕНО АВТОВЕДЕНИЕ | Vзад.: %1 км/ч| Уск.: %2 м/с2| Зад. уск.: %3 м/с2 | Прогноз Vцел.: %4 км/ч")
+    return QString(" | АВТОВЕДЕНИЕ | Vтек.: %1 км/ч | Vокр.: %2 км/ч | Vзад.: %3 км/ч| Уск.: %4 м/с2| Зад. уск.: %5 м/с2 | Прогноз Vцел.: %6 км/ч")
+        .arg(feedback->v_cur, 4, 'f', 1)
+        .arg(feedback->v_tau, 4, 'f', 1)
         .arg(v_ref, 4, 'f', 1)
         .arg(accel_meter->value(), 6, 'f', 2)
         .arg(-a_brake, 6, 'f', 2)
@@ -266,4 +269,15 @@ void Autopilot::slotVigilanceControl()
 {
     release_RB();
     rb_timer->stop();
+}
+
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::slotSandTimer()
+{
+    sand_timer->stop();
+
+    sand_OFF();
 }

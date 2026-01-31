@@ -81,7 +81,13 @@ private:
     void plusPos();
 
     /// Сброс одной позиции
-    void minusPos();    
+    void minusPos();
+
+    void sand_ON() override;
+
+    void sand_OFF() override;
+
+    void wheel_slim_process();
 
 private slots:
 
