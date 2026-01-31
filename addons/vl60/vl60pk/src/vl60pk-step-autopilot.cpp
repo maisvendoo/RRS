@@ -13,6 +13,7 @@
 #include    <ALSN-decoder.h>
 #include    <epb-2line-control.h>
 #include    <relay.h>
+#include    <sanding-system.h>
 
 //------------------------------------------------------------------------------
 //
@@ -106,5 +107,7 @@ void VL60pk::stepAutopilot(double t, double dt)
         // Управление прожектором
         auto_control[cab_idx]->spotlight_ON ? spotlight_low_tumbler[cab_idx].set() :
             spotlight_low_tumbler[cab_idx].reset();
+
+        sand_system->setSandDeliveryOn(auto_control[cab_idx]->sand_ON);
     }    
 }

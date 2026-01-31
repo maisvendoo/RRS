@@ -65,11 +65,9 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     // Вычисляем задание по току ТЭД
     double kp = Kp * train_mass / ref_mass;
 
-    double ks = 10.0;
-
     double dv_s = pf(feedback->v_tau - feedback->v_cur);
 
-    double I_ref = Imax * (kp * dv - ks * dv_s + getY(0));
+    double I_ref = Imax * (kp * dv - Ks * dv_s + getY(0));
 
     I_ref = cut(I_ref, 0.0, Imax);
 
@@ -159,6 +157,7 @@ void VL60Autopilot::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "DeltaI", delta_I);
     cfg.getDouble(secName, "Kp", Kp);
     cfg.getDouble(secName, "Ki", Ki);
+    cfg.getDouble(secName, "Ks", Ks);
 }
 
 //------------------------------------------------------------------------------
