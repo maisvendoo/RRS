@@ -62,6 +62,7 @@ void VL60pk::stepAutopilot(double t, double dt)
     auto_feedback[cab_idx]->km_pos = controller[cab_idx]->getMainPos();
     auto_feedback[cab_idx]->I_motor = motor[0]->getIa();
     auto_feedback[cab_idx]->v_cur = qAbs(velocity * Physics::kmh);
+    auto_feedback[cab_idx]->v_tau = qAbs(wheel_omega[0] * wheel_diameter[0] / 2.0 * Physics::kmh);
     auto_feedback[cab_idx]->v_lim = v_lim;
     auto_feedback[cab_idx]->v_lim_next = v_lim_next;
     auto_feedback[cab_idx]->limit_dist = limit_dist;
