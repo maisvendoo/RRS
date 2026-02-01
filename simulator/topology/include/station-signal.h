@@ -74,6 +74,7 @@ protected:
     {
         SR_OPENED = 0,
         SR_CLOSED,
+        SR_WHITE_CTRL,
         SR_SELF_CTRL,
         SR_CALL_CTRL,
         SR_SHUNT_CTRL,
@@ -139,6 +140,9 @@ protected:
     /// Признак ограничения по положениям стрелочных переводов
     Restrict switches_state = SWITCHES_STRAIGHT;
 
+    /// Признак следующей сигнальной точки только с локомотивной сигнализацией
+    bool is_next_ALSN_only = false;
+
     /// Контакт мигания
     bool blink_contact = true;
 
@@ -152,13 +156,13 @@ private:
     /// и заняты оба участка перед и за светофором (пока проезжает состав)
     bool is_lock_route = true;
 
-    /// Признак нажатия кнопки открытия
+    /// Признак нажатия кнопки открытия для поездного маршрута
     bool is_open_train_button_pressed = false;
 
-    /// Признак нажатия кнопки открытия
+    /// Признак нажатия кнопки открытия для маневрового маршрута
     bool is_open_shunt_button_pressed = false;
 
-    /// Признак нажатия кнопки открытия
+    /// Признак нажатия кнопки открытия пригласительного сигнала
     bool is_open_call_button_pressed = false;
 
     /// Признак НЕнажатия кнопки закрытия (нормально замкнутая)
