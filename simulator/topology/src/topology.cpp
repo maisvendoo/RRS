@@ -82,7 +82,7 @@ bool Topology::load(QString route_dir, bool solve_errors)
         connect(traj, &Trajectory::sendTrajBusyState, this, &Topology::sendTrajBusyState);
     }
 
-    if (traj_list.size() == 0)
+    if (traj_list.empty())
     {
         Journal::instance()->error("Empty list of trajectories");
         return false;
@@ -95,7 +95,7 @@ bool Topology::load(QString route_dir, bool solve_errors)
         Journal::instance()->error("Can't to load staions list");
     }
 
-    get_route_name(route_path);    
+    get_route_name(route_path);
 
     return true;
 }
@@ -125,13 +125,20 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
     {
         VehicleController *vc = new VehicleController;
         //vehicle_control[i] = new VehicleController;
+        Vehicle* const curr_vehicle = (*vehicles)[i];
+        const Vehicle* const prev_vehicle = (i == 0) ? nullptr : (*vehicles)[i - 1];
 
         // Смещаем координату центра данной ПЕ
         // на половину её длины и половину длины предыдущей ПЕ
-        double L = (*vehicles)[i]->getLength();
-        traj_coord = traj_coord - tp.dir * L / 2.0;
+        // double L = (*vehicles)[i]->getLength();
+        double L = curr_vehicle->getLength();
+        // traj_coord = traj_coord - tp.dir * L / 2.0;
+        traj_coord -= tp.dir * L / 2.0;
         if (i != 0)
-            traj_coord = traj_coord - tp.dir * (*vehicles)[i-1]->getLength() / 2.0;
+        {
+            // traj_coord = traj_coord - tp.dir * (*vehicles)[i-1]->getLength() / 2.0;
+            traj_coord -= tp.dir * prev_vehicle->getLength() / 2.0;
+        }
 
         // Если траекторная координата превысила длину траектории
         // (заехали за стык или стрелку спереди), пока она её превышает...
@@ -155,7 +162,8 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
 
             // Вычитаем из траекторной координаты длину предыдущей траектории,
             // чтобы получить координату на новой траектории впереди
-            traj_coord = traj_coord - cur_traj->getLength();
+            // traj_coord = traj_coord - cur_traj->getLength();
+            traj_coord -= cur_traj->getLength();
 
             // Обновляем текущую траекторию на ту,
             // с которой нас соединяет коннектор спереди
@@ -184,7 +192,8 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
 
             // Добавляем к траекторной координате длину новой траектории,
             // чтобы получить координату на новой траектории сзади
-            traj_coord = traj_coord + next_traj->getLength();
+            // traj_coord = traj_coord + next_traj->getLength();
+            traj_coord += next_traj->getLength();
 
             // Обновляем текущую траекторию на ту,
             // с которой нас соединяет коннектор сзади
@@ -192,26 +201,26 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
         }
 
         size_t idx = vehicle_control.size();
-        if ((*vehicles)[i]->getModelIndex() != idx)
+        if (curr_vehicle->getModelIndex() != idx)
         {
             Journal::instance()->warning(QString(
                 "Sizes of vehicles array at model and at topology are different."));
             Journal::instance()->warning(QString(
                 "For vehicle [%1] index from topology vehicle controller [%2] will be used.")
-                                             .arg((*vehicles)[i]->getModelIndex())
+                                             .arg(curr_vehicle->getModelIndex())
                                              .arg(idx));
 
-            (*vehicles)[i]->setModelIndex(idx);
+            curr_vehicle->setModelIndex(idx);
         }
         vc->setIndex(idx);
         vc->setLength(L);
-        vc->setVehicleRailwayConnectors((*vehicles)[i]->getRailwayConnectors());
+        vc->setVehicleRailwayConnectors(curr_vehicle->getRailwayConnectors());
         vc->setInitCurrentTraj(cur_traj, traj_coord);
         vc->setDirection(tp.dir);
-        vc->setInitCoord((*vehicles)[i]->getTrainCoord());
+        vc->setInitCoord(curr_vehicle->getTrainCoord());
 
         vehicle_control.push_back(vc);
-        vc_table[(*vehicles)[i]] = vc;
+        vc_table[curr_vehicle] = vc;
 
         Journal::instance()->info(QString("Vehcile #%1").arg(idx) +
                                   " at traj: " + cur_traj->getName() +
@@ -269,7 +278,7 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
     while (!q.empty())
     {
         // извлекаем текущую траекторию и направление из очереди
-        auto [curr_t, d] = q.front();
+        const auto& [curr_t, d] = q.front();
         q.pop();
 
         // Если текущая траектория - целевая, то ура, мы нашли путь!
@@ -349,7 +358,7 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
                 // Если есть незанатое направление по отклонению не включенной в другой маршрут
                 if (sw->fwdMinusTraj && !sw->fwdMinusTraj->isBusy() && !sw->fwdMinusTraj->isInRoute())
                 {
-                    // То же кандидат, надо рассмотреть!
+                    // Тоже кандидат, надо рассмотреть!
                     candidates.push_back(sw->fwdMinusTraj);
                 }
             }
@@ -473,8 +482,7 @@ bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
                 sw->setRefStateBwd(Switch::STATE_MINUS);
             }
         }
-
-        if (dir == -1)
+        else if (dir == -1)
         {
             // Переключаем попутные остряки
             if (next_traj == sw->bwdPlusTraj)
@@ -585,14 +593,12 @@ void Topology::step(double t, double dt)
                                 signals_data.exit_signals,
                                 signals_data.shunt_signals})
     {
-        for (auto& signal : signals_array)
+        for (auto* signal : signals_array)
         {
-            if (signal == nullptr)
+            if (signal)
             {
-                continue;
+                signal->step(t, dt);
             }
-
-            signal->step(t, dt);
         }
     }
 }
@@ -612,7 +618,7 @@ QByteArray Topology::serialize()
 
     stream << static_cast<uint32_t>(stations.size());
 
-    for (auto station : stations)
+    for (const auto& station : stations)
     {
         QByteArray sdata = station.serialize();
         stream << sdata;

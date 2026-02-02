@@ -47,7 +47,7 @@ struct topology_station_t
 
     }
 
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QBuffer buff(&data);
