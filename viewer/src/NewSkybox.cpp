@@ -176,9 +176,9 @@ void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degree
     auto angle_in_interval = [](const double& begin,
                                 const double& end,
                                 const double& cur_angle,
-                                const double& cur_angle_rise) -> float
+                                const bool& is_cur_angle_rise) -> float
     {
-        if ((begin < end) == cur_angle_rise)
+        if ((begin < end) == is_cur_angle_rise)
         {
             const float mix_value = (cur_angle - begin) / (end - begin);
             return std::clamp(mix_value, 0.0f, 1.0f);
