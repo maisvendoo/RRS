@@ -7,6 +7,7 @@
 #include    <QMenu>
 #include    <switch.h>
 #include    <QInputDialog>
+#include    <QClipboard>
 
 //------------------------------------------------------------------------------
 //
@@ -640,6 +641,14 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
             });
         }
     }
+
+    // Копирование имени траектории в буффер обмена (для сценаристов)
+    no_need_menu = false;
+    QAction *copy_name_to_clipboard = new QAction(tr("Copy trajectory name to clipboard"), this);
+    menu->addAction(copy_name_to_clipboard);
+    connect(copy_name_to_clipboard, &QAction::triggered, this, [this, nearest_traj]{
+        QApplication::clipboard()->setText(nearest_traj->getName(), QClipboard::Clipboard);
+    });
 
     if (no_need_menu)
     {
