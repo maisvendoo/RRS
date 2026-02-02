@@ -107,6 +107,8 @@ void ScenarioManager::processTasksQueue()
 //------------------------------------------------------------------------------
 void ScenarioManager::processTimeTriggers(const simulator_time_t &sim_time)
 {
+    this->sim_time = sim_time;
+
     // Очередь пуста - убегаем
     if (timeTriggerList.empty())
     {
@@ -265,6 +267,32 @@ void ScenarioManager::setRelTimeTirgger(const std::string &rel_time,
     double sec = trig_time.hour() * 3600 + trig_time.minute() * 60 + trig_time.sec();
 
     // Прибавляем эти секунды к времени старта
+    if (trig_date_time.time.addTime(sec))
+    {
+        // если надо, добавляем еще день
+        trig_date_time.date.nextDay();
+    }
+
+    // Ставим триггер
+    taskTimeTrigger(trig_date_time, trigger_func);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setPostEventTimeTirgger(const std::string &rel_time,
+                                              sol::function trigger_func)
+{
+    // Парсим заданное время
+    server_time_t trig_time;
+    strTimeToServerTime(rel_time, trig_time);
+
+    // Который час?
+    simulator_time_t trig_date_time = sim_time;
+    // Переводим в секунды дельту времени
+    double sec = trig_time.hour() * 3600 + trig_time.minute() * 60 + trig_time.sec();
+
+    // Прибавляем эти секунды к текущему времени
     if (trig_date_time.time.addTime(sec))
     {
         // если надо, добавляем еще день
@@ -1081,6 +1109,12 @@ void ScenarioManager::sys_functions_registration()
     });
 
     Journal::instance()->info("setTimeTrigger method binding...OK");
+
+    lua.set_function("setPostEventTimeTirgger", [this](const std::string &rel_time, sol::function trigger_func){
+        this->setPostEventTimeTirgger(rel_time, trigger_func);
+    });
+
+    Journal::instance()->info("setPostEventTimeTirgger method binding...OK");
 
     lua["openShuntingSignal"] = [this](const std::string &conn_name, int dir){
         this->taskOpenSignal(conn_name, dir, false, true);
