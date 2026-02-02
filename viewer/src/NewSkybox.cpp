@@ -242,7 +242,7 @@ void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degree
         if (texture1_id < 0)
         {
             // Нет активных текстур
-            for (auto tt : textures)
+            for (texture_t& tt : textures)
             {
                 tt.use_id = 0;
             }
@@ -265,7 +265,7 @@ void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degree
             mix_value->dirty();
         }
 
-        for (auto tt : textures)
+        for (texture_t& tt : textures)
         {
             tt.use_id = 0;
         }
@@ -300,7 +300,7 @@ void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degree
             mix_value->dirty();
         }
 
-        for (auto tt : textures)
+        for (texture_t& tt : textures)
         {
             tt.use_id = 0;
         }
