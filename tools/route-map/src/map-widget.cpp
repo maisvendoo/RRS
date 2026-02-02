@@ -334,7 +334,7 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         }
         else
         {
-            track_t bwd_track = bwd_traj->getLastTrack();
+            const track_t& bwd_track = bwd_traj->getLastTrack();
             center = bwd_track.end_point;
         }
     }
@@ -342,13 +342,13 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
     {
         if ((bwd_traj == nullptr || (bwd_traj->getTracks().empty())))
         {
-            track_t fwd_track = fwd_traj->getLastTrack();
+            const track_t& fwd_track = fwd_traj->getLastTrack();
             center = fwd_track.begin_point;
         }
         else
         {
-            track_t bwd_track = bwd_traj->getLastTrack();
-            track_t fwd_track = fwd_traj->getFirstTrack();
+            const track_t& bwd_track = bwd_traj->getLastTrack();
+            const track_t& fwd_track = fwd_traj->getFirstTrack();
             center = (bwd_track.end_point + fwd_track.begin_point) * 0.5;
         }
     }
@@ -777,26 +777,27 @@ void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor
     }
 
     dvec3 bottom_signal_pos;
-    track_t track;
+    const track_t* track = nullptr;
     SignalLabel *signal_label = nullptr;
+
     if (signal->getDirection() < 0)
     {
-        track = traj->getFirstTrack();
-        bottom_signal_pos = track.begin_point;
+        track = &traj->getFirstTrack();
+        bottom_signal_pos = track->begin_point;
         signal_label = signal_labels_bwd.value(conn->getName(), nullptr);
     }
     else
     {
-        track = traj->getLastTrack();
-        bottom_signal_pos = track.end_point;
+        track = &traj->getLastTrack();
+        bottom_signal_pos = track->end_point;
         signal_label = signal_labels_fwd.value(conn->getName(), nullptr);
     }
 
-    bottom_signal_pos += track.trav * (signal_offset * signal->getDirection());
+    bottom_signal_pos += track->trav * (signal_offset * signal->getDirection());
     double signed_r = signal_radius * signal->getDirection();
     int r = std::round(signal_radius * scale);
 
-    dvec3 label_pos = bottom_signal_pos + track.orth * ((2 * lens_colors.size() + 3) * signed_r);
+    dvec3 label_pos = bottom_signal_pos + track->orth * ((2 * lens_colors.size() + 3) * signed_r);
     if (signal_label != nullptr)
     {
         QPoint label_p = coord_transform(label_pos);
@@ -812,16 +813,16 @@ void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor
     painter.setPen(pen);
     for (size_t i = 1; i <= lens_colors.size(); ++i)
     {
-        dvec3 lens_pos = bottom_signal_pos + track.orth * (2 * i * signed_r);
+        dvec3 lens_pos = bottom_signal_pos + track->orth * (2 * i * signed_r);
         QPoint lens_point = coord_transform(lens_pos);
         painter.setBrush(lens_colors[i - 1]);
         painter.drawEllipse(lens_point, r, r);
     }
 
     QPoint bottom_down = coord_transform(bottom_signal_pos);
-    QPoint bottom_up = coord_transform(bottom_signal_pos + track.orth * signed_r);
-    QPoint bottom_left = coord_transform(bottom_signal_pos - track.trav * signed_r);
-    QPoint bottom_right = coord_transform(bottom_signal_pos + track.trav * signed_r);
+    QPoint bottom_up = coord_transform(bottom_signal_pos + track->orth * signed_r);
+    QPoint bottom_left = coord_transform(bottom_signal_pos - track->trav * signed_r);
+    QPoint bottom_right = coord_transform(bottom_signal_pos + track->trav * signed_r);
 
     pen.setWidth((scale > 2.0) ? 2 : 1);
     painter.setPen(pen);

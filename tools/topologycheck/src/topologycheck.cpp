@@ -175,8 +175,8 @@ void TopologyCheck::check_connector_point(Switch *sw)
         sw->setStateFwd(state_fwd);
         if (sw->getBwdTraj() && sw->getFwdTraj())
         {
-            auto bwd_track = sw->getBwdTraj()->getLastTrack();
-            auto fwd_track = sw->getFwdTraj()->getFirstTrack();
+            const auto& bwd_track = sw->getBwdTraj()->getLastTrack();
+            const auto& fwd_track = sw->getFwdTraj()->getFirstTrack();
 
             double curvature = calcCurvature(bwd_track, fwd_track);
             if (curvature > maximum_curvature)

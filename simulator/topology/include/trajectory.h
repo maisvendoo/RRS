@@ -93,15 +93,15 @@ public:
     void getBusyCoords(double &busy_begin_coord, double &busy_end_coord);
 
     /// Вернуть первый трек траектории
-    track_t getFirstTrack() const
+    const track_t& getFirstTrack() const
     {
-        return *tracks.begin();
+        return tracks.front();
     }
 
     /// Вернуть последний трек траектории
-    track_t getLastTrack() const
+    const track_t& getLastTrack() const
     {
-        return *(tracks.end() - 1);
+        return tracks.back();
     }
 
     /// Получить оборудование путевой инфраструктуры на этой траектории
