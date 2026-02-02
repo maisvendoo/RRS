@@ -234,7 +234,7 @@ private:
 
     /// Установить триггер на время, прошедшее после другого события, вызванного
     /// например другим триггером
-    void setPostEventTimeTirgger(const std::string &rel_time, sol::function trigger_func);
+    void setPostEventTimeTrigger(const std::string &rel_time, sol::function trigger_func);
 
     /// Получить состояние траектории
     scenario_traj_state_t getTrajState(const std::string &traj_name);
