@@ -107,7 +107,7 @@ private:
     std::vector<sol::protected_function> triggerList;
 
     /// Список временных триггеров
-    std::vector<date_time_tirgger_t> timeTriggerList;
+    std::vector<date_time_trigger_t> timeTriggerList;
 
     /// Таймер задержки исполнения очереди задач
     Timer *delayTimer = new Timer(0.1, false);
@@ -226,11 +226,11 @@ private:
     void taskTimeTrigger(const simulator_time_t &trig_time, sol::function trigger_func);
 
     /// Установить триггер на время
-    void setTimeTirgger(const std::string &time, sol::function trigger_func);
+    void setTimeTrigger(const std::string &time, sol::function trigger_func);
 
-    void setAbsTimeTirgger(const std::string &abs_time, sol::function trigger_func);
+    void setAbsTimeTrigger(const std::string &abs_time, sol::function trigger_func);
 
-    void setRelTimeTirgger(const std::string &rel_time, sol::function trigger_func);
+    void setRelTimeTrigger(const std::string &rel_time, sol::function trigger_func);
 
     /// Установить триггер на время, прошедшее после другого события, вызванного
     /// например другим триггером

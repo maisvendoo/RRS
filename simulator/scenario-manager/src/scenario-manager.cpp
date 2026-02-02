@@ -190,7 +190,7 @@ void ScenarioManager::taskTimeTrigger(const simulator_time_t &trig_time,
 {
     setTask([trig_time, trigger_func, this]{
 
-        date_time_tirgger_t trigger;
+        date_time_trigger_t trigger;
         trigger.action_time = trig_time;
         trigger.action_func = trigger_func;
 
@@ -201,7 +201,7 @@ void ScenarioManager::taskTimeTrigger(const simulator_time_t &trig_time,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setTimeTirgger(const std::string &time,
+void ScenarioManager::setTimeTrigger(const std::string &time,
                                      sol::function trigger_func)
 {
     if (time[0] == '-')
@@ -212,18 +212,18 @@ void ScenarioManager::setTimeTirgger(const std::string &time,
 
     if (time[0] != '+')
     {
-        setAbsTimeTirgger(time, trigger_func);
+        setAbsTimeTrigger(time, trigger_func);
     }
     else
     {
-        setRelTimeTirgger(time, trigger_func);
+        setRelTimeTrigger(time, trigger_func);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setAbsTimeTirgger(const std::string &abs_time,
+void ScenarioManager::setAbsTimeTrigger(const std::string &abs_time,
                                         sol::function trigger_func)
 {
     // Определяем время начала игры
@@ -253,7 +253,7 @@ void ScenarioManager::setAbsTimeTirgger(const std::string &abs_time,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setRelTimeTirgger(const std::string &rel_time,
+void ScenarioManager::setRelTimeTrigger(const std::string &rel_time,
                                         sol::function trigger_func)
 {
     // Определяем время начала игры
@@ -1105,7 +1105,7 @@ void ScenarioManager::sys_functions_registration()
     Journal::instance()->info("setTrigger method binding...OK");
 
     lua.set_function("setTimeTrigger", [this](const std::string &abs_time, sol::function trigger_func){
-        this->setTimeTirgger(abs_time, trigger_func);
+        this->setTimeTrigger(abs_time, trigger_func);
     });
 
     Journal::instance()->info("setTimeTrigger method binding...OK");
