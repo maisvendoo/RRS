@@ -107,6 +107,8 @@ void ScenarioManager::processTasksQueue()
 //------------------------------------------------------------------------------
 void ScenarioManager::processTimeTriggers(const simulator_time_t &sim_time)
 {
+    this->sim_time = sim_time;
+
     // Очередь пуста - убегаем
     if (timeTriggerList.empty())
     {
@@ -188,7 +190,7 @@ void ScenarioManager::taskTimeTrigger(const simulator_time_t &trig_time,
 {
     setTask([trig_time, trigger_func, this]{
 
-        date_time_tirgger_t trigger;
+        date_time_trigger_t trigger;
         trigger.action_time = trig_time;
         trigger.action_func = trigger_func;
 
@@ -199,7 +201,7 @@ void ScenarioManager::taskTimeTrigger(const simulator_time_t &trig_time,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setTimeTirgger(const std::string &time,
+void ScenarioManager::setTimeTrigger(const std::string &time,
                                      sol::function trigger_func)
 {
     if (time[0] == '-')
@@ -210,18 +212,18 @@ void ScenarioManager::setTimeTirgger(const std::string &time,
 
     if (time[0] != '+')
     {
-        setAbsTimeTirgger(time, trigger_func);
+        setAbsTimeTrigger(time, trigger_func);
     }
     else
     {
-        setRelTimeTirgger(time, trigger_func);
+        setRelTimeTrigger(time, trigger_func);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setAbsTimeTirgger(const std::string &abs_time,
+void ScenarioManager::setAbsTimeTrigger(const std::string &abs_time,
                                         sol::function trigger_func)
 {
     // Определяем время начала игры
@@ -251,7 +253,7 @@ void ScenarioManager::setAbsTimeTirgger(const std::string &abs_time,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setRelTimeTirgger(const std::string &rel_time,
+void ScenarioManager::setRelTimeTrigger(const std::string &rel_time,
                                         sol::function trigger_func)
 {
     // Определяем время начала игры
@@ -265,6 +267,32 @@ void ScenarioManager::setRelTimeTirgger(const std::string &rel_time,
     double sec = trig_time.hour() * 3600 + trig_time.minute() * 60 + trig_time.sec();
 
     // Прибавляем эти секунды к времени старта
+    if (trig_date_time.time.addTime(sec))
+    {
+        // если надо, добавляем еще день
+        trig_date_time.date.nextDay();
+    }
+
+    // Ставим триггер
+    taskTimeTrigger(trig_date_time, trigger_func);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ScenarioManager::setPostEventTimeTrigger(const std::string &rel_time,
+                                              sol::function trigger_func)
+{
+    // Парсим заданное время
+    server_time_t trig_time;
+    strTimeToServerTime(rel_time, trig_time);
+
+    // Который час?
+    simulator_time_t trig_date_time = sim_time;
+    // Переводим в секунды дельту времени
+    double sec = trig_time.hour() * 3600 + trig_time.minute() * 60 + trig_time.sec();
+
+    // Прибавляем эти секунды к текущему времени
     if (trig_date_time.time.addTime(sec))
     {
         // если надо, добавляем еще день
@@ -1077,10 +1105,16 @@ void ScenarioManager::sys_functions_registration()
     Journal::instance()->info("setTrigger method binding...OK");
 
     lua.set_function("setTimeTrigger", [this](const std::string &abs_time, sol::function trigger_func){
-        this->setTimeTirgger(abs_time, trigger_func);
+        this->setTimeTrigger(abs_time, trigger_func);
     });
 
     Journal::instance()->info("setTimeTrigger method binding...OK");
+
+    lua.set_function("setPostEventTimeTrigger", [this](const std::string &rel_time, sol::function trigger_func){
+        this->setPostEventTimeTrigger(rel_time, trigger_func);
+    });
+
+    Journal::instance()->info("setPostEventTimeTrigger method binding...OK");
 
     lua["openShuntingSignal"] = [this](const std::string &conn_name, int dir){
         this->taskOpenSignal(conn_name, dir, false, true);
