@@ -37,6 +37,9 @@ public:
     static void sort_intersections(LSIntersectorRefPtr intersector);
     static void sort_intersections(LSIntersections& intersections);
 
+    static LSIntersectionRefPtr get_closest_intersection(
+        LSIntersectorRefPtr intersector);
+
 private:
     vsg::ref_ptr<vsg::Camera> camera;
 

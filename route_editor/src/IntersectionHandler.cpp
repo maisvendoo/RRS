@@ -140,3 +140,17 @@ void IntersectionHandler::sort_intersections(LSIntersections& intersections)
         }
     );
 }
+
+LSIntersectionRefPtr IntersectionHandler::get_closest_intersection(
+    LSIntersectorRefPtr intersector)
+{
+    auto& intersections = intersector->intersections;
+    if (intersections.empty())
+    {
+        return nullptr;
+    }
+
+    sort_intersections(intersections);
+
+    return intersections.front();
+}
