@@ -173,15 +173,14 @@ bool Gizmo::handle_intersections()
 
     this->accept(*intersector);
 
-    auto& intersections = intersector->intersections;
-    if (intersections.empty())
+    const auto intersection = intersection_handler->get_closest_intersection(
+        intersector);
+
+    if (!intersection)
     {
         return false;
     }
 
-    intersection_handler->sort_intersections(intersections);
-
-    const auto intersection = intersections.front();
     const auto world_intersection = static_cast<vsg::vec3>(
         intersection->worldIntersection);
 
@@ -261,7 +260,7 @@ bool Gizmo::handle_intersections()
         active_plain_switch->mask = MASK_GUI1 | MASK_CLICKABLE;
     }
 
-    intersections.clear();
+    intersector->intersections.clear();
 
     return true;
 }
@@ -290,15 +289,14 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
     this->accept(*intersector);
 
-    auto& intersections = intersector->intersections;
-    if (intersections.empty())
+    const auto intersection = intersection_handler->get_closest_intersection(
+        intersector);
+
+    if (!intersection)
     {
         return;
     }
 
-    intersection_handler->sort_intersections(intersections);
-
-    const auto intersection = intersections.front();
     const auto world_intersection = static_cast<vsg::vec3>(
         intersection->worldIntersection);
 

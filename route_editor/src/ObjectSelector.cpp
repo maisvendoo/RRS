@@ -178,17 +178,17 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
     if (front_plane)
     {
         const auto intersector = intersection_handler->apply_(moveEvent);
+
         front_plane->accept(*intersector);
 
-        auto& intersections = intersector->intersections;
-        if (intersections.empty())
+        const auto intersection = intersection_handler->get_closest_intersection(
+            intersector);
+
+        if (!intersection)
         {
             return;
         }
 
-        intersection_handler->sort_intersections(intersections);
-
-        const auto intersection = intersections.front();
         const auto world_intersection = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
@@ -197,7 +197,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
             object->set_translation(world_intersection);
         }
 
-        intersections.clear();
+        intersector->intersections.clear();
     }
 }
 

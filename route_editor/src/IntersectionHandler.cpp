@@ -144,6 +144,11 @@ void IntersectionHandler::sort_intersections(LSIntersections& intersections)
 LSIntersectionRefPtr IntersectionHandler::get_closest_intersection(
     LSIntersectorRefPtr intersector)
 {
+    if (!intersector)
+    {
+        return nullptr;
+    }
+
     auto& intersections = intersector->intersections;
     if (intersections.empty())
     {
