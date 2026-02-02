@@ -65,9 +65,10 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     // Вычисляем задание по току ТЭД
     double kp = Kp * train_mass / ref_mass;
 
-    double I_ref = Imax * (kp * dv + getY(0));
+    double dv_s = pf(feedback->v_tau - feedback->v_cur);
 
-    // Обрезаем задание по максимальной уставке
+    double I_ref = Imax * (kp * dv - Ks * dv_s + getY(0));
+
     I_ref = cut(I_ref, 0.0, Imax);
 
     // Блокирование тяги по давлению в ТЦ
@@ -101,6 +102,11 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
         minusPos();
     }
 
+    if (auto_feedback->I_motor >= 500.0)
+    {
+        sand_ON();
+    }
+
     // Если превышаем скорость - мотаем вниз до упора
     if (dv < -dV_traction_off)
     {
@@ -126,6 +132,8 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
 
     // Управляем прожектором - включаем когда разрешено движение
     auto_control->spotlight_ON = is_motion_allowed;
+
+    wheel_slim_process();
 }
 
 //------------------------------------------------------------------------------
@@ -149,6 +157,7 @@ void VL60Autopilot::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "DeltaI", delta_I);
     cfg.getDouble(secName, "Kp", Kp);
     cfg.getDouble(secName, "Ki", Ki);
+    cfg.getDouble(secName, "Ks", Ks);
 }
 
 //------------------------------------------------------------------------------
@@ -288,6 +297,37 @@ void VL60Autopilot::minusPos()
 
         if (!delay->isStarted())
             delay->start();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::sand_ON()
+{
+    if (!sand_timer->isStarted())
+    {
+        sand_timer->start();
+        auto_control->sand_ON = true;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60Autopilot::sand_OFF()
+{
+    auto_control->sand_ON = false;
+}
+
+//------------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+void VL60Autopilot::wheel_slim_process()
+{
+    if (auto_feedback->v_tau - auto_feedback->v_cur >= 1.0)
+    {
+        sand_ON();
     }
 }
 

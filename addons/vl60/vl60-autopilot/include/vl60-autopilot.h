@@ -43,6 +43,8 @@ private:
     double Kp = 0.04;
     /// Коэффициент интегральной части регулятора скорости
     double Ki = 0.00001;
+    /// Коэффициент обратной связи по скорости проскальзывания КП
+    double Ks = 10.0;
 
     /// Ошибка по скорости
     double dv = 0.0;
@@ -81,7 +83,13 @@ private:
     void plusPos();
 
     /// Сброс одной позиции
-    void minusPos();    
+    void minusPos();
+
+    void sand_ON() override;
+
+    void sand_OFF() override;
+
+    void wheel_slim_process();
 
 private slots:
 

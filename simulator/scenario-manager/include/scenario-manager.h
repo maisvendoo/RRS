@@ -8,6 +8,7 @@
 
 #include    <scenario-manager-export.h>
 #include    <scenario-train-data.h>
+#include    <scenario-traj-state.h>
 
 #include    <init_data.h>
 #include    <timer.h>
@@ -74,6 +75,12 @@ signals:
 
     void sigSetSwitchsAlongRoute(QByteArray &route_data);
 
+    /// Поверить состояние траектории
+    void sigGetTrajState(QString traj_name, bool &is_busy, bool &in_route);
+
+    /// Получить имя следующей траектории в заданном направлении
+    void sigGetNextTrajName(QString traj_name, int dir, QString &next_traj_name);
+
     /// Этот сигнал инициирует сообщение во вьювер,
     /// о необходимости задать имя поезда
     /// (вывесим транспарат, который будет назойтиво висеть, напоминая что надо дать имя поезду)
@@ -111,7 +118,10 @@ private:
     LuaDebugger *lua_dbg = new LuaDebugger;
 
     /// Флаг идентифицирующий исполнение сценария
-    bool is_scenario_active = false;    
+    bool is_scenario_active = false;
+
+    /// Текущее время в симуляторе
+    simulator_time_t sim_time;
 
     /// Поставить задачу в очередь
     void setTask(task_t task);
@@ -221,6 +231,16 @@ private:
     void setAbsTimeTirgger(const std::string &abs_time, sol::function trigger_func);
 
     void setRelTimeTirgger(const std::string &rel_time, sol::function trigger_func);
+
+    /// Установить триггер на время, прошедшее после другого события, вызванного
+    /// например другим триггером
+    void setPostEventTimeTirgger(const std::string &rel_time, sol::function trigger_func);
+
+    /// Получить состояние траектории
+    scenario_traj_state_t getTrajState(const std::string &traj_name);
+
+    /// Получить имя следующей траектории в заданном направлении
+    std::string getNextTrajName(const std::string &traj_name, int dir);
 
 private slots:
 

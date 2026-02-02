@@ -16,6 +16,9 @@ public:
     /// Включение прожектора
     bool spotlight_ON = false;
 
+    /// Включение подачи песка
+    bool sand_ON = false;
+
     auto_control_t()
     {
 
@@ -32,7 +35,9 @@ class auto_feedback_t
 public:
 
     /// Текущая скорость
-    double v_cur = 0;
+    double v_cur = 0.0;
+    /// Окружная скорость точек колеса
+    double v_tau = 0.0;
     /// Текущее ограничение скорости
     double v_lim = 0;
     /// Следующее ограничение скорости
