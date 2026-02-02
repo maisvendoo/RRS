@@ -30,9 +30,6 @@
 #include <cassert>
 #include <cstdint>
 
-static vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
-static vsg::ref_ptr<vsg::Node> quad = nullptr;
-
 static vsg::ref_ptr<vsg::Commands> createQuad(const vsg::vec3& p0,
     const vsg::vec3& p1, const vsg::vec3& p2, const vsg::vec3& p3)
 {
@@ -90,6 +87,13 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 {
     if (buttonPress.handled)
     {
+        return;
+    }
+
+    if (state == State::KEYBOARD_MOVING)
+    {
+        confirm_keyboard_moving();
+
         return;
     }
 
@@ -171,10 +175,10 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
     gizmo->apply(moveEvent);
 
-    if (quad)
+    if (front_plane)
     {
         const auto intersector = intersection_handler->apply_(moveEvent);
-        quad->accept(*intersector);
+        front_plane->accept(*intersector);
 
         auto& intersections = intersector->intersections;
         if (intersections.empty())
@@ -207,7 +211,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     {
         first_time = false;
 
-        begin_pos = {0.0f, 0.0f, 0.0f};
+        vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
         for (const auto& object : selected_objects)
         {
             begin_pos += object->get_translation();
@@ -250,7 +254,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto p3_dir = vsg::normalize(camera_front * vsg::rotate(
             half_fov, camera_up) * vsg::rotate(-half_fov, camera_right));
 
-        quad = createQuad(
+        front_plane = createQuad(
             camera_pos + p0_dir * dist,
             camera_pos + p1_dir * dist,
             camera_pos + p2_dir * dist,
@@ -259,10 +263,10 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
         const auto viewer = observer_viewer.ref_ptr();
         const auto compile_manager = viewer->compileManager;
-        const auto compile_result = compile_manager->compile(quad);
+        const auto compile_result = compile_manager->compile(front_plane);
 
         // TODO: Change mask
-        scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, quad);
+        scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, front_plane);
 
         vsg::updateViewer(*viewer, compile_result);
     }
@@ -375,4 +379,9 @@ SelectedObjectsIterator ObjectSelector::deselect_object(
 
     return selected_objects.erase(std::find(selected_objects.cbegin(),
         selected_objects.cend(), object));
+}
+
+void ObjectSelector::confirm_keyboard_moving()
+{
+
 }

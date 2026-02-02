@@ -7,6 +7,7 @@
 #include <vsg/core/Visitor.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec3.h>
 
 class CameraHandler;
 class Gizmo;
@@ -25,6 +26,7 @@ class ButtonPressEvent;
 class ButtonReleaseEvent;
 class FrameEvent;
 class MoveEvent;
+class Node;
 class Viewer;
 
 }
@@ -54,7 +56,17 @@ private:
 
     SelectedObjectsIterator deselect_object(vsg::ref_ptr<RouteObject> object);
 
+    void confirm_keyboard_moving();
+
 private:
+    enum class State
+    {
+        INITIAL,
+        KEYBOARD_MOVING
+    };
+
+    State state = State::INITIAL;
+
     const settings_t& settings;
     vsg::ref_ptr<MouseHandler> mouse_handler;
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;
@@ -66,6 +78,9 @@ private:
     SelectedObjects selected_objects;
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<SingleSwitch> gizmo_switch;
+
+    vsg::vec3 begin_intersection_pos;
+    vsg::ref_ptr<vsg::Node> front_plane;
 };
 
 #endif // OBJECT_SELECTOR_H

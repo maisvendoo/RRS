@@ -489,7 +489,7 @@ void EditorGui::show_selected_objects_properties() const
 
     int i = 0;
 
-    for (const auto object : selected_objects)
+    for (const auto& object : selected_objects)
     {
         ImGui::Text("label: %s", object->label.c_str());
 
