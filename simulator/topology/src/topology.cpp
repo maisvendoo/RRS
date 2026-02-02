@@ -319,6 +319,7 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
             continue;
         }
 
+        // TODO: Не используется
         // Смотрим, какая траектория следующая
         Trajectory *next_traj = nullptr;
 
@@ -949,8 +950,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signals_data.line_signals.push_back(signal);
             Journal::instance()->info("Loaded line signal " + signal->getLetter());
         }
-
-        if (signal_model_fwd.right(4) == "entr")
+        else if (signal_model_fwd.right(4) == "entr")
         {
             EnterSignal *signal = new EnterSignal;
             configure_signal(signal, conn, signal_dir_fwd,
@@ -959,8 +959,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signals_data.enter_signals.push_back(signal);
             Journal::instance()->info("Loaded enter signal " + signal->getLetter());
         }
-
-        if (signal_model_fwd.right(4) == "rout")
+        else if (signal_model_fwd.right(4) == "rout")
         {
             RouteSignal *signal = new RouteSignal;
             configure_signal(signal, conn, signal_dir_fwd,
@@ -969,8 +968,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signals_data.route_signals.push_back(signal);
             Journal::instance()->info("Loaded route signal " + signal->getLetter());
         }
-
-        if (signal_model_fwd.right(4) == "exit")
+        else if (signal_model_fwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
             configure_signal(signal, conn, signal_dir_fwd,
@@ -979,8 +977,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signals_data.exit_signals.push_back(signal);
             Journal::instance()->info("Loaded exit signal " + signal->getLetter());
         }
-
-        if (signal_model_fwd.right(4) == "shnt")
+        else if (signal_model_fwd.right(4) == "shnt")
         {
             ShuntingSignal *signal = new ShuntingSignal;
             configure_signal(signal, conn, signal_dir_fwd,
@@ -1021,8 +1018,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signals_data.line_signals.push_back(signal);
             Journal::instance()->info("Loaded line signal " + signal->getLetter());
         }
-
-        if (signal_model_bwd.right(4) == "entr")
+        else if (signal_model_bwd.right(4) == "entr")
         {
             EnterSignal *signal = new EnterSignal;
             configure_signal(signal, conn, signal_dir_bwd,
@@ -1031,8 +1027,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signals_data.enter_signals.push_back(signal);
             Journal::instance()->info("Loaded enter signal " + signal->getLetter());
         }
-
-        if (signal_model_bwd.right(4) == "rout")
+        else if (signal_model_bwd.right(4) == "rout")
         {
             RouteSignal *signal = new RouteSignal;
             configure_signal(signal, conn, signal_dir_bwd,
@@ -1041,8 +1036,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signals_data.route_signals.push_back(signal);
             Journal::instance()->info("Loaded route signal " + signal->getLetter());
         }
-
-        if (signal_model_bwd.right(4) == "exit")
+        else if (signal_model_bwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
             configure_signal(signal, conn, signal_dir_bwd,
@@ -1051,8 +1045,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
             signals_data.exit_signals.push_back(signal);
             Journal::instance()->info("Loaded exit signal " + signal->getLetter());
         }
-
-        if (signal_model_bwd.right(4) == "shnt")
+        else if (signal_model_bwd.right(4) == "shnt")
         {
             ShuntingSignal *signal = new ShuntingSignal;
             configure_signal(signal, conn, signal_dir_bwd,
@@ -1416,7 +1409,7 @@ void Topology::slotGetTrajState(QString traj_name, bool &is_busy, bool &in_route
         return;
     }
 
-    auto traj = traj_list.value(traj_name, nullptr);
+    auto* traj = traj_list.value(traj_name, nullptr);
 
     if (traj == nullptr)
     {
