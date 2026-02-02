@@ -280,7 +280,7 @@ void ScenarioManager::setRelTimeTirgger(const std::string &rel_time,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::setPostEventTimeTirgger(const std::string &rel_time,
+void ScenarioManager::setPostEventTimeTrigger(const std::string &rel_time,
                                               sol::function trigger_func)
 {
     // Парсим заданное время
@@ -1110,11 +1110,11 @@ void ScenarioManager::sys_functions_registration()
 
     Journal::instance()->info("setTimeTrigger method binding...OK");
 
-    lua.set_function("setPostEventTimeTirgger", [this](const std::string &rel_time, sol::function trigger_func){
-        this->setPostEventTimeTirgger(rel_time, trigger_func);
+    lua.set_function("setPostEventTimeTrigger", [this](const std::string &rel_time, sol::function trigger_func){
+        this->setPostEventTimeTrigger(rel_time, trigger_func);
     });
 
-    Journal::instance()->info("setPostEventTimeTirgger method binding...OK");
+    Journal::instance()->info("setPostEventTimeTrigger method binding...OK");
 
     lua["openShuntingSignal"] = [this](const std::string &conn_name, int dir){
         this->taskOpenSignal(conn_name, dir, false, true);
