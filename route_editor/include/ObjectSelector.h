@@ -55,6 +55,7 @@ private:
     void select_object(vsg::ref_ptr<RouteObject> object);
 
     SelectedObjectsIterator deselect_object(vsg::ref_ptr<RouteObject> object);
+    void deselect_all_objects();
 
     void confirm_keyboard_moving();
 

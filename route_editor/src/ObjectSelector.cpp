@@ -122,9 +122,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // deselect them all
         if (!selected_objects_are_empty && !keyboard_handler->get_shift_state())
         {
-            for (auto it = selected_objects.begin();
-                it != selected_objects.end();
-                it = deselect_object(*it));
+            deselect_all_objects();
         }
 
         gizmo_switch->mask = selected_objects.empty()
@@ -346,10 +344,7 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
         }
         else
         {
-            for (auto it = selected_objects.begin();
-                it != selected_objects.end();
-                it = deselect_object(*it));
-
+            deselect_all_objects();
             select_object_inner();
         }
     }
@@ -379,6 +374,13 @@ SelectedObjectsIterator ObjectSelector::deselect_object(
 
     return selected_objects.erase(std::find(selected_objects.cbegin(),
         selected_objects.cend(), object));
+}
+
+void ObjectSelector::deselect_all_objects()
+{
+    for (auto it = selected_objects.begin();
+        it != selected_objects.end();
+        it = deselect_object(*it));
 }
 
 void ObjectSelector::confirm_keyboard_moving()
