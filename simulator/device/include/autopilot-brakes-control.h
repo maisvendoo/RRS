@@ -147,8 +147,8 @@ private:
     const double BRAKE_PB_DELAY = 2.0;
     Timer *brakePB_timer = new Timer(BRAKE_PB_DELAY, false);
 
-    const double BRAKE_EPB_DELAY = 1.0;
-    Timer *brakeEPB_timer = new Timer(BRAKE_PB_DELAY, false);
+    const double BRAKE_EPB_DELAY = 2.0;
+    Timer *brakeEPB_timer = new Timer(BRAKE_EPB_DELAY, false);
 
     void ode_system(const state_vector_t &Y,
                     state_vector_t &dYdt,
