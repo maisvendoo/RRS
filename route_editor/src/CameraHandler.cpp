@@ -127,27 +127,27 @@ vsg::ref_ptr<vsg::Camera> CameraHandler::get_camera() const
     return camera;
 }
 
-vsg::dvec3 CameraHandler::get_front() const
+CameraHandler::vector_type CameraHandler::get_front() const
 {
     return front;
 }
 
-vsg::dvec3 CameraHandler::get_right() const
+CameraHandler::vector_type CameraHandler::get_right() const
 {
     return right;
 }
 
-vsg::dvec3 CameraHandler::get_up() const
+CameraHandler::vector_type CameraHandler::get_up() const
 {
     return up;
 }
 
 void CameraHandler::calculate_front()
 {
-    const double yaw_rad = vsg::radians(yaw_deg);
-    const double pitch_rad = vsg::radians(pitch_deg);
+    const value_type yaw_rad = vsg::radians(yaw_deg);
+    const value_type pitch_rad = vsg::radians(pitch_deg);
 
-    front = vsg::normalize(vsg::dvec3{
+    front = vsg::normalize(vector_type{
         std::sin(yaw_rad) * std::cos(pitch_rad),
         std::cos(yaw_rad) * std::cos(pitch_rad),
         std::sin(pitch_rad)
@@ -156,7 +156,8 @@ void CameraHandler::calculate_front()
 
 void CameraHandler::calculate_right()
 {
-    right = vsg::normalize(vsg::cross(front, look_at->up));
+    const auto world_up = static_cast<vector_type>(look_at->up);
+    right = vsg::normalize(vsg::cross(front, world_up));
 }
 
 void CameraHandler::calculate_up()
