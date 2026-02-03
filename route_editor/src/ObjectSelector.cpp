@@ -94,9 +94,9 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    if (state == State::KEYBOARD_MOVING)
+    if (state == State::KEYBOARD_MOVE)
     {
-        confirm_keyboard_moving();
+        confirm_keyboard_move();
 
         return;
     }
@@ -206,6 +206,12 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
+    if (state == State::KEYBOARD_MOVE && mouse_handler->get_is_rmb_pressed())
+    {
+        cancel_keyboard_move();
+        return;
+    }
+
     if (state == State::INITIAL && !selected_objects.empty() &&
         keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
     {
@@ -263,7 +269,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto compile_manager = viewer->compileManager;
         const auto compile_result = compile_manager->compile(front_plane);
 
-        state = State::KEYBOARD_MOVING;
+        state = State::KEYBOARD_MOVE;
         front_plane_switch->node = front_plane;
 
         vsg::updateViewer(*viewer, compile_result);
@@ -400,8 +406,22 @@ void ObjectSelector::deselect_all_objects()
         it = deselect_object(*it));
 }
 
-void ObjectSelector::confirm_keyboard_moving()
+void ObjectSelector::confirm_keyboard_move()
 {
     state = State::INITIAL;
+    selected_objects_begin_poss.clear();
+    front_plane_switch->node = nullptr;
+}
+
+void ObjectSelector::cancel_keyboard_move()
+{
+    state = State::INITIAL;
+
+    for (const auto& [object, begin_pos] : selected_objects_begin_poss)
+    {
+        object->set_translation(begin_pos);
+    }
+    selected_objects_begin_poss.clear();
+
     front_plane_switch->node = nullptr;
 }
