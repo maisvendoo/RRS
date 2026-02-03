@@ -81,83 +81,6 @@ vsg::ref_ptr<vsg::Node> NewSkybox::getNode() const
 void NewSkybox::set_date_time(const simulator_time_t& sim_time)
 {
     is_sun_rise = sim_time.time.hour() < 13;
-    return;/*
-    for (season_time_texture_t& stt : textures)
-    {
-        // Проверяем, что дата попадет в сезон применения текстуры
-        const server_date_t date_begin = {sim_time.date.year(), stt.date_season_begin.month, stt.date_season_begin.day};
-        const bool is_after_season_begin = (sim_time.date >= date_begin);
-
-        const server_date_t date_end = {sim_time.date.year(), stt.date_season_end.month, stt.date_season_end.day};
-        const bool is_before_season_end = (sim_time.date <= date_end);
-
-        const bool is_season = (date_begin > date_end)
-            ? (is_after_season_begin || is_before_season_end)
-            : (is_after_season_begin && is_before_season_end);
-
-        if (!is_season)
-        {
-            stt.state = season_time_texture_t::State::INACTIVE;
-            continue;
-        }
-
-        // Проверяем, что время попадет в интервал применения текстуры
-        auto time_in_interval = [](const server_time_t& time,
-                                   const server_time_t& begin,
-                                   const server_time_t& end) -> bool
-        {
-            if (begin > end)
-            {
-                return (time >= begin) || (time < end);
-            }
-            else
-            {
-                return (time >= begin) && (time < end);
-            }
-        };
-
-        if (time_in_interval(sim_time.time, stt.time_appear_begin, stt.time_appear_end))
-        {
-            if (stt.state != season_time_texture_t::State::APPEARING)
-            {
-                std::memcpy(texture2_data->dataPointer(), stt.texture->dataPointer(), stt.texture->dataSize());
-                texture2_data->dirty();
-
-                stt.state = season_time_texture_t::State::APPEARING;
-            }
-        }
-        else if (time_in_interval(sim_time.time, stt.time_appear_end, stt.time_disappear_begin))
-        {
-            if (stt.state != season_time_texture_t::State::ACTIVE)
-            {
-                std::memcpy(texture2_data->dataPointer(), stt.texture->dataPointer(), stt.texture->dataSize());
-                texture2_data->dirty();
-
-                mix_value->set(1.0f);
-                mix_value->dirty();
-
-                stt.state = season_time_texture_t::State::ACTIVE;
-            }
-        }
-        else if (time_in_interval(sim_time.time, stt.time_disappear_begin, stt.time_disappear_end))
-        {
-            if (stt.state != season_time_texture_t::State::DISAPPEARING)
-            {
-                std::memcpy(texture1_data->dataPointer(), stt.texture->dataPointer(), stt.texture->dataSize());
-                texture1_data->dirty();
-
-                stt.state = season_time_texture_t::State::DISAPPEARING;
-            }
-
-            mix_value->set(1.0f - static_cast<float>(stt.time_disappear_end.data() - sim_time.time.data())
-                                  / static_cast<float>(stt.time_disappear_end.data() - stt.time_disappear_begin.data()));
-            mix_value->dirty();
-        }
-        else
-        {
-            stt.state = season_time_texture_t::State::INACTIVE;
-        }
-    }*/
 }
 
 void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degrees)
@@ -176,9 +99,9 @@ void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degree
     auto angle_in_interval = [](const double& begin,
                                 const double& end,
                                 const double& cur_angle,
-                                const double& cur_angle_rise) -> float
+                                const bool& is_cur_angle_rise) -> float
     {
-        if ((begin < end) == cur_angle_rise)
+        if ((begin < end) == is_cur_angle_rise)
         {
             const float mix_value = (cur_angle - begin) / (end - begin);
             return std::clamp(mix_value, 0.0f, 1.0f);
@@ -242,7 +165,7 @@ void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degree
         if (texture1_id < 0)
         {
             // Нет активных текстур
-            for (auto tt : textures)
+            for (texture_t& tt : textures)
             {
                 tt.use_id = 0;
             }
@@ -265,7 +188,7 @@ void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degree
             mix_value->dirty();
         }
 
-        for (auto tt : textures)
+        for (texture_t& tt : textures)
         {
             tt.use_id = 0;
         }
@@ -300,7 +223,7 @@ void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degree
             mix_value->dirty();
         }
 
-        for (auto tt : textures)
+        for (texture_t& tt : textures)
         {
             tt.use_id = 0;
         }
