@@ -89,17 +89,15 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     perspective->fieldOfViewY = std::clamp(perspective->fieldOfViewY,
         settings.fovy_min, settings.fovy_max);
 
-    const int move_forward = static_cast<int>(
-        keyboard_handler->get_binding_state(ACTION_MOVE_CAMERA_FORWARD));
+    const auto get_binding_state = [this](Action action) -> int
+    {
+        return static_cast<int>(keyboard_handler->get_binding_state(action));
+    };
 
-    const int move_backward = static_cast<int>(
-        keyboard_handler->get_binding_state(ACTION_MOVE_CAMERA_BACKWARD));
-
-    const int move_left = static_cast<int>(
-        keyboard_handler->get_binding_state(ACTION_MOVE_CAMERA_LEFT));
-
-    const int move_right = static_cast<int>(
-        keyboard_handler->get_binding_state(ACTION_MOVE_CAMERA_RIGHT));
+    const int move_forward = get_binding_state(ACTION_MOVE_CAMERA_FORWARD);
+    const int move_backward = get_binding_state(ACTION_MOVE_CAMERA_BACKWARD);
+    const int move_left = get_binding_state(ACTION_MOVE_CAMERA_LEFT);
+    const int move_right = get_binding_state(ACTION_MOVE_CAMERA_RIGHT);
 
     const vsg::dvec3 front_movememt = front * settings.camera_move_speed *
         delta_time * static_cast<double>(move_forward - move_backward);
