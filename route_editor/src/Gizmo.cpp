@@ -185,7 +185,6 @@ bool Gizmo::handle_intersections()
         intersection->worldIntersection);
 
     const auto& node_path = intersection->nodePath;
-    assert(!node_path.empty());
 
     const auto save_selected_objects_begin_matrixes = [&]() -> void
     {
@@ -301,8 +300,6 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
         intersection->worldIntersection);
 
     const auto& node_path = intersection->nodePath;
-    assert(!node_path.empty());
-
     for (const vsg::Node* node : node_path)
     {
         if (node != active_plain_switch)

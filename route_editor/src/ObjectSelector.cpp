@@ -139,8 +139,6 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     intersection_handler->sort_intersections(intersections);
 
     const auto& node_path = intersections.front()->nodePath;
-    assert(!node_path.empty());
-
     for (const vsg::Node* const node : node_path)
     {
         const auto object = vsg::ref_ptr(const_cast<RouteObject*>(
@@ -183,8 +181,8 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 
         front_plane->accept(*intersector);
 
-        const auto intersection = intersection_handler->get_closest_intersection(
-            intersector);
+        const auto intersection =
+            intersection_handler->get_closest_intersection(intersector);
 
         if (!intersection)
         {
@@ -194,9 +192,10 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         const auto world_intersection = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
-        for (const auto& object : selected_objects)
+        for (const auto& [object, begin_pos] : selected_objects_begin_poss)
         {
-            object->set_translation(world_intersection);
+            object->set_translation(begin_pos + world_intersection -
+                begin_intersection_pos);
         }
 
         intersector->intersections.clear();
@@ -268,6 +267,23 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         front_plane_switch->node = front_plane;
 
         vsg::updateViewer(*viewer, compile_result);
+
+        const auto intersector = intersection_handler->apply_(
+            mouse_handler->get_pos());
+
+        front_plane->accept(*intersector);
+
+        const auto intersection =
+            intersection_handler->get_closest_intersection(intersector);
+
+        begin_intersection_pos = static_cast<vsg::vec3>(
+            intersection->worldIntersection);
+
+        selected_objects_begin_poss.clear();
+        for (const auto& object : selected_objects)
+        {
+            selected_objects_begin_poss[object] = object->get_translation();
+        }
     }
 
     gizmo->update_position();
