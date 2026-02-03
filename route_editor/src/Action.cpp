@@ -11,23 +11,27 @@ const char* to_c_string(Action action)
     {
         case ACTION_MOVE_CAMERA_FORWARD:
         {
-            return "Move camera forward";
+            return "Camera: move forward";
         }
         case ACTION_MOVE_CAMERA_BACKWARD:
         {
-            return "Move camera backward";
+            return "Camera: move backward";
         }
         case ACTION_MOVE_CAMERA_LEFT:
         {
-            return "Move camera left";
+            return "Camera: move left";
         }
         case ACTION_MOVE_CAMERA_RIGHT:
         {
-            return "Move camera right";
+            return "Camera: move right";
         }
         case ACTION_MOVE_OBJECTS:
         {
-            return "Move objects";
+            return "Object: Grab";
+        }
+        case ACTION_ROTATE_OBJECTS:
+        {
+            return "Object: Rotate";
         }
         default:
         {

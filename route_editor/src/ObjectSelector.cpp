@@ -266,22 +266,23 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
             camera_pos + p3_dir * dist
         );
 
-        const auto viewer = observer_viewer.ref_ptr();
-        const auto compile_manager = viewer->compileManager;
-        const auto compile_result = compile_manager->compile(front_plane);
-
-        state = State::KEYBOARD_MOVE;
-        front_plane_switch->node = front_plane;
-
-        vsg::updateViewer(*viewer, compile_result);
-
         const auto intersector = intersection_handler->apply_(
             mouse_handler->get_pos());
+
+        if (!intersector)
+        {
+            return;
+        }
 
         front_plane->accept(*intersector);
 
         const auto intersection =
             intersection_handler->get_closest_intersection(intersector);
+
+        if (!intersection)
+        {
+            return;
+        }
 
         begin_intersection_pos = static_cast<vsg::vec3>(
             intersection->worldIntersection);
@@ -290,6 +291,15 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         {
             object->save_translation();
         }
+
+        const auto viewer = observer_viewer.ref_ptr();
+        const auto compile_manager = viewer->compileManager;
+        const auto compile_result = compile_manager->compile(front_plane);
+
+        state = State::KEYBOARD_MOVE;
+        front_plane_switch->node = front_plane;
+
+        vsg::updateViewer(*viewer, compile_result);
     }
 
     gizmo->update_position();
