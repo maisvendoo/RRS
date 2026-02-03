@@ -28,6 +28,7 @@ StationSignal::StationSignal(QObject* parent) : TrainSignal(parent)
     signal_relay->read_config("combine-relay");
     signal_relay->setInitContactState(SR_OPENED, false);
     signal_relay->setInitContactState(SR_CLOSED, true);
+    signal_relay->setInitContactState(SR_WHITE_CTRL, false);
     signal_relay->setInitContactState(SR_SELF_CTRL, false);
     signal_relay->setInitContactState(SR_CALL_CTRL, true);
     signal_relay->setInitContactState(SR_SHUNT_CTRL, true);
@@ -148,7 +149,8 @@ void StationSignal::step(double t, double dt)
     // Работа таймера мигания линз
     blink_timer->step(t, dt);
 
-    lens_state[WHITE_LENS] = signal_relay_shunt->getContactState(SRS_OPENED) ||
+    lens_state[WHITE_LENS] = (is_next_ALSN_only && signal_relay->getContactState(SR_WHITE_CTRL)) ||
+                             signal_relay_shunt->getContactState(SRS_OPENED) ||
                              (blink_contact && call_relay->getContactState(CALL_OPENED));
 }
 
@@ -370,6 +372,7 @@ void StationSignal::check_train_route()
     U_line = 0.0;
     U_side = 0.0;
     switches_state = SWITCHES_STRAIGHT;
+    is_next_ALSN_only = false;
     is_shunt_route = false;
     is_lock_route = true;
 
@@ -515,6 +518,8 @@ void StationSignal::check_train_route()
             // Если нашли маршрут до следующего поездного светофора, заканчиваем цикл
             if (TrainSignal* ts = dynamic_cast<TrainSignal*>(signal))
             {
+                // Запоминаем, если следующая сигнальная точка без напольного светофора
+                is_next_ALSN_only = (ts->getSignalModel().left(5) == "empty");
 
                 // Если сигнал закрыт, отключаем АЛСН-код от следующего светофора
                 ts->allowTransmitALSN(!lens_state[RED_LENS]);
