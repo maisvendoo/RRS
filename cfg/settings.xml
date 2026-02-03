@@ -174,5 +174,6 @@
         <KeyMoveCameraLeft>a</KeyMoveCameraLeft>
         <KeyMoveCameraRight>d</KeyMoveCameraRight>
         <KeyMoveObjects>g</KeyMoveObjects>
+        <KeyRotateObjects>r</KeyRotateObjects>
     </Editor>
 </Config>

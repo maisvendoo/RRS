@@ -104,4 +104,8 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getString(section, "KeyMoveObjects", tmp_qstr);
     key_move_objects = static_cast<vsg::KeySymbol>(
         tmp_qstr.front().toLatin1());
+
+    cfg.getString(section, "KeyRotateObjects", tmp_qstr);
+    key_rotate_objects = static_cast<vsg::KeySymbol>(
+        tmp_qstr.front().toLatin1());
 }

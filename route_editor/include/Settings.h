@@ -64,7 +64,8 @@ struct settings_t
     vsg::KeySymbol key_move_camera_backward = vsg::KEY_s;
     vsg::KeySymbol key_move_camera_left = vsg::KEY_a;
     vsg::KeySymbol key_move_camera_right = vsg::KEY_d;
-    vsg::KeySymbol key_move_objects = vsg::KEY_q;
+    vsg::KeySymbol key_move_objects = vsg::KEY_g;
+    vsg::KeySymbol key_rotate_objects = vsg::KEY_q;
 };
 
 #endif // EDITOR_SETTINGS_H
