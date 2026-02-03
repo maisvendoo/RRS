@@ -58,12 +58,65 @@ function autoApproach(traj_begin, traj_end, dir)
 end
 
 -------------------------------------------------------------------
---
+-- Функции-действия, для подстановки в триггеры
+-- (Прямой вызов C-функции нельзя присвоить sol::function)
 -------------------------------------------------------------------
+
+-- Постровение маршрута
 function actionBuildRoute(traj_begin, traj_end, dir)
 
 	function action()
 		buildRoute(traj_begin, traj_end, dir)	
+	end
+
+	return action
+end
+
+-- Постровение поездного маршрута
+function actionBuildTrainRoute(traj_begin, traj_end, dir)
+
+	function action()
+		buildTrainRoute(traj_begin, traj_end, dir)	
+	end
+
+	return action
+end
+
+-- Постровение маневрового маршрута
+function actionBuildShuntingRoute(traj_begin, traj_end, dir)
+
+	function action()
+		buildShuntingRoute(traj_begin, traj_end, dir)	
+	end
+
+	return action
+end
+
+-- Установить стрелки по маршруту
+function actionSetSwitchsAlongRoute(traj_begin, traj_end, dir)
+
+	function action()
+		setSwitchsAlongRoute(traj_begin, traj_end, dir)	
+	end
+
+	return action
+end
+
+-- Открыть маневровый сигнал
+function actionOpenShuntingSignal(conn_name, dir)
+
+	function action()
+		openShuntingSignal(conn_name, dir)
+	end
+
+	return action
+end
+
+-- Открыть пригласительны сигнал
+function actionOpenCallSignal(conn_name, dir)
+
+	function action()
+		openCallSignal(conn_name, dir)
 	end
 
 	return action
