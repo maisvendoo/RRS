@@ -28,11 +28,20 @@ public:
     vsg::vec3 get_translation() const;
     vsg::vec3 get_rotation_deg() const;
     vsg::vec3 get_scale() const;
+
+    vsg::vec3 get_initial_translation() const;
+    vsg::vec3 get_initial_rotation_deg() const;
+    vsg::vec3 get_initial_scale() const;
+
     const vsg::box& get_bounds() const;
 
     void set_translation(vsg::vec3 translation, bool update_matrix = true);
     void set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix = true);
     void set_scale(vsg::vec3 scale, bool update_matrix = true);
+
+    void save_translation();
+    void save_rotation();
+    void save_scale();
 
     void update_matrix();
     void update_bounds();
@@ -57,6 +66,11 @@ private:
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;
     vsg::vec3 scale = {1.0f, 1.0f, 1.0f};
+
+    vsg::vec3 initial_translation;
+    vsg::vec3 initial_rotation_deg;
+    vsg::vec3 initial_scale;
+
     vsg::box bounds;
 
     vsg::ref_ptr<SwitchGroup> switch_group;

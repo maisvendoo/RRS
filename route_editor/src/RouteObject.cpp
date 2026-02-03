@@ -54,6 +54,21 @@ vsg::vec3 RouteObject::get_scale() const
     return scale;
 }
 
+vsg::vec3 RouteObject::get_initial_translation() const
+{
+    return initial_translation;
+}
+
+vsg::vec3 RouteObject::get_initial_rotation_deg() const
+{
+    return initial_rotation_deg;
+}
+
+vsg::vec3 RouteObject::get_initial_scale() const
+{
+    return initial_scale;
+}
+
 const vsg::box& RouteObject::get_bounds() const
 {
     return bounds;
@@ -87,6 +102,21 @@ void RouteObject::set_scale(vsg::vec3 scale, bool update_matrix)
     {
         this->update_matrix();
     }
+}
+
+void RouteObject::save_translation()
+{
+    initial_translation = translation;
+}
+
+void RouteObject::save_rotation()
+{
+    initial_rotation_deg = rotation_deg;
+}
+
+void RouteObject::save_scale()
+{
+    initial_scale = scale;
 }
 
 void RouteObject::update_matrix()
