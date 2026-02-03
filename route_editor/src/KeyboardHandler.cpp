@@ -18,7 +18,7 @@ KeyboardHandler::KeyboardHandler(const settings_t& settings)
 
     key_bindings[ACTION_MOVE_CAMERA_LEFT] = settings.key_move_camera_left;
     key_bindings[ACTION_MOVE_CAMERA_RIGHT] = settings.key_move_camera_right;
-    key_bindings[ACTION_START_MOVING_OBJECT] = settings.key_start_moving_object;
+    key_bindings[ACTION_MOVE_OBJECTS] = settings.key_move_objects;
 }
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
@@ -42,7 +42,6 @@ vsg::KeySymbol KeyboardHandler::get_key_binding(Action action) const
 bool KeyboardHandler::get_key_state(vsg::KeySymbol key) const
 {
     const auto found_it = key_states.find(key);
-
     return (found_it == key_states.cend()) ? false : found_it->second;
 }
 

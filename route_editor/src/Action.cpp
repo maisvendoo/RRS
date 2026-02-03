@@ -25,9 +25,9 @@ const char* to_c_string(Action action)
         {
             return "Move camera right";
         }
-        case ACTION_START_MOVING_OBJECT:
+        case ACTION_MOVE_OBJECTS:
         {
-            return "Start moving object";
+            return "Move objects";
         }
         default:
         {

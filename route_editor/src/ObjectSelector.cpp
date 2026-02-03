@@ -205,7 +205,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
     static bool first_time = true;
     if (first_time && !selected_objects.empty() &&
-        keyboard_handler->get_binding_state(ACTION_START_MOVING_OBJECT))
+        keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
     {
         first_time = false;
 
@@ -240,9 +240,6 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto p0_dir = vsg::normalize(camera_front * vsg::rotate(
             -half_fov, camera_up) * vsg::rotate(half_fov, camera_right));
 
-        const auto dist = camera_norm_length / vsg::dot(
-            p0_dir, camera_front);
-
         const auto p1_dir = vsg::normalize(camera_front * vsg::rotate(
             half_fov, camera_up) * vsg::rotate(half_fov, camera_right));
 
@@ -251,6 +248,9 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
         const auto p3_dir = vsg::normalize(camera_front * vsg::rotate(
             half_fov, camera_up) * vsg::rotate(-half_fov, camera_right));
+
+        const auto dist = camera_norm_length / vsg::dot(
+            p0_dir, camera_front);
 
         front_plane = createQuad(
             camera_pos + p0_dir * dist,

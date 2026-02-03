@@ -25,6 +25,10 @@ class Perspective;
 class CameraHandler : public vsg::Inherit<vsg::Visitor, CameraHandler>
 {
 public:
+    using value_type = double;
+    using vector_type = vsg::t_vec3<value_type>;
+
+public:
     CameraHandler(
         const settings_t& settings,
         const VkExtent2D& window_extent,
@@ -39,9 +43,9 @@ public:
     vsg::ref_ptr<vsg::LookAt> get_look_at() const;
     vsg::ref_ptr<vsg::Camera> get_camera() const;
 
-    vsg::dvec3 get_front() const;
-    vsg::dvec3 get_right() const;
-    vsg::dvec3 get_up() const;
+    vector_type get_front() const;
+    vector_type get_right() const;
+    vector_type get_up() const;
 
 private:
     void calculate_front();
@@ -57,12 +61,12 @@ private:
     vsg::ref_ptr<vsg::LookAt> look_at;
     vsg::ref_ptr<vsg::Camera> camera;
 
-    double yaw_deg = 0.0;
-    double pitch_deg = 0.0;
+    value_type yaw_deg = 0.0;
+    value_type pitch_deg = 0.0;
 
-    vsg::dvec3 front;
-    vsg::dvec3 right;
-    vsg::dvec3 up;
+    vector_type front;
+    vector_type right;
+    vector_type up;
 };
 
 #endif // CAMERA_HANDLER_H

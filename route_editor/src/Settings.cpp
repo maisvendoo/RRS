@@ -101,7 +101,7 @@ void settings_t::read(const std::string& cfg_path)
     key_move_camera_right = static_cast<vsg::KeySymbol>(
         tmp_qstr.front().toLatin1());
 
-    cfg.getString(section, "KeyStartMovingObject", tmp_qstr);
-    key_start_moving_object = static_cast<vsg::KeySymbol>(
+    cfg.getString(section, "KeyMoveObjects", tmp_qstr);
+    key_move_objects = static_cast<vsg::KeySymbol>(
         tmp_qstr.front().toLatin1());
 }

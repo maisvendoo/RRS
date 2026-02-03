@@ -19,19 +19,16 @@ void MouseHandler::apply(vsg::ButtonPressEvent& buttonPress)
         case MOUSE_BUTTON_LEFT:
         {
             is_lmb_pressed = true;
-
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
             is_mmb_pressed = true;
-
             return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
             is_rmb_pressed = true;
-
             return;
         }
         default:
@@ -53,19 +50,16 @@ void MouseHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
         case MOUSE_BUTTON_LEFT:
         {
             is_lmb_pressed = false;
-
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
             is_mmb_pressed = false;
-
             return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
             is_rmb_pressed = false;
-
             return;
         }
         default:
@@ -125,14 +119,12 @@ vsg::ivec2 MouseHandler::get_pos() const
 vsg::ivec2 MouseHandler::get_delta_pos()
 {
     used_delta_pos = true;
-
     return delta_pos;
 }
 
 float MouseHandler::get_scroll()
 {
     used_scroll = true;
-
     return scroll;
 }
 
