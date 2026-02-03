@@ -63,7 +63,8 @@ private:
     enum class State
     {
         INITIAL,
-        KEYBOARD_MOVE
+        KEYBOARD_GRAB,
+        KEYBOARD_ROTATE
     };
 
     State state = State::INITIAL;

@@ -94,7 +94,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    if (state == State::KEYBOARD_MOVE)
+    if (state == State::KEYBOARD_GRAB)
     {
         if (mouse_handler->get_is_lmb_pressed())
         {
@@ -213,7 +213,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
-    if (state == State::INITIAL && !selected_objects.empty() &&
+    if (state != State::KEYBOARD_GRAB && !selected_objects.empty() &&
         keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
     {
         vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
@@ -296,7 +296,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto compile_manager = viewer->compileManager;
         const auto compile_result = compile_manager->compile(front_plane);
 
-        state = State::KEYBOARD_MOVE;
+        state = State::KEYBOARD_GRAB;
         front_plane_switch->node = front_plane;
 
         vsg::updateViewer(*viewer, compile_result);
