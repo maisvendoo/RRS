@@ -51,16 +51,9 @@ CameraHandler::CameraHandler(
     camera = vsg::Camera::create(perspective, look_at,
         vsg::ViewportState::create(window_extent));
 
-    const double yaw_rad = vsg::radians(yaw_deg);
-    const double pitch_rad = vsg::radians(pitch_deg);
-
-    front.x = std::sin(yaw_rad) * std::cos(pitch_rad);
-    front.y = std::cos(yaw_rad) * std::cos(pitch_rad);
-    front.z = std::sin(pitch_rad);
-    front = vsg::normalize(front);
-
-    right = vsg::cross(front, look_at->up);
-    right = vsg::normalize(right);
+    calculate_front();
+    calculate_right();
+    calculate_up();
 }
 
 void CameraHandler::apply(vsg::FrameEvent& frame)
@@ -85,16 +78,9 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
         pitch_deg = std::clamp(pitch_deg, settings.pitch_min,
             settings.pitch_max);
 
-        const double yaw_rad = vsg::radians(yaw_deg);
-        const double pitch_rad = vsg::radians(pitch_deg);
-
-        front.x = std::sin(yaw_rad) * std::cos(pitch_rad);
-        front.y = std::cos(yaw_rad) * std::cos(pitch_rad);
-        front.z = std::sin(pitch_rad);
-        front = vsg::normalize(front);
-
-        right = vsg::cross(front, look_at->up);
-        right = vsg::normalize(right);
+        calculate_front();
+        calculate_right();
+        calculate_up();
     }
 
     perspective->fieldOfViewY -= mouse_handler->get_scroll() *
@@ -149,4 +135,31 @@ vsg::dvec3 CameraHandler::get_front() const
 vsg::dvec3 CameraHandler::get_right() const
 {
     return right;
+}
+
+vsg::dvec3 CameraHandler::get_up() const
+{
+    return up;
+}
+
+void CameraHandler::calculate_front()
+{
+    const double yaw_rad = vsg::radians(yaw_deg);
+    const double pitch_rad = vsg::radians(pitch_deg);
+
+    front = vsg::normalize(vsg::dvec3{
+        std::sin(yaw_rad) * std::cos(pitch_rad),
+        std::cos(yaw_rad) * std::cos(pitch_rad),
+        std::sin(pitch_rad)
+    });
+}
+
+void CameraHandler::calculate_right()
+{
+    right = vsg::normalize(vsg::cross(front, look_at->up));
+}
+
+void CameraHandler::calculate_up()
+{
+    up = vsg::normalize(vsg::cross(right, front));
 }

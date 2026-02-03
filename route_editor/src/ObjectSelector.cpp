@@ -190,7 +190,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         const auto world_intersection = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
-        for (const auto& object :selected_objects)
+        for (const auto& object : selected_objects)
         {
             object->set_translation(world_intersection);
         }
@@ -219,14 +219,14 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto camera_pos = static_cast<vsg::vec3>(
             camera_handler->get_look_at()->eye);
 
-        const auto camera_front = vsg::normalize(static_cast<vsg::vec3>(
-            camera_handler->get_front()));
+        const auto camera_front = static_cast<vsg::vec3>(
+            camera_handler->get_front());
 
-        const auto camera_right = vsg::normalize(static_cast<vsg::vec3>(
-            camera_handler->get_right()));
+        const auto camera_right = static_cast<vsg::vec3>(
+            camera_handler->get_right());
 
-        const auto camera_up = vsg::normalize(vsg::cross(
-            camera_right, camera_front));
+        const auto camera_up = static_cast<vsg::vec3>(
+            camera_handler->get_up());
 
         const auto camera_to_object = begin_pos - camera_pos;
 

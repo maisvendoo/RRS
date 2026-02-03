@@ -41,6 +41,12 @@ public:
 
     vsg::dvec3 get_front() const;
     vsg::dvec3 get_right() const;
+    vsg::dvec3 get_up() const;
+
+private:
+    void calculate_front();
+    void calculate_right();
+    void calculate_up();
 
 private:
     const settings_t& settings;
@@ -53,8 +59,10 @@ private:
 
     double yaw_deg = 0.0;
     double pitch_deg = 0.0;
+
     vsg::dvec3 front;
     vsg::dvec3 right;
+    vsg::dvec3 up;
 };
 
 #endif // CAMERA_HANDLER_H
