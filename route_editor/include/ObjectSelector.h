@@ -9,8 +9,6 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
-#include <map>
-
 class CameraHandler;
 class Gizmo;
 class IntersectionHandler;
@@ -83,7 +81,6 @@ private:
     vsg::ref_ptr<SingleSwitch> gizmo_switch;
 
     vsg::vec3 begin_intersection_pos;
-    std::map<vsg::ref_ptr<RouteObject>, vsg::vec3> selected_objects_begin_poss;
     vsg::ref_ptr<SingleSwitch> front_plane_switch;
 };
 

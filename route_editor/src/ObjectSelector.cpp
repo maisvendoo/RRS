@@ -96,7 +96,14 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     if (state == State::KEYBOARD_MOVE)
     {
-        confirm_keyboard_move();
+        if (mouse_handler->get_is_lmb_pressed())
+        {
+            confirm_keyboard_move();
+        }
+        else if (mouse_handler->get_is_rmb_pressed())
+        {
+            cancel_keyboard_move();
+        }
 
         return;
     }
@@ -192,10 +199,10 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         const auto world_intersection = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
-        for (const auto& [object, begin_pos] : selected_objects_begin_poss)
+        for (const auto& object : selected_objects)
         {
-            object->set_translation(begin_pos + world_intersection -
-                begin_intersection_pos);
+            object->set_translation(object->get_initial_translation() +
+                world_intersection - begin_intersection_pos);
         }
 
         intersector->intersections.clear();
@@ -205,12 +212,6 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
-
-    if (state == State::KEYBOARD_MOVE && mouse_handler->get_is_rmb_pressed())
-    {
-        cancel_keyboard_move();
-        return;
-    }
 
     if (state == State::INITIAL && !selected_objects.empty() &&
         keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
@@ -285,10 +286,9 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         begin_intersection_pos = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
-        selected_objects_begin_poss.clear();
         for (const auto& object : selected_objects)
         {
-            selected_objects_begin_poss[object] = object->get_translation();
+            object->save_translation();
         }
     }
 
@@ -409,7 +409,6 @@ void ObjectSelector::deselect_all_objects()
 void ObjectSelector::confirm_keyboard_move()
 {
     state = State::INITIAL;
-    selected_objects_begin_poss.clear();
     front_plane_switch->node = nullptr;
 }
 
@@ -417,11 +416,10 @@ void ObjectSelector::cancel_keyboard_move()
 {
     state = State::INITIAL;
 
-    for (const auto& [object, begin_pos] : selected_objects_begin_poss)
+    for (const auto& object : selected_objects)
     {
-        object->set_translation(begin_pos);
+        object->set_translation(object->get_initial_translation());
     }
-    selected_objects_begin_poss.clear();
 
     front_plane_switch->node = nullptr;
 }

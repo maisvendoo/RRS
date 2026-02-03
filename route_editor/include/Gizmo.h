@@ -9,8 +9,6 @@
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/utils/Builder.h>
 
-#include <map>
-
 class CameraHandler;
 class IntersectionHandler;
 class RouteObject;
@@ -61,7 +59,7 @@ private:
     vsg::vec3 curr_position;
     vsg::vec3 click_position;
     vsg::vec3 click_position_offset;
-    std::map<vsg::ref_ptr<RouteObject>, vsg::vec3> selected_objects_begin_poss;
+
     vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;
 };

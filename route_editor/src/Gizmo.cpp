@@ -186,12 +186,11 @@ bool Gizmo::handle_intersections()
 
     const auto& node_path = intersection->nodePath;
 
-    const auto save_selected_objects_begin_matrixes = [&]() -> void
+    const auto save_selected_objects_translations = [&]() -> void
     {
-        selected_objects_begin_poss.clear();
-        for (const auto& object : selected_objects)
+        for (auto& object : selected_objects)
         {
-            selected_objects_begin_poss[object] = object->get_translation();
+            object->save_translation();
         }
     };
 
@@ -210,7 +209,7 @@ bool Gizmo::handle_intersections()
             click_position.x = world_intersection.x;
             click_position_offset = click_position - curr_position;
 
-            save_selected_objects_begin_matrixes();
+            save_selected_objects_translations();
 
             active_arrow = arrow_x;
 
@@ -226,7 +225,7 @@ bool Gizmo::handle_intersections()
             click_position.y = world_intersection.y;
             click_position_offset = click_position - curr_position;
 
-            save_selected_objects_begin_matrixes();
+            save_selected_objects_translations();
 
             active_arrow = arrow_y;
 
@@ -242,7 +241,7 @@ bool Gizmo::handle_intersections()
             click_position.z = world_intersection.z;
             click_position_offset = click_position - curr_position;
 
-            save_selected_objects_begin_matrixes();
+            save_selected_objects_translations();
 
             active_arrow = arrow_z;
 
@@ -328,9 +327,9 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
         curr_position = click_position - click_position_offset + offset;
 
-        for (const auto& [object, begin_pos] : selected_objects_begin_poss)
+        for (const auto& object : selected_objects)
         {
-            object->set_translation(begin_pos + offset);
+            object->set_translation(object->get_initial_translation() + offset);
         }
 
         break;
