@@ -26,7 +26,6 @@ class ButtonPressEvent;
 class ButtonReleaseEvent;
 class FrameEvent;
 class MoveEvent;
-class Node;
 class Viewer;
 
 }
@@ -81,7 +80,7 @@ private:
     vsg::ref_ptr<SingleSwitch> gizmo_switch;
 
     vsg::vec3 begin_intersection_pos;
-    vsg::ref_ptr<vsg::Node> front_plane;
+    vsg::ref_ptr<SingleSwitch> front_plane_switch;
 };
 
 #endif // OBJECT_SELECTOR_H

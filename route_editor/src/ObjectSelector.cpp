@@ -80,7 +80,11 @@ ObjectSelector::ObjectSelector(
 
     gizmo_switch = SingleSwitch::create(vsg::MASK_OFF, gizmo);
 
+    front_plane_switch = SingleSwitch::create(
+        vsg::Mask{MASK_CLICKABLE}, nullptr);
+
     scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo_switch);
+    scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, front_plane_switch);
 }
 
 void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
@@ -173,7 +177,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
     gizmo->apply(moveEvent);
 
-    if (front_plane)
+    if (const auto front_plane = front_plane_switch->node)
     {
         const auto intersector = intersection_handler->apply_(moveEvent);
 
@@ -203,12 +207,9 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
-    static bool first_time = true;
-    if (first_time && !selected_objects.empty() &&
+    if (state == State::INITIAL && !selected_objects.empty() &&
         keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
     {
-        first_time = false;
-
         vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
         for (const auto& object : selected_objects)
         {
@@ -252,7 +253,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto dist = camera_norm_length / vsg::dot(
             p0_dir, camera_front);
 
-        front_plane = createQuad(
+        const auto front_plane = createQuad(
             camera_pos + p0_dir * dist,
             camera_pos + p1_dir * dist,
             camera_pos + p2_dir * dist,
@@ -263,8 +264,8 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto compile_manager = viewer->compileManager;
         const auto compile_result = compile_manager->compile(front_plane);
 
-        // TODO: Change mask
-        scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, front_plane);
+        state = State::KEYBOARD_MOVING;
+        front_plane_switch->node = front_plane;
 
         vsg::updateViewer(*viewer, compile_result);
     }
@@ -385,5 +386,6 @@ void ObjectSelector::deselect_all_objects()
 
 void ObjectSelector::confirm_keyboard_moving()
 {
-
+    state = State::INITIAL;
+    front_plane_switch->node = nullptr;
 }
