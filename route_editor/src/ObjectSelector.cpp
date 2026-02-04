@@ -14,43 +14,15 @@
 #include "SingleSwitch.h"
 
 #include <vsg/app/Viewer.h>
-#include <vsg/commands/Commands.h>
-#include <vsg/core/Array.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/maths/common.h>
-#include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Node.h>
-#include <vsg/nodes/VertexIndexDraw.h>
 #include <vsg/ui/PointerEvent.h>
 
 #include <algorithm>
 #include <cassert>
-#include <cstdint>
-
-static vsg::ref_ptr<vsg::Commands> createQuad(const vsg::vec3& p0,
-    const vsg::vec3& p1, const vsg::vec3& p2, const vsg::vec3& p3)
-{
-    const auto vertices = vsg::vec3Array::create({p0, p1, p2, p3});
-
-    const auto indices = vsg::ushortArray::create({
-        0, 1, 2,
-        2, 1, 3
-    });
-
-    const auto vid = vsg::VertexIndexDraw::create();
-    vid->assignArrays(vsg::DataList{vertices});
-    vid->assignIndices(indices);
-    vid->indexCount = static_cast<std::uint32_t>(indices->size());
-    vid->instanceCount = 1;
-
-    const auto commands = vsg::Commands::create();
-    commands->addChild(vid);
-
-    return commands;
-}
 
 ObjectSelector::ObjectSelector(
     const settings_t& settings,
@@ -223,48 +195,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         }
         begin_pos /= static_cast<float>(selected_objects.size());
 
-        const auto camera_pos = static_cast<vsg::vec3>(
-            camera_handler->get_look_at()->eye);
-
-        const auto camera_front = static_cast<vsg::vec3>(
-            camera_handler->get_front());
-
-        const auto camera_right = static_cast<vsg::vec3>(
-            camera_handler->get_right());
-
-        const auto camera_up = static_cast<vsg::vec3>(
-            camera_handler->get_up());
-
-        // const auto half_fov = vsg::radians(static_cast<float>(
-        //     camera_handler->get_perspective()->fieldOfViewY) / 2.0f);
-        const auto half_fov = vsg::radians(80.0f);
-
-        const auto p0_dir = vsg::normalize(camera_front * vsg::rotate(
-            -half_fov, camera_up) * vsg::rotate(half_fov, camera_right));
-
-        const auto p1_dir = vsg::normalize(camera_front * vsg::rotate(
-            half_fov, camera_up) * vsg::rotate(half_fov, camera_right));
-
-        const auto p2_dir = vsg::normalize(camera_front * vsg::rotate(
-            -half_fov, camera_up) * vsg::rotate(-half_fov, camera_right));
-
-        const auto p3_dir = vsg::normalize(camera_front * vsg::rotate(
-            half_fov, camera_up) * vsg::rotate(-half_fov, camera_right));
-
-        const auto camera_to_object = begin_pos - camera_pos;
-
-        const auto camera_norm_length = vsg::length(camera_to_object) *
-            vsg::dot(camera_front, vsg::normalize(camera_to_object));
-
-        const auto dist = camera_norm_length / vsg::dot(
-            p0_dir, camera_front);
-
-        const auto front_plane = createQuad(
-            camera_pos + p0_dir * dist,
-            camera_pos + p1_dir * dist,
-            camera_pos + p2_dir * dist,
-            camera_pos + p3_dir * dist
-        );
+        const auto front_plane = camera_handler->create_front_plane(begin_pos);
 
         const auto intersector = intersection_handler->apply_(
             mouse_handler->get_pos());

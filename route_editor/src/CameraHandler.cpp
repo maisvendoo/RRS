@@ -8,10 +8,15 @@
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/ViewMatrix.h>
+#include <vsg/commands/Commands.h>
+#include <vsg/core/Array.h>
+#include <vsg/core/Data.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
+#include <vsg/maths/transform.h>
 #include <vsg/maths/vec2.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/VertexIndexDraw.h>
 #include <vsg/state/ViewportState.h>
 #include <vsg/ui/ApplicationEvent.h>
 #include <vsg/ui/FrameStamp.h>
@@ -21,11 +26,37 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstdint>
 
+using vec2_type = vsg::t_vec2<CameraHandler::value_type>;
+using vec3_array_type = vsg::Array<CameraHandler::vec3_type>;
 using perspective_value_type = decltype(vsg::Perspective::fieldOfViewY);
 using look_at_value_type = decltype(vsg::LookAt::eye.x);
 using look_at_vec3_type = vsg::t_vec3<look_at_value_type>;
 using time_type = decltype(vsg::FrameEvent::frameStamp->simulationTime);
+
+static vsg::ref_ptr<vsg::Commands> create_quad(
+    const CameraHandler::vec3_type& p0, const CameraHandler::vec3_type& p1,
+    const CameraHandler::vec3_type& p2, const CameraHandler::vec3_type& p3)
+{
+    const auto vertices = vec3_array_type::create({p0, p1, p2, p3});
+
+    const auto indices = vsg::ushortArray::create({
+        0, 1, 2,
+        2, 1, 3
+    });
+
+    const auto vid = vsg::VertexIndexDraw::create();
+    vid->assignArrays(vsg::DataList{vertices});
+    vid->assignIndices(indices);
+    vid->indexCount = static_cast<std::uint32_t>(indices->size());
+    vid->instanceCount = 1;
+
+    const auto commands = vsg::Commands::create();
+    commands->addChild(vid);
+
+    return commands;
+}
 
 CameraHandler::CameraHandler(
     const settings_t& settings,
@@ -183,6 +214,43 @@ CameraHandler::vec3_type CameraHandler::get_right() const
 CameraHandler::vec3_type CameraHandler::get_up() const
 {
     return up;
+}
+
+vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(vec3_type point) const
+{
+    const auto camera_pos = static_cast<vec3_type>(look_at->eye);
+    const auto angle_rad = vsg::radians(static_cast<value_type>(80));
+
+    const auto get_dir = [&](int yaw_dir, int pitch_dir) -> vec3_type
+    {
+        const auto yaw_angle_rad = angle_rad *
+            static_cast<value_type>(yaw_dir);
+
+        const auto pitch_angle_rad = angle_rad *
+            static_cast<value_type>(pitch_dir);
+
+        return vsg::normalize(front * vsg::rotate(yaw_angle_rad, up) *
+            vsg::rotate(-pitch_angle_rad, right));
+    };
+
+    const vec3_type p0_dir = get_dir(-1, -1);
+    const vec3_type p1_dir = get_dir( 1, -1);
+    const vec3_type p2_dir = get_dir(-1,  1);
+    const vec3_type p3_dir = get_dir( 1,  1);
+
+    const vec3_type camera_to_point = point - camera_pos;
+
+    const value_type camera_norm_length = vsg::length(camera_to_point) *
+        vsg::dot(front, vsg::normalize(camera_to_point));
+
+    const value_type dist = camera_norm_length / vsg::dot(p0_dir, front);
+
+    return create_quad(
+        camera_pos + p0_dir * dist,
+        camera_pos + p1_dir * dist,
+        camera_pos + p2_dir * dist,
+        camera_pos + p3_dir * dist
+    );
 }
 
 void CameraHandler::calculate_front()

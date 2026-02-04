@@ -18,6 +18,7 @@ namespace vsg
 class Camera;
 class FrameEvent;
 class LookAt;
+class Node;
 class Perspective;
 
 }
@@ -26,7 +27,6 @@ class CameraHandler : public vsg::Inherit<vsg::Visitor, CameraHandler>
 {
 public:
     using value_type = float;
-    using vec2_type = vsg::t_vec2<value_type>;
     using vec3_type = vsg::t_vec3<value_type>;
 
 public:
@@ -46,6 +46,8 @@ public:
     vec3_type get_front() const;
     vec3_type get_right() const;
     vec3_type get_up() const;
+
+    vsg::ref_ptr<vsg::Node> create_front_plane(vec3_type point) const;
 
 private:
     void calculate_front();
