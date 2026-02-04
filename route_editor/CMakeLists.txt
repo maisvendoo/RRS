@@ -22,7 +22,7 @@ find_package(vsgImGui REQUIRED)
 
 add_executable(${TARGET})
 
-file(GLOB INCLUDES "./include/*.h")
+file(GLOB_RECURSE INCLUDES "./include/*.h")
 file(GLOB SOURCES "./src/*.cpp")
 
 target_sources(${TARGET}

@@ -235,11 +235,6 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto camera_up = static_cast<vsg::vec3>(
             camera_handler->get_up());
 
-        const auto camera_to_object = begin_pos - camera_pos;
-
-        const auto camera_norm_length = vsg::length(camera_to_object) *
-            vsg::dot(camera_front, vsg::normalize(camera_to_object));
-
         // const auto half_fov = vsg::radians(static_cast<float>(
         //     camera_handler->get_perspective()->fieldOfViewY) / 2.0f);
         const auto half_fov = vsg::radians(80.0f);
@@ -255,6 +250,11 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
         const auto p3_dir = vsg::normalize(camera_front * vsg::rotate(
             half_fov, camera_up) * vsg::rotate(-half_fov, camera_right));
+
+        const auto camera_to_object = begin_pos - camera_pos;
+
+        const auto camera_norm_length = vsg::length(camera_to_object) *
+            vsg::dot(camera_front, vsg::normalize(camera_to_object));
 
         const auto dist = camera_norm_length / vsg::dot(
             p0_dir, camera_front);
