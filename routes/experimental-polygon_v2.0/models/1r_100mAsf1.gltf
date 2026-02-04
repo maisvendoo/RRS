@@ -1,0 +1,153 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "buffers": [
+        {
+            "uri": "bin/1r_100mAsf1.bin",
+            "byteLength": 1112
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 336,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 336,
+            "byteLength": 336,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 672,
+            "byteLength": 224,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 896,
+            "byteLength": 216,
+            "target": 34963
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 28,
+            "type": "VEC3",
+            "max": [
+                6.53081,
+                1,
+                2.48423
+            ],
+            "min": [
+                -6.46882,
+                -1.01092,
+                -102.487
+            ]
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 28,
+            "type": "VEC3",
+            "max": [
+                0.742086,
+                0.974714,
+                0.862285
+            ],
+            "min": [
+                -0.742086,
+                0.506424,
+                -0.862252
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 28,
+            "type": "VEC2",
+            "max": [
+                0.596255,
+                0.99899
+            ],
+            "min": [
+                0.224645,
+                -1.72088
+            ]
+        },
+        {
+            "bufferView": 3,
+            "componentType": 5125,
+            "count": 54,
+            "type": "SCALAR",
+            "max": [
+                27
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "images": [
+        {
+            "uri": "../textures/RoadSections.bmp"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0,
+                    "texCoord": 0
+                }
+            }
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
+                    },
+                    "indices": 3,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [ 0 ]
+        }
+    ],
+    "scene": 0
+}

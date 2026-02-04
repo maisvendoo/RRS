@@ -1,0 +1,365 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "babylon.js glTF exporter for 3dsmax 2024 v20251111.2"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "translation": [
+        0.0,
+        0.238837942,
+        0.0
+      ],
+      "name": "Изостык"
+    },
+    {
+      "mesh": 1,
+      "translation": [
+        0.0,
+        0.5774942,
+        0.39912802
+      ],
+      "name": "Светофор 3"
+    },
+    {
+      "mesh": 2,
+      "translation": [
+        0.0,
+        1.099,
+        0.470471442
+      ],
+      "rotation": [
+        0.7071068,
+        7.832296E-17,
+        -7.832296E-17,
+        0.7071067
+      ],
+      "name": "WHITE_Lens"
+    },
+    {
+      "mesh": 3,
+      "translation": [
+        0.0,
+        0.796944559,
+        0.470471442
+      ],
+      "rotation": [
+        0.7071068,
+        7.832296E-17,
+        -7.832296E-17,
+        0.7071067
+      ],
+      "name": "BLUE_Lens"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 1,
+            "NORMAL": 2,
+            "TEXCOORD_0": 3
+          },
+          "indices": 0,
+          "material": 0
+        }
+      ],
+      "name": "Изостык"
+    },
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 5,
+            "NORMAL": 6,
+            "TEXCOORD_0": 7
+          },
+          "indices": 4,
+          "material": 1
+        }
+      ],
+      "name": "Светофор 3"
+    },
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 9,
+            "NORMAL": 10,
+            "TEXCOORD_0": 11
+          },
+          "indices": 8
+        }
+      ],
+      "name": "WHITE_Lens"
+    },
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 13,
+            "NORMAL": 14,
+            "TEXCOORD_0": 15
+          },
+          "indices": 12
+        }
+      ],
+      "name": "BLUE_Lens"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5123,
+      "count": 14592,
+      "type": "SCALAR",
+      "name": "accessorIndices"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 5666,
+      "max": [
+        -0.4006958,
+        0.07434168,
+        1.06322038
+      ],
+      "min": [
+        -3.80488682,
+        -0.333001465,
+        -1.06322062
+      ],
+      "type": "VEC3",
+      "name": "accessorPositions"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 67992,
+      "componentType": 5126,
+      "count": 5666,
+      "type": "VEC3",
+      "name": "accessorNormals"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 5666,
+      "type": "VEC2",
+      "name": "accessorUVs"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 29184,
+      "componentType": 5123,
+      "count": 3810,
+      "type": "SCALAR",
+      "name": "accessorIndices"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 135984,
+      "componentType": 5126,
+      "count": 2282,
+      "max": [
+        0.218466058,
+        0.674917042,
+        0.482848167
+      ],
+      "min": [
+        -0.218477815,
+        -1.523979,
+        -0.738996744
+      ],
+      "type": "VEC3",
+      "name": "accessorPositions"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 163368,
+      "componentType": 5126,
+      "count": 2282,
+      "type": "VEC3",
+      "name": "accessorNormals"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 45328,
+      "componentType": 5126,
+      "count": 2282,
+      "type": "VEC2",
+      "name": "accessorUVs"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 36804,
+      "componentType": 5123,
+      "count": 1890,
+      "type": "SCALAR",
+      "name": "accessorIndices"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 190752,
+      "componentType": 5126,
+      "count": 531,
+      "max": [
+        0.106532946,
+        0.004435625,
+        0.106532946
+      ],
+      "min": [
+        -0.106532976,
+        -4.98839654E-08,
+        -0.106532976
+      ],
+      "type": "VEC3",
+      "name": "accessorPositions"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 197124,
+      "componentType": 5126,
+      "count": 531,
+      "type": "VEC3",
+      "name": "accessorNormals"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 63584,
+      "componentType": 5126,
+      "count": 531,
+      "type": "VEC2",
+      "name": "accessorUVs"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 40584,
+      "componentType": 5123,
+      "count": 1890,
+      "type": "SCALAR",
+      "name": "accessorIndices"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 203496,
+      "componentType": 5126,
+      "count": 531,
+      "max": [
+        0.106532946,
+        0.004435625,
+        0.106532946
+      ],
+      "min": [
+        -0.106532976,
+        -4.98839654E-08,
+        -0.106532976
+      ],
+      "type": "VEC3",
+      "name": "accessorPositions"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 209868,
+      "componentType": 5126,
+      "count": 531,
+      "type": "VEC3",
+      "name": "accessorNormals"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 67832,
+      "componentType": 5126,
+      "count": 531,
+      "type": "VEC2",
+      "name": "accessorUVs"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 44364,
+      "name": "bufferViewScalar"
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 44364,
+      "byteLength": 216240,
+      "byteStride": 12,
+      "name": "bufferViewFloatVec3"
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 260604,
+      "byteLength": 72080,
+      "byteStride": 8,
+      "name": "bufferViewFloatVec2"
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "RM_sig_M_KM1_2.bin",
+      "byteLength": 332684
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8
+      },
+      "name": "Material #1"
+    },
+    {
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8
+      },
+      "name": "Material #2"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "RM_izostyk.jpg"
+    },
+    {
+      "sampler": 0,
+      "source": 1,
+      "name": "RM_KM1.jpg"
+    }
+  ],
+  "images": [
+    {
+      "uri": "RM_izostyk.jpg"
+    },
+    {
+      "uri": "RM_KM1.jpg"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ]
+}

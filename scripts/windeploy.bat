@@ -106,11 +106,7 @@ xcopy /Y ..\themes\*.* %RRS_DEV_ROOT%\themes
 
 rem Копируем маршруты
 
-rem xcopy /Y /S ..\routes\experimental-polygon\*.* %RRS_DEV_ROOT%\routes\experimental-polygon\
-rem rmdir /S /Q %RRS_DEV_ROOT%\routes\experimental-polygon\map_editor
-rem del /S %RRS_DEV_ROOT%\routes\experimental-polygon\~*.*
-
-xcopy /Y /S ..\routes\experimental-polygon-gltf\*.* %RRS_DEV_ROOT%\routes\experimental-polygon\
+xcopy /Y /S ..\routes\experimental-polygon_v2.0\*.* %RRS_DEV_ROOT%\routes\experimental-polygon_v2.0\
 
 rem Копируем SDK
 

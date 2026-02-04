@@ -1,0 +1,154 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "buffers": [
+        {
+            "uri": "bin/Znak_KT.bin",
+            "byteLength": 912
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 288,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 288,
+            "byteLength": 288,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 576,
+            "byteLength": 192,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 768,
+            "byteLength": 144,
+            "target": 34963
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 24,
+            "type": "VEC3",
+            "max": [
+                0.25,
+                2.51137,
+                0.0288135
+            ],
+            "min": [
+                -0.25,
+                0,
+                -0.0288135
+            ]
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 24,
+            "type": "VEC3",
+            "max": [
+                1,
+                0,
+                1
+            ],
+            "min": [
+                -1,
+                0,
+                -1
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 24,
+            "type": "VEC2",
+            "max": [
+                0.999469,
+                0.90617
+            ],
+            "min": [
+                0.518141,
+                0.686984
+            ]
+        },
+        {
+            "bufferView": 3,
+            "componentType": 5125,
+            "count": 36,
+            "type": "SCALAR",
+            "max": [
+                23
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "images": [
+        {
+            "uri": "../textures/KM_ZnakSignal.tga"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0,
+                    "texCoord": 0
+                }
+            },
+            "alphaMode": "BLEND"
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
+                    },
+                    "indices": 3,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [ 0 ]
+        }
+    ],
+    "scene": 0
+}

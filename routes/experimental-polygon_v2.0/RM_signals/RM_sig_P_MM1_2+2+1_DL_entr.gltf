@@ -1,0 +1,712 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5123,
+      "count": 21894,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 10871,
+      "max": [
+        0.30000001192092896,
+        1.1209163665771484,
+        3.6599998474121094
+      ],
+      "min": [
+        -0.30000001192092896,
+        -1.2490425109863281,
+        -3.9136838912963867
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 10871,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 10871,
+      "max": [
+        0.9929643273353577,
+        0.998046875
+      ],
+      "min": [
+        0.0019531199941411614,
+        0.001953125
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5123,
+      "count": 138,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 48,
+      "max": [
+        0.12762713432312012,
+        0.003544032573699951,
+        0.12762761116027832
+      ],
+      "min": [
+        -0.12762689590454102,
+        -0.0035439729690551758,
+        -0.12762737274169922
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 7,
+      "componentType": 5123,
+      "count": 138,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 8,
+      "componentType": 5126,
+      "count": 48,
+      "max": [
+        0.12762713432312012,
+        0.003544032573699951,
+        0.12762761116027832
+      ],
+      "min": [
+        -0.12762689590454102,
+        -0.0035439729690551758,
+        -0.12762737274169922
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 9,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 10,
+      "componentType": 5123,
+      "count": 138,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 11,
+      "componentType": 5126,
+      "count": 48,
+      "max": [
+        0.12762713432312012,
+        0.003544032573699951,
+        0.12762761116027832
+      ],
+      "min": [
+        -0.12762689590454102,
+        -0.0035439729690551758,
+        -0.12762737274169922
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 12,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 13,
+      "componentType": 5123,
+      "count": 138,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 14,
+      "componentType": 5126,
+      "count": 48,
+      "max": [
+        0.12762713432312012,
+        0.003544032573699951,
+        0.12762761116027832
+      ],
+      "min": [
+        -0.12762689590454102,
+        -0.0035439729690551758,
+        -0.12762737274169922
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 15,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 16,
+      "componentType": 5123,
+      "count": 138,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 17,
+      "componentType": 5126,
+      "count": 48,
+      "max": [
+        0.12782502174377441,
+        -0.5583335757255554,
+        0.9681508541107178
+      ],
+      "min": [
+        -0.12742900848388672,
+        -0.5654215812683105,
+        0.7128958702087402
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 18,
+      "componentType": 5126,
+      "count": 48,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 19,
+      "componentType": 5123,
+      "count": 16380,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 20,
+      "componentType": 5126,
+      "count": 6416,
+      "max": [
+        3.804886817932129,
+        1.3671571016311646,
+        1.1604279279708862
+      ],
+      "min": [
+        -0.25911498069763184,
+        -1.0632203817367554,
+        -0.07165183126926422
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 21,
+      "componentType": 5126,
+      "count": 6416,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 22,
+      "componentType": 5126,
+      "count": 6416,
+      "max": [
+        0.9974618554115295,
+        0.998046875
+      ],
+      "min": [
+        0.0019531199941411614,
+        0.001953125
+      ],
+      "type": "VEC2"
+    }
+  ],
+  "asset": {
+    "generator": "HS glTF exporter for 3dsmax 1.53 (custom3dsmax@gmail.com)",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 43788,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 130452,
+      "byteOffset": 43788,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 130452,
+      "byteOffset": 174240,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 86968,
+      "byteOffset": 304692,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 276,
+      "byteOffset": 391660,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 576,
+      "byteOffset": 391936,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 576,
+      "byteOffset": 392512,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 276,
+      "byteOffset": 393088,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 576,
+      "byteOffset": 393364,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 576,
+      "byteOffset": 393940,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 276,
+      "byteOffset": 394516,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 576,
+      "byteOffset": 394792,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 576,
+      "byteOffset": 395368,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 276,
+      "byteOffset": 395944,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 576,
+      "byteOffset": 396220,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 576,
+      "byteOffset": 396796,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 276,
+      "byteOffset": 397372,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 576,
+      "byteOffset": 397648,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 576,
+      "byteOffset": 398224,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 32760,
+      "byteOffset": 398800,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 76992,
+      "byteOffset": 431560,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 76992,
+      "byteOffset": 508552,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 51328,
+      "byteOffset": 585544,
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 636872,
+      "uri": "RM_sig_MM1_2+2+1_DL_entr.bin"
+    }
+  ],
+  "images": [
+    {
+      "uri": "RM_izostyk.jpg"
+    },
+    {
+      "uri": "RM_entr.jpg"
+    }
+  ],
+  "materials": [
+    {
+      "name": "Изостык",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.6000000238418579
+      }
+    },
+    {
+      "name": "Входной сигнал",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.9934210777282715,
+          0.9934210777282715,
+          0.9934210777282715,
+          1.0
+        ],
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.6000000238418579
+      }
+    },
+    {
+      "name": "Линзы",
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.6000000238418579
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Светофор ВХОДНОЙ",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 2,
+            "POSITION": 1,
+            "TEXCOORD_0": 3
+          },
+          "indices": 0,
+          "material": 1,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "YELLOW_Lens",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 6,
+            "POSITION": 5
+          },
+          "indices": 4,
+          "material": 2,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "RED_Lens",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 9,
+            "POSITION": 8
+          },
+          "indices": 7,
+          "material": 2,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "GREEN_Lens",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 12,
+            "POSITION": 11
+          },
+          "indices": 10,
+          "material": 2,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "BOTTOM_YELLOW_Lens",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 15,
+            "POSITION": 14
+          },
+          "indices": 13,
+          "material": 2,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "WHITE_Lens",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 18,
+            "POSITION": 17
+          },
+          "indices": 16,
+          "material": 2,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Изостык",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 21,
+            "POSITION": 20,
+            "TEXCOORD_0": 22
+          },
+          "indices": 19,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        3.6599998474121094,
+        1.9213485717773438,
+        1.0
+      ],
+      "mesh": 0,
+      "name": "Светофор ВХОДНОЙ"
+    },
+    {
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        6.604656219482422,
+        2.4839353561401367,
+        1.0
+      ],
+      "mesh": 1,
+      "name": "YELLOW_Lens"
+    },
+    {
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        5.504655838012695,
+        2.4839353561401367,
+        1.0
+      ],
+      "mesh": 2,
+      "name": "RED_Lens"
+    },
+    {
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        6.300523281097412,
+        2.4832265377044678,
+        1.0
+      ],
+      "mesh": 3,
+      "name": "GREEN_Lens"
+    },
+    {
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        5.2005228996276855,
+        2.4832265377044678,
+        1.0
+      ],
+      "mesh": 4,
+      "name": "BOTTOM_YELLOW_Lens"
+    },
+    {
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        3.6599998474121094,
+        1.9213485717773438,
+        1.0
+      ],
+      "mesh": 5,
+      "name": "WHITE_Lens"
+    },
+    {
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "mesh": 6,
+      "name": "Изостык"
+    }
+  ],
+  "samplers": [
+    {
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 1,
+      "source": 1
+    }
+  ]
+}

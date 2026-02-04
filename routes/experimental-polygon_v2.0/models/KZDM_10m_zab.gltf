@@ -1,0 +1,154 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "buffers": [
+        {
+            "uri": "bin/KZDM_10m_zab.bin",
+            "byteLength": 32480
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 10056,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 10056,
+            "byteLength": 10056,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 20112,
+            "byteLength": 6704,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 26816,
+            "byteLength": 5664,
+            "target": 34963
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 838,
+            "type": "VEC3",
+            "max": [
+                4.09787,
+                1.11254,
+                0.0010272
+            ],
+            "min": [
+                -3.98646,
+                -2.16568,
+                -10.001
+            ]
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 838,
+            "type": "VEC3",
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 838,
+            "type": "VEC2",
+            "max": [
+                0.989485,
+                0.990667
+            ],
+            "min": [
+                0.00797057,
+                0.0361392
+            ]
+        },
+        {
+            "bufferView": 3,
+            "componentType": 5125,
+            "count": 1416,
+            "type": "SCALAR",
+            "max": [
+                837
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "images": [
+        {
+            "uri": "../textures/KZDM_most_2.tga"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0,
+                    "texCoord": 0
+                }
+            },
+            "alphaMode": "BLEND"
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
+                    },
+                    "indices": 3,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [ 0 ]
+        }
+    ],
+    "scene": 0
+}
