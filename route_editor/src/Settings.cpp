@@ -49,6 +49,8 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getDouble(section, "PitchMin", pitch_min);
     cfg.getDouble(section, "PitchMax", pitch_max);
 
+    cfg.getDouble(section, "CameraInitialHeight", camera_initial_height);
+
     cfg.getDouble(section, "MinCameraRotateSpeed", min_camera_rotate_speed);
     cfg.getDouble(section, "MaxCameraRotateSpeed", max_camera_rotate_speed);
     cfg.getDouble(section, "CameraRotateSpeed", camera_rotate_speed);

@@ -34,8 +34,7 @@ public:
         const settings_t& settings,
         const VkExtent2D& window_extent,
         vsg::ref_ptr<MouseHandler> mouse_handler,
-        vsg::ref_ptr<KeyboardHandler> keyboard_handler,
-        value_type initial_height
+        vsg::ref_ptr<KeyboardHandler> keyboard_handler
     );
 
     void apply(vsg::FrameEvent& frame) override;

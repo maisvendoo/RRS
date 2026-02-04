@@ -66,7 +66,7 @@ bool RouteEditor::initialize()
     keyboard_handler = KeyboardHandler::create(settings);
 
     camera_handler = CameraHandler::create(settings, window->extent2D(),
-        mouse_handler, keyboard_handler, 5.0);
+        mouse_handler, keyboard_handler);
 
     const auto camera = camera_handler->get_camera();
 

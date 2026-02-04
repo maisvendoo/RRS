@@ -147,6 +147,9 @@
         <!-- Отображать топологию -->
         <ShowTopology>0</ShowTopology>
 
+        <!-- Начальная высота камеры -->
+        <CameraInitialHeight>5.0</CameraInitialHeight>
+
         <!-- Минимальная скорость вращения камеры -->
         <MinCameraRotateSpeed>10.0</MinCameraRotateSpeed>
         <!-- Максимальная скорость вращения камеры -->

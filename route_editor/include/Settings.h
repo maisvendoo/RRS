@@ -30,6 +30,8 @@ struct settings_t
     double pitch_min = -70.0;         ///< Vertical angle down max
     double pitch_max = 70.0;          ///< Vertical angle up max
 
+    double camera_initial_height = 0.0;
+
     double min_camera_rotate_speed = 10.0;
     double max_camera_rotate_speed = 25.0;
     double camera_rotate_speed = 10.0;
