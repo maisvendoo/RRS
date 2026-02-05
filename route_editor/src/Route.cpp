@@ -49,10 +49,10 @@ Route::Route(
     const std::string& directory
 )
     : settings(settings)
-    , options(options)
+    , options(std::move(options))
     , directory(directory)
 {
-    assert(options);
+    assert(this->options);
 
     const bool success = load_objects_ref() && load_route_map();
     if (!success)
@@ -72,9 +72,9 @@ Route::Route(
             settings.view_distance);
 
         paged_lod->children.front() = {0.1, nullptr};
-        paged_lod->options = options;
+        paged_lod->options = this->options;
 
-        paged_lods[label] = paged_lod;
+        paged_lods.emplace(label, std::move(paged_lod));
     }
 
     load_static_objects(paged_lods);
@@ -111,18 +111,14 @@ bool Route::load_objects_ref()
     }
 
     std::string line;
-    std::istringstream iss;
-
     while (std::getline(objects_ref_file, line))
     {
-        iss.clear();
-        iss.str(line);
-
+        std::istringstream iss(std::move(line));
         std::string label, relative_path;
 
         if (iss >> label >> relative_path)
         {
-            objects_ref[label] = relative_path;
+            objects_ref.emplace(std::move(label), std::move(relative_path));
         }
     }
 
@@ -146,7 +142,6 @@ bool Route::load_route_map()
     }
 
     std::string line;
-    std::istringstream iss;
 
     while (std::getline(route_map_file, line))
     {
@@ -162,15 +157,14 @@ bool Route::load_route_map()
 
         std::replace(line.begin(), line.end(), ',', ' ');
 
-        iss.clear();
-        iss.str(line);
-
+        std::istringstream iss(std::move(line));
         std::string label;
         vsg::vec3 translation, rotation;
 
         if (iss >> label >> translation >> rotation)
         {
-            route_map.emplace(label, std::make_pair(translation, rotation));
+            route_map.emplace(std::move(label), std::make_pair(
+                translation, rotation));
         }
     }
 
@@ -201,10 +195,8 @@ bool Route::load_topology()
     const auto cfg_path = fs.combinePath(directory,
         "topology", "models-config.xml");
 
-    QString tmp_qstr = cfg_path.c_str();
-
     CfgReader cfg;
-    if (!cfg.load(tmp_qstr))
+    if (!cfg.load(QString::fromStdString(cfg_path)))
     {
         // TODO: Replace on Journal
         std::fprintf(stderr, "Failed to load %s\n", cfg_path.c_str());
@@ -213,9 +205,9 @@ bool Route::load_topology()
     }
 
     const QString section_name = "Models";
+    QString signal_models_dir;
 
-    tmp_qstr = "";
-    if (!cfg.getString(section_name, "SignalModelsDir", tmp_qstr))
+    if (!cfg.getString(section_name, "SignalModelsDir", signal_models_dir))
     {
         // TODO: Replace on Journal
         std::fprintf(stderr, "Failed to find field \"SignalModelsDir\" "
@@ -225,7 +217,7 @@ bool Route::load_topology()
         return false;
     }
 
-    const std::string models_dir_name = tmp_qstr.toStdString();
+    const std::string models_dir_name = signal_models_dir.toStdString();
 
     const std::string models_dir = fs.combinePath(fs.getDataDir(),
         "models", models_dir_name);
@@ -273,8 +265,8 @@ bool Route::load_topology()
 
             vsg::ref_ptr<vsg::PagedLOD> paged_lod;
 
-            const auto paged_lod_it = paged_lods.find(signal_model_path);
-            if (paged_lod_it == paged_lods.cend())
+            auto paged_lod_it = paged_lods.find(signal_model_path);
+            if (paged_lod_it == paged_lods.end())
             {
                 const auto new_paged_lod = vsg::PagedLOD::create();
                 new_paged_lod->filename = signal_model_path;
@@ -285,14 +277,11 @@ bool Route::load_topology()
                 new_paged_lod->children.front() = {0.1, nullptr};
                 new_paged_lod->options = options;
 
-                paged_lods[signal_model_path] = new_paged_lod;
+                paged_lod_it = paged_lods.emplace(signal_model_path,
+                    std::move(new_paged_lod)).first;
+            }
 
-                paged_lod = new_paged_lod;
-            }
-            else
-            {
-                paged_lod = paged_lod_it->second;
-            }
+            paged_lod = paged_lod_it->second;
 
             signal->calcPosition();
 
@@ -310,8 +299,7 @@ bool Route::load_topology()
 
             const vsg::vec3 rotation_deg = {
                 vsg::degrees(std::atan2(orth.z, up.z)),
-                vsg::degrees(std::atan2(-right.z,
-                    std::sqrt(orth.z * orth.z + up.z * up.z))),
+                vsg::degrees(std::atan2(-right.z, std::hypot(orth.z, up.z))),
                 vsg::degrees(std::atan2(-right.y, right.x))
             };
 
