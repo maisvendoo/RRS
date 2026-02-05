@@ -3,6 +3,13 @@
 *.txt.user
 *.txt.user.*
 *.bak
+*.exe
+*.dll
+*.obj
+*.o
+*.a
+*.so
+*.backup
 
 build/
 build-debug/
