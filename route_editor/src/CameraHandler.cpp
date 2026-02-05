@@ -139,23 +139,24 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
         calculate_up();
     }
 
-    const auto scroll = static_cast<perspective_value_type>(
-        mouse_handler->get_scroll());
+    if (const auto scroll = static_cast<perspective_value_type>(
+        mouse_handler->get_scroll()))
+    {
+        const auto zoom_power = static_cast<perspective_value_type>(
+            settings.camera_zoom_power);
 
-    const auto zoom_power = static_cast<perspective_value_type>(
-        settings.camera_zoom_power);
+        perspective->fieldOfViewY -= scroll * zoom_power *
+            static_cast<perspective_value_type>(delta_time);
 
-    perspective->fieldOfViewY -= scroll * zoom_power *
-        static_cast<perspective_value_type>(delta_time);
+        const auto fovy_min = static_cast<perspective_value_type>(
+            settings.fovy_min);
 
-    const auto fovy_min = static_cast<perspective_value_type>(
-        settings.fovy_min);
+        const auto fovy_max = static_cast<perspective_value_type>(
+            settings.fovy_max);
 
-    const auto fovy_max = static_cast<perspective_value_type>(
-        settings.fovy_max);
-
-    perspective->fieldOfViewY = std::clamp(perspective->fieldOfViewY,
-        fovy_min, fovy_max);
+        perspective->fieldOfViewY = std::clamp(perspective->fieldOfViewY,
+            fovy_min, fovy_max);
+    }
 
     const auto get_binding_state = [this](Action action) -> int
     {
@@ -173,16 +174,24 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     const auto move_speed = static_cast<look_at_value_type>(
         settings.camera_move_speed);
 
-    const look_at_vec3_type front_movememt = front * move_speed *
-        static_cast<look_at_value_type>(delta_time) *
-        static_cast<look_at_value_type>(move_forward - move_backward);
+    if (move_forward - move_backward != 0)
+    {
+        const look_at_vec3_type front_movememt = front * move_speed *
+            static_cast<look_at_value_type>(delta_time) *
+            static_cast<look_at_value_type>(move_forward - move_backward);
 
-    const look_at_vec3_type right_movement = right * move_speed *
-        static_cast<look_at_value_type>(delta_time) *
-        static_cast<look_at_value_type>(move_right - move_left);
+        look_at->eye += front_movememt;
+    }
 
-    look_at->eye += front_movememt;
-    look_at->eye += right_movement;
+    if (move_right - move_left != 0)
+    {
+        const look_at_vec3_type right_movement = right * move_speed *
+            static_cast<look_at_value_type>(delta_time) *
+            static_cast<look_at_value_type>(move_right - move_left);
+
+        look_at->eye += right_movement;
+    }
+
     look_at->center = look_at->eye + front;
 }
 
