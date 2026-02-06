@@ -55,6 +55,9 @@ private:
     vsg::ref_ptr<SingleSwitch> plane_yz_switch;
     vsg::ref_ptr<SingleSwitch> plane_xz_switch;
     vsg::ref_ptr<SingleSwitch> plane_xy_switch;
+    vsg::ref_ptr<SingleSwitch> line_x_switch;
+    vsg::ref_ptr<SingleSwitch> line_y_switch;
+    vsg::ref_ptr<SingleSwitch> line_z_switch;
 
     vsg::vec3 curr_position;
     vsg::vec3 click_position;
@@ -62,6 +65,7 @@ private:
 
     vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;
+    vsg::ref_ptr<SingleSwitch> active_line_switch;
 };
 
 #endif // GIZMO_H

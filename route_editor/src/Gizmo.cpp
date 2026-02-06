@@ -146,21 +146,31 @@ Gizmo::Gizmo(
     this->addChild(arrow_y);
     this->addChild(arrow_z);
 
-    this->addChild(create_line(X_AXIS_POSITIVE, arrow_x_color));
-    this->addChild(create_line(Y_AXIS_POSITIVE, arrow_y_color));
-    this->addChild(create_line(Z_AXIS_POSITIVE, arrow_z_color));
+    plane_yz_switch = SingleSwitch::create(vsg::MASK_OFF,
+        create_plane(X_AXIS_POSITIVE, arrow_x_color));
 
-    const auto plane_yz = create_plane(X_AXIS_POSITIVE, arrow_x_color);
-    const auto plane_xz = create_plane(Y_AXIS_POSITIVE, arrow_y_color);
-    const auto plane_xy = create_plane(Z_AXIS_POSITIVE, arrow_z_color);
+    plane_xz_switch = SingleSwitch::create(vsg::MASK_OFF,
+        create_plane(Y_AXIS_POSITIVE, arrow_y_color));
 
-    plane_yz_switch = SingleSwitch::create(vsg::MASK_OFF, plane_yz);
-    plane_xz_switch = SingleSwitch::create(vsg::MASK_OFF, plane_xz);
-    plane_xy_switch = SingleSwitch::create(vsg::MASK_OFF, plane_xy);
+    plane_xy_switch = SingleSwitch::create(vsg::MASK_OFF,
+        create_plane(Z_AXIS_POSITIVE, arrow_z_color));
 
     this->addChild(plane_yz_switch);
     this->addChild(plane_xz_switch);
     this->addChild(plane_xy_switch);
+
+    line_x_switch = SingleSwitch::create(vsg::MASK_OFF,
+        create_line(X_AXIS_POSITIVE, arrow_x_color));
+
+    line_y_switch = SingleSwitch::create(vsg::MASK_OFF,
+        create_line(Y_AXIS_POSITIVE, arrow_y_color));
+
+    line_z_switch = SingleSwitch::create(vsg::MASK_OFF,
+        create_line(Z_AXIS_POSITIVE, arrow_z_color));
+
+    this->addChild(line_x_switch);
+    this->addChild(line_y_switch);
+    this->addChild(line_z_switch);
 }
 
 bool Gizmo::handle_intersections()
@@ -217,6 +227,8 @@ bool Gizmo::handle_intersections()
                 ? plane_xz_switch
                 : plane_xy_switch;
 
+            active_line_switch = line_x_switch;
+
             break;
         }
         else if (node == arrow_y)
@@ -232,6 +244,8 @@ bool Gizmo::handle_intersections()
             active_plain_switch = (arrow_x_dot > arrow_z_dot)
                 ? plane_yz_switch
                 : plane_xy_switch;
+
+            active_line_switch = line_y_switch;
 
             break;
         }
@@ -249,13 +263,16 @@ bool Gizmo::handle_intersections()
                 ? plane_yz_switch
                 : plane_xz_switch;
 
+            active_line_switch = line_z_switch;
+
             break;
         }
     }
 
-    if (active_plain_switch)
+    if (active_arrow)
     {
-        active_plain_switch->mask = MASK_GUI1 | MASK_CLICKABLE;
+        active_plain_switch->mask = MASK_CLICKABLE;
+        active_line_switch->mask = MASK_GUI1;
     }
 
     intersector->intersections.clear();
@@ -274,6 +291,9 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
 
     active_plain_switch->mask = vsg::MASK_OFF;
     active_plain_switch = nullptr;
+
+    active_line_switch->mask = vsg::MASK_OFF;
+    active_line_switch = nullptr;
 }
 
 void Gizmo::apply(const vsg::MoveEvent& moveEvent)
