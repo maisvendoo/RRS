@@ -384,7 +384,11 @@ void Gizmo::update_scale()
     const auto camera_pos = static_cast<vsg::vec3>(
         camera_handler->get_look_at()->eye);
 
+    const auto fov = vsg::radians(static_cast<float>(
+        camera_handler->get_perspective()->fieldOfViewY));
+
     const float distance_to_camera = vsg::length(curr_position - camera_pos);
-    const float scale = distance_to_camera * 0.075f;
+    const float tan_half_fov = std::tan(fov * 0.5f);
+    const float scale = distance_to_camera * tan_half_fov * 0.05f;
     this->matrix = vsg::translate(curr_position) * vsg::scale(scale);
 }

@@ -120,17 +120,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     const auto& node_path = intersections.front()->nodePath;
     for (const vsg::Node* const node : node_path)
     {
-        const auto object = vsg::ref_ptr(const_cast<RouteObject*>(
-            node->cast<RouteObject>()));
-
-        if (!object)
+        if (const auto object = vsg::ref_ptr(const_cast<RouteObject*>(
+            node->cast<RouteObject>())))
         {
-            continue;
+            select_object(object);
+            break;
         }
-
-        select_object(object);
-
-        break;
     }
 
     intersections.clear();
