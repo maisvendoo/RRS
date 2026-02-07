@@ -9,6 +9,18 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+int lua_exceptions_handler(lua_State* L,
+               sol::optional<const std::exception&> ex,
+               sol::string_view description) {
+
+    Journal::instance()->critical("Lua error: " + QString(description.data()));
+
+    return sol::stack::push(L, description);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 ScenarioManager::ScenarioManager(QObject *parent) : QObject(parent)
 {
 
@@ -1182,6 +1194,9 @@ void ScenarioManager::lua_libraries_init()
 //------------------------------------------------------------------------------
 void ScenarioManager::lua_init()
 {
+    // Обработчки исключений
+    lua.set_exception_handler(&lua_exceptions_handler);
+
     // Инициализация библиотек Lua
     lua_libraries_init();
 
