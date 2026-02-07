@@ -334,9 +334,9 @@ setTimeTrigger("17:31", actionBuildTrainRoute("track_a_p1a", "track_a-b_nd-22", 
 my_scenario/-
             |-routes/-
                      |-experimental-polygon_v2.0/-
-                                                 |-senarios-
-                                                           |-my_scenario1
-                                                           |-my_scenario2
+                                                 |-sсenarios-
+                                                            |-my_scenario1
+                                                            |-my_scenario2
 ```
 
 Таким образом, ваш проект сценариев для данного маршрута может содержать несколько папок с разными сценариями.
@@ -352,9 +352,9 @@ my_scenario/-
                            |-train105.xml
             |-routes/-
                      |-experimental-polygon_v2.0/-
-                                                 |-senarios-
-                                                           |-my_scenario1
-                                                           |-my_scenario2
+                                                 |-sсenarios-
+                                                            |-my_scenario1
+                                                            |-my_scenario2
 ```
 
 
