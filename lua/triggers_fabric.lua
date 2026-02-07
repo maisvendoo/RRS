@@ -121,3 +121,13 @@ function actionOpenCallSignal(conn_name, dir)
 
 	return action
 end
+
+-- Закрыть сигнал (любой)
+function actionCloseSignal(conn_name, dir)
+
+	function action()
+		closeSignal(conn_name, dir)
+	end
+
+	return action
+end
