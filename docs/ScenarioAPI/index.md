@@ -1,4 +1,4 @@
-# Руководство по разработке сценариев для Russain Railway Simulator (RRS)
+# Руководство по разработке сценариев для Russian Railway Simulator (RRS)
 
 [Введение](intro.md)
 
