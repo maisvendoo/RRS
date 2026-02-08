@@ -135,6 +135,7 @@ bool Application::translate_map(std::string& old_file_path, std::string& new_fil
     if (new_file.is_open())
     {
         //LOG_INFO("Info: opened file: %s", new_file_path.c_str());
+        new_file << std::fixed << std::setprecision(6);
     }
     else
     {
@@ -143,11 +144,59 @@ bool Application::translate_map(std::string& old_file_path, std::string& new_fil
         return false;
     }
 
-    // Временно, просто пишем копию файла построчно
     std::string line_buffer;
     while (std::getline(old_file, line_buffer))
     {
-        new_file << line_buffer << "\n";
+        // Пустое название объекта
+        if (line_buffer.empty() || (*(line_buffer.begin()) == ',') )
+        {
+            new_file << line_buffer << "\n";
+            continue;
+        }
+        // Строка с объектом должна заканчиваться точкой с запятой
+        if (*(line_buffer.end() - 1) != ';')
+        {
+            new_file << line_buffer << "\n";
+            continue;
+        }
+        // Строка с объектом должна содержать шесть запятых - разделителей
+        if (std::count(line_buffer.begin(), line_buffer.end(), ',') != 6)
+        {
+            new_file << line_buffer << "\n";
+            continue;
+        }
+
+        std::string label = "";
+        double pos_x = 0.0;
+        double pos_y = 0.0;
+        double pos_z = 0.0;
+        double rot_x = 0.0;
+        double rot_y = 0.0;
+        double rot_z = 0.0;
+
+        std::string tmp_buffer = line_buffer;
+        std::replace(tmp_buffer.begin(), tmp_buffer.end(), ',', ' ');
+        std::istringstream ss(tmp_buffer);
+        ss >> label >> pos_x >> pos_y >> pos_z >> rot_x >> rot_y >> rot_z;
+
+        if (ss)
+        {
+            pos_x += x;
+            pos_y += y;
+            pos_z += z;
+            new_file << label
+                << "," << pos_x
+                << "," << pos_y
+                << "," << pos_z
+                << "," << rot_x
+                << "," << rot_y
+                << "," << rot_z
+                << ";\n";
+        }
+        else
+        {
+            new_file << line_buffer << "\n";
+        }
     }
     return true;
 }
@@ -174,6 +223,7 @@ bool Application::translate_trajectory(std::string& old_file_path, std::string& 
     if (new_file.is_open())
     {
         //LOG_INFO("Info: opened file: %s", new_file_path.c_str());
+        new_file << std::fixed << std::setprecision(6);
     }
     else
     {
@@ -182,11 +232,46 @@ bool Application::translate_trajectory(std::string& old_file_path, std::string& 
         return false;
     }
 
-    // Временно, просто пишем копию файла построчно
     std::string line_buffer;
     while (std::getline(old_file, line_buffer))
     {
-        new_file << line_buffer << "\n";
+        double pos_x = 0.0;
+        double pos_y = 0.0;
+        double pos_z = 0.0;
+        int railway_coord = 0;
+        double len = 0.0;
+
+        std::string tmp_buffer = line_buffer;
+        std::istringstream ss(tmp_buffer);
+        ss >> pos_x >> pos_y >> pos_z;
+
+        if (ss)
+        {
+            pos_x += x;
+            pos_y += y;
+            pos_z += z;
+            new_file << pos_x
+                << "\t" << pos_y
+                << "\t" << pos_z;
+
+            ss >> railway_coord;
+            if (ss)
+            {
+                new_file << "\t" << railway_coord;
+
+                ss >> len;
+                if (ss)
+                {
+                    new_file << "\t" << len;
+                }
+            }
+
+            new_file << "\n";
+        }
+        else
+        {
+            new_file << line_buffer << "\n";
+        }
     }
     return true;
 }
@@ -210,15 +295,15 @@ void Application::configure_parser(cli::Parser &parser)
 
     parser.set_optional<double>("x", "delta-x",
                                 0.0,
-                                "Transform along/aroung X axis");
+                                "Transform along X axis, meters");
 
     parser.set_optional<double>("y", "delta-y",
                                 0.0,
-                                "Transform along/aroung Y axis");
+                                "Transform along Y axis, meters");
 
     parser.set_optional<double>("z", "delta-z",
                                 0.0,
-                                "Transform along/aroung Z axis");
+                                "Transform along Z axis, meters");
 
     parser.enable_help();
 }
