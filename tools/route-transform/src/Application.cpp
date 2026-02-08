@@ -19,6 +19,178 @@ bool Application::parse_args(int argc, char* argv[])
     return check_command_line(cmd_line);
 }
 
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Application::transform_route()
+{
+    // Ищем топологию в маршруте
+    auto topology_dir = std::filesystem::path(cmd_line.input_route_path.value);
+    topology_dir /= "topology";
+
+    if (cmd_line.transform_map.value)
+    {
+        // Ищем расположение объектов маршрута - папку с файлами *.map
+        auto map_dir = std::filesystem::path(topology_dir / "map");
+        if (!std::filesystem::exists(map_dir) || !std::filesystem::is_directory(map_dir))
+        {
+            LOG_WARN("ERROR: map directory does not exists");
+            return false;
+        }
+
+        // Создаём бэкап имеющихся файлов
+        auto backup_dir = std::filesystem::path(topology_dir / "~map");
+        if (std::filesystem::exists(backup_dir))
+        {
+            std::filesystem::remove_all(backup_dir);
+        }
+
+        std::filesystem::rename(map_dir, backup_dir);
+        std::filesystem::create_directories(map_dir);
+
+        for (const auto& file_it : std::filesystem::directory_iterator(backup_dir))
+        {
+            if (!file_it.is_regular_file())
+            {
+                continue;
+            }
+
+            auto filename = file_it.path().filename();
+            if (filename.extension().string() == ".map")
+            {
+                std::string old_file_path = (backup_dir / filename).string();
+                std::string new_file_path = (map_dir / filename).string();
+                translate_map(old_file_path, new_file_path,
+                              cmd_line.shift_x.value,
+                              cmd_line.shift_y.value,
+                              cmd_line.shift_z.value);
+            }
+        }
+    }
+
+    if (cmd_line.transform_topology.value)
+    {
+        // Ищем координаты траекторий маршрута - папку с файлами *.traj
+        auto trajectories_dir = std::filesystem::path(topology_dir / "trajectories");
+        if (!std::filesystem::exists(trajectories_dir) || !std::filesystem::is_directory(trajectories_dir))
+        {
+            LOG_WARN("ERROR: trajectories directory does not exists");
+            return false;
+        }
+
+        // Создаём бэкап имеющихся файлов
+        auto backup_dir = std::filesystem::path(topology_dir / "~trajectories");
+        if (std::filesystem::exists(backup_dir))
+        {
+            std::filesystem::remove_all(backup_dir);
+        }
+
+        std::filesystem::rename(trajectories_dir, backup_dir);
+        std::filesystem::create_directories(trajectories_dir);
+
+        // Ищем траектории путей маршрута - файлы *.traj
+        for (const auto& file_it : std::filesystem::directory_iterator(backup_dir))
+        {
+            if (!file_it.is_regular_file())
+            {
+                continue;
+            }
+
+            auto filename = file_it.path().filename();
+            if (filename.extension().string() == ".traj")
+            {
+                std::string old_file_path = (backup_dir / filename).string();
+                std::string new_file_path = (trajectories_dir / filename).string();
+                translate_trajectory(old_file_path, new_file_path,
+                                     cmd_line.shift_x.value,
+                                     cmd_line.shift_y.value,
+                                     cmd_line.shift_z.value);
+            }
+        }
+    }
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Application::translate_map(std::string& old_file_path, std::string& new_file_path,
+                                double x, double y, double z)
+{
+    std::ifstream old_file = std::ifstream();
+    old_file.open(old_file_path, std::ios::in);
+    if (old_file.is_open())
+    {
+        //LOG_INFO("Info: opened file: %s", old_file_path.c_str());
+    }
+    else
+    {
+        LOG_WARN("Warn: failed to open file: %s", old_file_path.c_str());
+        return false;
+    }
+
+    std::ofstream new_file(new_file_path, std::ios::out);
+    if (new_file.is_open())
+    {
+        //LOG_INFO("Info: opened file: %s", new_file_path.c_str());
+    }
+    else
+    {
+        LOG_WARN("Warn: failed to open file: %s", new_file_path.c_str());
+        old_file.close();
+        return false;
+    }
+
+    // Временно, просто пишем копию файла построчно
+    std::string line_buffer;
+    while (std::getline(old_file, line_buffer))
+    {
+        new_file << line_buffer << "\n";
+    }
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Application::translate_trajectory(std::string& old_file_path, std::string& new_file_path,
+                                       double x, double y, double z)
+{
+    std::ifstream old_file = std::ifstream();
+    old_file.open(old_file_path, std::ios::in);
+    if (old_file.is_open())
+    {
+        //LOG_INFO("Info: opened file: %s", old_file_path.c_str());
+    }
+    else
+    {
+        LOG_WARN("Warn: failed to open file: %s", old_file_path.c_str());
+        return false;
+    }
+
+    std::ofstream new_file(new_file_path, std::ios::out);
+    if (new_file.is_open())
+    {
+        //LOG_INFO("Info: opened file: %s", new_file_path.c_str());
+    }
+    else
+    {
+        LOG_WARN("Warn: failed to open file: %s", new_file_path.c_str());
+        old_file.close();
+        return false;
+    }
+
+    // Временно, просто пишем копию файла построчно
+    std::string line_buffer;
+    while (std::getline(old_file, line_buffer))
+    {
+        new_file << line_buffer << "\n";
+    }
+    return true;
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
