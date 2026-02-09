@@ -62,7 +62,9 @@ end
 -- (Прямой вызов C-функции нельзя присвоить sol::function)
 -------------------------------------------------------------------
 
+--------------------------------------------------------------------------------
 -- Постровение маршрута
+--------------------------------------------------------------------------------
 function actionBuildRoute(traj_begin, traj_end, dir)
 
 	function action()
@@ -72,7 +74,9 @@ function actionBuildRoute(traj_begin, traj_end, dir)
 	return action
 end
 
+--------------------------------------------------------------------------------
 -- Постровение поездного маршрута
+--------------------------------------------------------------------------------
 function actionBuildTrainRoute(traj_begin, traj_end, dir)
 
 	function action()
@@ -82,7 +86,9 @@ function actionBuildTrainRoute(traj_begin, traj_end, dir)
 	return action
 end
 
+--------------------------------------------------------------------------------
 -- Постровение маневрового маршрута
+--------------------------------------------------------------------------------
 function actionBuildShuntingRoute(traj_begin, traj_end, dir)
 
 	function action()
@@ -92,7 +98,9 @@ function actionBuildShuntingRoute(traj_begin, traj_end, dir)
 	return action
 end
 
+--------------------------------------------------------------------------------
 -- Установить стрелки по маршруту
+--------------------------------------------------------------------------------
 function actionSetSwitchsAlongRoute(traj_begin, traj_end, dir)
 
 	function action()
@@ -112,7 +120,9 @@ function actionOpenShuntingSignal(conn_name, dir)
 	return action
 end
 
+--------------------------------------------------------------------------------
 -- Открыть пригласительны сигнал
+--------------------------------------------------------------------------------
 function actionOpenCallSignal(conn_name, dir)
 
 	function action()
@@ -120,4 +130,114 @@ function actionOpenCallSignal(conn_name, dir)
 	end
 
 	return action
+end
+
+--------------------------------------------------------------------------------
+-- Закрыть сигнал (любой)
+--------------------------------------------------------------------------------
+function actionCloseSignal(conn_name, dir)
+
+	function action()
+		closeSignal(conn_name, dir)
+	end
+
+	return action
+end
+
+--------------------------------------------------------------------------------
+--	Функции установки страндартных позиционных триггеров
+-- (на занятие и освобождение заданной траектории)
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Занятие траектории произвольным поездом
+--------------------------------------------------------------------------------
+function setOnTrajBusyTrigger(name_traj, action)
+
+
+	function on_busy_trigger_func(train_name, traj_name, is_busy)
+
+		if is_busy and traj_name == name_traj then
+
+			action()			
+
+			return TRIG_DELETE
+		end
+
+		return TRIG_SAFE
+	end	
+
+	setTrigger(on_busy_trigger_func)
+end
+
+--------------------------------------------------------------------------------
+-- Освобождение траектории произвольным поездом
+--------------------------------------------------------------------------------
+function setOnTrajFreeTrigger(name_traj, action)
+
+
+	function on_free_trigger_func(train_name, traj_name, is_busy)
+
+		if not is_busy and traj_name == name_traj then
+
+			action()			
+
+			return TRIG_DELETE
+		end
+
+		return TRIG_SAFE
+	end	
+
+	setTrigger(on_free_trigger_func)
+end
+
+--------------------------------------------------------------------------------
+-- Занятие траектории заданным поездом 
+--------------------------------------------------------------------------------
+function setOnTrajBusyByTrainTrigger(name_traj, name_train, action)
+
+
+	function on_busy_trigger_func(train_name, traj_name, is_busy)
+
+		if is_busy and traj_name == name_traj and train_name == name_train then
+
+			action()			
+
+			return TRIG_DELETE
+		end
+
+		return TRIG_SAFE
+	end	
+
+	setTrigger(on_busy_trigger_func)
+end
+
+--------------------------------------------------------------------------------
+-- Освобождение траектории заданным поездом 
+--------------------------------------------------------------------------------
+function setOnTrajFreeByTrainTrigger(name_traj, name_train, action)
+
+
+	function on_free_trigger_func(train_name, traj_name, is_busy)
+
+		if not is_busy and traj_name == name_traj and train_name == name_train then
+
+			action()			
+
+			return TRIG_DELETE
+		end
+
+		return TRIG_SAFE
+	end	
+
+	setTrigger(on_free_trigger_func)
+end
+
+--------------------------------------------------------------------------------
+-- Установить триггер на автоматический пропуск поездов
+--------------------------------------------------------------------------------
+function setAutoApproachTrigger(traj_begin, traj_end, dir)
+
+	setTrigger(autoApproach(traj_begin, traj_end, dir))
+
 end
