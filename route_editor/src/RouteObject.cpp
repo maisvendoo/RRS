@@ -104,6 +104,16 @@ void RouteObject::set_scale(vsg::vec3 scale, bool update_matrix)
     }
 }
 
+void RouteObject::move(vsg::vec3 translation, bool update_matrix)
+{
+    this->translation -= translation;
+
+    if (update_matrix)
+    {
+        this->update_matrix();
+    }
+}
+
 void RouteObject::save_translation()
 {
     initial_translation = translation;

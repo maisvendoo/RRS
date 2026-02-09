@@ -39,6 +39,8 @@ public:
     void set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix = true);
     void set_scale(vsg::vec3 scale, bool update_matrix = true);
 
+    void move(vsg::vec3 translation, bool update_matrix = true);
+
     void save_translation();
     void save_rotation();
     void save_scale();
