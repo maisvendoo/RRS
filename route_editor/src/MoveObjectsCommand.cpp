@@ -5,6 +5,8 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
+#include <cstdio>
+#include <string>
 #include <vector>
 
 MoveObjectsCommand::MoveObjectsCommand(
@@ -16,7 +18,7 @@ MoveObjectsCommand::MoveObjectsCommand(
 {
 }
 
-void MoveObjectsCommand::execute()
+void MoveObjectsCommand::execute() const
 {
     for (const auto& object : objects)
     {
@@ -24,10 +26,18 @@ void MoveObjectsCommand::execute()
     }
 }
 
-void MoveObjectsCommand::undo()
+void MoveObjectsCommand::undo() const
 {
     for (const auto& object : objects)
     {
         object->move(-translation);
     }
+}
+
+std::string MoveObjectsCommand::to_string() const
+{
+    char buffer[64];
+    std::snprintf(buffer, 64, "Move objects: {%10.3f, %10.3f, %10.3f}",
+        translation.x, translation.y, translation.z);
+    return buffer;
 }

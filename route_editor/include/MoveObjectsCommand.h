@@ -6,6 +6,7 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
+#include <string>
 #include <vector>
 
 class RouteObject;
@@ -19,12 +20,13 @@ public:
     );
 
     virtual ~MoveObjectsCommand() override = default;
-    virtual void execute() override;
-    virtual void undo() override;
+    virtual void execute() const override;
+    virtual void undo() const override;
+    virtual std::string to_string() const override;
 
 private:
-    std::vector<vsg::ref_ptr<RouteObject>> objects;
-    vsg::vec3 translation;
+    const std::vector<vsg::ref_ptr<RouteObject>> objects;
+    const vsg::vec3 translation;
 };
 
 #endif // MOVE_OBJECTS_COMMAND_H
