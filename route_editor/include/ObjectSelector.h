@@ -10,6 +10,7 @@
 #include <vsg/maths/vec3.h>
 
 class CameraHandler;
+class CommandList;
 class Gizmo;
 class IntersectionHandler;
 class KeyboardHandler;
@@ -35,6 +36,7 @@ class ObjectSelector : public vsg::Inherit<vsg::Visitor, ObjectSelector>
 public:
     ObjectSelector(
         const settings_t& settings,
+        CommandList& commands,
         vsg::ref_ptr<MouseHandler> mouse_handler,
         vsg::ref_ptr<KeyboardHandler> keyboard_handler,
         vsg::ref_ptr<CameraHandler> camera_handler,
@@ -70,6 +72,7 @@ private:
     State state = State::INITIAL;
 
     const settings_t& settings;
+    CommandList& commands;
     vsg::ref_ptr<MouseHandler> mouse_handler;
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;
     vsg::ref_ptr<CameraHandler> camera_handler;

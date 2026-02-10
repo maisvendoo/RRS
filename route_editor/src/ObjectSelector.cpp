@@ -26,6 +26,7 @@
 
 ObjectSelector::ObjectSelector(
     const settings_t& settings,
+    CommandList& commands,
     vsg::ref_ptr<MouseHandler> mouse_handler,
     vsg::ref_ptr<KeyboardHandler> keyboard_handler,
     vsg::ref_ptr<CameraHandler> camera_handler,
@@ -34,6 +35,7 @@ ObjectSelector::ObjectSelector(
     vsg::observer_ptr<vsg::Viewer> observer_viewer
 )
     : settings(settings)
+    , commands(commands)
     , mouse_handler(mouse_handler)
     , keyboard_handler(keyboard_handler)
     , camera_handler(camera_handler)
