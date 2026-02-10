@@ -70,7 +70,7 @@ bool KeyboardHandler::get_binding_state(Action action) const
     assert(action >= 0);
     assert(action < TOTAL_ACTIONS);
 
-    static const std::map<KeyModifier, vsg::KeySymbol> modifiers_map = {
+    static const std::map<MyKeyModifier, vsg::KeySymbol> modifiers_map = {
         {KEY_MODIFIER_LSHIFT, vsg::KEY_Shift_L},
         {KEY_MODIFIER_RSHIFT, vsg::KEY_Shift_R},
         {KEY_MODIFIER_LCTRL, vsg::KEY_Control_L},

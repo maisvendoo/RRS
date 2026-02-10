@@ -7,7 +7,7 @@
 
 #include <array>
 
-enum KeyModifier
+enum MyKeyModifier
 {
     KEY_MODIFIER_NONE =     0x0000,
     KEY_MODIFIER_LSHIFT =   0x0001,

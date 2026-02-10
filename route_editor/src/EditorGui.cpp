@@ -300,7 +300,7 @@ void EditorGui::show_key_bindings() const
             ImGui::TableNextColumn();
 
             std::string label;
-            label += std::toupper(key_bindings[i]);
+            label += std::toupper(key_bindings[i].key);
             ImGui::Text("%s", label.c_str());
         }
 
