@@ -1,6 +1,7 @@
 #ifndef ROUTE_EDITOR_H
 #define ROUTE_EDITOR_H
 
+#include "CommandList.h"
 #include "EditorState.h"
 #include "Settings.h"
 
@@ -41,6 +42,7 @@ private:
 private:
     EditorState state = EditorState::SELECT_ROUTE;
     settings_t settings;
+    CommandList commands;
     vsg::ref_ptr<vsg::Options> options;
     vsg::ref_ptr<WindowHandler> window_handler;
     vsg::ref_ptr<MouseHandler> mouse_handler;

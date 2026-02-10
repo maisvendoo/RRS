@@ -103,7 +103,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // If we clicked on empty space without shift
         // while there were selected objects,
         // deselect them all
-        if (!selected_objects_are_empty && !keyboard_handler->get_shift_state())
+        if (!selected_objects_are_empty && !keyboard_handler->get_any_shift_state())
         {
             deselect_all_objects();
         }
@@ -262,7 +262,7 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
         selected_objects.emplace_back(object);
     };
 
-    if (keyboard_handler->get_shift_state())
+    if (keyboard_handler->get_any_shift_state())
     {
         if (clicked_on_selected_object)
         {
