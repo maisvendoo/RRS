@@ -65,6 +65,12 @@ bool KeyboardHandler::get_any_ctrl_state() const
         get_key_state(vsg::KEY_Control_R);
 }
 
+bool KeyboardHandler::get_any_alt_state() const
+{
+    return get_key_state(vsg::KEY_Alt_L) ||
+        get_key_state(vsg::KEY_Alt_R);
+}
+
 bool KeyboardHandler::get_binding_state(Action action) const
 {
     assert(action >= 0);
