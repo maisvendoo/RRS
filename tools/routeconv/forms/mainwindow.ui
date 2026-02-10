@@ -328,6 +328,9 @@
                     <property name="decimals">
                      <number>3</number>
                     </property>
+                    <property name="minimum">
+                     <double>-999999.998999999952503</double>
+                    </property>
                     <property name="maximum">
                      <double>999999.998999999952503</double>
                     </property>
@@ -358,6 +361,9 @@
                     <property name="decimals">
                      <number>3</number>
                     </property>
+                    <property name="minimum">
+                     <double>-999999.998999999952503</double>
+                    </property>
                     <property name="maximum">
                      <double>999999.998999999952503</double>
                     </property>
@@ -387,6 +393,9 @@
                    <widget class="QDoubleSpinBox" name="dsbDeltaZ">
                     <property name="decimals">
                      <number>3</number>
+                    </property>
+                    <property name="minimum">
+                     <double>-999999.998999999952503</double>
                     </property>
                     <property name="maximum">
                      <double>999999.998999999952503</double>

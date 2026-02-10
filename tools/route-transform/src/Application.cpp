@@ -285,14 +285,6 @@ void Application::configure_parser(cli::Parser &parser)
                                      "",
                                      "Input route path");
 
-    parser.set_optional<bool>("m", "map-transform",
-                              false,
-                              "Transform positions at files /topology/map/*.map");
-
-    parser.set_optional<bool>("t", "topology-transform",
-                              false,
-                              "Transform positions at files /topology/trajectories/*.traj");
-
     parser.set_optional<double>("x", "delta-x",
                                 0.0,
                                 "Transform along X axis, meters");
@@ -305,6 +297,14 @@ void Application::configure_parser(cli::Parser &parser)
                                 0.0,
                                 "Transform along Z axis, meters");
 
+    parser.set_optional<bool>("m", "map-transform",
+                              false,
+                              "Transform positions at files /topology/map/*.map");
+
+    parser.set_optional<bool>("t", "topology-transform",
+                              false,
+                              "Transform positions at files /topology/trajectories/*.traj");
+
     parser.enable_help();
 }
 
@@ -315,11 +315,11 @@ void Application::parse_command_line(cli::Parser &parser, cmd_line_t &cmd_line)
 {
     parser.run_and_exit_if_error();
     cmd_line.input_route_path = parser.get<std::string>("i");
-    cmd_line.transform_map = parser.get<bool>("m");
-    cmd_line.transform_topology = parser.get<bool>("t");
     cmd_line.shift_x = parser.get<double>("x");
     cmd_line.shift_y = parser.get<double>("y");
     cmd_line.shift_z = parser.get<double>("z");
+    cmd_line.transform_map = parser.get<bool>("m");
+    cmd_line.transform_topology = parser.get<bool>("t");
 }
 
 //------------------------------------------------------------------------------
@@ -339,14 +339,17 @@ bool Application::check_command_line(const cmd_line_t &cmd_line)
         return false;
     }
 
-    if (cmd_line.transform_map.value || cmd_line.transform_topology.value)
-    {
-        return true;
-    }
-    else
+    if (!cmd_line.transform_map.value && !cmd_line.transform_topology.value)
     {
         LOG_WARN("ERROR: Nothing to do, options --map-transform or --topology-transform are missing");
         return false;
     }
+
+    if ((cmd_line.shift_x.value == 0.0) && (cmd_line.shift_y.value == 0.0) && (cmd_line.shift_z.value == 0.0))
+    {
+        LOG_WARN("ERROR: Nothing to do, --delta-x, --delta-y and --delta-z are all missing or set to zero");
+        return false;
+    }
+
     return true;
 }

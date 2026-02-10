@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(&dmd2gltfProc, &QProcess::finished, this, &MainWindow::slotIsDmd2gltfFinished);
 
     connect(ui->pbCheckTopology, &QPushButton::released, this, &MainWindow::slotCheckTopology);
+    connect(ui->pbTransformRoute, &QPushButton::released, this, &MainWindow::slotTransformRoute);
     connect(ui->pbGenParallel, &QPushButton::released, this, &MainWindow::slotGenerateParallel);
     connect(ui->pbGenSpline, &QPushButton::released, this, &MainWindow::slotGenerateSpline);
 
@@ -190,6 +191,36 @@ void MainWindow::startTopologyChecker()
 
     topologyCheckProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     topologyCheckProc.start(topologycheck_path, args);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::startTransformRoute()
+{
+    const FileSystem& fs = FileSystem::getInstance();
+    QString transformroute_path = ROUTETRANSFORM EXE_EXP;
+
+    double delta_x = ui->dsbDeltaX->value();
+    double delta_y = ui->dsbDeltaY->value();
+    double delta_z = ui->dsbDeltaZ->value();
+
+    QStringList args;
+    args << "--input-route" << routeDir;
+    args << "--delta-x" << QString("%1").arg(delta_x, 0, 'f', 3);
+    args << "--delta-y" << QString("%1").arg(delta_y, 0, 'f', 3);
+    args << "--delta-z" << QString("%1").arg(delta_z, 0, 'f', 3);
+    if (ui->cbTransformMap->checkState())
+    {
+        args << "--map-transform";
+    }
+    if (ui->cbTransformTopology->checkState())
+    {
+        args << "--topology-transform";
+    }
+
+    transformRouteProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
+    transformRouteProc.start(transformroute_path, args);
 }
 
 //------------------------------------------------------------------------------
@@ -373,6 +404,20 @@ void MainWindow::slotCheckTopology()
     }
 
     startTopologyChecker();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotTransformRoute()
+{
+    if (routeDir.isEmpty())
+    {
+        ui->lStatus->setText(tr("Error: route is not loaded. Please choose route"));
+        return;
+    }
+
+    startTransformRoute();
 }
 
 //------------------------------------------------------------------------------
