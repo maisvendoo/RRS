@@ -56,7 +56,8 @@ public:
     {
         INITIAL,
         MOVING,
-        ROTATING
+        ROTATING,
+        SCALING
     };
 
     State state = State::INITIAL;
