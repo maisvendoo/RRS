@@ -1,4 +1,4 @@
-#include "RotateObjectsCommand.h"
+#include "ScaleObjectsCommand.h"
 
 #include "RouteObject.h"
 
@@ -8,26 +8,26 @@
 #include <string>
 #include <vector>
 
-RotateObjectsCommand::RotateObjectsCommand(
+ScaleObjectsCommand::ScaleObjectsCommand(
     const std::vector<vsg::ref_ptr<RouteObject>>& objects,
-    vsg::vec3 rotation
+    vsg::vec3 scale
 )
     : objects(objects)
-    , rotation(rotation)
+    , scale(scale)
 {
 }
 
-void RotateObjectsCommand::execute() const
-{
-    // TODO
-}
-
-void RotateObjectsCommand::undo() const
+void ScaleObjectsCommand::execute() const
 {
     // TODO
 }
 
-std::string RotateObjectsCommand::to_string() const
+void ScaleObjectsCommand::undo() const
+{
+    // TODO
+}
+
+std::string ScaleObjectsCommand::to_string() const
 {
     // TODO
 }
