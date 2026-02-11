@@ -87,27 +87,18 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getBool(section, "ShowCameraSettings", show_camera_settings);
     cfg.getBool(section, "ShowTopology", show_topology);
 
-    cfg.getString(section, "KeyMoveCameraForward", tmp_qstr);
-    key_move_camera_forward = static_cast<vsg::KeySymbol>(
-        tmp_qstr.front().toLatin1());
+    const auto get_key_setting = [&](const char* const name,
+        vsg::KeySymbol& key) -> void
+    {
+        cfg.getString(section, name, tmp_qstr);
+        key = static_cast<vsg::KeySymbol>(
+            tmp_qstr.front().toLower().toLatin1());
+    };
 
-    cfg.getString(section, "KeyMoveCameraBackward", tmp_qstr);
-    key_move_camera_backward = static_cast<vsg::KeySymbol>(
-        tmp_qstr.front().toLatin1());
-
-    cfg.getString(section, "KeyMoveCameraLeft", tmp_qstr);
-    key_move_camera_left = static_cast<vsg::KeySymbol>(
-        tmp_qstr.front().toLatin1());
-
-    cfg.getString(section, "KeyMoveCameraRight", tmp_qstr);
-    key_move_camera_right = static_cast<vsg::KeySymbol>(
-        tmp_qstr.front().toLatin1());
-
-    cfg.getString(section, "KeyMoveObjects", tmp_qstr);
-    key_move_objects = static_cast<vsg::KeySymbol>(
-        tmp_qstr.front().toLatin1());
-
-    cfg.getString(section, "KeyRotateObjects", tmp_qstr);
-    key_rotate_objects = static_cast<vsg::KeySymbol>(
-        tmp_qstr.front().toLatin1());
+    get_key_setting("KeyMoveCameraForward", key_move_camera_forward);
+    get_key_setting("KeyMoveCameraBackward", key_move_camera_backward);
+    get_key_setting("KeyMoveCameraLeft", key_move_camera_left);
+    get_key_setting("KeyMoveCameraRight", key_move_camera_right);
+    get_key_setting("KeyMoveObjects", key_move_objects);
+    get_key_setting("KeyRotateObjects", key_rotate_objects);
 }
