@@ -54,7 +54,7 @@ void CommandList::push(const Command* command)
     if (size == 0)
     {
         tail = active = new CommandNode{command, nullptr, nullptr};
-        size = active_size = 1;
+        size = 1;
         return;
     }
 
@@ -74,26 +74,23 @@ void CommandList::push(const Command* command)
         delete head;
         next->prev = nullptr;
         --size;
-        --active_size;
     }
 
     CommandNode* new_node = new CommandNode{command, tail, nullptr};
     tail->next = new_node;
     tail = active = new_node;
     ++size;
-    ++active_size;
 }
 
 void CommandList::undo()
 {
-    if (active_size == 0)
+    if (!active)
     {
         return;
     }
 
     active->command->undo();
     active = active->prev;
-    --active_size;
 }
 
 void CommandList::redo()
@@ -105,7 +102,6 @@ void CommandList::redo()
 
     active = active->next;
     active->command->execute();
-    ++active_size;
 }
 
 void CommandList::print()
@@ -117,7 +113,6 @@ void CommandList::print()
     std::printf("\n");
     std::printf("Command list:\n");
     std::printf("size: %zu\n", size);
-    std::printf("active_size: %zu\n", active_size);
 
     CommandNode* curr = tail;
     while (curr)

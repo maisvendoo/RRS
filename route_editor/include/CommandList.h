@@ -32,10 +32,8 @@ public:
 
 private:
     CommandNode* tail = nullptr;
-    std::size_t size = 0;
-
     CommandNode* active = nullptr;
-    std::size_t active_size = 0;
+    std::size_t size = 0;
 };
 
 #endif // COMMAND_LIST_H
