@@ -2,10 +2,11 @@
 
 #include "Command.h"
 
+#include <cstddef>
 #include <cstdio>
 #include <string>
 
-#define MAX_SAVED_COMMANDS 50
+static constexpr std::size_t MAX_SAVED_COMMANDS = 50;
 
 CommandList::CommandNode::~CommandNode()
 {
@@ -69,7 +70,6 @@ void CommandList::push(const Command* command)
         if (active == head)
         {
             active = next;
-            ++active;
         }
         delete head;
         next->prev = nullptr;
