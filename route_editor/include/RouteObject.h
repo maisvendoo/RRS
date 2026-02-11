@@ -10,6 +10,7 @@
 #include <string>
 
 class Outline;
+class SingleSwitch;
 class SwitchGroup;
 
 namespace vsg
@@ -78,6 +79,7 @@ private:
 
     vsg::ref_ptr<SwitchGroup> switch_group;
     vsg::ref_ptr<vsg::PagedLOD> paged_lod;
+    vsg::ref_ptr<SingleSwitch> outline_switch;
 };
 
 #endif // ROUTE_OBJECT_H
