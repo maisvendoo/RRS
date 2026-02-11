@@ -55,6 +55,7 @@ void CommandList::push(const Command* command)
     if (size == 0)
     {
         tail = active = new CommandNode{command, nullptr, nullptr};
+        command->execute();
         size = 1;
         return;
     }
@@ -77,6 +78,7 @@ void CommandList::push(const Command* command)
     }
 
     CommandNode* new_node = new CommandNode{command, tail, nullptr};
+    command->execute();
     tail->next = new_node;
     tail = active = new_node;
     ++size;
