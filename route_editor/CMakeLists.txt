@@ -22,8 +22,8 @@ find_package(vsgImGui REQUIRED)
 
 add_executable(${TARGET})
 
-file(GLOB INCLUDES "./include/*.h")
-file(GLOB SOURCES "./src/*.cpp")
+file(GLOB_RECURSE INCLUDES "./include/*.h")
+file(GLOB_RECURSE SOURCES "./src/*.cpp")
 
 target_sources(${TARGET}
     PRIVATE
@@ -35,6 +35,10 @@ target_sources(${TARGET}
             include
         FILES
             ${INCLUDES}
+)
+
+target_include_directories(${TARGET} PRIVATE
+    include/commands
 )
 
 target_link_libraries(${TARGET}

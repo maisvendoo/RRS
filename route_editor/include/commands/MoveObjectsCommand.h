@@ -26,7 +26,7 @@ public:
 
 private:
     const std::vector<vsg::ref_ptr<RouteObject>> objects;
-    const vsg::vec3 translation;
+    vsg::vec3 translation;
 };
 
 #endif // MOVE_OBJECTS_COMMAND_H
