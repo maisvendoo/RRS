@@ -32,8 +32,11 @@
 #include <set>
 #include <string>
 
+static constexpr float MAX_DRAG = FLT_MAX / static_cast<float>(INT_MAX);
+
 EditorGui::EditorGui(
     settings_t& settings,
+    CommandList& commands,
     EditorState& editor_state,
     const KeyBindings& key_bindings,
     vsg::ref_ptr<vsg::Perspective> perspective,
@@ -42,6 +45,7 @@ EditorGui::EditorGui(
     std::string& route_directory
 )
     : settings(settings)
+    , commands(commands)
     , editor_state(editor_state)
     , key_bindings(key_bindings)
     , perspective(perspective)
@@ -121,6 +125,24 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             }
 
             show_selected_objects_properties();
+
+            ImGui::Begin("Commands");
+            auto active = commands.get_active();
+            auto curr = commands.get_tail();
+            while (curr)
+            {
+                if (curr == active)
+                {
+                    ImGui::TextColored(ImVec4{1.0f, 0.0f, 0.0f, 1.0f}, "%s", curr->to_string().c_str());
+                }
+                else
+                {
+                    ImGui::Text("%s", curr->to_string().c_str());
+                }
+
+                curr = curr->prev;
+            }
+            ImGui::End();
 
             return;
         }
@@ -321,21 +343,21 @@ void EditorGui::show_camera_settings() const
     ImGui::Text("Move speed:");
     float move_speed = static_cast<float>(settings.camera_move_speed);
     if (ImGui::DragFloat("##move_speed", &move_speed,
-        1.0f, 1.0f, FLT_MAX / INT_MAX))
+        1.0f, 1.0f, MAX_DRAG))
     {
         settings.camera_move_speed = move_speed;
     }
 
     ImGui::Text("Rotate speed:");
     float rotate_speed = static_cast<float>(settings.camera_rotate_speed);
-    if (ImGui::DragFloat("##rotate_speed", &rotate_speed, 1.0f, 1.0f, FLT_MAX / INT_MAX))
+    if (ImGui::DragFloat("##rotate_speed", &rotate_speed, 1.0f, 1.0f, MAX_DRAG))
     {
         settings.camera_rotate_speed = rotate_speed;
     }
 
     ImGui::Text("Zoom power:");
     float zoom_power = static_cast<float>(settings.camera_zoom_power);
-    if (ImGui::DragFloat("##zoom_power", &zoom_power, 1.0f, 1.0f, FLT_MAX / INT_MAX))
+    if (ImGui::DragFloat("##zoom_power", &zoom_power, 1.0f, 1.0f, MAX_DRAG))
     {
         settings.camera_zoom_power = zoom_power;
     }
@@ -476,16 +498,6 @@ void EditorGui::show_selected_objects_properties() const
     }
 
     ImGui::Begin("Selected objects", nullptr, window_flags);
-
-    static float min_translation = -100.0f;
-    static float max_translation = 100.0f;
-    static float min_rotation = -180.0f;
-    static float max_rotation = 180.0f;
-
-    ImGui::InputFloat("Min translation", &min_translation);
-    ImGui::InputFloat("Max translation", &max_translation);
-    ImGui::InputFloat("Min rotation", &min_rotation);
-    ImGui::InputFloat("Max rotation", &max_rotation);
 
     int i = 0;
 

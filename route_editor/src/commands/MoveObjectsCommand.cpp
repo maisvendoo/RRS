@@ -37,7 +37,7 @@ void MoveObjectsCommand::undo() const
 std::string MoveObjectsCommand::to_string() const
 {
     char buffer[64];
-    std::snprintf(buffer, 64, "Move objects: {%10.3f, %10.3f, %10.3f}",
+    std::snprintf(buffer, 64, "Move objects: {%.3f, %.3f, %.3f}",
         translation.x, translation.y, translation.z);
     return buffer;
 }

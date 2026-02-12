@@ -30,6 +30,16 @@ public:
 
     void print();
 
+    CommandNode* get_active() const
+    {
+        return active;
+    }
+
+    CommandNode* get_tail() const
+    {
+        return tail;
+    }
+
 private:
     CommandNode* tail = nullptr;
     CommandNode* active = nullptr;

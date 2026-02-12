@@ -97,7 +97,7 @@ bool RouteEditor::initialize()
     const auto gui_view2 = vsg::View::create(camera, scene_graph);
     gui_view2->mask = MASK_GUI2;
 
-    const auto editor_gui = EditorGui::create(settings, state,
+    const auto editor_gui = EditorGui::create(settings, commands, state,
         keyboard_handler->get_key_bindings(), camera_handler->get_perspective(),
         scene_graph, object_selector, route_directory);
 

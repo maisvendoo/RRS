@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <string>
 
-static constexpr std::size_t MAX_SAVED_COMMANDS = 50;
+static constexpr std::size_t MAX_SAVED_COMMANDS = 6;
 
 CommandList::CommandNode::~CommandNode()
 {
@@ -18,7 +18,7 @@ std::string CommandList::CommandNode::to_string()
     char buffer[512];
     std::snprintf(buffer, 512, "command: %s\nnext: %p\nprev: %p\n",
         command->to_string().c_str(), (void*)next, (void*)prev);
-    return buffer;
+    return command->to_string().c_str();
 }
 
 CommandList::~CommandList()

@@ -1,6 +1,7 @@
 #ifndef EDITOR_GUI_H
 #define EDITOR_GUI_H
 
+#include "CommandList.h"
 #include "EditorState.h"
 #include "KeyBindings.h"
 
@@ -28,6 +29,7 @@ class EditorGui : public vsg::Inherit<vsg::Command, EditorGui>
 public:
     EditorGui(
         settings_t& settings,
+        CommandList& commands,
         EditorState& editor_state,
         const KeyBindings& key_bindings,
         vsg::ref_ptr<vsg::Perspective> perspective,
@@ -51,6 +53,7 @@ private:
 
 private:
     settings_t& settings;
+    CommandList& commands;
     EditorState& editor_state;
     const KeyBindings& key_bindings;
     vsg::ref_ptr<vsg::Perspective> perspective;
