@@ -2,7 +2,6 @@
 
 #include "Mask.h"
 #include "Outline.h"
-#include "OutlineNew.h"
 #include "SingleSwitch.h"
 
 #include <vsg/core/Mask.h>
@@ -37,7 +36,7 @@ RouteObject::RouteObject(const settings_t& settings,
         vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
     outline_switch = SingleSwitch::create(vsg::MASK_OFF,
-        OutlineNew::create(settings, paged_lod));
+        Outline::create(settings, paged_lod));
 
     this->addChild(paged_lod_switch);
     this->addChild(outline_switch);
