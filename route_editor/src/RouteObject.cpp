@@ -57,7 +57,7 @@ vsg::vec3 RouteObject::get_rotation_deg() const
 
 vsg::vec3 RouteObject::get_scale() const
 {
-    return scale;
+    return scale_value;
 }
 
 vsg::vec3 RouteObject::get_initial_translation() const
@@ -107,7 +107,7 @@ void RouteObject::set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix)
 
 void RouteObject::set_scale(vsg::vec3 scale, bool update_matrix)
 {
-    this->scale = scale;
+    this->scale_value = scale;
 
     if (update_matrix)
     {
@@ -118,6 +118,26 @@ void RouteObject::set_scale(vsg::vec3 scale, bool update_matrix)
 void RouteObject::move(vsg::vec3 translation, bool update_matrix)
 {
     this->translation += translation;
+
+    if (update_matrix)
+    {
+        this->update_matrix();
+    }
+}
+
+void RouteObject::rotate(vsg::vec3 rotation_deg, bool update_matrix)
+{
+    this->rotation_deg += rotation_deg;
+
+    if (update_matrix)
+    {
+        this->update_matrix();
+    }
+}
+
+void RouteObject::scale(vsg::vec3 scale, bool update_matrix)
+{
+    this->scale_value = scale;
 
     if (update_matrix)
     {
@@ -150,7 +170,7 @@ void RouteObject::save_rotation()
 
 void RouteObject::save_scale()
 {
-    initial_scale = scale;
+    initial_scale = scale_value;
 }
 
 void RouteObject::update_matrix()
@@ -166,7 +186,7 @@ void RouteObject::update_matrix()
     const vsg::mat4 rotate_z = vsg::rotate(rotation_rad.z, AXIS_Z_POSITIVE);
 
     this->matrix = vsg::translate(translation) * rotate_z *
-        rotate_y * rotate_x * vsg::scale(scale);
+        rotate_y * rotate_x * vsg::scale(scale_value);
 
     update_bounds();
 }

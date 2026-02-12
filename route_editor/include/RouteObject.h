@@ -46,6 +46,8 @@ public:
     void set_scale(vsg::vec3 scale, bool update_matrix = true);
 
     void move(vsg::vec3 translation, bool update_matrix = true);
+    void rotate(vsg::vec3 rotation_deg, bool update_matrix = true);
+    void scale(vsg::vec3 scale, bool update_matrix = true);
 
     void select() const;
     void deselect() const;
@@ -74,7 +76,7 @@ private:
 
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;
-    vsg::vec3 scale = {1.0f, 1.0f, 1.0f};
+    vsg::vec3 scale_value = {1.0f, 1.0f, 1.0f};
 
     vsg::vec3 initial_translation;
     vsg::vec3 initial_rotation_deg;
