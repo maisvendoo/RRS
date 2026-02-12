@@ -5,6 +5,7 @@
 #include "filesystem.h"
 #include "shader_funcs.h"
 
+#include <vsg/app/Viewer.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>
 #include <vsg/io/Options.h>
@@ -39,35 +40,47 @@ struct OutlineStatic
 
 Outline::Outline(const settings_t& settings,
     vsg::ref_ptr<vsg::PagedLOD> paged_lod)
+    : settings(settings)
+    , paged_lod(paged_lod)
 {
     assert(paged_lod);
+}
 
-    static OutlineStatic outline_static;
+void Outline::load(vsg::observer_ptr<vsg::Viewer> observer_viewer)
+{
+    if (box != nullptr)
+    {
+        return;
+    }
 
-    const auto options = outline_static.options;
-    auto& builder = outline_static.builder;
-
-    const auto wireframe_outline = vsg::read_cast<vsg::Node>(
-        paged_lod->filename, options);
+    if (!paged_lod->pending)
+    {
+        return;
+    }
 
     vsg::ComputeBounds compute_bounds;
     compute_bounds.useNodeBounds = false;
-    wireframe_outline->accept(compute_bounds);
+    paged_lod->pending->accept(compute_bounds);
 
-    const vsg::GeometryInfo geometry_info(vsg::box(compute_bounds.bounds));
+    vsg::GeometryInfo geometry_info(vsg::box(compute_bounds.bounds));
+    geometry_info.color = vsg::vec4{1.0f, 0.6f, 0.0f, 0.4f};
 
     vsg::StateInfo state_info;
     state_info.blending = true;
     state_info.wireframe = true;
 
-    const auto box_outline = builder.createBox(geometry_info, state_info);
+    static OutlineStatic outline_static;
 
-    if (settings.show_wireframe)
-    {
-        this->addChild(wireframe_outline);
-    }
+    const auto viewer = observer_viewer.ref_ptr();
+    const auto compile_manager = viewer->compileManager;
 
-    this->addChild(box_outline);
+    box = outline_static.builder.createBox(geometry_info, state_info);
+
+    const auto compile_result = compile_manager->compile(box);
+
+    this->addChild(box);
+
+    vsg::updateViewer(*viewer, compile_result);
 }
 
 OutlineStatic::OutlineStatic()

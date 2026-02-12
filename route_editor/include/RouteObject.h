@@ -2,6 +2,7 @@
 #define ROUTE_OBJECT_H
 
 #include <vsg/core/Inherit.h>
+#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
 #include <vsg/maths/vec3.h>
@@ -38,6 +39,8 @@ public:
 
     const vsg::box& get_bounds() const;
 
+    static void set_observer_viewer(vsg::observer_ptr<vsg::Viewer> observer_viewer);
+
     void set_translation(vsg::vec3 translation, bool update_matrix = true);
     void set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix = true);
     void set_scale(vsg::vec3 scale, bool update_matrix = true);
@@ -66,9 +69,9 @@ public:
     State state = State::INITIAL;
     std::string label;
 
-    vsg::ref_ptr<Outline> outline;
-
 private:
+    static vsg::observer_ptr<vsg::Viewer> s_observer_viewer;
+
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;
     vsg::vec3 scale = {1.0f, 1.0f, 1.0f};

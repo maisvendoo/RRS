@@ -9,6 +9,7 @@
 #include "MouseHandler.h"
 #include "ObjectSelector.h"
 #include "Route.h"
+#include "RouteObject.h"
 #include "SceneGraph.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
@@ -112,6 +113,8 @@ bool RouteEditor::initialize()
 
     viewer = vsg::Viewer::create();
     const vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
+
+    RouteObject::set_observer_viewer(observer_viewer);
 
     object_selector = ObjectSelector::create(settings, commands, mouse_handler,
         keyboard_handler, camera_handler, intersection_handler, scene_graph,

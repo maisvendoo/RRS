@@ -5,6 +5,7 @@
 #include "SingleSwitch.h"
 
 #include <vsg/core/Mask.h>
+#include <vsg/core/observer_ptr.h>
 #include <vsg/maths/box.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
@@ -15,6 +16,8 @@
 
 #include <cassert>
 #include <string>
+
+vsg::observer_ptr<vsg::Viewer> RouteObject::s_observer_viewer;
 
 static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
@@ -77,6 +80,11 @@ const vsg::box& RouteObject::get_bounds() const
     return bounds;
 }
 
+void RouteObject::set_observer_viewer(vsg::observer_ptr<vsg::Viewer> observer_viewer)
+{
+    s_observer_viewer = observer_viewer;
+}
+
 void RouteObject::set_translation(vsg::vec3 translation, bool update_matrix)
 {
     this->translation = translation;
@@ -119,6 +127,9 @@ void RouteObject::move(vsg::vec3 translation, bool update_matrix)
 
 void RouteObject::select() const
 {
+    const auto outline = outline_switch->node.cast<Outline>();
+    outline->load(s_observer_viewer);
+
     outline_switch->mask = MASK_GUI2;
 }
 
