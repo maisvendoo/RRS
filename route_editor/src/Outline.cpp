@@ -37,7 +37,7 @@ struct OutlineStatic
     vsg::Builder builder;
 };
 
-Outline::Outline(const settings_t& settings, vsg::ref_ptr<RouteObject> object)
+Outline::Outline(const settings_t& settings, const RouteObject* object)
 {
     assert(object);
 
