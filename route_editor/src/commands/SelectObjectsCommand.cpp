@@ -15,7 +15,10 @@ SelectObjectsCommand::SelectObjectsCommand(
 
 void SelectObjectsCommand::execute() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->select();
+    }
 }
 
 void SelectObjectsCommand::undo() const
