@@ -16,6 +16,8 @@
 #include "trajectory.h"
 #include "vec3.h"
 
+#include <cfloat>
+#include <climits>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/quat.h>
@@ -318,24 +320,22 @@ void EditorGui::show_camera_settings() const
 
     ImGui::Text("Move speed:");
     float move_speed = static_cast<float>(settings.camera_move_speed);
-    if (ImGui::SliderFloat("##move_speed", &move_speed,
-        settings.min_camera_move_speed, settings.max_camera_move_speed))
+    if (ImGui::DragFloat("##move_speed", &move_speed,
+        1.0f, 1.0f, FLT_MAX / INT_MAX))
     {
         settings.camera_move_speed = move_speed;
     }
 
     ImGui::Text("Rotate speed:");
     float rotate_speed = static_cast<float>(settings.camera_rotate_speed);
-    if (ImGui::SliderFloat("##rotate_speed", &rotate_speed,
-        settings.min_camera_rotate_speed, settings.max_camera_rotate_speed))
+    if (ImGui::DragFloat("##rotate_speed", &rotate_speed, 1.0f, 1.0f, FLT_MAX / INT_MAX))
     {
         settings.camera_rotate_speed = rotate_speed;
     }
 
     ImGui::Text("Zoom power:");
     float zoom_power = static_cast<float>(settings.camera_zoom_power);
-    if (ImGui::SliderFloat("##zoom_power", &zoom_power,
-        settings.min_camera_zoom_power, settings.max_camera_zoom_power))
+    if (ImGui::DragFloat("##zoom_power", &zoom_power, 1.0f, 1.0f, FLT_MAX / INT_MAX))
     {
         settings.camera_zoom_power = zoom_power;
     }
@@ -497,8 +497,7 @@ void EditorGui::show_selected_objects_properties() const
         label += std::to_string(i);
 
         vsg::vec3 translation = object->get_translation();
-        if (ImGui::SliderFloat3(label.c_str(), translation.data(),
-            min_translation, max_translation))
+        if (ImGui::DragFloat3(label.c_str(), translation.data()))
         {
             object->set_translation(translation);
         }
@@ -507,8 +506,7 @@ void EditorGui::show_selected_objects_properties() const
         label += std::to_string(i);
 
         vsg::vec3 rotation_deg = object->get_rotation_deg();
-        if (ImGui::SliderFloat3(label.c_str(), rotation_deg.data(),
-            min_rotation, max_rotation))
+        if (ImGui::DragFloat3(label.c_str(), rotation_deg.data()))
         {
             object->set_rotation_deg(rotation_deg);
         }
