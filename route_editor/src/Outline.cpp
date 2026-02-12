@@ -30,6 +30,8 @@
 
 #include <cassert>
 
+const settings_t* Outline::s_settings = nullptr;
+
 struct OutlineStatic
 {
     OutlineStatic();
@@ -38,10 +40,8 @@ struct OutlineStatic
     vsg::Builder builder;
 };
 
-Outline::Outline(const settings_t& settings,
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod)
-    : settings(settings)
-    , paged_lod(paged_lod)
+Outline::Outline(vsg::ref_ptr<vsg::PagedLOD> paged_lod)
+    : paged_lod(paged_lod)
 {
     assert(paged_lod);
 
@@ -107,6 +107,11 @@ void Outline::load(vsg::observer_ptr<vsg::Viewer> observer_viewer)
     this->addChild(box);
 
     vsg::updateViewer(*viewer, compile_result);
+}
+
+void Outline::set_settings(const settings_t* settings)
+{
+    s_settings = settings;
 }
 
 OutlineStatic::OutlineStatic()

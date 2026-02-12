@@ -20,11 +20,14 @@ class Viewer;
 class Outline : public vsg::Inherit<vsg::Group, Outline>
 {
 public:
-    Outline(const settings_t& settings, vsg::ref_ptr<vsg::PagedLOD> paged_lod);
+    Outline(vsg::ref_ptr<vsg::PagedLOD> paged_lod);
 
     void load(vsg::observer_ptr<vsg::Viewer> observer_viewer);
 
-    const settings_t& settings;
+    static void set_settings(const settings_t* settings);
+
+private:
+    static const settings_t* s_settings;
     vsg::ref_ptr<vsg::PagedLOD> paged_lod;
     vsg::ref_ptr<vsg::Node> box = nullptr;
 };

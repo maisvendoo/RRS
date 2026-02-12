@@ -8,6 +8,7 @@
 #include "Mask.h"
 #include "MouseHandler.h"
 #include "ObjectSelector.h"
+#include "Outline.h"
 #include "Route.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
@@ -47,6 +48,8 @@ bool RouteEditor::initialize()
 {
     const FileSystem& fs = FileSystem::getInstance();
     settings.read(fs.combinePath(fs.getConfigDir(), "settings.xml"));
+
+    Outline::set_settings(&settings);
 
     options = vsg::Options::create();
     options->sharedObjects = vsg::SharedObjects::create();

@@ -39,7 +39,7 @@ RouteObject::RouteObject(const settings_t& settings,
         vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
     outline_switch = SingleSwitch::create(vsg::MASK_OFF,
-        Outline::create(settings, paged_lod));
+        Outline::create(paged_lod));
 
     this->addChild(paged_lod_switch);
     this->addChild(outline_switch);
