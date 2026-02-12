@@ -5,7 +5,6 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/Group.h>
 
-class RouteObject;
 struct settings_t;
 
 namespace vsg
