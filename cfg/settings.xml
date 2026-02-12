@@ -172,11 +172,13 @@
         <CameraMoveSpeed>100.0</CameraMoveSpeed>
 
         <!-- Key bindings -->
-        <KeyMoveCameraForward>w</KeyMoveCameraForward>
-        <KeyMoveCameraBackward>s</KeyMoveCameraBackward>
-        <KeyMoveCameraLeft>a</KeyMoveCameraLeft>
-        <KeyMoveCameraRight>d</KeyMoveCameraRight>
-        <KeyMoveObjects>g</KeyMoveObjects>
-        <KeyRotateObjects>r</KeyRotateObjects>
+        <KeyMoveCameraForward>W</KeyMoveCameraForward>
+        <KeyMoveCameraBackward>S</KeyMoveCameraBackward>
+        <KeyMoveCameraLeft>A</KeyMoveCameraLeft>
+        <KeyMoveCameraRight>D</KeyMoveCameraRight>
+        <KeyMoveObjects>G</KeyMoveObjects>
+        <KeyRotateObjects>R</KeyRotateObjects>
+        <KeyScaleObjects>S</KeyScaleObjects>
+
     </Editor>
 </Config>
