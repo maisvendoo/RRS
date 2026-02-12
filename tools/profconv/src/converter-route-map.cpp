@@ -74,7 +74,11 @@ bool ZDSimConverter::readRouteMAP(QTextStream &stream, zds_route_map_data_t &map
         // Удаляем завершающую точку с запятой и разделяем строку на данные
         QStringList tokens = line.removeLast().split(',');
         if (tokens.size() < 7)
+        {
+            LOG_WARN("Warn: <route1.map> invalid object: %s", line.toStdString().c_str());
+            LOG_WARN("      Expected 6 values of object's position and rotation, but only %i found", tokens.size() - 1);
             continue;
+        }
 
         // Проверяем, что есть запись об этом объекте в objects.ref
         auto it = objects_data.find(tokens[0].toStdString());
@@ -107,6 +111,40 @@ bool ZDSimConverter::readRouteMAP(QTextStream &stream, zds_route_map_data_t &map
         zds_object->attitude.x = tokens[4].toDouble();
         zds_object->attitude.y = tokens[5].toDouble();
         zds_object->attitude.z = tokens[6].toDouble();
+
+        // Поскольку уровень головки рельса в ZDS маршрутах находится не в нуле,
+        // а поднят в среднем на 0.3114, опускаем весь маршрут
+        constexpr double ZDS_change_Z = -0.3114;
+
+        // Отфильтровываем модели рельсового пути (с "track" в имени объекта)
+        if (   (zds_object->obj_name.find("track") == zds_object->obj_name.npos)
+            || (zds_object->obj_name.find("Track") == zds_object->obj_name.npos))
+        {
+            // Опускаем привязки всех прочих моделей в маршруте
+            zds_object->position.z += ZDS_change_Z;
+        }
+        else
+        {
+            // Рельсы будем опускать через изменение меша при конвертации в .gltf
+            // а в route1.map только корректируем положение привязки с учётом,
+            // что новый меш будет по-другому реагировать на вращения-наклоны
+            if (   ((std::abs(zds_object->attitude.x) > 1.0e-5) && (std::abs(zds_object->attitude.x) < 90.0))
+                || ((std::abs(zds_object->attitude.y) > 1.0e-5) && (std::abs(zds_object->attitude.y) < 90.0)))
+            {
+                const double radian_X = zds_object->attitude.x * M_PI / 180.0;
+                const double radian_Y = zds_object->attitude.y * M_PI / 180.0;
+                const double radian_Z = zds_object->attitude.z * M_PI / 180.0;
+
+                const double coeff_X_by_Y = std::sin(radian_Y);
+                const double coeff_Y_by_X = std::sin(-radian_X);
+                const double coeff_Z_by_X = (1.0 - std::cos(radian_X));
+                const double coeff_Z_by_Y = (1.0 - std::cos(radian_Y));
+
+                zds_object->position.x += ZDS_change_Z * (coeff_X_by_Y * std::sin(radian_Z) + coeff_Y_by_X * std::cos(radian_Z));
+                zds_object->position.y += ZDS_change_Z * (coeff_Y_by_X * std::sin(radian_Z) + coeff_X_by_Y * std::cos(radian_Z));
+                zds_object->position.y += ZDS_change_Z * (1.0 - coeff_Z_by_X * coeff_Z_by_Y);
+            }
+        }
 
         map_data.push_back(zds_object);
         may_add_info_to_last = true;

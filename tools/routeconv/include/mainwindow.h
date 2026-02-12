@@ -41,6 +41,7 @@ private:
     QProcess    profconvProc;
     QProcess    dmd2gltfProc;
     QProcess    topologyCheckProc;
+    QProcess    transformRouteProc;
     QProcess    parallelGenProc;
     QProcess    splineGenProc;
 
@@ -61,6 +62,8 @@ private:
 
     void startTopologyChecker();
 
+    void startTransformRoute();
+
     void startParallelGenerator();
 
     void startSplineGenerator();
@@ -80,6 +83,8 @@ private slots:
     void slotIsDmd2gltfFinished(int error_code, QProcess::ExitStatus exitstatus);
 
     void slotCheckTopology();
+
+    void slotTransformRoute();
 
     void slotGenerateParallel();
 

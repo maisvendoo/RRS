@@ -51,7 +51,8 @@ private:
                              std::string &in_texture_path,
                              std::string &gltf_directory_path,
                              std::string &out_relative_bin_path,
-                             std::string &out_relative_texture_path);
+                             std::string &out_relative_texture_path,
+                             float change_vertices_Z = 0.0);
 
 private:
 
