@@ -38,12 +38,12 @@
 
 
 	<Cabine>
-		<DriverPos>2.0 12.0 2.5</DriverPos>
+		<DriverPos>2.0 12.0 2.2</DriverPos>
 		<DriverDir>30.0</DriverDir>
 	</Cabine>
 
 	<Cabine>
-		<DriverPos>-2.0 -12.0 2.5</DriverPos>
+		<DriverPos>-2.0 -12.0 2.2</DriverPos>
 		<DriverDir>-150.0</DriverDir>
 	</Cabine>
 
@@ -55,26 +55,26 @@
 
 	<Model>
 		<ModelName>default-objects/rail_skid.gltf</ModelName>
-		<ModelShift>0.8 -9.705 0.312</ModelShift>
+		<ModelShift>0.8 -9.705 0.0</ModelShift>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
 
 	<Model>
 		<ModelName>default-objects/rail_skid.gltf</ModelName>
-		<ModelShift>0.8 7.295 0.312</ModelShift>
+		<ModelShift>0.8 7.295 0.0</ModelShift>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
 
 	<Model>
 		<ModelName>default-objects/rail_skid.gltf</ModelName>
-		<ModelShift>-0.8 9.705 0.312</ModelShift>
+		<ModelShift>-0.8 9.705 0.0</ModelShift>
 		<ModelRotate>0.0 0.0 180.0</ModelRotate>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
 
 	<Model>
 		<ModelName>default-objects/rail_skid.gltf</ModelName>
-		<ModelShift>-0.8 -7.295 0.312</ModelShift>
+		<ModelShift>-0.8 -7.295 0.0</ModelShift>
 		<ModelRotate>0.0 0.0 180.0</ModelRotate>
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>

@@ -7,6 +7,7 @@
 #define PROFCONV "profconv"
 #define DMD2GLTF "dmd2gltf"
 #define TOPOLOGYCHECK "topologycheck"
+#define ROUTETRANSFORM "route-transform"
 #define PARALLELGEN "offset-parallel-gen"
 #define SPLINEGEN "offset-spline-gen"
 

@@ -335,11 +335,21 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             }
             model_data.model_file_name = out_gltf_model_name;
 
+            // Поскольку уровень головки рельса в ZDS маршрутах находится не в нуле,
+            // а поднят в среднем на 0.3114, смещаем меш у моделей рельс (с "track" в имени объекта)
+            float change_vertices_Z = -0.3114f;
+            if (   (label.find("track") == label.npos)
+                || (label.find("Track") == label.npos))
+            {
+                change_vertices_Z = 0.0f;
+            }
+
             if (generate_gltf_model(model_data,
                                     in_texture_path,
                                     out_gltf_model_dir,
                                     out_relative_bin_path,
-                                    out_relative_texture_path))
+                                    out_relative_texture_path,
+                                    change_vertices_Z))
             {
                 // Записываем новые модели, кроме неба
                 if (label != skybox_label)
@@ -627,12 +637,13 @@ bool Application::generate_gltf_model(Geometry& model_data,
                                       std::string &in_texture_path,
                                       std::string &gltf_directory_path,
                                       std::string &out_relative_bin_path,
-                                      std::string &out_relative_texture_path)
+                                      std::string &out_relative_texture_path,
+                                      float change_vertices_Z)
 {
     for (auto& vertex : model_data.vertices)
     {
         std::swap(vertex.pos.y, vertex.pos.z);
-        vertex.pos.z = -vertex.pos.z;
+        vertex.pos.z = -vertex.pos.z + change_vertices_Z;
         std::swap(vertex.normal.y, vertex.normal.z);
         vertex.normal.z = -vertex.normal.z;
     }

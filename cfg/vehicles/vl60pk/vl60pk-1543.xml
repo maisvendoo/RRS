@@ -36,25 +36,24 @@
 
 
 	<Cabine>
-		<DriverPos>0.8 8.4 3.6</DriverPos>
+		<DriverPos>0.8 8.4 3.2</DriverPos>
 		<DriverDir>0.0</DriverDir>
 	</Cabine>
 
 	<Cabine>
-		<DriverPos>-0.8 -8.4 3.6</DriverPos>
+		<DriverPos>-0.8 -8.4 3.2</DriverPos>
 		<DriverDir>180.0</DriverDir>
 	</Cabine>
 
 
 	<Model>
 		<ModelName>VL60pk-1543/VL60pk-1543.gltf</ModelName>
-		<ModelShift>0.0 0.0 0.312</ModelShift>
 		<AnimationsConfigDir>vl60</AnimationsConfigDir>
 	</Model>
 
 	<Model>
 		<ModelName>VL60pk-1543/VL60pk-cabview.gltf</ModelName>
-		<ModelShift>0.0 0.0 0.317</ModelShift>
+		<ModelShift>0.0 0.0 0.005</ModelShift>
 		<AnimationsConfigDir>vl60</AnimationsConfigDir>
 	</Model>
 <!-- Закомментировал, пока не реализовано в коде
