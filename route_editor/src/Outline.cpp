@@ -44,11 +44,38 @@ Outline::Outline(const settings_t& settings,
     , paged_lod(paged_lod)
 {
     assert(paged_lod);
+
+    // static OutlineStatic outline_static;
+
+    // const auto options = outline_static.options;
+    // auto& builder = outline_static.builder;
+
+    // const auto wireframe_outline = vsg::read_cast<vsg::Node>(
+    //     paged_lod->filename, options);
+
+    // vsg::ComputeBounds compute_bounds;
+    // compute_bounds.useNodeBounds = false;
+    // wireframe_outline->accept(compute_bounds);
+
+    // const vsg::GeometryInfo geometry_info(vsg::box(compute_bounds.bounds));
+
+    // vsg::StateInfo state_info;
+    // state_info.blending = true;
+    // state_info.wireframe = true;
+
+    // const auto box_outline = builder.createBox(geometry_info, state_info);
+
+    // if (settings.show_wireframe)
+    // {
+    //     this->addChild(wireframe_outline);
+    // }
+
+    // this->addChild(box_outline);
 }
 
 void Outline::load(vsg::observer_ptr<vsg::Viewer> observer_viewer)
 {
-    if (box != nullptr)
+    if (box)
     {
         return;
     }
@@ -62,8 +89,7 @@ void Outline::load(vsg::observer_ptr<vsg::Viewer> observer_viewer)
     compute_bounds.useNodeBounds = false;
     paged_lod->pending->accept(compute_bounds);
 
-    vsg::GeometryInfo geometry_info(vsg::box(compute_bounds.bounds));
-    geometry_info.color = vsg::vec4{1.0f, 0.6f, 0.0f, 0.4f};
+    const vsg::GeometryInfo geometry_info(vsg::box(compute_bounds.bounds));
 
     vsg::StateInfo state_info;
     state_info.blending = true;
@@ -92,8 +118,8 @@ OutlineStatic::OutlineStatic()
     options->add(vsgXchange::all::create());
 
     const auto flat_shader = vsg::createFlatShadedShaderSet(options);
-    const auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
-    const auto phong_shader = vsg::createPhongShaderSet(options);
+    // const auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
+    // const auto phong_shader = vsg::createPhongShaderSet(options);
 
     const FileSystem& fs = FileSystem::getInstance();
     const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
@@ -105,8 +131,8 @@ OutlineStatic::OutlineStatic()
         shaders_dir.c_str(), "outline.frag", options);
 
     configure_shader_set(vert_shader, frag_shader, "flat", flat_shader);
-    configure_shader_set(vert_shader, frag_shader, "pbr", pbr_shader);
-    configure_shader_set(vert_shader, frag_shader, "phong", phong_shader);
+    // configure_shader_set(vert_shader, frag_shader, "pbr", pbr_shader);
+    // configure_shader_set(vert_shader, frag_shader, "phong", phong_shader);
 
 //     VkPipelineColorBlendAttachmentState color_blend_attachment = {};
 //     color_blend_attachment.blendEnable = VK_TRUE;
@@ -131,6 +157,7 @@ OutlineStatic::OutlineStatic()
     const auto rasterization_state = vsg::RasterizationState::create();
     rasterization_state->cullMode = VK_CULL_MODE_NONE;
     rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
+    rasterization_state->lineWidth = 2.0f;
 
     const vsg::GraphicsPipelineStates default_graphics_pipeline_states = {
         vsg::VertexInputState::create(),
@@ -144,18 +171,18 @@ OutlineStatic::OutlineStatic()
     flat_shader->defaultGraphicsPipelineStates =
         default_graphics_pipeline_states;
 
-    pbr_shader->defaultGraphicsPipelineStates =
-        default_graphics_pipeline_states;
+    // pbr_shader->defaultGraphicsPipelineStates =
+    //     default_graphics_pipeline_states;
 
-    phong_shader->defaultGraphicsPipelineStates =
-        default_graphics_pipeline_states;
+    // phong_shader->defaultGraphicsPipelineStates =
+    //     default_graphics_pipeline_states;
 
-    options->shaderSets.clear();
-    options->shaderSets["flat"] = flat_shader;
-    options->shaderSets["pbr"] = pbr_shader;
-    options->shaderSets["phong"] = phong_shader;
+    // options->shaderSets.clear();
+    // options->shaderSets["flat"] = flat_shader;
+    // options->shaderSets["pbr"] = pbr_shader;
+    // options->shaderSets["phong"] = phong_shader;
 
-    builder.options = options;
-    builder.sharedObjects = options->sharedObjects;
+    // builder.options = options;
+    // builder.sharedObjects = options->sharedObjects;
     builder.shaderSet = flat_shader;
 }
