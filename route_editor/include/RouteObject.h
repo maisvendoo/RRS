@@ -44,15 +44,15 @@ public:
 
     void move(vsg::vec3 translation, bool update_matrix = true);
 
+    void select() const;
+    void deselect() const;
+
     void save_translation();
     void save_rotation();
     void save_scale();
 
     void update_matrix();
     void update_bounds();
-
-    vsg::ref_ptr<SwitchGroup> get_switch_group() const;
-    vsg::ref_ptr<vsg::PagedLOD> get_paged_lod() const;
 
 public:
     enum class State
@@ -79,8 +79,7 @@ private:
 
     vsg::box bounds;
 
-    vsg::ref_ptr<SwitchGroup> switch_group;
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod;
+    vsg::ref_ptr<SingleSwitch> paged_lod_switch;
     vsg::ref_ptr<SingleSwitch> outline_switch;
 };
 

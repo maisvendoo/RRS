@@ -250,19 +250,7 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
 
     const auto select_object_inner = [&]() -> void
     {
-        const auto viewer = observer_viewer.ref_ptr();
-        const auto compile_manager = viewer->compileManager;
-
-        const auto outline = Outline::create(settings, object);
-
-        const auto compile_result = compile_manager->compile(outline);
-
-        object->get_switch_group()->addChild(vsg::Mask{MASK_GUI2}, outline);
-        object->outline = outline;
-        object->update_bounds();
-
-        vsg::updateViewer(*viewer, compile_result);
-
+        object->select();
         selected_objects.emplace_back(object);
     };
 
@@ -319,21 +307,7 @@ SelectedObjectsIterator ObjectSelector::deselect_object(
 {
     assert(object);
 
-    const auto switch_group = object->get_switch_group();
-    auto& switch_group_children = switch_group->children;
-
-    const auto outline = object->outline;
-
-    for (auto it = switch_group_children.begin();
-        it != switch_group_children.end(); ++it)
-    {
-        if (it->node == outline)
-        {
-            switch_group_children.erase(it);
-
-            break;
-        }
-    }
+    object->deselect();
 
     return selected_objects.erase(std::find(selected_objects.cbegin(),
         selected_objects.cend(), object));

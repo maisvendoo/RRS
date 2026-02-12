@@ -37,9 +37,10 @@ struct OutlineStatic
     vsg::Builder builder;
 };
 
-Outline::Outline(const settings_t& settings, const RouteObject* object)
+Outline::Outline(const settings_t& settings,
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod)
 {
-    assert(object);
+    assert(paged_lod);
 
     static OutlineStatic outline_static;
 
@@ -47,7 +48,7 @@ Outline::Outline(const settings_t& settings, const RouteObject* object)
     auto& builder = outline_static.builder;
 
     const auto wireframe_outline = vsg::read_cast<vsg::Node>(
-        object->get_paged_lod()->filename, options);
+        paged_lod->filename, options);
 
     vsg::ComputeBounds compute_bounds;
     compute_bounds.useNodeBounds = false;

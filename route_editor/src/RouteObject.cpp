@@ -3,7 +3,6 @@
 #include "Mask.h"
 #include "Outline.h"
 #include "SingleSwitch.h"
-#include "SwitchGroup.h"
 
 #include <vsg/core/Mask.h>
 #include <vsg/maths/box.h>
@@ -12,10 +11,10 @@
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/utils/ComputeBounds.h>
 
 #include <cassert>
 #include <string>
-#include <vsg/utils/ComputeBounds.h>
 
 static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
@@ -33,12 +32,14 @@ RouteObject::RouteObject(const settings_t& settings,
 
     update_matrix();
 
-    switch_group = SwitchGroup::create();
-    switch_group->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
+    paged_lod_switch = SingleSwitch::create(
+        vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
-    this->addChild(switch_group);
+    outline_switch = SingleSwitch::create(vsg::MASK_OFF,
+        Outline::create(settings, paged_lod));
 
-    this->paged_lod = paged_lod;
+    this->addChild(paged_lod_switch);
+    this->addChild(outline_switch);
 }
 
 vsg::vec3 RouteObject::get_translation() const
@@ -116,6 +117,16 @@ void RouteObject::move(vsg::vec3 translation, bool update_matrix)
     }
 }
 
+void RouteObject::select() const
+{
+    outline_switch->mask = MASK_GUI2;
+}
+
+void RouteObject::deselect() const
+{
+    outline_switch->mask = vsg::MASK_OFF;
+}
+
 void RouteObject::save_translation()
 {
     initial_translation = translation;
@@ -155,14 +166,4 @@ void RouteObject::update_bounds()
     compute_bounds.useNodeBounds = false;
     this->accept(compute_bounds);
     bounds = static_cast<vsg::box>(compute_bounds.bounds);
-}
-
-vsg::ref_ptr<SwitchGroup> RouteObject::get_switch_group() const
-{
-    return switch_group;
-}
-
-vsg::ref_ptr<vsg::PagedLOD> RouteObject::get_paged_lod() const
-{
-    return paged_lod;
 }
