@@ -16,7 +16,7 @@ class RotateObjectsCommand : public Command
 public:
     RotateObjectsCommand(
         const std::vector<vsg::ref_ptr<RouteObject>>& objects,
-        vsg::vec3 rotation
+        vsg::vec3 rotation_deg
     );
 
     virtual ~RotateObjectsCommand() override = default;
@@ -26,7 +26,7 @@ public:
 
 private:
     const std::vector<vsg::ref_ptr<RouteObject>> objects;
-    vsg::vec3 rotation;
+    vsg::vec3 rotation_deg;
 };
 
 

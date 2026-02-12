@@ -10,24 +10,33 @@
 
 RotateObjectsCommand::RotateObjectsCommand(
     const std::vector<vsg::ref_ptr<RouteObject>>& objects,
-    vsg::vec3 rotation
+    vsg::vec3 rotation_deg
 )
     : objects(objects)
-    , rotation(rotation)
+    , rotation_deg(rotation_deg)
 {
 }
 
 void RotateObjectsCommand::execute() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->rotate(rotation_deg);
+    }
 }
 
 void RotateObjectsCommand::undo() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->rotate(-rotation_deg);
+    }
 }
 
 std::string RotateObjectsCommand::to_string() const
 {
-    // TODO
+    char buffer[64];
+    std::snprintf(buffer, 64, "Rotate objects: { %10.3f, %10.3f, %10.3f }",
+        rotation_deg.x, rotation_deg.y, rotation_deg.z);
+    return buffer;
 }

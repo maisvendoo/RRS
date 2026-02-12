@@ -19,15 +19,24 @@ ScaleObjectsCommand::ScaleObjectsCommand(
 
 void ScaleObjectsCommand::execute() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->scale(scale);
+    }
 }
 
 void ScaleObjectsCommand::undo() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->scale(-scale);
+    }
 }
 
 std::string ScaleObjectsCommand::to_string() const
 {
-    // TODO
+    char buffer[64];
+    std::snprintf(buffer, 64, "Scale objects: { %10.3f, %10.3f, %10.3f }",
+        scale.x, scale.y, scale.z);
+    return buffer;
 }
