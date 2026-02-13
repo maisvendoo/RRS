@@ -47,7 +47,7 @@ RouteEditor::~RouteEditor() = default;
 bool RouteEditor::initialize()
 {
     const FileSystem& fs = FileSystem::getInstance();
-    settings.read(fs.combinePath(fs.getConfigDir(), "settings.xml"));
+    settings.read(fs.combinePath(fs.getConfigDir(), "editor-settings.xml"));
 
     Outline::set_settings(&settings);
 
