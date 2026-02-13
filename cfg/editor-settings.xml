@@ -97,7 +97,7 @@
         <CameraMoveSpeed>100.0</CameraMoveSpeed>
 
         <!-- Key bindings -->
-        <KeyMoveCameraForward>Q</KeyMoveCameraForward>
+        <KeyMoveCameraForward>Ctrl + W</KeyMoveCameraForward>
         <KeyMoveCameraBackward>S</KeyMoveCameraBackward>
         <KeyMoveCameraLeft>A</KeyMoveCameraLeft>
         <KeyMoveCameraRight>D</KeyMoveCameraRight>

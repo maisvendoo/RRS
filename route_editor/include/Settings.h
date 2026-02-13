@@ -1,6 +1,7 @@
 #ifndef EDITOR_SETTINGS_H
 #define EDITOR_SETTINGS_H
 
+#include "KeyBindings.h"
 #include <vsg/maths/vec3.h>
 #include <vsg/ui/KeyEvent.h>
 
@@ -62,12 +63,12 @@ struct settings_t
     bool show_camera_settings = false;
     bool show_topology = false;
 
-    vsg::KeySymbol key_move_camera_forward = vsg::KEY_w;
-    vsg::KeySymbol key_move_camera_backward = vsg::KEY_s;
-    vsg::KeySymbol key_move_camera_left = vsg::KEY_a;
-    vsg::KeySymbol key_move_camera_right = vsg::KEY_d;
-    vsg::KeySymbol key_move_objects = vsg::KEY_g;
-    vsg::KeySymbol key_rotate_objects = vsg::KEY_q;
+    KeyBinding key_move_camera_forward;
+    KeyBinding key_move_camera_backward;
+    KeyBinding key_move_camera_left;
+    KeyBinding key_move_camera_right;
+    KeyBinding key_move_objects;
+    KeyBinding key_rotate_objects;
 };
 
 #endif // EDITOR_SETTINGS_H

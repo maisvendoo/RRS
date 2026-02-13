@@ -1,7 +1,10 @@
 #include "Settings.h"
+#include "KeyBindings.h"
 
 #include <CfgReader.h>
 
+#include <qnamespace.h>
+#include <qregularexpression.h>
 #include <vsg/ui/KeyEvent.h>
 
 #include <QString>
@@ -87,18 +90,57 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getBool(section, "ShowCameraSettings", show_camera_settings);
     cfg.getBool(section, "ShowTopology", show_topology);
 
-    const auto get_key_setting = [&](const char* const name,
-        vsg::KeySymbol& key) -> void
+    const auto get_key_binding_setting = [&](const char* const name,
+        KeyBinding& key_binding) -> void
     {
-        cfg.getString(section, name, tmp_qstr);
-        key = static_cast<vsg::KeySymbol>(
-            tmp_qstr.front().toLower().toLatin1());
+        QString line;
+        cfg.getString(section, name, line);
+
+        line = line.toLower();
+
+        const auto strings = line.split(QRegularExpression("[ +]"),
+            Qt::SkipEmptyParts);
+
+        const auto strings_size = strings.size();
+
+        int modifiers = 0;
+
+        for (auto i = decltype(strings_size){0}; i < strings_size - 1; ++i)
+        {
+            static const std::map<std::string, MyKeyModifier> modifiers_map = {
+                {"lshift", MY_KEY_MODIFIER_LSHIFT},
+                {"rshift", MY_KEY_MODIFIER_RSHIFT},
+                {"lctrl", MY_KEY_MODIFIER_LCTRL},
+                {"rctrl", MY_KEY_MODIFIER_RCTRL},
+                {"lalt", MY_KEY_MODIFIER_LALT},
+                {"ralt", MY_KEY_MODIFIER_RALT},
+                {"shift", MY_KEY_MODIFIER_ANYSHIFT},
+                {"anyshift", MY_KEY_MODIFIER_ANYSHIFT},
+                {"ctrl", MY_KEY_MODIFIER_ANYCTRL},
+                {"anyctrl", MY_KEY_MODIFIER_ANYCTRL},
+                {"alt", MY_KEY_MODIFIER_ANYALT},
+                {"anyalt", MY_KEY_MODIFIER_ANYALT}
+            };
+
+            const auto str = strings[i];
+            for (const auto& [label, modifier] : modifiers_map)
+            {
+                if (str == label)
+                {
+                    modifiers |= modifier;
+                }
+            }
+        }
+
+        key_binding.modifiers = modifiers;
+        key_binding.key = static_cast<vsg::KeySymbol>(
+            strings.back().front().toLatin1());
     };
 
-    get_key_setting("KeyMoveCameraForward", key_move_camera_forward);
-    get_key_setting("KeyMoveCameraBackward", key_move_camera_backward);
-    get_key_setting("KeyMoveCameraLeft", key_move_camera_left);
-    get_key_setting("KeyMoveCameraRight", key_move_camera_right);
-    get_key_setting("KeyMoveObjects", key_move_objects);
-    get_key_setting("KeyRotateObjects", key_rotate_objects);
+    get_key_binding_setting("KeyMoveCameraForward", key_move_camera_forward);
+    get_key_binding_setting("KeyMoveCameraBackward", key_move_camera_backward);
+    get_key_binding_setting("KeyMoveCameraLeft", key_move_camera_left);
+    get_key_binding_setting("KeyMoveCameraRight", key_move_camera_right);
+    get_key_binding_setting("KeyMoveObjects", key_move_objects);
+    get_key_binding_setting("KeyRotateObjects", key_rotate_objects);
 }
