@@ -1,8 +1,12 @@
 #include "Action.h"
 
+#include <iterator>
 #include <map>
 
-static const std::map<Action, const char*> action_map = {
+using ActionNameMap = std::map<Action, const char*>;
+using ActionNamePair = ActionNameMap::value_type;
+
+static const ActionNamePair action_name_map_data[] = {
     {ACTION_MOVE_CAMERA_FORWARD, "Camera: move forward"},
     {ACTION_MOVE_CAMERA_BACKWARD, "Camera: move backward"},
     {ACTION_MOVE_CAMERA_LEFT, "Camera: move left"},
@@ -15,6 +19,12 @@ static const std::map<Action, const char*> action_map = {
     {ACTION_UNDO_COMMAND, "Undo command"},
     {ACTION_REDO_COMMAND, "Redo command"}
 };
+
+static_assert(sizeof action_name_map_data /
+    sizeof(ActionNamePair) == TOTAL_ACTIONS);
+
+static const ActionNameMap action_map(std::begin(action_name_map_data),
+    std::end(action_name_map_data));
 
 const char* to_c_string(Action action)
 {
