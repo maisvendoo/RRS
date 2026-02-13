@@ -1,15 +1,16 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <Config>
-    <Editor>
+    <!-- Настройки окна -->
+    <Window>
         <!-- Заголовок окна -->
-        <WindowTitle>Route Editor</WindowTitle>
+        <Title>Route Editor</Title>
         <!-- Положение окна, пикс. -->
-        <WindowX>50</WindowX>
-        <WindowY>50</WindowY>
+        <xPos>50</xPos>
+        <yPos>50</yPos>
         <!-- Размер окна, пикс. -->
-        <WindowWidth>1800</WindowWidth>
-        <WindowHeight>900</WindowHeight>
-        <!-- Номер монитора; 0 для монитора по умолчанию -->
+        <Width>1800</Width>
+        <Height>900</Height>
+        <!-- Номер монитора; 0 - для монитора по-умолчанию -->
         <ScreenNumber>0</ScreenNumber>
         <!-- Полноэкранный режим: 1 - включен; 0 - оконный режим -->
         <FullScreen>0</FullScreen>
@@ -19,47 +20,61 @@
         <DoubleBuffer>1</DoubleBuffer>
         <!-- Мультисемплинг (сглаживание) -->
         <Samples>8</Samples>
-
+    </Window>
+    <!-- Настройки камеры -->
+    <Camera>
         <!-- Ближняя плоскость отсечения, м. -->
         <zNear>0.1</zNear>
         <!-- Дальняя плоскость отсечения (дальность видимости), м. -->
         <ViewDistance>2000.0</ViewDistance>
-
-        <!-- Минимальный угол поля зрения, град. -->
-        <FovYMin>30</FovYMin>
-        <!-- Максимальный угол поля зрения, град. -->
-        <FovYMax>120</FovYMax>
-        <!-- Угол поля зрения по умолчанию, град. -->
+        <!-- Угол поля зрения, град. -->
         <FovY>90</FovY>
-
+        <FovYMin>30</FovYMin>
+        <FovYMax>120</FovYMax>
+        <!-- Начальная высота камеры -->
+        <InitialHeight>5.0</InitialHeight>
+        <!-- Скорость перемещения камеры -->
+        <MoveSpeed>100.0</MoveSpeed>
+        <MinMoveSpeed>10.0</MinMoveSpeed>
+        <MaxMoveSpeed>200.0</MaxMoveSpeed>
+        <!-- Скорость вращения камеры -->
+        <RotateSpeed>20.0</RotateSpeed>
+        <MinRotateSpeed>10.0</MinRotateSpeed>
+        <MaxRotateSpeed>25.0</MaxRotateSpeed>
+        <!-- Сила приближения/отдаления камеры -->
+        <ZoomPower>250.0</ZoomPower>
+        <MinZoomPower>50.0</MinZoomPower>
+        <MaxZoomPower>500.0</MaxZoomPower>
+    </Camera>
+    <!-- Настройки гизмо -->
+    <Gizmo>
         <!-- Длина стрелок гизмо -->
-        <GizmoArrowLength>3.0</GizmoArrowLength>
+        <ArrowLength>3.0</ArrowLength>
         <!-- Толщина стрелок гизмо-->
-        <GizmoArrowThickness>0.05</GizmoArrowThickness>
+        <ArrowThickness>0.05</ArrowThickness>
         <!-- Цвет оси X гизмо -->
-        <GizmoXAxisColorR>0.859</GizmoXAxisColorR>
-        <GizmoXAxisColorG>0.188</GizmoXAxisColorG>
-        <GizmoXAxisColorB>0.143</GizmoXAxisColorB>
+        <XAxisColorR>0.859</XAxisColorR>
+        <XAxisColorG>0.188</XAxisColorG>
+        <XAxisColorB>0.143</XAxisColorB>
         <!-- Цвет оси Y гизмо -->
-        <GizmoYAxisColorR>0.533</GizmoYAxisColorR>
-        <GizmoYAxisColorG>0.820</GizmoYAxisColorG>
-        <GizmoYAxisColorB>0.298</GizmoYAxisColorB>
+        <YAxisColorR>0.533</YAxisColorR>
+        <YAxisColorG>0.820</YAxisColorG>
+        <YAxisColorB>0.298</YAxisColorB>
         <!-- Цвет оси Z гизмо -->
-        <GizmoZAxisColorR>0.188</GizmoZAxisColorR>
-        <GizmoZAxisColorG>0.438</GizmoZAxisColorG>
-        <GizmoZAxisColorB>0.859</GizmoZAxisColorB>
+        <ZAxisColorR>0.188</ZAxisColorR>
+        <ZAxisColorG>0.438</ZAxisColorG>
+        <ZAxisColorB>0.859</ZAxisColorB>
         <!-- Непрозрачность гизмо -->
-        <GizmoOpacity>1.0</GizmoOpacity>
+        <Opacity>1.0</Opacity>
         <!-- Центрировать гизмо -->
-        <GizmoToCenter>0</GizmoToCenter>
-
-        <!-- Отображать wireframe сетку объектов при выделении -->
-        <ShowWireframe>1</ShowWireframe>
-
+        <ToCenter>0</ToCenter>
+    </Gizmo>
+    <!-- Настройки GUI (графического интерфейса пользователя) -->
+    <GUI>
         <!-- Размер шрифта GUI -->
-        <GuiFontSize>20.0</GuiFontSize>
+        <FontSize>20.0</FontSize>
         <!-- Можно ли перемещать и менять размер GUI -->
-        <IsGuiEditable>1</IsGuiEditable>
+        <IsEditable>1</IsEditable>
         <!-- Отображать список моделей в objects.ref после загрузки маршрута -->
         <ShowObjectsRef>1</ShowObjectsRef>
         <!-- Отображать список объектов в route1.map после загрузки маршрута -->
@@ -71,39 +86,15 @@
         <ShowCameraSettings>0</ShowCameraSettings>
         <!-- Отображать топологию -->
         <ShowTopology>0</ShowTopology>
-
-        <!-- Начальная высота камеры -->
-        <CameraInitialHeight>5.0</CameraInitialHeight>
-
-        <!-- Минимальная скорость вращения камеры -->
-        <MinCameraRotateSpeed>10.0</MinCameraRotateSpeed>
-        <!-- Максимальная скорость вращения камеры -->
-        <MaxCameraRotateSpeed>25.0</MaxCameraRotateSpeed>
-        <!-- Скорость вращения камеры -->
-        <CameraRotateSpeed>20.0</CameraRotateSpeed>
-
-        <!-- Минимальная сила приближения/отдаления камеры -->
-        <MinCameraZoomPower>50.0</MinCameraZoomPower>
-        <!-- Максимальная сила приближения/отдаления камеры -->
-        <MaxCameraZoomPower>500.0</MaxCameraZoomPower>
-        <!-- Сила приближения/отдаления камеры -->
-        <CameraZoomPower>250.0</CameraZoomPower>
-
-        <!-- Минимальная скорость перемещения камеры -->
-        <MinCameraMoveSpeed>10.0</MinCameraMoveSpeed>
-        <!-- Максимальная скорость перемещения камеры -->
-        <MaxCameraMoveSpeed>200.0</MaxCameraMoveSpeed>
-        <!-- Скорость перемещения камеры -->
-        <CameraMoveSpeed>100.0</CameraMoveSpeed>
-
-        <!-- Key bindings -->
-        <KeyMoveCameraForward>Ctrl + W</KeyMoveCameraForward>
-        <KeyMoveCameraBackward>S</KeyMoveCameraBackward>
-        <KeyMoveCameraLeft>A</KeyMoveCameraLeft>
-        <KeyMoveCameraRight>D</KeyMoveCameraRight>
-        <KeyMoveObjects>G</KeyMoveObjects>
-        <KeyRotateObjects>R</KeyRotateObjects>
-        <KeyScaleObjects>S</KeyScaleObjects>
-
-    </Editor>
+    </GUI>
+    <!-- Настройки клавиатурных комбинаций управления -->
+    <Keys>
+        <MoveCameraForward>W</MoveCameraForward>
+        <MoveCameraBackward>S</MoveCameraBackward>
+        <MoveCameraLeft>A</MoveCameraLeft>
+        <MoveCameraRight>D</MoveCameraRight>
+        <MoveObjects>G</MoveObjects>
+        <RotateObjects>R</RotateObjects>
+        <ScaleObjects>S</ScaleObjects>
+    </Keys>
 </Config>
