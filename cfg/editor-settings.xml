@@ -96,5 +96,9 @@
         <MoveObjects>G</MoveObjects>
         <RotateObjects>R</RotateObjects>
         <ScaleObjects>S</ScaleObjects>
+        <CopyObjects>Ctrl + C</CopyObject>
+        <PasteObjects>Ctrl + V</PasteObjects>
+        <UndoCommand>Ctrl + Z</UndoCommand>
+        <RedoCommand>Ctrl + Y</RedoCommand>
     </Keys>
 </Config>
