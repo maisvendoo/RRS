@@ -108,18 +108,18 @@ void settings_t::read(const std::string& cfg_path)
         for (auto i = decltype(strings_size){0}; i < strings_size - 1; ++i)
         {
             static const std::map<std::string, MyKeyModifier> modifiers_map = {
-                {"lshift", MY_KEY_MODIFIER_LSHIFT},
-                {"rshift", MY_KEY_MODIFIER_RSHIFT},
-                {"lctrl", MY_KEY_MODIFIER_LCTRL},
-                {"rctrl", MY_KEY_MODIFIER_RCTRL},
-                {"lalt", MY_KEY_MODIFIER_LALT},
-                {"ralt", MY_KEY_MODIFIER_RALT},
-                {"shift", MY_KEY_MODIFIER_ANYSHIFT},
-                {"anyshift", MY_KEY_MODIFIER_ANYSHIFT},
-                {"ctrl", MY_KEY_MODIFIER_ANYCTRL},
-                {"anyctrl", MY_KEY_MODIFIER_ANYCTRL},
-                {"alt", MY_KEY_MODIFIER_ANYALT},
-                {"anyalt", MY_KEY_MODIFIER_ANYALT}
+                {"lshift", MY_KEY_MODIFIER_SHIFT_L},
+                {"rshift", MY_KEY_MODIFIER_SHIFT_R},
+                {"shift", MY_KEY_MODIFIER_SHIFT_ANY},
+                {"anyshift", MY_KEY_MODIFIER_SHIFT_ANY},
+                {"lctrl", MY_KEY_MODIFIER_CTRL_L},
+                {"rctrl", MY_KEY_MODIFIER_CTRL_R},
+                {"ctrl", MY_KEY_MODIFIER_CTRL_ANY},
+                {"anyctrl", MY_KEY_MODIFIER_CTRL_ANY},
+                {"lalt", MY_KEY_MODIFIER_ALT_L},
+                {"ralt", MY_KEY_MODIFIER_ALT_R},
+                {"alt", MY_KEY_MODIFIER_ALT_ANY},
+                {"anyalt", MY_KEY_MODIFIER_ALT_ANY}
             };
 
             const auto str = strings[i];

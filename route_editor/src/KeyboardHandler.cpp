@@ -82,34 +82,39 @@ bool KeyboardHandler::get_binding_state(Action action) const
         return false;
     }
 
-    static const std::map<int, std::vector<vsg::KeySymbol>> modifiers_map = {
-        {MY_KEY_MODIFIER_NONE, {}},
-        {MY_KEY_MODIFIER_LSHIFT, {vsg::KEY_Shift_L}},
-        {MY_KEY_MODIFIER_RSHIFT, {vsg::KEY_Shift_R}},
-        {MY_KEY_MODIFIER_LCTRL, {vsg::KEY_Control_L}},
-        {MY_KEY_MODIFIER_RCTRL, {vsg::KEY_Control_R}},
-        {MY_KEY_MODIFIER_LALT, {vsg::KEY_Alt_L}},
-        {MY_KEY_MODIFIER_RALT, {vsg::KEY_Alt_R}},
-        {MY_KEY_MODIFIER_ANYSHIFT, {vsg::KEY_Shift_L, vsg::KEY_Shift_R}},
-        {MY_KEY_MODIFIER_ANYCTRL, {vsg::KEY_Control_L, vsg::KEY_Control_R}},
-        {MY_KEY_MODIFIER_ANYALT, {vsg::KEY_Alt_L, vsg::KEY_Alt_R}}
+    static const std::map<MyKeyModifier, std::vector<vsg::KeySymbol>> modifiers_map = {
+        {MY_KEY_MODIFIER_SHIFT_L, {vsg::KEY_Shift_L}},
+        {MY_KEY_MODIFIER_SHIFT_R, {vsg::KEY_Shift_R}},
+        {MY_KEY_MODIFIER_SHIFT_ANY, {vsg::KEY_Shift_L, vsg::KEY_Shift_R}},
+        {MY_KEY_MODIFIER_CTRL_L, {vsg::KEY_Control_L}},
+        {MY_KEY_MODIFIER_CTRL_R, {vsg::KEY_Control_R}},
+        {MY_KEY_MODIFIER_CTRL_ANY, {vsg::KEY_Control_L, vsg::KEY_Control_R}},
+        {MY_KEY_MODIFIER_ALT_L, {vsg::KEY_Alt_L}},
+        {MY_KEY_MODIFIER_ALT_R, {vsg::KEY_Alt_R}},
+        {MY_KEY_MODIFIER_ALT_ANY, {vsg::KEY_Alt_L, vsg::KEY_Alt_R}}
     };
 
-    const auto& modifiers = modifiers_map.at(key_binding.modifiers);
-    if (modifiers.empty())
+    for (const auto& [modifier, keys] : modifiers_map)
     {
-        return true;
-    }
-
-    for (const vsg::KeySymbol modifier : modifiers)
-    {
-        if (get_key_state(modifier))
+        if (key_binding.modifiers & modifier)
         {
-            return true;
+            bool pressed = false;
+            for (const auto& key : keys)
+            {
+                if (get_key_state(key))
+                {
+                    pressed = true;
+                    break;
+                }
+            }
+            if (!pressed)
+            {
+                return false;
+            }
         }
     }
 
-    return false;
+    return true;
 }
 
 const KeyBindings& KeyboardHandler::get_key_bindings() const
