@@ -151,6 +151,56 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Trajectory::setFwdSwitch(Switch *switch_ptr)
+{
+    fwd_switch = switch_ptr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::setBwdSwitch(Switch *switch_ptr)
+{
+    bwd_switch = switch_ptr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Switch* Trajectory::getNextSwitch(dir_t& dir) const
+{
+    if (dir == FWD)
+    {
+        dir = static_cast<dir_t>(dir * fwd_switch->getTrajOrientation(this));
+        return fwd_switch;
+    }
+    if (dir == BWD)
+    {
+        dir = static_cast<dir_t>(dir * bwd_switch->getTrajOrientation(this));
+        return bwd_switch;
+    }
+    return nullptr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Switch *Trajectory::getFwdSwitch() const
+{
+    return fwd_switch;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Switch *Trajectory::getBwdSwitch() const
+{
+    return bwd_switch;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 const std::vector<TrajectoryDevice *>& Trajectory::getTrajectoryDevices() const
 {
     return devices;
@@ -239,11 +289,11 @@ bool Trajectory::isBusy(double coord_begin, double coord_end) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int Trajectory::getBusyVehicle(double &distance, double coord, double search_distance, int direction)
+int Trajectory::getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction)
 {
     double coord_begin = coord;
     double coord_end = coord;
-    if (direction == -1)
+    if (direction == BWD)
     {
         coord_begin = coord_begin - search_distance;
         if (is_busy)
@@ -274,17 +324,19 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
         {
             distance = distance + coord_end;
 
-            if (bwd_connector == nullptr)
+            Switch* bwd_sw = getNextSwitch(direction);
+            if (bwd_sw == nullptr)
                 return -1;
 
-            Trajectory *traj = bwd_connector->getBwdTraj();
+            Trajectory *traj = bwd_switch->getNextTraj(direction);
             if (traj == nullptr)
                 return -1;
 
-            return traj->getBusyVehicle(distance, traj->getLength(), -coord_begin, -1);
+            return traj->getBusyVehicle(distance, traj->getLength(), -coord_begin, direction);
         }
     }
-    else
+
+    if (direction == FWD)
     {
         coord_end = coord_end + search_distance;
         if (is_busy)
@@ -315,14 +367,15 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
         {
             distance = distance + len - coord_begin;
 
-            if (fwd_connector == nullptr)
+            Switch* bwd_sw = getNextSwitch(direction);
+            if (bwd_sw == nullptr)
                 return -1;
 
-            Trajectory *traj = fwd_connector->getFwdTraj();
+            Trajectory *traj = bwd_switch->getNextTraj(direction);
             if (traj == nullptr)
                 return -1;
 
-            return traj->getBusyVehicle(distance, 0.0, coord_end - len, 1);
+            return traj->getBusyVehicle(distance, 0.0, coord_end - len, direction);
         }
     }
 

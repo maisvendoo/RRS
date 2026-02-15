@@ -1,8 +1,9 @@
-#include    <vehicle-controller.h>
+#include    "vehicle-controller.h"
 
-#include    <connector.h>
+#include    "Trajectory.h"
+#include    "Switch.h"
 
-#include    "physics.h"
+#include    <physics.h>
 
 //------------------------------------------------------------------------------
 //
@@ -47,12 +48,83 @@ void VehicleController::setCoord(double x)
     traj_coord += x - x_cur + x_off;
     // Обновляем значение дуговой координаты
     x_cur = x;
-    // Обнуляем выход за тупики топологии
-    x_off = 0.0;
 
     // Инициализируем предыдущую траекторию как текущую
     prev_traj = current_traj;
 
+    // Смещаемся на следующие траектории
+    dir_t move_dir;
+    while (true)
+    {
+        if (traj_coord < 0.0)
+        {
+            // Если траекторная координата меньше нуля - заехали за стрелку сзади
+            move_dir = BWD;
+            // Запоминаем выход за пределы траектории
+            x_off = traj_coord;
+        }
+        else
+        {
+            if (traj_coord > current_traj->getLength())
+            {
+                // Если траекторная координата превысила длину траектории - заехали за стрелку спереди
+                move_dir = FWD;
+                // Запоминаем выход за пределы траектории
+                x_off = traj_coord - current_traj->getLength();
+            }
+            else
+            {
+                // Остались в пределах траектории:
+                // обнуляем смещение за пределы топологии и выходим
+                x_off = 0.0;
+                break;
+            }
+        }
+
+        // Отслеживаем разворот ориентации траектории
+        dir_t new_dir = move_dir;
+
+        // Получаем указатель на стрелку в конце траектории
+        Switch* next_sw = current_traj->getNextSwitch(new_dir);
+        if (next_sw == nullptr)
+        {
+            // Если коннектора нет, останавливаемся на краю траектории и выходим
+            traj_coord = traj_coord - x_off;
+            break;
+        }
+
+        // Получаем указатель на ту траекторию, с которой нас соединяет стрелка
+        Trajectory* next_traj = next_sw->getNextTraj(new_dir);
+
+        // Если за стрелкой нет траектории,
+        // остаёмся на исходной траектории, останавливаемся на краю и выходим
+        if (next_traj == nullptr)
+        {
+            traj_coord = traj_coord - x_off;
+            break;
+        }
+
+        // Обновляем текущую траекторию
+        current_traj = next_traj;
+        if (new_dir != move_dir)
+        {
+            // Если ориентация траектории изменилась, разворачиваемся
+            dir = -dir;
+            x_off = -x_off;
+        }
+
+        // Смещаемся на новую траекторию, на величину смещения за пределы прежней
+        if (new_dir == BWD)
+        {
+            // Если смещаемся назад, начинаем отсчёт с конца траектории
+            traj_coord = current_traj->getLength() + x_off;
+        }
+        else
+        {
+            traj_coord = x_off;
+        }
+    }
+/*
     // Если траекторная координата превысила длину траектории
     // (заехали за стык или стрелку спереди), пока она её превышает...
     while (traj_coord > current_traj->getLength())
@@ -119,7 +191,7 @@ void VehicleController::setCoord(double x)
         // Добавляем к траекторной координате длину новой траектории,
         // чтобы получить координату на новой траектории сзади
         traj_coord = current_traj->getLength() + traj_coord;
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------

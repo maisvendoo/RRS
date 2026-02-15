@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Switch::Switch(QObject *parent) : Connector(parent)
+Switch::Switch(QObject *parent) : QObject(parent)
 {
 
 }
@@ -24,51 +24,45 @@ Switch::~Switch()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Trajectory *Switch::getFwdTraj() const
+Trajectory *Switch::getNextTraj(dir_t &dir) const
 {
-    // Если траектория вперёд единственная - делать дальше нечего
-    if (fwdMinusTraj == nullptr)
+    if (dir == FWD)
     {
-        return fwdPlusTraj;
+        if (state_fwd > 0)
+        {
+            // Направление вперёд, стрелка в плюсовом положении
+            const Switch_way_t way = SW_FWD_PLUS;
+            // Заменяем ориентацию траектории
+            dir = static_cast<dir_t>(dir * orientations[way]);
+            // Возвращаем указатель на траекторию
+            return trajectories[way];
+        }
+        if (state_fwd < 0)
+        {
+            // Направление вперёд, стрелка в минусовом положении
+            const Switch_way_t way = SW_FWD_MINUS;
+            dir = static_cast<dir_t>(dir * orientations[way]);
+            return trajectories[way];
+        }
     }
-    if (fwdPlusTraj == nullptr)
+    if (dir == BWD)
     {
-        return fwdMinusTraj;
+        if (state_bwd > 0)
+        {
+            // Направление назад, стрелка в плюсовом положении
+            const Switch_way_t way = SW_BWD_PLUS;
+            dir = static_cast<dir_t>(dir * orientations[way]);
+            return trajectories[way];
+        }
+        if (state_bwd < 0)
+        {
+            // Направление назад, стрелка в минусовом положении
+            const Switch_way_t way = SW_BWD_MINUS;
+            dir = static_cast<dir_t>(dir * orientations[way]);
+            return trajectories[way];
+        }
     }
-
-    // Стрелка в минусовом положении
-    if (state_fwd < 0)
-    {
-        return fwdMinusTraj;
-    }
-
-    // Стрелка в плюсовом положении
-    return fwdPlusTraj;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-Trajectory *Switch::getBwdTraj() const
-{
-    // Если траектория вперёд единственная - делать дальше нечего
-    if (bwdMinusTraj == nullptr)
-    {
-        return bwdPlusTraj;
-    }
-    if (bwdPlusTraj == nullptr)
-    {
-        return bwdMinusTraj;
-    }
-
-    // Стрелка в минусовом положении
-    if (state_bwd < 0)
-    {
-        return bwdMinusTraj;
-    }
-
-    // Стрелка в плюсовом положении
-    return bwdPlusTraj;
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -76,7 +70,7 @@ Trajectory *Switch::getBwdTraj() const
 //------------------------------------------------------------------------------
 Trajectory* Switch::get_fwd_minus_traj() const
 {
-    return fwdMinusTraj;
+    return trajectories[SW_FWD_MINUS];
 }
 
 //------------------------------------------------------------------------------
@@ -84,7 +78,7 @@ Trajectory* Switch::get_fwd_minus_traj() const
 //------------------------------------------------------------------------------
 Trajectory* Switch::get_fwd_plus_traj() const
 {
-    return fwdPlusTraj;
+    return trajectories[SW_FWD_PLUS];
 }
 
 //------------------------------------------------------------------------------
@@ -92,7 +86,7 @@ Trajectory* Switch::get_fwd_plus_traj() const
 //------------------------------------------------------------------------------
 Trajectory* Switch::get_bwd_minus_traj() const
 {
-    return bwdMinusTraj;
+    return trajectories[SW_BWD_MINUS];
 }
 
 //------------------------------------------------------------------------------
@@ -100,7 +94,22 @@ Trajectory* Switch::get_bwd_minus_traj() const
 //------------------------------------------------------------------------------
 Trajectory* Switch::get_bwd_plus_traj() const
 {
-    return bwdPlusTraj;
+    return trajectories[SW_BWD_PLUS];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+dir_t Switch::getTrajOrientation(const Trajectory *traj)
+{
+    for (const Switch_way_t& way : switch_ways_t)
+    {
+        if (trajectories[way] == traj)
+        {
+            return orientations[way];
+        }
+    }
+    return FWD;
 }
 
 //------------------------------------------------------------------------------
@@ -108,25 +117,42 @@ Trajectory* Switch::get_bwd_plus_traj() const
 //------------------------------------------------------------------------------
 void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 {
-    Connector::configure(cfg, secNode, traj_list);
+    cfg.getString(secNode, "Name", name);
+    Journal::instance()->info("Switch " + name + " will be initialized...");
 
-    Journal::instance()->info("Connector type: switch");
-
-    QString fwd_minus_name;
-    cfg.getString(secNode, "fwdMinusTraj", fwd_minus_name);
-    fwdMinusTraj = traj_list.value(fwd_minus_name, nullptr);
-
-    QString bwd_minus_name;
-    cfg.getString(secNode, "bwdMinusTraj", bwd_minus_name);
-    bwdMinusTraj = traj_list.value(bwd_minus_name, nullptr);
+    for (const traj_xml_nodes_t& txn : traj_xml_nodes)
+    {
+        QString traj_name;
+        if (cfg.getString(secNode, txn.normal_trajectory_node_name, traj_name))
+        {
+            trajectories[txn.way] = traj_list.value(traj_name, nullptr);
+            orientations[txn.way] = FWD;
+        }
+        else
+        {
+            if (cfg.getString(secNode, txn.reversed_trajectory_node_name, traj_name))
+            {
+                trajectories[txn.way] = traj_list.value(traj_name, nullptr);
+                orientations[txn.way] = BWD;
+            }
+        }
+    }
 
     QString fwd_plus_name;
     cfg.getString(secNode, "fwdPlusTraj", fwd_plus_name);
-    fwdPlusTraj = traj_list.value(fwd_plus_name, nullptr);
+    trajectories[SW_FWD_PLUS] = traj_list.value(fwd_plus_name, nullptr);
+
+    QString fwd_minus_name;
+    cfg.getString(secNode, "fwdMinusTraj", fwd_minus_name);
+    trajectories[SW_FWD_MINUS] = traj_list.value(fwd_minus_name, nullptr);
+
+    QString bwd_minus_name;
+    cfg.getString(secNode, "bwdMinusTraj", bwd_minus_name);
+    trajectories[SW_BWD_MINUS] = traj_list.value(bwd_minus_name, nullptr);
 
     QString bwd_plus_name;
     cfg.getString(secNode, "bwdPlusTraj", bwd_plus_name);
-    bwdPlusTraj = traj_list.value(bwd_plus_name, nullptr);
+    trajectories[SW_BWD_PLUS] = traj_list.value(bwd_plus_name, nullptr);
 
     size_t inputs_count = 0;
     size_t outputs_count = 0;
