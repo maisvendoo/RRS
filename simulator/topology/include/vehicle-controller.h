@@ -43,7 +43,7 @@ public:
     void setInitCurrentTraj(Trajectory *traj, double traj_coord);
 
     /// Устанавливаем направление движения по траектории
-    void setDirection(int dir) { this->dir = dir; }
+    void setDirection(int direction);
 
     /// Задать оборудование ПЕ, взаимодействующее с путевой инфраструктурой
     void setVehicleRailwayConnectors(device_coord_list_t *devices);
@@ -56,7 +56,7 @@ public:
 
     /// Индекс ближайшей единицы подвижного состава, если есть;
     /// -1, если нет подвижного состава в пределах дистанции поиска
-    int getNearestVehicle(double &distance, double search_distance, int direction);
+    int getNearestVehicle(double& distance, double search_distance, dir_t direction);
 
     /// Вернуть указатель на траекторию под центром ПЕ
     Trajectory *getCurrentTraj() const { return current_traj; }
@@ -77,7 +77,7 @@ public:
         return train_idx;
     }
 
-protected:
+private:
 
     /// Индекс данной ПЕ в симуляции
     size_t index = 0;
@@ -92,7 +92,7 @@ protected:
     double  x_off = 0.0;
 
     /// Направление движения
-    int    dir = 1;
+    dir_t   dir = FWD;
 
     /// Координата, в пределах текущей траектории
     double traj_coord = 0.0;
@@ -102,9 +102,6 @@ protected:
 
     /// Текущая траектория ПЕ
     Trajectory *current_traj = nullptr;
-
-    /// Предыдущая траектория ПЕ (за коннектором сзади по ходу движения)
-    Trajectory *prev_traj = nullptr;
 
     /// Оборудование ПЕ, взаимодействующее с путевой инфраструктурой,
     /// и его текущие траекторные координаты
