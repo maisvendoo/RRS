@@ -1,30 +1,39 @@
 #ifndef TOPOLOGY_DEFINES_H
 #define TOPOLOGY_DEFINES_H
 
-#include <cstdint>
+#include    <cstdint>
+#include    <QString>
+#include    <QMap>
+
+class Trajectory;
+class Switch;
+
+/// Список траекторий по именам
+using traj_list_t = QMap<QString, Trajectory *>;
+
+/// Список соединений между траекториями по именам
+using sw_list_t = QMap<QString, Switch *>;
+
+/// Направление прохода по топологии
+enum dir_t : std::int8_t
+{
+    FWD = 1,    ///< Движение по топологии совпадает с ориентацией траектории/стрелки
+    BWD = -1,   ///< Движение по топологии противоположно ориентации траектории/стрелки
+};
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-enum Direction_t : std::int8_t
+enum Switch_way_t : std::int8_t
 {
-    SW_BWD_PLUS = 0,   ///< Направление от стрелки сзади прямо
-    SW_FWD_PLUS = 1,   ///< Направление от стрелки спереди прямо
-    SW_BWD_MINUS = 2,  ///< Направление от стрелки сзади на отклонение
-    SW_FWD_MINUS = 3,  ///< Направление от стрелки спереди на отклонение
-    SW_DIRECTION_UNKNOWN = -1
+    SW_FWD_PLUS = 0,///< Направление от стрелки спереди прямо
+    SW_FWD_MINUS,   ///< Направление от стрелки спереди на отклонение
+    SW_BWD_PLUS,    ///< Направление от стрелки сзади прямо
+    SW_BWD_MINUS,   ///< Направление от стрелки сзади на отклонение
 };
-enum : std::int8_t { SW_DIRECTIONS_NUM = SW_FWD_MINUS + 1 }; ///< Количество вариантов направлений
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-enum Orientation_t : std::int8_t
-{
-    TRAJ_NORMAL = 1,     ///< Ориентация траектории совпадает с ориентацией стрелки
-    TRAJ_REVERSED = -1,  ///< Ориентация траектории противоположна ориентации стрелки
-    TRAJ_ORIENTATION_UNKNOWN = 0
-};
+constexpr std::initializer_list<Switch_way_t> switch_ways_t = {SW_FWD_PLUS, SW_FWD_MINUS, SW_BWD_PLUS, SW_BWD_MINUS};
+constexpr std::initializer_list<Switch_way_t> switch_fwd_ways_t = {SW_FWD_PLUS, SW_FWD_MINUS};
+constexpr std::initializer_list<Switch_way_t> switch_bwd_ways_t = {SW_BWD_PLUS, SW_BWD_MINUS};
 
 //------------------------------------------------------------------------------
 //

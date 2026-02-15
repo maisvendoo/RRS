@@ -1,15 +1,21 @@
 #ifndef     SWITCH_H
 #define     SWITCH_H
 
-#include    <connector.h>
-#include    <cstdint>
+#include    <QObject>
+
+#include    <CfgReader.h>
+#include    <topology-connector-device.h>
+
+//#include    <connector.h>
+#include    "topology-export.h"
+#include    "topology-defines.h"
 
 class Signal;
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class TOPOLOGY_EXPORT Switch : public Connector
+class TOPOLOGY_EXPORT Switch : public QObject/* : public Connector*/
 {
     Q_OBJECT
 
@@ -19,59 +25,78 @@ public:
 
     ~Switch();
 
-    Trajectory *getFwdTraj() const override;
+    QString getName() const { return this->name; }
 
-    Trajectory *getBwdTraj() const override;
+    /// Список траекторий, подключенных к данной стрелке
+    Trajectory* trajectories[switch_ways_t.size()] = {nullptr, nullptr, nullptr, nullptr};
+
+    /// Ориентация подключения данной траектории к стрелке
+    dir_t getTrajOrientation(const Trajectory* traj);
+
+    /// Следующая траектория в данном направлении
+    Trajectory* getNextTraj(dir_t& dir) const;
 
     Trajectory* get_fwd_minus_traj() const;
     Trajectory* get_fwd_plus_traj() const;
     Trajectory* get_bwd_minus_traj() const;
     Trajectory* get_bwd_plus_traj() const;
 
-    void configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list) override;
+    void setSignalFwd(Signal *signal)
+    {
+        this->signal_fwd = signal;
+    }
+
+    Signal *getSignalFwd()
+    {
+        return signal_fwd;
+    }
+
+    const Signal* getSignalFwd() const
+    {
+        return signal_fwd;
+    }
+
+    void setSignalBwd(Signal *signal)
+    {
+        this->signal_bwd = signal;
+    }
+
+    Signal *getSignalBwd()
+    {
+        return signal_bwd;
+    }
+
+    const Signal* getSignalBwd() const
+    {
+        return signal_bwd;
+    }
+
+    void configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list);
 
     /// Шаг симуляции
-    virtual void step(double t, double dt) override;
+    virtual void step(double t, double dt);
 
-    QByteArray serialize() override;
+    QByteArray serialize();
 
-    void deserialize(QByteArray &data, traj_list_t &traj_list) override;
+    void deserialize(QByteArray &data, traj_list_t &traj_list);
 
-    enum State : int8_t {
-        STATE_MINUS = -1,       ///< Стрелка в минусовом положении (на бок)
-        STATE_PLUS = 1,         ///< Стрелка в плусовом положении (прямо)
-        IS_BUSY_MINUS = -2,     ///< Стрелка занята ПЕ в минусовом положении
-        IS_BUSY_PLUS = 2,       ///< Стрелка занята ПЕ в плюсовом положении
-        IN_ROUTE_MINUS = -3,    ///< Стрелка в маршруте в минусовом положении
-        IN_ROUTE_PLUS = 3,      ///< Стрелка в маршруте в плюсовом положении
-        ONE_POSSIBLE_DIRECTION = 0  ///< Единственная возможная траектория
-    };
-
-    State getStateFwd() const
+    Switch_state_t getStateFwd() const
     {
         return state_fwd;
     }
 
-    State getStateBwd() const
+    Switch_state_t getStateBwd() const
     {
         return state_bwd;
     }
 
-    void setStateFwd(State state);
+    void setStateFwd(Switch_state_t state);
 
-    void setStateBwd(State state);
+    void setStateBwd(Switch_state_t state);
 
-    void setRefStateFwd(State state);
+    void setRefStateFwd(Switch_state_t state);
 
-    void setRefStateBwd(State state);
-
-    Trajectory *fwdMinusTraj = nullptr;
-
-    Trajectory *fwdPlusTraj = nullptr;
-
-    Trajectory *bwdMinusTraj = nullptr;
-
-    Trajectory *bwdPlusTraj = nullptr;
+    void setRefStateBwd(Switch_state_t state);
 
     /// Светофор, включающий данный стрелочный перевод вперёд в маршрут ДЦ
     Signal* getRouteBySignalFwd() const
@@ -99,17 +124,29 @@ signals:
 
 private:
 
+    /// Ориентации траекторий (FWD - совпадает с ориентацией стрелки, BWD - противоположна)
+    dir_t orientations[switch_ways_t.size()] = {FWD, FWD, FWD, FWD};
+
     /// Состояние стрелки впереди
-    State state_fwd = ONE_POSSIBLE_DIRECTION;
+    Switch_state_t state_fwd = NO_POSSIBLE_DIRECTION;
 
     /// Состояние стрелки сзади
-    State state_bwd = ONE_POSSIBLE_DIRECTION;
+    Switch_state_t state_bwd = NO_POSSIBLE_DIRECTION;
 
     /// Требуемое состояние стрелки впереди:
-    State ref_state_fwd = STATE_PLUS;
+    Switch_state_t ref_state_fwd = NO_POSSIBLE_DIRECTION;
 
     /// Требуемое состояние стрелки сзади:
-    State ref_state_bwd = STATE_PLUS;
+    Switch_state_t ref_state_bwd = NO_POSSIBLE_DIRECTION;
+
+    QString name = "";
+
+    /// Связи путевой инфраструктуры
+    std::vector<ConnectorDevice *> devices;
+
+    Signal *signal_fwd = nullptr;
+
+    Signal *signal_bwd = nullptr;
 
     /// Стрелка будет заблокирована в сторону траектории,
     /// которая занята ПЕ ближе чем в 40 метрах
@@ -124,6 +161,24 @@ private:
 
     Trajectory *deserialize_connected_trajectory(QDataStream &stream,
                                           traj_list_t &traj_list);
+
+    struct traj_xml_nodes_t
+    {
+        Switch_way_t way;
+        QString normal_trajectory_node_name;
+        QString reversed_trajectory_node_name;
+        traj_xml_nodes_t(Switch_way_t w, QString n, QString r)
+            : way(w)
+            , normal_trajectory_node_name(n)
+            , reversed_trajectory_node_name(r){}
+    };
+    inline static const traj_xml_nodes_t traj_xml_nodes[] =
+    {
+        traj_xml_nodes_t(SW_FWD_PLUS, QString("fwdPlusTraj"), QString("fwdPlusTrajReversed")),
+        traj_xml_nodes_t(SW_FWD_MINUS, QString("fwdMinusTraj"), QString("fwdMinusTrajReversed")),
+        traj_xml_nodes_t(SW_BWD_PLUS, QString("bwdPlusTraj"), QString("bwdPlusTrajReversed")),
+        traj_xml_nodes_t(SW_BWD_MINUS, QString("bwdMinusTraj"), QString("bwdMinusTrajReversed"))
+    };
 };
 
 #endif // SWITCH_H

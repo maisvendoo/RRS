@@ -3,7 +3,7 @@
 
 #include    <QObject>
 
-#include    <topology-types.h>
+#include    <topology-defines.h>
 #include    <topology-export.h>
 #include    <profile-point.h>
 #include    <device-list.h>

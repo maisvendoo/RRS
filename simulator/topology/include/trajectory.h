@@ -5,12 +5,12 @@
 #include    <QMap>
 
 #include    <topology-export.h>
+#include    "topology-defines.h"
 #include    <track.h>
 #include    <profile-point.h>
 #include    <device-list.h>
 #include    <topology-trajectory-device.h>
 
-class Connector;
 class Signal;
 
 //------------------------------------------------------------------------------
@@ -49,25 +49,12 @@ public:
         return len;
     }
 
-    void setFwdConnector(Connector *fwd_connector)
-    {
-        this->fwd_connector = fwd_connector;
-    }
+    void setFwdSwitch(Switch* switch_ptr);
+    void setBwdSwitch(Switch* switch_ptr);
 
-    void setBwdConnector(Connector *bwd_connector)
-    {
-        this->bwd_connector = bwd_connector;
-    }
-
-    Connector *getFwdConnector() const
-    {
-        return fwd_connector;
-    }
-
-    Connector *getBwdConnector() const
-    {
-        return bwd_connector;
-    }
+    Switch* getNextSwitch(dir_t& dir) const;
+    Switch* getFwdSwitch() const;
+    Switch* getBwdSwitch() const;
 
     /// Задать занятость единицей подвижного состава idx в интервале координат
     void setBusy(size_t idx, double coord_begin, double coord_end);
@@ -181,9 +168,9 @@ private:
 
     QMap<size_t, std::array<double, 2>> vehicles_coords;
 
-    Connector *fwd_connector = nullptr;
+    Switch* fwd_switch = nullptr;
 
-    Connector *bwd_connector = nullptr;
+    Switch* bwd_switch = nullptr;
 
     std::vector<track_t>    tracks;
 
