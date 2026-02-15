@@ -157,10 +157,10 @@ private:
     /// Светофор, включающий данный стрелочный перевод назад в маршрут ДЦ
     Signal* in_route_by_signal_bwd = nullptr;
 
-    void serialize_connected_trajectory(QDataStream &stream, Trajectory *traj);
+    void serialize_connected_trajectory(QDataStream &stream, Trajectory *traj, dir_t orient);
 
-    Trajectory *deserialize_connected_trajectory(QDataStream &stream,
-                                          traj_list_t &traj_list);
+    std::pair<Trajectory*, dir_t> deserialize_connected_trajectory(QDataStream &stream,
+                                                                   traj_list_t &traj_list);
 
     struct traj_xml_nodes_t
     {

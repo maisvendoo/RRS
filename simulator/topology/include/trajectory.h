@@ -4,9 +4,10 @@
 #include    <QObject>
 #include    <QMap>
 
-#include    <topology-export.h>
+#include    "topology-export.h"
 #include    "topology-defines.h"
-#include    <track.h>
+#include    "track.h"
+
 #include    <profile-point.h>
 #include    <device-list.h>
 #include    <topology-trajectory-device.h>
@@ -55,6 +56,10 @@ public:
     Switch* getNextSwitch(dir_t& dir) const;
     Switch* getFwdSwitch() const;
     Switch* getBwdSwitch() const;
+
+    /// Поиск новой траектории, траекторной координаты и смены ориентации,
+    /// возвращает false, если координата за пределы топологии (за тупик)
+    static bool findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_t& orient);
 
     /// Задать занятость единицей подвижного состава idx в интервале координат
     void setBusy(size_t idx, double coord_begin, double coord_end);

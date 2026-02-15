@@ -201,6 +201,74 @@ Switch *Trajectory::getBwdSwitch() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool Trajectory::findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_t& orient)
+{
+    dir_t move_dir;
+    while (true)
+    {
+        if (coord < 0.0)
+        {
+            // Если траекторная координата меньше нуля - заехали за стрелку сзади
+            move_dir = BWD;
+        }
+        else
+        {
+            if (coord > cur_traj->getLength())
+            {
+                // Если траекторная координата превысила длину траектории - заехали за стрелку спереди
+                move_dir = FWD;
+                // Учитываем выход за пределы траектории
+                coord = coord - cur_traj->getLength();
+            }
+            else
+            {
+                // УРА! Находимся в пределах траектории: выходим
+                return true;
+            }
+        }
+
+        // Отслеживаем разворот ориентации траектории
+        dir_t new_dir = move_dir;
+
+        // Получаем указатель на стрелку в конце траектории
+        Switch* next_sw = cur_traj->getNextSwitch(new_dir);
+        if (next_sw == nullptr)
+        {
+            // Если коннектора нет, выходим
+            return false;
+        }
+
+        // Получаем указатель на ту траекторию, с которой нас соединяет стрелка
+        Trajectory* next_traj = next_sw->getNextTraj(new_dir);
+
+        // Если за стрелкой нет траектории,
+        // остаёмся на исходной траектории, останавливаемся на краю и выходим
+        if (next_traj == nullptr)
+        {
+            return false;
+        }
+
+        // Обновляем текущую траекторию
+        cur_traj = next_traj;
+        if (new_dir != move_dir)
+        {
+            // Если ориентация траектории изменилась, разворачиваемся
+            orient = static_cast<dir_t>(-orient);
+            coord = -coord;
+        }
+
+        if (new_dir == BWD)
+        {
+            // Если смещаемся назад, начинаем отсчёт с конца траектории
+            coord = coord + cur_traj->getLength();
+        }
+    }
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 const std::vector<TrajectoryDevice *>& Trajectory::getTrajectoryDevices() const
 {
     return devices;

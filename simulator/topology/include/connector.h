@@ -33,8 +33,6 @@ public:
     virtual void configure(CfgReader &cfg,
                            QDomNode secNode,
                            traj_list_t &traj_list);
-    QString getName() const { return this->name; }
-
     /// Получить оборудование путевой инфраструктуры на этом коннекторе
     const std::vector<ConnectorDevice *>& getConnectorDevices() const;
 
@@ -44,37 +42,6 @@ public:
     virtual QByteArray serialize();
 
     virtual void deserialize(QByteArray &data, traj_list_t &traj_list);
-
-    void setSignalFwd(Signal *signal)
-    {
-        this->signal_fwd = signal;
-    }
-
-    Signal *getSignalFwd()
-    {
-        return signal_fwd;
-    }
-
-    const Signal* getSignalFwd() const
-    {
-        return signal_fwd;
-    }
-
-    void setSignalBwd(Signal *signal)
-    {
-        this->signal_bwd = signal;
-    }
-
-    Signal *getSignalBwd()
-    {
-        return signal_bwd;
-    }
-
-    const Signal* getSignalBwd() const
-    {
-        return signal_bwd;
-    }
-
 protected:
 
     Trajectory *fwdTraj = nullptr;
@@ -82,15 +49,6 @@ protected:
     Trajectory *bwdTraj = nullptr;
 
     int state = 1;
-
-    QString name = "";
-
-    /// Связи путевой инфраструктуры
-    std::vector<ConnectorDevice *> devices;
-
-    Signal *signal_fwd = nullptr;
-
-    Signal *signal_bwd = nullptr;
 };
 
 #endif
