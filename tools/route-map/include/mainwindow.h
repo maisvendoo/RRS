@@ -105,7 +105,7 @@ private slots:
 
     void slotNearestTrajectoryMenu(Trajectory* nearest_traj);
 
-    void slotNearestSwitchMenu(Connector* nearest_conn, std::int8_t nearest_switch_dir);
+    void slotNearestSwitchMenu(Switch* nearest_conn, std::int8_t nearest_switch_dir);
 
     void slotSelectTrajectory(Trajectory* nearest_traj);
 

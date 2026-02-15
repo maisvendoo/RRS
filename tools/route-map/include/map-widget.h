@@ -24,13 +24,13 @@ public:
 
     traj_list_t *traj_list = nullptr;
 
-    conn_list_t *conn_list = nullptr;
+    sw_list_t *conn_list = nullptr;
 
     Trajectory* route_begin_trajectory = nullptr;
 
     Trajectory* nearest_trajectory = nullptr;
 
-    Connector* nearest_switch = nullptr;
+    Switch* nearest_switch = nullptr;
 
     std::int8_t nearest_switch_dir = 0;
 
@@ -63,7 +63,7 @@ public:
     struct switch_menu_t {
         QMenu* menu = nullptr;
         QAction* action = nullptr;
-        Connector* conn = nullptr;
+        Switch* conn = nullptr;
         std::int8_t switch_dir = 0;
     } switch_menu;
 
@@ -74,6 +74,8 @@ public:
     void setSignalRadius(double value);
 
     void setSignalOffset(double value);
+
+    void calcCwitchCoords();
 
     double getScale() const
     {
@@ -87,7 +89,7 @@ public:
 
 signals:
 
-    void sigOpenSwitchMenu(Connector* nearest_conn, std::int8_t nearest_switch_dir);
+    void sigOpenSwitchMenu(Switch* nearest_conn, std::int8_t nearest_switch_dir);
 
     void sigOpenTrajectoryMenu(Trajectory* nearest_traj);
 
@@ -155,6 +157,13 @@ private:
     /// Смещение схематичного светофора вправо от оси пути, м
     double signal_offset = 2.5;
 
+    struct switch_coord_t {
+        dvec3 center;
+        dvec3 orth;
+        dvec3 trav;
+    };
+    QMap<QString, switch_coord_t> switch_coords;
+
     void paintEvent(QPaintEvent *event);
 
     void drawTrajectory(Trajectory* traj, QPainter& painter,
@@ -167,7 +176,7 @@ private:
     void drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &vehicle_half_length,
                      QPainter& painter, QColor color);
 
-    void drawConnector(Connector* conn, QPainter& painter,
+    void drawConnector(Switch* conn, QPainter& painter,
                        QPointF& cursor_pos, double& distance2, std::int8_t& dir);
 
     void drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& painter,

@@ -2,7 +2,7 @@
 #include    "ALSN-coil.h"
 #include    "topology-connector-device.h"
 #include    "trajectory.h"
-#include    "connector.h"
+#include    "switch.h"
 
 #include    "physics.h"
 
@@ -164,8 +164,9 @@ void TrajectoryALSN::setSignalInfoFwd(ALSN code, double distance, QString liter)
         return;
 
     // Проверяем стрелку на взрез
-    Connector *conn = conn_device->getConnector();
-    if (conn->getFwdTraj() != trajectory)
+    Switch* conn = conn_device->getConnector();
+    dir_t dir = FWD;
+    if (conn->getNextTraj(dir) != trajectory)
         return;
 
     // Предыдущая траектория
@@ -208,8 +209,9 @@ void TrajectoryALSN::setSignalInfoBwd(ALSN code, double distance, QString liter)
         return;
 
     // Проверяем стрелку на взрез
-    Connector *conn = conn_device->getConnector();
-    if (conn->getBwdTraj() != trajectory)
+    Switch* conn = conn_device->getConnector();
+    dir_t dir = BWD;
+    if (conn->getNextTraj(dir) != trajectory)
         return;
 
     // Следующая траектория

@@ -171,13 +171,19 @@ Switch* Trajectory::getNextSwitch(dir_t& dir) const
 {
     if (dir == FWD)
     {
-        dir = static_cast<dir_t>(dir * fwd_switch->getTrajOrientation(this));
-        return fwd_switch;
+        if (fwd_switch)
+        {
+            dir = static_cast<dir_t>(dir * fwd_switch->getTrajOrientation(this));
+            return fwd_switch;
+        }
     }
     if (dir == BWD)
     {
-        dir = static_cast<dir_t>(dir * bwd_switch->getTrajOrientation(this));
-        return bwd_switch;
+        if (bwd_switch)
+        {
+            dir = static_cast<dir_t>(dir * bwd_switch->getTrajOrientation(this));
+            return bwd_switch;
+        }
     }
     return nullptr;
 }

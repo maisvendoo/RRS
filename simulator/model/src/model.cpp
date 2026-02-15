@@ -318,7 +318,7 @@ void Model::findNearestVehicles()
         int train_dir = train->getDirection();
 
         // От каждого поезда ищем вперёд и назад по топологии
-        for (int dir_it : {1, -1})
+        for (dir_t dir_it : {FWD, BWD})
         {
             // Индекс крайней ПЕ в поезде, от которой начинаем поиск
             int idx = (train_dir == dir_it) ?

@@ -58,6 +58,62 @@ void MapWidget::setSignalOffset(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MapWidget::calcCwitchCoords()
+{
+    switch_coords.clear();
+
+    for (auto& sw : *conn_list)
+    {
+        switch_coord_t sc;
+
+        dir_t dir_fwd = FWD;
+        Trajectory *fwd_traj = sw->getNextTraj(dir_fwd);
+        dir_t dir_bwd = BWD;
+        Trajectory *bwd_traj = sw->getNextTraj(dir_bwd);
+        if ((fwd_traj == nullptr) || (fwd_traj->getTracks().empty()))
+        {
+            if ((bwd_traj == nullptr || (bwd_traj->getTracks().empty())))
+            {
+                return;
+            }
+            else
+            {
+                const track_t& bwd_track = (dir_bwd == BWD) ? bwd_traj->getLastTrack() : bwd_traj->getFirstTrack();
+                sc.center = (dir_bwd == BWD) ? bwd_track.end_point : bwd_track.begin_point;
+                sc.orth = (dir_bwd == BWD) ? bwd_track.orth : -bwd_track.orth;
+                sc.trav = (dir_bwd == BWD) ? bwd_track.trav : -bwd_track.trav;
+            }
+        }
+        else
+        {
+            if ((bwd_traj == nullptr || (bwd_traj->getTracks().empty())))
+            {
+                const track_t& fwd_track = (dir_fwd == FWD) ? fwd_traj->getFirstTrack() : fwd_traj->getLastTrack();
+                sc.center = (dir_fwd == FWD) ? fwd_track.begin_point : fwd_track.end_point;
+                sc.orth = (dir_fwd == FWD) ? fwd_track.orth : -fwd_track.orth;
+                sc.trav = (dir_fwd == FWD) ? fwd_track.trav : -fwd_track.trav;
+            }
+            else
+            {
+                const track_t& bwd_track = (dir_bwd == BWD) ? bwd_traj->getLastTrack() : bwd_traj->getFirstTrack();
+                const track_t& fwd_track = (dir_fwd == FWD) ? fwd_traj->getFirstTrack() : fwd_traj->getLastTrack();
+                sc.center = (  ((dir_bwd == BWD) ? bwd_track.end_point : bwd_track.begin_point)
+                             + ((dir_fwd == FWD) ? fwd_track.begin_point : fwd_track.end_point)) * 0.5;
+                sc.orth = normalize(
+                      ((dir_bwd == BWD) ? bwd_track.orth : -bwd_track.orth)
+                    + ((dir_fwd == FWD) ? fwd_track.orth : -fwd_track.orth));
+                sc.trav = normalize(
+                      ((dir_bwd == BWD) ? bwd_track.trav : -bwd_track.trav)
+                    + ((dir_fwd == FWD) ? fwd_track.trav : -fwd_track.trav));
+            }
+        }
+        switch_coords.insert(sw->getName(), sc);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MapWidget::slotStationAtCenter(int idx)
 {
     follow_player = false;
@@ -315,46 +371,23 @@ void MapWidget::drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &veh
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawConnector(Connector* conn, QPainter& painter,
+void MapWidget::drawConnector(Switch* sw, QPainter& painter,
                               QPointF& cursor_pos, double& distance2, std::int8_t &dir)
 {
-    if (conn == nullptr)
+    if (sw == nullptr)
     {
         return;
     }
 
-    dvec3 center;
-    Trajectory *fwd_traj = conn->getFwdTraj();
-    Trajectory *bwd_traj = conn->getBwdTraj();
-    if ((fwd_traj == nullptr) || (fwd_traj->getTracks().empty()))
-    {
-        if ((bwd_traj == nullptr || (bwd_traj->getTracks().empty())))
-        {
-            return;
-        }
-        else
-        {
-            const track_t& bwd_track = bwd_traj->getLastTrack();
-            center = bwd_track.end_point;
-        }
-    }
-    else
-    {
-        if ((bwd_traj == nullptr || (bwd_traj->getTracks().empty())))
-        {
-            const track_t& fwd_track = fwd_traj->getLastTrack();
-            center = fwd_track.begin_point;
-        }
-        else
-        {
-            const track_t& bwd_track = bwd_traj->getLastTrack();
-            const track_t& fwd_track = fwd_traj->getFirstTrack();
-            center = (bwd_track.end_point + fwd_track.begin_point) * 0.5;
-        }
-    }
-    QPoint center_point = coord_transform(center);
+    dir_t dir_fwd = FWD;
+    Trajectory *fwd_traj = sw->getNextTraj(dir_fwd);
+    dir_t dir_bwd = BWD;
+    Trajectory *bwd_traj = sw->getNextTraj(dir_bwd);
 
-    QLabel *sw_label = switch_labels.value(conn->getName(), nullptr);
+    switch_coord_t sc = switch_coords.value(sw->getName());
+    QPoint center_point = coord_transform(sc.center);
+
+    QLabel *sw_label = switch_labels.value(sw->getName(), nullptr);
     if (sw_label != nullptr)
     {
         if (show_conn_names)
@@ -373,26 +406,20 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
     int r = 4 + std::floor(sqrt(scale));
     painter.drawEllipse(center_point, r, r);
 
-    Switch *sw = dynamic_cast<Switch *>(conn);
-    if (sw == nullptr)
-    {
-        return;
-    }
-
     QPen pen;
     int switched_width = 2 + std::floor(sqrt(scale));
     int other_width = 1;
-    if (sw->fwdPlusTraj && sw->fwdMinusTraj)
+    if (sw->trajectories[SW_FWD_PLUS] && sw->trajectories[SW_FWD_MINUS])
     {
-        Trajectory* fwd_other = (fwd_traj == sw->fwdPlusTraj) ?
-                                    sw->fwdMinusTraj : sw->fwdPlusTraj;
+        Trajectory* fwd_other = (fwd_traj == sw->trajectories[SW_FWD_PLUS]) ?
+                                    sw->trajectories[SW_FWD_MINUS] : sw->trajectories[SW_FWD_PLUS];
 
         switch (sw->getStateFwd())
         {
-        case Switch::IS_BUSY_MINUS:
-        case Switch::IS_BUSY_PLUS:
+        case IS_BUSY_MINUS:
+        case IS_BUSY_PLUS:
         {
-            if ((switch_menu.conn == conn) && (switch_menu.switch_dir > 0) &&
+            if ((switch_menu.conn == sw) && (switch_menu.switch_dir > 0) &&
                 (switch_menu.action != nullptr))
             {
                 switch_menu.action->setEnabled(false);
@@ -409,10 +436,10 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
             drawSwitchTraj(fwd_traj, true, painter, cursor_pos, distance2, dir);
             break;
         }
-        case Switch::IN_ROUTE_MINUS:
-        case Switch::IN_ROUTE_PLUS:
+        case IN_ROUTE_MINUS:
+        case IN_ROUTE_PLUS:
         {
-            if ((switch_menu.conn == conn) && (switch_menu.switch_dir > 0) &&
+            if ((switch_menu.conn == sw) && (switch_menu.switch_dir > 0) &&
                 (switch_menu.action != nullptr))
             {
                 switch_menu.action->setEnabled(false);
@@ -431,7 +458,7 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         }
         default:
         {
-            if ((switch_menu.conn == conn) && (switch_menu.switch_dir > 0) &&
+            if ((switch_menu.conn == sw) && (switch_menu.switch_dir > 0) &&
                 (switch_menu.action != nullptr))
             {
                 switch_menu.action->setEnabled(true);
@@ -465,17 +492,17 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         }
     }
 
-    if (sw->bwdPlusTraj && sw->bwdMinusTraj)
+    if (sw->trajectories[SW_BWD_PLUS] && sw->trajectories[SW_BWD_MINUS])
     {
-        Trajectory* bwd_other = (bwd_traj == sw->bwdPlusTraj) ?
-                                    sw->bwdMinusTraj : sw->bwdPlusTraj;
+        Trajectory* bwd_other = (fwd_traj == sw->trajectories[SW_BWD_PLUS]) ?
+                                    sw->trajectories[SW_BWD_MINUS] : sw->trajectories[SW_BWD_PLUS];
 
         switch (sw->getStateBwd())
         {
-        case Switch::IS_BUSY_MINUS:
-        case Switch::IS_BUSY_PLUS:
+        case IS_BUSY_MINUS:
+        case IS_BUSY_PLUS:
         {
-            if ((switch_menu.conn == conn) && (switch_menu.switch_dir < 0) &&
+            if ((switch_menu.conn == sw) && (switch_menu.switch_dir < 0) &&
                 (switch_menu.action != nullptr))
             {
                 switch_menu.action->setEnabled(false);
@@ -492,10 +519,10 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
             drawSwitchTraj(bwd_traj, false, painter, cursor_pos, distance2, dir);
             break;
         }
-        case Switch::IN_ROUTE_MINUS:
-        case Switch::IN_ROUTE_PLUS:
+        case IN_ROUTE_MINUS:
+        case IN_ROUTE_PLUS:
         {
-            if ((switch_menu.conn == conn) && (switch_menu.switch_dir < 0) &&
+            if ((switch_menu.conn == sw) && (switch_menu.switch_dir < 0) &&
                 (switch_menu.action != nullptr))
             {
                 switch_menu.action->setEnabled(false);
@@ -514,7 +541,7 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
         }
         default:
         {
-            if ((switch_menu.conn == conn) && (switch_menu.switch_dir < 0) &&
+            if ((switch_menu.conn == sw) && (switch_menu.switch_dir < 0) &&
                 (switch_menu.action != nullptr))
             {
                 switch_menu.action->setEnabled(true);
@@ -552,7 +579,7 @@ void MapWidget::drawConnector(Connector* conn, QPainter& painter,
 //
 //------------------------------------------------------------------------------
 void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& painter,
-                               QPointF& cursor_pos, double& distance2, std::int8_t &dir)
+                               QPointF& cursor_pos, double& distance2, std::int8_t& dir)
 {
     if (traj == nullptr)
     {
@@ -563,10 +590,16 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
 
     if (draw_to_fwd)
     {
-        if (Switch* next_sw = dynamic_cast<Switch*>(traj->getFwdConnector());
-            next_sw && (next_sw->getStateBwd() != Switch::ONE_POSSIBLE_DIRECTION))
+        dir_t dir_fwd = FWD;
+        if (Switch* next_sw = traj->getNextSwitch(dir_fwd))
         {
-            draw_len = traj->getLength() * 0.5;
+            Switch_state_t next_state = (dir_fwd == FWD) ? next_sw->getStateBwd() : next_sw->getStateFwd();
+            if (   (next_state != NO_POSSIBLE_DIRECTION)
+                && (next_state != ONLY_MINUS)
+                && (next_state != ONLY_PLUS))
+            {
+                draw_len = traj->getLength() * 0.5;
+            }
         }
         draw_len = std::min(draw_len, switch_length);
 
@@ -595,10 +628,16 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
     }
     else
     {
-        if (Switch* next_sw = dynamic_cast<Switch*>(traj->getBwdConnector());
-            next_sw && (next_sw->getStateFwd() != Switch::ONE_POSSIBLE_DIRECTION))
+        dir_t dir_bwd = BWD;
+        if (Switch* next_sw = traj->getNextSwitch(dir_bwd))
         {
-            draw_len = traj->getLength() * 0.5;
+            Switch_state_t next_state = (dir_bwd == BWD) ? next_sw->getStateFwd() : next_sw->getStateBwd();
+            if (   (next_state != NO_POSSIBLE_DIRECTION)
+                && (next_state != ONLY_MINUS)
+                && (next_state != ONLY_PLUS))
+            {
+                draw_len = traj->getLength() * 0.5;
+            }
         }
         draw_len = std::min(draw_len, switch_length);
 
@@ -764,40 +803,31 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter)
 //------------------------------------------------------------------------------
 void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor> lens_colors)
 {
-    Connector *conn = signal->getConnector();
-    if ((conn == nullptr) || (signal->getDirection() == 0))
+    Switch* sw = signal->getConnector();
+    if (sw == nullptr)
     {
         return;
     }
 
-    Trajectory *traj = (signal->getDirection() < 0) ? conn->getFwdTraj() : conn->getBwdTraj();
-    if (traj == nullptr)
-    {
-        return;
-    }
+    switch_coord_t sc = switch_coords.value(sw->getName());
 
-    dvec3 bottom_signal_pos;
-    const track_t* track = nullptr;
+    dvec3 bottom_signal_pos = sc.center;
     SignalLabel *signal_label = nullptr;
 
     if (signal->getDirection() < 0)
     {
-        track = &traj->getFirstTrack();
-        bottom_signal_pos = track->begin_point;
-        signal_label = signal_labels_bwd.value(conn->getName(), nullptr);
+        signal_label = signal_labels_bwd.value(sw->getName(), nullptr);
     }
     else
     {
-        track = &traj->getLastTrack();
-        bottom_signal_pos = track->end_point;
-        signal_label = signal_labels_fwd.value(conn->getName(), nullptr);
+        signal_label = signal_labels_fwd.value(sw->getName(), nullptr);
     }
 
-    bottom_signal_pos += track->trav * (signal_offset * signal->getDirection());
+    bottom_signal_pos += sc.trav * (signal_offset * signal->getDirection());
     double signed_r = signal_radius * signal->getDirection();
     int r = std::round(signal_radius * scale);
 
-    dvec3 label_pos = bottom_signal_pos + track->orth * ((2 * lens_colors.size() + 3) * signed_r);
+    dvec3 label_pos = bottom_signal_pos + sc.orth * ((2 * lens_colors.size() + 3) * signed_r);
     if (signal_label != nullptr)
     {
         QPoint label_p = coord_transform(label_pos);
@@ -813,16 +843,16 @@ void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor
     painter.setPen(pen);
     for (size_t i = 1; i <= lens_colors.size(); ++i)
     {
-        dvec3 lens_pos = bottom_signal_pos + track->orth * (2 * i * signed_r);
+        dvec3 lens_pos = bottom_signal_pos + sc.orth * (2 * i * signed_r);
         QPoint lens_point = coord_transform(lens_pos);
         painter.setBrush(lens_colors[i - 1]);
         painter.drawEllipse(lens_point, r, r);
     }
 
     QPoint bottom_down = coord_transform(bottom_signal_pos);
-    QPoint bottom_up = coord_transform(bottom_signal_pos + track->orth * signed_r);
-    QPoint bottom_left = coord_transform(bottom_signal_pos - track->trav * signed_r);
-    QPoint bottom_right = coord_transform(bottom_signal_pos + track->trav * signed_r);
+    QPoint bottom_up = coord_transform(bottom_signal_pos + sc.orth * signed_r);
+    QPoint bottom_left = coord_transform(bottom_signal_pos - sc.trav * signed_r);
+    QPoint bottom_right = coord_transform(bottom_signal_pos + sc.trav * signed_r);
 
     pen.setWidth((scale > 2.0) ? 2 : 1);
     painter.setPen(pen);
