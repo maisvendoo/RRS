@@ -1,3 +1,4 @@
+/*
 #include    <connector.h>
 #include    <Journal.h>
 
@@ -68,4 +69,4 @@ void Connector::deserialize(QByteArray &data, traj_list_t &traj_list)
 {
     (void)data;
     (void)traj_list;
-}
+}*/

@@ -1,3 +1,4 @@
+/*
 #include    <isolated-joint.h>
 #include    <Journal.h>
 
@@ -53,5 +54,4 @@ void IsolatedJoint::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &tra
     {
         Journal::instance()->error("Joint " + name + " has't outgoing trajectory");
     }
-}
-
+}*/

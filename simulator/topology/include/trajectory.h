@@ -54,8 +54,6 @@ public:
     void setBwdSwitch(Switch* switch_ptr);
 
     Switch* getNextSwitch(dir_t& dir) const;
-    Switch* getFwdSwitch() const;
-    Switch* getBwdSwitch() const;
 
     /// Поиск новой траектории, траекторной координаты и смены ориентации,
     /// возвращает false, если координата за пределы топологии (за тупик)

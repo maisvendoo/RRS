@@ -1,3 +1,4 @@
+/*
 #ifndef     CONNECTOR_H
 #define     CONNECTOR_H
 
@@ -51,4 +52,4 @@ protected:
     int state = 1;
 };
 
-#endif
+#endif*/

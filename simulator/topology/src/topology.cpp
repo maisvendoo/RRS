@@ -894,29 +894,13 @@ bool strignToVector(const QString &str, dvec3 &vector)
 //------------------------------------------------------------------------------
 void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
 {
-    QString signal_model_fwd = "";
-    int signal_dir_fwd = 0;
-
-    QString signal_model_bwd = "";
-    int signal_dir_bwd = 0;
-
-    if (cfg.getString(secNode, "SignalModelFwd", signal_model_fwd))
-    {
-        signal_dir_fwd = 1;
-    }
-
-    if (cfg.getString(secNode, "SignalModelBwd", signal_model_bwd))
-    {
-        signal_dir_bwd = -1;
-    }
-
-    auto configure_signal = [](Signal* signal, Switch* sw, int direction,
+    auto configure_signal = [](Signal* signal, Switch* sw, dir_t direction,
                                QString signal_letter, QString signal_model,
                                dvec3 relative_position, dvec3 relative_rotation)
     {
-        if (direction == 1)
+        if (direction == FWD)
             sw->setSignalFwd(signal);
-        if (direction == -1)
+        if (direction == BWD)
             sw->setSignalBwd(signal);
 
         signal->setConnector(sw);
@@ -927,7 +911,10 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         signal->setRelRotation(relative_rotation);
     };
 
-    if (signal_dir_fwd == 1)
+    QString signal_model_fwd = "";
+    QString signal_model_bwd = "";
+
+    if (cfg.getString(secNode, "SignalModelFwd", signal_model_fwd))
     {
         QString tmp;
         dvec3 rel_pos = {0.0, 0.0, 0.0};
@@ -951,7 +938,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         if (signal_model_fwd.right(4) == "line")
         {
             LineSignal *signal = new LineSignal;
-            configure_signal(signal, sw, signal_dir_fwd,
+            configure_signal(signal, sw, FWD,
                              signal_letter, signal_model_fwd,
                              rel_pos, rel_rot);
             signals_data.line_signals.push_back(signal);
@@ -960,7 +947,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         else if (signal_model_fwd.right(4) == "entr")
         {
             EnterSignal *signal = new EnterSignal;
-            configure_signal(signal, sw, signal_dir_fwd,
+            configure_signal(signal, sw, FWD,
                              signal_letter, signal_model_fwd,
                              rel_pos, rel_rot);
             signals_data.enter_signals.push_back(signal);
@@ -969,7 +956,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         else if (signal_model_fwd.right(4) == "rout")
         {
             RouteSignal *signal = new RouteSignal;
-            configure_signal(signal, sw, signal_dir_fwd,
+            configure_signal(signal, sw, FWD,
                              signal_letter, signal_model_fwd,
                              rel_pos, rel_rot);
             signals_data.route_signals.push_back(signal);
@@ -978,7 +965,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         else if (signal_model_fwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
-            configure_signal(signal, sw, signal_dir_fwd,
+            configure_signal(signal, sw, FWD,
                              signal_letter, signal_model_fwd,
                              rel_pos, rel_rot);
             signals_data.exit_signals.push_back(signal);
@@ -987,7 +974,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         else if (signal_model_fwd.right(4) == "shnt")
         {
             ShuntingSignal *signal = new ShuntingSignal;
-            configure_signal(signal, sw, signal_dir_fwd,
+            configure_signal(signal, sw, FWD,
                              signal_letter, signal_model_fwd,
                              rel_pos, rel_rot);
             signals_data.shunt_signals.push_back(signal);
@@ -995,7 +982,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         }
     }
 
-    if (signal_dir_bwd == -1)
+    if (cfg.getString(secNode, "SignalModelBwd", signal_model_bwd))
     {
         QString tmp;
         dvec3 rel_pos = {0.0, 0.0, 0.0};
@@ -1019,7 +1006,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         if (signal_model_bwd.right(4) == "line")
         {
             LineSignal *signal = new LineSignal;
-            configure_signal(signal, sw, signal_dir_bwd,
+            configure_signal(signal, sw, BWD,
                              signal_letter, signal_model_bwd,
                              rel_pos, rel_rot);
             signals_data.line_signals.push_back(signal);
@@ -1028,7 +1015,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         else if (signal_model_bwd.right(4) == "entr")
         {
             EnterSignal *signal = new EnterSignal;
-            configure_signal(signal, sw, signal_dir_bwd,
+            configure_signal(signal, sw, BWD,
                              signal_letter, signal_model_bwd,
                              rel_pos, rel_rot);
             signals_data.enter_signals.push_back(signal);
@@ -1037,7 +1024,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         else if (signal_model_bwd.right(4) == "rout")
         {
             RouteSignal *signal = new RouteSignal;
-            configure_signal(signal, sw, signal_dir_bwd,
+            configure_signal(signal, sw, BWD,
                              signal_letter, signal_model_bwd,
                              rel_pos, rel_rot);
             signals_data.route_signals.push_back(signal);
@@ -1046,7 +1033,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         else if (signal_model_bwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
-            configure_signal(signal, sw, signal_dir_bwd,
+            configure_signal(signal, sw, BWD,
                              signal_letter, signal_model_bwd,
                              rel_pos, rel_rot);
             signals_data.exit_signals.push_back(signal);
@@ -1055,7 +1042,7 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
         else if (signal_model_bwd.right(4) == "shnt")
         {
             ShuntingSignal *signal = new ShuntingSignal;
-            configure_signal(signal, sw, signal_dir_bwd,
+            configure_signal(signal, sw, BWD,
                              signal_letter, signal_model_bwd,
                              rel_pos, rel_rot);
             signals_data.shunt_signals.push_back(signal);

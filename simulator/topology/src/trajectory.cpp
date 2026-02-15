@@ -1,12 +1,12 @@
-#include    <trajectory.h>
-#include    <connector.h>
+#include    "trajectory.h"
+#include    "switch.h"
+#include    "topology-types.h"
 
 #include    <filesystem.h>
 
 #include    <fstream>
 #include    <Journal.h>
 #include    <physics.h>
-#include    <switch.h>
 
 //------------------------------------------------------------------------------
 //
@@ -180,22 +180,6 @@ Switch* Trajectory::getNextSwitch(dir_t& dir) const
         return bwd_switch;
     }
     return nullptr;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-Switch *Trajectory::getFwdSwitch() const
-{
-    return fwd_switch;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-Switch *Trajectory::getBwdSwitch() const
-{
-    return bwd_switch;
 }
 
 //------------------------------------------------------------------------------

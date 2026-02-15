@@ -1,5 +1,6 @@
 #include    "line-signal.h"
-#include    "connector.h"
+#include    "switch.h"
+#include    "trajectory.h"
 
 //------------------------------------------------------------------------------
 //
@@ -78,17 +79,18 @@ void LineSignal::check_route()
     U_side = 0.0;
 
     // Начинаем с коннектора, к которому относится светофор
-    Connector *cur_conn = conn;
+    Switch *cur_conn = conn;
 
     if (!cur_conn)
     {
         return;
     }
 
+    dir_t cur_dir = signal_dir;
     while (true)
     {
         // Смотрим траекторию за текущим коннектором
-        Trajectory* traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
+        Trajectory* traj = cur_conn->getNextTraj(cur_dir);
 
         if (!traj)
         {
@@ -102,7 +104,7 @@ void LineSignal::check_route()
         }
 
         // Смотрим следующий коннектор
-        cur_conn = (signal_dir == 1) ? traj->getFwdConnector() : traj->getBwdConnector();
+        cur_conn = traj->getNextSwitch(cur_dir);
 
         if (!cur_conn)
         {

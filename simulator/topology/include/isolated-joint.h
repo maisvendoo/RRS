@@ -1,3 +1,4 @@
+/*
 #ifndef     ISOLATED_JOINT_H
 #define     ISOLATED_JOINT_H
 
@@ -23,4 +24,4 @@ private:
     Signal  *signal = nullptr;
 };
 
-#endif // ISOLATED_JOINT_H
+#endif // ISOLATED_JOINT_H*/

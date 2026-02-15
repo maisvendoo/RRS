@@ -5,6 +5,7 @@
 
 #include    <vec3.h>
 #include    "topology-export.h"
+#include    "topology-defines.h"
 #include    "signal-types.h"
 
 class CfgReader;
@@ -35,12 +36,12 @@ public:
 
     Switch* getConnector() const;
 
-    void setDirection(int signal_dir)
+    void setDirection(dir_t dir)
     {
-        this->signal_dir = signal_dir;
+        signal_dir = dir;
     }
 
-    int getDirection() const
+    dir_t getDirection() const
     {
         return signal_dir;
     }
@@ -135,7 +136,7 @@ private:
 
 protected:
 
-    int signal_dir = 0;
+    dir_t signal_dir = FWD;
 
     /// Состояние всех возможных огней светофора
     lens_state_t lens_state;
