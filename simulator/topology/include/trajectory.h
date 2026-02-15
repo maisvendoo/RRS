@@ -73,7 +73,7 @@ public:
 
     /// Индекс ближайшей единицы подвижного состава, если есть;
     /// -1, если нет подвижного состава в пределах дистанции поиска
-    int getBusyVehicle(double &distance, double coord, double search_distance, int direction);
+    int getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction);
 
     /// Интервал координат, занятых подвижным составом;
     /// если пустая, busy_begin_coord = length; busy_end_coord = 0.0
@@ -183,7 +183,16 @@ private:
                     track_t &prev_track,
                     track_t &next_track);
 
-    double calc_curvature(track_t &track0, track_t &track1);
+    /// Поиск трека на следующей траектории
+    track_t findNextTrack(const track_t& cur_track, dir_t dir);
+
+    /// Создание условного продолжения топологии за тупик для корректного расчёта
+    track_t addFakeTrack(const track_t& cur_track, dir_t dir);
+
+    /// Создание трека в обратном направлении для корректного расчёта
+    track_t createReversedTrack(const track_t& track);
+
+    double calc_curvature(track_t& track0, track_t& track1);
 };
 
 #endif

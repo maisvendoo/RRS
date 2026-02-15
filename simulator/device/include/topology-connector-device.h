@@ -5,7 +5,7 @@
 #include    "device.h"
 #include    "topology-trajectory-device.h"
 
-class Connector;
+class Switch;
 
 //------------------------------------------------------------------------------
 //
@@ -22,8 +22,8 @@ public:
     /// Destructor
     virtual ~ConnectorDevice();
 
-    void setConnector(Connector *conn);
-    Connector *getConnector() const;
+    void setConnector(Switch* conn);
+    Switch* getConnector() const;
 
     virtual void setFwdTrajectoryDevice(TrajectoryDevice *traj_device);
     virtual void setBwdTrajectoryDevice(TrajectoryDevice *traj_device);
@@ -45,7 +45,7 @@ public:
 
 protected:
 
-    Connector *connector = nullptr;
+    Switch* connector = nullptr;
 
     TrajectoryDevice *fwd_traj_device = nullptr;
 

@@ -1,9 +1,11 @@
-#include    <switch.h>
+#include    "switch.h"
+#include    "switch-state.h"
+#include    "trajectory.h"
 
 #include    <filesystem.h>
 #include    <Journal.h>
 
-#include    "math-funcs.h"
+//#include    <math-funcs.h>
 
 //------------------------------------------------------------------------------
 //
@@ -128,92 +130,68 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
             trajectories[txn.way] = traj_list.value(traj_name, nullptr);
             orientations[txn.way] = FWD;
         }
-        else
+
+        if (trajectories[txn.way] == nullptr)
         {
             if (cfg.getString(secNode, txn.reversed_trajectory_node_name, traj_name))
             {
                 trajectories[txn.way] = traj_list.value(traj_name, nullptr);
                 orientations[txn.way] = BWD;
             }
+
+            if (trajectories[txn.way] == nullptr)
+            {
+                Journal::instance()->info(txn.normal_trajectory_node_name + ": NONE");
+            }
+            else
+            {
+                Journal::instance()->info(txn.reversed_trajectory_node_name + ": " + trajectories[txn.way]->getName());
+            }
+        }
+        else
+        {
+            Journal::instance()->info(txn.normal_trajectory_node_name + ": " + trajectories[txn.way]->getName());
         }
     }
 
-    QString fwd_plus_name;
-    cfg.getString(secNode, "fwdPlusTraj", fwd_plus_name);
-    trajectories[SW_FWD_PLUS] = traj_list.value(fwd_plus_name, nullptr);
-
-    QString fwd_minus_name;
-    cfg.getString(secNode, "fwdMinusTraj", fwd_minus_name);
-    trajectories[SW_FWD_MINUS] = traj_list.value(fwd_minus_name, nullptr);
-
-    QString bwd_minus_name;
-    cfg.getString(secNode, "bwdMinusTraj", bwd_minus_name);
-    trajectories[SW_BWD_MINUS] = traj_list.value(bwd_minus_name, nullptr);
-
-    QString bwd_plus_name;
-    cfg.getString(secNode, "bwdPlusTraj", bwd_plus_name);
-    trajectories[SW_BWD_PLUS] = traj_list.value(bwd_plus_name, nullptr);
-
-    size_t inputs_count = 0;
-    size_t outputs_count = 0;
-
-    if (bwdMinusTraj != nullptr)
+    for (const Switch_way_t& way : switch_fwd_ways_t)
     {
-        bwdMinusTraj->setFwdConnector(this);
-        Journal::instance()->info("Backward minus traj: " + bwdMinusTraj->getName());
-        inputs_count++;
-    }
-    else
-    {
-        Journal::instance()->info("Backward minus traj: NONE");
-    }
-
-    if (bwdPlusTraj != nullptr)
-    {
-        bwdPlusTraj->setFwdConnector(this);
-        Journal::instance()->info("Backward plus traj: " + bwdPlusTraj->getName());
-        inputs_count++;
-    }
-    else
-    {
-        Journal::instance()->info("Backward plus traj: NONE");
-    }
-
-    if (fwdMinusTraj != nullptr)
-    {
-        fwdMinusTraj->setBwdConnector(this);
-        Journal::instance()->info("Forward minus traj: " + fwdMinusTraj->getName());
-        outputs_count++;
-    }
-    else
-    {
-        Journal::instance()->info("Forward minus traj: NONE");
-    }
-
-    if (fwdPlusTraj != nullptr)
-    {
-        fwdPlusTraj->setBwdConnector(this);
-        Journal::instance()->info("Forward plus traj: " + fwdPlusTraj->getName());
-        outputs_count++;
-    }
-    else
-    {
-        Journal::instance()->info("Forward plus traj: NONE");
-    }
-
-    if (inputs_count == 0)
-    {
-        Journal::instance()->error("Switch " + name + " has't incomming trajectories!!!");
-        state_bwd = ONE_POSSIBLE_DIRECTION;
-        ref_state_bwd = ONE_POSSIBLE_DIRECTION;
-    }
-    else
-    {
-        if (inputs_count != 2)
+        if (trajectories[way])
         {
-            Journal::instance()->info(QString("Incomming trajectories: %1").arg(inputs_count));
-            state_bwd = ONE_POSSIBLE_DIRECTION;
-            ref_state_bwd = ONE_POSSIBLE_DIRECTION;
+            trajectories[way]->setBwdSwitch(this);
+        }
+    }
+
+    for (const Switch_way_t& way : switch_bwd_ways_t)
+    {
+        if (trajectories[way])
+        {
+            trajectories[way]->setFwdSwitch(this);
+        }
+    }
+
+    if (trajectories[SW_BWD_PLUS] == nullptr)
+    {
+        if (trajectories[SW_BWD_MINUS] == nullptr)
+        {
+            Journal::instance()->error("Switch " + name + " hasn't incoming trajectories!!!");
+            state_bwd = NO_POSSIBLE_DIRECTION;
+            ref_state_bwd = NO_POSSIBLE_DIRECTION;
+        }
+        else
+        {
+            Journal::instance()->info("Only one incoming trajectory (as minus way)");
+            state_bwd = ONLY_MINUS;
+            ref_state_bwd = ONLY_MINUS;
+        }
+    }
+    else
+    {
+        if (trajectories[SW_BWD_MINUS] == nullptr)
+        {
+            Journal::instance()->info("Only one incoming trajectory (as plus way)");
+            state_bwd = ONLY_PLUS;
+            ref_state_bwd = ONLY_PLUS;
         }
         else
         {
@@ -225,55 +203,64 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
                 if (tmp_int < 0)
                 {
                     state_bwd = STATE_MINUS;
-                    Journal::instance()->info(QString("Incomming trajectories: %1. Switch is set to minus direction").arg(inputs_count));
+                    Journal::instance()->info("Incoming trajectories: 2. Switch is set to minus direction");
                 }
                 else
                 {
-                    Journal::instance()->info(QString("Incomming trajectories: %1. Switch is set to plus direction").arg(inputs_count));
+                    Journal::instance()->info("Incoming trajectories: 2. Switch is set to plus direction");
                 }
             }
             else
             {
-                Journal::instance()->info(QString("Incomming trajectories: %1. Parameter <state_bwd> not found, switch is set to plus direction").arg(inputs_count));
+                Journal::instance()->info("Incoming trajectories: 2. Parameter <state_bwd> not found, switch is set to plus direction");
             }
             ref_state_bwd = state_bwd;
         }
     }
 
-    if (outputs_count == 0)
+    if (trajectories[SW_FWD_PLUS] == nullptr)
     {
-        Journal::instance()->error("Switch " + name + " has't outgoing trajectories!!!");
-        state_fwd = ONE_POSSIBLE_DIRECTION;
-        ref_state_fwd = ONE_POSSIBLE_DIRECTION;
+        if (trajectories[SW_FWD_MINUS] == nullptr)
+        {
+            Journal::instance()->error("Switch " + name + " hasn't outcoming trajectories!!!");
+            state_fwd = NO_POSSIBLE_DIRECTION;
+            ref_state_fwd = NO_POSSIBLE_DIRECTION;
+        }
+        else
+        {
+            Journal::instance()->info("Only one outcoming trajectory (as minus way)");
+            state_fwd = ONLY_MINUS;
+            ref_state_fwd = ONLY_MINUS;
+        }
     }
     else
     {
-        if (outputs_count != 2)
+        if (trajectories[SW_FWD_MINUS] == nullptr)
         {
-            Journal::instance()->info(QString("Outgoing trajectories: %1").arg(outputs_count));
-            state_fwd = ONE_POSSIBLE_DIRECTION;
-            ref_state_fwd = ONE_POSSIBLE_DIRECTION;
+            Journal::instance()->info("Only one outcoming trajectory (as plus way)");
+            state_fwd = ONLY_PLUS;
+            ref_state_fwd = ONLY_PLUS;
         }
         else
         {
             state_fwd = STATE_PLUS;
 
             int tmp_int = 0;
-            if (cfg.getInt(secNode, "state_fwd", tmp_int))
+            if (cfg.getInt(secNode, "state_bwd", tmp_int))
             {
                 if (tmp_int < 0)
                 {
                     state_fwd = STATE_MINUS;
-                    Journal::instance()->info(QString("Outgoing trajectories: %1. Switch is set to minus direction").arg(inputs_count));
+                    Journal::instance()->info("Outcoming trajectories: 2. Switch is set to minus direction");
                 }
                 else
                 {
-                    Journal::instance()->info(QString("Outgoing trajectories: %1. Switch is set to plus direction").arg(inputs_count));
+                    Journal::instance()->info("Outcoming trajectories: 2. Switch is set to plus direction");
                 }
             }
             else
             {
-                Journal::instance()->info(QString("Outgoing trajectories: %1. Parameter <state_fwd> not found, switch is set to plus direction").arg(inputs_count));
+                Journal::instance()->info("Outcoming trajectories: 2. Parameter <state_bwd> not found, switch is set to plus direction");
             }
             ref_state_fwd = state_fwd;
         }
@@ -282,12 +269,12 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     // Загружаем модули
     // Находим названия модулей, которые есть в траекториях спереди или сзади
     QStringList devices_names;
-    for (auto* traj : {bwdPlusTraj, bwdMinusTraj, fwdPlusTraj, fwdMinusTraj})
+    for (const Switch_way_t& way : switch_ways_t)
     {
-        if (traj == nullptr)
+        if (trajectories[way] == nullptr)
             continue;
 
-        for (auto* device : traj->getTrajectoryDevices())
+        for (const auto* device : trajectories[way]->getTrajectoryDevices())
         {
             QString name = device->getName();
             if (!devices_names.contains(name))
@@ -306,7 +293,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
         QString conn_path = QString(fs.getModulesDir().c_str()) +
                                      QDir::separator() +
                                      conn_module;
-        ConnectorDevice *module = loadConnectorDevice(conn_path);
+        ConnectorDevice* module = loadConnectorDevice(conn_path);
 
         if (module == nullptr)
         {
@@ -322,67 +309,33 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 
         // Настраиваем связи модулей траекторий и коннектора,
         // параллельно топологии
-        bool no_plus = true;
-        if (bwdPlusTraj != nullptr)
+        auto link_module = [](ConnectorDevice* module, QString& device_name,
+                              Trajectory* traj, bool is_switched)
         {
-            no_plus = false;
-            for (auto* device_bwd : bwdPlusTraj->getTrajectoryDevices())
+            if (traj == nullptr)
             {
-                QString bwd_name = device_bwd->getName();
-                if (device_name == bwd_name)
-                {
-                    module->setBwdTrajectoryDevice(device_bwd);
-                    device_bwd->setFwdConnectorDevice(module);
-                    break;
-                }
+                return;
             }
-        }
 
-        if (bwdMinusTraj != nullptr)
-        {
-            for (auto* device_bwd : bwdMinusTraj->getTrajectoryDevices())
+            for (auto* device_bwd : traj->getTrajectoryDevices())
             {
                 QString bwd_name = device_bwd->getName();
                 if (device_name == bwd_name)
                 {
-                    if (no_plus || (state_bwd == -1))
+                    if (is_switched)
+                    {
                         module->setBwdTrajectoryDevice(device_bwd);
+                    }
                     device_bwd->setFwdConnectorDevice(module);
                     break;
                 }
             }
-        }
+        };
 
-        no_plus = true;
-        if (fwdPlusTraj != nullptr)
-        {
-            no_plus = false;
-            for (auto* device_fwd : fwdPlusTraj->getTrajectoryDevices())
-            {
-                QString fwd_name = device_fwd->getName();
-                if (device_name == fwd_name)
-                {
-                    module->setFwdTrajectoryDevice(device_fwd);
-                    device_fwd->setBwdConnectorDevice(module);
-                    break;
-                }
-            }
-        }
-
-        if (fwdMinusTraj != nullptr)
-        {
-            for (auto* device_fwd : fwdMinusTraj->getTrajectoryDevices())
-            {
-                QString fwd_name = device_fwd->getName();
-                if (device_name == fwd_name)
-                {
-                    if (no_plus || (state_fwd == -1))
-                        module->setFwdTrajectoryDevice(device_fwd);
-                    device_fwd->setBwdConnectorDevice(module);
-                    break;
-                }
-            }
-        }
+        link_module(module, device_name, trajectories[SW_FWD_PLUS], (state_fwd > 0));
+        link_module(module, device_name, trajectories[SW_FWD_MINUS], (state_fwd < 0));
+        link_module(module, device_name, trajectories[SW_BWD_PLUS], (state_bwd > 0));
+        link_module(module, device_name, trajectories[SW_BWD_MINUS], (state_bwd < 0));
 
         // TODO конфигурирование?
 
@@ -398,16 +351,13 @@ void Switch::step(double t, double dt)
     int prev_state_fwd = state_fwd;
     int prev_state_bwd = state_bwd;
 
-    // Если траектория вперёд единственная - делать дальше нечего
-    if ((fwdMinusTraj == nullptr) || (fwdPlusTraj == nullptr))
-    {
-        state_fwd = ONE_POSSIBLE_DIRECTION;
-    }
-    else
+    // Если возможны обе траектории вперёд, проверяем переключение стрелки
+    if ((trajectories[SW_FWD_PLUS] != nullptr) && (trajectories[SW_FWD_MINUS] != nullptr))
     {
         // Если какая-то траектория спереди занята ПЕ ближе,
-        // чем заданная дистанция, ставим стрелку в это направление
-        if (fwdPlusTraj->isBusy(0.0, lock_by_busy_distance))
+        // чем заданная дистанция, ставим стрелку в это направление,
+        // а также сбрасываем маршрут диспетчерской централизации
+        if (trajectories[SW_FWD_PLUS]->isBusy(0.0, lock_by_busy_distance))
         {
             state_fwd = IS_BUSY_PLUS;
             ref_state_fwd = STATE_PLUS;
@@ -415,7 +365,7 @@ void Switch::step(double t, double dt)
         }
         else
         {
-            if (fwdMinusTraj->isBusy(0.0, lock_by_busy_distance))
+            if (trajectories[SW_FWD_MINUS]->isBusy(0.0, lock_by_busy_distance))
             {
                 state_fwd = IS_BUSY_MINUS;
                 ref_state_fwd = STATE_MINUS;
@@ -429,16 +379,14 @@ void Switch::step(double t, double dt)
         }
     }
 
-    // Если траектория назад единственная - делать дальше нечего
-    if ((bwdMinusTraj == nullptr) || (bwdPlusTraj == nullptr))
-    {
-        state_bwd = ONE_POSSIBLE_DIRECTION;
-    }
-    else
+    // Если возможны обе траектории назад, проверяем переключение стрелки
+    if ((trajectories[SW_BWD_PLUS] != nullptr) && (trajectories[SW_BWD_MINUS] != nullptr))
     {
         // Если какая-то траектория сзади занята ПЕ ближе,
-        // чем заданная дистанция, ставим стрелку в это направление
-        if (bwdPlusTraj->isBusy(bwdPlusTraj->getLength() - lock_by_busy_distance, bwdPlusTraj->getLength()))
+        // чем заданная дистанция, ставим стрелку в это направление,
+        // а также сбрасываем маршрут диспетчерской централизации
+        double len = trajectories[SW_BWD_PLUS]->getLength();
+        if (trajectories[SW_BWD_PLUS]->isBusy(len - lock_by_busy_distance, len))
         {
             state_bwd = IS_BUSY_PLUS;
             ref_state_bwd = STATE_PLUS;
@@ -446,7 +394,8 @@ void Switch::step(double t, double dt)
         }
         else
         {
-            if (bwdMinusTraj->isBusy(bwdMinusTraj->getLength() - lock_by_busy_distance, bwdMinusTraj->getLength()))
+            len = trajectories[SW_BWD_MINUS]->getLength();
+            if (trajectories[SW_BWD_MINUS]->isBusy(len - lock_by_busy_distance, len))
             {
                 state_bwd = IS_BUSY_MINUS;
                 ref_state_bwd = STATE_MINUS;
@@ -477,7 +426,7 @@ void Switch::step(double t, double dt)
         if (change_fwd > 0)
         {
             bool no_change = true;
-            for (auto* device_fwd : fwdPlusTraj->getTrajectoryDevices())
+            for (auto* device_fwd : trajectories[SW_FWD_PLUS]->getTrajectoryDevices())
             {
                 if (device->getName() == device_fwd->getName())
                 {
@@ -492,7 +441,7 @@ void Switch::step(double t, double dt)
         if (change_fwd < 0)
         {
             bool no_change = true;
-            for (auto* device_fwd : fwdMinusTraj->getTrajectoryDevices())
+            for (auto* device_fwd : trajectories[SW_FWD_MINUS]->getTrajectoryDevices())
             {
                 if (device->getName() == device_fwd->getName())
                 {
@@ -508,7 +457,7 @@ void Switch::step(double t, double dt)
         if (change_bwd > 0)
         {
             bool no_change = true;
-            for (auto* device_bwd : bwdPlusTraj->getTrajectoryDevices())
+            for (auto* device_bwd : trajectories[SW_BWD_PLUS]->getTrajectoryDevices())
             {
                 if (device->getName() == device_bwd->getName())
                 {
@@ -523,7 +472,7 @@ void Switch::step(double t, double dt)
         if (change_bwd < 0)
         {
             bool no_change = true;
-            for (auto* device_bwd : bwdMinusTraj->getTrajectoryDevices())
+            for (auto* device_bwd : trajectories[SW_BWD_MINUS]->getTrajectoryDevices())
             {
                 if (device->getName() == device_bwd->getName())
                 {
@@ -556,10 +505,10 @@ QByteArray Switch::serialize()
     stream << name;
 
     // Сериализуем связанные с этим коннектором траектории
-    serialize_connected_trajectory(stream, fwdMinusTraj);
-    serialize_connected_trajectory(stream, fwdPlusTraj);
-    serialize_connected_trajectory(stream, bwdMinusTraj);
-    serialize_connected_trajectory(stream, bwdPlusTraj);
+    for (const Switch_way_t& way : switch_ways_t)
+    {
+        serialize_connected_trajectory(stream, trajectories[way], orientations[way]);
+    }
 
     // Помещаем в буФер состояние стрелки
     stream << state_fwd << state_bwd;
@@ -580,40 +529,46 @@ void Switch::deserialize(QByteArray &data, traj_list_t &traj_list)
     stream >> name;
 
     // Восстанавливаем связанные с этим коннектором траектории
-    fwdMinusTraj = deserialize_connected_trajectory(stream, traj_list);
-    if (fwdMinusTraj)
-        fwdMinusTraj->setBwdConnector(this);
-    fwdPlusTraj = deserialize_connected_trajectory(stream, traj_list);
-    if (fwdPlusTraj)
-        fwdPlusTraj->setBwdConnector(this);
-    bwdMinusTraj = deserialize_connected_trajectory(stream, traj_list);
-    if (bwdMinusTraj)
-        bwdMinusTraj->setFwdConnector(this);
-    bwdPlusTraj = deserialize_connected_trajectory(stream, traj_list);
-    if (bwdPlusTraj)
-        bwdPlusTraj->setFwdConnector(this);
+    for (const Switch_way_t& way : switch_ways_t)
+    {
+        std::tie(trajectories[way], orientations[way]) = deserialize_connected_trajectory(stream, traj_list);
+    }
+
+    for (const Switch_way_t& way : switch_fwd_ways_t)
+    {
+        if (trajectories[way])
+        {
+            trajectories[way]->setBwdSwitch(this);
+        }
+    }
+
+    for (const Switch_way_t& way : switch_bwd_ways_t)
+    {
+        if (trajectories[way])
+        {
+            trajectories[way]->setFwdSwitch(this);
+        }
+    }
 
     // Восстанавливаем статусы стрелки
     stream >> state_fwd;
     stream >> state_bwd;
-
-    fwdTraj = this->getFwdTraj();
-    bwdTraj = this->getBwdTraj();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::serialize_connected_trajectory(QDataStream &stream, Trajectory *traj)
+void Switch::serialize_connected_trajectory(QDataStream &stream, Trajectory *traj, dir_t orient)
 {
     // Анализирум наличие траектории на каждом из ответвлений,
     // пишем в буфер признак присутствия, и если она присутствует,
     // далее пишем имя этой траектории
-    bool has_traj = traj != nullptr;
+    bool has_traj = (traj != nullptr);
     stream << has_traj;
 
     if (has_traj)
     {
+        stream << orient;
         stream << traj->getName();
     }
 }
@@ -621,7 +576,7 @@ void Switch::serialize_connected_trajectory(QDataStream &stream, Trajectory *tra
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Trajectory *Switch::deserialize_connected_trajectory(QDataStream &stream,
+std::pair<Trajectory*, dir_t> Switch::deserialize_connected_trajectory(QDataStream &stream,
                                                      traj_list_t &traj_list)
 {
     // Извлекаем признак наличия траектории в этом направлении
@@ -630,24 +585,26 @@ Trajectory *Switch::deserialize_connected_trajectory(QDataStream &stream,
 
     if (has_traj)
     {
-        // Если она должна быть, восстанавливаем её имя
+        // Если она должна быть, восстанавливаем её ориентацию и имя
+        dir_t orient;
         QString traj_name;
+        stream >> orient;
         stream >> traj_name;
 
         // Если в списке траекторий есть такая, возвращаем указатель на нее
         if (traj_list.contains(traj_name))
         {
-            return traj_list[traj_name];
+            return {traj_list[traj_name], orient};
         }
     }
 
-    return nullptr;
+    return {nullptr, FWD};
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::setStateFwd(State state)
+void Switch::setStateFwd(Switch_state_t state)
 {
     // Задаём стрелке состояние
     state_fwd = state;
@@ -656,7 +613,7 @@ void Switch::setStateFwd(State state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::setStateBwd(State state)
+void Switch::setStateBwd(Switch_state_t state)
 {
     // Задаём стрелке состояние
     state_bwd = state;
@@ -665,7 +622,7 @@ void Switch::setStateBwd(State state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::setRefStateFwd(State state)
+void Switch::setRefStateFwd(Switch_state_t state)
 {
     // Задаём стрелке требуемое направление
     ref_state_fwd = state;
@@ -674,7 +631,7 @@ void Switch::setRefStateFwd(State state)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::setRefStateBwd(State state)
+void Switch::setRefStateBwd(Switch_state_t state)
 {
     // Задаём стрелке требуемое направление
     ref_state_bwd = state;
