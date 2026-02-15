@@ -8,7 +8,7 @@
 #include    "signal-types.h"
 
 class CfgReader;
-class Connector;
+class Switch;
 
 //------------------------------------------------------------------------------
 //
@@ -31,9 +31,9 @@ public:
 
     QString getConnectorName() const;
 
-    void setConnector(Connector* conn);
+    void setConnector(Switch* conn);
 
-    Connector* getConnector() const;
+    Switch* getConnector() const;
 
     void setDirection(int signal_dir)
     {
@@ -168,7 +168,7 @@ protected:
     dvec3 pos = {0.0, 0.0, 0.0};
 
     /// Коннектор, с которым связан сигнал
-    Connector* conn = nullptr;
+    Switch* conn = nullptr;
 
     virtual void preStep(double t);
 

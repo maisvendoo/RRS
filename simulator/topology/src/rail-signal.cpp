@@ -2,7 +2,7 @@
 #include    "filesystem.h"
 #include    "CfgReader.h"
 #include    "Journal.h"
-#include    "connector.h"
+#include    "switch.h"
 #include    "trajectory.h"
 #include    <QBuffer>
 
@@ -88,7 +88,7 @@ QString Signal::getConnectorName() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Signal::setConnector(Connector* conn)
+void Signal::setConnector(Switch* conn)
 {
     this->conn = conn;
     if (conn)
@@ -100,7 +100,7 @@ void Signal::setConnector(Connector* conn)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Connector* Signal::getConnector() const
+Switch* Signal::getConnector() const
 {
     return conn;
 }
@@ -175,11 +175,13 @@ bool Signal::calcPosition()
     Trajectory* traj = nullptr;
     if (signal_dir == 1)
     {
-        traj = conn->getBwdTraj();
+        dir_t d = FWD;
+        traj = conn->getNextTraj(d);
     }
     if (signal_dir == -1)
     {
-        traj = conn->getFwdTraj();
+        dir_t d = BWD;
+        traj = conn->getNextTraj(d);
     }
 
     if (traj == nullptr)
