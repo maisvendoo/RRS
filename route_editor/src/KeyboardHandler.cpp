@@ -12,22 +12,22 @@
 KeyboardHandler::KeyboardHandler(const settings_t& settings)
 {
     key_bindings[ACTION_MOVE_CAMERA_FORWARD] =
-        {KEY_MODIFIER_NONE, settings.key_move_camera_forward};
+        settings.key_move_camera_forward;
 
     key_bindings[ACTION_MOVE_CAMERA_BACKWARD] =
-        {KEY_MODIFIER_NONE, settings.key_move_camera_backward};
+        settings.key_move_camera_backward;
 
     key_bindings[ACTION_MOVE_CAMERA_LEFT] =
-        {KEY_MODIFIER_NONE, settings.key_move_camera_left};
+        settings.key_move_camera_left;
 
     key_bindings[ACTION_MOVE_CAMERA_RIGHT] =
-        {KEY_MODIFIER_NONE, settings.key_move_camera_right};
+        settings.key_move_camera_right;
 
     key_bindings[ACTION_MOVE_OBJECTS] =
-        {KEY_MODIFIER_NONE, settings.key_move_objects};
+        settings.key_move_objects;
 
     key_bindings[ACTION_ROTATE_OBJECTS] =
-        {KEY_MODIFIER_NONE, settings.key_rotate_objects};
+        settings.key_rotate_objects;
 }
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
@@ -76,26 +76,45 @@ bool KeyboardHandler::get_binding_state(Action action) const
     assert(action >= 0);
     assert(action < TOTAL_ACTIONS);
 
-    static const std::map<MyKeyModifier, vsg::KeySymbol> modifiers_map = {
-        {KEY_MODIFIER_LSHIFT, vsg::KEY_Shift_L},
-        {KEY_MODIFIER_RSHIFT, vsg::KEY_Shift_R},
-        {KEY_MODIFIER_LCTRL, vsg::KEY_Control_L},
-        {KEY_MODIFIER_RCTRL, vsg::KEY_Control_R},
-        {KEY_MODIFIER_LALT, vsg::KEY_Alt_L},
-        {KEY_MODIFIER_RALT, vsg::KEY_Alt_R}
+    const KeyBinding key_binding = get_key_binding(action);
+    if (!get_key_state(key_binding.key))
+    {
+        return false;
+    }
+
+    static const std::map<MyKeyModifier, std::vector<vsg::KeySymbol>> modifiers_map = {
+        {MY_KEY_MODIFIER_SHIFT_L, {vsg::KEY_Shift_L}},
+        {MY_KEY_MODIFIER_SHIFT_R, {vsg::KEY_Shift_R}},
+        {MY_KEY_MODIFIER_SHIFT_ANY, {vsg::KEY_Shift_L, vsg::KEY_Shift_R}},
+        {MY_KEY_MODIFIER_CTRL_L, {vsg::KEY_Control_L}},
+        {MY_KEY_MODIFIER_CTRL_R, {vsg::KEY_Control_R}},
+        {MY_KEY_MODIFIER_CTRL_ANY, {vsg::KEY_Control_L, vsg::KEY_Control_R}},
+        {MY_KEY_MODIFIER_ALT_L, {vsg::KEY_Alt_L}},
+        {MY_KEY_MODIFIER_ALT_R, {vsg::KEY_Alt_R}},
+        {MY_KEY_MODIFIER_ALT_ANY, {vsg::KEY_Alt_L, vsg::KEY_Alt_R}}
     };
 
-    const KeyBinding key_binding = get_key_binding(action);
-
-    for (const auto& [modifier, key] : modifiers_map)
+    for (const auto& [modifier, keys] : modifiers_map)
     {
-        if ((key_binding.modifiers & modifier) && !get_key_state(key))
+        if (key_binding.modifiers & modifier)
         {
-            return false;
+            bool pressed = false;
+            for (const auto& key : keys)
+            {
+                if (get_key_state(key))
+                {
+                    pressed = true;
+                    break;
+                }
+            }
+            if (!pressed)
+            {
+                return false;
+            }
         }
     }
 
-    return get_key_state(key_binding.key);
+    return true;
 }
 
 const KeyBindings& KeyboardHandler::get_key_bindings() const

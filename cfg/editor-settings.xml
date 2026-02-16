@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Config>
+    <!-- Настройки окна -->
+    <Window>
+        <!-- Заголовок окна -->
+        <Title>Route Editor</Title>
+        <!-- Положение окна, пикс. -->
+        <xPos>50</xPos>
+        <yPos>50</yPos>
+        <!-- Размер окна, пикс. -->
+        <Width>1800</Width>
+        <Height>900</Height>
+        <!-- Номер монитора; 0 - для монитора по-умолчанию -->
+        <ScreenNumber>0</ScreenNumber>
+        <!-- Полноэкранный режим: 1 - включен; 0 - оконный режим -->
+        <FullScreen>0</FullScreen>
+        <!-- Вертикальная синхронизация: 1 - включена; 0 - отключена -->
+        <VSync>1</VSync>
+        <!-- Двойная буферизация: 1 - включена; 0 - отключена -->
+        <DoubleBuffer>1</DoubleBuffer>
+        <!-- Мультисемплинг (сглаживание) -->
+        <Samples>8</Samples>
+    </Window>
+    <!-- Настройки камеры -->
+    <Camera>
+        <!-- Ближняя плоскость отсечения, м. -->
+        <zNear>0.1</zNear>
+        <!-- Дальняя плоскость отсечения (дальность видимости), м. -->
+        <ViewDistance>2000.0</ViewDistance>
+        <!-- Угол поля зрения, град. -->
+        <FovY>90</FovY>
+        <FovYMin>30</FovYMin>
+        <FovYMax>120</FovYMax>
+        <!-- Начальная высота камеры -->
+        <InitialHeight>5.0</InitialHeight>
+        <!-- Скорость перемещения камеры -->
+        <MoveSpeed>100.0</MoveSpeed>
+        <MinMoveSpeed>10.0</MinMoveSpeed>
+        <MaxMoveSpeed>200.0</MaxMoveSpeed>
+        <!-- Скорость вращения камеры -->
+        <RotateSpeed>20.0</RotateSpeed>
+        <MinRotateSpeed>10.0</MinRotateSpeed>
+        <MaxRotateSpeed>25.0</MaxRotateSpeed>
+        <!-- Сила приближения/отдаления камеры -->
+        <ZoomPower>250.0</ZoomPower>
+        <MinZoomPower>50.0</MinZoomPower>
+        <MaxZoomPower>500.0</MaxZoomPower>
+    </Camera>
+    <!-- Настройки гизмо -->
+    <Gizmo>
+        <!-- Длина стрелок гизмо -->
+        <ArrowLength>3.0</ArrowLength>
+        <!-- Толщина стрелок гизмо-->
+        <ArrowThickness>0.05</ArrowThickness>
+        <!-- Цвет оси X гизмо -->
+        <XAxisColorR>0.859</XAxisColorR>
+        <XAxisColorG>0.188</XAxisColorG>
+        <XAxisColorB>0.143</XAxisColorB>
+        <!-- Цвет оси Y гизмо -->
+        <YAxisColorR>0.533</YAxisColorR>
+        <YAxisColorG>0.820</YAxisColorG>
+        <YAxisColorB>0.298</YAxisColorB>
+        <!-- Цвет оси Z гизмо -->
+        <ZAxisColorR>0.188</ZAxisColorR>
+        <ZAxisColorG>0.438</ZAxisColorG>
+        <ZAxisColorB>0.859</ZAxisColorB>
+        <!-- Непрозрачность гизмо -->
+        <Opacity>1.0</Opacity>
+        <!-- Центрировать гизмо -->
+        <ToCenter>0</ToCenter>
+    </Gizmo>
+    <!-- Настройки GUI (графического интерфейса пользователя) -->
+    <GUI>
+        <!-- Размер шрифта GUI -->
+        <FontSize>20.0</FontSize>
+        <!-- Можно ли перемещать и менять размер GUI -->
+        <IsEditable>1</IsEditable>
+        <!-- Отображать список моделей в objects.ref после загрузки маршрута -->
+        <ShowObjectsRef>1</ShowObjectsRef>
+        <!-- Отображать список объектов в route1.map после загрузки маршрута -->
+        <!-- !!!Сейчас на больших маршрутах тормозит!!! -->
+        <ShowRouteMap>0</ShowRouteMap>
+        <!-- Отображать привязки клавиш и кнопок управления -->
+        <ShowControls>1</ShowControls>
+        <!-- Отображать настройки камеры -->
+        <ShowCameraSettings>0</ShowCameraSettings>
+        <!-- Отображать топологию -->
+        <ShowTopology>0</ShowTopology>
+    </GUI>
+    <!-- Настройки клавиатурных комбинаций управления -->
+    <Keys>
+        <MoveCameraForward>W</MoveCameraForward>
+        <MoveCameraBackward>S</MoveCameraBackward>
+        <MoveCameraLeft>A</MoveCameraLeft>
+        <MoveCameraRight>D</MoveCameraRight>
+        <MoveObjects>G</MoveObjects>
+        <RotateObjects>R</RotateObjects>
+        <ScaleObjects>S</ScaleObjects>
+        <CopyObjects>Ctrl + C</CopyObject>
+        <PasteObjects>Ctrl + V</PasteObjects>
+        <UndoCommand>Ctrl + Z</UndoCommand>
+        <RedoCommand>Ctrl + Y</RedoCommand>
+    </Keys>
+</Config>
