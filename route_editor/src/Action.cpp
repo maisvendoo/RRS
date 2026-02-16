@@ -6,7 +6,7 @@
 using ActionNameMap = std::map<Action, const char*>;
 using ActionNamePair = ActionNameMap::value_type;
 
-static const ActionNamePair action_name_map_data[] = {
+static constexpr ActionNamePair action_name_map_data[] = {
     {ACTION_MOVE_CAMERA_FORWARD,  "Camera: move forward"},
     {ACTION_MOVE_CAMERA_BACKWARD, "Camera: move backward"},
     {ACTION_MOVE_CAMERA_LEFT,     "Camera: move left"},

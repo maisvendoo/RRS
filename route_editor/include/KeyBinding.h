@@ -7,6 +7,7 @@
 
 #include <array>
 #include <cstdint>
+#include <vector>
 
 enum EditorKeyModifier
 {
@@ -20,6 +21,9 @@ enum EditorKeyModifier
     EDITOR_KEY_MODIFIER_ALT_R     = 0x0080,
     EDITOR_KEY_MODIFIER_ALT_ANY   = 0x0100
 };
+
+extern const std::map<EditorKeyModifier, std::vector<vsg::KeySymbol>>
+modifier_keys_map;
 
 struct KeyBinding
 {

@@ -38,7 +38,6 @@ EditorGui::EditorGui(
     settings_t& settings,
     CommandList& commands,
     EditorState& editor_state,
-    const KeyBindings& key_bindings,
     vsg::ref_ptr<vsg::Perspective> perspective,
     vsg::ref_ptr<SceneGraph> scene_graph,
     const vsg::ref_ptr<ObjectSelector>& object_selector,
@@ -47,7 +46,7 @@ EditorGui::EditorGui(
     : settings(settings)
     , commands(commands)
     , editor_state(editor_state)
-    , key_bindings(key_bindings)
+    , key_bindings(settings.key_bindings)
     , perspective(perspective)
     , scene_graph(scene_graph)
     , object_selector(object_selector)

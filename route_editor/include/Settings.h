@@ -2,8 +2,8 @@
 #define EDITOR_SETTINGS_H
 
 #include "KeyBinding.h"
+
 #include <vsg/maths/vec3.h>
-#include <vsg/ui/KeyEvent.h>
 
 #include <string>
 
@@ -33,17 +33,17 @@ struct settings_t
 
     double camera_initial_height = 0.0;
 
-    double min_camera_rotate_speed = 10.0;
-    double max_camera_rotate_speed = 25.0;
-    double camera_rotate_speed = 10.0;
-
-    double min_camera_zoom_power = 50.0;
-    double max_camera_zoom_power = 200.0;
-    double camera_zoom_power = 100.0;
-
+    double camera_move_speed = 100.0;
     double min_camera_move_speed = 50.0;
     double max_camera_move_speed = 200.0;
-    double camera_move_speed = 100.0;
+
+    double camera_rotate_speed = 10.0;
+    double min_camera_rotate_speed = 10.0;
+    double max_camera_rotate_speed = 25.0;
+
+    double camera_zoom_power = 100.0;
+    double min_camera_zoom_power = 50.0;
+    double max_camera_zoom_power = 200.0;
 
     float gizmo_arrow_length = 5.0f;
     float gizmo_arrow_thickness = 0.1f;
@@ -52,8 +52,6 @@ struct settings_t
     vsg::vec3 gizmo_arrow_z_color = {0.0f, 0.0f, 1.0f};
     float gizmo_opacity = 1.0f;
     bool gizmo_to_center = false;
-
-    bool show_wireframe = false;
 
     double gui_font_size = 20.0;
     bool is_gui_editable = false;

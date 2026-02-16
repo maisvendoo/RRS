@@ -12,7 +12,6 @@ EditorGui.h
 EditorState.h
 Gizmo.h
 IntersectionHandler.h
-KeyboardHandler.h
 KeyStates.h
 LSIntersector.h
 Mask.h
@@ -27,7 +26,6 @@ RouteMap.h
 RouteObject.h
 SceneGraph.h
 SelectedObjects.h
-Settings.h
 shader_funcs.h
 SingleSwitch.h
 StringMap.h
@@ -47,8 +45,6 @@ CameraHandler.cpp
 EditorGui.cpp
 Gizmo.cpp
 IntersectionHandler.cpp
-KeyboardHandler.cpp
-main.cpp
 MouseHandler.cpp
 ObjectSelector.cpp
 Outline.cpp
@@ -56,7 +52,6 @@ Route.cpp
 RouteEditor.cpp
 RouteObject.cpp
 SceneGraph.cpp
-Settings.cpp
 shader_funcs.cpp
 SwitchGroup.cpp
 WindowHandler.cpp

@@ -1,17 +1,22 @@
 #include "Settings.h"
+
 #include "Action.h"
 #include "KeyBinding.h"
 
 #include <CfgReader.h>
 
-#include <cstdint>
-#include <iterator>
-#include <qnamespace.h>
-#include <qregularexpression.h>
 #include <vsg/ui/KeyEvent.h>
 
+#include <QRegularExpression>
 #include <QString>
+#include <QStringList>
+#include <Qt>
+#include <QtTypes>
 
+#include <cstdint>
+#include <cstdio>
+#include <iterator>
+#include <map>
 #include <string>
 
 void settings_t::read(const std::string& cfg_path)
@@ -96,7 +101,7 @@ void settings_t::read(const std::string& cfg_path)
     using ActionSettingNameMap = std::map<Action, const char*>;
     using ActionSettingNamePair = ActionSettingNameMap::value_type;
 
-    const ActionSettingNamePair action_setting_name_map_data[] = {
+    constexpr ActionSettingNamePair action_setting_name_map_data[] = {
         {ACTION_MOVE_CAMERA_FORWARD,  "MoveCameraForward"},
         {ACTION_MOVE_CAMERA_BACKWARD, "MoveCameraBackward"},
         {ACTION_MOVE_CAMERA_LEFT,     "MoveCameraLeft"},
@@ -109,7 +114,7 @@ void settings_t::read(const std::string& cfg_path)
         {ACTION_PASTE_OBJECTS,  "PasteObjects"},
 
         {ACTION_UNDO_COMMAND, "UndoCommand"},
-        {ACTION_REDO_COMMAND, "RedoCommand"},
+        {ACTION_REDO_COMMAND, "RedoCommand"}
     };
 
     static_assert(sizeof action_setting_name_map_data /
@@ -140,14 +145,22 @@ void settings_t::read(const std::string& cfg_path)
     for (const auto& [action, setting_name] : action_setting_name_map)
     {
         QString line;
-        cfg.getString(section, setting_name, line);
+
+        if (!cfg.getString(section, setting_name, line))
+        {
+            // TODO: Replace on Journal
+            std::fprintf(stderr, "Failed to find key setting %s\n",
+                setting_name);
+
+            continue;
+        }
 
         line = line.toLower();
 
-        const auto strings = line.split(QRegularExpression("[ +]"),
+        const QStringList strings = line.split(QRegularExpression("[ +]"),
             Qt::SkipEmptyParts);
 
-        const auto string_size = strings.size();
+        const qsizetype string_size = strings.size();
         if (string_size <= 0)
         {
             continue;
@@ -155,17 +168,20 @@ void settings_t::read(const std::string& cfg_path)
 
         std::uint32_t modifiers = 0;
 
-        for (auto i = decltype(string_size){0}; i < string_size - 1; ++i)
+        for (qsizetype i = 0; i < string_size - 1; ++i)
         {
-            const auto str = strings[i].toStdString();
-            const auto found = key_modifier_setting_name_map.find(str);
-            if (found != key_modifier_setting_name_map.cend())
+            const auto found_it = key_modifier_setting_name_map.find(
+                strings[i].toStdString());
+
+            if (found_it != key_modifier_setting_name_map.cend())
             {
-                modifiers |= found->second;
+                modifiers |= found_it->second;
             }
         }
 
-        key_bindings[action].key = static_cast<vsg::KeySymbol>(strings.back().front().toLatin1());
-        key_bindings[action].modifiers = modifiers;
+        KeyBinding& key_binding = key_bindings[action];
+        key_binding.key = static_cast<vsg::KeySymbol>(
+            strings.back().front().toLatin1());
+        key_binding.modifiers = modifiers;
     }
 }
