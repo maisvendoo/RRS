@@ -386,7 +386,7 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
             if (bwd_sw == nullptr)
                 return -1;
 
-            Trajectory *traj = bwd_switch->getNextTraj(direction);
+            Trajectory *traj = bwd_sw->getNextTraj(direction);
             if (traj == nullptr)
                 return -1;
 
@@ -425,11 +425,11 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
         {
             distance = distance + len - coord_begin;
 
-            Switch* bwd_sw = getNextSwitch(direction);
-            if (bwd_sw == nullptr)
+            Switch* fwd_sw = getNextSwitch(direction);
+            if (fwd_sw == nullptr)
                 return -1;
 
-            Trajectory *traj = bwd_switch->getNextTraj(direction);
+            Trajectory *traj = fwd_sw->getNextTraj(direction);
             if (traj == nullptr)
                 return -1;
 

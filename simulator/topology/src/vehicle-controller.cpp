@@ -45,7 +45,7 @@ void VehicleController::setCoord(double x)
 {
     // Обновляем траекторную координату,
     // в соответствии с относительным перемещением ПЕ
-    traj_coord += x - x_cur + x_off;
+    traj_coord += dir * (x - x_cur) + x_off;
     // Обновляем значение дуговой координаты
     x_cur = x;
 
@@ -258,6 +258,7 @@ profile_point_t VehicleController::getPosition()
 int VehicleController::getNearestVehicle(double& distance, double search_distance, dir_t direction)
 {
     distance = 0.0;
+    direction = static_cast<dir_t>(dir * direction);
     double coord = traj_coord + x_off + length_half * static_cast<double>(direction);
     Trajectory *search_traj = current_traj;
 
@@ -443,55 +444,84 @@ void VehicleController::updateTrajectories()
 
     // Занятость пути
     current_traj->setBusy(index, max(0.0, vehicle_end), min(vehicle_begin, current_traj->getLength()));
-/* TODO Занятость пути за пределами текущей траектории
-    Trajectory* next_traj = current_traj;
-    // Если траекторная координата превысила длину траектории
-    // (заехали за стык или стрелку спереди), пока она её превышает...
-    while (vehicle_begin > next_traj->getLength())
+
+    // Занятость пути на соседних траекториях на длину ПЕ
+    // Реализация похожа на Trajectory::findTrajectoryAtCoord(), но здесь нужно
+    // вызвать Trajectory::setBusy для каждой посещённой траектории
+    auto set_busy_off = [](size_t index, Trajectory* cur_traj, double coord)
     {
-        // Получаем указатель на коннектор спереди
-        Connector *conn = next_traj->getFwdConnector();
-        if (conn == nullptr)
-            break;
+        dir_t move_dir;
+        while (true)
+        {
+            if (coord < 0.0)
+            {
+                // Если траекторная координата меньше нуля - заехали за стрелку сзади
+                move_dir = BWD;
+            }
+            else
+            {
+                if (coord > cur_traj->getLength())
+                {
+                    // Если траекторная координата превысила длину траектории - заехали за стрелку спереди
+                    move_dir = FWD;
+                    // Учитываем выход за пределы траектории
+                    coord = coord - cur_traj->getLength();
+                }
+                else
+                {
+                    // УРА! Находимся в пределах траектории: выходим
+                    return;
+                }
+            }
 
-        // Вычитаем из траекторной координаты длину предыдущей траектории,
-        // чтобы получить координату на новой траектории впереди
-        vehicle_begin = vehicle_begin - next_traj->getLength();
+            // Отслеживаем разворот ориентации траектории
+            dir_t new_dir = move_dir;
 
-        // Получаем указатель на траекторию впереди,
-        // с которой нас соединяет коннектор спереди
-        next_traj = conn->getFwdTraj();
-        if (next_traj == nullptr)
-            break;
+            // Получаем указатель на стрелку в конце траектории
+            Switch* next_sw = cur_traj->getNextSwitch(new_dir);
+            if (next_sw == nullptr)
+            {
+                // Если коннектора нет, выходим
+                return;
+            }
 
-        // Занятость пути
-        next_traj->setBusy(index, 0.0, min(vehicle_begin, next_traj->getLength()));
-    }
+            // Получаем указатель на ту траекторию, с которой нас соединяет стрелка
+            Trajectory* next_traj = next_sw->getNextTraj(new_dir);
 
-    next_traj = current_traj;
-    // Если траекторная координата меньше нуля
-    // (заехали за стык или стрелку сзади), пока она меньше нуля...
-    while (vehicle_end < 0.0)
-    {
-        // Получаем указатель на коннектор сзади
-        Connector *conn = next_traj->getBwdConnector();
-        if (conn == nullptr)
-            break;
+            // Если за стрелкой нет траектории, выходим
+            if (next_traj == nullptr)
+            {
+                return;
+            }
 
-        // Получаем указатель на траекторию сзади,
-        // с которой нас соединяет коннектор сзади
-        next_traj = conn->getBwdTraj();
-        if (next_traj == nullptr)
-            break;
+            // Обновляем текущую траекторию
+            cur_traj = next_traj;
+            if (new_dir != move_dir)
+            {
+                // Если ориентация траектории изменилась, разворачиваемся
+                coord = -coord;
+            }
 
-        // Добавляем к траекторной координате длину новой траектории,
-        // чтобы получить координату на новой траектории сзади
-        vehicle_end = vehicle_end + next_traj->getLength();
+            if (new_dir == BWD)
+            {
+                // Если смещаемся назад, начинаем отсчёт с конца траектории
+                coord = coord + cur_traj->getLength();
 
-        // Занятость пути
-        next_traj->setBusy(index, max(0.0, vehicle_end), next_traj->getLength());
-    }
-*/
+                // Занятость пути
+                cur_traj->setBusy(index, max(0.0, coord), cur_traj->getLength());
+            }
+            else
+            {
+                // Занятость пути
+                cur_traj->setBusy(index, 0.0, min(coord, cur_traj->getLength()));
+            }
+        }
+    };
+
+    set_busy_off(index, current_traj, vehicle_begin);
+    set_busy_off(index, current_traj, vehicle_end);
+
+
     // Связи оборудования ПЕ с путевой инфраструктурой
     size_t i = 0;
     for (auto veh_device : *devices)

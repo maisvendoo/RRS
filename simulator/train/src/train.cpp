@@ -993,7 +993,7 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
             {
                 size_t model_idx = vehicle->getModelIndex();
                 size_t idx = vehicle->getStateIndex();
-                topology->getVehicleController(model_idx)->setDirection(dir * vehicle->getOrientation());
+                //topology->getVehicleController(model_idx)->setDirection(dir * vehicle->getOrientation());
                 topology->getVehicleController(model_idx)->setCoord(y[idx]);
                 *(vehicle->getProfilePoint()) = topology->getVehicleController(model_idx)->getPosition();
             }

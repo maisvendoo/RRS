@@ -130,21 +130,23 @@ bool BackGroundWidget::drawSwitchHighlight(QPainter& painter, Switch* conn, std:
         {
             double draw_len = traj->getLength() - 1.0;
 
-            if (dir > 0)
+            dir_t traj_dir = (dir < 0) ? BWD : FWD;
+            traj_dir = static_cast<dir_t>(sw->getTrajOrientation(traj) * traj_dir);
+            dir_t next_sw_dir = traj_dir;
+            if (Switch* next_sw = traj->getNextSwitch(next_sw_dir))
             {
-                dir_t dir_fwd = FWD;
-                if (Switch* next_sw = traj->getNextSwitch(dir_fwd))
+                Switch_state_t next_state = (next_sw_dir == FWD) ? next_sw->getStateBwd() : next_sw->getStateFwd();
+                if (   (next_state != NO_POSSIBLE_DIRECTION)
+                    && (next_state != ONLY_MINUS)
+                    && (next_state != ONLY_PLUS))
                 {
-                    Switch_state_t next_state = (dir_fwd == FWD) ? next_sw->getStateBwd() : next_sw->getStateFwd();
-                    if (   (next_state != NO_POSSIBLE_DIRECTION)
-                        && (next_state != ONLY_MINUS)
-                        && (next_state != ONLY_PLUS))
-                    {
-                        draw_len = traj->getLength() * 0.5;
-                    }
+                    draw_len = traj->getLength() * 0.5;
                 }
-                draw_len = std::min(draw_len, switch_length);
+            }
+            draw_len = std::min(draw_len, switch_length);
 
+            if (traj_dir == FWD)
+            {
                 size_t i = 0;
                 dvec3 fwd = traj->getTracks().begin()->begin_point;
                 QPoint fwd_point = coord_transform(fwd);
@@ -163,19 +165,6 @@ bool BackGroundWidget::drawSwitchHighlight(QPainter& painter, Switch* conn, std:
             }
             else
             {
-                dir_t dir_bwd = BWD;
-                if (Switch* next_sw = traj->getNextSwitch(dir_bwd))
-                {
-                    Switch_state_t next_state = (dir_bwd == BWD) ? next_sw->getStateFwd() : next_sw->getStateBwd();
-                    if (   (next_state != NO_POSSIBLE_DIRECTION)
-                        && (next_state != ONLY_MINUS)
-                        && (next_state != ONLY_PLUS))
-                    {
-                        draw_len = traj->getLength() * 0.5;
-                    }
-                }
-                draw_len = std::min(draw_len, switch_length);
-
                 size_t i = 1;
                 dvec3 bwd = (traj->getTracks().end() - i)->end_point;
                 QPoint bwd_point = coord_transform(bwd);

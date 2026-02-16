@@ -158,7 +158,20 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     {
         if (trajectories[way])
         {
-            trajectories[way]->setBwdSwitch(this);
+            dir_t dir = static_cast<dir_t>(BWD * orientations[way]);
+            if (Switch* sw = trajectories[way]->getNextSwitch(dir))
+            {
+                Journal::instance()->error("Switch " + name + " has outcoming trajectory " + trajectories[way]->getName());
+                Journal::instance()->error("but this trajectory already connected to switch " + sw->getName());
+                trajectories[way] = nullptr;
+            }
+            else
+            {
+                if (dir == BWD)
+                    trajectories[way]->setBwdSwitch(this);
+                else
+                    trajectories[way]->setFwdSwitch(this);
+            }
         }
     }
 
@@ -166,7 +179,20 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
     {
         if (trajectories[way])
         {
-            trajectories[way]->setFwdSwitch(this);
+            dir_t dir = static_cast<dir_t>(FWD * orientations[way]);
+            if (Switch* sw = trajectories[way]->getNextSwitch(dir))
+            {
+                Journal::instance()->error("Switch " + name + " has incoming trajectory " + trajectories[way]->getName());
+                Journal::instance()->error("but this trajectory already connected to switch " + sw->getName());
+                trajectories[way] = nullptr;
+            }
+            else
+            {
+                if (dir == FWD)
+                    trajectories[way]->setFwdSwitch(this);
+                else
+                    trajectories[way]->setBwdSwitch(this);
+            }
         }
     }
 
@@ -538,7 +564,11 @@ void Switch::deserialize(QByteArray &data, traj_list_t &traj_list)
     {
         if (trajectories[way])
         {
-            trajectories[way]->setBwdSwitch(this);
+            dir_t dir = static_cast<dir_t>(BWD * orientations[way]);
+            if (dir == BWD)
+                trajectories[way]->setBwdSwitch(this);
+            else
+                trajectories[way]->setFwdSwitch(this);
         }
     }
 
@@ -546,7 +576,11 @@ void Switch::deserialize(QByteArray &data, traj_list_t &traj_list)
     {
         if (trajectories[way])
         {
-            trajectories[way]->setFwdSwitch(this);
+            dir_t dir = static_cast<dir_t>(FWD * orientations[way]);
+            if (dir == FWD)
+                trajectories[way]->setFwdSwitch(this);
+            else
+                trajectories[way]->setBwdSwitch(this);
         }
     }
 
