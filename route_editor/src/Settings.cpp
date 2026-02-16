@@ -122,10 +122,10 @@ void settings_t::read(const std::string& cfg_path)
                 {"anyalt", MY_KEY_MODIFIER_ALT_ANY}
             };
 
-            const auto str = strings[i];
+            const QString str = strings[i];
             for (const auto& [label, modifier] : modifiers_map)
             {
-                if (str == label)
+                if (str.toStdString() == label)
                 {
                     modifiers |= modifier;
                 }
