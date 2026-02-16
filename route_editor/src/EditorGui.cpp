@@ -1,6 +1,7 @@
 #include "EditorGui.h"
 
 #include "Action.h"
+#include "Command.h"
 #include "EditorState.h"
 #include "KeyBinding.h"
 #include "ObjectSelector.h"
@@ -132,11 +133,11 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 if (curr == active)
                 {
-                    ImGui::TextColored(ImVec4{1.0f, 0.0f, 0.0f, 1.0f}, "%s", curr->to_string().c_str());
+                    ImGui::TextColored(ImVec4{1.0f, 0.0f, 0.0f, 1.0f}, "%s", curr->command->to_string().c_str());
                 }
                 else
                 {
-                    ImGui::Text("%s", curr->to_string().c_str());
+                    ImGui::Text("%s", curr->command->to_string().c_str());
                 }
 
                 curr = curr->prev;

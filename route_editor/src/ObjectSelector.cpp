@@ -334,7 +334,7 @@ void ObjectSelector::confirm_keyboard_move()
         object->set_translation(object->get_initial_translation());
     }
 
-    commands.push(new MoveObjectsCommand(selected_objects, translation));
+    commands.push(new MoveObjectsCommand(selected_objects, translation), true);
 }
 
 void ObjectSelector::cancel_keyboard_move()
