@@ -17,6 +17,8 @@ static constexpr ActionNamePair action_name_map_data[] = {
     {ACTION_SCALE_OBJECTS,  "Objects: Scale"},
     {ACTION_COPY_OBJECTS,   "Objects: Copy"},
     {ACTION_PASTE_OBJECTS,  "Objects: Paste"},
+    {ACTION_HIDE_OBJECTS,   "Objects: Hide"},
+    {ACTION_SHOW_OBJECTS,   "Objects: Show"},
 
     {ACTION_UNDO_COMMAND, "Undo command"},
     {ACTION_REDO_COMMAND, "Redo command"}
