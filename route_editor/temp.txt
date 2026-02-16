@@ -12,7 +12,6 @@ EditorGui.h
 EditorState.h
 Gizmo.h
 IntersectionHandler.h
-KeyBindings.h
 KeyboardHandler.h
 KeyStates.h
 LSIntersector.h

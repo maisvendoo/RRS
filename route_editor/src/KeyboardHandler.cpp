@@ -11,23 +11,7 @@
 
 KeyboardHandler::KeyboardHandler(const settings_t& settings)
 {
-    key_bindings[ACTION_MOVE_CAMERA_FORWARD] =
-        settings.key_move_camera_forward;
-
-    key_bindings[ACTION_MOVE_CAMERA_BACKWARD] =
-        settings.key_move_camera_backward;
-
-    key_bindings[ACTION_MOVE_CAMERA_LEFT] =
-        settings.key_move_camera_left;
-
-    key_bindings[ACTION_MOVE_CAMERA_RIGHT] =
-        settings.key_move_camera_right;
-
-    key_bindings[ACTION_MOVE_OBJECTS] =
-        settings.key_move_objects;
-
-    key_bindings[ACTION_ROTATE_OBJECTS] =
-        settings.key_rotate_objects;
+    key_bindings = settings.key_bindings;
 }
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
@@ -82,16 +66,16 @@ bool KeyboardHandler::get_binding_state(Action action) const
         return false;
     }
 
-    static const std::map<MyKeyModifier, std::vector<vsg::KeySymbol>> modifiers_map = {
-        {MY_KEY_MODIFIER_SHIFT_L, {vsg::KEY_Shift_L}},
-        {MY_KEY_MODIFIER_SHIFT_R, {vsg::KEY_Shift_R}},
-        {MY_KEY_MODIFIER_SHIFT_ANY, {vsg::KEY_Shift_L, vsg::KEY_Shift_R}},
-        {MY_KEY_MODIFIER_CTRL_L, {vsg::KEY_Control_L}},
-        {MY_KEY_MODIFIER_CTRL_R, {vsg::KEY_Control_R}},
-        {MY_KEY_MODIFIER_CTRL_ANY, {vsg::KEY_Control_L, vsg::KEY_Control_R}},
-        {MY_KEY_MODIFIER_ALT_L, {vsg::KEY_Alt_L}},
-        {MY_KEY_MODIFIER_ALT_R, {vsg::KEY_Alt_R}},
-        {MY_KEY_MODIFIER_ALT_ANY, {vsg::KEY_Alt_L, vsg::KEY_Alt_R}}
+    static const std::map<EditorKeyModifier, std::vector<vsg::KeySymbol>> modifiers_map = {
+        {EDITOR_KEY_MODIFIER_SHIFT_L, {vsg::KEY_Shift_L}},
+        {EDITOR_KEY_MODIFIER_SHIFT_R, {vsg::KEY_Shift_R}},
+        {EDITOR_KEY_MODIFIER_SHIFT_ANY, {vsg::KEY_Shift_L, vsg::KEY_Shift_R}},
+        {EDITOR_KEY_MODIFIER_CTRL_L, {vsg::KEY_Control_L}},
+        {EDITOR_KEY_MODIFIER_CTRL_R, {vsg::KEY_Control_R}},
+        {EDITOR_KEY_MODIFIER_CTRL_ANY, {vsg::KEY_Control_L, vsg::KEY_Control_R}},
+        {EDITOR_KEY_MODIFIER_ALT_L, {vsg::KEY_Alt_L}},
+        {EDITOR_KEY_MODIFIER_ALT_R, {vsg::KEY_Alt_R}},
+        {EDITOR_KEY_MODIFIER_ALT_ANY, {vsg::KEY_Alt_L, vsg::KEY_Alt_R}}
     };
 
     for (const auto& [modifier, keys] : modifiers_map)

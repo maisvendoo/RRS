@@ -63,12 +63,7 @@ struct settings_t
     bool show_camera_settings = false;
     bool show_topology = false;
 
-    KeyBinding key_move_camera_forward;
-    KeyBinding key_move_camera_backward;
-    KeyBinding key_move_camera_left;
-    KeyBinding key_move_camera_right;
-    KeyBinding key_move_objects;
-    KeyBinding key_rotate_objects;
+    KeyBindings key_bindings;
 };
 
 #endif // EDITOR_SETTINGS_H
