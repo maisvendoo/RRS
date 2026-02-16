@@ -3,7 +3,7 @@
 
 #include "CommandList.h"
 #include "EditorState.h"
-#include "KeyBindings.h"
+#include "KeyBinding.h"
 
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>

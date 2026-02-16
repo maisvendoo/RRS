@@ -1,7 +1,7 @@
 #include "KeyboardHandler.h"
 
 #include "Action.h"
-#include "KeyBindings.h"
+#include "KeyBinding.h"
 #include "Settings.h"
 
 #include <map>

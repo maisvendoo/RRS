@@ -1,5 +1,5 @@
 #include "Settings.h"
-#include "KeyBindings.h"
+#include "KeyBinding.h"
 
 #include <CfgReader.h>
 

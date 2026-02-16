@@ -2,7 +2,7 @@
 
 #include "Action.h"
 #include "EditorState.h"
-#include "KeyBindings.h"
+#include "KeyBinding.h"
 #include "ObjectSelector.h"
 #include "Route.h"
 #include "RouteObject.h"

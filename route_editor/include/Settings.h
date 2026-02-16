@@ -1,7 +1,7 @@
 #ifndef EDITOR_SETTINGS_H
 #define EDITOR_SETTINGS_H
 
-#include "KeyBindings.h"
+#include "KeyBinding.h"
 #include <vsg/maths/vec3.h>
 #include <vsg/ui/KeyEvent.h>
 
