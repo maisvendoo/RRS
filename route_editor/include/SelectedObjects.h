@@ -3,11 +3,11 @@
 
 #include <vsg/core/ref_ptr.h>
 
-#include <vector>
+#include <list>
 
 class RouteObject;
 
-using SelectedObjects = std::vector<vsg::ref_ptr<RouteObject>>;
+using SelectedObjects = std::list<vsg::ref_ptr<RouteObject>>;
 using SelectedObjectsIterator = SelectedObjects::iterator;
 
 #endif // SELECTED_OBJECTS_H
