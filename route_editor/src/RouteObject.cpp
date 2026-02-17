@@ -15,10 +15,13 @@
 #include <vsg/nodes/PagedLOD.h>
 #include <vsg/utils/ComputeBounds.h>
 
+#include <algorithm>
 #include <cassert>
 #include <string>
 
 vsg::observer_ptr<vsg::Viewer> RouteObject::s_observer_viewer;
+RouteObjects* RouteObject::s_selected_objects = nullptr;
+RouteObjects* RouteObject::s_hidden_objects = nullptr;
 
 static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
@@ -84,6 +87,16 @@ void RouteObject::set_observer_viewer(
     vsg::observer_ptr<vsg::Viewer> observer_viewer)
 {
     s_observer_viewer = observer_viewer;
+}
+
+void RouteObject::set_selected_objects(RouteObjects* selected_objects)
+{
+    s_selected_objects = selected_objects;
+}
+
+void RouteObject::set_hidden_objects(RouteObjects* hidden_objects)
+{
+    s_hidden_objects = hidden_objects;
 }
 
 void RouteObject::set_translation(vsg::vec3 translation, bool update_matrix)
@@ -168,27 +181,38 @@ void RouteObject::scale_relative_to_point(vsg::vec3 point, vsg::vec3 scale,
     }
 }
 
-void RouteObject::hide() const
+void RouteObject::hide()
 {
-    // TODO
+    paged_lod_switch->mask = vsg::MASK_OFF;
+    outline_switch->mask = vsg::MASK_OFF;
+
+    s_hidden_objects->emplace_back(vsg::ref_ptr(this));
 }
 
 void RouteObject::show() const
 {
-    // TODO
+    paged_lod_switch->mask = MASK_SCENE | MASK_CLICKABLE;
+
+    s_hidden_objects->erase(std::find(s_hidden_objects->cbegin(),
+        s_hidden_objects->cend(), vsg::ref_ptr(this)));
 }
 
-void RouteObject::select() const
+void RouteObject::select()
 {
     const auto outline = outline_switch->node.cast<Outline>();
     outline->load(s_observer_viewer);
 
     outline_switch->mask = MASK_GUI2;
+
+    s_selected_objects->emplace_back(vsg::ref_ptr(this));
 }
 
 void RouteObject::deselect() const
 {
     outline_switch->mask = vsg::MASK_OFF;
+
+    s_selected_objects->erase(std::find(s_selected_objects->cbegin(),
+        s_selected_objects->cend(), vsg::ref_ptr(this)));
 }
 
 void RouteObject::save_translation()

@@ -44,6 +44,9 @@ public:
     static void set_observer_viewer(
         vsg::observer_ptr<vsg::Viewer> observer_viewer);
 
+    static void set_selected_objects(RouteObjects* selected_objects);
+    static void set_hidden_objects(RouteObjects* route_objects);
+
     void set_translation(vsg::vec3 translation, bool update_matrix);
     void set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix);
     void set_scale(vsg::vec3 scale, bool update_matrix);
@@ -58,10 +61,10 @@ public:
     void scale_relative_to_point(vsg::vec3 point, vsg::vec3 scale,
         bool update_matrix);
 
-    void hide() const;
+    void hide();
     void show() const;
 
-    void select() const;
+    void select();
     void deselect() const;
 
     void save_translation();
@@ -76,6 +79,8 @@ public:
 
 private:
     static vsg::observer_ptr<vsg::Viewer> s_observer_viewer;
+    static RouteObjects* s_selected_objects;
+    static RouteObjects* s_hidden_objects;
 
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;
