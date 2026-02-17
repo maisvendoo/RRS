@@ -204,15 +204,15 @@ void RouteObject::select()
 
     outline_switch->mask = MASK_GUI2;
 
-    s_selected_objects->emplace_back(vsg::ref_ptr(this));
+    // s_selected_objects->emplace_back(vsg::ref_ptr(this));
 }
 
 void RouteObject::deselect() const
 {
     outline_switch->mask = vsg::MASK_OFF;
 
-    s_selected_objects->erase(std::find(s_selected_objects->cbegin(),
-        s_selected_objects->cend(), vsg::ref_ptr(this)));
+    // s_selected_objects->erase(std::find(s_selected_objects->cbegin(),
+    //     s_selected_objects->cend(), vsg::ref_ptr(this)));
 }
 
 void RouteObject::save_translation()
