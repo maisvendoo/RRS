@@ -25,8 +25,7 @@ class PagedLOD;
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 {
 public:
-    RouteObject(const settings_t& settings,
-        vsg::ref_ptr<vsg::PagedLOD> paged_lod, const std::string& label,
+    RouteObject(vsg::ref_ptr<vsg::PagedLOD> paged_lod, const std::string& label,
         vsg::vec3 translation, vsg::vec3 rotation_deg);
 
     vsg::vec3 get_translation() const;

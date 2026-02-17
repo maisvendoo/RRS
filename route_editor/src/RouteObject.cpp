@@ -23,9 +23,8 @@ static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Z_POSITIVE = {0.0f, 0.0f, 1.0f};
 
-RouteObject::RouteObject(const settings_t& settings,
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod, const std::string& label,
-    vsg::vec3 translation, vsg::vec3 rotation_deg)
+RouteObject::RouteObject(vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    const std::string& label, vsg::vec3 translation, vsg::vec3 rotation_deg)
 {
     assert(paged_lod);
 
