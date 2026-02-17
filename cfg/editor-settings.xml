@@ -96,7 +96,9 @@
         <MoveObjects>G</MoveObjects>
         <RotateObjects>R</RotateObjects>
         <ScaleObjects>S</ScaleObjects>
-        <CopyObjects>Ctrl + C</CopyObject>
+        <HideObjects>H</HideObjects>
+        <ShowObjects>Alt + H</ShowObjects>
+        <CopyObjects>Ctrl + C</CopyObjects>
         <PasteObjects>Ctrl + V</PasteObjects>
         <UndoCommand>Ctrl + Z</UndoCommand>
         <RedoCommand>Ctrl + Y</RedoCommand>

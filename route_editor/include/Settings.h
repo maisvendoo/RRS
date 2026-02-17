@@ -1,9 +1,9 @@
 #ifndef EDITOR_SETTINGS_H
 #define EDITOR_SETTINGS_H
 
-#include "KeyBindings.h"
+#include "KeyBinding.h"
+
 #include <vsg/maths/vec3.h>
-#include <vsg/ui/KeyEvent.h>
 
 #include <string>
 
@@ -33,17 +33,17 @@ struct settings_t
 
     double camera_initial_height = 0.0;
 
-    double min_camera_rotate_speed = 10.0;
-    double max_camera_rotate_speed = 25.0;
-    double camera_rotate_speed = 10.0;
-
-    double min_camera_zoom_power = 50.0;
-    double max_camera_zoom_power = 200.0;
-    double camera_zoom_power = 100.0;
-
+    double camera_move_speed = 100.0;
     double min_camera_move_speed = 50.0;
     double max_camera_move_speed = 200.0;
-    double camera_move_speed = 100.0;
+
+    double camera_rotate_speed = 10.0;
+    double min_camera_rotate_speed = 10.0;
+    double max_camera_rotate_speed = 25.0;
+
+    double camera_zoom_power = 100.0;
+    double min_camera_zoom_power = 50.0;
+    double max_camera_zoom_power = 200.0;
 
     float gizmo_arrow_length = 5.0f;
     float gizmo_arrow_thickness = 0.1f;
@@ -53,8 +53,6 @@ struct settings_t
     float gizmo_opacity = 1.0f;
     bool gizmo_to_center = false;
 
-    bool show_wireframe = false;
-
     double gui_font_size = 20.0;
     bool is_gui_editable = false;
     bool show_objects_ref = true;
@@ -63,12 +61,7 @@ struct settings_t
     bool show_camera_settings = false;
     bool show_topology = false;
 
-    KeyBinding key_move_camera_forward;
-    KeyBinding key_move_camera_backward;
-    KeyBinding key_move_camera_left;
-    KeyBinding key_move_camera_right;
-    KeyBinding key_move_objects;
-    KeyBinding key_rotate_objects;
+    KeyBindings key_bindings;
 };
 
 #endif // EDITOR_SETTINGS_H

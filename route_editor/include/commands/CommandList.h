@@ -3,8 +3,6 @@
 
 #include <cstddef>
 
-#include <string>
-
 class Command;
 
 class CommandList
@@ -14,8 +12,6 @@ private:
     {
         ~CommandNode();
 
-        std::string to_string();
-
         const Command* command = nullptr;
         CommandNode* prev = nullptr;
         CommandNode* next = nullptr;
@@ -24,21 +20,15 @@ private:
 public:
     ~CommandList();
 
-    void push(const Command* command);
+    void push(const Command* command, bool execute);
     void undo();
     void redo();
 
-    void print();
+    const CommandNode* get_active() const;
+    const CommandNode* get_tail() const;
 
-    CommandNode* get_active() const
-    {
-        return active;
-    }
-
-    CommandNode* get_tail() const
-    {
-        return tail;
-    }
+private:
+    void push_inner(const Command* command, bool execute);
 
 private:
     CommandNode* tail = nullptr;

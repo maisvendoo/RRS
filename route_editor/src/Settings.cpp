@@ -1,14 +1,22 @@
 #include "Settings.h"
-#include "KeyBindings.h"
+
+#include "Action.h"
+#include "KeyBinding.h"
 
 #include <CfgReader.h>
 
-#include <qnamespace.h>
-#include <qregularexpression.h>
 #include <vsg/ui/KeyEvent.h>
 
+#include <QRegularExpression>
 #include <QString>
+#include <QStringList>
+#include <Qt>
+#include <QtTypes>
 
+#include <cstdint>
+#include <cstdio>
+#include <iterator>
+#include <map>
 #include <string>
 
 void settings_t::read(const std::string& cfg_path)
@@ -90,57 +98,92 @@ void settings_t::read(const std::string& cfg_path)
 
     section = "Keys";
 
-    const auto get_key_binding_setting = [&](const char* const name,
-        KeyBinding& key_binding) -> void
+    using ActionSettingNameMap = std::map<Action, const char*>;
+    using ActionSettingNamePair = ActionSettingNameMap::value_type;
+
+    constexpr ActionSettingNamePair action_setting_name_map_data[] = {
+        {ACTION_MOVE_CAMERA_FORWARD,  "MoveCameraForward"},
+        {ACTION_MOVE_CAMERA_BACKWARD, "MoveCameraBackward"},
+        {ACTION_MOVE_CAMERA_LEFT,     "MoveCameraLeft"},
+        {ACTION_MOVE_CAMERA_RIGHT,    "MoveCameraRight"},
+
+        {ACTION_MOVE_OBJECTS,   "MoveObjects"},
+        {ACTION_ROTATE_OBJECTS, "RotateObjects"},
+        {ACTION_SCALE_OBJECTS,  "ScaleObjects"},
+        {ACTION_COPY_OBJECTS,   "CopyObjects"},
+        {ACTION_PASTE_OBJECTS,  "PasteObjects"},
+        {ACTION_HIDE_OBJECTS,   "HideObjects"},
+        {ACTION_SHOW_OBJECTS,   "ShowObjects"},
+
+        {ACTION_UNDO_COMMAND, "UndoCommand"},
+        {ACTION_REDO_COMMAND, "RedoCommand"}
+    };
+
+    static_assert(sizeof action_setting_name_map_data /
+        sizeof(ActionSettingNamePair) == TOTAL_ACTIONS);
+
+    const ActionSettingNameMap action_setting_name_map(
+        std::begin(action_setting_name_map_data),
+        std::end(action_setting_name_map_data));
+
+    const std::map<std::string, EditorKeyModifier>
+    key_modifier_setting_name_map = {
+        {"lshift",   EDITOR_KEY_MODIFIER_SHIFT_L},
+        {"rshift",   EDITOR_KEY_MODIFIER_SHIFT_R},
+        {"shift",    EDITOR_KEY_MODIFIER_SHIFT_ANY},
+        {"anyshift", EDITOR_KEY_MODIFIER_SHIFT_ANY},
+
+        {"lctrl",   EDITOR_KEY_MODIFIER_CTRL_L},
+        {"rctrl",   EDITOR_KEY_MODIFIER_CTRL_R},
+        {"ctrl",    EDITOR_KEY_MODIFIER_CTRL_ANY},
+        {"anyctrl", EDITOR_KEY_MODIFIER_CTRL_ANY},
+
+        {"lalt",   EDITOR_KEY_MODIFIER_ALT_L},
+        {"ralt",   EDITOR_KEY_MODIFIER_ALT_R},
+        {"alt",    EDITOR_KEY_MODIFIER_ALT_ANY},
+        {"anyalt", EDITOR_KEY_MODIFIER_ALT_ANY}
+    };
+
+    for (const auto& [action, setting_name] : action_setting_name_map)
     {
         QString line;
-        cfg.getString(section, name, line);
+
+        if (!cfg.getString(section, setting_name, line))
+        {
+            // TODO: Replace on Journal
+            std::fprintf(stderr, "Failed to find key setting %s\n",
+                setting_name);
+
+            continue;
+        }
 
         line = line.toLower();
 
-        const auto strings = line.split(QRegularExpression("[ +]"),
+        const QStringList strings = line.split(QRegularExpression("[ +]"),
             Qt::SkipEmptyParts);
 
-        const auto strings_size = strings.size();
-
-        int modifiers = 0;
-
-        for (auto i = decltype(strings_size){0}; i < strings_size - 1; ++i)
+        const qsizetype string_size = strings.size();
+        if (string_size <= 0)
         {
-            static const std::map<std::string, MyKeyModifier> modifiers_map = {
-                {"lshift", MY_KEY_MODIFIER_SHIFT_L},
-                {"rshift", MY_KEY_MODIFIER_SHIFT_R},
-                {"shift", MY_KEY_MODIFIER_SHIFT_ANY},
-                {"anyshift", MY_KEY_MODIFIER_SHIFT_ANY},
-                {"lctrl", MY_KEY_MODIFIER_CTRL_L},
-                {"rctrl", MY_KEY_MODIFIER_CTRL_R},
-                {"ctrl", MY_KEY_MODIFIER_CTRL_ANY},
-                {"anyctrl", MY_KEY_MODIFIER_CTRL_ANY},
-                {"lalt", MY_KEY_MODIFIER_ALT_L},
-                {"ralt", MY_KEY_MODIFIER_ALT_R},
-                {"alt", MY_KEY_MODIFIER_ALT_ANY},
-                {"anyalt", MY_KEY_MODIFIER_ALT_ANY}
-            };
+            continue;
+        }
 
-            const QString str = strings[i];
-            for (const auto& [label, modifier] : modifiers_map)
+        std::uint32_t modifiers = 0;
+
+        for (qsizetype i = 0; i < string_size - 1; ++i)
+        {
+            const auto found_it = key_modifier_setting_name_map.find(
+                strings[i].toStdString());
+
+            if (found_it != key_modifier_setting_name_map.cend())
             {
-                if (str.toStdString() == label)
-                {
-                    modifiers |= modifier;
-                }
+                modifiers |= found_it->second;
             }
         }
 
-        key_binding.modifiers = modifiers;
+        KeyBinding& key_binding = key_bindings[action];
         key_binding.key = static_cast<vsg::KeySymbol>(
             strings.back().front().toLatin1());
-    };
-
-    get_key_binding_setting("MoveCameraForward", key_move_camera_forward);
-    get_key_binding_setting("MoveCameraBackward", key_move_camera_backward);
-    get_key_binding_setting("MoveCameraLeft", key_move_camera_left);
-    get_key_binding_setting("MoveCameraRight", key_move_camera_right);
-    get_key_binding_setting("MoveObjects", key_move_objects);
-    get_key_binding_setting("RotateObjects", key_rotate_objects);
+        key_binding.modifiers = modifiers;
+    }
 }

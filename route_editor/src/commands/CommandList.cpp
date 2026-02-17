@@ -3,22 +3,12 @@
 #include "Command.h"
 
 #include <cstddef>
-#include <cstdio>
-#include <string>
 
-static constexpr std::size_t MAX_SAVED_COMMANDS = 6;
+static constexpr std::size_t MAX_SAVED_COMMANDS = 5;
 
 CommandList::CommandNode::~CommandNode()
 {
     delete command;
-}
-
-std::string CommandList::CommandNode::to_string()
-{
-    char buffer[512];
-    std::snprintf(buffer, 512, "command: %s\nnext: %p\nprev: %p\n",
-        command->to_string().c_str(), (void*)next, (void*)prev);
-    return command->to_string().c_str();
 }
 
 CommandList::~CommandList()
@@ -33,7 +23,7 @@ CommandList::~CommandList()
     }
 }
 
-void CommandList::push(const Command* command)
+void CommandList::push(const Command* command, bool execute)
 {
     // If active node is not tail node (after undos)
     if (active != tail)
@@ -54,9 +44,7 @@ void CommandList::push(const Command* command)
 
     if (size == 0)
     {
-        tail = active = new CommandNode{command, nullptr, nullptr};
-        command->execute();
-        size = 1;
+        push_inner(command, execute);
         return;
     }
 
@@ -77,53 +65,51 @@ void CommandList::push(const Command* command)
         --size;
     }
 
-    CommandNode* new_node = new CommandNode{command, tail, nullptr};
-    command->execute();
-    tail->next = new_node;
-    tail = active = new_node;
-    ++size;
+    push_inner(command, execute);
 }
 
 void CommandList::undo()
 {
-    if (!active)
+    if (active)
     {
-        return;
+        active->command->undo();
+        active = active->prev;
     }
-
-    active->command->undo();
-    active = active->prev;
 }
 
 void CommandList::redo()
 {
-    if (active == tail)
+    if (active != tail)
     {
-        return;
+        active = active->next;
+        active->command->execute();
     }
-
-    active = active->next;
-    active->command->execute();
 }
 
-void CommandList::print()
+const CommandList::CommandNode* CommandList::get_tail() const
 {
-    for (int i = 0; i < 80; ++i)
-    {
-        std::printf("-");
-    }
-    std::printf("\n");
-    std::printf("Command list:\n");
-    std::printf("size: %zu\n", size);
+    return tail;
+}
 
-    CommandNode* curr = tail;
-    while (curr)
+const CommandList::CommandNode* CommandList::get_active() const
+{
+    return active;
+}
+
+void CommandList::push_inner(const Command* command, bool execute)
+{
+    CommandNode* const new_node = new CommandNode{command, tail, nullptr};
+
+    if (tail)
     {
-        if (curr == active)
-        {
-            std::printf("ACTIVE ");
-        }
-        std::printf("%p %s\n", (void*)curr, curr->to_string().c_str());
-        curr = curr->prev;
+        tail->next = new_node;
+    }
+
+    tail = active = new_node;
+    ++size;
+
+    if (execute)
+    {
+        command->execute();
     }
 }

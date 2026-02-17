@@ -3,7 +3,7 @@
 
 #include "CommandList.h"
 #include "EditorState.h"
-#include "KeyBindings.h"
+#include "KeyBinding.h"
 
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
@@ -31,7 +31,6 @@ public:
         settings_t& settings,
         CommandList& commands,
         EditorState& editor_state,
-        const KeyBindings& key_bindings,
         vsg::ref_ptr<vsg::Perspective> perspective,
         vsg::ref_ptr<SceneGraph> scene_graph,
         const vsg::ref_ptr<ObjectSelector>& object_selector,

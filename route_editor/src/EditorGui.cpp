@@ -1,8 +1,9 @@
 #include "EditorGui.h"
 
 #include "Action.h"
+#include "Command.h"
 #include "EditorState.h"
-#include "KeyBindings.h"
+#include "KeyBinding.h"
 #include "ObjectSelector.h"
 #include "Route.h"
 #include "RouteObject.h"
@@ -38,7 +39,6 @@ EditorGui::EditorGui(
     settings_t& settings,
     CommandList& commands,
     EditorState& editor_state,
-    const KeyBindings& key_bindings,
     vsg::ref_ptr<vsg::Perspective> perspective,
     vsg::ref_ptr<SceneGraph> scene_graph,
     const vsg::ref_ptr<ObjectSelector>& object_selector,
@@ -47,7 +47,7 @@ EditorGui::EditorGui(
     : settings(settings)
     , commands(commands)
     , editor_state(editor_state)
-    , key_bindings(key_bindings)
+    , key_bindings(settings.key_bindings)
     , perspective(perspective)
     , scene_graph(scene_graph)
     , object_selector(object_selector)
@@ -133,11 +133,11 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 if (curr == active)
                 {
-                    ImGui::TextColored(ImVec4{1.0f, 0.0f, 0.0f, 1.0f}, "%s", curr->to_string().c_str());
+                    ImGui::TextColored(ImVec4{1.0f, 0.0f, 0.0f, 1.0f}, "%s", curr->command->to_string().c_str());
                 }
                 else
                 {
-                    ImGui::Text("%s", curr->to_string().c_str());
+                    ImGui::Text("%s", curr->command->to_string().c_str());
                 }
 
                 curr = curr->prev;

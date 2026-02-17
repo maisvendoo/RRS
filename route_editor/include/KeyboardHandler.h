@@ -2,7 +2,7 @@
 #define KEYBOARD_HANDLER_H
 
 #include "Action.h"
-#include "KeyBindings.h"
+#include "KeyBinding.h"
 #include "KeyStates.h"
 
 #include <vsg/core/Inherit.h>
@@ -19,17 +19,14 @@ public:
     void apply(vsg::KeyPressEvent& keyPress) override;
     void apply(vsg::KeyReleaseEvent& keyRelease) override;
 
-    KeyBinding get_key_binding(Action action) const;
     bool get_key_state(vsg::KeySymbol key) const;
     bool get_any_shift_state() const;
     bool get_any_ctrl_state() const;
     bool get_any_alt_state() const;
     bool get_binding_state(Action action) const;
 
-    const KeyBindings& get_key_bindings() const;
-
 private:
-    KeyBindings key_bindings;
+    const KeyBindings& key_bindings;
     KeyStates key_states;
 };
 
