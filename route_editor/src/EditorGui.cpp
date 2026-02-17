@@ -324,6 +324,28 @@ void EditorGui::show_key_bindings() const
             ImGui::TableNextColumn();
 
             std::string label;
+
+            static const std::map<EditorKeyModifier, const char*> test_map = {
+                {EDITOR_KEY_MODIFIER_SHIFT_L, "LShift"},
+                {EDITOR_KEY_MODIFIER_SHIFT_R, "RShift"},
+                {EDITOR_KEY_MODIFIER_SHIFT_ANY, "Shift"},
+                {EDITOR_KEY_MODIFIER_CTRL_L, "LCtrl"},
+                {EDITOR_KEY_MODIFIER_CTRL_R, "RCtrl"},
+                {EDITOR_KEY_MODIFIER_CTRL_ANY, "Ctrl"},
+                {EDITOR_KEY_MODIFIER_ALT_L, "LAlt"},
+                {EDITOR_KEY_MODIFIER_ALT_R, "RAlt"},
+                {EDITOR_KEY_MODIFIER_ALT_ANY, "Alt"}
+            };
+
+            for (const auto& [modifier, name] : test_map)
+            {
+                if (key_bindings[i].modifiers & modifier)
+                {
+                    label += name;
+                    label += " + ";
+                }
+            }
+
             label += std::toupper(key_bindings[i].key);
             ImGui::Text("%s", label.c_str());
         }
@@ -505,8 +527,7 @@ void EditorGui::show_selected_objects_properties() const
     {
         ImGui::Text("label: %s", object->label.c_str());
 
-        std::string label = "translation##";
-        label += std::to_string(i);
+        std::string label = "translation##" + std::to_string(i);
 
         vsg::vec3 translation = object->get_translation();
         if (ImGui::DragFloat3(label.c_str(), translation.data()))
@@ -514,8 +535,7 @@ void EditorGui::show_selected_objects_properties() const
             object->set_translation(translation, true);
         }
 
-        label = "rotation##";
-        label += std::to_string(i);
+        label = "rotation##" + std::to_string(i);
 
         vsg::vec3 rotation_deg = object->get_rotation_deg();
         if (ImGui::DragFloat3(label.c_str(), rotation_deg.data()))
