@@ -6,6 +6,7 @@
 
 #include <vsg/core/Mask.h>
 #include <vsg/core/observer_ptr.h>
+#include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
@@ -79,7 +80,8 @@ const vsg::box& RouteObject::get_bounds() const
     return bounds;
 }
 
-void RouteObject::set_observer_viewer(vsg::observer_ptr<vsg::Viewer> observer_viewer)
+void RouteObject::set_observer_viewer(
+    vsg::observer_ptr<vsg::Viewer> observer_viewer)
 {
     s_observer_viewer = observer_viewer;
 }
@@ -136,12 +138,44 @@ void RouteObject::rotate(vsg::vec3 rotation_deg, bool update_matrix)
 
 void RouteObject::scale(vsg::vec3 scale, bool update_matrix)
 {
-    this->scale_value = scale;
+    this->scale_value *= scale;
 
     if (update_matrix)
     {
         this->update_matrix();
     }
+}
+
+void RouteObject::rotate_relative_to_point(vsg::vec3 point,
+    vsg::vec3 rotation_deg, bool update_matrix)
+{
+    // TODO
+
+    if (update_matrix)
+    {
+        this->update_matrix();
+    }
+}
+
+void RouteObject::scale_relative_to_point(vsg::vec3 point, vsg::vec3 scale,
+    bool update_matrix)
+{
+    // TODO
+
+    if (update_matrix)
+    {
+        this->update_matrix();
+    }
+}
+
+void RouteObject::hide() const
+{
+    // TODO
+}
+
+void RouteObject::show() const
+{
+    // TODO
 }
 
 void RouteObject::select() const

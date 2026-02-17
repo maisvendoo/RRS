@@ -10,15 +10,13 @@
 
 #include <string>
 
-class Outline;
 class SingleSwitch;
-class SwitchGroup;
-struct settings_t;
 
 namespace vsg
 {
 
 class PagedLOD;
+class Viewer;
 
 }
 
@@ -38,7 +36,8 @@ public:
 
     const vsg::box& get_bounds() const;
 
-    static void set_observer_viewer(vsg::observer_ptr<vsg::Viewer> observer_viewer);
+    static void set_observer_viewer(
+        vsg::observer_ptr<vsg::Viewer> observer_viewer);
 
     void set_translation(vsg::vec3 translation, bool update_matrix);
     void set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix);
@@ -47,6 +46,15 @@ public:
     void move(vsg::vec3 translation, bool update_matrix);
     void rotate(vsg::vec3 rotation_deg, bool update_matrix);
     void scale(vsg::vec3 scale, bool update_matrix);
+
+    void rotate_relative_to_point(vsg::vec3 point, vsg::vec3 rotation_deg,
+        bool update_matrix);
+
+    void scale_relative_to_point(vsg::vec3 point, vsg::vec3 scale,
+        bool update_matrix);
+
+    void hide() const;
+    void show() const;
 
     void select() const;
     void deselect() const;
@@ -59,15 +67,6 @@ public:
     void update_bounds();
 
 public:
-    enum class State
-    {
-        INITIAL,
-        MOVING,
-        ROTATING,
-        SCALING
-    };
-
-    State state = State::INITIAL;
     std::string label;
 
 private:
