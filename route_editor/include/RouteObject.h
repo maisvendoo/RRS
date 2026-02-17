@@ -22,7 +22,7 @@ class Viewer;
 
 }
 
-using RouteObjects = std::list<vsg::ref_ptr<RouteObject>>;
+using RouteObjects = std::list<RouteObject*>;
 using RouteObjectsIterator = RouteObjects::iterator;
 
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
@@ -41,11 +41,14 @@ public:
 
     const vsg::box& get_bounds() const;
 
+    bool get_is_selected() const;
+    bool get_is_hidden() const;
+
+    static RouteObjects& get_selected_objects();
+    static RouteObjects& get_hidden_objects();
+
     static void set_observer_viewer(
         vsg::observer_ptr<vsg::Viewer> observer_viewer);
-
-    static void set_selected_objects(RouteObjects* selected_objects);
-    static void set_hidden_objects(RouteObjects* route_objects);
 
     void set_translation(vsg::vec3 translation, bool update_matrix);
     void set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix);
@@ -62,10 +65,10 @@ public:
         bool update_matrix);
 
     void hide();
-    void show() const;
+    RouteObjectsIterator show();
 
     void select();
-    void deselect() const;
+    RouteObjectsIterator deselect();
 
     void save_translation();
     void save_rotation();
@@ -79,8 +82,8 @@ public:
 
 private:
     static vsg::observer_ptr<vsg::Viewer> s_observer_viewer;
-    static RouteObjects* s_selected_objects;
-    static RouteObjects* s_hidden_objects;
+    static RouteObjects s_selected_objects;
+    static RouteObjects s_hidden_objects;
 
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;
@@ -91,6 +94,9 @@ private:
     vsg::vec3 initial_scale;
 
     vsg::box bounds;
+
+    bool is_selected = false;
+    bool is_hidden = false;
 
     vsg::ref_ptr<SingleSwitch> paged_lod_switch;
     vsg::ref_ptr<SingleSwitch> outline_switch;

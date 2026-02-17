@@ -117,6 +117,9 @@ bool RouteEditor::initialize()
     viewer = vsg::Viewer::create();
     const vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
 
+    RouteObjects selected_objects;
+    RouteObjects hidden_objects;
+
     RouteObject::set_observer_viewer(observer_viewer);
 
     object_selector = ObjectSelector::create(settings, commands, mouse_handler,

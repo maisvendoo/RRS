@@ -50,6 +50,8 @@ ObjectSelector::ObjectSelector(
     assert(scene_graph);
     assert(observer_viewer);
 
+    auto& selected_objects = RouteObject::get_selected_objects();
+
     gizmo = Gizmo::create(settings, camera_handler,
         intersection_handler, selected_objects);
 
@@ -83,6 +85,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
+    auto& selected_objects = RouteObject::get_selected_objects();
     const bool selected_objects_are_empty = selected_objects.empty();
 
     // If we have selected objects and clicked on Gizmo,
@@ -169,6 +172,8 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         const auto world_intersection = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
+        auto& selected_objects = RouteObject::get_selected_objects();
+
         for (const auto& object : selected_objects)
         {
             object->set_translation(object->get_initial_translation() +
@@ -182,6 +187,8 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
+
+    auto& selected_objects = RouteObject::get_selected_objects();
 
     if (state != State::KEYBOARD_GRAB && !selected_objects.empty() &&
         keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
@@ -235,46 +242,34 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     gizmo->update_scale();
 }
 
-const RouteObjects& ObjectSelector::get_selected_objects() const
-{
-    return selected_objects;
-}
-
 void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
 {
-    const auto found_it = std::find(selected_objects.cbegin(),
-        selected_objects.cend(), object);
+    auto& selected_objects = RouteObject::get_selected_objects();
 
-    const bool clicked_on_selected_object = found_it != selected_objects.cend();
-
-    const auto select_object_inner = [&]() -> void
-    {
-        object->select();
-        selected_objects.emplace_back(object);
-    };
+    const bool clicked_on_selected_object = object->get_is_selected();
 
     if (keyboard_handler->get_any_shift_state())
     {
         if (clicked_on_selected_object)
         {
-            deselect_object(object);
+            object->deselect();
         }
         else
         {
-            select_object_inner();
+            object->select();
         }
     }
     else
     {
         if (selected_objects.empty())
         {
-            select_object_inner();
+            object->select();
         }
         else if (clicked_on_selected_object)
         {
             if (selected_objects.size() == 1)
             {
-                deselect_object(object);
+                object->deselect();
             }
             else
             {
@@ -287,7 +282,7 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
                     }
                     else
                     {
-                        it = deselect_object(*it);
+                        it = (*it)->deselect();
                     }
                 }
             }
@@ -295,34 +290,26 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
         else
         {
             deselect_all_objects();
-            select_object_inner();
+            object->select();
         }
     }
 }
 
-RouteObjectsIterator ObjectSelector::deselect_object(
-    vsg::ref_ptr<RouteObject> object
-)
-{
-    assert(object);
-
-    object->deselect();
-
-    return selected_objects.erase(std::find(selected_objects.cbegin(),
-        selected_objects.cend(), object));
-}
-
 void ObjectSelector::deselect_all_objects()
 {
+    auto& selected_objects = RouteObject::get_selected_objects();
+
     for (auto it = selected_objects.begin();
         it != selected_objects.end();
-        it = deselect_object(*it));
+        it = (*it)->deselect());
 }
 
 void ObjectSelector::confirm_keyboard_move()
 {
     state = State::INITIAL;
     front_plane_switch->node = nullptr;
+
+    auto& selected_objects = RouteObject::get_selected_objects();
 
     const auto first_object = selected_objects.front();
     const vsg::vec3 translation = first_object->get_translation() -
@@ -339,6 +326,8 @@ void ObjectSelector::confirm_keyboard_move()
 void ObjectSelector::cancel_keyboard_move()
 {
     state = State::INITIAL;
+
+    auto& selected_objects = RouteObject::get_selected_objects();
 
     for (const auto& object : selected_objects)
     {

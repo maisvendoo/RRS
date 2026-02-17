@@ -50,12 +50,9 @@ public:
     void apply(vsg::MoveEvent& moveEvent) override;
     void apply(vsg::FrameEvent& frame) override;
 
-    const RouteObjects& get_selected_objects() const;
-
 private:
     void select_object(vsg::ref_ptr<RouteObject> object);
 
-    RouteObjectsIterator deselect_object(vsg::ref_ptr<RouteObject> object);
     void deselect_all_objects();
 
     void confirm_keyboard_move();
@@ -80,7 +77,6 @@ private:
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::observer_ptr<vsg::Viewer> observer_viewer;
 
-    RouteObjects selected_objects;
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<SingleSwitch> gizmo_switch;
 
