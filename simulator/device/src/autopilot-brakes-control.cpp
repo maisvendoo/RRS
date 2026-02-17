@@ -203,7 +203,7 @@ void AutopilotBrakeController::stepKVT(bool is_motion_allowed,
         is_disable_release = false;
 
         // отпускаем состав если кран не в поездном положении
-        if (bc_state.brake_crane_pos_ref != KRM_POS_II)
+        if (bc_state.brake_crane_pos_ref != KRM_POS_II && bc_state.brake_crane_pos_ref != KRM_POS_I)
         {
             setBrakeCranePos(KRM_POS_I);
         }
