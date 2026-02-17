@@ -315,29 +315,28 @@ void Model::findNearestVehicles()
             continue;
         }
 
-        int train_dir = train->getDirection();
-
         // От каждого поезда ищем вперёд и назад по топологии
-        for (dir_t dir_it : {FWD, BWD})
+        std::tuple<int, int, bool> vehicles_idx_and_directions[] =
         {
-            // Индекс крайней ПЕ в поезде, от которой начинаем поиск
-            int idx = (train_dir == dir_it) ?
-                              train->getFirstVehicle()->getModelIndex() :
-                              train->getLastVehicle()->getModelIndex();
-
+            {train->getFirstVehicle()->getModelIndex(), train->getFirstVehicle()->getOrientation(), true},
+            {train->getLastVehicle()->getModelIndex(), -(train->getLastVehicle()->getOrientation()), false}
+        };
+        for (auto [idx, veh_dir, is_train_head] : vehicles_idx_and_directions)
+        {
             // Ищем другую ПЕ в пределах 10 метров, и дистанцию до неё в данный момент
             double current_distance = 0.0;
+            dir_t search_dir = static_cast<dir_t>(veh_dir);
             int nearest_idx = topology->getVehicleController(idx)->getNearestVehicle(
-                current_distance, DISTANCE_TO_COUPLE_TRAINS, dir_it);
+                current_distance, DISTANCE_TO_COUPLE_TRAINS, search_dir);
 
             // Если ничего не нашли - дальше делать нечего
             if (nearest_idx == -1)
             {
-                train->setDistanceToEndOfTrajectory(dir_it, current_distance);
+                train->setDistanceToEndOfTrajectory(is_train_head, current_distance);
                 continue;
             }
 
-            train->setDistanceToEndOfTrajectory(dir_it, DISTANCE_TO_COUPLE_TRAINS);
+            train->setDistanceToEndOfTrajectory(is_train_head, DISTANCE_TO_COUPLE_TRAINS);
 
             // Создаём число из индексов найденной пары ПЕ, в порядке возрастания
             size_t idx_pair = (idx < nearest_idx) ?
@@ -369,9 +368,9 @@ void Model::findNearestVehicles()
                                               .arg(fd.train_idx)
                                               .arg(fd.from_head ? "head" : "tail")
                                               .arg(train_idx)
-                                              .arg((train_dir == dir_it) ? "head" : "tail"));
+                                              .arg(is_train_head ? "head" : "tail"));
                 // Новый сцеп
-                trains[fd.train_idx]->couple(current_distance, fd.from_head, (train_dir == dir_it), train);
+                trains[fd.train_idx]->couple(current_distance, fd.from_head, is_train_head, train);
                 // Сбрасываем имя поезда
                 trains[fd.train_idx]->setName("");
 
@@ -387,7 +386,7 @@ void Model::findNearestVehicles()
                 // Сохраняем найденную пару ПЕ
                 founded_distance fd;
                 fd.train_idx = train_idx;
-                fd.from_head = (train_dir == dir_it);
+                fd.from_head = is_train_head;
                 fd.distance = current_distance;
                 nearest_trains.insert(idx_pair, fd);
             }
