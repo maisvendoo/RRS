@@ -55,9 +55,11 @@ public:
 
     Switch* getNextSwitch(dir_t& dir) const;
 
-    /// Поиск новой траектории, траекторной координаты и смены ориентации,
-    /// возвращает false, если координата за пределы топологии (за тупик)
-    static bool findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_t& orient);
+    /// Задать включение траектории в маршрут ДЦ
+    void setInRoute(bool is_route);
+
+    /// Включение траектории в маршрут ДЦ
+    bool isInRoute() const;
 
     /// Задать занятость единицей подвижного состава idx в интервале координат
     void setBusy(size_t idx, double coord_begin, double coord_end);
@@ -82,6 +84,12 @@ public:
     /// если пустая, busy_begin_coord = length; busy_end_coord = 0.0
     void getBusyCoords(double &busy_begin_coord, double &busy_end_coord);
 
+    /// Вернуть все треки траектории
+    const std::vector<track_t>& getTracks() const
+    {
+        return tracks;
+    }
+
     /// Вернуть первый трек траектории
     const track_t& getFirstTrack() const
     {
@@ -95,28 +103,10 @@ public:
     }
 
     /// Получить оборудование путевой инфраструктуры на этой траектории
-    const std::vector<TrajectoryDevice *>& getTrajectoryDevices() const;
-
-    /// Получить положение ПЕ на траектории
-    profile_point_t getPosition(double traj_coord, int direction);
-
-    /// Шаг симуляции
-    virtual void step(double t, double dt);
-
-    QByteArray serialize();
-
-    void deserialize(QByteArray &data);
-
-    const std::vector<track_t>& getTracks() const
+    const std::vector<TrajectoryDevice *>& getTrajectoryDevices() const
     {
-        return tracks;
+        return devices;
     }
-
-    /// Задать включение траектории в маршрут ДЦ
-    void setInRoute(bool is_route);
-
-    /// Включение траектории в маршрут ДЦ
-    bool isInRoute() const;
 
     /// Светофор вперёд, включающий данную траекторию в маршрут ДЦ
     Signal* getRouteBySignalFwd() const
@@ -137,6 +127,20 @@ public:
     {
         in_route_by_signal_bwd = signal;
     }
+
+
+    /// Шаг симуляции
+    virtual void step(double t, double dt);
+
+    QByteArray serialize();
+
+    void deserialize(QByteArray &data);
+    /// Поиск новой траектории, траекторной координаты и смены ориентации,
+    /// возвращает false, если координата за пределы топологии (за тупик)
+    static bool findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_t& orient);
+
+    /// Получить положение ПЕ на траектории
+    profile_point_t getPosition(double traj_coord, int direction);
 
 signals:
 
@@ -190,11 +194,12 @@ private:
     track_t findNextTrack(const track_t& cur_track, dir_t dir);
 
     /// Создание условного продолжения топологии за тупик для корректного расчёта
-    track_t addFakeTrack(const track_t& cur_track, dir_t dir);
+    track_t createFakeTrack(const track_t& cur_track, dir_t dir);
 
     /// Создание трека в обратном направлении для корректного расчёта
     track_t createReversedTrack(const track_t& track);
 
+    /// Расчёт кривизны между двумя соседними треками
     double calc_curvature(track_t& track0, track_t& track1);
 };
 

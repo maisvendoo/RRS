@@ -191,77 +191,26 @@ Switch* Trajectory::getNextSwitch(dir_t& dir) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Trajectory::findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_t& orient)
+void Trajectory::setInRoute(bool is_route)
 {
-    dir_t move_dir;
-    while (true)
+    if (is_route)
     {
-        if (coord < 0.0)
-        {
-            // Если траекторная координата меньше нуля - заехали за стрелку сзади
-            move_dir = BWD;
-        }
-        else
-        {
-            if (coord > cur_traj->getLength())
-            {
-                // Если траекторная координата превысила длину траектории - заехали за стрелку спереди
-                move_dir = FWD;
-                // Учитываем выход за пределы траектории
-                coord = coord - cur_traj->getLength();
-            }
-            else
-            {
-                // УРА! Находимся в пределах траектории: выходим
-                return true;
-            }
-        }
-
-        // Отслеживаем разворот ориентации траектории
-        dir_t new_dir = move_dir;
-
-        // Получаем указатель на стрелку в конце траектории
-        Switch* next_sw = cur_traj->getNextSwitch(new_dir);
-        if (next_sw == nullptr)
-        {
-            // Если коннектора нет, выходим
-            return false;
-        }
-
-        // Получаем указатель на ту траекторию, с которой нас соединяет стрелка
-        Trajectory* next_traj = next_sw->getNextTraj(new_dir);
-
-        // Если за стрелкой нет траектории,
-        // остаёмся на исходной траектории, останавливаемся на краю и выходим
-        if (next_traj == nullptr)
-        {
-            return false;
-        }
-
-        // Обновляем текущую траекторию
-        cur_traj = next_traj;
-        if (new_dir != move_dir)
-        {
-            // Если ориентация траектории изменилась, разворачиваемся
-            orient = static_cast<dir_t>(-orient);
-            coord = -coord;
-        }
-
-        if (new_dir == BWD)
-        {
-            // Если смещаемся назад, начинаем отсчёт с конца траектории
-            coord = coord + cur_traj->getLength();
-        }
+        in_route = true;
     }
-    return false;
+    else
+    {
+        in_route = false;
+        in_route_by_signal_fwd = nullptr;
+        in_route_by_signal_bwd = nullptr;
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-const std::vector<TrajectoryDevice *>& Trajectory::getTrajectoryDevices() const
+bool Trajectory::isInRoute() const
 {
-    return devices;
+    return in_route;
 }
 
 //------------------------------------------------------------------------------
@@ -293,31 +242,6 @@ void Trajectory::clearBusy()
 void Trajectory::setBusyState(bool busy_state)
 {
     is_busy = busy_state;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Trajectory::setInRoute(bool is_route)
-{
-    if (is_route)
-    {
-        in_route = true;
-    }
-    else
-    {
-        in_route = false;
-        in_route_by_signal_fwd = nullptr;
-        in_route_by_signal_bwd = nullptr;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool Trajectory::isInRoute() const
-{
-    return in_route;
 }
 
 //------------------------------------------------------------------------------
@@ -464,113 +388,6 @@ void Trajectory::getBusyCoords(double &busy_begin_coord, double &busy_end_coord)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-profile_point_t Trajectory::getPosition(double traj_coord, int direction)
-{
-    profile_point_t pp;
-
-    track_t cur_track = track_t();
-    track_t prev_track = track_t();
-    track_t next_track = track_t();
-
-    findTracks(traj_coord, cur_track, prev_track, next_track);
-
-    double dir = static_cast<double>(direction);
-
-    pp.position = cur_track.begin_point +
-                  cur_track.orth * (traj_coord - cur_track.traj_coord);
-
-    pp.inclination = cur_track.inclination * dir;
-
-    // Относительное перемещение вдоль текущего трека от 0.0 до 1.0
-    double rel_motion = (traj_coord - cur_track.traj_coord) / cur_track.len;
-    // Железнодорожный пикетаж
-    pp.railway_coord = cur_track.railway_coord0 +
-        rel_motion * (cur_track.railway_coord1 - cur_track.railway_coord0);
-
-    // Поворачиваем ориентацию к соседнему треку
-    if (cur_track.len < 30.0)
-    {
-        // На треках короче 30 метров поворачиваем неперерывно
-        // Плавное изменение кривизны от угла с предыдущем треком к углу со следующим
-        pp.curvature = (1.0 - rel_motion) * calc_curvature(prev_track, cur_track) +
-                       rel_motion * calc_curvature(cur_track, next_track);
-    }
-    else
-    {
-        // Треки длиннее 30 метров считаем прямыми в середине
-        // Поворачиваем на первых и последних 15 метрах
-        double track_coord = traj_coord - cur_track.traj_coord;
-        if (track_coord < 15.0)
-        {
-            // Поворачиваем на первых 15 метрах
-            // rel_motion от 0.0 до 0.5
-            rel_motion = track_coord / 30.0;
-            // Плавное изменение кривизны от угла с предыдущем треком к нулю
-            double curv = (1.0 - track_coord / 15.0) *
-                          calc_curvature(prev_track, cur_track);
-            pp.curvature = (curv > 1e-5) ? curv : 0.0;
-        }
-        else
-        {
-            if (track_coord > (cur_track.len - 15.0))
-            {
-                // Поворачиваем на последних 15 метрах
-                // rel_motion от 0.5 до 1.0
-                rel_motion = 1.0 - (cur_track.len - track_coord) / 30.0;
-                // Плавное изменение кривизны от нуля к углу со следующим треком
-                double curv = ((15.0 + track_coord - cur_track.len) / 15.0) *
-                              calc_curvature(cur_track, next_track);
-                pp.curvature = (curv > 1e-5) ? curv : 0.0;
-            }
-            else
-            {
-                // В середине длинного трека движемся вдоль него
-                pp.curvature = 0.0;
-                pp.orth = cur_track.orth * dir;
-                pp.right = cur_track.trav * dir;
-                pp.up = cur_track.up;
-                return pp;
-            }
-        }
-    }
-
-    if (rel_motion < 0.5)
-    {
-        pp.orth = cur_track.orth * (0.5 + rel_motion) * dir;
-        pp.orth += prev_track.orth * (0.5 - rel_motion) * dir;
-
-        pp.right = cur_track.trav * (0.5 + rel_motion) * dir;
-        pp.right += prev_track.trav * (0.5 - rel_motion) * dir;
-
-        pp.up = cur_track.up * (0.5 + rel_motion);
-        pp.up += prev_track.up * (0.5 - rel_motion);
-
-        pp.orth = normalize(pp.orth);
-        pp.right = normalize(pp.right);
-        pp.up = normalize(pp.up);
-        return pp;
-    }
-    else
-    {
-        pp.orth = cur_track.orth * (1.5 - rel_motion) * dir;
-        pp.orth += next_track.orth * (rel_motion - 0.5) * dir;
-
-        pp.right = cur_track.trav * (1.5 - rel_motion) * dir;
-        pp.right += next_track.trav * (rel_motion - 0.5) * dir;
-
-        pp.up = cur_track.up * (1.5 - rel_motion);
-        pp.up += next_track.up * (rel_motion - 0.5);
-
-        pp.orth = normalize(pp.orth);
-        pp.right = normalize(pp.right);
-        pp.up = normalize(pp.up);
-        return pp;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void Trajectory::step(double t, double dt)
 {
     // Необходимость рассылки состояния траектории
@@ -700,6 +517,181 @@ void Trajectory::deserialize(QByteArray &data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool Trajectory::findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_t& orient)
+{
+    dir_t move_dir;
+    while (true)
+    {
+        if (coord < 0.0)
+        {
+            // Если траекторная координата меньше нуля - заехали за стрелку сзади
+            move_dir = BWD;
+        }
+        else
+        {
+            if (coord > cur_traj->getLength())
+            {
+                // Если траекторная координата превысила длину траектории - заехали за стрелку спереди
+                move_dir = FWD;
+                // Учитываем выход за пределы траектории
+                coord = coord - cur_traj->getLength();
+            }
+            else
+            {
+                // УРА! Находимся в пределах траектории: выходим
+                return true;
+            }
+        }
+
+        // Отслеживаем разворот ориентации траектории
+        dir_t new_dir = move_dir;
+
+        // Получаем указатель на стрелку в конце траектории
+        Switch* next_sw = cur_traj->getNextSwitch(new_dir);
+        if (next_sw == nullptr)
+        {
+            // Если коннектора нет, выходим
+            return false;
+        }
+
+        // Получаем указатель на ту траекторию, с которой нас соединяет стрелка
+        Trajectory* next_traj = next_sw->getNextTraj(new_dir);
+
+        // Если за стрелкой нет траектории,
+        // остаёмся на исходной траектории, останавливаемся на краю и выходим
+        if (next_traj == nullptr)
+        {
+            return false;
+        }
+
+        // Обновляем текущую траекторию
+        cur_traj = next_traj;
+        if (new_dir != move_dir)
+        {
+            // Если ориентация траектории изменилась, разворачиваемся
+            orient = static_cast<dir_t>(-orient);
+            coord = -coord;
+        }
+
+        if (new_dir == BWD)
+        {
+            // Если смещаемся назад, начинаем отсчёт с конца траектории
+            coord = coord + cur_traj->getLength();
+        }
+    }
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+profile_point_t Trajectory::getPosition(double traj_coord, int direction)
+{
+    profile_point_t pp;
+
+    track_t cur_track = track_t();
+    track_t prev_track = track_t();
+    track_t next_track = track_t();
+
+    findTracks(traj_coord, cur_track, prev_track, next_track);
+
+    double dir = static_cast<double>(direction);
+
+    pp.position = cur_track.begin_point +
+                  cur_track.orth * (traj_coord - cur_track.traj_coord);
+
+    pp.inclination = cur_track.inclination * dir;
+
+    // Относительное перемещение вдоль текущего трека от 0.0 до 1.0
+    double rel_motion = (traj_coord - cur_track.traj_coord) / cur_track.len;
+    // Железнодорожный пикетаж
+    pp.railway_coord = cur_track.railway_coord0 +
+                       rel_motion * (cur_track.railway_coord1 - cur_track.railway_coord0);
+
+    // Поворачиваем ориентацию к соседнему треку
+    if (cur_track.len < 30.0)
+    {
+        // На треках короче 30 метров поворачиваем неперерывно
+        // Плавное изменение кривизны от угла с предыдущем треком к углу со следующим
+        pp.curvature = (1.0 - rel_motion) * calc_curvature(prev_track, cur_track) +
+                       rel_motion * calc_curvature(cur_track, next_track);
+    }
+    else
+    {
+        // Треки длиннее 30 метров считаем прямыми в середине
+        // Поворачиваем на первых и последних 15 метрах
+        double track_coord = traj_coord - cur_track.traj_coord;
+        if (track_coord < 15.0)
+        {
+            // Поворачиваем на первых 15 метрах
+            // rel_motion от 0.0 до 0.5
+            rel_motion = track_coord / 30.0;
+            // Плавное изменение кривизны от угла с предыдущем треком к нулю
+            double curv = (1.0 - track_coord / 15.0) *
+                          calc_curvature(prev_track, cur_track);
+            pp.curvature = (curv > 1e-5) ? curv : 0.0;
+        }
+        else
+        {
+            if (track_coord > (cur_track.len - 15.0))
+            {
+                // Поворачиваем на последних 15 метрах
+                // rel_motion от 0.5 до 1.0
+                rel_motion = 1.0 - (cur_track.len - track_coord) / 30.0;
+                // Плавное изменение кривизны от нуля к углу со следующим треком
+                double curv = ((15.0 + track_coord - cur_track.len) / 15.0) *
+                              calc_curvature(cur_track, next_track);
+                pp.curvature = (curv > 1e-5) ? curv : 0.0;
+            }
+            else
+            {
+                // В середине длинного трека движемся вдоль него
+                pp.curvature = 0.0;
+                pp.orth = cur_track.orth * dir;
+                pp.right = cur_track.trav * dir;
+                pp.up = cur_track.up;
+                return pp;
+            }
+        }
+    }
+
+    if (rel_motion < 0.5)
+    {
+        pp.orth = cur_track.orth * (0.5 + rel_motion) * dir;
+        pp.orth += prev_track.orth * (0.5 - rel_motion) * dir;
+
+        pp.right = cur_track.trav * (0.5 + rel_motion) * dir;
+        pp.right += prev_track.trav * (0.5 - rel_motion) * dir;
+
+        pp.up = cur_track.up * (0.5 + rel_motion);
+        pp.up += prev_track.up * (0.5 - rel_motion);
+
+        pp.orth = normalize(pp.orth);
+        pp.right = normalize(pp.right);
+        pp.up = normalize(pp.up);
+        return pp;
+    }
+    else
+    {
+        pp.orth = cur_track.orth * (1.5 - rel_motion) * dir;
+        pp.orth += next_track.orth * (rel_motion - 0.5) * dir;
+
+        pp.right = cur_track.trav * (1.5 - rel_motion) * dir;
+        pp.right += next_track.trav * (rel_motion - 0.5) * dir;
+
+        pp.up = cur_track.up * (1.5 - rel_motion);
+        pp.up += next_track.up * (rel_motion - 0.5);
+
+        pp.orth = normalize(pp.orth);
+        pp.right = normalize(pp.right);
+        pp.up = normalize(pp.up);
+        return pp;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Trajectory::findTracks(double traj_coord,
                             track_t& cur_track,
                             track_t& prev_track,
@@ -809,13 +801,13 @@ track_t Trajectory::findNextTrack(const track_t& cur_track, dir_t dir)
         }
     }
 
-    return addFakeTrack(cur_track, dir);
+    return createFakeTrack(cur_track, dir);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-track_t Trajectory::addFakeTrack(const track_t& cur_track, dir_t dir)
+track_t Trajectory::createFakeTrack(const track_t& cur_track, dir_t dir)
 {
     track_t fake_track;
 
