@@ -511,7 +511,7 @@ void EditorGui::show_selected_objects_properties() const
         vsg::vec3 translation = object->get_translation();
         if (ImGui::DragFloat3(label.c_str(), translation.data()))
         {
-            object->set_translation(translation);
+            object->set_translation(translation, true);
         }
 
         label = "rotation##";
@@ -520,7 +520,7 @@ void EditorGui::show_selected_objects_properties() const
         vsg::vec3 rotation_deg = object->get_rotation_deg();
         if (ImGui::DragFloat3(label.c_str(), rotation_deg.data()))
         {
-            object->set_rotation_deg(rotation_deg);
+            object->set_rotation_deg(rotation_deg, true);
         }
 
         ++i;

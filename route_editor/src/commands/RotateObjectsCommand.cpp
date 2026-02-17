@@ -21,7 +21,7 @@ void RotateObjectsCommand::execute() const
 {
     for (const auto& object : objects)
     {
-        object->rotate(rotation_deg);
+        object->rotate(rotation_deg, true);
     }
 }
 
@@ -29,7 +29,7 @@ void RotateObjectsCommand::undo() const
 {
     for (const auto& object : objects)
     {
-        object->rotate(-rotation_deg);
+        object->rotate(-rotation_deg, true);
     }
 }
 

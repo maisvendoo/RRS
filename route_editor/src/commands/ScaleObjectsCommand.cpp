@@ -21,7 +21,7 @@ void ScaleObjectsCommand::execute() const
 {
     for (const auto& object : objects)
     {
-        object->scale(scale);
+        object->scale(scale, true);
     }
 }
 
@@ -29,7 +29,7 @@ void ScaleObjectsCommand::undo() const
 {
     for (const auto& object : objects)
     {
-        object->scale(-scale);
+        object->scale(-scale, true);
     }
 }
 

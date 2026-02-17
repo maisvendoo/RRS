@@ -10,15 +10,10 @@ EditorGui.h
 EditorState.h
 Gizmo.h
 IntersectionHandler.h
-KeyStates.h
-LSIntersector.h
-MouseHandler.h
 ObjectSelector.h
 Outline.h
-PagedLodMap.h
 Route.h
 RouteEditor.h
-RouteMap.h
 RouteObject.h
 SceneGraph.h
 SelectedObjects.h
@@ -34,7 +29,6 @@ CameraHandler.cpp
 EditorGui.cpp
 Gizmo.cpp
 IntersectionHandler.cpp
-MouseHandler.cpp
 ObjectSelector.cpp
 Outline.cpp
 Route.cpp

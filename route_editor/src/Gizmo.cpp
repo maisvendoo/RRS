@@ -349,7 +349,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
         for (const auto& object : selected_objects)
         {
-            object->set_translation(object->get_initial_translation() + offset);
+            object->set_translation(object->get_initial_translation() + offset, true);
         }
 
         break;
