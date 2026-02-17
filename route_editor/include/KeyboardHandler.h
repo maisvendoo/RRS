@@ -9,12 +9,12 @@
 #include <vsg/core/Visitor.h>
 #include <vsg/ui/KeyEvent.h>
 
-struct settings_t;
+class CommandList;
 
 class KeyboardHandler : public vsg::Inherit<vsg::Visitor, KeyboardHandler>
 {
 public:
-    explicit KeyboardHandler(const settings_t& settings);
+    KeyboardHandler(const KeyBindings& key_bindings, CommandList& commands);
 
     void apply(vsg::KeyPressEvent& keyPress) override;
     void apply(vsg::KeyReleaseEvent& keyRelease) override;
@@ -27,6 +27,7 @@ public:
 
 private:
     const KeyBindings& key_bindings;
+    CommandList& commands;
     KeyStates key_states;
 };
 

@@ -39,7 +39,11 @@ void CommandList::push(const Command* command, bool execute)
         }
         // Now tail is equal to active
         tail = active;
-        tail->next = nullptr;
+
+        if (tail)
+        {
+            tail->next = nullptr;
+        }
     }
 
     if (size == 0)
@@ -79,11 +83,25 @@ void CommandList::undo()
 
 void CommandList::redo()
 {
-    if (active != tail)
+    if (active == tail)
+    {
+        return;
+    }
+
+    if (active)
     {
         active = active->next;
         active->command->execute();
+        return;
     }
+
+    CommandNode* head = tail;
+    while (head->prev)
+    {
+        head = head->prev;
+    }
+    active = head;
+    active->command->execute();
 }
 
 const CommandList::CommandNode* CommandList::get_tail() const

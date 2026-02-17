@@ -67,7 +67,7 @@ bool RouteEditor::initialize()
     }
 
     mouse_handler = MouseHandler::create();
-    keyboard_handler = KeyboardHandler::create(settings);
+    keyboard_handler = KeyboardHandler::create(settings.key_bindings, commands);
 
     camera_handler = CameraHandler::create(settings, window->extent2D(),
         mouse_handler, keyboard_handler);

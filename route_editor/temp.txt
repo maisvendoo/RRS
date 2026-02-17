@@ -5,9 +5,7 @@ commands/RotateObjectsCommand.h
 commands/ScaleObjectsCommand.h
 commands/SelectObjectsCommand.h
 commands/ShowObjectsCommand.h
-CameraHandler.h
 EditorGui.h
-EditorState.h
 Gizmo.h
 IntersectionHandler.h
 ObjectSelector.h
@@ -24,7 +22,6 @@ commands/RotateObjectsCommand.cpp
 commands/ScaleObjectsCommand.cpp
 commands/SelectObjectsCommand.cpp
 commands/ShowObjectsCommand.cpp
-CameraHandler.cpp
 EditorGui.cpp
 Gizmo.cpp
 IntersectionHandler.cpp
