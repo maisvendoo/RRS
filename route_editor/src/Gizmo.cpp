@@ -32,7 +32,7 @@ Gizmo::Gizmo(
     const settings_t& settings,
     vsg::ref_ptr<CameraHandler> camera_handler,
     vsg::ref_ptr<IntersectionHandler> intersection_handler,
-    const SelectedObjects& selected_objects
+    const RouteObjects& selected_objects
 )
     : settings(settings)
     , camera_handler(camera_handler)

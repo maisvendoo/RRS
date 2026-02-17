@@ -8,8 +8,10 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
 
+#include <list>
 #include <string>
 
+class RouteObject;
 class SingleSwitch;
 
 namespace vsg
@@ -19,6 +21,9 @@ class PagedLOD;
 class Viewer;
 
 }
+
+using RouteObjects = std::list<vsg::ref_ptr<RouteObject>>;
+using RouteObjectsIterator = RouteObjects::iterator;
 
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 {

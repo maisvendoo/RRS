@@ -2,7 +2,7 @@
 #define MOVE_OBJECTS_COMMAND_H
 
 #include "Command.h"
-#include "SelectedObjects.h"
+#include "RouteObject.h"
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
@@ -16,7 +16,7 @@ class MoveObjectsCommand : public Command
 {
 public:
     MoveObjectsCommand(
-        const SelectedObjects& objects,
+        const RouteObjects& objects,
         vsg::vec3 translation
     );
 
@@ -26,7 +26,7 @@ public:
     virtual std::string to_string() const override;
 
 private:
-    const SelectedObjects objects;
+    const RouteObjects objects;
     vsg::vec3 translation;
 };
 

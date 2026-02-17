@@ -1,7 +1,7 @@
 #ifndef GIZMO_H
 #define GIZMO_H
 
-#include "SelectedObjects.h"
+#include "RouteObject.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
@@ -31,7 +31,7 @@ public:
         const settings_t& settings,
         vsg::ref_ptr<CameraHandler> camera_handler,
         vsg::ref_ptr<IntersectionHandler> intersection_handler,
-        const SelectedObjects& selected_objects
+        const RouteObjects& selected_objects
     );
 
     bool handle_intersections();
@@ -46,7 +46,7 @@ private:
     const settings_t& settings;
     vsg::ref_ptr<CameraHandler> camera_handler;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
-    const SelectedObjects& selected_objects;
+    const RouteObjects& selected_objects;
 
     vsg::Builder builder;
     vsg::ref_ptr<vsg::Node> arrow_x;

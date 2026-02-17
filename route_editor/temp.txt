@@ -16,7 +16,6 @@ Route.h
 RouteEditor.h
 RouteObject.h
 SceneGraph.h
-SelectedObjects.h
 
 commands/DeselectObjectsCommand.cpp
 commands/HideObjectsCommand.cpp

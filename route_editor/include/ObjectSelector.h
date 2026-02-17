@@ -1,7 +1,7 @@
 #ifndef OBJECT_SELECTOR_H
 #define OBJECT_SELECTOR_H
 
-#include "SelectedObjects.h"
+#include "RouteObject.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
@@ -50,12 +50,12 @@ public:
     void apply(vsg::MoveEvent& moveEvent) override;
     void apply(vsg::FrameEvent& frame) override;
 
-    const SelectedObjects& get_selected_objects() const;
+    const RouteObjects& get_selected_objects() const;
 
 private:
     void select_object(vsg::ref_ptr<RouteObject> object);
 
-    SelectedObjectsIterator deselect_object(vsg::ref_ptr<RouteObject> object);
+    RouteObjectsIterator deselect_object(vsg::ref_ptr<RouteObject> object);
     void deselect_all_objects();
 
     void confirm_keyboard_move();
@@ -80,7 +80,7 @@ private:
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::observer_ptr<vsg::Viewer> observer_viewer;
 
-    SelectedObjects selected_objects;
+    RouteObjects selected_objects;
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<SingleSwitch> gizmo_switch;
 

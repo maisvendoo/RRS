@@ -10,7 +10,7 @@
 #include <vector>
 
 MoveObjectsCommand::MoveObjectsCommand(
-    const SelectedObjects& objects,
+    const RouteObjects& objects,
     vsg::vec3 translation
 )
     : objects(objects)

@@ -12,7 +12,6 @@
 #include "Outline.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
-#include "SelectedObjects.h"
 #include "SingleSwitch.h"
 
 #include <vsg/app/Viewer.h>
@@ -236,7 +235,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     gizmo->update_scale();
 }
 
-const SelectedObjects& ObjectSelector::get_selected_objects() const
+const RouteObjects& ObjectSelector::get_selected_objects() const
 {
     return selected_objects;
 }
@@ -301,7 +300,7 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
     }
 }
 
-SelectedObjectsIterator ObjectSelector::deselect_object(
+RouteObjectsIterator ObjectSelector::deselect_object(
     vsg::ref_ptr<RouteObject> object
 )
 {
