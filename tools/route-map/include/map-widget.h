@@ -180,7 +180,7 @@ private:
                        QPointF& cursor_pos, double& distance2, std::int8_t& dir);
 
     void drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& painter,
-                        QPointF& cursor_pos, double& distance2, std::int8_t& dir);
+                        QPointF& cursor_pos, double& distance2);
 
     void drawStations(topology_stations_list_t *stations, QPainter& painter);
 

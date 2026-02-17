@@ -128,7 +128,7 @@ bool BackGroundWidget::drawSwitchHighlight(QPainter& painter, Switch* conn, std:
 
         for (Trajectory* traj : {traj_plus, traj_minus})
         {
-            double draw_len = traj->getLength() - 1.0;
+            double draw_len = traj->getLength() - 5.0;
 
             dir_t traj_dir = (dir < 0) ? BWD : FWD;
             traj_dir = static_cast<dir_t>(sw->getTrajOrientation(traj) * traj_dir);
@@ -140,7 +140,7 @@ bool BackGroundWidget::drawSwitchHighlight(QPainter& painter, Switch* conn, std:
                     && (next_state != ONLY_MINUS)
                     && (next_state != ONLY_PLUS))
                 {
-                    draw_len = traj->getLength() * 0.5;
+                    draw_len = traj->getLength() * 0.5 - 2.0;
                 }
             }
             draw_len = std::min(draw_len, switch_length);

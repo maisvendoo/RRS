@@ -372,7 +372,7 @@ void MapWidget::drawVehicle(simulator_vehicle_pos_update_t &vehicle, double &veh
 //
 //------------------------------------------------------------------------------
 void MapWidget::drawConnector(Switch* sw, QPainter& painter,
-                              QPointF& cursor_pos, double& distance2, std::int8_t &dir)
+                              QPointF& cursor_pos, double& distance2, std::int8_t& dir)
 {
     if (sw == nullptr)
     {
@@ -425,12 +425,12 @@ void MapWidget::drawConnector(Switch* sw, QPainter& painter,
             pen.setColor(color_switch_other);
             pen.setWidth(other_width);
             painter.setPen(pen);
-            drawSwitchTraj(fwd_other, other_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(fwd_other, other_to_fwd, painter, cursor_pos, distance2);
 
             pen.setColor(color_switch_busy);
             pen.setWidth(switched_width);
             painter.setPen(pen);
-            drawSwitchTraj(fwd_traj, traj_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(fwd_traj, traj_to_fwd, painter, cursor_pos, distance2);
             break;
         }
         case IN_ROUTE_MINUS:
@@ -445,12 +445,12 @@ void MapWidget::drawConnector(Switch* sw, QPainter& painter,
             pen.setColor(color_switch_other);
             pen.setWidth(other_width);
             painter.setPen(pen);
-            drawSwitchTraj(fwd_other, other_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(fwd_other, other_to_fwd, painter, cursor_pos, distance2);
 
             pen.setColor(color_switch_route);
             pen.setWidth(switched_width);
             painter.setPen(pen);
-            drawSwitchTraj(fwd_traj, traj_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(fwd_traj, traj_to_fwd, painter, cursor_pos, distance2);
             break;
         }
         default:
@@ -478,19 +478,22 @@ void MapWidget::drawConnector(Switch* sw, QPainter& painter,
             }
 
             painter.setPen(pen);
-            drawSwitchTraj(fwd_other, other_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(fwd_other, other_to_fwd, painter, cursor_pos, distance2);
 
             pen.setColor(color_switch_free);
             pen.setWidth(switched_width);
             painter.setPen(pen);
-            drawSwitchTraj(fwd_traj, traj_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(fwd_traj, traj_to_fwd, painter, cursor_pos, distance2);
             break;
         }
         }
+        dir = 1;
     }
 
     if (sw->trajectories[SW_BWD_PLUS] && sw->trajectories[SW_BWD_MINUS])
     {
+        double fwd_distance2 = distance2;
+
         Trajectory* bwd_traj = (sw->getStateBwd() < 0) ? sw->trajectories[SW_BWD_MINUS] : sw->trajectories[SW_BWD_PLUS];
         bool traj_to_fwd = (sw->getTrajOrientation(bwd_traj) == BWD);
         Trajectory* bwd_other = (sw->getStateBwd() < 0) ? sw->trajectories[SW_BWD_PLUS] : sw->trajectories[SW_BWD_MINUS];
@@ -510,12 +513,12 @@ void MapWidget::drawConnector(Switch* sw, QPainter& painter,
             pen.setColor(color_switch_other);
             pen.setWidth(other_width);
             painter.setPen(pen);
-            drawSwitchTraj(bwd_other, other_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(bwd_other, other_to_fwd, painter, cursor_pos, distance2);
 
             pen.setColor(color_switch_busy);
             pen.setWidth(switched_width);
             painter.setPen(pen);
-            drawSwitchTraj(bwd_traj, traj_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(bwd_traj, traj_to_fwd, painter, cursor_pos, distance2);
             break;
         }
         case IN_ROUTE_MINUS:
@@ -530,12 +533,12 @@ void MapWidget::drawConnector(Switch* sw, QPainter& painter,
             pen.setColor(color_switch_other);
             pen.setWidth(other_width);
             painter.setPen(pen);
-            drawSwitchTraj(bwd_other, other_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(bwd_other, other_to_fwd, painter, cursor_pos, distance2);
 
             pen.setColor(color_switch_route);
             pen.setWidth(switched_width);
             painter.setPen(pen);
-            drawSwitchTraj(bwd_traj, traj_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(bwd_traj, traj_to_fwd, painter, cursor_pos, distance2);
             break;
         }
         default:
@@ -562,14 +565,18 @@ void MapWidget::drawConnector(Switch* sw, QPainter& painter,
                 pen.setWidth(other_width);
             }
             painter.setPen(pen);
-            drawSwitchTraj(bwd_other, other_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(bwd_other, other_to_fwd, painter, cursor_pos, distance2);
 
             pen.setColor(color_switch_free);
             pen.setWidth(switched_width);
             painter.setPen(pen);
-            drawSwitchTraj(bwd_traj, traj_to_fwd, painter, cursor_pos, distance2, dir);
+            drawSwitchTraj(bwd_traj, traj_to_fwd, painter, cursor_pos, distance2);
             break;
         }
+        }
+        if (distance2 < fwd_distance2)
+        {
+            dir = -1;
         }
     }
 }
@@ -578,16 +585,16 @@ void MapWidget::drawConnector(Switch* sw, QPainter& painter,
 //
 //------------------------------------------------------------------------------
 void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& painter,
-                               QPointF& cursor_pos, double& distance2, std::int8_t& dir)
+                               QPointF& cursor_pos, double& distance2)
 {
     if (traj == nullptr)
     {
         return;
     }
 
-    double draw_len = traj->getLength() - 1.0;
+    double draw_len = traj->getLength() - 5.0;
 
-    dir_t traj_dir = (draw_to_fwd) ? BWD : FWD;
+    dir_t traj_dir = (draw_to_fwd) ? FWD : BWD;
     if (Switch* next_sw = traj->getNextSwitch(traj_dir))
     {
         Switch_state_t next_state = (traj_dir == FWD) ? next_sw->getStateBwd() : next_sw->getStateFwd();
@@ -595,13 +602,10 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
             && (next_state != ONLY_MINUS)
             && (next_state != ONLY_PLUS))
         {
-            draw_len = traj->getLength() * 0.5;
+            draw_len = traj->getLength() * 0.5 - 2.0;
         }
     }
     draw_len = std::min(draw_len, switch_length);
-
-    traj_dir = (draw_to_fwd) ? FWD : BWD;
-    traj->getNextSwitch(traj_dir);
 
     if (draw_to_fwd)
     {
@@ -620,7 +624,6 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
             if (distance2 > conn_distance2)
             {
                 distance2 = conn_distance2;
-                dir = traj_dir;
             }
 
             fwd_point = fwd_point_next;
@@ -645,7 +648,6 @@ void MapWidget::drawSwitchTraj(Trajectory* traj, bool draw_to_fwd, QPainter& pai
             if (distance2 > conn_distance2)
             {
                 distance2 = conn_distance2;
-                dir = traj_dir;
             }
 
             bwd_point = bwd_point_next;
