@@ -282,11 +282,11 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
 
                 // На всякий случай актуализируем положение ПЕ в топологии
                 // по старой дуговой координате
-                topology->getVehicleController(model_idx)->setCoord(new_y[idx]);
+                topology->getVehicleController(model_idx)->setPathCoord(new_y[idx]);
 
                 // Новая дуговая координата
                 new_y[idx] = train_coord + dir * other_veh_distances[i];
-                topology->getVehicleController(model_idx)->setInitCoord(new_y[idx]);
+                topology->getVehicleController(model_idx)->setInitPathCoord(new_y[idx]);
                 train_coord = new_y[idx];
             }
 
@@ -336,11 +336,11 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
 
                 // На всякий случай актуализируем положение ПЕ в топологии
                 // по старой дуговой координате
-                topology->getVehicleController(model_idx)->setCoord(new_y[idx]);
+                topology->getVehicleController(model_idx)->setPathCoord(new_y[idx]);
 
                 // Новая дуговая координата
                 new_y[idx] = train_coord + dir * other_veh_distances[i - 1];
-                topology->getVehicleController(model_idx)->setInitCoord(new_y[idx]);
+                topology->getVehicleController(model_idx)->setInitPathCoord(new_y[idx]);
                 train_coord = new_y[idx];
             }
 
@@ -430,11 +430,11 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
 
                 // На всякий случай актуализируем положение ПЕ в топологии
                 // по старой дуговой координате
-                topology->getVehicleController(model_idx)->setCoord(new_y[idx]);
+                topology->getVehicleController(model_idx)->setPathCoord(new_y[idx]);
 
                 // Новая дуговая координата
                 new_y[idx] = train_coord - dir * other_veh_distances[i];
-                topology->getVehicleController(model_idx)->setInitCoord(new_y[idx]);
+                topology->getVehicleController(model_idx)->setInitPathCoord(new_y[idx]);
                 train_coord = new_y[idx];
             }
 
@@ -477,11 +477,11 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
 
                 // На всякий случай актуализируем положение ПЕ в топологии
                 // по старой дуговой координате
-                topology->getVehicleController(model_idx)->setCoord(other_y[idx]);
+                topology->getVehicleController(model_idx)->setPathCoord(other_y[idx]);
 
                 // Новая дуговая координата
                 new_y[new_ode_order] = train_coord - dir * other_veh_distances[i - 1];
-                topology->getVehicleController(model_idx)->setInitCoord(new_y[new_ode_order]);
+                topology->getVehicleController(model_idx)->setInitPathCoord(new_y[new_ode_order]);
                 train_coord = new_y[new_ode_order];
 
                 vehicle->setStateIndex(new_ode_order + y.size());
@@ -947,13 +947,13 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
                 (first->getOrientation() == -1) ?
                     first->addBackwardForce(-force) :
                     first->addForwardForce(-force);
-                // ОТЛАДКА
+                /* ОТЛАДКА
                 Journal::instance()->info(QString("Train #%1: Head (#%2) with velocity%3km/h should stop at distance%4m by force%5kN")
                                           .arg(train_idx, 3)
                                           .arg(first->getModelIndex(), 3)
                                           .arg(dir * velocity * Physics::kmh, 7, 'f', 1)
                                           .arg(dir * distance, 7, 'f', 3)
-                                          .arg(force / 1000.0, 12, 'f', 1));
+                                          .arg(force / 1000.0, 12, 'f', 1));*/
             }
         }
 
@@ -967,13 +967,13 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
                 (last->getOrientation() == -1) ?
                     last->addForwardForce(-force) :
                     last->addBackwardForce(-force);
-                // ОТЛАДКА
+                /* ОТЛАДКА
                 Journal::instance()->info(QString("Train #%1: Tail (#%2) with velocity%3km/h should stop at distance%4m by force%5kN")
                                           .arg(train_idx, 3)
                                           .arg(last->getModelIndex(), 3)
                                           .arg(-dir * velocity * Physics::kmh, 7, 'f', 1)
                                           .arg(dir * distance, 7, 'f', 3)
-                                          .arg(force / 1000.0, 12, 'f', 1));
+                                          .arg(force / 1000.0, 12, 'f', 1));*/
             }
         }
 
@@ -993,8 +993,7 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
             {
                 size_t model_idx = vehicle->getModelIndex();
                 size_t idx = vehicle->getStateIndex();
-                //topology->getVehicleController(model_idx)->setDirection(dir * vehicle->getOrientation());
-                topology->getVehicleController(model_idx)->setCoord(y[idx]);
+                topology->getVehicleController(model_idx)->setPathCoord(y[idx]);
                 *(vehicle->getProfilePoint()) = topology->getVehicleController(model_idx)->getPosition();
             }
         }

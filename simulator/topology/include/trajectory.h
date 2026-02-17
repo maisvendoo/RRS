@@ -135,6 +135,7 @@ public:
     QByteArray serialize();
 
     void deserialize(QByteArray &data);
+
     /// Поиск новой траектории, траекторной координаты и смены ориентации,
     /// возвращает false, если координата за пределы топологии (за тупик)
     static bool findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_t& orient);

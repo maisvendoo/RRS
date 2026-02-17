@@ -25,25 +25,23 @@ public:
     /// Устанавливаем индекс данной ПЕ в симуляции
     void setIndex(size_t idx);
 
-    size_t getIndex() const
-    {
-        return index;
-    }
+    /// Индекс данной ПЕ в симуляции
+    size_t getIndex() const;
 
     /// Устанавливаем длину данной ПЕ
     void setLength(double len);
 
     /// Устанавливаем текущую дуговую координату ПЕ
-    void setCoord(double x);
+    void setPathCoord(double x);
 
     /// Задание начальной дуговой координаты ПЕ
-    void setInitCoord(double x);
+    void setInitPathCoord(double x);
 
     /// Задание начальной траекториии и положения ПЕ на ней
-    void setInitCurrentTraj(Trajectory *traj, double traj_coord);
+    void setInitCurrentTraj(Trajectory *traj, double coord, dir_t direction);
 
-    /// Устанавливаем направление движения по траектории
-    void setDirection(int direction);
+    /// Ориентация на траектории
+    dir_t getOrientation() const;
 
     /// Задать оборудование ПЕ, взаимодействующее с путевой инфраструктурой
     void setVehicleRailwayConnectors(device_coord_list_t *devices);
@@ -57,12 +55,6 @@ public:
     /// Индекс ближайшей единицы подвижного состава, если есть;
     /// -1, если нет подвижного состава в пределах дистанции поиска
     int getNearestVehicle(double& distance, double search_distance, dir_t direction);
-
-    /// Вернуть указатель на траекторию под центром ПЕ
-    Trajectory *getCurrentTraj() const { return current_traj; }
-
-    /// Вернуть текущую координату вдоль траектории
-    double getTrajCoord() const { return traj_coord; }
 
     /// Шаг симуляции
     void step(double t, double dt);
@@ -82,23 +74,23 @@ private:
     /// Индекс данной ПЕ в симуляции
     size_t index = 0;
 
+    /// Индекс поезда, которому данный контроллер соответствует
+    size_t train_idx = 0;
+
     /// Половина длины данной ПЕ
     double length_half = 10.0;
 
     /// Текущее значение дуговой координаты ПЕ
-    double  x_cur = 0.0;
+    double x_cur = 0.0;
 
     /// Выход дуговой координаты ПЕ за тупик топологии
-    double  x_off = 0.0;
-
-    /// Направление движения
-    dir_t   dir = FWD;
+    double x_off = 0.0;
 
     /// Координата, в пределах текущей траектории
     double traj_coord = 0.0;
 
-    /// Индекс поезда, которому данный контроллер соответствует
-    size_t train_idx = 0;
+    /// Направление движения
+    dir_t orientation = FWD;
 
     /// Текущая траектория ПЕ
     Trajectory *current_traj = nullptr;

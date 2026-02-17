@@ -160,9 +160,8 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
             vc->setIndex(idx);
             vc->setLength(L);
             vc->setVehicleRailwayConnectors(curr_vehicle->getRailwayConnectors());
-            vc->setInitCurrentTraj(cur_traj, traj_coord);
-            vc->setDirection(dir);
-            vc->setInitCoord(curr_vehicle->getTrainCoord());
+            vc->setInitCurrentTraj(cur_traj, traj_coord, dir);
+            vc->setInitPathCoord(curr_vehicle->getTrainCoord());
 
             vehicle_control.push_back(vc);
             vc_table[curr_vehicle] = vc;
