@@ -9,7 +9,6 @@
 #include "Mask.h"
 #include "MouseHandler.h"
 #include "MoveObjectsCommand.h"
-#include "Outline.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
 #include "SingleSwitch.h"
@@ -22,7 +21,6 @@
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/PointerEvent.h>
 
-#include <algorithm>
 #include <cassert>
 
 ObjectSelector::ObjectSelector(
@@ -315,12 +313,7 @@ void ObjectSelector::confirm_keyboard_move()
     const vsg::vec3 translation = first_object->get_translation() -
         first_object->get_initial_translation();
 
-    for (const auto& object : selected_objects)
-    {
-        object->set_translation(object->get_initial_translation(), true);
-    }
-
-    commands.push(new MoveObjectsCommand(selected_objects, translation), true);
+    commands.push(new MoveObjectsCommand(selected_objects, translation), false);
 }
 
 void ObjectSelector::cancel_keyboard_move()
