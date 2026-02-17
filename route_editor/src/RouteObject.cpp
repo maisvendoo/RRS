@@ -78,6 +78,11 @@ vsg::vec3 RouteObject::get_initial_scale() const
     return initial_scale;
 }
 
+const vsg::dmat4& RouteObject::get_initial_matrix() const
+{
+    return initial_matrix;
+}
+
 const vsg::box& RouteObject::get_bounds() const
 {
     return bounds;
@@ -246,6 +251,11 @@ void RouteObject::save_rotation()
 void RouteObject::save_scale()
 {
     initial_scale = scale_value;
+}
+
+void RouteObject::save_matrix()
+{
+    initial_matrix = this->matrix;
 }
 
 void RouteObject::update_matrix()

@@ -5,6 +5,7 @@
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
+#include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
 
@@ -38,6 +39,7 @@ public:
     vsg::vec3 get_initial_translation() const;
     vsg::vec3 get_initial_rotation_deg() const;
     vsg::vec3 get_initial_scale() const;
+    const vsg::dmat4& get_initial_matrix() const;
 
     const vsg::box& get_bounds() const;
 
@@ -73,6 +75,7 @@ public:
     void save_translation();
     void save_rotation();
     void save_scale();
+    void save_matrix();
 
     void update_matrix();
     void update_bounds();
@@ -92,6 +95,7 @@ private:
     vsg::vec3 initial_translation;
     vsg::vec3 initial_rotation_deg;
     vsg::vec3 initial_scale;
+    vsg::dmat4 initial_matrix;
 
     vsg::box bounds;
 
