@@ -227,21 +227,21 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
     if (is_coupling_to_head)
     {
         veh = *(vehicles.begin());
-        cons = (veh->getOrientation() == -1) ?
+        cons = (veh->getDirection() == -1) ?
                                   veh->getBwdConnectors() :
                                   veh->getFwdConnectors();
 
         if (is_other_coupled_by_head)
         {
             other_veh = *(other_vehicles.begin());
-            other_cons = (other_veh->getOrientation() == -1) ?
+            other_cons = (other_veh->getDirection() == -1) ?
                              other_veh->getBwdConnectors() :
                              other_veh->getFwdConnectors();
 
-            (veh->getOrientation() == -1) ?
+            (veh->getDirection() == -1) ?
                 veh->setNextVehicle(other_veh) :
                 veh->setPrevVehicle(other_veh);
-            (other_veh->getOrientation() == -1) ?
+            (other_veh->getDirection() == -1) ?
                 other_veh->setNextVehicle(veh) :
                 other_veh->setPrevVehicle(veh);
 
@@ -257,8 +257,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                     new_y.push_back(other_y[j]);
                 }
 
-                vehicle->setDirection(1);
-                vehicle->setOrientation(-vehicle->getOrientation());
+                vehicle->setDirection(-vehicle->getDirection());
 
                 vehicle->setStateIndex(new_ode_order);
                 new_ode_order += 2 * s;
@@ -303,14 +302,14 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
         else
         {
             other_veh = *(other_vehicles.end() - 1);
-            other_cons = (other_veh->getOrientation() == -1) ?
+            other_cons = (other_veh->getDirection() == -1) ?
                              other_veh->getFwdConnectors() :
                              other_veh->getBwdConnectors();
 
-            (veh->getOrientation() == -1) ?
+            (veh->getDirection() == -1) ?
                 veh->setNextVehicle(other_veh) :
                 veh->setPrevVehicle(other_veh);
-            (other_veh->getOrientation() == -1) ?
+            (other_veh->getDirection() == -1) ?
                 other_veh->setPrevVehicle(veh) :
                 other_veh->setNextVehicle(veh);
 
@@ -388,21 +387,21 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
     else
     {
         veh = *(vehicles.end() - 1);
-        cons = (veh->getOrientation() == -1) ?
+        cons = (veh->getDirection() == -1) ?
                                   veh->getFwdConnectors() :
                                   veh->getBwdConnectors();
 
         if (is_other_coupled_by_head)
         {
             other_veh = *(other_vehicles.begin());
-            other_cons = (other_veh->getOrientation() == -1) ?
+            other_cons = (other_veh->getDirection() == -1) ?
                              other_veh->getBwdConnectors() :
                              other_veh->getFwdConnectors();
 
-            (veh->getOrientation() == -1) ?
+            (veh->getDirection() == -1) ?
                 veh->setPrevVehicle(other_veh) :
                 veh->setNextVehicle(other_veh);
-            (other_veh->getOrientation() == -1) ?
+            (other_veh->getDirection() == -1) ?
                 other_veh->setNextVehicle(veh) :
                 other_veh->setPrevVehicle(veh);
 
@@ -437,14 +436,14 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
         else
         {
             other_veh = *(other_vehicles.end() - 1);
-            other_cons = (other_veh->getOrientation() == -1) ?
+            other_cons = (other_veh->getDirection() == -1) ?
                              other_veh->getFwdConnectors() :
                              other_veh->getBwdConnectors();
 
-            (veh->getOrientation() == -1) ?
+            (veh->getDirection() == -1) ?
                 veh->setPrevVehicle(other_veh) :
                 veh->setNextVehicle(other_veh);
-            (other_veh->getOrientation() == -1) ?
+            (other_veh->getDirection() == -1) ?
                 other_veh->setPrevVehicle(veh) :
                 other_veh->setNextVehicle(veh);
 
@@ -458,7 +457,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                 new_vehicles.push_back(vehicle);
 
                 vehicle->setDirection(1);
-                vehicle->setOrientation(-vehicle->getOrientation());
+                vehicle->setDirection(-vehicle->getDirection());
                 vehicle->setTrainIndex(train_idx);
 
                 size_t model_idx = vehicle->getModelIndex();
@@ -612,10 +611,10 @@ Train* Train::uncouple(double uncoupling_distance)
         Train* new_train = new Train();
         new_train->setTopology(topology);
 
-        (vehicles[i - 1]->getOrientation() == -1) ?
+        (vehicles[i - 1]->getDirection() == -1) ?
             vehicles[i - 1]->setPrevVehicle(nullptr) :
             vehicles[i - 1]->setNextVehicle(nullptr);
-        (vehicles[i]->getOrientation() == -1) ?
+        (vehicles[i]->getDirection() == -1) ?
             vehicles[i]->setNextVehicle(nullptr) :
             vehicles[i]->setPrevVehicle(nullptr);
 
@@ -927,7 +926,7 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
             double force = calcStopForce(distance, velocity, first->getMass(), dt);
             if (force != 0.0)
             {
-                (first->getOrientation() == -1) ?
+                (first->getDirection() == -1) ?
                     first->addBackwardForce(-force) :
                     first->addForwardForce(-force);
                 /* ОТЛАДКА
@@ -947,7 +946,7 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
             double force = calcStopForce(distance, -velocity, last->getMass(), dt);
             if (force != 0.0)
             {
-                (last->getOrientation() == -1) ?
+                (last->getDirection() == -1) ?
                     last->addForwardForce(-force) :
                     last->addBackwardForce(-force);
                 /* ОТЛАДКА
@@ -1133,8 +1132,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
                 vehicle->setStateIndex(ode_order);
                 vehicle->setPayloadCoeff(payload_coeff);
                 vehicle->setBrakeShoesState(is_brake_shoes);
-                vehicle->setDirection(1);
-                vehicle->setOrientation(orient);
+                vehicle->setDirection(orient);
 
                 vehicle->init(QString(fs.getVehiclesDir().c_str()) + fs.separator() + relConfigPath + ".xml");
 
@@ -1147,11 +1145,11 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
                 if (vehicles.size() !=0)
                 {
                     Vehicle* prev =  *(vehicles.end() - 1);
-                    if (prev->getOrientation() > 0)
+                    if (prev->getDirection() > 0)
                         prev->setNextVehicle(vehicle);
                     else
                         prev->setPrevVehicle(vehicle);
-                    if (vehicle->getOrientation() > 0)
+                    if (vehicle->getDirection() > 0)
                         vehicle->setPrevVehicle(prev);
                     else
                         vehicle->setNextVehicle(prev);
@@ -1203,14 +1201,14 @@ bool Train::loadTrainJoints()
 
         // Get connectors list from ahead vehicle
         device_list_t* cons_fwd;
-        if (veh_fwd->getOrientation() > 0)
+        if (veh_fwd->getDirection() > 0)
             cons_fwd = veh_fwd->getBwdConnectors();
         else
             cons_fwd = veh_fwd->getFwdConnectors();
 
         // Get connectors list from behind vehicle
         device_list_t* cons_bwd;
-        if (veh_bwd->getOrientation() > 0)
+        if (veh_bwd->getDirection() > 0)
             cons_bwd = veh_bwd->getFwdConnectors();
         else
             cons_bwd = veh_bwd->getBwdConnectors();
@@ -1392,8 +1390,6 @@ void Train::setInitConditions(const init_data_t& init_data)
     double x0 = 0.0 - this->getFirstVehicle()->getLength() / 2.0;
     y[0] = x0;
 
-    vehicles[0]->setTrainCoord(x0);
-
     Journal::instance()->info(QString("Vehicle[%2] coordinate: %1").arg(y[0]).arg(0, 3));
 
     for (size_t i = 1; i < vehicles.size(); i++)
@@ -1405,8 +1401,6 @@ void Train::setInitConditions(const init_data_t& init_data)
         size_t idxi = vehicles[i]->getStateIndex();
 
         y[idxi] = y[idxi_1] - (Li + Li_1) / 2;
-
-        vehicles[i]->setTrainCoord(y[idxi]);
 
         Journal::instance()->info(QString("Vehicle[%2] coordinate: %1").arg(y[idxi]).arg(i, 3));
     }

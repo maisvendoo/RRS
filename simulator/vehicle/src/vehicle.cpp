@@ -139,17 +139,9 @@ void Vehicle::setFrictionCoeff(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::setDirection(int dir)
+void Vehicle::setDirection(std::int8_t dir)
 {
-    this->dir = dir;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Vehicle::setOrientation(int orient)
-{
-    this->orient = orient;
+    this->dir = (dir < 0) ? -1 : 1;
 }
 
 //------------------------------------------------------------------------------
@@ -320,9 +312,9 @@ profile_point_t* Vehicle::getProfilePoint()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int Vehicle::getOrientation() const
+std::int8_t Vehicle::getDirection() const
 {
-    return orient;
+    return dir;
 }
 
 //------------------------------------------------------------------------------
@@ -482,11 +474,8 @@ void Vehicle::getAcceleration(state_vector_t& Y, state_vector_t& dYdt, const dou
 {
     (void) t;
 
-    // Direction & orientation
-    int d = dir * orient;
-
     // Body velocity from state vector
-    double v = d * Y[state_idx + s];
+    double v = dir * Y[state_idx + s];
     double abs_v = abs(v);
 
     // Forces from wheels to vehicle body
@@ -621,7 +610,7 @@ void Vehicle::getAcceleration(state_vector_t& Y, state_vector_t& dYdt, const dou
     }
 
     // Vehicle body's acceleration
-    dYdt[state_idx + s + 0] = d * (force_a - force_r) / full_mass;
+    dYdt[state_idx + s + 0] = dir * (force_a - force_r) / full_mass;
 }
 
 //------------------------------------------------------------------------------
@@ -647,7 +636,7 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
 void Vehicle::integrationPreStep(state_vector_t& Y, const double& t)
 {
     train_coord = Y[state_idx];
-    velocity = dir * orient * Y[state_idx + s];
+    velocity = dir * Y[state_idx + s];
 
     // Calculate gravity force from profile inclination
     double weight = full_mass * Physics::g;
