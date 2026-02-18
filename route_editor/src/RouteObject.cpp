@@ -40,6 +40,21 @@ static vsg::vec3 to_euler_deg(const vsg::quat& quat)
     };
 }
 
+static vsg::mat4 to_rotate_matrix(vsg::vec3 rotation_deg)
+{
+    const vsg::vec3 rotation_rad = {
+        vsg::radians(rotation_deg.x),
+        vsg::radians(rotation_deg.y),
+        vsg::radians(rotation_deg.z)
+    };
+
+    const vsg::mat4 rotate_x = vsg::rotate(rotation_rad.x, AXIS_X_POSITIVE);
+    const vsg::mat4 rotate_y = vsg::rotate(rotation_rad.y, AXIS_Y_POSITIVE);
+    const vsg::mat4 rotate_z = vsg::rotate(rotation_rad.z, AXIS_Z_POSITIVE);
+
+    return rotate_z * rotate_y * rotate_x;
+}
+
 RouteObject::RouteObject(vsg::ref_ptr<vsg::PagedLOD> paged_lod,
     const std::string& label, vsg::vec3 translation, vsg::vec3 rotation_deg)
 {
@@ -190,17 +205,7 @@ void RouteObject::scale(vsg::vec3 scale, bool update_matrix)
 void RouteObject::rotate_relative_to_point(vsg::vec3 point,
     vsg::vec3 rotation_deg)
 {
-    const vsg::vec3 rotation_rad = {
-        vsg::radians(rotation_deg.x),
-        vsg::radians(rotation_deg.y),
-        vsg::radians(rotation_deg.z)
-    };
-
-    const vsg::mat4 rotate_x = vsg::rotate(rotation_rad.x, AXIS_X_POSITIVE);
-    const vsg::mat4 rotate_y = vsg::rotate(rotation_rad.y, AXIS_Y_POSITIVE);
-    const vsg::mat4 rotate_z = vsg::rotate(rotation_rad.z, AXIS_Z_POSITIVE);
-
-    this->matrix = vsg::translate(point) * rotate_z * rotate_y * rotate_x *
+    this->matrix = vsg::translate(point) * to_rotate_matrix(rotation_deg) *
         vsg::translate(-point) * static_cast<vsg::mat4>(initial_matrix);
 
     vsg::quat quat;
@@ -290,18 +295,8 @@ void RouteObject::save_matrix()
 
 void RouteObject::update_matrix()
 {
-    const vsg::vec3 rotation_rad = {
-        vsg::radians(rotation_deg.x),
-        vsg::radians(rotation_deg.y),
-        vsg::radians(rotation_deg.z)
-    };
-
-    const vsg::mat4 rotate_x = vsg::rotate(rotation_rad.x, AXIS_X_POSITIVE);
-    const vsg::mat4 rotate_y = vsg::rotate(rotation_rad.y, AXIS_Y_POSITIVE);
-    const vsg::mat4 rotate_z = vsg::rotate(rotation_rad.z, AXIS_Z_POSITIVE);
-
-    this->matrix = vsg::translate(translation) * rotate_z *
-        rotate_y * rotate_x * vsg::scale(scale_value);
+    this->matrix = vsg::translate(translation) *
+        to_rotate_matrix(rotation_deg) * vsg::scale(scale_value);
 
     update_bounds();
 }
