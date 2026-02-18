@@ -47,5 +47,12 @@ end
 
 setOnTrajFreeTrigger(sw12_H4, set_appr_train3)
 
+-- Действия, выполняемые после освобождения поездом 3 второго участка удаления
+function set_dep_train1()
 
-setOnTrajFreeTrigger(stB_CHU1, actionBuildTrainRoute(stB_p4, stB_CHU1, train1.dir))
+	-- Строим маршрут отправления поезду 1 через 1 минуту 20 секунд после освобождения ЧУ2
+	setPostEventTimeTrigger("+00:01:20", actionBuildTrainRoute(stB_p4, stB_CHU1, train1.dir))
+
+end
+
+setOnTrajFreeTrigger(stB_CHU2, set_dep_train1)
