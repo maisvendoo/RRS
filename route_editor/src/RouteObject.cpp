@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <string>
 
 vsg::observer_ptr<vsg::Viewer> RouteObject::s_observer_viewer;
@@ -28,9 +29,15 @@ static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Z_POSITIVE = {0.0f, 0.0f, 1.0f};
 
-static void quat_to_euler(const vsg::quat& quat, vsg::vec3& rotation_deg)
+static vsg::vec3 quat_to_euler(const vsg::quat& quat)
 {
-
+    return {
+        vsg::degrees(std::atan2(2.0f * (quat.w * quat.x + quat.y * quat.z),
+            1.0f - 2.0f * (quat.x * quat.x + quat.y * quat.y))),
+        vsg::degrees(std::asin(2.0f * (quat.w * quat.y - quat.z * quat.x))),
+        vsg::degrees(std::atan2(2.0f * (quat.w * quat.z + quat.x * quat.y),
+            1.0f - 2.0f * (quat.y * quat.y + quat.z * quat.z)))
+    };
 }
 
 RouteObject::RouteObject(vsg::ref_ptr<vsg::PagedLOD> paged_lod,
