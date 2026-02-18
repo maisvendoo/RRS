@@ -175,14 +175,20 @@ void RouteObject::scale(vsg::vec3 scale, bool update_matrix)
 }
 
 void RouteObject::rotate_relative_to_point(vsg::vec3 point,
-    vsg::vec3 rotation_deg, bool update_matrix)
+    vsg::vec3 rotation_deg)
 {
-    // TODO
+    const vsg::vec3 rotation_rad = {
+        vsg::radians(rotation_deg.x),
+        vsg::radians(rotation_deg.y),
+        vsg::radians(rotation_deg.z)
+    };
 
-    if (update_matrix)
-    {
-        this->update_matrix();
-    }
+    const vsg::mat4 rotate_x = vsg::rotate(rotation_rad.x, AXIS_X_POSITIVE);
+    const vsg::mat4 rotate_y = vsg::rotate(rotation_rad.y, AXIS_Y_POSITIVE);
+    const vsg::mat4 rotate_z = vsg::rotate(rotation_rad.z, AXIS_Z_POSITIVE);
+
+    this->matrix = vsg::translate(point) * rotate_z * rotate_y * rotate_x *
+        vsg::translate(-point) * static_cast<vsg::mat4>(initial_matrix);
 }
 
 void RouteObject::scale_relative_to_point(vsg::vec3 point, vsg::vec3 scale,

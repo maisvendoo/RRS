@@ -60,8 +60,7 @@ public:
     void rotate(vsg::vec3 rotation_deg, bool update_matrix);
     void scale(vsg::vec3 scale, bool update_matrix);
 
-    void rotate_relative_to_point(vsg::vec3 point, vsg::vec3 rotation_deg,
-        bool update_matrix);
+    void rotate_relative_to_point(vsg::vec3 point, vsg::vec3 rotation_deg);
 
     void scale_relative_to_point(vsg::vec3 point, vsg::vec3 scale,
         bool update_matrix);
