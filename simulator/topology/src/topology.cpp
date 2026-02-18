@@ -122,7 +122,7 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
 
     double traj_coord = std::clamp(tp.traj_coord, 0.0, cur_traj->getLength());
 
-    dir_t dir = (tp.dir < 0) ? (dir = BWD) : (dir = FWD);
+    dir_t dir = (tp.dir < 0) ? (BWD) : (FWD);
     for (size_t i = 0; i < vehicles->size(); ++i)
     {
         VehicleController *vc = new VehicleController;
@@ -132,19 +132,15 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
 
         // Смещаем координату центра данной ПЕ
         // на половину её длины и половину длины предыдущей ПЕ
-        // double L = (*vehicles)[i]->getLength();
         double L = curr_vehicle->getLength();
-        // traj_coord = traj_coord - tp.dir * L / 2.0;
         traj_coord -= static_cast<double>(dir) * L / 2.0;
         if (i != 0)
         {
-            // traj_coord = traj_coord - tp.dir * (*vehicles)[i-1]->getLength() / 2.0;
             traj_coord -= static_cast<double>(dir) * prev_vehicle->getLength() / 2.0;
         }
 
         if (Trajectory::findTrajectoryAtCoord(cur_traj, traj_coord, dir))
         {
-
             size_t idx = vehicle_control.size();
             if (curr_vehicle->getModelIndex() != idx)
             {
@@ -157,11 +153,12 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
 
                 curr_vehicle->setModelIndex(idx);
             }
+            dir_t veh_dir = static_cast<dir_t>(dir * curr_vehicle->getDirection());
             vc->setIndex(idx);
             vc->setLength(L);
             vc->setVehicleRailwayConnectors(curr_vehicle->getRailwayConnectors());
-            vc->setInitCurrentTraj(cur_traj, traj_coord, dir);
-            vc->setInitPathCoord(curr_vehicle->getTrainCoord());
+            vc->setInitCurrentTraj(cur_traj, traj_coord, veh_dir);
+            vc->setInitPathCoord(curr_vehicle->getDirection() * curr_vehicle->getTrainCoord());
 
             vehicle_control.push_back(vc);
             vc_table[curr_vehicle] = vc;
@@ -174,67 +171,7 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
         {
             return false;
         }
-/*
-        // Если траекторная координата превысила длину траектории
-        // (заехали за стык или стрелку спереди), пока она её превышает...
-        while (traj_coord > cur_traj->getLength())
-        {
-            // Получаем указатель на коннектор спереди
-            Switch* sw = cur_traj->getFwdConnector();
-            if (conn == nullptr)
-            {
-                Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't forward connector");
-                return false;
-            }
-
-            // Получаем указатель на следующую траекторию спереди
-            Trajectory *next_traj = conn->getFwdTraj();
-            if (next_traj == nullptr)
-            {
-                Journal::instance()->error("Connector " + conn->getName() + " has't forward trajectory");
-                return false;
-            }
-
-            // Вычитаем из траекторной координаты длину предыдущей траектории,
-            // чтобы получить координату на новой траектории впереди
-            // traj_coord = traj_coord - cur_traj->getLength();
-            traj_coord -= cur_traj->getLength();
-
-            // Обновляем текущую траекторию на ту,
-            // с которой нас соединяет коннектор спереди
-            cur_traj = next_traj;
-        }
-
-        // Если траекторная координата меньше нуля
-        // (заехали за стык или стрелку сзади), пока она меньше нуля...
-        while (traj_coord < 0.0)
-        {
-            // Получаем указатель на коннектор сзади
-            Connector *conn = cur_traj->getBwdConnector();
-            if (conn == nullptr)
-            {
-                Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't backward connector");
-                return false;
-            }
-
-            // Получаем указатель на следующую траекторию сзади
-            Trajectory *next_traj = conn->getBwdTraj();
-            if (next_traj == nullptr)
-            {
-                Journal::instance()->error("Connector " + conn->getName() + " has't backward trajectory");
-                return false;
-            }
-
-            // Добавляем к траекторной координате длину новой траектории,
-            // чтобы получить координату на новой траектории сзади
-            // traj_coord = traj_coord + next_traj->getLength();
-            traj_coord += next_traj->getLength();
-
-            // Обновляем текущую траекторию на ту,
-            // с которой нас соединяет коннектор сзади
-            cur_traj = next_traj;
-        }*/
-    }
+   }
 
     return true;
 }
