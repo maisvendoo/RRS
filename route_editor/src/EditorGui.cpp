@@ -588,5 +588,41 @@ void EditorGui::show_selected_objects_properties() const
         }
     }
 
+    if (ImGui::Button("Scale X 2"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->save_matrix();
+            object->scale_relative_to_point(center, vsg::vec3{2.0f, 1.0f, 1.0f});
+        }
+    }
+
+    if (ImGui::Button("Scale Y 2"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->save_matrix();
+            object->scale_relative_to_point(center, vsg::vec3{1.0f, 2.0f, 1.0f});
+        }
+    }
+
+    if (ImGui::Button("Scale Z 2"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->save_matrix();
+            object->scale_relative_to_point(center, vsg::vec3{1.0f, 1.0f, 2.0f});
+        }
+    }
+
+    if (ImGui::Button("Scale X 0.5"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->save_matrix();
+            object->scale_relative_to_point(center, vsg::vec3{0.5f, 1.0f, 1.0f});
+        }
+    }
+
     ImGui::End();
 }

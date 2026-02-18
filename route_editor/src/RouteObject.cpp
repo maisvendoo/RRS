@@ -209,17 +209,21 @@ void RouteObject::rotate_relative_to_point(vsg::vec3 point,
         translation, quat, scale_value);
 
     this->rotation_deg = to_euler_deg(quat);
+
+    update_bounds();
 }
 
-void RouteObject::scale_relative_to_point(vsg::vec3 point, vsg::vec3 scale,
-    bool update_matrix)
+void RouteObject::scale_relative_to_point(vsg::vec3 point, vsg::vec3 scale)
 {
-    // TODO
+    this->matrix = vsg::translate(point) * vsg::scale(scale) *
+        vsg::translate(-point) * static_cast<vsg::mat4>(initial_matrix);
 
-    if (update_matrix)
-    {
-        this->update_matrix();
-    }
+    vsg::quat quat;
+
+    vsg::decompose(static_cast<vsg::mat4>(this->matrix),
+        translation, quat, scale_value);
+
+    update_bounds();
 }
 
 void RouteObject::hide()
