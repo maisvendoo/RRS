@@ -88,13 +88,13 @@ void VL60k::stepBrakesControl(const double& t, const double& dt)
     // Рукава магистрали тормозных цилиндров
     hose_bc_fwd->setPressure(anglecock_bc_fwd->getPressureToHose());
     hose_bc_fwd->setFlowCoeff(anglecock_bc_fwd->getFlowCoeff());
-    hose_bc_fwd->setCoord(train_coord + dir * orient * (length / 2.0 - anglecock_bc_fwd->getShiftCoord()));
+    hose_bc_fwd->setCoord(train_coord + dir * (length / 2.0 - anglecock_bc_fwd->getShiftCoord()));
     hose_bc_fwd->setShiftSide(anglecock_bc_fwd->getShiftSide());
     hose_bc_fwd->step(t, dt);
 
     hose_bc_bwd->setPressure(anglecock_bc_bwd->getPressureToHose());
     hose_bc_bwd->setFlowCoeff(anglecock_bc_bwd->getFlowCoeff());
-    hose_bc_bwd->setCoord(train_coord - dir * orient * (length / 2.0 - anglecock_bc_bwd->getShiftCoord()));
+    hose_bc_bwd->setCoord(train_coord - dir * (length / 2.0 - anglecock_bc_bwd->getShiftCoord()));
     hose_bc_bwd->setShiftSide(anglecock_bc_bwd->getShiftSide());
     hose_bc_bwd->step(t, dt);
 }

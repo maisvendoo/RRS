@@ -318,8 +318,8 @@ void Model::findNearestVehicles()
         // От каждого поезда ищем вперёд и назад по топологии
         std::tuple<int, int, bool> vehicles_idx_and_directions[] =
         {
-            {train->getFirstVehicle()->getModelIndex(), train->getFirstVehicle()->getOrientation(), true},
-            {train->getLastVehicle()->getModelIndex(), -(train->getLastVehicle()->getOrientation()), false}
+            {train->getFirstVehicle()->getModelIndex(), train->getFirstVehicle()->getDirection(), true},
+            {train->getLastVehicle()->getModelIndex(), -(train->getLastVehicle()->getDirection()), false}
         };
         for (auto [idx, veh_dir, is_train_head] : vehicles_idx_and_directions)
         {
@@ -946,7 +946,7 @@ void Model::prepareFeedBack(bool need_trains_feedback)
         update_pos_data.vehicles[i].up_z = pp->up.z;
 
         update_vehicles.vehicles[i].train_id = vehicle->getTrainIndex();
-        int orient = vehicle->getOrientation();
+        int orient = vehicle->getDirection();
         update_vehicles.vehicles[i].orientation = orient;
         if (orient == -1)
         {
