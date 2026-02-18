@@ -419,7 +419,7 @@ void Model::findNearestVehicles()
         train_threads.erase(train_threads.begin() + train_idx);
 
         // Удаляем поезда из контекста сценария
-        scnmgr->train_datas.erase(scnmgr->train_datas.begin() + train_idx);
+        scnmgr->deleteTrainByIndex(train_idx);
     }
 
     // Назначаем новые порядковые индексы поездам после уменьшения массива

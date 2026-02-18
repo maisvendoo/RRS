@@ -57,6 +57,8 @@ public:
 
     void setTrainIndex(size_t t_idx);
 
+    void deleteTrainByIndex(size_t t_idx);
+
     std::string getTrainName(size_t t_idx);
 
     bool isTrainAutostarted(size_t t_idx);
