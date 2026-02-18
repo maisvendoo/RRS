@@ -10,6 +10,7 @@
 #include <vsg/maths/box.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/mat4.h>
+#include <vsg/maths/quat.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
@@ -26,6 +27,11 @@ RouteObjects RouteObject::s_hidden_objects;
 static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Z_POSITIVE = {0.0f, 0.0f, 1.0f};
+
+static void quat_to_euler(const vsg::quat& quat, vsg::vec3& rotation_deg)
+{
+
+}
 
 RouteObject::RouteObject(vsg::ref_ptr<vsg::PagedLOD> paged_lod,
     const std::string& label, vsg::vec3 translation, vsg::vec3 rotation_deg)
