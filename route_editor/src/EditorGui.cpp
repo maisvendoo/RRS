@@ -546,5 +546,39 @@ void EditorGui::show_selected_objects_properties() const
         ++i;
     }
 
+    vsg::vec3 center = {0.0f, 0.0f, 0.0f};
+    for (const auto& object : selected_objects)
+    {
+        center += object->get_translation();
+    }
+    center /= static_cast<float>(selected_objects.size());
+
+    if (ImGui::Button("Rotate X 30"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->save_matrix();
+            object->rotate_relative_to_point(center, vsg::vec3{30.0f, 0.0f, 0.0f});
+        }
+    }
+
+    if (ImGui::Button("Rotate Y 30"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->save_matrix();
+            object->rotate_relative_to_point(center, vsg::vec3{0.0f, 30.0f, 0.0f});
+        }
+    }
+
+    if (ImGui::Button("Rotate Z 30"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->save_matrix();
+            object->rotate_relative_to_point(center, vsg::vec3{0.0f, 0.0f, 30.0f});
+        }
+    }
+
     ImGui::End();
 }

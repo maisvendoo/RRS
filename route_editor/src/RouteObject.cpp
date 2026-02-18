@@ -29,9 +29,9 @@ static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Z_POSITIVE = {0.0f, 0.0f, 1.0f};
 
-static vsg::vec3 quat_to_euler(const vsg::quat& quat)
+static vsg::vec3 to_euler_deg(const vsg::quat& quat)
 {
-    return {
+    return vsg::vec3{
         vsg::degrees(std::atan2(2.0f * (quat.w * quat.x + quat.y * quat.z),
             1.0f - 2.0f * (quat.x * quat.x + quat.y * quat.y))),
         vsg::degrees(std::asin(2.0f * (quat.w * quat.y - quat.z * quat.x))),
@@ -202,6 +202,13 @@ void RouteObject::rotate_relative_to_point(vsg::vec3 point,
 
     this->matrix = vsg::translate(point) * rotate_z * rotate_y * rotate_x *
         vsg::translate(-point) * static_cast<vsg::mat4>(initial_matrix);
+
+    vsg::quat quat;
+
+    vsg::decompose(static_cast<vsg::mat4>(this->matrix),
+        translation, quat, scale_value);
+
+    this->rotation_deg = to_euler_deg(quat);
 }
 
 void RouteObject::scale_relative_to_point(vsg::vec3 point, vsg::vec3 scale,
