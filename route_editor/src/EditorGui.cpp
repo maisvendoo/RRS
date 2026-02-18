@@ -538,9 +538,17 @@ void EditorGui::show_selected_objects_properties() const
         label = "rotation##" + std::to_string(i);
 
         vsg::vec3 rotation_deg = object->get_rotation_deg();
-        if (ImGui::DragFloat3(label.c_str(), rotation_deg.data()))
+        if (ImGui::DragFloat3(label.c_str(), rotation_deg.data(), 0.2f))
         {
             object->set_rotation_deg(rotation_deg, true);
+        }
+
+        label = "scale##" + std::to_string(i);
+
+        vsg::vec3 scale = object->get_scale();
+        if (ImGui::DragFloat3(label.c_str(), scale.data(), 0.01f))
+        {
+            object->set_scale(scale, true);
         }
 
         ++i;
