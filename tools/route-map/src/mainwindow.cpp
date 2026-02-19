@@ -896,7 +896,7 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
     QDataStream stream(&buff);
 
     QString conn_name = "";
-    int signal_dir = 0;
+    int8_t signal_dir = 0;
 
     stream >> conn_name;
     stream >> signal_dir;
