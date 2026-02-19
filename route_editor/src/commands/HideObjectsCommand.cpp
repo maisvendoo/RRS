@@ -2,28 +2,33 @@
 
 #include "RouteObject.h"
 
-#include <vsg/core/ref_ptr.h>
-
+#include <cstdio>
 #include <string>
-#include <vector>
 
-HideObjectsCommand::HideObjectsCommand(
-    const std::vector<vsg::ref_ptr<RouteObject>>& objects)
+HideObjectsCommand::HideObjectsCommand(const RouteObjects& objects)
     : objects(objects)
 {
 }
 
 void HideObjectsCommand::execute() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->hide();
+    }
 }
 
 void HideObjectsCommand::undo() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->show();
+    }
 }
 
 std::string HideObjectsCommand::to_string() const
 {
-    // TODO
+    char buffer[64];
+    std::snprintf(buffer, 64, "Hide objects: %zu objects\n", objects.size());
+    return buffer;
 }
