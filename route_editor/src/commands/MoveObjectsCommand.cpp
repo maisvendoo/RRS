@@ -7,10 +7,8 @@
 #include <cstdio>
 #include <string>
 
-MoveObjectsCommand::MoveObjectsCommand(
-    const RouteObjects& objects,
-    vsg::vec3 translation
-)
+MoveObjectsCommand::MoveObjectsCommand(const RouteObjects& objects,
+    vsg::vec3 translation)
     : objects(objects)
     , translation(translation)
 {

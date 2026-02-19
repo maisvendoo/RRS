@@ -13,11 +13,7 @@ class RouteObject;
 class MoveObjectsCommand : public Command
 {
 public:
-    MoveObjectsCommand(
-        const RouteObjects& objects,
-        vsg::vec3 translation
-    );
-
+    MoveObjectsCommand(const RouteObjects& objects, vsg::vec3 translation);
     virtual ~MoveObjectsCommand() override = default;
     virtual void execute() const override;
     virtual void undo() const override;
