@@ -1,9 +1,7 @@
 EditorGui.h
 ObjectSelector.h
-Route.h
 RouteEditor.h
 
 EditorGui.cpp
 ObjectSelector.cpp
-Route.cpp
 RouteEditor.cpp

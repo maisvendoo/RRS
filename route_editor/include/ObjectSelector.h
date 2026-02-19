@@ -51,7 +51,7 @@ public:
     void apply(vsg::FrameEvent& frame) override;
 
 private:
-    void select_object(vsg::ref_ptr<RouteObject> object);
+    void select_object(RouteObject* object);
 
     void deselect_all_objects();
 

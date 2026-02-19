@@ -124,8 +124,8 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     const auto& node_path = intersections.front()->nodePath;
     for (const vsg::Node* const node : node_path)
     {
-        if (const auto object = vsg::ref_ptr(const_cast<RouteObject*>(
-            node->cast<RouteObject>())))
+        if (RouteObject* object = const_cast<RouteObject*>(
+            node->cast<RouteObject>()))
         {
             select_object(object);
             break;
@@ -240,7 +240,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     gizmo->update_scale();
 }
 
-void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
+void ObjectSelector::select_object(RouteObject* object)
 {
     auto& selected_objects = RouteObject::get_selected_objects();
 
