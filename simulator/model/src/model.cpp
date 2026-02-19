@@ -68,6 +68,26 @@ bool Model::init(const simulator_command_line_t &command_line)
 
         init_data.start_datetime = scnmgr->getStartDateTime();
     }
+    else
+    {
+
+        // Если мы не играем сценарий, заполняем для него данные о поездах
+        // расставленных игроком в лаунчере
+        int train_num = 0;
+
+        for (auto init_data : init_datas)
+        {
+            scenario_train_data_t sc_td;
+            sc_td.name = QString("%1").arg(train_num++).toStdString();
+            sc_td.train_config = init_data.train_config.toStdString();
+            sc_td.traj_name = init_data.trajectory_name.toStdString();
+            sc_td.traj_coord = init_data.init_coord;
+            sc_td.direction = init_data.direction;
+            sc_td.is_auto = false;
+
+            scnmgr->train_datas.push_back(sc_td);
+        }
+    }
 
     // Create all trains
     for (size_t i = 0; i < init_datas.size(); ++i)
@@ -419,7 +439,7 @@ void Model::findNearestVehicles()
         train_threads.erase(train_threads.begin() + train_idx);
 
         // Удаляем поезда из контекста сценария
-        scnmgr->train_datas.erase(scnmgr->train_datas.begin() + train_idx);
+        scnmgr->deleteTrainByIndex(train_idx);
     }
 
     // Назначаем новые порядковые индексы поездам после уменьшения массива

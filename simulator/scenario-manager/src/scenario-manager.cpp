@@ -391,6 +391,22 @@ void ScenarioManager::setTrainIndex(size_t t_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::deleteTrainByIndex(size_t t_idx)
+{
+    if (train_datas.empty())
+    {
+        return;
+    }
+
+    if (t_idx < train_datas.size())
+    {
+        train_datas.erase(train_datas.begin() + t_idx);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 std::string ScenarioManager::getTrainName(size_t t_idx)
 {
     if (t_idx >= train_datas.size())
