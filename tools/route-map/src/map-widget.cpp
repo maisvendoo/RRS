@@ -4,7 +4,6 @@
 #include    <QTreeWidget>
 #include    <QMouseEvent>
 #include    <QWheelEvent>
-#include    <connector.h>
 #include    <switch.h>
 
 //------------------------------------------------------------------------------

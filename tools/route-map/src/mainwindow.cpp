@@ -3,7 +3,6 @@
 
 #include    <CfgReader.h>
 #include    <QPainter>
-#include    <connector.h>
 #include    <QMenu>
 #include    <switch.h>
 #include    <switch-state.h>

@@ -1018,12 +1018,12 @@
 	<Switch>
 		<Name>B</Name>
 		<bwdPlusTraj>AB</bwdPlusTraj>
-		<!-- <bwdMinusTraj>BC</bwdMinusTraj> -->
+		<bwdMinusTrajReversed>BC</bwdMinusTrajReversed>
 		<fwdPlusTraj>BE</fwdPlusTraj>
 		<state_bwd>1</state_bwd>
 	</Switch>
 	<Switch>
-		<Name>B</Name>
+		<Name>C</Name>
 		<bwdPlusTraj>AC</bwdPlusTraj>
 		<bwdMinusTraj>BC</bwdMinusTraj>
 		<fwdPlusTraj>CD</fwdPlusTraj>

@@ -7,7 +7,6 @@
 #include    <CfgReader.h>
 #include    <switch.h>
 #include    <switch-state.h>
-#include    <isolated-joint.h>
 #include    <line-signal.h>
 
 #include    <Journal.h>
