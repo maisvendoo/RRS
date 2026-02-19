@@ -2,28 +2,33 @@
 
 #include "RouteObject.h"
 
-#include <vsg/core/ref_ptr.h>
-
+#include <cstdio>
 #include <string>
-#include <vector>
 
-DeselectObjectsCommand::DeselectObjectsCommand(
-    const std::vector<vsg::ref_ptr<RouteObject>>& objects)
+DeselectObjectsCommand::DeselectObjectsCommand(const RouteObjects& objects)
     : objects(objects)
 {
 }
 
 void DeselectObjectsCommand::execute() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->deselect();
+    }
 }
 
 void DeselectObjectsCommand::undo() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->select();
+    }
 }
 
 std::string DeselectObjectsCommand::to_string() const
 {
-    // TODO
+    char buffer[64];
+    std::snprintf(buffer, 64, "Deselect objects: %zu objects\n", objects.size());
+    return buffer;
 }
