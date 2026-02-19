@@ -27,6 +27,7 @@ void ScaleObjectsCommand::undo() const
 {
     for (const auto& object : objects)
     {
+        // TODO: Wrong calculation. Fix
         object->scale_relative_to_pivot(pivot, -scale, object->matrix);
     }
 }

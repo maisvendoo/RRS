@@ -142,14 +142,13 @@ void RouteObject::set_observer_viewer(
     s_observer_viewer = observer_viewer;
 }
 
-void RouteObject::set_translation(vsg::vec3 translation, bool update_matrix)
+void RouteObject::set_translation(vsg::vec3 translation)
 {
     this->translation = translation;
 
-    if (update_matrix)
-    {
-        this->update_matrix();
-    }
+    this->matrix[3][0] = this->translation.x;
+    this->matrix[3][1] = this->translation.y;
+    this->matrix[3][2] = this->translation.z;
 }
 
 void RouteObject::set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix)
@@ -172,14 +171,13 @@ void RouteObject::set_scale(vsg::vec3 scale, bool update_matrix)
     }
 }
 
-void RouteObject::move(vsg::vec3 translation, bool update_matrix)
+void RouteObject::move(vsg::vec3 translation)
 {
     this->translation += translation;
 
-    if (update_matrix)
-    {
-        this->update_matrix();
-    }
+    this->matrix[3][0] = this->translation.x;
+    this->matrix[3][1] = this->translation.y;
+    this->matrix[3][2] = this->translation.z;
 }
 
 void RouteObject::rotate(vsg::vec3 rotation_deg, bool update_matrix)

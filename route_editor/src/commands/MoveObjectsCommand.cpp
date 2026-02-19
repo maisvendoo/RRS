@@ -18,7 +18,7 @@ void MoveObjectsCommand::execute() const
 {
     for (const auto& object : objects)
     {
-        object->move(translation, true);
+        object->move(translation);
     }
 }
 
@@ -26,7 +26,7 @@ void MoveObjectsCommand::undo() const
 {
     for (const auto& object : objects)
     {
-        object->move(-translation, true);
+        object->move(-translation);
     }
 }
 

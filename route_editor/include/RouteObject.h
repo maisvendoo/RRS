@@ -52,11 +52,11 @@ public:
     static void set_observer_viewer(
         vsg::observer_ptr<vsg::Viewer> observer_viewer);
 
-    void set_translation(vsg::vec3 translation, bool update_matrix);
+    void set_translation(vsg::vec3 translation);
     void set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix);
     void set_scale(vsg::vec3 scale, bool update_matrix);
 
-    void move(vsg::vec3 translation, bool update_matrix);
+    void move(vsg::vec3 translation);
     void rotate(vsg::vec3 rotation_deg, bool update_matrix);
     void scale(vsg::vec3 scale, bool update_matrix);
 

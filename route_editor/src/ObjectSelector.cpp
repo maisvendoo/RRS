@@ -176,7 +176,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         for (const auto& object : selected_objects)
         {
             object->set_translation(object->get_initial_translation() +
-                world_intersection - begin_intersection_pos, true);
+                world_intersection - begin_intersection_pos);
         }
 
         intersector->intersections.clear();
@@ -316,7 +316,7 @@ void ObjectSelector::cancel_keyboard_move()
 
     for (const auto& object : selected_objects)
     {
-        object->set_translation(object->get_initial_translation(), true);
+        object->set_translation(object->get_initial_translation());
     }
 
     front_plane_switch->node = nullptr;

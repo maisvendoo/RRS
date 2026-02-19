@@ -532,7 +532,7 @@ void EditorGui::show_selected_objects_properties() const
         vsg::vec3 translation = object->get_translation();
         if (ImGui::DragFloat3(label.c_str(), translation.data()))
         {
-            object->set_translation(translation, true);
+            object->set_translation(translation);
         }
 
         label = "rotation##" + std::to_string(i);

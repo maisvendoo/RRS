@@ -337,7 +337,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
         for (const auto& object : selected_objects)
         {
-            object->move(translation, true);
+            object->move(translation);
         }
 
         return;
