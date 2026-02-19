@@ -2,13 +2,10 @@
 
 #include "RouteObject.h"
 
-#include <vsg/core/ref_ptr.h>
-
+#include <cstdio>
 #include <string>
-#include <vector>
 
-SelectObjectsCommand::SelectObjectsCommand(
-    const std::vector<vsg::ref_ptr<RouteObject>>& objects)
+SelectObjectsCommand::SelectObjectsCommand(const RouteObjects& objects)
     : objects(objects)
 {
 }
@@ -23,10 +20,15 @@ void SelectObjectsCommand::execute() const
 
 void SelectObjectsCommand::undo() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->deselect();
+    }
 }
 
 std::string SelectObjectsCommand::to_string() const
 {
-    // TODO
+    char buffer[64];
+    std::snprintf(buffer, 64, "Select objects: %zu objects\n", objects.size());
+    return buffer;
 }

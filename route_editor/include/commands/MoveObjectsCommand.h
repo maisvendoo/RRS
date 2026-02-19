@@ -8,8 +8,6 @@
 
 #include <string>
 
-class RouteObject;
-
 class MoveObjectsCommand : public Command
 {
 public:

@@ -1,6 +1,5 @@
 commands/DeselectObjectsCommand.h
 commands/HideObjectsCommand.h
-commands/SelectObjectsCommand.h
 commands/ShowObjectsCommand.h
 EditorGui.h
 Gizmo.h
@@ -11,7 +10,6 @@ RouteEditor.h
 
 commands/DeselectObjectsCommand.cpp
 commands/HideObjectsCommand.cpp
-commands/SelectObjectsCommand.cpp
 commands/ShowObjectsCommand.cpp
 EditorGui.cpp
 Gizmo.cpp
