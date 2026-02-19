@@ -5,10 +5,11 @@
 
 #include    <vec3.h>
 #include    "topology-export.h"
+#include    "topology-defines.h"
 #include    "signal-types.h"
 
 class CfgReader;
-class Connector;
+class Switch;
 
 //------------------------------------------------------------------------------
 //
@@ -31,16 +32,16 @@ public:
 
     QString getConnectorName() const;
 
-    void setConnector(Connector* conn);
+    void setConnector(Switch* conn);
 
-    Connector* getConnector() const;
+    Switch* getConnector() const;
 
-    void setDirection(int signal_dir)
+    void setDirection(dir_t dir)
     {
-        this->signal_dir = signal_dir;
+        signal_dir = dir;
     }
 
-    int getDirection() const
+    dir_t getDirection() const
     {
         return signal_dir;
     }
@@ -135,7 +136,7 @@ private:
 
 protected:
 
-    int signal_dir = 0;
+    dir_t signal_dir = FWD;
 
     /// Состояние всех возможных огней светофора
     lens_state_t lens_state;
@@ -168,7 +169,7 @@ protected:
     dvec3 pos = {0.0, 0.0, 0.0};
 
     /// Коннектор, с которым связан сигнал
-    Connector* conn = nullptr;
+    Switch* conn = nullptr;
 
     virtual void preStep(double t);
 

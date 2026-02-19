@@ -242,18 +242,20 @@ void StationSignal::slotBlinkTimer()
 bool StationSignal::check_and_lock_switch_fwd(Switch* sw, bool lock)
 {
     // Если это не стрелка, всё хорошо и дальше делать нечего
-    if (sw->getStateFwd() == Switch::ONE_POSSIBLE_DIRECTION)
+    if (   (sw->getStateFwd() == NO_POSSIBLE_DIRECTION)
+        || (sw->getStateFwd() == ONLY_MINUS)
+        || (sw->getStateFwd() == ONLY_PLUS))
     {
         return true;
     }
 
     // Если стрелка занята подвижным составом, маршрута дальше нет
-    if (sw->getStateFwd() == Switch::IS_BUSY_MINUS)
+    if (sw->getStateFwd() == IS_BUSY_MINUS)
     {
         switches_state = SWITCHES_SIDE;
         return false;
     }
-    if (sw->getStateFwd() == Switch::IS_BUSY_PLUS)
+    if (sw->getStateFwd() == IS_BUSY_PLUS)
     {
         return false;
     }
@@ -270,12 +272,12 @@ bool StationSignal::check_and_lock_switch_fwd(Switch* sw, bool lock)
         if (sw->getStateFwd() < 0)
         {
             switches_state = SWITCHES_SIDE;
-            sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
+            sw->setRefStateFwd(IN_ROUTE_MINUS);
             sw->setRouteBySignalFwd(this);
         }
         if (sw->getStateFwd() > 0)
         {
-            sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
+            sw->setRefStateFwd(IN_ROUTE_PLUS);
             sw->setRouteBySignalFwd(this);
         }
         return true;
@@ -287,12 +289,12 @@ bool StationSignal::check_and_lock_switch_fwd(Switch* sw, bool lock)
         if (sw->getStateFwd() < 0)
         {
             switches_state = SWITCHES_SIDE;
-            sw->setRefStateFwd(Switch::STATE_MINUS);
+            sw->setRefStateFwd(STATE_MINUS);
             sw->setRouteBySignalFwd(nullptr);
         }
         if (sw->getStateFwd() > 0)
         {
-            sw->setRefStateFwd(Switch::STATE_PLUS);
+            sw->setRefStateFwd(STATE_PLUS);
             sw->setRouteBySignalFwd(nullptr);
         }
     }
@@ -305,18 +307,20 @@ bool StationSignal::check_and_lock_switch_fwd(Switch* sw, bool lock)
 bool StationSignal::check_and_lock_switch_bwd(Switch* sw, bool lock)
 {
     // Если это не стрелка, всё хорошо и дальше делать нечего
-    if (sw->getStateBwd() == Switch::ONE_POSSIBLE_DIRECTION)
+    if (   (sw->getStateBwd() == NO_POSSIBLE_DIRECTION)
+        || (sw->getStateBwd() == ONLY_MINUS)
+        || (sw->getStateBwd() == ONLY_PLUS))
     {
         return true;
     }
 
     // Если стрелка занята подвижным составом, маршрута дальше нет
-    if (sw->getStateBwd() == Switch::IS_BUSY_MINUS)
+    if (sw->getStateBwd() == IS_BUSY_MINUS)
     {
         switches_state = SWITCHES_SIDE;
         return false;
     }
-    if (sw->getStateBwd() == Switch::IS_BUSY_PLUS)
+    if (sw->getStateBwd() == IS_BUSY_PLUS)
     {
         return false;
     }
@@ -333,12 +337,12 @@ bool StationSignal::check_and_lock_switch_bwd(Switch* sw, bool lock)
         if (sw->getStateBwd() < 0)
         {
             switches_state = SWITCHES_SIDE;
-            sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
+            sw->setRefStateBwd(IN_ROUTE_MINUS);
             sw->setRouteBySignalBwd(this);
         }
         if (sw->getStateBwd() > 0)
         {
-            sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
+            sw->setRefStateBwd(IN_ROUTE_PLUS);
             sw->setRouteBySignalBwd(this);
         }
         return true;
@@ -350,12 +354,12 @@ bool StationSignal::check_and_lock_switch_bwd(Switch* sw, bool lock)
         if (sw->getStateBwd() < 0)
         {
             switches_state = SWITCHES_SIDE;
-            sw->setRefStateBwd(Switch::STATE_MINUS);
+            sw->setRefStateBwd(STATE_MINUS);
             sw->setRouteBySignalBwd(nullptr);
         }
         if (sw->getStateBwd() > 0)
         {
-            sw->setRefStateBwd(Switch::STATE_PLUS);
+            sw->setRefStateBwd(STATE_PLUS);
             sw->setRouteBySignalBwd(nullptr);
         }
     }
@@ -380,7 +384,7 @@ void StationSignal::check_train_route()
     bool lock = lock_relay->getContactState(LR_NEUTRAL_ROUTE_LOCKED);
 
     // Начинаем с коннектора, к которому относится светофор
-    Connector *cur_conn = conn;
+    Switch* cur_conn = conn;
 
     if (!cur_conn)
     {
@@ -388,7 +392,8 @@ void StationSignal::check_train_route()
     }
 
     // Смотрим траекторию перед текущим коннектором (участок приближения)
-    Trajectory* traj = (signal_dir == 1) ? cur_conn->getBwdTraj() : cur_conn->getFwdTraj();
+    dir_t cur_dir = static_cast<dir_t>(-signal_dir);
+    Trajectory* traj = cur_conn->getNextTraj(cur_dir);
     if (traj && !traj->isBusy())
     {
         // Если траектория свободна, разрешаем размыкание маневрого маршрута
@@ -396,37 +401,35 @@ void StationSignal::check_train_route()
     }
 
     // Смотрим траекторию за текущим коннектором
-    traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
+    cur_dir = signal_dir;
+    traj = cur_conn->getNextTraj(cur_dir);
     if (traj && ((traj == ref_trajectory_shunt) || !traj->isBusy()))
     {
         // Если траектория свободна, разрешаем размыкание маневрого маршрута
         is_lock_route = false;
     }
 
-    // Смотрим стрелочный перевод на текущем коннекторе
-    if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+    // Блокировка противошёрстного стрелочного перевода за светофором в маршрут
+    if (signal_dir == 1)
     {
-        // Блокировка противошёрстного стрелочного перевода за светофором в маршрут
-        if (signal_dir == 1)
+        if (!check_and_lock_switch_fwd(cur_conn, lock))
         {
-            if (!check_and_lock_switch_fwd(sw, lock))
-            {
-                return;
-            }
+            return;
         }
-        else
+    }
+    else
+    {
+        if (!check_and_lock_switch_bwd(cur_conn, lock))
         {
-            if (!check_and_lock_switch_bwd(sw, lock))
-            {
-                return;
-            }
+            return;
         }
     }
 
+    cur_dir = signal_dir;
     while (true)
     {
         // Смотрим траекторию за текущим коннектором
-        traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
+        traj = cur_conn->getNextTraj(cur_dir);
 
         // Уперлись в тупик - разрешаем маневровый маршрут до тупика
         if (!traj)
@@ -438,7 +441,7 @@ void StationSignal::check_train_route()
         // Проверяем включение траектории в маршрут от другого светофора
         if (traj->isInRoute())
         {
-            Signal* s = (signal_dir == 1) ? traj->getRouteBySignalFwd() : traj->getRouteBySignalBwd();
+            Signal* s = (cur_dir == FWD) ? traj->getRouteBySignalFwd() : traj->getRouteBySignalBwd();
             if (s != this)
             {
                 return;
@@ -464,16 +467,16 @@ void StationSignal::check_train_route()
         if (lock)
         {
             traj->setInRoute(true);
-            (signal_dir == 1) ? traj->setRouteBySignalFwd(this) : traj->setRouteBySignalBwd(this);
+            (cur_dir == FWD) ? traj->setRouteBySignalFwd(this) : traj->setRouteBySignalBwd(this);
         }
         else
         {
             traj->setInRoute(false);
-            (signal_dir == 1) ? traj->setRouteBySignalFwd(nullptr) : traj->setRouteBySignalBwd(nullptr);
+            (cur_dir == FWD) ? traj->setRouteBySignalFwd(nullptr) : traj->setRouteBySignalBwd(nullptr);
         }
 
         // Смотрим следующий коннектор
-        cur_conn = (signal_dir == 1) ? traj->getFwdConnector() : traj->getBwdConnector();
+        cur_conn = traj->getNextSwitch(cur_dir);
 
         // Уперлись в тупик - разрешаем маневровый маршрут до тупика
         if (!cur_conn)
@@ -483,7 +486,8 @@ void StationSignal::check_train_route()
         }
 
         // Контроль взреза стрелки: смотрим траекторию перед следующим коннектором
-        Trajectory* prev = (signal_dir == 1) ? cur_conn->getBwdTraj() : cur_conn->getFwdTraj();
+        dir_t prev_dir = static_cast<dir_t>(-cur_dir);
+        Trajectory* prev = cur_conn->getNextTraj(prev_dir);
 
         if (traj != prev)
         {
@@ -491,27 +495,23 @@ void StationSignal::check_train_route()
         }
 
         // Смотрим сигнал на следующем коннекторе
-        Signal* signal = (signal_dir == 1) ? cur_conn->getSignalFwd() : cur_conn->getSignalBwd();
+        Signal* signal = (cur_dir == FWD) ? cur_conn->getSignalFwd() : cur_conn->getSignalBwd();
 
         if (signal)
         {
-            // Смотрим стрелочный перевод на коннекторе
-            if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+            // Блокировка пошёрстного стрелочного перевода перед светофором в маршрут
+            if (cur_dir == FWD)
             {
-                // Блокировка пошёрстного стрелочного перевода перед светофором в маршрут
-                if (signal_dir == 1)
+                if (!check_and_lock_switch_bwd(cur_conn, lock))
                 {
-                    if (!check_and_lock_switch_bwd(sw, lock))
-                    {
-                        return;
-                    }
+                    return;
                 }
-                else
+            }
+            else
+            {
+                if (!check_and_lock_switch_fwd(cur_conn, lock))
                 {
-                    if (!check_and_lock_switch_fwd(sw, lock))
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
 
@@ -540,36 +540,29 @@ void StationSignal::check_train_route()
 
             // Продолжаем обход топологии для поездного маршрута,
             // замыкаем противошёрстный стрелочный перевод
-            if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+            lock = lock_relay->getContactState(LR_PLUS_TRAIN_LOCKED);
+            if (cur_dir == FWD)
             {
-                lock = lock_relay->getContactState(LR_PLUS_TRAIN_LOCKED);
-                if (signal_dir == 1)
+                if (!check_and_lock_switch_fwd(cur_conn, lock))
                 {
-                    if (!check_and_lock_switch_fwd(sw, lock))
-                    {
-                        return;
-                    }
+                    return;
                 }
-                else
+            }
+            else
+            {
+                if (!check_and_lock_switch_bwd(cur_conn, lock))
                 {
-                    if (!check_and_lock_switch_bwd(sw, lock))
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
         }
         else
         {
-            // Смотрим стрелочный перевод на коннекторе
-            if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+            // Блокировка стрелочных переводов в маршрут
+            if (!check_and_lock_switch_bwd(cur_conn, lock) ||
+                !check_and_lock_switch_fwd(cur_conn, lock))
             {
-                // Блокировка стрелочных переводов в маршрут
-                if (!check_and_lock_switch_bwd(sw, lock) ||
-                    !check_and_lock_switch_fwd(sw, lock))
-                {
-                    return;
-                }
+                return;
             }
         }
     }

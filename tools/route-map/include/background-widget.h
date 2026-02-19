@@ -24,7 +24,7 @@ public:
 
     std::vector<Trajectory*> route_trajectories;
 
-    Connector* nearest_switch = nullptr;
+    Switch* nearest_switch = nullptr;
 
     std::int8_t nearest_switch_dir = 0;
 
@@ -72,7 +72,7 @@ private:
 
     bool drawTrajectoryHighlight(QPainter& painter, Trajectory* traj, QColor highlight);
 
-    bool drawSwitchHighlight(QPainter& painter, Connector* conn, std::int8_t dir, QColor highlight);
+    bool drawSwitchHighlight(QPainter& painter, Switch* conn, std::int8_t dir, QColor highlight);
 
     QPoint coord_transform(dvec3 point);
 

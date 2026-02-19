@@ -4,13 +4,14 @@
 #include    <QObject>
 #include    <QMap>
 
-#include    <topology-export.h>
-#include    <track.h>
+#include    "topology-export.h"
+#include    "topology-defines.h"
+#include    "track.h"
+
 #include    <profile-point.h>
 #include    <device-list.h>
 #include    <topology-trajectory-device.h>
 
-class Connector;
 class Signal;
 
 //------------------------------------------------------------------------------
@@ -49,25 +50,16 @@ public:
         return len;
     }
 
-    void setFwdConnector(Connector *fwd_connector)
-    {
-        this->fwd_connector = fwd_connector;
-    }
+    void setFwdSwitch(Switch* switch_ptr);
+    void setBwdSwitch(Switch* switch_ptr);
 
-    void setBwdConnector(Connector *bwd_connector)
-    {
-        this->bwd_connector = bwd_connector;
-    }
+    Switch* getNextSwitch(dir_t& dir) const;
 
-    Connector *getFwdConnector() const
-    {
-        return fwd_connector;
-    }
+    /// Задать включение траектории в маршрут ДЦ
+    void setInRoute(bool is_route);
 
-    Connector *getBwdConnector() const
-    {
-        return bwd_connector;
-    }
+    /// Включение траектории в маршрут ДЦ
+    bool isInRoute() const;
 
     /// Задать занятость единицей подвижного состава idx в интервале координат
     void setBusy(size_t idx, double coord_begin, double coord_end);
@@ -86,11 +78,17 @@ public:
 
     /// Индекс ближайшей единицы подвижного состава, если есть;
     /// -1, если нет подвижного состава в пределах дистанции поиска
-    int getBusyVehicle(double &distance, double coord, double search_distance, int direction);
+    int getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction);
 
     /// Интервал координат, занятых подвижным составом;
     /// если пустая, busy_begin_coord = length; busy_end_coord = 0.0
     void getBusyCoords(double &busy_begin_coord, double &busy_end_coord);
+
+    /// Вернуть все треки траектории
+    const std::vector<track_t>& getTracks() const
+    {
+        return tracks;
+    }
 
     /// Вернуть первый трек траектории
     const track_t& getFirstTrack() const
@@ -105,28 +103,10 @@ public:
     }
 
     /// Получить оборудование путевой инфраструктуры на этой траектории
-    const std::vector<TrajectoryDevice *>& getTrajectoryDevices() const;
-
-    /// Получить положение ПЕ на траектории
-    profile_point_t getPosition(double traj_coord, int direction);
-
-    /// Шаг симуляции
-    virtual void step(double t, double dt);
-
-    QByteArray serialize();
-
-    void deserialize(QByteArray &data);
-
-    const std::vector<track_t>& getTracks() const
+    const std::vector<TrajectoryDevice *>& getTrajectoryDevices() const
     {
-        return tracks;
+        return devices;
     }
-
-    /// Задать включение траектории в маршрут ДЦ
-    void setInRoute(bool is_route);
-
-    /// Включение траектории в маршрут ДЦ
-    bool isInRoute() const;
 
     /// Светофор вперёд, включающий данную траекторию в маршрут ДЦ
     Signal* getRouteBySignalFwd() const
@@ -147,6 +127,21 @@ public:
     {
         in_route_by_signal_bwd = signal;
     }
+
+
+    /// Шаг симуляции
+    virtual void step(double t, double dt);
+
+    QByteArray serialize();
+
+    void deserialize(QByteArray &data);
+
+    /// Поиск новой траектории, траекторной координаты и смены ориентации,
+    /// возвращает false, если координата за пределы топологии (за тупик)
+    static bool findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_t& orient);
+
+    /// Получить положение ПЕ на траектории
+    profile_point_t getPosition(double traj_coord, int direction);
 
 signals:
 
@@ -181,9 +176,9 @@ private:
 
     QMap<size_t, std::array<double, 2>> vehicles_coords;
 
-    Connector *fwd_connector = nullptr;
+    Switch* fwd_switch = nullptr;
 
-    Connector *bwd_connector = nullptr;
+    Switch* bwd_switch = nullptr;
 
     std::vector<track_t>    tracks;
 
@@ -196,7 +191,17 @@ private:
                     track_t &prev_track,
                     track_t &next_track);
 
-    double calc_curvature(track_t &track0, track_t &track1);
+    /// Поиск трека на следующей траектории
+    track_t findNextTrack(const track_t& cur_track, dir_t dir);
+
+    /// Создание условного продолжения топологии за тупик для корректного расчёта
+    track_t createFakeTrack(const track_t& cur_track, dir_t dir);
+
+    /// Создание трека в обратном направлении для корректного расчёта
+    track_t createReversedTrack(const track_t& track);
+
+    /// Расчёт кривизны между двумя соседними треками
+    double calc_curvature(track_t& track0, track_t& track1);
 };
 
 #endif

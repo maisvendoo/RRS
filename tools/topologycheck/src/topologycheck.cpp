@@ -44,7 +44,7 @@ int TopologyCheck::run(int argc, char *argv[])
     }
     LOG_INFO("================================================================================");
 
-    conn_list_t *switches = topology->getConnectorsList();
+    sw_list_t *switches = topology->getConnectorsList();
     for (auto conn = switches->begin(); conn != switches->end(); ++conn)
     {
         Switch *sw = dynamic_cast<Switch *>(*conn);
@@ -103,7 +103,8 @@ void TopologyCheck::parse_command_line(cli::Parser &parser)
 //------------------------------------------------------------------------------
 void TopologyCheck::find_ends_without_connector(Trajectory *traj)
 {
-    if (traj->getBwdConnector() == nullptr)
+    dir_t dir = BWD;
+    if (traj->getNextSwitch(dir) == nullptr)
     {
         dvec3 end_point = traj->getFirstTrack().begin_point;
         ends_without_connector.push_back({end_point, traj});
@@ -112,7 +113,8 @@ void TopologyCheck::find_ends_without_connector(Trajectory *traj)
                  end_point.x, end_point.y, end_point.z, traj->getName().toStdString().c_str());
 */
     }
-    if (traj->getFwdConnector() == nullptr)
+    dir = FWD;
+    if (traj->getNextSwitch(dir) == nullptr)
     {
         dvec3 end_point = traj->getLastTrack().end_point;
         ends_without_connector.push_back({end_point, traj});
@@ -164,39 +166,43 @@ void TopologyCheck::check_trajectory(Trajectory *traj)
 //------------------------------------------------------------------------------
 void TopologyCheck::check_connector_point(Switch *sw)
 {
-    std::array<std::pair<Switch::State, Switch::State>, 4> states;
-    states[0] = {Switch::STATE_PLUS, Switch::STATE_PLUS};
-    states[1] = {Switch::STATE_PLUS, Switch::STATE_MINUS};
-    states[2] = {Switch::STATE_MINUS, Switch::STATE_PLUS};
-    states[3] = {Switch::STATE_MINUS, Switch::STATE_MINUS};
+    std::array<std::pair<Switch_state_t, Switch_state_t>, 4> states;
+    states[0] = {STATE_PLUS, STATE_PLUS};
+    states[1] = {STATE_PLUS, STATE_MINUS};
+    states[2] = {STATE_MINUS, STATE_PLUS};
+    states[3] = {STATE_MINUS, STATE_MINUS};
     for (auto [state_bwd, state_fwd] : states)
     {
+        dir_t dir_bwd = BWD;
         sw->setStateBwd(state_bwd);
+        Trajectory* bwd_traj = sw->getNextTraj(dir_bwd);
+        dir_t dir_fwd = FWD;
         sw->setStateFwd(state_fwd);
-        if (sw->getBwdTraj() && sw->getFwdTraj())
+        Trajectory* fwd_traj = sw->getNextTraj(dir_fwd);
+        if (bwd_traj && dir_fwd)
         {
-            const auto& bwd_track = sw->getBwdTraj()->getLastTrack();
-            const auto& fwd_track = sw->getFwdTraj()->getFirstTrack();
+            const auto& bwd_track = (dir_bwd == BWD) ? bwd_traj->getLastTrack() : bwd_traj->getFirstTrack();
+            const auto& fwd_track = (dir_fwd == FWD) ? fwd_traj->getFirstTrack() : fwd_traj->getLastTrack();
 
             double curvature = calcCurvature(bwd_track, fwd_track);
             if (curvature > maximum_curvature)
             {
                 LOG_WARN("Warn: bwd_trajectory %s and fwd_trajectory %s of connector %s create curve with very small radius %5.1f m",
-                         sw->getBwdTraj()->getName().toStdString().c_str(),
-                         sw->getFwdTraj()->getName().toStdString().c_str(),
+                         bwd_traj->getName().toStdString().c_str(),
+                         fwd_traj->getName().toStdString().c_str(),
                          sw->getName().toStdString().c_str(),
                          1.0 / curvature);
             }
 
-            dvec3 bwd_end = bwd_track.end_point;
-            dvec3 fwd_begin = fwd_track.begin_point;
+            dvec3 bwd_end = (dir_bwd == BWD) ? bwd_track.end_point : bwd_track.begin_point;
+            dvec3 fwd_begin = (dir_fwd == FWD) ? fwd_track.begin_point : fwd_track.end_point;
             if (length(bwd_end - fwd_begin) >= 0.01)
             {
                 LOG_WARN("Warn: point at end {%12.3f;%12.3f;%8.3f} of trajectory %s is far away from point at begin {%12.3f;%12.3f;%8.3f} of trajectory %s in connector %s",
                          bwd_end.x, bwd_end.y, bwd_end.z,
-                         sw->getBwdTraj()->getName().toStdString().c_str(),
+                         bwd_traj->getName().toStdString().c_str(),
                          fwd_begin.x, fwd_begin.y, fwd_begin.z,
-                         sw->getFwdTraj()->getName().toStdString().c_str(),
+                         fwd_traj->getName().toStdString().c_str(),
                          sw->getName().toStdString().c_str());
             }
         }

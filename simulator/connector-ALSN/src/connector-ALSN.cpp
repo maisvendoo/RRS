@@ -1,6 +1,6 @@
 #include    "connector-ALSN.h"
 #include    "trajectory-ALSN.h"
-#include    "connector.h"
+#include    "switch.h"
 #include    "train-signal.h"
 
 //------------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 
 #include    <CfgReader.h>
 #include    <switch.h>
+#include    <switch-state.h>
 #include    <isolated-joint.h>
 #include    <line-signal.h>
 
@@ -121,6 +122,7 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
 
     double traj_coord = std::clamp(tp.traj_coord, 0.0, cur_traj->getLength());
 
+    dir_t dir = (tp.dir < 0) ? (BWD) : (FWD);
     for (size_t i = 0; i < vehicles->size(); ++i)
     {
         VehicleController *vc = new VehicleController;
@@ -130,102 +132,46 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
 
         // Смещаем координату центра данной ПЕ
         // на половину её длины и половину длины предыдущей ПЕ
-        // double L = (*vehicles)[i]->getLength();
         double L = curr_vehicle->getLength();
-        // traj_coord = traj_coord - tp.dir * L / 2.0;
-        traj_coord -= tp.dir * L / 2.0;
+        traj_coord -= static_cast<double>(dir) * L / 2.0;
         if (i != 0)
         {
-            // traj_coord = traj_coord - tp.dir * (*vehicles)[i-1]->getLength() / 2.0;
-            traj_coord -= tp.dir * prev_vehicle->getLength() / 2.0;
+            traj_coord -= static_cast<double>(dir) * prev_vehicle->getLength() / 2.0;
         }
 
-        // Если траекторная координата превысила длину траектории
-        // (заехали за стык или стрелку спереди), пока она её превышает...
-        while (traj_coord > cur_traj->getLength())
+        if (Trajectory::findTrajectoryAtCoord(cur_traj, traj_coord, dir))
         {
-            // Получаем указатель на коннектор спереди
-            Connector *conn = cur_traj->getFwdConnector();
-            if (conn == nullptr)
+            size_t idx = vehicle_control.size();
+            if (curr_vehicle->getModelIndex() != idx)
             {
-                Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't forward connector");
-                return false;
+                Journal::instance()->warning(QString(
+                    "Sizes of vehicles array at model and at topology are different."));
+                Journal::instance()->warning(QString(
+                                                 "For vehicle [%1] index from topology vehicle controller [%2] will be used.")
+                                                 .arg(curr_vehicle->getModelIndex())
+                                                 .arg(idx));
+
+                curr_vehicle->setModelIndex(idx);
             }
+            dir_t veh_dir = static_cast<dir_t>(dir * curr_vehicle->getDirection());
+            vc->setIndex(idx);
+            vc->setLength(L);
+            vc->setVehicleRailwayConnectors(curr_vehicle->getRailwayConnectors());
+            vc->setInitCurrentTraj(cur_traj, traj_coord, veh_dir);
+            vc->setInitPathCoord(curr_vehicle->getDirection() * curr_vehicle->getTrainCoord());
 
-            // Получаем указатель на следующую траекторию спереди
-            Trajectory *next_traj = conn->getFwdTraj();
-            if (next_traj == nullptr)
-            {
-                Journal::instance()->error("Connector " + conn->getName() + " has't forward trajectory");
-                return false;
-            }
+            vehicle_control.push_back(vc);
+            vc_table[curr_vehicle] = vc;
 
-            // Вычитаем из траекторной координаты длину предыдущей траектории,
-            // чтобы получить координату на новой траектории впереди
-            // traj_coord = traj_coord - cur_traj->getLength();
-            traj_coord -= cur_traj->getLength();
-
-            // Обновляем текущую траекторию на ту,
-            // с которой нас соединяет коннектор спереди
-            cur_traj = next_traj;
+            Journal::instance()->info(QString("Vehcile #%1").arg(idx) +
+                                      " at traj: " + cur_traj->getName() +
+                                      QString(" %1 m from start").arg(traj_coord));
         }
-
-        // Если траекторная координата меньше нуля
-        // (заехали за стык или стрелку сзади), пока она меньше нуля...
-        while (traj_coord < 0.0)
+        else
         {
-            // Получаем указатель на коннектор сзади
-            Connector *conn = cur_traj->getBwdConnector();
-            if (conn == nullptr)
-            {
-                Journal::instance()->error("Trajectory " + cur_traj->getName() + " has't backward connector");
-                return false;
-            }
-
-            // Получаем указатель на следующую траекторию сзади
-            Trajectory *next_traj = conn->getBwdTraj();
-            if (next_traj == nullptr)
-            {
-                Journal::instance()->error("Connector " + conn->getName() + " has't backward trajectory");
-                return false;
-            }
-
-            // Добавляем к траекторной координате длину новой траектории,
-            // чтобы получить координату на новой траектории сзади
-            // traj_coord = traj_coord + next_traj->getLength();
-            traj_coord += next_traj->getLength();
-
-            // Обновляем текущую траекторию на ту,
-            // с которой нас соединяет коннектор сзади
-            cur_traj = next_traj;
+            return false;
         }
-
-        size_t idx = vehicle_control.size();
-        if (curr_vehicle->getModelIndex() != idx)
-        {
-            Journal::instance()->warning(QString(
-                "Sizes of vehicles array at model and at topology are different."));
-            Journal::instance()->warning(QString(
-                "For vehicle [%1] index from topology vehicle controller [%2] will be used.")
-                                             .arg(curr_vehicle->getModelIndex())
-                                             .arg(idx));
-
-            curr_vehicle->setModelIndex(idx);
-        }
-        vc->setIndex(idx);
-        vc->setLength(L);
-        vc->setVehicleRailwayConnectors(curr_vehicle->getRailwayConnectors());
-        vc->setInitCurrentTraj(cur_traj, traj_coord);
-        vc->setDirection(tp.dir);
-        vc->setInitCoord(curr_vehicle->getTrainCoord());
-
-        vehicle_control.push_back(vc);
-        vc_table[curr_vehicle] = vc;
-
-        Journal::instance()->info(QString("Vehcile #%1").arg(idx) +
-                                  " at traj: " + cur_traj->getName() +
-                                  QString(" %1 m from start").arg(traj_coord));
-    }
+   }
 
     return true;
 }
@@ -249,8 +195,8 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
     if (start_traj == target_traj)
     {
         route_segment_t path;
-        path.dir = 0;
         path.trajectories = {start_traj};
+        path.directions = {FWD};
         Journal::instance()->warning("Build route: Target trajectory and start trajectory are the same");
         return path;
     }
@@ -263,16 +209,16 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
     }
 
     // Очередь для обхода графа (пары текущая траектория и направление)
-    std::queue<std::pair<Trajectory *, int>> q;
-    // Хеш-таблица поесещенных траекторий: ключ - текущая траектория,
-    // значение - предыдущая траектория.
+    std::queue<std::pair<Trajectory *, dir_t>> q;
+    // Хеш-таблица посещённых траекторий: ключ - текущая траектория,
+    // значение - предыдущая траектория и предыдущее направление.
     // Используется для восстановления пути по завершении поиска
-    std::unordered_map<Trajectory *, Trajectory *> visited;
+    std::unordered_map<Trajectory *, std::pair<Trajectory *, dir_t>> visited;
 
     // Начинаем с исходной траектории
-    q.push({start_traj, dir});
+    q.push({start_traj, (dir < 0) ? BWD : FWD});
     // Метим её как посещенную из несуществующей траектории через неизвестный узел
-    visited[start_traj] = nullptr;
+    visited[start_traj] = {nullptr, FWD};
 
     // Пока очередь траекторий для посещения не пуста
     while (!q.empty())
@@ -286,107 +232,116 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
         {
             // Построенный маршрут
             route_segment_t path;
-            path.dir = d;
 
             // Начинаем с целевой траектории
-            Trajectory *t = target_traj;
+            Trajectory *path_t = target_traj;
+            dir_t path_d = d;
 
             // Пока существует предыдущая траектория
-            while (t != nullptr)
+            while (path_t != nullptr)
             {
                 // Помещаем сегмент маршрута в путь
-                path.trajectories.push_back(t);
+                path.trajectories.push_back(path_t);
+                path.directions.push_back(path_d);
 
                 // Извлекаем предыдущую траекторию, переходим к ней
-                t = visited[t];
+                std::tie(path_t, path_d) = visited[path_t];
             }
 
             // Инвертируем маршрут, чтобы был от начала к концу
             std::reverse(path.trajectories.begin(), path.trajectories.end());
+            std::reverse(path.directions.begin(), path.directions.end());
 
             // Уходим, довольные как слон, с маршрутом под мышкой
             return path;
         }
 
+        dir_t next_d = d;
+
         // В зависимости от направления берем либо передний, либо задний
         // коннектор текущей траектории
-        Connector *next_conn = (d == 1) ? curr_t->getFwdConnector() : curr_t->getBwdConnector();
+        Switch* next_sw = curr_t->getNextSwitch(next_d);
 
         // Если коннектора нет - мы пришли в тупик, дальше хода нет
-        if (next_conn == nullptr)
+        if (next_sw == nullptr)
         {
             // идем на следующую итерацию
             continue;
         }
 
-        // TODO: Не используется
-        // Смотрим, какая траектория следующая
-        Trajectory *next_traj = nullptr;
-
-        // Смотрим, стрелка ли наш коннектор (Бу-гага, он всегда стрелка!)
-        if (Switch *sw = dynamic_cast<Switch *>(next_conn))
+        // Если стрелка уже занята подвижным составом или маршрутом, дальше хода нет
+        if (   (next_sw->getStateFwd() == IN_ROUTE_MINUS)
+            || (next_sw->getStateFwd() == IS_BUSY_MINUS)
+            || (next_sw->getStateFwd() == IS_BUSY_PLUS)
+            || (next_sw->getStateFwd() == IN_ROUTE_PLUS)
+            || (next_sw->getStateBwd() == IN_ROUTE_MINUS)
+            || (next_sw->getStateBwd() == IS_BUSY_MINUS)
+            || (next_sw->getStateBwd() == IS_BUSY_PLUS)
+            || (next_sw->getStateBwd() == IN_ROUTE_PLUS))
         {
-            // Если стрелка уже занята подвижным составом или маршрутом, дальше хода нет
-            /*if ((sw->getStateFwd() == Switch::IN_ROUTE_MINUS) ||
-                (sw->getStateFwd() == Switch::IS_BUSY_MINUS) ||
-                (sw->getStateFwd() == Switch::IS_BUSY_PLUS) ||
-                (sw->getStateFwd() == Switch::IN_ROUTE_PLUS) ||
-                (sw->getStateBwd() == Switch::IN_ROUTE_MINUS) ||
-                (sw->getStateBwd() == Switch::IS_BUSY_MINUS) ||
-                (sw->getStateBwd() == Switch::IS_BUSY_PLUS) ||
-                (sw->getStateBwd() == Switch::IN_ROUTE_PLUS))*/
-            if ((sw->getStateFwd() < -1) || (sw->getStateFwd() > 1) ||
-                (sw->getStateBwd() < -1) || (sw->getStateBwd() > 1))
+            // идем на следующую итерацию
+            continue;
+        }
+
+        // Список траекторий кандидатов в высокое звание маршрутных
+        std::vector<Trajectory *> candidates;
+
+        // Если едем по стрелке вперёд
+        if (next_d == FWD)
+        {
+            // Перебираем пути вперёд
+            for (const Switch_way_t& way : switch_fwd_ways_t)
             {
-                // идем на следующую итерацию
-                continue;
-            }
-
-            // Список траекторий кандидатов в высокое звание маршрутных
-            std::vector<Trajectory *> candidates;
-
-            // Если едем вперед
-            if (d == 1)
-            {
-                // Если есть прямое по стрелке направление
-                // и оно не занято и не включено в другой маршрут
-                if (sw->fwdPlusTraj && !sw->fwdPlusTraj->isBusy() && !sw->fwdPlusTraj->isInRoute())
+                if (Trajectory* traj = next_sw->trajectories[way])
                 {
-                    // то это наш кандидат
-                    candidates.push_back(sw->fwdPlusTraj);
-                }
+                    // Если траектория занята или включена в другой маршрут,
+                    // не рассматриваем маршрут через них
+                    if (traj->isBusy() || traj->isInRoute())
+                    {
+                        continue;
+                    }
 
-                // Если есть незанатое направление по отклонению не включенной в другой маршрут
-                if (sw->fwdMinusTraj && !sw->fwdMinusTraj->isBusy() && !sw->fwdMinusTraj->isInRoute())
-                {
-                    // Тоже кандидат, надо рассмотреть!
-                    candidates.push_back(sw->fwdMinusTraj);
+                    // Если траектория еще не посещалась - то список посещённых вернет end()
+                    if (visited.find(traj) == visited.end())
+                    {
+                        // Запоминаем траекторию как посещённую, и откуда мы к нему пришли
+                        visited[traj] = {curr_t, d};
+
+                        // Направление по новой траектории
+                        dir_t traj_d = static_cast<dir_t>(next_d * next_sw->getTrajOrientation(traj));
+                        // и помещаем новую траекторию в очередь
+                        q.push({traj, traj_d});
+                    }
                 }
             }
-            else // при движении назад - смотрим на задние +/- хвостики стрелки
-            {
-                // так же добавляя в кандидаты существующие незанятые траектории
-                if (sw->bwdPlusTraj && !sw->bwdPlusTraj->isBusy() && !sw->bwdPlusTraj->isInRoute())
-                {
-                    candidates.push_back(sw->bwdPlusTraj);
-                }
+        }
 
-                if (sw->bwdMinusTraj && !sw->bwdMinusTraj->isBusy() && !sw->bwdMinusTraj->isInRoute())
-                {
-                    candidates.push_back(sw->bwdMinusTraj);
-                }
-            }
-
-            // Перебираем собранных траекторий-кандидатов
-            for (Trajectory *cand : candidates)
+        // Если едем по стрелке назад
+        if (next_d == BWD)
+        {
+            // Перебираем пути назад
+            for (const Switch_way_t& way : switch_bwd_ways_t)
             {
-                // Если он еще не посещён - то список посещённых вернет end()
-                if (visited.find(cand) == visited.end())
+                if (Trajectory* traj = next_sw->trajectories[way])
                 {
-                    // Запоминаем кандидата как посещённого, и откуда мы к нему пришли
-                    visited[cand] = curr_t;
-                    // и помещаем его в очередь
-                    q.push({cand, d});
+                    // Если траектория занята или включена в другой маршрут,
+                    // не рассматриваем маршрут через них
+                    if (traj->isBusy() || traj->isInRoute())
+                    {
+                        continue;
+                    }
+
+                    // Если траектория еще не посещалась - то список посещённых вернет end()
+                    if (visited.find(traj) == visited.end())
+                    {
+                        // Запоминаем траекторию как посещённую, и откуда мы к нему пришли
+                        visited[traj] = {curr_t, d};
+
+                        // Направление по новой траектории
+                        dir_t traj_d = static_cast<dir_t>(next_d * next_sw->getTrajOrientation(traj));
+                        // и помещаем новую траекторию в очередь
+                        q.push({traj, traj_d});
+                    }
                 }
             }
         }
@@ -432,26 +387,19 @@ route_segment_t Topology::build_route(const route_command_t &rc)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
+bool Topology::set_switchs_by_route(const route_segment_t& route/*, int dir*/)
 {
     for (size_t i = 0; i < route.trajectories.size() - 1; ++i)
     {
         // Берём очередную траекторию маршрута
         Trajectory* prev_traj = route.trajectories[i];
 
-        // Берем коннектор у траектории в направлении построенного маршрута
-        Connector* conn = (dir == 1) ? prev_traj->getFwdConnector() : prev_traj->getBwdConnector();
-        if (conn == nullptr)
-        {
-            Journal::instance()->error(QString("Set switches by route: %1 conn of [%2]%3 is null")
-                                           .arg((dir == 1) ? "Fwd" : "Bwd").arg(i).arg(prev_traj->getName()));
-            return false;
-        }
-
-        Switch* sw = dynamic_cast<Switch*>(conn);
+        // Берем у траектории стрелку в направлении построенного маршрута
+        dir_t dir = route.directions[i];
+        Switch* sw = prev_traj->getNextSwitch(dir);
         if (sw == nullptr)
         {
-            Journal::instance()->error(QString("Set switches by route: %1 conn of [%2]%3 is not a switch")
+            Journal::instance()->error(QString("Set switches by route: %1 switch of [%2]%3 is null")
                                            .arg((dir == 1) ? "Fwd" : "Bwd").arg(i).arg(prev_traj->getName()));
             return false;
         }
@@ -459,52 +407,52 @@ bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
         // Ожидаемая траектория, исходя из построения маршрута
         Trajectory* next_traj = route.trajectories[i + 1];
 
-        if (dir == 1)
+        if (dir == FWD)
         {
             // Переключаем попутные остряки
-            if (next_traj == sw->fwdPlusTraj)
+            if (next_traj == sw->trajectories[SW_FWD_PLUS])
             {
-                sw->setRefStateFwd(Switch::STATE_PLUS);
+                sw->setRefStateFwd(STATE_PLUS);
             }
 
-            if (next_traj == sw->fwdMinusTraj)
+            if (next_traj == sw->trajectories[SW_FWD_MINUS])
             {
-                sw->setRefStateFwd(Switch::STATE_MINUS);
+                sw->setRefStateFwd(STATE_MINUS);
             }
 
             // Переключаем встречные остряки
-            if (prev_traj == sw->bwdPlusTraj)
+            if (prev_traj == sw->trajectories[SW_BWD_PLUS])
             {
-                sw->setRefStateBwd(Switch::STATE_PLUS);
+                sw->setRefStateBwd(STATE_PLUS);
             }
 
-            if (prev_traj == sw->bwdMinusTraj)
+            if (prev_traj == sw->trajectories[SW_BWD_MINUS])
             {
-                sw->setRefStateBwd(Switch::STATE_MINUS);
+                sw->setRefStateBwd(STATE_MINUS);
             }
         }
         else if (dir == -1)
         {
             // Переключаем попутные остряки
-            if (next_traj == sw->bwdPlusTraj)
+            if (next_traj == sw->trajectories[SW_BWD_PLUS])
             {
-                sw->setRefStateBwd(Switch::STATE_PLUS);
+                sw->setRefStateBwd(STATE_PLUS);
             }
 
-            if (next_traj == sw->bwdMinusTraj)
+            if (next_traj == sw->trajectories[SW_BWD_MINUS])
             {
-                sw->setRefStateBwd(Switch::STATE_MINUS);
+                sw->setRefStateBwd(STATE_MINUS);
             }
 
             // Переключаем встречные остряки
-            if (prev_traj == sw->fwdPlusTraj)
+            if (prev_traj == sw->trajectories[SW_FWD_PLUS])
             {
-                sw->setRefStateFwd(Switch::STATE_PLUS);
+                sw->setRefStateFwd(STATE_PLUS);
             }
 
-            if (prev_traj == sw->fwdMinusTraj)
+            if (prev_traj == sw->trajectories[SW_FWD_MINUS])
             {
-                sw->setRefStateFwd(Switch::STATE_MINUS);
+                sw->setRefStateFwd(STATE_MINUS);
             }
         }
     }
@@ -515,25 +463,25 @@ bool Topology::set_switchs_by_route(const route_segment_t& route, int dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Topology::open_route_signals(const route_segment_t &route, int dir, QStringList &conn_list, bool for_train)
+bool Topology::open_route_signals(const route_segment_t& route, QStringList& sw_list, bool for_train)
 {
     for (size_t i = 0; i < route.trajectories.size() - 1; ++i)
     {
         // Берём очередную траекторию маршрута
         Trajectory* traj = route.trajectories[i];
 
-        // Берем коннектор у траектории в направлении построенного маршрута
-        Connector *conn = (dir == 1) ? traj->getFwdConnector() : traj->getBwdConnector();
-
-        if (conn == nullptr)
+        // Берем у траектории стрелку в направлении построенного маршрута
+        dir_t dir = route.directions[i];
+        Switch* sw = traj->getNextSwitch(dir);
+        if (sw == nullptr)
         {
-            Journal::instance()->error(QString("Open route signals: %1 conn of [%2]%3 is null")
+            Journal::instance()->error(QString("Open route signals: %1 switch of [%2]%3 is null")
                                            .arg((dir == 1) ? "Fwd" : "Bwd").arg(i).arg(traj->getName()));
             return false;
         }
 
-        // Проверяем есть ли на нем сигнал
-        Signal* signal = (dir == 1) ? conn->getSignalFwd() : conn->getSignalBwd();
+        // Проверяем, есть ли на ней сигнал
+        Signal* signal = (dir == 1) ? sw->getSignalFwd() : sw->getSignalBwd();
 
         if (signal == nullptr)
         {
@@ -546,13 +494,13 @@ bool Topology::open_route_signals(const route_segment_t &route, int dir, QString
             if (StationSignal* station_sig = dynamic_cast<StationSignal *>(signal))
             {
                 // Добавляем в список поездной светофор
-                conn_list.append(conn->getName());
+                sw_list.append(sw->getName());
             }
         }
         else
         {
             // Добавляем в список
-            conn_list.append(conn->getName());
+            sw_list.append(sw->getName());
         }
     }
     return true;
@@ -578,14 +526,9 @@ void Topology::step(double t, double dt)
         (*traj)->step(t, dt);
     }
 
-    for (auto conn = joints.begin(); conn != joints.end(); ++conn)
+    for (auto sw = switches.begin(); sw != switches.end(); ++sw)
     {
-        (*conn)->step(t, dt);
-    }
-
-    for (auto conn = switches.begin(); conn != switches.end(); ++conn)
-    {
-        (*conn)->step(t, dt);
+        (*sw)->step(t, dt);
     }
 
     for (auto& signals_array : {signals_data.line_signals,
@@ -841,7 +784,7 @@ bool Topology::load_topology(QString route_dir)
 
         secNode = cfg.getNextSection();
     }
-
+/*
     secNode = cfg.getFirstSection("Joint");
 
     while (!secNode.isNull())
@@ -853,7 +796,7 @@ bool Topology::load_topology(QString route_dir)
 
         secNode = cfg.getNextSection();
     }
-
+*/
     // Увяжем сигналы траектории со слотами топологии
     for (auto traj : traj_list)
     {
@@ -885,34 +828,18 @@ bool strignToVector(const QString &str, dvec3 &vector)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
+void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
 {
-    QString signal_model_fwd = "";
-    int signal_dir_fwd = 0;
-
-    QString signal_model_bwd = "";
-    int signal_dir_bwd = 0;
-
-    if (cfg.getString(secNode, "SignalModelFwd", signal_model_fwd))
-    {
-        signal_dir_fwd = 1;
-    }
-
-    if (cfg.getString(secNode, "SignalModelBwd", signal_model_bwd))
-    {
-        signal_dir_bwd = -1;
-    }
-
-    auto configure_signal = [](Signal* signal, Connector* conn, int direction,
+    auto configure_signal = [](Signal* signal, Switch* sw, dir_t direction,
                                QString signal_letter, QString signal_model,
                                dvec3 relative_position, dvec3 relative_rotation)
     {
-        if (direction == 1)
-            conn->setSignalFwd(signal);
-        if (direction == -1)
-            conn->setSignalBwd(signal);
+        if (direction == FWD)
+            sw->setSignalFwd(signal);
+        if (direction == BWD)
+            sw->setSignalBwd(signal);
 
-        signal->setConnector(conn);
+        signal->setConnector(sw);
         signal->setDirection(direction);
         signal->setLetter(signal_letter);
         signal->setSignalModel(signal_model);
@@ -920,7 +847,10 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         signal->setRelRotation(relative_rotation);
     };
 
-    if (signal_dir_fwd == 1)
+    QString signal_model_fwd = "";
+    QString signal_model_bwd = "";
+
+    if (cfg.getString(secNode, "SignalModelFwd", signal_model_fwd))
     {
         QString tmp;
         dvec3 rel_pos = {0.0, 0.0, 0.0};
@@ -944,7 +874,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         if (signal_model_fwd.right(4) == "line")
         {
             LineSignal *signal = new LineSignal;
-            configure_signal(signal, conn, signal_dir_fwd,
+            configure_signal(signal, sw, FWD,
                              signal_letter, signal_model_fwd,
                              rel_pos, rel_rot);
             signals_data.line_signals.push_back(signal);
@@ -953,7 +883,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         else if (signal_model_fwd.right(4) == "entr")
         {
             EnterSignal *signal = new EnterSignal;
-            configure_signal(signal, conn, signal_dir_fwd,
+            configure_signal(signal, sw, FWD,
                              signal_letter, signal_model_fwd,
                              rel_pos, rel_rot);
             signals_data.enter_signals.push_back(signal);
@@ -962,7 +892,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         else if (signal_model_fwd.right(4) == "rout")
         {
             RouteSignal *signal = new RouteSignal;
-            configure_signal(signal, conn, signal_dir_fwd,
+            configure_signal(signal, sw, FWD,
                              signal_letter, signal_model_fwd,
                              rel_pos, rel_rot);
             signals_data.route_signals.push_back(signal);
@@ -971,7 +901,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         else if (signal_model_fwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
-            configure_signal(signal, conn, signal_dir_fwd,
+            configure_signal(signal, sw, FWD,
                              signal_letter, signal_model_fwd,
                              rel_pos, rel_rot);
             signals_data.exit_signals.push_back(signal);
@@ -980,7 +910,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         else if (signal_model_fwd.right(4) == "shnt")
         {
             ShuntingSignal *signal = new ShuntingSignal;
-            configure_signal(signal, conn, signal_dir_fwd,
+            configure_signal(signal, sw, FWD,
                              signal_letter, signal_model_fwd,
                              rel_pos, rel_rot);
             signals_data.shunt_signals.push_back(signal);
@@ -988,7 +918,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         }
     }
 
-    if (signal_dir_bwd == -1)
+    if (cfg.getString(secNode, "SignalModelBwd", signal_model_bwd))
     {
         QString tmp;
         dvec3 rel_pos = {0.0, 0.0, 0.0};
@@ -1012,7 +942,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         if (signal_model_bwd.right(4) == "line")
         {
             LineSignal *signal = new LineSignal;
-            configure_signal(signal, conn, signal_dir_bwd,
+            configure_signal(signal, sw, BWD,
                              signal_letter, signal_model_bwd,
                              rel_pos, rel_rot);
             signals_data.line_signals.push_back(signal);
@@ -1021,7 +951,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         else if (signal_model_bwd.right(4) == "entr")
         {
             EnterSignal *signal = new EnterSignal;
-            configure_signal(signal, conn, signal_dir_bwd,
+            configure_signal(signal, sw, BWD,
                              signal_letter, signal_model_bwd,
                              rel_pos, rel_rot);
             signals_data.enter_signals.push_back(signal);
@@ -1030,7 +960,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         else if (signal_model_bwd.right(4) == "rout")
         {
             RouteSignal *signal = new RouteSignal;
-            configure_signal(signal, conn, signal_dir_bwd,
+            configure_signal(signal, sw, BWD,
                              signal_letter, signal_model_bwd,
                              rel_pos, rel_rot);
             signals_data.route_signals.push_back(signal);
@@ -1039,7 +969,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         else if (signal_model_bwd.right(4) == "exit")
         {
             ExitSignal *signal = new ExitSignal;
-            configure_signal(signal, conn, signal_dir_bwd,
+            configure_signal(signal, sw, BWD,
                              signal_letter, signal_model_bwd,
                              rel_pos, rel_rot);
             signals_data.exit_signals.push_back(signal);
@@ -1048,7 +978,7 @@ void Topology::load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn)
         else if (signal_model_bwd.right(4) == "shnt")
         {
             ShuntingSignal *signal = new ShuntingSignal;
-            configure_signal(signal, conn, signal_dir_bwd,
+            configure_signal(signal, sw, BWD,
                              signal_letter, signal_model_bwd,
                              rel_pos, rel_rot);
             signals_data.shunt_signals.push_back(signal);
@@ -1120,33 +1050,33 @@ void Topology::get_route_name(QString route_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::serialize_connector_name(QDataStream &stream, Connector *conn)
+void Topology::serialize_connector_name(QDataStream& stream, Switch* sw)
 {
-    if (bool has_conn = conn != nullptr)
+    if (bool has_sw = sw != nullptr)
     {
-        stream << has_conn;
-        stream << conn->getName();
+        stream << has_sw;
+        stream << sw->getName();
     }
     else
     {
-        stream << has_conn;
+        stream << has_sw;
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Connector *Topology::deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const
+Switch* Topology::deserialize_traj_connectors(QDataStream &stream, sw_list_t& sw_list) const
 {
-    bool has_conn = false;
-    stream >> has_conn;
+    bool has_sw = false;
+    stream >> has_sw;
 
-    if (has_conn)
+    if (has_sw)
     {
-        QString conn_name = "";
-        stream >> conn_name;
+        QString sw_name = "";
+        stream >> sw_name;
 
-        return conn_list.value(conn_name, nullptr);
+        return sw_list.value(sw_name, nullptr);
     }
 
     return nullptr;
@@ -1198,11 +1128,11 @@ void Topology::slotSwitchCommand(QByteArray& switch_command)
 
     if (sc.switch_direction < 0)
     {
-        sw->setRefStateBwd(static_cast<Switch::State>(sc.switch_ref_state));
+        sw->setRefStateBwd(static_cast<Switch_state_t>(sc.switch_ref_state));
     }
     else
     {
-        sw->setRefStateFwd(static_cast<Switch::State>(sc.switch_ref_state));
+        sw->setRefStateFwd(static_cast<Switch_state_t>(sc.switch_ref_state));
     }
 }
 
@@ -1219,13 +1149,13 @@ void Topology::slotSignalCommand(QByteArray& signal_data)
         return;
     }
 
-    Connector* conn = switches.value(sc.conn_name, nullptr);
-    if (conn == nullptr)
+    Switch* sw = switches.value(sc.conn_name, nullptr);
+    if (sw == nullptr)
     {
         return;
     }
 
-    Signal* sig = (sc.sig_dir < 1) ? conn->getSignalBwd() : conn->getSignalFwd();
+    Signal* sig = (sc.sig_dir < 1) ? sw->getSignalBwd() : sw->getSignalFwd();
     if (sig == nullptr)
     {
         return;
@@ -1338,7 +1268,7 @@ void Topology::slotBuildRouteCommand(QByteArray &route_data)
                               + rc.trajectory_begin + " to " + rc.trajectory_end
                               + " through " + QString::number(route.trajectories.size()) + "trajectories");
 
-    set_switchs_by_route(route, rc.dir);
+    set_switchs_by_route(route);
 }
 
 //------------------------------------------------------------------------------
@@ -1361,10 +1291,10 @@ void Topology::slotTrainRouteCommand(QByteArray &route_data)
                               + rc.trajectory_begin + " to " + rc.trajectory_end
                               + " through " + QString::number(route.trajectories.size()) + "trajectories");
 
-    if (set_switchs_by_route(route, rc.dir))
+    if (set_switchs_by_route(route))
     {
         QStringList signals_for_open;
-        open_route_signals(route, rc.dir, signals_for_open, true);
+        open_route_signals(route, signals_for_open, true);
 
         emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, true, false);
     }
@@ -1390,10 +1320,10 @@ void Topology::slotShuntingRouteCommand(QByteArray &route_data)
                               + rc.trajectory_begin + " to " + rc.trajectory_end
                               + " through " + QString::number(route.trajectories.size()) + "trajectories");
 
-    if (set_switchs_by_route(route, rc.dir))
+    if (set_switchs_by_route(route))
     {
         QStringList signals_for_open;
-        open_route_signals(route, rc.dir, signals_for_open, false);
+        open_route_signals(route, signals_for_open, false);
 
         emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, false, true);
     }
@@ -1437,34 +1367,15 @@ void Topology::slotGetNextTrajName(QString traj_name, int dir, QString &next_tra
         return;
     }
 
-    Connector *conn = nullptr;
+    dir_t direction = (dir < 0) ? BWD : FWD;
+    Switch* sw = traj->getNextSwitch(direction);
 
-    if (dir == 1)
-    {
-        conn = traj->getFwdConnector();
-    }
-
-    if (dir == -1)
-    {
-        conn = traj->getBwdConnector();
-    }
-
-    if (conn == nullptr)
+    if (sw == nullptr)
     {
         return;
     }
 
-    Trajectory *next_traj = nullptr;
-
-    if (dir == 1)
-    {
-        next_traj = conn->getFwdTraj();
-    }
-
-    if (dir == -1)
-    {
-        next_traj = conn->getBwdTraj();
-    }
+    Trajectory *next_traj = sw->getNextTraj(direction);
 
     if (next_traj == nullptr)
     {

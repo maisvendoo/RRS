@@ -132,14 +132,16 @@ void ShuntingSignal::slotCloseTimer()
 bool ShuntingSignal::check_and_lock_switch_fwd(Switch* sw, bool lock)
 {
     // Если это не стрелка, всё хорошо и дальше делать нечего
-    if (sw->getStateFwd() == Switch::ONE_POSSIBLE_DIRECTION)
+    if (   (sw->getStateFwd() == NO_POSSIBLE_DIRECTION)
+        || (sw->getStateFwd() == ONLY_MINUS)
+        || (sw->getStateFwd() == ONLY_PLUS))
     {
         return true;
     }
 
     // Если стрелка занята подвижным составом, маршрута дальше нет
-    if ((sw->getStateFwd() == Switch::IS_BUSY_MINUS) ||
-        (sw->getStateFwd() == Switch::IS_BUSY_PLUS))
+    if ((sw->getStateFwd() == IS_BUSY_MINUS) ||
+        (sw->getStateFwd() == IS_BUSY_PLUS))
     {
         return false;
     }
@@ -155,28 +157,28 @@ bool ShuntingSignal::check_and_lock_switch_fwd(Switch* sw, bool lock)
     {
         if (sw->getStateFwd() < 0)
         {
-            sw->setRefStateFwd(Switch::IN_ROUTE_MINUS);
+            sw->setRefStateFwd(IN_ROUTE_MINUS);
             sw->setRouteBySignalFwd(this);
         }
         if (sw->getStateFwd() > 0)
         {
-            sw->setRefStateFwd(Switch::IN_ROUTE_PLUS);
+            sw->setRefStateFwd(IN_ROUTE_PLUS);
             sw->setRouteBySignalFwd(this);
         }
         return true;
     }
 
-    // Размыкаем маршрут
+    // Иначе, размыкаем маршрут
     if (sw->getRouteBySignalFwd())
     {
         if (sw->getStateFwd() < 0)
         {
-            sw->setRefStateFwd(Switch::STATE_MINUS);
+            sw->setRefStateFwd(STATE_MINUS);
             sw->setRouteBySignalFwd(nullptr);
         }
         if (sw->getStateFwd() > 0)
         {
-            sw->setRefStateFwd(Switch::STATE_PLUS);
+            sw->setRefStateFwd(STATE_PLUS);
             sw->setRouteBySignalFwd(nullptr);
         }
     }
@@ -189,14 +191,16 @@ bool ShuntingSignal::check_and_lock_switch_fwd(Switch* sw, bool lock)
 bool ShuntingSignal::check_and_lock_switch_bwd(Switch* sw, bool lock)
 {
     // Если это не стрелка, всё хорошо и дальше делать нечего
-    if (sw->getStateBwd() == Switch::ONE_POSSIBLE_DIRECTION)
+    if (   (sw->getStateBwd() == NO_POSSIBLE_DIRECTION)
+        || (sw->getStateBwd() == ONLY_MINUS)
+        || (sw->getStateBwd() == ONLY_PLUS))
     {
         return true;
     }
 
     // Если стрелка занята подвижным составом, маршрута дальше нет
-    if ((sw->getStateBwd() == Switch::IS_BUSY_MINUS) ||
-        (sw->getStateBwd() == Switch::IS_BUSY_PLUS))
+    if ((sw->getStateBwd() == IS_BUSY_MINUS) ||
+        (sw->getStateBwd() == IS_BUSY_PLUS))
     {
         return false;
     }
@@ -212,28 +216,28 @@ bool ShuntingSignal::check_and_lock_switch_bwd(Switch* sw, bool lock)
     {
         if (sw->getStateBwd() < 0)
         {
-            sw->setRefStateBwd(Switch::IN_ROUTE_MINUS);
+            sw->setRefStateBwd(IN_ROUTE_MINUS);
             sw->setRouteBySignalBwd(this);
         }
         if (sw->getStateBwd() > 0)
         {
-            sw->setRefStateBwd(Switch::IN_ROUTE_PLUS);
+            sw->setRefStateBwd(IN_ROUTE_PLUS);
             sw->setRouteBySignalBwd(this);
         }
         return true;
     }
 
-    // Размыкаем маршрут
+    // Иначе, размыкаем маршрут
     if (sw->getRouteBySignalBwd())
     {
         if (sw->getStateBwd() < 0)
         {
-            sw->setRefStateBwd(Switch::STATE_MINUS);
+            sw->setRefStateBwd(STATE_MINUS);
             sw->setRouteBySignalBwd(nullptr);
         }
         if (sw->getStateBwd() > 0)
         {
-            sw->setRefStateBwd(Switch::STATE_PLUS);
+            sw->setRefStateBwd(STATE_PLUS);
             sw->setRouteBySignalBwd(nullptr);
         }
     }
@@ -250,7 +254,7 @@ void ShuntingSignal::check_shunt_route()
     is_lock_route = true;
 
     // Начинаем с коннектора, к которому относится светофор
-    Connector *cur_conn = conn;
+    Switch* cur_conn = conn;
 
     if (!cur_conn)
     {
@@ -258,7 +262,8 @@ void ShuntingSignal::check_shunt_route()
     }
 
     // Смотрим траекторию перед текущим коннектором (участок приближения)
-    Trajectory* traj = (signal_dir == 1) ? cur_conn->getBwdTraj() : cur_conn->getFwdTraj();
+    dir_t cur_dir = static_cast<dir_t>(-signal_dir);
+    Trajectory* traj = cur_conn->getNextTraj(cur_dir);
     if (traj && !traj->isBusy())
     {
         // Если траектория свободна, разрешаем размыкание маневрого маршрута
@@ -266,37 +271,35 @@ void ShuntingSignal::check_shunt_route()
     }
 
     // Смотрим траекторию за текущим коннектором
-    traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
+    cur_dir = signal_dir;
+    traj = cur_conn->getNextTraj(cur_dir);
     if (traj && ((traj == ref_trajectory_shunt) || !traj->isBusy()))
     {
         // Если траектория свободна, разрешаем размыкание маневрого маршрута
         is_lock_route = false;
     }
 
-    // Смотрим стрелочный перевод на текущем коннекторе
-    if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+    // Блокировка противошёрстного стрелочного перевода за светофором в маршрут
+    if (signal_dir == 1)
     {
-        // Блокировка противошёрстного стрелочного перевода за светофором в маршрут
-        if (signal_dir == 1)
+        if (!check_and_lock_switch_fwd(cur_conn, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)))
         {
-            if (!check_and_lock_switch_fwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)))
-            {
-                return;
-            }
+            return;
         }
-        else
+    }
+    else
+    {
+        if (!check_and_lock_switch_bwd(cur_conn, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)))
         {
-            if (!check_and_lock_switch_bwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)))
-            {
-                return;
-            }
+            return;
         }
     }
 
+    cur_dir = signal_dir;
     while (true)
     {
         // Смотрим траекторию за текущим коннектором
-        traj = (signal_dir == 1) ? cur_conn->getFwdTraj() : cur_conn->getBwdTraj();
+        traj = cur_conn->getNextTraj(cur_dir);
 
         // Уперлись в тупик - разрешаем маневровый маршрут до тупика
         if (!traj)
@@ -308,7 +311,7 @@ void ShuntingSignal::check_shunt_route()
         // Проверяем включение траектории в маршрут от другого светофора
         if (traj->isInRoute())
         {
-            Signal* s = (signal_dir == 1) ? traj->getRouteBySignalFwd() : traj->getRouteBySignalBwd();
+            Signal* s = (cur_dir == FWD) ? traj->getRouteBySignalFwd() : traj->getRouteBySignalBwd();
             if (s != this)
             {
                 return;
@@ -333,16 +336,16 @@ void ShuntingSignal::check_shunt_route()
         if (lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED))
         {
             traj->setInRoute(true);
-            (signal_dir == 1) ? traj->setRouteBySignalFwd(this) : traj->setRouteBySignalBwd(this);
+            (cur_dir == FWD) ? traj->setRouteBySignalFwd(this) : traj->setRouteBySignalBwd(this);
         }
         else
         {
             traj->setInRoute(false);
-            (signal_dir == 1) ? traj->setRouteBySignalFwd(nullptr) : traj->setRouteBySignalBwd(nullptr);
+            (cur_dir == FWD) ? traj->setRouteBySignalFwd(nullptr) : traj->setRouteBySignalBwd(nullptr);
         }
 
         // Смотрим следующий коннектор
-        cur_conn = (signal_dir == 1) ? traj->getFwdConnector() : traj->getBwdConnector();
+        cur_conn = traj->getNextSwitch(cur_dir);
 
         // Уперлись в тупик - разрешаем маневровый маршрут до тупика
         if (!cur_conn)
@@ -352,7 +355,8 @@ void ShuntingSignal::check_shunt_route()
         }
 
         // Контроль взреза стрелки: смотрим траекторию перед следующим коннектором
-        Trajectory* prev = (signal_dir == 1) ? cur_conn->getBwdTraj() : cur_conn->getFwdTraj();
+        dir_t prev_dir = static_cast<dir_t>(-cur_dir);
+        Trajectory* prev = cur_conn->getNextTraj(prev_dir);
 
         if (traj != prev)
         {
@@ -360,28 +364,24 @@ void ShuntingSignal::check_shunt_route()
         }
 
         // Смотрим сигнал на следующем коннекторе
-        Signal* signal = (signal_dir == 1) ? cur_conn->getSignalFwd() : cur_conn->getSignalBwd();
+        Signal* signal = (cur_dir == FWD) ? cur_conn->getSignalFwd() : cur_conn->getSignalBwd();
 
         // Нашли маршрут до следующего светофора, заканчиваем цикл
         if (signal)
         {
-            // Смотрим стрелочный перевод на коннекторе
-            if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+            // Блокировка пошёрстного стрелочного перевода перед светофором в маршрут
+            if (cur_dir == FWD)
             {
-                // Блокировка пошёрстного стрелочного перевода перед светофором в маршрут
-                if (signal_dir == 1)
+                if (!check_and_lock_switch_bwd(cur_conn, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)))
                 {
-                    if (!check_and_lock_switch_bwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)))
-                    {
-                        return;
-                    }
+                    return;
                 }
-                else
+            }
+            else
+            {
+                if (!check_and_lock_switch_fwd(cur_conn, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)))
                 {
-                    if (!check_and_lock_switch_fwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)))
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
 
@@ -390,15 +390,11 @@ void ShuntingSignal::check_shunt_route()
             return;
         }
 
-        // Смотрим стрелочный перевод на коннекторе
-        if (Switch* sw = dynamic_cast<Switch*>(cur_conn))
+        // Блокировка стрелочных переводов в маршрут
+        if (!check_and_lock_switch_bwd(cur_conn, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)) ||
+            !check_and_lock_switch_fwd(cur_conn, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)))
         {
-            // Блокировка стрелочных переводов в маршрут
-            if (!check_and_lock_switch_bwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)) ||
-                !check_and_lock_switch_fwd(sw, lock_relay_shunt->getContactState(LRS_ROUTE_LOCKED)))
-            {
-                return;
-            }
+            return;
         }
     }
 }

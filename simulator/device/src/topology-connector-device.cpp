@@ -21,7 +21,7 @@ ConnectorDevice::~ConnectorDevice()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ConnectorDevice::setConnector(Connector *conn)
+void ConnectorDevice::setConnector(Switch* conn)
 {
     connector = conn;
 }
@@ -29,7 +29,7 @@ void ConnectorDevice::setConnector(Connector *conn)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Connector *ConnectorDevice::getConnector() const
+Switch* ConnectorDevice::getConnector() const
 {
     return connector;
 }
