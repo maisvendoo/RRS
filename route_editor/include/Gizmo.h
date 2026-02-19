@@ -59,9 +59,9 @@ private:
     vsg::ref_ptr<SingleSwitch> line_y_switch;
     vsg::ref_ptr<SingleSwitch> line_z_switch;
 
-    vsg::vec3 curr_position;
-    vsg::vec3 click_position;
-    vsg::vec3 click_position_offset;
+    vsg::vec3 curr_pos;
+    vsg::vec3 click_pos;
+    vsg::vec3 click_pos_offset;
 
     vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;

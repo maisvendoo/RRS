@@ -213,9 +213,9 @@ bool Gizmo::handle_intersections()
     {
         if (node == arrow_x)
         {
-            click_position = curr_position;
-            click_position.x = world_intersection.x;
-            click_position_offset = click_position - curr_position;
+            click_pos = curr_pos;
+            click_pos.x = world_intersection.x;
+            click_pos_offset = click_pos - curr_pos;
 
             save_selected_objects_translations();
 
@@ -231,9 +231,9 @@ bool Gizmo::handle_intersections()
         }
         else if (node == arrow_y)
         {
-            click_position = curr_position;
-            click_position.y = world_intersection.y;
-            click_position_offset = click_position - curr_position;
+            click_pos = curr_pos;
+            click_pos.y = world_intersection.y;
+            click_pos_offset = click_pos - curr_pos;
 
             save_selected_objects_translations();
 
@@ -249,9 +249,9 @@ bool Gizmo::handle_intersections()
         }
         else if (node == arrow_z)
         {
-            click_position = curr_position;
-            click_position.z = world_intersection.z;
-            click_position_offset = click_position - curr_position;
+            click_pos = curr_pos;
+            click_pos.z = world_intersection.z;
+            click_pos_offset = click_pos - curr_pos;
 
             save_selected_objects_translations();
 
@@ -328,22 +328,22 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
         if (active_arrow == arrow_x)
         {
-            offset.x = world_intersection.x - click_position.x;
+            offset.x = world_intersection.x - click_pos.x;
         }
         else if (active_arrow == arrow_y)
         {
-            offset.y = world_intersection.y - click_position.y;
+            offset.y = world_intersection.y - click_pos.y;
         }
         else if (active_arrow == arrow_z)
         {
-            offset.z = world_intersection.z - click_position.z;
+            offset.z = world_intersection.z - click_pos.z;
         }
         else
         {
             continue;
         }
 
-        curr_position = click_position - click_position_offset + offset;
+        curr_pos = click_pos - click_pos_offset + offset;
 
         for (const auto& object : selected_objects)
         {
@@ -357,25 +357,25 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
 void Gizmo::update_position()
 {
-    curr_position = {0.0f, 0.0f, 0.0f};
+    curr_pos = {0.0f, 0.0f, 0.0f};
 
     if (settings.gizmo_to_center)
     {
         for (const auto& object : selected_objects)
         {
             const auto& bounds = object->get_bounds();
-            curr_position += (bounds.min + bounds.max) / 2.0f;
+            curr_pos += (bounds.min + bounds.max) / 2.0f;
         }
     }
     else
     {
         for (const auto& object : selected_objects)
         {
-            curr_position += object->get_translation();
+            curr_pos += object->get_translation();
         }
     }
 
-    curr_position /= static_cast<float>(selected_objects.size());
+    curr_pos /= static_cast<float>(selected_objects.size());
 }
 
 void Gizmo::update_scale()
@@ -385,8 +385,8 @@ void Gizmo::update_scale()
     const auto fov = vsg::radians(static_cast<float>(
         camera_handler->get_fov()));
 
-    const float distance_to_camera = vsg::length(curr_position - camera_pos);
+    const float distance_to_camera = vsg::length(curr_pos - camera_pos);
     const float tan_half_fov = std::tan(fov * 0.5f);
     const float scale = distance_to_camera * tan_half_fov * 0.075f;
-    this->matrix = vsg::translate(curr_position) * vsg::scale(scale);
+    this->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
 }
