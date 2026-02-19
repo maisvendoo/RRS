@@ -3,6 +3,7 @@
 #include "Action.h"
 #include "CameraHandler.h"
 #include "CommandList.h"
+#include "DeselectObjectsCommand.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
@@ -109,7 +110,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // deselect them all
         if (!selected_objects_are_empty && !keyboard_handler->get_any_shift_state())
         {
-            deselect_all_objects();
+            commands.push(new DeselectObjectsCommand(selected_objects), true);
         }
 
         gizmo_switch->mask = selected_objects.empty()
@@ -287,19 +288,10 @@ void ObjectSelector::select_object(RouteObject* object)
         }
         else
         {
-            deselect_all_objects();
+            commands.push(new DeselectObjectsCommand(selected_objects), true);
             object->select();
         }
     }
-}
-
-void ObjectSelector::deselect_all_objects()
-{
-    auto& selected_objects = RouteObject::get_selected_objects();
-
-    for (auto it = selected_objects.begin();
-        it != selected_objects.end();
-        it = (*it)->deselect());
 }
 
 void ObjectSelector::confirm_keyboard_move()

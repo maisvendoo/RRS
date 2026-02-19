@@ -53,8 +53,6 @@ public:
 private:
     void select_object(RouteObject* object);
 
-    void deselect_all_objects();
-
     void confirm_keyboard_move();
     void cancel_keyboard_move();
 
