@@ -2,17 +2,15 @@
 
 #include "RouteObject.h"
 
-#include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
+#include <cstdio>
 #include <string>
-#include <vector>
 
-ScaleObjectsCommand::ScaleObjectsCommand(
-    const std::vector<vsg::ref_ptr<RouteObject>>& objects,
-    vsg::vec3 scale
-)
+ScaleObjectsCommand::ScaleObjectsCommand(const RouteObjects& objects,
+    vsg::vec3 pivot, vsg::vec3 scale)
     : objects(objects)
+    , pivot(pivot)
     , scale(scale)
 {
 }
@@ -21,7 +19,7 @@ void ScaleObjectsCommand::execute() const
 {
     for (const auto& object : objects)
     {
-        object->scale(scale, true);
+        object->scale_relative_to_pivot(pivot, scale, object->matrix);
     }
 }
 
@@ -29,14 +27,16 @@ void ScaleObjectsCommand::undo() const
 {
     for (const auto& object : objects)
     {
-        object->scale(-scale, true);
+        object->scale_relative_to_pivot(pivot, -scale, object->matrix);
     }
 }
 
 std::string ScaleObjectsCommand::to_string() const
 {
-    char buffer[64];
-    std::snprintf(buffer, 64, "Scale objects: { %10.3f, %10.3f, %10.3f }",
-        scale.x, scale.y, scale.z);
+    char buffer[128];
+    std::snprintf(buffer, 128,
+        "Scale objects: pivot = { %10.3f, %10.3f, %10.3f }\n"
+        "               scale = { %10.3f, %10.3f, %10.3f }",
+        pivot.x, pivot.y, pivot.z, scale.x, scale.y, scale.z);
     return buffer;
 }
