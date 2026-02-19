@@ -60,10 +60,10 @@ public:
     void rotate(vsg::vec3 rotation_deg, bool update_matrix);
     void scale(vsg::vec3 scale, bool update_matrix);
 
-    void rotate_relative_to_point(vsg::vec3 point, vsg::vec3 rotation_deg,
+    void rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 rotation_deg,
         const vsg::dmat4& matrix);
 
-    void scale_relative_to_point(vsg::vec3 point, vsg::vec3 scale,
+    void scale_relative_to_pivot(vsg::vec3 pivot, vsg::vec3 scale,
         const vsg::dmat4& matrix);
 
     void hide();

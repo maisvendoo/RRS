@@ -565,7 +565,7 @@ void EditorGui::show_selected_objects_properties() const
     {
         for (const auto& object : selected_objects)
         {
-            object->rotate_relative_to_point(center,
+            object->rotate_around_pivot(center,
                 vsg::vec3{30.0f, 0.0f, 0.0f}, object->matrix);
         }
     }
@@ -574,7 +574,7 @@ void EditorGui::show_selected_objects_properties() const
     {
         for (const auto& object : selected_objects)
         {
-            object->rotate_relative_to_point(center,
+            object->rotate_around_pivot(center,
                 vsg::vec3{0.0f, 30.0f, 0.0f}, object->matrix);
         }
     }
@@ -583,7 +583,7 @@ void EditorGui::show_selected_objects_properties() const
     {
         for (const auto& object : selected_objects)
         {
-            object->rotate_relative_to_point(center,
+            object->rotate_around_pivot(center,
                 vsg::vec3{0.0f, 0.0f, 30.0f}, object->matrix);
         }
     }
@@ -592,7 +592,7 @@ void EditorGui::show_selected_objects_properties() const
     {
         for (const auto& object : selected_objects)
         {
-            object->scale_relative_to_point(center,
+            object->scale_relative_to_pivot(center,
                 vsg::vec3{2.0f, 1.0f, 1.0f}, object->matrix);
         }
     }
@@ -601,7 +601,7 @@ void EditorGui::show_selected_objects_properties() const
     {
         for (const auto& object : selected_objects)
         {
-            object->scale_relative_to_point(center,
+            object->scale_relative_to_pivot(center,
                 vsg::vec3{1.0f, 2.0f, 1.0f}, object->matrix);
         }
     }
@@ -610,7 +610,7 @@ void EditorGui::show_selected_objects_properties() const
     {
         for (const auto& object : selected_objects)
         {
-            object->scale_relative_to_point(center,
+            object->scale_relative_to_pivot(center,
                 vsg::vec3{1.0f, 1.0f, 2.0f}, object->matrix);
         }
     }
@@ -619,7 +619,7 @@ void EditorGui::show_selected_objects_properties() const
     {
         for (const auto& object : selected_objects)
         {
-            object->scale_relative_to_point(center,
+            object->scale_relative_to_pivot(center,
                 vsg::vec3{0.5f, 1.0f, 1.0f}, object->matrix);
         }
     }

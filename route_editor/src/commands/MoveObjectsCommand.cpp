@@ -2,12 +2,10 @@
 
 #include "RouteObject.h"
 
-#include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
 #include <cstdio>
 #include <string>
-#include <vector>
 
 MoveObjectsCommand::MoveObjectsCommand(
     const RouteObjects& objects,

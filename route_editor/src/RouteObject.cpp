@@ -202,11 +202,11 @@ void RouteObject::scale(vsg::vec3 scale, bool update_matrix)
     }
 }
 
-void RouteObject::rotate_relative_to_point(vsg::vec3 point,
+void RouteObject::rotate_around_pivot(vsg::vec3 pivot,
     vsg::vec3 rotation_deg, const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(point) * to_rotate_matrix(rotation_deg) *
-        vsg::translate(-point) * static_cast<vsg::mat4>(matrix);
+    this->matrix = vsg::translate(pivot) * to_rotate_matrix(rotation_deg) *
+        vsg::translate(-pivot) * static_cast<vsg::mat4>(matrix);
 
     vsg::quat quat;
 
@@ -218,11 +218,11 @@ void RouteObject::rotate_relative_to_point(vsg::vec3 point,
     update_bounds();
 }
 
-void RouteObject::scale_relative_to_point(vsg::vec3 point,
+void RouteObject::scale_relative_to_pivot(vsg::vec3 pivot,
     vsg::vec3 scale, const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(point) * vsg::scale(scale) *
-        vsg::translate(-point) * static_cast<vsg::mat4>(matrix);
+    this->matrix = vsg::translate(pivot) * vsg::scale(scale) *
+        vsg::translate(-pivot) * static_cast<vsg::mat4>(matrix);
 
     vsg::quat quat;
 
