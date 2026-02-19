@@ -290,13 +290,6 @@ bool Route::load_topology()
             const auto orth = to_vsg_vec3(signal->getOrth());
             const auto up = to_vsg_vec3(signal->getUp());
 
-            // const vsg::mat4 rotate = {
-            //      right.x, -orth.x,  up.x,  0.0,
-            //     -right.y,  orth.y,  up.y,  0.0,
-            //      right.z,  orth.z,  up.z,  0.0,
-            //         0.0,      0.0,   0.0,  1.0
-            // };
-
             const vsg::vec3 rotation_deg = {
                 vsg::degrees(std::atan2(orth.z, up.z)),
                 vsg::degrees(std::atan2(-right.z, std::hypot(orth.z, up.z))),
