@@ -43,6 +43,9 @@ public:
     vsg::ref_ptr<vsg::LookAt> get_look_at() const;
     vsg::ref_ptr<vsg::Camera> get_camera() const;
 
+    double& get_fov() const;
+    vsg::dvec3& get_eye() const;
+
     vec3_type get_front() const;
     vec3_type get_right() const;
     vec3_type get_up() const;

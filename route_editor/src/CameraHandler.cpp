@@ -210,6 +210,16 @@ vsg::ref_ptr<vsg::Camera> CameraHandler::get_camera() const
     return camera;
 }
 
+double& CameraHandler::get_fov() const
+{
+    return perspective->fieldOfViewY;
+}
+
+vsg::dvec3& CameraHandler::get_eye() const
+{
+    return look_at->eye;
+}
+
 CameraHandler::vec3_type CameraHandler::get_front() const
 {
     return front;

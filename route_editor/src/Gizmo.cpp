@@ -7,7 +7,6 @@
 #include "Settings.h"
 #include "SingleSwitch.h"
 
-#include <vsg/app/ViewMatrix.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
@@ -17,7 +16,6 @@
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/Builder.h>
-#include <vsg/utils/ComputeBounds.h>
 #include <vsg/utils/LineSegmentIntersector.h>
 #include <vsg/utils/ShaderSet.h>
 
@@ -196,6 +194,13 @@ bool Gizmo::handle_intersections()
 
     const auto& node_path = intersection->nodePath;
 
+    const auto camera_front = static_cast<vsg::vec3>(
+        camera_handler->get_front());
+
+    const float arrow_x_dot = std::abs(vsg::dot(camera_front, X_AXIS_POSITIVE));
+    const float arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVE));
+    const float arrow_z_dot = std::abs(vsg::dot(camera_front, Z_AXIS_POSITIVE));
+
     const auto save_selected_objects_translations = [&]() -> void
     {
         for (auto& object : selected_objects)
@@ -203,13 +208,6 @@ bool Gizmo::handle_intersections()
             object->save_translation();
         }
     };
-
-    const auto camera_front = static_cast<vsg::vec3>(
-        camera_handler->get_front());
-
-    const float arrow_x_dot = std::abs(vsg::dot(camera_front, X_AXIS_POSITIVE));
-    const float arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVE));
-    const float arrow_z_dot = std::abs(vsg::dot(camera_front, Z_AXIS_POSITIVE));
 
     for (const vsg::Node* node : node_path)
     {
@@ -349,10 +347,11 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
         for (const auto& object : selected_objects)
         {
-            object->set_translation(object->get_initial_translation() + offset, true);
+            object->set_translation(object->get_initial_translation() + offset,
+                true);
         }
 
-        break;
+        return;
     }
 }
 
@@ -381,11 +380,10 @@ void Gizmo::update_position()
 
 void Gizmo::update_scale()
 {
-    const auto camera_pos = static_cast<vsg::vec3>(
-        camera_handler->get_look_at()->eye);
+    const auto camera_pos = static_cast<vsg::vec3>(camera_handler->get_eye());
 
     const auto fov = vsg::radians(static_cast<float>(
-        camera_handler->get_perspective()->fieldOfViewY));
+        camera_handler->get_fov()));
 
     const float distance_to_camera = vsg::length(curr_position - camera_pos);
     const float tan_half_fov = std::tan(fov * 0.5f);
