@@ -33,7 +33,7 @@ public:
     void deserialize(QByteArray& data);
 
     const QString& getConnectorName() const noexcept;
-    int getSignalDirection() const noexcept;
+    int8_t getSignalDirection() const noexcept;
     const QString& getLetter() const noexcept;
     const QString& getModelName() const noexcept;
 
@@ -43,7 +43,7 @@ public:
 
 private:
     QString connector_name = "";
-    int signal_dir = 0;
+    std::int8_t signal_dir = 0;
     QString letter = "";
     QString signal_model = "";
 

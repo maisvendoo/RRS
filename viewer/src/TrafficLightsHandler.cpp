@@ -183,7 +183,7 @@ void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
     QDataStream stream(&buff);
 
     QString connector_name = "";
-    int signal_dir = 0;
+    int8_t signal_dir = 0;
 
     stream >> connector_name;
     stream >> signal_dir;
