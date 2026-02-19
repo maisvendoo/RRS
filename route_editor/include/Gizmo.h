@@ -10,6 +10,7 @@
 #include <vsg/utils/Builder.h>
 
 class CameraHandler;
+class CommandList;
 class IntersectionHandler;
 class RouteObject;
 class SingleSwitch;
@@ -29,6 +30,7 @@ class Gizmo : public vsg::Inherit<vsg::MatrixTransform, Gizmo>
 public:
     Gizmo(
         const settings_t& settings,
+        CommandList& commands,
         vsg::ref_ptr<CameraHandler> camera_handler,
         vsg::ref_ptr<IntersectionHandler> intersection_handler,
         const RouteObjects& selected_objects
@@ -44,6 +46,7 @@ public:
 
 private:
     const settings_t& settings;
+    CommandList& commands;
     vsg::ref_ptr<CameraHandler> camera_handler;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
     const RouteObjects& selected_objects;
@@ -62,6 +65,7 @@ private:
     vsg::vec3 curr_pos;
     vsg::vec3 click_pos;
     vsg::vec3 prev_intersect_pos;
+    vsg::vec3 total_translation;
 
     vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;

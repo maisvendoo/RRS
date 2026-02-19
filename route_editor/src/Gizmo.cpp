@@ -1,8 +1,10 @@
 #include "Gizmo.h"
 
 #include "CameraHandler.h"
+#include "CommandList.h"
 #include "IntersectionHandler.h"
 #include "Mask.h"
+#include "MoveObjectsCommand.h"
 #include "RouteObject.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
@@ -28,11 +30,13 @@ static constexpr vsg::vec3 Z_AXIS_POSITIVE = {0.0f, 0.0f, 1.0f};
 
 Gizmo::Gizmo(
     const settings_t& settings,
+    CommandList& commands,
     vsg::ref_ptr<CameraHandler> camera_handler,
     vsg::ref_ptr<IntersectionHandler> intersection_handler,
     const RouteObjects& selected_objects
 )
     : settings(settings)
+    , commands(commands)
     , camera_handler(camera_handler)
     , intersection_handler(intersection_handler)
     , selected_objects(selected_objects)
@@ -201,23 +205,11 @@ bool Gizmo::handle_intersections()
     const float arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVE));
     const float arrow_z_dot = std::abs(vsg::dot(camera_front, Z_AXIS_POSITIVE));
 
-    const auto save_selected_objects_translations = [&]() -> void
-    {
-        for (auto& object : selected_objects)
-        {
-            object->save_translation();
-        }
-    };
-
     for (const vsg::Node* node : node_path)
     {
         if (node == arrow_x)
         {
-            click_pos = curr_pos;
-            click_pos.x = world_intersection.x;
-            prev_intersect_pos = click_pos;
-
-            save_selected_objects_translations();
+            click_pos = {world_intersection.x, curr_pos.y, curr_pos.z};
 
             active_arrow = arrow_x;
 
@@ -226,16 +218,10 @@ bool Gizmo::handle_intersections()
                 : plane_xy_switch;
 
             active_line_switch = line_x_switch;
-
-            break;
         }
         else if (node == arrow_y)
         {
-            click_pos = curr_pos;
-            click_pos.y = world_intersection.y;
-            prev_intersect_pos = click_pos;
-
-            save_selected_objects_translations();
+            click_pos = {curr_pos.x, world_intersection.y, curr_pos.z};
 
             active_arrow = arrow_y;
 
@@ -244,16 +230,10 @@ bool Gizmo::handle_intersections()
                 : plane_xy_switch;
 
             active_line_switch = line_y_switch;
-
-            break;
         }
         else if (node == arrow_z)
         {
-            click_pos = curr_pos;
-            click_pos.z = world_intersection.z;
-            prev_intersect_pos = click_pos;
-
-            save_selected_objects_translations();
+            click_pos = {curr_pos.x, curr_pos.y, world_intersection.z};
 
             active_arrow = arrow_z;
 
@@ -262,15 +242,19 @@ bool Gizmo::handle_intersections()
                 : plane_xz_switch;
 
             active_line_switch = line_z_switch;
-
-            break;
         }
-    }
+        else
+        {
+            continue;
+        }
 
-    if (active_arrow)
-    {
+        prev_intersect_pos = click_pos;
+        total_translation = {0.0f, 0.0f, 0.0f};
+
         active_plain_switch->mask = MASK_CLICKABLE;
         active_line_switch->mask = MASK_GUI1;
+
+        break;
     }
 
     intersector->intersections.clear();
@@ -280,10 +264,13 @@ bool Gizmo::handle_intersections()
 
 void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
 {
-    if (buttonRelease.handled || !active_plain_switch)
+    if (buttonRelease.handled || !active_arrow)
     {
         return;
     }
+
+    commands.push(new MoveObjectsCommand(selected_objects, total_translation),
+        false);
 
     active_arrow = nullptr;
 
@@ -345,6 +332,8 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
         {
             continue;
         }
+
+        total_translation += translation;
 
         for (const auto& object : selected_objects)
         {

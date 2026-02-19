@@ -50,7 +50,7 @@ ObjectSelector::ObjectSelector(
 
     auto& selected_objects = RouteObject::get_selected_objects();
 
-    gizmo = Gizmo::create(settings, camera_handler,
+    gizmo = Gizmo::create(settings, commands, camera_handler,
         intersection_handler, selected_objects);
 
     gizmo_switch = SingleSwitch::create(vsg::MASK_OFF, gizmo);
