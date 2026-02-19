@@ -210,7 +210,7 @@ vsg::ref_ptr<vsg::Camera> CameraHandler::get_camera() const
     return camera;
 }
 
-double& CameraHandler::get_fov() const
+double& CameraHandler::get_fov_deg() const
 {
     return perspective->fieldOfViewY;
 }

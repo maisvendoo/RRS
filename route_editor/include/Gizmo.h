@@ -61,7 +61,7 @@ private:
 
     vsg::vec3 curr_pos;
     vsg::vec3 click_pos;
-    vsg::vec3 click_pos_offset;
+    vsg::vec3 prev_intersect_pos;
 
     vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;
