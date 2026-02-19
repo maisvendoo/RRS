@@ -28,8 +28,9 @@ public:
 
 private:
     static const settings_t* s_settings;
+
     vsg::ref_ptr<vsg::PagedLOD> paged_lod;
-    vsg::ref_ptr<vsg::Node> box = nullptr;
+    vsg::ref_ptr<vsg::Node> box;
 };
 
 #endif // OUTLINE_H

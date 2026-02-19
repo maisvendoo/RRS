@@ -9,10 +9,8 @@ EditorGui.h
 Gizmo.h
 IntersectionHandler.h
 ObjectSelector.h
-Outline.h
 Route.h
 RouteEditor.h
-RouteObject.h
 SceneGraph.h
 
 commands/DeselectObjectsCommand.cpp
@@ -26,8 +24,6 @@ EditorGui.cpp
 Gizmo.cpp
 IntersectionHandler.cpp
 ObjectSelector.cpp
-Outline.cpp
 Route.cpp
 RouteEditor.cpp
-RouteObject.cpp
 SceneGraph.cpp
