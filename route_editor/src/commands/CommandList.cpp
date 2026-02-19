@@ -4,7 +4,7 @@
 
 #include <cstddef>
 
-static constexpr std::size_t MAX_SAVED_COMMANDS = 5;
+static constexpr std::size_t MAX_SAVED_COMMANDS = 50;
 
 CommandList::CommandNode::~CommandNode()
 {

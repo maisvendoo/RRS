@@ -1,13 +1,9 @@
 EditorGui.h
-Gizmo.h
-IntersectionHandler.h
 ObjectSelector.h
 Route.h
 RouteEditor.h
 
 EditorGui.cpp
-Gizmo.cpp
-IntersectionHandler.cpp
 ObjectSelector.cpp
 Route.cpp
 RouteEditor.cpp
