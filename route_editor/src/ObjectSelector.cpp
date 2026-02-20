@@ -113,10 +113,10 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    intersection_handler->sort_intersections(intersections);
+    const auto intersection = intersection_handler->get_closest_intersection(
+        intersector);
 
-    const auto& node_path = intersections.front()->nodePath;
-    for (const vsg::Node* const node : node_path)
+    for (const vsg::Node* const node : intersection->nodePath)
     {
         if (RouteObject* object = const_cast<RouteObject*>(
             node->cast<RouteObject>()))
@@ -243,14 +243,14 @@ void ObjectSelector::select_object(RouteObject* object)
         }
         else if (object->get_is_selected())
         {
+            RouteObjects objects_to_deselect;
+
             if (selected_objects.size() == 1)
             {
-                commands.push(new SelectObjectsCommand({}, {object}), true);
+                objects_to_deselect.emplace_back(object);
             }
             else
             {
-                RouteObjects objects_to_deselect;
-
                 for (const auto& selected_object : selected_objects)
                 {
                     if (selected_object != object)
@@ -258,10 +258,10 @@ void ObjectSelector::select_object(RouteObject* object)
                         objects_to_deselect.emplace_back(selected_object);
                     }
                 }
-
-                commands.push(new SelectObjectsCommand(
-                    {}, std::move(objects_to_deselect)), true);
             }
+
+            commands.push(new SelectObjectsCommand(
+                {}, std::move(objects_to_deselect)), true);
         }
         else
         {

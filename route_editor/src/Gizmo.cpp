@@ -201,8 +201,6 @@ bool Gizmo::handle_intersections()
     const auto world_intersection = static_cast<vsg::vec3>(
         intersection->worldIntersection);
 
-    const auto& node_path = intersection->nodePath;
-
     const auto camera_front = static_cast<vsg::vec3>(
         camera_handler->get_front());
 
@@ -210,7 +208,7 @@ bool Gizmo::handle_intersections()
     const float arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVE));
     const float arrow_z_dot = std::abs(vsg::dot(camera_front, Z_AXIS_POSITIVE));
 
-    for (const vsg::Node* node : node_path)
+    for (const vsg::Node* node : intersection->nodePath)
     {
         if (node == arrow_x)
         {
@@ -308,8 +306,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
     const auto world_intersection = static_cast<vsg::vec3>(
         intersection->worldIntersection);
 
-    const auto& node_path = intersection->nodePath;
-    for (const vsg::Node* node : node_path)
+    for (const vsg::Node* node : intersection->nodePath)
     {
         if (node != active_plain_switch)
         {
