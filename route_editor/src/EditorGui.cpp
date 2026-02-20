@@ -133,11 +133,13 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 if (curr == active)
                 {
-                    ImGui::TextColored(ImVec4{1.0f, 0.0f, 0.0f, 1.0f}, "%s", curr->command->to_string().c_str());
+                    ImGui::Text("--> %s", curr->command->to_string().c_str());
+                    ImGui::Separator();
                 }
                 else
                 {
                     ImGui::Text("%s", curr->command->to_string().c_str());
+                    ImGui::Separator();
                 }
 
                 curr = curr->prev;
