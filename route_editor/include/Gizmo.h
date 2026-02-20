@@ -20,6 +20,7 @@ namespace vsg
 {
 
 class ButtonReleaseEvent;
+class FrameEvent;
 class MoveEvent;
 class Node;
 
@@ -40,6 +41,7 @@ public:
 
     void apply(const vsg::ButtonReleaseEvent& buttonRelease);
     void apply(const vsg::MoveEvent& moveEvent);
+    void apply(const vsg::FrameEvent& frame);
 
     void update_position();
     void update_scale();
@@ -52,6 +54,7 @@ private:
     const RouteObjects& selected_objects;
 
     vsg::Builder builder;
+    vsg::ref_ptr<SingleSwitch> main_switch;
     vsg::ref_ptr<vsg::Node> arrow_x;
     vsg::ref_ptr<vsg::Node> arrow_y;
     vsg::ref_ptr<vsg::Node> arrow_z;

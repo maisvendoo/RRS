@@ -16,6 +16,7 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/Node.h>
+#include <vsg/ui/ApplicationEvent.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/Builder.h>
 #include <vsg/utils/LineSegmentIntersector.h>
@@ -144,10 +145,6 @@ Gizmo::Gizmo(
     arrow_y = create_arrow(Y_AXIS_POSITIVE, arrow_y_color);
     arrow_z = create_arrow(Z_AXIS_POSITIVE, arrow_z_color);
 
-    this->addChild(arrow_x);
-    this->addChild(arrow_y);
-    this->addChild(arrow_z);
-
     plane_yz_switch = SingleSwitch::create(vsg::MASK_OFF,
         create_plane(X_AXIS_POSITIVE, arrow_x_color));
 
@@ -156,10 +153,6 @@ Gizmo::Gizmo(
 
     plane_xy_switch = SingleSwitch::create(vsg::MASK_OFF,
         create_plane(Z_AXIS_POSITIVE, arrow_z_color));
-
-    this->addChild(plane_yz_switch);
-    this->addChild(plane_xz_switch);
-    this->addChild(plane_xy_switch);
 
     line_x_switch = SingleSwitch::create(vsg::MASK_OFF,
         create_line(X_AXIS_POSITIVE, arrow_x_color));
@@ -170,9 +163,20 @@ Gizmo::Gizmo(
     line_z_switch = SingleSwitch::create(vsg::MASK_OFF,
         create_line(Z_AXIS_POSITIVE, arrow_z_color));
 
-    this->addChild(line_x_switch);
-    this->addChild(line_y_switch);
-    this->addChild(line_z_switch);
+    const auto main_group = vsg::Group::create();
+    main_group->addChild(arrow_x);
+    main_group->addChild(arrow_y);
+    main_group->addChild(arrow_z);
+    main_group->addChild(plane_yz_switch);
+    main_group->addChild(plane_xz_switch);
+    main_group->addChild(plane_xy_switch);
+    main_group->addChild(line_x_switch);
+    main_group->addChild(line_y_switch);
+    main_group->addChild(line_z_switch);
+
+    main_switch = SingleSwitch::create(vsg::MASK_OFF, main_group);
+
+    this->addChild(main_switch);
 }
 
 bool Gizmo::handle_intersections()
@@ -342,6 +346,15 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
         return;
     }
+}
+
+void Gizmo::apply(const vsg::FrameEvent& frame)
+{
+    (void)frame;
+
+    main_switch->mask = selected_objects.empty()
+        ? vsg::MASK_OFF
+        : MASK_GUI1 | MASK_CLICKABLE;
 }
 
 void Gizmo::update_position()

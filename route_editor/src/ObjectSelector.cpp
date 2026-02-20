@@ -54,12 +54,10 @@ ObjectSelector::ObjectSelector(
     gizmo = Gizmo::create(settings, commands, camera_handler,
         intersection_handler, selected_objects);
 
-    gizmo_switch = SingleSwitch::create(vsg::MASK_OFF, gizmo);
-
     front_plane_switch = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
 
-    scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo_switch);
+    scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo);
     scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, front_plane_switch);
 }
 
@@ -113,10 +111,6 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
             commands.push(new DeselectObjectsCommand(selected_objects), true);
         }
 
-        gizmo_switch->mask = selected_objects.empty()
-            ? vsg::MASK_OFF
-            : MASK_GUI1 | MASK_CLICKABLE;
-
         return;
     }
 
@@ -134,15 +128,6 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     }
 
     intersections.clear();
-
-    if (selected_objects.empty())
-    {
-        gizmo_switch->mask = vsg::MASK_OFF;
-    }
-    else
-    {
-        gizmo_switch->mask = MASK_GUI1 | MASK_CLICKABLE;
-    }
 }
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
@@ -237,6 +222,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         vsg::updateViewer(*viewer, compile_result);
     }
 
+    gizmo->apply(frame);
     gizmo->update_position();
     gizmo->update_scale();
 }

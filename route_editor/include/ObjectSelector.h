@@ -76,7 +76,6 @@ private:
     vsg::observer_ptr<vsg::Viewer> observer_viewer;
 
     vsg::ref_ptr<Gizmo> gizmo;
-    vsg::ref_ptr<SingleSwitch> gizmo_switch;
 
     vsg::vec3 begin_intersection_pos;
     vsg::ref_ptr<SingleSwitch> front_plane_switch;
