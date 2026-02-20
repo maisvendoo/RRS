@@ -41,8 +41,8 @@ public:
 
     void apply(const vsg::ButtonReleaseEvent& buttonRelease);
     void apply(const vsg::MoveEvent& moveEvent);
-    void apply(const vsg::FrameEvent& frame);
 
+    void update_visibility();
     void update_position();
     void update_scale();
 

@@ -349,11 +349,8 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
     }
 }
 
-// TODO: Make it non every frame
-void Gizmo::apply(const vsg::FrameEvent& frame)
+void Gizmo::update_visibility()
 {
-    (void)frame;
-
     this->mask = selected_objects.empty()
         ? vsg::MASK_OFF
         : MASK_GUI1 | MASK_CLICKABLE;

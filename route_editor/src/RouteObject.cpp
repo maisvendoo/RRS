@@ -1,5 +1,6 @@
 #include "RouteObject.h"
 
+#include "Gizmo.h"
 #include "Mask.h"
 #include "Outline.h"
 #include "SingleSwitch.h"
@@ -155,6 +156,8 @@ void RouteObject::set_translation(vsg::vec3 translation)
     this->matrix[3][0] = this->translation.x;
     this->matrix[3][1] = this->translation.y;
     this->matrix[3][2] = this->translation.z;
+
+    s_gizmo->update_position();
 }
 
 void RouteObject::set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix)
@@ -184,6 +187,8 @@ void RouteObject::move(vsg::vec3 translation)
     this->matrix[3][0] = this->translation.x;
     this->matrix[3][1] = this->translation.y;
     this->matrix[3][2] = this->translation.z;
+
+    s_gizmo->update_position();
 }
 
 void RouteObject::rotate(vsg::vec3 rotation_deg, bool update_matrix)
@@ -266,6 +271,9 @@ void RouteObject::select()
     is_selected = true;
 
     s_selected_objects.emplace_back(this);
+
+    s_gizmo->update_visibility();
+    s_gizmo->update_position();
 }
 
 RouteObjectsIterator RouteObject::deselect()
@@ -274,8 +282,13 @@ RouteObjectsIterator RouteObject::deselect()
 
     is_selected = false;
 
-    return s_selected_objects.erase(std::find(s_selected_objects.cbegin(),
-        s_selected_objects.cend(), this));
+    const auto it = s_selected_objects.erase(std::find(
+        s_selected_objects.cbegin(), s_selected_objects.cend(), this));
+
+    s_gizmo->update_visibility();
+    s_gizmo->update_position();
+
+    return it;
 }
 
 void RouteObject::save_translation()
@@ -312,4 +325,6 @@ void RouteObject::update_bounds()
     compute_bounds.useNodeBounds = false;
     this->accept(compute_bounds);
     bounds = static_cast<vsg::box>(compute_bounds.bounds);
+
+    s_gizmo->update_position();
 }

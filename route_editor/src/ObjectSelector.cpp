@@ -219,8 +219,6 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         vsg::updateViewer(*viewer, compile_result);
     }
 
-    gizmo->apply(frame);
-    gizmo->update_position();
     gizmo->update_scale();
 }
 
