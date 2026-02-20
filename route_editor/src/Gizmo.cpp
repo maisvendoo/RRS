@@ -347,6 +347,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
     }
 }
 
+// TODO: Make it non every frame
 void Gizmo::apply(const vsg::FrameEvent& frame)
 {
     (void)frame;
