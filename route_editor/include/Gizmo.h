@@ -2,18 +2,17 @@
 #define GIZMO_H
 
 #include "RouteObject.h"
+#include "SingleSwitch.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
-#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/utils/Builder.h>
 
 class CameraHandler;
 class CommandList;
 class IntersectionHandler;
 class RouteObject;
-class SingleSwitch;
 struct settings_t;
 
 namespace vsg
@@ -21,12 +20,13 @@ namespace vsg
 
 class ButtonReleaseEvent;
 class FrameEvent;
+class MatrixTransform;
 class MoveEvent;
 class Node;
 
 }
 
-class Gizmo : public vsg::Inherit<vsg::MatrixTransform, Gizmo>
+class Gizmo : public vsg::Inherit<SingleSwitch, Gizmo>
 {
 public:
     Gizmo(
@@ -54,7 +54,7 @@ private:
     const RouteObjects& selected_objects;
 
     vsg::Builder builder;
-    vsg::ref_ptr<SingleSwitch> main_switch;
+    vsg::ref_ptr<vsg::MatrixTransform> matrix_transform;
     vsg::ref_ptr<vsg::Node> arrow_x;
     vsg::ref_ptr<vsg::Node> arrow_y;
     vsg::ref_ptr<vsg::Node> arrow_z;

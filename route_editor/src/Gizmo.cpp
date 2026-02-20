@@ -15,6 +15,7 @@
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/ApplicationEvent.h>
 #include <vsg/ui/PointerEvent.h>
@@ -163,20 +164,18 @@ Gizmo::Gizmo(
     line_z_switch = SingleSwitch::create(vsg::MASK_OFF,
         create_line(Z_AXIS_POSITIVE, arrow_z_color));
 
-    const auto main_group = vsg::Group::create();
-    main_group->addChild(arrow_x);
-    main_group->addChild(arrow_y);
-    main_group->addChild(arrow_z);
-    main_group->addChild(plane_yz_switch);
-    main_group->addChild(plane_xz_switch);
-    main_group->addChild(plane_xy_switch);
-    main_group->addChild(line_x_switch);
-    main_group->addChild(line_y_switch);
-    main_group->addChild(line_z_switch);
+    matrix_transform = vsg::MatrixTransform::create();
+    matrix_transform->addChild(arrow_x);
+    matrix_transform->addChild(arrow_y);
+    matrix_transform->addChild(arrow_z);
+    matrix_transform->addChild(plane_yz_switch);
+    matrix_transform->addChild(plane_xz_switch);
+    matrix_transform->addChild(plane_xy_switch);
+    matrix_transform->addChild(line_x_switch);
+    matrix_transform->addChild(line_y_switch);
+    matrix_transform->addChild(line_z_switch);
 
-    main_switch = SingleSwitch::create(vsg::MASK_OFF, main_group);
-
-    this->addChild(main_switch);
+    this->node = matrix_transform;
 }
 
 bool Gizmo::handle_intersections()
@@ -352,7 +351,7 @@ void Gizmo::apply(const vsg::FrameEvent& frame)
 {
     (void)frame;
 
-    main_switch->mask = selected_objects.empty()
+    this->mask = selected_objects.empty()
         ? vsg::MASK_OFF
         : MASK_GUI1 | MASK_CLICKABLE;
 }
@@ -390,5 +389,5 @@ void Gizmo::update_scale()
     const float distance_to_camera = vsg::length(curr_pos - camera_pos);
     const float tan_half_fov = std::tan(fov_rad * 0.5f);
     const float scale = distance_to_camera * tan_half_fov * 0.075f;
-    this->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
+    matrix_transform->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
 }
