@@ -3,7 +3,6 @@
 #include "Action.h"
 #include "CameraHandler.h"
 #include "CommandList.h"
-#include "DeselectObjectsCommand.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
@@ -12,6 +11,7 @@
 #include "MoveObjectsCommand.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
+#include "SelectObjectsCommand.h"
 #include "SingleSwitch.h"
 
 #include <vsg/app/Viewer.h>
@@ -23,6 +23,7 @@
 #include <vsg/ui/PointerEvent.h>
 
 #include <cassert>
+#include <utility>
 
 ObjectSelector::ObjectSelector(
     const settings_t& settings,
@@ -106,7 +107,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         if (!selected_objects.empty() &&
             !keyboard_handler->get_any_shift_state())
         {
-            commands.push(new DeselectObjectsCommand(selected_objects), true);
+            commands.push(new SelectObjectsCommand({}, selected_objects), true);
         }
 
         return;
@@ -225,51 +226,51 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
 void ObjectSelector::select_object(RouteObject* object)
 {
-    auto& selected_objects = RouteObject::get_selected_objects();
-
     if (keyboard_handler->get_any_shift_state())
     {
         if (object->get_is_selected())
         {
-            object->deselect();
+            commands.push(new SelectObjectsCommand({}, {object}), true);
         }
         else
         {
-            object->select();
+            commands.push(new SelectObjectsCommand({object}, {}), true);
         }
     }
     else
     {
+        const auto& selected_objects = RouteObject::get_selected_objects();
+
         if (selected_objects.empty())
         {
-            object->select();
+            commands.push(new SelectObjectsCommand({object}, {}), true);
         }
         else if (object->get_is_selected())
         {
             if (selected_objects.size() == 1)
             {
-                object->deselect();
+                commands.push(new SelectObjectsCommand({}, {object}), true);
             }
             else
             {
-                for (auto it = selected_objects.begin();
-                    it != selected_objects.end();)
+                RouteObjects objects_to_deselect;
+
+                for (const auto& selected_object : selected_objects)
                 {
-                    if (*it == object)
+                    if (selected_object != object)
                     {
-                        ++it;
-                    }
-                    else
-                    {
-                        it = (*it)->deselect();
+                        objects_to_deselect.emplace_back(selected_object);
                     }
                 }
+
+                commands.push(new SelectObjectsCommand(
+                    {}, std::move(objects_to_deselect)), true);
             }
         }
         else
         {
-            commands.push(new DeselectObjectsCommand(selected_objects), true);
-            object->select();
+            commands.push(new SelectObjectsCommand(
+                {object}, selected_objects), true);
         }
     }
 }

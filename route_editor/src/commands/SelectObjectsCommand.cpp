@@ -4,31 +4,76 @@
 
 #include <cstdio>
 #include <string>
+#include <utility>
 
-SelectObjectsCommand::SelectObjectsCommand(const RouteObjects& objects)
-    : objects(objects)
+SelectObjectsCommand::SelectObjectsCommand(
+    const RouteObjects& objects_to_select,
+    const RouteObjects& objects_to_deselect
+)
+    : objects_to_select(objects_to_select)
+    , objects_to_deselect(objects_to_deselect)
+{
+}
+
+SelectObjectsCommand::SelectObjectsCommand(
+    const RouteObjects& objects_to_select,
+    const RouteObjects&& objects_to_deselect
+)
+    : objects_to_select(objects_to_select)
+    , objects_to_deselect(std::move(objects_to_deselect))
+{
+}
+
+SelectObjectsCommand::SelectObjectsCommand(
+    const RouteObjects&& objects_to_select,
+    const RouteObjects& objects_to_deselect
+)
+    : objects_to_select(std::move(objects_to_select))
+    , objects_to_deselect(objects_to_deselect)
+{
+}
+
+SelectObjectsCommand::SelectObjectsCommand(
+    const RouteObjects&& objects_to_select,
+    const RouteObjects&& objects_to_deselect
+)
+    : objects_to_select(std::move(objects_to_select))
+    , objects_to_deselect(std::move(objects_to_deselect))
 {
 }
 
 void SelectObjectsCommand::execute() const
 {
-    for (const auto& object : objects)
+    for (const auto& object : objects_to_select)
     {
         object->select();
     }
-}
 
-void SelectObjectsCommand::undo() const
-{
-    for (const auto& object : objects)
+    for (const auto& object : objects_to_deselect)
     {
         object->deselect();
     }
 }
 
+void SelectObjectsCommand::undo() const
+{
+    for (const auto& object : objects_to_select)
+    {
+        object->deselect();
+    }
+
+    for (const auto& object : objects_to_deselect)
+    {
+        object->select();
+    }
+}
+
 std::string SelectObjectsCommand::to_string() const
 {
-    char buffer[64];
-    std::snprintf(buffer, 64, "Select objects: %zu objects\n", objects.size());
+    char buffer[128];
+    std::snprintf(buffer, 128,
+        "Select objects: to select: %zu objects\n"
+        "                to deselect: %zu objects",
+        objects_to_select.size(), objects_to_deselect.size());
     return buffer;
 }
