@@ -49,10 +49,8 @@ ObjectSelector::ObjectSelector(
     assert(scene_graph);
     assert(observer_viewer);
 
-    auto& selected_objects = RouteObject::get_selected_objects();
-
     gizmo = Gizmo::create(settings, commands, camera_handler,
-        intersection_handler, selected_objects);
+        intersection_handler, RouteObject::get_selected_objects());
 
     front_plane_switch = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
@@ -82,12 +80,11 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    auto& selected_objects = RouteObject::get_selected_objects();
-    const bool selected_objects_are_empty = selected_objects.empty();
+    const auto& selected_objects = RouteObject::get_selected_objects();
 
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
-    if (!selected_objects_are_empty && gizmo->handle_intersections())
+    if (!selected_objects.empty() && gizmo->handle_intersections())
     {
         return;
     }
@@ -106,7 +103,8 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // If we clicked on empty space without shift
         // while there were selected objects,
         // deselect them all
-        if (!selected_objects_are_empty && !keyboard_handler->get_any_shift_state())
+        if (!selected_objects.empty() &&
+            !keyboard_handler->get_any_shift_state())
         {
             commands.push(new DeselectObjectsCommand(selected_objects), true);
         }
@@ -156,9 +154,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         const auto world_intersection = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
-        auto& selected_objects = RouteObject::get_selected_objects();
-
-        for (const auto& object : selected_objects)
+        for (const auto& object : RouteObject::get_selected_objects())
         {
             object->set_translation(object->get_initial_translation() +
                 world_intersection - begin_intersection_pos);
@@ -172,7 +168,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
-    auto& selected_objects = RouteObject::get_selected_objects();
+    const auto& selected_objects = RouteObject::get_selected_objects();
 
     if (state != State::KEYBOARD_GRAB && !selected_objects.empty() &&
         keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
@@ -231,11 +227,9 @@ void ObjectSelector::select_object(RouteObject* object)
 {
     auto& selected_objects = RouteObject::get_selected_objects();
 
-    const bool clicked_on_selected_object = object->get_is_selected();
-
     if (keyboard_handler->get_any_shift_state())
     {
-        if (clicked_on_selected_object)
+        if (object->get_is_selected())
         {
             object->deselect();
         }
@@ -250,7 +244,7 @@ void ObjectSelector::select_object(RouteObject* object)
         {
             object->select();
         }
-        else if (clicked_on_selected_object)
+        else if (object->get_is_selected())
         {
             if (selected_objects.size() == 1)
             {
