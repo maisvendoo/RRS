@@ -12,6 +12,7 @@
 #include <list>
 #include <string>
 
+class Gizmo;
 class RouteObject;
 class SingleSwitch;
 
@@ -52,6 +53,8 @@ public:
     static void set_observer_viewer(
         vsg::observer_ptr<vsg::Viewer> observer_viewer);
 
+    static void set_gizmo(Gizmo* gizmo);
+
     void set_translation(vsg::vec3 translation);
     void set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix);
     void set_scale(vsg::vec3 scale, bool update_matrix);
@@ -85,6 +88,7 @@ public:
 
 private:
     static vsg::observer_ptr<vsg::Viewer> s_observer_viewer;
+    static Gizmo* s_gizmo;
     static RouteObjects s_selected_objects;
     static RouteObjects s_hidden_objects;
 

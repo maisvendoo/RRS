@@ -22,6 +22,7 @@
 #include <string>
 
 vsg::observer_ptr<vsg::Viewer> RouteObject::s_observer_viewer;
+Gizmo* RouteObject::s_gizmo = nullptr;
 RouteObjects RouteObject::s_selected_objects;
 RouteObjects RouteObject::s_hidden_objects;
 
@@ -140,6 +141,11 @@ void RouteObject::set_observer_viewer(
     vsg::observer_ptr<vsg::Viewer> observer_viewer)
 {
     s_observer_viewer = observer_viewer;
+}
+
+void RouteObject::set_gizmo(Gizmo* gizmo)
+{
+    s_gizmo = gizmo;
 }
 
 void RouteObject::set_translation(vsg::vec3 translation)

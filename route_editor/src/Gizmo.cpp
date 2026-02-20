@@ -176,6 +176,8 @@ Gizmo::Gizmo(
     matrix_transform->addChild(line_z_switch);
 
     this->node = matrix_transform;
+
+    RouteObject::set_gizmo(this);
 }
 
 bool Gizmo::handle_intersections()
