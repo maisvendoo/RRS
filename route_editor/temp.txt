@@ -1,7 +1,9 @@
 EditorGui.h
+Gizmo.h
 ObjectSelector.h
 RouteEditor.h
 
 EditorGui.cpp
+Gizmo.cpp
 ObjectSelector.cpp
 RouteEditor.cpp
