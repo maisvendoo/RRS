@@ -3,9 +3,9 @@
 
 #include    <QObject>
 #include    "device.h"
-#include    "topology-trajectory-device.h"
 
 class Switch;
+class TrajectoryDevice;
 
 //------------------------------------------------------------------------------
 //
@@ -25,11 +25,10 @@ public:
     void setConnector(Switch* conn);
     Switch* getConnector() const;
 
-    virtual void setFwdTrajectoryDevice(TrajectoryDevice *traj_device);
-    virtual void setBwdTrajectoryDevice(TrajectoryDevice *traj_device);
+    void setTrajectoryDevice(TrajectoryDevice* traj_device, std::int8_t dir, std::int8_t orient);
 
-    virtual TrajectoryDevice *getFwdTrajectoryDevice() const;
-    virtual TrajectoryDevice *getBwdTrajectoryDevice() const;
+    TrajectoryDevice* getTrajectoryDevice(std::int8_t& dir) const;
+    std::int8_t getDeviceOrientation(TrajectoryDevice* traj_device) const;
 
     /// Шаг симуляции
     virtual void step(double t, double dt);
@@ -47,9 +46,13 @@ protected:
 
     Switch* connector = nullptr;
 
-    TrajectoryDevice *fwd_traj_device = nullptr;
+    TrajectoryDevice* fwd_traj_device = nullptr;
+    TrajectoryDevice* bwd_traj_device = nullptr;
 
-    TrajectoryDevice *bwd_traj_device = nullptr;
+    /// Orientation of forward trajectory: 1 - co-directional, -1 - reversed
+    std::int8_t fwd_dir = 1;
+    /// Orientation of backward trajectory: 1 - co-directional, -1 - reversed
+    std::int8_t bwd_dir = 1;
 
     /// Name of this device
     QString name = "";

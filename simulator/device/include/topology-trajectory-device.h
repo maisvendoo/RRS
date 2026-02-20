@@ -27,11 +27,9 @@ public:
     void setTrajectory(Trajectory *traj);
     Trajectory *getTrajectory() const;
 
-    virtual void setFwdConnectorDevice(ConnectorDevice *conn_device);
-    virtual void setBwdConnectorDevice(ConnectorDevice *conn_device);
+    void setConnectorDevice(ConnectorDevice *conn_device, std::int8_t dir);
 
-    virtual ConnectorDevice *getFwdConnectorDevice() const;
-    virtual ConnectorDevice *getBwdConnectorDevice() const;
+    ConnectorDevice *getNextConnectorDevice(std::int8_t& dir);
 
     /// Set Device for next step
     void clearLinks();

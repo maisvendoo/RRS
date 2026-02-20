@@ -37,33 +37,48 @@ Switch* ConnectorDevice::getConnector() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ConnectorDevice::setFwdTrajectoryDevice(TrajectoryDevice *traj_device)
+void ConnectorDevice::setTrajectoryDevice(TrajectoryDevice* traj_device, std::int8_t dir, std::int8_t orient)
 {
-    fwd_traj_device = traj_device;
+    if (dir >= 1)
+    {
+        fwd_traj_device = traj_device;
+        (orient >= 1) ? (fwd_dir = 1) : (fwd_dir = -1);
+    }
+    else
+    {
+        bwd_traj_device = traj_device;
+        (orient >= 1) ? (bwd_dir = 1) : (bwd_dir = -1);
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ConnectorDevice::setBwdTrajectoryDevice(TrajectoryDevice *traj_device)
+TrajectoryDevice* ConnectorDevice::getTrajectoryDevice(std::int8_t& dir) const
 {
-    bwd_traj_device = traj_device;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-TrajectoryDevice *ConnectorDevice::getFwdTrajectoryDevice() const
-{
-    return fwd_traj_device;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-TrajectoryDevice *ConnectorDevice::getBwdTrajectoryDevice() const
-{
+    if (dir >= 1)
+    {
+        dir = fwd_dir;
+        return fwd_traj_device;
+    }
+    dir = -bwd_dir;
     return bwd_traj_device;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::int8_t ConnectorDevice::getDeviceOrientation(TrajectoryDevice* traj_device) const
+{
+    if (traj_device == fwd_traj_device)
+    {
+        return fwd_dir;
+    }
+    if (traj_device == bwd_traj_device)
+    {
+        return bwd_dir;
+    }
+    return 1;
 }
 
 //------------------------------------------------------------------------------

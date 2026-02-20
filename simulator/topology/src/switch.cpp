@@ -335,33 +335,34 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
 
         // Настраиваем связи модулей траекторий и коннектора,
         // параллельно топологии
-        auto link_module = [](ConnectorDevice* module, QString& device_name,
-                              Trajectory* traj, bool is_switched)
+        auto link_module = [](ConnectorDevice* module, QString& conn_device_name,
+                              Trajectory* traj, std::int8_t dir, std::int8_t orient,
+                              bool is_switched)
         {
             if (traj == nullptr)
             {
                 return;
             }
 
-            for (auto* device_bwd : traj->getTrajectoryDevices())
+            for (auto* device : traj->getTrajectoryDevices())
             {
-                QString bwd_name = device_bwd->getName();
-                if (device_name == bwd_name)
+                QString traj_device_name = device->getName();
+                if (conn_device_name == traj_device_name)
                 {
                     if (is_switched)
                     {
-                        module->setBwdTrajectoryDevice(device_bwd);
+                        module->setTrajectoryDevice(device, dir, orient);
                     }
-                    device_bwd->setFwdConnectorDevice(module);
+                    device->setConnectorDevice(module, -(dir * orient));
                     break;
                 }
             }
         };
 
-        link_module(module, device_name, trajectories[SW_FWD_PLUS], (state_fwd > 0));
-        link_module(module, device_name, trajectories[SW_FWD_MINUS], (state_fwd < 0));
-        link_module(module, device_name, trajectories[SW_BWD_PLUS], (state_bwd > 0));
-        link_module(module, device_name, trajectories[SW_BWD_MINUS], (state_bwd < 0));
+        link_module(module, device_name, trajectories[SW_FWD_PLUS], 1, orientations[SW_FWD_PLUS], (state_fwd > 0));
+        link_module(module, device_name, trajectories[SW_FWD_MINUS], 1, orientations[SW_FWD_MINUS], (state_fwd < 0));
+        link_module(module, device_name, trajectories[SW_BWD_PLUS], -1, orientations[SW_BWD_PLUS], (state_bwd > 0));
+        link_module(module, device_name, trajectories[SW_BWD_MINUS], -1, orientations[SW_BWD_MINUS], (state_bwd < 0));
 
         // TODO конфигурирование?
 
@@ -445,75 +446,52 @@ void Switch::step(double t, double dt)
     }
 
     // Переключаем связи модулей паралельно переключениям топологии
-    int change_fwd = (sign(prev_state_fwd) != sign(state_fwd)) * sign(state_fwd);
-    int change_bwd = (sign(prev_state_bwd) != sign(state_bwd)) * sign(state_bwd);
-    for (auto device : devices)
+    std::int8_t change_fwd = (sign(prev_state_fwd) != sign(state_fwd)) * sign(state_fwd);
+    std::int8_t change_bwd = (sign(prev_state_bwd) != sign(state_bwd)) * sign(state_bwd);
+
+    auto link_module = [](ConnectorDevice* module, Trajectory* traj,
+                          std::int8_t dir, std::int8_t orient)
+    {
+        bool no_change = true;
+        for (auto* device_fwd : traj->getTrajectoryDevices())
+        {
+            if (module->getName() == device_fwd->getName())
+            {
+                module->setTrajectoryDevice(device_fwd, dir, orient);
+                no_change = false;
+                break;
+            }
+        }
+        if (no_change)
+        {
+            module->setTrajectoryDevice(nullptr, dir, orient);
+        }
+    };
+    for (auto conn_device : devices)
     {
         if (change_fwd > 0)
         {
-            bool no_change = true;
-            for (auto* device_fwd : trajectories[SW_FWD_PLUS]->getTrajectoryDevices())
-            {
-                if (device->getName() == device_fwd->getName())
-                {
-                    device->setFwdTrajectoryDevice(device_fwd);
-                    no_change = false;
-                    break;
-                }
-            }
-            if (no_change)
-                device->setFwdTrajectoryDevice(nullptr);
+            Switch_way_t way = SW_FWD_PLUS;
+            link_module(conn_device, trajectories[way], 1, orientations[way]);
         }
         if (change_fwd < 0)
         {
-            bool no_change = true;
-            for (auto* device_fwd : trajectories[SW_FWD_MINUS]->getTrajectoryDevices())
-            {
-                if (device->getName() == device_fwd->getName())
-                {
-                    device->setFwdTrajectoryDevice(device_fwd);
-                    no_change = false;
-                    break;
-                }
-            }
-            if (no_change)
-                device->setFwdTrajectoryDevice(nullptr);
+            Switch_way_t way = SW_FWD_MINUS;
+            link_module(conn_device, trajectories[way], 1, orientations[way]);
         }
 
         if (change_bwd > 0)
         {
-            bool no_change = true;
-            for (auto* device_bwd : trajectories[SW_BWD_PLUS]->getTrajectoryDevices())
-            {
-                if (device->getName() == device_bwd->getName())
-                {
-                    device->setBwdTrajectoryDevice(device_bwd);
-                    no_change = false;
-                    break;
-                }
-            }
-            if (no_change)
-                device->setBwdTrajectoryDevice(nullptr);
+            Switch_way_t way = SW_BWD_PLUS;
+            link_module(conn_device, trajectories[way], -1, orientations[way]);
         }
         if (change_bwd < 0)
         {
-            bool no_change = true;
-            for (auto* device_bwd : trajectories[SW_BWD_MINUS]->getTrajectoryDevices())
-            {
-                if (device->getName() == device_bwd->getName())
-                {
-                    device->setBwdTrajectoryDevice(device_bwd);
-                    no_change = false;
-                    break;
-                }
-            }
-            if (no_change)
-                device->setBwdTrajectoryDevice(nullptr);
+            Switch_way_t way = SW_BWD_MINUS;
+            link_module(conn_device, trajectories[way], -1, orientations[way]);
         }
-    }
 
-    for (auto conn_device : devices)
-    {
+        // Шаг моделирования модулей путевой инфраструктуры
         conn_device->step(t, dt);
     }
 }
