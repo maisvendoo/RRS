@@ -27,7 +27,7 @@ public:
 
     void setTrajectoryDevice(TrajectoryDevice* traj_device, std::int8_t dir, std::int8_t orient);
 
-    TrajectoryDevice* getTrajectoryDevice(std::int8_t& dir) const;
+    TrajectoryDevice* getNextTrajectoryDevice(std::int8_t& dir) const;
     std::int8_t getDeviceOrientation(TrajectoryDevice* traj_device) const;
 
     /// Шаг симуляции

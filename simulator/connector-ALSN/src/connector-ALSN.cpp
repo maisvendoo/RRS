@@ -22,51 +22,13 @@ ConnectorALSN::~ConnectorALSN()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TrajectoryDevice *ConnectorALSN::getFwdTrajectoryDevice() const
-{
-    // Если есть светофор назад, не пропускаем поиск по топологии
-    // от предыдущих светофоров вперёд
-    if (is_signal_bwd)
-        return nullptr;
-
-    return fwd_traj_device;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-TrajectoryDevice *ConnectorALSN::getBwdTrajectoryDevice() const
-{
-    // Если есть светофор вперёд, не пропускаем поиск по топологии
-    // от следующих светофоров назад
-    if (is_signal_fwd)
-        return nullptr;
-
-    return bwd_traj_device;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void ConnectorALSN::step(double t, double dt)
 {
     (void) t;
     (void) dt;
 
-    TrainSignal* signal_fwd = dynamic_cast<TrainSignal*>(connector->getSignalFwd());
-    if (signal_fwd == nullptr)
-        is_signal_fwd = false;
-    else
-        is_signal_fwd = true;
-
-    TrainSignal* signal_bwd = dynamic_cast<TrainSignal*>(connector->getSignalBwd());
-    if (signal_bwd == nullptr)
-        is_signal_bwd = false;
-    else
-        is_signal_bwd = true;
-
     // Код АЛСН из светофора вперёд для частотного сигнала у траектории сзади
-    if (is_signal_fwd)
+    if (TrainSignal* signal_fwd = dynamic_cast<TrainSignal*>(connector->getSignalFwd()))
     {
         TrajectoryALSN *traj_device = dynamic_cast<TrajectoryALSN *>(bwd_traj_device);
         if (traj_device != nullptr)
@@ -91,12 +53,12 @@ void ConnectorALSN::step(double t, double dt)
                     }
                 }
             }
-            traj_device->setSignalInfoFwd(code, 0.0, signal_fwd->getLetter());
+            traj_device->setNextSignalInfo(-bwd_dir, code, 0.0, signal_fwd->getLetter());
         }
     }
 
     // Код АЛСН из светофора назад для частотного сигнала у траектории спереди
-    if (is_signal_bwd)
+    if (TrainSignal* signal_bwd = dynamic_cast<TrainSignal*>(connector->getSignalBwd()))
     {
         TrajectoryALSN *traj_device = dynamic_cast<TrajectoryALSN *>(fwd_traj_device);
         if (traj_device != nullptr)
@@ -121,7 +83,7 @@ void ConnectorALSN::step(double t, double dt)
                     }
                 }
             }
-            traj_device->setSignalInfoBwd(code, 0.0, signal_bwd->getLetter());
+            traj_device->setNextSignalInfo(fwd_dir, code, 0.0, signal_bwd->getLetter());
         }
     }
 }

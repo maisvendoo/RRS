@@ -14,15 +14,9 @@ public:
 
     ~ConnectorALSN();
 
-    TrajectoryDevice *getFwdTrajectoryDevice() const;
-    TrajectoryDevice *getBwdTrajectoryDevice() const;
-
     void step(double t, double dt);
 
 private:
-
-    bool is_signal_fwd = false;
-    bool is_signal_bwd = false;
 
     void load_config(CfgReader &cfg);
 };

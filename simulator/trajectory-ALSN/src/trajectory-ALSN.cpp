@@ -3,6 +3,7 @@
 #include    "topology-connector-device.h"
 #include    "trajectory.h"
 #include    "switch.h"
+#include    "train-signal.h"
 
 #include    "physics.h"
 
@@ -137,91 +138,60 @@ void TrajectoryALSN::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrajectoryALSN::setSignalInfoFwd(ALSN code, double distance, QString liter)
+void TrajectoryALSN::setNextSignalInfo(std::int8_t dir, ALSN code, double distance, QString liter)
 {
+    ALSN& code_from_dir = (dir >= 1) ? code_from_fwd : code_from_bwd;
+    double& distance_dir = (dir >= 1) ? distance_fwd : distance_bwd;
+    QString& next_liter_dir = (dir >= 1) ? next_liter_fwd : next_liter_bwd;
+
     if (frequency == 0.0)
     {
-        code_from_fwd = ALSN::NO_CODE;
+        code_from_dir = ALSN::NO_CODE;
     }
     else
     {
-        code_from_fwd = code;
+        code_from_dir = code;
     }
 
-    distance_fwd = distance;
-    next_liter_fwd = liter;
+    distance_dir = distance;
+    next_liter_dir = liter;
 
-    ALSN code_to_next = code_from_fwd;
-
-    // Если траектория занята, дальше код не проходит
-    if (trajectory->isBusy())
-        code_to_next = ALSN::NO_CODE;
-
-    // Переход к рельсовым цепям предыдущей траектории
-    // Модуль коннектора к предыдущей траектории
-    auto conn_device = getBwdConnectorDevice();
-    if (conn_device == nullptr)
-        return;
-
-    // Проверяем стрелку на взрез
-    Switch* conn = conn_device->getConnector();
-    dir_t dir = FWD;
-    if (conn->getNextTraj(dir) != trajectory)
-        return;
-
-    // Предыдущая траектория
-    TrajectoryALSN *traj_ALSN = dynamic_cast<TrajectoryALSN *>(
-        conn_device->getBwdTrajectoryDevice());
-    if (traj_ALSN == nullptr)
-        return;
-
-    // Передаём информацию дальше
-    traj_ALSN->setSignalInfoFwd(code_to_next, distance + trajectory->getLength(), liter);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TrajectoryALSN::setSignalInfoBwd(ALSN code, double distance, QString liter)
-{
-    if (frequency == 0.0)
-    {
-        code_from_bwd = ALSN::NO_CODE;
-    }
-    else
-    {
-        code_from_bwd = code;
-    }
-
-    distance_bwd = distance;
-    next_liter_bwd = liter;
-
-    ALSN code_to_next = code_from_bwd;
+    ALSN code_to_next = code_from_dir;
 
     // Если траектория занята, дальше код не проходит
     if (trajectory->isBusy())
         code_to_next = ALSN::NO_CODE;
 
     // Переход к рельсовым цепям следующей траектории
+    std::int8_t next_dir = dir;
     // Модуль коннектора к следующей траектории
-    auto conn_device = getFwdConnectorDevice();
+    auto conn_device = getNextConnectorDevice(dir);
     if (conn_device == nullptr)
+    {
         return;
+    }
 
-    // Проверяем стрелку на взрез
+    // Проверяем: если стрелка на взрез, или здесь следующий светофор, дальше код не проходит
     Switch* conn = conn_device->getConnector();
-    dir_t dir = BWD;
-    if (conn->getNextTraj(dir) != trajectory)
-        return;
+    if (next_dir >= 1)
+    {
+        dir_t traj_dir = BWD;
+        if ((conn->getNextTraj(traj_dir) != trajectory) || (dynamic_cast<TrainSignal*>(conn->getSignalFwd())))
+        {
+            return;
+        }
+    }
 
     // Следующая траектория
-    TrajectoryALSN *traj_ALSN = dynamic_cast<TrajectoryALSN *>(
-        conn_device->getFwdTrajectoryDevice());
+    TrajectoryALSN* traj_ALSN = dynamic_cast<TrajectoryALSN*>(
+        conn_device->getNextTrajectoryDevice(next_dir));
     if (traj_ALSN == nullptr)
+    {
         return;
+    }
 
     // Передаём информацию дальше
-    traj_ALSN->setSignalInfoBwd(code_to_next, distance + trajectory->getLength(), liter);
+    traj_ALSN->setNextSignalInfo(next_dir, code_to_next, distance + trajectory->getLength(), liter);
 }
 
 //------------------------------------------------------------------------------

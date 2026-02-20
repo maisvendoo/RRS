@@ -54,7 +54,7 @@ void ConnectorDevice::setTrajectoryDevice(TrajectoryDevice* traj_device, std::in
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TrajectoryDevice* ConnectorDevice::getTrajectoryDevice(std::int8_t& dir) const
+TrajectoryDevice* ConnectorDevice::getNextTrajectoryDevice(std::int8_t& dir) const
 {
     if (dir >= 1)
     {

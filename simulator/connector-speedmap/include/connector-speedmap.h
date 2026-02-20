@@ -14,8 +14,6 @@ public:
 
     ~ConnectorSpeedMap();
 
-    virtual void step(double t, double dt);
-
 private:
 
     void load_config(CfgReader &cfg);
