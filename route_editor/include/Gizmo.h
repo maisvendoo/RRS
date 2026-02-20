@@ -44,7 +44,6 @@ public:
 
     void update_visibility();
     void update_position();
-    void update_scale();
 
 private:
     const settings_t& settings;
@@ -69,6 +68,7 @@ private:
     vsg::vec3 click_pos;
     vsg::vec3 prev_intersect_pos;
     vsg::vec3 total_translation;
+    float scale;
 
     vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;

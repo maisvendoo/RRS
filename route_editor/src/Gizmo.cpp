@@ -53,8 +53,7 @@ Gizmo::Gizmo(
     const vsg::vec3 arrow_y_color = settings.gizmo_arrow_y_color;
     const vsg::vec3 arrow_z_color = settings.gizmo_arrow_z_color;
 
-    const float plane_width = 100.0f;
-    const float plane_opacity = 0.1f;
+    const float plane_width = 1.0e6f;
     const float line_thickness = 0.01f;
 
     vsg::StateInfo state_info;
@@ -106,11 +105,9 @@ Gizmo::Gizmo(
         return arrow;
     };
 
-    const auto create_plane = [&](vsg::vec3 normal,
-        vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
+    const auto create_plane = [&](vsg::vec3 normal) -> vsg::ref_ptr<vsg::Node>
     {
         const float width = plane_width;
-        const float opacity = plane_opacity;
 
         const vsg::box box = {
             vsg::vec3(-width, -width, 0.0f),
@@ -119,7 +116,6 @@ Gizmo::Gizmo(
 
         vsg::GeometryInfo geometry_info(box);
         rotate_geometry_info(geometry_info, normal);
-        geometry_info.color = {color, opacity};
 
         return builder.createQuad(geometry_info, state_info);
     };
@@ -148,13 +144,13 @@ Gizmo::Gizmo(
     arrow_z = create_arrow(Z_AXIS_POSITIVE, arrow_z_color);
 
     plane_yz_switch = SingleSwitch::create(vsg::MASK_OFF,
-        create_plane(X_AXIS_POSITIVE, arrow_x_color));
+        create_plane(X_AXIS_POSITIVE));
 
     plane_xz_switch = SingleSwitch::create(vsg::MASK_OFF,
-        create_plane(Y_AXIS_POSITIVE, arrow_y_color));
+        create_plane(Y_AXIS_POSITIVE));
 
     plane_xy_switch = SingleSwitch::create(vsg::MASK_OFF,
-        create_plane(Z_AXIS_POSITIVE, arrow_z_color));
+        create_plane(Z_AXIS_POSITIVE));
 
     line_x_switch = SingleSwitch::create(vsg::MASK_OFF,
         create_line(X_AXIS_POSITIVE, arrow_x_color));
@@ -177,6 +173,8 @@ Gizmo::Gizmo(
     matrix_transform->addChild(line_z_switch);
 
     this->node = matrix_transform;
+
+    update_visibility();
 
     RouteObject::set_gizmo(this);
     SelectObjectsCommand::set_gizmo(this);
@@ -356,6 +354,17 @@ void Gizmo::update_visibility()
     this->mask = selected_objects.empty()
         ? vsg::MASK_OFF
         : MASK_GUI1 | MASK_CLICKABLE;
+
+    const auto camera_pos = static_cast<vsg::vec3>(camera_handler->get_eye());
+
+    const auto fov_rad = vsg::radians(static_cast<float>(
+        camera_handler->get_fov_deg()));
+
+    const float distance_to_camera = vsg::length(curr_pos - camera_pos);
+    const float tan_half_fov = std::tan(fov_rad * 0.5f);
+    scale = distance_to_camera * tan_half_fov * 0.075f;
+
+    matrix_transform->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
 }
 
 void Gizmo::update_position()
@@ -379,17 +388,6 @@ void Gizmo::update_position()
     }
 
     curr_pos /= static_cast<float>(selected_objects.size());
-}
 
-void Gizmo::update_scale()
-{
-    const auto camera_pos = static_cast<vsg::vec3>(camera_handler->get_eye());
-
-    const auto fov_rad = vsg::radians(static_cast<float>(
-        camera_handler->get_fov_deg()));
-
-    const float distance_to_camera = vsg::length(curr_pos - camera_pos);
-    const float tan_half_fov = std::tan(fov_rad * 0.5f);
-    const float scale = distance_to_camera * tan_half_fov * 0.075f;
     matrix_transform->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
 }

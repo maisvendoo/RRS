@@ -157,7 +157,7 @@ void RouteObject::set_translation(vsg::vec3 translation)
     this->matrix[3][1] = this->translation.y;
     this->matrix[3][2] = this->translation.z;
 
-    s_gizmo->update_position();
+    update_bounds();
 }
 
 void RouteObject::set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix)
@@ -188,7 +188,7 @@ void RouteObject::move(vsg::vec3 translation)
     this->matrix[3][1] = this->translation.y;
     this->matrix[3][2] = this->translation.z;
 
-    s_gizmo->update_position();
+    update_bounds();
 }
 
 void RouteObject::rotate(vsg::vec3 rotation_deg, bool update_matrix)

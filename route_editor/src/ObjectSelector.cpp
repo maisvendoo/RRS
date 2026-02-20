@@ -218,8 +218,6 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
         vsg::updateViewer(*viewer, compile_result);
     }
-
-    gizmo->update_scale();
 }
 
 void ObjectSelector::select_object(RouteObject* object)
