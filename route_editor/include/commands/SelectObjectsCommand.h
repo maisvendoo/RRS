@@ -6,6 +6,8 @@
 
 #include <string>
 
+class Gizmo;
+
 class SelectObjectsCommand : public Command
 {
 public:
@@ -34,7 +36,11 @@ public:
     virtual void undo() const override;
     virtual std::string to_string() const override;
 
+    static void set_gizmo(Gizmo* gizmo);
+
 private:
+    static Gizmo* s_gizmo;
+
     const RouteObjects objects_to_select;
     const RouteObjects objects_to_deselect;
 };

@@ -1,10 +1,13 @@
 #include "SelectObjectsCommand.h"
 
+#include "Gizmo.h"
 #include "RouteObject.h"
 
 #include <cstdio>
 #include <string>
 #include <utility>
+
+Gizmo* SelectObjectsCommand::s_gizmo = nullptr;
 
 SelectObjectsCommand::SelectObjectsCommand(
     const RouteObjects& objects_to_select,
@@ -53,6 +56,8 @@ void SelectObjectsCommand::execute() const
     {
         object->deselect();
     }
+
+    s_gizmo->update_visibility();
 }
 
 void SelectObjectsCommand::undo() const
@@ -66,6 +71,8 @@ void SelectObjectsCommand::undo() const
     {
         object->select();
     }
+
+    s_gizmo->update_visibility();
 }
 
 std::string SelectObjectsCommand::to_string() const
@@ -76,4 +83,9 @@ std::string SelectObjectsCommand::to_string() const
         "                to deselect: %zu objects",
         objects_to_select.size(), objects_to_deselect.size());
     return buffer;
+}
+
+void SelectObjectsCommand::set_gizmo(Gizmo* gizmo)
+{
+    s_gizmo = gizmo;
 }

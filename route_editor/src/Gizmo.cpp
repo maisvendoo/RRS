@@ -6,6 +6,7 @@
 #include "Mask.h"
 #include "MoveObjectsCommand.h"
 #include "RouteObject.h"
+#include "SelectObjectsCommand.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
 
@@ -178,6 +179,7 @@ Gizmo::Gizmo(
     this->node = matrix_transform;
 
     RouteObject::set_gizmo(this);
+    SelectObjectsCommand::set_gizmo(this);
 }
 
 bool Gizmo::handle_intersections()

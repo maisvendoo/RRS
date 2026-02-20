@@ -272,7 +272,6 @@ void RouteObject::select()
 
     s_selected_objects.emplace_back(this);
 
-    s_gizmo->update_visibility();
     s_gizmo->update_position();
 }
 
@@ -285,7 +284,6 @@ RouteObjectsIterator RouteObject::deselect()
     const auto it = s_selected_objects.erase(std::find(
         s_selected_objects.cbegin(), s_selected_objects.cend(), this));
 
-    s_gizmo->update_visibility();
     s_gizmo->update_position();
 
     return it;
