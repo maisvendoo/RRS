@@ -175,12 +175,12 @@ bool Signal::calcPosition()
     Trajectory* traj = nullptr;
     if (signal_dir == 1)
     {
-        dir_t d = FWD;
+        dir_t d = BWD;
         traj = conn->getNextTraj(d);
     }
     if (signal_dir == -1)
     {
-        dir_t d = BWD;
+        dir_t d = FWD;
         traj = conn->getNextTraj(d);
     }
 
