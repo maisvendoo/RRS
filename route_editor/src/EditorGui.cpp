@@ -133,11 +133,13 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 if (curr == active)
                 {
-                    ImGui::TextColored(ImVec4{1.0f, 0.0f, 0.0f, 1.0f}, "%s", curr->command->to_string().c_str());
+                    ImGui::Text("--> %s", curr->command->to_string().c_str());
+                    ImGui::Separator();
                 }
                 else
                 {
                     ImGui::Text("%s", curr->command->to_string().c_str());
+                    ImGui::Separator();
                 }
 
                 curr = curr->prev;
@@ -324,6 +326,28 @@ void EditorGui::show_key_bindings() const
             ImGui::TableNextColumn();
 
             std::string label;
+
+            static const std::map<EditorKeyModifier, const char*> test_map = {
+                {EDITOR_KEY_MODIFIER_SHIFT_L, "LShift"},
+                {EDITOR_KEY_MODIFIER_SHIFT_R, "RShift"},
+                {EDITOR_KEY_MODIFIER_SHIFT_ANY, "Shift"},
+                {EDITOR_KEY_MODIFIER_CTRL_L, "LCtrl"},
+                {EDITOR_KEY_MODIFIER_CTRL_R, "RCtrl"},
+                {EDITOR_KEY_MODIFIER_CTRL_ANY, "Ctrl"},
+                {EDITOR_KEY_MODIFIER_ALT_L, "LAlt"},
+                {EDITOR_KEY_MODIFIER_ALT_R, "RAlt"},
+                {EDITOR_KEY_MODIFIER_ALT_ANY, "Alt"}
+            };
+
+            for (const auto& [modifier, name] : test_map)
+            {
+                if (key_bindings[i].modifiers & modifier)
+                {
+                    label += name;
+                    label += " + ";
+                }
+            }
+
             label += std::toupper(key_bindings[i].key);
             ImGui::Text("%s", label.c_str());
         }
@@ -491,7 +515,7 @@ void EditorGui::show_selected_objects_properties() const
         return;
     }
 
-    const auto& selected_objects = object_selector->get_selected_objects();
+    const auto& selected_objects = RouteObject::get_selected_objects();
     if (selected_objects.empty())
     {
         return;
@@ -505,8 +529,7 @@ void EditorGui::show_selected_objects_properties() const
     {
         ImGui::Text("label: %s", object->label.c_str());
 
-        std::string label = "translation##";
-        label += std::to_string(i);
+        std::string label = "translation##" + std::to_string(i);
 
         vsg::vec3 translation = object->get_translation();
         if (ImGui::DragFloat3(label.c_str(), translation.data()))
@@ -514,16 +537,93 @@ void EditorGui::show_selected_objects_properties() const
             object->set_translation(translation);
         }
 
-        label = "rotation##";
-        label += std::to_string(i);
+        label = "rotation##" + std::to_string(i);
 
         vsg::vec3 rotation_deg = object->get_rotation_deg();
-        if (ImGui::DragFloat3(label.c_str(), rotation_deg.data()))
+        if (ImGui::DragFloat3(label.c_str(), rotation_deg.data(), 0.2f))
         {
-            object->set_rotation_deg(rotation_deg);
+            object->set_rotation_deg(rotation_deg, true);
+        }
+
+        label = "scale##" + std::to_string(i);
+
+        vsg::vec3 scale = object->get_scale();
+        if (ImGui::DragFloat3(label.c_str(), scale.data(), 0.01f))
+        {
+            object->set_scale(scale, true);
         }
 
         ++i;
+    }
+
+    vsg::vec3 center = {0.0f, 0.0f, 0.0f};
+    for (const auto& object : selected_objects)
+    {
+        center += object->get_translation();
+    }
+    center /= static_cast<float>(selected_objects.size());
+
+    if (ImGui::Button("Rotate X 30"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->rotate_around_pivot(center,
+                vsg::vec3{30.0f, 0.0f, 0.0f}, object->matrix);
+        }
+    }
+
+    if (ImGui::Button("Rotate Y 30"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->rotate_around_pivot(center,
+                vsg::vec3{0.0f, 30.0f, 0.0f}, object->matrix);
+        }
+    }
+
+    if (ImGui::Button("Rotate Z 30"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->rotate_around_pivot(center,
+                vsg::vec3{0.0f, 0.0f, 30.0f}, object->matrix);
+        }
+    }
+
+    if (ImGui::Button("Scale X 2"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->scale_relative_to_pivot(center,
+                vsg::vec3{2.0f, 1.0f, 1.0f}, object->matrix);
+        }
+    }
+
+    if (ImGui::Button("Scale Y 2"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->scale_relative_to_pivot(center,
+                vsg::vec3{1.0f, 2.0f, 1.0f}, object->matrix);
+        }
+    }
+
+    if (ImGui::Button("Scale Z 2"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->scale_relative_to_pivot(center,
+                vsg::vec3{1.0f, 1.0f, 2.0f}, object->matrix);
+        }
+    }
+
+    if (ImGui::Button("Scale X 0.5"))
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->scale_relative_to_pivot(center,
+                vsg::vec3{0.5f, 1.0f, 1.0f}, object->matrix);
+        }
     }
 
     ImGui::End();

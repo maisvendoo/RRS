@@ -73,19 +73,16 @@ void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
         case MOUSE_BUTTON_LEFT:
         {
             lmb_intersector = nullptr;
-
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
             mmb_intersector = nullptr;
-
             return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
             rmb_intersector = nullptr;
-
             return;
         }
         default:

@@ -2,28 +2,33 @@
 
 #include "RouteObject.h"
 
-#include <vsg/core/ref_ptr.h>
-
+#include <cstdio>
 #include <string>
-#include <vector>
 
-ShowObjectsCommand::ShowObjectsCommand(
-    const std::vector<vsg::ref_ptr<RouteObject>>& objects)
+ShowObjectsCommand::ShowObjectsCommand(const RouteObjects& objects)
     : objects(objects)
 {
 }
 
 void ShowObjectsCommand::execute() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->show();
+    }
 }
 
 void ShowObjectsCommand::undo() const
 {
-    // TODO
+    for (const auto& object : objects)
+    {
+        object->hide();
+    }
 }
 
 std::string ShowObjectsCommand::to_string() const
 {
-    // TODO
+    char buffer[64];
+    std::snprintf(buffer, 64, "Show objects: %zu objects\n", objects.size());
+    return buffer;
 }

@@ -1,17 +1,15 @@
 #include "Outline.h"
 
-#include "RouteObject.h"
 #include "Settings.h"
 #include "filesystem.h"
 #include "shader_funcs.h"
 
 #include <vsg/app/Viewer.h>
+#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>
 #include <vsg/io/Options.h>
-#include <vsg/io/read.h>
 #include <vsg/maths/box.h>
-#include <vsg/nodes/Node.h>
 #include <vsg/nodes/PagedLOD.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
@@ -44,33 +42,6 @@ Outline::Outline(vsg::ref_ptr<vsg::PagedLOD> paged_lod)
     : paged_lod(paged_lod)
 {
     assert(paged_lod);
-
-    // static OutlineStatic outline_static;
-
-    // const auto options = outline_static.options;
-    // auto& builder = outline_static.builder;
-
-    // const auto wireframe_outline = vsg::read_cast<vsg::Node>(
-    //     paged_lod->filename, options);
-
-    // vsg::ComputeBounds compute_bounds;
-    // compute_bounds.useNodeBounds = false;
-    // wireframe_outline->accept(compute_bounds);
-
-    // const vsg::GeometryInfo geometry_info(vsg::box(compute_bounds.bounds));
-
-    // vsg::StateInfo state_info;
-    // state_info.blending = true;
-    // state_info.wireframe = true;
-
-    // const auto box_outline = builder.createBox(geometry_info, state_info);
-
-    // if (settings.show_wireframe)
-    // {
-    //     this->addChild(wireframe_outline);
-    // }
-
-    // this->addChild(box_outline);
 }
 
 void Outline::load(vsg::observer_ptr<vsg::Viewer> observer_viewer)
@@ -85,6 +56,8 @@ void Outline::load(vsg::observer_ptr<vsg::Viewer> observer_viewer)
         return;
     }
 
+    static OutlineStatic outline_static;
+
     vsg::ComputeBounds compute_bounds;
     compute_bounds.useNodeBounds = false;
     paged_lod->pending->accept(compute_bounds);
@@ -94,8 +67,6 @@ void Outline::load(vsg::observer_ptr<vsg::Viewer> observer_viewer)
     vsg::StateInfo state_info;
     state_info.blending = true;
     state_info.wireframe = true;
-
-    static OutlineStatic outline_static;
 
     const auto viewer = observer_viewer.ref_ptr();
     const auto compile_manager = viewer->compileManager;
@@ -123,8 +94,6 @@ OutlineStatic::OutlineStatic()
     options->add(vsgXchange::all::create());
 
     const auto flat_shader = vsg::createFlatShadedShaderSet(options);
-    // const auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
-    // const auto phong_shader = vsg::createPhongShaderSet(options);
 
     const FileSystem& fs = FileSystem::getInstance();
     const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
@@ -136,33 +105,11 @@ OutlineStatic::OutlineStatic()
         shaders_dir.c_str(), "outline.frag", options);
 
     configure_shader_set(vert_shader, frag_shader, "flat", flat_shader);
-    // configure_shader_set(vert_shader, frag_shader, "pbr", pbr_shader);
-    // configure_shader_set(vert_shader, frag_shader, "phong", phong_shader);
-
-//     VkPipelineColorBlendAttachmentState color_blend_attachment = {};
-//     color_blend_attachment.blendEnable = VK_TRUE;
-//     color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-//     color_blend_attachment.dstColorBlendFactor =
-//         VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-//     color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;
-//     color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-//     color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-//     color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
-//     color_blend_attachment.colorWriteMask =
-//         VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-//         VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-
-//     const auto color_blend_state = vsg::ColorBlendState::create();
-//     color_blend_state->attachments = {color_blend_attachment};
-
-//     const auto depth_stencil_state = vsg::DepthStencilState::create();
-//     depth_stencil_state->depthTestEnable = VK_TRUE;
-//     depth_stencil_state->depthWriteEnable = VK_FALSE;
 
     const auto rasterization_state = vsg::RasterizationState::create();
     rasterization_state->cullMode = VK_CULL_MODE_NONE;
     rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
-    rasterization_state->lineWidth = 2.0f;
+    rasterization_state->lineWidth = 1.2f;
 
     const vsg::GraphicsPipelineStates default_graphics_pipeline_states = {
         vsg::VertexInputState::create(),
@@ -176,18 +123,5 @@ OutlineStatic::OutlineStatic()
     flat_shader->defaultGraphicsPipelineStates =
         default_graphics_pipeline_states;
 
-    // pbr_shader->defaultGraphicsPipelineStates =
-    //     default_graphics_pipeline_states;
-
-    // phong_shader->defaultGraphicsPipelineStates =
-    //     default_graphics_pipeline_states;
-
-    // options->shaderSets.clear();
-    // options->shaderSets["flat"] = flat_shader;
-    // options->shaderSets["pbr"] = pbr_shader;
-    // options->shaderSets["phong"] = phong_shader;
-
-    // builder.options = options;
-    // builder.sharedObjects = options->sharedObjects;
     builder.shaderSet = flat_shader;
 }

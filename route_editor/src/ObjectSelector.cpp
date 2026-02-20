@@ -9,10 +9,9 @@
 #include "Mask.h"
 #include "MouseHandler.h"
 #include "MoveObjectsCommand.h"
-#include "Outline.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
-#include "SelectedObjects.h"
+#include "SelectObjectsCommand.h"
 #include "SingleSwitch.h"
 
 #include <vsg/app/Viewer.h>
@@ -23,8 +22,8 @@
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/PointerEvent.h>
 
-#include <algorithm>
 #include <cassert>
+#include <utility>
 
 ObjectSelector::ObjectSelector(
     const settings_t& settings,
@@ -51,15 +50,13 @@ ObjectSelector::ObjectSelector(
     assert(scene_graph);
     assert(observer_viewer);
 
-    gizmo = Gizmo::create(settings, camera_handler,
-        intersection_handler, selected_objects);
-
-    gizmo_switch = SingleSwitch::create(vsg::MASK_OFF, gizmo);
+    gizmo = Gizmo::create(settings, commands, camera_handler,
+        intersection_handler, RouteObject::get_selected_objects());
 
     front_plane_switch = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
 
-    scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo_switch);
+    scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo);
     scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, front_plane_switch);
 }
 
@@ -84,11 +81,11 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    const bool selected_objects_are_empty = selected_objects.empty();
+    const auto& selected_objects = RouteObject::get_selected_objects();
 
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
-    if (!selected_objects_are_empty && gizmo->handle_intersections())
+    if (!selected_objects.empty() && gizmo->handle_intersections())
     {
         return;
     }
@@ -107,25 +104,22 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // If we clicked on empty space without shift
         // while there were selected objects,
         // deselect them all
-        if (!selected_objects_are_empty && !keyboard_handler->get_any_shift_state())
+        if (!selected_objects.empty() &&
+            !keyboard_handler->get_any_shift_state())
         {
-            deselect_all_objects();
+            commands.push(new SelectObjectsCommand({}, selected_objects), true);
         }
-
-        gizmo_switch->mask = selected_objects.empty()
-            ? vsg::MASK_OFF
-            : MASK_GUI1 | MASK_CLICKABLE;
 
         return;
     }
 
-    intersection_handler->sort_intersections(intersections);
+    const auto intersection = intersection_handler->get_closest_intersection(
+        intersector);
 
-    const auto& node_path = intersections.front()->nodePath;
-    for (const vsg::Node* const node : node_path)
+    for (const vsg::Node* const node : intersection->nodePath)
     {
-        if (const auto object = vsg::ref_ptr(const_cast<RouteObject*>(
-            node->cast<RouteObject>())))
+        if (RouteObject* object = const_cast<RouteObject*>(
+            node->cast<RouteObject>()))
         {
             select_object(object);
             break;
@@ -133,15 +127,6 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     }
 
     intersections.clear();
-
-    if (selected_objects.empty())
-    {
-        gizmo_switch->mask = vsg::MASK_OFF;
-    }
-    else
-    {
-        gizmo_switch->mask = MASK_GUI1 | MASK_CLICKABLE;
-    }
 }
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
@@ -170,7 +155,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         const auto world_intersection = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
-        for (const auto& object : selected_objects)
+        for (const auto& object : RouteObject::get_selected_objects())
         {
             object->set_translation(object->get_initial_translation() +
                 world_intersection - begin_intersection_pos);
@@ -183,6 +168,8 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
+
+    const auto& selected_objects = RouteObject::get_selected_objects();
 
     if (state != State::KEYBOARD_GRAB && !selected_objects.empty() &&
         keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
@@ -231,93 +218,57 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
         vsg::updateViewer(*viewer, compile_result);
     }
-
-    gizmo->update_position();
-    gizmo->update_scale();
 }
 
-const SelectedObjects& ObjectSelector::get_selected_objects() const
+void ObjectSelector::select_object(RouteObject* object)
 {
-    return selected_objects;
-}
-
-void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
-{
-    const auto found_it = std::find(selected_objects.cbegin(),
-        selected_objects.cend(), object);
-
-    const bool clicked_on_selected_object = found_it != selected_objects.cend();
-
-    const auto select_object_inner = [&]() -> void
-    {
-        object->select();
-        selected_objects.emplace_back(object);
-    };
-
     if (keyboard_handler->get_any_shift_state())
     {
-        if (clicked_on_selected_object)
+        if (object->get_is_selected())
         {
-            deselect_object(object);
+            commands.push(new SelectObjectsCommand({}, {object}), true);
         }
         else
         {
-            select_object_inner();
+            commands.push(new SelectObjectsCommand({object}, {}), true);
         }
     }
     else
     {
+        const auto& selected_objects = RouteObject::get_selected_objects();
+
         if (selected_objects.empty())
         {
-            select_object_inner();
+            commands.push(new SelectObjectsCommand({object}, {}), true);
         }
-        else if (clicked_on_selected_object)
+        else if (object->get_is_selected())
         {
+            RouteObjects objects_to_deselect;
+
             if (selected_objects.size() == 1)
             {
-                deselect_object(object);
+                objects_to_deselect.emplace_back(object);
             }
             else
             {
-                for (auto it = selected_objects.begin();
-                    it != selected_objects.end();)
+                for (const auto& selected_object : selected_objects)
                 {
-                    if (*it == object)
+                    if (selected_object != object)
                     {
-                        ++it;
-                    }
-                    else
-                    {
-                        it = deselect_object(*it);
+                        objects_to_deselect.emplace_back(selected_object);
                     }
                 }
             }
+
+            commands.push(new SelectObjectsCommand(
+                {}, std::move(objects_to_deselect)), true);
         }
         else
         {
-            deselect_all_objects();
-            select_object_inner();
+            commands.push(new SelectObjectsCommand(
+                {object}, selected_objects), true);
         }
     }
-}
-
-SelectedObjectsIterator ObjectSelector::deselect_object(
-    vsg::ref_ptr<RouteObject> object
-)
-{
-    assert(object);
-
-    object->deselect();
-
-    return selected_objects.erase(std::find(selected_objects.cbegin(),
-        selected_objects.cend(), object));
-}
-
-void ObjectSelector::deselect_all_objects()
-{
-    for (auto it = selected_objects.begin();
-        it != selected_objects.end();
-        it = deselect_object(*it));
 }
 
 void ObjectSelector::confirm_keyboard_move()
@@ -325,21 +276,20 @@ void ObjectSelector::confirm_keyboard_move()
     state = State::INITIAL;
     front_plane_switch->node = nullptr;
 
+    auto& selected_objects = RouteObject::get_selected_objects();
+
     const auto first_object = selected_objects.front();
     const vsg::vec3 translation = first_object->get_translation() -
         first_object->get_initial_translation();
 
-    for (const auto& object : selected_objects)
-    {
-        object->set_translation(object->get_initial_translation());
-    }
-
-    commands.push(new MoveObjectsCommand(selected_objects, translation), true);
+    commands.push(new MoveObjectsCommand(selected_objects, translation), false);
 }
 
 void ObjectSelector::cancel_keyboard_move()
 {
     state = State::INITIAL;
+
+    auto& selected_objects = RouteObject::get_selected_objects();
 
     for (const auto& object : selected_objects)
     {

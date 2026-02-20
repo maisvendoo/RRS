@@ -67,7 +67,7 @@ bool RouteEditor::initialize()
     }
 
     mouse_handler = MouseHandler::create();
-    keyboard_handler = KeyboardHandler::create(settings);
+    keyboard_handler = KeyboardHandler::create(settings.key_bindings, commands);
 
     camera_handler = CameraHandler::create(settings, window->extent2D(),
         mouse_handler, keyboard_handler);
@@ -116,6 +116,9 @@ bool RouteEditor::initialize()
 
     viewer = vsg::Viewer::create();
     const vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
+
+    RouteObjects selected_objects;
+    RouteObjects hidden_objects;
 
     RouteObject::set_observer_viewer(observer_viewer);
 

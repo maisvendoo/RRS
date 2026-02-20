@@ -1,19 +1,30 @@
 #include "KeyboardHandler.h"
 
 #include "Action.h"
+#include "CommandList.h"
 #include "KeyBinding.h"
-#include "Settings.h"
 
 #include <vsg/ui/KeyEvent.h>
 
-KeyboardHandler::KeyboardHandler(const settings_t& settings)
-    : key_bindings(settings.key_bindings)
+KeyboardHandler::KeyboardHandler(const KeyBindings& key_bindings,
+    CommandList& commands)
+    : key_bindings(key_bindings)
+    , commands(commands)
 {
 }
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 {
     key_states[keyPress.keyBase] = true;
+
+    if (get_binding_state(ACTION_UNDO_COMMAND))
+    {
+        commands.undo();
+    }
+    else if (get_binding_state(ACTION_REDO_COMMAND))
+    {
+        commands.redo();
+    }
 }
 
 void KeyboardHandler::apply(vsg::KeyReleaseEvent& keyRelease)

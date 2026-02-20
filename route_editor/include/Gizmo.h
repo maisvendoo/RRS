@@ -1,37 +1,40 @@
 #ifndef GIZMO_H
 #define GIZMO_H
 
-#include "SelectedObjects.h"
+#include "RouteObject.h"
+#include "SingleSwitch.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
-#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/utils/Builder.h>
 
 class CameraHandler;
+class CommandList;
 class IntersectionHandler;
 class RouteObject;
-class SingleSwitch;
 struct settings_t;
 
 namespace vsg
 {
 
 class ButtonReleaseEvent;
+class FrameEvent;
+class MatrixTransform;
 class MoveEvent;
 class Node;
 
 }
 
-class Gizmo : public vsg::Inherit<vsg::MatrixTransform, Gizmo>
+class Gizmo : public vsg::Inherit<SingleSwitch, Gizmo>
 {
 public:
     Gizmo(
         const settings_t& settings,
+        CommandList& commands,
         vsg::ref_ptr<CameraHandler> camera_handler,
         vsg::ref_ptr<IntersectionHandler> intersection_handler,
-        const SelectedObjects& selected_objects
+        const RouteObjects& selected_objects
     );
 
     bool handle_intersections();
@@ -39,16 +42,18 @@ public:
     void apply(const vsg::ButtonReleaseEvent& buttonRelease);
     void apply(const vsg::MoveEvent& moveEvent);
 
+    void update_visibility();
     void update_position();
-    void update_scale();
 
 private:
     const settings_t& settings;
+    CommandList& commands;
     vsg::ref_ptr<CameraHandler> camera_handler;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
-    const SelectedObjects& selected_objects;
+    const RouteObjects& selected_objects;
 
     vsg::Builder builder;
+    vsg::ref_ptr<vsg::MatrixTransform> matrix_transform;
     vsg::ref_ptr<vsg::Node> arrow_x;
     vsg::ref_ptr<vsg::Node> arrow_y;
     vsg::ref_ptr<vsg::Node> arrow_z;
@@ -59,9 +64,11 @@ private:
     vsg::ref_ptr<SingleSwitch> line_y_switch;
     vsg::ref_ptr<SingleSwitch> line_z_switch;
 
-    vsg::vec3 curr_position;
-    vsg::vec3 click_position;
-    vsg::vec3 click_position_offset;
+    vsg::vec3 curr_pos;
+    vsg::vec3 click_pos;
+    vsg::vec3 prev_intersect_pos;
+    vsg::vec3 total_translation;
+    float scale;
 
     vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;

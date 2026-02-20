@@ -2,17 +2,13 @@
 
 #include "RouteObject.h"
 
-#include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
 #include <cstdio>
 #include <string>
-#include <vector>
 
-MoveObjectsCommand::MoveObjectsCommand(
-    const std::vector<vsg::ref_ptr<RouteObject>>& objects,
-    vsg::vec3 translation
-)
+MoveObjectsCommand::MoveObjectsCommand(const RouteObjects& objects,
+    vsg::vec3 translation)
     : objects(objects)
     , translation(translation)
 {

@@ -181,8 +181,8 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
             continue;
         }
 
-        const auto object = RouteObject::create(settings, paged_lod_it->second,
-            label, transform.first, -transform.second);
+        const auto object = RouteObject::create(paged_lod_it->second, label,
+            transform.first, -transform.second);
 
         this->addChild(vsg::MASK_ALL, object);
     }
@@ -290,20 +290,13 @@ bool Route::load_topology()
             const auto orth = to_vsg_vec3(signal->getOrth());
             const auto up = to_vsg_vec3(signal->getUp());
 
-            // const vsg::mat4 rotate = {
-            //      right.x, -orth.x,  up.x,  0.0,
-            //     -right.y,  orth.y,  up.y,  0.0,
-            //      right.z,  orth.z,  up.z,  0.0,
-            //         0.0,      0.0,   0.0,  1.0
-            // };
-
             const vsg::vec3 rotation_deg = {
                 vsg::degrees(std::atan2(orth.z, up.z)),
                 vsg::degrees(std::atan2(-right.z, std::hypot(orth.z, up.z))),
                 vsg::degrees(std::atan2(-right.y, right.x))
             };
 
-            const auto object = RouteObject::create(settings, paged_lod,
+            const auto object = RouteObject::create(paged_lod,
                 signal_model_name, pos, rotation_deg);
 
             this->addChild(vsg::MASK_ALL, object);
