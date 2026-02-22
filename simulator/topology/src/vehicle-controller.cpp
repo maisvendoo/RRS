@@ -266,7 +266,7 @@ void VehicleController::updateTrajectories()
                 // Связываем оборудование ПЕ и путевое оборудование
                 if (veh_device.device->getName() == traj_device->getName())
                 {
-                    traj_device->setLink(veh_device);
+                    traj_device->setLink(veh_device, device_dir);
                     break;
                 }
             }

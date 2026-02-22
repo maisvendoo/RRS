@@ -29,8 +29,12 @@ void TrajectorySpeedMap::step(double t, double dt)
     (void) t;
     (void) dt;
 
+    size_t device_idx = 0;
     for (auto device : vehicles_devices)
     {
+        std::int8_t search_dir = vehicles_devices_directions[device_idx];
+        ++device_idx;
+
         if (limits.empty())
         {
             device.device->setInputSignal(SpeedMap::INPUT_CURRENT_LIMIT, 300.0);
@@ -171,7 +175,10 @@ void TrajectorySpeedMap::step(double t, double dt)
         TrajectorySpeedMap* cur_traj_device = this;
         size_t next_idx = cur_idx;
 
-        const double search_dir = device.device->getOutputSignal(SpeedMap::OUTPUT_SEARCH_DIRECTION);
+        if (device.device->getOutputSignal(SpeedMap::OUTPUT_SEARCH_DIRECTION) < Physics::ZERO)
+        {
+            search_dir = -search_dir;
+        }
         const double cur_search_distance = device.device->getOutputSignal(SpeedMap::OUTPUT_CUR_SEARCH_DISTANCE);
         const double next_search_distance = device.device->getOutputSignal(SpeedMap::OUTPUT_NEXT_SEARCH_DISTANCE);
         double cur_limit = limits[cur_idx];

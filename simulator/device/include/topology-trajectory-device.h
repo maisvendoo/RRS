@@ -35,7 +35,7 @@ public:
     void clearLinks();
 
     /// Set Device for next step
-    void setLink(device_coord_t device);
+    void setLink(device_coord_t device, std::int8_t direction);
 
     /// Шаг симуляции
     virtual void step(double t, double dt);
@@ -64,6 +64,8 @@ protected:
     ConnectorDevice *bwd_conn_device = nullptr;
 
     device_coord_list_t vehicles_devices = {};
+
+    std::vector<std::int8_t> vehicles_devices_directions = {};
 
     /// Name of this device
     QString name = "";

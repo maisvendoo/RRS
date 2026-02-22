@@ -33,6 +33,7 @@ void TrajectoryALSN::step(double t, double dt)
 
     if (vehicles_devices.empty())
     {
+        // Здесь делать нечего, в конце выполнения шага очищаем информацию об АЛСН
         clear_code();
         return;
     }
@@ -47,9 +48,14 @@ void TrajectoryALSN::step(double t, double dt)
 
     // Задаём приёмным катушкам информацию о следующем светофоре,
     // а возле начала и конца занятого участка - и код АЛСН
+    size_t device_idx = 0;
     for (auto device : vehicles_devices)
     {
-        if (device.device->getOutputSignal(CoilALSN::OUTPUT_DIRECTION) == 1.0)
+        std::int8_t search_dir = vehicles_devices_directions[device_idx];
+        ++device_idx;
+
+        search_dir = search_dir * device.device->getOutputSignal(CoilALSN::OUTPUT_DIRECTION);
+        if (search_dir > 0)
         {
             // Литер следующего светофора
             size_t liter_size = min(static_cast<size_t>(next_liter_fwd.size()),
@@ -89,7 +95,7 @@ void TrajectoryALSN::step(double t, double dt)
                 device.device->setInputSignal(CoilALSN::INPUT_CODE, 0.0);
             }
         }
-        if (device.device->getOutputSignal(CoilALSN::OUTPUT_DIRECTION) == -1.0)
+        if (search_dir < 0)
         {
             // Литер следующего светофора
             size_t liter_size = min(static_cast<size_t>(next_liter_bwd.size()),
@@ -131,6 +137,7 @@ void TrajectoryALSN::step(double t, double dt)
         }
     }
 
+    // В конце выполнения шага очищаем информацию об АЛСН
     clear_code();
     return;
 }

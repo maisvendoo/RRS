@@ -84,17 +84,22 @@ void TrajectoryDevice::clearLinks()
         }
     }
     vehicles_devices.clear();
+    vehicles_devices_directions.clear();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrajectoryDevice::setLink(device_coord_t device)
+void TrajectoryDevice::setLink(device_coord_t device, std::int8_t direction)
 {
     if (device.device != nullptr)
     {
         device.device->link();
         vehicles_devices.push_back(device);
+        if (direction > 0)
+            vehicles_devices_directions.push_back(1);
+        else
+            vehicles_devices_directions.push_back(-1);
     }
 }
 
