@@ -140,9 +140,10 @@ void TrajectoryALSN::step(double t, double dt)
 //------------------------------------------------------------------------------
 void TrajectoryALSN::setNextSignalInfo(std::int8_t dir, ALSN code, double distance, QString liter)
 {
-    ALSN& code_from_dir = (dir >= 1) ? code_from_fwd : code_from_bwd;
-    double& distance_dir = (dir >= 1) ? distance_fwd : distance_bwd;
-    QString& next_liter_dir = (dir >= 1) ? next_liter_fwd : next_liter_bwd;
+    // Вперёд рассылается код от светофора сзади, назад - от светофора спереди
+    ALSN& code_from_dir = (dir > 0) ? code_from_bwd : code_from_fwd;
+    double& distance_dir = (dir > 0) ? distance_bwd : distance_fwd;
+    QString& next_liter_dir = (dir > 0) ? next_liter_bwd : next_liter_fwd;
 
     if (frequency == 0.0)
     {
@@ -173,10 +174,26 @@ void TrajectoryALSN::setNextSignalInfo(std::int8_t dir, ALSN code, double distan
 
     // Проверяем: если стрелка на взрез, или здесь следующий светофор, дальше код не проходит
     Switch* conn = conn_device->getConnector();
-    if (next_dir >= 1)
+    if (next_dir > 0)
     {
         dir_t traj_dir = BWD;
-        if ((conn->getNextTraj(traj_dir) != trajectory) || (dynamic_cast<TrainSignal*>(conn->getSignalFwd())))
+        if (conn->getNextTraj(traj_dir) != trajectory)
+        {
+            return;
+        }
+        if (dynamic_cast<TrainSignal*>(conn->getSignalBwd()))
+        {
+            return;
+        }
+    }
+    else
+    {
+        dir_t traj_dir = FWD;
+        if (conn->getNextTraj(traj_dir) != trajectory)
+        {
+            return;
+        }
+        if (dynamic_cast<TrainSignal*>(conn->getSignalFwd()))
         {
             return;
         }

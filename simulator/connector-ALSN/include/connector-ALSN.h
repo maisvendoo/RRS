@@ -14,11 +14,11 @@ public:
 
     ~ConnectorALSN();
 
-    void step(double t, double dt);
+    void step(double t, double dt) override;
 
 private:
 
-    void load_config(CfgReader &cfg);
+    void load_config(CfgReader &cfg) override;
 };
 
 #endif // CONNECTOR_ALSN_H

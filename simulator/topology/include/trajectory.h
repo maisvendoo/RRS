@@ -138,7 +138,8 @@ public:
 
     /// Поиск новой траектории, траекторной координаты и смены ориентации,
     /// возвращает false, если координата за пределы топологии (за тупик)
-    static bool findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_t& orient);
+    static bool findTrajectoryAtCoord(Trajectory*& cur_traj, double& coord, dir_t& orient);
+    static bool findTrajectoryAtCoord(Trajectory*& cur_traj, double& coord, double& coord_off, dir_t& orient);
 
     /// Получить положение ПЕ на траектории
     profile_point_t getPosition(double traj_coord, int direction);

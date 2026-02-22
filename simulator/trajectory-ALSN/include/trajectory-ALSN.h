@@ -16,7 +16,7 @@ public:
     ~TrajectoryALSN();
 
     /// Шаг симуляции
-    void step(double t, double dt);
+    void step(double t, double dt) override;
 
     void setNextSignalInfo(std::int8_t dir, ALSN code, double distance = 0.0, QString liter = "");
 
@@ -41,7 +41,7 @@ protected:
     QString next_liter_bwd = "";
 
     /// Инициализация и чтение конфигурационного файла
-    void load_config(CfgReader &cfg);
+    void load_config(CfgReader &cfg) override;
 
 private:
 

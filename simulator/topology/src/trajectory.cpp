@@ -519,7 +519,16 @@ void Trajectory::deserialize(QByteArray &data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Trajectory::findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_t& orient)
+bool Trajectory::findTrajectoryAtCoord(Trajectory*& cur_traj, double& coord, dir_t& orient)
+{
+    double coord_off;
+    return findTrajectoryAtCoord(cur_traj, coord, coord_off, orient);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Trajectory::findTrajectoryAtCoord(Trajectory*& cur_traj, double& coord, double &coord_off, dir_t& orient)
 {
     dir_t move_dir;
     while (true)
@@ -528,6 +537,8 @@ bool Trajectory::findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_
         {
             // Если траекторная координата меньше нуля - заехали за стрелку сзади
             move_dir = BWD;
+            // Запоминаем вылет за пределы траектории
+            coord_off = coord;
         }
         else
         {
@@ -535,12 +546,13 @@ bool Trajectory::findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_
             {
                 // Если траекторная координата превысила длину траектории - заехали за стрелку спереди
                 move_dir = FWD;
-                // Учитываем выход за пределы траектории
-                coord = coord - cur_traj->getLength();
+                // Запоминаем вылет за пределы траектории
+                coord_off = coord - cur_traj->getLength();
             }
             else
             {
                 // УРА! Находимся в пределах траектории: выходим
+                coord_off = 0.0;
                 return true;
             }
         }
@@ -553,6 +565,7 @@ bool Trajectory::findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_
         if (next_sw == nullptr)
         {
             // Если коннектора нет, выходим
+            coord = coord - coord_off;
             return false;
         }
 
@@ -563,6 +576,7 @@ bool Trajectory::findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_
         // остаёмся на исходной траектории, останавливаемся на краю и выходим
         if (next_traj == nullptr)
         {
+            coord = coord - coord_off;
             return false;
         }
 
@@ -572,13 +586,17 @@ bool Trajectory::findTrajectoryAtCoord(Trajectory* cur_traj, double& coord, dir_
         {
             // Если ориентация траектории изменилась, разворачиваемся
             orient = static_cast<dir_t>(-orient);
-            coord = -coord;
+            coord_off = -coord_off;
         }
 
         if (new_dir == BWD)
         {
             // Если смещаемся назад, начинаем отсчёт с конца траектории
-            coord = coord + cur_traj->getLength();
+            coord = coord_off + cur_traj->getLength();
+        }
+        else
+        {
+            coord = coord_off;
         }
     }
     return false;

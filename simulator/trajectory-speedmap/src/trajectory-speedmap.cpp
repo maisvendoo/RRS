@@ -62,11 +62,11 @@ void TrajectorySpeedMap::step(double t, double dt)
         auto next_traj_device = [](TrajectorySpeedMap* _cur_traj_device,
                                    std::int8_t& _dir,
                                    size_t& _cur_idx,
-                                   double& _cur_distance_coord) -> bool
+                                   double& _cur_coord) -> bool
         {
-            if (_dir <= 0)
+            if (_dir > 0)
             {
-                _cur_distance_coord -= _cur_traj_device->getTrajLength();
+                _cur_coord -= _cur_traj_device->getTrajLength();
             }
 
             // Переход к карте скоростей следующей траектории
@@ -89,15 +89,14 @@ void TrajectorySpeedMap::step(double t, double dt)
                 return false;
             }
 
-            if (_dir <= 0)
+            if (_dir > 0)
             {
-                --_cur_idx;
+                _cur_idx = 0;
             }
             else
             {
-                _cur_idx = 0;
-
-                _cur_distance_coord += _cur_traj_device->getTrajLength();
+                --_cur_idx;
+                _cur_coord += _cur_traj_device->getTrajLength();
             }
             return true;
         };
@@ -114,7 +113,7 @@ void TrajectorySpeedMap::step(double t, double dt)
         // Вспомогательная функция для сохранения следующего ближайшего ограничения
         auto save_next_limit = [](bool& _first, double& _next_limit, double& _distance_to_next_limit,
                                   const std::vector<double>& _limits, const size_t& _next_idx,
-                                  const double& _distance_to_limit, const double _brake_acceleration)
+                                  const double& _distance, const double _brake_acceleration)
         {
             const double _new_limit = _limits[_next_idx];
             // Ближайшее (_first==true) ограничение сохраняем безусловно
@@ -122,7 +121,7 @@ void TrajectorySpeedMap::step(double t, double dt)
             {
                 _first = false;
                 _next_limit = _new_limit;
-                _distance_to_next_limit = _distance_to_limit;
+                _distance_to_next_limit = _distance;
                 return;
             }
 
@@ -136,61 +135,45 @@ void TrajectorySpeedMap::step(double t, double dt)
                     // Тормозной путь от V1 до V2: d = (V1 ^ 2 - V2 ^ 2) / (2 * a)
                     constexpr double _denominator_coeff = 2.0 * Physics::kmh * Physics::kmh;
                     const double _brake_distance = (_next_limit * _next_limit - _new_limit * _new_limit) / (_denominator_coeff * _brake_acceleration);
-                    if (_brake_distance > (_distance_to_limit - _distance_to_next_limit))
+                    if (_brake_distance > (_distance - _distance_to_next_limit))
                     {
                         _next_limit = _new_limit;
-                        _distance_to_next_limit = _distance_to_limit;
+                        _distance_to_next_limit = _distance;
                     }
                 }
                 else
                 {
                     // Если тормозное ускорение не задано, сохраняем наименьшее ограничение
                     _next_limit = _new_limit;
-                    _distance_to_next_limit = _distance_to_limit;
+                    _distance_to_next_limit = _distance;
                 }
             }
         };
 
-        double search_dir = device.device->getOutputSignal(SpeedMap::OUTPUT_SEARCH_DIRECTION);
-        double cur_distance_coord = cur_coord -
-                                    search_dir * device.device->getOutputSignal(SpeedMap::OUTPUT_CUR_SEARCH_DISTANCE);
-        double next_distance_coord = cur_coord +
-                                     search_dir * device.device->getOutputSignal(SpeedMap::OUTPUT_NEXT_SEARCH_DISTANCE);
-
+        TrajectorySpeedMap* cur_traj_device = this;
         size_t next_idx = cur_idx;
-        double cur_limit  = limits[cur_idx];
-        double next_limit = limits[cur_idx];
+
+        const double search_dir = device.device->getOutputSignal(SpeedMap::OUTPUT_SEARCH_DIRECTION);
+        const double cur_search_distance = device.device->getOutputSignal(SpeedMap::OUTPUT_CUR_SEARCH_DISTANCE);
+        const double next_search_distance = device.device->getOutputSignal(SpeedMap::OUTPUT_NEXT_SEARCH_DISTANCE);
+        double cur_limit = limits[cur_idx];
+        double next_limit = limits[next_idx];
 
         // Ищем текущее ограничение - минимальное на длину поезда назад
-        TrajectorySpeedMap* cur_traj_device = this;
-        cur_coord = (search_dir >= 1) ? limit_begins[cur_idx] : limit_ends[cur_idx];
         std::int8_t dir = (search_dir > 0) ? BWD : FWD;
-
-        while (dir * (cur_coord - cur_distance_coord) > 0)
+        double distance = (dir > 0) ?
+                              limit_ends[cur_idx] - device.coord :
+                              device.coord - limit_begins[cur_idx];
+        cur_coord = (dir > 0) ?
+                        limit_ends[cur_idx] :
+                        limit_begins[cur_idx];
+        while (distance < cur_search_distance)
         {
             if (dir > 0)
             {
-                if (cur_idx == 0)
-                {
-                    if (!next_traj_device(cur_traj_device, dir, cur_idx, cur_distance_coord))
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    --cur_idx;
-                }
-
-                save_minimum_limit(cur_limit, (*cur_traj_device->getLimits()), cur_idx);
-
-                cur_coord = cur_traj_device->getLimitBegins()->at(cur_idx);
-            }
-            else
-            {
                 if (cur_idx == cur_traj_device->getLimits()->size() - 1)
                 {
-                    if (!next_traj_device(cur_traj_device, dir, cur_idx, cur_distance_coord))
+                    if (!next_traj_device(cur_traj_device, dir, cur_idx, cur_coord))
                     {
                         break;
                     }
@@ -199,29 +182,54 @@ void TrajectorySpeedMap::step(double t, double dt)
                 {
                     ++cur_idx;
                 }
+            }
+            else
+            {
+                if (cur_idx == 0)
+                {
+                    if (!next_traj_device(cur_traj_device, dir, cur_idx, cur_coord))
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    --cur_idx;
+                }
+            }
 
-                save_minimum_limit(cur_limit, (*cur_traj_device->getLimits()), cur_idx);
-
+            if (dir > 0)
+            {
+                distance += cur_traj_device->getLimitEnds()->at(cur_idx) - cur_coord;
                 cur_coord = cur_traj_device->getLimitEnds()->at(cur_idx);
             }
+            else
+            {
+                distance += cur_coord - cur_traj_device->getLimitBegins()->at(cur_idx);
+                cur_coord = cur_traj_device->getLimitBegins()->at(cur_idx);
+            }
+
+            save_minimum_limit(cur_limit, (*cur_traj_device->getLimits()), cur_idx);
         }
 
         // Ищем следущее ограничение - минимальное на заданную дистанцию вперёд
         cur_traj_device = this;
-        cur_coord = search_dir > 0 ? limit_ends[next_idx] : limit_begins[next_idx];
-        double distance_to_limit = search_dir > 0 ?
-                                      limit_ends[next_idx] - device.coord :
-                                      device.coord - limit_begins[next_idx];
-        double distance_to_next_limit = device.device->getOutputSignal(SpeedMap::OUTPUT_NEXT_SEARCH_DISTANCE);
         dir = (search_dir > 0) ? FWD : BWD;
+        distance = (dir > 0) ?
+                       limit_ends[next_idx] - device.coord :
+                       device.coord - limit_begins[next_idx];
+        cur_coord = (dir > 0) ?
+                        limit_ends[next_idx] :
+                        limit_begins[next_idx];
         bool is_first = true;
-        while (dir * (cur_coord - next_distance_coord) < 0)
+        double distance_to_next_limit = next_search_distance;
+        while (distance < next_search_distance)
         {
             if (dir > 0)
             {
                 if (next_idx == cur_traj_device->getLimits()->size() - 1)
                 {
-                    if (!next_traj_device(cur_traj_device, dir, cur_idx, cur_distance_coord))
+                    if (!next_traj_device(cur_traj_device, dir, next_idx, cur_coord))
                     {
                         break;
                     }
@@ -230,22 +238,12 @@ void TrajectorySpeedMap::step(double t, double dt)
                 {
                     ++next_idx;
                 }
-
-                save_next_limit(is_first, next_limit, distance_to_next_limit,
-                                (*cur_traj_device->getLimits()), next_idx,
-                                distance_to_limit, device.device->getOutputSignal(SpeedMap::OUTPUT_BRAKE_ACCELERATION));
-
-                cur_coord = cur_traj_device->getLimitEnds()->at(next_idx);
-                distance_to_limit += (cur_coord - next_distance_coord) < 0 ?
-                    (cur_coord - cur_traj_device->getLimitBegins()->at(next_idx)) :
-                    (next_distance_coord - cur_traj_device->getLimitBegins()->at(next_idx));
-
             }
             else
             {
                 if (next_idx == 0)
                 {
-                    if (!next_traj_device(cur_traj_device, dir, cur_idx, cur_distance_coord))
+                    if (!next_traj_device(cur_traj_device, dir, next_idx, cur_coord))
                     {
                         break;
                     }
@@ -254,16 +252,22 @@ void TrajectorySpeedMap::step(double t, double dt)
                 {
                     --next_idx;
                 }
-
-                save_next_limit(is_first, next_limit, distance_to_next_limit,
-                                (*cur_traj_device->getLimits()), next_idx,
-                                distance_to_limit, device.device->getOutputSignal(SpeedMap::OUTPUT_BRAKE_ACCELERATION));
-
-                cur_coord = cur_traj_device->getLimitBegins()->at(next_idx);
-                distance_to_limit += (cur_coord - next_distance_coord) > 0 ?
-                    (cur_traj_device->getLimitEnds()->at(next_idx) - cur_coord) :
-                    (cur_traj_device->getLimitEnds()->at(next_idx) - next_distance_coord);
             }
+
+            if (dir > 0)
+            {
+                distance += cur_traj_device->getLimitEnds()->at(next_idx) - cur_coord;
+                cur_coord = cur_traj_device->getLimitEnds()->at(next_idx);
+            }
+            else
+            {
+                distance += cur_coord - cur_traj_device->getLimitBegins()->at(next_idx);
+                cur_coord = cur_traj_device->getLimitBegins()->at(next_idx);
+            }
+
+            save_next_limit(is_first, next_limit, distance_to_next_limit,
+                            (*cur_traj_device->getLimits()), next_idx,
+                            distance, device.device->getOutputSignal(SpeedMap::OUTPUT_BRAKE_ACCELERATION));
         }
 
         device.device->setInputSignal(SpeedMap::INPUT_CURRENT_LIMIT, cur_limit);
