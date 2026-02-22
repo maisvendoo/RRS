@@ -1,1 +1,2 @@
 --train-config=vl60pk-1543 --route=experimental-polygon --traj-name=branch1_0002_2_12_22 --direction=1 --init-coord=785.00 -o
+--train-config=vl60pk-1543 --route=experimental-polygon_v2.0 --traj-name=track_a_p1a --direction=1 --init-coord=1690
