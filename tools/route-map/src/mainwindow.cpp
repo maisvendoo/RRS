@@ -3,9 +3,9 @@
 
 #include    <CfgReader.h>
 #include    <QPainter>
-#include    <connector.h>
 #include    <QMenu>
 #include    <switch.h>
+#include    <switch-state.h>
 #include    <QInputDialog>
 #include    <QClipboard>
 
@@ -176,7 +176,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     if (!is_menu_shows)
     {
-        Connector* new_nearest_switch = map->nearest_switch;
+        Switch* new_nearest_switch = map->nearest_switch;
         if (new_nearest_switch && (map->nearest_switch_dir != 0))
         {
             bg->nearest_switch = new_nearest_switch;
@@ -321,6 +321,7 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
         ui->ptLog->appendPlainText(tr("Connectors list is empty"));
         return;
     }
+    map->calcCwitchCoords();
 
     for (auto tl : map->traj_labels)
     {
@@ -429,7 +430,7 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
 
     auto configure_signal_label = [](Signal* sig, Topology* top, MapWidget* map) -> SignalLabel*
     {
-        Connector *conn = top->getConnectorsList()->value(sig->getConnectorName(), nullptr);
+        Switch* conn = top->getConnectorsList()->value(sig->getConnectorName(), nullptr);
 
         if (conn == nullptr)
         {
@@ -531,7 +532,7 @@ void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotNearestSwitchMenu(Connector* nearest_conn, std::int8_t nearest_switch_dir)
+void MainWindow::slotNearestSwitchMenu(Switch* nearest_conn, std::int8_t nearest_switch_dir)
 {
     if (route_begin_trajectory && map->nearest_trajectory)
     {
@@ -548,8 +549,10 @@ void MainWindow::slotNearestSwitchMenu(Connector* nearest_conn, std::int8_t near
     }
 
     // Если это не стрелка, меню не нужно
-    Switch::State state = (nearest_switch_dir > 0) ? sw->getStateFwd() : sw->getStateBwd();
-    if (state == Switch::ONE_POSSIBLE_DIRECTION)
+    Switch_state_t state = (nearest_switch_dir > 0) ? sw->getStateFwd() : sw->getStateBwd();
+    if (   (state == NO_POSSIBLE_DIRECTION)
+        || (state == ONLY_MINUS)
+        || (state == ONLY_PLUS))
     {
         return;
     }
@@ -562,8 +565,8 @@ void MainWindow::slotNearestSwitchMenu(Connector* nearest_conn, std::int8_t near
 
     // Создаём пункт меню для переключения стрелки
     QAction* action_switch = new QAction(tr("Switch"), this);
-    action_switch->setEnabled((state == Switch::STATE_MINUS) ||
-                              (state == Switch::STATE_PLUS));
+    action_switch->setEnabled((state == STATE_MINUS) ||
+                              (state == STATE_PLUS));
     menu->addAction(action_switch);
 
     // Сохраняем в карте указатель для интерактивной подсветки
@@ -574,11 +577,11 @@ void MainWindow::slotNearestSwitchMenu(Connector* nearest_conn, std::int8_t near
     // Создаём сетевой пакет с командой переключения стрелки
     std::int8_t switch_dir = nearest_switch_dir;
     connect(action_switch, &QAction::triggered, this, [sw, switch_dir, tc]{
-        Switch::State cur_state = (switch_dir > 0) ? sw->getStateFwd() : sw->getStateBwd();
+        Switch_state_t cur_state = (switch_dir > 0) ? sw->getStateFwd() : sw->getStateBwd();
         switch_command_t sc;
         sc.conn_name = sw->getName();
         sc.switch_direction = switch_dir;
-        sc.switch_ref_state = (cur_state < 0) ? 1 : -1;
+        sc.switch_ref_state = (cur_state < 0) ? STATE_PLUS : STATE_MINUS;
         tc->sendSwitchCommand(sc.serialize());
     });
 
@@ -611,9 +614,10 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
     bool no_need_menu = true;
 
     // Проверяем, есть ли траектория вперёд
-    if (Connector* conn_fwd = nearest_traj->getFwdConnector())
+    dir_t dir = FWD;
+    if (Switch* conn_fwd = nearest_traj->getNextSwitch(dir))
     {
-        if (Trajectory* next_fwd = conn_fwd->getFwdTraj())
+        if (Trajectory* next_fwd = conn_fwd->getNextTraj(dir))
         {
             no_need_menu = false;
             // Создаём пункт меню для поиска маршрута в направлении вперёд
@@ -627,9 +631,10 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
     }
 
     // Проверяем, есть ли траектория назад
-    if (Connector* conn_bwd = nearest_traj->getBwdConnector())
+    dir = BWD;
+    if (Switch* conn_bwd = nearest_traj->getNextSwitch(dir))
     {
-        if (Trajectory* next_bwd = conn_bwd->getBwdTraj())
+        if (Trajectory* next_bwd = conn_bwd->getNextTraj(dir))
         {
             no_need_menu = false;
             // Создаём пункт меню для поиска маршрута в направлении назад
@@ -858,8 +863,8 @@ void MainWindow::slotGetSwitchState(QByteArray &sw_state)
         return;
     }
 
-    sw->setStateFwd(Switch::State(switch_state.state_fwd));
-    sw->setStateBwd(Switch::State(switch_state.state_bwd));
+    sw->setStateFwd(Switch_state_t(switch_state.state_fwd));
+    sw->setStateBwd(Switch_state_t(switch_state.state_bwd));
 }
 
 //------------------------------------------------------------------------------
@@ -891,7 +896,7 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
     QDataStream stream(&buff);
 
     QString conn_name = "";
-    int signal_dir = 0;
+    int8_t signal_dir = 0;
 
     stream >> conn_name;
     stream >> signal_dir;
@@ -901,7 +906,7 @@ void MainWindow::slotUpdateSignal(QByteArray signal_data)
         return;
     }
 
-    Connector *conn = topology->getConnectorsList()->value(conn_name, nullptr);
+    Switch* conn = topology->getConnectorsList()->value(conn_name, nullptr);
 
     if (conn == nullptr)
     {

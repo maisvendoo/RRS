@@ -6,9 +6,11 @@
 
 #include    <topology-export.h>
 #include    <topology-types.h>
+#include    <trajectory.h>
 #include    <vehicle-controller.h>
 #include    <vehicle.h>
 #include    <signals-data-types.h>
+#include    <route-command.h>
 #include    <route-segment.h>
 
 /*!
@@ -63,12 +65,12 @@ public:
         return &traj_list;
     }
 
-    conn_list_t *getConnectorsList()
+    sw_list_t *getConnectorsList()
     {
         return &switches;
     }
 
-    const conn_list_t* getConnectorsList() const
+    const sw_list_t* getConnectorsList() const
     {
         return &switches;
     }
@@ -101,13 +103,10 @@ signals:
 private:
 
     /// Контейнер данных по всем траекториям на полигоне
-    traj_list_t     traj_list;
-
-    /// Контейнер изостыков
-    conn_list_t     joints;
+    traj_list_t traj_list;
 
     /// Контейнер стрелок
-    conn_list_t     switches;
+    sw_list_t   switches;
 
     /// Контейнер контроллеров ПЕ
     std::vector<VehicleController *> vehicle_control;
@@ -131,7 +130,7 @@ private:
     bool load_topology(QString route_dir);
 
     /// Загрузка сигналов (пока ограничиваюсь проходными)
-    void load_signals(CfgReader &cfg, QDomNode secNode, Connector *conn);
+    void load_signals(CfgReader &cfg, QDomNode secNode, Switch* sw);
 
     /// Загрузка списка станций
     bool load_stations(QString route_dir);
@@ -139,18 +138,18 @@ private:
     /// Получение название маршрута из конфига описания
     void get_route_name(QString route_dir);
 
-    void serialize_connector_name(QDataStream &stream, Connector *conn);
+    void serialize_connector_name(QDataStream &stream, Switch* sw);
 
-    Connector *deserialize_traj_connectors(QDataStream &stream, conn_list_t &conn_list) const;
+    Switch* deserialize_traj_connectors(QDataStream &stream, sw_list_t &conn_list) const;
 
     /// Команда построения маршрута
     route_segment_t build_route(const route_command_t& rc);
 
     /// Установка стрелок по маршруту
-    bool set_switchs_by_route(const route_segment_t &route, int dir);
+    bool set_switchs_by_route(const route_segment_t& route);
 
     /// Октрытие попутных сигналов по маршруту
-    bool open_route_signals(const route_segment_t &route, int dir, QStringList &conn_list, bool for_train = true);
+    bool open_route_signals(const route_segment_t& route, QStringList& sw_list, bool for_train = true);
 
 public slots:
 

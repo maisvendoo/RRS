@@ -14,11 +14,9 @@ public:
 
     ~ConnectorSpeedMap();
 
-    virtual void step(double t, double dt);
-
 private:
 
-    void load_config(CfgReader &cfg);
+    void load_config(CfgReader &cfg) override;
 };
 
 #endif // CONNECTOR_SPEEDMAP_H

@@ -2,7 +2,8 @@
 #include    "ALSN-coil.h"
 #include    "topology-connector-device.h"
 #include    "trajectory.h"
-#include    "connector.h"
+#include    "switch.h"
+#include    "train-signal.h"
 
 #include    "physics.h"
 
@@ -32,6 +33,7 @@ void TrajectoryALSN::step(double t, double dt)
 
     if (vehicles_devices.empty())
     {
+        // Здесь делать нечего, в конце выполнения шага очищаем информацию об АЛСН
         clear_code();
         return;
     }
@@ -46,9 +48,14 @@ void TrajectoryALSN::step(double t, double dt)
 
     // Задаём приёмным катушкам информацию о следующем светофоре,
     // а возле начала и конца занятого участка - и код АЛСН
+    size_t device_idx = 0;
     for (auto device : vehicles_devices)
     {
-        if (device.device->getOutputSignal(CoilALSN::OUTPUT_DIRECTION) == 1.0)
+        std::int8_t search_dir = vehicles_devices_directions[device_idx];
+        ++device_idx;
+
+        search_dir = search_dir * device.device->getOutputSignal(CoilALSN::OUTPUT_DIRECTION);
+        if (search_dir > 0)
         {
             // Литер следующего светофора
             size_t liter_size = min(static_cast<size_t>(next_liter_fwd.size()),
@@ -88,7 +95,7 @@ void TrajectoryALSN::step(double t, double dt)
                 device.device->setInputSignal(CoilALSN::INPUT_CODE, 0.0);
             }
         }
-        if (device.device->getOutputSignal(CoilALSN::OUTPUT_DIRECTION) == -1.0)
+        if (search_dir < 0)
         {
             // Литер следующего светофора
             size_t liter_size = min(static_cast<size_t>(next_liter_bwd.size()),
@@ -130,6 +137,7 @@ void TrajectoryALSN::step(double t, double dt)
         }
     }
 
+    // В конце выполнения шага очищаем информацию об АЛСН
     clear_code();
     return;
 }
@@ -137,89 +145,77 @@ void TrajectoryALSN::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrajectoryALSN::setSignalInfoFwd(ALSN code, double distance, QString liter)
+void TrajectoryALSN::setNextSignalInfo(std::int8_t dir, ALSN code, double distance, QString liter)
 {
+    // Вперёд рассылается код от светофора сзади, назад - от светофора спереди
+    ALSN& code_from_dir = (dir > 0) ? code_from_bwd : code_from_fwd;
+    double& distance_dir = (dir > 0) ? distance_bwd : distance_fwd;
+    QString& next_liter_dir = (dir > 0) ? next_liter_bwd : next_liter_fwd;
+
     if (frequency == 0.0)
     {
-        code_from_fwd = ALSN::NO_CODE;
+        code_from_dir = ALSN::NO_CODE;
     }
     else
     {
-        code_from_fwd = code;
+        code_from_dir = code;
     }
 
-    distance_fwd = distance;
-    next_liter_fwd = liter;
+    distance_dir = distance;
+    next_liter_dir = liter;
 
-    ALSN code_to_next = code_from_fwd;
-
-    // Если траектория занята, дальше код не проходит
-    if (trajectory->isBusy())
-        code_to_next = ALSN::NO_CODE;
-
-    // Переход к рельсовым цепям предыдущей траектории
-    // Модуль коннектора к предыдущей траектории
-    auto conn_device = getBwdConnectorDevice();
-    if (conn_device == nullptr)
-        return;
-
-    // Проверяем стрелку на взрез
-    Connector *conn = conn_device->getConnector();
-    if (conn->getFwdTraj() != trajectory)
-        return;
-
-    // Предыдущая траектория
-    TrajectoryALSN *traj_ALSN = dynamic_cast<TrajectoryALSN *>(
-        conn_device->getBwdTrajectoryDevice());
-    if (traj_ALSN == nullptr)
-        return;
-
-    // Передаём информацию дальше
-    traj_ALSN->setSignalInfoFwd(code_to_next, distance + trajectory->getLength(), liter);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void TrajectoryALSN::setSignalInfoBwd(ALSN code, double distance, QString liter)
-{
-    if (frequency == 0.0)
-    {
-        code_from_bwd = ALSN::NO_CODE;
-    }
-    else
-    {
-        code_from_bwd = code;
-    }
-
-    distance_bwd = distance;
-    next_liter_bwd = liter;
-
-    ALSN code_to_next = code_from_bwd;
+    ALSN code_to_next = code_from_dir;
 
     // Если траектория занята, дальше код не проходит
     if (trajectory->isBusy())
         code_to_next = ALSN::NO_CODE;
 
     // Переход к рельсовым цепям следующей траектории
+    std::int8_t next_dir = dir;
     // Модуль коннектора к следующей траектории
-    auto conn_device = getFwdConnectorDevice();
+    auto conn_device = getNextConnectorDevice(dir);
     if (conn_device == nullptr)
+    {
         return;
+    }
 
-    // Проверяем стрелку на взрез
-    Connector *conn = conn_device->getConnector();
-    if (conn->getBwdTraj() != trajectory)
-        return;
+    // Проверяем: если стрелка на взрез, или здесь следующий светофор, дальше код не проходит
+    Switch* conn = conn_device->getConnector();
+    if (next_dir > 0)
+    {
+        dir_t traj_dir = BWD;
+        if (conn->getNextTraj(traj_dir) != trajectory)
+        {
+            return;
+        }
+        if (dynamic_cast<TrainSignal*>(conn->getSignalBwd()))
+        {
+            return;
+        }
+    }
+    else
+    {
+        dir_t traj_dir = FWD;
+        if (conn->getNextTraj(traj_dir) != trajectory)
+        {
+            return;
+        }
+        if (dynamic_cast<TrainSignal*>(conn->getSignalFwd()))
+        {
+            return;
+        }
+    }
 
     // Следующая траектория
-    TrajectoryALSN *traj_ALSN = dynamic_cast<TrajectoryALSN *>(
-        conn_device->getFwdTrajectoryDevice());
+    TrajectoryALSN* traj_ALSN = dynamic_cast<TrajectoryALSN*>(
+        conn_device->getNextTrajectoryDevice(next_dir));
     if (traj_ALSN == nullptr)
+    {
         return;
+    }
 
     // Передаём информацию дальше
-    traj_ALSN->setSignalInfoBwd(code_to_next, distance + trajectory->getLength(), liter);
+    traj_ALSN->setNextSignalInfo(next_dir, code_to_next, distance + trajectory->getLength(), liter);
 }
 
 //------------------------------------------------------------------------------

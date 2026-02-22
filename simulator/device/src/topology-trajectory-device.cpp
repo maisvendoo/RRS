@@ -1,4 +1,5 @@
 #include    "topology-trajectory-device.h"
+#include    "topology-connector-device.h"
 
 #include    <QLibrary>
 
@@ -37,33 +38,37 @@ Trajectory *TrajectoryDevice::getTrajectory() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrajectoryDevice::setFwdConnectorDevice(ConnectorDevice *conn_device)
+void TrajectoryDevice::setConnectorDevice(ConnectorDevice *conn_device, std::int8_t dir)
 {
-    fwd_conn_device = conn_device;
+    if (dir >= 1)
+    {
+        fwd_conn_device = conn_device;
+    }
+    else
+    {
+        bwd_conn_device = conn_device;
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrajectoryDevice::setBwdConnectorDevice(ConnectorDevice *conn_device)
+ConnectorDevice* TrajectoryDevice::getNextConnectorDevice(std::int8_t& dir)
 {
-    bwd_conn_device = conn_device;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-ConnectorDevice *TrajectoryDevice::getFwdConnectorDevice() const
-{
-    return fwd_conn_device;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-ConnectorDevice *TrajectoryDevice::getBwdConnectorDevice() const
-{
-    return bwd_conn_device;
+    if (dir >= 1)
+    {
+        if (fwd_conn_device)
+        {
+            dir = fwd_conn_device->getDeviceOrientation(this);
+            return fwd_conn_device;
+        }
+    }
+    if (bwd_conn_device)
+    {
+        dir = -bwd_conn_device->getDeviceOrientation(this);
+        return bwd_conn_device;
+    }
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -79,17 +84,22 @@ void TrajectoryDevice::clearLinks()
         }
     }
     vehicles_devices.clear();
+    vehicles_devices_directions.clear();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrajectoryDevice::setLink(device_coord_t device)
+void TrajectoryDevice::setLink(device_coord_t device, std::int8_t direction)
 {
     if (device.device != nullptr)
     {
         device.device->link();
         vehicles_devices.push_back(device);
+        if (direction > 0)
+            vehicles_devices_directions.push_back(1);
+        else
+            vehicles_devices_directions.push_back(-1);
     }
 }
 

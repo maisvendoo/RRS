@@ -1008,4 +1008,25 @@
 		<RelPosVectorFwd>2.5 -2.75 0.0</RelPosVectorFwd>
 		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
 	</Switch>
+	<Switch>
+		<Name>A</Name>
+		<bwdPlusTraj>route1_0047_497</bwdPlusTraj>
+		<fwdPlusTraj>AB</fwdPlusTraj>
+		<fwdMinusTraj>AC</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>B</Name>
+		<bwdPlusTraj>AB</bwdPlusTraj>
+		<bwdMinusTrajReversed>BC</bwdMinusTrajReversed>
+		<fwdPlusTraj>BE</fwdPlusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>C</Name>
+		<bwdPlusTraj>AC</bwdPlusTraj>
+		<bwdMinusTraj>BC</bwdMinusTraj>
+		<fwdPlusTraj>CD</fwdPlusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
 </Config>

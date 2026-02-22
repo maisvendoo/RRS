@@ -89,7 +89,7 @@ const QString& TrafficLight::getConnectorName() const noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int TrafficLight::getSignalDirection() const noexcept
+std::int8_t TrafficLight::getSignalDirection() const noexcept
 {
     return signal_dir;
 }

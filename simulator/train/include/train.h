@@ -58,7 +58,7 @@ public:
     bool init(const init_data_t& init_data, int model_vehicles_count = -1);
 
     /// Train initialization
-    bool init(const solver_config_t& solver_config, int direction, std::vector<Vehicle*>& vehicles, state_vector_t& state_vector, std::vector<std::vector<Joint*>>& joints_list);
+    bool init(const solver_config_t& solver_config, std::vector<Vehicle*>& vehicles, state_vector_t& state_vector, std::vector<std::vector<Joint*>>& joints_list);
 
     /// Train coupling
     void couple(double current_distance, bool is_coupling_to_head, bool is_other_coupled_by_head, Train* other_train = nullptr);
@@ -67,7 +67,7 @@ public:
     Train* uncouple(double uncoupling_distance);
 
     /// Set distance to stop the train before end of trajectory
-    void setDistanceToEndOfTrajectory(int direction, double distance);
+    void setDistanceToEndOfTrajectory(bool is_train_head, double distance);
 
     /// Set train index
     void setTrainIndex(size_t idx);
@@ -100,8 +100,6 @@ public:
     QString getClientName();
 
     QString getTrainID();
-
-    int getDirection() const;
 
     std::vector<Vehicle*>* getVehicles();
 
@@ -147,9 +145,6 @@ private:
 
     /// Order of system ODE motion
     size_t      ode_order = 0;
-
-    /// Direction of motion on railway
-    int         dir = 1;
 
     /// Coefficient to friction between wheel and rail
     double      coeff_to_wheel_rail_friction = 1.0;

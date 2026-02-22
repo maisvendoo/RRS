@@ -14,17 +14,11 @@ public:
 
     ~ConnectorALSN();
 
-    TrajectoryDevice *getFwdTrajectoryDevice() const;
-    TrajectoryDevice *getBwdTrajectoryDevice() const;
-
-    void step(double t, double dt);
+    void step(double t, double dt) override;
 
 private:
 
-    bool is_signal_fwd = false;
-    bool is_signal_bwd = false;
-
-    void load_config(CfgReader &cfg);
+    void load_config(CfgReader &cfg) override;
 };
 
 #endif // CONNECTOR_ALSN_H

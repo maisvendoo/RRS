@@ -15,7 +15,7 @@ public:
     ~TrajectorySpeedMap();
 
     /// Шаг симуляции
-    void step(double t, double dt);
+    void step(double t, double dt) override;
 
     std::vector<double> *getLimits();
     std::vector<double> *getLimitBegins();
@@ -32,7 +32,7 @@ protected:
     std::vector<double> limit_ends = {};
 
     /// Инициализация и чтение конфигурационного файла
-    void load_config(CfgReader &cfg);
+    void load_config(CfgReader &cfg) override;
 };
 
 #endif // TRAJECTORY_SPEEDMAP_H

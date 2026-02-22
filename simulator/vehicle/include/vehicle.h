@@ -79,11 +79,8 @@ public:
     /// Set friction coefficient between wheel and rail
     void setFrictionCoeff(double value);
 
-    /// Set direction
-    void setDirection(int dir);
-
-    /// Set orientation
-    void setOrientation(int orient);
+    /// Set direction relative to train
+    void setDirection(std::int8_t dir);
 
     /// Set forward coupling force
     void addForwardForce(double value);
@@ -130,8 +127,8 @@ public:
 
     profile_point_t* getProfilePoint();
 
-    /// Get orientation
-    int getOrientation() const;
+    /// Direction relative to train: 1 - co-directional, -1 - reversed
+    std::int8_t getDirection() const;
 
     /// Get vehicle mass
     double getMass() const;
@@ -298,15 +295,20 @@ protected:
     /// Body velocity
     double velocity = 0.0;
 
+    /// Position at world and on railway
     profile_point_t profile_point_data = profile_point_t();
 
-    /// Railway motion direction
-    int     dir = 1;
-    /// Vehicle orientation
-    int     orient = 1;
+    /// Direction relative to train: 1 - co-directional, -1 - reversed
+    std::int8_t dir = 1;
 
-    QString DebugMsg = "";
+    /// Brake shoes state
+    bool is_brake_shoes = false;
+
+    /// Start autopilot after autostart
+    bool auto_start_autopilot = false;
+
     bool needDebugMsg = false;
+    QString DebugMsg = "";
 
     Vehicle* prev_vehicle = nullptr;
     Vehicle* next_vehicle = nullptr;
@@ -321,9 +323,6 @@ protected:
     state_vector_t  Q_a = {0.0, 0.0, 0.0, 0.0, 0.0};
     /// Reactive common forces
     state_vector_t  Q_r = {0.0, 0.0, 0.0, 0.0, 0.0};
-
-    /// Brake shoes state
-    bool is_brake_shoes = false;
 
     /// Keyboard state
     std::set<uint16_t> pressed_keys = {KEY_Undefined};
@@ -346,9 +345,6 @@ protected:
 
     /// Automation control module
     std::vector<Autopilot *> autopilot;
-
-    /// Start autopilot after autostart
-    bool auto_start_autopilot = false;
 
     /// User defined initialization
     virtual void initialization();

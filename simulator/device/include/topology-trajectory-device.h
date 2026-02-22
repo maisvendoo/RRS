@@ -27,17 +27,15 @@ public:
     void setTrajectory(Trajectory *traj);
     Trajectory *getTrajectory() const;
 
-    virtual void setFwdConnectorDevice(ConnectorDevice *conn_device);
-    virtual void setBwdConnectorDevice(ConnectorDevice *conn_device);
+    void setConnectorDevice(ConnectorDevice *conn_device, std::int8_t dir);
 
-    virtual ConnectorDevice *getFwdConnectorDevice() const;
-    virtual ConnectorDevice *getBwdConnectorDevice() const;
+    ConnectorDevice *getNextConnectorDevice(std::int8_t& dir);
 
     /// Set Device for next step
     void clearLinks();
 
     /// Set Device for next step
-    void setLink(device_coord_t device);
+    void setLink(device_coord_t device, std::int8_t direction);
 
     /// Шаг симуляции
     virtual void step(double t, double dt);
@@ -66,6 +64,8 @@ protected:
     ConnectorDevice *bwd_conn_device = nullptr;
 
     device_coord_list_t vehicles_devices = {};
+
+    std::vector<std::int8_t> vehicles_devices_directions = {};
 
     /// Name of this device
     QString name = "";

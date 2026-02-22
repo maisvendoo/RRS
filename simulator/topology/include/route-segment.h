@@ -1,9 +1,8 @@
 #ifndef     ROUTE_SEGMENT_H
 #define     ROUTE_SEGMENT_H
 
-#include    <QString>
-#include    <QBuffer>
-#include    <route-command.h>
+#include <vector>
+#include "topology-defines.h"
 
 class Trajectory;
 
@@ -13,7 +12,7 @@ class Trajectory;
 struct route_segment_t
 {
     std::vector<Trajectory*> trajectories; ///< Траектории, входящие в маршрут
-    int dir = 0; ///< Направление маршрута по топологии: 1 - вперёд, -1 - назад
+    std::vector<dir_t> directions; ///< Направление по траекториям: 1 - вперёд, -1 - назад
 
     route_segment_t()
     {
