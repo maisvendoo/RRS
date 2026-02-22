@@ -59,7 +59,7 @@ void TrajectorySpeedMap::step(double t, double dt)
 
 
         // Вспомогательная функция для перемещения по карте скоростей
-        auto next_traj_device = [](TrajectorySpeedMap* _cur_traj_device,
+        auto next_traj_device = [](TrajectorySpeedMap*& _cur_traj_device,
                                    std::int8_t& _dir,
                                    size_t& _cur_idx,
                                    double& _cur_coord) -> bool
@@ -113,41 +113,59 @@ void TrajectorySpeedMap::step(double t, double dt)
         // Вспомогательная функция для сохранения следующего ближайшего ограничения
         auto save_next_limit = [](bool& _first, double& _next_limit, double& _distance_to_next_limit,
                                   const std::vector<double>& _limits, const size_t& _next_idx,
-                                  const double& _distance, const double _brake_acceleration)
+                                  const double& _distance, const double _brake_acceleration) -> bool
         {
             const double _new_limit = _limits[_next_idx];
             // Ближайшее (_first==true) ограничение сохраняем безусловно
-            if (_first && (_new_limit != _next_limit))
+            if (_first)
             {
+                if (_new_limit == _next_limit)
+                {
+                    return false;
+                }
                 _first = false;
                 _next_limit = _new_limit;
                 _distance_to_next_limit = _distance;
-                return;
+                return false;
             }
 
-            // Последующие ограничения сохраняем вместо ближайшего,
-            // только если они более строгие: меньше и находятся ближе,
-            // чем требуемый тормозной путь
-            if (_new_limit < _next_limit)
+            if (_brake_acceleration > Physics::ZERO)
             {
-                if (_brake_acceleration > Physics::ZERO)
+                // Тормозной путь от V1 до V2: d = (V1 ^ 2 - V2 ^ 2) / (2 * a)
+                constexpr double _denominator_coeff = 2.0 * Physics::kmh * Physics::kmh;
+                const double _denominator = _denominator_coeff * _brake_acceleration;
+                double _brake_distance = _next_limit * _next_limit / _denominator;
+
+                // Если уже прошли тормозной путь полностью, возращаем true,
+                // как признак, что просматривать дальше нет смысла
+                if (_brake_distance > (_distance - _distance_to_next_limit))
                 {
-                    // Тормозной путь от V1 до V2: d = (V1 ^ 2 - V2 ^ 2) / (2 * a)
-                    constexpr double _denominator_coeff = 2.0 * Physics::kmh * Physics::kmh;
-                    const double _brake_distance = (_next_limit * _next_limit - _new_limit * _new_limit) / (_denominator_coeff * _brake_acceleration);
+                    return true;
+                }
+
+                // Последующие ограничения сохраняем вместо ближайшего,
+                // только если они более строгие: меньше и находятся ближе,
+                // чем требуемый тормозной путь
+                if (_new_limit < _next_limit)
+                {
+                    _brake_distance = (_next_limit * _next_limit - _new_limit * _new_limit) / (_denominator_coeff * _brake_acceleration);
                     if (_brake_distance > (_distance - _distance_to_next_limit))
                     {
                         _next_limit = _new_limit;
                         _distance_to_next_limit = _distance;
                     }
                 }
-                else
+            }
+            else
+            {
+                // Если тормозное ускорение не задано, сохраняем наименьшее ограничение
+                if (_new_limit < _next_limit)
                 {
-                    // Если тормозное ускорение не задано, сохраняем наименьшее ограничение
                     _next_limit = _new_limit;
                     _distance_to_next_limit = _distance;
                 }
             }
+            return false;
         };
 
         TrajectorySpeedMap* cur_traj_device = this;
@@ -254,6 +272,13 @@ void TrajectorySpeedMap::step(double t, double dt)
                 }
             }
 
+            if (save_next_limit(is_first, next_limit, distance_to_next_limit,
+                                (*cur_traj_device->getLimits()), next_idx,
+                                distance, device.device->getOutputSignal(SpeedMap::OUTPUT_BRAKE_ACCELERATION)))
+            {
+                break;
+            }
+
             if (dir > 0)
             {
                 distance += cur_traj_device->getLimitEnds()->at(next_idx) - cur_coord;
@@ -264,10 +289,6 @@ void TrajectorySpeedMap::step(double t, double dt)
                 distance += cur_coord - cur_traj_device->getLimitBegins()->at(next_idx);
                 cur_coord = cur_traj_device->getLimitBegins()->at(next_idx);
             }
-
-            save_next_limit(is_first, next_limit, distance_to_next_limit,
-                            (*cur_traj_device->getLimits()), next_idx,
-                            distance, device.device->getOutputSignal(SpeedMap::OUTPUT_BRAKE_ACCELERATION));
         }
 
         device.device->setInputSignal(SpeedMap::INPUT_CURRENT_LIMIT, cur_limit);
