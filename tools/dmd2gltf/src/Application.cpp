@@ -398,23 +398,37 @@ bool Application::convert_model(std::string &in_dmd_model_path,
     model_data.is_reversed_texture_coord = (texture_ext != ".tga");
     model_data.is_blend_material = ((texture_ext == ".tga") || (texture_ext == ".png"));
 
-    auto last_slash_pos = out_gltf_model_path.find_last_of(separator());
-
-    std::string gltf_directory_path = "";
-
-    if (last_slash_pos == std::string::npos)
-    {
-        gltf_directory_path = ".";
-    }
-    else
-    {
-        gltf_directory_path = out_gltf_model_path.substr(0, last_slash_pos);
-    }
-
-
     if (!get_dmd_model_data(in_dmd_model_path, model_data))
     {
         return false;
+    }
+
+    fs::path model_path = out_gltf_model_path;
+    std::string gltf_directory_path = model_path.parent_path().string();
+    fs::create_directories(gltf_directory_path);
+
+    // Относительный путь к файлу с информацией о модели в формате bin
+    if (out_relative_bin_path.empty())
+    {
+        out_relative_bin_path = model_path.stem().string() + ".bin";
+    }
+    fs::path bin_path = out_relative_bin_path;
+    fs::create_directories(bin_path);
+    if (bin_path.extension() != ".bin")
+    {
+        out_relative_bin_path = out_relative_bin_path + ".bin";
+    }
+
+    // Относительный путь к текстуре
+    if (out_relative_texture_path.empty())
+    {
+        out_relative_texture_path = fs::path(in_texture_path).filename().string();
+    }
+    fs::path texture_path = out_relative_texture_path;
+    fs::create_directories(texture_path);
+    if (texture_path.extension() != texture_ext)
+    {
+        out_relative_texture_path = out_relative_texture_path + texture_ext;
     }
 
     return generate_gltf_model(model_data,
