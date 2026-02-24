@@ -155,12 +155,15 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         const auto world_intersection = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
+        const auto translation = world_intersection - prev_intersect_pos;
+        prev_intersect_pos = world_intersection;
+        total_translation += translation;
+
         if (state == State::KEYBOARD_GRAB)
         {
             for (const auto& object : RouteObject::get_selected_objects())
             {
-                object->set_translation(object->get_initial_translation() +
-                    world_intersection - begin_intersection_pos);
+                object->move(translation);
             }
         }
 
@@ -204,13 +207,11 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
             return;
         }
 
-        begin_intersection_pos = static_cast<vsg::vec3>(
+        begin_intersect_pos = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
-        for (const auto& object : selected_objects)
-        {
-            object->save_translation();
-        }
+        prev_intersect_pos = begin_intersect_pos;
+        total_translation = {0.0f, 0.0f, 0.0f};
 
         const auto viewer = observer_viewer.ref_ptr();
         const auto compile_manager = viewer->compileManager;
@@ -279,24 +280,17 @@ void ObjectSelector::confirm_keyboard_move()
     state = State::INITIAL;
     front_plane_switch->node = nullptr;
 
-    auto& selected_objects = RouteObject::get_selected_objects();
-
-    const auto first_object = selected_objects.front();
-    const vsg::vec3 translation = first_object->get_translation() -
-        first_object->get_initial_translation();
-
-    commands.push(new MoveObjectsCommand(selected_objects, translation), false);
+    commands.push(new MoveObjectsCommand(RouteObject::get_selected_objects(),
+        total_translation), false);
 }
 
 void ObjectSelector::cancel_keyboard_move()
 {
     state = State::INITIAL;
 
-    auto& selected_objects = RouteObject::get_selected_objects();
-
-    for (const auto& object : selected_objects)
+    for (const auto& object : RouteObject::get_selected_objects())
     {
-        object->set_translation(object->get_initial_translation());
+        object->move(-total_translation);
     }
 
     front_plane_switch->node = nullptr;

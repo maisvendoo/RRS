@@ -77,7 +77,9 @@ private:
 
     vsg::ref_ptr<Gizmo> gizmo;
 
-    vsg::vec3 begin_intersection_pos;
+    vsg::vec3 begin_intersect_pos;
+    vsg::vec3 prev_intersect_pos;
+    vsg::vec3 total_translation;
     vsg::ref_ptr<SingleSwitch> front_plane_switch;
 };
 
