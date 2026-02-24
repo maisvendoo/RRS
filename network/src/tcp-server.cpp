@@ -76,8 +76,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
         QDataStream stream(&buff);
         stream >> client_data.players_update_interval;
 
-        Journal::instance()->info(QString("Received players update request for #%1 with interval %2")
-                                      .arg(client_data.id).arg(client_data.players_update_interval, 5, 'f', 3));
+        /*Journal::instance()->info(QString("Received players update request for #%1 with interval %2")
+                                      .arg(client_data.id).arg(client_data.players_update_interval, 5, 'f', 3));*/
         clients_for_players_info_updates.insert(client_data.socket);
         break;
     }
@@ -85,7 +85,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
     {
         client_data.received_data.data.clear();
 
-        Journal::instance()->info(QString("Received route info request for #%1").arg(client_data.id));
+        //Journal::instance()->info(QString("Received route info request for #%1").arg(client_data.id));
         send_route_info(client_data);
         break;
     }
@@ -93,7 +93,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
     {
         client_data.received_data.data.clear();
 
-        Journal::instance()->info(QString("Received topology data request for #%1").arg(client_data.id));
+        //Journal::instance()->info(QString("Received topology data request for #%1").arg(client_data.id));
         send_topology_data(client_data);
         // Пока не разделяем структуру топологии
         // и информацию о её текущем состоянии,
@@ -114,7 +114,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
     {
         client_data.received_data.data.clear();
 
-        Journal::instance()->info(QString("Received signals data request for #%1").arg(client_data.id));
+        //Journal::instance()->info(QString("Received signals data request for #%1").arg(client_data.id));
         send_signals_data(client_data);
         // Пока не разделяем положение сигналов
         // и информацию об их текущем состоянии,
@@ -135,7 +135,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
     {
         client_data.received_data.data.clear();
 
-        Journal::instance()->info(QString("Received vehicles info request for #%1").arg(client_data.id));
+        //Journal::instance()->info(QString("Received vehicles info request for #%1").arg(client_data.id));
         send_vehicles_info(client_data);
         break;
     }
@@ -143,7 +143,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
     {
         client_data.received_data.data.clear();
 
-        Journal::instance()->info(QString("Received trains update request for #%1").arg(client_data.id));
+        //Journal::instance()->info(QString("Received trains update request for #%1").arg(client_data.id));
 
         // Добавляем, чтобы потом из модели разослать всем кому нужно
         // при обновлении инфы
@@ -159,8 +159,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
         QDataStream stream(&buff);
         stream >> client_data.pos_update_interval;
 
-        Journal::instance()->info(QString("Received vehicles pos update request for #%1 with interval %2")
-                                      .arg(client_data.id).arg(client_data.pos_update_interval, 5, 'f', 3));
+        /*Journal::instance()->info(QString("Received vehicles pos update request for #%1 with interval %2")
+                                      .arg(client_data.id).arg(client_data.pos_update_interval, 5, 'f', 3));*/
         clients_for_vehicles_pos_updates.insert(client_data.socket);
         break;
     }
@@ -171,8 +171,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
         QDataStream stream(&buff);
         stream >> client_data.state_update_interval;
 
-        Journal::instance()->info(QString("Received vehicles state update request for #%1 with interval %2")
-                                      .arg(client_data.id).arg(client_data.state_update_interval, 5, 'f', 3));
+        /*Journal::instance()->info(QString("Received vehicles state update request for #%1 with interval %2")
+                                      .arg(client_data.id).arg(client_data.state_update_interval, 5, 'f', 3));*/
         clients_for_vehicles_updates.insert(client_data.socket);
         break;
     }
@@ -183,8 +183,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
         QDataStream stream(&buff);
         stream >> client_data.controlled_update_interval;
 
-        Journal::instance()->info(QString("Received vehicle controlled update request for #%1 with interval %2")
-                                      .arg(client_data.id).arg(client_data.state_update_interval, 5, 'f', 3));
+        /*Journal::instance()->info(QString("Received vehicle controlled update request for #%1 with interval %2")
+                                      .arg(client_data.id).arg(client_data.state_update_interval, 5, 'f', 3));*/
         clients_for_vehicle_controlled_updates.insert(client_data.socket);
         break;
     }
@@ -197,36 +197,36 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }
     case STYPE_COMMAND_SIGNAL_CONTROL:
     {
-        Journal::instance()->info(QString("Received signal command from #%1")
-                                      .arg(client_data.id));
+        /*Journal::instance()->info(QString("Received signal command from #%1")
+                                      .arg(client_data.id));*/
         emit sigSignalCommand(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_BUILD_ROUTE:
     {
-        Journal::instance()->info(QString("Received build route command from #%1")
-                                      .arg(client_data.id));
+        /*Journal::instance()->info(QString("Received build route command from #%1")
+                                      .arg(client_data.id));*/
         emit sigBuildRouteCommand(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_TRAIN_ROUTE:
     {
-        Journal::instance()->info(QString("Received train route command from #%1")
-                                      .arg(client_data.id));
+        /*Journal::instance()->info(QString("Received train route command from #%1")
+                                      .arg(client_data.id));*/
         emit sigTrainRouteCommand(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_SHUNTING_ROUTE:
     {
-        Journal::instance()->info(QString("Received shunting route command from #%1")
-                                      .arg(client_data.id));
+        /*Journal::instance()->info(QString("Received shunting route command from #%1")
+                                      .arg(client_data.id));*/
         emit sigShuntingRouteCommand(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_VEHICLE_CONTROL:
     {
-        Journal::instance()->info(QString("Received vehicle control command from #%1")
-                                      .arg(client_data.id));
+        /*Journal::instance()->info(QString("Received vehicle control command from #%1")
+                                      .arg(client_data.id));*/
         emit sigVehicleControl(client_data.received_data.data, client_data.id);
         break;
     }
@@ -243,7 +243,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
 
         if (train_idx < 0)
         {
-            Journal::instance()->error("Rename train: Invalide train index");
+            //Journal::instance()->error("Rename train: Invalide train index");
             break;
         }
 
@@ -251,7 +251,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
 
         if (new_name.isEmpty())
         {
-            Journal::instance()->error("Rename train: Empty new train name");
+            //Journal::instance()->error("Rename train: Empty new train name");
             break;
         }
 
