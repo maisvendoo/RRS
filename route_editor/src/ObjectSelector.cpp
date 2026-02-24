@@ -155,10 +155,13 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         const auto world_intersection = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
-        for (const auto& object : RouteObject::get_selected_objects())
+        if (state == State::KEYBOARD_GRAB)
         {
-            object->set_translation(object->get_initial_translation() +
-                world_intersection - begin_intersection_pos);
+            for (const auto& object : RouteObject::get_selected_objects())
+            {
+                object->set_translation(object->get_initial_translation() +
+                    world_intersection - begin_intersection_pos);
+            }
         }
 
         intersector->intersections.clear();

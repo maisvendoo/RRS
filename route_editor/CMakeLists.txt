@@ -39,6 +39,7 @@ target_sources(${TARGET}
 
 target_include_directories(${TARGET} PRIVATE
     include/commands
+    include/selection_states
 )
 
 target_link_libraries(${TARGET}
