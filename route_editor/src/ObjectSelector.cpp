@@ -153,6 +153,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     const auto intersection = intersection_handler->get_closest_intersection(
         intersector);
 
+    if (!intersection)
+    {
+        intersections.clear();
+        return;
+    }
+
     for (const vsg::Node* const node : intersection->nodePath)
     {
         if (RouteObject* object = const_cast<RouteObject*>(
@@ -196,19 +202,40 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
     const auto world_intersection = static_cast<vsg::vec3>(
         intersection->worldIntersection);
 
-    const auto translation = world_intersection - prev_intersect_pos;
-    prev_intersect_pos = world_intersection;
-    total_translation += translation;
+    intersector->intersections.clear();
 
-    if (state == State::KEYBOARD_GRAB)
+    switch (state)
     {
-        for (const auto& object : RouteObject::get_selected_objects())
+        case State::INITIAL:
         {
-            object->move(translation);
+            return;
+        }
+        case State::KEYBOARD_GRAB:
+        {
+            const auto translation = world_intersection - prev_intersect_pos;
+            prev_intersect_pos = world_intersection;
+            total_translation += translation;
+
+            for (const auto& object : RouteObject::get_selected_objects())
+            {
+                object->move(translation);
+            }
+
+            return;
+        }
+        case State::KEYBOARD_ROTATE:
+        {
+            return;
+        }
+        case State::KEYBOARD_SCALE:
+        {
+            return;
+        }
+        default:
+        {
+            return;
         }
     }
-
-    intersector->intersections.clear();
 }
 
 void ObjectSelector::apply(vsg::FrameEvent& frame)
@@ -227,7 +254,8 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         }
         begin_pos /= static_cast<float>(selected_objects.size());
 
-        const auto front_plane = camera_handler->create_front_plane(begin_pos);
+        const auto front_plane = camera_handler->create_front_plane(begin_pos,
+            &front_plane_up);
 
         const auto intersector = intersection_handler->apply_(
             mouse_handler->get_pos());

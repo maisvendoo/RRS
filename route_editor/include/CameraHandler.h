@@ -50,7 +50,8 @@ public:
     vec3_type get_right() const;
     vec3_type get_up() const;
 
-    vsg::ref_ptr<vsg::Node> create_front_plane(vec3_type point) const;
+    vsg::ref_ptr<vsg::Node> create_front_plane(vec3_type point,
+        vec3_type* up_out = nullptr) const;
 
 private:
     void calculate_front();

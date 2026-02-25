@@ -235,7 +235,8 @@ CameraHandler::vec3_type CameraHandler::get_up() const
     return up;
 }
 
-vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(vec3_type point) const
+vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(vec3_type point,
+    vec3_type* up_out) const
 {
     const auto camera_pos = static_cast<vec3_type>(look_at->eye);
     const auto angle_rad = vsg::radians(static_cast<value_type>(80));
@@ -264,12 +265,17 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(vec3_type point) const
 
     const value_type dist = camera_norm_length / vsg::dot(p0_dir, front);
 
-    return create_quad(
-        camera_pos + p0_dir * dist,
-        camera_pos + p1_dir * dist,
-        camera_pos + p2_dir * dist,
-        camera_pos + p3_dir * dist
-    );
+    const vsg::vec3 p0 = camera_pos + p0_dir * dist;
+    const vsg::vec3 p1 = camera_pos + p1_dir * dist;
+    const vsg::vec3 p2 = camera_pos + p2_dir * dist;
+    const vsg::vec3 p3 = camera_pos + p3_dir * dist;
+
+    if (up_out)
+    {
+        *up_out = vsg::normalize(p2 - p0);
+    }
+
+    return create_quad(p0, p1, p2, p3);
 }
 
 void CameraHandler::calculate_front()
