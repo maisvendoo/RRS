@@ -56,12 +56,19 @@ private:
     void confirm_keyboard_move();
     void cancel_keyboard_move();
 
+    void confirm_keyboard_rotate();
+    void cancel_keyboard_rotate();
+
+    void confirm_keyboard_scale();
+    void cancel_keyboard_scale();
+
 private:
     enum class State
     {
         INITIAL,
         KEYBOARD_GRAB,
-        KEYBOARD_ROTATE
+        KEYBOARD_ROTATE,
+        KEYBOARD_SCALE
     };
 
     State state = State::INITIAL;

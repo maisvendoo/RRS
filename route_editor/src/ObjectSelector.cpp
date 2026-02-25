@@ -67,18 +67,55 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    if (state == State::KEYBOARD_GRAB)
+    switch (state)
     {
-        if (mouse_handler->get_is_lmb_pressed())
+        case State::INITIAL:
         {
-            confirm_keyboard_move();
+            break;
         }
-        else if (mouse_handler->get_is_rmb_pressed())
+        case State::KEYBOARD_GRAB:
         {
-            cancel_keyboard_move();
-        }
+            if (mouse_handler->get_is_lmb_pressed())
+            {
+                confirm_keyboard_move();
+            }
+            else if (mouse_handler->get_is_rmb_pressed())
+            {
+                cancel_keyboard_move();
+            }
 
-        return;
+            return;
+        }
+        case State::KEYBOARD_ROTATE:
+        {
+            if (mouse_handler->get_is_lmb_pressed())
+            {
+                confirm_keyboard_rotate();
+            }
+            else if (mouse_handler->get_is_rmb_pressed())
+            {
+                cancel_keyboard_rotate();
+            }
+
+            return;
+        }
+        case State::KEYBOARD_SCALE:
+        {
+            if (mouse_handler->get_is_lmb_pressed())
+            {
+                confirm_keyboard_scale();
+            }
+            else if (mouse_handler->get_is_rmb_pressed())
+            {
+                cancel_keyboard_scale();
+            }
+
+            return;
+        }
+        default:
+        {
+            break;
+        }
     }
 
     const auto& selected_objects = RouteObject::get_selected_objects();
@@ -138,37 +175,40 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
     gizmo->apply(moveEvent);
 
-    if (const auto front_plane = front_plane_switch->node)
+    const auto front_plane = front_plane_switch->node;
+    if (!front_plane)
     {
-        const auto intersector = intersection_handler->apply_(moveEvent);
-
-        front_plane->accept(*intersector);
-
-        const auto intersection =
-            intersection_handler->get_closest_intersection(intersector);
-
-        if (!intersection)
-        {
-            return;
-        }
-
-        const auto world_intersection = static_cast<vsg::vec3>(
-            intersection->worldIntersection);
-
-        const auto translation = world_intersection - prev_intersect_pos;
-        prev_intersect_pos = world_intersection;
-        total_translation += translation;
-
-        if (state == State::KEYBOARD_GRAB)
-        {
-            for (const auto& object : RouteObject::get_selected_objects())
-            {
-                object->move(translation);
-            }
-        }
-
-        intersector->intersections.clear();
+        return;
     }
+
+    const auto intersector = intersection_handler->apply_(moveEvent);
+
+    front_plane->accept(*intersector);
+
+    const auto intersection =
+        intersection_handler->get_closest_intersection(intersector);
+
+    if (!intersection)
+    {
+        return;
+    }
+
+    const auto world_intersection = static_cast<vsg::vec3>(
+        intersection->worldIntersection);
+
+    const auto translation = world_intersection - prev_intersect_pos;
+    prev_intersect_pos = world_intersection;
+    total_translation += translation;
+
+    if (state == State::KEYBOARD_GRAB)
+    {
+        for (const auto& object : RouteObject::get_selected_objects())
+        {
+            object->move(translation);
+        }
+    }
+
+    intersector->intersections.clear();
 }
 
 void ObjectSelector::apply(vsg::FrameEvent& frame)
@@ -292,6 +332,48 @@ void ObjectSelector::cancel_keyboard_move()
     {
         object->move(-total_translation);
     }
+
+    front_plane_switch->node = nullptr;
+}
+
+void ObjectSelector::confirm_keyboard_rotate()
+{
+    state = State::INITIAL;
+    front_plane_switch->node = nullptr;
+
+    // commands.push(new MoveObjectsCommand(RouteObject::get_selected_objects(),
+    //     total_translation), false);
+}
+
+void ObjectSelector::cancel_keyboard_rotate()
+{
+    state = State::INITIAL;
+
+    // for (const auto& object : RouteObject::get_selected_objects())
+    // {
+    //     object->move(-total_translation);
+    // }
+
+    front_plane_switch->node = nullptr;
+}
+
+void ObjectSelector::confirm_keyboard_scale()
+{
+    state = State::INITIAL;
+    front_plane_switch->node = nullptr;
+
+    // commands.push(new MoveObjectsCommand(RouteObject::get_selected_objects(),
+    //     total_translation), false);
+}
+
+void ObjectSelector::cancel_keyboard_scale()
+{
+    state = State::INITIAL;
+
+    // for (const auto& object : RouteObject::get_selected_objects())
+    // {
+    //     object->move(-total_translation);
+    // }
 
     front_plane_switch->node = nullptr;
 }
