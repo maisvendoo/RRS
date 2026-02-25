@@ -89,6 +89,7 @@ private:
     vsg::vec3 total_translation;
     vsg::ref_ptr<SingleSwitch> front_plane_switch;
     vsg::vec3 front_plane_up;
+    vsg::vec3 front;
 };
 
 #endif // OBJECT_SELECTOR_H

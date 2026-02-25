@@ -18,6 +18,7 @@
 #include <vsg/core/Mask.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/common.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/PointerEvent.h>
@@ -212,14 +213,52 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         }
         case State::KEYBOARD_GRAB:
         {
-            const auto translation = world_intersection - prev_intersect_pos;
-            prev_intersect_pos = world_intersection;
-            total_translation += translation;
+            // const auto translation = world_intersection - prev_intersect_pos;
+            // prev_intersect_pos = world_intersection;
+            // total_translation += translation;
 
-            for (const auto& object : RouteObject::get_selected_objects())
+            // for (const auto& object : RouteObject::get_selected_objects())
+            // {
+            //     object->move(translation);
+            // }
+
+            vsg::vec3 center = {0.0f, 0.0f, 0.0f};
+            const auto& selected_objects = RouteObject::get_selected_objects();
+            for (const auto& object : selected_objects)
             {
-                object->move(translation);
+                center += object->get_translation();
             }
+            center /= static_cast<float>(selected_objects.size());
+
+            if (prev_intersect_pos == begin_intersect_pos)
+            {
+                prev_intersect_pos = world_intersection;
+            }
+
+            const auto dot1 = vsg::dot(
+                vsg::normalize(world_intersection - begin_intersect_pos),
+                vsg::normalize(front_plane_up)
+            );
+
+            const auto dot2 = vsg::dot(
+                vsg::normalize(prev_intersect_pos - begin_intersect_pos),
+                vsg::normalize(front_plane_up)
+            );
+
+            if (std::abs(dot1) < 0.99f && std::abs(dot2) < 0.99f)
+            {
+                const auto acos1 = std::acos(dot1);
+                const auto acos2 = std::acos(dot2);
+                const auto rotation_deg = front * vsg::degrees(acos1 - acos2);
+
+                prev_intersect_pos = world_intersection;
+
+                for (const auto& object : selected_objects)
+                {
+                    object->rotate_around_pivot(center, rotation_deg, object->matrix);
+                }
+            }
+
 
             return;
         }
@@ -256,6 +295,8 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
         const auto front_plane = camera_handler->create_front_plane(begin_pos,
             &front_plane_up);
+
+        front = camera_handler->get_front();
 
         const auto intersector = intersection_handler->apply_(
             mouse_handler->get_pos());
