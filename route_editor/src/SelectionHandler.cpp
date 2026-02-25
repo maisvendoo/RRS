@@ -10,6 +10,8 @@
 #include "PrepareRotateSelectionState.h"
 #include "PrepareScaleSelectionState.h"
 
+#include <vsg/ui/PointerEvent.h>
+
 SelectionHandler::SelectionHandler()
     : gizmo_grab_selection_state(new GizmoGrabSelectionState)
     , gizmo_rotate_selection_state(new GizmoRotateSelectionState)
@@ -20,7 +22,29 @@ SelectionHandler::SelectionHandler()
     , prepare_grab_selection_state(new PrepareGrabSelectionState)
     , prepare_rotate_selection_state(new PrepareRotateSelectionState)
     , prepare_scale_selection_state(new PrepareScaleSelectionState)
-    , prev_selection_state(prepare_grab_selection_state)
-    , curr_selection_state(prepare_grab_selection_state)
+    , selection_state(prepare_grab_selection_state)
 {
+}
+
+SelectionHandler::~SelectionHandler()
+{
+    delete gizmo_grab_selection_state;
+    delete gizmo_rotate_selection_state;
+    delete gizmo_scale_selection_state;
+    delete keyboard_grab_selection_state;
+    delete keyboard_rotate_selection_state;
+    delete keyboard_scale_selection_state;
+    delete prepare_grab_selection_state;
+    delete prepare_rotate_selection_state;
+    delete prepare_scale_selection_state;
+}
+
+void SelectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
+{
+    if (buttonPress.handled)
+    {
+        return;
+    }
+
+    selection_state->apply(buttonPress);
 }
