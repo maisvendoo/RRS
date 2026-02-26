@@ -91,7 +91,7 @@ signals:
     /// Сообщить через вьювер, что такое имя уже есть
     void sigSendExistedNameFound(int train_idx);
 
-    /// Переименовать пеозд в модели
+    /// Переименовать поезд в модели
     void sigRenameTrainInModel(int train_idx, QString new_name);
 
 private:
@@ -124,6 +124,9 @@ private:
 
     /// Текущее время в симуляторе
     simulator_time_t sim_time;
+
+    /// Имя каталога, содержащего сценарий (запоминаем для последующей загрузки графиков)
+    std::string cur_scenario_dir = "";
 
     /// Поставить задачу в очередь
     void setTask(task_t task);
@@ -243,6 +246,9 @@ private:
 
     /// Получить имя следующей траектории в заданном направлении
     std::string getNextTrajName(const std::string &traj_name, int dir);
+
+    /// Загрузить график движения для данного поезда
+    void loadTrainTimetable(const std::string &train_name);
 
 private slots:
 

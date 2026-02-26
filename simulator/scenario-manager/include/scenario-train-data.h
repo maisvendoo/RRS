@@ -18,8 +18,8 @@ struct scenario_train_data_t
     double traj_coord = 0;
     /// Направление
     int direction = 1;
-    /// Признак того, что это бот
-    bool is_auto = false;
+    /// Признак того, что это бот (опционально)
+    bool is_auto = false;    
 
     void setIndex(size_t idx)
     {
