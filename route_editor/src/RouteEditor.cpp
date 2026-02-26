@@ -12,6 +12,7 @@
 #include "Route.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
+#include "Settings.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
 #include "shader_funcs.h"
@@ -40,6 +41,8 @@
 #include <vsgXchange/all.h>
 
 #include <vulkan/vulkan_core.h>
+
+#include <string>
 
 RouteEditor::RouteEditor() = default;
 RouteEditor::~RouteEditor() = default;

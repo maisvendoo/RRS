@@ -3,6 +3,7 @@
 #include "Action.h"
 #include "CameraHandler.h"
 #include "Command.h"
+#include "CommandList.h"
 #include "EditorState.h"
 #include "KeyBinding.h"
 #include "ObjectSelector.h"

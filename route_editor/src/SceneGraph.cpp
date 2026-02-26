@@ -10,7 +10,6 @@
 #include <vsg/lighting/AmbientLight.h>
 
 #include <cassert>
-#include <string>
 
 SceneGraph::SceneGraph(const EditorContext& context)
     : context(context)
@@ -22,7 +21,7 @@ SceneGraph::SceneGraph(const EditorContext& context)
 
 void SceneGraph::load_route()
 {
-    route = Route::create(context.settings, context.options, context.route_dir);
+    route = Route::create(context);
 
     const auto compile_result = context.viewer->compileManager->compile(route);
 

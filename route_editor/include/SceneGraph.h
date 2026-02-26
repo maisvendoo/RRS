@@ -8,8 +8,6 @@
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 
-#include <string>
-
 class Route;
 struct settings_t;
 

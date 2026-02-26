@@ -1,6 +1,7 @@
 #ifndef GIZMO_H
 #define GIZMO_H
 
+#include "EditorContext.h"
 #include "RouteObject.h"
 #include "SingleSwitch.h"
 
@@ -29,13 +30,7 @@ class Node;
 class Gizmo : public vsg::Inherit<SingleSwitch, Gizmo>
 {
 public:
-    Gizmo(
-        const settings_t& settings,
-        CommandList& commands,
-        vsg::ref_ptr<CameraHandler> camera_handler,
-        vsg::ref_ptr<IntersectionHandler> intersection_handler,
-        const RouteObjects& selected_objects
-    );
+    Gizmo(EditorContext& context, const RouteObjects& selected_objects);
 
     bool handle_intersections();
 
@@ -46,10 +41,7 @@ public:
     void update_position();
 
 private:
-    const settings_t& settings;
-    CommandList& commands;
-    vsg::ref_ptr<CameraHandler> camera_handler;
-    vsg::ref_ptr<IntersectionHandler> intersection_handler;
+    EditorContext& context;
     const RouteObjects& selected_objects;
 
     vsg::Builder builder;

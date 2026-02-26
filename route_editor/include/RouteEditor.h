@@ -1,14 +1,9 @@
 #ifndef ROUTE_EDITOR_H
 #define ROUTE_EDITOR_H
 
-#include "CommandList.h"
 #include "EditorContext.h"
-#include "EditorState.h"
-#include "Settings.h"
 
 #include <vsg/core/ref_ptr.h>
-
-#include <string>
 
 class CameraHandler;
 class IntersectionHandler;

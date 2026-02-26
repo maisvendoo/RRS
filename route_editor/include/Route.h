@@ -1,6 +1,7 @@
 #ifndef ROUTE_H
 #define ROUTE_H
 
+#include "EditorContext.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
 #include "StringMap.h"
@@ -10,7 +11,6 @@
 #include <vsg/core/ref_ptr.h>
 
 #include <memory>
-#include <string>
 
 class Topology;
 struct settings_t;
@@ -25,11 +25,7 @@ class Options;
 class Route : public vsg::Inherit<SwitchGroup, Route>
 {
 public:
-    Route(
-        const settings_t& settings,
-        vsg::ref_ptr<vsg::Options> options,
-        const std::string& directory
-    );
+    Route(const EditorContext& context);
 
     const StringMap& get_objects_ref() const;
     const RouteMap& get_route_map() const;
@@ -43,9 +39,7 @@ private:
     bool load_topology();
 
 private:
-    const settings_t& settings;
-    vsg::ref_ptr<vsg::Options> options;
-    const std::string& directory;
+    const EditorContext& context;
 
     StringMap objects_ref;
     RouteMap route_map;

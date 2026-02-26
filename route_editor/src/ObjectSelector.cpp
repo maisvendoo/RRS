@@ -29,9 +29,7 @@
 ObjectSelector::ObjectSelector(EditorContext& context)
     : context(context)
 {
-    gizmo = Gizmo::create(context.settings, context.commands,
-        context.camera_handler, context.intersection_handler,
-        RouteObject::get_selected_objects());
+    gizmo = Gizmo::create(context, RouteObject::get_selected_objects());
 
     front_plane_switch = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
@@ -219,10 +217,10 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
                 return;
             }
 
-            const auto print_vec3 = [&](const char* name, vsg::vec3 v) -> void
-            {
-                std::printf("%s: %10.3f %10.3f %10.3f\n", name, v.x, v.y, v.z);
-            };
+            // const auto print_vec3 = [&](const char* name, vsg::vec3 v) -> void
+            // {
+            //     std::printf("%s: %10.3f %10.3f %10.3f\n", name, v.x, v.y, v.z);
+            // };
 
             const auto print_int = [&](const char* name, int i) -> void
             {
