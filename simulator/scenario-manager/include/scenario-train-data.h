@@ -2,6 +2,7 @@
 #define     SCENARIO_TRAIN_DATA_H
 
 #include    <string>
+#include    <autopilot-timetable.h>
 
 //------------------------------------------------------------------------------
 //
@@ -18,8 +19,10 @@ struct scenario_train_data_t
     double traj_coord = 0;
     /// Направление
     int direction = 1;
-    /// Признак того, что это бот
+    /// Признак того, что это бот (опционально)
     bool is_auto = false;
+    /// Нормативный график движения
+    autopilot_timetable_t timetable;
 
     void setIndex(size_t idx)
     {
