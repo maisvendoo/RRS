@@ -260,6 +260,19 @@ void MapWidget::drawTrajectory(Trajectory* traj, QPainter& painter,
         {
             distance2 = track_distance2;
         }
+
+        if (show_traj_names && (scale > 2.5))
+        {
+            const double t_len = std::min(scale, 6.0);
+            const double t_wid = std::min(scale, 6.0) * 0.25;
+            dvec3 pointA = track.end_point;
+            dvec3 pointB = pointA - track.orth * t_len + track.trav * t_wid;
+            dvec3 pointC = pointA - track.orth * t_len - track.trav * t_wid;
+            QPoint pA = coord_transform(pointA);
+            QPoint pB = coord_transform(pointB);
+            QPoint pC = coord_transform(pointC);
+            draw_triangle(painter, pA, pB, pC, pen.color());
+        }
     }
 
     QLabel *traj_label = traj_labels.value(traj->getName());
@@ -848,6 +861,15 @@ void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor
     painter.setPen(pen);
     painter.drawLine(bottom_down, bottom_up);
     painter.drawLine(bottom_left, bottom_right);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::draw_triangle(QPainter &painter, const QPointF &pointA, const QPointF &pointB, const QPointF &pointC, QColor color)
+{
+    painter.setBrush(color);
+    painter.drawPolygon({pointA, pointB, pointC});
 }
 
 

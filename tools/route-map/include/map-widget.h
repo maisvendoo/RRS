@@ -188,6 +188,10 @@ private:
 
     void drawSignal(Signal* signal, QPainter& painter, std::vector<QColor> lens_colors);
 
+    void draw_triangle(QPainter& painter,
+                       const QPointF& pointA, const QPointF& pointB, const QPointF& pointC,
+                       QColor color);
+
     QPoint coord_transform(dvec3 point);
 
     double distance2_pos_to_point(const QPointF& pos, const QPointF& point);
