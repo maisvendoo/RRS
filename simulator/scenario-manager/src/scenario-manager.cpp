@@ -70,9 +70,9 @@ bool ScenarioManager::run(const std::string &route_dir,
                                + "scenarios";
 
     cur_scenario_dir = scenario_dir + fs.separator()
-                       + scenario_name + fs.separator();
+                       + scenario_name;
 
-    std::string script_path = cur_scenario_dir + "main.lua";
+    std::string script_path = cur_scenario_dir  + fs.separator() + "main.lua";
 
     // Добавляем каталог сценария в пути поиска модулей
     const std::string &cur_path = lua["package"]["path"].get<std::string>();
@@ -347,7 +347,11 @@ std::string ScenarioManager::getNextTrajName(const std::string &traj_name, int d
 //------------------------------------------------------------------------------
 void ScenarioManager::loadTrainTimetable(const std::string &train_name)
 {
+    FileSystem &fs = FileSystem::getInstance();
 
+    std::string path = cur_scenario_dir + fs.separator()
+                       + "timetable" + fs.separator() +
+                       train_name + ".conf";
 }
 
 //------------------------------------------------------------------------------
