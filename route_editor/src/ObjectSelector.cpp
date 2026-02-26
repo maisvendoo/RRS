@@ -29,7 +29,7 @@
 ObjectSelector::ObjectSelector(EditorContext& context)
     : context(context)
 {
-    gizmo = Gizmo::create(context, RouteObject::get_selected_objects());
+    gizmo = Gizmo::create(context);
 
     front_plane_switch = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
@@ -96,7 +96,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         }
     }
 
-    const auto& selected_objects = RouteObject::get_selected_objects();
+    const auto& selected_objects = context.selected_objects;
 
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
@@ -194,7 +194,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
             prev_intersect_pos = world_intersection;
             total_translation += translation;
 
-            for (const auto& object : RouteObject::get_selected_objects())
+            for (const auto& object : context.selected_objects)
             {
                 object->move(translation);
             }
@@ -203,7 +203,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         }
         case State::KEYBOARD_ROTATE:
         {
-            const auto& selected_objects = RouteObject::get_selected_objects();
+            const auto& selected_objects = context.selected_objects;
 
             vsg::vec3 center = {0.0f, 0.0f, 0.0f};
             for (const auto& object : selected_objects)
@@ -342,7 +342,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
-    const auto& selected_objects = RouteObject::get_selected_objects();
+    const auto& selected_objects = context.selected_objects;
 
     if (state != State::KEYBOARD_GRAB && !selected_objects.empty() &&
         context.keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
@@ -409,7 +409,7 @@ void ObjectSelector::select_object(RouteObject* object)
     }
     else
     {
-        const auto& selected_objects = RouteObject::get_selected_objects();
+        const auto& selected_objects = context.selected_objects;
 
         if (selected_objects.empty())
         {
@@ -450,7 +450,7 @@ void ObjectSelector::confirm_keyboard_move()
     state = State::INITIAL;
     front_plane_switch->node = nullptr;
 
-    context.commands.push(new MoveObjectsCommand(RouteObject::get_selected_objects(),
+    context.commands.push(new MoveObjectsCommand(context.selected_objects,
         total_translation), false);
 }
 
@@ -458,7 +458,7 @@ void ObjectSelector::cancel_keyboard_move()
 {
     state = State::INITIAL;
 
-    for (const auto& object : RouteObject::get_selected_objects())
+    for (const auto& object : context.selected_objects)
     {
         object->move(-total_translation);
     }

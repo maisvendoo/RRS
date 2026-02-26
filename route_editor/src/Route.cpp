@@ -44,7 +44,7 @@ static vsg::vec3 to_vsg_vec3(dvec3 vec)
     };
 }
 
-Route::Route(const EditorContext& context)
+Route::Route(EditorContext& context)
     : context(context)
 {
     const bool success = load_objects_ref() && load_route_map();
@@ -174,8 +174,8 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
             continue;
         }
 
-        const auto object = RouteObject::create(paged_lod_it->second, label,
-            transform.first, -transform.second);
+        const auto object = RouteObject::create(context, paged_lod_it->second,
+            label, transform.first, -transform.second);
 
         this->addChild(vsg::MASK_ALL, object);
     }
@@ -289,7 +289,7 @@ bool Route::load_topology()
                 vsg::degrees(std::atan2(-right.y, right.x))
             };
 
-            const auto object = RouteObject::create(paged_lod,
+            const auto object = RouteObject::create(context, paged_lod,
                 signal_model_name, pos, rotation_deg);
 
             this->addChild(vsg::MASK_ALL, object);

@@ -17,7 +17,7 @@ class Topology;
 class Route : public vsg::Inherit<SwitchGroup, Route>
 {
 public:
-    Route(const EditorContext& context);
+    Route(EditorContext& context);
 
     const StringMap& get_objects_ref() const;
     const RouteMap& get_route_map() const;
@@ -31,7 +31,7 @@ private:
     bool load_topology();
 
 private:
-    const EditorContext& context;
+    EditorContext& context;
 
     StringMap objects_ref;
     RouteMap route_map;

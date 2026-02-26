@@ -119,8 +119,6 @@ bool RouteEditor::initialize()
     RouteObjects selected_objects;
     RouteObjects hidden_objects;
 
-    RouteObject::set_observer_viewer(observer_viewer);
-
     context.object_selector = ObjectSelector::create(context);
 
     context.viewer->addWindow(window);

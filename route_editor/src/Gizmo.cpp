@@ -31,9 +31,8 @@ static constexpr vsg::vec3 X_AXIS_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 Y_AXIS_POSITIVE = {0.0f, 1.0f, 0.0f};
 static constexpr vsg::vec3 Z_AXIS_POSITIVE = {0.0f, 0.0f, 1.0f};
 
-Gizmo::Gizmo(EditorContext& context, const RouteObjects& selected_objects)
+Gizmo::Gizmo(EditorContext& context)
     : context(context)
-    , selected_objects(selected_objects)
 {
     builder.shaderSet = vsg::createFlatShadedShaderSet();
 
@@ -260,7 +259,7 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
         return;
     }
 
-    context.commands.push(new MoveObjectsCommand(selected_objects, total_translation),
+    context.commands.push(new MoveObjectsCommand(context.selected_objects, total_translation),
         false);
 
     active_arrow = nullptr;
@@ -325,7 +324,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
         total_translation += translation;
 
-        for (const auto& object : selected_objects)
+        for (const auto& object : context.selected_objects)
         {
             object->move(translation);
         }
@@ -336,7 +335,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
 void Gizmo::update_visibility()
 {
-    this->mask = selected_objects.empty()
+    this->mask = context.selected_objects.empty()
         ? vsg::MASK_OFF
         : MASK_GUI1 | MASK_CLICKABLE;
 
@@ -358,7 +357,7 @@ void Gizmo::update_position()
 
     if (context.settings.gizmo_to_center)
     {
-        for (const auto& object : selected_objects)
+        for (const auto& object : context.selected_objects)
         {
             const auto& bounds = object->get_bounds();
             curr_pos += (bounds.min + bounds.max) / 2.0f;
@@ -366,13 +365,13 @@ void Gizmo::update_position()
     }
     else
     {
-        for (const auto& object : selected_objects)
+        for (const auto& object : context.selected_objects)
         {
             curr_pos += object->get_translation();
         }
     }
 
-    curr_pos /= static_cast<float>(selected_objects.size());
+    curr_pos /= static_cast<float>(context.selected_objects.size());
 
     matrix_transform->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
 }

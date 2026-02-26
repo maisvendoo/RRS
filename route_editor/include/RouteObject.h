@@ -12,6 +12,7 @@
 #include <list>
 #include <string>
 
+struct EditorContext;
 class Gizmo;
 class RouteObject;
 class SingleSwitch;
@@ -30,8 +31,8 @@ using RouteObjectsIterator = RouteObjects::iterator;
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 {
 public:
-    RouteObject(vsg::ref_ptr<vsg::PagedLOD> paged_lod, const std::string& label,
-        vsg::vec3 translation, vsg::vec3 rotation_deg);
+    RouteObject(EditorContext& context, vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+        const std::string& label, vsg::vec3 translation, vsg::vec3 rotation_deg);
 
     vsg::vec3 get_translation() const;
     vsg::vec3 get_rotation_deg() const;
@@ -46,12 +47,6 @@ public:
 
     bool get_is_selected() const;
     bool get_is_hidden() const;
-
-    static RouteObjects& get_selected_objects();
-    static RouteObjects& get_hidden_objects();
-
-    static void set_observer_viewer(
-        vsg::observer_ptr<vsg::Viewer> observer_viewer);
 
     static void set_gizmo(Gizmo* gizmo);
 
@@ -87,10 +82,8 @@ public:
     std::string label;
 
 private:
-    static vsg::observer_ptr<vsg::Viewer> s_observer_viewer;
+    EditorContext& context;
     static Gizmo* s_gizmo;
-    static RouteObjects s_selected_objects;
-    static RouteObjects s_hidden_objects;
 
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;

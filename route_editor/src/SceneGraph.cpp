@@ -12,7 +12,7 @@
 
 #include <cassert>
 
-SceneGraph::SceneGraph(const EditorContext& context)
+SceneGraph::SceneGraph(EditorContext& context)
     : context(context)
 {
     ambient_light = vsg::AmbientLight::create();

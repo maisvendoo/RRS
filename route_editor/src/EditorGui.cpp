@@ -499,7 +499,7 @@ void EditorGui::show_selected_objects_properties() const
         return;
     }
 
-    const auto& selected_objects = RouteObject::get_selected_objects();
+    const auto& selected_objects = context.selected_objects;
     if (selected_objects.empty())
     {
         return;

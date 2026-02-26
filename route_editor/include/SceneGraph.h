@@ -20,14 +20,14 @@ class AmbientLight;
 class SceneGraph : public vsg::Inherit<SwitchGroup, SceneGraph>
 {
 public:
-    SceneGraph(const EditorContext& context);
+    SceneGraph(EditorContext& context);
 
     void load_route();
 
     vsg::ref_ptr<Route> get_route() const;
 
 private:
-    const EditorContext& context;
+    EditorContext& context;
 
     vsg::ref_ptr<Route> route;
     vsg::ref_ptr<vsg::AmbientLight> ambient_light;

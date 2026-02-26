@@ -5,6 +5,7 @@
 #include "Outline.h"
 #include "SingleSwitch.h"
 
+#include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
@@ -22,10 +23,7 @@
 #include <cmath>
 #include <string>
 
-vsg::observer_ptr<vsg::Viewer> RouteObject::s_observer_viewer;
 Gizmo* RouteObject::s_gizmo = nullptr;
-RouteObjects RouteObject::s_selected_objects;
-RouteObjects RouteObject::s_hidden_objects;
 
 static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
@@ -57,14 +55,14 @@ static vsg::mat4 to_rotate_matrix(vsg::vec3 rotation_deg)
     return rotate_z * rotate_y * rotate_x;
 }
 
-RouteObject::RouteObject(vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+RouteObject::RouteObject(EditorContext& context, vsg::ref_ptr<vsg::PagedLOD> paged_lod,
     const std::string& label, vsg::vec3 translation, vsg::vec3 rotation_deg)
+    : label(label)
+    , context(context)
+    , translation(translation)
+    , rotation_deg(rotation_deg)
 {
     assert(paged_lod);
-
-    this->label = label;
-    this->translation = translation;
-    this->rotation_deg = rotation_deg;
 
     update_matrix();
 
@@ -126,22 +124,6 @@ bool RouteObject::get_is_selected() const
 bool RouteObject::get_is_hidden() const
 {
     return is_hidden;
-}
-
-RouteObjects& RouteObject::get_selected_objects()
-{
-    return s_selected_objects;
-}
-
-RouteObjects& RouteObject::get_hidden_objects()
-{
-    return s_hidden_objects;
-}
-
-void RouteObject::set_observer_viewer(
-    vsg::observer_ptr<vsg::Viewer> observer_viewer)
-{
-    s_observer_viewer = observer_viewer;
 }
 
 void RouteObject::set_gizmo(Gizmo* gizmo)
@@ -248,7 +230,7 @@ void RouteObject::hide()
 
     is_hidden = true;
 
-    s_hidden_objects.emplace_back(this);
+    context.hidden_objects.emplace_back(this);
 }
 
 RouteObjectsIterator RouteObject::show()
@@ -257,20 +239,20 @@ RouteObjectsIterator RouteObject::show()
 
     is_hidden = false;
 
-    return s_hidden_objects.erase(std::find(s_hidden_objects.cbegin(),
-        s_hidden_objects.cend(), this));
+    return context.hidden_objects.erase(std::find(context.hidden_objects.cbegin(),
+        context.hidden_objects.cend(), this));
 }
 
 void RouteObject::select()
 {
     const auto outline = outline_switch->node.cast<Outline>();
-    outline->load(s_observer_viewer);
+    outline->load(vsg::observer_ptr<vsg::Viewer>(context.viewer));
 
     outline_switch->mask = MASK_GUI2;
 
     is_selected = true;
 
-    s_selected_objects.emplace_back(this);
+    context.selected_objects.emplace_back(this);
 
     s_gizmo->update_position();
 }
@@ -281,8 +263,8 @@ RouteObjectsIterator RouteObject::deselect()
 
     is_selected = false;
 
-    const auto it = s_selected_objects.erase(std::find(
-        s_selected_objects.cbegin(), s_selected_objects.cend(), this));
+    const auto it = context.selected_objects.erase(std::find(
+        context.selected_objects.cbegin(), context.selected_objects.cend(), this));
 
     s_gizmo->update_position();
 
