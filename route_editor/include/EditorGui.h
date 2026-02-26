@@ -2,6 +2,7 @@
 #define EDITOR_GUI_H
 
 #include "CommandList.h"
+#include "EditorContext.h"
 #include "EditorState.h"
 #include "KeyBinding.h"
 
@@ -27,15 +28,7 @@ class Perspective;
 class EditorGui : public vsg::Inherit<vsg::Command, EditorGui>
 {
 public:
-    EditorGui(
-        settings_t& settings,
-        CommandList& commands,
-        EditorState& editor_state,
-        vsg::ref_ptr<vsg::Perspective> perspective,
-        vsg::ref_ptr<SceneGraph> scene_graph,
-        const vsg::ref_ptr<ObjectSelector>& object_selector,
-        std::string& route_directory
-    );
+    EditorGui(EditorContext& context);
 
     void record(vsg::CommandBuffer& command_buffer) const override;
 
@@ -51,16 +44,9 @@ private:
     void show_selected_objects_properties() const;
 
 private:
-    settings_t& settings;
-    CommandList& commands;
-    EditorState& editor_state;
-    const KeyBindings& key_bindings;
-    vsg::ref_ptr<vsg::Perspective> perspective;
-    vsg::ref_ptr<SceneGraph> scene_graph;
-    const vsg::ref_ptr<ObjectSelector>& object_selector;
+    EditorContext& context;
 
     ImGuiWindowFlags window_flags;
-    std::string& route_directory;
 };
 
 #endif // EDITOR_GUI_H

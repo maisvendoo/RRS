@@ -1,6 +1,7 @@
 #ifndef OBJECT_SELECTOR_H
 #define OBJECT_SELECTOR_H
 
+#include "EditorContext.h"
 #include "RouteObject.h"
 
 #include <vsg/core/Inherit.h>
@@ -34,16 +35,7 @@ class Viewer;
 class ObjectSelector : public vsg::Inherit<vsg::Visitor, ObjectSelector>
 {
 public:
-    ObjectSelector(
-        const settings_t& settings,
-        CommandList& commands,
-        vsg::ref_ptr<MouseHandler> mouse_handler,
-        vsg::ref_ptr<KeyboardHandler> keyboard_handler,
-        vsg::ref_ptr<CameraHandler> camera_handler,
-        vsg::ref_ptr<IntersectionHandler> intersection_handler,
-        vsg::ref_ptr<SceneGraph> scene_graph,
-        vsg::observer_ptr<vsg::Viewer> observer_viewer
-    );
+    ObjectSelector(EditorContext& context);
 
     void apply(vsg::ButtonPressEvent& buttonPress) override;
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
@@ -73,14 +65,7 @@ private:
 
     State state = State::INITIAL;
 
-    const settings_t& settings;
-    CommandList& commands;
-    vsg::ref_ptr<MouseHandler> mouse_handler;
-    vsg::ref_ptr<KeyboardHandler> keyboard_handler;
-    vsg::ref_ptr<CameraHandler> camera_handler;
-    vsg::ref_ptr<IntersectionHandler> intersection_handler;
-    vsg::ref_ptr<SceneGraph> scene_graph;
-    vsg::observer_ptr<vsg::Viewer> observer_viewer;
+    EditorContext& context;
 
     vsg::ref_ptr<Gizmo> gizmo;
 

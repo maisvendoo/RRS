@@ -6,10 +6,9 @@
 
 #include <vsg/ui/KeyEvent.h>
 
-KeyboardHandler::KeyboardHandler(const KeyBindings& key_bindings,
-    CommandList& commands)
-    : key_bindings(key_bindings)
-    , commands(commands)
+KeyboardHandler::KeyboardHandler(EditorContext& context)
+    : key_bindings(context.settings.key_bindings)
+    , commands(context.commands)
 {
 }
 

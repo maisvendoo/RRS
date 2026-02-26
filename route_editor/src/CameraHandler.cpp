@@ -1,9 +1,11 @@
 #include "CameraHandler.h"
 
 #include "Action.h"
+#include "EditorContext.h"
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
 #include "Settings.h"
+#include "WindowHandler.h"
 
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
@@ -58,22 +60,12 @@ static vsg::ref_ptr<vsg::Commands> create_quad(
     return commands;
 }
 
-CameraHandler::CameraHandler(
-    const settings_t& settings,
-    const VkExtent2D& window_extent,
-    vsg::ref_ptr<MouseHandler> mouse_handler,
-    vsg::ref_ptr<KeyboardHandler> keyboard_handler
-)
-    : settings(settings)
-    , mouse_handler(mouse_handler)
-    , keyboard_handler(keyboard_handler)
+CameraHandler::CameraHandler(const EditorContext& context)
+    : context(context)
 {
-    assert(window_extent.width != 0);
-    assert(window_extent.height != 0);
-    assert(mouse_handler);
-    assert(keyboard_handler);
+    const VkExtent2D& window_extent = context.window_handler->get_window()->extent2D();
 
-    const auto fovy = static_cast<perspective_value_type>(settings.fovy);
+    const auto fovy = static_cast<perspective_value_type>(context.settings.fovy);
 
     const auto window_width = static_cast<perspective_value_type>(
         window_extent.width);
@@ -84,16 +76,16 @@ CameraHandler::CameraHandler(
     const perspective_value_type aspect_ratio = window_width / window_height;
 
     const auto near_distance = static_cast<perspective_value_type>(
-        settings.zNear);
+        context.settings.zNear);
 
     const auto far_distance = static_cast<perspective_value_type>(
-        settings.view_distance);
+        context.settings.view_distance);
 
     perspective = vsg::Perspective::create(fovy, aspect_ratio,
         near_distance, far_distance);
 
     const auto initial_height = static_cast<look_at_value_type>(
-        settings.camera_initial_height);
+        context.settings.camera_initial_height);
 
     look_at = vsg::LookAt::create();
     look_at->eye.z = look_at->center.z = initial_height;
@@ -115,13 +107,13 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
 
     prev_time = time;
 
-    if (mouse_handler->get_is_rmb_pressed())
+    if (context.mouse_handler->get_is_rmb_pressed())
     {
         const auto delta_mouse_pos = static_cast<vec2_type>(
-            mouse_handler->get_delta_pos());
+            context.mouse_handler->get_delta_pos());
 
         const auto rotate_speed = static_cast<value_type>(
-            settings.camera_rotate_speed);
+            context.settings.camera_rotate_speed);
 
         yaw_deg += delta_mouse_pos.x * rotate_speed *
             static_cast<value_type>(delta_time);
@@ -129,8 +121,8 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
         pitch_deg -= delta_mouse_pos.y * rotate_speed *
             static_cast<value_type>(delta_time);
 
-        const auto pitch_min = static_cast<value_type>(settings.pitch_min);
-        const auto pitch_max = static_cast<value_type>(settings.pitch_max);
+        const auto pitch_min = static_cast<value_type>(context.settings.pitch_min);
+        const auto pitch_max = static_cast<value_type>(context.settings.pitch_max);
 
         pitch_deg = std::clamp(pitch_deg, pitch_min, pitch_max);
 
@@ -140,19 +132,19 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     }
 
     if (const auto scroll = static_cast<perspective_value_type>(
-        mouse_handler->get_scroll()))
+        context.mouse_handler->get_scroll()))
     {
         const auto zoom_power = static_cast<perspective_value_type>(
-            settings.camera_zoom_power);
+            context.settings.camera_zoom_power);
 
         perspective->fieldOfViewY -= scroll * zoom_power *
             static_cast<perspective_value_type>(delta_time);
 
         const auto fovy_min = static_cast<perspective_value_type>(
-            settings.fovy_min);
+            context.settings.fovy_min);
 
         const auto fovy_max = static_cast<perspective_value_type>(
-            settings.fovy_max);
+            context.settings.fovy_max);
 
         perspective->fieldOfViewY = std::clamp(perspective->fieldOfViewY,
             fovy_min, fovy_max);
@@ -160,7 +152,7 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
 
     const auto get_binding_state = [this](Action action) -> int
     {
-        return static_cast<int>(keyboard_handler->get_binding_state(action));
+        return static_cast<int>(context.keyboard_handler->get_binding_state(action));
     };
 
     const int move_forward = get_binding_state(ACTION_MOVE_CAMERA_FORWARD);
@@ -172,7 +164,7 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     const auto right = static_cast<look_at_vec3_type>(this->right);
 
     const auto move_speed = static_cast<look_at_value_type>(
-        settings.camera_move_speed);
+        context.settings.camera_move_speed);
 
     if (move_forward - move_backward != 0)
     {

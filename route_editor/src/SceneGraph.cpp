@@ -12,36 +12,23 @@
 #include <cassert>
 #include <string>
 
-SceneGraph::SceneGraph(
-    const settings_t& settings,
-    vsg::ref_ptr<vsg::Options> options
-)
-    : settings(settings)
-    , options(options)
+SceneGraph::SceneGraph(const EditorContext& context)
+    : context(context)
 {
-    assert(options);
-
     ambient_light = vsg::AmbientLight::create();
 
     this->addChild(vsg::Mask{MASK_SCENE}, ambient_light);
 }
 
-void SceneGraph::load_route(
-    vsg::observer_ptr<vsg::Viewer> observer_viewer,
-    const std::string& directory
-)
+void SceneGraph::load_route()
 {
-    assert(observer_viewer);
+    route = Route::create(context.settings, context.options, context.route_dir);
 
-    route = Route::create(settings, options, directory);
-
-    const auto viewer = observer_viewer.ref_ptr();
-    const auto compile_manager = viewer->compileManager;
-    const auto compile_result = compile_manager->compile(route);
+    const auto compile_result = context.viewer->compileManager->compile(route);
 
     this->addChild(vsg::MASK_ALL, route);
 
-    vsg::updateViewer(*viewer, compile_result);
+    vsg::updateViewer(*context.viewer, compile_result);
 }
 
 vsg::ref_ptr<Route> SceneGraph::get_route() const

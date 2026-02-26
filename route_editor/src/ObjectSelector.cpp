@@ -26,39 +26,18 @@
 #include <cassert>
 #include <utility>
 
-ObjectSelector::ObjectSelector(
-    const settings_t& settings,
-    CommandList& commands,
-    vsg::ref_ptr<MouseHandler> mouse_handler,
-    vsg::ref_ptr<KeyboardHandler> keyboard_handler,
-    vsg::ref_ptr<CameraHandler> camera_handler,
-    vsg::ref_ptr<IntersectionHandler> intersection_handler,
-    vsg::ref_ptr<SceneGraph> scene_graph,
-    vsg::observer_ptr<vsg::Viewer> observer_viewer
-)
-    : settings(settings)
-    , commands(commands)
-    , mouse_handler(mouse_handler)
-    , keyboard_handler(keyboard_handler)
-    , camera_handler(camera_handler)
-    , intersection_handler(intersection_handler)
-    , scene_graph(scene_graph)
-    , observer_viewer(observer_viewer)
+ObjectSelector::ObjectSelector(EditorContext& context)
+    : context(context)
 {
-    assert(keyboard_handler);
-    assert(camera_handler);
-    assert(intersection_handler);
-    assert(scene_graph);
-    assert(observer_viewer);
-
-    gizmo = Gizmo::create(settings, commands, camera_handler,
-        intersection_handler, RouteObject::get_selected_objects());
+    gizmo = Gizmo::create(context.settings, context.commands,
+        context.camera_handler, context.intersection_handler,
+        RouteObject::get_selected_objects());
 
     front_plane_switch = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
 
-    scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo);
-    scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, front_plane_switch);
+    context.scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo);
+    context.scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, front_plane_switch);
 }
 
 void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
@@ -76,11 +55,11 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         }
         case State::KEYBOARD_GRAB:
         {
-            if (mouse_handler->get_is_lmb_pressed())
+            if (context.mouse_handler->get_is_lmb_pressed())
             {
                 confirm_keyboard_move();
             }
-            else if (mouse_handler->get_is_rmb_pressed())
+            else if (context.mouse_handler->get_is_rmb_pressed())
             {
                 cancel_keyboard_move();
             }
@@ -89,11 +68,11 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         }
         case State::KEYBOARD_ROTATE:
         {
-            if (mouse_handler->get_is_lmb_pressed())
+            if (context.mouse_handler->get_is_lmb_pressed())
             {
                 confirm_keyboard_rotate();
             }
-            else if (mouse_handler->get_is_rmb_pressed())
+            else if (context.mouse_handler->get_is_rmb_pressed())
             {
                 cancel_keyboard_rotate();
             }
@@ -102,11 +81,11 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         }
         case State::KEYBOARD_SCALE:
         {
-            if (mouse_handler->get_is_lmb_pressed())
+            if (context.mouse_handler->get_is_lmb_pressed())
             {
                 confirm_keyboard_scale();
             }
-            else if (mouse_handler->get_is_rmb_pressed())
+            else if (context.mouse_handler->get_is_rmb_pressed())
             {
                 cancel_keyboard_scale();
             }
@@ -128,13 +107,13 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    const auto intersector = intersection_handler->get_lmb_intersector();
+    const auto intersector = context.intersection_handler->get_lmb_intersector();
     if (!intersector)
     {
         return;
     }
 
-    scene_graph->accept(*intersector);
+    context.scene_graph->accept(*intersector);
 
     auto& intersections = intersector->intersections;
     if (intersections.empty())
@@ -143,15 +122,16 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // while there were selected objects,
         // deselect them all
         if (!selected_objects.empty() &&
-            !keyboard_handler->get_any_shift_state())
+            !context.keyboard_handler->get_any_shift_state())
         {
-            commands.push(new SelectObjectsCommand({}, selected_objects), true);
+            context.commands.push(
+                new SelectObjectsCommand({}, selected_objects), true);
         }
 
         return;
     }
 
-    const auto intersection = intersection_handler->get_closest_intersection(
+    const auto intersection = context.intersection_handler->get_closest_intersection(
         intersector);
 
     if (!intersection)
@@ -188,12 +168,11 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    const auto intersector = intersection_handler->apply_(moveEvent);
+    const auto intersector = context.intersection_handler->apply_(moveEvent);
 
     front_plane->accept(*intersector);
 
-    const auto intersection =
-        intersection_handler->get_closest_intersection(intersector);
+    const auto intersection = context.intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {
@@ -368,7 +347,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     const auto& selected_objects = RouteObject::get_selected_objects();
 
     if (state != State::KEYBOARD_GRAB && !selected_objects.empty() &&
-        keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
+        context.keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
     {
         vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
         for (const auto& object : selected_objects)
@@ -377,13 +356,13 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         }
         begin_pos /= static_cast<float>(selected_objects.size());
 
-        const auto front_plane = camera_handler->create_front_plane(begin_pos,
+        const auto front_plane = context.camera_handler->create_front_plane(begin_pos,
             &front_plane_up);
 
-        front = camera_handler->get_front();
+        front = context.camera_handler->get_front();
 
-        const auto intersector = intersection_handler->apply_(
-            mouse_handler->get_pos());
+        const auto intersector = context.intersection_handler->apply_(
+            context.mouse_handler->get_pos());
 
         if (!intersector)
         {
@@ -393,7 +372,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         front_plane->accept(*intersector);
 
         const auto intersection =
-            intersection_handler->get_closest_intersection(intersector);
+            context.intersection_handler->get_closest_intersection(intersector);
 
         if (!intersection)
         {
@@ -406,7 +385,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         prev_intersect_pos = begin_intersect_pos;
         total_translation = {0.0f, 0.0f, 0.0f};
 
-        const auto viewer = observer_viewer.ref_ptr();
+        const auto viewer = context.viewer;
         const auto compile_manager = viewer->compileManager;
         const auto compile_result = compile_manager->compile(front_plane);
 
@@ -419,15 +398,15 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
 void ObjectSelector::select_object(RouteObject* object)
 {
-    if (keyboard_handler->get_any_shift_state())
+    if (context.keyboard_handler->get_any_shift_state())
     {
         if (object->get_is_selected())
         {
-            commands.push(new SelectObjectsCommand({}, {object}), true);
+            context.commands.push(new SelectObjectsCommand({}, {object}), true);
         }
         else
         {
-            commands.push(new SelectObjectsCommand({object}, {}), true);
+            context.commands.push(new SelectObjectsCommand({object}, {}), true);
         }
     }
     else
@@ -436,7 +415,7 @@ void ObjectSelector::select_object(RouteObject* object)
 
         if (selected_objects.empty())
         {
-            commands.push(new SelectObjectsCommand({object}, {}), true);
+            context.commands.push(new SelectObjectsCommand({object}, {}), true);
         }
         else if (object->get_is_selected())
         {
@@ -457,12 +436,12 @@ void ObjectSelector::select_object(RouteObject* object)
                 }
             }
 
-            commands.push(new SelectObjectsCommand(
+            context.commands.push(new SelectObjectsCommand(
                 {}, std::move(objects_to_deselect)), true);
         }
         else
         {
-            commands.push(new SelectObjectsCommand(
+            context.commands.push(new SelectObjectsCommand(
                 {object}, selected_objects), true);
         }
     }
@@ -473,7 +452,7 @@ void ObjectSelector::confirm_keyboard_move()
     state = State::INITIAL;
     front_plane_switch->node = nullptr;
 
-    commands.push(new MoveObjectsCommand(RouteObject::get_selected_objects(),
+    context.commands.push(new MoveObjectsCommand(RouteObject::get_selected_objects(),
         total_translation), false);
 }
 

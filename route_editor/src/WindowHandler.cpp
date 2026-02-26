@@ -1,5 +1,6 @@
 #include "WindowHandler.h"
 
+#include "EditorContext.h"
 #include "Settings.h"
 
 #include <vsg/app/Window.h>
@@ -12,8 +13,10 @@
 
 static VkSampleCountFlags samples_bit_flag(int samples);
 
-WindowHandler::WindowHandler(const settings_t& settings)
+WindowHandler::WindowHandler(const EditorContext& context)
 {
+    const settings_t& settings = context.settings;
+
     const auto window_traits = vsg::WindowTraits::create();
     window_traits->x = settings.window_x;
     window_traits->y = settings.window_y;

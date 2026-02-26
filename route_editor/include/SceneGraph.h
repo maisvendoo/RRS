@@ -1,6 +1,7 @@
 #ifndef SCENE_GRAPH_H
 #define SCENE_GRAPH_H
 
+#include "EditorContext.h"
 #include "SwitchGroup.h"
 
 #include <vsg/core/Inherit.h>
@@ -24,18 +25,14 @@ class Viewer;
 class SceneGraph : public vsg::Inherit<SwitchGroup, SceneGraph>
 {
 public:
-    SceneGraph(const settings_t& settings, vsg::ref_ptr<vsg::Options> options);
+    SceneGraph(const EditorContext& context);
 
-    void load_route(
-        vsg::observer_ptr<vsg::Viewer> observer_viewer,
-        const std::string& directory
-    );
+    void load_route();
 
     vsg::ref_ptr<Route> get_route() const;
 
 private:
-    const settings_t& settings;
-    vsg::ref_ptr<vsg::Options> options;
+    const EditorContext& context;
 
     vsg::ref_ptr<Route> route;
     vsg::ref_ptr<vsg::AmbientLight> ambient_light;
