@@ -2,15 +2,12 @@
 #define GIZMO_H
 
 #include "EditorContext.h"
-#include "RouteObject.h"
 #include "SingleSwitch.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/utils/Builder.h>
-
-class RouteObject;
 
 namespace vsg
 {
