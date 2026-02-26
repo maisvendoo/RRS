@@ -226,6 +226,128 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         }
         case State::KEYBOARD_ROTATE:
         {
+            const auto& selected_objects = RouteObject::get_selected_objects();
+
+            vsg::vec3 center = {0.0f, 0.0f, 0.0f};
+            for (const auto& object : selected_objects)
+            {
+                center += object->get_translation();
+            }
+            center /= static_cast<float>(selected_objects.size());
+
+            if (world_intersection == center)
+            {
+                return;
+            }
+
+            const auto print_vec3 = [&](const char* name, vsg::vec3 v) -> void
+            {
+                std::printf("%s: %10.3f %10.3f %10.3f\n", name, v.x, v.y, v.z);
+            };
+
+            const auto print_int = [&](const char* name, int i) -> void
+            {
+                std::printf("%s: %d\n", name, i);
+            };
+
+            const auto print_float = [&](const char* name, float f) -> void
+            {
+                std::printf("%s: %10.3f\n", name, f);
+            };
+
+            const auto vec_a = vsg::normalize(prev_intersect_pos - center);
+            const auto vec_b = vsg::normalize(world_intersection - center);
+
+            std::printf("-------------------------\n");
+            // print_vec3("vec_a", vec_a);
+            // print_vec3("vec_b", vec_b);
+
+            prev_intersect_pos = world_intersection;
+
+            const auto dot_a = vsg::dot(vec_a, front_plane_up);
+            const auto dot_b = vsg::dot(vec_b, front_plane_up);
+
+            // print_float("dot_a", dot_a);
+            // print_float("dot_b", dot_b);
+
+            const auto acos_a = std::acos(dot_a);
+            const auto acos_b = std::acos(dot_b);
+
+            // print_float("acos_a", acos_a);
+            // print_float("acos_b", acos_b);
+
+            int dir_a;
+            int dir_b;
+
+            if (vec_a == front_plane_up || vec_a == -front_plane_up)
+            {
+                dir_a = 1;
+            }
+            else
+            {
+                const auto cross_a = vsg::cross(vec_a, front_plane_up);
+                if (vsg::dot(cross_a, front) >= 0.0f)
+                {
+                    dir_a = 1;
+                }
+                else
+                {
+                    dir_a = -1;
+                }
+            }
+
+            if (vec_b == front_plane_up || vec_b == -front_plane_up)
+            {
+                dir_b = 1;
+            }
+            else
+            {
+                const auto cross_b = vsg::cross(vec_b, front_plane_up);
+                if (vsg::dot(cross_b, front) >= 0.0f)
+                {
+                    dir_b = 1;
+                }
+                else
+                {
+                    dir_b = -1;
+                }
+            }
+
+            print_int("dir_a", dir_a);
+            print_int("dir_b", dir_b);
+
+            auto deg_a = vsg::degrees(acos_a);
+            if (dir_a == -1)
+            {
+                deg_a = 360.0f - deg_a;
+            }
+
+            auto deg_b = vsg::degrees(acos_b);
+            if (dir_b == -1)
+            {
+                deg_b = 360.0f - deg_b;
+            }
+
+            print_float("deg_a", deg_a);
+            print_float("deg_b", deg_b);
+
+            auto diff = deg_a - deg_b;
+            if (diff > 180.0f)
+            {
+                diff -= 360.0f;
+            }
+            else if (diff < -180.0f)
+            {
+                diff += 360.0f;
+            }
+
+            print_float("diff", diff);
+
+            for (const auto& object : selected_objects)
+            {
+                object->rotate_around_pivot(center, front * diff, object->matrix);
+            }
+
             return;
         }
         case State::KEYBOARD_SCALE:
