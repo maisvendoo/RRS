@@ -10,11 +10,7 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/utils/Builder.h>
 
-class CameraHandler;
-class CommandList;
-class IntersectionHandler;
 class RouteObject;
-struct settings_t;
 
 namespace vsg
 {

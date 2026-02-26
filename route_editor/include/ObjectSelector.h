@@ -10,16 +10,9 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
-class CameraHandler;
-class CommandList;
 class Gizmo;
-class IntersectionHandler;
-class KeyboardHandler;
-class MouseHandler;
 class RouteObject;
-class SceneGraph;
 class SingleSwitch;
-struct settings_t;
 
 namespace vsg
 {
@@ -28,7 +21,6 @@ class ButtonPressEvent;
 class ButtonReleaseEvent;
 class FrameEvent;
 class MoveEvent;
-class Viewer;
 
 }
 

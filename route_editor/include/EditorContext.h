@@ -3,6 +3,7 @@
 
 #include "CommandList.h"
 #include "EditorState.h"
+#include "RouteObject.h"
 #include "Settings.h"
 
 #include <vsg/core/ref_ptr.h>
@@ -43,6 +44,8 @@ struct EditorContext
     vsg::ref_ptr<vsg::RenderGraph> render_graph;
     vsg::ref_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<ObjectSelector> object_selector;
+    RouteObjects selected_objects;
+    RouteObjects hidden_objects;
     std::string route_dir;
 };
 

@@ -1,5 +1,6 @@
 #include "Route.h"
 
+#include "EditorContext.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
 #include "RouteObject.h"

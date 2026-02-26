@@ -8,15 +8,10 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsgImGui/imgui.h>
 
-class ObjectSelector;
-class SceneGraph;
-struct settings_t;
-
 namespace vsg
 {
 
 class CommandBuffer;
-class Perspective;
 
 }
 

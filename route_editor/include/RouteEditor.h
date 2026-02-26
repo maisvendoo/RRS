@@ -3,26 +3,6 @@
 
 #include "EditorContext.h"
 
-#include <vsg/core/ref_ptr.h>
-
-class CameraHandler;
-class IntersectionHandler;
-class KeyboardHandler;
-class MouseHandler;
-class ObjectSelector;
-class SceneGraph;
-class WindowHandler;
-
-namespace vsg
-{
-
-class ClearAttachments;
-class Options;
-class RenderGraph;
-class Viewer;
-
-}
-
 class RouteEditor
 {
 public:

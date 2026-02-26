@@ -1,7 +1,6 @@
 #ifndef ROUTE_H
 #define ROUTE_H
 
-#include "EditorContext.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
 #include "StringMap.h"
@@ -12,15 +11,8 @@
 
 #include <memory>
 
+struct EditorContext;
 class Topology;
-struct settings_t;
-
-namespace vsg
-{
-
-class Options;
-
-}
 
 class Route : public vsg::Inherit<SwitchGroup, Route>
 {

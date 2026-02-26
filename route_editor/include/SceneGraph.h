@@ -1,22 +1,19 @@
 #ifndef SCENE_GRAPH_H
 #define SCENE_GRAPH_H
 
-#include "EditorContext.h"
 #include "SwitchGroup.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 
+struct EditorContext;
 class Route;
-struct settings_t;
 
 namespace vsg
 {
 
 class AmbientLight;
-class Options;
-class Viewer;
 
 }
 

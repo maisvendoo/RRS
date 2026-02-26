@@ -1,5 +1,6 @@
 #include "SceneGraph.h"
 
+#include "EditorContext.h"
 #include "Mask.h"
 #include "Route.h"
 
