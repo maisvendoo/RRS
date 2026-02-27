@@ -98,6 +98,13 @@ signals:
 
     void sigIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool &exists);
 
+    void sigGetRouteLength(QString cur_traj_name,
+                           double cur_coord,
+                           QString target_traj_name,
+                           double target_coord,
+                           int dir,
+                           double &lenght);
+
 protected:
 
     /// Признак активации
@@ -193,6 +200,10 @@ protected:
 
     /// Куда едем по графику (1 - туда, -1 - обратно)
     int target_dir = 1;
+
+    /// Расстояние до станции
+    double target_station_dist = 0;
+    double target_station_dist_prev = 0;
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)

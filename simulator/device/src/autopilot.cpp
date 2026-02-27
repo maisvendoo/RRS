@@ -330,6 +330,12 @@ void Autopilot::slotSetTimetable(QByteArray tt_data)
                               target_dir,
                               is_route_exists);
     }
+
+    // Определяем дистанцию до ближайшей станции
+    emit sigGetRouteLength(traj_name, coord,
+                           timetable.stations[target_station_idx].target_traj,
+                           timetable.stations[target_station_idx].coord,
+                           target_dir, target_station_dist);
 }
 
 //------------------------------------------------------------------------------

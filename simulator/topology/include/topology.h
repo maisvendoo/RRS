@@ -171,7 +171,12 @@ public slots:
 
     void slotIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool &exists);
 
-    void slotGetRouteLength(QString cur_traj_name, QString target_traj_name, int dir, double &lenght);
+    void slotGetRouteLength(QString cur_traj_name,
+                            double cur_coord, QString
+                                target_traj_name,
+                            double target_coord,
+                            int dir,
+                            double &lenght);
 
 private slots:
 

@@ -1423,11 +1423,58 @@ void Topology::slotIsRouteExists(QString start_traj_name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotGetRouteLength(QString cur_traj_name,
-                                  QString target_traj_name,
+void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
+                                  QString target_traj_name, double target_coord,
                                   int dir, double &lenght)
 {
+    auto cur_traj = traj_list.value(cur_traj_name, nullptr);
 
+    if (cur_traj == nullptr)
+    {
+        lenght = -1;
+        return;
+    }
+
+    auto target_traj = traj_list.value(target_traj_name, nullptr);
+
+    if (target_traj == nullptr)
+    {
+        lenght = -1;
+        return;
+    }
+
+    auto route_seg = find_route(cur_traj, target_traj, dir);
+
+    if (route_seg.trajectories.empty())
+    {
+        lenght = -1;
+        return;
+    }
+
+    if (route_seg.directions[0] == FWD)
+    {
+        lenght = route_seg.trajectories[0]->getLength() - cur_coord;
+    }
+
+    if (route_seg.directions[0] == BWD)
+    {
+        lenght = cur_coord;
+    }
+
+    for (size_t i = 1; i < route_seg.trajectories.size() - 1; ++i)
+    {
+        lenght += route_seg.trajectories[i]->getLength();
+    }
+
+    if (route_seg.directions.back() == FWD)
+    {
+        lenght += target_coord;
+    }
+
+    if (route_seg.directions.back() == BWD)
+    {
+        lenght += route_seg.trajectories.back()->getLength() - target_coord;
+    }
 }
 
 //------------------------------------------------------------------------------
