@@ -171,6 +171,8 @@ public slots:
 
     void slotIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool &exists);
 
+    void slotGetRouteLength(QString cur_traj_name, QString target_traj_name, int dir, double &lenght);
+
 private slots:
 
     void slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name);

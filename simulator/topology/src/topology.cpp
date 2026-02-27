@@ -1423,6 +1423,16 @@ void Topology::slotIsRouteExists(QString start_traj_name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Topology::slotGetRouteLength(QString cur_traj_name,
+                                  QString target_traj_name,
+                                  int dir, double &lenght)
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name)
 {
     // Определяем поезд, изменивший состояние траектории
