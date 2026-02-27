@@ -268,6 +268,18 @@ void Autopilot::slotSetBrakeAccel(double a_brake)
 void Autopilot::slotSetTimetable(QByteArray tt_data)
 {
     timetable.deserialize(tt_data);
+
+    if (timetable.stations.empty())
+    {
+        return;
+    }
+
+    QString traj_name = "";
+    double coord = 0;
+
+    emit sigGetVehicleTrajPosition(traj_name, coord);
+
+    target_station_idx = timetable.stations.size() - 1;
 }
 
 //------------------------------------------------------------------------------

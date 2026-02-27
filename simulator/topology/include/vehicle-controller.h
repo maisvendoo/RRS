@@ -105,6 +105,10 @@ private:
     /// Расчёт занятости траекторий по всей длине ПЕ
     /// и связей оборудования ПЕ с путевой инфраструктурой
     void updateTrajectories();
+
+public slots:
+
+    void slotGetVehicleTrajPosition(QString &traj_name, double &coord);
 };
 
 #endif // VEHICLE_CONTROLLER_H

@@ -92,7 +92,9 @@ public:
 
 signals:
 
-    void sigInitTrainParams();    
+    void sigInitTrainParams();
+
+    void sigGetVehicleTrajPosition(QString &traj_name, double &coord);
 
 protected:
 
@@ -183,6 +185,9 @@ protected:
     Timer *sand_timer = new Timer(SAND_TIME_INTERVAL, false);
 
     autopilot_timetable_t timetable;
+
+    /// Индекс станции-цели
+    int target_station_idx = 0;
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
