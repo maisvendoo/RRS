@@ -96,6 +96,8 @@ signals:
 
     void sigGetVehicleTrajPosition(QString &traj_name, double &coord);
 
+    void sigIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool &exists);
+
 protected:
 
     /// Признак активации
@@ -188,6 +190,9 @@ protected:
 
     /// Индекс станции-цели
     int target_station_idx = 0;
+
+    /// Куда едем по графику (1 - туда, -1 - обратно)
+    int target_dir = 1;
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)

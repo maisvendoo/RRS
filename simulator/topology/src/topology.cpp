@@ -1387,6 +1387,42 @@ void Topology::slotGetNextTrajName(QString traj_name, int dir, QString &next_tra
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Topology::slotIsRouteExists(QString start_traj_name,
+                                 QString end_traj_name,
+                                 int dir,
+                                 bool &exists)
+{
+    auto start_traj = traj_list.value(start_traj_name, nullptr);
+
+    if (start_traj == nullptr)
+    {
+        exists = false;
+        return;
+    }
+
+    auto end_traj = traj_list.value(end_traj_name, nullptr);
+
+    if (end_traj == nullptr)
+    {
+        exists = false;
+        return;
+    }
+
+    auto route_seg = find_route(start_traj, end_traj, dir);
+
+    if (route_seg.trajectories.empty())
+    {
+        exists = false;
+    }
+    else
+    {
+        exists = true;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name)
 {
     // Определяем поезд, изменивший состояние траектории

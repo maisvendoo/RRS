@@ -169,6 +169,8 @@ public slots:
 
     void slotGetNextTrajName(QString traj_name, int dir, QString &next_traj_name);
 
+    void slotIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool &exists);
+
 private slots:
 
     void slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name);

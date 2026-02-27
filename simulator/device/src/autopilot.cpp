@@ -267,6 +267,7 @@ void Autopilot::slotSetBrakeAccel(double a_brake)
 //------------------------------------------------------------------------------
 void Autopilot::slotSetTimetable(QByteArray tt_data)
 {
+    // Раскпаковыаем график
     timetable.deserialize(tt_data);
 
     if (timetable.stations.empty())
@@ -274,12 +275,61 @@ void Autopilot::slotSetTimetable(QByteArray tt_data)
         return;
     }
 
+    // Определяем текущее положение ПЕ, где мы установлены
     QString traj_name = "";
     double coord = 0;
 
     emit sigGetVehicleTrajPosition(traj_name, coord);
 
+    // Индек целевой станции - в самый конец графика
     target_station_idx = timetable.stations.size() - 1;
+
+    // Определяем направление, куда нам проверять маршрут
+    bool is_route_exists = false;
+
+    // Проверяем "туда"
+    emit sigIsRouteExists(traj_name,
+                          timetable.stations[target_station_idx].target_traj,
+                          target_dir,
+                          is_route_exists);
+
+    // Нет маршрута
+    if (!is_route_exists)
+    {
+        // Проверяем обратно
+        target_dir = -1;
+
+        emit sigIsRouteExists(traj_name,
+                              timetable.stations[target_station_idx].target_traj,
+                              target_dir,
+                              is_route_exists);
+
+        // Нет маршрута - из нашего текущего положения не достижима даже конечная станция
+        if (!is_route_exists)
+        {
+            // график хрень
+            target_station_idx = -1;
+            return;
+        }
+    }
+
+    // Ищем ближайшую станцию по ходу нашего следования, исходя из нашего текущего положения
+    while (is_route_exists)
+    {
+        if (target_station_idx == 1)
+        {
+            // Дошли до станции первой после станции отправления
+            // нет смысла искать - мы в самом начале пути
+            break;
+        }
+
+        target_station_idx--;
+
+        emit sigIsRouteExists(traj_name,
+                              timetable.stations[target_station_idx].target_traj,
+                              target_dir,
+                              is_route_exists);
+    }
 }
 
 //------------------------------------------------------------------------------

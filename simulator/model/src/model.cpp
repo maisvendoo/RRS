@@ -309,6 +309,8 @@ void Model::initTimetableLoading(Train *train)
 
                 connect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition);
 
+                connect(ap, &Autopilot::sigIsRouteExists, topology, &Topology::slotIsRouteExists);
+
                 scnmgr->loadTrainTimetable(train->getTrainIndex());
             }
         }
