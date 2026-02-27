@@ -224,6 +224,11 @@ public:
         return time_unit_since_midnight;
     }
 
+    double getSecondsSinceMidnight()
+    {
+        return static_cast<double>(time_unit_since_midnight) / 10000.0;
+    }
+
     /// Час
     std::uint8_t hour() const noexcept
     {

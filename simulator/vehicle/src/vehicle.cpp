@@ -109,7 +109,7 @@ void Vehicle::setModelIndex(size_t idx)
 //------------------------------------------------------------------------------
 void Vehicle::setTrainIndex(size_t idx)
 {
-    this->train_idx = idx;
+    this->train_idx = idx;    
 }
 
 //------------------------------------------------------------------------------

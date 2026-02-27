@@ -176,6 +176,9 @@ private:
     /// Построение очереди автозапуска
     void buildAutostartQueue(Train *train);
 
+    /// Связывание сигналов и слотов для загрузки сценария в модули автоведения
+    void initTimetableLoading(Train *train);
+
     /// Обработка очереди автозапуска
     void processAutostartQueue();
 

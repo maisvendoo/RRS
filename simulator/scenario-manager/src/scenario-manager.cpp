@@ -345,8 +345,15 @@ std::string ScenarioManager::getNextTrajName(const std::string &traj_name, int d
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::loadTrainTimetable(const std::string &train_name)
+void ScenarioManager::loadTrainTimetable(int train_idx)
 {
+    std::string train_name = findTrainByIndex(train_idx);
+
+    if (train_name.empty())
+    {
+        return;
+    }
+
     FileSystem &fs = FileSystem::getInstance();
 
     std::string path = cur_scenario_dir + fs.separator()
@@ -358,14 +365,6 @@ void ScenarioManager::loadTrainTimetable(const std::string &train_name)
     if (!tt_file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         Journal::instance()->error("File of timetable " + QString(path.c_str()) + " not found");
-        return;
-    }
-
-    int train_idx = findTrainByName(train_name);
-
-    if (train_idx == -1)
-    {
-        Journal::instance()->error("Train " + QString(train_name.c_str()) + " not exist");
         return;
     }
 
@@ -424,6 +423,13 @@ void ScenarioManager::loadTrainTimetable(const std::string &train_name)
 
         train_datas[train_idx].timetable.stations.push_back(station);
     }
+
+    if (train_datas[train_idx].timetable.stations.empty())
+    {
+        return;
+    }
+
+    emit sigSetTimetable(train_datas[train_idx].timetable.serialize());
 }
 
 //------------------------------------------------------------------------------
@@ -438,11 +444,11 @@ double ScenarioManager::timetableTimeToSimSeconds(const std::string &time_str)
 
     if (start_sim_time.time >= time)
     {
-        return 0;
+        return time.getSecondsSinceMidnight() + 3600 * 24 - start_sim_time.time.getSecondsSinceMidnight();
     }
     else
     {
-        return 0;
+        return time.getSecondsSinceMidnight() - start_sim_time.time.getSecondsSinceMidnight();;
     }
 
     return 0;
@@ -550,7 +556,7 @@ void ScenarioManager::setTrain(const scenario_train_data_t &train_data)
 
     init_datas.push_back(id);
 
-    train_datas.push_back(train_data);
+    train_datas.push_back(train_data);    
 
     QString msg = QString("setTrain: %1 at traj=%2 coord=%3 dir=%4")
                       .arg(train_data.train_config.c_str())
@@ -1085,6 +1091,8 @@ void ScenarioManager::slotRenameTrain(int train_idx, QString new_name)
             break;
         }
     }
+
+    loadTrainTimetable(train_idx);
 
     emit sigRenameTrainInModel(train_idx, new_name);
 }

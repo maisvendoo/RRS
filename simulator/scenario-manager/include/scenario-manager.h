@@ -63,6 +63,9 @@ public:
 
     bool isTrainAutostarted(size_t t_idx);
 
+    /// Загрузить график движения для данного поезда
+    void loadTrainTimetable(int train_idx);
+
 signals:
 
     void sigGetSwitchState(QByteArray &switch_data);
@@ -93,6 +96,8 @@ signals:
 
     /// Переименовать поезд в модели
     void sigRenameTrainInModel(int train_idx, QString new_name);
+
+    void sigSetTimetable(QByteArray tt_data);
 
 private:
 
@@ -245,10 +250,7 @@ private:
     scenario_traj_state_t getTrajState(const std::string &traj_name);
 
     /// Получить имя следующей траектории в заданном направлении
-    std::string getNextTrajName(const std::string &traj_name, int dir);
-
-    /// Загрузить график движения для данного поезда
-    void loadTrainTimetable(const std::string &train_name);
+    std::string getNextTrajName(const std::string &traj_name, int dir);    
 
     /// Перевод времени по графику в секунды симуляции
     double timetableTimeToSimSeconds(const std::string &time_str);

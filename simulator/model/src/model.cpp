@@ -107,6 +107,8 @@ bool Model::init(const simulator_command_line_t &command_line)
 
             buildAutostartQueue(train);
 
+            initTimetableLoading(train);
+
             QThread *thread = new QThread();
             train_threads.push_back(thread);
             train->moveToThread(thread);
@@ -285,6 +287,24 @@ void Model::buildAutostartQueue(Train *train)
             if (!vehicle->getAutopilot().empty())
             {
                 vehicles_for_autostart.push(vehicle);
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::initTimetableLoading(Train *train)
+{
+    for (auto vehicle : *(train->getVehicles()))
+    {
+        if (!vehicle->getAutopilot().empty())
+        {
+            for (auto ap : vehicle->getAutopilot())
+            {
+                connect(scnmgr, &ScenarioManager::sigSetTimetable, ap, &Autopilot::slotSetTimetable);
+                scnmgr->loadTrainTimetable(train->getTrainIndex());
             }
         }
     }

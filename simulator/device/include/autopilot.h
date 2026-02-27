@@ -5,6 +5,7 @@
 #include    <autopilot-types.h>
 #include    <autopilot-brakes-control.h>
 #include    <autopilot-accelerometer.h>
+#include    <autopilot-timetable.h>
 
 /*!
  * \class
@@ -87,11 +88,11 @@ public:
                                       const QString& custom_cfg_dir)
     {
 
-    }
+    }    
 
 signals:
 
-    void sigInitTrainParams();
+    void sigInitTrainParams();    
 
 protected:
 
@@ -181,6 +182,8 @@ protected:
 
     Timer *sand_timer = new Timer(SAND_TIME_INTERVAL, false);
 
+    autopilot_timetable_t timetable;
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,
@@ -233,6 +236,8 @@ protected:
 public slots:
 
     void slotSetBrakeAccel(double a_brake);
+
+    void slotSetTimetable(QByteArray tt_data);
 
 private slots:
 
