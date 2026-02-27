@@ -48,13 +48,14 @@ QString Autopilot::getDbgMsg()
 {
     double v_p = calcPredictVelocity(feedback->v_cur, dist_target, accel_meter->value());
 
-    return QString(" | АВТОВЕДЕНИЕ | Vтек.: %1 км/ч | Vокр.: %2 км/ч | Vзад.: %3 км/ч| Уск.: %4 м/с2| Зад. уск.: %5 м/с2 | Прогноз Vцел.: %6 км/ч")
+    return QString(" | АВТОВЕДЕНИЕ | Vтек.: %1 км/ч | Vокр.: %2 км/ч | Vзад.: %3 км/ч| Уск.: %4 м/с2| Зад. уск.: %5 м/с2 | Прогноз Vцел.: %6 км/ч | Цель. дист.: %7 м")
         .arg(feedback->v_cur, 4, 'f', 1)
         .arg(feedback->v_tau, 4, 'f', 1)
         .arg(v_ref, 4, 'f', 1)
         .arg(accel_meter->value(), 6, 'f', 2)
         .arg(-a_brake, 6, 'f', 2)
-        .arg(v_p, 4, 'f', 1);
+        .arg(v_p, 4, 'f', 1)
+        .arg(target_station_dist, 10, 'f', 1);
 }
 
 //------------------------------------------------------------------------------
@@ -87,6 +88,9 @@ void Autopilot::velocity_control(double t, double dt)
 {
     if (feedback == nullptr)
         return;
+
+    // Временно, для теста, помещаем сюда счисление пути
+    calcTargetDistance();
 
     // Выбираем минимум между текущим ограничением и конструкционной скоростью
     v_ref = min(calcCurrentSpeedLimit(t, dt), v_constr);
@@ -257,6 +261,34 @@ double Autopilot::calcPredictVelocity(double v_cur, double dist, double accel)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Autopilot::calcTargetDistance()
+{
+    prev_traj_coord = curr_traj_coord;
+    emit sigGetVehicleTrajPosition(curr_traj_name, curr_traj_coord);
+
+    // Если сменилась текущаяя траектория - нечего делать, дергаем
+    // топологию в поисках новой дистанции
+    if (curr_traj_name != prev_traj_name)
+    {
+        emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
+                               timetable.stations[target_station_idx].target_traj,
+                               timetable.stations[target_station_idx].coord,
+                               target_dir, target_station_dist);
+
+        prev_traj_name = curr_traj_name;
+        prev_traj_coord = curr_traj_coord;
+
+        return;
+    }
+
+    // Если мы на прежней траектории - совершенно незачем дергать топологию,
+    // вычисляем новую дистанцию по смещению вдоль траектории
+    target_station_dist -= qAbs(curr_traj_coord - prev_traj_coord);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Autopilot::slotSetBrakeAccel(double a_brake)
 {
     this->a_brake = a_brake;
@@ -265,8 +297,14 @@ void Autopilot::slotSetBrakeAccel(double a_brake)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Autopilot::slotSetTimetable(QByteArray tt_data)
+void Autopilot::slotSetTimetable(QByteArray tt_data, int vehicle_idx)
 {
+    // Оно не мое, оно мне не надо
+    if (vehicle_idx != this->vehicle_idx)
+    {
+        return;
+    }
+
     // Раскпаковыаем график
     timetable.deserialize(tt_data);
 
@@ -276,10 +314,9 @@ void Autopilot::slotSetTimetable(QByteArray tt_data)
     }
 
     // Определяем текущее положение ПЕ, где мы установлены
-    QString traj_name = "";
-    double coord = 0;
-
-    emit sigGetVehicleTrajPosition(traj_name, coord);
+    emit sigGetVehicleTrajPosition(curr_traj_name, curr_traj_coord);
+    prev_traj_name = curr_traj_name;
+    prev_traj_coord = curr_traj_coord;
 
     // Индек целевой станции - в самый конец графика
     target_station_idx = timetable.stations.size() - 1;
@@ -288,7 +325,7 @@ void Autopilot::slotSetTimetable(QByteArray tt_data)
     bool is_route_exists = false;
 
     // Проверяем "туда"
-    emit sigIsRouteExists(traj_name,
+    emit sigIsRouteExists(curr_traj_name,
                           timetable.stations[target_station_idx].target_traj,
                           target_dir,
                           is_route_exists);
@@ -299,7 +336,7 @@ void Autopilot::slotSetTimetable(QByteArray tt_data)
         // Проверяем обратно
         target_dir = -1;
 
-        emit sigIsRouteExists(traj_name,
+        emit sigIsRouteExists(curr_traj_name,
                               timetable.stations[target_station_idx].target_traj,
                               target_dir,
                               is_route_exists);
@@ -325,14 +362,14 @@ void Autopilot::slotSetTimetable(QByteArray tt_data)
 
         target_station_idx--;
 
-        emit sigIsRouteExists(traj_name,
+        emit sigIsRouteExists(curr_traj_name,
                               timetable.stations[target_station_idx].target_traj,
                               target_dir,
                               is_route_exists);
     }
 
     // Определяем дистанцию до ближайшей станции
-    emit sigGetRouteLength(traj_name, coord,
+    emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
                            timetable.stations[target_station_idx].target_traj,
                            timetable.stations[target_station_idx].coord,
                            target_dir, target_station_dist);

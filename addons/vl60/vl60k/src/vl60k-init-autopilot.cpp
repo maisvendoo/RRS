@@ -23,6 +23,7 @@ void VL60k::initAutopilot(const QString& modules_dir,
 
         if (autopilot != nullptr)
         {
+            autopilot->setVehicleIndex(model_idx);
             autopilot->read_config(autopilot_config_name, custom_cfg_dir);
             autopilot->initAutoBrakeControl(autopilot_config_name, custom_cfg_dir);
             autopilot_switcher[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);

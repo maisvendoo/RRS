@@ -64,7 +64,7 @@ public:
     bool isTrainAutostarted(size_t t_idx);
 
     /// Загрузить график движения для данного поезда
-    void loadTrainTimetable(int train_idx);
+    void loadTrainTimetable(int train_idx, int vehicle_idx);
 
 signals:
 
@@ -97,7 +97,9 @@ signals:
     /// Переименовать поезд в модели
     void sigRenameTrainInModel(int train_idx, QString new_name);
 
-    void sigSetTimetable(QByteArray tt_data);
+    void sigSetTimetable(QByteArray tt_data, int vehicle_idx);
+
+    void sigUpdateTrainTimetable(int train_idx);
 
 private:
 

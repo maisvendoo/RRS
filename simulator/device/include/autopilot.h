@@ -88,7 +88,12 @@ public:
                                       const QString& custom_cfg_dir)
     {
 
-    }    
+    }
+
+    void setVehicleIndex(int vehicle_idx)
+    {
+        this->vehicle_idx = vehicle_idx;
+    }
 
 signals:
 
@@ -203,7 +208,21 @@ protected:
 
     /// Расстояние до станции
     double target_station_dist = 0;
-    double target_station_dist_prev = 0;
+
+    /// Текущая траектория
+    QString curr_traj_name = "";
+
+    /// Предыдущая траектория
+    QString prev_traj_name = "";
+
+    /// Текущая координата на траектории
+    double curr_traj_coord = 0;
+
+    /// Предыдущая координата на траектории
+    double prev_traj_coord = 0;
+
+    /// Индекс ПЕ, на которой работает данный модуль
+    int vehicle_idx = 0;
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
@@ -254,11 +273,14 @@ protected:
 
     double calcPredictVelocity(double v_cur, double dist, double accel);
 
+    /// Счисление пути - определяем текущую дистанцию до цели на станции
+    void calcTargetDistance();
+
 public slots:
 
     void slotSetBrakeAccel(double a_brake);
 
-    void slotSetTimetable(QByteArray tt_data);
+    void slotSetTimetable(QByteArray tt_data, int vehicle_idx);
 
 private slots:
 

@@ -107,7 +107,7 @@ bool Model::init(const simulator_command_line_t &command_line)
 
             buildAutostartQueue(train);
 
-            initTimetableLoading(train);
+            slotUpdateTrainTimetable(train_idx);
 
             QThread *thread = new QThread();
             train_threads.push_back(thread);
@@ -295,25 +295,31 @@ void Model::buildAutostartQueue(Train *train)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::initTimetableLoading(Train *train)
+void Model::slotUpdateTrainTimetable(int train_idx)
 {
+    auto train = trains[train_idx];
+
     for (auto vehicle : *(train->getVehicles()))
     {
         if (!vehicle->getAutopilot().empty())
         {
             for (auto ap : vehicle->getAutopilot())
             {
-                connect(scnmgr, &ScenarioManager::sigSetTimetable, ap, &Autopilot::slotSetTimetable);
+                disconnect(scnmgr, &ScenarioManager::sigSetTimetable, ap, &Autopilot::slotSetTimetable);
+                connect(scnmgr, &ScenarioManager::sigSetTimetable, ap, &Autopilot::slotSetTimetable, Qt::DirectConnection);
 
                 auto vc = topology->getVehicleController(vehicle->getModelIndex());
 
-                connect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition);
+                disconnect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition);
+                connect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition, Qt::DirectConnection);
 
+                disconnect(ap, &Autopilot::sigIsRouteExists, topology, &Topology::slotIsRouteExists);
                 connect(ap, &Autopilot::sigIsRouteExists, topology, &Topology::slotIsRouteExists);
 
+                disconnect(ap, &Autopilot::sigIsRouteExists, topology, &Topology::slotIsRouteExists);
                 connect(ap, &Autopilot::sigGetRouteLength, topology, &Topology::slotGetRouteLength);
 
-                scnmgr->loadTrainTimetable(train->getTrainIndex());
+                scnmgr->loadTrainTimetable(train->getTrainIndex(), vehicle->getModelIndex());
             }
         }
     }
@@ -875,6 +881,7 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     connect(topology, &Topology::sigChangeTrajStateByTrain, scnmgr, &ScenarioManager::slotChangeTrajStateByTrain);
     connect(scnmgr, &ScenarioManager::sigGetTrajState, topology, &Topology::slotGetTrajState);
     connect(scnmgr, &ScenarioManager::sigGetNextTrajName, topology, &Topology::slotGetNextTrajName);
+    connect(scnmgr, &ScenarioManager::sigUpdateTrainTimetable, this, &Model::slotUpdateTrainTimetable);
 
     // Проверяем, есть ли вообще сценарий для исполнения
     if (!command_line.scenario.is_present)

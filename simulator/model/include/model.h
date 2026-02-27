@@ -174,10 +174,7 @@ private:
     std::queue<Vehicle *> vehicles_for_autostart;
 
     /// Построение очереди автозапуска
-    void buildAutostartQueue(Train *train);
-
-    /// Связывание сигналов и слотов для загрузки сценария в модули автоведения
-    void initTimetableLoading(Train *train);
+    void buildAutostartQueue(Train *train);    
 
     /// Обработка очереди автозапуска
     void processAutostartQueue();
@@ -240,6 +237,9 @@ private slots:
     void slotRenameTrainInModel(int train_idx, QString new_name);
 
     void slotGetTrainParams(int train_idx, double &train_len, double &train_mass);
+
+    /// Связывание сигналов и слотов для загрузки сценария в модули автоведения
+    void slotUpdateTrainTimetable(int train_idx);
 };
 
 #endif // MODEL_H

@@ -345,7 +345,7 @@ std::string ScenarioManager::getNextTrajName(const std::string &traj_name, int d
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::loadTrainTimetable(int train_idx)
+void ScenarioManager::loadTrainTimetable(int train_idx, int vehicle_idx)
 {
     std::string train_name = findTrainByIndex(train_idx);
 
@@ -429,7 +429,7 @@ void ScenarioManager::loadTrainTimetable(int train_idx)
         return;
     }
 
-    emit sigSetTimetable(train_datas[train_idx].timetable.serialize());
+    emit sigSetTimetable(train_datas[train_idx].timetable.serialize(), vehicle_idx);
 }
 
 //------------------------------------------------------------------------------
@@ -1092,7 +1092,7 @@ void ScenarioManager::slotRenameTrain(int train_idx, QString new_name)
         }
     }
 
-    loadTrainTimetable(train_idx);
+    emit sigUpdateTrainTimetable(train_idx);
 
     emit sigRenameTrainInModel(train_idx, new_name);
 }
