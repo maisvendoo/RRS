@@ -1,7 +1,9 @@
 #include "EditorGui.h"
 
 #include "Action.h"
+#include "CameraHandler.h"
 #include "Command.h"
+#include "CommandList.h"
 #include "EditorState.h"
 #include "KeyBinding.h"
 #include "ObjectSelector.h"
@@ -35,27 +37,9 @@
 
 static constexpr float MAX_DRAG = FLT_MAX / static_cast<float>(INT_MAX);
 
-EditorGui::EditorGui(
-    settings_t& settings,
-    CommandList& commands,
-    EditorState& editor_state,
-    vsg::ref_ptr<vsg::Perspective> perspective,
-    vsg::ref_ptr<SceneGraph> scene_graph,
-    const vsg::ref_ptr<ObjectSelector>& object_selector,
-    std::string& route_directory
-)
-    : settings(settings)
-    , commands(commands)
-    , editor_state(editor_state)
-    , key_bindings(settings.key_bindings)
-    , perspective(perspective)
-    , scene_graph(scene_graph)
-    , object_selector(object_selector)
-    , route_directory(route_directory)
+EditorGui::EditorGui(EditorContext& context)
+    : context(context)
 {
-    assert(perspective);
-    assert(scene_graph);
-
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
 
@@ -64,12 +48,12 @@ EditorGui::EditorGui(
     const char* const font_name = "JetBrainsMono-Regular.ttf";
     const auto font_path = fs.combinePath(fs.getFontsDir(), font_name);
 
-    io.Fonts->AddFontFromFileTTF(font_path.c_str(), settings.gui_font_size,
+    io.Fonts->AddFontFromFileTTF(font_path.c_str(), context.settings.gui_font_size,
         nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    if (!settings.is_gui_editable)
+    if (!context.settings.is_gui_editable)
     {
         window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     }
@@ -79,7 +63,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 {
     (void)command_buffer;
 
-    switch (editor_state)
+    switch (context.state)
     {
         case EditorState::SELECT_ROUTE:
         {
@@ -90,36 +74,36 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
         default:
         {
             ImGui::Begin("Settings", nullptr, window_flags);
-            ImGui::Checkbox("Show objects.ref", &settings.show_objects_ref);
-            ImGui::Checkbox("Show route1.map", &settings.show_route_map);
-            ImGui::Checkbox("Show controls", &settings.show_controls);
-            ImGui::Checkbox("Show camera settings", &settings.show_camera_settings);
-            ImGui::Checkbox("Show topology", &settings.show_topology);
+            ImGui::Checkbox("Show objects.ref", &context.settings.show_objects_ref);
+            ImGui::Checkbox("Show route1.map", &context.settings.show_route_map);
+            ImGui::Checkbox("Show controls", &context.settings.show_controls);
+            ImGui::Checkbox("Show camera settings", &context.settings.show_camera_settings);
+            ImGui::Checkbox("Show topology", &context.settings.show_topology);
             ImGui::End();
 
             // ImGui::ShowDemoWindow();
 
-            if (settings.show_objects_ref)
+            if (context.settings.show_objects_ref)
             {
                 show_objects_ref();
             }
 
-            if (settings.show_route_map)
+            if (context.settings.show_route_map)
             {
                 show_route_map();
             }
 
-            if (settings.show_controls)
+            if (context.settings.show_controls)
             {
                 show_key_bindings();
             }
 
-            if (settings.show_camera_settings)
+            if (context.settings.show_camera_settings)
             {
                 show_camera_settings();
             }
 
-            if (settings.show_topology)
+            if (context.settings.show_topology)
             {
                 show_topology();
             }
@@ -127,8 +111,8 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             show_selected_objects_properties();
 
             ImGui::Begin("Commands");
-            auto active = commands.get_active();
-            auto curr = commands.get_tail();
+            auto active = context.commands.get_active();
+            auto curr = context.commands.get_tail();
             while (curr)
             {
                 if (curr == active)
@@ -163,12 +147,12 @@ void EditorGui::select_route() const
 
     const auto change_route_directory = [&](const Path& path) -> void
     {
-        route_directory = path.string();
+        context.route_dir = path.string();
 
         files.clear();
         directories.clear();
 
-        for (const auto& dir_entry : DirIterator(route_directory))
+        for (const auto& dir_entry : DirIterator(context.route_dir))
         {
             if (dir_entry.is_directory())
             {
@@ -183,7 +167,7 @@ void EditorGui::select_route() const
 
     // TODO: Rewrite in English
     // Вызывается при первом запуске select_route
-    if (route_directory.empty())
+    if (context.route_dir.empty())
     {
         change_route_directory(FileSystem::getInstance().getRouteRootDir());
     }
@@ -194,20 +178,20 @@ void EditorGui::select_route() const
 
     // TODO: Rewrite in English
     // Выводит путь к текущей выбранной папке и позволяет подтвердить ее
-    ImGui::Text("Current: %s", route_directory.c_str());
+    ImGui::Text("Current: %s", context.route_dir.c_str());
     ImGui::SameLine();
     if (ImGui::Button("OK"))
     {
-        editor_state = EditorState::LOAD_ROUTE;
+        context.state = EditorState::LOAD_ROUTE;
     }
 
     // TODO: Rewrite in English
     // Отдельно выводим кнопку для перехода на одну папку выше
-    if (Path(route_directory).has_parent_path())
+    if (Path(context.route_dir).has_parent_path())
     {
         if (ImGui::Button(".."))
         {
-            change_route_directory(Path(route_directory).parent_path());
+            change_route_directory(Path(context.route_dir).parent_path());
         }
     }
 
@@ -237,7 +221,7 @@ void EditorGui::show_objects_ref() const
 {
     ImGui::Begin("objects_ref", nullptr, window_flags);
 
-    if (!scene_graph->get_route())
+    if (!context.scene_graph->get_route())
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -248,7 +232,7 @@ void EditorGui::show_objects_ref() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        const auto& objects_ref = scene_graph->get_route()->get_objects_ref();
+        const auto& objects_ref = context.scene_graph->get_route()->get_objects_ref();
         for (const auto& [label, relative_path] : objects_ref)
         {
             ImGui::TableNextRow();
@@ -266,11 +250,11 @@ void EditorGui::show_objects_ref() const
 
 void EditorGui::show_route_map() const
 {
-    assert(scene_graph->get_route());
+    assert(context.scene_graph->get_route());
 
     ImGui::Begin("route1.map", nullptr, window_flags);
 
-    if (!scene_graph->get_route())
+    if (!context.scene_graph->get_route())
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -281,7 +265,7 @@ void EditorGui::show_route_map() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        const auto& route_map = scene_graph->get_route()->get_route_map();
+        const auto& route_map = context.scene_graph->get_route()->get_route_map();
         for (const auto& [label, transform] : route_map)
         {
             const vsg::vec3 translation = transform.first;
@@ -341,14 +325,14 @@ void EditorGui::show_key_bindings() const
 
             for (const auto& [modifier, name] : test_map)
             {
-                if (key_bindings[i].modifiers & modifier)
+                if (context.settings.key_bindings[i].modifiers & modifier)
                 {
                     label += name;
                     label += " + ";
                 }
             }
 
-            label += std::toupper(key_bindings[i].key);
+            label += std::toupper(context.settings.key_bindings[i].key);
             ImGui::Text("%s", label.c_str());
         }
 
@@ -365,33 +349,33 @@ void EditorGui::show_camera_settings() const
     // TODO: Replace double on float
 
     ImGui::Text("Move speed:");
-    float move_speed = static_cast<float>(settings.camera_move_speed);
+    float move_speed = static_cast<float>(context.settings.camera_move_speed);
     if (ImGui::DragFloat("##move_speed", &move_speed,
         1.0f, 1.0f, MAX_DRAG))
     {
-        settings.camera_move_speed = move_speed;
+        context.settings.camera_move_speed = move_speed;
     }
 
     ImGui::Text("Rotate speed:");
-    float rotate_speed = static_cast<float>(settings.camera_rotate_speed);
+    float rotate_speed = static_cast<float>(context.settings.camera_rotate_speed);
     if (ImGui::DragFloat("##rotate_speed", &rotate_speed, 1.0f, 1.0f, MAX_DRAG))
     {
-        settings.camera_rotate_speed = rotate_speed;
+        context.settings.camera_rotate_speed = rotate_speed;
     }
 
     ImGui::Text("Zoom power:");
-    float zoom_power = static_cast<float>(settings.camera_zoom_power);
+    float zoom_power = static_cast<float>(context.settings.camera_zoom_power);
     if (ImGui::DragFloat("##zoom_power", &zoom_power, 1.0f, 1.0f, MAX_DRAG))
     {
-        settings.camera_zoom_power = zoom_power;
+        context.settings.camera_zoom_power = zoom_power;
     }
 
     ImGui::Text("FovY:");
-    float fovy = static_cast<float>(perspective->fieldOfViewY);
-    if (ImGui::SliderFloat("##fovy", &fovy, settings.fovy_min,
-        settings.fovy_max))
+    float fovy = static_cast<float>(context.camera_handler->get_perspective()->fieldOfViewY);
+    if (ImGui::SliderFloat("##fovy", &fovy, context.settings.fovy_min,
+        context.settings.fovy_max))
     {
-        perspective->fieldOfViewY = fovy;
+        context.camera_handler->get_perspective()->fieldOfViewY = fovy;
     }
 
     ImGui::End();
@@ -401,7 +385,7 @@ void EditorGui::show_topology() const
 {
     ImGui::Begin("Topology", nullptr, window_flags);
 
-    const auto route = scene_graph->get_route();
+    const auto route = context.scene_graph->get_route();
     if (!route)
     {
         ImGui::Text("There is no route yet");
@@ -510,12 +494,12 @@ void EditorGui::show_topology() const
 
 void EditorGui::show_selected_objects_properties() const
 {
-    if (!object_selector)
+    if (!context.object_selector)
     {
         return;
     }
 
-    const auto& selected_objects = RouteObject::get_selected_objects();
+    const auto& selected_objects = context.selected_objects;
     if (selected_objects.empty())
     {
         return;

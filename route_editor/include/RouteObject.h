@@ -12,6 +12,7 @@
 #include <list>
 #include <string>
 
+struct EditorContext;
 class Gizmo;
 class RouteObject;
 class SingleSwitch;
@@ -30,28 +31,22 @@ using RouteObjectsIterator = RouteObjects::iterator;
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 {
 public:
-    RouteObject(vsg::ref_ptr<vsg::PagedLOD> paged_lod, const std::string& label,
-        vsg::vec3 translation, vsg::vec3 rotation_deg);
+    RouteObject(EditorContext& context, vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+        const std::string& label, vsg::vec3 translation, vsg::vec3 rotation_deg);
 
     vsg::vec3 get_translation() const;
     vsg::vec3 get_rotation_deg() const;
     vsg::vec3 get_scale() const;
 
-    vsg::vec3 get_initial_translation() const;
-    vsg::vec3 get_initial_rotation_deg() const;
-    vsg::vec3 get_initial_scale() const;
-    const vsg::dmat4& get_initial_matrix() const;
+    // vsg::vec3 get_initial_translation() const;
+    // vsg::vec3 get_initial_rotation_deg() const;
+    // vsg::vec3 get_initial_scale() const;
+    // const vsg::dmat4& get_initial_matrix() const;
 
     const vsg::box& get_bounds() const;
 
     bool get_is_selected() const;
     bool get_is_hidden() const;
-
-    static RouteObjects& get_selected_objects();
-    static RouteObjects& get_hidden_objects();
-
-    static void set_observer_viewer(
-        vsg::observer_ptr<vsg::Viewer> observer_viewer);
 
     static void set_gizmo(Gizmo* gizmo);
 
@@ -75,10 +70,10 @@ public:
     void select();
     RouteObjectsIterator deselect();
 
-    void save_translation();
-    void save_rotation();
-    void save_scale();
-    void save_matrix();
+    // void save_translation();
+    // void save_rotation();
+    // void save_scale();
+    // void save_matrix();
 
     void update_matrix();
     void update_bounds();
@@ -87,19 +82,17 @@ public:
     std::string label;
 
 private:
-    static vsg::observer_ptr<vsg::Viewer> s_observer_viewer;
+    EditorContext& context;
     static Gizmo* s_gizmo;
-    static RouteObjects s_selected_objects;
-    static RouteObjects s_hidden_objects;
 
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;
     vsg::vec3 scale_value = {1.0f, 1.0f, 1.0f};
 
-    vsg::vec3 initial_translation;
-    vsg::vec3 initial_rotation_deg;
-    vsg::vec3 initial_scale;
-    vsg::dmat4 initial_matrix;
+    // vsg::vec3 initial_translation;
+    // vsg::vec3 initial_rotation_deg;
+    // vsg::vec3 initial_scale;
+    // vsg::dmat4 initial_matrix;
 
     vsg::box bounds;
 

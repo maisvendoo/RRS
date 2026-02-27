@@ -2,6 +2,7 @@
 #define KEYBOARD_HANDLER_H
 
 #include "Action.h"
+#include "EditorContext.h"
 #include "KeyBinding.h"
 #include "KeyStates.h"
 
@@ -14,7 +15,7 @@ class CommandList;
 class KeyboardHandler : public vsg::Inherit<vsg::Visitor, KeyboardHandler>
 {
 public:
-    KeyboardHandler(const KeyBindings& key_bindings, CommandList& commands);
+    KeyboardHandler(EditorContext& context);
 
     void apply(vsg::KeyPressEvent& keyPress) override;
     void apply(vsg::KeyReleaseEvent& keyRelease) override;

@@ -8,9 +8,7 @@
 
 #include <vulkan/vulkan_core.h>
 
-class KeyboardHandler;
-class MouseHandler;
-struct settings_t;
+struct EditorContext;
 
 namespace vsg
 {
@@ -30,12 +28,7 @@ public:
     using vec3_type = vsg::t_vec3<value_type>;
 
 public:
-    CameraHandler(
-        const settings_t& settings,
-        const VkExtent2D& window_extent,
-        vsg::ref_ptr<MouseHandler> mouse_handler,
-        vsg::ref_ptr<KeyboardHandler> keyboard_handler
-    );
+    CameraHandler(const EditorContext& context);
 
     void apply(vsg::FrameEvent& frame) override;
 
@@ -50,7 +43,8 @@ public:
     vec3_type get_right() const;
     vec3_type get_up() const;
 
-    vsg::ref_ptr<vsg::Node> create_front_plane(vec3_type point) const;
+    vsg::ref_ptr<vsg::Node> create_front_plane(vec3_type point,
+        vec3_type* up_out = nullptr) const;
 
 private:
     void calculate_front();
@@ -58,9 +52,7 @@ private:
     void calculate_up();
 
 private:
-    const settings_t& settings;
-    vsg::ref_ptr<MouseHandler> mouse_handler;
-    vsg::ref_ptr<KeyboardHandler> keyboard_handler;
+    const EditorContext& context;
 
     vsg::ref_ptr<vsg::Perspective> perspective;
     vsg::ref_ptr<vsg::LookAt> look_at;

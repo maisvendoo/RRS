@@ -1,5 +1,6 @@
 #include "Route.h"
 
+#include "EditorContext.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
@@ -43,17 +44,9 @@ static vsg::vec3 to_vsg_vec3(dvec3 vec)
     };
 }
 
-Route::Route(
-    const settings_t& settings,
-    vsg::ref_ptr<vsg::Options> options,
-    const std::string& directory
-)
-    : settings(settings)
-    , options(std::move(options))
-    , directory(directory)
+Route::Route(EditorContext& context)
+    : context(context)
 {
-    assert(this->options);
-
     const bool success = load_objects_ref() && load_route_map();
     if (!success)
     {
@@ -66,13 +59,13 @@ Route::Route(
     for (const auto& [label, relative_path] : objects_ref)
     {
         const auto paged_lod = vsg::PagedLOD::create();
-        paged_lod->filename = fs.combinePath(directory, relative_path);
+        paged_lod->filename = fs.combinePath(context.route_dir, relative_path);
 
         paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
-            settings.view_distance);
+            context.settings.view_distance);
 
         paged_lod->children.front() = {0.1, nullptr};
-        paged_lod->options = this->options;
+        paged_lod->options = context.options;
 
         paged_lods.emplace(label, std::move(paged_lod));
     }
@@ -99,7 +92,7 @@ const std::unique_ptr<Topology>& Route::get_topology() const
 bool Route::load_objects_ref()
 {
     const FileSystem& fs = FileSystem::getInstance();
-    const auto objects_ref_path = fs.combinePath(directory, "objects.ref");
+    const auto objects_ref_path = fs.combinePath(context.route_dir, "objects.ref");
 
     std::ifstream objects_ref_file(objects_ref_path);
     if (!objects_ref_file)
@@ -129,7 +122,7 @@ bool Route::load_route_map()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const auto route_map_path = fs.combinePath(directory,
+    const auto route_map_path = fs.combinePath(context.route_dir,
         "topology", "map", "route1.map");
 
     std::ifstream route_map_file(route_map_path);
@@ -181,8 +174,8 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
             continue;
         }
 
-        const auto object = RouteObject::create(paged_lod_it->second, label,
-            transform.first, -transform.second);
+        const auto object = RouteObject::create(context, paged_lod_it->second,
+            label, transform.first, -transform.second);
 
         this->addChild(vsg::MASK_ALL, object);
     }
@@ -192,7 +185,7 @@ bool Route::load_topology()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const auto cfg_path = fs.combinePath(directory,
+    const auto cfg_path = fs.combinePath(context.route_dir,
         "topology", "models-config.xml");
 
     CfgReader cfg;
@@ -227,7 +220,7 @@ bool Route::load_topology()
 
     topology = std::make_unique<Topology>();
 
-    const auto directory_stem = std::filesystem::path(directory).stem();
+    const auto directory_stem = std::filesystem::path(context.route_dir).stem();
 
     if (!topology->load(directory_stem.string().c_str()))
     {
@@ -272,10 +265,10 @@ bool Route::load_topology()
                 new_paged_lod->filename = signal_model_path;
 
                 new_paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
-                    settings.view_distance);
+                    context.settings.view_distance);
 
                 new_paged_lod->children.front() = {0.1, nullptr};
-                new_paged_lod->options = options;
+                new_paged_lod->options = context.options;
 
                 paged_lod_it = paged_lods.emplace(signal_model_path,
                     std::move(new_paged_lod)).first;
@@ -296,7 +289,7 @@ bool Route::load_topology()
                 vsg::degrees(std::atan2(-right.y, right.x))
             };
 
-            const auto object = RouteObject::create(paged_lod,
+            const auto object = RouteObject::create(context, paged_lod,
                 signal_model_name, pos, rotation_deg);
 
             this->addChild(vsg::MASK_ALL, object);

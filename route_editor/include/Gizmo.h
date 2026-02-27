@@ -1,19 +1,13 @@
 #ifndef GIZMO_H
 #define GIZMO_H
 
-#include "RouteObject.h"
+#include "EditorContext.h"
 #include "SingleSwitch.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/utils/Builder.h>
-
-class CameraHandler;
-class CommandList;
-class IntersectionHandler;
-class RouteObject;
-struct settings_t;
 
 namespace vsg
 {
@@ -29,13 +23,7 @@ class Node;
 class Gizmo : public vsg::Inherit<SingleSwitch, Gizmo>
 {
 public:
-    Gizmo(
-        const settings_t& settings,
-        CommandList& commands,
-        vsg::ref_ptr<CameraHandler> camera_handler,
-        vsg::ref_ptr<IntersectionHandler> intersection_handler,
-        const RouteObjects& selected_objects
-    );
+    Gizmo(EditorContext& context);
 
     bool handle_intersections();
 
@@ -46,11 +34,7 @@ public:
     void update_position();
 
 private:
-    const settings_t& settings;
-    CommandList& commands;
-    vsg::ref_ptr<CameraHandler> camera_handler;
-    vsg::ref_ptr<IntersectionHandler> intersection_handler;
-    const RouteObjects& selected_objects;
+    EditorContext& context;
 
     vsg::Builder builder;
     vsg::ref_ptr<vsg::MatrixTransform> matrix_transform;

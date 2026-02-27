@@ -1,7 +1,7 @@
 #include    "vehicle-controller.h"
 
-#include    "Trajectory.h"
-#include    "Switch.h"
+#include    "trajectory.h"
+#include    "switch.h"
 
 #include    <physics.h>
 
