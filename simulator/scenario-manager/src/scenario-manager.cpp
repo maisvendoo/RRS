@@ -352,6 +352,100 @@ void ScenarioManager::loadTrainTimetable(const std::string &train_name)
     std::string path = cur_scenario_dir + fs.separator()
                        + "timetable" + fs.separator() +
                        train_name + ".conf";
+
+    QFile tt_file(QString(path.c_str()));
+
+    if (!tt_file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        Journal::instance()->error("File of timetable " + QString(path.c_str()) + " not found");
+        return;
+    }
+
+    int train_idx = findTrainByName(train_name);
+
+    if (train_idx == -1)
+    {
+        Journal::instance()->error("Train " + QString(train_name.c_str()) + " not exist");
+        return;
+    }
+
+    // Инициализируем заново структуру графика
+    train_datas[train_idx].timetable.stations.clear();
+    train_datas[train_idx].timetable.train_name = QString(train_name.c_str());
+    train_datas[train_idx].timetable.train_idx = train_idx;
+
+    QTextStream in(&tt_file);
+
+    QStringList tt_data = in.readAll().split('\n');
+
+    for (auto line : tt_data)
+    {
+        QStringList tokens = line.split(';');
+
+        if (tokens.size() < 5)
+        {
+            Journal::instance()->error("Invalid timetable in file" + QString(path.c_str()));
+            return;
+        }
+
+        autopilot_station_t station;
+        station.name = tokens[0];
+        station.arr_time = tokens[1].remove(' ');
+        station.dep_time = tokens[2].remove(' ');
+        station.target_traj = tokens[3].remove(' ');
+
+        bool isOk = false;
+
+        station.coord = tokens[4].toDouble(&isOk);
+
+        if (station.arr_time == "-")
+        {
+            station.arr_time_sec = 0;
+        }
+        else
+        {
+            station.arr_time_sec = timetableTimeToSimSeconds(station.arr_time.toStdString());
+        }
+
+        if (station.dep_time == "-")
+        {
+            station.dep_time_sec = 1e10;
+        }
+        else
+        {
+            station.dep_time_sec = timetableTimeToSimSeconds(station.dep_time.toStdString());
+        }
+
+        if (!isOk)
+        {
+            Journal::instance()->error("Invalid traj coordinate at station " + tokens[0]);
+            return;
+        }
+
+        train_datas[train_idx].timetable.stations.push_back(station);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double ScenarioManager::timetableTimeToSimSeconds(const std::string &time_str)
+{
+    // Определяем время начала игры
+    simulator_time_t start_sim_time = simulator_time_t(launch_init_data.start_datetime);
+    server_time_t time;
+    strTimeToServerTime(time_str, time);
+
+    if (start_sim_time.time >= time)
+    {
+        return 0;
+    }
+    else
+    {
+        return 0;
+    }
+
+    return 0;
 }
 
 //------------------------------------------------------------------------------

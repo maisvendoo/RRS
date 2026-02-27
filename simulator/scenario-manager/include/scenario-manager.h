@@ -250,6 +250,9 @@ private:
     /// Загрузить график движения для данного поезда
     void loadTrainTimetable(const std::string &train_name);
 
+    /// Перевод времени по графику в секунды симуляции
+    double timetableTimeToSimSeconds(const std::string &time_str);
+
 private slots:
 
     void slotDelayTimer();
