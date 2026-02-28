@@ -169,14 +169,14 @@ public slots:
 
     void slotGetNextTrajName(QString traj_name, int dir, QString &next_traj_name);
 
-    void slotIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool &exists);
+    void slotIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool *exists);
 
     void slotGetRouteLength(QString cur_traj_name,
-                            double cur_coord, QString
-                                target_traj_name,
+                            double cur_coord,
+                            QString target_traj_name,
                             double target_coord,
                             int dir,
-                            double &lenght);
+                            double *lenght);
 
 private slots:
 

@@ -108,7 +108,7 @@ private:
 
 public slots:
 
-    void slotGetVehicleTrajPosition(QString &traj_name, double &coord);
+    void slotGetVehicleTrajPosition(QString *traj_name, double *coord);
 };
 
 #endif // VEHICLE_CONTROLLER_H

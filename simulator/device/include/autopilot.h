@@ -95,20 +95,22 @@ public:
         this->vehicle_idx = vehicle_idx;
     }
 
+    void setTimetable(const autopilot_timetable_t &timetable);
+
 signals:
 
     void sigInitTrainParams();
 
-    void sigGetVehicleTrajPosition(QString &traj_name, double &coord);
+    void sigGetVehicleTrajPosition(QString *traj_name, double *coord);
 
-    void sigIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool &exists);
+    void sigIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool *exists);
 
     void sigGetRouteLength(QString cur_traj_name,
                            double cur_coord,
                            QString target_traj_name,
                            double target_coord,
                            int dir,
-                           double &lenght);
+                           double *lenght);
 
 protected:
 
@@ -200,6 +202,9 @@ protected:
 
     autopilot_timetable_t timetable;
 
+    /// Признак готовности к движению ко графику
+    bool is_timetable_ready = false;
+
     /// Индекс станции-цели
     int target_station_idx = 0;
 
@@ -273,14 +278,14 @@ protected:
 
     double calcPredictVelocity(double v_cur, double dist, double accel);
 
+    void initTimeTable();
+
     /// Счисление пути - определяем текущую дистанцию до цели на станции
     void calcTargetDistance();
 
 public slots:
 
-    void slotSetBrakeAccel(double a_brake);
-
-    void slotSetTimetable(QByteArray tt_data, int vehicle_idx);
+    void slotSetBrakeAccel(double a_brake);    
 
 private slots:
 

@@ -277,8 +277,8 @@ void VehicleController::updateTrajectories()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VehicleController::slotGetVehicleTrajPosition(QString &traj_name, double &coord)
+void VehicleController::slotGetVehicleTrajPosition(QString *traj_name, double *coord)
 {
-    traj_name = current_traj->getName();
-    coord = traj_coord;
+    *traj_name = current_traj->getName();
+    *coord = traj_coord;
 }

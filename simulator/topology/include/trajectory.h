@@ -43,7 +43,7 @@ public:
     QString getName() const
     {
         return name;
-    }
+    }    
 
     double getLength() const
     {

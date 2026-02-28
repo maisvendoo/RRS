@@ -345,13 +345,13 @@ std::string ScenarioManager::getNextTrajName(const std::string &traj_name, int d
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::loadTrainTimetable(int train_idx, int vehicle_idx)
+autopilot_timetable_t ScenarioManager::loadTrainTimetable(int train_idx)
 {
     std::string train_name = findTrainByIndex(train_idx);
 
     if (train_name.empty())
     {
-        return;
+        return autopilot_timetable_t();
     }
 
     FileSystem &fs = FileSystem::getInstance();
@@ -365,7 +365,7 @@ void ScenarioManager::loadTrainTimetable(int train_idx, int vehicle_idx)
     if (!tt_file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         Journal::instance()->error("File of timetable " + QString(path.c_str()) + " not found");
-        return;
+        return autopilot_timetable_t();;
     }
 
     // Инициализируем заново структуру графика
@@ -384,7 +384,7 @@ void ScenarioManager::loadTrainTimetable(int train_idx, int vehicle_idx)
         if (tokens.size() < 5)
         {
             Journal::instance()->error("Invalid timetable in file" + QString(path.c_str()));
-            return;
+            return autopilot_timetable_t();
         }
 
         autopilot_station_t station;
@@ -418,7 +418,7 @@ void ScenarioManager::loadTrainTimetable(int train_idx, int vehicle_idx)
         if (!isOk)
         {
             Journal::instance()->error("Invalid traj coordinate at station " + tokens[0]);
-            return;
+            return autopilot_timetable_t();
         }
 
         train_datas[train_idx].timetable.stations.push_back(station);
@@ -426,10 +426,10 @@ void ScenarioManager::loadTrainTimetable(int train_idx, int vehicle_idx)
 
     if (train_datas[train_idx].timetable.stations.empty())
     {
-        return;
+        return autopilot_timetable_t();
     }
 
-    emit sigSetTimetable(train_datas[train_idx].timetable.serialize(), vehicle_idx);
+    return train_datas[train_idx].timetable;
 }
 
 //------------------------------------------------------------------------------

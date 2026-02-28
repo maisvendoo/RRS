@@ -89,6 +89,8 @@ void Autopilot::velocity_control(double t, double dt)
     if (feedback == nullptr)
         return;
 
+    initTimeTable();
+
     // Временно, для теста, помещаем сюда счисление пути
     calcTargetDistance();
 
@@ -261,60 +263,21 @@ double Autopilot::calcPredictVelocity(double v_cur, double dist, double accel)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Autopilot::calcTargetDistance()
+void Autopilot::initTimeTable()
 {
-    prev_traj_coord = curr_traj_coord;
-    emit sigGetVehicleTrajPosition(curr_traj_name, curr_traj_coord);
-
-    // Если сменилась текущаяя траектория - нечего делать, дергаем
-    // топологию в поисках новой дистанции
-    if (curr_traj_name != prev_traj_name)
-    {
-        emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
-                               timetable.stations[target_station_idx].target_traj,
-                               timetable.stations[target_station_idx].coord,
-                               target_dir, target_station_dist);
-
-        prev_traj_name = curr_traj_name;
-        prev_traj_coord = curr_traj_coord;
-
-        return;
-    }
-
-    // Если мы на прежней траектории - совершенно незачем дергать топологию,
-    // вычисляем новую дистанцию по смещению вдоль траектории
-    target_station_dist -= qAbs(curr_traj_coord - prev_traj_coord);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Autopilot::slotSetBrakeAccel(double a_brake)
-{
-    this->a_brake = a_brake;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Autopilot::slotSetTimetable(QByteArray tt_data, int vehicle_idx)
-{
-    // Оно не мое, оно мне не надо
-    if (vehicle_idx != this->vehicle_idx)
-    {
-        return;
-    }
-
-    // Раскпаковыаем график
-    timetable.deserialize(tt_data);
-
-    if (timetable.stations.empty())
+    if (is_timetable_ready)
     {
         return;
     }
 
     // Определяем текущее положение ПЕ, где мы установлены
-    emit sigGetVehicleTrajPosition(curr_traj_name, curr_traj_coord);
+    emit sigGetVehicleTrajPosition(&curr_traj_name, &curr_traj_coord);
+
+    if (curr_traj_name.isEmpty())
+    {
+        return;
+    }
+
     prev_traj_name = curr_traj_name;
     prev_traj_coord = curr_traj_coord;
 
@@ -328,7 +291,7 @@ void Autopilot::slotSetTimetable(QByteArray tt_data, int vehicle_idx)
     emit sigIsRouteExists(curr_traj_name,
                           timetable.stations[target_station_idx].target_traj,
                           target_dir,
-                          is_route_exists);
+                          &is_route_exists);
 
     // Нет маршрута
     if (!is_route_exists)
@@ -339,7 +302,7 @@ void Autopilot::slotSetTimetable(QByteArray tt_data, int vehicle_idx)
         emit sigIsRouteExists(curr_traj_name,
                               timetable.stations[target_station_idx].target_traj,
                               target_dir,
-                              is_route_exists);
+                              &is_route_exists);
 
         // Нет маршрута - из нашего текущего положения не достижима даже конечная станция
         if (!is_route_exists)
@@ -365,14 +328,70 @@ void Autopilot::slotSetTimetable(QByteArray tt_data, int vehicle_idx)
         emit sigIsRouteExists(curr_traj_name,
                               timetable.stations[target_station_idx].target_traj,
                               target_dir,
-                              is_route_exists);
+                              &is_route_exists);
     }
 
     // Определяем дистанцию до ближайшей станции
     emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
                            timetable.stations[target_station_idx].target_traj,
                            timetable.stations[target_station_idx].coord,
-                           target_dir, target_station_dist);
+                           target_dir, &target_station_dist);
+
+    is_timetable_ready = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::calcTargetDistance()
+{
+    if (!is_timetable_ready)
+    {
+        return;
+    }
+
+    prev_traj_coord = curr_traj_coord;
+    emit sigGetVehicleTrajPosition(&curr_traj_name, &curr_traj_coord);
+
+    // Если сменилась текущаяя траектория - нечего делать, дергаем
+    // топологию в поисках новой дистанции
+    if (curr_traj_name != prev_traj_name)
+    {
+        emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
+                               timetable.stations[target_station_idx].target_traj,
+                               timetable.stations[target_station_idx].coord,
+                               target_dir, &target_station_dist);
+
+        prev_traj_name = curr_traj_name;
+        prev_traj_coord = curr_traj_coord;
+
+        return;
+    }
+
+    // Если мы на прежней траектории - совершенно незачем дергать топологию,
+    // вычисляем новую дистанцию по смещению вдоль траектории
+    target_station_dist -= qAbs(curr_traj_coord - prev_traj_coord);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::slotSetBrakeAccel(double a_brake)
+{
+    this->a_brake = a_brake;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::setTimetable(const autopilot_timetable_t &timetable)
+{
+    if (timetable.stations.empty())
+    {
+        return;
+    }
+
+    this->timetable = timetable;
 }
 
 //------------------------------------------------------------------------------

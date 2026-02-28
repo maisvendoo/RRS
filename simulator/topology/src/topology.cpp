@@ -1390,13 +1390,13 @@ void Topology::slotGetNextTrajName(QString traj_name, int dir, QString &next_tra
 void Topology::slotIsRouteExists(QString start_traj_name,
                                  QString end_traj_name,
                                  int dir,
-                                 bool &exists)
+                                 bool *exists)
 {
     auto start_traj = traj_list.value(start_traj_name, nullptr);
 
     if (start_traj == nullptr)
     {
-        exists = false;
+        *exists = false;
         return;
     }
 
@@ -1404,7 +1404,7 @@ void Topology::slotIsRouteExists(QString start_traj_name,
 
     if (end_traj == nullptr)
     {
-        exists = false;
+        *exists = false;
         return;
     }
 
@@ -1412,11 +1412,11 @@ void Topology::slotIsRouteExists(QString start_traj_name,
 
     if (route_seg.trajectories.empty())
     {
-        exists = false;
+        *exists = false;
     }
     else
     {
-        exists = true;
+        *exists = true;
     }
 }
 
@@ -1425,13 +1425,13 @@ void Topology::slotIsRouteExists(QString start_traj_name,
 //------------------------------------------------------------------------------
 void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
                                   QString target_traj_name, double target_coord,
-                                  int dir, double &lenght)
+                                  int dir, double *lenght)
 {
     auto cur_traj = traj_list.value(cur_traj_name, nullptr);
 
     if (cur_traj == nullptr)
     {
-        lenght = -1;
+        *lenght = -1;
         return;
     }
 
@@ -1439,7 +1439,7 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
 
     if (target_traj == nullptr)
     {
-        lenght = -1;
+        *lenght = -1;
         return;
     }
 
@@ -1447,33 +1447,33 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
 
     if (route_seg.trajectories.empty())
     {
-        lenght = -1;
+        *lenght = -1;
         return;
     }
 
     if (route_seg.directions[0] == FWD)
     {
-        lenght = route_seg.trajectories[0]->getLength() - cur_coord;
+        *lenght = route_seg.trajectories[0]->getLength() - cur_coord;
     }
 
     if (route_seg.directions[0] == BWD)
     {
-        lenght = cur_coord;
+        *lenght = cur_coord;
     }
 
     for (size_t i = 1; i < route_seg.trajectories.size() - 1; ++i)
     {
-        lenght += route_seg.trajectories[i]->getLength();
+        *lenght += route_seg.trajectories[i]->getLength();
     }
 
     if (route_seg.directions.back() == FWD)
     {
-        lenght += target_coord;
+        *lenght += target_coord;
     }
 
     if (route_seg.directions.back() == BWD)
     {
-        lenght += route_seg.trajectories.back()->getLength() - target_coord;
+        *lenght += route_seg.trajectories.back()->getLength() - target_coord;
     }
 }
 
