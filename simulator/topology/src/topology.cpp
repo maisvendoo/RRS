@@ -186,127 +186,187 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-route_segment_t Topology::find_route(Trajectory *start_traj,
-                                     Trajectory *target_traj,
-                                     qint8 dir, bool check_busy)
+route_segment_t Topology::find_route(
+    Trajectory* start_traj,
+    Trajectory* target_traj,
+    qint8 dir,
+    bool check_busy)
 {
-    // Маршрут на самого себя
-    if (start_traj == target_traj)
+    // ---------------------------------------------------------------------
+    // 0. Входная валидация
+    // ---------------------------------------------------------------------
+    if (!start_traj || !target_traj)
     {
-        route_segment_t path;
-        path.trajectories = {start_traj};
-        path.directions = {FWD};
-        Journal::instance()->warning("Build route: Target trajectory and start trajectory are the same");
-        return path;
-    }
-
-    // Если целевая траектория занята, уходим сразу, ловить нечего
-    if (target_traj->isBusy())
-    {
-        Journal::instance()->error("Build route: Target trajectory is busy. Route is impossible");
+        Journal::instance()->error("find_route: null trajectory pointer");
         return route_segment_t();
     }
 
-    // Очередь для обхода графа (пары текущая траектория и направление)
-    std::queue<std::pair<Trajectory *, dir_t>> q;
-    // Хеш-таблица посещённых траекторий: ключ - текущая траектория,
-    // значение - предыдущая траектория и предыдущее направление.
-    // Используется для восстановления пути по завершении поиска
-    std::unordered_map<Trajectory *, std::pair<Trajectory *, dir_t>> visited;
-
-    // Начинаем с исходной траектории
-    q.push({start_traj, (dir < 0) ? BWD : FWD});
-    // Метим её как посещенную из несуществующей траектории через неизвестный узел
-    visited[start_traj] = {nullptr, FWD};
-
-    // Пока очередь траекторий для посещения не пуста
-    while (!q.empty())
+    // ---------------------------------------------------------------------
+    // 1. Маршрут на самого себя
+    // ---------------------------------------------------------------------
+    if (start_traj == target_traj)
     {
-        // извлекаем текущую траекторию и направление из очереди
-        const auto& [curr_t, d] = q.front();
-        q.pop();
+        route_segment_t path;
+        path.trajectories = { start_traj };
+        path.directions   = { (dir < 0) ? BWD : FWD };
 
-        // Если текущая траектория - целевая, то ура, мы нашли путь!
-        if (curr_t == target_traj)
+        Journal::instance()->warning(
+            "Build route: Target trajectory and start trajectory are the same");
+
+        return path;
+    }
+
+    // ---------------------------------------------------------------------
+    // 2. Проверка занятости целевой траектории
+    // ---------------------------------------------------------------------
+    if (target_traj->isBusy() && check_busy)
+    {
+        Journal::instance()->error(
+            "Build route: Target trajectory is busy. Route is impossible");
+
+        return route_segment_t();
+    }
+
+    // ---------------------------------------------------------------------
+    // 3. Инициализация структур поиска
+    // ---------------------------------------------------------------------
+    // Очередь: {траектория, направление движения по ней}
+    std::queue<std::pair<Trajectory*, dir_t>> queue;
+
+    // Посещённые состояния: ключ = {траектория, направление},
+    // значение = {предыдущая траектория, направление от неё}
+    // Используем std::map, так как он поддерживает pair как ключ "из коробки"
+    std::map<
+        std::pair<Trajectory*, dir_t>,
+        std::pair<Trajectory*, dir_t>
+        > visited;
+
+    const dir_t start_dir = (dir < 0) ? BWD : FWD;
+
+    queue.push({ start_traj, start_dir });
+    visited[{ start_traj, start_dir }] = { nullptr, start_dir };
+
+    // ---------------------------------------------------------------------
+    // 4. Основной цикл BFS
+    // ---------------------------------------------------------------------
+    while (!queue.empty())
+    {
+        const auto [curr_traj, curr_dir] = queue.front();
+        queue.pop();
+
+        // -------------------------------------------------------------
+        // 4.1. Проверка достижения цели
+        // -------------------------------------------------------------
+        if (curr_traj == target_traj)
         {
-            // Построенный маршрут
             route_segment_t path;
 
-            // Начинаем с целевой траектории
-            Trajectory *path_t = target_traj;
-            dir_t path_d = d;
+            // Восстановление пути от цели к старту
+            auto path_key = std::make_pair(curr_traj, curr_dir);
 
-            // Пока существует предыдущая траектория
-            while (path_t != nullptr)
+            while (visited.count(path_key) && path_key.first != nullptr)
             {
-                // Помещаем сегмент маршрута в путь
-                path.trajectories.push_back(path_t);
-                path.directions.push_back(path_d);
-
-                // Извлекаем предыдущую траекторию, переходим к ней
-                std::tie(path_t, path_d) = visited[path_t];
+                path.trajectories.push_back(path_key.first);
+                path.directions.push_back(path_key.second);
+                path_key = visited[path_key];
             }
 
-            // Инвертируем маршрут, чтобы был от начала к концу
+            // Путь собран в обратном порядке — инвертируем
             std::reverse(path.trajectories.begin(), path.trajectories.end());
             std::reverse(path.directions.begin(), path.directions.end());
 
-            // Уходим, довольные как слон, с маршрутом под мышкой
             return path;
         }
 
-        dir_t next_d = d;
+        // -------------------------------------------------------------
+        // 4.2. Получение следующей стрелки
+        // -------------------------------------------------------------
+        dir_t next_dir = curr_dir;
+        Switch* next_switch = curr_traj->getNextSwitch(next_dir);
 
-        // В зависимости от направления берем либо передний, либо задний
-        // коннектор текущей траектории
-        Switch* next_sw = curr_t->getNextSwitch(next_d);
-
-        // Если коннектора нет - мы пришли в тупик, дальше хода нет
-        if (next_sw == nullptr)
+        if (!next_switch)
         {
-            // идем на следующую итерацию
+            // Тупик — нет продолжения
             continue;
         }
 
-        // Если стрелка уже занята подвижным составом или маршрутом, дальше хода нет
-        if (   ((next_sw->getStateFwd() == IN_ROUTE_MINUS)
-            || (next_sw->getStateFwd() == IS_BUSY_MINUS)
-            || (next_sw->getStateFwd() == IS_BUSY_PLUS)
-            || (next_sw->getStateFwd() == IN_ROUTE_PLUS)
-            || (next_sw->getStateBwd() == IN_ROUTE_MINUS)
-            || (next_sw->getStateBwd() == IS_BUSY_MINUS)
-            || (next_sw->getStateBwd() == IS_BUSY_PLUS)
-             || (next_sw->getStateBwd() == IN_ROUTE_PLUS)) && check_busy)
+        // -------------------------------------------------------------
+        // 4.3. Проверка занятости стрелки
+        // -------------------------------------------------------------
+        if (check_busy)
         {
-            // идем на следующую итерацию
-            continue;
-        }
+            const bool switch_busy =
+                (next_switch->getStateFwd() == IN_ROUTE_MINUS) ||
+                (next_switch->getStateFwd() == IS_BUSY_MINUS)  ||
+                (next_switch->getStateFwd() == IS_BUSY_PLUS)   ||
+                (next_switch->getStateFwd() == IN_ROUTE_PLUS)  ||
+                (next_switch->getStateBwd() == IN_ROUTE_MINUS) ||
+                (next_switch->getStateBwd() == IS_BUSY_MINUS)  ||
+                (next_switch->getStateBwd() == IS_BUSY_PLUS)   ||
+                (next_switch->getStateBwd() == IN_ROUTE_PLUS);
 
-        // Список траекторий кандидатов в высокое звание маршрутных
-        std::vector<Trajectory *> candidates;
-
-        const auto& waysToIterate = (next_d == FWD) ? switch_fwd_ways_t : switch_bwd_ways_t;
-
-        for (const Switch_way_t& way : waysToIterate)
-        {
-            if (Trajectory* traj = next_sw->trajectories[way])
+            if (switch_busy)
             {
-                if ((traj->isBusy() || traj->isInRoute()) && check_busy)
-                {
-                    continue;
-                }
+                continue;
+            }
+        }
 
-                if (visited.find(traj) == visited.end())
-                {
-                    visited[traj] = {curr_t, d};
-                    dir_t traj_d = static_cast<dir_t>(next_d * next_sw->getTrajOrientation(traj));
-                    q.push({traj, traj_d});
-                }
+        // -------------------------------------------------------------
+        // 4.4. Перебор всех возможных выходов из стрелки
+        // -------------------------------------------------------------
+        for (const Switch_way_t& way : switch_ways_t)
+        {
+            Trajectory* next_traj = next_switch->trajectories[way];
+
+            if (!next_traj)
+            {
+                continue;
+            }
+
+            // Пропускаем, если вернулись на ту же траекторию
+            if (next_traj == curr_traj)
+            {
+                continue;
+            }
+
+            // Проверка занятости следующей траектории
+            if (check_busy && (next_traj->isBusy() || next_traj->isInRoute()))
+            {
+                continue;
+            }
+
+            // Вычисление направления движения по следующей траектории
+            const int orientation = next_switch->getTrajOrientation(next_traj);
+
+            if (orientation == 0)
+            {
+                // Некорректная ориентация — пропускаем
+                continue;
+            }
+
+            const dir_t next_traj_dir =
+                static_cast<dir_t>(next_dir * orientation);
+
+            // Ключ для проверки посещённости: {траектория, направление}
+            const auto visit_key = std::make_pair(next_traj, next_traj_dir);
+
+            if (visited.find(visit_key) == visited.end())
+            {
+                visited[visit_key] = { curr_traj, curr_dir };
+                queue.push({ next_traj, next_traj_dir });
             }
         }
     }
 
-    // Пичалька - очередь пуста, а маршрута нет :(
+    // ---------------------------------------------------------------------
+    // 5. Путь не найден
+    // ---------------------------------------------------------------------
+    Journal::instance()->warning(
+        QString("ROUTE NOT FOUND: %1 -> %2. Visited %3 states")
+            .arg(start_traj->getName())
+            .arg(target_traj->getName())
+            .arg(visited.size()));
+
     return route_segment_t();
 }
 
