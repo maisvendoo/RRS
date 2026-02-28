@@ -186,11 +186,10 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-route_segment_t Topology::find_route(
-    Trajectory* start_traj,
-    Trajectory* target_traj,
-    qint8 dir,
-    bool check_busy)
+route_segment_t Topology::find_route(Trajectory* start_traj,
+                                     Trajectory* target_traj,
+                                     qint8 dir,
+                                     bool check_busy)
 {
     // ---------------------------------------------------------------------
     // 0. Входная валидация
@@ -1479,6 +1478,12 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
     if (route_seg.directions[0] == BWD)
     {
         *lenght = cur_coord;
+    }
+
+    // Траектория одна, её длину мы учли в дистанции до цели
+    if (route_seg.trajectories.size() == 1)
+    {
+        return;
     }
 
     for (size_t i = 1; i < route_seg.trajectories.size() - 1; ++i)
