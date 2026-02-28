@@ -95,6 +95,8 @@ signals:
 
     void step(const simulator_time_t& current_time, const double& integration_time);
 
+    void sigInitTimetable();
+
 private:
 
     /// Current simulation time

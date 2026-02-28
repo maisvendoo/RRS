@@ -46,7 +46,8 @@ public:
     /// Нахождение пути в графе траекторий
     route_segment_t find_route(Trajectory *start_traj,
                                Trajectory *target_traj,
-                               int dir);
+                               qint8 dir,
+                               bool check_busy = true);
 
     /// Шаг симуляции
     void step(double t, double dt);

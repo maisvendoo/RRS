@@ -276,22 +276,23 @@ protected:
 
     double calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_target);
 
-    double calcPredictVelocity(double v_cur, double dist, double accel);
-
-    void initTimeTable();
+    double calcPredictVelocity(double v_cur, double dist, double accel);    
 
     /// Счисление пути - определяем текущую дистанцию до цели на станции
     void calcTargetDistance();
 
 public slots:
 
-    void slotSetBrakeAccel(double a_brake);    
+    void slotSetBrakeAccel(double a_brake);
+
+    void initTimeTable();
 
 private slots:
 
     void slotVigilanceControl();
 
     void slotSandTimer();
+
 };
 
 //------------------------------------------------------------------------------

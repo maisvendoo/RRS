@@ -188,7 +188,7 @@ VehicleController *Topology::getVehicleController(size_t idx)
 //------------------------------------------------------------------------------
 route_segment_t Topology::find_route(Trajectory *start_traj,
                                      Trajectory *target_traj,
-                                     int dir)
+                                     qint8 dir, bool check_busy)
 {
     // Маршрут на самого себя
     if (start_traj == target_traj)
@@ -295,7 +295,7 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
                 {
                     // Если траектория занята или включена в другой маршрут,
                     // не рассматриваем маршрут через них
-                    if (traj->isBusy() || traj->isInRoute())
+                    if ( (traj->isBusy() || traj->isInRoute()) && check_busy )
                     {
                         continue;
                     }
@@ -325,7 +325,7 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
                 {
                     // Если траектория занята или включена в другой маршрут,
                     // не рассматриваем маршрут через них
-                    if (traj->isBusy() || traj->isInRoute())
+                    if ( (traj->isBusy() || traj->isInRoute()) && check_busy )
                     {
                         continue;
                     }
@@ -1408,7 +1408,7 @@ void Topology::slotIsRouteExists(QString start_traj_name,
         return;
     }
 
-    auto route_seg = find_route(start_traj, end_traj, dir);
+    auto route_seg = find_route(start_traj, end_traj, dir, false);
 
     if (route_seg.trajectories.empty())
     {
@@ -1443,7 +1443,7 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
         return;
     }
 
-    auto route_seg = find_route(cur_traj, target_traj, dir);
+    auto route_seg = find_route(cur_traj, target_traj, dir, false);
 
     if (route_seg.trajectories.empty())
     {

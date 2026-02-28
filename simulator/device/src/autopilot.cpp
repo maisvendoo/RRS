@@ -87,9 +87,7 @@ void Autopilot::vigilance_control(double t, double dt)
 void Autopilot::velocity_control(double t, double dt)
 {
     if (feedback == nullptr)
-        return;
-
-    initTimeTable();
+        return;    
 
     // Временно, для теста, помещаем сюда счисление пути
     calcTargetDistance();

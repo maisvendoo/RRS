@@ -315,6 +315,7 @@ void Model::slotUpdateTrainTimetable(int train_idx)
                 connect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition);
                 connect(ap, &Autopilot::sigIsRouteExists, topology, &Topology::slotIsRouteExists);
                 connect(ap, &Autopilot::sigGetRouteLength, topology, &Topology::slotGetRouteLength);
+                connect(this, &Model::sigInitTimetable, ap, &Autopilot::initTimeTable);
             }
         }
     }
@@ -1145,6 +1146,8 @@ void Model::process()
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
 
     topology->step(sim_time.simulation_seconds, integration_time);
+
+    emit sigInitTimetable();
 
     scnmgr->step(sim_time, integration_time);
 
