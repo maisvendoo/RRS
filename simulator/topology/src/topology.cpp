@@ -269,14 +269,14 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
         }
 
         // Если стрелка уже занята подвижным составом или маршрутом, дальше хода нет
-        if (   (next_sw->getStateFwd() == IN_ROUTE_MINUS)
+        if (   ((next_sw->getStateFwd() == IN_ROUTE_MINUS)
             || (next_sw->getStateFwd() == IS_BUSY_MINUS)
             || (next_sw->getStateFwd() == IS_BUSY_PLUS)
             || (next_sw->getStateFwd() == IN_ROUTE_PLUS)
             || (next_sw->getStateBwd() == IN_ROUTE_MINUS)
             || (next_sw->getStateBwd() == IS_BUSY_MINUS)
             || (next_sw->getStateBwd() == IS_BUSY_PLUS)
-            || (next_sw->getStateBwd() == IN_ROUTE_PLUS))
+             || (next_sw->getStateBwd() == IN_ROUTE_PLUS)) && check_busy)
         {
             // идем на следующую итерацию
             continue;
@@ -285,62 +285,22 @@ route_segment_t Topology::find_route(Trajectory *start_traj,
         // Список траекторий кандидатов в высокое звание маршрутных
         std::vector<Trajectory *> candidates;
 
-        // Если едем по стрелке вперёд
-        if (next_d == FWD)
+        const auto& waysToIterate = (next_d == FWD) ? switch_fwd_ways_t : switch_bwd_ways_t;
+
+        for (const Switch_way_t& way : waysToIterate)
         {
-            // Перебираем пути вперёд
-            for (const Switch_way_t& way : switch_fwd_ways_t)
+            if (Trajectory* traj = next_sw->trajectories[way])
             {
-                if (Trajectory* traj = next_sw->trajectories[way])
+                if ((traj->isBusy() || traj->isInRoute()) && check_busy)
                 {
-                    // Если траектория занята или включена в другой маршрут,
-                    // не рассматриваем маршрут через них
-                    if ( (traj->isBusy() || traj->isInRoute()) && check_busy )
-                    {
-                        continue;
-                    }
-
-                    // Если траектория еще не посещалась - то список посещённых вернет end()
-                    if (visited.find(traj) == visited.end())
-                    {
-                        // Запоминаем траекторию как посещённую, и откуда мы к нему пришли
-                        visited[traj] = {curr_t, d};
-
-                        // Направление по новой траектории
-                        dir_t traj_d = static_cast<dir_t>(next_d * next_sw->getTrajOrientation(traj));
-                        // и помещаем новую траекторию в очередь
-                        q.push({traj, traj_d});
-                    }
+                    continue;
                 }
-            }
-        }
 
-        // Если едем по стрелке назад
-        if (next_d == BWD)
-        {
-            // Перебираем пути назад
-            for (const Switch_way_t& way : switch_bwd_ways_t)
-            {
-                if (Trajectory* traj = next_sw->trajectories[way])
+                if (visited.find(traj) == visited.end())
                 {
-                    // Если траектория занята или включена в другой маршрут,
-                    // не рассматриваем маршрут через них
-                    if ( (traj->isBusy() || traj->isInRoute()) && check_busy )
-                    {
-                        continue;
-                    }
-
-                    // Если траектория еще не посещалась - то список посещённых вернет end()
-                    if (visited.find(traj) == visited.end())
-                    {
-                        // Запоминаем траекторию как посещённую, и откуда мы к нему пришли
-                        visited[traj] = {curr_t, d};
-
-                        // Направление по новой траектории
-                        dir_t traj_d = static_cast<dir_t>(next_d * next_sw->getTrajOrientation(traj));
-                        // и помещаем новую траекторию в очередь
-                        q.push({traj, traj_d});
-                    }
+                    visited[traj] = {curr_t, d};
+                    dir_t traj_d = static_cast<dir_t>(next_d * next_sw->getTrajOrientation(traj));
+                    q.push({traj, traj_d});
                 }
             }
         }
