@@ -336,6 +336,12 @@ void Autopilot::initTimeTable()
                               timetable.stations[target_station_idx].target_traj,
                               target_dir,
                               &is_route_exists);
+
+    }
+
+    if (!is_route_exists)
+    {
+        target_station_idx++;
     }
 
     // Определяем дистанцию до ближайшей станции
