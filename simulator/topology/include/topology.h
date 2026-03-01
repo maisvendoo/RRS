@@ -101,6 +101,8 @@ signals:
 
     void sigChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
 
+    void sigIncTargetStation();
+
 private:
 
     /// Контейнер данных по всем траекториям на полигоне

@@ -312,10 +312,19 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 
                 auto vc = topology->getVehicleController(vehicle->getModelIndex());
 
+                disconnect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition);
                 connect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition);
+
+                disconnect(ap, &Autopilot::sigIsRouteExists, topology, &Topology::slotIsRouteExists);
                 connect(ap, &Autopilot::sigIsRouteExists, topology, &Topology::slotIsRouteExists);
+
+                disconnect(ap, &Autopilot::sigGetRouteLength, topology, &Topology::slotGetRouteLength);
                 connect(ap, &Autopilot::sigGetRouteLength, topology, &Topology::slotGetRouteLength);
+
+                disconnect(this, &Model::sigInitTimetable, ap, &Autopilot::initTimeTable);
                 connect(this, &Model::sigInitTimetable, ap, &Autopilot::initTimeTable);
+
+                connect(topology, &Topology::sigIncTargetStation, ap, &Autopilot::slotIncTargetStation);
             }
         }
     }

@@ -23,7 +23,7 @@ public:
     Autopilot(QObject *parent = nullptr) : Device(parent)
     {
         connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);
-        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);
+        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);        
     }
 
     ~Autopilot()
@@ -227,7 +227,7 @@ protected:
     double prev_traj_coord = 0;
 
     /// Индекс ПЕ, на которой работает данный модуль
-    int vehicle_idx = 0;
+    int vehicle_idx = 0;    
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
@@ -286,6 +286,8 @@ public slots:
     void slotSetBrakeAccel(double a_brake);
 
     void initTimeTable();
+
+    void slotIncTargetStation();
 
 private slots:
 

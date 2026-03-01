@@ -1474,6 +1474,12 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
     if (route_seg.trajectories.size() == 1)
     {
         *lenght = (target_coord - cur_coord) * route_seg.directions[0];
+
+        if (*lenght < 0)
+        {
+            emit sigIncTargetStation();
+        }
+
         return;
     }
 

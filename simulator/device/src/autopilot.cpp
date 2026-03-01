@@ -36,7 +36,7 @@ void Autopilot::step(double t, double dt)
     accel_meter->step(t, dt);
 
     rb_timer->step(t, dt);
-    sand_timer->step(t, dt);
+    sand_timer->step(t, dt);    
 
     Device::step(t, dt);
 }
@@ -48,14 +48,24 @@ QString Autopilot::getDbgMsg()
 {
     double v_p = calcPredictVelocity(feedback->v_cur, dist_target, accel_meter->value());
 
-    return QString(" | АВТОВЕДЕНИЕ | Vтек.: %1 км/ч | Vокр.: %2 км/ч | Vзад.: %3 км/ч| Уск.: %4 м/с2| Зад. уск.: %5 м/с2 | Прогноз Vцел.: %6 км/ч | Цель. дист.: %7 м")
+
+    QString msg = QString(" | АВТОВЕДЕНИЕ | Vтек.: %1 км/ч | Vокр.: %2 км/ч | Vзад.: %3 км/ч| Уск.: %4 м/с2| Зад. уск.: %5 м/с2 | Прогноз Vцел.: %6 км/ч")
         .arg(feedback->v_cur, 4, 'f', 1)
         .arg(feedback->v_tau, 4, 'f', 1)
         .arg(v_ref, 4, 'f', 1)
         .arg(accel_meter->value(), 6, 'f', 2)
         .arg(-a_brake, 6, 'f', 2)
         .arg(v_p, 4, 'f', 1)
-        .arg(target_station_dist, 10, 'f', 1);
+                      .arg(target_station_dist, 10, 'f', 1);
+
+    if (is_timetable_ready)
+    {
+        msg += QString(" | Цель: %1 | дист.: %2")
+                   .arg(timetable.stations[target_station_idx].name)
+                   .arg(target_station_dist, 7, 'f', 1);
+    }
+
+    return msg;
 }
 
 //------------------------------------------------------------------------------
@@ -314,10 +324,9 @@ void Autopilot::initTimeTable()
     // Ищем ближайшую станцию по ходу нашего следования, исходя из нашего текущего положения
     while (is_route_exists)
     {
-        if (target_station_idx == 1)
+        if (target_station_idx == 0)
         {
-            // Дошли до станции первой после станции отправления
-            // нет смысла искать - мы в самом начале пути
+            // Дошли до первой станции
             break;
         }
 
@@ -335,7 +344,7 @@ void Autopilot::initTimeTable()
                            timetable.stations[target_station_idx].coord,
                            target_dir, &target_station_dist);
 
-    is_timetable_ready = true;
+    is_timetable_ready = true;    
 }
 
 //------------------------------------------------------------------------------
@@ -355,10 +364,12 @@ void Autopilot::calcTargetDistance()
     // топологию в поисках новой дистанции
     //if (curr_traj_name != prev_traj_name)
     //{
-        emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
-                               timetable.stations[target_station_idx].target_traj,
-                               timetable.stations[target_station_idx].coord,
-                               target_dir, &target_station_dist);
+    emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
+                           timetable.stations[target_station_idx].target_traj,
+                           timetable.stations[target_station_idx].coord,
+                           target_dir, &target_station_dist);
+
+
 
         //prev_traj_name = curr_traj_name;
         //prev_traj_coord = curr_traj_coord;
@@ -410,4 +421,17 @@ void Autopilot::slotSandTimer()
     sand_timer->stop();
 
     sand_OFF();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::slotIncTargetStation()
+{
+    target_station_idx++;
+
+    if (target_station_idx > timetable.stations.size() - 1)
+    {
+        target_station_idx = timetable.stations.size() - 1;
+    }
 }
