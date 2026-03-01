@@ -1477,20 +1477,36 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
         return;
     }
 
-    *lenght = 0;
+    *lenght = 0.0;
 
-    for (size_t i = 0; i < route_seg.trajectories.size(); ++i)
+    if (route_seg.directions.front() == FWD)
     {
-        *lenght += route_seg.trajectories[i]->getLength();
+        *lenght += route_seg.trajectories.front()->getLength() - cur_coord;
+    }
+    else
+    {
+        *lenght += cur_coord;
     }
 
     if (route_seg.directions.back() == FWD)
     {
-        *lenght += -cur_coord - (route_seg.trajectories.back()->getLength() - target_coord);
+        *lenght += target_coord;
     }
     else
     {
-        *lenght += -(route_seg.trajectories.front()->getLength() - cur_coord) - target_coord;
+        *lenght += route_seg.trajectories.back()->getLength() - target_coord;
+    }
+
+    if (route_seg.trajectories.size() == 2)
+    {
+        return;
+    }
+
+    // Траекторий 3 и более
+    // Серединка из полных траекторий
+    for (size_t i = 1; i < route_seg.trajectories.size() - 1; ++i)
+    {
+        *lenght += route_seg.trajectories[i]->getLength();
     }
 }
 

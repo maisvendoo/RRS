@@ -348,27 +348,27 @@ void Autopilot::calcTargetDistance()
         return;
     }
 
-    prev_traj_coord = curr_traj_coord;
+    //prev_traj_coord = curr_traj_coord;
     emit sigGetVehicleTrajPosition(&curr_traj_name, &curr_traj_coord);
 
     // Если сменилась текущаяя траектория - нечего делать, дергаем
     // топологию в поисках новой дистанции
-    if (curr_traj_name != prev_traj_name)
-    {
+    //if (curr_traj_name != prev_traj_name)
+    //{
         emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
                                timetable.stations[target_station_idx].target_traj,
                                timetable.stations[target_station_idx].coord,
                                target_dir, &target_station_dist);
 
-        prev_traj_name = curr_traj_name;
-        prev_traj_coord = curr_traj_coord;
+        //prev_traj_name = curr_traj_name;
+        //prev_traj_coord = curr_traj_coord;
 
-        return;
+    /*    return;
     }
 
     // Если мы на прежней траектории - совершенно незачем дергать топологию,
     // вычисляем новую дистанцию по смещению вдоль траектории
-    target_station_dist -= qAbs(curr_traj_coord - prev_traj_coord);
+    target_station_dist -= qAbs(curr_traj_coord - prev_traj_coord);*/
 }
 
 //------------------------------------------------------------------------------
