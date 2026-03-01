@@ -1470,35 +1470,25 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
         return;
     }
 
-    if (route_seg.directions[0] == FWD)
-    {
-        *lenght = route_seg.trajectories[0]->getLength() - cur_coord;
-    }
-
-    if (route_seg.directions[0] == BWD)
-    {
-        *lenght = cur_coord;
-    }
-
-    // Траектория одна, её длину мы учли в дистанции до цели
+    // Траектория одна
     if (route_seg.trajectories.size() == 1)
     {
+        *lenght = (target_coord - cur_coord) * route_seg.directions[0];
         return;
     }
 
-    for (size_t i = 1; i < route_seg.trajectories.size() - 1; ++i)
+    for (size_t i = 0; i < route_seg.trajectories.size(); ++i)
     {
         *lenght += route_seg.trajectories[i]->getLength();
     }
 
     if (route_seg.directions.back() == FWD)
     {
-        *lenght += target_coord;
+        *lenght += -cur_coord - (route_seg.trajectories.back()->getLength() - target_coord);
     }
-
-    if (route_seg.directions.back() == BWD)
+    else
     {
-        *lenght += route_seg.trajectories.back()->getLength() - target_coord;
+        *lenght += -(route_seg.trajectories.front()->getLength() - cur_coord) - target_coord;
     }
 }
 
