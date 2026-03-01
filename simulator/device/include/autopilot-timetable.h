@@ -13,12 +13,24 @@ struct autopilot_station_t
     QString name = "";
     /// Время прибытия
     QString arr_time = "";
+    /// Фактическое время прибытия
+    QString fact_arr_time = "-";
     /// То же время, но в секундах от старта игры
     double arr_time_sec = 0.0;
+    /// Фактическое время прибытия в секундах
+    double fact_arr_time_sec = 0.0;
+    /// Признак прибытия
+    bool is_arrival = false;
     /// Время отправления
     QString dep_time = "";
+    /// Фактическое время отправления
+    QString fact_dep_time = "-";
     /// То же время, но в секундах от старта игры
     double dep_time_sec = 0.0;
+    /// Фактическое время отправления в секундах
+    double fact_dep_time_sec = 0.0;
+    /// Признак отправления
+    bool is_departure = false;
     /// Целевая траектория
     QString target_traj = "";
     /// Координата вдоль целевой траектории
@@ -33,9 +45,15 @@ struct autopilot_station_t
 
         stream << name;
         stream << arr_time;
+        stream << fact_arr_time;
         stream << arr_time_sec;
+        stream << fact_arr_time_sec;
+        stream << is_arrival;
         stream << dep_time;
+        stream << fact_dep_time;
         stream << dep_time_sec;
+        stream << fact_dep_time_sec;
+        stream << is_departure;
         stream << target_traj;
         stream << coord;
 
@@ -50,9 +68,15 @@ struct autopilot_station_t
 
         stream >> name;
         stream >> arr_time;
+        stream >> fact_arr_time;
         stream >> arr_time_sec;
+        stream >> fact_arr_time_sec;
+        stream >> is_arrival;
         stream >> dep_time;
+        stream >> fact_dep_time;
         stream >> dep_time_sec;
+        stream >> fact_dep_time_sec;
+        stream >> is_departure;
         stream >> target_traj;
         stream >> coord;
     }
