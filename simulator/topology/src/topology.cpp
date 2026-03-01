@@ -1477,6 +1477,8 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
         return;
     }
 
+    *lenght = 0;
+
     for (size_t i = 0; i < route_seg.trajectories.size(); ++i)
     {
         *lenght += route_seg.trajectories[i]->getLength();
