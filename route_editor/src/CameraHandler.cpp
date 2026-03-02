@@ -90,7 +90,7 @@ CameraHandler::CameraHandler(EditorContext& context)
     context.look_at = vsg::LookAt::create();
     context.look_at->eye.z = context.look_at->center.z = initial_height;
 
-    camera = vsg::Camera::create(context.perspective, context.look_at,
+    context.camera = vsg::Camera::create(context.perspective, context.look_at,
         vsg::ViewportState::create(window_extent));
 
     calculate_front();
@@ -185,11 +185,6 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     }
 
     context.look_at->center = context.look_at->eye + front;
-}
-
-vsg::ref_ptr<vsg::Camera> CameraHandler::get_camera() const
-{
-    return camera;
 }
 
 double& CameraHandler::get_fov_deg() const

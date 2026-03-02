@@ -14,7 +14,7 @@
 #include <cassert>
 
 IntersectionHandler::IntersectionHandler(const EditorContext& context)
-    : camera(*context.camera_handler->get_camera())
+    : camera(*context.camera)
 {
 }
 

@@ -76,9 +76,7 @@ bool RouteEditor::initialize()
     context.intersection_handler = IntersectionHandler::create(context);
     context.scene_graph = SceneGraph::create(context);
 
-    const auto camera = context.camera_handler->get_camera();
-
-    const auto scene_view = vsg::View::create(camera, context.scene_graph);
+    const auto scene_view = vsg::View::create(context.camera, context.scene_graph);
     scene_view->mask = MASK_SCENE;
 
     VkClearValue clear_value{};
@@ -91,10 +89,10 @@ bool RouteEditor::initialize()
         vsg::ClearAttachments::Attachments{attachment},
         vsg::ClearAttachments::Rects{rect});
 
-    const auto gui_view1 = vsg::View::create(camera, context.scene_graph);
+    const auto gui_view1 = vsg::View::create(context.camera, context.scene_graph);
     gui_view1->mask = MASK_GUI1;
 
-    const auto gui_view2 = vsg::View::create(camera, context.scene_graph);
+    const auto gui_view2 = vsg::View::create(context.camera, context.scene_graph);
     gui_view2->mask = MASK_GUI2;
 
     const auto editor_gui = EditorGui::create(context);

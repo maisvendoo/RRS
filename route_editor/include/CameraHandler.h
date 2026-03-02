@@ -32,8 +32,6 @@ public:
 
     void apply(vsg::FrameEvent& frame) override;
 
-    vsg::ref_ptr<vsg::Camera> get_camera() const;
-
     double& get_fov_deg() const;
 
     vec3_type get_front() const;
@@ -50,8 +48,6 @@ private:
 
 private:
     EditorContext& context;
-
-    vsg::ref_ptr<vsg::Camera> camera;
 
     value_type yaw_deg = 0.0;
     value_type pitch_deg = 0.0;
