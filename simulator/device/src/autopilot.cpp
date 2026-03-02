@@ -108,15 +108,35 @@ void Autopilot::velocity_control(double t, double dt)
     // Скорость, заданная по графику
     v_ref = calcTimetableVelocity(t, dt, target_station_dist);
 
+    if (v_ref < 0.1)
+    {
+        int a = 0;
+    }
+
     // Выбираем минимум между текущим ограничением и конструкционной скоростью
     v_ref = min(calcCurrentSpeedLimit(t, dt), v_ref);
+
+    if (v_ref < 0.1)
+    {
+        int a = 0;
+    }
 
     // Рассчитываем скорость по тормозной кривой до следующего ограничения
     // (если оно больше, ну и пусть :))) )
     v_ref = min(v_ref, calcBrakeCurveSpeed(feedback->v_lim_next, feedback->limit_dist));
 
+    if (v_ref < 0.1)
+    {
+        int a = 0;
+    }
+
     // Расчитываем скорость по тормозной кривой до ближайшего сигнала
     v_ref = min(v_ref, calcAlsnSpeed(feedback->alsn_code, feedback->signal_dist, v_target));
+
+    if (v_ref < 0.1)
+    {
+        int a = 0;
+    }
 
     // Если разрешено отправление по графику
     if (is_departure_allowed)
@@ -453,32 +473,43 @@ double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
 //------------------------------------------------------------------------------
 double Autopilot::calcTimetableVelocity(double t, double dt, double dist)
 {
-    double v_ref = v_constr;
-
     // Нет графика - нехер тут рассчитывать, конструкционная скорость,
     // далее порешают другие ограничения, скорость все равно будет выбрана
     // минимальная из возможных
     if (timetable.stations.empty())
     {
-        return v_ref;
+        return v_constr;
     }
 
-    // Рассчитываем среднюю скорость для выполнения графика
-    double delta_t = timetable.stations[target_station_idx].arr_time_sec - t;
+    double Kt = 0.01;
 
-    if (delta_t < 1.0)
+    auto st = timetable.stations[target_station_idx];
+
+    double delta_t = st.arr_time_sec - t;
+
+    if (delta_t < 0)
     {
-        return v_ref;
+        v_tt_ref = v_constr;
     }
+    else
+    {
+        if (target_station_dist > 0)
+            v_tt_ref = target_station_dist * Physics::kmh / (delta_t + 0.0001);
+        else
+            v_tt_ref = v_constr;
 
-    v_ref = target_station_dist * Physics::kmh / delta_t;
+        if (v_tt_ref < 0.1)
+        {
+            int a = 0;
+        }
+    }
 
     if (is_departure_allowed)
     {
-        return v_ref;
+        return min(v_tt_ref, v_constr);
     }
 
-    return min(v_ref, calcTimetableBrakeCurve(t, dt, dist));
+    return min(v_tt_ref, calcTimetableBrakeCurve(t, dt, dist));
 }
 
 //------------------------------------------------------------------------------
