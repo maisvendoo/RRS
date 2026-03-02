@@ -62,7 +62,7 @@ Route::Route(EditorContext& context)
         paged_lod->filename = fs.combinePath(context.route_dir, relative_path);
 
         paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
-            context.settings.view_distance);
+            static_cast<double>(context.settings.view_distance));
 
         paged_lod->children.front() = {0.1, nullptr};
         paged_lod->options = context.options;
@@ -265,7 +265,7 @@ bool Route::load_topology()
                 new_paged_lod->filename = signal_model_path;
 
                 new_paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
-                    context.settings.view_distance);
+                    static_cast<double>(context.settings.view_distance));
 
                 new_paged_lod->children.front() = {0.1, nullptr};
                 new_paged_lod->options = context.options;

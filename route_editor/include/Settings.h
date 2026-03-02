@@ -23,13 +23,13 @@ struct settings_t
     bool double_buffer = true;    ///< Double buffering flag
     int samples = 1;              ///< Number of antialiasing samples
 
-    double zNear = 0.1;               ///< Near clip plane
-    double view_distance = 2000.0;    ///< View distance
-    double fovy = 64.0;               ///< Vertical view angle
-    double fovy_min = 2.0;            ///< Vertical view angle min
-    double fovy_max = 100.0;          ///< Vertical view angle max
-    double pitch_min = -70.0;         ///< Vertical angle down max
-    double pitch_max = 70.0;          ///< Vertical angle up max
+    float zNear = 0.1f;               ///< Near clip plane
+    float view_distance = 2000.0f;    ///< View distance
+    float fovy = 64.0f;               ///< Vertical view angle
+    float fovy_min = 2.0f;            ///< Vertical view angle min
+    float fovy_max = 100.0f;          ///< Vertical view angle max
+    float pitch_min = -70.0f;         ///< Vertical angle down max
+    float pitch_max = 70.0f;          ///< Vertical angle up max
 
     double camera_initial_height = 0.0;
 

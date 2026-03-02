@@ -54,11 +54,11 @@ void settings_t::read(const std::string& cfg_path)
 
     section = "Camera";
 
-    cfg.getDouble(section, "zNear", zNear);
-    cfg.getDouble(section, "ViewDistance", view_distance);
-    cfg.getDouble(section, "FovY", fovy);
-    cfg.getDouble(section, "FovYMin", fovy_min);
-    cfg.getDouble(section, "FovYMax", fovy_max);
+    cfg.getFloat(section, "zNear", zNear);
+    cfg.getFloat(section, "ViewDistance", view_distance);
+    cfg.getFloat(section, "FovY", fovy);
+    cfg.getFloat(section, "FovYMin", fovy_min);
+    cfg.getFloat(section, "FovYMax", fovy_max);
     cfg.getDouble(section, "InitialHeight", camera_initial_height);
     cfg.getDouble(section, "MoveSpeed", camera_move_speed);
     cfg.getDouble(section, "MinMoveSpeed", min_camera_move_speed);
