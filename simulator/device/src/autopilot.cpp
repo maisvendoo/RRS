@@ -273,7 +273,14 @@ double Autopilot::calcPredictVelocity(double v_cur, double dist, double accel)
 //------------------------------------------------------------------------------
 void Autopilot::initTimeTable()
 {
+    // Гравик инициализирован - выход
     if (is_timetable_ready)
+    {
+        return;
+    }
+
+    // График пуст - выход
+    if (timetable.stations.empty())
     {
         return;
     }
