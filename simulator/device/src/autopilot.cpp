@@ -28,6 +28,8 @@ Autopilot *loadAutopilot(QString lib_path)
 //------------------------------------------------------------------------------
 void Autopilot::step(double t, double dt)
 {
+    time = t;
+
     velocity_control(t, dt);
 
     vigilance_control(t, dt);
@@ -385,7 +387,7 @@ void Autopilot::initTimeTable()
     }
 
     // Определяем дистанцию до ближайшей станции
-    emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
+    emit sigGetRouteLength(vehicle_idx, curr_traj_name, curr_traj_coord,
                            timetable.stations[target_station_idx].target_traj,
                            timetable.stations[target_station_idx].coord,
                            target_dir, &target_station_dist);
@@ -410,7 +412,7 @@ void Autopilot::calcTargetDistance()
     // топологию в поисках новой дистанции
     //if (curr_traj_name != prev_traj_name)
     //{
-    emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
+    emit sigGetRouteLength(vehicle_idx, curr_traj_name, curr_traj_coord,
                            timetable.stations[target_station_idx].target_traj,
                            timetable.stations[target_station_idx].coord,
                            target_dir, &target_station_dist);
@@ -479,29 +481,6 @@ double Autopilot::calcTimetableVelocity(double t, double dt, double dist)
     if (timetable.stations.empty())
     {
         return v_constr;
-    }
-
-    double Kt = 0.01;
-
-    auto st = timetable.stations[target_station_idx];
-
-    double delta_t = st.arr_time_sec - t;
-
-    if (delta_t < 0)
-    {
-        v_tt_ref = v_constr;
-    }
-    else
-    {
-        if (target_station_dist > 0)
-            v_tt_ref = target_station_dist * Physics::kmh / (delta_t + 0.0001);
-        else
-            v_tt_ref = v_constr;
-
-        if (v_tt_ref < 0.1)
-        {
-            int a = 0;
-        }
     }
 
     if (is_departure_allowed)
@@ -626,8 +605,13 @@ void Autopilot::slotHaltTimeout()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Autopilot::slotIncTargetStation()
+void Autopilot::slotIncTargetStation(int vehicle_idx)
 {
+    if (vehicle_idx != this->vehicle_idx)
+    {
+        return;
+    }
+
     if (!timetable.stations[target_station_idx].is_departure)
     {
         timetable.stations[target_station_idx].is_departure = true;
@@ -639,4 +623,31 @@ void Autopilot::slotIncTargetStation()
     {
         target_station_idx = timetable.stations.size() - 1;
     }    
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
+{
+    if (vehicle_idx != this->vehicle_idx)
+    {
+        return;
+    }
+
+    auto st = timetable.stations[target_station_idx];
+
+    double delta_t = st.arr_time_sec - time;
+
+    if (delta_t < 0)
+    {
+        v_tt_ref = v_constr;
+    }
+    else
+    {
+        if (target_station_dist > 0)
+            v_tt_ref = target_dist * Physics::kmh / (delta_t + 0.0001);
+        else
+            v_tt_ref = v_constr;
+    }
 }

@@ -106,7 +106,8 @@ signals:
 
     void sigIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool *exists);
 
-    void sigGetRouteLength(QString cur_traj_name,
+    void sigGetRouteLength(int vehicle_idx,
+                           QString cur_traj_name,
                            double cur_coord,
                            QString target_traj_name,
                            double target_coord,
@@ -241,6 +242,8 @@ protected:
 
     double v_tt_ref = 0.0;
 
+    double time = 0;
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,
@@ -311,7 +314,9 @@ public slots:
 
     void initTimeTable();
 
-    void slotIncTargetStation();
+    void slotIncTargetStation(int vehicle_idx);
+
+    void slotCalcMiddleVelocity(int vehicle_idx, double target_dist);
 
 private slots:
 

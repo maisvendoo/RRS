@@ -1442,7 +1442,7 @@ void Topology::slotIsRouteExists(QString start_traj_name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
+void Topology::slotGetRouteLength(int vehicle_idx, QString cur_traj_name, double cur_coord,
                                   QString target_traj_name, double target_coord,
                                   int dir, double *lenght)
 {
@@ -1477,9 +1477,10 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
 
         if (*lenght < 0)
         {
-            emit sigIncTargetStation();
+            emit sigIncTargetStation(vehicle_idx);
         }
 
+        emit sigCalcMiddleVelocity(vehicle_idx, *lenght);
         return;
     }
 
@@ -1505,6 +1506,7 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
 
     if (route_seg.trajectories.size() == 2)
     {
+        emit sigCalcMiddleVelocity(vehicle_idx, *lenght);
         return;
     }
 
@@ -1514,6 +1516,8 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
     {
         *lenght += route_seg.trajectories[i]->getLength();
     }
+
+    emit sigCalcMiddleVelocity(vehicle_idx, *lenght);
 }
 
 //------------------------------------------------------------------------------
