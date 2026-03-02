@@ -4,6 +4,7 @@
 #include "CommandList.h"
 #include "EditorState.h"
 #include "Gizmo.h"
+#include "Outline.h"
 #include "RouteObject.h"
 #include "Settings.h"
 
@@ -57,6 +58,7 @@ struct EditorContext
     RouteObjects selected_objects;
     RouteObjects hidden_objects;
     std::string route_dir;
+    vsg::ref_ptr<OutlineBuilder> outline_builder;
 };
 
 #endif // EDITOR_CONTEXT_H

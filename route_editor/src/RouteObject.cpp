@@ -69,7 +69,7 @@ RouteObject::RouteObject(EditorContext& context, vsg::ref_ptr<vsg::PagedLOD> pag
         vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
     outline_switch = SingleSwitch::create(vsg::MASK_OFF,
-        Outline::create(paged_lod));
+        nullptr);
 
     this->addChild(paged_lod_switch);
     this->addChild(outline_switch);
@@ -239,8 +239,14 @@ RouteObjectsIterator RouteObject::show()
 
 void RouteObject::select()
 {
-    const auto outline = outline_switch->node.cast<Outline>();
-    outline->load(vsg::observer_ptr<vsg::Viewer>(context.viewer));
+    if (!outline_switch->node)
+    {
+        const auto compile_manager = context.viewer->compileManager;
+        const auto outline = context.outline_builder->create_outline(paged_lod_switch->node.cast<vsg::PagedLOD>());
+        const auto compile_result = compile_manager->compile(outline);
+        outline_switch->node = outline;
+        vsg::updateViewer(*context.viewer, compile_result);
+    }
 
     outline_switch->mask = MASK_GUI2;
 

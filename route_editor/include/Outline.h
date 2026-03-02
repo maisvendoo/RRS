@@ -5,7 +5,9 @@
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/utils/Builder.h>
 
+struct EditorContext;
 struct settings_t;
 
 namespace vsg
@@ -17,20 +19,18 @@ class Viewer;
 
 }
 
-class Outline : public vsg::Inherit<vsg::Group, Outline>
+class OutlineBuilder : public vsg::Inherit<vsg::Object, OutlineBuilder>
 {
 public:
-    Outline(vsg::ref_ptr<vsg::PagedLOD> paged_lod);
+    OutlineBuilder(const EditorContext& context);
 
-    void load(vsg::observer_ptr<vsg::Viewer> observer_viewer);
-
-    static void set_settings(const settings_t* settings);
+    vsg::ref_ptr<vsg::Node> create_outline(vsg::ref_ptr<vsg::PagedLOD> paged_lod);
 
 private:
-    static const settings_t* s_settings;
+    const EditorContext& context;
 
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod;
-    vsg::ref_ptr<vsg::Node> box;
+    vsg::ref_ptr<vsg::Options> options;
+    vsg::Builder builder;
 };
 
 #endif // OUTLINE_H

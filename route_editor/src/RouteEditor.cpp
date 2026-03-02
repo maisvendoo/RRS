@@ -53,8 +53,6 @@ bool RouteEditor::initialize()
     context.settings.read(fs.combinePath(
         fs.getConfigDir(), "editor-settings.xml"));
 
-    Outline::set_settings(&context.settings);
-
     context.options = vsg::Options::create();
     context.options->sharedObjects = vsg::SharedObjects::create();
     context.options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
@@ -74,6 +72,8 @@ bool RouteEditor::initialize()
     context.camera_handler = CameraHandler::create(context);
     context.intersection_handler = IntersectionHandler::create(context);
     context.scene_graph = SceneGraph::create(context);
+
+    context.outline_builder = OutlineBuilder::create(context);
 
     const auto scene_view = vsg::View::create(context.camera, context.scene_graph);
     scene_view->mask = MASK_SCENE;
