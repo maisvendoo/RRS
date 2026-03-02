@@ -9,27 +9,29 @@
 
 struct settings_t
 {
+    settings_t();
+
     void read(const std::string& cfg_path);
 
-    std::string window_title = "Route Editor";
+    std::string window_title;
 
-    int window_x = 50;            ///< Window horizontal position
-    int window_y = 50;            ///< Window vertical position
-    int window_width = 1280;      ///< Window width
-    int window_height = 720;      ///< Window height
-    int screen_number = 0;        ///< Screen number
-    bool fullscreen = false;      ///< Fullscreen flag
-    bool vsync = true;            ///< Vertical sync flag
-    bool double_buffer = true;    ///< Double buffering flag
-    int samples = 1;              ///< Number of antialiasing samples
+    int window_x;          ///< Window horizontal position
+    int window_y;          ///< Window vertical position
+    int window_width;      ///< Window width
+    int window_height;     ///< Window height
+    int screen_number;     ///< Screen number
+    bool fullscreen;       ///< Fullscreen flag
+    bool vsync;            ///< Vertical sync flag
+    bool double_buffer;    ///< Double buffering flag
+    int samples;           ///< Number of antialiasing samples
 
-    float zNear = 0.1f;               ///< Near clip plane
-    float view_distance = 2000.0f;    ///< View distance
-    float fovy = 64.0f;               ///< Vertical view angle
-    float fovy_min = 2.0f;            ///< Vertical view angle min
-    float fovy_max = 100.0f;          ///< Vertical view angle max
-    float pitch_min = -70.0f;         ///< Vertical angle down max
-    float pitch_max = 70.0f;          ///< Vertical angle up max
+    float zNear;            ///< Near clip plane
+    float view_distance;    ///< View distance
+    float fovy;             ///< Vertical view angle
+    float fovy_min;         ///< Vertical view angle min
+    float fovy_max;         ///< Vertical view angle max
+    float pitch_min;        ///< Vertical angle down max
+    float pitch_max;        ///< Vertical angle up max
 
     double camera_initial_height = 0.0;
 

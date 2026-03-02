@@ -19,6 +19,27 @@
 #include <map>
 #include <string>
 
+settings_t::settings_t()
+    : window_title("Route Editor")
+    , window_x(50)
+    , window_y(50)
+    , window_width(1280)
+    , window_height(720)
+    , screen_number(0)
+    , fullscreen(false)
+    , vsync(true)
+    , double_buffer(true)
+    , samples(1)
+    , zNear(0.1f)
+    , view_distance(2000.0f)
+    , fovy(64.0f)
+    , fovy_min(2.0f)
+    , fovy_max(100.0f)
+    , pitch_min(-70.0f)
+    , pitch_max(70.0f)
+{
+}
+
 void settings_t::read(const std::string& cfg_path)
 {
     CfgReader cfg;
