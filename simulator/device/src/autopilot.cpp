@@ -36,7 +36,8 @@ void Autopilot::step(double t, double dt)
     accel_meter->step(t, dt);
 
     rb_timer->step(t, dt);
-    sand_timer->step(t, dt);    
+    sand_timer->step(t, dt);
+    halt_timer->step(t, dt);
 
     Device::step(t, dt);
 }
@@ -102,8 +103,11 @@ void Autopilot::velocity_control(double t, double dt)
     // Счисление пути
     calcTargetDistance();
 
+    // Обработка графика
+    checkTimetable(t, dt);
+
     // Скорость, заданная по графику
-    v_ref = calcTimetableVelocity(target_station_dist);
+    v_ref = calcTimetableVelocity(t, dt, target_station_dist);
 
     // Выбираем минимум между текущим ограничением и конструкционной скоростью
     v_ref = min(calcCurrentSpeedLimit(t, dt), v_ref);
@@ -114,6 +118,13 @@ void Autopilot::velocity_control(double t, double dt)
 
     // Расчитываем скорость по тормозной кривой до ближайшего сигнала
     v_ref = min(v_ref, calcAlsnSpeed(feedback->alsn_code, feedback->signal_dist, v_target));
+
+    // Если разрешено отправление по графику
+    if (is_departure_allowed)
+    {
+        // Действуем в соответсвии с АЛСН
+        is_motion_allowed = is_alsn_motion_allowed;
+    }
 
     // Минимальная целевая скорость (для предсказания тормозного пути)
     v_target = min(feedback->v_lim_next, v_target);
@@ -214,7 +225,7 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_ta
         // Если запрещен отпуск и мы остановились - запрещаем движение
         if ( (feedback->v_cur <= 1.0 || signal_dist <= lead_dist_RY) && is_disable_release)
         {
-            is_motion_allowed = false;
+            is_alsn_motion_allowed = false;
         }
 
         break;
@@ -224,7 +235,7 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_ta
         v_target = v_lim_RY;
 
         v_lim = calcBrakeCurveSpeed(v_target, signal_dist - lead_dist_Y);
-        is_motion_allowed = true;
+        is_alsn_motion_allowed = true;
 
         break;
 
@@ -234,13 +245,13 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_ta
         // не даст сорвать ЭПК
         v_lim = 40.0; // ????
 
-        is_motion_allowed = true;
+        is_alsn_motion_allowed = true;
 
         break;
 
     case GREEN:
 
-        is_motion_allowed = true;
+        is_alsn_motion_allowed = true;
 
         break;
     }
@@ -401,9 +412,39 @@ void Autopilot::calcTargetDistance()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Autopilot::calcTimetableBrakeCurve(double dist)
+double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
 {
     double v_ref = v_constr;
+
+    // Текущая станция
+    autopilot_station_t st = timetable.stations[target_station_idx];
+
+    // По текущей станции нет стоянки
+    if (st.arr_time == st.dep_time)
+    {
+        is_departure_allowed = true;
+        // тогда порешают другие источники торможения
+        return v_ref;
+    }
+
+    if (is_departure_allowed)
+    {
+        return v_ref;
+    }
+
+    v_ref = cut(calcBrakeCurveSpeed(0.0, dist), 0.0, v_constr);
+
+    // Запрещаем отпускать тормоза - остановка
+    if (feedback->v_cur <= v_disable_release)
+    {
+        is_disable_release = true;
+    }
+
+    // Если запрещен отпуск и мы остановились - запрещаем движение
+    if (feedback->v_cur <= 1.0 && is_disable_release)
+    {
+        is_alsn_motion_allowed = false;
+    }
 
     return v_ref;
 }
@@ -411,11 +452,83 @@ double Autopilot::calcTimetableBrakeCurve(double dist)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Autopilot::calcTimetableVelocity(double dist)
+double Autopilot::calcTimetableVelocity(double t, double dt, double dist)
 {
     double v_ref = v_constr;
 
-    return min(v_ref, calcTimetableBrakeCurve(dist));
+    // Нет графика - нехер тут рассчитывать, конструкционная скорость,
+    // далее порешают другие ограничения, скорость все равно будет выбрана
+    // минимальная из возможных
+    if (timetable.stations.empty())
+    {
+        return v_ref;
+    }
+
+    if (is_departure_allowed)
+    {
+        return v_ref;
+    }
+
+    return min(v_ref, calcTimetableBrakeCurve(t, dt, dist));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::checkTimetable(double t, double dt)
+{
+    if (timetable.stations.empty())
+    {
+        return;
+    }
+
+    auto st = &timetable.stations[target_station_idx];
+
+    if (st->arr_time == st->dep_time)
+    {
+        is_departure_allowed = true;
+        return;
+    }
+
+    fixArrival(t, st);
+
+    if ( (st->arr_time != "-") && (st->is_arrival) )
+    {
+        if (st->fact_arr_time_sec > st->arr_time_sec)
+        {
+            if (!halt_timer->isStarted())
+            {
+                halt_timer->setTimeout(st->dep_time_sec - st->arr_time_sec);
+                halt_timer->start();
+
+                return;
+            }
+        }
+    }
+
+    if (t >= st->dep_time_sec)
+    {
+        is_departure_allowed = true;
+    }
+    else
+    {
+        if (st->target_traj == curr_traj_name)
+        {
+            is_departure_allowed = false;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::fixArrival(double t, autopilot_station_t *st)
+{
+    if ( (target_station_dist < 10.0) && (!st->is_arrival) )
+    {
+        st->is_arrival = true;
+        st->fact_arr_time_sec = t;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -462,12 +575,28 @@ void Autopilot::slotSandTimer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Autopilot::slotHaltTimeout()
+{
+    // Разрешаем отправление после выдержки времени стоянки
+    is_departure_allowed = true;
+
+    timetable.stations[target_station_idx].is_departure = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Autopilot::slotIncTargetStation()
 {
+    if (!timetable.stations[target_station_idx].is_departure)
+    {
+        timetable.stations[target_station_idx].is_departure = true;
+    }
+
     target_station_idx++;
 
     if (target_station_idx > timetable.stations.size() - 1)
     {
         target_station_idx = timetable.stations.size() - 1;
-    }
+    }    
 }

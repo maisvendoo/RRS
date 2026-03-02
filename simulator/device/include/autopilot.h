@@ -23,7 +23,8 @@ public:
     Autopilot(QObject *parent = nullptr) : Device(parent)
     {
         connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);
-        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);        
+        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);
+        connect(halt_timer, &Timer::process, this, &Autopilot::slotHaltTimeout);
     }
 
     ~Autopilot()
@@ -156,7 +157,10 @@ protected:
     /// Запрет отпуска
     bool is_disable_release = false;
 
-    /// Разрешено движение
+    /// Разрешено движение от АЛСН
+    bool is_alsn_motion_allowed = false;
+
+    /// Разрешено движение в целом
     bool is_motion_allowed = false;
 
     /// Дистанция упреждения до КЖ
@@ -227,7 +231,13 @@ protected:
     double prev_traj_coord = 0;
 
     /// Индекс ПЕ, на которой работает данный модуль
-    int vehicle_idx = 0;    
+    int vehicle_idx = 0;
+
+    /// Флаг разрешения отправления по графику
+    bool is_departure_allowed = true;
+
+    /// Таймер стоянки, при прибытии с опозданием
+    Timer *halt_timer = new Timer(0.1, false);
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
@@ -282,10 +292,16 @@ protected:
     void calcTargetDistance();
 
     /// Расчет ограничения скорости при торможении на станции
-    double calcTimetableBrakeCurve(double dist);
+    double calcTimetableBrakeCurve(double t, double dt, double dist);
 
     /// Расчет скорости движения по графику
-    double calcTimetableVelocity(double dist);
+    double calcTimetableVelocity(double t, double dt, double dist);
+
+    /// Обработка графика, в части разрешения отправления
+    void checkTimetable(double t, double dt);
+
+    /// Фиксация прибытия
+    void fixArrival(double t, autopilot_station_t *st);
 
 public slots:
 
@@ -301,6 +317,7 @@ private slots:
 
     void slotSandTimer();
 
+    void slotHaltTimeout();
 };
 
 //------------------------------------------------------------------------------
