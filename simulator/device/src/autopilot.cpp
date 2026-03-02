@@ -483,11 +483,14 @@ double Autopilot::calcTimetableVelocity(double t, double dt, double dist)
         return v_constr;
     }
 
+    // Разрешено отправление, движемся с скоростью заданной по графику
+    // (ограничиваем конструкционной, остальное учтено дальше)
     if (is_departure_allowed)
     {
         return min(v_tt_ref, v_constr);
     }
 
+    // Отправление запрещено - значит идем по программной кривой торможения
     return min(v_tt_ref, calcTimetableBrakeCurve(t, dt, dist));
 }
 
@@ -501,14 +504,18 @@ void Autopilot::checkTimetable(double t, double dt)
         return;
     }
 
+    // Текущая станция
     auto st = &timetable.stations[target_station_idx];
 
+    // Время прибытия равно времени отправления
     if (st->arr_time == st->dep_time)
     {
+        // Разрешаем отправление
         is_departure_allowed = true;
         return;
     }
 
+    // Отмечаем, что прибыли на станцию
     fixArrival(t, st);
 
     if ( (st->arr_time != "-") && (st->is_arrival) )

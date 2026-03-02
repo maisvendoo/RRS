@@ -105,14 +105,12 @@ void VL60pk::OnAutopilot()
     // Делаем автозапуск
     if (controller[CAB1]->isReversHandle())
     {
-        initAutostartProgram(CAB1);
-        autopilot_switcher[CAB1].set();
+        initAutostartProgram(CAB1);        
     }
 
     if (controller[CAB2]->isReversHandle())
     {
-        initAutostartProgram(CAB2);
-        autopilot_switcher[CAB2].set();
+        initAutostartProgram(CAB2);        
     }
 
     autoStartTimer->start();
