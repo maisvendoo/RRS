@@ -443,7 +443,7 @@ double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
     // Если запрещен отпуск и мы остановились - запрещаем движение
     if (feedback->v_cur <= 1.0 && is_disable_release)
     {
-        is_alsn_motion_allowed = false;
+        is_motion_allowed = false;
     }
 
     return v_ref;
