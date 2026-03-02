@@ -64,8 +64,7 @@ bool RouteEditor::initialize()
     configure_shaders();
 
     context.window_handler = WindowHandler::create(context);
-    const auto window = context.window_handler->get_window();
-    if (!window)
+    if (!context.window)
     {
         return false;
     }
@@ -82,7 +81,7 @@ bool RouteEditor::initialize()
     VkClearValue clear_value{};
     clear_value.depthStencil = {0.0f, 0};
     VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clear_value};
-    const VkExtent2D& extent = window->extent2D();
+    const VkExtent2D& extent = context.window->extent2D();
     VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, extent}, 0, 1};
 
     context.clear_attachments = vsg::ClearAttachments::create(
@@ -97,9 +96,9 @@ bool RouteEditor::initialize()
 
     const auto editor_gui = EditorGui::create(context);
 
-    const auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
+    const auto render_gui = vsgImGui::RenderImGui::create(context.window, editor_gui);
 
-    context.render_graph = vsg::RenderGraph::create(window);
+    context.render_graph = vsg::RenderGraph::create(context.window);
     context.render_graph->addChild(scene_view);
     context.render_graph->addChild(context.clear_attachments);
     context.render_graph->addChild(gui_view1);
@@ -108,7 +107,7 @@ bool RouteEditor::initialize()
     context.render_graph->addChild(context.clear_attachments);
     context.render_graph->addChild(render_gui);
 
-    const auto command_graph = vsg::CommandGraph::create(window,
+    const auto command_graph = vsg::CommandGraph::create(context.window,
         context.render_graph);
 
     context.viewer = vsg::Viewer::create();
@@ -119,7 +118,7 @@ bool RouteEditor::initialize()
 
     context.object_selector = ObjectSelector::create(context);
 
-    context.viewer->addWindow(window);
+    context.viewer->addWindow(context.window);
 
     context.viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     context.viewer->addEventHandler(vsg::CloseHandler::create(context.viewer));

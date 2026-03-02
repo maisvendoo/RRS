@@ -13,7 +13,7 @@
 
 static VkSampleCountFlags samples_bit_flag(int samples);
 
-WindowHandler::WindowHandler(const EditorContext& context)
+WindowHandler::WindowHandler(EditorContext& context)
 {
     const settings_t& settings = context.settings;
 
@@ -32,17 +32,12 @@ WindowHandler::WindowHandler(const EditorContext& context)
 
     window_traits->samples = samples_bit_flag(settings.samples);
 
-    window = vsg::Window::create(window_traits);
-    if (!window)
+    context.window = vsg::Window::create(window_traits);
+    if (!context.window)
     {
         // TODO: Replace on Journal
         std::fputs("Failed to create window", stderr);
     }
-}
-
-vsg::ref_ptr<vsg::Window> WindowHandler::get_window() const
-{
-    return window;
 }
 
 VkSampleCountFlags samples_bit_flag(int samples)

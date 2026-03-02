@@ -63,7 +63,7 @@ static vsg::ref_ptr<vsg::Commands> create_quad(
 CameraHandler::CameraHandler(EditorContext& context)
     : context(context)
 {
-    const VkExtent2D& window_extent = context.window_handler->get_window()->extent2D();
+    const VkExtent2D& window_extent = context.window->extent2D();
 
     const auto fovy = static_cast<perspective_value_type>(context.settings.fovy);
 
@@ -185,11 +185,6 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     }
 
     context.look_at->center = context.look_at->eye + front;
-}
-
-double& CameraHandler::get_fov_deg() const
-{
-    return context.perspective->fieldOfViewY;
 }
 
 CameraHandler::vec3_type CameraHandler::get_front() const

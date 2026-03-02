@@ -17,12 +17,7 @@ class Window;
 class WindowHandler : public vsg::Inherit<vsg::Visitor, WindowHandler>
 {
 public:
-    explicit WindowHandler(const EditorContext& context);
-
-    vsg::ref_ptr<vsg::Window> get_window() const;
-
-private:
-    vsg::ref_ptr<vsg::Window> window;
+    explicit WindowHandler(EditorContext& context);
 };
 
 #endif // WINDOW_HANDLER_H

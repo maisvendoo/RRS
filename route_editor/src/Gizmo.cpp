@@ -339,7 +339,7 @@ void Gizmo::update_visibility()
     const auto camera_pos = static_cast<vsg::vec3>(context.look_at->eye);
 
     const auto fov_rad = vsg::radians(static_cast<float>(
-        context.camera_handler->get_fov_deg()));
+        context.perspective->fieldOfViewY));
 
     const float distance_to_camera = vsg::length(curr_pos - camera_pos);
     const float tan_half_fov = std::tan(fov_rad * 0.5f);

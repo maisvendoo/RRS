@@ -28,6 +28,7 @@ class Options;
 class Perspective;
 class RenderGraph;
 class Viewer;
+class Window;
 
 }
 
@@ -37,6 +38,7 @@ struct EditorContext
     settings_t settings;
     CommandList commands;
     vsg::ref_ptr<vsg::Options> options;
+    vsg::ref_ptr<vsg::Window> window;
     vsg::ref_ptr<WindowHandler> window_handler;
     vsg::ref_ptr<MouseHandler> mouse_handler;
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;

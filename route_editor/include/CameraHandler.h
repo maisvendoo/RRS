@@ -32,8 +32,6 @@ public:
 
     void apply(vsg::FrameEvent& frame) override;
 
-    double& get_fov_deg() const;
-
     vec3_type get_front() const;
     vec3_type get_right() const;
     vec3_type get_up() const;
