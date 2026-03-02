@@ -9,7 +9,7 @@
 class ShowObjectsCommand : public Command
 {
 public:
-    ShowObjectsCommand(const RouteObjects& objects);
+    ShowObjectsCommand(EditorContext& context, const RouteObjects& objects);
     virtual ~ShowObjectsCommand() override = default;
     virtual void execute() const override;
     virtual void undo() const override;

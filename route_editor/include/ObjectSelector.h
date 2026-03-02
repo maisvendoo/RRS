@@ -34,6 +34,8 @@ public:
     void apply(vsg::MoveEvent& moveEvent) override;
     void apply(vsg::FrameEvent& frame) override;
 
+    vsg::ref_ptr<Gizmo> get_gizmo() const;
+
 private:
     void select_object(RouteObject* object);
 

@@ -123,7 +123,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
             !context.keyboard_handler->get_any_shift_state())
         {
             context.commands.push(
-                new SelectObjectsCommand({}, selected_objects), true);
+                new SelectObjectsCommand(context, {}, selected_objects), true);
         }
 
         return;
@@ -394,17 +394,22 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     }
 }
 
+vsg::ref_ptr<Gizmo> ObjectSelector::get_gizmo() const
+{
+    return gizmo;
+}
+
 void ObjectSelector::select_object(RouteObject* object)
 {
     if (context.keyboard_handler->get_any_shift_state())
     {
         if (object->get_is_selected())
         {
-            context.commands.push(new SelectObjectsCommand({}, {object}), true);
+            context.commands.push(new SelectObjectsCommand(context, {}, {object}), true);
         }
         else
         {
-            context.commands.push(new SelectObjectsCommand({object}, {}), true);
+            context.commands.push(new SelectObjectsCommand(context, {object}, {}), true);
         }
     }
     else
@@ -413,7 +418,7 @@ void ObjectSelector::select_object(RouteObject* object)
 
         if (selected_objects.empty())
         {
-            context.commands.push(new SelectObjectsCommand({object}, {}), true);
+            context.commands.push(new SelectObjectsCommand(context, {object}, {}), true);
         }
         else if (object->get_is_selected())
         {
@@ -434,12 +439,12 @@ void ObjectSelector::select_object(RouteObject* object)
                 }
             }
 
-            context.commands.push(new SelectObjectsCommand(
+            context.commands.push(new SelectObjectsCommand(context,
                 {}, std::move(objects_to_deselect)), true);
         }
         else
         {
-            context.commands.push(new SelectObjectsCommand(
+            context.commands.push(new SelectObjectsCommand(context,
                 {object}, selected_objects), true);
         }
     }
@@ -450,7 +455,7 @@ void ObjectSelector::confirm_keyboard_move()
     state = State::INITIAL;
     front_plane_switch->node = nullptr;
 
-    context.commands.push(new MoveObjectsCommand(context.selected_objects,
+    context.commands.push(new MoveObjectsCommand(context, context.selected_objects,
         total_translation), false);
 }
 

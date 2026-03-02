@@ -48,8 +48,6 @@ public:
     bool get_is_selected() const;
     bool get_is_hidden() const;
 
-    static void set_gizmo(Gizmo* gizmo);
-
     void set_translation(vsg::vec3 translation);
     void set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix);
     void set_scale(vsg::vec3 scale, bool update_matrix);
@@ -83,7 +81,6 @@ public:
 
 private:
     EditorContext& context;
-    static Gizmo* s_gizmo;
 
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;

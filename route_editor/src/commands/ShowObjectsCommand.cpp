@@ -5,8 +5,9 @@
 #include <cstdio>
 #include <string>
 
-ShowObjectsCommand::ShowObjectsCommand(const RouteObjects& objects)
-    : objects(objects)
+ShowObjectsCommand::ShowObjectsCommand(EditorContext& context, const RouteObjects& objects)
+    : Command(context)
+    , objects(objects)
 {
 }
 

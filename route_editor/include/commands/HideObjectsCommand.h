@@ -9,7 +9,7 @@
 class HideObjectsCommand : public Command
 {
 public:
-    HideObjectsCommand(const RouteObjects& objects);
+    HideObjectsCommand(EditorContext& context, const RouteObjects& objects);
     virtual ~HideObjectsCommand() override = default;
     virtual void execute() const override;
     virtual void undo() const override;

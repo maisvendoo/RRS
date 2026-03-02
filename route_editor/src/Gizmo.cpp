@@ -162,9 +162,6 @@ Gizmo::Gizmo(EditorContext& context)
     this->node = matrix_transform;
 
     update_visibility();
-
-    RouteObject::set_gizmo(this);
-    SelectObjectsCommand::set_gizmo(this);
 }
 
 bool Gizmo::handle_intersections()
@@ -259,7 +256,7 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
         return;
     }
 
-    context.commands.push(new MoveObjectsCommand(context.selected_objects, total_translation),
+    context.commands.push(new MoveObjectsCommand(context, context.selected_objects, total_translation),
         false);
 
     active_arrow = nullptr;

@@ -5,8 +5,9 @@
 #include <cstdio>
 #include <string>
 
-HideObjectsCommand::HideObjectsCommand(const RouteObjects& objects)
-    : objects(objects)
+HideObjectsCommand::HideObjectsCommand(EditorContext& context, const RouteObjects& objects)
+    : Command(context)
+    , objects(objects)
 {
 }
 
