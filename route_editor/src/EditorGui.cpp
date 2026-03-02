@@ -371,11 +371,11 @@ void EditorGui::show_camera_settings() const
     }
 
     ImGui::Text("FovY:");
-    float fovy = static_cast<float>(context.camera_handler->get_perspective()->fieldOfViewY);
+    float fovy = static_cast<float>(context.perspective->fieldOfViewY);
     if (ImGui::SliderFloat("##fovy", &fovy, context.settings.fovy_min,
         context.settings.fovy_max))
     {
-        context.camera_handler->get_perspective()->fieldOfViewY = fovy;
+        context.perspective->fieldOfViewY = fovy;
     }
 
     ImGui::End();

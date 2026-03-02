@@ -28,11 +28,10 @@ public:
     using vec3_type = vsg::t_vec3<value_type>;
 
 public:
-    CameraHandler(const EditorContext& context);
+    CameraHandler(EditorContext& context);
 
     void apply(vsg::FrameEvent& frame) override;
 
-    vsg::ref_ptr<vsg::Perspective> get_perspective() const;
     vsg::ref_ptr<vsg::LookAt> get_look_at() const;
     vsg::ref_ptr<vsg::Camera> get_camera() const;
 
@@ -52,9 +51,8 @@ private:
     void calculate_up();
 
 private:
-    const EditorContext& context;
+    EditorContext& context;
 
-    vsg::ref_ptr<vsg::Perspective> perspective;
     vsg::ref_ptr<vsg::LookAt> look_at;
     vsg::ref_ptr<vsg::Camera> camera;
 

@@ -60,7 +60,7 @@ static vsg::ref_ptr<vsg::Commands> create_quad(
     return commands;
 }
 
-CameraHandler::CameraHandler(const EditorContext& context)
+CameraHandler::CameraHandler(EditorContext& context)
     : context(context)
 {
     const VkExtent2D& window_extent = context.window_handler->get_window()->extent2D();
@@ -81,7 +81,7 @@ CameraHandler::CameraHandler(const EditorContext& context)
     const auto far_distance = static_cast<perspective_value_type>(
         context.settings.view_distance);
 
-    perspective = vsg::Perspective::create(fovy, aspect_ratio,
+    context.perspective = vsg::Perspective::create(fovy, aspect_ratio,
         near_distance, far_distance);
 
     const auto initial_height = static_cast<look_at_value_type>(
@@ -90,7 +90,7 @@ CameraHandler::CameraHandler(const EditorContext& context)
     look_at = vsg::LookAt::create();
     look_at->eye.z = look_at->center.z = initial_height;
 
-    camera = vsg::Camera::create(perspective, look_at,
+    camera = vsg::Camera::create(context.perspective, look_at,
         vsg::ViewportState::create(window_extent));
 
     calculate_front();
@@ -137,7 +137,7 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
         const auto zoom_power = static_cast<perspective_value_type>(
             context.settings.camera_zoom_power);
 
-        perspective->fieldOfViewY -= scroll * zoom_power *
+        context.perspective->fieldOfViewY -= scroll * zoom_power *
             static_cast<perspective_value_type>(delta_time);
 
         const auto fovy_min = static_cast<perspective_value_type>(
@@ -146,7 +146,7 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
         const auto fovy_max = static_cast<perspective_value_type>(
             context.settings.fovy_max);
 
-        perspective->fieldOfViewY = std::clamp(perspective->fieldOfViewY,
+        context.perspective->fieldOfViewY = std::clamp(context.perspective->fieldOfViewY,
             fovy_min, fovy_max);
     }
 
@@ -187,11 +187,6 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     look_at->center = look_at->eye + front;
 }
 
-vsg::ref_ptr<vsg::Perspective> CameraHandler::get_perspective() const
-{
-    return perspective;
-}
-
 vsg::ref_ptr<vsg::LookAt> CameraHandler::get_look_at() const
 {
     return look_at;
@@ -204,7 +199,7 @@ vsg::ref_ptr<vsg::Camera> CameraHandler::get_camera() const
 
 double& CameraHandler::get_fov_deg() const
 {
-    return perspective->fieldOfViewY;
+    return context.perspective->fieldOfViewY;
 }
 
 vsg::dvec3& CameraHandler::get_eye() const
