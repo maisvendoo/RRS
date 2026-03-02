@@ -281,6 +281,12 @@ protected:
     /// Счисление пути - определяем текущую дистанцию до цели на станции
     void calcTargetDistance();
 
+    /// Расчет ограничения скорости при торможении на станции
+    double calcTimetableBrakeCurve(double dist);
+
+    /// Расчет скорости движения по графику
+    double calcTimetableVelocity(double dist);
+
 public slots:
 
     void slotSetBrakeAccel(double a_brake);

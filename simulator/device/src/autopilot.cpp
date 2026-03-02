@@ -97,13 +97,16 @@ void Autopilot::vigilance_control(double t, double dt)
 void Autopilot::velocity_control(double t, double dt)
 {
     if (feedback == nullptr)
-        return;    
+        return;
 
-    // Временно, для теста, помещаем сюда счисление пути
+    // Счисление пути
     calcTargetDistance();
 
+    // Скорость, заданная по графику
+    v_ref = calcTimetableVelocity(target_station_dist);
+
     // Выбираем минимум между текущим ограничением и конструкционной скоростью
-    v_ref = min(calcCurrentSpeedLimit(t, dt), v_constr);
+    v_ref = min(calcCurrentSpeedLimit(t, dt), v_ref);
 
     // Рассчитываем скорость по тормозной кривой до следующего ограничения
     // (если оно больше, ну и пусть :))) )
@@ -393,6 +396,26 @@ void Autopilot::calcTargetDistance()
     // Если мы на прежней траектории - совершенно незачем дергать топологию,
     // вычисляем новую дистанцию по смещению вдоль траектории
     target_station_dist -= qAbs(curr_traj_coord - prev_traj_coord);*/
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Autopilot::calcTimetableBrakeCurve(double dist)
+{
+    double v_ref = v_constr;
+
+    return v_ref;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Autopilot::calcTimetableVelocity(double dist)
+{
+    double v_ref = v_constr;
+
+    return min(v_ref, calcTimetableBrakeCurve(dist));
 }
 
 //------------------------------------------------------------------------------
