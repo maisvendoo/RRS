@@ -87,10 +87,10 @@ CameraHandler::CameraHandler(EditorContext& context)
     const auto initial_height = static_cast<look_at_value_type>(
         context.settings.camera_initial_height);
 
-    look_at = vsg::LookAt::create();
-    look_at->eye.z = look_at->center.z = initial_height;
+    context.look_at = vsg::LookAt::create();
+    context.look_at->eye.z = context.look_at->center.z = initial_height;
 
-    camera = vsg::Camera::create(context.perspective, look_at,
+    camera = vsg::Camera::create(context.perspective, context.look_at,
         vsg::ViewportState::create(window_extent));
 
     calculate_front();
@@ -172,7 +172,7 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
             static_cast<look_at_value_type>(delta_time) *
             static_cast<look_at_value_type>(move_forward - move_backward);
 
-        look_at->eye += front_movememt;
+        context.look_at->eye += front_movememt;
     }
 
     if (move_right - move_left != 0)
@@ -181,15 +181,10 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
             static_cast<look_at_value_type>(delta_time) *
             static_cast<look_at_value_type>(move_right - move_left);
 
-        look_at->eye += right_movement;
+        context.look_at->eye += right_movement;
     }
 
-    look_at->center = look_at->eye + front;
-}
-
-vsg::ref_ptr<vsg::LookAt> CameraHandler::get_look_at() const
-{
-    return look_at;
+    context.look_at->center = context.look_at->eye + front;
 }
 
 vsg::ref_ptr<vsg::Camera> CameraHandler::get_camera() const
@@ -200,11 +195,6 @@ vsg::ref_ptr<vsg::Camera> CameraHandler::get_camera() const
 double& CameraHandler::get_fov_deg() const
 {
     return context.perspective->fieldOfViewY;
-}
-
-vsg::dvec3& CameraHandler::get_eye() const
-{
-    return look_at->eye;
 }
 
 CameraHandler::vec3_type CameraHandler::get_front() const
@@ -225,7 +215,7 @@ CameraHandler::vec3_type CameraHandler::get_up() const
 vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(vec3_type point,
     vec3_type* up_out) const
 {
-    const auto camera_pos = static_cast<vec3_type>(look_at->eye);
+    const auto camera_pos = static_cast<vec3_type>(context.look_at->eye);
     const auto angle_rad = vsg::radians(static_cast<value_type>(80));
 
     const auto get_dir = [&](int yaw_dir, int pitch_dir) -> vec3_type
@@ -279,7 +269,7 @@ void CameraHandler::calculate_front()
 
 void CameraHandler::calculate_right()
 {
-    const auto world_up = static_cast<vec3_type>(look_at->up);
+    const auto world_up = static_cast<vec3_type>(context.look_at->up);
     right = vsg::normalize(vsg::cross(front, world_up));
 }
 

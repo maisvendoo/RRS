@@ -32,11 +32,9 @@ public:
 
     void apply(vsg::FrameEvent& frame) override;
 
-    vsg::ref_ptr<vsg::LookAt> get_look_at() const;
     vsg::ref_ptr<vsg::Camera> get_camera() const;
 
     double& get_fov_deg() const;
-    vsg::dvec3& get_eye() const;
 
     vec3_type get_front() const;
     vec3_type get_right() const;
@@ -53,7 +51,6 @@ private:
 private:
     EditorContext& context;
 
-    vsg::ref_ptr<vsg::LookAt> look_at;
     vsg::ref_ptr<vsg::Camera> camera;
 
     value_type yaw_deg = 0.0;

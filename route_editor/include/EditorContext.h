@@ -22,6 +22,7 @@ namespace vsg
 {
 
 class ClearAttachments;
+class LookAt;
 class Options;
 class Perspective;
 class RenderGraph;
@@ -39,6 +40,7 @@ struct EditorContext
     vsg::ref_ptr<MouseHandler> mouse_handler;
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;
     vsg::ref_ptr<vsg::Perspective> perspective;
+    vsg::ref_ptr<vsg::LookAt> look_at;
     vsg::ref_ptr<CameraHandler> camera_handler;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
     vsg::ref_ptr<SceneGraph> scene_graph;

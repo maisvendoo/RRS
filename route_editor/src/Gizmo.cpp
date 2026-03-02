@@ -336,7 +336,7 @@ void Gizmo::update_visibility()
         ? vsg::MASK_OFF
         : MASK_GUI1 | MASK_CLICKABLE;
 
-    const auto camera_pos = static_cast<vsg::vec3>(context.camera_handler->get_eye());
+    const auto camera_pos = static_cast<vsg::vec3>(context.look_at->eye);
 
     const auto fov_rad = vsg::radians(static_cast<float>(
         context.camera_handler->get_fov_deg()));
