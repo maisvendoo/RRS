@@ -56,8 +56,7 @@ QString Autopilot::getDbgMsg()
         .arg(v_ref, 4, 'f', 1)
         .arg(accel_meter->value(), 6, 'f', 2)
         .arg(-a_brake, 6, 'f', 2)
-        .arg(v_p, 4, 'f', 1)
-                      .arg(target_station_dist, 10, 'f', 1);
+        .arg(v_p, 4, 'f', 1);
 
     if (is_timetable_ready)
     {
@@ -463,6 +462,16 @@ double Autopilot::calcTimetableVelocity(double t, double dt, double dist)
     {
         return v_ref;
     }
+
+    // Рассчитываем среднюю скорость для выполнения графика
+    double delta_t = timetable.stations[target_station_idx].arr_time_sec - t;
+
+    if (delta_t < 1.0)
+    {
+        return v_ref;
+    }
+
+    v_ref = target_station_dist * Physics::kmh / delta_t;
 
     if (is_departure_allowed)
     {
