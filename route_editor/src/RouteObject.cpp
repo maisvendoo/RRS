@@ -248,7 +248,7 @@ void RouteObject::select()
 
     context.selected_objects.emplace_back(this);
 
-    context.object_selector->get_gizmo()->update_position();
+    context.gizmo->update_position();
 }
 
 RouteObjectsIterator RouteObject::deselect()
@@ -260,7 +260,7 @@ RouteObjectsIterator RouteObject::deselect()
     const auto it = context.selected_objects.erase(std::find(
         context.selected_objects.cbegin(), context.selected_objects.cend(), this));
 
-    context.object_selector->get_gizmo()->update_position();
+    context.gizmo->update_position();
 
     return it;
 }
@@ -300,5 +300,5 @@ void RouteObject::update_bounds()
     this->accept(compute_bounds);
     bounds = static_cast<vsg::box>(compute_bounds.bounds);
 
-    context.object_selector->get_gizmo()->update_position();
+    context.gizmo->update_position();
 }

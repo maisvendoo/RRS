@@ -29,12 +29,12 @@
 ObjectSelector::ObjectSelector(EditorContext& context)
     : context(context)
 {
-    gizmo = Gizmo::create(context);
+    context.gizmo = Gizmo::create(context);
 
     front_plane_switch = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
 
-    context.scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo);
+    context.scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, context.gizmo);
     context.scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, front_plane_switch);
 }
 
@@ -100,7 +100,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
-    if (!selected_objects.empty() && gizmo->handle_intersections())
+    if (!selected_objects.empty() && context.gizmo->handle_intersections())
     {
         return;
     }
@@ -153,12 +153,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
-    gizmo->apply(buttonRelease);
+    context.gizmo->apply(buttonRelease);
 }
 
 void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
-    gizmo->apply(moveEvent);
+    context.gizmo->apply(moveEvent);
 
     const auto front_plane = front_plane_switch->node;
     if (!front_plane)
@@ -392,11 +392,6 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
         vsg::updateViewer(*viewer, compile_result);
     }
-}
-
-vsg::ref_ptr<Gizmo> ObjectSelector::get_gizmo() const
-{
-    return gizmo;
 }
 
 void ObjectSelector::select_object(RouteObject* object)

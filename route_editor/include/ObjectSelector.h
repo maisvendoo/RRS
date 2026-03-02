@@ -34,8 +34,6 @@ public:
     void apply(vsg::MoveEvent& moveEvent) override;
     void apply(vsg::FrameEvent& frame) override;
 
-    vsg::ref_ptr<Gizmo> get_gizmo() const;
-
 private:
     void select_object(RouteObject* object);
 
@@ -60,8 +58,6 @@ private:
     State state = State::INITIAL;
 
     EditorContext& context;
-
-    vsg::ref_ptr<Gizmo> gizmo;
 
     vsg::vec3 begin_intersect_pos;
     vsg::vec3 prev_intersect_pos;

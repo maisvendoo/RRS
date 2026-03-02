@@ -65,7 +65,7 @@ void SelectObjectsCommand::execute() const
         object->deselect();
     }
 
-    context.object_selector->get_gizmo()->update_visibility();
+    context.gizmo->update_visibility();
 }
 
 void SelectObjectsCommand::undo() const
@@ -80,7 +80,7 @@ void SelectObjectsCommand::undo() const
         object->select();
     }
 
-    context.object_selector->get_gizmo()->update_visibility();
+    context.gizmo->update_visibility();
 }
 
 std::string SelectObjectsCommand::to_string() const

@@ -13,11 +13,8 @@ struct EditorContext;
 namespace vsg
 {
 
-class Camera;
 class FrameEvent;
-class LookAt;
 class Node;
-class Perspective;
 
 }
 
