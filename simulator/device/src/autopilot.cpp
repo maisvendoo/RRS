@@ -38,8 +38,7 @@ void Autopilot::step(double t, double dt)
     accel_meter->step(t, dt);
 
     rb_timer->step(t, dt);
-    sand_timer->step(t, dt);
-    halt_timer->step(t, dt);
+    sand_timer->step(t, dt);    
 
     Device::step(t, dt);
 }
@@ -587,17 +586,6 @@ void Autopilot::slotSandTimer()
     sand_timer->stop();
 
     sand_OFF();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Autopilot::slotHaltTimeout()
-{
-    // Разрешаем отправление после выдержки времени стоянки
-    is_departure_allowed = true;
-
-    timetable.stations[target_station_idx].is_departure = true;
 }
 
 //------------------------------------------------------------------------------

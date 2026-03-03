@@ -23,8 +23,7 @@ public:
     Autopilot(QObject *parent = nullptr) : Device(parent)
     {
         connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);
-        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);
-        connect(halt_timer, &Timer::process, this, &Autopilot::slotHaltTimeout);
+        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);        
     }
 
     ~Autopilot()
@@ -235,10 +234,7 @@ protected:
     int vehicle_idx = 0;
 
     /// Флаг разрешения отправления по графику
-    bool is_departure_allowed = true;
-
-    /// Таймер стоянки, при прибытии с опозданием
-    Timer *halt_timer = new Timer(0.1, false);
+    bool is_departure_allowed = true;    
 
     /// Заданная скорость по графику
     double v_tt_ref = 0.0;
@@ -326,9 +322,7 @@ private slots:
 
     void slotVigilanceControl();
 
-    void slotSandTimer();
-
-    void slotHaltTimeout();
+    void slotSandTimer();    
 };
 
 //------------------------------------------------------------------------------
