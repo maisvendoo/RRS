@@ -10,7 +10,6 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
-class Gizmo;
 class RouteObject;
 class SingleSwitch;
 

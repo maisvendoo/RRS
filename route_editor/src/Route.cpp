@@ -56,7 +56,7 @@ Route::Route(EditorContext& context)
     const FileSystem& fs = FileSystem::getInstance();
 
     PagedLodMap paged_lods;
-    for (const auto& [label, relative_path] : objects_ref)
+    for (const auto& [label, relative_path] : context.objects_ref)
     {
         const auto paged_lod = vsg::PagedLOD::create();
         paged_lod->filename = fs.combinePath(context.route_dir, relative_path);
@@ -72,21 +72,6 @@ Route::Route(EditorContext& context)
 
     load_static_objects(paged_lods);
     load_topology();
-}
-
-const StringMap& Route::get_objects_ref() const
-{
-    return objects_ref;
-}
-
-const RouteMap& Route::get_route_map() const
-{
-    return route_map;
-}
-
-const std::unique_ptr<Topology>& Route::get_topology() const
-{
-    return topology;
 }
 
 bool Route::load_objects_ref()
@@ -111,7 +96,7 @@ bool Route::load_objects_ref()
 
         if (iss >> label >> relative_path)
         {
-            objects_ref.emplace(std::move(label), std::move(relative_path));
+            context.objects_ref.emplace(std::move(label), std::move(relative_path));
         }
     }
 
@@ -156,7 +141,7 @@ bool Route::load_route_map()
 
         if (iss >> label >> translation >> rotation)
         {
-            route_map.emplace(std::move(label), std::make_pair(
+            context.route_map.emplace(std::move(label), std::make_pair(
                 translation, rotation));
         }
     }
@@ -166,7 +151,7 @@ bool Route::load_route_map()
 
 void Route::load_static_objects(const PagedLodMap& paged_lods)
 {
-    for (const auto& [label, transform] : route_map)
+    for (const auto& [label, transform] : context.route_map)
     {
         const auto paged_lod_it = paged_lods.find(label);
         if (paged_lod_it == paged_lods.cend())
@@ -218,11 +203,11 @@ bool Route::load_topology()
     // TODO: Replace on Journal
     std::printf("Signals directory: %s\n", models_dir.c_str());
 
-    topology = std::make_unique<Topology>();
+    context.topology = new Topology;
 
     const auto directory_stem = std::filesystem::path(context.route_dir).stem();
 
-    if (!topology->load(directory_stem.string().c_str()))
+    if (!context.topology->load(directory_stem.string().c_str()))
     {
         // TODO: Replace on Journal
         std::fputs("Failed to load topology\n", stderr);
@@ -232,7 +217,7 @@ bool Route::load_topology()
 
     PagedLodMap paged_lods;
 
-    const signals_data_t* const signals_data = topology->getSignalsData();
+    const signals_data_t* const signals_data = context.topology->getSignalsData();
     if (!signals_data)
     {
         return false;

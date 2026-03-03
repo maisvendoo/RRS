@@ -232,8 +232,7 @@ void EditorGui::show_objects_ref() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        const auto& objects_ref = context.scene_graph->get_route()->get_objects_ref();
-        for (const auto& [label, relative_path] : objects_ref)
+        for (const auto& [label, relative_path] : context.objects_ref)
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
@@ -265,8 +264,7 @@ void EditorGui::show_route_map() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        const auto& route_map = context.scene_graph->get_route()->get_route_map();
-        for (const auto& [label, transform] : route_map)
+        for (const auto& [label, transform] : context.route_map)
         {
             const vsg::vec3 translation = transform.first;
             const vsg::vec3 rotation_deg = transform.second;
@@ -393,20 +391,19 @@ void EditorGui::show_topology() const
         return;
     }
 
-    const auto& topology = route->get_topology();
-    if (!topology)
+    if (!context.topology)
     {
         ImGui::Text("There is no topology yet");
         ImGui::End();
         return;
     }
 
-    const auto route_name = topology->getRouteName().toStdString();
+    const auto route_name = context.topology->getRouteName().toStdString();
     ImGui::Text("Route name: %s", route_name.c_str());
 
     if (ImGui::CollapsingHeader("Trajectories"))
     {
-        const auto* trajectories = topology->getTrajectoriesList();
+        const auto* trajectories = context.topology->getTrajectoriesList();
         for (const Trajectory* trajectory : *trajectories)
         {
             if (ImGui::TreeNode(trajectory->getName().toStdString().c_str()))
@@ -465,7 +462,7 @@ void EditorGui::show_topology() const
             }
         };
 
-        const auto* connectors = topology->getConnectorsList();
+        const auto* connectors = context.topology->getConnectorsList();
         for (auto it = connectors->begin(); it != connectors->end(); ++it)
         {
             const Switch* const switch_ = dynamic_cast<Switch*>(*it);

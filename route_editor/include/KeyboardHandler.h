@@ -3,7 +3,6 @@
 
 #include "Action.h"
 #include "EditorContext.h"
-#include "KeyBinding.h"
 #include "KeyStates.h"
 
 #include <vsg/core/Inherit.h>
@@ -27,8 +26,7 @@ public:
     bool get_binding_state(Action action) const;
 
 private:
-    const KeyBindings& key_bindings;
-    CommandList& commands;
+    EditorContext& context;
     KeyStates key_states;
 };
 

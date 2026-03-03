@@ -5,8 +5,10 @@
 #include "EditorState.h"
 #include "Gizmo.h"
 #include "Outline.h"
+#include "RouteMap.h"
 #include "RouteObject.h"
 #include "Settings.h"
+#include "StringMap.h"
 
 #include <vsg/core/ref_ptr.h>
 
@@ -18,6 +20,7 @@ class KeyboardHandler;
 class MouseHandler;
 class ObjectSelector;
 class SceneGraph;
+class Topology;
 class WindowHandler;
 
 namespace vsg
@@ -36,6 +39,8 @@ class Window;
 
 struct EditorContext
 {
+    ~EditorContext();
+
     EditorState state = EditorState::SELECT_ROUTE;
     settings_t settings;
     CommandList commands;
@@ -59,6 +64,9 @@ struct EditorContext
     RouteObjects hidden_objects;
     std::string route_dir;
     vsg::ref_ptr<OutlineBuilder> outline_builder;
+    StringMap objects_ref;
+    RouteMap route_map;
+    Topology* topology = nullptr;
 };
 
 #endif // EDITOR_CONTEXT_H

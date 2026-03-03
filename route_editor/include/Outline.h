@@ -2,20 +2,16 @@
 #define OUTLINE_H
 
 #include <vsg/core/Inherit.h>
-#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/nodes/Group.h>
 #include <vsg/utils/Builder.h>
 
 struct EditorContext;
-struct settings_t;
 
 namespace vsg
 {
 
 class Node;
 class PagedLOD;
-class Viewer;
 
 }
 
