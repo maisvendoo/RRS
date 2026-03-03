@@ -17,8 +17,6 @@ KeyBinding.h
 KeyboardHandler.h
 KeyStates.h
 LSIntersector.h
-Mask.h
-MouseButton.h
 MouseHandler.h
 ObjectSelector.h
 Outline.h
