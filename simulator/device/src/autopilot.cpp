@@ -515,21 +515,12 @@ void Autopilot::checkTimetable(double t, double dt)
         return;
     }
 
-    // Отмечаем, что прибыли на станцию
-    fixArrival(t, st);
-
-    if ( (st->arr_time != "-") && (st->is_arrival) )
+    // Обработка опоздания
+    if ( (st->arr_time != "-") && (st->is_arrival) && (!st->is_delay) )
     {
-        if (st->fact_arr_time_sec > st->arr_time_sec)
-        {
-            if (!halt_timer->isStarted())
-            {
-                halt_timer->setTimeout(st->dep_time_sec - st->arr_time_sec);
-                halt_timer->start();
-
-                return;
-            }
-        }
+        double delay = pf(st->fact_arr_time_sec - st->arr_time_sec);
+        st->dep_time_sec += delay;
+        st->is_delay = true;
     }
 
     if (t >= st->dep_time_sec)
@@ -637,24 +628,38 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
 //------------------------------------------------------------------------------
 void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
 {
+    // Не нам данные, другому автопилоту
     if (vehicle_idx != this->vehicle_idx)
     {
         return;
     }
 
-    auto st = timetable.stations[target_station_idx];
+    if (target_dist < 0)
+    {
+        return;
+    }
 
-    double delta_t = st.arr_time_sec - time;
+    // Текущая станция
+    auto st = &timetable.stations[target_station_idx];
 
+    // Фиксируем факт прибытия
+    if ( (target_dist < 10.0) && (!st->is_arrival) )
+    {
+        st->is_arrival = true;
+        st->fact_arr_time_sec = time;
+    }
+
+    // Рассчитываем оставшееся время хода до станции
+    double delta_t = st->arr_time_sec - time;
+
+    // Уже опоздали - мчим с конструкционной (если позволят)
     if (delta_t < 0)
     {
         v_tt_ref = v_constr;
     }
     else
     {
-        if (target_station_dist > 0)
-            v_tt_ref = target_dist * Physics::kmh / (delta_t + 0.0001);
-        else
-            v_tt_ref = v_constr;
+        // Рассчитываем среднюю перегонную скорость
+        v_tt_ref = target_dist * Physics::kmh / (delta_t + 0.0001);
     }
 }
