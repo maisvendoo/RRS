@@ -12,7 +12,7 @@ struct autopilot_station_t
     /// Название станции
     QString name = "";
     /// Время прибытия
-    QString arr_time = "";
+    QString arr_time = "-";
     /// Фактическое время прибытия
     QString fact_arr_time = "-";
     /// То же время, но в секундах от старта игры
@@ -22,7 +22,7 @@ struct autopilot_station_t
     /// Признак прибытия
     bool is_arrival = false;
     /// Время отправления
-    QString dep_time = "";
+    QString dep_time = "-";
     /// Фактическое время отправления
     QString fact_dep_time = "-";
     /// То же время, но в секундах от старта игры
