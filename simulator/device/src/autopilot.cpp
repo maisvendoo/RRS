@@ -28,6 +28,8 @@ Autopilot *loadAutopilot(QString lib_path)
 //------------------------------------------------------------------------------
 void Autopilot::step(double t, double dt)
 {
+    time = t;
+
     velocity_control(t, dt);
 
     vigilance_control(t, dt);
@@ -36,8 +38,7 @@ void Autopilot::step(double t, double dt)
     accel_meter->step(t, dt);
 
     rb_timer->step(t, dt);
-    sand_timer->step(t, dt);
-    halt_timer->step(t, dt);
+    sand_timer->step(t, dt);    
 
     Device::step(t, dt);
 }
@@ -56,8 +57,7 @@ QString Autopilot::getDbgMsg()
         .arg(v_ref, 4, 'f', 1)
         .arg(accel_meter->value(), 6, 'f', 2)
         .arg(-a_brake, 6, 'f', 2)
-        .arg(v_p, 4, 'f', 1)
-                      .arg(target_station_dist, 10, 'f', 1);
+        .arg(v_p, 4, 'f', 1);
 
     if (is_timetable_ready)
     {
@@ -109,15 +109,35 @@ void Autopilot::velocity_control(double t, double dt)
     // Скорость, заданная по графику
     v_ref = calcTimetableVelocity(t, dt, target_station_dist);
 
+    if (v_ref < 0.1)
+    {
+        int a = 0;
+    }
+
     // Выбираем минимум между текущим ограничением и конструкционной скоростью
     v_ref = min(calcCurrentSpeedLimit(t, dt), v_ref);
+
+    if (v_ref < 0.1)
+    {
+        int a = 0;
+    }
 
     // Рассчитываем скорость по тормозной кривой до следующего ограничения
     // (если оно больше, ну и пусть :))) )
     v_ref = min(v_ref, calcBrakeCurveSpeed(feedback->v_lim_next, feedback->limit_dist));
 
+    if (v_ref < 0.1)
+    {
+        int a = 0;
+    }
+
     // Расчитываем скорость по тормозной кривой до ближайшего сигнала
     v_ref = min(v_ref, calcAlsnSpeed(feedback->alsn_code, feedback->signal_dist, v_target));
+
+    if (v_ref < 0.1)
+    {
+        int a = 0;
+    }
 
     // Если разрешено отправление по графику
     if (is_departure_allowed)
@@ -366,7 +386,7 @@ void Autopilot::initTimeTable()
     }
 
     // Определяем дистанцию до ближайшей станции
-    emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
+    emit sigGetRouteLength(vehicle_idx, curr_traj_name, curr_traj_coord,
                            timetable.stations[target_station_idx].target_traj,
                            timetable.stations[target_station_idx].coord,
                            target_dir, &target_station_dist);
@@ -391,7 +411,7 @@ void Autopilot::calcTargetDistance()
     // топологию в поисках новой дистанции
     //if (curr_traj_name != prev_traj_name)
     //{
-    emit sigGetRouteLength(curr_traj_name, curr_traj_coord,
+    emit sigGetRouteLength(vehicle_idx, curr_traj_name, curr_traj_coord,
                            timetable.stations[target_station_idx].target_traj,
                            timetable.stations[target_station_idx].coord,
                            target_dir, &target_station_dist);
@@ -454,22 +474,23 @@ double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
 //------------------------------------------------------------------------------
 double Autopilot::calcTimetableVelocity(double t, double dt, double dist)
 {
-    double v_ref = v_constr;
-
     // Нет графика - нехер тут рассчитывать, конструкционная скорость,
     // далее порешают другие ограничения, скорость все равно будет выбрана
     // минимальная из возможных
     if (timetable.stations.empty())
     {
-        return v_ref;
+        return v_constr;
     }
 
+    // Разрешено отправление, движемся с скоростью заданной по графику
+    // (ограничиваем конструкционной, остальное учтено дальше)
     if (is_departure_allowed)
     {
-        return v_ref;
+        return min(v_tt_ref, v_constr);
     }
 
-    return min(v_ref, calcTimetableBrakeCurve(t, dt, dist));
+    // Отправление запрещено - значит идем по программной кривой торможения
+    return min(v_tt_ref, calcTimetableBrakeCurve(t, dt, dist));
 }
 
 //------------------------------------------------------------------------------
@@ -482,28 +503,23 @@ void Autopilot::checkTimetable(double t, double dt)
         return;
     }
 
+    // Текущая станция
     auto st = &timetable.stations[target_station_idx];
 
+    // Время прибытия равно времени отправления
     if (st->arr_time == st->dep_time)
     {
+        // Разрешаем отправление
         is_departure_allowed = true;
         return;
     }
 
-    fixArrival(t, st);
-
-    if ( (st->arr_time != "-") && (st->is_arrival) )
+    // Обработка опоздания
+    if ( (st->arr_time != "-") && (st->is_arrival) && (!st->is_delay) )
     {
-        if (st->fact_arr_time_sec > st->arr_time_sec)
-        {
-            if (!halt_timer->isStarted())
-            {
-                halt_timer->setTimeout(st->dep_time_sec - st->arr_time_sec);
-                halt_timer->start();
-
-                return;
-            }
-        }
+        double delay = pf(st->fact_arr_time_sec - st->arr_time_sec);
+        st->dep_time_sec += delay;
+        st->is_delay = true;
     }
 
     if (t >= st->dep_time_sec)
@@ -575,19 +591,13 @@ void Autopilot::slotSandTimer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Autopilot::slotHaltTimeout()
+void Autopilot::slotIncTargetStation(int vehicle_idx)
 {
-    // Разрешаем отправление после выдержки времени стоянки
-    is_departure_allowed = true;
+    if (vehicle_idx != this->vehicle_idx)
+    {
+        return;
+    }
 
-    timetable.stations[target_station_idx].is_departure = true;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Autopilot::slotIncTargetStation()
-{
     if (!timetable.stations[target_station_idx].is_departure)
     {
         timetable.stations[target_station_idx].is_departure = true;
@@ -599,4 +609,45 @@ void Autopilot::slotIncTargetStation()
     {
         target_station_idx = timetable.stations.size() - 1;
     }    
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
+{
+    // Не нам данные, другому автопилоту
+    if (vehicle_idx != this->vehicle_idx)
+    {
+        return;
+    }
+
+    if (target_dist < 0)
+    {
+        return;
+    }
+
+    // Текущая станция
+    auto st = &timetable.stations[target_station_idx];
+
+    // Фиксируем факт прибытия
+    if ( (target_dist < 10.0) && (!st->is_arrival) )
+    {
+        st->is_arrival = true;
+        st->fact_arr_time_sec = time;
+    }
+
+    // Рассчитываем оставшееся время хода до станции
+    double delta_t = st->arr_time_sec - time;
+
+    // Уже опоздали - мчим с конструкционной (если позволят)
+    if (delta_t < 0)
+    {
+        v_tt_ref = v_constr;
+    }
+    else
+    {
+        // Рассчитываем среднюю перегонную скорость
+        v_tt_ref = target_dist * Physics::kmh / (delta_t + 0.0001);
+    }
 }

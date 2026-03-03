@@ -23,8 +23,7 @@ public:
     Autopilot(QObject *parent = nullptr) : Device(parent)
     {
         connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);
-        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);
-        connect(halt_timer, &Timer::process, this, &Autopilot::slotHaltTimeout);
+        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);        
     }
 
     ~Autopilot()
@@ -106,7 +105,8 @@ signals:
 
     void sigIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool *exists);
 
-    void sigGetRouteLength(QString cur_traj_name,
+    void sigGetRouteLength(int vehicle_idx,
+                           QString cur_traj_name,
                            double cur_coord,
                            QString target_traj_name,
                            double target_coord,
@@ -234,10 +234,13 @@ protected:
     int vehicle_idx = 0;
 
     /// Флаг разрешения отправления по графику
-    bool is_departure_allowed = true;
+    bool is_departure_allowed = true;    
 
-    /// Таймер стоянки, при прибытии с опозданием
-    Timer *halt_timer = new Timer(0.1, false);
+    /// Заданная скорость по графику
+    double v_tt_ref = 0.0;
+
+    /// Время симуляции (для слота расчета средней скорости)
+    double time = 0;
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
@@ -309,15 +312,17 @@ public slots:
 
     void initTimeTable();
 
-    void slotIncTargetStation();
+    /// Переключение на следующую станцию от топологии
+    void slotIncTargetStation(int vehicle_idx);
+
+    /// Исполнение запроса на пересчет средней скорости по перегону
+    void slotCalcMiddleVelocity(int vehicle_idx, double target_dist);
 
 private slots:
 
     void slotVigilanceControl();
 
-    void slotSandTimer();
-
-    void slotHaltTimeout();
+    void slotSandTimer();    
 };
 
 //------------------------------------------------------------------------------

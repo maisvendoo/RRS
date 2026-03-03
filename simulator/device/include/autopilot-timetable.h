@@ -35,6 +35,8 @@ struct autopilot_station_t
     QString target_traj = "";
     /// Координата вдоль целевой траектории
     double coord = 0.0;
+    /// Признак опоздания
+    bool is_delay = false;
 
     QByteArray serialize()
     {

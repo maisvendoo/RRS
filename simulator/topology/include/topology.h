@@ -101,7 +101,9 @@ signals:
 
     void sigChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
 
-    void sigIncTargetStation();
+    void sigIncTargetStation(int vehicle_idx);
+
+    void sigCalcMiddleVelocity(int vehicle_idx, double target_dist);
 
 private:
 
@@ -174,7 +176,7 @@ public slots:
 
     void slotIsRouteExists(QString start_traj_name, QString end_traj_name, int dir, bool *exists);
 
-    void slotGetRouteLength(QString cur_traj_name,
+    void slotGetRouteLength(int vehicle_idx, QString cur_traj_name,
                             double cur_coord,
                             QString target_traj_name,
                             double target_coord,

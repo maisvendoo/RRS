@@ -209,8 +209,7 @@ route_segment_t Topology::find_route(Trajectory* start_traj,
         path.trajectories = { start_traj };
         path.directions   = { (dir < 0) ? BWD : FWD };
 
-        Journal::instance()->warning(
-            "Build route: Target trajectory and start trajectory are the same");
+        //Journal::instance()->warning("Build route: Target trajectory and start trajectory are the same");
 
         return path;
     }
@@ -220,8 +219,7 @@ route_segment_t Topology::find_route(Trajectory* start_traj,
     // ---------------------------------------------------------------------
     if (target_traj->isBusy() && check_busy)
     {
-        Journal::instance()->error(
-            "Build route: Target trajectory is busy. Route is impossible");
+        Journal::instance()->error("Build route: Target trajectory is busy. Route is impossible");
 
         return route_segment_t();
     }
@@ -360,11 +358,11 @@ route_segment_t Topology::find_route(Trajectory* start_traj,
     // ---------------------------------------------------------------------
     // 5. Путь не найден
     // ---------------------------------------------------------------------
-    Journal::instance()->warning(
+    /*Journal::instance()->warning(
         QString("ROUTE NOT FOUND: %1 -> %2. Visited %3 states")
             .arg(start_traj->getName())
             .arg(target_traj->getName())
-            .arg(visited.size()));
+            .arg(visited.size()));*/
 
     return route_segment_t();
 }
@@ -1442,7 +1440,7 @@ void Topology::slotIsRouteExists(QString start_traj_name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
+void Topology::slotGetRouteLength(int vehicle_idx, QString cur_traj_name, double cur_coord,
                                   QString target_traj_name, double target_coord,
                                   int dir, double *lenght)
 {
@@ -1477,9 +1475,10 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
 
         if (*lenght < 0)
         {
-            emit sigIncTargetStation();
+            emit sigIncTargetStation(vehicle_idx);
         }
 
+        emit sigCalcMiddleVelocity(vehicle_idx, *lenght);
         return;
     }
 
@@ -1505,6 +1504,7 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
 
     if (route_seg.trajectories.size() == 2)
     {
+        emit sigCalcMiddleVelocity(vehicle_idx, *lenght);
         return;
     }
 
@@ -1514,6 +1514,8 @@ void Topology::slotGetRouteLength(QString cur_traj_name, double cur_coord,
     {
         *lenght += route_seg.trajectories[i]->getLength();
     }
+
+    emit sigCalcMiddleVelocity(vehicle_idx, *lenght);
 }
 
 //------------------------------------------------------------------------------

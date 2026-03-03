@@ -79,7 +79,7 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     else
     {
         // Если тяга заблокирована но скорость не упала сильно
-        if (lock_traction && dv < 10.0)
+        if (lock_traction && dv < 5.0)
             lock_traction = true; // продолжаем блокировать тягу
         else
             lock_traction = false;
