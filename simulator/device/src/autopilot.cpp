@@ -601,6 +601,7 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
     if (!timetable.stations[target_station_idx].is_departure)
     {
         timetable.stations[target_station_idx].is_departure = true;
+        timetable.stations[target_station_idx].fact_dep_time = time_str;
     }
 
     target_station_idx++;
@@ -635,6 +636,7 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
     {
         st->is_arrival = true;
         st->fact_arr_time_sec = time;
+        st->fact_arr_time = time_str;
     }
 
     // Рассчитываем оставшееся время хода до станции
@@ -650,4 +652,12 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
         // Рассчитываем среднюю перегонную скорость
         v_tt_ref = target_dist * Physics::kmh / (delta_t + 0.0001);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::slotSetTimeForAutopilot(QString time)
+{
+    this->time_str = time;
 }

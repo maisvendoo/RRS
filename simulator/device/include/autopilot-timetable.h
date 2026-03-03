@@ -58,6 +58,7 @@ struct autopilot_station_t
         stream << is_departure;
         stream << target_traj;
         stream << coord;
+        stream << is_delay;
 
         return data;
     }
@@ -81,6 +82,7 @@ struct autopilot_station_t
         stream >> is_departure;
         stream >> target_traj;
         stream >> coord;
+        stream >> is_delay;
     }
 };
 

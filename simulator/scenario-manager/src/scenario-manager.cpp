@@ -468,6 +468,14 @@ void ScenarioManager::step(const simulator_time_t &sim_time, double dt)
     delayTimer->step(sim_time.simulation_seconds, dt);
 
     curr_step = dt;
+
+    curr_time_str = sim_time.time.getString_hh_mm();
+
+    if (curr_time_str != prev_time_str)
+    {
+        prev_time_str = curr_time_str;
+        emit sigSetTimeForAutopilot(curr_time_str);
+    }
 }
 
 //------------------------------------------------------------------------------

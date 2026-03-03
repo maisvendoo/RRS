@@ -329,6 +329,9 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 
                 disconnect(topology, &Topology::sigCalcMiddleVelocity, ap, &Autopilot::slotCalcMiddleVelocity);
                 connect(topology, &Topology::sigCalcMiddleVelocity, ap, &Autopilot::slotCalcMiddleVelocity);
+
+                disconnect(scnmgr, &ScenarioManager::sigSetTimeForAutopilot, ap, &Autopilot::slotSetTimeForAutopilot);
+                connect(scnmgr, &ScenarioManager::sigSetTimeForAutopilot, ap, &Autopilot::slotSetTimeForAutopilot);
             }
         }
     }

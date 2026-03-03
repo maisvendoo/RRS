@@ -99,6 +99,8 @@ signals:
 
     void sigUpdateTrainTimetable(int train_idx);
 
+    void sigSetTimeForAutopilot(QString time);
+
 private:
 
     /// Контекст интерпретатора Lua
@@ -132,6 +134,10 @@ private:
 
     /// Имя каталога, содержащего сценарий (запоминаем для последующей загрузки графиков)
     std::string cur_scenario_dir = "";
+
+    QString curr_time_str = "00:00";
+
+    QString prev_time_str = "00:00";
 
     /// Поставить задачу в очередь
     void setTask(task_t task);
