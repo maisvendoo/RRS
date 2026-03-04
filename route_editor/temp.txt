@@ -17,7 +17,6 @@ KeyBinding.h
 KeyboardHandler.h
 KeyStates.h
 LSIntersector.h
-MouseHandler.h
 ObjectSelector.h
 Outline.h
 PagedLodMap.h
@@ -51,7 +50,6 @@ IntersectionHandler.cpp
 KeyBinding.cpp
 KeyboardHandler.cpp
 main.cpp
-MouseHandler.cpp
 ObjectSelector.cpp
 Outline.cpp
 Route.cpp

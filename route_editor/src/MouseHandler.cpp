@@ -3,9 +3,7 @@
 #include "MouseButton.h"
 
 #include <vsg/maths/vec2.h>
-#include <vsg/ui/ApplicationEvent.h>
 #include <vsg/ui/PointerEvent.h>
-#include <vsg/ui/ScrollWheelEvent.h>
 
 void MouseHandler::apply(vsg::ButtonPressEvent& buttonPress)
 {
@@ -89,7 +87,7 @@ vsg::ivec2 MouseHandler::get_pos() const
     return pos;
 }
 
-vsg::ivec2 MouseHandler::get_delta_pos()
+vsg::ivec2 MouseHandler::get_delta_pos() const
 {
     return delta_pos;
 }

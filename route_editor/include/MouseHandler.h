@@ -10,9 +10,7 @@ namespace vsg
 
 class ButtonPressEvent;
 class ButtonReleaseEvent;
-class FrameEvent;
 class MoveEvent;
-class ScrollWheelEvent;
 
 }
 
@@ -24,7 +22,7 @@ public:
     virtual void apply(vsg::MoveEvent& moveEvent) override;
 
     vsg::ivec2 get_pos() const;
-    vsg::ivec2 get_delta_pos();
+    vsg::ivec2 get_delta_pos() const;
 
     bool get_is_lmb_pressed() const;
     bool get_is_mmb_pressed() const;
