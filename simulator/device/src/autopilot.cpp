@@ -61,10 +61,10 @@ QString Autopilot::getDbgMsg()
         msg += QString(" | Цель: %1 | дист.: %2 | Приб.: %3 | Отпр.: %4 | Факт. приб.: %6 | Факт. отпр.: %7")
                    .arg(timetable.stations[target_station_idx].name)
                    .arg(target_station_dist, 7, 'f', 1)
-                   .arg(timetable.stations[target_station_idx].arr_time, 5)
-                   .arg(timetable.stations[target_station_idx].dep_time, 5)
-                   .arg(timetable.stations[target_station_idx].fact_arr_time, 5)
-                   .arg(timetable.stations[target_station_idx].fact_dep_time, 5);
+                   .arg(timetable.getStation(target_station_idx).arr_time, 5)
+                   .arg(timetable.getStation(target_station_idx).dep_time, 5)
+                   .arg(timetable.getStation(target_station_idx).fact_arr_time, 5)
+                   .arg(timetable.getStation(target_station_idx - 1).fact_dep_time, 5);
     }
 
     return msg;
@@ -175,6 +175,7 @@ void Autopilot::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "SpeedLimit_RY", v_lim_RY);
     cfg.getDouble(secName, "SpeedDisableRelease", v_disable_release);
     cfg.getDouble(secName, "dVTractionOff", dV_traction_off);
+    cfg.getDouble(secName, "dVref", dv_ref);
 }
 
 //------------------------------------------------------------------------------
@@ -651,7 +652,7 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
     else
     {
         // Рассчитываем среднюю перегонную скорость
-        v_tt_ref = target_dist * Physics::kmh / (delta_t + 0.0001);
+        v_tt_ref = target_dist * Physics::kmh / (delta_t + 0.0001) + dv_ref;
     }
 }
 

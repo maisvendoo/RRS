@@ -244,6 +244,8 @@ protected:
 
     QString time_str = "00:00";
 
+    double dv_ref = 0.0;
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,

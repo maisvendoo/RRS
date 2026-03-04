@@ -139,6 +139,21 @@ struct autopilot_timetable_t
             stations.push_back(station);
         }
     }
+
+    autopilot_station_t &getStation(int idx)
+    {
+        if (idx < 0)
+        {
+            idx = 0;
+        }
+
+        if (idx >= stations.size())
+        {
+            idx = stations.size() - 1;
+        }
+
+        return stations[idx];
+    }
 };
 
 
