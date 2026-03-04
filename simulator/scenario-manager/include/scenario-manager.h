@@ -276,6 +276,9 @@ public slots:
     /// Обработка события занятости или освобождения какой-либо траектории
     /// на карте
     void slotChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
+
+    /// Построение поездного маршрута по команде автоведения
+    void slotBuildTrainRoute(QString start_traj, QString target_traj, int dir);
 };
 
 #endif

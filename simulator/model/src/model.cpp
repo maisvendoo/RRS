@@ -332,6 +332,9 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 
                 disconnect(scnmgr, &ScenarioManager::sigSetTimeForAutopilot, ap, &Autopilot::slotSetTimeForAutopilot);
                 connect(scnmgr, &ScenarioManager::sigSetTimeForAutopilot, ap, &Autopilot::slotSetTimeForAutopilot);
+
+                disconnect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);
+                connect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);
             }
         }
     }

@@ -1110,6 +1110,15 @@ void ScenarioManager::slotChangeTrajStateByTrain(int train_idx, bool is_busy, QS
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::slotBuildTrainRoute(QString start_traj, QString target_traj, int dir)
+{
+    // Устанавливаем задачу на построение поездного маршрута
+    taskBuildRoute(start_traj.toStdString(), target_traj.toStdString(), dir, true);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ScenarioManager::setTask(task_t task)
 {
     taskQueue.push(std::move(task));

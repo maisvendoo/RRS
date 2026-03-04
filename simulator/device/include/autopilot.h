@@ -113,6 +113,8 @@ signals:
                            int dir,
                            double *lenght);
 
+    void sigBuildTrainRoute(QString start_traj, QString target_traj, int dir);
+
 protected:
 
     /// Признак активации
