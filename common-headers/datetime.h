@@ -282,6 +282,14 @@ public:
             .arg(sec(), 2, 10, QChar('0'));
     }
 
+    /// Вывод времени сервера в строку (только часы и минуты)
+    QString getString_hh_mm() const
+    {
+        return QString("%1:%2")
+            .arg(hour(), 2, 10, QChar('0'))
+            .arg(minute(), 2, 10, QChar('0'));
+    }
+
     /// Задать время, по умолчанию из текущего системного
     static server_time_t timeNow(std::tm* std_tm_now = nullptr) noexcept
     {

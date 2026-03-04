@@ -242,6 +242,8 @@ protected:
     /// Время симуляции (для слота расчета средней скорости)
     double time = 0;
 
+    QString time_str = "00:00";
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,
@@ -317,6 +319,8 @@ public slots:
 
     /// Исполнение запроса на пересчет средней скорости по перегону
     void slotCalcMiddleVelocity(int vehicle_idx, double target_dist);
+
+    void slotSetTimeForAutopilot(QString time);
 
 private slots:
 
