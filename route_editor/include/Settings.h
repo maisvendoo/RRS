@@ -33,35 +33,27 @@ struct settings_t
     float pitch_min;        ///< Vertical angle down max
     float pitch_max;        ///< Vertical angle up max
 
-    double camera_initial_height = 0.0;
+    double camera_initial_height;
 
-    double camera_move_speed = 100.0;
-    double min_camera_move_speed = 50.0;
-    double max_camera_move_speed = 200.0;
+    double camera_move_speed;
+    double camera_rotate_speed;
+    double camera_zoom_power;
 
-    double camera_rotate_speed = 10.0;
-    double min_camera_rotate_speed = 10.0;
-    double max_camera_rotate_speed = 25.0;
+    float gizmo_arrow_length;
+    float gizmo_arrow_thickness;
+    vsg::vec3 gizmo_arrow_x_color;
+    vsg::vec3 gizmo_arrow_y_color;
+    vsg::vec3 gizmo_arrow_z_color;
+    float gizmo_opacity;
+    bool gizmo_to_center;
 
-    double camera_zoom_power = 100.0;
-    double min_camera_zoom_power = 50.0;
-    double max_camera_zoom_power = 200.0;
-
-    float gizmo_arrow_length = 5.0f;
-    float gizmo_arrow_thickness = 0.1f;
-    vsg::vec3 gizmo_arrow_x_color = {1.0f, 0.0f, 0.0f};
-    vsg::vec3 gizmo_arrow_y_color = {0.0f, 1.0f, 0.0f};
-    vsg::vec3 gizmo_arrow_z_color = {0.0f, 0.0f, 1.0f};
-    float gizmo_opacity = 1.0f;
-    bool gizmo_to_center = false;
-
-    double gui_font_size = 20.0;
-    bool is_gui_editable = false;
-    bool show_objects_ref = true;
-    bool show_route_map = false;
-    bool show_controls = true;
-    bool show_camera_settings = false;
-    bool show_topology = false;
+    double gui_font_size;
+    bool is_gui_editable;
+    bool show_objects_ref;
+    bool show_route_map;
+    bool show_controls;
+    bool show_camera_settings;
+    bool show_topology;
 
     KeyBindings key_bindings;
 };

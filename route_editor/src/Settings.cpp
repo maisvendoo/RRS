@@ -37,6 +37,24 @@ settings_t::settings_t()
     , fovy_max(100.0f)
     , pitch_min(-70.0f)
     , pitch_max(70.0f)
+    , camera_initial_height(0.0)
+    , camera_move_speed(100.0)
+    , camera_rotate_speed(3.0)
+    , camera_zoom_power(250.0)
+    , gizmo_arrow_length(5.0f)
+    , gizmo_arrow_thickness(0.1f)
+    , gizmo_arrow_x_color(1.0f, 0.0f, 0.0f)
+    , gizmo_arrow_y_color(0.0f, 1.0f, 0.0f)
+    , gizmo_arrow_z_color(0.0f, 0.0f, 1.0f)
+    , gizmo_opacity(1.0f)
+    , gizmo_to_center(false)
+    , gui_font_size(20.0)
+    , is_gui_editable(false)
+    , show_objects_ref(true)
+    , show_route_map(false)
+    , show_controls(true)
+    , show_camera_settings(false)
+    , show_topology(false)
 {
 }
 
@@ -82,14 +100,8 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getFloat(section, "FovYMax", fovy_max);
     cfg.getDouble(section, "InitialHeight", camera_initial_height);
     cfg.getDouble(section, "MoveSpeed", camera_move_speed);
-    cfg.getDouble(section, "MinMoveSpeed", min_camera_move_speed);
-    cfg.getDouble(section, "MaxMoveSpeed", max_camera_move_speed);
     cfg.getDouble(section, "RotateSpeed", camera_rotate_speed);
-    cfg.getDouble(section, "MinRotateSpeed", min_camera_rotate_speed);
-    cfg.getDouble(section, "MaxRotateSpeed", max_camera_rotate_speed);
     cfg.getDouble(section, "ZoomPower", camera_zoom_power);
-    cfg.getDouble(section, "MinZoomPower", min_camera_zoom_power);
-    cfg.getDouble(section, "MaxZoomPower", max_camera_zoom_power);
 
     section = "Gizmo";
 
