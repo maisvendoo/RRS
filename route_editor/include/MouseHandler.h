@@ -22,6 +22,7 @@ public:
     virtual void apply(vsg::MoveEvent& moveEvent) override;
 
     vsg::ivec2 get_pos() const;
+    // Must be called only from MoveEvents
     vsg::ivec2 get_delta_pos() const;
 
     bool get_is_lmb_pressed() const;
