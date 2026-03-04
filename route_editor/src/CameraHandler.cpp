@@ -102,12 +102,7 @@ CameraHandler::CameraHandler(EditorContext& context)
 
 void CameraHandler::apply(vsg::FrameEvent& frame)
 {
-    static time_type prev_time = frame.frameStamp->simulationTime;
-
-    const time_type time = frame.frameStamp->simulationTime;
-    const time_type delta_time = time - prev_time;
-
-    prev_time = time;
+    (void)frame;
 
     const auto get_binding_state = [this](Action action) -> int
     {
@@ -128,7 +123,7 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     if (move_forward - move_backward != 0)
     {
         const look_at_vec3_type front_movememt = front * move_speed *
-            static_cast<look_at_value_type>(delta_time) *
+            static_cast<look_at_value_type>(context.delta_time) *
             static_cast<look_at_value_type>(move_forward - move_backward);
 
         context.look_at->eye += front_movememt;
@@ -137,7 +132,7 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     if (move_right - move_left != 0)
     {
         const look_at_vec3_type right_movement = right * move_speed *
-            static_cast<look_at_value_type>(delta_time) *
+            static_cast<look_at_value_type>(context.delta_time) *
             static_cast<look_at_value_type>(move_right - move_left);
 
         context.look_at->eye += right_movement;
@@ -159,11 +154,11 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
             context.mouse_handler->get_delta_pos());
 
         const auto rotate_speed = static_cast<value_type>(
-            context.settings.camera_rotate_speed) * context.delta_time;
+            context.settings.camera_rotate_speed);
 
-        yaw_deg += delta_mouse_pos.x * rotate_speed;
+        yaw_deg += delta_mouse_pos.x * rotate_speed * static_cast<value_type>(context.delta_time);
 
-        pitch_deg -= delta_mouse_pos.y * rotate_speed;
+        pitch_deg -= delta_mouse_pos.y * rotate_speed * static_cast<value_type>(context.delta_time);
 
         const auto pitch_min = static_cast<value_type>(context.settings.pitch_min);
         const auto pitch_max = static_cast<value_type>(context.settings.pitch_max);
@@ -184,9 +179,10 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
     }
 
     const auto zoom_power = static_cast<perspective_value_type>(
-        context.settings.camera_zoom_power) * context.delta_time;
+        context.settings.camera_zoom_power);
 
-    context.perspective->fieldOfViewY -= scrollWheel.delta.y * zoom_power;
+    context.perspective->fieldOfViewY -= scrollWheel.delta.y * zoom_power
+        * static_cast<perspective_value_type>(context.delta_time);
 
     const auto fovy_min = static_cast<perspective_value_type>(
         context.settings.fovy_min);
