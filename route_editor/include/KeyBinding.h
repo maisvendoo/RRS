@@ -19,7 +19,14 @@ enum EditorKeyModifier
     EDITOR_KEY_MODIFIER_CTRL_ANY  = 0x0020,
     EDITOR_KEY_MODIFIER_ALT_L     = 0x0040,
     EDITOR_KEY_MODIFIER_ALT_R     = 0x0080,
-    EDITOR_KEY_MODIFIER_ALT_ANY   = 0x0100
+    EDITOR_KEY_MODIFIER_ALT_ANY   = 0x0100,
+    TOTAL_EDITOR_KEY_MODIFIERS = 9
+};
+
+struct ModifierKeys
+{
+    vsg::KeySymbol keys[3];
+    std::uint8_t key_count;
 };
 
 extern const std::map<EditorKeyModifier, std::vector<vsg::KeySymbol>>

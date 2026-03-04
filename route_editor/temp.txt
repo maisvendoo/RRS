@@ -6,7 +6,6 @@ commands/RotateObjectsCommand.h
 commands/ScaleObjectsCommand.h
 commands/SelectObjectsCommand.h
 commands/ShowObjectsCommand.h
-selection_states
 CameraHandler.h
 EditorContext.h
 EditorGui.h
@@ -15,7 +14,6 @@ Gizmo.h
 IntersectionHandler.h
 KeyBinding.h
 KeyboardHandler.h
-KeyStates.h
 LSIntersector.h
 ObjectSelector.h
 Outline.h
@@ -25,7 +23,6 @@ RouteEditor.h
 RouteMap.h
 RouteObject.h
 SceneGraph.h
-SelectionHandler.h
 Settings.h
 shader_funcs.h
 SingleSwitch.h
@@ -41,7 +38,6 @@ commands/RotateObjectsCommand.cpp
 commands/ScaleObjectsCommand.cpp
 commands/SelectObjectsCommand.cpp
 commands/ShowObjectsCommand.cpp
-selection_states
 CameraHandler.cpp
 EditorContext.cpp
 EditorGui.cpp
@@ -61,3 +57,13 @@ Settings.cpp
 shader_funcs.cpp
 SwitchGroup.cpp
 WindowHandler.cpp
+
+--------------------------------------------------------------------------------
+
+Action.h
+Mask.h
+MouseButton.h
+MouseHandler.h
+
+Action.cpp
+MouseHandler.cpp

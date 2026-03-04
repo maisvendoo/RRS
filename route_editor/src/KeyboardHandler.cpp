@@ -2,6 +2,7 @@
 
 #include "Action.h"
 #include "CommandList.h"
+#include "EditorContext.h"
 #include "KeyBinding.h"
 
 #include <vsg/ui/KeyEvent.h>
