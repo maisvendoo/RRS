@@ -546,7 +546,8 @@ void Autopilot::checkTimetable(double t, double dt)
         // Если задан участок приближения, строим себе маршрут отправления
         if (!st->removal_traj.isEmpty())
         {
-            emit sigBuildTrainRoute(st->target_traj, st->removal_traj, target_dir);
+            // Маршрут строим от той траектории, где по факту находимся!!!
+            emit sigBuildTrainRoute(curr_traj_name, st->removal_traj, target_dir);
         }
     }
     else
