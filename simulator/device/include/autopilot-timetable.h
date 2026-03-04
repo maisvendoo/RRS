@@ -41,6 +41,10 @@ struct autopilot_station_t
     QString approach_traj = "";
     /// Траектория учатка удаления
     QString removal_traj = "";
+    /// Признак построения маршрута отправления
+    bool is_build_dep_route = false;
+    /// Признак построения маршрута прибытия
+    bool is_build_arr_route = false;
 
     QByteArray serialize()
     {

@@ -248,6 +248,8 @@ protected:
 
     double dv_ref = 0.0;
 
+    bool allow_inc_target_idx = false;
+
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
     void ode_system(const state_vector_t &Y,

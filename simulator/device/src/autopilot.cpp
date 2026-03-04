@@ -31,6 +31,11 @@ void Autopilot::step(double t, double dt)
 {
     time = t;
 
+    if (!is_active)
+    {
+        return;
+    }
+
     velocity_control(t, dt);
 
     vigilance_control(t, dt);
@@ -410,19 +415,21 @@ void Autopilot::calcTargetDistance()
     //prev_traj_coord = curr_traj_coord;
     emit sigGetVehicleTrajPosition(&curr_traj_name, &curr_traj_coord);
 
-    auto st = timetable.getStation(target_station_idx);
+    auto st = &timetable.stations[target_station_idx];
 
     // Если мы оказались на участке приближения
-    if (curr_traj_name == st.approach_traj)
+    if (curr_traj_name == st->approach_traj && !st->is_build_arr_route)
     {
         // Строим маршрут приема
-        emit sigBuildTrainRoute(st.approach_traj, st.target_traj, target_dir);
+        emit sigBuildTrainRoute(st->approach_traj, st->target_traj, target_dir);
 
         // или маршрут пропуска, если задан участок удаления
-        if (!st.removal_traj.isEmpty())
+        if (!st->removal_traj.isEmpty())
         {
-            emit sigBuildTrainRoute(st.target_traj, st.removal_traj, target_dir);
+            emit sigBuildTrainRoute(st->target_traj, st->removal_traj, target_dir);
         }
+
+        st->is_build_arr_route = true;
     }
 
     // Если сменилась текущаяя траектория - нечего делать, дергаем
@@ -545,10 +552,11 @@ void Autopilot::checkTimetable(double t, double dt)
         is_departure_allowed = true;
 
         // Если задан участок приближения, строим себе маршрут отправления
-        if (!st->removal_traj.isEmpty())
+        if (!st->removal_traj.isEmpty() && !st->is_build_dep_route)
         {
             // Маршрут строим от той траектории, где по факту находимся!!!
             emit sigBuildTrainRoute(curr_traj_name, st->removal_traj, target_dir);
+            st->is_build_dep_route = true;
         }
     }
     else
@@ -625,21 +633,23 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
 
     auto st = &timetable.stations[target_station_idx];
 
-    if (!st->is_departure)
+    if (!st->is_departure && allow_inc_target_idx)
     {
         st->is_departure = true;
         st->fact_dep_time = time_str;
 
-        QString msg = QString("STATION: %1 | Arr. time: %2 | Fact. arr.: %3 Dep. time: %4 | Fact. dep.: %5 |")
+        QString msg = QString("TIMETABLE PROCESS: %1 | Arr. time: %2 | Fact. arr.: %3 Dep. time: %4 | Fact. dep.: %5 |")
                           .arg(st->name)
-                          .arg(st->arr_time)
-                          .arg(st->fact_arr_time)
-                          .arg(st->dep_time)
-                          .arg(st->fact_dep_time);
+                          .arg(st->arr_time, 5)
+                          .arg(st->fact_arr_time, 5)
+                          .arg(st->dep_time, 5)
+                          .arg(st->fact_dep_time, 5);
 
         Journal::instance()->debug(msg);
 
         target_station_idx++;
+
+        allow_inc_target_idx = false;
 
         if (target_station_idx > timetable.stations.size() - 1)
         {
@@ -663,6 +673,8 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
     {
         return;
     }
+
+    allow_inc_target_idx = true;
 
     // Текущая станция
     auto st = &timetable.stations[target_station_idx];
