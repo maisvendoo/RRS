@@ -1,5 +1,6 @@
 #include    <autopilot.h>
 #include    <QLibrary>
+#include    <Journal.h>
 
 //------------------------------------------------------------------------------
 //
@@ -622,10 +623,21 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
         return;
     }
 
-    if (!timetable.stations[target_station_idx].is_departure)
+    auto st = timetable.getStation(target_station_idx);
+
+    if (!st.is_departure)
     {
-        timetable.stations[target_station_idx].is_departure = true;
-        timetable.stations[target_station_idx].fact_dep_time = time_str;
+        st.is_departure = true;
+        st.fact_dep_time = time_str;
+
+        QString msg = QString("STATION: %1 | Arr. time: %2 | Fact. arr.: %3 Dep. time: %4 | Fact. dep.: %5 |")
+                          .arg(st.name)
+                          .arg(st.arr_time)
+                          .arg(st.fact_arr_time)
+                          .arg(st.dep_time)
+                          .arg(st.fact_dep_time);
+
+        Journal::instance()->debug(msg);
 
         target_station_idx++;
 
