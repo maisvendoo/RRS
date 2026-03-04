@@ -37,6 +37,10 @@ struct autopilot_station_t
     double coord = 0.0;
     /// Признак опоздания
     bool is_delay = false;
+    /// Траектория участка приближения
+    QString approach_traj = "";
+    /// Траектория учатка удаления
+    QString removal_traj = "";
 
     QByteArray serialize()
     {
@@ -59,6 +63,8 @@ struct autopilot_station_t
         stream << target_traj;
         stream << coord;
         stream << is_delay;
+        stream << approach_traj;
+        stream << removal_traj;
 
         return data;
     }
@@ -83,6 +89,8 @@ struct autopilot_station_t
         stream >> target_traj;
         stream >> coord;
         stream >> is_delay;
+        stream >> approach_traj;
+        stream >> removal_traj;
     }
 };
 

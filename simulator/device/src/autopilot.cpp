@@ -409,6 +409,21 @@ void Autopilot::calcTargetDistance()
     //prev_traj_coord = curr_traj_coord;
     emit sigGetVehicleTrajPosition(&curr_traj_name, &curr_traj_coord);
 
+    auto st = timetable.getStation(target_station_idx);
+
+    // Если мы оказались на участке приближения
+    if (curr_traj_name == st.approach_traj)
+    {
+        // Строим маршрут приема
+        emit sigBuildTrainRoute(st.approach_traj, st.target_traj, target_dir);
+
+        // или маршрут пропуска, если задан участок удаления
+        if (!st.removal_traj.isEmpty())
+        {
+            emit sigBuildTrainRoute(st.target_traj, st.removal_traj, target_dir);
+        }
+    }
+
     // Если сменилась текущаяя траектория - нечего делать, дергаем
     // топологию в поисках новой дистанции
     //if (curr_traj_name != prev_traj_name)
@@ -527,6 +542,12 @@ void Autopilot::checkTimetable(double t, double dt)
     if (t >= st->dep_time_sec)
     {
         is_departure_allowed = true;
+
+        // Если задан участок приближения, строим себе маршрут отправления
+        if (!st->removal_traj.isEmpty())
+        {
+            emit sigBuildTrainRoute(st->target_traj, st->removal_traj, target_dir);
+        }
     }
     else
     {
