@@ -139,6 +139,11 @@ void RouteEditor::run()
 {
     while (context.viewer->advanceToNextFrame())
     {
+        static double prev_time = context.viewer->getFrameStamp()->simulationTime;
+        double curr_time = context.viewer->getFrameStamp()->simulationTime;
+        context.delta_time = curr_time - prev_time;
+        prev_time = curr_time;
+
         if (context.state == EditorState::LOAD_ROUTE)
         {
             context.scene_graph->load_route();

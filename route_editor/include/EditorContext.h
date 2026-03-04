@@ -67,6 +67,7 @@ struct EditorContext
     StringMap objects_ref;
     RouteMap route_map;
     Topology* topology = nullptr;
+    double delta_time;
 };
 
 #endif // EDITOR_CONTEXT_H

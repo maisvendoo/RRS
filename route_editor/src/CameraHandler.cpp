@@ -159,7 +159,7 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
             context.mouse_handler->get_delta_pos());
 
         const auto rotate_speed = static_cast<value_type>(
-            context.settings.camera_rotate_speed);
+            context.settings.camera_rotate_speed) * context.delta_time;
 
         yaw_deg += delta_mouse_pos.x * rotate_speed;
 
@@ -184,7 +184,7 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
     }
 
     const auto zoom_power = static_cast<perspective_value_type>(
-        context.settings.camera_zoom_power);
+        context.settings.camera_zoom_power) * context.delta_time;
 
     context.perspective->fieldOfViewY -= scrollWheel.delta.y * zoom_power;
 

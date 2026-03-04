@@ -52,8 +52,6 @@ private:
     vec3_type front;
     vec3_type right;
     vec3_type up;
-    double prev_time;
-    double delta_time;
 };
 
 #endif // CAMERA_HANDLER_H
