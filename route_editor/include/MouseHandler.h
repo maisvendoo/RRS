@@ -19,15 +19,12 @@ class ScrollWheelEvent;
 class MouseHandler : public vsg::Inherit<vsg::Visitor, MouseHandler>
 {
 public:
-    void apply(vsg::ButtonPressEvent& buttonPress) override;
-    void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
-    void apply(vsg::MoveEvent& moveEvent) override;
-    void apply(vsg::ScrollWheelEvent& scrollWheel) override;
-    void apply(vsg::FrameEvent& frame) override;
+    virtual void apply(vsg::ButtonPressEvent& buttonPress) override;
+    virtual void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
+    virtual void apply(vsg::MoveEvent& moveEvent) override;
 
     vsg::ivec2 get_pos() const;
     vsg::ivec2 get_delta_pos();
-    float get_scroll();
 
     bool get_is_lmb_pressed() const;
     bool get_is_mmb_pressed() const;
@@ -36,10 +33,6 @@ public:
 private:
     vsg::ivec2 pos = {0, 0};
     vsg::ivec2 delta_pos = {0, 0};
-    float scroll = 0.0f;
-
-    bool used_delta_pos = false;
-    bool used_scroll = false;
 
     bool is_lmb_pressed = false;
     bool is_mmb_pressed = false;

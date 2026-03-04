@@ -80,35 +80,8 @@ void MouseHandler::apply(vsg::MoveEvent& moveEvent)
 
     pos = {moveEvent.x, moveEvent.y};
     delta_pos = pos - prev_pos;
-    used_delta_pos = false;
 
     prev_pos = pos;
-}
-
-void MouseHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
-{
-    if (scrollWheel.handled)
-    {
-        return;
-    }
-
-    scroll += scrollWheel.delta.y;
-    used_scroll = false;
-}
-
-void MouseHandler::apply(vsg::FrameEvent& frame)
-{
-    (void)frame;
-
-    if (used_delta_pos)
-    {
-        delta_pos = {0, 0};
-    }
-
-    if (used_scroll)
-    {
-        scroll = 0.0f;
-    }
 }
 
 vsg::ivec2 MouseHandler::get_pos() const
@@ -118,14 +91,7 @@ vsg::ivec2 MouseHandler::get_pos() const
 
 vsg::ivec2 MouseHandler::get_delta_pos()
 {
-    used_delta_pos = true;
     return delta_pos;
-}
-
-float MouseHandler::get_scroll()
-{
-    used_scroll = true;
-    return scroll;
 }
 
 bool MouseHandler::get_is_lmb_pressed() const

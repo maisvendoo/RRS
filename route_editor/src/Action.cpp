@@ -23,7 +23,7 @@ static const char* const * get_action_names()
 
 const char* to_c_string(Action action)
 {
-    static const char* const * action_names = get_action_names();
+    static const char* const * const action_names = get_action_names();
 
     return action_names[action];
 }

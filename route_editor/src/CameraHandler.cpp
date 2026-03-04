@@ -23,6 +23,8 @@
 #include <vsg/ui/ApplicationEvent.h>
 #include <vsg/ui/FrameStamp.h>
 
+#include <vsg/ui/PointerEvent.h>
+#include <vsg/ui/ScrollWheelEvent.h>
 #include <vulkan/vulkan_core.h>
 
 #include <algorithm>
@@ -107,49 +109,6 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
 
     prev_time = time;
 
-    if (context.mouse_handler->get_is_rmb_pressed())
-    {
-        const auto delta_mouse_pos = static_cast<vec2_type>(
-            context.mouse_handler->get_delta_pos());
-
-        const auto rotate_speed = static_cast<value_type>(
-            context.settings.camera_rotate_speed);
-
-        yaw_deg += delta_mouse_pos.x * rotate_speed *
-            static_cast<value_type>(delta_time);
-
-        pitch_deg -= delta_mouse_pos.y * rotate_speed *
-            static_cast<value_type>(delta_time);
-
-        const auto pitch_min = static_cast<value_type>(context.settings.pitch_min);
-        const auto pitch_max = static_cast<value_type>(context.settings.pitch_max);
-
-        pitch_deg = std::clamp(pitch_deg, pitch_min, pitch_max);
-
-        calculate_front();
-        calculate_right();
-        calculate_up();
-    }
-
-    if (const auto scroll = static_cast<perspective_value_type>(
-        context.mouse_handler->get_scroll()))
-    {
-        const auto zoom_power = static_cast<perspective_value_type>(
-            context.settings.camera_zoom_power);
-
-        context.perspective->fieldOfViewY -= scroll * zoom_power *
-            static_cast<perspective_value_type>(delta_time);
-
-        const auto fovy_min = static_cast<perspective_value_type>(
-            context.settings.fovy_min);
-
-        const auto fovy_max = static_cast<perspective_value_type>(
-            context.settings.fovy_max);
-
-        context.perspective->fieldOfViewY = std::clamp(context.perspective->fieldOfViewY,
-            fovy_min, fovy_max);
-    }
-
     const auto get_binding_state = [this](Action action) -> int
     {
         return static_cast<int>(context.keyboard_handler->get_binding_state(action));
@@ -185,6 +144,58 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     }
 
     context.look_at->center = context.look_at->eye + front;
+}
+
+void CameraHandler::apply(vsg::MoveEvent& moveEvent)
+{
+    if (moveEvent.handled)
+    {
+        return;
+    }
+
+    if (context.mouse_handler->get_is_rmb_pressed())
+    {
+        const auto delta_mouse_pos = static_cast<vec2_type>(
+            context.mouse_handler->get_delta_pos());
+
+        const auto rotate_speed = static_cast<value_type>(
+            context.settings.camera_rotate_speed);
+
+        yaw_deg += delta_mouse_pos.x * rotate_speed;
+
+        pitch_deg -= delta_mouse_pos.y * rotate_speed;
+
+        const auto pitch_min = static_cast<value_type>(context.settings.pitch_min);
+        const auto pitch_max = static_cast<value_type>(context.settings.pitch_max);
+
+        pitch_deg = std::clamp(pitch_deg, pitch_min, pitch_max);
+
+        calculate_front();
+        calculate_right();
+        calculate_up();
+    }
+}
+
+void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
+{
+    if (scrollWheel.handled)
+    {
+        return;
+    }
+
+    const auto zoom_power = static_cast<perspective_value_type>(
+        context.settings.camera_zoom_power);
+
+    context.perspective->fieldOfViewY -= scrollWheel.delta.y * zoom_power;
+
+    const auto fovy_min = static_cast<perspective_value_type>(
+        context.settings.fovy_min);
+
+    const auto fovy_max = static_cast<perspective_value_type>(
+        context.settings.fovy_max);
+
+    context.perspective->fieldOfViewY = std::clamp(context.perspective->fieldOfViewY,
+        fovy_min, fovy_max);
 }
 
 CameraHandler::vec3_type CameraHandler::get_front() const

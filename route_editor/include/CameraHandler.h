@@ -28,6 +28,8 @@ public:
     CameraHandler(EditorContext& context);
 
     void apply(vsg::FrameEvent& frame) override;
+    void apply(vsg::MoveEvent& moveEvent) override;
+    void apply(vsg::ScrollWheelEvent& scrollWheel) override;
 
     vec3_type get_front() const;
     vec3_type get_right() const;
@@ -50,6 +52,8 @@ private:
     vec3_type front;
     vec3_type right;
     vec3_type up;
+    double prev_time;
+    double delta_time;
 };
 
 #endif // CAMERA_HANDLER_H
