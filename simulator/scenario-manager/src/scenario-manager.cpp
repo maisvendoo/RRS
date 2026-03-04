@@ -5,6 +5,7 @@
 #include    <switch-state.h>
 #include    <signal-command.h>
 #include    <route-command.h>
+#include    <CfgReader.h>
 
 //------------------------------------------------------------------------------
 //
@@ -358,11 +359,11 @@ autopilot_timetable_t ScenarioManager::loadTrainTimetable(int train_idx)
 
     std::string path = cur_scenario_dir + fs.separator()
                        + "timetable" + fs.separator() +
-                       train_name + ".conf";
+                       train_name + ".xml";
 
-    QFile tt_file(QString(path.c_str()));
+    CfgReader cfg;
 
-    if (!tt_file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (!cfg.load(QString(path.c_str())))
     {
         Journal::instance()->error("File of timetable " + QString(path.c_str()) + " not found");
         return autopilot_timetable_t();;
@@ -373,29 +374,14 @@ autopilot_timetable_t ScenarioManager::loadTrainTimetable(int train_idx)
     train_datas[train_idx].timetable.train_name = QString(train_name.c_str());
     train_datas[train_idx].timetable.train_idx = train_idx;
 
-    QTextStream in(&tt_file);
+    QDomNode secNode = cfg.getFirstSection("Station");
 
-    QStringList tt_data = in.readAll().split('\n');
-
-    for (auto line : tt_data)
+    while (!secNode.isNull())
     {
-        QStringList tokens = line.split(';');
-
-        if (tokens.size() < 5)
-        {
-            Journal::instance()->error("Invalid timetable in file" + QString(path.c_str()));
-            return autopilot_timetable_t();
-        }
-
         autopilot_station_t station;
-        station.name = tokens[0];
-        station.arr_time = tokens[1].remove(' ');
-        station.dep_time = tokens[2].remove(' ');
-        station.target_traj = tokens[3].remove(' ');
 
-        bool isOk = false;
-
-        station.coord = tokens[4].toDouble(&isOk);
+        cfg.getString(secNode, "Name", station.name);
+        cfg.getString(secNode, "ArrivalTime", station.arr_time);
 
         if (station.arr_time == "-")
         {
@@ -406,6 +392,8 @@ autopilot_timetable_t ScenarioManager::loadTrainTimetable(int train_idx)
             station.arr_time_sec = timetableTimeToSimSeconds(station.arr_time.toStdString());
         }
 
+        cfg.getString(secNode, "DepartureTime", station.dep_time);
+
         if (station.dep_time == "-")
         {
             station.dep_time_sec = 1e10;
@@ -415,18 +403,15 @@ autopilot_timetable_t ScenarioManager::loadTrainTimetable(int train_idx)
             station.dep_time_sec = timetableTimeToSimSeconds(station.dep_time.toStdString());
         }
 
-        if (!isOk)
-        {
-            Journal::instance()->error("Invalid traj coordinate at station " + tokens[0]);
-            return autopilot_timetable_t();
-        }
+        cfg.getString(secNode, "TargetTraj", station.target_traj);
+        cfg.getDouble(secNode, "TargetCoord", station.coord);
+
+        cfg.getString(secNode, "ApproachTraj", station.approach_traj);
+        cfg.getString(secNode, "RemovalTraj", station.removal_traj);
 
         train_datas[train_idx].timetable.stations.push_back(station);
-    }
 
-    if (train_datas[train_idx].timetable.stations.empty())
-    {
-        return autopilot_timetable_t();
+        secNode = cfg.getNextSection();
     }
 
     return train_datas[train_idx].timetable;
