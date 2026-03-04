@@ -420,6 +420,8 @@ void Autopilot::calcTargetDistance()
     // Если мы оказались на участке приближения
     if (curr_traj_name == st->approach_traj && !st->is_build_arr_route)
     {
+        st->is_build_arr_route = true;
+
         // Строим маршрут приема
         emit sigBuildTrainRoute(st->approach_traj, st->target_traj, target_dir);
 
@@ -427,9 +429,7 @@ void Autopilot::calcTargetDistance()
         if (!st->removal_traj.isEmpty())
         {
             emit sigBuildTrainRoute(st->target_traj, st->removal_traj, target_dir);
-        }
-
-        st->is_build_arr_route = true;
+        }        
     }
 
     // Если сменилась текущаяя траектория - нечего делать, дергаем
@@ -486,7 +486,7 @@ double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
     }
 
     // Если запрещен отпуск и мы остановились - запрещаем движение
-    if (feedback->v_cur <= 1.0 && is_disable_release)
+    if ( (feedback->v_cur <= 1.0 || target_station_dist <= 10.0)  && is_disable_release)
     {
         is_motion_allowed = false;
     }
@@ -638,7 +638,7 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
         st->is_departure = true;
         st->fact_dep_time = time_str;
 
-        QString msg = QString("TIMETABLE PROCESS: %1 | Arr. time: %2 | Fact. arr.: %3 Dep. time: %4 | Fact. dep.: %5 |")
+        QString msg = QString("TIMETABLE PROCESS: %1 | Arr. time: %2 | Fact. arr.: %3 | Dep. time: %4 | Fact. dep.: %5 |")
                           .arg(st->name)
                           .arg(st->arr_time, 5)
                           .arg(st->fact_arr_time, 5)
@@ -680,7 +680,7 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
     auto st = &timetable.stations[target_station_idx];
 
     // Фиксируем факт прибытия
-    if ( (target_dist < 10.0) && (!st->is_arrival) )
+    if ( (target_dist < 100.0) && (!st->is_arrival) )
     {
         st->is_arrival = true;
         st->fact_arr_time_sec = time;
