@@ -644,10 +644,8 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
         st->is_departure = true;
         st->fact_dep_time = time_str;
 
-        QString msg = QString("TIMETABLE PROCESS: %1 | Arr. time: %2 | Fact. arr.: %3 | Dep. time: %4 | Fact. dep.: %5 |")
-                          .arg(st->name)
-                          .arg(st->arr_time, 5)
-                          .arg(st->fact_arr_time, 5)
+        QString msg = QString("TIMETABLE PROCESS: Departure from: %1 | Dep. time: %2 | Fact. dep.: %3 |")
+                          .arg(st->name)                          
                           .arg(st->dep_time, 5)
                           .arg(st->fact_dep_time, 5);
 
@@ -691,6 +689,13 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
         st->is_arrival = true;
         st->fact_arr_time_sec = time;
         st->fact_arr_time = time_str;
+
+        QString msg = QString("TIMETABLE PROCESS: Arrival to: %1 | Arr. time: %2 | Fact. arr.: %3 |")
+                          .arg(st->name)
+                          .arg(st->arr_time, 5)
+                          .arg(st->fact_arr_time, 5);
+
+        Journal::instance()->debug(msg);
     }
 
     // Рассчитываем оставшееся время хода до станции
