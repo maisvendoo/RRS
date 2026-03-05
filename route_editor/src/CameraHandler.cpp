@@ -145,13 +145,6 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
-    const auto keyboard_handler = context.keyboard_handler;
-
-    const auto get_binding_state = [keyboard_handler](Action action) -> int
-    {
-        return static_cast<int>(keyboard_handler->get_binding_state(action));
-    };
-
     const auto look_at = context.look_at;
 
     const look_at_vec3_type front =
@@ -163,6 +156,13 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     const look_at_value_type move_speed =
         static_cast<look_at_value_type>(context.settings.camera_move_speed) *
         static_cast<look_at_value_type>(context.delta_time);
+
+    const auto keyboard_handler = context.keyboard_handler;
+
+    const auto get_binding_state = [keyboard_handler](Action action) -> int
+    {
+        return static_cast<int>(keyboard_handler->get_binding_state(action));
+    };
 
     look_at->eye += front * move_speed * static_cast<look_at_value_type>(
         get_binding_state(ACTION_MOVE_CAMERA_FORWARD) -
