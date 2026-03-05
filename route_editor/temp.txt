@@ -12,8 +12,6 @@ EditorGui.h
 EditorState.h
 Gizmo.h
 IntersectionHandler.h
-KeyBinding.h
-KeyboardHandler.h
 LSIntersector.h
 ObjectSelector.h
 Outline.h
@@ -43,8 +41,6 @@ EditorContext.cpp
 EditorGui.cpp
 Gizmo.cpp
 IntersectionHandler.cpp
-KeyBinding.cpp
-KeyboardHandler.cpp
 main.cpp
 ObjectSelector.cpp
 Outline.cpp
@@ -61,9 +57,13 @@ WindowHandler.cpp
 --------------------------------------------------------------------------------
 
 Action.h
+KeyBinding.h
+KeyboardHandler.h
 Mask.h
 MouseButton.h
 MouseHandler.h
 
 Action.cpp
+KeyBinding.cpp
+KeyboardHandler.cpp
 MouseHandler.cpp

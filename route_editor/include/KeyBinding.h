@@ -7,6 +7,7 @@
 
 #include <array>
 #include <cstdint>
+#include <map>
 #include <vector>
 
 enum EditorKeyModifier
@@ -23,12 +24,7 @@ enum EditorKeyModifier
     TOTAL_EDITOR_KEY_MODIFIERS = 9
 };
 
-struct ModifierKeys
-{
-    vsg::KeySymbol keys[3];
-    std::uint8_t key_count;
-};
-
+// Keys corresponding to modifiers
 extern const std::map<EditorKeyModifier, std::vector<vsg::KeySymbol>>
 modifier_keys_map;
 

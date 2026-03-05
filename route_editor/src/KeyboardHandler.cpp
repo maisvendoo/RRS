@@ -4,8 +4,11 @@
 #include "CommandList.h"
 #include "EditorContext.h"
 #include "KeyBinding.h"
+#include "Settings.h"
 
 #include <vsg/ui/KeyEvent.h>
+
+#include <map>
 
 KeyboardHandler::KeyboardHandler(EditorContext& context)
     : context(context)
@@ -64,12 +67,18 @@ bool KeyboardHandler::get_binding_state(Action action) const
         return false;
     }
 
+    // Walk through every binding's modifier and check it's keys
+    // For example:
+    // If binding's modifier = LShift + RShift, action will be performed
+    // only when we hold both Shifts;
+    // If binding's modifier = Shift(any), action will be performed
+    // when we hold any of Shifts
     for (const auto& [modifier, keys] : modifier_keys_map)
     {
         if (key_binding.modifiers & modifier)
         {
             bool pressed = false;
-            for (const auto& key : keys)
+            for (const vsg::KeySymbol key : keys)
             {
                 if (get_key_state(key))
                 {

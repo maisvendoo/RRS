@@ -1,5 +1,7 @@
 #include "Action.h"
 
+#include <cassert>
+
 static const char* const * get_action_names()
 {
     static const char* action_names[TOTAL_ACTIONS];
@@ -23,6 +25,8 @@ static const char* const * get_action_names()
 
 const char* to_c_string(Action action)
 {
+    assert(action < TOTAL_ACTIONS);
+
     static const char* const * const action_names = get_action_names();
 
     return action_names[action];
