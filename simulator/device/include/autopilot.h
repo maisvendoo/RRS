@@ -244,11 +244,23 @@ protected:
     /// Время симуляции (для слота расчета средней скорости)
     double time = 0;
 
+    /// Теущее время в формате hh:mm
     QString time_str = "00:00";
 
-    double dv_ref = 0.0;
-
+    /// Флаг, обеспечивающий однократное приращение индекса целевой станции
     bool allow_inc_target_idx = false;
+
+    /// Погрешность дистанции для фиксации факта прибытия на станцию
+    double arrival_dist_eps = 100.0;
+
+    /// Дистанция торможения при прибытии
+    double arrival_brake_dist = 10.0;
+
+    /// Скорость безусловного остановочного торможения
+    double v_stop_brake = 1.0;
+
+    /// Защита от деления на нулевое время при расчете средней перегонной скорости
+    const double TIME_ZERO_EPS = 0.0001;
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)
@@ -309,10 +321,7 @@ protected:
     double calcTimetableVelocity(double t, double dt, double dist);
 
     /// Обработка графика, в части разрешения отправления
-    void checkTimetable(double t, double dt);
-
-    /// Фиксация прибытия
-    void fixArrival(double t, autopilot_station_t *st);
+    void checkTimetable(double t, double dt);    
 
 public slots:
 

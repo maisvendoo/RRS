@@ -181,7 +181,10 @@ void Autopilot::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "SpeedLimit_RY", v_lim_RY);
     cfg.getDouble(secName, "SpeedDisableRelease", v_disable_release);
     cfg.getDouble(secName, "dVTractionOff", dV_traction_off);
-    cfg.getDouble(secName, "dVref", dv_ref);
+
+    cfg.getDouble(secName, "ArrivalDistEps", arrival_dist_eps);
+    cfg.getDouble(secName, "ArrivalBrakeDist", arrival_brake_dist);
+    cfg.getDouble(secName, "StopBrakeVelocity", v_stop_brake);
 }
 
 //------------------------------------------------------------------------------
@@ -251,7 +254,7 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_ta
         }
 
         // Если запрещен отпуск и мы остановились - запрещаем движение
-        if ( (feedback->v_cur <= 1.0 || signal_dist <= lead_dist_RY) && is_disable_release)
+        if ( (feedback->v_cur <= v_stop_brake || signal_dist <= lead_dist_RY) && is_disable_release)
         {
             is_alsn_motion_allowed = false;
         }
@@ -432,26 +435,11 @@ void Autopilot::calcTargetDistance()
         }        
     }
 
-    // Если сменилась текущаяя траектория - нечего делать, дергаем
-    // топологию в поисках новой дистанции
-    //if (curr_traj_name != prev_traj_name)
-    //{
+    // ОПределяем дистанцию до станции-цели
     emit sigGetRouteLength(vehicle_idx, curr_traj_name, curr_traj_coord,
                            timetable.stations[target_station_idx].target_traj,
                            timetable.stations[target_station_idx].coord,
-                           target_dir, &target_station_dist);
-
-
-
-        //prev_traj_name = curr_traj_name;
-        //prev_traj_coord = curr_traj_coord;
-
-    /*    return;
-    }
-
-    // Если мы на прежней траектории - совершенно незачем дергать топологию,
-    // вычисляем новую дистанцию по смещению вдоль траектории
-    target_station_dist -= qAbs(curr_traj_coord - prev_traj_coord);*/
+                           target_dir, &target_station_dist);       
 }
 
 //------------------------------------------------------------------------------
@@ -486,7 +474,7 @@ double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
     }
 
     // Если запрещен отпуск и мы остановились - запрещаем движение
-    if ( (feedback->v_cur <= 1.0 || target_station_dist <= 10.0)  && is_disable_release)
+    if ( (feedback->v_cur <= v_stop_brake || target_station_dist <= arrival_brake_dist)  && is_disable_release)
     {
         is_motion_allowed = false;
     }
@@ -565,18 +553,6 @@ void Autopilot::checkTimetable(double t, double dt)
         {
             is_departure_allowed = false;
         }
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Autopilot::fixArrival(double t, autopilot_station_t *st)
-{
-    if ( (target_station_dist < 10.0) && (!st->is_arrival) )
-    {
-        st->is_arrival = true;
-        st->fact_arr_time_sec = t;
     }
 }
 
@@ -684,7 +660,7 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
     auto st = &timetable.stations[target_station_idx];
 
     // Фиксируем факт прибытия
-    if ( (target_dist < 100.0) && (!st->is_arrival) )
+    if ( (target_dist < arrival_dist_eps) && (!st->is_arrival) )
     {
         st->is_arrival = true;
         st->fact_arr_time_sec = time;
@@ -709,7 +685,7 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
     else
     {
         // Рассчитываем среднюю перегонную скорость
-        v_tt_ref = target_dist * Physics::kmh / (delta_t + 0.0001) + dv_ref;
+        v_tt_ref = target_dist * Physics::kmh / (delta_t + TIME_ZERO_EPS);
     }
 }
 
