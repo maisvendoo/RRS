@@ -64,8 +64,8 @@ void VL60pk::slotAutoStart()
 
         if (auto_start_autopilot)
         {
-            autopilot_switcher[CAB1].set();
-            autopilot_switcher[CAB2].set();
+            autopilot_switcher[autostart_cab].set();
+            //autopilot_switcher[CAB2].set();
         }
     }
 }
