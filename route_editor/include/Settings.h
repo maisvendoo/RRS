@@ -30,8 +30,6 @@ struct settings_t
     float fovy;             ///< Vertical view angle
     float fovy_min;         ///< Vertical view angle min
     float fovy_max;         ///< Vertical view angle max
-    float pitch_min;        ///< Vertical angle down max
-    float pitch_max;        ///< Vertical angle up max
 
     double camera_initial_height;
 

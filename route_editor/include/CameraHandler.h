@@ -6,15 +6,15 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
-#include <vulkan/vulkan_core.h>
-
 struct EditorContext;
 
 namespace vsg
 {
 
 class FrameEvent;
+class MoveEvent;
 class Node;
+class ScrollWheelEvent;
 
 }
 
@@ -27,16 +27,20 @@ public:
 public:
     CameraHandler(EditorContext& context);
 
-    void apply(vsg::FrameEvent& frame) override;
-    void apply(vsg::MoveEvent& moveEvent) override;
-    void apply(vsg::ScrollWheelEvent& scrollWheel) override;
+    virtual void apply(vsg::MoveEvent& moveEvent) override;
+    virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;
+    virtual void apply(vsg::FrameEvent& frame) override;
 
-    vec3_type get_front() const;
-    vec3_type get_right() const;
-    vec3_type get_up() const;
+    const vec3_type& get_front() const;
+    const vec3_type& get_right() const;
+    const vec3_type& get_up() const;
 
-    vsg::ref_ptr<vsg::Node> create_front_plane(vec3_type point,
-        vec3_type* up_out = nullptr) const;
+    // Create plane perpedicular to camera normal and passing through
+    // specified point to test for intersections
+    vsg::ref_ptr<vsg::Node> create_front_plane(
+        const vec3_type& point,
+        vec3_type* up_out = nullptr
+    ) const;
 
 private:
     void calculate_front();
