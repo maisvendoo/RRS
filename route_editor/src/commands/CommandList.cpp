@@ -62,7 +62,8 @@ void CommandList::push(const Command* command, bool execute)
             head = head->prev;
         }
 
-        // Save second node
+        // Move head pointer to next node and decrease list size
+        // (first node becomes deleted)
         CommandNode* const next = head->next;
         if (active == head)
         {
