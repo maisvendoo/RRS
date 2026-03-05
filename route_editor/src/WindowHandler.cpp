@@ -36,7 +36,7 @@ WindowHandler::WindowHandler(EditorContext& context)
     if (!context.window)
     {
         // TODO: Replace on Journal
-        std::fputs("Failed to create window", stderr);
+        std::fputs("Failed to create window\n", stderr);
     }
 }
 

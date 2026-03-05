@@ -24,7 +24,6 @@ Settings.h
 shader_funcs.h
 SingleSwitch.h
 SwitchGroup.h
-WindowHandler.h
 
 commands/CommandList.cpp
 commands/HideObjectsCommand.cpp
@@ -48,7 +47,6 @@ SelectionHandler.cpp
 Settings.cpp
 shader_funcs.cpp
 SwitchGroup.cpp
-WindowHandler.cpp
 
 --------------------------------------------------------------------------------
 
@@ -59,9 +57,11 @@ KeyboardHandler.h
 Mask.h
 MouseButton.h
 MouseHandler.h
+WindowHandler.h
 
 Action.cpp
 CameraHandler.cpp
 KeyBinding.cpp
 KeyboardHandler.cpp
 MouseHandler.cpp
+WindowHandler.cpp
