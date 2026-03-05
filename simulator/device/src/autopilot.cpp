@@ -633,6 +633,12 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
 
     auto st = &timetable.stations[target_station_idx];
 
+    // Отправиться раньше графика решил ты? Путь к темной стороне это...
+    if (time < st->dep_time_sec)
+    {
+        return;
+    }
+
     if (!st->is_departure && allow_inc_target_idx)
     {
         st->is_departure = true;
