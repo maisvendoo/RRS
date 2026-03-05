@@ -1,14 +1,14 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "EditorContext.h"
-
 #include <string>
+
+struct EditorContext;
 
 class Command
 {
 public:
-    Command(EditorContext& context) : context(context) {}
+    explicit Command(EditorContext& context) : context(context) {}
     virtual ~Command() = default;
     virtual void execute() const = 0;
     virtual void undo() const = 0;

@@ -1,4 +1,3 @@
-commands/Command.h
 commands/CommandList.h
 commands/HideObjectsCommand.h
 commands/MoveObjectsCommand.h
@@ -50,6 +49,7 @@ SwitchGroup.cpp
 
 --------------------------------------------------------------------------------
 
+commands/Command.h
 Action.h
 CameraHandler.h
 KeyBinding.h
