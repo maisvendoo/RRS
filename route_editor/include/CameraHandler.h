@@ -6,18 +6,15 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
-#include <vulkan/vulkan_core.h>
-
 struct EditorContext;
 
 namespace vsg
 {
 
-class Camera;
 class FrameEvent;
-class LookAt;
+class MoveEvent;
 class Node;
-class Perspective;
+class ScrollWheelEvent;
 
 }
 
@@ -28,23 +25,22 @@ public:
     using vec3_type = vsg::t_vec3<value_type>;
 
 public:
-    CameraHandler(const EditorContext& context);
+    explicit CameraHandler(EditorContext& context);
 
-    void apply(vsg::FrameEvent& frame) override;
+    virtual void apply(vsg::MoveEvent& moveEvent) override;
+    virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;
+    virtual void apply(vsg::FrameEvent& frame) override;
 
-    vsg::ref_ptr<vsg::Perspective> get_perspective() const;
-    vsg::ref_ptr<vsg::LookAt> get_look_at() const;
-    vsg::ref_ptr<vsg::Camera> get_camera() const;
+    const vec3_type& get_front() const;
+    const vec3_type& get_right() const;
+    const vec3_type& get_up() const;
 
-    double& get_fov_deg() const;
-    vsg::dvec3& get_eye() const;
-
-    vec3_type get_front() const;
-    vec3_type get_right() const;
-    vec3_type get_up() const;
-
-    vsg::ref_ptr<vsg::Node> create_front_plane(vec3_type point,
-        vec3_type* up_out = nullptr) const;
+    // Create plane perpedicular to camera normal and passing through
+    // specified point to test for intersections
+    vsg::ref_ptr<vsg::Node> create_front_plane(
+        const vec3_type& point,
+        vec3_type* up_out = nullptr
+    ) const;
 
 private:
     void calculate_front();
@@ -52,11 +48,7 @@ private:
     void calculate_up();
 
 private:
-    const EditorContext& context;
-
-    vsg::ref_ptr<vsg::Perspective> perspective;
-    vsg::ref_ptr<vsg::LookAt> look_at;
-    vsg::ref_ptr<vsg::Camera> camera;
+    EditorContext& context;
 
     value_type yaw_deg = 0.0;
     value_type pitch_deg = 0.0;

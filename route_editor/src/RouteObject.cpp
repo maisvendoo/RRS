@@ -2,6 +2,7 @@
 
 #include "Gizmo.h"
 #include "Mask.h"
+#include "ObjectSelector.h"
 #include "Outline.h"
 #include "SingleSwitch.h"
 
@@ -22,8 +23,6 @@
 #include <cassert>
 #include <cmath>
 #include <string>
-
-Gizmo* RouteObject::s_gizmo = nullptr;
 
 static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
@@ -70,7 +69,7 @@ RouteObject::RouteObject(EditorContext& context, vsg::ref_ptr<vsg::PagedLOD> pag
         vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
     outline_switch = SingleSwitch::create(vsg::MASK_OFF,
-        Outline::create(paged_lod));
+        nullptr);
 
     this->addChild(paged_lod_switch);
     this->addChild(outline_switch);
@@ -124,11 +123,6 @@ bool RouteObject::get_is_selected() const
 bool RouteObject::get_is_hidden() const
 {
     return is_hidden;
-}
-
-void RouteObject::set_gizmo(Gizmo* gizmo)
-{
-    s_gizmo = gizmo;
 }
 
 void RouteObject::set_translation(vsg::vec3 translation)
@@ -245,8 +239,14 @@ RouteObjectsIterator RouteObject::show()
 
 void RouteObject::select()
 {
-    const auto outline = outline_switch->node.cast<Outline>();
-    outline->load(vsg::observer_ptr<vsg::Viewer>(context.viewer));
+    if (!outline_switch->node)
+    {
+        const auto compile_manager = context.viewer->compileManager;
+        const auto outline = context.outline_builder->create_outline(paged_lod_switch->node.cast<vsg::PagedLOD>());
+        const auto compile_result = compile_manager->compile(outline);
+        outline_switch->node = outline;
+        vsg::updateViewer(*context.viewer, compile_result);
+    }
 
     outline_switch->mask = MASK_GUI2;
 
@@ -254,7 +254,7 @@ void RouteObject::select()
 
     context.selected_objects.emplace_back(this);
 
-    s_gizmo->update_position();
+    context.gizmo->update_position();
 }
 
 RouteObjectsIterator RouteObject::deselect()
@@ -266,7 +266,7 @@ RouteObjectsIterator RouteObject::deselect()
     const auto it = context.selected_objects.erase(std::find(
         context.selected_objects.cbegin(), context.selected_objects.cend(), this));
 
-    s_gizmo->update_position();
+    context.gizmo->update_position();
 
     return it;
 }
@@ -306,5 +306,5 @@ void RouteObject::update_bounds()
     this->accept(compute_bounds);
     bounds = static_cast<vsg::box>(compute_bounds.bounds);
 
-    s_gizmo->update_position();
+    context.gizmo->update_position();
 }

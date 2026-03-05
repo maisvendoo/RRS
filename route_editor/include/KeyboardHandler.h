@@ -2,23 +2,22 @@
 #define KEYBOARD_HANDLER_H
 
 #include "Action.h"
-#include "EditorContext.h"
-#include "KeyBinding.h"
-#include "KeyStates.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/ui/KeyEvent.h>
 
-class CommandList;
+#include <map>
+
+struct EditorContext;
 
 class KeyboardHandler : public vsg::Inherit<vsg::Visitor, KeyboardHandler>
 {
 public:
-    KeyboardHandler(EditorContext& context);
+    explicit KeyboardHandler(EditorContext& context);
 
-    void apply(vsg::KeyPressEvent& keyPress) override;
-    void apply(vsg::KeyReleaseEvent& keyRelease) override;
+    virtual void apply(vsg::KeyPressEvent& keyPress) override;
+    virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;
 
     bool get_key_state(vsg::KeySymbol key) const;
     bool get_any_shift_state() const;
@@ -27,9 +26,8 @@ public:
     bool get_binding_state(Action action) const;
 
 private:
-    const KeyBindings& key_bindings;
-    CommandList& commands;
-    KeyStates key_states;
+    EditorContext& context;
+    std::map<vsg::KeySymbol, bool> key_states;
 };
 
 #endif // KEYBOARD_HANDLER_H

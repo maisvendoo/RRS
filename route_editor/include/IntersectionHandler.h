@@ -41,7 +41,7 @@ public:
         LSIntersectorRefPtr intersector);
 
 private:
-    vsg::Camera& camera;
+    const EditorContext& context;
 
     LSIntersectorRefPtr lmb_intersector;
     LSIntersectorRefPtr mmb_intersector;

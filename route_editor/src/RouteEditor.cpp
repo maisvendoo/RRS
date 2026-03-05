@@ -53,8 +53,6 @@ bool RouteEditor::initialize()
     context.settings.read(fs.combinePath(
         fs.getConfigDir(), "editor-settings.xml"));
 
-    Outline::set_settings(&context.settings);
-
     context.options = vsg::Options::create();
     context.options->sharedObjects = vsg::SharedObjects::create();
     context.options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
@@ -64,8 +62,7 @@ bool RouteEditor::initialize()
     configure_shaders();
 
     context.window_handler = WindowHandler::create(context);
-    const auto window = context.window_handler->get_window();
-    if (!window)
+    if (!context.window)
     {
         return false;
     }
@@ -76,32 +73,32 @@ bool RouteEditor::initialize()
     context.intersection_handler = IntersectionHandler::create(context);
     context.scene_graph = SceneGraph::create(context);
 
-    const auto camera = context.camera_handler->get_camera();
+    context.outline_builder = OutlineBuilder::create(context);
 
-    const auto scene_view = vsg::View::create(camera, context.scene_graph);
+    const auto scene_view = vsg::View::create(context.camera, context.scene_graph);
     scene_view->mask = MASK_SCENE;
 
     VkClearValue clear_value{};
     clear_value.depthStencil = {0.0f, 0};
     VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clear_value};
-    const VkExtent2D& extent = window->extent2D();
+    const VkExtent2D& extent = context.window->extent2D();
     VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, extent}, 0, 1};
 
     context.clear_attachments = vsg::ClearAttachments::create(
         vsg::ClearAttachments::Attachments{attachment},
         vsg::ClearAttachments::Rects{rect});
 
-    const auto gui_view1 = vsg::View::create(camera, context.scene_graph);
+    const auto gui_view1 = vsg::View::create(context.camera, context.scene_graph);
     gui_view1->mask = MASK_GUI1;
 
-    const auto gui_view2 = vsg::View::create(camera, context.scene_graph);
+    const auto gui_view2 = vsg::View::create(context.camera, context.scene_graph);
     gui_view2->mask = MASK_GUI2;
 
     const auto editor_gui = EditorGui::create(context);
 
-    const auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
+    const auto render_gui = vsgImGui::RenderImGui::create(context.window, editor_gui);
 
-    context.render_graph = vsg::RenderGraph::create(window);
+    context.render_graph = vsg::RenderGraph::create(context.window);
     context.render_graph->addChild(scene_view);
     context.render_graph->addChild(context.clear_attachments);
     context.render_graph->addChild(gui_view1);
@@ -110,7 +107,7 @@ bool RouteEditor::initialize()
     context.render_graph->addChild(context.clear_attachments);
     context.render_graph->addChild(render_gui);
 
-    const auto command_graph = vsg::CommandGraph::create(window,
+    const auto command_graph = vsg::CommandGraph::create(context.window,
         context.render_graph);
 
     context.viewer = vsg::Viewer::create();
@@ -121,7 +118,7 @@ bool RouteEditor::initialize()
 
     context.object_selector = ObjectSelector::create(context);
 
-    context.viewer->addWindow(window);
+    context.viewer->addWindow(context.window);
 
     context.viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     context.viewer->addEventHandler(vsg::CloseHandler::create(context.viewer));
@@ -142,6 +139,11 @@ void RouteEditor::run()
 {
     while (context.viewer->advanceToNextFrame())
     {
+        static double prev_time = context.viewer->getFrameStamp()->simulationTime;
+        double curr_time = context.viewer->getFrameStamp()->simulationTime;
+        context.delta_time = curr_time - prev_time;
+        prev_time = curr_time;
+
         if (context.state == EditorState::LOAD_ROUTE)
         {
             context.scene_graph->load_route();

@@ -11,7 +11,7 @@
 class ScaleObjectsCommand : public Command
 {
 public:
-    ScaleObjectsCommand(const RouteObjects& objects, vsg::vec3 pivot,
+    ScaleObjectsCommand(EditorContext& context, const RouteObjects& objects, vsg::vec3 pivot,
         vsg::vec3 scale);
 
     virtual ~ScaleObjectsCommand() override = default;

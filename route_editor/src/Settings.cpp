@@ -19,6 +19,43 @@
 #include <map>
 #include <string>
 
+settings_t::settings_t()
+    : window_title("Route Editor")
+    , window_x(50)
+    , window_y(50)
+    , window_width(1280)
+    , window_height(720)
+    , screen_number(0)
+    , fullscreen(false)
+    , vsync(true)
+    , double_buffer(true)
+    , samples(1)
+    , zNear(0.1f)
+    , view_distance(2000.0f)
+    , fovy(64.0f)
+    , fovy_min(2.0f)
+    , fovy_max(100.0f)
+    , camera_initial_height(0.0)
+    , camera_move_speed(100.0)
+    , camera_rotate_speed(3.0)
+    , camera_zoom_power(250.0)
+    , gizmo_arrow_length(5.0f)
+    , gizmo_arrow_thickness(0.1f)
+    , gizmo_arrow_x_color(1.0f, 0.0f, 0.0f)
+    , gizmo_arrow_y_color(0.0f, 1.0f, 0.0f)
+    , gizmo_arrow_z_color(0.0f, 0.0f, 1.0f)
+    , gizmo_opacity(1.0f)
+    , gizmo_to_center(false)
+    , gui_font_size(20.0)
+    , is_gui_editable(false)
+    , show_objects_ref(true)
+    , show_route_map(false)
+    , show_controls(true)
+    , show_camera_settings(false)
+    , show_topology(false)
+{
+}
+
 void settings_t::read(const std::string& cfg_path)
 {
     CfgReader cfg;
@@ -54,21 +91,15 @@ void settings_t::read(const std::string& cfg_path)
 
     section = "Camera";
 
-    cfg.getDouble(section, "zNear", zNear);
-    cfg.getDouble(section, "ViewDistance", view_distance);
-    cfg.getDouble(section, "FovY", fovy);
-    cfg.getDouble(section, "FovYMin", fovy_min);
-    cfg.getDouble(section, "FovYMax", fovy_max);
+    cfg.getFloat(section, "zNear", zNear);
+    cfg.getFloat(section, "ViewDistance", view_distance);
+    cfg.getFloat(section, "FovY", fovy);
+    cfg.getFloat(section, "FovYMin", fovy_min);
+    cfg.getFloat(section, "FovYMax", fovy_max);
     cfg.getDouble(section, "InitialHeight", camera_initial_height);
     cfg.getDouble(section, "MoveSpeed", camera_move_speed);
-    cfg.getDouble(section, "MinMoveSpeed", min_camera_move_speed);
-    cfg.getDouble(section, "MaxMoveSpeed", max_camera_move_speed);
     cfg.getDouble(section, "RotateSpeed", camera_rotate_speed);
-    cfg.getDouble(section, "MinRotateSpeed", min_camera_rotate_speed);
-    cfg.getDouble(section, "MaxRotateSpeed", max_camera_rotate_speed);
     cfg.getDouble(section, "ZoomPower", camera_zoom_power);
-    cfg.getDouble(section, "MinZoomPower", min_camera_zoom_power);
-    cfg.getDouble(section, "MaxZoomPower", max_camera_zoom_power);
 
     section = "Gizmo";
 

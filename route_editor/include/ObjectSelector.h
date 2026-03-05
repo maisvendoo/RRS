@@ -10,7 +10,6 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
-class Gizmo;
 class RouteObject;
 class SingleSwitch;
 
@@ -58,8 +57,6 @@ private:
     State state = State::INITIAL;
 
     EditorContext& context;
-
-    vsg::ref_ptr<Gizmo> gizmo;
 
     vsg::vec3 begin_intersect_pos;
     vsg::vec3 prev_intersect_pos;

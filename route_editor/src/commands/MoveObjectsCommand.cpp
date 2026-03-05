@@ -7,9 +7,10 @@
 #include <cstdio>
 #include <string>
 
-MoveObjectsCommand::MoveObjectsCommand(const RouteObjects& objects,
+MoveObjectsCommand::MoveObjectsCommand(EditorContext& context, const RouteObjects& objects,
     vsg::vec3 translation)
-    : objects(objects)
+    : Command(context)
+    , objects(objects)
     , translation(translation)
 {
 }

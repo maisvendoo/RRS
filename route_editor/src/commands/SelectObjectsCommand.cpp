@@ -1,46 +1,54 @@
 #include "SelectObjectsCommand.h"
 
 #include "Gizmo.h"
+#include "ObjectSelector.h"
 #include "RouteObject.h"
 
 #include <cstdio>
 #include <string>
 #include <utility>
 
-Gizmo* SelectObjectsCommand::s_gizmo = nullptr;
 
 SelectObjectsCommand::SelectObjectsCommand(
+    EditorContext& context,
     const RouteObjects& objects_to_select,
     const RouteObjects& objects_to_deselect
 )
-    : objects_to_select(objects_to_select)
+    : Command(context)
+    , objects_to_select(objects_to_select)
     , objects_to_deselect(objects_to_deselect)
 {
 }
 
 SelectObjectsCommand::SelectObjectsCommand(
+    EditorContext& context,
     const RouteObjects& objects_to_select,
     const RouteObjects&& objects_to_deselect
 )
-    : objects_to_select(objects_to_select)
+    : Command(context)
+    , objects_to_select(objects_to_select)
     , objects_to_deselect(std::move(objects_to_deselect))
 {
 }
 
 SelectObjectsCommand::SelectObjectsCommand(
+    EditorContext& context,
     const RouteObjects&& objects_to_select,
     const RouteObjects& objects_to_deselect
 )
-    : objects_to_select(std::move(objects_to_select))
+    : Command(context)
+    , objects_to_select(std::move(objects_to_select))
     , objects_to_deselect(objects_to_deselect)
 {
 }
 
 SelectObjectsCommand::SelectObjectsCommand(
+    EditorContext& context,
     const RouteObjects&& objects_to_select,
     const RouteObjects&& objects_to_deselect
 )
-    : objects_to_select(std::move(objects_to_select))
+    : Command(context)
+    , objects_to_select(std::move(objects_to_select))
     , objects_to_deselect(std::move(objects_to_deselect))
 {
 }
@@ -57,7 +65,7 @@ void SelectObjectsCommand::execute() const
         object->deselect();
     }
 
-    s_gizmo->update_visibility();
+    context.gizmo->update_visibility();
 }
 
 void SelectObjectsCommand::undo() const
@@ -72,7 +80,7 @@ void SelectObjectsCommand::undo() const
         object->select();
     }
 
-    s_gizmo->update_visibility();
+    context.gizmo->update_visibility();
 }
 
 std::string SelectObjectsCommand::to_string() const
@@ -83,9 +91,4 @@ std::string SelectObjectsCommand::to_string() const
         "                to deselect: %zu objects",
         objects_to_select.size(), objects_to_deselect.size());
     return buffer;
-}
-
-void SelectObjectsCommand::set_gizmo(Gizmo* gizmo)
-{
-    s_gizmo = gizmo;
 }
