@@ -23,7 +23,6 @@ SceneGraph.h
 Settings.h
 shader_funcs.h
 SingleSwitch.h
-StringMap.h
 SwitchGroup.h
 WindowHandler.h
 

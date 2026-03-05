@@ -8,7 +8,6 @@
 #include "RouteMap.h"
 #include "RouteObject.h"
 #include "Settings.h"
-#include "StringMap.h"
 
 #include <vsg/core/ref_ptr.h>
 
@@ -64,7 +63,7 @@ struct EditorContext
     RouteObjects hidden_objects;
     std::string route_dir;
     vsg::ref_ptr<OutlineBuilder> outline_builder;
-    StringMap objects_ref;
+    std::map<std::string, std::string> objects_ref;
     RouteMap route_map;
     Topology* topology = nullptr;
     double delta_time;

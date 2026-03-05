@@ -5,7 +5,6 @@
 #include "RouteMap.h"
 #include "RouteObject.h"
 #include "Settings.h"
-#include "StringMap.h"
 #include "filesystem.h"
 #include "rail-signal.h"
 #include "signals-data-types.h"
