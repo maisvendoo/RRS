@@ -6,7 +6,6 @@ commands/RotateObjectsCommand.h
 commands/ScaleObjectsCommand.h
 commands/SelectObjectsCommand.h
 commands/ShowObjectsCommand.h
-CameraHandler.h
 EditorContext.h
 EditorGui.h
 EditorState.h
@@ -26,7 +25,6 @@ shader_funcs.h
 SingleSwitch.h
 StringMap.h
 SwitchGroup.h
-Vec3Pair.h
 WindowHandler.h
 
 commands/CommandList.cpp
@@ -36,7 +34,6 @@ commands/RotateObjectsCommand.cpp
 commands/ScaleObjectsCommand.cpp
 commands/SelectObjectsCommand.cpp
 commands/ShowObjectsCommand.cpp
-CameraHandler.cpp
 EditorContext.cpp
 EditorGui.cpp
 Gizmo.cpp
@@ -57,6 +54,7 @@ WindowHandler.cpp
 --------------------------------------------------------------------------------
 
 Action.h
+CameraHandler.h
 KeyBinding.h
 KeyboardHandler.h
 Mask.h
@@ -64,6 +62,7 @@ MouseButton.h
 MouseHandler.h
 
 Action.cpp
+CameraHandler.cpp
 KeyBinding.cpp
 KeyboardHandler.cpp
 MouseHandler.cpp

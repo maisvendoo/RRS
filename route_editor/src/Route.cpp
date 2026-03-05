@@ -29,7 +29,6 @@
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
-#include <memory>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -141,8 +140,8 @@ bool Route::load_route_map()
 
         if (iss >> label >> translation >> rotation)
         {
-            context.route_map.emplace(std::move(label), std::make_pair(
-                translation, rotation));
+            context.route_map.emplace(std::move(label),
+                RouteMapTransformation{translation, rotation});
         }
     }
 
@@ -160,7 +159,7 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
         }
 
         const auto object = RouteObject::create(context, paged_lod_it->second,
-            label, transform.first, -transform.second);
+            label, transform.translation, -transform.rotation);
 
         this->addChild(vsg::MASK_ALL, object);
     }
