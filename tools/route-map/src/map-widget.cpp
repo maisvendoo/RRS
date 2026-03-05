@@ -391,6 +391,7 @@ void MapWidget::drawConnector(Switch* sw, QPainter& painter,
         return;
     }
 
+    painter.setPen(Qt::NoPen);
     switch_coord_t sc = switch_coords.value(sw->getName());
     QPoint center_point = coord_transform(sc.center);
 
@@ -401,17 +402,27 @@ void MapWidget::drawConnector(Switch* sw, QPainter& painter,
         {
             sw_label->move(center_point);
             sw_label->show();
+
+            const double t_half_len = std::min(scale, 6.0) * 0.5;
+            const double t_wid = std::min(scale, 6.0) * 0.25;
+            dvec3 pointA = sc.center + sc.orth * t_half_len;
+            dvec3 pointB = sc.center - sc.orth * t_half_len + sc.trav * t_wid;
+            dvec3 pointC = sc.center - sc.orth * t_half_len - sc.trav * t_wid;
+            QPoint pA = coord_transform(pointA);
+            QPoint pB = coord_transform(pointB);
+            QPoint pC = coord_transform(pointC);
+            draw_triangle(painter, pA, pB, pC, color_connector);
         }
         else
         {
             sw_label->hide();
+
+            painter.setBrush(color_connector);
+            int r = 4 + std::floor(sqrt(scale));
+
+            painter.drawEllipse(center_point, r, r);
         }
     }
-
-    painter.setBrush(color_connector);
-    painter.setPen(Qt::NoPen);
-    int r = 4 + std::floor(sqrt(scale));
-    painter.drawEllipse(center_point, r, r);
 
     QPen pen;
     int switched_width = 2 + std::floor(sqrt(scale));
