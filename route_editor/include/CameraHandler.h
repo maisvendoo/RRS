@@ -25,7 +25,7 @@ public:
     using vec3_type = vsg::t_vec3<value_type>;
 
 public:
-    CameraHandler(EditorContext& context);
+    explicit CameraHandler(EditorContext& context);
 
     virtual void apply(vsg::MoveEvent& moveEvent) override;
     virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;

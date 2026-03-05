@@ -14,7 +14,7 @@ struct EditorContext;
 class KeyboardHandler : public vsg::Inherit<vsg::Visitor, KeyboardHandler>
 {
 public:
-    KeyboardHandler(EditorContext& context);
+    explicit KeyboardHandler(EditorContext& context);
 
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
     virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;
