@@ -6,8 +6,6 @@
 
 #include <string>
 
-class Gizmo;
-
 class SelectObjectsCommand : public Command
 {
 public:

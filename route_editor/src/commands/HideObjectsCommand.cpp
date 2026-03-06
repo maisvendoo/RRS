@@ -5,47 +5,8 @@
 #include <cstdio>
 #include <string>
 
-HideObjectsCommand::HideObjectsCommand(
-    EditorContext& context,
-    const RouteObjects& objects_to_hide,
-    const RouteObjects& objects_to_show
-)
+HideObjectsCommand::HideObjectsCommand(EditorContext& context)
     : Command(context)
-    , objects_to_hide(objects_to_hide)
-    , objects_to_show(objects_to_show)
-{
-}
-
-HideObjectsCommand::HideObjectsCommand(
-    EditorContext& context,
-    const RouteObjects& objects_to_hide,
-    const RouteObjects&& objects_to_show
-)
-    : Command(context)
-    , objects_to_hide(objects_to_hide)
-    , objects_to_show(std::move(objects_to_show))
-{
-}
-
-HideObjectsCommand::HideObjectsCommand(
-    EditorContext& context,
-    const RouteObjects&& objects_to_hide,
-    const RouteObjects& objects_to_show
-)
-    : Command(context)
-    , objects_to_hide(std::move(objects_to_hide))
-    , objects_to_show(objects_to_show)
-{
-}
-
-HideObjectsCommand::HideObjectsCommand(
-    EditorContext& context,
-    const RouteObjects&& objects_to_hide,
-    const RouteObjects&& objects_to_show
-)
-    : Command(context)
-    , objects_to_hide(std::move(objects_to_hide))
-    , objects_to_show(std::move(objects_to_show))
 {
 }
 
