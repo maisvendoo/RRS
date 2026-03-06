@@ -1,12 +1,13 @@
 #include "SelectObjectsCommand.h"
 
+#include "Command.h"
+#include "EditorContext.h"
 #include "Gizmo.h"
 #include "ObjectSelector.h"
 #include "RouteObject.h"
 
 #include <cstdio>
 #include <string>
-
 
 SelectObjectsCommand::SelectObjectsCommand(EditorContext& context)
     : Command(context)
@@ -15,12 +16,12 @@ SelectObjectsCommand::SelectObjectsCommand(EditorContext& context)
 
 void SelectObjectsCommand::execute() const
 {
-    for (const auto& object : objects_to_select)
+    for (RouteObject* const object : objects_to_select)
     {
         object->select();
     }
 
-    for (const auto& object : objects_to_deselect)
+    for (RouteObject* const object : objects_to_deselect)
     {
         object->deselect();
     }
@@ -30,12 +31,12 @@ void SelectObjectsCommand::execute() const
 
 void SelectObjectsCommand::undo() const
 {
-    for (const auto& object : objects_to_select)
+    for (RouteObject* const object : objects_to_select)
     {
         object->deselect();
     }
 
-    for (const auto& object : objects_to_deselect)
+    for (RouteObject* const object : objects_to_deselect)
     {
         object->select();
     }

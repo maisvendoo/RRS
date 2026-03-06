@@ -1,5 +1,7 @@
 #include "ScaleObjectsCommand.h"
 
+#include "Command.h"
+#include "EditorContext.h"
 #include "RouteObject.h"
 
 #include <vsg/maths/vec3.h>
@@ -7,10 +9,10 @@
 #include <cstdio>
 #include <string>
 
-ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context, const RouteObjects& objects,
+ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context,
     vsg::vec3 pivot, vsg::vec3 scale)
     : Command(context)
-    , objects(objects)
+    , objects(context.selected_objects)
     , pivot(pivot)
     , scale(scale)
 {
@@ -18,7 +20,7 @@ ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context, const RouteObje
 
 void ScaleObjectsCommand::execute() const
 {
-    for (const auto& object : objects)
+    for (RouteObject* const object : objects)
     {
         object->scale_relative_to_pivot(pivot, scale, object->matrix);
     }
@@ -26,10 +28,13 @@ void ScaleObjectsCommand::execute() const
 
 void ScaleObjectsCommand::undo() const
 {
-    for (const auto& object : objects)
+    for (RouteObject* const object : objects)
     {
-        // TODO: Wrong calculation. Fix
-        object->scale_relative_to_pivot(pivot, -scale, object->matrix);
+        // TODO: Wrong calculation. Fix later
+        // (if we scale by zero, we can not undo this)
+        object->scale_relative_to_pivot(pivot,
+            vsg::vec3(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z),
+            object->matrix);
     }
 }
 

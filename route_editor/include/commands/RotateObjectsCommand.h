@@ -8,6 +8,8 @@
 
 #include <string>
 
+struct EditorContext;
+
 class RotateObjectsCommand : public Command
 {
 public:

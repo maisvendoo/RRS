@@ -6,6 +6,8 @@
 
 #include <string>
 
+struct EditorContext;
+
 class SelectObjectsCommand : public Command
 {
 public:
