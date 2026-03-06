@@ -236,6 +236,11 @@ bool Route::load_topology()
             const std::string signal_model_name =
                 signal->getSignalModel().toStdString();
 
+            if (signal_model_name.empty() || signal_model_name == "empty_line")
+            {
+                continue;
+            }
+
             const std::string signal_model_path = fs.combinePath(
                 models_dir, signal_model_name) + ".gltf";
 
