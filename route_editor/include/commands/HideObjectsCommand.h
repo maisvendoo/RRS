@@ -2,10 +2,11 @@
 #define HIDE_OBJECTS_COMMAND_H
 
 #include "Command.h"
-#include "EditorContext.h"
 #include "RouteObject.h"
 
 #include <string>
+
+struct EditorContext;
 
 class HideObjectsCommand : public Command
 {
@@ -16,7 +17,7 @@ public:
     virtual void undo() const override;
     virtual std::string to_string() const override;
 
-private:
+public:
     RouteObjects objects_to_hide;
     RouteObjects objects_to_show;
 };

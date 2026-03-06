@@ -11,7 +11,7 @@
 class MoveObjectsCommand : public Command
 {
 public:
-    MoveObjectsCommand(EditorContext& context, const RouteObjects& objects, vsg::vec3 translation);
+    MoveObjectsCommand(EditorContext& context, vsg::vec3 translation);
     virtual ~MoveObjectsCommand() override = default;
     virtual void execute() const override;
     virtual void undo() const override;

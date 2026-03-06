@@ -1,9 +1,6 @@
-commands/HideObjectsCommand.h
-commands/MoveObjectsCommand.h
 commands/RotateObjectsCommand.h
 commands/ScaleObjectsCommand.h
 commands/SelectObjectsCommand.h
-commands/ShowObjectsCommand.h
 EditorContext.h
 EditorGui.h
 EditorState.h
@@ -23,12 +20,9 @@ shader_funcs.h
 SingleSwitch.h
 SwitchGroup.h
 
-commands/HideObjectsCommand.cpp
-commands/MoveObjectsCommand.cpp
 commands/RotateObjectsCommand.cpp
 commands/ScaleObjectsCommand.cpp
 commands/SelectObjectsCommand.cpp
-commands/ShowObjectsCommand.cpp
 EditorContext.cpp
 EditorGui.cpp
 Gizmo.cpp
@@ -49,6 +43,8 @@ SwitchGroup.cpp
 
 commands/Command.h
 commands/CommandList.h
+commands/HideObjectsCommand.h
+commands/MoveObjectsCommand.h
 Action.h
 CameraHandler.h
 KeyBinding.h
@@ -59,6 +55,8 @@ MouseHandler.h
 WindowHandler.h
 
 commands/CommandList.cpp
+commands/HideObjectsCommand.cpp
+commands/MoveObjectsCommand.cpp
 Action.cpp
 CameraHandler.cpp
 KeyBinding.cpp

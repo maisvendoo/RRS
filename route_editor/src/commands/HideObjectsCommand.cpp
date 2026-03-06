@@ -1,5 +1,6 @@
 #include "HideObjectsCommand.h"
 
+#include "Command.h"
 #include "RouteObject.h"
 
 #include <cstdio>
@@ -12,12 +13,12 @@ HideObjectsCommand::HideObjectsCommand(EditorContext& context)
 
 void HideObjectsCommand::execute() const
 {
-    for (const auto& object : objects_to_hide)
+    for (RouteObject* const object : objects_to_hide)
     {
         object->hide();
     }
 
-    for (const auto& object : objects_to_show)
+    for (RouteObject* const object : objects_to_show)
     {
         object->show();
     }
@@ -25,12 +26,12 @@ void HideObjectsCommand::execute() const
 
 void HideObjectsCommand::undo() const
 {
-    for (const auto& object : objects_to_hide)
+    for (RouteObject* const object : objects_to_hide)
     {
         object->show();
     }
 
-    for (const auto& object : objects_to_show)
+    for (RouteObject* const object : objects_to_show)
     {
         object->hide();
     }

@@ -460,8 +460,7 @@ void ObjectSelector::confirm_keyboard_move()
     state = State::INITIAL;
     front_plane_switch->node = nullptr;
 
-    context.commands.push(new MoveObjectsCommand(context, context.selected_objects,
-        total_translation), false);
+    context.commands.push(new MoveObjectsCommand(context, total_translation), false);
 }
 
 void ObjectSelector::cancel_keyboard_move()
