@@ -6,50 +6,10 @@
 
 #include <cstdio>
 #include <string>
-#include <utility>
 
 
-SelectObjectsCommand::SelectObjectsCommand(
-    EditorContext& context,
-    const RouteObjects& objects_to_select,
-    const RouteObjects& objects_to_deselect
-)
+SelectObjectsCommand::SelectObjectsCommand(EditorContext& context)
     : Command(context)
-    , objects_to_select(objects_to_select)
-    , objects_to_deselect(objects_to_deselect)
-{
-}
-
-SelectObjectsCommand::SelectObjectsCommand(
-    EditorContext& context,
-    const RouteObjects& objects_to_select,
-    const RouteObjects&& objects_to_deselect
-)
-    : Command(context)
-    , objects_to_select(objects_to_select)
-    , objects_to_deselect(std::move(objects_to_deselect))
-{
-}
-
-SelectObjectsCommand::SelectObjectsCommand(
-    EditorContext& context,
-    const RouteObjects&& objects_to_select,
-    const RouteObjects& objects_to_deselect
-)
-    : Command(context)
-    , objects_to_select(std::move(objects_to_select))
-    , objects_to_deselect(objects_to_deselect)
-{
-}
-
-SelectObjectsCommand::SelectObjectsCommand(
-    EditorContext& context,
-    const RouteObjects&& objects_to_select,
-    const RouteObjects&& objects_to_deselect
-)
-    : Command(context)
-    , objects_to_select(std::move(objects_to_select))
-    , objects_to_deselect(std::move(objects_to_deselect))
 {
 }
 

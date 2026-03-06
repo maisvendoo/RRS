@@ -11,38 +11,15 @@ class Gizmo;
 class SelectObjectsCommand : public Command
 {
 public:
-    SelectObjectsCommand(
-        EditorContext& context,
-        const RouteObjects& objects_to_select,
-        const RouteObjects& objects_to_deselect
-    );
-
-    SelectObjectsCommand(
-        EditorContext& context,
-        const RouteObjects& objects_to_select,
-        const RouteObjects&& objects_to_deselect
-    );
-
-    SelectObjectsCommand(
-        EditorContext& context,
-        const RouteObjects&& objects_to_select,
-        const RouteObjects& objects_to_deselect
-    );
-
-    SelectObjectsCommand(
-        EditorContext& context,
-        const RouteObjects&& objects_to_select,
-        const RouteObjects&& objects_to_deselect
-    );
-
+    explicit SelectObjectsCommand(EditorContext& context);
     virtual ~SelectObjectsCommand() override = default;
     virtual void execute() const override;
     virtual void undo() const override;
     virtual std::string to_string() const override;
 
-private:
-    const RouteObjects objects_to_select;
-    const RouteObjects objects_to_deselect;
+public:
+    RouteObjects objects_to_select;
+    RouteObjects objects_to_deselect;
 };
 
 
