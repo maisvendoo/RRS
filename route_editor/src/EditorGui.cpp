@@ -269,7 +269,7 @@ void EditorGui::show_route_map() const
             for (const auto& transform : transforms)
             {
                 const vsg::vec3 translation = transform.translation;
-                const vsg::vec3 rotation_deg = transform.rotation;
+                const vsg::vec3 rotation_deg = transform.rotation_deg;
 
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();

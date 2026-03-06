@@ -161,7 +161,7 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
         for (const auto& transform : transforms)
         {
             const auto object = RouteObject::create(context, paged_lod_it->second,
-                label, transform.translation, -transform.rotation);
+                label, transform.translation, -transform.rotation_deg);
 
             this->addChild(vsg::MASK_ALL, object);
         }

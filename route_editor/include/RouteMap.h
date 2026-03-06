@@ -10,7 +10,7 @@
 struct RouteMapTransformation
 {
     vsg::vec3 translation;
-    vsg::vec3 rotation;
+    vsg::vec3 rotation_deg;
 };
 
 using RouteMap = std::map<std::string, std::vector<RouteMapTransformation>>;

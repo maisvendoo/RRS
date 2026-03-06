@@ -5,10 +5,8 @@ Gizmo.h
 IntersectionHandler.h
 ObjectSelector.h
 Outline.h
-PagedLodMap.h
 Route.h
 RouteEditor.h
-RouteMap.h
 RouteObject.h
 SceneGraph.h
 Settings.h
@@ -44,6 +42,8 @@ LSIntersector.h
 Mask.h
 MouseButton.h
 MouseHandler.h
+PagedLodMap.h
+RouteMap.h
 shader_funcs.h
 SingleSwitch.h
 SwitchGroup.h
