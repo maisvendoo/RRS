@@ -11,7 +11,7 @@
 class RotateObjectsCommand : public Command
 {
 public:
-    RotateObjectsCommand(EditorContext& context, const RouteObjects& objects, vsg::vec3 pivot,
+    RotateObjectsCommand(EditorContext& context,vsg::vec3 pivot,
         vsg::vec3 rotation_deg);
 
     virtual ~RotateObjectsCommand() override = default;

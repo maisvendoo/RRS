@@ -1,5 +1,7 @@
 #include "RotateObjectsCommand.h"
 
+#include "Command.h"
+#include "EditorContext.h"
 #include "RouteObject.h"
 
 #include <vsg/maths/vec3.h>
@@ -7,10 +9,10 @@
 #include <cstdio>
 #include <string>
 
-RotateObjectsCommand::RotateObjectsCommand(EditorContext& context, const RouteObjects& objects,
+RotateObjectsCommand::RotateObjectsCommand(EditorContext& context,
     vsg::vec3 pivot, vsg::vec3 rotation_deg)
     : Command(context)
-    , objects(objects)
+    , objects(context.selected_objects)
     , pivot(pivot)
     , rotation_deg(rotation_deg)
 {
@@ -18,7 +20,7 @@ RotateObjectsCommand::RotateObjectsCommand(EditorContext& context, const RouteOb
 
 void RotateObjectsCommand::execute() const
 {
-    for (const auto& object : objects)
+    for (RouteObject* const object : objects)
     {
         object->rotate_around_pivot(pivot, rotation_deg, object->matrix);
     }
@@ -26,7 +28,7 @@ void RotateObjectsCommand::execute() const
 
 void RotateObjectsCommand::undo() const
 {
-    for (const auto& object : objects)
+    for (RouteObject* const object : objects)
     {
         object->rotate_around_pivot(pivot, -rotation_deg, object->matrix);
     }
