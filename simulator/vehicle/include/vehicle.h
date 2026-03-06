@@ -205,7 +205,7 @@ public:
 
     virtual void OffAutopilot()
     {
-
+        auto_start_autopilot = false;
     }
 
 signals:

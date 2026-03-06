@@ -409,6 +409,9 @@ autopilot_timetable_t ScenarioManager::loadTrainTimetable(int train_idx)
         cfg.getString(secNode, "ApproachTraj", station.approach_traj);
         cfg.getString(secNode, "RemovalTraj", station.removal_traj);
 
+        cfg.getBool(secNode, "IsRightPlatform", station.is_right_platform);
+        cfg.getBool(secNode, "IsLeftPlatform", station.is_left_platform);
+
         train_datas[train_idx].timetable.stations.push_back(station);
 
         secNode = cfg.getNextSection();

@@ -321,7 +321,21 @@ protected:
     double calcTimetableVelocity(double t, double dt, double dist);
 
     /// Обработка графика, в части разрешения отправления
-    void checkTimetable(double t, double dt);    
+    void checkTimetable(double t, double dt);
+
+    /// Окрыть двери справа. Мы - только вызываем в нудный момент.
+    /// Вся внутренняя логика будет зависеть от того, как система контроля дверей
+    /// интегрирована в систему управления конкретной серией ПС
+    virtual void openRightDoors()
+    {
+
+    }
+
+    /// Окрыть двери слева
+    virtual void openLeftDoors()
+    {
+
+    }
 
 public slots:
 

@@ -31,10 +31,10 @@ void Autopilot::step(double t, double dt)
 {
     time = t;
 
-    if (!is_active)
+    /*if (!is_active)
     {
         return;
-    }
+    }*/
 
     velocity_control(t, dt);
 
@@ -54,10 +54,18 @@ void Autopilot::step(double t, double dt)
 //------------------------------------------------------------------------------
 QString Autopilot::getDbgMsg()
 {
-    double v_p = calcPredictVelocity(feedback->v_cur, dist_target, accel_meter->value());
+    QString msg = "";
 
+    if (is_active)
+    {
+        msg =  " | АВТОВЕДЕНИЕ";
+    }
+    else
+    {
+        msg =  " | СОВЕТЧИК";
+    }
 
-    QString msg = QString(" | АВТОВЕДЕНИЕ | Vтек.: %1 км/ч | Vзад.: %2 км/ч | Уск.: %3 м/с2")
+    msg += QString(" | Vтек.: %1 км/ч | Vзад.: %2 км/ч | Уск.: %3 м/с2")
         .arg(feedback->v_cur, 4, 'f', 1)
         .arg(v_ref, 4, 'f', 1)
         .arg(accel_meter->value(), 6, 'f', 2);
