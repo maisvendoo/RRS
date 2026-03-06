@@ -8,10 +8,8 @@
 
 #include <cstdio>
 
-MoveObjectsCommand::MoveObjectsCommand(
-    EditorContext& context,
-    vsg::vec3 translation
-)
+MoveObjectsCommand::MoveObjectsCommand(EditorContext& context,
+    vsg::vec3 translation)
     : Command(context)
     , objects(context.selected_objects)
     , translation(translation)

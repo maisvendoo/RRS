@@ -344,29 +344,17 @@ void EditorGui::show_camera_settings() const
 {
     ImGui::Begin("Camera Settings", nullptr, window_flags);
 
-    // TODO: Replace double on float
-
     ImGui::Text("Move speed:");
-    float move_speed = static_cast<float>(context.settings.camera_move_speed);
-    if (ImGui::DragFloat("##move_speed", &move_speed,
-        1.0f, 1.0f, MAX_DRAG))
-    {
-        context.settings.camera_move_speed = move_speed;
-    }
+    ImGui::DragFloat("##move_speed", &context.settings.camera_move_speed,
+        1.0f, 1.0f, MAX_DRAG);
 
     ImGui::Text("Rotate speed:");
-    float rotate_speed = static_cast<float>(context.settings.camera_rotate_speed);
-    if (ImGui::DragFloat("##rotate_speed", &rotate_speed, 1.0f, 1.0f, MAX_DRAG))
-    {
-        context.settings.camera_rotate_speed = rotate_speed;
-    }
+    ImGui::DragFloat("##rotate_speed", &context.settings.camera_rotate_speed,
+        1.0f, 1.0f, MAX_DRAG);
 
     ImGui::Text("Zoom power:");
-    float zoom_power = static_cast<float>(context.settings.camera_zoom_power);
-    if (ImGui::DragFloat("##zoom_power", &zoom_power, 1.0f, 1.0f, MAX_DRAG))
-    {
-        context.settings.camera_zoom_power = zoom_power;
-    }
+    ImGui::DragFloat("##zoom_power", &context.settings.camera_zoom_power,
+        1.0f, 1.0f, MAX_DRAG);
 
     ImGui::Text("FovY:");
     float fovy = static_cast<float>(context.perspective->fieldOfViewY);
