@@ -46,7 +46,7 @@ settings_t::settings_t()
     , gizmo_arrow_z_color(0.0f, 0.0f, 1.0f)
     , gizmo_opacity(1.0f)
     , gizmo_to_center(false)
-    , gui_font_size(20.0)
+    , gui_font_size(20.0f)
     , is_gui_editable(false)
     , show_objects_ref(true)
     , show_route_map(false)
@@ -119,7 +119,7 @@ void settings_t::read(const std::string& cfg_path)
 
     section = "GUI";
 
-    cfg.getDouble(section, "FontSize", gui_font_size);
+    cfg.getFloat(section, "FontSize", gui_font_size);
     cfg.getBool(section, "IsEditable", is_gui_editable);
     cfg.getBool(section, "ShowObjectsRef", show_objects_ref);
     cfg.getBool(section, "ShowRouteMap", show_route_map);

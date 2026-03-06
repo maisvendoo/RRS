@@ -44,7 +44,7 @@ struct settings_t
     float gizmo_opacity;
     bool gizmo_to_center;
 
-    double gui_font_size;
+    float gui_font_size;
     bool is_gui_editable;
     bool show_objects_ref;
     bool show_route_map;
