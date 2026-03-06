@@ -1,11 +1,11 @@
-#pragma once
 #ifndef VIEWER_ROUTE_H
 #define VIEWER_ROUTE_H
 
 #include <map>
 #include <string>
+#include <vector>
 
-struct RouteObjectTransform final
+struct RouteObjectTransform
 {
     float t_x;
     float t_y;
@@ -15,10 +15,10 @@ struct RouteObjectTransform final
     float r_z;
 };
 
-struct Route final
+struct Route
 {
     std::map<std::string, std::string> object_ref;
-    std::multimap<std::string, RouteObjectTransform> transforms;
+    std::map<std::string, std::vector<RouteObjectTransform>> route_map;
 };
 
 #endif // VIEWER_ROUTE_H

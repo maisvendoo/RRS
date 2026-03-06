@@ -13,12 +13,14 @@
 
 #include <CfgReader.h>
 
+#include <vsg/app/RecordTraversal.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/InstanceNode.h>
 
 #include <QString>
 

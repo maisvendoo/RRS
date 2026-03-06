@@ -103,7 +103,7 @@ bool RouteLoader::parse_route_map(Route& route)
         line_stream >> label >> t_x >> t_y >> t_z >> r_x >> r_y >> r_z;
         if (line_stream)
         {
-            route.transforms.insert({label, RouteObjectTransform{t_x, t_y, t_z, r_x, r_y, r_z}});
+            route.route_map[label].emplace_back(RouteObjectTransform{t_x, t_y, t_z, r_x, r_y, r_z});
         }
     }
 

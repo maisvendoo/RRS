@@ -725,16 +725,12 @@ bool RouteViewer::loadRoute()
 
     // Создание PagedLOD для моделей в маршруте
     vsg::ref_ptr<vsg::Group> route_root = vsg::Group::create();
-    auto current = route.transforms.begin();
-    while (current != route.transforms.end())
-    {
-        std::string label = current->first;
-        auto range = route.transforms.equal_range(label);
 
+    for (auto& [label, transforms] : route.route_map)
+    {
         auto found_it = route.object_ref.find(label);
         if (found_it == route.object_ref.end())
         {
-            current = range.second;
             continue;
         }
 
@@ -742,7 +738,6 @@ bool RouteViewer::loadRoute()
         if (!vsg::fileExists(model_filename_path))
         {
             LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
-            current = range.second;
             continue;
         }
 
@@ -752,10 +747,8 @@ bool RouteViewer::loadRoute()
         pagedLOD->filename = model_filename_path;
         pagedLOD->options = options;
 
-        for (auto it = range.first; it != range.second; ++it)
+        for (auto& transform : transforms)
         {
-            auto& transform = it->second;
-
             auto matrix = vsg::MatrixTransform::create();
             transform.r_x = -vsg::radians(transform.r_x);
             transform.r_y = -vsg::radians(transform.r_y);
@@ -770,12 +763,10 @@ bool RouteViewer::loadRoute()
             matrix->addChild(pagedLOD);
             route_root->addChild(matrix);
         }
-
-        current = range.second;
     }
 
     route.object_ref.clear();
-    route.transforms.clear();
+    route.route_map.clear();
 
     root->addChild(route_root);
 
