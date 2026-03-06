@@ -14,8 +14,6 @@ RouteObject.h
 SceneGraph.h
 Settings.h
 shader_funcs.h
-SingleSwitch.h
-SwitchGroup.h
 
 EditorContext.cpp
 EditorGui.cpp
@@ -31,7 +29,6 @@ SceneGraph.cpp
 SelectionHandler.cpp
 Settings.cpp
 shader_funcs.cpp
-SwitchGroup.cpp
 
 --------------------------------------------------------------------------------
 
@@ -49,6 +46,8 @@ KeyboardHandler.h
 Mask.h
 MouseButton.h
 MouseHandler.h
+SingleSwitch.h
+SwitchGroup.h
 WindowHandler.h
 
 commands/CommandList.cpp
@@ -62,4 +61,5 @@ CameraHandler.cpp
 KeyBinding.cpp
 KeyboardHandler.cpp
 MouseHandler.cpp
+SwitchGroup.cpp
 WindowHandler.cpp

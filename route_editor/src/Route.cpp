@@ -139,8 +139,7 @@ bool Route::load_route_map()
 
         if (iss >> label >> translation >> rotation)
         {
-            context.route_map.emplace(std::move(label),
-                RouteMapTransformation{translation, rotation});
+            context.route_map[label].emplace_back(RouteMapTransformation{translation, rotation});
         }
     }
 
@@ -149,7 +148,7 @@ bool Route::load_route_map()
 
 void Route::load_static_objects(const PagedLodMap& paged_lods)
 {
-    for (const auto& [label, transform] : context.route_map)
+    for (const auto& [label, transforms] : context.route_map)
     {
         const auto paged_lod_it = paged_lods.find(label);
         if (paged_lod_it == paged_lods.cend())
@@ -157,10 +156,13 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
             continue;
         }
 
-        const auto object = RouteObject::create(context, paged_lod_it->second,
-            label, transform.translation, -transform.rotation);
+        for (const auto& transform : transforms)
+        {
+            const auto object = RouteObject::create(context, paged_lod_it->second,
+                label, transform.translation, -transform.rotation);
 
-        this->addChild(vsg::MASK_ALL, object);
+            this->addChild(vsg::MASK_ALL, object);
+        }
     }
 }
 

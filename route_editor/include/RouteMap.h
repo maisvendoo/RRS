@@ -1,10 +1,11 @@
 #ifndef ROUTE_MAP_H
 #define ROUTE_MAP_H
 
+#include <vsg/maths/vec3.h>
+
 #include <map>
 #include <string>
-
-#include <vsg/maths/vec3.h>
+#include <vector>
 
 struct RouteMapTransformation
 {
@@ -12,6 +13,6 @@ struct RouteMapTransformation
     vsg::vec3 rotation;
 };
 
-using RouteMap = std::multimap<std::string, RouteMapTransformation>;
+using RouteMap = std::map<std::string, std::vector<RouteMapTransformation>>;
 
 #endif // ROUTE_MAP_H

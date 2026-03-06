@@ -264,26 +264,29 @@ void EditorGui::show_route_map() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, transform] : context.route_map)
+        for (const auto& [label, transforms] : context.route_map)
         {
-            const vsg::vec3 translation = transform.translation;
-            const vsg::vec3 rotation_deg = transform.rotation;
+            for (const auto& transform : transforms)
+            {
+                const vsg::vec3 translation = transform.translation;
+                const vsg::vec3 rotation_deg = transform.rotation;
 
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("%s", label.c_str());
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.x);
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.y);
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.z);
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", rotation_deg.x);
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", rotation_deg.y);
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", rotation_deg.z);
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", label.c_str());
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", translation.x);
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", translation.y);
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", translation.z);
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", rotation_deg.x);
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", rotation_deg.y);
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", rotation_deg.z);
+            }
         }
 
         ImGui::EndTable();
