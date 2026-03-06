@@ -44,12 +44,10 @@ void SelectObjectsCommand::undo() const
     context.gizmo->update_visibility();
 }
 
-std::string SelectObjectsCommand::to_string() const
+void SelectObjectsCommand::update_description()
 {
-    char buffer[128];
-    std::snprintf(buffer, 128,
+    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Select objects: to select: %zu objects\n"
         "                to deselect: %zu objects",
         objects_to_select.size(), objects_to_deselect.size());
-    return buffer;
 }

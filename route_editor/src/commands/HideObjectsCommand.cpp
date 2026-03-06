@@ -4,7 +4,6 @@
 #include "RouteObject.h"
 
 #include <cstdio>
-#include <string>
 
 HideObjectsCommand::HideObjectsCommand(EditorContext& context)
     : Command(context)
@@ -37,12 +36,10 @@ void HideObjectsCommand::undo() const
     }
 }
 
-std::string HideObjectsCommand::to_string() const
+void HideObjectsCommand::update_description()
 {
-    char buffer[128];
-    std::snprintf(buffer, 128,
+    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Hide objects: to hide: %zu objects\n"
         "              to show: %zu objects",
         objects_to_hide.size(), objects_to_show.size());
-    return buffer;
 }

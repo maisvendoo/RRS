@@ -126,6 +126,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
                 new SelectObjectsCommand(context);
 
             select_objects_command->objects_to_deselect = selected_objects;
+            select_objects_command->update_description();
 
             context.commands.push(select_objects_command, true);
         }
@@ -451,6 +452,8 @@ void ObjectSelector::select_object(RouteObject* object)
             objects_to_deselect = selected_objects;
         }
     }
+
+    select_objects_command->update_description();
 
     context.commands.push(select_objects_command, true);
 }

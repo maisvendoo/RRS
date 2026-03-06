@@ -4,8 +4,6 @@
 #include "Command.h"
 #include "RouteObject.h"
 
-#include <string>
-
 struct EditorContext;
 
 class HideObjectsCommand : public Command
@@ -15,7 +13,7 @@ public:
     virtual ~HideObjectsCommand() override = default;
     virtual void execute() const override;
     virtual void undo() const override;
-    virtual std::string to_string() const override;
+    virtual void update_description() override;
 
 public:
     RouteObjects objects_to_hide;

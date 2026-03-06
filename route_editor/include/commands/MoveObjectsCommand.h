@@ -6,8 +6,6 @@
 
 #include <vsg/maths/vec3.h>
 
-#include <string>
-
 struct EditorContext;
 
 class MoveObjectsCommand : public Command
@@ -17,7 +15,7 @@ public:
     virtual ~MoveObjectsCommand() override = default;
     virtual void execute() const override;
     virtual void undo() const override;
-    virtual std::string to_string() const override;
+    virtual void update_description() override;
 
 private:
     const RouteObjects objects;

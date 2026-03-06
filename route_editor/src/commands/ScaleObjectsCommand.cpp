@@ -7,7 +7,6 @@
 #include <vsg/maths/vec3.h>
 
 #include <cstdio>
-#include <string>
 
 ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context,
     vsg::vec3 pivot, vsg::vec3 scale)
@@ -16,6 +15,7 @@ ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context,
     , pivot(pivot)
     , scale(scale)
 {
+    update_description();
 }
 
 void ScaleObjectsCommand::execute() const
@@ -38,12 +38,10 @@ void ScaleObjectsCommand::undo() const
     }
 }
 
-std::string ScaleObjectsCommand::to_string() const
+void ScaleObjectsCommand::update_description()
 {
-    char buffer[128];
-    std::snprintf(buffer, 128,
+    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Scale objects: pivot = { %10.3f, %10.3f, %10.3f }\n"
         "               scale = { %10.3f, %10.3f, %10.3f }",
         pivot.x, pivot.y, pivot.z, scale.x, scale.y, scale.z);
-    return buffer;
 }

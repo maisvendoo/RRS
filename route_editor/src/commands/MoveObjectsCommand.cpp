@@ -7,7 +7,6 @@
 #include <vsg/maths/vec3.h>
 
 #include <cstdio>
-#include <string>
 
 MoveObjectsCommand::MoveObjectsCommand(
     EditorContext& context,
@@ -17,6 +16,7 @@ MoveObjectsCommand::MoveObjectsCommand(
     , objects(context.selected_objects)
     , translation(translation)
 {
+    update_description();
 }
 
 void MoveObjectsCommand::execute() const
@@ -35,10 +35,9 @@ void MoveObjectsCommand::undo() const
     }
 }
 
-std::string MoveObjectsCommand::to_string() const
+void MoveObjectsCommand::update_description()
 {
-    char buffer[64];
-    std::snprintf(buffer, 64, "Move objects: { %10.3f, %10.3f, %10.3f }",
+    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
+        "Move objects: { %10.3f, %10.3f, %10.3f }",
         translation.x, translation.y, translation.z);
-    return buffer;
 }

@@ -7,7 +7,6 @@
 #include <vsg/maths/vec3.h>
 
 #include <cstdio>
-#include <string>
 
 RotateObjectsCommand::RotateObjectsCommand(EditorContext& context,
     vsg::vec3 pivot, vsg::vec3 rotation_deg)
@@ -16,6 +15,7 @@ RotateObjectsCommand::RotateObjectsCommand(EditorContext& context,
     , pivot(pivot)
     , rotation_deg(rotation_deg)
 {
+    update_description();
 }
 
 void RotateObjectsCommand::execute() const
@@ -34,13 +34,11 @@ void RotateObjectsCommand::undo() const
     }
 }
 
-std::string RotateObjectsCommand::to_string() const
+void RotateObjectsCommand::update_description()
 {
-    char buffer[256];
-    std::snprintf(buffer, 256,
+    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Rotate objects: pivot = { %10.3f, %10.3f, %10.3f }\n"
         "                rotation_deg = { %10.3f, %10.3f, %10.3f }",
         pivot.x, pivot.y, pivot.z,
         rotation_deg.x, rotation_deg.y, rotation_deg.z);
-    return buffer;
 }

@@ -117,12 +117,12 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 if (curr == active)
                 {
-                    ImGui::Text("--> %s", curr->command->to_string().c_str());
+                    ImGui::Text("--> %s", curr->command->get_description());
                     ImGui::Separator();
                 }
                 else
                 {
-                    ImGui::Text("%s", curr->command->to_string().c_str());
+                    ImGui::Text("%s", curr->command->get_description());
                     ImGui::Separator();
                 }
 
