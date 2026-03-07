@@ -151,7 +151,7 @@ void MapWidget::resetSwitchMenu()
 //------------------------------------------------------------------------------
 void MapWidget::paintEvent(QPaintEvent *event)
 {
-    QWidget::paintEvent(event);
+    (void)event;
 
     if ((traj_list == nullptr) || (conn_list == nullptr))
     {

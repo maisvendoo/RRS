@@ -23,9 +23,9 @@ BackGroundWidget::~BackGroundWidget()
 //------------------------------------------------------------------------------
 void BackGroundWidget::paintEvent(QPaintEvent *event)
 {
-    QWidget::paintEvent(event);
+    (void)event;
 
-    QPainter painter(this);
+    QPainter painter;
     painter.begin(this);
 
     // Серый фон
@@ -44,7 +44,7 @@ void BackGroundWidget::paintEvent(QPaintEvent *event)
     // Ближайшая к курсору стрелка
     if (!drawSwitchHighlight(painter, nearest_switch, nearest_switch_dir, color_nearest))
     {
-        // Или ближайшая к курсору траетория
+        // Или ближайшая к курсору траектория
         if (nearest_trajectory != route_begin_trajectory)
         {
             drawTrajectoryHighlight(painter, nearest_trajectory, color_nearest);
