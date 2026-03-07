@@ -161,24 +161,6 @@ private:
 
     std::pair<Trajectory*, dir_t> deserialize_connected_trajectory(QDataStream &stream,
                                                                    traj_list_t &traj_list);
-
-    struct traj_xml_nodes_t
-    {
-        Switch_way_t way;
-        QString normal_trajectory_node_name;
-        QString reversed_trajectory_node_name;
-        traj_xml_nodes_t(Switch_way_t w, QString n, QString r)
-            : way(w)
-            , normal_trajectory_node_name(n)
-            , reversed_trajectory_node_name(r){}
-    };
-    inline static const traj_xml_nodes_t traj_xml_nodes[] =
-    {
-        traj_xml_nodes_t(SW_FWD_PLUS, QString("fwdPlusTraj"), QString("fwdPlusTrajReversed")),
-        traj_xml_nodes_t(SW_FWD_MINUS, QString("fwdMinusTraj"), QString("fwdMinusTrajReversed")),
-        traj_xml_nodes_t(SW_BWD_PLUS, QString("bwdPlusTraj"), QString("bwdPlusTrajReversed")),
-        traj_xml_nodes_t(SW_BWD_MINUS, QString("bwdMinusTraj"), QString("bwdMinusTrajReversed"))
-    };
 };
 
 #endif // SWITCH_H
