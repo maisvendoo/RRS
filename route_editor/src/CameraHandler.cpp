@@ -5,11 +5,11 @@
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
 #include "Settings.h"
-#include "WindowHandler.h"
 
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/ViewMatrix.h>
+#include <vsg/app/Window.h>
 #include <vsg/commands/Commands.h>
 #include <vsg/core/Array.h>
 #include <vsg/core/Data.h>
@@ -21,12 +21,12 @@
 #include <vsg/nodes/VertexIndexDraw.h>
 #include <vsg/state/ViewportState.h>
 #include <vsg/ui/ApplicationEvent.h>
-#include <vsg/ui/FrameStamp.h>
+#include <vsg/ui/PointerEvent.h>
+#include <vsg/ui/ScrollWheelEvent.h>
 
 #include <vulkan/vulkan_core.h>
 
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <cstdint>
 
@@ -35,11 +35,13 @@ using vec3_array_type = vsg::Array<CameraHandler::vec3_type>;
 using perspective_value_type = decltype(vsg::Perspective::fieldOfViewY);
 using look_at_value_type = decltype(vsg::LookAt::eye.x);
 using look_at_vec3_type = vsg::t_vec3<look_at_value_type>;
-using time_type = decltype(vsg::FrameEvent::frameStamp->simulationTime);
 
 static vsg::ref_ptr<vsg::Commands> create_quad(
-    const CameraHandler::vec3_type& p0, const CameraHandler::vec3_type& p1,
-    const CameraHandler::vec3_type& p2, const CameraHandler::vec3_type& p3)
+    const CameraHandler::vec3_type& p0,
+    const CameraHandler::vec3_type& p1,
+    const CameraHandler::vec3_type& p2,
+    const CameraHandler::vec3_type& p3
+)
 {
     const auto vertices = vec3_array_type::create({p0, p1, p2, p3});
 
@@ -60,37 +62,28 @@ static vsg::ref_ptr<vsg::Commands> create_quad(
     return commands;
 }
 
-CameraHandler::CameraHandler(const EditorContext& context)
+CameraHandler::CameraHandler(EditorContext& context)
     : context(context)
 {
-    const VkExtent2D& window_extent = context.window_handler->get_window()->extent2D();
+    const settings_t& settings = context.settings;
+    const VkExtent2D window_extent = context.window->extent2D();
 
-    const auto fovy = static_cast<perspective_value_type>(context.settings.fovy);
+    context.perspective = vsg::Perspective::create(
+        static_cast<perspective_value_type>(settings.fovy),
+        static_cast<perspective_value_type>(window_extent.width) /
+            static_cast<perspective_value_type>(window_extent.height),
+        static_cast<perspective_value_type>(settings.zNear),
+        static_cast<perspective_value_type>(settings.view_distance));
 
-    const auto window_width = static_cast<perspective_value_type>(
-        window_extent.width);
+    const look_at_value_type initial_height =
+        static_cast<look_at_value_type>(settings.camera_initial_height);
 
-    const auto window_height = static_cast<perspective_value_type>(
-        window_extent.height);
+    context.look_at = vsg::LookAt::create(
+        vsg::dvec3(0.0, 0.0, initial_height),
+        vsg::dvec3(0.0, 1.0, initial_height),
+        vsg::dvec3(0.0, 0.0, 1.0));
 
-    const perspective_value_type aspect_ratio = window_width / window_height;
-
-    const auto near_distance = static_cast<perspective_value_type>(
-        context.settings.zNear);
-
-    const auto far_distance = static_cast<perspective_value_type>(
-        context.settings.view_distance);
-
-    perspective = vsg::Perspective::create(fovy, aspect_ratio,
-        near_distance, far_distance);
-
-    const auto initial_height = static_cast<look_at_value_type>(
-        context.settings.camera_initial_height);
-
-    look_at = vsg::LookAt::create();
-    look_at->eye.z = look_at->center.z = initial_height;
-
-    camera = vsg::Camera::create(perspective, look_at,
+    context.camera = vsg::Camera::create(context.perspective, context.look_at,
         vsg::ViewportState::create(window_extent));
 
     calculate_front();
@@ -98,151 +91,126 @@ CameraHandler::CameraHandler(const EditorContext& context)
     calculate_up();
 }
 
-void CameraHandler::apply(vsg::FrameEvent& frame)
+void CameraHandler::apply(vsg::MoveEvent& moveEvent)
 {
-    static time_type prev_time = frame.frameStamp->simulationTime;
-
-    const time_type time = frame.frameStamp->simulationTime;
-    const time_type delta_time = time - prev_time;
-
-    prev_time = time;
+    if (moveEvent.handled)
+    {
+        return;
+    }
 
     if (context.mouse_handler->get_is_rmb_pressed())
     {
-        const auto delta_mouse_pos = static_cast<vec2_type>(
+        const vec2_type delta_mouse_pos = static_cast<vec2_type>(
             context.mouse_handler->get_delta_pos());
 
-        const auto rotate_speed = static_cast<value_type>(
-            context.settings.camera_rotate_speed);
+        const value_type rotate_speed =
+            static_cast<value_type>(context.settings.camera_rotate_speed) *
+            static_cast<value_type>(context.delta_time);
 
-        yaw_deg += delta_mouse_pos.x * rotate_speed *
-            static_cast<value_type>(delta_time);
+        yaw_deg += delta_mouse_pos.x * rotate_speed;
 
-        pitch_deg -= delta_mouse_pos.y * rotate_speed *
-            static_cast<value_type>(delta_time);
-
-        const auto pitch_min = static_cast<value_type>(context.settings.pitch_min);
-        const auto pitch_max = static_cast<value_type>(context.settings.pitch_max);
-
-        pitch_deg = std::clamp(pitch_deg, pitch_min, pitch_max);
+        pitch_deg = std::clamp(
+            pitch_deg - delta_mouse_pos.y * rotate_speed,
+            static_cast<value_type>(-89.0f),
+            static_cast<value_type>(89.0f));
 
         calculate_front();
         calculate_right();
         calculate_up();
     }
+}
 
-    if (const auto scroll = static_cast<perspective_value_type>(
-        context.mouse_handler->get_scroll()))
+void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
+{
+    if (scrollWheel.handled)
     {
-        const auto zoom_power = static_cast<perspective_value_type>(
-            context.settings.camera_zoom_power);
-
-        perspective->fieldOfViewY -= scroll * zoom_power *
-            static_cast<perspective_value_type>(delta_time);
-
-        const auto fovy_min = static_cast<perspective_value_type>(
-            context.settings.fovy_min);
-
-        const auto fovy_max = static_cast<perspective_value_type>(
-            context.settings.fovy_max);
-
-        perspective->fieldOfViewY = std::clamp(perspective->fieldOfViewY,
-            fovy_min, fovy_max);
+        return;
     }
 
-    const auto get_binding_state = [this](Action action) -> int
+    const settings_t& settings = context.settings;
+
+    const perspective_value_type zoom_power =
+        static_cast<perspective_value_type>(settings.camera_zoom_power) *
+        static_cast<perspective_value_type>(context.delta_time);
+
+    const auto perspective = context.perspective;
+
+    perspective->fieldOfViewY = std::clamp(
+        perspective->fieldOfViewY - scrollWheel.delta.y * zoom_power,
+        static_cast<perspective_value_type>(settings.fovy_min),
+        static_cast<perspective_value_type>(settings.fovy_max));
+}
+
+void CameraHandler::apply(vsg::FrameEvent& frame)
+{
+    (void)frame;
+
+    const auto look_at = context.look_at;
+
+    const look_at_vec3_type front =
+        static_cast<look_at_vec3_type>(this->front);
+
+    const look_at_vec3_type right =
+            static_cast<look_at_vec3_type>(this->right);
+
+    const look_at_value_type move_speed =
+        static_cast<look_at_value_type>(context.settings.camera_move_speed) *
+        static_cast<look_at_value_type>(context.delta_time);
+
+    const auto keyboard_handler = context.keyboard_handler;
+
+    const auto get_binding_state = [keyboard_handler](Action action) -> int
     {
-        return static_cast<int>(context.keyboard_handler->get_binding_state(action));
+        return static_cast<int>(keyboard_handler->get_binding_state(action));
     };
 
-    const int move_forward = get_binding_state(ACTION_MOVE_CAMERA_FORWARD);
-    const int move_backward = get_binding_state(ACTION_MOVE_CAMERA_BACKWARD);
-    const int move_left = get_binding_state(ACTION_MOVE_CAMERA_LEFT);
-    const int move_right = get_binding_state(ACTION_MOVE_CAMERA_RIGHT);
+    look_at->eye += front * move_speed * static_cast<look_at_value_type>(
+        get_binding_state(ACTION_MOVE_CAMERA_FORWARD) -
+        get_binding_state(ACTION_MOVE_CAMERA_BACKWARD));
 
-    const auto front = static_cast<look_at_vec3_type>(this->front);
-    const auto right = static_cast<look_at_vec3_type>(this->right);
-
-    const auto move_speed = static_cast<look_at_value_type>(
-        context.settings.camera_move_speed);
-
-    if (move_forward - move_backward != 0)
-    {
-        const look_at_vec3_type front_movememt = front * move_speed *
-            static_cast<look_at_value_type>(delta_time) *
-            static_cast<look_at_value_type>(move_forward - move_backward);
-
-        look_at->eye += front_movememt;
-    }
-
-    if (move_right - move_left != 0)
-    {
-        const look_at_vec3_type right_movement = right * move_speed *
-            static_cast<look_at_value_type>(delta_time) *
-            static_cast<look_at_value_type>(move_right - move_left);
-
-        look_at->eye += right_movement;
-    }
+    look_at->eye += right * move_speed * static_cast<look_at_value_type>(
+        get_binding_state(ACTION_MOVE_CAMERA_RIGHT) -
+        get_binding_state(ACTION_MOVE_CAMERA_LEFT));
 
     look_at->center = look_at->eye + front;
 }
 
-vsg::ref_ptr<vsg::Perspective> CameraHandler::get_perspective() const
-{
-    return perspective;
-}
-
-vsg::ref_ptr<vsg::LookAt> CameraHandler::get_look_at() const
-{
-    return look_at;
-}
-
-vsg::ref_ptr<vsg::Camera> CameraHandler::get_camera() const
-{
-    return camera;
-}
-
-double& CameraHandler::get_fov_deg() const
-{
-    return perspective->fieldOfViewY;
-}
-
-vsg::dvec3& CameraHandler::get_eye() const
-{
-    return look_at->eye;
-}
-
-CameraHandler::vec3_type CameraHandler::get_front() const
+const CameraHandler::vec3_type& CameraHandler::get_front() const
 {
     return front;
 }
 
-CameraHandler::vec3_type CameraHandler::get_right() const
+const CameraHandler::vec3_type& CameraHandler::get_right() const
 {
     return right;
 }
 
-CameraHandler::vec3_type CameraHandler::get_up() const
+const CameraHandler::vec3_type& CameraHandler::get_up() const
 {
     return up;
 }
 
-vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(vec3_type point,
-    vec3_type* up_out) const
+// Create plane perpedicular to camera normal and passing through
+// specified point to test for intersections
+vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
+    const vec3_type& point,
+    vec3_type* up_out
+) const
 {
-    const auto camera_pos = static_cast<vec3_type>(look_at->eye);
-    const auto angle_rad = vsg::radians(static_cast<value_type>(80));
+    constexpr value_type angle_rad = vsg::radians(static_cast<value_type>(80));
+
+    const vec3_type camera_pos = static_cast<vec3_type>(context.look_at->eye);
 
     const auto get_dir = [&](int yaw_dir, int pitch_dir) -> vec3_type
     {
-        const auto yaw_angle_rad = angle_rad *
+        const value_type yaw_angle_rad = angle_rad *
             static_cast<value_type>(yaw_dir);
 
-        const auto pitch_angle_rad = angle_rad *
+        const value_type pitch_angle_rad = angle_rad *
             static_cast<value_type>(pitch_dir);
 
-        return vsg::normalize(front * vsg::rotate(yaw_angle_rad, up) *
-            vsg::rotate(-pitch_angle_rad, right));
+        return vsg::rotate(yaw_angle_rad, up) *
+            vsg::rotate(-pitch_angle_rad, right) * front;
     };
 
     const vec3_type p0_dir = get_dir(-1, -1);
@@ -255,7 +223,7 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(vec3_type point,
     const value_type camera_norm_length = vsg::length(camera_to_point) *
         vsg::dot(front, vsg::normalize(camera_to_point));
 
-    const value_type dist = camera_norm_length / vsg::dot(p0_dir, front);
+    const value_type dist = camera_norm_length / vsg::dot(front, p0_dir);
 
     const vsg::vec3 p0 = camera_pos + p0_dir * dist;
     const vsg::vec3 p1 = camera_pos + p1_dir * dist;
@@ -275,16 +243,17 @@ void CameraHandler::calculate_front()
     const value_type yaw_rad = vsg::radians(yaw_deg);
     const value_type pitch_rad = vsg::radians(pitch_deg);
 
-    front = vsg::normalize(vec3_type{
+    front = vsg::normalize(vec3_type(
         std::sin(yaw_rad) * std::cos(pitch_rad),
         std::cos(yaw_rad) * std::cos(pitch_rad),
         std::sin(pitch_rad)
-    });
+    ));
 }
 
 void CameraHandler::calculate_right()
 {
-    const auto world_up = static_cast<vec3_type>(look_at->up);
+    const vec3_type world_up = static_cast<vec3_type>(context.look_at->up);
+
     right = vsg::normalize(vsg::cross(front, world_up));
 }
 

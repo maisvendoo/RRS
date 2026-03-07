@@ -7,9 +7,10 @@
 #include <cstdio>
 #include <string>
 
-ScaleObjectsCommand::ScaleObjectsCommand(const RouteObjects& objects,
+ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context, const RouteObjects& objects,
     vsg::vec3 pivot, vsg::vec3 scale)
-    : objects(objects)
+    : Command(context)
+    , objects(objects)
     , pivot(pivot)
     , scale(scale)
 {

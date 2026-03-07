@@ -35,16 +35,10 @@
         <InitialHeight>5.0</InitialHeight>
         <!-- Скорость перемещения камеры -->
         <MoveSpeed>100.0</MoveSpeed>
-        <MinMoveSpeed>10.0</MinMoveSpeed>
-        <MaxMoveSpeed>200.0</MaxMoveSpeed>
         <!-- Скорость вращения камеры -->
-        <RotateSpeed>20.0</RotateSpeed>
-        <MinRotateSpeed>10.0</MinRotateSpeed>
-        <MaxRotateSpeed>25.0</MaxRotateSpeed>
+        <RotateSpeed>3.0</RotateSpeed>
         <!-- Сила приближения/отдаления камеры -->
         <ZoomPower>250.0</ZoomPower>
-        <MinZoomPower>50.0</MinZoomPower>
-        <MaxZoomPower>500.0</MaxZoomPower>
     </Camera>
     <!-- Настройки гизмо -->
     <Gizmo>
@@ -83,7 +77,7 @@
         <!-- Отображать привязки клавиш и кнопок управления -->
         <ShowControls>1</ShowControls>
         <!-- Отображать настройки камеры -->
-        <ShowCameraSettings>0</ShowCameraSettings>
+        <ShowCameraSettings>1</ShowCameraSettings>
         <!-- Отображать топологию -->
         <ShowTopology>0</ShowTopology>
     </GUI>

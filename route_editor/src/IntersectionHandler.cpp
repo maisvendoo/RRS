@@ -14,7 +14,7 @@
 #include <cassert>
 
 IntersectionHandler::IntersectionHandler(const EditorContext& context)
-    : camera(*context.camera_handler->get_camera())
+    : context(context)
 {
 }
 
@@ -29,7 +29,7 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
     {
         case MOUSE_BUTTON_LEFT:
         {
-            lmb_intersector = LSIntersector::create(camera,
+            lmb_intersector = LSIntersector::create(*context.camera,
                 buttonPress.x, buttonPress.y);
 
             lmb_intersector->traversalMask = MASK_CLICKABLE;
@@ -38,7 +38,7 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
         }
         case MOUSE_BUTTON_MIDDLE:
         {
-            mmb_intersector = LSIntersector::create(camera,
+            mmb_intersector = LSIntersector::create(*context.camera,
                 buttonPress.x, buttonPress.y);
 
             mmb_intersector->traversalMask = MASK_CLICKABLE;
@@ -47,7 +47,7 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
         }
         case MOUSE_BUTTON_RIGHT:
         {
-            rmb_intersector = LSIntersector::create(camera,
+            rmb_intersector = LSIntersector::create(*context.camera,
                 buttonPress.x, buttonPress.y);
 
             rmb_intersector->traversalMask = MASK_CLICKABLE;
@@ -97,12 +97,12 @@ LSIntersectorRefPtr IntersectionHandler::apply_(
 ) const
 {
 
-    return LSIntersector::create(camera, moveEvent.x, moveEvent.y);
+    return LSIntersector::create(*context.camera, moveEvent.x, moveEvent.y);
 }
 
 LSIntersectorRefPtr IntersectionHandler::apply_(vsg::ivec2 mouse_pos) const
 {
-    return LSIntersector::create(camera, mouse_pos.x, mouse_pos.y);
+    return LSIntersector::create(*context.camera, mouse_pos.x, mouse_pos.y);
 }
 
 LSIntersectorRefPtr IntersectionHandler::get_lmb_intersector() const

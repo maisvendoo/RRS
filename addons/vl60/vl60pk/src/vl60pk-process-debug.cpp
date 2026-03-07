@@ -209,12 +209,12 @@ void VL60pk::debugPrint(const simulator_time_t& t, const double& dt)
     {
         QString auto_mode = "";
 
-        if (controller[CAB1]->isReversHandle() && autopilot[CAB1]->isActive())
+        if (controller[CAB1]->isReversHandle())
         {
             auto_mode = autopilot[CAB1]->getDbgMsg();
         }
 
-        if (controller[CAB2]->isReversHandle() && autopilot[CAB2]->isActive())
+        if (controller[CAB2]->isReversHandle())
         {
             auto_mode = autopilot[CAB2]->getDbgMsg();
         }

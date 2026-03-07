@@ -9,57 +9,49 @@
 
 struct settings_t
 {
+    settings_t();
+
     void read(const std::string& cfg_path);
 
-    std::string window_title = "Route Editor";
+    std::string window_title;
 
-    int window_x = 50;            ///< Window horizontal position
-    int window_y = 50;            ///< Window vertical position
-    int window_width = 1280;      ///< Window width
-    int window_height = 720;      ///< Window height
-    int screen_number = 0;        ///< Screen number
-    bool fullscreen = false;      ///< Fullscreen flag
-    bool vsync = true;            ///< Vertical sync flag
-    bool double_buffer = true;    ///< Double buffering flag
-    int samples = 1;              ///< Number of antialiasing samples
+    int window_x;          ///< Window horizontal position
+    int window_y;          ///< Window vertical position
+    int window_width;      ///< Window width
+    int window_height;     ///< Window height
+    int screen_number;     ///< Screen number
+    bool fullscreen;       ///< Fullscreen flag
+    bool vsync;            ///< Vertical sync flag
+    bool double_buffer;    ///< Double buffering flag
+    int samples;           ///< Number of antialiasing samples
 
-    double zNear = 0.1;               ///< Near clip plane
-    double view_distance = 2000.0;    ///< View distance
-    double fovy = 64.0;               ///< Vertical view angle
-    double fovy_min = 2.0;            ///< Vertical view angle min
-    double fovy_max = 100.0;          ///< Vertical view angle max
-    double pitch_min = -70.0;         ///< Vertical angle down max
-    double pitch_max = 70.0;          ///< Vertical angle up max
+    float zNear;            ///< Near clip plane
+    float view_distance;    ///< View distance
+    float fovy;             ///< Vertical view angle
+    float fovy_min;         ///< Vertical view angle min
+    float fovy_max;         ///< Vertical view angle max
 
-    double camera_initial_height = 0.0;
+    double camera_initial_height;
 
-    double camera_move_speed = 100.0;
-    double min_camera_move_speed = 50.0;
-    double max_camera_move_speed = 200.0;
+    double camera_move_speed;
+    double camera_rotate_speed;
+    double camera_zoom_power;
 
-    double camera_rotate_speed = 10.0;
-    double min_camera_rotate_speed = 10.0;
-    double max_camera_rotate_speed = 25.0;
+    float gizmo_arrow_length;
+    float gizmo_arrow_thickness;
+    vsg::vec3 gizmo_arrow_x_color;
+    vsg::vec3 gizmo_arrow_y_color;
+    vsg::vec3 gizmo_arrow_z_color;
+    float gizmo_opacity;
+    bool gizmo_to_center;
 
-    double camera_zoom_power = 100.0;
-    double min_camera_zoom_power = 50.0;
-    double max_camera_zoom_power = 200.0;
-
-    float gizmo_arrow_length = 5.0f;
-    float gizmo_arrow_thickness = 0.1f;
-    vsg::vec3 gizmo_arrow_x_color = {1.0f, 0.0f, 0.0f};
-    vsg::vec3 gizmo_arrow_y_color = {0.0f, 1.0f, 0.0f};
-    vsg::vec3 gizmo_arrow_z_color = {0.0f, 0.0f, 1.0f};
-    float gizmo_opacity = 1.0f;
-    bool gizmo_to_center = false;
-
-    double gui_font_size = 20.0;
-    bool is_gui_editable = false;
-    bool show_objects_ref = true;
-    bool show_route_map = false;
-    bool show_controls = true;
-    bool show_camera_settings = false;
-    bool show_topology = false;
+    double gui_font_size;
+    bool is_gui_editable;
+    bool show_objects_ref;
+    bool show_route_map;
+    bool show_controls;
+    bool show_camera_settings;
+    bool show_topology;
 
     KeyBindings key_bindings;
 };

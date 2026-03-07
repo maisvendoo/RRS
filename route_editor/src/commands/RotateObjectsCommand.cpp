@@ -7,9 +7,10 @@
 #include <cstdio>
 #include <string>
 
-RotateObjectsCommand::RotateObjectsCommand(const RouteObjects& objects,
+RotateObjectsCommand::RotateObjectsCommand(EditorContext& context, const RouteObjects& objects,
     vsg::vec3 pivot, vsg::vec3 rotation_deg)
-    : objects(objects)
+    : Command(context)
+    , objects(objects)
     , pivot(pivot)
     , rotation_deg(rotation_deg)
 {

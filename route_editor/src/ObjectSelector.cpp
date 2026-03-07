@@ -29,12 +29,12 @@
 ObjectSelector::ObjectSelector(EditorContext& context)
     : context(context)
 {
-    gizmo = Gizmo::create(context);
+    context.gizmo = Gizmo::create(context);
 
     front_plane_switch = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
 
-    context.scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo);
+    context.scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, context.gizmo);
     context.scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, front_plane_switch);
 }
 
@@ -100,7 +100,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
-    if (!selected_objects.empty() && gizmo->handle_intersections())
+    if (!selected_objects.empty() && context.gizmo->handle_intersections())
     {
         return;
     }
@@ -123,7 +123,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
             !context.keyboard_handler->get_any_shift_state())
         {
             context.commands.push(
-                new SelectObjectsCommand({}, selected_objects), true);
+                new SelectObjectsCommand(context, {}, selected_objects), true);
         }
 
         return;
@@ -153,12 +153,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
-    gizmo->apply(buttonRelease);
+    context.gizmo->apply(buttonRelease);
 }
 
 void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
-    gizmo->apply(moveEvent);
+    context.gizmo->apply(moveEvent);
 
     const auto front_plane = front_plane_switch->node;
     if (!front_plane)
@@ -400,11 +400,11 @@ void ObjectSelector::select_object(RouteObject* object)
     {
         if (object->get_is_selected())
         {
-            context.commands.push(new SelectObjectsCommand({}, {object}), true);
+            context.commands.push(new SelectObjectsCommand(context, {}, {object}), true);
         }
         else
         {
-            context.commands.push(new SelectObjectsCommand({object}, {}), true);
+            context.commands.push(new SelectObjectsCommand(context, {object}, {}), true);
         }
     }
     else
@@ -413,7 +413,7 @@ void ObjectSelector::select_object(RouteObject* object)
 
         if (selected_objects.empty())
         {
-            context.commands.push(new SelectObjectsCommand({object}, {}), true);
+            context.commands.push(new SelectObjectsCommand(context, {object}, {}), true);
         }
         else if (object->get_is_selected())
         {
@@ -434,12 +434,12 @@ void ObjectSelector::select_object(RouteObject* object)
                 }
             }
 
-            context.commands.push(new SelectObjectsCommand(
+            context.commands.push(new SelectObjectsCommand(context,
                 {}, std::move(objects_to_deselect)), true);
         }
         else
         {
-            context.commands.push(new SelectObjectsCommand(
+            context.commands.push(new SelectObjectsCommand(context,
                 {object}, selected_objects), true);
         }
     }
@@ -450,7 +450,7 @@ void ObjectSelector::confirm_keyboard_move()
     state = State::INITIAL;
     front_plane_switch->node = nullptr;
 
-    context.commands.push(new MoveObjectsCommand(context.selected_objects,
+    context.commands.push(new MoveObjectsCommand(context, context.selected_objects,
         total_translation), false);
 }
 

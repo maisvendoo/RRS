@@ -28,7 +28,7 @@ public:
     const CommandNode* get_tail() const;
 
 private:
-    void push_inner(const Command* command, bool execute);
+    void push_(const Command* command, bool execute);
 
 private:
     CommandNode* tail = nullptr;

@@ -1,6 +1,5 @@
 #include "Outline.h"
 
-#include "Settings.h"
 #include "filesystem.h"
 #include "shader_funcs.h"
 
@@ -28,64 +27,8 @@
 
 #include <cassert>
 
-const settings_t* Outline::s_settings = nullptr;
-
-struct OutlineStatic
-{
-    OutlineStatic();
-
-    vsg::ref_ptr<vsg::Options> options;
-    vsg::Builder builder;
-};
-
-Outline::Outline(vsg::ref_ptr<vsg::PagedLOD> paged_lod)
-    : paged_lod(paged_lod)
-{
-    assert(paged_lod);
-}
-
-void Outline::load(vsg::observer_ptr<vsg::Viewer> observer_viewer)
-{
-    if (box)
-    {
-        return;
-    }
-
-    if (!paged_lod->pending)
-    {
-        return;
-    }
-
-    static OutlineStatic outline_static;
-
-    vsg::ComputeBounds compute_bounds;
-    compute_bounds.useNodeBounds = false;
-    paged_lod->pending->accept(compute_bounds);
-
-    const vsg::GeometryInfo geometry_info(vsg::box(compute_bounds.bounds));
-
-    vsg::StateInfo state_info;
-    state_info.blending = true;
-    state_info.wireframe = true;
-
-    const auto viewer = observer_viewer.ref_ptr();
-    const auto compile_manager = viewer->compileManager;
-
-    box = outline_static.builder.createBox(geometry_info, state_info);
-
-    const auto compile_result = compile_manager->compile(box);
-
-    this->addChild(box);
-
-    vsg::updateViewer(*viewer, compile_result);
-}
-
-void Outline::set_settings(const settings_t* settings)
-{
-    s_settings = settings;
-}
-
-OutlineStatic::OutlineStatic()
+OutlineBuilder::OutlineBuilder(const EditorContext& context)
+    : context(context)
 {
     options = vsg::Options::create();
     options->sharedObjects = vsg::SharedObjects::create();
@@ -124,4 +67,24 @@ OutlineStatic::OutlineStatic()
         default_graphics_pipeline_states;
 
     builder.shaderSet = flat_shader;
+}
+
+vsg::ref_ptr<vsg::Node> OutlineBuilder::create_outline(vsg::ref_ptr<vsg::PagedLOD> paged_lod)
+{
+    if (!paged_lod->pending)
+    {
+        return nullptr;
+    }
+
+    vsg::ComputeBounds compute_bounds;
+    compute_bounds.useNodeBounds = false;
+    paged_lod->pending->accept(compute_bounds);
+
+    const vsg::GeometryInfo geometry_info(vsg::box(compute_bounds.bounds));
+
+    vsg::StateInfo state_info;
+    state_info.blending = true;
+    state_info.wireframe = true;
+
+    return builder.createBox(geometry_info, state_info);
 }
