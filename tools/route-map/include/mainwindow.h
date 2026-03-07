@@ -87,6 +87,8 @@ private:
 
     void updatePlayers();
 
+    void closeEvent(QCloseEvent *event);
+
 private slots:
 
     void slotConnectedToSimulator();

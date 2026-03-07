@@ -248,6 +248,21 @@ void MainWindow::updatePlayers()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (tcp_client != nullptr)
+    {
+        disconnect(tcp_client, nullptr, this, nullptr);
+        tcp_client->slotDisconnect();
+        tcp_client->deleteLater();
+    }
+
+    QMainWindow::closeEvent(event);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::slotConnectedToSimulator()
 {
     players_data = simulator_update_players_t();
