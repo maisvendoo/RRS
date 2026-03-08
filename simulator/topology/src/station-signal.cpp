@@ -462,8 +462,8 @@ void StationSignal::check_train_route()
         }
 
         // Занимаем траекторию маршрутом от данного светофора
-        lock = (lock_relay->getContactState(LR_PLUS_TRAIN_LOCKED) ||
-                (!is_shunt_route && lock_relay->getContactState(LR_MINUS_SHUNT_LOCKED)));
+        lock = (lock_relay->getPlusContactState(LR_PLUS_TRAIN_LOCKED) ||
+                ((!is_shunt_route) && lock_relay->getMinusContactState(LR_MINUS_SHUNT_LOCKED)));
         if (lock)
         {
             traj->setInRoute(true);
@@ -540,7 +540,7 @@ void StationSignal::check_train_route()
 
             // Продолжаем обход топологии для поездного маршрута,
             // замыкаем противошёрстный стрелочный перевод
-            lock = lock_relay->getContactState(LR_PLUS_TRAIN_LOCKED);
+            lock = lock_relay->getPlusContactState(LR_PLUS_TRAIN_LOCKED);
             if (cur_dir == FWD)
             {
                 if (!check_and_lock_switch_fwd(cur_conn, lock))
