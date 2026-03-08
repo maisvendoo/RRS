@@ -572,7 +572,7 @@ void MyGui::showTimetable() const
     float w = 500.0;
 
     ImGui::SetNextWindowSize(ImVec2(w, h));
-    ImGui::SetNextWindowPos(ImVec2(100, 300.0));
+    ImGui::SetNextWindowPos(ImVec2(0.0, 300.0));
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
