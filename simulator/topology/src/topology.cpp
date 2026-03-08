@@ -479,7 +479,9 @@ bool Topology::set_switchs_by_route(const route_segment_t& route/*, int dir*/)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Topology::open_route_signals(const route_segment_t& route, QStringList& sw_list, bool for_train)
+bool Topology::open_route_signals(const route_segment_t& route,
+                                  std::vector<std::pair<QString, int>>& sw_list,
+                                  bool for_train)
 {
     for (size_t i = 0; i < route.trajectories.size() - 1; ++i)
     {
@@ -510,13 +512,13 @@ bool Topology::open_route_signals(const route_segment_t& route, QStringList& sw_
             if (StationSignal* station_sig = dynamic_cast<StationSignal *>(signal))
             {
                 // Добавляем в список поездной светофор
-                sw_list.append(sw->getName());
+                sw_list.push_back({sw->getName(), dir});
             }
         }
         else
         {
             // Добавляем в список
-            sw_list.append(sw->getName());
+            sw_list.push_back({sw->getName(), dir});
         }
     }
     return true;
@@ -713,7 +715,7 @@ std::vector<std::vector<module_cfg_t>> Topology::load_topology_configs(QString r
 
     // Из папок trajectory-* загружаем все конфиги *.xml
     std::vector<std::vector<module_cfg_t>> all_modules;
-    for (auto name : traj_modules_dirs)
+    for (const auto& name : traj_modules_dirs)
     {
         if (name.isEmpty())
             continue;
@@ -723,7 +725,7 @@ std::vector<std::vector<module_cfg_t>> Topology::load_topology_configs(QString r
         QStringList cfg_files = traj_module_dir.entryList({"*.xml"}, QDir::Files);
 
         std::vector<module_cfg_t> all_cfgs;
-        for (auto cfg_name : cfg_files)
+        for (const auto& cfg_name : cfg_files)
         {
             if (cfg_name.isEmpty())
                 continue;
@@ -1309,10 +1311,10 @@ void Topology::slotTrainRouteCommand(QByteArray &route_data)
 
     if (set_switchs_by_route(route))
     {
-        QStringList signals_for_open;
+        std::vector<std::pair<QString, int>> signals_for_open;
         open_route_signals(route, signals_for_open, true);
 
-        emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, true, false);
+        emit sigSetOpenSignalsQueue(signals_for_open, true, false);
     }
 }
 
@@ -1338,10 +1340,10 @@ void Topology::slotShuntingRouteCommand(QByteArray &route_data)
 
     if (set_switchs_by_route(route))
     {
-        QStringList signals_for_open;
+        std::vector<std::pair<QString, int>> signals_for_open;
         open_route_signals(route, signals_for_open, false);
 
-        emit sigSetOpenSignalsQueue(signals_for_open, rc.dir, false, true);
+        emit sigSetOpenSignalsQueue(signals_for_open, false, true);
     }
 }
 

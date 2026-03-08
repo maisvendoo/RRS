@@ -268,7 +268,7 @@ private slots:
 public slots:
 
     /// Построение очереди задач на открытие сигналов
-    void slotSetOpenSignalsQueue(QStringList conn_list, int dir, bool for_train, bool for_shunting);
+    void slotSetOpenSignalsQueue(std::vector<std::pair<QString, int>> conn_list, bool for_train, bool for_shunting);
 
     /// Переименование поезда по команде от сервера, принявшего новое имя
     void slotRenameTrain(int train_idx, QString new_name);

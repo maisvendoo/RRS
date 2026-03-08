@@ -97,7 +97,7 @@ signals:
 
     void sendTrajBusyState(QByteArray busy_data);
 
-    void sigSetOpenSignalsQueue(QStringList conn_list, int dir, bool for_train, bool for_shunting);
+    void sigSetOpenSignalsQueue(std::vector<std::pair<QString, int>> conn_list, bool for_train, bool for_shunting);
 
     void sigChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
 
@@ -154,7 +154,7 @@ private:
     bool set_switchs_by_route(const route_segment_t& route);
 
     /// Октрытие попутных сигналов по маршруту
-    bool open_route_signals(const route_segment_t& route, QStringList& sw_list, bool for_train = true);
+    bool open_route_signals(const route_segment_t& route, std::vector<std::pair<QString, int>>& sw_list, bool for_train = true);
 
 public slots:
 

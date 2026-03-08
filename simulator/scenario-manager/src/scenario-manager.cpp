@@ -1054,13 +1054,13 @@ void ScenarioManager::slotDelayTimer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ScenarioManager::slotSetOpenSignalsQueue(QStringList conn_list, int dir, bool for_train, bool for_shunting)
+void ScenarioManager::slotSetOpenSignalsQueue(std::vector<std::pair<QString, int>> conn_list, bool for_train, bool for_shunting)
 {
     const double signal_open_first_delay = 0.75;
     taskSetDelay(signal_open_first_delay);
 
     const double signal_open_delay = 0.25;
-    for (auto& conn_name : conn_list)
+    for (auto& [conn_name, dir] : conn_list)
     {
         taskOpenSignal(conn_name.toStdString(), dir, for_train, for_shunting);
         taskSetDelay(signal_open_delay);
