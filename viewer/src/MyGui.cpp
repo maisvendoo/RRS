@@ -566,7 +566,7 @@ void MyGui::showTimetable() const
     size_t rows_count = timetable.stations.size() - timetable.start_station_idx;
 
     // Высота окна
-    float h = font_size * (rows_count + 2);
+    float h = font_size * (rows_count + 3);
     // Ширина окна
     float w = 500.0;
 
@@ -588,12 +588,24 @@ void MyGui::showTimetable() const
     ImGui::PopStyleColor();
     ImGui::Text(u8"%s", title.toStdString().c_str());
 
-    ImVec4 textColor = ImVec4(0.7f, 0.7f, 0.7f, 1.0f);
+    ImVec4 textColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
 
     for (int i = 0; i < timetable.stations.size(); ++i)
     {
+        QString station_info = QString("%1 %2 %3 %4 %5")
+                                   .arg(timetable.stations[i].name.leftJustified(15))
+                                   .arg(timetable.stations[i].arr_time, 5)
+                                   .arg(timetable.stations[i].dep_time, 5)
+                                   .arg(timetable.stations[i].fact_arr_time, 5)
+                                   .arg(timetable.stations[i].fact_dep_time, 5);
+
+        if (i < timetable.stations.size() - 1)
+        {
+            station_info += "\n";
+        }
+
         ImGui::PushStyleColor(ImGuiCol_Text, textColor);
-        ImGui::Text(u8"%s\n", timetable.stations[i].name.toStdString().c_str());
+        ImGui::Text(u8"%s", station_info.toStdString().c_str());
         ImGui::PopStyleColor();
     }
 
