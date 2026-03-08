@@ -175,23 +175,35 @@ bool Signal::calcPosition()
     Trajectory* traj = nullptr;
     if (signal_dir == 1)
     {
-        dir_t d = BWD;
-        traj = conn->getNextTraj(d);
+        if (conn->trajectories[SW_BWD_PLUS])
+        {
+            traj = conn->trajectories[SW_BWD_PLUS];
+        }
+        else
+        {
+            traj = conn->trajectories[SW_BWD_MINUS];
+        }
     }
     if (signal_dir == -1)
     {
-        dir_t d = FWD;
-        traj = conn->getNextTraj(d);
+        if (conn->trajectories[SW_FWD_PLUS])
+        {
+            traj = conn->trajectories[SW_FWD_PLUS];
+        }
+        else
+        {
+            traj = conn->trajectories[SW_FWD_MINUS];
+        }
     }
-
     if (traj == nullptr)
     {
         return false;
     }
 
     // Берём за точку отсчёта участок траектории перед коннектором
-    const track_t& track = (signal_dir == 1) ? traj->getLastTrack() : traj->getFirstTrack();
-    dvec3 conn_pos = (signal_dir == 1) ? track.end_point : track.begin_point;
+    const std::int8_t d = signal_dir * conn->getTrajOrientation(traj);
+    const track_t& track = (d > 0) ? traj->getLastTrack() : traj->getFirstTrack();
+    const dvec3 conn_pos = (d > 0) ? track.end_point : track.begin_point;
 
     // Положение светофора со смещением от коннектора
     pos = conn_pos +
