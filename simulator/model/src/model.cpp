@@ -335,9 +335,25 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 
                 disconnect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);
                 connect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);
+
+                disconnect(ap, &Autopilot::sigSetTimetableData, this, &Model::slotSetTimetableData);
+                connect(ap, &Autopilot::sigSetTimetableData, this, &Model::slotSetTimetableData);
             }
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotSetTimetableData(int vehicle_idx, QByteArray tt_data)
+{
+    if (vehicle_idx >= update_vehicles.vehicles.size())
+    {
+        return;
+    }
+
+    update_vehicles.vehicles[vehicle_idx].timetableData = tt_data;
 }
 
 //------------------------------------------------------------------------------

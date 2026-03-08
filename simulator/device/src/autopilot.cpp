@@ -633,6 +633,9 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
                           .arg(st->dep_time, 5)
                           .arg(st->fact_dep_time, 5);
 
+        // Обновляем график в сетевой структуре
+        emit sigSetTimetableData(vehicle_idx, timetable.serialize());
+
         Journal::instance()->debug(msg);
 
         target_station_idx++;
@@ -678,6 +681,9 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
                           .arg(st->name)
                           .arg(st->arr_time, 5)
                           .arg(st->fact_arr_time, 5);
+
+        // Обновляем график в сетевой структуре
+        emit sigSetTimetableData(vehicle_idx, timetable.serialize());
 
         Journal::instance()->debug(msg);
     }

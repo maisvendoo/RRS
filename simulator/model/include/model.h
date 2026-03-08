@@ -242,6 +242,8 @@ private slots:
 
     /// Связывание сигналов и слотов для загрузки сценария в модули автоведения
     void slotUpdateTrainTimetable(int train_idx);
+
+    void slotSetTimetableData(int vehicle_idx, QByteArray tt_data);
 };
 
 #endif // MODEL_H
