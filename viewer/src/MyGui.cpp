@@ -581,7 +581,11 @@ void MyGui::showTimetable() const
 
     bool open_ptr = true;
 
-    QString title = QString("Поезд %1").arg(timetable.train_name);
+    QString title = QString("Поезд %1 %2 %3 %4 %5").arg(timetable.train_name.leftJustified(9))
+                        .arg(QString("Приб.").leftJustified(5))
+                        .arg(QString("Отпр.").leftJustified(5))
+                        .arg(QString("Факт. приб.").leftJustified(10))
+                        .arg(QString("Факт. отпр.").leftJustified(10));
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
     ImGui::Begin(u8"Нормативный график", &open_ptr, window_flags);
@@ -596,8 +600,8 @@ void MyGui::showTimetable() const
                                    .arg(timetable.stations[i].name.leftJustified(15))
                                    .arg(timetable.stations[i].arr_time, 5)
                                    .arg(timetable.stations[i].dep_time, 5)
-                                   .arg(timetable.stations[i].fact_arr_time, 5)
-                                   .arg(timetable.stations[i].fact_dep_time, 5);
+                                   .arg(timetable.stations[i].fact_arr_time, 10)
+                                   .arg(timetable.stations[i].fact_dep_time, 10);
 
         if (i < timetable.stations.size() - 1)
         {
