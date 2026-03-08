@@ -118,9 +118,7 @@ signals:
                            int dir,
                            double *lenght);
 
-    void sigBuildTrainRoute(QString start_traj, QString target_traj, int dir);
-
-    void sigSetTimetableData(int vehicle_idx, QByteArray tt_data);
+    void sigBuildTrainRoute(QString start_traj, QString target_traj, int dir);    
 
 protected:
 

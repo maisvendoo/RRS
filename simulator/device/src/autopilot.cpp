@@ -635,10 +635,7 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
         QString msg = QString("TIMETABLE PROCESS: Departure from: %1 | Dep. time: %2 | Fact. dep.: %3 |")
                           .arg(st->name)                          
                           .arg(st->dep_time, 5)
-                          .arg(st->fact_dep_time, 5);
-
-        // Обновляем график в сетевой структуре
-        emit sigSetTimetableData(vehicle_idx, timetable.serialize());
+                          .arg(st->fact_dep_time, 5);        
 
         Journal::instance()->debug(msg);
 
@@ -686,10 +683,7 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
         QString msg = QString("TIMETABLE PROCESS: Arrival to: %1 | Arr. time: %2 | Fact. arr.: %3 |")
                           .arg(st->name)
                           .arg(st->arr_time, 5)
-                          .arg(st->fact_arr_time, 5);
-
-        // Обновляем график в сетевой структуре
-        emit sigSetTimetableData(vehicle_idx, timetable.serialize());
+                          .arg(st->fact_arr_time, 5);        
 
         Journal::instance()->debug(msg);
     }
