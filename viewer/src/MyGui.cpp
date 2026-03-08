@@ -566,7 +566,8 @@ void MyGui::showTimetable() const
     size_t rows_count = timetable.stations.size() - timetable.start_station_idx;
 
     // Высота окна
-    float h = font_size * (rows_count + 3);
+    float lineHeightWithSpacing = ImGui::GetTextLineHeightWithSpacing();
+    float h = lineHeightWithSpacing * (rows_count + 2);
     // Ширина окна
     float w = 500.0;
 
@@ -593,7 +594,7 @@ void MyGui::showTimetable() const
     ImGui::Text(u8"%s", title.toStdString().c_str());
 
 
-    for (int i = 0; i < timetable.stations.size(); ++i)
+    for (int i = timetable.start_station_idx; i < timetable.stations.size(); ++i)
     {
         QString station_info = QString("%1 %2 %3 %4 %5")
                                    .arg(timetable.stations[i].name.leftJustified(15))
