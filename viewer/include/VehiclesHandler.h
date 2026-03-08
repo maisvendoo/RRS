@@ -2,9 +2,10 @@
 #ifndef VEHICLES_HANDLER_H
 #define VEHICLES_HANDLER_H
 
-#include "simulator-info-struct.h"
-#include "simulator-update-struct.h"
-#include "VehicleExterior.h"
+#include <simulator-info-struct.h>
+#include <simulator-update-struct.h>
+#include <autopilot-timetable.h>
+#include <VehicleExterior.h>
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/Group.h>
@@ -69,6 +70,19 @@ public:
     );
 
     void set_camera_pos(const vsg::dvec3* camera_pos) noexcept { this->camera_pos = camera_pos; }
+
+    /// Получить данные о графике движения, если таковые имеются в текущей ПЕ
+    autopilot_timetable_t getTimetable()
+    {
+        autopilot_timetable_t timetable;
+
+        if (update_vehicles[0].vehicles[cur_vehicle].timetableData.size() != 0)
+        {
+            timetable.deserialize(update_vehicles[0].vehicles[cur_vehicle].timetableData);
+        }
+
+        return timetable;
+    }
 
 public slots:
     void slotGetTrainsData(QByteArray& data);
