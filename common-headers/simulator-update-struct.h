@@ -210,6 +210,8 @@ struct simulator_vehicle_update_t final
     int prev_vehicle = -1;
     int next_vehicle = -1;
     std::vector<float> analogSignal;
+    /// Сериализованные данные графика движения
+    QByteArray timetableData;
 
     QByteArray serialize() const
     {
@@ -228,6 +230,14 @@ struct simulator_vehicle_update_t final
         for (auto signal : analogSignal)
         {
             stream << signal;
+        }
+
+        quint32 tt_data_size = timetableData.size();
+        stream << tt_data_size;
+
+        if (tt_data_size != 0)
+        {
+            stream << timetableData;
         }
 
         return buff.data();
@@ -252,6 +262,14 @@ struct simulator_vehicle_update_t final
         for (auto& signal : analogSignal)
         {
             stream >> signal;
+        }
+
+        quint32 tt_data_size = 0;
+        stream >> tt_data_size;
+
+        if (tt_data_size != 0)
+        {
+            stream >> timetableData;
         }
     }
 };
