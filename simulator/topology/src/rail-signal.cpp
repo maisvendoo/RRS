@@ -201,19 +201,19 @@ bool Signal::calcPosition()
     }
 
     // Берём за точку отсчёта участок траектории перед коннектором
-    const std::int8_t d = signal_dir * conn->getTrajOrientation(traj);
-    const track_t& track = (d > 0) ? traj->getLastTrack() : traj->getFirstTrack();
-    const dvec3 conn_pos = (d > 0) ? track.end_point : track.begin_point;
+    const double d = signal_dir * conn->getTrajOrientation(traj);
+    const track_t& track = (d > 0.0) ? traj->getLastTrack() : traj->getFirstTrack();
+    const dvec3 conn_pos = (d > 0.0) ? track.end_point : track.begin_point;
 
     // Положение светофора со смещением от коннектора
     pos = conn_pos +
-          track.trav * (rel_pos.x * signal_dir) +
-          track.orth * (rel_pos.y * signal_dir) +
+          track.trav * (rel_pos.x * d) +
+          track.orth * (rel_pos.y * d) +
           track.up * rel_pos.z;
 
     // Делаем систему координат светофора вертикальной и повёрнутой в нужную сторону
-    right = normalize(dvec3(track.trav.x * signal_dir, track.trav.y * signal_dir, 0.0));
-    orth = normalize(dvec3(track.orth.x * signal_dir, track.orth.y * signal_dir, 0.0));
+    right = normalize(dvec3(track.trav.x * d, track.trav.y * d, 0.0));
+    orth = normalize(dvec3(track.orth.x * d, track.orth.y * d, 0.0));
     up = dvec3(0.0, 0.0, 1.0);
 
     return true;

@@ -145,41 +145,40 @@ void TrajectoryALSN::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrajectoryALSN::setNextSignalInfo(std::int8_t dir, ALSN code, double distance, QString liter)
+void TrajectoryALSN::setNextSignalInfo(std::int8_t dir, ALSN code, double distance, const QString& liter)
 {
-    // Вперёд рассылается код от светофора сзади, назад - от светофора спереди
-    ALSN& code_from_dir = (dir > 0) ? code_from_bwd : code_from_fwd;
-    double& distance_dir = (dir > 0) ? distance_bwd : distance_fwd;
-    QString& next_liter_dir = (dir > 0) ? next_liter_bwd : next_liter_fwd;
-
+    // Если на траектории нет трансмиттера с частотой, далее не передаём код,
+    // только имитируем работу электронной карты - дистанцию и литер
     if (frequency == 0.0)
     {
-        code_from_dir = ALSN::NO_CODE;
+        code = ALSN::NO_CODE;
+    }
+
+    // Вперёд рассылается код от светофора сзади, назад - от светофора спереди
+    if (dir > 0)
+    {
+        code_from_bwd = code;
+        distance_bwd = distance;
+        next_liter_bwd = liter;
     }
     else
     {
-        code_from_dir = code;
+        code_from_fwd = code;
+        distance_fwd = distance;
+        next_liter_fwd = liter;
     }
-
-    distance_dir = distance;
-    next_liter_dir = liter;
-
-    ALSN code_to_next = code_from_dir;
-
-    // Если траектория занята, дальше код не проходит
-    if (trajectory->isBusy())
-        code_to_next = ALSN::NO_CODE;
 
     // Переход к рельсовым цепям следующей траектории
     std::int8_t next_dir = dir;
     // Модуль коннектора к следующей траектории
-    auto conn_device = getNextConnectorDevice(dir);
+    auto conn_device = getNextConnectorDevice(next_dir);
     if (conn_device == nullptr)
     {
         return;
     }
 
-    // Проверяем: если стрелка на взрез, или здесь следующий светофор, дальше код не проходит
+    // Проверяем: если стрелка на взрез, или здесь следующий светофор,
+    // дальше информацию не передаём
     Switch* conn = conn_device->getConnector();
     if (next_dir > 0)
     {
@@ -214,8 +213,14 @@ void TrajectoryALSN::setNextSignalInfo(std::int8_t dir, ALSN code, double distan
         return;
     }
 
+    // Если траектория занята, колёсные пары шунтируют рельсовые цепи и дальше код не проходит
+    if (trajectory->isBusy())
+    {
+        code = ALSN::NO_CODE;
+    }
+
     // Передаём информацию дальше
-    traj_ALSN->setNextSignalInfo(next_dir, code_to_next, distance + trajectory->getLength(), liter);
+    traj_ALSN->setNextSignalInfo(next_dir, code, distance + trajectory->getLength(), liter);
 }
 
 //------------------------------------------------------------------------------

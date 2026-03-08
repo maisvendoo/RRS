@@ -18,7 +18,7 @@ public:
     /// Шаг симуляции
     void step(double t, double dt) override;
 
-    void setNextSignalInfo(std::int8_t dir, ALSN code, double distance = 0.0, QString liter = "");
+    void setNextSignalInfo(std::int8_t dir, ALSN code, double distance, const QString& liter);
 
 protected:
 
