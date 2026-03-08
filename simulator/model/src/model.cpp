@@ -298,6 +298,11 @@ void Model::buildAutostartQueue(Train *train)
 //------------------------------------------------------------------------------
 void Model::slotUpdateTrainTimetable(int train_idx)
 {
+    if (train_idx >= trains.size())
+    {
+        return;
+    }
+
     auto train = trains[train_idx];
 
     autopilot_timetable_t timetable = scnmgr->loadTrainTimetable(train_idx);

@@ -404,6 +404,9 @@ void Autopilot::initTimeTable()
         target_station_idx++;
     }
 
+    // Запоминаем индекс целевой станции
+    timetable.start_station_idx = target_station_idx;
+
     // Определяем дистанцию до ближайшей станции
     emit sigGetRouteLength(vehicle_idx, curr_traj_name, curr_traj_coord,
                            timetable.stations[target_station_idx].target_traj,

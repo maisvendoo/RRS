@@ -48,7 +48,7 @@ struct autopilot_station_t
     /// Признак платформы справа
     bool is_right_platform = false;
     /// Признак платформы слева
-    bool is_left_platform = false;
+    bool is_left_platform = false;    
 
     QByteArray serialize()
     {
@@ -119,6 +119,10 @@ struct autopilot_timetable_t
     int train_idx = 0;
     std::vector<autopilot_station_t> stations;
 
+    /// Индекс станции, с которого начинать отображение графика
+    /// (мы запросто можем начать с середины)
+    int start_station_idx = 0;
+
     QByteArray serialize()
     {
         QByteArray data;
@@ -136,6 +140,8 @@ struct autopilot_timetable_t
         }
 
         return data;
+
+        stream << start_station_idx;
     }
 
     void deserialize(QByteArray &data)
@@ -162,6 +168,8 @@ struct autopilot_timetable_t
 
             stations.push_back(station);
         }
+
+        stream >> start_station_idx;
     }
 
     autopilot_station_t &getStation(int idx)
