@@ -122,6 +122,7 @@ struct autopilot_timetable_t
     /// Индекс станции, с которого начинать отображение графика
     /// (мы запросто можем начать с середины)
     int start_station_idx = 0;
+    int curr_station_idx = 0;
 
     QByteArray serialize()
     {
@@ -139,9 +140,10 @@ struct autopilot_timetable_t
             stream << station.serialize();
         }
 
-        return data;
-
         stream << start_station_idx;
+        stream << curr_station_idx;
+
+        return data;
     }
 
     void deserialize(QByteArray &data)
@@ -170,6 +172,7 @@ struct autopilot_timetable_t
         }
 
         stream >> start_station_idx;
+        stream >> curr_station_idx;
     }
 
     autopilot_station_t &getStation(int idx)

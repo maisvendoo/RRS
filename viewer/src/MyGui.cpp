@@ -592,7 +592,6 @@ void MyGui::showTimetable() const
     ImGui::PopStyleColor();
     ImGui::Text(u8"%s", title.toStdString().c_str());
 
-    ImVec4 textColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
 
     for (int i = 0; i < timetable.stations.size(); ++i)
     {
@@ -606,6 +605,13 @@ void MyGui::showTimetable() const
         if (i < timetable.stations.size() - 1)
         {
             station_info += "\n";
+        }
+
+        ImVec4 textColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+
+        if (i == timetable.curr_station_idx)
+        {
+            textColor = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
         }
 
         ImGui::PushStyleColor(ImGuiCol_Text, textColor);
