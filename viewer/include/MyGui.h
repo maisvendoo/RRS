@@ -105,6 +105,8 @@ private:
 
     void showHUD() const;
 
+    void showTimetable() const;
+
     void printObject(const vsg::ref_ptr<vsg::Object>& object) const;
 
     void check_date_time() const;
