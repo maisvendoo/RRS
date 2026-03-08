@@ -117,6 +117,18 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         showTrainRenameDialog();
     }
 
+    // Отображение HUD
+    if (ImGui::IsKeyPressed(ImGuiKey_F7) && !params->prev_F7 && !is_modified_key)
+    {
+        params->is_show_HUD = !params->is_show_HUD;
+    }
+    params->prev_F7 = ImGui::IsKeyPressed(ImGuiKey_F7);
+
+    if (params->is_show_HUD)
+    {
+        showHUD();
+    }
+
     if (params->vehicles_handler)
     {
         params->sim_time = params->vehicles_handler->getDateTime();
@@ -526,6 +538,14 @@ void MyGui::showTrainRenameDialog() const
     }
 
     ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::showHUD() const
+{
+
 }
 
 //------------------------------------------------------------------------------

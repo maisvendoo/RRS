@@ -60,6 +60,9 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool prev_F8 = false;
     bool is_show_trane_rename_dialog = false;
 
+    bool prev_F7 = false;
+    bool is_show_HUD = false;
+
     bool is_no_controlled = false;
 
     bool is_no_cabine_control = false;
@@ -99,6 +102,8 @@ private:
     void showNoCabineControl() const;
 
     void showTrainRenameDialog() const;
+
+    void showHUD() const;
 
     void printObject(const vsg::ref_ptr<vsg::Object>& object) const;
 
