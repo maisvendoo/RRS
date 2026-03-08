@@ -97,6 +97,11 @@ public:
 
     void setTimetable(const autopilot_timetable_t &timetable);
 
+    QByteArray getTimetableData()
+    {
+        return timetable.serialize();
+    }
+
 signals:
 
     void sigInitTrainParams();

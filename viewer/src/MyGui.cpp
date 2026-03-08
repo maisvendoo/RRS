@@ -561,6 +561,43 @@ void MyGui::showTimetable() const
     {
         return;
     }
+
+    // Число строк в таблице графика
+    size_t rows_count = timetable.stations.size() - timetable.start_station_idx;
+
+    // Высота окна
+    float h = font_size * (rows_count + 2);
+    // Ширина окна
+    float w = 500.0;
+
+    ImGui::SetNextWindowSize(ImVec2(w, h));
+    ImGui::SetNextWindowPos(ImVec2(100, 300.0));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoInputs;
+
+    bool open_ptr = true;
+
+    QString title = QString("Поезд %1").arg(timetable.train_name);
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::Begin(u8"Нормативный график", &open_ptr, window_flags);
+    ImGui::PopStyleColor();
+    ImGui::Text(u8"%s", title.toStdString().c_str());
+
+    ImVec4 textColor = ImVec4(0.7f, 0.7f, 0.7f, 1.0f);
+
+    for (int i = 0; i < timetable.stations.size(); ++i)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, textColor);
+        ImGui::Text(u8"%s\n", timetable.stations[i].name.toStdString().c_str());
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::End();
 }
 
 //------------------------------------------------------------------------------

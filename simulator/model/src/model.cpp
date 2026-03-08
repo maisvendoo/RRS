@@ -341,8 +341,8 @@ void Model::slotUpdateTrainTimetable(int train_idx)
                 disconnect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);
                 connect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);
 
-                disconnect(ap, &Autopilot::sigSetTimetableData, this, &Model::slotSetTimetableData);
-                connect(ap, &Autopilot::sigSetTimetableData, this, &Model::slotSetTimetableData);
+                //disconnect(ap, &Autopilot::sigSetTimetableData, this, &Model::slotSetTimetableData);
+                //connect(ap, &Autopilot::sigSetTimetableData, this, &Model::slotSetTimetableData);
             }
         }
     }
@@ -1066,6 +1066,11 @@ void Model::prepareFeedBack(bool need_trains_feedback)
         }
 
         update_vehicles.vehicles[i].analogSignal = *(vehicle->getAnalogSignals());
+
+        if (!vehicle->getAutopilot().empty())
+        {
+            update_vehicles.vehicles[i].timetableData = vehicle->getAutopilot().at(0)->getTimetableData();
+        }
 
         ++i;
     }
