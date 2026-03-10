@@ -423,6 +423,12 @@ void MainWindow::loadScenarios(route_info_t &route_info)
             // доступных сценариев
             scn.scenario_name = scenarios_dir.relativeFilePath(abs_path);
 
+            // Пропускаем startup-сценарий, чтобы юзеру глаза не мозолил
+            if (scn.scenario_name == STARTUP_SCN_SUBDIR)
+            {
+                continue;
+            }
+
             // Читаем описание сценария из README.md
             QString desc_path = QDir::toNativeSeparators(abs_path + QDir::separator() + "README.md");
             scn.scenario_description = loadScenarioDescription(desc_path);
