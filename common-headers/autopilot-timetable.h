@@ -122,7 +122,10 @@ struct autopilot_timetable_t
     /// Индекс станции, с которого начинать отображение графика
     /// (мы запросто можем начать с середины)
     int start_station_idx = 0;
+    /// Индекс текущей станции-цели
     int curr_station_idx = 0;
+    /// Дистанция до станции-цели
+    double target_station_dist = 0;
 
     QByteArray serialize()
     {
@@ -142,6 +145,7 @@ struct autopilot_timetable_t
 
         stream << start_station_idx;
         stream << curr_station_idx;
+        stream << target_station_dist;
 
         return data;
     }
@@ -173,6 +177,7 @@ struct autopilot_timetable_t
 
         stream >> start_station_idx;
         stream >> curr_station_idx;
+        stream >> target_station_dist;
     }
 
     autopilot_station_t &getStation(int idx)

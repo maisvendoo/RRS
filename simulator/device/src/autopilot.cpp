@@ -451,7 +451,9 @@ void Autopilot::calcTargetDistance()
     emit sigGetRouteLength(vehicle_idx, curr_traj_name, curr_traj_coord,
                            timetable.stations[target_station_idx].target_traj,
                            timetable.stations[target_station_idx].coord,
-                           target_dir, &target_station_dist);       
+                           target_dir, &target_station_dist);
+
+    timetable.target_station_dist = target_station_dist;
 }
 
 //------------------------------------------------------------------------------

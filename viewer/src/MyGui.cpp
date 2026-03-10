@@ -567,7 +567,7 @@ void MyGui::showTimetable() const
 
     // Высота окна
     float lineHeightWithSpacing = ImGui::GetTextLineHeightWithSpacing();
-    float h = lineHeightWithSpacing * (rows_count + 2);
+    float h = lineHeightWithSpacing * (rows_count + 3);
     // Ширина окна
     float w = 500.0;
 
@@ -591,6 +591,12 @@ void MyGui::showTimetable() const
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
     ImGui::Begin(u8"Нормативный график", &open_ptr, window_flags);
     ImGui::PopStyleColor();
+
+    QString time = QString("Время: %1 Дист. до цели: %2 м")
+                       .arg(params->sim_time->time.getString(), 8)
+                       .arg(timetable.target_station_dist, 7, 'f', 1);
+
+    ImGui::Text(u8"%s", time.toStdString().c_str());
     ImGui::Text(u8"%s", title.toStdString().c_str());
 
 
