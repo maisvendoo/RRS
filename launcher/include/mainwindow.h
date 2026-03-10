@@ -20,6 +20,8 @@
 #include    <QToolBox>
 #include    <QProcess>
 #include    <QTimer>
+#include    <QDateEdit>
+#include    <QTimeEdit>
 
 #include    <train-info.h>
 #include    <route-info.h>
@@ -174,6 +176,9 @@ private:
 
     /// Save graph settings to file
     void saveGraphSettings(FieldsDataList &fd_list);
+
+    /// Генерация сценарной команды setDate
+    QString createLuaSetDate(QDateEdit *dateEdit);
 
 private slots:
 

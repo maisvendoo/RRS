@@ -1439,3 +1439,18 @@ void MainWindow::saveGraphSettings(FieldsDataList &fd_list)
 
     editor.editFile(settings_path, "Viewer", fd_list);
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString MainWindow::createLuaSetDate(QDateEdit *dateEdit)
+{
+    QString setDate = "";
+
+    setDate = QString("setDate(\"%1.%2.%3\")")
+                  .arg(dateEdit->dateTime().date().day(), 2, u'0')
+                  .arg(dateEdit->dateTime().date().month(), 2, u'0')
+                  .arg(dateEdit->dateTime().date().year(), 4);
+
+    return setDate;
+}
