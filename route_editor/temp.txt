@@ -9,7 +9,6 @@ Route.h
 RouteEditor.h
 RouteObject.h
 SceneGraph.h
-Settings.h
 
 EditorContext.cpp
 EditorGui.cpp
@@ -23,7 +22,6 @@ RouteEditor.cpp
 RouteObject.cpp
 SceneGraph.cpp
 SelectionHandler.cpp
-Settings.cpp
 
 --------------------------------------------------------------------------------
 
@@ -44,6 +42,7 @@ MouseButton.h
 MouseHandler.h
 PagedLodMap.h
 RouteMap.h
+Settings.h
 shader_funcs.h
 SingleSwitch.h
 SwitchGroup.h
@@ -60,6 +59,7 @@ CameraHandler.cpp
 KeyBinding.cpp
 KeyboardHandler.cpp
 MouseHandler.cpp
+Settings.cpp
 shader_funcs.cpp
 SwitchGroup.cpp
 WindowHandler.cpp
