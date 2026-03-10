@@ -326,8 +326,8 @@ void Model::slotUpdateTrainTimetable(int train_idx)
                 disconnect(ap, &Autopilot::sigGetRouteLength, topology, &Topology::slotGetRouteLength);
                 connect(ap, &Autopilot::sigGetRouteLength, topology, &Topology::slotGetRouteLength);
 
-                disconnect(this, &Model::sigInitTimetable, ap, &Autopilot::initTimeTable);
-                connect(this, &Model::sigInitTimetable, ap, &Autopilot::initTimeTable);
+                disconnect(this, &Model::sigInitTimetable, ap, &Autopilot::slotInitTimeTable);
+                connect(this, &Model::sigInitTimetable, ap, &Autopilot::slotInitTimeTable);
 
                 disconnect(topology, &Topology::sigIncTargetStation, ap, &Autopilot::slotIncTargetStation);
                 connect(topology, &Topology::sigIncTargetStation, ap, &Autopilot::slotIncTargetStation);

@@ -346,7 +346,7 @@ public slots:
 
     void slotSetBrakeAccel(double a_brake);
 
-    void initTimeTable();
+    void slotInitTimeTable();
 
     /// Переключение на следующую станцию от топологии
     void slotIncTargetStation(int vehicle_idx);

@@ -324,7 +324,7 @@ double Autopilot::calcPredictVelocity(double v_cur, double dist, double accel)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Autopilot::initTimeTable()
+void Autopilot::slotInitTimeTable()
 {
     // Гравик инициализирован - выход
     if (is_timetable_ready)
@@ -586,6 +586,9 @@ void Autopilot::setTimetable(const autopilot_timetable_t &timetable)
         return;
     }
 
+    // Сбрасываем флаг готовности графика, чтобы он был переинициализирован
+    is_timetable_ready = false;
+    // Запоминаем сам график
     this->timetable = timetable;
 }
 
@@ -678,7 +681,15 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
     {
         st->is_arrival = true;
         st->fact_arr_time_sec = time;
-        st->fact_arr_time = time_str;
+
+        if (st->arr_time == "-")
+        {
+            st->fact_arr_time = "-";
+        }
+        else
+        {
+            st->fact_arr_time = time_str;
+        }
 
         QString msg = QString("TIMETABLE PROCESS: Arrival to: %1 | Arr. time: %2 | Fact. arr.: %3 |")
                           .arg(st->name)
