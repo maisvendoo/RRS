@@ -356,6 +356,8 @@ void Autopilot::slotInitTimeTable()
     bool is_route_exists = false;
 
     // Проверяем "туда"
+    target_dir = 1;
+
     emit sigIsRouteExists(curr_traj_name,
                           timetable.stations[target_station_idx].target_traj,
                           target_dir,
@@ -377,6 +379,8 @@ void Autopilot::slotInitTimeTable()
         {
             // график хрень
             target_station_idx = -1;
+            // Стираем загруженные данные, так как график невыполним
+            timetable = autopilot_timetable_t();
             return;
         }
     }
