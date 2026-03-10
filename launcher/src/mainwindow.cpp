@@ -551,6 +551,9 @@ void MainWindow::startSimulator()
     args << "--direction=" + directions;
     args << "--init-coord=" + init_coords;
 
+    // ТЕСТ!!!!!
+    createTmpScenario(selectedRouteDirName, active_trains);
+
     if (selected_scenario_idx >= 0)
     {
         args << "--scenario=" + routes_info[selected_route_idx].scenarios[selected_scenario_idx].scenario_name;
@@ -1489,4 +1492,82 @@ QStringList MainWindow::createLuaSetTrain(size_t idx, const active_train_t &at)
     setTrainCode.append(QString("setTrain(%1)").arg(varName));
 
     return setTrainCode;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QStringList MainWindow::createTmpScenarioCode(const std::vector<active_train_t> &active_trains)
+{
+    QStringList scnCode;
+    scnCode.clear();
+
+    for (size_t i = 0; i < active_trains.size(); ++i)
+    {
+        scnCode += createLuaSetTrain(i, active_trains[i]);
+        scnCode.append("\n");
+    }
+
+    return scnCode;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::createTmpScenario(const QString &route_name,
+                                   const std::vector<active_train_t> &active_trains)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string route_path = fs.getRouteRootDir() + fs.separator() + route_name.toStdString();
+
+    QDir routeDir(route_path.c_str());
+
+    if (!routeDir.exists())
+    {
+        return;
+    }
+
+    QString scn_subdir_name = "scenarios";
+
+    if (!routeDir.exists(scn_subdir_name))
+    {
+        if (!routeDir.mkdir(scn_subdir_name))
+        {
+            return;
+        }
+    }
+
+    std::string scenarios_path = route_path + fs.separator() + scn_subdir_name.toStdString();
+
+    QString startup_scn_subdir = "startup";
+
+    QDir scnDir(scenarios_path.c_str());
+
+    if (!scnDir.exists(startup_scn_subdir))
+    {
+        if (!scnDir.mkdir(startup_scn_subdir))
+        {
+            return;
+        }
+    }
+
+    std::string file_path = scenarios_path + fs.separator() + startup_scn_subdir.toStdString() + fs.separator() + "main.lua";
+
+    QFile file(file_path.c_str());
+
+    if (!file.open(QIODevice::Text | QIODevice::WriteOnly))
+    {
+        return;
+    }
+
+    QTextStream stream(&file);
+
+    auto scnCode = createTmpScenarioCode(active_trains);
+
+    for (auto line : scnCode)
+    {
+        stream << line << "\n";
+    }
+
+    file.close();
 }

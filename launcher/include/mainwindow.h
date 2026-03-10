@@ -186,6 +186,13 @@ private:
     /// Генерация Lua-кода установки поезда
     QStringList createLuaSetTrain(size_t idx, const active_train_t &at);
 
+    /// Генерация кода сценария
+    QStringList createTmpScenarioCode(const std::vector<active_train_t> &active_trains);
+
+    /// Создание временного сценария
+    void createTmpScenario(const QString &route_name,
+                           const std::vector<active_train_t> &active_trains);
+
 private slots:
 
     void slotRouteSelection();
