@@ -505,58 +505,41 @@ void MainWindow::startSimulator()
     }
 
     bool reset_start_config = false;
+
     slotUpdateActiveTrains(reset_start_config);
+
     if (active_trains.empty() && selected_scenario_idx < 0)
     {
         return;
     }
 
-    server_date_t start_date = server_date_t(
-        static_cast<int16_t>(ui->dteStartDate->dateTime().date().year()),
-        static_cast<uint8_t>(ui->dteStartDate->dateTime().date().month()),
-        static_cast<uint8_t>(ui->dteStartDate->dateTime().date().day()));
-    server_time_t start_time = server_time_t(
-        static_cast<uint8_t>(ui->dteStartTime->dateTime().time().hour()),
-        static_cast<uint8_t>(ui->dteStartTime->dateTime().time().minute()),
-        static_cast<uint8_t>(ui->dteStartTime->dateTime().time().second()),
-        static_cast<uint16_t>(ui->dteStartTime->dateTime().time().msec()));
-    std::int64_t start_datetime = simulator_time_t(start_date, start_time).data();
-
-    QString selected_trains = "";
-    QString traj_names = "";
-    QString directions = "";
-    QString init_coords = "";
-
-    for (auto at = active_trains.begin(); at != active_trains.end(); ++at)
-    {
-        selected_trains += (*at).train_info.train_config_path;
-        traj_names += (*at).train_position.trajectory_name;
-        directions += QString("%1").arg((*at).train_position.direction);
-        init_coords += QString("%1").arg((*at).train_position.traj_coord, 0, 'f', 2);
-
-        if (at != active_trains.end() - 1)
-        {
-            selected_trains += ",";
-            traj_names += ",";
-            directions += ",";
-            init_coords += ",";
-        }
-    }
-
     QStringList args;
-    args << "--start=" + QString::number(start_datetime);
-    args << "--route=" + selectedRouteDirName;
-    args << "--train-config=" + selected_trains;
-    args << "--traj-name=" + traj_names;
-    args << "--direction=" + directions;
-    args << "--init-coord=" + init_coords;
+    args.clear();
 
-    // ТЕСТ!!!!!
-    createTmpScenario(selectedRouteDirName, active_trains);
+    args << "--route=" + selectedRouteDirName;
 
     if (selected_scenario_idx >= 0)
     {
         args << "--scenario=" + routes_info[selected_route_idx].scenarios[selected_scenario_idx].scenario_name;
+    }
+    else
+    {
+        server_date_t start_date = server_date_t(
+            static_cast<int16_t>(ui->dteStartDate->dateTime().date().year()),
+            static_cast<uint8_t>(ui->dteStartDate->dateTime().date().month()),
+            static_cast<uint8_t>(ui->dteStartDate->dateTime().date().day()));
+        server_time_t start_time = server_time_t(
+            static_cast<uint8_t>(ui->dteStartTime->dateTime().time().hour()),
+            static_cast<uint8_t>(ui->dteStartTime->dateTime().time().minute()),
+            static_cast<uint8_t>(ui->dteStartTime->dateTime().time().second()),
+            static_cast<uint16_t>(ui->dteStartTime->dateTime().time().msec()));
+        std::int64_t start_datetime = simulator_time_t(start_date, start_time).data();
+
+        args << "--start=" + QString::number(start_datetime);
+
+        createTmpScenario(selectedRouteDirName, active_trains);
+
+        args << "--scenario=" + STARTUP_SCN_SUBDIR;
     }
 
     FileSystem &fs = FileSystem::getInstance();
@@ -1235,6 +1218,7 @@ const   QString MainWindow::DOUBLE_BUFF = "DoubleBuffer";
 const   QString MainWindow::VSYNC = "VSync";
 const   QString MainWindow::NOTIFY_LEVEL = "NofifyLevel";
 const   QString MainWindow::VIEW_DIST = "ViewDistance";
+const   QString MainWindow::STARTUP_SCN_SUBDIR = "startup";
 
 //------------------------------------------------------------------------------
 //
@@ -1525,7 +1509,8 @@ void MainWindow::createTmpScenario(const QString &route_name,
     }
 
     FileSystem &fs = FileSystem::getInstance();
-    std::string route_path = fs.getRouteRootDir() + fs.separator() + route_name.toStdString();
+    std::string route_path = fs.getRouteRootDir() + fs.separator()
+                             + route_name.toStdString();
 
     QDir routeDir(route_path.c_str());
 
@@ -1544,21 +1529,22 @@ void MainWindow::createTmpScenario(const QString &route_name,
         }
     }
 
-    std::string scenarios_path = route_path + fs.separator() + scn_subdir_name.toStdString();
-
-    QString startup_scn_subdir = "startup";
+    std::string scenarios_path = route_path + fs.separator()
+                                 + scn_subdir_name.toStdString();
 
     QDir scnDir(scenarios_path.c_str());
 
-    if (!scnDir.exists(startup_scn_subdir))
+    if (!scnDir.exists(STARTUP_SCN_SUBDIR))
     {
-        if (!scnDir.mkdir(startup_scn_subdir))
+        if (!scnDir.mkdir(STARTUP_SCN_SUBDIR))
         {
             return;
         }
     }
 
-    std::string file_path = scenarios_path + fs.separator() + startup_scn_subdir.toStdString() + fs.separator() + "main.lua";
+    std::string file_path = scenarios_path + fs.separator()
+                            + STARTUP_SCN_SUBDIR.toStdString()
+                            + fs.separator() + "main.lua";
 
     QFile file(file_path.c_str());
 

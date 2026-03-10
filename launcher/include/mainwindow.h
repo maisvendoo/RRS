@@ -108,6 +108,7 @@ private:
     static const   QString VSYNC;
     static const   QString NOTIFY_LEVEL;
     static const   QString VIEW_DIST;
+    static const   QString STARTUP_SCN_SUBDIR;
 
     QString settings_path;
     QString saved_servers_path;
