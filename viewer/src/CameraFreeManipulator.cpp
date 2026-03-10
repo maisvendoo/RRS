@@ -57,9 +57,13 @@ void CameraFreeManipulator::returnView()
     }
     is_reset = false;
 
-    _lookAt->eye = _last_lookAt->eye;
-    _lookAt->center = _last_lookAt->center;
-    _lookAt->up = _last_lookAt->up;
+    if (_last_lookAt)
+    {
+        _lookAt->eye = _last_lookAt->eye;
+        _lookAt->center = _last_lookAt->center;
+        _lookAt->up = _last_lookAt->up;
+    }
+
     _perspective->fieldOfViewY = _last_fov;
 
     _last_lookAt = nullptr;
