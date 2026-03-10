@@ -748,14 +748,23 @@ bool RouteViewer::loadRoute()
 
         // if (transforms.size() > 1500)
         // {
-        //     auto instance_node = vsg::InstanceNode::create();
-        //     instance_node->firstInstance = 0;
-        //     instance_node->instanceCount = transforms.size();
-        //     instance_node->child = vsg::read_cast<vsg::Node>(model_filename_path, options);
+        //     auto model = vsg::read_cast<vsg::Node>(model_filename_path, options);
+        //     if (!model)
+        //     {
+        //         continue;
+        //     }
 
         //     auto translations = vsg::vec3Array::create(transforms.size());
         //     auto rotations = vsg::quatArray::create(transforms.size());
         //     auto scales = vsg::vec3Array::create(transforms.size());
+
+        //     auto instance_node = vsg::InstanceNode::create();
+        //     instance_node->firstInstance = 0;
+        //     instance_node->instanceCount = transforms.size();
+        //     instance_node->setTranslations(translations);
+        //     instance_node->setRotations(rotations);
+        //     instance_node->setScales(scales);
+        //     instance_node->child = model;
 
         //     for (std::size_t i = 0; i < transforms.size(); ++i)
         //     {
