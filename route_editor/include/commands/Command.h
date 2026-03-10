@@ -1,7 +1,7 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include <string>
+#define COMMAND_DESCRIPTION_BUFFER_SIZE 256
 
 struct EditorContext;
 
@@ -12,10 +12,12 @@ public:
     virtual ~Command() = default;
     virtual void execute() const = 0;
     virtual void undo() const = 0;
-    virtual std::string to_string() const = 0;
+    virtual void update_description() = 0;
+    const char* get_description() const { return description; }
 
 protected:
     EditorContext& context;
+    char description[COMMAND_DESCRIPTION_BUFFER_SIZE];
 };
 
 #endif // COMMAND_H

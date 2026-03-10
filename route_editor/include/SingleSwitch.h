@@ -31,8 +31,8 @@ public:
     template <class N, class V>
     static void t_traverse(N& node, V& visitor)
     {
-        if (node.node && (visitor.traversalMask & (
-            visitor.overrideMask | node.mask)) != vsg::MASK_OFF)
+        if (node.node && (visitor.traversalMask &
+            (visitor.overrideMask | node.mask)) != vsg::MASK_OFF)
         {
             node.node->accept(visitor);
         }

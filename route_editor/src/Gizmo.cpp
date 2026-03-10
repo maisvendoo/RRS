@@ -256,8 +256,7 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
         return;
     }
 
-    context.commands.push(new MoveObjectsCommand(context, context.selected_objects, total_translation),
-        false);
+    context.commands.push(new MoveObjectsCommand(context, total_translation), false);
 
     active_arrow = nullptr;
 

@@ -117,12 +117,12 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 if (curr == active)
                 {
-                    ImGui::Text("--> %s", curr->command->to_string().c_str());
+                    ImGui::Text("--> %s", curr->command->get_description());
                     ImGui::Separator();
                 }
                 else
                 {
-                    ImGui::Text("%s", curr->command->to_string().c_str());
+                    ImGui::Text("%s", curr->command->get_description());
                     ImGui::Separator();
                 }
 
@@ -264,26 +264,29 @@ void EditorGui::show_route_map() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, transform] : context.route_map)
+        for (const auto& [label, transforms] : context.route_map)
         {
-            const vsg::vec3 translation = transform.translation;
-            const vsg::vec3 rotation_deg = transform.rotation;
+            for (const auto& transform : transforms)
+            {
+                const vsg::vec3 translation = transform.translation;
+                const vsg::vec3 rotation_deg = transform.rotation_deg;
 
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("%s", label.c_str());
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.x);
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.y);
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.z);
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", rotation_deg.x);
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", rotation_deg.y);
-            ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", rotation_deg.z);
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", label.c_str());
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", translation.x);
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", translation.y);
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", translation.z);
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", rotation_deg.x);
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", rotation_deg.y);
+                ImGui::TableNextColumn();
+                ImGui::Text("%10.3f", rotation_deg.z);
+            }
         }
 
         ImGui::EndTable();
@@ -344,29 +347,17 @@ void EditorGui::show_camera_settings() const
 {
     ImGui::Begin("Camera Settings", nullptr, window_flags);
 
-    // TODO: Replace double on float
-
     ImGui::Text("Move speed:");
-    float move_speed = static_cast<float>(context.settings.camera_move_speed);
-    if (ImGui::DragFloat("##move_speed", &move_speed,
-        1.0f, 1.0f, MAX_DRAG))
-    {
-        context.settings.camera_move_speed = move_speed;
-    }
+    ImGui::DragFloat("##move_speed", &context.settings.camera_move_speed,
+        1.0f, 1.0f, MAX_DRAG);
 
     ImGui::Text("Rotate speed:");
-    float rotate_speed = static_cast<float>(context.settings.camera_rotate_speed);
-    if (ImGui::DragFloat("##rotate_speed", &rotate_speed, 1.0f, 1.0f, MAX_DRAG))
-    {
-        context.settings.camera_rotate_speed = rotate_speed;
-    }
+    ImGui::DragFloat("##rotate_speed", &context.settings.camera_rotate_speed,
+        1.0f, 1.0f, MAX_DRAG);
 
     ImGui::Text("Zoom power:");
-    float zoom_power = static_cast<float>(context.settings.camera_zoom_power);
-    if (ImGui::DragFloat("##zoom_power", &zoom_power, 1.0f, 1.0f, MAX_DRAG))
-    {
-        context.settings.camera_zoom_power = zoom_power;
-    }
+    ImGui::DragFloat("##zoom_power", &context.settings.camera_zoom_power,
+        1.0f, 1.0f, MAX_DRAG);
 
     ImGui::Text("FovY:");
     float fovy = static_cast<float>(context.perspective->fieldOfViewY);

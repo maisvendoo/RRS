@@ -24,13 +24,18 @@
 #include <vsg/app/CommandGraph.h>
 #include <vsg/app/RenderGraph.h>
 #include <vsg/app/View.h>
+#include <vsg/core/Array.h>
 #include <vsg/core/ConstVisitor.h>
 #include <vsg/io/Options.h>
+#include <vsg/io/read.h>
 #include <vsg/lighting/AmbientLight.h>
 #include <vsg/lighting/DirectionalLight.h>
 #include <vsg/lighting/HardShadows.h>
 #include <vsg/maths/sphere.h>
+#include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/CullNode.h>
+#include <vsg/nodes/InstanceNode.h>
 #include <vsg/nodes/PagedLOD.h>
 #include <vsg/nodes/RegionOfInterest.h>
 #include <vsg/nodes/StateGroup.h>
@@ -725,16 +730,12 @@ bool RouteViewer::loadRoute()
 
     // Создание PagedLOD для моделей в маршруте
     vsg::ref_ptr<vsg::Group> route_root = vsg::Group::create();
-    auto current = route.transforms.begin();
-    while (current != route.transforms.end())
-    {
-        std::string label = current->first;
-        auto range = route.transforms.equal_range(label);
 
+    for (auto& [label, transforms] : route.route_map)
+    {
         auto found_it = route.object_ref.find(label);
         if (found_it == route.object_ref.end())
         {
-            current = range.second;
             continue;
         }
 
@@ -742,40 +743,71 @@ bool RouteViewer::loadRoute()
         if (!vsg::fileExists(model_filename_path))
         {
             LOG_WARN("Fail to find file: %s", model_filename_path.c_str());
-            current = range.second;
             continue;
         }
 
-        auto pagedLOD = vsg::PagedLOD::create();
-        pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), settings.view_distance);
-        pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
-        pagedLOD->filename = model_filename_path;
-        pagedLOD->options = options;
+        // if (transforms.size() > 1500)
+        // {
+        //     auto instance_node = vsg::InstanceNode::create();
+        //     instance_node->firstInstance = 0;
+        //     instance_node->instanceCount = transforms.size();
+        //     instance_node->child = vsg::read_cast<vsg::Node>(model_filename_path, options);
 
-        for (auto it = range.first; it != range.second; ++it)
-        {
-            auto& transform = it->second;
+        //     auto translations = vsg::vec3Array::create(transforms.size());
+        //     auto rotations = vsg::quatArray::create(transforms.size());
+        //     auto scales = vsg::vec3Array::create(transforms.size());
 
-            auto matrix = vsg::MatrixTransform::create();
-            transform.r_x = -vsg::radians(transform.r_x);
-            transform.r_y = -vsg::radians(transform.r_y);
-            transform.r_z = -vsg::radians(transform.r_z);
+        //     for (std::size_t i = 0; i < transforms.size(); ++i)
+        //     {
+        //         auto& transform = transforms.at(i);
+        //         transform.r_x = -vsg::radians(transform.r_x);
+        //         transform.r_y = -vsg::radians(transform.r_y);
+        //         transform.r_z = -vsg::radians(transform.r_z);
 
-            auto rotate_x = vsg::rotate(transform.r_x, vsg::vec3(1.0f, 0.0f, 0.0f));
-            auto rotate_y = vsg::rotate(transform.r_y, vsg::vec3(0.0f, 1.0f, 0.0f));
-            auto rotate_z = vsg::rotate(transform.r_z, vsg::vec3(0.0f, 0.0f, 1.0f));
-            auto translate = vsg::translate(transform.t_x, transform.t_y, transform.t_z);
+        //         auto rotate_x = vsg::rotate(transform.r_x, vsg::vec3(1.0f, 0.0f, 0.0f));
+        //         auto rotate_y = vsg::rotate(transform.r_y, vsg::vec3(0.0f, 1.0f, 0.0f));
+        //         auto rotate_z = vsg::rotate(transform.r_z, vsg::vec3(0.0f, 0.0f, 1.0f));
+        //         auto translate = vsg::translate(transform.t_x, transform.t_y, transform.t_z);
 
-            matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
-            matrix->addChild(pagedLOD);
-            route_root->addChild(matrix);
-        }
+        //         auto matrix = translate * rotate_z * rotate_y * rotate_x;
 
-        current = range.second;
+        //         vsg::decompose(matrix, translations->at(i), rotations->at(i), scales->at(i));
+        //     }
+
+        //     auto cull_node = vsg::CullNode::create();
+        //     cull_node->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), settings.view_distance);
+        //     cull_node->child = instance_node;
+        //     route_root->addChild(cull_node);
+        // }
+        // else
+        // {
+            auto pagedLOD = vsg::PagedLOD::create();
+            pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), settings.view_distance);
+            pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
+            pagedLOD->filename = model_filename_path;
+            pagedLOD->options = options;
+
+            for (auto& transform : transforms)
+            {
+                auto matrix = vsg::MatrixTransform::create();
+                transform.r_x = -vsg::radians(transform.r_x);
+                transform.r_y = -vsg::radians(transform.r_y);
+                transform.r_z = -vsg::radians(transform.r_z);
+
+                auto rotate_x = vsg::rotate(transform.r_x, vsg::vec3(1.0f, 0.0f, 0.0f));
+                auto rotate_y = vsg::rotate(transform.r_y, vsg::vec3(0.0f, 1.0f, 0.0f));
+                auto rotate_z = vsg::rotate(transform.r_z, vsg::vec3(0.0f, 0.0f, 1.0f));
+                auto translate = vsg::translate(transform.t_x, transform.t_y, transform.t_z);
+
+                matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
+                matrix->addChild(pagedLOD);
+                route_root->addChild(matrix);
+            }
+        // }
     }
 
     route.object_ref.clear();
-    route.transforms.clear();
+    route.route_map.clear();
 
     root->addChild(route_root);
 

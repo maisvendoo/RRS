@@ -122,8 +122,13 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         if (!selected_objects.empty() &&
             !context.keyboard_handler->get_any_shift_state())
         {
-            context.commands.push(
-                new SelectObjectsCommand(context, {}, selected_objects), true);
+            SelectObjectsCommand* const select_objects_command =
+                new SelectObjectsCommand(context);
+
+            select_objects_command->objects_to_deselect = selected_objects;
+            select_objects_command->update_description();
+
+            context.commands.push(select_objects_command, true);
         }
 
         return;
@@ -396,29 +401,36 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
 void ObjectSelector::select_object(RouteObject* object)
 {
+    SelectObjectsCommand* const select_objects_command =
+        new SelectObjectsCommand(context);
+
+    RouteObjects& objects_to_select =
+        select_objects_command->objects_to_select;
+
+    RouteObjects& objects_to_deselect =
+        select_objects_command->objects_to_deselect;
+
     if (context.keyboard_handler->get_any_shift_state())
     {
         if (object->get_is_selected())
         {
-            context.commands.push(new SelectObjectsCommand(context, {}, {object}), true);
+            objects_to_deselect.emplace_back(object);
         }
         else
         {
-            context.commands.push(new SelectObjectsCommand(context, {object}, {}), true);
+            objects_to_select.emplace_back(object);
         }
     }
     else
     {
-        const auto& selected_objects = context.selected_objects;
+        const RouteObjects& selected_objects = context.selected_objects;
 
         if (selected_objects.empty())
         {
-            context.commands.push(new SelectObjectsCommand(context, {object}, {}), true);
+            objects_to_select.emplace_back(object);
         }
         else if (object->get_is_selected())
         {
-            RouteObjects objects_to_deselect;
-
             if (selected_objects.size() == 1)
             {
                 objects_to_deselect.emplace_back(object);
@@ -433,16 +445,17 @@ void ObjectSelector::select_object(RouteObject* object)
                     }
                 }
             }
-
-            context.commands.push(new SelectObjectsCommand(context,
-                {}, std::move(objects_to_deselect)), true);
         }
         else
         {
-            context.commands.push(new SelectObjectsCommand(context,
-                {object}, selected_objects), true);
+            objects_to_select.emplace_back(object);
+            objects_to_deselect = selected_objects;
         }
     }
+
+    select_objects_command->update_description();
+
+    context.commands.push(select_objects_command, true);
 }
 
 void ObjectSelector::confirm_keyboard_move()
@@ -450,8 +463,7 @@ void ObjectSelector::confirm_keyboard_move()
     state = State::INITIAL;
     front_plane_switch->node = nullptr;
 
-    context.commands.push(new MoveObjectsCommand(context, context.selected_objects,
-        total_translation), false);
+    context.commands.push(new MoveObjectsCommand(context, total_translation), false);
 }
 
 void ObjectSelector::cancel_keyboard_move()

@@ -35,10 +35,10 @@ settings_t::settings_t()
     , fovy(64.0f)
     , fovy_min(2.0f)
     , fovy_max(100.0f)
-    , camera_initial_height(0.0)
-    , camera_move_speed(100.0)
-    , camera_rotate_speed(3.0)
-    , camera_zoom_power(250.0)
+    , camera_initial_height(0.0f)
+    , camera_move_speed(100.0f)
+    , camera_rotate_speed(3.0f)
+    , camera_zoom_power(250.0f)
     , gizmo_arrow_length(5.0f)
     , gizmo_arrow_thickness(0.1f)
     , gizmo_arrow_x_color(1.0f, 0.0f, 0.0f)
@@ -46,7 +46,7 @@ settings_t::settings_t()
     , gizmo_arrow_z_color(0.0f, 0.0f, 1.0f)
     , gizmo_opacity(1.0f)
     , gizmo_to_center(false)
-    , gui_font_size(20.0)
+    , gui_font_size(20.0f)
     , is_gui_editable(false)
     , show_objects_ref(true)
     , show_route_map(false)
@@ -96,10 +96,10 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getFloat(section, "FovY", fovy);
     cfg.getFloat(section, "FovYMin", fovy_min);
     cfg.getFloat(section, "FovYMax", fovy_max);
-    cfg.getDouble(section, "InitialHeight", camera_initial_height);
-    cfg.getDouble(section, "MoveSpeed", camera_move_speed);
-    cfg.getDouble(section, "RotateSpeed", camera_rotate_speed);
-    cfg.getDouble(section, "ZoomPower", camera_zoom_power);
+    cfg.getFloat(section, "InitialHeight", camera_initial_height);
+    cfg.getFloat(section, "MoveSpeed", camera_move_speed);
+    cfg.getFloat(section, "RotateSpeed", camera_rotate_speed);
+    cfg.getFloat(section, "ZoomPower", camera_zoom_power);
 
     section = "Gizmo";
 
@@ -119,7 +119,7 @@ void settings_t::read(const std::string& cfg_path)
 
     section = "GUI";
 
-    cfg.getDouble(section, "FontSize", gui_font_size);
+    cfg.getFloat(section, "FontSize", gui_font_size);
     cfg.getBool(section, "IsEditable", is_gui_editable);
     cfg.getBool(section, "ShowObjectsRef", show_objects_ref);
     cfg.getBool(section, "ShowRouteMap", show_route_map);

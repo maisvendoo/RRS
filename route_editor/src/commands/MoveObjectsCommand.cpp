@@ -1,23 +1,25 @@
 #include "MoveObjectsCommand.h"
 
+#include "Command.h"
+#include "EditorContext.h"
 #include "RouteObject.h"
 
 #include <vsg/maths/vec3.h>
 
 #include <cstdio>
-#include <string>
 
-MoveObjectsCommand::MoveObjectsCommand(EditorContext& context, const RouteObjects& objects,
+MoveObjectsCommand::MoveObjectsCommand(EditorContext& context,
     vsg::vec3 translation)
     : Command(context)
-    , objects(objects)
+    , objects(context.selected_objects)
     , translation(translation)
 {
+    update_description();
 }
 
 void MoveObjectsCommand::execute() const
 {
-    for (const auto& object : objects)
+    for (RouteObject* const object : objects)
     {
         object->move(translation);
     }
@@ -25,16 +27,15 @@ void MoveObjectsCommand::execute() const
 
 void MoveObjectsCommand::undo() const
 {
-    for (const auto& object : objects)
+    for (RouteObject* const object : objects)
     {
         object->move(-translation);
     }
 }
 
-std::string MoveObjectsCommand::to_string() const
+void MoveObjectsCommand::update_description()
 {
-    char buffer[64];
-    std::snprintf(buffer, 64, "Move objects: { %10.3f, %10.3f, %10.3f }",
+    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
+        "Move objects: { %10.3f, %10.3f, %10.3f }",
         translation.x, translation.y, translation.z);
-    return buffer;
 }

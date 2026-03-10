@@ -6,18 +6,18 @@
 
 #include <vsg/maths/vec3.h>
 
-#include <string>
+struct EditorContext;
 
 class ScaleObjectsCommand : public Command
 {
 public:
-    ScaleObjectsCommand(EditorContext& context, const RouteObjects& objects, vsg::vec3 pivot,
+    ScaleObjectsCommand(EditorContext& context, vsg::vec3 pivot,
         vsg::vec3 scale);
 
     virtual ~ScaleObjectsCommand() override = default;
     virtual void execute() const override;
     virtual void undo() const override;
-    virtual std::string to_string() const override;
+    virtual void update_description() override;
 
 private:
     const RouteObjects objects;

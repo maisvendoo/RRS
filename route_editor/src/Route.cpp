@@ -13,12 +13,14 @@
 
 #include <CfgReader.h>
 
+#include <vsg/app/RecordTraversal.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/InstanceNode.h>
 
 #include <QString>
 
@@ -139,8 +141,7 @@ bool Route::load_route_map()
 
         if (iss >> label >> translation >> rotation)
         {
-            context.route_map.emplace(std::move(label),
-                RouteMapTransformation{translation, rotation});
+            context.route_map[label].emplace_back(RouteMapTransformation{translation, rotation});
         }
     }
 
@@ -149,7 +150,7 @@ bool Route::load_route_map()
 
 void Route::load_static_objects(const PagedLodMap& paged_lods)
 {
-    for (const auto& [label, transform] : context.route_map)
+    for (const auto& [label, transforms] : context.route_map)
     {
         const auto paged_lod_it = paged_lods.find(label);
         if (paged_lod_it == paged_lods.cend())
@@ -157,10 +158,13 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
             continue;
         }
 
-        const auto object = RouteObject::create(context, paged_lod_it->second,
-            label, transform.translation, -transform.rotation);
+        for (const auto& transform : transforms)
+        {
+            const auto object = RouteObject::create(context, paged_lod_it->second,
+                label, transform.translation, -transform.rotation_deg);
 
-        this->addChild(vsg::MASK_ALL, object);
+            this->addChild(vsg::MASK_ALL, object);
+        }
     }
 }
 
@@ -235,6 +239,11 @@ bool Route::load_topology()
 
             const std::string signal_model_name =
                 signal->getSignalModel().toStdString();
+
+            if (signal_model_name.empty() || signal_model_name == "empty_line")
+            {
+                continue;
+            }
 
             const std::string signal_model_path = fs.combinePath(
                 models_dir, signal_model_name) + ".gltf";

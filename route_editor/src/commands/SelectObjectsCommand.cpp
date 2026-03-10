@@ -1,66 +1,27 @@
 #include "SelectObjectsCommand.h"
 
+#include "Command.h"
+#include "EditorContext.h"
 #include "Gizmo.h"
 #include "ObjectSelector.h"
 #include "RouteObject.h"
 
 #include <cstdio>
 #include <string>
-#include <utility>
 
-
-SelectObjectsCommand::SelectObjectsCommand(
-    EditorContext& context,
-    const RouteObjects& objects_to_select,
-    const RouteObjects& objects_to_deselect
-)
+SelectObjectsCommand::SelectObjectsCommand(EditorContext& context)
     : Command(context)
-    , objects_to_select(objects_to_select)
-    , objects_to_deselect(objects_to_deselect)
-{
-}
-
-SelectObjectsCommand::SelectObjectsCommand(
-    EditorContext& context,
-    const RouteObjects& objects_to_select,
-    const RouteObjects&& objects_to_deselect
-)
-    : Command(context)
-    , objects_to_select(objects_to_select)
-    , objects_to_deselect(std::move(objects_to_deselect))
-{
-}
-
-SelectObjectsCommand::SelectObjectsCommand(
-    EditorContext& context,
-    const RouteObjects&& objects_to_select,
-    const RouteObjects& objects_to_deselect
-)
-    : Command(context)
-    , objects_to_select(std::move(objects_to_select))
-    , objects_to_deselect(objects_to_deselect)
-{
-}
-
-SelectObjectsCommand::SelectObjectsCommand(
-    EditorContext& context,
-    const RouteObjects&& objects_to_select,
-    const RouteObjects&& objects_to_deselect
-)
-    : Command(context)
-    , objects_to_select(std::move(objects_to_select))
-    , objects_to_deselect(std::move(objects_to_deselect))
 {
 }
 
 void SelectObjectsCommand::execute() const
 {
-    for (const auto& object : objects_to_select)
+    for (RouteObject* const object : objects_to_select)
     {
         object->select();
     }
 
-    for (const auto& object : objects_to_deselect)
+    for (RouteObject* const object : objects_to_deselect)
     {
         object->deselect();
     }
@@ -70,12 +31,12 @@ void SelectObjectsCommand::execute() const
 
 void SelectObjectsCommand::undo() const
 {
-    for (const auto& object : objects_to_select)
+    for (RouteObject* const object : objects_to_select)
     {
         object->deselect();
     }
 
-    for (const auto& object : objects_to_deselect)
+    for (RouteObject* const object : objects_to_deselect)
     {
         object->select();
     }
@@ -83,12 +44,10 @@ void SelectObjectsCommand::undo() const
     context.gizmo->update_visibility();
 }
 
-std::string SelectObjectsCommand::to_string() const
+void SelectObjectsCommand::update_description()
 {
-    char buffer[128];
-    std::snprintf(buffer, 128,
+    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Select objects: to select: %zu objects\n"
         "                to deselect: %zu objects",
         objects_to_select.size(), objects_to_deselect.size());
-    return buffer;
 }

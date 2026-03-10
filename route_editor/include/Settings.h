@@ -31,11 +31,10 @@ struct settings_t
     float fovy_min;         ///< Vertical view angle min
     float fovy_max;         ///< Vertical view angle max
 
-    double camera_initial_height;
-
-    double camera_move_speed;
-    double camera_rotate_speed;
-    double camera_zoom_power;
+    float camera_initial_height;
+    float camera_move_speed;
+    float camera_rotate_speed;
+    float camera_zoom_power;
 
     float gizmo_arrow_length;
     float gizmo_arrow_thickness;
@@ -45,7 +44,7 @@ struct settings_t
     float gizmo_opacity;
     bool gizmo_to_center;
 
-    double gui_font_size;
+    float gui_font_size;
     bool is_gui_editable;
     bool show_objects_ref;
     bool show_route_map;

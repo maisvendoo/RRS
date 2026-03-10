@@ -2,46 +2,22 @@
 #define HIDE_OBJECTS_COMMAND_H
 
 #include "Command.h"
-#include "EditorContext.h"
 #include "RouteObject.h"
 
-#include <string>
+struct EditorContext;
 
 class HideObjectsCommand : public Command
 {
 public:
-    HideObjectsCommand(
-        EditorContext& context,
-        const RouteObjects& objects_to_hide,
-        const RouteObjects& objects_to_show
-    );
-
-    HideObjectsCommand(
-        EditorContext& context,
-        const RouteObjects& objects_to_hide,
-        const RouteObjects&& objects_to_show
-    );
-
-    HideObjectsCommand(
-        EditorContext& context,
-        const RouteObjects&& objects_to_hide,
-        const RouteObjects& objects_to_show
-    );
-
-    HideObjectsCommand(
-        EditorContext& context,
-        const RouteObjects&& objects_to_hide,
-        const RouteObjects&& objects_to_show
-    );
-
+    explicit HideObjectsCommand(EditorContext& context);
     virtual ~HideObjectsCommand() override = default;
     virtual void execute() const override;
     virtual void undo() const override;
-    virtual std::string to_string() const override;
+    virtual void update_description() override;
 
-private:
-    const RouteObjects objects_to_hide;
-    const RouteObjects objects_to_show;
+public:
+    RouteObjects objects_to_hide;
+    RouteObjects objects_to_show;
 };
 
 
