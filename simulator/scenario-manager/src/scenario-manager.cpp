@@ -1077,12 +1077,17 @@ void ScenarioManager::slotRenameTrain(int train_idx, QString new_name)
     {
         emit sigSendExistedNameFound(train_idx);
         return;
-    }
+    }    
 
     for (size_t i = 0; i < train_datas.size(); ++i)
     {
         if (train_datas[i].getIndex() == train_idx)
         {
+            if (train_datas[i].name == new_name.toStdString())
+            {
+                return;
+            }
+
             train_datas[i].name = new_name.toStdString();
             break;
         }
