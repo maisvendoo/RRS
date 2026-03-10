@@ -190,9 +190,10 @@ private:
     /// Генерация кода сценария
     QStringList createTmpScenarioCode(const std::vector<active_train_t> &active_trains);
 
-    /// Создание временного сценария
-    void createTmpScenario(const QString &route_name,
-                           const std::vector<active_train_t> &active_trains);
+    /// Создание фалй сценария на основе ручной расстановки в лаунчере
+    void createScenario(const QString &route_name,
+                        const std::vector<active_train_t> &active_trains,
+                        const QString scenario_name = STARTUP_SCN_SUBDIR);
 
 private slots:
 

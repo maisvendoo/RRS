@@ -537,7 +537,7 @@ void MainWindow::startSimulator()
     }
     else
     {
-        createTmpScenario(selectedRouteDirName, active_trains);
+        createScenario(selectedRouteDirName, active_trains);
         args << "--scenario=" + STARTUP_SCN_SUBDIR;
     }
 
@@ -1497,8 +1497,9 @@ QStringList MainWindow::createTmpScenarioCode(const std::vector<active_train_t> 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::createTmpScenario(const QString &route_name,
-                                   const std::vector<active_train_t> &active_trains)
+void MainWindow::createScenario(const QString &route_name,
+                                const std::vector<active_train_t> &active_trains,
+                                const QString scenario_name)
 {
     auto scnCode = createTmpScenarioCode(active_trains);
 
@@ -1533,16 +1534,16 @@ void MainWindow::createTmpScenario(const QString &route_name,
 
     QDir scnDir(scenarios_path.c_str());
 
-    if (!scnDir.exists(STARTUP_SCN_SUBDIR))
+    if (!scnDir.exists(scenario_name))
     {
-        if (!scnDir.mkdir(STARTUP_SCN_SUBDIR))
+        if (!scnDir.mkdir(scenario_name))
         {
             return;
         }
     }
 
     std::string file_path = scenarios_path + fs.separator()
-                            + STARTUP_SCN_SUBDIR.toStdString()
+                            + scenario_name.toStdString()
                             + fs.separator() + "main.lua";
 
     QFile file(file_path.c_str());
