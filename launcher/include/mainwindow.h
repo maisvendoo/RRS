@@ -180,6 +180,9 @@ private:
     /// Генерация сценарной команды setDate
     QString createLuaSetDate(QDateEdit *dateEdit);
 
+    /// Генерация сценарной команды setTime
+    QString createLuaSetTime(QTimeEdit *timeEdit);
+
 private slots:
 
     void slotRouteSelection();
