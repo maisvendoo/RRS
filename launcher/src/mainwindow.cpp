@@ -1517,6 +1517,13 @@ QStringList MainWindow::createTmpScenarioCode(const std::vector<active_train_t> 
 void MainWindow::createTmpScenario(const QString &route_name,
                                    const std::vector<active_train_t> &active_trains)
 {
+    auto scnCode = createTmpScenarioCode(active_trains);
+
+    if (scnCode.empty())
+    {
+        return;
+    }
+
     FileSystem &fs = FileSystem::getInstance();
     std::string route_path = fs.getRouteRootDir() + fs.separator() + route_name.toStdString();
 
@@ -1560,9 +1567,7 @@ void MainWindow::createTmpScenario(const QString &route_name,
         return;
     }
 
-    QTextStream stream(&file);
-
-    auto scnCode = createTmpScenarioCode(active_trains);
+    QTextStream stream(&file);    
 
     for (auto line : scnCode)
     {
