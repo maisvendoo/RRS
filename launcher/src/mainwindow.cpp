@@ -518,27 +518,26 @@ void MainWindow::startSimulator()
 
     args << "--route=" + selectedRouteDirName;
 
+    server_date_t start_date = server_date_t(
+        static_cast<int16_t>(ui->dteStartDate->dateTime().date().year()),
+        static_cast<uint8_t>(ui->dteStartDate->dateTime().date().month()),
+        static_cast<uint8_t>(ui->dteStartDate->dateTime().date().day()));
+    server_time_t start_time = server_time_t(
+        static_cast<uint8_t>(ui->dteStartTime->dateTime().time().hour()),
+        static_cast<uint8_t>(ui->dteStartTime->dateTime().time().minute()),
+        static_cast<uint8_t>(ui->dteStartTime->dateTime().time().second()),
+        static_cast<uint16_t>(ui->dteStartTime->dateTime().time().msec()));
+    std::int64_t start_datetime = simulator_time_t(start_date, start_time).data();
+
+    args << "--start=" + QString::number(start_datetime);
+
     if (selected_scenario_idx >= 0)
     {
         args << "--scenario=" + routes_info[selected_route_idx].scenarios[selected_scenario_idx].scenario_name;
     }
     else
     {
-        server_date_t start_date = server_date_t(
-            static_cast<int16_t>(ui->dteStartDate->dateTime().date().year()),
-            static_cast<uint8_t>(ui->dteStartDate->dateTime().date().month()),
-            static_cast<uint8_t>(ui->dteStartDate->dateTime().date().day()));
-        server_time_t start_time = server_time_t(
-            static_cast<uint8_t>(ui->dteStartTime->dateTime().time().hour()),
-            static_cast<uint8_t>(ui->dteStartTime->dateTime().time().minute()),
-            static_cast<uint8_t>(ui->dteStartTime->dateTime().time().second()),
-            static_cast<uint16_t>(ui->dteStartTime->dateTime().time().msec()));
-        std::int64_t start_datetime = simulator_time_t(start_date, start_time).data();
-
-        args << "--start=" + QString::number(start_datetime);
-
         createTmpScenario(selectedRouteDirName, active_trains);
-
         args << "--scenario=" + STARTUP_SCN_SUBDIR;
     }
 
