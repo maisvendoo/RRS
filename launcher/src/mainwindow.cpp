@@ -1469,3 +1469,24 @@ QString MainWindow::createLuaSetTime(QTimeEdit *timeEdit)
 
     return setTime;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QStringList MainWindow::createLuaSetTrain(size_t idx, const active_train_t &at)
+{
+    QStringList setTrainCode;
+    setTrainCode.clear();
+
+    QString varName = QString("train%1").arg(idx);
+
+    setTrainCode.append(varName + QString(" = TrainData.new()"));
+    setTrainCode.append(varName + QString(".name = \"%1\"").arg(idx));
+    setTrainCode.append(varName + QString(".config = \"%1\"").arg(at.train_info.train_config_path));
+    setTrainCode.append(varName + QString(".traj = \"%1\"").arg(at.train_position.trajectory_name));
+    setTrainCode.append(varName + QString(".coord = %1").arg(at.train_position.traj_coord));
+    setTrainCode.append(varName + QString(".dir = %1").arg(at.train_position.direction));
+    setTrainCode.append(QString("setTrain(%1)").arg(varName));
+
+    return setTrainCode;
+}

@@ -183,6 +183,9 @@ private:
     /// Генерация сценарной команды setTime
     QString createLuaSetTime(QTimeEdit *timeEdit);
 
+    /// Генерация Lua-кода установки поезда
+    QStringList createLuaSetTrain(size_t idx, const active_train_t &at);
+
 private slots:
 
     void slotRouteSelection();
