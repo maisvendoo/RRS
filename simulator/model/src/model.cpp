@@ -59,35 +59,23 @@ bool Model::init(const simulator_command_line_t &command_line)
     initTopology(init_data);
 
     // Init scenario's manager
-    if (initScenarioManager(init_data, command_line))
+    if (!initScenarioManager(init_data, command_line))
     {
-        if (!scnmgr->init_datas.empty())
-        {
-            init_datas = scnmgr->init_datas;
-        }
+        Journal::instance()->critical("Failed scenario manager initialization");
+        return false;
+    }
 
-        init_data.start_datetime = scnmgr->getStartDateTime();
+    if (!scnmgr->init_datas.empty())
+    {
+        init_datas = scnmgr->init_datas;
     }
     else
     {
-
-        // Если мы не играем сценарий, заполняем для него данные о поездах
-        // расставленных игроком в лаунчере
-        int train_num = 0;
-
-        for (auto init_data : init_datas)
-        {
-            scenario_train_data_t sc_td;
-            sc_td.name = QString("%1").arg(train_num++).toStdString();
-            sc_td.train_config = init_data.train_config.toStdString();
-            sc_td.traj_name = init_data.trajectory_name.toStdString();
-            sc_td.traj_coord = init_data.init_coord;
-            sc_td.direction = init_data.direction;
-            sc_td.is_auto = false;
-
-            scnmgr->train_datas.push_back(sc_td);
-        }
+        Journal::instance()->critical("Train's list is empty!!!");
+        return false;
     }
+
+    init_data.start_datetime = scnmgr->getStartDateTime();
 
     // Create all trains
     for (size_t i = 0; i < init_datas.size(); ++i)
