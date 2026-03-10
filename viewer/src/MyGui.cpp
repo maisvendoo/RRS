@@ -616,6 +616,41 @@ void MyGui::showTimetable() const
 
         ImVec4 textColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
 
+        double arr_delta_t = 0.0;
+        double dep_delta_t = 0.0;
+
+        // Проверяем опоздали ли прибыть
+        if (timetable.stations[i].is_arrival)
+        {
+            if (timetable.stations[i].fact_arr_time != "-")
+            {
+                arr_delta_t = timetable.stations[i].fact_arr_time_sec - timetable.stations[i].arr_time_sec;
+
+                if (qAbs(static_cast<int>(arr_delta_t)) > 120)
+                {
+                    textColor = ImVec4(1.0f, 0.5f, 0.31f, 1.0);
+                }
+            }
+        }
+
+        // Проверяем, опоздали ли отправиться
+        if (timetable.stations[i].is_departure)
+        {
+            if (timetable.stations[i].fact_dep_time != "-")
+            {
+                dep_delta_t = timetable.stations[i].fact_dep_time_sec - timetable.stations[i].dep_time_sec;
+
+                if (qAbs(static_cast<int>(dep_delta_t)) > 120)
+                {
+                    textColor = ImVec4(1.0f, 0.5f, 0.31f, 1.0);
+                }
+                else
+                {
+                    textColor = ImVec4(0.0f, 0.5f, 0.0f, 1.0);
+                }
+            }
+        }
+
         if (i == timetable.curr_station_idx)
         {
             textColor = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
