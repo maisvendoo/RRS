@@ -48,7 +48,11 @@ struct autopilot_station_t
     /// Признак платформы справа
     bool is_right_platform = false;
     /// Признак платформы слева
-    bool is_left_platform = false;    
+    bool is_left_platform = false;
+    /// Опоздание прибытия
+    bool arr_delay = false;
+    /// Опоздание отправления
+    bool dep_delay = false;
 
     QByteArray serialize()
     {
@@ -77,6 +81,8 @@ struct autopilot_station_t
         stream << is_build_arr_route;
         stream << is_right_platform;
         stream << is_left_platform;
+        stream << arr_delay;
+        stream << dep_delay;
 
         return data;
     }
@@ -107,6 +113,8 @@ struct autopilot_station_t
         stream >> is_build_arr_route;
         stream >> is_right_platform;
         stream >> is_left_platform;
+        stream >> arr_delay;
+        stream >> dep_delay;
     }
 };
 
