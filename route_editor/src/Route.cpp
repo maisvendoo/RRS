@@ -77,14 +77,15 @@ Route::Route(EditorContext& context)
 bool Route::load_objects_ref()
 {
     const FileSystem& fs = FileSystem::getInstance();
-    const auto objects_ref_path = fs.combinePath(context.route_dir, "objects.ref");
+
+    const std::string objects_ref_path = fs.combinePath(
+        context.route_dir, "objects.ref");
 
     std::ifstream objects_ref_file(objects_ref_path);
     if (!objects_ref_file)
     {
         // TODO: Replace on Journal
         std::fprintf(stderr, "Failed to open %s\n", objects_ref_path.c_str());
-
         return false;
     }
 
@@ -96,7 +97,8 @@ bool Route::load_objects_ref()
 
         if (iss >> label >> relative_path)
         {
-            context.objects_ref.emplace(std::move(label), std::move(relative_path));
+            context.objects_ref.emplace(std::move(label),
+                std::move(relative_path));
         }
     }
 
@@ -107,7 +109,7 @@ bool Route::load_route_map()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const auto route_map_path = fs.combinePath(context.route_dir,
+    const std::string route_map_path = fs.combinePath(context.route_dir,
         "topology", "map", "route1.map");
 
     std::ifstream route_map_file(route_map_path);
@@ -115,12 +117,10 @@ bool Route::load_route_map()
     {
         // TODO: Replace on Journal
         std::fprintf(stderr, "Failed to open %s\n", route_map_path.c_str());
-
         return false;
     }
 
     std::string line;
-
     while (std::getline(route_map_file, line))
     {
         if (line.empty())
@@ -141,7 +141,8 @@ bool Route::load_route_map()
 
         if (iss >> label >> translation >> rotation)
         {
-            context.route_map[label].emplace_back(RouteMapTransformation{translation, rotation});
+            context.route_map[label].emplace_back(
+                RouteMapTransformation{translation, rotation});
         }
     }
 
