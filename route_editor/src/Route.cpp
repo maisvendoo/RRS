@@ -24,16 +24,17 @@
 
 #include <QString>
 
-#include <algorithm>
+// #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <cerrno>
 #include <filesystem>
-#include <fstream>
-#include <sstream>
+// #include <fstream>
+// #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -101,6 +102,7 @@ bool Route::load_objects_ref()
 
     if (!buffer)
     {
+        // TODO: Replace on Journal
         std::fprintf(stderr, "Failed to allocate memory for %s content\n",
             objects_ref_path.c_str());
 
@@ -117,6 +119,7 @@ bool Route::load_objects_ref()
 
     if (bytes_read < static_cast<std::size_t>(buffer_length))
     {
+        // TODO: Replace on Journal
         std::fprintf(stderr, "Failed to read %s\n", objects_ref_path.c_str());
         free(buffer);
         return false;
@@ -196,7 +199,8 @@ bool Route::load_objects_ref()
                         {
                             label[label_length] = '\0';
 
-                            std::fprintf(stderr, "Objects ref: could not append"
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Objects ref: Could not append"
                                 "to label buffer %s\n", label);
 
                             break;
@@ -219,7 +223,8 @@ bool Route::load_objects_ref()
                         {
                             relative_path[relative_path_length] = '\0';
 
-                            std::fprintf(stderr, "Objects ref: could not append"
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Objects ref: Could not append"
                                 "to relative path buffer %s\n", relative_path);
 
                             break;
@@ -271,7 +276,7 @@ bool Route::load_route_map()
     const std::string route_map_path = fs.combinePath(context.route_dir,
         "topology", "map", "route1.map");
 
-    std::ifstream route_map_file(route_map_path);
+    FILE* const route_map_file = std::fopen(route_map_path.c_str(), "rb");
     if (!route_map_file)
     {
         // TODO: Replace on Journal
@@ -279,31 +284,372 @@ bool Route::load_route_map()
         return false;
     }
 
-    std::string line;
-    while (std::getline(route_map_file, line))
+    std::fseek(route_map_file, 0, SEEK_END);
+    const long buffer_length = std::ftell(route_map_file);
+    std::rewind(route_map_file);
+
+    char* const buffer = reinterpret_cast<char*>(
+        std::malloc(buffer_length + 1));
+
+    if (!buffer)
     {
-        if (line.empty())
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to allocate memory for %s content\n",
+            route_map_path.c_str());
+
+        std::fclose(route_map_file);
+        return false;
+    }
+
+    const std::size_t bytes_read = std::fread(
+        buffer, 1, buffer_length, route_map_file);
+
+    buffer[buffer_length] = '\0';
+
+    std::fclose(route_map_file);
+
+    if (bytes_read < static_cast<std::size_t>(buffer_length))
+    {
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to read %s\n", route_map_path.c_str());
+        free(buffer);
+        return false;
+    }
+
+    enum State
+    {
+        INITIAL,
+        START_LABEL,
+        FINISH_LABEL,
+        START_TRANSLATION_X,
+        FINISH_TRANSLATION_X,
+        START_TRANSLATION_Y,
+        FINISH_TRANSLATION_Y,
+        START_TRANSLATION_Z,
+        FINISH_TRANSLATION_Z,
+        START_ROTATION_X,
+        FINISH_ROTATION_X,
+        START_ROTATION_Y,
+        FINISH_ROTATION_Y,
+        START_ROTATION_Z,
+        FINISH_ROTATION_Z
+    };
+
+    char label[256];
+    std::uint8_t label_length = 0;
+    char float_buffer[32];
+    std::uint8_t float_buffer_length = 0;
+    vsg::vec3 translation;
+    vsg::vec3 rotation;
+    State state = INITIAL;
+
+    for (const char* ptr = buffer; *ptr != '\0'; ++ptr)
+    {
+        switch (*ptr)
         {
-            continue;
-        }
+            case '\n':
+            {
+                if (state >= START_ROTATION_Z)
+                {
+                    if (state == START_ROTATION_Z)
+                    {
+                        float_buffer[float_buffer_length] = '\0';
 
-        if (line.back() == ';')
-        {
-            line.pop_back();
-        }
+                        char* endptr;
+                        errno = 0;
+                        rotation.z = std::strtof(float_buffer, &endptr);
 
-        std::replace(line.begin(), line.end(), ',', ' ');
+                        if (errno == 0 || *endptr == '\0')
+                        {
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Route map: Wrong float value"
+                                "%s\n", float_buffer);
+                        }
+                    }
 
-        std::istringstream iss(std::move(line));
-        std::string label;
-        vsg::vec3 translation, rotation;
+                    context.route_map[label].emplace_back(
+                        RouteMapTransformation{translation, rotation});
+                }
 
-        if (iss >> label >> translation >> rotation)
-        {
-            context.route_map[label].emplace_back(
-                RouteMapTransformation{translation, rotation});
+                label_length = 0;
+                float_buffer_length = 0;
+                state = INITIAL;
+
+                break;
+            }
+            case ' ': case '\t': case ',': case ';':
+            {
+                switch (state)
+                {
+                    case START_LABEL:
+                    {
+                        label[label_length] = '\0';
+                        state = FINISH_LABEL;
+                        break;
+                    }
+                    case START_TRANSLATION_X:
+                    {
+                        float_buffer[float_buffer_length] = '\0';
+
+                        char* endptr;
+                        errno = 0;
+                        translation.x = std::strtof(float_buffer, &endptr);
+
+                        if (errno != 0 || *endptr != '\0')
+                        {
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Route map: Wrong float value"
+                                "%s\n", float_buffer);
+                        }
+
+                        float_buffer_length = 0;
+                        state = FINISH_TRANSLATION_X;
+
+                        break;
+                    }
+                    case START_TRANSLATION_Y:
+                    {
+                        float_buffer[float_buffer_length] = '\0';
+
+                        char* endptr;
+                        errno = 0;
+                        translation.y = std::strtof(float_buffer, &endptr);
+
+                        if (errno != 0 || *endptr != '\0')
+                        {
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Route map: Wrong float value"
+                                "%s\n", float_buffer);
+                        }
+
+                        float_buffer_length = 0;
+                        state = FINISH_TRANSLATION_Y;
+
+                        break;
+                    }
+                    case START_TRANSLATION_Z:
+                    {
+                        float_buffer[float_buffer_length] = '\0';
+
+                        char* endptr;
+                        errno = 0;
+                        translation.z = std::strtof(float_buffer, &endptr);
+
+                        if (errno != 0 || *endptr != '\0')
+                        {
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Route map: Wrong float value"
+                                "%s\n", float_buffer);
+                        }
+
+                        float_buffer_length = 0;
+                        state = FINISH_TRANSLATION_Z;
+
+                        break;
+                    }
+                    case START_ROTATION_X:
+                    {
+                        float_buffer[float_buffer_length] = '\0';
+
+                        char* endptr;
+                        errno = 0;
+                        rotation.x = std::strtof(float_buffer, &endptr);
+
+                        if (errno != 0 || *endptr != '\0')
+                        {
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Route map: Wrong float value"
+                                "%s\n", float_buffer);
+                        }
+
+                        float_buffer_length = 0;
+                        state = FINISH_ROTATION_X;
+
+                        break;
+                    }
+                    case START_ROTATION_Y:
+                    {
+                        float_buffer[float_buffer_length] = '\0';
+
+                        char* endptr;
+                        errno = 0;
+                        rotation.y = std::strtof(float_buffer, &endptr);
+
+                        if (errno != 0 || *endptr != '\0')
+                        {
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Route map: Wrong float value"
+                                "%s\n", float_buffer);
+                        }
+
+                        float_buffer_length = 0;
+                        state = FINISH_ROTATION_Y;
+
+                        break;
+                    }
+                    case START_ROTATION_Z:
+                    {
+                        float_buffer[float_buffer_length] = '\0';
+
+                        char* endptr;
+                        errno = 0;
+                        rotation.z = std::strtof(float_buffer, &endptr);
+
+                        if (errno != 0 || *endptr != '\0')
+                        {
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Route map: Wrong float value"
+                                "%s\n", float_buffer);
+                        }
+
+                        float_buffer_length = 0;
+                        state = FINISH_ROTATION_Z;
+
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+
+                break;
+            }
+            default:
+            {
+                switch (state)
+                {
+                    case INITIAL:
+                    {
+                        label[label_length] = *ptr;
+                        ++label_length;
+                        state = START_LABEL;
+                        break;
+                    }
+                    case START_LABEL:
+                    {
+                        if (label_length == 255)
+                        {
+                            label[label_length] = '\0';
+
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Objects ref: Could not append"
+                                "to label buffer %s\n", label);
+
+                            break;
+                        }
+
+                        label[label_length] = *ptr;
+                        ++label_length;
+                        break;
+                    }
+                    case FINISH_LABEL:
+                    {
+                        float_buffer[float_buffer_length] = *ptr;
+                        ++float_buffer_length;
+                        state = START_TRANSLATION_X;
+                        break;
+                    }
+                    case START_TRANSLATION_X: case START_TRANSLATION_Y:
+                    case START_TRANSLATION_Z: case START_ROTATION_X:
+                    case START_ROTATION_Y: case START_ROTATION_Z:
+                    {
+                        if (float_buffer_length == 31)
+                        {
+                            float_buffer[float_buffer_length] = '\0';
+
+                            // TODO: Replace on Journal
+                            std::fprintf(stderr, "Route map: Could not append"
+                                "to float buffer %s\n", float_buffer);
+
+                            break;
+                        }
+
+                        float_buffer[float_buffer_length] = *ptr;
+                        ++float_buffer_length;
+                        break;
+                    }
+                    case FINISH_TRANSLATION_X:
+                    {
+                        float_buffer[float_buffer_length] = *ptr;
+                        ++float_buffer_length;
+                        state = START_TRANSLATION_Y;
+                        break;
+                    }
+                    case FINISH_TRANSLATION_Y:
+                    {
+                        float_buffer[float_buffer_length] = *ptr;
+                        ++float_buffer_length;
+                        state = START_TRANSLATION_Z;
+                        break;
+                    }
+                    case FINISH_TRANSLATION_Z:
+                    {
+                        float_buffer[float_buffer_length] = *ptr;
+                        ++float_buffer_length;
+                        state = START_ROTATION_X;
+                        break;
+                    }
+                    case FINISH_ROTATION_X:
+                    {
+                        float_buffer[float_buffer_length] = *ptr;
+                        ++float_buffer_length;
+                        state = START_ROTATION_Y;
+                        break;
+                    }
+                    case FINISH_ROTATION_Y:
+                    {
+                        float_buffer[float_buffer_length] = *ptr;
+                        ++float_buffer_length;
+                        state = START_ROTATION_Z;
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+
+                break;
+            }
         }
     }
+
+    free(buffer);
+
+    // std::ifstream route_map_file(route_map_path);
+    // if (!route_map_file)
+    // {
+    //     // TODO: Replace on Journal
+    //     std::fprintf(stderr, "Failed to open %s\n", route_map_path.c_str());
+    //     return false;
+    // }
+
+    // std::string line;
+    // while (std::getline(route_map_file, line))
+    // {
+    //     if (line.empty())
+    //     {
+    //         continue;
+    //     }
+
+    //     if (line.back() == ';')
+    //     {
+    //         line.pop_back();
+    //     }
+
+    //     std::replace(line.begin(), line.end(), ',', ' ');
+
+    //     std::istringstream iss(std::move(line));
+    //     std::string label;
+    //     vsg::vec3 translation, rotation;
+
+    //     if (iss >> label >> translation >> rotation)
+    //     {
+    //         context.route_map[label].emplace_back(
+    //             RouteMapTransformation{translation, rotation});
+    //     }
+    // }
 
     return true;
 }
