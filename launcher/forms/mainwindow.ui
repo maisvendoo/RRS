@@ -417,6 +417,9 @@
                   <height>0</height>
                  </size>
                 </property>
+                <property name="frame">
+                 <bool>false</bool>
+                </property>
                </widget>
               </item>
               <item>
