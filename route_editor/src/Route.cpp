@@ -207,9 +207,9 @@ bool Route::load_topology()
 
     context.topology = new Topology;
 
-    const auto directory_stem = std::filesystem::path(context.route_dir).stem();
+    const auto directory_filename = std::filesystem::path(context.route_dir).filename();
 
-    if (!context.topology->load(directory_stem.string().c_str()))
+    if (!context.topology->load(directory_filename.string().c_str()))
     {
         // TODO: Replace on Journal
         std::fputs("Failed to load topology\n", stderr);
