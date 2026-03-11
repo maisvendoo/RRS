@@ -290,7 +290,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
             state_fwd = STATE_PLUS;
 
             int tmp_int = 0;
-            if (cfg.getInt(secNode, "state_bwd", tmp_int))
+            if (cfg.getInt(secNode, "state_fwd", tmp_int))
             {
                 if (tmp_int < 0)
                 {
@@ -396,13 +396,24 @@ void Switch::step(double t, double dt)
     int prev_state_fwd = state_fwd;
     int prev_state_bwd = state_bwd;
 
+    auto check_busy = [](Trajectory* traj, bool from_begin_or_end, double distance) -> bool
+    {
+        if (from_begin_or_end)
+        {
+            return traj->isBusy(0.0, distance);
+        }
+
+        double len = traj->getLength();
+        return traj->isBusy(len - distance, len);
+    };
+
     // Если возможны обе траектории вперёд, проверяем переключение стрелки
     if ((trajectories[SW_FWD_PLUS] != nullptr) && (trajectories[SW_FWD_MINUS] != nullptr))
     {
         // Если какая-то траектория спереди занята ПЕ ближе,
         // чем заданная дистанция, ставим стрелку в это направление,
         // а также сбрасываем маршрут диспетчерской централизации
-        if (trajectories[SW_FWD_PLUS]->isBusy(0.0, lock_by_busy_distance))
+        if (check_busy(trajectories[SW_FWD_PLUS], (orientations[SW_FWD_PLUS] == FWD), lock_by_busy_distance))
         {
             state_fwd = IS_BUSY_PLUS;
             ref_state_fwd = STATE_PLUS;
@@ -410,7 +421,7 @@ void Switch::step(double t, double dt)
         }
         else
         {
-            if (trajectories[SW_FWD_MINUS]->isBusy(0.0, lock_by_busy_distance))
+            if (check_busy(trajectories[SW_FWD_MINUS], (orientations[SW_FWD_MINUS] == FWD), lock_by_busy_distance))
             {
                 state_fwd = IS_BUSY_MINUS;
                 ref_state_fwd = STATE_MINUS;
@@ -430,8 +441,7 @@ void Switch::step(double t, double dt)
         // Если какая-то траектория сзади занята ПЕ ближе,
         // чем заданная дистанция, ставим стрелку в это направление,
         // а также сбрасываем маршрут диспетчерской централизации
-        double len = trajectories[SW_BWD_PLUS]->getLength();
-        if (trajectories[SW_BWD_PLUS]->isBusy(len - lock_by_busy_distance, len))
+        if (check_busy(trajectories[SW_BWD_PLUS], (orientations[SW_BWD_PLUS] != FWD), lock_by_busy_distance))
         {
             state_bwd = IS_BUSY_PLUS;
             ref_state_bwd = STATE_PLUS;
@@ -439,8 +449,7 @@ void Switch::step(double t, double dt)
         }
         else
         {
-            len = trajectories[SW_BWD_MINUS]->getLength();
-            if (trajectories[SW_BWD_MINUS]->isBusy(len - lock_by_busy_distance, len))
+            if (check_busy(trajectories[SW_BWD_MINUS], (orientations[SW_BWD_MINUS] != FWD), lock_by_busy_distance))
             {
                 state_bwd = IS_BUSY_MINUS;
                 ref_state_bwd = STATE_MINUS;
