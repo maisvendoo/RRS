@@ -403,6 +403,13 @@
                </spacer>
               </item>
               <item>
+               <widget class="QLabel" name="lScenarioNameForSave">
+                <property name="text">
+                 <string>Senario name</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLineEdit" name="leScnName"/>
               </item>
               <item>
