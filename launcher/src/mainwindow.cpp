@@ -148,6 +148,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->pbAddTrain, &QPushButton::released, this, &MainWindow::slotAddActiveTrain);
     connect(ui->pbDeleteTrain, &QPushButton::released, this, &MainWindow::slotDeleteActiveTrain);
 
+    connect(ui->pbSaveAsScenario, &QPushButton::released, this, &MainWindow::slotSaveTrainsConfigAsScenario);
+
     setCentralWidget(ui->twMain);
 
     setFocusPolicy(Qt::ClickFocus);
@@ -482,6 +484,20 @@ void MainWindow::clearActiveTrainsList()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::reloadScenariosList()
+{
+    ui->cbScenario->clear();
+    ui->cbScenario->addItem(tr("<Not_selected>"));
+
+    for (auto& sc : routes_info[selected_route_idx].scenarios)
+    {
+        ui->cbScenario->addItem(sc.scenario_name);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::loadActiveTrainsList()
 {
     if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
@@ -489,13 +505,7 @@ void MainWindow::loadActiveTrainsList()
         return;
     }
 
-    ui->cbScenario->clear();
-    ui->cbScenario->addItem("<Not_selected>");
-
-    for (auto& sc : routes_info[selected_route_idx].scenarios)
-    {
-        ui->cbScenario->addItem(sc.scenario_name);        
-    }
+    reloadScenariosList();
 
     slotUpdateActiveTrains();
 }
@@ -1212,6 +1222,42 @@ void MainWindow::slotOnScenarioSelection(int cur_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::slotSaveTrainsConfigAsScenario()
+{
+    if (ui->leScnName->text().isEmpty())
+    {
+        return;
+    }
+
+    QStringList scnCode;
+    scnCode.clear();
+
+    if (ui->ckbSaveDateTime->isChecked())
+    {
+        scnCode.append(createLuaSetDate(ui->dteStartDate));
+        scnCode.append(createLuaSetTime(ui->dteStartTime));
+        scnCode.append("\n");
+    }
+
+    scnCode.append(createTmpScenarioCode(active_trains));
+
+    createScenario(selectedRouteDirName, scnCode, ui->leScnName->text());
+
+    if (selected_route_idx < 0 || selected_route_idx >= routes_info.size())
+    {
+        return;
+    }
+
+    auto ri = &routes_info[selected_route_idx];
+
+    loadScenarios(*ri);
+
+    reloadScenariosList();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 const   QString MainWindow::WIDTH = "Width";
 const   QString MainWindow::HEIGHT = "Height";
 const   QString MainWindow::FULLSCREEN = "FullScreen";
@@ -1441,9 +1487,9 @@ QString MainWindow::createLuaSetDate(QDateEdit *dateEdit)
     QString setDate = "";
 
     setDate = QString("setDate(\"%1.%2.%3\")")
-                  .arg(dateEdit->dateTime().date().day(), 2, u'0')
-                  .arg(dateEdit->dateTime().date().month(), 2, u'0')
-                  .arg(dateEdit->dateTime().date().year(), 4, u'0');
+                  .arg(dateEdit->dateTime().date().day(), 2, 10, QChar('0'))
+                  .arg(dateEdit->dateTime().date().month(), 2, 10, QChar('0'))
+                  .arg(dateEdit->dateTime().date().year(), 4, 10, QChar('0'));
 
     return setDate;
 }
@@ -1456,9 +1502,9 @@ QString MainWindow::createLuaSetTime(QTimeEdit *timeEdit)
     QString setTime = "";
 
     setTime = QString("setTime(\"%1:%2:%3\")")
-                  .arg(timeEdit->dateTime().time().hour(), 2, u'0')
-                  .arg(timeEdit->dateTime().time().minute(), 2, u'0')
-                  .arg(timeEdit->dateTime().time().second(), 2, u'0');
+                  .arg(timeEdit->dateTime().time().hour(), 2, 10, QChar('0'))
+                  .arg(timeEdit->dateTime().time().minute(), 2, 10, QChar('0'))
+                  .arg(timeEdit->dateTime().time().second(), 2, 10, QChar('0'));
 
     return setTime;
 }

@@ -195,6 +195,9 @@ private:
                         const QStringList &scnCode,
                         const QString scenario_name = STARTUP_SCN_SUBDIR);
 
+    /// Перезагрузка списка сценариев в интерфейс
+    void reloadScenariosList();
+
 private slots:
 
     void slotRouteSelection();
@@ -256,6 +259,8 @@ private slots:
     void slotApplyGraphSettings();
 
     void slotOnScenarioSelection(int cur_idx);
+
+    void slotSaveTrainsConfigAsScenario();
 };
 
 

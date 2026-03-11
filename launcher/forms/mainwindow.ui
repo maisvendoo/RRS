@@ -433,7 +433,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="bpSaveAsScenario">
+               <widget class="QPushButton" name="pbSaveAsScenario">
                 <property name="minimumSize">
                  <size>
                   <width>120</width>
