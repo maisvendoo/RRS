@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>720</height>
+    <width>1275</width>
+    <height>718</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -386,6 +386,33 @@
                <set>Qt::AlignCenter</set>
               </property>
              </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_20">
+              <item>
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="leScnName"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="bpSaveAsScenario">
+                <property name="text">
+                 <string>Save as scenario</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <widget class="QFrame" name="frame">
