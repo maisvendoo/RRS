@@ -37,7 +37,7 @@
 // #include <sstream>
 #include <string>
 #include <utility>
-#include <vector>
+// #include <vector>
 
 static vsg::vec3 to_vsg_vec3(dvec3 vec)
 {
@@ -766,7 +766,7 @@ bool Route::load_topology()
             new_paged_lod->options = context.options;
 
             paged_lod_it = paged_lods.emplace(signal_model_path,
-                std::move(new_paged_lod)).first;
+                new_paged_lod).first;
         }
 
         paged_lod = paged_lod_it->second;
