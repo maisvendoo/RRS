@@ -112,20 +112,214 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
     }
 
     // Находим уазатель на стартовую траекторию
-    Trajectory *cur_traj = traj_list.value(tp.traj_name, nullptr);
+    Trajectory* cur_traj = traj_list.value(tp.traj_name, nullptr);
     if (cur_traj == nullptr)
     {
-        Journal::instance()->critical("INVALID INITIAL TRAJECTORY!!!");
+        Journal::instance()->critical(tp.traj_name + " INVALID INITIAL TRAJECTORY!!!");
         return false;
     }
 
-    double traj_coord = std::clamp(tp.traj_coord, 0.0, cur_traj->getLength());
+    double train_length = 0.0;
+    for (size_t i = 0; i < vehicles->size(); ++i)
+    {
+        train_length += (*vehicles)[i]->getLength();
+    }
 
-    dir_t dir = (tp.dir < 0) ? (BWD) : (FWD);
+    double traj_coord = std::clamp(tp.traj_coord, 0.0, cur_traj->getLength());
+    dir_t dir = (tp.dir > 0) ? FWD : BWD;
+
+    // Проходим по стартовой и соседним траекториям на длину поезда.
+    // Реализация похожа на Trajectory::findTrajectoryAtCoord(),
+    // но здесь нужно проверить занятость и переключить стрелки в направлении поезда
+    {
+        double begin_coord = traj_coord;
+        double end_coord = begin_coord - static_cast<double>(dir) * train_length;
+        Trajectory* check_traj = cur_traj;
+        dir_t move_dir;
+        while (true)
+        {
+            if (begin_coord < end_coord)
+            {
+                if (check_traj->isBusy(begin_coord, end_coord))
+                {
+                    // Если этот участок траектории уже занят подвижным составом, выходим
+                    Journal::instance()->critical(check_traj->getName() + " TRAJECTORY IS BUSY!!!");
+                    return false;
+                }
+            }
+            else
+            {
+                if (check_traj->isBusy(end_coord, begin_coord))
+                {
+                    // Если этот участок траектории уже занят подвижным составом, выходим
+                    Journal::instance()->critical(check_traj->getName() + " TRAJECTORY IS BUSY!!!");
+                    return false;
+                }
+            }
+
+            if (end_coord < 0.0)
+            {
+                // Если траекторная координата меньше нуля - заехали за стрелку сзади
+                move_dir = BWD;
+            }
+            else
+            {
+                if (end_coord > check_traj->getLength())
+                {
+                    // Если траекторная координата превысила длину траектории - заехали за стрелку спереди
+                    move_dir = FWD;
+                    // Учитываем вылет за пределы траектории
+                    end_coord = end_coord - check_traj->getLength();
+                }
+                else
+                {
+                    // УРА! Находимся в пределах траектории: выходим из цикла,
+                    // продолжаем инициализацию поезда на топологии
+                    break;
+                }
+            }
+
+            // Отслеживаем разворот ориентации траектории
+            dir_t new_dir = move_dir;
+
+            // Получаем указатель на стрелку в конце траектории
+            Switch* next_sw = check_traj->getNextSwitch(new_dir);
+            if (next_sw == nullptr)
+            {
+                // Если коннектора нет, выходим
+                Journal::instance()->critical(check_traj->getName() + " TRAJECTORY WITH INVALID NEXT SWITCH!!!");
+                return false;
+            }
+
+            // Проверяем стрелку на взрез
+            if (new_dir > 0)
+            {
+                // Движемся через стрелку вперёд, значит проверяем траекторию сзади
+                Switch_state_t bwd_state = next_sw->getStateBwd();
+                if (check_traj == next_sw->trajectories[SW_BWD_PLUS])
+                {
+                    // Если пришли с прямой траектории, стрелка не должна быть в минусовом положении
+                    if (bwd_state <= 0)
+                    {
+                        if (bwd_state != STATE_MINUS)
+                        {
+                            // Если стрелка занята в минусовом положении, выходим
+                            Journal::instance()->critical(next_sw->getName() + " SWITCH IS BUSY!!!");
+                            return false;
+                        }
+                        // Переводим стрелку в плюсовое положение
+                        next_sw->setStateBwd(STATE_PLUS);
+                        next_sw->setRefStateBwd(STATE_PLUS);
+                    }
+                }
+                else
+                {
+                    if (check_traj == next_sw->trajectories[SW_BWD_MINUS])
+                    {
+                        // Если пришли с боковой траектории, стрелка не должна быть в плюсовом положении
+                        if (bwd_state >= 0)
+                        {
+                            if (bwd_state != STATE_PLUS)
+                            {
+                                // Если стрелка занята в плюсовом положении, выходим
+                                Journal::instance()->critical(next_sw->getName() + " SWITCH IS BUSY!!!");
+                                return false;
+                            }
+                            // Переводим стрелку в минусовое положение
+                            next_sw->setStateBwd(STATE_MINUS);
+                            next_sw->setRefStateBwd(STATE_MINUS);
+                        }
+                    }
+                    else
+                    {
+                        // Вокруг стрелки нет этой траектории,
+                        // какая-то ошибка в топологии, на всякий случай выходим
+                        Journal::instance()->critical(next_sw->getName() + " SWITCH WITH INVALID CONFIG!!!");
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                // Движемся через стрелку назад, значит проверяем траекторию спереди
+                Switch_state_t fwd_state = next_sw->getStateFwd();
+                if (check_traj == next_sw->trajectories[SW_FWD_PLUS])
+                {
+                    // Если пришли с прямой траектории, стрелка не должна быть в минусовом положении
+                    if (fwd_state <= 0)
+                    {
+                        if (fwd_state != STATE_MINUS)
+                        {
+                            // Если стрелка занята в минусовом положении, выходим
+                            Journal::instance()->critical(next_sw->getName() + " SWITCH IS BUSY!!!");
+                            return false;
+                        }
+                        // Переводим стрелку в плюсовое положение
+                        next_sw->setStateFwd(STATE_PLUS);
+                        next_sw->setRefStateFwd(STATE_PLUS);
+                    }
+                }
+                else
+                {
+                    if (check_traj == next_sw->trajectories[SW_FWD_MINUS])
+                    {
+                        // Если пришли с боковой траектории, стрелка не должна быть в плюсовом положении
+                        if (fwd_state >= 0)
+                        {
+                            if (fwd_state != STATE_PLUS)
+                            {
+                                // Если стрелка занята в плюсовом положении, выходим
+                                Journal::instance()->critical(next_sw->getName() + " SWITCH IS BUSY!!!");
+                                return false;
+                            }
+                            // Переводим стрелку в минусовое положение
+                            next_sw->setStateFwd(STATE_MINUS);
+                            next_sw->setRefStateFwd(STATE_MINUS);
+                        }
+                    }
+                    else
+                    {
+                        // Вокруг стрелки нет этой траектории,
+                        // какая-то ошибка в топологии, на всякий случай выходим
+                        Journal::instance()->critical(next_sw->getName() + " SWITCH WITH INVALID CONFIG!!!");
+                        return false;
+                    }
+                }
+            }
+
+            // Получаем указатель на ту траекторию, с которой нас соединяет стрелка
+            check_traj = next_sw->getNextTraj(new_dir);
+
+            // Если за стрелкой нет траектории, выходим
+            if (check_traj == nullptr)
+            {
+                Journal::instance()->critical(next_sw->getName() + " SWITCH WITH INVALID NEXT TRAJECTORY!!!");
+                return false;
+            }
+
+            // Обновляем текущую траекторию
+            if (new_dir != move_dir)
+            {
+                // Если ориентация траектории изменилась, разворачиваемся
+                end_coord = -end_coord;
+            }
+
+            if (new_dir == BWD)
+            {
+                // Если смещаемся назад, начинаем отсчёт с конца траектории
+                begin_coord = check_traj->getLength();
+                end_coord = end_coord + check_traj->getLength();
+            }
+            else
+            {
+                begin_coord = 0.0;
+            }
+        }
+    }
+
     for (size_t i = 0; i < vehicles->size(); ++i)
     {
         VehicleController *vc = new VehicleController;
-        //vehicle_control[i] = new VehicleController;
         Vehicle* const curr_vehicle = (*vehicles)[i];
         const Vehicle* const prev_vehicle = (i == 0) ? nullptr : (*vehicles)[i - 1];
 
@@ -168,6 +362,13 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
         }
         else
         {
+            // По идее мы уже проверили весь путь по топологии,
+            // и не должны попасть сюда, но на всякий случай обработаем
+            // В таком случае созданные к этому моменту VehicleController
+            // создадут утечку памяти
+            Journal::instance()->info(QString("Warning: fail to place Vehicle #%1").arg(vehicle_control.size()) +
+                                      " at traj: " + cur_traj->getName() +
+                                      QString(" %1 m from start").arg(traj_coord));
             return false;
         }
    }
