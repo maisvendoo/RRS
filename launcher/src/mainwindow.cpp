@@ -543,7 +543,8 @@ void MainWindow::startSimulator()
     }
     else
     {
-        createScenario(selectedRouteDirName, active_trains);
+        auto scnCode = createTmpScenarioCode(active_trains);
+        createScenario(selectedRouteDirName, scnCode);
         args << "--scenario=" + STARTUP_SCN_SUBDIR;
     }
 
@@ -1510,11 +1511,9 @@ QStringList MainWindow::createTmpScenarioCode(const std::vector<active_train_t> 
 //
 //------------------------------------------------------------------------------
 void MainWindow::createScenario(const QString &route_name,
-                                const std::vector<active_train_t> &active_trains,
+                                const QStringList &scnCode,
                                 const QString scenario_name)
 {
-    auto scnCode = createTmpScenarioCode(active_trains);
-
     if (scnCode.empty())
     {
         return;
