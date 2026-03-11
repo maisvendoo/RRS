@@ -731,75 +731,79 @@ bool Route::load_topology()
         return false;
     }
 
-    const auto load_signals = [&](const std::vector<Signal*>& signals_) -> void
+    const auto load_signal = [&](Signal* const signal) -> void
     {
-        for (Signal* const signal : signals_)
+        if (!signal)
         {
-            if (!signal)
-            {
-                // TODO: Replace on Journal
-                std::fprintf(stderr, "Invalid signal %p\n", (void*)signal);
-
-                continue;
-            }
-
-            const std::string signal_model_name =
-                signal->getSignalModel().toStdString();
-
-            if (signal_model_name.empty() || signal_model_name == "empty_line")
-            {
-                continue;
-            }
-
-            const std::string signal_model_path = fs.combinePath(
-                models_dir, signal_model_name) + ".gltf";
-
-            vsg::ref_ptr<vsg::PagedLOD> paged_lod;
-
-            auto paged_lod_it = paged_lods.find(signal_model_path);
-            if (paged_lod_it == paged_lods.end())
-            {
-                const auto new_paged_lod = vsg::PagedLOD::create();
-                new_paged_lod->filename = signal_model_path;
-
-                new_paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
-                    static_cast<double>(context.settings.view_distance));
-
-                new_paged_lod->children.front() = {0.1, nullptr};
-                new_paged_lod->options = context.options;
-
-                paged_lod_it = paged_lods.emplace(signal_model_path,
-                    std::move(new_paged_lod)).first;
-            }
-
-            paged_lod = paged_lod_it->second;
-
-            signal->calcPosition();
-
-            const auto pos = to_vsg_vec3(signal->getPos());
-            const auto right = to_vsg_vec3(signal->getRight());
-            const auto orth = to_vsg_vec3(signal->getOrth());
-            const auto up = to_vsg_vec3(signal->getUp());
-
-            const vsg::vec3 rotation_deg = {
-                vsg::degrees(std::atan2(orth.z, up.z)),
-                vsg::degrees(std::atan2(-right.z, std::hypot(orth.z, up.z))),
-                vsg::degrees(std::atan2(-right.y, right.x))
-            };
-
-            const auto object = RouteObject::create(context, paged_lod,
-                signal_model_name, pos, rotation_deg);
-
-            this->addChild(vsg::MASK_ALL, object);
+            // TODO: Replace on Journal
+            std::fprintf(stderr, "Invalid signal %p\n", (void*)signal);
+            return;
         }
+
+        const std::string signal_model_name =
+            signal->getSignalModel().toStdString();
+
+        if (signal_model_name.empty() || signal_model_name == "empty_line")
+        {
+            return;
+        }
+
+        const std::string signal_model_path = fs.combinePath(
+            models_dir, signal_model_name) + ".gltf";
+
+        vsg::ref_ptr<vsg::PagedLOD> paged_lod;
+
+        auto paged_lod_it = paged_lods.find(signal_model_path);
+        if (paged_lod_it == paged_lods.end())
+        {
+            const auto new_paged_lod = vsg::PagedLOD::create();
+            new_paged_lod->filename = signal_model_path;
+
+            new_paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
+                static_cast<double>(context.settings.view_distance));
+
+            new_paged_lod->children.front() = {0.1, nullptr};
+            new_paged_lod->options = context.options;
+
+            paged_lod_it = paged_lods.emplace(signal_model_path,
+                std::move(new_paged_lod)).first;
+        }
+
+        paged_lod = paged_lod_it->second;
+
+        signal->calcPosition();
+
+        const auto pos = to_vsg_vec3(signal->getPos());
+        const auto right = to_vsg_vec3(signal->getRight());
+        const auto orth = to_vsg_vec3(signal->getOrth());
+        const auto up = to_vsg_vec3(signal->getUp());
+
+        const vsg::vec3 rotation_deg = {
+            vsg::degrees(std::atan2(orth.z, up.z)),
+            vsg::degrees(std::atan2(-right.z, std::hypot(orth.z, up.z))),
+            vsg::degrees(std::atan2(-right.y, right.x))
+        };
+
+        const auto object = RouteObject::create(context, paged_lod,
+            signal_model_name, pos, rotation_deg);
+
+        this->addChild(vsg::MASK_ALL, object);
     };
 
-    load_signals(signals_data->line_signals);
-    load_signals(signals_data->enter_signals);
-    load_signals(signals_data->exit_signals);
+    for (Signal* const line_signal : signals_data->line_signals)
+    {
+        load_signal(line_signal);
+    }
+
+    for (Signal* const enter_signal : signals_data->enter_signals)
+    {
+        load_signal(enter_signal);
+    }
+
+    for (Signal* const exit_signal : signals_data->exit_signals)
+    {
+        load_signal(exit_signal);
+    }
 
     return true;
 }
-
-// C++ 233 918
-// C   292 569
