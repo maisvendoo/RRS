@@ -85,7 +85,7 @@ bool Route::load_objects_ref()
     const std::string objects_ref_path = fs.combinePath(
         context.route_dir, "objects.ref");
 
-    FILE* const objects_ref_file = std::fopen(objects_ref_path.c_str(), "rb");
+    FILE* const objects_ref_file = std::fopen(objects_ref_path.c_str(), "r");
     if (!objects_ref_file)
     {
         // TODO: Replace on Journal
@@ -276,7 +276,7 @@ bool Route::load_route_map()
     const std::string route_map_path = fs.combinePath(context.route_dir,
         "topology", "map", "route1.map");
 
-    FILE* const route_map_file = std::fopen(route_map_path.c_str(), "rb");
+    FILE* const route_map_file = std::fopen(route_map_path.c_str(), "r");
     if (!route_map_file)
     {
         // TODO: Replace on Journal
