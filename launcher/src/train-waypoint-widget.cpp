@@ -34,6 +34,7 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
 
     hblTrainHeader = new QHBoxLayout();
     hblTrainConfig = new QHBoxLayout();
+
     hblWaypointHeader = new QHBoxLayout();
     hblWaypointConfig = new QHBoxLayout();
     hblTrajpointHeader = new QHBoxLayout();
@@ -55,6 +56,9 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
     cbTrainConfigSelect = new QComboBox(this);
 
     hblTrainConfig->addWidget(cbTrainConfigSelect);
+    ckbAutopilot = new QCheckBox(tr("Autopilot"),this);
+
+    hblTrainConfig->addWidget(ckbAutopilot);
     vblTrain->addLayout(hblTrainConfig);
     hblLine1->addLayout(vblTrain);
 

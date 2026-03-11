@@ -46,7 +46,7 @@ public:
 
     QHBoxLayout *hblTrainHeader;
     QHBoxLayout *hblTrainConfig;
-    QHBoxLayout *hblAutopilot;
+    
     QHBoxLayout *hblWaypointHeader;
     QHBoxLayout *hblWaypointConfig;
     QHBoxLayout *hblTrajpointHeader;

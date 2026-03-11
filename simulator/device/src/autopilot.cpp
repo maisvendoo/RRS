@@ -193,6 +193,8 @@ void Autopilot::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "ArrivalDistEps", arrival_dist_eps);
     cfg.getDouble(secName, "ArrivalBrakeDist", arrival_brake_dist);
     cfg.getDouble(secName, "StopBrakeVelocity", v_stop_brake);
+
+    cfg.getInt(secName, "DelayTimeout", delay_timeout_min);
 }
 
 //------------------------------------------------------------------------------
@@ -640,7 +642,7 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
     {
         st->is_departure = true;
         st->fact_dep_time = time_str;
-        st->dep_delay = static_cast<int>(st->fact_dep_time_sec - st->dep_time_sec) > 180;
+        st->dep_delay = static_cast<int>(st->fact_dep_time_sec - st->dep_time_sec) >= delay_timeout_min * 60;
 
         QString msg = QString("TIMETABLE PROCESS: Departure from: %1 | Dep. time: %2 | Fact. dep.: %3 |")
                           .arg(st->name)                          
@@ -698,7 +700,7 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
             st->fact_arr_time = time_str;
         }
 
-        st->arr_delay = static_cast<int>(st->fact_arr_time_sec - st->arr_time_sec) > 180;
+        st->arr_delay = static_cast<int>(st->fact_arr_time_sec - st->arr_time_sec) >= delay_timeout_min * 60;
 
         QString msg = QString("TIMETABLE PROCESS: Arrival to: %1 | Arr. time: %2 | Fact. arr.: %3 |")
                           .arg(st->name)
