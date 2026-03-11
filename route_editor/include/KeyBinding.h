@@ -31,7 +31,7 @@ modifier_keys_map;
 struct KeyBinding
 {
     vsg::KeySymbol key;
-    std::uint32_t modifiers = 0;
+    std::uint16_t modifiers = 0;
 };
 
 using KeyBindings = std::array<KeyBinding, TOTAL_ACTIONS>;

@@ -184,7 +184,7 @@ bool Signal::calcPosition()
             traj = conn->trajectories[SW_BWD_MINUS];
         }
     }
-    if (signal_dir == -1)
+    else if (signal_dir == -1)
     {
         if (conn->trajectories[SW_FWD_PLUS])
         {
@@ -195,6 +195,7 @@ bool Signal::calcPosition()
             traj = conn->trajectories[SW_FWD_MINUS];
         }
     }
+
     if (traj == nullptr)
     {
         return false;

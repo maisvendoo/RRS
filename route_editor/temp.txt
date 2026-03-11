@@ -1,6 +1,5 @@
 EditorContext.h
 EditorGui.h
-EditorState.h
 Gizmo.h
 IntersectionHandler.h
 ObjectSelector.h
@@ -9,21 +8,17 @@ Route.h
 RouteEditor.h
 RouteObject.h
 SceneGraph.h
-Settings.h
 
 EditorContext.cpp
 EditorGui.cpp
 Gizmo.cpp
 IntersectionHandler.cpp
-main.cpp
 ObjectSelector.cpp
 Outline.cpp
 Route.cpp
 RouteEditor.cpp
 RouteObject.cpp
 SceneGraph.cpp
-SelectionHandler.cpp
-Settings.cpp
 
 --------------------------------------------------------------------------------
 
@@ -36,6 +31,7 @@ commands/ScaleObjectsCommand.h
 commands/SelectObjectsCommand.h
 Action.h
 CameraHandler.h
+EditorState.h
 KeyBinding.h
 KeyboardHandler.h
 LSIntersector.h
@@ -44,6 +40,7 @@ MouseButton.h
 MouseHandler.h
 PagedLodMap.h
 RouteMap.h
+Settings.h
 shader_funcs.h
 SingleSwitch.h
 SwitchGroup.h
@@ -59,7 +56,9 @@ Action.cpp
 CameraHandler.cpp
 KeyBinding.cpp
 KeyboardHandler.cpp
+main.cpp
 MouseHandler.cpp
+Settings.cpp
 shader_funcs.cpp
 SwitchGroup.cpp
 WindowHandler.cpp

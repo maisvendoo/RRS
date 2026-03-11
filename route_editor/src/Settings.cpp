@@ -13,7 +13,6 @@
 #include <Qt>
 #include <QtTypes>
 
-#include <cstdint>
 #include <cstdio>
 #include <iterator>
 #include <map>
@@ -133,19 +132,17 @@ void settings_t::read(const std::string& cfg_path)
     using ActionSettingNamePair = ActionSettingNameMap::value_type;
 
     constexpr ActionSettingNamePair action_setting_name_map_data[] = {
-        {ACTION_MOVE_CAMERA_FORWARD,  "MoveCameraForward"},
+        {ACTION_MOVE_CAMERA_FORWARD, "MoveCameraForward"},
         {ACTION_MOVE_CAMERA_BACKWARD, "MoveCameraBackward"},
-        {ACTION_MOVE_CAMERA_LEFT,     "MoveCameraLeft"},
-        {ACTION_MOVE_CAMERA_RIGHT,    "MoveCameraRight"},
-
-        {ACTION_MOVE_OBJECTS,   "MoveObjects"},
+        {ACTION_MOVE_CAMERA_LEFT, "MoveCameraLeft"},
+        {ACTION_MOVE_CAMERA_RIGHT, "MoveCameraRight"},
+        {ACTION_MOVE_OBJECTS, "MoveObjects"},
         {ACTION_ROTATE_OBJECTS, "RotateObjects"},
-        {ACTION_SCALE_OBJECTS,  "ScaleObjects"},
-        {ACTION_COPY_OBJECTS,   "CopyObjects"},
-        {ACTION_PASTE_OBJECTS,  "PasteObjects"},
-        {ACTION_HIDE_OBJECTS,   "HideObjects"},
-        {ACTION_SHOW_OBJECTS,   "ShowObjects"},
-
+        {ACTION_SCALE_OBJECTS, "ScaleObjects"},
+        {ACTION_COPY_OBJECTS, "CopyObjects"},
+        {ACTION_PASTE_OBJECTS, "PasteObjects"},
+        {ACTION_HIDE_OBJECTS, "HideObjects"},
+        {ACTION_SHOW_OBJECTS, "ShowObjects"},
         {ACTION_UNDO_COMMAND, "UndoCommand"},
         {ACTION_REDO_COMMAND, "RedoCommand"}
     };
@@ -159,19 +156,17 @@ void settings_t::read(const std::string& cfg_path)
 
     const std::map<std::string, EditorKeyModifier>
     key_modifier_setting_name_map = {
-        {"lshift",   EDITOR_KEY_MODIFIER_SHIFT_L},
-        {"rshift",   EDITOR_KEY_MODIFIER_SHIFT_R},
-        {"shift",    EDITOR_KEY_MODIFIER_SHIFT_ANY},
+        {"lshift", EDITOR_KEY_MODIFIER_SHIFT_L},
+        {"rshift", EDITOR_KEY_MODIFIER_SHIFT_R},
+        {"shift", EDITOR_KEY_MODIFIER_SHIFT_ANY},
         {"anyshift", EDITOR_KEY_MODIFIER_SHIFT_ANY},
-
-        {"lctrl",   EDITOR_KEY_MODIFIER_CTRL_L},
-        {"rctrl",   EDITOR_KEY_MODIFIER_CTRL_R},
-        {"ctrl",    EDITOR_KEY_MODIFIER_CTRL_ANY},
+        {"lctrl", EDITOR_KEY_MODIFIER_CTRL_L},
+        {"rctrl", EDITOR_KEY_MODIFIER_CTRL_R},
+        {"ctrl", EDITOR_KEY_MODIFIER_CTRL_ANY},
         {"anyctrl", EDITOR_KEY_MODIFIER_CTRL_ANY},
-
-        {"lalt",   EDITOR_KEY_MODIFIER_ALT_L},
-        {"ralt",   EDITOR_KEY_MODIFIER_ALT_R},
-        {"alt",    EDITOR_KEY_MODIFIER_ALT_ANY},
+        {"lalt", EDITOR_KEY_MODIFIER_ALT_L},
+        {"ralt", EDITOR_KEY_MODIFIER_ALT_R},
+        {"alt", EDITOR_KEY_MODIFIER_ALT_ANY},
         {"anyalt", EDITOR_KEY_MODIFIER_ALT_ANY}
     };
 
@@ -199,7 +194,9 @@ void settings_t::read(const std::string& cfg_path)
             continue;
         }
 
-        std::uint32_t modifiers = 0;
+        KeyBinding& key_binding = key_bindings[action];
+        key_binding.key = static_cast<vsg::KeySymbol>(
+            strings.back().front().toLatin1());
 
         for (qsizetype i = 0; i < string_size - 1; ++i)
         {
@@ -208,13 +205,8 @@ void settings_t::read(const std::string& cfg_path)
 
             if (found_it != key_modifier_setting_name_map.cend())
             {
-                modifiers |= found_it->second;
+                key_binding.modifiers |= found_it->second;
             }
         }
-
-        KeyBinding& key_binding = key_bindings[action];
-        key_binding.key = static_cast<vsg::KeySymbol>(
-            strings.back().front().toLatin1());
-        key_binding.modifiers = modifiers;
     }
 }
