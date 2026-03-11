@@ -235,6 +235,8 @@ active_train_t TrainWaypointWidget::getActiveTrainConfig()
 
     at.is_active = true;
 
+    at.is_autopilot_on = ckbAutopilot->isChecked();
+
     return at;
 }
 

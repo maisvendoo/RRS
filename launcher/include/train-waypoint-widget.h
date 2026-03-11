@@ -45,8 +45,7 @@ public:
     QVBoxLayout *vblTrajpoint;
 
     QHBoxLayout *hblTrainHeader;
-    QHBoxLayout *hblTrainConfig;
-    QHBoxLayout *hblAutopilot;
+    QHBoxLayout *hblTrainConfig;    
     QHBoxLayout *hblWaypointHeader;
     QHBoxLayout *hblWaypointConfig;
     QHBoxLayout *hblTrajpointHeader;

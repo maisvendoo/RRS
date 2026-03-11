@@ -1478,12 +1478,13 @@ QStringList MainWindow::createLuaSetTrain(size_t idx, const active_train_t &at)
     setTrainCode.append(varName + QString(".traj = \"%1\"").arg(at.train_position.trajectory_name));
     setTrainCode.append(varName + QString(".coord = %1").arg(at.train_position.traj_coord));
     setTrainCode.append(varName + QString(".dir = %1").arg(at.train_position.direction));
-    setTrainCode.append(QString("setTrain(%1)").arg(varName));
 
     if (at.is_autopilot_on)
     {
         setTrainCode.append(varName + QString(".auto = true"));
     }
+
+    setTrainCode.append(QString("setTrain(%1)").arg(varName));
 
     return setTrainCode;
 }
