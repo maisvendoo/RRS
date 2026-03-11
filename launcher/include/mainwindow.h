@@ -108,6 +108,7 @@ private:
     static const   QString VSYNC;
     static const   QString NOTIFY_LEVEL;
     static const   QString VIEW_DIST;
+    static const   QString STARTUP_SCN_SUBDIR;
 
     QString settings_path;
     QString saved_servers_path;
@@ -182,6 +183,17 @@ private:
 
     /// Генерация сценарной команды setTime
     QString createLuaSetTime(QTimeEdit *timeEdit);
+
+    /// Генерация Lua-кода установки поезда
+    QStringList createLuaSetTrain(size_t idx, const active_train_t &at);
+
+    /// Генерация кода сценария
+    QStringList createTmpScenarioCode(const std::vector<active_train_t> &active_trains);
+
+    /// Создание фалй сценария на основе ручной расстановки в лаунчере
+    void createScenario(const QString &route_name,
+                        const std::vector<active_train_t> &active_trains,
+                        const QString scenario_name = STARTUP_SCN_SUBDIR);
 
 private slots:
 

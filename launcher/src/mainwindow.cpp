@@ -423,6 +423,12 @@ void MainWindow::loadScenarios(route_info_t &route_info)
             // доступных сценариев
             scn.scenario_name = scenarios_dir.relativeFilePath(abs_path);
 
+            // Пропускаем startup-сценарий, чтобы юзеру глаза не мозолил
+            if (scn.scenario_name == STARTUP_SCN_SUBDIR)
+            {
+                continue;
+            }
+
             // Читаем описание сценария из README.md
             QString desc_path = QDir::toNativeSeparators(abs_path + QDir::separator() + "README.md");
             scn.scenario_description = loadScenarioDescription(desc_path);
@@ -505,11 +511,18 @@ void MainWindow::startSimulator()
     }
 
     bool reset_start_config = false;
+
     slotUpdateActiveTrains(reset_start_config);
+
     if (active_trains.empty() && selected_scenario_idx < 0)
     {
         return;
     }
+
+    QStringList args;
+    args.clear();
+
+    args << "--route=" + selectedRouteDirName;
 
     server_date_t start_date = server_date_t(
         static_cast<int16_t>(ui->dteStartDate->dateTime().date().year()),
@@ -522,38 +535,16 @@ void MainWindow::startSimulator()
         static_cast<uint16_t>(ui->dteStartTime->dateTime().time().msec()));
     std::int64_t start_datetime = simulator_time_t(start_date, start_time).data();
 
-    QString selected_trains = "";
-    QString traj_names = "";
-    QString directions = "";
-    QString init_coords = "";
-
-    for (auto at = active_trains.begin(); at != active_trains.end(); ++at)
-    {
-        selected_trains += (*at).train_info.train_config_path;
-        traj_names += (*at).train_position.trajectory_name;
-        directions += QString("%1").arg((*at).train_position.direction);
-        init_coords += QString("%1").arg((*at).train_position.traj_coord, 0, 'f', 2);
-
-        if (at != active_trains.end() - 1)
-        {
-            selected_trains += ",";
-            traj_names += ",";
-            directions += ",";
-            init_coords += ",";
-        }
-    }
-
-    QStringList args;
     args << "--start=" + QString::number(start_datetime);
-    args << "--route=" + selectedRouteDirName;
-    args << "--train-config=" + selected_trains;
-    args << "--traj-name=" + traj_names;
-    args << "--direction=" + directions;
-    args << "--init-coord=" + init_coords;
 
     if (selected_scenario_idx >= 0)
     {
         args << "--scenario=" + routes_info[selected_route_idx].scenarios[selected_scenario_idx].scenario_name;
+    }
+    else
+    {
+        createScenario(selectedRouteDirName, active_trains);
+        args << "--scenario=" + STARTUP_SCN_SUBDIR;
     }
 
     FileSystem &fs = FileSystem::getInstance();
@@ -1232,6 +1223,7 @@ const   QString MainWindow::DOUBLE_BUFF = "DoubleBuffer";
 const   QString MainWindow::VSYNC = "VSync";
 const   QString MainWindow::NOTIFY_LEVEL = "NofifyLevel";
 const   QString MainWindow::VIEW_DIST = "ViewDistance";
+const   QString MainWindow::STARTUP_SCN_SUBDIR = "startup";
 
 //------------------------------------------------------------------------------
 //
@@ -1468,4 +1460,111 @@ QString MainWindow::createLuaSetTime(QTimeEdit *timeEdit)
                   .arg(timeEdit->dateTime().time().second(), 2, u'0');
 
     return setTime;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QStringList MainWindow::createLuaSetTrain(size_t idx, const active_train_t &at)
+{
+    QStringList setTrainCode;
+    setTrainCode.clear();
+
+    QString varName = QString("train%1").arg(idx);
+
+    setTrainCode.append(varName + QString(" = TrainData.new()"));
+    setTrainCode.append(varName + QString(".name = \"%1\"").arg(idx));
+    setTrainCode.append(varName + QString(".config = \"%1\"").arg(at.train_info.train_config_path));
+    setTrainCode.append(varName + QString(".traj = \"%1\"").arg(at.train_position.trajectory_name));
+    setTrainCode.append(varName + QString(".coord = %1").arg(at.train_position.traj_coord));
+    setTrainCode.append(varName + QString(".dir = %1").arg(at.train_position.direction));
+    setTrainCode.append(QString("setTrain(%1)").arg(varName));
+
+    return setTrainCode;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QStringList MainWindow::createTmpScenarioCode(const std::vector<active_train_t> &active_trains)
+{
+    QStringList scnCode;
+    scnCode.clear();
+
+    for (size_t i = 0; i < active_trains.size(); ++i)
+    {
+        scnCode += createLuaSetTrain(i, active_trains[i]);
+        scnCode.append("\n");
+    }
+
+    return scnCode;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::createScenario(const QString &route_name,
+                                const std::vector<active_train_t> &active_trains,
+                                const QString scenario_name)
+{
+    auto scnCode = createTmpScenarioCode(active_trains);
+
+    if (scnCode.empty())
+    {
+        return;
+    }
+
+    FileSystem &fs = FileSystem::getInstance();
+    std::string route_path = fs.getRouteRootDir() + fs.separator()
+                             + route_name.toStdString();
+
+    QDir routeDir(route_path.c_str());
+
+    if (!routeDir.exists())
+    {
+        return;
+    }
+
+    QString scn_subdir_name = "scenarios";
+
+    if (!routeDir.exists(scn_subdir_name))
+    {
+        if (!routeDir.mkdir(scn_subdir_name))
+        {
+            return;
+        }
+    }
+
+    std::string scenarios_path = route_path + fs.separator()
+                                 + scn_subdir_name.toStdString();
+
+    QDir scnDir(scenarios_path.c_str());
+
+    if (!scnDir.exists(scenario_name))
+    {
+        if (!scnDir.mkdir(scenario_name))
+        {
+            return;
+        }
+    }
+
+    std::string file_path = scenarios_path + fs.separator()
+                            + scenario_name.toStdString()
+                            + fs.separator() + "main.lua";
+
+    QFile file(file_path.c_str());
+
+    if (!file.open(QIODevice::Text | QIODevice::WriteOnly))
+    {
+        return;
+    }
+
+    QTextStream stream(&file);    
+
+    for (auto line : scnCode)
+    {
+        stream << line << "\n";
+    }
+
+    file.close();
 }
