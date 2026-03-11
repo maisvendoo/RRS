@@ -27,7 +27,10 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -81,7 +84,7 @@ bool Route::load_objects_ref()
     const std::string objects_ref_path = fs.combinePath(
         context.route_dir, "objects.ref");
 
-    std::ifstream objects_ref_file(objects_ref_path);
+    FILE* const objects_ref_file = std::fopen(objects_ref_path.c_str(), "rb");
     if (!objects_ref_file)
     {
         // TODO: Replace on Journal
@@ -89,18 +92,174 @@ bool Route::load_objects_ref()
         return false;
     }
 
-    std::string line;
-    while (std::getline(objects_ref_file, line))
-    {
-        std::istringstream iss(std::move(line));
-        std::string label, relative_path;
+    std::fseek(objects_ref_file, 0, SEEK_END);
+    const long buffer_length = std::ftell(objects_ref_file);
+    std::rewind(objects_ref_file);
 
-        if (iss >> label >> relative_path)
+    char* const buffer = reinterpret_cast<char*>(
+        std::malloc(buffer_length + 1));
+
+    if (!buffer)
+    {
+        std::fprintf(stderr, "Failed to allocate memory for %s content\n",
+            objects_ref_path.c_str());
+
+        std::fclose(objects_ref_file);
+        return false;
+    }
+
+    const std::size_t bytes_read = std::fread(
+        buffer, 1, buffer_length, objects_ref_file);
+
+    buffer[buffer_length] = '\0';
+
+    std::fclose(objects_ref_file);
+
+    if (bytes_read < static_cast<std::size_t>(buffer_length))
+    {
+        std::fprintf(stderr, "Failed to read %s\n", objects_ref_path.c_str());
+        free(buffer);
+        return false;
+    }
+
+    enum State
+    {
+        INITIAL,
+        START_LABEL,
+        FINISH_LABEL,
+        START_RELATIVE_PATH,
+        FINISH_RELATIVE_PATH
+    };
+
+    char label[256];
+    std::uint8_t label_length = 0;
+    char relative_path[512];
+    std::uint16_t relative_path_length = 0;
+    State state = INITIAL;
+
+    for (const char* ptr = buffer; *ptr != '\0'; ++ptr)
+    {
+        switch (*ptr)
         {
-            context.objects_ref.emplace(std::move(label),
-                std::move(relative_path));
+            case '\n':
+            {
+                if (state >= START_RELATIVE_PATH)
+                {
+                    relative_path[relative_path_length] = '\0';
+                    context.objects_ref.emplace(label, relative_path);
+                }
+
+                label_length = 0;
+                relative_path_length = 0;
+                state = INITIAL;
+
+                break;
+            }
+            case ' ': case '\t':
+            {
+                switch (state)
+                {
+                    case START_LABEL:
+                    {
+                        label[label_length] = '\0';
+                        state = FINISH_LABEL;
+                        break;
+                    }
+                    case START_RELATIVE_PATH:
+                    {
+                        relative_path[relative_path_length] = '\0';
+                        state = FINISH_RELATIVE_PATH;
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+
+                break;
+            }
+            default:
+            {
+                switch (state)
+                {
+                    case INITIAL:
+                    {
+                        label[label_length] = *ptr;
+                        ++label_length;
+                        state = START_LABEL;
+                        break;
+                    }
+                    case START_LABEL:
+                    {
+                        if (label_length == 255)
+                        {
+                            label[label_length] = '\0';
+
+                            std::fprintf(stderr, "Objects ref: could not append"
+                                "to label buffer %s\n", label);
+
+                            break;
+                        }
+
+                        label[label_length] = *ptr;
+                        ++label_length;
+                        break;
+                    }
+                    case FINISH_LABEL:
+                    {
+                        relative_path[relative_path_length] = *ptr;
+                        ++relative_path_length;
+                        state = START_RELATIVE_PATH;
+                        break;
+                    }
+                    case START_RELATIVE_PATH:
+                    {
+                        if (relative_path_length == 511)
+                        {
+                            relative_path[relative_path_length] = '\0';
+
+                            std::fprintf(stderr, "Objects ref: could not append"
+                                "to relative path buffer %s\n", relative_path);
+
+                            break;
+                        }
+
+                        relative_path[relative_path_length] = *ptr;
+                        ++relative_path_length;
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+            }
         }
     }
+
+    free(buffer);
+
+    // std::ifstream objects_ref_file(objects_ref_path);
+    // if (!objects_ref_file)
+    // {
+    //     // TODO: Replace on Journal
+    //     std::fprintf(stderr, "Failed to open %s\n", objects_ref_path.c_str());
+    //     return false;
+    // }
+
+    // std::string line;
+    // while (std::getline(objects_ref_file, line))
+    // {
+    //     std::istringstream iss(std::move(line));
+    //     std::string label, relative_path;
+
+    //     if (iss >> label >> relative_path)
+    //     {
+    //         context.objects_ref.emplace(std::move(label),
+    //             std::move(relative_path));
+    //     }
+    // }
 
     return true;
 }
@@ -295,3 +454,6 @@ bool Route::load_topology()
 
     return true;
 }
+
+// C++ 233 918
+// C   292 569
