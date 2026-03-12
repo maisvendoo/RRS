@@ -122,7 +122,7 @@
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="559"/>
-        <location filename="../src/mainwindow.cpp" line="990"/>
+        <location filename="../src/mainwindow.cpp" line="1045"/>
         <source>Start server</source>
         <translation>Запуск сервера</translation>
     </message>
@@ -244,18 +244,23 @@
         <translation>&lt;Не выбран&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="933"/>
+        <location filename="../src/mainwindow.cpp" line="513"/>
+        <source>Trains positions are defined in scenario</source>
+        <translation>Расположение поездов определяется сценарием</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="988"/>
         <source>Stop server</source>
         <translation>Остановить сервер</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1084"/>
-        <location filename="../src/mainwindow.cpp" line="1110"/>
+        <location filename="../src/mainwindow.cpp" line="1139"/>
+        <location filename="../src/mainwindow.cpp" line="1165"/>
         <source>Save Server</source>
         <translation>Сохранить сервер</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1091"/>
+        <location filename="../src/mainwindow.cpp" line="1146"/>
         <source>Rewrite Server</source>
         <translation>Перезаписать сервер</translation>
     </message>
