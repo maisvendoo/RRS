@@ -3,6 +3,7 @@
 
 #include    <QObject>
 #include    <QMap>
+#include    <QSet>
 
 #include    "topology-export.h"
 #include    "topology-defines.h"
@@ -21,7 +22,7 @@ struct module_cfg_t
 {
     CfgReader cfg;
     QString module_name = "";
-    QStringList traj_names = {};
+    QSet<QString> traj_names = {};
 };
 
 //------------------------------------------------------------------------------
@@ -43,7 +44,7 @@ public:
     QString getName() const
     {
         return name;
-    }    
+    }
 
     double getLength() const
     {

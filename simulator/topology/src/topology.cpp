@@ -758,7 +758,7 @@ std::vector<std::vector<module_cfg_t>> Topology::load_topology_configs(QString r
                 }
                 else
                 {
-                    mc.traj_names.push_back(traj_name);
+                    mc.traj_names.insert(traj_name);
                 }
 
                 trajNode = mc.cfg.getNextSection();
