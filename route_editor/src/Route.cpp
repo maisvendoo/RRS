@@ -180,153 +180,153 @@ bool Route::load_objects_ref()
     const std::string objects_ref_path = fs.combinePath(
         context.route_dir, "objects.ref");
 
-    char* const buffer = read_file_in_buffer(objects_ref_path.c_str(), "r");
-    if (!buffer)
-    {
-        return false;
-    }
-
-    enum State
-    {
-        INITIAL,
-        START_LABEL,
-        FINISH_LABEL,
-        START_RELATIVE_PATH,
-        FINISH_RELATIVE_PATH
-    };
-
-    char label[LABEL_BUFFER_SIZE];
-    std::uint8_t label_length = 0;
-    char relative_path[RELATIVE_PATH_BUFFER_SIZE];
-    std::uint16_t relative_path_length = 0;
-    State state = INITIAL;
-
-    for (const char* ptr = buffer; *ptr != '\0'; ++ptr)
-    {
-        switch (*ptr)
-        {
-            case '\n':
-            {
-                if (state >= START_RELATIVE_PATH)
-                {
-                    relative_path[relative_path_length] = '\0';
-                    context.objects_ref.emplace(label, relative_path);
-                }
-
-                label_length = 0;
-                relative_path_length = 0;
-                state = INITIAL;
-
-                break;
-            }
-            case ' ': case '\t': case '\r':
-            {
-                switch (state)
-                {
-                    case START_LABEL:
-                    {
-                        label[label_length] = '\0';
-                        state = FINISH_LABEL;
-                        break;
-                    }
-                    case START_RELATIVE_PATH:
-                    {
-                        relative_path[relative_path_length] = '\0';
-                        state = FINISH_RELATIVE_PATH;
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
-                }
-
-                break;
-            }
-            default:
-            {
-                switch (state)
-                {
-                    case INITIAL:
-                    {
-                        label[label_length] = *ptr;
-                        ++label_length;
-                        state = START_LABEL;
-                        break;
-                    }
-                    case START_LABEL:
-                    {
-                        if (label_length == LABEL_BUFFER_SIZE - 1)
-                        {
-                            label[label_length] = '\0';
-
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Objects ref: Could not append"
-                                "to label buffer %s\n", label);
-
-                            break;
-                        }
-
-                        label[label_length] = *ptr;
-                        ++label_length;
-                        break;
-                    }
-                    case FINISH_LABEL:
-                    {
-                        relative_path[relative_path_length] = *ptr;
-                        ++relative_path_length;
-                        state = START_RELATIVE_PATH;
-                        break;
-                    }
-                    case START_RELATIVE_PATH:
-                    {
-                        if (relative_path_length ==
-                            RELATIVE_PATH_BUFFER_SIZE - 1)
-                        {
-                            relative_path[relative_path_length] = '\0';
-
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Objects ref: Could not append"
-                                "to relative path buffer %s\n", relative_path);
-
-                            break;
-                        }
-
-                        relative_path[relative_path_length] = *ptr;
-                        ++relative_path_length;
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    std::free(buffer);
-
-    // std::ifstream objects_ref_file(objects_ref_path);
-    // if (!objects_ref_file)
+    // char* const buffer = read_file_in_buffer(objects_ref_path.c_str(), "r");
+    // if (!buffer)
     // {
-    //     // TODO: Replace on Journal
-    //     std::fprintf(stderr, "Failed to open %s\n", objects_ref_path.c_str());
     //     return false;
     // }
 
-    // std::string line;
-    // while (std::getline(objects_ref_file, line))
+    // enum State
     // {
-    //     std::istringstream iss(std::move(line));
-    //     std::string label, relative_path;
+    //     INITIAL,
+    //     START_LABEL,
+    //     FINISH_LABEL,
+    //     START_RELATIVE_PATH,
+    //     FINISH_RELATIVE_PATH
+    // };
 
-    //     if (iss >> label >> relative_path)
+    // char label[LABEL_BUFFER_SIZE];
+    // std::uint8_t label_length = 0;
+    // char relative_path[RELATIVE_PATH_BUFFER_SIZE];
+    // std::uint16_t relative_path_length = 0;
+    // State state = INITIAL;
+
+    // for (const char* ptr = buffer; *ptr != '\0'; ++ptr)
+    // {
+    //     switch (*ptr)
     //     {
-    //         context.objects_ref.emplace(std::move(label),
-    //             std::move(relative_path));
+    //         case '\n':
+    //         {
+    //             if (state >= START_RELATIVE_PATH)
+    //             {
+    //                 relative_path[relative_path_length] = '\0';
+    //                 context.objects_ref.emplace(label, relative_path);
+    //             }
+
+    //             label_length = 0;
+    //             relative_path_length = 0;
+    //             state = INITIAL;
+
+    //             break;
+    //         }
+    //         case ' ': case '\t': case '\r':
+    //         {
+    //             switch (state)
+    //             {
+    //                 case START_LABEL:
+    //                 {
+    //                     label[label_length] = '\0';
+    //                     state = FINISH_LABEL;
+    //                     break;
+    //                 }
+    //                 case START_RELATIVE_PATH:
+    //                 {
+    //                     relative_path[relative_path_length] = '\0';
+    //                     state = FINISH_RELATIVE_PATH;
+    //                     break;
+    //                 }
+    //                 default:
+    //                 {
+    //                     break;
+    //                 }
+    //             }
+
+    //             break;
+    //         }
+    //         default:
+    //         {
+    //             switch (state)
+    //             {
+    //                 case INITIAL:
+    //                 {
+    //                     label[label_length] = *ptr;
+    //                     ++label_length;
+    //                     state = START_LABEL;
+    //                     break;
+    //                 }
+    //                 case START_LABEL:
+    //                 {
+    //                     if (label_length == LABEL_BUFFER_SIZE - 1)
+    //                     {
+    //                         label[label_length] = '\0';
+
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Objects ref: Could not append"
+    //                             "to label buffer %s\n", label);
+
+    //                         break;
+    //                     }
+
+    //                     label[label_length] = *ptr;
+    //                     ++label_length;
+    //                     break;
+    //                 }
+    //                 case FINISH_LABEL:
+    //                 {
+    //                     relative_path[relative_path_length] = *ptr;
+    //                     ++relative_path_length;
+    //                     state = START_RELATIVE_PATH;
+    //                     break;
+    //                 }
+    //                 case START_RELATIVE_PATH:
+    //                 {
+    //                     if (relative_path_length ==
+    //                         RELATIVE_PATH_BUFFER_SIZE - 1)
+    //                     {
+    //                         relative_path[relative_path_length] = '\0';
+
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Objects ref: Could not append"
+    //                             "to relative path buffer %s\n", relative_path);
+
+    //                         break;
+    //                     }
+
+    //                     relative_path[relative_path_length] = *ptr;
+    //                     ++relative_path_length;
+    //                     break;
+    //                 }
+    //                 default:
+    //                 {
+    //                     break;
+    //                 }
+    //             }
+    //         }
     //     }
     // }
+
+    // std::free(buffer);
+
+    std::ifstream objects_ref_file(objects_ref_path);
+    if (!objects_ref_file)
+    {
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to open %s\n", objects_ref_path.c_str());
+        return false;
+    }
+
+    std::string line;
+    while (std::getline(objects_ref_file, line))
+    {
+        std::istringstream iss(std::move(line));
+        std::string label, relative_path;
+
+        if (iss >> label >> relative_path)
+        {
+            context.objects_ref.emplace(std::move(label),
+                std::move(relative_path));
+        }
+    }
 
     return true;
 }
@@ -338,318 +338,318 @@ bool Route::load_route_map()
     const std::string route_map_path = fs.combinePath(context.route_dir,
         "topology", "map", "route1.map");
 
-    char* const buffer = read_file_in_buffer(route_map_path.c_str(), "r");
-    if (!buffer)
-    {
-        return false;
-    }
-
-    enum State
-    {
-        INITIAL,
-        START_LABEL,
-        FINISH_LABEL,
-        START_TRANSLATION_X,
-        FINISH_TRANSLATION_X,
-        START_TRANSLATION_Y,
-        FINISH_TRANSLATION_Y,
-        START_TRANSLATION_Z,
-        FINISH_TRANSLATION_Z,
-        START_ROTATION_X,
-        FINISH_ROTATION_X,
-        START_ROTATION_Y,
-        FINISH_ROTATION_Y,
-        START_ROTATION_Z,
-        FINISH_ROTATION_Z
-    };
-
-    char label[LABEL_BUFFER_SIZE];
-    std::uint8_t label_length = 0;
-    char float_buffer[FLOAT_BUFFER_SIZE];
-    std::uint8_t float_buffer_length = 0;
-    vsg::vec3 translation;
-    vsg::vec3 rotation;
-    State state = INITIAL;
-
-    for (const char* ptr = buffer; *ptr != '\0'; ++ptr)
-    {
-        switch (*ptr)
-        {
-            case '\n':
-            {
-                if (state >= START_ROTATION_Z)
-                {
-                    if (state == START_ROTATION_Z)
-                    {
-                        float_buffer[float_buffer_length] = '\0';
-
-                        if (!to_float(float_buffer, rotation.z))
-                        {
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Route map: Wrong float value "
-                                "%s\n", float_buffer);
-                        }
-                    }
-
-                    context.route_map[label].emplace_back(
-                        RouteMapTransformation{translation, rotation});
-                }
-
-                label_length = 0;
-                float_buffer_length = 0;
-                state = INITIAL;
-
-                break;
-            }
-            case ' ': case '\t': case ',': case ';': case '\r':
-            {
-                switch (state)
-                {
-                    case START_LABEL:
-                    {
-                        label[label_length] = '\0';
-                        state = FINISH_LABEL;
-                        break;
-                    }
-                    case START_TRANSLATION_X:
-                    {
-                        float_buffer[float_buffer_length] = '\0';
-
-                        if (!to_float(float_buffer, translation.x))
-                        {
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Route map: Wrong float value "
-                                "%s\n", float_buffer);
-                        }
-
-                        float_buffer_length = 0;
-                        state = FINISH_TRANSLATION_X;
-
-                        break;
-                    }
-                    case START_TRANSLATION_Y:
-                    {
-                        float_buffer[float_buffer_length] = '\0';
-
-                        if (!to_float(float_buffer, translation.y))
-                        {
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Route map: Wrong float value "
-                                "%s\n", float_buffer);
-                        }
-
-                        float_buffer_length = 0;
-                        state = FINISH_TRANSLATION_Y;
-
-                        break;
-                    }
-                    case START_TRANSLATION_Z:
-                    {
-                        float_buffer[float_buffer_length] = '\0';
-
-                        if (!to_float(float_buffer, translation.z))
-                        {
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Route map: Wrong float value "
-                                "%s\n", float_buffer);
-                        }
-
-                        float_buffer_length = 0;
-                        state = FINISH_TRANSLATION_Z;
-
-                        break;
-                    }
-                    case START_ROTATION_X:
-                    {
-                        float_buffer[float_buffer_length] = '\0';
-
-                        if (!to_float(float_buffer, rotation.x))
-                        {
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Route map: Wrong float value "
-                                "%s\n", float_buffer);
-                        }
-
-                        float_buffer_length = 0;
-                        state = FINISH_ROTATION_X;
-
-                        break;
-                    }
-                    case START_ROTATION_Y:
-                    {
-                        float_buffer[float_buffer_length] = '\0';
-
-                        if (!to_float(float_buffer, rotation.y))
-                        {
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Route map: Wrong float value "
-                                "%s\n", float_buffer);
-                        }
-
-                        float_buffer_length = 0;
-                        state = FINISH_ROTATION_Y;
-
-                        break;
-                    }
-                    case START_ROTATION_Z:
-                    {
-                        float_buffer[float_buffer_length] = '\0';
-
-                        if (!to_float(float_buffer, rotation.z))
-                        {
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Route map: Wrong float value "
-                                "%s\n", float_buffer);
-                        }
-
-                        float_buffer_length = 0;
-                        state = FINISH_ROTATION_Z;
-
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
-                }
-
-                break;
-            }
-            default:
-            {
-                switch (state)
-                {
-                    case INITIAL:
-                    {
-                        label[label_length] = *ptr;
-                        ++label_length;
-                        state = START_LABEL;
-                        break;
-                    }
-                    case START_LABEL:
-                    {
-                        if (label_length == LABEL_BUFFER_SIZE - 1)
-                        {
-                            label[label_length] = '\0';
-
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Objects ref: Could not append"
-                                "to label buffer %s\n", label);
-
-                            break;
-                        }
-
-                        label[label_length] = *ptr;
-                        ++label_length;
-                        break;
-                    }
-                    case FINISH_LABEL:
-                    {
-                        float_buffer[float_buffer_length] = *ptr;
-                        ++float_buffer_length;
-                        state = START_TRANSLATION_X;
-                        break;
-                    }
-                    case START_TRANSLATION_X: case START_TRANSLATION_Y:
-                    case START_TRANSLATION_Z: case START_ROTATION_X:
-                    case START_ROTATION_Y: case START_ROTATION_Z:
-                    {
-                        if (float_buffer_length == FLOAT_BUFFER_SIZE - 1)
-                        {
-                            float_buffer[float_buffer_length] = '\0';
-
-                            // TODO: Replace on Journal
-                            std::fprintf(stderr, "Route map: Could not append"
-                                "to float buffer %s\n", float_buffer);
-
-                            break;
-                        }
-
-                        float_buffer[float_buffer_length] = *ptr;
-                        ++float_buffer_length;
-                        break;
-                    }
-                    case FINISH_TRANSLATION_X:
-                    {
-                        float_buffer[float_buffer_length] = *ptr;
-                        ++float_buffer_length;
-                        state = START_TRANSLATION_Y;
-                        break;
-                    }
-                    case FINISH_TRANSLATION_Y:
-                    {
-                        float_buffer[float_buffer_length] = *ptr;
-                        ++float_buffer_length;
-                        state = START_TRANSLATION_Z;
-                        break;
-                    }
-                    case FINISH_TRANSLATION_Z:
-                    {
-                        float_buffer[float_buffer_length] = *ptr;
-                        ++float_buffer_length;
-                        state = START_ROTATION_X;
-                        break;
-                    }
-                    case FINISH_ROTATION_X:
-                    {
-                        float_buffer[float_buffer_length] = *ptr;
-                        ++float_buffer_length;
-                        state = START_ROTATION_Y;
-                        break;
-                    }
-                    case FINISH_ROTATION_Y:
-                    {
-                        float_buffer[float_buffer_length] = *ptr;
-                        ++float_buffer_length;
-                        state = START_ROTATION_Z;
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
-                }
-
-                break;
-            }
-        }
-    }
-
-    std::free(buffer);
-
-    // std::ifstream route_map_file(route_map_path);
-    // if (!route_map_file)
+    // char* const buffer = read_file_in_buffer(route_map_path.c_str(), "r");
+    // if (!buffer)
     // {
-    //     // TODO: Replace on Journal
-    //     std::fprintf(stderr, "Failed to open %s\n", route_map_path.c_str());
     //     return false;
     // }
 
-    // std::string line;
-    // while (std::getline(route_map_file, line))
+    // enum State
     // {
-    //     if (line.empty())
+    //     INITIAL,
+    //     START_LABEL,
+    //     FINISH_LABEL,
+    //     START_TRANSLATION_X,
+    //     FINISH_TRANSLATION_X,
+    //     START_TRANSLATION_Y,
+    //     FINISH_TRANSLATION_Y,
+    //     START_TRANSLATION_Z,
+    //     FINISH_TRANSLATION_Z,
+    //     START_ROTATION_X,
+    //     FINISH_ROTATION_X,
+    //     START_ROTATION_Y,
+    //     FINISH_ROTATION_Y,
+    //     START_ROTATION_Z,
+    //     FINISH_ROTATION_Z
+    // };
+
+    // char label[LABEL_BUFFER_SIZE];
+    // std::uint8_t label_length = 0;
+    // char float_buffer[FLOAT_BUFFER_SIZE];
+    // std::uint8_t float_buffer_length = 0;
+    // vsg::vec3 translation;
+    // vsg::vec3 rotation;
+    // State state = INITIAL;
+
+    // for (const char* ptr = buffer; *ptr != '\0'; ++ptr)
+    // {
+    //     switch (*ptr)
     //     {
-    //         continue;
-    //     }
+    //         case '\n':
+    //         {
+    //             if (state >= START_ROTATION_Z)
+    //             {
+    //                 if (state == START_ROTATION_Z)
+    //                 {
+    //                     float_buffer[float_buffer_length] = '\0';
 
-    //     if (line.back() == ';')
-    //     {
-    //         line.pop_back();
-    //     }
+    //                     if (!to_float(float_buffer, rotation.z))
+    //                     {
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Route map: Wrong float value "
+    //                             "%s\n", float_buffer);
+    //                     }
+    //                 }
 
-    //     std::replace(line.begin(), line.end(), ',', ' ');
+    //                 context.route_map[label].emplace_back(
+    //                     RouteMapTransformation{translation, rotation});
+    //             }
 
-    //     std::istringstream iss(std::move(line));
-    //     std::string label;
-    //     vsg::vec3 translation, rotation;
+    //             label_length = 0;
+    //             float_buffer_length = 0;
+    //             state = INITIAL;
 
-    //     if (iss >> label >> translation >> rotation)
-    //     {
-    //         context.route_map[label].emplace_back(
-    //             RouteMapTransformation{translation, rotation});
+    //             break;
+    //         }
+    //         case ' ': case '\t': case ',': case ';': case '\r':
+    //         {
+    //             switch (state)
+    //             {
+    //                 case START_LABEL:
+    //                 {
+    //                     label[label_length] = '\0';
+    //                     state = FINISH_LABEL;
+    //                     break;
+    //                 }
+    //                 case START_TRANSLATION_X:
+    //                 {
+    //                     float_buffer[float_buffer_length] = '\0';
+
+    //                     if (!to_float(float_buffer, translation.x))
+    //                     {
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Route map: Wrong float value "
+    //                             "%s\n", float_buffer);
+    //                     }
+
+    //                     float_buffer_length = 0;
+    //                     state = FINISH_TRANSLATION_X;
+
+    //                     break;
+    //                 }
+    //                 case START_TRANSLATION_Y:
+    //                 {
+    //                     float_buffer[float_buffer_length] = '\0';
+
+    //                     if (!to_float(float_buffer, translation.y))
+    //                     {
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Route map: Wrong float value "
+    //                             "%s\n", float_buffer);
+    //                     }
+
+    //                     float_buffer_length = 0;
+    //                     state = FINISH_TRANSLATION_Y;
+
+    //                     break;
+    //                 }
+    //                 case START_TRANSLATION_Z:
+    //                 {
+    //                     float_buffer[float_buffer_length] = '\0';
+
+    //                     if (!to_float(float_buffer, translation.z))
+    //                     {
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Route map: Wrong float value "
+    //                             "%s\n", float_buffer);
+    //                     }
+
+    //                     float_buffer_length = 0;
+    //                     state = FINISH_TRANSLATION_Z;
+
+    //                     break;
+    //                 }
+    //                 case START_ROTATION_X:
+    //                 {
+    //                     float_buffer[float_buffer_length] = '\0';
+
+    //                     if (!to_float(float_buffer, rotation.x))
+    //                     {
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Route map: Wrong float value "
+    //                             "%s\n", float_buffer);
+    //                     }
+
+    //                     float_buffer_length = 0;
+    //                     state = FINISH_ROTATION_X;
+
+    //                     break;
+    //                 }
+    //                 case START_ROTATION_Y:
+    //                 {
+    //                     float_buffer[float_buffer_length] = '\0';
+
+    //                     if (!to_float(float_buffer, rotation.y))
+    //                     {
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Route map: Wrong float value "
+    //                             "%s\n", float_buffer);
+    //                     }
+
+    //                     float_buffer_length = 0;
+    //                     state = FINISH_ROTATION_Y;
+
+    //                     break;
+    //                 }
+    //                 case START_ROTATION_Z:
+    //                 {
+    //                     float_buffer[float_buffer_length] = '\0';
+
+    //                     if (!to_float(float_buffer, rotation.z))
+    //                     {
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Route map: Wrong float value "
+    //                             "%s\n", float_buffer);
+    //                     }
+
+    //                     float_buffer_length = 0;
+    //                     state = FINISH_ROTATION_Z;
+
+    //                     break;
+    //                 }
+    //                 default:
+    //                 {
+    //                     break;
+    //                 }
+    //             }
+
+    //             break;
+    //         }
+    //         default:
+    //         {
+    //             switch (state)
+    //             {
+    //                 case INITIAL:
+    //                 {
+    //                     label[label_length] = *ptr;
+    //                     ++label_length;
+    //                     state = START_LABEL;
+    //                     break;
+    //                 }
+    //                 case START_LABEL:
+    //                 {
+    //                     if (label_length == LABEL_BUFFER_SIZE - 1)
+    //                     {
+    //                         label[label_length] = '\0';
+
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Objects ref: Could not append"
+    //                             "to label buffer %s\n", label);
+
+    //                         break;
+    //                     }
+
+    //                     label[label_length] = *ptr;
+    //                     ++label_length;
+    //                     break;
+    //                 }
+    //                 case FINISH_LABEL:
+    //                 {
+    //                     float_buffer[float_buffer_length] = *ptr;
+    //                     ++float_buffer_length;
+    //                     state = START_TRANSLATION_X;
+    //                     break;
+    //                 }
+    //                 case START_TRANSLATION_X: case START_TRANSLATION_Y:
+    //                 case START_TRANSLATION_Z: case START_ROTATION_X:
+    //                 case START_ROTATION_Y: case START_ROTATION_Z:
+    //                 {
+    //                     if (float_buffer_length == FLOAT_BUFFER_SIZE - 1)
+    //                     {
+    //                         float_buffer[float_buffer_length] = '\0';
+
+    //                         // TODO: Replace on Journal
+    //                         std::fprintf(stderr, "Route map: Could not append"
+    //                             "to float buffer %s\n", float_buffer);
+
+    //                         break;
+    //                     }
+
+    //                     float_buffer[float_buffer_length] = *ptr;
+    //                     ++float_buffer_length;
+    //                     break;
+    //                 }
+    //                 case FINISH_TRANSLATION_X:
+    //                 {
+    //                     float_buffer[float_buffer_length] = *ptr;
+    //                     ++float_buffer_length;
+    //                     state = START_TRANSLATION_Y;
+    //                     break;
+    //                 }
+    //                 case FINISH_TRANSLATION_Y:
+    //                 {
+    //                     float_buffer[float_buffer_length] = *ptr;
+    //                     ++float_buffer_length;
+    //                     state = START_TRANSLATION_Z;
+    //                     break;
+    //                 }
+    //                 case FINISH_TRANSLATION_Z:
+    //                 {
+    //                     float_buffer[float_buffer_length] = *ptr;
+    //                     ++float_buffer_length;
+    //                     state = START_ROTATION_X;
+    //                     break;
+    //                 }
+    //                 case FINISH_ROTATION_X:
+    //                 {
+    //                     float_buffer[float_buffer_length] = *ptr;
+    //                     ++float_buffer_length;
+    //                     state = START_ROTATION_Y;
+    //                     break;
+    //                 }
+    //                 case FINISH_ROTATION_Y:
+    //                 {
+    //                     float_buffer[float_buffer_length] = *ptr;
+    //                     ++float_buffer_length;
+    //                     state = START_ROTATION_Z;
+    //                     break;
+    //                 }
+    //                 default:
+    //                 {
+    //                     break;
+    //                 }
+    //             }
+
+    //             break;
+    //         }
     //     }
     // }
+
+    // std::free(buffer);
+
+    std::ifstream route_map_file(route_map_path);
+    if (!route_map_file)
+    {
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to open %s\n", route_map_path.c_str());
+        return false;
+    }
+
+    std::string line;
+    while (std::getline(route_map_file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        if (line.back() == ';')
+        {
+            line.pop_back();
+        }
+
+        std::replace(line.begin(), line.end(), ',', ' ');
+
+        std::istringstream iss(std::move(line));
+        std::string label;
+        vsg::vec3 translation, rotation;
+
+        if (iss >> label >> translation >> rotation)
+        {
+            context.route_map[label].emplace_back(
+                RouteMapTransformation{translation, rotation});
+        }
+    }
 
     return true;
 }
