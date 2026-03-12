@@ -63,6 +63,8 @@
 
 #include <AltSoundLocker.h>
 
+#include <tracy/Tracy.hpp>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -183,18 +185,38 @@ int RouteViewer::run()
     // Главный цикл рендеринга
     while (viewer->advanceToNextFrame())
     {
+        ZoneScopedN("Main Frame");
+
         QApplication::processEvents();
 
-        viewer->handleEvents();
-        viewer->update();
+        {
+            ZoneScopedN("EventHandling");
+            viewer->handleEvents();
+        }
+
+        {
+            ZoneScopedN("Update");
+            viewer->update();
+        }
 
         if (screenshot_writer->isScreeenshot())
         {
+            ZoneScopedN("Do screenshot");
             screenshot_writer->doScreeenshot(window, options);
         }
 
-        viewer->recordAndSubmit();
-        viewer->present();
+
+        {
+            ZoneScopedN("RecordAndSubmit");
+            viewer->recordAndSubmit();
+        }
+
+        {
+            ZoneScopedN("Present");
+            viewer->present();
+        }
+
+        FrameMark;
     }
 
     return 0;

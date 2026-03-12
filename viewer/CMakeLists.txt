@@ -13,6 +13,12 @@ find_package(vsg REQUIRED)
 find_package(vsgXchange REQUIRED)
 find_package(vsgImGui REQUIRED)
 
+# Определяем опцию включения профилирования
+option(ENABLE_PROFILING "Enable Tracy profiling" ON)
+
+find_package(Tracy REQUIRED)
+
+
 file(GLOB TARGET_SOURCES include/*.h src/*.cpp)
 
 add_executable(${TARGET} ${TARGET_SOURCES})
@@ -33,6 +39,10 @@ target_link_libraries(${TARGET} PRIVATE
     display
     topology
 )
+
+target_link_libraries(${TARGET} PRIVATE Tracy::TracyClient)
+#target_compile_definitions(${TARGET} PRIVATE TRACY_ENABLE)
+
 
 target_include_directories(${TARGET} PRIVATE
     ../common-headers
