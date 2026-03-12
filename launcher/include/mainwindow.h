@@ -198,6 +198,12 @@ private:
     /// Перезагрузка списка сценариев в интерфейс
     void reloadScenariosList();
 
+    void showTrainsConfigTip();
+
+    QLabel *trainsConfigTip = nullptr;
+
+    void hideTrainsConfigsTip();
+
 private slots:
 
     void slotRouteSelection();
