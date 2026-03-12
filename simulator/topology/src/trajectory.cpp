@@ -35,6 +35,7 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
                    QDir::separator() + "trajectories" +
                    QDir::separator() + traj_name + ".traj";
 
+    // TODO: Optimize
     std::ifstream stream(path.toStdString(), std::ios::in);
 
     if (!stream.is_open())
@@ -56,6 +57,8 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
 
         lines.push_back(line);
     }
+
+    tracks.reserve(lines.size());
 
     for (size_t i = 0; i < lines.size() - 1; ++i)
     {
@@ -91,7 +94,7 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
         }
 
         // Конструируем трек
-        track_t track(p0, p1);
+        track_t& track = tracks.emplace_back(track_t(p0, p1));
 
         // Железнодорожный пикетаж
         track.railway_coord0 = railway_coord0;
@@ -102,8 +105,6 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
 
         // Обновляем длину траектории
         len += track.len;
-
-        tracks.push_back(track);
     }
 
     // Заполняем имя траектории (по имени файла, где она хранится)
@@ -116,30 +117,31 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
         return true;
     }
 
-    FileSystem &fs = FileSystem::getInstance();
-    for (auto mc = modules.begin(); mc != modules.end(); ++mc)
+    const FileSystem& fs = FileSystem::getInstance();
+
+    for (module_cfg_t& mc : modules)
     {
         // Загружаем dll модуль путевой инфраструктуры
         QString module_path = QString(fs.getModulesDir().c_str()) +
                                       QDir::separator() +
-                                      mc->module_name;
-        TrajectoryDevice *module = loadTrajectoryDevice(module_path);
+                                      mc.module_name;
+        TrajectoryDevice* module = loadTrajectoryDevice(module_path);
 
         if (module  == nullptr)
         {
             Journal::instance()->error(
-                "Fail to load module " + mc->module_name + ".dll for trajectory " + traj_name);
+                "Fail to load module " + mc.module_name + ".dll for trajectory " + traj_name);
             continue;
         }
 
         Journal::instance()->info(
-            "Loaded module " + mc->module_name + ".dll for trajectory " + traj_name);
+            "Loaded module " + mc.module_name + ".dll for trajectory " + traj_name);
 
         // Указываем модулю, что он относится к этой траектории
         module->setTrajectory(this);
 
         // Конфигурируем модуль
-        module->load_config(mc->cfg);
+        module->load_config(mc.cfg);
 
         // Добавляем модуль в список оборудования путевой инфраструктуры
         devices.push_back(module);
