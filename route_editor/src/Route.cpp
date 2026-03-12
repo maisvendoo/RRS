@@ -143,6 +143,25 @@ static char* read_file_in_buffer(const char* filename, const char* modes)
 //     FLOAT, float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.y,
 //     FLOAT, float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.z);
 
+// char double_buffer[DOUBLE_BUFFER_SIZE];
+// dvec3 prev_point;
+// dvec3 point;
+// dvec3 prev_railway_coord;
+// double railway_coord;
+// bool first_line = true;
+// uni_read(filename, separators, [&]() -> void {
+//         if (!first_line)
+//         {
+//             calculate_track...
+//         }
+//         prev_point = point;
+//         prev_railway_coord = railway_coord;
+//     }, 4,
+//     DOUBLE, double_buffer, DOUBLE_BUFFER_SIZE, &point.x,
+//     DOUBLE, double_buffer, DOUBLE_BUFFER_SIZE, &point.y,
+//     DOUBLE, double_buffer, DOUBLE_BUFFER_SIZE, &point.z,
+//     DOUBLE, double_buffer, DOUBLE_BUFFER_SIZE, &railway_coord);
+
 Route::Route(EditorContext& context)
     : context(context)
 {
