@@ -35,10 +35,10 @@ Topology::~Topology()
 //------------------------------------------------------------------------------
 bool Topology::load(QString route_dir, bool solve_errors)
 {
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
 
-    QString route_path = QString(fs.getRouteRootDir().c_str()) +
-                         QDir::separator() + route_dir;
+    const QString route_path = QString(fs.getRouteRootDir().c_str()) +
+        QDir::separator() + route_dir;
 
     QStringList names = getTrajNamesList(route_path);
 
@@ -50,20 +50,18 @@ bool Topology::load(QString route_dir, bool solve_errors)
 
     std::vector<std::vector<module_cfg_t>> all_modules = load_topology_configs(route_path);
 
-    for (auto it = names.begin(); it != names.end(); ++it)
+    for (const QString& name : names)
     {
-        QString name = *it;
-        Trajectory *traj = new Trajectory();
+        Trajectory* traj = new Trajectory();
 
         std::vector<module_cfg_t> modules;
-        for (auto all_cfgs = all_modules.begin(); all_cfgs != all_modules.end(); ++all_cfgs)
+        for (const std::vector<module_cfg_t>& all_cfgs : all_modules)
         {
-            for (auto it = all_cfgs->begin(); it != all_cfgs->end(); ++it)
+            for (const module_cfg_t& module_cfg : all_cfgs)
             {
-                module_cfg_t mc = *it;
-                if (mc.traj_names.contains(name))
+                if (module_cfg.traj_names.contains(name))
                 {
-                    modules.push_back(mc);
+                    modules.push_back(module_cfg);
                     break;
                 }
             }
@@ -529,24 +527,24 @@ bool Topology::open_route_signals(const route_segment_t& route,
 //------------------------------------------------------------------------------
 void Topology::step(double t, double dt)
 {
-    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    for (Trajectory* const traj : traj_list)
     {
-        (*traj)->clearBusy();
+        traj->clearBusy();
     }
 
-    for (auto vc = vehicle_control.begin(); vc != vehicle_control.end(); ++vc)
+    for (VehicleController* const vc : vehicle_control)
     {
-        (*vc)->step(t, dt);
+        vc->step(t, dt);
     }
 
-    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    for (Trajectory* const traj : traj_list)
     {
-        (*traj)->step(t, dt);
+        traj->step(t, dt);
     }
 
-    for (auto sw = switches.begin(); sw != switches.end(); ++sw)
+    for (Switch* const sw : switches)
     {
-        (*sw)->step(t, dt);
+        sw->step(t, dt);
     }
 
     for (auto& signals_array : {signals_data.line_signals,
@@ -555,7 +553,7 @@ void Topology::step(double t, double dt)
                                 signals_data.exit_signals,
                                 signals_data.shunt_signals})
     {
-        for (auto* signal : signals_array)
+        for (Signal* const signal : signals_array)
         {
             if (signal)
             {
@@ -715,26 +713,32 @@ std::vector<std::vector<module_cfg_t>> Topology::load_topology_configs(QString r
 
     // Из папок trajectory-* загружаем все конфиги *.xml
     std::vector<std::vector<module_cfg_t>> all_modules;
-    for (const auto& name : traj_modules_dirs)
+    for (const QString& name : traj_modules_dirs)
     {
         if (name.isEmpty())
+        {
             continue;
+        }
 
         QString traj_module_path = topology_path + QDir::separator() + name;
         QDir traj_module_dir = QDir(traj_module_path);
         QStringList cfg_files = traj_module_dir.entryList({"*.xml"}, QDir::Files);
 
         std::vector<module_cfg_t> all_cfgs;
-        for (const auto& cfg_name : cfg_files)
+        for (const QString& cfg_name : cfg_files)
         {
             if (cfg_name.isEmpty())
+            {
                 continue;
+            }
 
             module_cfg_t mc;
 
             QString cfg_path = traj_module_path + QDir::separator() + cfg_name;
             if (!mc.cfg.load(cfg_path))
+            {
                 continue;
+            }
 
             mc.module_name = name;
 
@@ -749,23 +753,35 @@ std::vector<std::vector<module_cfg_t>> Topology::load_topology_configs(QString r
                 mc.cfg.getString(trajNode, "Name", traj_name);
 
                 if (traj_name.isEmpty())
+                {
                     Journal::instance()->warning("Empty trajectory name at " + cfg_path);
+                }
                 else
+                {
                     mc.traj_names.push_back(traj_name);
+                }
 
                 trajNode = mc.cfg.getNextSection();
             }
 
             if (mc.traj_names.empty())
+            {
                 Journal::instance()->warning("No trajectories found in " + cfg_path);
+            }
             else
+            {
                 all_cfgs.push_back(mc);
+            }
         }
 
         if (all_cfgs.empty())
+        {
             Journal::instance()->warning("No trajectories found in files at " + traj_module_path);
+        }
         else
+        {
             all_modules.push_back(all_cfgs);
+        }
     }
 
     return all_modules;
