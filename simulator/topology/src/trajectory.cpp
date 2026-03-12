@@ -2,6 +2,7 @@
 #include    "switch.h"
 #include    "topology-types.h"
 
+#include    <cstdio>
 #include    <filesystem.h>
 
 #include    <fstream>
@@ -35,7 +36,118 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
                    QDir::separator() + "trajectories" +
                    QDir::separator() + traj_name + ".traj";
 
-    // TODO: Optimize
+    // FILE* const stream = std::fopen(path.toStdString().c_str(), "r");
+    // if (!stream)
+    // {
+    //     Journal::instance()->error("File " + path + " not found");
+    //     return false;
+    // }
+
+    // std::fseek(stream, 0, SEEK_END);
+    // const long buffer_length = std::ftell(stream);
+    // std::rewind(stream);
+
+    // char* const buffer = reinterpret_cast<char*>(
+    //     std::malloc(buffer_length + 1));
+
+    // if (!buffer)
+    // {
+    //     Journal::instance()->error("Failed to allocate memory for " +
+    //         path + " content");
+
+    //     std::fclose(stream);
+    //     return false;
+    // }
+
+    //  const std::size_t bytes_read = std::fread(
+    //     buffer, 1, buffer_length, stream);
+
+    // buffer[buffer_length] = '\0';
+
+    // std::fclose(stream);
+
+    // if (bytes_read < static_cast<std::size_t>(buffer_length))
+    // {
+    //     Journal::instance()->error("Failed to read " + path);
+    //     free(buffer);
+    //     return false;
+    // }
+
+    // enum State
+    // {
+    //     INITIAL,
+    //     START_POINT_X,
+    //     FINISH_POINT_X,
+    //     START_POINT_Y,
+    //     FINISH_POINT_Y,
+    //     START_POINT_Z,
+    //     FINISH_POINT_Z,
+    //     START_RAILWAY_COORD,
+    //     FINISH_RAILWAY_COORD
+    // };
+
+    // char double_buffer[32];
+    // std::uint8_t double_buffer_length = 0;
+    // int curr_index = 0;
+    // dvec3 points[2];
+    // double railway_coords[2];
+    // State state = INITIAL;
+
+    // for (const char* ptr = buffer; *ptr != '\0'; ++ptr)
+    // {
+    //     switch (*ptr)
+    //     {
+    //         case '\n': case ' ': case '\t': case '\r':
+    //         {
+    //             switch (state)
+    //             {
+    //                 case START_POINT_X:
+    //                 {
+    //                     break;
+    //                 }
+    //                 case FINISH_POINT_X:
+    //                 {
+    //                     break;
+    //                 }
+    //                 case START_POINT_Y:
+    //                 {
+    //                     break;
+    //                 }
+    //                 case FINISH_POINT_Y:
+    //                 {
+    //                     break;
+    //                 }
+    //                 case START_POINT_Z:
+    //                 {
+    //                     break;
+    //                 }
+    //                 case FINISH_POINT_Z:
+    //                 {
+    //                     break;
+    //                 }
+    //                 case START_RAILWAY_COORD:
+    //                 {
+    //                     break;
+    //                 }
+    //                 case FINISH_RAILWAY_COORD:
+    //                 {
+    //                     break;
+    //                 }
+    //                 default:
+    //                 {
+    //                     break;
+    //                 }
+    //             }
+
+    //             break;
+    //         }
+    //         default:
+    //         {
+    //             break;
+    //         }
+    //     }
+    // }
+
     std::ifstream stream(path.toStdString(), std::ios::in);
 
     if (!stream.is_open())
@@ -57,8 +169,6 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
 
         lines.push_back(line);
     }
-
-    tracks.reserve(lines.size());
 
     for (size_t i = 0; i < lines.size() - 1; ++i)
     {

@@ -48,6 +48,22 @@ static vsg::vec3 to_vsg_vec3(dvec3 vec)
     };
 }
 
+static bool to_float(const char* buf, float& out)
+{
+    char* endptr;
+    errno = 0;
+    const float result = std::strtof(buf, &endptr);
+    if (errno == 0 && *endptr == '\0')
+    {
+        out = result;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 Route::Route(EditorContext& context)
     : context(context)
 {
@@ -158,7 +174,7 @@ bool Route::load_objects_ref()
 
                 break;
             }
-            case ' ': case '\t':
+            case ' ': case '\t': case '\r':
             {
                 switch (state)
                 {
@@ -355,11 +371,7 @@ bool Route::load_route_map()
                     {
                         float_buffer[float_buffer_length] = '\0';
 
-                        char* endptr;
-                        errno = 0;
-                        rotation.z = std::strtof(float_buffer, &endptr);
-
-                        if (errno == 0 || *endptr == '\0')
+                        if (!to_float(float_buffer, rotation.z))
                         {
                             // TODO: Replace on Journal
                             std::fprintf(stderr, "Route map: Wrong float value"
@@ -377,7 +389,7 @@ bool Route::load_route_map()
 
                 break;
             }
-            case ' ': case '\t': case ',': case ';':
+            case ' ': case '\t': case ',': case ';': case '\r':
             {
                 switch (state)
                 {
@@ -391,11 +403,7 @@ bool Route::load_route_map()
                     {
                         float_buffer[float_buffer_length] = '\0';
 
-                        char* endptr;
-                        errno = 0;
-                        translation.x = std::strtof(float_buffer, &endptr);
-
-                        if (errno != 0 || *endptr != '\0')
+                        if (!to_float(float_buffer, translation.x))
                         {
                             // TODO: Replace on Journal
                             std::fprintf(stderr, "Route map: Wrong float value"
@@ -411,11 +419,7 @@ bool Route::load_route_map()
                     {
                         float_buffer[float_buffer_length] = '\0';
 
-                        char* endptr;
-                        errno = 0;
-                        translation.y = std::strtof(float_buffer, &endptr);
-
-                        if (errno != 0 || *endptr != '\0')
+                        if (!to_float(float_buffer, translation.y))
                         {
                             // TODO: Replace on Journal
                             std::fprintf(stderr, "Route map: Wrong float value"
@@ -431,11 +435,7 @@ bool Route::load_route_map()
                     {
                         float_buffer[float_buffer_length] = '\0';
 
-                        char* endptr;
-                        errno = 0;
-                        translation.z = std::strtof(float_buffer, &endptr);
-
-                        if (errno != 0 || *endptr != '\0')
+                        if (!to_float(float_buffer, translation.z))
                         {
                             // TODO: Replace on Journal
                             std::fprintf(stderr, "Route map: Wrong float value"
@@ -451,11 +451,7 @@ bool Route::load_route_map()
                     {
                         float_buffer[float_buffer_length] = '\0';
 
-                        char* endptr;
-                        errno = 0;
-                        rotation.x = std::strtof(float_buffer, &endptr);
-
-                        if (errno != 0 || *endptr != '\0')
+                        if (!to_float(float_buffer, rotation.x))
                         {
                             // TODO: Replace on Journal
                             std::fprintf(stderr, "Route map: Wrong float value"
@@ -471,11 +467,7 @@ bool Route::load_route_map()
                     {
                         float_buffer[float_buffer_length] = '\0';
 
-                        char* endptr;
-                        errno = 0;
-                        rotation.y = std::strtof(float_buffer, &endptr);
-
-                        if (errno != 0 || *endptr != '\0')
+                        if (!to_float(float_buffer, rotation.y))
                         {
                             // TODO: Replace on Journal
                             std::fprintf(stderr, "Route map: Wrong float value"
@@ -491,11 +483,7 @@ bool Route::load_route_map()
                     {
                         float_buffer[float_buffer_length] = '\0';
 
-                        char* endptr;
-                        errno = 0;
-                        rotation.z = std::strtof(float_buffer, &endptr);
-
-                        if (errno != 0 || *endptr != '\0')
+                        if (!to_float(float_buffer, rotation.z))
                         {
                             // TODO: Replace on Journal
                             std::fprintf(stderr, "Route map: Wrong float value"
