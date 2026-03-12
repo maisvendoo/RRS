@@ -28,7 +28,7 @@ Trajectory::~Trajectory()
 //
 //------------------------------------------------------------------------------
 bool Trajectory::load(const QString &route_dir, const QString &traj_name,
-                      std::vector<module_cfg_t> modules, bool solve_errors)
+                      std::vector<module_cfg_t>& modules, bool solve_errors)
 {
     QString path = QDir::toNativeSeparators(route_dir) +
                    QDir::separator() + "topology" +
