@@ -369,14 +369,12 @@ bool Trajectory::isBusy() const
 //------------------------------------------------------------------------------
 bool Trajectory::isBusy(double coord_begin, double coord_end) const
 {
-    if (is_busy)
+    for (auto vehicle_coord : vehicles_coords)
     {
-        for (auto vehicle_coord : vehicles_coords)
-        {
-            if ((vehicle_coord[1] >= coord_begin) && (vehicle_coord[0] <= coord_end))
-                return true;
-        }
+        if ((vehicle_coord[1] >= coord_begin) && (vehicle_coord[0] <= coord_end))
+            return true;
     }
+
     return false;
 }
 
