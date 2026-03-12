@@ -39,6 +39,10 @@
 #include <utility>
 // #include <vector>
 
+#define LABEL_BUFFER_SIZE 256
+#define RELATIVE_PATH_BUFFER_SIZE 512
+#define FLOAT_BUFFER_SIZE 32
+
 static vsg::vec3 to_vsg_vec3(dvec3 vec)
 {
     return vsg::vec3{
@@ -62,6 +66,49 @@ static bool to_float(const char* buf, float& out)
     {
         return false;
     }
+}
+
+static char* read_file_in_buffer(const char* filename, const char* modes)
+{
+    std::FILE* const file = std::fopen(filename, modes);
+    if (!file)
+    {
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to open %s\n", filename);
+        return nullptr;
+    }
+
+    std::fseek(file, 0, SEEK_END);
+    const long buffer_length = std::ftell(file);
+    std::rewind(file);
+
+    char* const buffer = reinterpret_cast<char*>(
+        std::malloc(buffer_length + 1));
+
+    if (!buffer)
+    {
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to allocate memory for %s content\n",
+            filename);
+
+        std::fclose(file);
+        return nullptr;
+    }
+
+    const std::size_t bytes_read = std::fread(buffer, 1, buffer_length, file);
+    buffer[buffer_length] = '\0';
+
+    std::fclose(file);
+
+    if (bytes_read < static_cast<std::size_t>(buffer_length))
+    {
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to read %s\n", filename);
+        std::free(buffer);
+        return nullptr;
+    }
+
+    return buffer;
 }
 
 Route::Route(EditorContext& context)
@@ -101,43 +148,9 @@ bool Route::load_objects_ref()
     const std::string objects_ref_path = fs.combinePath(
         context.route_dir, "objects.ref");
 
-    FILE* const objects_ref_file = std::fopen(objects_ref_path.c_str(), "r");
-    if (!objects_ref_file)
-    {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to open %s\n", objects_ref_path.c_str());
-        return false;
-    }
-
-    std::fseek(objects_ref_file, 0, SEEK_END);
-    const long buffer_length = std::ftell(objects_ref_file);
-    std::rewind(objects_ref_file);
-
-    char* const buffer = reinterpret_cast<char*>(
-        std::malloc(buffer_length + 1));
-
+    char* const buffer = read_file_in_buffer(objects_ref_path.c_str(), "r");
     if (!buffer)
     {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to allocate memory for %s content\n",
-            objects_ref_path.c_str());
-
-        std::fclose(objects_ref_file);
-        return false;
-    }
-
-    const std::size_t bytes_read = std::fread(
-        buffer, 1, buffer_length, objects_ref_file);
-
-    buffer[buffer_length] = '\0';
-
-    std::fclose(objects_ref_file);
-
-    if (bytes_read < static_cast<std::size_t>(buffer_length))
-    {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to read %s\n", objects_ref_path.c_str());
-        free(buffer);
         return false;
     }
 
@@ -150,9 +163,9 @@ bool Route::load_objects_ref()
         FINISH_RELATIVE_PATH
     };
 
-    char label[256];
+    char label[LABEL_BUFFER_SIZE];
     std::uint8_t label_length = 0;
-    char relative_path[512];
+    char relative_path[RELATIVE_PATH_BUFFER_SIZE];
     std::uint16_t relative_path_length = 0;
     State state = INITIAL;
 
@@ -211,7 +224,7 @@ bool Route::load_objects_ref()
                     }
                     case START_LABEL:
                     {
-                        if (label_length == 255)
+                        if (label_length == LABEL_BUFFER_SIZE - 1)
                         {
                             label[label_length] = '\0';
 
@@ -235,7 +248,8 @@ bool Route::load_objects_ref()
                     }
                     case START_RELATIVE_PATH:
                     {
-                        if (relative_path_length == 511)
+                        if (relative_path_length ==
+                            RELATIVE_PATH_BUFFER_SIZE - 1)
                         {
                             relative_path[relative_path_length] = '\0';
 
@@ -259,7 +273,7 @@ bool Route::load_objects_ref()
         }
     }
 
-    free(buffer);
+    std::free(buffer);
 
     // std::ifstream objects_ref_file(objects_ref_path);
     // if (!objects_ref_file)
@@ -292,43 +306,9 @@ bool Route::load_route_map()
     const std::string route_map_path = fs.combinePath(context.route_dir,
         "topology", "map", "route1.map");
 
-    FILE* const route_map_file = std::fopen(route_map_path.c_str(), "r");
-    if (!route_map_file)
-    {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to open %s\n", route_map_path.c_str());
-        return false;
-    }
-
-    std::fseek(route_map_file, 0, SEEK_END);
-    const long buffer_length = std::ftell(route_map_file);
-    std::rewind(route_map_file);
-
-    char* const buffer = reinterpret_cast<char*>(
-        std::malloc(buffer_length + 1));
-
+    char* const buffer = read_file_in_buffer(route_map_path.c_str(), "r");
     if (!buffer)
     {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to allocate memory for %s content\n",
-            route_map_path.c_str());
-
-        std::fclose(route_map_file);
-        return false;
-    }
-
-    const std::size_t bytes_read = std::fread(
-        buffer, 1, buffer_length, route_map_file);
-
-    buffer[buffer_length] = '\0';
-
-    std::fclose(route_map_file);
-
-    if (bytes_read < static_cast<std::size_t>(buffer_length))
-    {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to read %s\n", route_map_path.c_str());
-        free(buffer);
         return false;
     }
 
@@ -351,9 +331,9 @@ bool Route::load_route_map()
         FINISH_ROTATION_Z
     };
 
-    char label[256];
+    char label[LABEL_BUFFER_SIZE];
     std::uint8_t label_length = 0;
-    char float_buffer[32];
+    char float_buffer[FLOAT_BUFFER_SIZE];
     std::uint8_t float_buffer_length = 0;
     vsg::vec3 translation;
     vsg::vec3 rotation;
@@ -516,7 +496,7 @@ bool Route::load_route_map()
                     }
                     case START_LABEL:
                     {
-                        if (label_length == 255)
+                        if (label_length == LABEL_BUFFER_SIZE - 1)
                         {
                             label[label_length] = '\0';
 
@@ -542,7 +522,7 @@ bool Route::load_route_map()
                     case START_TRANSLATION_Z: case START_ROTATION_X:
                     case START_ROTATION_Y: case START_ROTATION_Z:
                     {
-                        if (float_buffer_length == 31)
+                        if (float_buffer_length == FLOAT_BUFFER_SIZE - 1)
                         {
                             float_buffer[float_buffer_length] = '\0';
 
@@ -603,7 +583,7 @@ bool Route::load_route_map()
         }
     }
 
-    free(buffer);
+    std::free(buffer);
 
     // std::ifstream route_map_file(route_map_path);
     // if (!route_map_file)
