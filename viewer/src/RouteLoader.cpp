@@ -74,6 +74,30 @@ bool RouteLoader::parse_objects_ref(Route& route)
         PARSE_VALUE_TYPE_STRING, label, static_cast<std::size_t>(LABEL_BUFFER_SIZE),
         PARSE_VALUE_TYPE_STRING, relative_path, static_cast<std::size_t>(RELATIVE_PATH_BUFFER_SIZE)
     );
+
+    // std::ifstream objects_ref(route_path + "/objects.ref");
+    // if (!objects_ref)
+    // {
+    //     LOG_ERROR("Failed to open %s", objects_ref_path.c_str());
+    //     return false;
+    // }
+
+    // std::string line;
+    // while (std::getline(objects_ref, line))
+    // {
+    //     std::istringstream line_stream(line);
+    //     std::string label;
+    //     std::string model_path;
+    //     line_stream >> label >> model_path;
+    //     if (!model_path.empty()
+    //         && is_slash(model_path.front()))
+    //     {
+    //         // std::replace(model_path.begin(), model_path.end(), '/', '\\');
+    //         route.object_ref.insert({label, model_path});
+    //     }
+    // }
+
+    // return true;
 }
 
 //------------------------------------------------------------------------------
