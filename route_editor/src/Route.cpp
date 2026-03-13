@@ -89,8 +89,7 @@ bool Route::load_objects_ref()
     char label[LABEL_BUFFER_SIZE];
     char relative_path[RELATIVE_PATH_BUFFER_SIZE];
 
-    return parse_file_line_by_line(
-        objects_ref_path.c_str(), "r", " \t\r",
+    return parse_file_line_by_line(objects_ref_path.c_str(), "r", " \t\r",
         [&]() -> void {
             context.objects_ref.emplace(label, relative_path);
         }, 2,
@@ -111,8 +110,7 @@ bool Route::load_route_map()
     vsg::vec3 translation;
     vsg::vec3 rotation;
 
-    return parse_file_line_by_line(
-        route_map_path.c_str(), "r", " \t\r,;",
+    return parse_file_line_by_line(route_map_path.c_str(), "r", " \t\r,;",
         [&]() -> void {
             context.route_map[label].emplace_back(
                 RouteMapTransformation{translation, rotation});

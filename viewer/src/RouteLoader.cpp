@@ -3,11 +3,15 @@
 #include "CfgReader.h"
 #include "Logger.h"
 #include "Route.h"
+#include "parse_file_funcs.h"
 
 #include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <string>
+
+#define LABEL_BUFFER_SIZE 256
+#define RELATIVE_PATH_BUFFER_SIZE 512
 
 bool is_slash(char ch)
 {
@@ -55,29 +59,21 @@ void RouteLoader::read_description()
 //------------------------------------------------------------------------------
 bool RouteLoader::parse_objects_ref(Route& route)
 {
-    std::ifstream objects_ref(route_path + "/objects.ref");
-    if (!objects_ref)
-    {
-        LOG_ERROR("Failed to open %s", objects_ref_path.c_str());
-        return false;
-    }
+    char label[LABEL_BUFFER_SIZE];
+    char relative_path[RELATIVE_PATH_BUFFER_SIZE];
 
-    std::string line;
-    while (std::getline(objects_ref, line))
-    {
-        std::istringstream line_stream(line);
-        std::string label;
-        std::string model_path;
-        line_stream >> label >> model_path;
-        if (!model_path.empty()
-            && is_slash(model_path.front()))
-        {
-            // std::replace(model_path.begin(), model_path.end(), '/', '\\');
-            route.object_ref.insert({label, model_path});
-        }
-    }
-
-    return true;
+    return parse_file_line_by_line(
+        (route_path + "/objects.ref").c_str(), "r", " \t\r,;",
+        [&]() -> void {
+            std::string model_path = relative_path;
+            if (!model_path.empty() && is_slash(model_path.front()))
+            {
+                route.object_ref.insert({label, relative_path});
+            }
+        }, 2,
+        PARSE_VALUE_TYPE_STRING, label, static_cast<std::size_t>(LABEL_BUFFER_SIZE),
+        PARSE_VALUE_TYPE_STRING, relative_path, static_cast<std::size_t>(RELATIVE_PATH_BUFFER_SIZE)
+    );
 }
 
 //------------------------------------------------------------------------------
