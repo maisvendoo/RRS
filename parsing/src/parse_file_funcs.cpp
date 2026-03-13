@@ -158,7 +158,8 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
         ParseValue* const parse_value = &parse_values[i];
         parse_value->type = va_arg(args, ParseValueType);
         parse_value->buffer = va_arg(args, char*);
-        parse_value->buffer_length = va_arg(args, std::size_t);
+        parse_value->buffer_length = 0;
+        parse_value->buffer_size = va_arg(args, std::size_t);
 
         if (parse_value->type != PARSE_VALUE_TYPE_STRING)
         {
@@ -195,9 +196,22 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
                 print_error(filename, line_num, "wrong parse value count",
                     line_begin, ptr);
 
-                std::free(parse_values);
-                std::free(buffer);
-                return false;
+                if (*ptr == '\0')
+                {
+                    std::free(parse_values);
+                    std::free(buffer);
+                    return true;
+                }
+
+                curr_state = 0;
+                ++line_num;
+                line_begin = ptr + 1;
+                ++ptr;
+                continue;
+
+                // std::free(parse_values);
+                // std::free(buffer);
+                // return false;
             }
 
             if (curr_state != 0)
@@ -250,12 +264,15 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
             {
                 if (curr_state == 2 * argc)
                 {
-                    print_error(filename, line_num, "too many parse values"
-                        "int line", line_begin, ptr);
+                    print_error(filename, line_num, "too many parse values "
+                        "in line", line_begin, ptr);
 
-                    std::free(parse_values);
-                    std::free(buffer);
-                    return false;
+                    ++ptr;
+                    continue;
+
+                    // std::free(parse_values);
+                    // std::free(buffer);
+                    // return false;
                 }
 
                 if (state_is_even)

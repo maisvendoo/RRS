@@ -1,13 +1,16 @@
 #include    "trajectory.h"
+#include    "parse_file_funcs.h"
 #include    "switch.h"
 #include    "topology-types.h"
 
+#include    <cstddef>
 #include    <cstdio>
 #include    <filesystem.h>
 
-#include    <fstream>
 #include    <Journal.h>
 #include    <physics.h>
+
+#define DOUBLE_BUFFER_SIZE 32
 
 //------------------------------------------------------------------------------
 //
@@ -36,186 +39,135 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
                    QDir::separator() + "trajectories" +
                    QDir::separator() + traj_name + ".traj";
 
-    // FILE* const stream = std::fopen(path.toStdString().c_str(), "r");
-    // if (!stream)
+    char double_buffer[DOUBLE_BUFFER_SIZE];
+    dvec3 prev_point;
+    dvec3 curr_point;
+    double prev_railway_coord;
+    double curr_railway_coord;
+    bool first_line = true;
+    int index = 0;
+
+    const bool success = parse_file_line_by_line(path.toStdString().c_str(),
+        "r", " \t\r,;",
+        [&]() -> void {
+            if (first_line)
+            {
+                first_line = false;
+            }
+            else
+            {
+                // Проверка совпадения точек p0 и p1
+                const dvec3 delta_point = prev_point - curr_point;
+
+                // Откидываем сантиметровые треки и меньше
+                if (solve_errors && (length(delta_point) <= 0.01))
+                {
+                    const QString msg = QString("TOPOLOGY WARNING: Points %1 and %2 match in trajectory %3")
+                        .arg(index - 1, 4)
+                        .arg(index, 4)
+                        .arg(traj_name);
+
+                    Journal::instance()->error(msg);
+                    return;
+                }
+
+                // Конструируем трек
+                track_t& track = tracks.emplace_back(track_t(prev_point, curr_point));
+
+                // Железнодорожный пикетаж
+                track.railway_coord0 = prev_railway_coord;
+                track.railway_coord1 = curr_railway_coord;
+
+                // Обновляем траекторную координату начала трека
+                track.traj_coord = len;
+
+                // Обновляем длину траектории
+                len += track.len;
+            }
+
+            prev_point = curr_point;
+            prev_railway_coord = curr_railway_coord;
+            ++index;
+        }, 4,
+        PARSE_VALUE_TYPE_DOUBLE, double_buffer, static_cast<std::size_t>(DOUBLE_BUFFER_SIZE), &curr_point.x,
+        PARSE_VALUE_TYPE_DOUBLE, double_buffer, static_cast<std::size_t>(DOUBLE_BUFFER_SIZE), &curr_point.y,
+        PARSE_VALUE_TYPE_DOUBLE, double_buffer, static_cast<std::size_t>(DOUBLE_BUFFER_SIZE), &curr_point.z,
+        PARSE_VALUE_TYPE_DOUBLE, double_buffer, static_cast<std::size_t>(DOUBLE_BUFFER_SIZE), &curr_railway_coord
+    );
+
+    if (!success)
+    {
+        return false;
+    }
+
+    // std::ifstream stream(path.toStdString(), std::ios::in);
+
+    // if (!stream.is_open())
     // {
     //     Journal::instance()->error("File " + path + " not found");
     //     return false;
     // }
 
-    // std::fseek(stream, 0, SEEK_END);
-    // const long buffer_length = std::ftell(stream);
-    // std::rewind(stream);
+    // std::vector<std::string> lines;
 
-    // char* const buffer = reinterpret_cast<char*>(
-    //     std::malloc(buffer_length + 1));
-
-    // if (!buffer)
+    // // Читаем непустые линии из файла точек траектории
+    // while (!stream.eof())
     // {
-    //     Journal::instance()->error("Failed to allocate memory for " +
-    //         path + " content");
+    //     std::string line = "";
+    //     std::getline(stream, line);
 
-    //     std::fclose(stream);
-    //     return false;
+    //     if (line.empty())
+    //         continue;
+
+    //     lines.push_back(line);
     // }
 
-    //  const std::size_t bytes_read = std::fread(
-    //     buffer, 1, buffer_length, stream);
-
-    // buffer[buffer_length] = '\0';
-
-    // std::fclose(stream);
-
-    // if (bytes_read < static_cast<std::size_t>(buffer_length))
+    // for (size_t i = 0; i < lines.size() - 1; ++i)
     // {
-    //     Journal::instance()->error("Failed to read " + path);
-    //     free(buffer);
-    //     return false;
-    // }
+    //     // Линия, описывающая начальную точку трека
+    //     std::istringstream ss_begin(lines[i]);
+    //     // следующая линия описывает конечную точку трека
+    //     std::istringstream ss_end(lines[i+1]);
 
-    // enum State
-    // {
-    //     INITIAL,
-    //     START_POINT_X,
-    //     FINISH_POINT_X,
-    //     START_POINT_Y,
-    //     FINISH_POINT_Y,
-    //     START_POINT_Z,
-    //     FINISH_POINT_Z,
-    //     START_RAILWAY_COORD,
-    //     FINISH_RAILWAY_COORD
-    // };
+    //     // Читаем начальную и конечную точки
+    //     dvec3 p0;
+    //     double railway_coord0;
 
-    // char double_buffer[32];
-    // std::uint8_t double_buffer_length = 0;
-    // int curr_index = 0;
-    // dvec3 points[2];
-    // double railway_coords[2];
-    // State state = INITIAL;
+    //     ss_begin >> p0.x >> p0.y >> p0.z >> railway_coord0;
 
-    // for (const char* ptr = buffer; *ptr != '\0'; ++ptr)
-    // {
-    //     switch (*ptr)
+    //     dvec3 p1;
+    //     double railway_coord1;
+
+    //     ss_end >> p1.x >> p1.y >> p1.z >> railway_coord1;
+
+    //     // Проверка совпадения точек p0 и p1
+    //     dvec3 dp = p1 - p0;
+
+    //     // Откидываем сантиметровые треки и меньше
+    //     if (solve_errors && (length(dp) <= 0.01))
     //     {
-    //         case '\n': case ' ': case '\t': case '\r':
-    //         {
-    //             switch (state)
-    //             {
-    //                 case START_POINT_X:
-    //                 {
-    //                     break;
-    //                 }
-    //                 case FINISH_POINT_X:
-    //                 {
-    //                     break;
-    //                 }
-    //                 case START_POINT_Y:
-    //                 {
-    //                     break;
-    //                 }
-    //                 case FINISH_POINT_Y:
-    //                 {
-    //                     break;
-    //                 }
-    //                 case START_POINT_Z:
-    //                 {
-    //                     break;
-    //                 }
-    //                 case FINISH_POINT_Z:
-    //                 {
-    //                     break;
-    //                 }
-    //                 case START_RAILWAY_COORD:
-    //                 {
-    //                     break;
-    //                 }
-    //                 case FINISH_RAILWAY_COORD:
-    //                 {
-    //                     break;
-    //                 }
-    //                 default:
-    //                 {
-    //                     break;
-    //                 }
-    //             }
+    //         QString msg = QString("TOPOLOGY WARNING: Points %1 and %2 match in trajectory %3")
+    //                           .arg(i, 4)
+    //                           .arg(i+1, 4)
+    //                           .arg(traj_name);
 
-    //             break;
-    //         }
-    //         default:
-    //         {
-    //             break;
-    //         }
+    //         Journal::instance()->error(msg);
+    //         continue;
     //     }
+
+    //     // Конструируем трек
+    //     track_t& track = tracks.emplace_back(track_t(p0, p1));
+
+    //     // Железнодорожный пикетаж
+    //     track.railway_coord0 = railway_coord0;
+    //     track.railway_coord1 = railway_coord1;
+
+    //     // Обновляем траекторную координату начала трека
+    //     track.traj_coord = len;
+
+    //     // Обновляем длину траектории
+    //     len += track.len;
     // }
-
-    std::ifstream stream(path.toStdString(), std::ios::in);
-
-    if (!stream.is_open())
-    {
-        Journal::instance()->error("File " + path + " not found");
-        return false;
-    }
-
-    std::vector<std::string> lines;
-
-    // Читаем непустые линии из файла точек траектории
-    while (!stream.eof())
-    {
-        std::string line = "";
-        std::getline(stream, line);
-
-        if (line.empty())
-            continue;
-
-        lines.push_back(line);
-    }
-
-    for (size_t i = 0; i < lines.size() - 1; ++i)
-    {
-        // Линия, описывающая начальную точку трека
-        std::istringstream ss_begin(lines[i]);
-        // следующая линия описывает конечную точку трека
-        std::istringstream ss_end(lines[i+1]);
-
-        // Читаем начальную и конечную точки
-        dvec3 p0;
-        double railway_coord0;
-
-        ss_begin >> p0.x >> p0.y >> p0.z >> railway_coord0;
-
-        dvec3 p1;
-        double railway_coord1;
-
-        ss_end >> p1.x >> p1.y >> p1.z >> railway_coord1;
-
-        // Проверка совпадения точек p0 и p1
-        dvec3 dp = p1 - p0;
-
-        // Откидываем сантиметровые треки и меньше
-        if (solve_errors && (length(dp) <= 0.01))
-        {
-            QString msg = QString("TOPOLOGY WARNING: Points %1 and %2 match in trajectory %3")
-                              .arg(i, 4)
-                              .arg(i+1, 4)
-                              .arg(traj_name);
-
-            Journal::instance()->error(msg);
-            continue;
-        }
-
-        // Конструируем трек
-        track_t& track = tracks.emplace_back(track_t(p0, p1));
-
-        // Железнодорожный пикетаж
-        track.railway_coord0 = railway_coord0;
-        track.railway_coord1 = railway_coord1;
-
-        // Обновляем траекторную координату начала трека
-        track.traj_coord = len;
-
-        // Обновляем длину траектории
-        len += track.len;
-    }
 
     // Заполняем имя траектории (по имени файла, где она хранится)
     name = traj_name;
