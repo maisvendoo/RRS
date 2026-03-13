@@ -498,6 +498,52 @@ void MainWindow::reloadScenariosList()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::showTrainsConfigTip()
+{
+    QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(ui->frame->layout());
+
+    if (layout == nullptr)
+    {
+        layout = new QVBoxLayout(this);
+        ui->frame->setLayout(layout);
+    }
+
+    layout->setAlignment(Qt::AlignCenter);
+
+    trainsConfigTip = new QLabel(tr("Trains positions are defined in scenario"), ui->frame);
+    trainsConfigTip->setAlignment(Qt::AlignCenter);
+
+    layout->addWidget(trainsConfigTip);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::hideTrainsConfigsTip()
+{
+    if (trainsConfigTip == nullptr)
+    {
+        return;
+    }
+
+    QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(ui->frame->layout());
+
+    if (layout == nullptr)
+    {
+        return;
+    }
+
+    layout->removeWidget(trainsConfigTip);
+    trainsConfigTip->deleteLater();
+    trainsConfigTip = nullptr;
+
+    layout->deleteLater();
+    layout = nullptr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::loadActiveTrainsList()
 {
     if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
@@ -750,6 +796,8 @@ void MainWindow::slotAddActiveTrain()
             this, &MainWindow::slotTrainConfigChanged);
 
     slotUpdateActiveTrains();
+
+    ui->cbScenario->setEnabled(false);
 }
 
 //------------------------------------------------------------------------------
@@ -758,7 +806,9 @@ void MainWindow::slotAddActiveTrain()
 void MainWindow::slotDeleteActiveTrain()
 {
     if (tbActiveTrains->count() <= 0)
+    {
         return;
+    }
 
     int cur = tbActiveTrains->currentIndex();
     TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(tbActiveTrains->widget(cur));
@@ -773,6 +823,11 @@ void MainWindow::slotDeleteActiveTrain()
     }
 
     slotUpdateActiveTrains();
+
+    if (active_trains.size() == 0)
+    {
+        ui->cbScenario->setEnabled(true);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -1208,6 +1263,8 @@ void MainWindow::slotOnScenarioSelection(int cur_idx)
     if (cur_idx <= 0)
     {
         ui->pbStartServer->setEnabled(false);
+        hideTrainsConfigsTip();
+        ui->pbAddTrain->setEnabled(true);
         return;
     }
 
@@ -1217,6 +1274,9 @@ void MainWindow::slotOnScenarioSelection(int cur_idx)
     selected_scenario_idx = cur_idx - 1;
 
     ui->pbStartServer->setEnabled(true);
+
+    showTrainsConfigTip();
+    ui->pbAddTrain->setEnabled(false);
 }
 
 //------------------------------------------------------------------------------
