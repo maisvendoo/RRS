@@ -130,57 +130,6 @@ static char* read_file_in_buffer(const char* filename, const char* modes)
     return buffer;
 }
 
-// TODO: Make universal file reader for line by line data
-
-// label relative_path
-// Между словами могут быть сколько угодно пробелов и табуляций
-// Строка может заканчиваться как \n, так и \0
-
-// label,tx,ty,tz,rx,ry,rz;
-
-// char label[LABEL_BUFFER_SIZE];
-// char relative_path[RELATIVE_PATH_BUFFER_SIZE];
-// read_line_by_line(filename, separators, [&]() -> void {
-//         context.objects_ref.emplace(label, relative_path);
-//     }, 2,
-//     STRING, label, LABEL_BUFFER_SIZE,
-//     STRING, relative_path, RELATIVE_PATH_BUFFER_SIZE);
-
-// char label[LABEL_BUFFER_SIZE];
-// char float_buffer[FLOAT_BUFFER_SIZE];
-// vsg::vec3 translation;
-// vsg::vec3 rotation_deg;
-// read_line_by_line(filename, separators, [&]() -> void {
-//         context.route_map[label].emplace_back(
-//             RouteMapTransformation{translation, rotation});
-//     }, 7,
-//     STRING, label, LABEL_BUFFER_SIZE,
-//     FLOAT, float_buffer, FLOAT_BUFFER_SIZE, &translation.x,
-//     FLOAT, float_buffer, FLOAT_BUFFER_SIZE, &translation.y,
-//     FLOAT, float_buffer, FLOAT_BUFFER_SIZE, &translation.z,
-//     FLOAT, float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.x,
-//     FLOAT, float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.y,
-//     FLOAT, float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.z);
-
-// char double_buffer[DOUBLE_BUFFER_SIZE];
-// dvec3 prev_point;
-// dvec3 point;
-// dvec3 prev_railway_coord;
-// double railway_coord;
-// bool first_line = true;
-// read_line_by_line(filename, separators, [&]() -> void {
-//         if (!first_line)
-//         {
-//             calculate_track...
-//         }
-//         prev_point = point;
-//         prev_railway_coord = railway_coord;
-//     }, 4,
-//     DOUBLE, double_buffer, DOUBLE_BUFFER_SIZE, &point.x,
-//     DOUBLE, double_buffer, DOUBLE_BUFFER_SIZE, &point.y,
-//     DOUBLE, double_buffer, DOUBLE_BUFFER_SIZE, &point.z,
-//     DOUBLE, double_buffer, DOUBLE_BUFFER_SIZE, &railway_coord);
-
 enum Type
 {
     TYPE_STRING,
