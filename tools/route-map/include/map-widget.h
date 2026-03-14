@@ -158,9 +158,9 @@ private:
     double signal_offset = 2.5;
 
     struct switch_coord_t {
-        dvec3 center;
-        dvec3 orth;
-        dvec3 trav;
+        dvec3 center = {0.0, 0.0, 0.0};
+        dvec3 orth = {0.0, 1.0, 0.0};
+        dvec3 trav = {1.0, 0.0, 0.0};
     };
     QMap<QString, switch_coord_t> switch_coords;
 

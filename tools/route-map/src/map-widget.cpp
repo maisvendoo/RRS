@@ -73,7 +73,8 @@ void MapWidget::calcCwitchCoords()
         {
             if ((bwd_traj == nullptr || (bwd_traj->getTracks().empty())))
             {
-                return;
+                switch_coords.insert(sw->getName(), switch_coord_t());
+                continue;
             }
             else
             {
