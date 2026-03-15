@@ -32,6 +32,7 @@ target_link_libraries(${TARGET} PRIVATE
     sound-manager
     display
     topology
+    parsing
 )
 
 target_include_directories(${TARGET} PRIVATE

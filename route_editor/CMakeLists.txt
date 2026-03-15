@@ -52,6 +52,7 @@ target_link_libraries(${TARGET}
         CfgReader
         filesystem
         topology
+        parsing
 )
 
 if(MSVC)

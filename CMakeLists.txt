@@ -10,6 +10,7 @@ add_subdirectory (CfgEditor)
 add_subdirectory (filesystem)
 add_subdirectory (libJournal)
 add_subdirectory (network)
+add_subdirectory (parsing)
 
 add_subdirectory (simulator)
 
