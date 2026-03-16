@@ -1,7 +1,6 @@
 EditorContext.h
 EditorGui.h
 Gizmo.h
-IntersectionHandler.h
 ObjectSelector.h
 RouteEditor.h
 RouteObject.h
@@ -9,7 +8,6 @@ RouteObject.h
 EditorContext.cpp
 EditorGui.cpp
 Gizmo.cpp
-IntersectionHandler.cpp
 ObjectSelector.cpp
 RouteEditor.cpp
 RouteObject.cpp
@@ -26,6 +24,7 @@ commands/SelectObjectsCommand.h
 Action.h
 CameraHandler.h
 EditorState.h
+IntersectionHandler.h
 KeyBinding.h
 KeyboardHandler.h
 LSIntersector.h
@@ -51,6 +50,7 @@ commands/ScaleObjectsCommand.cpp
 commands/SelectObjectsCommand.cpp
 Action.cpp
 CameraHandler.cpp
+IntersectionHandler.cpp
 KeyBinding.cpp
 KeyboardHandler.cpp
 main.cpp

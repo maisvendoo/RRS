@@ -2,6 +2,7 @@
 
 #include "CameraHandler.h"
 #include "CommandList.h"
+#include "EditorContext.h"
 #include "IntersectionHandler.h"
 #include "Mask.h"
 #include "MoveObjectsCommand.h"
