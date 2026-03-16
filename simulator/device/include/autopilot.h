@@ -345,6 +345,18 @@ protected:
 
     }
 
+    virtual void closeRightDoors()
+    {
+
+    }
+
+    virtual void closeLeftDoors()
+    {
+
+    }
+
+    void doors_control(double t, double dt);
+
 public slots:
 
     void slotSetBrakeAccel(double a_brake);
