@@ -1,18 +1,16 @@
 #ifndef VIEWER_ROUTE_H
 #define VIEWER_ROUTE_H
 
+#include <vsg/maths/vec3.h>
+
 #include <map>
 #include <string>
 #include <vector>
 
 struct RouteObjectTransform
 {
-    float t_x;
-    float t_y;
-    float t_z;
-    float r_x;
-    float r_y;
-    float r_z;
+    vsg::vec3 translation;
+    vsg::vec3 rotation_deg;
 };
 
 struct Route

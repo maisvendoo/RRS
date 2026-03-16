@@ -142,12 +142,13 @@ bool RouteLoader::parse_route_map(Route& route)
         std::replace(line.begin(), line.end(), ',', ' ');
         std::istringstream line_stream(line);
         std::string label;
-        float t_x, t_y, t_z;
-        float r_x, r_y, r_z;
-        line_stream >> label >> t_x >> t_y >> t_z >> r_x >> r_y >> r_z;
+        vsg::vec3 translation;
+        vsg::vec3 rotation_deg;
+        line_stream >> label >> translation.x >> translation.y >> translation.z
+            >> rotation_deg.x >> rotation_deg.y >> rotation_deg.z;
         if (line_stream)
         {
-            route.route_map[label].emplace_back(RouteObjectTransform{t_x, t_y, t_z, r_x, r_y, r_z});
+            route.route_map[label].emplace_back(RouteObjectTransform{translation, rotation_deg});
         }
     }
 

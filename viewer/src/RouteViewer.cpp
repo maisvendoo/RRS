@@ -798,15 +798,17 @@ bool RouteViewer::loadRoute()
 
             for (auto& transform : transforms)
             {
-                auto matrix = vsg::MatrixTransform::create();
-                transform.r_x = -vsg::radians(transform.r_x);
-                transform.r_y = -vsg::radians(transform.r_y);
-                transform.r_z = -vsg::radians(transform.r_z);
+                vsg::vec3& rotation_deg = transform.rotation_deg;
 
-                auto rotate_x = vsg::rotate(transform.r_x, vsg::vec3(1.0f, 0.0f, 0.0f));
-                auto rotate_y = vsg::rotate(transform.r_y, vsg::vec3(0.0f, 1.0f, 0.0f));
-                auto rotate_z = vsg::rotate(transform.r_z, vsg::vec3(0.0f, 0.0f, 1.0f));
-                auto translate = vsg::translate(transform.t_x, transform.t_y, transform.t_z);
+                auto matrix = vsg::MatrixTransform::create();
+                rotation_deg.x = -vsg::radians(rotation_deg.x);
+                rotation_deg.y = -vsg::radians(rotation_deg.y);
+                rotation_deg.z = -vsg::radians(rotation_deg.z);
+
+                auto rotate_x = vsg::rotate(rotation_deg.x, vsg::vec3(1.0f, 0.0f, 0.0f));
+                auto rotate_y = vsg::rotate(rotation_deg.y, vsg::vec3(0.0f, 1.0f, 0.0f));
+                auto rotate_z = vsg::rotate(rotation_deg.z, vsg::vec3(0.0f, 0.0f, 1.0f));
+                auto translate = vsg::translate(transform.translation);
 
                 matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
                 matrix->addChild(pagedLOD);
