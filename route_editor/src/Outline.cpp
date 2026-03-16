@@ -3,8 +3,6 @@
 #include "filesystem.h"
 #include "shader_funcs.h"
 
-#include <vsg/app/Viewer.h>
-#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>
 #include <vsg/io/Options.h>
@@ -25,7 +23,7 @@
 
 #include <vulkan/vulkan_core.h>
 
-#include <cassert>
+#include <string>
 
 OutlineBuilder::OutlineBuilder(const EditorContext& context)
     : context(context)
@@ -39,7 +37,7 @@ OutlineBuilder::OutlineBuilder(const EditorContext& context)
     const auto flat_shader = vsg::createFlatShadedShaderSet(options);
 
     const FileSystem& fs = FileSystem::getInstance();
-    const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
+    const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
     const auto vert_shader = read_shader(VK_SHADER_STAGE_VERTEX_BIT,
         shaders_dir.c_str(), "standard.vert", options);
@@ -69,7 +67,8 @@ OutlineBuilder::OutlineBuilder(const EditorContext& context)
     builder.shaderSet = flat_shader;
 }
 
-vsg::ref_ptr<vsg::Node> OutlineBuilder::create_outline(vsg::ref_ptr<vsg::PagedLOD> paged_lod)
+vsg::ref_ptr<vsg::Node> OutlineBuilder::create_outline(
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod)
 {
     if (!paged_lod->pending)
     {
