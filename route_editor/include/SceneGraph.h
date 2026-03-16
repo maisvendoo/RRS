@@ -4,11 +4,9 @@
 #include "SwitchGroup.h"
 
 #include <vsg/core/Inherit.h>
-#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 
 struct EditorContext;
-class Route;
 
 namespace vsg
 {

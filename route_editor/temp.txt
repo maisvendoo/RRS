@@ -5,7 +5,6 @@ IntersectionHandler.h
 ObjectSelector.h
 RouteEditor.h
 RouteObject.h
-SceneGraph.h
 
 EditorContext.cpp
 EditorGui.cpp
@@ -14,7 +13,6 @@ IntersectionHandler.cpp
 ObjectSelector.cpp
 RouteEditor.cpp
 RouteObject.cpp
-SceneGraph.cpp
 
 --------------------------------------------------------------------------------
 
@@ -38,6 +36,7 @@ Outline.h
 PagedLodMap.h
 Route.h
 RouteMap.h
+SceneGraph.h
 Settings.h
 shader_funcs.h
 SingleSwitch.h
@@ -58,6 +57,7 @@ main.cpp
 MouseHandler.cpp
 Outline.cpp
 Route.cpp
+SceneGraph.cpp
 Settings.cpp
 shader_funcs.cpp
 SwitchGroup.cpp
