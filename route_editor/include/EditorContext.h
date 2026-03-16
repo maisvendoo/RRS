@@ -5,6 +5,7 @@
 #include "EditorState.h"
 #include "Gizmo.h"
 #include "Outline.h"
+#include "Route.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
 #include "Settings.h"
@@ -54,6 +55,7 @@ struct EditorContext
     vsg::ref_ptr<CameraHandler> camera_handler;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
     vsg::ref_ptr<SceneGraph> scene_graph;
+    vsg::ref_ptr<Route> route;
     vsg::ref_ptr<vsg::ClearAttachments> clear_attachments;
     vsg::ref_ptr<vsg::RenderGraph> render_graph;
     vsg::ref_ptr<vsg::Viewer> viewer;

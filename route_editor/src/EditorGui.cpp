@@ -221,7 +221,7 @@ void EditorGui::show_objects_ref() const
 {
     ImGui::Begin("objects_ref", nullptr, window_flags);
 
-    if (!context.scene_graph->get_route())
+    if (!context.route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -249,11 +249,11 @@ void EditorGui::show_objects_ref() const
 
 void EditorGui::show_route_map() const
 {
-    assert(context.scene_graph->get_route());
+    assert(context.route);
 
     ImGui::Begin("route1.map", nullptr, window_flags);
 
-    if (!context.scene_graph->get_route())
+    if (!context.route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -374,7 +374,7 @@ void EditorGui::show_topology() const
 {
     ImGui::Begin("Topology", nullptr, window_flags);
 
-    const auto route = context.scene_graph->get_route();
+    const auto route = context.route;
     if (!route)
     {
         ImGui::Text("There is no route yet");
