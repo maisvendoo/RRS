@@ -14,31 +14,23 @@
 
 #include <CfgReader.h>
 
-#include <vsg/app/RecordTraversal.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
-#include <vsg/nodes/InstanceNode.h>
 
 #include <QString>
 
-#include <cassert>
 #include <cmath>
-#include <cstddef>
 #include <cstdio>
-#include <cstdlib>
 #include <filesystem>
-#include <functional>
 #include <string>
-#include <utility>
 
 #define LABEL_BUFFER_SIZE 256
 #define RELATIVE_PATH_BUFFER_SIZE 512
 #define FLOAT_BUFFER_SIZE 32
-#define LINE_BUFFER_SIZE 1024
 
 static vsg::vec3 to_vsg_vec3(dvec3 vec)
 {
@@ -72,7 +64,7 @@ Route::Route(EditorContext& context)
         paged_lod->children.front() = {0.1, nullptr};
         paged_lod->options = context.options;
 
-        paged_lods.emplace(label, std::move(paged_lod));
+        paged_lods.emplace(label, paged_lod);
     }
 
     load_static_objects(paged_lods);
@@ -89,12 +81,15 @@ bool Route::load_objects_ref()
     char label[LABEL_BUFFER_SIZE];
     char relative_path[RELATIVE_PATH_BUFFER_SIZE];
 
-    return parse_file_line_by_line(objects_ref_path.c_str(), "r", " \t\r",
+    return parse_file_line_by_line(
+        objects_ref_path.c_str(), "r", " \t\r",
         [&]() -> void {
             context.objects_ref.emplace(label, relative_path);
         }, 2,
-        PARSE_VALUE_TYPE_STRING, label, static_cast<std::size_t>(LABEL_BUFFER_SIZE),
-        PARSE_VALUE_TYPE_STRING, relative_path, static_cast<std::size_t>(RELATIVE_PATH_BUFFER_SIZE)
+        PARSE_VALUE_TYPE_STRING, label,
+            static_cast<std::size_t>(LABEL_BUFFER_SIZE),
+        PARSE_VALUE_TYPE_STRING, relative_path,
+            static_cast<std::size_t>(RELATIVE_PATH_BUFFER_SIZE)
     );
 }
 
@@ -108,20 +103,28 @@ bool Route::load_route_map()
     char label[LABEL_BUFFER_SIZE];
     char float_buffer[FLOAT_BUFFER_SIZE];
     vsg::vec3 translation;
-    vsg::vec3 rotation;
+    vsg::vec3 rotation_deg;
 
-    return parse_file_line_by_line(route_map_path.c_str(), "r", " \t\r,;",
+    return parse_file_line_by_line(
+        route_map_path.c_str(), "r", " \t\r,;",
         [&]() -> void {
             context.route_map[label].emplace_back(
-                RouteMapTransformation{translation, rotation});
+                RouteMapTransformation{translation, rotation_deg});
         }, 7,
-        PARSE_VALUE_TYPE_STRING, label, static_cast<std::size_t>(LABEL_BUFFER_SIZE),
-        PARSE_VALUE_TYPE_FLOAT, float_buffer, static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &translation.x,
-        PARSE_VALUE_TYPE_FLOAT, float_buffer, static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &translation.y,
-        PARSE_VALUE_TYPE_FLOAT, float_buffer, static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &translation.z,
-        PARSE_VALUE_TYPE_FLOAT, float_buffer, static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &rotation.x,
-        PARSE_VALUE_TYPE_FLOAT, float_buffer, static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &rotation.y,
-        PARSE_VALUE_TYPE_FLOAT, float_buffer, static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &rotation.z
+        PARSE_VALUE_TYPE_STRING, label,
+            static_cast<std::size_t>(LABEL_BUFFER_SIZE),
+        PARSE_VALUE_TYPE_FLOAT, float_buffer,
+            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &translation.x,
+        PARSE_VALUE_TYPE_FLOAT, float_buffer,
+            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &translation.y,
+        PARSE_VALUE_TYPE_FLOAT, float_buffer,
+            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &translation.z,
+        PARSE_VALUE_TYPE_FLOAT, float_buffer,
+            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &rotation_deg.x,
+        PARSE_VALUE_TYPE_FLOAT, float_buffer,
+            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &rotation_deg.y,
+        PARSE_VALUE_TYPE_FLOAT, float_buffer,
+            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &rotation_deg.z
     );
 }
 
@@ -137,8 +140,9 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
 
         for (const auto& transform : transforms)
         {
-            const auto object = RouteObject::create(context, paged_lod_it->second,
-                label, transform.translation, -transform.rotation_deg);
+            const auto object = RouteObject::create(context,
+                paged_lod_it->second, label, transform.translation,
+                -transform.rotation_deg);
 
             this->addChild(vsg::MASK_ALL, object);
         }
@@ -149,7 +153,7 @@ bool Route::load_topology()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const auto cfg_path = fs.combinePath(context.route_dir,
+    const std::string cfg_path = fs.combinePath(context.route_dir,
         "topology", "models-config.xml");
 
     CfgReader cfg;
@@ -157,7 +161,6 @@ bool Route::load_topology()
     {
         // TODO: Replace on Journal
         std::fprintf(stderr, "Failed to load %s\n", cfg_path.c_str());
-
         return false;
     }
 
@@ -184,13 +187,13 @@ bool Route::load_topology()
 
     context.topology = new Topology;
 
-    const auto directory_filename = std::filesystem::path(context.route_dir).filename();
+    const auto directory_name = std::filesystem::path(
+        context.route_dir).filename();
 
-    if (!context.topology->load(directory_filename.string().c_str()))
+    if (!context.topology->load(directory_name.string().c_str()))
     {
         // TODO: Replace on Journal
         std::fputs("Failed to load topology\n", stderr);
-
         return false;
     }
 
@@ -244,10 +247,10 @@ bool Route::load_topology()
 
         signal->calcPosition();
 
-        const auto pos = to_vsg_vec3(signal->getPos());
-        const auto right = to_vsg_vec3(signal->getRight());
-        const auto orth = to_vsg_vec3(signal->getOrth());
-        const auto up = to_vsg_vec3(signal->getUp());
+        const vsg::vec3 pos = to_vsg_vec3(signal->getPos());
+        const vsg::vec3 right = to_vsg_vec3(signal->getRight());
+        const vsg::vec3 orth = to_vsg_vec3(signal->getOrth());
+        const vsg::vec3 up = to_vsg_vec3(signal->getUp());
 
         const vsg::vec3 rotation_deg = {
             vsg::degrees(std::atan2(orth.z, up.z)),
