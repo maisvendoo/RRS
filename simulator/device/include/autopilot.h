@@ -400,6 +400,17 @@ protected:
     /// Таймер подачи звукового сигнала
     Timer *sound_signal_timer = new Timer(SOUND_SIGNAL_DELAY, false);
 
+    /// Разрешить движение с подачей свистка
+    void AllowMotion(bool is_allowed)
+    {
+        if (!is_motion_allowed && is_allowed)
+        {
+            OnWhistle();
+        }
+
+        is_motion_allowed = is_allowed;
+    }
+
 public slots:
 
     void slotSetBrakeAccel(double a_brake);
