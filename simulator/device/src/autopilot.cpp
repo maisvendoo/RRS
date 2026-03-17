@@ -40,6 +40,8 @@ void Autopilot::step(double t, double dt)
 
     vigilance_control(t, dt);
 
+    doors_control(t, dt);
+
     accel_meter->setVelocity(feedback->v_cur);
     accel_meter->step(t, dt);
 
@@ -572,6 +574,50 @@ void Autopilot::checkTimetable(double t, double dt)
         if (st->target_traj == curr_traj_name)
         {
             is_departure_allowed = false;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::doors_control(double t, double dt)
+{
+    if (feedback == nullptr)
+    {
+        return;
+    }
+
+    if (timetable.stations.empty())
+    {
+        return;
+    }
+
+    auto st = &timetable.stations[target_station_idx];
+
+    if (st->is_arrival && feedback->v_cur < 0.1)
+    {
+        if (st->is_left_platform)
+        {
+            openLeftDoors();
+        }
+
+        if (st->is_right_platform)
+        {
+            openRightDoors();
+        }
+    }
+
+    if (t >= st->dep_time_sec)
+    {
+        if (st->is_left_platform)
+        {
+            closeLeftDoors();
+        }
+
+        if (st->is_right_platform)
+        {
+            closeRightDoors();
         }
     }
 }
