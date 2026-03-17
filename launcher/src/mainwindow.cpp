@@ -1315,6 +1315,8 @@ void MainWindow::slotSaveTrainsConfigAsScenario()
     loadScenarios(*ri);
 
     reloadScenariosList();
+
+    ui->pbStartServer->setEnabled(!active_trains.empty());
 }
 
 //------------------------------------------------------------------------------
