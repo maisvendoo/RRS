@@ -1299,6 +1299,8 @@ void MainWindow::slotSaveTrainsConfigAsScenario()
         scnCode.append("\n");
     }
 
+    slotUpdateActiveTrains();
+
     scnCode.append(createTmpScenarioCode(active_trains));
 
     createScenario(selectedRouteDirName, scnCode, ui->leScnName->text());
