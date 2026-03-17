@@ -1309,6 +1309,8 @@ void MainWindow::slotSaveTrainsConfigAsScenario()
         scnCode.append("\n");
     }
 
+    slotUpdateActiveTrains();
+
     scnCode.append(createTmpScenarioCode(active_trains));
 
     createScenario(selectedRouteDirName, scnCode, ui->leScnName->text());
@@ -1324,6 +1326,8 @@ void MainWindow::slotSaveTrainsConfigAsScenario()
     loadScenarios(*ri);
 
     reloadScenariosList();
+
+    ui->pbStartServer->setEnabled(!active_trains.empty());
 }
 
 //------------------------------------------------------------------------------

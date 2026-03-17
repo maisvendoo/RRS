@@ -167,7 +167,8 @@ void Autopilot::velocity_control(double t, double dt)
     if (is_departure_allowed)
     {
         // Действуем в соответсвии с АЛСН
-        is_motion_allowed = is_alsn_motion_allowed;
+        //is_motion_allowed = is_alsn_motion_allowed;
+        AllowMotion(is_alsn_motion_allowed);
     }
 
     // Минимальная целевая скорость (для предсказания тормозного пути)
@@ -721,7 +722,6 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
         st->fact_dep_time = time_str;
         st->dep_delay = static_cast<int>(st->fact_dep_time_sec - st->dep_time_sec) >= delay_timeout_min * 60;
 
-        // Свисток
         OnWhistle();
 
         QString msg = QString("TIMETABLE PROCESS: Departure from: %1 | Dep. time: %2 | Fact. dep.: %3 |")
@@ -771,7 +771,6 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
         st->is_arrival = true;
         st->fact_arr_time_sec = time;
 
-        // Свисток
         OnWhistle();
 
         if (st->arr_time == "-")
