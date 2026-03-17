@@ -24,6 +24,7 @@ public:
     {
         connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);
         connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);
+        connect(sound_signal_timer, &Timer::process, this, &Autopilot::slotSoundSignal);
     }
 
     ~Autopilot()
@@ -358,6 +359,48 @@ protected:
 
     void doors_control(double t, double dt);
 
+    /// Подача свистка
+    virtual void OnWhistle()
+    {
+        auto ctrl = getControl();
+
+        if (ctrl == nullptr)
+        {
+            return;
+        }
+
+        ctrl->whistle = true;
+
+        if (!sound_signal_timer->isStarted())
+        {
+            sound_signal_timer->start();
+        }
+    }
+
+    /// Подача тифона
+    virtual void OnTyphoid()
+    {
+        auto ctrl = getControl();
+
+        if (ctrl == nullptr)
+        {
+            return;
+        }
+
+        ctrl->typhoid = true;
+
+        if (!sound_signal_timer->isStarted())
+        {
+            sound_signal_timer->start();
+        }
+    }
+
+    /// Длительность подачи звукового сигнала
+    const double SOUND_SIGNAL_DELAY = 2.0;
+
+    /// Таймер подачи звукового сигнала
+    Timer *sound_signal_timer = new Timer(SOUND_SIGNAL_DELAY, false);
+
 public slots:
 
     void slotSetBrakeAccel(double a_brake);
@@ -377,6 +420,8 @@ private slots:
     void slotVigilanceControl();
 
     void slotSandTimer();
+
+    void slotSoundSignal();
 };
 
 //------------------------------------------------------------------------------

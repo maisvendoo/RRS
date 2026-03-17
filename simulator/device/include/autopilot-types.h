@@ -19,6 +19,12 @@ public:
     /// Включение подачи песка
     bool sand_ON = false;
 
+    /// Подать свисток
+    bool whistle = false;
+
+    /// Подать тифон
+    bool typhoid = false;
+
     auto_control_t()
     {
 

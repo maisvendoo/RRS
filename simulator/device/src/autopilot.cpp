@@ -47,6 +47,7 @@ void Autopilot::step(double t, double dt)
 
     rb_timer->step(t, dt);
     sand_timer->step(t, dt);
+    sound_signal_timer->step(t, dt);
 
     Device::step(t, dt);
 }
@@ -682,6 +683,23 @@ void Autopilot::slotSandTimer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Autopilot::slotSoundSignal()
+{
+    auto ctrl = getControl();
+
+    if (ctrl == nullptr)
+    {
+        return;
+    }
+
+    ctrl->whistle = ctrl->typhoid = false;
+
+    sound_signal_timer->stop();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Autopilot::slotIncTargetStation(int vehicle_idx)
 {
     if (vehicle_idx != this->vehicle_idx)
@@ -702,6 +720,9 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
         st->is_departure = true;
         st->fact_dep_time = time_str;
         st->dep_delay = static_cast<int>(st->fact_dep_time_sec - st->dep_time_sec) >= delay_timeout_min * 60;
+
+        // Свисток
+        OnWhistle();
 
         QString msg = QString("TIMETABLE PROCESS: Departure from: %1 | Dep. time: %2 | Fact. dep.: %3 |")
                           .arg(st->name)
@@ -749,6 +770,9 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
     {
         st->is_arrival = true;
         st->fact_arr_time_sec = time;
+
+        // Свисток
+        OnWhistle();
 
         if (st->arr_time == "-")
         {
