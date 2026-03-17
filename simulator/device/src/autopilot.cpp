@@ -46,7 +46,7 @@ void Autopilot::step(double t, double dt)
     accel_meter->step(t, dt);
 
     rb_timer->step(t, dt);
-    sand_timer->step(t, dt);    
+    sand_timer->step(t, dt);
 
     Device::step(t, dt);
 }
@@ -91,6 +91,9 @@ QString Autopilot::getDbgMsg()
 //------------------------------------------------------------------------------
 void Autopilot::vigilance_control(double t, double dt)
 {
+    (void)t;
+    (void)dt;
+
     if (feedback == nullptr)
     {
         return;
@@ -128,6 +131,7 @@ void Autopilot::velocity_control(double t, double dt)
 
     if (v_ref < 0.1)
     {
+        // TODO: Не используется нигде
         int a = 0;
     }
 
@@ -136,6 +140,7 @@ void Autopilot::velocity_control(double t, double dt)
 
     if (v_ref < 0.1)
     {
+        // TODO: Не используется нигде
         int a = 0;
     }
 
@@ -145,6 +150,7 @@ void Autopilot::velocity_control(double t, double dt)
 
     if (v_ref < 0.1)
     {
+        // TODO: Не используется нигде
         int a = 0;
     }
 
@@ -204,6 +210,8 @@ void Autopilot::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 double Autopilot::calcCurrentSpeedLimit(double t, double dt)
 {
+    (void)t;
+
     double v_lim = feedback->v_lim;
 
     if (feedback->v_lim < feedback->v_lim_next)
@@ -223,7 +231,7 @@ double Autopilot::calcCurrentSpeedLimit(double t, double dt)
         else // хвост не затянут, едем по старому ограничению
         {
             v_lim = prev_v_lim;
-            tail_len -= feedback->v_cur *dt / Physics::kmh;
+            tail_len -= feedback->v_cur * dt / Physics::kmh;
         }
     }
 
@@ -262,7 +270,7 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_ta
         // Запрещаем отпускать тормоза - остановка
         if (feedback->v_cur <= v_disable_release)
         {
-            is_disable_release = true;            
+            is_disable_release = true;
         }
 
         // Если запрещен отпуск и мы остановились - запрещаем движение
@@ -422,7 +430,7 @@ void Autopilot::slotInitTimeTable()
                            timetable.stations[target_station_idx].coord,
                            target_dir, &target_station_dist);
 
-    is_timetable_ready = true;    
+    is_timetable_ready = true;
 }
 
 //------------------------------------------------------------------------------
@@ -452,7 +460,7 @@ void Autopilot::calcTargetDistance()
         if (!st->removal_traj.isEmpty())
         {
             emit sigBuildTrainRoute(st->target_traj, st->removal_traj, target_dir);
-        }        
+        }
     }
 
     // ОПределяем дистанцию до станции-цели
@@ -469,6 +477,9 @@ void Autopilot::calcTargetDistance()
 //------------------------------------------------------------------------------
 double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
 {
+    (void)t;
+    (void)dt;
+
     double v_ref = v_constr;
 
     // Текущая станция
@@ -533,6 +544,8 @@ double Autopilot::calcTimetableVelocity(double t, double dt, double dist)
 //------------------------------------------------------------------------------
 void Autopilot::checkTimetable(double t, double dt)
 {
+    (void)dt;
+
     if (timetable.stations.empty())
     {
         return;
@@ -691,9 +704,9 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
         st->dep_delay = static_cast<int>(st->fact_dep_time_sec - st->dep_time_sec) >= delay_timeout_min * 60;
 
         QString msg = QString("TIMETABLE PROCESS: Departure from: %1 | Dep. time: %2 | Fact. dep.: %3 |")
-                          .arg(st->name)                          
+                          .arg(st->name)
                           .arg(st->dep_time, 5)
-                          .arg(st->fact_dep_time, 5);        
+                          .arg(st->fact_dep_time, 5);
 
         Journal::instance()->debug(msg);
 
@@ -751,7 +764,7 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
         QString msg = QString("TIMETABLE PROCESS: Arrival to: %1 | Arr. time: %2 | Fact. arr.: %3 |")
                           .arg(st->name)
                           .arg(st->arr_time, 5)
-                          .arg(st->fact_arr_time, 5);        
+                          .arg(st->fact_arr_time, 5);
 
         Journal::instance()->debug(msg);
     }

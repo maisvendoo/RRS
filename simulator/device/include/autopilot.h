@@ -23,7 +23,7 @@ public:
     Autopilot(QObject *parent = nullptr) : Device(parent)
     {
         connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);
-        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);        
+        connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);
     }
 
     ~Autopilot()
@@ -87,7 +87,8 @@ public:
     virtual void initAutoBrakeControl(const QString& modules_dir,
                                       const QString& custom_cfg_dir)
     {
-
+        (void)modules_dir;
+        (void)custom_cfg_dir;
     }
 
     void setVehicleIndex(int vehicle_idx)
@@ -118,12 +119,12 @@ signals:
                            int dir,
                            double *lenght);
 
-    void sigBuildTrainRoute(QString start_traj, QString target_traj, int dir);    
+    void sigBuildTrainRoute(QString start_traj, QString target_traj, int dir);
 
 protected:
 
     /// Признак активации
-    bool is_active = false;    
+    bool is_active = false;
 
     /// Выдержка РБ в нажатом положении
     const double RB_PRESS_DELAY = 1.5;
@@ -241,7 +242,7 @@ protected:
     int vehicle_idx = 0;
 
     /// Флаг разрешения отправления по графику
-    bool is_departure_allowed = true;    
+    bool is_departure_allowed = true;
 
     /// Заданная скорость по графику
     double v_tt_ref = 0.0;
@@ -317,7 +318,7 @@ protected:
 
     double calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_target);
 
-    double calcPredictVelocity(double v_cur, double dist, double accel);    
+    double calcPredictVelocity(double v_cur, double dist, double accel);
 
     /// Счисление пути - определяем текущую дистанцию до цели на станции
     void calcTargetDistance();
@@ -375,7 +376,7 @@ private slots:
 
     void slotVigilanceControl();
 
-    void slotSandTimer();    
+    void slotSandTimer();
 };
 
 //------------------------------------------------------------------------------
