@@ -195,6 +195,7 @@ struct autopilot_timetable_t
             idx = 0;
         }
 
+        // TODO: Разные типы с size_t
         if (idx >= stations.size())
         {
             idx = stations.size() - 1;

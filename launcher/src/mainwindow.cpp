@@ -546,6 +546,7 @@ void MainWindow::hideTrainsConfigsTip()
 //------------------------------------------------------------------------------
 void MainWindow::loadActiveTrainsList()
 {
+    // TODO: Разные типы с size_t
     if ((selected_route_idx < 0) || (selected_route_idx >= routes_info.size()))
     {
         return;
@@ -843,7 +844,7 @@ void MainWindow::slotSelectSavedStartConfig(int idx)
 
     if (idx > 0)
     {
-        clearActiveTrainsList();        
+        clearActiveTrainsList();
     }
 }
 
@@ -862,6 +863,7 @@ void MainWindow::slotTrainConfigChanged()
         tbActiveTrains->setItemText(idx, tww->getTrainName());
 
         int train_idx = tww->cbTrainConfigSelect->currentIndex() - 1;
+        // TODO: Разные типы с size_t
         if ((train_idx >= 0) && (train_idx < trains_info.size()))
         {
             ui->lwTrains->setCurrentRow(train_idx, QItemSelectionModel::ClearAndSelect);
@@ -874,6 +876,8 @@ void MainWindow::slotTrainConfigChanged()
 //------------------------------------------------------------------------------
 void MainWindow::slotUpdateActiveTrains(bool reset_start_config)
 {
+    (void)reset_start_config;
+
     active_trains.clear();
 
     int active_trains_count = tbActiveTrains->count();
@@ -1039,6 +1043,7 @@ void MainWindow::slotConnectMapPressed()
 void MainWindow::slotSimulatorFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode)
+    Q_UNUSED(exitStatus);
 
     is_start_button_to_stop_server = false;
     ui->pbStartServer->setStyleSheet("background-color: ;");
@@ -1074,6 +1079,7 @@ void MainWindow::slotSimulatorFinished(int exitCode, QProcess::ExitStatus exitSt
 void MainWindow::slotViewerFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode)
+    Q_UNUSED(exitStatus)
 
     if (simulatorProc.state() != QProcess::NotRunning)
         ui->pbStartViewer->setEnabled(true);
@@ -1088,6 +1094,7 @@ void MainWindow::slotViewerFinished(int exitCode, QProcess::ExitStatus exitStatu
 void MainWindow::slotMapFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode)
+    Q_UNUSED(exitStatus)
 
     if (simulatorProc.state() != QProcess::NotRunning)
         ui->pbStartMap->setEnabled(true);
@@ -1098,6 +1105,9 @@ void MainWindow::slotMapFinished(int exitCode, QProcess::ExitStatus exitStatus)
 //------------------------------------------------------------------------------
 void MainWindow::slotAdditionalProcFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    Q_UNUSED(exitCode)
+    Q_UNUSED(exitStatus)
+
     QProcess *proc = dynamic_cast<QProcess *>(sender());
     disconnect(proc, &QProcess::finished, this, &MainWindow::slotAdditionalProcFinished);
     delete proc;
@@ -1303,6 +1313,7 @@ void MainWindow::slotSaveTrainsConfigAsScenario()
 
     createScenario(selectedRouteDirName, scnCode, ui->leScnName->text());
 
+    // TODO: Разные типы с size_t
     if (selected_route_idx < 0 || selected_route_idx >= routes_info.size())
     {
         return;
@@ -1670,7 +1681,7 @@ void MainWindow::createScenario(const QString &route_name,
         return;
     }
 
-    QTextStream stream(&file);    
+    QTextStream stream(&file);
 
     for (auto line : scnCode)
     {
