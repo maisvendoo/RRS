@@ -4,7 +4,10 @@
 #include "Command.h"
 #include "RouteObject.h"
 
+#include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
+
+#include <vector>
 
 struct EditorContext;
 
@@ -21,6 +24,7 @@ public:
 
 private:
     const RouteObjects objects;
+    std::vector<vsg::dmat4> initial_matrices;
     vsg::vec3 pivot;
     vsg::vec3 scale;
 };

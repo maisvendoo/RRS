@@ -6,6 +6,7 @@
 
 #include <vsg/maths/vec3.h>
 
+#include <cstddef>
 #include <cstdio>
 
 ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context,
@@ -15,6 +16,12 @@ ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context,
     , pivot(pivot)
     , scale(scale)
 {
+    initial_matrices.reserve(objects.size());
+    for (RouteObject* const object : objects)
+    {
+        initial_matrices.emplace_back(object->matrix);
+    }
+
     update_description();
 }
 
@@ -28,13 +35,12 @@ void ScaleObjectsCommand::execute() const
 
 void ScaleObjectsCommand::undo() const
 {
+    std::size_t index = 0;
     for (RouteObject* const object : objects)
     {
-        // TODO: Wrong calculation. Fix later
-        // (if we scale by zero, we can not undo this)
-        object->scale_relative_to_pivot(pivot,
-            vsg::vec3(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z),
-            object->matrix);
+        object->matrix = initial_matrices[index];
+        object->update_bounds();
+        ++index;
     }
 }
 
