@@ -90,25 +90,10 @@ vsg::vec3 RouteObject::get_scale() const
     return scale_value;
 }
 
-// vsg::vec3 RouteObject::get_initial_translation() const
-// {
-//     return initial_translation;
-// }
-
-// vsg::vec3 RouteObject::get_initial_rotation_deg() const
-// {
-//     return initial_rotation_deg;
-// }
-
-// vsg::vec3 RouteObject::get_initial_scale() const
-// {
-//     return initial_scale;
-// }
-
-// const vsg::dmat4& RouteObject::get_initial_matrix() const
-// {
-//     return initial_matrix;
-// }
+const vsg::dmat4& RouteObject::get_initial_matrix() const
+{
+    return initial_matrix;
+}
 
 const vsg::box& RouteObject::get_bounds() const
 {
@@ -271,25 +256,10 @@ RouteObjectsIterator RouteObject::deselect()
     return it;
 }
 
-// void RouteObject::save_translation()
-// {
-//     initial_translation = translation;
-// }
-
-// void RouteObject::save_rotation()
-// {
-//     initial_rotation_deg = rotation_deg;
-// }
-
-// void RouteObject::save_scale()
-// {
-//     initial_scale = scale_value;
-// }
-
-// void RouteObject::save_matrix()
-// {
-//     initial_matrix = this->matrix;
-// }
+void RouteObject::save_matrix()
+{
+    initial_matrix = this->matrix;
+}
 
 void RouteObject::update_matrix()
 {
