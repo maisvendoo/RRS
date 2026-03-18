@@ -4,7 +4,7 @@
 #include "CommandList.h"
 #include "EditorState.h"
 #include "RouteMap.h"
-#include "RouteObject.h"
+#include "RouteObjects.h"
 #include "Settings.h"
 
 #include <vsg/core/ref_ptr.h>

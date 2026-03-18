@@ -3,11 +3,9 @@
 #include "Command.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
-#include "ObjectSelector.h"
 #include "RouteObject.h"
 
 #include <cstdio>
-#include <string>
 
 SelectObjectsCommand::SelectObjectsCommand(EditorContext& context)
     : Command(context)

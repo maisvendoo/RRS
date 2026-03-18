@@ -23,9 +23,6 @@
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/PointerEvent.h>
 
-#include <cassert>
-#include <utility>
-
 ObjectSelector::ObjectSelector(EditorContext& context)
     : context(context)
 {

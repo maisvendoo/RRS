@@ -2,7 +2,6 @@
 #define OBJECT_SELECTOR_H
 
 #include "EditorContext.h"
-#include "RouteObject.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>

@@ -2,7 +2,7 @@
 #define ROTATE_OBJECTS_COMMAND_H
 
 #include "Command.h"
-#include "RouteObject.h"
+#include "RouteObjects.h"
 
 #include <vsg/maths/vec3.h>
 

@@ -33,6 +33,7 @@ MouseHandler.h
 Outline.h
 PagedLodMap.h
 Route.h
+RouteObjects.h
 RouteMap.h
 SceneGraph.h
 Settings.h

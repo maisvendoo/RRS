@@ -1,6 +1,8 @@
 #ifndef ROUTE_OBJECT_H
 #define ROUTE_OBJECT_H
 
+#include "RouteObjects.h"
+
 #include <vsg/core/Inherit.h>
 #include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
@@ -9,7 +11,6 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
 
-#include <list>
 #include <string>
 
 struct EditorContext;
@@ -24,9 +25,6 @@ class PagedLOD;
 class Viewer;
 
 }
-
-using RouteObjects = std::list<RouteObject*>;
-using RouteObjectsIterator = RouteObjects::iterator;
 
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 {

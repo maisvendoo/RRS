@@ -2,7 +2,7 @@
 #define TRANSFORM_OBJECTS_COMMAND_H
 
 #include "Command.h"
-#include "RouteObject.h"
+#include "RouteObjects.h"
 
 #include <vsg/maths/mat4.h>
 
