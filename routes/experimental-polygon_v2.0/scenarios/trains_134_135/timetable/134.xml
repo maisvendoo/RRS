@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
+
 	<Station>
 		<Name>Станция A</Name>			
 		<DepartureTime>12:00</DepartureTime>
@@ -25,4 +26,5 @@
 		<TargetCoord>1250.0</TargetCoord>
 		<ApproachTraj>track_b-c_4-2</ApproachTraj>			
 	</Station>	
+	
 </Config>
