@@ -213,6 +213,9 @@ private:
     /// Установка задачи задания маршрута
     void taskBuildRoute(const std::string &start_traj, const std::string &target_traj, int dir, bool is_train);
 
+    /// Установка задачи переименования поезда
+    void taskRenameTrain(const std::string &old_name, const std::string &new_name);
+
     /// Найти индекc поезда по имени
     int findTrainByName(const std::string &name);
 
