@@ -53,6 +53,8 @@ struct autopilot_station_t
     bool arr_delay = false;
     /// Опоздание отправления
     bool dep_delay = false;
+    /// Видимость станции в виджете отображения графика
+    bool is_visible = true;
 
     QByteArray serialize()
     {
@@ -83,6 +85,7 @@ struct autopilot_station_t
         stream << is_left_platform;
         stream << arr_delay;
         stream << dep_delay;
+        stream << is_visible;
 
         return data;
     }
@@ -115,6 +118,7 @@ struct autopilot_station_t
         stream >> is_left_platform;
         stream >> arr_delay;
         stream >> dep_delay;
+        stream >> is_visible;
     }
 };
 
