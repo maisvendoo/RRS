@@ -7,6 +7,7 @@
 #include <vsg/core/Visitor.h>
 #include <vsg/ui/KeyEvent.h>
 
+#include <cstdint>
 #include <map>
 
 struct EditorContext;
@@ -28,6 +29,7 @@ public:
 private:
     EditorContext& context;
     std::map<vsg::KeySymbol, bool> key_states;
+    std::uint8_t key_state_bits[8192];
 };
 
 #endif // KEYBOARD_HANDLER_H

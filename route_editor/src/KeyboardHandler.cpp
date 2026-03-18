@@ -8,15 +8,20 @@
 
 #include <vsg/ui/KeyEvent.h>
 
+#include <cstdint>
+#include <cstring>
 #include <map>
 
 KeyboardHandler::KeyboardHandler(EditorContext& context)
     : context(context)
 {
+    std::memset(key_state_bits, 0, 8192);
 }
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 {
+    std::uint16_t byte_index;
+
     key_states[keyPress.keyBase] = true;
 
     if (get_binding_state(ACTION_UNDO_COMMAND))
