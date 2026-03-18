@@ -412,6 +412,8 @@ autopilot_timetable_t ScenarioManager::loadTrainTimetable(int train_idx)
         cfg.getBool(secNode, "IsRightPlatform", station.is_right_platform);
         cfg.getBool(secNode, "IsLeftPlatform", station.is_left_platform);
 
+        cfg.getBool(secNode, "IsVisible", station.is_visible);
+
         train_datas[train_idx].timetable.stations.push_back(station);
 
         secNode = cfg.getNextSection();

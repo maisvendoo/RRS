@@ -602,6 +602,11 @@ void MyGui::showTimetable() const
 
     for (int i = timetable.start_station_idx; i < timetable.stations.size(); ++i)
     {
+        if (!timetable.stations[i].is_visible)
+        {
+            continue;
+        }
+
         QString station_info = QString("%1 %2 %3 %4 %5")
                                    .arg(timetable.stations[i].name.leftJustified(15))
                                    .arg(timetable.stations[i].arr_time, 5)
