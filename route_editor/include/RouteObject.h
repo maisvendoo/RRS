@@ -65,6 +65,8 @@ public:
 
     void save_matrix();
 
+    void set_matrix(vsg::dmat4 matrix);
+
     void update_matrix();
     void update_bounds();
 

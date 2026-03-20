@@ -242,6 +242,11 @@ bool Gizmo::handle_intersections()
         active_plain_switch->mask = MASK_CLICKABLE;
         active_line_switch->mask = MASK_GUI1;
 
+        for (RouteObject* const object : context.selected_objects)
+        {
+            object->save_matrix();
+        }
+
         break;
     }
 

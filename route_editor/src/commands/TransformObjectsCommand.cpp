@@ -22,7 +22,7 @@ void TransformObjectsCommand::undo() const
     std::size_t index = 0;
     for (RouteObject* const object : objects)
     {
-        object->matrix = initial_matrices[index];
+        object->set_matrix(initial_matrices[index]);
         object->update_bounds();
         ++index;
     }

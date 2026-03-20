@@ -249,6 +249,14 @@ void RouteObject::save_matrix()
     initial_matrix = this->matrix;
 }
 
+void RouteObject::set_matrix(vsg::dmat4 matrix)
+{
+    this->matrix = matrix;
+    vsg::quat quat;
+    vsg::decompose(static_cast<vsg::mat4>(this->matrix), translation, quat, scale_value);
+    rotation_deg = to_euler_deg(quat);
+}
+
 void RouteObject::update_matrix()
 {
     this->matrix = vsg::translate(translation) *

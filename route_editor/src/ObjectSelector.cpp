@@ -316,6 +316,11 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
         vsg::updateViewer(*viewer, compile_result);
 
+        for (RouteObject* const object : context.selected_objects)
+        {
+            object->save_matrix();
+        }
+
         if (pressed_action_move)
         {
             state = State::KEYBOARD_GRAB;
