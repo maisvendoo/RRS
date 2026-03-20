@@ -607,8 +607,10 @@ void MyGui::showTimetable() const
             continue;
         }
 
+        QString striped_name = timetable.stations[i].name.left(15);
+
         QString station_info = QString("%1 %2 %3 %4 %5")
-                                   .arg(timetable.stations[i].name.leftJustified(15))
+                                   .arg(striped_name.leftJustified(15))
                                    .arg(timetable.stations[i].arr_time, 5)
                                    .arg(timetable.stations[i].dep_time, 5)
                                    .arg(timetable.stations[i].fact_arr_time, 10)
