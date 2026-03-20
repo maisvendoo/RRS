@@ -12,7 +12,7 @@ class RotateObjectsCommand : public Command
 {
 public:
     RotateObjectsCommand(EditorContext& context,vsg::vec3 pivot,
-        vsg::vec3 rotation_deg);
+        vsg::vec3 axis, float radians);
 
     virtual ~RotateObjectsCommand() override = default;
     virtual void execute() const override;
@@ -22,7 +22,8 @@ public:
 private:
     const RouteObjects objects;
     vsg::vec3 pivot;
-    vsg::vec3 rotation_deg;
+    vsg::vec3 axis;
+    float radians;
 };
 
 #endif // ROTATE_OBJECTS_COMMAND_H
