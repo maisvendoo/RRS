@@ -955,6 +955,25 @@ void ScenarioManager::taskBuildRoute(const std::string &start_traj, const std::s
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::taskRenameTrain(const std::string &old_name, const std::string &new_name)
+{
+    setTask([old_name, new_name, this] {
+
+        int train_idx = findTrainByName(old_name);
+
+        if (train_idx == -1)
+        {
+            Journal::instance()->error(QString("LUA DEBUG: Train %1 not found").arg(old_name.c_str()));
+            return;
+        }
+
+        slotRenameTrain(train_idx, QString(new_name.c_str()));
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 int ScenarioManager::findTrainByName(const std::string &name)
 {
     for (auto& train_data : train_datas)
@@ -1300,6 +1319,12 @@ void ScenarioManager::sys_functions_registration()
     });
 
     Journal::instance()->info("getNextTraj method binding...OK");
+
+    lua.set_function("renameTrain", [this](const std::string &old_name, const std::string &new_name){
+        this->taskRenameTrain(old_name, new_name);
+    });
+
+    Journal::instance()->info("renameTrain method binding...OK");
 }
 
 //------------------------------------------------------------------------------

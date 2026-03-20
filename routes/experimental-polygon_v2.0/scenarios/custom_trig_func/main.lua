@@ -41,7 +41,7 @@ function train104_appr(train_name, traj_name, is_busy)
 		-- Если он занят или включен в маршрут
 		if traj_state.is_busy or traj_state.in_route then
 
-			-- Ставим триггер на его совобожение с целью таки построить маршрут
+			-- Ставим триггер на его оcвобожение с целью таки построить маршрут
 			setOnTrajFreeTrigger(stB_CHU1, actionBuildTrainRoute(stB_CHP1, stB_CHU1, train104.dir))
 
 		else
