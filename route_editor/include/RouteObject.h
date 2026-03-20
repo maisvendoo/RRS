@@ -51,7 +51,7 @@ public:
     void rotate(vsg::vec3 rotation_deg, bool update_matrix);
     void scale(vsg::vec3 scale, bool update_matrix);
 
-    void rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 rotation_deg,
+    void rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis, float radians,
         const vsg::dmat4& matrix);
 
     void scale_relative_to_pivot(vsg::vec3 pivot, vsg::vec3 scale,

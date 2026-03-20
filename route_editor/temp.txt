@@ -1,9 +1,17 @@
+commands/MoveObjectsCommand.h
+commands/RotateObjectsCommand.h
+commands/ScaleObjectsCommand.h
+commands/TransformObjectsCommand.h
 EditorGui.h
 Gizmo.h
 ObjectSelector.h
 RouteEditor.h
 RouteObject.h
 
+commands/MoveObjectsCommand.cpp
+commands/RotateObjectsCommand.cpp
+commands/ScaleObjectsCommand.cpp
+commands/TransformObjectsCommand.cpp
 EditorGui.cpp
 Gizmo.cpp
 ObjectSelector.cpp
@@ -15,9 +23,6 @@ RouteObject.cpp
 commands/Command.h
 commands/CommandList.h
 commands/HideObjectsCommand.h
-commands/MoveObjectsCommand.h
-commands/RotateObjectsCommand.h
-commands/ScaleObjectsCommand.h
 commands/SelectObjectsCommand.h
 Action.h
 CameraHandler.h
@@ -44,9 +49,6 @@ WindowHandler.h
 
 commands/CommandList.cpp
 commands/HideObjectsCommand.cpp
-commands/MoveObjectsCommand.cpp
-commands/RotateObjectsCommand.cpp
-commands/ScaleObjectsCommand.cpp
 commands/SelectObjectsCommand.cpp
 Action.cpp
 CameraHandler.cpp

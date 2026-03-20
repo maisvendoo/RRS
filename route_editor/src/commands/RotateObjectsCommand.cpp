@@ -22,7 +22,7 @@ void RotateObjectsCommand::execute() const
 {
     for (RouteObject* const object : objects)
     {
-        object->rotate_around_pivot(pivot, rotation_deg, object->matrix);
+        // object->rotate_around_pivot(pivot, rotation_deg, object->matrix);
     }
 }
 
@@ -30,7 +30,7 @@ void RotateObjectsCommand::undo() const
 {
     for (RouteObject* const object : objects)
     {
-        object->rotate_around_pivot(pivot, -rotation_deg, object->matrix);
+        // object->rotate_around_pivot(pivot, -rotation_deg, object->matrix);
     }
 }
 

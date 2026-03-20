@@ -23,6 +23,7 @@
 #include <climits>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/common.h>
 #include <vsg/maths/quat.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
@@ -539,8 +540,8 @@ void EditorGui::show_selected_objects_properties() const
     {
         for (const auto& object : selected_objects)
         {
-            object->rotate_around_pivot(center,
-                vsg::vec3{30.0f, 0.0f, 0.0f}, object->matrix);
+            object->rotate_around_pivot(center, vsg::vec3(1.0f, 0.0f, 0.0f),
+                vsg::radians(30.0f), object->matrix);
         }
     }
 
@@ -548,8 +549,8 @@ void EditorGui::show_selected_objects_properties() const
     {
         for (const auto& object : selected_objects)
         {
-            object->rotate_around_pivot(center,
-                vsg::vec3{0.0f, 30.0f, 0.0f}, object->matrix);
+            object->rotate_around_pivot(center, vsg::vec3(0.0f, 1.0f, 0.0f),
+                vsg::radians(30.0f), object->matrix);
         }
     }
 
@@ -557,8 +558,8 @@ void EditorGui::show_selected_objects_properties() const
     {
         for (const auto& object : selected_objects)
         {
-            object->rotate_around_pivot(center,
-                vsg::vec3{0.0f, 0.0f, 30.0f}, object->matrix);
+            object->rotate_around_pivot(center, vsg::vec3(0.0f, 0.0f, 1.0f),
+                vsg::radians(30.0f), object->matrix);
         }
     }
 

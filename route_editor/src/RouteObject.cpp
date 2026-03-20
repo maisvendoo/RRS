@@ -20,7 +20,6 @@
 #include <vsg/utils/ComputeBounds.h>
 
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -61,8 +60,6 @@ RouteObject::RouteObject(EditorContext& context, vsg::ref_ptr<vsg::PagedLOD> pag
     , translation(translation)
     , rotation_deg(rotation_deg)
 {
-    assert(paged_lod);
-
     update_matrix();
 
     paged_lod_switch = SingleSwitch::create(
@@ -172,16 +169,15 @@ void RouteObject::scale(vsg::vec3 scale, bool update_matrix)
     }
 }
 
-void RouteObject::rotate_around_pivot(vsg::vec3 pivot,
-    vsg::vec3 rotation_deg, const vsg::dmat4& matrix)
+void RouteObject::rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis,
+    float radians, const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(pivot) * to_rotate_matrix(rotation_deg) *
+    this->matrix = vsg::translate(pivot) *
+        vsg::rotate(vsg::quat(radians, axis)) *
         vsg::translate(-pivot) * static_cast<vsg::mat4>(matrix);
 
     vsg::quat quat;
-
-    vsg::decompose(static_cast<vsg::mat4>(this->matrix),
-        translation, quat, scale_value);
+    vsg::decompose(static_cast<vsg::mat4>(this->matrix), translation, quat, scale_value);
 
     this->rotation_deg = to_euler_deg(quat);
 
@@ -264,7 +260,8 @@ void RouteObject::save_matrix()
 void RouteObject::update_matrix()
 {
     this->matrix = vsg::translate(translation) *
-        to_rotate_matrix(rotation_deg) * vsg::scale(scale_value);
+        to_rotate_matrix(rotation_deg) *
+        vsg::scale(scale_value);
 
     update_bounds();
 }
