@@ -8,9 +8,7 @@
 
 #include <vsg/ui/KeyEvent.h>
 
-#include <cstdint>
 #include <cstring>
-#include <map>
 
 KeyboardHandler::KeyboardHandler(EditorContext& context)
     : context(context)
@@ -20,9 +18,7 @@ KeyboardHandler::KeyboardHandler(EditorContext& context)
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    std::uint16_t byte_index;
-
-    key_states[keyPress.keyBase] = true;
+    key_state_bits[keyPress.keyBase >> 3] |= 1 << (keyPress.keyBase & 7);
 
     if (get_binding_state(ACTION_UNDO_COMMAND))
     {
@@ -36,14 +32,12 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 
 void KeyboardHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
-    key_states[keyRelease.keyBase] = false;
+    key_state_bits[keyRelease.keyBase >> 3] &= ~(1 << (keyRelease.keyBase & 7));
 }
 
 bool KeyboardHandler::get_key_state(vsg::KeySymbol key) const
 {
-    const auto found_it = key_states.find(key);
-
-    return (found_it == key_states.cend()) ? false : found_it->second;
+    return key_state_bits[key >> 3] & (1 << (key & 7));
 }
 
 bool KeyboardHandler::get_any_shift_state() const
