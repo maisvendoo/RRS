@@ -8,7 +8,18 @@
 
 #include <vsg/ui/KeyEvent.h>
 
+#include <cstdint>
 #include <cstring>
+
+static std::uint16_t get_byte_index(vsg::KeySymbol key)
+{
+    return key >> 3;
+}
+
+static std::uint8_t get_byte_value(vsg::KeySymbol key)
+{
+    return 1 << (key & 7);
+}
 
 KeyboardHandler::KeyboardHandler(EditorContext& context)
     : context(context)
@@ -18,7 +29,8 @@ KeyboardHandler::KeyboardHandler(EditorContext& context)
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    key_state_bits[keyPress.keyBase >> 3] |= 1 << (keyPress.keyBase & 7);
+    key_state_bits[get_byte_index(keyPress.keyBase)] |=
+        get_byte_value(keyPress.keyBase);
 
     if (get_binding_state(ACTION_UNDO_COMMAND))
     {
@@ -32,12 +44,13 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 
 void KeyboardHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
-    key_state_bits[keyRelease.keyBase >> 3] &= ~(1 << (keyRelease.keyBase & 7));
+    key_state_bits[get_byte_index(keyRelease.keyBase)] &=
+        ~get_byte_value(keyRelease.keyBase);
 }
 
 bool KeyboardHandler::get_key_state(vsg::KeySymbol key) const
 {
-    return key_state_bits[key >> 3] & (1 << (key & 7));
+    return key_state_bits[get_byte_index(key)] & get_byte_value(key);
 }
 
 bool KeyboardHandler::get_any_shift_state() const
@@ -53,8 +66,7 @@ bool KeyboardHandler::get_any_ctrl_state() const
 
 bool KeyboardHandler::get_any_alt_state() const
 {
-    return get_key_state(vsg::KEY_Alt_L) ||
-        get_key_state(vsg::KEY_Alt_R);
+    return get_key_state(vsg::KEY_Alt_L) || get_key_state(vsg::KEY_Alt_R);
 }
 
 bool KeyboardHandler::get_binding_state(Action action) const
