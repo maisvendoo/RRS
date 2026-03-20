@@ -194,4 +194,62 @@ setTrain(train135)
 
 Симулятор сбросит старый график и попытается найти новый график, в соотвествии с новым именем (номером) поезда. Если таковой график есть в каталоге timetable сценария, то он будет успешно загружен.
 
+
 Напомню, что переименование поезда возможно тремя способами: из кабины локомотива (F8), из интерфейса карты (правой кнопкой по имени поезда -> "Переименовать"), а так же по триггеру в сценарии с помощю action-функции actionRenameTrain().
+
+Пример переименования поезда в процессе исполнения сценария мы не рассматривали. Рассмотрим в этот раз. Пусть поезд едет от станции А до станции В по графику поезда 134, который мы привели выше, в на станции В меняет номер на 136. Создадим еще один график для поезда 136, в котором, для простоты, время прибытия на станцию В будет таким же как и в графике 134.
+
+**timetable/136.xml**
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Station>
+		<Name>Станция A</Name>			
+		<DepartureTime>12:00</DepartureTime>
+		<TargetTraj>track_a_p2b</TargetTraj>
+		<TargetCoord>1040.0</TargetCoord>
+		<RemovalTraj>track_a-b_nd-22</RemovalTraj>
+	</Station>
+
+	<Station>
+		<Name>Станция B</Name>
+		<ArrivalTime>12:18</ArrivalTime>			
+		<DepartureTime>12:28</DepartureTime>
+		<TargetTraj>track_b_p4</TargetTraj>
+		<TargetCoord>1250.0</TargetCoord>
+		<ApproachTraj>track_a-b_4-2</ApproachTraj>
+		<RemovalTraj>track_b-c_nd-22</RemovalTraj>
+	</Station>
+
+	<Station>
+		<Name>Станция C</Name>
+		<ArrivalTime>12:40</ArrivalTime>			
+		<TargetTraj>track_c_p3</TargetTraj>
+		<TargetCoord>1250.0</TargetCoord>
+		<ApproachTraj>track_b-c_4-2</ApproachTraj>			
+	</Station>	
+</Config>
+```
+
+После станции В этот график отличается от графика 134. Сменим имя поезда на 136 в момент его прибытия на станцию В. Для этого напишем такой сценарий
+
+**main.lua**
+```
+-- Задаем время
+setTime("11:59")
+
+-- Задаем поезд 134
+train134 = TrainData.new()
+train134.name = "134"
+train134.config = "vl60pk-1543-T65_17"
+train134.traj = "track_a_p2b"
+train134.coord = 1040.0
+train134.dir = 1
+train134.auto = true 
+
+setTrain(train134)
+
+-- Меняем имя поезда с 134 на 136 в момент прибытия на станцию В
+setTimeTrigger("12:20", actionRenameTrain(train134.name, "136"))
+```
+
