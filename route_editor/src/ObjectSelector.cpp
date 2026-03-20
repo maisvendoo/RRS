@@ -263,8 +263,14 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 
     const auto& selected_objects = context.selected_objects;
 
-    if (state != State::KEYBOARD_GRAB && !selected_objects.empty() &&
-        context.keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
+    const bool pressed_action_move =
+        context.keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS);
+
+    const bool pressed_action_rotate =
+        context.keyboard_handler->get_binding_state(ACTION_ROTATE_OBJECTS);
+
+    if (state == State::INITIAL && !selected_objects.empty() &&
+        (pressed_action_move || pressed_action_rotate))
     {
         vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
         for (const auto& object : selected_objects)
@@ -306,10 +312,18 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto compile_manager = viewer->compileManager;
         const auto compile_result = compile_manager->compile(front_plane);
 
-        state = State::KEYBOARD_GRAB;
         front_plane_switch->node = front_plane;
 
         vsg::updateViewer(*viewer, compile_result);
+
+        if (pressed_action_move)
+        {
+            state = State::KEYBOARD_GRAB;
+        }
+        else if (pressed_action_rotate)
+        {
+            state = State::KEYBOARD_ROTATE;
+        }
     }
 }
 
