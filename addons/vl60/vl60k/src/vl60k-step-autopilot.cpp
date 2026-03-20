@@ -13,6 +13,7 @@
 #include    <ALSN-decoder.h>
 #include    <relay.h>
 #include    <sanding-system.h>
+#include    <train-horn.h>
 
 //------------------------------------------------------------------------------
 //
@@ -113,5 +114,8 @@ void VL60k::stepAutopilot(double t, double dt)
 
         // Управление подачей песка
         sand_system->setSandDeliveryOn(auto_control[cab_idx]->sand_ON);
+
+        horn[cab_idx]->setSvistokOn(auto_control[cab_idx]->whistle);
+        horn[cab_idx]->setTifonOn(auto_control[cab_idx]->typhoid);
     }
 }
