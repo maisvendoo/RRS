@@ -642,15 +642,16 @@ void Autopilot::slotSetBrakeAccel(double a_brake)
 //------------------------------------------------------------------------------
 void Autopilot::setTimetable(const autopilot_timetable_t &timetable)
 {
+    // Запоминаем сам график
+    this->timetable = timetable;
+
     if (timetable.stations.empty())
     {
         return;
     }
 
     // Сбрасываем флаг готовности графика, чтобы он был переинициализирован
-    is_timetable_ready = false;
-    // Запоминаем сам график
-    this->timetable = timetable;
+    is_timetable_ready = false;    
 }
 
 //------------------------------------------------------------------------------
