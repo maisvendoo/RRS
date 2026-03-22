@@ -92,6 +92,8 @@ void VL60pk::process(const simulator_time_t& t, const double& dt)
     signalsOutput(t, dt);
 
     soundsOutput(t, dt);
+
+    stepAutopilot(t.simulation_seconds, dt);
 }
 
 //------------------------------------------------------------------------------
@@ -133,9 +135,7 @@ void VL60pk::step(const double &t, const double &dt)
 
     stepOtherEquipment(t, dt);
 
-    stepSafetyDevices(t, dt);
-
-    stepAutopilot(t, dt);
+    stepSafetyDevices(t, dt);    
 
     autoStartTimer->step(t, dt);
 }
