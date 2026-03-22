@@ -1706,8 +1706,11 @@ void Topology::slotGetRouteLength(int vehicle_idx, QString cur_traj_name, double
         {
             emit sigIncTargetStation(vehicle_idx);
         }
+        else
+        {
+            emit sigCalcMiddleVelocity(vehicle_idx, *lenght);
+        }
 
-        emit sigCalcMiddleVelocity(vehicle_idx, *lenght);
         return;
     }
 
