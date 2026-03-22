@@ -148,16 +148,16 @@ struct autopilot_timetable_t
 
         stream << train_name;
         stream << train_idx;
+        stream << start_station_idx;
+        stream << curr_station_idx;
+        stream << target_station_dist;
+
         stream << static_cast<quint32>(stations.size());
 
         for (auto station : stations)
         {
             stream << station.serialize();
-        }
-
-        stream << start_station_idx;
-        stream << curr_station_idx;
-        stream << target_station_dist;
+        }        
 
         return data;
     }
@@ -170,6 +170,9 @@ struct autopilot_timetable_t
 
         stream >> train_name;
         stream >> train_idx;
+        stream >> start_station_idx;
+        stream >> curr_station_idx;
+        stream >> target_station_dist;
 
         quint32 size = 0;
         stream >> size;
@@ -185,11 +188,7 @@ struct autopilot_timetable_t
             station.deserialize(st_data);
 
             stations.push_back(station);
-        }
-
-        stream >> start_station_idx;
-        stream >> curr_station_idx;
-        stream >> target_station_dist;
+        }        
     }
 
     autopilot_station_t &getStation(int idx)
