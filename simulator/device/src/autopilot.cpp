@@ -473,6 +473,11 @@ double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
 {
     double v_ref = v_constr;
 
+    if (timetable.stations.empty())
+    {
+        return v_constr;
+    }
+
     // Текущая станция
     autopilot_station_t st = timetable.stations[target_station_idx];
 
@@ -695,6 +700,11 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
         return;
     }
 
+    if (timetable.stations.empty())
+    {
+        return;
+    }
+
     auto st = &timetable.stations[target_station_idx];
 
     // Отправиться раньше графика решил ты? Путь к темной стороне это...
@@ -743,6 +753,11 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
     }
 
     if (target_dist < 0)
+    {
+        return;
+    }
+
+    if (timetable.stations.empty())
     {
         return;
     }
