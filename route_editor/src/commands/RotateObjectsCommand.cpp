@@ -1,6 +1,5 @@
 #include "RotateObjectsCommand.h"
 
-#include "Command.h"
 #include "EditorContext.h"
 #include "RouteObject.h"
 #include "TransformObjectsCommand.h"
@@ -12,7 +11,6 @@
 RotateObjectsCommand::RotateObjectsCommand(EditorContext& context,
     vsg::vec3 pivot, vsg::vec3 axis, float radians)
     : TransformObjectsCommand(context)
-    , objects(context.selected_objects)
     , pivot(pivot)
     , axis(axis)
     , radians(radians)

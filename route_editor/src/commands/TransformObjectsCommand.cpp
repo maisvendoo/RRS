@@ -11,7 +11,7 @@ TransformObjectsCommand::TransformObjectsCommand(EditorContext& context)
     , objects(context.selected_objects)
 {
     initial_matrices.reserve(objects.size());
-    for (RouteObject* const object : objects)
+    for (const RouteObject* const object : objects)
     {
         initial_matrices.emplace_back(object->get_initial_matrix());
     }

@@ -1,8 +1,6 @@
 #ifndef ROTATE_OBJECTS_COMMAND_H
 #define ROTATE_OBJECTS_COMMAND_H
 
-#include "Command.h"
-#include "RouteObjects.h"
 #include "TransformObjectsCommand.h"
 
 #include <vsg/maths/vec3.h>
@@ -20,7 +18,6 @@ public:
     virtual void update_description() override;
 
 private:
-    const RouteObjects objects;
     vsg::vec3 pivot;
     vsg::vec3 axis;
     float radians;
