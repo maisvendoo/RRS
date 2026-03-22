@@ -1,14 +1,13 @@
 #include "RouteObject.h"
 
+#include "EditorContext.h"
 #include "Gizmo.h"
 #include "Mask.h"
-#include "ObjectSelector.h"
 #include "Outline.h"
 #include "SingleSwitch.h"
 
 #include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
-#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
 #include <vsg/maths/common.h>
@@ -103,9 +102,9 @@ void RouteObject::set_translation(vsg::vec3 translation)
 {
     this->translation = translation;
 
-    this->matrix[3][0] = this->translation.x;
-    this->matrix[3][1] = this->translation.y;
-    this->matrix[3][2] = this->translation.z;
+    this->matrix[3][0] = translation.x;
+    this->matrix[3][1] = translation.y;
+    this->matrix[3][2] = translation.z;
 
     update_bounds();
 }

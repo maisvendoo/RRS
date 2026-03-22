@@ -4,7 +4,6 @@
 #include "RouteObjects.h"
 
 #include <vsg/core/Inherit.h>
-#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
 #include <vsg/maths/mat4.h>
@@ -14,23 +13,25 @@
 #include <string>
 
 struct EditorContext;
-class Gizmo;
-class RouteObject;
 class SingleSwitch;
 
 namespace vsg
 {
 
 class PagedLOD;
-class Viewer;
 
 }
 
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 {
 public:
-    RouteObject(EditorContext& context, vsg::ref_ptr<vsg::PagedLOD> paged_lod,
-        const std::string& label, vsg::vec3 translation, vsg::vec3 rotation_deg);
+    RouteObject(
+        EditorContext& context,
+        vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+        const std::string& label,
+        vsg::vec3 translation,
+        vsg::vec3 rotation_deg
+    );
 
     vsg::vec3 get_translation() const;
     vsg::vec3 get_rotation_deg() const;
