@@ -9,6 +9,7 @@
 #include "Mask.h"
 #include "MouseHandler.h"
 #include "MoveObjectsCommand.h"
+#include "RotateObjectsCommand.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
 #include "SelectObjectsCommand.h"
@@ -416,8 +417,7 @@ void ObjectSelector::confirm_keyboard_rotate()
     state = State::INITIAL;
     front_plane_switch->node = nullptr;
 
-    // commands.push(new MoveObjectsCommand(RouteObject::get_selected_objects(),
-    //     total_translation), false);
+    // context.commands.push(new RotateObjectsCommand(context, ), bool execute)
 }
 
 void ObjectSelector::cancel_keyboard_rotate()

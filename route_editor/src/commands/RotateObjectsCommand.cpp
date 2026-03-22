@@ -3,6 +3,7 @@
 #include "Command.h"
 #include "EditorContext.h"
 #include "RouteObject.h"
+#include "TransformObjectsCommand.h"
 
 #include <vsg/maths/vec3.h>
 
@@ -10,7 +11,7 @@
 
 RotateObjectsCommand::RotateObjectsCommand(EditorContext& context,
     vsg::vec3 pivot, vsg::vec3 axis, float radians)
-    : Command(context)
+    : TransformObjectsCommand(context)
     , objects(context.selected_objects)
     , pivot(pivot)
     , axis(axis)
@@ -24,14 +25,6 @@ void RotateObjectsCommand::execute() const
     for (RouteObject* const object : objects)
     {
         object->rotate_around_pivot(pivot, axis, radians, object->matrix);
-    }
-}
-
-void RotateObjectsCommand::undo() const
-{
-    for (RouteObject* const object : objects)
-    {
-        object->rotate_around_pivot(pivot, axis, -radians, object->matrix);
     }
 }
 

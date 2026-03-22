@@ -3,12 +3,13 @@
 
 #include "Command.h"
 #include "RouteObjects.h"
+#include "TransformObjectsCommand.h"
 
 #include <vsg/maths/vec3.h>
 
 struct EditorContext;
 
-class RotateObjectsCommand : public Command
+class RotateObjectsCommand : public TransformObjectsCommand
 {
 public:
     RotateObjectsCommand(EditorContext& context,vsg::vec3 pivot,
@@ -16,7 +17,6 @@ public:
 
     virtual ~RotateObjectsCommand() override = default;
     virtual void execute() const override;
-    virtual void undo() const override;
     virtual void update_description() override;
 
 private:
