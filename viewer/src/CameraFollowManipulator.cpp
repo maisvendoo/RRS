@@ -231,9 +231,13 @@ void CameraFollowManipulator::calc_view()
     vsg::dvec3 view = _lookAt->center - _lookAt->eye;
 
     // Check there is no divide by zero
-    if (vsg::length2(view) < 1.0)
+    double dist = 1.0;
+
+    if (vsg::length2(view) < dist)
     {
-        set_view();
+        //set_view();
+        auto safeView = vsg::normalize(view) * dist;
+        _lookAt->eye = _lookAt->center - safeView;
         return;
     }
 

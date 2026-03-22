@@ -122,7 +122,7 @@ signals:
 
     void sigBuildTrainRoute(QString start_traj, QString target_traj, int dir);
 
-protected:
+protected:    
 
     /// Признак активации
     bool is_active = false;
@@ -271,6 +271,8 @@ protected:
 
     /// Задержка отправления/прибытия, определяемая как опоздение (в минутах)
     int delay_timeout_min = 3;
+
+    double delta_t = 0.0;
 
     /// Переопределяем эту реализацию пустой, так как её может и не быть
     /// (что вряд ли, конечно...)

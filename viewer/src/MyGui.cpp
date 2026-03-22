@@ -607,8 +607,17 @@ void MyGui::showTimetable() const
             continue;
         }
 
+        const int NAME_SIZE = 15;
+
+        QString striped_name = timetable.stations[i].name;
+
+        if (striped_name.length() > NAME_SIZE)
+        {
+            striped_name = striped_name.left(NAME_SIZE - 1) + ".";
+        }
+
         QString station_info = QString("%1 %2 %3 %4 %5")
-                                   .arg(timetable.stations[i].name.leftJustified(15))
+                                   .arg(striped_name.leftJustified(NAME_SIZE))
                                    .arg(timetable.stations[i].arr_time, 5)
                                    .arg(timetable.stations[i].dep_time, 5)
                                    .arg(timetable.stations[i].fact_arr_time, 10)
