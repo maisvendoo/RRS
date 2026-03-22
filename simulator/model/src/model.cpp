@@ -306,28 +306,25 @@ void Model::slotUpdateTrainTimetable(int train_idx)
                 auto vc = topology->getVehicleController(vehicle->getModelIndex());
 
                 disconnect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition);
-                connect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition);
-
                 disconnect(ap, &Autopilot::sigIsRouteExists, topology, &Topology::slotIsRouteExists);
-                connect(ap, &Autopilot::sigIsRouteExists, topology, &Topology::slotIsRouteExists);
-
                 disconnect(ap, &Autopilot::sigGetRouteLength, topology, &Topology::slotGetRouteLength);
-                connect(ap, &Autopilot::sigGetRouteLength, topology, &Topology::slotGetRouteLength);
-
                 disconnect(this, &Model::sigInitTimetable, ap, &Autopilot::slotInitTimeTable);
-                connect(this, &Model::sigInitTimetable, ap, &Autopilot::slotInitTimeTable);
-
                 disconnect(topology, &Topology::sigIncTargetStation, ap, &Autopilot::slotIncTargetStation);
-                connect(topology, &Topology::sigIncTargetStation, ap, &Autopilot::slotIncTargetStation);
-
                 disconnect(topology, &Topology::sigCalcMiddleVelocity, ap, &Autopilot::slotCalcMiddleVelocity);
-                connect(topology, &Topology::sigCalcMiddleVelocity, ap, &Autopilot::slotCalcMiddleVelocity);
-
                 disconnect(scnmgr, &ScenarioManager::sigSetTimeForAutopilot, ap, &Autopilot::slotSetTimeForAutopilot);
-                connect(scnmgr, &ScenarioManager::sigSetTimeForAutopilot, ap, &Autopilot::slotSetTimeForAutopilot);
-
                 disconnect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);
-                connect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);                
+
+                if (!timetable.stations.empty())
+                {
+                    connect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition);
+                    connect(ap, &Autopilot::sigIsRouteExists, topology, &Topology::slotIsRouteExists);
+                    connect(ap, &Autopilot::sigGetRouteLength, topology, &Topology::slotGetRouteLength);
+                    connect(this, &Model::sigInitTimetable, ap, &Autopilot::slotInitTimeTable);
+                    connect(topology, &Topology::sigIncTargetStation, ap, &Autopilot::slotIncTargetStation);
+                    connect(topology, &Topology::sigCalcMiddleVelocity, ap, &Autopilot::slotCalcMiddleVelocity);
+                    connect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);
+                    connect(scnmgr, &ScenarioManager::sigSetTimeForAutopilot, ap, &Autopilot::slotSetTimeForAutopilot);
+                }
             }
         }
     }
