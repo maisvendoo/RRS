@@ -515,7 +515,7 @@ void EditorGui::show_selected_objects_properties() const
         vsg::vec3 rotation_deg = object->get_rotation_deg();
         if (ImGui::DragFloat3(label.c_str(), rotation_deg.data(), 0.2f))
         {
-            object->set_rotation_deg(rotation_deg, true);
+            object->set_rotation_deg(rotation_deg);
         }
 
         label = "scale##" + std::to_string(i);
@@ -523,7 +523,7 @@ void EditorGui::show_selected_objects_properties() const
         vsg::vec3 scale = object->get_scale();
         if (ImGui::DragFloat3(label.c_str(), scale.data(), 0.01f))
         {
-            object->set_scale(scale, true);
+            object->set_scale(scale);
         }
 
         ++i;
@@ -535,33 +535,6 @@ void EditorGui::show_selected_objects_properties() const
         center += object->get_translation();
     }
     center /= static_cast<float>(selected_objects.size());
-
-    if (ImGui::Button("Rotate X 30"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->rotate_around_pivot(center, vsg::vec3(1.0f, 0.0f, 0.0f),
-                vsg::radians(30.0f), object->matrix);
-        }
-    }
-
-    if (ImGui::Button("Rotate Y 30"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->rotate_around_pivot(center, vsg::vec3(0.0f, 1.0f, 0.0f),
-                vsg::radians(30.0f), object->matrix);
-        }
-    }
-
-    if (ImGui::Button("Rotate Z 30"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->rotate_around_pivot(center, vsg::vec3(0.0f, 0.0f, 1.0f),
-                vsg::radians(30.0f), object->matrix);
-        }
-    }
 
     if (ImGui::Button("Scale X 2"))
     {
