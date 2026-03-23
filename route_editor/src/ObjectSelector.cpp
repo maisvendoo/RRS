@@ -262,6 +262,8 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
+    // TODO: Нужно переделать систему, чтобы движение, поворот и масштабирование
+    // считались математически, а не через пересечения с дорогостоящей плоскостью
     const auto& selected_objects = context.selected_objects;
 
     const bool pressed_action_move =
