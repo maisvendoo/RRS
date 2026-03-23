@@ -38,7 +38,6 @@ public:
     vsg::vec3 get_scale() const;
 
     const vsg::dmat4& get_initial_matrix() const;
-
     const vsg::box& get_bounds() const;
 
     bool get_is_selected() const;
@@ -49,8 +48,6 @@ public:
     void set_scale(vsg::vec3 scale);
 
     void move(vsg::vec3 translation);
-    void rotate(vsg::vec3 rotation_deg, bool update_matrix);
-    void scale(vsg::vec3 scale, bool update_matrix);
 
     void rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis, float radians,
         const vsg::dmat4& matrix);
@@ -65,24 +62,23 @@ public:
     RouteObjectsIterator deselect();
 
     void save_matrix();
-
-    void set_matrix(vsg::dmat4 matrix);
-
-    void update_matrix();
-    void update_bounds();
+    void set_matrix(const vsg::dmat4& matrix);
 
 public:
     std::string label;
+
+private:
+    void update_matrix();
+    void update_bounds();
 
 private:
     EditorContext& context;
 
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;
-    vsg::vec3 scale_value = {1.0f, 1.0f, 1.0f};
+    vsg::vec3 scale = {1.0f, 1.0f, 1.0f};
 
     vsg::dmat4 initial_matrix;
-
     vsg::box bounds;
 
     bool is_selected = false;

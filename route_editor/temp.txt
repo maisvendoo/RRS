@@ -2,13 +2,11 @@ EditorGui.h
 Gizmo.h
 ObjectSelector.h
 RouteEditor.h
-RouteObject.h
 
 EditorGui.cpp
 Gizmo.cpp
 ObjectSelector.cpp
 RouteEditor.cpp
-RouteObject.cpp
 
 --------------------------------------------------------------------------------
 
@@ -34,6 +32,7 @@ MouseHandler.h
 Outline.h
 PagedLodMap.h
 Route.h
+RouteObject.h
 RouteObjects.h
 RouteMap.h
 SceneGraph.h
@@ -60,6 +59,7 @@ main.cpp
 MouseHandler.cpp
 Outline.cpp
 Route.cpp
+RouteObject.cpp
 SceneGraph.cpp
 Settings.cpp
 shader_funcs.cpp

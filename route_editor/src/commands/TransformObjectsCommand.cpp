@@ -23,7 +23,6 @@ void TransformObjectsCommand::undo() const
     for (RouteObject* const object : objects)
     {
         object->set_matrix(initial_matrices[index]);
-        object->update_bounds();
         ++index;
     }
 }
