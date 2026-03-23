@@ -15,6 +15,7 @@ class KeyboardHandler : public vsg::Inherit<vsg::Visitor, KeyboardHandler>
 {
 public:
     explicit KeyboardHandler(EditorContext& context);
+    virtual ~KeyboardHandler() = default;
 
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
     virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;
