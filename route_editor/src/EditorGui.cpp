@@ -498,7 +498,7 @@ void EditorGui::show_selected_objects_properties() const
 
     int i = 0;
 
-    for (const auto& object : selected_objects)
+    for (RouteObject* const object : selected_objects)
     {
         ImGui::Text("label: %s", object->label.c_str());
 
@@ -530,7 +530,7 @@ void EditorGui::show_selected_objects_properties() const
     }
 
     vsg::vec3 center = {0.0f, 0.0f, 0.0f};
-    for (const auto& object : selected_objects)
+    for (const RouteObject* const object : selected_objects)
     {
         center += object->get_translation();
     }
@@ -538,7 +538,7 @@ void EditorGui::show_selected_objects_properties() const
 
     if (ImGui::Button("Scale X 2"))
     {
-        for (const auto& object : selected_objects)
+        for (RouteObject* const object : selected_objects)
         {
             object->scale_relative_to_pivot(center,
                 vsg::vec3{2.0f, 1.0f, 1.0f}, object->matrix);
@@ -547,7 +547,7 @@ void EditorGui::show_selected_objects_properties() const
 
     if (ImGui::Button("Scale Y 2"))
     {
-        for (const auto& object : selected_objects)
+        for (RouteObject* const object : selected_objects)
         {
             object->scale_relative_to_pivot(center,
                 vsg::vec3{1.0f, 2.0f, 1.0f}, object->matrix);
@@ -556,7 +556,7 @@ void EditorGui::show_selected_objects_properties() const
 
     if (ImGui::Button("Scale Z 2"))
     {
-        for (const auto& object : selected_objects)
+        for (RouteObject* const object : selected_objects)
         {
             object->scale_relative_to_pivot(center,
                 vsg::vec3{1.0f, 1.0f, 2.0f}, object->matrix);
@@ -565,7 +565,7 @@ void EditorGui::show_selected_objects_properties() const
 
     if (ImGui::Button("Scale X 0.5"))
     {
-        for (const auto& object : selected_objects)
+        for (RouteObject* const object : selected_objects)
         {
             object->scale_relative_to_pivot(center,
                 vsg::vec3{0.5f, 1.0f, 1.0f}, object->matrix);

@@ -197,7 +197,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
             prev_intersect_pos = world_intersection;
             total_translation += translation;
 
-            for (const auto& object : context.selected_objects)
+            for (RouteObject* const object : context.selected_objects)
             {
                 object->move(translation);
             }
@@ -240,7 +240,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
                 acos_b = 2 * vsg::PI - acos_b;
             }
 
-            for (const auto& object : selected_objects)
+            for (RouteObject* const object : selected_objects)
             {
                 object->rotate_around_pivot(center, front, acos_a - acos_b, object->matrix);
             }
@@ -274,7 +274,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         (pressed_action_move || pressed_action_rotate))
     {
         vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
-        for (const auto& object : selected_objects)
+        for (const RouteObject* const object : selected_objects)
         {
             begin_pos += object->get_translation();
         }
@@ -404,7 +404,7 @@ void ObjectSelector::cancel_keyboard_move()
 {
     state = State::INITIAL;
 
-    for (const auto& object : context.selected_objects)
+    for (RouteObject* const object : context.selected_objects)
     {
         object->move(-total_translation);
     }
@@ -424,7 +424,7 @@ void ObjectSelector::cancel_keyboard_rotate()
 {
     state = State::INITIAL;
 
-    // for (const auto& object : RouteObject::get_selected_objects())
+    // for (const RouteObject* const object : RouteObject::get_selected_objects())
     // {
     //     object->move(-total_translation);
     // }
@@ -445,7 +445,7 @@ void ObjectSelector::cancel_keyboard_scale()
 {
     state = State::INITIAL;
 
-    // for (const auto& object : RouteObject::get_selected_objects())
+    // for (const RouteObject* const object : RouteObject::get_selected_objects())
     // {
     //     object->move(-total_translation);
     // }
