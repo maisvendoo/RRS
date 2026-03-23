@@ -79,6 +79,9 @@ void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 
     cfg.getBool(section, "DoubleBuffer", settings.double_buffer);
     cfg.getInt(section, "Samples", settings.samples);
+
+    cfg.getBool(section, "EnableDebugLayer", settings.enableDebugLayer);
+    cfg.getBool(section, "EnableDebugUtils", settings.enableDebugUtils);
 }
 
 //------------------------------------------------------------------------------

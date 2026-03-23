@@ -104,6 +104,9 @@ struct settings_t final
     double follow_cam_speed_coeff = std::sqrt(2.0); ///< Follow camera speed coeff
     double follow_cam_height_step = 0.1;            ///< Follow camera vertical shift
     double follow_cam_fovy_coeff = std::cbrt(2.0);  ///< Follow camera FovY coeff
+
+    bool enableDebugLayer = false;
+    bool enableDebugUtils = false;
 };
 
 #endif // VIEWER_SETTINGS_H

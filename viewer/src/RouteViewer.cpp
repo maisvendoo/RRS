@@ -306,8 +306,9 @@ void RouteViewer::initWindowTraits()
     windowTraits->windowTitle = settings.name;
     windowTraits->decoration = settings.window_decoration;
     windowTraits->samples = samples_bit_flag(settings.samples);
-    // windowTraits->debugLayer = true;
-    // windowTraits->debugUtils = true;
+
+    windowTraits->debugLayer = settings.enableDebugLayer;
+    windowTraits->debugUtils = settings.enableDebugUtils;
 
     // Настройка вертикальной синхронизации (упрощенно - вкл/выкл)
     windowTraits->swapchainPreferences.presentMode = settings.vsync ? VK_PRESENT_MODE_FIFO_KHR

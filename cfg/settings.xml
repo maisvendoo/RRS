@@ -74,5 +74,8 @@
         <SunAzimuth>45</SunAzimuth>
         <!-- Высота солнечного освещения над горизонтом, град. -->
         <SunAltitude>45</SunAltitude>
+
+        <EnableDebugLayer>1</EnableDebugLayer>
+        <EnableDebugUtils>1</EnableDebugUtils>
     </Viewer>
 </Config>
