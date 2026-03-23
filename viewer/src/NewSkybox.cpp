@@ -85,6 +85,15 @@ void NewSkybox::set_date_time(const simulator_time_t& sim_time)
 
 void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degrees)
 {
+    // Обновлять не чаще 1 раза в секунду
+    static auto last_update = std::chrono::steady_clock::now();
+    auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast<std::chrono::seconds>(now - last_update).count() < 1)
+    {
+        return;  // Пропускаем обновление
+    }
+    last_update = now;
+
     // Поворот модели скайбокса в используемую систему координат,
     // и поворот для отрисовки солнца в той же стороне, где источник солнечного света
     transform->matrix = vsg::rotate(vsg::radians(90.0), vsg::dvec3{1.0, 0.0, 0.0}) *
