@@ -44,13 +44,18 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    if (context.mouse_handler->get_is_lmb_pressed())
+    if (state != State::INITIAL)
     {
-        confirm_keyboard_transformation();
-    }
-    else if (context.mouse_handler->get_is_rmb_pressed())
-    {
-        cancel_keyboard_transformation();
+        if (context.mouse_handler->get_is_lmb_pressed())
+        {
+            confirm_keyboard_transformation();
+            return;
+        }
+        else if (context.mouse_handler->get_is_rmb_pressed())
+        {
+            cancel_keyboard_transformation();
+            return;
+        }
     }
 
     const auto& selected_objects = context.selected_objects;
