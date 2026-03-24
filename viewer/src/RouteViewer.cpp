@@ -659,6 +659,7 @@ void RouteViewer::initViewer()
 
     // Перед компиляцией вьювера подсовываем ему наш кастомный DatabasePager
     vsg::ref_ptr<vsg::DatabasePager> databasePager = AnimatedDatabasePager::create();
+    databasePager->targetMaxNumPagedLODWithHighResSubgraphs = settings.targetPagedLODs;
     for (auto& task : viewer->recordAndSubmitTasks)
     {
         task->databasePager = databasePager;
