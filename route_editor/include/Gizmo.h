@@ -14,7 +14,6 @@ namespace vsg
 {
 
 class ButtonReleaseEvent;
-class FrameEvent;
 class MatrixTransform;
 class MoveEvent;
 class Node;

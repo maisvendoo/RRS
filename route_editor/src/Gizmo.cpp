@@ -7,25 +7,22 @@
 #include "Mask.h"
 #include "MoveObjectsCommand.h"
 #include "RouteObject.h"
-#include "SelectObjectsCommand.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
 
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
+#include <vsg/maths/common.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
-#include <vsg/ui/ApplicationEvent.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/Builder.h>
-#include <vsg/utils/LineSegmentIntersector.h>
 #include <vsg/utils/ShaderSet.h>
 
-#include <cassert>
 #include <cmath>
 
 static constexpr vsg::vec3 X_AXIS_POSITIVE = {1.0f, 0.0f, 0.0f};
@@ -167,7 +164,9 @@ Gizmo::Gizmo(EditorContext& context)
 
 bool Gizmo::handle_intersections()
 {
-    const auto intersector = context.intersection_handler->get_lmb_intersector();
+    const auto intersector =
+        context.intersection_handler->get_lmb_intersector();
+
     if (!intersector)
     {
         return false;
@@ -175,8 +174,8 @@ bool Gizmo::handle_intersections()
 
     this->accept(*intersector);
 
-    const auto intersection = context.intersection_handler->get_closest_intersection(
-        intersector);
+    const auto intersection =
+        context.intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {
@@ -193,7 +192,7 @@ bool Gizmo::handle_intersections()
     const float arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVE));
     const float arrow_z_dot = std::abs(vsg::dot(camera_front, Z_AXIS_POSITIVE));
 
-    for (const vsg::Node* node : intersection->nodePath)
+    for (const vsg::Node* const node : intersection->nodePath)
     {
         if (node == arrow_x)
         {
@@ -262,7 +261,8 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
         return;
     }
 
-    context.commands.push(new MoveObjectsCommand(context, total_translation), false);
+    context.commands.push(new MoveObjectsCommand(
+        context, total_translation), false);
 
     active_arrow = nullptr;
 
@@ -284,8 +284,8 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
     this->accept(*intersector);
 
-    const auto intersection = context.intersection_handler->get_closest_intersection(
-        intersector);
+    const auto intersection =
+        context.intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {
@@ -295,7 +295,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
     const auto world_intersection = static_cast<vsg::vec3>(
         intersection->worldIntersection);
 
-    for (const vsg::Node* node : intersection->nodePath)
+    for (const vsg::Node* const node : intersection->nodePath)
     {
         if (node != active_plain_switch)
         {
