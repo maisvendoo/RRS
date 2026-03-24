@@ -188,6 +188,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
             const vsg::vec3 vec_b = vsg::normalize(world_intersection - center);
 
             prev_intersect_pos = world_intersection;
+            vsg::vec3 front = context.camera_handler->get_front();
 
             float acos_a = std::acos(vsg::dot(vec_a, front_plane_up));
             float acos_b = std::acos(vsg::dot(vec_b, front_plane_up));
@@ -226,8 +227,6 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
-    // TODO: Нужно переделать систему, чтобы движение, поворот и масштабирование
-    // считались математически, а не через пересечения с дорогостоящей плоскостью
     const auto& selected_objects = context.selected_objects;
 
     const bool pressed_action_move =
@@ -249,8 +248,6 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         const auto front_plane = context.camera_handler->create_front_plane(begin_pos,
             &front_plane_up);
 
-        front = context.camera_handler->get_front();
-
         const auto intersector = context.intersection_handler->apply_(
             context.mouse_handler->get_pos());
 
@@ -269,10 +266,9 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
             return;
         }
 
-        begin_intersect_pos = static_cast<vsg::vec3>(
+        prev_intersect_pos = static_cast<vsg::vec3>(
             intersection->worldIntersection);
 
-        prev_intersect_pos = begin_intersect_pos;
         total_translation = {0.0f, 0.0f, 0.0f};
 
         const auto viewer = context.viewer;

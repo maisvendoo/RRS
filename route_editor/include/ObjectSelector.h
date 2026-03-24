@@ -49,12 +49,10 @@ private:
 
     EditorContext& context;
 
-    vsg::vec3 begin_intersect_pos;
     vsg::vec3 prev_intersect_pos;
     vsg::vec3 total_translation;
     vsg::ref_ptr<SingleSwitch> front_plane_switch;
     vsg::vec3 front_plane_up;
-    vsg::vec3 front;
 };
 
 #endif // OBJECT_SELECTOR_H
