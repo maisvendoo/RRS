@@ -453,7 +453,7 @@ void Autopilot::calcTargetDistance()
         emit sigBuildTrainRoute(st->approach_traj, st->target_traj, target_dir);
 
         // или маршрут пропуска, если задан участок удаления
-        if (!st->removal_traj.isEmpty())
+        if (!st->removal_traj.isEmpty() && st->arr_time == st->dep_time)
         {
             emit sigBuildTrainRoute(st->target_traj, st->removal_traj, target_dir);
         }        
