@@ -3,6 +3,7 @@
 #include "Action.h"
 #include "CameraHandler.h"
 #include "CommandList.h"
+#include "EditorContext.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
@@ -43,55 +44,13 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    switch (state)
+    if (context.mouse_handler->get_is_lmb_pressed())
     {
-        case State::INITIAL:
-        {
-            break;
-        }
-        case State::KEYBOARD_GRAB:
-        {
-            if (context.mouse_handler->get_is_lmb_pressed())
-            {
-                confirm_keyboard_move();
-            }
-            else if (context.mouse_handler->get_is_rmb_pressed())
-            {
-                cancel_keyboard_move();
-            }
-
-            return;
-        }
-        case State::KEYBOARD_ROTATE:
-        {
-            if (context.mouse_handler->get_is_lmb_pressed())
-            {
-                confirm_keyboard_rotate();
-            }
-            else if (context.mouse_handler->get_is_rmb_pressed())
-            {
-                cancel_keyboard_rotate();
-            }
-
-            return;
-        }
-        case State::KEYBOARD_SCALE:
-        {
-            if (context.mouse_handler->get_is_lmb_pressed())
-            {
-                confirm_keyboard_scale();
-            }
-            else if (context.mouse_handler->get_is_rmb_pressed())
-            {
-                cancel_keyboard_scale();
-            }
-
-            return;
-        }
-        default:
-        {
-            break;
-        }
+        confirm_keyboard_transformation();
+    }
+    else if (context.mouse_handler->get_is_rmb_pressed())
+    {
+        cancel_keyboard_transformation();
     }
 
     const auto& selected_objects = context.selected_objects;
@@ -394,63 +353,42 @@ void ObjectSelector::select_object(RouteObject* object)
     context.commands.push(select_objects_command, true);
 }
 
-void ObjectSelector::confirm_keyboard_move()
+void ObjectSelector::confirm_keyboard_transformation()
 {
-    state = State::INITIAL;
-    front_plane_switch->node = nullptr;
-
-    context.commands.push(new MoveObjectsCommand(context, total_translation), false);
-}
-
-void ObjectSelector::cancel_keyboard_move()
-{
-    state = State::INITIAL;
-
-    for (RouteObject* const object : context.selected_objects)
+    switch (state)
     {
-        object->move(-total_translation);
+        case State::KEYBOARD_GRAB:
+        {
+            context.commands.push(new MoveObjectsCommand(
+                context, total_translation), false);
+
+            break;
+        }
+        case State::KEYBOARD_ROTATE:
+        {
+            break;
+        }
+        case State::KEYBOARD_SCALE:
+        {
+            break;
+        }
+        default:
+        {
+            break;
+        }
     }
 
+    state = State::INITIAL;
     front_plane_switch->node = nullptr;
 }
 
-void ObjectSelector::confirm_keyboard_rotate()
+void ObjectSelector::cancel_keyboard_transformation()
 {
+    for (RouteObject* const object : context.selected_objects)
+    {
+        object->set_matrix(object->get_initial_matrix());
+    }
+
     state = State::INITIAL;
-    front_plane_switch->node = nullptr;
-
-    // context.commands.push(new RotateObjectsCommand(context, ), bool execute)
-}
-
-void ObjectSelector::cancel_keyboard_rotate()
-{
-    state = State::INITIAL;
-
-    // for (const RouteObject* const object : RouteObject::get_selected_objects())
-    // {
-    //     object->move(-total_translation);
-    // }
-
-    front_plane_switch->node = nullptr;
-}
-
-void ObjectSelector::confirm_keyboard_scale()
-{
-    state = State::INITIAL;
-    front_plane_switch->node = nullptr;
-
-    // commands.push(new MoveObjectsCommand(RouteObject::get_selected_objects(),
-    //     total_translation), false);
-}
-
-void ObjectSelector::cancel_keyboard_scale()
-{
-    state = State::INITIAL;
-
-    // for (const RouteObject* const object : RouteObject::get_selected_objects())
-    // {
-    //     object->move(-total_translation);
-    // }
-
     front_plane_switch->node = nullptr;
 }

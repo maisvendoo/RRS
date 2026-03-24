@@ -1,14 +1,12 @@
 #ifndef OBJECT_SELECTOR_H
 #define OBJECT_SELECTOR_H
 
-#include "EditorContext.h"
-
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
-#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
+struct EditorContext;
 class RouteObject;
 class SingleSwitch;
 
@@ -35,14 +33,8 @@ public:
 private:
     void select_object(RouteObject* object);
 
-    void confirm_keyboard_move();
-    void cancel_keyboard_move();
-
-    void confirm_keyboard_rotate();
-    void cancel_keyboard_rotate();
-
-    void confirm_keyboard_scale();
-    void cancel_keyboard_scale();
+    void confirm_keyboard_transformation();
+    void cancel_keyboard_transformation();
 
 private:
     enum class State
