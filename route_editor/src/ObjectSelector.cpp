@@ -18,12 +18,11 @@
 
 #include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
-#include <vsg/core/observer_ptr.h>
-#include <vsg/core/ref_ptr.h>
-#include <vsg/maths/common.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/PointerEvent.h>
+
+#include <cmath>
 
 ObjectSelector::ObjectSelector(EditorContext& context)
     : context(context)
