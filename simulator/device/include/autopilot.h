@@ -237,7 +237,7 @@ protected:
     double target_station_dist = 0;
 
     /// Текущая траектория
-    QString curr_traj_name = "";
+    QString curr_traj_name = "";    
 
     /// Предыдущая траектория
     QString prev_traj_name = "";

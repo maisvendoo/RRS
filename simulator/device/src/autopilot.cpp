@@ -354,7 +354,12 @@ void Autopilot::slotInitTimeTable()
         return;
     }
 
-    prev_traj_name = curr_traj_name;
+    if (curr_traj_name != prev_traj_name)
+    {
+        Journal::instance()->debug("TIMETABLE PROCESS: Current trajectory is " + curr_traj_name);
+        prev_traj_name = curr_traj_name;
+    }
+
     prev_traj_coord = curr_traj_coord;
 
     // Индек целевой станции - в самый конец графика
@@ -442,6 +447,12 @@ void Autopilot::calcTargetDistance()
     //prev_traj_coord = curr_traj_coord;
     emit sigGetVehicleTrajPosition(&curr_traj_name, &curr_traj_coord);
 
+    if (curr_traj_name != prev_traj_name)
+    {
+        Journal::instance()->debug("TIMETABLE PROCESS: Current trajectory is " + curr_traj_name);
+        prev_traj_name = curr_traj_name;
+    }
+
     auto st = &timetable.stations[target_station_idx];
 
     // Если мы оказались на участке приближения
@@ -464,7 +475,7 @@ void Autopilot::calcTargetDistance()
         // Если уже построен маршрут приема, но еще не построен маршрут пропуска
         if (!st->is_build_dep_route && st->is_build_arr_route)
         {
-            emit sigGetTrajStateRequest(this->vehicle_idx, st->target_traj, st->removal_traj, target_dir, APPROACH_REQUEST);
+            emit sigGetTrajStateRequest(this->vehicle_idx, st->target_traj, st->removal_traj, target_dir, DEPARTURE_REQUEST);
         }
     }
 
@@ -863,18 +874,21 @@ void Autopilot::slotGetTrajState(int vehicle_idx, QString start_traj_name, QStri
     {
     case ARRIVAL_REQUEST:
 
+        Journal::instance()->debug(QString("TIMETABLE PROCESS: try build route from %1 to %2").arg(start_traj_name).arg(traj_name));
         emit sigBuildTrainRoute(start_traj_name, traj_name, target_dir);
         st->is_build_arr_route = true;
         break;
 
     case DEPARTURE_REQUEST:
 
+        Journal::instance()->debug(QString("TIMETABLE PROCESS: try build route from %1 to %2").arg(start_traj_name).arg(traj_name));
         emit sigBuildTrainRoute(start_traj_name, traj_name, target_dir);
         st->is_build_dep_route = true;
         break;
 
     case APPROACH_REQUEST:
 
+        Journal::instance()->debug(QString("TIMETABLE PROCESS: try build route from %1 to %2").arg(st->target_traj).arg(traj_name));
         emit sigBuildTrainRoute(st->target_traj, traj_name, target_dir);
         st->is_build_arr_route = st->is_build_dep_route = true;
         break;
