@@ -447,16 +447,23 @@ void Autopilot::calcTargetDistance()
     // Если мы оказались на участке приближения
     if (curr_traj_name == st->approach_traj && !st->is_build_arr_route)
     {
-        st->is_build_arr_route = true;
-
-        // Строим маршрут приема
-        emit sigBuildTrainRoute(st->approach_traj, st->target_traj, target_dir);
-
-        // или маршрут пропуска, если задан участок удаления
-        if (!st->removal_traj.isEmpty() && st->arr_time == st->dep_time)
+        // Не задан участок удаления
+        if (st->removal_traj.isEmpty())
         {
-            emit sigBuildTrainRoute(st->target_traj, st->removal_traj, target_dir);
-        }        
+            // посылаем запрос статуса пути приема
+            emit sigGetTrajStateRequest(this->vehicle_idx, st->target_traj, ARRIVAL_REQUEST);
+        }
+        else if (st->arr_time == st->dep_time)
+        {
+            // посылаем запрос статуса участка удаления, с целью построить любой
+            // свободный маршрут пропуска
+            emit sigGetTrajStateRequest(this->vehicle_idx, st->removal_traj, APPROACH_REQUEST);
+        }
+        else
+        {
+            // посылаем запрос статуса пути приема
+            emit sigGetTrajStateRequest(this->vehicle_idx, st->target_traj, ARRIVAL_REQUEST);
+        }
     }
 
     // ОПределяем дистанцию до станции-цели
@@ -573,9 +580,8 @@ void Autopilot::checkTimetable(double t, double dt)
         // Если задан участок приближения, строим себе маршрут отправления
         if (!st->removal_traj.isEmpty() && !st->is_build_dep_route)
         {
-            // Маршрут строим от той траектории, где по факту находимся!!!
-            emit sigBuildTrainRoute(curr_traj_name, st->removal_traj, target_dir);
-            st->is_build_dep_route = true;
+            // Запрос на проверку свободности маршрута отправления
+            emit sigGetTrajStateRequest(this->vehicle_idx, st->removal_traj, DEPARTURE_REQUEST);
         }
     }
     else
@@ -818,4 +824,59 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
 void Autopilot::slotSetTimeForAutopilot(QString time)
 {
     this->time_str = time;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Autopilot::slotGetTrajState(int vehicle_idx, QString traj_name, int request_type, bool is_busy, bool in_route)
+{
+    // Если данные не наши - выходим
+    if (vehicle_idx != this->vehicle_idx)
+    {
+        return;
+    }
+
+    // Если нет графика - выходим
+    if (timetable.stations.empty())
+    {
+        return;
+    }
+
+    // Если указанная траектория занята или включена в другой маршрут - выходим
+    if (is_busy || in_route)
+    {
+        QString msg = QString("TIMETABLE PROCESS: trajectory %1 state: is_busy %2 in_route %3")
+            .arg(traj_name)
+            .arg(is_busy)
+            .arg(in_route);
+
+        Journal::instance()->debug(msg);
+
+        return;
+    }
+
+    // Посылаем команду на построение маршрута
+    emit sigBuildTrainRoute(curr_traj_name, traj_name, target_dir);
+
+    auto st = &timetable.stations[target_station_idx];
+
+    switch (request_type)
+    {
+    case ARRIVAL_REQUEST:
+        st->is_build_arr_route = true;
+        break;
+
+    case DEPARTURE_REQUEST:
+        st->is_build_dep_route = true;
+        break;
+
+    case APPROACH_REQUEST:
+        st->is_build_arr_route = st->is_build_dep_route = true;
+        break;
+
+    default:
+
+        break;
+    }
 }
