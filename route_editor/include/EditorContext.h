@@ -77,6 +77,7 @@ struct EditorContext
     RouteMap route_map;
     Topology* topology = nullptr;
 
+    RouteObjects objects;
     RouteObjects selected_objects;
     RouteObjects hidden_objects;
 
