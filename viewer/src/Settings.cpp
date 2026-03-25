@@ -45,6 +45,13 @@ void RouteViewer::loadLoggerSettings(CfgReader& cfg, const QString& section)
 //------------------------------------------------------------------------------
 void RouteViewer::loadModelsSettings(CfgReader& cfg, const QString& section)
 {
+    int targetPagedLODs = 0;
+    cfg.getInt(section, "TargetPagedLODs", targetPagedLODs);
+    if (targetPagedLODs > 0)
+    {
+        settings.targetPagedLODs = targetPagedLODs;
+    }
+
     cfg.getBool(section, "DisableCullNode", settings.disable_culling_node);
     cfg.getBool(section, "DisableNativeGLTF", settings.disable_native_gltf_loader);
     cfg.getBool(section, "DrawModelsTwoSided", settings.draw_models_two_sided);

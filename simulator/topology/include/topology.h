@@ -105,6 +105,12 @@ signals:
 
     void sigCalcMiddleVelocity(int vehicle_idx, double target_dist);
 
+    void sigGetTrajState(int vehicle_idx,
+                         QString traj_name,
+                         int request_type,
+                         bool is_busy,
+                         bool in_route);
+
 private:
 
     /// Контейнер данных по всем траекториям на полигоне
@@ -182,6 +188,8 @@ public slots:
                             double target_coord,
                             int dir,
                             double *lenght);
+
+    void slotGetTrajStateRequest(int vehicle_idx, QString traj_name, int request_type);
 
 private slots:
 

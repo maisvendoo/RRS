@@ -1753,6 +1753,25 @@ void Topology::slotGetRouteLength(int vehicle_idx, QString cur_traj_name, double
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Topology::slotGetTrajStateRequest(int vehicle_idx, QString traj_name, int request_type)
+{
+    QString msg = QString("TIMETABLE PROCESS: request from vehicle #%1 by trajectory %2 state")
+                      .arg(vehicle_idx, 4)
+                      .arg(traj_name);
+
+    Journal::instance()->debug(msg);
+
+    bool is_busy = false;
+    bool in_route = false;
+
+    slotGetTrajState(traj_name, is_busy, in_route);
+
+    emit sigGetTrajState(vehicle_idx, traj_name, request_type, is_busy, in_route);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name)
 {
     // Определяем поезд, изменивший состояние траектории

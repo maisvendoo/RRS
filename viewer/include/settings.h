@@ -25,6 +25,7 @@ struct settings_t final
     std::string route_dir_full_path;   ///< Route directory path
 
     std::string notify_level = "INFO";      ///< Notify level
+    int targetPagedLODs = 64000;            ///< Set number of maximum PagedLOD with loaded high-resolution subgraphs
     bool disable_culling_node = true;       ///< Disable automatic cullnode for models
     bool disable_native_gltf_loader = false;///< Use assimp loader for .gltf models
     bool draw_models_two_sided = false;     ///< Draw all model's faces two sided
@@ -40,7 +41,7 @@ struct settings_t final
     bool window_decoration = true;  ///< Set/unset window decorations
 
     bool double_buffer = true;  ///< Set/unset double buffering
-    int samples = 1;            ///< Set number of anialiasing samples
+    int samples = 1;            ///< Set number of antialiasing samples
 
     bool shadow = false;                        ///< Shadow flag
     double shadow_distance = 50.0;              ///< Shadow compute distance

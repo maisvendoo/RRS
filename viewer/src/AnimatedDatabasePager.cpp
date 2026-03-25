@@ -146,12 +146,12 @@ vsg::ref_ptr<vsg::Node> AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<Anima
     FindCustomAnimationsVisitor fcav(fcav_create_info);
     node->accept(fcav);
 
-    /*LOG_INFO("AnimatedDatabasePager: loaded %zu model and %zu custom (total: %zu) animations from %s for model %s",
+    LOG_INFO("AnimatedDatabasePager: loaded %zu model and %zu custom (total: %zu) animations from %s for model %s",
              old_size,
              aplod->animations_map->animations.size() - old_size,
              aplod->animations_map->animations.size(),
              aplod->animations_dir.c_str(),
-             aplod->filename.string().c_str());*/
+             aplod->filename.string().c_str());
 
     node->traverse(*pdo);
 

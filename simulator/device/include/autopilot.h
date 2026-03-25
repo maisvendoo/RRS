@@ -122,7 +122,17 @@ signals:
 
     void sigBuildTrainRoute(QString start_traj, QString target_traj, int dir);
 
-protected:    
+    /// Запрос состояния траектории, куда предполагается строить маршрут приема/отправления
+    void sigGetTrajStateRequest(int vehicle_idx, QString traj_name, int request_type);
+
+protected:
+
+    enum
+    {
+        ARRIVAL_REQUEST,
+        DEPARTURE_REQUEST,
+        APPROACH_REQUEST
+    };
 
     /// Признак активации
     bool is_active = false;
@@ -427,6 +437,13 @@ public slots:
     void slotCalcMiddleVelocity(int vehicle_idx, double target_dist);
 
     void slotSetTimeForAutopilot(QString time);
+
+    /// Слот для приема состояния траектории по запросу
+    void slotGetTrajState(int vehicle_idx,
+                          QString traj_name,
+                          int request_type,
+                          bool is_busy,
+                          bool in_route);
 
 private slots:
 

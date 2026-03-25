@@ -314,6 +314,9 @@ void Model::slotUpdateTrainTimetable(int train_idx)
                 disconnect(scnmgr, &ScenarioManager::sigSetTimeForAutopilot, ap, &Autopilot::slotSetTimeForAutopilot);
                 disconnect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);
 
+                disconnect(ap, &Autopilot::sigGetTrajStateRequest, topology, &Topology::slotGetTrajStateRequest);
+                disconnect(topology, &Topology::sigGetTrajState, ap, &Autopilot::slotGetTrajState);
+
                 if (!timetable.stations.empty())
                 {
                     connect(ap, &Autopilot::sigGetVehicleTrajPosition, vc, &VehicleController::slotGetVehicleTrajPosition);
@@ -324,6 +327,9 @@ void Model::slotUpdateTrainTimetable(int train_idx)
                     connect(topology, &Topology::sigCalcMiddleVelocity, ap, &Autopilot::slotCalcMiddleVelocity);
                     connect(ap, &Autopilot::sigBuildTrainRoute, scnmgr, &ScenarioManager::slotBuildTrainRoute);
                     connect(scnmgr, &ScenarioManager::sigSetTimeForAutopilot, ap, &Autopilot::slotSetTimeForAutopilot);
+
+                    connect(ap, &Autopilot::sigGetTrajStateRequest, topology, &Topology::slotGetTrajStateRequest);
+                    connect(topology, &Topology::sigGetTrajState, ap, &Autopilot::slotGetTrajState);
                 }
             }
         }
