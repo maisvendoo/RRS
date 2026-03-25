@@ -20,5 +20,4 @@ public:
     RouteObjects objects_to_deselect;
 };
 
-
 #endif // SELECT_OBJECTS_COMMAND_H
