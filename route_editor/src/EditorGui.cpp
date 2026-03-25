@@ -118,7 +118,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 if (curr == active)
                 {
-                    ImGui::Text("--> %s", curr->command->get_description());
+                    ImGui::TextColored(ImVec4{0.0f, 1.0f, 0.0f, 1.0f}, "%s", curr->command->get_description());
                     ImGui::Separator();
                 }
                 else
