@@ -226,71 +226,79 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
-    const auto& selected_objects = context.selected_objects;
-
-    const bool pressed_action_move =
-        context.keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS);
-
-    const bool pressed_action_rotate =
-        context.keyboard_handler->get_binding_state(ACTION_ROTATE_OBJECTS);
-
-    if (state == State::INITIAL && !selected_objects.empty() &&
-        (pressed_action_move || pressed_action_rotate))
+    if (state != State::INITIAL)
     {
-        vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
-        for (const RouteObject* const object : selected_objects)
-        {
-            begin_pos += object->get_translation();
-        }
-        begin_pos /= static_cast<float>(selected_objects.size());
+        return;
+    }
 
-        const auto front_plane = context.camera_handler->create_front_plane(begin_pos,
-            &front_plane_up);
+    const RouteObjects& selected_objects = context.selected_objects;
+    if (selected_objects.empty())
+    {
+        return;
+    }
 
-        const auto intersector = context.intersection_handler->apply_(
-            context.mouse_handler->get_pos());
+    const auto keyboard_handler = context.keyboard_handler;
 
-        if (!intersector)
-        {
-            return;
-        }
+    const auto get_binding_state = [keyboard_handler](Action action) -> bool
+    {
+        return keyboard_handler->get_binding_state(action);
+    };
 
-        front_plane->accept(*intersector);
+    const bool pressed_action_move = get_binding_state(ACTION_MOVE_OBJECTS);
+    const bool pressed_action_rotate = get_binding_state(ACTION_ROTATE_OBJECTS);
+    const bool pressed_action_scale = get_binding_state(ACTION_SCALE_OBJECTS);
 
-        const auto intersection =
-            context.intersection_handler->get_closest_intersection(intersector);
+    if (!pressed_action_move && !pressed_action_rotate &&
+        !pressed_action_scale)
+    {
+        return;
+    }
 
-        if (!intersection)
-        {
-            return;
-        }
+    const auto front_plane = context.camera_handler->create_front_plane(
+        context.gizmo->get_curr_pos(), &front_plane_up);
 
-        prev_intersect_pos = static_cast<vsg::vec3>(
-            intersection->worldIntersection);
+    const auto intersector = context.intersection_handler->apply_(
+        context.mouse_handler->get_pos());
 
-        total_translation = {0.0f, 0.0f, 0.0f};
+    if (!intersector)
+    {
+        return;
+    }
 
-        const auto viewer = context.viewer;
-        const auto compile_manager = viewer->compileManager;
-        const auto compile_result = compile_manager->compile(front_plane);
+    front_plane->accept(*intersector);
 
-        front_plane_switch->node = front_plane;
+    const auto intersection =
+        context.intersection_handler->get_closest_intersection(intersector);
 
-        vsg::updateViewer(*viewer, compile_result);
+    if (!intersection)
+    {
+        return;
+    }
 
-        for (RouteObject* const object : context.selected_objects)
-        {
-            object->save_matrix();
-        }
+    prev_intersect_pos = static_cast<vsg::vec3>(
+        intersection->worldIntersection);
 
-        if (pressed_action_move)
-        {
-            state = State::KEYBOARD_GRAB;
-        }
-        else if (pressed_action_rotate)
-        {
-            state = State::KEYBOARD_ROTATE;
-        }
+    total_translation = {0.0f, 0.0f, 0.0f};
+
+    const auto compile_result = context.viewer->compileManager->compile(
+        front_plane);
+
+    front_plane_switch->node = front_plane;
+
+    vsg::updateViewer(*context.viewer, compile_result);
+
+    for (RouteObject* const object : selected_objects)
+    {
+        object->save_matrix();
+    }
+
+    if (pressed_action_move)
+    {
+        state = State::KEYBOARD_GRAB;
+    }
+    else if (pressed_action_rotate)
+    {
+        state = State::KEYBOARD_ROTATE;
     }
 }
 
