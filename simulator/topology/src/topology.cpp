@@ -1753,20 +1753,47 @@ void Topology::slotGetRouteLength(int vehicle_idx, QString cur_traj_name, double
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotGetTrajStateRequest(int vehicle_idx, QString traj_name, int request_type)
+void Topology::slotGetTrajStateRequest(int vehicle_idx, QString start_traj_name, QString traj_name, int dir, int request_type)
 {
-    QString msg = QString("TIMETABLE PROCESS: request from vehicle #%1 by trajectory %2 state")
+    QString msg = QString("TIMETABLE PROCESS: request vehicle #%1 from %2 to %3 build route")
                       .arg(vehicle_idx, 4)
+                      .arg(start_traj_name)
                       .arg(traj_name);
 
     Journal::instance()->debug(msg);
 
+    // Проверяем статус траектории
     bool is_busy = false;
     bool in_route = false;
 
     slotGetTrajState(traj_name, is_busy, in_route);
 
-    emit sigGetTrajState(vehicle_idx, traj_name, request_type, is_busy, in_route);
+    if (is_busy || in_route)
+    {
+        emit sigGetTrajState(vehicle_idx, start_traj_name, traj_name, request_type, false);
+        return;
+    }
+
+    // Проверяем, возможен ли данный маршрут
+    auto* start_traj = traj_list.value(start_traj_name, nullptr);
+
+    if (start_traj == nullptr)
+    {
+        emit sigGetTrajState(vehicle_idx, start_traj_name, traj_name, request_type, false);
+        return;
+    }
+
+    auto* traj = traj_list.value(traj_name, nullptr);
+
+    if (traj == nullptr)
+    {
+        emit sigGetTrajState(vehicle_idx, start_traj_name, traj_name, request_type, false);
+        return;
+    }
+
+    auto route_seg = find_route(start_traj, traj, dir);
+
+    emit sigGetTrajState(vehicle_idx, start_traj_name, traj_name, request_type, !route_seg.trajectories.empty());
 }
 
 //------------------------------------------------------------------------------

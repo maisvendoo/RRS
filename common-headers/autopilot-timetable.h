@@ -56,6 +56,9 @@ struct autopilot_station_t
     /// Видимость станции в виджете отображения графика
     bool is_visible = true;
 
+    /// Требуется посылать запросы на построение маршрута на станцию
+    bool build_arr_route_request = false;
+
     QByteArray serialize()
     {
         QByteArray data;
@@ -86,6 +89,7 @@ struct autopilot_station_t
         stream << arr_delay;
         stream << dep_delay;
         stream << is_visible;
+        stream << build_arr_route_request;
 
         return data;
     }
@@ -119,6 +123,7 @@ struct autopilot_station_t
         stream >> arr_delay;
         stream >> dep_delay;
         stream >> is_visible;
+        stream >> build_arr_route_request;
     }
 };
 
