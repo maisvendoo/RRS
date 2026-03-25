@@ -335,6 +335,11 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
     }
 }
 
+vsg::vec3 Gizmo::get_curr_pos() const
+{
+    return curr_pos;
+}
+
 void Gizmo::update_visibility()
 {
     this->mask = context.selected_objects.empty()
