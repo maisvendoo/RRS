@@ -55,6 +55,7 @@ RouteObject::RouteObject(
     , context(context)
     , translation(translation)
     , rotation_deg(rotation_deg)
+    , paged_lod(paged_lod)
 {
     paged_lod_switch = SingleSwitch::create(
         vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
@@ -101,6 +102,11 @@ bool RouteObject::get_is_selected() const
 bool RouteObject::get_is_hidden() const
 {
     return is_hidden;
+}
+
+vsg::ref_ptr<vsg::PagedLOD> RouteObject::get_paged_lod() const
+{
+    return paged_lod;
 }
 
 void RouteObject::set_translation(vsg::vec3 translation)

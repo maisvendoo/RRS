@@ -11,6 +11,7 @@
 #include "MouseHandler.h"
 #include "MoveObjectsCommand.h"
 #include "RotateObjectsCommand.h"
+#include "Route.h"
 #include "RouteObject.h"
 #include "ScaleObjectsCommand.h"
 #include "SceneGraph.h"
@@ -63,9 +64,35 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         return keyboard_handler->get_binding_state(action);
     };
 
-    const bool pressed_action_move = get_binding_state(ACTION_MOVE_OBJECTS);
+    bool pressed_action_move = get_binding_state(ACTION_MOVE_OBJECTS);
     const bool pressed_action_rotate = get_binding_state(ACTION_ROTATE_OBJECTS);
     const bool pressed_action_scale = get_binding_state(ACTION_SCALE_OBJECTS);
+
+    if (get_binding_state(ACTION_COPY_OBJECTS))
+    {
+        context.copied_objects = selected_objects;
+        return;
+    }
+    else if (get_binding_state(ACTION_PASTE_OBJECTS))
+    {
+        // for (const RouteObject* const object : context.copied_objects)
+        // {
+        //     const auto new_object = RouteObject::create(context,
+        //         object->get_paged_lod(), object->label,
+        //         object->get_translation(), object->get_rotation_deg());
+
+        //     context.route->addChild(vsg::MASK_ALL, new_object);
+
+        //     context.objects.emplace_back(new_object);
+        // }
+
+        // const auto compile_result = context.viewer->compileManager->compile(
+        //     context.route);
+
+        // vsg::updateViewer(*context.viewer, compile_result);
+
+        // pressed_action_move = true;
+    }
 
     if (!pressed_action_move && !pressed_action_rotate &&
         !pressed_action_scale)

@@ -43,6 +43,8 @@ public:
     bool get_is_selected() const;
     bool get_is_hidden() const;
 
+    vsg::ref_ptr<vsg::PagedLOD> get_paged_lod() const;
+
     void set_translation(vsg::vec3 translation);
     void set_rotation_deg(vsg::vec3 rotation_deg);
     void set_scale(vsg::vec3 scale);
@@ -85,6 +87,7 @@ private:
     bool is_hidden = false;
 
     vsg::ref_ptr<SingleSwitch> paged_lod_switch;
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod;
     vsg::ref_ptr<SingleSwitch> outline_switch;
 };
 
