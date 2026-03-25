@@ -445,24 +445,26 @@ void Autopilot::calcTargetDistance()
     auto st = &timetable.stations[target_station_idx];
 
     // Если мы оказались на участке приближения
-    if (curr_traj_name == st->approach_traj && !st->is_build_arr_route)
+    if (curr_traj_name == st->approach_traj)
     {
-        // Не задан участок удаления
-        if (st->removal_traj.isEmpty())
+        // Включаем запросы на построение маршрута на станцию
+        st->build_arr_route_request = true;
+    }
+
+    // Маршрут приема надо строить, но он еще не построен
+    if (st->build_arr_route_request && !st->is_build_arr_route)
+    {
+        // Посылаем запрос статуса пути приема
+        emit sigGetTrajStateRequest(this->vehicle_idx, curr_traj_name, st->target_traj, target_dir, ARRIVAL_REQUEST);
+    }
+
+    // Если нужен сквозной пропуск и он еще не построен
+    if (st->arr_time == st->dep_time && !st->removal_traj.isEmpty())
+    {
+        // Если уже построен маршрут приема, но еще не построен маршрут пропуска
+        if (!st->is_build_dep_route && st->is_build_arr_route)
         {
-            // посылаем запрос статуса пути приема
-            emit sigGetTrajStateRequest(this->vehicle_idx, st->target_traj, ARRIVAL_REQUEST);
-        }
-        else if (st->arr_time == st->dep_time)
-        {
-            // посылаем запрос статуса участка удаления, с целью построить любой
-            // свободный маршрут пропуска
-            emit sigGetTrajStateRequest(this->vehicle_idx, st->removal_traj, APPROACH_REQUEST);
-        }
-        else
-        {
-            // посылаем запрос статуса пути приема
-            emit sigGetTrajStateRequest(this->vehicle_idx, st->target_traj, ARRIVAL_REQUEST);
+            emit sigGetTrajStateRequest(this->vehicle_idx, st->target_traj, st->removal_traj, target_dir, APPROACH_REQUEST);
         }
     }
 
@@ -581,7 +583,7 @@ void Autopilot::checkTimetable(double t, double dt)
         if (!st->removal_traj.isEmpty() && !st->is_build_dep_route)
         {
             // Запрос на проверку свободности маршрута отправления
-            emit sigGetTrajStateRequest(this->vehicle_idx, st->removal_traj, DEPARTURE_REQUEST);
+            emit sigGetTrajStateRequest(this->vehicle_idx, curr_traj_name, st->removal_traj, target_dir, DEPARTURE_REQUEST);
         }
     }
     else
@@ -829,7 +831,7 @@ void Autopilot::slotSetTimeForAutopilot(QString time)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Autopilot::slotGetTrajState(int vehicle_idx, QString traj_name, int request_type, bool is_busy, bool in_route)
+void Autopilot::slotGetTrajState(int vehicle_idx, QString start_traj_name, QString traj_name, int request_type, bool is_route_possible)
 {
     // Если данные не наши - выходим
     if (vehicle_idx != this->vehicle_idx)
@@ -844,34 +846,36 @@ void Autopilot::slotGetTrajState(int vehicle_idx, QString traj_name, int request
     }
 
     // Если указанная траектория занята или включена в другой маршрут - выходим
-    if (is_busy || in_route)
+    if (!is_route_possible)
     {
-        QString msg = QString("TIMETABLE PROCESS: trajectory %1 state: is_busy %2 in_route %3")
-            .arg(traj_name)
-            .arg(is_busy)
-            .arg(in_route);
+        QString msg = QString("TIMETABLE PROCESS: route from %1 to %2 is't possible")
+                          .arg(start_traj_name)
+                          .arg(traj_name);
 
         Journal::instance()->debug(msg);
 
         return;
     }
 
-    // Посылаем команду на построение маршрута
-    emit sigBuildTrainRoute(curr_traj_name, traj_name, target_dir);
-
     auto st = &timetable.stations[target_station_idx];
 
     switch (request_type)
     {
     case ARRIVAL_REQUEST:
+
+        emit sigBuildTrainRoute(start_traj_name, traj_name, target_dir);
         st->is_build_arr_route = true;
         break;
 
     case DEPARTURE_REQUEST:
+
+        emit sigBuildTrainRoute(start_traj_name, traj_name, target_dir);
         st->is_build_dep_route = true;
         break;
 
     case APPROACH_REQUEST:
+
+        emit sigBuildTrainRoute(st->target_traj, traj_name, target_dir);
         st->is_build_arr_route = st->is_build_dep_route = true;
         break;
 
