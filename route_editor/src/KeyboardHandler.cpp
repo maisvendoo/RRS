@@ -78,6 +78,11 @@ bool KeyboardHandler::get_binding_state(Action action) const
         return false;
     }
 
+    if (key_binding.modifiers == 0)
+    {
+        return true;
+    }
+
     // Walk through every binding's modifier and check it's keys
     // For example:
     // If binding's modifier = LShift + RShift, action will be performed
