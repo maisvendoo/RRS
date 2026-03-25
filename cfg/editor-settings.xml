@@ -83,10 +83,10 @@
     </GUI>
     <!-- Настройки клавиатурных комбинаций управления -->
     <Keys>
-        <MoveCameraForward>W</MoveCameraForward>
-        <MoveCameraBackward>S</MoveCameraBackward>
-        <MoveCameraLeft>A</MoveCameraLeft>
-        <MoveCameraRight>D</MoveCameraRight>
+        <MoveCameraForward>I</MoveCameraForward>
+        <MoveCameraBackward>K</MoveCameraBackward>
+        <MoveCameraLeft>J</MoveCameraLeft>
+        <MoveCameraRight>L</MoveCameraRight>
         <MoveObjects>G</MoveObjects>
         <RotateObjects>R</RotateObjects>
         <ScaleObjects>S</ScaleObjects>

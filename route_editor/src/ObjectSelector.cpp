@@ -12,6 +12,7 @@
 #include "MoveObjectsCommand.h"
 #include "RotateObjectsCommand.h"
 #include "RouteObject.h"
+#include "ScaleObjectsCommand.h"
 #include "SceneGraph.h"
 #include "SelectObjectsCommand.h"
 #include "SingleSwitch.h"
@@ -215,6 +216,30 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         }
         case State::KEYBOARD_SCALE:
         {
+            const vsg::vec3 gizmo_pos = context.gizmo->get_curr_pos();
+
+            if (world_intersection == gizmo_pos)
+            {
+                return;
+            }
+
+            const vsg::vec3 prev_vec = prev_intersect_pos - gizmo_pos;
+            const vsg::vec3 curr_vec = world_intersection - gizmo_pos;
+
+            prev_intersect_pos = world_intersection;
+
+            const float scale_value = vsg::length(curr_vec) /
+                vsg::length(prev_vec);
+
+            const vsg::vec3 scale = {scale_value, scale_value, scale_value};
+            total_scale *= scale;
+
+            for (RouteObject* const object : context.selected_objects)
+            {
+                object->scale_relative_to_pivot(gizmo_pos, scale,
+                    object->matrix);
+            }
+
             return;
         }
         default:
@@ -281,8 +306,11 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     prev_intersect_pos = static_cast<vsg::vec3>(
         intersection->worldIntersection);
 
+    intersector->intersections.clear();
+
     total_translation = {0.0f, 0.0f, 0.0f};
     total_rotation_rad = 0.0f;
+    total_scale = {1.0f, 1.0f, 1.0f};
 
     const auto compile_result = context.viewer->compileManager->compile(
         front_plane);
@@ -303,6 +331,10 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
     else if (pressed_action_rotate)
     {
         state = State::KEYBOARD_ROTATE;
+    }
+    else if (pressed_action_scale)
+    {
+        state = State::KEYBOARD_SCALE;
     }
 }
 
@@ -390,6 +422,9 @@ void ObjectSelector::confirm_keyboard_transformation()
         }
         case State::KEYBOARD_SCALE:
         {
+            context.commands.push(new ScaleObjectsCommand(context,
+                context.gizmo->get_curr_pos(), total_scale), false);
+
             break;
         }
         default:
