@@ -204,8 +204,11 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 
             for (RouteObject* const object : context.selected_objects)
             {
-                object->rotate_around_pivot(gizmo_pos, front,
-                    prev_acos - curr_acos, object->matrix);
+                const float rotation_rad = prev_acos - curr_acos;
+                total_rotation_rad += rotation_rad;
+
+                object->rotate_around_pivot(gizmo_pos, front, rotation_rad,
+                    object->matrix);
             }
 
             return;
@@ -279,6 +282,7 @@ void ObjectSelector::apply(vsg::FrameEvent& frame)
         intersection->worldIntersection);
 
     total_translation = {0.0f, 0.0f, 0.0f};
+    total_rotation_rad = 0.0f;
 
     const auto compile_result = context.viewer->compileManager->compile(
         front_plane);
@@ -374,6 +378,14 @@ void ObjectSelector::confirm_keyboard_transformation()
         }
         case State::KEYBOARD_ROTATE:
         {
+            context.commands.push(
+                new RotateObjectsCommand(
+                    context, context.gizmo->get_curr_pos(),
+                    context.camera_handler->get_front(), total_rotation_rad
+                ),
+                false
+            );
+
             break;
         }
         case State::KEYBOARD_SCALE:
