@@ -79,6 +79,7 @@ struct EditorContext
 
     RouteObjects objects;
     RouteObjects selected_objects;
+    RouteObjects copied_objects;
     RouteObjects hidden_objects;
 
     std::string route_dir;
