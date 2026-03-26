@@ -727,9 +727,9 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter,
             lens_state_t lens = line_signal->getAllLensState();
 
             std::vector<QColor> lens_colors;
-            lens_colors.emplace_back(lens[RED_LENS] ? QColor(255, 0, 0) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[RED_LENS] ? color_lens_red : color_lens_off);
+            lens_colors.emplace_back(lens[GREEN_LENS] ? color_lens_green : color_lens_off);
+            lens_colors.emplace_back(lens[YELLOW_LENS] ? color_lens_yellow : color_lens_off);
 
             drawSignal(line_signal, painter, lens_colors, cursor_pos, dist2_to_nearest_signal);
         }
@@ -746,11 +746,11 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter,
             lens_state_t lens = enter_signal->getAllLensState();
 
             std::vector<QColor> lens_colors;
-            lens_colors.emplace_back(lens[WHITE_LENS] ? QColor(255, 255, 196) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[BOTTOM_YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[RED_LENS] ? QColor(255, 0, 0) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[WHITE_LENS] ? color_lens_white : color_lens_off);
+            lens_colors.emplace_back(lens[BOTTOM_YELLOW_LENS] ? color_lens_yellow : color_lens_off);
+            lens_colors.emplace_back(lens[RED_LENS] ? color_lens_red : color_lens_off);
+            lens_colors.emplace_back(lens[GREEN_LENS] ? color_lens_green : color_lens_off);
+            lens_colors.emplace_back(lens[YELLOW_LENS] ? color_lens_yellow : color_lens_off);
 
             drawSignal(enter_signal, painter, lens_colors, cursor_pos, dist2_to_nearest_signal);
         }
@@ -767,11 +767,11 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter,
             lens_state_t lens = route_signal->getAllLensState();
 
             std::vector<QColor> lens_colors;
-            lens_colors.emplace_back(lens[WHITE_LENS] ? QColor(255, 255, 196) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[BOTTOM_YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[RED_LENS] ? QColor(255, 0, 0) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[WHITE_LENS] ? color_lens_white : color_lens_off);
+            lens_colors.emplace_back(lens[BOTTOM_YELLOW_LENS] ? color_lens_yellow : color_lens_off);
+            lens_colors.emplace_back(lens[RED_LENS] ? color_lens_red : color_lens_off);
+            lens_colors.emplace_back(lens[GREEN_LENS] ? color_lens_green : color_lens_off);
+            lens_colors.emplace_back(lens[YELLOW_LENS] ? color_lens_yellow : color_lens_off);
 
             drawSignal(route_signal, painter, lens_colors, cursor_pos, dist2_to_nearest_signal);
         }
@@ -788,10 +788,10 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter,
             lens_state_t lens = exit_signal->getAllLensState();
 
             std::vector<QColor> lens_colors;
-            lens_colors.emplace_back(lens[WHITE_LENS] ? QColor(255, 255, 196) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[RED_LENS] ? QColor(255, 0, 0) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[WHITE_LENS] ? color_lens_white : color_lens_off);
+            lens_colors.emplace_back(lens[RED_LENS] ? color_lens_red : color_lens_off);
+            lens_colors.emplace_back(lens[GREEN_LENS] ? color_lens_green : color_lens_off);
+            lens_colors.emplace_back(lens[YELLOW_LENS] ? color_lens_yellow : color_lens_off);
 
             drawSignal(exit_signal, painter, lens_colors, cursor_pos, dist2_to_nearest_signal);
         }
@@ -808,8 +808,8 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter,
             lens_state_t lens = shunt_signal->getAllLensState();
 
             std::vector<QColor> lens_colors;
-            lens_colors.emplace_back(lens[BLUE_LENS] ? QColor(0, 96, 255) : QColor(0, 0, 0));
-            lens_colors.emplace_back(lens[WHITE_LENS] ? QColor(255, 255, 196) : QColor(0, 0, 0));
+            lens_colors.emplace_back(lens[BLUE_LENS] ? color_lens_blue : color_lens_off);
+            lens_colors.emplace_back(lens[WHITE_LENS] ? color_lens_white : color_lens_off);
 
             drawSignal(shunt_signal, painter, lens_colors, cursor_pos, dist2_to_nearest_signal);
         }

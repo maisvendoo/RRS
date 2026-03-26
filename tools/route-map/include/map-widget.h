@@ -129,6 +129,19 @@ private:
     /// Другое направление стрелки при выборе пункта меню с переключением
     static constexpr QColor color_switch_other_selected = QColor(0, 128, 255);
 
+    /// Погашенная линза светофора
+    static constexpr QColor color_lens_off = QColor(0, 0, 0);
+    /// Красная линза светофора
+    static constexpr QColor color_lens_red = QColor(255, 0, 0);
+    /// Жёлтая линза светофора
+    static constexpr QColor color_lens_yellow = QColor(255, 255, 0);
+    /// Зелёная линза светофора
+    static constexpr QColor color_lens_green = QColor(0, 255, 0);
+    /// Лунно-белая линза светофора
+    static constexpr QColor color_lens_white = QColor(255, 255, 196);
+    /// Синяя линза светофора
+    static constexpr QColor color_lens_blue = QColor(0, 96, 255);
+
     /// Масштаб отображения карты
     double scale = 1.0;
 
