@@ -30,6 +30,10 @@ public:
 
     Trajectory* nearest_trajectory = nullptr;
 
+    Signal* nearest_signal = nullptr;
+
+    std::pair<QPoint, QPoint> nearest_signal_coord = {QPoint(0, 0), QPoint(0, 0)};
+
     Switch* nearest_switch = nullptr;
 
     std::int8_t nearest_switch_dir = 0;
@@ -50,9 +54,7 @@ public:
 
     signals_data_t *signals_data = nullptr;
 
-    QMap<QString, SignalLabel *> signal_labels_fwd;
-
-    QMap<QString, SignalLabel *> signal_labels_bwd;
+    QMap<Signal*, SignalLabel*> signal_labels;
 
     QMap<QString, QLabel *> traj_labels;
 
@@ -89,6 +91,8 @@ public:
 
 signals:
 
+    void sigOpenSignalMenu(Signal* nearest_signal);
+
     void sigOpenSwitchMenu(Switch* nearest_conn, std::int8_t nearest_switch_dir);
 
     void sigOpenTrajectoryMenu(Trajectory* nearest_traj);
@@ -124,6 +128,19 @@ private:
     static constexpr QColor color_switch_other = color_traj_free;
     /// Другое направление стрелки при выборе пункта меню с переключением
     static constexpr QColor color_switch_other_selected = QColor(0, 128, 255);
+
+    /// Погашенная линза светофора
+    static constexpr QColor color_lens_off = QColor(0, 0, 0);
+    /// Красная линза светофора
+    static constexpr QColor color_lens_red = QColor(255, 0, 0);
+    /// Жёлтая линза светофора
+    static constexpr QColor color_lens_yellow = QColor(255, 255, 0);
+    /// Зелёная линза светофора
+    static constexpr QColor color_lens_green = QColor(0, 255, 0);
+    /// Лунно-белая линза светофора
+    static constexpr QColor color_lens_white = QColor(255, 255, 196);
+    /// Синяя линза светофора
+    static constexpr QColor color_lens_blue = QColor(0, 96, 255);
 
     /// Масштаб отображения карты
     double scale = 1.0;
@@ -184,9 +201,11 @@ private:
 
     void drawStations(topology_stations_list_t *stations, QPainter& painter);
 
-    void drawSignals(signals_data_t *signals_data, QPainter& painter);
+    void drawSignals(signals_data_t *signals_data, QPainter& painter,
+                     QPointF& cursor_pos, double& dist2_to_nearest_signal);
 
-    void drawSignal(Signal* signal, QPainter& painter, std::vector<QColor> lens_colors);
+    void drawSignal(Signal* signal, QPainter& painter, std::vector<QColor> lens_colors,
+                    QPointF& cursor_pos, double& dist2_to_nearest_signal);
 
     void draw_triangle(QPainter& painter,
                        const QPointF& pointA, const QPointF& pointB, const QPointF& pointC,

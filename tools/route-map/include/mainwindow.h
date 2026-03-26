@@ -111,7 +111,7 @@ private slots:
 
     void slotSelectTrajectory(Trajectory* nearest_traj);
 
-    void slotSignalControlMenu();
+    void slotSignalControlMenu(Signal* sig);
 
     void slotMenuHide();
 
