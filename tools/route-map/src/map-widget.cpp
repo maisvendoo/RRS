@@ -1041,7 +1041,16 @@ void MapWidget::mouseReleaseEvent(QMouseEvent *event)
         }
         else
         {
-            emit sigSelectNearestTrajectory(nearest_trajectory);
+            if (nearest_signal)
+            {
+                dir_t dir = static_cast<dir_t>(-1 * nearest_signal->getDirection());
+                Trajectory* target_traj = nearest_signal->getConnector()->getNextTraj(dir);
+                emit sigSelectNearestTrajectory(target_traj);
+            }
+            else
+            {
+                emit sigSelectNearestTrajectory(nearest_trajectory);
+            }
         }
     }
 }

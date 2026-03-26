@@ -180,9 +180,13 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     if (!is_menu_shows)
     {
+        Trajectory* new_nearest_trajectory = nullptr;
         Signal* new_nearest_signal = map->nearest_signal;
         if (new_nearest_signal)
         {
+            dir_t dir = static_cast<dir_t>(-1 * new_nearest_signal->getDirection());
+            new_nearest_trajectory = new_nearest_signal->getConnector()->getNextTraj(dir);
+
             bg->nearest_signal = new_nearest_signal;
             bg->nearest_signal_coord = map->nearest_signal_coord;
 
@@ -192,6 +196,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
         else
         {
             bg->nearest_signal = nullptr;
+            new_nearest_trajectory = map->nearest_trajectory;
 
             Switch* new_nearest_switch = map->nearest_switch;
             if (new_nearest_switch && (map->nearest_switch_dir != 0))
@@ -205,7 +210,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
                 bg->nearest_switch_dir = 0;
             }
         }
-        Trajectory* new_nearest_trajectory = map->nearest_trajectory;
+
         if (route_begin_trajectory && new_nearest_trajectory && (route_dir != 0))
         {
             if (new_nearest_trajectory != bg->nearest_trajectory)
@@ -220,7 +225,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
         {
             bg->route_trajectories.clear();
         }
-        bg->nearest_trajectory = map->nearest_trajectory;
+        bg->nearest_trajectory = new_nearest_trajectory;
         bg->route_begin_trajectory = route_begin_trajectory;
     }
 
@@ -777,6 +782,15 @@ void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
 //------------------------------------------------------------------------------
 void MainWindow::slotSignalControlMenu(Signal* sig)
 {
+    if (route_begin_trajectory)
+    {
+        // Если уже строим маршрут, то заканчиваем строить маршрут до траектории перед светофором
+        dir_t dir = static_cast<dir_t>(-1 * sig->getDirection());
+        Trajectory* target_traj = sig->getConnector()->getNextTraj(dir);
+        slotSelectTrajectory(target_traj);
+        return;
+    }
+
     // Создаём меню для текстовой метки с литером светофора
     SignalLabel* signal_label = map->signal_labels.value(sig, nullptr);
     if (!signal_label)
