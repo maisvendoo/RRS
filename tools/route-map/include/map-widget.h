@@ -30,6 +30,8 @@ public:
 
     Trajectory* nearest_trajectory = nullptr;
 
+    Signal* nearest_signal = nullptr;
+
     Switch* nearest_switch = nullptr;
 
     std::int8_t nearest_switch_dir = 0;
@@ -50,9 +52,7 @@ public:
 
     signals_data_t *signals_data = nullptr;
 
-    QMap<QString, SignalLabel *> signal_labels_fwd;
-
-    QMap<QString, SignalLabel *> signal_labels_bwd;
+    QMap<Signal*, SignalLabel*> signal_labels;
 
     QMap<QString, QLabel *> traj_labels;
 
@@ -88,6 +88,8 @@ public:
     }
 
 signals:
+
+    void sigOpenSignalMenu(Signal* nearest_signal);
 
     void sigOpenSwitchMenu(Switch* nearest_conn, std::int8_t nearest_switch_dir);
 
@@ -184,9 +186,11 @@ private:
 
     void drawStations(topology_stations_list_t *stations, QPainter& painter);
 
-    void drawSignals(signals_data_t *signals_data, QPainter& painter);
+    void drawSignals(signals_data_t *signals_data, QPainter& painter,
+                     QPointF& cursor_pos, double& dist2_to_nearest_signal);
 
-    void drawSignal(Signal* signal, QPainter& painter, std::vector<QColor> lens_colors);
+    void drawSignal(Signal* signal, QPainter& painter, std::vector<QColor> lens_colors,
+                    QPointF& cursor_pos, double& dist2_to_nearest_signal);
 
     void draw_triangle(QPainter& painter,
                        const QPointF& pointA, const QPointF& pointB, const QPointF& pointC,

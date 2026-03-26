@@ -162,8 +162,10 @@ void MapWidget::paintEvent(QPaintEvent *event)
     const double limit_dist = 4.0 + 2.0 * scale;
     double dist2_to_nearest_trajectory = limit_dist * limit_dist;
     double dist2_to_nearest_switch = limit_dist * limit_dist;
+    double dist2_to_nearest_signal = limit_dist * limit_dist;
     nearest_trajectory = nullptr;
     nearest_switch = nullptr;
+    nearest_signal = nullptr;
     nearest_switch_dir = 0;
     QPointF mouse_pos_current = mapFromGlobal(QCursor::pos());
 
@@ -196,7 +198,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
         }
     }
 
-    drawSignals(signals_data, painter);
+    drawSignals(signals_data, painter, mouse_pos_current, dist2_to_nearest_signal);
 
     drawStations(stations, painter);
 
@@ -706,7 +708,8 @@ void MapWidget::drawStations(topology_stations_list_t* stations, QPainter& paint
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter)
+void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter,
+                            QPointF& cursor_pos, double& dist2_to_nearest_signal)
 {
     if (signals_data == nullptr)
     {
@@ -728,7 +731,7 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter)
             lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
             lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
 
-            drawSignal(line_signal, painter, lens_colors);
+            drawSignal(line_signal, painter, lens_colors, cursor_pos, dist2_to_nearest_signal);
         }
     }
 
@@ -749,7 +752,7 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter)
             lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
             lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
 
-            drawSignal(enter_signal, painter, lens_colors);
+            drawSignal(enter_signal, painter, lens_colors, cursor_pos, dist2_to_nearest_signal);
         }
     }
 
@@ -770,7 +773,7 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter)
             lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
             lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
 
-            drawSignal(route_signal, painter, lens_colors);
+            drawSignal(route_signal, painter, lens_colors, cursor_pos, dist2_to_nearest_signal);
         }
     }
 
@@ -790,7 +793,7 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter)
             lens_colors.emplace_back(lens[GREEN_LENS] ? QColor(0, 255, 0) : QColor(0, 0, 0));
             lens_colors.emplace_back(lens[YELLOW_LENS] ? QColor(255, 255, 0) : QColor(0, 0, 0));
 
-            drawSignal(exit_signal, painter, lens_colors);
+            drawSignal(exit_signal, painter, lens_colors, cursor_pos, dist2_to_nearest_signal);
         }
     }
 
@@ -808,7 +811,7 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter)
             lens_colors.emplace_back(lens[BLUE_LENS] ? QColor(0, 96, 255) : QColor(0, 0, 0));
             lens_colors.emplace_back(lens[WHITE_LENS] ? QColor(255, 255, 196) : QColor(0, 0, 0));
 
-            drawSignal(shunt_signal, painter, lens_colors);
+            drawSignal(shunt_signal, painter, lens_colors, cursor_pos, dist2_to_nearest_signal);
         }
     }
 }
@@ -816,7 +819,8 @@ void MapWidget::drawSignals(signals_data_t *signals_data, QPainter& painter)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor> lens_colors)
+void MapWidget::drawSignal(Signal* signal, QPainter& painter, std::vector<QColor> lens_colors,
+                           QPointF& cursor_pos, double& dist2_to_nearest_signal)
 {
     Switch* sw = signal->getConnector();
     if (sw == nullptr)
@@ -827,25 +831,16 @@ void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor
     switch_coord_t sc = switch_coords.value(sw->getName());
 
     dvec3 bottom_signal_pos = sc.center;
-    SignalLabel *signal_label = nullptr;
-
-    if (signal->getDirection() < 0)
-    {
-        signal_label = signal_labels_bwd.value(sw->getName(), nullptr);
-    }
-    else
-    {
-        signal_label = signal_labels_fwd.value(sw->getName(), nullptr);
-    }
+    SignalLabel* signal_label = signal_labels.value(signal, nullptr);
 
     bottom_signal_pos += sc.trav * (signal_offset * signal->getDirection());
     double signed_r = signal_radius * signal->getDirection();
     int r = std::round(signal_radius * scale);
 
-    dvec3 label_pos = bottom_signal_pos + sc.orth * ((2 * lens_colors.size() + 3) * signed_r);
+    dvec3 pos = bottom_signal_pos + sc.orth * ((2 * lens_colors.size() + 3) * signed_r);
     if (signal_label != nullptr)
     {
-        QPoint label_p = coord_transform(label_pos);
+        QPoint label_p = coord_transform(pos);
         label_p.setX(label_p.x() - signal_label->width() / 2);
         label_p.setY(label_p.y() - signal_label->height() / 2);
 
@@ -856,10 +851,11 @@ void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor
     QPen pen;
     pen.setWidth((scale > 5.0) ? 2 : 1);
     painter.setPen(pen);
+    QPoint lens_point;
     for (size_t i = 1; i <= lens_colors.size(); ++i)
     {
-        dvec3 lens_pos = bottom_signal_pos + sc.orth * (2 * i * signed_r);
-        QPoint lens_point = coord_transform(lens_pos);
+        pos = bottom_signal_pos + sc.orth * (2 * i * signed_r);
+        lens_point = coord_transform(pos);
         painter.setBrush(lens_colors[i - 1]);
         painter.drawEllipse(lens_point, r, r);
     }
@@ -873,6 +869,13 @@ void MapWidget::drawSignal(Signal *signal, QPainter& painter, std::vector<QColor
     painter.setPen(pen);
     painter.drawLine(bottom_down, bottom_up);
     painter.drawLine(bottom_left, bottom_right);
+
+    double distance2 = distance2_pos_to_line_segment(cursor_pos, bottom_up, lens_point);
+    if (dist2_to_nearest_signal > distance2)
+    {
+        dist2_to_nearest_signal = distance2;
+        nearest_signal = signal;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -1009,14 +1012,18 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
 
     if (event->button() == Qt::RightButton)
     {
+        if (nearest_signal)
+        {
+            emit sigOpenSignalMenu(nearest_signal);
+            return;
+        }
         if (nearest_switch)
         {
             emit sigOpenSwitchMenu(nearest_switch, nearest_switch_dir);
+            return;
         }
-        else
-        {
-            emit sigOpenTrajectoryMenu(nearest_trajectory);
-        }
+
+        emit sigOpenTrajectoryMenu(nearest_trajectory);
     }
 }
 

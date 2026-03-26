@@ -36,6 +36,6 @@ void SignalLabel::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::RightButton)
     {
-        emit popUpMenu();
+        emit popUpMenu(signal);
     }
 }

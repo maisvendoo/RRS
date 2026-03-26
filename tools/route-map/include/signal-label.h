@@ -32,7 +32,7 @@ public:
 
 signals:
 
-    void popUpMenu();
+    void popUpMenu(Signal* signal);
 
 public slots:
 
