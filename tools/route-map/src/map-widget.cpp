@@ -159,7 +159,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
-    const double limit_dist = 4.0 + 2.0 * scale;
+    const double limit_dist = underMouse() ? (4.0 + 2.0 * scale) : 0.0;
     double dist2_to_nearest_trajectory = limit_dist * limit_dist;
     double dist2_to_nearest_switch = limit_dist * limit_dist;
     double dist2_to_nearest_signal = limit_dist * limit_dist;
@@ -870,10 +870,24 @@ void MapWidget::drawSignal(Signal* signal, QPainter& painter, std::vector<QColor
     painter.drawLine(bottom_down, bottom_up);
     painter.drawLine(bottom_left, bottom_right);
 
-    double distance2 = distance2_pos_to_line_segment(cursor_pos, bottom_up, lens_point);
-    if (dist2_to_nearest_signal > distance2)
+    bool nearest = false;
+    if (signal_label && signal_label->underMouse())
     {
-        dist2_to_nearest_signal = distance2;
+        nearest = true;
+        dist2_to_nearest_signal = 0.0;
+    }
+    else
+    {
+        double distance2 = distance2_pos_to_line_segment(cursor_pos, bottom_up, lens_point);
+        if (dist2_to_nearest_signal > distance2)
+        {
+            nearest = true;
+            dist2_to_nearest_signal = distance2;
+        }
+    }
+
+    if (nearest)
+    {
         nearest_signal = signal;
         nearest_signal_coord = {bottom_up, lens_point};
     }
