@@ -1755,10 +1755,15 @@ void Topology::slotGetRouteLength(int vehicle_idx, QString cur_traj_name, double
 //------------------------------------------------------------------------------
 void Topology::slotGetTrajStateRequest(int vehicle_idx, QString start_traj_name, QString traj_name, int dir, int request_type)
 {
-    QString msg = QString("TIMETABLE PROCESS: vehicle #%1 request from %2 to %3 build route")
+    QString request_name = "";
+
+    request_type == 0 ? request_name = "ARRIVAL" : "DEPARTURE";
+
+    QString msg = QString("TIMETABLE PROCESS: vehicle #%1 request from %2 to %3 build %4 route")
                       .arg(vehicle_idx)
                       .arg(start_traj_name)
-                      .arg(traj_name);
+                      .arg(traj_name)
+                      .arg(request_name);
 
     Journal::instance()->debug(msg);
 
