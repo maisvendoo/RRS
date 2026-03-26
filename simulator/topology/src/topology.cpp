@@ -1757,7 +1757,7 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, QString start_traj_name,
 {
     QString request_name = "";
 
-    request_type == 0 ? request_name = "ARRIVAL" : "DEPARTURE";
+    request_type == 0 ? request_name = "ARRIVAL" : request_name = "DEPARTURE";
 
     QString msg = QString("TIMETABLE PROCESS: vehicle #%1 request from %2 to %3 build %4 route")
                       .arg(vehicle_idx)

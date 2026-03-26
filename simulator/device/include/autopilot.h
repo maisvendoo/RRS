@@ -25,6 +25,7 @@ public:
         connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);
         connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);
         connect(sound_signal_timer, &Timer::process, this, &Autopilot::slotSoundSignal);
+        connect(routeBuildRequest, &Timer::process, this, &Autopilot::slotRouteBuildRequest);
     }
 
     ~Autopilot()
@@ -422,6 +423,9 @@ protected:
         is_motion_allowed = is_allowed;
     }
 
+    const double ROUTE_BUILD_REQUEST_DELAY = 5.0;
+    Timer *routeBuildRequest = new Timer(ROUTE_BUILD_REQUEST_DELAY, false);
+
 public slots:
 
     void slotSetBrakeAccel(double a_brake);
@@ -450,6 +454,8 @@ private slots:
     void slotSandTimer();
 
     void slotSoundSignal();
+
+    void slotRouteBuildRequest();
 };
 
 //------------------------------------------------------------------------------
