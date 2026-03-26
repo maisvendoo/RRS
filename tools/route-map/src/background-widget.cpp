@@ -41,13 +41,17 @@ void BackGroundWidget::paintEvent(QPaintEvent *event)
         drawTrajectoryHighlight(painter, traj, color_route);
     }
 
-    // Ближайшая к курсору стрелка
-    if (!drawSwitchHighlight(painter, nearest_switch, nearest_switch_dir, color_nearest))
+    // Ближайший к курсору светофор
+    if (!drawSignalHighlight(painter, nearest_signal, color_nearest))
     {
-        // Или ближайшая к курсору траектория
-        if (nearest_trajectory != route_begin_trajectory)
+        // Ближайшая к курсору стрелка
+        if (!drawSwitchHighlight(painter, nearest_switch, nearest_switch_dir, color_nearest))
         {
-            drawTrajectoryHighlight(painter, nearest_trajectory, color_nearest);
+            // Или ближайшая к курсору траектория
+            if (nearest_trajectory != route_begin_trajectory)
+            {
+                drawTrajectoryHighlight(painter, nearest_trajectory, color_nearest);
+            }
         }
     }
 
@@ -65,17 +69,8 @@ bool BackGroundWidget::drawTrajectoryHighlight(QPainter &painter, Trajectory *tr
     }
 
     float max_width = std::ceil(static_cast<float>(scale)) + 3.0f;
-    float width = max_width;
     std::vector<QPen> higlight_pens;
-    while (width >= 0.0f)
-    {
-        QPen pen;
-        pen.setWidth(width * 2.0f + 3.0f);
-        pen.setColor(mix_color(color_background, highlight, (width / max_width)));
-        pen.setCapStyle(Qt::RoundCap);
-        higlight_pens.push_back(pen);
-        width -= 1.0f;
-    }
+    initHighlightPens(higlight_pens, color_background, highlight, max_width);
 
     for (auto& pen : higlight_pens)
     {
@@ -86,6 +81,28 @@ bool BackGroundWidget::drawTrajectoryHighlight(QPainter &painter, Trajectory *tr
             QPoint p1 = coord_transform(track.end_point);
             painter.drawLine(p0, p1);
         }
+    }
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool BackGroundWidget::drawSignalHighlight(QPainter &painter, Signal *sig, QColor highlight)
+{
+    if (!sig)
+    {
+        return false;
+    }
+
+    float max_width = std::ceil(signal_radius * scale) + 3.0f;
+    std::vector<QPen> higlight_pens;
+    initHighlightPens(higlight_pens, color_background, highlight, max_width);
+
+    for (auto& pen : higlight_pens)
+    {
+        painter.setPen(pen);
+        painter.drawLine(nearest_signal_coord.first, nearest_signal_coord.second);
     }
     return true;
 }
@@ -110,17 +127,8 @@ bool BackGroundWidget::drawSwitchHighlight(QPainter& painter, Switch* conn, std:
     }
 
     float max_width = std::ceil(static_cast<float>(scale)) + 3.0f;
-    float width = max_width;
     std::vector<QPen> higlight_pens;
-    while (width >= 0.0f)
-    {
-        QPen pen;
-        pen.setWidth(width * 2.0f + 3.0f);
-        pen.setColor(mix_color(color_background, highlight, (width / max_width)));
-        pen.setCapStyle(Qt::RoundCap);
-        higlight_pens.push_back(pen);
-        width -= 1.0f;
-    }
+    initHighlightPens(higlight_pens, color_background, highlight, max_width);
 
     for (auto& pen : higlight_pens)
     {
@@ -222,4 +230,23 @@ QColor BackGroundWidget::mix_color(QColor color1, QColor color2, float mix_ratio
     result.setGreenF(color1.greenF() * mix_ratio + color2.greenF() * (1.0f - mix_ratio));
     result.setBlueF (color1.blueF()  * mix_ratio + color2.blueF()  * (1.0f - mix_ratio));
     return result;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void BackGroundWidget::initHighlightPens(std::vector<QPen>& higlight_pens,
+                                         const QColor& background, const QColor& highlight,
+                                         const float max_width)
+{
+    float width = max_width;
+    while (width >= 0.0f)
+    {
+        QPen pen;
+        pen.setWidth(width * 2.0f + 3.0f);
+        pen.setColor(mix_color(background, highlight, (width / max_width)));
+        pen.setCapStyle(Qt::RoundCap);
+        higlight_pens.push_back(pen);
+        width -= 1.0f;
+    }
 }

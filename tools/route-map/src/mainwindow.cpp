@@ -141,6 +141,7 @@ void MainWindow::load_config(const QString &cfg_name)
     if (tmp_value > Physics::ZERO)
     {
         map->setSignalRadius(tmp_value);
+        bg->setSignalRadius(tmp_value);
     }
 
     tmp_value = 0.0;
@@ -179,16 +180,30 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     if (!is_menu_shows)
     {
-        Switch* new_nearest_switch = map->nearest_switch;
-        if (new_nearest_switch && (map->nearest_switch_dir != 0))
+        Signal* new_nearest_signal = map->nearest_signal;
+        if (new_nearest_signal)
         {
-            bg->nearest_switch = new_nearest_switch;
-            bg->nearest_switch_dir = map->nearest_switch_dir;
+            bg->nearest_signal = new_nearest_signal;
+            bg->nearest_signal_coord = map->nearest_signal_coord;
+
+            bg->nearest_switch = nullptr;
+            bg->nearest_switch_dir = 0;
         }
         else
         {
-            bg->nearest_switch = nullptr;
-            bg->nearest_switch_dir = 0;
+            bg->nearest_signal = nullptr;
+
+            Switch* new_nearest_switch = map->nearest_switch;
+            if (new_nearest_switch && (map->nearest_switch_dir != 0))
+            {
+                bg->nearest_switch = new_nearest_switch;
+                bg->nearest_switch_dir = map->nearest_switch_dir;
+            }
+            else
+            {
+                bg->nearest_switch = nullptr;
+                bg->nearest_switch_dir = 0;
+            }
         }
         Trajectory* new_nearest_trajectory = map->nearest_trajectory;
         if (route_begin_trajectory && new_nearest_trajectory && (route_dir != 0))

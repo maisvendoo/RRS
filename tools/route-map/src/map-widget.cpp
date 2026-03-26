@@ -875,6 +875,7 @@ void MapWidget::drawSignal(Signal* signal, QPainter& painter, std::vector<QColor
     {
         dist2_to_nearest_signal = distance2;
         nearest_signal = signal;
+        nearest_signal_coord = {bottom_up, lens_point};
     }
 }
 

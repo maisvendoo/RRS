@@ -32,6 +32,8 @@ public:
 
     Signal* nearest_signal = nullptr;
 
+    std::pair<QPoint, QPoint> nearest_signal_coord = {QPoint(0, 0), QPoint(0, 0)};
+
     Switch* nearest_switch = nullptr;
 
     std::int8_t nearest_switch_dir = 0;
