@@ -123,7 +123,7 @@ signals:
     void sigBuildTrainRoute(QString start_traj, QString target_traj, int dir);
 
     /// Запрос состояния траектории, куда предполагается строить маршрут приема/отправления
-    void sigGetTrajStateRequest(int vehicle_idx, QString start_traj_name, QString traj_name, int dir, int request_type);
+    void sigGetTrajStateRequest(int vehicle_idx, int station_idx, QString start_traj_name, QString traj_name, int dir, int request_type);
 
 protected:
 
@@ -442,6 +442,7 @@ public slots:
 
     /// Слот для приема состояния траектории по запросу
     void slotGetTrajState(int vehicle_idx,
+                          int station_idx,
                           QString start_traj_name,
                           QString traj_name,
                           int request_type,

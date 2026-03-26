@@ -106,6 +106,7 @@ signals:
     void sigCalcMiddleVelocity(int vehicle_idx, double target_dist);
 
     void sigGetTrajState(int vehicle_idx,
+                         int station_idx,
                          QString start_traj_name,
                          QString traj_name,
                          int request_type,
@@ -189,7 +190,7 @@ public slots:
                             int dir,
                             double *lenght);
 
-    void slotGetTrajStateRequest(int vehicle_idx, QString start_traj_name, QString traj_name, int dir, int request_type);
+    void slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString start_traj_name, QString traj_name, int dir, int request_type);
 
 private slots:
 
