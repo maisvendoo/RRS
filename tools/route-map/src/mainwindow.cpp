@@ -798,6 +798,20 @@ void MainWindow::slotSignalControlMenu(Signal* sig)
     QMenu* menu = new QMenu(this);
     signal_label->menu = menu;
 
+    // Создаём пункт меню для построения маршрута от светофора
+    QAction *build_route = new QAction(tr("Build route..."), this);
+    menu->addAction(build_route);
+
+    signal_label->action_build_route = build_route;
+    connect(build_route, &QAction::triggered, signal_label, &SignalLabel::resetMenu);
+
+    // Создаём команду маршрута от траектории перед светофором в направлении этого светофора
+    connect(build_route, &QAction::triggered, this, [this, sig]{
+        dir_t dir = static_cast<dir_t>(-1 * sig->getDirection());
+        route_begin_trajectory = sig->getConnector()->getNextTraj(dir);
+        route_dir = -1 * dir;
+    });
+
     if (signal_label->need_train)
     {
         // Создаём пункт меню для открытия сигнала поездным маршрутом

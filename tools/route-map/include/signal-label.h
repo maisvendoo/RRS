@@ -21,6 +21,7 @@ public:
 
     QMenu* menu = nullptr;
 
+    QAction* action_build_route = nullptr;
     QAction* action_open_train = nullptr;
     QAction* action_open_shunting = nullptr;
     QAction* action_open_call = nullptr;
