@@ -356,7 +356,8 @@ void Autopilot::slotInitTimeTable()
 
     if (curr_traj_name != prev_traj_name)
     {
-        Journal::instance()->debug("TIMETABLE PROCESS: Current trajectory is " + curr_traj_name);
+        QString msg = QString("TIMETABLE PROCESS: vehicle #%1 current trajectory is %2").arg(vehicle_idx).arg(curr_traj_name);
+        Journal::instance()->debug(msg);
         prev_traj_name = curr_traj_name;
     }
 
@@ -447,16 +448,18 @@ void Autopilot::calcTargetDistance()
     //prev_traj_coord = curr_traj_coord;
     emit sigGetVehicleTrajPosition(&curr_traj_name, &curr_traj_coord);
 
+    // Сообщаем в лог текущую траекторию
     if (curr_traj_name != prev_traj_name)
     {
-        Journal::instance()->debug("TIMETABLE PROCESS: Current trajectory is " + curr_traj_name);
+        QString msg = QString("TIMETABLE PROCESS: vehicle #%1 current trajectory is %2").arg(vehicle_idx).arg(curr_traj_name);
+        Journal::instance()->debug(msg);
         prev_traj_name = curr_traj_name;
     }
 
     auto st = &timetable.stations[target_station_idx];
 
     // Если мы оказались на участке приближения
-    if (curr_traj_name == st->approach_traj)
+    if (curr_traj_name == st->approach_traj && !st->approach_traj.isEmpty())
     {
         // Включаем запросы на построение маршрута на станцию
         st->build_arr_route_request = true;
@@ -479,7 +482,7 @@ void Autopilot::calcTargetDistance()
         }
     }
 
-    // ОПределяем дистанцию до станции-цели
+    // Определяем дистанцию до станции-цели
     emit sigGetRouteLength(vehicle_idx, curr_traj_name, curr_traj_coord,
                            timetable.stations[target_station_idx].target_traj,
                            timetable.stations[target_station_idx].coord,
@@ -859,9 +862,10 @@ void Autopilot::slotGetTrajState(int vehicle_idx, QString start_traj_name, QStri
     // Если указанная траектория занята или включена в другой маршрут - выходим
     if (!is_route_possible)
     {
-        QString msg = QString("TIMETABLE PROCESS: route from %1 to %2 is't possible")
+        QString msg = QString("TIMETABLE PROCESS: vehicle #%3 route from %1 to %2 is't possible")
                           .arg(start_traj_name)
-                          .arg(traj_name);
+                          .arg(traj_name)
+                          .arg(vehicle_idx);
 
         Journal::instance()->debug(msg);
 
@@ -874,23 +878,16 @@ void Autopilot::slotGetTrajState(int vehicle_idx, QString start_traj_name, QStri
     {
     case ARRIVAL_REQUEST:
 
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: try build route from %1 to %2").arg(start_traj_name).arg(traj_name));
+        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%3 try build route from %1 to %2").arg(start_traj_name).arg(traj_name).arg(vehicle_idx));
         emit sigBuildTrainRoute(start_traj_name, traj_name, target_dir);
         st->is_build_arr_route = true;
         break;
 
     case DEPARTURE_REQUEST:
 
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: try build route from %1 to %2").arg(start_traj_name).arg(traj_name));
+        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%3 try build route from %1 to %2").arg(start_traj_name).arg(traj_name).arg(vehicle_idx));
         emit sigBuildTrainRoute(start_traj_name, traj_name, target_dir);
         st->is_build_dep_route = true;
-        break;
-
-    case APPROACH_REQUEST:
-
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: try build route from %1 to %2").arg(st->target_traj).arg(traj_name));
-        emit sigBuildTrainRoute(st->target_traj, traj_name, target_dir);
-        st->is_build_arr_route = st->is_build_dep_route = true;
         break;
 
     default:

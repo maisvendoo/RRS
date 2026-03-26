@@ -129,8 +129,7 @@ protected:
     enum
     {
         ARRIVAL_REQUEST,
-        DEPARTURE_REQUEST,
-        APPROACH_REQUEST
+        DEPARTURE_REQUEST
     };
 
     /// Признак активации
