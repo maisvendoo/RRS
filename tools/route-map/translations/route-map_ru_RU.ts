@@ -9,22 +9,27 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="45"/>
+        <location filename="../forms/mainwindow.ui" line="46"/>
         <source>Stations</source>
         <translation>Станции</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="50"/>
+        <location filename="../forms/mainwindow.ui" line="51"/>
         <source>View</source>
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="64"/>
+        <location filename="../forms/mainwindow.ui" line="58"/>
+        <source>Trains</source>
+        <translation>Поезда</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="70"/>
         <source>Show trajectories names</source>
         <translation>Показать имена траекторий</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="72"/>
+        <location filename="../forms/mainwindow.ui" line="78"/>
         <source>Show connectors names</source>
         <translation>Показать имена стрелок и стыков</translation>
     </message>
@@ -237,12 +242,12 @@
         <translation>Скрыты имена стрелок и стыков</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1075"/>
+        <location filename="../src/mainwindow.cpp" line="1086"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1083"/>
+        <location filename="../src/mainwindow.cpp" line="1094"/>
         <source>Enter train name</source>
         <translation>Введите имя поезда</translation>
     </message>
