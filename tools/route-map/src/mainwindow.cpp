@@ -1032,6 +1032,7 @@ void MainWindow::slotSetShowConnStatus(bool is_show)
 void MainWindow::slotGetTrainsInfo(QByteArray &data)
 {
     simulator_trains_update_t update_trains;
+
     update_trains.deserialize(data);
 
     for (auto tl : map->train_labels)
@@ -1060,6 +1061,16 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
         connect(train_label, &TrainLabel::popUpMenu, this, &MainWindow::slotRenameTrainMenu);
 
         map->train_labels.push_back(train_label);
+
+        QAction *action_train = new QAction(train_name);
+        ui->mTrains->addAction(action_train);
+
+        MapWidget *mw = map;
+        int vehicle_idx = update_trains.trains[i].first_vehicle_id;
+
+        connect(action_train, &QAction::triggered, this, [mw, vehicle_idx]{
+            mw->slotSetVehicleAtCenter(vehicle_idx);
+        });
     }
 }
 

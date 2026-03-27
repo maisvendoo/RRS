@@ -75,7 +75,7 @@ private:
 
     MapWidget *map;
 
-    signals_data_t *signals_data = new signals_data_t();
+    signals_data_t *signals_data = new signals_data_t();    
 
     void load_config(const QString &cfg_name);
 

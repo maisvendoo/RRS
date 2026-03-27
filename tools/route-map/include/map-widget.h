@@ -69,6 +69,8 @@ public:
         std::int8_t switch_dir = 0;
     } switch_menu;
 
+    int current_vehicle = 0;
+
     void resize(int width, int height);
 
     void setSwitchLength(double value);
@@ -104,6 +106,8 @@ public slots:
     void slotStationAtCenter(int idx);
 
     void slotPlayerAtCenter(int idx);
+
+    void slotSetVehicleAtCenter(int idx);
 
     void resetSwitchMenu();
 
