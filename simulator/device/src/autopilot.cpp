@@ -889,13 +889,6 @@ void Autopilot::slotGetTrajState(int vehicle_idx, int station_idx, QString start
     // Если указанная траектория занята или включена в другой маршрут - выходим
     if (!is_route_possible)
     {
-        QString msg = QString("TIMETABLE PROCESS: vehicle #%3 route from %1 to %2 is't possible")
-                          .arg(start_traj_name)
-                          .arg(traj_name)
-                          .arg(vehicle_idx);
-
-        Journal::instance()->debug(msg);
-
         return;
     }
 

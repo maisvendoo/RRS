@@ -1775,6 +1775,16 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString
 
     if (is_busy || in_route)
     {
+        if (is_busy)
+        {
+            Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 target trajectory %2 is busy").arg(vehicle_idx).arg(traj_name));
+        }
+
+        if (in_route)
+        {
+            Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 target trajectory %2 is in other route").arg(vehicle_idx).arg(traj_name));
+        }
+
         emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, false);
         return;
     }
@@ -1782,8 +1792,9 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString
     // Проверяем, возможен ли данный маршрут
     auto* start_traj = traj_list.value(start_traj_name, nullptr);
 
-    if (start_traj == nullptr)
+    if (start_traj == nullptr)        
     {
+        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 start trajectory %2 not exists").arg(vehicle_idx).arg(start_traj_name));
         emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, false);
         return;
     }
@@ -1792,11 +1803,17 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString
 
     if (traj == nullptr)
     {
+        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 target trajectory %2 not exists").arg(vehicle_idx).arg(traj_name));
         emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, false);
         return;
     }
 
     auto route_seg = find_route(start_traj, traj, dir);
+
+    if (route_seg.trajectories.empty())
+    {
+        Journal::instance()->debug(QString("TIMETABLE PROCESS: route is not available for vehicle #%1").arg(vehicle_idx));
+    }
 
     emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, !route_seg.trajectories.empty());
 }
