@@ -604,20 +604,7 @@ void Autopilot::doors_control(double t, double dt)
         return;
     }
 
-    auto st = &timetable.stations[target_station_idx];
-
-    if (st->is_arrival && feedback->v_cur < 0.1)
-    {
-        if (st->is_left_platform)
-        {
-            openLeftDoors();
-        }
-
-        if (st->is_right_platform)
-        {
-            openRightDoors();
-        }
-    }
+    auto st = &timetable.stations[target_station_idx];    
 
     if (t >= st->dep_time_sec)
     {
@@ -629,6 +616,18 @@ void Autopilot::doors_control(double t, double dt)
         if (st->is_right_platform)
         {
             closeRightDoors();
+        }
+    }
+    else if (st->is_arrival && feedback->v_cur < 0.1)
+    {
+        if (st->is_left_platform)
+        {
+            openLeftDoors();
+        }
+
+        if (st->is_right_platform)
+        {
+            openRightDoors();
         }
     }
 }
