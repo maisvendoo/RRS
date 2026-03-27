@@ -1,5 +1,6 @@
 #include "MoveObjectsCommand.h"
 
+#include "Command.h"
 #include "EditorContext.h"
 #include "RouteObject.h"
 #include "TransformObjectsCommand.h"

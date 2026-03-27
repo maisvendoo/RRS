@@ -4,7 +4,11 @@
 #include "Command.h"
 #include "RouteObjects.h"
 
-class PasteObjectsCommand : Command
+#include <vsg/core/ref_ptr.h>
+
+#include <map>
+
+class PasteObjectsCommand : public Command
 {
 public:
     explicit PasteObjectsCommand(EditorContext& context);
@@ -15,21 +19,8 @@ public:
 
 private:
     const RouteObjects objects_to_paste;
-    RouteObjects pasted_objects;
+    std::map<RouteObject*, vsg::ref_ptr<RouteObject>> pasted_objects;
     const RouteObjects objects_to_deselect;
 };
-
-// Копирование
-// Создаем новые объекты на основе старых,
-// добавляем их к Route,
-// делаем updateViewer,
-// снимаем выделение с уже выбранных объектов,
-// выделяем новые
-
-// Отмена
-// Снимаем выделение с новых объектов,
-// выделяем старые,
-// удаляем модели из Route и вообще,
-// делаем updateViewer
 
 #endif // PASTE_OBJECTS_COMMAND_H
