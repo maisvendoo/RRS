@@ -1753,12 +1753,17 @@ void Topology::slotGetRouteLength(int vehicle_idx, QString cur_traj_name, double
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotGetTrajStateRequest(int vehicle_idx, QString start_traj_name, QString traj_name, int dir, int request_type)
+void Topology::slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString start_traj_name, QString traj_name, int dir, int request_type)
 {
-    QString msg = QString("TIMETABLE PROCESS: request vehicle #%1 from %2 to %3 build route")
-                      .arg(vehicle_idx, 4)
+    QString request_name = "";
+
+    request_type == 0 ? request_name = "ARRIVAL" : request_name = "DEPARTURE";
+
+    QString msg = QString("TIMETABLE PROCESS: vehicle #%1 request from %2 to %3 build %4 route")
+                      .arg(vehicle_idx)
                       .arg(start_traj_name)
-                      .arg(traj_name);
+                      .arg(traj_name)
+                      .arg(request_name);
 
     Journal::instance()->debug(msg);
 
@@ -1770,7 +1775,7 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, QString start_traj_name,
 
     if (is_busy || in_route)
     {
-        emit sigGetTrajState(vehicle_idx, start_traj_name, traj_name, request_type, false);
+        emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, false);
         return;
     }
 
@@ -1779,7 +1784,7 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, QString start_traj_name,
 
     if (start_traj == nullptr)
     {
-        emit sigGetTrajState(vehicle_idx, start_traj_name, traj_name, request_type, false);
+        emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, false);
         return;
     }
 
@@ -1787,13 +1792,13 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, QString start_traj_name,
 
     if (traj == nullptr)
     {
-        emit sigGetTrajState(vehicle_idx, start_traj_name, traj_name, request_type, false);
+        emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, false);
         return;
     }
 
     auto route_seg = find_route(start_traj, traj, dir);
 
-    emit sigGetTrajState(vehicle_idx, start_traj_name, traj_name, request_type, !route_seg.trajectories.empty());
+    emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, !route_seg.trajectories.empty());
 }
 
 //------------------------------------------------------------------------------

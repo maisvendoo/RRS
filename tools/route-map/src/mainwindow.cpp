@@ -72,6 +72,9 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     map->vehicles_half_length = &vehicles_half_length;
     map->players_data = &players_data;
 
+    connect(map, &MapWidget::sigOpenSignalMenu,
+            this, &MainWindow::slotSignalControlMenu);
+
     connect(map, &MapWidget::sigOpenSwitchMenu,
             this, &MainWindow::slotNearestSwitchMenu);
 
@@ -138,6 +141,7 @@ void MainWindow::load_config(const QString &cfg_name)
     if (tmp_value > Physics::ZERO)
     {
         map->setSignalRadius(tmp_value);
+        bg->setSignalRadius(tmp_value);
     }
 
     tmp_value = 0.0;
@@ -176,18 +180,37 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     if (!is_menu_shows)
     {
-        Switch* new_nearest_switch = map->nearest_switch;
-        if (new_nearest_switch && (map->nearest_switch_dir != 0))
+        Trajectory* new_nearest_trajectory = nullptr;
+        Signal* new_nearest_signal = map->nearest_signal;
+        if (new_nearest_signal)
         {
-            bg->nearest_switch = new_nearest_switch;
-            bg->nearest_switch_dir = map->nearest_switch_dir;
-        }
-        else
-        {
+            dir_t dir = static_cast<dir_t>(-1 * new_nearest_signal->getDirection());
+            new_nearest_trajectory = new_nearest_signal->getConnector()->getNextTraj(dir);
+
+            bg->nearest_signal = new_nearest_signal;
+            bg->nearest_signal_coord = map->nearest_signal_coord;
+
             bg->nearest_switch = nullptr;
             bg->nearest_switch_dir = 0;
         }
-        Trajectory* new_nearest_trajectory = map->nearest_trajectory;
+        else
+        {
+            bg->nearest_signal = nullptr;
+            new_nearest_trajectory = map->nearest_trajectory;
+
+            Switch* new_nearest_switch = map->nearest_switch;
+            if (new_nearest_switch && (map->nearest_switch_dir != 0))
+            {
+                bg->nearest_switch = new_nearest_switch;
+                bg->nearest_switch_dir = map->nearest_switch_dir;
+            }
+            else
+            {
+                bg->nearest_switch = nullptr;
+                bg->nearest_switch_dir = 0;
+            }
+        }
+
         if (route_begin_trajectory && new_nearest_trajectory && (route_dir != 0))
         {
             if (new_nearest_trajectory != bg->nearest_trajectory)
@@ -202,7 +225,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
         {
             bg->route_trajectories.clear();
         }
-        bg->nearest_trajectory = map->nearest_trajectory;
+        bg->nearest_trajectory = new_nearest_trajectory;
         bg->route_begin_trajectory = route_begin_trajectory;
     }
 
@@ -432,16 +455,11 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         ui->ptLog->appendPlainText(QString(tr("Warning: no shunt signals data")));
     }
 
-    for (auto sl : map->signal_labels_fwd)
+    for (auto sl : map->signal_labels)
     {
         delete sl;
     }
-    for (auto sl : map->signal_labels_bwd)
-    {
-        delete sl;
-    }
-    map->signal_labels_fwd.clear();
-    map->signal_labels_bwd.clear();
+    map->signal_labels.clear();
 
     auto configure_signal_label = [](Signal* sig, Topology* top, MapWidget* map) -> SignalLabel*
     {
@@ -461,13 +479,13 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
         if (sig->getDirection() == 1)
         {
             conn->setSignalFwd(sig);
-            map->signal_labels_fwd.insert(conn->getName(), signal_label);
+            map->signal_labels.insert(sig, signal_label);
         }
 
         if (sig->getDirection() == -1)
         {
             conn->setSignalBwd(sig);
-            map->signal_labels_bwd.insert(conn->getName(), signal_label);
+            map->signal_labels.insert(sig, signal_label);
         }
 
         return signal_label;
@@ -584,9 +602,9 @@ void MainWindow::slotNearestSwitchMenu(Switch* nearest_conn, std::int8_t nearest
                               (state == STATE_PLUS));
     menu->addAction(action_switch);
 
-    // Сохраняем в карте указатель для интерактивной подсветки
+    // Сохраняем в карте указатель для интерактивных действий по наведению курсора
     map->switch_menu = {menu, action_switch, nearest_conn, nearest_switch_dir};
-    // И сбрасываем сохранённый указатель
+    // И подключаем слот для сброса сохранённого указателя
     connect(action_switch, &QAction::triggered, map, &MapWidget::resetSwitchMenu);
 
     // Создаём сетевой пакет с командой переключения стрелки
@@ -626,7 +644,7 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
     }
 
     QMenu* menu = new QMenu(this);
-    bool no_need_menu = true;
+//    bool no_need_menu = true;
 
     // Проверяем, есть ли траектория вперёд
     dir_t dir = FWD;
@@ -634,7 +652,7 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
     {
         if (Trajectory* next_fwd = conn_fwd->getNextTraj(dir))
         {
-            no_need_menu = false;
+//            no_need_menu = false;
             // Создаём пункт меню для поиска маршрута в направлении вперёд
             QAction* route_from_traj_fwd = new QAction(tr("Build route to forward direction"), this);
             menu->addAction(route_from_traj_fwd);
@@ -651,7 +669,7 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
     {
         if (Trajectory* next_bwd = conn_bwd->getNextTraj(dir))
         {
-            no_need_menu = false;
+//            no_need_menu = false;
             // Создаём пункт меню для поиска маршрута в направлении назад
             QAction* route_from_traj_bwd = new QAction(tr("Build route to backward direction"), this);
             menu->addAction(route_from_traj_bwd);
@@ -663,19 +681,19 @@ void MainWindow::slotNearestTrajectoryMenu(Trajectory *nearest_traj)
     }
 
     // Копирование имени траектории в буффер обмена (для сценаристов)
-    no_need_menu = false;
+//    no_need_menu = false;
     QAction *copy_name_to_clipboard = new QAction(tr("Copy trajectory name to clipboard"), this);
     menu->addAction(copy_name_to_clipboard);
     connect(copy_name_to_clipboard, &QAction::triggered, this, [this, nearest_traj]{
         QApplication::clipboard()->setText(nearest_traj->getName(), QClipboard::Clipboard);
     });
-
+/*
     if (no_need_menu)
     {
         delete menu;
         return;
     }
-
+*/
     connect(menu, &QMenu::aboutToHide, this, &MainWindow::slotMenuHide);
     is_menu_shows = true;
     menu->exec(QCursor::pos());
@@ -762,24 +780,51 @@ void MainWindow::slotSelectTrajectory(Trajectory *nearest_traj)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotSignalControlMenu()
+void MainWindow::slotSignalControlMenu(Signal* sig)
 {
-    // Создаём меню для текстовой метки с литером светофора
-    SignalLabel* signal_label = dynamic_cast<SignalLabel *>(sender());
+    if (route_begin_trajectory)
+    {
+        // Если уже строим маршрут, то заканчиваем строить маршрут до траектории перед светофором
+        dir_t dir = static_cast<dir_t>(-1 * sig->getDirection());
+        Trajectory* target_traj = sig->getConnector()->getNextTraj(dir);
+        slotSelectTrajectory(target_traj);
+        return;
+    }
 
+    // Создаём меню для текстовой метки с литером светофора
+    SignalLabel* signal_label = map->signal_labels.value(sig, nullptr);
+    if (!signal_label)
+    {
+        return;
+    }
+
+    // Светофорам без управления маршрутами меню не нужно
     if (!(signal_label->need_train || signal_label->need_shunting || signal_label->need_call))
     {
         return;
     }
 
-    Signal* sig = signal_label->signal;
-
     // Указатель на сетевого клиента, который отправит команду светофору
     TcpClient* tc = tcp_client;
 
-    // Создаём меню, передаём в текстовую метку указатель для интерактивной подсветки
+    // Создаём меню, передаём указатель на меню
+    // в текстовую метку для интерактивных действий по наведению курсора (пока не используется)
     QMenu* menu = new QMenu(this);
     signal_label->menu = menu;
+
+    // Создаём пункт меню для построения маршрута от светофора
+    QAction *build_route = new QAction(tr("Build route..."), this);
+    menu->addAction(build_route);
+
+    signal_label->action_build_route = build_route;
+    connect(build_route, &QAction::triggered, signal_label, &SignalLabel::resetMenu);
+
+    // Создаём команду маршрута от траектории перед светофором в направлении этого светофора
+    connect(build_route, &QAction::triggered, this, [this, sig]{
+        dir_t dir = static_cast<dir_t>(-1 * sig->getDirection());
+        route_begin_trajectory = sig->getConnector()->getNextTraj(dir);
+        route_dir = -1 * dir;
+    });
 
     if (signal_label->need_train)
     {
@@ -987,6 +1032,7 @@ void MainWindow::slotSetShowConnStatus(bool is_show)
 void MainWindow::slotGetTrainsInfo(QByteArray &data)
 {
     simulator_trains_update_t update_trains;
+
     update_trains.deserialize(data);
 
     for (auto tl : map->train_labels)
@@ -1015,6 +1061,16 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
         connect(train_label, &TrainLabel::popUpMenu, this, &MainWindow::slotRenameTrainMenu);
 
         map->train_labels.push_back(train_label);
+
+        QAction *action_train = new QAction(train_name);
+        ui->mTrains->addAction(action_train);
+
+        MapWidget *mw = map;
+        int vehicle_idx = update_trains.trains[i].first_vehicle_id;
+
+        connect(action_train, &QAction::triggered, this, [mw, vehicle_idx]{
+            mw->slotSetVehicleAtCenter(vehicle_idx);
+        });
     }
 }
 

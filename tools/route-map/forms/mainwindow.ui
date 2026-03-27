@@ -31,13 +31,14 @@
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="mStations">
@@ -52,10 +53,15 @@
     <addaction name="actionShowTrajName"/>
     <addaction name="actionShowConnName"/>
    </widget>
+   <widget class="QMenu" name="mTrains">
+    <property name="title">
+     <string>Trains</string>
+    </property>
+   </widget>
    <addaction name="mStations"/>
+   <addaction name="mTrains"/>
    <addaction name="menuView"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionShowTrajName">
    <property name="checkable">
     <bool>true</bool>

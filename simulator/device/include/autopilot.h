@@ -25,6 +25,7 @@ public:
         connect(rb_timer, &Timer::process, this, &Autopilot::slotVigilanceControl);
         connect(sand_timer, &Timer::process, this, &Autopilot::slotSandTimer);
         connect(sound_signal_timer, &Timer::process, this, &Autopilot::slotSoundSignal);
+        connect(routeBuildRequest, &Timer::process, this, &Autopilot::slotRouteBuildRequest);
     }
 
     ~Autopilot()
@@ -123,15 +124,14 @@ signals:
     void sigBuildTrainRoute(QString start_traj, QString target_traj, int dir);
 
     /// Запрос состояния траектории, куда предполагается строить маршрут приема/отправления
-    void sigGetTrajStateRequest(int vehicle_idx, QString start_traj_name, QString traj_name, int dir, int request_type);
+    void sigGetTrajStateRequest(int vehicle_idx, int station_idx, QString start_traj_name, QString traj_name, int dir, int request_type);
 
 protected:
 
     enum
     {
         ARRIVAL_REQUEST,
-        DEPARTURE_REQUEST,
-        APPROACH_REQUEST
+        DEPARTURE_REQUEST
     };
 
     /// Признак активации
@@ -238,7 +238,7 @@ protected:
     double target_station_dist = 0;
 
     /// Текущая траектория
-    QString curr_traj_name = "";
+    QString curr_traj_name = "";    
 
     /// Предыдущая траектория
     QString prev_traj_name = "";
@@ -424,6 +424,9 @@ protected:
         is_motion_allowed = is_allowed;
     }
 
+    const double ROUTE_BUILD_REQUEST_DELAY = 5.0;
+    Timer *routeBuildRequest = new Timer(ROUTE_BUILD_REQUEST_DELAY, false);
+
 public slots:
 
     void slotSetBrakeAccel(double a_brake);
@@ -440,6 +443,7 @@ public slots:
 
     /// Слот для приема состояния траектории по запросу
     void slotGetTrajState(int vehicle_idx,
+                          int station_idx,
                           QString start_traj_name,
                           QString traj_name,
                           int request_type,
@@ -452,6 +456,8 @@ private slots:
     void slotSandTimer();
 
     void slotSoundSignal();
+
+    void slotRouteBuildRequest();
 };
 
 //------------------------------------------------------------------------------
