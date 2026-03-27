@@ -14,7 +14,7 @@ public:
         vsg::vec3 scale);
 
     virtual ~ScaleObjectsCommand() override = default;
-    virtual void execute() const override;
+    virtual void execute() override;
     virtual void update_description() override;
 
 private:

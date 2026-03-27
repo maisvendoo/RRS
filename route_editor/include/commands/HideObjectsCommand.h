@@ -11,8 +11,8 @@ class HideObjectsCommand : public Command
 public:
     explicit HideObjectsCommand(EditorContext& context);
     virtual ~HideObjectsCommand() override = default;
-    virtual void execute() const override;
-    virtual void undo() const override;
+    virtual void execute() override;
+    virtual void undo() override;
     virtual void update_description() override;
 
 public:

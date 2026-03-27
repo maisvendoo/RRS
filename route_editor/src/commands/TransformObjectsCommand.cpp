@@ -17,7 +17,7 @@ TransformObjectsCommand::TransformObjectsCommand(EditorContext& context)
     }
 }
 
-void TransformObjectsCommand::undo() const
+void TransformObjectsCommand::undo()
 {
     std::size_t index = 0;
     for (RouteObject* const object : objects)

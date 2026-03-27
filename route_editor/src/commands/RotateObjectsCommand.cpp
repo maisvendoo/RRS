@@ -18,7 +18,7 @@ RotateObjectsCommand::RotateObjectsCommand(EditorContext& context,
     update_description();
 }
 
-void RotateObjectsCommand::execute() const
+void RotateObjectsCommand::execute()
 {
     for (RouteObject* const object : objects)
     {

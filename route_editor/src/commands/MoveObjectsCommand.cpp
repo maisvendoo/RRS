@@ -18,7 +18,7 @@ MoveObjectsCommand::MoveObjectsCommand(
     update_description();
 }
 
-void MoveObjectsCommand::execute() const
+void MoveObjectsCommand::execute()
 {
     for (RouteObject* const object : objects)
     {

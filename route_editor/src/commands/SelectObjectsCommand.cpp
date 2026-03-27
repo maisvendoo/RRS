@@ -12,7 +12,7 @@ SelectObjectsCommand::SelectObjectsCommand(EditorContext& context)
 {
 }
 
-void SelectObjectsCommand::execute() const
+void SelectObjectsCommand::execute()
 {
     for (RouteObject* const object : objects_to_select)
     {
@@ -27,7 +27,7 @@ void SelectObjectsCommand::execute() const
     context.gizmo->update_visibility();
 }
 
-void SelectObjectsCommand::undo() const
+void SelectObjectsCommand::undo()
 {
     for (RouteObject* const object : objects_to_select)
     {

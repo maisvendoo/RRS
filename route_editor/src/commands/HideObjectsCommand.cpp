@@ -10,7 +10,7 @@ HideObjectsCommand::HideObjectsCommand(EditorContext& context)
 {
 }
 
-void HideObjectsCommand::execute() const
+void HideObjectsCommand::execute()
 {
     for (RouteObject* const object : objects_to_hide)
     {
@@ -23,7 +23,7 @@ void HideObjectsCommand::execute() const
     }
 }
 
-void HideObjectsCommand::undo() const
+void HideObjectsCommand::undo()
 {
     for (RouteObject* const object : objects_to_hide)
     {

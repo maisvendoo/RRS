@@ -15,7 +15,7 @@ class TransformObjectsCommand : public Command
 public:
     explicit TransformObjectsCommand(EditorContext& context);
     virtual ~TransformObjectsCommand() override = default;
-    virtual void undo() const override;
+    virtual void undo() override;
 
 protected:
     const RouteObjects objects;

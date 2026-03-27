@@ -17,7 +17,7 @@ ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context,
     update_description();
 }
 
-void ScaleObjectsCommand::execute() const
+void ScaleObjectsCommand::execute()
 {
     for (RouteObject* const object : objects)
     {

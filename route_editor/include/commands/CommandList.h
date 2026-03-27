@@ -12,7 +12,7 @@ private:
     {
         ~CommandNode();
 
-        const Command* command = nullptr;
+        Command* command = nullptr;
         CommandNode* prev = nullptr;
         CommandNode* next = nullptr;
     };
@@ -20,7 +20,7 @@ private:
 public:
     ~CommandList();
 
-    void push(const Command* command, bool execute);
+    void push(Command* command, bool execute);
     void undo();
     void redo();
 
@@ -28,7 +28,7 @@ public:
     const CommandNode* get_tail() const;
 
 private:
-    void push_(const Command* command, bool execute);
+    void push_(Command* command, bool execute);
 
 private:
     CommandNode* tail = nullptr;

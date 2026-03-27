@@ -12,7 +12,7 @@ class MoveObjectsCommand : public TransformObjectsCommand
 public:
     MoveObjectsCommand(EditorContext& context, vsg::vec3 translation);
     virtual ~MoveObjectsCommand() override = default;
-    virtual void execute() const override;
+    virtual void execute() override;
     virtual void update_description() override;
 
 private:
