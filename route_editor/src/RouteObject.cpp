@@ -104,11 +104,6 @@ bool RouteObject::get_is_hidden() const
     return is_hidden;
 }
 
-vsg::ref_ptr<vsg::PagedLOD> RouteObject::get_paged_lod() const
-{
-    return paged_lod;
-}
-
 void RouteObject::set_translation(vsg::vec3 translation)
 {
     this->translation = translation;
@@ -198,8 +193,7 @@ void RouteObject::select()
 {
     if (!outline_switch->node)
     {
-        const auto outline = context.outline_builder->create_outline(
-            paged_lod_switch->node.cast<vsg::PagedLOD>());
+        const auto outline = context.outline_builder->create_outline(paged_lod);
 
         const auto compile_result = context.viewer->compileManager->compile(
             outline);
@@ -230,6 +224,12 @@ RouteObjectsIterator RouteObject::deselect()
     context.gizmo->update_position();
 
     return it;
+}
+
+vsg::ref_ptr<RouteObject> RouteObject::copy() const
+{
+    return RouteObject::create(context, paged_lod, label,
+        translation, rotation_deg);
 }
 
 void RouteObject::save_matrix()

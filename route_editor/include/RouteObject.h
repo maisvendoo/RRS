@@ -43,8 +43,6 @@ public:
     bool get_is_selected() const;
     bool get_is_hidden() const;
 
-    vsg::ref_ptr<vsg::PagedLOD> get_paged_lod() const;
-
     void set_translation(vsg::vec3 translation);
     void set_rotation_deg(vsg::vec3 rotation_deg);
     void set_scale(vsg::vec3 scale);
@@ -62,6 +60,8 @@ public:
 
     void select();
     RouteObjectsIterator deselect();
+
+    vsg::ref_ptr<RouteObject> copy() const;
 
     void save_matrix();
     void set_matrix(const vsg::dmat4& matrix);

@@ -16,8 +16,8 @@ public:
     virtual void update_description() override;
 
 public:
-    RouteObjects objects_to_hide;
-    RouteObjects objects_to_show;
+    const RouteObjects objects_to_hide;
+    const RouteObjects objects_to_show;
 };
 
 

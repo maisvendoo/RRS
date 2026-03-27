@@ -14,9 +14,9 @@ public:
     virtual void update_description() override;
 
 private:
-    RouteObjects objects_to_paste;
+    const RouteObjects objects_to_paste;
     RouteObjects pasted_objects;
-    RouteObjects objects_to_deselect;
+    const RouteObjects objects_to_deselect;
 };
 
 // Копирование

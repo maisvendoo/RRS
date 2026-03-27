@@ -77,9 +77,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     {
         // for (const RouteObject* const object : context.copied_objects)
         // {
-        //     const auto new_object = RouteObject::create(context,
-        //         object->get_paged_lod(), object->label,
-        //         object->get_translation(), object->get_rotation_deg());
+        //     const auto new_object = object->copy();
 
         //     context.route->addChild(vsg::MASK_ALL, new_object);
 
