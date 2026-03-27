@@ -1041,6 +1041,7 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
     }
 
     map->train_labels.clear();
+    ui->mTrains->clear();
 
     for (size_t i = 0; i < update_trains.trains.size(); ++i)
     {
