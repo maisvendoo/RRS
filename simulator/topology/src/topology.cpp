@@ -1534,7 +1534,7 @@ void Topology::slotTrainRouteCommand(QByteArray &route_data)
     }
     Journal::instance()->info("Build route: founded from "
                               + rc.trajectory_begin + " to " + rc.trajectory_end
-                              + " through " + QString::number(route.trajectories.size()) + "trajectories");
+                              + " through " + QString::number(route.trajectories.size()) + " trajectories");
 
     if (set_switchs_by_route(route))
     {
