@@ -8,6 +8,8 @@
 
 #include <map>
 
+struct EditorContext;
+
 class PasteObjectsCommand : public Command
 {
 public:
