@@ -28,8 +28,20 @@ find_package(Qt6 COMPONENTS Network REQUIRED)
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
+if(WIN32)
+    find_package(lua CONFIG REQUIRED)
+else()
+    find_package(Lua 5.4 REQUIRED)
+endif()
+
 # Компиляция библиотеки
 add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
+if(WIN32)
+    target_link_libraries(${TARGET} lua::lua)
+else()
+    target_link_libraries(${TARGET} ${LUA_LIBRARIES})
+    include_directories(${TARGET} ${LUA_INCLUDE_DIR})
+endif()
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
@@ -38,7 +50,6 @@ target_include_directories (${TARGET} PRIVATE ../../common-headers)
 target_include_directories (${TARGET} PRIVATE ../../network/include)
 target_include_directories (${TARGET} PRIVATE ../train/include)
 target_include_directories (${TARGET} PRIVATE ../scenario-manager/include)
-
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Xml)
 # и со своими не забываем

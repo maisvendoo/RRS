@@ -22,9 +22,20 @@ find_package(Qt6 COMPONENTS Network REQUIRED)
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
+if(WIN32)
+    find_package(lua CONFIG REQUIRED)
+else()
+    find_package(Lua 5.4 REQUIRED)
+endif()
 
 # Компиляция приложения
 add_executable (${TARGET} ${SOURCES} ${INCLUDES})
+if(WIN32)
+    target_link_libraries(${TARGET} lua::lua)
+else()
+    target_link_libraries(${TARGET} ${LUA_LIBRARIES})
+    include_directories(${TARGET} ${LUA_INCLUDE_DIR})
+endif()
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
