@@ -41,6 +41,7 @@ struct init_data_t final
     int     control_time_interval = 15;
     bool    debug_print = false;
     bool    lua_debug = false;
+    double  simulation_speed = 1.0;
     solver_config_t solver_config;
 };
 

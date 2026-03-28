@@ -178,7 +178,13 @@ void Model::start()
         is_simulation_started = true;
 
         connect(&simTimer, &ElapsedTimer::process, this, &Model::process, Qt::DirectConnection);
-        simTimer.setInterval(static_cast<quint64>(integration_time_interval));
+
+        double interval = static_cast<double>(integration_time_interval);
+        if (init_datas[0].simulation_speed > Physics::ZERO)
+        {
+            interval = interval / init_datas[0].simulation_speed;
+        }
+        simTimer.setInterval(static_cast<quint64>(std::ceil(interval)));
         simTimer.start();
     }
 }
@@ -600,6 +606,11 @@ void Model::loadInitData(init_data_t &init_data)
         if (!cfg.getBool(secName, "LuaDebug", init_data.lua_debug))
         {
             init_data.lua_debug = false;
+        }
+
+        if (!cfg.getDouble(secName, "SimulationSpeed", init_data.simulation_speed))
+        {
+            init_data.simulation_speed = 1.0;
         }
 
         Journal::instance()->info("Loaded settings from: " + cfg_path);
