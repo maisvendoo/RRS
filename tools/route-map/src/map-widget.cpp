@@ -134,7 +134,9 @@ void MapWidget::slotPlayerAtCenter(int idx)
     follow_player = true;
 
     if ((idx < 0) || (idx >= players_data->current_vehicles.size()))
+    {
         return;
+    }
 
     follow_player_idx = idx;
     current_vehicle = players_data->current_vehicles[idx];
@@ -219,7 +221,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
-    if (follow_player && (follow_player_idx < players_data->current_vehicles.size()))
+    if (follow_player /*&& (follow_player_idx < players_data->current_vehicles.size())*/)
     {
         // В мультиплеере отслеживаем текущую ПЕ у самого первого подключенного вьювера
         // Следует придумать, как следить за ПЕ выбранного игрока, например себя
