@@ -280,7 +280,14 @@ void Model::slotSetSimSpeed(int speed_factor)
         return;
     }
 
-    init_datas[0].simulation_speed = static_cast<double>(speed_factor);
+    quint64 interval = qRound(static_cast<double>(integration_time_interval) / speed_factor);
+
+    if (interval < 1)
+    {
+        interval = 1;
+    }
+
+    simTimer.setInterval(interval);
 }
 
 //------------------------------------------------------------------------------

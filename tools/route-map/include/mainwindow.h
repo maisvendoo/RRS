@@ -130,6 +130,8 @@ private slots:
     void slotGetTrainsInfo(QByteArray& data);
 
     void slotRenameTrainMenu();
+
+    void slotSetSimSpeed(bool is_cheked);
 };
 
 #endif // MAINWINDOW_H

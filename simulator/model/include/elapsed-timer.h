@@ -2,6 +2,7 @@
 #define     ELAPSED_TIMER_H
 
 #include    <QThread>
+#include    <QTimer>
 
 class ElapsedTimer : public QObject
 {
@@ -28,6 +29,8 @@ private:
     quint64 interval;
 
     QThread thread;
+
+    QTimer *timer = new QTimer(this);
 
 private slots:
 

@@ -1,7 +1,7 @@
 #include    "elapsed-timer.h"
 
 #include    <QElapsedTimer>
-#include    <QTimer>
+//#include    <QTimer>
 #include    <QEventLoop>
 
 #include    "Journal.h"
@@ -30,6 +30,7 @@ ElapsedTimer::~ElapsedTimer()
 void ElapsedTimer::setInterval(quint64 interval)
 {
     this->interval = interval;
+    timer->setInterval(interval);
 }
 
 //------------------------------------------------------------------------------
@@ -47,7 +48,7 @@ void ElapsedTimer::start()
 //------------------------------------------------------------------------------
 void ElapsedTimer::loop()
 {
-    QTimer *timer = new QTimer(this);
+    //QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &ElapsedTimer::process, Qt::DirectConnection);
     timer->setTimerType(Qt::PreciseTimer);
     timer->start(static_cast<int>(interval));

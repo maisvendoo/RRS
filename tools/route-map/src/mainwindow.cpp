@@ -61,6 +61,11 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(tcp_client, &TcpClient::setTrainInfo,
             this, &MainWindow::slotGetTrainsInfo);
 
+    for (auto action : ui->mSimSpeed->actions())
+    {
+        connect(action, &QAction::triggered, this, &MainWindow::slotSetSimSpeed);
+    }
+
     bg = new BackGroundWidget(ui->Map);
 
     map = new MapWidget(ui->Map);
@@ -1111,4 +1116,29 @@ void MainWindow::slotRenameTrainMenu()
     });
 
     menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSetSimSpeed(bool is_cheked)
+{
+    for (auto action : ui->mSimSpeed->actions())
+    {
+        action->setChecked(false);
+    }
+
+    QAction *action = dynamic_cast<QAction *>(sender());
+    action->setChecked(true);
+
+    int idx = ui->mSimSpeed->actions().indexOf(action);
+
+    if (idx < 0)
+    {
+        return;
+    }
+
+    int speed_factor = 1 << idx;
+
+    tcp_client->sendSimSpeedCommand(speed_factor);
 }
