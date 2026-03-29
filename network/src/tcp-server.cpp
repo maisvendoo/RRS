@@ -1,8 +1,9 @@
 #include    <tcp-server.h>
 #include    <Journal.h>
 #include    <CfgReader.h>
-#include <QBuffer>
-#include <QTcpSocket>
+#include    <QBuffer>
+#include    <QTcpSocket>
+#include    <simspeed-command.h>
 
 //------------------------------------------------------------------------------
 //
@@ -256,6 +257,16 @@ void TcpServer::process_client_request(client_data_t &client_data)
         }
 
         emit sigRenameTrain(train_idx, new_name);
+
+        break;
+    }
+
+    case STYPE_COMMAND_SET_SIMULATION_SPEED:
+    {
+        simspeed_command_t sc;
+        sc.deserialize(client_data.received_data.data);
+
+        emit sigSetSimSpeed(sc.speed_factor);
 
         break;
     }

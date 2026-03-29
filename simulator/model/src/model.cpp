@@ -268,6 +268,24 @@ void Model::receiveSignalsFromControlPanel(const control_signals_t &control_sign
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::slotSetSimSpeed(int speed_factor)
+{
+    if (init_datas.empty())
+    {
+        return;
+    }
+
+    if (speed_factor <= 0)
+    {
+        return;
+    }
+
+    init_datas[0].simulation_speed = static_cast<double>(speed_factor);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::buildAutostartQueue(Train *train)
 {
     if (train == nullptr)
@@ -981,6 +999,8 @@ void Model::initTcpServer()
     connect(tcp_server, &TcpServer::sigResetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
 
     connect(tcp_server, &TcpServer::sigRenameTrain, this, &Model::slotRenameTrainInModel);
+
+    connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
 
     Journal::instance()->info("TCP server is initialized successfully");
 }
