@@ -1704,7 +1704,10 @@ void Topology::slotGetRouteLength(int vehicle_idx, QString cur_traj_name, double
 
         if (*lenght < 0)
         {
-            emit sigIncTargetStation(vehicle_idx);
+            double eps = 1.0;
+            bool is_on_target_traj = (cur_coord >= eps) && (cur_coord <= target_traj->getLength() - eps);
+
+            emit sigIncTargetStation(vehicle_idx, is_on_target_traj);
         }
         else
         {

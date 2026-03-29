@@ -101,7 +101,7 @@ signals:
 
     void sigChangeTrajStateByTrain(int train_idx, bool is_busy, QString traj_name);
 
-    void sigIncTargetStation(int vehicle_idx);
+    void sigIncTargetStation(int vehicle_idx, bool is_on_target_traj);
 
     void sigCalcMiddleVelocity(int vehicle_idx, double target_dist);
 

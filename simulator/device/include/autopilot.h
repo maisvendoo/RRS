@@ -433,7 +433,7 @@ public slots:
     void slotInitTimeTable();
 
     /// Переключение на следующую станцию от топологии
-    void slotIncTargetStation(int vehicle_idx);
+    void slotIncTargetStation(int vehicle_idx, bool is_on_target_traj);
 
     /// Исполнение запроса на пересчет средней скорости по перегону
     void slotCalcMiddleVelocity(int vehicle_idx, double target_dist);
