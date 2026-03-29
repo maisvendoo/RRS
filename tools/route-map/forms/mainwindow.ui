@@ -52,6 +52,7 @@
     </property>
     <addaction name="actionShowTrajName"/>
     <addaction name="actionShowConnName"/>
+    <addaction name="actionShow_trajectories_tooltips"/>
    </widget>
    <widget class="QMenu" name="mTrains">
     <property name="title">
@@ -138,6 +139,14 @@
    </property>
    <property name="text">
     <string>x32</string>
+   </property>
+  </action>
+  <action name="actionShow_trajectories_tooltips">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show trajectories tooltips</string>
    </property>
   </action>
  </widget>

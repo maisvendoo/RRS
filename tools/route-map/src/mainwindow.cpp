@@ -66,6 +66,8 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
         connect(action, &QAction::triggered, this, &MainWindow::slotSetSimSpeed);
     }
 
+    connect(ui->actionShow_trajectories_tooltips, &QAction::triggered, this, &MainWindow::slotSetShowTrajTooltip);
+
     bg = new BackGroundWidget(ui->Map);
 
     map = new MapWidget(ui->Map);
@@ -1141,4 +1143,19 @@ void MainWindow::slotSetSimSpeed(bool is_cheked)
     int speed_factor = 1 << idx;
 
     tcp_client->sendSimSpeedCommand(speed_factor);
+
+    slotRecvLogMessage(QString(tr("Simulation speed x%1")).arg(speed_factor));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSetShowTrajTooltip(bool is_show)
+{
+    map->setShowTrajectoryTooltip(is_show);
+
+    if (is_show)
+        slotRecvLogMessage(tr("Enabled trajectory tooltips"));
+    else
+        slotRecvLogMessage(tr("Disabled trajectory tooltips"));
 }
