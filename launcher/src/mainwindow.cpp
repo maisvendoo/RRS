@@ -500,6 +500,11 @@ void MainWindow::reloadScenariosList()
 //------------------------------------------------------------------------------
 void MainWindow::showTrainsConfigTip()
 {
+    if (trainsConfigTip != nullptr)
+    {
+        return;
+    }
+
     QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(ui->frame->layout());
 
     if (layout == nullptr)
