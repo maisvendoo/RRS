@@ -1534,7 +1534,7 @@ void Topology::slotTrainRouteCommand(QByteArray &route_data)
     }
     Journal::instance()->info("Build route: founded from "
                               + rc.trajectory_begin + " to " + rc.trajectory_end
-                              + " through " + QString::number(route.trajectories.size()) + "trajectories");
+                              + " through " + QString::number(route.trajectories.size()) + " trajectories");
 
     if (set_switchs_by_route(route))
     {
@@ -1704,7 +1704,11 @@ void Topology::slotGetRouteLength(int vehicle_idx, QString cur_traj_name, double
 
         if (*lenght < 0)
         {
-            emit sigIncTargetStation(vehicle_idx);
+            double eps = 1.0;
+            double piket_length = 100.0;
+            bool is_on_target_traj = (cur_coord >= eps) && (cur_coord <= target_traj->getLength() - eps) && (*lenght >= -piket_length);
+
+            emit sigIncTargetStation(vehicle_idx, is_on_target_traj);
         }
         else
         {

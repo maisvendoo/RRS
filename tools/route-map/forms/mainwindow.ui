@@ -52,14 +52,26 @@
     </property>
     <addaction name="actionShowTrajName"/>
     <addaction name="actionShowConnName"/>
+    <addaction name="actionShow_trajectories_tooltips"/>
    </widget>
    <widget class="QMenu" name="mTrains">
     <property name="title">
      <string>Trains</string>
     </property>
    </widget>
+   <widget class="QMenu" name="mSimSpeed">
+    <property name="title">
+     <string>Simulation speed</string>
+    </property>
+    <addaction name="action_x1"/>
+    <addaction name="action_x2"/>
+    <addaction name="action_x4"/>
+    <addaction name="action_x8"/>
+    <addaction name="action_x16"/>
+   </widget>
    <addaction name="mStations"/>
    <addaction name="mTrains"/>
+   <addaction name="mSimSpeed"/>
    <addaction name="menuView"/>
   </widget>
   <action name="actionShowTrajName">
@@ -76,6 +88,65 @@
    </property>
    <property name="text">
     <string>Show connectors names</string>
+   </property>
+  </action>
+  <action name="action_x1">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x1 (Real time)</string>
+   </property>
+  </action>
+  <action name="action_x2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x2</string>
+   </property>
+  </action>
+  <action name="action_x4">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x4</string>
+   </property>
+  </action>
+  <action name="action_x8">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x8</string>
+   </property>
+  </action>
+  <action name="action_x16">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x16</string>
+   </property>
+  </action>
+  <action name="action_x32">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x32</string>
+   </property>
+  </action>
+  <action name="actionShow_trajectories_tooltips">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show trajectories tooltips</string>
    </property>
   </action>
  </widget>

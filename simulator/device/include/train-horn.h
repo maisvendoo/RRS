@@ -51,6 +51,11 @@ public:
     /// Сигнал состояния звука
     float getSoundSignal(size_t idx = SVISTOK_SOUND) const;
 
+    void lockManualControl(bool lock)
+    {
+        lock_manual_control = lock;
+    }
+
 protected:
 
     /// Код управляющей клавиши свистка
@@ -76,6 +81,8 @@ protected:
 
     /// Коэффициент потока - расхода воздуха на тифон
     double k_tifon = 8.0e-4;
+
+    bool lock_manual_control = false;
 
     void ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t);
 

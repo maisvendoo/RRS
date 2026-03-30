@@ -170,6 +170,9 @@ void TrainHorn::stepKeysControl(double t, double dt)
     (void) t;
     (void) dt;
 
-    setSvistokOn(getKeyState(pressed_keys, key_symbol_svistok));
-    setTifonOn(getKeyState(pressed_keys, key_symbol_tifon));
+    if (!lock_manual_control)
+    {
+        setSvistokOn(getKeyState(pressed_keys, key_symbol_svistok));
+        setTifonOn(getKeyState(pressed_keys, key_symbol_tifon));
+    }
 }

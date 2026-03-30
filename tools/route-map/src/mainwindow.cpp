@@ -61,6 +61,13 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(tcp_client, &TcpClient::setTrainInfo,
             this, &MainWindow::slotGetTrainsInfo);
 
+    for (auto action : ui->mSimSpeed->actions())
+    {
+        connect(action, &QAction::triggered, this, &MainWindow::slotSetSimSpeed);
+    }
+
+    connect(ui->actionShow_trajectories_tooltips, &QAction::triggered, this, &MainWindow::slotSetShowTrajTooltip);
+
     bg = new BackGroundWidget(ui->Map);
 
     map = new MapWidget(ui->Map);
@@ -1041,6 +1048,7 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
     }
 
     map->train_labels.clear();
+    ui->mTrains->clear();
 
     for (size_t i = 0; i < update_trains.trains.size(); ++i)
     {
@@ -1071,6 +1079,12 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
         connect(action_train, &QAction::triggered, this, [mw, vehicle_idx]{
             mw->slotSetVehicleAtCenter(vehicle_idx);
         });
+    }
+
+    if (!update_trains.trains.empty())
+    {
+        int vehicle_idx = update_trains.trains[0].first_vehicle_id;
+        map->slotSetVehicleAtCenter(0);
     }
 }
 
@@ -1104,4 +1118,44 @@ void MainWindow::slotRenameTrainMenu()
     });
 
     menu->exec(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSetSimSpeed(bool is_cheked)
+{
+    for (auto action : ui->mSimSpeed->actions())
+    {
+        action->setChecked(false);
+    }
+
+    QAction *action = dynamic_cast<QAction *>(sender());
+    action->setChecked(true);
+
+    int idx = ui->mSimSpeed->actions().indexOf(action);
+
+    if (idx < 0)
+    {
+        return;
+    }
+
+    int speed_factor = 1 << idx;
+
+    tcp_client->sendSimSpeedCommand(speed_factor);
+
+    slotRecvLogMessage(QString(tr("Simulation speed x%1")).arg(speed_factor));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSetShowTrajTooltip(bool is_show)
+{
+    map->setShowTrajectoryTooltip(is_show);
+
+    if (is_show)
+        slotRecvLogMessage(tr("Enabled trajectory tooltips"));
+    else
+        slotRecvLogMessage(tr("Disabled trajectory tooltips"));
 }

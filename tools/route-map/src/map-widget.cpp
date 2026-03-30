@@ -5,6 +5,7 @@
 #include    <QMouseEvent>
 #include    <QWheelEvent>
 #include    <switch.h>
+#include    <QToolTip>
 
 //------------------------------------------------------------------------------
 //
@@ -114,6 +115,22 @@ void MapWidget::calcCwitchCoords()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MapWidget::setShowTrajectoryTooltip(bool show)
+{
+    show_trajectory_tooltip = show;
+
+    if (!show)
+    {
+        QToolTip::hideText();
+        last_tooltip_text.clear();
+    }
+
+    update();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MapWidget::slotStationAtCenter(int idx)
 {
     follow_player = false;
@@ -134,7 +151,9 @@ void MapWidget::slotPlayerAtCenter(int idx)
     follow_player = true;
 
     if ((idx < 0) || (idx >= players_data->current_vehicles.size()))
+    {
         return;
+    }
 
     follow_player_idx = idx;
     current_vehicle = players_data->current_vehicles[idx];
@@ -195,6 +214,29 @@ void MapWidget::paintEvent(QPaintEvent *event)
         }
     }
 
+    // Отображение всплывающей подсказки при наведении на траекторию
+    if (show_trajectory_tooltip && nearest_trajectory != nullptr)
+    {
+        QString tooltip_text = QString(tr("%1\nLength: %2 m"))
+                                   .arg(nearest_trajectory->getName())
+                                   .arg(nearest_trajectory->getLength(), 0, 'f', 1);
+
+        if (last_tooltip_text != tooltip_text)
+        {
+            last_tooltip_text = tooltip_text;
+            QPoint global_pos = QCursor::pos();
+            QToolTip::showText(global_pos, tooltip_text, this);
+        }
+    }
+    else if (nearest_trajectory == nullptr)
+    {
+        if (!last_tooltip_text.isEmpty())
+        {
+            last_tooltip_text.clear();
+            QToolTip::hideText();
+        }
+    }
+
     for (auto& conn : *conn_list)
     {
         double distance2 = std::numeric_limits<double>::max();
@@ -219,7 +261,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
-    if (follow_player && (follow_player_idx < players_data->current_vehicles.size()))
+    if (follow_player /*&& (follow_player_idx < players_data->current_vehicles.size())*/)
     {
         // В мультиплеере отслеживаем текущую ПЕ у самого первого подключенного вьювера
         // Следует придумать, как следить за ПЕ выбранного игрока, например себя

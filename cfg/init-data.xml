@@ -23,5 +23,7 @@
 		<!-- Интегрированный отладчик Lua-скриптов -->
 		<LuaDebug>0</LuaDebug>
 
+		<!-- Скорость симуляции -->
+		<SimulationSpeed>1.0</SimulationSpeed>
 	</InitData>
 </Config>

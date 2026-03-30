@@ -178,7 +178,13 @@ void Model::start()
         is_simulation_started = true;
 
         connect(&simTimer, &ElapsedTimer::process, this, &Model::process, Qt::DirectConnection);
-        simTimer.setInterval(static_cast<quint64>(integration_time_interval));
+
+        double interval = static_cast<double>(integration_time_interval);
+        if (init_datas[0].simulation_speed > Physics::ZERO)
+        {
+            interval = interval / init_datas[0].simulation_speed;
+        }
+        simTimer.setInterval(static_cast<quint64>(std::ceil(interval)));
         simTimer.start();
     }
 }
@@ -257,6 +263,31 @@ void Model::receiveSignalsFromControlPanel(const control_signals_t &control_sign
 {
     if (vehicle_controlled_by_panel)
         vehicle_controlled_by_panel->setControlSignals(control_signals);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotSetSimSpeed(int speed_factor)
+{
+    if (init_datas.empty())
+    {
+        return;
+    }
+
+    if (speed_factor <= 0)
+    {
+        return;
+    }
+
+    quint64 interval = qRound(static_cast<double>(integration_time_interval) / speed_factor);
+
+    if (interval < 1)
+    {
+        interval = 1;
+    }
+
+    simTimer.setInterval(interval);
 }
 
 //------------------------------------------------------------------------------
@@ -600,6 +631,11 @@ void Model::loadInitData(init_data_t &init_data)
         if (!cfg.getBool(secName, "LuaDebug", init_data.lua_debug))
         {
             init_data.lua_debug = false;
+        }
+
+        if (!cfg.getDouble(secName, "SimulationSpeed", init_data.simulation_speed))
+        {
+            init_data.simulation_speed = 1.0;
         }
 
         Journal::instance()->info("Loaded settings from: " + cfg_path);
@@ -970,6 +1006,8 @@ void Model::initTcpServer()
     connect(tcp_server, &TcpServer::sigResetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
 
     connect(tcp_server, &TcpServer::sigRenameTrain, this, &Model::slotRenameTrainInModel);
+
+    connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
 
     Journal::instance()->info("TCP server is initialized successfully");
 }

@@ -87,6 +87,8 @@ public slots:
 
     void receiveSignalsFromControlPanel(const control_signals_t& control_signals);
 
+    void slotSetSimSpeed(int speed_factor);
+
 signals:
 
     void sendSignalsToControlPanel(feedback_signals_t feedback_signals);

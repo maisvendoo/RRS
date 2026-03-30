@@ -619,19 +619,6 @@ void Autopilot::doors_control(double t, double dt)
 
     auto st = &timetable.stations[target_station_idx];
 
-    if (st->is_arrival && feedback->v_cur < 0.1)
-    {
-        if (st->is_left_platform)
-        {
-            openLeftDoors();
-        }
-
-        if (st->is_right_platform)
-        {
-            openRightDoors();
-        }
-    }
-
     if (t >= st->dep_time_sec)
     {
         if (st->is_left_platform)
@@ -642,6 +629,18 @@ void Autopilot::doors_control(double t, double dt)
         if (st->is_right_platform)
         {
             closeRightDoors();
+        }
+    }
+    else if (st->is_arrival && feedback->v_cur < 0.1)
+    {
+        if (st->is_left_platform)
+        {
+            openLeftDoors();
+        }
+
+        if (st->is_right_platform)
+        {
+            openRightDoors();
         }
     }
 }
@@ -718,11 +717,6 @@ void Autopilot::slotRouteBuildRequest()
         return;
     }
 
-    /*if (target_station_idx < 0 || target_station_idx > timetable.stations.size() - 1)
-    {
-        return;
-    }*/
-
     auto st = &timetable.stations[target_station_idx];
 
     // Если мы оказались на участке приближения
@@ -758,7 +752,7 @@ void Autopilot::slotRouteBuildRequest()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Autopilot::slotIncTargetStation(int vehicle_idx)
+void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
 {
     if (vehicle_idx != this->vehicle_idx)
     {
@@ -773,9 +767,16 @@ void Autopilot::slotIncTargetStation(int vehicle_idx)
     auto st = &timetable.stations[target_station_idx];
 
     // Отправиться раньше графика решил ты? Путь к темной стороне это...
-    if (time < st->dep_time_sec)
+    if (time < st->dep_time_sec && is_on_target_traj)
     {
         return;
+    }
+
+    // Разрешаем отправление, если мы выехали за пределы целевой траектории,
+    // так как раньше отправились вручную
+    if (!is_on_target_traj)
+    {
+        is_departure_allowed = true;
     }
 
     if (!st->is_departure && allow_inc_target_idx)

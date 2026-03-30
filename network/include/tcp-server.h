@@ -61,7 +61,9 @@ signals:
 
     void sigResetVehicleControl(int client_id);
 
-    void sigRenameTrain(int train_idx, QString new_name);    
+    void sigRenameTrain(int train_idx, QString new_name);
+
+    void sigSetSimSpeed(int speed_factor);
 
 private:
 

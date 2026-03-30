@@ -91,6 +91,13 @@ public:
         return map_shift;
     }
 
+    void setShowTrajectoryTooltip(bool show);
+
+    bool getShowTrajectoryTooltip() const
+    {
+        return show_trajectory_tooltip;
+    }
+
 signals:
 
     void sigOpenSignalMenu(Signal* nearest_signal);
@@ -184,6 +191,11 @@ private:
         dvec3 trav = {1.0, 0.0, 0.0};
     };
     QMap<QString, switch_coord_t> switch_coords;
+
+    /// Показывать всплвающие подсказки при наведении на траекторию
+    bool show_trajectory_tooltip = false;
+    /// Последний текст подсказки
+    QString last_tooltip_text = "";
 
     void paintEvent(QPaintEvent *event);
 

@@ -3,6 +3,7 @@
 #include    <QTcpSocket>
 #include    <QNetworkProxy>
 #include    <QBuffer>
+#include    <simspeed-command.h>
 
 //------------------------------------------------------------------------------
 //
@@ -157,6 +158,22 @@ void TcpClient::sendNewTrainName(int train_idx, const QString &new_name)
 
     stream << train_idx;
     stream << new_name;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpClient::sendSimSpeedCommand(int speed_factor)
+{
+    network_data_t request;
+    request.stype = STYPE_COMMAND_SET_SIMULATION_SPEED;
+
+    simspeed_command_t sc;
+    sc.speed_factor = speed_factor;
+    request.data = sc.serialize();
 
     socket->write(request.serialize());
     socket->flush();
