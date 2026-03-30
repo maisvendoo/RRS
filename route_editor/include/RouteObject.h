@@ -1,8 +1,6 @@
 #ifndef ROUTE_OBJECT_H
 #define ROUTE_OBJECT_H
 
-#include "RouteObjects.h"
-
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
@@ -10,9 +8,11 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
 
+#include <list>
 #include <string>
 
 struct EditorContext;
+class RouteObject;
 class SingleSwitch;
 
 namespace vsg
@@ -21,6 +21,9 @@ namespace vsg
 class PagedLOD;
 
 }
+
+using RouteObjects = std::list<vsg::ref_ptr<RouteObject>>;
+using RouteObjectsIterator = RouteObjects::iterator;
 
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 {

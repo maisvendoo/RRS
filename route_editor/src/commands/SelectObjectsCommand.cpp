@@ -14,12 +14,12 @@ SelectObjectsCommand::SelectObjectsCommand(EditorContext& context)
 
 void SelectObjectsCommand::execute()
 {
-    for (RouteObject* const object : objects_to_select)
+    for (const auto& object : objects_to_select)
     {
         object->select();
     }
 
-    for (RouteObject* const object : objects_to_deselect)
+    for (const auto& object : objects_to_deselect)
     {
         object->deselect();
     }
@@ -29,12 +29,12 @@ void SelectObjectsCommand::execute()
 
 void SelectObjectsCommand::undo()
 {
-    for (RouteObject* const object : objects_to_select)
+    for (const auto& object : objects_to_select)
     {
         object->deselect();
     }
 
-    for (RouteObject* const object : objects_to_deselect)
+    for (const auto& object : objects_to_deselect)
     {
         object->select();
     }

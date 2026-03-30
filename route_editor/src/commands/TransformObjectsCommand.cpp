@@ -11,7 +11,7 @@ TransformObjectsCommand::TransformObjectsCommand(EditorContext& context)
     , objects(context.selected_objects)
 {
     initial_matrices.reserve(objects.size());
-    for (const RouteObject* const object : objects)
+    for (const auto& object : objects)
     {
         initial_matrices.emplace_back(object->get_initial_matrix());
     }
@@ -20,7 +20,7 @@ TransformObjectsCommand::TransformObjectsCommand(EditorContext& context)
 void TransformObjectsCommand::undo()
 {
     std::size_t index = 0;
-    for (RouteObject* const object : objects)
+    for (const auto& object : objects)
     {
         object->set_matrix(initial_matrices[index]);
         ++index;

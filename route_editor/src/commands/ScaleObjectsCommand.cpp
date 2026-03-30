@@ -20,7 +20,7 @@ ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context,
 
 void ScaleObjectsCommand::execute()
 {
-    for (RouteObject* const object : objects)
+    for (const auto& object : objects)
     {
         object->scale_relative_to_pivot(pivot, scale, object->matrix);
     }

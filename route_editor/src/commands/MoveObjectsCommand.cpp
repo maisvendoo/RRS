@@ -21,7 +21,7 @@ MoveObjectsCommand::MoveObjectsCommand(
 
 void MoveObjectsCommand::execute()
 {
-    for (RouteObject* const object : objects)
+    for (const auto& object : objects)
     {
         object->move(translation);
     }

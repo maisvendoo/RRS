@@ -2,11 +2,7 @@
 #define PASTE_OBJECTS_COMMAND_H
 
 #include "Command.h"
-#include "RouteObjects.h"
-
-#include <vsg/core/ref_ptr.h>
-
-#include <map>
+#include "RouteObject.h"
 
 struct EditorContext;
 
@@ -21,7 +17,7 @@ public:
 
 private:
     const RouteObjects objects_to_paste;
-    std::map<RouteObject*, vsg::ref_ptr<RouteObject>> pasted_objects;
+    RouteObjects pasted_objects;
     const RouteObjects objects_to_deselect;
 };
 

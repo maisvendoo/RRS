@@ -123,7 +123,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
 
     vsg::updateViewer(*context.viewer, compile_result);
 
-    for (RouteObject* const object : selected_objects)
+    for (const auto& object : selected_objects)
     {
         object->save_matrix();
     }
@@ -215,7 +215,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     {
         if (const RouteObject* const object = node->cast<RouteObject>())
         {
-            select_object(const_cast<RouteObject*>(object));
+            select_object(vsg::ref_ptr(const_cast<RouteObject*>(object)));
             break;
         }
     }
@@ -264,7 +264,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
             prev_intersect_pos = world_intersection;
             total_translation += translation;
 
-            for (RouteObject* const object : context.selected_objects)
+            for (const auto& object : context.selected_objects)
             {
                 object->move(translation);
             }
@@ -305,7 +305,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
                 curr_acos = 2 * vsg::PI - curr_acos;
             }
 
-            for (RouteObject* const object : context.selected_objects)
+            for (const auto& object : context.selected_objects)
             {
                 const float rotation_rad = prev_acos - curr_acos;
                 total_rotation_rad += rotation_rad;
@@ -336,7 +336,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
             const vsg::vec3 scale = {scale_value, scale_value, scale_value};
             total_scale *= scale;
 
-            for (RouteObject* const object : context.selected_objects)
+            for (const auto& object : context.selected_objects)
             {
                 object->scale_relative_to_pivot(gizmo_pos, scale,
                     object->matrix);
@@ -351,7 +351,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
     }
 }
 
-void ObjectSelector::select_object(RouteObject* object)
+void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
 {
     SelectObjectsCommand* const select_objects_command =
         new SelectObjectsCommand(context);
@@ -452,7 +452,7 @@ void ObjectSelector::confirm_keyboard_transformation()
 
 void ObjectSelector::cancel_keyboard_transformation()
 {
-    for (RouteObject* const object : context.selected_objects)
+    for (const auto& object : context.selected_objects)
     {
         object->set_matrix(object->get_initial_matrix());
     }

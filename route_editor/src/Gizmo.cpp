@@ -241,7 +241,7 @@ bool Gizmo::handle_intersections()
         active_plain_switch->mask = MASK_CLICKABLE;
         active_line_switch->mask = MASK_GUI1;
 
-        for (RouteObject* const object : context.selected_objects)
+        for (const auto& object : context.selected_objects)
         {
             object->save_matrix();
         }
@@ -326,7 +326,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
         total_translation += translation;
 
-        for (RouteObject* const object : context.selected_objects)
+        for (const auto& object : context.selected_objects)
         {
             object->move(translation);
         }
@@ -364,7 +364,7 @@ void Gizmo::update_position()
 
     if (context.settings.gizmo_to_center)
     {
-        for (const RouteObject* const object : context.selected_objects)
+        for (const auto& object : context.selected_objects)
         {
             const auto& bounds = object->get_bounds();
             curr_pos += (bounds.min + bounds.max) / 2.0f;
@@ -372,7 +372,7 @@ void Gizmo::update_position()
     }
     else
     {
-        for (const RouteObject* const object : context.selected_objects)
+        for (const auto& object : context.selected_objects)
         {
             curr_pos += object->get_translation();
         }

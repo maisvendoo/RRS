@@ -21,7 +21,7 @@ RotateObjectsCommand::RotateObjectsCommand(EditorContext& context,
 
 void RotateObjectsCommand::execute()
 {
-    for (RouteObject* const object : objects)
+    for (const auto& object : objects)
     {
         object->rotate_around_pivot(pivot, axis, radians, object->matrix);
     }

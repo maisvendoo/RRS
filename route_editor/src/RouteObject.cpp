@@ -186,7 +186,7 @@ RouteObjectsIterator RouteObject::show()
     RouteObjects& hidden_objects = context.hidden_objects;
 
     return hidden_objects.erase(std::find(hidden_objects.begin(),
-        hidden_objects.end(), this));
+        hidden_objects.end(), vsg::ref_ptr(this)));
 }
 
 void RouteObject::select()
@@ -219,7 +219,7 @@ RouteObjectsIterator RouteObject::deselect()
     RouteObjects& selected_objects = context.selected_objects;
 
     const auto it = selected_objects.erase(std::find(selected_objects.begin(),
-        selected_objects.end(), this));
+        selected_objects.end(), vsg::ref_ptr(this)));
 
     context.gizmo->update_position();
 

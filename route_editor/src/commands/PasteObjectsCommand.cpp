@@ -22,28 +22,25 @@ PasteObjectsCommand::PasteObjectsCommand(EditorContext& context)
 
 void PasteObjectsCommand::execute()
 {
-    for (RouteObject* const object : objects_to_deselect)
+    for (const auto& object : objects_to_deselect)
     {
         object->deselect();
     }
 
-    const bool first_paste = pasted_objects.empty();
-
-    for (RouteObject* const object : objects_to_paste)
+    if (pasted_objects.empty())
     {
-        const auto new_object = first_paste
-            ? object->copy()
-            : pasted_objects[object];
-
-        context.route->addChild(vsg::MASK_ALL, new_object);
-        context.objects.emplace_back(new_object);
-
-        if (first_paste)
+        for (const auto& object : objects_to_paste)
         {
-            pasted_objects.emplace(object, new_object);
+            pasted_objects.emplace_back(object->copy());
         }
+    }
 
-        new_object->select();
+    for (const auto& pasted_object : pasted_objects)
+    {
+        context.route->addChild(vsg::MASK_ALL, pasted_object);
+        context.objects.emplace_back(pasted_object);
+
+        pasted_object->select();
     }
 
     const auto compile_result = context.viewer->compileManager->compile(
@@ -56,19 +53,19 @@ void PasteObjectsCommand::execute()
 
 void PasteObjectsCommand::undo()
 {
-    for (const auto& [_, new_object] : pasted_objects)
+    for (const auto& pasted_object : pasted_objects)
     {
-        new_object->deselect();
+        pasted_object->deselect();
 
         RouteObjects& objects = context.objects;
-        objects.erase(std::find(objects.begin(), objects.end(), new_object));
+        objects.erase(std::find(objects.begin(), objects.end(), pasted_object));
 
         const auto route = context.route;
 
         for (auto it = route->children.begin(); it != route->children.end();
             ++it)
         {
-            if (it->node == new_object)
+            if (it->node == pasted_object)
             {
                 route->children.erase(it);
                 break;
@@ -76,7 +73,7 @@ void PasteObjectsCommand::undo()
         }
     }
 
-    for (RouteObject* const object : objects_to_deselect)
+    for (const auto& object : objects_to_deselect)
     {
         object->select();
     }

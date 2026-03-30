@@ -31,7 +31,7 @@ public:
     void apply(vsg::MoveEvent& moveEvent) override;
 
 private:
-    void select_object(RouteObject* object);
+    void select_object(vsg::ref_ptr<RouteObject> object);
 
     void confirm_keyboard_transformation();
     void cancel_keyboard_transformation();

@@ -12,12 +12,12 @@ HideObjectsCommand::HideObjectsCommand(EditorContext& context)
 
 void HideObjectsCommand::execute()
 {
-    for (RouteObject* const object : objects_to_hide)
+    for (const auto& object : objects_to_hide)
     {
         object->hide();
     }
 
-    for (RouteObject* const object : objects_to_show)
+    for (const auto& object : objects_to_show)
     {
         object->show();
     }
@@ -25,12 +25,12 @@ void HideObjectsCommand::execute()
 
 void HideObjectsCommand::undo()
 {
-    for (RouteObject* const object : objects_to_hide)
+    for (const auto& object : objects_to_hide)
     {
         object->show();
     }
 
-    for (RouteObject* const object : objects_to_show)
+    for (const auto& object : objects_to_show)
     {
         object->hide();
     }
