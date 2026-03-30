@@ -53,6 +53,7 @@
     <addaction name="actionShowTrajName"/>
     <addaction name="actionShowConnName"/>
     <addaction name="actionShow_trajectories_tooltips"/>
+    <addaction name="actionShow_server_time"/>
    </widget>
    <widget class="QMenu" name="mTrains">
     <property name="title">
@@ -147,6 +148,14 @@
    </property>
    <property name="text">
     <string>Show trajectories tooltips</string>
+   </property>
+  </action>
+  <action name="actionShow_server_time">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show server time</string>
    </property>
   </action>
  </widget>

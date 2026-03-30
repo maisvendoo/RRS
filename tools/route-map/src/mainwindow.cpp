@@ -68,6 +68,8 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
 
     connect(ui->actionShow_trajectories_tooltips, &QAction::triggered, this, &MainWindow::slotSetShowTrajTooltip);
 
+    connect(ui->actionShow_server_time, &QAction::triggered, this, &MainWindow::slotShowSimTime);
+
     bg = new BackGroundWidget(ui->Map);
 
     map = new MapWidget(ui->Map);
@@ -564,6 +566,15 @@ void MainWindow::slotGetPlayersData(QByteArray &players_update)
 void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
 {
     train_data.deserialize(sim_data);
+
+    QString formatted_time = train_data.sim_time.time.getString();
+
+    // Убедиться что формат "HH:MM:SS" (8 символов всегда)
+    if (formatted_time.length() < 8)
+    {
+        formatted_time = formatted_time.rightJustified(8, '0');
+    }
+    map->setSimTime(formatted_time);
 
     // Дата-время сервера в статусной строке внизу
     ui->statusbar->showMessage(train_data.sim_time.getString());
@@ -1158,4 +1169,17 @@ void MainWindow::slotSetShowTrajTooltip(bool is_show)
         slotRecvLogMessage(tr("Enabled trajectory tooltips"));
     else
         slotRecvLogMessage(tr("Disabled trajectory tooltips"));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotShowSimTime(bool is_show)
+{
+    if (map == nullptr)
+    {
+        return;
+    }
+
+    map->showSimTime(is_show);
 }

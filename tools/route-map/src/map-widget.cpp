@@ -6,6 +6,7 @@
 #include    <QWheelEvent>
 #include    <switch.h>
 #include    <QToolTip>
+#include    <QRect>
 
 //------------------------------------------------------------------------------
 //
@@ -276,6 +277,11 @@ void MapWidget::paintEvent(QPaintEvent *event)
     drawTrains(train_data, painter);
 
     drawTrainNames(train_data, painter);
+
+    if (show_sim_time && !sim_time.isEmpty())
+    {
+        drawSimTime(painter);
+    }
 
     painter.end();
 }
@@ -955,6 +961,44 @@ void MapWidget::draw_triangle(QPainter &painter, const QPointF &pointA, const QP
     painter.drawPolygon({pointA, pointB, pointC});
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MapWidget::drawSimTime(QPainter &painter)
+{
+    if (sim_time.isEmpty() || !show_sim_time)
+    {
+        return;
+    }
+
+    QFont font("Consolas", 36, QFont::Bold);
+    font.setStyleHint(QFont::Monospace);
+    painter.setFont(font);
+
+    QColor text_color(64, 64, 64);
+    QColor border_color(255, 255, 255);
+
+    int margin = 10;
+
+    // ← Использовать QRect с выравниванием
+    QRect text_rect = painter.fontMetrics().boundingRect(sim_time);
+    int text_height = text_rect.height();
+
+    // Область для текста (весь правый верхний угол)
+    QRect draw_rect(margin, margin,
+                    this->width() - margin * 2,
+                    text_height + 10);
+
+    // Фон
+    painter.fillRect(draw_rect, QColor(0, 0, 0, 0));
+
+    // Текст с выравниванием по правому краю
+    painter.setPen(border_color);
+    painter.drawText(draw_rect, Qt::AlignRight | Qt::AlignVCenter, sim_time);
+
+    painter.setPen(text_color);
+    painter.drawText(draw_rect, Qt::AlignRight | Qt::AlignVCenter, sim_time);
+}
 
 //------------------------------------------------------------------------------
 //

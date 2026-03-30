@@ -98,6 +98,18 @@ public:
         return show_trajectory_tooltip;
     }
 
+    void setSimTime(const QString &sim_time)
+    {
+        this->sim_time = sim_time;
+        update();
+    }
+
+    void showSimTime(bool show)
+    {
+        show_sim_time = show;
+        update();
+    }
+
 signals:
 
     void sigOpenSignalMenu(Signal* nearest_signal);
@@ -197,7 +209,11 @@ private:
     /// Последний текст подсказки
     QString last_tooltip_text = "";
 
-    void paintEvent(QPaintEvent *event);
+    /// Показывать время сервера
+    bool show_sim_time = false;
+    QString sim_time = "";
+
+    void paintEvent(QPaintEvent *event);    
 
     void drawTrajectory(Trajectory* traj, QPainter& painter,
                         QPointF& cursor_pos, double& distance2);
@@ -226,6 +242,8 @@ private:
     void draw_triangle(QPainter& painter,
                        const QPointF& pointA, const QPointF& pointB, const QPointF& pointC,
                        QColor color);
+
+    void drawSimTime(QPainter &painter);
 
     QPoint coord_transform(dvec3 point);
 
