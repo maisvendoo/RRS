@@ -115,7 +115,12 @@ void VL60pk::stepAutopilot(double t, double dt)
 
         sand_system->setSandDeliveryOn(auto_control[cab_idx]->sand_ON);
 
+        horn[cab_idx]->lockManualControl(true);
         horn[cab_idx]->setSvistokOn(auto_control[cab_idx]->whistle);
         horn[cab_idx]->setTifonOn(auto_control[cab_idx]->typhoid);
-    }    
+    }
+    else
+    {
+        horn[cab_idx]->lockManualControl(false);
+    }
 }
