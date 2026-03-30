@@ -58,6 +58,14 @@ EditorGui::EditorGui(EditorContext& context)
     {
         window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     }
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.FrameRounding = 6.0f;
+    style.FrameBorderSize = 1.0f;
+    style.WindowRounding = 6.0f;
+    style.ScrollbarSize = 16.0f;
+    style.GrabMinSize = 16.0f;
+    style.GrabRounding = 6.0f;
 }
 
 void EditorGui::record(vsg::CommandBuffer& command_buffer) const
