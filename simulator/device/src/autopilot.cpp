@@ -565,8 +565,13 @@ void Autopilot::checkTimetable(double t, double dt)
     if ( (st->arr_time != "-") && (st->is_arrival) && (!st->is_delay) )
     {
         double delay = pf(st->fact_arr_time_sec - st->arr_time_sec);
-        st->dep_time_sec += delay;
-        st->is_delay = true;
+
+        // Выдерживаем без сокращения только короткую стоянку
+        if (st->dep_time_sec - st->arr_time_sec < min_reduced_halt_time * 60.0)
+        {
+            st->dep_time_sec += delay;
+            st->is_delay = true;
+        }
     }
 
     if (t >= st->dep_time_sec)
