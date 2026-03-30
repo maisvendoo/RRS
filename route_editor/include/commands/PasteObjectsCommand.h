@@ -14,7 +14,7 @@ class PasteObjectsCommand : public Command
 {
 public:
     explicit PasteObjectsCommand(EditorContext& context);
-    virtual ~PasteObjectsCommand() = default;
+    virtual ~PasteObjectsCommand() override = default;
     virtual void execute() override;
     virtual void undo() override;
     virtual void update_description() override;

@@ -22,12 +22,12 @@ PasteObjectsCommand::PasteObjectsCommand(EditorContext& context)
 
 void PasteObjectsCommand::execute()
 {
-    const bool first_paste = pasted_objects.empty();
-
     for (RouteObject* const object : objects_to_deselect)
     {
         object->deselect();
     }
+
+    const bool first_paste = pasted_objects.empty();
 
     for (RouteObject* const object : objects_to_paste)
     {
