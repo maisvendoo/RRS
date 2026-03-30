@@ -33,7 +33,8 @@ public:
         vsg::ref_ptr<vsg::PagedLOD> paged_lod,
         const std::string& label,
         vsg::vec3 translation,
-        vsg::vec3 rotation_deg
+        vsg::vec3 rotation_deg,
+        vsg::vec3 scale = {1.0f, 1.0f, 1.0f}
     );
 
     vsg::vec3 get_translation() const;
@@ -81,7 +82,7 @@ private:
 
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;
-    vsg::vec3 scale = {1.0f, 1.0f, 1.0f};
+    vsg::vec3 scale;
 
     vsg::dmat4 initial_matrix;
     vsg::box bounds;

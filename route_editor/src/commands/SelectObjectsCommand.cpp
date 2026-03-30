@@ -46,7 +46,7 @@ void SelectObjectsCommand::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Select objects: to select: %zu objects\n"
-        "                to deselect: %zu objects",
+        "              to deselect: %zu objects",
         objects_to_select.size(), objects_to_deselect.size()
     );
 }

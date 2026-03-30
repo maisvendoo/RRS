@@ -29,8 +29,8 @@ void ScaleObjectsCommand::execute()
 void ScaleObjectsCommand::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
-        "Scale objects: pivot = { %10.3f, %10.3f, %10.3f }\n"
-        "               scale = { %10.3f, %10.3f, %10.3f }",
+        "Scale objects: pivot = { %.3f, %.3f, %.3f }\n"
+        "               scale = { %.3f, %.3f, %.3f }",
         pivot.x, pivot.y, pivot.z, scale.x, scale.y, scale.z
     );
 }

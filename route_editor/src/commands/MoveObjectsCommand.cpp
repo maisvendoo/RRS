@@ -30,7 +30,7 @@ void MoveObjectsCommand::execute()
 void MoveObjectsCommand::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
-        "Move objects: { %10.3f, %10.3f, %10.3f }",
+        "Move objects: { %.3f, %.3f, %.3f }",
         translation.x, translation.y, translation.z
     );
 }

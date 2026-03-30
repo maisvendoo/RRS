@@ -49,12 +49,14 @@ RouteObject::RouteObject(
     vsg::ref_ptr<vsg::PagedLOD> paged_lod,
     const std::string& label,
     vsg::vec3 translation,
-    vsg::vec3 rotation_deg
+    vsg::vec3 rotation_deg,
+    vsg::vec3 scale
 )
     : label(label)
     , context(context)
     , translation(translation)
     , rotation_deg(rotation_deg)
+    , scale(scale)
     , paged_lod(paged_lod)
 {
     paged_lod_switch = SingleSwitch::create(
@@ -229,7 +231,7 @@ RouteObjectsIterator RouteObject::deselect()
 vsg::ref_ptr<RouteObject> RouteObject::copy() const
 {
     return RouteObject::create(context, paged_lod, label,
-        translation, rotation_deg);
+        translation, rotation_deg, scale);
 }
 
 void RouteObject::save_matrix()

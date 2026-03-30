@@ -30,9 +30,9 @@ void RotateObjectsCommand::execute()
 void RotateObjectsCommand::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
-        "Rotate objects: pivot = { %10.3f, %10.3f, %10.3f }\n"
-        "                axis = { %10.3f, %10.3f, %10.3f }\n"
-        "                radians = %10.3f",
+        "Rotate objects: pivot = { %.3f, %.3f, %.3f }\n"
+        "                 axis = { %.3f, %.3f, %.3f }\n"
+        "              radians = %.3f",
         pivot.x, pivot.y, pivot.z, axis.x, axis.y, axis.z, radians
     );
 }
