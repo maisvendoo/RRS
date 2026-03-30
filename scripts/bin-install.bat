@@ -19,3 +19,15 @@ rem Копируем плагины
 
 xcopy /Y ..\..\plugins\*.dll %RRS_DEV_ROOT%\plugins
 
+xcopy /Y %OPENAL_BIN%\*.dll %RRS_DEV_ROOT%\bin\
+
+rem Генерируем рантайм Qt
+
+cd %RRS_DEV_ROOT%\bin
+windeployqt %RRS_DEV_ROOT%\bin\launcher.exe
+windeployqt %RRS_DEV_ROOT%\bin\simulator.exe
+windeployqt %RRS_DEV_ROOT%\bin\viewer.exe
+windeployqt %RRS_DEV_ROOT%\bin\pathconv.exe
+windeployqt %RRS_DEV_ROOT%\bin\profconv.exe
+windeployqt %RRS_DEV_ROOT%\bin\routeconv.exe
+windeployqt %RRS_DEV_ROOT%\bin\CfgReader.dll
