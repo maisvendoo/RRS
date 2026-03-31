@@ -3,42 +3,36 @@
 #include "Command.h"
 #include "EditorContext.h"
 #include "RouteObject.h"
+#include "TransformObjectsCommand.h"
 
 #include <vsg/maths/vec3.h>
 
 #include <cstdio>
 
 RotateObjectsCommand::RotateObjectsCommand(EditorContext& context,
-    vsg::vec3 pivot, vsg::vec3 rotation_deg)
-    : Command(context)
-    , objects(context.selected_objects)
+    vsg::vec3 pivot, vsg::vec3 axis, float radians)
+    : TransformObjectsCommand(context)
     , pivot(pivot)
-    , rotation_deg(rotation_deg)
+    , axis(axis)
+    , radians(radians)
 {
     update_description();
 }
 
-void RotateObjectsCommand::execute() const
+void RotateObjectsCommand::execute()
 {
-    for (RouteObject* const object : objects)
+    for (const auto& object : objects)
     {
-        object->rotate_around_pivot(pivot, rotation_deg, object->matrix);
-    }
-}
-
-void RotateObjectsCommand::undo() const
-{
-    for (RouteObject* const object : objects)
-    {
-        object->rotate_around_pivot(pivot, -rotation_deg, object->matrix);
+        object->rotate_around_pivot(pivot, axis, radians, object->matrix);
     }
 }
 
 void RotateObjectsCommand::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
-        "Rotate objects: pivot = { %10.3f, %10.3f, %10.3f }\n"
-        "                rotation_deg = { %10.3f, %10.3f, %10.3f }",
-        pivot.x, pivot.y, pivot.z,
-        rotation_deg.x, rotation_deg.y, rotation_deg.z);
+        "Rotate objects: pivot = { %.3f, %.3f, %.3f }\n"
+        "                 axis = { %.3f, %.3f, %.3f }\n"
+        "              radians = %.3f",
+        pivot.x, pivot.y, pivot.z, axis.x, axis.y, axis.z, radians
+    );
 }

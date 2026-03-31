@@ -35,6 +35,7 @@ CfgEditor::CfgEditor()
 void CfgEditor::openFileForWrite(QString fileName)
 {
     file_.setFileName(fileName);
+    // TODO: Не проверяется
     file_.open(QIODevice::WriteOnly);
 
     xmlWriter_.setDevice(&file_);

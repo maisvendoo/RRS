@@ -82,6 +82,7 @@ private:
 
     bool state_RBS = false;
 
+    // TODO: Не используется нигде
     bool state_EPK = false;
 
     double v_kmh = 0.0;

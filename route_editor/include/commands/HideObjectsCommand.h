@@ -11,13 +11,13 @@ class HideObjectsCommand : public Command
 public:
     explicit HideObjectsCommand(EditorContext& context);
     virtual ~HideObjectsCommand() override = default;
-    virtual void execute() const override;
-    virtual void undo() const override;
+    virtual void execute() override;
+    virtual void undo() override;
     virtual void update_description() override;
 
 public:
-    RouteObjects objects_to_hide;
-    RouteObjects objects_to_show;
+    const RouteObjects objects_to_hide;
+    const RouteObjects objects_to_show;
 };
 
 

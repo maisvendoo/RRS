@@ -50,6 +50,7 @@ private:
     double dv = 0.0;
 
     /// Число выполенных ступеней торможения
+    // TODO: Не используется нигде
     uint8_t brake_step = 0;
 
     /// Тормозной контроллер
@@ -59,6 +60,7 @@ private:
     bool lock_traction = false;
 
     /// Блокирование тяги при постановке КМ в 0
+    // TODO: Не используется нигде
     bool is_zero_lock = false;
 
     /// Структура управляющих воздействий ВСЕГДА специфична
@@ -73,7 +75,7 @@ private:
                     state_vector_t &dYdt,
                     double t) override;
 
-    void load_config(CfgReader &cfg) override;    
+    void load_config(CfgReader &cfg) override;
 
     void release_RB() override;
 
@@ -93,7 +95,7 @@ private:
 
 private slots:
 
-    void slotDelayTimer();    
+    void slotDelayTimer();
 };
 
 #endif

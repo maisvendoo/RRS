@@ -5,7 +5,6 @@
 #include "SwitchGroup.h"
 
 #include <vsg/core/Inherit.h>
-#include <vsg/core/ref_ptr.h>
 
 struct EditorContext;
 

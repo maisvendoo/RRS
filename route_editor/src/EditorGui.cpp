@@ -23,6 +23,7 @@
 #include <climits>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/common.h>
 #include <vsg/maths/quat.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
@@ -57,6 +58,14 @@ EditorGui::EditorGui(EditorContext& context)
     {
         window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     }
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.FrameRounding = 6.0f;
+    style.FrameBorderSize = 1.0f;
+    style.WindowRounding = 6.0f;
+    style.ScrollbarSize = 16.0f;
+    style.GrabMinSize = 16.0f;
+    style.GrabRounding = 6.0f;
 }
 
 void EditorGui::record(vsg::CommandBuffer& command_buffer) const
@@ -117,7 +126,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 if (curr == active)
                 {
-                    ImGui::Text("--> %s", curr->command->get_description());
+                    ImGui::TextColored(ImVec4{0.2f, 1.0f, 0.3f, 1.0f}, "%s", curr->command->get_description());
                     ImGui::Separator();
                 }
                 else
@@ -221,7 +230,7 @@ void EditorGui::show_objects_ref() const
 {
     ImGui::Begin("objects_ref", nullptr, window_flags);
 
-    if (!context.scene_graph->get_route())
+    if (!context.route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -249,11 +258,11 @@ void EditorGui::show_objects_ref() const
 
 void EditorGui::show_route_map() const
 {
-    assert(context.scene_graph->get_route());
+    assert(context.route);
 
     ImGui::Begin("route1.map", nullptr, window_flags);
 
-    if (!context.scene_graph->get_route())
+    if (!context.route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -374,7 +383,7 @@ void EditorGui::show_topology() const
 {
     ImGui::Begin("Topology", nullptr, window_flags);
 
-    const auto route = context.scene_graph->get_route();
+    const auto route = context.route;
     if (!route)
     {
         ImGui::Text("There is no route yet");
@@ -514,7 +523,7 @@ void EditorGui::show_selected_objects_properties() const
         vsg::vec3 rotation_deg = object->get_rotation_deg();
         if (ImGui::DragFloat3(label.c_str(), rotation_deg.data(), 0.2f))
         {
-            object->set_rotation_deg(rotation_deg, true);
+            object->set_rotation_deg(rotation_deg);
         }
 
         label = "scale##" + std::to_string(i);
@@ -522,7 +531,7 @@ void EditorGui::show_selected_objects_properties() const
         vsg::vec3 scale = object->get_scale();
         if (ImGui::DragFloat3(label.c_str(), scale.data(), 0.01f))
         {
-            object->set_scale(scale, true);
+            object->set_scale(scale);
         }
 
         ++i;
@@ -534,33 +543,6 @@ void EditorGui::show_selected_objects_properties() const
         center += object->get_translation();
     }
     center /= static_cast<float>(selected_objects.size());
-
-    if (ImGui::Button("Rotate X 30"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->rotate_around_pivot(center,
-                vsg::vec3{30.0f, 0.0f, 0.0f}, object->matrix);
-        }
-    }
-
-    if (ImGui::Button("Rotate Y 30"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->rotate_around_pivot(center,
-                vsg::vec3{0.0f, 30.0f, 0.0f}, object->matrix);
-        }
-    }
-
-    if (ImGui::Button("Rotate Z 30"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->rotate_around_pivot(center,
-                vsg::vec3{0.0f, 0.0f, 30.0f}, object->matrix);
-        }
-    }
 
     if (ImGui::Button("Scale X 2"))
     {

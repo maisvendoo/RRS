@@ -1,14 +1,13 @@
 #include "RouteObject.h"
 
+#include "EditorContext.h"
 #include "Gizmo.h"
 #include "Mask.h"
-#include "ObjectSelector.h"
 #include "Outline.h"
 #include "SingleSwitch.h"
 
 #include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
-#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
 #include <vsg/maths/common.h>
@@ -20,7 +19,6 @@
 #include <vsg/utils/ComputeBounds.h>
 
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -41,30 +39,26 @@ static vsg::vec3 to_euler_deg(const vsg::quat& quat)
 
 static vsg::mat4 to_rotate_matrix(vsg::vec3 rotation_deg)
 {
-    const vsg::vec3 rotation_rad = {
-        vsg::radians(rotation_deg.x),
-        vsg::radians(rotation_deg.y),
-        vsg::radians(rotation_deg.z)
-    };
-
-    const vsg::mat4 rotate_x = vsg::rotate(rotation_rad.x, AXIS_X_POSITIVE);
-    const vsg::mat4 rotate_y = vsg::rotate(rotation_rad.y, AXIS_Y_POSITIVE);
-    const vsg::mat4 rotate_z = vsg::rotate(rotation_rad.z, AXIS_Z_POSITIVE);
-
-    return rotate_z * rotate_y * rotate_x;
+    return vsg::rotate(vsg::radians(rotation_deg.z), AXIS_Z_POSITIVE) *
+           vsg::rotate(vsg::radians(rotation_deg.y), AXIS_Y_POSITIVE) *
+           vsg::rotate(vsg::radians(rotation_deg.x), AXIS_X_POSITIVE);
 }
 
-RouteObject::RouteObject(EditorContext& context, vsg::ref_ptr<vsg::PagedLOD> paged_lod,
-    const std::string& label, vsg::vec3 translation, vsg::vec3 rotation_deg)
+RouteObject::RouteObject(
+    EditorContext& context,
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    const std::string& label,
+    vsg::vec3 translation,
+    vsg::vec3 rotation_deg,
+    vsg::vec3 scale
+)
     : label(label)
     , context(context)
     , translation(translation)
     , rotation_deg(rotation_deg)
+    , scale(scale)
+    , paged_lod(paged_lod)
 {
-    assert(paged_lod);
-
-    update_matrix();
-
     paged_lod_switch = SingleSwitch::create(
         vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
@@ -73,6 +67,8 @@ RouteObject::RouteObject(EditorContext& context, vsg::ref_ptr<vsg::PagedLOD> pag
 
     this->addChild(paged_lod_switch);
     this->addChild(outline_switch);
+
+    update_matrix();
 }
 
 vsg::vec3 RouteObject::get_translation() const
@@ -87,28 +83,13 @@ vsg::vec3 RouteObject::get_rotation_deg() const
 
 vsg::vec3 RouteObject::get_scale() const
 {
-    return scale_value;
+    return scale;
 }
 
-// vsg::vec3 RouteObject::get_initial_translation() const
-// {
-//     return initial_translation;
-// }
-
-// vsg::vec3 RouteObject::get_initial_rotation_deg() const
-// {
-//     return initial_rotation_deg;
-// }
-
-// vsg::vec3 RouteObject::get_initial_scale() const
-// {
-//     return initial_scale;
-// }
-
-// const vsg::dmat4& RouteObject::get_initial_matrix() const
-// {
-//     return initial_matrix;
-// }
+const vsg::dmat4& RouteObject::get_initial_matrix() const
+{
+    return initial_matrix;
+}
 
 const vsg::box& RouteObject::get_bounds() const
 {
@@ -129,76 +110,48 @@ void RouteObject::set_translation(vsg::vec3 translation)
 {
     this->translation = translation;
 
-    this->matrix[3][0] = this->translation.x;
-    this->matrix[3][1] = this->translation.y;
-    this->matrix[3][2] = this->translation.z;
+    this->matrix[3][0] = translation.x;
+    this->matrix[3][1] = translation.y;
+    this->matrix[3][2] = translation.z;
 
     update_bounds();
 }
 
-void RouteObject::set_rotation_deg(vsg::vec3 rotation_deg, bool update_matrix)
+void RouteObject::set_rotation_deg(vsg::vec3 rotation_deg)
 {
     this->rotation_deg = rotation_deg;
-
-    if (update_matrix)
-    {
-        this->update_matrix();
-    }
+    update_matrix();
 }
 
-void RouteObject::set_scale(vsg::vec3 scale, bool update_matrix)
+void RouteObject::set_scale(vsg::vec3 scale)
 {
-    this->scale_value = scale;
-
-    if (update_matrix)
-    {
-        this->update_matrix();
-    }
+    this->scale = scale;
+    update_matrix();
 }
 
 void RouteObject::move(vsg::vec3 translation)
 {
     this->translation += translation;
 
-    this->matrix[3][0] = this->translation.x;
-    this->matrix[3][1] = this->translation.y;
-    this->matrix[3][2] = this->translation.z;
+    this->matrix[3][0] += translation.x;
+    this->matrix[3][1] += translation.y;
+    this->matrix[3][2] += translation.z;
 
     update_bounds();
 }
 
-void RouteObject::rotate(vsg::vec3 rotation_deg, bool update_matrix)
+void RouteObject::rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis,
+    float radians, const vsg::dmat4& matrix)
 {
-    this->rotation_deg += rotation_deg;
+    this->matrix = vsg::translate(pivot) *
+        vsg::rotate(vsg::quat(radians, axis)) * vsg::translate(-pivot) *
+        static_cast<vsg::mat4>(matrix);
 
-    if (update_matrix)
-    {
-        this->update_matrix();
-    }
-}
-
-void RouteObject::scale(vsg::vec3 scale, bool update_matrix)
-{
-    this->scale_value *= scale;
-
-    if (update_matrix)
-    {
-        this->update_matrix();
-    }
-}
-
-void RouteObject::rotate_around_pivot(vsg::vec3 pivot,
-    vsg::vec3 rotation_deg, const vsg::dmat4& matrix)
-{
-    this->matrix = vsg::translate(pivot) * to_rotate_matrix(rotation_deg) *
-        vsg::translate(-pivot) * static_cast<vsg::mat4>(matrix);
-
-    vsg::quat quat;
-
+    vsg::quat temp_quat;
     vsg::decompose(static_cast<vsg::mat4>(this->matrix),
-        translation, quat, scale_value);
+        this->translation, temp_quat, this->scale);
 
-    this->rotation_deg = to_euler_deg(quat);
+    this->rotation_deg = to_euler_deg(temp_quat);
 
     update_bounds();
 }
@@ -209,10 +162,9 @@ void RouteObject::scale_relative_to_pivot(vsg::vec3 pivot,
     this->matrix = vsg::translate(pivot) * vsg::scale(scale) *
         vsg::translate(-pivot) * static_cast<vsg::mat4>(matrix);
 
-    vsg::quat quat;
-
+    vsg::quat temp_quat;
     vsg::decompose(static_cast<vsg::mat4>(this->matrix),
-        translation, quat, scale_value);
+        this->translation, temp_quat, this->scale);
 
     update_bounds();
 }
@@ -233,17 +185,21 @@ RouteObjectsIterator RouteObject::show()
 
     is_hidden = false;
 
-    return context.hidden_objects.erase(std::find(context.hidden_objects.cbegin(),
-        context.hidden_objects.cend(), this));
+    RouteObjects& hidden_objects = context.hidden_objects;
+
+    return hidden_objects.erase(std::find(hidden_objects.begin(),
+        hidden_objects.end(), vsg::ref_ptr(this)));
 }
 
 void RouteObject::select()
 {
     if (!outline_switch->node)
     {
-        const auto compile_manager = context.viewer->compileManager;
-        const auto outline = context.outline_builder->create_outline(paged_lod_switch->node.cast<vsg::PagedLOD>());
-        const auto compile_result = compile_manager->compile(outline);
+        const auto outline = context.outline_builder->create_outline(paged_lod);
+
+        const auto compile_result = context.viewer->compileManager->compile(
+            outline);
+
         outline_switch->node = outline;
         vsg::updateViewer(*context.viewer, compile_result);
     }
@@ -253,7 +209,6 @@ void RouteObject::select()
     is_selected = true;
 
     context.selected_objects.emplace_back(this);
-
     context.gizmo->update_position();
 }
 
@@ -263,38 +218,45 @@ RouteObjectsIterator RouteObject::deselect()
 
     is_selected = false;
 
-    const auto it = context.selected_objects.erase(std::find(
-        context.selected_objects.cbegin(), context.selected_objects.cend(), this));
+    RouteObjects& selected_objects = context.selected_objects;
+
+    const auto it = selected_objects.erase(std::find(selected_objects.begin(),
+        selected_objects.end(), vsg::ref_ptr(this)));
 
     context.gizmo->update_position();
 
     return it;
 }
 
-// void RouteObject::save_translation()
-// {
-//     initial_translation = translation;
-// }
+vsg::ref_ptr<RouteObject> RouteObject::copy() const
+{
+    return RouteObject::create(context, paged_lod, label,
+        translation, rotation_deg, scale);
+}
 
-// void RouteObject::save_rotation()
-// {
-//     initial_rotation_deg = rotation_deg;
-// }
+void RouteObject::save_matrix()
+{
+    initial_matrix = this->matrix;
+}
 
-// void RouteObject::save_scale()
-// {
-//     initial_scale = scale_value;
-// }
+void RouteObject::set_matrix(const vsg::dmat4& matrix)
+{
+    this->matrix = matrix;
 
-// void RouteObject::save_matrix()
-// {
-//     initial_matrix = this->matrix;
-// }
+    vsg::quat temp_quat;
+    vsg::decompose(static_cast<vsg::mat4>(this->matrix),
+        this->translation, temp_quat, this->scale);
+
+    this->rotation_deg = to_euler_deg(temp_quat);
+
+    update_bounds();
+}
 
 void RouteObject::update_matrix()
 {
-    this->matrix = vsg::translate(translation) *
-        to_rotate_matrix(rotation_deg) * vsg::scale(scale_value);
+    this->matrix = vsg::translate(this->translation) *
+        to_rotate_matrix(this->rotation_deg) *
+        vsg::scale(this->scale);
 
     update_bounds();
 }
@@ -304,7 +266,7 @@ void RouteObject::update_bounds()
     vsg::ComputeBounds compute_bounds;
     compute_bounds.useNodeBounds = false;
     this->accept(compute_bounds);
-    bounds = static_cast<vsg::box>(compute_bounds.bounds);
+    this->bounds = static_cast<vsg::box>(compute_bounds.bounds);
 
     context.gizmo->update_position();
 }

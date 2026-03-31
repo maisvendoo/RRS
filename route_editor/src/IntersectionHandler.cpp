@@ -1,17 +1,15 @@
 #include "IntersectionHandler.h"
 
-#include "CameraHandler.h"
+#include "EditorContext.h"
 #include "LSIntersector.h"
 #include "Mask.h"
 #include "MouseButton.h"
 
 #include <vsg/app/Camera.h>
-#include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec2.h>
 #include <vsg/ui/PointerEvent.h>
 
 #include <algorithm>
-#include <cassert>
 
 IntersectionHandler::IntersectionHandler(const EditorContext& context)
     : context(context)
@@ -33,7 +31,6 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
                 buttonPress.x, buttonPress.y);
 
             lmb_intersector->traversalMask = MASK_CLICKABLE;
-
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
@@ -42,7 +39,6 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
                 buttonPress.x, buttonPress.y);
 
             mmb_intersector->traversalMask = MASK_CLICKABLE;
-
             return;
         }
         case MOUSE_BUTTON_RIGHT:
@@ -51,7 +47,6 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
                 buttonPress.x, buttonPress.y);
 
             rmb_intersector->traversalMask = MASK_CLICKABLE;
-
             return;
         }
         default:

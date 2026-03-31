@@ -3,17 +3,39 @@
 #include "EditorContext.h"
 #include "Settings.h"
 
+#include <vsg/app/Camera.h>
+#include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/Window.h>
 #include <vsg/app/WindowTraits.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/ui/WindowEvent.h>
 
 #include <vulkan/vulkan_core.h>
 
 #include <cstdio>
 
-static VkSampleCountFlags samples_bit_flag(int samples);
+static VkSampleCountFlags samples_bit_flag(int samples)
+{
+    if (samples >= 8)
+    {
+        return VK_SAMPLE_COUNT_8_BIT;
+    }
+    else if (samples >= 4)
+    {
+        return VK_SAMPLE_COUNT_4_BIT;
+    }
+    else if (samples >= 2)
+    {
+        return VK_SAMPLE_COUNT_2_BIT;
+    }
+    else
+    {
+        return VK_SAMPLE_COUNT_1_BIT;
+    }
+}
 
 WindowHandler::WindowHandler(EditorContext& context)
+    : context(context)
 {
     const settings_t& settings = context.settings;
 
@@ -40,22 +62,12 @@ WindowHandler::WindowHandler(EditorContext& context)
     }
 }
 
-VkSampleCountFlags samples_bit_flag(int samples)
+void WindowHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
 {
-    if (samples >= 8)
-    {
-        return VK_SAMPLE_COUNT_8_BIT;
-    }
-    else if (samples >= 4)
-    {
-        return VK_SAMPLE_COUNT_4_BIT;
-    }
-    else if (samples >= 2)
-    {
-        return VK_SAMPLE_COUNT_2_BIT;
-    }
-    else
-    {
-        return VK_SAMPLE_COUNT_1_BIT;
-    }
+    context.perspective->aspectRatio =
+        static_cast<double>(configureWindow.width) /
+        static_cast<double>(configureWindow.height);
+
+    context.camera->viewportState->set(0, 0,
+        configureWindow.width, configureWindow.height);
 }

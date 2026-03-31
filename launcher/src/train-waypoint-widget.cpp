@@ -197,6 +197,7 @@ TrainWaypointWidget::~TrainWaypointWidget()
 QString TrainWaypointWidget::getTrainName()
 {
     int train_idx = cbTrainConfigSelect->currentIndex();
+    // TODO: Разные типы с size_t
     if ((train_idx <= 0) || (train_idx > trains_info->size()))
         return QString("<Not Selected>");
 
@@ -211,6 +212,7 @@ active_train_t TrainWaypointWidget::getActiveTrainConfig()
     active_train_t at;
 
     int train_idx = cbTrainConfigSelect->currentIndex();
+    // TODO: Разные типы с size_t
     if ((train_idx <= 0) || (train_idx > trains_info->size()))
     {
         at.is_active = false;
@@ -219,6 +221,7 @@ active_train_t TrainWaypointWidget::getActiveTrainConfig()
     at.train_info = trains_info->at(train_idx - 1);
 
     int traj_idx = cbTrajectoryNameSelect->currentIndex();
+    // TODO: Разные типы с size_t
     if ((traj_idx <= 0) || (traj_idx > trajectrories->size()))
     {
         at.is_active = false;
@@ -245,6 +248,7 @@ active_train_t TrainWaypointWidget::getActiveTrainConfig()
 //------------------------------------------------------------------------------
 void TrainWaypointWidget::slotTrainConfigChange(int train_idx)
 {
+    // TODO: Разные типы с size_t
     bool is_selected = (train_idx > 0) && (train_idx <= trains_info->size());
 
     if (is_train_config_selected != is_selected)
@@ -287,6 +291,7 @@ void TrainWaypointWidget::slotWaypointChange(int waypoint_idx)
 //------------------------------------------------------------------------------
 void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
 {
+    // TODO: Разные типы с size_t
     bool is_selected = (traj_idx > 0) && (traj_idx <= trajectrories->size());
     if (is_trajectory_selected != is_selected)
     {

@@ -23,7 +23,7 @@ CommandList::~CommandList()
     }
 }
 
-void CommandList::push(const Command* command, bool execute)
+void CommandList::push(Command* command, bool execute)
 {
     // If active node is not tail node (after undos)
     if (active != tail)
@@ -119,7 +119,7 @@ const CommandList::CommandNode* CommandList::get_active() const
     return active;
 }
 
-void CommandList::push_(const Command* command, bool execute)
+void CommandList::push_(Command* command, bool execute)
 {
     CommandNode* const new_node = new CommandNode{command, tail, nullptr};
 

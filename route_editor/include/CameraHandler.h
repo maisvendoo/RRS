@@ -26,6 +26,7 @@ public:
 
 public:
     explicit CameraHandler(EditorContext& context);
+    virtual ~CameraHandler() = default;
 
     virtual void apply(vsg::MoveEvent& moveEvent) override;
     virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;

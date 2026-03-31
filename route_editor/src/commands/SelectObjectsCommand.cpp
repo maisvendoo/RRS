@@ -3,25 +3,23 @@
 #include "Command.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
-#include "ObjectSelector.h"
 #include "RouteObject.h"
 
 #include <cstdio>
-#include <string>
 
 SelectObjectsCommand::SelectObjectsCommand(EditorContext& context)
     : Command(context)
 {
 }
 
-void SelectObjectsCommand::execute() const
+void SelectObjectsCommand::execute()
 {
-    for (RouteObject* const object : objects_to_select)
+    for (const auto& object : objects_to_select)
     {
         object->select();
     }
 
-    for (RouteObject* const object : objects_to_deselect)
+    for (const auto& object : objects_to_deselect)
     {
         object->deselect();
     }
@@ -29,14 +27,14 @@ void SelectObjectsCommand::execute() const
     context.gizmo->update_visibility();
 }
 
-void SelectObjectsCommand::undo() const
+void SelectObjectsCommand::undo()
 {
-    for (RouteObject* const object : objects_to_select)
+    for (const auto& object : objects_to_select)
     {
         object->deselect();
     }
 
-    for (RouteObject* const object : objects_to_deselect)
+    for (const auto& object : objects_to_deselect)
     {
         object->select();
     }
@@ -48,6 +46,7 @@ void SelectObjectsCommand::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Select objects: to select: %zu objects\n"
-        "                to deselect: %zu objects",
-        objects_to_select.size(), objects_to_deselect.size());
+        "              to deselect: %zu objects",
+        objects_to_select.size(), objects_to_deselect.size()
+    );
 }

@@ -48,6 +48,8 @@ void VL60Autopilot::initAutoBrakeControl(const QString &config_name,
 //------------------------------------------------------------------------------
 void VL60Autopilot::preStep(state_vector_t &Y, double t)
 {
+    (void)t;
+
     // Приводим общую структуру обратной связи к нашему типу
     auto_feedback = dynamic_cast<vl60_feedback_t *>(feedback);
 
@@ -83,7 +85,7 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
             lock_traction = true; // продолжаем блокировать тягу
         else
             lock_traction = false;
-    }    
+    }
 
     // Если ток упал ниже уставки
     if (auto_feedback->I_motor < I_ref - delta_I)
@@ -110,7 +112,7 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
     // Если превышаем скорость - мотаем вниз до упора
     if (dv < -dV_traction_off)
     {
-        auto_control->km_pos_ref = POS_ZERO;        
+        auto_control->km_pos_ref = POS_ZERO;
     }
 
     brake_control->setBrakePressures(auto_feedback->pEQ,
@@ -141,6 +143,9 @@ void VL60Autopilot::preStep(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void VL60Autopilot::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
+    (void)Y;
+    (void)t;
+
     dYdt[0] = Ki * dv;
 }
 

@@ -3,28 +3,30 @@
 #include "Action.h"
 #include "CameraHandler.h"
 #include "CommandList.h"
+#include "EditorContext.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
 #include "Mask.h"
 #include "MouseHandler.h"
 #include "MoveObjectsCommand.h"
+#include "PasteObjectsCommand.h"
+#include "RotateObjectsCommand.h"
+#include "Route.h"
 #include "RouteObject.h"
+#include "ScaleObjectsCommand.h"
 #include "SceneGraph.h"
 #include "SelectObjectsCommand.h"
 #include "SingleSwitch.h"
 
 #include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
-#include <vsg/core/observer_ptr.h>
-#include <vsg/core/ref_ptr.h>
-#include <vsg/maths/common.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Node.h>
+#include <vsg/ui/KeyEvent.h>
 #include <vsg/ui/PointerEvent.h>
 
-#include <cassert>
-#include <utility>
+#include <cmath>
 
 ObjectSelector::ObjectSelector(EditorContext& context)
     : context(context)
@@ -34,8 +36,110 @@ ObjectSelector::ObjectSelector(EditorContext& context)
     front_plane_switch = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
 
-    context.scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, context.gizmo);
-    context.scene_graph->addChild(vsg::Mask{MASK_CLICKABLE}, front_plane_switch);
+    context.scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE},
+        context.gizmo);
+
+    context.scene_graph->addChild(vsg::Mask{MASK_CLICKABLE},
+        front_plane_switch);
+}
+
+void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
+{
+    (void)keyPress;
+
+    if (state != State::INITIAL)
+    {
+        return;
+    }
+
+    const RouteObjects& selected_objects = context.selected_objects;
+    if (selected_objects.empty())
+    {
+        return;
+    }
+
+    const auto keyboard_handler = context.keyboard_handler;
+
+    const auto get_binding_state = [keyboard_handler](Action action) -> bool
+    {
+        return keyboard_handler->get_binding_state(action);
+    };
+
+    if (get_binding_state(ACTION_COPY_OBJECTS))
+    {
+        context.copied_objects = selected_objects;
+        return;
+    }
+    else if (get_binding_state(ACTION_PASTE_OBJECTS))
+    {
+        context.commands.push(new PasteObjectsCommand(context), true);
+        return;
+    }
+
+    const bool pressed_action_move = get_binding_state(ACTION_MOVE_OBJECTS);
+    const bool pressed_action_rotate = get_binding_state(ACTION_ROTATE_OBJECTS);
+    const bool pressed_action_scale = get_binding_state(ACTION_SCALE_OBJECTS);
+
+    if (!pressed_action_move && !pressed_action_rotate &&
+        !pressed_action_scale)
+    {
+        return;
+    }
+
+    const auto front_plane = context.camera_handler->create_front_plane(
+        context.gizmo->get_curr_pos(), &front_plane_up);
+
+    const auto intersector = context.intersection_handler->apply_(
+        context.mouse_handler->get_pos());
+
+    if (!intersector)
+    {
+        return;
+    }
+
+    front_plane->accept(*intersector);
+
+    const auto intersection =
+        context.intersection_handler->get_closest_intersection(intersector);
+
+    if (!intersection)
+    {
+        return;
+    }
+
+    prev_intersect_pos = static_cast<vsg::vec3>(
+        intersection->worldIntersection);
+
+    intersector->intersections.clear();
+
+    total_translation = {0.0f, 0.0f, 0.0f};
+    total_rotation_rad = 0.0f;
+    total_scale = {1.0f, 1.0f, 1.0f};
+
+    const auto compile_result = context.viewer->compileManager->compile(
+        front_plane);
+
+    front_plane_switch->node = front_plane;
+
+    vsg::updateViewer(*context.viewer, compile_result);
+
+    for (const auto& object : selected_objects)
+    {
+        object->save_matrix();
+    }
+
+    if (pressed_action_move)
+    {
+        state = State::KEYBOARD_GRAB;
+    }
+    else if (pressed_action_rotate)
+    {
+        state = State::KEYBOARD_ROTATE;
+    }
+    else if (pressed_action_scale)
+    {
+        state = State::KEYBOARD_SCALE;
+    }
 }
 
 void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
@@ -45,58 +149,21 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    switch (state)
+    if (state != State::INITIAL)
     {
-        case State::INITIAL:
+        if (context.mouse_handler->get_is_lmb_pressed())
         {
-            break;
-        }
-        case State::KEYBOARD_GRAB:
-        {
-            if (context.mouse_handler->get_is_lmb_pressed())
-            {
-                confirm_keyboard_move();
-            }
-            else if (context.mouse_handler->get_is_rmb_pressed())
-            {
-                cancel_keyboard_move();
-            }
-
+            confirm_keyboard_transformation();
             return;
         }
-        case State::KEYBOARD_ROTATE:
+        else if (context.mouse_handler->get_is_rmb_pressed())
         {
-            if (context.mouse_handler->get_is_lmb_pressed())
-            {
-                confirm_keyboard_rotate();
-            }
-            else if (context.mouse_handler->get_is_rmb_pressed())
-            {
-                cancel_keyboard_rotate();
-            }
-
+            cancel_keyboard_transformation();
             return;
-        }
-        case State::KEYBOARD_SCALE:
-        {
-            if (context.mouse_handler->get_is_lmb_pressed())
-            {
-                confirm_keyboard_scale();
-            }
-            else if (context.mouse_handler->get_is_rmb_pressed())
-            {
-                cancel_keyboard_scale();
-            }
-
-            return;
-        }
-        default:
-        {
-            break;
         }
     }
 
-    const auto& selected_objects = context.selected_objects;
+    const RouteObjects& selected_objects = context.selected_objects;
 
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
@@ -105,7 +172,9 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    const auto intersector = context.intersection_handler->get_lmb_intersector();
+    const auto intersector =
+        context.intersection_handler->get_lmb_intersector();
+
     if (!intersector)
     {
         return;
@@ -134,21 +203,19 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    const auto intersection = context.intersection_handler->get_closest_intersection(
-        intersector);
+    const auto intersection =
+        context.intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {
-        intersections.clear();
         return;
     }
 
     for (const vsg::Node* const node : intersection->nodePath)
     {
-        if (RouteObject* object = const_cast<RouteObject*>(
-            node->cast<RouteObject>()))
+        if (const RouteObject* const object = node->cast<RouteObject>())
         {
-            select_object(object);
+            select_object(vsg::ref_ptr(const_cast<RouteObject*>(object)));
             break;
         }
     }
@@ -165,17 +232,17 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
     context.gizmo->apply(moveEvent);
 
-    const auto front_plane = front_plane_switch->node;
-    if (!front_plane)
+    if (state == State::INITIAL)
     {
         return;
     }
 
     const auto intersector = context.intersection_handler->apply_(moveEvent);
 
-    front_plane->accept(*intersector);
+    front_plane_switch->node->accept(*intersector);
 
-    const auto intersection = context.intersection_handler->get_closest_intersection(intersector);
+    const auto intersection =
+        context.intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {
@@ -189,13 +256,11 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 
     switch (state)
     {
-        case State::INITIAL:
-        {
-            return;
-        }
         case State::KEYBOARD_GRAB:
         {
-            const auto translation = world_intersection - prev_intersect_pos;
+            const vsg::vec3 translation = world_intersection -
+                prev_intersect_pos;
+
             prev_intersect_pos = world_intersection;
             total_translation += translation;
 
@@ -208,132 +273,75 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         }
         case State::KEYBOARD_ROTATE:
         {
-            const auto& selected_objects = context.selected_objects;
+            const vsg::vec3 gizmo_pos = context.gizmo->get_curr_pos();
 
-            vsg::vec3 center = {0.0f, 0.0f, 0.0f};
-            for (const auto& object : selected_objects)
-            {
-                center += object->get_translation();
-            }
-            center /= static_cast<float>(selected_objects.size());
-
-            if (world_intersection == center)
+            if (world_intersection == gizmo_pos)
             {
                 return;
             }
 
-            // const auto print_vec3 = [&](const char* name, vsg::vec3 v) -> void
-            // {
-            //     std::printf("%s: %10.3f %10.3f %10.3f\n", name, v.x, v.y, v.z);
-            // };
+            const vsg::vec3 prev_vec = vsg::normalize(
+                prev_intersect_pos - gizmo_pos);
 
-            const auto print_int = [&](const char* name, int i) -> void
-            {
-                std::printf("%s: %d\n", name, i);
-            };
-
-            const auto print_float = [&](const char* name, float f) -> void
-            {
-                std::printf("%s: %10.3f\n", name, f);
-            };
-
-            const auto vec_a = vsg::normalize(prev_intersect_pos - center);
-            const auto vec_b = vsg::normalize(world_intersection - center);
-
-            std::printf("-------------------------\n");
-            // print_vec3("vec_a", vec_a);
-            // print_vec3("vec_b", vec_b);
+            const vsg::vec3 curr_vec = vsg::normalize(
+                world_intersection - gizmo_pos);
 
             prev_intersect_pos = world_intersection;
 
-            const auto dot_a = vsg::dot(vec_a, front_plane_up);
-            const auto dot_b = vsg::dot(vec_b, front_plane_up);
+            float prev_acos = std::acos(vsg::dot(prev_vec, front_plane_up));
+            float curr_acos = std::acos(vsg::dot(curr_vec, front_plane_up));
 
-            // print_float("dot_a", dot_a);
-            // print_float("dot_b", dot_b);
+            const vsg::vec3 front = context.camera_handler->get_front();
 
-            const auto acos_a = std::acos(dot_a);
-            const auto acos_b = std::acos(dot_b);
-
-            // print_float("acos_a", acos_a);
-            // print_float("acos_b", acos_b);
-
-            int dir_a;
-            int dir_b;
-
-            if (vec_a == front_plane_up || vec_a == -front_plane_up)
+            if (prev_vec != front_plane_up && prev_vec != -front_plane_up &&
+                vsg::dot(vsg::cross(prev_vec, front_plane_up), front) < 0.0f)
             {
-                dir_a = 1;
-            }
-            else
-            {
-                const auto cross_a = vsg::cross(vec_a, front_plane_up);
-                if (vsg::dot(cross_a, front) >= 0.0f)
-                {
-                    dir_a = 1;
-                }
-                else
-                {
-                    dir_a = -1;
-                }
+                prev_acos = 2 * vsg::PI - prev_acos;
             }
 
-            if (vec_b == front_plane_up || vec_b == -front_plane_up)
+            if (curr_vec != front_plane_up && curr_vec != -front_plane_up &&
+                vsg::dot(vsg::cross(curr_vec, front_plane_up), front) < 0.0f)
             {
-                dir_b = 1;
-            }
-            else
-            {
-                const auto cross_b = vsg::cross(vec_b, front_plane_up);
-                if (vsg::dot(cross_b, front) >= 0.0f)
-                {
-                    dir_b = 1;
-                }
-                else
-                {
-                    dir_b = -1;
-                }
+                curr_acos = 2 * vsg::PI - curr_acos;
             }
 
-            print_int("dir_a", dir_a);
-            print_int("dir_b", dir_b);
-
-            auto deg_a = vsg::degrees(acos_a);
-            if (dir_a == -1)
+            for (const auto& object : context.selected_objects)
             {
-                deg_a = 360.0f - deg_a;
-            }
+                const float rotation_rad = prev_acos - curr_acos;
+                total_rotation_rad += rotation_rad;
 
-            auto deg_b = vsg::degrees(acos_b);
-            if (dir_b == -1)
-            {
-                deg_b = 360.0f - deg_b;
-            }
-
-            print_float("deg_a", deg_a);
-            print_float("deg_b", deg_b);
-
-            auto diff = deg_a - deg_b;
-            if (diff > 180.0f)
-            {
-                diff -= 360.0f;
-            }
-            else if (diff < -180.0f)
-            {
-                diff += 360.0f;
-            }
-
-            print_float("diff", diff);
-
-            for (const auto& object : selected_objects)
-            {
-                object->rotate_around_pivot(center, front * diff, object->matrix);
+                object->rotate_around_pivot(gizmo_pos, front, rotation_rad,
+                    object->matrix);
             }
 
             return;
         }
         case State::KEYBOARD_SCALE:
         {
+            const vsg::vec3 gizmo_pos = context.gizmo->get_curr_pos();
+
+            if (world_intersection == gizmo_pos)
+            {
+                return;
+            }
+
+            const vsg::vec3 prev_vec = prev_intersect_pos - gizmo_pos;
+            const vsg::vec3 curr_vec = world_intersection - gizmo_pos;
+
+            prev_intersect_pos = world_intersection;
+
+            const float scale_value = vsg::length(curr_vec) /
+                vsg::length(prev_vec);
+
+            const vsg::vec3 scale = {scale_value, scale_value, scale_value};
+            total_scale *= scale;
+
+            for (const auto& object : context.selected_objects)
+            {
+                object->scale_relative_to_pivot(gizmo_pos, scale,
+                    object->matrix);
+            }
+
             return;
         }
         default:
@@ -343,63 +351,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
     }
 }
 
-void ObjectSelector::apply(vsg::FrameEvent& frame)
-{
-    (void)frame;
-
-    const auto& selected_objects = context.selected_objects;
-
-    if (state != State::KEYBOARD_GRAB && !selected_objects.empty() &&
-        context.keyboard_handler->get_binding_state(ACTION_MOVE_OBJECTS))
-    {
-        vsg::vec3 begin_pos = {0.0f, 0.0f, 0.0f};
-        for (const auto& object : selected_objects)
-        {
-            begin_pos += object->get_translation();
-        }
-        begin_pos /= static_cast<float>(selected_objects.size());
-
-        const auto front_plane = context.camera_handler->create_front_plane(begin_pos,
-            &front_plane_up);
-
-        front = context.camera_handler->get_front();
-
-        const auto intersector = context.intersection_handler->apply_(
-            context.mouse_handler->get_pos());
-
-        if (!intersector)
-        {
-            return;
-        }
-
-        front_plane->accept(*intersector);
-
-        const auto intersection =
-            context.intersection_handler->get_closest_intersection(intersector);
-
-        if (!intersection)
-        {
-            return;
-        }
-
-        begin_intersect_pos = static_cast<vsg::vec3>(
-            intersection->worldIntersection);
-
-        prev_intersect_pos = begin_intersect_pos;
-        total_translation = {0.0f, 0.0f, 0.0f};
-
-        const auto viewer = context.viewer;
-        const auto compile_manager = viewer->compileManager;
-        const auto compile_result = compile_manager->compile(front_plane);
-
-        state = State::KEYBOARD_GRAB;
-        front_plane_switch->node = front_plane;
-
-        vsg::updateViewer(*viewer, compile_result);
-    }
-}
-
-void ObjectSelector::select_object(RouteObject* object)
+void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
 {
     SelectObjectsCommand* const select_objects_command =
         new SelectObjectsCommand(context);
@@ -458,64 +410,53 @@ void ObjectSelector::select_object(RouteObject* object)
     context.commands.push(select_objects_command, true);
 }
 
-void ObjectSelector::confirm_keyboard_move()
+void ObjectSelector::confirm_keyboard_transformation()
 {
-    state = State::INITIAL;
-    front_plane_switch->node = nullptr;
-
-    context.commands.push(new MoveObjectsCommand(context, total_translation), false);
-}
-
-void ObjectSelector::cancel_keyboard_move()
-{
-    state = State::INITIAL;
-
-    for (const auto& object : context.selected_objects)
+    switch (state)
     {
-        object->move(-total_translation);
+        case State::KEYBOARD_GRAB:
+        {
+            context.commands.push(new MoveObjectsCommand(
+                context, total_translation), false);
+
+            break;
+        }
+        case State::KEYBOARD_ROTATE:
+        {
+            context.commands.push(
+                new RotateObjectsCommand(
+                    context, context.gizmo->get_curr_pos(),
+                    context.camera_handler->get_front(), total_rotation_rad
+                ),
+                false
+            );
+
+            break;
+        }
+        case State::KEYBOARD_SCALE:
+        {
+            context.commands.push(new ScaleObjectsCommand(context,
+                context.gizmo->get_curr_pos(), total_scale), false);
+
+            break;
+        }
+        default:
+        {
+            break;
+        }
     }
 
+    state = State::INITIAL;
     front_plane_switch->node = nullptr;
 }
 
-void ObjectSelector::confirm_keyboard_rotate()
+void ObjectSelector::cancel_keyboard_transformation()
 {
+    for (const auto& object : context.selected_objects)
+    {
+        object->set_matrix(object->get_initial_matrix());
+    }
+
     state = State::INITIAL;
-    front_plane_switch->node = nullptr;
-
-    // commands.push(new MoveObjectsCommand(RouteObject::get_selected_objects(),
-    //     total_translation), false);
-}
-
-void ObjectSelector::cancel_keyboard_rotate()
-{
-    state = State::INITIAL;
-
-    // for (const auto& object : RouteObject::get_selected_objects())
-    // {
-    //     object->move(-total_translation);
-    // }
-
-    front_plane_switch->node = nullptr;
-}
-
-void ObjectSelector::confirm_keyboard_scale()
-{
-    state = State::INITIAL;
-    front_plane_switch->node = nullptr;
-
-    // commands.push(new MoveObjectsCommand(RouteObject::get_selected_objects(),
-    //     total_translation), false);
-}
-
-void ObjectSelector::cancel_keyboard_scale()
-{
-    state = State::INITIAL;
-
-    // for (const auto& object : RouteObject::get_selected_objects())
-    // {
-    //     object->move(-total_translation);
-    // }
-
     front_plane_switch->node = nullptr;
 }

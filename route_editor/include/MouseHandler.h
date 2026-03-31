@@ -17,6 +17,8 @@ class MoveEvent;
 class MouseHandler : public vsg::Inherit<vsg::Visitor, MouseHandler>
 {
 public:
+    virtual ~MouseHandler() = default;
+
     virtual void apply(vsg::ButtonPressEvent& buttonPress) override;
     virtual void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
     virtual void apply(vsg::MoveEvent& moveEvent) override;

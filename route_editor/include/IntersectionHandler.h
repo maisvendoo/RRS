@@ -1,25 +1,25 @@
 #ifndef INTERSECTION_HANDLER_H
 #define INTERSECTION_HANDLER_H
 
-#include "EditorContext.h"
 #include "LSIntersector.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
-#include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec2.h>
+
+struct EditorContext;
 
 namespace vsg
 {
 
 class ButtonPressEvent;
 class ButtonReleaseEvent;
-class Camera;
 class MoveEvent;
 
 }
 
-class IntersectionHandler : public vsg::Inherit<vsg::Visitor, IntersectionHandler>
+class IntersectionHandler : public vsg::Inherit<
+    vsg::Visitor, IntersectionHandler>
 {
 public:
     explicit IntersectionHandler(const EditorContext& context);

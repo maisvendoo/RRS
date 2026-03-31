@@ -4,11 +4,9 @@
 #include "SwitchGroup.h"
 
 #include <vsg/core/Inherit.h>
-#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 
 struct EditorContext;
-class Route;
 
 namespace vsg
 {
@@ -24,12 +22,9 @@ public:
 
     void load_route();
 
-    vsg::ref_ptr<Route> get_route() const;
-
 private:
     EditorContext& context;
 
-    vsg::ref_ptr<Route> route;
     vsg::ref_ptr<vsg::AmbientLight> ambient_light;
 };
 

@@ -190,7 +190,7 @@ const CameraHandler::vec3_type& CameraHandler::get_up() const
     return up;
 }
 
-// Create plane perpedicular to camera normal and passing through
+// Create plane perpedicular to camera normal passing through
 // specified point to test for intersections
 vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
     const vec3_type& point,

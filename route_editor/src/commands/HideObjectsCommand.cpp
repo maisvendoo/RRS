@@ -10,27 +10,27 @@ HideObjectsCommand::HideObjectsCommand(EditorContext& context)
 {
 }
 
-void HideObjectsCommand::execute() const
+void HideObjectsCommand::execute()
 {
-    for (RouteObject* const object : objects_to_hide)
+    for (const auto& object : objects_to_hide)
     {
         object->hide();
     }
 
-    for (RouteObject* const object : objects_to_show)
+    for (const auto& object : objects_to_show)
     {
         object->show();
     }
 }
 
-void HideObjectsCommand::undo() const
+void HideObjectsCommand::undo()
 {
-    for (RouteObject* const object : objects_to_hide)
+    for (const auto& object : objects_to_hide)
     {
         object->show();
     }
 
-    for (RouteObject* const object : objects_to_show)
+    for (const auto& object : objects_to_show)
     {
         object->hide();
     }
@@ -41,5 +41,6 @@ void HideObjectsCommand::update_description()
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Hide objects: to hide: %zu objects\n"
         "              to show: %zu objects",
-        objects_to_hide.size(), objects_to_show.size());
+        objects_to_hide.size(), objects_to_show.size()
+    );
 }

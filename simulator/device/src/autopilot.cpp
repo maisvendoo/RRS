@@ -95,6 +95,9 @@ QString Autopilot::getDbgMsg()
 //------------------------------------------------------------------------------
 void Autopilot::vigilance_control(double t, double dt)
 {
+    (void)t;
+    (void)dt;
+
     if (feedback == nullptr)
     {
         return;
@@ -132,6 +135,7 @@ void Autopilot::velocity_control(double t, double dt)
 
     if (v_ref < 0.1)
     {
+        // TODO: Не используется нигде
         int a = 0;
     }
 
@@ -140,6 +144,7 @@ void Autopilot::velocity_control(double t, double dt)
 
     if (v_ref < 0.1)
     {
+        // TODO: Не используется нигде
         int a = 0;
     }
 
@@ -149,6 +154,7 @@ void Autopilot::velocity_control(double t, double dt)
 
     if (v_ref < 0.1)
     {
+        // TODO: Не используется нигде
         int a = 0;
     }
 
@@ -209,6 +215,8 @@ void Autopilot::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 double Autopilot::calcCurrentSpeedLimit(double t, double dt)
 {
+    (void)t;
+
     double v_lim = feedback->v_lim;
 
     if (feedback->v_lim < feedback->v_lim_next)
@@ -228,7 +236,7 @@ double Autopilot::calcCurrentSpeedLimit(double t, double dt)
         else // хвост не затянут, едем по старому ограничению
         {
             v_lim = prev_v_lim;
-            tail_len -= feedback->v_cur *dt / Physics::kmh;
+            tail_len -= feedback->v_cur * dt / Physics::kmh;
         }
     }
 
@@ -267,7 +275,7 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_ta
         // Запрещаем отпускать тормоза - остановка
         if (feedback->v_cur <= v_disable_release)
         {
-            is_disable_release = true;            
+            is_disable_release = true;
         }
 
         // Если запрещен отпуск и мы остановились - запрещаем движение
@@ -460,7 +468,7 @@ void Autopilot::calcTargetDistance()
         QString msg = QString("TIMETABLE PROCESS: vehicle #%1 current trajectory is %2").arg(vehicle_idx).arg(curr_traj_name);
         Journal::instance()->debug(msg);
         prev_traj_name = curr_traj_name;
-    }        
+    }
 
     // Определяем дистанцию до станции-цели
     emit sigGetRouteLength(vehicle_idx, curr_traj_name, curr_traj_coord,
@@ -476,6 +484,9 @@ void Autopilot::calcTargetDistance()
 //------------------------------------------------------------------------------
 double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
 {
+    (void)t;
+    (void)dt;
+
     double v_ref = v_constr;
 
     if (timetable.stations.empty())
@@ -545,6 +556,8 @@ double Autopilot::calcTimetableVelocity(double t, double dt, double dist)
 //------------------------------------------------------------------------------
 void Autopilot::checkTimetable(double t, double dt)
 {
+    (void)dt;
+
     if (timetable.stations.empty())
     {
         return;
@@ -609,7 +622,7 @@ void Autopilot::doors_control(double t, double dt)
         return;
     }
 
-    auto st = &timetable.stations[target_station_idx];    
+    auto st = &timetable.stations[target_station_idx];
 
     if (t >= st->dep_time_sec)
     {
@@ -659,7 +672,7 @@ void Autopilot::setTimetable(const autopilot_timetable_t &timetable)
     }
 
     // Сбрасываем флаг готовности графика, чтобы он был переинициализирован
-    is_timetable_ready = false;    
+    is_timetable_ready = false;
 }
 
 //------------------------------------------------------------------------------
@@ -709,13 +722,13 @@ void Autopilot::slotRouteBuildRequest()
         return;
     }
 
-    auto st = &timetable.stations[target_station_idx];    
+    auto st = &timetable.stations[target_station_idx];
 
     // Если мы оказались на участке приближения
     if (curr_traj_name == st->approach_traj && !st->approach_traj.isEmpty())
     {
         // Включаем запросы на построение маршрута на станцию
-        st->build_arr_route_request = true;        
+        st->build_arr_route_request = true;
     }
 
     // Маршрут приема надо строить, но он еще не построен
@@ -736,7 +749,7 @@ void Autopilot::slotRouteBuildRequest()
                 {
                     emit sigGetTrajStateRequest(this->vehicle_idx, target_station_idx, st->target_traj, st->removal_traj, target_dir, DEPARTURE_REQUEST);
                 }
-            }            
+            }
         }
     }
 }
@@ -758,7 +771,7 @@ void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
 
     auto st = &timetable.stations[target_station_idx];
 
-    // Отправиться раньше графика решил ты? Путь к темной стороне это...    
+    // Отправиться раньше графика решил ты? Путь к темной стороне это...
     if (time < st->dep_time_sec && is_on_target_traj)
     {
         return;
@@ -780,13 +793,13 @@ void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
         OnWhistle();
 
         QString msg = QString("TIMETABLE PROCESS: Departure from: %1 | Dep. time: %2 | Fact. dep.: %3 |")
-                          .arg(st->name)                          
+                          .arg(st->name)
                           .arg(st->dep_time, 5)
-                          .arg(st->fact_dep_time, 5);        
+                          .arg(st->fact_dep_time, 5);
 
         Journal::instance()->debug(msg);
 
-        target_station_idx++;        
+        target_station_idx++;
 
         timetable.curr_station_idx = target_station_idx;
 
@@ -847,7 +860,7 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
         QString msg = QString("TIMETABLE PROCESS: Arrival to: %1 | Arr. time: %2 | Fact. arr.: %3 |")
                           .arg(st->name)
                           .arg(st->arr_time, 5)
-                          .arg(st->fact_arr_time, 5);        
+                          .arg(st->fact_arr_time, 5);
 
         Journal::instance()->debug(msg);
     }
