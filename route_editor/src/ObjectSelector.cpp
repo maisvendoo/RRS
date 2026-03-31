@@ -3,6 +3,7 @@
 #include "Action.h"
 #include "CameraHandler.h"
 #include "CommandList.h"
+#include "DeleteObjectsCommand.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
@@ -78,6 +79,11 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     else if (get_binding_state(ACTION_PASTE_OBJECTS))
     {
         context.commands.push(new PasteObjectsCommand(context), true);
+        return;
+    }
+    else if (get_binding_state(ACTION_DELETE_OBJECTS))
+    {
+        context.commands.push(new DeleteObjectsCommand(context), true);
         return;
     }
 
