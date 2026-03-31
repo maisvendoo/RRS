@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <functional>
 #include <initializer_list>
+#include <string>
 
 struct ParseField
 {
@@ -27,7 +28,7 @@ struct ParseField
     bool append_char(char ch, const char** error);
 };
 
-char* read_file_in_buffer(const char* filename, const char* modes);
+std::string read_file_in_buffer(const char* filename, const char* modes);
 
 bool parse_file_line_by_line(const char* filename, const char* modes,
     const char* separators, std::function<void()> func,
