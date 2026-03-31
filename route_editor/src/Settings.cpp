@@ -143,6 +143,7 @@ void settings_t::read(const std::string& cfg_path)
         {ACTION_PASTE_OBJECTS, "PasteObjects"},
         {ACTION_HIDE_OBJECTS, "HideObjects"},
         {ACTION_SHOW_OBJECTS, "ShowObjects"},
+        {ACTION_DELETE_OBJECTS, "DeleteObjects"},
         {ACTION_UNDO_COMMAND, "UndoCommand"},
         {ACTION_REDO_COMMAND, "RedoCommand"}
     };

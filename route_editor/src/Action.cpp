@@ -17,6 +17,7 @@ static const char* const * get_action_names()
     action_names[ACTION_PASTE_OBJECTS] = "Objects: Paste";
     action_names[ACTION_HIDE_OBJECTS] = "Objects: Hide";
     action_names[ACTION_SHOW_OBJECTS] = "Objects: Show";
+    action_names[ACTION_DELETE_OBJECTS] = "Objects: Delete";
     action_names[ACTION_UNDO_COMMAND] = "Undo command";
     action_names[ACTION_REDO_COMMAND] = "Redo command";
 

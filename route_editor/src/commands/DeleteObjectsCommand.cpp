@@ -8,6 +8,7 @@
 #include <vsg/app/Viewer.h>
 
 #include <algorithm>
+#include <cstdio>
 
 DeleteObjectsCommand::DeleteObjectsCommand(EditorContext& context)
     : Command(context)
@@ -66,5 +67,8 @@ void DeleteObjectsCommand::undo()
 
 void DeleteObjectsCommand::update_description()
 {
-
+    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
+        "Delete objects: to delete: %zu objects",
+        objects.size()
+    );
 }
