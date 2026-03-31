@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <functional>
 #include <initializer_list>
+#include <vector>
 
 static bool to_float(const char* str, float* out)
 {
@@ -141,25 +142,7 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
         return false;
     }
 
-    const int fields_size = static_cast<int>(fields.size());
-
-    ParseField* const parse_fields = reinterpret_cast<ParseField*>(
-        malloc(sizeof(ParseField) * fields_size));
-
-    if (!parse_fields)
-    {
-        fprintf(stderr, "Failed to allocate memory for %s parse values\n",
-            filename);
-
-        free(buf);
-        return false;
-    }
-
-    ParseField* field_ptr = parse_fields;
-    for (const ParseField& field : fields)
-    {
-        *field_ptr++ = field;
-    }
+    std::vector<ParseField> parse_fields(fields.begin(), fields.end());
 
     int curr_state = 0;
     int line_num = 1;
@@ -168,29 +151,29 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
     const char* line_begin = ptr;
     const char* error;
 
+    const int args = static_cast<int>(fields.size());
+
     while (true)
     {
         if (*ptr == '\n' || *ptr == '\0')
         {
-            if (curr_state == 2 * fields_size - 1)
+            if (curr_state == 2 * args - 1)
             {
                 index = (curr_state - 1) / 2;
                 if (!parse_fields[index].process(&error))
                 {
                     print_error(filename, line_num, error, line_begin, ptr);
-                    free(parse_fields);
                     free(buf);
                     return false;
                 }
             }
-            else if (curr_state != 0 && curr_state != 2 * fields_size)
+            else if (curr_state != 0 && curr_state != 2 * args)
             {
                 print_error(filename, line_num, "wrong parse value count",
                     line_begin, ptr);
 
                 if (*ptr == '\0')
                 {
-                    free(parse_fields);
                     free(buf);
                     return true;
                 }
@@ -201,7 +184,6 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
                 ++ptr;
                 continue;
 
-                // free(parse_values);
                 // free(buffer);
                 // return false;
             }
@@ -213,7 +195,6 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
 
             if (*ptr == '\0')
             {
-                free(parse_fields);
                 free(buf);
                 return true;
             }
@@ -244,7 +225,6 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
                     if (!parse_fields[index].process(&error))
                     {
                         print_error(filename, line_num, error, line_begin, ptr);
-                        free(parse_fields);
                         free(buf);
                         return false;
                     }
@@ -254,7 +234,7 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
             }
             else
             {
-                if (curr_state == 2 * fields_size)
+                if (curr_state == 2 * args)
                 {
                     print_error(filename, line_num, "too many parse values "
                         "in line", line_begin, ptr);
@@ -262,7 +242,6 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
                     ++ptr;
                     continue;
 
-                    // free(parse_values);
                     // free(buffer);
                     // return false;
                 }
@@ -276,7 +255,6 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
                 if (parse_fields[index].append_char(*ptr, &error))
                 {
                     print_error(filename, line_num, error, line_begin, ptr);
-                    free(parse_fields);
                     free(buf);
                     return false;
                 }
