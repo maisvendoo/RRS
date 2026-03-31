@@ -47,6 +47,11 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
 {
     (void)keyPress;
 
+    if (context.mouse_handler->get_is_rmb_pressed())
+    {
+        return;
+    }
+
     if (state != State::INITIAL)
     {
         return;

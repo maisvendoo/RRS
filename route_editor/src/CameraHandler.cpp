@@ -145,6 +145,11 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
 {
     (void)frame;
 
+    if (!context.mouse_handler->get_is_rmb_pressed())
+    {
+        return;
+    }
+
     const auto look_at = context.look_at;
 
     const look_at_vec3_type front =
