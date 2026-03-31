@@ -1,17 +1,17 @@
 #include "parse_file_funcs.h"
 
-#include <cstdarg>
 #include <cerrno>
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <functional>
+#include <initializer_list>
 
 static bool to_float(const char* str, float* out)
 {
     char* endptr;
     errno = 0;
-    const float result = std::strtof(str, &endptr);
+    const float result = strtof(str, &endptr);
     if (errno == 0 && *endptr == '\0')
     {
         *out = result;
@@ -27,7 +27,7 @@ static bool to_double(const char* str, double* out)
 {
     char* endptr;
     errno = 0;
-    const double result = std::strtod(str, &endptr);
+    const double result = strtod(str, &endptr);
     if (errno == 0 && *endptr == '\0')
     {
         *out = result;
@@ -42,137 +42,129 @@ static bool to_double(const char* str, double* out)
 static void print_error(const char* filename, int line_num, const char* error,
     const char* line_begin, const char* line_end)
 {
-    std::fprintf(stderr, "%s:%d: error: %s\n    %.*s\n",
-        filename, line_num, error,
+    fprintf(stderr, "%s:%d: error: %s\n    %.*s\n", filename, line_num, error,
         static_cast<int>(line_end - line_begin), line_begin);
 }
 
-struct ParseValue
+bool ParseField::process(const char** error)
 {
-    ParseValueType type;
-    char* buffer;
-    std::size_t buffer_length;
-    std::size_t buffer_size;
-    void* out;
+    buf[buf_len] = '\0';
+    buf_len = 0;
 
-    bool process(const char** error)
+    switch (type)
     {
-        buffer[buffer_length] = '\0';
-        buffer_length = 0;
-
-        switch (type)
+        case FLOAT:
         {
-            case PARSE_VALUE_TYPE_FLOAT:
-            {
-                *error = "failed to read float value";
-                return to_float(buffer, reinterpret_cast<float*>(out));
-            }
-            case PARSE_VALUE_TYPE_DOUBLE:
-            {
-                *error = "failed to read double value";
-                return to_double(buffer, reinterpret_cast<double*>(out));
-            }
-            default:
-            {
-                return true;
-            }
+            *error = "failed to read float value";
+            return to_float(buf, reinterpret_cast<float*>(out));
+        }
+        case DOUBLE:
+        {
+            *error = "failed to read double value";
+            return to_double(buf, reinterpret_cast<double*>(out));
+        }
+        default:
+        {
+            return true;
         }
     }
+}
 
-    bool append_char(char ch, const char** error)
-    {
-        buffer[buffer_length] = ch;
-        ++buffer_length;
+bool ParseField::append_char(char ch, const char** error)
+{
+    buf[buf_len] = ch;
+    ++buf_len;
 
-        *error = "value is not fitting into buffer";
-        return buffer_length == buffer_size;
-    }
-};
+    *error = "value is not fitting into buffer";
+    return buf_len == buf_size;
+}
+
+ParseField ParseField::String(char* buf, size_t size)
+{
+    return {STRING, buf, 0, size, nullptr};
+}
+
+ParseField ParseField::Float(char* buf, size_t size, float* out)
+{
+    return {FLOAT, buf, 0, size, out};
+}
+
+ParseField ParseField::Double(char* buf, size_t size, double* out)
+{
+    return {DOUBLE, buf, 0, size, out};
+}
 
 char* read_file_in_buffer(const char* filename, const char* modes)
 {
-    std::FILE* const file = std::fopen(filename, modes);
+    FILE* const file = fopen(filename, modes);
     if (!file)
     {
-        std::fprintf(stderr, "Failed to open %s\n", filename);
+        fprintf(stderr, "Failed to open %s\n", filename);
         return nullptr;
     }
 
-    std::fseek(file, 0, SEEK_END);
-    const long buffer_length = std::ftell(file);
-    std::rewind(file);
+    fseek(file, 0, SEEK_END);
+    const long buffer_length = ftell(file);
+    rewind(file);
 
-    char* const buffer = reinterpret_cast<char*>(
-        std::malloc(buffer_length + 1));
-
-    if (!buffer)
+    char* const buf = reinterpret_cast<char*>(malloc(buffer_length + 1));
+    if (!buf)
     {
-        std::fprintf(stderr, "Failed to allocate memory "
-            "for %s content\n", filename);
-
-        std::fclose(file);
+        fprintf(stderr, "Failed to allocate memory for %s content\n", filename);
+        fclose(file);
         return nullptr;
     }
 
-    const std::size_t bytes_read = std::fread(buffer, 1, buffer_length, file);
-    buffer[buffer_length] = '\0';
+    const size_t bytes_read = fread(buf, 1, buffer_length, file);
+    buf[buffer_length] = '\0';
 
-    std::fclose(file);
+    fclose(file);
 
-    if (bytes_read < static_cast<std::size_t>(buffer_length))
+    if (bytes_read < static_cast<size_t>(buffer_length))
     {
-        std::fprintf(stderr, "Failed to read %s\n", filename);
-        std::free(buffer);
+        fprintf(stderr, "Failed to read %s\n", filename);
+        free(buf);
         return nullptr;
     }
 
-    return buffer;
+    return buf;
 }
 
 bool parse_file_line_by_line(const char* filename, const char* modes,
-    const char* separators, std::function<void()> func, int argc, ...)
+    const char* separators, std::function<void()> func,
+    std::initializer_list<ParseField> fields
+)
 {
-    char* const buffer = read_file_in_buffer(filename, modes);
-    if (!buffer)
+    char* const buf = read_file_in_buffer(filename, modes);
+    if (!buf)
     {
         return false;
     }
 
-    ParseValue* const parse_values = reinterpret_cast<ParseValue*>(
-        std::malloc(sizeof(ParseValue) * argc));
+    const int fields_size = static_cast<int>(fields.size());
 
-    if (!parse_values)
+    ParseField* const parse_fields = reinterpret_cast<ParseField*>(
+        malloc(sizeof(ParseField) * fields_size));
+
+    if (!parse_fields)
     {
-        std::fprintf(stderr, "Failed to allocate memory "
-            "for %s parse values\n", filename);
+        fprintf(stderr, "Failed to allocate memory for %s parse values\n",
+            filename);
 
-        std::free(buffer);
+        free(buf);
         return false;
     }
 
-    std::va_list args;
-    va_start(args, argc);
-
-    for (int i = 0; i < argc; ++i)
+    ParseField* field_ptr = parse_fields;
+    for (const ParseField& field : fields)
     {
-        ParseValue* const parse_value = &parse_values[i];
-        parse_value->type = va_arg(args, ParseValueType);
-        parse_value->buffer = va_arg(args, char*);
-        parse_value->buffer_length = 0;
-        parse_value->buffer_size = va_arg(args, std::size_t);
-
-        if (parse_value->type != PARSE_VALUE_TYPE_STRING)
-        {
-            parse_value->out = va_arg(args, void*);
-        }
+        *field_ptr++ = field;
     }
-
-    va_end(args);
 
     int curr_state = 0;
     int line_num = 1;
     int index;
-    const char* ptr = buffer;
+    const char* ptr = buf;
     const char* line_begin = ptr;
     const char* error;
 
@@ -180,26 +172,26 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
     {
         if (*ptr == '\n' || *ptr == '\0')
         {
-            if (curr_state == 2 * argc - 1)
+            if (curr_state == 2 * fields_size - 1)
             {
                 index = (curr_state - 1) / 2;
-                if (!parse_values[index].process(&error))
+                if (!parse_fields[index].process(&error))
                 {
                     print_error(filename, line_num, error, line_begin, ptr);
-                    std::free(parse_values);
-                    std::free(buffer);
+                    free(parse_fields);
+                    free(buf);
                     return false;
                 }
             }
-            else if (curr_state != 0 && curr_state != 2 * argc)
+            else if (curr_state != 0 && curr_state != 2 * fields_size)
             {
                 print_error(filename, line_num, "wrong parse value count",
                     line_begin, ptr);
 
                 if (*ptr == '\0')
                 {
-                    std::free(parse_values);
-                    std::free(buffer);
+                    free(parse_fields);
+                    free(buf);
                     return true;
                 }
 
@@ -209,8 +201,8 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
                 ++ptr;
                 continue;
 
-                // std::free(parse_values);
-                // std::free(buffer);
+                // free(parse_values);
+                // free(buffer);
                 // return false;
             }
 
@@ -221,8 +213,8 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
 
             if (*ptr == '\0')
             {
-                std::free(parse_values);
-                std::free(buffer);
+                free(parse_fields);
+                free(buf);
                 return true;
             }
 
@@ -249,11 +241,11 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
                 if (!state_is_even)
                 {
                     index = (curr_state - 1) / 2;
-                    if (!parse_values[index].process(&error))
+                    if (!parse_fields[index].process(&error))
                     {
                         print_error(filename, line_num, error, line_begin, ptr);
-                        std::free(parse_values);
-                        std::free(buffer);
+                        free(parse_fields);
+                        free(buf);
                         return false;
                     }
 
@@ -262,7 +254,7 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
             }
             else
             {
-                if (curr_state == 2 * argc)
+                if (curr_state == 2 * fields_size)
                 {
                     print_error(filename, line_num, "too many parse values "
                         "in line", line_begin, ptr);
@@ -270,8 +262,8 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
                     ++ptr;
                     continue;
 
-                    // std::free(parse_values);
-                    // std::free(buffer);
+                    // free(parse_values);
+                    // free(buffer);
                     // return false;
                 }
 
@@ -281,11 +273,11 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
                 }
 
                 index = (curr_state - 1) / 2;
-                if (parse_values[index].append_char(*ptr, &error))
+                if (parse_fields[index].append_char(*ptr, &error))
                 {
                     print_error(filename, line_num, error, line_begin, ptr);
-                    std::free(parse_values);
-                    std::free(buffer);
+                    free(parse_fields);
+                    free(buf);
                     return false;
                 }
             }

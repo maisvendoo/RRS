@@ -85,11 +85,11 @@ bool Route::load_objects_ref()
         objects_ref_path.c_str(), "r", " \t\r",
         [&]() -> void {
             context.objects_ref.emplace(label, relative_path);
-        }, 2,
-        PARSE_VALUE_TYPE_STRING, label,
-            static_cast<std::size_t>(LABEL_BUFFER_SIZE),
-        PARSE_VALUE_TYPE_STRING, relative_path,
-            static_cast<std::size_t>(RELATIVE_PATH_BUFFER_SIZE)
+        },
+        {
+            ParseField::String(label, LABEL_BUFFER_SIZE),
+            ParseField::String(relative_path, RELATIVE_PATH_BUFFER_SIZE)
+        }
     );
 }
 
@@ -110,21 +110,16 @@ bool Route::load_route_map()
         [&]() -> void {
             context.route_map[label].emplace_back(
                 RouteMapTransformation{translation, rotation_deg});
-        }, 7,
-        PARSE_VALUE_TYPE_STRING, label,
-            static_cast<std::size_t>(LABEL_BUFFER_SIZE),
-        PARSE_VALUE_TYPE_FLOAT, float_buffer,
-            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &translation.x,
-        PARSE_VALUE_TYPE_FLOAT, float_buffer,
-            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &translation.y,
-        PARSE_VALUE_TYPE_FLOAT, float_buffer,
-            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &translation.z,
-        PARSE_VALUE_TYPE_FLOAT, float_buffer,
-            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &rotation_deg.x,
-        PARSE_VALUE_TYPE_FLOAT, float_buffer,
-            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &rotation_deg.y,
-        PARSE_VALUE_TYPE_FLOAT, float_buffer,
-            static_cast<std::size_t>(FLOAT_BUFFER_SIZE), &rotation_deg.z
+        },
+        {
+            ParseField::String(label, LABEL_BUFFER_SIZE),
+            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.x),
+            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.y),
+            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.z),
+            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.x),
+            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.y),
+            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.z)
+        }
     );
 }
 
