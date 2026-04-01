@@ -24,6 +24,7 @@ struct settings_t
     bool vsync;            ///< Vertical sync flag
     bool double_buffer;    ///< Double buffering flag
     int samples;           ///< Number of antialiasing samples
+    int num_lights;        ///< Max number of lights in scene
 
     float zNear;            ///< Near clip plane
     float view_distance;    ///< View distance

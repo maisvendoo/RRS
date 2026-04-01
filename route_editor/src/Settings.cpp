@@ -29,6 +29,7 @@ settings_t::settings_t()
     , vsync(true)
     , double_buffer(true)
     , samples(1)
+    , num_lights(200)
     , zNear(0.1f)
     , view_distance(2000.0f)
     , fovy(64.0f)
@@ -87,6 +88,7 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getBool(section, "VSync", vsync);
     cfg.getBool(section, "DoubleBuffer", double_buffer);
     cfg.getInt(section, "Samples", samples);
+    cfg.getInt(section, "NumLights", num_lights);
 
     section = "Camera";
 

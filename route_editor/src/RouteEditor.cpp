@@ -132,8 +132,11 @@ bool RouteEditor::initialize()
 
     context.viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
 
+    const uint32_t num_lights = static_cast<uint32_t>(
+        context.settings.num_lights);
+
     auto resource_hints = vsg::ResourceHints::create();
-    resource_hints->numLightsRange = {200, 201};
+    resource_hints->numLightsRange = {num_lights, num_lights + 1};
 
     context.viewer->compile(resource_hints);
 

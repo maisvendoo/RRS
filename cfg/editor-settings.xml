@@ -20,6 +20,8 @@
         <DoubleBuffer>1</DoubleBuffer>
         <!-- Мультисемплинг (сглаживание) -->
         <Samples>8</Samples>
+        <!-- Допустимое количество источников света в сцене -->
+        <NumLights>200</NumLights>
     </Window>
     <!-- Настройки камеры -->
     <Camera>
