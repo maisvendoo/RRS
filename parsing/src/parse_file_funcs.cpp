@@ -41,15 +41,21 @@ static bool to_double(const char* str, double* out)
     }
 }
 
-static void print_error(const char* filename, int line_num, const char* error,
-    const char* line_begin, const char* line_end)
+static void print_error(const char* filename, size_t line_num,
+    const char* error, const char* line_begin, const char* line_end)
 {
-    fprintf(stderr, "%s:%d: error: %s\n    %.*s\n", filename, line_num, error,
+    fprintf(stderr, "%s:%zu: error: %s\n    %.*s\n", filename, line_num, error,
         static_cast<int>(line_end - line_begin), line_begin);
 }
 
 bool ParseField::process(const char** error)
 {
+    if (buf_len >= buf_size)
+    {
+        *error = "buffer overflow in field processing";
+        return false;
+    }
+
     buf[buf_len] = '\0';
     buf_len = 0;
 
@@ -74,11 +80,16 @@ bool ParseField::process(const char** error)
 
 bool ParseField::append_char(char ch, const char** error)
 {
+    if (buf_len >= buf_size - 1)
+    {
+        *error = "value is not fitting into buffer";
+        return false;
+    }
+
     buf[buf_len] = ch;
     ++buf_len;
 
-    *error = "value is not fitting into buffer";
-    return buf_len == buf_size;
+    return true;
 }
 
 ParseField ParseField::String(char* buf, size_t size)
@@ -134,18 +145,16 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
         return false;
     }
 
-    char* const buf = buf_str.data();
-
     std::vector<ParseField> parse_fields(fields.begin(), fields.end());
 
-    int curr_state = 0;
-    int line_num = 1;
-    int index;
-    const char* ptr = buf;
+    size_t curr_state = 0;
+    size_t line_num = 1;
+    size_t index = 0;
+    const char* ptr = buf_str.data();
     const char* line_begin = ptr;
-    const char* error;
+    const char* error = "";
 
-    const int argc = static_cast<int>(fields.size());
+    const size_t argc = fields.size();
 
     while (true)
     {
@@ -240,7 +249,7 @@ bool parse_file_line_by_line(const char* filename, const char* modes,
                 }
 
                 index = (curr_state - 1) / 2;
-                if (parse_fields[index].append_char(*ptr, &error))
+                if (!parse_fields[index].append_char(*ptr, &error))
                 {
                     print_error(filename, line_num, error, line_begin, ptr);
                     return false;
