@@ -6,7 +6,7 @@
 #include "RouteObject.h"
 #include "Settings.h"
 #include "filesystem.h"
-#include "parse_file_funcs.h"
+// #include "parse_file_funcs.h"
 #include "rail-signal.h"
 #include "signals-data-types.h"
 #include "topology.h"
@@ -14,6 +14,7 @@
 
 #include <CfgReader.h>
 
+#include <fstream>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
@@ -78,19 +79,42 @@ bool Route::load_objects_ref()
     const std::string objects_ref_path = fs.combinePath(
         context.route_dir, "objects.ref");
 
-    char label[LABEL_BUFFER_SIZE];
-    char relative_path[RELATIVE_PATH_BUFFER_SIZE];
+    // char label[LABEL_BUFFER_SIZE];
+    // char relative_path[RELATIVE_PATH_BUFFER_SIZE];
 
-    return parse_file_line_by_line(
-        objects_ref_path.c_str(), "r", " \t\r",
-        [&]() -> void {
-            context.objects_ref.emplace(label, relative_path);
-        },
+    // return parse_file_line_by_line(
+    //     objects_ref_path.c_str(), "r", " \t\r",
+    //     [&]() -> void {
+    //         context.objects_ref.emplace(label, relative_path);
+    //     },
+    //     {
+    //         ParseField::String(label, LABEL_BUFFER_SIZE),
+    //         ParseField::String(relative_path, RELATIVE_PATH_BUFFER_SIZE)
+    //     }
+    // );
+
+    std::ifstream objects_ref_file(objects_ref_path);
+    if (!objects_ref_file)
+    {
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to open %s\n", objects_ref_path.c_str());
+        return false;
+    }
+
+    std::string line;
+    while (std::getline(objects_ref_file, line))
+    {
+        std::istringstream iss(std::move(line));
+        std::string label, relative_path;
+
+        if (iss >> label >> relative_path)
         {
-            ParseField::String(label, LABEL_BUFFER_SIZE),
-            ParseField::String(relative_path, RELATIVE_PATH_BUFFER_SIZE)
+            context.objects_ref.emplace(std::move(label),
+                std::move(relative_path));
         }
-    );
+    }
+
+    return true;
 }
 
 bool Route::load_route_map()
@@ -100,27 +124,63 @@ bool Route::load_route_map()
     const std::string route_map_path = fs.combinePath(context.route_dir,
         "topology", "map", "route1.map");
 
-    char label[LABEL_BUFFER_SIZE];
-    char float_buffer[FLOAT_BUFFER_SIZE];
-    vsg::vec3 translation;
-    vsg::vec3 rotation_deg;
+    // char label[LABEL_BUFFER_SIZE];
+    // char float_buffer[FLOAT_BUFFER_SIZE];
+    // vsg::vec3 translation;
+    // vsg::vec3 rotation_deg;
 
-    return parse_file_line_by_line(
-        route_map_path.c_str(), "r", " \t\r,;",
-        [&]() -> void {
-            context.route_map[label].emplace_back(
-                RouteMapTransformation{translation, rotation_deg});
-        },
+    // return parse_file_line_by_line(
+    //     route_map_path.c_str(), "r", " \t\r,;",
+    //     [&]() -> void {
+    //         context.route_map[label].emplace_back(
+    //             RouteMapTransformation{translation, rotation_deg});
+    //     },
+    //     {
+    //         ParseField::String(label, LABEL_BUFFER_SIZE),
+    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.x),
+    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.y),
+    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.z),
+    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.x),
+    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.y),
+    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.z)
+    //     }
+    // );
+
+    std::ifstream route_map_file(route_map_path);
+    if (!route_map_file)
+    {
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to open %s\n", route_map_path.c_str());
+        return false;
+    }
+
+    std::string line;
+    while (std::getline(route_map_file, line))
+    {
+        if (line.empty())
         {
-            ParseField::String(label, LABEL_BUFFER_SIZE),
-            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.x),
-            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.y),
-            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.z),
-            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.x),
-            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.y),
-            ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.z)
+            continue;
         }
-    );
+
+        if (line.back() == ';')
+        {
+            line.pop_back();
+        }
+
+        std::replace(line.begin(), line.end(), ',', ' ');
+
+        std::istringstream iss(std::move(line));
+        std::string label;
+        vsg::vec3 translation, rotation;
+
+        if (iss >> label >> translation >> rotation)
+        {
+            context.route_map[label].emplace_back(
+                RouteMapTransformation{translation, rotation});
+        }
+    }
+
+    return true;
 }
 
 void Route::load_static_objects(const PagedLodMap& paged_lods)
@@ -141,7 +201,7 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
 
             this->addChild(vsg::MASK_ALL, object);
 
-            context.objects.emplace_back(object);
+            // context.objects.emplace_back(object);
         }
     }
 }
@@ -260,7 +320,7 @@ bool Route::load_topology()
 
         this->addChild(vsg::MASK_ALL, object);
 
-        context.objects.emplace_back(object);
+        // context.objects.emplace_back(object);
     };
 
     for (Signal* const line_signal : signals_data->line_signals)

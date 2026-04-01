@@ -23,8 +23,8 @@ void DeleteObjectsCommand::execute()
     {
         object->deselect();
 
-        context.objects.erase(std::find(context.objects.begin(),
-            context.objects.end(), object));
+        // context.objects.erase(std::find(context.objects.begin(),
+            // context.objects.end(), object));
 
         const auto route = context.route;
 
@@ -52,7 +52,7 @@ void DeleteObjectsCommand::undo()
     for (const auto& object : objects)
     {
         context.route->addChild(vsg::MASK_ALL, object);
-        context.objects.emplace_back(object);
+        // context.objects.emplace_back(object);
 
         object->select();
     }

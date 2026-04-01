@@ -38,7 +38,7 @@ void PasteObjectsCommand::execute()
     for (const auto& pasted_object : pasted_objects)
     {
         context.route->addChild(vsg::MASK_ALL, pasted_object);
-        context.objects.emplace_back(pasted_object);
+        // context.objects.emplace_back(pasted_object);
 
         pasted_object->select();
     }
@@ -57,8 +57,8 @@ void PasteObjectsCommand::undo()
     {
         pasted_object->deselect();
 
-        RouteObjects& objects = context.objects;
-        objects.erase(std::find(objects.begin(), objects.end(), pasted_object));
+        // RouteObjects& objects = context.objects;
+        // objects.erase(std::find(objects.begin(), objects.end(), pasted_object));
 
         const auto route = context.route;
 
