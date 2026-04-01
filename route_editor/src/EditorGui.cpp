@@ -241,13 +241,16 @@ void EditorGui::show_objects_ref() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, relative_path] : context.objects_ref)
+        for (const auto& [label, ref] : context.objects_ref)
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
-            ImGui::Text("%s", label.c_str());
+            if (ImGui::Button(label.c_str()))
+            {
+                // const auto object = RouteObject::create(context, )
+            }
             ImGui::TableNextColumn();
-            ImGui::Text("%s", relative_path.c_str());
+            ImGui::Text("%s", ref.relative_path.c_str());
         }
 
         ImGui::EndTable();

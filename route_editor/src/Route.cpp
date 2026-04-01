@@ -53,11 +53,11 @@ Route::Route(EditorContext& context)
 
     const FileSystem& fs = FileSystem::getInstance();
 
-    PagedLodMap paged_lods;
-    for (const auto& [label, relative_path] : context.objects_ref)
+    for (auto& [label, ref] : context.objects_ref)
     {
         const auto paged_lod = vsg::PagedLOD::create();
-        paged_lod->filename = fs.combinePath(context.route_dir, relative_path);
+        paged_lod->filename = fs.combinePath(context.route_dir,
+            ref.relative_path);
 
         paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
             static_cast<double>(context.settings.view_distance));
@@ -65,10 +65,10 @@ Route::Route(EditorContext& context)
         paged_lod->children.front() = {0.1, nullptr};
         paged_lod->options = context.options;
 
-        paged_lods.emplace(label, paged_lod);
+        ref.paged_lod = paged_lod;
     }
 
-    load_static_objects(paged_lods);
+    load_static_objects();
     load_topology();
 }
 
@@ -110,7 +110,7 @@ bool Route::load_objects_ref()
         if (iss >> label >> relative_path)
         {
             context.objects_ref.emplace(std::move(label),
-                std::move(relative_path));
+                ObjectRef{std::move(relative_path), nullptr});
         }
     }
 
@@ -183,12 +183,12 @@ bool Route::load_route_map()
     return true;
 }
 
-void Route::load_static_objects(const PagedLodMap& paged_lods)
+void Route::load_static_objects()
 {
     for (const auto& [label, transforms] : context.route_map)
     {
-        const auto paged_lod_it = paged_lods.find(label);
-        if (paged_lod_it == paged_lods.cend())
+        const auto ref_it = context.objects_ref.find(label);
+        if (ref_it == context.objects_ref.cend())
         {
             continue;
         }
@@ -196,7 +196,7 @@ void Route::load_static_objects(const PagedLodMap& paged_lods)
         for (const auto& transform : transforms)
         {
             const auto object = RouteObject::create(context,
-                paged_lod_it->second, label, transform.translation,
+                ref_it->second.paged_lod, label, transform.translation,
                 -transform.rotation_deg);
 
             this->addChild(vsg::MASK_ALL, object);

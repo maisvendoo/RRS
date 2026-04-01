@@ -31,12 +31,19 @@ class Camera;
 class ClearAttachments;
 class LookAt;
 class Options;
+class PagedLOD;
 class Perspective;
 class RenderGraph;
 class Viewer;
 class Window;
 
 }
+
+struct ObjectRef
+{
+    std::string relative_path;
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod;
+};
 
 struct EditorContext
 {
@@ -73,7 +80,7 @@ struct EditorContext
     vsg::ref_ptr<ObjectSelector> object_selector;
     vsg::ref_ptr<OutlineBuilder> outline_builder;
 
-    std::map<std::string, std::string> objects_ref;
+    std::map<std::string, ObjectRef> objects_ref;
     RouteMap route_map;
     Topology* topology = nullptr;
 
