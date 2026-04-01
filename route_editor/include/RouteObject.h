@@ -78,7 +78,7 @@ private:
     void update_bounds();
 
 private:
-    EditorContext& context;
+    static EditorContext* s_context;
 
     vsg::vec3 translation;
     vsg::vec3 rotation_deg;

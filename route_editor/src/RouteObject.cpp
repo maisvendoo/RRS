@@ -22,6 +22,8 @@
 #include <cmath>
 #include <string>
 
+EditorContext* RouteObject::s_context = nullptr;
+
 static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Z_POSITIVE = {0.0f, 0.0f, 1.0f};
@@ -53,12 +55,13 @@ RouteObject::RouteObject(
     vsg::vec3 scale
 )
     : label(label)
-    , context(context)
     , translation(translation)
     , rotation_deg(rotation_deg)
     , scale(scale)
     , paged_lod(paged_lod)
 {
+    s_context = &context;
+
     paged_lod_switch = SingleSwitch::create(
         vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
@@ -176,7 +179,7 @@ void RouteObject::hide()
 
     is_hidden = true;
 
-    context.hidden_objects.emplace_back(this);
+    s_context->hidden_objects.emplace_back(this);
 }
 
 RouteObjectsIterator RouteObject::show()
@@ -185,7 +188,7 @@ RouteObjectsIterator RouteObject::show()
 
     is_hidden = false;
 
-    RouteObjects& hidden_objects = context.hidden_objects;
+    RouteObjects& hidden_objects = s_context->hidden_objects;
 
     return hidden_objects.erase(std::find(hidden_objects.begin(),
         hidden_objects.end(), vsg::ref_ptr(this)));
@@ -195,21 +198,21 @@ void RouteObject::select()
 {
     if (!outline_switch->node)
     {
-        const auto outline = context.outline_builder->create_outline(paged_lod);
+        const auto outline = s_context->outline_builder->create_outline(paged_lod);
 
-        const auto compile_result = context.viewer->compileManager->compile(
+        const auto compile_result = s_context->viewer->compileManager->compile(
             outline);
 
         outline_switch->node = outline;
-        vsg::updateViewer(*context.viewer, compile_result);
+        vsg::updateViewer(*s_context->viewer, compile_result);
     }
 
     outline_switch->mask = MASK_GUI2;
 
     is_selected = true;
 
-    context.selected_objects.emplace_back(this);
-    context.gizmo->update_position();
+    s_context->selected_objects.emplace_back(this);
+    s_context->gizmo->update_position();
 }
 
 RouteObjectsIterator RouteObject::deselect()
@@ -218,19 +221,19 @@ RouteObjectsIterator RouteObject::deselect()
 
     is_selected = false;
 
-    RouteObjects& selected_objects = context.selected_objects;
+    RouteObjects& selected_objects = s_context->selected_objects;
 
     const auto it = selected_objects.erase(std::find(selected_objects.begin(),
         selected_objects.end(), vsg::ref_ptr(this)));
 
-    context.gizmo->update_position();
+    s_context->gizmo->update_position();
 
     return it;
 }
 
 vsg::ref_ptr<RouteObject> RouteObject::copy() const
 {
-    return RouteObject::create(context, paged_lod, label,
+    return RouteObject::create(*s_context, paged_lod, label,
         translation, rotation_deg, scale);
 }
 
@@ -268,5 +271,5 @@ void RouteObject::update_bounds()
     this->accept(compute_bounds);
     this->bounds = static_cast<vsg::box>(compute_bounds.bounds);
 
-    context.gizmo->update_position();
+    s_context->gizmo->update_position();
 }
