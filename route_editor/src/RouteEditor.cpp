@@ -33,6 +33,7 @@
 #include <vsg/state/InputAssemblyState.h>
 #include <vsg/state/MultisampleState.h>
 #include <vsg/state/RasterizationState.h>
+#include <vsg/state/ResourceHints.h>
 #include <vsg/state/VertexInputState.h>
 #include <vsg/utils/ShaderSet.h>
 #include <vsg/utils/SharedObjects.h>
@@ -130,7 +131,11 @@ bool RouteEditor::initialize()
     context.viewer->addEventHandler(context.object_selector);
 
     context.viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
-    context.viewer->compile();
+
+    auto resource_hints = vsg::ResourceHints::create();
+    resource_hints->numLightsRange = {200, 201};
+
+    context.viewer->compile(resource_hints);
 
     return true;
 }
