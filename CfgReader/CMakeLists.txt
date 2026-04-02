@@ -40,6 +40,7 @@ add_library(${TARGET} SHARED)
 target_sources(${TARGET}
     PRIVATE
         src/CfgReader.cpp
+        src/CfgReader2.cpp
         src/convert.cpp
 
     # TODO: Make convert.h private if it is not used anywhere outside
@@ -58,6 +59,7 @@ target_sources(${TARGET}
             include
         FILES
             include/CfgReader.h
+            include/CfgReader2.h
             include/convert.h
 )
 
