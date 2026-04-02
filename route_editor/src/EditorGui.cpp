@@ -260,6 +260,8 @@ void EditorGui::show_objects_ref() const
                 context.compile_infos.emplace_back(CompileInfo{
                     context.route, object, vsg::MASK_ALL});
 
+                context.static_objects.emplace_back(object);
+
                 context.deferred_selection.emplace_back(object);
             }
 

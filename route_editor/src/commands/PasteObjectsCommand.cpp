@@ -40,7 +40,7 @@ void PasteObjectsCommand::execute()
         context.compile_infos.emplace_back(CompileInfo{
             context.route, pasted_object, vsg::MASK_ALL});
 
-        // context.objects.emplace_back(pasted_object);
+        context.static_objects.emplace_back(pasted_object);
 
         pasted_object->select();
     }
@@ -54,8 +54,8 @@ void PasteObjectsCommand::undo()
     {
         pasted_object->deselect();
 
-        // RouteObjects& objects = context.objects;
-        // objects.erase(std::find(objects.begin(), objects.end(), pasted_object));
+        RouteObjects& objects = context.static_objects;
+        objects.erase(std::find(objects.begin(), objects.end(), pasted_object));
 
         const auto route = context.route;
 

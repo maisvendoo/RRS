@@ -24,8 +24,8 @@ void DeleteObjectsCommand::execute()
     {
         object->deselect();
 
-        // context.objects.erase(std::find(context.objects.begin(),
-            // context.objects.end(), object));
+        context.static_objects.erase(std::find(context.static_objects.begin(),
+            context.static_objects.end(), object));
 
         const auto route = context.route;
 
@@ -52,7 +52,7 @@ void DeleteObjectsCommand::undo()
         context.compile_infos.emplace_back(CompileInfo{
             context.route, object, vsg::MASK_ALL});
 
-        // context.objects.emplace_back(object);
+        context.static_objects.emplace_back(object);
 
         object->select();
     }

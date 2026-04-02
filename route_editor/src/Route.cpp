@@ -201,7 +201,7 @@ void Route::load_static_objects()
 
             this->addChild(vsg::MASK_ALL, object);
 
-            // context.objects.emplace_back(object);
+            context.static_objects.emplace_back(object);
         }
     }
 }
@@ -319,8 +319,6 @@ bool Route::load_topology()
             signal_model_name, pos, rotation_deg);
 
         this->addChild(vsg::MASK_ALL, object);
-
-        // context.objects.emplace_back(object);
     };
 
     for (Signal* const line_signal : signals_data->line_signals)
