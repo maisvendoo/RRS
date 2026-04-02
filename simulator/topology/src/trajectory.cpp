@@ -40,67 +40,6 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
                    QDir::separator() + "trajectories" +
                    QDir::separator() + traj_name + ".traj";
 
-    // char double_buffer[DOUBLE_BUFFER_SIZE];
-    // dvec3 prev_point;
-    // dvec3 curr_point;
-    // double prev_railway_coord;
-    // double curr_railway_coord;
-    // bool first_line = true;
-    // int index = 0;
-
-    // const bool success = parse_file_line_by_line(
-    //     path.toStdString().c_str(), "r", " \t\r,;",
-    //     [&]() -> void {
-    //         if (first_line)
-    //         {
-    //             first_line = false;
-    //         }
-    //         else
-    //         {
-    //             // Проверка совпадения точек p0 и p1
-    //             const dvec3 delta_point = prev_point - curr_point;
-
-    //             // Откидываем сантиметровые треки и меньше
-    //             if (solve_errors && (length(delta_point) <= 0.01))
-    //             {
-    //                 const QString msg = QString("TOPOLOGY WARNING: Points %1 and %2 match in trajectory %3")
-    //                     .arg(index - 1, 4)
-    //                     .arg(index, 4)
-    //                     .arg(traj_name);
-
-    //                 Journal::instance()->error(msg);
-    //                 return;
-    //             }
-
-    //             // Конструируем трек
-    //             track_t& track = tracks.emplace_back(track_t(prev_point, curr_point));
-
-    //             // Железнодорожный пикетаж
-    //             track.railway_coord0 = prev_railway_coord;
-    //             track.railway_coord1 = curr_railway_coord;
-
-    //             // Обновляем траекторную координату начала трека
-    //             track.traj_coord = len;
-
-    //             // Обновляем длину траектории
-    //             len += track.len;
-    //         }
-
-    //         prev_point = curr_point;
-    //         prev_railway_coord = curr_railway_coord;
-    //         ++index;
-    //     }, 4,
-    //     PARSE_VALUE_TYPE_DOUBLE, double_buffer, static_cast<std::size_t>(DOUBLE_BUFFER_SIZE), &curr_point.x,
-    //     PARSE_VALUE_TYPE_DOUBLE, double_buffer, static_cast<std::size_t>(DOUBLE_BUFFER_SIZE), &curr_point.y,
-    //     PARSE_VALUE_TYPE_DOUBLE, double_buffer, static_cast<std::size_t>(DOUBLE_BUFFER_SIZE), &curr_point.z,
-    //     PARSE_VALUE_TYPE_DOUBLE, double_buffer, static_cast<std::size_t>(DOUBLE_BUFFER_SIZE), &curr_railway_coord
-    // );
-
-    // if (!success)
-    // {
-    //     return false;
-    // }
-
     std::ifstream stream(path.toStdString(), std::ios::in);
 
     if (!stream.is_open())
