@@ -3,6 +3,7 @@
 #include "CameraHandler.h"
 #include "EditorGui.h"
 #include "EditorState.h"
+#include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
 #include "Mask.h"
@@ -194,6 +195,21 @@ void RouteEditor::run()
 
         vsg::updateViewer(*context.viewer, compile_result);
         context.compile_infos.clear();
+
+        RouteObjects& deferred_selection = context.deferred_selection;
+        for (auto it = deferred_selection.begin();
+            it != deferred_selection.end();)
+        {
+            if ((*it)->select())
+            {
+                it = deferred_selection.erase(it);
+                context.gizmo->update_visibility();
+            }
+            else
+            {
+                ++it;
+            }
+        }
     }
 }
 

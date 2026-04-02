@@ -194,11 +194,15 @@ RouteObjectsIterator RouteObject::show()
         hidden_objects.end(), vsg::ref_ptr(this)));
 }
 
-void RouteObject::select()
+bool RouteObject::select()
 {
     if (!outline_switch->node)
     {
         const auto outline = s_context->outline_builder->create_outline(paged_lod);
+        if (!outline)
+        {
+            return false;
+        }
 
         s_context->compile_infos.emplace_back(
             CompileInfo{outline_switch, outline});
@@ -210,6 +214,8 @@ void RouteObject::select()
 
     s_context->selected_objects.emplace_back(this);
     s_context->gizmo->update_position();
+
+    return true;
 }
 
 RouteObjectsIterator RouteObject::deselect()

@@ -62,7 +62,7 @@ public:
     void hide();
     RouteObjectsIterator show();
 
-    void select();
+    bool select();
     RouteObjectsIterator deselect();
 
     vsg::ref_ptr<RouteObject> copy() const;

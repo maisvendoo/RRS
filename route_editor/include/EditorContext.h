@@ -102,6 +102,7 @@ struct EditorContext
     double delta_time;
 
     std::vector<CompileInfo> compile_infos;
+    RouteObjects deferred_selection;
 };
 
 #endif // EDITOR_CONTEXT_H
