@@ -4,7 +4,6 @@
 #include "Mask.h"
 #include "Route.h"
 
-#include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
 #include <vsg/lighting/AmbientLight.h>
 

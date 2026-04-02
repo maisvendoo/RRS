@@ -20,7 +20,6 @@
 #include "SelectObjectsCommand.h"
 #include "SingleSwitch.h"
 
-#include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Node.h>

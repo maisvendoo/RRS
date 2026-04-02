@@ -6,7 +6,6 @@
 #include "Route.h"
 #include "RouteObject.h"
 
-#include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
 
 #include <algorithm>

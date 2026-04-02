@@ -21,9 +21,6 @@
 #include "trajectory.h"
 #include "vec3.h"
 
-#include <cfloat>
-#include <climits>
-#include <vsg/app/Viewer.h>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
@@ -32,10 +29,13 @@
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/PagedLOD.h>
 #include <vsgImGui/imgui.h>
 
 #include <cassert>
 #include <cctype>
+#include <cfloat>
+#include <climits>
 #include <filesystem>
 #include <set>
 #include <string>

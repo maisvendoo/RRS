@@ -5,11 +5,10 @@
 #include "Gizmo.h"
 #include "Route.h"
 
-#include <vsg/app/Viewer.h>
+#include <vsg/core/Mask.h>
 
 #include <algorithm>
 #include <cstdio>
-#include <vsg/core/Mask.h>
 
 DeleteObjectsCommand::DeleteObjectsCommand(EditorContext& context)
     : Command(context)

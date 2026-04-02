@@ -6,7 +6,6 @@
 #include "Outline.h"
 #include "SingleSwitch.h"
 
-#include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
