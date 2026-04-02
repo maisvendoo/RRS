@@ -37,16 +37,13 @@ void PasteObjectsCommand::execute()
 
     for (const auto& pasted_object : pasted_objects)
     {
-        context.route->addChild(vsg::MASK_ALL, pasted_object);
+        context.compile_infos.emplace_back(CompileInfo{
+            context.route, pasted_object, vsg::MASK_ALL});
+
         // context.objects.emplace_back(pasted_object);
 
         pasted_object->select();
     }
-
-    const auto compile_result = context.viewer->compileManager->compile(
-        context.route);
-
-    vsg::updateViewer(*context.viewer, compile_result);
 
     context.gizmo->update_visibility();
 }
@@ -78,10 +75,7 @@ void PasteObjectsCommand::undo()
         object->select();
     }
 
-    const auto compile_result = context.viewer->compileManager->compile(
-        context.route);
-
-    vsg::updateViewer(*context.viewer, compile_result);
+    context.compile_infos.emplace_back(CompileInfo{nullptr, context.route});
 
     context.gizmo->update_visibility();
 }

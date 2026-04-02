@@ -5,6 +5,7 @@
 #include "Command.h"
 #include "CommandList.h"
 #include "EditorState.h"
+#include "Gizmo.h"
 #include "KeyBinding.h"
 #include "ObjectSelector.h"
 #include "Route.h"
@@ -21,7 +22,9 @@
 
 #include <cfloat>
 #include <climits>
+#include <vsg/app/Viewer.h>
 #include <vsg/app/ProjectionMatrix.h>
+#include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/quat.h>
@@ -247,8 +250,24 @@ void EditorGui::show_objects_ref() const
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                // const auto object = RouteObject::create(context, )
+                // const auto object = RouteObject::create(context, ref.paged_lod,
+                //     label, static_cast<vsg::vec3>(context.look_at->eye) +
+                //     context.camera_handler->get_front() * 5.0f,
+                //     vsg::vec3(0.0f, 0.0f, 0.0f)
+                // );
+
+                // context.route->addChild(vsg::MASK_ALL, object);
+
+                // object->select();
+
+                // const auto compile_result = context.viewer->compileManager->compile(
+                //     context.route);
+
+                // vsg::updateViewer(*context.viewer, compile_result);
+
+                // context.gizmo->update_visibility();
             }
+
             ImGui::TableNextColumn();
             ImGui::Text("%s", ref.relative_path.c_str());
         }

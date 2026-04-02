@@ -200,11 +200,8 @@ void RouteObject::select()
     {
         const auto outline = s_context->outline_builder->create_outline(paged_lod);
 
-        const auto compile_result = s_context->viewer->compileManager->compile(
-            outline);
-
-        outline_switch->node = outline;
-        vsg::updateViewer(*s_context->viewer, compile_result);
+        s_context->compile_infos.emplace_back(
+            CompileInfo{outline_switch, outline});
     }
 
     outline_switch->mask = MASK_GUI2;

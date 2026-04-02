@@ -19,9 +19,6 @@ void SceneGraph::load_route()
 {
     context.route = Route::create(context);
 
-    const auto compile_result = context.viewer->compileManager->compile(
-        context.route);
-
-    this->addChild(vsg::MASK_ALL, context.route);
-    vsg::updateViewer(*context.viewer, compile_result);
+    context.compile_infos.emplace_back(CompileInfo{
+        context.scene_graph, context.route, vsg::MASK_ALL});
 }

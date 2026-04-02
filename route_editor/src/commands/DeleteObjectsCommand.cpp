@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <vsg/core/Mask.h>
 
 DeleteObjectsCommand::DeleteObjectsCommand(EditorContext& context)
     : Command(context)
@@ -39,10 +40,7 @@ void DeleteObjectsCommand::execute()
         }
     }
 
-    const auto compile_result = context.viewer->compileManager->compile(
-        context.route);
-
-    vsg::updateViewer(*context.viewer, compile_result);
+    context.compile_infos.emplace_back(CompileInfo{nullptr, context.route});
 
     context.gizmo->update_visibility();
 }
@@ -51,16 +49,13 @@ void DeleteObjectsCommand::undo()
 {
     for (const auto& object : objects)
     {
-        context.route->addChild(vsg::MASK_ALL, object);
+        context.compile_infos.emplace_back(CompileInfo{
+            context.route, object, vsg::MASK_ALL});
+
         // context.objects.emplace_back(object);
 
         object->select();
     }
-
-    const auto compile_result = context.viewer->compileManager->compile(
-        context.route);
-
-    vsg::updateViewer(*context.viewer, compile_result);
 
     context.gizmo->update_visibility();
 }

@@ -7,6 +7,7 @@
 #include "RouteObject.h"
 #include "Settings.h"
 
+#include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 
 #include <map>
@@ -43,6 +44,13 @@ struct ObjectRef
 {
     std::string relative_path;
     vsg::ref_ptr<vsg::PagedLOD> paged_lod;
+};
+
+struct CompileInfo
+{
+    vsg::ref_ptr<vsg::Node> group_node;
+    vsg::ref_ptr<vsg::Node> node;
+    vsg::Mask mask = vsg::MASK_OFF;
 };
 
 struct EditorContext
@@ -92,6 +100,8 @@ struct EditorContext
     std::string route_dir;
 
     double delta_time;
+
+    std::vector<CompileInfo> compile_infos;
 };
 
 #endif // EDITOR_CONTEXT_H

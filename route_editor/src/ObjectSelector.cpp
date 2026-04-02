@@ -127,12 +127,8 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     total_rotation_rad = 0.0f;
     total_scale = {1.0f, 1.0f, 1.0f};
 
-    const auto compile_result = context.viewer->compileManager->compile(
-        front_plane);
-
-    front_plane_switch->node = front_plane;
-
-    vsg::updateViewer(*context.viewer, compile_result);
+    context.compile_infos.emplace_back(CompileInfo{
+        front_plane_switch, front_plane});
 
     for (const auto& object : selected_objects)
     {
@@ -243,7 +239,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
     context.gizmo->apply(moveEvent);
 
-    if (state == State::INITIAL)
+    if (state == State::INITIAL || !front_plane_switch->node)
     {
         return;
     }

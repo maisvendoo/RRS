@@ -13,12 +13,14 @@
 #include "RouteObject.h"
 #include "SceneGraph.h"
 #include "Settings.h"
+#include "SingleSwitch.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
 #include "shader_funcs.h"
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
+#include <vsg/app/CompileManager.h>
 #include <vsg/app/RenderGraph.h>
 #include <vsg/app/View.h>
 #include <vsg/app/Viewer.h>
@@ -162,6 +164,36 @@ void RouteEditor::run()
         context.viewer->update();
         context.viewer->recordAndSubmit();
         context.viewer->present();
+
+        vsg::CompileResult compile_result;
+
+        for (const CompileInfo& compile_info : context.compile_infos)
+        {
+            const auto& group_node = compile_info.group_node;
+            const vsg::Mask mask = compile_info.mask;
+            const auto& node = compile_info.node;
+
+            compile_result.add(context.viewer->compileManager->compile(node));
+
+            if (group_node)
+            {
+                if (auto group = group_node.cast<vsg::Group>())
+                {
+                    group->addChild(node);
+                }
+                else if (auto switch_ = group_node.cast<vsg::Switch>())
+                {
+                    switch_->addChild(mask, node);
+                }
+                else if (auto single_switch = group_node.cast<SingleSwitch>())
+                {
+                    single_switch->node = node;
+                }
+            }
+        }
+
+        vsg::updateViewer(*context.viewer, compile_result);
+        context.compile_infos.clear();
     }
 }
 
