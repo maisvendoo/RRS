@@ -1,5 +1,6 @@
 #include "RouteEditor.h"
 
+#include "Action.h"
 #include "CameraHandler.h"
 #include "EditorGui.h"
 #include "EditorState.h"
@@ -19,6 +20,8 @@
 #include "filesystem.h"
 #include "shader_funcs.h"
 
+#include <fstream>
+#include <iostream>
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
 #include <vsg/app/CompileManager.h>
@@ -208,6 +211,23 @@ void RouteEditor::run()
             else
             {
                 ++it;
+            }
+        }
+
+        if (context.keyboard_handler->get_binding_state(ACTION_SAVE_ROUTE))
+        {
+            const FileSystem& fs = FileSystem::getInstance();
+            std::ofstream route_map_file(fs.combinePath(context.route_dir,
+                "topology", "map", "route1.map_edited"));
+            for (const auto& object : context.static_objects)
+            {
+                const auto translation = object->get_translation();
+                const auto rotation_deg = -object->get_rotation_deg();
+
+                route_map_file << object->label << "," << translation.x <<
+                    "," << translation.y << "," << translation.z << "," <<
+                    rotation_deg.x << "," << rotation_deg.y << "," <<
+                    rotation_deg.z << ";\n";
             }
         }
     }
