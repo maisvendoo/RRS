@@ -99,5 +99,6 @@
         <DeleteObjects>X</DeleteObjects>
         <UndoCommand>Ctrl + Z</UndoCommand>
         <RedoCommand>Ctrl + Y</RedoCommand>
+        <SaveRoute>Ctrl + S</SaveRoute>
     </Keys>
 </Config>

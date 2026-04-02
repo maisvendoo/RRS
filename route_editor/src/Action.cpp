@@ -20,6 +20,7 @@ static const char* const * get_action_names()
     action_names[ACTION_DELETE_OBJECTS] = "Objects: Delete";
     action_names[ACTION_UNDO_COMMAND] = "Undo command";
     action_names[ACTION_REDO_COMMAND] = "Redo command";
+    action_names[ACTION_SAVE_ROUTE] = "Save route";
 
     return action_names;
 }

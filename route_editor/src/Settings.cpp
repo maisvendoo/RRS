@@ -147,7 +147,8 @@ void settings_t::read(const std::string& cfg_path)
         {ACTION_SHOW_OBJECTS, "ShowObjects"},
         {ACTION_DELETE_OBJECTS, "DeleteObjects"},
         {ACTION_UNDO_COMMAND, "UndoCommand"},
-        {ACTION_REDO_COMMAND, "RedoCommand"}
+        {ACTION_REDO_COMMAND, "RedoCommand"},
+        {ACTION_SAVE_ROUTE, "SaveRoute"}
     };
 
     static_assert(sizeof action_setting_name_map_data /
