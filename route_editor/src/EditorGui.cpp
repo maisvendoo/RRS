@@ -1,6 +1,7 @@
 #include "EditorGui.h"
 
 #include "Action.h"
+#include "AddObjectCommand.h"
 #include "CameraHandler.h"
 #include "Command.h"
 #include "CommandList.h"
@@ -257,12 +258,8 @@ void EditorGui::show_objects_ref() const
                     vsg::vec3(0.0f, 0.0f, 0.0f)
                 );
 
-                context.compile_infos.emplace_back(CompileInfo{
-                    context.route, object, vsg::MASK_ALL});
-
-                context.static_objects.emplace_back(object);
-
-                context.deferred_selection.emplace_back(object);
+                context.commands.push(new AddObjectCommand(
+                    context, object), true);
             }
 
             ImGui::TableNextColumn();
