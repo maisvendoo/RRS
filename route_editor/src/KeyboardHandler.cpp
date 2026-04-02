@@ -5,7 +5,9 @@
 #include "EditorContext.h"
 #include "KeyBinding.h"
 #include "Settings.h"
+#include "filesystem.h"
 
+#include <fstream>
 #include <vsg/ui/KeyEvent.h>
 
 #include <cstdint>
@@ -39,6 +41,22 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
     else if (get_binding_state(ACTION_REDO_COMMAND))
     {
         context.commands.redo();
+    }
+    else if (get_binding_state(ACTION_SAVE_ROUTE))
+    {
+        const FileSystem& fs = FileSystem::getInstance();
+        std::ofstream route_map_file(fs.combinePath(context.route_dir,
+            "topology", "map", "route1.map_edited"));
+        for (const auto& object : context.static_objects)
+        {
+            const auto translation = object->get_translation();
+            const auto rotation_deg = -object->get_rotation_deg();
+
+            route_map_file << object->label << "," << translation.x <<
+                "," << translation.y << "," << translation.z << "," <<
+                rotation_deg.x << "," << rotation_deg.y << "," <<
+                rotation_deg.z << ";\n";
+        }
     }
 }
 
