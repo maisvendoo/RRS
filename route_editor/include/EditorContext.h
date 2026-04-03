@@ -90,6 +90,7 @@ struct EditorContext
 
     std::map<std::string, ObjectRef> objects_ref;
     RouteMap route_map;
+    std::map<std::string, vsg::vec3> stations_conf;
     Topology* topology = nullptr;
 
     RouteObjects static_objects;

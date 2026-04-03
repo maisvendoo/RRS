@@ -107,6 +107,8 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
                 show_route_map();
             }
 
+            show_stations_conf();
+
             if (context.settings.show_controls)
             {
                 show_key_bindings();
@@ -312,6 +314,40 @@ void EditorGui::show_route_map() const
                 ImGui::TableNextColumn();
                 ImGui::Text("%10.3f", rotation_deg.z);
             }
+        }
+
+        ImGui::EndTable();
+    }
+
+    ImGui::End();
+}
+
+void EditorGui::show_stations_conf() const
+{
+    ImGui::Begin("stations.conf", nullptr, window_flags);
+
+    if (ImGui::BeginTable("stations_conf_table", 4,
+        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
+        ImGuiTableFlags_RowBg))
+    {
+        for (const auto& [label, translation] : context.stations_conf)
+        {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Button(label.c_str()))
+            {
+                context.look_at->eye = static_cast<vsg::dvec3>(translation)
+                    + vsg::dvec3(0.0, 0.0, 50.0);
+
+                context.look_at->center = context.look_at->eye
+                    + static_cast<vsg::dvec3>(context.camera_handler->get_front());
+            }
+            ImGui::TableNextColumn();
+            ImGui::Text("%10.3f", translation.x);
+            ImGui::TableNextColumn();
+            ImGui::Text("%10.3f", translation.y);
+            ImGui::TableNextColumn();
+            ImGui::Text("%10.3f", translation.z);
         }
 
         ImGui::EndTable();

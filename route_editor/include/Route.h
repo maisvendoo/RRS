@@ -15,6 +15,7 @@ public:
 private:
     bool load_objects_ref();
     bool load_route_map();
+    bool load_stations_conf();
     void load_static_objects();
 
     bool load_topology();
