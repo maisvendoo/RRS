@@ -297,7 +297,8 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
             float prev_acos = std::acos(vsg::dot(prev_vec, front_plane_up));
             float curr_acos = std::acos(vsg::dot(curr_vec, front_plane_up));
 
-            const vsg::vec3 front = context.camera_handler->get_front();
+            const vsg::vec3 front = static_cast<vsg::vec3>(
+                context.camera_handler->get_front());
 
             if (prev_vec != front_plane_up && prev_vec != -front_plane_up &&
                 vsg::dot(vsg::cross(prev_vec, front_plane_up), front) < 0.0f)
@@ -432,7 +433,8 @@ void ObjectSelector::confirm_keyboard_transformation()
             context.commands.push(
                 new RotateObjectsCommand(
                     context, context.gizmo->get_curr_pos(),
-                    context.camera_handler->get_front(), total_rotation_rad
+                    static_cast<vsg::vec3>(context.camera_handler->get_front()),
+                    total_rotation_rad
                 ),
                 false
             );

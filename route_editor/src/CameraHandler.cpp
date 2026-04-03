@@ -180,7 +180,7 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     look_at->center = look_at->eye + front;
 }
 
-const CameraHandler::vec3_type& CameraHandler::get_front() const
+const vsg::dvec3& CameraHandler::get_front() const
 {
     return front;
 }
@@ -215,7 +215,8 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
             static_cast<value_type>(pitch_dir);
 
         return vsg::rotate(yaw_angle_rad, up) *
-            vsg::rotate(-pitch_angle_rad, right) * front;
+            vsg::rotate(-pitch_angle_rad, right) *
+            static_cast<vsg::vec3>(front);
     };
 
     const vec3_type p0_dir = get_dir(-1, -1);
@@ -226,9 +227,11 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
     const vec3_type camera_to_point = point - camera_pos;
 
     const value_type camera_norm_length = vsg::length(camera_to_point) *
-        vsg::dot(front, vsg::normalize(camera_to_point));
+        vsg::dot(static_cast<vsg::vec3>(front),
+        vsg::normalize(camera_to_point));
 
-    const value_type dist = camera_norm_length / vsg::dot(front, p0_dir);
+    const value_type dist = camera_norm_length /
+        vsg::dot(static_cast<vsg::vec3>(front), p0_dir);
 
     const vsg::vec3 p0 = camera_pos + p0_dir * dist;
     const vsg::vec3 p1 = camera_pos + p1_dir * dist;
@@ -259,10 +262,10 @@ void CameraHandler::calculate_right()
 {
     const vec3_type world_up = static_cast<vec3_type>(context.look_at->up);
 
-    right = vsg::normalize(vsg::cross(front, world_up));
+    right = vsg::normalize(vsg::cross(static_cast<vsg::vec3>(front), world_up));
 }
 
 void CameraHandler::calculate_up()
 {
-    up = vsg::normalize(vsg::cross(right, front));
+    up = vsg::normalize(vsg::cross(right, static_cast<vsg::vec3>(front)));
 }

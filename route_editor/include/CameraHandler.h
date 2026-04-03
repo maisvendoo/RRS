@@ -32,7 +32,7 @@ public:
     virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;
     virtual void apply(vsg::FrameEvent& frame) override;
 
-    const vec3_type& get_front() const;
+    const vsg::dvec3& get_front() const;
     const vec3_type& get_right() const;
     const vec3_type& get_up() const;
 
@@ -54,7 +54,7 @@ private:
     value_type yaw_deg = 0.0;
     value_type pitch_deg = 0.0;
 
-    vec3_type front;
+    vsg::dvec3 front;
     vec3_type right;
     vec3_type up;
 };

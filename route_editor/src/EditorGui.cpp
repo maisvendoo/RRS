@@ -258,7 +258,8 @@ void EditorGui::show_objects_ref() const
             {
                 const auto object = RouteObject::create(context, ref.paged_lod,
                     label, static_cast<vsg::vec3>(context.look_at->eye) +
-                    context.camera_handler->get_front() * 20.0f,
+                    static_cast<vsg::vec3>(context.camera_handler->get_front())
+                        * 20.0f,
                     vsg::vec3(0.0f, 0.0f, 0.0f)
                 );
 
@@ -342,7 +343,7 @@ void EditorGui::show_stations_conf() const
                     + vsg::dvec3(0.0, 0.0, 50.0);
 
                 context.look_at->center = context.look_at->eye
-                    + static_cast<vsg::dvec3>(context.camera_handler->get_front());
+                    + context.camera_handler->get_front();
             }
             ImGui::TableNextColumn();
             ImGui::Text("%10.3f", translation.x);
@@ -394,7 +395,7 @@ void EditorGui::show_waypoints_conf() const
 
                     context.look_at->eye = vsg::dvec3(pos.x, pos.y, pos.z + 50.0);
                     context.look_at->center = context.look_at->eye
-                        + static_cast<vsg::dvec3>(context.camera_handler->get_front());
+                        + context.camera_handler->get_front();
                 }
             }
             ImGui::TableNextColumn();
