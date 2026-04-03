@@ -47,7 +47,7 @@ Route::Route(EditorContext& context)
     : context(context)
 {
     const bool success = load_objects_ref() && load_route_map()
-        && load_stations_conf();
+        && load_stations_conf() && load_waypoints_conf();
 
     if (!success)
     {
@@ -204,12 +204,64 @@ bool Route::load_stations_conf()
     std::string line;
     while (std::getline(stations_conf_file, line))
     {
+        if (line.empty())
+        {
+            continue;
+        }
+
         std::istringstream iss(std::move(line));
         std::string label;
         vsg::vec3 translation;
         if (iss >> label >> translation)
         {
             context.stations_conf[label] = translation;
+        }
+    }
+
+    return true;
+}
+
+bool Route::load_waypoints_conf()
+{
+    const FileSystem& fs = FileSystem::getInstance();
+
+    const std::string waypoints_conf_path = fs.combinePath(context.route_dir,
+        "topology", "waypoints.conf");
+
+    std::ifstream waypoints_conf_file(waypoints_conf_path);
+    if (!waypoints_conf_file)
+    {
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to open %s\n", waypoints_conf_path.c_str());
+        return false;
+    }
+
+    std::string line;
+    while (std::getline(waypoints_conf_file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        std::istringstream iss(std::move(line));
+        std::string label;
+        WaypointData data;
+        std::string direction_string;
+        std::string coord_string;
+        std::string length_string;
+
+        if (std::getline(iss, label, '\t') &&
+            std::getline(iss, data.trajectory_name, '\t') &&
+            std::getline(iss, direction_string, '\t') &&
+            std::getline(iss, coord_string, '\t') &&
+            std::getline(iss, length_string, '\t'))
+        {
+            data.direction = stoi(direction_string);
+            data.coord = stod(coord_string);
+            data.length = stod(length_string);
+
+            context.waypoints_conf[label] = data;
         }
     }
 
