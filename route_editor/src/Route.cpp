@@ -15,6 +15,7 @@
 #include <CfgReader.h>
 
 #include <fstream>
+#include <sstream>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
@@ -45,7 +46,9 @@ static vsg::vec3 to_vsg_vec3(dvec3 vec)
 Route::Route(EditorContext& context)
     : context(context)
 {
-    const bool success = load_objects_ref() && load_route_map();
+    const bool success = load_objects_ref() && load_route_map()
+        && load_stations_conf();
+
     if (!success)
     {
         return;
@@ -177,6 +180,36 @@ bool Route::load_route_map()
         {
             context.route_map[label].emplace_back(
                 RouteMapTransformation{translation, rotation});
+        }
+    }
+
+    return true;
+}
+
+bool Route::load_stations_conf()
+{
+    const FileSystem& fs = FileSystem::getInstance();
+
+    const std::string stations_conf_path = fs.combinePath(context.route_dir,
+        "topology", "stations.conf");
+
+    std::ifstream stations_conf_file(stations_conf_path);
+    if (!stations_conf_file)
+    {
+        // TODO: Replace on Journal
+        std::fprintf(stderr, "Failed to open %s\n", stations_conf_path.c_str());
+        return false;
+    }
+
+    std::string line;
+    while (std::getline(stations_conf_file, line))
+    {
+        std::istringstream iss(std::move(line));
+        std::string label;
+        vsg::vec3 translation;
+        if (iss >> label >> translation)
+        {
+            context.stations_conf[label] = translation;
         }
     }
 

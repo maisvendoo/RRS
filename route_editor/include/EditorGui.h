@@ -26,6 +26,7 @@ private:
     void select_route() const;
     void show_objects_ref() const;
     void show_route_map() const;
+    void show_stations_conf() const;
 
     void show_key_bindings() const;
     void show_camera_settings() const;
