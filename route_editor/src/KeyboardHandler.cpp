@@ -45,8 +45,16 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
     else if (get_binding_state(ACTION_SAVE_ROUTE))
     {
         const FileSystem& fs = FileSystem::getInstance();
-        std::ofstream route_map_file(fs.combinePath(context.route_dir,
-            "topology", "map", "route1.map_edited"));
+        std::string dir_for_save = fs.combinePath(context.route_dir, "topology", "map");
+
+        // Создаем резервную копия
+        std::filesystem::copy_file(fs.combinePath(dir_for_save, "route1.map"),
+                                   fs.combinePath(dir_for_save, "~route1.map"),
+                                   std::filesystem::copy_options::overwrite_existing);
+
+        // Перезаписываем рабочую копию
+        std::ofstream route_map_file(fs.combinePath(dir_for_save, "route1.map"));
+
         for (const auto& object : context.static_objects)
         {
             const auto translation = object->get_translation();
