@@ -17,6 +17,7 @@
 #include "filesystem.h"
 #include "rail-signal.h"
 #include "switch.h"
+#include "topology-defines.h"
 #include "topology.h"
 #include "track.h"
 #include "trajectory.h"
@@ -108,6 +109,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             }
 
             show_stations_conf();
+            show_waypoints_conf();
 
             if (context.settings.show_controls)
             {
@@ -348,6 +350,61 @@ void EditorGui::show_stations_conf() const
             ImGui::Text("%10.3f", translation.y);
             ImGui::TableNextColumn();
             ImGui::Text("%10.3f", translation.z);
+        }
+
+        ImGui::EndTable();
+    }
+
+    ImGui::End();
+}
+
+void EditorGui::show_waypoints_conf() const
+{
+    ImGui::Begin("waypoints.conf", nullptr, window_flags);
+
+    if (ImGui::BeginTable("waypoints_conf_table", 5,
+        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
+        ImGuiTableFlags_RowBg))
+    {
+        for (const auto& [label, data] : context.waypoints_conf)
+        {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Button(label.c_str()))
+            {
+                const traj_list_t* const traj_list =
+                    context.topology->getTrajectoriesList();
+
+                const QString traj_name = QString::fromStdString(
+                    data.trajectory_name);
+
+                auto found_it = traj_list->find(traj_name);
+                if (found_it == traj_list->end())
+                {
+                    // TODO: Replace on Journal
+                    std::fprintf(stderr, "Failed to find trajectory %s\n",
+                        data.trajectory_name.c_str());
+                }
+                else
+                {
+                    Trajectory* const trajectory = *found_it;
+
+                    const dvec3 pos = trajectory->getPosition(
+                        data.coord, data.direction).position;
+
+                    context.look_at->eye = vsg::dvec3(pos.x, pos.y, pos.z + 50.0);
+                    context.look_at->center = context.look_at->eye
+                        + static_cast<vsg::dvec3>(context.camera_handler->get_front());
+                }
+            }
+            ImGui::TableNextColumn();
+            ImGui::Text("%s", data.trajectory_name.c_str());
+            ImGui::TableNextColumn();
+            ImGui::Text("%d", data.direction);
+            ImGui::TableNextColumn();
+            ImGui::Text("%10.3f", data.coord);
+            ImGui::TableNextColumn();
+            ImGui::Text("%10.3f", data.length);
         }
 
         ImGui::EndTable();

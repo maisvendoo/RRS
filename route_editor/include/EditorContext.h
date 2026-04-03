@@ -53,6 +53,14 @@ struct CompileInfo
     vsg::Mask mask = vsg::MASK_OFF;
 };
 
+struct WaypointData
+{
+    std::string trajectory_name;
+    int direction;
+    double coord;
+    double length;
+};
+
 struct EditorContext
 {
     EditorContext();
@@ -91,6 +99,7 @@ struct EditorContext
     std::map<std::string, ObjectRef> objects_ref;
     RouteMap route_map;
     std::map<std::string, vsg::vec3> stations_conf;
+    std::map<std::string, WaypointData> waypoints_conf;
     Topology* topology = nullptr;
 
     RouteObjects static_objects;
