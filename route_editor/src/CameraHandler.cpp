@@ -185,7 +185,7 @@ const vsg::dvec3& CameraHandler::get_front() const
     return front;
 }
 
-const CameraHandler::vec3_type& CameraHandler::get_right() const
+const vsg::dvec3& CameraHandler::get_right() const
 {
     return right;
 }
@@ -215,7 +215,7 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
             static_cast<value_type>(pitch_dir);
 
         return vsg::rotate(yaw_angle_rad, up) *
-            vsg::rotate(-pitch_angle_rad, right) *
+            vsg::rotate(-pitch_angle_rad, static_cast<vsg::vec3>(right)) *
             static_cast<vsg::vec3>(front);
     };
 
@@ -260,12 +260,11 @@ void CameraHandler::calculate_front()
 
 void CameraHandler::calculate_right()
 {
-    const vec3_type world_up = static_cast<vec3_type>(context.look_at->up);
-
-    right = vsg::normalize(vsg::cross(static_cast<vsg::vec3>(front), world_up));
+    right = vsg::normalize(vsg::cross(front, context.look_at->up));
 }
 
 void CameraHandler::calculate_up()
 {
-    up = vsg::normalize(vsg::cross(right, static_cast<vsg::vec3>(front)));
+    up = vsg::normalize(vsg::cross(static_cast<vsg::vec3>(right),
+        static_cast<vsg::vec3>(front)));
 }

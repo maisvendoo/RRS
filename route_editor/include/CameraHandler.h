@@ -33,7 +33,7 @@ public:
     virtual void apply(vsg::FrameEvent& frame) override;
 
     const vsg::dvec3& get_front() const;
-    const vec3_type& get_right() const;
+    const vsg::dvec3& get_right() const;
     const vec3_type& get_up() const;
 
     // Create plane perpedicular to camera normal and passing through
@@ -55,7 +55,7 @@ private:
     value_type pitch_deg = 0.0;
 
     vsg::dvec3 front;
-    vec3_type right;
+    vsg::dvec3 right;
     vec3_type up;
 };
 
