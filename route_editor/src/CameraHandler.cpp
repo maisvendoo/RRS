@@ -32,7 +32,6 @@
 
 using vec2_type = vsg::t_vec2<CameraHandler::value_type>;
 using vec3_array_type = vsg::Array<CameraHandler::vec3_type>;
-using look_at_vec3_type = vsg::dvec3;
 
 static vsg::ref_ptr<vsg::Commands> create_quad(
     const CameraHandler::vec3_type& p0,
@@ -107,10 +106,8 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
 
         yaw_deg += delta_mouse_pos.x * rotate_speed;
 
-        pitch_deg = std::clamp(
-            pitch_deg - delta_mouse_pos.y * rotate_speed,
-            static_cast<value_type>(-89.0f),
-            static_cast<value_type>(89.0f));
+        pitch_deg = std::clamp(pitch_deg - delta_mouse_pos.y * rotate_speed,
+            -89.0, 89.0);
 
         calculate_front();
         calculate_right();
@@ -239,10 +236,10 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
 
 void CameraHandler::calculate_front()
 {
-    const value_type yaw_rad = vsg::radians(yaw_deg);
-    const value_type pitch_rad = vsg::radians(pitch_deg);
+    const double yaw_rad = vsg::radians(yaw_deg);
+    const double pitch_rad = vsg::radians(pitch_deg);
 
-    front = vsg::normalize(vec3_type(
+    front = vsg::normalize(vsg::dvec3(
         std::sin(yaw_rad) * std::cos(pitch_rad),
         std::cos(yaw_rad) * std::cos(pitch_rad),
         std::sin(pitch_rad)

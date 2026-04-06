@@ -51,8 +51,8 @@ private:
 private:
     EditorContext& context;
 
-    value_type yaw_deg = 0.0;
-    value_type pitch_deg = 0.0;
+    double yaw_deg = 0.0;
+    double pitch_deg = 0.0;
 
     vsg::dvec3 front;
     vsg::dvec3 right;
