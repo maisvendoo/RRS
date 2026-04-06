@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.29)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project (RRS VERSION 1.8.0)
+project (RRS VERSION 1.9.0)
 
 add_subdirectory (CfgReader)
 add_subdirectory (CfgEditor)

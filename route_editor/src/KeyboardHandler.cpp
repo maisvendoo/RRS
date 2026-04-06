@@ -13,6 +13,8 @@
 #include <cstdint>
 #include <cstring>
 
+#include <iostream>
+
 static std::uint16_t get_byte_index(vsg::KeySymbol key)
 {
     return key >> 3;
@@ -45,8 +47,23 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
     else if (get_binding_state(ACTION_SAVE_ROUTE))
     {
         const FileSystem& fs = FileSystem::getInstance();
-        std::ofstream route_map_file(fs.combinePath(context.route_dir,
-            "topology", "map", "route1.map_edited"));
+        std::string dir_for_save = fs.combinePath(context.route_dir, "topology", "map");
+
+        try
+        {
+            // Создаем резервную копия
+            std::filesystem::copy_file(fs.combinePath(dir_for_save, "route1.map"),
+                                       fs.combinePath(dir_for_save, "route1.map.prev"),
+                                       std::filesystem::copy_options::overwrite_existing);
+        }
+        catch (const std::filesystem::filesystem_error &e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+
+        // Перезаписываем рабочую копию
+        std::ofstream route_map_file(fs.combinePath(dir_for_save, "route1.map"));
+
         for (const auto& object : context.static_objects)
         {
             const auto translation = object->get_translation();

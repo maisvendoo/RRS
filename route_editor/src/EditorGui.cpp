@@ -390,12 +390,18 @@ void EditorGui::show_waypoints_conf() const
                 {
                     Trajectory* const trajectory = *found_it;
 
-                    const dvec3 pos = trajectory->getPosition(
-                        data.coord, data.direction).position;
+                    auto pd = trajectory->getPosition(data.coord, data.direction);
 
-                    context.look_at->eye = vsg::dvec3(pos.x, pos.y, pos.z + 50.0);
+                    const dvec3 pos = pd.position;
+
+                    double h = 5.0;
+
+                    context.look_at->eye = vsg::dvec3(pos.x + pd.up.x * h,
+                                                      pos.y + pd.up.y * h,
+                                                      pos.z + pd.up.z * h);
+
                     context.look_at->center = context.look_at->eye
-                        + context.camera_handler->get_front();
+                        + static_cast<vsg::dvec3>(context.camera_handler->get_front());
                 }
             }
             ImGui::TableNextColumn();
