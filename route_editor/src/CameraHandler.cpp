@@ -32,7 +32,7 @@
 
 using vec2_type = vsg::t_vec2<CameraHandler::value_type>;
 using vec3_array_type = vsg::Array<CameraHandler::vec3_type>;
-using look_at_vec3_type = vsg::t_vec3<double>;
+using look_at_vec3_type = vsg::dvec3;
 
 static vsg::ref_ptr<vsg::Commands> create_quad(
     const CameraHandler::vec3_type& p0,
@@ -148,12 +148,6 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     }
 
     const auto look_at = context.look_at;
-
-    const look_at_vec3_type front =
-        static_cast<look_at_vec3_type>(this->front);
-
-    const look_at_vec3_type right =
-            static_cast<look_at_vec3_type>(this->right);
 
     const double move_speed =
         static_cast<double>(context.settings.camera_move_speed) *
