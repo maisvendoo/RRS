@@ -1,6 +1,5 @@
 #include "RouteEditor.h"
 
-#include "Action.h"
 #include "CameraHandler.h"
 #include "EditorGui.h"
 #include "EditorState.h"
@@ -20,8 +19,6 @@
 #include "filesystem.h"
 #include "shader_funcs.h"
 
-#include <fstream>
-#include <iostream>
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
 #include <vsg/app/CompileManager.h>
