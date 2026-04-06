@@ -47,7 +47,7 @@ static vsg::ref_ptr<vsg::Commands> create_quad(
     const auto vid = vsg::VertexIndexDraw::create();
     vid->assignArrays(vsg::DataList{vertices});
     vid->assignIndices(indices);
-    vid->indexCount = static_cast<std::uint32_t>(indices->size());
+    vid->indexCount = static_cast<uint32_t>(indices->size());
     vid->instanceCount = 1;
 
     const auto commands = vsg::Commands::create();
@@ -94,8 +94,8 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
 
     if (context.mouse_handler->get_is_rmb_pressed())
     {
-        const vsg::vec2 delta_mouse_pos = static_cast<vsg::vec2>(
-            context.mouse_handler->get_delta_pos());
+        const vsg::ivec2 delta_mouse_pos =
+            context.mouse_handler->get_delta_pos();
 
         const double rotate_speed =
             static_cast<double>(context.settings.camera_rotate_speed) *
@@ -103,8 +103,8 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
 
         yaw_deg += delta_mouse_pos.x * rotate_speed;
 
-        pitch_deg = std::clamp(pitch_deg - delta_mouse_pos.y * rotate_speed,
-            -89.0, 89.0);
+        pitch_deg -= delta_mouse_pos.y * rotate_speed;
+        pitch_deg = std::clamp(pitch_deg, -89.0, 89.0);
 
         calculate_front();
         calculate_right();
@@ -124,11 +124,9 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
     const double zoom_power = static_cast<double>(settings.camera_zoom_power) *
         context.delta_time;
 
-    const auto perspective = context.perspective;
-
-    perspective->fieldOfViewY = std::clamp(
-        perspective->fieldOfViewY - scrollWheel.delta.y * zoom_power,
-        static_cast<double>(settings.fovy_min),
+    double& fovy = context.perspective->fieldOfViewY;
+    fovy -= scrollWheel.delta.y * zoom_power;
+    fovy = std::clamp(fovy, static_cast<double>(settings.fovy_min),
         static_cast<double>(settings.fovy_max));
 }
 
@@ -189,7 +187,7 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
 {
     constexpr double angle_rad = vsg::radians(80.0);
 
-    const vsg::dvec3 camera_pos = context.look_at->eye;
+    const vsg::dvec3& camera_pos = context.look_at->eye;
 
     const auto get_dir = [&](int yaw_dir, int pitch_dir) -> vsg::dvec3
     {
@@ -232,9 +230,9 @@ void CameraHandler::calculate_front()
     const double pitch_rad = vsg::radians(pitch_deg);
 
     front = vsg::normalize(vsg::dvec3(
-        std::sin(yaw_rad) * std::cos(pitch_rad),
-        std::cos(yaw_rad) * std::cos(pitch_rad),
-        std::sin(pitch_rad)
+        sin(yaw_rad) * cos(pitch_rad),
+        cos(yaw_rad) * cos(pitch_rad),
+        sin(pitch_rad)
     ));
 }
 
