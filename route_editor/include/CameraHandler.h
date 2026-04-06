@@ -34,7 +34,7 @@ public:
 
     const vsg::dvec3& get_front() const;
     const vsg::dvec3& get_right() const;
-    const vec3_type& get_up() const;
+    const vsg::dvec3& get_up() const;
 
     // Create plane perpedicular to camera normal and passing through
     // specified point to test for intersections
@@ -56,7 +56,7 @@ private:
 
     vsg::dvec3 front;
     vsg::dvec3 right;
-    vec3_type up;
+    vsg::dvec3 up;
 };
 
 #endif // CAMERA_HANDLER_H
