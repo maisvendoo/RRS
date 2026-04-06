@@ -100,9 +100,9 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
         const vec2_type delta_mouse_pos = static_cast<vec2_type>(
             context.mouse_handler->get_delta_pos());
 
-        const value_type rotate_speed =
-            static_cast<value_type>(context.settings.camera_rotate_speed) *
-            static_cast<value_type>(context.delta_time);
+        const double rotate_speed =
+            static_cast<double>(context.settings.camera_rotate_speed) *
+            context.delta_time;
 
         yaw_deg += delta_mouse_pos.x * rotate_speed;
 
@@ -190,48 +190,43 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
     vec3_type* up_out
 ) const
 {
-    constexpr value_type angle_rad = vsg::radians(static_cast<value_type>(80));
+    constexpr double angle_rad = vsg::radians(80.0);
 
-    const vec3_type camera_pos = static_cast<vec3_type>(context.look_at->eye);
+    const vsg::dvec3 camera_pos = context.look_at->eye;
 
-    const auto get_dir = [&](int yaw_dir, int pitch_dir) -> vec3_type
+    const auto get_dir = [&](int yaw_dir, int pitch_dir) -> vsg::dvec3
     {
-        const value_type yaw_angle_rad = angle_rad *
-            static_cast<value_type>(yaw_dir);
+        const double yaw_angle_rad = angle_rad * yaw_dir;
+        const double pitch_angle_rad = angle_rad * pitch_dir;
 
-        const value_type pitch_angle_rad = angle_rad *
-            static_cast<value_type>(pitch_dir);
-
-        return vsg::rotate(yaw_angle_rad, static_cast<vsg::vec3>(up)) *
-            vsg::rotate(-pitch_angle_rad, static_cast<vsg::vec3>(right)) *
-            static_cast<vsg::vec3>(front);
+        return vsg::rotate(yaw_angle_rad, up) *
+            vsg::rotate(-pitch_angle_rad, right) * front;
     };
 
-    const vec3_type p0_dir = get_dir(-1, -1);
-    const vec3_type p1_dir = get_dir( 1, -1);
-    const vec3_type p2_dir = get_dir(-1,  1);
-    const vec3_type p3_dir = get_dir( 1,  1);
+    const vsg::dvec3 p0_dir = get_dir(-1, -1);
+    const vsg::dvec3 p1_dir = get_dir( 1, -1);
+    const vsg::dvec3 p2_dir = get_dir(-1,  1);
+    const vsg::dvec3 p3_dir = get_dir( 1,  1);
 
-    const vec3_type camera_to_point = point - camera_pos;
+    const vsg::dvec3 camera_to_point = static_cast<vsg::dvec3>(point) - camera_pos;
 
-    const value_type camera_norm_length = vsg::length(camera_to_point) *
-        vsg::dot(static_cast<vsg::vec3>(front),
-        vsg::normalize(camera_to_point));
+    const double camera_norm_length = vsg::length(camera_to_point) *
+        vsg::dot(front, vsg::normalize(camera_to_point));
 
-    const value_type dist = camera_norm_length /
-        vsg::dot(static_cast<vsg::vec3>(front), p0_dir);
+    const double dist = camera_norm_length / vsg::dot(front, p0_dir);
 
-    const vsg::vec3 p0 = camera_pos + p0_dir * dist;
-    const vsg::vec3 p1 = camera_pos + p1_dir * dist;
-    const vsg::vec3 p2 = camera_pos + p2_dir * dist;
-    const vsg::vec3 p3 = camera_pos + p3_dir * dist;
+    const vsg::dvec3 p0 = camera_pos + p0_dir * dist;
+    const vsg::dvec3 p1 = camera_pos + p1_dir * dist;
+    const vsg::dvec3 p2 = camera_pos + p2_dir * dist;
+    const vsg::dvec3 p3 = camera_pos + p3_dir * dist;
 
     if (up_out)
     {
-        *up_out = vsg::normalize(p2 - p0);
+        *up_out = static_cast<vsg::vec3>(vsg::normalize(p2 - p0));
     }
 
-    return create_quad(p0, p1, p2, p3);
+    return create_quad(static_cast<vsg::vec3>(p0), static_cast<vsg::vec3>(p1),
+        static_cast<vsg::vec3>(p2), static_cast<vsg::vec3>(p3));
 }
 
 void CameraHandler::calculate_front()
