@@ -32,8 +32,7 @@
 
 using vec2_type = vsg::t_vec2<CameraHandler::value_type>;
 using vec3_array_type = vsg::Array<CameraHandler::vec3_type>;
-using look_at_value_type = decltype(vsg::LookAt::eye.x);
-using look_at_vec3_type = vsg::t_vec3<look_at_value_type>;
+using look_at_vec3_type = vsg::t_vec3<double>;
 
 static vsg::ref_ptr<vsg::Commands> create_quad(
     const CameraHandler::vec3_type& p0,
@@ -74,8 +73,8 @@ CameraHandler::CameraHandler(EditorContext& context)
         static_cast<double>(settings.zNear),
         static_cast<double>(settings.view_distance));
 
-    const look_at_value_type initial_height =
-        static_cast<look_at_value_type>(settings.camera_initial_height);
+    const double initial_height =
+        static_cast<double>(settings.camera_initial_height);
 
     context.look_at = vsg::LookAt::create(
         vsg::dvec3(0.0, 0.0, initial_height),
@@ -156,9 +155,9 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
     const look_at_vec3_type right =
             static_cast<look_at_vec3_type>(this->right);
 
-    const look_at_value_type move_speed =
-        static_cast<look_at_value_type>(context.settings.camera_move_speed) *
-        static_cast<look_at_value_type>(context.delta_time);
+    const double move_speed =
+        static_cast<double>(context.settings.camera_move_speed) *
+        context.delta_time;
 
     const auto keyboard_handler = context.keyboard_handler;
 
@@ -167,11 +166,11 @@ void CameraHandler::apply(vsg::FrameEvent& frame)
         return static_cast<int>(keyboard_handler->get_binding_state(action));
     };
 
-    look_at->eye += front * move_speed * static_cast<look_at_value_type>(
+    look_at->eye += front * move_speed * static_cast<double>(
         get_binding_state(ACTION_MOVE_CAMERA_FORWARD) -
         get_binding_state(ACTION_MOVE_CAMERA_BACKWARD));
 
-    look_at->eye += right * move_speed * static_cast<look_at_value_type>(
+    look_at->eye += right * move_speed * static_cast<double>(
         get_binding_state(ACTION_MOVE_CAMERA_RIGHT) -
         get_binding_state(ACTION_MOVE_CAMERA_LEFT));
 
