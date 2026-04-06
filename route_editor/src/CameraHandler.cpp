@@ -32,7 +32,6 @@
 
 using vec2_type = vsg::t_vec2<CameraHandler::value_type>;
 using vec3_array_type = vsg::Array<CameraHandler::vec3_type>;
-using perspective_value_type = decltype(vsg::Perspective::fieldOfViewY);
 using look_at_value_type = decltype(vsg::LookAt::eye.x);
 using look_at_vec3_type = vsg::t_vec3<look_at_value_type>;
 
@@ -69,11 +68,11 @@ CameraHandler::CameraHandler(EditorContext& context)
     const VkExtent2D window_extent = context.window->extent2D();
 
     context.perspective = vsg::Perspective::create(
-        static_cast<perspective_value_type>(settings.fovy),
-        static_cast<perspective_value_type>(window_extent.width) /
-            static_cast<perspective_value_type>(window_extent.height),
-        static_cast<perspective_value_type>(settings.zNear),
-        static_cast<perspective_value_type>(settings.view_distance));
+        static_cast<double>(settings.fovy),
+        static_cast<double>(window_extent.width) /
+            static_cast<double>(window_extent.height),
+        static_cast<double>(settings.zNear),
+        static_cast<double>(settings.view_distance));
 
     const look_at_value_type initial_height =
         static_cast<look_at_value_type>(settings.camera_initial_height);
@@ -129,16 +128,15 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
 
     const settings_t& settings = context.settings;
 
-    const perspective_value_type zoom_power =
-        static_cast<perspective_value_type>(settings.camera_zoom_power) *
-        static_cast<perspective_value_type>(context.delta_time);
+    const double zoom_power = static_cast<double>(settings.camera_zoom_power) *
+        context.delta_time;
 
     const auto perspective = context.perspective;
 
     perspective->fieldOfViewY = std::clamp(
         perspective->fieldOfViewY - scrollWheel.delta.y * zoom_power,
-        static_cast<perspective_value_type>(settings.fovy_min),
-        static_cast<perspective_value_type>(settings.fovy_max));
+        static_cast<double>(settings.fovy_min),
+        static_cast<double>(settings.fovy_max));
 }
 
 void CameraHandler::apply(vsg::FrameEvent& frame)
