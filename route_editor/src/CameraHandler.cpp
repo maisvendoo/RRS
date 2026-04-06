@@ -30,17 +30,14 @@
 #include <cmath>
 #include <cstdint>
 
-using vec2_type = vsg::t_vec2<CameraHandler::value_type>;
-using vec3_array_type = vsg::Array<CameraHandler::vec3_type>;
-
 static vsg::ref_ptr<vsg::Commands> create_quad(
-    const CameraHandler::vec3_type& p0,
-    const CameraHandler::vec3_type& p1,
-    const CameraHandler::vec3_type& p2,
-    const CameraHandler::vec3_type& p3
+    const vsg::vec3& p0,
+    const vsg::vec3& p1,
+    const vsg::vec3& p2,
+    const vsg::vec3& p3
 )
 {
-    const auto vertices = vec3_array_type::create({p0, p1, p2, p3});
+    const auto vertices = vsg::vec3Array::create({p0, p1, p2, p3});
 
     const auto indices = vsg::ushortArray::create({
         0, 1, 2,
@@ -97,7 +94,7 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
 
     if (context.mouse_handler->get_is_rmb_pressed())
     {
-        const vec2_type delta_mouse_pos = static_cast<vec2_type>(
+        const vsg::vec2 delta_mouse_pos = static_cast<vsg::vec2>(
             context.mouse_handler->get_delta_pos());
 
         const double rotate_speed =
@@ -186,8 +183,8 @@ const vsg::dvec3& CameraHandler::get_up() const
 // Create plane perpedicular to camera normal passing through
 // specified point to test for intersections
 vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
-    const vec3_type& point,
-    vec3_type* up_out
+    const vsg::vec3& point,
+    vsg::vec3* up_out
 ) const
 {
     constexpr double angle_rad = vsg::radians(80.0);

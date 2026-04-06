@@ -21,10 +21,6 @@ class ScrollWheelEvent;
 class CameraHandler : public vsg::Inherit<vsg::Visitor, CameraHandler>
 {
 public:
-    using value_type = float;
-    using vec3_type = vsg::t_vec3<value_type>;
-
-public:
     explicit CameraHandler(EditorContext& context);
     virtual ~CameraHandler() = default;
 
@@ -39,8 +35,8 @@ public:
     // Create plane perpedicular to camera normal and passing through
     // specified point to test for intersections
     vsg::ref_ptr<vsg::Node> create_front_plane(
-        const vec3_type& point,
-        vec3_type* up_out = nullptr
+        const vsg::vec3& point,
+        vsg::vec3* up_out = nullptr
     ) const;
 
 private:
