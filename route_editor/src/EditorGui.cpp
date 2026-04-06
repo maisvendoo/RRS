@@ -39,8 +39,6 @@
 #include <cctype>
 #include <cfloat>
 #include <climits>
-#include <filesystem>
-#include <set>
 #include <string>
 
 static constexpr float MAX_DRAG = FLT_MAX / static_cast<float>(INT_MAX);
@@ -156,84 +154,26 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 
 void EditorGui::select_route() const
 {
-    using Path = std::filesystem::path;
-    using DirIterator = std::filesystem::directory_iterator;
-
-    // TODO: Rewrite in English
-    // Сеты для будущего отображения папок и файлов в алфавитном порядке
-    static std::set<Path> files;
-    static std::set<Path> directories;
-
-    const auto change_route_directory = [&](const Path& path) -> void
+    static bool dialog_opened = false;
+    if (!dialog_opened)
     {
-        context.route_dir = path.string();
+        IGFD::FileDialogConfig config;
+        config.path = "../routes";
+        ImGuiFileDialog::Instance()->OpenDialog(
+            "select_route", "Select route", nullptr, config);
+        dialog_opened = true;
+    }
 
-        files.clear();
-        directories.clear();
-
-        for (const auto& dir_entry : DirIterator(context.route_dir))
+    if (ImGuiFileDialog::Instance()->Display("select_route"))
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
         {
-            if (dir_entry.is_directory())
-            {
-                directories.emplace(dir_entry);
-            }
-            else
-            {
-                files.emplace(dir_entry);
-            }
+            context.route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
+            context.state = EditorState::LOAD_ROUTE;
         }
-    };
 
-    // TODO: Rewrite in English
-    // Вызывается при первом запуске select_route
-    if (context.route_dir.empty())
-    {
-        change_route_directory(FileSystem::getInstance().getRouteRootDir());
+        ImGuiFileDialog::Instance()->Close();
     }
-
-    ImGui::Begin("Select Route", nullptr, window_flags);
-
-    ImGui::Text("Select route:");
-
-    // TODO: Rewrite in English
-    // Выводит путь к текущей выбранной папке и позволяет подтвердить ее
-    ImGui::Text("Current: %s", context.route_dir.c_str());
-    ImGui::SameLine();
-    if (ImGui::Button("OK"))
-    {
-        context.state = EditorState::LOAD_ROUTE;
-    }
-
-    // TODO: Rewrite in English
-    // Отдельно выводим кнопку для перехода на одну папку выше
-    if (Path(context.route_dir).has_parent_path())
-    {
-        if (ImGui::Button(".."))
-        {
-            change_route_directory(Path(context.route_dir).parent_path());
-        }
-    }
-
-    // TODO: Rewrite in English
-    // Отображаем все папки как кнопки для перемещения по ним
-    for (const Path& directory : directories)
-    {
-        if (ImGui::Button(directory.filename().string().c_str()))
-        {
-            change_route_directory(directory);
-
-            break;
-        }
-    }
-
-    // TODO: Rewrite in English
-    // А все файлы просто как текст
-    for (const Path& file : files)
-    {
-        ImGui::Text("%s", file.filename().c_str());
-    }
-
-    ImGui::End();
 }
 
 void EditorGui::show_objects_ref() const
