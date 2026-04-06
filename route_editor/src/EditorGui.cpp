@@ -20,6 +20,7 @@
 #include "topology-defines.h"
 #include "topology.h"
 #include "track.h"
+#include "ImGuiFileDialog.h"
 #include "trajectory.h"
 #include "vec3.h"
 
