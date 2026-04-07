@@ -78,12 +78,12 @@ public:
         return lens_state;
     }
 
-    void setRelPosition(dvec3 rel_pos)
+    void setRelPosition(const dvec3& rel_pos)
     {
         this->rel_pos = rel_pos;
     }
 
-    void setRelRotation(dvec3 rel_rot)
+    void setRelRotation(const dvec3 rel_rot)
     {
         this->rel_rot = rel_rot;
     }
@@ -94,32 +94,32 @@ public:
 
     bool calcPosition();
 
-    dvec3 getPos() const
+    const dvec3& getPos() const
     {
         return pos;
     }
 
-    dvec3 getRight() const
+    const dvec3& getRight() const
     {
         return right;
     }
 
-    dvec3 getOrth() const
+    const dvec3& getOrth() const
     {
         return orth;
     }
 
-    dvec3 getUp() const
+    const dvec3& getUp() const
     {
         return up;
     }
 
-    dvec3 getRelPos() const
+    const dvec3& getRelPos() const
     {
         return rel_pos;
     }
 
-    dvec3 getRelRot() const
+    const dvec3& getRelRot() const
     {
         return rel_rot;
     }
