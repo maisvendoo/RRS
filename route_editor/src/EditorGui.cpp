@@ -283,8 +283,7 @@ void EditorGui::show_stations_conf() const
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                context.look_at->eye = static_cast<vsg::dvec3>(translation)
-                    + vsg::dvec3(0.0, 0.0, 50.0);
+                context.look_at->eye = translation + vsg::dvec3(0.0, 0.0, 50.0);
 
                 context.look_at->center = context.look_at->eye
                     + context.camera_handler->get_front();

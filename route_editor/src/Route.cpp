@@ -211,7 +211,7 @@ bool Route::load_stations_conf()
 
         std::istringstream iss(std::move(line));
         std::string label;
-        vsg::vec3 translation;
+        vsg::dvec3 translation;
         if (iss >> label >> translation)
         {
             context.stations_conf[label] = translation;
