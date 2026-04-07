@@ -415,16 +415,16 @@ void EditorGui::show_camera_settings() const
     ImGui::Begin("Camera Settings", nullptr, window_flags);
 
     ImGui::Text("Move speed:");
-    ImGui::DragFloat("##move_speed", &context.settings.camera_move_speed,
-        1.0f, 1.0f, MAX_DRAG);
+    ImGui::DragScalar("##move_speed", ImGuiDataType_Double,
+        &context.settings.camera_move_speed, 1.0f, nullptr, nullptr, "%.3f");
 
     ImGui::Text("Rotate speed:");
-    ImGui::DragFloat("##rotate_speed", &context.settings.camera_rotate_speed,
-        1.0f, 1.0f, MAX_DRAG);
+    ImGui::DragScalar("##rotate_speed", ImGuiDataType_Double,
+        &context.settings.camera_rotate_speed, 1.0f, nullptr, nullptr, "%.3f");
 
     ImGui::Text("Zoom power:");
-    ImGui::DragFloat("##zoom_power", &context.settings.camera_zoom_power,
-        1.0f, 1.0f, MAX_DRAG);
+    ImGui::DragScalar("##zoom_power", ImGuiDataType_Double,
+        &context.settings.camera_zoom_power, 1.0f, nullptr, nullptr, "%.3f");
 
     ImGui::Text("FovY:");
 

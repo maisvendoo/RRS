@@ -32,10 +32,10 @@ struct settings_t
     double fovy_min;         ///< Vertical view angle min
     double fovy_max;         ///< Vertical view angle max
 
-    float camera_initial_height;
-    float camera_move_speed;
-    float camera_rotate_speed;
-    float camera_zoom_power;
+    double camera_initial_height;
+    double camera_move_speed;
+    double camera_rotate_speed;
+    double camera_zoom_power;
 
     float gizmo_arrow_length;
     float gizmo_arrow_thickness;
