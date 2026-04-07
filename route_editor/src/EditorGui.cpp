@@ -38,11 +38,7 @@
 
 #include <cassert>
 #include <cctype>
-#include <cfloat>
-#include <climits>
 #include <string>
-
-static constexpr float MAX_DRAG = FLT_MAX / static_cast<float>(INT_MAX);
 
 EditorGui::EditorGui(EditorContext& context)
     : context(context)
