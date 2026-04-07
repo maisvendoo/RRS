@@ -9,6 +9,7 @@
 #include "EditorState.h"
 #include "Gizmo.h"
 #include "KeyBinding.h"
+#include "MoveObjectsCommand.h"
 #include "ObjectSelector.h"
 #include "Route.h"
 #include "RouteObject.h"
@@ -563,6 +564,17 @@ void EditorGui::show_selected_objects_properties() const
 
     int i = 0;
 
+    static bool dragging = false;
+    static vsg::vec3 total_translation;
+
+    const auto save_matrixes = [&]() -> void
+    {
+        for (const auto& object : selected_objects)
+        {
+            object->save_matrix();
+        }
+    };
+
     for (const auto& object : selected_objects)
     {
         ImGui::Text("label: %s", object->label.c_str());
@@ -572,7 +584,20 @@ void EditorGui::show_selected_objects_properties() const
         vsg::vec3 translation = object->get_translation();
         if (ImGui::DragFloat3(label.c_str(), translation.data()))
         {
+            if (!dragging)
+            {
+                total_translation = {0.0f, 0.0f, 0.0f};
+                save_matrixes();
+                dragging = true;
+            }
+            total_translation += translation;
+
             object->set_translation(translation);
+        }
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            context.commands.push(new MoveObjectsCommand(context, total_translation), false);
+            dragging = false;
         }
 
         label = "rotation##" + std::to_string(i);
@@ -592,49 +617,6 @@ void EditorGui::show_selected_objects_properties() const
         }
 
         ++i;
-    }
-
-    vsg::vec3 center = {0.0f, 0.0f, 0.0f};
-    for (const auto& object : selected_objects)
-    {
-        center += object->get_translation();
-    }
-    center /= static_cast<float>(selected_objects.size());
-
-    if (ImGui::Button("Scale X 2"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->scale_relative_to_pivot(center,
-                vsg::vec3{2.0f, 1.0f, 1.0f}, object->matrix);
-        }
-    }
-
-    if (ImGui::Button("Scale Y 2"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->scale_relative_to_pivot(center,
-                vsg::vec3{1.0f, 2.0f, 1.0f}, object->matrix);
-        }
-    }
-
-    if (ImGui::Button("Scale Z 2"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->scale_relative_to_pivot(center,
-                vsg::vec3{1.0f, 1.0f, 2.0f}, object->matrix);
-        }
-    }
-
-    if (ImGui::Button("Scale X 0.5"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->scale_relative_to_pivot(center,
-                vsg::vec3{0.5f, 1.0f, 1.0f}, object->matrix);
-        }
     }
 
     ImGui::End();
