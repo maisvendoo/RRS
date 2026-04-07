@@ -82,7 +82,7 @@ private:
 
     vsg::dvec3 translation;
     vsg::dvec3 rotation_deg;
-    vsg::vec3 scale;
+    vsg::dvec3 scale;
 
     vsg::dmat4 initial_matrix;
     vsg::box bounds;

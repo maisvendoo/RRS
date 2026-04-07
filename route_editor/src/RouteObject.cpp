@@ -56,7 +56,7 @@ RouteObject::RouteObject(
     : label(label)
     , translation(static_cast<vsg::dvec3>(translation))
     , rotation_deg(static_cast<vsg::dvec3>(rotation_deg))
-    , scale(scale)
+    , scale(static_cast<vsg::vec3>(scale))
     , paged_lod(paged_lod)
 {
     s_context = &context;
@@ -85,7 +85,7 @@ vsg::vec3 RouteObject::get_rotation_deg() const
 
 vsg::vec3 RouteObject::get_scale() const
 {
-    return scale;
+    return static_cast<vsg::vec3>(scale);
 }
 
 const vsg::dmat4& RouteObject::get_initial_matrix() const
@@ -151,12 +151,13 @@ void RouteObject::rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis,
 
     vsg::vec3 temp_trans;
     vsg::quat temp_quat;
+    vsg::vec3 temp_scale;
     vsg::decompose(static_cast<vsg::mat4>(this->matrix),
-        temp_trans, temp_quat, this->scale);
+        temp_trans, temp_quat, temp_scale);
 
     this->translation = temp_trans;
-
     this->rotation_deg = to_euler_deg(temp_quat);
+    this->scale = temp_scale;
 
     update_bounds();
 }
@@ -169,10 +170,12 @@ void RouteObject::scale_relative_to_pivot(vsg::vec3 pivot,
 
     vsg::vec3 temp_trans;
     vsg::quat temp_quat;
+    vsg::vec3 temp_scale;
     vsg::decompose(static_cast<vsg::mat4>(this->matrix),
-        temp_trans, temp_quat, this->scale);
+        temp_trans, temp_quat, temp_scale);
 
     this->translation = temp_trans;
+    this->scale = temp_scale;
 
     update_bounds();
 }
@@ -242,7 +245,8 @@ RouteObjectsIterator RouteObject::deselect()
 vsg::ref_ptr<RouteObject> RouteObject::copy() const
 {
     return RouteObject::create(*s_context, paged_lod, label,
-        static_cast<vsg::vec3>(translation), static_cast<vsg::vec3>(rotation_deg), scale);
+        static_cast<vsg::vec3>(translation), static_cast<vsg::vec3>(rotation_deg),
+        static_cast<vsg::vec3>(scale));
 }
 
 void RouteObject::save_matrix()
@@ -256,11 +260,13 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
 
     vsg::vec3 temp_trans;
     vsg::quat temp_quat;
+    vsg::vec3 temp_scale;
     vsg::decompose(static_cast<vsg::mat4>(this->matrix),
-        temp_trans, temp_quat, this->scale);
+        temp_trans, temp_quat, temp_scale);
 
     this->translation = temp_trans;
     this->rotation_deg = to_euler_deg(temp_quat);
+    this->scale = temp_scale;
 
     update_bounds();
 }
@@ -269,7 +275,7 @@ void RouteObject::update_matrix()
 {
     this->matrix = vsg::translate(static_cast<vsg::vec3>(this->translation)) *
         to_rotate_matrix(static_cast<vsg::vec3>(this->rotation_deg)) *
-        vsg::scale(this->scale);
+        vsg::scale(static_cast<vsg::vec3>(this->scale));
 
     update_bounds();
 }
