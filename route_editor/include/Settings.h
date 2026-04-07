@@ -26,11 +26,11 @@ struct settings_t
     int samples;           ///< Number of antialiasing samples
     int num_lights;        ///< Max number of lights in scene
 
-    float zNear;            ///< Near clip plane
-    float view_distance;    ///< View distance
-    double fovy;            ///< Vertical view angle
-    double fovy_min;        ///< Vertical view angle min
-    double fovy_max;        ///< Vertical view angle max
+    double zNear;            ///< Near clip plane
+    double view_distance;    ///< View distance
+    double fovy;             ///< Vertical view angle
+    double fovy_min;         ///< Vertical view angle min
+    double fovy_max;         ///< Vertical view angle max
 
     float camera_initial_height;
     float camera_move_speed;

@@ -30,8 +30,8 @@ settings_t::settings_t()
     , double_buffer(true)
     , samples(1)
     , num_lights(200)
-    , zNear(0.1f)
-    , view_distance(2000.0f)
+    , zNear(0.1)
+    , view_distance(2000.0)
     , fovy(60.0)
     , fovy_min(2.0)
     , fovy_max(100.0)
@@ -92,8 +92,8 @@ void settings_t::read(const std::string& cfg_path)
 
     section = "Camera";
 
-    cfg.getFloat(section, "zNear", zNear);
-    cfg.getFloat(section, "ViewDistance", view_distance);
+    cfg.getDouble(section, "zNear", zNear);
+    cfg.getDouble(section, "ViewDistance", view_distance);
     cfg.getDouble(section, "FovY", fovy);
     cfg.getDouble(section, "FovYMin", fovy_min);
     cfg.getDouble(section, "FovYMax", fovy_max);

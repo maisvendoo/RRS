@@ -66,8 +66,9 @@ CameraHandler::CameraHandler(EditorContext& context)
         settings.fovy,
         static_cast<double>(window_extent.width) /
             static_cast<double>(window_extent.height),
-        static_cast<double>(settings.zNear),
-        static_cast<double>(settings.view_distance));
+        settings.zNear,
+        settings.view_distance
+    );
 
     const double initial_height =
         static_cast<double>(settings.camera_initial_height);
