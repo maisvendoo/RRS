@@ -520,8 +520,8 @@ void EditorGui::show_topology() const
             }
         };
 
-        const auto* connectors = context.topology->getConnectorsList();
-        for (auto it = connectors->begin(); it != connectors->end(); ++it)
+        const sw_list_t* const connectors = context.topology->getConnectorsList();
+        for (auto it = connectors->constBegin(); it != connectors->constEnd(); ++it)
         {
             const Switch* const switch_ = dynamic_cast<Switch*>(*it);
             if (!switch_)
