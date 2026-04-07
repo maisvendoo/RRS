@@ -1,16 +1,16 @@
-#ifndef PASTE_OBJECTS_COMMAND_H
-#define PASTE_OBJECTS_COMMAND_H
+#ifndef PASTE_OBJECTS_H
+#define PASTE_OBJECTS_H
 
 #include "commands/Command.h"
 #include "RouteObject.h"
 
 struct EditorContext;
 
-class PasteObjectsCommand : public Command
+class PasteObjects : public Command
 {
 public:
-    explicit PasteObjectsCommand(EditorContext& context);
-    virtual ~PasteObjectsCommand() override = default;
+    explicit PasteObjects(EditorContext& context);
+    virtual ~PasteObjects() override = default;
     virtual void execute() override;
     virtual void undo() override;
     virtual void update_description() override;
@@ -21,4 +21,4 @@ private:
     const RouteObjects objects_to_deselect;
 };
 
-#endif // PASTE_OBJECTS_COMMAND_H
+#endif // PASTE_OBJECTS_H

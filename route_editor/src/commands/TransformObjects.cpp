@@ -1,4 +1,4 @@
-#include "commands/TransformObjectsCommand.h"
+#include "commands/TransformObjects.h"
 
 #include "commands/Command.h"
 #include "EditorContext.h"
@@ -6,7 +6,7 @@
 
 #include <cstddef>
 
-TransformObjectsCommand::TransformObjectsCommand(EditorContext& context)
+TransformObjects::TransformObjects(EditorContext& context)
     : Command(context)
     , objects(context.selected_objects)
 {
@@ -17,7 +17,7 @@ TransformObjectsCommand::TransformObjectsCommand(EditorContext& context)
     }
 }
 
-void TransformObjectsCommand::undo()
+void TransformObjects::undo()
 {
     std::size_t index = 0;
     for (const auto& object : objects)

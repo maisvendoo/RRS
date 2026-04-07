@@ -1,5 +1,5 @@
-#ifndef HIDE_OBJECTS_COMMAND_H
-#define HIDE_OBJECTS_COMMAND_H
+#ifndef HIDE_OBJECTS_H
+#define HIDE_OBJECTS_H
 
 #include "commands/Command.h"
 #include "RouteObject.h"
@@ -21,4 +21,4 @@ public:
 };
 
 
-#endif // HIDE_OBJECTS_COMMAND_H
+#endif // HIDE_OBJECTS_H

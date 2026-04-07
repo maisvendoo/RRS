@@ -1,17 +1,17 @@
-#include "commands/RotateObjectsCommand.h"
+#include "commands/RotateObjects.h"
 
 #include "commands/Command.h"
 #include "EditorContext.h"
 #include "RouteObject.h"
-#include "commands/TransformObjectsCommand.h"
+#include "commands/TransformObjects.h"
 
 #include <vsg/maths/vec3.h>
 
 #include <cstdio>
 
-RotateObjectsCommand::RotateObjectsCommand(EditorContext& context,
+RotateObjects::RotateObjects(EditorContext& context,
     vsg::vec3 pivot, vsg::vec3 axis, float radians)
-    : TransformObjectsCommand(context)
+    : TransformObjects(context)
     , pivot(pivot)
     , axis(axis)
     , radians(radians)
@@ -19,7 +19,7 @@ RotateObjectsCommand::RotateObjectsCommand(EditorContext& context,
     update_description();
 }
 
-void RotateObjectsCommand::execute()
+void RotateObjects::execute()
 {
     for (const auto& object : objects)
     {
@@ -27,7 +27,7 @@ void RotateObjectsCommand::execute()
     }
 }
 
-void RotateObjectsCommand::update_description()
+void RotateObjects::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Rotate objects: pivot = { %.3f, %.3f, %.3f }\n"

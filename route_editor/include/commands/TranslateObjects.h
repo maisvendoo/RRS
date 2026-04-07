@@ -1,13 +1,13 @@
-#ifndef MOVE_OBJECTS_COMMAND_H
-#define MOVE_OBJECTS_COMMAND_H
+#ifndef MOVE_OBJECTS_H
+#define MOVE_OBJECTS_H
 
-#include "commands/TransformObjectsCommand.h"
+#include "commands/TransformObjects.h"
 
 #include <vsg/maths/vec3.h>
 
 struct EditorContext;
 
-class TranslateObjects : public TransformObjectsCommand
+class TranslateObjects : public TransformObjects
 {
 public:
     TranslateObjects(EditorContext& context, vsg::vec3 translation);
@@ -19,4 +19,4 @@ private:
     vsg::vec3 translation;
 };
 
-#endif // MOVE_OBJECTS_COMMAND_H
+#endif // MOVE_OBJECTS_H

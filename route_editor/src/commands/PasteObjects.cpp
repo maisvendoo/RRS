@@ -1,4 +1,4 @@
-#include "commands/PasteObjectsCommand.h"
+#include "commands/PasteObjects.h"
 
 #include "commands/Command.h"
 #include "EditorContext.h"
@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <cstdio>
 
-PasteObjectsCommand::PasteObjectsCommand(EditorContext& context)
+PasteObjects::PasteObjects(EditorContext& context)
     : Command(context)
     , objects_to_paste(context.copied_objects)
     , objects_to_deselect(context.selected_objects)
@@ -19,7 +19,7 @@ PasteObjectsCommand::PasteObjectsCommand(EditorContext& context)
     update_description();
 }
 
-void PasteObjectsCommand::execute()
+void PasteObjects::execute()
 {
     for (const auto& object : objects_to_deselect)
     {
@@ -47,7 +47,7 @@ void PasteObjectsCommand::execute()
     context.gizmo->update_visibility();
 }
 
-void PasteObjectsCommand::undo()
+void PasteObjects::undo()
 {
     for (const auto& pasted_object : pasted_objects)
     {
@@ -79,7 +79,7 @@ void PasteObjectsCommand::undo()
     context.gizmo->update_visibility();
 }
 
-void PasteObjectsCommand::update_description()
+void PasteObjects::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Paste objects: to paste: %zu objects",

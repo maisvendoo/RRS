@@ -1,5 +1,5 @@
-#ifndef DELETE_OBJECTS_COMMAND_H
-#define DELETE_OBJECTS_COMMAND_H
+#ifndef DELETE_OBJECTS_H
+#define DELETE_OBJECTS_H
 
 #include "commands/Command.h"
 #include "RouteObject.h"
@@ -19,4 +19,4 @@ private:
     const RouteObjects objects;
 };
 
-#endif // DELETE_OBJECTS_COMMAND_H
+#endif // DELETE_OBJECTS_H

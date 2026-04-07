@@ -11,13 +11,13 @@
 #include "Mask.h"
 #include "MouseHandler.h"
 #include "commands/TranslateObjects.h"
-#include "commands/PasteObjectsCommand.h"
-#include "commands/RotateObjectsCommand.h"
+#include "commands/PasteObjects.h"
+#include "commands/RotateObjects.h"
 #include "Route.h"
 #include "RouteObject.h"
-#include "commands/ScaleObjectsCommand.h"
+#include "commands/ScaleObjects.h"
 #include "SceneGraph.h"
-#include "commands/SelectObjectsCommand.h"
+#include "commands/SelectObjects.h"
 #include "SingleSwitch.h"
 
 #include <vsg/core/Mask.h>
@@ -77,7 +77,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     }
     else if (get_binding_state(ACTION_PASTE_OBJECTS))
     {
-        context.commands.push(new PasteObjectsCommand(context), true);
+        context.commands.push(new PasteObjects(context), true);
         return;
     }
     else if (get_binding_state(ACTION_DELETE_OBJECTS))
@@ -197,8 +197,8 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         if (!selected_objects.empty() &&
             !context.keyboard_handler->get_any_shift_state())
         {
-            SelectObjectsCommand* const select_objects_command =
-                new SelectObjectsCommand(context);
+            SelectObjects* const select_objects_command =
+                new SelectObjects(context);
 
             select_objects_command->objects_to_deselect = selected_objects;
             select_objects_command->update_description();
@@ -360,8 +360,8 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 
 void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
 {
-    SelectObjectsCommand* const select_objects_command =
-        new SelectObjectsCommand(context);
+    SelectObjects* const select_objects_command =
+        new SelectObjects(context);
 
     RouteObjects& objects_to_select =
         select_objects_command->objects_to_select;
@@ -431,7 +431,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         case State::KEYBOARD_ROTATE:
         {
             context.commands.push(
-                new RotateObjectsCommand(
+                new RotateObjects(
                     context, context.gizmo->get_curr_pos(),
                     static_cast<vsg::vec3>(context.camera_handler->get_front()),
                     total_rotation_rad
@@ -443,7 +443,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         }
         case State::KEYBOARD_SCALE:
         {
-            context.commands.push(new ScaleObjectsCommand(context,
+            context.commands.push(new ScaleObjects(context,
                 context.gizmo->get_curr_pos(), total_scale), false);
 
             break;

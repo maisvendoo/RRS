@@ -3,7 +3,7 @@
 #include "commands/Command.h"
 #include "EditorContext.h"
 #include "RouteObject.h"
-#include "commands/TransformObjectsCommand.h"
+#include "commands/TransformObjects.h"
 
 #include <vsg/maths/vec3.h>
 
@@ -13,7 +13,7 @@ TranslateObjects::TranslateObjects(
     EditorContext& context,
     vsg::vec3 translation
 )
-    : TransformObjectsCommand(context)
+    : TransformObjects(context)
     , translation(translation)
 {
     update_description();

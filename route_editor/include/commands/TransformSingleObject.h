@@ -1,5 +1,5 @@
-// #ifndef TRANSFORM_SINGLE_OBJECT_COMMAND_H
-// #define TRANSFORM_SINGLE_OBJECT_COMMAND_H
+// #ifndef TRANSFORM_SINGLE_OBJECT_H
+// #define TRANSFORM_SINGLE_OBJECT_H
 
 // #include "commands/Command.h"
 
@@ -28,4 +28,4 @@
 //     vsg::dmat4 initial_matrix;
 // };
 
-// #endif // TRANSFORM_SINGLE_OBJECT_COMMAND_H
+// #endif // TRANSFORM_SINGLE_OBJECT_H

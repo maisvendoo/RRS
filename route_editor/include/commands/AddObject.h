@@ -1,5 +1,5 @@
-#ifndef ADD_OBJECT_COMMAND_H
-#define ADD_OBJECT_COMMAND_H
+#ifndef ADD_OBJECT_H
+#define ADD_OBJECT_H
 
 #include "commands/Command.h"
 #include "RouteObject.h"
@@ -29,4 +29,4 @@ private:
     const RouteObjects objects_to_deselect;
 };
 
-#endif // ADD_OBJECT_COMMAND_H
+#endif // ADD_OBJECT_H
