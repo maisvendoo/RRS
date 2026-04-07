@@ -27,14 +27,14 @@ static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
 static constexpr vsg::vec3 AXIS_Z_POSITIVE = {0.0f, 0.0f, 1.0f};
 
-static vsg::vec3 to_euler_deg(const vsg::quat& quat)
+static vsg::dvec3 to_euler_deg(const vsg::dquat& quat)
 {
-    return vsg::vec3{
-        vsg::degrees(std::atan2(2.0f * (quat.w * quat.x + quat.y * quat.z),
-            1.0f - 2.0f * (quat.x * quat.x + quat.y * quat.y))),
-        vsg::degrees(std::asin(2.0f * (quat.w * quat.y - quat.z * quat.x))),
-        vsg::degrees(std::atan2(2.0f * (quat.w * quat.z + quat.x * quat.y),
-            1.0f - 2.0f * (quat.y * quat.y + quat.z * quat.z)))
+    return vsg::dvec3{
+        vsg::degrees(std::atan2(2.0 * (quat.w * quat.x + quat.y * quat.z),
+            1.0 - 2.0 * (quat.x * quat.x + quat.y * quat.y))),
+        vsg::degrees(std::asin(2.0 * (quat.w * quat.y - quat.z * quat.x))),
+        vsg::degrees(std::atan2(2.0 * (quat.w * quat.z + quat.x * quat.y),
+            1.0 - 2.0 * (quat.y * quat.y + quat.z * quat.z)))
     };
 }
 
@@ -152,7 +152,7 @@ void RouteObject::rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis,
     vsg::dquat temp_quat;
 
     vsg::decompose(matrix, translation, temp_quat, scale);
-    rotation_deg = to_euler_deg(static_cast<vsg::quat>(temp_quat));
+    rotation_deg = to_euler_deg(temp_quat);
 
     update_bounds();
 }
@@ -166,7 +166,7 @@ void RouteObject::scale_relative_to_pivot(vsg::vec3 pivot,
     vsg::dquat temp_quat;
 
     vsg::decompose(matrix, translation, temp_quat, this->scale);
-    rotation_deg = to_euler_deg(static_cast<vsg::quat>(temp_quat));
+    rotation_deg = to_euler_deg(temp_quat);
 
     update_bounds();
 }
@@ -252,7 +252,7 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
     vsg::dquat temp_quat;
 
     vsg::decompose(matrix, translation, temp_quat, scale);
-    rotation_deg = to_euler_deg(static_cast<vsg::quat>(temp_quat));
+    rotation_deg = to_euler_deg(temp_quat);
 
     update_bounds();
 }
