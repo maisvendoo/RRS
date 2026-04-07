@@ -1,16 +1,16 @@
-#include "commands/HideObjectsCommand.h"
+#include "commands/HideObjects.h"
 
 #include "commands/Command.h"
 #include "RouteObject.h"
 
 #include <cstdio>
 
-HideObjectsCommand::HideObjectsCommand(EditorContext& context)
+HideObjects::HideObjects(EditorContext& context)
     : Command(context)
 {
 }
 
-void HideObjectsCommand::execute()
+void HideObjects::execute()
 {
     for (const auto& object : objects_to_hide)
     {
@@ -23,7 +23,7 @@ void HideObjectsCommand::execute()
     }
 }
 
-void HideObjectsCommand::undo()
+void HideObjects::undo()
 {
     for (const auto& object : objects_to_hide)
     {
@@ -36,7 +36,7 @@ void HideObjectsCommand::undo()
     }
 }
 
-void HideObjectsCommand::update_description()
+void HideObjects::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Hide objects: to hide: %zu objects\n"

@@ -15,11 +15,11 @@ class RouteObject;
 
 }
 
-class AddObjectCommand : public Command
+class AddObject : public Command
 {
 public:
-    AddObjectCommand(EditorContext& context, vsg::ref_ptr<RouteObject> object);
-    virtual ~AddObjectCommand() override = default;
+    AddObject(EditorContext& context, vsg::ref_ptr<RouteObject> object);
+    virtual ~AddObject() override = default;
     virtual void execute() override;
     virtual void undo() override;
     virtual void update_description() override;

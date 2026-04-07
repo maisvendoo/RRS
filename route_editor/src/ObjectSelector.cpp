@@ -3,14 +3,14 @@
 #include "Action.h"
 #include "CameraHandler.h"
 #include "commands/CommandList.h"
-#include "commands/DeleteObjectsCommand.h"
+#include "commands/DeleteObjects.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
 #include "Mask.h"
 #include "MouseHandler.h"
-#include "commands/MoveObjectsCommand.h"
+#include "commands/TranslateObjects.h"
 #include "commands/PasteObjectsCommand.h"
 #include "commands/RotateObjectsCommand.h"
 #include "Route.h"
@@ -82,7 +82,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     }
     else if (get_binding_state(ACTION_DELETE_OBJECTS))
     {
-        context.commands.push(new DeleteObjectsCommand(context), true);
+        context.commands.push(new DeleteObjects(context), true);
         return;
     }
 
@@ -423,7 +423,7 @@ void ObjectSelector::confirm_keyboard_transformation()
     {
         case State::KEYBOARD_GRAB:
         {
-            context.commands.push(new MoveObjectsCommand(
+            context.commands.push(new TranslateObjects(
                 context, total_translation), false);
 
             break;

@@ -5,7 +5,7 @@
 #include "EditorContext.h"
 #include "IntersectionHandler.h"
 #include "Mask.h"
-#include "commands/MoveObjectsCommand.h"
+#include "commands/TranslateObjects.h"
 #include "RouteObject.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
@@ -261,7 +261,7 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
         return;
     }
 
-    context.commands.push(new MoveObjectsCommand(
+    context.commands.push(new TranslateObjects(
         context, total_translation), false);
 
     active_arrow = nullptr;

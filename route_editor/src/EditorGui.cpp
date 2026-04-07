@@ -1,7 +1,7 @@
 #include "EditorGui.h"
 
 #include "Action.h"
-#include "commands/AddObjectCommand.h"
+#include "commands/AddObject.h"
 #include "CameraHandler.h"
 #include "commands/Command.h"
 #include "commands/CommandList.h"
@@ -9,7 +9,7 @@
 #include "EditorState.h"
 #include "Gizmo.h"
 #include "KeyBinding.h"
-#include "commands/MoveObjectsCommand.h"
+#include "commands/TranslateObjects.h"
 #include "ObjectSelector.h"
 #include "Route.h"
 #include "RouteObject.h"
@@ -205,7 +205,7 @@ void EditorGui::show_objects_ref() const
                     vsg::vec3(0.0f, 0.0f, 0.0f)
                 );
 
-                context.commands.push(new AddObjectCommand(
+                context.commands.push(new AddObject(
                     context, object), true);
             }
 
@@ -596,7 +596,7 @@ void EditorGui::show_selected_objects_properties() const
         }
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
-            context.commands.push(new MoveObjectsCommand(context, total_translation), false);
+            context.commands.push(new TranslateObjects(context, total_translation), false);
             dragging = false;
         }
 

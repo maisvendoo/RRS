@@ -1,4 +1,4 @@
-#include "commands/MoveObjectsCommand.h"
+#include "commands/TranslateObjects.h"
 
 #include "commands/Command.h"
 #include "EditorContext.h"
@@ -9,7 +9,7 @@
 
 #include <cstdio>
 
-MoveObjectsCommand::MoveObjectsCommand(
+TranslateObjects::TranslateObjects(
     EditorContext& context,
     vsg::vec3 translation
 )
@@ -19,7 +19,7 @@ MoveObjectsCommand::MoveObjectsCommand(
     update_description();
 }
 
-void MoveObjectsCommand::execute()
+void TranslateObjects::execute()
 {
     for (const auto& object : objects)
     {
@@ -27,10 +27,10 @@ void MoveObjectsCommand::execute()
     }
 }
 
-void MoveObjectsCommand::update_description()
+void TranslateObjects::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
-        "Move objects: { %.3f, %.3f, %.3f }",
+        "Translate objects: { %.3f, %.3f, %.3f }",
         translation.x, translation.y, translation.z
     );
 }

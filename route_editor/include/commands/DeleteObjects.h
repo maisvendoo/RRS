@@ -6,11 +6,11 @@
 
 struct EditorContext;
 
-class DeleteObjectsCommand : public Command
+class DeleteObjects : public Command
 {
 public:
-    explicit DeleteObjectsCommand(EditorContext& context);
-    virtual ~DeleteObjectsCommand() override = default;
+    explicit DeleteObjects(EditorContext& context);
+    virtual ~DeleteObjects() override = default;
     virtual void execute() override;
     virtual void undo() override;
     virtual void update_description() override;

@@ -7,11 +7,11 @@
 
 struct EditorContext;
 
-class MoveObjectsCommand : public TransformObjectsCommand
+class TranslateObjects : public TransformObjectsCommand
 {
 public:
-    MoveObjectsCommand(EditorContext& context, vsg::vec3 translation);
-    virtual ~MoveObjectsCommand() override = default;
+    TranslateObjects(EditorContext& context, vsg::vec3 translation);
+    virtual ~TranslateObjects() override = default;
     virtual void execute() override;
     virtual void update_description() override;
 

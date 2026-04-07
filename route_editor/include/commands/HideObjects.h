@@ -6,11 +6,11 @@
 
 struct EditorContext;
 
-class HideObjectsCommand : public Command
+class HideObjects : public Command
 {
 public:
-    explicit HideObjectsCommand(EditorContext& context);
-    virtual ~HideObjectsCommand() override = default;
+    explicit HideObjects(EditorContext& context);
+    virtual ~HideObjects() override = default;
     virtual void execute() override;
     virtual void undo() override;
     virtual void update_description() override;

@@ -1,4 +1,4 @@
-#include "commands/DeleteObjectsCommand.h"
+#include "commands/DeleteObjects.h"
 
 #include "commands/Command.h"
 #include "EditorContext.h"
@@ -10,14 +10,14 @@
 #include <algorithm>
 #include <cstdio>
 
-DeleteObjectsCommand::DeleteObjectsCommand(EditorContext& context)
+DeleteObjects::DeleteObjects(EditorContext& context)
     : Command(context)
     , objects(context.selected_objects)
 {
     update_description();
 }
 
-void DeleteObjectsCommand::execute()
+void DeleteObjects::execute()
 {
     for (const auto& object : objects)
     {
@@ -44,7 +44,7 @@ void DeleteObjectsCommand::execute()
     context.gizmo->update_visibility();
 }
 
-void DeleteObjectsCommand::undo()
+void DeleteObjects::undo()
 {
     for (const auto& object : objects)
     {
@@ -59,7 +59,7 @@ void DeleteObjectsCommand::undo()
     context.gizmo->update_visibility();
 }
 
-void DeleteObjectsCommand::update_description()
+void DeleteObjects::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Delete objects: to delete: %zu objects",
