@@ -55,7 +55,7 @@ RouteObject::RouteObject(
 )
     : label(label)
     , translation(static_cast<vsg::dvec3>(translation))
-    , rotation_deg(rotation_deg)
+    , rotation_deg(static_cast<vsg::dvec3>(rotation_deg))
     , scale(scale)
     , paged_lod(paged_lod)
 {
@@ -80,7 +80,7 @@ vsg::vec3 RouteObject::get_translation() const
 
 vsg::vec3 RouteObject::get_rotation_deg() const
 {
-    return rotation_deg;
+    return static_cast<vsg::vec3>(rotation_deg);
 }
 
 vsg::vec3 RouteObject::get_scale() const
@@ -242,7 +242,7 @@ RouteObjectsIterator RouteObject::deselect()
 vsg::ref_ptr<RouteObject> RouteObject::copy() const
 {
     return RouteObject::create(*s_context, paged_lod, label,
-        static_cast<vsg::vec3>(translation), rotation_deg, scale);
+        static_cast<vsg::vec3>(translation), static_cast<vsg::vec3>(rotation_deg), scale);
 }
 
 void RouteObject::save_matrix()
@@ -268,7 +268,7 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
 void RouteObject::update_matrix()
 {
     this->matrix = vsg::translate(static_cast<vsg::vec3>(this->translation)) *
-        to_rotate_matrix(this->rotation_deg) *
+        to_rotate_matrix(static_cast<vsg::vec3>(this->rotation_deg)) *
         vsg::scale(this->scale);
 
     update_bounds();

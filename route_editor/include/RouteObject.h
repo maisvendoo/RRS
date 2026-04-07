@@ -81,7 +81,7 @@ private:
     static EditorContext* s_context;
 
     vsg::dvec3 translation;
-    vsg::vec3 rotation_deg;
+    vsg::dvec3 rotation_deg;
     vsg::vec3 scale;
 
     vsg::dmat4 initial_matrix;
