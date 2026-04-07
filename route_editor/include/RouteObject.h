@@ -80,7 +80,7 @@ private:
 private:
     static EditorContext* s_context;
 
-    vsg::vec3 translation;
+    vsg::dvec3 translation;
     vsg::vec3 rotation_deg;
     vsg::vec3 scale;
 
