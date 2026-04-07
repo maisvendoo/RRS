@@ -1,6 +1,6 @@
-#include "SelectObjectsCommand.h"
+#include "commands/SelectObjectsCommand.h"
 
-#include "Command.h"
+#include "commands/Command.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
 #include "RouteObject.h"

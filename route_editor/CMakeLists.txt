@@ -37,11 +37,6 @@ target_sources(${TARGET}
             ${INCLUDES}
 )
 
-target_include_directories(${TARGET} PRIVATE
-    include/commands
-    include/selection_states
-)
-
 target_link_libraries(${TARGET}
     PRIVATE
         # Qt6::Widgets

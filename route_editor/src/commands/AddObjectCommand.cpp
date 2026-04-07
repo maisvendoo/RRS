@@ -1,6 +1,6 @@
-#include "AddObjectCommand.h"
+#include "commands/AddObjectCommand.h"
 
-#include "Command.h"
+#include "commands/Command.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
 #include "Route.h"

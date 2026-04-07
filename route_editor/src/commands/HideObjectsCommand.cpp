@@ -1,6 +1,6 @@
-#include "HideObjectsCommand.h"
+#include "commands/HideObjectsCommand.h"
 
-#include "Command.h"
+#include "commands/Command.h"
 #include "RouteObject.h"
 
 #include <cstdio>

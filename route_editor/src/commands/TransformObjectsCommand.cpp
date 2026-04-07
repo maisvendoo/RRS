@@ -1,6 +1,6 @@
-#include "TransformObjectsCommand.h"
+#include "commands/TransformObjectsCommand.h"
 
-#include "Command.h"
+#include "commands/Command.h"
 #include "EditorContext.h"
 #include "RouteObject.h"
 

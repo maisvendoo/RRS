@@ -1,6 +1,6 @@
-#include "PasteObjectsCommand.h"
+#include "commands/PasteObjectsCommand.h"
 
-#include "Command.h"
+#include "commands/Command.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
 #include "Route.h"

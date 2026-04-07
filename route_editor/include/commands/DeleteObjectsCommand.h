@@ -1,7 +1,7 @@
 #ifndef DELETE_OBJECTS_COMMAND_H
 #define DELETE_OBJECTS_COMMAND_H
 
-#include "Command.h"
+#include "commands/Command.h"
 #include "RouteObject.h"
 
 struct EditorContext;

@@ -1,7 +1,7 @@
 #ifndef ADD_OBJECT_COMMAND_H
 #define ADD_OBJECT_COMMAND_H
 
-#include "Command.h"
+#include "commands/Command.h"
 #include "RouteObject.h"
 
 #include <vsg/core/ref_ptr.h>

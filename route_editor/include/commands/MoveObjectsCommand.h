@@ -1,7 +1,7 @@
 #ifndef MOVE_OBJECTS_COMMAND_H
 #define MOVE_OBJECTS_COMMAND_H
 
-#include "TransformObjectsCommand.h"
+#include "commands/TransformObjectsCommand.h"
 
 #include <vsg/maths/vec3.h>
 

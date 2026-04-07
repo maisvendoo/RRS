@@ -1,7 +1,7 @@
 #include "KeyboardHandler.h"
 
 #include "Action.h"
-#include "CommandList.h"
+#include "commands/CommandList.h"
 #include "EditorContext.h"
 #include "KeyBinding.h"
 #include "Settings.h"

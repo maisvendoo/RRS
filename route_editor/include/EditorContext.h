@@ -1,7 +1,7 @@
 #ifndef EDITOR_CONTEXT_H
 #define EDITOR_CONTEXT_H
 
-#include "CommandList.h"
+#include "commands/CommandList.h"
 #include "EditorState.h"
 #include "RouteMap.h"
 #include "RouteObject.h"

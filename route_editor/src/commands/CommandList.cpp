@@ -1,6 +1,6 @@
-#include "CommandList.h"
+#include "commands/CommandList.h"
 
-#include "Command.h"
+#include "commands/Command.h"
 
 #include <cstddef>
 

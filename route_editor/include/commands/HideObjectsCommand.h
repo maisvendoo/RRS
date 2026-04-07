@@ -1,7 +1,7 @@
 #ifndef HIDE_OBJECTS_COMMAND_H
 #define HIDE_OBJECTS_COMMAND_H
 
-#include "Command.h"
+#include "commands/Command.h"
 #include "RouteObject.h"
 
 struct EditorContext;

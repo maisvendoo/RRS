@@ -1,6 +1,6 @@
-#include "DeleteObjectsCommand.h"
+#include "commands/DeleteObjectsCommand.h"
 
-#include "Command.h"
+#include "commands/Command.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
 #include "Route.h"
