@@ -40,6 +40,12 @@
 #include <cctype>
 #include <string>
 
+static bool drag_double(const char* label, double* data)
+{
+    return ImGui::DragScalar(label, ImGuiDataType_Double, data,
+        1.0f, nullptr, nullptr, "%.3f");
+}
+
 EditorGui::EditorGui(EditorContext& context)
     : context(context)
 {
@@ -411,16 +417,13 @@ void EditorGui::show_camera_settings() const
     ImGui::Begin("Camera Settings", nullptr, window_flags);
 
     ImGui::Text("Move speed:");
-    ImGui::DragScalar("##move_speed", ImGuiDataType_Double,
-        &context.settings.camera_move_speed, 1.0f, nullptr, nullptr, "%.3f");
+    drag_double("##move_speed", &context.settings.camera_move_speed);
 
     ImGui::Text("Rotate speed:");
-    ImGui::DragScalar("##rotate_speed", ImGuiDataType_Double,
-        &context.settings.camera_rotate_speed, 1.0f, nullptr, nullptr, "%.3f");
+    drag_double("##rotate_speed", &context.settings.camera_rotate_speed);
 
     ImGui::Text("Zoom power:");
-    ImGui::DragScalar("##zoom_power", ImGuiDataType_Double,
-        &context.settings.camera_zoom_power, 1.0f, nullptr, nullptr, "%.3f");
+    drag_double("##zoom_power", &context.settings.camera_zoom_power);
 
     ImGui::Text("FovY:");
 
