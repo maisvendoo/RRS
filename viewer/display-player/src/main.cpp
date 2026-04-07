@@ -1,5 +1,6 @@
 #include    <QApplication>
 #include    <QCommandLineParser>
+#include    <QtDebug>
 #include    "mainwindow.h"
 
 void parser(QStringList args, QString& module_path, QString& config_path)
@@ -50,6 +51,15 @@ int main(int argc, char *argv[])
     QString module_path = "";
     QString config_path = "";
     parser(app.arguments(), module_path, config_path);
+    if( module_path.isEmpty() ) {
+         QApplication::translate("main", "Display module path"),
+                                  QApplication::translate("main", "module-path");
+
+        qDebug() << " Module path is empty."
+                 << "Usage: display-player -m, --module-path <module-path> -c, --config-path <signal-path>";
+        QApplication::exit(1);
+        return 1;
+    }
     MainWindow w(module_path, config_path);
 
     w.show();
