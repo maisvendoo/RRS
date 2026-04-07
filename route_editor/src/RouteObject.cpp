@@ -56,7 +56,7 @@ RouteObject::RouteObject(
     : label(label)
     , translation(static_cast<vsg::dvec3>(translation))
     , rotation_deg(static_cast<vsg::dvec3>(rotation_deg))
-    , scale(static_cast<vsg::vec3>(scale))
+    , scale(static_cast<vsg::dvec3>(scale))
     , paged_lod(paged_lod)
 {
     s_context = &context;
@@ -149,15 +149,10 @@ void RouteObject::rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis,
         vsg::rotate(vsg::quat(radians, axis)) * vsg::translate(-pivot) *
         static_cast<vsg::mat4>(matrix);
 
-    vsg::vec3 temp_trans;
-    vsg::quat temp_quat;
-    vsg::vec3 temp_scale;
-    vsg::decompose(static_cast<vsg::mat4>(this->matrix),
-        temp_trans, temp_quat, temp_scale);
+    vsg::dquat temp_quat;
 
-    this->translation = temp_trans;
-    this->rotation_deg = to_euler_deg(temp_quat);
-    this->scale = temp_scale;
+    vsg::decompose(matrix, translation, temp_quat, scale);
+    rotation_deg = to_euler_deg(static_cast<vsg::quat>(temp_quat));
 
     update_bounds();
 }
@@ -168,14 +163,10 @@ void RouteObject::scale_relative_to_pivot(vsg::vec3 pivot,
     this->matrix = vsg::translate(pivot) * vsg::scale(scale) *
         vsg::translate(-pivot) * static_cast<vsg::mat4>(matrix);
 
-    vsg::vec3 temp_trans;
-    vsg::quat temp_quat;
-    vsg::vec3 temp_scale;
-    vsg::decompose(static_cast<vsg::mat4>(this->matrix),
-        temp_trans, temp_quat, temp_scale);
+    vsg::dquat temp_quat;
 
-    this->translation = temp_trans;
-    this->scale = temp_scale;
+    vsg::decompose(matrix, translation, temp_quat, this->scale);
+    rotation_deg = to_euler_deg(static_cast<vsg::quat>(temp_quat));
 
     update_bounds();
 }
@@ -258,15 +249,10 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
 {
     this->matrix = matrix;
 
-    vsg::vec3 temp_trans;
-    vsg::quat temp_quat;
-    vsg::vec3 temp_scale;
-    vsg::decompose(static_cast<vsg::mat4>(this->matrix),
-        temp_trans, temp_quat, temp_scale);
+    vsg::dquat temp_quat;
 
-    this->translation = temp_trans;
-    this->rotation_deg = to_euler_deg(temp_quat);
-    this->scale = temp_scale;
+    vsg::decompose(matrix, translation, temp_quat, scale);
+    rotation_deg = to_euler_deg(static_cast<vsg::quat>(temp_quat));
 
     update_bounds();
 }
