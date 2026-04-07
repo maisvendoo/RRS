@@ -345,7 +345,7 @@ void EditorGui::show_waypoints_conf() const
                                                       pos.z + pd.up.z * h);
 
                     context.look_at->center = context.look_at->eye
-                        + static_cast<vsg::dvec3>(context.camera_handler->get_front());
+                        + context.camera_handler->get_front();
                 }
             }
             ImGui::TableNextColumn();
