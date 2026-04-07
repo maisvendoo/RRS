@@ -28,9 +28,9 @@ struct settings_t
 
     float zNear;            ///< Near clip plane
     float view_distance;    ///< View distance
-    float fovy;             ///< Vertical view angle
-    float fovy_min;         ///< Vertical view angle min
-    float fovy_max;         ///< Vertical view angle max
+    double fovy;            ///< Vertical view angle
+    double fovy_min;        ///< Vertical view angle min
+    double fovy_max;        ///< Vertical view angle max
 
     float camera_initial_height;
     float camera_move_speed;

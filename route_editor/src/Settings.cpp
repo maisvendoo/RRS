@@ -32,9 +32,9 @@ settings_t::settings_t()
     , num_lights(200)
     , zNear(0.1f)
     , view_distance(2000.0f)
-    , fovy(64.0f)
-    , fovy_min(2.0f)
-    , fovy_max(100.0f)
+    , fovy(60.0)
+    , fovy_min(2.0)
+    , fovy_max(100.0)
     , camera_initial_height(0.0f)
     , camera_move_speed(100.0f)
     , camera_rotate_speed(3.0f)
@@ -94,9 +94,9 @@ void settings_t::read(const std::string& cfg_path)
 
     cfg.getFloat(section, "zNear", zNear);
     cfg.getFloat(section, "ViewDistance", view_distance);
-    cfg.getFloat(section, "FovY", fovy);
-    cfg.getFloat(section, "FovYMin", fovy_min);
-    cfg.getFloat(section, "FovYMax", fovy_max);
+    cfg.getDouble(section, "FovY", fovy);
+    cfg.getDouble(section, "FovYMin", fovy_min);
+    cfg.getDouble(section, "FovYMax", fovy_max);
     cfg.getFloat(section, "InitialHeight", camera_initial_height);
     cfg.getFloat(section, "MoveSpeed", camera_move_speed);
     cfg.getFloat(section, "RotateSpeed", camera_rotate_speed);

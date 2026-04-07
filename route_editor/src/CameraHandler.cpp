@@ -63,7 +63,7 @@ CameraHandler::CameraHandler(EditorContext& context)
     const VkExtent2D window_extent = context.window->extent2D();
 
     context.perspective = vsg::Perspective::create(
-        static_cast<double>(settings.fovy),
+        settings.fovy,
         static_cast<double>(window_extent.width) /
             static_cast<double>(window_extent.height),
         static_cast<double>(settings.zNear),
@@ -126,8 +126,7 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
 
     double& fovy = context.perspective->fieldOfViewY;
     fovy -= scrollWheel.delta.y * zoom_power;
-    fovy = std::clamp(fovy, static_cast<double>(settings.fovy_min),
-        static_cast<double>(settings.fovy_max));
+    fovy = std::clamp(fovy, settings.fovy_min, settings.fovy_max);
 }
 
 void CameraHandler::apply(vsg::FrameEvent& frame)
