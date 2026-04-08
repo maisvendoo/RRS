@@ -108,7 +108,7 @@ bool RouteObject::get_is_hidden() const
     return is_hidden;
 }
 
-void RouteObject::set_translation(vsg::vec3 translation)
+void RouteObject::set_translation(const vsg::dvec3& translation)
 {
     this->translation = translation;
 

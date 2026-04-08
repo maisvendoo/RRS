@@ -47,7 +47,7 @@ public:
     bool get_is_selected() const;
     bool get_is_hidden() const;
 
-    void set_translation(vsg::vec3 translation);
+    void set_translation(const vsg::dvec3& translation);
     void set_rotation_deg(vsg::vec3 rotation_deg);
     void set_scale(vsg::vec3 scale);
 

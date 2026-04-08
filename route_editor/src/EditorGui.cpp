@@ -46,9 +46,9 @@ static bool drag_double(const char* label, double* data)
         1.0f, nullptr, nullptr, "%.3f");
 }
 
-static bool drag_double3(const char* label, double* v)
+static bool drag_double3(const char* label, double* data)
 {
-    return ImGui::DragScalarN(label, ImGuiDataType_Double, v, 3,
+    return ImGui::DragScalarN(label, ImGuiDataType_Double, data, 3,
         1.0f, nullptr, nullptr, "%.3f");
 }
 
@@ -586,11 +586,8 @@ void EditorGui::show_selected_objects_properties() const
 
         std::string label = "translation##" + std::to_string(i);
 
-        // vsg::dvec3 translation = static_cast<vsg::dvec3>(object->get_translation());
-
-
-        vsg::vec3 translation = static_cast<vsg::vec3>(object->get_translation());
-        if (ImGui::DragFloat3(label.c_str(), translation.data()))
+        vsg::dvec3 translation = object->get_translation();
+        if (drag_double3(label.c_str(), translation.data()))
         {
             if (!dragging)
             {
@@ -598,10 +595,10 @@ void EditorGui::show_selected_objects_properties() const
                 save_matrixes();
                 dragging = true;
             }
-            total_translation += translation;
-
+            total_translation += static_cast<vsg::vec3>(translation);
             object->set_translation(translation);
         }
+
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
             context.commands.push(new TranslateObjects(context, total_translation), false);
