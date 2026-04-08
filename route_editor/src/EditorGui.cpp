@@ -46,6 +46,12 @@ static bool drag_double(const char* label, double* data)
         1.0f, nullptr, nullptr, "%.3f");
 }
 
+static bool drag_double3(const char* label, double* v)
+{
+    return ImGui::DragScalarN(label, ImGuiDataType_Double, v, 3,
+        1.0f, nullptr, nullptr, "%.3f");
+}
+
 EditorGui::EditorGui(EditorContext& context)
     : context(context)
 {
@@ -579,6 +585,9 @@ void EditorGui::show_selected_objects_properties() const
         ImGui::Text("label: %s", object->label.c_str());
 
         std::string label = "translation##" + std::to_string(i);
+
+        // vsg::dvec3 translation = static_cast<vsg::dvec3>(object->get_translation());
+
 
         vsg::vec3 translation = object->get_translation();
         if (ImGui::DragFloat3(label.c_str(), translation.data()))
