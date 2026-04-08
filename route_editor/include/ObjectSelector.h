@@ -49,7 +49,7 @@ private:
 
     EditorContext& context;
 
-    vsg::vec3 prev_intersect_pos;
+    vsg::dvec3 prev_intersect_pos;
     vsg::vec3 total_translation;
     float total_rotation_rad;
     vsg::vec3 total_scale;

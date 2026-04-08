@@ -265,7 +265,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         case State::KEYBOARD_GRAB:
         {
             const vsg::vec3 translation = world_intersection -
-                prev_intersect_pos;
+                static_cast<vsg::vec3>(prev_intersect_pos);
 
             prev_intersect_pos = world_intersection;
             total_translation += translation;
@@ -287,7 +287,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
             }
 
             const vsg::vec3 prev_vec = vsg::normalize(
-                prev_intersect_pos - gizmo_pos);
+                static_cast<vsg::vec3>(prev_intersect_pos) - gizmo_pos);
 
             const vsg::vec3 curr_vec = vsg::normalize(
                 world_intersection - gizmo_pos);
@@ -333,7 +333,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
                 return;
             }
 
-            const vsg::vec3 prev_vec = prev_intersect_pos - gizmo_pos;
+            const vsg::vec3 prev_vec = static_cast<vsg::vec3>(prev_intersect_pos) - gizmo_pos;
             const vsg::vec3 curr_vec = world_intersection - gizmo_pos;
 
             prev_intersect_pos = world_intersection;
