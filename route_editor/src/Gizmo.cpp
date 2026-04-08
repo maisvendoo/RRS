@@ -25,9 +25,13 @@
 
 #include <cmath>
 
-static constexpr vsg::vec3 X_AXIS_POSITIVE = {1.0f, 0.0f, 0.0f};
-static constexpr vsg::vec3 Y_AXIS_POSITIVE = {0.0f, 1.0f, 0.0f};
-static constexpr vsg::vec3 Z_AXIS_POSITIVE = {0.0f, 0.0f, 1.0f};
+static constexpr vsg::vec3 X_AXIS_POSITIVEf = {1.0f, 0.0f, 0.0f};
+static constexpr vsg::vec3 Y_AXIS_POSITIVEf = {0.0f, 1.0f, 0.0f};
+static constexpr vsg::vec3 Z_AXIS_POSITIVEf = {0.0f, 0.0f, 1.0f};
+
+static constexpr vsg::dvec3 X_AXIS_POSITIVEd = {1.0, 0.0, 0.0};
+static constexpr vsg::dvec3 Y_AXIS_POSITIVEd = {0.0, 1.0, 0.0};
+static constexpr vsg::dvec3 Z_AXIS_POSITIVEd = {0.0, 0.0, 1.0};
 
 Gizmo::Gizmo(EditorContext& context)
     : context(context)
@@ -48,10 +52,10 @@ Gizmo::Gizmo(EditorContext& context)
     const auto rotate_geometry_info = [&](vsg::GeometryInfo& geometry_info,
         vsg::vec3 direction) -> void
     {
-        if (vsg::length(vsg::cross(Z_AXIS_POSITIVE, direction)) > 0.001f)
+        if (vsg::length(vsg::cross(Z_AXIS_POSITIVEf, direction)) > 0.001f)
         {
-            const vsg::vec3 axis = vsg::cross(Z_AXIS_POSITIVE, direction);
-            const float angle = std::acos(vsg::dot(Z_AXIS_POSITIVE, direction));
+            const vsg::vec3 axis = vsg::cross(Z_AXIS_POSITIVEf, direction);
+            const float angle = std::acos(vsg::dot(Z_AXIS_POSITIVEf, direction));
             geometry_info.transform = vsg::rotate(angle, axis);
         }
     };
@@ -124,27 +128,27 @@ Gizmo::Gizmo(EditorContext& context)
         return builder.createCylinder(geometry_info, state_info);
     };
 
-    arrow_x = create_arrow(X_AXIS_POSITIVE, arrow_x_color);
-    arrow_y = create_arrow(Y_AXIS_POSITIVE, arrow_y_color);
-    arrow_z = create_arrow(Z_AXIS_POSITIVE, arrow_z_color);
+    arrow_x = create_arrow(X_AXIS_POSITIVEf, arrow_x_color);
+    arrow_y = create_arrow(Y_AXIS_POSITIVEf, arrow_y_color);
+    arrow_z = create_arrow(Z_AXIS_POSITIVEf, arrow_z_color);
 
     plane_yz_switch = SingleSwitch::create(vsg::MASK_OFF,
-        create_plane(X_AXIS_POSITIVE));
+        create_plane(X_AXIS_POSITIVEf));
 
     plane_xz_switch = SingleSwitch::create(vsg::MASK_OFF,
-        create_plane(Y_AXIS_POSITIVE));
+        create_plane(Y_AXIS_POSITIVEf));
 
     plane_xy_switch = SingleSwitch::create(vsg::MASK_OFF,
-        create_plane(Z_AXIS_POSITIVE));
+        create_plane(Z_AXIS_POSITIVEf));
 
     line_x_switch = SingleSwitch::create(vsg::MASK_OFF,
-        create_line(X_AXIS_POSITIVE, arrow_x_color));
+        create_line(X_AXIS_POSITIVEf, arrow_x_color));
 
     line_y_switch = SingleSwitch::create(vsg::MASK_OFF,
-        create_line(Y_AXIS_POSITIVE, arrow_y_color));
+        create_line(Y_AXIS_POSITIVEf, arrow_y_color));
 
     line_z_switch = SingleSwitch::create(vsg::MASK_OFF,
-        create_line(Z_AXIS_POSITIVE, arrow_z_color));
+        create_line(Z_AXIS_POSITIVEf, arrow_z_color));
 
     matrix_transform = vsg::MatrixTransform::create();
     matrix_transform->addChild(arrow_x);
@@ -183,13 +187,11 @@ bool Gizmo::handle_intersections()
     }
 
     const vsg::dvec3& world_intersection = intersection->worldIntersection;
+    const vsg::dvec3& camera_front = context.camera_handler->get_front();
 
-    const auto camera_front = static_cast<vsg::vec3>(
-        context.camera_handler->get_front());
-
-    const float arrow_x_dot = std::abs(vsg::dot(camera_front, X_AXIS_POSITIVE));
-    const float arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVE));
-    const float arrow_z_dot = std::abs(vsg::dot(camera_front, Z_AXIS_POSITIVE));
+    const double arrow_x_dot = std::abs(vsg::dot(camera_front, X_AXIS_POSITIVEd));
+    const double arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVEd));
+    const double arrow_z_dot = std::abs(vsg::dot(camera_front, Z_AXIS_POSITIVEd));
 
     for (const vsg::Node* const node : intersection->nodePath)
     {
@@ -235,7 +237,7 @@ bool Gizmo::handle_intersections()
         }
 
         prev_intersect_pos = click_pos;
-        total_translation = {0.0f, 0.0f, 0.0f};
+        total_translation.set(0.0, 0.0, 0.0);
 
         active_plain_switch->mask = MASK_CLICKABLE;
         active_line_switch->mask = MASK_GUI1;
@@ -291,8 +293,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
         return;
     }
 
-    const auto world_intersection = static_cast<vsg::vec3>(
-        intersection->worldIntersection);
+    const vsg::dvec3& world_intersection = intersection->worldIntersection;
 
     for (const vsg::Node* const node : intersection->nodePath)
     {
@@ -301,7 +302,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
             continue;
         }
 
-        vsg::vec3 translation = {0.0f, 0.0f, 0.0f};
+        vsg::dvec3 translation = {0.0, 0.0, 0.0};
 
         if (active_arrow == arrow_x)
         {
@@ -323,11 +324,11 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
             continue;
         }
 
-        total_translation += static_cast<vsg::dvec3>(translation);
+        total_translation += translation;
 
         for (const auto& object : context.selected_objects)
         {
-            object->move(static_cast<vsg::dvec3>(translation));
+            object->move(translation);
         }
 
         return;
