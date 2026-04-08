@@ -268,7 +268,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
                 static_cast<vsg::vec3>(prev_intersect_pos);
 
             prev_intersect_pos = world_intersection;
-            total_translation += translation;
+            total_translation += static_cast<vsg::dvec3>(translation);
 
             for (const auto& object : context.selected_objects)
             {
@@ -425,7 +425,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         case State::KEYBOARD_GRAB:
         {
             context.commands.push(new TranslateObjects(
-                context, total_translation), false);
+                context, static_cast<vsg::vec3>(total_translation)), false);
 
             break;
         }

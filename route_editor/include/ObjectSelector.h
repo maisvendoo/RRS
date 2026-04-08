@@ -50,7 +50,7 @@ private:
     EditorContext& context;
 
     vsg::dvec3 prev_intersect_pos;
-    vsg::vec3 total_translation;
+    vsg::dvec3 total_translation;
     float total_rotation_rad;
     vsg::vec3 total_scale;
     vsg::ref_ptr<SingleSwitch> front_plane_switch;
