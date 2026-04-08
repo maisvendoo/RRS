@@ -30,7 +30,7 @@ public:
     void apply(const vsg::ButtonReleaseEvent& buttonRelease);
     void apply(const vsg::MoveEvent& moveEvent);
 
-    vsg::vec3 get_curr_pos() const;
+    const vsg::dvec3& get_curr_pos() const;
 
     void update_visibility();
     void update_position();

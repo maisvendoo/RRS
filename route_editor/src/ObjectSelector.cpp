@@ -97,7 +97,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     }
 
     const auto front_plane = context.camera_handler->create_front_plane(
-        context.gizmo->get_curr_pos(), &front_plane_up);
+        static_cast<vsg::vec3>(context.gizmo->get_curr_pos()), &front_plane_up);
 
     const auto intersector = context.intersection_handler->apply_(
         context.mouse_handler->get_pos());
@@ -279,7 +279,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         }
         case State::KEYBOARD_ROTATE:
         {
-            const vsg::vec3 gizmo_pos = context.gizmo->get_curr_pos();
+            const vsg::vec3 gizmo_pos = static_cast<vsg::vec3>(context.gizmo->get_curr_pos());
 
             if (world_intersection == gizmo_pos)
             {
@@ -326,7 +326,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         }
         case State::KEYBOARD_SCALE:
         {
-            const vsg::vec3 gizmo_pos = context.gizmo->get_curr_pos();
+            const vsg::vec3 gizmo_pos = static_cast<vsg::vec3>(context.gizmo->get_curr_pos());
 
             if (world_intersection == gizmo_pos)
             {
@@ -433,7 +433,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         {
             context.commands.push(
                 new RotateObjects(
-                    context, context.gizmo->get_curr_pos(),
+                    context, static_cast<vsg::vec3>(context.gizmo->get_curr_pos()),
                     static_cast<vsg::vec3>(context.camera_handler->get_front()),
                     total_rotation_rad
                 ),
@@ -445,7 +445,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         case State::KEYBOARD_SCALE:
         {
             context.commands.push(new ScaleObjects(context,
-                context.gizmo->get_curr_pos(), total_scale), false);
+                static_cast<vsg::vec3>(context.gizmo->get_curr_pos()), total_scale), false);
 
             break;
         }

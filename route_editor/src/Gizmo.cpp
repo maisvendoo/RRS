@@ -335,9 +335,9 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
     }
 }
 
-vsg::vec3 Gizmo::get_curr_pos() const
+const vsg::dvec3& Gizmo::get_curr_pos() const
 {
-    return static_cast<vsg::vec3>(curr_pos);
+    return curr_pos;
 }
 
 void Gizmo::update_visibility()
