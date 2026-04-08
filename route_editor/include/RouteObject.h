@@ -49,7 +49,7 @@ public:
 
     void set_translation(const vsg::dvec3& translation);
     void set_rotation_deg(const vsg::dvec3& rotation_deg);
-    void set_scale(vsg::vec3 scale);
+    void set_scale(const vsg::dvec3& scale);
 
     void move(vsg::vec3 translation);
 

@@ -615,8 +615,8 @@ void EditorGui::show_selected_objects_properties() const
 
         label = "scale##" + std::to_string(i);
 
-        vsg::vec3 scale = static_cast<vsg::vec3>(object->get_scale());
-        if (ImGui::DragFloat3(label.c_str(), scale.data(), 0.01f))
+        vsg::dvec3 scale = object->get_scale();
+        if (drag_double3(label.c_str(), scale.data(), 0.01f))
         {
             object->set_scale(scale);
         }

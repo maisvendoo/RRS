@@ -125,7 +125,7 @@ void RouteObject::set_rotation_deg(const vsg::dvec3& rotation_deg)
     update_matrix();
 }
 
-void RouteObject::set_scale(vsg::vec3 scale)
+void RouteObject::set_scale(const vsg::dvec3& scale)
 {
     this->scale = scale;
     update_matrix();
