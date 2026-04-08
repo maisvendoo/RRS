@@ -342,7 +342,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
                 vsg::length(prev_vec);
 
             const vsg::vec3 scale = {scale_value, scale_value, scale_value};
-            total_scale *= scale;
+            total_scale *= static_cast<vsg::dvec3>(scale);
 
             for (const auto& object : context.selected_objects)
             {
@@ -445,7 +445,8 @@ void ObjectSelector::confirm_keyboard_transformation()
         case State::KEYBOARD_SCALE:
         {
             context.commands.push(new ScaleObjects(context,
-                static_cast<vsg::vec3>(context.gizmo->get_curr_pos()), total_scale), false);
+                static_cast<vsg::vec3>(context.gizmo->get_curr_pos()),
+                static_cast<vsg::vec3>(total_scale)), false);
 
             break;
         }
