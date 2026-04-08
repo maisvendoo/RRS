@@ -610,7 +610,7 @@ void EditorGui::show_selected_objects_properties() const
 
         label = "rotation##" + std::to_string(i);
 
-        vsg::vec3 rotation_deg = object->get_rotation_deg();
+        vsg::vec3 rotation_deg = static_cast<vsg::vec3>(object->get_rotation_deg());
         if (ImGui::DragFloat3(label.c_str(), rotation_deg.data(), 0.2f))
         {
             object->set_rotation_deg(rotation_deg);

@@ -38,7 +38,7 @@ public:
     );
 
     const vsg::dvec3& get_translation() const;
-    vsg::vec3 get_rotation_deg() const;
+    const vsg::dvec3& get_rotation_deg() const;
     vsg::vec3 get_scale() const;
 
     const vsg::dmat4& get_initial_matrix() const;
