@@ -31,13 +31,15 @@
 #include <cstdint>
 
 static vsg::ref_ptr<vsg::Commands> create_quad(
-    const vsg::vec3& p0,
-    const vsg::vec3& p1,
-    const vsg::vec3& p2,
-    const vsg::vec3& p3
+    const vsg::dvec3& p0, const vsg::dvec3& p1,
+    const vsg::dvec3& p2, const vsg::dvec3& p3
 )
 {
-    const auto vertices = vsg::vec3Array::create({p0, p1, p2, p3});
+    const auto vertices = vsg::vec3Array::create(4);
+    vertices->at(0) = p0;
+    vertices->at(1) = p1;
+    vertices->at(2) = p2;
+    vertices->at(3) = p3;
 
     const auto indices = vsg::ushortArray::create({
         0, 1, 2,
@@ -175,8 +177,8 @@ const vsg::dvec3& CameraHandler::get_up() const
 // Create plane perpedicular to camera normal passing through
 // specified point to test for intersections
 vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
-    const vsg::vec3& point,
-    vsg::vec3* up_out
+    const vsg::dvec3& point,
+    vsg::dvec3* up_out
 ) const
 {
     constexpr double angle_rad = vsg::radians(80.0);
@@ -197,7 +199,7 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
     const vsg::dvec3 p2_dir = get_dir(-1,  1);
     const vsg::dvec3 p3_dir = get_dir( 1,  1);
 
-    const vsg::dvec3 camera_to_point = static_cast<vsg::dvec3>(point) - camera_pos;
+    const vsg::dvec3 camera_to_point = point - camera_pos;
 
     const double camera_norm_length = vsg::length(camera_to_point) *
         vsg::dot(front, vsg::normalize(camera_to_point));
@@ -211,11 +213,10 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
 
     if (up_out)
     {
-        *up_out = static_cast<vsg::vec3>(vsg::normalize(p2 - p0));
+        *up_out = vsg::normalize(p2 - p0);
     }
 
-    return create_quad(static_cast<vsg::vec3>(p0), static_cast<vsg::vec3>(p1),
-        static_cast<vsg::vec3>(p2), static_cast<vsg::vec3>(p3));
+    return create_quad(p0, p1, p2, p3);
 }
 
 void CameraHandler::calculate_front()

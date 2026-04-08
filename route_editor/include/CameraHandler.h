@@ -35,8 +35,8 @@ public:
     // Create plane perpedicular to camera normal and passing through
     // specified point to test for intersections
     vsg::ref_ptr<vsg::Node> create_front_plane(
-        const vsg::vec3& point,
-        vsg::vec3* up_out = nullptr
+        const vsg::dvec3& point,
+        vsg::dvec3* up_out = nullptr
     ) const;
 
 private:

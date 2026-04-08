@@ -54,7 +54,7 @@ private:
     double total_rotation_rad;
     vsg::dvec3 total_scale;
     vsg::ref_ptr<SingleSwitch> front_plane_switch;
-    vsg::vec3 front_plane_up;
+    vsg::dvec3 front_plane_up;
 };
 
 #endif // OBJECT_SELECTOR_H

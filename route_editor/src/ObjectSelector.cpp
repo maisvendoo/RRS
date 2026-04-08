@@ -21,6 +21,7 @@
 #include "SingleSwitch.h"
 
 #include <vsg/core/Mask.h>
+#include <vsg/maths/common.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/KeyEvent.h>
@@ -97,7 +98,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     }
 
     const auto front_plane = context.camera_handler->create_front_plane(
-        static_cast<vsg::vec3>(context.gizmo->get_curr_pos()), &front_plane_up);
+        context.gizmo->get_curr_pos(), &front_plane_up);
 
     const auto intersector = context.intersection_handler->apply_(
         context.mouse_handler->get_pos());
@@ -255,8 +256,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    const auto world_intersection = static_cast<vsg::vec3>(
-        intersection->worldIntersection);
+    const vsg::dvec3& world_intersection = intersection->worldIntersection;
 
     intersector->intersections.clear();
 
@@ -264,90 +264,81 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
     {
         case State::KEYBOARD_GRAB:
         {
-            const vsg::vec3 translation = world_intersection -
-                static_cast<vsg::vec3>(prev_intersect_pos);
+            const vsg::dvec3 translation = world_intersection - prev_intersect_pos;
 
             prev_intersect_pos = world_intersection;
-            total_translation += static_cast<vsg::dvec3>(translation);
+            total_translation += translation;
 
             for (const auto& object : context.selected_objects)
             {
-                object->move(static_cast<vsg::dvec3>(translation));
+                object->move(translation);
             }
 
             return;
         }
         case State::KEYBOARD_ROTATE:
         {
-            const vsg::vec3 gizmo_pos = static_cast<vsg::vec3>(context.gizmo->get_curr_pos());
+            const vsg::dvec3& gizmo_pos = context.gizmo->get_curr_pos();
 
             if (world_intersection == gizmo_pos)
             {
                 return;
             }
 
-            const vsg::vec3 prev_vec = vsg::normalize(
-                static_cast<vsg::vec3>(prev_intersect_pos) - gizmo_pos);
-
-            const vsg::vec3 curr_vec = vsg::normalize(
-                world_intersection - gizmo_pos);
+            const vsg::dvec3 prev_vec = vsg::normalize(prev_intersect_pos - gizmo_pos);
+            const vsg::dvec3 curr_vec = vsg::normalize(world_intersection - gizmo_pos);
 
             prev_intersect_pos = world_intersection;
 
-            float prev_acos = std::acos(vsg::dot(prev_vec, front_plane_up));
-            float curr_acos = std::acos(vsg::dot(curr_vec, front_plane_up));
+            double prev_acos = acos(vsg::dot(prev_vec, front_plane_up));
+            double curr_acos = acos(vsg::dot(curr_vec, front_plane_up));
 
-            const vsg::vec3 front = static_cast<vsg::vec3>(
-                context.camera_handler->get_front());
+            const vsg::dvec3& front = context.camera_handler->get_front();
 
             if (prev_vec != front_plane_up && prev_vec != -front_plane_up &&
-                vsg::dot(vsg::cross(prev_vec, front_plane_up), front) < 0.0f)
+                vsg::dot(vsg::cross(prev_vec, front_plane_up), front) < 0.0)
             {
                 prev_acos = 2 * vsg::PI - prev_acos;
             }
 
             if (curr_vec != front_plane_up && curr_vec != -front_plane_up &&
-                vsg::dot(vsg::cross(curr_vec, front_plane_up), front) < 0.0f)
+                vsg::dot(vsg::cross(curr_vec, front_plane_up), front) < 0.0)
             {
                 curr_acos = 2 * vsg::PI - curr_acos;
             }
 
             for (const auto& object : context.selected_objects)
             {
-                const float rotation_rad = prev_acos - curr_acos;
+                const double rotation_rad = prev_acos - curr_acos;
                 total_rotation_rad += rotation_rad;
 
-                object->rotate_around_pivot(static_cast<vsg::dvec3>(gizmo_pos),
-                static_cast<vsg::dvec3>(front), static_cast<double>(rotation_rad),
-                    object->matrix);
+                object->rotate_around_pivot(gizmo_pos, front, rotation_rad, object->matrix);
             }
 
             return;
         }
         case State::KEYBOARD_SCALE:
         {
-            const vsg::vec3 gizmo_pos = static_cast<vsg::vec3>(context.gizmo->get_curr_pos());
+            const vsg::dvec3& gizmo_pos = context.gizmo->get_curr_pos();
 
             if (world_intersection == gizmo_pos)
             {
                 return;
             }
 
-            const vsg::vec3 prev_vec = static_cast<vsg::vec3>(prev_intersect_pos) - gizmo_pos;
-            const vsg::vec3 curr_vec = world_intersection - gizmo_pos;
+            const vsg::dvec3 prev_vec = prev_intersect_pos - gizmo_pos;
+            const vsg::dvec3 curr_vec = world_intersection - gizmo_pos;
 
             prev_intersect_pos = world_intersection;
 
-            const float scale_value = vsg::length(curr_vec) /
-                vsg::length(prev_vec);
+            const double scale_value = vsg::length(curr_vec) / vsg::length(prev_vec);
 
-            const vsg::vec3 scale = {scale_value, scale_value, scale_value};
-            total_scale *= static_cast<vsg::dvec3>(scale);
+            const vsg::dvec3 scale = {scale_value, scale_value, scale_value};
+            total_scale *= scale;
 
             for (const auto& object : context.selected_objects)
             {
-                object->scale_relative_to_pivot(static_cast<vsg::dvec3>(gizmo_pos),
-                    static_cast<vsg::dvec3>(scale), object->matrix);
+                object->scale_relative_to_pivot(gizmo_pos, scale, object->matrix);
             }
 
             return;
