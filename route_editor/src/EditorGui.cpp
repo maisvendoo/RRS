@@ -247,8 +247,8 @@ void EditorGui::show_route_map() const
         {
             for (const auto& transform : transforms)
             {
-                const vsg::vec3 translation = transform.translation;
-                const vsg::vec3 rotation_deg = transform.rotation_deg;
+                const vsg::dvec3& translation = transform.translation;
+                const vsg::dvec3& rotation_deg = transform.rotation_deg;
 
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
@@ -569,7 +569,7 @@ void EditorGui::show_selected_objects_properties() const
     int i = 0;
 
     static bool dragging = false;
-    static vsg::vec3 total_translation;
+    static vsg::dvec3 total_translation;
 
     const auto save_matrixes = [&]() -> void
     {
@@ -590,18 +590,17 @@ void EditorGui::show_selected_objects_properties() const
         {
             if (!dragging)
             {
-                total_translation = {0.0f, 0.0f, 0.0f};
+                total_translation = {0.0, 0.0, 0.0};
                 save_matrixes();
                 dragging = true;
             }
-            total_translation += static_cast<vsg::vec3>(translation);
+            total_translation += translation;
             object->set_translation(translation);
         }
 
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
-            context.commands.push(new TranslateObjects(context,
-                static_cast<vsg::dvec3>(total_translation)), false);
+            context.commands.push(new TranslateObjects(context, total_translation), false);
             dragging = false;
         }
 

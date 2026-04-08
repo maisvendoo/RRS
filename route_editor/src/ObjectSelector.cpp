@@ -118,8 +118,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    prev_intersect_pos = static_cast<vsg::vec3>(
-        intersection->worldIntersection);
+    prev_intersect_pos = intersection->worldIntersection;
 
     intersector->intersections.clear();
 

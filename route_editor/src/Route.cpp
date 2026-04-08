@@ -34,13 +34,9 @@
 #define RELATIVE_PATH_BUFFER_SIZE 512
 #define FLOAT_BUFFER_SIZE 32
 
-static vsg::vec3 to_vsg_vec3(dvec3 vec)
+static vsg::dvec3 to_vsg_vec3(dvec3 vec)
 {
-    return vsg::vec3{
-        static_cast<float>(vec.x),
-        static_cast<float>(vec.y),
-        static_cast<float>(vec.z)
-    };
+    return vsg::dvec3{vec.x, vec.y, vec.z};
 }
 
 Route::Route(EditorContext& context)
@@ -174,7 +170,7 @@ bool Route::load_route_map()
 
         std::istringstream iss(std::move(line));
         std::string label;
-        vsg::vec3 translation, rotation;
+        vsg::dvec3 translation, rotation;
 
         if (iss >> label >> translation >> rotation)
         {
@@ -281,8 +277,8 @@ void Route::load_static_objects()
         for (const auto& transform : transforms)
         {
             const auto object = RouteObject::create(context,
-                ref_it->second.paged_lod, label, static_cast<vsg::dvec3>(transform.translation),
-                static_cast<vsg::dvec3>(-transform.rotation_deg));
+                ref_it->second.paged_lod, label, transform.translation,
+                -transform.rotation_deg);
 
             this->addChild(vsg::MASK_ALL, object);
 
@@ -389,20 +385,19 @@ bool Route::load_topology()
 
         signal->calcPosition();
 
-        const vsg::vec3 pos = to_vsg_vec3(signal->getPos());
-        const vsg::vec3 right = to_vsg_vec3(signal->getRight());
-        const vsg::vec3 orth = to_vsg_vec3(signal->getOrth());
-        const vsg::vec3 up = to_vsg_vec3(signal->getUp());
+        const vsg::dvec3 pos = to_vsg_vec3(signal->getPos());
+        const vsg::dvec3 right = to_vsg_vec3(signal->getRight());
+        const vsg::dvec3 orth = to_vsg_vec3(signal->getOrth());
+        const vsg::dvec3 up = to_vsg_vec3(signal->getUp());
 
-        const vsg::vec3 rotation_deg = {
-            vsg::degrees(std::atan2(orth.z, up.z)),
-            vsg::degrees(std::atan2(-right.z, std::hypot(orth.z, up.z))),
-            vsg::degrees(std::atan2(-right.y, right.x))
+        const vsg::dvec3 rotation_deg = {
+            vsg::degrees(atan2(orth.z, up.z)),
+            vsg::degrees(atan2(-right.z, hypot(orth.z, up.z))),
+            vsg::degrees(atan2(-right.y, right.x))
         };
 
         const auto object = RouteObject::create(context, paged_lod,
-            signal_model_name, static_cast<vsg::dvec3>(pos),
-            static_cast<vsg::dvec3>(rotation_deg));
+            signal_model_name, pos, rotation_deg);
 
         this->addChild(vsg::MASK_ALL, object);
     };

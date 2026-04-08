@@ -66,8 +66,8 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 
         for (const auto& object : context.static_objects)
         {
-            const vsg::vec3 translation = static_cast<vsg::vec3>(object->get_translation());
-            const vsg::vec3 rotation_deg = static_cast<vsg::vec3>(-object->get_rotation_deg());
+            const vsg::dvec3& translation = object->get_translation();
+            const vsg::dvec3 rotation_deg = -object->get_rotation_deg();
 
             route_map_file << object->label << "," << translation.x <<
                 "," << translation.y << "," << translation.z << "," <<
