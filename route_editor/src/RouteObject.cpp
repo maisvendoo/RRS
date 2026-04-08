@@ -142,11 +142,7 @@ void RouteObject::rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3&
     this->matrix = vsg::translate(pivot) * vsg::rotate(vsg::dquat(radians, axis)) *
         vsg::translate(-pivot) * matrix;
 
-    vsg::dquat temp_quat;
-
-    vsg::decompose(matrix, translation, temp_quat, scale);
-    rotation_deg = to_euler_deg(temp_quat);
-
+    decompose_matrix();
     update_bounds();
 }
 
@@ -156,11 +152,7 @@ void RouteObject::scale_relative_to_pivot(const vsg::dvec3& pivot,
     this->matrix = vsg::translate(pivot) * vsg::scale(scale) *
         vsg::translate(-pivot) * matrix;
 
-    vsg::dquat temp_quat;
-
-    vsg::decompose(matrix, translation, temp_quat, this->scale);
-    rotation_deg = to_euler_deg(temp_quat);
-
+    decompose_matrix();
     update_bounds();
 }
 
@@ -241,11 +233,7 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
 {
     this->matrix = matrix;
 
-    vsg::dquat temp_quat;
-
-    vsg::decompose(matrix, translation, temp_quat, scale);
-    rotation_deg = to_euler_deg(temp_quat);
-
+    decompose_matrix();
     update_bounds();
 }
 
@@ -265,4 +253,11 @@ void RouteObject::update_bounds()
     this->bounds = compute_bounds.bounds;
 
     s_context->gizmo->update_position();
+}
+
+void RouteObject::decompose_matrix()
+{
+    vsg::dquat temp_quat;
+    vsg::decompose(matrix, translation, temp_quat, scale);
+    rotation_deg = to_euler_deg(temp_quat);
 }

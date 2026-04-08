@@ -76,6 +76,7 @@ public:
 private:
     void update_matrix();
     void update_bounds();
+    void decompose_matrix();
 
 private:
     static EditorContext* s_context;
