@@ -196,7 +196,7 @@ bool Gizmo::handle_intersections()
     {
         if (node == arrow_x)
         {
-            click_pos = {world_intersection.x, curr_pos.y, curr_pos.z};
+            click_pos = {world_intersection.x, static_cast<float>(curr_pos.y), static_cast<float>(curr_pos.z)};
 
             active_arrow = arrow_x;
 
@@ -208,7 +208,7 @@ bool Gizmo::handle_intersections()
         }
         else if (node == arrow_y)
         {
-            click_pos = {curr_pos.x, world_intersection.y, curr_pos.z};
+            click_pos = {static_cast<float>(curr_pos.x), world_intersection.y, static_cast<float>(curr_pos.z)};
 
             active_arrow = arrow_y;
 
@@ -220,7 +220,7 @@ bool Gizmo::handle_intersections()
         }
         else if (node == arrow_z)
         {
-            click_pos = {curr_pos.x, curr_pos.y, world_intersection.z};
+            click_pos = {static_cast<float>(curr_pos.x), static_cast<float>(curr_pos.y), world_intersection.z};
 
             active_arrow = arrow_z;
 
@@ -337,7 +337,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
 vsg::vec3 Gizmo::get_curr_pos() const
 {
-    return curr_pos;
+    return static_cast<vsg::vec3>(curr_pos);
 }
 
 void Gizmo::update_visibility()
@@ -351,11 +351,11 @@ void Gizmo::update_visibility()
     const auto fov_rad = vsg::radians(static_cast<float>(
         context.perspective->fieldOfViewY));
 
-    const float distance_to_camera = vsg::length(curr_pos - camera_pos);
+    const float distance_to_camera = vsg::length(static_cast<vsg::vec3>(curr_pos) - camera_pos);
     const float tan_half_fov = std::tan(fov_rad * 0.5f);
     scale = distance_to_camera * tan_half_fov * 0.075f;
 
-    matrix_transform->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
+    matrix_transform->matrix = vsg::translate(static_cast<vsg::vec3>(curr_pos)) * vsg::scale(scale);
 }
 
 void Gizmo::update_position()
@@ -366,19 +366,19 @@ void Gizmo::update_position()
     {
         for (const auto& object : context.selected_objects)
         {
-            const vsg::box bounds = static_cast<vsg::box>(object->get_bounds());
-            curr_pos += (bounds.min + bounds.max) / 2.0f;
+            const vsg::dbox& bounds = object->get_bounds();
+            curr_pos += (bounds.min + bounds.max) * 0.5;
         }
     }
     else
     {
         for (const auto& object : context.selected_objects)
         {
-            curr_pos += static_cast<vsg::vec3>(object->get_translation());
+            curr_pos += object->get_translation();
         }
     }
 
     curr_pos /= static_cast<float>(context.selected_objects.size());
 
-    matrix_transform->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
+    matrix_transform->matrix = vsg::translate(static_cast<vsg::vec3>(curr_pos)) * vsg::scale(scale);
 }

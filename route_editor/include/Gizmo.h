@@ -50,7 +50,7 @@ private:
     vsg::ref_ptr<SingleSwitch> line_y_switch;
     vsg::ref_ptr<SingleSwitch> line_z_switch;
 
-    vsg::vec3 curr_pos;
+    vsg::dvec3 curr_pos;
     vsg::vec3 click_pos;
     vsg::vec3 prev_intersect_pos;
     vsg::vec3 total_translation;
