@@ -23,7 +23,9 @@ void RotateObjects::execute()
 {
     for (const auto& object : objects)
     {
-        object->rotate_around_pivot(pivot, axis, radians, object->matrix);
+        object->rotate_around_pivot(static_cast<vsg::dvec3>(pivot),
+            static_cast<vsg::dvec3>(axis), static_cast<double>(radians),
+            object->matrix);
     }
 }
 

@@ -53,8 +53,8 @@ public:
 
     void move(const vsg::dvec3& translation);
 
-    void rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis, float radians,
-        const vsg::dmat4& matrix);
+    void rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3& axis,
+        double radians, const vsg::dmat4& matrix);
 
     void scale_relative_to_pivot(vsg::vec3 pivot, vsg::vec3 scale,
         const vsg::dmat4& matrix);

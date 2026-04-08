@@ -142,12 +142,11 @@ void RouteObject::move(const vsg::dvec3& translation)
     update_bounds();
 }
 
-void RouteObject::rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis,
-    float radians, const vsg::dmat4& matrix)
+void RouteObject::rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3& axis,
+    double radians, const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(pivot) *
-        vsg::rotate(vsg::quat(radians, axis)) * vsg::translate(-pivot) *
-        static_cast<vsg::mat4>(matrix);
+    this->matrix = vsg::translate(pivot) * vsg::rotate(vsg::dquat(radians, axis)) *
+        vsg::translate(-pivot) * matrix;
 
     vsg::dquat temp_quat;
 

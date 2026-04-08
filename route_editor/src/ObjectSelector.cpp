@@ -317,7 +317,8 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
                 const float rotation_rad = prev_acos - curr_acos;
                 total_rotation_rad += rotation_rad;
 
-                object->rotate_around_pivot(gizmo_pos, front, rotation_rad,
+                object->rotate_around_pivot(static_cast<vsg::dvec3>(gizmo_pos),
+                static_cast<vsg::dvec3>(front), static_cast<double>(rotation_rad),
                     object->matrix);
             }
 
