@@ -83,9 +83,9 @@ const vsg::dvec3& RouteObject::get_rotation_deg() const
     return rotation_deg;
 }
 
-vsg::vec3 RouteObject::get_scale() const
+const vsg::dvec3& RouteObject::get_scale() const
 {
-    return static_cast<vsg::vec3>(scale);
+    return scale;
 }
 
 const vsg::dmat4& RouteObject::get_initial_matrix() const

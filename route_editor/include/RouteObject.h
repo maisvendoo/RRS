@@ -39,7 +39,7 @@ public:
 
     const vsg::dvec3& get_translation() const;
     const vsg::dvec3& get_rotation_deg() const;
-    vsg::vec3 get_scale() const;
+    const vsg::dvec3& get_scale() const;
 
     const vsg::dmat4& get_initial_matrix() const;
     const vsg::dbox& get_bounds() const;
