@@ -46,10 +46,10 @@ static bool drag_double(const char* label, double* data)
         1.0f, nullptr, nullptr, "%.3f");
 }
 
-static bool drag_double3(const char* label, double* data)
+static bool drag_double3(const char* label, double* data, float speed = 1.0f)
 {
     return ImGui::DragScalarN(label, ImGuiDataType_Double, data, 3,
-        1.0f, nullptr, nullptr, "%.3f");
+        speed, nullptr, nullptr, "%.3f");
 }
 
 EditorGui::EditorGui(EditorContext& context)
@@ -607,8 +607,8 @@ void EditorGui::show_selected_objects_properties() const
 
         label = "rotation##" + std::to_string(i);
 
-        vsg::vec3 rotation_deg = static_cast<vsg::vec3>(object->get_rotation_deg());
-        if (ImGui::DragFloat3(label.c_str(), rotation_deg.data(), 0.2f))
+        vsg::dvec3 rotation_deg = object->get_rotation_deg();
+        if (drag_double3(label.c_str(), rotation_deg.data(), 0.2f))
         {
             object->set_rotation_deg(rotation_deg);
         }

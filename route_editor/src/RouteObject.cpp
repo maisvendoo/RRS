@@ -119,7 +119,7 @@ void RouteObject::set_translation(const vsg::dvec3& translation)
     update_bounds();
 }
 
-void RouteObject::set_rotation_deg(vsg::vec3 rotation_deg)
+void RouteObject::set_rotation_deg(const vsg::dvec3& rotation_deg)
 {
     this->rotation_deg = rotation_deg;
     update_matrix();
