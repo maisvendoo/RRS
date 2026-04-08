@@ -281,8 +281,8 @@ void Route::load_static_objects()
         for (const auto& transform : transforms)
         {
             const auto object = RouteObject::create(context,
-                ref_it->second.paged_lod, label, transform.translation,
-                -transform.rotation_deg);
+                ref_it->second.paged_lod, label, static_cast<vsg::dvec3>(transform.translation),
+                static_cast<vsg::dvec3>(-transform.rotation_deg));
 
             this->addChild(vsg::MASK_ALL, object);
 
@@ -401,7 +401,8 @@ bool Route::load_topology()
         };
 
         const auto object = RouteObject::create(context, paged_lod,
-            signal_model_name, pos, rotation_deg);
+            signal_model_name, static_cast<vsg::dvec3>(pos),
+            static_cast<vsg::dvec3>(rotation_deg));
 
         this->addChild(vsg::MASK_ALL, object);
     };

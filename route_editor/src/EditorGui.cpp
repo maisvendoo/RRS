@@ -207,10 +207,9 @@ void EditorGui::show_objects_ref() const
             if (ImGui::Button(label.c_str()))
             {
                 const auto object = RouteObject::create(context, ref.paged_lod,
-                    label, static_cast<vsg::vec3>(context.look_at->eye) +
-                    static_cast<vsg::vec3>(context.camera_handler->get_front())
-                        * 20.0f,
-                    vsg::vec3(0.0f, 0.0f, 0.0f)
+                    label, context.look_at->eye +
+                        context.camera_handler->get_front() * 20.0,
+                    vsg::dvec3(0.0, 0.0, 0.0)
                 );
 
                 context.commands.push(new AddObject(

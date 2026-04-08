@@ -32,9 +32,9 @@ public:
         EditorContext& context,
         vsg::ref_ptr<vsg::PagedLOD> paged_lod,
         const std::string& label,
-        vsg::vec3 translation,
-        vsg::vec3 rotation_deg,
-        vsg::vec3 scale = {1.0f, 1.0f, 1.0f}
+        const vsg::dvec3& translation,
+        const vsg::dvec3& rotation_deg,
+        const vsg::dvec3& scale = {1.0f, 1.0f, 1.0f}
     );
 
     const vsg::dvec3& get_translation() const;

@@ -49,14 +49,14 @@ RouteObject::RouteObject(
     EditorContext& context,
     vsg::ref_ptr<vsg::PagedLOD> paged_lod,
     const std::string& label,
-    vsg::vec3 translation,
-    vsg::vec3 rotation_deg,
-    vsg::vec3 scale
+    const vsg::dvec3& translation,
+    const vsg::dvec3& rotation_deg,
+    const vsg::dvec3& scale
 )
     : label(label)
-    , translation(static_cast<vsg::dvec3>(translation))
-    , rotation_deg(static_cast<vsg::dvec3>(rotation_deg))
-    , scale(static_cast<vsg::dvec3>(scale))
+    , translation(translation)
+    , rotation_deg(rotation_deg)
+    , scale(scale)
     , paged_lod(paged_lod)
 {
     s_context = &context;
@@ -235,8 +235,7 @@ RouteObjectsIterator RouteObject::deselect()
 vsg::ref_ptr<RouteObject> RouteObject::copy() const
 {
     return RouteObject::create(*s_context, paged_lod, label,
-        static_cast<vsg::vec3>(translation), static_cast<vsg::vec3>(rotation_deg),
-        static_cast<vsg::vec3>(scale));
+        translation, rotation_deg, scale);
 }
 
 void RouteObject::save_matrix()
