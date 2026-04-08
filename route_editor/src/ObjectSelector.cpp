@@ -346,8 +346,8 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 
             for (const auto& object : context.selected_objects)
             {
-                object->scale_relative_to_pivot(gizmo_pos, scale,
-                    object->matrix);
+                object->scale_relative_to_pivot(static_cast<vsg::dvec3>(gizmo_pos),
+                    static_cast<vsg::dvec3>(scale), object->matrix);
             }
 
             return;

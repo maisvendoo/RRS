@@ -56,7 +56,7 @@ public:
     void rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3& axis,
         double radians, const vsg::dmat4& matrix);
 
-    void scale_relative_to_pivot(vsg::vec3 pivot, vsg::vec3 scale,
+    void scale_relative_to_pivot(const vsg::dvec3& pivot, const vsg::dvec3& scale,
         const vsg::dmat4& matrix);
 
     void hide();

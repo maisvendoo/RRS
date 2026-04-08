@@ -22,7 +22,8 @@ void ScaleObjects::execute()
 {
     for (const auto& object : objects)
     {
-        object->scale_relative_to_pivot(pivot, scale, object->matrix);
+        object->scale_relative_to_pivot(static_cast<vsg::dvec3>(pivot),
+            static_cast<vsg::dvec3>(scale), object->matrix);
     }
 }
 
