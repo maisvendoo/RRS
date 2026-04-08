@@ -10,13 +10,13 @@ struct EditorContext;
 class TranslateObjects : public TransformObjects
 {
 public:
-    TranslateObjects(EditorContext& context, vsg::vec3 translation);
+    TranslateObjects(EditorContext& context, const vsg::dvec3& translation);
     virtual ~TranslateObjects() override = default;
     virtual void execute() override;
     virtual void update_description() override;
 
 private:
-    vsg::vec3 translation;
+    vsg::dvec3 translation;
 };
 
 #endif // MOVE_OBJECTS_H

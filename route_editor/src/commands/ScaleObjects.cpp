@@ -10,7 +10,7 @@
 #include <cstdio>
 
 ScaleObjects::ScaleObjects(EditorContext& context,
-    vsg::vec3 pivot, vsg::vec3 scale)
+    const vsg::dvec3& pivot, const vsg::dvec3& scale)
     : TransformObjects(context)
     , pivot(pivot)
     , scale(scale)
@@ -22,8 +22,7 @@ void ScaleObjects::execute()
 {
     for (const auto& object : objects)
     {
-        object->scale_relative_to_pivot(static_cast<vsg::dvec3>(pivot),
-            static_cast<vsg::dvec3>(scale), object->matrix);
+        object->scale_relative_to_pivot(pivot, scale, object->matrix);
     }
 }
 

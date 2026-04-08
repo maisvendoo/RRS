@@ -123,9 +123,9 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
 
     intersector->intersections.clear();
 
-    total_translation = {0.0f, 0.0f, 0.0f};
-    total_rotation_rad = 0.0f;
-    total_scale = {1.0f, 1.0f, 1.0f};
+    total_translation = {0.0, 0.0, 0.0};
+    total_rotation_rad = 0.0;
+    total_scale = {1.0, 1.0, 1.0};
 
     context.compile_infos.emplace_back(CompileInfo{
         front_plane_switch, front_plane});
@@ -416,7 +416,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         case State::KEYBOARD_GRAB:
         {
             context.commands.push(new TranslateObjects(
-                context, static_cast<vsg::vec3>(total_translation)), false);
+                context, total_translation), false);
 
             break;
         }
@@ -424,8 +424,8 @@ void ObjectSelector::confirm_keyboard_transformation()
         {
             context.commands.push(
                 new RotateObjects(
-                    context, static_cast<vsg::vec3>(context.gizmo->get_curr_pos()),
-                    static_cast<vsg::vec3>(context.camera_handler->get_front()),
+                    context, context.gizmo->get_curr_pos(),
+                    context.camera_handler->get_front(),
                     total_rotation_rad
                 ),
                 false
@@ -436,8 +436,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         case State::KEYBOARD_SCALE:
         {
             context.commands.push(new ScaleObjects(context,
-                static_cast<vsg::vec3>(context.gizmo->get_curr_pos()),
-                static_cast<vsg::vec3>(total_scale)), false);
+                context.gizmo->get_curr_pos(), total_scale), false);
 
             break;
         }

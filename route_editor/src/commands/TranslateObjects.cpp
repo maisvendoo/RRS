@@ -11,7 +11,7 @@
 
 TranslateObjects::TranslateObjects(
     EditorContext& context,
-    vsg::vec3 translation
+    const vsg::dvec3& translation
 )
     : TransformObjects(context)
     , translation(translation)
@@ -23,7 +23,7 @@ void TranslateObjects::execute()
 {
     for (const auto& object : objects)
     {
-        object->move(static_cast<vsg::dvec3>(translation));
+        object->move(translation);
     }
 }
 

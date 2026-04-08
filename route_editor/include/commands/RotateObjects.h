@@ -10,17 +10,17 @@ struct EditorContext;
 class RotateObjects : public TransformObjects
 {
 public:
-    RotateObjects(EditorContext& context,vsg::vec3 pivot,
-        vsg::vec3 axis, float radians);
+    RotateObjects(EditorContext& context,const vsg::dvec3& pivot,
+        const vsg::dvec3& axis, double radians);
 
     virtual ~RotateObjects() override = default;
     virtual void execute() override;
     virtual void update_description() override;
 
 private:
-    vsg::vec3 pivot;
-    vsg::vec3 axis;
-    float radians;
+    vsg::dvec3 pivot;
+    vsg::dvec3 axis;
+    double radians;
 };
 
 #endif // ROTATE_OBJECTS_H

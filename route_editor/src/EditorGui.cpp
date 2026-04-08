@@ -600,7 +600,8 @@ void EditorGui::show_selected_objects_properties() const
 
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
-            context.commands.push(new TranslateObjects(context, total_translation), false);
+            context.commands.push(new TranslateObjects(context,
+                static_cast<vsg::dvec3>(total_translation)), false);
             dragging = false;
         }
 
