@@ -346,21 +346,19 @@ void Gizmo::update_visibility()
         ? vsg::MASK_OFF
         : MASK_GUI1 | MASK_CLICKABLE;
 
-    const auto camera_pos = static_cast<vsg::vec3>(context.look_at->eye);
+    const vsg::dvec3& camera_pos = context.look_at->eye;
+    const double fov_rad = vsg::radians(context.perspective->fieldOfViewY);
 
-    const auto fov_rad = vsg::radians(static_cast<float>(
-        context.perspective->fieldOfViewY));
-
-    const float distance_to_camera = vsg::length(static_cast<vsg::vec3>(curr_pos) - camera_pos);
-    const float tan_half_fov = std::tan(fov_rad * 0.5f);
-    scale = distance_to_camera * tan_half_fov * 0.075f;
+    const double distance_to_camera = vsg::length(curr_pos - camera_pos);
+    const double tan_half_fov = std::tan(fov_rad * 0.5);
+    scale = distance_to_camera * tan_half_fov * 0.075;
 
     matrix_transform->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
 }
 
 void Gizmo::update_position()
 {
-    curr_pos = {0.0f, 0.0f, 0.0f};
+    curr_pos = {0.0, 0.0, 0.0};
 
     if (context.settings.gizmo_to_center)
     {
@@ -378,7 +376,7 @@ void Gizmo::update_position()
         }
     }
 
-    curr_pos /= static_cast<float>(context.selected_objects.size());
+    curr_pos /= context.selected_objects.size();
 
     matrix_transform->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
 }
