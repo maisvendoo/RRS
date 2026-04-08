@@ -51,7 +51,7 @@ public:
     void set_rotation_deg(const vsg::dvec3& rotation_deg);
     void set_scale(const vsg::dvec3& scale);
 
-    void move(vsg::vec3 translation);
+    void move(const vsg::dvec3& translation);
 
     void rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis, float radians,
         const vsg::dmat4& matrix);

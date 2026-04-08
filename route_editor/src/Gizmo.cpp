@@ -328,7 +328,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
         for (const auto& object : context.selected_objects)
         {
-            object->move(translation);
+            object->move(static_cast<vsg::dvec3>(translation));
         }
 
         return;

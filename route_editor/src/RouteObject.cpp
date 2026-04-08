@@ -131,9 +131,9 @@ void RouteObject::set_scale(const vsg::dvec3& scale)
     update_matrix();
 }
 
-void RouteObject::move(vsg::vec3 translation)
+void RouteObject::move(const vsg::dvec3& translation)
 {
-    this->translation += static_cast<vsg::dvec3>(translation);
+    this->translation += translation;
 
     this->matrix[3][0] += translation.x;
     this->matrix[3][1] += translation.y;
