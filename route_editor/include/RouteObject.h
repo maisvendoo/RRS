@@ -42,7 +42,7 @@ public:
     vsg::vec3 get_scale() const;
 
     const vsg::dmat4& get_initial_matrix() const;
-    const vsg::box& get_bounds() const;
+    const vsg::dbox& get_bounds() const;
 
     bool get_is_selected() const;
     bool get_is_hidden() const;
@@ -85,7 +85,7 @@ private:
     vsg::dvec3 scale;
 
     vsg::dmat4 initial_matrix;
-    vsg::box bounds;
+    vsg::dbox bounds;
 
     bool is_selected = false;
     bool is_hidden = false;

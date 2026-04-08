@@ -366,7 +366,7 @@ void Gizmo::update_position()
     {
         for (const auto& object : context.selected_objects)
         {
-            const auto& bounds = object->get_bounds();
+            const vsg::box bounds = static_cast<vsg::box>(object->get_bounds());
             curr_pos += (bounds.min + bounds.max) / 2.0f;
         }
     }

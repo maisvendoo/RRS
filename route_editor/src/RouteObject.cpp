@@ -93,7 +93,7 @@ const vsg::dmat4& RouteObject::get_initial_matrix() const
     return initial_matrix;
 }
 
-const vsg::box& RouteObject::get_bounds() const
+const vsg::dbox& RouteObject::get_bounds() const
 {
     return bounds;
 }
@@ -271,7 +271,7 @@ void RouteObject::update_bounds()
     vsg::ComputeBounds compute_bounds;
     compute_bounds.useNodeBounds = false;
     this->accept(compute_bounds);
-    this->bounds = static_cast<vsg::box>(compute_bounds.bounds);
+    this->bounds = compute_bounds.bounds;
 
     s_context->gizmo->update_position();
 }
