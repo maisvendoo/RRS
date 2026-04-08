@@ -73,9 +73,9 @@ RouteObject::RouteObject(
     update_matrix();
 }
 
-vsg::vec3 RouteObject::get_translation() const
+const vsg::dvec3& RouteObject::get_translation() const
 {
-    return static_cast<vsg::vec3>(translation);
+    return translation;
 }
 
 vsg::vec3 RouteObject::get_rotation_deg() const

@@ -37,7 +37,7 @@ public:
         vsg::vec3 scale = {1.0f, 1.0f, 1.0f}
     );
 
-    vsg::vec3 get_translation() const;
+    const vsg::dvec3& get_translation() const;
     vsg::vec3 get_rotation_deg() const;
     vsg::vec3 get_scale() const;
 

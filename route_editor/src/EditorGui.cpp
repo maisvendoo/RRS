@@ -589,7 +589,7 @@ void EditorGui::show_selected_objects_properties() const
         // vsg::dvec3 translation = static_cast<vsg::dvec3>(object->get_translation());
 
 
-        vsg::vec3 translation = object->get_translation();
+        vsg::vec3 translation = static_cast<vsg::vec3>(object->get_translation());
         if (ImGui::DragFloat3(label.c_str(), translation.data()))
         {
             if (!dragging)

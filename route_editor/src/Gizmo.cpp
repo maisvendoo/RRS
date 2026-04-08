@@ -374,7 +374,7 @@ void Gizmo::update_position()
     {
         for (const auto& object : context.selected_objects)
         {
-            curr_pos += object->get_translation();
+            curr_pos += static_cast<vsg::vec3>(object->get_translation());
         }
     }
 
