@@ -51,7 +51,7 @@ private:
     vsg::ref_ptr<SingleSwitch> line_z_switch;
 
     vsg::dvec3 curr_pos;
-    vsg::vec3 click_pos;
+    vsg::dvec3 click_pos;
     vsg::vec3 prev_intersect_pos;
     vsg::vec3 total_translation;
     float scale;

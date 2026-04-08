@@ -182,8 +182,7 @@ bool Gizmo::handle_intersections()
         return false;
     }
 
-    const auto world_intersection = static_cast<vsg::vec3>(
-        intersection->worldIntersection);
+    const vsg::dvec3& world_intersection = intersection->worldIntersection;
 
     const auto camera_front = static_cast<vsg::vec3>(
         context.camera_handler->get_front());
@@ -196,7 +195,7 @@ bool Gizmo::handle_intersections()
     {
         if (node == arrow_x)
         {
-            click_pos = {world_intersection.x, static_cast<float>(curr_pos.y), static_cast<float>(curr_pos.z)};
+            click_pos = {world_intersection.x, curr_pos.y, curr_pos.z};
 
             active_arrow = arrow_x;
 
@@ -208,7 +207,7 @@ bool Gizmo::handle_intersections()
         }
         else if (node == arrow_y)
         {
-            click_pos = {static_cast<float>(curr_pos.x), world_intersection.y, static_cast<float>(curr_pos.z)};
+            click_pos = {curr_pos.x, world_intersection.y, curr_pos.z};
 
             active_arrow = arrow_y;
 
@@ -220,7 +219,7 @@ bool Gizmo::handle_intersections()
         }
         else if (node == arrow_z)
         {
-            click_pos = {static_cast<float>(curr_pos.x), static_cast<float>(curr_pos.y), world_intersection.z};
+            click_pos = {curr_pos.x, curr_pos.y, world_intersection.z};
 
             active_arrow = arrow_z;
 
@@ -235,7 +234,7 @@ bool Gizmo::handle_intersections()
             continue;
         }
 
-        prev_intersect_pos = click_pos;
+        prev_intersect_pos = static_cast<vsg::vec3>(click_pos);
         total_translation = {0.0f, 0.0f, 0.0f};
 
         active_plain_switch->mask = MASK_CLICKABLE;
