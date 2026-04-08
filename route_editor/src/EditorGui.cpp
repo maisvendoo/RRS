@@ -386,15 +386,9 @@ void EditorGui::show_key_bindings() const
             std::string label;
 
             static const std::map<EditorKeyModifier, const char*> test_map = {
-                {EDITOR_KEY_MODIFIER_SHIFT_L, "LShift"},
-                {EDITOR_KEY_MODIFIER_SHIFT_R, "RShift"},
-                {EDITOR_KEY_MODIFIER_SHIFT_ANY, "Shift"},
-                {EDITOR_KEY_MODIFIER_CTRL_L, "LCtrl"},
-                {EDITOR_KEY_MODIFIER_CTRL_R, "RCtrl"},
-                {EDITOR_KEY_MODIFIER_CTRL_ANY, "Ctrl"},
-                {EDITOR_KEY_MODIFIER_ALT_L, "LAlt"},
-                {EDITOR_KEY_MODIFIER_ALT_R, "RAlt"},
-                {EDITOR_KEY_MODIFIER_ALT_ANY, "Alt"}
+                {EDITOR_KEY_MODIFIER_SHIFT, "Shift"},
+                {EDITOR_KEY_MODIFIER_CTRL, "Ctrl"},
+                {EDITOR_KEY_MODIFIER_ALT, "Alt"}
             };
 
             for (const auto& [modifier, name] : test_map)

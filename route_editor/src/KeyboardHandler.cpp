@@ -113,36 +113,10 @@ bool KeyboardHandler::get_binding_state(Action action) const
         return false;
     }
 
-    if (key_binding.modifiers == 0)
-    {
-        return true;
-    }
+    uint16_t modifiers = 0;
+    modifiers |= (EDITOR_KEY_MODIFIER_SHIFT * get_any_shift_state());
+    modifiers |= (EDITOR_KEY_MODIFIER_CTRL * get_any_ctrl_state());
+    modifiers |= (EDITOR_KEY_MODIFIER_ALT * get_any_alt_state());
 
-    // Walk through every binding's modifier and check it's keys
-    // For example:
-    // If binding's modifier = LShift + RShift, action will be performed
-    // only when we hold both Shifts;
-    // If binding's modifier = Shift(any), action will be performed
-    // when we hold any of Shifts
-    for (const auto& [modifier, keys] : modifier_keys_map)
-    {
-        if (key_binding.modifiers & modifier)
-        {
-            bool pressed = false;
-            for (const vsg::KeySymbol key : keys)
-            {
-                if (get_key_state(key))
-                {
-                    pressed = true;
-                    break;
-                }
-            }
-            if (!pressed)
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
+    return modifiers == key_binding.modifiers;
 }

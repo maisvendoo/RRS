@@ -160,18 +160,9 @@ void settings_t::read(const std::string& cfg_path)
 
     const std::map<std::string, EditorKeyModifier>
     key_modifier_setting_name_map = {
-        {"lshift", EDITOR_KEY_MODIFIER_SHIFT_L},
-        {"rshift", EDITOR_KEY_MODIFIER_SHIFT_R},
-        {"shift", EDITOR_KEY_MODIFIER_SHIFT_ANY},
-        {"anyshift", EDITOR_KEY_MODIFIER_SHIFT_ANY},
-        {"lctrl", EDITOR_KEY_MODIFIER_CTRL_L},
-        {"rctrl", EDITOR_KEY_MODIFIER_CTRL_R},
-        {"ctrl", EDITOR_KEY_MODIFIER_CTRL_ANY},
-        {"anyctrl", EDITOR_KEY_MODIFIER_CTRL_ANY},
-        {"lalt", EDITOR_KEY_MODIFIER_ALT_L},
-        {"ralt", EDITOR_KEY_MODIFIER_ALT_R},
-        {"alt", EDITOR_KEY_MODIFIER_ALT_ANY},
-        {"anyalt", EDITOR_KEY_MODIFIER_ALT_ANY}
+        {"shift", EDITOR_KEY_MODIFIER_SHIFT},
+        {"ctrl", EDITOR_KEY_MODIFIER_CTRL},
+        {"alt", EDITOR_KEY_MODIFIER_ALT}
     };
 
     for (const auto& [action, setting_name] : action_setting_name_map)
