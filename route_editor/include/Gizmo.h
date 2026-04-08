@@ -54,7 +54,7 @@ private:
     vsg::dvec3 click_pos;
     vsg::dvec3 prev_intersect_pos;
     vsg::dvec3 total_translation;
-    float scale;
+    double scale;
 
     vsg::ref_ptr<vsg::Node> active_arrow;
     vsg::ref_ptr<SingleSwitch> active_plain_switch;

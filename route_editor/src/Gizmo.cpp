@@ -354,7 +354,7 @@ void Gizmo::update_visibility()
     const float tan_half_fov = std::tan(fov_rad * 0.5f);
     scale = distance_to_camera * tan_half_fov * 0.075f;
 
-    matrix_transform->matrix = vsg::translate(static_cast<vsg::vec3>(curr_pos)) * vsg::scale(scale);
+    matrix_transform->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
 }
 
 void Gizmo::update_position()
@@ -379,5 +379,5 @@ void Gizmo::update_position()
 
     curr_pos /= static_cast<float>(context.selected_objects.size());
 
-    matrix_transform->matrix = vsg::translate(static_cast<vsg::vec3>(curr_pos)) * vsg::scale(scale);
+    matrix_transform->matrix = vsg::translate(curr_pos) * vsg::scale(scale);
 }
