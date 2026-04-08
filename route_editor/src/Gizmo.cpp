@@ -234,7 +234,7 @@ bool Gizmo::handle_intersections()
             continue;
         }
 
-        prev_intersect_pos = static_cast<vsg::vec3>(click_pos);
+        prev_intersect_pos = click_pos;
         total_translation = {0.0f, 0.0f, 0.0f};
 
         active_plain_switch->mask = MASK_CLICKABLE;
@@ -261,7 +261,7 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
     }
 
     context.commands.push(new TranslateObjects(
-        context, total_translation), false);
+        context, static_cast<vsg::vec3>(total_translation)), false);
 
     active_arrow = nullptr;
 
@@ -323,7 +323,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
             continue;
         }
 
-        total_translation += translation;
+        total_translation += static_cast<vsg::dvec3>(translation);
 
         for (const auto& object : context.selected_objects)
         {

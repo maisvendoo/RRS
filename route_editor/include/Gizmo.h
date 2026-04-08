@@ -52,8 +52,8 @@ private:
 
     vsg::dvec3 curr_pos;
     vsg::dvec3 click_pos;
-    vsg::vec3 prev_intersect_pos;
-    vsg::vec3 total_translation;
+    vsg::dvec3 prev_intersect_pos;
+    vsg::dvec3 total_translation;
     float scale;
 
     vsg::ref_ptr<vsg::Node> active_arrow;
