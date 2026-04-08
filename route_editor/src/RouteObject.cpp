@@ -23,9 +23,9 @@
 
 EditorContext* RouteObject::s_context = nullptr;
 
-static constexpr vsg::vec3 AXIS_X_POSITIVE = {1.0f, 0.0f, 0.0f};
-static constexpr vsg::vec3 AXIS_Y_POSITIVE = {0.0f, 1.0f, 0.0f};
-static constexpr vsg::vec3 AXIS_Z_POSITIVE = {0.0f, 0.0f, 1.0f};
+static constexpr vsg::dvec3 AXIS_X_POSITIVE = {1.0, 0.0, 0.0};
+static constexpr vsg::dvec3 AXIS_Y_POSITIVE = {0.0, 1.0, 0.0};
+static constexpr vsg::dvec3 AXIS_Z_POSITIVE = {0.0, 0.0, 1.0};
 
 static vsg::dvec3 to_euler_deg(const vsg::dquat& quat)
 {
@@ -38,7 +38,7 @@ static vsg::dvec3 to_euler_deg(const vsg::dquat& quat)
     };
 }
 
-static vsg::mat4 to_rotate_matrix(vsg::vec3 rotation_deg)
+static vsg::dmat4 to_rotate_matrix(const vsg::dvec3& rotation_deg)
 {
     return vsg::rotate(vsg::radians(rotation_deg.z), AXIS_Z_POSITIVE) *
            vsg::rotate(vsg::radians(rotation_deg.y), AXIS_Y_POSITIVE) *
@@ -133,13 +133,7 @@ void RouteObject::set_scale(const vsg::dvec3& scale)
 
 void RouteObject::move(const vsg::dvec3& translation)
 {
-    this->translation += translation;
-
-    this->matrix[3][0] += translation.x;
-    this->matrix[3][1] += translation.y;
-    this->matrix[3][2] += translation.z;
-
-    update_bounds();
+    set_translation(this->translation + translation);
 }
 
 void RouteObject::rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3& axis,
@@ -257,9 +251,8 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
 
 void RouteObject::update_matrix()
 {
-    this->matrix = vsg::translate(static_cast<vsg::vec3>(this->translation)) *
-        to_rotate_matrix(static_cast<vsg::vec3>(this->rotation_deg)) *
-        vsg::scale(static_cast<vsg::vec3>(this->scale));
+    matrix = vsg::translate(translation) * to_rotate_matrix(rotation_deg) *
+        vsg::scale(scale);
 
     update_bounds();
 }
