@@ -11,9 +11,10 @@
 
 TranslateObjects::TranslateObjects(
     EditorContext& context,
+    const RouteObjects& objects,
     const vsg::dvec3& translation
 )
-    : TransformObjects(context, context.selected_objects)
+    : TransformObjects(context, objects)
     , translation_(translation)
 {
     update_description();

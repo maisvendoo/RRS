@@ -10,7 +10,9 @@ struct EditorContext;
 class TranslateObjects : public TransformObjects
 {
 public:
-    TranslateObjects(EditorContext& context, const vsg::dvec3& translation);
+    TranslateObjects(EditorContext& context, const RouteObjects& objects,
+        const vsg::dvec3& translation);
+
     virtual ~TranslateObjects() override = default;
     virtual void execute() override;
     virtual void update_description() override;

@@ -594,7 +594,8 @@ void EditorGui::show_selected_objects_properties() const
 
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
-            context_.commands.push(new TranslateObjects(context_, total_translation), false);
+            context_.commands.push(new TranslateObjects(context_, {object},
+                total_translation), false);
             dragging = false;
         }
 

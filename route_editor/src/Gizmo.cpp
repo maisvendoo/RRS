@@ -263,7 +263,7 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
     }
 
     context_.commands.push(new TranslateObjects(
-        context_, total_translation_), false);
+        context_, context_.selected_objects, total_translation_), false);
 
     active_arrow_ = nullptr;
 

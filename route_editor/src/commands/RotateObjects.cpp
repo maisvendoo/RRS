@@ -9,9 +9,14 @@
 
 #include <cstdio>
 
-RotateObjects::RotateObjects(EditorContext& context,
-    const vsg::dvec3& pivot, const vsg::dvec3& axis, double radians)
-    : TransformObjects(context, context.selected_objects)
+RotateObjects::RotateObjects(
+    EditorContext& context,
+    const RouteObjects& objects,
+    const vsg::dvec3& pivot,
+    const vsg::dvec3& axis,
+    double radians
+)
+    : TransformObjects(context, objects)
     , pivot_(pivot)
     , axis_(axis)
     , radians_(radians)

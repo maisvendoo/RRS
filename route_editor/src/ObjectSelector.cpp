@@ -415,7 +415,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         case State::KEYBOARD_GRAB:
         {
             context_.commands.push(new TranslateObjects(
-                context_, total_translation_), false);
+                context_, context_.selected_objects, total_translation_), false);
 
             break;
         }
@@ -423,7 +423,8 @@ void ObjectSelector::confirm_keyboard_transformation()
         {
             context_.commands.push(
                 new RotateObjects(
-                    context_, context_.gizmo->get_curr_pos(),
+                    context_, context_.selected_objects,
+                    context_.gizmo->get_curr_pos(),
                     context_.camera_handler->get_front(),
                     total_rotation_rad_
                 ),
