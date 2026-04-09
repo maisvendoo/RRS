@@ -44,10 +44,11 @@
 #include <cctype>
 #include <string>
 
-static bool drag_double(const char* label, double* data)
+static bool drag_double(const char* label, double* data,
+    const double* min = nullptr)
 {
     return ImGui::DragScalar(label, ImGuiDataType_Double, data,
-        1.0f, nullptr, nullptr, "%.3f");
+        1.0f, min, nullptr, "%.3f");
 }
 
 static bool drag_double3(const char* label, double* data, float speed = 1.0f,
@@ -231,7 +232,8 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             {
                 if (curr == active)
                 {
-                    ImGui::TextColored(ImVec4{0.2f, 1.0f, 0.3f, 1.0f}, "%s", curr->command->get_description());
+                    ImGui::TextColored(ImVec4{0.2f, 1.0f, 0.3f, 1.0f}, "%s",
+                        curr->command->get_description());
                     ImGui::Separator();
                 }
                 else
@@ -393,7 +395,8 @@ void EditorGui::show_stations_conf() const
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                context_.look_at->eye = translation + vsg::dvec3(0.0, 0.0, 50.0);
+                context_.look_at->eye = translation +
+                    vsg::dvec3(0.0, 0.0, 50.0);
 
                 context_.look_at->center = context_.look_at->eye
                     + context_.camera_handler->get_front();
@@ -519,14 +522,16 @@ void EditorGui::show_camera_settings() const
 {
     ImGui::Begin("Camera Settings", nullptr, window_flags_);
 
+    constexpr double min = 0.0;
+
     ImGui::Text("Move speed:");
-    drag_double("##move_speed", &context_.settings.camera_move_speed);
+    drag_double("##move_speed", &context_.settings.camera_move_speed, &min);
 
     ImGui::Text("Rotate speed:");
-    drag_double("##rotate_speed", &context_.settings.camera_rotate_speed);
+    drag_double("##rotate_speed", &context_.settings.camera_rotate_speed, &min);
 
     ImGui::Text("Zoom power:");
-    drag_double("##zoom_power", &context_.settings.camera_zoom_power);
+    drag_double("##zoom_power", &context_.settings.camera_zoom_power, &min);
 
     ImGui::Text("FovY:");
 
@@ -612,8 +617,8 @@ void EditorGui::show_topology() const
                 ImGui::Text("SignalModel%s: %s", type,
                     signal->getSignalModel().toStdString().c_str());
 
-                const dvec3 rel_pos = signal->getRelPos();
-                const dvec3 rel_rot = signal->getRelRot();
+                const dvec3& rel_pos = signal->getRelPos();
+                const dvec3& rel_rot = signal->getRelRot();
 
                 ImGui::Text("RelPos%s: %8.3f %8.3f %8.3f", type,
                     rel_pos.x, rel_pos.y, rel_pos.z);
