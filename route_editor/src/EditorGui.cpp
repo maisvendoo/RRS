@@ -27,6 +27,7 @@
 #include "trajectory.h"
 #include "vec3.h"
 
+#include <filesystem>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
@@ -139,6 +140,88 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             }
 
             show_selected_objects_properties();
+
+            // enum class ImportState
+            // {
+            //     INITIAL,
+            //     SELECT_OBJECT,
+            //     TEST,
+            //     COPY_OBJECT,
+            //     LABELING
+            // };
+
+            // static ImportState import_state = ImportState::INITIAL;
+            // static std::string file_path;
+            // static std::string dir;
+
+            // if (import_state == ImportState::INITIAL)
+            // {
+            //     ImGui::Begin("Import object");
+            //     if (ImGui::Button("Import object"))
+            //     {
+            //         IGFD::FileDialogConfig config;
+            //         config.path = context_.route_dir;
+            //         ImGuiFileDialog::Instance()->OpenDialog("select_object",
+            //             "Select object", ".gltf", config);
+            //         import_state = ImportState::SELECT_OBJECT;
+            //     }
+            //     ImGui::End();
+            // }
+            // else if (import_state == ImportState::SELECT_OBJECT)
+            // {
+            //     if (ImGuiFileDialog::Instance()->Display("select_object"))
+            //     {
+            //         if (ImGuiFileDialog::Instance()->IsOk())
+            //         {
+            //             file_path = ImGuiFileDialog::Instance()->GetFilePathName();
+            //             import_state = ImportState::TEST;
+            //         }
+
+            //         ImGuiFileDialog::Instance()->Close();
+            //     }
+            // }
+            // else if (import_state == ImportState::TEST)
+            // {
+            //     IGFD::FileDialogConfig config;
+            //     config.path = context_.route_dir;
+            //     ImGuiFileDialog::Instance()->OpenDialog("select_dir",
+            //         "Select directory", nullptr, config);
+            //     import_state = ImportState::COPY_OBJECT;
+            // }
+            // else if (import_state == ImportState::COPY_OBJECT)
+            // {
+            //     if (ImGuiFileDialog::Instance()->Display("select_dir"))
+            //     {
+            //         if (ImGuiFileDialog::Instance()->IsOk())
+            //         {
+            //             dir = ImGuiFileDialog::Instance()->GetCurrentPath();
+            //             try
+            //             {
+            //                 std::filesystem::copy(file_path, dir);
+            //             }
+            //             catch (const std::filesystem::filesystem_error &e)
+            //             {
+            //                 fprintf(stderr, "%s\n", e.what());
+            //             }
+            //             import_state = ImportState::LABELING;
+            //         }
+
+            //         ImGuiFileDialog::Instance()->Close();
+            //     }
+            // }
+            // else if (import_state == ImportState::LABELING)
+            // {
+            //     ImGui::Begin("Import object");
+            //     static char buf[128];
+            //     ImGui::InputText("label", buf, 128);
+            //     ImGui::Text("%s", file_path.c_str());
+            //         ImGui::Text("%s", dir.c_str());
+            //     if (ImGui::Button("OK##import"))
+            //     {
+            //         import_state = ImportState::INITIAL;
+            //     }
+            //     ImGui::End();
+            // }
 
             ImGui::Begin("Commands");
             auto active = context_.commands.get_active();
@@ -661,7 +744,8 @@ void EditorGui::show_selected_objects_properties() const
                     save_matrixes();
                     dragging = true;
                 }
-                total_scale *= {scale.x / prev_scale.x, scale.y / prev_scale.y, scale.z / prev_scale.z};
+                total_scale *= {scale.x / prev_scale.x, scale.y / prev_scale.y,
+                    scale.z / prev_scale.z};
                 object->set_scale(scale);
             }
         }
