@@ -28,7 +28,7 @@
 #include "vec3.h"
 
 #include <algorithm>
-#include <filesystem>
+// #include <filesystem>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
@@ -585,7 +585,7 @@ void EditorGui::show_topology() const
                 for (auto i = decltype(tracks_size){0}; i < tracks_size; ++i)
                 {
                     const track_t& track = tracks[i];
-                    ImGui::Text("[%2zu]:%12.3f%12.3f%12.3f%12.3f%12.3f", i,
+                    ImGui::Text("[%4zu]:%12.3f%12.3f%12.3f%12.3f%12.3f", i,
                         track.begin_point.x, track.begin_point.y,
                         track.begin_point.z, track.railway_coord0,
                         track.traj_coord);
