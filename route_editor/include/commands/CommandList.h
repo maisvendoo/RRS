@@ -31,9 +31,9 @@ private:
     void push_(Command* command, bool execute);
 
 private:
-    CommandNode* tail = nullptr;
-    CommandNode* active = nullptr;
-    std::size_t size = 0;
+    CommandNode* tail_ = nullptr;
+    CommandNode* active_ = nullptr;
+    std::size_t size_ = 0;
 };
 
 #endif // COMMAND_LIST_H

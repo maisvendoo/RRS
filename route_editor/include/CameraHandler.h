@@ -45,14 +45,14 @@ private:
     void calculate_up();
 
 private:
-    EditorContext& context;
+    EditorContext& context_;
 
-    double yaw_deg = 0.0;
-    double pitch_deg = 0.0;
+    double yaw_deg_ = 0.0;
+    double pitch_deg_ = 0.0;
 
-    vsg::dvec3 front;
-    vsg::dvec3 right;
-    vsg::dvec3 up;
+    vsg::dvec3 front_;
+    vsg::dvec3 right_;
+    vsg::dvec3 up_;
 };
 
 #endif // CAMERA_HANDLER_H

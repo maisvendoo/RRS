@@ -36,9 +36,9 @@ private:
     void show_selected_objects_properties() const;
 
 private:
-    EditorContext& context;
+    EditorContext& context_;
 
-    ImGuiWindowFlags window_flags;
+    ImGuiWindowFlags window_flags_;
 };
 
 #endif // EDITOR_GUI_H

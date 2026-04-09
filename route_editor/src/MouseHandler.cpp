@@ -16,17 +16,17 @@ void MouseHandler::apply(vsg::ButtonPressEvent& buttonPress)
     {
         case MOUSE_BUTTON_LEFT:
         {
-            is_lmb_pressed = true;
+            is_lmb_pressed_ = true;
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
-            is_mmb_pressed = true;
+            is_mmb_pressed_ = true;
             return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
-            is_rmb_pressed = true;
+            is_rmb_pressed_ = true;
             return;
         }
         default:
@@ -47,17 +47,17 @@ void MouseHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
     {
         case MOUSE_BUTTON_LEFT:
         {
-            is_lmb_pressed = false;
+            is_lmb_pressed_ = false;
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
-            is_mmb_pressed = false;
+            is_mmb_pressed_ = false;
             return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
-            is_rmb_pressed = false;
+            is_rmb_pressed_ = false;
             return;
         }
         default:
@@ -76,33 +76,33 @@ void MouseHandler::apply(vsg::MoveEvent& moveEvent)
 
     static vsg::ivec2 prev_pos = {moveEvent.x, moveEvent.y};
 
-    pos = {moveEvent.x, moveEvent.y};
-    delta_pos = pos - prev_pos;
+    pos_ = {moveEvent.x, moveEvent.y};
+    delta_pos_ = pos_ - prev_pos;
 
-    prev_pos = pos;
+    prev_pos = pos_;
 }
 
 vsg::ivec2 MouseHandler::get_pos() const
 {
-    return pos;
+    return pos_;
 }
 
 vsg::ivec2 MouseHandler::get_delta_pos() const
 {
-    return delta_pos;
+    return delta_pos_;
 }
 
 bool MouseHandler::get_is_lmb_pressed() const
 {
-    return is_lmb_pressed;
+    return is_lmb_pressed_;
 }
 
 bool MouseHandler::get_is_mmb_pressed() const
 {
-    return is_mmb_pressed;
+    return is_mmb_pressed_;
 }
 
 bool MouseHandler::get_is_rmb_pressed() const
 {
-    return is_rmb_pressed;
+    return is_rmb_pressed_;
 }

@@ -41,11 +41,11 @@ public:
         LSIntersectorRefPtr intersector);
 
 private:
-    const EditorContext& context;
+    const EditorContext& context_;
 
-    LSIntersectorRefPtr lmb_intersector;
-    LSIntersectorRefPtr mmb_intersector;
-    LSIntersectorRefPtr rmb_intersector;
+    LSIntersectorRefPtr lmb_intersector_;
+    LSIntersectorRefPtr mmb_intersector_;
+    LSIntersectorRefPtr rmb_intersector_;
 };
 
 #endif // INTERSECTION_HANDLER_H

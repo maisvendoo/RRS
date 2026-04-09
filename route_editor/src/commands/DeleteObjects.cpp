@@ -12,21 +12,21 @@
 
 DeleteObjects::DeleteObjects(EditorContext& context)
     : Command(context)
-    , objects(context.selected_objects)
+    , objects_(context.selected_objects)
 {
     update_description();
 }
 
 void DeleteObjects::execute()
 {
-    for (const auto& object : objects)
+    for (const auto& object : objects_)
     {
         object->deselect();
 
-        context.static_objects.erase(std::find(context.static_objects.begin(),
-            context.static_objects.end(), object));
+        context_.static_objects.erase(std::find(context_.static_objects.begin(),
+            context_.static_objects.end(), object));
 
-        const auto route = context.route;
+        const auto route = context_.route;
 
         for (auto it = route->children.begin(); it != route->children.end();
             ++it)
@@ -39,30 +39,30 @@ void DeleteObjects::execute()
         }
     }
 
-    context.compile_infos.emplace_back(CompileInfo{nullptr, context.route});
+    context_.compile_infos.emplace_back(CompileInfo{nullptr, context_.route});
 
-    context.gizmo->update_visibility();
+    context_.gizmo->update_visibility();
 }
 
 void DeleteObjects::undo()
 {
-    for (const auto& object : objects)
+    for (const auto& object : objects_)
     {
-        context.compile_infos.emplace_back(CompileInfo{
-            context.route, object, vsg::MASK_ALL});
+        context_.compile_infos.emplace_back(CompileInfo{
+            context_.route, object, vsg::MASK_ALL});
 
-        context.static_objects.emplace_back(object);
+        context_.static_objects.emplace_back(object);
 
         object->select();
     }
 
-    context.gizmo->update_visibility();
+    context_.gizmo->update_visibility();
 }
 
 void DeleteObjects::update_description()
 {
-    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
+    std::snprintf(description_, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Delete objects: to delete: %zu objects",
-        objects.size()
+        objects_.size()
     );
 }

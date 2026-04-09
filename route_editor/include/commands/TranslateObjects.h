@@ -16,7 +16,7 @@ public:
     virtual void update_description() override;
 
 private:
-    vsg::dvec3 translation;
+    vsg::dvec3 translation_;
 };
 
 #endif // MOVE_OBJECTS_H

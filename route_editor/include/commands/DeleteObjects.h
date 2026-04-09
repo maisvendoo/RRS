@@ -16,7 +16,7 @@ public:
     virtual void update_description() override;
 
 private:
-    const RouteObjects objects;
+    const RouteObjects objects_;
 };
 
 #endif // DELETE_OBJECTS_H

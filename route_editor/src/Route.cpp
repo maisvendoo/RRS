@@ -40,7 +40,7 @@ static vsg::dvec3 to_vsg_vec3(dvec3 vec)
 }
 
 Route::Route(EditorContext& context)
-    : context(context)
+    : context_(context)
 {
     const bool success = load_objects_ref() && load_route_map()
         && load_stations_conf() && load_waypoints_conf();
@@ -76,7 +76,7 @@ bool Route::load_objects_ref()
     const FileSystem& fs = FileSystem::getInstance();
 
     const std::string objects_ref_path = fs.combinePath(
-        context.route_dir, "objects.ref");
+        context_.route_dir, "objects.ref");
 
     // char label[LABEL_BUFFER_SIZE];
     // char relative_path[RELATIVE_PATH_BUFFER_SIZE];
@@ -108,7 +108,7 @@ bool Route::load_objects_ref()
 
         if (iss >> label >> relative_path)
         {
-            context.objects_ref.emplace(std::move(label),
+            context_.objects_ref.emplace(std::move(label),
                 ObjectRef{std::move(relative_path), nullptr});
         }
     }
@@ -120,7 +120,7 @@ bool Route::load_route_map()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string route_map_path = fs.combinePath(context.route_dir,
+    const std::string route_map_path = fs.combinePath(context_.route_dir,
         "topology", "map", "route1.map");
 
     // char label[LABEL_BUFFER_SIZE];
@@ -174,7 +174,7 @@ bool Route::load_route_map()
 
         if (iss >> label >> translation >> rotation)
         {
-            context.route_map[label].emplace_back(
+            context_.route_map[label].emplace_back(
                 RouteMapTransformation{translation, rotation});
         }
     }
@@ -186,7 +186,7 @@ bool Route::load_stations_conf()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string stations_conf_path = fs.combinePath(context.route_dir,
+    const std::string stations_conf_path = fs.combinePath(context_.route_dir,
         "topology", "stations.conf");
 
     std::ifstream stations_conf_file(stations_conf_path);
@@ -210,7 +210,7 @@ bool Route::load_stations_conf()
         vsg::dvec3 translation;
         if (iss >> label >> translation)
         {
-            context.stations_conf[label] = translation;
+            context_.stations_conf[label] = translation;
         }
     }
 
@@ -221,7 +221,7 @@ bool Route::load_waypoints_conf()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string waypoints_conf_path = fs.combinePath(context.route_dir,
+    const std::string waypoints_conf_path = fs.combinePath(context_.route_dir,
         "topology", "waypoints.conf");
 
     std::ifstream waypoints_conf_file(waypoints_conf_path);
@@ -257,7 +257,7 @@ bool Route::load_waypoints_conf()
             data.coord = stod(coord_string);
             data.length = stod(length_string);
 
-            context.waypoints_conf[label] = data;
+            context_.waypoints_conf[label] = data;
         }
     }
 
@@ -266,23 +266,23 @@ bool Route::load_waypoints_conf()
 
 void Route::load_static_objects()
 {
-    for (const auto& [label, transforms] : context.route_map)
+    for (const auto& [label, transforms] : context_.route_map)
     {
-        const auto ref_it = context.objects_ref.find(label);
-        if (ref_it == context.objects_ref.cend())
+        const auto ref_it = context_.objects_ref.find(label);
+        if (ref_it == context_.objects_ref.cend())
         {
             continue;
         }
 
         for (const auto& transform : transforms)
         {
-            const auto object = RouteObject::create(context,
+            const auto object = RouteObject::create(context_,
                 ref_it->second.paged_lod, label, transform.translation,
                 -transform.rotation_deg);
 
             this->addChild(vsg::MASK_ALL, object);
 
-            context.static_objects.emplace_back(object);
+            context_.static_objects.emplace_back(object);
         }
     }
 }
@@ -291,7 +291,7 @@ bool Route::load_topology()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string cfg_path = fs.combinePath(context.route_dir,
+    const std::string cfg_path = fs.combinePath(context_.route_dir,
         "topology", "models-config.xml");
 
     CfgReader cfg;
@@ -323,12 +323,12 @@ bool Route::load_topology()
     // TODO: Replace on Journal
     std::printf("Signals directory: %s\n", models_dir.c_str());
 
-    context.topology = new Topology;
+    context_.topology = new Topology;
 
     const auto directory_name = std::filesystem::path(
-        context.route_dir).filename();
+        context_.route_dir).filename();
 
-    if (!context.topology->load(directory_name.string().c_str()))
+    if (!context_.topology->load(directory_name.string().c_str()))
     {
         // TODO: Replace on Journal
         std::fputs("Failed to load topology\n", stderr);
@@ -337,7 +337,7 @@ bool Route::load_topology()
 
     PagedLodMap paged_lods;
 
-    const signals_data_t* const signals_data = context.topology->getSignalsData();
+    const signals_data_t* const signals_data = context_.topology->getSignalsData();
     if (!signals_data)
     {
         return false;
@@ -372,10 +372,10 @@ bool Route::load_topology()
             new_paged_lod->filename = signal_model_path;
 
             new_paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
-                context.settings.view_distance);
+                context_.settings.view_distance);
 
             new_paged_lod->children.front() = {0.1, nullptr};
-            new_paged_lod->options = context.options;
+            new_paged_lod->options = context_.options;
 
             paged_lod_it = paged_lods.emplace(signal_model_path,
                 new_paged_lod).first;
@@ -396,7 +396,7 @@ bool Route::load_topology()
             vsg::degrees(atan2(-right.y, right.x))
         };
 
-        const auto object = RouteObject::create(context, paged_lod,
+        const auto object = RouteObject::create(context_, paged_lod,
             signal_model_name, pos, rotation_deg);
 
         this->addChild(vsg::MASK_ALL, object);

@@ -21,7 +21,7 @@ public:
     virtual void apply(vsg::ConfigureWindowEvent& configureWindow) override;
 
 private:
-    EditorContext& context;
+    EditorContext& context_;
 };
 
 #endif // WINDOW_HANDLER_H

@@ -18,9 +18,9 @@ public:
     virtual void update_description() override;
 
 private:
-    vsg::dvec3 pivot;
-    vsg::dvec3 axis;
-    double radians;
+    vsg::dvec3 pivot_;
+    vsg::dvec3 axis_;
+    double radians_;
 };
 
 #endif // ROTATE_OBJECTS_H

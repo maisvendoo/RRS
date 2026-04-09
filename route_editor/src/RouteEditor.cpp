@@ -54,127 +54,127 @@ RouteEditor::~RouteEditor() = default;
 bool RouteEditor::initialize()
 {
     const FileSystem& fs = FileSystem::getInstance();
-    context.settings.read(fs.combinePath(
+    context_.settings.read(fs.combinePath(
         fs.getConfigDir(), "editor-settings.xml"));
 
-    context.options = vsg::Options::create();
-    context.options->sharedObjects = vsg::SharedObjects::create();
-    context.options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
-    context.options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
-    context.options->add(vsgXchange::all::create());
+    context_.options = vsg::Options::create();
+    context_.options->sharedObjects = vsg::SharedObjects::create();
+    context_.options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
+    context_.options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
+    context_.options->add(vsgXchange::all::create());
 
     configure_shaders();
 
-    context.window_handler = WindowHandler::create(context);
-    if (!context.window)
+    context_.window_handler = WindowHandler::create(context_);
+    if (!context_.window)
     {
         return false;
     }
 
-    context.mouse_handler = MouseHandler::create();
-    context.keyboard_handler = KeyboardHandler::create(context);
-    context.camera_handler = CameraHandler::create(context);
-    context.intersection_handler = IntersectionHandler::create(context);
-    context.scene_graph = SceneGraph::create(context);
+    context_.mouse_handler = MouseHandler::create();
+    context_.keyboard_handler = KeyboardHandler::create(context_);
+    context_.camera_handler = CameraHandler::create(context_);
+    context_.intersection_handler = IntersectionHandler::create(context_);
+    context_.scene_graph = SceneGraph::create(context_);
 
-    context.outline_builder = OutlineBuilder::create(context);
+    context_.outline_builder = OutlineBuilder::create(context_);
 
-    const auto scene_view = vsg::View::create(context.camera, context.scene_graph);
+    const auto scene_view = vsg::View::create(context_.camera, context_.scene_graph);
     scene_view->mask = MASK_SCENE;
 
     VkClearValue clear_value{};
     clear_value.depthStencil = {0.0f, 0};
     VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clear_value};
-    const VkExtent2D& extent = context.window->extent2D();
+    const VkExtent2D& extent = context_.window->extent2D();
     VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, extent}, 0, 1};
 
-    context.clear_attachments = vsg::ClearAttachments::create(
+    context_.clear_attachments = vsg::ClearAttachments::create(
         vsg::ClearAttachments::Attachments{attachment},
         vsg::ClearAttachments::Rects{rect});
 
-    const auto gui_view1 = vsg::View::create(context.camera, context.scene_graph);
+    const auto gui_view1 = vsg::View::create(context_.camera, context_.scene_graph);
     gui_view1->mask = MASK_GUI1;
 
-    const auto gui_view2 = vsg::View::create(context.camera, context.scene_graph);
+    const auto gui_view2 = vsg::View::create(context_.camera, context_.scene_graph);
     gui_view2->mask = MASK_GUI2;
 
-    const auto editor_gui = EditorGui::create(context);
+    const auto editor_gui = EditorGui::create(context_);
 
-    const auto render_gui = vsgImGui::RenderImGui::create(context.window, editor_gui);
+    const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
 
-    context.render_graph = vsg::RenderGraph::create(context.window);
-    context.render_graph->addChild(scene_view);
-    context.render_graph->addChild(context.clear_attachments);
-    context.render_graph->addChild(gui_view1);
-    context.render_graph->addChild(context.clear_attachments);
-    context.render_graph->addChild(gui_view2);
-    context.render_graph->addChild(context.clear_attachments);
-    context.render_graph->addChild(render_gui);
+    context_.render_graph = vsg::RenderGraph::create(context_.window);
+    context_.render_graph->addChild(scene_view);
+    context_.render_graph->addChild(context_.clear_attachments);
+    context_.render_graph->addChild(gui_view1);
+    context_.render_graph->addChild(context_.clear_attachments);
+    context_.render_graph->addChild(gui_view2);
+    context_.render_graph->addChild(context_.clear_attachments);
+    context_.render_graph->addChild(render_gui);
 
-    const auto command_graph = vsg::CommandGraph::create(context.window,
-        context.render_graph);
+    const auto command_graph = vsg::CommandGraph::create(context_.window,
+        context_.render_graph);
 
-    context.viewer = vsg::Viewer::create();
-    const vsg::observer_ptr<vsg::Viewer> observer_viewer(context.viewer);
+    context_.viewer = vsg::Viewer::create();
+    const vsg::observer_ptr<vsg::Viewer> observer_viewer(context_.viewer);
 
     RouteObjects selected_objects;
     RouteObjects hidden_objects;
 
-    context.object_selector = ObjectSelector::create(context);
+    context_.object_selector = ObjectSelector::create(context_);
 
-    context.viewer->addWindow(context.window);
+    context_.viewer->addWindow(context_.window);
 
-    context.viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
-    context.viewer->addEventHandler(vsg::CloseHandler::create(context.viewer));
-    context.viewer->addEventHandler(context.window_handler);
-    context.viewer->addEventHandler(context.mouse_handler);
-    context.viewer->addEventHandler(context.keyboard_handler);
-    context.viewer->addEventHandler(context.camera_handler);
-    context.viewer->addEventHandler(context.intersection_handler);
-    context.viewer->addEventHandler(context.object_selector);
+    context_.viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
+    context_.viewer->addEventHandler(vsg::CloseHandler::create(context_.viewer));
+    context_.viewer->addEventHandler(context_.window_handler);
+    context_.viewer->addEventHandler(context_.mouse_handler);
+    context_.viewer->addEventHandler(context_.keyboard_handler);
+    context_.viewer->addEventHandler(context_.camera_handler);
+    context_.viewer->addEventHandler(context_.intersection_handler);
+    context_.viewer->addEventHandler(context_.object_selector);
 
-    context.viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
+    context_.viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
 
     const uint32_t num_lights = static_cast<uint32_t>(
-        context.settings.num_lights);
+        context_.settings.num_lights);
 
     auto resource_hints = vsg::ResourceHints::create();
     resource_hints->numLightsRange = {num_lights, num_lights + 1};
 
-    context.viewer->compile(resource_hints);
+    context_.viewer->compile(resource_hints);
 
     return true;
 }
 
 void RouteEditor::run()
 {
-    while (context.viewer->advanceToNextFrame())
+    while (context_.viewer->advanceToNextFrame())
     {
-        static double prev_time = context.viewer->getFrameStamp()->simulationTime;
-        double curr_time = context.viewer->getFrameStamp()->simulationTime;
-        context.delta_time = curr_time - prev_time;
+        static double prev_time = context_.viewer->getFrameStamp()->simulationTime;
+        double curr_time = context_.viewer->getFrameStamp()->simulationTime;
+        context_.delta_time = curr_time - prev_time;
         prev_time = curr_time;
 
-        if (context.state == EditorState::LOAD_ROUTE)
+        if (context_.state == EditorState::LOAD_ROUTE)
         {
-            context.scene_graph->load_route();
-            context.state = EditorState::EDIT_ROUTE;
+            context_.scene_graph->load_route();
+            context_.state = EditorState::EDIT_ROUTE;
         }
 
-        context.viewer->handleEvents();
-        context.viewer->update();
-        context.viewer->recordAndSubmit();
-        context.viewer->present();
+        context_.viewer->handleEvents();
+        context_.viewer->update();
+        context_.viewer->recordAndSubmit();
+        context_.viewer->present();
 
         vsg::CompileResult compile_result;
 
-        for (const CompileInfo& compile_info : context.compile_infos)
+        for (const CompileInfo& compile_info : context_.compile_infos)
         {
             const auto& group_node = compile_info.group_node;
             const vsg::Mask mask = compile_info.mask;
             const auto& node = compile_info.node;
 
-            compile_result.add(context.viewer->compileManager->compile(node));
+            compile_result.add(context_.viewer->compileManager->compile(node));
 
             if (group_node)
             {
@@ -193,17 +193,17 @@ void RouteEditor::run()
             }
         }
 
-        vsg::updateViewer(*context.viewer, compile_result);
-        context.compile_infos.clear();
+        vsg::updateViewer(*context_.viewer, compile_result);
+        context_.compile_infos.clear();
 
-        RouteObjects& deferred_selection = context.deferred_selection;
+        RouteObjects& deferred_selection = context_.deferred_selection;
         for (auto it = deferred_selection.begin();
             it != deferred_selection.end();)
         {
             if ((*it)->select())
             {
                 it = deferred_selection.erase(it);
-                context.gizmo->update_visibility();
+                context_.gizmo->update_visibility();
             }
             else
             {
@@ -215,24 +215,24 @@ void RouteEditor::run()
 
 void RouteEditor::configure_shaders()
 {
-    const auto flat_shader = vsg::createFlatShadedShaderSet(context.options);
-    const auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(context.options);
-    const auto phong_shader = vsg::createPhongShaderSet(context.options);
+    const auto flat_shader = vsg::createFlatShadedShaderSet(context_.options);
+    const auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(context_.options);
+    const auto phong_shader = vsg::createPhongShaderSet(context_.options);
 
     const FileSystem& fs = FileSystem::getInstance();
     const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
     const auto vert_shader = read_shader(VK_SHADER_STAGE_VERTEX_BIT,
-        shaders_dir.c_str(), "standard.vert", context.options);
+        shaders_dir.c_str(), "standard.vert", context_.options);
 
     configure_shader_set(shaders_dir.c_str(), vert_shader,
-        "standard_flat_shaded.frag", context.options, "flat", flat_shader);
+        "standard_flat_shaded.frag", context_.options, "flat", flat_shader);
 
     configure_shader_set(shaders_dir.c_str(), vert_shader,
-        "standard_pbr.frag", context.options, "pbr", pbr_shader);
+        "standard_pbr.frag", context_.options, "pbr", pbr_shader);
 
     configure_shader_set(shaders_dir.c_str(), vert_shader,
-        "standard_phong.frag", context.options, "phong", phong_shader);
+        "standard_phong.frag", context_.options, "phong", phong_shader);
 
     const auto rasterization_state = vsg::RasterizationState::create();
     rasterization_state->cullMode = VK_CULL_MODE_NONE;
@@ -255,8 +255,8 @@ void RouteEditor::configure_shaders()
     phong_shader->defaultGraphicsPipelineStates =
         default_graphics_pipeline_states;
 
-    context.options->shaderSets.clear();
-    context.options->shaderSets["flat"] = flat_shader;
-    context.options->shaderSets["pbr"] = pbr_shader;
-    context.options->shaderSets["phong"] = phong_shader;
+    context_.options->shaderSets.clear();
+    context_.options->shaderSets["flat"] = flat_shader;
+    context_.options->shaderSets["pbr"] = pbr_shader;
+    context_.options->shaderSets["phong"] = phong_shader;
 }

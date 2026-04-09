@@ -21,7 +21,7 @@
 #include <cmath>
 #include <string>
 
-EditorContext* RouteObject::s_context = nullptr;
+EditorContext* RouteObject::s_context_ = nullptr;
 
 static constexpr vsg::dvec3 AXIS_X_POSITIVE = {1.0, 0.0, 0.0};
 static constexpr vsg::dvec3 AXIS_Y_POSITIVE = {0.0, 1.0, 0.0};
@@ -54,86 +54,86 @@ RouteObject::RouteObject(
     const vsg::dvec3& scale
 )
     : label(label)
-    , translation(translation)
-    , rotation_deg(rotation_deg)
-    , scale(scale)
-    , paged_lod(paged_lod)
+    , translation_(translation)
+    , rotation_deg_(rotation_deg)
+    , scale_(scale)
+    , paged_lod_(paged_lod)
 {
-    s_context = &context;
+    s_context_ = &context;
 
-    paged_lod_switch = SingleSwitch::create(
+    paged_lod_switch_ = SingleSwitch::create(
         vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
-    outline_switch = SingleSwitch::create(vsg::MASK_OFF,
+    outline_switch_ = SingleSwitch::create(vsg::MASK_OFF,
         nullptr);
 
-    this->addChild(paged_lod_switch);
-    this->addChild(outline_switch);
+    this->addChild(paged_lod_switch_);
+    this->addChild(outline_switch_);
 
     update_matrix();
 }
 
 const vsg::dvec3& RouteObject::get_translation() const
 {
-    return translation;
+    return translation_;
 }
 
 const vsg::dvec3& RouteObject::get_rotation_deg() const
 {
-    return rotation_deg;
+    return rotation_deg_;
 }
 
 const vsg::dvec3& RouteObject::get_scale() const
 {
-    return scale;
+    return scale_;
 }
 
 const vsg::dmat4& RouteObject::get_initial_matrix() const
 {
-    return initial_matrix;
+    return initial_matrix_;
 }
 
 const vsg::dbox& RouteObject::get_bounds() const
 {
-    return bounds;
+    return bounds_;
 }
 
 bool RouteObject::get_is_selected() const
 {
-    return is_selected;
+    return is_selected_;
 }
 
 bool RouteObject::get_is_hidden() const
 {
-    return is_hidden;
+    return is_hidden_;
 }
 
 void RouteObject::set_translation(const vsg::dvec3& translation)
 {
-    this->translation = translation;
+    translation_ = translation;
 
-    this->matrix[3][0] = translation.x;
-    this->matrix[3][1] = translation.y;
-    this->matrix[3][2] = translation.z;
+    matrix[3][0] = translation.x;
+    matrix[3][1] = translation.y;
+    matrix[3][2] = translation.z;
 
     update_bounds();
 }
 
 void RouteObject::set_rotation_deg(const vsg::dvec3& rotation_deg)
 {
-    this->rotation_deg = rotation_deg;
+    rotation_deg_ = rotation_deg;
     update_matrix();
 }
 
 void RouteObject::set_scale(const vsg::dvec3& scale)
 {
-    this->scale = scale;
+    scale_ = scale;
     update_matrix();
 }
 
 void RouteObject::move(const vsg::dvec3& translation)
 {
-    set_translation(this->translation + translation);
+    set_translation(translation_ + translation);
 }
 
 void RouteObject::rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3& axis,
@@ -158,21 +158,21 @@ void RouteObject::scale_relative_to_pivot(const vsg::dvec3& pivot,
 
 void RouteObject::hide()
 {
-    paged_lod_switch->mask = vsg::MASK_OFF;
-    outline_switch->mask = vsg::MASK_OFF;
+    paged_lod_switch_->mask = vsg::MASK_OFF;
+    outline_switch_->mask = vsg::MASK_OFF;
 
-    is_hidden = true;
+    is_hidden_ = true;
 
-    s_context->hidden_objects.emplace_back(this);
+    s_context_->hidden_objects.emplace_back(this);
 }
 
 RouteObjectsIterator RouteObject::show()
 {
-    paged_lod_switch->mask = MASK_SCENE | MASK_CLICKABLE;
+    paged_lod_switch_->mask = MASK_SCENE | MASK_CLICKABLE;
 
-    is_hidden = false;
+    is_hidden_ = false;
 
-    RouteObjects& hidden_objects = s_context->hidden_objects;
+    RouteObjects& hidden_objects = s_context_->hidden_objects;
 
     return hidden_objects.erase(std::find(hidden_objects.begin(),
         hidden_objects.end(), vsg::ref_ptr(this)));
@@ -180,53 +180,53 @@ RouteObjectsIterator RouteObject::show()
 
 bool RouteObject::select()
 {
-    if (!outline_switch->node)
+    if (!outline_switch_->node)
     {
-        const auto outline = s_context->outline_builder->create_outline(paged_lod);
+        const auto outline = s_context_->outline_builder->create_outline(paged_lod_);
         if (!outline)
         {
             return false;
         }
 
-        s_context->compile_infos.emplace_back(
-            CompileInfo{outline_switch, outline});
+        s_context_->compile_infos.emplace_back(
+            CompileInfo{outline_switch_, outline});
     }
 
-    outline_switch->mask = MASK_GUI2;
+    outline_switch_->mask = MASK_GUI2;
 
-    is_selected = true;
+    is_selected_ = true;
 
-    s_context->selected_objects.emplace_back(this);
-    s_context->gizmo->update_position();
+    s_context_->selected_objects.emplace_back(this);
+    s_context_->gizmo->update_position();
 
     return true;
 }
 
 RouteObjectsIterator RouteObject::deselect()
 {
-    outline_switch->mask = vsg::MASK_OFF;
+    outline_switch_->mask = vsg::MASK_OFF;
 
-    is_selected = false;
+    is_selected_ = false;
 
-    RouteObjects& selected_objects = s_context->selected_objects;
+    RouteObjects& selected_objects = s_context_->selected_objects;
 
     const auto it = selected_objects.erase(std::find(selected_objects.begin(),
         selected_objects.end(), vsg::ref_ptr(this)));
 
-    s_context->gizmo->update_position();
+    s_context_->gizmo->update_position();
 
     return it;
 }
 
 vsg::ref_ptr<RouteObject> RouteObject::copy() const
 {
-    return RouteObject::create(*s_context, paged_lod, label,
-        translation, rotation_deg, scale);
+    return RouteObject::create(*s_context_, paged_lod_, label,
+        translation_, rotation_deg_, scale_);
 }
 
 void RouteObject::save_matrix()
 {
-    initial_matrix = this->matrix;
+    initial_matrix_ = matrix;
 }
 
 void RouteObject::set_matrix(const vsg::dmat4& matrix)
@@ -239,8 +239,8 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
 
 void RouteObject::update_matrix()
 {
-    matrix = vsg::translate(translation) * to_rotate_matrix(rotation_deg) *
-        vsg::scale(scale);
+    matrix = vsg::translate(translation_) * to_rotate_matrix(rotation_deg_) *
+        vsg::scale(scale_);
 
     update_bounds();
 }
@@ -250,14 +250,14 @@ void RouteObject::update_bounds()
     vsg::ComputeBounds compute_bounds;
     compute_bounds.useNodeBounds = false;
     this->accept(compute_bounds);
-    this->bounds = compute_bounds.bounds;
+    bounds_ = compute_bounds.bounds;
 
-    s_context->gizmo->update_position();
+    s_context_->gizmo->update_position();
 }
 
 void RouteObject::decompose_matrix()
 {
     vsg::dquat temp_quat;
-    vsg::decompose(matrix, translation, temp_quat, scale);
-    rotation_deg = to_euler_deg(temp_quat);
+    vsg::decompose(matrix, translation_, temp_quat, scale_);
+    rotation_deg_ = to_euler_deg(temp_quat);
 }

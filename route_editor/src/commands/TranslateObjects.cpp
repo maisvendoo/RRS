@@ -14,7 +14,7 @@ TranslateObjects::TranslateObjects(
     const vsg::dvec3& translation
 )
     : TransformObjects(context, context.selected_objects)
-    , translation(translation)
+    , translation_(translation)
 {
     update_description();
 }
@@ -23,14 +23,14 @@ void TranslateObjects::execute()
 {
     for (const auto& object : objects_)
     {
-        object->move(translation);
+        object->move(translation_);
     }
 }
 
 void TranslateObjects::update_description()
 {
-    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
+    std::snprintf(description_, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Translate objects: { %.3f, %.3f, %.3f }",
-        translation.x, translation.y, translation.z
+        translation_.x, translation_.y, translation_.z
     );
 }

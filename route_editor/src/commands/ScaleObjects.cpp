@@ -12,8 +12,8 @@
 ScaleObjects::ScaleObjects(EditorContext& context,
     const vsg::dvec3& pivot, const vsg::dvec3& scale)
     : TransformObjects(context, context.selected_objects)
-    , pivot(pivot)
-    , scale(scale)
+    , pivot_(pivot)
+    , scale_(scale)
 {
     update_description();
 }
@@ -22,15 +22,15 @@ void ScaleObjects::execute()
 {
     for (const auto& object : objects_)
     {
-        object->scale_relative_to_pivot(pivot, scale, object->matrix);
+        object->scale_relative_to_pivot(pivot_, scale_, object->matrix);
     }
 }
 
 void ScaleObjects::update_description()
 {
-    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
+    std::snprintf(description_, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Scale objects: pivot = { %.3f, %.3f, %.3f }\n"
         "               scale = { %.3f, %.3f, %.3f }",
-        pivot.x, pivot.y, pivot.z, scale.x, scale.y, scale.z
+        pivot_.x, pivot_.y, pivot_.z, scale_.x, scale_.y, scale_.z
     );
 }

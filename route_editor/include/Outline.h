@@ -25,10 +25,10 @@ public:
         vsg::ref_ptr<vsg::PagedLOD> paged_lod);
 
 private:
-    const EditorContext& context;
+    const EditorContext& context_;
 
-    vsg::ref_ptr<vsg::Options> options;
-    vsg::Builder builder;
+    vsg::ref_ptr<vsg::Options> options_;
+    vsg::Builder builder_;
 };
 
 #endif // OUTLINE_H

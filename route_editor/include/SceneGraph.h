@@ -23,9 +23,9 @@ public:
     void load_route();
 
 private:
-    EditorContext& context;
+    EditorContext& context_;
 
-    vsg::ref_ptr<vsg::AmbientLight> ambient_light;
+    vsg::ref_ptr<vsg::AmbientLight> ambient_light_;
 };
 
 #endif // SCENE_GRAPH_H

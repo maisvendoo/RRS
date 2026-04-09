@@ -45,16 +45,16 @@ private:
         KEYBOARD_SCALE
     };
 
-    State state = State::INITIAL;
+    State state_ = State::INITIAL;
 
-    EditorContext& context;
+    EditorContext& context_;
 
-    vsg::dvec3 prev_intersect_pos;
-    vsg::dvec3 total_translation;
-    double total_rotation_rad;
-    vsg::dvec3 total_scale;
-    vsg::ref_ptr<SingleSwitch> front_plane_switch;
-    vsg::dvec3 front_plane_up;
+    vsg::dvec3 prev_intersect_pos_;
+    vsg::dvec3 total_translation_;
+    double total_rotation_rad_;
+    vsg::dvec3 total_scale_;
+    vsg::ref_ptr<SingleSwitch> front_plane_switch_;
+    vsg::dvec3 front_plane_up_;
 };
 
 #endif // OBJECT_SELECTOR_H

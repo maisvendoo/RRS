@@ -36,29 +36,29 @@ public:
     void update_position();
 
 private:
-    EditorContext& context;
+    EditorContext& context_;
 
-    vsg::Builder builder;
-    vsg::ref_ptr<vsg::MatrixTransform> matrix_transform;
-    vsg::ref_ptr<vsg::Node> arrow_x;
-    vsg::ref_ptr<vsg::Node> arrow_y;
-    vsg::ref_ptr<vsg::Node> arrow_z;
-    vsg::ref_ptr<SingleSwitch> plane_yz_switch;
-    vsg::ref_ptr<SingleSwitch> plane_xz_switch;
-    vsg::ref_ptr<SingleSwitch> plane_xy_switch;
-    vsg::ref_ptr<SingleSwitch> line_x_switch;
-    vsg::ref_ptr<SingleSwitch> line_y_switch;
-    vsg::ref_ptr<SingleSwitch> line_z_switch;
+    vsg::Builder builder_;
+    vsg::ref_ptr<vsg::MatrixTransform> matrix_transform_;
+    vsg::ref_ptr<vsg::Node> arrow_x_;
+    vsg::ref_ptr<vsg::Node> arrow_y_;
+    vsg::ref_ptr<vsg::Node> arrow_z_;
+    vsg::ref_ptr<SingleSwitch> plane_yz_switch_;
+    vsg::ref_ptr<SingleSwitch> plane_xz_switch_;
+    vsg::ref_ptr<SingleSwitch> plane_xy_switch_;
+    vsg::ref_ptr<SingleSwitch> line_x_switch_;
+    vsg::ref_ptr<SingleSwitch> line_y_switch_;
+    vsg::ref_ptr<SingleSwitch> line_z_switch_;
 
-    vsg::dvec3 curr_pos;
-    vsg::dvec3 click_pos;
-    vsg::dvec3 prev_intersect_pos;
-    vsg::dvec3 total_translation;
-    double scale;
+    vsg::dvec3 curr_pos_;
+    vsg::dvec3 click_pos_;
+    vsg::dvec3 prev_intersect_pos_;
+    vsg::dvec3 total_translation_;
+    double scale_;
 
-    vsg::ref_ptr<vsg::Node> active_arrow;
-    vsg::ref_ptr<SingleSwitch> active_plain_switch;
-    vsg::ref_ptr<SingleSwitch> active_line_switch;
+    vsg::ref_ptr<vsg::Node> active_arrow_;
+    vsg::ref_ptr<SingleSwitch> active_plain_switch_;
+    vsg::ref_ptr<SingleSwitch> active_line_switch_;
 };
 
 #endif // GIZMO_H

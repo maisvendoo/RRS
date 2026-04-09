@@ -16,7 +16,7 @@ private:
     void configure_shaders();
 
 private:
-    EditorContext context;
+    EditorContext context_;
 };
 
 #endif // ROUTE_EDITOR_H

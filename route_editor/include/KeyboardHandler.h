@@ -27,7 +27,7 @@ public:
     bool get_binding_state(Action action) const;
 
 private:
-    EditorContext& context;
+    EditorContext& context_;
 
     // Bit array for 65536 bits.
     // vsg::KeySymbol is uint16_t with maximum value of 65535,
@@ -45,7 +45,7 @@ private:
     // keyBase = 33 = 0b00100001
     // Byte index   = 0b00000100 = 4
     // key_state_bits[4] |= 1 << 1 = 0b00000010
-    std::uint8_t key_state_bits[8192];
+    std::uint8_t key_state_bits_[8192];
 };
 
 #endif // KEYBOARD_HANDLER_H

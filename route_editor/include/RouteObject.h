@@ -79,21 +79,21 @@ private:
     void decompose_matrix();
 
 private:
-    static EditorContext* s_context;
+    static EditorContext* s_context_;
 
-    vsg::dvec3 translation;
-    vsg::dvec3 rotation_deg;
-    vsg::dvec3 scale;
+    vsg::dvec3 translation_;
+    vsg::dvec3 rotation_deg_;
+    vsg::dvec3 scale_;
 
-    vsg::dmat4 initial_matrix;
-    vsg::dbox bounds;
+    vsg::dmat4 initial_matrix_;
+    vsg::dbox bounds_;
 
-    bool is_selected = false;
-    bool is_hidden = false;
+    bool is_selected_ = false;
+    bool is_hidden_ = false;
 
-    vsg::ref_ptr<SingleSwitch> paged_lod_switch;
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod;
-    vsg::ref_ptr<SingleSwitch> outline_switch;
+    vsg::ref_ptr<SingleSwitch> paged_lod_switch_;
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod_;
+    vsg::ref_ptr<SingleSwitch> outline_switch_;
 };
 
 #endif // ROUTE_OBJECT_H

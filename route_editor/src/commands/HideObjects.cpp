@@ -38,7 +38,7 @@ void HideObjects::undo()
 
 void HideObjects::update_description()
 {
-    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
+    std::snprintf(description_, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Hide objects: to hide: %zu objects\n"
         "              to show: %zu objects",
         objects_to_hide.size(), objects_to_show.size()

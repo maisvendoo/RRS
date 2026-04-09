@@ -22,7 +22,7 @@ private:
     bool load_topology();
 
 private:
-    EditorContext& context;
+    EditorContext& context_;
 };
 
 #endif // ROUTE_H

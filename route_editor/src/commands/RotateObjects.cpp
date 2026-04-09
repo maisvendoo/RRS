@@ -12,9 +12,9 @@
 RotateObjects::RotateObjects(EditorContext& context,
     const vsg::dvec3& pivot, const vsg::dvec3& axis, double radians)
     : TransformObjects(context, context.selected_objects)
-    , pivot(pivot)
-    , axis(axis)
-    , radians(radians)
+    , pivot_(pivot)
+    , axis_(axis)
+    , radians_(radians)
 {
     update_description();
 }
@@ -23,16 +23,16 @@ void RotateObjects::execute()
 {
     for (const auto& object : objects_)
     {
-        object->rotate_around_pivot(pivot, axis, radians, object->matrix);
+        object->rotate_around_pivot(pivot_, axis_, radians_, object->matrix);
     }
 }
 
 void RotateObjects::update_description()
 {
-    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
+    std::snprintf(description_, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Rotate objects: pivot = { %.3f, %.3f, %.3f }\n"
         "                 axis = { %.3f, %.3f, %.3f }\n"
         "              radians = %.3f",
-        pivot.x, pivot.y, pivot.z, axis.x, axis.y, axis.z, radians
+        pivot_.x, pivot_.y, pivot_.z, axis_.x, axis_.y, axis_.z, radians_
     );
 }

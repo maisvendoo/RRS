@@ -18,8 +18,8 @@ public:
     virtual void update_description() override;
 
 private:
-    vsg::dvec3 pivot;
-    vsg::dvec3 scale;
+    vsg::dvec3 pivot_;
+    vsg::dvec3 scale_;
 };
 
 #endif // SCALE_OBJECTS_H

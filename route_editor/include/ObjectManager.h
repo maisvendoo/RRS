@@ -27,24 +27,24 @@ public:
     ~ObjectManager();
 
 private:
-    EditorContext& context;
+    EditorContext& context_;
 
-    vsg::ref_ptr<vsg::MatrixTransform>* transforms = nullptr;
+    vsg::ref_ptr<vsg::MatrixTransform>* transforms_ = nullptr;
 
-    std::string* labels = nullptr;
-    vsg::dvec3* translations = nullptr;
-    vsg::dvec3* rotation_degs = nullptr;
-    vsg::dvec3* scales = nullptr;
+    std::string* labels_ = nullptr;
+    vsg::dvec3* translations_ = nullptr;
+    vsg::dvec3* rotation_degs_ = nullptr;
+    vsg::dvec3* scales_ = nullptr;
 
-    vsg::dmat4* initial_matrices = nullptr;
-    vsg::dbox* bounds = nullptr;
+    vsg::dmat4* initial_matrices_ = nullptr;
+    vsg::dbox* bounds_ = nullptr;
 
-    bool* is_selected = nullptr;
-    bool* is_hidden = nullptr;
+    bool* is_selected_ = nullptr;
+    bool* is_hidden_ = nullptr;
 
-    vsg::ref_ptr<SingleSwitch>* paged_lod_switches = nullptr;
-    vsg::ref_ptr<vsg::PagedLOD>* paged_lods = nullptr;
-    vsg::ref_ptr<SingleSwitch>* outline_switches = nullptr;
+    vsg::ref_ptr<SingleSwitch>* paged_lod_switches_ = nullptr;
+    vsg::ref_ptr<vsg::PagedLOD>* paged_lods_ = nullptr;
+    vsg::ref_ptr<SingleSwitch>* outline_switches_ = nullptr;
 };
 
 #endif // OBJECT_MANAGER_H

@@ -24,7 +24,7 @@ void SelectObjects::execute()
         object->deselect();
     }
 
-    context.gizmo->update_visibility();
+    context_.gizmo->update_visibility();
 }
 
 void SelectObjects::undo()
@@ -39,12 +39,12 @@ void SelectObjects::undo()
         object->select();
     }
 
-    context.gizmo->update_visibility();
+    context_.gizmo->update_visibility();
 }
 
 void SelectObjects::update_description()
 {
-    std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
+    std::snprintf(description_, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Select objects: to select: %zu objects\n"
         "              to deselect: %zu objects",
         objects_to_select.size(), objects_to_deselect.size()
