@@ -6,23 +6,26 @@
 
 #include <cstddef>
 
-TransformObjects::TransformObjects(EditorContext& context)
+TransformObjects::TransformObjects(
+    EditorContext& context,
+    const RouteObjects& objects
+)
     : Command(context)
-    , objects(context.selected_objects)
+    , objects_(objects)
 {
-    initial_matrices.reserve(objects.size());
+    initial_matrices_.reserve(objects.size());
     for (const auto& object : objects)
     {
-        initial_matrices.emplace_back(object->get_initial_matrix());
+        initial_matrices_.emplace_back(object->get_initial_matrix());
     }
 }
 
 void TransformObjects::undo()
 {
     std::size_t index = 0;
-    for (const auto& object : objects)
+    for (const auto& object : objects_)
     {
-        object->set_matrix(initial_matrices[index]);
+        object->set_matrix(initial_matrices_[index]);
         ++index;
     }
 }

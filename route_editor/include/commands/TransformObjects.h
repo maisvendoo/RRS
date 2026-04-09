@@ -13,15 +13,15 @@ struct EditorContext;
 class TransformObjects : public Command
 {
 public:
-    explicit TransformObjects(EditorContext& context);
+    TransformObjects(EditorContext& context, const RouteObjects& objects);
     virtual ~TransformObjects() override = default;
     virtual void undo() override;
 
 protected:
-    const RouteObjects objects;
+    const RouteObjects objects_;
 
 private:
-    std::vector<vsg::dmat4> initial_matrices;
+    std::vector<vsg::dmat4> initial_matrices_;
 };
 
 #endif // TRANSFORM_OBJECTS_H

@@ -11,7 +11,7 @@
 
 RotateObjects::RotateObjects(EditorContext& context,
     const vsg::dvec3& pivot, const vsg::dvec3& axis, double radians)
-    : TransformObjects(context)
+    : TransformObjects(context, context.selected_objects)
     , pivot(pivot)
     , axis(axis)
     , radians(radians)
@@ -21,7 +21,7 @@ RotateObjects::RotateObjects(EditorContext& context,
 
 void RotateObjects::execute()
 {
-    for (const auto& object : objects)
+    for (const auto& object : objects_)
     {
         object->rotate_around_pivot(pivot, axis, radians, object->matrix);
     }

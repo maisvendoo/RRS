@@ -11,7 +11,7 @@
 
 ScaleObjects::ScaleObjects(EditorContext& context,
     const vsg::dvec3& pivot, const vsg::dvec3& scale)
-    : TransformObjects(context)
+    : TransformObjects(context, context.selected_objects)
     , pivot(pivot)
     , scale(scale)
 {
@@ -20,7 +20,7 @@ ScaleObjects::ScaleObjects(EditorContext& context,
 
 void ScaleObjects::execute()
 {
-    for (const auto& object : objects)
+    for (const auto& object : objects_)
     {
         object->scale_relative_to_pivot(pivot, scale, object->matrix);
     }

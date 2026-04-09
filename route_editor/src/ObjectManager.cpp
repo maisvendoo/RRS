@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-ObjectManager::ObjectManager(EditorContext& context, size_t max_object_count)
+ObjectManager::ObjectManager(EditorContext& context, std::size_t max_object_count)
     : context(context)
 {
 

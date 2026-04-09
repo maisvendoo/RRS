@@ -13,7 +13,7 @@ TranslateObjects::TranslateObjects(
     EditorContext& context,
     const vsg::dvec3& translation
 )
-    : TransformObjects(context)
+    : TransformObjects(context, context.selected_objects)
     , translation(translation)
 {
     update_description();
@@ -21,7 +21,7 @@ TranslateObjects::TranslateObjects(
 
 void TranslateObjects::execute()
 {
-    for (const auto& object : objects)
+    for (const auto& object : objects_)
     {
         object->move(translation);
     }

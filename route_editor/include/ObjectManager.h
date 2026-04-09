@@ -23,7 +23,7 @@ class PagedLOD;
 class ObjectManager
 {
 public:
-    explicit ObjectManager(EditorContext& context, size_t max_object_count);
+    explicit ObjectManager(EditorContext& context, std::size_t max_object_count);
     ~ObjectManager();
 
 private:
@@ -36,7 +36,7 @@ private:
     vsg::dvec3* rotation_degs = nullptr;
     vsg::dvec3* scales = nullptr;
 
-    vsg::dmat4* initial_matrixes = nullptr;
+    vsg::dmat4* initial_matrices = nullptr;
     vsg::dbox* bounds = nullptr;
 
     bool* is_selected = nullptr;
