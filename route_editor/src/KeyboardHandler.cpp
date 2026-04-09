@@ -1,18 +1,17 @@
 #include "KeyboardHandler.h"
 
-#include "Action.h"
 #include "commands/CommandList.h"
+#include "Action.h"
 #include "EditorContext.h"
 #include "KeyBinding.h"
 #include "Settings.h"
 #include "filesystem.h"
 
-#include <fstream>
 #include <vsg/ui/KeyEvent.h>
 
 #include <cstdint>
 #include <cstring>
-
+#include <fstream>
 #include <iostream>
 
 static std::uint16_t get_byte_index(vsg::KeySymbol key)

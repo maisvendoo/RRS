@@ -1,11 +1,11 @@
 #include "Gizmo.h"
 
-#include "CameraHandler.h"
 #include "commands/CommandList.h"
+#include "commands/TranslateObjects.h"
+#include "CameraHandler.h"
 #include "EditorContext.h"
 #include "IntersectionHandler.h"
 #include "Mask.h"
-#include "commands/TranslateObjects.h"
 #include "RouteObject.h"
 #include "Settings.h"
 #include "SingleSwitch.h"

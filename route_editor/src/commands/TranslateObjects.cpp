@@ -1,9 +1,9 @@
 #include "commands/TranslateObjects.h"
 
 #include "commands/Command.h"
+#include "commands/TransformObjects.h"
 #include "EditorContext.h"
 #include "RouteObject.h"
-#include "commands/TransformObjects.h"
 
 #include <vsg/maths/vec3.h>
 
