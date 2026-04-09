@@ -27,22 +27,15 @@ static constexpr vsg::dvec3 AXIS_X_POSITIVE = {1.0, 0.0, 0.0};
 static constexpr vsg::dvec3 AXIS_Y_POSITIVE = {0.0, 1.0, 0.0};
 static constexpr vsg::dvec3 AXIS_Z_POSITIVE = {0.0, 0.0, 1.0};
 
-static vsg::dvec3 to_euler_deg(const vsg::dquat& quat)
+static vsg::dvec3 to_euler_deg(const vsg::dquat& q)
 {
     return vsg::dvec3{
-        vsg::degrees(std::atan2(2.0 * (quat.w * quat.x + quat.y * quat.z),
-            1.0 - 2.0 * (quat.x * quat.x + quat.y * quat.y))),
-        vsg::degrees(std::asin(2.0 * (quat.w * quat.y - quat.z * quat.x))),
-        vsg::degrees(std::atan2(2.0 * (quat.w * quat.z + quat.x * quat.y),
-            1.0 - 2.0 * (quat.y * quat.y + quat.z * quat.z)))
+        vsg::degrees(std::atan2(2.0 * (q.w * q.x + q.y * q.z),
+            1.0 - 2.0 * (q.x * q.x + q.y * q.y))),
+        vsg::degrees(std::asin(2.0 * (q.w * q.y - q.z * q.x))),
+        vsg::degrees(std::atan2(2.0 * (q.w * q.z + q.x * q.y),
+            1.0 - 2.0 * (q.y * q.y + q.z * q.z)))
     };
-}
-
-static vsg::dmat4 to_rotate_matrix(const vsg::dvec3& rotation_deg)
-{
-    return vsg::rotate(vsg::radians(rotation_deg.z), AXIS_Z_POSITIVE) *
-           vsg::rotate(vsg::radians(rotation_deg.y), AXIS_Y_POSITIVE) *
-           vsg::rotate(vsg::radians(rotation_deg.x), AXIS_X_POSITIVE);
 }
 
 RouteObject::RouteObject(
@@ -64,8 +57,7 @@ RouteObject::RouteObject(
     paged_lod_switch_ = SingleSwitch::create(
         vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
-    outline_switch_ = SingleSwitch::create(vsg::MASK_OFF,
-        nullptr);
+    outline_switch_ = SingleSwitch::create(vsg::MASK_OFF, nullptr);
 
     this->addChild(paged_lod_switch_);
     this->addChild(outline_switch_);
@@ -136,11 +128,12 @@ void RouteObject::move(const vsg::dvec3& translation)
     set_translation(translation_ + translation);
 }
 
-void RouteObject::rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3& axis,
-    double radians, const vsg::dmat4& matrix)
+void RouteObject::rotate_around_pivot(const vsg::dvec3& pivot,
+    const vsg::dvec3& axis, double radians, const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(pivot) * vsg::rotate(vsg::dquat(radians, axis)) *
-        vsg::translate(-pivot) * matrix;
+    this->matrix = vsg::translate(pivot) *
+                   vsg::rotate(vsg::dquat(radians, axis)) *
+                   vsg::translate(-pivot) * matrix;
 
     decompose_matrix();
     update_bounds();
@@ -149,8 +142,10 @@ void RouteObject::rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3&
 void RouteObject::scale_relative_to_pivot(const vsg::dvec3& pivot,
     const vsg::dvec3& scale, const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(pivot) * vsg::scale(scale) *
-        vsg::translate(-pivot) * matrix;
+    this->matrix = vsg::translate(pivot) *
+                   vsg::scale(scale) *
+                   vsg::translate(-pivot) *
+                   matrix;
 
     decompose_matrix();
     update_bounds();
@@ -182,7 +177,9 @@ bool RouteObject::select()
 {
     if (!outline_switch_->node)
     {
-        const auto outline = s_context_->outline_builder->create_outline(paged_lod_);
+        const auto outline = s_context_->outline_builder->create_outline(
+            paged_lod_);
+
         if (!outline)
         {
             return false;
@@ -239,8 +236,11 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
 
 void RouteObject::update_matrix()
 {
-    matrix = vsg::translate(translation_) * to_rotate_matrix(rotation_deg_) *
-        vsg::scale(scale_);
+    matrix = vsg::translate(translation_) *
+             vsg::rotate(vsg::radians(rotation_deg_.z), AXIS_Z_POSITIVE) *
+             vsg::rotate(vsg::radians(rotation_deg_.y), AXIS_Y_POSITIVE) *
+             vsg::rotate(vsg::radians(rotation_deg_.x), AXIS_X_POSITIVE) *
+             vsg::scale(scale_);
 
     update_bounds();
 }
