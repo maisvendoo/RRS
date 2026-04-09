@@ -9,6 +9,7 @@
 #include "EditorState.h"
 #include "Gizmo.h"
 #include "KeyBinding.h"
+#include "commands/RotateObjects.h"
 #include "commands/TranslateObjects.h"
 #include "ObjectSelector.h"
 #include "Route.h"
@@ -46,10 +47,12 @@ static bool drag_double(const char* label, double* data)
         1.0f, nullptr, nullptr, "%.3f");
 }
 
-static bool drag_double3(const char* label, double* data, float speed = 1.0f)
+static bool drag_double3(const char* label, double* data, float speed = 1.0f,
+    const double* min = nullptr, const double* max = nullptr,
+    ImGuiSliderFlags flags = 0)
 {
     return ImGui::DragScalarN(label, ImGuiDataType_Double, data, 3,
-        speed, nullptr, nullptr, "%.3f");
+        speed, min, max, "%.3f", flags);
 }
 
 EditorGui::EditorGui(EditorContext& context)
@@ -564,6 +567,7 @@ void EditorGui::show_selected_objects_properties() const
 
     static bool dragging = false;
     static vsg::dvec3 total_translation;
+    static vsg::dvec3 total_rotation_deg;
 
     const auto save_matrixes = [&]() -> void
     {
@@ -588,7 +592,7 @@ void EditorGui::show_selected_objects_properties() const
                 save_matrixes();
                 dragging = true;
             }
-            total_translation += translation;
+            total_translation += translation - object->get_translation();
             object->set_translation(translation);
         }
 
@@ -601,10 +605,44 @@ void EditorGui::show_selected_objects_properties() const
 
         label = "rotation##" + std::to_string(i);
 
+        constexpr double min_rot_deg = -360.0;
+        constexpr double max_rot_deg = 360.0;
         vsg::dvec3 rotation_deg = object->get_rotation_deg();
-        if (drag_double3(label.c_str(), rotation_deg.data(), 0.2f))
+        if (drag_double3(label.c_str(), rotation_deg.data(), 1.0f,
+            &min_rot_deg, &max_rot_deg, ImGuiSliderFlags_WrapAround))
         {
+            if (!dragging)
+            {
+                total_rotation_deg = {0.0, 0.0, 0.0};
+                save_matrixes();
+                dragging = true;
+            }
+            total_rotation_deg += rotation_deg - object->get_rotation_deg();
             object->set_rotation_deg(rotation_deg);
+        }
+
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            vsg::dvec3 axis;
+            double radians;
+            if (std::abs(total_rotation_deg.x) >= 1.0e-6)
+            {
+                axis = {1.0, 0.0, 0.0};
+                radians = vsg::radians(total_rotation_deg.x);
+            }
+            else if (std::abs(total_rotation_deg.y) >= 1.0e-6)
+            {
+                axis = {0.0, 1.0, 0.0};
+                radians = vsg::radians(total_rotation_deg.y);
+            }
+            else
+            {
+                axis = {0.0, 0.0, 1.0};
+                radians = vsg::radians(total_rotation_deg.z);
+            }
+            context_.commands.push(new RotateObjects(context_, {object},
+                context_.gizmo->get_curr_pos(), axis, radians), false);
+            dragging = false;
         }
 
         label = "scale##" + std::to_string(i);
