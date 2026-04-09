@@ -27,6 +27,7 @@
 #include "trajectory.h"
 #include "vec3.h"
 
+#include <algorithm>
 #include <filesystem>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/Mask.h>
@@ -283,12 +284,29 @@ void EditorGui::show_objects_ref() const
         return;
     }
 
+    static char search_buffer[256] = "";
+    ImGui::InputTextWithHint("search_label", "", search_buffer, 256);
+
+    std::string search_lower = search_buffer;
+    std::transform(search_lower.begin(), search_lower.end(),
+        search_lower.begin(), ::tolower);
+
     if (ImGui::BeginTable("objects_ref_table", 2,
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
         for (const auto& [label, ref] : context_.objects_ref)
         {
+            std::string label_lower = label;
+            std::transform(label_lower.begin(), label_lower.end(),
+                label_lower.begin(), ::tolower);
+
+            if (search_buffer[0] != '\0' &&
+                label_lower.find(search_lower) == std::string::npos)
+            {
+                continue;
+            }
+
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
