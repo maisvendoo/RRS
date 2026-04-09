@@ -9,9 +9,9 @@
 
 #include <cstdio>
 
-ScaleObjects::ScaleObjects(EditorContext& context,
+ScaleObjects::ScaleObjects(EditorContext& context, const RouteObjects& objects,
     const vsg::dvec3& pivot, const vsg::dvec3& scale)
-    : TransformObjects(context, context.selected_objects)
+    : TransformObjects(context, objects)
     , pivot_(pivot)
     , scale_(scale)
 {

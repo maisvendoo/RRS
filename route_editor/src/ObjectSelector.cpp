@@ -435,7 +435,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         }
         case State::KEYBOARD_SCALE:
         {
-            context_.commands.push(new ScaleObjects(context_,
+            context_.commands.push(new ScaleObjects(context_, context_.selected_objects,
                 context_.gizmo->get_curr_pos(), total_scale_), false);
 
             break;

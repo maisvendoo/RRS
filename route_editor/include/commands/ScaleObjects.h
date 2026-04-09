@@ -10,8 +10,8 @@ struct EditorContext;
 class ScaleObjects : public TransformObjects
 {
 public:
-    ScaleObjects(EditorContext& context, const vsg::dvec3& pivot,
-        const vsg::dvec3& scale);
+    ScaleObjects(EditorContext& context, const RouteObjects& objects,
+        const vsg::dvec3& pivot, const vsg::dvec3& scale);
 
     virtual ~ScaleObjects() override = default;
     virtual void execute() override;

@@ -10,6 +10,7 @@
 #include "Gizmo.h"
 #include "KeyBinding.h"
 #include "commands/RotateObjects.h"
+#include "commands/ScaleObjects.h"
 #include "commands/TranslateObjects.h"
 #include "ObjectSelector.h"
 #include "Route.h"
@@ -568,6 +569,7 @@ void EditorGui::show_selected_objects_properties() const
     static bool dragging = false;
     static vsg::dvec3 total_translation;
     static vsg::dvec3 total_rotation_deg;
+    static vsg::dvec3 total_scale;
 
     const auto save_matrixes = [&]() -> void
     {
@@ -647,10 +649,28 @@ void EditorGui::show_selected_objects_properties() const
 
         label = "scale##" + std::to_string(i);
 
+        const vsg::dvec3& prev_scale = object->get_scale();
         vsg::dvec3 scale = object->get_scale();
         if (drag_double3(label.c_str(), scale.data(), 0.01f))
         {
-            object->set_scale(scale);
+            if (vsg::length(scale) > 1.0e-6)
+            {
+                if (!dragging)
+                {
+                    total_scale = {1.0, 1.0, 1.0};
+                    save_matrixes();
+                    dragging = true;
+                }
+                total_scale *= {scale.x / prev_scale.x, scale.y / prev_scale.y, scale.z / prev_scale.z};
+                object->set_scale(scale);
+            }
+        }
+
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            context_.commands.push(new ScaleObjects(context_, {object},
+                context_.gizmo->get_curr_pos(), total_scale), false);
+            dragging = false;
         }
 
         ++i;
