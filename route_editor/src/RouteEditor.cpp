@@ -176,8 +176,6 @@ void RouteEditor::run()
                 const vsg::Mask mask = compile_info.mask;
                 const auto& node = compile_info.node;
 
-                compile_result.add(context_.viewer->compileManager->compile(node));
-
                 if (group_node)
                 {
                     if (auto group = group_node.cast<vsg::Group>())
@@ -193,6 +191,8 @@ void RouteEditor::run()
                         single_switch->node = node;
                     }
                 }
+
+                compile_result.add(context_.viewer->compileManager->compile(node));
             }
 
             vsg::updateViewer(*context_.viewer, compile_result);
