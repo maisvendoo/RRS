@@ -103,6 +103,11 @@ EditorGui::EditorGui(EditorContext& context)
     style.GrabRounding = 6.0f;
 }
 
+EditorGui::~EditorGui()
+{
+    // ImGui::DestroyContext();
+}
+
 void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 {
     (void)command_buffer;

@@ -58,6 +58,12 @@ static vsg::ref_ptr<vsg::Commands> create_quad(
     return commands;
 }
 
+static int get_binding_state(vsg::ref_ptr<KeyboardHandler> keyboard_handler,
+    Action action)
+{
+    return static_cast<int>(keyboard_handler->get_binding_state(action));
+}
+
 CameraHandler::CameraHandler(EditorContext& context)
     : context_(context)
 {
@@ -128,33 +134,26 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
     fovy = std::clamp(fovy, settings.fovy_min, settings.fovy_max);
 }
 
-void CameraHandler::apply(vsg::FrameEvent& frame)
+void CameraHandler::apply(vsg::FrameEvent&)
 {
-    (void)frame;
-
     if (!context_.mouse_handler->get_is_rmb_pressed())
     {
         return;
     }
 
+    const double move_speed = context_.settings.camera_move_speed *
+        context_.delta_time;
+
     const auto look_at = context_.look_at;
-
-    const double move_speed = context_.settings.camera_move_speed * context_.delta_time;
-
     const auto keyboard_handler = context_.keyboard_handler;
 
-    const auto get_binding_state = [keyboard_handler](Action action) -> int
-    {
-        return static_cast<int>(keyboard_handler->get_binding_state(action));
-    };
-
     look_at->eye += front_ * move_speed * static_cast<double>(
-        get_binding_state(ACTION_MOVE_CAMERA_FORWARD) -
-        get_binding_state(ACTION_MOVE_CAMERA_BACKWARD));
+        get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_FORWARD) -
+        get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_BACKWARD));
 
     look_at->eye += right_ * move_speed * static_cast<double>(
-        get_binding_state(ACTION_MOVE_CAMERA_RIGHT) -
-        get_binding_state(ACTION_MOVE_CAMERA_LEFT));
+        get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_RIGHT) -
+        get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_LEFT));
 
     look_at->center = look_at->eye + front_;
 }

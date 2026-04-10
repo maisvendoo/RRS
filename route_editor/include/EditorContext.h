@@ -109,7 +109,7 @@ struct EditorContext
 
     std::string route_dir;
 
-    double delta_time;
+    double delta_time = 0.0;
 
     std::vector<CompileInfo> compile_infos;
     RouteObjects deferred_selection;

@@ -19,6 +19,7 @@ class EditorGui : public vsg::Inherit<vsg::Command, EditorGui>
 {
 public:
     EditorGui(EditorContext& context);
+    ~EditorGui();
 
     void record(vsg::CommandBuffer& command_buffer) const override;
 
