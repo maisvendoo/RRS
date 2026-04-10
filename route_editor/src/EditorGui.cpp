@@ -43,6 +43,7 @@
 #include <vsg/nodes/Geometry.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/StateGroup.h>
 #include <vsg/nodes/VertexIndexDraw.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
@@ -70,48 +71,6 @@ static bool drag_double3(const char* label, double* data, float speed = 1.0f,
 {
     return ImGui::DragScalarN(label, ImGuiDataType_Double, data, 3,
         speed, min, max, "%.3f", flags);
-}
-
-static vsg::ref_ptr<vsg::Node> create_tline(const std::vector<vsg::dvec3>& points)
-{
-    const auto vertices = vsg::vec3Array::create(points.size());
-    const auto indices = vsg::ushortArray::create(points.size());
-    const auto colors = vsg::vec3Array::create(points.size());
-
-    for (std::size_t i = 0; i < points.size(); ++i)
-    {
-        vertices->at(i) = points[i];
-        indices->at(i) = i;
-        colors->at(i) = {1.0f, 1.0f, 0.0f};
-    }
-
-    const auto vid = vsg::VertexIndexDraw::create();
-    vid->assignArrays(vsg::DataList{vertices, colors});
-    vid->assignIndices(indices);
-    vid->indexCount = points.size();
-    vid->instanceCount = 1;
-
-    const auto rasterization_state = vsg::RasterizationState::create();
-    rasterization_state->cullMode = VK_CULL_MODE_NONE;
-    rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
-    rasterization_state->lineWidth = 2.0f;
-
-    const vsg::GraphicsPipelineStates states = {
-        vsg::VertexInputState::create(),
-        vsg::InputAssemblyState::create(),
-        rasterization_state,
-        vsg::ColorBlendState::create(),
-        vsg::DepthStencilState::create(),
-        vsg::MultisampleState::create()
-    };
-
-    const auto commands = vsg::Commands::create();
-    commands->addChild(vid);
-
-    const auto geometry_node = vsg::Geometry::create();
-    geometry_node->arrays = vid->arrays;
-    geometry_node->indices = vid->indices;
-    // geometry_node->commands = commands;
 }
 
 EditorGui::EditorGui(EditorContext& context)
