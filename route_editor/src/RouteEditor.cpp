@@ -166,35 +166,38 @@ void RouteEditor::run()
         context_.viewer->recordAndSubmit();
         context_.viewer->present();
 
-        vsg::CompileResult compile_result;
-
-        for (const CompileInfo& compile_info : context_.compile_infos)
+        if (!context_.compile_infos.empty())
         {
-            const auto& group_node = compile_info.group_node;
-            const vsg::Mask mask = compile_info.mask;
-            const auto& node = compile_info.node;
+            vsg::CompileResult compile_result;
 
-            compile_result.add(context_.viewer->compileManager->compile(node));
-
-            if (group_node)
+            for (const CompileInfo& compile_info : context_.compile_infos)
             {
-                if (auto group = group_node.cast<vsg::Group>())
+                const auto& group_node = compile_info.group_node;
+                const vsg::Mask mask = compile_info.mask;
+                const auto& node = compile_info.node;
+
+                compile_result.add(context_.viewer->compileManager->compile(node));
+
+                if (group_node)
                 {
-                    group->addChild(node);
-                }
-                else if (auto switch_ = group_node.cast<vsg::Switch>())
-                {
-                    switch_->addChild(mask, node);
-                }
-                else if (auto single_switch = group_node.cast<SingleSwitch>())
-                {
-                    single_switch->node = node;
+                    if (auto group = group_node.cast<vsg::Group>())
+                    {
+                        group->addChild(node);
+                    }
+                    else if (auto switch_ = group_node.cast<vsg::Switch>())
+                    {
+                        switch_->addChild(mask, node);
+                    }
+                    else if (auto single_switch = group_node.cast<SingleSwitch>())
+                    {
+                        single_switch->node = node;
+                    }
                 }
             }
-        }
 
-        vsg::updateViewer(*context_.viewer, compile_result);
-        context_.compile_infos.clear();
+            vsg::updateViewer(*context_.viewer, compile_result);
+            context_.compile_infos.clear();
+        }
 
         RouteObjects& deferred_selection = context_.deferred_selection;
         for (auto it = deferred_selection.begin();
