@@ -7,6 +7,7 @@
 #include "RouteObject.h"
 #include "Settings.h"
 
+#include <memory>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 
@@ -100,7 +101,7 @@ struct EditorContext
     RouteMap route_map;
     std::map<std::string, vsg::dvec3> stations_conf;
     std::map<std::string, WaypointData> waypoints_conf;
-    Topology* topology = nullptr;
+    std::unique_ptr<Topology> topology;
 
     RouteObjects static_objects;
     RouteObjects selected_objects;

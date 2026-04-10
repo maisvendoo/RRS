@@ -9,21 +9,16 @@
 #include "Outline.h"
 #include "Route.h"
 #include "SceneGraph.h"
-#include "WindowHandler.h"
 #include "topology.h"
+#include "WindowHandler.h"
 
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/RenderGraph.h>
 #include <vsg/app/ViewMatrix.h>
 #include <vsg/app/Viewer.h>
-#include <vsg/app/Window.h>
 #include <vsg/commands/ClearAttachments.h>
-#include <vsg/io/Options.h>
+#include <vsg/nodes/PagedLOD.h>
 
 EditorContext::EditorContext() = default;
-
-EditorContext::~EditorContext()
-{
-    delete topology;
-}
+EditorContext::~EditorContext() = default;

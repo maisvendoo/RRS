@@ -337,7 +337,7 @@ bool Route::load_topology()
     // TODO: Replace on Journal
     std::printf("Signals directory: %s\n", models_dir.c_str());
 
-    context_.topology = new Topology;
+    context_.topology = std::make_unique<Topology>();
 
     const auto directory_name = std::filesystem::path(
         context_.route_dir).filename();
