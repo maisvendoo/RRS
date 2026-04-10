@@ -79,7 +79,7 @@ private:
     void decompose_matrix();
 
 private:
-    static EditorContext* s_context_;
+    EditorContext& context_;
 
     vsg::dvec3 translation_;
     vsg::dvec3 rotation_deg_;
