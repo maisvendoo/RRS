@@ -1,6 +1,7 @@
 #include "Route.h"
 
 #include "EditorContext.h"
+#include "Mask.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
@@ -9,19 +10,26 @@
 // #include "parse_file_funcs.h"
 #include "rail-signal.h"
 #include "signals-data-types.h"
+#include "topology-defines.h"
 #include "topology.h"
+#include "trajectory.h"
 #include "vec3.h"
 
 #include <CfgReader.h>
 
 #include <fstream>
 #include <sstream>
+#include <vsg/app/RecordTraversal.h>
+#include <vsg/commands/DrawIndexed.h>
+#include <vsg/core/Array.h>
+#include <vsg/core/Data.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/Geometry.h>
 
 #include <QString>
 
@@ -29,6 +37,12 @@
 #include <cstdio>
 #include <filesystem>
 #include <string>
+#include <vsg/nodes/StateGroup.h>
+#include <vsg/nodes/VertexDraw.h>
+#include <vsg/nodes/VertexIndexDraw.h>
+#include <vsg/state/InputAssemblyState.h>
+#include <vsg/state/RasterizationState.h>
+#include <vulkan/vulkan_core.h>
 
 #define LABEL_BUFFER_SIZE 256
 #define RELATIVE_PATH_BUFFER_SIZE 512
@@ -416,6 +430,61 @@ bool Route::load_topology()
     {
         load_signal(exit_signal);
     }
+
+    const auto input_assembly_state = vsg::InputAssemblyState::create();
+    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+
+    const auto rasterization_state = vsg::RasterizationState::create();
+    rasterization_state->lineWidth = 15.0f;
+    rasterization_state->cullMode = VK_CULL_MODE_NONE;
+    rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
+
+    const auto state_group = vsg::StateGroup::create();
+    state_group->add(input_assembly_state);
+    state_group->add(rasterization_state);
+
+    const traj_list_t* traj_list = context_.topology->getTrajectoriesList();
+    for (const Trajectory* trajectory : *traj_list)
+    {
+        const auto& tracks = trajectory->getTracks();
+        const std::size_t tracks_size = tracks.size();
+
+        if (tracks_size < 2)
+        {
+            continue;
+        }
+
+        std::vector<vsg::dvec3> points;
+        points.reserve(tracks_size);
+        for (const track_t& track : tracks)
+        {
+            points.emplace_back(vsg::dvec3{track.begin_point.x,
+                track.begin_point.y, track.begin_point.z});
+        }
+
+        const auto vertices = vsg::vec3Array::create(tracks_size);
+        const auto colors = vsg::vec4Array::create(tracks_size);
+        const auto indices = vsg::ushortArray::create(tracks_size);
+
+        for (std::size_t i = 0; i < tracks_size; ++i)
+        {
+            vertices->at(i) = points[i];
+            colors->at(i).set(1.0f, 1.0f, 0.0f, 1.0f);
+            indices->at(i) = i;
+        }
+
+        const auto geometry = vsg::Geometry::create();
+        geometry->assignArrays(vsg::DataList{vertices});
+        geometry->assignIndices(indices);
+        geometry->commands.push_back(vsg::DrawIndexed::create(
+            tracks_size, 1, 0, 0, 0
+        ));
+
+        state_group->addChild(geometry);
+    }
+
+    context_.compile_infos.emplace_back(CompileInfo{context_.route,
+        state_group, vsg::Mask{MASK_GUI2}});
 
     return true;
 }
