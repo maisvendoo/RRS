@@ -588,21 +588,27 @@ void EditorGui::show_topology() const
         {
             if (ImGui::TreeNode(trajectory->getName().toStdString().c_str()))
             {
-                ImGui::Text("%17s%12s%12s%12s%12s", "begin.x", "begin.y",
-                    "begin.z", "rail_coord", "traj_coord");
-
-                ImGui::Separator();
-
                 const auto& tracks = trajectory->getTracks();
                 const auto tracks_size = tracks.size();
 
                 for (auto i = decltype(tracks_size){0}; i < tracks_size; ++i)
                 {
                     const track_t& track = tracks[i];
-                    ImGui::Text("[%4zu]:%12.3f%12.3f%12.3f%12.3f%12.3f", i,
-                        track.begin_point.x, track.begin_point.y,
-                        track.begin_point.z, track.railway_coord0,
-                        track.traj_coord);
+                    const dvec3& begin_point = track.begin_point;
+                    const dvec3& end_point = track.end_point;
+
+                    std::string label = "[";
+                    label += std::to_string(i);
+                    label += "]##";
+                    label += trajectory->getName().toStdString();
+                    ImGui::SeparatorText(label.c_str());
+                    ImGui::Text("         begin: %12.3f %12.3f %12.3f",
+                        begin_point.x, begin_point.y, begin_point.z);
+                    ImGui::Text("           end: %12.3f %12.3f %12.3f",
+                        end_point.x, end_point.y, end_point.z);
+                    ImGui::Text("railway_coords: %12.3f %12.3f",
+                        track.railway_coord0, track.railway_coord1);
+                    ImGui::Text("    traj_coord: %12.3f", track.traj_coord);
                 }
 
                 ImGui::TreePop();
