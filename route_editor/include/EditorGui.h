@@ -1,12 +1,12 @@
 #ifndef EDITOR_GUI_H
 #define EDITOR_GUI_H
 
-#include "EditorContext.h"
-
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsgImGui/imgui.h>
+
+struct EditorContext;
 
 namespace vsg
 {

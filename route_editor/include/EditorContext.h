@@ -7,11 +7,11 @@
 #include "RouteObject.h"
 #include "Settings.h"
 
-#include <memory>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 
 #include <map>
+#include <memory>
 #include <string>
 
 class CameraHandler;
