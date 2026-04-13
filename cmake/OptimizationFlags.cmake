@@ -3,7 +3,7 @@
 
 # Базовые флаги для всех конфигураций
 target_compile_options(optflags INTERFACE
-    $<$<CXX_COMPILER_ID:GNU,Clang>:
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
         -Wall
         -Wextra
         -Wpedantic
@@ -15,7 +15,7 @@ target_compile_options(optflags INTERFACE
 # Флаги только для релизных конфигураций
 target_compile_options(optflags INTERFACE
     $<$<CONFIG:Release,RelWithDebInfo,MinSizeRel>:
-        $<$<CXX_COMPILER_ID:GNU,Clang>:
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
             -O3
             -march=native          # см. предупреждение ниже
             -funroll-loops
@@ -28,7 +28,7 @@ target_compile_options(optflags INTERFACE
 # Отладочные конфигурации: безопасные флаги
 target_compile_options(optflags INTERFACE
     $<$<CONFIG:Debug>:
-        $<$<CXX_COMPILER_ID:GNU,Clang>:
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
             -Og                    # оптимизация для отладки
             -g3
             -fno-omit-frame-pointer
@@ -42,7 +42,7 @@ if(CMAKE_CROSSCOMPILING AND NOT DEFINED ALLOW_NATIVE_ARCH)
                     "Установите -DALLOW_NATIVE_ARCH=ON для принудительного включения.")
     target_compile_options(optflags INTERFACE
         $<$<CONFIG:Release,RelWithDebInfo>:
-            $<$<CXX_COMPILER_ID:GNU,Clang>:
+            $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
                 -march=haswell     # безопасный минимум для современных CPU
             >
         >

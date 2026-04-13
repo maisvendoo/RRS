@@ -4,7 +4,7 @@
 #include "JournalStorage.h"
 
 
-#if __unix__
+#if !defined(_WIN32)
     #include <syslog.h>
 #else
     #include "wsyslog.h"

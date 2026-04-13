@@ -178,7 +178,7 @@ std::string FileSystem::toNativeSeparators(const std::string& path) const
 {
     std::string tmp = path;
 
-#if __unix__
+#if !defined(_WIN32)
     std::replace(tmp.begin(), tmp.end(), '\\', '/');
 #else
     std::replace(tmp.begin(), tmp.end(), '/', '\\');

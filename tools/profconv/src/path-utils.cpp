@@ -9,7 +9,7 @@ std::string toNativeSeparators(const std::string &path)
 {
     std::string tmp = path;
 
-#ifdef __unix__
+#if !defined(_WIN32)
     std::replace(tmp.begin(), tmp.end(), '\\', '/');
 #else
     std::replace(tmp.begin(), tmp.end(), '/', '\\');
@@ -23,7 +23,7 @@ std::string toNativeSeparators(const std::string &path)
 //------------------------------------------------------------------------------
 char separator()
 {
-#ifdef __unix__
+#if !defined(_WIN32)
     return '/';
 #else
     return '\\';
