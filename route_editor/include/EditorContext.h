@@ -7,6 +7,7 @@
 #include "RouteObject.h"
 #include "Settings.h"
 
+#include <mutex>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 
@@ -113,6 +114,8 @@ struct EditorContext
     double delta_time = 0.0;
 
     std::vector<CompileInfo> compile_infos;
+    std::mutex compile_mutex;
+
     RouteObjects deferred_selection;
 };
 

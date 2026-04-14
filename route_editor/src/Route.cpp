@@ -18,7 +18,9 @@
 #include <CfgReader.h>
 
 #include <fstream>
+#include <mutex>
 #include <sstream>
+#include <thread>
 #include <vsg/app/RecordTraversal.h>
 #include <vsg/commands/DrawIndexed.h>
 #include <vsg/core/Array.h>
@@ -80,6 +82,31 @@ Route::Route(EditorContext& context)
 
         ref.paged_lod = paged_lod;
     }
+
+    // std::thread load_static_objects_thread([&context]() -> void {
+    //     for (const auto& [label, transforms] : context.route_map)
+    //     {
+    //         const auto found_it = context.objects_ref.find(label);
+    //         if (found_it == context.objects_ref.end())
+    //         {
+    //             continue;
+    //         }
+
+    //         for (const auto& transform : transforms)
+    //         {
+    //             const auto object = RouteObject::create(context,
+    //                 found_it->second.paged_lod, label,
+    //                 transform.translation, -transform.rotation_deg);
+
+
+    //             std::lock_guard<std::mutex> lock(context.compile_mutex);
+    //             context.static_objects.emplace_back(object);
+
+    //             context.compile_infos.emplace_back(CompileInfo{
+    //                 context.route, object, vsg::MASK_ALL});
+    //         }
+    //     }
+    // });
 
     load_static_objects();
     load_topology();
