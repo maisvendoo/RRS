@@ -23,30 +23,26 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
+    const auto intersector = LSIntersector::create(*context_.camera,
+        buttonPress.x, buttonPress.y);
+
+    intersector->traversalMask = MASK_CLICKABLE;
+
     switch (buttonPress.button)
     {
         case MOUSE_BUTTON_LEFT:
         {
-            lmb_intersector_ = LSIntersector::create(*context_.camera,
-                buttonPress.x, buttonPress.y);
-
-            lmb_intersector_->traversalMask = MASK_CLICKABLE;
+            lmb_intersector_ = intersector;
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
-            mmb_intersector_ = LSIntersector::create(*context_.camera,
-                buttonPress.x, buttonPress.y);
-
-            mmb_intersector_->traversalMask = MASK_CLICKABLE;
+            mmb_intersector_ = intersector;
             return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
-            rmb_intersector_ = LSIntersector::create(*context_.camera,
-                buttonPress.x, buttonPress.y);
-
-            rmb_intersector_->traversalMask = MASK_CLICKABLE;
+            rmb_intersector_ = intersector;
             return;
         }
         default:
