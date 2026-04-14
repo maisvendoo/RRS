@@ -115,10 +115,6 @@ bool RouteEditor::initialize()
         render_graph_);
 
     viewer_ = vsg::Viewer::create();
-    const vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer_);
-
-    RouteObjects selected_objects;
-    RouteObjects hidden_objects;
 
     context_.object_selector = ObjectSelector::create(context_);
 
