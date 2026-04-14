@@ -14,7 +14,6 @@
 
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
-#include <vsg/app/RenderGraph.h>
 #include <vsg/app/ViewMatrix.h>
 #include <vsg/commands/ClearAttachments.h>
 #include <vsg/nodes/PagedLOD.h>

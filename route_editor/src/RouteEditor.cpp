@@ -102,17 +102,17 @@ bool RouteEditor::initialize()
 
     const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
 
-    context_.render_graph = vsg::RenderGraph::create(context_.window);
-    context_.render_graph->addChild(scene_view);
-    context_.render_graph->addChild(context_.clear_attachments);
-    context_.render_graph->addChild(gui_view1);
-    context_.render_graph->addChild(context_.clear_attachments);
-    context_.render_graph->addChild(gui_view2);
-    context_.render_graph->addChild(context_.clear_attachments);
-    context_.render_graph->addChild(render_gui);
+    render_graph_ = vsg::RenderGraph::create(context_.window);
+    render_graph_->addChild(scene_view);
+    render_graph_->addChild(context_.clear_attachments);
+    render_graph_->addChild(gui_view1);
+    render_graph_->addChild(context_.clear_attachments);
+    render_graph_->addChild(gui_view2);
+    render_graph_->addChild(context_.clear_attachments);
+    render_graph_->addChild(render_gui);
 
     const auto command_graph = vsg::CommandGraph::create(context_.window,
-        context_.render_graph);
+        render_graph_);
 
     viewer_ = vsg::Viewer::create();
     const vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer_);
