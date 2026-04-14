@@ -458,60 +458,60 @@ bool Route::load_topology()
         load_signal(exit_signal);
     }
 
-    const auto input_assembly_state = vsg::InputAssemblyState::create();
-    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+    // const auto input_assembly_state = vsg::InputAssemblyState::create();
+    // input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
 
-    const auto rasterization_state = vsg::RasterizationState::create();
-    rasterization_state->lineWidth = 15.0f;
-    rasterization_state->cullMode = VK_CULL_MODE_NONE;
-    rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
+    // const auto rasterization_state = vsg::RasterizationState::create();
+    // rasterization_state->lineWidth = 15.0f;
+    // rasterization_state->cullMode = VK_CULL_MODE_NONE;
+    // rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
 
-    const auto state_group = vsg::StateGroup::create();
-    state_group->add(input_assembly_state);
-    state_group->add(rasterization_state);
+    // const auto state_group = vsg::StateGroup::create();
+    // state_group->add(input_assembly_state);
+    // state_group->add(rasterization_state);
 
-    const traj_list_t* traj_list = context_.topology->getTrajectoriesList();
-    for (const Trajectory* trajectory : *traj_list)
-    {
-        const auto& tracks = trajectory->getTracks();
-        const std::size_t tracks_size = tracks.size();
+    // const traj_list_t* traj_list = context_.topology->getTrajectoriesList();
+    // for (const Trajectory* trajectory : *traj_list)
+    // {
+    //     const auto& tracks = trajectory->getTracks();
+    //     const std::size_t tracks_size = tracks.size();
 
-        if (tracks_size < 2)
-        {
-            continue;
-        }
+    //     if (tracks_size < 2)
+    //     {
+    //         continue;
+    //     }
 
-        std::vector<vsg::dvec3> points;
-        points.reserve(tracks_size);
-        for (const track_t& track : tracks)
-        {
-            points.emplace_back(vsg::dvec3{track.begin_point.x,
-                track.begin_point.y, track.begin_point.z});
-        }
+    //     std::vector<vsg::dvec3> points;
+    //     points.reserve(tracks_size);
+    //     for (const track_t& track : tracks)
+    //     {
+    //         points.emplace_back(vsg::dvec3{track.begin_point.x,
+    //             track.begin_point.y, track.begin_point.z});
+    //     }
 
-        const auto vertices = vsg::vec3Array::create(tracks_size);
-        const auto colors = vsg::vec4Array::create(tracks_size);
-        const auto indices = vsg::ushortArray::create(tracks_size);
+    //     const auto vertices = vsg::vec3Array::create(tracks_size);
+    //     const auto colors = vsg::vec4Array::create(tracks_size);
+    //     const auto indices = vsg::ushortArray::create(tracks_size);
 
-        for (std::size_t i = 0; i < tracks_size; ++i)
-        {
-            vertices->at(i) = points[i];
-            colors->at(i).set(1.0f, 1.0f, 0.0f, 1.0f);
-            indices->at(i) = i;
-        }
+    //     for (std::size_t i = 0; i < tracks_size; ++i)
+    //     {
+    //         vertices->at(i) = points[i];
+    //         colors->at(i).set(1.0f, 1.0f, 0.0f, 1.0f);
+    //         indices->at(i) = i;
+    //     }
 
-        const auto geometry = vsg::Geometry::create();
-        geometry->assignArrays(vsg::DataList{vertices});
-        geometry->assignIndices(indices);
-        geometry->commands.push_back(vsg::DrawIndexed::create(
-            tracks_size, 1, 0, 0, 0
-        ));
+    //     const auto geometry = vsg::Geometry::create();
+    //     geometry->assignArrays(vsg::DataList{vertices});
+    //     geometry->assignIndices(indices);
+    //     geometry->commands.push_back(vsg::DrawIndexed::create(
+    //         tracks_size, 1, 0, 0, 0
+    //     ));
 
-        state_group->addChild(geometry);
-    }
+    //     state_group->addChild(geometry);
+    // }
 
-    context_.compile_infos.emplace_back(CompileInfo{context_.route,
-        state_group, vsg::Mask{MASK_GUI2}});
+    // context_.compile_infos.emplace_back(CompileInfo{context_.route,
+    //     state_group, vsg::Mask{MASK_GUI2}});
 
     return true;
 }

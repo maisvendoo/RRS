@@ -35,6 +35,7 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
     key_state_bits_[get_byte_index(keyPress.keyBase)] |=
         get_byte_value(keyPress.keyBase);
 
+    // Move this logic somewhere else
     if (get_binding_state(ACTION_UNDO_COMMAND))
     {
         context_.commands.undo();
