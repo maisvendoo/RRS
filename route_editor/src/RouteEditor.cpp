@@ -217,38 +217,40 @@ void RouteEditor::configure_shaders()
 
 void RouteEditor::compile_models()
 {
-    if (!context_.compile_infos.empty())
+    if (context_.compile_infos.empty())
     {
-        vsg::CompileResult compile_result;
+        return;
+    }
 
-        for (const CompileInfo& compile_info : context_.compile_infos)
+    vsg::CompileResult compile_result;
+
+    for (const CompileInfo& compile_info : context_.compile_infos)
+    {
+        const auto& group_node = compile_info.group_node;
+        const vsg::Mask mask = compile_info.mask;
+        const auto& node = compile_info.node;
+
+        if (group_node)
         {
-            const auto& group_node = compile_info.group_node;
-            const vsg::Mask mask = compile_info.mask;
-            const auto& node = compile_info.node;
-
-            if (group_node)
+            if (auto group = group_node.cast<vsg::Group>())
             {
-                if (auto group = group_node.cast<vsg::Group>())
-                {
-                    group->addChild(node);
-                }
-                else if (auto switch_ = group_node.cast<vsg::Switch>())
-                {
-                    switch_->addChild(mask, node);
-                }
-                else if (auto single_switch = group_node.cast<SingleSwitch>())
-                {
-                    single_switch->node = node;
-                }
+                group->addChild(node);
             }
-
-            compile_result.add(viewer_->compileManager->compile(node));
+            else if (auto switch_ = group_node.cast<vsg::Switch>())
+            {
+                switch_->addChild(mask, node);
+            }
+            else if (auto single_switch = group_node.cast<SingleSwitch>())
+            {
+                single_switch->node = node;
+            }
         }
 
-        vsg::updateViewer(*viewer_, compile_result);
-        context_.compile_infos.clear();
+        compile_result.add(viewer_->compileManager->compile(node));
     }
+
+    vsg::updateViewer(*viewer_, compile_result);
+    context_.compile_infos.clear();
 }
 
 void RouteEditor::handle_deferred_selection()
