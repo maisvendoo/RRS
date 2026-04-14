@@ -25,6 +25,20 @@
 
 #include <cmath>
 
+#define IF_CHECK_INTERSECTION(axis, dot1, dot2, plane1, plane2)             \
+    if (node == arrow_##axis##_)                                            \
+    {                                                                       \
+        click_pos_.axis = world_intersection.axis;                          \
+                                                                            \
+        active_arrow_ = arrow_##axis##_;                                    \
+                                                                            \
+        active_plain_switch_ = (arrow_##dot1##_dot > arrow_##dot2##_dot)    \
+            ? plane_##plane1##_switch_                                      \
+            : plane_##plane2##_switch_;                                     \
+                                                                            \
+        active_line_switch_ = line_##axis##_switch_;                        \
+    }
+
 static constexpr vsg::vec3 X_AXIS_POSITIVEf = {1.0f, 0.0f, 0.0f};
 static constexpr vsg::vec3 Y_AXIS_POSITIVEf = {0.0f, 1.0f, 0.0f};
 static constexpr vsg::vec3 Z_AXIS_POSITIVEf = {0.0f, 0.0f, 1.0f};
@@ -195,42 +209,11 @@ bool Gizmo::handle_intersections()
 
     for (const vsg::Node* const node : intersection->nodePath)
     {
-        if (node == arrow_x_)
-        {
-            click_pos_ = {world_intersection.x, curr_pos_.y, curr_pos_.z};
+        click_pos_ = curr_pos_;
 
-            active_arrow_ = arrow_x_;
-
-            active_plain_switch_ = (arrow_y_dot > arrow_z_dot)
-                ? plane_xz_switch_
-                : plane_xy_switch_;
-
-            active_line_switch_ = line_x_switch_;
-        }
-        else if (node == arrow_y_)
-        {
-            click_pos_ = {curr_pos_.x, world_intersection.y, curr_pos_.z};
-
-            active_arrow_ = arrow_y_;
-
-            active_plain_switch_ = (arrow_x_dot > arrow_z_dot)
-                ? plane_yz_switch_
-                : plane_xy_switch_;
-
-            active_line_switch_ = line_y_switch_;
-        }
-        else if (node == arrow_z_)
-        {
-            click_pos_ = {curr_pos_.x, curr_pos_.y, world_intersection.z};
-
-            active_arrow_ = arrow_z_;
-
-            active_plain_switch_ = (arrow_x_dot > arrow_y_dot)
-                ? plane_yz_switch_
-                : plane_xz_switch_;
-
-            active_line_switch_ = line_z_switch_;
-        }
+        IF_CHECK_INTERSECTION(x, y, z, xz, xy)
+        else IF_CHECK_INTERSECTION(y, x, z, yz, xy)
+        else IF_CHECK_INTERSECTION(z, x, y, yz, xz)
         else
         {
             continue;
