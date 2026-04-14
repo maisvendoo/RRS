@@ -28,13 +28,7 @@ file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
 # Компиляция библиотеки
-if(APPLE)
-    # On macOS MODULE libraries can't be linked to by other targets.
-    # trajectory-ALSN is linked by connector-ALSN, so it must be SHARED.
-    add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
-else()
-    add_library (${TARGET} MODULE ${SOURCES} ${INCLUDES})
-endif()
+add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
