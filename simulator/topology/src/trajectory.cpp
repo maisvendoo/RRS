@@ -765,7 +765,7 @@ void Trajectory::findTracks(double traj_coord,
 
     // Если мы не на первом или последнем треке, ищем на каком мы треке
     // бинарным поиском
-    track_t track;
+    track_t* track = nullptr;
 
     size_t left_idx = 0;
     size_t right_idx = tracks.size() - 1;
@@ -773,9 +773,9 @@ void Trajectory::findTracks(double traj_coord,
 
     while (idx != left_idx)
     {
-        track = tracks[idx];
+        track = &tracks[idx];
 
-        if (traj_coord <= track.traj_coord)
+        if (traj_coord <= track->traj_coord)
             right_idx = idx;
         else
             left_idx = idx;
