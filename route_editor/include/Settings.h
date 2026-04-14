@@ -49,9 +49,13 @@ struct settings_t
     bool is_gui_editable;
     bool show_objects_ref;
     bool show_route_map;
-    bool show_controls;
+    bool show_stations_conf;
+    bool show_waypoints_conf;
+    bool show_key_bindings;
     bool show_camera_settings;
     bool show_topology;
+    bool show_selected_objects_properties;
+    bool show_commands;
 
     KeyBindings key_bindings;
 };

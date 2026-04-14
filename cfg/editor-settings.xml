@@ -76,12 +76,20 @@
         <!-- Отображать список объектов в route1.map после загрузки маршрута -->
         <!-- !!!Сейчас на больших маршрутах тормозит!!! -->
         <ShowRouteMap>0</ShowRouteMap>
+        <!-- Отображать список станций -->
+        <ShowStationsConf>1</ShowStationsConf>
+        <!-- Отображать вэйпоинты -->
+        <ShowWaypointsConf>1</ShowWaypointsConf>
         <!-- Отображать привязки клавиш и кнопок управления -->
-        <ShowControls>1</ShowControls>
+        <ShowKeyBindings>1</ShowKeyBindings>
         <!-- Отображать настройки камеры -->
         <ShowCameraSettings>1</ShowCameraSettings>
         <!-- Отображать топологию -->
         <ShowTopology>0</ShowTopology>
+        <!-- Отображать свойства выделенных объектов -->
+        <ShowSelectedObjectsProperties>1</ShowSelectedObjectsProperties>
+        <!-- Отображать очередь выполненных команд -->
+        <ShowCommands>1</ShowCommands>
     </GUI>
     <!-- Настройки клавиатурных комбинаций управления -->
     <Keys>

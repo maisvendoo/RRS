@@ -58,6 +58,8 @@
 #include <cctype>
 #include <string>
 
+#define SHOW_WINDOW(setting_name) if (settings.setting_name) setting_name()
+
 static bool drag_double(const char* label, double* data,
     const double* min = nullptr)
 {
@@ -122,47 +124,31 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
         }
         default:
         {
+            settings_t& settings = context_.settings;
+
             ImGui::Begin("Settings", nullptr, window_flags_);
-            ImGui::Checkbox("Show objects.ref", &context_.settings.show_objects_ref);
-            ImGui::Checkbox("Show route1.map", &context_.settings.show_route_map);
-            ImGui::Checkbox("Show controls", &context_.settings.show_controls);
-            ImGui::Checkbox("Show camera settings", &context_.settings.show_camera_settings);
-            ImGui::Checkbox("Show topology", &context_.settings.show_topology);
+            ImGui::Checkbox("Show objects.ref", &settings.show_objects_ref);
+            ImGui::Checkbox("Show route1.map", &settings.show_route_map);
+            ImGui::Checkbox("Show stations", &settings.show_stations_conf);
+            ImGui::Checkbox("Show waypoints", &settings.show_waypoints_conf);
+            ImGui::Checkbox("Show key bindings", &settings.show_key_bindings);
+            ImGui::Checkbox("Show camera settings", &settings.show_camera_settings);
+            ImGui::Checkbox("Show topology", &settings.show_topology);
+            ImGui::Checkbox("Show selected objects properties", &settings.show_selected_objects_properties);
+            ImGui::Checkbox("Show commands", &settings.show_commands);
             ImGui::End();
 
             // ImGui::ShowDemoWindow();
 
-            if (context_.settings.show_objects_ref)
-            {
-                show_objects_ref();
-            }
-
-            if (context_.settings.show_route_map)
-            {
-                show_route_map();
-            }
-
-            show_stations_conf();
-            show_waypoints_conf();
-
-            if (context_.settings.show_controls)
-            {
-                show_key_bindings();
-            }
-
-            if (context_.settings.show_camera_settings)
-            {
-                show_camera_settings();
-            }
-
-            if (context_.settings.show_topology)
-            {
-                show_topology();
-            }
-
-            show_selected_objects_properties();
-
-            show_commands();
+            SHOW_WINDOW(show_objects_ref);
+            SHOW_WINDOW(show_route_map);
+            SHOW_WINDOW(show_stations_conf);
+            SHOW_WINDOW(show_waypoints_conf);
+            SHOW_WINDOW(show_key_bindings);
+            SHOW_WINDOW(show_camera_settings);
+            SHOW_WINDOW(show_topology);
+            SHOW_WINDOW(show_selected_objects_properties);
+            SHOW_WINDOW(show_commands);
 
             return;
         }

@@ -50,9 +50,13 @@ settings_t::settings_t()
     , is_gui_editable(false)
     , show_objects_ref(true)
     , show_route_map(false)
-    , show_controls(true)
+    , show_stations_conf(true)
+    , show_waypoints_conf(false)
+    , show_key_bindings(true)
     , show_camera_settings(false)
     , show_topology(false)
+    , show_selected_objects_properties(true)
+    , show_commands(true)
 {
 }
 
@@ -124,9 +128,13 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getBool(section, "IsEditable", is_gui_editable);
     cfg.getBool(section, "ShowObjectsRef", show_objects_ref);
     cfg.getBool(section, "ShowRouteMap", show_route_map);
-    cfg.getBool(section, "ShowControls", show_controls);
+    cfg.getBool(section, "ShowStationsConf", show_stations_conf);
+    cfg.getBool(section, "ShowWaypointsConf", show_waypoints_conf);
+    cfg.getBool(section, "ShowKeyBindings", show_key_bindings);
     cfg.getBool(section, "ShowCameraSettings", show_camera_settings);
     cfg.getBool(section, "ShowTopology", show_topology);
+    cfg.getBool(section, "ShowSelectedObjectsProperties", show_selected_objects_properties);
+    cfg.getBool(section, "ShowCommands", show_commands);
 
     section = "Keys";
 
