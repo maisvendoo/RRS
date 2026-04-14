@@ -12,7 +12,7 @@ add_definitions(-DSCNMGR_LIB)
 
 find_package(Qt6 COMPONENTS Core REQUIRED)
 
-if(WIN32)
+if(WIN32 OR APPLE)
     find_package(lua CONFIG REQUIRED)
 else()
     find_package(Lua 5.4 REQUIRED)
@@ -30,13 +30,17 @@ target_include_directories (${TARGET} PRIVATE ../../libJournal/include)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 
 target_link_libraries(${TARGET} Qt6::Core)
-include_directories(${LUA_INCLUDE_DIR})
 
-if(WIN32)
+if(WIN32 OR APPLE)
+    # On macOS: ensure Lua headers from lua-cmake are found before system Lua 5.5
+    if(APPLE)
+        get_target_property(_LUA_INC lua::lua INTERFACE_INCLUDE_DIRECTORIES)
+        target_include_directories(${TARGET} BEFORE PRIVATE ${_LUA_INC})
+    endif()
     target_link_libraries(${TARGET} lua::lua)
 else()
     target_link_libraries(${TARGET} ${LUA_LIBRARIES})
-    include_directories(${TARGET} ${LUA_INCLUDE_DIR})
+    target_include_directories(${TARGET} PRIVATE ${LUA_INCLUDE_DIR})
 endif()
 
 if(TARGET sol2::sol2)
