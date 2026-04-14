@@ -166,53 +166,8 @@ void RouteEditor::run()
         viewer_->recordAndSubmit();
         viewer_->present();
 
-        if (!context_.compile_infos.empty())
-        {
-            vsg::CompileResult compile_result;
-
-            for (const CompileInfo& compile_info : context_.compile_infos)
-            {
-                const auto& group_node = compile_info.group_node;
-                const vsg::Mask mask = compile_info.mask;
-                const auto& node = compile_info.node;
-
-                if (group_node)
-                {
-                    if (auto group = group_node.cast<vsg::Group>())
-                    {
-                        group->addChild(node);
-                    }
-                    else if (auto switch_ = group_node.cast<vsg::Switch>())
-                    {
-                        switch_->addChild(mask, node);
-                    }
-                    else if (auto single_switch = group_node.cast<SingleSwitch>())
-                    {
-                        single_switch->node = node;
-                    }
-                }
-
-                compile_result.add(viewer_->compileManager->compile(node));
-            }
-
-            vsg::updateViewer(*viewer_, compile_result);
-            context_.compile_infos.clear();
-        }
-
-        RouteObjects& deferred_selection = context_.deferred_selection;
-        for (auto it = deferred_selection.begin();
-            it != deferred_selection.end();)
-        {
-            if ((*it)->select())
-            {
-                it = deferred_selection.erase(it);
-                context_.gizmo->update_visibility();
-            }
-            else
-            {
-                ++it;
-            }
-        }
+        compile_models();
+        handle_deferred_selection();
     }
 }
 
@@ -262,4 +217,57 @@ void RouteEditor::configure_shaders()
     context_.options->shaderSets["flat"] = flat_shader;
     context_.options->shaderSets["pbr"] = pbr_shader;
     context_.options->shaderSets["phong"] = phong_shader;
+}
+
+void RouteEditor::compile_models()
+{
+    if (!context_.compile_infos.empty())
+    {
+        vsg::CompileResult compile_result;
+
+        for (const CompileInfo& compile_info : context_.compile_infos)
+        {
+            const auto& group_node = compile_info.group_node;
+            const vsg::Mask mask = compile_info.mask;
+            const auto& node = compile_info.node;
+
+            if (group_node)
+            {
+                if (auto group = group_node.cast<vsg::Group>())
+                {
+                    group->addChild(node);
+                }
+                else if (auto switch_ = group_node.cast<vsg::Switch>())
+                {
+                    switch_->addChild(mask, node);
+                }
+                else if (auto single_switch = group_node.cast<SingleSwitch>())
+                {
+                    single_switch->node = node;
+                }
+            }
+
+            compile_result.add(viewer_->compileManager->compile(node));
+        }
+
+        vsg::updateViewer(*viewer_, compile_result);
+        context_.compile_infos.clear();
+    }
+}
+
+void RouteEditor::handle_deferred_selection()
+{
+    RouteObjects& deferred_selection = context_.deferred_selection;
+    for (auto it = deferred_selection.begin(); it != deferred_selection.end();)
+    {
+        if ((*it)->select())
+        {
+            it = deferred_selection.erase(it);
+            context_.gizmo->update_visibility();
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }

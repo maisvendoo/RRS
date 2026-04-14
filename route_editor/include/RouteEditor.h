@@ -14,6 +14,8 @@ public:
 
 private:
     void configure_shaders();
+    void compile_models();
+    void handle_deferred_selection();
 
 private:
     EditorContext context_;
