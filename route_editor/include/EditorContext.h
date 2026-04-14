@@ -31,7 +31,6 @@ namespace vsg
 {
 
 class Camera;
-class ClearAttachments;
 class LookAt;
 class Options;
 class PagedLOD;
@@ -87,8 +86,6 @@ struct EditorContext
 
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::ref_ptr<Route> route;
-
-    vsg::ref_ptr<vsg::ClearAttachments> clear_attachments;
 
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<ObjectSelector> object_selector;

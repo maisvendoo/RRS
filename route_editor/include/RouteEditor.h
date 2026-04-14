@@ -18,7 +18,6 @@ private:
 private:
     EditorContext context_;
     vsg::ref_ptr<vsg::Viewer> viewer_;
-    vsg::ref_ptr<vsg::RenderGraph> render_graph_;
 };
 
 #endif // ROUTE_EDITOR_H

@@ -88,7 +88,7 @@ bool RouteEditor::initialize()
     const VkExtent2D& extent = context_.window->extent2D();
     VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, extent}, 0, 1};
 
-    context_.clear_attachments = vsg::ClearAttachments::create(
+    const auto clear_attachments_ = vsg::ClearAttachments::create(
         vsg::ClearAttachments::Attachments{attachment},
         vsg::ClearAttachments::Rects{rect});
 
@@ -102,13 +102,13 @@ bool RouteEditor::initialize()
 
     const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
 
-    render_graph_ = vsg::RenderGraph::create(context_.window);
+    const auto render_graph_ = vsg::RenderGraph::create(context_.window);
     render_graph_->addChild(scene_view);
-    render_graph_->addChild(context_.clear_attachments);
+    render_graph_->addChild(clear_attachments_);
     render_graph_->addChild(gui_view1);
-    render_graph_->addChild(context_.clear_attachments);
+    render_graph_->addChild(clear_attachments_);
     render_graph_->addChild(gui_view2);
-    render_graph_->addChild(context_.clear_attachments);
+    render_graph_->addChild(clear_attachments_);
     render_graph_->addChild(render_gui);
 
     const auto command_graph = vsg::CommandGraph::create(context_.window,
