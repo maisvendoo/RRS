@@ -695,23 +695,25 @@ void EditorGui::handle_rotation_drag(
 
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
-        vsg::dvec3 axis;
+        vsg::dvec3 axis = {0.0, 0.0, 0.0};
         double radians;
+
         if (std::abs(total_rotation_deg.x) >= 1.0e-6)
         {
-            axis = {1.0, 0.0, 0.0};
+            axis.x = 1.0;
             radians = vsg::radians(total_rotation_deg.x);
         }
         else if (std::abs(total_rotation_deg.y) >= 1.0e-6)
         {
-            axis = {0.0, 1.0, 0.0};
+            axis.y = 1.0;
             radians = vsg::radians(total_rotation_deg.y);
         }
         else
         {
-            axis = {0.0, 0.0, 1.0};
+            axis.z = 1.0;
             radians = vsg::radians(total_rotation_deg.z);
         }
+
         context_.commands.push(new RotateObjects(context_, {object},
             context_.gizmo->get_curr_pos(), axis, radians), false);
         dragging = false;
