@@ -35,6 +35,7 @@ private:
     void show_topology() const;
 
     void show_selected_objects_properties() const;
+    void show_commands() const;
 
 private:
     EditorContext& context_;
