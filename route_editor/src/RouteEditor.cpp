@@ -114,26 +114,26 @@ bool RouteEditor::initialize()
     const auto command_graph = vsg::CommandGraph::create(context_.window,
         context_.render_graph);
 
-    context_.viewer = vsg::Viewer::create();
-    const vsg::observer_ptr<vsg::Viewer> observer_viewer(context_.viewer);
+    viewer_ = vsg::Viewer::create();
+    const vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer_);
 
     RouteObjects selected_objects;
     RouteObjects hidden_objects;
 
     context_.object_selector = ObjectSelector::create(context_);
 
-    context_.viewer->addWindow(context_.window);
+    viewer_->addWindow(context_.window);
 
-    context_.viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
-    context_.viewer->addEventHandler(vsg::CloseHandler::create(context_.viewer));
-    context_.viewer->addEventHandler(context_.window_handler);
-    context_.viewer->addEventHandler(context_.mouse_handler);
-    context_.viewer->addEventHandler(context_.keyboard_handler);
-    context_.viewer->addEventHandler(context_.camera_handler);
-    context_.viewer->addEventHandler(context_.intersection_handler);
-    context_.viewer->addEventHandler(context_.object_selector);
+    viewer_->addEventHandler(vsgImGui::SendEventsToImGui::create());
+    viewer_->addEventHandler(vsg::CloseHandler::create(viewer_));
+    viewer_->addEventHandler(context_.window_handler);
+    viewer_->addEventHandler(context_.mouse_handler);
+    viewer_->addEventHandler(context_.keyboard_handler);
+    viewer_->addEventHandler(context_.camera_handler);
+    viewer_->addEventHandler(context_.intersection_handler);
+    viewer_->addEventHandler(context_.object_selector);
 
-    context_.viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
+    viewer_->assignRecordAndSubmitTaskAndPresentation({command_graph});
 
     const uint32_t num_lights = static_cast<uint32_t>(
         context_.settings.num_lights);
@@ -141,17 +141,17 @@ bool RouteEditor::initialize()
     auto resource_hints = vsg::ResourceHints::create();
     resource_hints->numLightsRange = {num_lights, num_lights + 1};
 
-    context_.viewer->compile(resource_hints);
+    viewer_->compile(resource_hints);
 
     return true;
 }
 
 void RouteEditor::run()
 {
-    while (context_.viewer->advanceToNextFrame())
+    while (viewer_->advanceToNextFrame())
     {
-        static double prev_time = context_.viewer->getFrameStamp()->simulationTime;
-        double curr_time = context_.viewer->getFrameStamp()->simulationTime;
+        static double prev_time = viewer_->getFrameStamp()->simulationTime;
+        double curr_time = viewer_->getFrameStamp()->simulationTime;
         context_.delta_time = curr_time - prev_time;
         prev_time = curr_time;
 
@@ -161,10 +161,10 @@ void RouteEditor::run()
             context_.state = EditorState::EDIT_ROUTE;
         }
 
-        context_.viewer->handleEvents();
-        context_.viewer->update();
-        context_.viewer->recordAndSubmit();
-        context_.viewer->present();
+        viewer_->handleEvents();
+        viewer_->update();
+        viewer_->recordAndSubmit();
+        viewer_->present();
 
         if (!context_.compile_infos.empty())
         {
@@ -192,10 +192,10 @@ void RouteEditor::run()
                     }
                 }
 
-                compile_result.add(context_.viewer->compileManager->compile(node));
+                compile_result.add(viewer_->compileManager->compile(node));
             }
 
-            vsg::updateViewer(*context_.viewer, compile_result);
+            vsg::updateViewer(*viewer_, compile_result);
             context_.compile_infos.clear();
         }
 

@@ -37,7 +37,6 @@ class Options;
 class PagedLOD;
 class Perspective;
 class RenderGraph;
-class Viewer;
 class Window;
 
 }
@@ -92,7 +91,6 @@ struct EditorContext
 
     vsg::ref_ptr<vsg::ClearAttachments> clear_attachments;
     vsg::ref_ptr<vsg::RenderGraph> render_graph;
-    vsg::ref_ptr<vsg::Viewer> viewer;
 
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<ObjectSelector> object_selector;

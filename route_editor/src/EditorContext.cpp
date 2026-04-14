@@ -16,7 +16,6 @@
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/RenderGraph.h>
 #include <vsg/app/ViewMatrix.h>
-#include <vsg/app/Viewer.h>
 #include <vsg/commands/ClearAttachments.h>
 #include <vsg/nodes/PagedLOD.h>
 
