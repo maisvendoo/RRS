@@ -33,8 +33,8 @@ public:
         vsg::ref_ptr<vsg::PagedLOD> paged_lod,
         const std::string& label,
         const vsg::dvec3& translation,
-        const vsg::dvec3& rotation_deg,
-        const vsg::dvec3& scale = {1.0f, 1.0f, 1.0f}
+        const vsg::dvec3& rotation_deg = {0.0, 0.0, 0.0},
+        const vsg::dvec3& scale = {1.0, 1.0, 1.0}
     );
 
     const vsg::dvec3& get_translation() const;

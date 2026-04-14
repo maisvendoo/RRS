@@ -6,6 +6,9 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsgImGui/imgui.h>
 
+#include <cstddef>
+
+class RouteObject;
 struct EditorContext;
 
 namespace vsg
@@ -36,6 +39,31 @@ private:
 
     void show_selected_objects_properties() const;
     void show_commands() const;
+
+    void add_object(
+        vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+        const std::string& label
+    ) const;
+
+    void save_objects_matrixes() const;
+
+    void handle_translation_drag(
+        std::size_t index,
+        vsg::ref_ptr<RouteObject> object,
+        bool& dragging
+    ) const;
+
+    void handle_rotation_drag(
+        std::size_t index,
+        vsg::ref_ptr<RouteObject> object,
+        bool& dragging
+    ) const;
+
+    void handle_scale_drag(
+        std::size_t index,
+        vsg::ref_ptr<RouteObject> object,
+        bool& dragging
+    ) const;
 
 private:
     EditorContext& context_;

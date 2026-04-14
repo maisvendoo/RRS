@@ -217,14 +217,7 @@ void EditorGui::show_objects_ref() const
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                const auto object = RouteObject::create(context_, ref.paged_lod,
-                    label, context_.look_at->eye +
-                        context_.camera_handler->get_front() * 20.0,
-                    vsg::dvec3(0.0, 0.0, 0.0)
-                );
-
-                context_.commands.push(new AddObject(
-                    context_, object), true);
+                add_object(ref.paged_lod, label);
             }
 
             ImGui::TableNextColumn();
@@ -261,21 +254,23 @@ void EditorGui::show_route_map() const
                 const vsg::dvec3& translation = transform.translation;
                 const vsg::dvec3& rotation_deg = transform.rotation_deg;
 
+                constexpr const char* number_format = "%10.3f";
+
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
                 ImGui::Text("%s", label.c_str());
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", translation.x);
+                ImGui::Text(number_format, translation.x);
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", translation.y);
+                ImGui::Text(number_format, translation.y);
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", translation.z);
+                ImGui::Text(number_format, translation.z);
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", rotation_deg.x);
+                ImGui::Text(number_format, rotation_deg.x);
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", rotation_deg.y);
+                ImGui::Text(number_format, rotation_deg.y);
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", rotation_deg.z);
+                ImGui::Text(number_format, rotation_deg.z);
             }
         }
 
@@ -295,6 +290,8 @@ void EditorGui::show_stations_conf() const
     {
         for (const auto& [label, translation] : context_.stations_conf)
         {
+            constexpr const char* number_format = "%10.3f";
+
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
@@ -306,11 +303,11 @@ void EditorGui::show_stations_conf() const
                     + context_.camera_handler->get_front();
             }
             ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.x);
+            ImGui::Text(number_format, translation.x);
             ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.y);
+            ImGui::Text(number_format, translation.y);
             ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.z);
+            ImGui::Text(number_format, translation.z);
         }
 
         ImGui::EndTable();
@@ -580,115 +577,17 @@ void EditorGui::show_selected_objects_properties() const
 
     ImGui::Begin("Selected objects", nullptr, window_flags_);
 
-    int i = 0;
-
     static bool dragging = false;
-    static vsg::dvec3 total_translation;
-    static vsg::dvec3 total_rotation_deg;
-    static vsg::dvec3 total_scale;
 
-    const auto save_matrixes = [&]() -> void
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->save_matrix();
-        }
-    };
+    std::size_t i = 0;
 
     for (const auto& object : selected_objects)
     {
         ImGui::Text("label: %s", object->label.c_str());
 
-        std::string label = "translation##" + std::to_string(i);
-
-        vsg::dvec3 translation = object->get_translation();
-        if (drag_double3(label.c_str(), translation.data()))
-        {
-            if (!dragging)
-            {
-                total_translation = {0.0, 0.0, 0.0};
-                save_matrixes();
-                dragging = true;
-            }
-            total_translation += translation - object->get_translation();
-            object->set_translation(translation);
-        }
-
-        if (ImGui::IsItemDeactivatedAfterEdit())
-        {
-            context_.commands.push(new TranslateObjects(context_, {object},
-                total_translation), false);
-            dragging = false;
-        }
-
-        label = "rotation##" + std::to_string(i);
-
-        constexpr double min_rot_deg = -360.0;
-        constexpr double max_rot_deg = 360.0;
-        vsg::dvec3 rotation_deg = object->get_rotation_deg();
-        if (drag_double3(label.c_str(), rotation_deg.data(), 1.0f,
-            &min_rot_deg, &max_rot_deg, ImGuiSliderFlags_WrapAround))
-        {
-            if (!dragging)
-            {
-                total_rotation_deg = {0.0, 0.0, 0.0};
-                save_matrixes();
-                dragging = true;
-            }
-            total_rotation_deg += rotation_deg - object->get_rotation_deg();
-            object->set_rotation_deg(rotation_deg);
-        }
-
-        if (ImGui::IsItemDeactivatedAfterEdit())
-        {
-            vsg::dvec3 axis;
-            double radians;
-            if (std::abs(total_rotation_deg.x) >= 1.0e-6)
-            {
-                axis = {1.0, 0.0, 0.0};
-                radians = vsg::radians(total_rotation_deg.x);
-            }
-            else if (std::abs(total_rotation_deg.y) >= 1.0e-6)
-            {
-                axis = {0.0, 1.0, 0.0};
-                radians = vsg::radians(total_rotation_deg.y);
-            }
-            else
-            {
-                axis = {0.0, 0.0, 1.0};
-                radians = vsg::radians(total_rotation_deg.z);
-            }
-            context_.commands.push(new RotateObjects(context_, {object},
-                context_.gizmo->get_curr_pos(), axis, radians), false);
-            dragging = false;
-        }
-
-        label = "scale##" + std::to_string(i);
-
-        const vsg::dvec3& prev_scale = object->get_scale();
-        vsg::dvec3 scale = object->get_scale();
-        if (drag_double3(label.c_str(), scale.data(), 0.01f))
-        {
-            if (vsg::length(scale) > 1.0e-6)
-            {
-                if (!dragging)
-                {
-                    total_scale = {1.0, 1.0, 1.0};
-                    save_matrixes();
-                    dragging = true;
-                }
-                total_scale *= {scale.x / prev_scale.x, scale.y / prev_scale.y,
-                    scale.z / prev_scale.z};
-                object->set_scale(scale);
-            }
-        }
-
-        if (ImGui::IsItemDeactivatedAfterEdit())
-        {
-            context_.commands.push(new ScaleObjects(context_, {object},
-                context_.gizmo->get_curr_pos(), total_scale), false);
-            dragging = false;
-        }
+        handle_translation_drag(i, object, dragging);
+        handle_rotation_drag(i, object, dragging);
+        handle_scale_drag(i, object, dragging);
 
         ++i;
     }
@@ -718,4 +617,138 @@ void EditorGui::show_commands() const
         curr = curr->prev;
     }
     ImGui::End();
+}
+
+void EditorGui::add_object(
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    const std::string& label
+) const
+{
+    const auto object = RouteObject::create(context_, paged_lod, label,
+        context_.look_at->eye + context_.camera_handler->get_front() * 20.0);
+
+    context_.commands.push(new AddObject(context_, object), true);
+}
+
+void EditorGui::save_objects_matrixes() const
+{
+    for (const auto& object : context_.selected_objects)
+    {
+        object->save_matrix();
+    }
+}
+
+void EditorGui::handle_translation_drag(
+    size_t index,
+    vsg::ref_ptr<RouteObject> object,
+    bool& dragging
+) const
+{
+    std::string label = "translation##" + std::to_string(index);
+    static vsg::dvec3 total_translation = {0.0, 0.0, 0.0};
+
+    vsg::dvec3 translation = object->get_translation();
+    if (drag_double3(label.c_str(), translation.data()))
+    {
+        if (!dragging)
+        {
+            total_translation = {0.0, 0.0, 0.0};
+            save_objects_matrixes();
+            dragging = true;
+        }
+        total_translation += translation - object->get_translation();
+        object->set_translation(translation);
+    }
+
+    if (ImGui::IsItemDeactivatedAfterEdit())
+    {
+        context_.commands.push(new TranslateObjects(context_, {object},
+            total_translation), false);
+        dragging = false;
+    }
+}
+
+void EditorGui::handle_rotation_drag(
+    std::size_t index,
+    vsg::ref_ptr<RouteObject> object,
+    bool& dragging
+) const
+{
+    std::string label = "rotation##" + std::to_string(index);
+    static vsg::dvec3 total_rotation_deg = {0.0, 0.0, 0.0};
+
+    constexpr double min_rot_deg = -360.0;
+    constexpr double max_rot_deg = 360.0;
+    vsg::dvec3 rotation_deg = object->get_rotation_deg();
+    if (drag_double3(label.c_str(), rotation_deg.data(), 1.0f,
+        &min_rot_deg, &max_rot_deg, ImGuiSliderFlags_WrapAround))
+    {
+        if (!dragging)
+        {
+            total_rotation_deg = {0.0, 0.0, 0.0};
+            save_objects_matrixes();
+            dragging = true;
+        }
+        total_rotation_deg += rotation_deg - object->get_rotation_deg();
+        object->set_rotation_deg(rotation_deg);
+    }
+
+    if (ImGui::IsItemDeactivatedAfterEdit())
+    {
+        vsg::dvec3 axis;
+        double radians;
+        if (std::abs(total_rotation_deg.x) >= 1.0e-6)
+        {
+            axis = {1.0, 0.0, 0.0};
+            radians = vsg::radians(total_rotation_deg.x);
+        }
+        else if (std::abs(total_rotation_deg.y) >= 1.0e-6)
+        {
+            axis = {0.0, 1.0, 0.0};
+            radians = vsg::radians(total_rotation_deg.y);
+        }
+        else
+        {
+            axis = {0.0, 0.0, 1.0};
+            radians = vsg::radians(total_rotation_deg.z);
+        }
+        context_.commands.push(new RotateObjects(context_, {object},
+            context_.gizmo->get_curr_pos(), axis, radians), false);
+        dragging = false;
+    }
+}
+
+void EditorGui::handle_scale_drag(
+    size_t index,
+    vsg::ref_ptr<RouteObject> object,
+    bool& dragging
+) const
+{
+    std::string label = "scale##" + std::to_string(index);
+    static vsg::dvec3 total_scale = {1.0, 1.0, 1.0};
+
+    const vsg::dvec3& prev_scale = object->get_scale();
+    vsg::dvec3 scale = object->get_scale();
+    if (drag_double3(label.c_str(), scale.data(), 0.01f))
+    {
+        if (vsg::length(scale) > 1.0e-6)
+        {
+            if (!dragging)
+            {
+                total_scale = {1.0, 1.0, 1.0};
+                save_objects_matrixes();
+                dragging = true;
+            }
+            total_scale *= {scale.x / prev_scale.x, scale.y / prev_scale.y,
+                scale.z / prev_scale.z};
+            object->set_scale(scale);
+        }
+    }
+
+    if (ImGui::IsItemDeactivatedAfterEdit())
+    {
+        context_.commands.push(new ScaleObjects(context_, {object},
+            context_.gizmo->get_curr_pos(), total_scale), false);
+        dragging = false;
+    }
 }
