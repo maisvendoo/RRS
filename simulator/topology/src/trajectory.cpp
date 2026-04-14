@@ -9,6 +9,7 @@
 
 #include    <Journal.h>
 #include    <fstream>
+#include    <sstream>
 #include    <physics.h>
 
 #define DOUBLE_BUFFER_SIZE 32
@@ -132,12 +133,12 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
         if (module  == nullptr)
         {
             Journal::instance()->error(
-                "Fail to load module " + mc.module_name + ".dll for trajectory " + traj_name);
+                "Fail to load module " + mc.module_name + " for trajectory " + traj_name);
             continue;
         }
 
         Journal::instance()->info(
-            "Loaded module " + mc.module_name + ".dll for trajectory " + traj_name);
+            "Loaded module " + mc.module_name + " for trajectory " + traj_name);
 
         // Указываем модулю, что он относится к этой траектории
         module->setTrajectory(this);

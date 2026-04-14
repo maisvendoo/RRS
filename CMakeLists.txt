@@ -5,6 +5,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project (RRS VERSION 1.9.0)
 
+# RPATH configuration for finding shared libraries at runtime
+if(APPLE)
+    set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+    set(CMAKE_MACOSX_RPATH ON)
+elseif(UNIX)
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+endif()
+
 add_subdirectory (CfgReader)
 add_subdirectory (CfgEditor)
 add_subdirectory (filesystem)

@@ -69,6 +69,9 @@ bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_f
         }
     }
 
+    models_dir = fs.toNativeSeparators(models_dir);
+    animations_dir = fs.toNativeSeparators(animations_dir);
+
     std::string models_dir_path = fs.getDataDir();
     models_dir_path = fs.combinePath(models_dir_path, "models");
     models_dir_path = fs.combinePath(models_dir_path, models_dir);

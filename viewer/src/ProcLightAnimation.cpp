@@ -1,5 +1,6 @@
 #include    <ProcLightAnimation.h>
 #include    <CfgReader.h>
+#include    <sstream>
 
 #include    <vsg/lighting/SpotLight.h>
 #include    <vsg/lighting/DirectionalLight.h>

@@ -346,7 +346,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
         }
 
         Journal::instance()->info(
-            "Loaded module " + conn_module + ".dll for connector " + name);
+            "Loaded module " + conn_module + " for connector " + name);
 
         // Указываем модулю, что он относится к этому коннектору
         module->setConnector(this);

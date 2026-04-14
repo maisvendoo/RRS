@@ -56,7 +56,7 @@
 #include <vsgImGui/SendEventsToImGui.h>
 #include <vsgXchange/all.h>
 
-#include <QApplication>
+#include <QCoreApplication>
 
 #include <cstdlib>
 #include <string>
@@ -174,7 +174,7 @@ int RouteViewer::run()
     // инициализации все объектов
     while (!is_ready)
     {
-        QApplication::processEvents();
+        QCoreApplication::processEvents();
     }
 
     // viewer->setupThreading(); // Эта функция была в одном из vsgExamples
@@ -183,7 +183,7 @@ int RouteViewer::run()
     // Главный цикл рендеринга
     while (viewer->advanceToNextFrame())
     {
-        QApplication::processEvents();
+        QCoreApplication::processEvents();
 
         viewer->handleEvents();
         viewer->update();

@@ -28,7 +28,7 @@ find_package(Qt6 COMPONENTS Network REQUIRED)
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
-if(WIN32)
+if(WIN32 OR APPLE)
     find_package(lua CONFIG REQUIRED)
 else()
     find_package(Lua 5.4 REQUIRED)
@@ -36,11 +36,11 @@ endif()
 
 # Компиляция библиотеки
 add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
-if(WIN32)
+if(WIN32 OR APPLE)
     target_link_libraries(${TARGET} lua::lua)
 else()
     target_link_libraries(${TARGET} ${LUA_LIBRARIES})
-    include_directories(${TARGET} ${LUA_INCLUDE_DIR})
+    target_include_directories(${TARGET} PRIVATE ${LUA_INCLUDE_DIR})
 endif()
 
 # Указываем пути поиска заголовков

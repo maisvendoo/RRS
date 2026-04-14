@@ -1347,7 +1347,7 @@ void Train::loadJointModule(Device* con_fwd, Device* con_bwd, std::vector<Joint*
     if (joint == nullptr)
         return;
 
-    Journal::instance()->info("Loaded joint model from: " + joint_module_name + ".dll");
+    Journal::instance()->info("Loaded joint model from: " + joint_module_name);
 
     joint->setLink(con_fwd, 0);
     joint->setLink(con_bwd, 1);
