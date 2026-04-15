@@ -91,10 +91,7 @@ QString Signal::getConnectorName() const
 void Signal::setConnector(Switch* conn)
 {
     this->conn = conn;
-    if (conn)
-        conn_name = conn->getName();
-    else
-        conn_name = "";
+    conn_name = conn ? conn->getName() : "";
 }
 
 //------------------------------------------------------------------------------
@@ -120,7 +117,7 @@ QByteArray Signal::serialize()
     stream << letter;
     stream << signal_model;
 
-    for (auto lens : lens_state)
+    for (bool lens : lens_state)
     {
         stream << lens;
     }
@@ -149,9 +146,9 @@ void Signal::deserialize(QByteArray &data)
     stream >> letter;
     stream >> signal_model;
 
-    for (size_t i = 0; i < lens_state.size(); ++i)
+    for (bool lens : lens_state)
     {
-        stream >> lens_state[i];
+        stream >> lens;
     }
 
     stream >> pos.x >> pos.y >> pos.z;
@@ -172,7 +169,7 @@ bool Signal::calcPosition()
     }
 
     // Смотрим на траекторию перед коннектором при светофоре
-    Trajectory* traj = nullptr;
+    const Trajectory* traj = nullptr;
     if (signal_dir == 1)
     {
         if (conn->trajectories[SW_BWD_PLUS])

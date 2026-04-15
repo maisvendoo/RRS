@@ -79,19 +79,18 @@ void LineSignal::check_route()
     U_side = 0.0;
 
     // Начинаем с коннектора, к которому относится светофор
-    Switch *cur_conn = conn;
-
+    const Switch* cur_conn = conn;
     if (!cur_conn)
     {
         return;
     }
 
     dir_t cur_dir = signal_dir;
+
     while (true)
     {
         // Смотрим траекторию за текущим коннектором
-        Trajectory* traj = cur_conn->getNextTraj(cur_dir);
-
+        const Trajectory* traj = cur_conn->getNextTraj(cur_dir);
         if (!traj)
         {
             return;
@@ -105,28 +104,34 @@ void LineSignal::check_route()
 
         // Смотрим следующий коннектор
         cur_conn = traj->getNextSwitch(cur_dir);
-
         if (!cur_conn)
         {
             return;
         }
 
         // Смотрим сигнал на следующем коннекторе
-        Signal* signal = (signal_dir == 1) ? cur_conn->getSignalFwd() : cur_conn->getSignalBwd();
+        const Signal* signal = (signal_dir == 1)
+            ? cur_conn->getSignalFwd()
+            : cur_conn->getSignalBwd();
 
-        if (signal)
+        if (!signal)
         {
-            if (TrainSignal* ts = dynamic_cast<TrainSignal*>(signal))
-            {
-                // Замыкание цепи на путевое реле в релейном шкафу следующего светофора
-                U_way = U_bat;
-                // Линейное реле питается от линии следующего светофора
-                U_line = ts->getLineVoltage();
-                // Боковое сигнальное реле питается от линии следующего светофора
-                U_side = ts->getSideVoltage();
-                return;
-            }
+            continue;
         }
+
+        const TrainSignal* ts = dynamic_cast<const TrainSignal*>(signal);
+        if (!ts)
+        {
+            continue;
+        }
+
+        // Замыкание цепи на путевое реле в релейном шкафу следующего светофора
+        U_way = U_bat;
+        // Линейное реле питается от линии следующего светофора
+        U_line = ts->getLineVoltage();
+        // Боковое сигнальное реле питается от линии следующего светофора
+        U_side = ts->getSideVoltage();
+        return;
     }
 }
 
