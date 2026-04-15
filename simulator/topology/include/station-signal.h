@@ -2,10 +2,12 @@
 #define     STATION_SIGNAL_H
 
 #include    "train-signal.h"
-#include    <combine-relay.h>
 
-class Trajectory;
+class CombineRelay;
+class Relay;
 class Switch;
+class Timer;
+class Trajectory;
 
 //------------------------------------------------------------------------------
 //
@@ -57,7 +59,7 @@ protected:
     };
     /// Реле пригласительного сигнала:
     /// управляется кнопками открыть пригласительный/закрыть
-    Relay* call_relay = new Relay(NUM_CALL_CONTACTS);
+    Relay* call_relay = nullptr;
 
     enum
     {
@@ -68,7 +70,7 @@ protected:
     };
     /// Контрольное маршрутное реле:
     /// включено, когда до следующего поездного светофора свободно и стрелки по маршруту
-    Relay* control_relay = new Relay(NUM_CR_CONTACTS);
+    Relay* control_relay = nullptr;
 
     enum
     {
@@ -83,7 +85,7 @@ protected:
     };
     /// Сигнальное реле:
     /// управляется кнопками открыть поездной/закрыть сигнал (если маршрут возможен)
-    Relay* signal_relay = new Relay(NUM_SR_CONTACTS);
+    Relay* signal_relay = nullptr;
 
     enum
     {
@@ -95,7 +97,7 @@ protected:
     /// Контрольное реле маневрового маршрута:
     /// включено, когда до целевой траектории свободно и стрелки по маршруту,
     /// либо пока светофор открыт и заняты оба участка перед и за светофором (пока проезжает состав)
-    Relay* control_relay_shunt = new Relay(NUM_CRS_CONTACTS);
+    Relay* control_relay_shunt = nullptr;
 
     enum
     {
@@ -110,7 +112,7 @@ protected:
     };
     /// Сигнальное реле маневрового маршрута:
     /// управляется кнопками открыть маневровый/закрыть сигнал (если маршрут возможен)
-    Relay* signal_relay_shunt = new Relay(NUM_SRS_CONTACTS);
+    Relay* signal_relay_shunt = nullptr;
 
     enum
     {
@@ -127,7 +129,7 @@ protected:
     /// Реле замыкания маршрута (с полярным якорем):
     /// при питании положительным напряжением блокирует стрелки и занимает пути
     /// по поездному маршруту, при питании отрицательным напряжением - по маневровому
-    CombineRelay* lock_relay = new CombineRelay(NUM_LR_NEUTRAL_CONTACTS, NUM_LR_PLUS_CONTACTS, NUM_LR_MINUS_CONTACTS);
+    CombineRelay* lock_relay = nullptr;
 
 
     enum Restrict : std::uint8_t {
@@ -169,13 +171,13 @@ private:
     bool is_close_button_unpressed = true;
 
     /// Таймер выдержки времени удержания кнопки открыть
-    Timer* open_timer = new Timer(1.0, false);
+    Timer* open_timer = nullptr;
 
     /// Таймер выдержки времени удержания кнопки закрыть
-    Timer* close_timer = new Timer(1.0, false);
+    Timer* close_timer = nullptr;
 
     /// Таймер мигания линз светофора
-    Timer* blink_timer = new Timer(0.75, false);
+    Timer* blink_timer = nullptr;
 
     /// Замыкание или размыкание стрелочного перевода вперёд
     bool check_and_lock_switch_fwd(Switch* sw, bool lock);

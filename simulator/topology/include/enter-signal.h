@@ -1,6 +1,7 @@
 #ifndef     ENTER_SIGNAL_H
 #define     ENTER_SIGNAL_H
 
+#include "relay.h"
 #include    "station-signal.h"
 
 //------------------------------------------------------------------------------
