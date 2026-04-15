@@ -224,9 +224,13 @@ bool Trajectory::isInRoute() const
 void Trajectory::setBusy(size_t idx, double coord_begin, double coord_end)
 {
     if ((coord_begin < len) && (coord_end > 0.0) && (coord_begin < coord_end))
+    {
         vehicles_coords.insert(idx, {coord_begin, coord_end});
+    }
     else
+    {
         vehicles_coords.remove(idx);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -235,7 +239,8 @@ void Trajectory::setBusy(size_t idx, double coord_begin, double coord_end)
 void Trajectory::clearBusy()
 {
     vehicles_coords.clear();
-    for (auto traj_device : devices)
+
+    for (auto* traj_device : devices)
     {
         traj_device->clearLinks();
     }
@@ -262,10 +267,13 @@ bool Trajectory::isBusy() const
 //------------------------------------------------------------------------------
 bool Trajectory::isBusy(double coord_begin, double coord_end) const
 {
-    for (auto vehicle_coord : vehicles_coords)
+    for (const auto& vehicle_coord : vehicles_coords)
     {
-        if ((vehicle_coord[1] >= coord_begin) && (vehicle_coord[0] <= coord_end))
+        if ((vehicle_coord[1] >= coord_begin) &&
+            (vehicle_coord[0] <= coord_end))
+        {
             return true;
+        }
     }
 
     return false;
@@ -274,10 +282,11 @@ bool Trajectory::isBusy(double coord_begin, double coord_end) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int Trajectory::getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction)
+int Trajectory::getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction) const
 {
     double coord_begin = coord;
     double coord_end = coord;
+
     if (direction == BWD)
     {
         coord_begin = coord_begin - search_distance;
@@ -309,11 +318,11 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
         {
             distance = distance + coord_end;
 
-            Switch* bwd_sw = getNextSwitch(direction);
+            const Switch* bwd_sw = getNextSwitch(direction);
             if (bwd_sw == nullptr)
                 return -1;
 
-            Trajectory *traj = bwd_sw->getNextTraj(direction);
+            const Trajectory *traj = bwd_sw->getNextTraj(direction);
             if (traj == nullptr)
                 return -1;
 
@@ -353,11 +362,11 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
         {
             distance = distance + len - coord_begin;
 
-            Switch* fwd_sw = getNextSwitch(direction);
+            const Switch* fwd_sw = getNextSwitch(direction);
             if (fwd_sw == nullptr)
                 return -1;
 
-            Trajectory *traj = fwd_sw->getNextTraj(direction);
+            const Trajectory *traj = fwd_sw->getNextTraj(direction);
             if (traj == nullptr)
                 return -1;
 
@@ -373,10 +382,11 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trajectory::getBusyCoords(double &busy_begin_coord, double &busy_end_coord)
+void Trajectory::getBusyCoords(double &busy_begin_coord, double &busy_end_coord) const
 {
     busy_begin_coord = len;
     busy_end_coord = 0.0;
+
     if (is_busy)
     {
         for (const auto& vehicle_coord : vehicles_coords)
@@ -564,7 +574,7 @@ bool Trajectory::findTrajectoryAtCoord(Trajectory*& cur_traj, double& coord, dou
         dir_t new_dir = move_dir;
 
         // Получаем указатель на стрелку в конце траектории
-        Switch* next_sw = cur_traj->getNextSwitch(new_dir);
+        const Switch* next_sw = cur_traj->getNextSwitch(new_dir);
         if (next_sw == nullptr)
         {
             // Если коннектора нет, выходим

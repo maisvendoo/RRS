@@ -79,11 +79,11 @@ public:
 
     /// Индекс ближайшей единицы подвижного состава, если есть;
     /// -1, если нет подвижного состава в пределах дистанции поиска
-    int getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction);
+    int getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction) const;
 
     /// Интервал координат, занятых подвижным составом;
     /// если пустая, busy_begin_coord = length; busy_end_coord = 0.0
-    void getBusyCoords(double &busy_begin_coord, double &busy_end_coord);
+    void getBusyCoords(double &busy_begin_coord, double &busy_end_coord) const;
 
     /// Вернуть все треки траектории
     const std::vector<track_t>& getTracks() const
