@@ -4,7 +4,7 @@
 
 #include <vsg/core/Exception.h>
 
-#include <QCoreApplication>
+#include <QApplication>
 
 #include <cstdio>
 #include <cstdlib>
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
         // Use QCoreApplication instead of QApplication — viewer does not need Qt GUI,
         // only Qt networking/XML. Avoids NSApp run loop conflict with VSG window on macOS.
-        QCoreApplication application(argc, argv);
+        QApplication application(argc, argv);
 
         RouteViewer viewer;
         viewer.initialize(argc, argv);
