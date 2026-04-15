@@ -3,8 +3,8 @@
 
 #include    "rail-signal.h"
 
-#include    <relay.h>
-#include    <timer.h>
+class Relay;
+class Timer;
 
 //------------------------------------------------------------------------------
 //
@@ -23,27 +23,15 @@ public:
     virtual void step(double t, double dt) override;
 
     /// Код АЛСН
-    alsn_state_t getALSNstate() const
-    {
-        return alsn_state;
-    }
+    alsn_state_t getALSNstate() const;
 
     /// Напряжение для линейного реле предыдущего светофора
-    double getLineVoltage() const
-    {
-        return U_line_prev;
-    }
+    double getLineVoltage() const;
 
     /// Напряжение для бокового сигнального реле предыдущего светофора
-    double getSideVoltage() const
-    {
-        return U_side_prev;
-    }
+    double getSideVoltage() const;
 
-    void allowTransmitALSN(bool is_allow)
-    {
-        is_alsn_allow = is_allow;
-    }
+    void allowTransmitALSN(bool is_allow);
 
 protected:
 
@@ -88,16 +76,16 @@ protected:
     };
 
     /// Реле включения красного с жёлтым кода АЛСН
-    Relay *alsn_RY_relay = new Relay(NUM_ALSN_RY_CONTACTS);
+    Relay *alsn_RY_relay = nullptr;
 
     /// Реле включения жёлтого кода АЛСН
-    Relay *alsn_Y_relay = new Relay(NUM_ALSN_Y_CONTACTS);
+    Relay *alsn_Y_relay = nullptr;
 
     /// Реле включения зелёного кода АЛСН
-    Relay *alsn_G_relay = new Relay(NUM_ALSN_G_CONTACTS);
+    Relay *alsn_G_relay = nullptr;
 
     /// Таймер включения путевого трансмитера, если нет запрета
-    Timer *alsn_allow_timer = new Timer(15.0, false);
+    Timer *alsn_allow_timer = nullptr;
 
 private slots:
 
