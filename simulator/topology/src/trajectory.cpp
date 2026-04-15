@@ -608,7 +608,7 @@ bool Trajectory::findTrajectoryAtCoord(Trajectory*& cur_traj, double& coord, dou
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-profile_point_t Trajectory::getPosition(double traj_coord, int direction)
+profile_point_t Trajectory::getPosition(double traj_coord, int direction) const
 {
     profile_point_t pp;
 
@@ -718,10 +718,12 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 void Trajectory::findTracks(double traj_coord,
                             track_t& cur_track,
                             track_t& prev_track,
-                            track_t& next_track)
+                            track_t& next_track) const
 {
-    if (tracks.size() == 0)
+    if (tracks.empty())
+    {
         return;
+    }
 
     // Исходим из того, что случаи traj_coord < 0 и traj_coord > len не допускаются.
     // В этом случае, текущий трек это трек на данной траектории, и если
@@ -765,7 +767,7 @@ void Trajectory::findTracks(double traj_coord,
 
     // Если мы не на первом или последнем треке, ищем на каком мы треке
     // бинарным поиском
-    track_t* track = nullptr;
+    const track_t* track = nullptr;
 
     size_t left_idx = 0;
     size_t right_idx = tracks.size() - 1;
@@ -791,13 +793,13 @@ void Trajectory::findTracks(double traj_coord,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-track_t Trajectory::findNextTrack(const track_t& cur_track, dir_t dir)
+track_t Trajectory::findNextTrack(const track_t& cur_track, dir_t dir) const
 {
     dir_t new_dir = dir;
 
-    if (Switch* next_sw = getNextSwitch(new_dir))
+    if (const Switch* next_sw = getNextSwitch(new_dir))
     {
-        if (Trajectory* next_traj = next_sw->getNextTraj(new_dir))
+        if (const Trajectory* next_traj = next_sw->getNextTraj(new_dir))
         {
             if (new_dir == dir)
             {
@@ -830,7 +832,7 @@ track_t Trajectory::findNextTrack(const track_t& cur_track, dir_t dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-track_t Trajectory::createFakeTrack(const track_t& cur_track, dir_t dir)
+track_t Trajectory::createFakeTrack(const track_t& cur_track, dir_t dir) const
 {
     track_t fake_track;
 
@@ -839,7 +841,7 @@ track_t Trajectory::createFakeTrack(const track_t& cur_track, dir_t dir)
         fake_track.begin_point = cur_track.end_point;
         fake_track.end_point += cur_track.orth * cur_track.len;
     }
-    if (dir == BWD)
+    else if (dir == BWD)
     {
         fake_track.begin_point -= cur_track.orth * cur_track.len;
         fake_track.end_point = cur_track.begin_point;
@@ -857,7 +859,7 @@ track_t Trajectory::createFakeTrack(const track_t& cur_track, dir_t dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-track_t Trajectory::createReversedTrack(const track_t& track)
+track_t Trajectory::createReversedTrack(const track_t& track) const
 {
     track_t fake_track;
 
@@ -878,7 +880,7 @@ track_t Trajectory::createReversedTrack(const track_t& track)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Trajectory::calc_curvature(track_t& track0, track_t& track1)
+double Trajectory::calc_curvature(const track_t& track0, const track_t& track1) const
 {
     double curvature = 0.0;
 
@@ -890,7 +892,7 @@ double Trajectory::calc_curvature(track_t& track0, track_t& track1)
     double A1 = track1.orth.x;
     double B1 = track1.orth.y;
 
-    double det = A0*B1 - A1*B0;
+    double det = A0 * B1 - A1 * B0;
 
     // Если треки параллельны - кривизна нулевая
     if ( qAbs(det) < 1e-5 )
@@ -900,19 +902,19 @@ double Trajectory::calc_curvature(track_t& track0, track_t& track1)
     }
 
     // Центр первого трека
-    dvec3 S0 = - track0.orth * 0.5 * track0.len;
+    dvec3 S0 = -track0.orth * 0.5 * track0.len;
     double D0 = A0 * S0.x + B0 * S0.y;
 
     // Центр второго трека
     dvec3 S1 = track1.orth * 0.5 * track1.len;
     double D1 = A1 * S1.x + B1 * S1.y;
 
-    double xC = (B0*D1 - B1*D0) / det;
-    double yC = (A0*D1 - A1*D0) / det;
+    double xC = (B0 * D1 - B1 * D0) / det;
+    double yC = (A0 * D1 - A1 * D0) / det;
 
     double rho = std::sqrt(xC * xC + yC * yC);
 
-    curvature = 1 / rho;
+    curvature = 1.0 / rho;
 
     //Journal::instance()->info(QString("det=%1 | curv=%2 | r=%3").arg(det, 15, 'f', 12).arg(curvature, 15, 'f', 12).arg(rho, 15, 'f', 1));
     return curvature;

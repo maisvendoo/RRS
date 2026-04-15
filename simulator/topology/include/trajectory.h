@@ -143,7 +143,7 @@ public:
     static bool findTrajectoryAtCoord(Trajectory*& cur_traj, double& coord, double& coord_off, dir_t& orient);
 
     /// Получить положение ПЕ на траектории
-    profile_point_t getPosition(double traj_coord, int direction);
+    profile_point_t getPosition(double traj_coord, int direction) const;
 
 signals:
 
@@ -191,19 +191,19 @@ private:
     void findTracks(double traj_coord,
                     track_t &cur_track,
                     track_t &prev_track,
-                    track_t &next_track);
+                    track_t &next_track) const;
 
     /// Поиск трека на следующей траектории
-    track_t findNextTrack(const track_t& cur_track, dir_t dir);
+    track_t findNextTrack(const track_t& cur_track, dir_t dir) const;
 
     /// Создание условного продолжения топологии за тупик для корректного расчёта
-    track_t createFakeTrack(const track_t& cur_track, dir_t dir);
+    track_t createFakeTrack(const track_t& cur_track, dir_t dir) const;
 
     /// Создание трека в обратном направлении для корректного расчёта
-    track_t createReversedTrack(const track_t& track);
+    track_t createReversedTrack(const track_t& track) const;
 
     /// Расчёт кривизны между двумя соседними треками
-    double calc_curvature(track_t& track0, track_t& track1);
+    double calc_curvature(const track_t& track0, const track_t& track1) const;
 };
 
 #endif
