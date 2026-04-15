@@ -146,7 +146,7 @@ void Signal::deserialize(QByteArray &data)
     stream >> letter;
     stream >> signal_model;
 
-    for (bool lens : lens_state)
+    for (bool& lens : lens_state)
     {
         stream >> lens;
     }
