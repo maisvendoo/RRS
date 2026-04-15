@@ -30,7 +30,7 @@ using lens_state_t = std::array<bool, NUM_LENS>;
 //
 //------------------------------------------------------------------------------
 enum
-{    
+{
     ALSN_RY_LINE,
     ALSN_Y_LINE,
     ALSN_G_LINE,
