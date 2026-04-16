@@ -387,7 +387,7 @@ void MyGui::showSettings() const
         if (params->sun->use_gui_sun_direction)
         {
             ImGui::SliderFloat("Sun azimuth", &(params->sun->azimuth_deg), 0.0f, 360.0f, "%.3f");
-            ImGui::SliderFloat("Sun altitude", &(params->sun->azimuth_deg), 0.0f, 360.0f, "%.3f");
+            ImGui::SliderFloat("Sun altitude", &(params->sun->altitude_deg), -90.0f, 90.0f, "%.3f");
         }
         else
         {

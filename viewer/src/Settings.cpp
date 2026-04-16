@@ -185,12 +185,12 @@ void RouteViewer::loadFreeCameraSettings(CfgReader& cfg, const QString& section)
     }
 
     cfg.getDouble(section, "FreeCamRotKeyboard", settings.free_cam_rotate_keyboard);
-    cfg.getDouble(section, "FreeCamRotMouse", settings.free_cam_rotate_keyboard);
+    cfg.getDouble(section, "FreeCamRotMouse", settings.free_cam_rotate_mouse);
     cfg.getDouble(section, "FreeCamHeightStep", settings.free_cam_height_step);
 
     double freeCamFovYCoeff = 1.0;
     cfg.getDouble(section, "FreeCamFovYCoeff", freeCamFovYCoeff);
-    if (freeCamSpeedCoeff > 1.01)
+    if (freeCamFovYCoeff > 1.01)
     {
         settings.free_cam_fovy_coeff = freeCamFovYCoeff;
     }
