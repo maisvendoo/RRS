@@ -1,5 +1,9 @@
 #include    "line-signal.h"
+
+#include    "combine-relay.h"
+#include    "relay.h"
 #include    "switch.h"
+#include    "timer.h"
 #include    "trajectory.h"
 
 //------------------------------------------------------------------------------
@@ -7,6 +11,12 @@
 //------------------------------------------------------------------------------
 LineSignal::LineSignal(QObject *parent) : TrainSignal(parent)
 {
+    way_relay = new Relay(WR_NUM);
+    line_relay = new CombineRelay(LR_NEUTRAL_NUM, LR_PLUS_NUM, LR_MINUS_NUM);
+    side_signal_relay = new Relay(NUM_SSR_CONTACTS);
+
+    blink_timer = new Timer(0.75, false);
+
     way_relay->read_config("combine-relay");
     way_relay->setInitContactState(WR_WAY_BUSY, false);
 
@@ -29,10 +39,7 @@ LineSignal::LineSignal(QObject *parent) : TrainSignal(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-LineSignal::~LineSignal()
-{
-
-}
+LineSignal::~LineSignal() = default;
 
 //------------------------------------------------------------------------------
 //
