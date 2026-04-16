@@ -168,18 +168,25 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 
             ImGui::ProgressBar(fraction, {200.0f, 30.0f}, overlay);
 
-            fraction = 1.0f;
-            if (context_.total_topology_objects_count != 0)
+            if (context_.topology_loaded)
             {
-                fraction = (float)context_.topology_objects_count /
-                    context_.total_topology_objects_count;
+                fraction = 1.0f;
+                if (context_.total_topology_objects_count != 0)
+                {
+                    fraction = (float)context_.topology_objects_count /
+                        context_.total_topology_objects_count;
+                }
+
+                snprintf(overlay, 64, "%zu / %zu",
+                    context_.topology_objects_count.load(),
+                    context_.total_topology_objects_count.load());
+
+                ImGui::ProgressBar(fraction, {200.0f, 30.0f}, overlay);
             }
-
-            snprintf(overlay, 64, "%zu / %zu",
-                context_.topology_objects_count.load(),
-                context_.total_topology_objects_count.load());
-
-            ImGui::ProgressBar(fraction, {200.0f, 30.0f}, overlay);
+            else
+            {
+                ImGui::Text("Topology not yet loaded");
+            }
 
             ImGui::End();
 
@@ -352,8 +359,7 @@ void EditorGui::show_stations_conf() const
 // TODO: Сделать, чтобы реальные позиции грузились один раз?
 void EditorGui::show_waypoints_conf() const
 {
-    // std::lock_guard<std::mutex> lock_guard(context_.topology_mutex);
-    if (!context_.topology)
+    if (!context_.topology_loaded)
     {
         return;
     }

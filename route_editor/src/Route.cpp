@@ -17,6 +17,7 @@
 
 #include <CfgReader.h>
 
+#include <chrono>
 #include <fstream>
 #include <mutex>
 #include <sstream>
@@ -358,19 +359,19 @@ bool Route::load_topology()
 
         context_.topology_mutex.lock();
         context_.topology = std::make_unique<Topology>();
+        context_.topology_mutex.unlock();
 
         const auto directory_name = std::filesystem::path(
             context_.route_dir).filename();
 
         if (!context_.topology->load(directory_name.string().c_str()))
         {
-            context_.topology_mutex.unlock();
             // TODO: Replace on Journal
             std::fputs("Failed to load topology\n", stderr);
             // return false;
             return;
         }
-        context_.topology_mutex.unlock();
+        context_.topology_loaded = true;
 
         PagedLodMap paged_lods;
 
