@@ -1,7 +1,6 @@
 #include "Route.h"
 
 #include "EditorContext.h"
-#include "Mask.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
@@ -10,14 +9,12 @@
 // #include "parse_file_funcs.h"
 #include "rail-signal.h"
 #include "signals-data-types.h"
-#include "topology-defines.h"
 #include "topology.h"
 #include "trajectory.h"
 #include "vec3.h"
 
 #include <CfgReader.h>
 
-#include <chrono>
 #include <fstream>
 #include <mutex>
 #include <sstream>
