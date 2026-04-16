@@ -66,9 +66,9 @@ void Device::step(double t, double dt)
     {
         ode_system(y, dydt, t + static_cast<double>(i) * _dt);
 
-        for (size_t i = 0; i < y.size(); ++i)
+        for (size_t j = 0; j < y.size(); ++j)
         {
-            y[i] = y[i] + dydt[i] * _dt;
+            y[j] = y[j] + dydt[j] * _dt;
         }
     }
 

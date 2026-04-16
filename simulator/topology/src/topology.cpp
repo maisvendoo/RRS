@@ -8,6 +8,7 @@
 #include    <vehicle-controller.h>
 #include    <topology.h>
 
+#include    <cassert>
 #include    <QDir>
 #include    <QDirIterator>
 #include    <QFile>
@@ -320,6 +321,8 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
         }
     }
 
+    const size_t initial_vc_count = vehicle_control.size();
+
     for (size_t i = 0; i < vehicles->size(); ++i)
     {
         VehicleController *vc = new VehicleController;
@@ -367,11 +370,21 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
         {
             // По идее мы уже проверили весь путь по топологии,
             // и не должны попасть сюда, но на всякий случай обработаем
-            // В таком случае созданные к этому моменту VehicleController
-            // создадут утечку памяти
-            Journal::instance()->info(QString("Warning: fail to place Vehicle #%1").arg(vehicle_control.size()) +
-                                      " at traj: " + cur_traj->getName() +
-                                      QString(" %1 m from start").arg(traj_coord));
+            delete vc;
+            Journal::instance()->error(QString("Fail to place Vehicle #%1").arg(vehicle_control.size()) +
+                                       " at traj: " + cur_traj->getName() +
+                                       QString(" %1 m from start").arg(traj_coord));
+
+            // Очищаем ранее размещённые контроллеры этого поезда
+            for (auto it = vehicle_control.begin() + initial_vc_count; it != vehicle_control.end(); ++it)
+            {
+                for (auto vt = vc_table.begin(); vt != vc_table.end(); ++vt)
+                {
+                    if (vt->second == *it) { vc_table.erase(vt); break; }
+                }
+                delete *it;
+            }
+            vehicle_control.erase(vehicle_control.begin() + initial_vc_count, vehicle_control.end());
             return false;
         }
    }
@@ -382,9 +395,10 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-VehicleController *Topology::getVehicleController(size_t idx)
+VehicleController& Topology::getVehicleController(size_t idx)
 {
-    return vehicle_control[idx];
+    assert(idx < vehicle_control.size() && "VehicleController index out of range");
+    return *vehicle_control[idx];
 }
 
 //------------------------------------------------------------------------------
@@ -753,13 +767,13 @@ void Topology::step(double t, double dt)
         sw->step(t, dt);
     }
 
-    for (auto& signals_array : {signals_data.line_signals,
-                                signals_data.enter_signals,
-                                signals_data.route_signals,
-                                signals_data.exit_signals,
-                                signals_data.shunt_signals})
+    for (const auto* signals_array : {&signals_data.line_signals,
+                                      &signals_data.enter_signals,
+                                      &signals_data.route_signals,
+                                      &signals_data.exit_signals,
+                                      &signals_data.shunt_signals})
     {
-        for (Signal* const signal : signals_array)
+        for (Signal* const signal : *signals_array)
         {
             if (signal)
             {
@@ -1576,7 +1590,7 @@ void Topology::slotBuildRouteCommand(QByteArray &route_data)
     }
     Journal::instance()->info("Build route: founded from "
                               + rc.trajectory_begin + " to " + rc.trajectory_end
-                              + " through " + QString::number(route.trajectories.size()) + "trajectories");
+                              + " through " + QString::number(route.trajectories.size()) + " trajectories");
 
     set_switchs_by_route(route);
 }
@@ -1628,7 +1642,7 @@ void Topology::slotShuntingRouteCommand(QByteArray &route_data)
     }
     Journal::instance()->info("Build route: founded from "
                               + rc.trajectory_begin + " to " + rc.trajectory_end
-                              + " through " + QString::number(route.trajectories.size()) + "trajectories");
+                              + " through " + QString::number(route.trajectories.size()) + " trajectories");
 
     if (set_switchs_by_route(route))
     {
@@ -1892,6 +1906,9 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString
 //------------------------------------------------------------------------------
 void Topology::slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name)
 {
+    if (vehicle_idx < 0 || static_cast<size_t>(vehicle_idx) >= vehicle_control.size())
+        return;
+
     // Определяем поезд, изменивший состояние траектории
     size_t train_idx = vehicle_control[vehicle_idx]->getTrainIndex();
 
