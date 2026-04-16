@@ -1,3 +1,9 @@
+#include "enter-signal.h"
+#include "exit-signal.h"
+#include "route-signal.h"
+#include "shunting-signal.h"
+#include "signal-command.h"
+#include "station-signal.h"
 #include    <topology.h>
 
 #include    <QDir>
@@ -1796,7 +1802,7 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString
     // Проверяем, возможен ли данный маршрут
     auto* start_traj = traj_list.value(start_traj_name, nullptr);
 
-    if (start_traj == nullptr)        
+    if (start_traj == nullptr)
     {
         Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 start trajectory %2 not exists").arg(vehicle_idx).arg(start_traj_name));
         emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, false);
