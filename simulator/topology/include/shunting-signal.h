@@ -3,11 +3,10 @@
 
 #include    "rail-signal.h"
 
-#include    <relay.h>
-#include    <timer.h>
-
-class Trajectory;
+class Relay;
 class Switch;
+class Timer;
+class Trajectory;
 
 //------------------------------------------------------------------------------
 //
@@ -20,19 +19,13 @@ public:
 
     ShuntingSignal(QObject *parent = nullptr);
 
-    virtual ~ShuntingSignal();
+    virtual ~ShuntingSignal() override;
 
     /// Шаг симуляции
     virtual void step(double t, double dt) override;
 
-    void setRefTrajectory(Trajectory* trajectory)
-    {
-        ref_trajectory_shunt = trajectory;
-    }
-    Trajectory* getRefTrajectory() const
-    {
-        return ref_trajectory_shunt;
-    }
+    void setRefTrajectory(Trajectory* trajectory);
+    Trajectory* getRefTrajectory() const;
 
 public slots:
 
@@ -61,7 +54,7 @@ private:
     /// Контрольное реле маневрового маршрута:
     /// включено, когда до целевой траектории свободно и стрелки по маршруту,
     /// либо пока светофор открыт и заняты оба участка перед и за светофором (пока проезжает состав)
-    Relay *control_relay_shunt = new Relay(NUM_CRS_CONTACTS);
+    Relay *control_relay_shunt = nullptr;
 
     enum
     {
@@ -74,7 +67,7 @@ private:
     };
     /// Сигнальное реле:
     /// управляется кнопками открыть/закрыть сигнал (если маршрут возможен)
-    Relay *signal_relay_shunt = new Relay(NUM_SRS_CONTACTS);
+    Relay *signal_relay_shunt = nullptr;
 
     enum
     {
@@ -84,7 +77,7 @@ private:
     };
     /// Реле замыкания маневрового маршрута:
     /// при открытии сигнала отключается и блокирует стрелки по маршруту от перевода
-    Relay *lock_relay_shunt = new Relay(NUM_LRS_CONTACTS);
+    Relay *lock_relay_shunt = nullptr;
 
     /// Напряжение батареи
     double U_bat = 12.0;
@@ -104,10 +97,10 @@ private:
     bool is_close_button_unpressed = true;
 
     /// Таймер выдержки времени удержания кнопки открыть
-    Timer *open_timer = new Timer(1.0, false);
+    Timer *open_timer = nullptr;
 
     /// Таймер выдержки времени удержания кнопки закрыть
-    Timer *close_timer = new Timer(1.0, false);
+    Timer *close_timer = nullptr;
 
     /// Замыкание или размыкание стрелочного перевода вперёд
     bool check_and_lock_switch_fwd(Switch* sw, bool lock);
