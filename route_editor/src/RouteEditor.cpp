@@ -10,7 +10,6 @@
 #include "MouseHandler.h"
 #include "ObjectSelector.h"
 #include "Outline.h"
-#include "Route.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
 #include "Settings.h"
@@ -19,7 +18,6 @@
 #include "filesystem.h"
 #include "shader_funcs.h"
 
-#include <mutex>
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
 #include <vsg/app/CompileManager.h>
@@ -27,7 +25,6 @@
 #include <vsg/app/View.h>
 #include <vsg/app/Viewer.h>
 #include <vsg/commands/ClearAttachments.h>
-#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>
 #include <vsg/io/Options.h>
@@ -47,6 +44,7 @@
 
 #include <vulkan/vulkan_core.h>
 
+#include <mutex>
 #include <string>
 
 RouteEditor::RouteEditor() = default;
