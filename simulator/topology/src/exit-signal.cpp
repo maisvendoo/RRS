@@ -1,10 +1,21 @@
 #include    "exit-signal.h"
 
+#include    "combine-relay.h"
+#include    "relay.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 ExitSignal::ExitSignal(QObject *parent) : StationSignal(parent)
 {
+    semaphore_signal_relay = new CombineRelay(
+        NUM_SRS_NEUTRAL_CONTACTS,
+        NUM_SRS_PLUS_CONTACTS,
+        NUM_SRS_MINUS_CONTACTS
+    );
+
+    side_signal_relay = new Relay(NUM_SSR_CONTACTS);
+
     semaphore_signal_relay->read_config("combine-relay");
     semaphore_signal_relay->setInitContactState(SS_N_RED, true);
     semaphore_signal_relay->setInitContactState(SS_N_ALLOW, false);
@@ -19,10 +30,7 @@ ExitSignal::ExitSignal(QObject *parent) : StationSignal(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ExitSignal::~ExitSignal()
-{
-
-}
+ExitSignal::~ExitSignal() = default;
 
 //------------------------------------------------------------------------------
 //
