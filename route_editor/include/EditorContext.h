@@ -87,6 +87,19 @@ struct EditorContext
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::ref_ptr<Route> route;
 
+    RouteObjects static_objects;
+    std::mutex static_objects_mutex;
+
+    RouteObjects selected_objects;
+    RouteObjects copied_objects;
+    RouteObjects hidden_objects;
+
+    std::vector<CompileInfo> compile_infos;
+    std::mutex compile_infos_mutex;
+
+    std::unique_ptr<Topology> topology;
+    std::mutex topology_mutex;
+
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<ObjectSelector> object_selector;
     vsg::ref_ptr<OutlineBuilder> outline_builder;
@@ -95,19 +108,10 @@ struct EditorContext
     RouteMap route_map;
     std::map<std::string, vsg::dvec3> stations_conf;
     std::map<std::string, WaypointData> waypoints_conf;
-    std::unique_ptr<Topology> topology;
-
-    RouteObjects static_objects;
-    RouteObjects selected_objects;
-    RouteObjects copied_objects;
-    RouteObjects hidden_objects;
 
     std::string route_dir;
 
     double delta_time = 0.0;
-
-    std::vector<CompileInfo> compile_infos;
-    std::mutex compile_mutex;
 
     RouteObjects deferred_selection;
 };
