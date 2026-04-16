@@ -379,7 +379,7 @@ bool Route::load_topology()
             {
                 // TODO: Replace on Journal
                 std::fprintf(stderr, "Invalid signal %p\n", (void*)signal);
-                return;
+                continue;
             }
 
             const std::string signal_model_name =
@@ -387,7 +387,8 @@ bool Route::load_topology()
 
             if (signal_model_name.empty() || signal_model_name == "empty_line")
             {
-                return;
+                ++context_.topology_objects_count;
+                continue;
             }
 
             const std::string signal_model_path = fs.combinePath(
@@ -430,8 +431,13 @@ bool Route::load_topology()
                 signal_model_name, pos, rotation_deg);
 
             this->addChild(vsg::MASK_ALL, object);
+            ++context_.topology_objects_count;
         }
     };
+
+    context_.total_topology_objects_count += signals_data->line_signals.size();
+    context_.total_topology_objects_count += signals_data->enter_signals.size();
+    context_.total_topology_objects_count += signals_data->exit_signals.size();
 
     load_signals(signals_data->line_signals);
     load_signals(signals_data->enter_signals);

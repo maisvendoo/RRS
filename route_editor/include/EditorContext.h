@@ -102,6 +102,8 @@ struct EditorContext
 
     std::unique_ptr<Topology> topology;
     std::mutex topology_mutex;
+    std::atomic_size_t topology_objects_count = 0;
+    std::atomic_size_t total_topology_objects_count = 0;
 
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<ObjectSelector> object_selector;

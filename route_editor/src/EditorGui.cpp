@@ -152,7 +152,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             SHOW_WINDOW(show_selected_objects_properties);
             SHOW_WINDOW(show_commands);
 
-            ImGui::Begin("TestProgressBar");
+            ImGui::Begin("TestProgressBars");
 
             float fraction = 1.0f;
             if (context_.total_static_objects_count != 0)
@@ -165,6 +165,19 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             snprintf(overlay, 64, "%zu / %zu",
                 context_.static_objects_count.load(),
                 context_.total_static_objects_count.load());
+
+            ImGui::ProgressBar(fraction, {200.0f, 30.0f}, overlay);
+
+            fraction = 1.0f;
+            if (context_.total_topology_objects_count != 0)
+            {
+                fraction = (float)context_.topology_objects_count /
+                    context_.total_topology_objects_count;
+            }
+
+            snprintf(overlay, 64, "%zu / %zu",
+                context_.topology_objects_count.load(),
+                context_.total_topology_objects_count.load());
 
             ImGui::ProgressBar(fraction, {200.0f, 30.0f}, overlay);
 
