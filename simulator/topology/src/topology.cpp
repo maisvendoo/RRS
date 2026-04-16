@@ -794,18 +794,18 @@ QByteArray Topology::serialize()
     stream << static_cast<uint32_t>(traj_list.size());
 
     // Складываем в буфер сериализованную информацию о траекториях
-    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    for (Trajectory* traj : traj_list)
     {
-        stream << traj.value()->serialize();
+        stream << traj->serialize();
     }
 
     // Указываем число коннекторов
     stream << static_cast<uint32_t>(switches.size());
 
     // Складываем в буфер сериализованную информацию о коннекторах
-    for (auto sw = switches.begin(); sw != switches.end(); ++sw)
+    for (Switch* sw : switches)
     {
-        stream << sw.value()->serialize();
+        stream << sw->serialize();
     }
 
     return data.data();
@@ -1141,9 +1141,13 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
                                dvec3 relative_position, dvec3 relative_rotation)
     {
         if (direction == FWD)
+        {
             sw->setSignalFwd(signal);
-        if (direction == BWD)
+        }
+        else if (direction == BWD)
+        {
             sw->setSignalBwd(signal);
+        }
 
         signal->setConnector(sw);
         signal->setDirection(direction);
