@@ -2,7 +2,9 @@
 #define     EXIT_SIGNAL_H
 
 #include    "station-signal.h"
-#include    <combine-relay.h>
+
+class CombineRelay;
+class Relay;
 
 //------------------------------------------------------------------------------
 //
@@ -35,9 +37,7 @@ private:
     /// Сигнальное реле светофора (с полярным якорем):
     /// при питании положительным напряжением переключает на зелёный,
     /// отрицательным напряжением - жёлтый, без питания - красный
-    CombineRelay *semaphore_signal_relay = new CombineRelay(NUM_SRS_NEUTRAL_CONTACTS,
-                                                            NUM_SRS_PLUS_CONTACTS,
-                                                            NUM_SRS_MINUS_CONTACTS);
+    CombineRelay *semaphore_signal_relay = nullptr;
 
     enum
     {
@@ -47,7 +47,7 @@ private:
     };
 
     /// Боковое сигнальное реле (желтый мигающий, если следующий с отклонением по стрелкам)
-    Relay *side_signal_relay = new Relay(NUM_SSR_CONTACTS);
+    Relay *side_signal_relay = nullptr;
 
     void preStep(double t) override;
 

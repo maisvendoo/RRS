@@ -2,6 +2,7 @@
 // #include    "parse_file_funcs.h"
 #include    "switch.h"
 #include    "topology-types.h"
+#include    <topology-trajectory-device.h>
 
 #include    <cstddef>
 #include    <cstdio>
@@ -224,9 +225,13 @@ bool Trajectory::isInRoute() const
 void Trajectory::setBusy(size_t idx, double coord_begin, double coord_end)
 {
     if ((coord_begin < len) && (coord_end > 0.0) && (coord_begin < coord_end))
+    {
         vehicles_coords.insert(idx, {coord_begin, coord_end});
+    }
     else
+    {
         vehicles_coords.remove(idx);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -235,7 +240,8 @@ void Trajectory::setBusy(size_t idx, double coord_begin, double coord_end)
 void Trajectory::clearBusy()
 {
     vehicles_coords.clear();
-    for (auto traj_device : devices)
+
+    for (auto* traj_device : devices)
     {
         traj_device->clearLinks();
     }
@@ -262,10 +268,13 @@ bool Trajectory::isBusy() const
 //------------------------------------------------------------------------------
 bool Trajectory::isBusy(double coord_begin, double coord_end) const
 {
-    for (auto vehicle_coord : vehicles_coords)
+    for (const auto& vehicle_coord : vehicles_coords)
     {
-        if ((vehicle_coord[1] >= coord_begin) && (vehicle_coord[0] <= coord_end))
+        if ((vehicle_coord[1] >= coord_begin) &&
+            (vehicle_coord[0] <= coord_end))
+        {
             return true;
+        }
     }
 
     return false;
@@ -274,10 +283,11 @@ bool Trajectory::isBusy(double coord_begin, double coord_end) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int Trajectory::getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction)
+int Trajectory::getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction) const
 {
     double coord_begin = coord;
     double coord_end = coord;
+
     if (direction == BWD)
     {
         coord_begin = coord_begin - search_distance;
@@ -309,11 +319,11 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
         {
             distance = distance + coord_end;
 
-            Switch* bwd_sw = getNextSwitch(direction);
+            const Switch* bwd_sw = getNextSwitch(direction);
             if (bwd_sw == nullptr)
                 return -1;
 
-            Trajectory *traj = bwd_sw->getNextTraj(direction);
+            const Trajectory *traj = bwd_sw->getNextTraj(direction);
             if (traj == nullptr)
                 return -1;
 
@@ -353,11 +363,11 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
         {
             distance = distance + len - coord_begin;
 
-            Switch* fwd_sw = getNextSwitch(direction);
+            const Switch* fwd_sw = getNextSwitch(direction);
             if (fwd_sw == nullptr)
                 return -1;
 
-            Trajectory *traj = fwd_sw->getNextTraj(direction);
+            const Trajectory *traj = fwd_sw->getNextTraj(direction);
             if (traj == nullptr)
                 return -1;
 
@@ -373,10 +383,11 @@ int Trajectory::getBusyVehicle(double &distance, double coord, double search_dis
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trajectory::getBusyCoords(double &busy_begin_coord, double &busy_end_coord)
+void Trajectory::getBusyCoords(double &busy_begin_coord, double &busy_end_coord) const
 {
     busy_begin_coord = len;
     busy_end_coord = 0.0;
+
     if (is_busy)
     {
         for (const auto& vehicle_coord : vehicles_coords)
@@ -564,7 +575,7 @@ bool Trajectory::findTrajectoryAtCoord(Trajectory*& cur_traj, double& coord, dou
         dir_t new_dir = move_dir;
 
         // Получаем указатель на стрелку в конце траектории
-        Switch* next_sw = cur_traj->getNextSwitch(new_dir);
+        const Switch* next_sw = cur_traj->getNextSwitch(new_dir);
         if (next_sw == nullptr)
         {
             // Если коннектора нет, выходим
@@ -608,7 +619,7 @@ bool Trajectory::findTrajectoryAtCoord(Trajectory*& cur_traj, double& coord, dou
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-profile_point_t Trajectory::getPosition(double traj_coord, int direction)
+profile_point_t Trajectory::getPosition(double traj_coord, int direction) const
 {
     profile_point_t pp;
 
@@ -718,10 +729,12 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction)
 void Trajectory::findTracks(double traj_coord,
                             track_t& cur_track,
                             track_t& prev_track,
-                            track_t& next_track)
+                            track_t& next_track) const
 {
-    if (tracks.size() == 0)
+    if (tracks.empty())
+    {
         return;
+    }
 
     // Исходим из того, что случаи traj_coord < 0 и traj_coord > len не допускаются.
     // В этом случае, текущий трек это трек на данной траектории, и если
@@ -765,7 +778,7 @@ void Trajectory::findTracks(double traj_coord,
 
     // Если мы не на первом или последнем треке, ищем на каком мы треке
     // бинарным поиском
-    track_t track;
+    const track_t* track = nullptr;
 
     size_t left_idx = 0;
     size_t right_idx = tracks.size() - 1;
@@ -773,9 +786,9 @@ void Trajectory::findTracks(double traj_coord,
 
     while (idx != left_idx)
     {
-        track = tracks[idx];
+        track = &tracks[idx];
 
-        if (traj_coord <= track.traj_coord)
+        if (traj_coord <= track->traj_coord)
             right_idx = idx;
         else
             left_idx = idx;
@@ -791,13 +804,13 @@ void Trajectory::findTracks(double traj_coord,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-track_t Trajectory::findNextTrack(const track_t& cur_track, dir_t dir)
+track_t Trajectory::findNextTrack(const track_t& cur_track, dir_t dir) const
 {
     dir_t new_dir = dir;
 
-    if (Switch* next_sw = getNextSwitch(new_dir))
+    if (const Switch* next_sw = getNextSwitch(new_dir))
     {
-        if (Trajectory* next_traj = next_sw->getNextTraj(new_dir))
+        if (const Trajectory* next_traj = next_sw->getNextTraj(new_dir))
         {
             if (new_dir == dir)
             {
@@ -830,7 +843,7 @@ track_t Trajectory::findNextTrack(const track_t& cur_track, dir_t dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-track_t Trajectory::createFakeTrack(const track_t& cur_track, dir_t dir)
+track_t Trajectory::createFakeTrack(const track_t& cur_track, dir_t dir) const
 {
     track_t fake_track;
 
@@ -839,7 +852,7 @@ track_t Trajectory::createFakeTrack(const track_t& cur_track, dir_t dir)
         fake_track.begin_point = cur_track.end_point;
         fake_track.end_point += cur_track.orth * cur_track.len;
     }
-    if (dir == BWD)
+    else if (dir == BWD)
     {
         fake_track.begin_point -= cur_track.orth * cur_track.len;
         fake_track.end_point = cur_track.begin_point;
@@ -857,7 +870,7 @@ track_t Trajectory::createFakeTrack(const track_t& cur_track, dir_t dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-track_t Trajectory::createReversedTrack(const track_t& track)
+track_t Trajectory::createReversedTrack(const track_t& track) const
 {
     track_t fake_track;
 
@@ -878,7 +891,7 @@ track_t Trajectory::createReversedTrack(const track_t& track)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double Trajectory::calc_curvature(track_t& track0, track_t& track1)
+double Trajectory::calc_curvature(const track_t& track0, const track_t& track1) const
 {
     double curvature = 0.0;
 
@@ -890,7 +903,7 @@ double Trajectory::calc_curvature(track_t& track0, track_t& track1)
     double A1 = track1.orth.x;
     double B1 = track1.orth.y;
 
-    double det = A0*B1 - A1*B0;
+    double det = A0 * B1 - A1 * B0;
 
     // Если треки параллельны - кривизна нулевая
     if ( qAbs(det) < 1e-5 )
@@ -900,19 +913,19 @@ double Trajectory::calc_curvature(track_t& track0, track_t& track1)
     }
 
     // Центр первого трека
-    dvec3 S0 = - track0.orth * 0.5 * track0.len;
+    dvec3 S0 = -track0.orth * 0.5 * track0.len;
     double D0 = A0 * S0.x + B0 * S0.y;
 
     // Центр второго трека
     dvec3 S1 = track1.orth * 0.5 * track1.len;
     double D1 = A1 * S1.x + B1 * S1.y;
 
-    double xC = (B0*D1 - B1*D0) / det;
-    double yC = (A0*D1 - A1*D0) / det;
+    double xC = (B0 * D1 - B1 * D0) / det;
+    double yC = (A0 * D1 - A1 * D0) / det;
 
     double rho = std::sqrt(xC * xC + yC * yC);
 
-    curvature = 1 / rho;
+    curvature = 1.0 / rho;
 
     //Journal::instance()->info(QString("det=%1 | curv=%2 | r=%3").arg(det, 15, 'f', 12).arg(curvature, 15, 'f', 12).arg(rho, 15, 'f', 1));
     return curvature;

@@ -5,15 +5,15 @@
 #include    <QMap>
 #include    <QSet>
 
+#include    "CfgReader.h"
 #include    "topology-export.h"
 #include    "topology-defines.h"
 #include    "track.h"
 
 #include    <profile-point.h>
-#include    <device-list.h>
-#include    <topology-trajectory-device.h>
 
 class Signal;
+class TrajectoryDevice;
 
 //------------------------------------------------------------------------------
 //
@@ -79,11 +79,11 @@ public:
 
     /// Индекс ближайшей единицы подвижного состава, если есть;
     /// -1, если нет подвижного состава в пределах дистанции поиска
-    int getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction);
+    int getBusyVehicle(double &distance, double coord, double search_distance, dir_t direction) const;
 
     /// Интервал координат, занятых подвижным составом;
     /// если пустая, busy_begin_coord = length; busy_end_coord = 0.0
-    void getBusyCoords(double &busy_begin_coord, double &busy_end_coord);
+    void getBusyCoords(double &busy_begin_coord, double &busy_end_coord) const;
 
     /// Вернуть все треки траектории
     const std::vector<track_t>& getTracks() const
@@ -143,7 +143,7 @@ public:
     static bool findTrajectoryAtCoord(Trajectory*& cur_traj, double& coord, double& coord_off, dir_t& orient);
 
     /// Получить положение ПЕ на траектории
-    profile_point_t getPosition(double traj_coord, int direction);
+    profile_point_t getPosition(double traj_coord, int direction) const;
 
 signals:
 
@@ -191,19 +191,19 @@ private:
     void findTracks(double traj_coord,
                     track_t &cur_track,
                     track_t &prev_track,
-                    track_t &next_track);
+                    track_t &next_track) const;
 
     /// Поиск трека на следующей траектории
-    track_t findNextTrack(const track_t& cur_track, dir_t dir);
+    track_t findNextTrack(const track_t& cur_track, dir_t dir) const;
 
     /// Создание условного продолжения топологии за тупик для корректного расчёта
-    track_t createFakeTrack(const track_t& cur_track, dir_t dir);
+    track_t createFakeTrack(const track_t& cur_track, dir_t dir) const;
 
     /// Создание трека в обратном направлении для корректного расчёта
-    track_t createReversedTrack(const track_t& track);
+    track_t createReversedTrack(const track_t& track) const;
 
     /// Расчёт кривизны между двумя соседними треками
-    double calc_curvature(track_t& track0, track_t& track1);
+    double calc_curvature(const track_t& track0, const track_t& track1) const;
 };
 
 #endif

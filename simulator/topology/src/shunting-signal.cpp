@@ -1,13 +1,23 @@
 #include    "shunting-signal.h"
-#include    "trajectory.h"
-#include    "switch.h"
+
 #include    "Journal.h"
+#include    "relay.h"
+#include    "switch.h"
+#include    "timer.h"
+#include    "trajectory.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 ShuntingSignal::ShuntingSignal(QObject* parent) : Signal(parent)
 {
+    control_relay_shunt = new Relay(NUM_CRS_CONTACTS);
+    signal_relay_shunt = new Relay(NUM_SRS_CONTACTS);
+    lock_relay_shunt = new Relay(NUM_LRS_CONTACTS);
+
+    open_timer = new Timer(1.0, false);
+    close_timer = new Timer(1.0, false);
+
     connect(open_timer, &Timer::process, this, &ShuntingSignal::slotOpenTimerShunt);
     connect(close_timer, &Timer::process, this, &ShuntingSignal::slotCloseTimer);
 
@@ -31,10 +41,7 @@ ShuntingSignal::ShuntingSignal(QObject* parent) : Signal(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ShuntingSignal::~ShuntingSignal()
-{
-
-}
+ShuntingSignal::~ShuntingSignal() = default;
 
 //------------------------------------------------------------------------------
 //
@@ -80,6 +87,22 @@ void ShuntingSignal::step(double t, double dt)
 
     lens_state[BLUE_LENS] = signal_relay_shunt->getContactState(SRS_CLOSED);
     lens_state[WHITE_LENS] = signal_relay_shunt->getContactState(SRS_OPENED);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ShuntingSignal::setRefTrajectory(Trajectory* trajectory)
+{
+    ref_trajectory_shunt = trajectory;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Trajectory* ShuntingSignal::getRefTrajectory() const
+{
+    return ref_trajectory_shunt;
 }
 
 //------------------------------------------------------------------------------

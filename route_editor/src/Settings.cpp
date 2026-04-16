@@ -30,15 +30,15 @@ settings_t::settings_t()
     , double_buffer(true)
     , samples(1)
     , num_lights(200)
-    , zNear(0.1f)
-    , view_distance(2000.0f)
-    , fovy(64.0f)
-    , fovy_min(2.0f)
-    , fovy_max(100.0f)
-    , camera_initial_height(0.0f)
-    , camera_move_speed(100.0f)
-    , camera_rotate_speed(3.0f)
-    , camera_zoom_power(250.0f)
+    , zNear(0.1)
+    , view_distance(2000.0)
+    , fovy(60.0)
+    , fovy_min(2.0)
+    , fovy_max(100.0)
+    , camera_initial_height(0.0)
+    , camera_move_speed(100.0)
+    , camera_rotate_speed(3.0)
+    , camera_zoom_power(250.0)
     , gizmo_arrow_length(5.0f)
     , gizmo_arrow_thickness(0.1f)
     , gizmo_arrow_x_color(1.0f, 0.0f, 0.0f)
@@ -50,9 +50,13 @@ settings_t::settings_t()
     , is_gui_editable(false)
     , show_objects_ref(true)
     , show_route_map(false)
-    , show_controls(true)
+    , show_stations_conf(true)
+    , show_waypoints_conf(false)
+    , show_key_bindings(true)
     , show_camera_settings(false)
     , show_topology(false)
+    , show_selected_objects_properties(true)
+    , show_commands(true)
 {
 }
 
@@ -92,15 +96,15 @@ void settings_t::read(const std::string& cfg_path)
 
     section = "Camera";
 
-    cfg.getFloat(section, "zNear", zNear);
-    cfg.getFloat(section, "ViewDistance", view_distance);
-    cfg.getFloat(section, "FovY", fovy);
-    cfg.getFloat(section, "FovYMin", fovy_min);
-    cfg.getFloat(section, "FovYMax", fovy_max);
-    cfg.getFloat(section, "InitialHeight", camera_initial_height);
-    cfg.getFloat(section, "MoveSpeed", camera_move_speed);
-    cfg.getFloat(section, "RotateSpeed", camera_rotate_speed);
-    cfg.getFloat(section, "ZoomPower", camera_zoom_power);
+    cfg.getDouble(section, "zNear", zNear);
+    cfg.getDouble(section, "ViewDistance", view_distance);
+    cfg.getDouble(section, "FovY", fovy);
+    cfg.getDouble(section, "FovYMin", fovy_min);
+    cfg.getDouble(section, "FovYMax", fovy_max);
+    cfg.getDouble(section, "InitialHeight", camera_initial_height);
+    cfg.getDouble(section, "MoveSpeed", camera_move_speed);
+    cfg.getDouble(section, "RotateSpeed", camera_rotate_speed);
+    cfg.getDouble(section, "ZoomPower", camera_zoom_power);
 
     section = "Gizmo";
 
@@ -124,9 +128,13 @@ void settings_t::read(const std::string& cfg_path)
     cfg.getBool(section, "IsEditable", is_gui_editable);
     cfg.getBool(section, "ShowObjectsRef", show_objects_ref);
     cfg.getBool(section, "ShowRouteMap", show_route_map);
-    cfg.getBool(section, "ShowControls", show_controls);
+    cfg.getBool(section, "ShowStationsConf", show_stations_conf);
+    cfg.getBool(section, "ShowWaypointsConf", show_waypoints_conf);
+    cfg.getBool(section, "ShowKeyBindings", show_key_bindings);
     cfg.getBool(section, "ShowCameraSettings", show_camera_settings);
     cfg.getBool(section, "ShowTopology", show_topology);
+    cfg.getBool(section, "ShowSelectedObjectsProperties", show_selected_objects_properties);
+    cfg.getBool(section, "ShowCommands", show_commands);
 
     section = "Keys";
 
@@ -160,18 +168,9 @@ void settings_t::read(const std::string& cfg_path)
 
     const std::map<std::string, EditorKeyModifier>
     key_modifier_setting_name_map = {
-        {"lshift", EDITOR_KEY_MODIFIER_SHIFT_L},
-        {"rshift", EDITOR_KEY_MODIFIER_SHIFT_R},
-        {"shift", EDITOR_KEY_MODIFIER_SHIFT_ANY},
-        {"anyshift", EDITOR_KEY_MODIFIER_SHIFT_ANY},
-        {"lctrl", EDITOR_KEY_MODIFIER_CTRL_L},
-        {"rctrl", EDITOR_KEY_MODIFIER_CTRL_R},
-        {"ctrl", EDITOR_KEY_MODIFIER_CTRL_ANY},
-        {"anyctrl", EDITOR_KEY_MODIFIER_CTRL_ANY},
-        {"lalt", EDITOR_KEY_MODIFIER_ALT_L},
-        {"ralt", EDITOR_KEY_MODIFIER_ALT_R},
-        {"alt", EDITOR_KEY_MODIFIER_ALT_ANY},
-        {"anyalt", EDITOR_KEY_MODIFIER_ALT_ANY}
+        {"shift", EDITOR_KEY_MODIFIER_SHIFT},
+        {"ctrl", EDITOR_KEY_MODIFIER_CTRL},
+        {"alt", EDITOR_KEY_MODIFIER_ALT}
     };
 
     for (const auto& [action, setting_name] : action_setting_name_map)

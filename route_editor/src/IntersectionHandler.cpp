@@ -12,7 +12,7 @@
 #include <algorithm>
 
 IntersectionHandler::IntersectionHandler(const EditorContext& context)
-    : context(context)
+    : context_(context)
 {
 }
 
@@ -23,30 +23,26 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
+    const auto intersector = LSIntersector::create(*context_.camera,
+        buttonPress.x, buttonPress.y);
+
+    intersector->traversalMask = MASK_CLICKABLE;
+
     switch (buttonPress.button)
     {
         case MOUSE_BUTTON_LEFT:
         {
-            lmb_intersector = LSIntersector::create(*context.camera,
-                buttonPress.x, buttonPress.y);
-
-            lmb_intersector->traversalMask = MASK_CLICKABLE;
+            lmb_intersector_ = intersector;
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
-            mmb_intersector = LSIntersector::create(*context.camera,
-                buttonPress.x, buttonPress.y);
-
-            mmb_intersector->traversalMask = MASK_CLICKABLE;
+            mmb_intersector_ = intersector;
             return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
-            rmb_intersector = LSIntersector::create(*context.camera,
-                buttonPress.x, buttonPress.y);
-
-            rmb_intersector->traversalMask = MASK_CLICKABLE;
+            rmb_intersector_ = intersector;
             return;
         }
         default:
@@ -67,17 +63,17 @@ void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
     {
         case MOUSE_BUTTON_LEFT:
         {
-            lmb_intersector = nullptr;
+            lmb_intersector_ = nullptr;
             return;
         }
         case MOUSE_BUTTON_MIDDLE:
         {
-            mmb_intersector = nullptr;
+            mmb_intersector_ = nullptr;
             return;
         }
         case MOUSE_BUTTON_RIGHT:
         {
-            rmb_intersector = nullptr;
+            rmb_intersector_ = nullptr;
             return;
         }
         default:
@@ -92,27 +88,27 @@ LSIntersectorRefPtr IntersectionHandler::apply_(
 ) const
 {
 
-    return LSIntersector::create(*context.camera, moveEvent.x, moveEvent.y);
+    return LSIntersector::create(*context_.camera, moveEvent.x, moveEvent.y);
 }
 
 LSIntersectorRefPtr IntersectionHandler::apply_(vsg::ivec2 mouse_pos) const
 {
-    return LSIntersector::create(*context.camera, mouse_pos.x, mouse_pos.y);
+    return LSIntersector::create(*context_.camera, mouse_pos.x, mouse_pos.y);
 }
 
 LSIntersectorRefPtr IntersectionHandler::get_lmb_intersector() const
 {
-    return lmb_intersector;
+    return lmb_intersector_;
 }
 
 LSIntersectorRefPtr IntersectionHandler::get_mmb_intersector() const
 {
-    return mmb_intersector;
+    return mmb_intersector_;
 }
 
 LSIntersectorRefPtr IntersectionHandler::get_rmb_intersector() const
 {
-    return rmb_intersector;
+    return rmb_intersector_;
 }
 
 void IntersectionHandler::sort_intersections(LSIntersectorRefPtr intersector)

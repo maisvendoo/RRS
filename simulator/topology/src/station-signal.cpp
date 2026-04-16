@@ -1,4 +1,8 @@
 #include    "station-signal.h"
+
+#include    "combine-relay.h"
+#include    "relay.h"
+#include    "timer.h"
 #include    "trajectory.h"
 #include    "switch.h"
 #include    "Journal.h"
@@ -8,6 +12,18 @@
 //------------------------------------------------------------------------------
 StationSignal::StationSignal(QObject* parent) : TrainSignal(parent)
 {
+    call_relay = new Relay(NUM_CALL_CONTACTS);
+    control_relay = new Relay(NUM_CR_CONTACTS);
+    signal_relay = new Relay(NUM_SR_CONTACTS);
+    control_relay_shunt = new Relay(NUM_CRS_CONTACTS);
+    signal_relay_shunt = new Relay(NUM_SRS_CONTACTS);
+    lock_relay = new CombineRelay(NUM_LR_NEUTRAL_CONTACTS,
+        NUM_LR_PLUS_CONTACTS, NUM_LR_MINUS_CONTACTS);
+
+    open_timer = new Timer(1.0, false);
+    close_timer = new Timer(1.0, false);
+    blink_timer = new Timer(0.75, false);
+
     connect(open_timer, &Timer::process, this, &StationSignal::slotOpenTimer);
     connect(close_timer, &Timer::process, this, &StationSignal::slotCloseTimer);
     connect(blink_timer, &Timer::process, this, &StationSignal::slotBlinkTimer);
@@ -58,10 +74,7 @@ StationSignal::StationSignal(QObject* parent) : TrainSignal(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-StationSignal::~StationSignal()
-{
-
-}
+StationSignal::~StationSignal() = default;
 
 //------------------------------------------------------------------------------
 //

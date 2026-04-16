@@ -26,16 +26,16 @@ struct settings_t
     int samples;           ///< Number of antialiasing samples
     int num_lights;        ///< Max number of lights in scene
 
-    float zNear;            ///< Near clip plane
-    float view_distance;    ///< View distance
-    float fovy;             ///< Vertical view angle
-    float fovy_min;         ///< Vertical view angle min
-    float fovy_max;         ///< Vertical view angle max
+    double zNear;            ///< Near clip plane
+    double view_distance;    ///< View distance
+    double fovy;             ///< Vertical view angle
+    double fovy_min;         ///< Vertical view angle min
+    double fovy_max;         ///< Vertical view angle max
 
-    float camera_initial_height;
-    float camera_move_speed;
-    float camera_rotate_speed;
-    float camera_zoom_power;
+    double camera_initial_height;
+    double camera_move_speed;
+    double camera_rotate_speed;
+    double camera_zoom_power;
 
     float gizmo_arrow_length;
     float gizmo_arrow_thickness;
@@ -49,9 +49,13 @@ struct settings_t
     bool is_gui_editable;
     bool show_objects_ref;
     bool show_route_map;
-    bool show_controls;
+    bool show_stations_conf;
+    bool show_waypoints_conf;
+    bool show_key_bindings;
     bool show_camera_settings;
     bool show_topology;
+    bool show_selected_objects_properties;
+    bool show_commands;
 
     KeyBindings key_bindings;
 };

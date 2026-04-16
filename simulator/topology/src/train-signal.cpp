@@ -1,10 +1,20 @@
 #include    "train-signal.h"
+#include "signal-types.h"
+
+#include "relay.h"
+#include "timer.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 TrainSignal::TrainSignal(QObject* parent) : Signal(parent)
 {
+    alsn_RY_relay = new Relay(NUM_ALSN_RY_CONTACTS);
+    alsn_Y_relay = new Relay(NUM_ALSN_Y_CONTACTS);
+    alsn_G_relay = new Relay(NUM_ALSN_G_CONTACTS);
+
+    alsn_allow_timer = new Timer(15.0, false);
+
     std::fill(alsn_state.begin(), alsn_state.end(), false);
 
     alsn_RY_relay->read_config("combine-relay");
@@ -22,10 +32,7 @@ TrainSignal::TrainSignal(QObject* parent) : Signal(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-TrainSignal::~TrainSignal()
-{
-
-}
+TrainSignal::~TrainSignal() = default;
 
 //------------------------------------------------------------------------------
 //
@@ -66,6 +73,38 @@ void TrainSignal::step(double t, double dt)
     alsn_state[ALSN_RY_LINE] = alsn_RY_relay->getContactState(ALSN_RY);
     alsn_state[ALSN_Y_LINE] = alsn_Y_relay->getContactState(ALSN_Y);
     alsn_state[ALSN_G_LINE] = alsn_G_relay->getContactState(ALSN_G);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+alsn_state_t TrainSignal::getALSNstate() const
+{
+    return alsn_state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double TrainSignal::getLineVoltage() const
+{
+    return U_line_prev;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double TrainSignal::getSideVoltage() const
+{
+    return U_side_prev;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainSignal::allowTransmitALSN(bool is_allow)
+{
+    is_alsn_allow = is_allow;
 }
 
 //------------------------------------------------------------------------------

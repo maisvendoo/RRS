@@ -1,16 +1,18 @@
 #ifndef EDITOR_CONTEXT_H
 #define EDITOR_CONTEXT_H
 
-#include "CommandList.h"
+#include "commands/CommandList.h"
 #include "EditorState.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
 #include "Settings.h"
 
+#include <mutex>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 
 #include <map>
+#include <memory>
 #include <string>
 
 class CameraHandler;
@@ -29,13 +31,10 @@ namespace vsg
 {
 
 class Camera;
-class ClearAttachments;
 class LookAt;
 class Options;
 class PagedLOD;
 class Perspective;
-class RenderGraph;
-class Viewer;
 class Window;
 
 }
@@ -88,9 +87,18 @@ struct EditorContext
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::ref_ptr<Route> route;
 
-    vsg::ref_ptr<vsg::ClearAttachments> clear_attachments;
-    vsg::ref_ptr<vsg::RenderGraph> render_graph;
-    vsg::ref_ptr<vsg::Viewer> viewer;
+    RouteObjects static_objects;
+    std::mutex static_objects_mutex;
+
+    RouteObjects selected_objects;
+    RouteObjects copied_objects;
+    RouteObjects hidden_objects;
+
+    std::vector<CompileInfo> compile_infos;
+    std::mutex compile_infos_mutex;
+
+    std::unique_ptr<Topology> topology;
+    std::mutex topology_mutex;
 
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<ObjectSelector> object_selector;
@@ -98,20 +106,13 @@ struct EditorContext
 
     std::map<std::string, ObjectRef> objects_ref;
     RouteMap route_map;
-    std::map<std::string, vsg::vec3> stations_conf;
+    std::map<std::string, vsg::dvec3> stations_conf;
     std::map<std::string, WaypointData> waypoints_conf;
-    Topology* topology = nullptr;
-
-    RouteObjects static_objects;
-    RouteObjects selected_objects;
-    RouteObjects copied_objects;
-    RouteObjects hidden_objects;
 
     std::string route_dir;
 
-    double delta_time;
+    double delta_time = 0.0;
 
-    std::vector<CompileInfo> compile_infos;
     RouteObjects deferred_selection;
 };
 

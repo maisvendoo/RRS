@@ -1,12 +1,15 @@
 #ifndef EDITOR_GUI_H
 #define EDITOR_GUI_H
 
-#include "EditorContext.h"
-
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsgImGui/imgui.h>
+
+#include <cstddef>
+
+class RouteObject;
+struct EditorContext;
 
 namespace vsg
 {
@@ -19,6 +22,7 @@ class EditorGui : public vsg::Inherit<vsg::Command, EditorGui>
 {
 public:
     EditorGui(EditorContext& context);
+    ~EditorGui();
 
     void record(vsg::CommandBuffer& command_buffer) const override;
 
@@ -34,11 +38,37 @@ private:
     void show_topology() const;
 
     void show_selected_objects_properties() const;
+    void show_commands() const;
+
+    void add_object(
+        vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+        const std::string& label
+    ) const;
+
+    void save_objects_matrixes() const;
+
+    void handle_translation_drag(
+        std::size_t index,
+        vsg::ref_ptr<RouteObject> object,
+        bool& dragging
+    ) const;
+
+    void handle_rotation_drag(
+        std::size_t index,
+        vsg::ref_ptr<RouteObject> object,
+        bool& dragging
+    ) const;
+
+    void handle_scale_drag(
+        std::size_t index,
+        vsg::ref_ptr<RouteObject> object,
+        bool& dragging
+    ) const;
 
 private:
-    EditorContext& context;
+    EditorContext& context_;
 
-    ImGuiWindowFlags window_flags;
+    ImGuiWindowFlags window_flags_;
 };
 
 #endif // EDITOR_GUI_H

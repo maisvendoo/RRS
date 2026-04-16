@@ -3,6 +3,8 @@
 
 #include    "station-signal.h"
 
+class Relay;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -20,44 +22,43 @@ private:
 
     enum
     {
-        NUM_MSR_CONTACTS = 4,
-        NUM_SSR_CONTACTS = 5,
-        NUM_DSR_CONTACTS = 3,
-        NUM_BLINK_CONTACTS = 2,
-
         MSR_RED = 0,
-        MSR_YELLOW = 1,
-        MSR_GREEN = 2,
-        MSR_BLINK = 3,
+        MSR_YELLOW,
+        MSR_GREEN,
+        MSR_BLINK,
+        NUM_MSR_CONTACTS,
 
         SSR_RED = 0,
-        SSR_TOP_YELLOW = 1,
-        SSR_BOTTOM_YELLOW = 2,
-        SSR_SIDE = 3,
-        SSR_BLINK = 4,
+        SSR_TOP_YELLOW,
+        SSR_BOTTOM_YELLOW,
+        SSR_SIDE,
+        SSR_BLINK,
+        NUM_SSR_CONTACTS,
 
         DSR_TOP_YELLOW = 0,
-        DSR_GREEN = 1,
-        DSR_BLINK = 2,
+        DSR_GREEN,
+        DSR_BLINK,
+        NUM_DSR_CONTACTS,
 
         BLINK_GREEN = 0,
-        BLINK_YELLOW = 1
+        BLINK_YELLOW,
+        NUM_BLINK_CONTACTS
     };
 
     /// Главное сигнальное реле:
     /// включено, когда сигнал открыт на маршрут прямо
-    Relay *main_signal_relay = new Relay(NUM_MSR_CONTACTS);
+    Relay *main_signal_relay = nullptr;
 
     /// Боковое сигнальное реле:
     /// включено, когда сигнал открыт на маршрут с отклонением по стрелкам
-    Relay *side_signal_relay = new Relay(NUM_SSR_CONTACTS);
+    Relay *side_signal_relay = nullptr;
 
     /// Сигнальное реле сквозного пропуска:
     /// включено, когда следующий светофор открыт
-    Relay *direct_signal_relay = new Relay(NUM_DSR_CONTACTS);
+    Relay *direct_signal_relay = nullptr;
 
     /// Реле мигания верхнего желтого
-    Relay *blink_relay = new Relay(NUM_BLINK_CONTACTS);
+    Relay *blink_relay = nullptr;
 
     bool is_yellow_wire_ON = false;
 

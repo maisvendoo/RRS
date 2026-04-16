@@ -1,3 +1,5 @@
+#include "physics.h"
+#include "signal-command.h"
 #include    <mainwindow.h>
 #include    <ui_mainwindow.h>
 

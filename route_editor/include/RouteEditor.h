@@ -14,9 +14,12 @@ public:
 
 private:
     void configure_shaders();
+    void compile_models();
+    void handle_deferred_selection();
 
 private:
-    EditorContext context;
+    EditorContext context_;
+    vsg::ref_ptr<vsg::Viewer> viewer_;
 };
 
 #endif // ROUTE_EDITOR_H

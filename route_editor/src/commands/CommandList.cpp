@@ -1,6 +1,6 @@
-#include "CommandList.h"
+#include "commands/CommandList.h"
 
-#include "Command.h"
+#include "commands/Command.h"
 
 #include <cstddef>
 
@@ -13,8 +13,8 @@ CommandList::CommandNode::~CommandNode()
 
 CommandList::~CommandList()
 {
-    // Delete all command nodes starting from tail
-    CommandNode* curr = tail;
+    // Delete all command nodes starting from tail_
+    CommandNode* curr = tail_;
     while (curr)
     {
         CommandNode* const prev = curr->prev;
@@ -25,38 +25,38 @@ CommandList::~CommandList()
 
 void CommandList::push(Command* command, bool execute)
 {
-    // If active node is not tail node (after undos)
-    if (active != tail)
+    // If active_ node is not tail_ node (after undos)
+    if (active_ != tail_)
     {
-        // Delete all command nodes from tail to active (exclusive)
-        CommandNode* curr = tail;
-        while (curr != active)
+        // Delete all command nodes from tail_ to active_ (exclusive)
+        CommandNode* curr = tail_;
+        while (curr != active_)
         {
             CommandNode* const prev = curr->prev;
             delete curr;
             curr = prev;
-            --size;
+            --size_;
         }
 
-        // Now tail is equal to active
-        tail = active;
+        // Now tail_ is equal to active_
+        tail_ = active_;
 
-        if (tail)
+        if (tail_)
         {
-            tail->next = nullptr;
+            tail_->next = nullptr;
         }
     }
 
-    if (size == 0)
+    if (size_ == 0)
     {
         push_(command, execute);
         return;
     }
 
-    if (size == MAX_SAVED_COMMANDS)
+    if (size_ == MAX_SAVED_COMMANDS)
     {
         // Find head of list (first node)
-        CommandNode* head = tail;
+        CommandNode* head = tail_;
         while (head->prev)
         {
             head = head->prev;
@@ -65,13 +65,13 @@ void CommandList::push(Command* command, bool execute)
         // Move head pointer to next node and decrease list size
         // (first node becomes deleted)
         CommandNode* const next = head->next;
-        if (active == head)
+        if (active_ == head)
         {
-            active = next;
+            active_ = next;
         }
         delete head;
         next->prev = nullptr;
-        --size;
+        --size_;
     }
 
     push_(command, execute);
@@ -79,57 +79,57 @@ void CommandList::push(Command* command, bool execute)
 
 void CommandList::undo()
 {
-    if (active)
+    if (active_)
     {
-        active->command->undo();
-        active = active->prev;
+        active_->command->undo();
+        active_ = active_->prev;
     }
 }
 
 void CommandList::redo()
 {
-    if (active == tail)
+    if (active_ == tail_)
     {
         return;
     }
 
-    if (active)
+    if (active_)
     {
-        active = active->next;
-        active->command->execute();
+        active_ = active_->next;
+        active_->command->execute();
         return;
     }
 
-    CommandNode* head = tail;
+    CommandNode* head = tail_;
     while (head->prev)
     {
         head = head->prev;
     }
-    active = head;
-    active->command->execute();
+    active_ = head;
+    active_->command->execute();
 }
 
 const CommandList::CommandNode* CommandList::get_tail() const
 {
-    return tail;
+    return tail_;
 }
 
 const CommandList::CommandNode* CommandList::get_active() const
 {
-    return active;
+    return active_;
 }
 
 void CommandList::push_(Command* command, bool execute)
 {
-    CommandNode* const new_node = new CommandNode{command, tail, nullptr};
+    CommandNode* const new_node = new CommandNode{command, tail_, nullptr};
 
-    if (tail)
+    if (tail_)
     {
-        tail->next = new_node;
+        tail_->next = new_node;
     }
 
-    tail = active = new_node;
-    ++size;
+    tail_ = active_ = new_node;
+    ++size_;
 
     if (execute)
     {

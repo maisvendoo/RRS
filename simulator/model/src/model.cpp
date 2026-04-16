@@ -14,12 +14,14 @@
  */
 
 #include    "model.h"
+#include "rail-signal.h"
 
 #include    <QTime>
 
 #include    <CfgReader.h>
 #include    <Journal.h>
 #include    <JournalFile.h>
+#include    <vehicle-controller.h>
 
 //------------------------------------------------------------------------------
 //
@@ -93,7 +95,7 @@ bool Model::init(const simulator_command_line_t &command_line)
 
             trains.push_back(train);
 
-            buildAutostartQueue(train);            
+            buildAutostartQueue(train);
 
             QThread *thread = new QThread();
             train_threads.push_back(thread);
@@ -551,7 +553,7 @@ void Model::findFarthestVehicles()
             // Добавляем наш новый поезд в контекст менеджера сценариев
             scenario_train_data_t scn_train;
             scn_train.setIndex(uncoupled_train->getTrainIndex());
-            scnmgr->addNewTrain(scn_train);            
+            scnmgr->addNewTrain(scn_train);
 
             QThread *thread = new QThread();
             train_threads.push_back(thread);
@@ -941,7 +943,7 @@ bool Model::initScenarioManager(const init_data_t &init_data,
                      command_line.scenario.value.toStdString()))
     {
         return false;
-    }    
+    }
 
     return true;
 }

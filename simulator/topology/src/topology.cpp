@@ -1,3 +1,11 @@
+#include "enter-signal.h"
+#include "exit-signal.h"
+#include "route-signal.h"
+#include "shunting-signal.h"
+#include "signal-command.h"
+#include "station-signal.h"
+#include    <vehicle.h>
+#include    <vehicle-controller.h>
 #include    <topology.h>
 
 #include    <QDir>
@@ -25,10 +33,7 @@ Topology::Topology(QObject *parent) : QObject(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Topology::~Topology()
-{
-
-}
+Topology::~Topology() = default;
 
 //------------------------------------------------------------------------------
 //
@@ -789,18 +794,18 @@ QByteArray Topology::serialize()
     stream << static_cast<uint32_t>(traj_list.size());
 
     // Складываем в буфер сериализованную информацию о траекториях
-    for (auto traj = traj_list.begin(); traj != traj_list.end(); ++traj)
+    for (Trajectory* traj : traj_list)
     {
-        stream << traj.value()->serialize();
+        stream << traj->serialize();
     }
 
     // Указываем число коннекторов
     stream << static_cast<uint32_t>(switches.size());
 
     // Складываем в буфер сериализованную информацию о коннекторах
-    for (auto sw = switches.begin(); sw != switches.end(); ++sw)
+    for (Switch* sw : switches)
     {
-        stream << sw.value()->serialize();
+        stream << sw->serialize();
     }
 
     return data.data();
@@ -865,6 +870,62 @@ void Topology::deserialize(QByteArray &data)
 
         switches.insert(sw->getName(), sw);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+traj_list_t *Topology::getTrajectoriesList()
+{
+    return &traj_list;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+const traj_list_t* Topology::getTrajectoriesList() const
+{
+    return &traj_list;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sw_list_t *Topology::getConnectorsList()
+{
+    return &switches;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+const sw_list_t* Topology::getConnectorsList() const
+{
+    return &switches;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+topology_stations_list_t *Topology::getStationsList()
+{
+    return &stations;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+signals_data_t *Topology::getSignalsData()
+{
+    return &signals_data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Topology::getRouteName() const
+{
+    return route_name;
 }
 
 //------------------------------------------------------------------------------
@@ -1080,9 +1141,13 @@ void Topology::load_signals(CfgReader& cfg, QDomNode secNode, Switch* sw)
                                dvec3 relative_position, dvec3 relative_rotation)
     {
         if (direction == FWD)
+        {
             sw->setSignalFwd(signal);
-        if (direction == BWD)
+        }
+        else if (direction == BWD)
+        {
             sw->setSignalBwd(signal);
+        }
 
         signal->setConnector(sw);
         signal->setDirection(direction);
@@ -1796,7 +1861,7 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString
     // Проверяем, возможен ли данный маршрут
     auto* start_traj = traj_list.value(start_traj_name, nullptr);
 
-    if (start_traj == nullptr)        
+    if (start_traj == nullptr)
     {
         Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 start trajectory %2 not exists").arg(vehicle_idx).arg(start_traj_name));
         emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, false);

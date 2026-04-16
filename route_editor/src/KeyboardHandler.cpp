@@ -1,18 +1,17 @@
 #include "KeyboardHandler.h"
 
+#include "commands/CommandList.h"
 #include "Action.h"
-#include "CommandList.h"
 #include "EditorContext.h"
 #include "KeyBinding.h"
 #include "Settings.h"
 #include "filesystem.h"
 
-#include <fstream>
 #include <vsg/ui/KeyEvent.h>
 
 #include <cstdint>
 #include <cstring>
-
+#include <fstream>
 #include <iostream>
 
 static std::uint16_t get_byte_index(vsg::KeySymbol key)
@@ -26,28 +25,29 @@ static std::uint8_t get_byte_value(vsg::KeySymbol key)
 }
 
 KeyboardHandler::KeyboardHandler(EditorContext& context)
-    : context(context)
+    : context_(context)
 {
-    std::memset(key_state_bits, 0, 8192);
+    std::memset(key_state_bits_, 0, 8192);
 }
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    key_state_bits[get_byte_index(keyPress.keyBase)] |=
+    key_state_bits_[get_byte_index(keyPress.keyBase)] |=
         get_byte_value(keyPress.keyBase);
 
+    // Move this logic somewhere else
     if (get_binding_state(ACTION_UNDO_COMMAND))
     {
-        context.commands.undo();
+        context_.commands.undo();
     }
     else if (get_binding_state(ACTION_REDO_COMMAND))
     {
-        context.commands.redo();
+        context_.commands.redo();
     }
     else if (get_binding_state(ACTION_SAVE_ROUTE))
     {
         const FileSystem& fs = FileSystem::getInstance();
-        std::string dir_for_save = fs.combinePath(context.route_dir, "topology", "map");
+        std::string dir_for_save = fs.combinePath(context_.route_dir, "topology", "map");
 
         try
         {
@@ -64,10 +64,10 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
         // Перезаписываем рабочую копию
         std::ofstream route_map_file(fs.combinePath(dir_for_save, "route1.map"));
 
-        for (const auto& object : context.static_objects)
+        for (const auto& object : context_.static_objects)
         {
-            const auto translation = object->get_translation();
-            const auto rotation_deg = -object->get_rotation_deg();
+            const vsg::dvec3& translation = object->get_translation();
+            const vsg::dvec3 rotation_deg = -object->get_rotation_deg();
 
             route_map_file << object->label << "," << translation.x <<
                 "," << translation.y << "," << translation.z << "," <<
@@ -79,13 +79,13 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 
 void KeyboardHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
-    key_state_bits[get_byte_index(keyRelease.keyBase)] &=
+    key_state_bits_[get_byte_index(keyRelease.keyBase)] &=
         ~get_byte_value(keyRelease.keyBase);
 }
 
 bool KeyboardHandler::get_key_state(vsg::KeySymbol key) const
 {
-    return key_state_bits[get_byte_index(key)] & get_byte_value(key);
+    return key_state_bits_[get_byte_index(key)] & get_byte_value(key);
 }
 
 bool KeyboardHandler::get_any_shift_state() const
@@ -106,43 +106,17 @@ bool KeyboardHandler::get_any_alt_state() const
 
 bool KeyboardHandler::get_binding_state(Action action) const
 {
-    const KeyBinding key_binding = context.settings.key_bindings.at(action);
+    const KeyBinding key_binding = context_.settings.key_bindings.at(action);
 
     if (!get_key_state(key_binding.key))
     {
         return false;
     }
 
-    if (key_binding.modifiers == 0)
-    {
-        return true;
-    }
+    uint16_t modifiers = 0;
+    modifiers |= (EDITOR_KEY_MODIFIER_SHIFT * get_any_shift_state());
+    modifiers |= (EDITOR_KEY_MODIFIER_CTRL * get_any_ctrl_state());
+    modifiers |= (EDITOR_KEY_MODIFIER_ALT * get_any_alt_state());
 
-    // Walk through every binding's modifier and check it's keys
-    // For example:
-    // If binding's modifier = LShift + RShift, action will be performed
-    // only when we hold both Shifts;
-    // If binding's modifier = Shift(any), action will be performed
-    // when we hold any of Shifts
-    for (const auto& [modifier, keys] : modifier_keys_map)
-    {
-        if (key_binding.modifiers & modifier)
-        {
-            bool pressed = false;
-            for (const vsg::KeySymbol key : keys)
-            {
-                if (get_key_state(key))
-                {
-                    pressed = true;
-                    break;
-                }
-            }
-            if (!pressed)
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
+    return modifiers == key_binding.modifiers;
 }

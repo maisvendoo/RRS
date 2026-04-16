@@ -32,31 +32,31 @@ public:
         EditorContext& context,
         vsg::ref_ptr<vsg::PagedLOD> paged_lod,
         const std::string& label,
-        vsg::vec3 translation,
-        vsg::vec3 rotation_deg,
-        vsg::vec3 scale = {1.0f, 1.0f, 1.0f}
+        const vsg::dvec3& translation,
+        const vsg::dvec3& rotation_deg = {0.0, 0.0, 0.0},
+        const vsg::dvec3& scale = {1.0, 1.0, 1.0}
     );
 
-    vsg::vec3 get_translation() const;
-    vsg::vec3 get_rotation_deg() const;
-    vsg::vec3 get_scale() const;
+    const vsg::dvec3& get_translation() const;
+    const vsg::dvec3& get_rotation_deg() const;
+    const vsg::dvec3& get_scale() const;
 
     const vsg::dmat4& get_initial_matrix() const;
-    const vsg::box& get_bounds() const;
+    const vsg::dbox& get_bounds() const;
 
     bool get_is_selected() const;
     bool get_is_hidden() const;
 
-    void set_translation(vsg::vec3 translation);
-    void set_rotation_deg(vsg::vec3 rotation_deg);
-    void set_scale(vsg::vec3 scale);
+    void set_translation(const vsg::dvec3& translation);
+    void set_rotation_deg(const vsg::dvec3& rotation_deg);
+    void set_scale(const vsg::dvec3& scale);
 
-    void move(vsg::vec3 translation);
+    void move(const vsg::dvec3& translation);
 
-    void rotate_around_pivot(vsg::vec3 pivot, vsg::vec3 axis, float radians,
-        const vsg::dmat4& matrix);
+    void rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3& axis,
+        double radians, const vsg::dmat4& matrix);
 
-    void scale_relative_to_pivot(vsg::vec3 pivot, vsg::vec3 scale,
+    void scale_relative_to_pivot(const vsg::dvec3& pivot, const vsg::dvec3& scale,
         const vsg::dmat4& matrix);
 
     void hide();
@@ -76,23 +76,24 @@ public:
 private:
     void update_matrix();
     void update_bounds();
+    void decompose_matrix();
 
 private:
-    static EditorContext* s_context;
+    EditorContext& context_;
 
-    vsg::vec3 translation;
-    vsg::vec3 rotation_deg;
-    vsg::vec3 scale;
+    vsg::dvec3 translation_;
+    vsg::dvec3 rotation_deg_;
+    vsg::dvec3 scale_;
 
-    vsg::dmat4 initial_matrix;
-    vsg::box bounds;
+    vsg::dmat4 initial_matrix_;
+    vsg::dbox bounds_;
 
-    bool is_selected = false;
-    bool is_hidden = false;
+    bool is_selected_ = false;
+    bool is_hidden_ = false;
 
-    vsg::ref_ptr<SingleSwitch> paged_lod_switch;
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod;
-    vsg::ref_ptr<SingleSwitch> outline_switch;
+    vsg::ref_ptr<SingleSwitch> paged_lod_switch_;
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod_;
+    vsg::ref_ptr<SingleSwitch> outline_switch_;
 };
 
 #endif // ROUTE_OBJECT_H

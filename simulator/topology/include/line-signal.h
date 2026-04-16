@@ -2,7 +2,10 @@
 #define     LINE_SIGNAL_H
 
 #include    "train-signal.h"
-#include    <combine-relay.h>
+
+class CombineRelay;
+class Relay;
+class Timer;
 
 //------------------------------------------------------------------------------
 //
@@ -21,48 +24,46 @@ private:
 
     enum
     {
-        WR_NUM = 1,
-        WR_WAY_BUSY = 0
+        WR_WAY_BUSY = 0,
+        WR_NUM,
     };
 
     /// Путевое реле:
     /// включено, когда путь свободен (не зашунтирован колёсными парами)
-    Relay *way_relay = new Relay(WR_NUM);
+    Relay *way_relay = nullptr;
 
     enum
     {
-        LR_NEUTRAL_NUM = 4,
         LR_NEUTRAL_LINE_PLUS = 0,
-        LR_NEUTRAL_LINE_MINIS = 1,
-        LR_NEUTRAL_ALLOW = 2,
-        LR_NEUTRAL_PROHIBITING = 3,
+        LR_NEUTRAL_LINE_MINIS,
+        LR_NEUTRAL_ALLOW,
+        LR_NEUTRAL_PROHIBITING,
+        LR_NEUTRAL_NUM,
 
-        LR_PLUS_NUM = 1,
         LR_PLUS_GREEN = 0,
+        LR_PLUS_NUM,
 
-        LR_MINUS_NUM = 1,
-        LR_MINUS_YELLOW = 0
+        LR_MINUS_YELLOW = 0,
+        LR_MINUS_NUM,
     };
 
     /// Линейное реле (с полярным якорем):
     /// при питании положительным напряжением переключает на зелёный,
     /// отрицательным напряжением - жёлтый, без питания - красный
-    CombineRelay *line_relay = new CombineRelay(LR_NEUTRAL_NUM,
-                                                LR_PLUS_NUM,
-                                                LR_MINUS_NUM);
+    CombineRelay *line_relay = nullptr;
 
     enum
     {
-        NUM_SSR_CONTACTS = 2,
         SSR_GREEN = 0,
-        SSR_YELLOW = 1
+        SSR_YELLOW,
+        NUM_SSR_CONTACTS,
     };
 
     /// Боковое сигнальное реле (желтый мигающий, если следующий с отклонением по стрелкам)
-    Relay *side_signal_relay = new Relay(NUM_SSR_CONTACTS);
+    Relay *side_signal_relay = nullptr;
 
     /// Таймер мигания желтого
-    Timer *blink_timer = new Timer(0.75, false);
+    Timer *blink_timer = nullptr;
 
     /// Контакт мигания
     bool blink_contact = true;

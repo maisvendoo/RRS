@@ -7,11 +7,12 @@
 #include    <topology-export.h>
 #include    <topology-types.h>
 #include    <trajectory.h>
-#include    <vehicle-controller.h>
-#include    <vehicle.h>
 #include    <signals-data-types.h>
 #include    <route-command.h>
 #include    <route-segment.h>
+
+class Vehicle;
+class VehicleController;
 
 /*!
  * \class
@@ -53,43 +54,19 @@ public:
     void step(double t, double dt);
 
     QByteArray serialize();
-
     void deserialize(QByteArray &data);
 
-    traj_list_t *getTrajectoriesList()
-    {
-        return &traj_list;
-    }
+    traj_list_t *getTrajectoriesList();
+    const traj_list_t* getTrajectoriesList() const;
 
-    const traj_list_t* getTrajectoriesList() const
-    {
-        return &traj_list;
-    }
+    sw_list_t *getConnectorsList();
+    const sw_list_t* getConnectorsList() const;
 
-    sw_list_t *getConnectorsList()
-    {
-        return &switches;
-    }
+    topology_stations_list_t *getStationsList();
 
-    const sw_list_t* getConnectorsList() const
-    {
-        return &switches;
-    }
+    signals_data_t *getSignalsData();
 
-    topology_stations_list_t *getStationsList()
-    {
-        return &stations;
-    }
-
-    signals_data_t *getSignalsData()
-    {
-        return &signals_data;
-    }
-
-    QString getRouteName() const
-    {
-        return route_name;
-    }
+    QString getRouteName() const;
 
 signals:
 

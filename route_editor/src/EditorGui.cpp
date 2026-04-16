@@ -1,10 +1,13 @@
 #include "EditorGui.h"
 
+#include "commands/AddObject.h"
+#include "commands/Command.h"
+#include "commands/CommandList.h"
+#include "commands/RotateObjects.h"
+#include "commands/ScaleObjects.h"
+#include "commands/TranslateObjects.h"
 #include "Action.h"
-#include "AddObjectCommand.h"
 #include "CameraHandler.h"
-#include "Command.h"
-#include "CommandList.h"
 #include "EditorContext.h"
 #include "EditorState.h"
 #include "Gizmo.h"
@@ -24,27 +27,56 @@
 #include "trajectory.h"
 #include "vec3.h"
 
+#include <algorithm>
+// #include <filesystem>
 #include <vsg/app/ProjectionMatrix.h>
+#include <vsg/app/RecordTraversal.h>
+#include <vsg/commands/Commands.h>
+#include <vsg/core/Array.h>
+#include <vsg/core/Data.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/quat.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/Geometry.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/StateGroup.h>
+#include <vsg/nodes/VertexIndexDraw.h>
+#include <vsg/state/ColorBlendState.h>
+#include <vsg/state/DepthStencilState.h>
+#include <vsg/state/GraphicsPipeline.h>
+#include <vsg/state/InputAssemblyState.h>
+#include <vsg/state/MultisampleState.h>
+#include <vsg/state/RasterizationState.h>
+#include <vsg/state/VertexInputState.h>
 #include <vsgImGui/imgui.h>
 
 #include <cassert>
 #include <cctype>
-#include <cfloat>
-#include <climits>
 #include <string>
 
-static constexpr float MAX_DRAG = FLT_MAX / static_cast<float>(INT_MAX);
+#define SHOW_WINDOW(setting_name) if (settings.setting_name) setting_name()
+
+static bool drag_double(const char* label, double* data,
+    const double* min = nullptr)
+{
+    return ImGui::DragScalar(label, ImGuiDataType_Double, data,
+        1.0f, min, nullptr, "%.3f");
+}
+
+static bool drag_double3(const char* label, double* data, float speed = 1.0f,
+    const double* min = nullptr, const double* max = nullptr,
+    ImGuiSliderFlags flags = 0)
+{
+    return ImGui::DragScalarN(label, ImGuiDataType_Double, data, 3,
+        speed, min, max, "%.3f", flags);
+}
 
 EditorGui::EditorGui(EditorContext& context)
-    : context(context)
+    : context_(context)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -61,7 +93,7 @@ EditorGui::EditorGui(EditorContext& context)
 
     if (!context.settings.is_gui_editable)
     {
-        window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+        window_flags_ |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     }
 
     ImGuiStyle& style = ImGui::GetStyle();
@@ -73,11 +105,16 @@ EditorGui::EditorGui(EditorContext& context)
     style.GrabRounding = 6.0f;
 }
 
+EditorGui::~EditorGui()
+{
+    // ImGui::DestroyContext();
+}
+
 void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 {
     (void)command_buffer;
 
-    switch (context.state)
+    switch (context_.state)
     {
         case EditorState::SELECT_ROUTE:
         {
@@ -87,65 +124,31 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
         }
         default:
         {
-            ImGui::Begin("Settings", nullptr, window_flags);
-            ImGui::Checkbox("Show objects.ref", &context.settings.show_objects_ref);
-            ImGui::Checkbox("Show route1.map", &context.settings.show_route_map);
-            ImGui::Checkbox("Show controls", &context.settings.show_controls);
-            ImGui::Checkbox("Show camera settings", &context.settings.show_camera_settings);
-            ImGui::Checkbox("Show topology", &context.settings.show_topology);
+            settings_t& settings = context_.settings;
+
+            ImGui::Begin("Settings", nullptr, window_flags_);
+            ImGui::Checkbox("Show objects.ref", &settings.show_objects_ref);
+            ImGui::Checkbox("Show route1.map", &settings.show_route_map);
+            ImGui::Checkbox("Show stations", &settings.show_stations_conf);
+            ImGui::Checkbox("Show waypoints", &settings.show_waypoints_conf);
+            ImGui::Checkbox("Show key bindings", &settings.show_key_bindings);
+            ImGui::Checkbox("Show camera settings", &settings.show_camera_settings);
+            ImGui::Checkbox("Show topology", &settings.show_topology);
+            ImGui::Checkbox("Show selected objects properties", &settings.show_selected_objects_properties);
+            ImGui::Checkbox("Show commands", &settings.show_commands);
             ImGui::End();
 
             // ImGui::ShowDemoWindow();
 
-            if (context.settings.show_objects_ref)
-            {
-                show_objects_ref();
-            }
-
-            if (context.settings.show_route_map)
-            {
-                show_route_map();
-            }
-
-            show_stations_conf();
-            show_waypoints_conf();
-
-            if (context.settings.show_controls)
-            {
-                show_key_bindings();
-            }
-
-            if (context.settings.show_camera_settings)
-            {
-                show_camera_settings();
-            }
-
-            if (context.settings.show_topology)
-            {
-                show_topology();
-            }
-
-            show_selected_objects_properties();
-
-            ImGui::Begin("Commands");
-            auto active = context.commands.get_active();
-            auto curr = context.commands.get_tail();
-            while (curr)
-            {
-                if (curr == active)
-                {
-                    ImGui::TextColored(ImVec4{0.2f, 1.0f, 0.3f, 1.0f}, "%s", curr->command->get_description());
-                    ImGui::Separator();
-                }
-                else
-                {
-                    ImGui::Text("%s", curr->command->get_description());
-                    ImGui::Separator();
-                }
-
-                curr = curr->prev;
-            }
-            ImGui::End();
+            SHOW_WINDOW(show_objects_ref);
+            SHOW_WINDOW(show_route_map);
+            SHOW_WINDOW(show_stations_conf);
+            SHOW_WINDOW(show_waypoints_conf);
+            SHOW_WINDOW(show_key_bindings);
+            SHOW_WINDOW(show_camera_settings);
+            SHOW_WINDOW(show_topology);
+            SHOW_WINDOW(show_selected_objects_properties);
+            SHOW_WINDOW(show_commands);
 
             return;
         }
@@ -168,8 +171,8 @@ void EditorGui::select_route() const
     {
         if (ImGuiFileDialog::Instance()->IsOk())
         {
-            context.route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
-            context.state = EditorState::LOAD_ROUTE;
+            context_.route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
+            context_.state = EditorState::LOAD_ROUTE;
         }
 
         ImGuiFileDialog::Instance()->Close();
@@ -178,34 +181,43 @@ void EditorGui::select_route() const
 
 void EditorGui::show_objects_ref() const
 {
-    ImGui::Begin("objects_ref", nullptr, window_flags);
+    ImGui::Begin("objects_ref", nullptr, window_flags_);
 
-    if (!context.route)
+    if (!context_.route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
         return;
     }
 
+    static char search_buffer[256] = "";
+    ImGui::InputTextWithHint("search_label", "", search_buffer, 256);
+
+    std::string search_lower = search_buffer;
+    std::transform(search_lower.begin(), search_lower.end(),
+        search_lower.begin(), ::tolower);
+
     if (ImGui::BeginTable("objects_ref_table", 2,
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, ref] : context.objects_ref)
+        for (const auto& [label, ref] : context_.objects_ref)
         {
+            std::string label_lower = label;
+            std::transform(label_lower.begin(), label_lower.end(),
+                label_lower.begin(), ::tolower);
+
+            if (search_buffer[0] != '\0' &&
+                label_lower.find(search_lower) == std::string::npos)
+            {
+                continue;
+            }
+
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                const auto object = RouteObject::create(context, ref.paged_lod,
-                    label, static_cast<vsg::vec3>(context.look_at->eye) +
-                    static_cast<vsg::vec3>(context.camera_handler->get_front())
-                        * 20.0f,
-                    vsg::vec3(0.0f, 0.0f, 0.0f)
-                );
-
-                context.commands.push(new AddObjectCommand(
-                    context, object), true);
+                add_object(ref.paged_lod, label);
             }
 
             ImGui::TableNextColumn();
@@ -220,11 +232,11 @@ void EditorGui::show_objects_ref() const
 
 void EditorGui::show_route_map() const
 {
-    assert(context.route);
+    assert(context_.route);
 
-    ImGui::Begin("route1.map", nullptr, window_flags);
+    ImGui::Begin("route1.map", nullptr, window_flags_);
 
-    if (!context.route)
+    if (!context_.route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -235,28 +247,30 @@ void EditorGui::show_route_map() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, transforms] : context.route_map)
+        for (const auto& [label, transforms] : context_.route_map)
         {
             for (const auto& transform : transforms)
             {
-                const vsg::vec3 translation = transform.translation;
-                const vsg::vec3 rotation_deg = transform.rotation_deg;
+                const vsg::dvec3& translation = transform.translation;
+                const vsg::dvec3& rotation_deg = transform.rotation_deg;
+
+                constexpr const char* number_format = "%10.3f";
 
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
                 ImGui::Text("%s", label.c_str());
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", translation.x);
+                ImGui::Text(number_format, translation.x);
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", translation.y);
+                ImGui::Text(number_format, translation.y);
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", translation.z);
+                ImGui::Text(number_format, translation.z);
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", rotation_deg.x);
+                ImGui::Text(number_format, rotation_deg.x);
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", rotation_deg.y);
+                ImGui::Text(number_format, rotation_deg.y);
                 ImGui::TableNextColumn();
-                ImGui::Text("%10.3f", rotation_deg.z);
+                ImGui::Text(number_format, rotation_deg.z);
             }
         }
 
@@ -268,30 +282,32 @@ void EditorGui::show_route_map() const
 
 void EditorGui::show_stations_conf() const
 {
-    ImGui::Begin("stations.conf", nullptr, window_flags);
+    ImGui::Begin("stations.conf", nullptr, window_flags_);
 
     if (ImGui::BeginTable("stations_conf_table", 4,
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, translation] : context.stations_conf)
+        for (const auto& [label, translation] : context_.stations_conf)
         {
+            constexpr const char* number_format = "%10.3f";
+
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                context.look_at->eye = static_cast<vsg::dvec3>(translation)
-                    + vsg::dvec3(0.0, 0.0, 50.0);
+                context_.look_at->eye = translation +
+                    vsg::dvec3(0.0, 0.0, 50.0);
 
-                context.look_at->center = context.look_at->eye
-                    + context.camera_handler->get_front();
+                context_.look_at->center = context_.look_at->eye
+                    + context_.camera_handler->get_front();
             }
             ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.x);
+            ImGui::Text(number_format, translation.x);
             ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.y);
+            ImGui::Text(number_format, translation.y);
             ImGui::TableNextColumn();
-            ImGui::Text("%10.3f", translation.z);
+            ImGui::Text(number_format, translation.z);
         }
 
         ImGui::EndTable();
@@ -302,20 +318,20 @@ void EditorGui::show_stations_conf() const
 
 void EditorGui::show_waypoints_conf() const
 {
-    ImGui::Begin("waypoints.conf", nullptr, window_flags);
+    ImGui::Begin("waypoints.conf", nullptr, window_flags_);
 
     if (ImGui::BeginTable("waypoints_conf_table", 5,
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, data] : context.waypoints_conf)
+        for (const auto& [label, data] : context_.waypoints_conf)
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
                 const traj_list_t* const traj_list =
-                    context.topology->getTrajectoriesList();
+                    context_.topology->getTrajectoriesList();
 
                 const QString traj_name = QString::fromStdString(
                     data.trajectory_name);
@@ -337,12 +353,12 @@ void EditorGui::show_waypoints_conf() const
 
                     double h = 5.0;
 
-                    context.look_at->eye = vsg::dvec3(pos.x + pd.up.x * h,
+                    context_.look_at->eye = vsg::dvec3(pos.x + pd.up.x * h,
                                                       pos.y + pd.up.y * h,
                                                       pos.z + pd.up.z * h);
 
-                    context.look_at->center = context.look_at->eye
-                        + static_cast<vsg::dvec3>(context.camera_handler->get_front());
+                    context_.look_at->center = context_.look_at->eye
+                        + context_.camera_handler->get_front();
                 }
             }
             ImGui::TableNextColumn();
@@ -363,7 +379,7 @@ void EditorGui::show_waypoints_conf() const
 
 void EditorGui::show_key_bindings() const
 {
-    ImGui::Begin("Key Bindings", nullptr, window_flags);
+    ImGui::Begin("Key Bindings", nullptr, window_flags_);
 
     if (ImGui::BeginTable("key_bindings_table", 2,
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
@@ -379,27 +395,21 @@ void EditorGui::show_key_bindings() const
             std::string label;
 
             static const std::map<EditorKeyModifier, const char*> test_map = {
-                {EDITOR_KEY_MODIFIER_SHIFT_L, "LShift"},
-                {EDITOR_KEY_MODIFIER_SHIFT_R, "RShift"},
-                {EDITOR_KEY_MODIFIER_SHIFT_ANY, "Shift"},
-                {EDITOR_KEY_MODIFIER_CTRL_L, "LCtrl"},
-                {EDITOR_KEY_MODIFIER_CTRL_R, "RCtrl"},
-                {EDITOR_KEY_MODIFIER_CTRL_ANY, "Ctrl"},
-                {EDITOR_KEY_MODIFIER_ALT_L, "LAlt"},
-                {EDITOR_KEY_MODIFIER_ALT_R, "RAlt"},
-                {EDITOR_KEY_MODIFIER_ALT_ANY, "Alt"}
+                {EDITOR_KEY_MODIFIER_SHIFT, "Shift"},
+                {EDITOR_KEY_MODIFIER_CTRL, "Ctrl"},
+                {EDITOR_KEY_MODIFIER_ALT, "Alt"}
             };
 
             for (const auto& [modifier, name] : test_map)
             {
-                if (context.settings.key_bindings[i].modifiers & modifier)
+                if (context_.settings.key_bindings[i].modifiers & modifier)
                 {
                     label += name;
                     label += " + ";
                 }
             }
 
-            label += std::toupper(context.settings.key_bindings[i].key);
+            label += std::toupper(context_.settings.key_bindings[i].key);
             ImGui::Text("%s", label.c_str());
         }
 
@@ -411,26 +421,26 @@ void EditorGui::show_key_bindings() const
 
 void EditorGui::show_camera_settings() const
 {
-    ImGui::Begin("Camera Settings", nullptr, window_flags);
+    ImGui::Begin("Camera Settings", nullptr, window_flags_);
+
+    constexpr double min = 0.0;
 
     ImGui::Text("Move speed:");
-    ImGui::DragFloat("##move_speed", &context.settings.camera_move_speed,
-        1.0f, 1.0f, MAX_DRAG);
+    drag_double("##move_speed", &context_.settings.camera_move_speed, &min);
 
     ImGui::Text("Rotate speed:");
-    ImGui::DragFloat("##rotate_speed", &context.settings.camera_rotate_speed,
-        1.0f, 1.0f, MAX_DRAG);
+    drag_double("##rotate_speed", &context_.settings.camera_rotate_speed, &min);
 
     ImGui::Text("Zoom power:");
-    ImGui::DragFloat("##zoom_power", &context.settings.camera_zoom_power,
-        1.0f, 1.0f, MAX_DRAG);
+    drag_double("##zoom_power", &context_.settings.camera_zoom_power, &min);
 
     ImGui::Text("FovY:");
-    float fovy = static_cast<float>(context.perspective->fieldOfViewY);
-    if (ImGui::SliderFloat("##fovy", &fovy, context.settings.fovy_min,
-        context.settings.fovy_max))
+
+    settings_t& settings = context_.settings;
+    if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &settings.fovy,
+        &settings.fovy_min, &settings.fovy_max, "%.3f"))
     {
-        context.perspective->fieldOfViewY = fovy;
+        context_.perspective->fieldOfViewY = settings.fovy;
     }
 
     ImGui::End();
@@ -438,9 +448,9 @@ void EditorGui::show_camera_settings() const
 
 void EditorGui::show_topology() const
 {
-    ImGui::Begin("Topology", nullptr, window_flags);
+    ImGui::Begin("Topology", nullptr, window_flags_);
 
-    const auto route = context.route;
+    const auto route = context_.route;
     if (!route)
     {
         ImGui::Text("There is no route yet");
@@ -448,38 +458,44 @@ void EditorGui::show_topology() const
         return;
     }
 
-    if (!context.topology)
+    if (!context_.topology)
     {
         ImGui::Text("There is no topology yet");
         ImGui::End();
         return;
     }
 
-    const auto route_name = context.topology->getRouteName().toStdString();
+    const auto route_name = context_.topology->getRouteName().toStdString();
     ImGui::Text("Route name: %s", route_name.c_str());
 
     if (ImGui::CollapsingHeader("Trajectories"))
     {
-        const auto* trajectories = context.topology->getTrajectoriesList();
+        const auto* trajectories = context_.topology->getTrajectoriesList();
         for (const Trajectory* trajectory : *trajectories)
         {
             if (ImGui::TreeNode(trajectory->getName().toStdString().c_str()))
             {
-                ImGui::Text("%17s%12s%12s%12s%12s", "begin.x", "begin.y",
-                    "begin.z", "rail_coord", "traj_coord");
-
-                ImGui::Separator();
-
                 const auto& tracks = trajectory->getTracks();
                 const auto tracks_size = tracks.size();
 
                 for (auto i = decltype(tracks_size){0}; i < tracks_size; ++i)
                 {
                     const track_t& track = tracks[i];
-                    ImGui::Text("[%2zu]:%12.3f%12.3f%12.3f%12.3f%12.3f", i,
-                        track.begin_point.x, track.begin_point.y,
-                        track.begin_point.z, track.railway_coord0,
-                        track.traj_coord);
+                    const dvec3& begin_point = track.begin_point;
+                    const dvec3& end_point = track.end_point;
+
+                    std::string label = "[";
+                    label += std::to_string(i);
+                    label += "]##";
+                    label += trajectory->getName().toStdString();
+                    ImGui::SeparatorText(label.c_str());
+                    ImGui::Text("         begin: %12.3f %12.3f %12.3f",
+                        begin_point.x, begin_point.y, begin_point.z);
+                    ImGui::Text("           end: %12.3f %12.3f %12.3f",
+                        end_point.x, end_point.y, end_point.z);
+                    ImGui::Text("railway_coords: %12.3f %12.3f",
+                        track.railway_coord0, track.railway_coord1);
+                    ImGui::Text("    traj_coord: %12.3f", track.traj_coord);
                 }
 
                 ImGui::TreePop();
@@ -508,8 +524,8 @@ void EditorGui::show_topology() const
                 ImGui::Text("SignalModel%s: %s", type,
                     signal->getSignalModel().toStdString().c_str());
 
-                const dvec3 rel_pos = signal->getRelPos();
-                const dvec3 rel_rot = signal->getRelRot();
+                const dvec3& rel_pos = signal->getRelPos();
+                const dvec3& rel_rot = signal->getRelRot();
 
                 ImGui::Text("RelPos%s: %8.3f %8.3f %8.3f", type,
                     rel_pos.x, rel_pos.y, rel_pos.z);
@@ -519,8 +535,8 @@ void EditorGui::show_topology() const
             }
         };
 
-        const auto* connectors = context.topology->getConnectorsList();
-        for (auto it = connectors->begin(); it != connectors->end(); ++it)
+        const sw_list_t* const connectors = context_.topology->getConnectorsList();
+        for (auto it = connectors->constBegin(); it != connectors->constEnd(); ++it)
         {
             const Switch* const switch_ = dynamic_cast<Switch*>(*it);
             if (!switch_)
@@ -548,94 +564,193 @@ void EditorGui::show_topology() const
 
 void EditorGui::show_selected_objects_properties() const
 {
-    if (!context.object_selector)
+    if (!context_.object_selector)
     {
         return;
     }
 
-    const auto& selected_objects = context.selected_objects;
+    const auto& selected_objects = context_.selected_objects;
     if (selected_objects.empty())
     {
         return;
     }
 
-    ImGui::Begin("Selected objects", nullptr, window_flags);
+    ImGui::Begin("Selected objects", nullptr, window_flags_);
 
-    int i = 0;
+    static bool dragging = false;
+
+    std::size_t i = 0;
 
     for (const auto& object : selected_objects)
     {
         ImGui::Text("label: %s", object->label.c_str());
 
-        std::string label = "translation##" + std::to_string(i);
-
-        vsg::vec3 translation = object->get_translation();
-        if (ImGui::DragFloat3(label.c_str(), translation.data()))
-        {
-            object->set_translation(translation);
-        }
-
-        label = "rotation##" + std::to_string(i);
-
-        vsg::vec3 rotation_deg = object->get_rotation_deg();
-        if (ImGui::DragFloat3(label.c_str(), rotation_deg.data(), 0.2f))
-        {
-            object->set_rotation_deg(rotation_deg);
-        }
-
-        label = "scale##" + std::to_string(i);
-
-        vsg::vec3 scale = object->get_scale();
-        if (ImGui::DragFloat3(label.c_str(), scale.data(), 0.01f))
-        {
-            object->set_scale(scale);
-        }
+        handle_translation_drag(i, object, dragging);
+        handle_rotation_drag(i, object, dragging);
+        handle_scale_drag(i, object, dragging);
 
         ++i;
     }
 
-    vsg::vec3 center = {0.0f, 0.0f, 0.0f};
-    for (const auto& object : selected_objects)
-    {
-        center += object->get_translation();
-    }
-    center /= static_cast<float>(selected_objects.size());
-
-    if (ImGui::Button("Scale X 2"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->scale_relative_to_pivot(center,
-                vsg::vec3{2.0f, 1.0f, 1.0f}, object->matrix);
-        }
-    }
-
-    if (ImGui::Button("Scale Y 2"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->scale_relative_to_pivot(center,
-                vsg::vec3{1.0f, 2.0f, 1.0f}, object->matrix);
-        }
-    }
-
-    if (ImGui::Button("Scale Z 2"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->scale_relative_to_pivot(center,
-                vsg::vec3{1.0f, 1.0f, 2.0f}, object->matrix);
-        }
-    }
-
-    if (ImGui::Button("Scale X 0.5"))
-    {
-        for (const auto& object : selected_objects)
-        {
-            object->scale_relative_to_pivot(center,
-                vsg::vec3{0.5f, 1.0f, 1.0f}, object->matrix);
-        }
-    }
-
     ImGui::End();
+}
+
+void EditorGui::show_commands() const
+{
+    ImGui::Begin("Commands");
+    auto active = context_.commands.get_active();
+    auto curr = context_.commands.get_tail();
+    while (curr)
+    {
+        if (curr == active)
+        {
+            ImGui::TextColored(ImVec4{0.2f, 1.0f, 0.3f, 1.0f}, "%s",
+                curr->command->get_description());
+            ImGui::Separator();
+        }
+        else
+        {
+            ImGui::Text("%s", curr->command->get_description());
+            ImGui::Separator();
+        }
+
+        curr = curr->prev;
+    }
+    ImGui::End();
+}
+
+void EditorGui::add_object(
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    const std::string& label
+) const
+{
+    const auto object = RouteObject::create(context_, paged_lod, label,
+        context_.look_at->eye + context_.camera_handler->get_front() * 20.0);
+
+    context_.commands.push(new AddObject(context_, object), true);
+}
+
+void EditorGui::save_objects_matrixes() const
+{
+    for (const auto& object : context_.selected_objects)
+    {
+        object->save_matrix();
+    }
+}
+
+void EditorGui::handle_translation_drag(
+    size_t index,
+    vsg::ref_ptr<RouteObject> object,
+    bool& dragging
+) const
+{
+    std::string label = "translation##" + std::to_string(index);
+    static vsg::dvec3 total_translation = {0.0, 0.0, 0.0};
+
+    vsg::dvec3 translation = object->get_translation();
+    if (drag_double3(label.c_str(), translation.data()))
+    {
+        if (!dragging)
+        {
+            total_translation = {0.0, 0.0, 0.0};
+            save_objects_matrixes();
+            dragging = true;
+        }
+        total_translation += translation - object->get_translation();
+        object->set_translation(translation);
+    }
+
+    if (ImGui::IsItemDeactivatedAfterEdit())
+    {
+        context_.commands.push(new TranslateObjects(context_, {object},
+            total_translation), false);
+        dragging = false;
+    }
+}
+
+void EditorGui::handle_rotation_drag(
+    std::size_t index,
+    vsg::ref_ptr<RouteObject> object,
+    bool& dragging
+) const
+{
+    std::string label = "rotation##" + std::to_string(index);
+    static vsg::dvec3 total_rotation_deg = {0.0, 0.0, 0.0};
+
+    constexpr double min_rot_deg = -360.0;
+    constexpr double max_rot_deg = 360.0;
+    vsg::dvec3 rotation_deg = object->get_rotation_deg();
+    if (drag_double3(label.c_str(), rotation_deg.data(), 1.0f,
+        &min_rot_deg, &max_rot_deg, ImGuiSliderFlags_WrapAround))
+    {
+        if (!dragging)
+        {
+            total_rotation_deg = {0.0, 0.0, 0.0};
+            save_objects_matrixes();
+            dragging = true;
+        }
+        total_rotation_deg += rotation_deg - object->get_rotation_deg();
+        object->set_rotation_deg(rotation_deg);
+    }
+
+    if (ImGui::IsItemDeactivatedAfterEdit())
+    {
+        vsg::dvec3 axis = {0.0, 0.0, 0.0};
+        double radians;
+
+        if (std::abs(total_rotation_deg.x) >= 1.0e-6)
+        {
+            axis.x = 1.0;
+            radians = vsg::radians(total_rotation_deg.x);
+        }
+        else if (std::abs(total_rotation_deg.y) >= 1.0e-6)
+        {
+            axis.y = 1.0;
+            radians = vsg::radians(total_rotation_deg.y);
+        }
+        else
+        {
+            axis.z = 1.0;
+            radians = vsg::radians(total_rotation_deg.z);
+        }
+
+        context_.commands.push(new RotateObjects(context_, {object},
+            context_.gizmo->get_curr_pos(), axis, radians), false);
+        dragging = false;
+    }
+}
+
+void EditorGui::handle_scale_drag(
+    size_t index,
+    vsg::ref_ptr<RouteObject> object,
+    bool& dragging
+) const
+{
+    std::string label = "scale##" + std::to_string(index);
+    static vsg::dvec3 total_scale = {1.0, 1.0, 1.0};
+
+    const vsg::dvec3& prev_scale = object->get_scale();
+    vsg::dvec3 scale = object->get_scale();
+    if (drag_double3(label.c_str(), scale.data(), 0.01f))
+    {
+        if (vsg::length(scale) > 1.0e-6)
+        {
+            if (!dragging)
+            {
+                total_scale = {1.0, 1.0, 1.0};
+                save_objects_matrixes();
+                dragging = true;
+            }
+            total_scale *= {scale.x / prev_scale.x, scale.y / prev_scale.y,
+                scale.z / prev_scale.z};
+            object->set_scale(scale);
+        }
+    }
+
+    if (ImGui::IsItemDeactivatedAfterEdit())
+    {
+        context_.commands.push(new ScaleObjects(context_, {object},
+            context_.gizmo->get_curr_pos(), total_scale), false);
+        dragging = false;
+    }
 }

@@ -35,7 +35,7 @@ static VkSampleCountFlags samples_bit_flag(int samples)
 }
 
 WindowHandler::WindowHandler(EditorContext& context)
-    : context(context)
+    : context_(context)
 {
     const settings_t& settings = context.settings;
 
@@ -64,10 +64,10 @@ WindowHandler::WindowHandler(EditorContext& context)
 
 void WindowHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
 {
-    context.perspective->aspectRatio =
+    context_.perspective->aspectRatio =
         static_cast<double>(configureWindow.width) /
         static_cast<double>(configureWindow.height);
 
-    context.camera->viewportState->set(0, 0,
+    context_.camera->viewportState->set(0, 0,
         configureWindow.width, configureWindow.height);
 }

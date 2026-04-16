@@ -8,16 +8,16 @@
 #include <vsg/lighting/AmbientLight.h>
 
 SceneGraph::SceneGraph(EditorContext& context)
-    : context(context)
+    : context_(context)
 {
-    ambient_light = vsg::AmbientLight::create();
-    this->addChild(vsg::Mask{MASK_SCENE}, ambient_light);
+    ambient_light_ = vsg::AmbientLight::create();
+    this->addChild(vsg::Mask{MASK_SCENE}, ambient_light_);
 }
 
 void SceneGraph::load_route()
 {
-    context.route = Route::create(context);
+    context_.route = Route::create(context_);
 
-    context.compile_infos.emplace_back(CompileInfo{
-        context.scene_graph, context.route, vsg::MASK_ALL});
+    context_.compile_infos.emplace_back(CompileInfo{
+        context_.scene_graph, context_.route, vsg::MASK_ALL});
 }

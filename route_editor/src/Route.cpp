@@ -1,6 +1,7 @@
 #include "Route.h"
 
 #include "EditorContext.h"
+#include "Mask.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
@@ -9,19 +10,28 @@
 // #include "parse_file_funcs.h"
 #include "rail-signal.h"
 #include "signals-data-types.h"
+#include "topology-defines.h"
 #include "topology.h"
+#include "trajectory.h"
 #include "vec3.h"
 
 #include <CfgReader.h>
 
 #include <fstream>
+#include <mutex>
 #include <sstream>
+#include <thread>
+#include <vsg/app/RecordTraversal.h>
+#include <vsg/commands/DrawIndexed.h>
+#include <vsg/core/Array.h>
+#include <vsg/core/Data.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/Geometry.h>
 
 #include <QString>
 
@@ -29,22 +39,24 @@
 #include <cstdio>
 #include <filesystem>
 #include <string>
+#include <vsg/nodes/StateGroup.h>
+#include <vsg/nodes/VertexDraw.h>
+#include <vsg/nodes/VertexIndexDraw.h>
+#include <vsg/state/InputAssemblyState.h>
+#include <vsg/state/RasterizationState.h>
+#include <vulkan/vulkan_core.h>
 
 #define LABEL_BUFFER_SIZE 256
 #define RELATIVE_PATH_BUFFER_SIZE 512
 #define FLOAT_BUFFER_SIZE 32
 
-static vsg::vec3 to_vsg_vec3(dvec3 vec)
+static vsg::dvec3 to_vsg_vec3(dvec3 vec)
 {
-    return vsg::vec3{
-        static_cast<float>(vec.x),
-        static_cast<float>(vec.y),
-        static_cast<float>(vec.z)
-    };
+    return vsg::dvec3{vec.x, vec.y, vec.z};
 }
 
 Route::Route(EditorContext& context)
-    : context(context)
+    : context_(context)
 {
     const bool success = load_objects_ref() && load_route_map()
         && load_stations_conf() && load_waypoints_conf();
@@ -63,13 +75,38 @@ Route::Route(EditorContext& context)
             ref.relative_path);
 
         paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
-            static_cast<double>(context.settings.view_distance));
+            context.settings.view_distance);
 
         paged_lod->children.front() = {0.1, nullptr};
         paged_lod->options = context.options;
 
         ref.paged_lod = paged_lod;
     }
+
+    // std::thread load_static_objects_thread([&context]() -> void {
+    //     for (const auto& [label, transforms] : context.route_map)
+    //     {
+    //         const auto found_it = context.objects_ref.find(label);
+    //         if (found_it == context.objects_ref.end())
+    //         {
+    //             continue;
+    //         }
+
+    //         for (const auto& transform : transforms)
+    //         {
+    //             const auto object = RouteObject::create(context,
+    //                 found_it->second.paged_lod, label,
+    //                 transform.translation, -transform.rotation_deg);
+
+
+    //             std::lock_guard<std::mutex> lock(context.compile_mutex);
+    //             context.static_objects.emplace_back(object);
+
+    //             context.compile_infos.emplace_back(CompileInfo{
+    //                 context.route, object, vsg::MASK_ALL});
+    //         }
+    //     }
+    // });
 
     load_static_objects();
     load_topology();
@@ -80,7 +117,7 @@ bool Route::load_objects_ref()
     const FileSystem& fs = FileSystem::getInstance();
 
     const std::string objects_ref_path = fs.combinePath(
-        context.route_dir, "objects.ref");
+        context_.route_dir, "objects.ref");
 
     // char label[LABEL_BUFFER_SIZE];
     // char relative_path[RELATIVE_PATH_BUFFER_SIZE];
@@ -112,7 +149,7 @@ bool Route::load_objects_ref()
 
         if (iss >> label >> relative_path)
         {
-            context.objects_ref.emplace(std::move(label),
+            context_.objects_ref.emplace(std::move(label),
                 ObjectRef{std::move(relative_path), nullptr});
         }
     }
@@ -124,7 +161,7 @@ bool Route::load_route_map()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string route_map_path = fs.combinePath(context.route_dir,
+    const std::string route_map_path = fs.combinePath(context_.route_dir,
         "topology", "map", "route1.map");
 
     // char label[LABEL_BUFFER_SIZE];
@@ -174,11 +211,11 @@ bool Route::load_route_map()
 
         std::istringstream iss(std::move(line));
         std::string label;
-        vsg::vec3 translation, rotation;
+        vsg::dvec3 translation, rotation;
 
         if (iss >> label >> translation >> rotation)
         {
-            context.route_map[label].emplace_back(
+            context_.route_map[label].emplace_back(
                 RouteMapTransformation{translation, rotation});
         }
     }
@@ -190,7 +227,7 @@ bool Route::load_stations_conf()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string stations_conf_path = fs.combinePath(context.route_dir,
+    const std::string stations_conf_path = fs.combinePath(context_.route_dir,
         "topology", "stations.conf");
 
     std::ifstream stations_conf_file(stations_conf_path);
@@ -211,10 +248,10 @@ bool Route::load_stations_conf()
 
         std::istringstream iss(std::move(line));
         std::string label;
-        vsg::vec3 translation;
+        vsg::dvec3 translation;
         if (iss >> label >> translation)
         {
-            context.stations_conf[label] = translation;
+            context_.stations_conf[label] = translation;
         }
     }
 
@@ -225,7 +262,7 @@ bool Route::load_waypoints_conf()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string waypoints_conf_path = fs.combinePath(context.route_dir,
+    const std::string waypoints_conf_path = fs.combinePath(context_.route_dir,
         "topology", "waypoints.conf");
 
     std::ifstream waypoints_conf_file(waypoints_conf_path);
@@ -261,7 +298,7 @@ bool Route::load_waypoints_conf()
             data.coord = stod(coord_string);
             data.length = stod(length_string);
 
-            context.waypoints_conf[label] = data;
+            context_.waypoints_conf[label] = data;
         }
     }
 
@@ -270,23 +307,23 @@ bool Route::load_waypoints_conf()
 
 void Route::load_static_objects()
 {
-    for (const auto& [label, transforms] : context.route_map)
+    for (const auto& [label, transforms] : context_.route_map)
     {
-        const auto ref_it = context.objects_ref.find(label);
-        if (ref_it == context.objects_ref.cend())
+        const auto ref_it = context_.objects_ref.find(label);
+        if (ref_it == context_.objects_ref.cend())
         {
             continue;
         }
 
         for (const auto& transform : transforms)
         {
-            const auto object = RouteObject::create(context,
+            const auto object = RouteObject::create(context_,
                 ref_it->second.paged_lod, label, transform.translation,
                 -transform.rotation_deg);
 
             this->addChild(vsg::MASK_ALL, object);
 
-            context.static_objects.emplace_back(object);
+            context_.static_objects.emplace_back(object);
         }
     }
 }
@@ -295,7 +332,7 @@ bool Route::load_topology()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string cfg_path = fs.combinePath(context.route_dir,
+    const std::string cfg_path = fs.combinePath(context_.route_dir,
         "topology", "models-config.xml");
 
     CfgReader cfg;
@@ -327,12 +364,12 @@ bool Route::load_topology()
     // TODO: Replace on Journal
     std::printf("Signals directory: %s\n", models_dir.c_str());
 
-    context.topology = new Topology;
+    context_.topology = std::make_unique<Topology>();
 
     const auto directory_name = std::filesystem::path(
-        context.route_dir).filename();
+        context_.route_dir).filename();
 
-    if (!context.topology->load(directory_name.string().c_str()))
+    if (!context_.topology->load(directory_name.string().c_str()))
     {
         // TODO: Replace on Journal
         std::fputs("Failed to load topology\n", stderr);
@@ -341,85 +378,132 @@ bool Route::load_topology()
 
     PagedLodMap paged_lods;
 
-    const signals_data_t* const signals_data = context.topology->getSignalsData();
+    const signals_data_t* const signals_data = context_.topology->getSignalsData();
     if (!signals_data)
     {
         return false;
     }
 
-    const auto load_signal = [&](Signal* const signal) -> void
+    const auto load_signals = [&](const std::vector<Signal*>& signals_) -> void
     {
-        if (!signal)
+        for (Signal* const signal : signals_)
         {
-            // TODO: Replace on Journal
-            std::fprintf(stderr, "Invalid signal %p\n", (void*)signal);
-            return;
+            if (!signal)
+            {
+                // TODO: Replace on Journal
+                std::fprintf(stderr, "Invalid signal %p\n", (void*)signal);
+                return;
+            }
+
+            const std::string signal_model_name =
+                signal->getSignalModel().toStdString();
+
+            if (signal_model_name.empty() || signal_model_name == "empty_line")
+            {
+                return;
+            }
+
+            const std::string signal_model_path = fs.combinePath(
+                models_dir, signal_model_name) + ".gltf";
+
+            vsg::ref_ptr<vsg::PagedLOD> paged_lod;
+
+            auto paged_lod_it = paged_lods.find(signal_model_path);
+            if (paged_lod_it == paged_lods.end())
+            {
+                const auto new_paged_lod = vsg::PagedLOD::create();
+                new_paged_lod->filename = signal_model_path;
+
+                new_paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
+                    context_.settings.view_distance);
+
+                new_paged_lod->children.front() = {0.1, nullptr};
+                new_paged_lod->options = context_.options;
+
+                paged_lod_it = paged_lods.emplace(signal_model_path,
+                    new_paged_lod).first;
+            }
+
+            paged_lod = paged_lod_it->second;
+
+            signal->calcPosition();
+
+            const vsg::dvec3 pos = to_vsg_vec3(signal->getPos());
+            const vsg::dvec3 right = to_vsg_vec3(signal->getRight());
+            const vsg::dvec3 orth = to_vsg_vec3(signal->getOrth());
+            const vsg::dvec3 up = to_vsg_vec3(signal->getUp());
+
+            const vsg::dvec3 rotation_deg = {
+                vsg::degrees(atan2(orth.z, up.z)),
+                vsg::degrees(atan2(-right.z, hypot(orth.z, up.z))),
+                vsg::degrees(atan2(-right.y, right.x))
+            };
+
+            const auto object = RouteObject::create(context_, paged_lod,
+                signal_model_name, pos, rotation_deg);
+
+            this->addChild(vsg::MASK_ALL, object);
         }
-
-        const std::string signal_model_name =
-            signal->getSignalModel().toStdString();
-
-        if (signal_model_name.empty() || signal_model_name == "empty_line")
-        {
-            return;
-        }
-
-        const std::string signal_model_path = fs.combinePath(
-            models_dir, signal_model_name) + ".gltf";
-
-        vsg::ref_ptr<vsg::PagedLOD> paged_lod;
-
-        auto paged_lod_it = paged_lods.find(signal_model_path);
-        if (paged_lod_it == paged_lods.end())
-        {
-            const auto new_paged_lod = vsg::PagedLOD::create();
-            new_paged_lod->filename = signal_model_path;
-
-            new_paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
-                static_cast<double>(context.settings.view_distance));
-
-            new_paged_lod->children.front() = {0.1, nullptr};
-            new_paged_lod->options = context.options;
-
-            paged_lod_it = paged_lods.emplace(signal_model_path,
-                new_paged_lod).first;
-        }
-
-        paged_lod = paged_lod_it->second;
-
-        signal->calcPosition();
-
-        const vsg::vec3 pos = to_vsg_vec3(signal->getPos());
-        const vsg::vec3 right = to_vsg_vec3(signal->getRight());
-        const vsg::vec3 orth = to_vsg_vec3(signal->getOrth());
-        const vsg::vec3 up = to_vsg_vec3(signal->getUp());
-
-        const vsg::vec3 rotation_deg = {
-            vsg::degrees(std::atan2(orth.z, up.z)),
-            vsg::degrees(std::atan2(-right.z, std::hypot(orth.z, up.z))),
-            vsg::degrees(std::atan2(-right.y, right.x))
-        };
-
-        const auto object = RouteObject::create(context, paged_lod,
-            signal_model_name, pos, rotation_deg);
-
-        this->addChild(vsg::MASK_ALL, object);
     };
 
-    for (Signal* const line_signal : signals_data->line_signals)
-    {
-        load_signal(line_signal);
-    }
+    load_signals(signals_data->line_signals);
+    load_signals(signals_data->enter_signals);
+    load_signals(signals_data->exit_signals);
 
-    for (Signal* const enter_signal : signals_data->enter_signals)
-    {
-        load_signal(enter_signal);
-    }
+    // const auto input_assembly_state = vsg::InputAssemblyState::create();
+    // input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
 
-    for (Signal* const exit_signal : signals_data->exit_signals)
-    {
-        load_signal(exit_signal);
-    }
+    // const auto rasterization_state = vsg::RasterizationState::create();
+    // rasterization_state->lineWidth = 15.0f;
+    // rasterization_state->cullMode = VK_CULL_MODE_NONE;
+    // rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
+
+    // const auto state_group = vsg::StateGroup::create();
+    // state_group->add(input_assembly_state);
+    // state_group->add(rasterization_state);
+
+    // const traj_list_t* traj_list = context_.topology->getTrajectoriesList();
+    // for (const Trajectory* trajectory : *traj_list)
+    // {
+    //     const auto& tracks = trajectory->getTracks();
+    //     const std::size_t tracks_size = tracks.size();
+
+    //     if (tracks_size < 2)
+    //     {
+    //         continue;
+    //     }
+
+    //     std::vector<vsg::dvec3> points;
+    //     points.reserve(tracks_size);
+    //     for (const track_t& track : tracks)
+    //     {
+    //         points.emplace_back(vsg::dvec3{track.begin_point.x,
+    //             track.begin_point.y, track.begin_point.z});
+    //     }
+
+    //     const auto vertices = vsg::vec3Array::create(tracks_size);
+    //     const auto colors = vsg::vec4Array::create(tracks_size);
+    //     const auto indices = vsg::ushortArray::create(tracks_size);
+
+    //     for (std::size_t i = 0; i < tracks_size; ++i)
+    //     {
+    //         vertices->at(i) = points[i];
+    //         colors->at(i).set(1.0f, 1.0f, 0.0f, 1.0f);
+    //         indices->at(i) = i;
+    //     }
+
+    //     const auto geometry = vsg::Geometry::create();
+    //     geometry->assignArrays(vsg::DataList{vertices});
+    //     geometry->assignIndices(indices);
+    //     geometry->commands.push_back(vsg::DrawIndexed::create(
+    //         tracks_size, 1, 0, 0, 0
+    //     ));
+
+    //     state_group->addChild(geometry);
+    // }
+
+    // context_.compile_infos.emplace_back(CompileInfo{context_.route,
+    //     state_group, vsg::Mask{MASK_GUI2}});
 
     return true;
 }

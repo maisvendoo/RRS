@@ -26,24 +26,24 @@
 #include <string>
 
 OutlineBuilder::OutlineBuilder(const EditorContext& context)
-    : context(context)
+    : context_(context)
 {
-    options = vsg::Options::create();
-    options->sharedObjects = vsg::SharedObjects::create();
-    options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
-    options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
-    options->add(vsgXchange::all::create());
+    options_ = vsg::Options::create();
+    options_->sharedObjects = vsg::SharedObjects::create();
+    options_->fileCache = vsg::getEnv("VSG_FILE_CACHE");
+    options_->paths = vsg::getEnvPaths("VSG_FILE_PATH");
+    options_->add(vsgXchange::all::create());
 
-    const auto flat_shader = vsg::createFlatShadedShaderSet(options);
+    const auto flat_shader = vsg::createFlatShadedShaderSet(options_);
 
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
     const auto vert_shader = read_shader(VK_SHADER_STAGE_VERTEX_BIT,
-        shaders_dir.c_str(), "standard.vert", options);
+        shaders_dir.c_str(), "standard.vert", options_);
 
     const auto frag_shader = read_shader(VK_SHADER_STAGE_FRAGMENT_BIT,
-        shaders_dir.c_str(), "outline.frag", options);
+        shaders_dir.c_str(), "outline.frag", options_);
 
     configure_shader_set(vert_shader, frag_shader, "flat", flat_shader);
 
@@ -64,7 +64,7 @@ OutlineBuilder::OutlineBuilder(const EditorContext& context)
     flat_shader->defaultGraphicsPipelineStates =
         default_graphics_pipeline_states;
 
-    builder.shaderSet = flat_shader;
+    builder_.shaderSet = flat_shader;
 }
 
 vsg::ref_ptr<vsg::Node> OutlineBuilder::create_outline(
@@ -85,5 +85,5 @@ vsg::ref_ptr<vsg::Node> OutlineBuilder::create_outline(
     state_info.blending = true;
     state_info.wireframe = true;
 
-    return builder.createBox(geometry_info, state_info);
+    return builder_.createBox(geometry_info, state_info);
 }

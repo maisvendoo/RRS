@@ -32,12 +32,12 @@ public:
     bool get_is_rmb_pressed() const;
 
 private:
-    vsg::ivec2 pos = {0, 0};
-    vsg::ivec2 delta_pos = {0, 0};
+    vsg::ivec2 pos_ = {0, 0};
+    vsg::ivec2 delta_pos_ = {0, 0};
 
-    bool is_lmb_pressed = false;
-    bool is_mmb_pressed = false;
-    bool is_rmb_pressed = false;
+    bool is_lmb_pressed_ = false;
+    bool is_mmb_pressed_ = false;
+    bool is_rmb_pressed_ = false;
 };
 
 #endif // MOUSE_HANDLER_H

@@ -1,15 +1,15 @@
 #ifndef     SWITCH_H
 #define     SWITCH_H
 
-#include    <QObject>
-
-#include    <CfgReader.h>
-#include    <topology-connector-device.h>
-
 //#include    <connector.h>
 #include    "topology-export.h"
 #include    "topology-defines.h"
 
+#include    <QObject>
+#include    <QDomNode>
+
+class CfgReader;
+class ConnectorDevice;
 class Signal;
 
 //------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ public:
 
     ~Switch();
 
-    QString getName() const { return this->name; }
+    QString getName() const;
 
     /// Список траекторий, подключенных к данной стрелке
     Trajectory* trajectories[switch_ways_t.size()] = {nullptr, nullptr, nullptr, nullptr};
@@ -41,35 +41,13 @@ public:
     Trajectory* get_bwd_minus_traj() const;
     Trajectory* get_bwd_plus_traj() const;
 
-    void setSignalFwd(Signal *signal)
-    {
-        this->signal_fwd = signal;
-    }
+    void setSignalFwd(Signal *signal);
+    Signal *getSignalFwd();
+    const Signal* getSignalFwd() const;
 
-    Signal *getSignalFwd()
-    {
-        return signal_fwd;
-    }
-
-    const Signal* getSignalFwd() const
-    {
-        return signal_fwd;
-    }
-
-    void setSignalBwd(Signal *signal)
-    {
-        this->signal_bwd = signal;
-    }
-
-    Signal *getSignalBwd()
-    {
-        return signal_bwd;
-    }
-
-    const Signal* getSignalBwd() const
-    {
-        return signal_bwd;
-    }
+    void setSignalBwd(Signal *signal);
+    Signal *getSignalBwd();
+    const Signal* getSignalBwd() const;
 
     void configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list);
 
@@ -80,15 +58,9 @@ public:
 
     void deserialize(QByteArray &data, traj_list_t &traj_list);
 
-    Switch_state_t getStateFwd() const
-    {
-        return state_fwd;
-    }
+    Switch_state_t getStateFwd() const;
 
-    Switch_state_t getStateBwd() const
-    {
-        return state_bwd;
-    }
+    Switch_state_t getStateBwd() const;
 
     void setStateFwd(Switch_state_t state);
 
@@ -99,24 +71,12 @@ public:
     void setRefStateBwd(Switch_state_t state);
 
     /// Светофор, включающий данный стрелочный перевод вперёд в маршрут ДЦ
-    Signal* getRouteBySignalFwd() const
-    {
-        return in_route_by_signal_fwd;
-    }
-    void setRouteBySignalFwd(Signal* signal)
-    {
-        in_route_by_signal_fwd = signal;
-    }
+    Signal* getRouteBySignalFwd() const;
+    void setRouteBySignalFwd(Signal* signal);
 
     /// Светофор, включающий данный стрелочный перевод назад в маршрут ДЦ
-    Signal* getRouteBySignalBwd() const
-    {
-        return in_route_by_signal_bwd;
-    }
-    void setRouteBySignalBwd(Signal* signal)
-    {
-        in_route_by_signal_bwd = signal;
-    }
+    Signal* getRouteBySignalBwd() const;
+    void setRouteBySignalBwd(Signal* signal);
 
 signals:
 

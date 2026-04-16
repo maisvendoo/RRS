@@ -33,60 +33,25 @@ public:
     QString getConnectorName() const;
 
     void setConnector(Switch* conn);
-
     Switch* getConnector() const;
 
-    void setDirection(dir_t dir)
-    {
-        signal_dir = dir;
-    }
+    void setDirection(dir_t dir);
+    dir_t getDirection() const;
 
-    dir_t getDirection() const
-    {
-        return signal_dir;
-    }
-
-    void setLetter(const QString& letter)
-    {
-        this->letter = letter;
-    }
-
-    QString getLetter() const
-    {
-        return letter;
-    }
+    void setLetter(const QString& letter);
+    QString getLetter() const;
 
     /// Задать имя модели сигнала
-    void setSignalModel(const QString& signal_model)
-    {
-        this->signal_model = signal_model;
-    }
-
-    QString getSignalModel() const
-    {
-        return this->signal_model;
-    }
+    void setSignalModel(const QString& signal_model);
+    QString getSignalModel() const;
 
     /// Вернуть тип сигнала (проходной/входной/выходной/маршрутный)
-    QString getSignalType() const
-    {
-        return signal_model.right(4);
-    }
+    QString getSignalType() const;
 
-    lens_state_t getAllLensState() const
-    {
-        return lens_state;
-    }
+    lens_state_t getAllLensState() const;
 
-    void setRelPosition(dvec3 rel_pos)
-    {
-        this->rel_pos = rel_pos;
-    }
-
-    void setRelRotation(dvec3 rel_rot)
-    {
-        this->rel_rot = rel_rot;
-    }
+    void setRelPosition(const dvec3& rel_pos);
+    void setRelRotation(const dvec3& rel_rot);
 
     QByteArray serialize();
 
@@ -94,35 +59,13 @@ public:
 
     bool calcPosition();
 
-    dvec3 getPos() const
-    {
-        return pos;
-    }
+    const dvec3& getPos() const;
+    const dvec3& getRight() const;
+    const dvec3& getOrth() const;
+    const dvec3& getUp() const;
 
-    dvec3 getRight() const
-    {
-        return right;
-    }
-
-    dvec3 getOrth() const
-    {
-        return orth;
-    }
-
-    dvec3 getUp() const
-    {
-        return up;
-    }
-
-    dvec3 getRelPos() const
-    {
-        return rel_pos;
-    }
-
-    dvec3 getRelRot() const
-    {
-        return rel_rot;
-    }
+    const dvec3& getRelPos() const;
+    const dvec3& getRelRot() const;
 
 signals:
 

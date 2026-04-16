@@ -35,8 +35,8 @@ public:
     // Create plane perpedicular to camera normal and passing through
     // specified point to test for intersections
     vsg::ref_ptr<vsg::Node> create_front_plane(
-        const vsg::vec3& point,
-        vsg::vec3* up_out = nullptr
+        const vsg::dvec3& point,
+        vsg::dvec3* up_out = nullptr
     ) const;
 
 private:
@@ -45,14 +45,14 @@ private:
     void calculate_up();
 
 private:
-    EditorContext& context;
+    EditorContext& context_;
 
-    double yaw_deg = 0.0;
-    double pitch_deg = 0.0;
+    double yaw_deg_ = 0.0;
+    double pitch_deg_ = 0.0;
 
-    vsg::dvec3 front;
-    vsg::dvec3 right;
-    vsg::dvec3 up;
+    vsg::dvec3 front_;
+    vsg::dvec3 right_;
+    vsg::dvec3 up_;
 };
 
 #endif // CAMERA_HANDLER_H
