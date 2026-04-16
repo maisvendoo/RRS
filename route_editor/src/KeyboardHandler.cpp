@@ -7,6 +7,7 @@
 #include "Settings.h"
 #include "filesystem.h"
 
+#include <mutex>
 #include <vsg/ui/KeyEvent.h>
 
 #include <cstdint>
@@ -64,6 +65,7 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
         // Перезаписываем рабочую копию
         std::ofstream route_map_file(fs.combinePath(dir_for_save, "route1.map"));
 
+        std::lock_guard<std::mutex> lock_guard(context_.static_objects_mutex);
         for (const auto& object : context_.static_objects)
         {
             const vsg::dvec3& translation = object->get_translation();

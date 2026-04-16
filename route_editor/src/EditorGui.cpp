@@ -29,6 +29,8 @@
 
 #include <algorithm>
 // #include <filesystem>
+#include <cstdio>
+#include <mutex>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/RecordTraversal.h>
 #include <vsg/commands/Commands.h>
@@ -149,6 +151,44 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             SHOW_WINDOW(show_topology);
             SHOW_WINDOW(show_selected_objects_properties);
             SHOW_WINDOW(show_commands);
+
+            ImGui::Begin("TestProgressBars");
+
+            float fraction = 1.0f;
+            if (context_.total_static_objects_count != 0)
+            {
+                fraction = (float)context_.static_objects_count /
+                    context_.total_static_objects_count;
+            }
+
+            char overlay[64];
+            snprintf(overlay, 64, "%zu / %zu",
+                context_.static_objects_count.load(),
+                context_.total_static_objects_count.load());
+
+            ImGui::ProgressBar(fraction, {200.0f, 30.0f}, overlay);
+
+            if (context_.topology_loaded)
+            {
+                fraction = 1.0f;
+                if (context_.total_topology_objects_count != 0)
+                {
+                    fraction = (float)context_.topology_objects_count /
+                        context_.total_topology_objects_count;
+                }
+
+                snprintf(overlay, 64, "%zu / %zu",
+                    context_.topology_objects_count.load(),
+                    context_.total_topology_objects_count.load());
+
+                ImGui::ProgressBar(fraction, {200.0f, 30.0f}, overlay);
+            }
+            else
+            {
+                ImGui::Text("Topology not yet loaded");
+            }
+
+            ImGui::End();
 
             return;
         }
@@ -316,8 +356,14 @@ void EditorGui::show_stations_conf() const
     ImGui::End();
 }
 
+// TODO: Сделать, чтобы реальные позиции грузились один раз?
 void EditorGui::show_waypoints_conf() const
 {
+    if (!context_.topology_loaded)
+    {
+        return;
+    }
+
     ImGui::Begin("waypoints.conf", nullptr, window_flags_);
 
     if (ImGui::BeginTable("waypoints_conf_table", 5,
@@ -458,6 +504,7 @@ void EditorGui::show_topology() const
         return;
     }
 
+    std::lock_guard<std::mutex> lock_guard(context_.topology_mutex);
     if (!context_.topology)
     {
         ImGui::Text("There is no topology yet");

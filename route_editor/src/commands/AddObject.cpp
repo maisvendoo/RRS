@@ -26,10 +26,16 @@ void AddObject::execute()
         object->deselect();
     }
 
+    context_.compile_infos_mutex.lock();
     context_.compile_infos.emplace_back(CompileInfo{
         context_.route, object_to_add_, vsg::MASK_ALL});
+    context_.compile_infos_mutex.unlock();
 
+    context_.static_objects_mutex.lock();
     context_.static_objects.emplace_back(object_to_add_);
+    context_.static_objects_mutex.unlock();
+    ++context_.static_objects_count;
+    ++context_.total_static_objects_count;
 
     context_.deferred_selection.emplace_back(object_to_add_);
 }
@@ -38,8 +44,12 @@ void AddObject::undo()
 {
     object_to_add_->deselect();
 
+    context_.static_objects_mutex.lock();
     RouteObjects& objects = context_.static_objects;
     objects.erase(std::find(objects.begin(), objects.end(), object_to_add_));
+    context_.static_objects_mutex.unlock();
+    --context_.static_objects_count;
+    --context_.total_static_objects_count;
 
     const auto route = context_.route;
 
@@ -58,7 +68,9 @@ void AddObject::undo()
         object->select();
     }
 
+    context_.compile_infos_mutex.lock();
     context_.compile_infos.emplace_back(CompileInfo{nullptr, context_.route});
+    context_.compile_infos_mutex.unlock();
 
     context_.gizmo->update_visibility();
 }

@@ -7,7 +7,9 @@
 #include "RouteObject.h"
 #include "Settings.h"
 
+#include <atomic>
 #include <mutex>
+#include <thread>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 
@@ -89,6 +91,8 @@ struct EditorContext
 
     RouteObjects static_objects;
     std::mutex static_objects_mutex;
+    std::atomic_size_t static_objects_count = 0;
+    std::atomic_size_t total_static_objects_count = 0;
 
     RouteObjects selected_objects;
     RouteObjects copied_objects;
@@ -99,6 +103,12 @@ struct EditorContext
 
     std::unique_ptr<Topology> topology;
     std::mutex topology_mutex;
+    std::atomic_bool topology_loaded = false;
+    std::atomic_size_t topology_objects_count = 0;
+    std::atomic_size_t total_topology_objects_count = 0;
+
+    std::thread load_static_objects_thread;
+    std::thread load_topology_thread;
 
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<ObjectSelector> object_selector;
