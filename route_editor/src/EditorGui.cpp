@@ -352,7 +352,7 @@ void EditorGui::show_stations_conf() const
 // TODO: Сделать, чтобы реальные позиции грузились один раз?
 void EditorGui::show_waypoints_conf() const
 {
-    std::lock_guard<std::mutex> lock_guard(context_.topology_mutex);
+    // std::lock_guard<std::mutex> lock_guard(context_.topology_mutex);
     if (!context_.topology)
     {
         return;
