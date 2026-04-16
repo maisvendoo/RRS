@@ -49,7 +49,7 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                 vsg::ref_ptr<vsg::Node> node = plod->pending;
                 if (!node)
                 {
-                    vsg::ref_ptr<vsg::Object> loaded = vsg::read(plod->filename, plod->options);
+                    vsg::ref_ptr<vsg::Object> loaded = animatedDatabasePager.dedupRead(plod->filename, plod->options);
                     node = loaded.cast<vsg::Node>();
 
                     if (!node)
@@ -101,12 +101,12 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                             animatedDatabasePager.requestDiscarded(plod);
                         }
                     }
-                    catch (vsg::Exception e)
+                    catch (const vsg::Exception& e)
                     {
                         animatedDatabasePager.requestDiscarded(plod);
                         LOG_WARN("AnimatedDatabasePager: vsg::Exception (%s) while compiling model from file: %s", e.message.c_str(), plod->filename.string().c_str());
                     }
-                    catch (std::exception e)
+                    catch (const std::exception& e)
                     {
                         animatedDatabasePager.requestDiscarded(plod);
                         LOG_WARN("AnimatedDatabasePager: std::exception (%s) while compiling model from file: %s", e.what(), plod->filename.string().c_str());
@@ -199,4 +199,80 @@ vsg::ref_ptr<vsg::Node> AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<Anima
         fcav.reconfigure_animations();
     }
     return node;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+vsg::ref_ptr<vsg::Object> AnimatedDatabasePager::dedupRead(
+    const vsg::Path& filename, vsg::ref_ptr<const vsg::Options> options)
+{
+    const auto key = filename.string();
+
+    std::shared_future<vsg::ref_ptr<vsg::Object>> future;
+    bool iAmLoader = false;
+    std::shared_ptr<std::promise<vsg::ref_ptr<vsg::Object>>> promise;
+
+    {
+        std::scoped_lock lock(_readMutex);
+        auto it = _pendingReads.find(key);
+        if (it != _pendingReads.end())
+        {
+            future = it->second;
+            ++_dedupWaits;
+        }
+        else
+        {
+            promise = std::make_shared<std::promise<vsg::ref_ptr<vsg::Object>>>();
+            future = promise->get_future().share();
+            _pendingReads.emplace(key, future);
+            iAmLoader = true;
+            ++_actualLoads;
+        }
+        ++_totalReads;
+    }
+
+    if (iAmLoader)
+    {
+        vsg::ref_ptr<vsg::Object> result;
+        try
+        {
+            result = vsg::read(filename, options);
+        }
+        catch (...)
+        {
+            promise->set_exception(std::current_exception());
+            std::scoped_lock lock(_readMutex);
+            _pendingReads.erase(key);
+            return {};
+        }
+        promise->set_value(result);
+
+        std::scoped_lock lock(_readMutex);
+        _pendingReads.erase(key);
+
+        return result;
+    }
+    else
+    {
+        LOG_INFO("dedupRead: reusing in-flight load for %s", key.c_str());
+        try
+        {
+            return future.get();
+        }
+        catch (...)
+        {
+            LOG_WARN("dedupRead: in-flight load failed for %s", key.c_str());
+            return {};
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AnimatedDatabasePager::reportDedupStats() const
+{
+    LOG_INFO("dedupRead stats: %u total reads, %u actual loads, %u deduplicated waits",
+             _totalReads.load(), _actualLoads.load(), _dedupWaits.load());
 }

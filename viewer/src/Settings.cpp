@@ -55,6 +55,7 @@ void RouteViewer::loadModelsSettings(CfgReader& cfg, const QString& section)
     cfg.getBool(section, "DisableCullNode", settings.disable_culling_node);
     cfg.getBool(section, "DisableNativeGLTF", settings.disable_native_gltf_loader);
     cfg.getBool(section, "DrawModelsTwoSided", settings.draw_models_two_sided);
+    cfg.getDouble(section, "CullRadius", settings.cull_radius);
 }
 
 //------------------------------------------------------------------------------
@@ -86,6 +87,8 @@ void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 
     cfg.getBool(section, "DoubleBuffer", settings.double_buffer);
     cfg.getInt(section, "Samples", settings.samples);
+
+    cfg.getInt(section, "MaxFPS", settings.max_fps);
 
     cfg.getBool(section, "EnableDebugLayer", settings.enableDebugLayer);
     cfg.getBool(section, "EnableDebugUtils", settings.enableDebugUtils);
@@ -185,12 +188,12 @@ void RouteViewer::loadFreeCameraSettings(CfgReader& cfg, const QString& section)
     }
 
     cfg.getDouble(section, "FreeCamRotKeyboard", settings.free_cam_rotate_keyboard);
-    cfg.getDouble(section, "FreeCamRotMouse", settings.free_cam_rotate_keyboard);
+    cfg.getDouble(section, "FreeCamRotMouse", settings.free_cam_rotate_mouse);
     cfg.getDouble(section, "FreeCamHeightStep", settings.free_cam_height_step);
 
     double freeCamFovYCoeff = 1.0;
     cfg.getDouble(section, "FreeCamFovYCoeff", freeCamFovYCoeff);
-    if (freeCamSpeedCoeff > 1.01)
+    if (freeCamFovYCoeff > 1.01)
     {
         settings.free_cam_fovy_coeff = freeCamFovYCoeff;
     }

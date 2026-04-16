@@ -156,13 +156,16 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         params->prev_F9 = ImGui::IsKeyPressed(ImGuiKey_F9);
 
         // Строка нажмите Enter для управления
-        params->is_no_controlled =
-                        (params->vehicles_handler->getCurrentVehicleIndex() !=
-                        params->vehicles_handler->getControlledVehicleIndex());
+        if (params->vehicles_handler)
+        {
+            params->is_no_controlled =
+                            (params->vehicles_handler->getCurrentVehicleIndex() !=
+                            params->vehicles_handler->getControlledVehicleIndex());
 
-        VehicleExterior* cur_vehicle = params->vehicles_handler->getCurrentVehicle();
-        params->is_no_cabine_control = ((cur_vehicle != nullptr) &&
-                                        (cur_vehicle->controlled_cabine_idx != cur_vehicle->current_cabine_idx));
+            VehicleExterior* cur_vehicle = params->vehicles_handler->getCurrentVehicle();
+            params->is_no_cabine_control = ((cur_vehicle != nullptr) &&
+                                            (cur_vehicle->controlled_cabine_idx != cur_vehicle->current_cabine_idx));
+        }
     }
     else
     {
@@ -176,12 +179,20 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     simulator_time_t datetime({static_cast<int16_t>(params->year), static_cast<uint8_t>(params->month), static_cast<uint8_t>(params->day)},
                               {static_cast<uint8_t>(params->hour), static_cast<uint8_t>(params->minute), static_cast<uint8_t>(params->sec), static_cast<uint8_t>(params->msec)});
 
-    params->sun->update(datetime, 3.0, params->latitude, params->longitude);
+    if (params->sun)
+    {
+        params->sun->update(datetime, 3.0, params->latitude, params->longitude);
+    }
 
-    // params->skybox->setDateTime(datetime);
-    params->new_skybox->set_date_time(datetime);
-    params->new_skybox->set_sun_direction(params->sun->azimuth_deg,
-                                          params->sun->altitude_deg);
+    if (params->new_skybox)
+    {
+        params->new_skybox->set_date_time(datetime);
+        if (params->sun)
+        {
+            params->new_skybox->set_sun_direction(params->sun->azimuth_deg,
+                                                  params->sun->altitude_deg);
+        }
+    }
 
     if (params->is_show_debug_msg)
     {
@@ -387,7 +398,7 @@ void MyGui::showSettings() const
         if (params->sun->use_gui_sun_direction)
         {
             ImGui::SliderFloat("Sun azimuth", &(params->sun->azimuth_deg), 0.0f, 360.0f, "%.3f");
-            ImGui::SliderFloat("Sun altitude", &(params->sun->azimuth_deg), 0.0f, 360.0f, "%.3f");
+            ImGui::SliderFloat("Sun altitude", &(params->sun->altitude_deg), -90.0f, 90.0f, "%.3f");
         }
         else
         {
@@ -462,8 +473,13 @@ void MyGui::showNoControlled() const
 //------------------------------------------------------------------------------
 void MyGui::showNoCabineControl() const
 {
+    VehicleExterior* cur = params->vehicles_handler
+                           ? params->vehicles_handler->getCurrentVehicle()
+                           : nullptr;
+    if (!cur) return;
+
     std::string msg = QString("Нажмите Enter для управления из кабины %1")
-                            .arg(params->vehicles_handler->getCurrentVehicle()->current_cabine_idx + 1)
+                            .arg(cur->current_cabine_idx + 1)
                             .toStdString();
     const char *text = msg.c_str();
     ImVec2 text_size = ImGui::CalcTextSize(text);

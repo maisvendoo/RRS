@@ -4,9 +4,11 @@
 #include "settings.h"
 
 #include <vsg/core/ref_ptr.h>
+#include <memory>
 
 class  CfgReader;
 class  FileSystem;
+class  NewSkybox;
 struct GUIParams;
 class  QByteArray;
 class  ScreenshotWriter;
@@ -108,6 +110,7 @@ private slots:
 
 private:
     bool  is_ready = false;
+    bool  is_connection_abandoned = false;
     bool  is_route = false;
     bool  is_signals = false;
     bool  is_vehicles = false;
@@ -117,11 +120,12 @@ private:
     vsg::ref_ptr<GUIParams>            GUIparams;
     vsg::ref_ptr<UpdateViewerHandler>  upd_viewer_handler;
 
-    TcpClient*             tcp_client = nullptr;
-    SoundManager*          sound_manager = nullptr;
-    ScreenshotWriter*      screenshot_writer = nullptr;
-    TrafficLightsHandler*  traffic_lights_handler = nullptr;
-    VehiclesHandler*       vehicles_handler = nullptr;
+    std::unique_ptr<TcpClient>             tcp_client;
+    std::unique_ptr<SoundManager>          sound_manager;
+    std::unique_ptr<ScreenshotWriter>      screenshot_writer;
+    std::unique_ptr<TrafficLightsHandler>  traffic_lights_handler;
+    std::unique_ptr<VehiclesHandler>       vehicles_handler;
+    std::unique_ptr<NewSkybox>             skybox;
 
     vsg::ref_ptr<vsg::Options>       options;
     vsg::ref_ptr<vsg::WindowTraits>  windowTraits;

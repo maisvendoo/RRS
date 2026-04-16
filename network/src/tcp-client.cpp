@@ -38,7 +38,6 @@ bool TcpClient::init(const tcp_config_t &tcp_config)
     connect(socket, &QTcpSocket::errorOccurred, this, &TcpClient::slotAcceptError);
     connect(socket, &QTcpSocket::connected, this, &TcpClient::slotConnect);
     connect(socket, &QTcpSocket::disconnected, this, &TcpClient::slotDisconnect);
-    connect(socket, &QTcpSocket::destroyed, this, &TcpClient::slotDisconnect);
     connect(socket, &QTcpSocket::readyRead, this, &TcpClient::slotReceive);
 
     socket->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
@@ -53,6 +52,8 @@ bool TcpClient::init(const tcp_config_t &tcp_config)
 //------------------------------------------------------------------------------
 void TcpClient::sendRequest(StructureType stype, double update_interval)
 {
+    if (!canSend()) return;
+
     network_data_t request;
     request.stype = stype;
 
@@ -71,6 +72,8 @@ void TcpClient::sendRequest(StructureType stype, double update_interval)
 //------------------------------------------------------------------------------
 void TcpClient::sendSwitchCommand(QByteArray switch_command)
 {
+    if (!canSend()) return;
+
     network_data_t request;
     request.stype = STYPE_COMMAND_SWITCH_CONTROL;
     request.data = switch_command;
@@ -84,6 +87,8 @@ void TcpClient::sendSwitchCommand(QByteArray switch_command)
 //------------------------------------------------------------------------------
 void TcpClient::sendSignalCommand(QByteArray signal_command)
 {
+    if (!canSend()) return;
+
     network_data_t request;
     request.stype = STYPE_COMMAND_SIGNAL_CONTROL;
     request.data = signal_command;
@@ -97,6 +102,8 @@ void TcpClient::sendSignalCommand(QByteArray signal_command)
 //------------------------------------------------------------------------------
 void TcpClient::sendBuildRouteCommand(QByteArray route_command)
 {
+    if (!canSend()) return;
+
     network_data_t request;
     request.stype = STYPE_COMMAND_BUILD_ROUTE;
     request.data = route_command;
@@ -110,6 +117,8 @@ void TcpClient::sendBuildRouteCommand(QByteArray route_command)
 //------------------------------------------------------------------------------
 void TcpClient::sendTrainRouteCommand(QByteArray route_command)
 {
+    if (!canSend()) return;
+
     network_data_t request;
     request.stype = STYPE_COMMAND_TRAIN_ROUTE;
     request.data = route_command;
@@ -123,6 +132,8 @@ void TcpClient::sendTrainRouteCommand(QByteArray route_command)
 //------------------------------------------------------------------------------
 void TcpClient::sendShuntingRouteCommand(QByteArray route_command)
 {
+    if (!canSend()) return;
+
     network_data_t request;
     request.stype = STYPE_COMMAND_SHUNTING_ROUTE;
     request.data = route_command;
@@ -136,6 +147,8 @@ void TcpClient::sendShuntingRouteCommand(QByteArray route_command)
 //------------------------------------------------------------------------------
 void TcpClient::sendVehicleControl(QByteArray vehicle_control_by_keyboard)
 {
+    if (!canSend()) return;
+
     network_data_t request;
     request.stype = STYPE_COMMAND_VEHICLE_CONTROL;
     request.data = vehicle_control_by_keyboard;
@@ -149,6 +162,8 @@ void TcpClient::sendVehicleControl(QByteArray vehicle_control_by_keyboard)
 //------------------------------------------------------------------------------
 void TcpClient::sendNewTrainName(int train_idx, const QString &new_name)
 {
+    if (!canSend()) return;
+
     network_data_t request;
     request.stype = STYPE_COMMAND_RENAME_TRAIN;
 
@@ -168,6 +183,8 @@ void TcpClient::sendNewTrainName(int train_idx, const QString &new_name)
 //------------------------------------------------------------------------------
 void TcpClient::sendSimSpeedCommand(int speed_factor)
 {
+    if (!canSend()) return;
+
     network_data_t request;
     request.stype = STYPE_COMMAND_SET_SIMULATION_SPEED;
 
@@ -195,6 +212,15 @@ bool TcpClient::isConnected() const
     }
 
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool TcpClient::canSend() const
+{
+    return socket != nullptr &&
+           socket->state() == QAbstractSocket::ConnectedState;
 }
 
 //------------------------------------------------------------------------------
@@ -287,6 +313,7 @@ void TcpClient::process_received_data(network_data_t &net_data)
 void TcpClient::slotConnect()
 {
     connectionTimer->stop();
+    connection_attempts = 0;
     emit connected();
 }
 
@@ -295,8 +322,8 @@ void TcpClient::slotConnect()
 //------------------------------------------------------------------------------
 void TcpClient::slotDisconnect()
 {
-    //Journal::instance()->info("Disconnected from the server...");
     emit sendLogMessage("Disconnected from the server. Try to reconnect...");
+    connection_attempts = 0;
     socket->abort();
     connectionTimer->start();
     emit disconnected();
@@ -307,18 +334,32 @@ void TcpClient::slotDisconnect()
 //------------------------------------------------------------------------------
 void TcpClient::slotOnConnectionTimeout()
 {
+    ++connection_attempts;
+
+    if (connection_attempts > MAX_CONNECTION_ATTEMPTS)
+    {
+        connectionTimer->stop();
+        emit sendLogMessage("Failed to connect after " +
+                            QString::number(MAX_CONNECTION_ATTEMPTS) +
+                            " attempts. Giving up.");
+        emit connectionAbandoned();
+        return;
+    }
+
     this->connectToServer(tcp_config);
-    //Journal::instance()->info("Try connect to server...");
 
     if (tcp_config.show_server_addr)
     {
         emit sendLogMessage("Try connect to " +
                             tcp_config.host_addr + ":" +
-                            QString::number(tcp_config.port) + " server...");
+                            QString::number(tcp_config.port) +
+                            " server... (attempt " +
+                            QString::number(connection_attempts) + ")");
     }
     else
     {
-        emit sendLogMessage("Try connect to server...");
+        emit sendLogMessage("Try connect to server... (attempt " +
+                            QString::number(connection_attempts) + ")");
     }
 }
 
@@ -327,6 +368,8 @@ void TcpClient::slotOnConnectionTimeout()
 //------------------------------------------------------------------------------
 void TcpClient::slotReceive()
 {
+    if (!canSend()) return;
+
     while (socket->bytesAvailable())
     {
         recvBuff.append(socket->readAll());
@@ -364,5 +407,9 @@ void TcpClient::slotReceive()
 
 void TcpClient::slotAcceptError(QAbstractSocket::SocketError error)
 {
-
+    Q_UNUSED(error);
+    if (socket)
+    {
+        emit sendLogMessage("Socket error: " + socket->errorString());
+    }
 }
