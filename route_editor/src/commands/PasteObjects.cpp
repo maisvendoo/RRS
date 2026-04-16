@@ -44,6 +44,8 @@ void PasteObjects::execute()
         context_.static_objects_mutex.lock();
         context_.static_objects.emplace_back(pasted_object);
         context_.static_objects_mutex.unlock();
+        ++context_.static_objects_count;
+        ++context_.total_static_objects_count;
 
         pasted_object->select();
     }
@@ -61,6 +63,8 @@ void PasteObjects::undo()
         RouteObjects& objects = context_.static_objects;
         objects.erase(std::find(objects.begin(), objects.end(), pasted_object));
         context_.static_objects_mutex.unlock();
+        --context_.static_objects_count;
+        --context_.total_static_objects_count;
 
         const auto route = context_.route;
 

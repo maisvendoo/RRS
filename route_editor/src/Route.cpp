@@ -195,6 +195,13 @@ bool Route::load_route_map()
         }
     }
 
+    std::size_t total_static_objects_count = 0;
+    for (const auto& [label, transforms] : context_.route_map)
+    {
+        total_static_objects_count += transforms.size();
+    }
+    context_.total_static_objects_count = total_static_objects_count;
+
     return true;
 }
 
@@ -300,6 +307,7 @@ void Route::load_static_objects()
 
             std::lock_guard<std::mutex> lock_guard(context_.static_objects_mutex);
             context_.static_objects.emplace_back(object);
+            ++context_.static_objects_count;
         }
     }
 }

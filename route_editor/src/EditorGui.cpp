@@ -29,6 +29,7 @@
 
 #include <algorithm>
 // #include <filesystem>
+#include <cstdio>
 #include <mutex>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/RecordTraversal.h>
@@ -150,6 +151,26 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             SHOW_WINDOW(show_topology);
             SHOW_WINDOW(show_selected_objects_properties);
             SHOW_WINDOW(show_commands);
+
+            ImGui::Begin("TestProgressBar");
+
+            char overlay[64];
+            snprintf(overlay, 64, "%zu / %zu",
+                context_.static_objects_count.load(),
+                context_.total_static_objects_count.load());
+
+            if (context_.total_static_objects_count == 0)
+            {
+                ImGui::ProgressBar(1.0f, ImVec2(150.0f, 50.0f), overlay);
+            }
+            else
+            {
+                ImGui::ProgressBar((float)context_.static_objects_count /
+                    context_.total_static_objects_count,
+                    ImVec2(150.0f, 50.0f), overlay);
+            }
+
+            ImGui::End();
 
             return;
         }
