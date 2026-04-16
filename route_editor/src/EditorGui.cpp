@@ -29,6 +29,7 @@
 
 #include <algorithm>
 // #include <filesystem>
+#include <mutex>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/RecordTraversal.h>
 #include <vsg/commands/Commands.h>
@@ -316,8 +317,15 @@ void EditorGui::show_stations_conf() const
     ImGui::End();
 }
 
+// TODO: Сделать, чтобы реальные позиции грузились один раз?
 void EditorGui::show_waypoints_conf() const
 {
+    std::lock_guard<std::mutex> lock_guard(context_.topology_mutex);
+    if (!context_.topology)
+    {
+        return;
+    }
+
     ImGui::Begin("waypoints.conf", nullptr, window_flags_);
 
     if (ImGui::BeginTable("waypoints_conf_table", 5,
@@ -458,6 +466,7 @@ void EditorGui::show_topology() const
         return;
     }
 
+    std::lock_guard<std::mutex> lock_guard(context_.topology_mutex);
     if (!context_.topology)
     {
         ImGui::Text("There is no topology yet");

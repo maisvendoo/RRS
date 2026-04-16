@@ -19,6 +19,7 @@
 #include "filesystem.h"
 #include "shader_funcs.h"
 
+#include <mutex>
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
 #include <vsg/app/CompileManager.h>
@@ -217,6 +218,7 @@ void RouteEditor::configure_shaders()
 
 void RouteEditor::compile_models()
 {
+    std::lock_guard<std::mutex> lock_guard(context_.compile_infos_mutex);
     if (context_.compile_infos.empty())
     {
         return;
