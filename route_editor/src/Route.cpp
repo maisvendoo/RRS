@@ -289,27 +289,32 @@ bool Route::load_waypoints_conf()
 
 void Route::load_static_objects()
 {
-    for (const auto& [label, transforms] : context_.route_map)
-    {
-        const auto ref_it = context_.objects_ref.find(label);
-        if (ref_it == context_.objects_ref.cend())
+    context_.load_static_objects_thread = std::thread([&]() -> void {
+        for (const auto& [label, transforms] : context_.route_map)
         {
-            continue;
+            const auto ref_it = context_.objects_ref.find(label);
+            if (ref_it == context_.objects_ref.cend())
+            {
+                continue;
+            }
+
+            for (const auto& transform : transforms)
+            {
+                const auto object = RouteObject::create(context_,
+                    ref_it->second.paged_lod, label, transform.translation,
+                    -transform.rotation_deg);
+
+                context_.compile_infos_mutex.lock();
+                context_.compile_infos.emplace_back(CompileInfo{
+                    vsg::ref_ptr(this), object, vsg::MASK_ALL});
+                context_.compile_infos_mutex.unlock();
+
+                std::lock_guard<std::mutex> lock_guard(context_.static_objects_mutex);
+                context_.static_objects.emplace_back(object);
+                ++context_.static_objects_count;
+            }
         }
-
-        for (const auto& transform : transforms)
-        {
-            const auto object = RouteObject::create(context_,
-                ref_it->second.paged_lod, label, transform.translation,
-                -transform.rotation_deg);
-
-            this->addChild(vsg::MASK_ALL, object);
-
-            std::lock_guard<std::mutex> lock_guard(context_.static_objects_mutex);
-            context_.static_objects.emplace_back(object);
-            ++context_.static_objects_count;
-        }
-    }
+    });
 }
 
 bool Route::load_topology()

@@ -9,6 +9,7 @@
 
 #include <atomic>
 #include <mutex>
+#include <thread>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 
@@ -104,6 +105,9 @@ struct EditorContext
     std::mutex topology_mutex;
     std::atomic_size_t topology_objects_count = 0;
     std::atomic_size_t total_topology_objects_count = 0;
+
+    std::thread load_static_objects_thread;
+    std::thread load_topology_thread;
 
     vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<ObjectSelector> object_selector;

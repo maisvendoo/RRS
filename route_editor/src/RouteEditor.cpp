@@ -166,6 +166,16 @@ void RouteEditor::run()
         compile_models();
         handle_deferred_selection();
     }
+
+    if (context_.load_static_objects_thread.joinable())
+    {
+        context_.load_static_objects_thread.join();
+    }
+
+    if (context_.load_topology_thread.joinable())
+    {
+        context_.load_topology_thread.join();
+    }
 }
 
 void RouteEditor::configure_shaders()
