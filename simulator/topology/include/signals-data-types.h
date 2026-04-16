@@ -3,14 +3,15 @@
 
 #include <QByteArray>
 
-#include <vector>
+#include    <vector>
+#include    <topology-export.h>
 
 class Signal;
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct signals_data_t
+struct TOPOLOGY_EXPORT signals_data_t
 {
     std::vector<Signal*> line_signals;
     std::vector<Signal*> enter_signals;
