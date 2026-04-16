@@ -154,21 +154,19 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 
             ImGui::Begin("TestProgressBar");
 
+            float fraction = 1.0f;
+            if (context_.total_static_objects_count != 0)
+            {
+                fraction = (float)context_.static_objects_count /
+                    context_.total_static_objects_count;
+            }
+
             char overlay[64];
             snprintf(overlay, 64, "%zu / %zu",
                 context_.static_objects_count.load(),
                 context_.total_static_objects_count.load());
 
-            if (context_.total_static_objects_count == 0)
-            {
-                ImGui::ProgressBar(1.0f, ImVec2(150.0f, 50.0f), overlay);
-            }
-            else
-            {
-                ImGui::ProgressBar((float)context_.static_objects_count /
-                    context_.total_static_objects_count,
-                    ImVec2(150.0f, 50.0f), overlay);
-            }
+            ImGui::ProgressBar(fraction, {200.0f, 30.0f}, overlay);
 
             ImGui::End();
 
