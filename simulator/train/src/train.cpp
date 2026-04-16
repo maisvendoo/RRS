@@ -4,6 +4,7 @@
 #include    "CfgReader.h"
 #include    "physics.h"
 #include    "Journal.h"
+#include    <vehicle-controller.h>
 
 //------------------------------------------------------------------------------
 //

@@ -21,6 +21,7 @@
 #include    <CfgReader.h>
 #include    <Journal.h>
 #include    <JournalFile.h>
+#include    <vehicle-controller.h>
 
 //------------------------------------------------------------------------------
 //
