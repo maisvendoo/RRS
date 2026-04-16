@@ -38,7 +38,7 @@ public:
     bool addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles);
 
     /// Вернуть контроллер конкретной ПЕ
-    VehicleController *getVehicleController(size_t idx);
+    VehicleController& getVehicleController(size_t idx);
 
     /// Хэш-таблица указателей на вайкл контроллеры по указателю на вайкл
     /// (для удобства смены индекса поезда у контролов из поезда)

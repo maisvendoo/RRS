@@ -54,7 +54,7 @@ void Coupling::setCouplingOperatingState(double state)
 {
     if (state < -Physics::ZERO)
         uncouple();
-    if (state > Physics::ZERO)
+    else if (state > Physics::ZERO)
         couple();
 }
 
