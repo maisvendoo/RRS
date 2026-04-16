@@ -1,12 +1,18 @@
 #include    "enter-signal.h"
 
 #include    "combine-relay.h"
+#include    "relay.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 EnterSignal::EnterSignal(QObject *parent) : StationSignal(parent)
 {
+    main_signal_relay = new Relay(NUM_MSR_CONTACTS);
+    side_signal_relay = new Relay(NUM_SSR_CONTACTS);
+    direct_signal_relay = new Relay(NUM_DSR_CONTACTS);
+    blink_relay = new Relay(NUM_BLINK_CONTACTS);
+
     main_signal_relay->read_config("combine-relay");
     main_signal_relay->setInitContactState(MSR_RED, true);
     main_signal_relay->setInitContactState(MSR_YELLOW, false);
@@ -33,10 +39,7 @@ EnterSignal::EnterSignal(QObject *parent) : StationSignal(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-EnterSignal::~EnterSignal()
-{
-
-}
+EnterSignal::~EnterSignal() = default;
 
 //------------------------------------------------------------------------------
 //
