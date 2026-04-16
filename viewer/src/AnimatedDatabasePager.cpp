@@ -19,74 +19,102 @@
 //------------------------------------------------------------------------------
 void AnimatedDatabasePager::start(uint32_t numReadThreads)
 {
-    auto readThread = [](vsg::ref_ptr<vsg::DatabaseQueue> requestQueue,
-                         vsg::ref_ptr<vsg::ActivityStatus> status,
-                         AnimatedDatabasePager& animatedDatabasePager)
+    //LOG_INFO("AnimatedDatabasePager::start(%u)", numReadThreads);
+
+    auto readThread = [](AnimatedDatabasePager& animatedDatabasePager, const std::string& threadName)
     {
-        while (status->active())
+        LOG_INFO("Started %s", threadName.c_str());
+
+        //auto local_instrumentation = shareOrDuplicateForThreadSafety(animatedDatabasePager.instrumentation);
+        //if (local_instrumentation) local_instrumentation->setThreadName(threadName);
+
+        while (animatedDatabasePager.status->active())
         {
-            vsg::ref_ptr<vsg::PagedLOD> plod = requestQueue->take_when_available();
+            vsg::ref_ptr<vsg::PagedLOD> plod = animatedDatabasePager._requestQueue->take_when_available(animatedDatabasePager.frameCount.load());
             if (plod)
             {
+                //CPU_INSTRUMENTATION_L1_NC(animatedDatabasePager.instrumentation, "AnimatedDatabasePager read", COLOR_PAGER);
+
                 uint64_t frameDelta = animatedDatabasePager.frameCount - plod->frameHighResLastUsed.load();
+
                 if (frameDelta > 1 || !vsg::compare_exchange(plod->requestStatus, vsg::PagedLOD::ReadRequest, vsg::PagedLOD::Reading))
                 {
+                    LOG_WARN("AnimatedDatabasePager: Expired (%u/%u) read request for model from file: %s", plod->frameHighResLastUsed.load(), animatedDatabasePager.frameCount.load(), plod->filename.string().c_str());
                     animatedDatabasePager.requestDiscarded(plod);
                     continue;
                 }
 
-                vsg::ref_ptr<vsg::Object> loaded = vsg::read(plod->filename, plod->options);
+                ++(plod->loadAttempts);
 
-                vsg::ref_ptr<vsg::Node> node = loaded.cast<vsg::Node>();
+                vsg::ref_ptr<vsg::Node> node = plod->pending;
                 if (!node)
                 {
-                    LOG_WARN("AnimatedDatabasePager: fail to load model from file: %s", plod->filename.string().c_str());
+                    vsg::ref_ptr<vsg::Object> loaded = vsg::read(plod->filename, plod->options);
+                    node = loaded.cast<vsg::Node>();
 
-                    auto error = loaded.cast<vsg::ReadError>();
-                    if (error)
+                    if (!node)
                     {
-                        LOG_WARN(error->message.c_str());
+                        LOG_WARN("AnimatedDatabasePager: fail to load model from file: %s", plod->filename.string().c_str());
+
+                        auto error = loaded.cast<vsg::ReadError>();
+                        if (error)
+                        {
+                            LOG_WARN(error->message.c_str());
+                        }
+
+                        animatedDatabasePager.requestDiscarded(plod);
+                        continue;
                     }
 
-                    animatedDatabasePager.requestDiscarded(plod);
-                    continue;
-                }
-
-                if (compare_exchange(plod->requestStatus, vsg::PagedLOD::Reading, vsg::PagedLOD::Compiling))
-                {
                     if (auto cullnode = node.cast<vsg::CullNode>())
                     {
                         node = cullnode->child;
                     }
-                    /*if (auto transform = node.cast<vsg::Transform>())
-                    {
-                        transform->subgraphRequiresLocalFrustum = false;
-                    }*/
-
                     if (auto aplod = plod.cast<AnimatedPagedLOD>())
                     {
                         node = animatedDatabasePager.loadAnimations(aplod, node);
                     }
+                }
 
+                if (compare_exchange(plod->requestStatus, vsg::PagedLOD::Reading, vsg::PagedLOD::Compiling))
+                {
                     {
                         std::scoped_lock<std::mutex> lock(animatedDatabasePager.pendingPagedLODMutex);
                         plod->pending = node;
                     }
 
-                    // compile plod
-                    if (auto result = animatedDatabasePager.compileManager->compile(node))
+                    try
                     {
-                        plod->requestStatus.exchange(vsg::PagedLOD::MergeRequest);
+                        // compile plod
+                        if (auto result = animatedDatabasePager.compileManager->compile(node))
+                        {
+                            plod->requestStatus.exchange(vsg::PagedLOD::MergeRequest);
 
-                        // move to the merge queue;
-                        animatedDatabasePager._toMergeQueue->add(plod, result);
+                            // move to the merge queue;
+                            animatedDatabasePager._toMergeQueue->add(plod, result);
 
-                        //LOG_INFO("AnimatedDatabasePager: load and compiled model from file: %s", plod->filename.string().c_str());
+                            //LOG_INFO("AnimatedDatabasePager: load and compiled model from file: %s", plod->filename.string().c_str());
+                        }
+                        else
+                        {
+                            LOG_WARN("AnimatedDatabasePager: fail to compile model from file: %s", plod->filename.string().c_str());
+                            animatedDatabasePager.requestDiscarded(plod);
+                        }
                     }
-                    else
+                    catch (vsg::Exception e)
                     {
-                        LOG_WARN("AnimatedDatabasePager: fail to compile model from file: %s", plod->filename.string().c_str());
                         animatedDatabasePager.requestDiscarded(plod);
+                        LOG_WARN("AnimatedDatabasePager: vsg::Exception (%s) while compiling model from file: %s", e.message.c_str(), plod->filename.string().c_str());
+                    }
+                    catch (std::exception e)
+                    {
+                        animatedDatabasePager.requestDiscarded(plod);
+                        LOG_WARN("AnimatedDatabasePager: std::exception (%s) while compiling model from file: %s", e.what(), plod->filename.string().c_str());
+                    }
+                    catch (...)
+                    {
+                        animatedDatabasePager.requestDiscarded(plod);
+                        LOG_WARN("AnimatedDatabasePager: exception while compiling model from file: %s", plod->filename.string().c_str());
                     }
                 }
                 else
@@ -94,27 +122,33 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                     animatedDatabasePager.requestDiscarded(plod);
                 }
             }
+            else
+            {
+                // sleep for a frame.
+                std::this_thread::sleep_for(std::chrono::milliseconds(32));
+                continue;
+            }
         }
+        //LOG_INFO("Finished %s", threadName.c_str());
     };
 
-    auto deleteThread = [](vsg::ref_ptr<vsg::DeleteQueue> deleteQueue,
-                           vsg::ref_ptr<vsg::ActivityStatus> status,
-                           const AnimatedDatabasePager& databasePager)
+    auto deleteThread = [](const AnimatedDatabasePager& animatedDatabasePager, const std::string& threadName)
     {
-        (void)databasePager;
+        LOG_INFO("Started %s", threadName.c_str());
 
-        while (status->active())
+        while (animatedDatabasePager.status->active())
         {
-            deleteQueue->wait_then_clear();
+            animatedDatabasePager.deleteQueue->wait_then_clear();
         }
+        //LOG_INFO("Finished %s", threadName.c_str());
     };
 
     for (uint32_t i = 0; i < numReadThreads; ++i)
     {
-        threads.emplace_back(readThread, std::ref(_requestQueue), std::ref(_status), std::ref(*this));
+        threads.emplace_back(readThread, std::ref(*this), vsg::make_string("AnimatedDatabasePager read thread ", i));
     }
 
-    threads.emplace_back(deleteThread, std::ref(_deleteQueue), std::ref(_status), std::ref(*this));
+    threads.emplace_back(deleteThread, std::ref(*this), "AnimatedDatabasePager delete thread");
 }
 
 //------------------------------------------------------------------------------
@@ -126,14 +160,15 @@ vsg::ref_ptr<vsg::Node> AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<Anima
     aplod->animations_map->thread_safe_clear();
 
     if (aplod->animations_dir.empty())
+    {
         return node;
+    }
 
     {
         // Model's animations
         FindModelAnimationsCreateInfo fma_create_info = {node, aplod->animations_map, aplod->animations_dir};
         auto find_model_animations = FindModelAnimations::create(fma_create_info);
     }
-    std::size_t old_size = aplod->animations_map->animations.size();
 
     // Custom animations for model
     auto pdo = vsg::PropagateDynamicObjects::create();
@@ -145,13 +180,6 @@ vsg::ref_ptr<vsg::Node> AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<Anima
 
     FindCustomAnimationsVisitor fcav(fcav_create_info);
     node->accept(fcav);
-
-    LOG_INFO("AnimatedDatabasePager: loaded %zu model and %zu custom (total: %zu) animations from %s for model %s",
-             old_size,
-             aplod->animations_map->animations.size() - old_size,
-             aplod->animations_map->animations.size(),
-             aplod->animations_dir.c_str(),
-             aplod->filename.string().c_str());
 
     node->traverse(*pdo);
 

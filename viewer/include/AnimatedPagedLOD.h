@@ -13,9 +13,11 @@ class AnimatedPagedLOD : public vsg::Inherit<vsg::PagedLOD, AnimatedPagedLOD>
 public:
     AnimatedPagedLOD() : Inherit() {};
 
-    AnimatedPagedLOD(const AnimatedPagedLOD& rhs, const vsg::CopyOp& copyop) :
+    AnimatedPagedLOD(const AnimatedPagedLOD& rhs, const vsg::CopyOp& copyop = {}) :
         Inherit(rhs, copyop)
     {
+        animations_dir = rhs.animations_dir;
+
         filename = rhs.filename;
         bound = rhs.bound;
 
