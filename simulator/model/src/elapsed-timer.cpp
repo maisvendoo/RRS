@@ -59,6 +59,6 @@ void ElapsedTimer::loop()
 
     while (is_started)
     {
-        eventLoop.processEvents();
+        eventLoop.processEvents(QEventLoop::WaitForMoreEvents);
     }
 }
