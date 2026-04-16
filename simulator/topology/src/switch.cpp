@@ -5,6 +5,7 @@
 
 #include    <filesystem.h>
 #include    <Journal.h>
+#include    <topology-trajectory-device.h>
 
 //#include    <math-funcs.h>
 

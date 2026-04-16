@@ -2,6 +2,7 @@
 
 #include    "trajectory.h"
 #include    "switch.h"
+#include    <topology-trajectory-device.h>
 
 #include    <physics.h>
 

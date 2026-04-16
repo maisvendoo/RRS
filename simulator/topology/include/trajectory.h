@@ -5,15 +5,15 @@
 #include    <QMap>
 #include    <QSet>
 
+#include    "CfgReader.h"
 #include    "topology-export.h"
 #include    "topology-defines.h"
 #include    "track.h"
 
 #include    <profile-point.h>
-#include    <device-list.h>
-#include    <topology-trajectory-device.h>
 
 class Signal;
+class TrajectoryDevice;
 
 //------------------------------------------------------------------------------
 //

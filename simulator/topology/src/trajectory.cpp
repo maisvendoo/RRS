@@ -2,6 +2,7 @@
 // #include    "parse_file_funcs.h"
 #include    "switch.h"
 #include    "topology-types.h"
+#include    <topology-trajectory-device.h>
 
 #include    <cstddef>
 #include    <cstdio>
