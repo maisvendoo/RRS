@@ -360,12 +360,9 @@ void main()
     if (baseColor.a < 0.04)
 #endif
     {
-        gl_FragDepth = 0.0f;
-        outColor = vec4(0.0, 0.0, 0.0, 0.0);
-        return;
+        discard;
     }
 
-    gl_FragDepth = gl_FragCoord.z;
 
 #ifdef VSG_WORKFLOW_SPECGLOSS
     #ifdef VSG_DIFFUSE_MAP

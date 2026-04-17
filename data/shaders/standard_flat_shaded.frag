@@ -82,11 +82,8 @@ void main()
     if (diffuseColor.a < 0.04)
 #endif
     {
-        gl_FragDepth = 0.0f;
-        outColor = vec4(0.0, 0.0, 0.0, 0.0);
-        return;
+        discard;
     }
 
-    gl_FragDepth = gl_FragCoord.z;
     outColor = diffuseColor;
 }
