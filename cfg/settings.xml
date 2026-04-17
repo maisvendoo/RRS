@@ -22,6 +22,10 @@
         <NotifyLevel>INFO</NotifyLevel>
         <!-- Ограничение на количество загруженных в память моделей -->
         <TargetPagedLODs>64000</TargetPagedLODs>
+        <!-- Количество фоновых потоков для загрузки 3d-моделей (1 .. N) -->
+        <ReadThreads>2</ReadThreads>
+        <!-- Количество вспомогательных потоков для загрузки текстур 3d-моделей (0 .. N) -->
+        <OperationsThreads>2</OperationsThreads>
         <!-- 1 - отключение дополнительной проверки моделей на видимость из камеры -->
         <DisableCullNode>1</DisableCullNode>
         <!-- 1 - отключение нативного загрузчика моделей формата .gltf в VulkanSceneGraph -->
@@ -29,9 +33,9 @@
         <!-- 1 - отрисовка всех полигонов моделей с обеих сторон -->
         <DrawModelsTwoSided>0</DrawModelsTwoSided>
         <!-- Размер крупномасштабной сетки для отсечения видимости объектов маршрута, м -->
-        <LargeScaleTileSize0>4000.0</LargeScaleTileSize0>
+        <LargeScaleTileSize>4000.0</LargeScaleTileSize>
         <!-- Размер мелкомасштабной сетки для отсечения видимости объектов маршрута, м -->
-        <LargeScaleTileSize1>32000.0</LargeScaleTileSize1>
+        <SmallScaleTileSize>32000.0</SmallScaleTileSize>
         <!-- Заголовок окна -->
         <Name>viewer</Name>
         <!-- Оформление окна: 1 - отображение рамки и заголовка; 0 - режим окна без рамки -->

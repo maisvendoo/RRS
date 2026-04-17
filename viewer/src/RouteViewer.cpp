@@ -734,7 +734,10 @@ void RouteViewer::initViewer()
 
     // Перед компиляцией вьювера применяем некоторые настройки
     auto resourceHints = vsg::ResourceHints::create();
-    resourceHints->numDatabasePagerReadThreads = 4;
+    // Указываем количество потоков чтения 3d-моделей
+    uint32_t numThreads = std::max(1u, std::thread::hardware_concurrency() / 2);
+    uint32_t numReadThreads = std::min(settings.read_threads, numThreads);
+    resourceHints->numDatabasePagerReadThreads = numReadThreads;
     // Указываем разрешение карты теней
     resourceHints->shadowMapSize = {static_cast<uint32_t>(settings.shadow_resolution),
                                     static_cast<uint32_t>(settings.shadow_resolution)};
@@ -747,8 +750,12 @@ void RouteViewer::initViewer()
         LOG_WARN("Viewer compile returned empty result — some resources may not have been compiled");
     }
 
-    unsigned int numOpThreads = std::max(2u, std::thread::hardware_concurrency() / 2);
-    options->operationThreads = vsg::OperationThreads::create(numOpThreads, viewer->status);
+    // Создаём вспомогательные потоки для чтения текстур 3d-моделей
+    uint32_t numOpThreads = std::min(settings.operation_threads, numThreads);
+    if (numOpThreads)
+    {
+        options->operationThreads = vsg::OperationThreads::create(numOpThreads, viewer->status);
+    }
 
     GUIparams->viewer = viewer;
     GUIparams->vehicles_handler = vehicles_handler.get();

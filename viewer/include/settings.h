@@ -25,7 +25,9 @@ struct settings_t final
     std::string route_dir_full_path;   ///< Route directory path
 
     std::string notify_level = "INFO";      ///< Notify level
-    int targetPagedLODs = 64000;            ///< Set number of maximum PagedLOD with loaded high-resolution subgraphs
+    uint32_t targetPagedLODs = 64000;       ///< Set number of maximum PagedLOD with loaded high-resolution subgraphs
+    uint32_t read_threads = 1;              ///< Number of background threads for loading 3d-models
+    uint32_t operation_threads = 0;         ///< Number of background threads for loading textures of 3d-models
     bool disable_culling_node = true;       ///< Disable automatic cullnode for models
     bool disable_native_gltf_loader = false;///< Use assimp loader for .gltf models
     bool draw_models_two_sided = false;     ///< Draw all model's faces two sided
