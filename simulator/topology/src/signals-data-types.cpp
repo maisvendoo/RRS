@@ -20,7 +20,6 @@ static void serialize_signals(
     stream << static_cast<std::uint32_t>(signals_.size());
     for (Signal* signal : signals_)
     {
-        signal->calcPosition();
         stream << signal->serialize();
     }
 }

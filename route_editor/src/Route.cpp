@@ -432,7 +432,7 @@ bool Route::load_topology()
             };
 
             const auto object = RouteObject::create(context_, paged_lod,
-                signal_model_name, pos, rotation_deg);
+                signal_model_name, pos, -rotation_deg);
 
             context_.compile_infos_mutex.lock();
             context_.compile_infos.emplace_back(CompileInfo{

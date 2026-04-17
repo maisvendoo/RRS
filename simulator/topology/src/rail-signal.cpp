@@ -33,7 +33,6 @@ void Signal::step(double t, double dt)
     if (old_lens_state != lens_state)
     {
         old_lens_state = lens_state;
-        calcPosition();
         emit sendDataUpdate(serialize());
     }
 }
@@ -94,6 +93,7 @@ void Signal::setConnector(Switch* conn)
 {
     this->conn = conn;
     conn_name = conn ? conn->getName() : "";
+    calcPosition();
 }
 
 //------------------------------------------------------------------------------
