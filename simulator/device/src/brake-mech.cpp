@@ -157,7 +157,6 @@ void BrakeMech::ode_system(const state_vector_t &Y,
                            double t)
 {
     Q_UNUSED(t)
-    Q_UNUSED(Y)
 
     dYdt[0] = (Q - k_leak * Y[0]) / V;
 }
