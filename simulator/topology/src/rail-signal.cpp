@@ -33,6 +33,7 @@ void Signal::step(double t, double dt)
     if (old_lens_state != lens_state)
     {
         old_lens_state = lens_state;
+        calcPosition();
         emit sendDataUpdate(serialize());
     }
 }
@@ -74,6 +75,7 @@ void Signal::read_config(const QString &filename, const QString &dir_path)
         load_config(cfg);
         return;
     }
+
     Journal::instance()->error("File " + filename + ".xml is't found at default path " + cfg_dir);
 }
 
@@ -185,7 +187,7 @@ void Signal::setRelRotation(const dvec3& rel_rot)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QByteArray Signal::serialize()
+QByteArray Signal::serialize() const
 {
     QByteArray tmp_data;
     QBuffer buff(&tmp_data);
@@ -201,8 +203,6 @@ QByteArray Signal::serialize()
     {
         stream << lens;
     }
-
-    this->calcPosition();
 
     stream << pos.x << pos.y << pos.z;
     stream << orth.x << orth.y << orth.z;
@@ -252,25 +252,15 @@ bool Signal::calcPosition()
     const Trajectory* traj = nullptr;
     if (signal_dir == 1)
     {
-        if (conn->trajectories[SW_BWD_PLUS])
-        {
-            traj = conn->trajectories[SW_BWD_PLUS];
-        }
-        else
-        {
-            traj = conn->trajectories[SW_BWD_MINUS];
-        }
+        traj = conn->trajectories[SW_BWD_PLUS]
+            ? conn->trajectories[SW_BWD_PLUS]
+            : conn->trajectories[SW_BWD_MINUS];
     }
     else if (signal_dir == -1)
     {
-        if (conn->trajectories[SW_FWD_PLUS])
-        {
-            traj = conn->trajectories[SW_FWD_PLUS];
-        }
-        else
-        {
-            traj = conn->trajectories[SW_FWD_MINUS];
-        }
+        traj = conn->trajectories[SW_FWD_PLUS]
+            ? conn->trajectories[SW_FWD_PLUS]
+            : conn->trajectories[SW_FWD_MINUS];
     }
 
     if (traj == nullptr)

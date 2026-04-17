@@ -138,6 +138,7 @@ void LineSignal::check_route()
         U_line = ts->getLineVoltage();
         // Боковое сигнальное реле питается от линии следующего светофора
         U_side = ts->getSideVoltage();
+
         return;
     }
 }
@@ -155,7 +156,6 @@ void LineSignal::relay_control()
 
     // Линейное реле питается от линии следующего светофора
     line_relay->setVoltage(static_cast<double>(is_line_ON) * U_line);
-
 
     double is_line_PLUS = static_cast<double>(line_relay->getContactState(LR_NEUTRAL_LINE_PLUS));
     double is_line_MINUS = static_cast<double>(line_relay->getContactState(LR_NEUTRAL_LINE_MINIS));

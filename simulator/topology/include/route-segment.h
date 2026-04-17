@@ -13,11 +13,6 @@ struct route_segment_t
 {
     std::vector<Trajectory*> trajectories; ///< Траектории, входящие в маршрут
     std::vector<dir_t> directions; ///< Направление по траекториям: 1 - вперёд, -1 - назад
-
-    route_segment_t()
-    {
-
-    }
 };
 
 #endif

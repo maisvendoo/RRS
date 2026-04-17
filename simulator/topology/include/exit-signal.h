@@ -15,7 +15,7 @@ public:
 
     ExitSignal(QObject *parent = nullptr);
 
-    ~ExitSignal();
+    virtual ~ExitSignal() override;
 
     void step(double t, double dt) override;
 

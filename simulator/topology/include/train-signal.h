@@ -17,7 +17,7 @@ public:
 
     TrainSignal(QObject *parent = nullptr);
 
-    virtual ~TrainSignal();
+    virtual ~TrainSignal() override;
 
     /// Шаг симуляции
     virtual void step(double t, double dt) override;

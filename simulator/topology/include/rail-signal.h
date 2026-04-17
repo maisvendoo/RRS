@@ -53,7 +53,7 @@ public:
     void setRelPosition(const dvec3& rel_pos);
     void setRelRotation(const dvec3& rel_rot);
 
-    QByteArray serialize();
+    QByteArray serialize() const;
 
     void deserialize(QByteArray& data);
 

@@ -16,7 +16,7 @@ public:
 
     LineSignal(QObject *parent = nullptr);
 
-    ~LineSignal();
+    virtual ~LineSignal() override;
 
     void step(double t, double dt) override;
 

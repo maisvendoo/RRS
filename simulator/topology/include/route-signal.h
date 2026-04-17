@@ -12,7 +12,7 @@ public:
 
     RouteSignal(QObject *parent = nullptr);
 
-    ~RouteSignal();
+    virtual ~RouteSignal() override;
 };
 
 #endif

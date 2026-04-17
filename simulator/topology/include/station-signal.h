@@ -20,7 +20,7 @@ public:
 
     StationSignal(QObject* parent = nullptr);
 
-    virtual ~StationSignal();
+    virtual ~StationSignal() override;
 
     /// Шаг симуляции
     virtual void step(double t, double dt) override;

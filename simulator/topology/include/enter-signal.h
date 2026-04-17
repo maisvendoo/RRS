@@ -14,7 +14,7 @@ public:
 
     EnterSignal(QObject *parent = nullptr);
 
-    ~EnterSignal();
+    virtual ~EnterSignal() override;
 
     void step(double t, double dt) override;
 
