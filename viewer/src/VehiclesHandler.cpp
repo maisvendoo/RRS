@@ -36,7 +36,6 @@ VehiclesHandler::VehiclesHandler(const settings_t& settings, SoundManager* sound
     , sound_manager(sound_manager)
 {
     settings_delay = (settings.vehicle_controled_update_interval + settings.client_delay) * 0.001;
-    current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData1(data); };
 }
 
 //------------------------------------------------------------------------------
@@ -95,6 +94,8 @@ int VehiclesHandler::getControlledVehicleIndex() const noexcept
 //------------------------------------------------------------------------------
 int VehiclesHandler::getCurrentTrainIndex() const noexcept
 {
+    if (cur_vehicle < 0 || static_cast<std::size_t>(cur_vehicle) >= vehicles.size())
+        return -1;
     return vehicles[cur_vehicle].train_id;
 }
 
@@ -103,7 +104,7 @@ int VehiclesHandler::getCurrentTrainIndex() const noexcept
 //------------------------------------------------------------------------------
 bool VehiclesHandler::isUpdated() const noexcept
 {
-    return is_pos_updated && is_state_updated;
+    return pos_count >= 3;
 }
 
 //------------------------------------------------------------------------------
@@ -111,7 +112,8 @@ bool VehiclesHandler::isUpdated() const noexcept
 //------------------------------------------------------------------------------
 simulator_time_t *VehiclesHandler::getDateTime()
 {
-    return isUpdated() ? &(update_pos_data[cur_data].sim_time) : nullptr;
+    return (pos_count.load(std::memory_order_relaxed) >= 1)
+        ? &pos_buf[pos_read % POS_BUF_SIZE].sim_time : nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -127,7 +129,7 @@ QString VehiclesHandler::getDebugMessage() const noexcept
 //------------------------------------------------------------------------------
 void VehiclesHandler::step(double t, double dt)
 {
-    ref_time = t;
+    ref_time.store(t, std::memory_order_relaxed);
     if (isUpdated())
     {
         if (!is_updated)
@@ -142,105 +144,48 @@ void VehiclesHandler::step(double t, double dt)
         return;
     }
 
-    const double client_time = ref_time + time_difference;
-    const bool is_update = (client_time >= update_pos_data[cur_data].sim_time.simulation_seconds);
+    const double client_time = ref_time + time_difference.load(std::memory_order_relaxed);
 
-    // Swap indexes of positions info array
-    while (is_update)
-    {
-        // Check for use the latest data already
-        if (cur_data == delay_data)
-        {
-            delay_data = new_data;
+    // Advance read head so pos_read is the first frame >= client_time
+    advanceInterpolation(client_time);
 
-            if (cur_data == delay_data)
-            {
-                // No new data, the latest data is already used
-                break;
-            }
-        }
-
-        // Update index
-        unused_data = (cur_data == 0) ? (DATA_ARRAY_SIZE - 1) : (cur_data - 1);
-        old_data = cur_data;
-        cur_data = delay_data;
-        delay_data = new_data;
-
-        if (client_time < update_pos_data[cur_data].sim_time.simulation_seconds)
-        {
-            break;
-        }
-    }
-
-    // Save state update flag for this frame update
+    // Swap state double buffer
     const bool update_state = is_new_state;
     if (update_state)
     {
-        // Swap indexes of states info array
-        std::swap(new_state, unused_state);
-
-        // Reset state update flag
+        std::swap(state_front, state_back);
         is_new_state = false;
     }
 
-    // Interframe coordinate
-    const double upd_dt = update_pos_data[cur_data].sim_time.simulation_seconds - update_pos_data[old_data].sim_time.simulation_seconds;
-    const double r = (client_time - update_pos_data[old_data].sim_time.simulation_seconds) / upd_dt;
+    // Interframe interpolation — clamp to [0,1] to prevent extrapolation overshoot
+    const auto& frame_cur  = pos_buf[pos_read      % POS_BUF_SIZE];
+    const auto& frame_prev = pos_buf[pos_read_prev  % POS_BUF_SIZE];
+    const double upd_dt = frame_cur.sim_time.simulation_seconds - frame_prev.sim_time.simulation_seconds;
+    const double r_raw = (upd_dt > 0.0) ? (client_time - frame_prev.sim_time.simulation_seconds) / upd_dt : 0.0;
+    const double r = std::clamp(r_raw, 0.0, 1.0);
     const double k = (1.0 - r);
 
     for (std::size_t i = 0; i < vehicles.size(); ++i)
     {
         vehicles[i].position = vsg::dvec3(
-            k * update_pos_data[old_data].vehicles[i].position_x + r * update_pos_data[cur_data].vehicles[i].position_x,
-            k * update_pos_data[old_data].vehicles[i].position_y + r * update_pos_data[cur_data].vehicles[i].position_y,
-            k * update_pos_data[old_data].vehicles[i].position_z + r * update_pos_data[cur_data].vehicles[i].position_z
+            k * frame_prev.vehicles[i].position_x + r * frame_cur.vehicles[i].position_x,
+            k * frame_prev.vehicles[i].position_y + r * frame_cur.vehicles[i].position_y,
+            k * frame_prev.vehicles[i].position_z + r * frame_cur.vehicles[i].position_z
         );
 
         vehicles[i].orth = vsg::normalize(vsg::dvec3(
-            k * update_pos_data[old_data].vehicles[i].orth_x + r * update_pos_data[cur_data].vehicles[i].orth_x,
-            k * update_pos_data[old_data].vehicles[i].orth_y + r * update_pos_data[cur_data].vehicles[i].orth_y,
-            k * update_pos_data[old_data].vehicles[i].orth_z + r * update_pos_data[cur_data].vehicles[i].orth_z
+            k * frame_prev.vehicles[i].orth_x + r * frame_cur.vehicles[i].orth_x,
+            k * frame_prev.vehicles[i].orth_y + r * frame_cur.vehicles[i].orth_y,
+            k * frame_prev.vehicles[i].orth_z + r * frame_cur.vehicles[i].orth_z
         ));
 
         vehicles[i].up = vsg::normalize(vsg::dvec3(
-            k * update_pos_data[old_data].vehicles[i].up_x + r * update_pos_data[cur_data].vehicles[i].up_x,
-            k * update_pos_data[old_data].vehicles[i].up_y + r * update_pos_data[cur_data].vehicles[i].up_y,
-            k * update_pos_data[old_data].vehicles[i].up_z + r * update_pos_data[cur_data].vehicles[i].up_z
+            k * frame_prev.vehicles[i].up_x + r * frame_cur.vehicles[i].up_x,
+            k * frame_prev.vehicles[i].up_y + r * frame_cur.vehicles[i].up_y,
+            k * frame_prev.vehicles[i].up_z + r * frame_cur.vehicles[i].up_z
         ));
 
         vehicles[i].right = vsg::cross(vehicles[i].orth, vehicles[i].up);
-
-        // May be delete attitude?? Not used anywhere
-        double attitude_z;
-        if (vehicles[i].orth.x > vehicles[i].orth.y)
-        {
-            if (vehicles[i].orth.x > -vehicles[i].orth.y)
-            {
-                attitude_z = std::acos(vehicles[i].orth.y);
-            }
-            else
-            {
-                attitude_z = vsg::numbers<double>::PI() - std::asin(vehicles[i].orth.x);
-            }
-        }
-        else
-        {
-            if (vehicles[i].orth.x > -vehicles[i].orth.y)
-            {
-                attitude_z = std::asin(vehicles[i].orth.x);
-            }
-            else
-            {
-                attitude_z = -std::acos(vehicles[i].orth.y);
-            }
-        }
-
-        vehicles[i].attitude = vsg::dvec3(
-            std::asin(vehicles[i].orth.z),
-            0.0,
-            attitude_z
-        );
-
 
         const vsg::dmat4 rotate_matrix{vehicles[i].right.x,vehicles[i].right.y,vehicles[i].right.z,0.0,
                                        vehicles[i].orth.x, vehicles[i].orth.y, vehicles[i].orth.z, 0.0,
@@ -250,59 +195,48 @@ void VehiclesHandler::step(double t, double dt)
         // Apply vehicle body matrix transform
         vehicles[i].transform->matrix = vsg::translate(vehicles[i].position) * rotate_matrix;
 
-        if (is_update)
+        if (upd_dt > 0.0)
         {
             vehicles[i].velocity = vsg::dvec3(
-                (update_pos_data[cur_data].vehicles[i].position_x - update_pos_data[old_data].vehicles[i].position_x) / upd_dt,
-                (update_pos_data[cur_data].vehicles[i].position_y - update_pos_data[old_data].vehicles[i].position_y) / upd_dt,
-                (update_pos_data[cur_data].vehicles[i].position_z - update_pos_data[old_data].vehicles[i].position_z) / upd_dt
+                (frame_cur.vehicles[i].position_x - frame_prev.vehicles[i].position_x) / upd_dt,
+                (frame_cur.vehicles[i].position_y - frame_prev.vehicles[i].position_y) / upd_dt,
+                (frame_cur.vehicles[i].position_z - frame_prev.vehicles[i].position_z) / upd_dt
             );
         }
 
+        // Model animations update and step
         if (update_state)
         {
-            vehicles[i].train_id = update_vehicles[new_state].vehicles[i].train_id;
-            vehicles[i].orientation = update_vehicles[new_state].vehicles[i].orientation;
-            vehicles[i].prev_vehicle = update_vehicles[new_state].vehicles[i].prev_vehicle;
-            vehicles[i].next_vehicle = update_vehicles[new_state].vehicles[i].next_vehicle;
+            vehicles[i].train_id = state_front.vehicles[i].train_id;
+            vehicles[i].orientation = state_front.vehicles[i].orientation;
+            vehicles[i].prev_vehicle = state_front.vehicles[i].prev_vehicle;
+            vehicles[i].next_vehicle = state_front.vehicles[i].next_vehicle;
 
-            // Model animations update and step
-            vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), &(update_vehicles[new_state].vehicles[i].analogSignal));
-
-            // Sounds update
-            for (auto sound_id : vehicles[i].sounds_id)
-            {
-                const vsg::vec3 pos = vsg::vec3(vehicles[i].position) +
-                                      vsg::vec3(vehicles[i].right) * sound_manager->getLocalPositionX(sound_id) +
-                                      vsg::vec3(vehicles[i].orth) * sound_manager->getLocalPositionY(sound_id) +
-                                      vsg::vec3(vehicles[i].up) * sound_manager->getLocalPositionZ(sound_id);
-                sound_manager->setPosition(sound_id, pos.x, pos.y, pos.z);
-                sound_manager->setVelocity(sound_id, vehicles[i].velocity.x, vehicles[i].velocity.y, vehicles[i].velocity.z);
-
-                const std::size_t signal_id = sound_manager->getSignalID(sound_id);
-                if (signal_id < update_vehicles[new_state].vehicles[i].analogSignal.size())
-                {
-                    sound_manager->setSoundSignal(sound_id, update_vehicles[new_state].vehicles[i].analogSignal[signal_id]);
-                }
-                else
-                {
-                    sound_manager->setSoundSignal(sound_id, 0.0f);
-                }
-            }
+            vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), &(state_front.vehicles[i].analogSignal));
         }
         else
         {
-            // Model animations step
             vehicles[i].step(static_cast<float>(t), static_cast<float>(dt));
+        }
 
-            // Sounds update
-            for (auto sound_id : vehicles[i].sounds_id)
+        // Sounds update
+        for (auto sound_id : vehicles[i].sounds_id)
+        {
+            const vsg::vec3 pos = vsg::vec3(vehicles[i].position) +
+                                  vsg::vec3(vehicles[i].right) * sound_manager->getLocalPositionX(sound_id) +
+                                  vsg::vec3(vehicles[i].orth) * sound_manager->getLocalPositionY(sound_id) +
+                                  vsg::vec3(vehicles[i].up) * sound_manager->getLocalPositionZ(sound_id);
+            sound_manager->setPosition(sound_id, pos.x, pos.y, pos.z);
+
+            if (update_state)
             {
-                const vsg::vec3 pos = vsg::vec3(vehicles[i].position) +
-                                      vsg::vec3(vehicles[i].right) * sound_manager->getLocalPositionX(sound_id) +
-                                      vsg::vec3(vehicles[i].orth) * sound_manager->getLocalPositionY(sound_id) +
-                                      vsg::vec3(vehicles[i].up) * sound_manager->getLocalPositionZ(sound_id);
-                sound_manager->setPosition(sound_id, pos.x, pos.y, pos.z);
+                sound_manager->setVelocity(sound_id, vehicles[i].velocity.x, vehicles[i].velocity.y, vehicles[i].velocity.z);
+
+                const std::size_t signal_id = sound_manager->getSignalID(sound_id);
+                if (signal_id < state_front.vehicles[i].analogSignal.size())
+                    sound_manager->setSoundSignal(sound_id, state_front.vehicles[i].analogSignal[signal_id]);
+                else
+                    sound_manager->setSoundSignal(sound_id, 0.0f);
             }
         }
     }
@@ -510,7 +444,37 @@ void VehiclesHandler::slotGetTrainsData(QByteArray &data)
 //------------------------------------------------------------------------------
 void VehiclesHandler::slotGetVehiclesPosData(QByteArray& data)
 {
-    current_get_vehicles_pos_data_function(data);
+    const size_t slot = pos_write.load(std::memory_order_relaxed) % POS_BUF_SIZE;
+    pos_buf[slot].deserialize(data);
+
+    if (pos_buf[slot].vehicles.size() != vehicles.size())
+    {
+        LOG_WARN("Fail to update: get %zu positions but there are %zu vehicles",
+                 pos_buf[slot].vehicles.size(), vehicles.size());
+        return;
+    }
+
+    // Exponential smoothing of time offset (converges quickly during startup)
+    const size_t count = pos_count.load(std::memory_order_relaxed);
+    const double alpha = (count < 3) ? 0.5 : 0.05;
+    const double td = time_difference.load(std::memory_order_relaxed);
+    const double rt = ref_time.load(std::memory_order_relaxed);
+    time_difference.store(td * (1.0 - alpha) +
+        (pos_buf[slot].sim_time.simulation_seconds - rt - settings_delay) * alpha,
+        std::memory_order_relaxed);
+
+    // Publish: data is fully written, now make it visible to the reader
+    const size_t new_write = pos_write.load(std::memory_order_relaxed) + 1;
+    pos_write.store(new_write, std::memory_order_release);
+    if (count < POS_BUF_SIZE)
+        pos_count.store(count + 1, std::memory_order_release);
+
+    // Initialize read heads once we have enough frames
+    if (count + 1 == 3)
+    {
+        pos_read_prev = new_write - 3;
+        pos_read      = new_write - 2;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -519,45 +483,17 @@ void VehiclesHandler::slotGetVehiclesPosData(QByteArray& data)
 void VehiclesHandler::slotGetVehiclesStateData(QByteArray& data)
 {
     if (is_new_state)
-    {
         return;
-    }
 
-    update_vehicles[unused_state].deserialize(data);
-    if (update_vehicles[unused_state].vehicles.size() == vehicles.size())
+    state_back.deserialize(data);
+    if (state_back.vehicles.size() == vehicles.size())
     {
-/*
-        QString msg = "";
-        msg += "Vehicles(";
-        msg += QString::number(update_vehicles[unused_state].vehicles.size());
-        msg += "):";
-        for (size_t i = 0; i < update_vehicles[unused_state].vehicles.size(); ++i)
-        {
-            msg += "\n(";
-            msg += QString::number(update_vehicles[unused_state].vehicles[i].train_id);
-            msg += ")";
-            msg += QString::number(i);
-            msg += "(";
-            msg += QString::number(update_vehicles[unused_state].vehicles[i].analogSignal.size());
-            msg += "):";
-            for (auto s : update_vehicles[unused_state].vehicles[i].analogSignal)
-            {
-                msg += QString::number(s);
-                msg += "|";
-            }
-        }
-        LOG_INFO("%s", msg.toStdString().c_str());
-*/
-        is_state_updated = true;
         is_new_state = true;
     }
     else
     {
-        LOG_WARN("Fail to update: get %u states but there are %u vehicles",
-                 update_vehicles[unused_state].vehicles.size(),
-                 vehicles.size());
-
-        is_state_updated = false;
+        LOG_WARN("Fail to update: get %zu states but there are %zu vehicles",
+                 state_back.vehicles.size(), vehicles.size());
         is_new_state = false;
     }
 }
@@ -568,9 +504,7 @@ void VehiclesHandler::slotGetVehiclesStateData(QByteArray& data)
 void VehiclesHandler::slotGetVehicleControlled(QByteArray& data)
 {
     if (!isUpdated())
-    {
         return;
-    }
 
     vehicle_controlled.deserialize(data);
     if ((vehicle_controlled.controlled_vehicle >= 0) &&
@@ -583,116 +517,22 @@ void VehiclesHandler::slotGetVehicleControlled(QByteArray& data)
 }
 
 //------------------------------------------------------------------------------
-// Первое получение данных
+//
 //------------------------------------------------------------------------------
-void VehiclesHandler::getVehiclesPosData1(QByteArray& data)
+void VehiclesHandler::advanceInterpolation(double client_time)
 {
-    new_data = DATA_ARRAY_SIZE - 3;
-    update_pos_data[new_data].deserialize(data);
-    if (update_pos_data[new_data].vehicles.size() == vehicles.size())
+    // Advance read head until pos_read is the first frame with time >= client_time
+    // but don't go past the latest written frame.
+    // pos_write is atomic — snapshot it once to avoid torn reads in the loop.
+    const size_t write_snapshot = pos_write.load(std::memory_order_acquire);
+    if (write_snapshot == 0)
+        return;
+    const size_t latest = write_snapshot - 1;
+    while (pos_read < latest &&
+           client_time >= pos_buf[pos_read % POS_BUF_SIZE].sim_time.simulation_seconds)
     {
-        time_difference = update_pos_data[new_data].sim_time.simulation_seconds - ref_time - settings_delay;
-        current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData2(data); };
-    }
-    else
-    {
-        LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
-                    update_pos_data[new_data].vehicles.size(),
-                    vehicles.size());
-        new_data = -1;
-    }
-}
-
-//------------------------------------------------------------------------------
-// Второе получение данных
-//------------------------------------------------------------------------------
-void VehiclesHandler::getVehiclesPosData2(QByteArray& data)
-{
-    delay_data = new_data;
-    new_data = DATA_ARRAY_SIZE - 2;
-    update_pos_data[new_data].deserialize(data);
-    if (update_pos_data[new_data].vehicles.size() == vehicles.size())
-    {
-        double r = 0.5;
-        time_difference = time_difference * (1.0 - r) +
-            (update_pos_data[new_data].sim_time.simulation_seconds - ref_time - settings_delay) * r;
-        current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData3(data); };
-    }
-    else
-    {
-        LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
-                    update_pos_data[new_data].vehicles.size(),
-                    vehicles.size());
-        new_data = -1;
-        delay_data = -1;
-        current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData1(data); };
-    }
-}
-
-//------------------------------------------------------------------------------
-// Третье получение данных
-//------------------------------------------------------------------------------
-void VehiclesHandler::getVehiclesPosData3(QByteArray& data)
-{
-    new_data = DATA_ARRAY_SIZE - 1;
-    update_pos_data[new_data].deserialize(data);
-
-    is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles.size());
-    if (is_pos_updated)
-    {
-        unused_data = DATA_ARRAY_SIZE - 4;
-        old_data = DATA_ARRAY_SIZE - 3;
-        cur_data = DATA_ARRAY_SIZE - 2;
-        delay_data = DATA_ARRAY_SIZE - 1;
-
-        double r = 0.25;
-        time_difference = time_difference * (1.0 - r) +
-            (update_pos_data[new_data].sim_time.simulation_seconds - ref_time - settings_delay) * r;
-        current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData4(data); };
-    }
-    else
-    {
-        LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
-                 update_pos_data[new_data].vehicles.size(),
-                 vehicles.size());
-        new_data = -1;
-        delay_data = -1;
-        current_get_vehicles_pos_data_function = [&](QByteArray& data) { getVehiclesPosData1(data); };
-    }
-}
-
-//------------------------------------------------------------------------------
-// Обновление данных по очереди
-//------------------------------------------------------------------------------
-void VehiclesHandler::getVehiclesPosData4(QByteArray& data)
-{
-    ++new_data;
-    if (new_data >= DATA_ARRAY_SIZE)
-    {
-        new_data = 0;
-    }
-
-    // Не даём обновлениям догнать цикл сзади
-    if (new_data == old_data)
-    {
-        new_data = unused_data;
-    }
-
-    update_pos_data[new_data].deserialize(data);
-
-    is_pos_updated = (update_pos_data[new_data].vehicles.size() == vehicles.size());
-
-    if (is_pos_updated)
-    {
-        double r = 0.05;
-        time_difference = time_difference * (1.0 - r) +
-            (update_pos_data[new_data].sim_time.simulation_seconds - ref_time - settings_delay) * r;
-    }
-    else
-    {
-        LOG_WARN("Fail to update: get %u positions but there are %u vehicles",
-                 update_pos_data[new_data].vehicles.size(),
-                 vehicles.size());
+        pos_read_prev = pos_read;
+        ++pos_read;
     }
 }
 
@@ -701,16 +541,22 @@ void VehiclesHandler::getVehiclesPosData4(QByteArray& data)
 //------------------------------------------------------------------------------
 void VehiclesHandler::updateDebugString()
 {
+    const size_t w = pos_write.load(std::memory_order_acquire);
+    if (w == 0)
+        return;
+
+    auto& latest = pos_buf[(w - 1) % POS_BUF_SIZE];
+
     // Дата-время сервера
-    debug_message = update_pos_data[new_data].sim_time.getString() + "\n";
+    debug_message = latest.sim_time.getString() + "\n";
 
     const int current = vehicle_controlled.current_vehicle;
     if (current >= 0
-        && static_cast<std::size_t>(current) < update_vehicles[new_state].vehicles.size()
-        && static_cast<std::size_t>(current) < update_pos_data[new_data].vehicles.size())
+        && static_cast<std::size_t>(current) < state_front.vehicles.size()
+        && static_cast<std::size_t>(current) < latest.vehicles.size())
     {
-        const int current_train = update_vehicles[new_state].vehicles[current].train_id;
-        const auto& new_pos_data = update_pos_data[new_data].vehicles[current];
+        const int current_train = state_front.vehicles[current].train_id;
+        const auto& new_pos_data = latest.vehicles[current];
         debug_message += QString("Данная ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
             .arg(current, 3)
             .arg(current_train, 3)
@@ -730,11 +576,11 @@ void VehiclesHandler::updateDebugString()
 
     const int control = vehicle_controlled.controlled_vehicle;
     if (control >= 0
-        && control < update_vehicles[new_state].vehicles.size()
-        && control < update_pos_data[new_data].vehicles.size())
+        && control < state_front.vehicles.size()
+        && control < latest.vehicles.size())
     {
-        const int control_train = update_vehicles[new_state].vehicles[control].train_id;
-        const auto& new_pos_data = update_pos_data[new_data].vehicles[control];
+        const int control_train = state_front.vehicles[control].train_id;
+        const auto& new_pos_data = latest.vehicles[control];
         debug_message += QString("\nУправляемая ПЕ: %1 | Поезд %2 | pos{%3,%4,%5} | dir{%6,%7,%8}\n")
             .arg(control, 3)
             .arg(control_train, 3)

@@ -29,6 +29,7 @@ struct settings_t final
     bool disable_culling_node = true;       ///< Disable automatic cullnode for models
     bool disable_native_gltf_loader = false;///< Use assimp loader for .gltf models
     bool draw_models_two_sided = false;     ///< Draw all model's faces two sided
+    double cull_radius = 150.0;             ///< Frustum cull bounding sphere radius for route objects, m
 
     std::string name = "viewer";///< Window title
     int x = 50;                 ///< Window horizontal position
@@ -42,6 +43,7 @@ struct settings_t final
 
     bool double_buffer = true;  ///< Set/unset double buffering
     int samples = 1;            ///< Set number of antialiasing samples
+    int max_fps = 60;           ///< Maximum frames per second (0 = unlimited)
 
     bool shadow = false;                        ///< Shadow flag
     double shadow_distance = 50.0;              ///< Shadow compute distance

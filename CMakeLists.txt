@@ -15,6 +15,9 @@ elseif(UNIX)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif()
 
+# No lib prefix in all shared libraries
+set(CMAKE_SHARED_LIBRARY_PREFIX "")
+
 add_subdirectory (CfgReader)
 add_subdirectory (CfgEditor)
 add_subdirectory (filesystem)

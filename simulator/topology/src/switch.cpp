@@ -359,7 +359,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
             }
             else
             {
-                Journal::instance()->info("Outcoming trajectories: 2. Parameter <state_bwd> not found, switch is set to plus direction");
+                Journal::instance()->info("Outcoming trajectories: 2. Parameter <state_fwd> not found, switch is set to plus direction");
             }
             ref_state_fwd = state_fwd;
         }

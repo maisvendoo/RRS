@@ -91,6 +91,8 @@ signals:
 
     void sendLogMessage(QString msg);
 
+    void connectionAbandoned();
+
 private:
 
     QTcpSocket *socket = nullptr;
@@ -108,6 +110,11 @@ private:
     bool is_first_data = true;
 
     QDataStream     in;
+
+    int connection_attempts = 0;
+    static constexpr int MAX_CONNECTION_ATTEMPTS = 60;
+
+    bool canSend() const;
 
     void connectToServer(const tcp_config_t &tcp_config);
 

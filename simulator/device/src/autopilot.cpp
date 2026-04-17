@@ -133,38 +133,15 @@ void Autopilot::velocity_control(double t, double dt)
     // Скорость, заданная по графику
     v_ref = calcTimetableVelocity(t, dt, target_station_dist);
 
-    if (v_ref < 0.1)
-    {
-        // TODO: Не используется нигде
-        int a = 0;
-    }
-
     // Выбираем минимум между текущим ограничением и конструкционной скоростью
     v_ref = min(calcCurrentSpeedLimit(t, dt), v_ref);
-
-    if (v_ref < 0.1)
-    {
-        // TODO: Не используется нигде
-        int a = 0;
-    }
 
     // Рассчитываем скорость по тормозной кривой до следующего ограничения
     // (если оно больше, ну и пусть :))) )
     v_ref = min(v_ref, calcBrakeCurveSpeed(feedback->v_lim_next, feedback->limit_dist));
 
-    if (v_ref < 0.1)
-    {
-        // TODO: Не используется нигде
-        int a = 0;
-    }
-
     // Расчитываем скорость по тормозной кривой до ближайшего сигнала
     v_ref = min(v_ref, calcAlsnSpeed(feedback->alsn_code, feedback->signal_dist, v_target));
-
-    if (v_ref < 0.1)
-    {
-        int a = 0;
-    }
 
     // Если разрешено отправление по графику
     if (is_departure_allowed)
@@ -296,14 +273,14 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_ta
         break;
 
     case NO_CODE:
-
+    {
         // Тут, по идее, будет происходить торможение, а проверка бдительности
         // не даст сорвать ЭПК
-        v_lim = 40.0; // ????
-
+        constexpr double V_LIM_NO_CODE = 40.0;
+        v_lim = V_LIM_NO_CODE;
         is_alsn_motion_allowed = true;
-
         break;
+    }
 
     case GREEN:
 

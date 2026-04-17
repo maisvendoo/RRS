@@ -31,8 +31,6 @@ int main(int argc, char* argv[])
         initialize_logger();
         print_command_line_arguments(argc, argv);
 
-        // Use QCoreApplication instead of QApplication — viewer does not need Qt GUI,
-        // only Qt networking/XML. Avoids NSApp run loop conflict with VSG window on macOS.
         QApplication application(argc, argv);
 
         RouteViewer viewer;
