@@ -16,6 +16,7 @@
 #include "UpdateStatisticsHandler.h"
 #include "UpdateViewerHandler.h"
 #include "VehiclesHandler.h"
+#include "WorldCulling.h"
 #include "filesystem.h"
 #include "sound-manager.h"
 #include "tcp-client.h"
@@ -448,6 +449,9 @@ void RouteViewer::initScenegraph()
 {
     root = vsg::Group::create();
 
+    world_culling = WorldCulling::create();
+    root->addChild(world_culling->world_root);
+
     // Модель неба - создаём в первую очередь,
     // до всего остального в сцене и до компиляции вьювера
     FileSystem& fs = FileSystem::getInstance();
@@ -802,8 +806,6 @@ bool RouteViewer::loadRoute()
     loader.parse_route_map(route);
 
     // Создание PagedLOD для моделей в маршруте
-    vsg::ref_ptr<vsg::Group> route_root = vsg::Group::create();
-
     for (auto& [label, transforms] : route.route_map)
     {
         auto found_it = route.object_ref.find(label);
@@ -843,19 +845,14 @@ bool RouteViewer::loadRoute()
                 matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
                 matrix->addChild(pagedLOD);
 
-                // Frustum-cull before the matrix push
-                vsg::dsphere cullBound(vsg::dvec3(matrix->matrix[3][0], matrix->matrix[3][1], matrix->matrix[3][2]),
-                                      settings.cull_radius);
-                auto cullNode = vsg::CullNode::create(cullBound, matrix);
-                route_root->addChild(cullNode);
+                vsg::dvec3 position = vsg::dvec3(matrix->matrix[3][0], matrix->matrix[3][1], matrix->matrix[3][2]);
+                world_culling->add(position, matrix);
             }
         }
     }
 
     route.object_ref.clear();
     route.route_map.clear();
-
-    root->addChild(route_root);
 
     return true;
 }
