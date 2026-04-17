@@ -19,7 +19,7 @@ struct TOPOLOGY_EXPORT signals_data_t
     std::vector<Signal*> exit_signals;
     std::vector<Signal*> shunt_signals;
 
-    QByteArray serialize();
+    QByteArray serialize() const;
     void deserialize(QByteArray& data);
 };
 

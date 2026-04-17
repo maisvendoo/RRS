@@ -14,11 +14,11 @@
 
 static void serialize_signals(
     QDataStream& stream,
-    std::vector<Signal*>& signals_
+    const std::vector<Signal*>& signals_
 )
 {
     stream << static_cast<std::uint32_t>(signals_.size());
-    for (Signal* signal : signals_)
+    for (const Signal* const signal : signals_)
     {
         stream << signal->serialize();
     }
@@ -46,7 +46,7 @@ static void deserialize_signals(
     }
 }
 
-QByteArray signals_data_t::serialize()
+QByteArray signals_data_t::serialize() const
 {
     QByteArray tmp_data;
     QBuffer buff(&tmp_data);
