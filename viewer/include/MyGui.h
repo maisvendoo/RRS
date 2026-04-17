@@ -25,7 +25,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     simulator_time_t* sim_time = nullptr;
 
     // Skybox *skybox = nullptr;
-    NewSkybox* new_skybox = nullptr;
+    NewSkybox* new_skybox = nullptr;  // Owned by RouteViewer
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
     UpdateControlToServerHandler *controls_handler = nullptr;
