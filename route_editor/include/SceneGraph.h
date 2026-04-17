@@ -1,10 +1,9 @@
 #ifndef SCENE_GRAPH_H
 #define SCENE_GRAPH_H
 
-#include "SwitchGroup.h"
-
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/nodes/Switch.h>
 
 struct EditorContext;
 
@@ -15,7 +14,7 @@ class AmbientLight;
 
 }
 
-class SceneGraph : public vsg::Inherit<SwitchGroup, SceneGraph>
+class SceneGraph : public vsg::Inherit<vsg::Switch, SceneGraph>
 {
 public:
     SceneGraph(EditorContext& context);

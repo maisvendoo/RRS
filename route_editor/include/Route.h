@@ -1,13 +1,12 @@
 #ifndef ROUTE_H
 #define ROUTE_H
 
-#include "SwitchGroup.h"
-
 #include <vsg/core/Inherit.h>
+#include <vsg/nodes/Switch.h>
 
 struct EditorContext;
 
-class Route : public vsg::Inherit<SwitchGroup, Route>
+class Route : public vsg::Inherit<vsg::Switch, Route>
 {
 public:
     Route(EditorContext& context);
@@ -17,8 +16,8 @@ private:
     bool load_route_map();
     bool load_stations_conf();
     bool load_waypoints_conf();
-    void load_static_objects();
 
+    void load_static_objects();
     bool load_topology();
 
 private:
