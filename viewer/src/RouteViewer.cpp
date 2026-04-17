@@ -449,7 +449,7 @@ void RouteViewer::initScenegraph()
 {
     root = vsg::Group::create();
 
-    world_culling = WorldCulling::create();
+    world_culling = WorldCulling::create(settings.culling_tiles_size_0, settings.culling_tiles_size_1);
     root->addChild(world_culling->world_root);
 
     // Модель неба - создаём в первую очередь,

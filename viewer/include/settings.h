@@ -29,7 +29,8 @@ struct settings_t final
     bool disable_culling_node = true;       ///< Disable automatic cullnode for models
     bool disable_native_gltf_loader = false;///< Use assimp loader for .gltf models
     bool draw_models_two_sided = false;     ///< Draw all model's faces two sided
-    double cull_radius = 150.0;             ///< Frustum cull bounding sphere radius for route objects, m
+    double culling_tiles_size_0 = 4000.0;   ///< Large-scale tile size for cascade culling of route objects, m
+    double culling_tiles_size_1 = 32000.0;  ///< Small-scale tile size for cascade culling of route objects, m
 
     std::string name = "viewer";///< Window title
     int x = 50;                 ///< Window horizontal position

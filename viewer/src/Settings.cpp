@@ -55,7 +55,8 @@ void RouteViewer::loadModelsSettings(CfgReader& cfg, const QString& section)
     cfg.getBool(section, "DisableCullNode", settings.disable_culling_node);
     cfg.getBool(section, "DisableNativeGLTF", settings.disable_native_gltf_loader);
     cfg.getBool(section, "DrawModelsTwoSided", settings.draw_models_two_sided);
-    cfg.getDouble(section, "CullRadius", settings.cull_radius);
+    cfg.getDouble(section, "LargeScaleTileSize0", settings.culling_tiles_size_0);
+    cfg.getDouble(section, "LargeScaleTileSize1", settings.culling_tiles_size_1);
 }
 
 //------------------------------------------------------------------------------
