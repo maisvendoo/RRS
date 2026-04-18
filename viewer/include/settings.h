@@ -28,9 +28,10 @@ struct settings_t final
     uint32_t targetPagedLODs = 64000;       ///< Set number of maximum PagedLOD with loaded high-resolution subgraphs
     uint32_t read_threads = 1;              ///< Number of background threads for loading 3d-models
     uint32_t operation_threads = 0;         ///< Number of background threads for loading textures of 3d-models
-    bool disable_culling_node = true;       ///< Disable automatic cullnode for models
+    bool disable_culling_node = false;      ///< Disable automatic cullnode for models
     bool disable_native_gltf_loader = false;///< Use assimp loader for .gltf models
     bool draw_models_two_sided = false;     ///< Draw all model's faces two sided
+    double cullingScreenHeightRatio = 0.005;///< Ratio of screen height that a bounding sphere of 3d-model needs to occupy to be visible, 0.0-1.0
     double culling_tiles_size_0 = 4000.0;   ///< Large-scale tile size for cascade culling of route objects, m
     double culling_tiles_size_1 = 32000.0;  ///< Small-scale tile size for cascade culling of route objects, m
 

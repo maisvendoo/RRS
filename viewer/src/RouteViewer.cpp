@@ -725,8 +725,9 @@ void RouteViewer::initViewer()
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
 
     // Перед компиляцией вьювера подсовываем ему наш кастомный DatabasePager
-    vsg::ref_ptr<vsg::DatabasePager> databasePager = AnimatedDatabasePager::create();
+    vsg::ref_ptr<AnimatedDatabasePager> databasePager = AnimatedDatabasePager::create();
     databasePager->targetMaxNumPagedLODWithHighResSubgraphs = settings.targetPagedLODs;
+    databasePager->cullingScreenHeightRatio = settings.cullingScreenHeightRatio;
     for (auto& task : viewer->recordAndSubmitTasks)
     {
         task->databasePager = databasePager;
@@ -831,7 +832,7 @@ bool RouteViewer::loadRoute()
         {
             auto pagedLOD = vsg::PagedLOD::create();
             pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), settings.view_distance);
-            pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
+            pagedLOD->children[0] = vsg::PagedLOD::Child{0.0, {}};
             pagedLOD->filename = model_filename_path;
             pagedLOD->options = options;
 

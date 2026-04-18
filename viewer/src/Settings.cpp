@@ -52,6 +52,9 @@ void RouteViewer::loadModelsSettings(CfgReader& cfg, const QString& section)
         settings.targetPagedLODs = targetPagedLODs;
     }
 
+    cfg.getDouble(section, "CullingScreenRatio", settings.cullingScreenHeightRatio);
+    settings.cullingScreenHeightRatio = std::clamp(settings.cullingScreenHeightRatio, 0.0, 1.0);
+
     int threads = -1;
     cfg.getInt(section, "ReadThreads", threads);
     if (threads >= 1)
