@@ -926,9 +926,8 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     GUIparams->status = QString("Загрузка светофоров...");
 
-    is_signals = traffic_lights_handler->load(sig_data, settings.route_dir_full_path, options);
-
-    root->addChild(traffic_lights_handler->getNode());
+    is_signals = traffic_lights_handler->load(sig_data, settings.route_dir_full_path,
+                                              world_culling, options);
 
     connect(tcp_client.get(), &TcpClient::updateSignal,
             traffic_lights_handler.get(), &TrafficLightsHandler::slotUpdateSignal);

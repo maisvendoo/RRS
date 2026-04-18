@@ -17,11 +17,8 @@
 #include <QObject>
 #include <QString>
 
-#include <algorithm>
 #include <array>
-#include <cmath>
 #include <cstddef>
-#include <functional>
 #include <string>
 #include <utility>
 #include <vector>

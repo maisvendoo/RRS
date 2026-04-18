@@ -9,7 +9,6 @@
 
 #include <vsg/core/Array.h>
 #include <vsg/maths/vec2.h>
-#include <vsg/threading/OperationThreads.h>
 
 #include <QDomNode>
 

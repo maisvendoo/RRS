@@ -4,23 +4,15 @@
 #include "filesystem.h"
 #include "Logger.h"
 #include "TrafficLight.h"
-
-#include <vsg/app/Viewer.h>
+#include "WorldCulling.h"
 
 #include <QBuffer>
 
+#include <vsg/io/Options.h>
 
 TrafficLightsHandler::TrafficLightsHandler(QObject* parent)
     : QObject(parent)
 {
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-vsg::ref_ptr<vsg::Group> TrafficLightsHandler::getNode()
-{
-    return traffic_light_nodes;
 }
 
 //------------------------------------------------------------------------------
@@ -42,11 +34,12 @@ void TrafficLightsHandler::step(float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_full_path, vsg::ref_ptr<vsg::Options> options)
+bool TrafficLightsHandler::load(QByteArray& data, const std::string& route_dir_full_path,
+                                vsg::ref_ptr<WorldCulling> world_culling, vsg::ref_ptr<vsg::Options> options)
 {
     deserialize(data);
 
-    FileSystem& fs =FileSystem::getInstance();
+    FileSystem& fs = FileSystem::getInstance();
     std::string path = fs.combinePath(route_dir_full_path, "topology");
     path = fs.combinePath(path, "models-config.xml");
 
@@ -79,14 +72,14 @@ bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_f
     LOG_INFO("Signals directory: %s ", models_dir_path.c_str());
     LOG_INFO("Start adding signal models");
 
-    traffic_light_nodes->children.reserve(traffic_lights_fwd.size() + traffic_lights_bwd.size());
-
     for (auto* traffic_light : traffic_lights_fwd)
     {
         traffic_light->loadSignal(models_dir_path,
                                   animations_dir,
                                   options);
-        traffic_light_nodes->addChild(traffic_light->transform);
+        auto& matrix = traffic_light->transform;
+        vsg::dvec3 position = vsg::dvec3(matrix->matrix[3][0], matrix->matrix[3][1], matrix->matrix[3][2]);
+        world_culling->add(position, matrix);
     }
 
     for (auto* traffic_light : traffic_lights_bwd)
@@ -94,7 +87,9 @@ bool TrafficLightsHandler::load(QByteArray &data, const std::string& route_dir_f
         traffic_light->loadSignal(models_dir_path,
                                   animations_dir,
                                   options);
-        traffic_light_nodes->addChild(traffic_light->transform);
+        auto& matrix = traffic_light->transform;
+        vsg::dvec3 position = vsg::dvec3(matrix->matrix[3][0], matrix->matrix[3][1], matrix->matrix[3][2]);
+        world_culling->add(position, matrix);
     }
     LOG_INFO("Finished adding signal models");
 
