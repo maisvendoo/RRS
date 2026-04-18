@@ -1,5 +1,5 @@
 #define Name          "RRS"
-#define Version       "1.9.0"
+#define Version       "1.9.1"
 #define arch          "x86_64"
 #define Publisher     "maisvendoo"
 
