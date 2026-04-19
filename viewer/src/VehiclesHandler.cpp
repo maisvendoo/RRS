@@ -13,6 +13,8 @@
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/nodes/CullNode.h>
+#include <vsg/nodes/MatrixTransform.h>
 
 #include <QObject>
 #include <QString>
@@ -191,6 +193,7 @@ void VehiclesHandler::step(double t, double dt)
 
         // Apply vehicle body matrix transform
         vehicles[i].transform->matrix = vsg::translate(vehicles[i].position) * rotate_matrix;
+        vehicles[i].cullnode->bound.center = vehicles[i].position;
 
         if (upd_dt > 0.0)
         {
@@ -388,8 +391,10 @@ bool VehiclesHandler::load(
     {
         const std::string cfg_dir = vehicles_info.vehicles[i].vehicle_config_dir.toStdString();
         const std::string cfg_file = vehicles_info.vehicles[i].vehicle_config_file.toStdString();
+        const double veh_len = vehicles_info.vehicles[i].vehicle_length;
 
-        VehicleExterior vehicle_exterior;
+        vehicles.emplace_back(VehicleExterior());
+        VehicleExterior& vehicle_exterior = vehicles.back();
         vehicle_exterior.driver_pos[vehicle_exterior.current_cabine_idx] = settings.cabine_default_pos;
         vehicle_exterior.saved_cabine_cam_fov = settings.fovy;
 
@@ -404,9 +409,9 @@ bool VehiclesHandler::load(
                      i + 1, vehicle_count, cfg_dir.c_str(), cfg_file.c_str());
         }
 
-        auto vehicle_exterior_transform = vehicle_exterior.transform;
-        vehicles.emplace_back(std::move(vehicle_exterior));
-        vehicles_node->addChild(vehicle_exterior_transform);
+        vehicle_exterior.cullnode->bound = vsg::dsphere(0.0, 0.0, 0.0, veh_len);
+        vehicle_exterior.cullnode->child = vehicle_exterior.transform;
+        vehicles_node->addChild(vehicle_exterior.cullnode);
     }
 
     return true;
