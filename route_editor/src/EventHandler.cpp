@@ -3,8 +3,8 @@
 #include "states/State.h"
 
 EventHandler::EventHandler()
-    : state(&select_route_state)
 {
+    state = &select_route_state;
 }
 
 EventHandler::~EventHandler() = default;

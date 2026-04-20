@@ -11,30 +11,17 @@
 #include <vsg/ui/KeyEvent.h>
 
 #include <cstdint>
-#include <cstring>
 #include <fstream>
 #include <iostream>
-
-static std::uint16_t get_byte_index(vsg::KeySymbol key)
-{
-    return key >> 3;
-}
-
-static std::uint8_t get_byte_value(vsg::KeySymbol key)
-{
-    return 1 << (key & 7);
-}
 
 KeyboardHandler::KeyboardHandler(EditorContext& context)
     : context_(context)
 {
-    std::memset(key_state_bits_, 0, 8192);
 }
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    key_state_bits_[get_byte_index(keyPress.keyBase)] |=
-        get_byte_value(keyPress.keyBase);
+    key_state_bits_.set(keyPress.keyBase, true);
 
     // Move this logic somewhere else
     if (get_binding_state(ACTION_UNDO_COMMAND))
@@ -81,13 +68,12 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 
 void KeyboardHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
-    key_state_bits_[get_byte_index(keyRelease.keyBase)] &=
-        ~get_byte_value(keyRelease.keyBase);
+    key_state_bits_.set(keyRelease.keyBase, false);
 }
 
 bool KeyboardHandler::get_key_state(vsg::KeySymbol key) const
 {
-    return key_state_bits_[get_byte_index(key)] & get_byte_value(key);
+    return key_state_bits_.test(key);
 }
 
 bool KeyboardHandler::get_any_shift_state() const
