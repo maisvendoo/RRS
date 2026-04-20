@@ -1,10 +1,12 @@
 #include "Action.h"
 
-#include <cassert>
+#include <array>
 
-static const char* const * get_action_names()
+using ActionNames = std::array<const char*, TOTAL_ACTIONS>;
+
+static ActionNames get_action_names()
 {
-    static const char* action_names[TOTAL_ACTIONS];
+    ActionNames action_names;
 
     action_names[ACTION_MOVE_CAMERA_FORWARD] = "Camera: move forward";
     action_names[ACTION_MOVE_CAMERA_BACKWARD] = "Camera: move backward";
@@ -27,9 +29,7 @@ static const char* const * get_action_names()
 
 const char* to_c_string(Action action)
 {
-    assert(action < TOTAL_ACTIONS);
+    static const ActionNames action_names = get_action_names();
 
-    static const char* const * const action_names = get_action_names();
-
-    return action_names[action];
+    return action_names.at(action);
 }
