@@ -563,7 +563,6 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
     model_file.close();
 
     model_data.vertices.reserve(face_count * 3);
-    model_data.indices.reserve(face_count * 3);
 
     for (std::uint32_t i = 0; i < face_count; ++i)
     {
@@ -594,16 +593,12 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
         const TexIndex& tex_index2 = tex_indices[i * 3 + 1];
         const TexIndex& tex_index3 = tex_indices[i * 3 + 2];
 
-        model_data.indices.push_back(model_data.vertices.size());
         model_data.vertices.emplace_back(Vertex{p1, n, tex_coords[tex_index1]});
-        model_data.indices.push_back(model_data.vertices.size());
         model_data.vertices.emplace_back(Vertex{p2, n, tex_coords[tex_index2]});
-        model_data.indices.push_back(model_data.vertices.size());
         model_data.vertices.emplace_back(Vertex{p3, n, tex_coords[tex_index3]});
     }
 
     model_data.vertices.shrink_to_fit();
-    model_data.indices.shrink_to_fit();
 
     return (model_data.vertices.size() > 0);
 }
@@ -657,13 +652,6 @@ bool Application::generate_gltf_model(Geometry& model_data,
     }
 
     auto tex_coords_byte_length = bin_file.tellp() - normals_byte_length - positions_byte_length;
-
-    for (auto index : model_data.indices)
-    {
-        bin_file.write(reinterpret_cast<const char*>(&index), sizeof(index));
-    }
-
-    auto indices_byte_length = bin_file.tellp() - tex_coords_byte_length - normals_byte_length - positions_byte_length;
 
     bin_file.close();
 
@@ -722,7 +710,7 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "    \"buffers\": [\n"
         "        {\n"
         "            \"uri\": \"" << out_relative_bin_path << "\",\n"
-        "            \"byteLength\": " << positions_byte_length + normals_byte_length  + tex_coords_byte_length + indices_byte_length << "\n"
+        "            \"byteLength\": " << positions_byte_length + normals_byte_length  + tex_coords_byte_length << "\n"
         "        }\n"
         "    ],\n"
         "    \"bufferViews\": [\n"
@@ -743,12 +731,6 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "            \"byteOffset\": " << positions_byte_length + normals_byte_length << ",\n"
         "            \"byteLength\": " << tex_coords_byte_length << ",\n"
         "            \"target\": 34962\n"
-        "        },\n"
-        "        {\n"
-        "            \"buffer\": 0,\n"
-        "            \"byteOffset\": " << positions_byte_length + normals_byte_length + tex_coords_byte_length << ",\n"
-        "            \"byteLength\": " << indices_byte_length << ",\n"
-        "            \"target\": 34963\n"
         "        }\n"
         "    ],\n"
         "    \"accessors\": [\n"
@@ -797,18 +779,6 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "                " << min_tex.x << ",\n"
         "                " << min_tex.y << "\n"
         "            ]\n"
-        "        },\n"
-        "        {\n"
-        "            \"bufferView\": 3,\n"
-        "            \"componentType\": 5125,\n"
-        "            \"count\": " << model_data.indices.size() << ",\n"
-        "            \"type\": \"SCALAR\",\n"
-        "            \"max\": [\n"
-        "                " << model_data.vertices.size() - 1 << "\n"
-        "            ],\n"
-        "            \"min\": [\n"
-        "                0\n"
-        "            ]\n"
         "        }\n"
         "    ],\n"
         "    \"images\": [\n"
@@ -849,7 +819,6 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "                        \"NORMAL\": 1,\n"
         "                        \"TEXCOORD_0\": 2\n"
         "                    },\n"
-        "                    \"indices\": 3,\n"
         "                    \"material\": 0,\n"
         "                    \"mode\": 4\n"
         "                }\n"

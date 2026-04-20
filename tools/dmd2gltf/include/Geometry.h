@@ -1,7 +1,6 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include <cstdint>
 #include <vector>
 #include <string>
 
@@ -31,7 +30,6 @@ struct Geometry
     bool is_reversed_texture_coord = false;
     bool is_blend_material = false;
     std::vector<Vertex> vertices;
-    std::vector<std::uint32_t> indices;
 };
 
 #endif // GEOMETRY_H
