@@ -52,10 +52,27 @@ void RouteViewer::loadModelsSettings(CfgReader& cfg, const QString& section)
         settings.targetPagedLODs = targetPagedLODs;
     }
 
+    cfg.getDouble(section, "CullingScreenRatio", settings.cullingScreenHeightRatio);
+    settings.cullingScreenHeightRatio = std::clamp(settings.cullingScreenHeightRatio, 0.0, 1.0);
+
+    int threads = -1;
+    cfg.getInt(section, "ReadThreads", threads);
+    if (threads >= 1)
+    {
+        settings.read_threads = threads;
+    }
+    threads = -1;
+    cfg.getInt(section, "OperationsThreads", threads);
+    if (threads >= 0)
+    {
+        settings.operation_threads = threads;
+    }
+
     cfg.getBool(section, "DisableCullNode", settings.disable_culling_node);
     cfg.getBool(section, "DisableNativeGLTF", settings.disable_native_gltf_loader);
     cfg.getBool(section, "DrawModelsTwoSided", settings.draw_models_two_sided);
-    cfg.getDouble(section, "CullRadius", settings.cull_radius);
+    cfg.getDouble(section, "LargeScaleTileSize", settings.culling_tiles_size_0);
+    cfg.getDouble(section, "SmallScaleTileSize", settings.culling_tiles_size_1);
 }
 
 //------------------------------------------------------------------------------

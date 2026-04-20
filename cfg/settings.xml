@@ -22,14 +22,22 @@
         <NotifyLevel>INFO</NotifyLevel>
         <!-- Ограничение на количество загруженных в память моделей -->
         <TargetPagedLODs>64000</TargetPagedLODs>
-        <!-- 1 - отключение дополнительной проверки моделей на видимость из камеры -->
-        <DisableCullNode>1</DisableCullNode>
+        <!-- Количество фоновых потоков для загрузки 3d-моделей (1 .. N) -->
+        <ReadThreads>2</ReadThreads>
+        <!-- Количество вспомогательных потоков для загрузки текстур 3d-моделей (0 .. N) -->
+        <OperationsThreads>2</OperationsThreads>
+        <!-- 1 - отключение автоматического создания ограничивающей сферы для загружаемых 3d-моделей -->
+        <DisableCullNode>0</DisableCullNode>
         <!-- 1 - отключение нативного загрузчика моделей формата .gltf в VulkanSceneGraph -->
         <DisableNativeGLTF>0</DisableNativeGLTF>
         <!-- 1 - отрисовка всех полигонов моделей с обеих сторон -->
         <DrawModelsTwoSided>0</DrawModelsTwoSided>
-        <!-- Радиус сферы отсечения объектов маршрута, м -->
-        <CullRadius>150.0</CullRadius>
+        <!-- Минимальная доля от высоты окна, от которой начинают отрисовываться 3d-модели (0.0 - 1.0) -->
+        <CullingScreenRatio>0.005</CullingScreenRatio>
+        <!-- Размер крупномасштабной сетки для отсечения видимости объектов маршрута, м -->
+        <LargeScaleTileSize>4000.0</LargeScaleTileSize>
+        <!-- Размер мелкомасштабной сетки для отсечения видимости объектов маршрута, м -->
+        <SmallScaleTileSize>32000.0</SmallScaleTileSize>
         <!-- Заголовок окна -->
         <Name>viewer</Name>
         <!-- Оформление окна: 1 - отображение рамки и заголовка; 0 - режим окна без рамки -->

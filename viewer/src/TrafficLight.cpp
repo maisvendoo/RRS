@@ -145,8 +145,8 @@ bool TrafficLight::loadSignal(std::string &models_dir_path,
     // Load model
     animated_pagedLOD->animations_dir = animations_dir;
     animated_pagedLOD->filename = model_filename_path;
-    animated_pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-    animated_pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
+    animated_pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 50.0);
+    animated_pagedLOD->children[0] = vsg::PagedLOD::Child{0.0, {}};
     animated_pagedLOD->options = options;
     transform->addChild(animated_pagedLOD);
 

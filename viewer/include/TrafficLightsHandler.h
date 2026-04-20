@@ -2,7 +2,8 @@
 #ifndef TRAFFIC_LIGHTS_HANDLER_H
 #define TRAFFIC_LIGHTS_HANDLER_H
 
-#include <vsg/nodes/Group.h>
+#include <vsg/core/Object.h>
+#include <vsg/core/ref_ptr.h>
 
 #include <QMap>
 #include <QObject>
@@ -10,8 +11,14 @@
 
 #include <string>
 
+class WorldCulling;
 class TrafficLight;
 class QByteArray;
+
+namespace vsg
+{
+    class Options;
+}
 
 //------------------------------------------------------------------------------
 //
@@ -23,22 +30,16 @@ class TrafficLightsHandler final : public QObject
 public:
     explicit TrafficLightsHandler(QObject* parent = nullptr);
 
-    /// Get scene group
-    vsg::ref_ptr<vsg::Group> getNode();
-
     void step(float t, float dt);
 
-    bool load(QByteArray &data,
-              const std::string& route_dir_full_path,
-              vsg::ref_ptr<vsg::Options> options);
+    bool load(QByteArray& data, const std::string& route_dir_full_path,
+              vsg::ref_ptr<WorldCulling> world_culling, vsg::ref_ptr<vsg::Options> options);
 
 private:
     void deserialize(QByteArray& data);
     void deserialize_signals(const char* signals_type, QDataStream& data_stream);
 
     void printSignalInfo(const TrafficLight* tl) const;
-
-    vsg::ref_ptr<vsg::Group> traffic_light_nodes = vsg::Group::create();
 
     QMap<QString, TrafficLight*> traffic_lights_fwd;
     QMap<QString, TrafficLight*> traffic_lights_bwd;
