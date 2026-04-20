@@ -563,45 +563,17 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
     model_file.close();
 
     model_data.vertices.reserve(face_count * 3);
-    model_data.indices.resize(face_count * 3);
+    model_data.indices.reserve(face_count * 3);
 
-    std::map<std::pair<PosIndex, TexIndex>, VertexIndex> unique_indices;
-
-    for (std::uint32_t i = 0; i < face_count * 3; ++i)
+    for (std::uint32_t i = 0; i < face_count; ++i)
     {
-        PosIndex pos_index = pos_indices[i];
-        TexIndex tex_index = tex_indices[i];
+        const PosIndex& pos_index1 = pos_indices[i * 3];
+        const PosIndex& pos_index2 = pos_indices[i * 3 + 1];
+        const PosIndex& pos_index3 = pos_indices[i * 3 + 2];
 
-        auto found_it = unique_indices.find({pos_index, tex_index});
-        if (found_it == unique_indices.end())
-        {
-            model_data.vertices.emplace_back(Vertex{positions[pos_index], Vec3{0.0f, 0.0f, 0.0f}, tex_coords[tex_index]});
-
-            VertexIndex new_vertex_index = model_data.vertices.size() - 1;
-            model_data.indices[i] = new_vertex_index;
-            unique_indices.insert({{pos_index, tex_index}, new_vertex_index});
-        }
-        else
-        {
-            model_data.indices[i] = found_it->second;
-        }
-    }
-
-    model_data.vertices.shrink_to_fit();
-
-    for (std::uint32_t i = 0; i < face_count * 3; i += 3)
-    {
-        const std::uint32_t i1 = model_data.indices[i];
-        const std::uint32_t i2 = model_data.indices[i + 1];
-        const std::uint32_t i3 = model_data.indices[i + 2];
-
-        auto& v1 = model_data.vertices[i1];
-        auto& v2 = model_data.vertices[i2];
-        auto& v3 = model_data.vertices[i3];
-
-        const auto& p1 = v1.pos;
-        const auto& p2 = v2.pos;
-        const auto& p3 = v3.pos;
+        const Vec3& p1 = positions[pos_index1];
+        const Vec3& p2 = positions[pos_index2];
+        const Vec3& p3 = positions[pos_index3];
 
         const Vec3 v12 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z};
         const Vec3 v13 = {p3.x - p1.x, p3.y - p1.y, p3.z - p1.z};
@@ -613,33 +585,25 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
         float length = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
         if (length < 1e-5)
         {
-            LOG_WARN("Wrong normals: %s, %e", in_dmd_model_path.c_str(), length);
+            LOG_WARN("Wrong normal (%e) for face %u in file: %s", length, i, in_dmd_model_path.c_str());
+            continue;
         }
         n = {n.x / length, n.y / length, n.z / length};
 
-        v1.normal.x = n.x;
-        v1.normal.y = n.y;
-        v1.normal.z = n.z;
+        const TexIndex& tex_index1 = tex_indices[i * 3];
+        const TexIndex& tex_index2 = tex_indices[i * 3 + 1];
+        const TexIndex& tex_index3 = tex_indices[i * 3 + 2];
 
-        v2.normal.x = n.x;
-        v2.normal.y = n.y;
-        v2.normal.z = n.z;
-
-        v3.normal.x = n.x;
-        v3.normal.y = n.y;
-        v3.normal.z = n.z;
+        model_data.indices.push_back(model_data.vertices.size());
+        model_data.vertices.emplace_back(Vertex{p1, n, tex_coords[tex_index1]});
+        model_data.indices.push_back(model_data.vertices.size());
+        model_data.vertices.emplace_back(Vertex{p2, n, tex_coords[tex_index2]});
+        model_data.indices.push_back(model_data.vertices.size());
+        model_data.vertices.emplace_back(Vertex{p3, n, tex_coords[tex_index3]});
     }
 
-    /*for (auto& vertex : model_data.vertices)
-    {
-        auto& n = vertex.normal;
-        float length = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
-        if (length < 1e-5)
-        {
-            LOG_WARN("Wrong result normals: %s, %e", in_dmd_model_path.c_str(), length);
-        }
-        n = {n.x / length, n.y / length, n.z / length};
-    }*/
+    model_data.vertices.shrink_to_fit();
+    model_data.indices.shrink_to_fit();
 
     return (model_data.vertices.size() > 0);
 }
@@ -752,6 +716,7 @@ bool Application::generate_gltf_model(Geometry& model_data,
 
     gltf_file << "{\n"
         "    \"asset\": {\n"
+        "        \"generator\": \"dmd2gltf\",\n"
         "        \"version\": \"2.0\"\n"
         "    },\n"
         "    \"buffers\": [\n"
