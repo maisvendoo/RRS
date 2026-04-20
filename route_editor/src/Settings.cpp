@@ -146,7 +146,7 @@ void settings_t::read(const std::string& cfg_path)
         {ACTION_MOVE_CAMERA_BACKWARD, "MoveCameraBackward"},
         {ACTION_MOVE_CAMERA_LEFT, "MoveCameraLeft"},
         {ACTION_MOVE_CAMERA_RIGHT, "MoveCameraRight"},
-        {ACTION_MOVE_OBJECTS, "MoveObjects"},
+        {ACTION_TRANSLATE_OBJECTS, "MoveObjects"},
         {ACTION_ROTATE_OBJECTS, "RotateObjects"},
         {ACTION_SCALE_OBJECTS, "ScaleObjects"},
         {ACTION_COPY_OBJECTS, "CopyObjects"},

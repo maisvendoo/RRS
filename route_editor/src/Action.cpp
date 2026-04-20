@@ -12,7 +12,7 @@ static ActionNames get_action_names()
     action_names[ACTION_MOVE_CAMERA_BACKWARD] = "Camera: move backward";
     action_names[ACTION_MOVE_CAMERA_LEFT] = "Camera: move left";
     action_names[ACTION_MOVE_CAMERA_RIGHT] = "Camera: move right";
-    action_names[ACTION_MOVE_OBJECTS] = "Objects: Grab";
+    action_names[ACTION_TRANSLATE_OBJECTS] = "Objects: Grab";
     action_names[ACTION_ROTATE_OBJECTS] = "Objects: Rotate";
     action_names[ACTION_SCALE_OBJECTS] = "Objects: Scale";
     action_names[ACTION_COPY_OBJECTS] = "Objects: Copy";
