@@ -19,6 +19,8 @@ class AnimatedDatabasePager : public vsg::Inherit<vsg::DatabasePager, AnimatedDa
 public:
     AnimatedDatabasePager() = default;
 
+    double cullingScreenHeightRatio = 0.005;
+
     void start(uint32_t numReadThreads = 4) override;
 
     /// Thread-safe read that deduplicates concurrent loads of the same file.

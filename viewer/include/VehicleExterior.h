@@ -3,6 +3,7 @@
 #define VEHICLE_EXTERIOR_H
 
 #include <vsg/core/Object.h>
+#include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/MatrixTransform.h>
 
 class SoundManager;
@@ -17,12 +18,12 @@ class VehicleExterior final
 public:
     VehicleExterior() = default;
 
+    vsg::ref_ptr<vsg::CullNode> cullnode = vsg::CullNode::create();
     vsg::ref_ptr<vsg::MatrixTransform> transform = vsg::MatrixTransform::create();
     vsg::dvec3  position = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dvec3  orth = vsg::dvec3(0.0, 1.0, 0.0);
     vsg::dvec3  up = vsg::dvec3(0.0, 0.0, 1.0);
     vsg::dvec3  right = vsg::dvec3(1.0, 0.0, 0.0);
-    vsg::dvec3  attitude = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dvec3  velocity = vsg::dvec3(0.0, 0.0, 0.0);
     std::vector<vsg::dvec3>  driver_pos = {vsg::dvec3(0.0, 0.0, 0.0)};
     std::vector<double>  driver_dir = {0};

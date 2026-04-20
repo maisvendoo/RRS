@@ -18,6 +18,7 @@ class  TcpClient;
 class  TrafficLightsHandler;
 class  UpdateViewerHandler;
 class  VehiclesHandler;
+class  WorldCulling;
 
 namespace vsg
 {
@@ -140,6 +141,7 @@ private:
     vsg::ref_ptr<vsg::ShadowSettings>    shadowSettings;
     vsg::ref_ptr<vsg::RegionOfInterest>  shadow_region;
     vsg::ref_ptr<Sun>                    sun;
+    vsg::ref_ptr<WorldCulling>           world_culling;
 };
 
 #endif // ROUTE_VIEWER_H

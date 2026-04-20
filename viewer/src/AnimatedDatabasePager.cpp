@@ -9,8 +9,10 @@
 #include <vsg/io/read.h>
 #include <vsg/nodes/Transform.h>
 #include <vsg/nodes/CullNode.h>
+#include <vsg/nodes/CullGroup.h>
 #include <vsg/threading/atomics.h>
 #include <vsg/ui/ApplicationEvent.h>
+#include <vsg/utils/ComputeBounds.h>
 #include <vsg/utils/SharedObjects.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
@@ -39,7 +41,8 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
 
                 if (frameDelta > 1 || !vsg::compare_exchange(plod->requestStatus, vsg::PagedLOD::ReadRequest, vsg::PagedLOD::Reading))
                 {
-                    LOG_WARN("AnimatedDatabasePager: Expired (%u/%u) read request for model from file: %s", plod->frameHighResLastUsed.load(), animatedDatabasePager.frameCount.load(), plod->filename.string().c_str());
+                    LOG_WARN("AnimatedDatabasePager: Expired (%u/%u) read request for model from file: %s",
+                             plod->frameHighResLastUsed.load(), animatedDatabasePager.frameCount.load(), plod->filename.string().c_str());
                     animatedDatabasePager.requestDiscarded(plod);
                     continue;
                 }
@@ -66,10 +69,65 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                         continue;
                     }
 
-                    if (auto cullnode = node.cast<vsg::CullNode>())
+                    // Считаем, что инициализируем все PagedLOD с нулевым угловым размером отсечения
+                    if (plod->children[0].minimumScreenHeightRatio <= 0.0)
                     {
-                        node = cullnode->child;
+                        // При первой загрузке настраиваем ограничивающую сферу для отсечения
+                        if (auto cullnode = node.cast<vsg::CullNode>())
+                        {
+                            // Пробуем использовать готовую сферу из автосоздаваемого CullNode
+                            plod->bound = cullnode->bound;
+                            node = cullnode->child;
+                        }
+                        else if (auto cullgroup = node.cast<vsg::CullGroup>())
+                        {
+                            // Пробуем использовать готовую сферу из автосоздаваемого CullGroup
+                            plod->bound = cullgroup->bound;
+                            node = vsg::Group::create(cullgroup->children.begin(), cullgroup->children.end());
+                        }
+                        else if (auto bounds = vsg::visit<vsg::ComputeBounds>(node).bounds)
+                        {
+                            // Рассчитываем ограничивающую сферу вручную утилитой ComputeBounds
+                            const vsg::dvec3 center = (bounds.max + bounds.min) * 0.5;
+                            const double radius = vsg::length(bounds.max - bounds.min) * 0.5;
+                            plod->bound = vsg::dsphere(center, radius);
+                        }
+                        else
+                        {
+                            plod->bound = vsg::dsphere(0.0, 0.0, 0.0, 1.0);
+                        }
+
+                        // Вручную задаём ненулевой радиус объектам
+                        // с нулевой ограничивающей сферой (например,
+                        // модели с источником света, но без меша)
+                        if (plod->bound.radius <= 0.0)
+                        {
+                            plod->bound.radius = 0.5;
+                        }
+                        else
+                        {
+                            plod->bound.radius += 0.5;
+                        }
+
+                        // Настраиваем угловой размер отсечения
+                        plod->children[0].minimumScreenHeightRatio = animatedDatabasePager.cullingScreenHeightRatio;
                     }
+                    else
+                    {
+                        // Если угловой размер отсечения не нулевой,
+                        // мы уже загружали модель и настраивали ограничивающую сферу,
+                        // просто убираем лишние CullNode
+                        if (auto cullnode = node.cast<vsg::CullNode>())
+                        {
+                            node = cullnode->child;
+                        }
+                        else if (auto cullgroup = node.cast<vsg::CullGroup>())
+                        {
+                            node = vsg::Group::create(cullgroup->children.begin(), cullgroup->children.end());
+                        }
+                    }
+
+                    // Создаём, конфигурируем анимации и подключаем их к сигналам симулятора
                     if (auto aplod = plod.cast<AnimatedPagedLOD>())
                     {
                         node = animatedDatabasePager.loadAnimations(aplod, node);

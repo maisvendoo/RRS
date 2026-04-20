@@ -9,7 +9,6 @@
 
 #include <vsg/core/Array.h>
 #include <vsg/maths/vec2.h>
-#include <vsg/threading/OperationThreads.h>
 
 #include <QDomNode>
 
@@ -197,7 +196,7 @@ bool VehicleExterior::load_models(const std::string &cfg_path, CfgReader &cfg, v
         model_pagedLOD->animations_dir = animations_dir;
         model_pagedLOD->filename = model_filename_path;
         model_pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-        model_pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
+        model_pagedLOD->children[0] = vsg::PagedLOD::Child{0.0, {}};
         model_pagedLOD->options = options;
         animated_nodes.push_back(model_pagedLOD);
 
@@ -288,7 +287,7 @@ bool VehicleExterior::load_body_model(const std::string &cfg_path, CfgReader &cf
     vehicle_pagedLOD->animations_dir = animations_dir;
     vehicle_pagedLOD->filename = model_filename_path;
     vehicle_pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-    vehicle_pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
+    vehicle_pagedLOD->children[0] = vsg::PagedLOD::Child{0.0, {}};
     vehicle_pagedLOD->options = options;
     vehicle_node->addChild(vehicle_pagedLOD);
     animated_nodes.push_back(vehicle_pagedLOD);
@@ -340,7 +339,7 @@ bool VehicleExterior::load_cabine_model(const std::string &cfg_path, CfgReader &
     cabine_pagedLOD->animations_dir = animations_dir;
     cabine_pagedLOD->filename = model_filename_path;
     cabine_pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), 200.0);
-    cabine_pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
+    cabine_pagedLOD->children[0] = vsg::PagedLOD::Child{0.0, {}};
     cabine_pagedLOD->options = options;
     cabine_node->addChild(cabine_pagedLOD);
     animated_nodes.push_back(cabine_pagedLOD);

@@ -16,6 +16,7 @@
 #include "UpdateStatisticsHandler.h"
 #include "UpdateViewerHandler.h"
 #include "VehiclesHandler.h"
+#include "WorldCulling.h"
 #include "filesystem.h"
 #include "sound-manager.h"
 #include "tcp-client.h"
@@ -448,6 +449,9 @@ void RouteViewer::initScenegraph()
 {
     root = vsg::Group::create();
 
+    world_culling = WorldCulling::create(settings.culling_tiles_size_0, settings.culling_tiles_size_1);
+    root->addChild(world_culling->world_root);
+
     // Модель неба - создаём в первую очередь,
     // до всего остального в сцене и до компиляции вьювера
     FileSystem& fs = FileSystem::getInstance();
@@ -721,8 +725,9 @@ void RouteViewer::initViewer()
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
 
     // Перед компиляцией вьювера подсовываем ему наш кастомный DatabasePager
-    vsg::ref_ptr<vsg::DatabasePager> databasePager = AnimatedDatabasePager::create();
+    vsg::ref_ptr<AnimatedDatabasePager> databasePager = AnimatedDatabasePager::create();
     databasePager->targetMaxNumPagedLODWithHighResSubgraphs = settings.targetPagedLODs;
+    databasePager->cullingScreenHeightRatio = settings.cullingScreenHeightRatio;
     for (auto& task : viewer->recordAndSubmitTasks)
     {
         task->databasePager = databasePager;
@@ -730,7 +735,10 @@ void RouteViewer::initViewer()
 
     // Перед компиляцией вьювера применяем некоторые настройки
     auto resourceHints = vsg::ResourceHints::create();
-    resourceHints->numDatabasePagerReadThreads = 4;
+    // Указываем количество потоков чтения 3d-моделей
+    uint32_t numThreads = std::max(1u, std::thread::hardware_concurrency() / 2);
+    uint32_t numReadThreads = std::min(settings.read_threads, numThreads);
+    resourceHints->numDatabasePagerReadThreads = numReadThreads;
     // Указываем разрешение карты теней
     resourceHints->shadowMapSize = {static_cast<uint32_t>(settings.shadow_resolution),
                                     static_cast<uint32_t>(settings.shadow_resolution)};
@@ -743,8 +751,12 @@ void RouteViewer::initViewer()
         LOG_WARN("Viewer compile returned empty result — some resources may not have been compiled");
     }
 
-    unsigned int numOpThreads = std::max(2u, std::thread::hardware_concurrency() / 2);
-    options->operationThreads = vsg::OperationThreads::create(numOpThreads, viewer->status);
+    // Создаём вспомогательные потоки для чтения текстур 3d-моделей
+    uint32_t numOpThreads = std::min(settings.operation_threads, numThreads);
+    if (numOpThreads)
+    {
+        options->operationThreads = vsg::OperationThreads::create(numOpThreads, viewer->status);
+    }
 
     GUIparams->viewer = viewer;
     GUIparams->vehicles_handler = vehicles_handler.get();
@@ -802,8 +814,6 @@ bool RouteViewer::loadRoute()
     loader.parse_route_map(route);
 
     // Создание PagedLOD для моделей в маршруте
-    vsg::ref_ptr<vsg::Group> route_root = vsg::Group::create();
-
     for (auto& [label, transforms] : route.route_map)
     {
         auto found_it = route.object_ref.find(label);
@@ -822,7 +832,7 @@ bool RouteViewer::loadRoute()
         {
             auto pagedLOD = vsg::PagedLOD::create();
             pagedLOD->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0), settings.view_distance);
-            pagedLOD->children[0] = vsg::PagedLOD::Child{0.1, {}};
+            pagedLOD->children[0] = vsg::PagedLOD::Child{0.0, {}};
             pagedLOD->filename = model_filename_path;
             pagedLOD->options = options;
 
@@ -843,19 +853,14 @@ bool RouteViewer::loadRoute()
                 matrix->matrix = translate * rotate_z * rotate_y * rotate_x;
                 matrix->addChild(pagedLOD);
 
-                // Frustum-cull before the matrix push
-                vsg::dsphere cullBound(vsg::dvec3(matrix->matrix[3][0], matrix->matrix[3][1], matrix->matrix[3][2]),
-                                      settings.cull_radius);
-                auto cullNode = vsg::CullNode::create(cullBound, matrix);
-                route_root->addChild(cullNode);
+                vsg::dvec3 position = vsg::dvec3(matrix->matrix[3][0], matrix->matrix[3][1], matrix->matrix[3][2]);
+                world_culling->add(position, matrix);
             }
         }
     }
 
     route.object_ref.clear();
     route.route_map.clear();
-
-    root->addChild(route_root);
 
     return true;
 }
@@ -922,9 +927,8 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     GUIparams->status = QString("Загрузка светофоров...");
 
-    is_signals = traffic_lights_handler->load(sig_data, settings.route_dir_full_path, options);
-
-    root->addChild(traffic_lights_handler->getNode());
+    is_signals = traffic_lights_handler->load(sig_data, settings.route_dir_full_path,
+                                              world_culling, options);
 
     connect(tcp_client.get(), &TcpClient::updateSignal,
             traffic_lights_handler.get(), &TrafficLightsHandler::slotUpdateSignal);
