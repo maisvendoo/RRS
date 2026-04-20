@@ -3,13 +3,14 @@
 #include "states/State.h"
 
 EventHandler::EventHandler()
+    : state_(nullptr)
 {
-    state = &select_route_state;
+    state_ = &select_route_state_;
 }
 
 EventHandler::~EventHandler() = default;
 
 void EventHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    state->handle_key_press(keyPress);
+    state_->handle_key_press(keyPress);
 }

@@ -22,13 +22,14 @@ class EventHandler : public vsg::Inherit<vsg::Visitor, EventHandler>
 public:
     EventHandler();
     virtual ~EventHandler() override;
+
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
 
 private:
-    State* state = nullptr;
-    SelectRouteState select_route_state;
-    InitialState initial_state;
-    CameraNavigationState camera_navigation_state;
+    State* state_;
+    SelectRouteState select_route_state_;
+    InitialState initial_state_;
+    CameraNavigationState camera_navigation_state_;
 };
 
 #endif // EVENT_HANDLER_H
