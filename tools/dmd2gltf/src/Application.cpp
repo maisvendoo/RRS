@@ -339,8 +339,9 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             // а поднят в среднем на 0.3114, смещаем меш у моделей рельс (с "track" в имени объекта)
             float change_vertices_Z = -0.3114f;
             if (   (label.find("track") == label.npos)
-                || (label.find("Track") == label.npos))
+                && (label.find("Track") == label.npos))
             {
+                // У всех прочих моделей уже опущена привязка в route1.map
                 change_vertices_Z = 0.0f;
             }
 
@@ -541,7 +542,6 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
     if (!model_file)
     {
         LOG_WARN("Warn: failed to read texture coordinates from file: %s", in_dmd_model_path.c_str());
-        std::cerr << "Failed to read texture coordinates from " << in_dmd_model_path << std::endl;
         return false;
     }
 
@@ -641,7 +641,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
         n = {n.x / length, n.y / length, n.z / length};
     }*/
 
-    return true;
+    return (model_data.vertices.size() > 0);
 }
 
 //------------------------------------------------------------------------------
@@ -657,7 +657,9 @@ bool Application::generate_gltf_model(Geometry& model_data,
     for (auto& vertex : model_data.vertices)
     {
         std::swap(vertex.pos.y, vertex.pos.z);
-        vertex.pos.z = -vertex.pos.z + change_vertices_Z;
+        vertex.pos.y += change_vertices_Z;
+        vertex.pos.z = -vertex.pos.z;
+
         std::swap(vertex.normal.y, vertex.normal.z);
         vertex.normal.z = -vertex.normal.z;
     }
@@ -870,7 +872,7 @@ bool Application::generate_gltf_model(Geometry& model_data,
         "                    \"index\": 0,\n"
         "                    \"texCoord\": 0\n"
         "                }\n"
-        "            }" << blend <<"\n"
+        "            }" << blend << "\n"
         "        }\n"
         "    ],\n"
         "    \"meshes\": [\n"
