@@ -1,5 +1,5 @@
-#ifndef SELECT_ROUTE_H
-#define SELECT_ROUTE_H
+#ifndef INITIAL_STATE_H
+#define INITIAL_STATE_H
 
 #include "states/State.h"
 
@@ -10,11 +10,11 @@ class KeyPressEvent;
 
 }
 
-class SelectRoute : public State
+class InitialState : public State
 {
 public:
-    virtual ~SelectRoute() override;
+    virtual ~InitialState() override;
     virtual void handle_key_press(vsg::KeyPressEvent& keyPress) override;
 };
 
-#endif // SELECT_ROUTE_H
+#endif // INITIAL_STATE_H

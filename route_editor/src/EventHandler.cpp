@@ -1,18 +1,15 @@
 #include "EventHandler.h"
 
-#include "states/SelectRoute.h"
 #include "states/State.h"
 
-#include <memory>
-
 EventHandler::EventHandler()
-    : select_route(std::make_unique<SelectRoute>())
-    // , state(&select_route)
+    : state(&select_route_state)
 {
-
 }
+
+EventHandler::~EventHandler() = default;
 
 void EventHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    (*state)->handle_key_press(keyPress);
+    state->handle_key_press(keyPress);
 }
