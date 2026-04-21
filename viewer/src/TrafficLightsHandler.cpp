@@ -6,7 +6,7 @@
 #include "TrafficLight.h"
 #include "WorldCulling.h"
 
-#include <QBuffer>
+#include <QDataStream>
 
 #include <vsg/io/Options.h>
 
@@ -105,9 +105,7 @@ void TrafficLightsHandler::deserialize(QByteArray& data)
     traffic_lights_fwd.clear();
     traffic_lights_bwd.clear();
 
-    QBuffer buffer(&data);
-    buffer.open(QIODevice::ReadOnly);
-    QDataStream stream(&buffer);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     deserialize_signals("Line", stream);
     deserialize_signals("Enter", stream);
@@ -176,9 +174,7 @@ void TrafficLightsHandler::printSignalInfo(const TrafficLight* tl) const
 //------------------------------------------------------------------------------
 void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
 {
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     QString connector_name = "";
     int8_t signal_dir = 0;
