@@ -572,6 +572,8 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
     {
         return static_cast<Tile_index_t>(std::round(coord * 1000.0f));
     };
+    uint32_t wrong_normals_count = 0;
+    uint32_t repeat_faces_count = 0;
     for (std::uint32_t i = 0; i < face_count; ++i)
     {
         const PosIndex& pos_index1 = pos_indices[i * 3];
@@ -593,6 +595,7 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
         if (length < 1e-5)
         {
             //LOG_WARN("Wrong normal (%e) for face %u in file: %s", length, i, in_dmd_model_path.c_str());
+            ++wrong_normals_count;
             continue;
         }
         n = {n.x / length, n.y / length, n.z / length};
@@ -639,8 +642,12 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
         else
         {
             //LOG_WARN("Face %u is already exists in file: %s", i, in_dmd_model_path.c_str());
+            ++repeat_faces_count;
+            continue;
         }
     }
+    LOG_WARN("Excluded %u faces with wrong normal in file: %s", wrong_normals_count, in_dmd_model_path.c_str());
+    LOG_WARN("Excluded %u repeat faces in file: %s", repeat_faces_count, in_dmd_model_path.c_str());
 
     model_data.vertices.shrink_to_fit();
 
