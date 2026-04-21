@@ -7,6 +7,7 @@
 #include "RouteObject.h"
 
 #include <vsg/core/Mask.h>
+#include <vsg/nodes/Switch.h>
 
 #include <algorithm>
 #include <cstdio>
@@ -44,6 +45,7 @@ void PasteObjects::execute()
         context_.static_objects_mutex.lock();
         context_.static_objects.emplace_back(pasted_object);
         context_.static_objects_mutex.unlock();
+
         ++context_.static_objects_count;
         ++context_.total_static_objects_count;
 
@@ -63,20 +65,19 @@ void PasteObjects::undo()
         RouteObjects& objects = context_.static_objects;
         objects.erase(std::find(objects.begin(), objects.end(), pasted_object));
         context_.static_objects_mutex.unlock();
+
         --context_.static_objects_count;
         --context_.total_static_objects_count;
 
         const auto route = context_.route;
 
-        for (auto it = route->children.begin(); it != route->children.end();
-            ++it)
-        {
-            if (it->node == pasted_object)
-            {
-                route->children.erase(it);
-                break;
-            }
-        }
+        route->children.erase(
+            std::find_if(route->children.begin(), route->children.end(),
+                [pasted_object](const vsg::Switch::Child& child) {
+                    return child.node == pasted_object;
+                }
+            )
+        );
     }
 
     for (const auto& object : objects_to_deselect_)

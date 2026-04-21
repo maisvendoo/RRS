@@ -26,6 +26,7 @@ void DeleteObjects::execute()
         context_.static_objects_mutex.lock();
         context_.static_objects.erase(std::find(context_.static_objects.begin(),
             context_.static_objects.end(), object));
+
         context_.static_objects_mutex.unlock();
         --context_.static_objects_count;
         --context_.total_static_objects_count;
@@ -62,6 +63,7 @@ void DeleteObjects::undo()
         context_.static_objects_mutex.lock();
         context_.static_objects.emplace_back(object);
         context_.static_objects_mutex.unlock();
+
         ++context_.static_objects_count;
         ++context_.total_static_objects_count;
 
