@@ -265,17 +265,16 @@ void RouteEditor::compile_models()
 
 void RouteEditor::handle_deferred_selection()
 {
-    RouteObjects& deferred_selection = context_.deferred_selection;
-    for (auto it = deferred_selection.begin(); it != deferred_selection.end();)
+    const auto size = context_.deferred_selection.size();
+
+    context_.deferred_selection.remove_if(
+        [](const vsg::ref_ptr<RouteObject>& object) {
+            return object->select();
+        }
+    );
+
+    if (context_.deferred_selection.size() != size)
     {
-        if ((*it)->select())
-        {
-            it = deferred_selection.erase(it);
-            context_.gizmo->update_visibility();
-        }
-        else
-        {
-            ++it;
-        }
+        context_.gizmo->update_visibility();
     }
 }
