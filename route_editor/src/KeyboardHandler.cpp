@@ -19,6 +19,45 @@ KeyboardHandler::KeyboardHandler(EditorContext& context)
 {
 }
 
+static void save_route(
+    const std::string& route_dir,
+    std::mutex& static_objects_mutex,
+    const RouteObjects& static_objects
+)
+{
+    const FileSystem& fs = FileSystem::getInstance();
+    std::string dir_for_save = fs.combinePath(route_dir, "topology", "map");
+
+    try
+    {
+        // Создаем резервную копия
+        std::filesystem::copy_file(
+            fs.combinePath(dir_for_save, "route1.map"),
+            fs.combinePath(dir_for_save, "route1.map.prev"),
+            std::filesystem::copy_options::overwrite_existing
+        );
+    }
+    catch (const std::filesystem::filesystem_error &e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    // Перезаписываем рабочую копию
+    std::ofstream route_map_file(fs.combinePath(dir_for_save, "route1.map"));
+
+    std::lock_guard<std::mutex> lock_guard(static_objects_mutex);
+    for (const auto& object : static_objects)
+    {
+        const vsg::dvec3& translation = object->get_translation();
+        const vsg::dvec3 rotation_deg = -object->get_rotation_deg();
+
+        route_map_file << object->label << "," << translation.x <<
+            "," << translation.y << "," << translation.z << "," <<
+            rotation_deg.x << "," << rotation_deg.y << "," <<
+            rotation_deg.z << ";\n";
+    }
+}
+
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 {
     key_state_bits_.set(keyPress.keyBase, true);
@@ -34,35 +73,7 @@ void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
     }
     else if (get_binding_state(ACTION_SAVE_ROUTE))
     {
-        const FileSystem& fs = FileSystem::getInstance();
-        std::string dir_for_save = fs.combinePath(context_.route_dir, "topology", "map");
-
-        try
-        {
-            // Создаем резервную копия
-            std::filesystem::copy_file(fs.combinePath(dir_for_save, "route1.map"),
-                                       fs.combinePath(dir_for_save, "route1.map.prev"),
-                                       std::filesystem::copy_options::overwrite_existing);
-        }
-        catch (const std::filesystem::filesystem_error &e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-
-        // Перезаписываем рабочую копию
-        std::ofstream route_map_file(fs.combinePath(dir_for_save, "route1.map"));
-
-        std::lock_guard<std::mutex> lock_guard(context_.static_objects_mutex);
-        for (const auto& object : context_.static_objects)
-        {
-            const vsg::dvec3& translation = object->get_translation();
-            const vsg::dvec3 rotation_deg = -object->get_rotation_deg();
-
-            route_map_file << object->label << "," << translation.x <<
-                "," << translation.y << "," << translation.z << "," <<
-                rotation_deg.x << "," << rotation_deg.y << "," <<
-                rotation_deg.z << ";\n";
-        }
+        save_route(context_.route_dir, context_.static_objects_mutex, context_.static_objects);
     }
 }
 
