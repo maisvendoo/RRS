@@ -564,6 +564,14 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
 
     model_data.vertices.reserve(face_count * 3);
 
+    using Tile_index_t = int;
+    using Vertex_tile_t = std::tuple<int, int, int>;
+    using Face_t = std::tuple<Vertex_tile_t, Vertex_tile_t, Vertex_tile_t>;
+    std::set<Face_t> unique_faces;
+    auto tile = [](const float& coord) -> Tile_index_t
+    {
+        return static_cast<Tile_index_t>(std::round(coord * 1000.0f));
+    };
     for (std::uint32_t i = 0; i < face_count; ++i)
     {
         const PosIndex& pos_index1 = pos_indices[i * 3];
@@ -584,18 +592,54 @@ bool Application::get_dmd_model_data(std::string &in_dmd_model_path,
         float length = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
         if (length < 1e-5)
         {
-            LOG_WARN("Wrong normal (%e) for face %u in file: %s", length, i, in_dmd_model_path.c_str());
+            //LOG_WARN("Wrong normal (%e) for face %u in file: %s", length, i, in_dmd_model_path.c_str());
             continue;
         }
         n = {n.x / length, n.y / length, n.z / length};
 
-        const TexIndex& tex_index1 = tex_indices[i * 3];
-        const TexIndex& tex_index2 = tex_indices[i * 3 + 1];
-        const TexIndex& tex_index3 = tex_indices[i * 3 + 2];
+        Vertex_tile_t vt1 = {tile(p1.x), tile(p1.y), tile(p1.z)};
+        Vertex_tile_t vt2 = {tile(p2.x), tile(p2.y), tile(p2.z)};
+        Vertex_tile_t vt3 = {tile(p3.x), tile(p3.y), tile(p3.z)};
+        Face_t ft;
+        if (vt1 < vt2)
+        {
+            if (vt1 < vt3)
+            {
+                ft = {vt1, vt2, vt3};
+            }
+            else
+            {
+                ft = {vt3, vt1, vt2};
+            }
+        }
+        else
+        {
+            if (vt2 < vt3)
+            {
+                ft = {vt2, vt3, vt1};
+            }
+            else
+            {
+                ft = {vt3, vt1, vt2};
+            }
+        }
 
-        model_data.vertices.emplace_back(Vertex{p1, n, tex_coords[tex_index1]});
-        model_data.vertices.emplace_back(Vertex{p2, n, tex_coords[tex_index2]});
-        model_data.vertices.emplace_back(Vertex{p3, n, tex_coords[tex_index3]});
+        if (unique_faces.find(ft) == unique_faces.end())
+        {
+            unique_faces.insert(ft);
+
+            const TexIndex& tex_index1 = tex_indices[i * 3];
+            const TexIndex& tex_index2 = tex_indices[i * 3 + 1];
+            const TexIndex& tex_index3 = tex_indices[i * 3 + 2];
+
+            model_data.vertices.emplace_back(Vertex{p1, n, tex_coords[tex_index1]});
+            model_data.vertices.emplace_back(Vertex{p2, n, tex_coords[tex_index2]});
+            model_data.vertices.emplace_back(Vertex{p3, n, tex_coords[tex_index3]});
+        }
+        else
+        {
+            //LOG_WARN("Face %u is already exists in file: %s", i, in_dmd_model_path.c_str());
+        }
     }
 
     model_data.vertices.shrink_to_fit();
