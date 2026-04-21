@@ -24,7 +24,7 @@ public:
     bool get_binding_state(Action action) const;
 
 private:
-    const KeyBindings* key_bindings_;
+    const KeyBindings* const key_bindings_;
 
     std::bitset<UINT16_MAX + 1> key_states_;
 };
