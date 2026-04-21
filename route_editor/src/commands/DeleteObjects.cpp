@@ -6,6 +6,7 @@
 #include "Route.h"
 
 #include <vsg/core/Mask.h>
+#include <vsg/nodes/Switch.h>
 
 #include <algorithm>
 #include <cstdio>
@@ -33,15 +34,13 @@ void DeleteObjects::execute()
 
         const auto route = context_.route;
 
-        for (auto it = route->children.begin(); it != route->children.end();
-            ++it)
-        {
-            if (it->node == object)
-            {
-                route->children.erase(it);
-                break;
-            }
-        }
+        route->children.erase(
+            std::find_if(route->children.begin(), route->children.end(),
+                [object](const vsg::Switch::Child& child) {
+                    return child.node == object;
+                }
+            )
+        );
     }
 
     context_.compile_infos_mutex.lock();
