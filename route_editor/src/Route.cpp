@@ -418,8 +418,6 @@ bool Route::load_topology()
 
             paged_lod = paged_lod_it->second;
 
-            signal->calcPosition();
-
             const vsg::dvec3 pos = to_vsg_vec3(signal->getPos());
             const vsg::dvec3 right = to_vsg_vec3(signal->getRight());
             const vsg::dvec3 orth = to_vsg_vec3(signal->getOrth());

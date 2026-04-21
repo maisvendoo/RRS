@@ -93,7 +93,6 @@ void Signal::setConnector(Switch* conn)
 {
     this->conn = conn;
     conn_name = conn ? conn->getName() : "";
-    calcPosition();
 }
 
 //------------------------------------------------------------------------------
@@ -187,7 +186,7 @@ void Signal::setRelRotation(const dvec3& rel_rot)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QByteArray Signal::serialize() const
+QByteArray Signal::serialize()
 {
     QByteArray tmp_data;
     QBuffer buff(&tmp_data);
@@ -203,6 +202,8 @@ QByteArray Signal::serialize() const
     {
         stream << lens;
     }
+
+    calcPosition();
 
     stream << pos.x << pos.y << pos.z;
     stream << orth.x << orth.y << orth.z;
