@@ -8,6 +8,7 @@
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 
+#include <algorithm>
 #include <cstdio>
 
 AddObject::AddObject(EditorContext& context,
@@ -48,20 +49,19 @@ void AddObject::undo()
     RouteObjects& objects = context_.static_objects;
     objects.erase(std::find(objects.begin(), objects.end(), object_to_add_));
     context_.static_objects_mutex.unlock();
+
     --context_.static_objects_count;
     --context_.total_static_objects_count;
 
     const auto route = context_.route;
 
-    for (auto it = route->children.begin(); it != route->children.end();
-        ++it)
-    {
-        if (it->node == object_to_add_)
-        {
-            route->children.erase(it);
-            break;
-        }
-    }
+    route->children.erase(
+        std::find_if(route->children.begin(), route->children.end(),
+            [this](const vsg::Switch::Child& child) {
+                return child.node == object_to_add_;
+            }
+        )
+    );
 
     for (const auto& object : objects_to_deselect_)
     {
