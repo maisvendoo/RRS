@@ -124,9 +124,9 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
     }
 
     double train_length = 0.0;
-    for (size_t i = 0; i < vehicles->size(); ++i)
+    for (const Vehicle* vehicle : *vehicles)
     {
-        train_length += (*vehicles)[i]->getLength();
+        train_length += vehicle->getLength();
     }
 
     double traj_coord = std::clamp(tp.traj_coord, 0.0, cur_traj->getLength());
