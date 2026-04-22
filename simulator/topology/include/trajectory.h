@@ -80,49 +80,24 @@ public:
     void getBusyCoords(double &busy_begin_coord, double &busy_end_coord) const;
 
     /// Вернуть все треки траектории
-    const std::vector<track_t>& getTracks() const
-    {
-        return tracks;
-    }
+    const std::vector<track_t>& getTracks() const;
 
     /// Вернуть первый трек траектории
-    const track_t& getFirstTrack() const
-    {
-        return tracks.front();
-    }
+    const track_t& getFirstTrack() const;
 
     /// Вернуть последний трек траектории
-    const track_t& getLastTrack() const
-    {
-        return tracks.back();
-    }
+    const track_t& getLastTrack() const;
 
     /// Получить оборудование путевой инфраструктуры на этой траектории
-    const std::vector<TrajectoryDevice *>& getTrajectoryDevices() const
-    {
-        return devices;
-    }
+    const std::vector<TrajectoryDevice*>& getTrajectoryDevices() const;
 
     /// Светофор вперёд, включающий данную траекторию в маршрут ДЦ
-    Signal* getRouteBySignalFwd() const
-    {
-        return in_route_by_signal_fwd;
-    }
-    void setRouteBySignalFwd(Signal* signal)
-    {
-        in_route_by_signal_fwd = signal;
-    }
+    Signal* getRouteBySignalFwd() const;
+    void setRouteBySignalFwd(Signal* signal);
 
     /// Светофор назад, включающий данную траекторию в маршрут ДЦ
-    Signal* getRouteBySignalBwd() const
-    {
-        return in_route_by_signal_bwd;
-    }
-    void setRouteBySignalBwd(Signal* signal)
-    {
-        in_route_by_signal_bwd = signal;
-    }
-
+    Signal* getRouteBySignalBwd() const;
+    void setRouteBySignalBwd(Signal* signal);
 
     /// Шаг симуляции
     virtual void step(double t, double dt);
