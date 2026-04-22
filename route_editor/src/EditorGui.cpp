@@ -140,7 +140,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             ImGui::Checkbox("Show commands", &settings.show_commands);
             ImGui::End();
 
-            // ImGui::ShowDemoWindow();
+            ImGui::ShowDemoWindow();
 
             SHOW_WINDOW(show_objects_ref);
             SHOW_WINDOW(show_route_map);

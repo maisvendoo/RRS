@@ -87,7 +87,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    const bool pressed_action_move = get_binding_state(ACTION_MOVE_OBJECTS);
+    const bool pressed_action_move = get_binding_state(ACTION_TRANSLATE_OBJECTS);
     const bool pressed_action_rotate = get_binding_state(ACTION_ROTATE_OBJECTS);
     const bool pressed_action_scale = get_binding_state(ACTION_SCALE_OBJECTS);
 

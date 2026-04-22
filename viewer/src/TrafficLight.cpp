@@ -5,7 +5,7 @@
 #include "ProcAnimation.h"
 #include "Logger.h"
 
-#include <QBuffer>
+#include <QDataStream>
 
 #include <algorithm>
 
@@ -58,18 +58,16 @@ void TrafficLight::step(float t, float dt)
 //------------------------------------------------------------------------------
 void TrafficLight::deserialize(QByteArray& data)
 {
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     stream >> connector_name;
     stream >> signal_dir;
     stream >> letter;
     stream >> signal_model;
 
-    for (std::size_t i = 0; i < lens_state.size(); ++i)
+    for (bool& lens : lens_state)
     {
-        stream >> lens_state[i];
+        stream >> lens;
     }
 
     stream >> position.x >> position.y >> position.z;

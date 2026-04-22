@@ -6,7 +6,7 @@
 #include "TrafficLight.h"
 #include "WorldCulling.h"
 
-#include <QBuffer>
+#include <QDataStream>
 
 #include <vsg/io/Options.h>
 
@@ -72,25 +72,27 @@ bool TrafficLightsHandler::load(QByteArray& data, const std::string& route_dir_f
     LOG_INFO("Signals directory: %s ", models_dir_path.c_str());
     LOG_INFO("Start adding signal models");
 
-    for (auto* traffic_light : traffic_lights_fwd)
+    auto load_and_add_signal = [&](TrafficLight* traffic_light) -> void {
+        traffic_light->loadSignal(models_dir_path, animations_dir, options);
+        auto matrix_transform = traffic_light->transform;
+        vsg::dvec3 position = {
+            matrix_transform->matrix[3][0],
+            matrix_transform->matrix[3][1],
+            matrix_transform->matrix[3][2]
+        };
+        world_culling->add(position, matrix_transform);
+    };
+
+    for (TrafficLight* traffic_light : traffic_lights_fwd)
     {
-        traffic_light->loadSignal(models_dir_path,
-                                  animations_dir,
-                                  options);
-        auto& matrix = traffic_light->transform;
-        vsg::dvec3 position = vsg::dvec3(matrix->matrix[3][0], matrix->matrix[3][1], matrix->matrix[3][2]);
-        world_culling->add(position, matrix);
+        load_and_add_signal(traffic_light);
     }
 
-    for (auto* traffic_light : traffic_lights_bwd)
+    for (TrafficLight* traffic_light : traffic_lights_bwd)
     {
-        traffic_light->loadSignal(models_dir_path,
-                                  animations_dir,
-                                  options);
-        auto& matrix = traffic_light->transform;
-        vsg::dvec3 position = vsg::dvec3(matrix->matrix[3][0], matrix->matrix[3][1], matrix->matrix[3][2]);
-        world_culling->add(position, matrix);
+        load_and_add_signal(traffic_light);
     }
+
     LOG_INFO("Finished adding signal models");
 
     return true;
@@ -105,9 +107,7 @@ void TrafficLightsHandler::deserialize(QByteArray& data)
     traffic_lights_fwd.clear();
     traffic_lights_bwd.clear();
 
-    QBuffer buffer(&data);
-    buffer.open(QIODevice::ReadOnly);
-    QDataStream stream(&buffer);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     deserialize_signals("Line", stream);
     deserialize_signals("Enter", stream);
@@ -123,6 +123,7 @@ void TrafficLightsHandler::deserialize_signals(const char* signals_type, QDataSt
 {
     std::uint32_t signal_count;
     data_stream >> signal_count;
+
     LOG_INFO("%s signals: %u", signals_type, signal_count);
 
     for (std::uint32_t i = 0; i < signal_count; ++i)
@@ -176,9 +177,7 @@ void TrafficLightsHandler::printSignalInfo(const TrafficLight* tl) const
 //------------------------------------------------------------------------------
 void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
 {
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     QString connector_name = "";
     int8_t signal_dir = 0;

@@ -18,7 +18,7 @@ static void serialize_signals(
 )
 {
     stream << static_cast<std::uint32_t>(signals_.size());
-    for (const Signal* const signal : signals_)
+    for (Signal* const signal : signals_)
     {
         stream << signal->serialize();
     }
