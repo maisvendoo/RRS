@@ -788,11 +788,8 @@ void Topology::step(double t, double dt)
 //------------------------------------------------------------------------------
 QByteArray Topology::serialize()
 {
-    // Задаем буфер для данных и открываем его на запись
-    QBuffer data;
-    data.open(QIODevice::WriteOnly);
-    // Связываем с буфером поток данных
-    QDataStream stream(&data);
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     stream << route_name;
 
@@ -822,17 +819,15 @@ QByteArray Topology::serialize()
         stream << sw->serialize();
     }
 
-    return data.data();
+    return data;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::deserialize(QByteArray &data)
+void Topology::deserialize(QByteArray& data)
 {
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     stream >> route_name;
 

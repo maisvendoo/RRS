@@ -583,9 +583,8 @@ void Switch::step(double t, double dt)
 //------------------------------------------------------------------------------
 QByteArray Switch::serialize()
 {
-    QBuffer data;
-    data.open(QIODevice::WriteOnly);
-    QDataStream stream(&data);
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     // Имя коннектора в буфер данных
     stream << name;
@@ -599,17 +598,15 @@ QByteArray Switch::serialize()
     // Помещаем в буФер состояние стрелки
     stream << state_fwd << state_bwd;
 
-    return data.data();
+    return data;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::deserialize(QByteArray &data, traj_list_t &traj_list)
+void Switch::deserialize(QByteArray& data, traj_list_t& traj_list)
 {
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     // Извлекаем имя коннектора из буфера
     stream >> name;

@@ -5,7 +5,6 @@
 #include    "Journal.h"
 #include    "switch.h"
 #include    "trajectory.h"
-#include    <QBuffer>
 
 //------------------------------------------------------------------------------
 //
@@ -188,10 +187,8 @@ void Signal::setRelRotation(const dvec3& rel_rot)
 //------------------------------------------------------------------------------
 QByteArray Signal::serialize()
 {
-    QByteArray tmp_data;
-    QBuffer buff(&tmp_data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     stream << conn_name;
     stream << signal_dir;
@@ -210,17 +207,15 @@ QByteArray Signal::serialize()
     stream << right.x << right.y << right.z;
     stream << up.x << up.y << up.z;
 
-    return buff.data();
+    return data;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Signal::deserialize(QByteArray &data)
+void Signal::deserialize(QByteArray& data)
 {
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     stream >> conn_name;
     stream >> signal_dir;

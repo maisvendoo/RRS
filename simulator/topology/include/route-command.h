@@ -1,36 +1,40 @@
 #ifndef     ROUTE_COMMAND_H
 #define     ROUTE_COMMAND_H
 
-#include    <QBuffer>
+#include    <QByteArray>
+#include    <QDataStream>
+#include    <QIODevice>
+#include    <QString>
+
+#include    <cstdint>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct route_command_t
 {
-    QString trajectory_begin = "";  ///< Имя траектории, с которой начать поиск маршрута
-    QString trajectory_end = "";    ///< Имя траектории, до которой нужен маршрут (включительно)
-    std::int8_t dir = 0;    ///< Направление маршрута по топологии: 1 - вперёд, -1 - назад
+    /// Имя траектории, с которой начать поиск маршрута
+    QString trajectory_begin = "";
+    /// Имя траектории, до которой нужен маршрут (включительно)
+    QString trajectory_end = "";
+    /// Направление маршрута по топологии: 1 - вперёд, -1 - назад
+    std::int8_t dir = 0;
 
     QByteArray serialize()
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << trajectory_begin;
         stream << trajectory_end;
         stream << dir;
 
-        return buff.data();
+        return data;
     }
 
-    void deserialize(QByteArray data)
+    void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> trajectory_begin;
         stream >> trajectory_end;
@@ -38,4 +42,4 @@ struct route_command_t
     }
 };
 
-#endif
+#endif // ROUTE_COMMAND_H

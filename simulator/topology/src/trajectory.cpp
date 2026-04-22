@@ -479,9 +479,8 @@ void Trajectory::step(double t, double dt)
 //------------------------------------------------------------------------------
 QByteArray Trajectory::serialize()
 {
-    QBuffer data;
-    data.open(QIODevice::WriteOnly);
-    QDataStream stream(&data);
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     // Кладем в буфер имя, длину и признак занятости
     stream << name << len << is_busy << in_route;
@@ -495,17 +494,15 @@ QByteArray Trajectory::serialize()
         stream << track->serialize();
     }
 
-    return data.data();
+    return data;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Trajectory::deserialize(QByteArray &data)
+void Trajectory::deserialize(QByteArray& data)
 {
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     // Восстанавливаем имя длину и признак занятости
     stream >> name;

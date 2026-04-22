@@ -1,10 +1,11 @@
 #ifndef     TRACK_H
 #define     TRACK_H
 
-#include    <vec3.h>
+#include    "vec3.h"
+
 #include    <QByteArray>
-#include    <QBuffer>
 #include    <QDataStream>
+#include    <QIODevice>
 
 //------------------------------------------------------------------------------
 //
@@ -44,12 +45,9 @@ struct track_t
     /// Железнодорожный пикетаж в точке конца данного трека
     double railway_coord1 = 0.0;
 
-    track_t()
-    {
+    track_t() = default;
 
-    }
-
-    track_t(dvec3 p0, dvec3 p1)
+    track_t(const dvec3& p0, const dvec3& p1)
     {
         begin_point = p0;
         end_point = p1;
@@ -59,9 +57,8 @@ struct track_t
     /// Сериализация (прeобразование в последовательность байт)
     QByteArray serialize()
     {
-        QBuffer data;
-        data.open(QIODevice::WriteOnly);
-        QDataStream stream(&data);
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << begin_point.x << begin_point.y << begin_point.z
                << end_point.x << end_point.y << end_point.z
@@ -70,15 +67,13 @@ struct track_t
                << railway_coord0
                << railway_coord1;
 
-        return data.data();
+        return data;
     }
 
     /// Десериализация
-    void deserialize(QByteArray &data)
+    void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> begin_point.x >> begin_point.y >> begin_point.z
                >> end_point.x >> end_point.y >> end_point.z
@@ -91,7 +86,6 @@ struct track_t
     }
 
 private:
-
     void calc_parameters()
     {
         dvec3 t = end_point - begin_point;
@@ -101,7 +95,7 @@ private:
 
         inclination = orth.z * 1000.0;
 
-        //trav = cross(orth, {0.0, 0.0, 1.0});
+        // trav = cross(orth, {0.0, 0.0, 1.0});
         trav.x = t.y;
         trav.y = -t.x;
         trav.z = 0.0;
@@ -113,4 +107,4 @@ private:
     }
 };
 
-#endif
+#endif // TRACK_H

@@ -1,7 +1,12 @@
 #ifndef     SIGNAL_COMMAND_H
 #define     SIGNAL_COMMAND_H
 
-#include    <QBuffer>
+#include    <QByteArray>
+#include    <QDataStream>
+#include    <QIODevice>
+#include    <QString>
+
+#include    <cstdint>
 
 //------------------------------------------------------------------------------
 //
@@ -17,10 +22,8 @@ struct signal_command_t
 
     QByteArray serialize()
     {
-        QByteArray tmp_data;
-        QBuffer buff(&tmp_data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << conn_name;
         stream << sig_dir;
@@ -29,14 +32,12 @@ struct signal_command_t
         stream << command_open_call;
         stream << command_close;
 
-        return buff.data();
+        return data;
     }
 
-    void deserialize(QByteArray &data)
+    void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> conn_name;
         stream >> sig_dir;
@@ -47,4 +48,4 @@ struct signal_command_t
     }
 };
 
-#endif
+#endif // SIGNAL_COMMAND_H

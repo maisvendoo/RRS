@@ -6,9 +6,9 @@
 #include "route-signal.h"
 #include "shunting-signal.h"
 
-#include <QBuffer>
 #include <QByteArray>
 #include <QDataStream>
+#include <QIODevice>
 
 #include <cstdint>
 
@@ -48,10 +48,8 @@ static void deserialize_signals(
 
 QByteArray signals_data_t::serialize() const
 {
-    QByteArray tmp_data;
-    QBuffer buff(&tmp_data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     serialize_signals(stream, line_signals);
     serialize_signals(stream, enter_signals);
@@ -59,14 +57,12 @@ QByteArray signals_data_t::serialize() const
     serialize_signals(stream, exit_signals);
     serialize_signals(stream, shunt_signals);
 
-    return buff.data();
+    return data;
 }
 
 void signals_data_t::deserialize(QByteArray& data)
 {
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     deserialize_signals<LineSignal>(stream, line_signals);
     deserialize_signals<EnterSignal>(stream, enter_signals);

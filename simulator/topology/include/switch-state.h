@@ -1,8 +1,12 @@
 #ifndef     SWITCH_STATE_H
 #define     SWITCH_STATE_H
 
+#include    <QByteArray>
+#include    <QDataStream>
+#include    <QIODevice>
 #include    <QString>
-#include    <QBuffer>
+
+#include    <cstdint>
 
 //------------------------------------------------------------------------------
 //
@@ -16,22 +20,18 @@ struct switch_command_t
     QByteArray serialize()
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << conn_name;
         stream << switch_direction;
         stream << switch_ref_state;
 
-        return buff.data();
+        return data;
     }
 
-    void deserialize(QByteArray data)
+    void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> conn_name;
         stream >> switch_direction;
@@ -51,22 +51,18 @@ struct switch_state_t
     QByteArray serialize()
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << name;
         stream << state_fwd;
         stream << state_bwd;
 
-        return buff.data();
+        return data;
     }
 
-    void deserialize(QByteArray data)
+    void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> name;
         stream >> state_fwd;
@@ -74,4 +70,4 @@ struct switch_state_t
     }
 };
 
-#endif
+#endif // SWITCH_STATE_H
