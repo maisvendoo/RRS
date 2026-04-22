@@ -13,7 +13,31 @@
 #include    <sstream>
 #include    <physics.h>
 
-#define DOUBLE_BUFFER_SIZE 32
+static bool get_non_empty_lines_from_file(
+    const QString& path,
+    std::vector<std::string>& lines
+)
+{
+    std::ifstream file(path.toStdString());
+    if (!file.is_open())
+    {
+        Journal::instance()->error("File " + path + " not found");
+        return false;
+    }
+
+    while (!file.eof())
+    {
+        std::string line;
+        std::getline(file, line);
+
+        if (!line.empty())
+        {
+            lines.emplace_back(std::move(line));
+        }
+    }
+
+    return true;
+}
 
 //------------------------------------------------------------------------------
 //
@@ -26,10 +50,7 @@ Trajectory::Trajectory(QObject *parent) : QObject(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-Trajectory::~Trajectory()
-{
-
-}
+Trajectory::~Trajectory() = default;
 
 //------------------------------------------------------------------------------
 //
@@ -42,26 +63,10 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
                    QDir::separator() + "trajectories" +
                    QDir::separator() + traj_name + ".traj";
 
-    std::ifstream stream(path.toStdString(), std::ios::in);
-
-    if (!stream.is_open())
-    {
-        Journal::instance()->error("File " + path + " not found");
-        return false;
-    }
-
     std::vector<std::string> lines;
-
-    // Читаем непустые линии из файла точек траектории
-    while (!stream.eof())
+    if (!get_non_empty_lines_from_file(path, lines))
     {
-        std::string line = "";
-        std::getline(stream, line);
-
-        if (line.empty())
-            continue;
-
-        lines.push_back(line);
+        return false;
     }
 
     for (size_t i = 0; i < lines.size() - 1; ++i)
