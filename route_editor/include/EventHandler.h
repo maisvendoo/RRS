@@ -1,20 +1,19 @@
 #ifndef EVENT_HANDLER_H
 #define EVENT_HANDLER_H
 
-#include "states/CameraNavigationState.h"
-#include "states/GizmoRotateState.h"
-#include "states/GizmoScaleState.h"
-#include "states/GizmoTranslateState.h"
-#include "states/InitialState.h"
-#include "states/KeyboardRotateState.h"
-#include "states/KeyboardScaleState.h"
-#include "states/KeyboardTranslateState.h"
-#include "states/SelectRouteState.h"
-
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 
+class CameraNavigationState;
+class GizmoRotateState;
+class GizmoScaleState;
+class GizmoTranslateState;
+class InitialState;
 class Keyboard;
+class KeyboardRotateState;
+class KeyboardScaleState;
+class KeyboardTranslateState;
+class SelectRouteState;
 class State;
 
 namespace vsg
@@ -38,15 +37,15 @@ private:
     Keyboard* const keyboard_;
 
     State* state_;
-    SelectRouteState select_route_state_;
-    InitialState initial_state_;
-    CameraNavigationState camera_navigation_state_;
-    KeyboardTranslateState keyboard_translate_state_;
-    KeyboardRotateState keyboard_rotate_state_;
-    KeyboardScaleState keyboard_scale_state_;
-    GizmoTranslateState gizmo_translate_state_;
-    GizmoRotateState gizmo_rotate_state_;
-    GizmoScaleState gizmo_scale_state_;
+    SelectRouteState* const select_route_state_;
+    InitialState* const initial_state_;
+    CameraNavigationState* const camera_navigation_state_;
+    KeyboardTranslateState* const keyboard_translate_state_;
+    KeyboardRotateState* const keyboard_rotate_state_;
+    KeyboardScaleState* const keyboard_scale_state_;
+    GizmoTranslateState* const gizmo_translate_state_;
+    GizmoRotateState* const gizmo_rotate_state_;
+    GizmoScaleState* const gizmo_scale_state_;
 };
 
 #endif // EVENT_HANDLER_H
