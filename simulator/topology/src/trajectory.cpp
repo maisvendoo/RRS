@@ -172,6 +172,22 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QString Trajectory::getName() const
+{
+    return name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Trajectory::getLength() const
+{
+    return len;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Trajectory::setFwdSwitch(Switch *switch_ptr)
 {
     fwd_switch = switch_ptr;
@@ -198,7 +214,7 @@ Switch* Trajectory::getNextSwitch(dir_t& dir) const
             return fwd_switch;
         }
     }
-    if (dir == BWD)
+    else if (dir == BWD)
     {
         if (bwd_switch)
         {

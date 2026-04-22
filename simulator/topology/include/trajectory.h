@@ -41,15 +41,9 @@ public:
     bool load(const QString &route_dir, const QString &traj_name,
               std::vector<module_cfg_t>& modules, bool solve_errors = true);
 
-    QString getName() const
-    {
-        return name;
-    }
+    QString getName() const;
 
-    double getLength() const
-    {
-        return len;
-    }
+    double getLength() const;
 
     void setFwdSwitch(Switch* switch_ptr);
     void setBwdSwitch(Switch* switch_ptr);
@@ -182,7 +176,7 @@ private:
 
     Switch* bwd_switch = nullptr;
 
-    std::vector<track_t>    tracks;
+    std::vector<track_t> tracks;
 
     /// Оборудование путевой инфраструктуры на этой траектории
     std::vector<TrajectoryDevice *> devices;
