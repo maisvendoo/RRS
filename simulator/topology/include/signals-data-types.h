@@ -1,10 +1,11 @@
-#ifndef SIGNALS_DATA_TYPES_H
-#define SIGNALS_DATA_TYPES_H
+#ifndef     SIGNALS_DATA_TYPES_H
+#define     SIGNALS_DATA_TYPES_H
 
-#include <QByteArray>
+#include    "topology-export.h"
+
+#include    <QByteArray>
 
 #include    <vector>
-#include    <topology-export.h>
 
 class Signal;
 

@@ -1,9 +1,9 @@
 #ifndef     SWITCH_STATE_H
 #define     SWITCH_STATE_H
 
+#include    "topology-export.h"
+
 #include    <QByteArray>
-#include    <QDataStream>
-#include    <QIODevice>
 #include    <QString>
 
 #include    <cstdint>
@@ -11,63 +11,27 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct switch_command_t
+struct TOPOLOGY_EXPORT switch_command_t
 {
     QString conn_name = "";
     std::int8_t switch_direction = 0;
     std::int8_t switch_ref_state = 0;
 
-    QByteArray serialize() const
-    {
-        QByteArray data;
-        QDataStream stream(&data, QIODevice::WriteOnly);
-
-        stream << conn_name;
-        stream << switch_direction;
-        stream << switch_ref_state;
-
-        return data;
-    }
-
-    void deserialize(QByteArray& data)
-    {
-        QDataStream stream(&data, QIODevice::ReadOnly);
-
-        stream >> conn_name;
-        stream >> switch_direction;
-        stream >> switch_ref_state;
-    }
+    QByteArray serialize() const;
+    void deserialize(QByteArray& data);
 };
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct switch_state_t
+struct TOPOLOGY_EXPORT switch_state_t
 {
     QString name = "";
     int8_t state_fwd = 1;
     int8_t state_bwd = 1;
 
-    QByteArray serialize() const
-    {
-        QByteArray data;
-        QDataStream stream(&data, QIODevice::WriteOnly);
-
-        stream << name;
-        stream << state_fwd;
-        stream << state_bwd;
-
-        return data;
-    }
-
-    void deserialize(QByteArray& data)
-    {
-        QDataStream stream(&data, QIODevice::ReadOnly);
-
-        stream >> name;
-        stream >> state_fwd;
-        stream >> state_bwd;
-    }
+    QByteArray serialize() const;
+    void deserialize(QByteArray& data);
 };
 
 #endif // SWITCH_STATE_H
