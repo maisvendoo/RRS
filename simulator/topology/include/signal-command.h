@@ -1,9 +1,9 @@
 #ifndef     SIGNAL_COMMAND_H
 #define     SIGNAL_COMMAND_H
 
+#include    "topology-export.h"
+
 #include    <QByteArray>
-#include    <QDataStream>
-#include    <QIODevice>
 #include    <QString>
 
 #include    <cstdint>
@@ -11,7 +11,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-struct signal_command_t
+struct TOPOLOGY_EXPORT signal_command_t
 {
     QString conn_name = "";
     std::int8_t sig_dir = 0;
@@ -20,32 +20,8 @@ struct signal_command_t
     bool command_open_call = false;
     bool command_close = false;
 
-    QByteArray serialize() const
-    {
-        QByteArray data;
-        QDataStream stream(&data, QIODevice::WriteOnly);
-
-        stream << conn_name;
-        stream << sig_dir;
-        stream << command_open_train;
-        stream << command_open_shunting;
-        stream << command_open_call;
-        stream << command_close;
-
-        return data;
-    }
-
-    void deserialize(QByteArray& data)
-    {
-        QDataStream stream(&data, QIODevice::ReadOnly);
-
-        stream >> conn_name;
-        stream >> sig_dir;
-        stream >> command_open_train;
-        stream >> command_open_shunting;
-        stream >> command_open_call;
-        stream >> command_close;
-    }
+    QByteArray serialize() const;
+    void deserialize(QByteArray& data);
 };
 
 #endif // SIGNAL_COMMAND_H
