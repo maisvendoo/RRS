@@ -256,7 +256,7 @@ void Trajectory::clearBusy()
 {
     vehicles_coords.clear();
 
-    for (auto* traj_device : devices)
+    for (TrajectoryDevice* traj_device : devices)
     {
         traj_device->clearLinks();
     }
