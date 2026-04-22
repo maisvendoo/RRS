@@ -786,7 +786,7 @@ void Topology::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QByteArray Topology::serialize()
+QByteArray Topology::serialize() const
 {
     QByteArray data;
     QDataStream stream(&data, QIODevice::WriteOnly);
@@ -797,15 +797,14 @@ QByteArray Topology::serialize()
 
     for (const auto& station : stations)
     {
-        QByteArray sdata = station.serialize();
-        stream << sdata;
+        stream << station.serialize();
     }
 
     // Указываем число траекторий
     stream << static_cast<uint32_t>(traj_list.size());
 
     // Складываем в буфер сериализованную информацию о траекториях
-    for (Trajectory* traj : traj_list)
+    for (const Trajectory* traj : traj_list)
     {
         stream << traj->serialize();
     }
@@ -814,7 +813,7 @@ QByteArray Topology::serialize()
     stream << static_cast<uint32_t>(switches.size());
 
     // Складываем в буфер сериализованную информацию о коннекторах
-    for (Switch* sw : switches)
+    for (const Switch* sw : switches)
     {
         stream << sw->serialize();
     }
@@ -1369,16 +1368,13 @@ void Topology::get_route_name(QString route_dir)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::serialize_connector_name(QDataStream& stream, Switch* sw)
+void Topology::serialize_connector_name(QDataStream& stream, const Switch* sw) const
 {
-    if (bool has_sw = sw != nullptr)
+    bool has_sw = (sw != nullptr);
+    stream << has_sw;
+    if (has_sw)
     {
-        stream << has_sw;
         stream << sw->getName();
-    }
-    else
-    {
-        stream << has_sw;
     }
 }
 

@@ -581,7 +581,7 @@ void Switch::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QByteArray Switch::serialize()
+QByteArray Switch::serialize() const
 {
     QByteArray data;
     QDataStream stream(&data, QIODevice::WriteOnly);
@@ -697,7 +697,8 @@ void Switch::setRouteBySignalBwd(Signal* signal)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Switch::serialize_connected_trajectory(QDataStream &stream, Trajectory *traj, dir_t orient)
+void Switch::serialize_connected_trajectory(QDataStream& stream,
+    Trajectory* traj, dir_t orient) const
 {
     // Анализирум наличие траектории на каждом из ответвлений,
     // пишем в буфер признак присутствия, и если она присутствует,

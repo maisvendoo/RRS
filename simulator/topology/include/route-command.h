@@ -20,7 +20,7 @@ struct route_command_t
     /// Направление маршрута по топологии: 1 - вперёд, -1 - назад
     std::int8_t dir = 0;
 
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QDataStream stream(&data, QIODevice::WriteOnly);

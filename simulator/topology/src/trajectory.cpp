@@ -477,7 +477,7 @@ void Trajectory::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QByteArray Trajectory::serialize()
+QByteArray Trajectory::serialize() const
 {
     QByteArray data;
     QDataStream stream(&data, QIODevice::WriteOnly);
@@ -489,9 +489,9 @@ QByteArray Trajectory::serialize()
     stream << static_cast<uint32_t>(tracks.size());
 
     // Последовательно сериализум треки
-    for (auto track = tracks.begin(); track != tracks.end(); ++track)
+    for (const track_t& track : tracks)
     {
-        stream << track->serialize();
+        stream << track.serialize();
     }
 
     return data;

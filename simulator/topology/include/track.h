@@ -55,7 +55,7 @@ struct track_t
     }
 
     /// Сериализация (прeобразование в последовательность байт)
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QDataStream stream(&data, QIODevice::WriteOnly);

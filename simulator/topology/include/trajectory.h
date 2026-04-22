@@ -133,7 +133,7 @@ public:
     /// Шаг симуляции
     virtual void step(double t, double dt);
 
-    QByteArray serialize();
+    QByteArray serialize() const;
 
     void deserialize(QByteArray &data);
 

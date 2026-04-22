@@ -20,7 +20,7 @@ struct signal_command_t
     bool command_open_call = false;
     bool command_close = false;
 
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QDataStream stream(&data, QIODevice::WriteOnly);

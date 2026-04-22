@@ -54,7 +54,7 @@ public:
     /// Шаг симуляции
     virtual void step(double t, double dt);
 
-    QByteArray serialize();
+    QByteArray serialize() const;
 
     void deserialize(QByteArray &data, traj_list_t &traj_list);
 
@@ -117,7 +117,8 @@ private:
     /// Светофор, включающий данный стрелочный перевод назад в маршрут ДЦ
     Signal* in_route_by_signal_bwd = nullptr;
 
-    void serialize_connected_trajectory(QDataStream &stream, Trajectory *traj, dir_t orient);
+    void serialize_connected_trajectory(QDataStream &stream,
+        Trajectory *traj, dir_t orient) const;
 
     std::pair<Trajectory*, dir_t> deserialize_connected_trajectory(QDataStream &stream,
                                                                    traj_list_t &traj_list);

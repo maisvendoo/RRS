@@ -65,7 +65,7 @@ struct traj_busy_state_t
     bool    is_busy = false;
     bool    in_route = false;
 
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QDataStream stream(&data, QIODevice::WriteOnly);

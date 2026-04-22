@@ -53,7 +53,7 @@ public:
     /// Шаг симуляции
     void step(double t, double dt);
 
-    QByteArray serialize();
+    QByteArray serialize() const;
     void deserialize(QByteArray &data);
 
     traj_list_t *getTrajectoriesList();
@@ -127,7 +127,7 @@ private:
     /// Получение название маршрута из конфига описания
     void get_route_name(QString route_dir);
 
-    void serialize_connector_name(QDataStream &stream, Switch* sw);
+    void serialize_connector_name(QDataStream &stream, const Switch* sw) const;
 
     Switch* deserialize_traj_connectors(QDataStream &stream, sw_list_t &conn_list) const;
 

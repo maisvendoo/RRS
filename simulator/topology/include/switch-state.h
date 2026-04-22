@@ -17,7 +17,7 @@ struct switch_command_t
     std::int8_t switch_direction = 0;
     std::int8_t switch_ref_state = 0;
 
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QDataStream stream(&data, QIODevice::WriteOnly);
@@ -48,7 +48,7 @@ struct switch_state_t
     int8_t state_fwd = 1;
     int8_t state_bwd = 1;
 
-    QByteArray serialize()
+    QByteArray serialize() const
     {
         QByteArray data;
         QDataStream stream(&data, QIODevice::WriteOnly);
