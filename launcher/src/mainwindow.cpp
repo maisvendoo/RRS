@@ -233,12 +233,12 @@ void MainWindow::loadRoutesList(const std::string &routesDir)
         loadTrainPositions(route_info);
         loadScenarios(route_info);
 
-        routes_info.push_back(route_info);
+        routes_info.emplace_back(std::move(route_info));
     }
 
-    for (auto it = routes_info.begin(); it != routes_info.end(); ++it)
+    for (const route_info_t& route_info : routes_info)
     {
-        ui->lwRoutes->addItem((*it).route_title);
+        ui->lwRoutes->addItem(route_info.route_title);
     }
 }
 
