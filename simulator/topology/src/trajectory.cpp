@@ -2,6 +2,7 @@
 // #include    "parse_file_funcs.h"
 #include    "switch.h"
 #include    "topology-types.h"
+#include    "vec3.h"
 #include    <topology-trajectory-device.h>
 
 #include    <cstddef>
@@ -58,47 +59,53 @@ Trajectory::~Trajectory() = default;
 bool Trajectory::load(const QString &route_dir, const QString &traj_name,
                       std::vector<module_cfg_t>& modules, bool solve_errors)
 {
-    QString path = QDir::toNativeSeparators(route_dir) +
-                   QDir::separator() + "topology" +
-                   QDir::separator() + "trajectories" +
-                   QDir::separator() + traj_name + ".traj";
+    const QString path =
+        QDir::toNativeSeparators(route_dir) +
+        QDir::separator() + "topology" +
+        QDir::separator() + "trajectories" +
+        QDir::separator() + traj_name + ".traj";
 
     std::vector<std::string> lines;
-    if (!get_non_empty_lines_from_file(path, lines))
+    const bool result = get_non_empty_lines_from_file(path, lines);
+    if (!result || lines.empty())
     {
         return false;
     }
 
-    for (size_t i = 0; i < lines.size() - 1; ++i)
+    dvec3 p0;
+    double railway_coord0;
+
+    // Линия, описывающая начальную точку трека
+    std::istringstream ss_begin(lines[0]);
+    ss_begin >> p0.x >> p0.y >> p0.z >> railway_coord0;
+
+    const std::size_t lines_size = lines.size();
+    for (std::size_t i = 1; i < lines_size; ++i)
     {
-        // Линия, описывающая начальную точку трека
-        std::istringstream ss_begin(lines[i]);
-        // следующая линия описывает конечную точку трека
-        std::istringstream ss_end(lines[i+1]);
-
-        // Читаем начальную и конечную точки
-        dvec3 p0;
-        double railway_coord0;
-
-        ss_begin >> p0.x >> p0.y >> p0.z >> railway_coord0;
-
         dvec3 p1;
         double railway_coord1;
 
+        // Следующая линия описывает конечную точку трека
+        std::istringstream ss_end(lines[i]);
         ss_end >> p1.x >> p1.y >> p1.z >> railway_coord1;
 
         // Проверка совпадения точек p0 и p1
-        dvec3 dp = p1 - p0;
+        const dvec3 dp = p1 - p0;
 
         // Откидываем сантиметровые треки и меньше
         if (solve_errors && (length(dp) <= 0.01))
         {
-            QString msg = QString("TOPOLOGY WARNING: Points %1 and %2 match in trajectory %3")
-                              .arg(i, 4)
-                              .arg(i+1, 4)
-                              .arg(traj_name);
+            const QString msg = QString("TOPOLOGY WARNING: "
+                "Points %1 and %2 match in trajectory %3")
+                .arg(i - 1, 4)
+                .arg(i, 4)
+                .arg(traj_name);
 
             Journal::instance()->error(msg);
+
+            p0 = p1;
+            railway_coord0 = railway_coord1;
+
             continue;
         }
 
@@ -114,6 +121,9 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
 
         // Обновляем длину траектории
         len += track.len;
+
+        p0 = p1;
+        railway_coord0 = railway_coord1;
     }
 
     // Заполняем имя траектории (по имени файла, где она хранится)
