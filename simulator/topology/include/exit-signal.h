@@ -64,4 +64,4 @@ private:
     void alsn_control();
 };
 
-#endif
+#endif // EXIT_SIGNAL_H

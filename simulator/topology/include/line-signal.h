@@ -90,4 +90,4 @@ private slots:
     void slotBlinkTimer();
 };
 
-#endif
+#endif // LINE_SIGNAL_H

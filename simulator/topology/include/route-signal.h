@@ -9,10 +9,8 @@
 class TOPOLOGY_EXPORT RouteSignal : public EnterSignal
 {
 public:
-
     RouteSignal(QObject *parent = nullptr);
-
     virtual ~RouteSignal() override;
 };
 
-#endif
+#endif // ROUTE_SIGNAL_H

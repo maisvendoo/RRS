@@ -77,4 +77,4 @@ private:
     void alsn_control();
 };
 
-#endif
+#endif // ENTER_SIGNAL_H

@@ -1,8 +1,9 @@
 #ifndef     ROUTE_SEGMENT_H
 #define     ROUTE_SEGMENT_H
 
-#include <vector>
-#include "topology-defines.h"
+#include    "topology-defines.h"
+
+#include    <vector>
 
 class Trajectory;
 
@@ -11,8 +12,10 @@ class Trajectory;
 //------------------------------------------------------------------------------
 struct route_segment_t
 {
-    std::vector<Trajectory*> trajectories; ///< Траектории, входящие в маршрут
-    std::vector<dir_t> directions; ///< Направление по траекториям: 1 - вперёд, -1 - назад
+    /// Траектории, входящие в маршрут
+    std::vector<Trajectory*> trajectories;
+    /// Направление по траекториям: 1 - вперёд, -1 - назад
+    std::vector<dir_t> directions;
 };
 
-#endif
+#endif // ROUTE_SEGMENT_H
