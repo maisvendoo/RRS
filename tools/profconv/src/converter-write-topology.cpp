@@ -69,7 +69,12 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
 
         if (!bwd_type.isEmpty())
         {
-            flist.append(QPair<QString, QString>("SignalModelBwd", "ab_" + bwd_type.right(4)));
+            if (bwd_type != "empty_line")
+            {
+                bwd_type = "ab_" + bwd_type.right(4);
+            }
+
+            flist.append(QPair<QString, QString>("SignalModelBwd", bwd_type));
 
             if (connector->is_signal_bwd_left)
                 flist.append(QPair<QString, QString>("RelPosVectorBwd", "-2.5 -2.75 0.0"));
@@ -87,7 +92,12 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
         QString fwd_type = QString(connector->signal_fwd_type.c_str());
         if (!fwd_type.isEmpty())
         {
-            flist.append(QPair<QString, QString>("SignalModelFwd", "ab_" + fwd_type.right(4)));
+            if (fwd_type != "empty_line")
+            {
+                fwd_type = "ab_" + fwd_type.right(4);
+            }
+
+            flist.append(QPair<QString, QString>("SignalModelFwd", fwd_type));
 
             if (connector->is_signal_fwd_left)
                 flist.append(QPair<QString, QString>("RelPosVectorFwd", "-2.5 -2.75 0.0"));

@@ -118,11 +118,14 @@ bool ZDSimConverter::readRouteMAP(QTextStream &stream, zds_route_map_data_t &map
 
         // Отфильтровываем модели рельсового пути (с "track" в имени объекта)
         if (   (zds_object->obj_name.find("track") == zds_object->obj_name.npos)
-            || (zds_object->obj_name.find("Track") == zds_object->obj_name.npos))
+            && (zds_object->obj_name.find("Track") == zds_object->obj_name.npos))
         {
             // Опускаем привязки всех прочих моделей в маршруте
             zds_object->position.z += ZDS_change_Z;
         }
+#if 0
+// с поправкой рельсы смещаются неправильно, возможно где-то ошибка в знаках
+// рельсы не встречаются под большим наклоном, так что и без поправки некритично
         else
         {
             // Рельсы будем опускать через изменение меша при конвертации в .gltf
@@ -142,10 +145,10 @@ bool ZDSimConverter::readRouteMAP(QTextStream &stream, zds_route_map_data_t &map
 
                 zds_object->position.x += ZDS_change_Z * (coeff_X_by_Y * std::sin(radian_Z) + coeff_Y_by_X * std::cos(radian_Z));
                 zds_object->position.y += ZDS_change_Z * (coeff_Y_by_X * std::sin(radian_Z) + coeff_X_by_Y * std::cos(radian_Z));
-                zds_object->position.y += ZDS_change_Z * (1.0 - coeff_Z_by_X * coeff_Z_by_Y);
+                zds_object->position.z += ZDS_change_Z * (1.0 - (1.0 - coeff_Z_by_X) * (1.0 - coeff_Z_by_Y));
             }
         }
-
+#endif
         map_data.push_back(zds_object);
         may_add_info_to_last = true;
     }
@@ -309,13 +312,13 @@ void ZDSimConverter::writeSignalsForDebug()
     stream_n.setEncoding(QStringConverter::Utf8);
     stream_n.setRealNumberNotation(QTextStream::FixedNotation);
 
-    for (auto map : {signals_line_data
+    for (auto& map : {signals_line_data
                      , signals_enter_data
                      , signals_exit_data
                      , signals_povt_data
                      , signals_maneurous_data})
     {
-        for (auto sig : map)
+        for (auto& sig : map)
         {
             if (sig->route_num == -1)
             {
@@ -370,7 +373,7 @@ void ZDSimConverter::writeSignalsForDebug()
         }
     }
 
-    for (auto sig : signals_povt_data)
+    for (auto& sig : signals_povt_data)
     {
         stream_p << sig->obj_name.c_str()
                  << DELIMITER_SYMBOL << sig->liter.c_str()
@@ -415,7 +418,7 @@ void ZDSimConverter::writeSignalsForDebug()
         }
     }
 
-    for (auto sig : signals_maneurous_data)
+    for (auto& sig : signals_maneurous_data)
     {
         stream_m << sig->obj_name.c_str()
                  << DELIMITER_SYMBOL << sig->liter.c_str()
@@ -500,7 +503,9 @@ bool ZDSimConverter::findTrackNearToSignal(zds_signal_position_t *signal, int di
     }
     // Светофор в непонятном направлении - дальше делать нечего
     if (signal->direction == 0)
+    {
         return false;
+    }
 
     signal->attitude.z = signal_attitude_z;
 

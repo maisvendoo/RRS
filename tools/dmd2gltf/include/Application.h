@@ -40,11 +40,12 @@ private:
     bool convert_model(std::string &in_dmd_model_path,
                        std::string &in_texture_path,
                        std::string &out_gltf_model_path,
+                       bool smooth = false,
                        std::string out_relative_bin_path = "",
                        std::string out_relative_texture_path = "");
 
     /// Получение данных о модели из DMD-файла
-    bool get_dmd_model_data(std::string &in_dmd_model_path, Geometry& model_data);
+    bool get_dmd_model_data(std::string &in_dmd_model_path, Geometry& model_data, bool smooth = false);
 
     /// Генерация GLTF-модели
     bool generate_gltf_model(Geometry& model_data,
