@@ -7,15 +7,15 @@ project (${TARGET})
 
 # Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
+#set(CMAKE_AUTOMOC ON)
+#set(CMAKE_AUTORCC ON)
+#set(CMAKE_AUTOUIC ON)
 
 # Путь, куда надо сложить собранное
 set (EXECUTABLE_OUTPUT_PATH "../../../../bin")
 
 # Ищем зависимости Qt6
-find_package(Qt6 COMPONENTS Core REQUIRED)
+#find_package(Qt6 COMPONENTS Core REQUIRED)
 
 find_package(KTX QUIET)
 if(NOT KTX_FOUND)
@@ -45,5 +45,5 @@ add_executable (${TARGET} ${CPP_SOURCES} ${C_SOURCES} ${INCLUDES})
 target_include_directories (${TARGET} PRIVATE ./include/)
 
 # Компонуемся с библиотеками Qt6
-target_link_libraries (${TARGET} Qt6::Core)
+#target_link_libraries (${TARGET} Qt6::Core)
 target_link_libraries (${TARGET} ${KTX_TARGET})
