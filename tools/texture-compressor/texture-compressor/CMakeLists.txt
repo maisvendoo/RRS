@@ -35,10 +35,11 @@ endif()
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
-file (GLOB SOURCES "./src/*.cpp")
+file (GLOB CPP_SOURCES "./src/*.cpp")
+file (GLOB C_SOURCES "./src/*.c")
 
 # Компиляция приложения
-add_executable (${TARGET} ${SOURCES} ${INCLUDES})
+add_executable (${TARGET} ${CPP_SOURCES} ${C_SOURCES} ${INCLUDES})
 
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
