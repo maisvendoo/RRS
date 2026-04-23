@@ -34,7 +34,9 @@ bool ZDSimConverter::readSvetoforDAT(QTextStream &stream, zds_signals_data_t &si
         QString line = stream.readLine();
 
         if (line.isEmpty())
+        {
             continue;
+        }
 
         QStringList tokens = line.split(RE_zds_separartors);
         //QStringList tokens = line.split('\t');
@@ -46,6 +48,14 @@ bool ZDSimConverter::readSvetoforDAT(QTextStream &stream, zds_signals_data_t &si
 
         zds_signals_t signal;
         signal.track_id = id_value - 1;
+        if (tokens[1].right(5) == "enter")
+        {
+            tokens[1].erase(tokens[1].cend() - 2); // enter -> entr
+        }
+        if (tokens[1].right(5) == "route")
+        {
+            tokens[1].erase(tokens[1].cend() - 1); // route -> rout
+        }
         signal.type = tokens[1].toStdString();
         if (tokens.size() > 2)
             signal.liter = tokens[2].toStdString();

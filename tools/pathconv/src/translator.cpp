@@ -12,6 +12,8 @@
 //------------------------------------------------------------------------------
 Translator::Translator(const QString& routeDir)
 {
+    alphabet.insert(' ', "_");
+
     alphabet.insert(QChar(0x410), "A");
     alphabet.insert(QChar(0x411), "B");
     alphabet.insert(QChar(0x412), "V");
@@ -188,7 +190,7 @@ bool Translator::translateFileContent(const QString& path, std::function<bool(QS
         if (line != new_line)
         {
             LOG_WARN("Warn: line %u with non-latin symbols: %s", line_num, line.toStdString().c_str());
-            LOG_WARN("      rewrite to latin symbols only: %s", line.toStdString().c_str());
+            LOG_WARN("      rewrite to latin symbols only: %s", new_line.toStdString().c_str());
             new_stream << new_line << "\n";
         }
         else
