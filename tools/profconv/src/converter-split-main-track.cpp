@@ -23,9 +23,6 @@ void ZDSimConverter::findSplitsMainTrajectory1()
             zds_track_t track2 = *it2;
             if (length(track.begin_point - track2.begin_point) < 0.1)
             {
-                // Сохраняем в треке "обратно" id совпадающего трека "туда"
-                it2->begin_at_track1 = id;
-
                 if ((!was_1_track) && (id != 0))
                 {
                     // Начало однопутного участка
@@ -39,6 +36,8 @@ void ZDSimConverter::findSplitsMainTrajectory1()
 
                     // Сохраняем в треке "обратно" id совпадающего трека "туда"
                     it2->id_at_track1 = id;
+                    // Сохраняем в этом треке его собственный id как признак однопутки
+                    it->id_at_track1 = id;
                 }
                 else
                 {
@@ -793,12 +792,49 @@ void ZDSimConverter::splitMainTrajectory(const int &dir)
 
                 // Всегда кодируем АЛСН по главным путям
                 if (is_25kv)
+                {
                     trajectory.ALSN_frequency = 25;
+                }
                 else
+                {
                     trajectory.ALSN_frequency = 50;
+                }
+
+                // На двухпутных участках добавляем к проходным светофорам
+                // пустые встречные светофоры для работы автоблокировки и АЛСН
+                // при движении в неправильном направлении
+                if (it->id_at_track1 == -1)
+                {
+                    auto is_digits_only = [](std::string& liter) -> bool
+                    {
+                        if (liter.empty()) return false;
+
+                        for (auto c : liter)
+                        {
+                            if (!std::isdigit(c)) return false;
+                        }
+
+                        return true;
+                    };
+
+                    if ((dir > 0) && (*split)->signal_bwd_liter.empty()
+                         && is_digits_only((*split)->signal_fwd_liter))
+                    {
+                        (*split)->signal_bwd_liter = (*split)->signal_fwd_liter;
+                        (*split)->signal_bwd_type = "empty_line";
+                    }
+                    else if ((dir < 0) && (*split)->signal_fwd_liter.empty()
+                         && is_digits_only((*split)->signal_bwd_liter))
+                    {
+                        (*split)->signal_fwd_liter = (*split)->signal_bwd_liter;
+                        (*split)->signal_fwd_type = "empty_line";
+                    }
+                }
 
                 if (!(*split)->signal_bwd_liter.empty() || !(*split)->signal_fwd_liter.empty())
+                {
                     is_25kv = false;
+                }
             }
         }
 
