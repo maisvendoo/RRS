@@ -98,8 +98,8 @@ int Converter::run(const command_line_t &cmd_line)
         }
     }
 
-    fs::path out_gltf = gltf_path.parent_path() / (gltf_path.stem().string() + "_ktx.gltf");
-    //fs::path out_gltf = gltf_path;
+    //fs::path out_gltf = gltf_path.parent_path() / (gltf_path.stem().string() + "_ktx.gltf");
+    fs::path out_gltf = gltf_path;
     std::ofstream ofs(out_gltf);
     if (!ofs.is_open()) {
         std::cerr << "[ERR] Cannot write output glTF\n";
