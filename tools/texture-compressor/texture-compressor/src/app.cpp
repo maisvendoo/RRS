@@ -1,0 +1,57 @@
+#include    <app.h>
+#include    <converter.h>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+int Application::run(int argc, char *argv[])
+{
+    if (!init(argc, argv))
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+int Application::init(int argc, char *argv[])
+{
+    cli::Parser parser(argc, argv);
+
+    configure_parser(parser);
+
+    parse_command_line(parser, cmd_line);
+
+    Converter conv;
+
+    return conv.run(cmd_line);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Application::configure_parser(cli::Parser &parser)
+{
+    parser.set_optional<std::string>("m", "model-path",
+                                     "",
+                                     "glTF 2.0 model file");
+
+    parser.enable_help();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Application::parse_command_line(cli::Parser &parser,
+                                     command_line_t &cmd_line)
+{
+    parser.run_and_exit_if_error();
+
+    cmd_line.model_path.value = parser.get<std::string>("m");
+    cmd_line.model_path.is_present = !cmd_line.model_path.value.empty();
+
+    return true;
+}
