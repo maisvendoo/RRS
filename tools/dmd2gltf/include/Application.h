@@ -34,12 +34,14 @@ private:
     bool convert_route(std::string &in_dmd_route_path,
                        std::string &out_gltf_route_path,
                        bool only_used_at_map,
-                       bool lights_at_map);
+                       bool lights_at_map,
+                       bool compress_texture);
 
     /// Конвертация отдельной модели
     bool convert_model(std::string &in_dmd_model_path,
                        std::string &in_texture_path,
                        std::string &out_gltf_model_path,
+                       bool compress_texture = false,
                        bool smooth = false,
                        std::string out_relative_bin_path = "",
                        std::string out_relative_texture_path = "");
@@ -53,7 +55,10 @@ private:
                              std::string &gltf_directory_path,
                              std::string &out_relative_bin_path,
                              std::string &out_relative_texture_path,
-                             float change_vertices_Z = 0.0);
+                             bool compress_texture = false,
+                             float change_vertices_Z = 0.0f);
+
+    bool compress_to_ktx2(const std::string &in_texture_path, const std::string &out_texture_path);
 
 private:
 
