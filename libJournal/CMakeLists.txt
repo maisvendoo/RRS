@@ -28,15 +28,25 @@ if(WIN32)
 endif()
 
 # Компиляция библиотеки
-add_library (${TARGET} SHARED ${CPP_SOURCES} ${C_SOURCES} ${INCLUDES})
+add_library (${TARGET} SHARED)
 
-# Указываем пути поиска заголовков
-target_include_directories (${TARGET} PRIVATE ./include/)
+target_sources(${TARGET}
+    PRIVATE
+        ${CPP_SOURCES}
+        ${C_SOURCES}
+
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS
+            include
+        FILES
+            ${INCLUDES}
+)
 
 if(WIN32)
-    target_link_libraries(${TARGET} Qt6::Core ws2_32)
+    target_link_libraries(${TARGET} PUBLIC Qt6::Core ws2_32)
 else()
-    target_link_libraries(${TARGET} Qt6::Core)
+    target_link_libraries(${TARGET} PUBLIC Qt6::Core)
 endif()
 
 #if (WIN32)
