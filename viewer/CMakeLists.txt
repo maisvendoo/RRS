@@ -53,7 +53,6 @@ target_link_libraries(${TARGET} PRIVATE
 
 target_include_directories(${TARGET} PRIVATE
     ../common-headers
-    ../network/include
     ../sound-manager/include
     display/include
     ./include

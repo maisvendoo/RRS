@@ -46,7 +46,6 @@ endif()
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
-target_include_directories (${TARGET} PRIVATE ../../network/include)
 target_include_directories (${TARGET} PRIVATE ../train/include)
 target_include_directories (${TARGET} PRIVATE ../scenario-manager/include)
 # Компонуемся с библиотеками Qt6

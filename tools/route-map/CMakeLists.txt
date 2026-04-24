@@ -46,7 +46,6 @@ endif()
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 target_include_directories (${TARGET} PRIVATE ../../CfgEditor/include)
-target_include_directories (${TARGET} PRIVATE ../../network/include)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Xml)

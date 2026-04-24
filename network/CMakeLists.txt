@@ -28,11 +28,19 @@ file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
 
 # Компиляция библиотеки
-add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES})
+add_library (${TARGET} SHARED)
 
-# Указываем пути поиска заголовков
-target_include_directories (${TARGET} PRIVATE ./include/)
-target_include_directories (${TARGET} PRIVATE ../libJournal/include)
+target_sources(${TARGET}
+    PRIVATE
+        ${SOURCES}
+
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS
+            include
+        FILES
+            ${INCLUDES}
+)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Network)
