@@ -1,6 +1,7 @@
 #include "WindowHandler.h"
 
 #include "EditorContext.h"
+#include "Journal.h"
 #include "Settings.h"
 
 #include <vsg/app/Camera.h>
@@ -57,8 +58,7 @@ WindowHandler::WindowHandler(EditorContext& context)
     context.window = vsg::Window::create(window_traits);
     if (!context.window)
     {
-        // TODO: Replace on Journal
-        std::fputs("Failed to create window\n", stderr);
+        Journal::instance()->error("Failed to create window");
     }
 }
 

@@ -4,13 +4,13 @@ set(TARGET route_editor)
 
 project(${TARGET})
 
-# set(CMAKE_CXX_STANDARD 17)
-# set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# set(CMAKE_AUTOMOC ON)
-# set(CMAKE_AUTORCC ON)
-# set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 # TODO: Think how to replace
 set(EXECUTABLE_OUTPUT_PATH "../../bin")
@@ -45,6 +45,7 @@ target_link_libraries(${TARGET}
         vsgXchange::vsgXchange
         vsgImGui::vsgImGui
         CfgReader
+        Journal
         filesystem
         topology
         # parsing

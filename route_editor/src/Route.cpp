@@ -1,6 +1,7 @@
 #include "Route.h"
 
 #include "EditorContext.h"
+#include "Journal.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
@@ -112,8 +113,9 @@ bool Route::load_objects_ref()
     std::ifstream objects_ref_file(objects_ref_path);
     if (!objects_ref_file)
     {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to open %s\n", objects_ref_path.c_str());
+        Journal::instance()->error(QString("Failed to open %1")
+            .arg(objects_ref_path));
+
         return false;
     }
 
@@ -165,8 +167,9 @@ bool Route::load_route_map()
     std::ifstream route_map_file(route_map_path);
     if (!route_map_file)
     {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to open %s\n", route_map_path.c_str());
+        Journal::instance()->error(QString("Failed to open %1")
+            .arg(route_map_path));
+
         return false;
     }
 
@@ -216,8 +219,9 @@ bool Route::load_stations_conf()
     std::ifstream stations_conf_file(stations_conf_path);
     if (!stations_conf_file)
     {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to open %s\n", stations_conf_path.c_str());
+        Journal::instance()->error(QString("Failed to open %1")
+            .arg(stations_conf_path));
+
         return false;
     }
 
@@ -251,8 +255,9 @@ bool Route::load_waypoints_conf()
     std::ifstream waypoints_conf_file(waypoints_conf_path);
     if (!waypoints_conf_file)
     {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to open %s\n", waypoints_conf_path.c_str());
+        Journal::instance()->error(QString("Failed to open %1")
+            .arg(waypoints_conf_path));
+
         return false;
     }
 
@@ -326,8 +331,9 @@ bool Route::load_topology()
     CfgReader cfg;
     if (!cfg.load(QString::fromStdString(cfg_path)))
     {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to load %s\n", cfg_path.c_str());
+        Journal::instance()->error(QString("Failed to load %1")
+            .arg(cfg_path));
+
         return false;
     }
 
@@ -336,10 +342,10 @@ bool Route::load_topology()
 
     if (!cfg.getString(section_name, "SignalModelsDir", signal_models_dir))
     {
-        // TODO: Replace on Journal
-        std::fprintf(stderr, "Failed to find field \"SignalModelsDir\" "
-            "in section %s in %s\n", section_name.toStdString().c_str(),
-            cfg_path.c_str());
+        Journal::instance()->error(QString("Failed to find field "
+            "\"SignalModelsDir\" in section %1 in %2")
+            .arg(section_name)
+            .arg(cfg_path));
 
         return false;
     }
@@ -361,8 +367,7 @@ bool Route::load_topology()
 
     if (!context_.topology->load(directory_name.string().c_str()))
     {
-        // TODO: Replace on Journal
-        std::fputs("Failed to load topology\n", stderr);
+        Journal::instance()->error("Failed to load topology");
         return false;
     }
     context_.topology_loaded = true;
@@ -381,8 +386,9 @@ bool Route::load_topology()
         {
             if (!signal)
             {
-                // TODO: Replace on Journal
-                std::fprintf(stderr, "Invalid signal %p\n", (void*)signal);
+                Journal::instance()->error(QString("Invalid signal %1")
+                    .arg(reinterpret_cast<quintptr>(signal)));
+
                 continue;
             }
 

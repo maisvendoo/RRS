@@ -1,6 +1,7 @@
 #include "Settings.h"
 
 #include "Action.h"
+#include "Journal.h"
 #include "KeyBinding.h"
 
 #include <CfgReader.h>
@@ -179,9 +180,8 @@ void settings_t::read(const std::string& cfg_path)
 
         if (!cfg.getString(section, setting_name, line))
         {
-            // TODO: Replace on Journal
-            std::fprintf(stderr, "Failed to find key setting %s\n",
-                setting_name);
+            Journal::instance()->error(QString("Failed to find key setting %1")
+                .arg(setting_name));
 
             continue;
         }

@@ -1,5 +1,6 @@
 #include "EditorGui.h"
 
+#include "Journal.h"
 #include "commands/AddObject.h"
 #include "commands/Command.h"
 #include "commands/CommandList.h"
@@ -31,6 +32,7 @@
 // #include <filesystem>
 #include <cstdio>
 #include <mutex>
+#include <qcontainerfwd.h>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/RecordTraversal.h>
 #include <vsg/commands/Commands.h>
@@ -385,9 +387,8 @@ void EditorGui::show_waypoints_conf() const
                 auto found_it = traj_list->find(traj_name);
                 if (found_it == traj_list->end())
                 {
-                    // TODO: Replace on Journal
-                    std::fprintf(stderr, "Failed to find trajectory %s\n",
-                        data.trajectory_name.c_str());
+                    Journal::instance()->error(QString("Failed to find trajectory %1")
+                        .arg(data.trajectory_name));
                 }
                 else
                 {

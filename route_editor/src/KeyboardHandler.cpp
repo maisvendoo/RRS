@@ -1,5 +1,6 @@
 #include "KeyboardHandler.h"
 
+#include "Journal.h"
 #include "commands/CommandList.h"
 #include "Action.h"
 #include "EditorContext.h"
@@ -39,7 +40,7 @@ static void save_route(
     }
     catch (const std::filesystem::filesystem_error &e)
     {
-        std::cout << e.what() << std::endl;
+        Journal::instance()->error(e.what());
     }
 
     // Перезаписываем рабочую копию
