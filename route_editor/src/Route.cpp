@@ -355,8 +355,7 @@ bool Route::load_topology()
     const std::string models_dir = fs.combinePath(fs.getDataDir(),
         "models", models_dir_name);
 
-    // TODO: Replace on Journal
-    std::printf("Signals directory: %s\n", models_dir.c_str());
+    Journal::instance()->info(QString("Signals directory %1").arg(models_dir));
 
     context_.topology_mutex.lock();
     context_.topology = std::make_unique<Topology>();

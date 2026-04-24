@@ -1,5 +1,6 @@
 #include "shader_funcs.h"
 
+#include "Journal.h"
 #include "filesystem.h"
 
 #include <vsg/core/ref_ptr.h>
@@ -27,8 +28,8 @@ vsg::ref_ptr<vsg::ShaderStage> read_shader(
 
     if (!shader)
     {
-        // TODO: Replace on Journal
-        std::printf("Failed to load shader %s\n", shader_path.c_str());
+        Journal::instance()->warning(QString("Failed to load shader %1")
+            .arg(shader_path));
     }
 
     return shader;
@@ -98,8 +99,9 @@ void configure_shader_set(
 {
     if (!vert_shader || !frag_shader)
     {
-        // TODO: Replace on Journal
-        std::printf("Using default %s shader set\n", shader_set_name);
+        Journal::instance()->warning(QString("Using default %1 shader set")
+            .arg(shader_set_name));
+
         return;
     }
 
@@ -109,6 +111,6 @@ void configure_shader_set(
     // Clear all built-in shader set variants
     shader_set->variants.clear();
 
-    // TODO: Replace on Journal
-    std::printf("Shader set %s configured\n", shader_set_name);
+    Journal::instance()->info(QString("Shader set %1 configured")
+            .arg(shader_set_name));
 }
