@@ -1,12 +1,11 @@
-#include    <ktx.h>
-#include    <nlohmann/json.hpp>
-#include    <stb_image.h>
-#include    <cmdparser.hpp>
+#include    <app.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-    return 0;
+    Application app;
+
+    return app.run(argc, argv);
 }
