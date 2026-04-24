@@ -21,7 +21,7 @@ public:
 
 private:
 
-    bool compress_to_ktx2(const fs::path& src_img, const fs::path& out_ktx);
+    bool compress_to_ktx2(const fs::path& src_img, const fs::path& out_ktx, unsigned int format);
 };
 
 #endif

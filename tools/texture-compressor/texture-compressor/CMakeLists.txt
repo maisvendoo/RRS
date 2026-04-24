@@ -17,6 +17,8 @@ set (EXECUTABLE_OUTPUT_PATH "../../../../bin")
 # Ищем зависимости Qt6
 #find_package(Qt6 COMPONENTS Core REQUIRED)
 
+find_package(Vulkan REQUIRED)
+
 find_package(KTX QUIET)
 if(NOT KTX_FOUND)
     find_package(ktx QUIET)
@@ -47,3 +49,4 @@ target_include_directories (${TARGET} PRIVATE ./include/)
 # Компонуемся с библиотеками Qt6
 #target_link_libraries (${TARGET} Qt6::Core)
 target_link_libraries (${TARGET} ${KTX_TARGET})
+target_link_libraries (${TARGET} Vulkan::Vulkan)

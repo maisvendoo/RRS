@@ -3,6 +3,7 @@
 #include    <fstream>
 #include    <iostream>
 #include    <ktx.h>
+#include    <vulkan/vulkan.h>
 #include    <stb_image.h>
 
 using json = nlohmann::json;
@@ -12,10 +13,6 @@ using KtxPtr = std::unique_ptr<ktxTexture, KtxDeleter>;
 
 struct StbiDeleter { void operator()(stbi_uc* d) const { if(d) stbi_image_free(d); } };
 using StbiPtr = std::unique_ptr<unsigned char[], StbiDeleter>;
-
-#ifndef VK_FORMAT_R8G8B8A8_UNORM
-#define VK_FORMAT_R8G8B8A8_UNORM static_cast<VkFormat>(37)
-#endif
 
 //------------------------------------------------------------------------------
 //
@@ -83,7 +80,7 @@ int Converter::run(const command_line_t &cmd_line)
                       << fs::relative(ktx_path, base_dir).string()
                       << std::endl;
 
-            if (compress_to_ktx2(src_path, ktx_path))
+            if (compress_to_ktx2(src_path, ktx_path, VK_FORMAT_R8G8B8A8_SRGB))
             {
                 img["uri"] = fs::relative(ktx_path, base_dir).string();
                 img.erase("mimeType");
@@ -118,7 +115,7 @@ int Converter::run(const command_line_t &cmd_line)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Converter::compress_to_ktx2(const fs::path& src_img, const fs::path& out_ktx)
+bool Converter::compress_to_ktx2(const fs::path& src_img, const fs::path& out_ktx, unsigned int format)
 {
 
     // === 1. Загрузка изображения ===
@@ -135,7 +132,7 @@ bool Converter::compress_to_ktx2(const fs::path& src_img, const fs::path& out_kt
 
     ktxTextureCreateInfo ci = {};
     // --format R8G8B8A8_SRGB
-    ci.vkFormat        = 43;
+    ci.vkFormat        = format;
 
     ci.baseWidth       = static_cast<ktx_uint32_t>(w);
     ci.baseHeight      = static_cast<ktx_uint32_t>(h);
