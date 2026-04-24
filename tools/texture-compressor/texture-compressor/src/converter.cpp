@@ -98,8 +98,8 @@ int Converter::run(const command_line_t &cmd_line)
         }
     }
 
-    fs::path out_gltf = gltf_path;
-    out_gltf.replace_extension("_ktx.gltf");
+    fs::path out_gltf = gltf_path.parent_path() / (gltf_path.stem().string() + "_ktx.gltf");
+    //fs::path out_gltf = gltf_path;
     std::ofstream ofs(out_gltf);
     if (!ofs.is_open()) {
         std::cerr << "[ERR] Cannot write output glTF\n";
@@ -128,7 +128,7 @@ bool Converter::compress_to_ktx2(const fs::path& src_img,
         return false;
     }
 
-    const size_t size = w * h * ch;
+    const size_t size = w * h * 4;
 
     ktxTextureCreateInfo ci = {};
     // --format R8G8B8A8_SRGB
