@@ -1,18 +1,8 @@
 #include    <converter.h>
-#include    <nlohmann/json.hpp>
 #include    <fstream>
 #include    <iostream>
 #include    <ktx.h>
-#include    <vulkan/vulkan.h>
 #include    <stb_image.h>
-
-using json = nlohmann::json;
-
-struct KtxDeleter { void operator()(ktxTexture* t) const { if(t) ktxTexture_Destroy(t); } };
-using KtxPtr = std::unique_ptr<ktxTexture, KtxDeleter>;
-
-struct StbiDeleter { void operator()(stbi_uc* d) const { if(d) stbi_image_free(d); } };
-using StbiPtr = std::unique_ptr<unsigned char[], StbiDeleter>;
 
 //------------------------------------------------------------------------------
 //
@@ -55,10 +45,14 @@ int Converter::run(const command_line_t &cmd_line)
     int processed = 0;
     int failed = 0;
 
+    auto img_settings = parse_gltf_textures(gltf);
+
     if (gltf.contains("images") && gltf["images"].is_array())
     {
-        for (auto &img : gltf["images"])
+        for (int img_idx = 0; img_idx < gltf["images"].size(); ++img_idx)
         {
+            auto &img = gltf["images"][img_idx];
+
             if (!img.contains("uri"))
             {
                 continue;
@@ -80,7 +74,12 @@ int Converter::run(const command_line_t &cmd_line)
                       << fs::relative(ktx_path, base_dir).string()
                       << std::endl;
 
-            if (compress_to_ktx2(src_path, ktx_path, VK_FORMAT_R8G8B8A8_SRGB))
+            auto it = img_settings.find(img_idx);
+            const TextureSettings& cfg = (it != img_settings.end()) ? it->second : TextureSettings{};
+            std::cout << " (Role: " << (cfg.role == PBRTextureRole::UNKNOWN ? "UNKNOWN" : "PBR")
+                      << ", Format: " << (cfg.isSRGB ? "SRGB" : "UNORM") << ")\n";
+
+            if (compress_to_ktx2(src_path, ktx_path, cfg))
             {
                 img["uri"] = fs::relative(ktx_path, base_dir).string();
                 img.erase("mimeType");
@@ -115,7 +114,10 @@ int Converter::run(const command_line_t &cmd_line)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Converter::compress_to_ktx2(const fs::path& src_img, const fs::path& out_ktx, unsigned int format)
+bool Converter::compress_to_ktx2(const fs::path& src_img,
+                                 const fs::path& out_ktx,
+                                 const TextureSettings &cfg,
+                                 bool generate_mipmaps)
 {
 
     // === 1. Загрузка изображения ===
@@ -126,13 +128,11 @@ bool Converter::compress_to_ktx2(const fs::path& src_img, const fs::path& out_kt
         return false;
     }
 
-    StbiPtr img(data);
-
     const size_t size = w * h * ch;
 
     ktxTextureCreateInfo ci = {};
     // --format R8G8B8A8_SRGB
-    ci.vkFormat        = format;
+    ci.vkFormat        = cfg.vkFormat;
 
     ci.baseWidth       = static_cast<ktx_uint32_t>(w);
     ci.baseHeight      = static_cast<ktx_uint32_t>(h);
@@ -144,7 +144,7 @@ bool Converter::compress_to_ktx2(const fs::path& src_img, const fs::path& out_kt
 
     // В CLI мипмапы НЕ генерируются без явного --generate-mipmap
     ci.numLevels       = 1;
-    ci.generateMipmaps = KTX_FALSE;
+    ci.generateMipmaps = generate_mipmaps ? KTX_TRUE : KTX_FALSE;
 
     ktxTexture2* texture = nullptr;
     KTX_error_code result = ktxTexture2_Create(&ci,
@@ -175,7 +175,7 @@ bool Converter::compress_to_ktx2(const fs::path& src_img, const fs::path& out_kt
     params.codec = KTX_BASIS_CODEC_ETC1S;
 
     // --qlevel (по умолчанию 128)
-    params.qualityLevel = 128;
+    params.qualityLevel = cfg.qualityLevel;
 
     // --clevel (CLI по умолчанию 1, хотя в libktx константа = 2)
     params.etc1sCompressionLevel = 1;
@@ -194,7 +194,7 @@ bool Converter::compress_to_ktx2(const fs::path& src_img, const fs::path& out_kt
     // Флаги по умолчанию
     params.verbose           = KTX_FALSE;
     params.noSSE             = KTX_FALSE;
-    params.normalMap         = KTX_FALSE;
+    params.normalMap         = cfg.isNormalMap ? KTX_TRUE : KTX_FALSE;
     params.preSwizzle        = KTX_FALSE;
     params.noEndpointRDO     = KTX_FALSE;
     params.noSelectorRDO     = KTX_FALSE;
@@ -217,5 +217,60 @@ bool Converter::compress_to_ktx2(const fs::path& src_img, const fs::path& out_kt
 
     ktxTexture_Destroy(ktxTexture(texture));
 
+    stbi_image_free(data);
+
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::map<int, Converter::TextureSettings> Converter::parse_gltf_textures(const json &gltf)
+{
+    std::map<int, TextureSettings> image_settings;
+
+    if (!gltf.contains("textures") || !gltf["textures"].is_array() ||
+        !gltf.contains("materials") || !gltf["materials"].is_array())
+    {
+        return image_settings;
+    }
+
+    auto set_role = [&](int tex_idx, PBRTextureRole role, uint32_t quality, bool is_srgb, bool is_normal) {
+        if (tex_idx < 0 || tex_idx >= gltf["textures"].size()) return;
+        int img_idx = gltf["textures"][tex_idx].value("source", -1);
+        if (img_idx < 0 || img_idx >= gltf["images"].size()) return;
+
+        auto& settings = image_settings[img_idx];
+        // Приоритет: Normal > BaseColor > остальные. Не перезаписываем, если роль уже определена.
+        if (settings.role == PBRTextureRole::UNKNOWN || role == PBRTextureRole::NORMAL) {
+            settings.role = role;
+            settings.qualityLevel = quality;
+            settings.isNormalMap = is_normal;
+            settings.isSRGB = is_srgb;
+            settings.vkFormat = is_srgb ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
+            if (role == PBRTextureRole::OCCLUSION) settings.vkFormat = VK_FORMAT_R8_UNORM;
+        }
+    };
+
+    for (const auto& mat : gltf["materials"])
+    {
+        if (mat.contains("pbrMetallicRoughness"))
+        {
+            auto& pbr = mat["pbrMetallicRoughness"];
+            if (pbr.contains("baseColorTexture"))
+                set_role(pbr["baseColorTexture"]["index"], PBRTextureRole::BASE_COLOR, 160, true, false);
+
+            if (pbr.contains("metallicRoughnessTexture"))
+                set_role(pbr["metallicRoughnessTexture"]["index"], PBRTextureRole::METALLIC_ROUGHNESS, 128, false, false);
+        }
+
+        if (mat.contains("normalTexture"))
+            set_role(mat["normalTexture"]["index"], PBRTextureRole::NORMAL, 192, false, true);
+
+        if (mat.contains("emissiveTexture"))
+            set_role(mat["emissiveTexture"]["index"], PBRTextureRole::EMISSIVE, 128, true, false);
+        if (mat.contains("occlusionTexture"))
+            set_role(mat["occlusionTexture"]["index"], PBRTextureRole::OCCLUSION, 96, false, false);
+    }
+    return image_settings;
 }
