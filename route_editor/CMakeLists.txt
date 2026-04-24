@@ -47,17 +47,11 @@ target_link_libraries(${TARGET}
         CfgReader
         filesystem
         topology
-        parsing
+        # parsing
 )
 
 if(MSVC)
-    target_compile_options(${TARGET}
-        PRIVATE
-            /W3
-    )
+    target_compile_options(${TARGET} PRIVATE /W3)
 else()
-    target_compile_options(${TARGET}
-        PRIVATE
-            -Wall -Wextra -Wpedantic
-    )
+    target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Wpedantic)
 endif()
