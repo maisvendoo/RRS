@@ -170,7 +170,10 @@ void MainWindow::startDmd2gltfConverter()
         args << "--used-only";
     }
     args << "--lights";
-    args << "--compress-textures";
+    if (ui->cbCompressTextures->checkState())
+    {
+        args << "--compress-textures";
+    }
 
     dmd2gltfProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     dmd2gltfProc.start(dmd2gltf_path, args);
