@@ -20,6 +20,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include    <stb_image.h>
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include    <stb_image_resize.h>
 
 namespace fs = std::filesystem;
 
@@ -1210,7 +1212,7 @@ bool Application::compress_to_ktx2(const std::string& in_texture_path, const std
         return false;
     }
 
-    const size_t size = w * h * 4;
+    size_t size = w * h * 4;
 
     ktxTextureCreateInfo ci = {};
     // --format R8G8B8A8_SRGB
@@ -1224,30 +1226,69 @@ bool Application::compress_to_ktx2(const std::string& in_texture_path, const std
     ci.numFaces        = 1;
     ci.isArray         = KTX_FALSE;
 
-    // В CLI мипмапы НЕ генерируются без явного --generate-mipmap
-    ci.numLevels       = 1;
+    // Число mipmap-уровней определяем ЯВНО, так как сами их сгенерируем
+    ci.numLevels       = static_cast<uint32_t>(std::floor(std::log2(std::max(w, h))) + 1);
+    // Не полагаемся на аппратную генерацию - это для несжатых текстур
     ci.generateMipmaps = KTX_FALSE;
 
-    ktxTexture2* texture = nullptr;
+    ktxTexture2* Ktexture2 = nullptr;
     KTX_error_code result = ktxTexture2_Create(&ci,
                                                KTX_TEXTURE_CREATE_ALLOC_STORAGE,
-                                               &texture);
+                                               &Ktexture2);
 
     if (result != KTX_SUCCESS)
     {
         LOG_WARN("KTX: error (%u) while creating ktxTexture2 for file: %s", result, in_texture_path.c_str());
+        stbi_image_free(data);
         return false;
     }
 
-    result = ktxTexture_SetImageFromMemory(ktxTexture(texture),
+    ktxTexture* Ktexture = ktxTexture(Ktexture2);
+    result = ktxTexture_SetImageFromMemory(Ktexture,
                                            0, 0, 0,
-                                           data,
-                                           size);
-
+                                           data, size);
     if (result != KTX_SUCCESS)
     {
-        LOG_WARN("KTX: error (%u) to set image data from file: %s", result, in_texture_path.c_str());
+        LOG_WARN("KTX: error (%u) to set 0 level of image from file: %s", result, in_texture_path.c_str());
+        ktxTexture_Destroy(Ktexture);
+        stbi_image_free(data);
         return false;
+    }
+
+    // Массив под указатели на данные всех уровней, не удаляем эти данные
+    // до сжатия и сохранения текстуры на диск!
+    std::vector<stbi_uc *> levels_data = {data};
+
+    // Вручную генерируем mipmaps, последовательно уменьшая
+    // размеры текстуры в два раза на каждом уровне
+    for (uint32_t level = 1; level < ci.numLevels; ++level)
+    {
+        int next_w = std::max(1, w >> 1);
+        int next_h = std::max(1, h >> 1);
+        size = next_w * next_h * 4;
+        stbi_uc* next_resized = new stbi_uc[size];
+
+        // Ресемплинг
+        stbir_resize_uint8(levels_data.back(), w, h, 0,
+                           next_resized, next_w, next_h, 0, 4);
+        levels_data.push_back(next_resized);
+
+        // Загружаем уровень в ktxTexture
+        result = ktxTexture_SetImageFromMemory(Ktexture,
+                                               level, 0, 0,
+                                               next_resized, size);
+        if (result != KTX_SUCCESS)
+        {
+            LOG_WARN("KTX: error (%u) to set %u level of image from file: %s", result, level, in_texture_path.c_str());
+            ktxTexture_Destroy(Ktexture);
+            for (auto d : levels_data)
+            {
+                stbi_image_free(d);
+            }
+            return false;
+        }
+        w = next_w;
+        h = next_h;
     }
 
     ktxBasisParams params = {};
@@ -1281,27 +1322,30 @@ bool Application::compress_to_ktx2(const std::string& in_texture_path, const std
     params.noEndpointRDO     = KTX_FALSE;
     params.noSelectorRDO     = KTX_FALSE;
 
-    result = ktxTexture2_CompressBasisEx(texture, &params);
+    result = ktxTexture2_CompressBasisEx(Ktexture2, &params);
 
     if (result != KTX_SUCCESS)
     {
         LOG_WARN("KTX: error (%u) while compressing image from file: %s", result, in_texture_path.c_str());
-        return false;
     }
-
-    result = ktxTexture_WriteToNamedFile(ktxTexture(texture), out_texture_path.c_str());
-
-    if (result != KTX_SUCCESS)
+    else
     {
-        LOG_WARN("KTX: error (%u) while writing file: %s", result, out_texture_path.c_str());
-        return false;
+        result = ktxTexture_WriteToNamedFile(Ktexture, out_texture_path.c_str());
+
+        if (result != KTX_SUCCESS)
+        {
+            LOG_WARN("KTX: error (%u) while writing file: %s", result, out_texture_path.c_str());
+        }
     }
 
-    ktxTexture_Destroy(ktxTexture(texture));
+    // Освобождаем память от ktx-параметров и от пикселей всех уровней
+    ktxTexture_Destroy(Ktexture);
+    for (auto d : levels_data)
+    {
+        stbi_image_free(d);
+    }
 
-    stbi_image_free(data);
-
-    return true;
+    return result == KTX_SUCCESS;
 }
 
 //------------------------------------------------------------------------------
