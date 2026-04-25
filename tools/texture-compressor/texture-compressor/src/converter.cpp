@@ -82,7 +82,7 @@ int Converter::run(const command_line_t &cmd_line)
             std::cout << " (Role: " << (cfg.role == PBRTextureRole::UNKNOWN ? "UNKNOWN" : "PBR")
                       << ", Format: " << (cfg.isSRGB ? "SRGB" : "UNORM") << ")\n";
 
-            if (compress_to_ktx2(src_path, ktx_path, cfg, true))
+            if (compress_to_ktx2(src_path, ktx_path, cfg, cmd_line.generate_mipmaps))
             {
                 img["uri"] = fs::relative(ktx_path, base_dir).string();
                 img.erase("mimeType");

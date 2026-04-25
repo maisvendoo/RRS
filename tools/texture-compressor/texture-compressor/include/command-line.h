@@ -26,6 +26,7 @@ struct option_t
 struct command_line_t
 {
     option_t<std::string> model_path;
+    bool generate_mipmaps = false;
 };
 
 #endif

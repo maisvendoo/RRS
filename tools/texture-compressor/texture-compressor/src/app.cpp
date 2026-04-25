@@ -39,6 +39,10 @@ void Application::configure_parser(cli::Parser &parser)
                                      "",
                                      "glTF 2.0 model file");
 
+    parser.set_optional<bool>("g", "generate-mipmaps",
+                              false,
+                              "Generate mipmaps");
+
     parser.enable_help();
 }
 
@@ -52,6 +56,8 @@ bool Application::parse_command_line(cli::Parser &parser,
 
     cmd_line.model_path.value = parser.get<std::string>("m");
     cmd_line.model_path.is_present = !cmd_line.model_path.value.empty();
+
+    cmd_line.generate_mipmaps = parser.get<bool>("g");
 
     return true;
 }
