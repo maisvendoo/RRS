@@ -12,6 +12,7 @@
 #include    <map>
 #include    <set>
 #include    <string>
+#include    <thread>
 #include    <utility>
 #include    <vector>
 
@@ -1304,7 +1305,7 @@ bool Application::compress_to_ktx2(const std::string& in_texture_path, const std
     params.etc1sCompressionLevel = 1;
 
     // Потоки (по умолчанию 0 = аппаратное определение всех ядер)
-    params.threadCount = 0;
+    params.threadCount = std::thread::hardware_concurrency();
 
     // RDO-пороги (по умолчанию 1.25, применяются при qlevel <= 128)
     params.endpointRDOThreshold = 1.25f;
