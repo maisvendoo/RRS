@@ -2,6 +2,7 @@
 #include    <fstream>
 #include    <iostream>
 #include    <ktx.h>
+#include    <thread>
 
 #define     STB_IMAGE_IMPLEMENTATION
 #include    <stb_image.h>
@@ -142,8 +143,13 @@ int Converter::run(const command_line_t &cmd_line)
         }
     }
 
-    fs::path out_gltf = gltf_path.parent_path() / (gltf_path.stem().string() + "_ktx.gltf");
-    //fs::path out_gltf = gltf_path;
+    fs::path out_gltf;
+
+    if (cmd_line.overwrite_gltf)
+        out_gltf = gltf_path;
+    else
+        out_gltf = gltf_path.parent_path() / (gltf_path.stem().string() + "_ktx.gltf");
+
     std::ofstream ofs(out_gltf);
     if (!ofs.is_open()) {
         std::cerr << "[ERR] Cannot write output glTF\n";
@@ -263,8 +269,17 @@ bool Converter::compress_to_ktx2(const fs::path& src_img,
     // --clevel (CLI по умолчанию 1, хотя в libktx константа = 2)
     params.etc1sCompressionLevel = 1;
 
-    // Потоки (по умолчанию 0 = аппаратное определение всех ядер)
-    params.threadCount = 0;
+    // Потоки - ЯВНО указываем количиство наших ядер
+    unsigned int numThreads = std::thread::hardware_concurrency();
+
+    if (numThreads == 0)
+    {
+        numThreads = 1;
+    }
+
+    params.threadCount = numThreads;
+
+    std::cout << "[INF] Compession by " << numThreads << " threads of your CPU" << std::endl;
 
     // RDO-пороги (по умолчанию 1.25, применяются при qlevel <= 128)
     params.endpointRDOThreshold = 1.25f;

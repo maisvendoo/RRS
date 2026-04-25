@@ -28,6 +28,7 @@ struct command_line_t
     option_t<std::string> model_path;
     bool generate_mipmaps = false;
     option_t<std::string> skip_textures;
+    bool overwrite_gltf = false;
 };
 
 #endif

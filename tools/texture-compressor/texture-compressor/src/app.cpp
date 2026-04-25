@@ -47,6 +47,10 @@ void Application::configure_parser(cli::Parser &parser)
                                      "",
                                      "Skip textures by name (<name1>,<name2>,...,<name_N>)");
 
+    parser.set_optional<bool>("o", "overwrite-gltf",
+                              false,
+                              "Overwrite source GLTF file");
+
     parser.enable_help();
 }
 
@@ -65,6 +69,8 @@ bool Application::parse_command_line(cli::Parser &parser,
 
     cmd_line.skip_textures.value = parser.get<std::string>("s");
     cmd_line.skip_textures.is_present = !cmd_line.skip_textures.value.empty();
+
+    cmd_line.overwrite_gltf = parser.get<bool>("o");
 
     return true;
 }
