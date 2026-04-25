@@ -2,7 +2,11 @@
 #include    <fstream>
 #include    <iostream>
 #include    <ktx.h>
+
+#define     STB_IMAGE_IMPLEMENTATION
 #include    <stb_image.h>
+#define     STB_IMAGE_RESIZE_IMPLEMENTATION
+#include    <stb_image_resize.h>
 
 //------------------------------------------------------------------------------
 //
@@ -12,7 +16,7 @@ int Converter::run(const command_line_t &cmd_line)
     // Открываем модель по указанному пути
     if (!cmd_line.model_path.is_present)
     {
-        std::cerr << "ERROR: missing path to GLTF-file" << std::endl;
+        std::cerr << "[ERR] missing path to GLTF-file" << std::endl;
         return -1;
     }
 
@@ -23,7 +27,7 @@ int Converter::run(const command_line_t &cmd_line)
 
     if (!ifs.is_open())
     {
-        std::cerr << "ERROR: can't open GLTF-file" << std::endl;
+        std::cerr << "[ERR] can't open GLTF-file" << std::endl;
         return -1;
     }
 
@@ -36,7 +40,7 @@ int Converter::run(const command_line_t &cmd_line)
     }
     catch (const std::exception &e)
     {
-        std::cerr << "ERROR: JSON parse error: " << e.what() << std::endl;
+        std::cerr << "[ERR] JSON parse error: " << e.what() << std::endl;
         return -1;
     }
 
@@ -63,14 +67,13 @@ int Converter::run(const command_line_t &cmd_line)
 
             if (!fs::exists(src_path))
             {
-                std::cerr << "ERROR: Texture not found: " << src_path << std::endl;
+                std::cerr << "[ERR] Texture not found: " << src_path << std::endl;
                 continue;
             }
 
-
             fs::path ktx_path = src_path;
             ktx_path.replace_extension(".ktx2");
-            std::cout << "INFO: Converting: " << uri << " -> "
+            std::cout << "[INF] Converting: " << uri << " -> "
                       << fs::relative(ktx_path, base_dir).string()
                       << std::endl;
 
@@ -79,7 +82,7 @@ int Converter::run(const command_line_t &cmd_line)
             std::cout << " (Role: " << (cfg.role == PBRTextureRole::UNKNOWN ? "UNKNOWN" : "PBR")
                       << ", Format: " << (cfg.isSRGB ? "SRGB" : "UNORM") << ")\n";
 
-            if (compress_to_ktx2(src_path, ktx_path, cfg))
+            if (compress_to_ktx2(src_path, ktx_path, cfg, true))
             {
                 img["uri"] = fs::relative(ktx_path, base_dir).string();
                 img.erase("mimeType");
@@ -98,8 +101,8 @@ int Converter::run(const command_line_t &cmd_line)
         }
     }
 
-    //fs::path out_gltf = gltf_path.parent_path() / (gltf_path.stem().string() + "_ktx.gltf");
-    fs::path out_gltf = gltf_path;
+    fs::path out_gltf = gltf_path.parent_path() / (gltf_path.stem().string() + "_ktx.gltf");
+    //fs::path out_gltf = gltf_path;
     std::ofstream ofs(out_gltf);
     if (!ofs.is_open()) {
         std::cerr << "[ERR] Cannot write output glTF\n";
@@ -119,33 +122,40 @@ bool Converter::compress_to_ktx2(const fs::path& src_img,
                                  const TextureSettings &cfg,
                                  bool generate_mipmaps)
 {
-
-    // === 1. Загрузка изображения ===
+    // Загрузка оригинальной текстуры
     int w = 0, h = 0, ch = 0;
+
+    // Всегда берем 4 канала, если нет альфы, то создается альфа равная 255
     stbi_uc* data = stbi_load(src_img.string().c_str(), &w, &h, &ch, 4);
-    if (!data) {
-        std::cerr << "[ERR] stbi_load: " << stbi_failure_reason() << " | " << src_img << "\n";
+
+    if (!data)
+    {
+        std::cerr << "[ERR] stbi_load: " << stbi_failure_reason() << " | " << src_img << std::endl;
         return false;
-    }
+    }    
 
-    const size_t size = w * h * 4;
+    // Вычисление количества мип-уровней
+    auto calcMipLevels = [](uint32_t w, uint32_t h) -> uint32_t {
+        return static_cast<uint32_t>(floor(log2(std::max(w, h))) + 1);
+    };
 
+    // Заполняем структуру, несущую информацию о будущей текстре
     ktxTextureCreateInfo ci = {};
-    // --format R8G8B8A8_SRGB
-    ci.vkFormat        = cfg.vkFormat;
-
-    ci.baseWidth       = static_cast<ktx_uint32_t>(w);
-    ci.baseHeight      = static_cast<ktx_uint32_t>(h);
-    ci.baseDepth       = 1;
-    ci.numDimensions   = 2;
+    ci.vkFormat        = cfg.vkFormat; // формат входных данных
+    ci.baseWidth       = static_cast<ktx_uint32_t>(w); // базовая ширина
+    ci.baseHeight      = static_cast<ktx_uint32_t>(h); // базовая выоста
+    ci.baseDepth       = 1; // базовая глубина
+    ci.numDimensions   = 2; // базовая размерность (2D)
     ci.numLayers       = 1;
     ci.numFaces        = 1;
     ci.isArray         = KTX_FALSE;
 
-    // В CLI мипмапы НЕ генерируются без явного --generate-mipmap
-    ci.numLevels       = 1;
-    ci.generateMipmaps = generate_mipmaps ? KTX_TRUE : KTX_FALSE;
+    // Число mipmap-уровней определяем ЯВНО, так как сами их сгенерируем
+    ci.numLevels       = generate_mipmaps ? calcMipLevels(w, h) : 1;
+    // Не полагаемся на аппратную генерацию - это для несжатых текстур
+    ci.generateMipmaps = KTX_FALSE;
 
+    // Создаем текстуру
     ktxTexture2* texture = nullptr;
     KTX_error_code result = ktxTexture2_Create(&ci,
                                                KTX_TEXTURE_CREATE_ALLOC_STORAGE,
@@ -153,23 +163,55 @@ bool Converter::compress_to_ktx2(const fs::path& src_img,
 
     if (result != KTX_SUCCESS)
     {
-        std::cerr << "Failed to create ktxTexture2: " << result << std::endl;
+        std::cerr << "[ERR] Failed to create ktxTexture2: " << result << std::endl;
         return false;
     }
 
-    result = ktxTexture_SetImageFromMemory(ktxTexture(texture),
-                                           0, 0, 0,
-                                           data,
-                                           size);
+    // Загружаем базовый уровень (0)
+    auto* baseTex = ktxTexture(texture);
+    ktxTexture_SetImageFromMemory(baseTex, 0, 0, 0, data, w * h * 4);
 
-    if (result != KTX_SUCCESS)
+    // Массив под указатели на данные всех уровней, не удаляем эти данные до сжатия
+    // и сохранения текстуры на диск!
+    std::vector<stbi_uc *> levels_data;
+
+    // Если нужны мипы — генерируем их вручную, последовательно уменашая
+    // рзмеры текструы в два раза на каждом уровне
+    if (generate_mipmaps && ci.numLevels > 1)
     {
-        std::cerr << "Failed to set base image: " << result << std::endl;
-        return false;
+        stbi_uc* prevLevelData = data;
+        uint32_t prevW = w, prevH = h;
+
+        for (uint32_t level = 1; level < ci.numLevels; ++level)
+        {
+            levels_data.push_back(prevLevelData);
+
+            uint32_t curW = std::max(1u, prevW >> 1);
+            uint32_t curH = std::max(1u, prevH >> 1);
+
+            stbi_uc* resized = new stbi_uc[curW * curH * 4];
+
+            // Ресемплинг
+            stbir_resize_uint8(
+                prevLevelData, prevW, prevH, 0,
+                resized, curW, curH, 0, 4
+                );
+
+            // Загружаем уровень в ktxTexture
+            ktxTexture_SetImageFromMemory(
+                baseTex, level, 0, 0,
+                resized, curW * curH * 4
+                );
+
+            prevLevelData = resized;
+            prevW = curW;
+            prevH = curH;
+        }
     }
 
+    // Подготовка данных для сжатия
     ktxBasisParams params = {};
-    params.structSize = sizeof(ktxBasisParams);  // Всегда первым полем
+    params.structSize = sizeof(ktxBasisParams);
 
     // --encode basis-lz
     params.codec = KTX_BASIS_CODEC_ETC1S;
@@ -203,7 +245,7 @@ bool Converter::compress_to_ktx2(const fs::path& src_img,
 
     if (result != KTX_SUCCESS)
     {
-        std::cerr << "Failed to compress texture: " << result << std::endl;
+        std::cerr << "[ERR] Failed to compress texture: " << result << std::endl;
         return false;
     }
 
@@ -211,14 +253,20 @@ bool Converter::compress_to_ktx2(const fs::path& src_img,
 
     if (result != KTX_SUCCESS)
     {
-        std::cerr << "Failed to write file: " << result << std::endl;
+        std::cerr << "[ERR] Failed to write file: " << result << std::endl;
         return false;
     }
 
+    // Уничтожаем текстуру в памяти
     ktxTexture_Destroy(ktxTexture(texture));
 
-    stbi_image_free(data);
+    // Освобождаем память всех мипмап-уровней
+    for (auto d : levels_data)
+    {
+        stbi_image_free(d);
+    }
 
+    // Уходим довольные, как слон, проделанной работой
     return true;
 }
 
@@ -241,8 +289,10 @@ std::map<int, Converter::TextureSettings> Converter::parse_gltf_textures(const j
         if (img_idx < 0 || img_idx >= gltf["images"].size()) return;
 
         auto& settings = image_settings[img_idx];
+
         // Приоритет: Normal > BaseColor > остальные. Не перезаписываем, если роль уже определена.
-        if (settings.role == PBRTextureRole::UNKNOWN || role == PBRTextureRole::NORMAL) {
+        if (settings.role == PBRTextureRole::UNKNOWN || role == PBRTextureRole::NORMAL)
+        {
             settings.role = role;
             settings.qualityLevel = quality;
             settings.isNormalMap = is_normal;
@@ -269,8 +319,10 @@ std::map<int, Converter::TextureSettings> Converter::parse_gltf_textures(const j
 
         if (mat.contains("emissiveTexture"))
             set_role(mat["emissiveTexture"]["index"], PBRTextureRole::EMISSIVE, 128, true, false);
+
         if (mat.contains("occlusionTexture"))
             set_role(mat["occlusionTexture"]["index"], PBRTextureRole::OCCLUSION, 96, false, false);
     }
+
     return image_settings;
 }
