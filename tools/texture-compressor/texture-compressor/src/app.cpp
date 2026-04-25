@@ -43,6 +43,10 @@ void Application::configure_parser(cli::Parser &parser)
                               false,
                               "Generate mipmaps");
 
+    parser.set_optional<std::string>("s", "skip-textures",
+                                     "",
+                                     "Skip textures by name (<name1>,<name2>,...,<name_N>)");
+
     parser.enable_help();
 }
 
@@ -58,6 +62,9 @@ bool Application::parse_command_line(cli::Parser &parser,
     cmd_line.model_path.is_present = !cmd_line.model_path.value.empty();
 
     cmd_line.generate_mipmaps = parser.get<bool>("g");
+
+    cmd_line.skip_textures.value = parser.get<std::string>("s");
+    cmd_line.skip_textures.is_present = !cmd_line.skip_textures.value.empty();
 
     return true;
 }

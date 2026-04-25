@@ -11,6 +11,25 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+std::vector<std::string_view> split_by_comma_view(std::string_view str)
+{
+    std::vector<std::string_view> tokens;
+    size_t start = 0;
+    size_t end = str.find(',');
+
+    while (end != std::string_view::npos)
+    {
+        tokens.emplace_back(str.substr(start, end - start));
+        start = end + 1;
+        end = str.find(',', start);
+    }
+    tokens.emplace_back(str.substr(start));
+    return tokens;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 int Converter::run(const command_line_t &cmd_line)
 {
     // Открываем модель по указанному пути
@@ -51,6 +70,9 @@ int Converter::run(const command_line_t &cmd_line)
 
     auto img_settings = parse_gltf_textures(gltf);
 
+    // Формируем список пропускаемых текструр
+    auto skiped_textures = split_by_comma_view(cmd_line.skip_textures.value);
+
     if (gltf.contains("images") && gltf["images"].is_array())
     {
         for (int img_idx = 0; img_idx < gltf["images"].size(); ++img_idx)
@@ -68,6 +90,25 @@ int Converter::run(const command_line_t &cmd_line)
             if (!fs::exists(src_path))
             {
                 std::cerr << "[ERR] Texture not found: " << src_path << std::endl;
+                continue;
+            }
+
+            // Проверяем, не надо ли пропустить эту текстуру
+            bool is_skip_texture = false;
+
+            for (auto skip_tex : skiped_textures)
+            {
+                if (skip_tex == src_path.filename().string())
+                {
+                    is_skip_texture = true;
+                    break;
+                }
+            }
+
+            // Пропускаем текстуру из списка
+            if (is_skip_texture)
+            {
+                std::cout << "[INF] Skip texture " << src_path << std::endl;
                 continue;
             }
 
