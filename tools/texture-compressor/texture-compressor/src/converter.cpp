@@ -170,7 +170,7 @@ bool Converter::compress_to_ktx2(const fs::path& src_img,
                                  bool generate_mipmaps)
 {
     // Загрузка оригинальной текстуры
-    int w = 0, h = 0, ch = 0;
+    int w = 0, h = 0, ch = 0;   
 
     // Всегда берем 4 канала, если нет альфы, то создается альфа равная 255
     stbi_uc* data = stbi_load(src_img.string().c_str(), &w, &h, &ch, 4);
@@ -260,42 +260,50 @@ bool Converter::compress_to_ktx2(const fs::path& src_img,
     ktxBasisParams params = {};
     params.structSize = sizeof(ktxBasisParams);
 
+    // КРИТИЧНО: Обязательно устанавливаем уровень сжатия ETC1S
+    // Ваше значение 1 - допустимо, но используйте константу для ясности
+    params.etc1sCompressionLevel = 2; // KTX_ETC1S_DEFAULT_COMPRESSION_LEVEL = 2
+
     // --encode basis-lz
     params.codec = KTX_BASIS_CODEC_ETC1S;
 
     // --qlevel (по умолчанию 128)
     params.qualityLevel = cfg.qualityLevel;
 
-    // --clevel (CLI по умолчанию 1, хотя в libktx константа = 2)
-    params.etc1sCompressionLevel = 1;
-
-    // Потоки - ЯВНО указываем количиство наших ядер
+    // Потоки - ЯВНО указываем количество наших ядер
     unsigned int numThreads = std::thread::hardware_concurrency();
+    params.threadCount = (numThreads == 0) ? 1 : numThreads;
 
-    if (numThreads == 0)
+    // RDO-пороги - важны для normal maps!
+    if (cfg.isNormalMap)
     {
-        numThreads = 1;
+        // Для normal map ДОЛЖНЫ быть отключены RDO оптимизации
+        // Согласно документации: "Tunes codec parameters for better quality on normal maps
+        // (no selector RDO, no endpoint RDO)"
+        params.normalMap = KTX_TRUE;
+        params.noEndpointRDO = KTX_TRUE;  // Отключаем endpoint RDO
+        params.noSelectorRDO = KTX_TRUE;  // Отключаем selector RDO
+
+        // Для normal maps не используем preSwizzle - он для метаданных KTXswizzle
+        // В вашем случае нет такой метаинформации
+        params.preSwizzle = KTX_FALSE;
+
+        // Также не используем inputSwizzle, если не нужно менять порядок каналов
+        params.inputSwizzle[0] = 'r'; // Если нужно переставить каналы
+        params.inputSwizzle[1] = 'g';
+        params.inputSwizzle[2] = 'b';
+        params.inputSwizzle[3] = 'a';
+    } else
+    {
+        params.normalMap = KTX_FALSE;
+        params.endpointRDOThreshold = 1.25f;
+        params.selectorRDOThreshold = 1.25f;
+        params.noEndpointRDO = KTX_FALSE;
+        params.noSelectorRDO = KTX_FALSE;
     }
 
-    params.threadCount = numThreads;
-
-    std::cout << "[INF] Compession by " << numThreads << " threads of your CPU" << std::endl;
-
-    // RDO-пороги (по умолчанию 1.25, применяются при qlevel <= 128)
-    params.endpointRDOThreshold = 1.25f;
-    params.selectorRDOThreshold = 1.25f;
-
-    // Автоматический выбор кластеров (по умолчанию)
-    params.maxEndpoints = 0;
-    params.maxSelectors = 0;
-
-    // Флаги по умолчанию
-    params.verbose           = KTX_FALSE;
-    params.noSSE             = KTX_FALSE;
-    params.normalMap         = cfg.isNormalMap ? KTX_TRUE : KTX_FALSE;
-    params.preSwizzle        = KTX_FALSE;
-    params.noEndpointRDO     = KTX_FALSE;
-    params.noSelectorRDO     = KTX_FALSE;
+    params.verbose = KTX_FALSE;
+    params.noSSE = KTX_FALSE;
 
     result = ktxTexture2_CompressBasisEx(texture, &params);
 
