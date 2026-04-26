@@ -10,7 +10,6 @@
 
 #include <vulkan/vulkan_core.h>
 
-#include <cstdio>
 #include <string>
 
 vsg::ref_ptr<vsg::ShaderStage> read_shader(
