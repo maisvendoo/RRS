@@ -4,6 +4,7 @@
 #include    <Logger.h>
 
 #include    <algorithm>
+#include    <chrono>
 #include    <cmath>
 #include    <cstdint>
 #include    <filesystem>
@@ -282,6 +283,11 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         new_objects.insert({"light", "/../../data/models/default-objects/light.gltf"});
     }
 
+    uint32_t models_total = objects.size();
+    uint32_t models_count = 0;
+    auto prev_time = std::chrono::steady_clock::now();
+    std::cerr << " (" << 0 << "/" << models_total << ")";
+
     uint32_t smooth_count = 0;
     uint32_t not_smooth_count = 0;
     for (const auto& [relative_model_path, labels_textures_smooth] : objects)
@@ -387,6 +393,13 @@ bool Application::convert_route(std::string &in_dmd_route_path,
 
                 smooth ? ++smooth_count : ++not_smooth_count;
             }
+        }
+        ++models_count;
+        const auto cur_time = std::chrono::steady_clock::now();
+        if (std::chrono::duration<double> diff = cur_time - prev_time; diff.count() > 0.5)
+        {
+            std::cerr << " (" << models_count << "/" << models_total << ")";
+            prev_time = cur_time;
         }
     }
     LOG_INFO("Info: converted %u smooth models and %u not-smooth models", smooth_count, not_smooth_count);
