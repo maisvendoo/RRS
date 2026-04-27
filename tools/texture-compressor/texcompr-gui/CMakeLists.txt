@@ -53,3 +53,4 @@ target_link_libraries (${TARGET} Qt6::Widgets)
 # и со своими не забываем
 target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} CfgEditor)
+target_link_libraries (${TARGET} filesystem)
