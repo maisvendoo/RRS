@@ -14,9 +14,6 @@ Keyboard::Keyboard(const KeyBindings* key_bindings)
 
 void Keyboard::handle_key_press(vsg::KeyPressEvent& keyPress)
 {
-    for (KeyBinding key_binding : *key_bindings_)
-    {
-    }
     key_states_.set(keyPress.keyBase, true);
 }
 

@@ -88,18 +88,18 @@ bool KeyboardHandler::get_key_state(vsg::KeySymbol key) const
     return key_state_bits_.test(key);
 }
 
-bool KeyboardHandler::get_any_shift_state() const
+bool KeyboardHandler::get_shift_state() const
 {
     return get_key_state(vsg::KEY_Shift_L) || get_key_state(vsg::KEY_Shift_R);
 }
 
-bool KeyboardHandler::get_any_ctrl_state() const
+bool KeyboardHandler::get_ctrl_state() const
 {
     return get_key_state(vsg::KEY_Control_L) ||
         get_key_state(vsg::KEY_Control_R);
 }
 
-bool KeyboardHandler::get_any_alt_state() const
+bool KeyboardHandler::get_alt_state() const
 {
     return get_key_state(vsg::KEY_Alt_L) || get_key_state(vsg::KEY_Alt_R);
 }
@@ -114,9 +114,9 @@ bool KeyboardHandler::get_binding_state(Action action) const
     }
 
     uint16_t modifiers = 0;
-    modifiers |= (vsg::MODKEY_Shift * get_any_shift_state());
-    modifiers |= (vsg::MODKEY_Control * get_any_ctrl_state());
-    modifiers |= (vsg::MODKEY_Alt * get_any_alt_state());
+    modifiers |= (vsg::MODKEY_Shift * get_shift_state());
+    modifiers |= (vsg::MODKEY_Control * get_ctrl_state());
+    modifiers |= (vsg::MODKEY_Alt * get_alt_state());
 
     return modifiers == key_binding.modifiers;
 }

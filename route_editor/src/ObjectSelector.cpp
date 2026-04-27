@@ -197,7 +197,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // while there were selected objects,
         // deselect them all
         if (!selected_objects.empty() &&
-            !context_.keyboard_handler->get_any_shift_state())
+            !context_.keyboard_handler->get_shift_state())
         {
             SelectObjects* const select_objects_command =
                 new SelectObjects(context_);
@@ -362,7 +362,7 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
     RouteObjects& objects_to_deselect =
         select_objects_command->objects_to_deselect;
 
-    if (context_.keyboard_handler->get_any_shift_state())
+    if (context_.keyboard_handler->get_shift_state())
     {
         if (object->get_is_selected())
         {

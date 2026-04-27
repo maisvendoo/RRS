@@ -22,9 +22,9 @@ public:
     virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;
 
     bool get_key_state(vsg::KeySymbol key) const;
-    bool get_any_shift_state() const;
-    bool get_any_ctrl_state() const;
-    bool get_any_alt_state() const;
+    bool get_shift_state() const;
+    bool get_ctrl_state() const;
+    bool get_alt_state() const;
     bool get_binding_state(Action action) const;
 
 private:
