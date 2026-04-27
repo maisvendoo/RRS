@@ -51,6 +51,10 @@ void Application::configure_parser(cli::Parser &parser)
                               false,
                               "Overwrite source GLTF file");
 
+    parser.set_optional<bool>("i", "ignore-existed-ktx2",
+                              false,
+                              "Not rewrite existed KTX2 texture");
+
     parser.enable_help();
 }
 
@@ -71,6 +75,8 @@ bool Application::parse_command_line(cli::Parser &parser,
     cmd_line.skip_textures.is_present = !cmd_line.skip_textures.value.empty();
 
     cmd_line.overwrite_gltf = parser.get<bool>("o");
+
+    cmd_line.ignore_existed = parser.get<bool>("i");
 
     return true;
 }

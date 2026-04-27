@@ -124,7 +124,7 @@ int Converter::run(const command_line_t &cmd_line)
             std::cout << " (Role: " << (cfg.role == PBRTextureRole::UNKNOWN ? "UNKNOWN" : "PBR")
                       << ", Format: " << (cfg.isSRGB ? "SRGB" : "UNORM") << ")\n";
 
-            if (compress_to_ktx2(src_path, ktx_path, cfg, cmd_line.generate_mipmaps))
+            if (compress_to_ktx2(src_path, ktx_path, cfg, cmd_line.generate_mipmaps, cmd_line.ignore_existed))
             {
                 img["uri"] = fs::relative(ktx_path, base_dir).string();
                 img.erase("mimeType");
@@ -167,8 +167,18 @@ int Converter::run(const command_line_t &cmd_line)
 bool Converter::compress_to_ktx2(const fs::path& src_img,
                                  const fs::path& out_ktx,
                                  const TextureSettings &cfg,
-                                 bool generate_mipmaps)
+                                 bool generate_mipmaps,
+                                 bool ignore)
 {
+    if (ignore)
+    {
+        if (fs::exists(out_ktx))
+        {
+            std::cout << "[INF] Texture " << out_ktx << " already exist. Skiped" << std::endl;
+            return true;
+        }
+    }
+
     // Загрузка оригинальной текстуры
     int w = 0, h = 0, ch = 0;   
 

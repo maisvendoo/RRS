@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->pbSave, &QPushButton::released, this, &MainWindow::slotSaveSkipList);
     connect(ui->pbLoad, &QPushButton::released, this, &MainWindow::slotLoadSkipList);
+
+    ui->lwSkipedTextures->setSelectionMode(QAbstractItemView::SingleSelection);
 }
 
 //------------------------------------------------------------------------------
@@ -134,6 +136,11 @@ void MainWindow::slotCopmpress()
     if (ui->cbOverwriteGLTF->isChecked())
     {
         args << "-o";
+    }
+
+    if (ui->cbNoRewrite)
+    {
+        args << "-i";
     }
 
     if (ui->lwSkipedTextures->count() != 0)
@@ -276,7 +283,9 @@ void MainWindow::slotLoadSkipList()
     while (!file.atEnd())
     {
         QString line = file.readLine();
-        ui->lwSkipedTextures->addItem(line);
+        QListWidgetItem *item = new QListWidgetItem(ui->lwSkipedTextures);
+        item->setText(line);
+        ui->lwSkipedTextures->addItem(item);
     }
 
     file.close();

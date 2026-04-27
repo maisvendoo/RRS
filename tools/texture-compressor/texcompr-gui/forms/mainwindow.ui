@@ -80,6 +80,16 @@
              </widget>
             </item>
             <item>
+             <widget class="QCheckBox" name="cbNoRewrite">
+              <property name="text">
+               <string>No rewrite existing KTX2</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QCheckBox" name="cbOverwriteGLTF">
               <property name="text">
                <string>Overwrite GLTF file</string>
@@ -100,6 +110,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
                <widget class="QListWidget" name="lwSkipedTextures">
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectRows</enum>
+                </property>
                 <property name="gridSize">
                  <size>
                   <width>0</width>

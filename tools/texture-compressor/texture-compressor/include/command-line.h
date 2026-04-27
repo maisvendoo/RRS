@@ -29,6 +29,7 @@ struct command_line_t
     bool generate_mipmaps = false;
     option_t<std::string> skip_textures;
     bool overwrite_gltf = false;
+    bool ignore_existed = false;
 };
 
 #endif
