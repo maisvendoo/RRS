@@ -132,6 +132,25 @@ void MainWindow::slotCopmpress()
         args << "-o";
     }
 
+    if (ui->lwSkipedTextures->count() != 0)
+    {
+        args << "-s";
+
+        QString tex_list = "";
+
+        for (int i = 0; i < ui->lwSkipedTextures->count(); ++i)
+        {
+            tex_list += ui->lwSkipedTextures->item(i)->text();
+
+            if (i < ui->lwSkipedTextures->count() - 1)
+            {
+                tex_list += ",";
+            }
+
+            args << tex_list;
+        }
+    }
+
     QString texComprPath = workDir + QDir::separator() + TEXCOMPRESS_NAME + EXE_EXP;
 
     texCompressor->setWorkingDirectory(workDir);
