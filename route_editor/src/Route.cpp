@@ -466,6 +466,7 @@ bool Route::load_topology()
     load_signals(signals_data->enter_signals);
     load_signals(signals_data->exit_signals);
 
+    const auto group = vsg::Group::create();
     const auto state_group = create_state_group_for_topology(context_);
 
     const traj_list_t* traj_list = context_.topology->getTrajectoriesList();
@@ -485,6 +486,13 @@ bool Route::load_topology()
 
         // printf("trajectory: %s\n", trajectory->getName().toStdString().c_str());
 
+        vsg::Builder builder;
+        constexpr float marker_size{0.5f};
+        constexpr vsg::vec3 offset1{-marker_size, -marker_size, 1.0f};
+        constexpr vsg::vec3 offset2{ marker_size,  marker_size, 6.0f};
+        vsg::GeometryInfo gi;
+        gi.color.set(0.0f, 1.0f, 1.0f, 0.5f);
+
         for (const track_t& track : tracks)
         {
             // printf("    begin_point:    %.3f %.3f %.3f\n", track.begin_point.x, track.begin_point.y, track.begin_point.z);
@@ -497,6 +505,13 @@ bool Route::load_topology()
 
             const dvec3& p = track.begin_point;
             points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
+
+            vsg::vec3 pf;
+            pf.x = p.x;
+            pf.y = p.y;
+            pf.z = p.z;
+            gi.set(vsg::box{pf + offset1, pf + offset2});
+            // group->addChild(builder.createBox(gi));
         }
         const dvec3& p = tracks.back().end_point;
         points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
@@ -523,9 +538,11 @@ bool Route::load_topology()
         state_group->addChild(geometry);
     }
 
+    group->addChild(state_group);
+
     context_.compile_infos_mutex.lock();
     context_.compile_infos.emplace_back(CompileInfo{context_.route,
-        state_group, vsg::Mask{MASK_GUI2}});
+        group, vsg::Mask{MASK_GUI2}});
     context_.compile_infos_mutex.unlock();
 
     return true;
