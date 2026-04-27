@@ -145,10 +145,10 @@ void MainWindow::slotCopmpress()
             if (i < ui->lwSkipedTextures->count() - 1)
             {
                 tex_list += ",";
-            }
-
-            args << tex_list;
+            }            
         }
+
+        args << tex_list;
     }
 
     QString texComprPath = workDir + QDir::separator() + TEXCOMPRESS_NAME + EXE_EXP;
