@@ -26,6 +26,8 @@ public:
 private:
     const KeyBindings* const key_bindings_;
 
+    std::array<bool, TOTAL_ACTIONS> action_states_;
+
     std::bitset<UINT16_MAX + 1> key_states_;
 };
 

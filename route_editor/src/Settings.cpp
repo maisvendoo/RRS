@@ -167,11 +167,11 @@ void settings_t::read(const std::string& cfg_path)
         std::begin(action_setting_name_map_data),
         std::end(action_setting_name_map_data));
 
-    const std::map<std::string, EditorKeyModifier>
+    const std::map<std::string, vsg::KeyModifier>
     key_modifier_setting_name_map = {
-        {"shift", EDITOR_KEY_MODIFIER_SHIFT},
-        {"ctrl", EDITOR_KEY_MODIFIER_CTRL},
-        {"alt", EDITOR_KEY_MODIFIER_ALT}
+        {"shift", vsg::MODKEY_Shift},
+        {"ctrl", vsg::MODKEY_Control},
+        {"alt", vsg::MODKEY_Alt}
     };
 
     for (const auto& [action, setting_name] : action_setting_name_map)

@@ -114,9 +114,9 @@ bool KeyboardHandler::get_binding_state(Action action) const
     }
 
     uint16_t modifiers = 0;
-    modifiers |= (EDITOR_KEY_MODIFIER_SHIFT * get_any_shift_state());
-    modifiers |= (EDITOR_KEY_MODIFIER_CTRL * get_any_ctrl_state());
-    modifiers |= (EDITOR_KEY_MODIFIER_ALT * get_any_alt_state());
+    modifiers |= (vsg::MODKEY_Shift * get_any_shift_state());
+    modifiers |= (vsg::MODKEY_Control * get_any_ctrl_state());
+    modifiers |= (vsg::MODKEY_Alt * get_any_alt_state());
 
     return modifiers == key_binding.modifiers;
 }

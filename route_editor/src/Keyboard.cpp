@@ -14,6 +14,9 @@ Keyboard::Keyboard(const KeyBindings* key_bindings)
 
 void Keyboard::handle_key_press(vsg::KeyPressEvent& keyPress)
 {
+    for (KeyBinding key_binding : *key_bindings_)
+    {
+    }
     key_states_.set(keyPress.keyBase, true);
 }
 
@@ -47,9 +50,9 @@ bool Keyboard::get_binding_state(Action action) const
     const KeyBinding key_binding = key_bindings_->at(action);
 
     std::uint16_t modifiers = 0;
-    modifiers |= (EDITOR_KEY_MODIFIER_ALT * get_alt_state());
-    modifiers |= (EDITOR_KEY_MODIFIER_CTRL * get_ctrl_state());
-    modifiers |= (EDITOR_KEY_MODIFIER_SHIFT * get_shift_state());
+    modifiers |= (vsg::MODKEY_Alt * get_alt_state());
+    modifiers |= (vsg::MODKEY_Control * get_ctrl_state());
+    modifiers |= (vsg::MODKEY_Shift * get_shift_state());
 
     return get_key_state(key_binding.key) && (modifiers == key_binding.modifiers);
 }

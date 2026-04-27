@@ -3,8 +3,10 @@
 #include "CameraHandler.h"
 #include "EditorGui.h"
 #include "EditorState.h"
+#include "EventHandler.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
+#include "Keyboard.h"
 #include "KeyboardHandler.h"
 #include "Mask.h"
 #include "MouseHandler.h"
@@ -124,6 +126,10 @@ bool RouteEditor::initialize()
     viewer_->addEventHandler(context_.window_handler);
     viewer_->addEventHandler(context_.mouse_handler);
     viewer_->addEventHandler(context_.keyboard_handler);
+
+    static Keyboard keyboard(&context_.settings.key_bindings);
+    viewer_->addEventHandler(EventHandler::create(&keyboard));
+
     viewer_->addEventHandler(context_.camera_handler);
     viewer_->addEventHandler(context_.intersection_handler);
     viewer_->addEventHandler(context_.object_selector);

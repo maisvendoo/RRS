@@ -56,6 +56,7 @@
 #include <vsg/state/MultisampleState.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/VertexInputState.h>
+#include <vsg/ui/KeyEvent.h>
 #include <vsgImGui/imgui.h>
 
 #include <cassert>
@@ -441,10 +442,10 @@ void EditorGui::show_key_bindings() const
 
             std::string label;
 
-            static const std::map<EditorKeyModifier, const char*> test_map = {
-                {EDITOR_KEY_MODIFIER_SHIFT, "Shift"},
-                {EDITOR_KEY_MODIFIER_CTRL, "Ctrl"},
-                {EDITOR_KEY_MODIFIER_ALT, "Alt"}
+            static const std::map<vsg::KeyModifier, const char*> test_map = {
+                {vsg::MODKEY_Shift, "Shift"},
+                {vsg::MODKEY_Control, "Ctrl"},
+                {vsg::MODKEY_Alt, "Alt"}
             };
 
             for (const auto& [modifier, name] : test_map)

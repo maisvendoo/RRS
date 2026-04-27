@@ -8,13 +8,6 @@
 #include <array>
 #include <cstdint>
 
-enum EditorKeyModifier
-{
-    EDITOR_KEY_MODIFIER_SHIFT = 0x01,
-    EDITOR_KEY_MODIFIER_CTRL  = 0x02,
-    EDITOR_KEY_MODIFIER_ALT   = 0x04
-};
-
 struct KeyBinding
 {
     vsg::KeySymbol key;
