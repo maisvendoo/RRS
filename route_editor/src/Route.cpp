@@ -584,4 +584,6 @@ static vsg::ref_ptr<vsg::StateGroup> create_state_group_for_topology(EditorConte
     const auto state_group = vsg::StateGroup::create();
     state_group->add(bind_graphics_pipeline);
     state_group->add(bind_descriptor_set);
+
+    return state_group;
 }
