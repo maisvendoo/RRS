@@ -27,6 +27,7 @@
 #include <vsg/core/Data.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/io/read.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/vec3.h>
@@ -42,8 +43,15 @@
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/nodes/VertexDraw.h>
 #include <vsg/nodes/VertexIndexDraw.h>
+#include <vsg/state/BindDescriptorSet.h>
+#include <vsg/state/ColorBlendState.h>
+#include <vsg/state/DepthStencilState.h>
+#include <vsg/state/DescriptorSetLayout.h>
 #include <vsg/state/InputAssemblyState.h>
+#include <vsg/state/MultisampleState.h>
+#include <vsg/state/PipelineLayout.h>
 #include <vsg/state/RasterizationState.h>
+#include <vsg/state/VertexInputState.h>
 #include <vsg/utils/Builder.h>
 #include <vulkan/vulkan_core.h>
 
@@ -55,6 +63,8 @@ static vsg::dvec3 to_vsg_vec3(dvec3 vec)
 {
     return vsg::dvec3{vec.x, vec.y, vec.z};
 }
+
+static vsg::ref_ptr<vsg::StateGroup> create_state_group_for_topology(EditorContext& context);
 
 Route::Route(EditorContext& context)
     : context_(context)
@@ -456,59 +466,58 @@ bool Route::load_topology()
     load_signals(signals_data->enter_signals);
     load_signals(signals_data->exit_signals);
 
-    const auto input_assembly_state = vsg::InputAssemblyState::create();
-    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
-
-    const auto rasterization_state = vsg::RasterizationState::create();
-    rasterization_state->lineWidth = 5.0f;
-    rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
-
-    const auto state_group = vsg::StateGroup::create();
-    state_group->add(input_assembly_state);
-    state_group->add(rasterization_state);
+    const auto state_group = create_state_group_for_topology(context_);
 
     const traj_list_t* traj_list = context_.topology->getTrajectoriesList();
     for (const Trajectory* trajectory : *traj_list)
     {
         const auto& tracks = trajectory->getTracks();
-        const std::size_t tracks_size = tracks.size();
-
-        if (tracks_size < 2)
+        if (tracks.empty())
         {
             continue;
         }
 
+        const std::size_t tracks_size = tracks.size();
+        const std::size_t points_size = tracks_size + 1;
+
         std::vector<vsg::dvec3> points;
-        points.reserve(tracks_size);
+        points.reserve(points_size);
+
+        // printf("trajectory: %s\n", trajectory->getName().toStdString().c_str());
+
         for (const track_t& track : tracks)
         {
-            points.emplace_back(vsg::dvec3{track.begin_point.x,
-                track.begin_point.y, track.begin_point.z});
+            // printf("    begin_point:    %.3f %.3f %.3f\n", track.begin_point.x, track.begin_point.y, track.begin_point.z);
+            // printf("    end_point:      %.3f %.3f %.3f\n", track.end_point.x, track.end_point.y, track.end_point.z);
+            // printf("    len:            %.3f\n", track.len);
+            // printf("    traj_coord:     %.3f\n", track.traj_coord);
+            // printf("    railway_coord0: %.3f\n", track.railway_coord0);
+            // printf("    railway_coord1: %.3f\n", track.railway_coord1);
+            // printf("----------------------------------------\n");
+
+            const dvec3& p = track.begin_point;
+            points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
         }
+        const dvec3& p = tracks.back().end_point;
+        points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
+        // printf("--------------------------------------------------------------------------------\n");
 
-        const auto vertices = vsg::vec3Array::create(tracks_size);
-        const auto colors = vsg::vec4Array::create(tracks_size);
-        const auto indices = vsg::ushortArray::create(tracks_size);
+        const auto vertices = vsg::vec3Array::create(points_size);
+        const auto colors = vsg::vec3Array::create(points_size);
+        const auto indices = vsg::ushortArray::create(points_size);
 
-        for (std::size_t i = 0; i < tracks_size; ++i)
+        for (std::size_t i = 0; i < points_size; ++i)
         {
             vertices->at(i) = points[i];
-            colors->at(i).set(1.0f, 1.0f, 0.0f, 1.0f);
+            colors->at(i) = {1.0f, 1.0f, 0.0f};
             indices->at(i) = i;
-
-            vsg::Builder builder;
-            const int sz = 2;
-        vsg::GeometryInfo gi(vsg::box{vertices->at(i) - vsg::vec3(sz, sz, sz),
-            vertices->at(i) + vsg::vec3(sz, sz, sz)});
-        auto node = builder.createBox(gi);
-        state_group->addChild(node);
         }
 
         const auto geometry = vsg::Geometry::create();
-        geometry->assignArrays(vsg::DataList{vertices});
+        geometry->assignArrays(vsg::DataList{vertices, colors});
         geometry->assignIndices(indices);
         geometry->commands.push_back(vsg::DrawIndexed::create(
-            tracks_size, 1, 0, 0, 0
+            points_size, 1, 0, 0, 0
         ));
 
         state_group->addChild(geometry);
@@ -520,4 +529,59 @@ bool Route::load_topology()
     context_.compile_infos_mutex.unlock();
 
     return true;
+}
+
+static vsg::ref_ptr<vsg::StateGroup> create_state_group_for_topology(EditorContext& context)
+{
+    const FileSystem& fs = FileSystem::getInstance();
+    const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
+    const std::string shader_vert_path = shaders_dir_path + fs.separator() + "traj_line.vert";
+    const std::string shader_frag_path = shaders_dir_path + fs.separator() + "traj_line.frag";
+
+    auto vertex_shader = vsg::read_cast<vsg::ShaderStage>(shader_vert_path, context.options);
+    auto fragment_shader = vsg::read_cast<vsg::ShaderStage>(shader_frag_path, context.options);
+
+    vsg::DescriptorSetLayoutBindings descriptor_bindings{};
+    auto descriptor_set_layout = vsg::DescriptorSetLayout::create(descriptor_bindings);
+
+    vsg::PushConstantRanges push_constant_ranges{
+        {VK_SHADER_STAGE_VERTEX_BIT, 0, 128}
+    };
+
+    vsg::VertexInputState::Bindings vertex_bindings_descriptions{
+        VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
+        VkVertexInputBindingDescription{1, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX}
+    };
+
+    vsg::VertexInputState::Attributes vertex_attribute_descriptions{
+        VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
+        VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32B32_SFLOAT, 0}
+    };
+
+    auto input_assembly_state = vsg::InputAssemblyState::create();
+    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+
+    auto rasterization_state = vsg::RasterizationState::create();
+    // rasterization_state->lineWidth = 2.0f;
+    rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
+
+    vsg::GraphicsPipelineStates pipeline_states{
+        vsg::VertexInputState::create(vertex_bindings_descriptions, vertex_attribute_descriptions),
+        input_assembly_state,
+        rasterization_state,
+        vsg::MultisampleState::create(),
+        vsg::ColorBlendState::create(),
+        vsg::DepthStencilState::create()
+    };
+
+    auto pipeline_layout = vsg::PipelineLayout::create(vsg::DescriptorSetLayouts{descriptor_set_layout}, push_constant_ranges);
+    auto graphics_pipeline = vsg::GraphicsPipeline::create(pipeline_layout, vsg::ShaderStages{vertex_shader, fragment_shader}, pipeline_states);
+    auto bind_graphics_pipeline = vsg::BindGraphicsPipeline::create(graphics_pipeline);
+
+    auto descriptor_set = vsg::DescriptorSet::create(descriptor_set_layout, vsg::Descriptors{});
+    auto bind_descriptor_set = vsg::BindDescriptorSet::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, descriptor_set);
+
+    const auto state_group = vsg::StateGroup::create();
+    state_group->add(bind_graphics_pipeline);
+    state_group->add(bind_descriptor_set);
 }
