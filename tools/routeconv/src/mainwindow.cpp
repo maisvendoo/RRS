@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(&pathconvProc, &QProcess::finished, this, &MainWindow::slotIsPathconvFinished);
     connect(&profconvProc, &QProcess::finished, this, &MainWindow::slotIsProfconvFinished);
     connect(&dmd2gltfProc, &QProcess::finished, this, &MainWindow::slotIsDmd2gltfFinished);
+    connect(&dmd2gltfProc, &QProcess::readyReadStandardError, this, &MainWindow::slotSubProcessReadyReadStandardError);
 
     connect(ui->pbCheckTopology, &QPushButton::released, this, &MainWindow::slotCheckTopology);
     connect(ui->pbTransformRoute, &QPushButton::released, this, &MainWindow::slotTransformRoute);
@@ -170,6 +171,10 @@ void MainWindow::startDmd2gltfConverter()
         args << "--used-only";
     }
     args << "--lights";
+    if (ui->cbCompressTextures->checkState())
+    {
+        args << "--compress-textures";
+    }
 
     dmd2gltfProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
     dmd2gltfProc.start(dmd2gltf_path, args);
@@ -282,6 +287,45 @@ void MainWindow::startSplineGenerator()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::updateStatus()
+{
+    subProcessStatus = "";
+    ui->lStatus->setText(status);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::updateStatus(QString new_status, QString new_subprocess_status)
+{
+    if (status != new_status)
+    {
+        status = new_status;
+        subProcessStatus = "";
+        ui->lStatus->setText(status);
+    }
+    else if (subProcessStatus != new_subprocess_status)
+    {
+        subProcessStatus = new_subprocess_status;
+        ui->lStatus->setText(status + subProcessStatus);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSubProcessReadyReadStandardError()
+{
+    if (QProcess* p = dynamic_cast<QProcess *>(sender()))
+    {
+        QString new_subprocess_status = QString::fromUtf8(p->readAllStandardError());
+        updateStatus(status, new_subprocess_status);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::slotOpenRoute()
 {
     routeDir = QFileDialog::getExistingDirectory(this, tr("Open route"),
@@ -291,7 +335,7 @@ void MainWindow::slotOpenRoute()
 
     if (routeDir.isEmpty())
     {
-        ui->lStatus->setText(tr("Route is not selected. Please choose route"));
+        updateStatus(tr("Route is not selected. Please choose route"));
         ui->lCurrentRouteDir->setText("");
         ui->lOutputPath->setText("");
 
@@ -300,7 +344,7 @@ void MainWindow::slotOpenRoute()
     }
 
     ui->pbSelectOutputPath->setEnabled(true);
-    ui->lStatus->setText(tr("Route opened succesfully"));
+    updateStatus(tr("Route opened succesfully"));
 
     QDir dir(routesRootDir);
     QString relPath = dir.relativeFilePath(routeDir);
@@ -330,19 +374,19 @@ void MainWindow::slotSelectOutputPath()
     {
         if (routeDir.isEmpty())
         {
-            ui->lStatus->setText(tr("Route is not selected. Please choose route"));
+            updateStatus(tr("Route is not selected. Please choose route"));
             ui->lOutputPath->setText("");
             return;
         }
         else
         {
-            ui->lStatus->setText(tr("Output is not selected. Using selected route as output"));
+            updateStatus(tr("Output is not selected. Using selected route as output"));
             outputDir = routeDir;
         }
     }
     else
     {
-        ui->lStatus->setText(tr("Output selected succesfully"));
+        updateStatus(tr("Output selected succesfully"));
     }
 
     QDir dir(routesRootDir);
@@ -360,35 +404,35 @@ void MainWindow::slotConvert()
 {
     if (routeDir.isEmpty())
     {
-        ui->lStatus->setText(tr("Error: route is not loaded. Please choose route"));
+        updateStatus(tr("Error: route is not loaded. Please choose route"));
         return;
     }
 
     if (ui->leRouteTitle->text().isEmpty())
     {
-        ui->lStatus->setText(tr("Error: route title is empty. Please fill it"));
+        updateStatus(tr("Error: route title is empty. Please fill it"));
         return;
     }
 
     if (ui->teRouteDescription->toPlainText().isEmpty())
     {
-        ui->lStatus->setText(tr("Error: route description is empty. Please fill it"));
+        updateStatus(tr("Error: route description is empty. Please fill it"));
         return;
     }
 
     if (!createRouteTypeFile())
     {
-        ui->lStatus->setText(tr("Error: route-type file is not created"));
+        updateStatus(tr("Error: route-type file is not created"));
         return;
     }
 
     if (!createDescriptionFile(ui->leRouteTitle->text(), ui->teRouteDescription->toPlainText()))
     {
-        ui->lStatus->setText(tr("Error: description file is not created"));
+        updateStatus(tr("Error: description file is not created"));
         return;
     }
 
-    ui->lStatus->setText(tr("Conversion..."));
+    updateStatus(tr("Filepath conversion..."));
     startPathConverter();
 }
 
@@ -399,7 +443,7 @@ void MainWindow::slotCheckTopology()
 {
     if (routeDir.isEmpty())
     {
-        ui->lStatus->setText(tr("Error: route is not loaded. Please choose route"));
+        updateStatus(tr("Error: route is not loaded. Please choose route"));
         return;
     }
 
@@ -413,7 +457,7 @@ void MainWindow::slotTransformRoute()
 {
     if (routeDir.isEmpty())
     {
-        ui->lStatus->setText(tr("Error: route is not loaded. Please choose route"));
+        updateStatus(tr("Error: route is not loaded. Please choose route"));
         return;
     }
 
@@ -427,13 +471,13 @@ void MainWindow::slotGenerateParallel()
 {
     if (routeDir.isEmpty())
     {
-        ui->lStatus->setText(tr("Error: route is not loaded. Please choose route"));
+        updateStatus(tr("Error: route is not loaded. Please choose route"));
         return;
     }
 
     if (ui->leFileParallel->text().isEmpty())
     {
-        ui->lStatus->setText(tr("Error: filename is empty. Please fill it"));
+        updateStatus(tr("Error: filename is empty. Please fill it"));
         return;
     }
 
@@ -447,13 +491,13 @@ void MainWindow::slotGenerateSpline()
 {
     if (routeDir.isEmpty())
     {
-        ui->lStatus->setText(tr("Error: route is not loaded. Please choose route"));
+        updateStatus(tr("Error: route is not loaded. Please choose route"));
         return;
     }
 
     if (ui->leFileSpline->text().isEmpty())
     {
-        ui->lStatus->setText(tr("Error: filename is empty. Please fill it"));
+        updateStatus(tr("Error: filename is empty. Please fill it"));
         return;
     }
 
@@ -467,6 +511,7 @@ void MainWindow::slotIsPathconvFinished(int error_code, QProcess::ExitStatus exi
 {
     Q_UNUSED(error_code)
 
+    updateStatus(tr("Tracks topology conversion..."));
     startProfConverter();
 }
 
@@ -477,6 +522,7 @@ void MainWindow::slotIsProfconvFinished(int error_code, QProcess::ExitStatus exi
 {
     Q_UNUSED(error_code)
 
+    updateStatus(tr("3d-models conversion..."));
     startDmd2gltfConverter();
 }
 
@@ -487,5 +533,5 @@ void MainWindow::slotIsDmd2gltfFinished(int error_code, QProcess::ExitStatus exi
 {
     Q_UNUSED(error_code)
 
-    ui->lStatus->setText(tr("OK: conversion complete"));
+    updateStatus(tr("OK: conversion complete"));
 }

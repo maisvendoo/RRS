@@ -2,6 +2,8 @@
 #include    <filesystem.h>
 #include    <Logger.h>
 
+#include    <chrono>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -41,11 +43,14 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    const auto start = std::chrono::steady_clock::now();
     if (!application.convert())
     {
         return -1;
     }
+    const auto end = std::chrono::steady_clock::now();
+    const std::chrono::duration<double> diff = end - start;
 
-    LOG_INFO("Info: conversion is done succesfully");
+    LOG_INFO("Info: conversion is done succesfully for %.3f seconds", diff);
     return 0;
 }

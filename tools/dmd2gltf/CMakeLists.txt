@@ -8,6 +8,24 @@ project(${TARGET})
 # Путь, куда надо сложить собранное
 set(EXECUTABLE_OUTPUT_PATH "../../../bin")
 
+find_package(Vulkan REQUIRED)
+
+find_package(KTX QUIET)
+if(NOT KTX_FOUND)
+    find_package(ktx QUIET)
+endif()
+if(NOT KTX_FOUND AND NOT ktx_FOUND)
+    message(FATAL_ERROR "KTX library not found. Install libktx v4+ with BASIS & Vulkan support.")
+endif()
+
+if(TARGET KTX::ktx)
+    set(KTX_TARGET KTX::ktx)
+elseif(TARGET ktx::ktx)
+    set(KTX_TARGET ktx::ktx)
+else()
+    message(FATAL_ERROR "Found KTX but could not resolve imported target name.")
+endif()
+
 # Пути к заголовкам и сорцам
 file(GLOB INCLUDES "./include/*.h" "./include/*.hpp")
 file(GLOB SOURCES "./src/*.cpp")
@@ -20,3 +38,5 @@ target_include_directories(${TARGET} PRIVATE ./include)
 
 # Компонуемся с библиотеками
 target_link_libraries (${TARGET} filesystem)
+target_link_libraries (${TARGET} ${KTX_TARGET})
+target_link_libraries (${TARGET} Vulkan::Vulkan)

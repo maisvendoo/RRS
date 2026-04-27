@@ -37,6 +37,9 @@ private:
 
     QString outputDir;
 
+    QString status;
+    QString subProcessStatus;
+
     QProcess    pathconvProc;
     QProcess    profconvProc;
     QProcess    dmd2gltfProc;
@@ -68,7 +71,12 @@ private:
 
     void startSplineGenerator();
 
+    void updateStatus();
+    void updateStatus(QString new_status, QString new_subprocess_status = "");
+
 private slots:
+
+    void slotSubProcessReadyReadStandardError();
 
     void slotOpenRoute();
 
