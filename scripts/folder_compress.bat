@@ -53,7 +53,7 @@ for /r "%INPUT_DIR%" %%f in (*.gltf) do (
         echo --------------------------------------------------
         
         :: call гарантирует корректный возврат в цикл после выполнения
-        texcompr -m "%%f" -g -o
+        texcompr -m "%%f" -g -o -i
         if errorlevel 1 (
             echo [ERROR] Failed to convert: %%f
             set /a FAILED+=1
