@@ -48,6 +48,10 @@ private slots:
     void slotOnReadyReadStdout();
 
     void slotOnCompressionFinish(int exitCode, QProcess::ExitStatus exitStatus);
+
+    void slotSaveSkipList();
+
+    void slotLoadSkipList();
 };
 
 #endif // MAINWINDOW_H

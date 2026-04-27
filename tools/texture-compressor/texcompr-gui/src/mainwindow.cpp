@@ -3,6 +3,7 @@
 #include    <QFileDialog>
 #include    <QDir>
 #include    <QFileInfo>
+#include    <QFile>
 #include    <filesystem.h>
 
 const QString TEXCOMPRESS_NAME = "texcompr";
@@ -30,6 +31,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(texCompressor, &QProcess::readyRead, this, &MainWindow::slotOnReadyReadStdout);
     connect(texCompressor, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this, &MainWindow::slotOnCompressionFinish);
+
+    connect(ui->pbSave, &QPushButton::released, this, &MainWindow::slotSaveSkipList);
+    connect(ui->pbLoad, &QPushButton::released, this, &MainWindow::slotLoadSkipList);
 }
 
 //------------------------------------------------------------------------------
@@ -192,4 +196,88 @@ void MainWindow::slotOnCompressionFinish(int exitCode, QProcess::ExitStatus exit
 
     ui->ptLog->appendPlainText(statusText);
     ui->pbCompress->setEnabled(true);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotSaveSkipList()
+{
+    if (modelFilePath.isEmpty())
+    {
+        return;
+    }
+
+    QFileInfo fileInfo(modelFilePath);
+
+    QString startDir = fileInfo.absoluteFilePath();
+
+    QString filter = tr("Text files (*.txt)");
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), startDir, filter);
+
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+
+    QFile file(fileName);
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        return;
+    }
+
+    QTextStream out(&file);
+
+    for (int i = 0; i < ui->lwSkipedTextures->count(); ++i)
+    {
+        out << ui->lwSkipedTextures->item(i)->text() << "\n";
+    }
+
+    file.close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotLoadSkipList()
+{
+    if (modelFilePath.isEmpty())
+    {
+        return;
+    }
+
+    QFileInfo fileInfo(modelFilePath);
+
+    QString startDir = fileInfo.absoluteFilePath();
+
+    QString filter = tr("Text files (*.txt)");
+
+    QString fileName = QFileDialog::getOpenFileName(nullptr,
+                                                    tr("Select text file"),
+                                                    startDir,
+                                                    filter);
+
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+
+    QFile file(fileName);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        return;
+    }
+
+    ui->lwSkipedTextures->clear();
+
+    while (!file.atEnd())
+    {
+        QString line = file.readLine();
+        ui->lwSkipedTextures->addItem(line);
+    }
+
+    file.close();
 }
