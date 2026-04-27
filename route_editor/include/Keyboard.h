@@ -4,10 +4,16 @@
 #include "Action.h"
 #include "KeyBinding.h"
 
-#include <vsg/ui/KeyEvent.h>
-
 #include <bitset>
 #include <cstdint>
+
+namespace vsg
+{
+
+class KeyPressEvent;
+class KeyReleaseEvent;
+
+}
 
 class Keyboard
 {
@@ -17,18 +23,16 @@ public:
     void handle_key_press(vsg::KeyPressEvent& keyPress);
     void handle_key_release(vsg::KeyReleaseEvent& keyRelease);
 
-    bool get_key_state(vsg::KeySymbol key) const;
+    bool get_action_state(Action action) const;
     bool get_alt_state() const;
     bool get_ctrl_state() const;
     bool get_shift_state() const;
-    bool get_binding_state(Action action) const;
 
 private:
     const KeyBindings* const key_bindings_;
 
-    std::array<bool, TOTAL_ACTIONS> action_states_;
-
     std::bitset<UINT16_MAX + 1> key_states_;
+    std::uint16_t active_modifiers_;
 };
 
 #endif // KEYBOARD_H
