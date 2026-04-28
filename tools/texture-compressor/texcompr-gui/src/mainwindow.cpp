@@ -208,11 +208,21 @@ void MainWindow::slotOpenModel()
     modelFilePath.clear();
 
     FileSystem &fs = FileSystem::getInstance();
-    QString startDir = QString(fs.getDataDir().c_str()) + fs.separator() + "models";
 
-    if (!QDir(startDir).exists())
+    QString startDir = "";
+
+    if (lastDir.isEmpty())
     {
-        startDir = QDir::homePath();
+        startDir = QString(fs.getDataDir().c_str()) + fs.separator() + "models";
+
+        if (!QDir(startDir).exists())
+        {
+            startDir = QDir::homePath();
+        }
+    }
+    else
+    {
+        startDir = lastDir;
     }
 
     QString filter = tr("Models glTF 2.0 (*.gltf)");
@@ -223,6 +233,8 @@ void MainWindow::slotOpenModel()
                                                  filter);
 
     modelFilePath = QDir::toNativeSeparators(modelFilePath);
+    QFileInfo fileInfo(modelFilePath);
+    lastDir = fileInfo.absoluteFilePath();
 
     ui->teModelPath->setText(modelFilePath);
 }
@@ -232,7 +244,7 @@ void MainWindow::slotOpenModel()
 //------------------------------------------------------------------------------
 void MainWindow::slotAddSkipedTexture()
 {
-    if (modelFilePath.isEmpty())
+    if (ui->teModelPath->toPlainText().isEmpty())
     {
         return;
     }
@@ -243,19 +255,21 @@ void MainWindow::slotAddSkipedTexture()
 
     QString filter = tr("Image files (*.png *.jpg *.bmp *.tga)");
 
-    QString texturePath = QFileDialog::getOpenFileName(nullptr,
-                                                       tr("Select texture file"),
-                                                       startDir,
-                                                       filter);
+    QStringList texturePaths = QFileDialog::getOpenFileNames(nullptr,
+                                                             tr("Select texture file"),
+                                                             startDir,
+                                                             filter);
 
-    if (texturePath.isEmpty())
+    if (texturePaths.isEmpty())
     {
         return;
     }
 
-    QFileInfo textureInfo(texturePath);
-
-    ui->lwSkipedTextures->addItem(textureInfo.fileName());
+    for (auto tex_info : texturePaths)
+    {
+        QFileInfo textureInfo(tex_info);
+        ui->lwSkipedTextures->addItem(textureInfo.fileName());
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -271,16 +285,18 @@ void MainWindow::slotDeleteSkipedTexture()
 //------------------------------------------------------------------------------
 void MainWindow::slotCopmpress()
 {
-    if (modelFilePath.isEmpty())
+    if (ui->teModelPath->toPlainText().isEmpty())
     {
         return;
     }
+
+    modelFilePath = ui->teModelPath->toPlainText();
 
     FileSystem &fs = FileSystem::getInstance();
     QString workDir = QString(fs.getBinaryDir().c_str());
 
     QStringList args;
-    args << "-m" << modelFilePath;
+    args << "-m" << ui->teModelPath->toPlainText();
 
     if (ui->cbMipMaps->isChecked())
     {

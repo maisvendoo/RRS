@@ -44,6 +44,8 @@ private:
     int m_processedFiles = 0;
     int m_maxConcurrency = 1;
 
+    QString lastDir = "";
+
     QStringList scanGltfFiles(const QString& dir);
 
     void launchNextProcess();
