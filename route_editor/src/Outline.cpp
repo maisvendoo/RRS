@@ -1,6 +1,7 @@
 #include "Outline.h"
 
 #include "filesystem.h"
+#include "graphics/common.h"
 #include "graphics/shader_funcs.h"
 
 #include <vsg/core/ref_ptr.h>
@@ -28,11 +29,7 @@
 OutlineBuilder::OutlineBuilder(const EditorContext& context)
     : context_(context)
 {
-    options_ = vsg::Options::create();
-    options_->sharedObjects = vsg::SharedObjects::create();
-    options_->fileCache = vsg::getEnv("VSG_FILE_CACHE");
-    options_->paths = vsg::getEnvPaths("VSG_FILE_PATH");
-    options_->add(vsgXchange::all::create());
+    options_ = create_default_vsg_options();
 
     const auto flat_shader = vsg::createFlatShadedShaderSet(options_);
 

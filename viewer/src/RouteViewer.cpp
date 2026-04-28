@@ -18,6 +18,7 @@
 #include "VehiclesHandler.h"
 #include "WorldCulling.h"
 #include "filesystem.h"
+#include "graphics/common.h"
 #include "sound-manager.h"
 #include "tcp-client.h"
 #include "graphics/shader_funcs.h"
@@ -307,11 +308,7 @@ void RouteViewer::configureLogLevel() const
 //------------------------------------------------------------------------------
 void RouteViewer::initVsgOptions()
 {
-    options = vsg::Options::create();
-    options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
-    options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
-    options->sharedObjects = vsg::SharedObjects::create();
-    options->add(vsgXchange::all::create());
+    options = create_default_vsg_options();
 
     // Отключаем автоматическое создание узла CullNode в загружаемых моделях
     options->setValue("culling", !settings.disable_culling_node);

@@ -1,5 +1,5 @@
-#ifndef SHADER_FUNCS_H
-#define SHADER_FUNCS_H
+#ifndef GRAPHICS_SHADER_FUNCS_H
+#define GRAPHICS_SHADER_FUNCS_H
 
 #include <vsg/core/ref_ptr.h>
 
@@ -52,4 +52,4 @@ void configure_shader_set(
     vsg::ref_ptr<vsg::ShaderSet> shader_set
 );
 
-#endif // SHADER_FUNCS_H
+#endif // GRAPHICS_SHADER_FUNCS_H

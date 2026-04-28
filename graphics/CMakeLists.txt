@@ -16,6 +16,7 @@ add_library(graphics STATIC)
 
 target_sources(graphics
     PRIVATE
+        src/common.cpp
         src/shader_funcs.cpp
 
     PUBLIC

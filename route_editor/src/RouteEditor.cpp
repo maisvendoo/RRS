@@ -18,6 +18,7 @@
 #include "SingleSwitch.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
+#include "graphics/common.h"
 #include "graphics/shader_funcs.h"
 
 #include <vsg/app/CloseHandler.h>
@@ -58,11 +59,7 @@ bool RouteEditor::initialize()
     context_.settings.read(fs.combinePath(
         fs.getConfigDir(), "editor-settings.xml"));
 
-    context_.options = vsg::Options::create();
-    context_.options->sharedObjects = vsg::SharedObjects::create();
-    context_.options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
-    context_.options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
-    context_.options->add(vsgXchange::all::create());
+    context_.options = create_default_vsg_options();
 
     configure_shaders();
 
