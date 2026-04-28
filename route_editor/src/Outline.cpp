@@ -39,11 +39,9 @@ OutlineBuilder::OutlineBuilder(const EditorContext& context)
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
-    const auto vert_shader = read_shader(VK_SHADER_STAGE_VERTEX_BIT,
-        shaders_dir.c_str(), "standard.vert", options_);
+    const auto vert_shader = read_shader(shaders_dir.c_str(), "standard.vert", options_);
 
-    const auto frag_shader = read_shader(VK_SHADER_STAGE_FRAGMENT_BIT,
-        shaders_dir.c_str(), "outline.frag", options_);
+    const auto frag_shader = read_shader(shaders_dir.c_str(), "outline.frag", options_);
 
     configure_shader_set(vert_shader, frag_shader, "flat", flat_shader);
 

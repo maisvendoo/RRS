@@ -191,8 +191,7 @@ void RouteEditor::configure_shaders()
     const FileSystem& fs = FileSystem::getInstance();
     const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
-    const auto vert_shader = read_shader(VK_SHADER_STAGE_VERTEX_BIT,
-        shaders_dir.c_str(), "standard.vert", context_.options);
+    const auto vert_shader = read_shader(shaders_dir.c_str(), "standard.vert", context_.options);
 
     configure_shader_set(shaders_dir.c_str(), vert_shader,
         "standard_flat_shaded.frag", context_.options, "flat", flat_shader);

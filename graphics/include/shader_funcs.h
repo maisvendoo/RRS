@@ -3,8 +3,6 @@
 
 #include <vsg/core/ref_ptr.h>
 
-#include <vulkan/vulkan_core.h>
-
 namespace vsg
 {
 
@@ -15,7 +13,6 @@ class ShaderStage;
 }
 
 vsg::ref_ptr<vsg::ShaderStage> read_shader(
-    VkShaderStageFlagBits stage,
     const char* shaders_dir,
     const char* filename,
     vsg::ref_ptr<const vsg::Options> options

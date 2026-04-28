@@ -48,6 +48,7 @@ target_link_libraries(${TARGET}
         Journal
         filesystem
         topology
+        graphics
         # parsing
 )
 

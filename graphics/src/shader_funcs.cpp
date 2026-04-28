@@ -5,15 +5,15 @@
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
+#include <vsg/io/read.h>
 #include <vsg/state/ShaderStage.h>
 #include <vsg/utils/ShaderSet.h>
 
-#include <vulkan/vulkan_core.h>
+#include <QString>
 
 #include <string>
 
 vsg::ref_ptr<vsg::ShaderStage> read_shader(
-    VkShaderStageFlagBits stage,
     const char* shaders_dir,
     const char* filename,
     vsg::ref_ptr<const vsg::Options> options
@@ -22,9 +22,7 @@ vsg::ref_ptr<vsg::ShaderStage> read_shader(
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shader_path = fs.combinePath(shaders_dir, filename);
 
-    const auto shader = vsg::ShaderStage::read(
-        stage, "main", shader_path, options);
-
+    const auto shader = vsg::read_cast<vsg::ShaderStage>(shader_path, options);
     if (!shader)
     {
         Journal::instance()->warning(QString("Failed to load shader %1")
@@ -44,10 +42,8 @@ void configure_shader_set(
 )
 {
     configure_shader_set(
-        read_shader(VK_SHADER_STAGE_VERTEX_BIT,
-            shaders_dir, vert_shader_filename, options),
-        read_shader(VK_SHADER_STAGE_FRAGMENT_BIT,
-            shaders_dir, frag_shader_filename, options),
+        read_shader(shaders_dir, vert_shader_filename, options),
+        read_shader(shaders_dir, frag_shader_filename, options),
         shader_set_name,
         shader_set
     );
@@ -63,8 +59,7 @@ void configure_shader_set(
 )
 {
     configure_shader_set(
-        read_shader(VK_SHADER_STAGE_VERTEX_BIT,
-            shaders_dir, vert_shader_filename, options),
+        read_shader(shaders_dir, vert_shader_filename, options),
         frag_shader,
         shader_set_name,
         shader_set
@@ -82,8 +77,7 @@ void configure_shader_set(
 {
     configure_shader_set(
         vert_shader,
-        read_shader(VK_SHADER_STAGE_FRAGMENT_BIT,
-            shaders_dir, frag_shader_filename, options),
+        read_shader(shaders_dir, frag_shader_filename, options),
         shader_set_name,
         shader_set
     );
@@ -107,9 +101,8 @@ void configure_shader_set(
     shader_set->stages.front() = vert_shader;
     shader_set->stages.back() = frag_shader;
 
-    // Clear all built-in shader set variants
     shader_set->variants.clear();
 
     Journal::instance()->info(QString("Shader set %1 configured")
-            .arg(shader_set_name));
+        .arg(shader_set_name));
 }
