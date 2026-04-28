@@ -18,7 +18,7 @@
 #include "SingleSwitch.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
-#include "shader_funcs.h"
+#include "graphics/shader_funcs.h"
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>

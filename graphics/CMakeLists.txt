@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(vsg REQUIRED)
+find_package(vsgXchange REQUIRED)
 
 set(LIBRARY_OUTPUT_PATH "../../lib")
 
@@ -22,12 +23,14 @@ target_sources(graphics
         BASE_DIRS
             include
         FILES
-            include/shader_funcs.h
+            include/graphics/common.h
+            include/graphics/shader_funcs.h
 )
 
 target_link_libraries(graphics PRIVATE
     Qt6::Core
     vsg::vsg
+    vsgXchange::vsgXchange
     Journal
     filesystem
 )

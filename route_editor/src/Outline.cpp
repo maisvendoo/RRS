@@ -1,7 +1,7 @@
 #include "Outline.h"
 
 #include "filesystem.h"
-#include "shader_funcs.h"
+#include "graphics/shader_funcs.h"
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>

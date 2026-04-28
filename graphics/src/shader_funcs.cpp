@@ -1,4 +1,4 @@
-#include "shader_funcs.h"
+#include "graphics/shader_funcs.h"
 
 #include "Journal.h"
 #include "filesystem.h"

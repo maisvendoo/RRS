@@ -18,9 +18,9 @@
 #include "VehiclesHandler.h"
 #include "WorldCulling.h"
 #include "filesystem.h"
-#include "shader_funcs.h"
 #include "sound-manager.h"
 #include "tcp-client.h"
+#include "graphics/shader_funcs.h"
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
