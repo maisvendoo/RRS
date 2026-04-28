@@ -26,6 +26,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->pbOpenModel, &QPushButton::released, this, &MainWindow::slotOpenModel);
     connect(ui->pbAddTexture, &QPushButton::released, this, &MainWindow::slotAddSkipedTexture);
+    connect(ui->pbDeleteTexture, &QPushButton::released, this, &MainWindow::slotDeleteSkipedTexture);
+
+    connect(ui->pbClear, &QPushButton::released, this, [this](){
+        ui->lwSkipedTextures->clear();
+    });
+
     connect(ui->pbCompress, &QPushButton::released, this, &MainWindow::slotCopmpress);
 
     // Объединяем stdout и stderr в один поток вывода
@@ -277,7 +283,20 @@ void MainWindow::slotAddSkipedTexture()
 //------------------------------------------------------------------------------
 void MainWindow::slotDeleteSkipedTexture()
 {
+    if (ui->lwSkipedTextures->count() == 0)
+    {
+        return;
+    }
 
+    int cur_idx = ui->lwSkipedTextures->currentRow();
+
+    if (cur_idx == -1)
+    {
+        return;
+    }
+
+    auto item = ui->lwSkipedTextures->takeItem(cur_idx);
+    delete item;
 }
 
 //------------------------------------------------------------------------------

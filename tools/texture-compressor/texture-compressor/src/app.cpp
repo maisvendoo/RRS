@@ -11,13 +11,15 @@ int Application::run(int argc, char *argv[])
         return -1;
     }
 
-    return 0;
+    Converter conv;
+
+    return conv.run(cmd_line);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-int Application::init(int argc, char *argv[])
+bool Application::init(int argc, char *argv[])
 {
     cli::Parser parser(argc, argv);
 
@@ -25,9 +27,7 @@ int Application::init(int argc, char *argv[])
 
     parse_command_line(parser, cmd_line);
 
-    Converter conv;
-
-    return conv.run(cmd_line);
+    return true;
 }
 
 //------------------------------------------------------------------------------

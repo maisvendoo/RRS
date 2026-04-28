@@ -157,10 +157,13 @@ int Converter::run(const command_line_t &cmd_line)
         out_gltf = gltf_path.parent_path() / (gltf_path.stem().string() + "_ktx.gltf");
 
     std::ofstream ofs(out_gltf);
-    if (!ofs.is_open()) {
+
+    if (!ofs.is_open())
+    {
         std::cerr << "[ERR] Cannot write output glTF\n";
-        return 1;
+        return -1;
     }
+
     ofs << gltf.dump(2);
     ofs.close();
 

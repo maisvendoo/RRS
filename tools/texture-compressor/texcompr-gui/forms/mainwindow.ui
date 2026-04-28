@@ -144,7 +144,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="deleteTexture">
+                 <widget class="QPushButton" name="pbDeleteTexture">
                   <property name="text">
                    <string>Delete</string>
                   </property>

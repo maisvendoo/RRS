@@ -21,7 +21,7 @@ private:
 
     command_line_t cmd_line;
 
-    int init(int argc, char *argv[]);
+    bool init(int argc, char *argv[]);
 
     void configure_parser(cli::Parser &parser);
 
