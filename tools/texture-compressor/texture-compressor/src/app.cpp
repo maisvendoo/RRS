@@ -55,6 +55,10 @@ void Application::configure_parser(cli::Parser &parser)
                               false,
                               "Not rewrite existed KTX2 texture");
 
+    parser.set_optional<bool>("d", "delete-src-texture",
+                              false,
+                              "Delete source texture");
+
     parser.enable_help();
 }
 
@@ -77,6 +81,8 @@ bool Application::parse_command_line(cli::Parser &parser,
     cmd_line.overwrite_gltf = parser.get<bool>("o");
 
     cmd_line.ignore_existed = parser.get<bool>("i");
+
+    cmd_line.delete_src = parser.get<bool>("d");
 
     return true;
 }

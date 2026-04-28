@@ -134,6 +134,12 @@ int Converter::run(const command_line_t &cmd_line)
                     img.erase("bufferView");
                 }
 
+                // Удаляем исходную текстуру, если это требуется
+                if (cmd_line.delete_src)
+                {
+                    fs::remove(src_path);
+                }
+
                 processed++;
             }
             else

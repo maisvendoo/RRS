@@ -43,7 +43,11 @@ private:
         bool isSRGB = false;
     };
 
-    bool compress_to_ktx2(const fs::path& src_img, const fs::path& out_ktx, const TextureSettings& cfg, bool generate_mipmaps = false, bool ignore = false);
+    bool compress_to_ktx2(const fs::path& src_img,
+                          const fs::path& out_ktx,
+                          const TextureSettings& cfg,
+                          bool generate_mipmaps = false,
+                          bool ignore = false);
 
     std::map<int, TextureSettings> parse_gltf_textures(const json& gltf);
 };

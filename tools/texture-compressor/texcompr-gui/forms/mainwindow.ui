@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
-    <height>478</height>
+    <width>738</width>
+    <height>537</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="twMode">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="SingleModel">
        <attribute name="title">
@@ -97,6 +97,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QCheckBox" name="cbDeleteSrcTex">
+              <property name="text">
+               <string>Delete source texture</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QLabel" name="label_2">
               <property name="text">
                <string>Skiped textures</string>
@@ -110,6 +117,12 @@
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
                <widget class="QListWidget" name="lwSkipedTextures">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>1</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="selectionBehavior">
                  <enum>QAbstractItemView::SelectRows</enum>
                 </property>
@@ -148,6 +161,13 @@
                  <widget class="QPushButton" name="pbLoad">
                   <property name="text">
                    <string>Load</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pbClear">
+                  <property name="text">
+                   <string>Clear</string>
                   </property>
                  </widget>
                 </item>
@@ -371,7 +391,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>650</width>
+     <width>738</width>
      <height>22</height>
     </rect>
    </property>

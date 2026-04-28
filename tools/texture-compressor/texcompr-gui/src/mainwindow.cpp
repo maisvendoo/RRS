@@ -109,7 +109,7 @@ void MainWindow::launchNextProcess()
         if (ui->cbNoRewriteKtxDir->isChecked())
         {
             args << "-i";
-        }
+        }       
 
         proc->setArguments(args);
 
@@ -295,6 +295,11 @@ void MainWindow::slotCopmpress()
     if (ui->cbNoRewrite)
     {
         args << "-i";
+    }
+
+    if (ui->cbDeleteSrcTex->isChecked())
+    {
+        args << "-d";
     }
 
     if (ui->lwSkipedTextures->count() != 0)

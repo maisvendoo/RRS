@@ -30,6 +30,7 @@ struct command_line_t
     option_t<std::string> skip_textures;
     bool overwrite_gltf = false;
     bool ignore_existed = false;
+    bool delete_src = false;
 };
 
 #endif
