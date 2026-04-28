@@ -14,7 +14,6 @@
 #include <Qt>
 #include <QtTypes>
 
-#include <cstdio>
 #include <iterator>
 #include <map>
 #include <string>

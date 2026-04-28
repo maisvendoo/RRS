@@ -1,17 +1,11 @@
 #include "EditorGui.h"
 
-#include "Journal.h"
-#include "commands/AddObject.h"
-#include "commands/Command.h"
-#include "commands/CommandList.h"
-#include "commands/RotateObjects.h"
-#include "commands/ScaleObjects.h"
-#include "commands/TranslateObjects.h"
 #include "Action.h"
 #include "CameraHandler.h"
 #include "EditorContext.h"
 #include "EditorState.h"
 #include "Gizmo.h"
+#include "Journal.h"
 #include "KeyBinding.h"
 #include "ObjectSelector.h"
 #include "Route.h"
@@ -21,18 +15,20 @@
 #include "filesystem.h"
 #include "rail-signal.h"
 #include "switch.h"
-#include "topology-defines.h"
 #include "topology.h"
+#include "topology-defines.h"
 #include "track.h"
-#include "ImGuiFileDialog.h"
 #include "trajectory.h"
 #include "vec3.h"
+#include "commands/AddObject.h"
+#include "commands/Command.h"
+#include "commands/CommandList.h"
+#include "commands/RotateObjects.h"
+#include "commands/ScaleObjects.h"
+#include "commands/TranslateObjects.h"
 
-#include <algorithm>
-// #include <filesystem>
-#include <cstdio>
-#include <mutex>
-#include <qcontainerfwd.h>
+#include "ImGuiFileDialog.h"
+
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/RecordTraversal.h>
 #include <vsg/commands/Commands.h>
@@ -59,8 +55,10 @@
 #include <vsg/ui/KeyEvent.h>
 #include <vsgImGui/imgui.h>
 
-#include <cassert>
+#include <algorithm>
 #include <cctype>
+#include <cstdio>
+#include <mutex>
 #include <string>
 
 #define SHOW_WINDOW(setting_name) if (settings.setting_name) setting_name()
@@ -275,8 +273,6 @@ void EditorGui::show_objects_ref() const
 
 void EditorGui::show_route_map() const
 {
-    assert(context_.route);
-
     ImGui::Begin("route1.map", nullptr, window_flags_);
 
     if (!context_.route)

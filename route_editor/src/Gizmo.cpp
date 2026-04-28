@@ -1,7 +1,5 @@
 #include "Gizmo.h"
 
-#include "commands/CommandList.h"
-#include "commands/TranslateObjects.h"
 #include "CameraHandler.h"
 #include "EditorContext.h"
 #include "IntersectionHandler.h"
@@ -9,6 +7,8 @@
 #include "RouteObject.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
+#include "commands/CommandList.h"
+#include "commands/TranslateObjects.h"
 
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>

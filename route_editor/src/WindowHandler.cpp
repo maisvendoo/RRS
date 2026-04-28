@@ -13,8 +13,6 @@
 
 #include <vulkan/vulkan_core.h>
 
-#include <cstdio>
-
 static VkSampleCountFlags samples_bit_flag(int samples)
 {
     if (samples >= 8)

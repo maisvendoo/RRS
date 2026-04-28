@@ -1,12 +1,5 @@
 #include "ObjectSelector.h"
 
-#include "commands/CommandList.h"
-#include "commands/DeleteObjects.h"
-#include "commands/PasteObjects.h"
-#include "commands/RotateObjects.h"
-#include "commands/ScaleObjects.h"
-#include "commands/SelectObjects.h"
-#include "commands/TranslateObjects.h"
 #include "Action.h"
 #include "CameraHandler.h"
 #include "EditorContext.h"
@@ -19,6 +12,13 @@
 #include "RouteObject.h"
 #include "SceneGraph.h"
 #include "SingleSwitch.h"
+#include "commands/CommandList.h"
+#include "commands/DeleteObjects.h"
+#include "commands/PasteObjects.h"
+#include "commands/RotateObjects.h"
+#include "commands/ScaleObjects.h"
+#include "commands/SelectObjects.h"
+#include "commands/TranslateObjects.h"
 
 #include <vsg/core/Mask.h>
 #include <vsg/maths/common.h>

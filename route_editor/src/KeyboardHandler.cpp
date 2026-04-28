@@ -1,19 +1,19 @@
 #include "KeyboardHandler.h"
 
-#include "Journal.h"
-#include "commands/CommandList.h"
 #include "Action.h"
 #include "EditorContext.h"
+#include "Journal.h"
 #include "KeyBinding.h"
 #include "Settings.h"
 #include "filesystem.h"
+#include "commands/CommandList.h"
 
-#include <mutex>
 #include <vsg/ui/KeyEvent.h>
 
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 
 KeyboardHandler::KeyboardHandler(EditorContext& context)
     : context_(context)

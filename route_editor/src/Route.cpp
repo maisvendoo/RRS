@@ -8,7 +8,6 @@
 #include "RouteObject.h"
 #include "Settings.h"
 #include "filesystem.h"
-// #include "parse_file_funcs.h"
 #include "rail-signal.h"
 #include "signals-data-types.h"
 #include "topology.h"
@@ -17,10 +16,6 @@
 
 #include <CfgReader.h>
 
-#include <fstream>
-#include <mutex>
-#include <sstream>
-#include <thread>
 #include <vsg/app/RecordTraversal.h>
 #include <vsg/commands/DrawIndexed.h>
 #include <vsg/core/Array.h>
@@ -33,13 +28,6 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
 #include <vsg/nodes/Geometry.h>
-
-#include <QString>
-
-#include <cmath>
-#include <cstdio>
-#include <filesystem>
-#include <string>
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/nodes/VertexDraw.h>
 #include <vsg/nodes/VertexIndexDraw.h>
@@ -53,11 +41,19 @@
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/VertexInputState.h>
 #include <vsg/utils/Builder.h>
+
+#include <QString>
+
 #include <vulkan/vulkan_core.h>
 
-#define LABEL_BUFFER_SIZE 256
-#define RELATIVE_PATH_BUFFER_SIZE 512
-#define FLOAT_BUFFER_SIZE 32
+#include <cmath>
+#include <cstdio>
+#include <filesystem>
+#include <fstream>
+#include <mutex>
+#include <sstream>
+#include <string>
+#include <thread>
 
 static vsg::dvec3 to_vsg_vec3(dvec3 vec)
 {
@@ -108,20 +104,6 @@ bool Route::load_objects_ref()
     const std::string objects_ref_path = fs.combinePath(
         context_.route_dir, "objects.ref");
 
-    // char label[LABEL_BUFFER_SIZE];
-    // char relative_path[RELATIVE_PATH_BUFFER_SIZE];
-
-    // return parse_file_line_by_line(
-    //     objects_ref_path.c_str(), "r", " \t\r",
-    //     [&]() -> void {
-    //         context.objects_ref.emplace(label, relative_path);
-    //     },
-    //     {
-    //         ParseField::String(label, LABEL_BUFFER_SIZE),
-    //         ParseField::String(relative_path, RELATIVE_PATH_BUFFER_SIZE)
-    //     }
-    // );
-
     std::ifstream objects_ref_file(objects_ref_path);
     if (!objects_ref_file)
     {
@@ -153,28 +135,6 @@ bool Route::load_route_map()
 
     const std::string route_map_path = fs.combinePath(context_.route_dir,
         "topology", "map", "route1.map");
-
-    // char label[LABEL_BUFFER_SIZE];
-    // char float_buffer[FLOAT_BUFFER_SIZE];
-    // vsg::vec3 translation;
-    // vsg::vec3 rotation_deg;
-
-    // return parse_file_line_by_line(
-    //     route_map_path.c_str(), "r", " \t\r,;",
-    //     [&]() -> void {
-    //         context.route_map[label].emplace_back(
-    //             RouteMapTransformation{translation, rotation_deg});
-    //     },
-    //     {
-    //         ParseField::String(label, LABEL_BUFFER_SIZE),
-    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.x),
-    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.y),
-    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &translation.z),
-    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.x),
-    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.y),
-    //         ParseField::Float(float_buffer, FLOAT_BUFFER_SIZE, &rotation_deg.z)
-    //     }
-    // );
 
     std::ifstream route_map_file(route_map_path);
     if (!route_map_file)
