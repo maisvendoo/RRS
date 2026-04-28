@@ -5,6 +5,8 @@
 #include    <QFileInfo>
 #include    <QFile>
 #include    <filesystem.h>
+#include    <QDirIterator>
+#include    <QThread>
 
 const QString TEXCOMPRESS_NAME = "texcompr";
 
@@ -36,6 +38,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->pbLoad, &QPushButton::released, this, &MainWindow::slotLoadSkipList);
 
     ui->lwSkipedTextures->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    connect(ui->pbOpenFolder, &QPushButton::released, this, &MainWindow::slotOpenDirectory);
+
+    ui->prbCompression->setValue(0);
+
+    m_maxConcurrency = qMax(1, QThread::idealThreadCount());
+
+    connect(ui->pbCompressDir, &QPushButton::released, this, &MainWindow::slotDirectoryCompress);
 }
 
 //------------------------------------------------------------------------------
@@ -44,6 +54,150 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QStringList MainWindow::scanGltfFiles(const QString &dir)
+{
+    QStringList files;
+    QDirIterator it(dir, {"*.gltf", "*.gltf2"}, QDir::Files, QDirIterator::Subdirectories);
+
+    while (it.hasNext())
+    {
+        files.append(it.next());
+    }
+
+    files.sort();
+    return files;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::launchNextProcess()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString workDir(fs.getBinaryDir().c_str());
+
+    QString texComprPath = workDir + QDir::separator() + TEXCOMPRESS_NAME + EXE_EXP;
+
+    while (m_runningProcesses.size() < m_maxConcurrency && !m_fileQueue.isEmpty())
+    {
+        QString filePath = m_fileQueue.dequeue();
+        QProcess* proc = new QProcess(this);
+
+        // Настройка параметров из help.txt
+        // -m обязательно, остальные опциональны. Можно добавить флаги через UI.
+        proc->setProgram(texComprPath);
+
+        QStringList args;
+
+        args << "-m" << QDir::toNativeSeparators(filePath);
+
+        if (ui->cbGenMipmapsDir->isChecked())
+        {
+            args << "-g";
+        }
+
+        if (ui->cbOverWriteGltfDir->isChecked())
+        {
+            args << "-o";
+        }
+
+        if (ui->cbNoRewriteKtxDir->isChecked())
+        {
+            args << "-i";
+        }
+
+        proc->setArguments(args);
+
+        // Асинхронные соединения
+        connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+                this, [this, proc](int exitCode, QProcess::ExitStatus exitStatus) {
+                    onProcessFinished(proc, exitCode, exitStatus);
+                });
+
+        connect(proc, &QProcess::errorOccurred, this, [this, proc](QProcess::ProcessError error) {
+            onProcessErrorOccurred(error);
+        });
+
+        proc->start();
+
+        if (proc->state() == QProcess::Starting || proc->state() == QProcess::Running)
+        {
+            m_runningProcesses.append(proc);
+            ui->ptDirLog->appendPlainText(QString(tr("Started: %1")).arg(QFileInfo(filePath).fileName()));
+        }
+        else
+        {
+            ui->ptDirLog->appendPlainText(QString(tr("Failed start: %1")).arg(filePath));
+            proc->deleteLater();
+
+            // Если запуск не удался, сразу уменьшаем счётчик и пробуем запустить следующий
+            m_processedFiles++;
+
+            updateProgress();
+
+            launchNextProcess();
+        }
+    }
+
+    if (m_fileQueue.isEmpty() && m_runningProcesses.isEmpty())
+    {
+        ui->pbCompressDir->setEnabled(true);
+        ui->ptDirLog->appendPlainText(tr("All tasks finished success"));
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onProcessFinished(QProcess* proc, int exitCode, QProcess::ExitStatus exitStatus)
+{
+    m_runningProcesses.removeAll(proc);
+    m_processedFiles++;
+    updateProgress();
+
+    QString fileName = QFileInfo(proc->arguments().value(1)).fileName();
+    if (exitStatus == QProcess::NormalExit)
+    {
+        ui->ptDirLog->appendPlainText(QString(tr("Ready: %1")).arg(fileName));
+    }
+    else
+    {
+        ui->ptDirLog->appendPlainText(QString(tr("Error: %1 (exit code: %2, state: %3)"))
+                                          .arg(fileName)
+                                          .arg(exitCode)
+                                          .arg(exitStatus == QProcess::NormalExit ? "Normal" : "Crash"));
+    }
+
+    proc->deleteLater();
+    launchNextProcess(); // Запускаем следующие из очереди
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::onProcessErrorOccurred(QProcess::ProcessError error)
+{
+    QProcess* proc = qobject_cast<QProcess*>(sender());
+
+    if (!proc)
+    {
+        return;
+    }
+
+    Q_UNUSED(error);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::updateProgress()
+{
+    ui->prbCompression->setValue(qRound(100.0 * m_processedFiles / m_totalFiles));
 }
 
 //------------------------------------------------------------------------------
@@ -289,4 +443,67 @@ void MainWindow::slotLoadSkipList()
     }
 
     file.close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotOpenDirectory()
+{
+    modelsDirPath.clear();
+
+    FileSystem &fs = FileSystem::getInstance();
+    QString startDir = QString(fs.getLevelUpDirectory(fs.getBinaryDir(), 1).c_str());
+
+    modelsDirPath = QFileDialog::getExistingDirectory(this, tr("Select models folder"), startDir);
+
+    if (modelsDirPath.isEmpty())
+    {
+        return;
+    }
+
+    modelsDirPath = QDir::toNativeSeparators(modelsDirPath);
+
+    ui->teDirectoryPath->setText(modelsDirPath);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotDirectoryCompress()
+{
+    QString dir = modelsDirPath.trimmed();
+
+    if (dir.isEmpty() || !QDir(dir).exists())
+    {
+        return;
+    }
+
+    m_fileQueue.clear();
+    qDeleteAll(m_runningProcesses);
+    m_runningProcesses.clear();
+    m_totalFiles = 0;
+    m_processedFiles = 0;
+    ui->ptDirLog->clear();
+
+    QStringList gltfFiles = scanGltfFiles(dir);
+
+    if (gltfFiles.empty())
+    {
+        ui->ptDirLog->appendPlainText(tr("There are no GLTF files. Abort"));
+        return;
+    }
+
+    m_totalFiles = gltfFiles.size();
+
+    for (const QString &f : gltfFiles)
+    {
+        m_fileQueue.enqueue(f);
+    }
+
+    ui->pbCompressDir->setEnabled(false);
+    ui->prbCompression->setValue(0);
+    ui->ptDirLog->appendPlainText(QString(tr("Find %1 files for compression...")).arg(m_totalFiles));
+
+    launchNextProcess();
 }

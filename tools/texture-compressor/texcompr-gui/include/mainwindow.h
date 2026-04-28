@@ -3,6 +3,7 @@
 
 #include    <QMainWindow>
 #include    <QProcess>
+#include    <QQueue>
 
 //------------------------------------------------------------------------------
 //
@@ -32,7 +33,26 @@ private:
 
     QString modelFilePath = "";
 
+    QString modelsDirPath = "";
+
     QProcess *texCompressor = new QProcess(this);
+
+    // Состояние задачи
+    QQueue<QString> m_fileQueue;
+    QList<QProcess*> m_runningProcesses;
+    int m_totalFiles = 0;
+    int m_processedFiles = 0;
+    int m_maxConcurrency = 1;
+
+    QStringList scanGltfFiles(const QString& dir);
+
+    void launchNextProcess();
+
+    void updateProgress();
+
+    void onProcessFinished(QProcess* proc, int exitCode, QProcess::ExitStatus exitStatus);
+
+    void onProcessErrorOccurred(QProcess::ProcessError error);
 
 private slots:
 
@@ -52,6 +72,10 @@ private slots:
     void slotSaveSkipList();
 
     void slotLoadSkipList();
+
+    void slotOpenDirectory();
+
+    void slotDirectoryCompress();
 };
 
 #endif // MAINWINDOW_H

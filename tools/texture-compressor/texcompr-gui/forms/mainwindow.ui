@@ -301,12 +301,15 @@
              </widget>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="plainTextEdit"/>
+             <widget class="QPlainTextEdit" name="ptDirLog"/>
             </item>
             <item>
              <widget class="QProgressBar" name="prbCompression">
               <property name="value">
-               <number>24</number>
+               <number>0</number>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
               <property name="textVisible">
                <bool>true</bool>
@@ -334,7 +337,7 @@
               <item>
                <widget class="QPushButton" name="pbCompressDir">
                 <property name="text">
-                 <string>PushButton</string>
+                 <string>Compress</string>
                 </property>
                </widget>
               </item>
