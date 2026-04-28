@@ -61,8 +61,6 @@ static vsg::dvec3 to_vsg_vec3(dvec3 vec)
     return vsg::dvec3{vec.x, vec.y, vec.z};
 }
 
-static vsg::ref_ptr<vsg::StateGroup> create_state_group_for_topology(EditorContext& context);
-
 Route::Route(EditorContext& context)
     : context_(context)
 {
@@ -428,7 +426,36 @@ bool Route::load_topology()
     load_signals(signals_data->exit_signals);
 
     const auto group = vsg::Group::create();
-    const auto state_group = create_state_group_for_topology(context_);
+
+    const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
+
+    const auto input_assembly_state = vsg::InputAssemblyState::create();
+    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+
+    const auto rasterization_state = vsg::RasterizationState::create();
+    rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
+
+    const auto state_group = create_state_group_with_custom_pipeline(
+        shaders_dir_path.c_str(),
+        "traj_line.vert",
+        "traj_line.frag",
+        context_.options,
+        vsg::VertexInputState::Bindings{
+            VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
+            VkVertexInputBindingDescription{1, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX}
+        },
+        vsg::VertexInputState::Attributes{
+            VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
+            VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32B32_SFLOAT, 0}
+        },
+        vsg::DescriptorSetLayoutBindings{},
+        vsg::Descriptors{},
+        input_assembly_state,
+        rasterization_state,
+        vsg::MultisampleState::create(),
+        vsg::ColorBlendState::create(),
+        vsg::DepthStencilState::create()
+    );
 
     const traj_list_t* traj_list = context_.topology->getTrajectoriesList();
     for (const Trajectory* trajectory : *traj_list)
@@ -507,38 +534,4 @@ bool Route::load_topology()
     context_.compile_infos_mutex.unlock();
 
     return true;
-}
-
-static vsg::ref_ptr<vsg::StateGroup> create_state_group_for_topology(EditorContext& context)
-{
-    const FileSystem& fs = FileSystem::getInstance();
-    const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
-
-    const auto input_assembly_state = vsg::InputAssemblyState::create();
-    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
-
-    const auto rasterization_state = vsg::RasterizationState::create();
-    rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
-
-    return create_state_group_with_custom_pipeline(
-        shaders_dir_path.c_str(),
-        "traj_line.vert",
-        "traj_line.frag",
-        context.options,
-        vsg::VertexInputState::Bindings{
-            VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
-            VkVertexInputBindingDescription{1, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX}
-        },
-        vsg::VertexInputState::Attributes{
-            VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
-            VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32B32_SFLOAT, 0}
-        },
-        vsg::DescriptorSetLayoutBindings{},
-        vsg::Descriptors{},
-        input_assembly_state,
-        rasterization_state,
-        vsg::MultisampleState::create(),
-        vsg::ColorBlendState::create(),
-        vsg::DepthStencilState::create()
-    );
 }
