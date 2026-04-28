@@ -18,6 +18,7 @@
 #include "VehiclesHandler.h"
 #include "WorldCulling.h"
 #include "filesystem.h"
+#include "shader_funcs.h"
 #include "sound-manager.h"
 #include "tcp-client.h"
 
@@ -532,9 +533,14 @@ void RouteViewer::configureShaders()
     FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
 
-    loadCustomShader(fs, shaders_dir_path, "standard.vert", "standard_flat_shaded.frag", "flat", flat_shader);
-    loadCustomShader(fs, shaders_dir_path, "standard.vert", "standard_pbr.frag", "PBR", pbr_shader);
-    loadCustomShader(fs, shaders_dir_path, "standard.vert", "standard_phong.frag", "Phong", phong_shader);
+    const auto vertex_shader = read_shader(shaders_dir_path.c_str(), "standard.vert", options);
+
+    configure_shader_set(shaders_dir_path.c_str(), vertex_shader,
+        "standard_flat_shaded.frag", options, "flat", flat_shader);
+    configure_shader_set(shaders_dir_path.c_str(), vertex_shader,
+        "standard_pbr.frag", options, "PBR", pbr_shader);
+    configure_shader_set(shaders_dir_path.c_str(), vertex_shader,
+        "standard_phong.frag", options, "Phong", phong_shader);
 
     // Можем по своему настроить стадии графического конвейера
     auto vertexInputState = vsg::VertexInputState::create();
@@ -619,43 +625,6 @@ void RouteViewer::configureShaders()
     options->shaderSets["flat"] = flat_shader;
     options->shaderSets["pbr"] = pbr_shader;
     options->shaderSets["phong"] = phong_shader;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void RouteViewer::loadCustomShader(
-    FileSystem& fs,
-    const std::string& shaders_dir_path,
-    const char* vert_shader_filename,
-    const char* frag_shader_filename,
-    const char* shader_set_name,
-    vsg::ref_ptr<vsg::ShaderSet> shader_set
-)
-{
-    auto vert_shader_path = shaders_dir_path + fs.separator() + vert_shader_filename;
-    auto vert_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_VERTEX_BIT, "main", vert_shader_path, options);
-
-    auto frag_shader_path = shaders_dir_path + fs.separator() + frag_shader_filename;
-    auto frag_shader_stage = vsg::ShaderStage::read(VK_SHADER_STAGE_FRAGMENT_BIT, "main", frag_shader_path, options);
-
-    if (!vert_shader_stage || !frag_shader_stage)
-    {
-        if (!vert_shader_stage)
-            LOG_WARN("Failed to load vertex shader: %s", vert_shader_path.c_str());
-        if (!frag_shader_stage)
-            LOG_WARN("Failed to load fragment shader: %s", frag_shader_path.c_str());
-        LOG_INFO("Using default %s shader set", shader_set_name);
-        return;
-    }
-
-    LOG_INFO("Loaded custom %s shader set: %s, %s", shader_set_name, vert_shader_path.c_str(), frag_shader_path.c_str());
-
-    shader_set->stages.front() = vert_shader_stage;
-    shader_set->stages.back() = frag_shader_stage;
-
-    // Очищаем все встроенные сохранённые варианты настроек
-    shader_set->variants.clear();
 }
 
 //------------------------------------------------------------------------------

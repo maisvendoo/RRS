@@ -49,6 +49,7 @@ target_link_libraries(${TARGET} PRIVATE
     display
     topology
     parsing
+    graphics
 )
 
 target_include_directories(${TARGET} PRIVATE
