@@ -19,13 +19,13 @@ vsg::ref_ptr<vsg::ShaderStage> read_shader(
     vsg::ref_ptr<const vsg::Options> options
 )
 {
-    const FileSystem& fs = FileSystem::getInstance();
-    const std::string shader_path = fs.combinePath(shaders_dir, filename);
+    const FileSystem& fs{FileSystem::getInstance()};
+    const std::string shader_path{fs.combinePath(shaders_dir, filename)};
 
-    const auto shader = vsg::read_cast<vsg::ShaderStage>(shader_path, options);
+    const auto shader{vsg::read_cast<vsg::ShaderStage>(shader_path, options)};
     if (!shader)
     {
-        Journal::instance()->warning(QString("Failed to load shader %1")
+        Journal::instance()->warning(QString{"Failed to load shader %1"}
             .arg(shader_path));
     }
 
@@ -92,7 +92,7 @@ void configure_shader_set(
 {
     if (!vert_shader || !frag_shader)
     {
-        Journal::instance()->warning(QString("Using default %1 shader set")
+        Journal::instance()->warning(QString{"Using default %1 shader set"}
             .arg(shader_set_name));
 
         return;
@@ -103,6 +103,6 @@ void configure_shader_set(
 
     shader_set->variants.clear();
 
-    Journal::instance()->info(QString("Shader set %1 configured")
+    Journal::instance()->info(QString{"Shader set %1 configured"}
         .arg(shader_set_name));
 }

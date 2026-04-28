@@ -8,6 +8,7 @@
 #include "RouteObject.h"
 #include "Settings.h"
 #include "filesystem.h"
+#include "graphics/pipeline_funcs.h"
 #include "rail-signal.h"
 #include "signals-data-types.h"
 #include "topology.h"
@@ -512,55 +513,32 @@ static vsg::ref_ptr<vsg::StateGroup> create_state_group_for_topology(EditorConte
 {
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
-    const std::string shader_vert_path = shaders_dir_path + fs.separator() + "traj_line.vert";
-    const std::string shader_frag_path = shaders_dir_path + fs.separator() + "traj_line.frag";
 
-    auto vertex_shader = vsg::read_cast<vsg::ShaderStage>(shader_vert_path, context.options);
-    auto fragment_shader = vsg::read_cast<vsg::ShaderStage>(shader_frag_path, context.options);
-
-    vsg::DescriptorSetLayoutBindings descriptor_bindings{};
-    auto descriptor_set_layout = vsg::DescriptorSetLayout::create(descriptor_bindings);
-
-    vsg::PushConstantRanges push_constant_ranges{
-        {VK_SHADER_STAGE_VERTEX_BIT, 0, 128}
-    };
-
-    vsg::VertexInputState::Bindings vertex_bindings_descriptions{
-        VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
-        VkVertexInputBindingDescription{1, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX}
-    };
-
-    vsg::VertexInputState::Attributes vertex_attribute_descriptions{
-        VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
-        VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32B32_SFLOAT, 0}
-    };
-
-    auto input_assembly_state = vsg::InputAssemblyState::create();
+    const auto input_assembly_state = vsg::InputAssemblyState::create();
     input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
 
-    auto rasterization_state = vsg::RasterizationState::create();
-    // rasterization_state->lineWidth = 2.0f;
+    const auto rasterization_state = vsg::RasterizationState::create();
     rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
 
-    vsg::GraphicsPipelineStates pipeline_states{
-        vsg::VertexInputState::create(vertex_bindings_descriptions, vertex_attribute_descriptions),
+    return create_state_group_with_custom_pipeline(
+        shaders_dir_path.c_str(),
+        "traj_line.vert",
+        "traj_line.frag",
+        context.options,
+        vsg::VertexInputState::Bindings{
+            VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
+            VkVertexInputBindingDescription{1, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX}
+        },
+        vsg::VertexInputState::Attributes{
+            VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
+            VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32B32_SFLOAT, 0}
+        },
+        vsg::DescriptorSetLayoutBindings{},
+        vsg::Descriptors{},
         input_assembly_state,
         rasterization_state,
         vsg::MultisampleState::create(),
         vsg::ColorBlendState::create(),
         vsg::DepthStencilState::create()
-    };
-
-    auto pipeline_layout = vsg::PipelineLayout::create(vsg::DescriptorSetLayouts{descriptor_set_layout}, push_constant_ranges);
-    auto graphics_pipeline = vsg::GraphicsPipeline::create(pipeline_layout, vsg::ShaderStages{vertex_shader, fragment_shader}, pipeline_states);
-    auto bind_graphics_pipeline = vsg::BindGraphicsPipeline::create(graphics_pipeline);
-
-    auto descriptor_set = vsg::DescriptorSet::create(descriptor_set_layout, vsg::Descriptors{});
-    auto bind_descriptor_set = vsg::BindDescriptorSet::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, descriptor_set);
-
-    const auto state_group = vsg::StateGroup::create();
-    state_group->add(bind_graphics_pipeline);
-    state_group->add(bind_descriptor_set);
-
-    return state_group;
+    );
 }

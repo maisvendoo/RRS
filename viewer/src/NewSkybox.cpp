@@ -4,6 +4,7 @@
 #include "Logger.h"
 #include "datetime.h"
 #include "filesystem.h"
+#include "graphics/pipeline_funcs.h"
 
 #include <vsg/app/RecordTraversal.h>
 #include <vsg/commands/BindIndexBuffer.h>
@@ -304,61 +305,11 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
     // Получаем пути к шейдерам скайбокса
     FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
-    const std::string shader_vert_path = shaders_dir_path + fs.separator() + "new_skybox.vert";
-    const std::string shader_frag_path = shaders_dir_path + fs.separator() + "new_skybox.frag";
 
-    // Читаем шейдеры из соответствующих путей
-    auto vertex_shader = vsg::read_cast<vsg::ShaderStage>(shader_vert_path, options);
-    auto fragment_shader = vsg::read_cast<vsg::ShaderStage>(shader_frag_path, options);
-
-    if (!vertex_shader || !fragment_shader)
-    {
-        LOG_ERROR("Could not create shaders");
-        return;
-    }
-
-    // Настраиваем пайплайн скайбокса
-    vsg::DescriptorSetLayoutBindings descriptor_bindings = {
-        // {binding, descriptorType, descriptorCount, stageFlags, pImmutableSamplers}
-        {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-        {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-        {2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
-    };
-
-    auto descriptor_set_layout = vsg::DescriptorSetLayout::create(descriptor_bindings);
-
-    // projection, view, and model matrices, actual push constant calls automatically provided by the VSG's RecordTraversal
-    vsg::PushConstantRanges push_constant_ranges = {
-        {VK_SHADER_STAGE_VERTEX_BIT, 0, 128}
-    };
-
-    vsg::VertexInputState::Bindings vertex_bindings_descriptions = {
-        VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
-        VkVertexInputBindingDescription{1, sizeof(vsg::vec2), VK_VERTEX_INPUT_RATE_VERTEX}
-    };
-
-    vsg::VertexInputState::Attributes vertex_attribute_descriptions = {
-        VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
-        VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32_SFLOAT, 0}
-    };
-
-    auto depth_state = vsg::DepthStencilState::create();
-    depth_state->depthTestEnable = VK_TRUE;
-    depth_state->depthWriteEnable = VK_FALSE;
-    depth_state->depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL;
-
-    vsg::GraphicsPipelineStates pipeline_states = {
-        vsg::VertexInputState::create(vertex_bindings_descriptions, vertex_attribute_descriptions),
-        vsg::InputAssemblyState::create(),
-        vsg::RasterizationState::create(),
-        vsg::MultisampleState::create(),
-        vsg::ColorBlendState::create(),
-        depth_state
-    };
-
-    auto pipeline_layout = vsg::PipelineLayout::create(vsg::DescriptorSetLayouts{descriptor_set_layout}, push_constant_ranges);
-    auto pipeline = vsg::GraphicsPipeline::create(pipeline_layout, vsg::ShaderStages{vertex_shader, fragment_shader}, pipeline_states);
-    auto bind_graphics_pipeline = vsg::BindGraphicsPipeline::create(pipeline);
+    auto depth_stencil_state = vsg::DepthStencilState::create();
+    depth_stencil_state->depthTestEnable = VK_TRUE;
+    depth_stencil_state->depthWriteEnable = VK_FALSE;
+    depth_stencil_state->depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL;
 
     texture1_data = vsg::clone(textures[0].texture);
     texture2_data = vsg::clone(textures[0].texture);
@@ -366,23 +317,39 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
     texture2_data->properties.dataVariance = vsg::DYNAMIC_DATA;
 
     auto sampler = vsg::Sampler::create();
-    auto texture_descriptor1 = vsg::DescriptorImage::create(sampler, texture1_data, 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-    auto texture_descriptor2 = vsg::DescriptorImage::create(sampler, texture2_data, 1, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 
     mix_value = vsg::floatValue::create(0.0f);
     mix_value->properties.dataVariance = vsg::DYNAMIC_DATA;
 
-    auto mix_value_descriptor = vsg::DescriptorBuffer::create(mix_value, 2, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-
-    auto descriptor_set = vsg::DescriptorSet::create(descriptor_set_layout, vsg::Descriptors{
-        texture_descriptor1, texture_descriptor2, mix_value_descriptor
-    });
-
-    auto bind_descriptor_set = vsg::BindDescriptorSet::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, descriptor_set);
-
-    state_group = vsg::StateGroup::create();
-    state_group->add(bind_graphics_pipeline);
-    state_group->add(bind_descriptor_set);
+    state_group = create_state_group_with_custom_pipeline(
+        shaders_dir_path.c_str(),
+        "new_skybox.vert",
+        "new_skybox.frag",
+        options,
+        vsg::VertexInputState::Bindings{
+            VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
+            VkVertexInputBindingDescription{1, sizeof(vsg::vec2), VK_VERTEX_INPUT_RATE_VERTEX}
+        },
+        vsg::VertexInputState::Attributes{
+            VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
+            VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32_SFLOAT, 0}
+        },
+        vsg::DescriptorSetLayoutBindings{
+            {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+            {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+            {2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
+        },
+        vsg::Descriptors{
+            vsg::DescriptorImage::create(sampler, texture1_data, 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER),
+            vsg::DescriptorImage::create(sampler, texture2_data, 1, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER),
+            vsg::DescriptorBuffer::create(mix_value, 2, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+        },
+        vsg::InputAssemblyState::create(),
+        vsg::RasterizationState::create(),
+        vsg::MultisampleState::create(),
+        vsg::ColorBlendState::create(),
+        depth_stencil_state
+    );
 
     // Загружаем модель скайбокса
     QString model_filename = "sky.gltf";
