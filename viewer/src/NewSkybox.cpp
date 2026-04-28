@@ -303,10 +303,10 @@ public:
 void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
 {
     // Получаем пути к шейдерам скайбокса
-    FileSystem& fs = FileSystem::getInstance();
+    const FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
 
-    auto depth_stencil_state = vsg::DepthStencilState::create();
+    const auto depth_stencil_state = vsg::DepthStencilState::create();
     depth_stencil_state->depthTestEnable = VK_TRUE;
     depth_stencil_state->depthWriteEnable = VK_FALSE;
     depth_stencil_state->depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL;
@@ -316,7 +316,7 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
     texture1_data->properties.dataVariance = vsg::DYNAMIC_DATA;
     texture2_data->properties.dataVariance = vsg::DYNAMIC_DATA;
 
-    auto sampler = vsg::Sampler::create();
+    const auto sampler = vsg::Sampler::create();
 
     mix_value = vsg::floatValue::create(0.0f);
     mix_value->properties.dataVariance = vsg::DYNAMIC_DATA;
@@ -332,17 +332,17 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
         },
         vsg::VertexInputState::Attributes{
             VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
-            VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32_SFLOAT, 0}
+            VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32_SFLOAT,    0}
         },
         vsg::DescriptorSetLayoutBindings{
             {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
             {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-            {2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
+            {2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
         },
         vsg::Descriptors{
             vsg::DescriptorImage::create(sampler, texture1_data, 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER),
             vsg::DescriptorImage::create(sampler, texture2_data, 1, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER),
-            vsg::DescriptorBuffer::create(mix_value, 2, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+            vsg::DescriptorBuffer::create(            mix_value, 2, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
         },
         vsg::InputAssemblyState::create(),
         vsg::RasterizationState::create(),
