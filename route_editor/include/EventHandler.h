@@ -4,6 +4,8 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 
+#include <memory>
+
 class CameraNavigationState;
 class GizmoRotateState;
 class GizmoScaleState;
@@ -36,16 +38,16 @@ public:
 private:
     Keyboard* const keyboard_;
 
-    State* state_;
-    SelectRouteState* const select_route_state_;
-    InitialState* const initial_state_;
-    CameraNavigationState* const camera_navigation_state_;
-    KeyboardTranslateState* const keyboard_translate_state_;
-    KeyboardRotateState* const keyboard_rotate_state_;
-    KeyboardScaleState* const keyboard_scale_state_;
-    GizmoTranslateState* const gizmo_translate_state_;
-    GizmoRotateState* const gizmo_rotate_state_;
-    GizmoScaleState* const gizmo_scale_state_;
+    std::unique_ptr<State>* state_;
+    std::unique_ptr<State> select_route_state_;
+    std::unique_ptr<State> initial_state_;
+    std::unique_ptr<State> camera_navigation_state_;
+    std::unique_ptr<State> keyboard_translate_state_;
+    std::unique_ptr<State> keyboard_rotate_state_;
+    std::unique_ptr<State> keyboard_scale_state_;
+    std::unique_ptr<State> gizmo_translate_state_;
+    std::unique_ptr<State> gizmo_rotate_state_;
+    std::unique_ptr<State> gizmo_scale_state_;
 };
 
 #endif // EVENT_HANDLER_H
