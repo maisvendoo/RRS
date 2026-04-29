@@ -125,7 +125,7 @@ bool RouteEditor::initialize()
     viewer_->addEventHandler(context_.mouse_handler);
     viewer_->addEventHandler(context_.keyboard_handler);
 
-    static Keyboard keyboard(&context_.settings.key_bindings);
+    static Keyboard keyboard(context_.settings.key_bindings);
     viewer_->addEventHandler(EventHandler::create(&keyboard));
 
     viewer_->addEventHandler(context_.camera_handler);

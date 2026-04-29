@@ -18,7 +18,7 @@ class KeyReleaseEvent;
 class Keyboard
 {
 public:
-    explicit Keyboard(const KeyBindings* key_bindings);
+    explicit Keyboard(const KeyBindings& key_bindings);
 
     void handle_key_press(vsg::KeyPressEvent& keyPress);
     void handle_key_release(vsg::KeyReleaseEvent& keyRelease);
@@ -29,7 +29,7 @@ public:
     bool get_shift_state() const;
 
 private:
-    const KeyBindings* const key_bindings_;
+    const KeyBindings& key_bindings_;
 
     std::bitset<UINT16_MAX + 1> key_states_;
     std::uint16_t active_modifiers_;

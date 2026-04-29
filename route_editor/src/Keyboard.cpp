@@ -32,7 +32,7 @@
         }                                             \
     }
 
-Keyboard::Keyboard(const KeyBindings* key_bindings)
+Keyboard::Keyboard(const KeyBindings& key_bindings)
     : key_bindings_{key_bindings}
     , active_modifiers_{0}
 {
@@ -52,7 +52,7 @@ void Keyboard::handle_key_release(vsg::KeyReleaseEvent& keyRelease)
 
 bool Keyboard::get_action_state(Action action) const
 {
-    const KeyBinding key_binding{key_bindings_->at(action)};
+    const KeyBinding key_binding{key_bindings_.at(action)};
     return key_states_.test(key_binding.key) && (active_modifiers_ == key_binding.modifiers);
 }
 
