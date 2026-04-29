@@ -132,14 +132,25 @@
              <widget class="QTextEdit" name="teRouteDescription"/>
             </item>
             <item>
-             <widget class="QCheckBox" name="cbOnlyUsedModels">
-              <property name="text">
-               <string>Convert only used models</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="hlOptions">
+              <item>
+               <widget class="QCheckBox" name="cbCompressTextures">
+                <property name="text">
+                 <string>Compress textures to .ktx2 format</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="cbOnlyUsedModels">
+                <property name="text">
+                 <string>Convert only used models</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <layout class="QHBoxLayout" name="hlStatus">

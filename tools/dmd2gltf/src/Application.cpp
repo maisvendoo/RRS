@@ -4,6 +4,7 @@
 #include    <Logger.h>
 
 #include    <algorithm>
+#include    <chrono>
 #include    <cmath>
 #include    <cstdint>
 #include    <filesystem>
@@ -12,8 +13,17 @@
 #include    <map>
 #include    <set>
 #include    <string>
+#include    <thread>
 #include    <utility>
 #include    <vector>
+
+#include    <vulkan/vulkan.h>
+#include    <ktx.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include    <stb_image.h>
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include    <stb_image_resize.h>
 
 namespace fs = std::filesystem;
 
@@ -49,7 +59,8 @@ bool Application::convert()
         return convert_route(cmd_line.input_route_path.value,
                              cmd_line.output_route_path.value,
                              cmd_line.input_only_used_at_map.value,
-                             cmd_line.input_lights_at_map.value);
+                             cmd_line.input_lights_at_map.value,
+                             cmd_line.input_compress_textures.value);
     }
 
     if (convert_mode == CONVERT_MODEL)
@@ -57,6 +68,7 @@ bool Application::convert()
         return convert_model(cmd_line.input_model_path.value,
                              cmd_line.input_texture_path.value,
                              cmd_line.output_model_path.value,
+                             cmd_line.input_compress_textures.value,
                              cmd_line.smooth.value);
     }
 
@@ -69,7 +81,8 @@ bool Application::convert()
 bool Application::convert_route(std::string &in_dmd_route_path,
                                 std::string &out_gltf_route_path,
                                 bool only_used_at_map,
-                                bool lights_at_map)
+                                bool lights_at_map,
+                                bool compress_texture)
 {
     // Преобразуем пути к платформоспецифичному виду
     path_to_native_separator(in_dmd_route_path);
@@ -270,6 +283,11 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         new_objects.insert({"light", "/../../data/models/default-objects/light.gltf"});
     }
 
+    uint32_t models_total = objects.size();
+    uint32_t models_count = 0;
+    auto prev_time = std::chrono::steady_clock::now();
+    std::cerr << " (" << 0 << "/" << models_total << ")";
+
     uint32_t smooth_count = 0;
     uint32_t not_smooth_count = 0;
     for (const auto& [relative_model_path, labels_textures_smooth] : objects)
@@ -311,8 +329,15 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             path_to_native_separator(in_texture_path);
 
             fs::path texture_path = relative_texture_path;
-            std::string out_relative_texture_path =
-                out_relative_texture_dir + texture_path.filename().string();
+            std::string out_relative_texture_path = out_relative_texture_dir;
+            if (compress_texture)
+            {
+                out_relative_texture_path += texture_path.filename().stem().string() + ".ktx2";
+            }
+            else
+            {
+                out_relative_texture_path += texture_path.filename().string();
+            }
 
             std::ifstream texture(in_texture_path, std::ios::in);
             if (!texture.is_open())
@@ -357,6 +382,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
                                     out_gltf_model_dir,
                                     out_relative_bin_path,
                                     out_relative_texture_path,
+                                    compress_texture,
                                     change_vertices_Z))
             {
                 // Записываем новые модели, кроме неба
@@ -367,6 +393,13 @@ bool Application::convert_route(std::string &in_dmd_route_path,
 
                 smooth ? ++smooth_count : ++not_smooth_count;
             }
+        }
+        ++models_count;
+        const auto cur_time = std::chrono::steady_clock::now();
+        if (std::chrono::duration<double> diff = cur_time - prev_time; diff.count() > 0.5)
+        {
+            std::cerr << " (" << models_count << "/" << models_total << ")";
+            prev_time = cur_time;
         }
     }
     LOG_INFO("Info: converted %u smooth models and %u not-smooth models", smooth_count, not_smooth_count);
@@ -393,6 +426,7 @@ bool Application::convert_model(std::string &in_dmd_model_path,
                                 std::string &in_texture_path,
                                 std::string &out_gltf_model_path,
                                 bool smooth,
+                                bool compress_texture,
                                 std::string out_relative_bin_path,
                                 std::string out_relative_texture_path)
 {
@@ -409,6 +443,10 @@ bool Application::convert_model(std::string &in_dmd_model_path,
     std::string texture_ext = fs::path(in_texture_path).extension().string();
     model_data.is_reversed_texture_coord = (texture_ext != ".tga");
     model_data.is_blend_material = ((texture_ext == ".tga") || (texture_ext == ".png"));
+    if (compress_texture)
+    {
+        texture_ext = ".ktx2";
+    }
 
     if (!get_dmd_model_data(in_dmd_model_path, model_data, smooth))
     {
@@ -434,7 +472,14 @@ bool Application::convert_model(std::string &in_dmd_model_path,
     // Относительный путь к текстуре
     if (out_relative_texture_path.empty())
     {
-        out_relative_texture_path = fs::path(in_texture_path).filename().string();
+        if (compress_texture)
+        {
+            out_relative_texture_path = fs::path(in_texture_path).filename().stem().string() + ".ktx2";
+        }
+        else
+        {
+            out_relative_texture_path = fs::path(in_texture_path).filename().string();
+        }
     }
     fs::path texture_path = out_relative_texture_path;
     fs::create_directories(texture_path);
@@ -447,7 +492,9 @@ bool Application::convert_model(std::string &in_dmd_model_path,
                                in_texture_path,
                                gltf_directory_path,
                                out_relative_bin_path,
-                               out_relative_texture_path);
+                               out_relative_texture_path,
+                               compress_texture,
+                               0.0f);
 }
 
 //------------------------------------------------------------------------------
@@ -861,6 +908,7 @@ bool Application::generate_gltf_model(Geometry& model_data,
                                       std::string &gltf_directory_path,
                                       std::string &out_relative_bin_path,
                                       std::string &out_relative_texture_path,
+                                      bool compress_texture,
                                       float change_vertices_Z)
 {
     for (auto& vertex : model_data.vertices)
@@ -1143,11 +1191,19 @@ bool Application::generate_gltf_model(Geometry& model_data,
 
     gltf_file.close();
 
-    if (!std::filesystem::exists(gltf_directory_path + '/' + out_relative_texture_path))
+    std::string out_texture_path = gltf_directory_path + '/' + out_relative_texture_path;
+    if (!std::filesystem::exists(out_texture_path))
     {
         try
         {
-            std::filesystem::copy(in_texture_path, gltf_directory_path + '/' + out_relative_texture_path);
+            if (compress_texture)
+            {
+                compress_to_ktx2(in_texture_path, out_texture_path);
+            }
+            else
+            {
+                std::filesystem::copy(in_texture_path, out_texture_path);
+            }
         }
         catch (std::exception &e)
         {
@@ -1156,6 +1212,154 @@ bool Application::generate_gltf_model(Geometry& model_data,
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Application::compress_to_ktx2(const std::string& in_texture_path, const std::string& out_texture_path)
+{
+    int w = 0, h = 0, ch = 0;
+    stbi_uc* data = stbi_load(in_texture_path.c_str(), &w, &h, &ch, 4);
+    if (!data) {
+        LOG_WARN("STBI: error (%s) while loading texture file: %s", stbi_failure_reason(), in_texture_path.c_str());
+        return false;
+    }
+
+    size_t size = w * h * 4;
+
+    ktxTextureCreateInfo ci = {};
+    // --format R8G8B8A8_SRGB
+    ci.vkFormat        = VK_FORMAT_R8G8B8A8_SRGB;
+
+    ci.baseWidth       = static_cast<ktx_uint32_t>(w);
+    ci.baseHeight      = static_cast<ktx_uint32_t>(h);
+    ci.baseDepth       = 1;
+    ci.numDimensions   = 2;
+    ci.numLayers       = 1;
+    ci.numFaces        = 1;
+    ci.isArray         = KTX_FALSE;
+
+    // Число mipmap-уровней определяем ЯВНО, так как сами их сгенерируем
+    ci.numLevels       = static_cast<uint32_t>(std::floor(std::log2(std::max(w, h))) + 1);
+    // Не полагаемся на аппратную генерацию - это для несжатых текстур
+    ci.generateMipmaps = KTX_FALSE;
+
+    ktxTexture2* Ktexture2 = nullptr;
+    KTX_error_code result = ktxTexture2_Create(&ci,
+                                               KTX_TEXTURE_CREATE_ALLOC_STORAGE,
+                                               &Ktexture2);
+
+    if (result != KTX_SUCCESS)
+    {
+        LOG_WARN("KTX: error (%u) while creating ktxTexture2 for file: %s", result, in_texture_path.c_str());
+        stbi_image_free(data);
+        return false;
+    }
+
+    ktxTexture* Ktexture = ktxTexture(Ktexture2);
+    result = ktxTexture_SetImageFromMemory(Ktexture,
+                                           0, 0, 0,
+                                           data, size);
+    if (result != KTX_SUCCESS)
+    {
+        LOG_WARN("KTX: error (%u) to set 0 level of image from file: %s", result, in_texture_path.c_str());
+        ktxTexture_Destroy(Ktexture);
+        stbi_image_free(data);
+        return false;
+    }
+
+    // Массив под указатели на данные всех уровней, не удаляем эти данные
+    // до сжатия и сохранения текстуры на диск!
+    std::vector<stbi_uc *> levels_data = {data};
+
+    // Вручную генерируем mipmaps, последовательно уменьшая
+    // размеры текстуры в два раза на каждом уровне
+    for (uint32_t level = 1; level < ci.numLevels; ++level)
+    {
+        int next_w = std::max(1, w >> 1);
+        int next_h = std::max(1, h >> 1);
+        size = next_w * next_h * 4;
+        stbi_uc* next_resized = new stbi_uc[size];
+
+        // Ресемплинг
+        stbir_resize_uint8(levels_data.back(), w, h, 0,
+                           next_resized, next_w, next_h, 0, 4);
+        levels_data.push_back(next_resized);
+
+        // Загружаем уровень в ktxTexture
+        result = ktxTexture_SetImageFromMemory(Ktexture,
+                                               level, 0, 0,
+                                               next_resized, size);
+        if (result != KTX_SUCCESS)
+        {
+            LOG_WARN("KTX: error (%u) to set %u level of image from file: %s", result, level, in_texture_path.c_str());
+            ktxTexture_Destroy(Ktexture);
+            for (auto d : levels_data)
+            {
+                stbi_image_free(d);
+            }
+            return false;
+        }
+        w = next_w;
+        h = next_h;
+    }
+
+    ktxBasisParams params = {};
+    params.structSize = sizeof(ktxBasisParams);  // Всегда первым полем
+
+    // --encode basis-lz
+    params.codec = KTX_BASIS_CODEC_ETC1S;
+
+    // --qlevel (по умолчанию 128)
+    params.qualityLevel = 128;
+
+    // --clevel (CLI по умолчанию 1, хотя в libktx константа = 2)
+    params.etc1sCompressionLevel = 1;
+
+    // Потоки (по умолчанию 0 = аппаратное определение всех ядер)
+    params.threadCount = std::thread::hardware_concurrency();
+
+    // RDO-пороги (по умолчанию 1.25, применяются при qlevel <= 128)
+    params.endpointRDOThreshold = 1.25f;
+    params.selectorRDOThreshold = 1.25f;
+
+    // Автоматический выбор кластеров (по умолчанию)
+    params.maxEndpoints = 0;
+    params.maxSelectors = 0;
+
+    // Флаги по умолчанию
+    params.verbose           = KTX_FALSE;
+    params.noSSE             = KTX_FALSE;
+    params.normalMap         = KTX_FALSE;
+    params.preSwizzle        = KTX_FALSE;
+    params.noEndpointRDO     = KTX_FALSE;
+    params.noSelectorRDO     = KTX_FALSE;
+
+    result = ktxTexture2_CompressBasisEx(Ktexture2, &params);
+
+    if (result != KTX_SUCCESS)
+    {
+        LOG_WARN("KTX: error (%u) while compressing image from file: %s", result, in_texture_path.c_str());
+    }
+    else
+    {
+        result = ktxTexture_WriteToNamedFile(Ktexture, out_texture_path.c_str());
+
+        if (result != KTX_SUCCESS)
+        {
+            LOG_WARN("KTX: error (%u) while writing file: %s", result, out_texture_path.c_str());
+        }
+    }
+
+    // Освобождаем память от ktx-параметров и от пикселей всех уровней
+    ktxTexture_Destroy(Ktexture);
+    for (auto d : levels_data)
+    {
+        stbi_image_free(d);
+    }
+
+    return result == KTX_SUCCESS;
 }
 
 //------------------------------------------------------------------------------
@@ -1174,6 +1378,10 @@ void Application::configure_parser(cli::Parser &parser)
     parser.set_optional<bool>("l", "lights",
                               false,
                               "Convert lights at map");
+
+    parser.set_optional<bool>("c", "compress-textures",
+                              false,
+                              "Convert textures to compressed .ktx2");
 
     parser.set_optional<bool>("s", "smooth",
                               false,
@@ -1207,6 +1415,7 @@ void Application::parse_command_line(cli::Parser &parser, cmd_line_t &cmd_line)
     cmd_line.input_route_path = parser.get<std::string>("i");
     cmd_line.input_only_used_at_map = parser.get<bool>("u");
     cmd_line.input_lights_at_map = parser.get<bool>("l");
+    cmd_line.input_compress_textures = parser.get<bool>("c");
     cmd_line.smooth = parser.get<bool>("s");
     cmd_line.output_route_path = parser.get<std::string>("o");
     cmd_line.input_model_path = parser.get<std::string>("m");

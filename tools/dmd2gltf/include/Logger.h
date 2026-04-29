@@ -37,7 +37,7 @@ private:
     Logger() noexcept = default;
 
     int streams_count = 1;
-    std::FILE* streams[2] = {stderr, nullptr};
+    std::FILE* streams[2] = {stdout, nullptr};
 };
 
 #endif // DMD2GLTF_LOGGER_H

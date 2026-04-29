@@ -21,11 +21,11 @@
         <!-- Запись в лог-файл: INFO - все сообщения, WARN - только ошибки, FATAL - только критические ошибки -->
         <NotifyLevel>INFO</NotifyLevel>
         <!-- Ограничение на количество загруженных в память моделей -->
-        <TargetPagedLODs>64000</TargetPagedLODs>
+        <TargetPagedLODs>4000</TargetPagedLODs>
         <!-- Количество фоновых потоков для загрузки 3d-моделей (1 .. N) -->
-        <ReadThreads>2</ReadThreads>
+        <ReadThreads>1</ReadThreads>
         <!-- Количество вспомогательных потоков для загрузки текстур 3d-моделей (0 .. N) -->
-        <OperationsThreads>2</OperationsThreads>
+        <OperationsThreads>1</OperationsThreads>
         <!-- 1 - отключение автоматического создания ограничивающей сферы для загружаемых 3d-моделей -->
         <DisableCullNode>0</DisableCullNode>
         <!-- 1 - отключение нативного загрузчика моделей формата .gltf в VulkanSceneGraph -->

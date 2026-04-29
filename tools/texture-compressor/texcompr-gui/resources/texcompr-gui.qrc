@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/translations">
+        <file>translations/texcompr-gui.ru_RU.qm</file>
+    </qresource>    
+</RCC>
