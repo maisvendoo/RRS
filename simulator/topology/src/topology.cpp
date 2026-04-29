@@ -1050,7 +1050,7 @@ std::vector<std::vector<module_cfg_t>> Topology::load_topology_configs(QString r
             }
             else
             {
-                all_cfgs.push_back(module_config);
+                all_cfgs.emplace_back(std::move(module_config));
             }
         }
 
@@ -1060,7 +1060,7 @@ std::vector<std::vector<module_cfg_t>> Topology::load_topology_configs(QString r
         }
         else
         {
-            all_modules.push_back(all_cfgs);
+            all_modules.emplace_back(std::move(all_cfgs));
         }
     }
 
