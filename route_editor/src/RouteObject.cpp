@@ -182,7 +182,6 @@ bool RouteObject::select()
             return false;
         }
 
-        std::lock_guard<std::mutex> lock_guard(context_.compile_infos_mutex);
         context_.compile_infos.emplace_back(
             CompileInfo{outline_switch_, outline});
     }

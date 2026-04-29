@@ -1,6 +1,7 @@
 #include "RouteEditor.h"
 
 #include "CameraHandler.h"
+#include "EditorContext.h"
 #include "EditorGui.h"
 #include "EditorState.h"
 #include "EventHandler.h"
@@ -228,7 +229,6 @@ void RouteEditor::configure_shaders()
 
 void RouteEditor::compile_models()
 {
-    std::lock_guard<std::mutex> lock_guard(context_.compile_infos_mutex);
     if (context_.compile_infos.empty())
     {
         return;
@@ -236,8 +236,7 @@ void RouteEditor::compile_models()
 
     vsg::CompileResult compile_result;
 
-    for (const CompileInfo& compile_info : context_.compile_infos)
-    {
+    context_.compile_infos.for_each([&](const CompileInfo& compile_info) -> void {
         const auto& group_node = compile_info.group_node;
         const vsg::Mask mask = compile_info.mask;
         const auto& node = compile_info.node;
@@ -259,7 +258,7 @@ void RouteEditor::compile_models()
         }
 
         compile_result.add(viewer_->compileManager->compile(node));
-    }
+    });
 
     vsg::updateViewer(*viewer_, compile_result);
     context_.compile_infos.clear();

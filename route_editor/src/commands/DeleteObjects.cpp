@@ -43,9 +43,7 @@ void DeleteObjects::execute()
         );
     }
 
-    context_.compile_infos_mutex.lock();
     context_.compile_infos.emplace_back(CompileInfo{nullptr, context_.route});
-    context_.compile_infos_mutex.unlock();
 
     context_.gizmo->update_visibility();
 }
@@ -54,10 +52,8 @@ void DeleteObjects::undo()
 {
     for (const auto& object : objects_)
     {
-        context_.compile_infos_mutex.lock();
         context_.compile_infos.emplace_back(CompileInfo{
             context_.route, object, vsg::MASK_ALL});
-        context_.compile_infos_mutex.unlock();
 
         context_.static_objects_mutex.lock();
         context_.static_objects.emplace_back(object);

@@ -37,10 +37,8 @@ void PasteObjects::execute()
 
     for (const auto& pasted_object : pasted_objects_)
     {
-        context_.compile_infos_mutex.lock();
         context_.compile_infos.emplace_back(CompileInfo{
             context_.route, pasted_object, vsg::MASK_ALL});
-        context_.compile_infos_mutex.unlock();
 
         context_.static_objects_mutex.lock();
         context_.static_objects.emplace_back(pasted_object);
@@ -85,9 +83,7 @@ void PasteObjects::undo()
         object->select();
     }
 
-    context_.compile_infos_mutex.lock();
     context_.compile_infos.emplace_back(CompileInfo{nullptr, context_.route});
-    context_.compile_infos_mutex.unlock();
 
     context_.gizmo->update_visibility();
 }

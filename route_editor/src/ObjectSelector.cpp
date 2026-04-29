@@ -126,10 +126,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     total_rotation_rad_ = 0.0;
     total_scale_ = {1.0, 1.0, 1.0};
 
-    context_.compile_infos_mutex.lock();
-    context_.compile_infos.emplace_back(CompileInfo{
-        front_plane_switch_, front_plane});
-    context_.compile_infos_mutex.unlock();
+    context_.compile_infos.emplace_back(CompileInfo{front_plane_switch_, front_plane});
 
     for (const auto& object : selected_objects)
     {

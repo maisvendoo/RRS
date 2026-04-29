@@ -1,6 +1,7 @@
 #ifndef EDITOR_CONTEXT_H
 #define EDITOR_CONTEXT_H
 
+#include "MutexedVector.h"
 #include "commands/CommandList.h"
 #include "EditorState.h"
 #include "RouteMap.h"
@@ -98,8 +99,7 @@ struct EditorContext
     RouteObjects copied_objects;
     RouteObjects hidden_objects;
 
-    std::vector<CompileInfo> compile_infos;
-    std::mutex compile_infos_mutex;
+    MutexedVector<CompileInfo> compile_infos;
 
     std::unique_ptr<Topology> topology;
     std::mutex topology_mutex;

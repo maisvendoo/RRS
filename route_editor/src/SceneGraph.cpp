@@ -18,7 +18,6 @@ void SceneGraph::load_route()
 {
     context_.route = Route::create(context_);
 
-    std::lock_guard<std::mutex> lock_guard(context_.compile_infos_mutex);
     context_.compile_infos.emplace_back(CompileInfo{
         context_.scene_graph, context_.route, vsg::MASK_ALL});
 }
