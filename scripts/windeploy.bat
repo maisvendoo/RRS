@@ -107,7 +107,7 @@ xcopy /Y ..\themes\*.* %RRS_DEV_ROOT%\themes
 
 rem Копируем маршруты
 
-xcopy /Y /S ..\routes\experimental-polygon_v2.0\*.* %RRS_DEV_ROOT%\routes\experimental-polygon_v2.0\
+xcopy /Y /S ..\routes\experimental-polygon_v2.0_ktx\*.* %RRS_DEV_ROOT%\routes\experimental-polygon_v2.0\
 
 rem Копируем SDK
 

@@ -1,0 +1,156 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 13869,
+      "max": [
+        3.40664,
+        0.441619,
+        3.11318
+      ],
+      "min": [
+        -5.51865,
+        -0.504614,
+        -35.8522
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 13869,
+      "max": [
+        1,
+        1,
+        1
+      ],
+      "min": [
+        -1,
+        -1,
+        -1
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 13869,
+      "max": [
+        0.999538,
+        0.816814
+      ],
+      "min": [
+        0.00109751,
+        -1.33239e-06
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 26643,
+      "max": [
+        13868
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 166428,
+      "byteOffset": 0,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 166428,
+      "byteOffset": 166428,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 110952,
+      "byteOffset": 332856,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 106572,
+      "byteOffset": 443808,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 550380,
+      "uri": "bin/TSM_Jction_1d9_L_Pr.bin"
+    }
+  ],
+  "images": [
+    {
+      "uri": "..\\textures\\TBB_Rails.ktx2"
+    }
+  ],
+  "materials": [
+    {
+      "alphaMode": "BLEND",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    }
+  ]
+}

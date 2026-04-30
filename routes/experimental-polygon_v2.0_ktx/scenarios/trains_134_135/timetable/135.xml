@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Station>
+		<Name>Станция C</Name>			
+		<DepartureTime>12:00</DepartureTime>
+		<TargetTraj>track_c_p2</TargetTraj>
+		<TargetCoord>30.0</TargetCoord>
+		<RemovalTraj>track_b-c_21-chd</RemovalTraj>
+	</Station>
+
+	<Station>
+		<Name>Станция B</Name>
+		<ArrivalTime>12:20</ArrivalTime>			
+		<DepartureTime>12:25</DepartureTime>
+		<TargetTraj>track_b_p3</TargetTraj>
+		<TargetCoord>30.0</TargetCoord>
+		<ApproachTraj>track_b-c_1-3</ApproachTraj>
+		<RemovalTraj>track_a-b_21-chd</RemovalTraj>
+	</Station>
+
+	<Station>
+		<Name>Станция A</Name>
+		<ArrivalTime>12:45</ArrivalTime>			
+		<TargetTraj>track_a_p1a</TargetTraj>
+		<TargetCoord>30.0</TargetCoord>
+		<ApproachTraj>track_a-b_1-3</ApproachTraj>			
+	</Station>	
+</Config>

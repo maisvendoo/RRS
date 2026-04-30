@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Models>
+		<SignalModelsDir>\..\..\routes\experimental-polygon_v2.0\RM_signals</SignalModelsDir>
+		<SignalAnimationsDir>\..\..\routes\experimental-polygon_v2.0\RM_signals\animations</SignalAnimationsDir>
+	</Models>
+</Config>
