@@ -81,23 +81,23 @@ xcopy /Y /S %DATA_PATH%\shaders\*.* %RRS_DEV_ROOT%\data\shaders\
 rem Копируем данные игры (модели, звуки, конфиги анимаций, шрифты)
 
 rem ВЛ60пк и ВЛ60к
-xcopy /Y /S %DATA_PATH%\models\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
-xcopy /Y /S %DATA_PATH%\models\VL60k-1737\*.* %RRS_DEV_ROOT%\data\models\VL60k-1737\
+xcopy /Y /S %DATA_PATH%\models_ktx\VL60pk-1543\*.* %RRS_DEV_ROOT%\data\models\VL60pk-1543\
+xcopy /Y /S %DATA_PATH%\models_ktx\VL60k-1737\*.* %RRS_DEV_ROOT%\data\models\VL60k-1737\
 xcopy /Y /S %DATA_PATH%\sounds\vl60\*.* %RRS_DEV_ROOT%\data\sounds\vl60\
 xcopy /Y /S %DATA_PATH%\animations\vl60\*.* %RRS_DEV_ROOT%\data\animations\vl60\
 
 rem Пассажирские вагоны
-xcopy /Y /S %DATA_PATH%\models\IMR_pass_rzd\*.* %RRS_DEV_ROOT%\data\models\IMR_pass_rzd\
+xcopy /Y /S %DATA_PATH%\models_ktx\IMR_pass_rzd\*.* %RRS_DEV_ROOT%\data\models\IMR_pass_rzd\
 xcopy /Y /S %DATA_PATH%\animations\passcar\*.* %RRS_DEV_ROOT%\data\animations\passcar\
 xcopy /Y /S %DATA_PATH%\sounds\pass\*.* %RRS_DEV_ROOT%\data\sounds\pass\
 
 rem Вагоны-хоперы
-xcopy /Y /S %DATA_PATH%\models\FrWag_hopper_1\*.* %RRS_DEV_ROOT%\data\models\FrWag_hopper_1\
+xcopy /Y /S %DATA_PATH%\models_ktx\FrWag_hopper_1\*.* %RRS_DEV_ROOT%\data\models\FrWag_hopper_1\
 xcopy /Y /S %DATA_PATH%\animations\freight\*.* %RRS_DEV_ROOT%\data\animations\freight\
 xcopy /Y /S %DATA_PATH%\sounds\freight\*.* %RRS_DEV_ROOT%\data\sounds\freight\
 
 rem Дефолтные модели светофоров и конфиги их анимации
-xcopy /Y /E /I %DATA_PATH%\models\default-objects\*.* %RRS_DEV_ROOT%\data\models\default-objects
+xcopy /Y /E /I %DATA_PATH%\models_ktx\default-objects\*.* %RRS_DEV_ROOT%\data\models\default-objects
 xcopy /Y /E /I %DATA_PATH%\animations\default-objects\*.* %RRS_DEV_ROOT%\data\animations\default-objects
 
 rem Шрифты вьювера и темы оформления лаунчера
