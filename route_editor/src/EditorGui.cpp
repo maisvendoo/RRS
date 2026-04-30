@@ -385,7 +385,7 @@ void EditorGui::show_waypoints_conf() const
                 if (found_it == traj_list->end())
                 {
                     Journal::instance()->error(QString("Failed to find trajectory %1")
-                        .arg(data.trajectory_name));
+                        .arg(data.trajectory_name.c_str()));
                 }
                 else
                 {

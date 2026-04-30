@@ -38,8 +38,5 @@ target_link_libraries(graphics PRIVATE
     filesystem
 )
 
-if(WIN32)
-    target_compile_options(graphics PRIVATE /W3)
-else()
-    target_compile_options(graphics PRIVATE -Wall -Wextra -Wpedantic)
-endif()
+target_compile_options(graphics PRIVATE -Wall -Wextra -Wpedantic)
+

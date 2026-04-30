@@ -25,8 +25,7 @@ vsg::ref_ptr<vsg::ShaderStage> read_shader(
     const auto shader{vsg::read_cast<vsg::ShaderStage>(shader_path, options)};
     if (!shader)
     {
-        Journal::instance()->warning(QString{"Failed to load shader %1"}
-            .arg(shader_path));
+        Journal::instance()->warning(QString("Failed to load shader %1").arg(shader_path.c_str()));
     }
 
     return shader;

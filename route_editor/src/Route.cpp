@@ -107,7 +107,7 @@ bool Route::load_objects_ref()
     if (!objects_ref_file)
     {
         Journal::instance()->error(QString("Failed to open %1")
-            .arg(objects_ref_path));
+            .arg(objects_ref_path.c_str()));
 
         return false;
     }
@@ -139,7 +139,7 @@ bool Route::load_route_map()
     if (!route_map_file)
     {
         Journal::instance()->error(QString("Failed to open %1")
-            .arg(route_map_path));
+            .arg(route_map_path.c_str()));
 
         return false;
     }
@@ -191,7 +191,7 @@ bool Route::load_stations_conf()
     if (!stations_conf_file)
     {
         Journal::instance()->error(QString("Failed to open %1")
-            .arg(stations_conf_path));
+            .arg(stations_conf_path.c_str()));
 
         return false;
     }
@@ -227,7 +227,7 @@ bool Route::load_waypoints_conf()
     if (!waypoints_conf_file)
     {
         Journal::instance()->error(QString("Failed to open %1")
-            .arg(waypoints_conf_path));
+            .arg(waypoints_conf_path.c_str()));
 
         return false;
     }
@@ -301,7 +301,7 @@ bool Route::load_topology()
     if (!cfg.load(QString::fromStdString(cfg_path)))
     {
         Journal::instance()->error(QString("Failed to load %1")
-            .arg(cfg_path));
+            .arg(cfg_path.c_str()));
 
         return false;
     }
@@ -314,7 +314,7 @@ bool Route::load_topology()
         Journal::instance()->error(QString("Failed to find field "
             "\"SignalModelsDir\" in section %1 in %2")
             .arg(section_name)
-            .arg(cfg_path));
+            .arg(cfg_path.c_str()));
 
         return false;
     }
@@ -324,7 +324,7 @@ bool Route::load_topology()
     const std::string models_dir = fs.combinePath(fs.getDataDir(),
         "models", models_dir_name);
 
-    Journal::instance()->info(QString("Signals directory %1").arg(models_dir));
+    Journal::instance()->info(QString("Signals directory %1").arg(models_dir.c_str()));
 
     context_.topology_mutex.lock();
     context_.topology = std::make_unique<Topology>();
