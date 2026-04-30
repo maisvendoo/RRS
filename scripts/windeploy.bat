@@ -147,3 +147,6 @@ windeployqt %RRS_DEV_ROOT%\bin\profconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\routeconv.exe
 windeployqt %RRS_DEV_ROOT%\bin\CfgReader.dll
 windeployqt %RRS_DEV_ROOT%\bin\tcp-connection.dll
+
+rem Копируем 3rdprty приложения
+xcopy /Y /S %ktx_DIR%\..\..\..\bin\ktx.exe %RRS_DEV_ROOT%\bin\
