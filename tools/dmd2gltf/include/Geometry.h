@@ -33,6 +33,8 @@ struct Geometry
     std::vector<Vertex> vertices = {};
     std::vector<std::uint16_t> indices16 = {};
     std::vector<std::uint32_t> indices32 = {};
+
+    bool get_dmd_model_data(std::string &in_dmd_model_path, bool smooth);
 };
 
 #endif // GEOMETRY_H
