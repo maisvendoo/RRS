@@ -11,6 +11,7 @@
 #include    <fstream>
 #include    <iostream>
 #include    <map>
+#include    <mutex>
 #include    <set>
 #include    <string>
 #include    <thread>
@@ -179,7 +180,34 @@ bool Application::convert_route(std::string &in_dmd_route_path,
     LOG_INFO("Info: opened ZDSimulator's objects.ref: %s", ref_path.c_str());
 
     // Список моделей, и списки сокращённых имён и текстур к этим моделям
-    std::map<RelativeModelPath, std::vector<LabelTextureSmooth>> objects;
+    struct mutexed_objects
+    {
+    public:
+        std::map<RelativeModelPath, std::vector<LabelTextureSmooth>> objects;
+        bool get_next(RelativeModelPath& _relative_model_path, std::vector<LabelTextureSmooth>& _labels_textures_smooth)
+        {
+            std::scoped_lock lock(mutex);
+            if (objects.empty())
+            {
+                return false;
+            }
+            try
+            {
+                const auto it = objects.erase(objects.begin());
+                _relative_model_path = it->first;
+                _labels_textures_smooth = it->second;
+                return true;
+            }
+            catch (...)
+            {
+                LOG_WARN("Warn: exception while erase objects.begin(): size = %u", objects.size());
+                return false;
+            }
+        }
+    private:
+        std::mutex mutex;
+    } objects;
+
     std::map<RelativeTexturePath, int> out_textures_and_path_count;
     std::map<RelativeTexturePath, RelativeTexturePath> textures_path_and_out_path;
     std::set<Label> unique_refs;
@@ -263,17 +291,10 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             }
             texture.close();
 
-            const int slash_count = std::count(relative_dmd_model_path.begin(), relative_dmd_model_path.end(), '/');
-            out_relative_texture_path = "";
-            for (int i = 1; i < slash_count; ++i)
-            {
-                out_relative_texture_path += "../";
-            }
-            out_relative_texture_path += "textures/";
-
             fs::path texture_path = relative_texture_path;
             const std::string texture_filename = texture_path.filename().stem().string();
             const std::string texture_ext = texture_path.filename().extension().string();
+            out_relative_texture_path = "textures/";
             out_relative_texture_path += texture_filename;
 
             auto out_path_it = out_textures_and_path_count.find(out_relative_texture_path);
@@ -316,11 +337,11 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             out_relative_texture_path = texture_path_it->second;
         }
 
-        auto it = objects.find(relative_dmd_model_path);
-        if (it == objects.end())
+        auto it = objects.objects.find(relative_dmd_model_path);
+        if (it == objects.objects.end())
         {
             // Добавляем файл модели, её сокращённое наименование, текстуру и сглаживание
-            objects.insert({ relative_dmd_model_path, {{label, relative_texture_path, out_relative_texture_path, smooth}} });
+            objects.objects.insert({ relative_dmd_model_path, {{label, relative_texture_path, out_relative_texture_path, smooth}} });
         }
         else
         {
@@ -334,7 +355,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
     textures_path_and_out_path.clear();
     objects_ref.close();
 
-    if (objects.empty())
+    if (objects.objects.empty())
     {
         LOG_WARN("Warn: failed to find any objects in objects.ref");
         return false;
@@ -346,125 +367,214 @@ bool Application::convert_route(std::string &in_dmd_route_path,
     fs::create_directory(combine_path(out_gltf_route_path, "textures"));
 
     // Новый список ссылок на файлы моделей
-    std::map<Label, RelativeModelPath> new_objects;
+    struct mutexed_map_for_new_objects
+    {
+    public:
+        std::map<Label, RelativeModelPath> objects_label_and_path;
+        void add_object(const Label& label, const RelativeModelPath& path)
+        {
+            std::lock_guard lock(mutex);
+            objects_label_and_path.insert({label, path});
+        }
+    private:
+        std::mutex mutex;
+    } new_objects;
+
     // Добавляем модель с источником света вместо костыльной модели для ZDS
     if (lights_at_map && light_found)
     {
-        new_objects.insert({"light", "/../../data/models/default-objects/light.gltf"});
+        new_objects.add_object("light", "/../../data/models/default-objects/light.gltf");
     }
 
-    // Через std::cerr выдаём прогресс конвертации в GUI
-    uint32_t models_total = objects.size();
-    uint32_t models_count = 0;
-    auto prev_time = std::chrono::steady_clock::now();
-    std::cerr << " (" << 0 << "/" << models_total << ")";
+    // Список скопированных/сжатых текстур
+    struct mutexed_map_for_ready_textures
+    {
+    public:
+        bool texture_not_ready_or_get_alpha_blending(const RelativeTexturePath& output_texture_path, bool& is_alpha_blending)
+        {
+            std::lock_guard lock(mutex);
+            auto it = output_texture_path_and_alpha_blending.find(output_texture_path);
+            if (it == output_texture_path_and_alpha_blending.end())
+            {
+                return true;
+            }
 
-    uint32_t smooth_count = 0;
-    uint32_t not_smooth_count = 0;
+            is_alpha_blending = it->second;
+            return false;
+        }
+
+        void add_texture_ready(const RelativeTexturePath& output_texture_path, bool& is_alpha_blending)
+        {
+            std::lock_guard lock(mutex);
+            output_texture_path_and_alpha_blending.insert({output_texture_path, is_alpha_blending});
+        }
+    private:
+        std::map<RelativeTexturePath, bool> output_texture_path_and_alpha_blending;
+        std::mutex mutex;
+    } ready_textures;
+
+    struct mutexed_models_count
+    {
+    public:
+        uint32_t models_total;
+        void increase()
+        {
+            std::lock_guard lock(mutex);
+            ++models_count;
+
+            // Через std::cerr выдаём прогресс конвертации в GUI
+            const auto cur_time = std::chrono::steady_clock::now();
+            if (std::chrono::duration<double> diff = cur_time - prev_time; diff.count() > 0.5)
+            {
+                std::cerr << " (" << models_count << "/" << models_total << ")";
+                prev_time = cur_time;
+            }
+        }
+    private:
+        std::chrono::time_point<std::chrono::steady_clock> prev_time = std::chrono::steady_clock::now();
+        uint32_t models_count = 0;
+        std::mutex mutex;
+    } models_count;
+    models_count.models_total = objects.objects.size();
+
+    // Через std::cerr выдаём в GUI прогресс конвертации
+    std::cerr << " (" << 0 << "/" << models_count.models_total << ")";
+
+    auto convert = [&](mutexed_objects& _objects,
+                       mutexed_map_for_new_objects& _new_objects,
+                       mutexed_map_for_ready_textures& _ready_textures,
+                       mutexed_models_count& _models_count,
+                       const std::string& _in_dmd_route_path,
+                       const std::string& _out_gltf_route_path,
+                       bool _compress_textures)
+    {
+        RelativeModelPath _relative_model_path;
+        std::vector<LabelTextureSmooth> _labels_textures_smooth;
+        while (_objects.get_next(_relative_model_path, _labels_textures_smooth))
+        {
+            fs::path model_path = _relative_model_path;
+
+            // Путь к исходной модели
+            std::string in_dmd_model_path =
+                _in_dmd_route_path + _relative_model_path;
+            path_to_native_separator(in_dmd_model_path);
+
+            // Путь к папке с новым файлом модели
+            std::string out_gltf_model_dir =
+                _out_gltf_route_path + model_path.parent_path().string();
+
+            // Относительный путь к файлу с информацией о модели в формате bin
+            fs::create_directories(_out_gltf_route_path + model_path.parent_path().string() + "/bin");
+            std::string out_relative_bin_path = "bin/"s + model_path.stem().string() + ".bin";
+
+            // Создаём модели для всех вариантов текстур
+            bool add_texture_name = (_labels_textures_smooth.size() > 1);
+            for (const auto& [label, relative_texture_path, out_relative_texture, smooth] : _labels_textures_smooth)
+            {
+                fs::path texture_path = _in_dmd_route_path + relative_texture_path;
+
+                // Читаем файл модели
+                Geometry model_data;
+                std::string texture_ext = texture_path.extension().string();
+                model_data.is_reversed_texture_coord = (texture_ext != ".tga");
+                model_data.is_blend_material = ((texture_ext == ".tga") || (texture_ext == ".png"));
+                if (!model_data.get_dmd_model_data(in_dmd_model_path, smooth))
+                {
+                    LOG_WARN("      model with name \"%s\" will not be converted", label.c_str());
+                    continue;
+                }
+
+                // Путь к новому файлу модели
+                std::string out_gltf_model_name = model_path.stem().string();
+                if (add_texture_name)
+                {
+                    out_gltf_model_name += '_' + texture_path.stem().string();
+                }
+                model_data.model_file_name = out_gltf_model_name;
+
+                // Поскольку уровень головки рельса в ZDS маршрутах находится не в нуле,
+                // а поднят в среднем на 0.3114, смещаем меш у моделей рельс (с "track" в имени объекта)
+                float change_vertices_Z = -0.3114f;
+                if (   (label.find("track") == label.npos)
+                    && (label.find("Track") == label.npos))
+                {
+                    // У всех прочих моделей уже опущена привязка в route1.map
+                    change_vertices_Z = 0.0f;
+                }
+
+                std::string out_texture_path = out_gltf_route_path + '/' + out_relative_texture;
+                const int slash_count = std::count(_relative_model_path.begin(), _relative_model_path.end(), '/');
+                std::string out_relative_texture_path;
+                for (int i = 1; i < slash_count; ++i)
+                {
+                    out_relative_texture_path += "../";
+                }
+                out_relative_texture_path += out_relative_texture;
+
+                if (_ready_textures.texture_not_ready_or_get_alpha_blending(out_texture_path, model_data.is_blend_material))
+                {
+                    if (!std::filesystem::exists(out_texture_path))
+                    {
+                        try
+                        {
+                            if (_compress_textures)
+                            {
+                                compress_to_ktx2(texture_path.string(), out_texture_path, model_data.is_blend_material);
+                            }
+                            else
+                            {
+                                std::filesystem::copy(texture_path, out_texture_path);
+                            }
+                        }
+                        catch (std::exception &e)
+                        {
+                            LOG_INFO("Info: %s", e.what());
+                        }
+                    }
+                    _ready_textures.add_texture_ready(out_texture_path, model_data.is_blend_material);
+                }
+
+                if (generate_gltf_model(model_data,
+                                        out_gltf_model_dir,
+                                        out_relative_bin_path,
+                                        out_relative_texture_path,
+                                        _compress_textures,
+                                        change_vertices_Z))
+                {
+                    // Записываем новые модели
+                    _new_objects.add_object(label, model_path.parent_path().string() + '/' + out_gltf_model_name + ".gltf");
+                }
+            }
+
+            // Через std::cerr выдаём в GUI прогресс конвертации
+            _models_count.increase();
+        }
+    };
+
+    std::vector<std::thread> threads;
+    int possible_threads = static_cast<int>(std::thread::hardware_concurrency()) - 2;
+    for (size_t i = 0; i < (std::max(1, std::min(num_threads, possible_threads))); ++i)
+    {
+        threads.emplace_back(convert, std::ref(objects), std::ref(new_objects),
+                             std::ref(ready_textures), std::ref(models_count),
+                             std::ref(in_dmd_route_path), std::ref(out_gltf_route_path),
+                             std::ref(compress_texture));
+    }
+    convert(objects, new_objects, ready_textures, models_count,
+            in_dmd_route_path, out_gltf_route_path,
+            compress_texture);
+/*
     for (const auto& [relative_model_path, labels_textures_smooth] : objects)
     {
-        fs::path model_path = relative_model_path;
-
-        // Путь к исходной модели
-        std::string in_dmd_model_path =
-            in_dmd_route_path + relative_model_path;
-        path_to_native_separator(in_dmd_model_path);
-
-        // Путь к папке с новым файлом модели
-        std::string out_gltf_model_dir =
-            out_gltf_route_path + model_path.parent_path().string();
-
-        // Относительный путь к файлу с информацией о модели в формате bin
-        fs::create_directories(out_gltf_route_path + model_path.parent_path().string() + "/bin");
-        std::string out_relative_bin_path = "bin/"s + model_path.stem().string() + ".bin";
-
-        // Создаём модели для всех вариантов текстур
-        bool add_texture_name = (labels_textures_smooth.size() > 1);
-        for (const auto& [label, relative_texture_path, out_relative_texture_path, smooth] : labels_textures_smooth)
-        {
-            fs::path texture_path = in_dmd_route_path + relative_texture_path;
-
-            // Читаем файл модели
-            Geometry model_data;
-            std::string texture_ext = texture_path.extension().string();
-            model_data.is_reversed_texture_coord = (texture_ext != ".tga");
-            model_data.is_blend_material = ((texture_ext == ".tga") || (texture_ext == ".png"));
-            if (!model_data.get_dmd_model_data(in_dmd_model_path, smooth))
-            {
-                LOG_WARN("      model with name \"%s\" will not be converted", label.c_str());
-                continue;
-            }
-
-            // Путь к новому файлу модели
-            std::string out_gltf_model_name = model_path.stem().string();
-            if (add_texture_name)
-            {
-                out_gltf_model_name += '_' + texture_path.stem().string();
-            }
-            model_data.model_file_name = out_gltf_model_name;
-
-            // Поскольку уровень головки рельса в ZDS маршрутах находится не в нуле,
-            // а поднят в среднем на 0.3114, смещаем меш у моделей рельс (с "track" в имени объекта)
-            float change_vertices_Z = -0.3114f;
-            if (   (label.find("track") == label.npos)
-                && (label.find("Track") == label.npos))
-            {
-                // У всех прочих моделей уже опущена привязка в route1.map
-                change_vertices_Z = 0.0f;
-            }
-
-            std::string out_texture_path = out_gltf_model_dir + '/' + out_relative_texture_path;
-            auto itr = out_textures_and_path_count.find(out_texture_path);
-            if (itr == out_textures_and_path_count.end())
-            {
-                if (!std::filesystem::exists(out_texture_path))
-                {
-                    try
-                    {
-                        if (compress_texture)
-                        {
-                            compress_to_ktx2(texture_path.string(), out_texture_path, model_data.is_blend_material);
-                        }
-                        else
-                        {
-                            std::filesystem::copy(texture_path, out_texture_path);
-                        }
-                    }
-                    catch (std::exception &e)
-                    {
-                        LOG_INFO("Info: %s", e.what());
-                    }
-                }
-                out_textures_and_path_count.insert({out_texture_path, model_data.is_blend_material});
-            }
-            else
-            {
-                model_data.is_blend_material = itr->second;
-            }
-
-            if (generate_gltf_model(model_data,
-                                    out_gltf_model_dir,
-                                    out_relative_bin_path,
-                                    out_relative_texture_path,
-                                    compress_texture,
-                                    change_vertices_Z))
-            {
-                // Записываем новые модели
-                new_objects.insert({label, model_path.parent_path().string() + '/' + out_gltf_model_name + ".gltf"});
-                smooth ? ++smooth_count : ++not_smooth_count;
-            }
-        }
-
-        // Через std::cerr выдаём прогресс конвертации в GUI
-        ++models_count;
-        const auto cur_time = std::chrono::steady_clock::now();
-        if (std::chrono::duration<double> diff = cur_time - prev_time; diff.count() > 0.5)
-        {
-            std::cerr << " (" << models_count << "/" << models_total << ")";
-            prev_time = cur_time;
-        }
+        convert(new_objects, ready_textures, models_count,
+                in_dmd_route_path, out_gltf_route_path,
+                relative_model_path, labels_textures_smooth,
+                compress_texture);
+    }*/
+    for (auto& thread : threads)
+    {
+        thread.join();
     }
-    LOG_INFO("Info: converted %u smooth models and %u not-smooth models", smooth_count, not_smooth_count);
 
     std::ofstream new_objects_ref(combine_path(out_gltf_route_path, "objects.ref"), std::ios::out);
     if (!new_objects_ref.is_open())
@@ -473,7 +583,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         return false;
     }
 
-    for (const auto& [label, path] : new_objects)
+    for (const auto& [label, path] : new_objects.objects_label_and_path)
     {
         new_objects_ref << label << "\t" << path << '\n';
     }
@@ -886,7 +996,6 @@ bool Application::compress_to_ktx2(const std::string& in_texture_path, const std
     is_alpha = false;
     if (ch >= 4)
     {
-        is_alpha = true;
         for (size_t i = 0; i < w * h; ++i)
         {
             unsigned char* a = data + i * 4 + 3;
@@ -989,8 +1098,8 @@ bool Application::compress_to_ktx2(const std::string& in_texture_path, const std
     // --clevel (CLI по умолчанию 1, хотя в libktx константа = 2)
     params.etc1sCompressionLevel = 1;
 
-    // Потоки (по умолчанию 0 = аппаратное определение всех ядер)
-    params.threadCount = std::thread::hardware_concurrency();
+    // Потоки
+    params.threadCount = 1;
 
     // RDO-пороги (по умолчанию 1.25, применяются при qlevel <= 128)
     params.endpointRDOThreshold = 1.25f;
@@ -1060,7 +1169,7 @@ void Application::configure_parser(cli::Parser &parser)
                               "Smooth normals (single-model use)");
 
     parser.set_optional<int>("n", "num-threads",
-                             1,
+                             std::thread::hardware_concurrency(),
                              "Count of threads (route use)");
 
     parser.set_optional<std::string>("o", "output-route",

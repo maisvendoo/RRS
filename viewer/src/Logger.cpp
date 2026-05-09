@@ -75,6 +75,7 @@ void Logger::log_message(LogLevel level, const char* file, int line, const char*
 #endif
 
         std::fputs("\n", streams[i]);
+        std::fflush(streams[i]);
     }
 }
 
