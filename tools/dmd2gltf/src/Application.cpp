@@ -93,7 +93,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
     using Label = std::string;
     using RelativeModelPath = std::string;
     using RelativeTexturePath = std::string;
-    using LabelTextureSmooth = std::tuple<Label, RelativeTexturePath, bool>;
+    using LabelTextureSmooth = std::tuple<Label, RelativeTexturePath, RelativeTexturePath, bool>;
     std::string line_buffer;
 
     // Список объектов, используемых в .map маршрута
@@ -180,6 +180,8 @@ bool Application::convert_route(std::string &in_dmd_route_path,
 
     // Список моделей, и списки сокращённых имён и текстур к этим моделям
     std::map<RelativeModelPath, std::vector<LabelTextureSmooth>> objects;
+    std::map<RelativeTexturePath, int> out_textures_and_path_count;
+    std::map<RelativeTexturePath, RelativeTexturePath> textures_path_and_out_path;
     std::set<Label> unique_refs;
     bool light_found = false;
     bool smooth = false;
@@ -193,7 +195,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         }
 
         // Исходная информация - сокращённое имя, путь к модели, путь к текстуре
-        std::string label, relative_dmd_model_path, relative_texture_path;
+        std::string label, relative_dmd_model_path, relative_texture_path, out_relative_texture_path;
         ss >> label >> relative_dmd_model_path >> relative_texture_path;
         if (is_slash(label.front())
             || relative_dmd_model_path.empty()
@@ -244,20 +246,92 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         std::replace(relative_dmd_model_path.begin(), relative_dmd_model_path.end(), '\\', '/');
         std::replace(relative_texture_path.begin(), relative_texture_path.end(), '\\', '/');
 
-        auto it = objects.find(relative_dmd_model_path);
-        if (it == objects.end())
+        auto texture_path_it = textures_path_and_out_path.find(relative_texture_path);
+        if (texture_path_it == textures_path_and_out_path.end())
         {
-            // Добавляем файл модели, её сокращённое наименование и текстуру
-            objects.insert({ relative_dmd_model_path, {{label, relative_texture_path, smooth}} });
+            // Путь к текстуре
+            std::string in_texture_path =
+                in_dmd_route_path + relative_texture_path;
+            path_to_native_separator(in_texture_path);
+
+            std::ifstream texture(in_texture_path, std::ios::in);
+            if (!texture.is_open())
+            {
+                LOG_WARN("Warn: failed to find and open texture file: %s", in_texture_path.c_str());
+                LOG_WARN("      model with name \"%s\" will not be converted", label.c_str());
+                continue;
+            }
+            texture.close();
+
+            const int slash_count = std::count(relative_dmd_model_path.begin(), relative_dmd_model_path.end(), '/');
+            out_relative_texture_path = "";
+            for (int i = 1; i < slash_count; ++i)
+            {
+                out_relative_texture_path += "../";
+            }
+            out_relative_texture_path += "textures/";
+
+            fs::path texture_path = relative_texture_path;
+            const std::string texture_filename = texture_path.filename().stem().string();
+            const std::string texture_ext = texture_path.filename().extension().string();
+            out_relative_texture_path += texture_filename;
+
+            auto out_path_it = out_textures_and_path_count.find(out_relative_texture_path);
+            if (out_path_it == out_textures_and_path_count.end())
+            {
+                out_textures_and_path_count.insert({out_relative_texture_path, 1});
+            }
+            else
+            {
+                out_path_it->second += 1;
+                int add_number = out_path_it->second;
+
+                while (true)
+                {
+                    const std::string out_path = out_relative_texture_path + "_" + std::to_string(add_number);
+                    if (out_textures_and_path_count.find(out_path) == out_textures_and_path_count.end())
+                    {
+                        out_relative_texture_path = out_path;
+                        out_textures_and_path_count.insert({out_relative_texture_path, 1});
+                        break;
+                    }
+
+                    ++add_number;
+                }
+            }
+
+            if (compress_texture)
+            {
+                out_relative_texture_path += ".ktx2";
+            }
+            else
+            {
+                out_relative_texture_path += texture_ext;
+            }
+
+            textures_path_and_out_path.insert({relative_texture_path, out_relative_texture_path});
         }
         else
         {
-            // К уже добавленой модели ещё вариант наименования и текстуры
-            it->second.push_back({label, relative_texture_path, smooth});
+            out_relative_texture_path = texture_path_it->second;
+        }
+
+        auto it = objects.find(relative_dmd_model_path);
+        if (it == objects.end())
+        {
+            // Добавляем файл модели, её сокращённое наименование, текстуру и сглаживание
+            objects.insert({ relative_dmd_model_path, {{label, relative_texture_path, out_relative_texture_path, smooth}} });
+        }
+        else
+        {
+            // К уже добавленой модели ещё вариант наименования, текстуры и сглаживания
+            it->second.push_back({label, relative_texture_path, out_relative_texture_path, smooth});
             it->second.shrink_to_fit();
         }
     }
 
+    out_textures_and_path_count.clear();
+    textures_path_and_out_path.clear();
     objects_ref.close();
 
     if (objects.empty())
@@ -265,12 +339,6 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         LOG_WARN("Warn: failed to find any objects in objects.ref");
         return false;
     }
-
-    // Добавляем в список для конвертации модель неба
-    Label skybox_label = "sky";
-    RelativeModelPath skybox_model_path = "/models/sky.dmd";
-    RelativeTexturePath skybox_texture_path = "/textures/sky_day.bmp";
-    objects.insert({ skybox_model_path, {{skybox_label, skybox_texture_path, true}} });
 
     // Создаем каталог под новый маршрут
     fs::create_directories(out_gltf_route_path);
@@ -285,6 +353,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         new_objects.insert({"light", "/../../data/models/default-objects/light.gltf"});
     }
 
+    // Через std::cerr выдаём прогресс конвертации в GUI
     uint32_t models_total = objects.size();
     uint32_t models_count = 0;
     auto prev_time = std::chrono::steady_clock::now();
@@ -305,54 +374,19 @@ bool Application::convert_route(std::string &in_dmd_route_path,
         std::string out_gltf_model_dir =
             out_gltf_route_path + model_path.parent_path().string();
 
-        // Относительный путь к папке с файлами текстур
-        std::string mps = model_path.string();
-        auto slash_count = std::count(mps.begin(), mps.end(), '/');
-
-        std::string out_relative_texture_dir = "";
-
-        for (int i = 1; i < slash_count; ++i)
-        {
-            out_relative_texture_dir += "../";
-        }
-        out_relative_texture_dir += "textures/";
-
         // Относительный путь к файлу с информацией о модели в формате bin
         fs::create_directories(out_gltf_route_path + model_path.parent_path().string() + "/bin");
         std::string out_relative_bin_path = "bin/"s + model_path.stem().string() + ".bin";
 
         // Создаём модели для всех вариантов текстур
         bool add_texture_name = (labels_textures_smooth.size() > 1);
-        for (const auto& [label, relative_texture_path, smooth] : labels_textures_smooth)
+        for (const auto& [label, relative_texture_path, out_relative_texture_path, smooth] : labels_textures_smooth)
         {
-            // Путь к текстуре
-            std::string in_texture_path =
-                in_dmd_route_path + relative_texture_path;
-            path_to_native_separator(in_texture_path);
-
-            fs::path texture_path = relative_texture_path;
-            std::string out_relative_texture_path = out_relative_texture_dir;
-            if (compress_texture)
-            {
-                out_relative_texture_path += texture_path.filename().stem().string() + ".ktx2";
-            }
-            else
-            {
-                out_relative_texture_path += texture_path.filename().string();
-            }
-
-            std::ifstream texture(in_texture_path, std::ios::in);
-            if (!texture.is_open())
-            {
-                LOG_WARN("Warn: failed to open texture file: %s", in_texture_path.c_str());
-                LOG_WARN("      model with name \"%s\" will not be converted", label.c_str());
-                continue;
-            }
-            texture.close();
+            fs::path texture_path = in_dmd_route_path + relative_texture_path;
 
             // Читаем файл модели
             Geometry model_data;
-            std::string texture_ext = fs::path(in_texture_path).extension().string();
+            std::string texture_ext = texture_path.extension().string();
             model_data.is_reversed_texture_coord = (texture_ext != ".tga");
             model_data.is_blend_material = ((texture_ext == ".tga") || (texture_ext == ".png"));
             if (!model_data.get_dmd_model_data(in_dmd_model_path, smooth))
@@ -379,23 +413,49 @@ bool Application::convert_route(std::string &in_dmd_route_path,
                 change_vertices_Z = 0.0f;
             }
 
+            std::string out_texture_path = out_gltf_model_dir + '/' + out_relative_texture_path;
+            auto itr = out_textures_and_path_count.find(out_texture_path);
+            if (itr == out_textures_and_path_count.end())
+            {
+                if (!std::filesystem::exists(out_texture_path))
+                {
+                    try
+                    {
+                        if (compress_texture)
+                        {
+                            compress_to_ktx2(texture_path.string(), out_texture_path, model_data.is_blend_material);
+                        }
+                        else
+                        {
+                            std::filesystem::copy(texture_path, out_texture_path);
+                        }
+                    }
+                    catch (std::exception &e)
+                    {
+                        LOG_INFO("Info: %s", e.what());
+                    }
+                }
+                out_textures_and_path_count.insert({out_texture_path, model_data.is_blend_material});
+            }
+            else
+            {
+                model_data.is_blend_material = itr->second;
+            }
+
             if (generate_gltf_model(model_data,
-                                    in_texture_path,
                                     out_gltf_model_dir,
                                     out_relative_bin_path,
                                     out_relative_texture_path,
                                     compress_texture,
                                     change_vertices_Z))
             {
-                // Записываем новые модели, кроме неба
-                if (label != skybox_label)
-                {
-                    new_objects.insert({label, model_path.parent_path().string() + '/' + out_gltf_model_name + ".gltf"});
-                }
-
+                // Записываем новые модели
+                new_objects.insert({label, model_path.parent_path().string() + '/' + out_gltf_model_name + ".gltf"});
                 smooth ? ++smooth_count : ++not_smooth_count;
             }
         }
+
+        // Через std::cerr выдаём прогресс конвертации в GUI
         ++models_count;
         const auto cur_time = std::chrono::steady_clock::now();
         if (std::chrono::duration<double> diff = cur_time - prev_time; diff.count() > 0.5)
@@ -490,8 +550,27 @@ bool Application::convert_model(std::string &in_dmd_model_path,
         out_relative_texture_path = out_relative_texture_path + texture_ext;
     }
 
+    std::string out_texture_path = gltf_directory_path + '/' + out_relative_texture_path;
+    if (!std::filesystem::exists(out_texture_path))
+    {
+        try
+        {
+            if (compress_texture)
+            {
+                compress_to_ktx2(in_texture_path, out_texture_path, model_data.is_blend_material);
+            }
+            else
+            {
+                std::filesystem::copy(in_texture_path, out_texture_path);
+            }
+        }
+        catch (std::exception &e)
+        {
+            LOG_INFO("Info: %s", e.what());
+        }
+    }
+
     return generate_gltf_model(model_data,
-                               in_texture_path,
                                gltf_directory_path,
                                out_relative_bin_path,
                                out_relative_texture_path,
@@ -503,10 +582,9 @@ bool Application::convert_model(std::string &in_dmd_model_path,
 //
 //------------------------------------------------------------------------------
 bool Application::generate_gltf_model(Geometry& model_data,
-                                      std::string &in_texture_path,
-                                      std::string &gltf_directory_path,
-                                      std::string &out_relative_bin_path,
-                                      std::string &out_relative_texture_path,
+                                      const std::string &gltf_directory_path,
+                                      const std::string &out_relative_bin_path,
+                                      const std::string &out_relative_texture_path,
                                       bool compress_texture,
                                       float change_vertices_Z)
 {
@@ -790,39 +868,34 @@ bool Application::generate_gltf_model(Geometry& model_data,
 
     gltf_file.close();
 
-    std::string out_texture_path = gltf_directory_path + '/' + out_relative_texture_path;
-    if (!std::filesystem::exists(out_texture_path))
-    {
-        try
-        {
-            if (compress_texture)
-            {
-                compress_to_ktx2(in_texture_path, out_texture_path);
-            }
-            else
-            {
-                std::filesystem::copy(in_texture_path, out_texture_path);
-            }
-        }
-        catch (std::exception &e)
-        {
-            LOG_INFO("Info: %s", e.what());
-        }
-    }
-
     return true;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Application::compress_to_ktx2(const std::string& in_texture_path, const std::string& out_texture_path)
+bool Application::compress_to_ktx2(const std::string& in_texture_path, const std::string& out_texture_path, bool& is_alpha)
 {
     int w = 0, h = 0, ch = 0;
     stbi_uc* data = stbi_load(in_texture_path.c_str(), &w, &h, &ch, 4);
     if (!data) {
         LOG_WARN("STBI: error (%s) while loading texture file: %s", stbi_failure_reason(), in_texture_path.c_str());
         return false;
+    }
+
+    is_alpha = false;
+    if (ch >= 4)
+    {
+        is_alpha = true;
+        for (size_t i = 0; i < w * h; ++i)
+        {
+            unsigned char* a = data + i * 4 + 3;
+            if (*a < 255)
+            {
+                is_alpha = true;
+                break;
+            }
+        }
     }
 
     size_t size = w * h * 4;
