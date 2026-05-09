@@ -60,7 +60,8 @@ bool Application::convert()
                              cmd_line.output_route_path.value,
                              cmd_line.input_only_used_at_map.value,
                              cmd_line.input_lights_at_map.value,
-                             cmd_line.input_compress_textures.value);
+                             cmd_line.input_compress_textures.value,
+                             cmd_line.num_threads.value);
     }
 
     if (convert_mode == CONVERT_MODEL)
@@ -82,7 +83,8 @@ bool Application::convert_route(std::string &in_dmd_route_path,
                                 std::string &out_gltf_route_path,
                                 bool only_used_at_map,
                                 bool lights_at_map,
-                                bool compress_texture)
+                                bool compress_texture,
+                                int num_threads)
 {
     // Преобразуем пути к платформоспецифичному виду
     path_to_native_separator(in_dmd_route_path);
@@ -1387,6 +1389,10 @@ void Application::configure_parser(cli::Parser &parser)
                               false,
                               "Smooth normals (single-model use)");
 
+    parser.set_optional<int>("n", "num-threads",
+                             1,
+                             "Count of threads (route use)");
+
     parser.set_optional<std::string>("o", "output-route",
                                      "",
                                      "Output GLTF route path");
@@ -1417,6 +1423,7 @@ void Application::parse_command_line(cli::Parser &parser, cmd_line_t &cmd_line)
     cmd_line.input_lights_at_map = parser.get<bool>("l");
     cmd_line.input_compress_textures = parser.get<bool>("c");
     cmd_line.smooth = parser.get<bool>("s");
+    cmd_line.num_threads = parser.get<int>("n");
     cmd_line.output_route_path = parser.get<std::string>("o");
     cmd_line.input_model_path = parser.get<std::string>("m");
     cmd_line.input_texture_path = parser.get<std::string>("t");

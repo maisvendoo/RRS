@@ -35,7 +35,8 @@ private:
                        std::string &out_gltf_route_path,
                        bool only_used_at_map,
                        bool lights_at_map,
-                       bool compress_texture);
+                       bool compress_texture,
+                       int num_threads);
 
     /// Конвертация отдельной модели
     bool convert_model(std::string &in_dmd_model_path,

@@ -61,6 +61,7 @@ struct cmd_line_t
     option_t<bool> input_lights_at_map;
     option_t<bool> input_compress_textures;
     option_t<bool> smooth;
+    option_t<int> num_threads;
 
     option_t<std::string> output_route_path;
 
