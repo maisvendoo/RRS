@@ -1,3 +1,4 @@
+/* old dmd parser
 #ifndef     VEC_H
 #define     VEC_H
 
@@ -72,3 +73,4 @@ struct Vec3
 };
 
 #endif // VEC_H
+*/

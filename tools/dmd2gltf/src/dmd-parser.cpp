@@ -1,3 +1,4 @@
+/* old dmd parser
 #include    "dmd-parser.h"
 
 #include    <algorithm>
@@ -175,4 +176,4 @@ void readTextureBlock(std::ifstream &stream, dmd_multimesh_t &multimesh)
         multimesh.texfaces.push_back(texface);
     }
 }
-
+*/

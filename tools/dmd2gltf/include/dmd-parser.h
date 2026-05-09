@@ -1,3 +1,4 @@
+/* old dmd parser
 #ifndef     DMD_PARSER_H
 #define     DMD_PARSER_H
 
@@ -11,3 +12,4 @@ void readNextMesh(std::ifstream &stream, dmd_multimesh_t &multimesh);
 void readTextureBlock(std::ifstream &stream, dmd_multimesh_t &multimesh);
 
 #endif // DMD_PARSER_H
+*/

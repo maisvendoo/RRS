@@ -1,3 +1,4 @@
+/* old dmd parser
 #ifndef     DMD_MESH_H
 #define     DMD_MESH_H
 
@@ -53,3 +54,4 @@ struct dmd_multimesh_t
 };
 
 #endif // DMD_MESH_H
+*/
