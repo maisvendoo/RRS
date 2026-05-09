@@ -9,8 +9,6 @@
 #include    <string>
 #include    <vector>
 
-namespace fs = std::filesystem;
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -27,7 +25,7 @@ bool Geometry::get_dmd_model_data(std::string &in_dmd_model_path, bool smooth)
         return false;
     }
 
-    std::string file_name = fs::path(in_dmd_model_path).filename().string();
+    std::string file_name = std::filesystem::path(in_dmd_model_path).filename().string();
     model_file_name = file_name.substr(0, file_name.find_last_of('.'));
 
     std::string buffer;
@@ -142,7 +140,7 @@ bool Geometry::get_dmd_model_data(std::string &in_dmd_model_path, bool smooth)
         Vec3 vertex[3];
         Vec2 t_coord[3];
         Vec3 normal;
-        float normal_length;
+        float normal_length2;
         int8_t normal_variant[3] = {0, 0, 0};
         int8_t t_coord_variant[3] = {0, 0, 0};
     };
@@ -176,25 +174,23 @@ bool Geometry::get_dmd_model_data(std::string &in_dmd_model_path, bool smooth)
 
         const Vec3 v12 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z};
         const Vec3 v13 = {p3.x - p1.x, p3.y - p1.y, p3.z - p1.z};
-        Vec3 n = {
+        const Vec3 n = {
             v12.y * v13.z - v12.z * v13.y,
             v12.z * v13.x - v12.x * v13.z,
             v12.x * v13.y - v12.y * v13.x
         };
-        float n_length = n.x * n.x + n.y * n.y + n.z * n.z;
-        if (n_length < 1e-10)
+        const float n_length2 = n.x * n.x + n.y * n.y + n.z * n.z;
+        if (n_length2 < 1e-10)
         {
             //LOG_WARN("Wrong normal (%e) for face %u in file: %s", length, i, in_dmd_model_path.c_str());
             ++wrong_normals_count;
             continue;
         }
-        n_length = std::sqrt(n_length);
-        //n = {n.x / n_length, n.y / n_length, n.z / n_length};
 
-        Vertex_tile_t vt1 = tile_pos(p1);
-        Vertex_tile_t vt2 = tile_pos(p2);
-        Vertex_tile_t vt3 = tile_pos(p3);
-        Face_unique_t ft = {vt1, vt2, vt3};
+        const Vertex_tile_t vt1 = tile_pos(p1);
+        const Vertex_tile_t vt2 = tile_pos(p2);
+        const Vertex_tile_t vt3 = tile_pos(p3);
+        Face_unique_t ft;
         if (vt1 < vt2)
         {
             if (vt1 < vt3)
@@ -230,92 +226,87 @@ bool Geometry::get_dmd_model_data(std::string &in_dmd_model_path, bool smooth)
 
             Face_t new_face = {p1, p2, p3,
                                t_coord1, t_coord2, t_coord3,
-                               n, n_length};
+                               n, n_length2};
 
-            if (smooth)
+            auto find_or_create_unique_vertex_variant = [](Face_t& _face,
+                                                           std::map<Vertex_tile_t, std::pair<Vec3, Vertex_normal_variants_t>>& _unique_vertices,
+                                                           const Vertex_tile_t& _vt, const uint8_t _v_idx, const bool smooth,
+                                                           uint32_t& _reusing_vertex_count)
             {
-                auto find_or_create_unique_vertex_variant = [](Face_t& _face,
-                    std::map<Vertex_tile_t, std::pair<Vec3, Vertex_normal_variants_t>>& _unique_vertices,
-                    Vertex_tile_t& _vt, uint8_t _v_idx, uint32_t& _reusing_vertex_count)
+                const Vec3& _p = _face.vertex[_v_idx];
+                const Vec3& _n = _face.normal;
+                const Vec2& _t_coord = _face.t_coord[_v_idx];
+
+                auto it = _unique_vertices.find(_vt);
+                if (it == _unique_vertices.end())
                 {
-                    Vec3& _p = _face.vertex[_v_idx];
-                    Vec3& _n = _face.normal;
-                    Vec2& _t_coord = _face.t_coord[_v_idx];
+                    _face.normal_variant[_v_idx] = 0;
+                    _face.t_coord_variant[_v_idx] = 0;
+                    _unique_vertices.insert({ _vt, {_p, {{ _n, {{_t_coord, 0}} }} } });
+                }
+                else
+                {
+                    Vertex_normal_variants_t& vnv = it->second.second;
+                    bool add_new_normal_variant = true;
+                    for (uint8_t n_var = 0; n_var < vnv.size(); ++n_var)
+                    {
+                        Vec3& nv = vnv[n_var].first;
+                        const float nv_length2 = nv.x * nv.x + nv.y * nv.y + nv.z * nv.z;
+                        const float n_nv_dot = _n.x * nv.x + _n.y * nv.y + _n.z * nv.z;
+                        const float cos_n_nv = n_nv_dot / std::sqrt(_face.normal_length2 * nv_length2);
+                        const float cos_angle_between_unique_normal_vectors = smooth ? 0.7f : 0.9999f;
 
-                    auto it = _unique_vertices.find(_vt);
-                    if (it == _unique_vertices.end())
-                    {
-                        _face.normal_variant[_v_idx] = 0;
-                        _face.t_coord_variant[_v_idx] = 0;
-                        _unique_vertices.insert({ _vt, {_p, {{ _n, {{_t_coord, 0}} }} } });
-                    }
-                    else
-                    {
-                        Vertex_normal_variants_t& vnv = it->second.second;
-                        bool add_new_normal_variant = true;
-                        for (uint8_t n_var = 0; n_var < vnv.size(); ++n_var)
+                        if (cos_n_nv >= cos_angle_between_unique_normal_vectors)
                         {
-                            Vec3& nv = vnv[n_var].first;
-                            const float nv_length = std::sqrt(nv.x * nv.x + nv.y * nv.y + nv.z * nv.z);
-                            const float n_nv_dot = _n.x * nv.x + _n.y * nv.y + _n.z * nv.z;
-                            const float cos_n_nv = n_nv_dot / (_face.normal_length * nv_length);
-                            if (cos_n_nv > 0.7)
+                            _face.normal_variant[_v_idx] = n_var;
+                            add_new_normal_variant = false;
+
+                            nv.x += _n.x;
+                            nv.y += _n.y;
+                            nv.z += _n.z;
+
+                            Vertex_tcoord_variants_t& vtcv = vnv[n_var].second;
+                            bool add_new_tcoord_variant = true;
+                            for (uint8_t tc_var = 0; tc_var < vtcv.size(); ++tc_var)
                             {
-                                _face.normal_variant[_v_idx] = n_var;
-                                add_new_normal_variant = false;
-
-                                nv.x += _n.x;
-                                nv.y += _n.y;
-                                nv.z += _n.z;
-
-                                Vertex_tcoord_variants_t& vtcv = vnv[n_var].second;
-                                bool add_new_tcoord_variant = true;
-                                for (uint8_t tc_var = 0; tc_var < vtcv.size(); ++tc_var)
+                                if (   (std::abs(_t_coord.x - vtcv[tc_var].first.x) < 1e-5f)
+                                    && (std::abs(_t_coord.y - vtcv[tc_var].first.y) < 1e-5f))
                                 {
-#if 1
-                                    if (   (std::abs(_t_coord.x - vtcv[tc_var].first.x) < 1e-5f)
-                                        && (std::abs(_t_coord.y - vtcv[tc_var].first.y) < 1e-5f))
-#else
-                                    if (   (_t_coord.x == vtcv[tc_var].first.x)
-                                        && (_t_coord.y == vtcv[tc_var].first.y))
-#endif
-                                    {
-                                        _face.t_coord_variant[_v_idx] = tc_var;
-                                        add_new_tcoord_variant = false;
-                                        ++_reusing_vertex_count;
-                                        break;
-                                    }
+                                    _face.t_coord_variant[_v_idx] = tc_var;
+                                    add_new_tcoord_variant = false;
+                                    ++_reusing_vertex_count;
+                                    break;
                                 }
-                                if (add_new_tcoord_variant)
-                                {
-                                    vtcv.push_back({_t_coord, 0});
-                                }
-
-                                break;
                             }
-                        }
-                        if (add_new_normal_variant)
-                        {
-                            _face.normal_variant[_v_idx] = vnv.size();
-                            _face.t_coord_variant[_v_idx] = 0;
-                            vnv.push_back({ _n, {{_t_coord, 0}} });
+                            if (add_new_tcoord_variant)
+                            {
+                                _face.t_coord_variant[_v_idx] = vtcv.size();
+                                vtcv.push_back({_t_coord, 0});
+                            }
+
+                            break;
                         }
                     }
-                };
+                    if (add_new_normal_variant)
+                    {
+                        _face.normal_variant[_v_idx] = vnv.size();
+                        _face.t_coord_variant[_v_idx] = 0;
+                        vnv.push_back({ _n, {{_t_coord, 0}} });
+                    }
+                }
+            };
 
-                find_or_create_unique_vertex_variant(
-                    new_face, unique_vertices, vt1, 0,reusing_vertex_count);
-                find_or_create_unique_vertex_variant(
-                    new_face, unique_vertices, vt2, 1,reusing_vertex_count);
-                find_or_create_unique_vertex_variant(
-                    new_face, unique_vertices, vt3, 2,reusing_vertex_count);
-            }
+            find_or_create_unique_vertex_variant(
+                new_face, unique_vertices, vt1, 0, smooth, reusing_vertex_count);
+            find_or_create_unique_vertex_variant(
+                new_face, unique_vertices, vt2, 1, smooth, reusing_vertex_count);
+            find_or_create_unique_vertex_variant(
+                new_face, unique_vertices, vt3, 2, smooth, reusing_vertex_count);
 
             unique_faces.insert({ft, new_face});
         }
         else
         {
-            //LOG_WARN("Face %u is already exists in file: %s", i, in_dmd_model_path.c_str());
             ++repeat_faces_count;
             continue;
         }
@@ -329,86 +320,64 @@ bool Geometry::get_dmd_model_data(std::string &in_dmd_model_path, bool smooth)
         LOG_WARN("Excluded %u repeat faces in file: %s", repeat_faces_count, in_dmd_model_path.c_str());
     }
 
-    vertices.reserve(unique_faces.size() * 3);
-    if (smooth)
+    vertices.reserve(unique_faces.size() * 3 - reusing_vertex_count);
+    for (auto& [vt, pos_and_normal_variants] : unique_vertices)
     {
-        for (auto& [vt, pos_and_normal_variants] : unique_vertices)
+        Vec3& pos = pos_and_normal_variants.first;
+        for (auto& [nv, t_coord_variants] : pos_and_normal_variants.second)
         {
-            Vec3& pos = pos_and_normal_variants.first;
-            for (auto& [nv, t_coord_variants] : pos_and_normal_variants.second)
-            {
-                const float nv_length_inv = 1.0f / std::sqrt(nv.x * nv.x + nv.y * nv.y + nv.z * nv.z);
-                nv = {nv.x * nv_length_inv, nv.y * nv_length_inv, nv.z * nv_length_inv};
+            const float nv_length_inv = 1.0f / std::sqrt(nv.x * nv.x + nv.y * nv.y + nv.z * nv.z);
+            nv = {nv.x * nv_length_inv, nv.y * nv_length_inv, nv.z * nv_length_inv};
 
-                for (auto& [t_coord, index] : t_coord_variants)
-                {
-                    index = vertices.size();
-                    vertices.emplace_back(Vertex{pos, nv, t_coord});
-                }
+            for (auto& [t_coord, index] : t_coord_variants)
+            {
+                index = vertices.size();
+                vertices.emplace_back(Vertex{pos, nv, t_coord});
             }
         }
+    }
 
-        const bool use_indices16 = (vertices.size() < 65535);
-        if (use_indices16)
-        {
-            indices16.reserve(unique_faces.size() * 3);
-        }
-        else
-        {
-            indices32.reserve(unique_faces.size() * 3);
-        }
-
-        auto vertex_index = [](Vertex_tile_t _vt, uint8_t _normal_variant, uint8_t _tcoord_variant,
-            std::map<Vertex_tile_t, std::pair<Vec3, Vertex_normal_variants_t>>& _unique_vertices) -> uint32_t
-        {
-            auto it = _unique_vertices.find(_vt);
-            Vertex_normal_variants_t& vnv = it->second.second;
-            Vertex_tcoord_variants_t& vtcv = vnv[_normal_variant].second;
-            return vtcv[_tcoord_variant].second;
-        };
-
-        for (auto& [ft, face] : unique_faces)
-        {
-            Vertex_tile_t vt1 = tile_pos(face.vertex[0]);
-            Vertex_tile_t vt2 = tile_pos(face.vertex[1]);
-            Vertex_tile_t vt3 = tile_pos(face.vertex[2]);
-
-            uint32_t index1 = vertex_index(vt1, face.normal_variant[0], face.t_coord_variant[0], unique_vertices);
-            uint32_t index2 = vertex_index(vt2, face.normal_variant[1], face.t_coord_variant[1], unique_vertices);
-            uint32_t index3 = vertex_index(vt3, face.normal_variant[2], face.t_coord_variant[2], unique_vertices);
-            if (use_indices16)
-            {
-                indices16.push_back(index1);
-                indices16.push_back(index2);
-                indices16.push_back(index3);
-            }
-            else
-            {
-                indices32.push_back(index1);
-                indices32.push_back(index2);
-                indices32.push_back(index3);
-            }
-        }
+    const bool use_indices16 = (vertices.size() < 65535);
+    if (use_indices16)
+    {
+        indices16.reserve(unique_faces.size() * 3);
     }
     else
     {
-        for (const auto& [ft, face] : unique_faces)
+        indices32.reserve(unique_faces.size() * 3);
+    }
+
+    auto vertex_index = [](Vertex_tile_t _vt, uint8_t _normal_variant, uint8_t _tcoord_variant,
+                           std::map<Vertex_tile_t, std::pair<Vec3, Vertex_normal_variants_t>>& _unique_vertices) -> uint32_t
+    {
+        const auto it = _unique_vertices.find(_vt);
+        const Vertex_normal_variants_t& vnv = it->second.second;
+        const Vertex_tcoord_variants_t& vtcv = vnv[_normal_variant].second;
+        return vtcv[_tcoord_variant].second;
+    };
+
+    for (auto& [ft, face] : unique_faces)
+    {
+        const Vertex_tile_t vt1 = tile_pos(face.vertex[0]);
+        const Vertex_tile_t vt2 = tile_pos(face.vertex[1]);
+        const Vertex_tile_t vt3 = tile_pos(face.vertex[2]);
+
+        const uint32_t index1 = vertex_index(vt1, face.normal_variant[0], face.t_coord_variant[0], unique_vertices);
+        const uint32_t index2 = vertex_index(vt2, face.normal_variant[1], face.t_coord_variant[1], unique_vertices);
+        const uint32_t index3 = vertex_index(vt3, face.normal_variant[2], face.t_coord_variant[2], unique_vertices);
+        if (use_indices16)
         {
-            const float n_length_inv = 1.0f / face.normal_length;
-            const Vec3 normal = {face.normal.x * n_length_inv,
-                                 face.normal.y * n_length_inv,
-                                 face.normal.z * n_length_inv};
-            vertices.emplace_back(Vertex{face.vertex[0], normal, face.t_coord[0]});
-            vertices.emplace_back(Vertex{face.vertex[1], normal, face.t_coord[1]});
-            vertices.emplace_back(Vertex{face.vertex[2], normal, face.t_coord[2]});
+            indices16.push_back(index1);
+            indices16.push_back(index2);
+            indices16.push_back(index3);
+        }
+        else
+        {
+            indices32.push_back(index1);
+            indices32.push_back(index2);
+            indices32.push_back(index3);
         }
     }
-    vertices.shrink_to_fit();
-/*
-    if (reusing_vertex_count)
-    {
-        LOG_INFO("Info: %u vertices (reusing %u/%u) in model from file: %s", model_data.vertices.size(), reusing_vertex_count, unique_faces.size() * 3, in_dmd_model_path.c_str());
-    }
-*/
+
     return (vertices.size() > 0);
 }
