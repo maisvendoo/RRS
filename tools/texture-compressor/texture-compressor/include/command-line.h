@@ -31,6 +31,7 @@ struct command_line_t
     bool overwrite_gltf = false;
     bool ignore_existed = false;
     bool delete_src = false;
+    bool extract = false;
 };
 
 #endif

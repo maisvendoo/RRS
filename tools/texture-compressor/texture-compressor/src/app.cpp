@@ -59,6 +59,10 @@ void Application::configure_parser(cli::Parser &parser)
                               false,
                               "Delete source texture");
 
+    parser.set_optional<bool>("e", "extract",
+                              false,
+                              "Extract model's textures");
+
     parser.enable_help();
 }
 
@@ -83,6 +87,8 @@ bool Application::parse_command_line(cli::Parser &parser,
     cmd_line.ignore_existed = parser.get<bool>("i");
 
     cmd_line.delete_src = parser.get<bool>("d");
+
+    cmd_line.extract = parser.get<bool>("e");
 
     return true;
 }
