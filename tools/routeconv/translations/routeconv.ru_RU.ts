@@ -15,7 +15,7 @@
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="52"/>
-        <location filename="../src/mainwindow.cpp" line="287"/>
+        <location filename="../src/mainwindow.cpp" line="360"/>
         <source>Open route</source>
         <translation>Открыть маршрут</translation>
     </message>
@@ -45,216 +45,235 @@
         <translation>Описание маршрута</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="137"/>
+        <location filename="../forms/mainwindow.ui" line="139"/>
+        <source>Compress textures to .ktx2 format</source>
+        <translation>Преобразовать текстуры в *.ktx2</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="149"/>
         <source>Convert only used models</source>
         <translation>Конвертировать только используемые модели</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="149"/>
+        <location filename="../forms/mainwindow.ui" line="163"/>
         <source>Status:</source>
         <translation>Статус:</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="156"/>
+        <location filename="../forms/mainwindow.ui" line="170"/>
         <source>Route is not opened</source>
         <translation>Маршрут не открыт</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="176"/>
+        <location filename="../forms/mainwindow.ui" line="190"/>
         <source>Convert</source>
         <translation>Конвертировать</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="188"/>
+        <location filename="../forms/mainwindow.ui" line="212"/>
         <source>Utilites</source>
         <translation>Утилиты</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="198"/>
+        <location filename="../forms/mainwindow.ui" line="222"/>
         <source>Topology errors checker</source>
         <translation>Проверка ошибок топологии</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="218"/>
+        <location filename="../forms/mainwindow.ui" line="242"/>
         <source>Minimum radius:</source>
         <translation>Минимальный радиус кривой</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="257"/>
+        <location filename="../forms/mainwindow.ui" line="281"/>
         <source>Check topology</source>
         <translation>Проверить топологию</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="283"/>
+        <location filename="../forms/mainwindow.ui" line="307"/>
         <source>Transform map</source>
         <translation>Сместить map-файл</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="293"/>
+        <location filename="../forms/mainwindow.ui" line="317"/>
         <source>Transform topology</source>
         <translation>Сместить топологию</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="322"/>
+        <location filename="../forms/mainwindow.ui" line="346"/>
         <source>X:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="355"/>
+        <location filename="../forms/mainwindow.ui" line="379"/>
         <source>Y:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="388"/>
+        <location filename="../forms/mainwindow.ui" line="412"/>
         <source>Z:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="425"/>
+        <location filename="../forms/mainwindow.ui" line="449"/>
         <source>Transform route</source>
         <translation>Перобразовать маршрут</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="451"/>
+        <location filename="../forms/mainwindow.ui" line="475"/>
         <source>Generate parallel trajectory for topology</source>
         <translation>Генерировать параллельную траекторию</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="498"/>
+        <location filename="../forms/mainwindow.ui" line="522"/>
         <source>Begin track:</source>
         <translation>Начальный трек</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="528"/>
+        <location filename="../forms/mainwindow.ui" line="552"/>
         <source>End track:</source>
         <translation>Конечный трек</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="558"/>
+        <location filename="../forms/mainwindow.ui" line="582"/>
         <source>Offset:</source>
         <translation>Смещение</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="588"/>
-        <location filename="../forms/mainwindow.ui" line="821"/>
+        <location filename="../forms/mainwindow.ui" line="612"/>
+        <location filename="../forms/mainwindow.ui" line="845"/>
         <source>Output filename:</source>
         <translation>Имя выходного файла</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="601"/>
-        <location filename="../forms/mainwindow.ui" line="828"/>
+        <location filename="../forms/mainwindow.ui" line="625"/>
+        <location filename="../forms/mainwindow.ui" line="852"/>
         <source>trajectory</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="611"/>
-        <location filename="../forms/mainwindow.ui" line="838"/>
+        <location filename="../forms/mainwindow.ui" line="635"/>
+        <location filename="../forms/mainwindow.ui" line="862"/>
         <source>.traj</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="631"/>
+        <location filename="../forms/mainwindow.ui" line="655"/>
         <source>Generate parallel trajectory</source>
         <translation>Генерировать</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="655"/>
+        <location filename="../forms/mainwindow.ui" line="679"/>
         <source>Generate spline trajectory for topology</source>
         <translation>Генерировать сплайн</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="702"/>
+        <location filename="../forms/mainwindow.ui" line="726"/>
         <source>Track:</source>
         <translation>Трек:</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="732"/>
+        <location filename="../forms/mainwindow.ui" line="756"/>
         <source>Length:</source>
         <translation>Длина:</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="768"/>
+        <location filename="../forms/mainwindow.ui" line="792"/>
         <source>Offset at begin:</source>
         <translation>Смещение от начала:</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="791"/>
+        <location filename="../forms/mainwindow.ui" line="815"/>
         <source>end:</source>
         <translation>конца:</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="858"/>
+        <location filename="../forms/mainwindow.ui" line="882"/>
         <source>Generate spline trajectory</source>
         <translation>Генерировать</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="294"/>
-        <location filename="../src/mainwindow.cpp" line="333"/>
+        <location filename="../src/mainwindow.cpp" line="367"/>
+        <location filename="../src/mainwindow.cpp" line="406"/>
         <source>Route is not selected. Please choose route</source>
         <translation>Маршрут не выбран. Пожалуйста, выберите маршрут</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="303"/>
+        <location filename="../src/mainwindow.cpp" line="376"/>
         <source>Route opened succesfully</source>
         <translation>Маршрут открыт полностью</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="324"/>
+        <location filename="../src/mainwindow.cpp" line="397"/>
         <source>Select converted route path</source>
         <translation>Выбрать путь к конвертируемому маршруту</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="339"/>
+        <location filename="../src/mainwindow.cpp" line="412"/>
         <source>Output is not selected. Using selected route as output</source>
         <translation>Каталог вывода не выбран. Для вывода используется каталог исходного маршрута</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="345"/>
+        <location filename="../src/mainwindow.cpp" line="418"/>
         <source>Output selected succesfully</source>
-        <translation>Каталок вывода выбран</translation>
+        <translation>Каталог вывода выбран</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="363"/>
-        <location filename="../src/mainwindow.cpp" line="402"/>
-        <location filename="../src/mainwindow.cpp" line="416"/>
-        <location filename="../src/mainwindow.cpp" line="430"/>
-        <location filename="../src/mainwindow.cpp" line="450"/>
+        <location filename="../src/mainwindow.cpp" line="436"/>
+        <location filename="../src/mainwindow.cpp" line="475"/>
+        <location filename="../src/mainwindow.cpp" line="489"/>
+        <location filename="../src/mainwindow.cpp" line="503"/>
+        <location filename="../src/mainwindow.cpp" line="523"/>
         <source>Error: route is not loaded. Please choose route</source>
         <translation>ОШИБКА: маршрут не загружен. Пожалуйства, выберете маршрут</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="369"/>
+        <location filename="../src/mainwindow.cpp" line="442"/>
         <source>Error: route title is empty. Please fill it</source>
         <translation>ОШИБКА: пустое название маршрута</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="375"/>
+        <location filename="../src/mainwindow.cpp" line="448"/>
         <source>Error: route description is empty. Please fill it</source>
         <translation>ОШИБКА: пустое описание маршрута</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="381"/>
+        <location filename="../src/mainwindow.cpp" line="454"/>
         <source>Error: route-type file is not created</source>
         <translation>ОШИБКА: не создан файл route-type</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="387"/>
+        <location filename="../src/mainwindow.cpp" line="460"/>
         <source>Error: description file is not created</source>
         <translation>ОШИБКА: не создан файл описания</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="391"/>
-        <source>Conversion...</source>
-        <translation>Конвертация...</translation>
+        <location filename="../src/mainwindow.cpp" line="464"/>
+        <source>Filepath conversion...</source>
+        <translation>Преобразование путей к файлам...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="436"/>
-        <location filename="../src/mainwindow.cpp" line="456"/>
+        <source>Conversion...</source>
+        <translation type="vanished">Конвертация...</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="509"/>
+        <location filename="../src/mainwindow.cpp" line="529"/>
         <source>Error: filename is empty. Please fill it</source>
         <translation>ОШИБКА: пустое имя файла</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="490"/>
+        <location filename="../src/mainwindow.cpp" line="543"/>
+        <source>Tracks topology conversion...</source>
+        <translation>Преобразование треков в топологию...</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="554"/>
+        <source>3d-models conversion...</source>
+        <translation>Преобразование 3D-моделей</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="565"/>
         <source>OK: conversion complete</source>
         <translation>OK: конвертация завершена</translation>
     </message>
