@@ -236,7 +236,7 @@ int RouteViewer::run()
             break;
         }
     }
-
+/*
     // Report dedup stats from all database pagers
     for (auto& task : viewer->recordAndSubmitTasks)
     {
@@ -249,11 +249,30 @@ int RouteViewer::run()
     // Report shared objects stats
     if (options && options->sharedObjects)
     {
+        struct Logger_VSG_to_RRS : public vsg::Logger
+        {
+            void debug_implementation(const std::string_view& message) override
+            {::LOG_DEBUG("%.*s", static_cast<int>(message.length()), message.data());}
+
+            void info_implementation(const std::string_view& message) override
+            {::LOG_INFO("%.*s", static_cast<int>(message.length()), message.data());}
+
+            void warn_implementation(const std::string_view& message) override
+            {::LOG_WARN("%.*s", static_cast<int>(message.length()), message.data());}
+
+            void error_implementation(const std::string_view& message) override
+            {::LOG_ERROR("%.*s", static_cast<int>(message.length()), message.data());}
+
+            void fatal_implementation(const std::string_view& message) override
+            {::LOG_FATAL("%.*s", static_cast<int>(message.length()), message.data());}
+        };
+
         LOG_INFO("=== SharedObjects report ===");
         vsg::LogOutput output;
+        output.logger = new Logger_VSG_to_RRS;
         options->sharedObjects->report(output);
     }
-
+*/
     return 0;
 }
 

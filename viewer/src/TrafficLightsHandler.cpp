@@ -139,7 +139,7 @@ void TrafficLightsHandler::deserialize_signals(const char* signals_type, QDataSt
             continue;
         }
 
-        printSignalInfo(traffic_light);
+        //printSignalInfo(traffic_light);
 
         if (traffic_light->getSignalDirection() == -1)
         {

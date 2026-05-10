@@ -141,7 +141,7 @@ bool VehicleExterior::load_sounds(const std::string &cfg_path, CfgReader &cfg, S
 
     const std::string sounds_dir = soundsDir.toStdString();
     sounds_id = sm->loadVehicleSounds(sounds_dir);
-    LOG_INFO("Loaded %u sounds from %s", sounds_id.size(), sounds_dir.c_str());
+    //LOG_INFO("Loaded %u sounds from %s", sounds_id.size(), sounds_dir.c_str());
     return true;
 }
 

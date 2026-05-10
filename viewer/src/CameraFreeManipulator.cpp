@@ -30,7 +30,10 @@ void CameraFreeManipulator::resetView()
 
     if (_current_vehicle)
     {
-        _lookAt->eye = _current_vehicle->position + _settings.free_cam_init_pos;
+        _lookAt->eye =   _current_vehicle->position
+                       + _current_vehicle->right * _settings.free_cam_init_pos.x
+                       + _current_vehicle->orth * _settings.free_cam_init_pos.y
+                       + _current_vehicle->up * _settings.free_cam_init_pos.z;
         _lookAt->center = _lookAt->eye + normalize(vsg::dvec3(_current_vehicle->orth.x,
                                                               _current_vehicle->orth.y,
                                                               0.0));
