@@ -345,6 +345,9 @@ void MainWindow::slotSubProcessReadyReadStandardError()
     if (QProcess* p = dynamic_cast<QProcess *>(sender()))
     {
         QString new_subprocess_status = QString::fromUtf8(p->readAllStandardError());
+
+        ui->prbDmdConversion->setValue(getDMDConversionPercent(new_subprocess_status));
+
         updateStatus(status, new_subprocess_status);
     }
 }
