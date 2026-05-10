@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="twMode">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="SingleModel">
        <attribute name="title">
@@ -196,6 +196,9 @@
                 <height>100</height>
                </size>
               </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -321,7 +324,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="ptDirLog"/>
+             <widget class="QPlainTextEdit" name="ptDirLog">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QProgressBar" name="prbCompression">
@@ -388,7 +395,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_8">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,1,10">
+         <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,0,1,10">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
             <item>
@@ -428,6 +435,13 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="ptExtractLog">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9">

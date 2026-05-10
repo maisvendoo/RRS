@@ -40,6 +40,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(texCompressor, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this, &MainWindow::slotOnCompressionFinish);
 
+    texExtractor->setProcessChannelMode(QProcess::MergedChannels);
+    connect(texExtractor, &QProcess::readyRead, this, &MainWindow::slotOnReadyReadStdout);
+    connect(texExtractor, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, &MainWindow::slotOnCompressionFinish);
+
     connect(ui->pbSave, &QPushButton::released, this, &MainWindow::slotSaveSkipList);
     connect(ui->pbLoad, &QPushButton::released, this, &MainWindow::slotLoadSkipList);
 
@@ -52,6 +57,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     m_maxConcurrency = qMax(1, QThread::idealThreadCount());
 
     connect(ui->pbCompressDir, &QPushButton::released, this, &MainWindow::slotDirectoryCompress);
+
+    connect(ui->pbOpenModelForExtract, &QPushButton::released, this, &MainWindow::slotOpenExtractedModel);
+    connect(ui->pbExtract, &QPushButton::released, this, &MainWindow::slotExtractModelsTextures);
 }
 
 //------------------------------------------------------------------------------
@@ -369,14 +377,31 @@ void MainWindow::slotCopmpress()
 //------------------------------------------------------------------------------
 void MainWindow::slotOnReadyReadStdout()
 {
-    QByteArray data = texCompressor->readAllStandardOutput();
-    QString text = QString::fromUtf8(data);
+    auto proc = dynamic_cast<QProcess *>(sender());
 
-    ui->ptLog->appendPlainText(text);
+    if (proc == texCompressor)
+    {
+        QByteArray data = proc->readAllStandardOutput();
+        QString text = QString::fromUtf8(data).remove("\n");
 
-    QTextCursor cursor = ui->ptLog->textCursor();
-    cursor.movePosition(QTextCursor::End);
-    ui->ptLog->setTextCursor(cursor);
+        ui->ptLog->appendPlainText(text);
+
+        QTextCursor cursor = ui->ptLog->textCursor();
+        cursor.movePosition(QTextCursor::End);
+        ui->ptLog->setTextCursor(cursor);
+    }
+
+    if (proc == texExtractor)
+    {
+        QByteArray data = proc->readAllStandardOutput();
+        QString text = QString::fromUtf8(data).remove("\n");
+
+        ui->ptExtractLog->appendPlainText(text);
+
+        QTextCursor cursor = ui->ptExtractLog->textCursor();
+        cursor.movePosition(QTextCursor::End);
+        ui->ptExtractLog->setTextCursor(cursor);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -384,19 +409,39 @@ void MainWindow::slotOnReadyReadStdout()
 //------------------------------------------------------------------------------
 void MainWindow::slotOnCompressionFinish(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    QString statusText;
+    auto proc = dynamic_cast<QProcess *>(sender());
 
-    if (exitStatus == QProcess::NormalExit)
+    QString statusText = "";
+
+    if (proc == texCompressor)
     {
-        statusText = QString(tr("Execution success. Exit code %1")).arg(exitCode);
-    }
-    else
-    {
-        statusText = QString(tr("Execution failed. Exit code %1")).arg(exitCode);
+        if (exitStatus == QProcess::NormalExit)
+        {
+            statusText = QString(tr("Execution success. Exit code %1")).arg(exitCode);
+        }
+        else
+        {
+            statusText = QString(tr("Execution failed. Exit code %1")).arg(exitCode);
+        }
+
+        ui->ptLog->appendPlainText(statusText);
+        ui->pbCompress->setEnabled(true);
     }
 
-    ui->ptLog->appendPlainText(statusText);
-    ui->pbCompress->setEnabled(true);
+    if (proc == texExtractor)
+    {
+        if (exitStatus == QProcess::NormalExit)
+        {
+            statusText = QString(tr("Execution success. Exit code %1")).arg(exitCode);
+        }
+        else
+        {
+            statusText = QString(tr("Execution failed. Exit code %1")).arg(exitCode);
+        }
+
+        ui->ptExtractLog->appendPlainText(statusText);
+        ui->pbExtract->setEnabled(true);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -546,4 +591,70 @@ void MainWindow::slotDirectoryCompress()
     ui->ptDirLog->appendPlainText(QString(tr("Find %1 files for compression...")).arg(m_totalFiles));
 
     launchNextProcess();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotOpenExtractedModel()
+{
+    extractedModelPath.clear();
+
+    FileSystem &fs = FileSystem::getInstance();
+
+    QString startDir = "";
+
+    if (lastDir.isEmpty())
+    {
+        startDir = QString(fs.getDataDir().c_str()) + fs.separator() + "models";
+
+        if (!QDir(startDir).exists())
+        {
+            startDir = QDir::homePath();
+        }
+    }
+    else
+    {
+        startDir = lastDir;
+    }
+
+    QString filter = tr("Models glTF 2.0 (*.gltf)");
+
+    extractedModelPath = QFileDialog::getOpenFileName(nullptr,
+                                                 tr("Select model file"),
+                                                 startDir,
+                                                 filter);
+
+    extractedModelPath = QDir::toNativeSeparators(extractedModelPath);
+    QFileInfo fileInfo(extractedModelPath);
+    lastDir = fileInfo.absoluteFilePath();
+
+    ui->teExtractedModelPath->setText(extractedModelPath);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotExtractModelsTextures()
+{
+    if (ui->teExtractedModelPath->toPlainText().isEmpty())
+    {
+        return;
+    }
+
+    extractedModelPath = ui->teExtractedModelPath->toPlainText();
+
+    FileSystem &fs = FileSystem::getInstance();
+    QString workDir = QString(fs.getBinaryDir().c_str());
+
+    QStringList args;
+    args << "-m" << ui->teExtractedModelPath->toPlainText();
+    args << "-e";
+
+    QString texComprPath = workDir + QDir::separator() + TEXCOMPRESS_NAME + EXE_EXP;
+
+    texExtractor->setWorkingDirectory(workDir);
+    texExtractor->start(texComprPath, args);
+
+    ui->pbExtract->setEnabled(false);
 }

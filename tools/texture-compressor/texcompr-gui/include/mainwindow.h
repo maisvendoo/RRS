@@ -37,6 +37,8 @@ private:
 
     QProcess *texCompressor = new QProcess(this);
 
+    QProcess *texExtractor = new QProcess(this);
+
     // Состояние задачи
     QQueue<QString> m_fileQueue;
     QList<QProcess*> m_runningProcesses;
@@ -47,6 +49,8 @@ private:
     QString lastDir = "";
 
     QStringList scanGltfFiles(const QString& dir);
+
+    QString extractedModelPath = "";
 
     void launchNextProcess();
 
@@ -78,6 +82,10 @@ private slots:
     void slotOpenDirectory();
 
     void slotDirectoryCompress();
+
+    void slotOpenExtractedModel();
+
+    void slotExtractModelsTextures();
 };
 
 #endif // MAINWINDOW_H
