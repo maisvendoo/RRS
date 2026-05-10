@@ -1,6 +1,6 @@
 # Устанавливаем переменную TARGET равной имени проекта,
 # чтобы потом везде подставлять
-set (TARGET textcompr-gui)
+set (TARGET ktxTools)
 
 # Задаем имя проекта
 project (${TARGET})
