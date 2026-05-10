@@ -28,7 +28,6 @@ rem Копируем бинарные файлы
 
 xcopy /Y  ..\..\bin\*.exe %RRS_DEV_ROOT%\bin\
 xcopy /Y  ..\..\lib\*.dll %RRS_DEV_ROOT%\bin\
-xcopy /Y  folder_compress.bat %RRS_DEV_ROOT%\bin\
 move %RRS_DEV_ROOT%\bin\rkf5.dll %RRS_DEV_ROOT%\lib\
 move %RRS_DEV_ROOT%\bin\rk4.dll %RRS_DEV_ROOT%\lib\
 move %RRS_DEV_ROOT%\bin\euler2.dll %RRS_DEV_ROOT%\lib\
