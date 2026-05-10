@@ -2,12 +2,7 @@
 #define     COMPRESSOR_H
 
 #include    <command-line.h>
-#include    <filesystem>
 #include    <vulkan/vulkan.h>
-#include    <nlohmann/json.hpp>
-
-namespace fs = std::filesystem;
-using json = nlohmann::json;
 
 enum class PBRTextureRole
 {

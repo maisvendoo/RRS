@@ -12,6 +12,13 @@
 
 #include    <split-by-comma.h>
 
+#include    <filesystem>
+#include    <vulkan/vulkan.h>
+#include    <nlohmann/json.hpp>
+
+namespace fs = std::filesystem;
+using json = nlohmann::json;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
