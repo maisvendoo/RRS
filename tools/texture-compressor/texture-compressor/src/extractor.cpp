@@ -9,11 +9,73 @@
 namespace fs = std::filesystem;
 using json = nlohmann::json;
 
+#define     STB_IMAGE_WRITE_IMPLEMENTATION
+#include    <stb_image_write.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 bool extract_to_png(const fs::path &src_ktx, const fs::path &out_png)
 {
+    ktxTexture2 *texture = NULL;
+    KTX_error_code result;
+
+    result = ktxTexture2_CreateFromNamedFile(src_ktx.string().c_str(),
+                                             KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
+                                             &texture);
+
+    if (result != KTX_SUCCESS)
+    {
+        std::cerr << "[ERR] error of texture loading" << std::endl;
+        return false;
+    }
+
+    if (ktxTexture2_NeedsTranscoding(texture))
+    {
+        result = ktxTexture2_TranscodeBasis(texture, KTX_TTF_RGBA32, 0);
+
+        if (result != KTX_SUCCESS)
+        {
+            std::cerr << "[ERR] error of texture transcoding" << std::endl;
+            ktxTexture2_Destroy(texture);
+
+            return false;
+        }
+    }
+
+    ktx_size_t offset = 0;
+
+    result = ktxTexture2_GetImageOffset(texture, 0, 0, 0, &offset);
+
+    if (result != KTX_SUCCESS)
+    {
+        std::cerr << "[ERR] error of get image offset" << std::endl;
+        return false;
+    }
+
+    uint8_t *pixel_data = texture->pData + offset;
+    uint32_t width = texture->baseWidth;
+    uint32_t height = texture->baseHeight;
+
+    if (!pixel_data || width == 0 || height == 0)
+    {
+        std::cerr << "[ERR] missign valid image data in texture" << std::endl;
+        ktxTexture2_Destroy(texture);
+
+        return false;
+    }
+
+    if (!stbi_write_png(out_png.string().c_str(), width, height, 4, pixel_data, width * 4))
+    {
+        std::cerr << "[ERR] wirte PNG file error" << std::endl;
+        ktxTexture2_Destroy(texture);
+
+        return false;
+    }
+
+    std::cout << "[INF] file " << out_png.string() << " saved success" << std::endl;
+    ktxTexture2_Destroy(texture);
+
     return true;
 }
 
