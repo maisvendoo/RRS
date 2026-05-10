@@ -138,6 +138,9 @@
                 <property name="text">
                  <string>Compress textures to .ktx2 format</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
