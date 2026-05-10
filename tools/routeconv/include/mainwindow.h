@@ -74,6 +74,8 @@ private:
     void updateStatus();
     void updateStatus(QString new_status, QString new_subprocess_status = "");
 
+    int getDMDConversionPercent(QString sub_status);
+
 private slots:
 
     void slotSubProcessReadyReadStandardError();

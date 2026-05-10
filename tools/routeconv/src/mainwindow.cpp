@@ -314,6 +314,32 @@ void MainWindow::updateStatus(QString new_status, QString new_subprocess_status)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+int MainWindow::getDMDConversionPercent(QString sub_status)
+{
+    QString tmp = sub_status.remove(" ");
+    tmp = tmp.remove("(").remove(")");
+
+    auto tokens = tmp.split("/");
+
+    if (tokens.size() < 2)
+    {
+        return 0;
+    }
+
+    double complete = tokens[0].toDouble();
+    int total = tokens[1].toInt();
+
+    if (total == 0)
+    {
+        return 0;
+    }
+
+    return qRound(complete * 100.0 / total);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::slotSubProcessReadyReadStandardError()
 {
     if (QProcess* p = dynamic_cast<QProcess *>(sender()))
