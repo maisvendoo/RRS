@@ -373,6 +373,7 @@ void MainWindow::slotOpenRoute()
     }
 
     ui->pbSelectOutputPath->setEnabled(true);
+    ui->prbDmdConversion->setValue(0);
     updateStatus(tr("Route opened succesfully"));
 
     QDir dir(routesRootDir);
@@ -415,6 +416,7 @@ void MainWindow::slotSelectOutputPath()
     }
     else
     {
+        ui->prbDmdConversion->setValue(0);
         updateStatus(tr("Output selected succesfully"));
     }
 
@@ -461,6 +463,7 @@ void MainWindow::slotConvert()
         return;
     }
 
+    ui->prbDmdConversion->setValue(0);
     updateStatus(tr("Filepath conversion..."));
     startPathConverter();
 }
@@ -562,5 +565,6 @@ void MainWindow::slotIsDmd2gltfFinished(int error_code, QProcess::ExitStatus exi
 {
     Q_UNUSED(error_code)
 
+    ui->prbDmdConversion->setValue(100);
     updateStatus(tr("OK: conversion complete"));
 }
