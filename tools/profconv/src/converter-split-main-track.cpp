@@ -23,6 +23,9 @@ void ZDSimConverter::findSplitsMainTrajectory1()
             zds_track_t track2 = *it2;
             if (length(track.begin_point - track2.begin_point) < 0.1)
             {
+                // Сохраняем в треке "обратно" id совпадающего трека "туда"
+                it2->begin_at_track1 = id;
+
                 if ((!was_1_track) && (id != 0))
                 {
                     // Начало однопутного участка
