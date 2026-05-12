@@ -39,19 +39,19 @@ WindowHandler::WindowHandler(EditorContext& context)
     const settings_t& settings = context.settings;
 
     const auto window_traits = vsg::WindowTraits::create();
-    window_traits->x = settings.window_x;
-    window_traits->y = settings.window_y;
-    window_traits->width = settings.window_width;
-    window_traits->height = settings.window_height;
-    window_traits->fullscreen = settings.fullscreen;
-    window_traits->screenNum = settings.screen_number;
-    window_traits->windowTitle = settings.window_title;
+    window_traits->x = settings.window.x;
+    window_traits->y = settings.window.y;
+    window_traits->width = settings.window.width;
+    window_traits->height = settings.window.height;
+    window_traits->fullscreen = settings.window.fullscreen;
+    window_traits->screenNum = settings.window.screen_number;
+    window_traits->windowTitle = settings.window.title;
 
     window_traits->swapchainPreferences.presentMode =
-        settings.vsync ? VK_PRESENT_MODE_FIFO_KHR
-                       : VK_PRESENT_MODE_MAILBOX_KHR;
+        settings.window.vsync ? VK_PRESENT_MODE_FIFO_KHR
+                              : VK_PRESENT_MODE_MAILBOX_KHR;
 
-    window_traits->samples = samples_bit_flag(settings.samples);
+    window_traits->samples = samples_bit_flag(settings.window.samples);
 
     context.window = vsg::Window::create(window_traits);
     if (!context.window)
