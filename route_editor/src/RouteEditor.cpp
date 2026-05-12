@@ -73,7 +73,7 @@ bool RouteEditor::initialize()
     }
 
     context_.mouse_handler = MouseHandler::create();
-    context_.keyboard_handler = KeyboardHandler::create(context_);
+    context_.keyboard_handler = KeyboardHandler::create(context_.settings.key_bindings);
     auto undo_redo_save_handler = UndoRedoSaveHandler::create(
         context_.keyboard_handler, context_.commands, context_.route_dir,
         context_.static_objects_mutex, context_.static_objects);

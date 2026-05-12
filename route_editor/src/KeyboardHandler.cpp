@@ -3,14 +3,13 @@
 #include "Action.h"
 #include "EditorContext.h"
 #include "KeyBinding.h"
-#include "Settings.h"
 
 #include <vsg/ui/KeyEvent.h>
 
 #include <cstdint>
 
-KeyboardHandler::KeyboardHandler(EditorContext& context)
-    : context_(context)
+KeyboardHandler::KeyboardHandler(const KeyBindings& key_bindings)
+    : key_bindings_{key_bindings}
 {
 }
 
@@ -47,7 +46,7 @@ bool KeyboardHandler::get_alt_state() const
 
 bool KeyboardHandler::get_binding_state(Action action) const
 {
-    const KeyBinding key_binding = context_.settings.key_bindings.at(action);
+    const KeyBinding key_binding = key_bindings_.at(action);
 
     uint16_t modifiers = 0;
     modifiers |= (vsg::MODKEY_Shift * get_shift_state());
