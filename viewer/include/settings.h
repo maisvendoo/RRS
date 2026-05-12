@@ -40,6 +40,7 @@ struct settings_t final
     int y = 50;                 ///< Window vertical position
     int width = 1280;           ///< Window width
     int height = 720;           ///< Window height
+    int physical_device = 0;    ///< Physical device
     int screen_number = 0;      ///< Screen number
     bool fullscreen = false;    ///< Fullscreen flag
     bool vsync = true;          ///< Vertical sync flag

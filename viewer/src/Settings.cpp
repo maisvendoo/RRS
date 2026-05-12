@@ -91,6 +91,8 @@ void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
     cfg.getInt(section, "Width", settings.width);
     cfg.getInt(section, "Height", settings.height);
 
+    cfg.getInt(section, "PhysicalDevice", settings.physical_device);
+
     int screenNumber = 0;
     cfg.getInt(section, "ScreenNumber", screenNumber);
     if (screenNumber >= 0)

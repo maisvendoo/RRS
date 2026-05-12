@@ -67,6 +67,8 @@
 
 #include <AltSoundLocker.h>
 
+#include <iostream>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -404,6 +406,23 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
     try
     {
         window = vsg::Window::create(windowTraits);
+
+        // Получаем инстанс Vulkan от созданного окна
+        auto instance = window->getOrCreateInstance();
+        // ОБЯЗАТЕЛЬНО создаем поверхность рендеринга!!!
+        auto surface = window->getOrCreateSurface();
+        // Поучаем список физических устройств
+        auto physDevs = instance->getPhysicalDevices();
+
+        // Защита от дурака
+        if (settings.physical_device < 0 || settings.physical_device > physDevs.size() - 1)
+        {
+            settings.physical_device = 0;
+        }
+
+        // Устанавливаем устройство из настроек
+        window->setPhysicalDevice(physDevs[settings.physical_device]);
+
         lockAltSound(window.get());
     }
     catch (const vsg::Exception& exception)
