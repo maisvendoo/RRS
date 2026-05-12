@@ -63,7 +63,9 @@ bool RouteEditor::initialize()
 
     configure_shaders();
 
-    context_.window_handler = WindowHandler::create(context_);
+    context_.window_handler = WindowHandler::create(context_.settings.window,
+        context_.window, context_.perspective, context_.camera);
+
     if (!context_.window)
     {
         return false;
