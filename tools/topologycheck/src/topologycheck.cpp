@@ -84,14 +84,14 @@ void TopologyCheck::parse_command_line(cli::Parser &parser)
     cmd_line.route_path = parser.get<std::string>("r");
     cmd_line.minimum_curve_radius = parser.get<double>("c");
 
-    if (cmd_line.minimum_curve_radius.isPresent())
+    if (cmd_line.minimum_curve_radius.has_value())
     {
-        maximum_curvature = 1.0 / std::max(1.0, cmd_line.minimum_curve_radius.value);
+        maximum_curvature = 1.0 / std::max(1.0, cmd_line.minimum_curve_radius.value());
     }
 
-    if (cmd_line.route_path.isPresent())
+    if (cmd_line.route_path.has_value())
     {
-        route_path = cmd_line.route_path.value;
+        route_path = cmd_line.route_path.value();
         return;
     }
 
