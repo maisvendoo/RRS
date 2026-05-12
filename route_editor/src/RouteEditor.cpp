@@ -48,7 +48,6 @@
 
 #include <vulkan/vulkan_core.h>
 
-#include <mutex>
 #include <string>
 
 RouteEditor::RouteEditor() = default;
