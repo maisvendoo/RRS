@@ -1,0 +1,48 @@
+#ifndef UNDO_REDO_SAVE_HANDLER_H
+#define UNDO_REDO_SAVE_HANDLER_H
+
+#include "RouteObject.h"
+
+#include <vsg/core/Inherit.h>
+#include <vsg/core/Visitor.h>
+#include <vsg/core/ref_ptr.h>
+
+#include <mutex>
+#include <string>
+
+class CommandList;
+class KeyboardHandler;
+
+namespace vsg
+{
+
+class KeyPressEvent;
+
+}
+
+// This is temp class to move out functionality from KeyboardHandler
+class UndoRedoSaveHandler : public vsg::Inherit<vsg::Visitor, UndoRedoSaveHandler>
+{
+public:
+    UndoRedoSaveHandler(
+        vsg::ref_ptr<KeyboardHandler>& keyboard_handler,
+        CommandList& commands,
+        const std::string& route_dir,
+        std::mutex& static_objects_mutex,
+        const RouteObjects& static_objects
+    );
+
+    virtual void apply(vsg::KeyPressEvent& keyPress) override;
+
+private:
+    void save_route() const;
+
+private:
+    vsg::ref_ptr<KeyboardHandler> keyboard_handler_;
+    CommandList& commands_;
+    const std::string& route_dir_;
+    std::mutex& static_objects_mutex_;
+    const RouteObjects& static_objects_;
+};
+
+#endif // UNDO_REDO_SAVE_HANDLER_H

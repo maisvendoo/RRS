@@ -17,6 +17,7 @@
 #include "SceneGraph.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
+#include "UndoRedoSaveHandler.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
 #include "graphics/common.h"
@@ -73,6 +74,9 @@ bool RouteEditor::initialize()
 
     context_.mouse_handler = MouseHandler::create();
     context_.keyboard_handler = KeyboardHandler::create(context_);
+    auto undo_redo_save_handler = UndoRedoSaveHandler::create(
+        context_.keyboard_handler, context_.commands, context_.route_dir,
+        context_.static_objects_mutex, context_.static_objects);
     context_.camera_handler = CameraHandler::create(context_);
     context_.intersection_handler = IntersectionHandler::create(context_);
     context_.scene_graph = SceneGraph::create(context_);
@@ -125,6 +129,7 @@ bool RouteEditor::initialize()
     viewer_->addEventHandler(window_handler_);
     viewer_->addEventHandler(context_.mouse_handler);
     viewer_->addEventHandler(context_.keyboard_handler);
+    viewer_->addEventHandler(undo_redo_save_handler);
 
     static Keyboard keyboard(context_.settings.key_bindings);
     viewer_->addEventHandler(EventHandler::create(&keyboard));
