@@ -63,7 +63,7 @@ bool RouteEditor::initialize()
 
     configure_shaders();
 
-    context_.window_handler = WindowHandler::create(context_.settings.window,
+    window_handler_ = WindowHandler::create(context_.settings.window,
         context_.window, context_.perspective, context_.camera);
 
     if (!context_.window)
@@ -122,7 +122,7 @@ bool RouteEditor::initialize()
 
     viewer_->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer_->addEventHandler(vsg::CloseHandler::create(viewer_));
-    viewer_->addEventHandler(context_.window_handler);
+    viewer_->addEventHandler(window_handler_);
     viewer_->addEventHandler(context_.mouse_handler);
     viewer_->addEventHandler(context_.keyboard_handler);
 
