@@ -20,6 +20,7 @@ set (EXECUTABLE_OUTPUT_PATH "../../bin")
 find_package(Qt6 COMPONENTS Xml REQUIRED)
 find_package(Qt6 COMPONENTS Gui REQUIRED)
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
+find_package(Vulkan REQUIRED)
 
 find_package(Qt6 REQUIRED COMPONENTS Core LinguistTools)
 
@@ -57,3 +58,4 @@ target_link_libraries (${TARGET} Qt6::Widgets)
 target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} CfgEditor)
 target_link_libraries (${TARGET} filesystem)
+target_link_libraries (${TARGET} Vulkan::Vulkan)
