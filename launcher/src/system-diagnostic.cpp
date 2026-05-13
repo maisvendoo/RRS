@@ -146,8 +146,52 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
                                   .arg(VK_VERSION_PATCH(props.driverVersion));
 
 
+        for (size_t i = 0; i < memProps.memoryHeapCount; ++i)
+        {
+            if (memProps.memoryHeaps[i].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+            {
+                gpu_info.vram_size += (memProps.memoryHeaps[i].size >> 20);
+            }
+        }
+
+        // Присваиваем рейтинг по типу GPU
+        if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+        {
+            // +1000 очков Гриффендору за дискретность
+            gpu_info.score += 1000;
+        }
+        else if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
+        {
+            // +500 Пуффендую - интегрированный, но за факт поддрежки вулкан
+            gpu_info.score += 500;
+        }
+        else if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU)
+        {
+            // +300 Когтеврану (я не знаю что такое виртуальный GPU, но прикольно звучит)
+        }
+        else
+        {
+            // Слизерину чтоб не выеживался сильно тоже накинем...
+            gpu_info.score += 100;
+        }
+
+        // По баллу за каждый Гб VRAM
+        gpu_info.score += (gpu_info.vram_size >> 10);
+
+        // Оцениваем поддерживаемую версию Vulkan API
+        uint32_t major = VK_VERSION_MAJOR(props.apiVersion);
+        uint32_t minor = VK_VERSION_MINOR(props.apiVersion);
+
+        gpu_info.score += static_cast<int>(major * 100) + static_cast<int>(minor * 10);
 
         gpus_info.push_back(gpu_info);
+
+        if (coreFeat2.features.samplerAnisotropy)   gpu_info.score += 50;
+        if (coreFeat2.features.geometryShader)      gpu_info.score += 30;
+        if (coreFeat2.features.tessellationShader)  gpu_info.score += 30;
+        if (coreFeat2.features.multiDrawIndirect)   gpu_info.score += 20;
+        if (coreFeat2.features.fillModeNonSolid)    gpu_info.score += 15;
+        if (coreFeat2.features.wideLines)           gpu_info.score += 15;
     }
 
     return GPU_STATE_READY;

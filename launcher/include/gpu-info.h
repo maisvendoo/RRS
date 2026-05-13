@@ -14,7 +14,11 @@ struct gpu_info_t
     uint32_t                deviceID = 0;
     QString                 apiVersion = "";
     QString                 driverVersion = "";
-    std::vector<uint64_t>   memory_size;
+    uint64_t                vram_size = 0;
+
+    /// Эвристический рейтинг данного GPU, для последующего
+    /// автоматического выбора самого мощного
+    uint32_t                score = 0;
 };
 
 #endif
