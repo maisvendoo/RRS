@@ -4,6 +4,33 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+const char* deviceTypeToStr(VkPhysicalDeviceType t)
+{
+    switch(t)
+    {
+    case VK_PHYSICAL_DEVICE_TYPE_OTHER:
+        return "Other";
+
+    case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+        return "Integrated GPU";
+
+    case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+        return "Discrete GPU";
+
+    case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+        return "Virtual GPU";
+
+    case VK_PHYSICAL_DEVICE_TYPE_CPU:
+        return "CPU";
+
+    default:
+        return "Unknown";
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
 {
     // Задаем информацию о приложении
@@ -42,6 +69,7 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
     // Не повезло тебе с видюхой, чувак...
     if (deviceCount == 0)
     {
+        // Купи новую, или играй в ZDSimulator :-)
         return GPU_STATE_NO_CAPABLE_DEVICES_ERROR;
     }
 
@@ -52,6 +80,61 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
     if (result != VK_SUCCESS)
     {
         return GPU_STATE_GET_DEVICES_LIST_ERROR;
+    }
+
+    // Смотрим что за видюхи нашлись
+    for (size_t i = 0; i < deviceCount; ++i)
+    {
+        VkPhysicalDevice physDev = physicalDevices[i];
+
+        // Цепочка pNext для Vulkan 1.1 + 1.2 + Core)
+        VkPhysicalDeviceVulkan12Features vk12Feat{};
+        vk12Feat.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+
+        VkPhysicalDeviceVulkan11Features vk11Feat{};
+        vk11Feat.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+        vk12Feat.pNext = &vk11Feat;
+
+        VkPhysicalDeviceFeatures2 coreFeat2{};
+        coreFeat2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+        coreFeat2.pNext = &vk12Feat;
+
+        vkGetPhysicalDeviceFeatures2(physDev, &coreFeat2);
+
+        // Свойства (цепочка pNext)
+        VkPhysicalDeviceVulkan12Properties vk12Prop{};
+        vk12Prop.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
+
+        VkPhysicalDeviceVulkan11Properties vk11Prop{};
+        vk11Prop.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
+        vk12Prop.pNext = &vk11Prop;
+
+        VkPhysicalDeviceProperties2 coreProp2{};
+        coreProp2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        coreProp2.pNext = &vk12Prop;
+
+        vkGetPhysicalDeviceProperties2(physDev, &coreProp2);
+
+        // Queue Families
+        uint32_t queueFamilyCount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(physDev, &queueFamilyCount, nullptr);
+        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(physDev, &queueFamilyCount, queueFamilies.data());
+
+        // Memory Properties
+        VkPhysicalDeviceMemoryProperties memProps{};
+        vkGetPhysicalDeviceMemoryProperties(physDev, &memProps);
+
+        // Вычитываем информацию о карточках
+        auto &props = coreProp2.properties;
+
+        gpu_info_t gpu_info;
+        gpu_info.deviceName = QString(props.deviceName);
+        gpu_info.deviceType = QString(deviceTypeToStr(props.deviceType));
+        gpu_info.vendorID = props.vendorID;
+        gpu_info.deviceID = props.deviceID;
+
+        gpus_info.push_back(gpu_info);
     }
 
     return GPU_STATE_READY;
