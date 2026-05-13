@@ -29,6 +29,8 @@
 #include    "platform.h"
 #include    "styles.h"
 
+#include    <system-diagnostic.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -181,6 +183,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     ui->tbScenarioDescription->setTextInteractionFlags(Qt::NoTextInteraction);
     ui->tbScenarioDescription->setFocusPolicy(Qt::NoFocus);
+
+    std::vector<gpu_info_t> gpus_info;
+    auto status = getInfoGPUs(gpus_info);
 }
 
 //------------------------------------------------------------------------------
