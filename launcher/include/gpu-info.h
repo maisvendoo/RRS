@@ -8,10 +8,13 @@
 //------------------------------------------------------------------------------
 struct gpu_info_t
 {
-    QString     deviceName = "";
-    QString     deviceType = "";
-    uint32_t    vendorID = 0;
-    uint32_t    deviceID = 0;
+    QString                 deviceName = "";
+    QString                 deviceType = "";
+    uint32_t                vendorID = 0;
+    uint32_t                deviceID = 0;
+    QString                 apiVersion = "";
+    QString                 driverVersion = "";
+    std::vector<uint64_t>   memory_size;
 };
 
 #endif

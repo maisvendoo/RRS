@@ -134,6 +134,19 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
         gpu_info.vendorID = props.vendorID;
         gpu_info.deviceID = props.deviceID;
 
+        gpu_info.apiVersion = QString("%1.%2.%3")
+                                  .arg(VK_VERSION_MAJOR(props.apiVersion))
+                                  .arg(VK_VERSION_MINOR(props.apiVersion))
+                                  .arg(VK_VERSION_PATCH(props.apiVersion));
+
+
+        gpu_info.driverVersion = QString("%1.%2.%3")
+                                  .arg(VK_VERSION_MAJOR(props.driverVersion))
+                                  .arg(VK_VERSION_MINOR(props.driverVersion))
+                                  .arg(VK_VERSION_PATCH(props.driverVersion));
+
+
+
         gpus_info.push_back(gpu_info);
     }
 
