@@ -7,20 +7,20 @@
 //------------------------------------------------------------------------------
 /*!
  *  \file
- *  \brief Strings to numbers conversion
+ *  \brief     Strings to numbers conversion
  *  \copyright maisvendoo
- *  \author Dmitry Pritykin
- *  \date  17/09/2016
+ *  \author    Dmitry Pritykin
+ *  \date      17/09/2016
  */
 
-#include "convert.h"
+#include    "convert.h"
 
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-bool TextToDouble(QString text, double& value)
+//------------------------------------------------------------------------------
+// QString to double
+//------------------------------------------------------------------------------
+bool TextToDouble(const QString& text, double& value)
 {
-    bool validate = false; // Check data flag
+    bool validate{false}; // Check data flag
 
     // Try data conversion
     value = text.toDouble(&validate);
@@ -29,37 +29,37 @@ bool TextToDouble(QString text, double& value)
     return validate;
 }
 
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-bool TextToInt(QString text, int& value)
+//------------------------------------------------------------------------------
+// QString to integer
+//------------------------------------------------------------------------------
+bool TextToInt(const QString& text, int& value)
 {
-    bool validate = false;
+    bool validate{false};
     value = text.toInt(&validate);
     return validate;
 }
 
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-bool TextToFloat(QString text, float& value)
+//------------------------------------------------------------------------------
+// QString to float
+//------------------------------------------------------------------------------
+bool TextToFloat(const QString& text, float& value)
 {
-    bool validate = false;
+    bool validate{false};
     value = text.toFloat(&validate);
     return validate;
 }
 
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-QString EraseSpaces(QString str)
+//------------------------------------------------------------------------------
+// Erase all spaces from QString
+//------------------------------------------------------------------------------
+QString EraseSpaces(const QString& str)
 {
-    QString result = "";
+    QString result{};
 
-    const auto length = str.length();
-    for (auto i = decltype(length){0}; i < length; ++i)
+    const qsizetype length{str.length()};
+    for (qsizetype i{0}; i < length; ++i)
     {
-        if (str.at(i) != QChar(' '))
+        if (str.at(i) != QChar{' '})
         {
             result += str.at(i);
         }
