@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>293</width>
+    <width>373</width>
     <height>367</height>
    </rect>
   </property>
@@ -261,7 +261,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox">
+               <widget class="QSpinBox" name="sbViewDistance">
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>

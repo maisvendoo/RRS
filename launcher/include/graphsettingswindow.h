@@ -3,6 +3,7 @@
 
 #include    <QMainWindow>
 #include    <gpu-info.h>
+#include    <CfgEditor.h>
 
 //------------------------------------------------------------------------------
 //
@@ -35,9 +36,38 @@ private:
 
     Ui::GraphSettingsWindow *ui;
 
+    FieldsDataList fd_list;
+
+    QString settings_path = "";
+
+    static const   QString WIDTH;
+    static const   QString HEIGHT;
+    static const   QString FULLSCREEN;
+    static const   QString FOV_Y;
+    static const   QString ZNEAR;
+    static const   QString ZFAR;
+    static const   QString SCREEN_NUM;
+    static const   QString WIN_DECOR;
+    static const   QString DOUBLE_BUFF;
+    static const   QString VSYNC;
+    static const   QString NOTIFY_LEVEL;
+    static const   QString VIEW_DIST;
+    static const   QString STARTUP_SCN_SUBDIR;
+
+    void loadGraphicsSettings(QString file_name);
+
+    void updateGraphSettings(FieldsDataList &fd_list,
+                             Ui::GraphSettingsWindow *ui);
+
+    void showEvent(QShowEvent *event) override;
+
 private slots:
 
     void slotOnChangeCurrentGPU(int idx);
+
+    void slotApplySettings();
+
+    void slotCancelSettings();
 };
 
 #endif // GRAPHSETTINGSWINDOW_H

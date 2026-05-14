@@ -1,6 +1,25 @@
 #include    "graphsettingswindow.h"
 #include    "ui_graphsettingswindow.h"
 
+#include    <filesystem.h>
+#include    <CfgReader.h>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+const   QString GraphSettingsWindow::WIDTH = "Width";
+const   QString GraphSettingsWindow::HEIGHT = "Height";
+const   QString GraphSettingsWindow::FULLSCREEN = "FullScreen";
+const   QString GraphSettingsWindow::FOV_Y = "FovY";
+const   QString GraphSettingsWindow::ZNEAR = "zNear";
+const   QString GraphSettingsWindow::ZFAR = "zFar";
+const   QString GraphSettingsWindow::SCREEN_NUM = "ScreenNumber";
+const   QString GraphSettingsWindow::WIN_DECOR = "WindowDecoration";
+const   QString GraphSettingsWindow::DOUBLE_BUFF = "DoubleBuffer";
+const   QString GraphSettingsWindow::VSYNC = "VSync";
+const   QString GraphSettingsWindow::NOTIFY_LEVEL = "NofifyLevel";
+const   QString GraphSettingsWindow::VIEW_DIST = "ViewDistance";
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -10,6 +29,12 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
     ui->setupUi(this);
 
     setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
+
+    connect(ui->pbGraphApply, &QPushButton::released,
+            this, &GraphSettingsWindow::slotApplySettings);
+
+    connect(ui->pbGraphCancel, &QPushButton::released,
+            this, &GraphSettingsWindow::slotCancelSettings);
 }
 
 //------------------------------------------------------------------------------
@@ -57,6 +82,141 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void GraphSettingsWindow::loadGraphicsSettings(QString file_name)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    QString config_dir = QString(fs.getConfigDir().c_str());
+
+    settings_path = config_dir + fs.separator() + file_name + ".xml";
+
+    QString secName = "Viewer";
+
+    CfgReader   cfg;
+
+    if (cfg.load(settings_path))
+    {
+        int width = 0;
+        cfg.getInt(secName, WIDTH, width);
+        fd_list.append(QPair<QString, QVariant>(WIDTH, width));
+
+        int height = 0;
+        cfg.getInt(secName, HEIGHT, height);
+        fd_list.append(QPair<QString, QVariant>(HEIGHT, height));
+
+        int fullscreen = 0;
+        cfg.getInt(secName, FULLSCREEN, fullscreen);
+        fd_list.append(QPair<QString, QVariant>(FULLSCREEN, fullscreen));
+
+        double fovY = 0;
+        cfg.getDouble(secName, FOV_Y, fovY);
+        fd_list.append(QPair<QString, QVariant>(FOV_Y, fovY));
+
+        double zNear = 0;
+        cfg.getDouble(secName, ZNEAR, zNear);
+        fd_list.append(QPair<QString, QVariant>(ZNEAR, zNear));
+
+        double zFar = 0;
+        cfg.getDouble(secName, ZFAR, zFar);
+        fd_list.append(QPair<QString, QVariant>(ZFAR, zFar));
+
+        int screen_num = 0;
+        cfg.getInt(secName, SCREEN_NUM, screen_num);
+        fd_list.append(QPair<QString, QVariant>(SCREEN_NUM, screen_num));
+
+        int win_decor = 0;
+        cfg.getInt(secName, WIN_DECOR, win_decor);
+        fd_list.append(QPair<QString, QVariant>(WIN_DECOR, win_decor));
+
+        int double_buff = 0;
+        cfg.getInt(secName, DOUBLE_BUFF, double_buff);
+        fd_list.append(QPair<QString, QVariant>(DOUBLE_BUFF, double_buff));
+
+        int vsync = 0;
+        cfg.getInt(secName, VSYNC, vsync);
+        fd_list.append(QPair<QString, QVariant>(VSYNC, vsync));
+
+        double view_dist = 0;
+        cfg.getDouble(secName, VIEW_DIST, view_dist);
+        fd_list.append(QPair<QString, QVariant>(VIEW_DIST, view_dist));
+
+        updateGraphSettings(fd_list, ui);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QPair<QString, QVariant> findSetting(QString setting,
+                                     FieldsDataList &fd_list,
+                                     int &idx)
+{
+    QPair<QString, QVariant> pair;
+
+    for (int i = 0; i < fd_list.size(); ++i)
+    {
+        pair = fd_list[i];
+
+        if (pair.first == setting)
+        {
+            idx = i;
+            return pair;
+        }
+    }
+
+    return pair;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QPair<QString, QVariant> findSetting(QString setting, FieldsDataList &fd_list)
+{
+    int idx = 0;
+    QPair<QString, QVariant> pair = findSetting(setting, fd_list, idx);
+
+    return pair;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::GraphSettingsWindow *ui)
+{
+    ui->sbWindowWidth->setValue(findSetting(WIDTH, fd_list).second.toInt());
+    ui->sbWindowHeight->setValue(findSetting(HEIGHT, fd_list).second.toInt());
+
+    findSetting(FULLSCREEN, fd_list).second == 1 ?
+        ui->cbFullScreenMode->setCheckState(Qt::CheckState::Checked) :
+        ui->cbFullScreenMode->setCheckState(Qt::CheckState::Unchecked);
+
+    findSetting(WIN_DECOR, fd_list).second == 1 ?
+        ui->cbWindowDecoration->setCheckState(Qt::CheckState::Checked) :
+        ui->cbWindowDecoration->setCheckState(Qt::CheckState::Unchecked);
+
+    findSetting(VSYNC, fd_list).second == 1 ?
+        ui->cbLimitFPS->setCheckState(Qt::CheckState::Unchecked) :
+        ui->cbLimitFPS->setCheckState(Qt::CheckState::Checked);
+
+    ui->sbDisplayNumber->setValue(findSetting(SCREEN_NUM, fd_list).second.toInt());
+
+    ui->sbViewDistance->setValue(findSetting(VIEW_DIST, fd_list).second.toInt());
+
+    ui->pbGraphApply->setEnabled(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void GraphSettingsWindow::showEvent(QShowEvent *event)
+{
+    QMainWindow::showEvent(event);
+
+    loadGraphicsSettings("settings");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void GraphSettingsWindow::slotOnChangeCurrentGPU(int idx)
 {
     if (idx < 0)
@@ -70,4 +230,22 @@ void GraphSettingsWindow::slotOnChangeCurrentGPU(int idx)
     }
 
     current_gpu_idx = idx;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void GraphSettingsWindow::slotApplySettings()
+{
+    ui->pbGraphApply->setEnabled(false);
+    this->hide();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void GraphSettingsWindow::slotCancelSettings()
+{
+    ui->pbGraphApply->setEnabled(false);
+    this->hide();
 }

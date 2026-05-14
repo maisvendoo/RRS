@@ -99,7 +99,7 @@ private:
     /// Viewer settings
     FieldsDataList  fd_list;
 
-    static const   QString WIDTH;
+    /*static const   QString WIDTH;
     static const   QString HEIGHT;
     static const   QString FULLSCREEN;
     static const   QString FOV_Y;
@@ -110,7 +110,7 @@ private:
     static const   QString DOUBLE_BUFF;
     static const   QString VSYNC;
     static const   QString NOTIFY_LEVEL;
-    static const   QString VIEW_DIST;
+    static const   QString VIEW_DIST;*/
     static const   QString STARTUP_SCN_SUBDIR;
 
     QString settings_path;
@@ -167,16 +167,10 @@ private:
     void startMap(bool local = true);
 
     /// Load theme
-    void loadTheme();
-
-    /// Load graphics settings
-    void loadGraphicsSettings(QString file_name);
-
-    /// Update graphics settings
-    void updateGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui);
+    void loadTheme();    
 
     /// Apply new graph settings
-    void applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui);
+    //void applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui);
 
     /// Save graph settings to file
     void saveGraphSettings(FieldsDataList &fd_list);
