@@ -168,6 +168,7 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
         else if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU)
         {
             // +300 Когтеврану (я не знаю что такое виртуальный GPU, но прикольно звучит)
+            gpu_info.score += 300;
         }
         else
         {
