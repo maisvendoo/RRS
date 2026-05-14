@@ -8,6 +8,8 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
     , ui(new Ui::GraphSettingsWindow)
 {
     ui->setupUi(this);
+
+    setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
 }
 
 //------------------------------------------------------------------------------
@@ -30,6 +32,7 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
         return;
     }
 
+    // Выбираем самый производительный GPU из найденных в качестве текущего
     int max_score = 0;
     current_gpu_idx = -1;
 
