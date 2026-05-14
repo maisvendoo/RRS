@@ -173,7 +173,7 @@ private:
     //void applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui);
 
     /// Save graph settings to file
-    void saveGraphSettings(FieldsDataList &fd_list);
+    //void saveGraphSettings(FieldsDataList &fd_list);
 
     /// Генерация сценарной команды setDate
     QString createLuaSetDate(QDateEdit *dateEdit);
@@ -260,14 +260,6 @@ private slots:
     void slotChangedServerSettings();
 
     void slotSaveServer();
-
-    void slotChangedGraphSetting(int);
-
-    void slotChangedGraphSetting(double);
-
-    void slotCancelGraphSettings();
-
-    void slotApplyGraphSettings();
 
     void slotOnScenarioSelection(int cur_idx);
 

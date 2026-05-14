@@ -115,40 +115,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             this, &MainWindow::slotChangedServerSettings);
 
     connect(ui->pbSaveServer, &QPushButton::pressed,
-            this, &MainWindow::slotSaveServer);
-
-    connect(ui->spWidth, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
-
-    connect(ui->spHeight, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
-
-    connect(ui->cbFullScreen, QOverload<int>::of(&QCheckBox::stateChanged),
-            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
-
-    connect(ui->cbDoubleBuffer, QOverload<int>::of(&QCheckBox::stateChanged),
-            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
-
-    connect(ui->cbVSync, QOverload<int>::of(&QCheckBox::stateChanged),
-            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
-
-    connect(ui->cbWindowDecoration, QOverload<int>::of(&QCheckBox::stateChanged),
-            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
-
-    connect(ui->dspFovY, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this, QOverload<double>::of(&MainWindow::slotChangedGraphSetting));
-
-    connect(ui->dspNear, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this, QOverload<double>::of(&MainWindow::slotChangedGraphSetting));
-
-    connect(ui->spViewDist, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
-
-    connect(ui->spScreenNumber, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, QOverload<int>::of(&MainWindow::slotChangedGraphSetting));
-
-    connect(ui->pbCancel, &QPushButton::released, this, &MainWindow::slotCancelGraphSettings);
-    connect(ui->pbApply, &QPushButton::released, this, &MainWindow::slotApplyGraphSettings);
+            this, &MainWindow::slotSaveServer);    
 
     connect(ui->pbAddTrain, &QPushButton::released, this, &MainWindow::slotAddActiveTrain);
     connect(ui->pbDeleteTrain, &QPushButton::released, this, &MainWindow::slotDeleteActiveTrain);
@@ -1311,45 +1278,6 @@ void MainWindow::slotSaveServer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotChangedGraphSetting(int)
-{
-    ui->pbApply->setEnabled(true);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotChangedGraphSetting(double)
-{
-    ui->pbApply->setEnabled(true);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotCancelGraphSettings()
-{
-    //updateGraphSettings(fd_list, ui);
-    ui->pbApply->setEnabled(false);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotApplyGraphSettings()
-{
-    //applyGraphSettings(fd_list, ui);
-
-    //updateGraphSettings(fd_list, ui);
-
-    saveGraphSettings(fd_list);
-
-    ui->pbApply->setEnabled(false);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void MainWindow::slotOnScenarioSelection(int cur_idx)
 {
     ui->tbScenarioDescription->clear();
@@ -1413,82 +1341,6 @@ void MainWindow::slotSaveTrainsConfigAsScenario()
     reloadScenariosList();
 
     ui->pbStartServer->setEnabled(!active_trains.empty());
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-/*void MainWindow::applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui)
-{
-    int idx = 0;
-
-    findSetting(WIDTH, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(WIDTH, ui->spWidth->value());
-
-    findSetting(HEIGHT, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(HEIGHT, ui->spHeight->value());
-
-    findSetting(FULLSCREEN, fd_list, idx);
-    if (ui->cbFullScreen->checkState() == Qt::CheckState::Checked)
-    {
-        fd_list[idx] = QPair<QString, QVariant>(FULLSCREEN, 1);
-    }
-    else
-    {
-        fd_list[idx] = QPair<QString, QVariant>(FULLSCREEN, 0);
-    }
-
-    findSetting(DOUBLE_BUFF, fd_list, idx);
-    if (ui->cbDoubleBuffer->checkState() == Qt::CheckState::Checked)
-    {
-        fd_list[idx] = QPair<QString, QVariant>(DOUBLE_BUFF, 1);
-    }
-    else
-    {
-        fd_list[idx] = QPair<QString, QVariant>(DOUBLE_BUFF, 0);
-    }
-
-    findSetting(VSYNC, fd_list, idx);
-    if (ui->cbVSync->checkState() == Qt::CheckState::Checked)
-    {
-        fd_list[idx] = QPair<QString, QVariant>(VSYNC, 1);
-    }
-    else
-    {
-        fd_list[idx] = QPair<QString, QVariant>(VSYNC, 0);
-    }
-
-    findSetting(WIN_DECOR, fd_list, idx);
-    if (ui->cbWindowDecoration->checkState() == Qt::CheckState::Checked)
-    {
-        fd_list[idx] = QPair<QString, QVariant>(WIN_DECOR, 1);
-    }
-    else
-    {
-        fd_list[idx] = QPair<QString, QVariant>(WIN_DECOR, 0);
-    }
-
-    findSetting(SCREEN_NUM, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(SCREEN_NUM, ui->spScreenNumber->value());
-
-    findSetting(FOV_Y, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(FOV_Y, ui->dspFovY->value());
-
-    findSetting(ZNEAR, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(ZNEAR, ui->dspNear->value());
-
-    findSetting(VIEW_DIST, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(VIEW_DIST, ui->spViewDist->value());
-}*/
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::saveGraphSettings(FieldsDataList &fd_list)
-{
-    CfgEditor editor;
-
-    editor.editFile(settings_path, "Viewer", fd_list);
 }
 
 //------------------------------------------------------------------------------

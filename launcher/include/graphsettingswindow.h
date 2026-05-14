@@ -59,6 +59,11 @@ private:
     void updateGraphSettings(FieldsDataList &fd_list,
                              Ui::GraphSettingsWindow *ui);
 
+    void applyGraphSettings(FieldsDataList &fd_list,
+                            Ui::GraphSettingsWindow *ui);
+
+    void saveGraphSettings(FieldsDataList &fd_list);
+
     void showEvent(QShowEvent *event) override;
 
 private slots:
