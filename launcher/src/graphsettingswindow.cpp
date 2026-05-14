@@ -154,6 +154,8 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
 
         applyGraphSettings(fd_list, ui);
 
+        updateGraphSettings(fd_list, ui);
+
         // Сохраняем настройки
         saveGraphSettings(fd_list);
     }
@@ -179,6 +181,8 @@ void GraphSettingsWindow::loadGraphicsSettings(QString file_name)
     QString secName = "Viewer";
 
     CfgReader   cfg;
+
+    fd_list.clear();
 
     if (cfg.load(settings_path))
     {
@@ -350,18 +354,6 @@ void GraphSettingsWindow::showEvent(QShowEvent *event)
 //------------------------------------------------------------------------------
 void GraphSettingsWindow::slotOnChangeCurrentGPU(int idx)
 {
-    if (idx < 0)
-    {
-        return;
-    }
-
-    if (idx > gpus_info.size() - 1)
-    {
-        return;
-    }
-
-    current_gpu_idx = idx;
-
     ui->pbGraphApply->setEnabled(true);
 }
 
