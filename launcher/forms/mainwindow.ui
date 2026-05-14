@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_local_server">
        <attribute name="title">
@@ -874,7 +874,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_19">
         <item>
-         <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,2,3">
+         <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,0,0">
           <item row="0" column="0">
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
@@ -1128,31 +1128,6 @@
           <item row="0" column="1">
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="QComboBox" name="cbListGPU"/>
-            </item>
-            <item>
-             <widget class="QPlainTextEdit" name="ptLogGPU">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>300</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>Courier New</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTextBrowser" name="tbLogGPU"/>
-            </item>
-            <item>
              <spacer name="verticalSpacer_6">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -1175,6 +1150,34 @@
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1520</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionGraphics_settings"/>
+    <addaction name="actionNetwork_settings"/>
+   </widget>
+   <addaction name="menuSettings"/>
+  </widget>
+  <action name="actionGraphics_settings">
+   <property name="text">
+    <string>Graphics settings</string>
+   </property>
+  </action>
+  <action name="actionNetwork_settings">
+   <property name="text">
+    <string>Network settings</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

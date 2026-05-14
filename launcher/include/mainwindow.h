@@ -30,6 +30,8 @@
 #include    <gpu-info.h>
 #include    <CfgEditor.h>
 
+#include    "graphsettingswindow.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -211,6 +213,8 @@ private:
 
     bool start_viewer_allowed = false;
 
+    GraphSettingsWindow *graphSettingsWindow = new GraphSettingsWindow(this);
+
 private slots:
 
     void slotRouteSelection();
@@ -273,9 +277,7 @@ private slots:
 
     void slotOnScenarioSelection(int cur_idx);
 
-    void slotSaveTrainsConfigAsScenario();
-
-    void slotUpdateInfoGPU(int index);
+    void slotSaveTrainsConfigAsScenario();   
 };
 
 

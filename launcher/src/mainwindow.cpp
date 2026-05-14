@@ -30,6 +30,7 @@
 #include    "styles.h"
 
 #include    <system-diagnostic.h>
+#include    <graphsettingswindow.h>
 
 //------------------------------------------------------------------------------
 //
@@ -186,6 +187,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // Предстартовая диагностика GPU
     gpuDiagnostics();
+
+    connect(ui->actionGraphics_settings, &QAction::triggered, this, [this](){
+        graphSettingsWindow->show();
+    });
 }
 
 //------------------------------------------------------------------------------
@@ -559,7 +564,6 @@ void MainWindow::gpuDiagnostics()
     // Получаем список GPU
     auto status = getInfoGPUs(gpus_info);
 
-    ui->cbListGPU->setEnabled(false);
     start_viewer_allowed = false;
     ui->lStatusGPU->clear();
 
@@ -601,30 +605,14 @@ void MainWindow::gpuDiagnostics()
                 break;
             }
 
-            ui->cbListGPU->setEnabled(true);
-            start_viewer_allowed = true;
-
-            uint32_t max_score = 0;
-            int best_gpu_idx = -1;
+            start_viewer_allowed = true;            
 
             for (size_t i = 0; i < gpus_info.size(); ++i)
             {
                 auto &gpu_info = gpus_info[i];
-
-                if (gpu_info.score > max_score)
-                {
-                    max_score = gpu_info.score;
-                    best_gpu_idx = i;
-                }
-
-                ui->cbListGPU->addItem(gpu_info.deviceName);
             }
 
-            connect(ui->cbListGPU, &QComboBox::currentIndexChanged, this, &MainWindow::slotUpdateInfoGPU);
-
-            ui->cbListGPU->setCurrentIndex(best_gpu_idx);            
-
-            slotUpdateInfoGPU(best_gpu_idx);
+            graphSettingsWindow->setSettingsGPU(gpus_info);
 
             break;
         }
@@ -1423,32 +1411,6 @@ void MainWindow::slotSaveTrainsConfigAsScenario()
     reloadScenariosList();
 
     ui->pbStartServer->setEnabled(!active_trains.empty());
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotUpdateInfoGPU(int index)
-{
-    if (index < 0)
-    {
-        return;
-    }
-
-    if (index > gpus_info.size())
-    {
-        return;
-    }
-
-    ui->tbLogGPU->clear();
-    //ui->tbLogGPU->setMarkdown("|a|b|\n");
-    ui->tbLogGPU->setMarkdown("|-|-|\n");
-    ui->tbLogGPU->setMarkdown(tr("|GPU type|") + QString("%1|\n").arg(gpus_info[index].deviceType));
-    /*ui->tbLogGPU->insertPlainText(tr("Available VRAM: ") + QString("%1 MB").arg(gpus_info[index].vram_size));
-    ui->tbLogGPU->insertPlainText(tr("GPU driver version: ") + gpus_info[index].driverVersion);
-    ui->tbLogGPU->insertPlainText(tr("Vulkan API version: ") + gpus_info[index].apiVersion);
-    ui->tbLogGPU->insertPlainText(tr("VendorID: ") + QString("0x%1").arg(gpus_info[index].vendorID, 0, 16));
-    ui->tbLogGPU->insertPlainText(tr("DeviceID: ") + QString("0x%1").arg(gpus_info[index].deviceID, 0, 16));*/
 }
 
 //------------------------------------------------------------------------------
