@@ -31,7 +31,13 @@ private:
 
     gpus_info_list_t gpus_info;
 
+    int current_gpu_idx = -1;
+
     Ui::GraphSettingsWindow *ui;
+
+private slots:
+
+    void slotOnChangeCurrentGPU(int idx);
 };
 
 #endif // GRAPHSETTINGSWINDOW_H
