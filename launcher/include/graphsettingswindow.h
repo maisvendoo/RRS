@@ -52,7 +52,8 @@ private:
     static const   QString VSYNC;
     static const   QString NOTIFY_LEVEL;
     static const   QString VIEW_DIST;
-    static const   QString STARTUP_SCN_SUBDIR;
+    static const   QString MAX_FPS;
+    static const   QString PHYSICAL_DEVICE;
 
     void loadGraphicsSettings(QString file_name);
 

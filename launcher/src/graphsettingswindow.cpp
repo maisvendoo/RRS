@@ -19,6 +19,42 @@ const   QString GraphSettingsWindow::DOUBLE_BUFF = "DoubleBuffer";
 const   QString GraphSettingsWindow::VSYNC = "VSync";
 const   QString GraphSettingsWindow::NOTIFY_LEVEL = "NofifyLevel";
 const   QString GraphSettingsWindow::VIEW_DIST = "ViewDistance";
+const   QString GraphSettingsWindow::MAX_FPS = "MaxFPS";
+const   QString GraphSettingsWindow::PHYSICAL_DEVICE = "PhysicalDevice";
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QPair<QString, QVariant> findSetting(QString setting,
+                                     FieldsDataList &fd_list,
+                                     int &idx)
+{
+    QPair<QString, QVariant> pair;
+
+    for (int i = 0; i < fd_list.size(); ++i)
+    {
+        pair = fd_list[i];
+
+        if (pair.first == setting)
+        {
+            idx = i;
+            return pair;
+        }
+    }
+
+    return pair;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QPair<QString, QVariant> findSetting(QString setting, FieldsDataList &fd_list)
+{
+    int idx = 0;
+    QPair<QString, QVariant> pair = findSetting(setting, fd_list, idx);
+
+    return pair;
+}
 
 //------------------------------------------------------------------------------
 //
@@ -52,7 +88,13 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
         ui->pbGraphApply->setEnabled(true);
     });
 
-    connect(ui->cbLimitFPS, &QCheckBox::stateChanged, this, [this](int){
+    connect(ui->cbLimitFPS, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state){
+
+        ui->pbGraphApply->setEnabled(true);
+        ui->sbMaxFPS->setEnabled(state == Qt::Checked);
+    });
+
+    connect(ui->sbMaxFPS, &QSpinBox::valueChanged, this, [this](int){
         ui->pbGraphApply->setEnabled(true);
     });
 
@@ -63,6 +105,8 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->sbDisplayNumber, &QSpinBox::valueChanged, this, [this](int){
         ui->pbGraphApply->setEnabled(true);
     });
+
+    loadGraphicsSettings("settings");
 }
 
 //------------------------------------------------------------------------------
@@ -87,7 +131,7 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
 
     // Выбираем самый производительный GPU из найденных в качестве текущего
     int max_score = 0;
-    current_gpu_idx = -1;
+    int best_gpu_idx = -1;
 
     for (size_t i = 0; i < gpus_info.size(); ++i)
     {
@@ -96,10 +140,25 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
         if (gpu_info.score > max_score)
         {
             max_score = gpu_info.score;
-            current_gpu_idx = i;
+            best_gpu_idx = i;
         }
 
-        ui->cbListGPU->addItem(gpu_info.deviceName);
+        ui->cbListGPU->addItem(gpu_info.deviceName);        
+    }    
+
+    // Если видюха еще не настраивалась никогда
+    if (current_gpu_idx == -1)
+    {
+        // выбираем лючшую из найденных
+        ui->cbListGPU->setCurrentIndex(best_gpu_idx);
+
+        applyGraphSettings(fd_list, ui);
+
+        // Сохраняем настройки
+        saveGraphSettings(fd_list);
+    }
+    else
+    {
         ui->cbListGPU->setCurrentIndex(current_gpu_idx);
     }
 
@@ -163,46 +222,19 @@ void GraphSettingsWindow::loadGraphicsSettings(QString file_name)
         cfg.getInt(secName, VSYNC, vsync);
         fd_list.append(QPair<QString, QVariant>(VSYNC, vsync));
 
+        int max_fps = 0;
+        cfg.getInt(secName, MAX_FPS, max_fps);
+        fd_list.append(QPair<QString, QVariant>(MAX_FPS, max_fps));
+
+        cfg.getInt(secName, PHYSICAL_DEVICE, current_gpu_idx);
+        fd_list.append(QPair<QString, QVariant>(PHYSICAL_DEVICE, current_gpu_idx));
+
         double view_dist = 0;
         cfg.getDouble(secName, VIEW_DIST, view_dist);
         fd_list.append(QPair<QString, QVariant>(VIEW_DIST, view_dist));
 
         updateGraphSettings(fd_list, ui);
     }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QPair<QString, QVariant> findSetting(QString setting,
-                                     FieldsDataList &fd_list,
-                                     int &idx)
-{
-    QPair<QString, QVariant> pair;
-
-    for (int i = 0; i < fd_list.size(); ++i)
-    {
-        pair = fd_list[i];
-
-        if (pair.first == setting)
-        {
-            idx = i;
-            return pair;
-        }
-    }
-
-    return pair;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QPair<QString, QVariant> findSetting(QString setting, FieldsDataList &fd_list)
-{
-    int idx = 0;
-    QPair<QString, QVariant> pair = findSetting(setting, fd_list, idx);
-
-    return pair;
 }
 
 //------------------------------------------------------------------------------
@@ -224,6 +256,10 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
     findSetting(VSYNC, fd_list).second == 1 ?
         ui->cbLimitFPS->setCheckState(Qt::CheckState::Unchecked) :
         ui->cbLimitFPS->setCheckState(Qt::CheckState::Checked);
+
+    ui->sbMaxFPS->setValue(findSetting(MAX_FPS, fd_list).second.toInt());
+
+    ui->cbListGPU->setCurrentIndex(findSetting(PHYSICAL_DEVICE, fd_list).second.toInt());
 
     ui->sbDisplayNumber->setValue(findSetting(SCREEN_NUM, fd_list).second.toInt());
 
@@ -256,16 +292,6 @@ void GraphSettingsWindow::applyGraphSettings(FieldsDataList &fd_list,
         fd_list[idx] = QPair<QString, QVariant>(FULLSCREEN, 0);
     }
 
-    /*findSetting(DOUBLE_BUFF, fd_list, idx);
-    if (ui->cbDoubleBuffer->checkState() == Qt::CheckState::Checked)
-    {
-        fd_list[idx] = QPair<QString, QVariant>(DOUBLE_BUFF, 1);
-    }
-    else
-    {
-        fd_list[idx] = QPair<QString, QVariant>(DOUBLE_BUFF, 0);
-    }*/
-
     findSetting(VSYNC, fd_list, idx);
     if (ui->cbLimitFPS->checkState() == Qt::CheckState::Checked)
     {
@@ -275,6 +301,12 @@ void GraphSettingsWindow::applyGraphSettings(FieldsDataList &fd_list,
     {
         fd_list[idx] = QPair<QString, QVariant>(VSYNC, 1);
     }
+
+    findSetting(MAX_FPS, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(MAX_FPS, ui->sbMaxFPS->value());
+
+    findSetting(PHYSICAL_DEVICE, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(PHYSICAL_DEVICE, ui->cbListGPU->currentIndex());
 
     findSetting(WIN_DECOR, fd_list, idx);
     if (ui->cbWindowDecoration->checkState() == Qt::CheckState::Checked)
@@ -288,12 +320,6 @@ void GraphSettingsWindow::applyGraphSettings(FieldsDataList &fd_list,
 
     findSetting(SCREEN_NUM, fd_list, idx);
     fd_list[idx] = QPair<QString, QVariant>(SCREEN_NUM, ui->sbDisplayNumber->value());
-
-    /*findSetting(FOV_Y, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(FOV_Y, ui->dspFovY->value());
-
-    findSetting(ZNEAR, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(ZNEAR, ui->dspNear->value());*/
 
     findSetting(VIEW_DIST, fd_list, idx);
     fd_list[idx] = QPair<QString, QVariant>(VIEW_DIST, ui->sbViewDistance->value());
