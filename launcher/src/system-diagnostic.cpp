@@ -1,5 +1,6 @@
 #include    <system-diagnostic.h>
-#include    <vulkan/vulkan.h>
+#define     VOLK_IMPLEMENTATION
+#include    <volk.h>
 
 //------------------------------------------------------------------------------
 //
@@ -33,6 +34,13 @@ const char* deviceTypeToStr(VkPhysicalDeviceType t)
 //------------------------------------------------------------------------------
 StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
 {
+    VkResult result = volkInitialize();
+
+    if (result != VK_SUCCESS)
+    {
+        return GPU_STATE_VULKAN_LOADER_NOT_FOUND_ERROR;
+    }
+
     // Задаем информацию о приложении
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -48,13 +56,15 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
     instanceCI.pApplicationInfo = &appInfo;
 
     VkInstance instance = VK_NULL_HANDLE;
-    VkResult result = vkCreateInstance(&instanceCI, nullptr, &instance);
+    result = vkCreateInstance(&instanceCI, nullptr, &instance);
 
     // Переустанови дарйвер с официального сайта!
     if (result != VK_SUCCESS)
     {
         return GPU_STATE_VK_INSTANCE_ERROR;
     }
+
+    volkLoadInstance(instance);
 
     // Определяем наличие совместимых GPU в принципе
     uint32_t deviceCount = 0;
