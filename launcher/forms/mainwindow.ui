@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_local_server">
        <attribute name="title">
@@ -1126,6 +1126,9 @@
                <bool>true</bool>
               </property>
              </widget>
+            </item>
+            <item>
+             <widget class="QTextBrowser" name="tbLogGPU"/>
             </item>
             <item>
              <spacer name="verticalSpacer_6">
