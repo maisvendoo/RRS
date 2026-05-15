@@ -220,8 +220,6 @@ int RouteViewer::run()
                 }
             }
 
-            auto frame_start = clock::now();
-
             QApplication::processEvents();
             viewer->handleEvents();
             viewer->update();
