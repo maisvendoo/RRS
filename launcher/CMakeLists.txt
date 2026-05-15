@@ -25,7 +25,8 @@ find_package(Qt6 REQUIRED COMPONENTS Core LinguistTools)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
-file (GLOB SOURCES "./src/*.cpp")
+file (GLOB SOURCES_CPP "./src/*.cpp")
+file (GLOB SOURCES_C "./src/*.c")
 file (GLOB FORMS "./forms/*.ui")
 file (GLOB TS_FILES "./translations/*.ts")
 file (GLOB RESOURCES "./resources/*.qrc")
@@ -38,9 +39,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Компиляция приложения
 
 if (WIN32)
-    add_executable (${TARGET} WIN32 ${SOURCES} ${INCLUDES} ${UI_HEADERS} ${TS_FILES} ${RESOURCES})
+    add_executable (${TARGET} WIN32 ${SOURCES_CPP} ${SOURCES_C} ${INCLUDES} ${UI_HEADERS} ${TS_FILES} ${RESOURCES})
 else()
-    add_executable (${TARGET} ${SOURCES} ${INCLUDES} ${UI_HEADERS} ${TS_FILES} ${RESOURCES})
+    add_executable (${TARGET} ${SOURCES_CPP} ${SOURCES_C} ${INCLUDES} ${UI_HEADERS} ${TS_FILES} ${RESOURCES})
 endif()
 
 # Указываем пути поиска заголовков
@@ -57,3 +58,4 @@ target_link_libraries (${TARGET} Qt6::Widgets)
 target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} CfgEditor)
 target_link_libraries (${TARGET} filesystem)
+

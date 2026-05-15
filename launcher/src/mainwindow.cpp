@@ -29,6 +29,8 @@
 #include    "platform.h"
 #include    "styles.h"
 
+#include    <system-diagnostic.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -181,6 +183,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     ui->tbScenarioDescription->setTextInteractionFlags(Qt::NoTextInteraction);
     ui->tbScenarioDescription->setFocusPolicy(Qt::NoFocus);
+
+    // Предстартовая диагностика GPU
+    gpuDiagnostics();
 }
 
 //------------------------------------------------------------------------------
@@ -549,6 +554,86 @@ void MainWindow::hideTrainsConfigsTip()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::gpuDiagnostics()
+{
+    // Получаем список GPU
+    auto status = getInfoGPUs(gpus_info);
+
+    ui->cbListGPU->setEnabled(false);
+    start_viewer_allowed = false;
+    ui->lStatusGPU->clear();
+
+    switch (status)
+    {
+    case GPU_STATE_VULKAN_LOADER_NOT_FOUND_ERROR:
+        {
+            ui->lStatusGPU->setText(tr("Start graphics client is impossible: missing Vulkan loader in your system. Check that you have lastest version of driver for your GPU from offcial vendor site."));
+            break;
+        }
+    case GPU_STATE_VK_INSTANCE_ERROR:
+        {
+            ui->lStatusGPU->setText(tr("Start graphics client is impossible: can not create vkInstance. Check that you have lastest version of driver for your GPU from offcaial vendor site."));
+            break;
+        }
+
+    case GPU_STATE_VK_ENUM_PHYSICAL_DEVICE_ERROR:
+        {
+            ui->lStatusGPU->setText(tr("Start graphics client is impossible: GPU driver error, can't get information about GPUs. Check that you have lastest version of driver for your GPU from offcial vendor site"));
+            break;
+        }
+
+    case GPU_STATE_NO_CAPABLE_DEVICES_ERROR:
+        {
+            ui->lStatusGPU->setText(tr("Start graphics client is impossible: not find GPU devices capable with Vulkan API."));
+            break;
+        }
+
+    case GPU_STATE_GET_DEVICES_LIST_ERROR:
+        {
+            ui->lStatusGPU->setText(tr("Start graphics client is impossible: GPU driver error, can't get GPUs list. Check that you have lastest version of driver for your GPU from offcial vendor site"));
+            break;
+        }
+
+    case GPU_STATE_READY:
+        {
+            if (gpus_info.empty())
+            {
+                break;
+            }
+
+            ui->cbListGPU->setEnabled(true);
+            start_viewer_allowed = true;
+
+            uint32_t max_score = 0;
+            int best_gpu_idx = -1;
+
+            for (size_t i = 0; i < gpus_info.size(); ++i)
+            {
+                auto &gpu_info = gpus_info[i];
+
+                if (gpu_info.score > max_score)
+                {
+                    max_score = gpu_info.score;
+                    best_gpu_idx = i;
+                }
+
+                ui->cbListGPU->addItem(gpu_info.deviceName);
+            }
+
+            connect(ui->cbListGPU, &QComboBox::currentIndexChanged, this, &MainWindow::slotUpdateInfoGPU);
+
+            ui->cbListGPU->setCurrentIndex(best_gpu_idx);            
+
+            slotUpdateInfoGPU(best_gpu_idx);
+
+            break;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::loadActiveTrainsList()
 {
     // TODO: Разные типы с size_t
@@ -622,6 +707,11 @@ void MainWindow::startSimulator()
 //------------------------------------------------------------------------------
 void MainWindow::startViewer(bool local)
 {
+    if (!start_viewer_allowed)
+    {
+        return;
+    }
+
     server_info_t server;
     if (local)
     {
@@ -1333,6 +1423,32 @@ void MainWindow::slotSaveTrainsConfigAsScenario()
     reloadScenariosList();
 
     ui->pbStartServer->setEnabled(!active_trains.empty());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotUpdateInfoGPU(int index)
+{
+    if (index < 0)
+    {
+        return;
+    }
+
+    if (index > gpus_info.size())
+    {
+        return;
+    }
+
+    ui->tbLogGPU->clear();
+    //ui->tbLogGPU->setMarkdown("|a|b|\n");
+    ui->tbLogGPU->setMarkdown("|-|-|\n");
+    ui->tbLogGPU->setMarkdown(tr("|GPU type|") + QString("%1|\n").arg(gpus_info[index].deviceType));
+    /*ui->tbLogGPU->insertPlainText(tr("Available VRAM: ") + QString("%1 MB").arg(gpus_info[index].vram_size));
+    ui->tbLogGPU->insertPlainText(tr("GPU driver version: ") + gpus_info[index].driverVersion);
+    ui->tbLogGPU->insertPlainText(tr("Vulkan API version: ") + gpus_info[index].apiVersion);
+    ui->tbLogGPU->insertPlainText(tr("VendorID: ") + QString("0x%1").arg(gpus_info[index].vendorID, 0, 16));
+    ui->tbLogGPU->insertPlainText(tr("DeviceID: ") + QString("0x%1").arg(gpus_info[index].deviceID, 0, 16));*/
 }
 
 //------------------------------------------------------------------------------

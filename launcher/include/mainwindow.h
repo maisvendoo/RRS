@@ -27,6 +27,7 @@
 #include    <route-info.h>
 #include    <active-train.h>
 #include    <server_info.h>
+#include    <gpu-info.h>
 #include    <CfgEditor.h>
 
 //------------------------------------------------------------------------------
@@ -204,6 +205,12 @@ private:
 
     void hideTrainsConfigsTip();
 
+    std::vector<gpu_info_t> gpus_info;
+
+    void gpuDiagnostics();
+
+    bool start_viewer_allowed = false;
+
 private slots:
 
     void slotRouteSelection();
@@ -267,6 +274,8 @@ private slots:
     void slotOnScenarioSelection(int cur_idx);
 
     void slotSaveTrainsConfigAsScenario();
+
+    void slotUpdateInfoGPU(int index);
 };
 
 
