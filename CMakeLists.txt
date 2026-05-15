@@ -32,6 +32,7 @@ add_subdirectory (sound-manager)
 add_subdirectory (viewer)
 
 add_subdirectory (route_editor)
+add_subdirectory (core)
 
 add_subdirectory (addons/passcar)
 add_subdirectory (addons/freightcar)
