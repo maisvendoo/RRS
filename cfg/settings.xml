@@ -39,7 +39,7 @@
         <!-- Размер мелкомасштабной сетки для отсечения видимости объектов маршрута, м -->
         <SmallScaleTileSize>32000.0</SmallScaleTileSize>
         <!-- Заголовок окна -->
-        <Name>viewer</Name>
+        <Name>Russian Railway Simulator (RRS)</Name>
         <!-- Оформление окна: 1 - отображение рамки и заголовка; 0 - режим окна без рамки -->
         <WindowDecoration>1</WindowDecoration>
         <!-- Положение окна, пикс. -->
@@ -49,7 +49,7 @@
         <Width>1280</Width>
         <Height>720</Height>
         <!-- Физическое устройство, выполняющее рендеринг (видеокарта) -->
-        <PhysicalDevice>-1</PhysicalDevice>
+        <PhysicalDevice>0</PhysicalDevice>
         <!-- Номер монитора; 0 для монитора по умолчанию -->
         <ScreenNumber>0</ScreenNumber>
         <!-- Полноэкранный режим: 1 - включен; 0 - оконный режим -->
