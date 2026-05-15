@@ -85,6 +85,53 @@ RouteViewer::~RouteViewer() = default;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void RouteViewer::checkPhysicalDeviceProperties()
+{
+    if (vsg::ref_ptr<vsg::Device> vulkan_device = window->getDevice())
+    {
+        if (const vsg::PhysicalDevice* phys_device = vulkan_device->getPhysicalDevice())
+        {
+            const VkPhysicalDeviceProperties& propeties = phys_device->getProperties();
+            auto device_type_to_string = [](VkPhysicalDeviceType device_type) -> const char* {
+                switch (device_type)
+                {
+                case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:    return "discrete";
+                case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:  return "integrated";
+                case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:     return "virtual";
+                case VK_PHYSICAL_DEVICE_TYPE_CPU:             return "CPU";
+                default:                                      return "<other_type>";
+                }
+            };
+
+            LOG_INFO("Using %s device: %s",
+                     device_type_to_string(propeties.deviceType),
+                     propeties.deviceName);
+
+            VkPhysicalDeviceMemoryProperties memory_properties;
+            vkGetPhysicalDeviceMemoryProperties(*phys_device, &memory_properties);
+            for (std::uint32_t heap_idx = 0; heap_idx < VK_MAX_MEMORY_HEAPS; ++heap_idx)
+            {
+                const std::uint64_t memory_size = memory_properties.memoryHeaps[heap_idx].size;
+                if (memory_size > 0)
+                {
+                    LOG_INFO("Device's memory[%u] size = %u MB", heap_idx, memory_size / 1024 / 1024);
+                }
+            }
+        }
+        else
+        {
+            LOG_WARN("WARN: No physical device");
+        }
+    }
+    else
+    {
+        LOG_WARN("WARN: No Vulkan device");
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initialize(int argc, char* argv[])
 {
     loadSettings();
@@ -116,46 +163,7 @@ void RouteViewer::initialize(int argc, char* argv[])
     initCommandGraph();
     initViewer();
 
-    if (vsg::ref_ptr<vsg::Device> vulkan_device = window->getDevice())
-    {
-        if (const vsg::PhysicalDevice* phys_device = vulkan_device->getPhysicalDevice())
-        {
-            const VkPhysicalDeviceProperties& propeties = phys_device->getProperties();
-            auto device_type_to_string = [](VkPhysicalDeviceType device_type) -> const char* {
-                switch (device_type)
-                {
-                    case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:    return "discrete";
-                    case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:  return "integrated";
-                    case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:     return "virtual";
-                    case VK_PHYSICAL_DEVICE_TYPE_CPU:             return "CPU";
-                    default:                                      return "<other_type>";
-                }
-            };
-
-            LOG_INFO("Using %s device: %s",
-                     device_type_to_string(propeties.deviceType),
-                     propeties.deviceName);
-
-            VkPhysicalDeviceMemoryProperties memory_properties;
-            vkGetPhysicalDeviceMemoryProperties(*phys_device, &memory_properties);
-            for (std::uint32_t heap_idx = 0; heap_idx < VK_MAX_MEMORY_HEAPS; ++heap_idx)
-            {
-                const std::uint64_t memory_size = memory_properties.memoryHeaps[heap_idx].size;
-                if (memory_size > 0)
-                {
-                    LOG_INFO("Device's memory[%u] size = %u MB", heap_idx, memory_size / 1024 / 1024);
-                }
-            }
-        }
-        else
-        {
-            LOG_WARN("WARN: No physical device");
-        }
-    }
-    else
-    {
-        LOG_WARN("WARN: No Vulkan device");
-    }
+    checkPhysicalDeviceProperties();
 
     vehicles_handler->set_camera_pos(&lookAt->eye);
 

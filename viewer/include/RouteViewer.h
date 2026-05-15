@@ -133,6 +133,7 @@ private:
     vsg::ref_ptr<vsg::RegionOfInterest>  shadow_region;
     vsg::ref_ptr<Sun>                    sun;
     vsg::ref_ptr<WorldCulling>           world_culling;
+void checkPhysicalDeviceProperties();
 };
 
 #endif // ROUTE_VIEWER_H
