@@ -54,6 +54,7 @@ private:
     static const   QString VIEW_DIST;
     static const   QString MAX_FPS;
     static const   QString PHYSICAL_DEVICE;
+    static const   QString SAMPLES;
 
     void loadGraphicsSettings(QString file_name);
 

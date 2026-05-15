@@ -391,6 +391,8 @@ void RouteViewer::initWindowTraits()
     windowTraits->swapchainPreferences.presentMode = settings.vsync ? VK_PRESENT_MODE_MAILBOX_KHR
                                                                     : VK_PRESENT_MODE_IMMEDIATE_KHR;
 
+    windowTraits->vulkanVersion = VK_API_VERSION_1_4;
+
     // auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create(); // VSG и так создает deviceFeatures по умолчанию
     // deviceFeatures->get().samplerAnisotropy = VK_TRUE;                                  // и выставляет samplerAnisotropy в true
 

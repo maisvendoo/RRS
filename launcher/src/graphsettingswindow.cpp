@@ -21,6 +21,7 @@ const   QString GraphSettingsWindow::NOTIFY_LEVEL = "NofifyLevel";
 const   QString GraphSettingsWindow::VIEW_DIST = "ViewDistance";
 const   QString GraphSettingsWindow::MAX_FPS = "MaxFPS";
 const   QString GraphSettingsWindow::PHYSICAL_DEVICE = "PhysicalDevice";
+const   QString GraphSettingsWindow::SAMPLES = "Samples";
 
 //------------------------------------------------------------------------------
 //
@@ -104,6 +105,11 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->sbDisplayNumber, &QSpinBox::valueChanged, this, [this](int){
         ui->pbGraphApply->setEnabled(true);
+    });
+
+    connect(ui->hsMSAA, &QSlider::valueChanged, this, [this](int){
+        ui->pbGraphApply->setEnabled(true);
+        ui->lMSAA->setText(QString("%1x").arg((1 << ui->hsMSAA->value())));
     });
 
     loadGraphicsSettings("settings");
@@ -237,6 +243,10 @@ void GraphSettingsWindow::loadGraphicsSettings(QString file_name)
         cfg.getDouble(secName, VIEW_DIST, view_dist);
         fd_list.append(QPair<QString, QVariant>(VIEW_DIST, view_dist));
 
+        int samples = 0;
+        cfg.getInt(secName, SAMPLES, samples);
+        fd_list.append(QPair<QString, QVariant>(SAMPLES, samples));
+
         updateGraphSettings(fd_list, ui);
     }
 }
@@ -268,6 +278,10 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
     ui->sbDisplayNumber->setValue(findSetting(SCREEN_NUM, fd_list).second.toInt());
 
     ui->sbViewDistance->setValue(findSetting(VIEW_DIST, fd_list).second.toInt());
+
+    int samples = findSetting(SAMPLES, fd_list).second.toInt();
+    int s = qRound(std::log2(samples));
+    ui->hsMSAA->setValue(s);
 
     ui->pbGraphApply->setEnabled(false);
 }
@@ -327,6 +341,10 @@ void GraphSettingsWindow::applyGraphSettings(FieldsDataList &fd_list,
 
     findSetting(VIEW_DIST, fd_list, idx);
     fd_list[idx] = QPair<QString, QVariant>(VIEW_DIST, ui->sbViewDistance->value());
+
+    findSetting(SAMPLES, fd_list, idx);
+    int samples = (1 << ui->hsMSAA->value());
+    fd_list[idx] = QPair<QString, QVariant>(SAMPLES, samples);
 }
 
 //------------------------------------------------------------------------------
