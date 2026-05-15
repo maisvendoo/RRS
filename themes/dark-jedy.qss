@@ -5,6 +5,7 @@ QWidget {
 
 QPushButton {
 	background-color: #00aa00;
+	color: #ffffff; /* Добавил цвет текста для кнопки */
 }
 
 QPushButton::pressed {
@@ -13,12 +14,14 @@ QPushButton::pressed {
 
 QPushButton::disabled {
 	background-color: #606060;
+	color: #888888; /* Добавил цвет текста для неактивной кнопки */
 }
 
 QListWidget {
 	background-color: #606060;
 }
 
+/* Выделение пункта в списке (например, в выборе маршрута) */
 QListWidget::item:selected {
 	background-color: #ffb140;
 	color: #000000;
@@ -40,12 +43,16 @@ QDoubleSpinBox {
 	background-color: #606060;
 }
 
+/* --- Главное меню (Вкладки) --- */
 QTabBar::tab:selected {
-	background: #ffb140;
+	/* Принудительно оранжевый фон для активной вкладки */
+	background: #ffb140; 
+	color: #000000; /* Черный текст для контраста на оранжевом */
 }
 
 QTabBar::tab:!selected {
 	background: #606060;
+	color: #ffffff;
 }
 
 QToolBox::tab {
@@ -56,10 +63,44 @@ QTabWidget::pane {
 	border: 0; 
 }
 
+/* --- Настройки QComboBox (Выпадающие списки) --- */
 QComboBox {
 	background-color: #606060;
+	color: #ffffff;
+	/* Граница, чтобы выделить сам блок */
+	border: 1px solid #404040; 
+	padding: 2px;
+}
+
+/* Когда комбобокс активен (нажат), он становится оранжевым */
+QComboBox:focus {
+    background-color: #ffb140;
+    color: #000000;
+}
+
+/* Выделение элемента внутри выпадающего списка комбобокса */
+QComboBox QAbstractItemView::item:selected {
+    background-color: #ffb140;
+    color: #000000;
+}
+
+/* Стиль стрелочки комбобокса (опционально, чтобы вписывалась) */
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
 }
 
 QDateTimeEdit::disabled {
 	color: #888888;
+}
+
+QToolButton:checked {
+    background-color: #ffb140;
+    color: #000000;
+}
+
+/* Если "Settings" это элемент меню */
+QMenuBar::item:selected {
+    background-color: #ffb140;
+    color: #000000;
 }
