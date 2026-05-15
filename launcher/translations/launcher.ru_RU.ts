@@ -4,252 +4,188 @@
 <context>
     <name>GraphSettingsWindow</name>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="23"/>
         <source>Graphics settings</source>
-        <translation>Графические настройки</translation>
+        <translation type="vanished">Графические настройки</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="32"/>
         <source>Current GPU</source>
-        <translation>Текущий графический процессор</translation>
+        <translation type="vanished">Текущий графический процессор</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="51"/>
         <source>Window settings</source>
-        <translation>Настройки окна</translation>
+        <translation type="vanished">Настройки окна</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="106"/>
         <source>X</source>
-        <translation>X</translation>
+        <translation type="vanished">X</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="156"/>
         <source>Fullscreen</source>
-        <translation>Полноэкранный режим</translation>
+        <translation type="vanished">Полноэкранный режим</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="163"/>
         <source>Window decoration</source>
-        <translation>Заголовок окна</translation>
+        <translation type="vanished">Заголовок окна</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="175"/>
         <source>Display number</source>
-        <translation>Номер монитора</translation>
+        <translation type="vanished">Номер монитора</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="208"/>
         <source>FPS limit</source>
-        <translation>Ограничивать FPS</translation>
+        <translation type="vanished">Ограничивать FPS</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="251"/>
         <source>View settings</source>
-        <translation>Настройки отображения</translation>
+        <translation type="vanished">Настройки отображения</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="262"/>
         <source>View distanse, m</source>
-        <translation>Дистанция видимости, м</translation>
+        <translation type="vanished">Дистанция видимости, м</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="292"/>
         <source>Apply</source>
-        <translation>Применить</translation>
+        <translation type="vanished">Применить</translation>
     </message>
     <message>
-        <location filename="../forms/graphsettingswindow.ui" line="299"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="vanished">Отмена</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../forms/mainwindow.ui" line="14"/>
-        <source>Russian Railway Simulator</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../forms/mainwindow.ui" line="31"/>
         <source>Local server</source>
-        <translation>Локальный сервер</translation>
+        <translation type="vanished">Локальный сервер</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="53"/>
         <source>Change route</source>
-        <translation>Выбор маршрута</translation>
+        <translation type="vanished">Выбор маршрута</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="98"/>
         <source>Route description</source>
-        <translation>Описание маршрута</translation>
+        <translation type="vanished">Описание маршрута</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="132"/>
         <source>Change train</source>
-        <translation>Выбор поезда</translation>
+        <translation type="vanished">Выбор поезда</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="177"/>
         <source>Train description</source>
-        <translation>Описание поезда</translation>
+        <translation type="vanished">Описание поезда</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="224"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="vanished">Добавить</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="231"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="vanished">Удалить</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="244"/>
         <source>Start date</source>
-        <translation>Дата страта</translation>
+        <translation type="vanished">Дата страта</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="260"/>
-        <location filename="../forms/mainwindow.ui" line="299"/>
         <source>Manually</source>
-        <translation>Вручную</translation>
+        <translation type="vanished">Вручную</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="270"/>
         <source>yyyy.MM.dd</source>
-        <translation>гггг.ММ.дд</translation>
+        <translation type="vanished">гггг.ММ.дд</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="283"/>
         <source>Start time</source>
-        <translation>Время старта</translation>
+        <translation type="vanished">Время старта</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="306"/>
         <source>HH:mm</source>
-        <translation>ЧЧ:мм</translation>
+        <translation type="vanished">ЧЧ:мм</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="319"/>
         <source>Scenarios</source>
-        <translation>Сценарии</translation>
+        <translation type="vanished">Сценарии</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="338"/>
         <source>Scenario description</source>
-        <translation>Описание сценария</translation>
+        <translation type="vanished">Описание сценария</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="377"/>
         <source>Active trains</source>
-        <translation>Ативные поезда игрока</translation>
+        <translation type="vanished">Ативные поезда игрока</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="402"/>
         <source>Senario name</source>
-        <translation>Введите имя сценария</translation>
+        <translation type="vanished">Введите имя сценария</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="422"/>
         <source>Save date and time</source>
-        <translation>Сохранить дату и время</translation>
+        <translation type="vanished">Сохранить дату и время</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="438"/>
         <source>Save as scenario</source>
-        <translation>Сохранить</translation>
+        <translation type="vanished">Сохранить</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="503"/>
-        <location filename="../forms/mainwindow.ui" line="873"/>
         <source>Start viewer</source>
-        <translation>Запуск вьювера</translation>
+        <translation type="vanished">Запуск вьювера</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="510"/>
         <source>Start viewer automatically</source>
-        <translation>Запуск вьювера автоматически</translation>
+        <translation type="vanished">Запуск вьювера автоматически</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="539"/>
         <source>Start route map</source>
-        <translation>Запуск карты</translation>
+        <translation type="vanished">Запуск карты</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="546"/>
         <source>Start route map automatically</source>
-        <translation>Запуск карты автоматически</translation>
+        <translation type="vanished">Запуск карты автоматически</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="575"/>
-        <location filename="../src/mainwindow.cpp" line="1102"/>
+        <location filename="../src/mainwindow.cpp" line="1104"/>
         <source>Start server</source>
         <translation>Запуск сервера</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="587"/>
         <source>Connect to server</source>
-        <translation>Подключение к серверу</translation>
+        <translation type="vanished">Подключение к серверу</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="621"/>
         <source>Network connections settings</source>
-        <translation>Настройки сетевого соединения</translation>
+        <translation type="vanished">Настройки сетевого соединения</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="632"/>
         <source>Saved servers</source>
-        <translation>Сохраненные серверы</translation>
+        <translation type="vanished">Сохраненные серверы</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="655"/>
         <source>Server name</source>
-        <translation>Имя сервера</translation>
+        <translation type="vanished">Имя сервера</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="680"/>
         <source>Save server</source>
-        <translation>Сохранить сервер</translation>
+        <translation type="vanished">Сохранить сервер</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="702"/>
         <source>IP address and port</source>
-        <translation>IP-адрес и порт</translation>
+        <translation type="vanished">IP-адрес и порт</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="735"/>
-        <location filename="../forms/mainwindow.ui" line="766"/>
-        <location filename="../forms/mainwindow.ui" line="797"/>
-        <source>.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../forms/mainwindow.ui" line="828"/>
-        <source>:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../forms/mainwindow.ui" line="899"/>
         <source>Start map</source>
-        <translation>Запуск карты</translation>
+        <translation type="vanished">Запуск карты</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="976"/>
         <source>Settings</source>
-        <translation>Настройки</translation>
+        <translation type="vanished">Настройки</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="984"/>
         <source>Graphics settings</source>
-        <translation>Графические настройки</translation>
+        <translation type="vanished">Графические настройки</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="989"/>
         <source>Network settings</source>
-        <translation>Сетевые настройки</translation>
+        <translation type="vanished">Сетевые настройки</translation>
     </message>
     <message>
         <source>Window size</source>
@@ -302,43 +238,43 @@
         <translation>Расположение поездов определяется сценарием</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="543"/>
+        <location filename="../src/mainwindow.cpp" line="551"/>
         <source>Start graphics client is impossible: missing Vulkan loader in your system. Check that you have lastest version of driver for your GPU from offcial vendor site.</source>
         <translation>Запустить графический клиент невозможно: в вашей системе отсутствует загрузчик Vulkan. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="548"/>
+        <location filename="../src/mainwindow.cpp" line="556"/>
         <source>Start graphics client is impossible: can not create vkInstance. Check that you have lastest version of driver for your GPU from offcaial vendor site.</source>
         <translation>Запустить графический клиент невозможно: не удается создать vkInstance. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="554"/>
+        <location filename="../src/mainwindow.cpp" line="562"/>
         <source>Start graphics client is impossible: GPU driver error, can&apos;t get information about GPUs. Check that you have lastest version of driver for your GPU from offcial vendor site</source>
         <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить информацию о графических процессорах. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="560"/>
+        <location filename="../src/mainwindow.cpp" line="568"/>
         <source>Start graphics client is impossible: not find GPU devices capable with Vulkan API.</source>
         <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить список графических процессоров. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="566"/>
+        <location filename="../src/mainwindow.cpp" line="574"/>
         <source>Start graphics client is impossible: GPU driver error, can&apos;t get GPUs list. Check that you have lastest version of driver for your GPU from offcial vendor site</source>
         <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить список графических процессоров. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1044"/>
+        <location filename="../src/mainwindow.cpp" line="1046"/>
         <source>Stop server</source>
         <translation>Остановить сервер</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1201"/>
-        <location filename="../src/mainwindow.cpp" line="1227"/>
+        <location filename="../src/mainwindow.cpp" line="1203"/>
+        <location filename="../src/mainwindow.cpp" line="1229"/>
         <source>Save Server</source>
         <translation>Сохранить сервер</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1208"/>
+        <location filename="../src/mainwindow.cpp" line="1210"/>
         <source>Rewrite Server</source>
         <translation>Перезаписать сервер</translation>
     </message>

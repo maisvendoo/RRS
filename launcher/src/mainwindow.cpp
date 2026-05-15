@@ -528,42 +528,50 @@ void MainWindow::hideTrainsConfigsTip()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QString getCenteredHtml(QString msg)
+{
+    return QString("<p style='text-align: center;'>%1</p>").arg(msg);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::gpuDiagnostics()
 {
     // Получаем список GPU
     auto status = getInfoGPUs(gpus_info);
 
     start_viewer_allowed = false;
-    ui->lStatusGPU->clear();
+    ui->tbLogGPU->clear();
 
     switch (status)
     {
     case GPU_STATE_VULKAN_LOADER_NOT_FOUND_ERROR:
         {
-            ui->lStatusGPU->setText(tr("Start graphics client is impossible: missing Vulkan loader in your system. Check that you have lastest version of driver for your GPU from offcial vendor site."));
+            ui->tbLogGPU->setHtml(getCenteredHtml(tr("Start graphics client is impossible: missing Vulkan loader in your system. Check that you have lastest version of driver for your GPU from offcial vendor site.")));
             break;
         }
     case GPU_STATE_VK_INSTANCE_ERROR:
         {
-            ui->lStatusGPU->setText(tr("Start graphics client is impossible: can not create vkInstance. Check that you have lastest version of driver for your GPU from offcaial vendor site."));
+            ui->tbLogGPU->setHtml(getCenteredHtml(tr("Start graphics client is impossible: can not create vkInstance. Check that you have lastest version of driver for your GPU from offcaial vendor site.")));
             break;
         }
 
     case GPU_STATE_VK_ENUM_PHYSICAL_DEVICE_ERROR:
         {
-            ui->lStatusGPU->setText(tr("Start graphics client is impossible: GPU driver error, can't get information about GPUs. Check that you have lastest version of driver for your GPU from offcial vendor site"));
+            ui->tbLogGPU->setHtml(getCenteredHtml(tr("Start graphics client is impossible: GPU driver error, can't get information about GPUs. Check that you have lastest version of driver for your GPU from offcial vendor site")));
             break;
         }
 
     case GPU_STATE_NO_CAPABLE_DEVICES_ERROR:
         {
-            ui->lStatusGPU->setText(tr("Start graphics client is impossible: not find GPU devices capable with Vulkan API."));
+            ui->tbLogGPU->setHtml(getCenteredHtml(tr("Start graphics client is impossible: not find GPU devices capable with Vulkan API.")));
             break;
         }
 
     case GPU_STATE_GET_DEVICES_LIST_ERROR:
         {
-            ui->lStatusGPU->setText(tr("Start graphics client is impossible: GPU driver error, can't get GPUs list. Check that you have lastest version of driver for your GPU from offcial vendor site"));
+            ui->tbLogGPU->setHtml(getCenteredHtml(tr("Start graphics client is impossible: GPU driver error, can't get GPUs list. Check that you have lastest version of driver for your GPU from offcial vendor site")));
             break;
         }
 
@@ -574,13 +582,7 @@ void MainWindow::gpuDiagnostics()
                 break;
             }
 
-            start_viewer_allowed = true;            
-
-            for (size_t i = 0; i < gpus_info.size(); ++i)
-            {
-                auto &gpu_info = gpus_info[i];
-            }
-
+            start_viewer_allowed = true;
             graphSettingsWindow->setSettingsGPU(gpus_info);
 
             break;
