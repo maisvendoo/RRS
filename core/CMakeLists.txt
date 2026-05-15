@@ -17,22 +17,14 @@ target_sources(core
         src/load_module.cpp
         src/string_funcs.cpp
 
-    PRIVATE
-        FILE_SET private_headers
-        TYPE HEADERS
-        BASE_DIRS
-            include
-        FILES
-            include/core/module_export.h
-
     PUBLIC
-        FILE_SET public_headers
-        TYPE HEADERS
+        FILE_SET HEADERS
         BASE_DIRS
             include
         FILES
             include/core/get_module.h
             include/core/load_module.h
+            include/core/module_export.h
             include/core/string_funcs.h
 )
 
