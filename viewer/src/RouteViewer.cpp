@@ -190,22 +190,39 @@ int RouteViewer::run()
         }
     }
 
-    // Главный цикл рендеринга
     using clock = std::chrono::steady_clock;
-    // Frame limiter only needed when vsync is off — FIFO already caps at refresh rate
-    const auto frame_duration = (!settings.vsync && settings.max_fps > 0)
-        ? std::chrono::duration_cast<std::chrono::microseconds>(
-              std::chrono::duration<double>(1.0 / settings.max_fps))
-        : std::chrono::microseconds(0);
+    using namespace std::chrono;
+
+    auto target_frame_time = microseconds(0);
+    if (!settings.vsync && settings.max_fps > 0)
+    {
+        target_frame_time = duration_cast<microseconds>(duration<double>(1.0 / settings.max_fps));
+    }
+
+    auto next_frame_time = clock::now();
 
     while (viewer->advanceToNextFrame())
     {
         try
         {
+            // Ждём до точного времени начала кадра (с коррекцией дрифта)
+            if (target_frame_time.count() > 0)
+            {
+                auto now = clock::now();
+                if (now < next_frame_time)
+                {
+                    std::this_thread::sleep_until(next_frame_time);
+                }
+                else
+                {
+                    // Пропустили кадр — сбрасываем таймер, чтобы не копить отставание
+                    next_frame_time = now;
+                }
+            }
+
             auto frame_start = clock::now();
 
             QApplication::processEvents();
-
             viewer->handleEvents();
             viewer->update();
 
@@ -217,13 +234,16 @@ int RouteViewer::run()
             viewer->recordAndSubmit();
             viewer->present();
 
-            // Frame limiter — only when vsync is off (FIFO already caps at refresh rate)
-            if (frame_duration.count() > 0)
+            // Планируем следующий кадр
+            if (target_frame_time.count() > 0)
             {
-                auto elapsed = clock::now() - frame_start;
-                if (elapsed < frame_duration)
+                next_frame_time += target_frame_time;
+
+                // Защита от спирали отставания
+                auto now = clock::now();
+                if (next_frame_time < now)
                 {
-                    std::this_thread::sleep_for(frame_duration - elapsed);
+                    next_frame_time = now;
                 }
             }
         }
@@ -238,43 +258,7 @@ int RouteViewer::run()
             break;
         }
     }
-/*
-    // Report dedup stats from all database pagers
-    for (auto& task : viewer->recordAndSubmitTasks)
-    {
-        if (auto pager = task->databasePager.cast<AnimatedDatabasePager>())
-        {
-            pager->reportDedupStats();
-        }
-    }
 
-    // Report shared objects stats
-    if (options && options->sharedObjects)
-    {
-        struct Logger_VSG_to_RRS : public vsg::Logger
-        {
-            void debug_implementation(const std::string_view& message) override
-            {::LOG_DEBUG("%.*s", static_cast<int>(message.length()), message.data());}
-
-            void info_implementation(const std::string_view& message) override
-            {::LOG_INFO("%.*s", static_cast<int>(message.length()), message.data());}
-
-            void warn_implementation(const std::string_view& message) override
-            {::LOG_WARN("%.*s", static_cast<int>(message.length()), message.data());}
-
-            void error_implementation(const std::string_view& message) override
-            {::LOG_ERROR("%.*s", static_cast<int>(message.length()), message.data());}
-
-            void fatal_implementation(const std::string_view& message) override
-            {::LOG_FATAL("%.*s", static_cast<int>(message.length()), message.data());}
-        };
-
-        LOG_INFO("=== SharedObjects report ===");
-        vsg::LogOutput output;
-        output.logger = new Logger_VSG_to_RRS;
-        options->sharedObjects->report(output);
-    }
-*/
     return 0;
 }
 
