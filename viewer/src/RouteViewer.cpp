@@ -381,8 +381,6 @@ void RouteViewer::initWindowTraits()
     windowTraits->swapchainPreferences.presentMode = settings.vsync ? VK_PRESENT_MODE_MAILBOX_KHR
                                                                     : VK_PRESENT_MODE_IMMEDIATE_KHR;
 
-    windowTraits->vulkanVersion = VK_API_VERSION_1_4;
-
     // auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create(); // VSG и так создает deviceFeatures по умолчанию
     // deviceFeatures->get().samplerAnisotropy = VK_TRUE;                                  // и выставляет samplerAnisotropy в true
 
@@ -398,7 +396,6 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
     try
     {
         window = vsg::Window::create(windowTraits);
-
         // Получаем инстанс Vulkan от созданного окна
         auto instance = window->getOrCreateInstance();
         // ОБЯЗАТЕЛЬНО создаем поверхность рендеринга!!!
@@ -412,8 +409,10 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
             settings.physical_device = 0;
         }
 
+        auto physDev = physDevs[settings.physical_device];
+
         // Устанавливаем устройство из настроек
-        window->setPhysicalDevice(physDevs[settings.physical_device]);
+        window->setPhysicalDevice(physDev);
 
         lockAltSound(window.get());
     }
