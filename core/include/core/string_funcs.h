@@ -1,5 +1,5 @@
-#ifndef STRING_FUNCS_H
-#define STRING_FUNCS_H
+#ifndef CORE_STRING_FUNCS_H
+#define CORE_STRING_FUNCS_H
 
 #include <QString>
 
@@ -15,4 +15,4 @@ QString to_qstring(const QString& str);
 bool string_is_empty(std::string_view str);
 bool string_is_empty(const QString& str);
 
-#endif // STRING_FUNCS_H
+#endif // CORE_STRING_FUNCS_H

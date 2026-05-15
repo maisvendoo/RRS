@@ -8,17 +8,31 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Qt6 COMPONENTS Core REQUIRED)
 
+add_definitions(-DMODULE_LIB)
+
 add_library(core STATIC)
 
 target_sources(core
     PRIVATE
+        src/load_module.cpp
         src/string_funcs.cpp
 
-    PUBLIC
-        FILE_SET HEADERS
+    PRIVATE
+        FILE_SET private_headers
+        TYPE HEADERS
         BASE_DIRS
             include
         FILES
+            include/core/module_export.h
+
+    PUBLIC
+        FILE_SET public_headers
+        TYPE HEADERS
+        BASE_DIRS
+            include
+        FILES
+            include/core/get_module.h
+            include/core/load_module.h
             include/core/string_funcs.h
 )
 

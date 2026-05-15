@@ -1,0 +1,4 @@
+#ifndef CORE_LOAD_MODULE_H
+#define CORE_LOAD_MODULE_H
+
+#endif // CORE_LOAD_MODULE_H
