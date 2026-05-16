@@ -24,6 +24,7 @@ const   QString GraphSettingsWindow::VIEW_DIST = "ViewDistance";
 const   QString GraphSettingsWindow::MAX_FPS = "MaxFPS";
 const   QString GraphSettingsWindow::PHYSICAL_DEVICE = "PhysicalDevice";
 const   QString GraphSettingsWindow::SAMPLES = "Samples";
+const   QString GraphSettingsWindow::DEPTH_FORMAT = "depthFormat";
 
 //------------------------------------------------------------------------------
 //
@@ -114,7 +115,19 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
         ui->lMSAA->setText(QString("%1x").arg((1 << ui->hsMSAA->value())));
     });
 
+    connect(ui->cbDepthDetails, &QComboBox::currentIndexChanged, this, [this](int){
+        ui->pbGraphApply->setEnabled(true);
+    });
+
     loadGraphicsSettings("settings");
+
+    ui->cbDepthDetails->addItem(tr("Low (performance)"));
+    ui->cbDepthDetails->addItem(tr("Default"));
+    ui->cbDepthDetails->addItem(tr("High"));
+    ui->cbDepthDetails->addItem(tr("Ultra"));
+
+    connect(ui->cbListGPU, &QComboBox::currentIndexChanged,
+            this, &GraphSettingsWindow::slotOnChangeCurrentGPU);
 }
 
 //------------------------------------------------------------------------------
@@ -161,9 +174,7 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
         ui->cbListGPU->setCurrentIndex(best_gpu_idx);
         current_gpu_idx = best_gpu_idx;
 
-        applyGraphSettings(fd_list, ui);
-
-        updateGraphSettings(fd_list, ui);
+        setDefaultSettingsForChangedGPU(current_gpu_idx);
 
         // Сохраняем настройки
         saveGraphSettings(fd_list);
@@ -183,9 +194,6 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
     {
         return;
     }
-
-    connect(ui->cbListGPU, &QComboBox::currentIndexChanged,
-            this, &GraphSettingsWindow::slotOnChangeCurrentGPU);
 }
 
 //------------------------------------------------------------------------------
@@ -261,6 +269,10 @@ void GraphSettingsWindow::loadGraphicsSettings(QString file_name)
         cfg.getInt(secName, SAMPLES, samples);
         fd_list.append(QPair<QString, QVariant>(SAMPLES, samples));
 
+        int depthFormat = 0;
+        cfg.getInt(secName, DEPTH_FORMAT, depthFormat);
+        fd_list.append(QPair<QString, QVariant>(DEPTH_FORMAT, depthFormat));
+
         updateGraphSettings(fd_list, ui);
     }
 }
@@ -296,6 +308,8 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
     int samples = findSetting(SAMPLES, fd_list).second.toInt();
     int s = qRound(std::log2(samples));
     ui->hsMSAA->setValue(s);
+
+    ui->cbDepthDetails->setCurrentIndex(findSetting(DEPTH_FORMAT, fd_list).second.toInt());
 
     ui->pbGraphApply->setEnabled(false);
 }
@@ -359,6 +373,9 @@ void GraphSettingsWindow::applyGraphSettings(FieldsDataList &fd_list,
     findSetting(SAMPLES, fd_list, idx);
     int samples = (1 << ui->hsMSAA->value());
     fd_list[idx] = QPair<QString, QVariant>(SAMPLES, samples);
+
+    findSetting(DEPTH_FORMAT, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(DEPTH_FORMAT, ui->cbDepthDetails->currentIndex());
 }
 
 //------------------------------------------------------------------------------
@@ -384,8 +401,21 @@ void GraphSettingsWindow::showEvent(QShowEvent *event)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void GraphSettingsWindow::setDefaultSettingsForChangedGPU(int gpu_idx)
+{
+    auto &gpu_info = gpus_info[gpu_idx];
+    ui->cbDepthDetails->setCurrentIndex(gpu_info.depthFormat);
+
+    applyGraphSettings(fd_list, ui);
+    updateGraphSettings(fd_list, ui);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void GraphSettingsWindow::slotOnChangeCurrentGPU(int idx)
 {
+    setDefaultSettingsForChangedGPU(idx);
     ui->pbGraphApply->setEnabled(true);
 }
 

@@ -48,6 +48,7 @@ struct settings_t final
 
     bool double_buffer = true;  ///< Set/unset double buffering
     int samples = 1;            ///< Set number of antialiasing samples
+    int depthFormat = 1;        ///< Set depth buffer format
     int max_fps = 60;           ///< Maximum frames per second (0 = unlimited)
 
     bool shadow = false;                        ///< Shadow flag

@@ -333,6 +333,26 @@ void RouteViewer::initVsgOptions()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+VkFormat getDepthFormat(int idx)
+{
+    switch (idx)
+    {
+    case 0:
+        return VK_FORMAT_D16_UNORM;
+    case 1:
+        return VK_FORMAT_D24_UNORM_S8_UINT;
+    case 2:
+        return VK_FORMAT_D32_SFLOAT;
+    case 3:
+        return VK_FORMAT_D32_SFLOAT_S8_UINT;
+    }
+
+    return VK_FORMAT_D16_UNORM;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::initWindowTraits()
 {
     auto samples_bit_flag = [](int s) -> VkSampleCountFlags
@@ -370,6 +390,8 @@ void RouteViewer::initWindowTraits()
     windowTraits->windowTitle = settings.name;
     windowTraits->decoration = settings.window_decoration;
     windowTraits->samples = samples_bit_flag(settings.samples);
+
+    windowTraits->depthFormat = getDepthFormat(settings.depthFormat);
 
     windowTraits->debugLayer = settings.enableDebugLayer;
     windowTraits->debugUtils = settings.enableDebugUtils;

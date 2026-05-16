@@ -106,6 +106,7 @@ void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 
     cfg.getBool(section, "DoubleBuffer", settings.double_buffer);
     cfg.getInt(section, "Samples", settings.samples);
+    cfg.getInt(section, "depthFormat", settings.depthFormat);
 
     cfg.getInt(section, "MaxFPS", settings.max_fps);
 

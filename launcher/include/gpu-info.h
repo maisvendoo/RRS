@@ -18,6 +18,7 @@ struct gpu_info_t
     QString                 driverVersion = "";
     uint64_t                vram_size = 0;
     uint32_t                framebufferColorSamplesCounts = 0;
+    int                     depthFormat = 0;
 
     /// Эвристический рейтинг данного GPU, для последующего
     /// автоматического выбора самого мощного

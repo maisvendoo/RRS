@@ -166,6 +166,26 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
         // Доступный уровень сглаживания MSAA
         gpu_info.framebufferColorSamplesCounts = props.limits.framebufferColorSampleCounts;
 
+        // Определяем настройку буфера глубины
+        VkFormatProperties formatProps{};
+        vkGetPhysicalDeviceFormatProperties(physDev, VK_FORMAT_D24_UNORM_S8_UINT, &formatProps);
+
+        // старое железо/ZDS-говнобуки
+        if (!(formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT))
+        {
+            gpu_info.depthFormat = 0;
+        }
+        else if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
+                 props.limits.maxMemoryAllocationCount > 4096)
+        {
+            // добрая железяка с > 4Гб VRAM
+            gpu_info.depthFormat = 2;
+        }
+        else // нормальный середнячек
+        {
+            gpu_info.depthFormat = 1;
+        }
+
         // Присваиваем рейтинг по типу GPU
         if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
         {

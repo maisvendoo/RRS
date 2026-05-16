@@ -55,6 +55,7 @@ private:
     static const   QString MAX_FPS;
     static const   QString PHYSICAL_DEVICE;
     static const   QString SAMPLES;
+    static const   QString DEPTH_FORMAT;
 
     void loadGraphicsSettings(QString file_name);
 
@@ -67,6 +68,8 @@ private:
     void saveGraphSettings(FieldsDataList &fd_list);
 
     void showEvent(QShowEvent *event) override;
+
+    void setDefaultSettingsForChangedGPU(int gpu_idx);
 
 private slots:
 
