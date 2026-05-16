@@ -69,7 +69,7 @@ private:
 
     void showEvent(QShowEvent *event) override;
 
-    void setDefaultSettingsForChangedGPU(int gpu_idx);
+    void setDefaultSettingsForChangedGPU(int gpu_idx);    
 
 private slots:
 
