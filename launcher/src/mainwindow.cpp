@@ -159,7 +159,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->actionGraphics_settings, &QAction::triggered, this, [this](){
         graphSettingsWindow->show();
-    });
+    });    
 }
 
 //------------------------------------------------------------------------------
@@ -580,6 +580,43 @@ void MainWindow::gpuDiagnostics()
             if (gpus_info.empty())
             {
                 break;
+            }
+
+            // последний рубеж - проверка версии ОС. На тот случай, когда устройство
+            // надежно детектируется как Vulkan-совместимое, но на заведомо совместимом обрудовании
+            // не запускает и падает вьювер, а драйверы не хотят устанавливаться
+            // жалуясь на версию ОС.
+            // TODO: протестировать это!!! иначе огребем от юзеров по полной!
+            size_t valid_gpus_count = 0;
+            size_t invalid_gpus_count = 0;
+            std::vector<size_t> devices_with_problems;
+
+            for (size_t i = 0; i < gpus_info.size(); ++i)
+            {
+                if (checkOperationSystemVersion(gpus_info[i].vendorID, gpus_info[i].nameOS))
+                {
+                    ++valid_gpus_count;
+                }
+                else
+                {
+                    devices_with_problems.push_back(i);
+                }
+            }
+
+            if (valid_gpus_count == 0)
+            {
+                ui->tbLogGPU->setHtml(getCenteredHtml(tr("Start graphics client is impossible: You operation system %1 is not capable with modern direvers of all your devices. Please, update you operation system").arg(gpus_info[0].nameOS)));
+                return;
+            }
+
+            if (!devices_with_problems.empty())
+            {
+                QString devList = "";
+                for (auto i : devices_with_problems)
+                {
+                    devList += gpus_info[i].deviceName + ", ";
+                    ui->tbLogGPU->setHtml(getCenteredHtml(tr("WARNING: You devices ") + devList + tr(" may have a problems with start graphics client, becourse modern drivers for them not capable with your OS version")));
+                }
             }
 
             start_viewer_allowed = true;

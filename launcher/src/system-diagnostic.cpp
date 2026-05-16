@@ -1,6 +1,44 @@
 #include    <system-diagnostic.h>
 #include    <volk.h>
 
+#include    <QOperatingSystemVersion>
+#include    <QSysInfo>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool checkOperationSystemVersion(uint32_t vendorID, QString &productName)
+{
+#ifdef Q_OS_WIN
+
+    auto currentOS = QOperatingSystemVersion::current();
+    productName = QSysInfo::prettyProductName();
+
+    if (currentOS.majorVersion() < 10)
+    {
+        return false;
+    }
+
+    int buildNumber = currentOS.microVersion();
+
+    switch (vendorID)
+    {
+    case VID_NVIDIA:
+    case VID_AMD:
+        return (buildNumber >= 19041);
+
+    case VID_INTEL:
+        return (buildNumber >= 19045);
+    }
+
+    return true;
+
+#else
+    // Для нормальных операционных систем проблем быть не должно
+    return true;
+#endif
+}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -89,7 +127,7 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
     if (result != VK_SUCCESS)
     {
         return GPU_STATE_GET_DEVICES_LIST_ERROR;
-    }
+    }    
 
     // Смотрим что за видюхи нашлись
     for (size_t i = 0; i < deviceCount; ++i)
@@ -140,7 +178,8 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
         gpu_info_t gpu_info;
         gpu_info.deviceName = QString(props.deviceName);
         gpu_info.deviceType = QString(deviceTypeToStr(props.deviceType));
-        gpu_info.vendorID = props.vendorID;
+        gpu_info.vendorID = props.vendorID;        
+
         gpu_info.deviceID = props.deviceID;
 
         gpu_info.apiVersion = QString("%1.%2.%3")
@@ -225,6 +264,11 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
         if (coreFeat2.features.multiDrawIndirect)   gpu_info.score += 20;
         if (coreFeat2.features.fillModeNonSolid)    gpu_info.score += 15;
         if (coreFeat2.features.wideLines)           gpu_info.score += 15;
+    }    
+
+    if (instance != VK_NULL_HANDLE)
+    {
+        vkDestroyInstance(instance, nullptr);
     }
 
     return GPU_STATE_READY;

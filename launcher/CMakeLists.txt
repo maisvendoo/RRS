@@ -37,7 +37,6 @@ qt_wrap_ui(UI_HEADERS ${FORMS})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Компиляция приложения
-
 if (WIN32)
     add_executable (${TARGET} WIN32 ${SOURCES_CPP} ${SOURCES_C} ${INCLUDES} ${UI_HEADERS} ${TS_FILES} ${RESOURCES})
 else()
@@ -58,4 +57,6 @@ target_link_libraries (${TARGET} Qt6::Widgets)
 target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} CfgEditor)
 target_link_libraries (${TARGET} filesystem)
+
+
 
