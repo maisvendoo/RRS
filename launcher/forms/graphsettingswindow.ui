@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>397</width>
+    <width>400</width>
     <height>774</height>
    </rect>
   </property>
@@ -18,6 +18,18 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>774</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>400</width>
+    <height>774</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Graphics settings</string>
@@ -380,7 +392,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="cbSwadowsQuality"/>
+            <widget class="QComboBox" name="cbSwadowsQuality">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -395,7 +411,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="cbShadowsMap"/>
+          <widget class="QComboBox" name="cbShadowsMap">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -420,6 +440,9 @@
          </item>
          <item>
           <widget class="QSlider" name="hsShadowsCascades">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="minimum">
             <number>1</number>
            </property>
@@ -454,6 +477,9 @@
          </item>
          <item>
           <widget class="QSlider" name="hsShadowsDistance">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="minimum">
             <number>20</number>
            </property>

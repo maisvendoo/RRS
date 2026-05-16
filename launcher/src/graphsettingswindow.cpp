@@ -25,6 +25,11 @@ const   QString GraphSettingsWindow::MAX_FPS = "MaxFPS";
 const   QString GraphSettingsWindow::PHYSICAL_DEVICE = "PhysicalDevice";
 const   QString GraphSettingsWindow::SAMPLES = "Samples";
 const   QString GraphSettingsWindow::DEPTH_FORMAT = "depthFormat";
+const   QString GraphSettingsWindow::SHADOW = "Shadow";
+const   QString GraphSettingsWindow::SHADOWS_PRESET = "ShadowsPreset";
+const   QString GraphSettingsWindow::SHADOW_DISTANCE = "ShadowDistance";
+const   QString GraphSettingsWindow::SHADOW_CASCADE = "ShadowCascade";
+const   QString GraphSettingsWindow::SHADOW_RESOLUTION = "ShadowResolution";
 
 //------------------------------------------------------------------------------
 //
@@ -128,6 +133,67 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->cbListGPU, &QComboBox::currentIndexChanged,
             this, &GraphSettingsWindow::slotOnChangeCurrentGPU);
+
+    ui->cbSwadowsQuality->addItem(tr("Low"));
+    ui->cbSwadowsQuality->addItem(tr("Medium"));
+    ui->cbSwadowsQuality->addItem(tr("High"));
+    ui->cbSwadowsQuality->addItem(tr("Ultra"));
+    ui->cbSwadowsQuality->addItem(tr("Custom"));
+
+    ui->cbShadowsMap->addItem(tr("Low"));
+    ui->cbShadowsMap->addItem(tr("Medium"));
+    ui->cbShadowsMap->addItem(tr("High"));
+
+    connect(ui->cbSwadowsQuality, &QComboBox::currentIndexChanged, this, [this](int idx){
+
+        if (idx < shadowsPresets.size())
+        {
+            ulockShadowsSettings(ui, false);
+            auto sp = shadowsPresets[idx];
+
+            ui->cbShadowsMap->setCurrentIndex(sp.resolution_idx);
+            ui->hsShadowsCascades->setValue(sp.cascades);
+            ui->hsShadowsDistance->setValue(sp.distanse);
+        }
+        else
+        {
+            ulockShadowsSettings(ui, true);
+        }
+
+        ui->pbGraphApply->setEnabled(true);
+    });
+
+    connect(ui->cbShowShadows, &QCheckBox::stateChanged, this, [this](int){
+
+        if (ui->cbShowShadows->checkState() == Qt::CheckState::Checked)
+        {
+            ui->cbSwadowsQuality->setEnabled(true);
+        }
+        else
+        {
+            ui->cbSwadowsQuality->setEnabled(false);
+        }
+    });
+
+    connect(ui->hsShadowsCascades, &QSlider::valueChanged, this, [this](int idx){
+        ui->lShadowsCascades->setText(QString("%1").arg(idx));
+    });
+
+    connect(ui->hsShadowsDistance, &QSlider::valueChanged, this, [this](int idx){
+        ui->lShadowsDistance->setText(QString("%1").arg(idx));
+    });
+
+    connect(ui->cbShadowsMap, &QComboBox::currentIndexChanged, this, [this](int idx){
+
+        if (idx > 0 && idx < shadowMapResolution.size())
+        {
+            auto resolution = shadowMapResolution[idx];
+
+            int index = 0;
+            findSetting(SHADOW_RESOLUTION, fd_list, index);
+            fd_list[index] = QPair<QString, QVariant>(SHADOW_RESOLUTION, resolution);
+        }
+    });
 }
 
 //------------------------------------------------------------------------------
@@ -273,8 +339,38 @@ void GraphSettingsWindow::loadGraphicsSettings(QString file_name)
         cfg.getInt(secName, DEPTH_FORMAT, depthFormat);
         fd_list.append(QPair<QString, QVariant>(DEPTH_FORMAT, depthFormat));
 
+        bool shadow = false;
+        cfg.getBool(secName, SHADOW, shadow);
+        fd_list.append(QPair<QString, QVariant>(SHADOW, shadow));
+
+        int shadows_preset = 0;
+        cfg.getInt(secName, SHADOWS_PRESET, shadows_preset);
+        fd_list.append(QPair<QString, QVariant>(SHADOWS_PRESET, shadows_preset));
+
+        double shadow_dist = 0;
+        cfg.getDouble(secName, SHADOW_DISTANCE, shadow_dist);
+        fd_list.append(QPair<QString, QVariant>(SHADOW_DISTANCE, qRound(shadow_dist)));
+
+        int shadows_cascade = 0;
+        cfg.getInt(secName, SHADOW_CASCADE, shadows_cascade);
+        fd_list.append(QPair<QString, QVariant>(SHADOW_CASCADE, shadows_cascade));
+
+        int shadows_resolution = 0;
+        cfg.getInt(secName, SHADOW_RESOLUTION, shadows_resolution);
+        fd_list.append(QPair<QString, QVariant>(SHADOW_RESOLUTION, shadows_resolution));
+
         updateGraphSettings(fd_list, ui);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void GraphSettingsWindow::ulockShadowsSettings(Ui::GraphSettingsWindow *ui, bool lock)
+{
+    ui->cbShadowsMap->setEnabled(lock);
+    ui->hsShadowsCascades->setEnabled(lock);
+    ui->hsShadowsDistance->setEnabled(lock);
 }
 
 //------------------------------------------------------------------------------
@@ -310,6 +406,37 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
     ui->hsMSAA->setValue(s);
 
     ui->cbDepthDetails->setCurrentIndex(findSetting(DEPTH_FORMAT, fd_list).second.toInt());
+
+    findSetting(SHADOW, fd_list).second.toBool() ?
+        ui->cbShowShadows->setCheckState(Qt::CheckState::Checked) :
+        ui->cbShowShadows->setCheckState(Qt::CheckState::Unchecked);
+
+    int shadows_preset = findSetting(SHADOWS_PRESET, fd_list).second.toInt();
+
+    if (shadows_preset > 0 && shadows_preset < ui->cbSwadowsQuality->count())
+    {
+        ui->cbSwadowsQuality->setCurrentIndex(shadows_preset);
+    }
+
+    if (shadows_preset >= shadowsPresets.size())
+    {
+        ulockShadowsSettings(ui, true);
+    }
+    else
+    {
+        ulockShadowsSettings(ui, false);
+    }
+
+    for (size_t i = 0; i < shadowMapResolution.size(); ++i)
+    {
+        if (shadowMapResolution[i] == findSetting(SHADOW_RESOLUTION, fd_list).second.toInt())
+        {
+            ui->cbShadowsMap->setCurrentIndex(i);
+        }
+    }
+
+    ui->hsShadowsCascades->setValue(findSetting(SHADOW_CASCADE, fd_list).second.toInt());
+    ui->hsShadowsDistance->setValue(findSetting(SHADOW_DISTANCE, fd_list).second.toInt());
 
     ui->pbGraphApply->setEnabled(false);
 }
@@ -376,6 +503,21 @@ void GraphSettingsWindow::applyGraphSettings(FieldsDataList &fd_list,
 
     findSetting(DEPTH_FORMAT, fd_list, idx);
     fd_list[idx] = QPair<QString, QVariant>(DEPTH_FORMAT, ui->cbDepthDetails->currentIndex());
+
+    findSetting(SHADOW, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(SHADOW, ui->cbShowShadows->checkState() == Qt::CheckState::Checked ? true : false);
+
+    findSetting(SHADOW_RESOLUTION, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(SHADOW_RESOLUTION, shadowMapResolution[ui->cbShadowsMap->currentIndex()]);
+
+    findSetting(SHADOW_CASCADE, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(SHADOW_CASCADE, ui->hsShadowsCascades->value());
+
+    findSetting(SHADOW_DISTANCE, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(SHADOW_DISTANCE, ui->hsShadowsDistance->value());
+
+    findSetting(SHADOWS_PRESET, fd_list, idx);
+    fd_list[idx] = QPair<QString, QVariant>(SHADOWS_PRESET, ui->cbSwadowsQuality->currentIndex());
 }
 
 //------------------------------------------------------------------------------

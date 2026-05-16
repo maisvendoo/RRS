@@ -79,12 +79,20 @@
         <ViewDistance>2000</ViewDistance>
         <!-- Тени: 1 - включены; 0 - отключены -->
         <Shadow>0</Shadow>
+        <!-- Пресет настроек теней 
+        0 - Низко
+        1 - Среднее
+        2 - Высоко
+        3 - Ультра
+        4 - Пользовательский
+        -->
+        <ShadowsPreset>0</ShadowsPreset>
         <!-- Дальность прорисовки теней, м -->
-        <ShadowDistance>50.0</ShadowDistance>
+        <ShadowDistance>30.0</ShadowDistance>
         <!-- Количество каскадных карт теней -->
         <ShadowCascade>1</ShadowCascade>
         <!-- Разрешение карт теней -->
-        <ShadowResolution>4096</ShadowResolution>
+        <ShadowResolution>1024</ShadowResolution>
         <!-- Допустимое количество источников света в сцене -->
         <NumLights>200</NumLights>
         <!-- Яркость общего освещения -->
