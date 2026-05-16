@@ -407,9 +407,9 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
 
     ui->cbDepthDetails->setCurrentIndex(findSetting(DEPTH_FORMAT, fd_list).second.toInt());
 
-    findSetting(SHADOW, fd_list).second.toBool() ?
-        ui->cbShowShadows->setCheckState(Qt::CheckState::Checked) :
-        ui->cbShowShadows->setCheckState(Qt::CheckState::Unchecked);
+    bool shadow = findSetting(SHADOW, fd_list).second.toBool();
+    shadow ? ui->cbShowShadows->setCheckState(Qt::CheckState::Checked) : ui->cbShowShadows->setCheckState(Qt::CheckState::Unchecked);
+    ui->cbSwadowsQuality->setEnabled(true);
 
     int shadows_preset = findSetting(SHADOWS_PRESET, fd_list).second.toInt();
 
@@ -436,7 +436,10 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
     }
 
     ui->hsShadowsCascades->setValue(findSetting(SHADOW_CASCADE, fd_list).second.toInt());
+    ui->lShadowsCascades->setText(QString("%1").arg(ui->hsShadowsCascades->value()));
+
     ui->hsShadowsDistance->setValue(findSetting(SHADOW_DISTANCE, fd_list).second.toInt());
+    ui->lShadowsDistance->setText(QString("%2").arg(ui->hsShadowsDistance->value()));
 
     ui->pbGraphApply->setEnabled(false);
 }
