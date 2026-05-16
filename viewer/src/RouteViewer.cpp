@@ -433,6 +433,9 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
 
         auto physDev = physDevs[settings.physical_device];
 
+        auto props = physDev->getProperties();
+        GUIparams->physicalDeviceName = QString(props.deviceName);
+
         // Устанавливаем устройство из настроек
         window->setPhysicalDevice(physDev);
 

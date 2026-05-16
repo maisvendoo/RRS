@@ -68,6 +68,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool is_no_cabine_control = false;
 
     QString status = "";
+    QString physicalDeviceName = "";
 };
 
 //------------------------------------------------------------------------------

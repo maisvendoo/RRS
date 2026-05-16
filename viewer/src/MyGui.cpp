@@ -294,9 +294,11 @@ void MyGui::showQuitDialog() const
 //------------------------------------------------------------------------------
 void MyGui::showStatistics() const
 {
-    QString text = QString("FPS:%1 (lowest:%2)")
-                       .arg(params->statistics_handler->getAverageFPS(), 6, 'f', 1)
-                       .arg(params->statistics_handler->getLowestFPS(), 6, 'f', 1);
+    QString text = QString("Device: %1 ").arg(params->physicalDeviceName);
+    text += QString("FPS:%1 (lowest:%2)")
+                    .arg(params->statistics_handler->getAverageFPS(), 6, 'f', 1)
+                    .arg(params->statistics_handler->getLowestFPS(), 6, 'f', 1);
+
     ImVec2 text_size = ImGui::CalcTextSize(text.toStdString().c_str());
 
     ImGuiIO &io = ImGui::GetIO();
