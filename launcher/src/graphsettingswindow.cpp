@@ -4,6 +4,8 @@
 #include    <filesystem.h>
 #include    <CfgReader.h>
 
+#include    <QSlider>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -157,6 +159,7 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
     {
         // выбираем лючшую из найденных
         ui->cbListGPU->setCurrentIndex(best_gpu_idx);
+        current_gpu_idx = best_gpu_idx;
 
         applyGraphSettings(fd_list, ui);
 
@@ -165,9 +168,20 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
         // Сохраняем настройки
         saveGraphSettings(fd_list);
     }
-    else
+
+    if (current_gpu_idx > 0 && current_gpu_idx < gpus_info.size())
     {
         ui->cbListGPU->setCurrentIndex(current_gpu_idx);
+
+        auto &gpu_info = gpus_info[current_gpu_idx];
+
+        // Устанавливаем максимальный уровень сглаживания MSAA который обеспечивает GPU
+        int s = qRound(std::log2(gpu_info.framebufferColorSamplesCounts));
+        ui->hsMSAA->setMaximum(s);
+    }
+    else
+    {
+        return;
     }
 
     connect(ui->cbListGPU, &QComboBox::currentIndexChanged,

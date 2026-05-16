@@ -163,6 +163,9 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info)
             }
         }
 
+        // Доступный уровень сглаживания MSAA
+        gpu_info.framebufferColorSamplesCounts = props.limits.framebufferColorSampleCounts;
+
         // Присваиваем рейтинг по типу GPU
         if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
         {
