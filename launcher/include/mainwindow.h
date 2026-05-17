@@ -204,6 +204,8 @@ private:
 
     QMainWindow *helpWindow = new QMainWindow(this);
 
+    void centerWindow(QWidget* window);
+
 private slots:
 
     void slotRouteSelection();

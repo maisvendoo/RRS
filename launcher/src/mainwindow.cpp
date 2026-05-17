@@ -658,7 +658,7 @@ void MainWindow::createHelpMenu()
         QAction *action = new QAction(fileInfo.baseName());
         ui->menuHelp->addAction(action);
 
-        connect(action, &QAction::triggered, this, [this, fullPath]{
+        connect(action, &QAction::triggered, this, [this, fullPath, fileInfo]{
 
             if (fullPath.isEmpty())
             {
@@ -679,15 +679,33 @@ void MainWindow::createHelpMenu()
             }
 
             helpWindow->setCentralWidget(viewer);
-            helpWindow->setWindowTitle(QString("PDF Viewer | %1 страниц").arg(viewer->pageCount()));
+            helpWindow->setWindowTitle(QString("%2 | %1 страниц").arg(viewer->pageCount()).arg(fileInfo.baseName()));
             helpWindow->show();
             helpWindow->resize(900, 1000);
 
-            QTimer::singleShot(0, viewer, [viewer]() {
+            QTimer::singleShot(0, viewer, [this, viewer]() {
                 viewer->adjustWindowToPageWidth(0); // 0 = первая страница
+                this->centerWindow(helpWindow);
             });
         });
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::centerWindow(QWidget *window)
+{
+    if (!window || !window->parentWidget())
+    {
+        return;
+    }
+
+    QRect parentRect = window->parentWidget()->geometry();
+    QRect myRect = window->geometry();
+    int x = parentRect.x() + (parentRect.width() - myRect.width()) / 2;
+    int y = parentRect.y() + (parentRect.height() - myRect.height()) / 2;
+    window->move(x, y);
 }
 
 //------------------------------------------------------------------------------

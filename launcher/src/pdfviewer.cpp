@@ -19,8 +19,7 @@ PdfViewer::PdfViewer(QWidget *parent) : QScrollArea(parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
-    setStyleSheet("QScrollArea { border: none; background: transparent; }");
-    //viewport()->setStyleSheet("background: white;");
+    setStyleSheet("QScrollArea { border: none; background: transparent; }");    
 }
 
 //------------------------------------------------------------------------------
@@ -133,10 +132,6 @@ void PdfViewer::wheelEvent(QWheelEvent *event)
     }
 }
 
-#include <QTimer>
-#include <QGuiApplication>
-#include <QScreen>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -158,7 +153,11 @@ void PdfViewer::adjustWindowToPageWidth(int pageIndex)
     if (!win) return;
 
     int chromeW = win->frameGeometry().width() - win->geometry().width();
-    if (chromeW <= 0) chromeW = 12;
+
+    if (chromeW <= 0)
+    {
+        chromeW = 12;
+    }
 
     win->resize(contentWidth + chromeW, win->height());
 }
