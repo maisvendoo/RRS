@@ -20,7 +20,7 @@ set (EXECUTABLE_OUTPUT_PATH "../../bin")
 find_package(Qt6 COMPONENTS Xml REQUIRED)
 find_package(Qt6 COMPONENTS Gui REQUIRED)
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
-#find_package(Qt6 COMPONENTS Pdf REQUIRED)
+find_package(Qt6 COMPONENTS Pdf REQUIRED)
 
 find_package(Qt6 REQUIRED COMPONENTS Core LinguistTools)
 
@@ -53,7 +53,7 @@ target_include_directories (${TARGET} PRIVATE ../CfgEditor/include)
 target_link_libraries (${TARGET} Qt6::Xml)
 target_link_libraries (${TARGET} Qt6::Gui)
 target_link_libraries (${TARGET} Qt6::Widgets)
-#target_link_libraries (${TARGET} Qt6::Pdf)
+target_link_libraries (${TARGET} Qt6::Pdf)
 
 # и со своими не забываем
 target_link_libraries (${TARGET} CfgReader)

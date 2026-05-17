@@ -971,7 +971,13 @@
     </property>
     <addaction name="actionGraphics_settings"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
    <addaction name="menuSettings"/>
+   <addaction name="menuHelp"/>
   </widget>
   <action name="actionGraphics_settings">
    <property name="text">

@@ -29,6 +29,8 @@
 #include    "platform.h"
 #include    "styles.h"
 
+#include    "pdfviewer.h"
+
 #include    <system-diagnostic.h>
 #include    <graphsettingswindow.h>
 
@@ -159,7 +161,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->actionGraphics_settings, &QAction::triggered, this, [this](){
         graphSettingsWindow->show();
-    });    
+    });
+
+    // Окно скрывается, а не удаляется
+    helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
+    createHelpMenu();
 }
 
 //------------------------------------------------------------------------------
@@ -626,6 +632,61 @@ void MainWindow::gpuDiagnostics()
 
             break;
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::createHelpMenu()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    auto docsDir = fs.getDocsDir();
+
+    QDir docs(QString(docsDir.c_str()));
+    QDirIterator docs_files(docs.path(),
+                            QStringList() << "*.pdf",
+                            QDir::NoDotAndDotDot | QDir::Files);
+
+    while (docs_files.hasNext())
+    {
+        QString fullPath = docs_files.next();
+        QFileInfo fileInfo(fullPath);
+
+        //train_info.train_config_path = fileInfo.baseName();
+
+        QAction *action = new QAction(fileInfo.baseName());
+        ui->menuHelp->addAction(action);
+
+        connect(action, &QAction::triggered, this, [this, fullPath]{
+
+            if (fullPath.isEmpty())
+            {
+                return;
+            }
+
+            auto *viewer = new PdfViewer(helpWindow);
+
+            if (!viewer->load(fullPath))
+            {
+                delete viewer;
+                return;
+            }
+
+            if (auto* old = helpWindow->centralWidget())
+            {
+                old->deleteLater();
+            }
+
+            helpWindow->setCentralWidget(viewer);
+            helpWindow->setWindowTitle(QString("PDF Viewer | %1 страниц").arg(viewer->pageCount()));
+            helpWindow->show();
+            helpWindow->resize(900, 1000);
+
+            QTimer::singleShot(0, viewer, [viewer]() {
+                viewer->adjustWindowToPageWidth(0); // 0 = первая страница
+            });
+        });
     }
 }
 

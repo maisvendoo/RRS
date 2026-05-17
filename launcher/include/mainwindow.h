@@ -100,18 +100,6 @@ private:
     /// Viewer settings
     FieldsDataList  fd_list;
 
-    /*static const   QString WIDTH;
-    static const   QString HEIGHT;
-    static const   QString FULLSCREEN;
-    static const   QString FOV_Y;
-    static const   QString ZNEAR;
-    static const   QString ZFAR;
-    static const   QString SCREEN_NUM;
-    static const   QString WIN_DECOR;
-    static const   QString DOUBLE_BUFF;
-    static const   QString VSYNC;
-    static const   QString NOTIFY_LEVEL;
-    static const   QString VIEW_DIST;*/
     static const   QString STARTUP_SCN_SUBDIR;
 
     QString settings_path;
@@ -211,6 +199,10 @@ private:
     GraphSettingsWindow *graphSettingsWindow = new GraphSettingsWindow(this);
 
     RequireWindowsVersion winver;
+
+    void createHelpMenu();
+
+    QMainWindow *helpWindow = new QMainWindow(this);
 
 private slots:
 
