@@ -68,32 +68,23 @@ QTabWidget::pane {
 	border: 0; 
 }
 
-/* --- Настройки QComboBox (Выпадающие списки) --- */
 QComboBox {
 	background-color: #606060;
 	color: #ffffff;
-	/* Граница, чтобы выделить сам блок */
-	border: 1px solid #404040; 
+	border: 1px solid #404040;
 	padding: 2px;
 }
 
-/* Когда комбобокс активен (нажат), он становится оранжевым */
 QComboBox:focus {
-    background-color: #ffb140;
-    color: #000000;
+	background-color: #ffb140;
+	color: #000000;
 }
 
-/* Выделение элемента внутри выпадающего списка комбобокса */
 QComboBox QAbstractItemView::item:selected {
-    background-color: #ffb140;
-    color: #000000;
+	background-color: #ffb140;
+	color: #000000;
 }
 
-/* Стиль стрелочки комбобокса (опционально, чтобы вписывалась) */
-QComboBox::drop-down {
-    border: none;
-    width: 20px;
-}
 
 QDateTimeEdit::disabled {
 	color: #888888;
