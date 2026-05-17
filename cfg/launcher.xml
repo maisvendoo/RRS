@@ -2,5 +2,10 @@
 <Config>
 	<Launcher>
 		<Theme>dark-jedy</Theme>
+		<!-- Минимальная версия Windows -->
+		<MinWinver>10</MinWinver>
+		<MinWinBuild_NDIVIA>19041</MinWinBuild_NDIVIA>
+		<MinWinBuild_AMD>19041</MinWinBuild_AMD>
+		<MinWinBuild_INTEL>19045</MinWinBuild_INTEL>
 	</Launcher>
 </Config>

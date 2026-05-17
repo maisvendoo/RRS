@@ -7,14 +7,14 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool checkOperationSystemVersion(uint32_t vendorID, QString &productName)
+bool checkOperationSystemVersion(uint32_t vendorID, const RequireWindowsVersion &winver, QString &productName)
 {
 #ifdef Q_OS_WIN
 
     auto currentOS = QOperatingSystemVersion::current();
     productName = QSysInfo::prettyProductName();
 
-    if (currentOS.majorVersion() < 10)
+    if (currentOS.majorVersion() < winver.majorVer)
     {
         return false;
     }
@@ -24,11 +24,13 @@ bool checkOperationSystemVersion(uint32_t vendorID, QString &productName)
     switch (vendorID)
     {
     case VID_NVIDIA:
+        return (buildNumber >= winver.buildNvidia);
+
     case VID_AMD:
-        return (buildNumber >= 19041);
+        return (buildNumber >= winver.buildAMD);
 
     case VID_INTEL:
-        return (buildNumber >= 19045);
+        return (buildNumber >= winver.buildIntel);
     }
 
     return true;

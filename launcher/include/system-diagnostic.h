@@ -1,6 +1,7 @@
 #ifndef     SYSTEM_DIAGNOSTIC_H
 #define     SYSTEM_DIAGNOSTIC_H
 
+#include    "winver.h"
 #include    <gpu-info.h>
 
 //------------------------------------------------------------------------------
@@ -34,6 +35,6 @@ StateGPU getInfoGPUs(std::vector<gpu_info_t> &gpus_info);
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool checkOperationSystemVersion(uint32_t vendorID, QString &productName);
+bool checkOperationSystemVersion(uint32_t vendorID, const RequireWindowsVersion &winver, QString &productName);
 
 #endif

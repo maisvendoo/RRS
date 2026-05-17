@@ -31,6 +31,7 @@
 #include    <CfgEditor.h>
 
 #include    "graphsettingswindow.h"
+#include    "winver.h"
 
 //------------------------------------------------------------------------------
 //
@@ -167,7 +168,7 @@ private:
     void startMap(bool local = true);
 
     /// Load theme
-    void loadTheme();    
+    void loadConfig();
 
     /// Apply new graph settings
     //void applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui);
@@ -208,6 +209,8 @@ private:
     bool start_viewer_allowed = false;
 
     GraphSettingsWindow *graphSettingsWindow = new GraphSettingsWindow(this);
+
+    RequireWindowsVersion winver;
 
 private slots:
 

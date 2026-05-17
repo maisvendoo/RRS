@@ -126,7 +126,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setFocusPolicy(Qt::ClickFocus);
 
-    loadTheme();
+    loadConfig();
 
     QIcon icon(":/images/images/RRS_logo.png");
     setWindowIcon(icon);
@@ -179,9 +179,7 @@ void MainWindow::init()
 
     loadRoutesList(fs.getRouteRootDir());
     loadTrainsList(fs.getTrainsDir());
-    loadServersList(fs.getConfigDir());
-
-    //loadGraphicsSettings("settings");
+    loadServersList(fs.getConfigDir());    
 }
 
 //------------------------------------------------------------------------------
@@ -593,7 +591,7 @@ void MainWindow::gpuDiagnostics()
 
             for (size_t i = 0; i < gpus_info.size(); ++i)
             {
-                if (checkOperationSystemVersion(gpus_info[i].vendorID, gpus_info[i].nameOS))
+                if (checkOperationSystemVersion(gpus_info[i].vendorID, winver, gpus_info[i].nameOS))
                 {
                     ++valid_gpus_count;
                 }
@@ -786,7 +784,7 @@ void MainWindow::startMap(bool local)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::loadTheme()
+void MainWindow::loadConfig()
 {
     FileSystem &fs = FileSystem::getInstance();
     std::string cfg_dir = fs.getConfigDir();
@@ -809,6 +807,11 @@ void MainWindow::loadTheme()
         QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
 
         this->setStyleSheet(style_sheet);
+
+        cfg.getInt(secName, "MinWinver", winver.majorVer);
+        cfg.getInt(secName, "MinWinBuild_NVIDIA", winver.buildNvidia);
+        cfg.getInt(secName, "MinWinBuild_AMD", winver.buildAMD);
+        cfg.getInt(secName, "MinWinBuild_INTEL", winver.buildIntel);
     }
 }
 
