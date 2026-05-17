@@ -3,6 +3,11 @@ QWidget {
 	color: #ffffff;
 }
 
+QTextBrowser {
+    background-color: #404040;  
+    color: #ffffff;             
+}
+
 QPushButton {
 	background-color: #00aa00;
 	color: #ffffff; /* Добавил цвет текста для кнопки */

@@ -526,9 +526,13 @@ void MainWindow::hideTrainsConfigsTip()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString getCenteredHtml(QString msg)
+QString getCenteredHtml(QString msg, QString color = "#ff6b6b")
 {
-    return QString("<p style='text-align: center;'>%1</p>").arg(msg);
+    if (color.isEmpty())
+        return QString("<p style='text-align: center;'>%1</p>").arg(msg);
+
+    return QString("<p style='text-align: center; color: %1;'>%2</p>")
+        .arg(color, msg);
 }
 
 //------------------------------------------------------------------------------
@@ -546,7 +550,7 @@ void MainWindow::gpuDiagnostics()
     {
     case GPU_STATE_VULKAN_LOADER_NOT_FOUND_ERROR:
         {
-            ui->tbLogGPU->setHtml(getCenteredHtml(tr("Start graphics client is impossible: missing Vulkan loader in your system. Check that you have lastest version of driver for your GPU from offcial vendor site.")));
+        ui->tbLogGPU->setHtml(getCenteredHtml(tr("Start graphics client is impossible: missing Vulkan loader in your system. Check that you have lastest version of driver for your GPU from offcial vendor site.")));
             break;
         }
     case GPU_STATE_VK_INSTANCE_ERROR:
@@ -613,7 +617,7 @@ void MainWindow::gpuDiagnostics()
                 for (auto i : devices_with_problems)
                 {
                     devList += gpus_info[i].deviceName + ", ";
-                    ui->tbLogGPU->setHtml(getCenteredHtml(tr("WARNING: You devices ") + devList + tr(" may have a problems with start graphics client, becourse modern drivers for them not capable with your OS version")));
+                    ui->tbLogGPU->setHtml(getCenteredHtml(tr("WARNING: You devices ") + devList + tr(" may have a problems with start graphics client, becourse modern drivers for them not capable with your OS version"), "#ffff00"));
                 }
             }
 

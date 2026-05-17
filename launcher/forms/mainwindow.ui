@@ -477,8 +477,8 @@
             </property>
             <property name="font">
              <font>
-              <pointsize>12</pointsize>
-              <bold>true</bold>
+              <pointsize>14</pointsize>
+              <bold>false</bold>
              </font>
             </property>
            </widget>
