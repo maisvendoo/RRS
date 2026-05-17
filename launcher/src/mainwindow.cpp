@@ -981,6 +981,7 @@ void MainWindow::slotUpdateActiveTrains(bool reset_start_config)
             ui->pbStartServer->setEnabled(false);
 
         ui->pbDeleteTrain->setEnabled(false);
+        ui->cbScenario->setEnabled(true);
 
         return;
     }
