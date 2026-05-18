@@ -285,7 +285,7 @@
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="569"/>
-        <location filename="../src/mainwindow.cpp" line="1259"/>
+        <location filename="../src/mainwindow.cpp" line="1351"/>
         <source>Start server</source>
         <translation>Запуск сервера</translation>
     </message>
@@ -347,12 +347,17 @@
         <translation>Помощь</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="984"/>
+        <location filename="../forms/mainwindow.ui" line="981"/>
+        <source>Tools</source>
+        <translation>Инструменты</translation>
+    </message>
+    <message>
+        <location filename="../forms/mainwindow.ui" line="990"/>
         <source>Graphics settings</source>
         <translation>Графические настройки</translation>
     </message>
     <message>
-        <location filename="../forms/mainwindow.ui" line="989"/>
+        <location filename="../forms/mainwindow.ui" line="995"/>
         <source>Network settings</source>
         <translation>Сетевые настройки</translation>
     </message>
@@ -397,68 +402,68 @@
         <translation type="vanished">Отмена</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="475"/>
+        <location filename="../src/mainwindow.cpp" line="478"/>
         <source>&lt;Not_selected&gt;</source>
         <translation>&lt;Не выбран&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="503"/>
+        <location filename="../src/mainwindow.cpp" line="506"/>
         <source>Trains positions are defined in scenario</source>
         <translation>Расположение поездов определяется сценарием</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="561"/>
+        <location filename="../src/mainwindow.cpp" line="564"/>
         <source>Start graphics client is impossible: missing Vulkan loader in your system. Check that you have lastest version of driver for your GPU from offcial vendor site.</source>
         <translation>Запустить графический клиент невозможно: в вашей системе отсутствует загрузчик Vulkan. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="566"/>
+        <location filename="../src/mainwindow.cpp" line="569"/>
         <source>Start graphics client is impossible: can not create vkInstance. Check that you have lastest version of driver for your GPU from offcaial vendor site.</source>
         <translation>Запустить графический клиент невозможно: не удается создать vkInstance. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="572"/>
+        <location filename="../src/mainwindow.cpp" line="575"/>
         <source>Start graphics client is impossible: GPU driver error, can&apos;t get information about GPUs. Check that you have lastest version of driver for your GPU from offcial vendor site</source>
         <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить информацию о графических процессорах. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="578"/>
+        <location filename="../src/mainwindow.cpp" line="581"/>
         <source>Start graphics client is impossible: not find GPU devices capable with Vulkan API.</source>
         <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить список графических процессоров. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="584"/>
+        <location filename="../src/mainwindow.cpp" line="587"/>
         <source>Start graphics client is impossible: GPU driver error, can&apos;t get GPUs list. Check that you have lastest version of driver for your GPU from offcial vendor site</source>
         <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить список графических процессоров. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="618"/>
+        <location filename="../src/mainwindow.cpp" line="621"/>
         <source>Start graphics client is impossible: You operation system %1 is not capable with modern direvers of all your devices. Please, update you operation system</source>
         <translation>Запуск графического клиента невозможен: Ваша операционная система %1 несовместима с современными драйверами всех ваших устройств. Пожалуйста, обновите вашу операционную систему.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="628"/>
+        <location filename="../src/mainwindow.cpp" line="631"/>
         <source>WARNING: You devices </source>
         <translation>ПРЕДУПРЕЖДЕНИЕ: Ваши устройства </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="628"/>
+        <location filename="../src/mainwindow.cpp" line="631"/>
         <source> may have a problems with start graphics client, becourse modern drivers for them not capable with your OS version</source>
         <translation>могут иметь возникли проблемы с запуском графического клиента, поскольку современные драйверы для него несовместимы с вашей версией ОС.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1201"/>
+        <location filename="../src/mainwindow.cpp" line="1293"/>
         <source>Stop server</source>
         <translation>Остановить сервер</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1358"/>
-        <location filename="../src/mainwindow.cpp" line="1384"/>
+        <location filename="../src/mainwindow.cpp" line="1450"/>
+        <location filename="../src/mainwindow.cpp" line="1476"/>
         <source>Save Server</source>
         <translation>Сохранить сервер</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1365"/>
+        <location filename="../src/mainwindow.cpp" line="1457"/>
         <source>Rewrite Server</source>
         <translation>Перезаписать сервер</translation>
     </message>
