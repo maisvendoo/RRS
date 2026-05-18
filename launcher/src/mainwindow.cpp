@@ -167,6 +167,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // Окно скрывается, а не удаляется
     helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
+
+    createToolsMenu();
+
     createHelpMenu();
 }
 
@@ -690,6 +693,95 @@ void MainWindow::createHelpMenu()
                 this->centerWindow(helpWindow);
             });
         });
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::createToolsMenu()
+{
+    CfgReader cfg;
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_dir = fs.getConfigDir();
+    std::string cfg_path = fs.combinePath(cfg_dir, "launcher.xml");
+
+    if (!cfg.load(QString(cfg_path.c_str())))
+    {
+        return;
+    }
+
+    auto secNode = cfg.getFirstSection("Tool");
+
+    QString binPath = QDir::toNativeSeparators(QString(fs.getBinaryDir().c_str()));
+
+    while (!secNode.isNull())
+    {
+        QString toolName;
+        cfg.getString(secNode, "Name", toolName);
+
+        if (toolName.isEmpty())
+        {
+            continue;
+        }
+
+        QString toolPath = binPath + QDir::separator() + toolName + EXE_EXP;
+
+        QFile toolFile(toolPath);
+
+        if (!toolFile.exists())
+        {
+            continue;
+        }
+
+        QProcess *proc = new QProcess(this);
+        proc->setWorkingDirectory(binPath);
+        proc->setProgram(toolPath);
+
+        QString args_str;
+        cfg.getString(secNode, "CommandLine", args_str);
+        QStringList args = args_str.split(' ');
+
+        if (!args.empty())
+        {
+            proc->setArguments(args);
+        }
+
+        QString description;
+        cfg.getString(secNode, "Description", description);
+
+        if (description.isEmpty())
+        {
+            description = toolName;
+        }
+
+        toolProcs.push_back(proc);
+
+        QAction *action = new QAction(description);
+
+        connect(action, &QAction::triggered, this, [this](){
+
+            QAction *ac = qobject_cast<QAction *>(sender());
+
+            if (ac == nullptr)
+            {
+                return;
+            }
+
+            int idx = ui->menuTools->actions().indexOf(ac);
+
+            if (idx >= 0 && idx < toolProcs.size())
+            {
+                if (toolProcs[idx] != nullptr && toolProcs[idx]->state() != QProcess::Running)
+                {
+                    toolProcs[idx]->start();
+                }
+            }
+        });
+
+        ui->menuTools->addAction(action);
+
+        secNode = cfg.getNextSection();
     }
 }
 

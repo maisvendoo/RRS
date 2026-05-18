@@ -33,6 +33,8 @@
 #include    "graphsettingswindow.h"
 #include    "winver.h"
 
+#include    "tools-config.h"
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -204,6 +206,10 @@ private:
     RequireWindowsVersion winver;
 
     void createHelpMenu();
+
+    void createToolsMenu();
+
+    std::vector<QProcess *> toolProcs;
 
     QMainWindow *helpWindow = new QMainWindow(this);
 
