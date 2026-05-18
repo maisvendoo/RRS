@@ -106,3 +106,35 @@ MapWidget QLabel {
     background-color: transparent;
     border: none; /* Убираем рамку, если есть */
 }
+
+/* --- Выпадающее меню (QMenu) и QAction внутри него --- */
+QMenu {
+    background-color: #606060;
+    border: 1px solid #404040;
+}
+
+QMenu::item {
+    background-color: transparent;
+    padding: 4px 16px;
+    color: #ffffff;
+    border: 1px solid transparent; /* Убирает артефакты отрисовки на Windows */
+}
+
+QMenu::item:hover,
+QMenu::item:selected {
+    background-color: #ffb140;
+    color: #000000;
+}
+
+/* --- Если QAction добавлен в тулбар (QToolBar) --- */
+QToolBar QToolButton:hover {
+    background-color: #ffb140;
+    color: #000000;
+}
+
+/* --- Разделители в меню (если есть) --- */
+QMenu::separator {
+    height: 1px;
+    background-color: #404040;
+    margin: 4px 0;
+}
