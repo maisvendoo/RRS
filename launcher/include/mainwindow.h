@@ -155,8 +155,11 @@ private:
     /// Start dispatcher map
     void startMap(bool local = true);
 
-    /// Load theme
+    /// Load settings
     void loadConfig();
+
+    /// Load GUI settings
+    void loadSettingsGUI();
 
     /// Apply new graph settings
     //void applyGraphSettings(FieldsDataList &fd_list, Ui::MainWindow *ui);

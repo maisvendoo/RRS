@@ -128,6 +128,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setFocusPolicy(Qt::ClickFocus);
 
+    loadSettingsGUI();
+
     loadConfig();
 
     QIcon icon(":/images/images/RRS_logo.png");
@@ -861,6 +863,35 @@ void MainWindow::startMap(bool local)
         connect(proc, &QProcess::finished, this, &MainWindow::slotAdditionalProcFinished);
         proc->setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
         proc->start(QString::fromStdString(fs.getBinaryDir()) + '/' + mapPath, args);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadSettingsGUI()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_dir = fs.getConfigDir();
+    std::string cfg_path = fs.combinePath(cfg_dir, "gui-settings.xml");
+
+    CfgReader cfg;
+
+    if ( cfg.load(QString(cfg_path.c_str())) )
+    {
+        QString secName = "GUISettings";
+        QString theme_name = "";
+
+        if (!cfg.getString(secName, "Theme", theme_name))
+        {
+            theme_name = "dark-jedy";
+        }
+
+        std::string theme_dir = fs.getThemeDir();
+        std::string theme_path = fs.combinePath(theme_dir, theme_name.toStdString() + ".qss");
+        QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
+
+        this->setStyleSheet(style_sheet);
     }
 }
 
