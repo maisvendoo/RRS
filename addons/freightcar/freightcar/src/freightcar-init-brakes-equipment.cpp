@@ -38,8 +38,7 @@ void FreightCar::initBrakesEquipment(const QString& modules_dir, const QString& 
     supply_reservoir->setLeakCoeff(sr_leak);
 
     // Авторежим
-    automode = loadBrakeAutoMode(
-                modules_dir + QDir::separator() + automode_module);
+    automode = LOAD_MODULE(BrakeAutoMode, modules_dir + QDir::separator() + automode_module);
     if (automode != nullptr)
         automode->read_config(automode_config);
 

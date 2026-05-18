@@ -40,25 +40,3 @@ double BrakeAutoMode::getBCflow() const
 {
     return QBC;
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-BrakeAutoMode *loadBrakeAutoMode(QString lib_path)
-{
-    BrakeAutoMode *automode = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetBrakeAutoMode getBrakeAutoMode = reinterpret_cast<GetBrakeAutoMode>(lib.resolve("getBrakeAutoMode"));
-
-        if (getBrakeAutoMode)
-        {
-            automode = getBrakeAutoMode();
-        }
-    }
-
-    return automode;
-}
