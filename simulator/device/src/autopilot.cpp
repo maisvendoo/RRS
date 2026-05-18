@@ -1,5 +1,4 @@
 #include    <autopilot.h>
-#include    <QLibrary>
 #include    <Journal.h>
 
 //------------------------------------------------------------------------------

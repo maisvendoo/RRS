@@ -14,8 +14,6 @@
 
 #include    "brake-mech.h"
 
-#include    <QLibrary>
-
 #include    "physics.h"
 
 //------------------------------------------------------------------------------
