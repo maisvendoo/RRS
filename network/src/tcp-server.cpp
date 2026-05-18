@@ -1,9 +1,13 @@
 #include    <tcp-server.h>
-#include    <Journal.h>
+
 #include    <CfgReader.h>
-#include    <QBuffer>
-#include    <QTcpSocket>
+#include    <Journal.h>
 #include    <simspeed-command.h>
+
+#include    <QByteArray>
+#include    <QDataStream>
+#include    <QIODevice>
+#include    <QTcpSocket>
 
 //------------------------------------------------------------------------------
 //
@@ -72,9 +76,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
 
     case STYPE_REQUEST_PLAYERS_INFO:
     {
-        QBuffer buff(&client_data.received_data.data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
         stream >> client_data.players_update_interval;
 
         /*Journal::instance()->info(QString("Received players update request for #%1 with interval %2")
@@ -155,9 +158,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }
     case STYPE_REQUEST_VEHICLES_POS_UPDATE:
     {
-        QBuffer buff(&client_data.received_data.data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
         stream >> client_data.pos_update_interval;
 
         /*Journal::instance()->info(QString("Received vehicles pos update request for #%1 with interval %2")
@@ -167,9 +169,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }
     case STYPE_REQUEST_VEHICLES_STATE_UPDATE:
     {
-        QBuffer buff(&client_data.received_data.data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
         stream >> client_data.state_update_interval;
 
         /*Journal::instance()->info(QString("Received vehicles state update request for #%1 with interval %2")
@@ -179,9 +180,8 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }
     case STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE:
     {
-        QBuffer buff(&client_data.received_data.data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
         stream >> client_data.controlled_update_interval;
 
         /*Journal::instance()->info(QString("Received vehicle controlled update request for #%1 with interval %2")
@@ -233,9 +233,7 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }
     case STYPE_COMMAND_RENAME_TRAIN:
     {
-        QBuffer buff(&client_data.received_data.data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
 
         int train_idx = -1;
         QString new_name = "";
@@ -457,9 +455,7 @@ void TcpServer::slotReceive()
     {
         if (is_first_data)
         {
-            QBuffer b(&recvBuff);
-            b.open(QIODevice::ReadOnly);
-            QDataStream stream(&b);
+            QDataStream stream(&recvBuff, QIODevice::ReadOnly);
 
             stream >> wait_data_size;
 

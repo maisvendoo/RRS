@@ -1,6 +1,8 @@
 #include "network-data-types.h"
 
-#include <QBuffer>
+#include <QByteArray>
+#include <QDataStream>
+#include <QIODevice>
 
 network_data_t::network_data_t()
     : stype(STYPE_EMPTY_DATA)
@@ -12,22 +14,18 @@ network_data_t::network_data_t()
 QByteArray network_data_t::serialize()
 {
     QByteArray tmp_data;
-    QBuffer buff(&tmp_data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&tmp_data, QIODevice::WriteOnly);
 
     stream << data.size() + sizeof(data_size) + sizeof(stype);
     stream << stype;
     stream << data;
 
-    return buff.data();
+    return tmp_data;
 }
 
 void network_data_t::deserialize(QByteArray &data)
 {
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     stream >> data_size;
     stream >> stype;
