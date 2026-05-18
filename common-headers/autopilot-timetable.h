@@ -1,8 +1,10 @@
 #ifndef     AUTOPILOT_TIMETABLE_H
 #define     AUTOPILOT_TIMETABLE_H
 
+#include    <QByteArray>
+#include    <QDataStream>
+#include    <QIODevice>
 #include    <QString>
-#include    <QBuffer>
 
 //------------------------------------------------------------------------------
 //
@@ -62,9 +64,7 @@ struct autopilot_station_t
     QByteArray serialize()
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << name;
         stream << arr_time;
@@ -96,9 +96,7 @@ struct autopilot_station_t
 
     void deserialize(QByteArray &data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> name;
         stream >> arr_time;
@@ -147,9 +145,7 @@ struct autopilot_timetable_t
     QByteArray serialize()
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << train_name;
         stream << train_idx;
@@ -162,16 +158,14 @@ struct autopilot_timetable_t
         for (auto station : stations)
         {
             stream << station.serialize();
-        }        
+        }
 
         return data;
     }
 
     void deserialize(QByteArray &data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> train_name;
         stream >> train_idx;
@@ -193,7 +187,7 @@ struct autopilot_timetable_t
             station.deserialize(st_data);
 
             stations.push_back(station);
-        }        
+        }
     }
 
     autopilot_station_t &getStation(int idx)
@@ -213,5 +207,4 @@ struct autopilot_timetable_t
     }
 };
 
-
-#endif
+#endif // AUTOPILOT_TIMETABLE_H
