@@ -100,3 +100,9 @@ QMenuBar::item:selected {
     background-color: #ffb140;
     color: #000000;
 }
+
+/* Делаем фон меток внутри MapWidget прозрачным */
+MapWidget QLabel {
+    background-color: transparent;
+    border: none; /* Убираем рамку, если есть */
+}
