@@ -4,6 +4,8 @@
 #include    <rail-signal.h>
 #include    <ui_mainwindow.h>
 
+#include    <QBuffer>
+
 #include    <CfgReader.h>
 #include    <QPainter>
 #include    <QMenu>
