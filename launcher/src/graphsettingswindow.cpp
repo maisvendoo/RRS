@@ -173,6 +173,8 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
         {
             ui->cbSwadowsQuality->setEnabled(false);
         }
+
+        ui->pbGraphApply->setEnabled(true);
     });
 
     connect(ui->hsShadowsCascades, &QSlider::valueChanged, this, [this](int idx){
