@@ -6,6 +6,7 @@
 #include    <kme-60-044.h>
 #include    <brake-crane.h>
 #include    <loco-crane.h>
+#include    <core/load_module.h>
 
 //------------------------------------------------------------------------------
 //
@@ -16,9 +17,10 @@ void VL60pk::initAutopilot(const QString& modules_dir,
     // Модули автоведения
     for (auto cab_idx : {CAB1, CAB2})
     {
-        Autopilot *autopilot = loadAutopilot(modules_dir + QDir::separator()
-                                         + custom_modules_dir + QDir::separator() +
-                                         autopilot_module_name);
+        Autopilot* autopilot = LOAD_MODULE(Autopilot,
+            modules_dir +QDir::separator() +
+            custom_modules_dir + QDir::separator() +
+            autopilot_module_name);
 
         if (autopilot != nullptr)
         {
@@ -57,7 +59,7 @@ void VL60pk::slotInitTrainForAutopilot()
         autopilot[cab_idx]->setTrainMass(train_mass);
     }
 
-    // Кое-какие другие действия при активации автоведения    
+    // Кое-какие другие действия при активации автоведения
     if (controller[CAB1]->isReversHandle())
     {
         prepareCabineForAutopilot(CAB1, CAB2);
@@ -88,7 +90,7 @@ void VL60pk::prepareCabineForAutopilot(int my_cab_idx, int other_cab_idx)
     // прожектор на ярко
     spotlight_high_tumbler[my_cab_idx].set();
     // подсветка приборов
-    P_light_devices_tumbler[my_cab_idx].set();    
+    P_light_devices_tumbler[my_cab_idx].set();
 
     // В другой кабине
 
@@ -106,12 +108,12 @@ void VL60pk::OnAutopilot()
     // Делаем автозапуск
     if (controller[CAB1]->isReversHandle())
     {
-        initAutostartProgram(CAB1);        
+        initAutostartProgram(CAB1);
     }
 
     if (controller[CAB2]->isReversHandle())
     {
-        initAutostartProgram(CAB2);        
+        initAutostartProgram(CAB2);
     }
 
     autoStartTimer->start();

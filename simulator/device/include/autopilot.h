@@ -238,7 +238,7 @@ protected:
     double target_station_dist = 0;
 
     /// Текущая траектория
-    QString curr_traj_name = "";    
+    QString curr_traj_name = "";
 
     /// Предыдущая траектория
     QString prev_traj_name = "";
@@ -463,23 +463,4 @@ private slots:
     void slotRouteBuildRequest();
 };
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef Autopilot* (*GetAutopilot)();
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_AUTOPILOT(ClassName) \
-    extern "C" Q_DECL_EXPORT Autopilot *getAutopilot() \
-    {\
-        return new (ClassName) ();\
-    }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" DEVICE_EXPORT Autopilot *loadAutopilot(QString lib_path);
-
-#endif
+#endif // AUTOPILOT_H
