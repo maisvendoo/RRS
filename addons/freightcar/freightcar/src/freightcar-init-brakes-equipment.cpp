@@ -9,6 +9,7 @@
 #include "pneumo-anglecock.h"
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"
+#include "core/load_module.h"
 
 //------------------------------------------------------------------------
 //
@@ -23,8 +24,7 @@ void FreightCar::initBrakesEquipment(const QString& modules_dir, const QString& 
     brakepipe->setLeakCoeff(bp_leak);
 
     // Воздухораспределитель
-    air_dist = loadAirDistributor(
-                modules_dir + QDir::separator() + air_dist_module);
+    air_dist = LOAD_MODULE(AirDistributor, modules_dir + QDir::separator() + air_dist_module);
     air_dist->read_config(air_dist_config);
 
     // Электровоздухораспределитель
