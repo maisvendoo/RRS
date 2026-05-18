@@ -1,5 +1,5 @@
-#ifndef STATE_H
-#define STATE_H
+#ifndef EDITOR_STATE_H2
+#define EDITOR_STATE_H2
 
 namespace vsg
 {
@@ -17,4 +17,4 @@ public:
     virtual void handle_key_release(vsg::KeyReleaseEvent& keyRelease);
 };
 
-#endif // STATE_H
+#endif // EDITOR_STATE_H2

@@ -123,7 +123,7 @@ void MainWindow::launchNextProcess()
         if (ui->cbNoRewriteKtxDir->isChecked())
         {
             args << "-i";
-        }       
+        }
 
         proc->setArguments(args);
 
@@ -133,7 +133,7 @@ void MainWindow::launchNextProcess()
                     onProcessFinished(proc, exitCode, exitStatus);
                 });
 
-        connect(proc, &QProcess::errorOccurred, this, [this, proc](QProcess::ProcessError error) {
+        connect(proc, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
             onProcessErrorOccurred(error);
         });
 
@@ -279,7 +279,7 @@ void MainWindow::slotAddSkipedTexture()
         return;
     }
 
-    for (auto tex_info : texturePaths)
+    for (const QString& tex_info : texturePaths)
     {
         QFileInfo textureInfo(tex_info);
         ui->lwSkipedTextures->addItem(textureInfo.fileName());
@@ -303,7 +303,7 @@ void MainWindow::slotDeleteSkipedTexture()
         return;
     }
 
-    auto item = ui->lwSkipedTextures->takeItem(cur_idx);
+    auto* item = ui->lwSkipedTextures->takeItem(cur_idx);
     delete item;
 }
 
@@ -358,7 +358,7 @@ void MainWindow::slotCopmpress()
             if (i < ui->lwSkipedTextures->count() - 1)
             {
                 tex_list += ",";
-            }            
+            }
         }
 
         args << tex_list;
@@ -377,7 +377,7 @@ void MainWindow::slotCopmpress()
 //------------------------------------------------------------------------------
 void MainWindow::slotOnReadyReadStdout()
 {
-    auto proc = dynamic_cast<QProcess *>(sender());
+    auto* proc = dynamic_cast<QProcess *>(sender());
 
     if (proc == texCompressor)
     {
@@ -409,7 +409,7 @@ void MainWindow::slotOnReadyReadStdout()
 //------------------------------------------------------------------------------
 void MainWindow::slotOnCompressionFinish(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    auto proc = dynamic_cast<QProcess *>(sender());
+    auto* proc = dynamic_cast<QProcess *>(sender());
 
     QString statusText = "";
 

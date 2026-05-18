@@ -17,6 +17,7 @@
 #include "SceneGraph.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
+#include "UndoRedoSaveHandler.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
 #include "graphics/common.h"
@@ -48,7 +49,6 @@
 
 #include <vulkan/vulkan_core.h>
 
-#include <mutex>
 #include <string>
 
 RouteEditor::RouteEditor() = default;
@@ -64,14 +64,19 @@ bool RouteEditor::initialize()
 
     configure_shaders();
 
-    context_.window_handler = WindowHandler::create(context_);
+    window_handler_ = WindowHandler::create(context_.settings.window,
+        context_.window, context_.perspective, context_.camera);
+
     if (!context_.window)
     {
         return false;
     }
 
     context_.mouse_handler = MouseHandler::create();
-    context_.keyboard_handler = KeyboardHandler::create(context_);
+    context_.keyboard_handler = KeyboardHandler::create(context_.settings.key_bindings);
+    auto undo_redo_save_handler = UndoRedoSaveHandler::create(
+        context_.keyboard_handler, context_.commands, context_.route_dir,
+        context_.static_objects_mutex, context_.static_objects);
     context_.camera_handler = CameraHandler::create(context_);
     context_.intersection_handler = IntersectionHandler::create(context_);
     context_.scene_graph = SceneGraph::create(context_);
@@ -121,9 +126,10 @@ bool RouteEditor::initialize()
 
     viewer_->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer_->addEventHandler(vsg::CloseHandler::create(viewer_));
-    viewer_->addEventHandler(context_.window_handler);
+    viewer_->addEventHandler(window_handler_);
     viewer_->addEventHandler(context_.mouse_handler);
     viewer_->addEventHandler(context_.keyboard_handler);
+    viewer_->addEventHandler(undo_redo_save_handler);
 
     static Keyboard keyboard(context_.settings.key_bindings);
     viewer_->addEventHandler(EventHandler::create(&keyboard));
@@ -135,7 +141,7 @@ bool RouteEditor::initialize()
     viewer_->assignRecordAndSubmitTaskAndPresentation({command_graph});
 
     const uint32_t num_lights = static_cast<uint32_t>(
-        context_.settings.num_lights);
+        context_.settings.window.num_lights);
 
     auto resource_hints = vsg::ResourceHints::create();
     resource_hints->numLightsRange = {num_lights, num_lights + 1};

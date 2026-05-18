@@ -1,4 +1,7 @@
 #include    <map-widget.h>
+
+#include    <rail-signal.h>
+
 #include    <QPainter>
 #include    <QMenu>
 #include    <QTreeWidget>

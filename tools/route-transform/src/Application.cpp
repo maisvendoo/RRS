@@ -27,10 +27,10 @@ bool Application::parse_args(int argc, char* argv[])
 bool Application::transform_route()
 {
     // Ищем топологию в маршруте
-    auto topology_dir = std::filesystem::path(cmd_line.input_route_path.value);
+    auto topology_dir = std::filesystem::path(cmd_line.input_route_path.value());
     topology_dir /= "topology";
 
-    if (cmd_line.transform_map.value)
+    if (cmd_line.transform_map.value())
     {
         // Ищем расположение объектов маршрута - папку с файлами *.map
         auto map_dir = std::filesystem::path(topology_dir / "map");
@@ -63,14 +63,14 @@ bool Application::transform_route()
                 std::string old_file_path = (backup_dir / filename).string();
                 std::string new_file_path = (map_dir / filename).string();
                 translate_map(old_file_path, new_file_path,
-                              cmd_line.shift_x.value,
-                              cmd_line.shift_y.value,
-                              cmd_line.shift_z.value);
+                              cmd_line.shift_x.value(),
+                              cmd_line.shift_y.value(),
+                              cmd_line.shift_z.value());
             }
         }
     }
 
-    if (cmd_line.transform_topology.value)
+    if (cmd_line.transform_topology.value())
     {
         // Ищем координаты траекторий маршрута - папку с файлами *.traj
         auto trajectories_dir = std::filesystem::path(topology_dir / "trajectories");
@@ -104,9 +104,9 @@ bool Application::transform_route()
                 std::string old_file_path = (backup_dir / filename).string();
                 std::string new_file_path = (trajectories_dir / filename).string();
                 translate_trajectory(old_file_path, new_file_path,
-                                     cmd_line.shift_x.value,
-                                     cmd_line.shift_y.value,
-                                     cmd_line.shift_z.value);
+                                     cmd_line.shift_x.value(),
+                                     cmd_line.shift_y.value(),
+                                     cmd_line.shift_z.value());
             }
         }
     }
@@ -328,25 +328,25 @@ void Application::parse_command_line(cli::Parser &parser, cmd_line_t &cmd_line)
 //------------------------------------------------------------------------------
 bool Application::check_command_line(const cmd_line_t &cmd_line)
 {
-    if (!cmd_line.input_route_path.isPresent())
+    if (!cmd_line.input_route_path.has_value())
     {
         LOG_WARN("ERROR: Missing input route path");
         return false;
     }
 
-    if (!std::filesystem::exists(cmd_line.input_route_path.value))
+    if (!std::filesystem::exists(cmd_line.input_route_path.value()))
     {
         LOG_WARN("ERROR: input route path not exists");
         return false;
     }
 
-    if (!cmd_line.transform_map.value && !cmd_line.transform_topology.value)
+    if (!cmd_line.transform_map.value() && !cmd_line.transform_topology.value())
     {
         LOG_WARN("ERROR: Nothing to do, options --map-transform or --topology-transform are missing");
         return false;
     }
 
-    if ((cmd_line.shift_x.value == 0.0) && (cmd_line.shift_y.value == 0.0) && (cmd_line.shift_z.value == 0.0))
+    if ((cmd_line.shift_x.value() == 0.0) && (cmd_line.shift_y.value() == 0.0) && (cmd_line.shift_z.value() == 0.0))
     {
         LOG_WARN("ERROR: Nothing to do, --delta-x, --delta-y and --delta-z are all missing or set to zero");
         return false;

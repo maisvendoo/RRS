@@ -73,15 +73,15 @@ void ZDSimConverter::parse_command_line(cli::Parser &parser)
     cmd_line.input_route_path = parser.get<std::string>("i");
     cmd_line.output_route_path = parser.get<std::string>("o");
 
-    if (cmd_line.route_path.isPresent())
+    if (cmd_line.route_path.has_value())
     {
-        configure_path(cmd_line.route_path.value, cmd_line.route_path.value);
+        configure_path(cmd_line.route_path.value(), cmd_line.route_path.value());
         return;
     }
 
-    if (cmd_line.input_route_path.isPresent() && cmd_line.output_route_path.isPresent())
+    if (cmd_line.input_route_path.has_value() && cmd_line.output_route_path.has_value())
     {
-        configure_path(cmd_line.input_route_path.value, cmd_line.output_route_path.value);
+        configure_path(cmd_line.input_route_path.value(), cmd_line.output_route_path.value());
         return;
     }
 

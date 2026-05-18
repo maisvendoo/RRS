@@ -13,7 +13,56 @@
 
 #include <vulkan/vulkan_core.h>
 
-static VkSampleCountFlags samples_bit_flag(int samples)
+static VkSampleCountFlags samples_bit_flag(int samples);
+
+WindowHandler::WindowHandler(
+        const window_settings_t& window_settings,
+        vsg::ref_ptr<vsg::Window>& window,
+        vsg::ref_ptr<vsg::Perspective>& perspective,
+        vsg::ref_ptr<vsg::Camera>& camera
+    )
+    : perspective_{perspective}
+    , camera_{camera}
+{
+    const auto window_traits = vsg::WindowTraits::create();
+    window_traits->x = window_settings.x;
+    window_traits->y = window_settings.y;
+    window_traits->width = window_settings.width;
+    window_traits->height = window_settings.height;
+    window_traits->fullscreen = window_settings.fullscreen;
+    window_traits->screenNum = window_settings.screen_number;
+    window_traits->windowTitle = window_settings.title;
+
+    window_traits->swapchainPreferences.presentMode =
+        window_settings.vsync ? VK_PRESENT_MODE_FIFO_KHR
+                              : VK_PRESENT_MODE_MAILBOX_KHR;
+
+    window_traits->samples = samples_bit_flag(window_settings.samples);
+
+    window = vsg::Window::create(window_traits);
+    if (!window)
+    {
+        Journal::instance()->error("Failed to create window");
+    }
+}
+
+void WindowHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
+{
+    const std::uint32_t width{configureWindow.width};
+    const std::uint32_t height{configureWindow.height};
+
+    if (perspective_)
+    {
+        perspective_->aspectRatio = static_cast<double>(width) / static_cast<double>(height);
+    }
+
+    if (camera_)
+    {
+        camera_->viewportState->set(0, 0, width, height);
+    }
+}
+
+VkSampleCountFlags samples_bit_flag(int samples)
 {
     if (samples >= 8)
     {
@@ -31,41 +80,4 @@ static VkSampleCountFlags samples_bit_flag(int samples)
     {
         return VK_SAMPLE_COUNT_1_BIT;
     }
-}
-
-WindowHandler::WindowHandler(EditorContext& context)
-    : context_(context)
-{
-    const settings_t& settings = context.settings;
-
-    const auto window_traits = vsg::WindowTraits::create();
-    window_traits->x = settings.window_x;
-    window_traits->y = settings.window_y;
-    window_traits->width = settings.window_width;
-    window_traits->height = settings.window_height;
-    window_traits->fullscreen = settings.fullscreen;
-    window_traits->screenNum = settings.screen_number;
-    window_traits->windowTitle = settings.window_title;
-
-    window_traits->swapchainPreferences.presentMode =
-        settings.vsync ? VK_PRESENT_MODE_FIFO_KHR
-                       : VK_PRESENT_MODE_MAILBOX_KHR;
-
-    window_traits->samples = samples_bit_flag(settings.samples);
-
-    context.window = vsg::Window::create(window_traits);
-    if (!context.window)
-    {
-        Journal::instance()->error("Failed to create window");
-    }
-}
-
-void WindowHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
-{
-    context_.perspective->aspectRatio =
-        static_cast<double>(configureWindow.width) /
-        static_cast<double>(configureWindow.height);
-
-    context_.camera->viewportState->set(0, 0,
-        configureWindow.width, configureWindow.height);
 }

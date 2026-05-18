@@ -7,24 +7,35 @@
 
 #include <string>
 
+class CfgReader;
+
+struct window_settings_t
+{
+    window_settings_t();
+
+    void read(CfgReader& cfg);
+
+    std::string title;
+    int x;
+    int y;
+    int width;
+    int height;
+    int screen_number;
+    bool fullscreen;
+    bool vsync;
+    bool double_buffer;
+    int samples;
+    // TODO: Move from window settings
+    int num_lights;
+};
+
 struct settings_t
 {
     settings_t();
 
     void read(const std::string& cfg_path);
 
-    std::string window_title;
-
-    int window_x;          ///< Window horizontal position
-    int window_y;          ///< Window vertical position
-    int window_width;      ///< Window width
-    int window_height;     ///< Window height
-    int screen_number;     ///< Screen number
-    bool fullscreen;       ///< Fullscreen flag
-    bool vsync;            ///< Vertical sync flag
-    bool double_buffer;    ///< Double buffering flag
-    int samples;           ///< Number of antialiasing samples
-    int num_lights;        ///< Max number of lights in scene
+    window_settings_t window;
 
     double zNear;            ///< Near clip plane
     double view_distance;    ///< View distance

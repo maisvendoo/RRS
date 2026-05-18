@@ -67,10 +67,10 @@ public:
     /// Get float field
     bool getFloat(QDomNode secNode, QString field, float& value);
     /// Get integer field
-    bool getInt(QString section, QString filed, int &value);
+    bool getInt(QString section, QString field, int &value);
     /// Get integer field
     bool getInt(QDomNode secNode, QString field, int &value);
-    /// Get boolean filed
+    /// Get boolean field
     bool getBool(QString section, QString field, bool &value);
     /// Get boolean field
     bool getBool(QDomNode secNode, QString field, bool &value);

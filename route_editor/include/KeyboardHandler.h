@@ -2,6 +2,7 @@
 #define KEYBOARD_HANDLER_H
 
 #include "Action.h"
+#include "KeyBinding.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
@@ -10,12 +11,10 @@
 #include <bitset>
 #include <cstdint>
 
-struct EditorContext;
-
 class KeyboardHandler : public vsg::Inherit<vsg::Visitor, KeyboardHandler>
 {
 public:
-    explicit KeyboardHandler(EditorContext& context);
+    explicit KeyboardHandler(const KeyBindings& key_bindings);
     virtual ~KeyboardHandler() = default;
 
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
@@ -28,7 +27,7 @@ public:
     bool get_binding_state(Action action) const;
 
 private:
-    EditorContext& context_;
+    const KeyBindings& key_bindings_;
     std::bitset<UINT16_MAX + 1> key_state_bits_;
 };
 
