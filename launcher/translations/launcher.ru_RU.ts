@@ -4,120 +4,164 @@
 <context>
     <name>GraphSettingsWindow</name>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="35"/>
         <source>Graphics settings</source>
-        <translation type="vanished">Графические настройки</translation>
+        <translation>Графические настройки</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="44"/>
         <source>Current GPU</source>
-        <translation type="vanished">Текущий графический процессор</translation>
+        <translation>Текущий графический процессор</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="63"/>
         <source>Window settings</source>
-        <translation type="vanished">Настройки окна</translation>
+        <translation>Настройки окна</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="118"/>
         <source>X</source>
-        <translation type="vanished">X</translation>
+        <translation>X</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="168"/>
         <source>Fullscreen</source>
-        <translation type="vanished">Полноэкранный режим</translation>
+        <translation>Полноэкранный режим</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="175"/>
         <source>Window decoration</source>
-        <translation type="vanished">Заголовок окна</translation>
+        <translation>Заголовок окна</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="187"/>
         <source>Display number</source>
-        <translation type="vanished">Номер монитора</translation>
+        <translation>Номер монитора</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="220"/>
         <source>FPS limit</source>
-        <translation type="vanished">Ограничивать FPS</translation>
+        <translation>Ограничивать FPS</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="263"/>
         <source>Multisampling</source>
-        <translation type="vanished">Сглаживание</translation>
+        <translation>Сглаживание</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="274"/>
         <source>MSAA</source>
-        <translation type="vanished">MSAA</translation>
+        <translation>MSAA</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="284"/>
         <source>2x</source>
-        <translation type="vanished">2x</translation>
+        <translation>2x</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="315"/>
         <source>Depth details</source>
-        <translation type="vanished">Детализация глубины</translation>
+        <translation>Детализация глубины</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="330"/>
         <source>View settings</source>
-        <translation type="vanished">Настройки отображения</translation>
+        <translation>Настройки отображения</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="341"/>
         <source>View distanse, m</source>
-        <translation type="vanished">Дистанция видимости, м</translation>
+        <translation>Дистанция видимости, м</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="369"/>
         <source>Shadows</source>
-        <translation type="vanished">Тени</translation>
+        <translation>Тени</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="378"/>
         <source>Show shadows</source>
-        <translation type="vanished">Включить тени</translation>
+        <translation>Включить тени</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="387"/>
         <source>Shadows quality</source>
-        <translation type="vanished">Качество теней</translation>
+        <translation>Качество теней</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="406"/>
         <source>Swadow map resolution</source>
-        <translation type="vanished">Разрешение теней</translation>
+        <translation>Разрешение теней</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="425"/>
         <source>Swadow&apos;s cascades</source>
-        <translation type="vanished">Число каскадов теней</translation>
+        <translation>Число каскадов теней</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="432"/>
+        <source>1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../forms/graphsettingswindow.ui" line="462"/>
         <source>Swadow&apos;s distance, m</source>
-        <translation type="vanished">Дальность отрисовки теней</translation>
+        <translation>Дальность отрисовки теней</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="469"/>
+        <source>30</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../forms/graphsettingswindow.ui" line="508"/>
         <source>Apply</source>
-        <translation type="vanished">Применить</translation>
+        <translation>Применить</translation>
     </message>
     <message>
+        <location filename="../forms/graphsettingswindow.ui" line="515"/>
         <source>Cancel</source>
-        <translation type="vanished">Отмена</translation>
+        <translation>Отмена</translation>
     </message>
     <message>
+        <location filename="../src/graphsettingswindow.cpp" line="129"/>
         <source>Low (performance)</source>
-        <translation type="vanished">Низко (производительность)</translation>
+        <translation>Низко (производительность)</translation>
     </message>
     <message>
+        <location filename="../src/graphsettingswindow.cpp" line="130"/>
         <source>Default</source>
-        <translation type="vanished">Нормально</translation>
+        <translation>Нормально</translation>
     </message>
     <message>
+        <location filename="../src/graphsettingswindow.cpp" line="131"/>
+        <location filename="../src/graphsettingswindow.cpp" line="139"/>
+        <location filename="../src/graphsettingswindow.cpp" line="145"/>
         <source>High</source>
-        <translation type="vanished">Высоко</translation>
+        <translation>Высоко</translation>
     </message>
     <message>
+        <location filename="../src/graphsettingswindow.cpp" line="132"/>
+        <location filename="../src/graphsettingswindow.cpp" line="140"/>
         <source>Ultra</source>
-        <translation type="vanished">Ультра</translation>
+        <translation>Ультра</translation>
     </message>
     <message>
+        <location filename="../src/graphsettingswindow.cpp" line="137"/>
+        <location filename="../src/graphsettingswindow.cpp" line="143"/>
         <source>Low</source>
-        <translation type="vanished">Низко</translation>
+        <translation>Низко</translation>
     </message>
     <message>
+        <location filename="../src/graphsettingswindow.cpp" line="138"/>
+        <location filename="../src/graphsettingswindow.cpp" line="144"/>
         <source>Medium</source>
-        <translation type="vanished">Среднее</translation>
+        <translation>Среднее</translation>
     </message>
     <message>
+        <location filename="../src/graphsettingswindow.cpp" line="141"/>
         <source>Custom</source>
-        <translation type="vanished">Пользовательское</translation>
+        <translation>Пользовательское</translation>
     </message>
 </context>
 <context>
@@ -241,6 +285,7 @@
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="569"/>
+        <location filename="../src/mainwindow.cpp" line="1259"/>
         <source>Start server</source>
         <translation>Запуск сервера</translation>
     </message>
@@ -352,56 +397,70 @@
         <translation type="vanished">Отмена</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="475"/>
         <source>&lt;Not_selected&gt;</source>
-        <translation type="vanished">&lt;Не выбран&gt;</translation>
+        <translation>&lt;Не выбран&gt;</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="503"/>
         <source>Trains positions are defined in scenario</source>
-        <translation type="vanished">Расположение поездов определяется сценарием</translation>
+        <translation>Расположение поездов определяется сценарием</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="561"/>
         <source>Start graphics client is impossible: missing Vulkan loader in your system. Check that you have lastest version of driver for your GPU from offcial vendor site.</source>
-        <translation type="vanished">Запустить графический клиент невозможно: в вашей системе отсутствует загрузчик Vulkan. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
+        <translation>Запустить графический клиент невозможно: в вашей системе отсутствует загрузчик Vulkan. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="566"/>
         <source>Start graphics client is impossible: can not create vkInstance. Check that you have lastest version of driver for your GPU from offcaial vendor site.</source>
-        <translation type="vanished">Запустить графический клиент невозможно: не удается создать vkInstance. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
+        <translation>Запустить графический клиент невозможно: не удается создать vkInstance. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="572"/>
         <source>Start graphics client is impossible: GPU driver error, can&apos;t get information about GPUs. Check that you have lastest version of driver for your GPU from offcial vendor site</source>
-        <translation type="vanished">Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить информацию о графических процессорах. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
+        <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить информацию о графических процессорах. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="578"/>
         <source>Start graphics client is impossible: not find GPU devices capable with Vulkan API.</source>
-        <translation type="vanished">Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить список графических процессоров. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
+        <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить список графических процессоров. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="584"/>
         <source>Start graphics client is impossible: GPU driver error, can&apos;t get GPUs list. Check that you have lastest version of driver for your GPU from offcial vendor site</source>
-        <translation type="vanished">Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить список графических процессоров. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
+        <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить список графических процессоров. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="618"/>
         <source>Start graphics client is impossible: You operation system %1 is not capable with modern direvers of all your devices. Please, update you operation system</source>
-        <translation type="vanished">Запуск графического клиента невозможен: Ваша операционная система %1 несовместима с современными драйверами всех ваших устройств. Пожалуйста, обновите вашу операционную систему.</translation>
+        <translation>Запуск графического клиента невозможен: Ваша операционная система %1 несовместима с современными драйверами всех ваших устройств. Пожалуйста, обновите вашу операционную систему.</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="628"/>
         <source>WARNING: You devices </source>
-        <translation type="vanished">ПРЕДУПРЕЖДЕНИЕ: Ваши устройства </translation>
+        <translation>ПРЕДУПРЕЖДЕНИЕ: Ваши устройства </translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="628"/>
         <source> may have a problems with start graphics client, becourse modern drivers for them not capable with your OS version</source>
-        <translation type="vanished">могут иметь возникли проблемы с запуском графического клиента, поскольку современные драйверы для него несовместимы с вашей версией ОС.</translation>
+        <translation>могут иметь возникли проблемы с запуском графического клиента, поскольку современные драйверы для него несовместимы с вашей версией ОС.</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="1201"/>
         <source>Stop server</source>
-        <translation type="vanished">Остановить сервер</translation>
+        <translation>Остановить сервер</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="1358"/>
+        <location filename="../src/mainwindow.cpp" line="1384"/>
         <source>Save Server</source>
-        <translation type="vanished">Сохранить сервер</translation>
+        <translation>Сохранить сервер</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="1365"/>
         <source>Rewrite Server</source>
-        <translation type="vanished">Перезаписать сервер</translation>
+        <translation>Перезаписать сервер</translation>
     </message>
 </context>
 <context>
