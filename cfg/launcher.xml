@@ -6,6 +6,10 @@
 		<MinWinBuild_NDIVIA>19041</MinWinBuild_NDIVIA>
 		<MinWinBuild_AMD>19041</MinWinBuild_AMD>
 		<MinWinBuild_INTEL>19045</MinWinBuild_INTEL>
+		<!-- Автозапуск вьювера -->
+		<AutoStartViewer>1</AutoStartViewer>
+		<!-- Автозапуск карты -->
+		<AutoStartRouteMap>1</AutoStartRouteMap>
 	</Launcher>
 
 	<Tool>

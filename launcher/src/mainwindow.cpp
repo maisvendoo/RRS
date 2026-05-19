@@ -35,6 +35,8 @@
 #include    <graphsettingswindow.h>
 
 const   QString MainWindow::STARTUP_SCN_SUBDIR = "startup";
+const   QString MainWindow::AUTO_START_VIEWER = "AutoStartViewer";
+const   QString MainWindow::AUTO_START_ROUTE_MAP = "AutoStartRouteMap";
 
 //------------------------------------------------------------------------------
 //

@@ -213,6 +213,12 @@ private:
 
     void centerWindow(QWidget* window);
 
+    /// Все-таки сохраняемые опции из данного окна
+    FieldsDataList fd_options;
+
+    static const   QString AUTO_START_VIEWER;
+    static const   QString AUTO_START_ROUTE_MAP;
+
 private slots:
 
     void slotRouteSelection();
