@@ -1101,9 +1101,9 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
             {
                 Journal::instance()->info("==== Vehicle loading ====");
 
-                Vehicle *vehicle = loadVehicle(QString(fs.getModulesDir().c_str()) +
-                                               fs.separator() +
-                                               relModulePath);
+                Vehicle *vehicle = LOAD_MODULE(Vehicle,
+                    QString(fs.getModulesDir().c_str()) +
+                    fs.separator() + relModulePath);
 
                 if (vehicle == nullptr)
                 {

@@ -109,7 +109,7 @@ void Vehicle::setModelIndex(size_t idx)
 //------------------------------------------------------------------------------
 void Vehicle::setTrainIndex(size_t idx)
 {
-    this->train_idx = idx;    
+    this->train_idx = idx;
 }
 
 //------------------------------------------------------------------------------
@@ -1094,34 +1094,4 @@ void Vehicle::loadWheelRailFriction(QString cfg_path, QString wheel_cfg)
     }
     Journal::instance()->info("Wheel friction coefficient formula: " + QString("psi = %1 + (%2 / (%3 + %4 * V)) + %5 * V")
                                                                            .arg(psi_a).arg(psi_b).arg(psi_c).arg(psi_d).arg(psi_e));
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-Vehicle* loadVehicle(QString lib_path)
-{
-    Vehicle* vehicle = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetVehicle getVehicle = reinterpret_cast<GetVehicle>(lib.resolve("getVehicle"));
-
-        if (getVehicle)
-        {
-            vehicle = getVehicle();
-        }
-        else
-        {
-            Journal::instance()->error(lib.errorString());
-        }
-    }
-    else
-    {
-        Journal::instance()->error(lib.errorString());
-    }
-
-    return vehicle;
 }
