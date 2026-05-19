@@ -27,8 +27,8 @@ void PassCar::initBrakesEquipment(const QString& modules_dir, const QString& cus
     air_dist->read_config(air_dist_config);
 
     // Электровоздухораспределитель
-    electro_air_dist = loadElectroAirDistributor(
-                modules_dir + QDir::separator() + electro_air_dist_module);
+    electro_air_dist = LOAD_MODULE(ElectroAirDistributor,
+        modules_dir + QDir::separator() + electro_air_dist_module);
     if (electro_air_dist != nullptr)
         electro_air_dist->read_config(electro_air_dist_config);
 
