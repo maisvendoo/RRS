@@ -36,7 +36,7 @@ bool Train::init(const init_data_t& init_data, int model_vehicles_count)
     FileSystem &fs = FileSystem::getInstance();
     QString solver_path = QString(fs.getLibraryDir().c_str()) + fs.separator() + solver_config.method;
 
-    train_motion_solver = loadSolver(solver_path);
+    train_motion_solver = LOAD_MODULE(Solver, solver_path);
 
     if (train_motion_solver == nullptr)
     {
@@ -105,7 +105,7 @@ bool Train::init(const solver_config_t& solver_config, std::vector<Vehicle*>& ve
     FileSystem &fs = FileSystem::getInstance();
     QString solver_path = QString(fs.getLibraryDir().c_str()) + fs.separator() + solver_config.method;
 
-    train_motion_solver = loadSolver(solver_path);
+    train_motion_solver = LOAD_MODULE(Solver, solver_path);
 
     if (train_motion_solver == nullptr)
     {

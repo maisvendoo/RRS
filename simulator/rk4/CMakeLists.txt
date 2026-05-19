@@ -32,3 +32,4 @@ target_include_directories (${TARGET} PRIVATE ./include/)
 # Компонуемся с библиотеками Qt6
 #target_link_libraries (${TARGET} Qt6::Core)
 target_link_libraries (${TARGET} solver)
+target_link_libraries (${TARGET} core)

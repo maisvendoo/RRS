@@ -58,35 +58,4 @@ public:
     virtual void setODEsize(size_t n);
 };
 
-/*!
- * \typedef
- * \brief GetSolver function signature
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef Solver* (*GetSolver)();
-
-/*!
- * \def
- * \brief Marco for generate getSolver() function
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_SOLVER(ClassName) \
-    extern "C" Q_DECL_EXPORT Solver *getSolver() \
-    {\
-        return new (ClassName)(); \
-    }
-
-/*!
- * \fn
- * \brief Load solver from library
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" SOLVER_EXPORT Solver *loadSolver(QString lib_path);
-
 #endif // SOLVER_H
