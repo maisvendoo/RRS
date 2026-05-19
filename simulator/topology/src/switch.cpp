@@ -6,6 +6,7 @@
 #include    <filesystem.h>
 #include    <Journal.h>
 #include    <topology-trajectory-device.h>
+#include    <core/load_module.h>
 
 //#include    <math-funcs.h>
 
@@ -392,7 +393,7 @@ void Switch::configure(CfgReader &cfg, QDomNode secNode, traj_list_t &traj_list)
         QString conn_path = QString(fs.getModulesDir().c_str()) +
                                      QDir::separator() +
                                      conn_module;
-        ConnectorDevice* module = loadConnectorDevice(conn_path);
+        ConnectorDevice* module = LOAD_MODULE(ConnectorDevice, conn_path);
 
         if (module == nullptr)
         {

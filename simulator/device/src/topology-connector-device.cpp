@@ -113,25 +113,3 @@ void ConnectorDevice::load_config(CfgReader &cfg)
 {
     (void) cfg;
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-ConnectorDevice *loadConnectorDevice(QString lib_path)
-{
-    ConnectorDevice *conn_device = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetConnectorDevice getConnectorDevice = reinterpret_cast<GetConnectorDevice>(lib.resolve("getConnectorDevice"));
-
-        if (getConnectorDevice)
-        {
-            conn_device = getConnectorDevice();
-        }
-    }
-
-    return conn_device;
-}
