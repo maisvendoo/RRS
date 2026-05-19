@@ -16,8 +16,6 @@
 #include    "model.h"
 #include "rail-signal.h"
 
-#include    <QTime>
-
 #include    <CfgReader.h>
 #include    <Journal.h>
 #include    <JournalFile.h>
@@ -1127,18 +1125,20 @@ void Model::tcpFeedBack(bool need_trains_feedback)
         tcp_server->updateTrainsInfo(update_trains.serialize());
         update_trains = simulator_trains_update_t();
     }
-    tcp_server->updateVehiclesPos(update_pos_data.serialize(), sim_time.simulation_seconds);
+
+    double realtime_seconds = std::chrono::duration<double, std::chrono::seconds::period>(process_timepoint - start_timepoint).count();
+    tcp_server->updateVehiclesPos(update_pos_data.serialize(), realtime_seconds);
     update_pos_data = simulator_update_pos_t();
 
-    tcp_server->updateVehiclesState(update_vehicles.serialize(), sim_time.simulation_seconds);
+    tcp_server->updateVehiclesState(update_vehicles.serialize(), realtime_seconds);
     update_vehicles = simulator_vehicles_update_t();
 
-    tcp_server->updatePlayers(update_players.serialize(), sim_time.simulation_seconds);
+    tcp_server->updatePlayers(update_players.serialize(), realtime_seconds);
     update_players = simulator_update_players_t();
 
     for (auto с_id = controlled_clients.keyBegin(); с_id != controlled_clients.keyEnd(); ++с_id)
     {
-        tcp_server->updateVehicleControlled(controlled_clients[*с_id].vehicle_controlled.serialize(), (*с_id), sim_time.simulation_seconds);
+        tcp_server->updateVehicleControlled(controlled_clients[*с_id].vehicle_controlled.serialize(), (*с_id), realtime_seconds);
         controlled_clients[*с_id].vehicle_controlled = simulator_vehicle_controlled_update_t();
     }
 }
@@ -1201,7 +1201,7 @@ void Model::process()
     // Обнуляем счётчик
     count_trains_done_its_step = 0;
 
-    realtime_at_step_begin = QTime::currentTime().msecsSinceStartOfDay();
+    process_timepoint = std::chrono::steady_clock::now();
 
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
 
@@ -1249,14 +1249,14 @@ void Model::slotTrainStepDone(int idx)
         count_trains_done_its_step = -1;
 
         // Расчитываем задержку симуляции от реалтайма
-        int realtime_at_step_end = QTime::currentTime().msecsSinceStartOfDay();
-        realtime_delay = realtime_at_step_end - realtime_at_step_begin - integration_time_interval;
-        if (realtime_delay > 0)
+        std::chrono::steady_clock::time_point end_timepoint = std::chrono::steady_clock::now();
+        realtime_delay = std::chrono::duration<double, std::chrono::seconds::period>(end_timepoint - process_timepoint).count();
+        if (realtime_delay * 1000.0 > integration_time_interval)
         {
             QString msg = QString("t = %1 | simulation of %2ms take %3ms | slowest train #%4 | WARNING: realtime delay!")
                               .arg(sim_time.simulation_seconds, 10, 'f', 3)
                               .arg(integration_time_interval)
-                              .arg(realtime_delay + integration_time_interval)
+                              .arg(realtime_delay * 1000.0, 10, 'f', 1)
                               .arg(idx);
             fputs(qPrintable(msg + "\n"), stdout);
             Journal::instance()->critical(msg);
@@ -1266,7 +1266,7 @@ void Model::slotTrainStepDone(int idx)
             QString msg = QString("t = %1 | simulation of %2ms take %3ms | slowest train #%4 ")
                               .arg(sim_time.simulation_seconds, 10, 'f', 3)
                               .arg(integration_time_interval)
-                              .arg(realtime_delay + integration_time_interval)
+                              .arg(realtime_delay * 1000.0, 10, 'f', 1)
                               .arg(idx);
             fputs(qPrintable(msg + "\n"), stdout);
             Journal::instance()->critical(msg);
