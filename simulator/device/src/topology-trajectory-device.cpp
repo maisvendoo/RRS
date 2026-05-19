@@ -155,25 +155,3 @@ void TrajectoryDevice::load_config(CfgReader &cfg)
 {
     (void) cfg;
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-TrajectoryDevice *loadTrajectoryDevice(QString lib_path)
-{
-    TrajectoryDevice *conn_device = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetTrajectoryDevice getTrajectoryDevice = reinterpret_cast<GetTrajectoryDevice>(lib.resolve("getTrajectoryDevice"));
-
-        if (getTrajectoryDevice)
-        {
-            conn_device = getTrajectoryDevice();
-        }
-    }
-
-    return conn_device;
-}
