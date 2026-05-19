@@ -2,8 +2,17 @@
 #define     TOPOLOGYCHECK_H
 
 #include    "cmdparser.hpp"
-#include    "topology.h"
-#include    "switch.h"
+#include    "vec3.h"
+
+#include    <memory>
+#include    <string>
+#include    <utility>
+#include    <vector>
+
+class Switch;
+class Topology;
+class Trajectory;
+struct track_t;
 
 //------------------------------------------------------------------------------
 //
@@ -12,9 +21,8 @@ class TopologyCheck
 {
 public:
 
-    TopologyCheck(){}
-
-    ~TopologyCheck(){}
+    TopologyCheck();
+    ~TopologyCheck();
 
     int run(int argc, char *argv[]);
 
@@ -22,9 +30,9 @@ private:
 
     std::string route_path = "";
 
-    Topology* topology = new Topology();
+    std::unique_ptr<Topology> topology;
 
-    std::vector<std::pair<dvec3, Trajectory *>> ends_without_connector = {};
+    std::vector<std::pair<dvec3, Trajectory*>> ends_without_connector = {};
 
     double maximum_curvature = 1.0 / 150.0;
 

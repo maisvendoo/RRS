@@ -20,6 +20,7 @@ FileSystem::FileSystem()
     setDir(binDir, workDir);
     setDir(routeRootDir, tmp + "routes");
     setDir(configDir, tmp + "cfg");
+    setDir(docsDir, tmp + "docs");
     setDir(logsDir, tmp + "logs");
     setDir(libraryDir, tmp + "lib");
     setDir(trainsDir, configDir + separator() + "trains");
@@ -59,6 +60,14 @@ const std::string& FileSystem::getRouteRootDir() const
 const std::string& FileSystem::getConfigDir() const
 {
     return configDir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+const std::string &FileSystem::getDocsDir() const
+{
+    return docsDir;
 }
 
 //------------------------------------------------------------------------------

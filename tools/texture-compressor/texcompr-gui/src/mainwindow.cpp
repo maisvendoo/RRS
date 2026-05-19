@@ -7,6 +7,8 @@
 #include    <filesystem.h>
 #include    <QDirIterator>
 #include    <QThread>
+#include    <CfgReader.h>
+#include    <styles.h>
 
 const QString TEXCOMPRESS_NAME = "texcompr";
 
@@ -23,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    loadSettingsGUI();
 
     connect(ui->pbOpenModel, &QPushButton::released, this, &MainWindow::slotOpenModel);
     connect(ui->pbAddTexture, &QPushButton::released, this, &MainWindow::slotAddSkipedTexture);
@@ -68,6 +72,35 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadSettingsGUI()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_dir = fs.getConfigDir();
+    std::string cfg_path = fs.combinePath(cfg_dir, "gui-settings.xml");
+
+    CfgReader cfg;
+
+    if ( cfg.load(QString(cfg_path.c_str())) )
+    {
+        QString secName = "GUISettings";
+        QString theme_name = "";
+
+        if (!cfg.getString(secName, "Theme", theme_name))
+        {
+            theme_name = "dark-jedy";
+        }
+
+        std::string theme_dir = fs.getThemeDir();
+        std::string theme_path = fs.combinePath(theme_dir, theme_name.toStdString() + ".qss");
+        QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
+
+        this->setStyleSheet(style_sheet);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -123,7 +156,7 @@ void MainWindow::launchNextProcess()
         if (ui->cbNoRewriteKtxDir->isChecked())
         {
             args << "-i";
-        }       
+        }
 
         proc->setArguments(args);
 
@@ -133,7 +166,7 @@ void MainWindow::launchNextProcess()
                     onProcessFinished(proc, exitCode, exitStatus);
                 });
 
-        connect(proc, &QProcess::errorOccurred, this, [this, proc](QProcess::ProcessError error) {
+        connect(proc, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
             onProcessErrorOccurred(error);
         });
 
@@ -279,7 +312,7 @@ void MainWindow::slotAddSkipedTexture()
         return;
     }
 
-    for (auto tex_info : texturePaths)
+    for (const QString& tex_info : texturePaths)
     {
         QFileInfo textureInfo(tex_info);
         ui->lwSkipedTextures->addItem(textureInfo.fileName());
@@ -303,7 +336,7 @@ void MainWindow::slotDeleteSkipedTexture()
         return;
     }
 
-    auto item = ui->lwSkipedTextures->takeItem(cur_idx);
+    auto* item = ui->lwSkipedTextures->takeItem(cur_idx);
     delete item;
 }
 
@@ -358,7 +391,7 @@ void MainWindow::slotCopmpress()
             if (i < ui->lwSkipedTextures->count() - 1)
             {
                 tex_list += ",";
-            }            
+            }
         }
 
         args << tex_list;
@@ -377,7 +410,7 @@ void MainWindow::slotCopmpress()
 //------------------------------------------------------------------------------
 void MainWindow::slotOnReadyReadStdout()
 {
-    auto proc = dynamic_cast<QProcess *>(sender());
+    auto* proc = dynamic_cast<QProcess *>(sender());
 
     if (proc == texCompressor)
     {
@@ -409,7 +442,7 @@ void MainWindow::slotOnReadyReadStdout()
 //------------------------------------------------------------------------------
 void MainWindow::slotOnCompressionFinish(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    auto proc = dynamic_cast<QProcess *>(sender());
+    auto* proc = dynamic_cast<QProcess *>(sender());
 
     QString statusText = "";
 

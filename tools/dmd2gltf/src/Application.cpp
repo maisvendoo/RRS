@@ -57,21 +57,21 @@ bool Application::convert()
 {
     if (convert_mode == CONVERT_ROUTE)
     {
-        return convert_route(cmd_line.input_route_path.value,
-                             cmd_line.output_route_path.value,
-                             cmd_line.input_only_used_at_map.value,
-                             cmd_line.input_lights_at_map.value,
-                             cmd_line.input_compress_textures.value,
-                             cmd_line.num_threads.value);
+        return convert_route(cmd_line.input_route_path.value(),
+                             cmd_line.output_route_path.value(),
+                             cmd_line.input_only_used_at_map.value(),
+                             cmd_line.input_lights_at_map.value(),
+                             cmd_line.input_compress_textures.value(),
+                             cmd_line.num_threads.value());
     }
 
     if (convert_mode == CONVERT_MODEL)
     {
-        return convert_model(cmd_line.input_model_path.value,
-                             cmd_line.input_texture_path.value,
-                             cmd_line.output_model_path.value,
-                             cmd_line.input_compress_textures.value,
-                             cmd_line.smooth.value);
+        return convert_model(cmd_line.input_model_path.value(),
+                             cmd_line.input_texture_path.value(),
+                             cmd_line.output_model_path.value(),
+                             cmd_line.input_compress_textures.value(),
+                             cmd_line.smooth.value());
     }
 
     return false;
@@ -1215,9 +1215,9 @@ void Application::parse_command_line(cli::Parser &parser, cmd_line_t &cmd_line)
 bool Application::set_convert_mode(const cmd_line_t &cmd_line,
                                    ConvertMode &convert_mode)
 {
-    if (cmd_line.input_route_path.isPresent())
+    if (cmd_line.input_route_path.has_value())
     {
-        if (cmd_line.output_route_path.isPresent())
+        if (cmd_line.output_route_path.has_value())
         {
             convert_mode = CONVERT_ROUTE;
             return true;
@@ -1229,11 +1229,11 @@ bool Application::set_convert_mode(const cmd_line_t &cmd_line,
         }
     }
 
-    if (cmd_line.input_model_path.isPresent())
+    if (cmd_line.input_model_path.has_value())
     {
-        if (cmd_line.input_texture_path.isPresent())
+        if (cmd_line.input_texture_path.has_value())
         {
-            if (cmd_line.output_model_path.isPresent())
+            if (cmd_line.output_model_path.has_value())
             {
                 convert_mode = CONVERT_MODEL;
                 return true;

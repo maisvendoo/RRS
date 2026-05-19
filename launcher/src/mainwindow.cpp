@@ -25,14 +25,19 @@
 
 #include    "filesystem.h"
 #include    "CfgReader.h"
+#include    "find-settings.h"
 
 #include    "platform.h"
 #include    "styles.h"
+
+#include    "pdfviewer.h"
 
 #include    <system-diagnostic.h>
 #include    <graphsettingswindow.h>
 
 const   QString MainWindow::STARTUP_SCN_SUBDIR = "startup";
+const   QString MainWindow::AUTO_START_VIEWER = "AutoStartViewer";
+const   QString MainWindow::AUTO_START_ROUTE_MAP = "AutoStartRouteMap";
 
 //------------------------------------------------------------------------------
 //
@@ -126,6 +131,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setFocusPolicy(Qt::ClickFocus);
 
+    loadSettingsGUI();
+
     loadConfig();
 
     QIcon icon(":/images/images/RRS_logo.png");
@@ -159,7 +166,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(ui->actionGraphics_settings, &QAction::triggered, this, [this](){
         graphSettingsWindow->show();
-    });    
+    });
+
+    // Окно скрывается, а не удаляется
+    helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
+
+    createToolsMenu();
+
+    createHelpMenu();
+
+    connect(ui->cbAutostartViewer, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState){
+        applyOptions(fd_options, ui);
+        saveOptions(fd_options);
+    });
+
+    connect(ui->cbAutostartMap, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState){
+        applyOptions(fd_options, ui);
+        saveOptions(fd_options);
+    });
 }
 
 //------------------------------------------------------------------------------
@@ -632,6 +656,195 @@ void MainWindow::gpuDiagnostics()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::createHelpMenu()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    auto docsDir = fs.getDocsDir();
+
+    QDir docs(QString(docsDir.c_str()));
+    QDirIterator docs_files(docs.path(),
+                            QStringList() << "*.pdf",
+                            QDir::NoDotAndDotDot | QDir::Files);
+
+    while (docs_files.hasNext())
+    {
+        QString fullPath = docs_files.next();
+        QFileInfo fileInfo(fullPath);
+
+        //train_info.train_config_path = fileInfo.baseName();
+
+        QAction *action = new QAction(fileInfo.baseName());
+        ui->menuHelp->addAction(action);
+
+        connect(action, &QAction::triggered, this, [this, fullPath, fileInfo]{
+
+            if (fullPath.isEmpty())
+            {
+                return;
+            }
+
+            auto *viewer = new PdfViewer(helpWindow);
+
+            if (!viewer->load(fullPath))
+            {
+                delete viewer;
+                return;
+            }
+
+            if (auto* old = helpWindow->centralWidget())
+            {
+                old->deleteLater();
+            }
+
+            helpWindow->setCentralWidget(viewer);
+            helpWindow->setWindowTitle(QString("%2 | %1 страниц").arg(viewer->pageCount()).arg(fileInfo.baseName()));
+            helpWindow->show();
+            helpWindow->resize(900, 1000);
+
+            QTimer::singleShot(0, viewer, [this, viewer]() {
+                viewer->adjustWindowToPageWidth(0); // 0 = первая страница
+                this->centerWindow(helpWindow);
+            });
+        });
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::createToolsMenu()
+{
+    CfgReader cfg;
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_dir = fs.getConfigDir();
+    std::string cfg_path = fs.combinePath(cfg_dir, "launcher.xml");
+
+    if (!cfg.load(QString(cfg_path.c_str())))
+    {
+        return;
+    }
+
+    auto secNode = cfg.getFirstSection("Tool");
+
+    QString binPath = QDir::toNativeSeparators(QString(fs.getBinaryDir().c_str()));
+
+    while (!secNode.isNull())
+    {
+        QString toolName;
+        cfg.getString(secNode, "Name", toolName);
+
+        if (toolName.isEmpty())
+        {
+            continue;
+        }
+
+        QString toolPath = binPath + QDir::separator() + toolName + EXE_EXP;
+
+        QFile toolFile(toolPath);
+
+        if (!toolFile.exists())
+        {
+            continue;
+        }
+
+        QProcess *proc = new QProcess(this);
+        proc->setWorkingDirectory(binPath);
+        proc->setProgram(toolPath);
+
+        QString args_str;
+        cfg.getString(secNode, "CommandLine", args_str);
+        QStringList args = args_str.split(' ');
+
+        if (!args.empty())
+        {
+            proc->setArguments(args);
+        }
+
+        QString description;
+        cfg.getString(secNode, "Description", description);
+
+        if (description.isEmpty())
+        {
+            description = toolName;
+        }
+
+        toolProcs.push_back(proc);
+
+        QAction *action = new QAction(description);
+
+        connect(action, &QAction::triggered, this, [this](){
+
+            QAction *ac = qobject_cast<QAction *>(sender());
+
+            if (ac == nullptr)
+            {
+                return;
+            }
+
+            int idx = ui->menuTools->actions().indexOf(ac);
+
+            if (idx >= 0 && idx < toolProcs.size())
+            {
+                if (toolProcs[idx] != nullptr && toolProcs[idx]->state() != QProcess::Running)
+                {
+                    toolProcs[idx]->start();
+                }
+            }
+        });
+
+        ui->menuTools->addAction(action);
+
+        secNode = cfg.getNextSection();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::centerWindow(QWidget *window)
+{
+    if (!window || !window->parentWidget())
+    {
+        return;
+    }
+
+    QRect parentRect = window->parentWidget()->geometry();
+    QRect myRect = window->geometry();
+    int x = parentRect.x() + (parentRect.width() - myRect.width()) / 2;
+    int y = parentRect.y() + (parentRect.height() - myRect.height()) / 2;
+    window->move(x, y);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::updateOptions(FieldsDataList &fd_options)
+{
+    findSetting(AUTO_START_VIEWER, fd_options).second.toBool() ?
+        ui->cbAutostartViewer->setCheckState(Qt::CheckState::Checked) :
+        ui->cbAutostartViewer->setCheckState(Qt::CheckState::Unchecked);
+
+    findSetting(AUTO_START_ROUTE_MAP, fd_options).second.toBool() ?
+        ui->cbAutostartMap->setCheckState(Qt::CheckState::Checked) :
+        ui->cbAutostartMap->setCheckState(Qt::CheckState::Unchecked);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::applyOptions(FieldsDataList &fd_options, Ui::MainWindow *ui)
+{
+    int idx = 0;
+    findSetting(AUTO_START_VIEWER, fd_options, idx);
+    fd_options[idx] = QPair<QString, QVariant>(AUTO_START_VIEWER, static_cast<int>(ui->cbAutostartViewer->checkState() == Qt::CheckState::Checked));
+
+    findSetting(AUTO_START_ROUTE_MAP, fd_options, idx);
+    fd_options[idx] = QPair<QString, QVariant>(AUTO_START_ROUTE_MAP, static_cast<int>(ui->cbAutostartMap->checkState() == Qt::CheckState::Checked));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::loadActiveTrainsList()
 {
     // TODO: Разные типы с size_t
@@ -643,6 +856,16 @@ void MainWindow::loadActiveTrainsList()
     reloadScenariosList();
 
     slotUpdateActiveTrains();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::saveOptions(FieldsDataList &fd_options)
+{
+    CfgEditor editor;
+
+    editor.editFile(settings_path, "Launcher", fd_options);
 }
 
 //------------------------------------------------------------------------------
@@ -788,6 +1011,35 @@ void MainWindow::startMap(bool local)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::loadSettingsGUI()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_dir = fs.getConfigDir();
+    std::string cfg_path = fs.combinePath(cfg_dir, "gui-settings.xml");
+
+    CfgReader cfg;
+
+    if ( cfg.load(QString(cfg_path.c_str())) )
+    {
+        QString secName = "GUISettings";
+        QString theme_name = "";
+
+        if (!cfg.getString(secName, "Theme", theme_name))
+        {
+            theme_name = "dark-jedy";
+        }
+
+        std::string theme_dir = fs.getThemeDir();
+        std::string theme_path = fs.combinePath(theme_dir, theme_name.toStdString() + ".qss");
+        QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
+
+        this->setStyleSheet(style_sheet);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::loadConfig()
 {
     FileSystem &fs = FileSystem::getInstance();
@@ -816,6 +1068,18 @@ void MainWindow::loadConfig()
         cfg.getInt(secName, "MinWinBuild_NVIDIA", winver.buildNvidia);
         cfg.getInt(secName, "MinWinBuild_AMD", winver.buildAMD);
         cfg.getInt(secName, "MinWinBuild_INTEL", winver.buildIntel);
+
+        settings_path = QString(cfg_path.c_str());
+
+        bool is_auto_start_viewer = false;
+        cfg.getBool(secName, AUTO_START_VIEWER, is_auto_start_viewer);
+        fd_options.append(QPair<QString, QVariant>(AUTO_START_VIEWER, is_auto_start_viewer));
+
+        bool is_auto_start_route_map = false;
+        cfg.getBool(secName, AUTO_START_ROUTE_MAP, is_auto_start_route_map);
+        fd_options.append(QPair<QString, QVariant>(AUTO_START_ROUTE_MAP, is_auto_start_route_map));
+
+        updateOptions(fd_options);
     }
 }
 

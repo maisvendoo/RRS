@@ -31,6 +31,8 @@ public:
 
     const std::string& getConfigDir() const;
 
+    const std::string& getDocsDir() const;
+
     const std::string& getLogsDir() const;
 
     const std::string& getLibraryDir() const;
@@ -81,6 +83,7 @@ public:
 private:
     std::string routeRootDir;
     std::string configDir;
+    std::string docsDir;
     std::string logsDir;
     std::string libraryDir;
     std::string trainsDir;

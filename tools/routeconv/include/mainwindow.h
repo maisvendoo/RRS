@@ -4,8 +4,6 @@
 #include    <QMainWindow>
 #include    <QProcess>
 
-
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -75,6 +73,8 @@ private:
     void updateStatus(QString new_status, QString new_subprocess_status = "");
 
     int getDMDConversionPercent(QString sub_status);
+
+    void loadSettingsGUI();
 
 private slots:
 

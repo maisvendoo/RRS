@@ -89,6 +89,8 @@ private:
 
     void closeEvent(QCloseEvent *event);
 
+    void loadSettingsGUI();
+
 private slots:
 
     void slotConnectedToSimulator();
