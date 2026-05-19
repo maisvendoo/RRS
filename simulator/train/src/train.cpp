@@ -5,6 +5,7 @@
 #include    "physics.h"
 #include    "Journal.h"
 #include    <vehicle-controller.h>
+#include    <core/load_module.h>
 
 //------------------------------------------------------------------------------
 //
@@ -1353,8 +1354,8 @@ void Train::loadJointModule(Device* con_fwd, Device* con_bwd, std::vector<Joint*
     QString joint_module_name = "";
     cfg.getString(secName, "ModuleName", joint_module_name);
 
-    Joint* joint = loadJoint(QString(joint_module_dir +
-                             fs.separator() + joint_module_name));
+    Joint* joint = LOAD_MODULE(Joint,
+        QString(joint_module_dir + fs.separator() + joint_module_name));
     if (joint == nullptr)
         return;
 

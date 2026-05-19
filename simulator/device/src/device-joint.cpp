@@ -3,8 +3,6 @@
 #include    "device-joint.h"
 
 #include    "CfgReader.h"
-#include    "Journal.h"
-#include    "physics.h"
 #include    "device.h"
 
 //------------------------------------------------------------------------------
@@ -97,34 +95,4 @@ void Joint::step(double t, double dt)
 void Joint::load_config(CfgReader &cfg)
 {
     (void) cfg;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-Joint *loadJoint(QString lib_path)
-{
-    Joint *joint = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetJoint getJoint = reinterpret_cast<GetJoint>(lib.resolve("getJoint"));
-
-        if (getJoint)
-        {
-            joint = getJoint();
-        }
-        else
-        {
-            Journal::instance()->error(lib.errorString());
-        }
-    }
-    else
-    {
-        Journal::instance()->error(lib.errorString());
-    }
-
-    return joint;
 }
