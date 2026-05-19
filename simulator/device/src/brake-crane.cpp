@@ -123,25 +123,3 @@ void BrakeCrane::ode_system(const state_vector_t &Y,
 
     dYdt[ER_PRESSURE] = Qer / Ver;
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-BrakeCrane *loadBrakeCrane(QString lib_path)
-{
-    BrakeCrane *crane = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetBrakeCrane getBrakeCrane = reinterpret_cast<GetBrakeCrane>(lib.resolve("getBrakeCrane"));
-
-        if (getBrakeCrane)
-        {
-            crane = getBrakeCrane();
-        }
-    }
-
-    return crane;
-}
