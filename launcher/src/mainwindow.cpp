@@ -25,6 +25,7 @@
 
 #include    "filesystem.h"
 #include    "CfgReader.h"
+#include    "find-settings.h"
 
 #include    "platform.h"
 #include    "styles.h"
@@ -173,6 +174,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     createToolsMenu();
 
     createHelpMenu();
+
+    connect(ui->cbAutostartViewer, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState){
+        applyOptions(fd_options, ui);
+        saveOptions(fd_options);
+    });
+
+    connect(ui->cbAutostartMap, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState){
+        applyOptions(fd_options, ui);
+        saveOptions(fd_options);
+    });
 }
 
 //------------------------------------------------------------------------------
@@ -807,6 +818,33 @@ void MainWindow::centerWindow(QWidget *window)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::updateOptions(FieldsDataList &fd_options)
+{
+    findSetting(AUTO_START_VIEWER, fd_options).second.toBool() ?
+        ui->cbAutostartViewer->setCheckState(Qt::CheckState::Checked) :
+        ui->cbAutostartViewer->setCheckState(Qt::CheckState::Unchecked);
+
+    findSetting(AUTO_START_ROUTE_MAP, fd_options).second.toBool() ?
+        ui->cbAutostartMap->setCheckState(Qt::CheckState::Checked) :
+        ui->cbAutostartMap->setCheckState(Qt::CheckState::Unchecked);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::applyOptions(FieldsDataList &fd_options, Ui::MainWindow *ui)
+{
+    int idx = 0;
+    findSetting(AUTO_START_VIEWER, fd_options, idx);
+    fd_options[idx] = QPair<QString, QVariant>(AUTO_START_VIEWER, static_cast<int>(ui->cbAutostartViewer->checkState() == Qt::CheckState::Checked));
+
+    findSetting(AUTO_START_ROUTE_MAP, fd_options, idx);
+    fd_options[idx] = QPair<QString, QVariant>(AUTO_START_ROUTE_MAP, static_cast<int>(ui->cbAutostartMap->checkState() == Qt::CheckState::Checked));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::loadActiveTrainsList()
 {
     // TODO: Разные типы с size_t
@@ -818,6 +856,16 @@ void MainWindow::loadActiveTrainsList()
     reloadScenariosList();
 
     slotUpdateActiveTrains();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::saveOptions(FieldsDataList &fd_options)
+{
+    CfgEditor editor;
+
+    editor.editFile(settings_path, "Launcher", fd_options);
 }
 
 //------------------------------------------------------------------------------
@@ -1020,6 +1068,18 @@ void MainWindow::loadConfig()
         cfg.getInt(secName, "MinWinBuild_NVIDIA", winver.buildNvidia);
         cfg.getInt(secName, "MinWinBuild_AMD", winver.buildAMD);
         cfg.getInt(secName, "MinWinBuild_INTEL", winver.buildIntel);
+
+        settings_path = QString(cfg_path.c_str());
+
+        bool is_auto_start_viewer = false;
+        cfg.getBool(secName, AUTO_START_VIEWER, is_auto_start_viewer);
+        fd_options.append(QPair<QString, QVariant>(AUTO_START_VIEWER, is_auto_start_viewer));
+
+        bool is_auto_start_route_map = false;
+        cfg.getBool(secName, AUTO_START_ROUTE_MAP, is_auto_start_route_map);
+        fd_options.append(QPair<QString, QVariant>(AUTO_START_ROUTE_MAP, is_auto_start_route_map));
+
+        updateOptions(fd_options);
     }
 }
 

@@ -3,6 +3,7 @@
 
 #include    <filesystem.h>
 #include    <CfgReader.h>
+#include    <find-settings.h>
 
 #include    <QSlider>
 
@@ -30,40 +31,6 @@ const   QString GraphSettingsWindow::SHADOWS_PRESET = "ShadowsPreset";
 const   QString GraphSettingsWindow::SHADOW_DISTANCE = "ShadowDistance";
 const   QString GraphSettingsWindow::SHADOW_CASCADE = "ShadowCascade";
 const   QString GraphSettingsWindow::SHADOW_RESOLUTION = "ShadowResolution";
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QPair<QString, QVariant> findSetting(QString setting,
-                                     FieldsDataList &fd_list,
-                                     int &idx)
-{
-    QPair<QString, QVariant> pair;
-
-    for (int i = 0; i < fd_list.size(); ++i)
-    {
-        pair = fd_list[i];
-
-        if (pair.first == setting)
-        {
-            idx = i;
-            return pair;
-        }
-    }
-
-    return pair;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QPair<QString, QVariant> findSetting(QString setting, FieldsDataList &fd_list)
-{
-    int idx = 0;
-    QPair<QString, QVariant> pair = findSetting(setting, fd_list, idx);
-
-    return pair;
-}
 
 //------------------------------------------------------------------------------
 //

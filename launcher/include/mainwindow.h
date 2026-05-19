@@ -97,9 +97,6 @@ private:
     bool is_start_button_to_stop_server;
     int new_added_start_config_idx = -1;
 
-    /// Viewer settings
-    FieldsDataList  fd_list;
-
     static const   QString STARTUP_SCN_SUBDIR;
 
     QString settings_path;
@@ -218,6 +215,12 @@ private:
 
     static const   QString AUTO_START_VIEWER;
     static const   QString AUTO_START_ROUTE_MAP;
+
+    void updateOptions(FieldsDataList &fd_options);
+
+    void applyOptions(FieldsDataList &fd_options, Ui::MainWindow *ui);
+
+    void saveOptions(FieldsDataList &fd_options);
 
 private slots:
 
