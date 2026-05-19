@@ -62,4 +62,5 @@ target_link_libraries (${TARGET} train)
 target_link_libraries (${TARGET} network)
 target_link_libraries (${TARGET} scenario-manager)
 target_link_libraries (${TARGET} topology)
+target_link_libraries (${TARGET} core)
 

@@ -37,25 +37,3 @@ void VirtualInterfaceDevice::receiveFeedback(feedback_signals_t feedback_signals
 {
     this->feedback_signals = feedback_signals;
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-VirtualInterfaceDevice *loadInterfaceDevice(QString lib_path)
-{
-    VirtualInterfaceDevice *device = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetInterfaceDevice getInterfaceDevice = reinterpret_cast<GetInterfaceDevice>(lib.resolve("getInterfaceDevice"));
-
-        if (getInterfaceDevice)
-        {
-            device = getInterfaceDevice();
-        }
-    }
-
-    return device;
-}
