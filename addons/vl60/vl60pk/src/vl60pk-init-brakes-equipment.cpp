@@ -54,11 +54,13 @@ void VL60pk::initBrakesEquipment(const QString& modules_dir, const QString& cust
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 
     // Рукава тормозной магистрали
-    hose_bp_fwd = loadPneumoHoseEPB(modules_dir + QDir::separator() + "hose369a");
+    hose_bp_fwd = LOAD_MODULE(PneumoHoseEPB,
+        modules_dir + QDir::separator() + "hose369a");
     hose_bp_fwd->read_config("pneumo-hose-BP369a-loco");
     forward_connectors.push_back(hose_bp_fwd);
 
-    hose_bp_bwd = loadPneumoHoseEPB(modules_dir + QDir::separator() + "hose369a");
+    hose_bp_bwd = LOAD_MODULE(PneumoHoseEPB,
+        modules_dir + QDir::separator() + "hose369a");
     hose_bp_bwd->read_config("pneumo-hose-BP369a-loco");
     backward_connectors.push_back(hose_bp_bwd);
 }
