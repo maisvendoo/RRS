@@ -50,7 +50,6 @@ target_link_libraries(${TARGET} PRIVATE
     topology
     parsing
     graphics
-    core
 )
 
 target_include_directories(${TARGET} PRIVATE

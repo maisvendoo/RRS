@@ -5,8 +5,6 @@
 #include "Logger.h"
 #include "filesystem.h"
 
-#include <core/load_module.h>
-
 #include <QApplication>
 #include <QThread>
 #include <QPainter>
@@ -214,7 +212,7 @@ bool ProcDisplayAnimation::load_config(CfgReader &cfg)
         cfgdir_path = fs.combinePath(cfgdir_path, tmp_qstr.toStdString());
     }
 
-    display = LOAD_MODULE(AbstractDisplay, module_path.c_str());
+    display = loadDisplay(module_path.c_str());
 
     if (!display)
     {
