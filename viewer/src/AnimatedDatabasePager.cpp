@@ -21,29 +21,24 @@
 //------------------------------------------------------------------------------
 void AnimatedDatabasePager::start(uint32_t numReadThreads)
 {
-    //LOG_INFO("AnimatedDatabasePager::start(%u)", numReadThreads);
-
     auto readThread = [](AnimatedDatabasePager& animatedDatabasePager, const std::string& threadName)
     {
         LOG_INFO("Started %s", threadName.c_str());
-
-        //auto local_instrumentation = shareOrDuplicateForThreadSafety(animatedDatabasePager.instrumentation);
-        //if (local_instrumentation) local_instrumentation->setThreadName(threadName);
 
         while (animatedDatabasePager.status->active())
         {
             vsg::ref_ptr<vsg::PagedLOD> plod = animatedDatabasePager._requestQueue->take_when_available(animatedDatabasePager.frameCount.load());
             if (plod)
             {
-                //CPU_INSTRUMENTATION_L1_NC(animatedDatabasePager.instrumentation, "AnimatedDatabasePager read", COLOR_PAGER);
-
                 uint64_t frameDelta = animatedDatabasePager.frameCount - plod->frameHighResLastUsed.load();
 
                 if (frameDelta > 1 || !vsg::compare_exchange(plod->requestStatus, vsg::PagedLOD::ReadRequest, vsg::PagedLOD::Reading))
                 {
-                    LOG_WARN("AnimatedDatabasePager: Expired (%u/%u) read request for model from file: %s",
-                             plod->frameHighResLastUsed.load(), animatedDatabasePager.frameCount.load(), plod->filename.string().c_str());
-                    animatedDatabasePager.requestDiscarded(plod);
+                    LOG_WARN("AnimatedDatabasePager: Expired (%llu/%llu) read request for model from file: %s",
+                             (unsigned long long)plod->frameHighResLastUsed.load(),
+                             (unsigned long long)animatedDatabasePager.frameCount.load(),
+                             plod->filename.string().c_str());
+                    animatedDatabasePager.requestDiscarded(plod.get());
                     continue;
                 }
 
@@ -65,29 +60,24 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                             LOG_WARN(error->message.c_str());
                         }
 
-                        animatedDatabasePager.requestDiscarded(plod);
+                        animatedDatabasePager.requestDiscarded(plod.get());
                         continue;
                     }
 
-                    // Считаем, что инициализируем все PagedLOD с нулевым угловым размером отсечения
                     if (plod->children[0].minimumScreenHeightRatio <= 0.0)
                     {
-                        // При первой загрузке настраиваем ограничивающую сферу для отсечения
                         if (auto cullnode = node.cast<vsg::CullNode>())
                         {
-                            // Пробуем использовать готовую сферу из автосоздаваемого CullNode
                             plod->bound = cullnode->bound;
                             node = cullnode->child;
                         }
                         else if (auto cullgroup = node.cast<vsg::CullGroup>())
                         {
-                            // Пробуем использовать готовую сферу из автосоздаваемого CullGroup
                             plod->bound = cullgroup->bound;
                             node = vsg::Group::create(cullgroup->children.begin(), cullgroup->children.end());
                         }
                         else if (auto bounds = vsg::visit<vsg::ComputeBounds>(node).bounds)
                         {
-                            // Рассчитываем ограничивающую сферу вручную утилитой ComputeBounds
                             const vsg::dvec3 center = (bounds.max + bounds.min) * 0.5;
                             const double radius = vsg::length(bounds.max - bounds.min) * 0.5;
                             plod->bound = vsg::dsphere(center, radius);
@@ -97,9 +87,6 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                             plod->bound = vsg::dsphere(0.0, 0.0, 0.0, 1.0);
                         }
 
-                        // Вручную задаём ненулевой радиус объектам
-                        // с нулевой ограничивающей сферой (например,
-                        // модели с источником света, но без меша)
                         if (plod->bound.radius <= 0.0)
                         {
                             plod->bound.radius = 0.5;
@@ -109,14 +96,10 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                             plod->bound.radius += 0.5;
                         }
 
-                        // Настраиваем угловой размер отсечения
                         plod->children[0].minimumScreenHeightRatio = animatedDatabasePager.cullingScreenHeightRatio;
                     }
                     else
                     {
-                        // Если угловой размер отсечения не нулевой,
-                        // мы уже загружали модель и настраивали ограничивающую сферу,
-                        // просто убираем лишние CullNode
                         if (auto cullnode = node.cast<vsg::CullNode>())
                         {
                             node = cullnode->child;
@@ -127,14 +110,13 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                         }
                     }
 
-                    // Создаём, конфигурируем анимации и подключаем их к сигналам симулятора
                     if (auto aplod = plod.cast<AnimatedPagedLOD>())
                     {
                         node = animatedDatabasePager.loadAnimations(aplod, node);
                     }
                 }
 
-                if (compare_exchange(plod->requestStatus, vsg::PagedLOD::Reading, vsg::PagedLOD::Compiling))
+                if (vsg::compare_exchange(plod->requestStatus, vsg::PagedLOD::Reading, vsg::PagedLOD::Compiling))
                 {
                     {
                         std::scoped_lock<std::mutex> lock(animatedDatabasePager.pendingPagedLODMutex);
@@ -143,51 +125,45 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
 
                     try
                     {
-                        // compile plod
                         if (auto result = animatedDatabasePager.compileManager->compile(node))
                         {
                             plod->requestStatus.exchange(vsg::PagedLOD::MergeRequest);
-
-                            // move to the merge queue;
                             animatedDatabasePager._toMergeQueue->add(plod, result);
-
-                            //LOG_INFO("AnimatedDatabasePager: load and compiled model from file: %s", plod->filename.string().c_str());
                         }
                         else
                         {
                             LOG_WARN("AnimatedDatabasePager: fail to compile model from file: %s", plod->filename.string().c_str());
-                            animatedDatabasePager.requestDiscarded(plod);
+                            animatedDatabasePager.requestDiscarded(plod.get());
                         }
                     }
                     catch (const vsg::Exception& e)
                     {
-                        animatedDatabasePager.requestDiscarded(plod);
+                        animatedDatabasePager.requestDiscarded(plod.get());
                         LOG_WARN("AnimatedDatabasePager: vsg::Exception (%s) while compiling model from file: %s", e.message.c_str(), plod->filename.string().c_str());
                     }
                     catch (const std::exception& e)
                     {
-                        animatedDatabasePager.requestDiscarded(plod);
+                        animatedDatabasePager.requestDiscarded(plod.get());
                         LOG_WARN("AnimatedDatabasePager: std::exception (%s) while compiling model from file: %s", e.what(), plod->filename.string().c_str());
                     }
                     catch (...)
                     {
-                        animatedDatabasePager.requestDiscarded(plod);
+                        animatedDatabasePager.requestDiscarded(plod.get());
                         LOG_WARN("AnimatedDatabasePager: exception while compiling model from file: %s", plod->filename.string().c_str());
                     }
                 }
                 else
                 {
-                    animatedDatabasePager.requestDiscarded(plod);
+                    animatedDatabasePager.requestDiscarded(plod.get());
                 }
             }
             else
             {
-                // sleep for a frame.
                 std::this_thread::sleep_for(std::chrono::milliseconds(32));
                 continue;
             }
         }
-        //LOG_INFO("Finished %s", threadName.c_str());
+        LOG_INFO("Finished %s", threadName.c_str());
     };
 
     auto deleteThread = [](const AnimatedDatabasePager& animatedDatabasePager, const std::string& threadName)
@@ -198,7 +174,7 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
         {
             animatedDatabasePager.deleteQueue->wait_then_clear();
         }
-        //LOG_INFO("Finished %s", threadName.c_str());
+        LOG_INFO("Finished %s", threadName.c_str());
     };
 
     for (uint32_t i = 0; i < numReadThreads; ++i)
@@ -213,7 +189,7 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
 //
 //------------------------------------------------------------------------------
 vsg::ref_ptr<vsg::Node> AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<AnimatedPagedLOD> aplod,
-                                           vsg::ref_ptr<vsg::Node> node)
+                                                              vsg::ref_ptr<vsg::Node> node)
 {
     aplod->animations_map->thread_safe_clear();
 
@@ -223,12 +199,10 @@ vsg::ref_ptr<vsg::Node> AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<Anima
     }
 
     {
-        // Model's animations
         FindModelAnimationsCreateInfo fma_create_info = {node, aplod->animations_map, aplod->animations_dir};
         auto find_model_animations = FindModelAnimations::create(fma_create_info);
     }
 
-    // Custom animations for model
     auto pdo = vsg::PropagateDynamicObjects::create();
 
     vsg::CopyOp copyop;
@@ -241,7 +215,6 @@ vsg::ref_ptr<vsg::Node> AnimatedDatabasePager::loadAnimations(vsg::ref_ptr<Anima
 
     node->traverse(*pdo);
 
-    // Copy all animated parts of shared model for independent behaviour
     if (!pdo->dynamicObjects.empty())
     {
         for (auto& object : pdo->dynamicObjects)
@@ -333,4 +306,140 @@ void AnimatedDatabasePager::reportDedupStats() const
 {
     LOG_INFO("dedupRead stats: %u total reads, %u actual loads, %u deduplicated waits",
              _totalReads.load(), _actualLoads.load(), _dedupWaits.load());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AnimatedDatabasePager::clearDedupCache()
+{
+    std::scoped_lock lock(_readMutex);
+    _pendingReads.clear();
+    LOG_INFO("Dedup cache cleared (total reads: %u, actual loads: %u, waits: %u)",
+             _totalReads.load(), _actualLoads.load(), _dedupWaits.load());
+    _totalReads = 0;
+    _actualLoads = 0;
+    _dedupWaits = 0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AnimatedDatabasePager::requestDiscarded(vsg::PagedLOD* plod)
+{
+    vsg::DatabasePager::requestDiscarded(plod);
+}
+
+// ========= РЕАЛИЗАЦИЯ УПРАВЛЕНИЯ ПАМЯТЬЮ =========
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::vector<vsg::ref_ptr<vsg::PagedLOD>> AnimatedDatabasePager::collectInvisibleObjects(uint64_t currentFrame)
+{
+    std::vector<vsg::ref_ptr<vsg::PagedLOD>> invisibleObjects;
+
+    if (!pagedLODContainer) return invisibleObjects;
+
+    std::scoped_lock lock(pendingPagedLODMutex);
+
+    auto& elements = pagedLODContainer->elements;
+
+    uint32_t index = pagedLODContainer->inactiveList.head;
+    while (index != 0) {
+        auto& element = elements[index];
+        if (element.plod) {
+            invisibleObjects.push_back(element.plod);
+        }
+        index = element.next;
+    }
+
+    std::sort(invisibleObjects.begin(), invisibleObjects.end(),
+              [](const vsg::ref_ptr<vsg::PagedLOD>& a, const vsg::ref_ptr<vsg::PagedLOD>& b) {
+                  return a->frameHighResLastUsed.load() < b->frameHighResLastUsed.load();
+              });
+
+    return invisibleObjects;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool AnimatedDatabasePager::unloadPagedLOD(vsg::PagedLOD* plod)
+{
+    if (!plod) return false;
+
+    vsg::PagedLOD::RequestStatus expected = vsg::PagedLOD::NoRequest;
+    if (!vsg::compare_exchange(plod->requestStatus, expected, vsg::PagedLOD::DeleteRequest)) {
+        return false;
+    }
+
+    LOG_INFO("Unloading invisible object: %s", plod->filename.string().c_str());
+
+    if (plod->children[0].node) {
+        plod->children[0].node = nullptr;
+    }
+
+    // ИСПРАВЛЕНИЕ: передаём одиночный объект через список
+    if (plod->pending) {
+        std::list<vsg::ref_ptr<vsg::Object>> deleteList;
+        deleteList.push_back(plod->pending);
+        if (deleteQueue) {
+            deleteQueue->add(deleteList);
+        }
+        plod->pending = nullptr;
+    }
+
+    if (pagedLODContainer && plod->index != 0) {
+        pagedLODContainer->remove(plod);
+    }
+
+    plod->requestStatus.exchange(vsg::PagedLOD::NoRequest);
+    plod->requestCount.exchange(0);
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+uint32_t AnimatedDatabasePager::forceUnloadInvisibleObjects()
+{
+    uint64_t currentFrame = frameCount.load();
+    auto invisibleObjects = collectInvisibleObjects(currentFrame);
+
+    uint32_t unloadedCount = 0;
+    for (auto& plod : invisibleObjects) {
+        if (unloadPagedLOD(plod.get())) {
+            unloadedCount++;
+        }
+    }
+
+    if (unloadedCount > 0) {
+        LOG_INFO("Unloaded %u invisible objects", unloadedCount);
+    }
+
+    return unloadedCount;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+uint32_t AnimatedDatabasePager::unloadInvisibleIfNeeded()
+{
+    if (gpuMemoryLimitBytes == 0) return 0;
+
+    uint32_t activeCount = pagedLODContainer ? pagedLODContainer->activeList.count : 0;
+    uint32_t inactiveCount = pagedLODContainer ? pagedLODContainer->inactiveList.count : 0;
+
+    uint64_t estimatedMemory = static_cast<uint64_t>(activeCount + inactiveCount) * 10 * 1024 * 1024;
+    float usagePercent = 100.0f * estimatedMemory / gpuMemoryLimitBytes;
+
+    if (usagePercent >= cleanupThreshold * 100.0f) {
+        LOG_WARN("Memory threshold reached: %.1f%% (estimated), unloading invisible objects",
+                 usagePercent);
+        return forceUnloadInvisibleObjects();
+    }
+
+    return 0;
 }

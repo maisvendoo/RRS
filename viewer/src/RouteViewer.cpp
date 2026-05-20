@@ -209,6 +209,11 @@ int RouteViewer::run()
 
     auto next_frame_time = clock::now();
 
+    // ========= ДОБАВЬТЕ ЭТИ СТРОКИ =========
+    auto lastMemoryCheck = clock::now();
+    const auto MEMORY_CHECK_INTERVAL = seconds(30);  // Проверяем каждые 30 секунд
+    // ========= КОНЕЦ ДОБАВЛЕННЫХ СТРОК =========
+
     while (viewer->advanceToNextFrame())
     {
         try
@@ -252,6 +257,21 @@ int RouteViewer::run()
                     next_frame_time = now;
                 }
             }
+
+            // ========= ДОБАВЬТЕ ЭТОТ БЛОК =========
+            auto now = clock::now();
+            if (now - lastMemoryCheck >= MEMORY_CHECK_INTERVAL)
+            {
+                if (!viewer->recordAndSubmitTasks.empty())
+                {
+                    if (auto pager = viewer->recordAndSubmitTasks.front()->databasePager.cast<AnimatedDatabasePager>())
+                    {
+                        pager->unloadInvisibleIfNeeded();
+                    }
+                }
+                lastMemoryCheck = now;
+            }
+            // ========= КОНЕЦ ДОБАВЛЕННОГО БЛОКА =========
         }
         catch (const vsg::Exception& e)
         {
@@ -748,6 +768,11 @@ void RouteViewer::initViewer()
     vsg::ref_ptr<AnimatedDatabasePager> databasePager = AnimatedDatabasePager::create();
     databasePager->targetMaxNumPagedLODWithHighResSubgraphs = settings.targetPagedLODs;
     databasePager->cullingScreenHeightRatio = settings.cullingScreenHeightRatio;
+
+    // ========= ДОБАВЬТЕ ЭТИ СТРОКИ =========
+    databasePager->setGPUMemoryLimitMB(2048);      // Лимит 2 GB
+    databasePager->setCleanupThreshold(0.85f);     // Очистка при 85%
+    // ========= КОНЕЦ ДОБАВЛЕННЫХ СТРОК =========
     for (auto& task : viewer->recordAndSubmitTasks)
     {
         task->databasePager = databasePager;
