@@ -22,8 +22,8 @@ enum StateGPU
 //------------------------------------------------------------------------------
 enum VendorGPU
 {
-    VID_NVIDIA = 0x10ED,
-    VID_AMD = 0x1022,
+    VID_NVIDIA = 0x10DE,
+    VID_AMD = 0x1002,
     VID_INTEL = 0x8086
 };
 

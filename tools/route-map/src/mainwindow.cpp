@@ -15,6 +15,8 @@
 #include    <QInputDialog>
 #include    <QMenu>
 #include    <QPainter>
+#include    <styles.h>
+#include    <filesystem.h>
 
 //------------------------------------------------------------------------------
 //
@@ -25,6 +27,8 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     this->setWindowTitle(tr("route-map"));
 
     ui->setupUi(this);
+
+    loadSettingsGUI();
 
     connect(tcp_client, &TcpClient::connected,
             this, &MainWindow::slotConnectedToSimulator);
@@ -113,6 +117,35 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadSettingsGUI()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_dir = fs.getConfigDir();
+    std::string cfg_path = fs.combinePath(cfg_dir, "gui-settings.xml");
+
+    CfgReader cfg;
+
+    if ( cfg.load(QString(cfg_path.c_str())) )
+    {
+        QString secName = "GUISettings";
+        QString theme_name = "";
+
+        if (!cfg.getString(secName, "Theme", theme_name))
+        {
+            theme_name = "dark-jedy";
+        }
+
+        std::string theme_dir = fs.getThemeDir();
+        std::string theme_path = fs.combinePath(theme_dir, theme_name.toStdString() + ".qss");
+        QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
+
+        this->setStyleSheet(style_sheet);
+    }
 }
 
 //------------------------------------------------------------------------------
