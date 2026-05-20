@@ -69,6 +69,13 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 
     QString status = "";
     QString physicalDeviceName = "";
+
+    uint64_t available_CPU_memory = 0;
+    uint64_t reserved_CPU_memory = 0;
+    uint64_t available_GPU_memory = 0;
+    uint64_t reserved_GPU_memory = 0;
+    uint64_t available_GPU_buffer = 0;
+    uint64_t reserved_GPU_buffer = 0;
 };
 
 //------------------------------------------------------------------------------
