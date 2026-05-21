@@ -30,6 +30,8 @@ public:
 
     void reportDedupStats() const;
 
+    void updateSceneGraph(vsg::ref_ptr<vsg::FrameStamp> frameStamp, vsg::CompileResult& cr) override;
+
 protected:
     ~AnimatedDatabasePager() = default;
 
