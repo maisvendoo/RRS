@@ -16,14 +16,11 @@ Joint::Joint()
 //------------------------------------------------------------------------------
 Joint::~Joint()
 {
-    if (!devices.empty())
+    for (Device* device : devices)
     {
-        for (auto device : devices)
+        if (device)
         {
-            if (device != nullptr)
-            {
-                device->unlink();
-            }
+            device->unlink();
         }
     }
 }
