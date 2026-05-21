@@ -1,5 +1,3 @@
-#include    <QLibrary>
-
 #include    "pneumo-hose.h"
 
 #include    "CfgReader.h"

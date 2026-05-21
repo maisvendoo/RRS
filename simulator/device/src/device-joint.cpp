@@ -1,5 +1,3 @@
-#include    <QLibrary>
-
 #include    "device-joint.h"
 
 #include    "CfgReader.h"

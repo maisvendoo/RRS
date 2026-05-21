@@ -3,7 +3,6 @@
 #include "display-types.h"
 
 #include <QApplication>
-#include <QLibrary>
 #include <QString>
 #include <QThread>
 #include <QWidget>

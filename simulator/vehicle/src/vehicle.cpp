@@ -19,7 +19,6 @@
 #include    "physics.h"
 #include    "Journal.h"
 
-#include    <QLibrary>
 #include    <QDir>
 #include    <QFileInfo>
 #include    <QDataStream>
