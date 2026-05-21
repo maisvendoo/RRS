@@ -187,8 +187,6 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
         devices.push_back(module);
     }
 
-    printf("%lld\n", get_module_funcs.size());
-
     return true;
 }
 
