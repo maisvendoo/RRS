@@ -35,9 +35,12 @@ public:
 
     void setGPUMemoryMonitor(vsg::ref_ptr<GPUMemoryMonitor> memory_monitor);
 
+
 protected:
 
     ~AnimatedDatabasePager() = default;
+
+    void requestDiscarded(vsg::PagedLOD* plod);
 
 private:
 
@@ -47,6 +50,15 @@ private:
     vsg::ref_ptr<GPUMemoryMonitor> _memory_monitor;
 
     void checkAndUnloadIfMemoryLimitExceeded();
+
+    /// Получаем список неативных лодов
+    std::vector<vsg::ref_ptr<vsg::PagedLOD>> collectInvisibleObjects();
+
+    /// Выгрузка конкретного лода
+    bool unloadPagedLOD(vsg::PagedLOD *plod);
+
+    /// Принудительное удаление невидимых объектов
+    uint32_t forceUnloadInvisibleObjects();
 
     std::mutex _readMutex;
     std::unordered_map<std::string, std::shared_future<vsg::ref_ptr<vsg::Object>>> _pendingReads;

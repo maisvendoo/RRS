@@ -52,7 +52,12 @@ void GPUMemoryMonitor::update()
 //------------------------------------------------------------------------------
 uint64_t GPUMemoryMonitor::getCurrentUsageMB() const
 {
-    return _currentUsageBytes >> 20;
+    return _currentUsageBytes / 1024 / 1024;
+}
+
+uint64_t GPUMemoryMonitor::getMemoryLimitMB() const
+{
+    return _memoryLimitBytes;
 }
 
 //------------------------------------------------------------------------------

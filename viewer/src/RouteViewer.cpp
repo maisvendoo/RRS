@@ -758,16 +758,16 @@ void RouteViewer::initViewer()
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
 
-    auto gpu_memory_monitor = GPUMemoryMonitor::create();
+    /*auto gpu_memory_monitor = GPUMemoryMonitor::create();
     gpu_memory_monitor->init(window->getDevice()->deviceMemoryBufferPools.ref_ptr());
     gpu_memory_monitor->setMemoryLimitMB(1024);
-    gpu_memory_monitor->setThreshold(0.65);
+    gpu_memory_monitor->setThreshold(0.65);*/
 
     // Перед компиляцией вьювера подсовываем ему наш кастомный DatabasePager
     vsg::ref_ptr<AnimatedDatabasePager> databasePager = AnimatedDatabasePager::create();
     databasePager->targetMaxNumPagedLODWithHighResSubgraphs = settings.targetPagedLODs;
     databasePager->cullingScreenHeightRatio = settings.cullingScreenHeightRatio;
-    databasePager->setGPUMemoryMonitor(gpu_memory_monitor);
+
 
     for (auto& task : viewer->recordAndSubmitTasks)
     {
@@ -790,6 +790,22 @@ void RouteViewer::initViewer()
     if (!compileResult)
     {
         LOG_WARN("Viewer compile returned empty result — some resources may not have been compiled");
+    }
+
+    // Теперь память выделена, можно инициализировать монитор
+    if (window && window->getDevice())
+    {
+        auto memPools = window->getDevice()->deviceMemoryBufferPools.ref_ptr();
+        if (memPools)
+        {
+            auto gpu_memory_monitor = GPUMemoryMonitor::create();
+            gpu_memory_monitor->init(memPools);
+            gpu_memory_monitor->setMemoryLimitMB(1024);
+            gpu_memory_monitor->setThreshold(0.7);
+            databasePager->setGPUMemoryMonitor(gpu_memory_monitor);
+            LOG_INFO("GPUMemoryMonitor initialized AFTER compile, reserved=%llu MB",
+                     memPools->computeMemoryTotalReserved() / (1024*1024));
+        }
     }
 
     // Создаём вспомогательные потоки для чтения текстур 3d-моделей

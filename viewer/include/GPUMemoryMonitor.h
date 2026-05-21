@@ -22,9 +22,12 @@ public:
 
     uint64_t getCurrentUsageMB() const;
 
+    uint64_t getMemoryLimitMB() const;
+
     float getCurrentUsagePercent() const;
 
     bool isThresholdExceeded() const;
+
 
 private:
 

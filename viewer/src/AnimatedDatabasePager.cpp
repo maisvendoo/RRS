@@ -25,7 +25,7 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
 {
     //LOG_INFO("AnimatedDatabasePager::start(%u)", numReadThreads);
 
-    auto readThread = [](AnimatedDatabasePager& animatedDatabasePager, const std::string& threadName)
+    auto readThread = [this](AnimatedDatabasePager& animatedDatabasePager, const std::string& threadName)
     {
         LOG_INFO("Started %s", threadName.c_str());
 
@@ -38,6 +38,15 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
             if (plod)
             {
                 //CPU_INSTRUMENTATION_L1_NC(animatedDatabasePager.instrumentation, "AnimatedDatabasePager read", COLOR_PAGER);
+
+                // ============ ДОБАВИТЬ ПРОВЕРКУ ============
+                // Если узел помечен на удаление - пропускаем
+                if (plod->requestStatus.load() == vsg::PagedLOD::DeleteRequest)
+                {
+                    animatedDatabasePager.requestDiscarded(plod.get());
+                    continue;
+                }
+                // ============================================
 
                 uint64_t frameDelta = animatedDatabasePager.frameCount - plod->frameHighResLastUsed.load();
 
@@ -157,7 +166,7 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                         }
                         else
                         {
-                            LOG_WARN("AnimatedDatabasePager: fail to compile model from file: %s", plod->filename.string().c_str());
+                            LOG_WARN("AnimatedDatabasePager: fail to compile model from file: %s", plod->filename.string().c_str());                            
                             animatedDatabasePager.requestDiscarded(plod);
                         }
                     }
@@ -343,99 +352,15 @@ void AnimatedDatabasePager::reportDedupStats() const
 void AnimatedDatabasePager::updateSceneGraph(vsg::ref_ptr<vsg::FrameStamp> frameStamp,
                                              vsg::CompileResult &cr)
 {
+    vsg::DatabasePager::updateSceneGraph(frameStamp, cr);
+
     // Периодическая проверка памяти
-    if (frameStamp && (frameStamp->frameCount % 1 == 0))
+    if (frameStamp && (frameStamp->frameCount % 60 == 0))
     {
         checkAndUnloadIfMemoryLimitExceeded();
     }
-
-    vsg::DatabasePager::updateSceneGraph(frameStamp, cr);
-
-    if (pagedLODContainer && frameStamp)
-    {
-        // Общее число активных (видимых) лодов
-        uint32_t totalActive = pagedLODContainer->activeList.count;
-
-        // Если активно больше лодов, чем дозволено в конфиге
-        if (totalActive > targetMaxNumPagedLODWithHighResSubgraphs)
-        {
-            // Число лодов, подлежащих выгрузке
-            uint32_t toRemove = totalActive - targetMaxNumPagedLODWithHighResSubgraphs;
-
-
-            std::vector<std::pair<uint64_t, vsg::ref_ptr<vsg::PagedLOD>>> candidates;
-            uint32_t index = pagedLODContainer->activeList.head;
-
-            while (index != 0)
-            {
-                auto& element = pagedLODContainer->elements[index];
-
-                if (element.plod)
-                {
-                    candidates.emplace_back(element.plod->frameHighResLastUsed.load(), element.plod);
-                }
-
-                index = element.next;
-            }
-
-            std::sort(candidates.begin(), candidates.end(),
-                      [](const auto& a, const auto& b) { return a.first < b.first; });
-
-            std::list<vsg::ref_ptr<vsg::Node>> nodesToDelete;
-
-            for (size_t i = 0; i < toRemove && i < candidates.size(); ++i)
-            {
-                auto& plod = candidates[i].second;
-
-                {
-                    std::scoped_lock lock(pendingPagedLODMutex);
-
-                    if (plod->children[0].node)
-                    {
-                        nodesToDelete.push_back(plod->children[0].node);
-                        plod->children[0].node = nullptr;
-                    }
-
-                    if (plod->pending)
-                    {
-                        nodesToDelete.push_back(plod->pending);
-                        plod->pending = nullptr;
-                    }
-                }
-
-                if (plod->index != 0)
-                {
-                    pagedLODContainer->remove(plod.get());
-                }
-
-                plod->requestStatus.exchange(vsg::PagedLOD::NoRequest);
-                plod->requestCount.exchange(0);
-            }
-
-            if (!nodesToDelete.empty() && deleteQueue)
-            {
-                deleteQueue->add(nodesToDelete);
-            }
-
-            if (toRemove > 0)
-            {
-                LOG_INFO("Forced unload: removed %u nodes, active now %u, target=%u",
-                         static_cast<unsigned int>(toRemove),
-                         pagedLODContainer->activeList.count,
-                         targetMaxNumPagedLODWithHighResSubgraphs);
-            }
-        }
-    }
-
-    if (frameStamp && (frameStamp->frameCount % 600 == 0))
-    {
-        LOG_INFO("DatabasePager stats: active=%u, inactive=%u, available=%u, target=%u",
-                 pagedLODContainer ? pagedLODContainer->activeList.count : 0,
-                 pagedLODContainer ? pagedLODContainer->inactiveList.count : 0,
-                 pagedLODContainer ? pagedLODContainer->availableList.count : 0,
-                 targetMaxNumPagedLODWithHighResSubgraphs);
-    }
 }
+
 
 //------------------------------------------------------------------------------
 //
@@ -461,9 +386,149 @@ void AnimatedDatabasePager::checkAndUnloadIfMemoryLimitExceeded()
     {
         LOG_WARN("GPU memory threshold reached: %f", _memory_monitor->getCurrentUsagePercent());
 
-        uint32_t newTarget = std::max(this->targetMaxNumPagedLODWithHighResSubgraphs / 2, 10u);
-        this->targetMaxNumPagedLODWithHighResSubgraphs = newTarget;
+        forceUnloadInvisibleObjects();
 
-        LOG_INFO("Reduced targetMaxNumPagedLODWithHighResSubgraphs to %u", newTarget);
+        _memory_monitor->update();
+
+        if (_memory_monitor->isThresholdExceeded())
+        {
+            uint32_t newTarget = std::max(this->targetMaxNumPagedLODWithHighResSubgraphs / 2, 1u);
+            this->targetMaxNumPagedLODWithHighResSubgraphs = newTarget;
+            LOG_INFO("Reduced targetMaxNumPagedLODWithHighResSubgraphs to %u", newTarget);
+        }
     }
+}
+
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::vector<vsg::ref_ptr<vsg::PagedLOD>> AnimatedDatabasePager::collectInvisibleObjects()
+{
+    std::vector<vsg::ref_ptr<vsg::PagedLOD>> invisibleObjects;
+
+    if (!pagedLODContainer)
+    {
+        return invisibleObjects;
+    }
+
+    std::scoped_lock lock(pendingPagedLODMutex);
+
+    auto &elements = pagedLODContainer->elements;
+
+    uint32_t index = pagedLODContainer->inactiveList.head;
+
+    while (index != 0)
+    {
+        auto &element = elements[index];
+
+        if (element.plod)
+        {
+            invisibleObjects.push_back(element.plod);
+        }
+
+        index = element.next;
+    }
+
+    std::sort(invisibleObjects.begin(), invisibleObjects.end(),
+              [](const vsg::ref_ptr<vsg::PagedLOD>& a, const vsg::ref_ptr<vsg::PagedLOD>& b) {
+                  return a->frameHighResLastUsed.load() < b->frameHighResLastUsed.load();
+              });
+
+    return invisibleObjects;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool AnimatedDatabasePager::unloadPagedLOD(vsg::PagedLOD *plod)
+{
+    if (plod == nullptr)
+    {
+        return false;
+    }
+
+    vsg::PagedLOD::RequestStatus expected = vsg::PagedLOD::NoRequest;
+
+    if (!vsg::compare_exchange(plod->requestStatus, expected, vsg::PagedLOD::DeleteRequest))
+    {
+        return false;
+    }
+
+    LOG_INFO("Unloading invisible obkect: %s", plod->filename.string().c_str());
+
+    {
+        std::scoped_lock lock(pendingPagedLODMutex);
+
+        if (plod->children[0].node)
+        {
+            plod->children[0].node = nullptr;
+        }
+
+        if (plod->pending)
+        {
+            if (deleteQueue)
+            {
+                std::list<vsg::ref_ptr<vsg::Object>> deleteList;
+                deleteList.push_back(plod->pending);
+                deleteQueue->add(deleteList);
+            }
+
+            plod->pending = nullptr;
+        }
+    }
+
+    if (pagedLODContainer && plod->index != 0)
+    {
+        pagedLODContainer->remove(plod);
+    }
+
+    plod->requestStatus.exchange(vsg::PagedLOD::NoRequest);
+    plod->requestCount.exchange(0);
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+uint32_t AnimatedDatabasePager::forceUnloadInvisibleObjects()
+{
+    if (!pagedLODContainer)
+    {
+        return 0;
+    }
+
+    uint64_t currentFrame = frameCount.load();
+    auto invisibleObjects = collectInvisibleObjects();
+
+    uint32_t unloadedCount = 0;
+
+    for (auto &plod : invisibleObjects)
+    {
+        if (unloadPagedLOD(plod))
+        {
+            unloadedCount++;
+        }
+    }
+
+    if (unloadedCount > 0)
+    {
+        LOG_INFO("Unloaded %u invisible objects", unloadedCount);
+    }
+
+    return unloadedCount;
+}
+
+void AnimatedDatabasePager::requestDiscarded(vsg::PagedLOD* plod)
+{
+    // Если узел помечен на удаление, просто сбрасываем состояние
+    if (plod->requestStatus.load() == vsg::PagedLOD::DeleteRequest)
+    {
+        plod->requestStatus.exchange(vsg::PagedLOD::NoRequest);
+        plod->requestCount.exchange(0);
+        return;
+    }
+
+    vsg::DatabasePager::requestDiscarded(plod);
 }
