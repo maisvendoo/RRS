@@ -10,6 +10,7 @@
 
 struct animations_t;
 class AnimatedPagedLOD;
+class GPUMemoryMonitor;
 
 //------------------------------------------------------------------------------
 //
@@ -32,13 +33,20 @@ public:
 
     void updateSceneGraph(vsg::ref_ptr<vsg::FrameStamp> frameStamp, vsg::CompileResult& cr) override;
 
+    void setGPUMemoryMonitor(vsg::ref_ptr<GPUMemoryMonitor> memory_monitor);
+
 protected:
+
     ~AnimatedDatabasePager() = default;
 
 private:
 
     vsg::ref_ptr<vsg::Node> loadAnimations(vsg::ref_ptr<AnimatedPagedLOD> aplod,
                                            vsg::ref_ptr<vsg::Node> node);
+
+    vsg::ref_ptr<GPUMemoryMonitor> _memory_monitor;
+
+    void checkAndUnloadIfMemoryLimitExceeded();
 
     std::mutex _readMutex;
     std::unordered_map<std::string, std::shared_future<vsg::ref_ptr<vsg::Object>>> _pendingReads;

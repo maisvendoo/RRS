@@ -16,6 +16,8 @@
 #include <vsg/utils/SharedObjects.h>
 #include <vsg/utils/PropagateDynamicObjects.h>
 
+#include <GPUMemoryMonitor.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -341,6 +343,12 @@ void AnimatedDatabasePager::reportDedupStats() const
 void AnimatedDatabasePager::updateSceneGraph(vsg::ref_ptr<vsg::FrameStamp> frameStamp,
                                              vsg::CompileResult &cr)
 {
+    // Периодическая проверка памяти
+    if (frameStamp && (frameStamp->frameCount % 1 == 0))
+    {
+        checkAndUnloadIfMemoryLimitExceeded();
+    }
+
     vsg::DatabasePager::updateSceneGraph(frameStamp, cr);
 
     if (pagedLODContainer && frameStamp)
@@ -426,5 +434,36 @@ void AnimatedDatabasePager::updateSceneGraph(vsg::ref_ptr<vsg::FrameStamp> frame
                  pagedLODContainer ? pagedLODContainer->inactiveList.count : 0,
                  pagedLODContainer ? pagedLODContainer->availableList.count : 0,
                  targetMaxNumPagedLODWithHighResSubgraphs);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AnimatedDatabasePager::setGPUMemoryMonitor(vsg::ref_ptr<GPUMemoryMonitor> memory_monitor)
+{
+    _memory_monitor = memory_monitor;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AnimatedDatabasePager::checkAndUnloadIfMemoryLimitExceeded()
+{
+    if (_memory_monitor == nullptr)
+    {
+        return;
+    }
+
+    _memory_monitor->update();
+
+    if (_memory_monitor->isThresholdExceeded())
+    {
+        LOG_WARN("GPU memory threshold reached: %f", _memory_monitor->getCurrentUsagePercent());
+
+        uint32_t newTarget = std::max(this->targetMaxNumPagedLODWithHighResSubgraphs / 2, 10u);
+        this->targetMaxNumPagedLODWithHighResSubgraphs = newTarget;
+
+        LOG_INFO("Reduced targetMaxNumPagedLODWithHighResSubgraphs to %u", newTarget);
     }
 }

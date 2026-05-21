@@ -67,7 +67,7 @@
 
 #include <AltSoundLocker.h>
 
-#include <iostream>
+#include <GPUMemoryMonitor.h>
 
 //------------------------------------------------------------------------------
 //
@@ -207,7 +207,7 @@ int RouteViewer::run()
         target_frame_time = duration_cast<microseconds>(duration<double>(1.0 / settings.max_fps));
     }
 
-    auto next_frame_time = clock::now();
+    auto next_frame_time = clock::now();   
 
     while (viewer->advanceToNextFrame())
     {
@@ -237,7 +237,9 @@ int RouteViewer::run()
                 screenshot_writer->doScreeenshot(window, options);
             }
 
-            if (viewer->getFrameStamp()->frameCount % 30 == 0) { // Каждые 30 кадров
+            if (viewer->getFrameStamp()->frameCount % 30 == 0)
+            {
+                // Каждые 30 кадров
                 auto& alloc = vsg::Allocator::instance();
                 GUIparams->available_CPU_memory = alloc->totalAvailableSize();
                 GUIparams->reserved_CPU_memory = alloc->totalReservedSize();
@@ -246,7 +248,7 @@ int RouteViewer::run()
                 GUIparams->available_GPU_memory = mem_pools->computeMemoryTotalAvailable();
                 GUIparams->reserved_GPU_memory = mem_pools->computeMemoryTotalReserved();
                 GUIparams->available_GPU_buffer = mem_pools->computeBufferTotalAvailable();
-                GUIparams->reserved_GPU_buffer = mem_pools->computeBufferTotalReserved();
+                GUIparams->reserved_GPU_buffer = mem_pools->computeBufferTotalReserved();                
             }
 
             viewer->recordAndSubmit();
@@ -756,10 +758,17 @@ void RouteViewer::initViewer()
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
 
+    auto gpu_memory_monitor = GPUMemoryMonitor::create();
+    gpu_memory_monitor->init(window->getDevice()->deviceMemoryBufferPools.ref_ptr());
+    gpu_memory_monitor->setMemoryLimitMB(1024);
+    gpu_memory_monitor->setThreshold(0.65);
+
     // Перед компиляцией вьювера подсовываем ему наш кастомный DatabasePager
     vsg::ref_ptr<AnimatedDatabasePager> databasePager = AnimatedDatabasePager::create();
     databasePager->targetMaxNumPagedLODWithHighResSubgraphs = settings.targetPagedLODs;
     databasePager->cullingScreenHeightRatio = settings.cullingScreenHeightRatio;
+    databasePager->setGPUMemoryMonitor(gpu_memory_monitor);
+
     for (auto& task : viewer->recordAndSubmitTasks)
     {
         task->databasePager = databasePager;
