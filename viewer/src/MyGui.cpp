@@ -298,33 +298,6 @@ void MyGui::showStatistics() const
     text += QString("FPS:%1 (lowest:%2)")
                     .arg(params->statistics_handler->getAverageFPS(), 6, 'f', 1)
                     .arg(params->statistics_handler->getLowestFPS(), 6, 'f', 1);
-    float total_CPU_memory = params->available_CPU_memory + params->reserved_CPU_memory;
-    float total_GPU_memory = params->available_GPU_memory + params->reserved_GPU_memory;
-    float total_GPU_buffer = params->available_GPU_buffer + params->reserved_GPU_buffer;
-    if ((total_CPU_memory > 0.0f) && (total_GPU_memory > 0.0f) && (total_GPU_buffer > 1.0f))
-    {
-        float available_CPU_memory_percent = 100.0f * params->available_CPU_memory / total_CPU_memory;
-        float reserved_CPU_memory_percent = 100.0f * params->reserved_CPU_memory / total_CPU_memory;
-        float available_GPU_memory_percent = 100.0f * params->available_GPU_memory / total_GPU_memory;
-        float reserved_GPU_memory_percent = 100.0f * params->reserved_GPU_memory / total_GPU_memory;
-        float available_GPU_buffer_percent = 100.0f * params->available_GPU_buffer / total_GPU_buffer;
-        float reserved_GPU_buffer_percent = 100.0f * params->reserved_GPU_buffer / total_GPU_buffer;
-        text += QString("\n CPU memory available %1(%2%) reserved %3(%4%)")
-                    .arg(params->available_CPU_memory, 12)
-                    .arg(available_CPU_memory_percent, 5, 'f', 1)
-                    .arg(params->reserved_CPU_memory, 12)
-                    .arg(reserved_CPU_memory_percent, 5, 'f', 1);
-        text += QString("\n GPU memory available %1(%2%) reserved %3(%4%)")
-                    .arg(params->available_GPU_memory, 12)
-                    .arg(available_GPU_memory_percent, 5, 'f', 1)
-                    .arg(params->reserved_GPU_memory, 12)
-                    .arg(reserved_GPU_memory_percent, 5, 'f', 1);
-        text += QString("\n GPU buffer available %1(%2%) reserved %3(%4%)")
-                    .arg(params->available_GPU_buffer, 12)
-                    .arg(available_GPU_buffer_percent, 5, 'f', 1)
-                    .arg(params->reserved_GPU_buffer, 12)
-                    .arg(reserved_GPU_buffer_percent, 5, 'f', 1);
-    }
 
     ImVec2 text_size = ImGui::CalcTextSize(text.toStdString().c_str());
 

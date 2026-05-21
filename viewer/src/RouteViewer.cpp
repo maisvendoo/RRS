@@ -237,18 +237,6 @@ int RouteViewer::run()
                 screenshot_writer->doScreeenshot(window, options);
             }
 
-            if (viewer->getFrameStamp()->frameCount % 30 == 0) { // Каждые 30 кадров
-                auto& alloc = vsg::Allocator::instance();
-                GUIparams->available_CPU_memory = alloc->totalAvailableSize();
-                GUIparams->reserved_CPU_memory = alloc->totalReservedSize();
-
-                auto mem_pools = window->getDevice()->deviceMemoryBufferPools.ref_ptr();
-                GUIparams->available_GPU_memory = mem_pools->computeMemoryTotalAvailable();
-                GUIparams->reserved_GPU_memory = mem_pools->computeMemoryTotalReserved();
-                GUIparams->available_GPU_buffer = mem_pools->computeBufferTotalAvailable();
-                GUIparams->reserved_GPU_buffer = mem_pools->computeBufferTotalReserved();
-            }
-
             viewer->recordAndSubmit();
             viewer->present();
 
