@@ -338,65 +338,53 @@ void AnimatedDatabasePager::reportDedupStats() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void AnimatedDatabasePager::updateSceneGraph(vsg::ref_ptr<vsg::FrameStamp> frameStamp,
-                                             vsg::CompileResult &cr)
+void AnimatedDatabasePager::updateSceneGraph(vsg::ref_ptr<vsg::FrameStamp> frameStamp, vsg::CompileResult &cr)
 {
     vsg::DatabasePager::updateSceneGraph(frameStamp, cr);
 
-    if (pagedLODContainer && frameStamp)
-    {
-        // Общее число активных (видимых) лодов
+    // ============ ПРИНУДИТЕЛЬНОЕ ВЫТЕСНЕНИЕ ============
+    if (pagedLODContainer && frameStamp) {
         uint32_t totalActive = pagedLODContainer->activeList.count;
 
-        // Если активно больше лодов, чем дозволено в конфиге
-        if (totalActive > targetMaxNumPagedLODWithHighResSubgraphs)
-        {
-            // Число лодов, подлежащих выгрузке
+        // Если активных узлов больше лимита
+        if (totalActive > targetMaxNumPagedLODWithHighResSubgraphs) {
             uint32_t toRemove = totalActive - targetMaxNumPagedLODWithHighResSubgraphs;
 
-
+            // Собираем узлы из activeList для выгрузки (самые старые)
             std::vector<std::pair<uint64_t, vsg::ref_ptr<vsg::PagedLOD>>> candidates;
             uint32_t index = pagedLODContainer->activeList.head;
 
-            while (index != 0)
-            {
+            while (index != 0) {
                 auto& element = pagedLODContainer->elements[index];
-
-                if (element.plod)
-                {
+                if (element.plod) {
                     candidates.emplace_back(element.plod->frameHighResLastUsed.load(), element.plod);
                 }
-
                 index = element.next;
             }
 
+            // Сортируем по времени последнего использования (самые старые первыми)
             std::sort(candidates.begin(), candidates.end(),
                       [](const auto& a, const auto& b) { return a.first < b.first; });
 
+            // Собираем список узлов для удаления
             std::list<vsg::ref_ptr<vsg::Node>> nodesToDelete;
 
-            for (size_t i = 0; i < toRemove && i < candidates.size(); ++i)
-            {
+            for (size_t i = 0; i < toRemove && i < candidates.size(); ++i) {
                 auto& plod = candidates[i].second;
 
-                {
-                    std::scoped_lock lock(pendingPagedLODMutex);
-
-                    if (plod->children[0].node)
-                    {
-                        nodesToDelete.push_back(plod->children[0].node);
-                        plod->children[0].node = nullptr;
-                    }
-
-                    if (plod->pending)
-                    {
-                        nodesToDelete.push_back(plod->pending);
-                        plod->pending = nullptr;
-                    }
+                // Добавляем узлы в список для удаления
+                if (plod->children[0].node) {
+                    nodesToDelete.push_back(plod->children[0].node);
+                    plod->children[0].node = nullptr;
                 }
 
-                if (plod->index != 0)
-                {
+                if (plod->pending) {
+                    nodesToDelete.push_back(plod->pending);
+                    plod->pending = nullptr;
+                }
+
+                // Перемещаем в availableList
+                if (plod->index != 0) {
                     pagedLODContainer->remove(plod.get());
                 }
 
@@ -404,23 +392,22 @@ void AnimatedDatabasePager::updateSceneGraph(vsg::ref_ptr<vsg::FrameStamp> frame
                 plod->requestCount.exchange(0);
             }
 
-            if (!nodesToDelete.empty() && deleteQueue)
-            {
+            // Удаляем все собранные узлы одной операцией
+            if (!nodesToDelete.empty() && deleteQueue) {
                 deleteQueue->add(nodesToDelete);
             }
 
-            if (toRemove > 0)
-            {
-                LOG_INFO("Forced unload: removed %u nodes, active now %u, target=%u",
-                         static_cast<unsigned int>(toRemove),
+            if (toRemove > 0) {
+                LOG_INFO("Forced unload: removed %zu nodes, active now %u, target=%u",
+                         toRemove,
                          pagedLODContainer->activeList.count,
                          targetMaxNumPagedLODWithHighResSubgraphs);
             }
         }
     }
+    // ===================================================
 
-    if (frameStamp && (frameStamp->frameCount % 600 == 0))
-    {
+    if (frameStamp && (frameStamp->frameCount % 600 == 0)) {
         LOG_INFO("DatabasePager stats: active=%u, inactive=%u, available=%u, target=%u",
                  pagedLODContainer ? pagedLODContainer->activeList.count : 0,
                  pagedLODContainer ? pagedLODContainer->inactiveList.count : 0,
