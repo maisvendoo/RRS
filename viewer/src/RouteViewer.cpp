@@ -777,7 +777,7 @@ void RouteViewer::initViewer()
 
     if (memPolls)
     {
-        memPolls->allocatedMemoryLimit = settings.allocatedMemoryLimit;
+        memPolls->allocatedMemoryLimit = std::clamp(settings.allocatedMemoryLimit, 0.0, 1.0);
     }
 
     // Создаём вспомогательные потоки для чтения текстур 3d-моделей
