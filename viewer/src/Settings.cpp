@@ -112,6 +112,8 @@ void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 
     cfg.getBool(section, "EnableDebugLayer", settings.enableDebugLayer);
     cfg.getBool(section, "EnableDebugUtils", settings.enableDebugUtils);
+
+    cfg.getDouble(section, "GPUAllocatedMemoryLimit", settings.allocatedMemoryLimit);
 }
 
 //------------------------------------------------------------------------------
