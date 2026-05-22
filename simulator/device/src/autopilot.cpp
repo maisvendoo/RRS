@@ -62,11 +62,11 @@ QString Autopilot::getDbgMsg()
 
     if (is_active)
     {
-        msg =  " | АВТОВЕДЕНИЕ";
+        msg =  "АВТОВЕДЕНИЕ";
     }
     else
     {
-        msg =  " | СОВЕТЧИК";
+        msg =  "СОВЕТЧИК";
     }
 
     msg += QString(" | Vтек.: %1 км/ч | Vзад.: %2 км/ч | Уск.: %3 м/с2")
@@ -76,15 +76,24 @@ QString Autopilot::getDbgMsg()
 
     if (is_timetable_ready)
     {
-        msg += QString(" | Цель: %1 | дист.: %2 | Приб.: %3 | Отпр.: %4 | Факт. приб.: %6 | Факт. отпр.: %7 | Время хода: %8 | Ск. гр.: %9")
+        msg += QString(" | Цель: %1 | дист.: %2")
                    .arg(timetable.stations[target_station_idx].name)
-                   .arg(target_station_dist, 7, 'f', 1)
+                   .arg(target_station_dist, 7, 'f', 1);
+        if (timetable.stations[target_station_idx].is_arrival && (timetable.stations[target_station_idx].dep_time != "-"))
+        {
+            msg += QString(" | Стоянка: %1")
+                       .arg(timetable.stations[target_station_idx].dep_time_sec - time, 8, 'f', 1);
+        }
+        else
+        {
+            msg += QString(" | Время хода: %1")
+                       .arg(delta_t, 8, 'f', 1);
+        }
+        msg += QString(" | Приб.: %1 | Отпр.: %2 | Факт. приб.: %3 | Факт. отпр.: %4")
                    .arg(timetable.getStation(target_station_idx).arr_time, 5)
                    .arg(timetable.getStation(target_station_idx).dep_time, 5)
                    .arg(timetable.getStation(target_station_idx).fact_arr_time, 5)
-                   .arg(timetable.getStation(target_station_idx - 1).fact_dep_time, 5)
-                   .arg(delta_t, 10, 'f', 1)
-                   .arg(v_tt_ref, 4, 'f', 1);
+                   .arg(timetable.getStation(target_station_idx - 1).fact_dep_time, 5);
     }
 
     return msg;
