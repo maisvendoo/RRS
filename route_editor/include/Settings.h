@@ -2,6 +2,7 @@
 #define EDITOR_SETTINGS_H
 
 #include "KeyBinding.h"
+#include "settings/CameraSettings.h"
 #include "settings/SceneSettings.h"
 #include "settings/WindowSettings.h"
 
@@ -19,17 +20,7 @@ struct settings_t
 
     window_settings_t window;
     scene_settings_t scene;
-
-    double zNear;            ///< Near clip plane
-    double view_distance;    ///< View distance
-    double fovy;             ///< Vertical view angle
-    double fovy_min;         ///< Vertical view angle min
-    double fovy_max;         ///< Vertical view angle max
-
-    double camera_initial_height;
-    double camera_move_speed;
-    double camera_rotate_speed;
-    double camera_zoom_power;
+    camera_settings_t camera;
 
     float gizmo_arrow_length;
     float gizmo_arrow_thickness;

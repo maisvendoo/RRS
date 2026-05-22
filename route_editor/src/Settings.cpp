@@ -19,16 +19,7 @@
 #include <string>
 
 settings_t::settings_t()
-    : zNear(0.1)
-    , view_distance(2000.0)
-    , fovy(60.0)
-    , fovy_min(2.0)
-    , fovy_max(100.0)
-    , camera_initial_height(0.0)
-    , camera_move_speed(100.0)
-    , camera_rotate_speed(3.0)
-    , camera_zoom_power(250.0)
-    , gizmo_arrow_length(5.0f)
+    : gizmo_arrow_length(5.0f)
     , gizmo_arrow_thickness(0.1f)
     , gizmo_arrow_x_color(1.0f, 0.0f, 0.0f)
     , gizmo_arrow_y_color(0.0f, 1.0f, 0.0f)
@@ -59,20 +50,9 @@ void settings_t::read(const std::string& cfg_path)
 
     window.read(cfg);
     scene.read(cfg);
+    camera.read(cfg);
 
-    QString section = "Camera";
-
-    cfg.getDouble(section, "zNear", zNear);
-    cfg.getDouble(section, "ViewDistance", view_distance);
-    cfg.getDouble(section, "FovY", fovy);
-    cfg.getDouble(section, "FovYMin", fovy_min);
-    cfg.getDouble(section, "FovYMax", fovy_max);
-    cfg.getDouble(section, "InitialHeight", camera_initial_height);
-    cfg.getDouble(section, "MoveSpeed", camera_move_speed);
-    cfg.getDouble(section, "RotateSpeed", camera_rotate_speed);
-    cfg.getDouble(section, "ZoomPower", camera_zoom_power);
-
-    section = "Gizmo";
+    QString section = "Gizmo";
 
     cfg.getFloat(section, "ArrowLength", gizmo_arrow_length);
     cfg.getFloat(section, "ArrowThickness", gizmo_arrow_thickness);
