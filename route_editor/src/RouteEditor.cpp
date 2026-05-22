@@ -295,10 +295,14 @@
 #include <core/string_funcs.h>
 #include <filesystem.h>
 
+#include <vsg/io/Options.h>
+
 RouteEditor::RouteEditor()
 {
     initialize_journal();
 }
+
+RouteEditor::~RouteEditor() = default;
 
 void RouteEditor::initialize_journal() const
 {
