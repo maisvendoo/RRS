@@ -17,6 +17,7 @@
 #include <vsg/utils/PropagateDynamicObjects.h>
 
 #include <GPUMemoryMonitor.h>
+#include <ResourceCollector.h>
 
 //------------------------------------------------------------------------------
 //
@@ -355,10 +356,10 @@ void AnimatedDatabasePager::updateSceneGraph(vsg::ref_ptr<vsg::FrameStamp> frame
     vsg::DatabasePager::updateSceneGraph(frameStamp, cr);
 
     // Периодическая проверка памяти
-    if (frameStamp && (frameStamp->frameCount % 60 == 0))
-    {
+    //if (frameStamp && (frameStamp->frameCount % 60 == 0))
+    //{
         checkAndUnloadIfMemoryLimitExceeded();
-    }
+    //}
 }
 
 
@@ -443,20 +444,56 @@ std::vector<vsg::ref_ptr<vsg::PagedLOD>> AnimatedDatabasePager::collectInvisible
 //------------------------------------------------------------------------------
 bool AnimatedDatabasePager::unloadPagedLOD(vsg::PagedLOD *plod)
 {
-    if (plod == nullptr)
+    if (plod == nullptr) return false;
+
+    // 1. Проверяем, не используется ли узел в текущем кадре
+    uint64_t currentFrame = frameCount.load();
+    uint64_t lastUsed = plod->frameHighResLastUsed.load();
+    if (currentFrame - lastUsed < 2)
     {
+        // Узел использовался в прошлом или текущем кадре — не удаляем
+        LOG_DEBUG("Skipping unload: node used recently, frame=%llu, lastUsed=%llu",
+                  currentFrame, lastUsed);
         return false;
     }
 
     vsg::PagedLOD::RequestStatus expected = vsg::PagedLOD::NoRequest;
-
     if (!vsg::compare_exchange(plod->requestStatus, expected, vsg::PagedLOD::DeleteRequest))
     {
         return false;
     }
 
-    LOG_INFO("Unloading invisible obkect: %s", plod->filename.string().c_str());
+    LOG_INFO("Unloading invisible object: %s", plod->filename.string().c_str());
 
+    // 2. Удаляем узел из culledPagedLODs, чтобы RecordTraversal не использовал его
+    if (culledPagedLODs)
+    {
+        auto& highresCulled = culledPagedLODs->highresCulled;
+        highresCulled.erase(
+            std::remove(highresCulled.begin(), highresCulled.end(), plod),
+            highresCulled.end()
+            );
+
+        auto& newHighresRequired = culledPagedLODs->newHighresRequired;
+        newHighresRequired.erase(
+            std::remove(newHighresRequired.begin(), newHighresRequired.end(), plod),
+            newHighresRequired.end()
+            );
+    }
+
+    // 3. Собираем и освобождаем ресурсы
+    /*ResourceCollector collector;
+    if (plod->children[0].node)
+    {
+        plod->children[0].node->accept(collector);
+    }
+    if (plod->pending)
+    {
+        plod->pending->accept(collector);
+    }
+    collector.releaseAll();*/
+
+    // 4. Очищаем ссылки внутри мьютекса
     {
         std::scoped_lock lock(pendingPagedLODMutex);
 
@@ -473,16 +510,17 @@ bool AnimatedDatabasePager::unloadPagedLOD(vsg::PagedLOD *plod)
                 deleteList.push_back(plod->pending);
                 deleteQueue->add(deleteList);
             }
-
             plod->pending = nullptr;
         }
     }
 
+    // 5. Удаляем из контейнера PagedLOD
     if (pagedLODContainer && plod->index != 0)
     {
         pagedLODContainer->remove(plod);
     }
 
+    // 6. Сбрасываем состояние
     plod->requestStatus.exchange(vsg::PagedLOD::NoRequest);
     plod->requestCount.exchange(0);
 
@@ -520,6 +558,9 @@ uint32_t AnimatedDatabasePager::forceUnloadInvisibleObjects()
     return unloadedCount;
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void AnimatedDatabasePager::requestDiscarded(vsg::PagedLOD* plod)
 {
     // Если узел помечен на удаление, просто сбрасываем состояние
