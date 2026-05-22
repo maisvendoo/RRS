@@ -543,8 +543,8 @@ void Autopilot::checkTimetable(double t, double dt)
     // Текущая станция
     auto st = &timetable.stations[target_station_idx];
 
-    // Время прибытия равно времени отправления
-    if (st->arr_time == st->dep_time)
+    // Время прибытия позже или равно времени отправления
+    if (st->arr_time_sec > st->dep_time_sec - 1.0)
     {
         // Разрешаем отправление
         is_departure_allowed = true;
@@ -554,21 +554,27 @@ void Autopilot::checkTimetable(double t, double dt)
     // Обработка опоздания
     if ( (st->arr_time != "-") && (st->is_arrival) && (!st->is_delay) )
     {
-        double delay = pf(st->fact_arr_time_sec - st->arr_time_sec);
+        double delay_sec = std::max(0.0, st->fact_arr_time_sec - st->arr_time_sec);
+        double halt_sec = std::max(0.0, st->dep_time_sec - st->arr_time_sec);
 
-        // Выдерживаем без сокращения только короткую стоянку
-        if (st->dep_time_sec - st->arr_time_sec < min_reduced_halt_time * 60.0)
-        {
-            st->dep_time_sec += delay;
-            st->is_delay = true;
-        }
+        // Короткую стоянку выдерживаем без сокращения
+        double min_halt_sec = std::min(halt_sec, min_reduced_halt_time * 60.0);
+
+        // Уменьшаем опоздание за счёт сокращения стоянки
+        double delay_reduced_sec = std::max(0.0, delay_sec - (halt_sec - min_halt_sec));
+
+        // Отправляемся с опозданием
+        st->dep_time_sec += delay_reduced_sec;
+
+        // Запоминаем, что обработали опоздание
+        st->is_delay = true;
     }
 
-    if (t >= st->dep_time_sec)
+    if (st->is_arrival && (t >= st->dep_time_sec))
     {
         is_departure_allowed = true;
 
-        // Если задан участок приближения, строим себе маршрут отправления
+        // Если задан участок удаления, строим себе маршрут отправления
         if (!st->removal_traj.isEmpty() && !st->is_build_dep_route)
         {
             // Запрос на проверку свободности маршрута отправления
