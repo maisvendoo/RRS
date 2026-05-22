@@ -141,7 +141,7 @@ bool RouteEditor::initialize()
     viewer_->assignRecordAndSubmitTaskAndPresentation({command_graph});
 
     const uint32_t num_lights = static_cast<uint32_t>(
-        context_.settings.num_lights);
+        context_.settings.scene.num_lights);
 
     auto resource_hints = vsg::ResourceHints::create();
     resource_hints->numLightsRange = {num_lights, num_lights + 1};

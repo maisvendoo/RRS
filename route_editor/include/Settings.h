@@ -2,6 +2,7 @@
 #define EDITOR_SETTINGS_H
 
 #include "KeyBinding.h"
+#include "settings/SceneSettings.h"
 #include "settings/WindowSettings.h"
 
 #include <vsg/maths/vec3.h>
@@ -17,8 +18,7 @@ struct settings_t
     void read(const std::string& cfg_path);
 
     window_settings_t window;
-
-    int num_lights;
+    scene_settings_t scene;
 
     double zNear;            ///< Near clip plane
     double view_distance;    ///< View distance

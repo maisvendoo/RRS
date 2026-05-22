@@ -58,12 +58,9 @@ void settings_t::read(const std::string& cfg_path)
     }
 
     window.read(cfg);
+    scene.read(cfg);
 
-    QString section = "Scene";
-
-    cfg.getInt(section, "NumLights", num_lights);
-
-    section = "Camera";
+    QString section = "Camera";
 
     cfg.getDouble(section, "zNear", zNear);
     cfg.getDouble(section, "ViewDistance", view_distance);
