@@ -771,6 +771,15 @@ void RouteViewer::initViewer()
         LOG_WARN("Viewer compile returned empty result — some resources may not have been compiled");
     }
 
+    // Задаем лимит выделение видеопамяти (для разработчиков! отладка работы на слабых системах!)
+    auto device = window->getDevice();
+    auto memPolls = device->deviceMemoryBufferPools.ref_ptr();
+
+    if (memPolls)
+    {
+        memPolls->allocatedMemoryLimit = settings.allocatedMemoryLimit;
+    }
+
     // Создаём вспомогательные потоки для чтения текстур 3d-моделей
     uint32_t numOpThreads = std::min(settings.operation_threads, numThreads);
     if (numOpThreads)
