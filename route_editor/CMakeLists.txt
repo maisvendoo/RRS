@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+find_package(Qt6 COMPONENTS Core REQUIRED)
 find_package(vsg REQUIRED)
 find_package(vsgXchange REQUIRED)
 find_package(vsgImGui REQUIRED)
@@ -31,11 +32,13 @@ target_sources(route_editor
 
 target_link_libraries(route_editor
     PRIVATE
+        Qt6::Core
         vsg::vsg
         vsgXchange::vsgXchange
         vsgImGui::vsgImGui
         CfgReader
         Journal
+        core
         filesystem
         graphics
         topology

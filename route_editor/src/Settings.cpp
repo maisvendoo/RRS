@@ -18,50 +18,6 @@
 #include <map>
 #include <string>
 
-window_settings_t::window_settings_t()
-    : title{"Route Editor"}
-    , x{50}
-    , y{50}
-    , width{1280}
-    , height{720}
-    , screen_number{0}
-    , fullscreen{false}
-    , vsync{true}
-    , double_buffer{true}
-    , samples{1}
-    , num_lights{200}
-{
-}
-
-void window_settings_t::read(CfgReader& cfg)
-{
-    const QString section = "Window";
-
-    QString temp_qstr = title.c_str();
-    if (cfg.getString(section, "Title", temp_qstr))
-    {
-        title = temp_qstr.toStdString();
-    }
-
-    cfg.getInt(section, "xPos", x);
-    cfg.getInt(section, "yPos", y);
-    cfg.getInt(section, "Width", width);
-    cfg.getInt(section, "Height", height);
-
-    int temp_int = screen_number;
-    cfg.getInt(section, "ScreenNumber", temp_int);
-    if (temp_int >= 0)
-    {
-        screen_number = temp_int;
-    }
-
-    cfg.getBool(section, "FullScreen", fullscreen);
-    cfg.getBool(section, "VSync", vsync);
-    cfg.getBool(section, "DoubleBuffer", double_buffer);
-    cfg.getInt(section, "Samples", samples);
-    cfg.getInt(section, "NumLights", num_lights);
-}
-
 settings_t::settings_t()
     : zNear(0.1)
     , view_distance(2000.0)
@@ -103,7 +59,11 @@ void settings_t::read(const std::string& cfg_path)
 
     window.read(cfg);
 
-    QString section = "Camera";
+    QString section = "Scene";
+
+    cfg.getInt(section, "NumLights", num_lights);
+
+    section = "Camera";
 
     cfg.getDouble(section, "zNear", zNear);
     cfg.getDouble(section, "ViewDistance", view_distance);

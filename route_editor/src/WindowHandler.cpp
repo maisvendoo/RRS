@@ -25,8 +25,8 @@ WindowHandler::WindowHandler(
     , camera_{camera}
 {
     const auto window_traits = vsg::WindowTraits::create();
-    window_traits->x = window_settings.x;
-    window_traits->y = window_settings.y;
+    window_traits->x = window_settings.pos_x;
+    window_traits->y = window_settings.pos_y;
     window_traits->width = window_settings.width;
     window_traits->height = window_settings.height;
     window_traits->fullscreen = window_settings.fullscreen;

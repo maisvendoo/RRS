@@ -2,32 +2,13 @@
 #define EDITOR_SETTINGS_H
 
 #include "KeyBinding.h"
+#include "settings/WindowSettings.h"
 
 #include <vsg/maths/vec3.h>
 
 #include <string>
 
 class CfgReader;
-
-struct window_settings_t
-{
-    window_settings_t();
-
-    void read(CfgReader& cfg);
-
-    std::string title;
-    int x;
-    int y;
-    int width;
-    int height;
-    int screen_number;
-    bool fullscreen;
-    bool vsync;
-    bool double_buffer;
-    int samples;
-    // TODO: Move from window settings
-    int num_lights;
-};
 
 struct settings_t
 {
@@ -36,6 +17,8 @@ struct settings_t
     void read(const std::string& cfg_path);
 
     window_settings_t window;
+
+    int num_lights;
 
     double zNear;            ///< Near clip plane
     double view_distance;    ///< View distance
