@@ -36,7 +36,6 @@ target_link_libraries(route_editor
         vsgImGui::vsgImGui
         CfgReader
         Journal
-        core
         filesystem
         graphics
         topology
