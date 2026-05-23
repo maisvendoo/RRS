@@ -116,6 +116,7 @@ struct settings_t final
 
     bool enableDebugLayer = false;
     bool enableDebugUtils = false;
+    double allocatedMemoryLimit = 1.0;
 };
 
 #endif // VIEWER_SETTINGS_H
