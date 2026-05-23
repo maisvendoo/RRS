@@ -1,7 +1,6 @@
 #include    <physics.h>
 #include    <signal-command.h>
 #include    <mainwindow.h>
-#include    <rail-signal.h>
 #include    <ui_mainwindow.h>
 
 #include    <CfgReader.h>
