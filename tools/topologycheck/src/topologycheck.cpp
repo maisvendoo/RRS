@@ -1,28 +1,10 @@
 #include    "topologycheck.h"
-
-#include    "Logger.h"
 #include    "command-line.h"
-#include    "switch.h"
-#include    "topology.h"
+#include    "Logger.h"
 
 #include    <QString>
 #include    <QDir>
-
-#include    <algorithm>
-#include    <memory>
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-TopologyCheck::TopologyCheck()
-    : topology{std::make_unique<Topology>()}
-{
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-TopologyCheck::~TopologyCheck() = default;
+#include <algorithm>
 
 //------------------------------------------------------------------------------
 //
