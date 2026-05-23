@@ -208,16 +208,16 @@ void VL60k::debugPrint(const simulator_time_t& t, const double& dt)
 
     if (autopilot[CAB1] != nullptr && autopilot[CAB2] != nullptr)
     {
-        QString auto_mode = "";
+        QString auto_mode = QString("\n");
 
-        if (controller[CAB1]->isReversHandle() && autopilot[CAB1]->isActive())
+        if (controller[CAB1]->isReversHandle())
         {
-            auto_mode = autopilot[CAB1]->getDbgMsg();
+            auto_mode += autopilot[CAB1]->getDbgMsg();
         }
 
-        if (controller[CAB2]->isReversHandle() && autopilot[CAB2]->isActive())
+        if (controller[CAB2]->isReversHandle())
         {
-            auto_mode = autopilot[CAB2]->getDbgMsg();
+            auto_mode += autopilot[CAB2]->getDbgMsg();
         }
 
         DebugMsg += auto_mode;
