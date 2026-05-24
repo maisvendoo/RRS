@@ -153,7 +153,7 @@ struct simulator_vehicle_pos_update_t final
 //------------------------------------------------------------------------------
 struct simulator_update_pos_t final
 {
-    int speed_factor = false;
+    int speed_factor = 1;
     simulator_time_t sim_time;
     std::vector<simulator_vehicle_pos_update_t> vehicles;
 

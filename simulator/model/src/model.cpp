@@ -280,16 +280,15 @@ void Model::slotSetSimSpeed(int speed_factor)
         return;
     }
 
-    if (speed_factor == 0)
+    this->speed_factor = speed_factor;
+
+    if (this->speed_factor == 0)
     {
-        this->speed_factor = 0;
         simTimer.setInterval(integration_time_interval);
     }
     else
     {
-        this->speed_factor = speed_factor;
-
-        quint64 interval = qRound(static_cast<double>(integration_time_interval) / speed_factor);
+        quint64 interval = qRound(static_cast<double>(integration_time_interval) / this->speed_factor);
 
         if (interval < 1)
         {
@@ -1204,7 +1203,7 @@ void Model::process()
 {
     process_timepoint = std::chrono::steady_clock::now();
 
-    if (speed_factor)
+    if (speed_factor == 0)
     {
         prepareFeedBack(false);
         tcpFeedBack(false);

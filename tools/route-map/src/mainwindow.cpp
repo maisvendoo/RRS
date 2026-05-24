@@ -147,6 +147,26 @@ void MainWindow::loadSettingsGUI()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::updateSimSpeedMenu(int speed_factor)
+{
+    for (auto *action : ui->mSimSpeed->actions())
+    {
+        int idx = ui->mSimSpeed->actions().indexOf(action);
+
+        if (idx == speed_factor)
+        {
+            action->setChecked(true);
+        }
+        else
+        {
+            action->setChecked(false);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::load_config(const QString &cfg_name)
 {
     CfgReader cfg;
@@ -604,6 +624,8 @@ void MainWindow::slotGetVehiclePosData(QByteArray &sim_data)
     train_data.deserialize(sim_data);
 
     QString formatted_time = train_data.sim_time.time.getString();
+
+    updateSimSpeedMenu(train_data.speed_factor);
 
     // Убедиться что формат "HH:MM:SS" (8 символов всегда)
     if (formatted_time.length() < 8)

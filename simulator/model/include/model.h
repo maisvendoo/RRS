@@ -228,7 +228,7 @@ private:
 
     void controlStep();
 
-    int speed_factor = false;
+    int speed_factor = 1;
 
 private slots:
 
