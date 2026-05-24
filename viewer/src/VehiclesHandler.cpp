@@ -113,12 +113,14 @@ bool VehiclesHandler::isPaused() const noexcept
 {
     if (pos_count.load(std::memory_order_relaxed) >= 1)
     {
-        return pos_buf[pos_read % POS_BUF_SIZE].is_paused;
+        // Читаем из последнего записанного пакета, а не из буфера интерполяции
+        size_t write_idx = pos_write.load(std::memory_order_acquire);
+        if (write_idx == 0) return false;
+
+        return pos_buf[(write_idx - 1) % POS_BUF_SIZE].is_paused;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------

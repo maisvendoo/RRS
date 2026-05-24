@@ -1201,9 +1201,10 @@ void Model::controlStep()
 //------------------------------------------------------------------------------
 void Model::process()
 {
-    // Постановка на паузу
     if (is_paused)
     {
+        prepareFeedBack(is_trains_changed);
+        tcpFeedBack(is_trains_changed);
         return;
     }
 

@@ -1,5 +1,6 @@
 #include "MyGui.h"
 
+#include "Logger.h"
 #include "filesystem.h"
 #include "datetime.h"
 
