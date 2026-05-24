@@ -275,19 +275,28 @@ void Model::slotSetSimSpeed(int speed_factor)
         return;
     }
 
-    if (speed_factor <= 0)
+    if (speed_factor < 0)
     {
         return;
     }
 
-    quint64 interval = qRound(static_cast<double>(integration_time_interval) / speed_factor);
-
-    if (interval < 1)
+    if (speed_factor == 0)
     {
-        interval = 1;
+        is_paused = true;
     }
+    else
+    {
+        is_paused = false;
 
-    simTimer.setInterval(interval);
+        quint64 interval = qRound(static_cast<double>(integration_time_interval) / speed_factor);
+
+        if (interval < 1)
+        {
+            interval = 1;
+        }
+
+        simTimer.setInterval(interval);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -1191,6 +1200,12 @@ void Model::controlStep()
 //------------------------------------------------------------------------------
 void Model::process()
 {
+    // Постановка на паузу
+    if (is_paused)
+    {
+        return;
+    }
+
     // Проверяем, если в счётчике ещё нет отрицательного значения,
     // то предыдущий шаг симуляции не завершён, пропускаем новый шаг
     if (count_trains_done_its_step >= 0)

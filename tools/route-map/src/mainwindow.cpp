@@ -1187,7 +1187,16 @@ void MainWindow::slotSetSimSpeed(bool is_cheked)
         return;
     }
 
-    int speed_factor = 1 << idx;
+    int speed_factor = 0;
+
+    if (idx == 0)
+    {
+        speed_factor = 0;
+    }
+    else
+    {
+        speed_factor = 1 << (idx - 1);
+    }
 
     tcp_client->sendSimSpeedCommand(speed_factor);
 

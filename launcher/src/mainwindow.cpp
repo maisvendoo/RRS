@@ -199,7 +199,7 @@ MainWindow::~MainWindow()
 //------------------------------------------------------------------------------
 void MainWindow::init()
 {
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
 
     loadRoutesList(fs.getRouteRootDir());
     loadTrainsList(fs.getTrainsDir());
@@ -413,8 +413,6 @@ void MainWindow::loadScenarios(route_info_t &route_info)
 
     while (it.hasNext())
     {
-        scenario_t scn;
-
         // Проверяем наличие в найденном подкаталоге файла main.lua
         QString abs_path = it.next();
         QString main_path = QDir::toNativeSeparators(abs_path + QDir::separator() + "main.lua");
@@ -422,6 +420,8 @@ void MainWindow::loadScenarios(route_info_t &route_info)
 
         if (main_file.exists())
         {
+            scenario_t scn;
+
             // И только в случае наличия такового - добавляем каталог в список
             // доступных сценариев
             scn.scenario_name = scenarios_dir.relativeFilePath(abs_path);
@@ -472,7 +472,7 @@ void MainWindow::clearActiveTrainsList()
 
     while (tbActiveTrains->count() > 0)
     {
-        TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(tbActiveTrains->widget(0));
+        const TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(tbActiveTrains->widget(0));
         disconnect(tww, &TrainWaypointWidget::activeTrainChanged,
                    this, &MainWindow::slotUpdateActiveTrains);
         disconnect(tww, &TrainWaypointWidget::trainConfigChanged,
@@ -613,8 +613,7 @@ void MainWindow::gpuDiagnostics()
             // не запускает и падает вьювер, а драйверы не хотят устанавливаться
             // жалуясь на версию ОС.
             // TODO: протестировать это!!! иначе огребем от юзеров по полной!
-            size_t valid_gpus_count = 0;
-            size_t invalid_gpus_count = 0;
+            size_t valid_gpus_count = 0;            
             std::vector<size_t> devices_with_problems;
 
             for (size_t i = 0; i < gpus_info.size(); ++i)
@@ -658,7 +657,7 @@ void MainWindow::gpuDiagnostics()
 //------------------------------------------------------------------------------
 void MainWindow::createHelpMenu()
 {
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
     auto docsDir = fs.getDocsDir();
 
     QDir docs(QString(docsDir.c_str()));
@@ -861,7 +860,7 @@ void MainWindow::loadActiveTrainsList()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::saveOptions(FieldsDataList &fd_options)
+void MainWindow::saveOptions(const FieldsDataList &fd_options) const
 {
     CfgEditor editor;
 
@@ -916,7 +915,7 @@ void MainWindow::startSimulator()
         args << "--scenario=" + STARTUP_SCN_SUBDIR;
     }
 
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
     QString simPath = SIMULATOR_NAME + EXE_EXP;
 
     simulatorProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
@@ -951,7 +950,7 @@ void MainWindow::startViewer(bool local)
     args << "--host-address" << server.getHostAddress();
     args << "--port" << QString::number(server.ipv4_port);
 
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
     QString viewerPath = VIEWER_NAME + EXE_EXP;
 
     if (local)
@@ -991,7 +990,7 @@ void MainWindow::startMap(bool local)
     args << "--host-address" << server.getHostAddress();
     args << "--port" << QString::number(server.ipv4_port);
 
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
     QString mapPath = ROUTE_MAP_NAME + EXE_EXP;
 
     if (local)
@@ -1185,7 +1184,7 @@ void MainWindow::slotDeleteActiveTrain()
         delete tww;
     }
 
-    slotUpdateActiveTrains();
+    slotUpdateActiveTrains();    
 
     if (active_trains.size() == 0)
     {
@@ -1554,13 +1553,13 @@ void MainWindow::slotSaveServer()
             idx = i;
         ++i;
 
-        server_info_t server = it.value();
-        ui->cbSavedServers->addItem(server.server_name + " (" + server.getHostAddressAndPort() + ")");
+        server_info_t current_server = it.value();
+        ui->cbSavedServers->addItem(current_server.server_name + " (" + current_server.getHostAddressAndPort() + ")");
 
         FieldsDataList flist;
-        flist.append(QPair<QString, QString>("Name", server.server_name));
-        flist.append(QPair<QString, QString>("HostAddr", server.getHostAddress()));
-        flist.append(QPair<QString, QString>("port", QString::number(server.ipv4_port)));
+        flist.append(QPair<QString, QString>("Name", current_server.server_name));
+        flist.append(QPair<QString, QString>("HostAddr", current_server.getHostAddress()));
+        flist.append(QPair<QString, QString>("port", QString::number(current_server.ipv4_port)));
         editor.writeFile("Server", flist);
     }
 
