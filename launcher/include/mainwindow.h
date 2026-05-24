@@ -224,6 +224,10 @@ private:
 
     void closeEvent(QCloseEvent *event) override;
 
+    const int PROC_WAIT_TIMEOUT = 1000;
+
+    bool terminateProcess(QProcess *proc);
+
 private slots:
 
     void slotRouteSelection();

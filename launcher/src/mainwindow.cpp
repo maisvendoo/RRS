@@ -1800,5 +1800,68 @@ void MainWindow::createScenario(const QString &route_name,
 //------------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    event->accept();
+    bool is_ready_for_close = true;
+
+    if (viewerProc.state() == QProcess::ProcessState::Running)
+    {
+        is_ready_for_close = is_ready_for_close && terminateProcess(&viewerProc);
+    }
+
+    if (mapProc.state() == QProcess::ProcessState::Running)
+    {
+        is_ready_for_close = is_ready_for_close && terminateProcess(&mapProc);
+    }
+
+    if (simulatorProc.state() == QProcess::ProcessState::Running)
+    {
+        is_ready_for_close = is_ready_for_close && terminateProcess(&simulatorProc);
+    }
+
+    for (auto *proc : toolProcs)
+    {
+        if (proc == nullptr)
+        {
+            continue;
+        }
+
+        if (proc->state() == QProcess::ProcessState::Running)
+        {
+            is_ready_for_close = is_ready_for_close && terminateProcess(proc);
+        }
+    }
+
+    if (is_ready_for_close)
+    {
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool MainWindow::terminateProcess(QProcess *proc)
+{
+    if (proc == nullptr)
+    {
+        return false;
+    }
+
+    // Посылаем процессу SIGTERM
+    proc->terminate();
+
+    // Если он не завершился
+    if (!proc->waitForFinished(PROC_WAIT_TIMEOUT))
+    {
+        // Посылаем SIGKILL
+        proc->kill();
+
+        // Ждем завершения
+        return proc->waitForFinished(PROC_WAIT_TIMEOUT);
+    }
+
+    return true;
 }
