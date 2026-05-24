@@ -283,6 +283,7 @@ void Model::slotSetSimSpeed(int speed_factor)
     if (speed_factor == 0)
     {
         is_paused = true;
+        simTimer.setInterval(integration_time_interval);
     }
     else
     {
@@ -1201,10 +1202,12 @@ void Model::controlStep()
 //------------------------------------------------------------------------------
 void Model::process()
 {
+    process_timepoint = std::chrono::steady_clock::now();
+
     if (is_paused)
     {
-        prepareFeedBack(is_trains_changed);
-        tcpFeedBack(is_trains_changed);
+        prepareFeedBack(false);
+        tcpFeedBack(false);
         return;
     }
 
@@ -1217,8 +1220,6 @@ void Model::process()
     }
     // Обнуляем счётчик
     count_trains_done_its_step = 0;
-
-    process_timepoint = std::chrono::steady_clock::now();
 
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
 
