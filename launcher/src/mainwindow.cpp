@@ -1794,3 +1794,11 @@ void MainWindow::createScenario(const QString &route_name,
 
     file.close();
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    event->accept();
+}
