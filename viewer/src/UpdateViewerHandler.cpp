@@ -17,6 +17,7 @@
 #include <vsg/ui/TouchEvent.h>
 #include <vsg/nodes/RegionOfInterest.h>
 
+#include <KeyPauseProcess.h>
 
 //------------------------------------------------------------------------------
 //
@@ -65,6 +66,15 @@ UpdateViewerHandler::~UpdateViewerHandler() noexcept
 //------------------------------------------------------------------------------
 void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
 {
+    bool isPausePressedNow = isPausePressed();
+
+    if (isPausePressedNow && !_wasPausePhysicallyPressed)
+    {
+        setPause();
+    }
+
+    _wasPausePhysicallyPressed = isPausePressedNow;
+
     if (frame.frameStamp->frameCount)
     {
         const double t = frame.frameStamp->simulationTime;
@@ -78,6 +88,24 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
         _current_manipulator->frameEvent(dt);
 
         updateShadowRegion();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::setPause()
+{
+    int current_sf = _vehicles_handler->getSpeedFactor();
+    LOG_INFO("PRESSED PAUSE");
+
+    if (current_sf == 0)
+    {
+        _upd_server_control->setSpeedFactor(1);
+    }
+    else
+    {
+        _upd_server_control->setSpeedFactor(0);
     }
 }
 
@@ -105,18 +133,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
 
     if (keyPress.keyBase == vsg::KEY_Pause)
     {
-        int current_sf = _vehicles_handler->getSpeedFactor();
-        LOG_INFO("PRESSED PAUSE");
-
-        if (current_sf == 0)
-        {
-            _upd_server_control->setSpeedFactor(1);
-        }
-        else
-        {
-            _upd_server_control->setSpeedFactor(0);
-        }
-
+        setPause();
         return;
     }
 

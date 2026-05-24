@@ -112,6 +112,9 @@ private:
     ScreenshotWriter* _screenshot_writer = nullptr;
     TrafficLightsHandler* _sig_handler = nullptr;
     VehiclesHandler* _vehicles_handler = nullptr;
+
+    bool _wasPausePhysicallyPressed = false;
+    void setPause();
 };
 
 #endif // UPDATE_VIEWER_HANDLER_H
