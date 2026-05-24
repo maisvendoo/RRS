@@ -1316,7 +1316,7 @@ void MainWindow::slotStartServerPressed()
     // Check button is stop running server mode
     if (is_start_button_to_stop_server)
     {
-        simulatorProc.kill();
+        terminateProcess(&simulatorProc);
         return;
     }
 
@@ -1430,10 +1430,10 @@ void MainWindow::slotSimulatorFinished(int exitCode, QProcess::ExitStatus exitSt
     ui->pbStartMap->setEnabled(false);
 
     if (viewerProc.state() != QProcess::NotRunning)
-        viewerProc.kill();
+       terminateProcess(&viewerProc);
 
     if (mapProc.state() != QProcess::NotRunning)
-        mapProc.kill();
+        terminateProcess(&mapProc);
 }
 
 //------------------------------------------------------------------------------
@@ -1802,32 +1802,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     bool is_ready_for_close = true;
 
-    if (viewerProc.state() == QProcess::ProcessState::Running)
-    {
-        is_ready_for_close = is_ready_for_close && terminateProcess(&viewerProc);
-    }
-
-    if (mapProc.state() == QProcess::ProcessState::Running)
-    {
-        is_ready_for_close = is_ready_for_close && terminateProcess(&mapProc);
-    }
-
     if (simulatorProc.state() == QProcess::ProcessState::Running)
     {
         is_ready_for_close = is_ready_for_close && terminateProcess(&simulatorProc);
-    }
-
-    for (auto *proc : toolProcs)
-    {
-        if (proc == nullptr)
-        {
-            continue;
-        }
-
-        if (proc->state() == QProcess::ProcessState::Running)
-        {
-            is_ready_for_close = is_ready_for_close && terminateProcess(proc);
-        }
     }
 
     if (is_ready_for_close)
