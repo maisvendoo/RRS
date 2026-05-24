@@ -1040,6 +1040,7 @@ void Model::prepareFeedBack(bool need_trains_feedback)
         }
     }
 
+    update_pos_data.is_paused = is_paused;
     update_pos_data.sim_time = sim_time;
     update_pos_data.vehicles.resize(vehicles.size());
     update_vehicles.vehicles.resize(vehicles.size());
