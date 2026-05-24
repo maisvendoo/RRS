@@ -226,7 +226,7 @@ private:
 
     const int PROC_WAIT_TIMEOUT = 1000;
 
-    bool terminateProcess(QProcess *proc);
+    bool terminateProcess(QProcess *proc) const;
 
 private slots:
 

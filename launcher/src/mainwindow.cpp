@@ -1787,7 +1787,7 @@ void MainWindow::createScenario(const QString &route_name,
 
     QTextStream stream(&file);
 
-    for (auto line : scnCode)
+    for (const auto &line : scnCode)
     {
         stream << line << "\n";
     }
@@ -1800,27 +1800,27 @@ void MainWindow::createScenario(const QString &route_name,
 //------------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    bool is_ready_for_close = true;
-
     if (simulatorProc.state() == QProcess::ProcessState::Running)
     {
-        is_ready_for_close = is_ready_for_close && terminateProcess(&simulatorProc);
+        if (terminateProcess(&simulatorProc))
+        {
+            event->accept();
+            return;
+        }
+        else
+        {
+            event->ignore();
+            return;
+        }
     }
 
-    if (is_ready_for_close)
-    {
-        event->accept();
-    }
-    else
-    {
-        event->ignore();
-    }
+    event->accept();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool MainWindow::terminateProcess(QProcess *proc)
+bool MainWindow::terminateProcess(QProcess *proc) const
 {
     if (proc == nullptr)
     {
