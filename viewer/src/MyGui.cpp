@@ -569,7 +569,50 @@ void MyGui::showTrainRenameDialog() const
 //------------------------------------------------------------------------------
 void MyGui::showPauseState() const
 {
+    QString text = QString("ПAУЗА\nДля возобновления игры нажмите Pause");
 
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 content_size = io.DisplaySize;
+
+    // Предварительный расчёт габаритов текста для центрирования окна
+    ImVec2 text_size = ImGui::CalcTextSize(text.toStdString().c_str());
+
+    // Центрируем окно по середине экрана
+    ImGui::SetNextWindowPos(ImVec2(
+        (content_size.x - text_size.x) * 0.5f,
+        (content_size.y - text_size.y) * 0.5f
+        ));
+    ImGui::SetNextWindowSize(ImVec2(text_size.x + 20, text_size.y + 20));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoInputs;
+
+    bool open_ptr = true;
+
+    // Полупрозрачный фон для лучшей читаемости
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::Begin(u8"Пауза", &open_ptr, window_flags);
+    ImGui::PopStyleColor();
+
+    // Красный цвет текста
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+    // Построчное центрирование текста
+    QStringList lines = text.split('\n');
+    for (const QString &line : lines)
+    {
+        QByteArray line_utf8 = line.toUtf8();
+        ImVec2 line_size = ImGui::CalcTextSize(line_utf8.constData());
+        float cursor_x = (ImGui::GetWindowWidth() - line_size.x) * 0.5f;
+        ImGui::SetCursorPosX(cursor_x);
+        ImGui::Text("%s", line_utf8.constData());
+    }
+
+    ImGui::PopStyleColor();
+    ImGui::End();
 }
 
 //------------------------------------------------------------------------------
