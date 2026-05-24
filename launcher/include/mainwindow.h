@@ -179,7 +179,7 @@ private:
     /// Создание фалй сценария на основе ручной расстановки в лаунчере
     void createScenario(const QString &route_name,
                         const QStringList &scnCode,
-                        const QString scenario_name = STARTUP_SCN_SUBDIR);
+                        const QString &scenario_name = STARTUP_SCN_SUBDIR);
 
     /// Перезагрузка списка сценариев в интерфейс
     void reloadScenariosList();
@@ -236,9 +236,7 @@ private slots:
 
     void slotAddActiveTrain();
 
-    void slotDeleteActiveTrain();
-
-    void slotSelectSavedStartConfig(int idx);
+    void slotDeleteActiveTrain();    
 
     void slotTrainConfigChanged();
 

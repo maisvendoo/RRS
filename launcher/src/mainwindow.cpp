@@ -1196,23 +1196,6 @@ void MainWindow::slotDeleteActiveTrain()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotSelectSavedStartConfig(int idx)
-{
-    if (idx == new_added_start_config_idx)
-    {
-        new_added_start_config_idx = -1;
-        return;
-    }
-
-    if (idx > 0)
-    {
-        clearActiveTrainsList();
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void MainWindow::slotTrainConfigChanged()
 {
     TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(sender());
@@ -1483,7 +1466,7 @@ void MainWindow::slotSelectSavedServer(int idx)
 {
     server_info_t server = server_info_t();
     int i = 0;
-    for (auto& ss : saved_servers)
+    for (const auto& ss : saved_servers)
     {
         if (i == idx)
         {
@@ -1659,9 +1642,7 @@ void MainWindow::slotSaveTrainsConfigAsScenario()
 //------------------------------------------------------------------------------
 QString MainWindow::createLuaSetDate(QDateEdit *dateEdit)
 {
-    QString setDate = "";
-
-    setDate = QString("setDate(\"%1.%2.%3\")")
+    QString setDate = QString("setDate(\"%1.%2.%3\")")
                   .arg(dateEdit->dateTime().date().day(), 2, 10, QChar('0'))
                   .arg(dateEdit->dateTime().date().month(), 2, 10, QChar('0'))
                   .arg(dateEdit->dateTime().date().year(), 4, 10, QChar('0'));
@@ -1674,9 +1655,7 @@ QString MainWindow::createLuaSetDate(QDateEdit *dateEdit)
 //------------------------------------------------------------------------------
 QString MainWindow::createLuaSetTime(QTimeEdit *timeEdit)
 {
-    QString setTime = "";
-
-    setTime = QString("setTime(\"%1:%2:%3\")")
+    QString setTime = QString("setTime(\"%1:%2:%3\")")
                   .arg(timeEdit->dateTime().time().hour(), 2, 10, QChar('0'))
                   .arg(timeEdit->dateTime().time().minute(), 2, 10, QChar('0'))
                   .arg(timeEdit->dateTime().time().second(), 2, 10, QChar('0'));
@@ -1733,14 +1712,14 @@ QStringList MainWindow::createTmpScenarioCode(const std::vector<active_train_t> 
 //------------------------------------------------------------------------------
 void MainWindow::createScenario(const QString &route_name,
                                 const QStringList &scnCode,
-                                const QString scenario_name)
+                                const QString &scenario_name)
 {
     if (scnCode.empty())
     {
         return;
     }
 
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
     std::string route_path = fs.getRouteRootDir() + fs.separator()
                              + route_name.toStdString();
 
