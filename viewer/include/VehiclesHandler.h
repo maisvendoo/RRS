@@ -49,7 +49,7 @@ public:
 
     bool isUpdated() const noexcept;
 
-    bool isPaused() const noexcept;
+    int getSpeedFactor() const noexcept;
 
     simulator_time_t* getDateTime();
 

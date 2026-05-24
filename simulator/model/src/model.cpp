@@ -282,12 +282,12 @@ void Model::slotSetSimSpeed(int speed_factor)
 
     if (speed_factor == 0)
     {
-        is_paused = true;
+        this->speed_factor = 0;
         simTimer.setInterval(integration_time_interval);
     }
     else
     {
-        is_paused = false;
+        this->speed_factor = speed_factor;
 
         quint64 interval = qRound(static_cast<double>(integration_time_interval) / speed_factor);
 
@@ -1041,7 +1041,7 @@ void Model::prepareFeedBack(bool need_trains_feedback)
         }
     }
 
-    update_pos_data.is_paused = is_paused;
+    update_pos_data.speed_factor = speed_factor;
     update_pos_data.sim_time = sim_time;
     update_pos_data.vehicles.resize(vehicles.size());
     update_vehicles.vehicles.resize(vehicles.size());
@@ -1204,7 +1204,7 @@ void Model::process()
 {
     process_timepoint = std::chrono::steady_clock::now();
 
-    if (is_paused)
+    if (speed_factor)
     {
         prepareFeedBack(false);
         tcpFeedBack(false);

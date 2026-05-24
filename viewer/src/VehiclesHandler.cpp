@@ -109,18 +109,22 @@ bool VehiclesHandler::isUpdated() const noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool VehiclesHandler::isPaused() const noexcept
+int VehiclesHandler::getSpeedFactor() const noexcept
 {
     if (pos_count.load(std::memory_order_relaxed) >= 1)
     {
         // Читаем из последнего записанного пакета, а не из буфера интерполяции
         size_t write_idx = pos_write.load(std::memory_order_acquire);
-        if (write_idx == 0) return false;
 
-        return pos_buf[(write_idx - 1) % POS_BUF_SIZE].is_paused;
+        if (write_idx == 0)
+        {
+            return 1;
+        }
+
+        return pos_buf[(write_idx - 1) % POS_BUF_SIZE].speed_factor;
     }
 
-    return false;
+    return 1;
 }
 
 //------------------------------------------------------------------------------

@@ -132,7 +132,7 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
 
     if (params->vehicles_handler)
     {
-        params->is_paused = params->vehicles_handler->isPaused();
+        params->speed_factor = params->vehicles_handler->getSpeedFactor();
         params->sim_time = params->vehicles_handler->getDateTime();
         if (params->sim_time && params->use_server_time)
         {
@@ -211,7 +211,7 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         showNoCabineControl();
     }
 
-    if (params->is_paused)
+    if (params->speed_factor == 0)
     {
         showPauseState();
     }

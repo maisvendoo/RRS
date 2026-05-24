@@ -153,7 +153,7 @@ struct simulator_vehicle_pos_update_t final
 //------------------------------------------------------------------------------
 struct simulator_update_pos_t final
 {
-    bool is_paused = false;
+    int speed_factor = false;
     simulator_time_t sim_time;
     std::vector<simulator_vehicle_pos_update_t> vehicles;
 
@@ -164,7 +164,7 @@ struct simulator_update_pos_t final
         buff.open(QIODevice::WriteOnly);
         QDataStream stream(&buff);
 
-        stream << is_paused;
+        stream << speed_factor;
         stream << sim_time.serialize();
 
         stream << static_cast<std::uint32_t>(vehicles.size());
@@ -182,7 +182,7 @@ struct simulator_update_pos_t final
         buff.open(QIODevice::ReadOnly);
         QDataStream stream(&buff);
 
-        stream >> is_paused;
+        stream >> speed_factor;
 
         QByteArray sim_time_data;
         stream >> sim_time_data;

@@ -228,7 +228,7 @@ private:
 
     void controlStep();
 
-    bool is_paused = false;
+    int speed_factor = false;
 
 private slots:
 
