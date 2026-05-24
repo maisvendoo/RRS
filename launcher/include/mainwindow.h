@@ -179,7 +179,7 @@ private:
     /// Создание фалй сценария на основе ручной расстановки в лаунчере
     void createScenario(const QString &route_name,
                         const QStringList &scnCode,
-                        const QString scenario_name = STARTUP_SCN_SUBDIR);
+                        const QString &scenario_name = STARTUP_SCN_SUBDIR);
 
     /// Перезагрузка списка сценариев в интерфейс
     void reloadScenariosList();
@@ -198,7 +198,7 @@ private:
 
     GraphSettingsWindow *graphSettingsWindow = new GraphSettingsWindow(this);
 
-    RequireWindowsVersion winver;
+    [[maybe_unused]] RequireWindowsVersion winver;
 
     void createHelpMenu();
 
@@ -211,16 +211,22 @@ private:
     void centerWindow(QWidget* window);
 
     /// Все-таки сохраняемые опции из данного окна
-    FieldsDataList fd_options;
+    [[maybe_unused]] FieldsDataList fd_options;
 
-    static const   QString AUTO_START_VIEWER;
-    static const   QString AUTO_START_ROUTE_MAP;
+    [[maybe_unused]] static const   QString AUTO_START_VIEWER;
+    [[maybe_unused]] static const   QString AUTO_START_ROUTE_MAP;
 
     void updateOptions(FieldsDataList &fd_options);
 
     void applyOptions(FieldsDataList &fd_options, Ui::MainWindow *ui);
 
-    void saveOptions(FieldsDataList &fd_options);
+    void saveOptions(const FieldsDataList &fd_options) const;
+
+    void closeEvent(QCloseEvent *event) override;
+
+    [[maybe_unused]] const int PROC_WAIT_TIMEOUT = 1000;
+
+    bool terminateProcess(QProcess *proc) const;
 
 private slots:
 
@@ -230,9 +236,7 @@ private slots:
 
     void slotAddActiveTrain();
 
-    void slotDeleteActiveTrain();
-
-    void slotSelectSavedStartConfig(int idx);
+    void slotDeleteActiveTrain();    
 
     void slotTrainConfigChanged();
 

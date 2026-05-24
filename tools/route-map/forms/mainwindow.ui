@@ -64,6 +64,7 @@
     <property name="title">
      <string>Simulation speed</string>
     </property>
+    <addaction name="actionPause"/>
     <addaction name="action_x1"/>
     <addaction name="action_x2"/>
     <addaction name="action_x4"/>
@@ -156,6 +157,14 @@
    </property>
    <property name="text">
     <string>Show server time</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Pause</string>
    </property>
   </action>
  </widget>

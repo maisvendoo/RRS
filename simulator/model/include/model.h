@@ -228,6 +228,8 @@ private:
 
     void controlStep();
 
+    bool is_paused = false;
+
 private slots:
 
     void process();

@@ -275,19 +275,28 @@ void Model::slotSetSimSpeed(int speed_factor)
         return;
     }
 
-    if (speed_factor <= 0)
+    if (speed_factor < 0)
     {
         return;
     }
 
-    quint64 interval = qRound(static_cast<double>(integration_time_interval) / speed_factor);
-
-    if (interval < 1)
+    if (speed_factor == 0)
     {
-        interval = 1;
+        is_paused = true;
     }
+    else
+    {
+        is_paused = false;
 
-    simTimer.setInterval(interval);
+        quint64 interval = qRound(static_cast<double>(integration_time_interval) / speed_factor);
+
+        if (interval < 1)
+        {
+            interval = 1;
+        }
+
+        simTimer.setInterval(interval);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -1031,6 +1040,7 @@ void Model::prepareFeedBack(bool need_trains_feedback)
         }
     }
 
+    update_pos_data.is_paused = is_paused;
     update_pos_data.sim_time = sim_time;
     update_pos_data.vehicles.resize(vehicles.size());
     update_vehicles.vehicles.resize(vehicles.size());
@@ -1191,6 +1201,13 @@ void Model::controlStep()
 //------------------------------------------------------------------------------
 void Model::process()
 {
+    if (is_paused)
+    {
+        prepareFeedBack(is_trains_changed);
+        tcpFeedBack(is_trains_changed);
+        return;
+    }
+
     // Проверяем, если в счётчике ещё нет отрицательного значения,
     // то предыдущий шаг симуляции не завершён, пропускаем новый шаг
     if (count_trains_done_its_step >= 0)
