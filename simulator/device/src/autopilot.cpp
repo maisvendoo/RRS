@@ -152,13 +152,13 @@ void Autopilot::velocity_control(double t, double dt)
     // Расчитываем скорость по тормозной кривой до ближайшего сигнала
     v_ref = min(v_ref, calcAlsnSpeed(feedback->alsn_code, feedback->signal_dist, v_target));
 
-    // Если разрешено отправление по графику
-    if (is_departure_allowed)
+    // Разрешаем движение в соответсвии с АЛСН и стоянками в графике
+    bool allow = is_alsn_motion_allowed;
+    if (!timetable.stations.empty())
     {
-        // Действуем в соответсвии с АЛСН
-        //is_motion_allowed = is_alsn_motion_allowed;
-        AllowMotion(is_alsn_motion_allowed);
+        allow &= !timetable.stations[target_station_idx].is_arrival || is_departure_allowed;
     }
+    AllowMotion(allow);
 
     // Минимальная целевая скорость (для предсказания тормозного пути)
     v_target = min(feedback->v_lim_next, v_target);
@@ -473,30 +473,22 @@ double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
     (void)t;
     (void)dt;
 
-    double v_ref = v_constr;
-
-    if (timetable.stations.empty())
+    if (timetable.stations.empty() || is_departure_allowed)
     {
+        // Нет стоянки - порешают другие источники торможения
         return v_constr;
     }
 
+    // Торможение к остановке
+    double v_ref = cut(calcBrakeCurveSpeed(0.0, dist), 0.0, v_constr);
+
     // Текущая станция
     autopilot_station_t st = timetable.stations[target_station_idx];
-
-    // По текущей станции нет стоянки
-    if (st.arr_time == st.dep_time)
+    if (!st.is_arrival)
     {
-        is_departure_allowed = true;
-        // тогда порешают другие источники торможения
+        // Ещё не приехали - не проверяем условия полной остановки
         return v_ref;
     }
-
-    if (is_departure_allowed)
-    {
-        return v_ref;
-    }
-
-    v_ref = cut(calcBrakeCurveSpeed(0.0, dist), 0.0, v_constr);
 
     // Запрещаем отпускать тормоза - остановка
     if (feedback->v_cur <= v_disable_release)
@@ -588,13 +580,6 @@ void Autopilot::checkTimetable(double t, double dt)
         {
             // Запрос на проверку свободности маршрута отправления
             emit sigGetTrajStateRequest(this->vehicle_idx, target_station_idx, curr_traj_name, st->removal_traj, target_dir, DEPARTURE_REQUEST);
-        }
-    }
-    else
-    {
-        if (st->target_traj == curr_traj_name)
-        {
-            is_departure_allowed = false;
         }
     }
 }
@@ -734,7 +719,7 @@ void Autopilot::slotRouteBuildRequest()
         else
         {
             // Если нужен сквозной пропуск и он еще не построен
-            if ( st->arr_time == st->dep_time && !st->removal_traj.isEmpty() )
+            if ( (st->arr_time_sec > st->dep_time_sec - 1.0) && !st->removal_traj.isEmpty() )
             {
                 // Если уже построен маршрут приема, но еще не построен маршрут пропуска
                 if (!st->is_build_dep_route)
@@ -771,7 +756,7 @@ void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
 
     // Разрешаем отправление, если мы выехали за пределы целевой траектории,
     // так как раньше отправились вручную
-    if (!is_on_target_traj)
+    if (st->is_arrival && !is_on_target_traj)
     {
         is_departure_allowed = true;
     }
@@ -800,6 +785,11 @@ void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
         if (target_station_idx > timetable.stations.size() - 1)
         {
             target_station_idx = timetable.stations.size() - 1;
+        }
+        else
+        {
+            // При успешном переходе к следующей станции - запрещаем отправляться с неё
+            is_departure_allowed = false;
         }
     }
 }
