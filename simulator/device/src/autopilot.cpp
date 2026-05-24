@@ -89,7 +89,7 @@ QString Autopilot::getDbgMsg()
             msg += QString(" | Время хода: %1")
                        .arg(delta_t, 8, 'f', 1);
         }
-        msg += QString(" | Приб.: %1 | Отпр.: %2 | Факт. приб.: %3 | Факт. отпр.: %4")
+        msg += QString(" | Приб.: %1 | Отпр.: %2 | Факт.приб.: %3 | Факт.отпр.: %4")
                    .arg(timetable.getStation(target_station_idx).arr_time, 5)
                    .arg(timetable.getStation(target_station_idx).dep_time, 5)
                    .arg(timetable.getStation(target_station_idx).fact_arr_time, 5)
@@ -234,11 +234,16 @@ double Autopilot::calcCurrentSpeedLimit(double t, double dt)
 //------------------------------------------------------------------------------
 double Autopilot::calcBrakeCurveSpeed(double v_target, double dist)
 {
+    if (dist < Physics::ZERO)
+    {
+        return v_target;
+    }
+
     double vt = v_target / Physics::kmh;
 
     a_brake = a_brake_ref * ref_mass * train_length / train_mass / ref_length;
 
-    return sqrt(vt * vt + pf(2 * a_brake * dist)) * Physics::kmh;
+    return sqrt(vt * vt + 2 * a_brake * dist) * Physics::kmh;
 }
 
 //------------------------------------------------------------------------------
@@ -354,7 +359,7 @@ void Autopilot::slotInitTimeTable()
 
     if (curr_traj_name != prev_traj_name)
     {
-        QString msg = QString("TIMETABLE PROCESS: vehicle #%1 current trajectory is %2").arg(vehicle_idx).arg(curr_traj_name);
+        QString msg = QString("TIMETABLE PROCESS %1: vehicle #%2 current trajectory is %3").arg(timetable.train_name).arg(vehicle_idx).arg(curr_traj_name);
         Journal::instance()->debug(msg);
         prev_traj_name = curr_traj_name;
     }
@@ -431,6 +436,7 @@ void Autopilot::slotInitTimeTable()
                            target_dir, &target_station_dist);
 
     is_timetable_ready = true;
+    is_departure_allowed = false;
 
     routeBuildRequest->start();
 }
@@ -451,7 +457,7 @@ void Autopilot::calcTargetDistance()
     // Сообщаем в лог текущую траекторию
     if (curr_traj_name != prev_traj_name)
     {
-        QString msg = QString("TIMETABLE PROCESS: vehicle #%1 current trajectory is %2").arg(vehicle_idx).arg(curr_traj_name);
+        QString msg = QString("TIMETABLE PROCESS %1: vehicle #%2 current trajectory is %3").arg(timetable.train_name).arg(vehicle_idx).arg(curr_traj_name);
         Journal::instance()->debug(msg);
         prev_traj_name = curr_traj_name;
     }
@@ -483,8 +489,7 @@ double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
     double v_ref = cut(calcBrakeCurveSpeed(0.0, dist), 0.0, v_constr);
 
     // Текущая станция
-    autopilot_station_t st = timetable.stations[target_station_idx];
-    if (!st.is_arrival)
+    if (!timetable.stations[target_station_idx].is_arrival)
     {
         // Ещё не приехали - не проверяем условия полной остановки
         return v_ref;
@@ -536,7 +541,7 @@ void Autopilot::checkTimetable(double t, double dt)
 {
     (void)dt;
 
-    if (timetable.stations.empty())
+    if (timetable.stations.empty() || is_departure_allowed)
     {
         return;
     }
@@ -548,6 +553,7 @@ void Autopilot::checkTimetable(double t, double dt)
     if (st->arr_time_sec > st->dep_time_sec - 1.0)
     {
         // Разрешаем отправление
+        Journal::instance()->warning(QString("checkTimetable: no halt, allow departure %1").arg(timetable.train_name));
         is_departure_allowed = true;
         return;
     }
@@ -573,6 +579,7 @@ void Autopilot::checkTimetable(double t, double dt)
 
     if (st->is_arrival && (t >= st->dep_time_sec))
     {
+        Journal::instance()->warning(QString("checkTimetable: halt done, allow departure %1").arg(timetable.train_name));
         is_departure_allowed = true;
 
         // Если задан участок удаления, строим себе маршрут отправления
@@ -758,6 +765,7 @@ void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
     // так как раньше отправились вручную
     if (st->is_arrival && !is_on_target_traj)
     {
+        Journal::instance()->warning(QString("slotIncStation: allow departure %1").arg(timetable.train_name));
         is_departure_allowed = true;
     }
 
@@ -769,7 +777,8 @@ void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
 
         OnWhistle();
 
-        QString msg = QString("TIMETABLE PROCESS: Departure from: %1 | Dep. time: %2 | Fact. dep.: %3 |")
+        QString msg = QString("TIMETABLE PROCESS %1: Departure from: %2 | Dep. time: %3 | Fact. dep.: %4 |")
+                          .arg(timetable.train_name)
                           .arg(st->name)
                           .arg(st->dep_time, 5)
                           .arg(st->fact_dep_time, 5);
@@ -839,7 +848,8 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
 
         st->arr_delay = static_cast<int>(st->fact_arr_time_sec - st->arr_time_sec) >= delay_timeout_min * 60;
 
-        QString msg = QString("TIMETABLE PROCESS: Arrival to: %1 | Arr. time: %2 | Fact. arr.: %3 |")
+        QString msg = QString("TIMETABLE PROCESS %1: Arrival to: %2 | Arr. time: %3 | Fact. arr.: %4 |")
+                          .arg(timetable.train_name)
                           .arg(st->name)
                           .arg(st->arr_time, 5)
                           .arg(st->fact_arr_time, 5);
@@ -899,32 +909,28 @@ void Autopilot::slotGetTrajState(int vehicle_idx, int station_idx, QString start
     {
     case ARRIVAL_REQUEST:
 
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%3 try build route from %1 to %2")
+        Journal::instance()->debug(QString("TIMETABLE PROCESS %1: vehicle #%2 arrives to %3 and builds route from %4 to %5")
+                                       .arg(timetable.train_name)
+                                       .arg(vehicle_idx)
+                                       .arg(st->name)
                                        .arg(start_traj_name)
-                                       .arg(traj_name)
-                                       .arg(vehicle_idx));
+                                       .arg(traj_name));
 
         emit sigBuildTrainRoute(start_traj_name, traj_name, target_dir);
-
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 station: %2 is_build_arr_route %3").arg(vehicle_idx).arg(st->name).arg(st->is_build_arr_route));
         st->is_build_arr_route = true;
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 station: %2 is_build_arr_route %3").arg(vehicle_idx).arg(st->name).arg(st->is_build_arr_route));
-
         break;
 
     case DEPARTURE_REQUEST:
 
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%3 try build route from %1 to %2")
+        Journal::instance()->debug(QString("TIMETABLE PROCESS %1: vehicle #%2 departures from %3 and builds route from %4 to %5")
+                                       .arg(timetable.train_name)
+                                       .arg(vehicle_idx)
+                                       .arg(st->name)
                                        .arg(start_traj_name)
-                                       .arg(traj_name)
-                                       .arg(vehicle_idx));
+                                       .arg(traj_name));
 
         emit sigBuildTrainRoute(start_traj_name, traj_name, target_dir);
-
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 station: %2 is_build_dep_route %3").arg(vehicle_idx).arg(st->name).arg(st->is_build_dep_route));
         st->is_build_dep_route = true;
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 station: %2 is_build_dep_route %3").arg(vehicle_idx).arg(st->name).arg(st->is_build_dep_route));
-
         break;
 
     default:
