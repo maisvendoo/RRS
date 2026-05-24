@@ -131,6 +131,7 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
 
     if (params->vehicles_handler)
     {
+        params->is_paused = params->vehicles_handler->isPaused();
         params->sim_time = params->vehicles_handler->getDateTime();
         if (params->sim_time && params->use_server_time)
         {
@@ -207,6 +208,11 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     if (params->is_no_cabine_control)
     {
         showNoCabineControl();
+    }
+
+    if (params->is_paused)
+    {
+        showPauseState();
     }
 }
 
@@ -556,6 +562,14 @@ void MyGui::showTrainRenameDialog() const
     }
 
     ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::showPauseState() const
+{
+
 }
 
 //------------------------------------------------------------------------------

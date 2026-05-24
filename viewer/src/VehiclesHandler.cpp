@@ -109,6 +109,21 @@ bool VehiclesHandler::isUpdated() const noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool VehiclesHandler::isPaused() const noexcept
+{
+    if (pos_count.load(std::memory_order_relaxed) >= 1)
+    {
+        return pos_buf[pos_read % POS_BUF_SIZE].is_paused;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 simulator_time_t *VehiclesHandler::getDateTime()
 {
     return (pos_count.load(std::memory_order_relaxed) >= 1)
