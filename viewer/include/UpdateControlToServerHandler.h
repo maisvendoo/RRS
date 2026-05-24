@@ -23,6 +23,8 @@ public:
     void changeCurrentVehicle(int current_idx, int controlled_idx, int cabine_idx);
     void setNeedDebugMsg(bool is_needed);
 
+    void setSpeedFactor(int speed_factor);
+
 private:
 
     void sendControlToServer();

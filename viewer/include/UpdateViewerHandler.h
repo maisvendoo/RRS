@@ -58,7 +58,7 @@ public:
     ~UpdateViewerHandler() noexcept;
 
     void apply(vsg::FrameEvent& frame) override;
-    void apply(vsg::KeyPressEvent& keyPress) override;
+    void apply(vsg::KeyPressEvent& keyPress) override;    
     void apply(vsg::KeyReleaseEvent& keyRelease) override;
     void apply(vsg::FocusInEvent& focusIn) override;
     void apply(vsg::FocusOutEvent& focusOut) override;

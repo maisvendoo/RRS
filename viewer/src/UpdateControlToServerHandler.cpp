@@ -71,6 +71,14 @@ void UpdateControlToServerHandler::setNeedDebugMsg(bool is_needed)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void UpdateControlToServerHandler::setSpeedFactor(int speed_factor)
+{
+    _tcp_client->sendSimSpeedCommand(speed_factor);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void UpdateControlToServerHandler::apply([[maybe_unused]] vsg::FocusInEvent& focusIn)
 {
     sendControlToServer();

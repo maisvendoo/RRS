@@ -1,5 +1,6 @@
 #include "UpdateViewerHandler.h"
 
+#include "Logger.h"
 #include "UpdateControlToServerHandler.h"
 
 #include "CameraCabineManipulator.h"
@@ -88,7 +89,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
     if (_keyboard)
     {
         keyPress.accept(*_keyboard);
-    }
+    }    
 
     _current_manipulator->keyboardPressEvent(keyPress.keyBase, true);
 
@@ -99,6 +100,23 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         {
             _current_manipulator->returnView();
         }
+        return;
+    }
+
+    if (keyPress.keyBase == vsg::KEY_Pause)
+    {
+        int current_sf = _vehicles_handler->getSpeedFactor();
+        LOG_INFO("PRESSED PAUSE");
+
+        if (current_sf == 0)
+        {
+            _upd_server_control->setSpeedFactor(1);
+        }
+        else
+        {
+            _upd_server_control->setSpeedFactor(0);
+        }
+
         return;
     }
 
@@ -285,8 +303,7 @@ void UpdateViewerHandler::apply(vsg::KeyReleaseEvent& keyRelease)
         keyRelease.accept(*_keyboard);
     }
 
-    _current_manipulator->keyboardPressEvent(keyRelease.keyBase, false);
-
+    _current_manipulator->keyboardPressEvent(keyRelease.keyBase, false);   
 }
 
 //------------------------------------------------------------------------------
