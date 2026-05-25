@@ -470,21 +470,21 @@ void EditorGui::show_camera_settings() const
     constexpr double min = 0.0;
 
     ImGui::Text("Move speed:");
-    drag_double("##move_speed", &context_.settings.camera.move_speed, &min);
+    drag_double("##move_speed", &context_.settings.camera_settings.move_speed, &min);
 
     ImGui::Text("Rotate speed:");
-    drag_double("##rotate_speed", &context_.settings.camera.rotate_speed, &min);
+    drag_double("##rotate_speed", &context_.settings.camera_settings.rotate_speed, &min);
 
     ImGui::Text("Zoom power:");
-    drag_double("##zoom_power", &context_.settings.camera.zoom_power, &min);
+    drag_double("##zoom_power", &context_.settings.camera_settings.zoom_power, &min);
 
     ImGui::Text("FovY:");
 
     settings_t& settings = context_.settings;
-    if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &settings.camera.fovy,
-        &settings.camera.fovy_min, &settings.camera.fovy_max, "%.3f"))
+    if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &settings.camera_settings.fovy,
+        &settings.camera_settings.fovy_min, &settings.camera_settings.fovy_max, "%.3f"))
     {
-        context_.perspective->fieldOfViewY = settings.camera.fovy;
+        context_.perspective->fieldOfViewY = settings.camera_settings.fovy;
     }
 
     ImGui::End();

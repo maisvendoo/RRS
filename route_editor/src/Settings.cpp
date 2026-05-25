@@ -48,9 +48,9 @@ void settings_t::read(const std::string& cfg_path)
         return;
     }
 
-    window.read(cfg);
-    scene.read(cfg);
-    camera.read(cfg);
+    window_settings.read(cfg);
+    scene_settings.read(cfg);
+    camera_settings.read(cfg);
 
     QString section = "Gizmo";
 

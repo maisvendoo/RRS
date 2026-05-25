@@ -18,9 +18,9 @@ struct settings_t
 
     void read(const std::string& cfg_path);
 
-    window_settings_t window;
-    scene_settings_t scene;
-    camera_settings_t camera;
+    window_settings_t window_settings;
+    scene_settings_t scene_settings;
+    camera_settings_t camera_settings;
 
     float gizmo_arrow_length;
     float gizmo_arrow_thickness;
