@@ -60,6 +60,8 @@ private:
 
     void onProcessErrorOccurred(QProcess::ProcessError error);
 
+    void loadSettingsGUI();
+
 private slots:
 
 

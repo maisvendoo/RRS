@@ -23,6 +23,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 
     vsg::observer_ptr<vsg::Viewer> viewer;
     simulator_time_t* sim_time = nullptr;
+    int speed_factor = 1;
 
     // Skybox *skybox = nullptr;
     NewSkybox* new_skybox = nullptr;  // Owned by RouteViewer
@@ -103,6 +104,8 @@ private:
     void showNoCabineControl() const;
 
     void showTrainRenameDialog() const;
+
+    void showPauseState() const;
 
     void showHUD() const;
 

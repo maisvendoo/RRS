@@ -49,6 +49,8 @@ public:
 
     bool isUpdated() const noexcept;
 
+    int getSpeedFactor() const noexcept;
+
     simulator_time_t* getDateTime();
 
     QString getDebugMessage() const noexcept;

@@ -21,6 +21,7 @@
 #include    <QThread>
 #include    <QSharedMemory>
 #include    <QTimer>
+#include    <chrono>
 
 #include    <simulator-command-line.h>
 #include    <filesystem.h>
@@ -101,23 +102,26 @@ signals:
 
 private:
 
+    /// Realtime start timepoint
+    std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
+    /// Realtime timepoint of current process() begin
+    std::chrono::steady_clock::time_point process_timepoint = std::chrono::steady_clock::now();
     /// Current simulation time
     simulator_time_t sim_time = simulator_time_t::timeNow();
     /// Simulation start time
     double      start_time = 0.0;
+    /// Delay for realtime simulation
+    double      realtime_delay = 0;
     /// Flag of integration step is correct
     bool        is_step_correct = true;
     /// Flag is simulation thread started
     bool        is_simulation_started = false;
     /// Flag is trains changed since previous tcpFeedBack
     bool        is_trains_changed = true;
-    /// Delay for realtime simulation
-    int         realtime_delay = 0;
     /// Minimal intergation interval
     int         integration_time_interval = 100;
 
     int count_trains_done_its_step = -1;
-    int realtime_at_step_begin = 0;
 
     /// Feedback with vehicles state
     simulator_trains_update_t   update_trains = simulator_trains_update_t();
@@ -223,6 +227,8 @@ private:
     void tcpFeedBack(bool need_trains_feedback);
 
     void controlStep();
+
+    int speed_factor = 1;
 
 private slots:
 

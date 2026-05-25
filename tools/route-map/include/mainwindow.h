@@ -89,6 +89,10 @@ private:
 
     void closeEvent(QCloseEvent *event);
 
+    void loadSettingsGUI();
+
+    void updateSimSpeedMenu(int speed_factor);
+
 private slots:
 
     void slotConnectedToSimulator();

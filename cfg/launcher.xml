@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Launcher>
-		<Theme>dark-jedy</Theme>
+	<Launcher>		
 		<!-- Минимальная версия Windows -->
 		<MinWinver>10</MinWinver>
 		<MinWinBuild_NDIVIA>19041</MinWinBuild_NDIVIA>
 		<MinWinBuild_AMD>19041</MinWinBuild_AMD>
 		<MinWinBuild_INTEL>19045</MinWinBuild_INTEL>
+		<!-- Автозапуск вьювера -->
+		<AutoStartViewer>1</AutoStartViewer>
+		<!-- Автозапуск карты -->
+		<AutoStartRouteMap>1</AutoStartRouteMap>
 	</Launcher>
+
+	<Tool>
+		<Name>routeconv</Name>
+		<Description>Конвертер маршрутов</Description>
+		<CommandLine></CommandLine>
+	</Tool>
+
+	<Tool>
+		<Name>ktxTools</Name>
+		<Description>Инструменты KTX</Description>
+		<CommandLine></CommandLine>
+	</Tool>
+
 </Config>

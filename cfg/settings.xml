@@ -111,5 +111,7 @@
         <EnableDebugLayer>0</EnableDebugLayer>
         <!-- Включить отладочные сообщения Vulkan -->
         <EnableDebugUtils>0</EnableDebugUtils>
+        <!-- Ограничение объема используемой памяти GPU (от 0.0 до 1.0) -->
+        <GPUAllocatedMemoryLimit>1.0</GPUAllocatedMemoryLimit>
     </Viewer>
 </Config>

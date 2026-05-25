@@ -62,11 +62,11 @@ QString Autopilot::getDbgMsg()
 
     if (is_active)
     {
-        msg =  " | АВТОВЕДЕНИЕ";
+        msg =  "АВТОВЕДЕНИЕ";
     }
     else
     {
-        msg =  " | СОВЕТЧИК";
+        msg =  "СОВЕТЧИК";
     }
 
     msg += QString(" | Vтек.: %1 км/ч | Vзад.: %2 км/ч | Уск.: %3 м/с2")
@@ -76,15 +76,24 @@ QString Autopilot::getDbgMsg()
 
     if (is_timetable_ready)
     {
-        msg += QString(" | Цель: %1 | дист.: %2 | Приб.: %3 | Отпр.: %4 | Факт. приб.: %6 | Факт. отпр.: %7 | Время хода: %8 | Ск. гр.: %9")
+        msg += QString(" | Цель: %1 | дист.: %2")
                    .arg(timetable.stations[target_station_idx].name)
-                   .arg(target_station_dist, 7, 'f', 1)
+                   .arg(target_station_dist, 7, 'f', 1);
+        if (timetable.stations[target_station_idx].is_arrival && (timetable.stations[target_station_idx].dep_time != "-"))
+        {
+            msg += QString(" | Стоянка: %1")
+                       .arg(timetable.stations[target_station_idx].dep_time_sec - time, 8, 'f', 1);
+        }
+        else
+        {
+            msg += QString(" | Время хода: %1")
+                       .arg(delta_t, 8, 'f', 1);
+        }
+        msg += QString(" | Приб.: %1 | Отпр.: %2 | Факт.приб.: %3 | Факт.отпр.: %4")
                    .arg(timetable.getStation(target_station_idx).arr_time, 5)
                    .arg(timetable.getStation(target_station_idx).dep_time, 5)
                    .arg(timetable.getStation(target_station_idx).fact_arr_time, 5)
-                   .arg(timetable.getStation(target_station_idx - 1).fact_dep_time, 5)
-                   .arg(delta_t, 10, 'f', 1)
-                   .arg(v_tt_ref, 4, 'f', 1);
+                   .arg(timetable.getStation(target_station_idx - 1).fact_dep_time, 5);
     }
 
     return msg;
@@ -143,13 +152,13 @@ void Autopilot::velocity_control(double t, double dt)
     // Расчитываем скорость по тормозной кривой до ближайшего сигнала
     v_ref = min(v_ref, calcAlsnSpeed(feedback->alsn_code, feedback->signal_dist, v_target));
 
-    // Если разрешено отправление по графику
-    if (is_departure_allowed)
+    // Разрешаем движение в соответсвии с АЛСН и стоянками в графике
+    bool allow = is_alsn_motion_allowed;
+    if (!timetable.stations.empty())
     {
-        // Действуем в соответсвии с АЛСН
-        //is_motion_allowed = is_alsn_motion_allowed;
-        AllowMotion(is_alsn_motion_allowed);
+        allow &= !timetable.stations[target_station_idx].is_arrival || is_departure_allowed;
     }
+    AllowMotion(allow);
 
     // Минимальная целевая скорость (для предсказания тормозного пути)
     v_target = min(feedback->v_lim_next, v_target);
@@ -225,11 +234,16 @@ double Autopilot::calcCurrentSpeedLimit(double t, double dt)
 //------------------------------------------------------------------------------
 double Autopilot::calcBrakeCurveSpeed(double v_target, double dist)
 {
+    if (dist < Physics::ZERO)
+    {
+        return v_target;
+    }
+
     double vt = v_target / Physics::kmh;
 
     a_brake = a_brake_ref * ref_mass * train_length / train_mass / ref_length;
 
-    return sqrt(vt * vt + pf(2 * a_brake * dist)) * Physics::kmh;
+    return sqrt(vt * vt + 2 * a_brake * dist) * Physics::kmh;
 }
 
 //------------------------------------------------------------------------------
@@ -345,7 +359,7 @@ void Autopilot::slotInitTimeTable()
 
     if (curr_traj_name != prev_traj_name)
     {
-        QString msg = QString("TIMETABLE PROCESS: vehicle #%1 current trajectory is %2").arg(vehicle_idx).arg(curr_traj_name);
+        QString msg = QString("TIMETABLE PROCESS %1: vehicle #%2 current trajectory is %3").arg(timetable.train_name).arg(vehicle_idx).arg(curr_traj_name);
         Journal::instance()->debug(msg);
         prev_traj_name = curr_traj_name;
     }
@@ -422,6 +436,7 @@ void Autopilot::slotInitTimeTable()
                            target_dir, &target_station_dist);
 
     is_timetable_ready = true;
+    is_departure_allowed = false;
 
     routeBuildRequest->start();
 }
@@ -442,7 +457,7 @@ void Autopilot::calcTargetDistance()
     // Сообщаем в лог текущую траекторию
     if (curr_traj_name != prev_traj_name)
     {
-        QString msg = QString("TIMETABLE PROCESS: vehicle #%1 current trajectory is %2").arg(vehicle_idx).arg(curr_traj_name);
+        QString msg = QString("TIMETABLE PROCESS %1: vehicle #%2 current trajectory is %3").arg(timetable.train_name).arg(vehicle_idx).arg(curr_traj_name);
         Journal::instance()->debug(msg);
         prev_traj_name = curr_traj_name;
     }
@@ -464,30 +479,21 @@ double Autopilot::calcTimetableBrakeCurve(double t, double dt, double dist)
     (void)t;
     (void)dt;
 
-    double v_ref = v_constr;
-
-    if (timetable.stations.empty())
+    if (timetable.stations.empty() || is_departure_allowed)
     {
+        // Нет стоянки - порешают другие источники торможения
         return v_constr;
     }
 
+    // Торможение к остановке
+    double v_ref = cut(calcBrakeCurveSpeed(0.0, dist), 0.0, v_constr);
+
     // Текущая станция
-    autopilot_station_t st = timetable.stations[target_station_idx];
-
-    // По текущей станции нет стоянки
-    if (st.arr_time == st.dep_time)
+    if (!timetable.stations[target_station_idx].is_arrival)
     {
-        is_departure_allowed = true;
-        // тогда порешают другие источники торможения
+        // Ещё не приехали - не проверяем условия полной остановки
         return v_ref;
     }
-
-    if (is_departure_allowed)
-    {
-        return v_ref;
-    }
-
-    v_ref = cut(calcBrakeCurveSpeed(0.0, dist), 0.0, v_constr);
 
     // Запрещаем отпускать тормоза - остановка
     if (feedback->v_cur <= v_disable_release)
@@ -535,7 +541,7 @@ void Autopilot::checkTimetable(double t, double dt)
 {
     (void)dt;
 
-    if (timetable.stations.empty())
+    if (timetable.stations.empty() || is_departure_allowed)
     {
         return;
     }
@@ -543,10 +549,11 @@ void Autopilot::checkTimetable(double t, double dt)
     // Текущая станция
     auto st = &timetable.stations[target_station_idx];
 
-    // Время прибытия равно времени отправления
-    if (st->arr_time == st->dep_time)
+    // Время прибытия позже или равно времени отправления
+    if (st->arr_time_sec > st->dep_time_sec - 1.0)
     {
         // Разрешаем отправление
+        Journal::instance()->warning(QString("checkTimetable: no halt, allow departure %1").arg(timetable.train_name));
         is_departure_allowed = true;
         return;
     }
@@ -554,32 +561,32 @@ void Autopilot::checkTimetable(double t, double dt)
     // Обработка опоздания
     if ( (st->arr_time != "-") && (st->is_arrival) && (!st->is_delay) )
     {
-        double delay = pf(st->fact_arr_time_sec - st->arr_time_sec);
+        double delay_sec = std::max(0.0, st->fact_arr_time_sec - st->arr_time_sec);
+        double halt_sec = std::max(0.0, st->dep_time_sec - st->arr_time_sec);
 
-        // Выдерживаем без сокращения только короткую стоянку
-        if (st->dep_time_sec - st->arr_time_sec < min_reduced_halt_time * 60.0)
-        {
-            st->dep_time_sec += delay;
-            st->is_delay = true;
-        }
+        // Короткую стоянку выдерживаем без сокращения
+        double min_halt_sec = std::min(halt_sec, min_reduced_halt_time * 60.0);
+
+        // Уменьшаем опоздание за счёт сокращения стоянки
+        double delay_reduced_sec = std::max(0.0, delay_sec - (halt_sec - min_halt_sec));
+
+        // Отправляемся с опозданием
+        st->dep_time_sec += delay_reduced_sec;
+
+        // Запоминаем, что обработали опоздание
+        st->is_delay = true;
     }
 
-    if (t >= st->dep_time_sec)
+    if (st->is_arrival && (t >= st->dep_time_sec))
     {
+        Journal::instance()->warning(QString("checkTimetable: halt done, allow departure %1").arg(timetable.train_name));
         is_departure_allowed = true;
 
-        // Если задан участок приближения, строим себе маршрут отправления
+        // Если задан участок удаления, строим себе маршрут отправления
         if (!st->removal_traj.isEmpty() && !st->is_build_dep_route)
         {
             // Запрос на проверку свободности маршрута отправления
             emit sigGetTrajStateRequest(this->vehicle_idx, target_station_idx, curr_traj_name, st->removal_traj, target_dir, DEPARTURE_REQUEST);
-        }
-    }
-    else
-    {
-        if (st->target_traj == curr_traj_name)
-        {
-            is_departure_allowed = false;
         }
     }
 }
@@ -719,7 +726,7 @@ void Autopilot::slotRouteBuildRequest()
         else
         {
             // Если нужен сквозной пропуск и он еще не построен
-            if ( st->arr_time == st->dep_time && !st->removal_traj.isEmpty() )
+            if ( (st->arr_time_sec > st->dep_time_sec - 1.0) && !st->removal_traj.isEmpty() )
             {
                 // Если уже построен маршрут приема, но еще не построен маршрут пропуска
                 if (!st->is_build_dep_route)
@@ -756,8 +763,9 @@ void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
 
     // Разрешаем отправление, если мы выехали за пределы целевой траектории,
     // так как раньше отправились вручную
-    if (!is_on_target_traj)
+    if (st->is_arrival && !is_on_target_traj)
     {
+        Journal::instance()->warning(QString("slotIncStation: allow departure %1").arg(timetable.train_name));
         is_departure_allowed = true;
     }
 
@@ -769,7 +777,8 @@ void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
 
         OnWhistle();
 
-        QString msg = QString("TIMETABLE PROCESS: Departure from: %1 | Dep. time: %2 | Fact. dep.: %3 |")
+        QString msg = QString("TIMETABLE PROCESS %1: Departure from: %2 | Dep. time: %3 | Fact. dep.: %4 |")
+                          .arg(timetable.train_name)
                           .arg(st->name)
                           .arg(st->dep_time, 5)
                           .arg(st->fact_dep_time, 5);
@@ -785,6 +794,11 @@ void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
         if (target_station_idx > timetable.stations.size() - 1)
         {
             target_station_idx = timetable.stations.size() - 1;
+        }
+        else
+        {
+            // При успешном переходе к следующей станции - запрещаем отправляться с неё
+            is_departure_allowed = false;
         }
     }
 }
@@ -834,7 +848,8 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
 
         st->arr_delay = static_cast<int>(st->fact_arr_time_sec - st->arr_time_sec) >= delay_timeout_min * 60;
 
-        QString msg = QString("TIMETABLE PROCESS: Arrival to: %1 | Arr. time: %2 | Fact. arr.: %3 |")
+        QString msg = QString("TIMETABLE PROCESS %1: Arrival to: %2 | Arr. time: %3 | Fact. arr.: %4 |")
+                          .arg(timetable.train_name)
                           .arg(st->name)
                           .arg(st->arr_time, 5)
                           .arg(st->fact_arr_time, 5);
@@ -894,32 +909,28 @@ void Autopilot::slotGetTrajState(int vehicle_idx, int station_idx, QString start
     {
     case ARRIVAL_REQUEST:
 
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%3 try build route from %1 to %2")
+        Journal::instance()->debug(QString("TIMETABLE PROCESS %1: vehicle #%2 arrives to %3 and builds route from %4 to %5")
+                                       .arg(timetable.train_name)
+                                       .arg(vehicle_idx)
+                                       .arg(st->name)
                                        .arg(start_traj_name)
-                                       .arg(traj_name)
-                                       .arg(vehicle_idx));
+                                       .arg(traj_name));
 
         emit sigBuildTrainRoute(start_traj_name, traj_name, target_dir);
-
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 station: %2 is_build_arr_route %3").arg(vehicle_idx).arg(st->name).arg(st->is_build_arr_route));
         st->is_build_arr_route = true;
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 station: %2 is_build_arr_route %3").arg(vehicle_idx).arg(st->name).arg(st->is_build_arr_route));
-
         break;
 
     case DEPARTURE_REQUEST:
 
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%3 try build route from %1 to %2")
+        Journal::instance()->debug(QString("TIMETABLE PROCESS %1: vehicle #%2 departures from %3 and builds route from %4 to %5")
+                                       .arg(timetable.train_name)
+                                       .arg(vehicle_idx)
+                                       .arg(st->name)
                                        .arg(start_traj_name)
-                                       .arg(traj_name)
-                                       .arg(vehicle_idx));
+                                       .arg(traj_name));
 
         emit sigBuildTrainRoute(start_traj_name, traj_name, target_dir);
-
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 station: %2 is_build_dep_route %3").arg(vehicle_idx).arg(st->name).arg(st->is_build_dep_route));
         st->is_build_dep_route = true;
-        Journal::instance()->debug(QString("TIMETABLE PROCESS: vehicle #%1 station: %2 is_build_dep_route %3").arg(vehicle_idx).arg(st->name).arg(st->is_build_dep_route));
-
         break;
 
     default:

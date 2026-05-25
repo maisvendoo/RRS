@@ -97,9 +97,6 @@ private:
     bool is_start_button_to_stop_server;
     int new_added_start_config_idx = -1;
 
-    /// Viewer settings
-    FieldsDataList  fd_list;
-
     static const   QString STARTUP_SCN_SUBDIR;
 
     QString settings_path;
@@ -182,7 +179,7 @@ private:
     /// Создание фалй сценария на основе ручной расстановки в лаунчере
     void createScenario(const QString &route_name,
                         const QStringList &scnCode,
-                        const QString scenario_name = STARTUP_SCN_SUBDIR);
+                        const QString &scenario_name = STARTUP_SCN_SUBDIR);
 
     /// Перезагрузка списка сценариев в интерфейс
     void reloadScenariosList();
@@ -201,13 +198,35 @@ private:
 
     GraphSettingsWindow *graphSettingsWindow = new GraphSettingsWindow(this);
 
-    RequireWindowsVersion winver;
+    [[maybe_unused]] RequireWindowsVersion winver;
 
     void createHelpMenu();
+
+    void createToolsMenu();
+
+    std::vector<QProcess *> toolProcs;
 
     QMainWindow *helpWindow = new QMainWindow(this);
 
     void centerWindow(QWidget* window);
+
+    /// Все-таки сохраняемые опции из данного окна
+    [[maybe_unused]] FieldsDataList fd_options;
+
+    [[maybe_unused]] static const   QString AUTO_START_VIEWER;
+    [[maybe_unused]] static const   QString AUTO_START_ROUTE_MAP;
+
+    void updateOptions(FieldsDataList &fd_options);
+
+    void applyOptions(FieldsDataList &fd_options, Ui::MainWindow *ui);
+
+    void saveOptions(const FieldsDataList &fd_options) const;
+
+    void closeEvent(QCloseEvent *event) override;
+
+    [[maybe_unused]] const int PROC_WAIT_TIMEOUT = 1000;
+
+    bool terminateProcess(QProcess *proc) const;
 
 private slots:
 
@@ -217,9 +236,7 @@ private slots:
 
     void slotAddActiveTrain();
 
-    void slotDeleteActiveTrain();
-
-    void slotSelectSavedStartConfig(int idx);
+    void slotDeleteActiveTrain();    
 
     void slotTrainConfigChanged();
 

@@ -58,3 +58,4 @@ target_link_libraries (${TARGET} CfgEditor)
 target_link_libraries (${TARGET} filesystem)
 target_link_libraries (${TARGET} network)
 target_link_libraries (${TARGET} topology)
+

@@ -25,6 +25,7 @@
 
 #include    "filesystem.h"
 #include    "CfgReader.h"
+#include    "find-settings.h"
 
 #include    "platform.h"
 #include    "styles.h"
@@ -35,6 +36,8 @@
 #include    <graphsettingswindow.h>
 
 const   QString MainWindow::STARTUP_SCN_SUBDIR = "startup";
+const   QString MainWindow::AUTO_START_VIEWER = "AutoStartViewer";
+const   QString MainWindow::AUTO_START_ROUTE_MAP = "AutoStartRouteMap";
 
 //------------------------------------------------------------------------------
 //
@@ -167,7 +170,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // Окно скрывается, а не удаляется
     helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
+
+    createToolsMenu();
+
     createHelpMenu();
+
+    connect(ui->cbAutostartViewer, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState){
+        applyOptions(fd_options, ui);
+        saveOptions(fd_options);
+    });
+
+    connect(ui->cbAutostartMap, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState){
+        applyOptions(fd_options, ui);
+        saveOptions(fd_options);
+    });
 }
 
 //------------------------------------------------------------------------------
@@ -183,7 +199,7 @@ MainWindow::~MainWindow()
 //------------------------------------------------------------------------------
 void MainWindow::init()
 {
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
 
     loadRoutesList(fs.getRouteRootDir());
     loadTrainsList(fs.getTrainsDir());
@@ -397,8 +413,6 @@ void MainWindow::loadScenarios(route_info_t &route_info)
 
     while (it.hasNext())
     {
-        scenario_t scn;
-
         // Проверяем наличие в найденном подкаталоге файла main.lua
         QString abs_path = it.next();
         QString main_path = QDir::toNativeSeparators(abs_path + QDir::separator() + "main.lua");
@@ -406,6 +420,8 @@ void MainWindow::loadScenarios(route_info_t &route_info)
 
         if (main_file.exists())
         {
+            scenario_t scn;
+
             // И только в случае наличия такового - добавляем каталог в список
             // доступных сценариев
             scn.scenario_name = scenarios_dir.relativeFilePath(abs_path);
@@ -456,7 +472,7 @@ void MainWindow::clearActiveTrainsList()
 
     while (tbActiveTrains->count() > 0)
     {
-        TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(tbActiveTrains->widget(0));
+        const TrainWaypointWidget *tww = dynamic_cast<TrainWaypointWidget *>(tbActiveTrains->widget(0));
         disconnect(tww, &TrainWaypointWidget::activeTrainChanged,
                    this, &MainWindow::slotUpdateActiveTrains);
         disconnect(tww, &TrainWaypointWidget::trainConfigChanged,
@@ -597,8 +613,7 @@ void MainWindow::gpuDiagnostics()
             // не запускает и падает вьювер, а драйверы не хотят устанавливаться
             // жалуясь на версию ОС.
             // TODO: протестировать это!!! иначе огребем от юзеров по полной!
-            size_t valid_gpus_count = 0;
-            size_t invalid_gpus_count = 0;
+            size_t valid_gpus_count = 0;            
             std::vector<size_t> devices_with_problems;
 
             for (size_t i = 0; i < gpus_info.size(); ++i)
@@ -642,7 +657,7 @@ void MainWindow::gpuDiagnostics()
 //------------------------------------------------------------------------------
 void MainWindow::createHelpMenu()
 {
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
     auto docsDir = fs.getDocsDir();
 
     QDir docs(QString(docsDir.c_str()));
@@ -696,6 +711,95 @@ void MainWindow::createHelpMenu()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::createToolsMenu()
+{
+    CfgReader cfg;
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_dir = fs.getConfigDir();
+    std::string cfg_path = fs.combinePath(cfg_dir, "launcher.xml");
+
+    if (!cfg.load(QString(cfg_path.c_str())))
+    {
+        return;
+    }
+
+    auto secNode = cfg.getFirstSection("Tool");
+
+    QString binPath = QDir::toNativeSeparators(QString(fs.getBinaryDir().c_str()));
+
+    while (!secNode.isNull())
+    {
+        QString toolName;
+        cfg.getString(secNode, "Name", toolName);
+
+        if (toolName.isEmpty())
+        {
+            continue;
+        }
+
+        QString toolPath = binPath + QDir::separator() + toolName + EXE_EXP;
+
+        QFile toolFile(toolPath);
+
+        if (!toolFile.exists())
+        {
+            continue;
+        }
+
+        QProcess *proc = new QProcess(this);
+        proc->setWorkingDirectory(binPath);
+        proc->setProgram(toolPath);
+
+        QString args_str;
+        cfg.getString(secNode, "CommandLine", args_str);
+        QStringList args = args_str.split(' ');
+
+        if (!args.empty())
+        {
+            proc->setArguments(args);
+        }
+
+        QString description;
+        cfg.getString(secNode, "Description", description);
+
+        if (description.isEmpty())
+        {
+            description = toolName;
+        }
+
+        toolProcs.push_back(proc);
+
+        QAction *action = new QAction(description);
+
+        connect(action, &QAction::triggered, this, [this](){
+
+            QAction *ac = qobject_cast<QAction *>(sender());
+
+            if (ac == nullptr)
+            {
+                return;
+            }
+
+            int idx = ui->menuTools->actions().indexOf(ac);
+
+            if (idx >= 0 && idx < toolProcs.size())
+            {
+                if (toolProcs[idx] != nullptr && toolProcs[idx]->state() != QProcess::Running)
+                {
+                    toolProcs[idx]->start();
+                }
+            }
+        });
+
+        ui->menuTools->addAction(action);
+
+        secNode = cfg.getNextSection();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::centerWindow(QWidget *window)
 {
     if (!window || !window->parentWidget())
@@ -713,6 +817,33 @@ void MainWindow::centerWindow(QWidget *window)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MainWindow::updateOptions(FieldsDataList &fd_options)
+{
+    findSetting(AUTO_START_VIEWER, fd_options).second.toBool() ?
+        ui->cbAutostartViewer->setCheckState(Qt::CheckState::Checked) :
+        ui->cbAutostartViewer->setCheckState(Qt::CheckState::Unchecked);
+
+    findSetting(AUTO_START_ROUTE_MAP, fd_options).second.toBool() ?
+        ui->cbAutostartMap->setCheckState(Qt::CheckState::Checked) :
+        ui->cbAutostartMap->setCheckState(Qt::CheckState::Unchecked);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::applyOptions(FieldsDataList &fd_options, Ui::MainWindow *ui)
+{
+    int idx = 0;
+    findSetting(AUTO_START_VIEWER, fd_options, idx);
+    fd_options[idx] = QPair<QString, QVariant>(AUTO_START_VIEWER, static_cast<int>(ui->cbAutostartViewer->checkState() == Qt::CheckState::Checked));
+
+    findSetting(AUTO_START_ROUTE_MAP, fd_options, idx);
+    fd_options[idx] = QPair<QString, QVariant>(AUTO_START_ROUTE_MAP, static_cast<int>(ui->cbAutostartMap->checkState() == Qt::CheckState::Checked));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MainWindow::loadActiveTrainsList()
 {
     // TODO: Разные типы с size_t
@@ -724,6 +855,16 @@ void MainWindow::loadActiveTrainsList()
     reloadScenariosList();
 
     slotUpdateActiveTrains();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::saveOptions(const FieldsDataList &fd_options) const
+{
+    CfgEditor editor;
+
+    editor.editFile(settings_path, "Launcher", fd_options);
 }
 
 //------------------------------------------------------------------------------
@@ -774,7 +915,7 @@ void MainWindow::startSimulator()
         args << "--scenario=" + STARTUP_SCN_SUBDIR;
     }
 
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
     QString simPath = SIMULATOR_NAME + EXE_EXP;
 
     simulatorProc.setWorkingDirectory(QString(fs.getBinaryDir().c_str()));
@@ -809,7 +950,7 @@ void MainWindow::startViewer(bool local)
     args << "--host-address" << server.getHostAddress();
     args << "--port" << QString::number(server.ipv4_port);
 
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
     QString viewerPath = VIEWER_NAME + EXE_EXP;
 
     if (local)
@@ -849,7 +990,7 @@ void MainWindow::startMap(bool local)
     args << "--host-address" << server.getHostAddress();
     args << "--port" << QString::number(server.ipv4_port);
 
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
     QString mapPath = ROUTE_MAP_NAME + EXE_EXP;
 
     if (local)
@@ -926,6 +1067,18 @@ void MainWindow::loadConfig()
         cfg.getInt(secName, "MinWinBuild_NVIDIA", winver.buildNvidia);
         cfg.getInt(secName, "MinWinBuild_AMD", winver.buildAMD);
         cfg.getInt(secName, "MinWinBuild_INTEL", winver.buildIntel);
+
+        settings_path = QString(cfg_path.c_str());
+
+        bool is_auto_start_viewer = false;
+        cfg.getBool(secName, AUTO_START_VIEWER, is_auto_start_viewer);
+        fd_options.append(QPair<QString, QVariant>(AUTO_START_VIEWER, is_auto_start_viewer));
+
+        bool is_auto_start_route_map = false;
+        cfg.getBool(secName, AUTO_START_ROUTE_MAP, is_auto_start_route_map);
+        fd_options.append(QPair<QString, QVariant>(AUTO_START_ROUTE_MAP, is_auto_start_route_map));
+
+        updateOptions(fd_options);
     }
 }
 
@@ -1031,28 +1184,11 @@ void MainWindow::slotDeleteActiveTrain()
         delete tww;
     }
 
-    slotUpdateActiveTrains();
+    slotUpdateActiveTrains();    
 
     if (active_trains.size() == 0)
     {
         ui->cbScenario->setEnabled(true);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotSelectSavedStartConfig(int idx)
-{
-    if (idx == new_added_start_config_idx)
-    {
-        new_added_start_config_idx = -1;
-        return;
-    }
-
-    if (idx > 0)
-    {
-        clearActiveTrainsList();
     }
 }
 
@@ -1162,7 +1298,7 @@ void MainWindow::slotStartServerPressed()
     // Check button is stop running server mode
     if (is_start_button_to_stop_server)
     {
-        simulatorProc.kill();
+        terminateProcess(&simulatorProc);
         return;
     }
 
@@ -1276,10 +1412,10 @@ void MainWindow::slotSimulatorFinished(int exitCode, QProcess::ExitStatus exitSt
     ui->pbStartMap->setEnabled(false);
 
     if (viewerProc.state() != QProcess::NotRunning)
-        viewerProc.kill();
+       terminateProcess(&viewerProc);
 
     if (mapProc.state() != QProcess::NotRunning)
-        mapProc.kill();
+        terminateProcess(&mapProc);
 }
 
 //------------------------------------------------------------------------------
@@ -1329,7 +1465,7 @@ void MainWindow::slotSelectSavedServer(int idx)
 {
     server_info_t server = server_info_t();
     int i = 0;
-    for (auto& ss : saved_servers)
+    for (const auto& ss : saved_servers)
     {
         if (i == idx)
         {
@@ -1417,13 +1553,13 @@ void MainWindow::slotSaveServer()
             idx = i;
         ++i;
 
-        server_info_t server = it.value();
-        ui->cbSavedServers->addItem(server.server_name + " (" + server.getHostAddressAndPort() + ")");
+        server_info_t current_server = it.value();
+        ui->cbSavedServers->addItem(current_server.server_name + " (" + current_server.getHostAddressAndPort() + ")");
 
         FieldsDataList flist;
-        flist.append(QPair<QString, QString>("Name", server.server_name));
-        flist.append(QPair<QString, QString>("HostAddr", server.getHostAddress()));
-        flist.append(QPair<QString, QString>("port", QString::number(server.ipv4_port)));
+        flist.append(QPair<QString, QString>("Name", current_server.server_name));
+        flist.append(QPair<QString, QString>("HostAddr", current_server.getHostAddress()));
+        flist.append(QPair<QString, QString>("port", QString::number(current_server.ipv4_port)));
         editor.writeFile("Server", flist);
     }
 
@@ -1505,9 +1641,7 @@ void MainWindow::slotSaveTrainsConfigAsScenario()
 //------------------------------------------------------------------------------
 QString MainWindow::createLuaSetDate(QDateEdit *dateEdit)
 {
-    QString setDate = "";
-
-    setDate = QString("setDate(\"%1.%2.%3\")")
+    QString setDate = QString("setDate(\"%1.%2.%3\")")
                   .arg(dateEdit->dateTime().date().day(), 2, 10, QChar('0'))
                   .arg(dateEdit->dateTime().date().month(), 2, 10, QChar('0'))
                   .arg(dateEdit->dateTime().date().year(), 4, 10, QChar('0'));
@@ -1520,9 +1654,7 @@ QString MainWindow::createLuaSetDate(QDateEdit *dateEdit)
 //------------------------------------------------------------------------------
 QString MainWindow::createLuaSetTime(QTimeEdit *timeEdit)
 {
-    QString setTime = "";
-
-    setTime = QString("setTime(\"%1:%2:%3\")")
+    QString setTime = QString("setTime(\"%1:%2:%3\")")
                   .arg(timeEdit->dateTime().time().hour(), 2, 10, QChar('0'))
                   .arg(timeEdit->dateTime().time().minute(), 2, 10, QChar('0'))
                   .arg(timeEdit->dateTime().time().second(), 2, 10, QChar('0'));
@@ -1579,14 +1711,14 @@ QStringList MainWindow::createTmpScenarioCode(const std::vector<active_train_t> 
 //------------------------------------------------------------------------------
 void MainWindow::createScenario(const QString &route_name,
                                 const QStringList &scnCode,
-                                const QString scenario_name)
+                                const QString &scenario_name)
 {
     if (scnCode.empty())
     {
         return;
     }
 
-    FileSystem &fs = FileSystem::getInstance();
+    const FileSystem &fs = FileSystem::getInstance();
     std::string route_path = fs.getRouteRootDir() + fs.separator()
                              + route_name.toStdString();
 
@@ -1633,10 +1765,58 @@ void MainWindow::createScenario(const QString &route_name,
 
     QTextStream stream(&file);
 
-    for (auto line : scnCode)
+    for (const auto &line : scnCode)
     {
         stream << line << "\n";
     }
 
     file.close();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (simulatorProc.state() == QProcess::ProcessState::Running)
+    {
+        if (terminateProcess(&simulatorProc))
+        {
+            event->accept();
+            return;
+        }
+        else
+        {
+            event->ignore();
+            return;
+        }
+    }
+
+    event->accept();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool MainWindow::terminateProcess(QProcess *proc) const
+{
+    if (proc == nullptr)
+    {
+        return false;
+    }
+
+    // Посылаем процессу SIGTERM
+    proc->terminate();
+
+    // Если он не завершился
+    if (!proc->waitForFinished(PROC_WAIT_TIMEOUT))
+    {
+        // Посылаем SIGKILL
+        proc->kill();
+
+        // Ждем завершения
+        return proc->waitForFinished(PROC_WAIT_TIMEOUT);
+    }
+
+    return true;
 }

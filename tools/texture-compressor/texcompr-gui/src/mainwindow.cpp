@@ -7,6 +7,8 @@
 #include    <filesystem.h>
 #include    <QDirIterator>
 #include    <QThread>
+#include    <CfgReader.h>
+#include    <styles.h>
 
 const QString TEXCOMPRESS_NAME = "texcompr";
 
@@ -23,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    loadSettingsGUI();
 
     connect(ui->pbOpenModel, &QPushButton::released, this, &MainWindow::slotOpenModel);
     connect(ui->pbAddTexture, &QPushButton::released, this, &MainWindow::slotAddSkipedTexture);
@@ -68,6 +72,35 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::loadSettingsGUI()
+{
+    FileSystem &fs = FileSystem::getInstance();
+    std::string cfg_dir = fs.getConfigDir();
+    std::string cfg_path = fs.combinePath(cfg_dir, "gui-settings.xml");
+
+    CfgReader cfg;
+
+    if ( cfg.load(QString(cfg_path.c_str())) )
+    {
+        QString secName = "GUISettings";
+        QString theme_name = "";
+
+        if (!cfg.getString(secName, "Theme", theme_name))
+        {
+            theme_name = "dark-jedy";
+        }
+
+        std::string theme_dir = fs.getThemeDir();
+        std::string theme_path = fs.combinePath(theme_dir, theme_name.toStdString() + ".qss");
+        QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
+
+        this->setStyleSheet(style_sheet);
+    }
 }
 
 //------------------------------------------------------------------------------
