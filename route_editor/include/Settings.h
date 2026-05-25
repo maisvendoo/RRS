@@ -3,6 +3,7 @@
 
 #include "KeyBinding.h"
 #include "settings/CameraSettings.h"
+#include "settings/GizmoSettings.h"
 #include "settings/SceneSettings.h"
 #include "settings/WindowSettings.h"
 
@@ -21,14 +22,7 @@ struct settings_t
     window_settings_t window_settings;
     scene_settings_t scene_settings;
     camera_settings_t camera_settings;
-
-    float gizmo_arrow_length;
-    float gizmo_arrow_thickness;
-    vsg::vec3 gizmo_arrow_x_color;
-    vsg::vec3 gizmo_arrow_y_color;
-    vsg::vec3 gizmo_arrow_z_color;
-    float gizmo_opacity;
-    bool gizmo_to_center;
+    gizmo_settings_t gizmo_settings;
 
     float gui_font_size;
     bool is_gui_editable;

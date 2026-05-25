@@ -19,14 +19,7 @@
 #include <string>
 
 settings_t::settings_t()
-    : gizmo_arrow_length(5.0f)
-    , gizmo_arrow_thickness(0.1f)
-    , gizmo_arrow_x_color(1.0f, 0.0f, 0.0f)
-    , gizmo_arrow_y_color(0.0f, 1.0f, 0.0f)
-    , gizmo_arrow_z_color(0.0f, 0.0f, 1.0f)
-    , gizmo_opacity(1.0f)
-    , gizmo_to_center(false)
-    , gui_font_size(20.0f)
+    : gui_font_size(20.0f)
     , is_gui_editable(false)
     , show_objects_ref(true)
     , show_route_map(false)
@@ -51,24 +44,9 @@ void settings_t::read(const std::string& cfg_path)
     window_settings.read(cfg);
     scene_settings.read(cfg);
     camera_settings.read(cfg);
+    gizmo_settings.read(cfg);
 
-    QString section = "Gizmo";
-
-    cfg.getFloat(section, "ArrowLength", gizmo_arrow_length);
-    cfg.getFloat(section, "ArrowThickness", gizmo_arrow_thickness);
-    cfg.getFloat(section, "XAxisColorR", gizmo_arrow_x_color.r);
-    cfg.getFloat(section, "XAxisColorG", gizmo_arrow_x_color.g);
-    cfg.getFloat(section, "XAxisColorB", gizmo_arrow_x_color.b);
-    cfg.getFloat(section, "YAxisColorR", gizmo_arrow_y_color.r);
-    cfg.getFloat(section, "YAxisColorG", gizmo_arrow_y_color.g);
-    cfg.getFloat(section, "YAxisColorB", gizmo_arrow_y_color.b);
-    cfg.getFloat(section, "ZAxisColorR", gizmo_arrow_z_color.r);
-    cfg.getFloat(section, "ZAxisColorG", gizmo_arrow_z_color.g);
-    cfg.getFloat(section, "ZAxisColorB", gizmo_arrow_z_color.b);
-    cfg.getFloat(section, "Opacity", gizmo_opacity);
-    cfg.getBool(section, "ToCenter", gizmo_to_center);
-
-    section = "GUI";
+    QString section = "GUI";
 
     cfg.getFloat(section, "FontSize", gui_font_size);
     cfg.getBool(section, "IsEditable", is_gui_editable);
