@@ -19,17 +19,6 @@
 #include <string>
 
 settings_t::settings_t()
-    : gui_font_size(20.0f)
-    , is_gui_editable(false)
-    , show_objects_ref(true)
-    , show_route_map(false)
-    , show_stations_conf(true)
-    , show_waypoints_conf(false)
-    , show_key_bindings(true)
-    , show_camera_settings(false)
-    , show_topology(false)
-    , show_selected_objects_properties(true)
-    , show_commands(true)
 {
 }
 
@@ -45,22 +34,9 @@ void settings_t::read(const std::string& cfg_path)
     scene_settings.read(cfg);
     camera_settings.read(cfg);
     gizmo_settings.read(cfg);
+    gui_settings.read(cfg);
 
-    QString section = "GUI";
-
-    cfg.getFloat(section, "FontSize", gui_font_size);
-    cfg.getBool(section, "IsEditable", is_gui_editable);
-    cfg.getBool(section, "ShowObjectsRef", show_objects_ref);
-    cfg.getBool(section, "ShowRouteMap", show_route_map);
-    cfg.getBool(section, "ShowStationsConf", show_stations_conf);
-    cfg.getBool(section, "ShowWaypointsConf", show_waypoints_conf);
-    cfg.getBool(section, "ShowKeyBindings", show_key_bindings);
-    cfg.getBool(section, "ShowCameraSettings", show_camera_settings);
-    cfg.getBool(section, "ShowTopology", show_topology);
-    cfg.getBool(section, "ShowSelectedObjectsProperties", show_selected_objects_properties);
-    cfg.getBool(section, "ShowCommands", show_commands);
-
-    section = "Keys";
+    QString section = "Keys";
 
     using ActionSettingNameMap = std::map<Action, const char*>;
     using ActionSettingNamePair = ActionSettingNameMap::value_type;
