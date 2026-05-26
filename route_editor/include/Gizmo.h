@@ -1,7 +1,9 @@
 #ifndef GIZMO_H
 #define GIZMO_H
 
+#include "IntersectionHandler.h"
 #include "SingleSwitch.h"
+#include "settings/GizmoSettings.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
@@ -23,7 +25,7 @@ class Node;
 class Gizmo : public vsg::Inherit<SingleSwitch, Gizmo>
 {
 public:
-    Gizmo(EditorContext& context);
+    Gizmo(EditorContext& context, gizmo_settings_t& gizmo_settings, vsg::ref_ptr<IntersectionHandler>& intersection_handler);
 
     bool handle_intersections();
 
@@ -37,6 +39,8 @@ public:
 
 private:
     EditorContext& context_;
+    gizmo_settings_t& gizmo_settings;
+    vsg::ref_ptr<IntersectionHandler>& intersection_handler;
 
     vsg::Builder builder_;
     vsg::ref_ptr<vsg::MatrixTransform> matrix_transform_;

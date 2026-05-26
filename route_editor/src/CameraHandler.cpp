@@ -1,7 +1,6 @@
 #include "CameraHandler.h"
 
 #include "Action.h"
-#include "EditorContext.h"
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
 

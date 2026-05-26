@@ -47,12 +47,12 @@ static constexpr vsg::dvec3 X_AXIS_POSITIVEd = {1.0, 0.0, 0.0};
 static constexpr vsg::dvec3 Y_AXIS_POSITIVEd = {0.0, 1.0, 0.0};
 static constexpr vsg::dvec3 Z_AXIS_POSITIVEd = {0.0, 0.0, 1.0};
 
-Gizmo::Gizmo(EditorContext& context)
+Gizmo::Gizmo(EditorContext& context, gizmo_settings_t& gizmo_settings, vsg::ref_ptr<IntersectionHandler>& intersection_handler)
     : context_(context)
+    , gizmo_settings(gizmo_settings)
+    , intersection_handler(intersection_handler)
 {
     builder_.shaderSet = vsg::createFlatShadedShaderSet();
-
-    const auto& gizmo_settings = context.settings.gizmo_settings;
 
     const vsg::vec3 arrow_x_color = gizmo_settings.arrow_x_color;
     const vsg::vec3 arrow_y_color = gizmo_settings.arrow_y_color;
@@ -184,8 +184,7 @@ Gizmo::Gizmo(EditorContext& context)
 
 bool Gizmo::handle_intersections()
 {
-    const auto intersector =
-        context_.intersection_handler->get_lmb_intersector();
+    const auto intersector = intersection_handler->get_lmb_intersector();
 
     if (!intersector)
     {
@@ -194,8 +193,7 @@ bool Gizmo::handle_intersections()
 
     this->accept(*intersector);
 
-    const auto intersection =
-        context_.intersection_handler->get_closest_intersection(intersector);
+    const auto intersection = intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {
