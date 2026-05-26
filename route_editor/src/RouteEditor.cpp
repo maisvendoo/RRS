@@ -92,7 +92,7 @@ bool RouteEditor::initialize()
     context_.intersection_handler = IntersectionHandler::create(context_.camera);
     context_.scene_graph = SceneGraph::create(context_);
 
-    context_.outline_builder = OutlineBuilder::create(context_);
+    context_.outline_builder = OutlineBuilder::create();
 
     const auto scene_view = vsg::View::create(context_.camera, context_.scene_graph);
     scene_view->mask = MASK_SCENE;

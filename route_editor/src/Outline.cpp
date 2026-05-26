@@ -26,8 +26,7 @@
 
 #include <string>
 
-OutlineBuilder::OutlineBuilder(const EditorContext& context)
-    : context_(context)
+OutlineBuilder::OutlineBuilder()
 {
     options_ = create_default_vsg_options();
 
