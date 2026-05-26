@@ -1,6 +1,5 @@
 #include "UpdateViewerHandler.h"
 
-#include "Logger.h"
 #include "UpdateControlToServerHandler.h"
 
 #include "CameraCabineManipulator.h"
@@ -16,8 +15,6 @@
 #include <vsg/ui/ScrollWheelEvent.h>
 #include <vsg/ui/TouchEvent.h>
 #include <vsg/nodes/RegionOfInterest.h>
-
-#include <KeyPauseProcess.h>
 
 //------------------------------------------------------------------------------
 //
