@@ -79,10 +79,14 @@ bool RouteEditor::initialize()
         context_.static_objects_mutex, context_.static_objects);
 
     context_.camera_handler = CameraHandler::create(
-        context_,
         context_.settings.camera_settings,
         context_.perspective,
-        context_.look_at
+        context_.look_at,
+        context_.camera,
+        context_.window->extent2D(),
+        context_.mouse_handler,
+        context_.keyboard_handler,
+        context_.delta_time
     );
 
     context_.intersection_handler = IntersectionHandler::create(context_);
