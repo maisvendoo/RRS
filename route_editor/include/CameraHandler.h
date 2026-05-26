@@ -1,6 +1,7 @@
 #ifndef CAMERA_HANDLER_H
 #define CAMERA_HANDLER_H
 
+#include "settings/CameraSettings.h"
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
@@ -21,7 +22,7 @@ class ScrollWheelEvent;
 class CameraHandler : public vsg::Inherit<vsg::Visitor, CameraHandler>
 {
 public:
-    explicit CameraHandler(EditorContext& context);
+    CameraHandler(EditorContext& context, const camera_settings_t& camera_settings);
     virtual ~CameraHandler() = default;
 
     virtual void apply(vsg::MoveEvent& moveEvent) override;
@@ -46,6 +47,7 @@ private:
 
 private:
     EditorContext& context_;
+    const camera_settings_t& camera_settings;
 
     double yaw_deg_ = 0.0;
     double pitch_deg_ = 0.0;

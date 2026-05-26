@@ -4,7 +4,6 @@
 #include "EditorContext.h"
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
-#include "Settings.h"
 
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
@@ -64,21 +63,21 @@ static int get_binding_state(vsg::ref_ptr<KeyboardHandler> keyboard_handler,
     return static_cast<int>(keyboard_handler->get_binding_state(action));
 }
 
-CameraHandler::CameraHandler(EditorContext& context)
+CameraHandler::CameraHandler(EditorContext& context, const camera_settings_t& camera_settings)
     : context_(context)
+    , camera_settings(camera_settings)
 {
-    const settings_t& settings = context.settings;
     const VkExtent2D window_extent = context.window->extent2D();
 
     context.perspective = vsg::Perspective::create(
-        settings.camera_settings.fovy,
+        camera_settings.fovy,
         static_cast<double>(window_extent.width) /
             static_cast<double>(window_extent.height),
-        settings.camera_settings.zNear,
-        settings.camera_settings.view_distance
+        camera_settings.zNear,
+        camera_settings.view_distance
     );
 
-    const double initial_height = settings.camera_settings.initial_height;
+    const double initial_height = camera_settings.initial_height;
 
     context.look_at = vsg::LookAt::create(
         vsg::dvec3(0.0, 0.0, initial_height),
@@ -105,7 +104,7 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
         const vsg::ivec2 delta_mouse_pos =
             context_.mouse_handler->get_delta_pos();
 
-        const double rotate_speed = context_.settings.camera_settings.rotate_speed * context_.delta_time;
+        const double rotate_speed = camera_settings.rotate_speed * context_.delta_time;
 
         yaw_deg_ += delta_mouse_pos.x * rotate_speed;
 
@@ -125,13 +124,11 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
         return;
     }
 
-    const settings_t& settings = context_.settings;
-
-    const double zoom_power = settings.camera_settings.zoom_power * context_.delta_time;
+    const double zoom_power = camera_settings.zoom_power * context_.delta_time;
 
     double& fovy = context_.perspective->fieldOfViewY;
     fovy -= scrollWheel.delta.y * zoom_power;
-    fovy = std::clamp(fovy, settings.camera_settings.fovy_min, settings.camera_settings.fovy_max);
+    fovy = std::clamp(fovy, camera_settings.fovy_min, camera_settings.fovy_max);
 }
 
 void CameraHandler::apply(vsg::FrameEvent&)
@@ -141,7 +138,7 @@ void CameraHandler::apply(vsg::FrameEvent&)
         return;
     }
 
-    const double move_speed = context_.settings.camera_settings.move_speed *
+    const double move_speed = camera_settings.move_speed *
         context_.delta_time;
 
     const auto look_at = context_.look_at;
