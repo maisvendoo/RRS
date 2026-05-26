@@ -66,15 +66,6 @@ UpdateViewerHandler::~UpdateViewerHandler() noexcept
 //------------------------------------------------------------------------------
 void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
 {
-    bool isPausePressedNow = isPausePressed();
-
-    if (isPausePressedNow && !_wasPausePhysicallyPressed)
-    {
-        setPause();
-    }
-
-    _wasPausePhysicallyPressed = isPausePressedNow;
-
     if (frame.frameStamp->frameCount)
     {
         const double t = frame.frameStamp->simulationTime;
@@ -97,7 +88,6 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
 void UpdateViewerHandler::setPause()
 {
     int current_sf = _vehicles_handler->getSpeedFactor();
-    LOG_INFO("PRESSED PAUSE");
 
     if (current_sf == 0)
     {
