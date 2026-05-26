@@ -3,8 +3,10 @@
 
 #include "LSIntersector.h"
 
+#include <vsg/app/Camera.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
+#include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec2.h>
 
 struct EditorContext;
@@ -22,7 +24,7 @@ class IntersectionHandler : public vsg::Inherit<
     vsg::Visitor, IntersectionHandler>
 {
 public:
-    explicit IntersectionHandler(const EditorContext& context);
+    explicit IntersectionHandler(vsg::ref_ptr<vsg::Camera>& camera);
 
     void apply(vsg::ButtonPressEvent& buttonPress) override;
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
@@ -41,7 +43,7 @@ public:
         LSIntersectorRefPtr intersector);
 
 private:
-    const EditorContext& context_;
+    vsg::ref_ptr<vsg::Camera>& camera;
 
     LSIntersectorRefPtr lmb_intersector_;
     LSIntersectorRefPtr mmb_intersector_;

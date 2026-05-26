@@ -11,8 +11,8 @@
 
 #include <algorithm>
 
-IntersectionHandler::IntersectionHandler(const EditorContext& context)
-    : context_(context)
+IntersectionHandler::IntersectionHandler(vsg::ref_ptr<vsg::Camera>& camera)
+    : camera(camera)
 {
 }
 
@@ -23,7 +23,7 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    const auto intersector = LSIntersector::create(*context_.camera,
+    const auto intersector = LSIntersector::create(*camera,
         buttonPress.x, buttonPress.y);
 
     intersector->traversalMask = MASK_CLICKABLE;
@@ -88,12 +88,12 @@ LSIntersectorRefPtr IntersectionHandler::apply_(
 ) const
 {
 
-    return LSIntersector::create(*context_.camera, moveEvent.x, moveEvent.y);
+    return LSIntersector::create(*camera, moveEvent.x, moveEvent.y);
 }
 
 LSIntersectorRefPtr IntersectionHandler::apply_(vsg::ivec2 mouse_pos) const
 {
-    return LSIntersector::create(*context_.camera, mouse_pos.x, mouse_pos.y);
+    return LSIntersector::create(*camera, mouse_pos.x, mouse_pos.y);
 }
 
 LSIntersectorRefPtr IntersectionHandler::get_lmb_intersector() const

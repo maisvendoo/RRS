@@ -89,7 +89,7 @@ bool RouteEditor::initialize()
         context_.delta_time
     );
 
-    context_.intersection_handler = IntersectionHandler::create(context_);
+    context_.intersection_handler = IntersectionHandler::create(context_.camera);
     context_.scene_graph = SceneGraph::create(context_);
 
     context_.outline_builder = OutlineBuilder::create(context_);
