@@ -41,9 +41,9 @@
         <!-- Скорость перемещения камеры -->
         <MoveSpeed>100.0</MoveSpeed>
         <!-- Скорость вращения камеры -->
-        <RotateSpeed>3.0</RotateSpeed>
+        <RotateSpeed>0.3</RotateSpeed>
         <!-- Сила приближения/отдаления камеры -->
-        <ZoomPower>250.0</ZoomPower>
+        <ZoomPower>25.0</ZoomPower>
     </Camera>
     <!-- Настройки гизмо -->
     <Gizmo>

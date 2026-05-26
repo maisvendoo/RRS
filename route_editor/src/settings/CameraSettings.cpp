@@ -12,8 +12,8 @@ camera_settings_t::camera_settings_t()
     , fovy_max(100.0)
     , initial_height(0.0)
     , move_speed(100.0)
-    , rotate_speed(3.0)
-    , zoom_power(250.0)
+    , rotate_speed(0.3)
+    , zoom_power(25.0)
 {
 }
 

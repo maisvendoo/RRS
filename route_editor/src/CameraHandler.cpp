@@ -104,7 +104,7 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
         const vsg::ivec2 delta_mouse_pos =
             context_.mouse_handler->get_delta_pos();
 
-        const double rotate_speed = camera_settings.rotate_speed * context_.delta_time;
+        const double rotate_speed = camera_settings.rotate_speed;
 
         yaw_deg_ += delta_mouse_pos.x * rotate_speed;
 
@@ -124,7 +124,7 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
         return;
     }
 
-    const double zoom_power = camera_settings.zoom_power * context_.delta_time;
+    const double zoom_power = camera_settings.zoom_power;
 
     double& fovy = context_.perspective->fieldOfViewY;
     fovy -= scrollWheel.delta.y * zoom_power;
