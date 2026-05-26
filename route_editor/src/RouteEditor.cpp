@@ -77,7 +77,14 @@ bool RouteEditor::initialize()
     auto undo_redo_save_handler = UndoRedoSaveHandler::create(
         context_.keyboard_handler, context_.commands, context_.route_dir,
         context_.static_objects_mutex, context_.static_objects);
-    context_.camera_handler = CameraHandler::create(context_, context_.settings.camera_settings);
+
+    context_.camera_handler = CameraHandler::create(
+        context_,
+        context_.settings.camera_settings,
+        context_.perspective,
+        context_.look_at
+    );
+
     context_.intersection_handler = IntersectionHandler::create(context_);
     context_.scene_graph = SceneGraph::create(context_);
 
