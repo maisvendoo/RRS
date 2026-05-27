@@ -26,8 +26,8 @@ private:
     vsg::ref_ptr<vsg::Window> window;
 
 private:
-    void initialize_journal() const;
-    bool read_settings();
+    void initialize_journal(const char* filename) const;
+    bool read_settings(const char* filename);
     void create_window();
 };
 

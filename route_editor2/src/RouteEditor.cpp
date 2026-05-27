@@ -16,9 +16,9 @@
 
 RouteEditor::RouteEditor(bool& success)
 {
-    initialize_journal();
+    initialize_journal("editor.log");
 
-    if (!read_settings())
+    if (!read_settings("editor-settings.xml"))
     {
         success = false;
         return;
@@ -33,14 +33,14 @@ RouteEditor::RouteEditor(bool& success)
 
 RouteEditor::~RouteEditor() = default;
 
-void RouteEditor::initialize_journal() const
+void RouteEditor::initialize_journal(const char* filename) const
 {
     Journal* const journal = Journal::instance();
     const FileSystem& fs = FileSystem::getInstance();
 
     journal->addStorage(
         new JournalFile(
-            to_qstring(fs.combinePath(fs.getLogsDir(), "editor.log")),
+            to_qstring(fs.combinePath(fs.getLogsDir(), filename)),
             JournalLevel::All
         )
     );
@@ -53,12 +53,12 @@ void RouteEditor::initialize_journal() const
     journal->message(dash_line);
 }
 
-bool RouteEditor::read_settings()
+bool RouteEditor::read_settings(const char* filename)
 {
     const FileSystem& fs = FileSystem::getInstance();
 
     const QString cfg_path = to_qstring(
-        fs.combinePath(fs.getConfigDir(), "editor-settings.xml")
+        fs.combinePath(fs.getConfigDir(), filename)
     );
 
     CfgReader cfg;
