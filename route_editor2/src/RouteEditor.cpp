@@ -16,9 +16,9 @@
 
 RouteEditor::RouteEditor(bool& success)
 {
-    initialize_journal("editor.log");
+    initialize_journal();
 
-    if (!read_settings("editor-settings.xml"))
+    if (!read_settings())
     {
         success = false;
         return;

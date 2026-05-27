@@ -16,7 +16,21 @@ class Window;
 class RouteEditor
 {
 public:
+    /**
+     * @brief Construct a new Route Editor object.
+     *
+     * Construct a new Route Editor object and set param success
+     * depending on the success of the initialization.
+     * If an error occured during initialization, check the log
+     * file (default - "logs/editor.log") for possible errors.
+     *
+     * @param[out] true if initialization was successful, otherwise false.
+     */
     explicit RouteEditor(bool& success);
+
+    /**
+     * @brief Destroy the Route Editor object.
+     */
     ~RouteEditor();
 
 private:
@@ -26,8 +40,32 @@ private:
     vsg::ref_ptr<vsg::Window> window;
 
 private:
-    void initialize_journal(const char* filename) const;
-    bool read_settings(const char* filename);
+    /**
+     * @brief Initialize Journal subsystem.
+     *
+     * Add additional storage for the editor to Journal subsystem in
+     * the default logs directory with the specified filename and
+     * start writing to it.
+     *
+     * @param[in] filename Log filename (default - "editor.log").
+     */
+    void initialize_journal(const char* filename = "editor.log") const;
+
+    /**
+     * @brief Read the editor settings.
+     *
+     * Create a CfgReader and read the editor settings from the config file in
+     * the default configs directory with the specified filename.
+     * If an error occured, it usually means that CfgReader
+     * was unable to load the config file. Check the log
+     * file (default - "logs/editor.log") for possible errors.
+     *
+     * @param[in] filename Config filename (default = "editor-settings.xml").
+     * @return true if the editor settings were read successfully.
+     * @return false - otherwise.
+     */
+    bool read_settings(const char* filename = "editor-settings.xml");
+
     void create_window();
 };
 
