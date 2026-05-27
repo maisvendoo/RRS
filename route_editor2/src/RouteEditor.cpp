@@ -25,7 +25,7 @@ void RouteEditor::initialize_journal() const
         )
     );
 
-    const QString dash_line = QString("=").repeated(80);
+    const QString dash_line = QString('=').repeated(80);
 
     journal->message(dash_line);
     journal->message("Started new session");
