@@ -1,5 +1,7 @@
 #include "editor/RouteEditor.h"
 
+#include "editor/settings/WindowSettings.h"
+
 #include <CfgReader.h>
 #include <Journal.h>
 #include <JournalFile.h>
@@ -27,6 +29,13 @@ RouteEditor::RouteEditor(bool& success)
 
     vsg_options = create_default_vsg_options();
     Journal::instance()->info("VSG options are initialized successfully");
+
+    if (!create_window())
+    {
+        success = false;
+        return;
+    }
+    Journal::instance()->info("Window is created successfully");
 
     success = true;
 }
@@ -73,7 +82,28 @@ bool RouteEditor::read_settings(const char* filename)
     return true;
 }
 
-void RouteEditor::create_window()
+bool RouteEditor::create_window()
 {
     const auto window_traits = vsg::WindowTraits::create();
+    window_traits->x = window_settings.pos_x;
+    window_traits->y = window_settings.pos_y;
+    window_traits->width = window_settings.width;
+    window_traits->height = window_settings.height;
+    window_traits->fullscreen = window_settings.fullscreen;
+    window_traits->screenNum = window_settings.screen_number;
+    window_traits->windowTitle = window_settings.title;
+    window_traits->swapchainPreferences.presentMode =
+        window_settings.vsync
+        ? VK_PRESENT_MODE_FIFO_KHR
+        : VK_PRESENT_MODE_IMMEDIATE_KHR;
+    window_traits->samples = get_vk_sample_count_flag(window_settings.samples);
+
+    window = vsg::Window::create(window_traits);
+    if (!window)
+    {
+        Journal::instance()->error("Failed to create window");
+        return false;
+    }
+
+    return true;
 }

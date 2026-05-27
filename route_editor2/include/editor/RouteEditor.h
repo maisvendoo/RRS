@@ -66,7 +66,7 @@ private:
      */
     bool read_settings(const char* filename = "editor-settings.xml");
 
-    void create_window();
+    bool create_window();
 };
 
 #endif // ROUTE_EDITOR_H
