@@ -5,13 +5,19 @@
 #include <JournalStorage.h>
 #include <core/string_funcs.h>
 #include <filesystem.h>
+#include <graphics/common.h>
+
+#include <vsg/io/Options.h>
 
 #include <QString>
 
 RouteEditor::RouteEditor()
 {
     initialize_journal();
+    vsg_options = create_default_vsg_options();
 }
+
+RouteEditor::~RouteEditor() = default;
 
 void RouteEditor::initialize_journal() const
 {
