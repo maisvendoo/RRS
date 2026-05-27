@@ -4,7 +4,12 @@
 
 int main()
 {
-    RouteEditor route_editor;
+    bool success;
+    RouteEditor route_editor(success);
+    if (!success)
+    {
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
