@@ -492,16 +492,6 @@ bool Application::convert_route(std::string &in_dmd_route_path,
                 }
                 model_data.model_file_name = out_gltf_model_name;
 
-                // Поскольку уровень головки рельса в ZDS маршрутах находится не в нуле,
-                // а поднят в среднем на 0.3114, смещаем меш у моделей рельс (с "track" в имени объекта)
-                float change_vertices_Z = -0.3114f;
-                if (   (label.find("track") == label.npos)
-                    && (label.find("Track") == label.npos))
-                {
-                    // У всех прочих моделей уже опущена привязка в route1.map
-                    change_vertices_Z = 0.0f;
-                }
-
                 std::string out_texture_path = out_gltf_route_path + '/' + out_relative_texture;
                 const int slash_count = std::count(_relative_model_path.begin(), _relative_model_path.end(), '/');
                 std::string out_relative_texture_path;
@@ -534,6 +524,18 @@ bool Application::convert_route(std::string &in_dmd_route_path,
                     _ready_textures.add_texture_ready(out_texture_path, model_data.is_blend_material);
                 }
 
+                float change_vertices_Z = 0.0f;
+#if 0
+// По итогам общения с маршрутостроителями,
+// выравнивание мешей с рельсами под УГР на данный момент не нужно
+                if (   (label.find("track") != label.npos)
+                    || (label.find("Track") != label.npos))
+                {
+                    // Поскольку уровень головки рельса в ZDS маршрутах находится не в нуле,
+                    // а поднят в среднем на 0.3114, смещаем меш у моделей рельс (с "track" в имени объекта)
+                    change_vertices_Z = -0.3114f;
+                }
+#endif
                 if (generate_gltf_model(model_data,
                                         out_gltf_model_dir,
                                         out_relative_bin_path,
