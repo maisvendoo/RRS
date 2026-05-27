@@ -67,7 +67,7 @@
         2 - высокая
         3 - ультра
         -->
-        <depthFormat>1</depthFormat>
+        <depthFormat>2</depthFormat>
         
         <!-- Ограничение частоты кадров; 0 - без ограничения -->
         <MaxFPS>60</MaxFPS>
