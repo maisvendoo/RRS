@@ -400,8 +400,21 @@ void RouteViewer::initWindowTraits()
     // MAILBOX = triple-buffered, no tearing, no stall on missed vsync
     // FIFO = double-buffered, waits for next vsync on miss (causes hitching)
     // IMMEDIATE = no sync at all (tearing)
-    windowTraits->swapchainPreferences.presentMode = settings.vsync ? VK_PRESENT_MODE_MAILBOX_KHR
-                                                                    : VK_PRESENT_MODE_IMMEDIATE_KHR;
+    if (settings.vsync)
+    {
+        if (settings.max_fps <= 0)
+        {
+            windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+        }
+        else
+        {
+            windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+        }
+    }
+    else
+    {
+        windowTraits->swapchainPreferences.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+    }
 
     // auto deviceFeatures = windowTraits->deviceFeatures = vsg::DeviceFeatures::create(); // VSG и так создает deviceFeatures по умолчанию
     // deviceFeatures->get().samplerAnisotropy = VK_TRUE;                                  // и выставляет samplerAnisotropy в true
