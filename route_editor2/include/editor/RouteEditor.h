@@ -20,9 +20,9 @@ class RouteEditor
 {
 public:
     /**
-     * @brief Construct a new Route Editor object.
+     * @brief Construct a new RouteEditor object.
      *
-     * Construct a new Route Editor object and set param success
+     * Construct a new RouteEditor object and set param success
      * depending on the success of the initialization.
      * If an error occured during initialization, check the log
      * file (default - "logs/editor.log") for possible errors.
@@ -33,7 +33,7 @@ public:
     explicit RouteEditor(bool& success);
 
     /**
-     * @brief Destroy the Route Editor object.
+     * @brief Destroy the RouteEditor object.
      */
     ~RouteEditor();
 
@@ -73,9 +73,7 @@ private:
     bool read_settings(const char* filename = "editor-settings.xml");
 
     /**
-     * @brief Create a VSG window.
-     *
-     * Create a VSG window based on the window_settings.
+     * @brief Create a VSG window based on the window_settings.
      *
      * @return true if the window was created successfully.
      * @return false - otherwise.
