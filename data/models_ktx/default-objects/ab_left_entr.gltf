@@ -12,13 +12,13 @@
       "componentType": 5126,
       "count": 6428,
       "max": [
-        0.25911498,
-        0.92159,
+        1.3048868,
+        0.8484279,
         1.0632204
       ],
       "min": [
-        -3.8048868,
-        -0.31048977,
+        -2.759115,
+        -0.38365185,
         -1.3671571
       ],
       "name": "accessorPositions",
@@ -43,7 +43,7 @@
       "bufferView": 0,
       "byteOffset": 32760,
       "componentType": 5123,
-      "count": 12810,
+      "count": 22332,
       "name": "accessorIndices",
       "type": "SCALAR"
     },
@@ -51,25 +51,25 @@
       "bufferView": 1,
       "byteOffset": 154272,
       "componentType": 5126,
-      "count": 7440,
+      "count": 13079,
       "max": [
-        0.29902458,
-        3.0871663,
-        1.2601353
+        0.29826587,
+        3.6599998,
+        1.2601354
       ],
       "min": [
-        -0.30097556,
-        -3.5734258,
-        -0.57684416
+        -0.30173415,
+        -3.913684,
+        -1.1209164
       ],
       "name": "accessorPositions",
       "type": "VEC3"
     },
     {
       "bufferView": 1,
-      "byteOffset": 243552,
+      "byteOffset": 311220,
       "componentType": 5126,
-      "count": 7440,
+      "count": 13079,
       "name": "accessorNormals",
       "type": "VEC3"
     },
@@ -77,13 +77,13 @@
       "bufferView": 2,
       "byteOffset": 51424,
       "componentType": 5126,
-      "count": 7440,
+      "count": 13079,
       "name": "accessorUVs",
       "type": "VEC2"
     },
     {
       "bufferView": 0,
-      "byteOffset": 58380,
+      "byteOffset": 77424,
       "componentType": 5123,
       "count": 1890,
       "name": "accessorIndices",
@@ -91,7 +91,7 @@
     },
     {
       "bufferView": 1,
-      "byteOffset": 332832,
+      "byteOffset": 468168,
       "componentType": 5126,
       "count": 531,
       "max": [
@@ -109,7 +109,7 @@
     },
     {
       "bufferView": 1,
-      "byteOffset": 339204,
+      "byteOffset": 474540,
       "componentType": 5126,
       "count": 531,
       "name": "accessorNormals",
@@ -117,7 +117,7 @@
     },
     {
       "bufferView": 2,
-      "byteOffset": 110944,
+      "byteOffset": 156056,
       "componentType": 5126,
       "count": 531,
       "name": "accessorUVs",
@@ -125,7 +125,7 @@
     },
     {
       "bufferView": 0,
-      "byteOffset": 62160,
+      "byteOffset": 81204,
       "componentType": 5123,
       "count": 1890,
       "name": "accessorIndices",
@@ -133,7 +133,7 @@
     },
     {
       "bufferView": 1,
-      "byteOffset": 345576,
+      "byteOffset": 480912,
       "componentType": 5126,
       "count": 531,
       "max": [
@@ -151,7 +151,7 @@
     },
     {
       "bufferView": 1,
-      "byteOffset": 351948,
+      "byteOffset": 487284,
       "componentType": 5126,
       "count": 531,
       "name": "accessorNormals",
@@ -159,7 +159,7 @@
     },
     {
       "bufferView": 2,
-      "byteOffset": 115192,
+      "byteOffset": 160304,
       "componentType": 5126,
       "count": 531,
       "name": "accessorUVs",
@@ -167,7 +167,7 @@
     },
     {
       "bufferView": 0,
-      "byteOffset": 65940,
+      "byteOffset": 84984,
       "componentType": 5123,
       "count": 1890,
       "name": "accessorIndices",
@@ -175,7 +175,7 @@
     },
     {
       "bufferView": 1,
-      "byteOffset": 358320,
+      "byteOffset": 493656,
       "componentType": 5126,
       "count": 531,
       "max": [
@@ -193,7 +193,7 @@
     },
     {
       "bufferView": 1,
-      "byteOffset": 364692,
+      "byteOffset": 500028,
       "componentType": 5126,
       "count": 531,
       "name": "accessorNormals",
@@ -201,7 +201,91 @@
     },
     {
       "bufferView": 2,
-      "byteOffset": 119440,
+      "byteOffset": 164552,
+      "componentType": 5126,
+      "count": 531,
+      "name": "accessorUVs",
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 88764,
+      "componentType": 5123,
+      "count": 1890,
+      "name": "accessorIndices",
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 506400,
+      "componentType": 5126,
+      "count": 531,
+      "max": [
+        0.106532946,
+        0.004435625,
+        0.106532946
+      ],
+      "min": [
+        -0.106532976,
+        -4.9883965e-08,
+        -0.106532976
+      ],
+      "name": "accessorPositions",
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 512772,
+      "componentType": 5126,
+      "count": 531,
+      "name": "accessorNormals",
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 168800,
+      "componentType": 5126,
+      "count": 531,
+      "name": "accessorUVs",
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 92544,
+      "componentType": 5123,
+      "count": 1890,
+      "name": "accessorIndices",
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 519144,
+      "componentType": 5126,
+      "count": 531,
+      "max": [
+        0.106532946,
+        0.004435625,
+        0.106532946
+      ],
+      "min": [
+        -0.106532976,
+        -4.9883965e-08,
+        -0.106532976
+      ],
+      "name": "accessorPositions",
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 525516,
+      "componentType": 5126,
+      "count": 531,
+      "name": "accessorNormals",
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 173048,
       "componentType": 5126,
       "count": 531,
       "name": "accessorUVs",
@@ -215,28 +299,28 @@
   "bufferViews": [
     {
       "buffer": 0,
-      "byteLength": 69720,
+      "byteLength": 96324,
       "name": "bufferViewScalar"
     },
     {
       "buffer": 0,
-      "byteLength": 371064,
-      "byteOffset": 69720,
+      "byteLength": 531888,
+      "byteOffset": 96324,
       "byteStride": 12,
       "name": "bufferViewFloatVec3"
     },
     {
       "buffer": 0,
-      "byteLength": 123688,
-      "byteOffset": 440784,
+      "byteLength": 177296,
+      "byteOffset": 628212,
       "byteStride": 8,
       "name": "bufferViewFloatVec2"
     }
   ],
   "buffers": [
     {
-      "byteLength": 564472,
-      "uri": "ab_line.bin"
+      "byteLength": 805508,
+      "uri": "ab_left_entr.bin"
     }
   ],
   "images": [
@@ -311,7 +395,7 @@
       ]
     },
     {
-      "name": "Светофор 3",
+      "name": "Светофор 2+2+1",
       "primitives": [
         {
           "attributes": {
@@ -325,7 +409,7 @@
       ]
     },
     {
-      "name": "GREEN_Lens",
+      "name": "BOTTOM_YELLOW_Lens",
       "primitives": [
         {
           "attributes": {
@@ -338,7 +422,7 @@
       ]
     },
     {
-      "name": "YELLOW_Lens",
+      "name": "GREEN_Lens",
       "primitives": [
         {
           "attributes": {
@@ -351,7 +435,7 @@
       ]
     },
     {
-      "name": "RED_Lens",
+      "name": "YELLOW_Lens",
       "primitives": [
         {
           "attributes": {
@@ -362,29 +446,65 @@
           "indices": 16
         }
       ]
+    },
+    {
+      "name": "WHITE_Lens",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 22,
+            "POSITION": 21,
+            "TEXCOORD_0": 23
+          },
+          "indices": 20
+        }
+      ]
+    },
+    {
+      "name": "RED_Lens",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 26,
+            "POSITION": 25,
+            "TEXCOORD_0": 27
+          },
+          "indices": 24
+        }
+      ]
     }
   ],
   "nodes": [
     {
       "mesh": 0,
-      "name": "Изостык",
-      "translation": [
-        2.5,
-        -0.073162064,
-        -0.0
-      ]
+      "name": "Изостык"
     },
     {
       "mesh": 1,
-      "name": "Светофор 3",
+      "name": "Светофор 2+2+1",
       "translation": [
-        2.4997776,
-        2.8908334,
-        0.5767671
+        -2.5,
+        3.3479998,
+        1.1209164
       ]
     },
     {
       "mesh": 2,
+      "name": "BOTTOM_YELLOW_Lens",
+      "rotation": [
+        0.7071068,
+        7.832296e-17,
+        -7.832296e-17,
+        0.7071067
+      ],
+      "translation": [
+        -2.5,
+        4.887999,
+        1.6910517
+      ]
+    },
+    {
+      "mesh": 3,
       "name": "GREEN_Lens",
       "rotation": [
         0.7071068,
@@ -393,13 +513,13 @@
         0.7071067
       ],
       "translation": [
-        2.4988027,
-        5.0726027,
-        1.1469026
+        -2.5,
+        6.14191,
+        1.6910517
       ]
     },
     {
-      "mesh": 3,
+      "mesh": 4,
       "name": "YELLOW_Lens",
       "rotation": [
         0.7071068,
@@ -408,13 +528,28 @@
         0.7071067
       ],
       "translation": [
-        2.4988027,
-        5.376552,
-        1.1469026
+        -2.5,
+        6.4459014,
+        1.6910517
       ]
     },
     {
-      "mesh": 4,
+      "mesh": 5,
+      "name": "WHITE_Lens",
+      "rotation": [
+        0.7071068,
+        7.832296e-17,
+        -7.832296e-17,
+        0.7071067
+      ],
+      "translation": [
+        -2.5,
+        4.188,
+        1.6910517
+      ]
+    },
+    {
+      "mesh": 6,
       "name": "RED_Lens",
       "rotation": [
         0.7071068,
@@ -423,9 +558,9 @@
         0.7071067
       ],
       "translation": [
-        2.4988027,
-        4.7677035,
-        1.1469026
+        -2.5,
+        5.1919904,
+        1.6910517
       ]
     }
   ],
@@ -443,7 +578,9 @@
         1,
         2,
         3,
-        4
+        4,
+        5,
+        6
       ]
     }
   ],

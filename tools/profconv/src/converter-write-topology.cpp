@@ -71,17 +71,18 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
         {
             if (bwd_type != "empty_line")
             {
-                bwd_type = "ab_" + bwd_type.right(4);
+                if (connector->is_signal_bwd_left)
+                {
+                    bwd_type = "ab_left_" + bwd_type.right(4);
+                }
+                else
+                {
+                    bwd_type = "ab_" + bwd_type.right(4);
+                }
             }
 
             flist.append(QPair<QString, QString>("SignalModelBwd", bwd_type));
-
-            if (connector->is_signal_bwd_left)
-                flist.append(QPair<QString, QString>("RelPosVectorBwd", "-2.5 0.0 0.0"));
-            else
-                flist.append(QPair<QString, QString>("RelPosVectorBwd", "2.5 0.0 0.0"));
-
-            flist.append(QPair<QString, QString>("RelRotVectorBwd", "0.0 0.0 0.0"));
+            flist.append(QPair<QString, QString>("RelPosVectorBwd", "0.0 0.0 0.0"));
         }
     }
     // Светофор вперёд
@@ -94,17 +95,18 @@ void addTopologyNode(CfgEditor &editor, split_zds_trajectory_t* connector, size_
         {
             if (fwd_type != "empty_line")
             {
-                fwd_type = "ab_" + fwd_type.right(4);
+                if (connector->is_signal_fwd_left)
+                {
+                    fwd_type = "ab_left_" + fwd_type.right(4);
+                }
+                else
+                {
+                    fwd_type = "ab_" + fwd_type.right(4);
+                }
             }
 
             flist.append(QPair<QString, QString>("SignalModelFwd", fwd_type));
-
-            if (connector->is_signal_fwd_left)
-                flist.append(QPair<QString, QString>("RelPosVectorFwd", "-2.5 0.0 0.0"));
-            else
-                flist.append(QPair<QString, QString>("RelPosVectorFwd", "2.5 0.0 0.0"));
-
-            flist.append(QPair<QString, QString>("RelRotVectorFwd", "0.0 0.0 0.0"));
+            flist.append(QPair<QString, QString>("RelPosVectorFwd", "0.0 0.0 0.0"));
         }
     }
     //editor.writeFile("Joint", flist);
