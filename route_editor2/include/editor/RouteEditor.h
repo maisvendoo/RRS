@@ -72,6 +72,14 @@ private:
      */
     bool read_settings(const char* filename = "editor-settings.xml");
 
+    /**
+     * @brief Create a VSG window.
+     *
+     * Create a VSG window based on the window_settings.
+     *
+     * @return true if the window was created successfully.
+     * @return false - otherwise.
+     */
     bool create_window();
 };
 
