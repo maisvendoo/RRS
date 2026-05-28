@@ -24,7 +24,8 @@ public:
      * If an error occured during initialization, check the log
      * file (default - "logs/editor.log") for possible errors.
      *
-     * @param[out] true if initialization was successful, otherwise false.
+     * @param[out] success true if initialization was successful,
+     *                     otherwise false.
      */
     explicit RouteEditor(bool& success);
 
