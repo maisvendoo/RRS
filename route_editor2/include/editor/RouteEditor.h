@@ -6,6 +6,8 @@
 
 #include <vsg/core/ref_ptr.h>
 
+class Camera;
+
 namespace vsg
 {
 
@@ -41,6 +43,7 @@ private:
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
+    vsg::ref_ptr<Camera> camera;
 
 private:
     /**

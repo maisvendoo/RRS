@@ -1,5 +1,6 @@
 #include "editor/RouteEditor.h"
 
+#include "editor/Camera.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/WindowSettings.h"
 
