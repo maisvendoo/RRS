@@ -1,6 +1,7 @@
 #include "editor/settings/WindowSettings.h"
 
 #include <CfgReader.h>
+#include <Journal.h>
 #include <core/string_funcs.h>
 
 #include <QString>
@@ -45,4 +46,21 @@ void window_settings_t::read(CfgReader& cfg)
     cfg.getBool(section, "FullScreen", fullscreen);
     cfg.getBool(section, "VSync", vsync);
     cfg.getBool(section, "DoubleBuffer", double_buffer);
+}
+
+void window_settings_t::print_in_journal() const
+{
+    Journal* const journal = Journal::instance();
+
+    journal->debug("Window settings:");
+    journal->debug("    title: " + to_qstring(title));
+    journal->debug("    pos_x: " + QString::number(pos_x));
+    journal->debug("    pos_y: " + QString::number(pos_y));
+    journal->debug("    width: " + QString::number(width));
+    journal->debug("    height: " + QString::number(height));
+    journal->debug("    screen_number: " + QString::number(screen_number));
+    journal->debug("    samples: " + QString::number(samples));
+    journal->debug("    fullscreen: " + to_qstring(fullscreen));
+    journal->debug("    vsync: " + to_qstring(vsync));
+    journal->debug("    double_buffer: " + to_qstring(double_buffer));
 }

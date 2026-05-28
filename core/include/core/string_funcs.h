@@ -10,11 +10,13 @@ std::string           to_std_string(const char* str);
 const std::string&    to_std_string(const std::string& str);
 std::string           to_std_string(std::string_view str);
 std::string           to_std_string(const QString& str);
+std::string           to_std_string(bool value);
 
 QString               to_qstring(const char* str);
 QString               to_qstring(const std::string& str);
 QString               to_qstring(std::string_view str);
 const QString&        to_qstring(const QString& str);
+QString               to_qstring(bool value);
 
 bool                  string_is_empty(const char* str);
 bool                  string_is_empty(const std::string& str);

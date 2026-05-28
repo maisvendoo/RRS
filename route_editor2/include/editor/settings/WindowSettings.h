@@ -20,6 +20,7 @@ struct window_settings_t
 
     window_settings_t();
     void read(CfgReader& cfg);
+    void print_in_journal() const;
 };
 
 #endif // EDITOR_WINDOW_SETTINGS_H

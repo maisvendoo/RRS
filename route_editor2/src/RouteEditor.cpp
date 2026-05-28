@@ -19,23 +19,24 @@
 RouteEditor::RouteEditor(bool& success)
 {
     initialize_journal();
+    Journal* const journal = Journal::instance();
 
     if (!read_settings())
     {
         success = false;
         return;
     }
-    Journal::instance()->info("Settings are readed successfully");
+    journal->info("Settings are readed successfully");
 
     vsg_options = create_default_vsg_options();
-    Journal::instance()->info("VSG options are initialized successfully");
+    journal->info("VSG options are initialized successfully");
 
     if (!create_window())
     {
         success = false;
         return;
     }
-    Journal::instance()->info("Window is created successfully");
+    journal->info("Window is created successfully");
 
     success = true;
 }
@@ -78,6 +79,7 @@ bool RouteEditor::read_settings(const char* filename)
     }
 
     window_settings.read(cfg);
+    window_settings.print_in_journal();
 
     return true;
 }
