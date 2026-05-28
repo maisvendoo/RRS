@@ -1,6 +1,7 @@
 #ifndef ROUTE_EDITOR_H
 #define ROUTE_EDITOR_H
 
+#include "editor/settings/CameraSettings.h"
 #include "editor/settings/WindowSettings.h"
 
 #include <vsg/core/ref_ptr.h>
@@ -36,6 +37,7 @@ public:
 
 private:
     window_settings_t window_settings;
+    camera_settings_t camera_settings;
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;

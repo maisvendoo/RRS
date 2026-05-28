@@ -1,5 +1,6 @@
 #include "editor/RouteEditor.h"
 
+#include "editor/settings/CameraSettings.h"
 #include "editor/settings/WindowSettings.h"
 
 #include <CfgReader.h>
@@ -79,7 +80,10 @@ bool RouteEditor::read_settings(const char* filename)
     }
 
     window_settings.read(cfg);
+    camera_settings.read(cfg);
+
     window_settings.print_in_journal();
+    camera_settings.print_in_journal();
 
     return true;
 }

@@ -17,6 +17,7 @@ struct camera_settings_t
 
     camera_settings_t();
     void read(CfgReader& cfg);
+    void print_in_journal() const;
 };
 
 #endif // EDITOR_CAMERA_SETTINGS_H
