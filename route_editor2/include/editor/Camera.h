@@ -5,6 +5,10 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 
+#include <vulkan/vulkan_core.h>
+
+struct camera_settings_t;
+
 namespace vsg
 {
 
@@ -17,7 +21,7 @@ class Perspective;
 class Camera : public vsg::Inherit<vsg::Camera, Camera>
 {
 public:
-    Camera();
+    Camera(const camera_settings_t& camera_settings, VkExtent2D window_extent);
     ~Camera();
 
     const vsg::ref_ptr<vsg::Perspective>& get_perspective() const;

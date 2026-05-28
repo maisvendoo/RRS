@@ -40,6 +40,8 @@ RouteEditor::RouteEditor(bool& success)
     }
     journal->info("Window is created successfully");
 
+    camera = Camera::create(camera_settings, window->extent2D());
+
     success = true;
 }
 
