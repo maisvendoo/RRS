@@ -15,8 +15,24 @@ struct gizmo_settings_t
     float opacity;
     bool to_center;
 
+    /**
+     * @brief Construct a new gizmo_settings_t object
+     *        and initialize it with default values.
+     */
     gizmo_settings_t();
+
+    /**
+     * @brief Read the gizmo settings.
+     *
+     * @param[in] cfg CfgReader, which is associated with a config
+     *                file containing editor settings.
+     */
     void read(CfgReader& cfg);
+
+    /**
+     * @brief Print the gizmo settings in Journal.
+     */
+    void print_in_journal() const;
 };
 
 #endif // EDITOR_GIZMO_SETTINGS_H
