@@ -30,9 +30,13 @@ RouteEditor::RouteEditor(bool& success)
     }
     journal->info("Settings are readed successfully");
 
-    // TODO: Check vsg_options allocation?
     vsg_options = create_default_vsg_options();
-
+    if (!vsg_options)
+    {
+        success = false;
+        journal->error("Failed to initialize VSG options");
+        return;
+    }
     journal->info("VSG options are initialized successfully");
 
     if (!create_window())
@@ -56,12 +60,11 @@ void RouteEditor::initialize_journal(const char* filename) const
     const FileSystem& fs = FileSystem::getInstance();
 
     // TODO: Check JournalFile allocation?
-    journal->addStorage(
-        new JournalFile(
-            to_qstring(fs.combinePath(fs.getLogsDir(), filename)),
-            JournalLevel::All
-        )
+    JournalFile* const journal_file = new JournalFile(
+        to_qstring(fs.combinePath(fs.getLogsDir(), filename)),
+        JournalLevel::All
     );
+    journal->addStorage(journal_file);
 
     const QString dash_line = QString('=').repeated(80);
 
