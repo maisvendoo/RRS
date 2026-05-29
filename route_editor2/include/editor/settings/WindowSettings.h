@@ -18,8 +18,23 @@ struct window_settings_t
     bool vsync;
     bool double_buffer;
 
+    /**
+     * @brief Construct a new window_settings_t object
+     *        and initialize it with default values.
+     */
     window_settings_t();
+
+    /**
+     * @brief Read the window settings.
+     *
+     * @param[in] cfg CfgReader, which is associated with a config
+     *                file containing editor settings.
+     */
     void read(CfgReader& cfg);
+
+    /**
+     * @brief Print the window settings in Journal.
+     */
     void print_in_journal() const;
 };
 
