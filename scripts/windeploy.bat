@@ -133,7 +133,7 @@ xcopy /Y ..\LICENSE-Russian %RRS_DEV_ROOT%\
 
 rem Копируем документацию
 
-xcopy /Y /S ..\docs\*.pdf %RRS_DEV_ROOT%\docs\
+xcopy /Y ..\docs\*.pdf %RRS_DEV_ROOT%\docs\
 
 rem Генерируем рантайм Qt
 
