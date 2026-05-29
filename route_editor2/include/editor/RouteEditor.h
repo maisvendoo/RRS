@@ -28,7 +28,7 @@ public:
      * file (default - "logs/editor.log") for possible errors.
      *
      * @param[out] success true if initialization was successful,
-     *                     otherwise false.
+     *                     false - otherwise.
      */
     explicit RouteEditor(bool& success);
 
@@ -49,9 +49,9 @@ private:
     /**
      * @brief Initialize Journal subsystem.
      *
-     * Add additional storage for the editor to Journal subsystem in
-     * the default logs directory with the specified filename and
-     * start writing to it.
+     * Add additional storage for the editor to Journal
+     * subsystem in the default logs directory with the
+     * specified filename and start writing to it.
      *
      * @param[in] filename Log filename (default - "editor.log").
      */
@@ -60,11 +60,11 @@ private:
     /**
      * @brief Read the editor settings.
      *
-     * Create a CfgReader and read the editor settings from the config file in
-     * the default configs directory with the specified filename.
-     * If an error occured, it usually means that CfgReader
-     * was unable to load the config file. Check the log
-     * file (default - "logs/editor.log") for possible errors.
+     * Create a CfgReader and read the editor settings from the config file
+     * in the default configs directory with the specified filename.
+     * If an error occured, it usually means that CfgReader was
+     * unable to load the config file. Check the log file
+     * (default - "logs/editor.log") for possible errors.
      *
      * @param[in] filename Config filename (default = "editor-settings.xml").
      * @return true if the editor settings were read successfully.

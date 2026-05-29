@@ -22,8 +22,8 @@ struct camera_settings_t
     double zoom_power;
 
     /**
-     * @brief Construct a new camera_settings_t object and
-     *        initialize it with default values.
+     * @brief Construct a new camera_settings_t object
+     *        and initialize it with default values.
      */
     camera_settings_t();
 
