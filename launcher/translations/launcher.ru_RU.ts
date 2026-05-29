@@ -101,7 +101,7 @@
     <message>
         <location filename="../forms/graphsettingswindow.ui" line="432"/>
         <source>1</source>
-        <translation></translation>
+        <translation>1</translation>
     </message>
     <message>
         <location filename="../forms/graphsettingswindow.ui" line="462"/>
@@ -111,7 +111,7 @@
     <message>
         <location filename="../forms/graphsettingswindow.ui" line="469"/>
         <source>30</source>
-        <translation></translation>
+        <translation>30</translation>
     </message>
     <message>
         <location filename="../forms/graphsettingswindow.ui" line="508"/>
@@ -124,42 +124,42 @@
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="../src/graphsettingswindow.cpp" line="129"/>
+        <location filename="../src/graphsettingswindow.cpp" line="96"/>
         <source>Low (performance)</source>
         <translation>Низко (производительность)</translation>
     </message>
     <message>
-        <location filename="../src/graphsettingswindow.cpp" line="130"/>
+        <location filename="../src/graphsettingswindow.cpp" line="97"/>
         <source>Default</source>
         <translation>Нормально</translation>
     </message>
     <message>
-        <location filename="../src/graphsettingswindow.cpp" line="131"/>
-        <location filename="../src/graphsettingswindow.cpp" line="139"/>
-        <location filename="../src/graphsettingswindow.cpp" line="145"/>
+        <location filename="../src/graphsettingswindow.cpp" line="98"/>
+        <location filename="../src/graphsettingswindow.cpp" line="106"/>
+        <location filename="../src/graphsettingswindow.cpp" line="112"/>
         <source>High</source>
         <translation>Высоко</translation>
     </message>
     <message>
-        <location filename="../src/graphsettingswindow.cpp" line="132"/>
-        <location filename="../src/graphsettingswindow.cpp" line="140"/>
+        <location filename="../src/graphsettingswindow.cpp" line="99"/>
+        <location filename="../src/graphsettingswindow.cpp" line="107"/>
         <source>Ultra</source>
         <translation>Ультра</translation>
     </message>
     <message>
-        <location filename="../src/graphsettingswindow.cpp" line="137"/>
-        <location filename="../src/graphsettingswindow.cpp" line="143"/>
+        <location filename="../src/graphsettingswindow.cpp" line="104"/>
+        <location filename="../src/graphsettingswindow.cpp" line="110"/>
         <source>Low</source>
         <translation>Низко</translation>
     </message>
     <message>
-        <location filename="../src/graphsettingswindow.cpp" line="138"/>
-        <location filename="../src/graphsettingswindow.cpp" line="144"/>
+        <location filename="../src/graphsettingswindow.cpp" line="105"/>
+        <location filename="../src/graphsettingswindow.cpp" line="111"/>
         <source>Medium</source>
         <translation>Среднее</translation>
     </message>
     <message>
-        <location filename="../src/graphsettingswindow.cpp" line="141"/>
+        <location filename="../src/graphsettingswindow.cpp" line="108"/>
         <source>Custom</source>
         <translation>Пользовательское</translation>
     </message>
@@ -169,7 +169,7 @@
     <message>
         <location filename="../forms/mainwindow.ui" line="14"/>
         <source>Russian Railway Simulator</source>
-        <translation></translation>
+        <translation>Russian Railway Simulator</translation>
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="31"/>
@@ -285,7 +285,7 @@
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="569"/>
-        <location filename="../src/mainwindow.cpp" line="1351"/>
+        <location filename="../src/mainwindow.cpp" line="1395"/>
         <source>Start server</source>
         <translation>Запуск сервера</translation>
     </message>
@@ -324,12 +324,12 @@
         <location filename="../forms/mainwindow.ui" line="760"/>
         <location filename="../forms/mainwindow.ui" line="791"/>
         <source>.</source>
-        <translation></translation>
+        <translation>.</translation>
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="822"/>
         <source>:</source>
-        <translation></translation>
+        <translation>:</translation>
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="893"/>
@@ -402,68 +402,68 @@
         <translation type="vanished">Отмена</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="478"/>
+        <location filename="../src/mainwindow.cpp" line="491"/>
         <source>&lt;Not_selected&gt;</source>
         <translation>&lt;Не выбран&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="506"/>
+        <location filename="../src/mainwindow.cpp" line="519"/>
         <source>Trains positions are defined in scenario</source>
         <translation>Расположение поездов определяется сценарием</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="564"/>
+        <location filename="../src/mainwindow.cpp" line="577"/>
         <source>Start graphics client is impossible: missing Vulkan loader in your system. Check that you have lastest version of driver for your GPU from offcial vendor site.</source>
         <translation>Запустить графический клиент невозможно: в вашей системе отсутствует загрузчик Vulkan. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="569"/>
+        <location filename="../src/mainwindow.cpp" line="582"/>
         <source>Start graphics client is impossible: can not create vkInstance. Check that you have lastest version of driver for your GPU from offcaial vendor site.</source>
         <translation>Запустить графический клиент невозможно: не удается создать vkInstance. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="575"/>
+        <location filename="../src/mainwindow.cpp" line="588"/>
         <source>Start graphics client is impossible: GPU driver error, can&apos;t get information about GPUs. Check that you have lastest version of driver for your GPU from offcial vendor site</source>
         <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить информацию о графических процессорах. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="581"/>
+        <location filename="../src/mainwindow.cpp" line="594"/>
         <source>Start graphics client is impossible: not find GPU devices capable with Vulkan API.</source>
         <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить список графических процессоров. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="587"/>
+        <location filename="../src/mainwindow.cpp" line="600"/>
         <source>Start graphics client is impossible: GPU driver error, can&apos;t get GPUs list. Check that you have lastest version of driver for your GPU from offcial vendor site</source>
         <translation>Запустить графический клиент невозможно: ошибка драйвера графического процессора, не удается получить список графических процессоров. Убедитесь, что у вас установлена последняя версия драйвера для вашего графического процессора с официального сайта производителя.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="621"/>
+        <location filename="../src/mainwindow.cpp" line="633"/>
         <source>Start graphics client is impossible: You operation system %1 is not capable with modern direvers of all your devices. Please, update you operation system</source>
         <translation>Запуск графического клиента невозможен: Ваша операционная система %1 несовместима с современными драйверами всех ваших устройств. Пожалуйста, обновите вашу операционную систему.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="631"/>
+        <location filename="../src/mainwindow.cpp" line="643"/>
         <source>WARNING: You devices </source>
         <translation>ПРЕДУПРЕЖДЕНИЕ: Ваши устройства </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="631"/>
+        <location filename="../src/mainwindow.cpp" line="643"/>
         <source> may have a problems with start graphics client, becourse modern drivers for them not capable with your OS version</source>
         <translation>могут иметь возникли проблемы с запуском графического клиента, поскольку современные драйверы для него несовместимы с вашей версией ОС.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1293"/>
+        <location filename="../src/mainwindow.cpp" line="1337"/>
         <source>Stop server</source>
         <translation>Остановить сервер</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1450"/>
-        <location filename="../src/mainwindow.cpp" line="1476"/>
+        <location filename="../src/mainwindow.cpp" line="1494"/>
+        <location filename="../src/mainwindow.cpp" line="1520"/>
         <source>Save Server</source>
         <translation>Сохранить сервер</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1457"/>
+        <location filename="../src/mainwindow.cpp" line="1501"/>
         <source>Rewrite Server</source>
         <translation>Перезаписать сервер</translation>
     </message>
@@ -471,36 +471,48 @@
 <context>
     <name>TrainWaypointWidget</name>
     <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="47"/>
         <source>Train selection:</source>
-        <translation type="vanished">Выбор поезда</translation>
+        <translation>Выбор поезда</translation>
     </message>
     <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="59"/>
         <source>Autopilot</source>
-        <translation type="vanished">Автоведение</translation>
+        <translation>Автоведение</translation>
     </message>
     <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="69"/>
         <source>Route&apos;s predefined start waypoints:</source>
-        <translation type="vanished">Точки старта, заданные в маршруте</translation>
+        <translation>Точки старта, заданные в маршруте</translation>
     </message>
     <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="92"/>
         <source>Configuration of the start point:</source>
-        <translation type="vanished">Стартовая траектория</translation>
+        <translation>Стартовая траектория</translation>
     </message>
     <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="105"/>
         <source>Trajectory coordinate:</source>
-        <translation type="vanished">Координата</translation>
+        <translation>Координата</translation>
     </message>
     <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="370"/>
+        <location filename="../src/train-waypoint-widget.cpp" line="375"/>
         <source>Forward</source>
-        <translation type="vanished">Туда</translation>
+        <translation>Туда</translation>
     </message>
     <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="371"/>
+        <location filename="../src/train-waypoint-widget.cpp" line="376"/>
         <source>Backward</source>
-        <translation type="vanished">Обратно</translation>
+        <translation>Обратно</translation>
     </message>
     <message>
+        <location filename="../src/train-waypoint-widget.cpp" line="386"/>
+        <location filename="../src/train-waypoint-widget.cpp" line="407"/>
+        <location filename="../src/train-waypoint-widget.cpp" line="433"/>
         <source>&lt;Not selected&gt;</source>
-        <translation type="vanished">&lt;Не выбрано&gt;</translation>
+        <translation>&lt;Не выбрано&gt;</translation>
     </message>
 </context>
 </TS>
