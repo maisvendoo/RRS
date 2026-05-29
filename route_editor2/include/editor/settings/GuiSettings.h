@@ -17,8 +17,24 @@ struct gui_settings_t
     bool show_selected_objects_properties;
     bool show_commands;
 
+    /**
+     * @brief Construct a new gui_settings_t object
+     *        and initialize it with default values.
+     */
     gui_settings_t();
+
+    /**
+     * @brief Read the GUI settings.
+     *
+     * @param[in] cfg CfgReader, which is associated with a config
+     *                file containing editor settings.
+     */
     void read(CfgReader& cfg);
+
+    /**
+     * @brief Print the GUI settings in Journal.
+     */
+    void print_in_journal() const;
 };
 
 #endif // EDITOR_GUI_SETTINGS_H
