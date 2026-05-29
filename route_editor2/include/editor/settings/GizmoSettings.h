@@ -13,6 +13,11 @@ struct gizmo_settings_t
     float arrow_length;
     float arrow_thickness;
     float opacity;
+
+    /**
+     * @brief Place the gizmo at the center of the object's bounds
+     * instead of placing it at the objects's origin.
+     */
     bool to_center;
 
     /**
