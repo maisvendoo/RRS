@@ -30,7 +30,9 @@ RouteEditor::RouteEditor(bool& success)
     }
     journal->info("Settings are readed successfully");
 
+    // TODO: Check vsg_options allocation?
     vsg_options = create_default_vsg_options();
+
     journal->info("VSG options are initialized successfully");
 
     if (!create_window())
@@ -40,6 +42,7 @@ RouteEditor::RouteEditor(bool& success)
     }
     journal->info("Window is created successfully");
 
+    // TODO: Check camera allocation?
     camera = Camera::create(camera_settings, window->extent2D());
 
     success = true;
@@ -52,6 +55,7 @@ void RouteEditor::initialize_journal(const char* filename) const
     Journal* const journal = Journal::instance();
     const FileSystem& fs = FileSystem::getInstance();
 
+    // TODO: Check JournalFile allocation?
     journal->addStorage(
         new JournalFile(
             to_qstring(fs.combinePath(fs.getLogsDir(), filename)),
@@ -93,7 +97,9 @@ bool RouteEditor::read_settings(const char* filename)
 
 bool RouteEditor::create_window()
 {
+    // TODO: Check window_traits allocation?
     const auto window_traits = vsg::WindowTraits::create();
+
     window_traits->x = window_settings.pos_x;
     window_traits->y = window_settings.pos_y;
     window_traits->width = window_settings.width;

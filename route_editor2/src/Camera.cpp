@@ -21,14 +21,17 @@ Camera::Camera(
 
     Journal* const journal = Journal::instance();
 
+    // TODO: Check perspective allocation?
     perspective = vsg::Perspective::create(
         camera_settings.fovy,
         window_width / window_height,
         camera_settings.zNear,
         camera_settings.view_distance
     );
+
     journal->info("Perspective projection matrix is created successfully");
 
+    // TODO: Check orthographic allocation?
     orthographic = vsg::Orthographic::create(
         -1.0,
         1.0,
@@ -37,15 +40,21 @@ Camera::Camera(
         camera_settings.zNear,
         camera_settings.view_distance
     );
+
     journal->info("Orthographic projection matrix is created successfully");
 
+    // TODO: Check look_at allocation?
     look_at = vsg::LookAt::create();
+
     look_at->eye.z = look_at->center.z = camera_settings.initial_height;
+
     journal->info("LookAt view matrix is created successfully");
 
     projectionMatrix = perspective;
     viewMatrix = look_at;
+    // TODO: Check viewportState allocation?
     viewportState = vsg::ViewportState::create(window_extent);
+
     journal->info("Camera is created successfully");
 }
 
