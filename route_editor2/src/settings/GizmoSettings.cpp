@@ -14,7 +14,7 @@
  * @param vec The vec3 object.
  * @return Formatted string representation of vec3 object.
  */
-QString to_qstring(vsg::vec3 vec)
+static QString to_qstring(vsg::vec3 vec)
 {
     return QString("{%1, %2, %3}").arg(vec.x).arg(vec.y).arg(vec.z);
 }
