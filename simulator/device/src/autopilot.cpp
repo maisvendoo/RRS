@@ -718,7 +718,7 @@ void Autopilot::slotRouteBuildRequest()
     }
 
     // Если нужен маршрут отправления и он еще не построен
-    if (is_departure_allowed && !st->removal_traj.isEmpty() && !st->is_build_dep_route)
+    if ((st->is_arrival || st->is_build_arr_route || st->approach_traj.isEmpty()) && is_departure_allowed && !st->removal_traj.isEmpty() && !st->is_build_dep_route)
     {
         // Посылаем запрос статуса пути отправления
         emit sigGetTrajStateRequest(this->vehicle_idx, target_station_idx, st->target_traj, st->removal_traj, target_dir, DEPARTURE_REQUEST);
