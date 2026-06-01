@@ -553,7 +553,8 @@ void Autopilot::checkTimetable(double t, double dt)
     if (st->arr_time_sec > st->dep_time_sec - 1.0)
     {
         // Разрешаем отправление
-        Journal::instance()->warning(QString("checkTimetable: no halt, allow departure %1").arg(timetable.train_name));
+        Journal::instance()->warning(QString("TIMETABLE PROCESS %1: no halt, allow departure from %2")
+                                         .arg(timetable.train_name).arg(st->name));
         is_departure_allowed = true;
         return;
     }
@@ -579,15 +580,9 @@ void Autopilot::checkTimetable(double t, double dt)
 
     if (st->is_arrival && (t >= st->dep_time_sec))
     {
-        Journal::instance()->warning(QString("checkTimetable: halt done, allow departure %1").arg(timetable.train_name));
+        Journal::instance()->warning(QString("TIMETABLE PROCESS %1: halt done, allow departure from %2")
+                                         .arg(timetable.train_name).arg(st->name));
         is_departure_allowed = true;
-
-        // Если задан участок удаления, строим себе маршрут отправления
-        if (!st->removal_traj.isEmpty() && !st->is_build_dep_route)
-        {
-            // Запрос на проверку свободности маршрута отправления
-            emit sigGetTrajStateRequest(this->vehicle_idx, target_station_idx, curr_traj_name, st->removal_traj, target_dir, DEPARTURE_REQUEST);
-        }
     }
 }
 
@@ -716,25 +711,17 @@ void Autopilot::slotRouteBuildRequest()
     }
 
     // Маршрут приема надо строить, но он еще не построен
-    if (st->build_arr_route_request)
+    if (st->build_arr_route_request && !st->is_build_arr_route)
     {
-        if (!st->is_build_arr_route)
-        {
-            // Посылаем запрос статуса пути приема
-            emit sigGetTrajStateRequest(this->vehicle_idx, target_station_idx, curr_traj_name, st->target_traj, target_dir, ARRIVAL_REQUEST);
-        }
-        else
-        {
-            // Если нужен сквозной пропуск и он еще не построен
-            if ( (st->arr_time_sec > st->dep_time_sec - 1.0) && !st->removal_traj.isEmpty() )
-            {
-                // Если уже построен маршрут приема, но еще не построен маршрут пропуска
-                if (!st->is_build_dep_route)
-                {
-                    emit sigGetTrajStateRequest(this->vehicle_idx, target_station_idx, st->target_traj, st->removal_traj, target_dir, DEPARTURE_REQUEST);
-                }
-            }
-        }
+        // Посылаем запрос статуса пути приема
+        emit sigGetTrajStateRequest(this->vehicle_idx, target_station_idx, curr_traj_name, st->target_traj, target_dir, ARRIVAL_REQUEST);
+    }
+
+    // Если нужен маршрут отправления и он еще не построен
+    if ((st->is_arrival || st->is_build_arr_route || st->approach_traj.isEmpty()) && is_departure_allowed && !st->removal_traj.isEmpty() && !st->is_build_dep_route)
+    {
+        // Посылаем запрос статуса пути отправления
+        emit sigGetTrajStateRequest(this->vehicle_idx, target_station_idx, st->target_traj, st->removal_traj, target_dir, DEPARTURE_REQUEST);
     }
 }
 
@@ -767,6 +754,7 @@ void Autopilot::slotIncTargetStation(int vehicle_idx, bool is_on_target_traj)
     {
         Journal::instance()->warning(QString("slotIncStation: allow departure %1").arg(timetable.train_name));
         is_departure_allowed = true;
+        allow_inc_target_idx = true;
     }
 
     if (!st->is_departure && allow_inc_target_idx)
@@ -824,10 +812,10 @@ void Autopilot::slotCalcMiddleVelocity(int vehicle_idx, double target_dist)
         return;
     }
 
-    allow_inc_target_idx = true;
-
     // Текущая станция
     auto st = &timetable.stations[target_station_idx];
+
+    allow_inc_target_idx = (st->removal_traj.isEmpty() || st->is_build_dep_route);
 
     // Фиксируем факт прибытия
     if ( (target_dist < arrival_dist_eps) && (!st->is_arrival) )
