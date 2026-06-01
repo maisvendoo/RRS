@@ -31,7 +31,11 @@ public:
      * @param[in] camera_settings The camera settings object.
      * @param[in] window_extent Window extent from the VSG window object.
      */
-    Camera(const camera_settings_t& camera_settings, VkExtent2D window_extent);
+    Camera(
+        const camera_settings_t& camera_settings,
+        VkExtent2D window_extent,
+        bool& success
+    );
 
     /**
      * @brief Destroy the Camera object.

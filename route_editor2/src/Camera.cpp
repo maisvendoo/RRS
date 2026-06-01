@@ -13,7 +13,8 @@
 
 Camera::Camera(
     const camera_settings_t& camera_settings,
-    VkExtent2D window_extent
+    VkExtent2D window_extent,
+    bool& success
 )
 {
     const double window_width = static_cast<double>(window_extent.width);
@@ -56,6 +57,8 @@ Camera::Camera(
     viewportState = vsg::ViewportState::create(window_extent);
 
     journal->info("Camera is created successfully");
+
+    success = true;
 }
 
 Camera::~Camera() = default;
