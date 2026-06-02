@@ -45,25 +45,8 @@ public:
      */
     ~Camera();
 
-    /**
-     * @brief Get the perspective object.
-     *
-     * @return The perspective object.
-     */
     const vsg::ref_ptr<vsg::Perspective>& get_perspective() const;
-
-    /**
-     * @brief Get the orthographic object.
-     *
-     * @return The orthographic object.
-     */
     const vsg::ref_ptr<vsg::Orthographic>& get_orthographic() const;
-
-    /**
-     * @brief Get the look_at object
-     *
-     * @return The look_at object.
-     */
     const vsg::ref_ptr<vsg::LookAt>& get_look_at() const;
 
 private:
