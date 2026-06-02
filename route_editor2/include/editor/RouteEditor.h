@@ -55,7 +55,7 @@ private:
      *
      * @param[in] filename Log filename (default - "editor.log").
      */
-    void initialize_journal(const char* filename = "editor.log") const;
+    bool initialize_journal(const char* filename = "editor.log") const;
 
     /**
      * @brief Read the editor settings.
@@ -71,6 +71,8 @@ private:
      * @return false - otherwise.
      */
     bool read_settings(const char* filename = "editor-settings.xml");
+
+    bool create_vsg_options();
 
     /**
      * @brief Create a VSG window based on the window_settings.

@@ -1,6 +1,7 @@
 #include "editor/RouteEditor.h"
 
 #include "editor/Camera.h"
+#include "editor/check_macro.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/WindowSettings.h"
 
@@ -18,63 +19,48 @@
 
 #include <QString>
 
+#include <cstdio>
+
 RouteEditor::RouteEditor(bool& success)
 {
-    initialize_journal();
-    Journal* const journal = Journal::instance();
-
-    if (!read_settings())
-    {
-        success = false;
-        return;
-    }
-    journal->info("Settings are readed successfully");
-
-    vsg_options = create_default_vsg_options();
-    if (!vsg_options)
-    {
-        success = false;
-        journal->error("Failed to initialize VSG options");
-        return;
-    }
-    journal->info("VSG options are initialized successfully");
-
-    if (!create_window())
-    {
-        success = false;
-        return;
-    }
-    journal->info("Window is created successfully");
+    CHECK(initialize_journal(), success);
+    CHECK(read_settings(), success)
+    CHECK(create_vsg_options(), success)
+    CHECK(create_window(), success)
 
     camera = Camera::create(camera_settings, window->extent2D(), success);
-    if (!success)
-    {
-        return;
-    }
+    CHECK(success, success)
 
     success = true;
 }
 
 RouteEditor::~RouteEditor() = default;
 
-void RouteEditor::initialize_journal(const char* filename) const
+bool RouteEditor::initialize_journal(const char* filename) const
 {
-    Journal* const journal = Journal::instance();
     const FileSystem& fs = FileSystem::getInstance();
 
-    // TODO: Check JournalFile allocation?
-    JournalFile* const journal_file = new JournalFile(
+    JournalFile* const journal_file = new(std::nothrow) JournalFile(
         to_qstring(fs.combinePath(fs.getLogsDir(), filename)),
         JournalLevel::All
     );
-    journal->addStorage(journal_file);
+
+    if (!journal_file)
+    {
+        std::fputs("Failed to allocate memory for JournalFile\n", stderr);
+        return false;
+    }
+
+    Journal::instance()->addStorage(journal_file);
 
     const QString dash_line = QString('=').repeated(80);
 
-    journal->message(dash_line);
-    journal->message("Started new session");
-    journal->message("Journal subsystem is initialized successfully");
-    journal->message(dash_line);
+    Journal::instance()->message(dash_line);
+    Journal::instance()->message("Started new session");
+    Journal::instance()->message("Journal subsystem is initialized successfully");
+    Journal::instance()->message(dash_line);
+
+    return true;
 }
 
 bool RouteEditor::read_settings(const char* filename)
@@ -98,13 +84,33 @@ bool RouteEditor::read_settings(const char* filename)
     window_settings.print_in_journal();
     camera_settings.print_in_journal();
 
+    Journal::instance()->info("Settings are readed successfully");
+
+    return true;
+}
+
+bool RouteEditor::create_vsg_options()
+{
+    vsg_options = create_default_vsg_options();
+    if (!vsg_options)
+    {
+        Journal::instance()->error("Failed to initialize VSG options");
+        return false;
+    }
+
+    Journal::instance()->info("VSG options are initialized successfully");
     return true;
 }
 
 bool RouteEditor::create_window()
 {
-    // TODO: Check window_traits allocation?
     const auto window_traits = vsg::WindowTraits::create();
+    if (!window_traits)
+    {
+        Journal::instance()->error("Failed to create window traits");
+        return false;
+    }
+    Journal::instance()->info("Window traits is created successfully");
 
     window_traits->x = window_settings.pos_x;
     window_traits->y = window_settings.pos_y;
@@ -126,5 +132,6 @@ bool RouteEditor::create_window()
         return false;
     }
 
+    Journal::instance()->info("Window is created successfully");
     return true;
 }

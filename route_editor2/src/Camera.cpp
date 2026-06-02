@@ -1,5 +1,6 @@
 #include "editor/Camera.h"
 
+#include "editor/check_macro.h"
 #include "editor/settings/CameraSettings.h"
 
 #include <Journal.h>
@@ -10,13 +11,6 @@
 #include <vsg/state/ViewportState.h>
 
 #include <vulkan/vulkan_core.h>
-
-#define CHECK(result, success)    \
-    if (!result)                  \
-    {                             \
-        success = false;          \
-        return;                   \
-    }
 
 Camera::Camera(
     const camera_settings_t& camera_settings,
