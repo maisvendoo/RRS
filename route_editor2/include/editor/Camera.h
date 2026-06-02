@@ -66,10 +66,24 @@ public:
 private:
     /// Perspective projection matrix.
     vsg::ref_ptr<vsg::Perspective> perspective;
+
     /// Orthographic projection matrix.
     vsg::ref_ptr<vsg::Orthographic> orthographic;
+
     /// LookAt view matrix.
     vsg::ref_ptr<vsg::LookAt> look_at;
+
+private:
+    bool create_perspective(
+        const camera_settings_t& camera_settings,
+        VkExtent2D window_extent
+    );
+
+    bool create_orthographic(const camera_settings_t& camera_settings);
+
+    bool create_look_at(const camera_settings_t& camera_settings);
+
+    bool create_viewport_state(VkExtent2D window_extent);
 };
 
 #endif // EDITOR_CAMERA_H
