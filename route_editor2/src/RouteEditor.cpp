@@ -46,7 +46,6 @@ RouteEditor::RouteEditor(bool& success)
     }
     journal->info("Window is created successfully");
 
-    // TODO: Check camera allocation?
     camera = Camera::create(camera_settings, window->extent2D(), success);
     if (!success)
     {
