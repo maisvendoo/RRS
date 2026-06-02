@@ -7,18 +7,29 @@ struct camera_settings_t
 {
     /// Near clip plane distance.
     double zNear;
+
     /// Far clip plane distance.
     double view_distance;
-    /// Vertical field of view.
-    double fovy;
-    /// Minimum vertical field of view.
-    double fovy_min;
-    /// Maximum vertical field of view.
-    double fovy_max;
 
+    /// Vertical field of view in degrees.
+    double fovy_degrees;
+
+    /// Minimum vertical field of view in degrees.
+    double min_fovy_degrees;
+
+    /// Maximum vertical field of view in degrees.
+    double max_fovy_degrees;
+
+    /// Initial height of camera above the ground.
     double initial_height;
+
+    /// Move speed.
     double move_speed;
+
+    /// Rotate speed.
     double rotate_speed;
+
+    /// Zoom power.
     double zoom_power;
 
     /**

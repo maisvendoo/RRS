@@ -24,7 +24,7 @@ Camera::Camera(
 
     // TODO: Check perspective allocation?
     perspective = vsg::Perspective::create(
-        camera_settings.fovy,
+        camera_settings.fovy_degrees,
         window_width / window_height,
         camera_settings.zNear,
         camera_settings.view_distance
