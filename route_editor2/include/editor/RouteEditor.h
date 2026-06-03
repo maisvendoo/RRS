@@ -8,7 +8,7 @@
 #include <vsg/core/ref_ptr.h>
 
 class Camera;
-class Keyboard;
+class EventHandler;
 
 namespace vsg
 {
@@ -55,7 +55,7 @@ private:
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
-    vsg::ref_ptr<Keyboard> keyboard;
+    vsg::ref_ptr<EventHandler> event_handler;
     vsg::ref_ptr<Camera> camera;
     vsg::ref_ptr<vsg::Group> scenegraph;
     vsg::ref_ptr<vsg::View> scene_view;

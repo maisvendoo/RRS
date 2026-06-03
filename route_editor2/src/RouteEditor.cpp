@@ -1,7 +1,7 @@
 #include "editor/RouteEditor.h"
 
 #include "editor/Camera.h"
-#include "editor/Keyboard.h"
+#include "editor/EventHandler.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/SceneSettings.h"
 #include "editor/settings/WindowSettings.h"
@@ -38,7 +38,7 @@ RouteEditor::RouteEditor()
     print_settings();
     create_vsg_options();
     create_window();
-    keyboard = Keyboard::create();
+    event_handler = EventHandler::create();
     camera = Camera::create(camera_settings, window->extent2D());
     create_scenegraph();
     create_scene_view();
@@ -237,7 +237,7 @@ void RouteEditor::create_viewer()
 
     viewer->addWindow(window);
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
-    viewer->addEventHandler(keyboard);
+    viewer->addEventHandler(event_handler);
     viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
     viewer->compile(resource_hints);
 
