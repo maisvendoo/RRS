@@ -2,6 +2,7 @@
 #define ROUTE_EDITOR_H
 
 #include "editor/settings/CameraSettings.h"
+#include "editor/settings/SceneSettings.h"
 #include "editor/settings/WindowSettings.h"
 
 #include <vsg/core/ref_ptr.h>
@@ -43,11 +44,15 @@ public:
      */
     ~RouteEditor();
 
+    /**
+     * @brief Run event loop.
+     */
     void run();
 
 private:
     window_settings_t window_settings;
     camera_settings_t camera_settings;
+    scene_settings_t scene_settings;
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
@@ -101,6 +106,20 @@ private:
      * @return false - otherwise.
      */
     bool create_window();
+
+    bool create_camera();
+
+    bool create_scenegraph();
+
+    bool create_scene_view();
+
+    bool create_render_graph();
+
+    bool create_command_graph();
+
+    bool create_resource_hints();
+
+    bool create_viewer();
 };
 
 #endif // ROUTE_EDITOR_H

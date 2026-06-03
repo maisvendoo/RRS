@@ -3,6 +3,7 @@
 #include "editor/Camera.h"
 #include "editor/check_macro.h"
 #include "editor/settings/CameraSettings.h"
+#include "editor/settings/SceneSettings.h"
 #include "editor/settings/WindowSettings.h"
 
 #include <CfgReader.h>
@@ -21,6 +22,7 @@
 #include <vsg/app/Window.h>
 #include <vsg/app/WindowTraits.h>
 #include <vsg/io/Options.h>
+#include <vsg/maths/vec4.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/state/ResourceHints.h>
 
@@ -30,76 +32,17 @@
 
 RouteEditor::RouteEditor(bool& success)
 {
-    CHECK(initialize_journal(), success);
+    CHECK(initialize_journal(), success)
     CHECK(read_settings(), success)
     CHECK(create_vsg_options(), success)
     CHECK(create_window(), success)
-
-    camera = Camera::create(camera_settings, window->extent2D(), success);
-    CHECK(success, success)
-
-    scenegraph = vsg::Group::create();
-    if (!scenegraph)
-    {
-        success = false;
-        Journal::instance()->error("Failed to create scenegraph");
-        return;
-    }
-    Journal::instance()->info("Scenegraph is created successfully");
-
-    scene_view = vsg::View::create(camera, scenegraph);
-    if (!scene_view)
-    {
-        success = false;
-        Journal::instance()->error("Failed to create scene view");
-        return;
-    }
-    Journal::instance()->info("Scene view is created successfully");
-
-    render_graph = vsg::RenderGraph::create(window);
-    if (!render_graph)
-    {
-        success = false;
-        Journal::instance()->error("Failed to create render graph");
-        return;
-    }
-
-    render_graph->addChild(scene_view);
-    Journal::instance()->info("Render graph is created successfully");
-
-    command_graph = vsg::CommandGraph::create(window, render_graph);
-    if (!command_graph)
-    {
-        success = false;
-        Journal::instance()->error("Failed to create command graph");
-        return;
-    }
-    Journal::instance()->info("Command graph is created successfully");
-
-    resource_hints = vsg::ResourceHints::create();
-    if (!resource_hints)
-    {
-        success = false;
-        Journal::instance()->error("Failed to create resource hints");
-        return;
-    }
-
-    // TODO: Set resource hints's numLightsRange
-    Journal::instance()->info("Resource hints is created successfully");
-
-    viewer = vsg::Viewer::create();
-    if (!viewer)
-    {
-        success = false;
-        Journal::instance()->error("Failed to create viewer");
-        return;
-    }
-    Journal::instance()->info("Viewer is created successfully");
-
-    viewer->addWindow(window);
-    viewer->addEventHandler(vsg::CloseHandler::create(viewer));
-    viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
-    viewer->compile(resource_hints);
+    CHECK(create_camera(), success)
+    CHECK(create_scenegraph(), success)
+    CHECK(create_scene_view(), success)
+    CHECK(create_render_graph(), success)
+    CHECK(create_command_graph(), success)
+    CHECK(create_resource_hints(), success)
+    CHECK(create_viewer(), success)
 
     success = true;
 }
@@ -161,9 +104,11 @@ bool RouteEditor::read_settings(const char* filename)
 
     window_settings.read(cfg);
     camera_settings.read(cfg);
+    scene_settings.read(cfg);
 
     window_settings.print_in_journal();
     camera_settings.print_in_journal();
+    scene_settings.print_in_journal();
 
     Journal::instance()->info("Settings are readed successfully");
 
@@ -213,6 +158,102 @@ bool RouteEditor::create_window()
         return false;
     }
 
+    window->clearColor() = vsg::vec4(0.03f, 0.03f, 0.03f, 1.0f);
     Journal::instance()->info("Window is created successfully");
+    return true;
+}
+
+bool RouteEditor::create_camera()
+{
+    bool success;
+    camera = Camera::create(camera_settings, window->extent2D(), success);
+    return success;
+}
+
+bool RouteEditor::create_scenegraph()
+{
+    scenegraph = vsg::Group::create();
+    if (!scenegraph)
+    {
+        Journal::instance()->error("Failed to create scenegraph");
+        return false;
+    }
+
+    Journal::instance()->info("Scenegraph is created successfully");
+    return true;
+}
+
+bool RouteEditor::create_scene_view()
+{
+    scene_view = vsg::View::create(camera, scenegraph);
+    if (!scene_view)
+    {
+        Journal::instance()->error("Failed to create scene view");
+        return false;
+    }
+
+    Journal::instance()->info("Scene view is created successfully");
+    return true;
+}
+
+bool RouteEditor::create_render_graph()
+{
+    render_graph = vsg::RenderGraph::create(window);
+    if (!render_graph)
+    {
+        Journal::instance()->error("Failed to create render graph");
+        return false;
+    }
+
+    render_graph->addChild(scene_view);
+
+    Journal::instance()->info("Render graph is created successfully");
+    return true;
+}
+
+bool RouteEditor::create_command_graph()
+{
+    command_graph = vsg::CommandGraph::create(window, render_graph);
+    if (!command_graph)
+    {
+        Journal::instance()->error("Failed to create command graph");
+        return false;
+    }
+
+    Journal::instance()->info("Command graph is created successfully");
+    return true;
+}
+
+bool RouteEditor::create_resource_hints()
+{
+    resource_hints = vsg::ResourceHints::create();
+    if (!resource_hints)
+    {
+        Journal::instance()->error("Failed to create resource hints");
+        return false;
+    }
+
+    const unsigned int num_lights = static_cast<unsigned int>(scene_settings.num_lights);
+    resource_hints->numLightsRange = {num_lights, num_lights + 1};
+
+    Journal::instance()->info("Resource hints is created successfully");
+    return true;
+}
+
+bool RouteEditor::create_viewer()
+{
+    viewer = vsg::Viewer::create();
+    if (!viewer)
+    {
+        Journal::instance()->error("Failed to create viewer");
+        return false;
+    }
+
+    viewer->addWindow(window);
+    viewer->addEventHandler(vsg::CloseHandler::create(viewer));
+    viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
+    viewer->compile(resource_hints);
+
+    Journal::instance()->info("Viewer is created successfully");
     return true;
 }
