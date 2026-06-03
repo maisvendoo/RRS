@@ -37,7 +37,7 @@ public:
      * @param[out] success true if initialization was successful,
      *                     false - otherwise.
      */
-    explicit RouteEditor(bool& success);
+    RouteEditor();
 
     /**
      * @brief Destroy the RouteEditor object.
@@ -74,7 +74,7 @@ private:
      *
      * @param[in] filename Log filename (default - "editor.log").
      */
-    bool initialize_journal(const char* filename = "editor.log") const;
+    void initialize_journal(const char* filename = "editor.log") const;
 
     /**
      * @brief Read the editor settings.
@@ -89,7 +89,9 @@ private:
      * @return true if the editor settings were read successfully.
      * @return false - otherwise.
      */
-    bool read_settings(const char* filename = "editor-settings.xml");
+    void read_settings(const char* filename = "editor-settings.xml");
+
+    void print_settings() const;
 
     /**
      * @brief Create a VSG options object.
@@ -97,7 +99,7 @@ private:
      * @return true if the VSG options were created successfully.
      * @return false - otherwise.
      */
-    bool create_vsg_options();
+    void create_vsg_options();
 
     /**
      * @brief Create a VSG window based on the window_settings.
@@ -105,21 +107,21 @@ private:
      * @return true if the window was created successfully.
      * @return false - otherwise.
      */
-    bool create_window();
+    void create_window();
 
-    bool create_camera();
+    void create_camera();
 
-    bool create_scenegraph();
+    void create_scenegraph();
 
-    bool create_scene_view();
+    void create_scene_view();
 
-    bool create_render_graph();
+    void create_render_graph();
 
-    bool create_command_graph();
+    void create_command_graph();
 
-    bool create_resource_hints();
+    void create_resource_hints();
 
-    bool create_viewer();
+    void create_viewer();
 };
 
 #endif // ROUTE_EDITOR_H

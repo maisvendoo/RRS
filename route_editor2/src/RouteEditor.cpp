@@ -1,7 +1,6 @@
 #include "editor/RouteEditor.h"
 
 #include "editor/Camera.h"
-#include "editor/check_macro.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/SceneSettings.h"
 #include "editor/settings/WindowSettings.h"
@@ -29,22 +28,22 @@
 #include <QString>
 
 #include <cstdio>
+#include <cstdlib>
 
-RouteEditor::RouteEditor(bool& success)
+RouteEditor::RouteEditor()
 {
-    CHECK(initialize_journal(), success)
-    CHECK(read_settings(), success)
-    CHECK(create_vsg_options(), success)
-    CHECK(create_window(), success)
-    CHECK(create_camera(), success)
-    CHECK(create_scenegraph(), success)
-    CHECK(create_scene_view(), success)
-    CHECK(create_render_graph(), success)
-    CHECK(create_command_graph(), success)
-    CHECK(create_resource_hints(), success)
-    CHECK(create_viewer(), success)
-
-    success = true;
+    initialize_journal();
+    read_settings();
+    print_settings();
+    create_vsg_options();
+    create_window();
+    create_camera();
+    create_scenegraph();
+    create_scene_view();
+    create_render_graph();
+    create_command_graph();
+    create_resource_hints();
+    create_viewer();
 }
 
 RouteEditor::~RouteEditor() = default;
@@ -60,7 +59,7 @@ void RouteEditor::run()
     }
 }
 
-bool RouteEditor::initialize_journal(const char* filename) const
+void RouteEditor::initialize_journal(const char* filename) const
 {
     const FileSystem& fs = FileSystem::getInstance();
 
@@ -72,7 +71,7 @@ bool RouteEditor::initialize_journal(const char* filename) const
     if (!journal_file)
     {
         std::fputs("Failed to allocate memory for JournalFile\n", stderr);
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     Journal::instance()->addStorage(journal_file);
@@ -83,11 +82,9 @@ bool RouteEditor::initialize_journal(const char* filename) const
     Journal::instance()->message("Started new session");
     Journal::instance()->message("Journal subsystem is initialized successfully");
     Journal::instance()->message(dash_line);
-
-    return true;
 }
 
-bool RouteEditor::read_settings(const char* filename)
+void RouteEditor::read_settings(const char* filename)
 {
     const FileSystem& fs = FileSystem::getInstance();
 
@@ -99,42 +96,42 @@ bool RouteEditor::read_settings(const char* filename)
     if (!cfg.load(cfg_path))
     {
         Journal::instance()->error("Failed to load config file " + cfg_path);
-        return false;
+        return;
     }
 
     window_settings.read(cfg);
     camera_settings.read(cfg);
     scene_settings.read(cfg);
 
+    Journal::instance()->info("Settings are readed successfully");
+}
+
+void RouteEditor::print_settings() const
+{
     window_settings.print_in_journal();
     camera_settings.print_in_journal();
     scene_settings.print_in_journal();
-
-    Journal::instance()->info("Settings are readed successfully");
-
-    return true;
 }
 
-bool RouteEditor::create_vsg_options()
+void RouteEditor::create_vsg_options()
 {
     vsg_options = create_default_vsg_options();
     if (!vsg_options)
     {
         Journal::instance()->error("Failed to initialize VSG options");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     Journal::instance()->info("VSG options are initialized successfully");
-    return true;
 }
 
-bool RouteEditor::create_window()
+void RouteEditor::create_window()
 {
     const auto window_traits = vsg::WindowTraits::create();
     if (!window_traits)
     {
         Journal::instance()->error("Failed to create window traits");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
     Journal::instance()->info("Window traits is created successfully");
 
@@ -155,98 +152,95 @@ bool RouteEditor::create_window()
     if (!window)
     {
         Journal::instance()->error("Failed to create window");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     window->clearColor() = vsg::vec4(0.03f, 0.03f, 0.03f, 1.0f);
     Journal::instance()->info("Window is created successfully");
-    return true;
 }
 
-bool RouteEditor::create_camera()
+void RouteEditor::create_camera()
 {
     bool success;
     camera = Camera::create(camera_settings, window->extent2D(), success);
-    return success;
+    if (!success)
+    {
+        std::exit(EXIT_FAILURE);
+    }
 }
 
-bool RouteEditor::create_scenegraph()
+void RouteEditor::create_scenegraph()
 {
     scenegraph = vsg::Group::create();
     if (!scenegraph)
     {
         Journal::instance()->error("Failed to create scenegraph");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     Journal::instance()->info("Scenegraph is created successfully");
-    return true;
 }
 
-bool RouteEditor::create_scene_view()
+void RouteEditor::create_scene_view()
 {
     scene_view = vsg::View::create(camera, scenegraph);
     if (!scene_view)
     {
         Journal::instance()->error("Failed to create scene view");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     Journal::instance()->info("Scene view is created successfully");
-    return true;
 }
 
-bool RouteEditor::create_render_graph()
+void RouteEditor::create_render_graph()
 {
     render_graph = vsg::RenderGraph::create(window);
     if (!render_graph)
     {
         Journal::instance()->error("Failed to create render graph");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     render_graph->addChild(scene_view);
 
     Journal::instance()->info("Render graph is created successfully");
-    return true;
 }
 
-bool RouteEditor::create_command_graph()
+void RouteEditor::create_command_graph()
 {
     command_graph = vsg::CommandGraph::create(window, render_graph);
     if (!command_graph)
     {
         Journal::instance()->error("Failed to create command graph");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     Journal::instance()->info("Command graph is created successfully");
-    return true;
 }
 
-bool RouteEditor::create_resource_hints()
+void RouteEditor::create_resource_hints()
 {
     resource_hints = vsg::ResourceHints::create();
     if (!resource_hints)
     {
         Journal::instance()->error("Failed to create resource hints");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     const unsigned int num_lights = static_cast<unsigned int>(scene_settings.num_lights);
     resource_hints->numLightsRange = {num_lights, num_lights + 1};
 
     Journal::instance()->info("Resource hints is created successfully");
-    return true;
 }
 
-bool RouteEditor::create_viewer()
+void RouteEditor::create_viewer()
 {
     viewer = vsg::Viewer::create();
     if (!viewer)
     {
         Journal::instance()->error("Failed to create viewer");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     viewer->addWindow(window);
@@ -255,5 +249,4 @@ bool RouteEditor::create_viewer()
     viewer->compile(resource_hints);
 
     Journal::instance()->info("Viewer is created successfully");
-    return true;
 }
