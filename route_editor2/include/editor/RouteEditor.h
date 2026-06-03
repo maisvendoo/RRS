@@ -72,6 +72,12 @@ private:
      */
     bool read_settings(const char* filename = "editor-settings.xml");
 
+    /**
+     * @brief Create a VSG options object.
+     *
+     * @return true if the VSG options were created successfully.
+     * @return false - otherwise.
+     */
     bool create_vsg_options();
 
     /**

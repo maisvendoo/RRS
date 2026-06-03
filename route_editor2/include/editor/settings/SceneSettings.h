@@ -15,15 +15,15 @@ struct scene_settings_t
     scene_settings_t();
 
     /**
-     * @brief Read the scene settings.
+     * @brief Read the scene settings from a config file.
      *
      * @param[in] cfg CfgReader, which is associated with a config
-     *                file containing editor settings.
+     *                file containing the editor settings.
      */
     void read(CfgReader& cfg);
 
     /**
-     * @brief Print the scene settings in Journal.
+     * @brief Print the scene settings in the Journal.
      */
     void print_in_journal() const;
 };

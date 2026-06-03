@@ -25,15 +25,15 @@ struct window_settings_t
     window_settings_t();
 
     /**
-     * @brief Read the window settings.
+     * @brief Read the window settings from a config file.
      *
      * @param[in] cfg CfgReader, which is associated with a config
-     *                file containing editor settings.
+     *                file containing the editor settings.
      */
     void read(CfgReader& cfg);
 
     /**
-     * @brief Print the window settings in Journal.
+     * @brief Print the window settings in the Journal.
      */
     void print_in_journal() const;
 };

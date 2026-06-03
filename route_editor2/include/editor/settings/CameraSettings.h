@@ -5,10 +5,10 @@ class CfgReader;
 
 struct camera_settings_t
 {
-    /// Near clip plane distance.
+    /// Near clipping plane distance.
     double zNear;
 
-    /// Far clip plane distance.
+    /// Far clipping plane distance.
     double view_distance;
 
     /// Vertical field of view in degrees.
@@ -20,16 +20,9 @@ struct camera_settings_t
     /// Maximum vertical field of view in degrees.
     double max_fovy_degrees;
 
-    /// Initial height of camera above the ground.
     double initial_height;
-
-    /// Move speed.
     double move_speed;
-
-    /// Rotate speed.
     double rotate_speed;
-
-    /// Zoom power.
     double zoom_power;
 
     /**
@@ -39,15 +32,15 @@ struct camera_settings_t
     camera_settings_t();
 
     /**
-     * @brief Read the camera settings.
+     * @brief Read the camera settings from a config file.
      *
      * @param[in] cfg CfgReader, which is associated with a config
-     *                file containing editor settings.
+     *                file containing the editor settings.
      */
     void read(CfgReader& cfg);
 
     /**
-     * @brief Print the camera settings in Journal.
+     * @brief Print the camera settings in the Journal.
      */
     void print_in_journal() const;
 };

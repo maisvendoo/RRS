@@ -27,15 +27,15 @@ struct gizmo_settings_t
     gizmo_settings_t();
 
     /**
-     * @brief Read the gizmo settings.
+     * @brief Read the gizmo settings from a config file.
      *
      * @param[in] cfg CfgReader, which is associated with a config
-     *                file containing editor settings.
+     *                file containing the editor settings.
      */
     void read(CfgReader& cfg);
 
     /**
-     * @brief Print the gizmo settings in Journal.
+     * @brief Print the gizmo settings in the Journal.
      */
     void print_in_journal() const;
 };

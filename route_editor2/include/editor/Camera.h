@@ -25,7 +25,7 @@ public:
      * @brief Construct a new Camera object.
      *
      * Create perspective and orthographic projection matrices, as well
-     * as a LookAt view matrix, and ViewportState based on the
+     * as LookAt view matrix, and ViewportState based on the
      * camera_settings and window_extent parameters. Then
      * set the projection matrix to perspective mode.
      *
@@ -61,7 +61,7 @@ private:
 
 private:
     /**
-     * @brief Create a perspective object.
+     * @brief Create a Perspective object.
      *
      * @param[in] camera_settings The camera settings object.
      * @param[in] window_extent Window extent from the VSG window object.
@@ -74,7 +74,7 @@ private:
     );
 
     /**
-     * @brief Create an orthographic object.
+     * @brief Create an Orthographic object.
      *
      * @param camera_settings The camera settings object.
      * @return true if orthographic was created successfully.

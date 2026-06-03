@@ -24,15 +24,15 @@ struct gui_settings_t
     gui_settings_t();
 
     /**
-     * @brief Read the GUI settings.
+     * @brief Read the GUI settings from a config file.
      *
      * @param[in] cfg CfgReader, which is associated with a config
-     *                file containing editor settings.
+     *                file containing the editor settings.
      */
     void read(CfgReader& cfg);
 
     /**
-     * @brief Print the GUI settings in Journal.
+     * @brief Print the GUI settings in the Journal.
      */
     void print_in_journal() const;
 };
