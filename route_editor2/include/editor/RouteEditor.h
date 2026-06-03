@@ -11,9 +11,13 @@ class Camera;
 namespace vsg
 {
 
+class CommandGraph;
 class Group;
 class Options;
+class RenderGraph;
+class ResourceHints;
 class View;
+class Viewer;
 class Window;
 
 }
@@ -39,6 +43,8 @@ public:
      */
     ~RouteEditor();
 
+    void run();
+
 private:
     window_settings_t window_settings;
     camera_settings_t camera_settings;
@@ -48,6 +54,10 @@ private:
     vsg::ref_ptr<Camera> camera;
     vsg::ref_ptr<vsg::Group> scenegraph;
     vsg::ref_ptr<vsg::View> scene_view;
+    vsg::ref_ptr<vsg::RenderGraph> render_graph;
+    vsg::ref_ptr<vsg::CommandGraph> command_graph;
+    vsg::ref_ptr<vsg::ResourceHints> resource_hints;
+    vsg::ref_ptr<vsg::Viewer> viewer;
 
 private:
     /**

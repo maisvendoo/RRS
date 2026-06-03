@@ -13,11 +13,16 @@
 #include <filesystem.h>
 #include <graphics/common.h>
 
+#include <vsg/app/CloseHandler.h>
+#include <vsg/app/CommandGraph.h>
+#include <vsg/app/RenderGraph.h>
 #include <vsg/app/View.h>
+#include <vsg/app/Viewer.h>
 #include <vsg/app/Window.h>
 #include <vsg/app/WindowTraits.h>
 #include <vsg/io/Options.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/state/ResourceHints.h>
 
 #include <QString>
 
@@ -51,10 +56,66 @@ RouteEditor::RouteEditor(bool& success)
     }
     Journal::instance()->info("Scene view is created successfully");
 
+    render_graph = vsg::RenderGraph::create(window);
+    if (!render_graph)
+    {
+        success = false;
+        Journal::instance()->error("Failed to create render graph");
+        return;
+    }
+
+    render_graph->addChild(scene_view);
+    Journal::instance()->info("Render graph is created successfully");
+
+    command_graph = vsg::CommandGraph::create(window, render_graph);
+    if (!command_graph)
+    {
+        success = false;
+        Journal::instance()->error("Failed to create command graph");
+        return;
+    }
+    Journal::instance()->info("Command graph is created successfully");
+
+    resource_hints = vsg::ResourceHints::create();
+    if (!resource_hints)
+    {
+        success = false;
+        Journal::instance()->error("Failed to create resource hints");
+        return;
+    }
+
+    // TODO: Set resource hints's numLightsRange
+    Journal::instance()->info("Resource hints is created successfully");
+
+    viewer = vsg::Viewer::create();
+    if (!viewer)
+    {
+        success = false;
+        Journal::instance()->error("Failed to create viewer");
+        return;
+    }
+    Journal::instance()->info("Viewer is created successfully");
+
+    viewer->addWindow(window);
+    viewer->addEventHandler(vsg::CloseHandler::create(viewer));
+    viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
+    viewer->compile(resource_hints);
+
     success = true;
 }
 
 RouteEditor::~RouteEditor() = default;
+
+void RouteEditor::run()
+{
+    while (viewer->advanceToNextFrame())
+    {
+        viewer->handleEvents();
+        viewer->update();
+        viewer->recordAndSubmit();
+        viewer->present();
+    }
+}
 
 bool RouteEditor::initialize_journal(const char* filename) const
 {

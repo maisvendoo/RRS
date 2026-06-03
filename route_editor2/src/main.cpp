@@ -11,5 +11,7 @@ int main()
         return EXIT_FAILURE;
     }
 
+    route_editor.run();
+
     return EXIT_SUCCESS;
 }
