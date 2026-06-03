@@ -29,13 +29,9 @@ public:
     /**
      * @brief Construct a new RouteEditor object.
      *
-     * Construct a new RouteEditor object and set param success
-     * depending on the success of the initialization.
-     * If an error occured during initialization, check the log
-     * file (default - "logs/editor.log") for possible errors.
-     *
-     * @param[out] success true if initialization was successful,
-     *                     false - otherwise.
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
      */
     RouteEditor();
 
@@ -46,6 +42,8 @@ public:
 
     /**
      * @brief Run event loop.
+     *
+     * Handle events, update, render.
      */
     void run();
 
@@ -72,6 +70,10 @@ private:
      * subsystem in the default logs directory with the
      * specified filename and start writing to it.
      *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check stderr
+     * (standard error output stream) for possible errors).
+     *
      * @param[in] filename Log filename (default - "editor.log").
      */
     void initialize_journal(const char* filename = "editor.log") const;
@@ -81,13 +83,12 @@ private:
      *
      * Create a CfgReader and read the editor settings from the config file
      * in the default configs directory with the specified filename.
+     *
      * If an error occured, it usually means that CfgReader was
      * unable to load the config file. Check the log file
      * (default - "logs/editor.log") for possible errors.
      *
      * @param[in] filename Config filename (default = "editor-settings.xml").
-     * @return true if the editor settings were read successfully.
-     * @return false - otherwise.
      */
     void read_settings(const char* filename = "editor-settings.xml");
 
@@ -96,31 +97,81 @@ private:
     /**
      * @brief Create a VSG options object.
      *
-     * @return true if the VSG options were created successfully.
-     * @return false - otherwise.
+     * Create a default VSG options object (with configured paths,
+     * vsg::SharedObjects and vsgXchange included).
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
      */
     void create_vsg_options();
 
     /**
      * @brief Create a VSG window based on the window_settings.
      *
-     * @return true if the window was created successfully.
-     * @return false - otherwise.
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
      */
     void create_window();
 
-    void create_camera();
-
+    /**
+     * @brief Create a scenegraph object.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
     void create_scenegraph();
 
+    /**
+     * @brief Create a scene view object.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
     void create_scene_view();
 
+    /**
+     * @brief Create a render graph object.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
     void create_render_graph();
 
+    /**
+     * @brief Create a command graph object.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
     void create_command_graph();
 
+    /**
+     * @brief Create a resource hints object.
+     *
+     * Set numLightsRange based on scene settings.
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
     void create_resource_hints();
 
+    /**
+     * @brief Create a viewer object.
+     *
+     * Assign window and all appropriate event handlers to viewer.
+     *
+     * Compile viewer with resource hints.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
     void create_viewer();
 };
 

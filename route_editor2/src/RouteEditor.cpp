@@ -37,7 +37,7 @@ RouteEditor::RouteEditor()
     print_settings();
     create_vsg_options();
     create_window();
-    create_camera();
+    camera = Camera::create(camera_settings, window->extent2D());
     create_scenegraph();
     create_scene_view();
     create_render_graph();
@@ -157,16 +157,6 @@ void RouteEditor::create_window()
 
     window->clearColor() = vsg::vec4(0.03f, 0.03f, 0.03f, 1.0f);
     Journal::instance()->info("Window is created successfully");
-}
-
-void RouteEditor::create_camera()
-{
-    bool success;
-    camera = Camera::create(camera_settings, window->extent2D(), success);
-    if (!success)
-    {
-        std::exit(EXIT_FAILURE);
-    }
 }
 
 void RouteEditor::create_scenegraph()

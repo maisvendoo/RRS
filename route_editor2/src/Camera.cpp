@@ -1,6 +1,5 @@
 #include "editor/Camera.h"
 
-#include "editor/check_macro.h"
 #include "editor/settings/CameraSettings.h"
 
 #include <Journal.h>
@@ -12,23 +11,22 @@
 
 #include <vulkan/vulkan_core.h>
 
+#include <cstdlib>
+
 Camera::Camera(
     const camera_settings_t& camera_settings,
-    VkExtent2D window_extent,
-    bool& success
+    VkExtent2D window_extent
 )
 {
-    CHECK(create_perspective(camera_settings, window_extent), success)
-    CHECK(create_orthographic(camera_settings), success)
-    CHECK(create_look_at(camera_settings), success)
-    CHECK(create_viewport_state(window_extent), success)
+    create_perspective(camera_settings, window_extent);
+    create_orthographic(camera_settings);
+    create_look_at(camera_settings);
+    create_viewport_state(window_extent);
 
     projectionMatrix = perspective;
     viewMatrix = look_at;
 
     Journal::instance()->info("Camera is created successfully");
-
-    success = true;
 }
 
 Camera::~Camera() = default;
@@ -48,7 +46,7 @@ const vsg::ref_ptr<vsg::LookAt>& Camera::get_look_at() const
     return look_at;
 }
 
-bool Camera::create_perspective(
+void Camera::create_perspective(
     const camera_settings_t& camera_settings,
     VkExtent2D window_extent
 )
@@ -64,14 +62,13 @@ bool Camera::create_perspective(
     if (!perspective)
     {
         Journal::instance()->error("Failed to create perspective projection matrix");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     Journal::instance()->info("Perspective projection matrix is created successfully");
-    return true;
 }
 
-bool Camera::create_orthographic(const camera_settings_t& camera_settings)
+void Camera::create_orthographic(const camera_settings_t& camera_settings)
 {
     orthographic = vsg::Orthographic::create(
         -1.0,
@@ -85,37 +82,34 @@ bool Camera::create_orthographic(const camera_settings_t& camera_settings)
     if (!orthographic)
     {
         Journal::instance()->error("Failed to create orthographic projection matrix");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     Journal::instance()->info("Orthographic projection matrix is created successfully");
-    return true;
 }
 
-bool Camera::create_look_at(const camera_settings_t& camera_settings)
+void Camera::create_look_at(const camera_settings_t& camera_settings)
 {
     look_at = vsg::LookAt::create();
     if (!look_at)
     {
         Journal::instance()->error("Failed to create LookAt view matrix");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     look_at->eye.z = look_at->center.z = camera_settings.initial_height;
 
     Journal::instance()->info("LookAt view matrix is created successfully");
-    return true;
 }
 
-bool Camera::create_viewport_state(VkExtent2D window_extent)
+void Camera::create_viewport_state(VkExtent2D window_extent)
 {
     viewportState = vsg::ViewportState::create(window_extent);
     if (!viewportState)
     {
         Journal::instance()->error("Failed to create viewport state");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     Journal::instance()->info("Viewport state is created successfully");
-    return true;
 }
