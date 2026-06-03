@@ -11,7 +11,9 @@ class Camera;
 namespace vsg
 {
 
+class Group;
 class Options;
+class View;
 class Window;
 
 }
@@ -44,6 +46,8 @@ private:
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
     vsg::ref_ptr<Camera> camera;
+    vsg::ref_ptr<vsg::Group> scenegraph;
+    vsg::ref_ptr<vsg::View> scene_view;
 
 private:
     /**

@@ -13,9 +13,11 @@
 #include <filesystem.h>
 #include <graphics/common.h>
 
+#include <vsg/app/View.h>
 #include <vsg/app/Window.h>
 #include <vsg/app/WindowTraits.h>
 #include <vsg/io/Options.h>
+#include <vsg/nodes/Group.h>
 
 #include <QString>
 
@@ -30,6 +32,24 @@ RouteEditor::RouteEditor(bool& success)
 
     camera = Camera::create(camera_settings, window->extent2D(), success);
     CHECK(success, success)
+
+    scenegraph = vsg::Group::create();
+    if (!scenegraph)
+    {
+        success = false;
+        Journal::instance()->error("Failed to create scenegraph");
+        return;
+    }
+    Journal::instance()->info("Scenegraph is created successfully");
+
+    scene_view = vsg::View::create(camera, scenegraph);
+    if (!scene_view)
+    {
+        success = false;
+        Journal::instance()->error("Failed to create scene view");
+        return;
+    }
+    Journal::instance()->info("Scene view is created successfully");
 
     success = true;
 }
