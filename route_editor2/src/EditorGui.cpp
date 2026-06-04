@@ -24,5 +24,24 @@ EditorGui::EditorGui(const gui_settings_t& gui_settings)
 void EditorGui::record(vsg::CommandBuffer&) const
 {
     ImGui::ShowDemoWindow();
+
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("New route"))
+            {
+                // TODO
+            }
+
+            if (ImGui::MenuItem("Open route"))
+            {
+                // TODO
+            }
+
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
 }
 
