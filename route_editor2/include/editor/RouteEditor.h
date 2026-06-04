@@ -9,11 +9,13 @@
 #include <vsg/core/ref_ptr.h>
 
 class Camera;
+class EditorGui;
 class EventHandler;
 
 namespace vsg
 {
 
+class ClearAttachments;
 class CommandGraph;
 class Group;
 class Options;
@@ -22,6 +24,13 @@ class ResourceHints;
 class View;
 class Viewer;
 class Window;
+
+}
+
+namespace vsgImGui
+{
+
+class RenderImGui;
 
 }
 
@@ -61,6 +70,9 @@ private:
     vsg::ref_ptr<Camera> camera;
     vsg::ref_ptr<vsg::Group> scenegraph;
     vsg::ref_ptr<vsg::View> scene_view;
+    vsg::ref_ptr<vsg::ClearAttachments> clear_attachments;
+    vsg::ref_ptr<EditorGui> editor_gui;
+    vsg::ref_ptr<vsgImGui::RenderImGui> render_gui;
     vsg::ref_ptr<vsg::RenderGraph> render_graph;
     vsg::ref_ptr<vsg::CommandGraph> command_graph;
     vsg::ref_ptr<vsg::ResourceHints> resource_hints;

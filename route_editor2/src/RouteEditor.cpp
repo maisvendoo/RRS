@@ -1,6 +1,7 @@
 #include "editor/RouteEditor.h"
 
 #include "editor/Camera.h"
+#include "editor/EditorGui.h"
 #include "editor/EventHandler.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/GuiSettings.h"
@@ -22,12 +23,17 @@
 #include <vsg/app/Viewer.h>
 #include <vsg/app/Window.h>
 #include <vsg/app/WindowTraits.h>
+#include <vsg/commands/ClearAttachments.h>
 #include <vsg/io/Options.h>
 #include <vsg/maths/vec4.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/state/ResourceHints.h>
+#include <vsgImGui/RenderImGui.h>
+#include <vsgImGui/SendEventsToImGui.h>
 
 #include <QString>
+
+#include <vulkan/vulkan_core.h>
 
 #include <cstdio>
 #include <cstdlib>
@@ -43,6 +49,21 @@ RouteEditor::RouteEditor()
     camera = Camera::create(camera_settings, window->extent2D());
     create_scenegraph();
     create_scene_view();
+
+    VkClearValue clear_value = {};
+    clear_value.depthStencil = {0.0f, 0};
+    VkClearAttachment clear_attachment = {VK_IMAGE_ASPECT_DEPTH_BIT, 1, clear_value};
+    const VkExtent2D window_extent = window->extent2D();
+    VkClearRect clear_rect = {VkRect2D{VkOffset2D{0, 0}, window_extent}, 0, 1};
+
+    clear_attachments = vsg::ClearAttachments::create(
+        vsg::ClearAttachments::Attachments{clear_attachment},
+        vsg::ClearAttachments::Rects{clear_rect}
+    );
+
+    editor_gui = EditorGui::create(gui_settings);
+    render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
+
     create_render_graph();
     create_command_graph();
     create_resource_hints();
@@ -198,6 +219,8 @@ void RouteEditor::create_render_graph()
     }
 
     render_graph->addChild(scene_view);
+    render_graph->addChild(clear_attachments);
+    render_graph->addChild(render_gui);
 
     Journal::instance()->info("Render graph is created successfully");
 }
@@ -239,6 +262,7 @@ void RouteEditor::create_viewer()
     }
 
     viewer->addWindow(window);
+    viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
     viewer->addEventHandler(event_handler);
     viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
