@@ -5,6 +5,9 @@
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
 
+#include <memory>
+
+class EditorState;
 class Keyboard;
 
 namespace vsg
@@ -30,6 +33,8 @@ public:
 
 private:
     vsg::ref_ptr<Keyboard> keyboard;
+    std::unique_ptr<EditorState>* editor_state;
+    std::unique_ptr<EditorState> select_route_state;
 };
 
 #endif // EDITOR_EVENT_HANDLER_H
