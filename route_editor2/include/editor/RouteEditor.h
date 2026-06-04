@@ -2,6 +2,7 @@
 #define ROUTE_EDITOR_H
 
 #include "editor/settings/CameraSettings.h"
+#include "editor/settings/GuiSettings.h"
 #include "editor/settings/SceneSettings.h"
 #include "editor/settings/WindowSettings.h"
 
@@ -52,6 +53,7 @@ private:
     window_settings_t window_settings;
     camera_settings_t camera_settings;
     scene_settings_t scene_settings;
+    gui_settings_t gui_settings;
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;

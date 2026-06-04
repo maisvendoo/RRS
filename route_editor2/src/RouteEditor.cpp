@@ -3,6 +3,7 @@
 #include "editor/Camera.h"
 #include "editor/EventHandler.h"
 #include "editor/settings/CameraSettings.h"
+#include "editor/settings/GuiSettings.h"
 #include "editor/settings/SceneSettings.h"
 #include "editor/settings/WindowSettings.h"
 
@@ -104,6 +105,7 @@ void RouteEditor::read_settings(const char* filename)
     window_settings.read(cfg);
     camera_settings.read(cfg);
     scene_settings.read(cfg);
+    gui_settings.read(cfg);
 
     Journal::instance()->info("Settings are readed successfully");
 }
@@ -113,6 +115,7 @@ void RouteEditor::print_settings() const
     window_settings.print_in_journal();
     camera_settings.print_in_journal();
     scene_settings.print_in_journal();
+    gui_settings.print_in_journal();
 }
 
 void RouteEditor::create_vsg_options()
