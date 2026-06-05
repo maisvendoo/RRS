@@ -24,6 +24,8 @@ EditorGui::EditorGui(const gui_settings_t& gui_settings)
     const std::string font_path = fs.combinePath(fs.getFontsDir(), font_name);
 
     io.Fonts->AddFontFromFileTTF(font_path.c_str(), gui_settings.font_size);
+
+    viewport = ImGui::GetMainViewport();
 }
 
 void EditorGui::record(vsg::CommandBuffer&) const
@@ -52,8 +54,6 @@ void EditorGui::record(vsg::CommandBuffer&) const
 
         ImGui::EndMainMenuBar();
     }
-
-    ImGuiViewport* const viewport = ImGui::GetMainViewport();
 
     if (ImGui::BeginViewportSideBar("StatusBar", viewport, ImGuiDir_Down,
         ImGui::GetFrameHeight(), ImGuiWindowFlags_NoScrollbar))

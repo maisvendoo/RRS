@@ -6,6 +6,8 @@
 
 struct gui_settings_t;
 
+class ImGuiViewport;
+
 namespace vsg
 {
 
@@ -19,6 +21,9 @@ public:
     explicit EditorGui(const gui_settings_t& gui_settings);
 
     virtual void record(vsg::CommandBuffer& commandBuffer) const override;
+
+private:
+    ImGuiViewport* viewport;
 };
 
 #endif // EDITOR_GUI_H
