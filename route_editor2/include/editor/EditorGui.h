@@ -24,6 +24,15 @@ public:
 
 private:
     ImGuiViewport* viewport;
+
+private:
+    void draw_menu_bar() const;
+
+    void draw_status_bar() const;
+
+    void draw_open_route_file_dialog() const;
+
+    void draw_invalid_route_popup() const;
 };
 
 #endif // EDITOR_GUI_H

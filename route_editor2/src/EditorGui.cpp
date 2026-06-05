@@ -32,6 +32,14 @@ void EditorGui::record(vsg::CommandBuffer&) const
 {
     ImGui::ShowDemoWindow();
 
+    draw_menu_bar();
+    draw_status_bar();
+    draw_open_route_file_dialog();
+    draw_invalid_route_popup();
+}
+
+void EditorGui::draw_menu_bar() const
+{
     if (ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("File"))
@@ -54,14 +62,20 @@ void EditorGui::record(vsg::CommandBuffer&) const
 
         ImGui::EndMainMenuBar();
     }
+}
 
+void EditorGui::draw_status_bar() const
+{
     if (ImGui::BeginViewportSideBar("StatusBar", viewport, ImGuiDir_Down,
         ImGui::GetFrameHeight(), ImGuiWindowFlags_NoScrollbar))
     {
         ImGui::Text("Status bar");
         ImGui::End();
     }
+}
 
+void EditorGui::draw_open_route_file_dialog() const
+{
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
 
@@ -89,7 +103,10 @@ void EditorGui::record(vsg::CommandBuffer&) const
             ImGuiFileDialog::Instance()->Close();
         }
     }
+}
 
+void EditorGui::draw_invalid_route_popup() const
+{
     if (ImGui::BeginPopupModal("InvalidRoute", nullptr,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
     {
@@ -110,4 +127,3 @@ void EditorGui::record(vsg::CommandBuffer&) const
         ImGui::EndPopup();
     }
 }
-
