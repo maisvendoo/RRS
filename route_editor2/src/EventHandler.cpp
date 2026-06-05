@@ -2,15 +2,13 @@
 
 #include "editor/Keyboard.h"
 #include "editor/states/EditorState.h"
-#include "editor/states/SelectRouteState.h"
 
 #include <memory>
 
 EventHandler::EventHandler()
 {
     keyboard = Keyboard::create();
-    select_route_state = std::make_unique<SelectRouteState>();
-    editor_state = &select_route_state;
+    editor_state = nullptr;
 }
 
 EventHandler::~EventHandler() = default;

@@ -34,7 +34,6 @@ public:
 private:
     vsg::ref_ptr<Keyboard> keyboard;
     std::unique_ptr<EditorState>* editor_state;
-    std::unique_ptr<EditorState> select_route_state;
 };
 
 #endif // EDITOR_EVENT_HANDLER_H
