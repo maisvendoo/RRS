@@ -1,12 +1,12 @@
 #ifndef     RRS_DATE_TIME_H
 #define     RRS_DATE_TIME_H
 
-#include    <cstdint>
-#include    <ctime>
-
-#include    <QBuffer>
 #include    <QByteArray>
 #include    <QDataStream>
+#include    <QIODevice>
+
+#include    <cstdint>
+#include    <ctime>
 
 // Храним дату в виде 32-битного числа, где год - число в первых 16 битах,
 // месяц - число в следующих 8 битах и день - число в последних 8 битах
@@ -147,19 +147,15 @@ public:
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << date_data;
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> date_data;
     }
@@ -307,19 +303,15 @@ public:
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << time_unit_since_midnight;
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray &data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> time_unit_since_midnight;
     }
@@ -421,9 +413,7 @@ struct simulator_time_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << date.serialize();
 
@@ -431,14 +421,12 @@ struct simulator_time_t final
 
         stream << simulation_seconds;
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         QByteArray date_data;
         stream >> date_data;

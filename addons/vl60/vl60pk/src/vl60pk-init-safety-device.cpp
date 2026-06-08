@@ -7,6 +7,7 @@
 #include "automatic-train-stop.h"
 #include "sl2m.h"
 #include "speedmap.h"
+#include "core/load_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -45,7 +46,7 @@ void VL60pk::initSafetyDevices(const QString& modules_dir, const QString& custom
     for (size_t cab_idx : {CAB1, CAB2})
     {
         // ЭПК автостопа
-        epk[cab_idx] = loadAutoTrainStop(modules_dir + QDir::separator() + "epk150");
+        epk[cab_idx] = LOAD_MODULE(AutoTrainStop, modules_dir + QDir::separator() + "epk150");
         epk[cab_idx]->read_config("epk150");
 
         // Дешифратор АЛСН

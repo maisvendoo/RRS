@@ -15,12 +15,14 @@
 #include    "vl60-signals.h"
 #include    "filesystem.h"
 
+#include    <core/get_module.h>
+
 #include    <QDir>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-VL60k::VL60k() : Vehicle ()  
+VL60k::VL60k() : Vehicle ()
 {
     analogSignal.resize(SIGNALS_NUM_TOTAL);
 
@@ -131,7 +133,7 @@ void VL60k::step(const double &t, const double &dt)
 
     stepOtherEquipment(t, dt);
 
-    stepSafetyDevices(t, dt);   
+    stepSafetyDevices(t, dt);
 
     autoStartTimer->step(t, dt);
 }
@@ -139,4 +141,4 @@ void VL60k::step(const double &t, const double &dt)
 //------------------------------------------------------------------------------
 //  Макрос генерации функции loadVehicle() для симулятора
 //------------------------------------------------------------------------------
-GET_VEHICLE(VL60k)
+GET_MODULE(VL60k)

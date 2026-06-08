@@ -1,6 +1,7 @@
-#include	"vr292.h"
+#include    "vr292.h"
 
-#include    "physics.h"
+#include    "math-funcs.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -226,4 +227,4 @@ void AirDist292::load_config(CfgReader &cfg)
 
 }
 
-GET_AIR_DISTRIBUTOR(AirDist292)
+GET_MODULE(AirDist292)
