@@ -51,3 +51,70 @@ add_subdirectory (tools/routeconv)
 add_subdirectory (tools/route-map)
 add_subdirectory (tools/route-transform)
 add_subdirectory (tools/texture-compressor)
+
+include(CMakePackageConfigHelpers)
+
+# ПРАВИЛЬНЫЙ ПОРЯДОК КОМПОНЕНТОВ (с учетом зависимостей)
+# Сначала независимые, потом зависимые
+set(RRS_SDK_COMPONENTS
+    # Базовые (не имеют зависимостей внутри SDK)
+    core
+    filesystem
+    Journal
+    physics
+
+    # Промежуточные
+    solver
+    CfgReader
+
+    # Высокоуровневые (зависят от предыдущих)
+    device      # зависит от filesystem, Journal, physics
+    display
+    io-controller
+    vehicle     # зависит от CfgReader, device, Journal, physics
+)
+
+# Создаем шаблон (содержимое одинаково для всех платформ)
+set(CONFIG_IN_CONTENT "
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Автоматически определяем RRS_DIR (работает на Windows/Linux/macOS)
+get_filename_component(RRS_CMAKE_DIR \"\${CMAKE_CURRENT_LIST_DIR}\" ABSOLUTE)
+get_filename_component(RRS_SDK_LIB_DIR \"\${RRS_CMAKE_DIR}\" DIRECTORY)
+get_filename_component(RRS_SDK_DIR \"\${RRS_SDK_LIB_DIR}\" DIRECTORY)
+get_filename_component(RRS_DIR \"\${RRS_SDK_DIR}\" DIRECTORY)
+
+list(APPEND CMAKE_PREFIX_PATH \"\${RRS_CMAKE_DIR}\")
+
+set(RRS_INCLUDE_DIR \"\${RRS_SDK_DIR}/include\")
+set(RRS_LIBRARY_DIR \"\${RRS_SDK_DIR}/lib\")
+
+foreach(comp ${RRS_SDK_COMPONENTS})
+    if(EXISTS \"\${RRS_CMAKE_DIR}/\${comp}/\${comp}Config.cmake\")
+        find_dependency(\${comp})
+    endif()
+endforeach()
+")
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/RRSConfig.cmake.in "${CONFIG_IN_CONTENT}")
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/RRSConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/RRSConfig.cmake
+    INSTALL_DESTINATION sdk/lib/cmake
+)
+
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/RRSConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+install(
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/RRSConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/RRSConfigVersion.cmake
+    DESTINATION sdk/lib/cmake
+)
