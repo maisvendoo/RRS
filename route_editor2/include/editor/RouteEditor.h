@@ -8,6 +8,8 @@
 
 #include <vsg/core/ref_ptr.h>
 
+#include <string>
+
 class Camera;
 class EditorGui;
 class EventHandler;
@@ -63,6 +65,8 @@ private:
     camera_settings_t camera_settings;
     scene_settings_t scene_settings;
     gui_settings_t gui_settings;
+
+    std::string route_dir;
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;

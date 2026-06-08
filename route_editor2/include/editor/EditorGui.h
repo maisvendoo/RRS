@@ -4,6 +4,8 @@
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 
+#include <string>
+
 struct gui_settings_t;
 
 class ImGuiViewport;
@@ -18,11 +20,13 @@ class CommandBuffer;
 class EditorGui : public vsg::Inherit<vsg::Command, EditorGui>
 {
 public:
-    explicit EditorGui(const gui_settings_t& gui_settings);
+    EditorGui(const gui_settings_t& gui_settings, std::string& route_dir);
 
     virtual void record(vsg::CommandBuffer& commandBuffer) const override;
 
 private:
+    std::string& route_dir;
+
     ImGuiViewport* viewport;
 
 private:

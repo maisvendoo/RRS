@@ -12,7 +12,8 @@
 #include <filesystem>
 #include <string>
 
-EditorGui::EditorGui(const gui_settings_t& gui_settings)
+EditorGui::EditorGui(const gui_settings_t& gui_settings, std::string& route_dir)
+    : route_dir(route_dir)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -85,7 +86,7 @@ void EditorGui::draw_open_route_file_dialog() const
     {
         if (ImGuiFileDialog::Instance()->IsOk())
         {
-            const std::string route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
+            route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
             if (!std::filesystem::exists(route_dir + "/models") ||
                 !std::filesystem::exists(route_dir + "/textures") ||
                 !std::filesystem::exists(route_dir + "/topology") ||

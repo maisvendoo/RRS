@@ -61,7 +61,7 @@ RouteEditor::RouteEditor()
         vsg::ClearAttachments::Rects{clear_rect}
     );
 
-    editor_gui = EditorGui::create(gui_settings);
+    editor_gui = EditorGui::create(gui_settings, route_dir);
     render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
 
     create_render_graph();
