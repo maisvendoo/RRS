@@ -1,6 +1,7 @@
-#include	"vr483.h"
+#include    "vr483.h"
 
-#include    "physics.h"
+#include    "math-funcs.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -213,4 +214,4 @@ void AirDist483::ode_system(const state_vector_t &Y,
     dYdt[KDR] = Q[KDR] / v[KDR];
 }
 
-GET_AIR_DISTRIBUTOR(AirDist483)
+GET_MODULE(AirDist483)

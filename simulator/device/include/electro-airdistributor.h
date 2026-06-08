@@ -87,23 +87,4 @@ protected:
     double QSR;
 };
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef ElectroAirDistributor* (*GetElectroAirDistributor)();
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_ELECTRO_AIRDISTRIBUTOR(ClassName) \
-    extern "C" ElectroAirDistributor *getElectroAirDistributor() \
-    { \
-        return new (ClassName) (); \
-    }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" DEVICE_EXPORT ElectroAirDistributor *loadElectroAirDistributor(QString lib_path);
-
 #endif // ELECTRO_AIRDISTRIBUTOR_H

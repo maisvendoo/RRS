@@ -4,6 +4,7 @@
 #include    "physics.h"
 
 #include    "device.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -151,4 +152,4 @@ void JointPneumoHose::load_config(CfgReader &cfg)
     cfg.getBool(secName, "initConnectionState", is_connected);
 }
 
-GET_JOINT(JointPneumoHose)
+GET_MODULE(JointPneumoHose)

@@ -7,6 +7,7 @@
 #include "pneumo-anglecock.h"
 #include "pneumo-hose.h"
 #include "reservoir.h"
+#include "core/load_module.h"
 
 //------------------------------------------------------------------------
 //
@@ -19,7 +20,7 @@ void VL60k::initBrakesEquipment(const QString& modules_dir, const QString& custo
     brakepipe->setLeakCoeff(3e-6);
 
     // Воздухораспределитель
-    air_dist = loadAirDistributor(modules_dir + QDir::separator() + airdist_module_name);
+    air_dist = LOAD_MODULE(AirDistributor, modules_dir + QDir::separator() + airdist_module_name);
     air_dist->read_config(airdist_config_name);
 
     // Запасный резервуар

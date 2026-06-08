@@ -404,35 +404,4 @@ private:
     void loadWheelRailFriction(QString cfg_path, QString wheel_rail_friction_cfg);
 };
 
-/*!
- * \typedef
- * \brief Signature for getVehicle() function
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef Vehicle* (*GetVehicle)();
-
-/*!
- * \def
- * \brief Macro for generate getVehicle() function
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_VEHICLE(ClassName) \
-    extern "C" Vehicle* getVehicle() \
-    {\
-        return new (ClassName)(); \
-    }
-
-/*!
- * \fn
- * \brief Load vehicle from library
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" VEHICLE_EXPORT Vehicle* loadVehicle(QString lib_path);
-
 #endif // VEHICLE_H

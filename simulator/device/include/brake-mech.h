@@ -157,35 +157,4 @@ protected:
     double phi(double K, double v);
 };
 
-/*!
- * \typedef
- * \brief Get brake mechics model function
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef BrakeMech* (*GetBrakeMech)();
-
-/*!
- * \def
- * \brief Macro for generation getBrakeMech() function
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_BRAKE_MECH(ClassName) \
-    extern "C" Q_DECL_EXPORT BrakeMech *getBrakeMech() \
-    { \
-        return new (ClassName) (); \
-    }
-
-/*!
- * \fn
- * \brief Loading of brake mechanism module
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT BrakeMech *loadBrakeMech(QString lib_path);
-
 #endif // BRAKEMECH_H

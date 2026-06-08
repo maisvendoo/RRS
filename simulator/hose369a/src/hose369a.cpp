@@ -1,5 +1,7 @@
 #include    "hose369a.h"
 
+#include    <core/get_module.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -65,4 +67,4 @@ void Hose369A::load_config(CfgReader &cfg)
     PneumoHoseEPB::load_config(cfg);
 }
 
-GET_PNEUMO_HOSE_EPB(Hose369A)
+GET_MODULE(Hose369A)

@@ -8,8 +8,8 @@ project (${TARGET})
 # Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
+# set(CMAKE_AUTORCC ON)
+# set(CMAKE_AUTOUIC ON)
 
 # Путь, куда надо сложить собранное
 set (LIBRARY_OUTPUT_PATH "../../../modules")
@@ -40,3 +40,4 @@ target_link_libraries (${TARGET} device)
 target_link_libraries (${TARGET} topology)
 target_link_libraries (${TARGET} filesystem)
 target_link_libraries (${TARGET} trajectory-ALSN)
+target_link_libraries (${TARGET} core)

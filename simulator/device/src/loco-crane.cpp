@@ -1,7 +1,5 @@
 #include    "loco-crane.h"
 
-#include    <QLibrary>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -108,26 +106,4 @@ float LocoCrane::getSoundSignal(size_t idx) const
     if (idx < sounds.size())
         return sounds[idx].createSoundSignal();
     return Device::getSoundSignal();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-LocoCrane *loadLocoCrane(QString lib_path)
-{
-    LocoCrane *crane = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetLocoCrane getLocoCrane = reinterpret_cast<GetLocoCrane>(lib.resolve("getLocoCrane"));
-
-        if (getLocoCrane)
-        {
-            crane = getLocoCrane();
-        }
-    }
-
-    return crane;
 }

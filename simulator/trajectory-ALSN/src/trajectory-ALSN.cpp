@@ -5,7 +5,7 @@
 #include    "switch.h"
 #include    "train-signal.h"
 
-#include    "physics.h"
+#include    <core/get_module.h>
 
 //------------------------------------------------------------------------------
 //
@@ -245,4 +245,4 @@ void TrajectoryALSN::clear_code()
     next_liter_bwd = "";
 }
 
-GET_TRAJECTORY_DEVICE(TrajectoryALSN)
+GET_MODULE(TrajectoryALSN)

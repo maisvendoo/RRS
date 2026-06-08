@@ -61,35 +61,4 @@ private:
 
 };
 
-/*!
- * \typedef
- * \brief getCoupling() signature
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef Coupling* (*GetCoupling)();
-
-/*!
- * \def
- * \brief Macro for getCoupling() generation
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_COUPLING(ClassName) \
-    extern "C" Coupling *getCoupling() \
-    {\
-        return new (ClassName)(); \
-    }
-
-/*!
- * \fn
- * \brief Load Coupling from library
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" DEVICE_EXPORT Coupling *loadCoupling(QString lib_path);
-
 #endif // COUPLING_H

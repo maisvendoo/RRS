@@ -4,6 +4,7 @@
 #include    "physics.h"
 
 #include    "device.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -175,4 +176,4 @@ void JointCoupling::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "ck", ck);
 }
 
-GET_JOINT(JointCoupling)
+GET_MODULE(JointCoupling)

@@ -42,14 +42,13 @@ target_sources(${TARGET}
         src/CfgReader.cpp
         src/convert.cpp
 
-    # TODO: Make convert.h private if it is not used anywhere outside
-    # PRIVATE
-    #     FILE_SET private_headers
-    #     TYPE HEADERS
-    #     BASE_DIRS
-    #         include
-    #     FILES
-    #         include/convert.h
+    PRIVATE
+        FILE_SET private_headers
+        TYPE HEADERS
+        BASE_DIRS
+            include
+        FILES
+            include/convert.h
 
     PUBLIC
         FILE_SET public_headers
@@ -58,7 +57,6 @@ target_sources(${TARGET}
             include
         FILES
             include/CfgReader.h
-            include/convert.h
 )
 
 # Компонуемся с библиотеками Qt6

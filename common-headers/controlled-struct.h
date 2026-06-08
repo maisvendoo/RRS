@@ -1,9 +1,9 @@
 #ifndef CLIENT_CONTROL_STRUCT_H
 #define CLIENT_CONTROL_STRUCT_H
 
-#include <QBuffer>
 #include <QByteArray>
 #include <QDataStream>
+#include <QIODevice>
 
 #include <cstdint>
 
@@ -21,9 +21,7 @@ struct controlled_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << controlled_vehicle;
         stream << current_vehicle;
@@ -36,14 +34,12 @@ struct controlled_t final
             stream << key_id;
         }
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> controlled_vehicle;
         stream >> current_vehicle;

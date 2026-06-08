@@ -76,24 +76,4 @@ protected:
     state_vector_t output_signals = {};
 };
 
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef TrajectoryDevice* (*GetTrajectoryDevice)();
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_TRAJECTORY_DEVICE(ClassName) \
-extern "C" TrajectoryDevice *getTrajectoryDevice() \
-{ \
-        return new (ClassName) (); \
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" DEVICE_EXPORT TrajectoryDevice *loadTrajectoryDevice(QString lib_path);
-
 #endif // TRAJECTORYDEVICE_H

@@ -20,6 +20,7 @@
 #include    <Journal.h>
 #include    <JournalFile.h>
 #include    <vehicle-controller.h>
+#include    <core/load_module.h>
 
 //------------------------------------------------------------------------------
 //
@@ -799,7 +800,7 @@ void Model::initControlPanel(QString cfg_path)
 
         control_panel = nullptr;
         QString module_path = QString(fs.getPluginsDir().c_str()) + fs.separator() + module_name;
-        control_panel = loadInterfaceDevice(module_path);
+        control_panel = LOAD_MODULE(VirtualInterfaceDevice, module_path);
         if (control_panel == nullptr)
         {
             return;

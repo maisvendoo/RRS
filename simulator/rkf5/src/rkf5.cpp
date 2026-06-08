@@ -1,6 +1,8 @@
 #include    "rkf5.h"
 
-#include	<cmath>
+#include    <core/get_module.h>
+
+#include    <cmath>
 
 using namespace std;
 
@@ -168,4 +170,4 @@ void RKF5Solver::setODEsize(size_t n)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-GET_SOLVER(RKF5Solver)
+GET_MODULE(RKF5Solver)

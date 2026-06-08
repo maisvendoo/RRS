@@ -8,8 +8,8 @@ project (${TARGET})
 # Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
+# set(CMAKE_AUTORCC ON)
+# set(CMAKE_AUTOUIC ON)
 
 set (EXECUTABLE_OUTPUT_PATH "../../../bin")
 
@@ -35,3 +35,4 @@ target_link_libraries (${TARGET} Qt6::Widgets)
 target_link_libraries (${TARGET} Qt6::OpenGL)
 target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} display)
+target_link_libraries (${TARGET} core)

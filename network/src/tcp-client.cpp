@@ -1,9 +1,13 @@
 #include    <tcp-client.h>
+
 #include    <CfgReader.h>
-#include    <QTcpSocket>
-#include    <QNetworkProxy>
-#include    <QBuffer>
 #include    <simspeed-command.h>
+
+#include    <QByteArray>
+#include    <QDataStream>
+#include    <QIODevice>
+#include    <QNetworkProxy>
+#include    <QTcpSocket>
 
 //------------------------------------------------------------------------------
 //
@@ -57,9 +61,7 @@ void TcpClient::sendRequest(StructureType stype, double update_interval)
     network_data_t request;
     request.stype = stype;
 
-    QBuffer buff(&request.data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
 
     stream << update_interval;
 
@@ -167,9 +169,7 @@ void TcpClient::sendNewTrainName(int train_idx, const QString &new_name)
     network_data_t request;
     request.stype = STYPE_COMMAND_RENAME_TRAIN;
 
-    QBuffer buff(&request.data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
 
     stream << train_idx;
     stream << new_name;
@@ -379,9 +379,7 @@ void TcpClient::slotReceive()
     {
         if (is_first_data)
         {
-            QBuffer b(&recvBuff);
-            b.open(QIODevice::ReadOnly);
-            QDataStream stream(&b);
+            QDataStream stream(&recvBuff, QIODevice::ReadOnly);
 
             stream >> wait_data_size;
 

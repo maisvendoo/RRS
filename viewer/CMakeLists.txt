@@ -3,8 +3,8 @@ set (TARGET viewer)
 project (${TARGET})
 
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
+# set(CMAKE_AUTORCC ON)
+# set(CMAKE_AUTOUIC ON)
 
 set (EXECUTABLE_OUTPUT_PATH "../../bin")
 
@@ -35,6 +35,7 @@ target_compile_options(${TARGET} PRIVATE
 
 add_subdirectory (display)
 add_subdirectory (display-player)
+add_subdirectory (IO-controller)
 
 target_link_libraries(${TARGET} PRIVATE
     Qt6::Widgets
@@ -50,6 +51,7 @@ target_link_libraries(${TARGET} PRIVATE
     topology
     parsing
     graphics
+    core
 )
 
 target_include_directories(${TARGET} PRIVATE

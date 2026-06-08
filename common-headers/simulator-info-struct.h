@@ -1,10 +1,10 @@
 #ifndef     SIMULATOR_INFO_STRUCT_H
 #define     SIMULATOR_INFO_STRUCT_H
 
-#include    <QString>
 #include    <QByteArray>
-#include    <QBuffer>
 #include    <QDataStream>
+#include    <QIODevice>
+#include    <QString>
 
 //------------------------------------------------------------------------------
 //
@@ -18,22 +18,18 @@ struct simulator_route_info_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << latitude;
         stream << longitude;
         stream << route_dir_name;
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> latitude;
         stream >> longitude;
@@ -53,22 +49,18 @@ struct simulator_vehicle_info_t
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << vehicle_length;
         stream << vehicle_config_dir;
         stream << vehicle_config_file;
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> vehicle_length;
         stream >> vehicle_config_dir;
@@ -86,9 +78,7 @@ struct simulator_vehicles_info_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << static_cast<std::uint32_t>(vehicles.size());
 
@@ -97,14 +87,12 @@ struct simulator_vehicles_info_t final
             stream << vehicle.serialize();
         }
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray &data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         uint32_t num;
         stream >> num;

@@ -1,4 +1,6 @@
-#include	"ar265.h"
+#include    "ar265.h"
+
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -98,4 +100,4 @@ void AutoMode265::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "reduction_max", reduction_max);
 }
 
-GET_BRAKE_AUTOMODE(AutoMode265)
+GET_MODULE(AutoMode265)

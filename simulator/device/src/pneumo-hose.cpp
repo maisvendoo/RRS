@@ -1,5 +1,3 @@
-#include    <QLibrary>
-
 #include    "pneumo-hose.h"
 
 #include    "CfgReader.h"
@@ -254,26 +252,4 @@ void PneumoHose::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "Length", tmp);
     if (tmp > Physics::ZERO)
         output_signals[HOSE_OUTPUT_LENGTH] = tmp;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-PneumoHose *loadPneumoHose(QString lib_path)
-{
-    PneumoHose *hose = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetPneumoHose getPneumoHose = reinterpret_cast<GetPneumoHose>(lib.resolve("getPneumoHose"));
-
-        if (getPneumoHose)
-        {
-            hose = getPneumoHose();
-        }
-    }
-
-    return hose;
 }

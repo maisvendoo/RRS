@@ -1,5 +1,7 @@
 #include    "rk4.h"
 
+#include    <core/get_module.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -86,4 +88,4 @@ void RK4Solver::setODEsize(size_t n)
     Y1.resize(n);
 }
 
-GET_SOLVER(RK4Solver)
+GET_MODULE(RK4Solver)
