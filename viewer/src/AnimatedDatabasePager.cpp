@@ -23,18 +23,16 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
 {
     //LOG_INFO("AnimatedDatabasePager::start(%u)", numReadThreads);
 
-    auto readThread = [](AnimatedDatabasePager& animatedDatabasePager, const std::string& threadName,
-                         vsg::ref_ptr<vsg::ActivityStatus> animatedDatabasePager_status,
-                         vsg::ref_ptr<vsg::DatabaseQueue> animatedDatabasePager_requestQueue)
+    auto readThread = [](AnimatedDatabasePager& animatedDatabasePager, const std::string& threadName)
     {
         LOG_INFO("Started %s", threadName.c_str());
 
         //auto local_instrumentation = shareOrDuplicateForThreadSafety(animatedDatabasePager.instrumentation);
         //if (local_instrumentation) local_instrumentation->setThreadName(threadName);
 
-        while (animatedDatabasePager_status->active())
+        while (animatedDatabasePager.status->active())
         {
-            vsg::ref_ptr<vsg::PagedLOD> plod = animatedDatabasePager_requestQueue->take_when_available(/*animatedDatabasePager.frameCount.load()*/);
+            vsg::ref_ptr<vsg::PagedLOD> plod = animatedDatabasePager._requestQueue->take_when_available(animatedDatabasePager.frameCount.load());
             if (plod)
             {
                 //CPU_INSTRUMENTATION_L1_NC(animatedDatabasePager.instrumentation, "AnimatedDatabasePager read", COLOR_PAGER);
@@ -49,7 +47,7 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
                     continue;
                 }
 
-                /*++(plod->loadAttempts);*/
+                ++(plod->loadAttempts);
 
                 vsg::ref_ptr<vsg::Node> node = plod->pending;
                 if (!node)
@@ -192,25 +190,23 @@ void AnimatedDatabasePager::start(uint32_t numReadThreads)
         //LOG_INFO("Finished %s", threadName.c_str());
     };
 
-    auto deleteThread = [](const AnimatedDatabasePager& animatedDatabasePager, const std::string& threadName,
-                           vsg::ref_ptr<vsg::ActivityStatus> animatedDatabasePager_status,
-                           vsg::ref_ptr<vsg::DeleteQueue> animatedDatabasePager_deleteQueue)
+    auto deleteThread = [](const AnimatedDatabasePager& animatedDatabasePager, const std::string& threadName)
     {
         LOG_INFO("Started %s", threadName.c_str());
 
-        while (animatedDatabasePager_status->active())
+        while (animatedDatabasePager.status->active())
         {
-            animatedDatabasePager_deleteQueue->wait_then_clear();
+            animatedDatabasePager.deleteQueue->wait_then_clear();
         }
         //LOG_INFO("Finished %s", threadName.c_str());
     };
 
     for (uint32_t i = 0; i < numReadThreads; ++i)
     {
-        threads.emplace_back(readThread, std::ref(*this), vsg::make_string("AnimatedDatabasePager read thread ", i), _status, _requestQueue);
+        threads.emplace_back(readThread, std::ref(*this), vsg::make_string("AnimatedDatabasePager read thread ", i));
     }
 
-    threads.emplace_back(deleteThread, std::ref(*this), "AnimatedDatabasePager delete thread", _status, _deleteQueue);
+    threads.emplace_back(deleteThread, std::ref(*this), "AnimatedDatabasePager delete thread");
 }
 
 //------------------------------------------------------------------------------
