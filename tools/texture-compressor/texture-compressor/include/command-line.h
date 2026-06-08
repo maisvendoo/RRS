@@ -1,21 +1,37 @@
 #ifndef     COMMAND_LINE_H
 #define     COMMAND_LINE_H
 
-#include    <optional>
 #include    <string>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+template <class T>
+struct option_t
+{
+    T       value;
+    bool    is_present;
+
+    option_t()
+        : value(T())
+        , is_present(false)
+    {
+
+    }
+};
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct command_line_t
 {
-    std::optional<std::string> model_path;
+    option_t<std::string> model_path;
     bool generate_mipmaps = false;
-    std::optional<std::string> skip_textures;
+    option_t<std::string> skip_textures;
     bool overwrite_gltf = false;
     bool ignore_existed = false;
     bool delete_src = false;
     bool extract = false;
 };
 
-#endif // COMMAND_LINE_H
+#endif

@@ -61,7 +61,7 @@
 #include <mutex>
 #include <string>
 
-#define SHOW_WINDOW(setting_name) if (settings.setting_name) setting_name()
+#define SHOW_WINDOW(setting_name) if (gui_settings.setting_name) setting_name()
 
 static bool drag_double(const char* label, double* data,
     const double* min = nullptr)
@@ -89,12 +89,12 @@ EditorGui::EditorGui(EditorContext& context)
     const char* const font_name = "JetBrainsMono-Regular.ttf";
     const auto font_path = fs.combinePath(fs.getFontsDir(), font_name);
 
-    io.Fonts->AddFontFromFileTTF(font_path.c_str(), context.settings.gui_font_size,
+    io.Fonts->AddFontFromFileTTF(font_path.c_str(), context.settings.gui_settings.font_size,
         nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    if (!context.settings.is_gui_editable)
+    if (!context.settings.gui_settings.is_editable)
     {
         window_flags_ |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     }
@@ -127,18 +127,18 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
         }
         default:
         {
-            settings_t& settings = context_.settings;
+            gui_settings_t& gui_settings = context_.settings.gui_settings;
 
             ImGui::Begin("Settings", nullptr, window_flags_);
-            ImGui::Checkbox("Show objects.ref", &settings.show_objects_ref);
-            ImGui::Checkbox("Show route1.map", &settings.show_route_map);
-            ImGui::Checkbox("Show stations", &settings.show_stations_conf);
-            ImGui::Checkbox("Show waypoints", &settings.show_waypoints_conf);
-            ImGui::Checkbox("Show key bindings", &settings.show_key_bindings);
-            ImGui::Checkbox("Show camera settings", &settings.show_camera_settings);
-            ImGui::Checkbox("Show topology", &settings.show_topology);
-            ImGui::Checkbox("Show selected objects properties", &settings.show_selected_objects_properties);
-            ImGui::Checkbox("Show commands", &settings.show_commands);
+            ImGui::Checkbox("Show objects.ref", &gui_settings.show_objects_ref);
+            ImGui::Checkbox("Show route1.map", &gui_settings.show_route_map);
+            ImGui::Checkbox("Show stations", &gui_settings.show_stations_conf);
+            ImGui::Checkbox("Show waypoints", &gui_settings.show_waypoints_conf);
+            ImGui::Checkbox("Show key bindings", &gui_settings.show_key_bindings);
+            ImGui::Checkbox("Show camera settings", &gui_settings.show_camera_settings);
+            ImGui::Checkbox("Show topology", &gui_settings.show_topology);
+            ImGui::Checkbox("Show selected objects properties", &gui_settings.show_selected_objects_properties);
+            ImGui::Checkbox("Show commands", &gui_settings.show_commands);
             ImGui::End();
 
             ImGui::ShowDemoWindow();
@@ -470,21 +470,21 @@ void EditorGui::show_camera_settings() const
     constexpr double min = 0.0;
 
     ImGui::Text("Move speed:");
-    drag_double("##move_speed", &context_.settings.camera_move_speed, &min);
+    drag_double("##move_speed", &context_.settings.camera_settings.move_speed, &min);
 
     ImGui::Text("Rotate speed:");
-    drag_double("##rotate_speed", &context_.settings.camera_rotate_speed, &min);
+    drag_double("##rotate_speed", &context_.settings.camera_settings.rotate_speed, &min);
 
     ImGui::Text("Zoom power:");
-    drag_double("##zoom_power", &context_.settings.camera_zoom_power, &min);
+    drag_double("##zoom_power", &context_.settings.camera_settings.zoom_power, &min);
 
     ImGui::Text("FovY:");
 
     settings_t& settings = context_.settings;
-    if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &settings.fovy,
-        &settings.fovy_min, &settings.fovy_max, "%.3f"))
+    if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &settings.camera_settings.fovy,
+        &settings.camera_settings.fovy_min, &settings.camera_settings.fovy_max, "%.3f"))
     {
-        context_.perspective->fieldOfViewY = settings.fovy;
+        context_.perspective->fieldOfViewY = settings.camera_settings.fovy;
     }
 
     ImGui::End();

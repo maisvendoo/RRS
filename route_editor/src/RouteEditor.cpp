@@ -64,7 +64,7 @@ bool RouteEditor::initialize()
 
     configure_shaders();
 
-    window_handler_ = WindowHandler::create(context_.settings.window,
+    window_handler_ = WindowHandler::create(context_.settings.window_settings,
         context_.window, context_.perspective, context_.camera);
 
     if (!context_.window)
@@ -77,11 +77,22 @@ bool RouteEditor::initialize()
     auto undo_redo_save_handler = UndoRedoSaveHandler::create(
         context_.keyboard_handler, context_.commands, context_.route_dir,
         context_.static_objects_mutex, context_.static_objects);
-    context_.camera_handler = CameraHandler::create(context_);
-    context_.intersection_handler = IntersectionHandler::create(context_);
+
+    context_.camera_handler = CameraHandler::create(
+        context_.settings.camera_settings,
+        context_.perspective,
+        context_.look_at,
+        context_.camera,
+        context_.window->extent2D(),
+        context_.mouse_handler,
+        context_.keyboard_handler,
+        context_.delta_time
+    );
+
+    context_.intersection_handler = IntersectionHandler::create(context_.camera);
     context_.scene_graph = SceneGraph::create(context_);
 
-    context_.outline_builder = OutlineBuilder::create(context_);
+    context_.outline_builder = OutlineBuilder::create();
 
     const auto scene_view = vsg::View::create(context_.camera, context_.scene_graph);
     scene_view->mask = MASK_SCENE;
@@ -141,7 +152,7 @@ bool RouteEditor::initialize()
     viewer_->assignRecordAndSubmitTaskAndPresentation({command_graph});
 
     const uint32_t num_lights = static_cast<uint32_t>(
-        context_.settings.window.num_lights);
+        context_.settings.scene_settings.num_lights);
 
     auto resource_hints = vsg::ResourceHints::create();
     resource_hints->numLightsRange = {num_lights, num_lights + 1};

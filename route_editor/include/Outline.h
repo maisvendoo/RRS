@@ -19,14 +19,12 @@ class PagedLOD;
 class OutlineBuilder : public vsg::Inherit<vsg::Object, OutlineBuilder>
 {
 public:
-    OutlineBuilder(const EditorContext& context);
+    OutlineBuilder();
 
     vsg::ref_ptr<vsg::Node> create_outline(
         vsg::ref_ptr<vsg::PagedLOD> paged_lod);
 
 private:
-    const EditorContext& context_;
-
     vsg::ref_ptr<vsg::Options> options_;
     vsg::Builder builder_;
 };

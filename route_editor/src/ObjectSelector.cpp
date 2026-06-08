@@ -32,7 +32,7 @@
 ObjectSelector::ObjectSelector(EditorContext& context)
     : context_(context)
 {
-    context.gizmo = Gizmo::create(context);
+    context.gizmo = Gizmo::create(context, context.settings.gizmo_settings, context.intersection_handler);
 
     front_plane_switch_ = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);

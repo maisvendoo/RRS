@@ -2,73 +2,26 @@
 #define EDITOR_SETTINGS_H
 
 #include "KeyBinding.h"
-
-#include <vsg/maths/vec3.h>
+#include "settings/CameraSettings.h"
+#include "settings/GizmoSettings.h"
+#include "settings/GuiSettings.h"
+#include "settings/SceneSettings.h"
+#include "settings/WindowSettings.h"
 
 #include <string>
 
-class CfgReader;
-
-struct window_settings_t
-{
-    window_settings_t();
-
-    void read(CfgReader& cfg);
-
-    std::string title;
-    int x;
-    int y;
-    int width;
-    int height;
-    int screen_number;
-    bool fullscreen;
-    bool vsync;
-    bool double_buffer;
-    int samples;
-    // TODO: Move from window settings
-    int num_lights;
-};
-
 struct settings_t
 {
-    settings_t();
-
-    void read(const std::string& cfg_path);
-
-    window_settings_t window;
-
-    double zNear;            ///< Near clip plane
-    double view_distance;    ///< View distance
-    double fovy;             ///< Vertical view angle
-    double fovy_min;         ///< Vertical view angle min
-    double fovy_max;         ///< Vertical view angle max
-
-    double camera_initial_height;
-    double camera_move_speed;
-    double camera_rotate_speed;
-    double camera_zoom_power;
-
-    float gizmo_arrow_length;
-    float gizmo_arrow_thickness;
-    vsg::vec3 gizmo_arrow_x_color;
-    vsg::vec3 gizmo_arrow_y_color;
-    vsg::vec3 gizmo_arrow_z_color;
-    float gizmo_opacity;
-    bool gizmo_to_center;
-
-    float gui_font_size;
-    bool is_gui_editable;
-    bool show_objects_ref;
-    bool show_route_map;
-    bool show_stations_conf;
-    bool show_waypoints_conf;
-    bool show_key_bindings;
-    bool show_camera_settings;
-    bool show_topology;
-    bool show_selected_objects_properties;
-    bool show_commands;
+    window_settings_t window_settings;
+    scene_settings_t scene_settings;
+    camera_settings_t camera_settings;
+    gizmo_settings_t gizmo_settings;
+    gui_settings_t gui_settings;
 
     KeyBindings key_bindings;
+
+    settings_t();
+    void read(const std::string& cfg_path);
 };
 
 #endif // EDITOR_SETTINGS_H

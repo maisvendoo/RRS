@@ -1,28 +1,10 @@
 #include    "topologycheck.h"
-
-#include    "Logger.h"
 #include    "command-line.h"
-#include    "switch.h"
-#include    "topology.h"
+#include    "Logger.h"
 
 #include    <QString>
 #include    <QDir>
-
-#include    <algorithm>
-#include    <memory>
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-TopologyCheck::TopologyCheck()
-    : topology{std::make_unique<Topology>()}
-{
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-TopologyCheck::~TopologyCheck() = default;
+#include <algorithm>
 
 //------------------------------------------------------------------------------
 //
@@ -102,14 +84,14 @@ void TopologyCheck::parse_command_line(cli::Parser &parser)
     cmd_line.route_path = parser.get<std::string>("r");
     cmd_line.minimum_curve_radius = parser.get<double>("c");
 
-    if (cmd_line.minimum_curve_radius.has_value())
+    if (cmd_line.minimum_curve_radius.isPresent())
     {
-        maximum_curvature = 1.0 / std::max(1.0, cmd_line.minimum_curve_radius.value());
+        maximum_curvature = 1.0 / std::max(1.0, cmd_line.minimum_curve_radius.value);
     }
 
-    if (cmd_line.route_path.has_value())
+    if (cmd_line.route_path.isPresent())
     {
-        route_path = cmd_line.route_path.value();
+        route_path = cmd_line.route_path.value;
         return;
     }
 

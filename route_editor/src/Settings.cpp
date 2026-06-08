@@ -18,78 +18,7 @@
 #include <map>
 #include <string>
 
-window_settings_t::window_settings_t()
-    : title{"Route Editor"}
-    , x{50}
-    , y{50}
-    , width{1280}
-    , height{720}
-    , screen_number{0}
-    , fullscreen{false}
-    , vsync{true}
-    , double_buffer{true}
-    , samples{1}
-    , num_lights{200}
-{
-}
-
-void window_settings_t::read(CfgReader& cfg)
-{
-    const QString section = "Window";
-
-    QString temp_qstr = title.c_str();
-    if (cfg.getString(section, "Title", temp_qstr))
-    {
-        title = temp_qstr.toStdString();
-    }
-
-    cfg.getInt(section, "xPos", x);
-    cfg.getInt(section, "yPos", y);
-    cfg.getInt(section, "Width", width);
-    cfg.getInt(section, "Height", height);
-
-    int temp_int = screen_number;
-    cfg.getInt(section, "ScreenNumber", temp_int);
-    if (temp_int >= 0)
-    {
-        screen_number = temp_int;
-    }
-
-    cfg.getBool(section, "FullScreen", fullscreen);
-    cfg.getBool(section, "VSync", vsync);
-    cfg.getBool(section, "DoubleBuffer", double_buffer);
-    cfg.getInt(section, "Samples", samples);
-    cfg.getInt(section, "NumLights", num_lights);
-}
-
 settings_t::settings_t()
-    : zNear(0.1)
-    , view_distance(2000.0)
-    , fovy(60.0)
-    , fovy_min(2.0)
-    , fovy_max(100.0)
-    , camera_initial_height(0.0)
-    , camera_move_speed(100.0)
-    , camera_rotate_speed(3.0)
-    , camera_zoom_power(250.0)
-    , gizmo_arrow_length(5.0f)
-    , gizmo_arrow_thickness(0.1f)
-    , gizmo_arrow_x_color(1.0f, 0.0f, 0.0f)
-    , gizmo_arrow_y_color(0.0f, 1.0f, 0.0f)
-    , gizmo_arrow_z_color(0.0f, 0.0f, 1.0f)
-    , gizmo_opacity(1.0f)
-    , gizmo_to_center(false)
-    , gui_font_size(20.0f)
-    , is_gui_editable(false)
-    , show_objects_ref(true)
-    , show_route_map(false)
-    , show_stations_conf(true)
-    , show_waypoints_conf(false)
-    , show_key_bindings(true)
-    , show_camera_settings(false)
-    , show_topology(false)
-    , show_selected_objects_properties(true)
-    , show_commands(true)
 {
 }
 
@@ -101,51 +30,13 @@ void settings_t::read(const std::string& cfg_path)
         return;
     }
 
-    window.read(cfg);
+    window_settings.read(cfg);
+    scene_settings.read(cfg);
+    camera_settings.read(cfg);
+    gizmo_settings.read(cfg);
+    gui_settings.read(cfg);
 
-    QString section = "Camera";
-
-    cfg.getDouble(section, "zNear", zNear);
-    cfg.getDouble(section, "ViewDistance", view_distance);
-    cfg.getDouble(section, "FovY", fovy);
-    cfg.getDouble(section, "FovYMin", fovy_min);
-    cfg.getDouble(section, "FovYMax", fovy_max);
-    cfg.getDouble(section, "InitialHeight", camera_initial_height);
-    cfg.getDouble(section, "MoveSpeed", camera_move_speed);
-    cfg.getDouble(section, "RotateSpeed", camera_rotate_speed);
-    cfg.getDouble(section, "ZoomPower", camera_zoom_power);
-
-    section = "Gizmo";
-
-    cfg.getFloat(section, "ArrowLength", gizmo_arrow_length);
-    cfg.getFloat(section, "ArrowThickness", gizmo_arrow_thickness);
-    cfg.getFloat(section, "XAxisColorR", gizmo_arrow_x_color.r);
-    cfg.getFloat(section, "XAxisColorG", gizmo_arrow_x_color.g);
-    cfg.getFloat(section, "XAxisColorB", gizmo_arrow_x_color.b);
-    cfg.getFloat(section, "YAxisColorR", gizmo_arrow_y_color.r);
-    cfg.getFloat(section, "YAxisColorG", gizmo_arrow_y_color.g);
-    cfg.getFloat(section, "YAxisColorB", gizmo_arrow_y_color.b);
-    cfg.getFloat(section, "ZAxisColorR", gizmo_arrow_z_color.r);
-    cfg.getFloat(section, "ZAxisColorG", gizmo_arrow_z_color.g);
-    cfg.getFloat(section, "ZAxisColorB", gizmo_arrow_z_color.b);
-    cfg.getFloat(section, "Opacity", gizmo_opacity);
-    cfg.getBool(section, "ToCenter", gizmo_to_center);
-
-    section = "GUI";
-
-    cfg.getFloat(section, "FontSize", gui_font_size);
-    cfg.getBool(section, "IsEditable", is_gui_editable);
-    cfg.getBool(section, "ShowObjectsRef", show_objects_ref);
-    cfg.getBool(section, "ShowRouteMap", show_route_map);
-    cfg.getBool(section, "ShowStationsConf", show_stations_conf);
-    cfg.getBool(section, "ShowWaypointsConf", show_waypoints_conf);
-    cfg.getBool(section, "ShowKeyBindings", show_key_bindings);
-    cfg.getBool(section, "ShowCameraSettings", show_camera_settings);
-    cfg.getBool(section, "ShowTopology", show_topology);
-    cfg.getBool(section, "ShowSelectedObjectsProperties", show_selected_objects_properties);
-    cfg.getBool(section, "ShowCommands", show_commands);
-
-    section = "Keys";
+    QString section = "Keys";
 
     using ActionSettingNameMap = std::map<Action, const char*>;
     using ActionSettingNamePair = ActionSettingNameMap::value_type;
