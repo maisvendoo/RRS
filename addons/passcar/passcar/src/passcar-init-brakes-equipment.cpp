@@ -8,6 +8,7 @@
 #include "pneumo-anglecock.h"
 #include "pneumo-hose-epb.h"
 #include "reservoir.h"
+#include "core/load_module.h"
 
 //------------------------------------------------------------------------
 //
@@ -22,13 +23,12 @@ void PassCar::initBrakesEquipment(const QString& modules_dir, const QString& cus
     brakepipe->setLeakCoeff(bp_leak);
 
     // Воздухораспределитель
-    air_dist = loadAirDistributor(
-                modules_dir + QDir::separator() + air_dist_module);
+    air_dist = LOAD_MODULE(AirDistributor, modules_dir + QDir::separator() + air_dist_module);
     air_dist->read_config(air_dist_config);
 
     // Электровоздухораспределитель
-    electro_air_dist = loadElectroAirDistributor(
-                modules_dir + QDir::separator() + electro_air_dist_module);
+    electro_air_dist = LOAD_MODULE(ElectroAirDistributor,
+        modules_dir + QDir::separator() + electro_air_dist_module);
     if (electro_air_dist != nullptr)
         electro_air_dist->read_config(electro_air_dist_config);
 
@@ -52,15 +52,15 @@ void PassCar::initBrakesEquipment(const QString& modules_dir, const QString& cus
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 
     // Рукава тормозной магистрали
-    hose_bp_fwd = loadPneumoHoseEPB(
-                modules_dir + QDir::separator() + hose_bp_module);
+    hose_bp_fwd = LOAD_MODULE(PneumoHoseEPB,
+        modules_dir + QDir::separator() + hose_bp_module);
     if (hose_bp_fwd == nullptr)
         hose_bp_fwd = new PneumoHoseEPB();
     hose_bp_fwd->read_config(hose_bp_config);
     forward_connectors.push_back(hose_bp_fwd);
 
-    hose_bp_bwd = loadPneumoHoseEPB(
-                modules_dir + QDir::separator() + hose_bp_module);
+    hose_bp_bwd = LOAD_MODULE(PneumoHoseEPB,
+        modules_dir + QDir::separator() + hose_bp_module);
     if (hose_bp_bwd == nullptr)
         hose_bp_bwd = new PneumoHoseEPB();
     hose_bp_bwd->read_config(hose_bp_config);

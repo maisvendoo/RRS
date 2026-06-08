@@ -1,6 +1,7 @@
 #include    <freejoy.h>
 #include    <Journal.h>
 #include    <CfgReader.h>
+#include    <core/get_module.h>
 
 #include    <QDir>
 
@@ -160,4 +161,4 @@ bool FreeJoy::load_config(QString path)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-GET_INTERFACE_DEVICE(FreeJoy)
+GET_MODULE(FreeJoy)

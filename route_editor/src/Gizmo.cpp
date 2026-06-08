@@ -47,14 +47,16 @@ static constexpr vsg::dvec3 X_AXIS_POSITIVEd = {1.0, 0.0, 0.0};
 static constexpr vsg::dvec3 Y_AXIS_POSITIVEd = {0.0, 1.0, 0.0};
 static constexpr vsg::dvec3 Z_AXIS_POSITIVEd = {0.0, 0.0, 1.0};
 
-Gizmo::Gizmo(EditorContext& context)
+Gizmo::Gizmo(EditorContext& context, gizmo_settings_t& gizmo_settings, vsg::ref_ptr<IntersectionHandler>& intersection_handler)
     : context_(context)
+    , gizmo_settings(gizmo_settings)
+    , intersection_handler(intersection_handler)
 {
     builder_.shaderSet = vsg::createFlatShadedShaderSet();
 
-    const vsg::vec3 arrow_x_color = context.settings.gizmo_arrow_x_color;
-    const vsg::vec3 arrow_y_color = context.settings.gizmo_arrow_y_color;
-    const vsg::vec3 arrow_z_color = context.settings.gizmo_arrow_z_color;
+    const vsg::vec3 arrow_x_color = gizmo_settings.arrow_x_color;
+    const vsg::vec3 arrow_y_color = gizmo_settings.arrow_y_color;
+    const vsg::vec3 arrow_z_color = gizmo_settings.arrow_z_color;
 
     const float plane_width = 1.0e6f;
     const float line_thickness = 0.01f;
@@ -77,9 +79,9 @@ Gizmo::Gizmo(EditorContext& context)
     const auto create_arrow = [&](vsg::vec3 direction,
         vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
     {
-        float thickness = context.settings.gizmo_arrow_thickness;
-        const float length = context.settings.gizmo_arrow_length;
-        const float opacity = context.settings.gizmo_opacity;
+        float thickness = gizmo_settings.arrow_thickness;
+        const float length = gizmo_settings.arrow_length;
+        const float opacity = gizmo_settings.opacity;
 
         vsg::box box = {
             vsg::vec3(-thickness, -thickness, 0.0f),
@@ -128,7 +130,7 @@ Gizmo::Gizmo(EditorContext& context)
     {
         const float width = plane_width;
         const float thickness = line_thickness;
-        const float opacity = context.settings.gizmo_opacity;
+        const float opacity = gizmo_settings.opacity;
 
         const vsg::box box = {
             vsg::vec3(-thickness, -thickness, -width),
@@ -182,8 +184,7 @@ Gizmo::Gizmo(EditorContext& context)
 
 bool Gizmo::handle_intersections()
 {
-    const auto intersector =
-        context_.intersection_handler->get_lmb_intersector();
+    const auto intersector = intersection_handler->get_lmb_intersector();
 
     if (!intersector)
     {
@@ -192,8 +193,7 @@ bool Gizmo::handle_intersections()
 
     this->accept(*intersector);
 
-    const auto intersection =
-        context_.intersection_handler->get_closest_intersection(intersector);
+    const auto intersection = intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {
@@ -343,7 +343,7 @@ void Gizmo::update_position()
 {
     curr_pos_ = {0.0, 0.0, 0.0};
 
-    if (context_.settings.gizmo_to_center)
+    if (context_.settings.gizmo_settings.to_center)
     {
         for (const auto& object : context_.selected_objects)
         {

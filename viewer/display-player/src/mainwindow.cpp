@@ -1,10 +1,12 @@
 #include    "mainwindow.h"
 
+#include    <core/load_module.h>
+
 #include    <QVBoxLayout>
 
 MainWindow::MainWindow(QString& module_path, QString& config_path, QWidget* parent) : QWidget(parent)
 {
-    display = loadDisplay(module_path);
+    display = LOAD_MODULE(AbstractDisplay, module_path);
     display->setConfigDir(config_path);
     display->init();
 

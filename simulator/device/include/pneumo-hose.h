@@ -99,35 +99,4 @@ protected:
     virtual void load_config(CfgReader &cfg) override;
 };
 
-/*!
- * \typedef
- * \brief getPneumoHose() signature
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef PneumoHose* (*GetPneumoHose)();
-
-/*!
- * \def
- * \brief Macro for getPneumoHose() generation
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_PNEUMO_HOSE(ClassName) \
-    extern "C" Q_DECL_EXPORT PneumoHose *getPneumoHose() \
-    {\
-        return new (ClassName)(); \
-    }
-
-/*!
- * \fn
- * \brief Load PneumoHose from library
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT PneumoHose *loadPneumoHose(QString lib_path);
-
 #endif // PNEUMO_HOSE_H

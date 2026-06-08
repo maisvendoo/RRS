@@ -1,5 +1,7 @@
 #include    <vl60-autopilot.h>
 
+#include    <core/get_module.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -344,4 +346,4 @@ void VL60Autopilot::slotDelayTimer()
     delay->stop();
 }
 
-GET_AUTOPILOT(VL60Autopilot)
+GET_MODULE(VL60Autopilot)

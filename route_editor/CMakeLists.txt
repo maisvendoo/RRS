@@ -1,31 +1,24 @@
 cmake_minimum_required(VERSION 3.23)
 
-set(TARGET route_editor)
-
-project(${TARGET})
+project(route_editor)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_AUTOMOC ON)
-# set(CMAKE_AUTORCC ON)
-# set(CMAKE_AUTOUIC ON)
-
-# TODO: Think how to replace
-set(EXECUTABLE_OUTPUT_PATH "../../bin")
-
-# find_package(Qt6 COMPONENTS Widgets Xml REQUIRED)
+find_package(Qt6 COMPONENTS Core REQUIRED)
 find_package(vsg REQUIRED)
 find_package(vsgXchange REQUIRED)
 find_package(vsgImGui REQUIRED)
 
-add_executable(${TARGET})
+set(EXECUTABLE_OUTPUT_PATH "../../bin")
+
+add_executable(route_editor)
 
 file(GLOB_RECURSE INCLUDES "./include/*.h")
 file(GLOB_RECURSE SOURCES "./src/*.cpp")
 
-target_sources(${TARGET}
+target_sources(route_editor
     PRIVATE
         ${SOURCES}
 
@@ -37,23 +30,22 @@ target_sources(${TARGET}
             ${INCLUDES}
 )
 
-target_link_libraries(${TARGET}
+target_link_libraries(route_editor
     PRIVATE
-        # Qt6::Widgets
-        # Qt6::Xml
+        Qt6::Core
         vsg::vsg
         vsgXchange::vsgXchange
         vsgImGui::vsgImGui
         CfgReader
         Journal
+        core
         filesystem
-        topology
         graphics
-        # parsing
+        topology
 )
 
 if(MSVC)
-    target_compile_options(${TARGET} PRIVATE /W3)
+    target_compile_options(route_editor PRIVATE /W3)
 else()
-    target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(route_editor PRIVATE -Wall -Wextra -Wpedantic)
 endif()

@@ -1,6 +1,7 @@
 #include    "sa3.h"
 
 #include    "physics.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -83,4 +84,4 @@ void CouplingSA3::load_config(CfgReader &cfg)
     cfg.getString(secName, "Name", name);
 }
 
-GET_COUPLING(CouplingSA3)
+GET_MODULE(CouplingSA3)

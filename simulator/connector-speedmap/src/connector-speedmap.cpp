@@ -1,5 +1,7 @@
 #include    "connector-speedmap.h"
 
+#include    <core/get_module.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -26,4 +28,4 @@ void ConnectorSpeedMap::load_config(CfgReader &cfg)
     cfg.getString(secName, "Name", name);
 }
 
-GET_CONNECTOR_DEVICE(ConnectorSpeedMap)
+GET_MODULE(ConnectorSpeedMap)

@@ -1,8 +1,8 @@
 #include    "krm395.h"
 
-#include    "physics.h"
 #include    "key-symbols.h"
 #include    "timer.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -297,4 +297,4 @@ void BrakeCrane395::dec()
     setHandlePosition(new_pos);
 }
 
-GET_BRAKE_CRANE(BrakeCrane395)
+GET_MODULE(BrakeCrane395)

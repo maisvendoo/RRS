@@ -7,6 +7,7 @@
 #include    <kme-60-044.h>
 #include    <brake-crane.h>
 #include    <loco-crane.h>
+#include    <core/load_module.h>
 
 //------------------------------------------------------------------------------
 //
@@ -17,9 +18,10 @@ void VL60k::initAutopilot(const QString& modules_dir,
     // Модули автоведения
     for (auto cab_idx : {CAB1, CAB2})
     {
-        Autopilot *autopilot = loadAutopilot(modules_dir + QDir::separator()
-                                             + custom_modules_dir + QDir::separator() +
-                                             autopilot_module_name);
+        Autopilot* autopilot = LOAD_MODULE(Autopilot,
+            modules_dir + QDir::separator() +
+            custom_modules_dir + QDir::separator() +
+            autopilot_module_name);
 
         if (autopilot != nullptr)
         {
@@ -101,12 +103,12 @@ void VL60k::OnAutopilot()
     // Делаем автозапуск
     if (controller[CAB1]->isReversHandle())
     {
-        initAutostartProgram(CAB1);        
+        initAutostartProgram(CAB1);
     }
 
     if (controller[CAB2]->isReversHandle())
     {
-        initAutostartProgram(CAB2);        
+        initAutostartProgram(CAB2);
     }
 
     autoStartTimer->start();

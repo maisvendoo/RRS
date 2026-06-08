@@ -41,35 +41,4 @@ protected:
     virtual void load_config(CfgReader &cfg);
 };
 
-/*!
- * \typedef
- * \brief getJoint() signature
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef Joint* (*GetJoint)();
-
-/*!
- * \def
- * \brief Macro for getJoint() generation
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_JOINT(ClassName) \
-    extern "C" Joint *getJoint() \
-    {\
-        return new (ClassName)(); \
-    }
-
-/*!
- * \fn
- * \brief Load joint from library
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" DEVICE_EXPORT Joint *loadJoint(QString lib_path);
-
 #endif // JOINT_H

@@ -1,16 +1,20 @@
-#include    <physics.h>
-#include    <signal-command.h>
 #include    <mainwindow.h>
-#include    <rail-signal.h>
 #include    <ui_mainwindow.h>
 
 #include    <CfgReader.h>
-#include    <QPainter>
-#include    <QMenu>
+#include    <physics.h>
+#include    <rail-signal.h>
+#include    <signal-command.h>
 #include    <switch.h>
 #include    <switch-state.h>
-#include    <QInputDialog>
+
+#include    <QByteArray>
 #include    <QClipboard>
+#include    <QDataStream>
+#include    <QIODevice>
+#include    <QInputDialog>
+#include    <QMenu>
+#include    <QPainter>
 #include    <styles.h>
 #include    <filesystem.h>
 
@@ -1027,9 +1031,7 @@ void MainWindow::slotGetTrajBusyState(QByteArray &busy_data)
 //------------------------------------------------------------------------------
 void MainWindow::slotUpdateSignal(QByteArray signal_data)
 {
-    QBuffer buff(&signal_data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&signal_data, QIODevice::ReadOnly);
 
     QString conn_name = "";
     int8_t signal_dir = 0;

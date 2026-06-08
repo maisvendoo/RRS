@@ -27,6 +27,21 @@ std::string to_std_string(const QString& str)
     return str.toStdString();
 }
 
+std::string to_std_string(bool value)
+{
+    return std::string{value ? "true" : "false"};
+}
+
+std::string to_std_string(int value)
+{
+    return std::to_string(value);
+}
+
+std::string to_std_string(double value)
+{
+    return std::to_string(value);
+}
+
 QString to_qstring(const char* str)
 {
     assert(str != nullptr);
@@ -46,6 +61,21 @@ QString to_qstring(std::string_view str)
 const QString& to_qstring(const QString& str)
 {
     return str;
+}
+
+QString to_qstring(bool value)
+{
+    return QString{value ? "true" : "false"};
+}
+
+QString to_qstring(int value)
+{
+    return QString::number(value);
+}
+
+QString to_qstring(double value)
+{
+    return QString::number(value);
 }
 
 bool string_is_empty(const char* str)

@@ -1,10 +1,8 @@
 #include "CameraHandler.h"
 
 #include "Action.h"
-#include "EditorContext.h"
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
-#include "Settings.h"
 
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
@@ -64,28 +62,40 @@ static int get_binding_state(vsg::ref_ptr<KeyboardHandler> keyboard_handler,
     return static_cast<int>(keyboard_handler->get_binding_state(action));
 }
 
-CameraHandler::CameraHandler(EditorContext& context)
-    : context_(context)
+CameraHandler::CameraHandler(
+    const camera_settings_t& camera_settings,
+    vsg::ref_ptr<vsg::Perspective>& perspective,
+    vsg::ref_ptr<vsg::LookAt>& look_at,
+    vsg::ref_ptr<vsg::Camera>& camera,
+    VkExtent2D window_extent,
+    vsg::ref_ptr<MouseHandler>& mouse_handler,
+    vsg::ref_ptr<KeyboardHandler>& keyboard_handler,
+    double& delta_time
+)
+    : camera_settings(camera_settings)
+    , perspective(perspective)
+    , look_at(look_at)
+    , camera(camera)
+    , mouse_handler(mouse_handler)
+    , keyboard_handler(keyboard_handler)
+    , delta_time(delta_time)
 {
-    const settings_t& settings = context.settings;
-    const VkExtent2D window_extent = context.window->extent2D();
-
-    context.perspective = vsg::Perspective::create(
-        settings.fovy,
+    perspective = vsg::Perspective::create(
+        camera_settings.fovy,
         static_cast<double>(window_extent.width) /
             static_cast<double>(window_extent.height),
-        settings.zNear,
-        settings.view_distance
+        camera_settings.zNear,
+        camera_settings.view_distance
     );
 
-    const double initial_height = settings.camera_initial_height;
+    const double initial_height = camera_settings.initial_height;
 
-    context.look_at = vsg::LookAt::create(
+    look_at = vsg::LookAt::create(
         vsg::dvec3(0.0, 0.0, initial_height),
         vsg::dvec3(0.0, 1.0, initial_height),
         vsg::dvec3(0.0, 0.0, 1.0));
 
-    context.camera = vsg::Camera::create(context.perspective, context.look_at,
+    camera = vsg::Camera::create(perspective, look_at,
         vsg::ViewportState::create(window_extent));
 
     calculate_front();
@@ -100,12 +110,12 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    if (context_.mouse_handler->get_is_rmb_pressed())
+    if (mouse_handler->get_is_rmb_pressed())
     {
         const vsg::ivec2 delta_mouse_pos =
-            context_.mouse_handler->get_delta_pos();
+            mouse_handler->get_delta_pos();
 
-        const double rotate_speed = context_.settings.camera_rotate_speed * context_.delta_time;
+        const double rotate_speed = camera_settings.rotate_speed;
 
         yaw_deg_ += delta_mouse_pos.x * rotate_speed;
 
@@ -125,27 +135,22 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
         return;
     }
 
-    const settings_t& settings = context_.settings;
+    const double zoom_power = camera_settings.zoom_power;
 
-    const double zoom_power = settings.camera_zoom_power * context_.delta_time;
-
-    double& fovy = context_.perspective->fieldOfViewY;
+    double& fovy = perspective->fieldOfViewY;
     fovy -= scrollWheel.delta.y * zoom_power;
-    fovy = std::clamp(fovy, settings.fovy_min, settings.fovy_max);
+    fovy = std::clamp(fovy, camera_settings.fovy_min, camera_settings.fovy_max);
 }
 
 void CameraHandler::apply(vsg::FrameEvent&)
 {
-    if (!context_.mouse_handler->get_is_rmb_pressed())
+    if (!mouse_handler->get_is_rmb_pressed())
     {
         return;
     }
 
-    const double move_speed = context_.settings.camera_move_speed *
-        context_.delta_time;
-
-    const auto look_at = context_.look_at;
-    const auto keyboard_handler = context_.keyboard_handler;
+    const double move_speed = camera_settings.move_speed *
+        delta_time;
 
     look_at->eye += front_ * move_speed * static_cast<double>(
         get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_FORWARD) -
@@ -182,7 +187,7 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
 {
     constexpr double angle_rad = vsg::radians(80.0);
 
-    const vsg::dvec3& camera_pos = context_.look_at->eye;
+    const vsg::dvec3& camera_pos = look_at->eye;
 
     const auto get_dir = [&](int yaw_dir, int pitch_dir) -> vsg::dvec3
     {
@@ -232,7 +237,7 @@ void CameraHandler::calculate_front()
 
 void CameraHandler::calculate_right()
 {
-    right_ = vsg::normalize(vsg::cross(front_, context_.look_at->up));
+    right_ = vsg::normalize(vsg::cross(front_, look_at->up));
 }
 
 void CameraHandler::calculate_up()

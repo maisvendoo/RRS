@@ -2,6 +2,7 @@
 #include    "trajectory-ALSN.h"
 #include    "switch.h"
 #include    "train-signal.h"
+#include    <core/get_module.h>
 
 //------------------------------------------------------------------------------
 //
@@ -98,4 +99,4 @@ void ConnectorALSN::load_config(CfgReader &cfg)
     cfg.getString(secName, "Name", name);
 }
 
-GET_CONNECTOR_DEVICE(ConnectorALSN)
+GET_MODULE(ConnectorALSN)

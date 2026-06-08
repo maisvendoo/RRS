@@ -14,6 +14,7 @@
 #include    "vl60pk.h"
 #include    "vl60-signals.h"
 #include    "filesystem.h"
+#include    <core/get_module.h>
 
 #include    <QDir>
 
@@ -135,7 +136,7 @@ void VL60pk::step(const double &t, const double &dt)
 
     stepOtherEquipment(t, dt);
 
-    stepSafetyDevices(t, dt);    
+    stepSafetyDevices(t, dt);
 
     autoStartTimer->step(t, dt);
 }
@@ -143,4 +144,4 @@ void VL60pk::step(const double &t, const double &dt)
 //------------------------------------------------------------------------------
 //  Макрос генерации функции loadVehicle() для симулятора
 //------------------------------------------------------------------------------
-GET_VEHICLE(VL60pk)
+GET_MODULE(VL60pk)

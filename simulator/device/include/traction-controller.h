@@ -19,20 +19,4 @@ protected:
 
 };
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef  TractionController* (*GetTractionController)();
-
-#define GET_TRACTION_CONTROLLER(ClassName) \
-    extern "C" Q_DECL_EXPORT TractionController *getTractionController() \
-    { \
-        return new (ClassName) (); \
-    }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" Q_DECL_EXPORT TractionController *loadTractionController(QString lib_path);
-
 #endif // TRACTION_CONTROLLER_H

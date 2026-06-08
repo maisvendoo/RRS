@@ -46,7 +46,7 @@ public:
     Device(QObject *parent = nullptr);
 
     /// Destructor
-    virtual ~Device();
+    virtual ~Device() override;
 
     /// Step of ODE system solving
     virtual void step(double t, double dt);

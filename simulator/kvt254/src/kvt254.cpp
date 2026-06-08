@@ -2,8 +2,8 @@
 
 #include    <sstream>
 
-#include    "physics.h"
 #include    "key-symbols.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -262,4 +262,4 @@ int LocoCrane254::getPositionNumber() const
     return pos_n;
 }
 
-GET_LOCO_CRANE(LocoCrane254)
+GET_MODULE(LocoCrane254)
