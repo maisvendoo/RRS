@@ -5,8 +5,6 @@
 
 class RouteNotSelectedState : public EditorState
 {
-public:
-
 };
 
 #endif // EDITOR_ROUTE_NOT_SELECTED_STATE_H

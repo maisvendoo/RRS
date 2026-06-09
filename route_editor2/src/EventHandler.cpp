@@ -1,6 +1,7 @@
 #include "editor/EventHandler.h"
 
 #include "editor/Keyboard.h"
+#include "editor/states/BasicEditorState.h"
 #include "editor/states/EditorState.h"
 #include "editor/states/RouteNotSelectedState.h"
 
@@ -10,6 +11,7 @@ EventHandler::EventHandler()
 {
     keyboard = Keyboard::create();
     route_not_selected_state = std::make_unique<RouteNotSelectedState>();
+    basic_editor_state = std::make_unique<BasicEditorState>();
     editor_state = &route_not_selected_state;
 }
 
