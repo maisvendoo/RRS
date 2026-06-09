@@ -68,7 +68,7 @@ void EditorGui::draw_menu_bar() const
 void EditorGui::draw_status_bar() const
 {
     if (ImGui::BeginViewportSideBar("StatusBar", viewport, ImGuiDir_Down,
-        ImGui::GetFrameHeight(), ImGuiWindowFlags_NoScrollbar))
+        ImGui::GetFrameHeight() * 1.4f, ImGuiWindowFlags_NoScrollbar))
     {
         ImGui::Text("Status bar");
         ImGui::End();
