@@ -154,6 +154,15 @@ private:
     void create_scene_view();
 
     /**
+     * @brief Create a clear attachments object.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
+    void create_clear_attachments();
+
+    /**
      * @brief Create a render graph object.
      *
      * If an error occured during initialization,

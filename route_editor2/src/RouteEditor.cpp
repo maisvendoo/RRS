@@ -49,17 +49,7 @@ RouteEditor::RouteEditor()
     camera = Camera::create(camera_settings, window->extent2D());
     create_scenegraph();
     create_scene_view();
-
-    VkClearValue clear_value = {};
-    clear_value.depthStencil = {0.0f, 0};
-    VkClearAttachment clear_attachment = {VK_IMAGE_ASPECT_DEPTH_BIT, 1, clear_value};
-    const VkExtent2D window_extent = window->extent2D();
-    VkClearRect clear_rect = {VkRect2D{VkOffset2D{0, 0}, window_extent}, 0, 1};
-
-    clear_attachments = vsg::ClearAttachments::create(
-        vsg::ClearAttachments::Attachments{clear_attachment},
-        vsg::ClearAttachments::Rects{clear_rect}
-    );
+    create_clear_attachments();
 
     editor_gui = EditorGui::create(gui_settings, route_dir);
     render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
@@ -207,6 +197,28 @@ void RouteEditor::create_scene_view()
     }
 
     Journal::instance()->info("Scene view is created successfully");
+}
+
+void RouteEditor::create_clear_attachments()
+{
+    VkClearValue clear_value = {};
+    clear_value.depthStencil = {0.0f, 0};
+    VkClearAttachment clear_attachment = {VK_IMAGE_ASPECT_DEPTH_BIT, 1, clear_value};
+    const VkExtent2D window_extent = window->extent2D();
+    VkClearRect clear_rect = {VkRect2D{VkOffset2D{0, 0}, window_extent}, 0, 1};
+
+    clear_attachments = vsg::ClearAttachments::create(
+        vsg::ClearAttachments::Attachments{clear_attachment},
+        vsg::ClearAttachments::Rects{clear_rect}
+    );
+
+    if (!clear_attachments)
+    {
+        Journal::instance()->error("Failed to create clear attachments");
+        std::exit(EXIT_FAILURE);
+    }
+
+    Journal::instance()->info("Clear attachments are created successfully");
 }
 
 void RouteEditor::create_render_graph()
