@@ -50,10 +50,8 @@ RouteEditor::RouteEditor()
     create_scenegraph();
     create_scene_view();
     create_clear_attachments();
-
-    editor_gui = EditorGui::create(gui_settings, route_dir);
-    render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
-
+    create_editor_gui();
+    create_render_gui();
     create_render_graph();
     create_command_graph();
     create_resource_hints();
@@ -243,6 +241,30 @@ void RouteEditor::create_clear_attachments()
     }
 
     Journal::instance()->info("Clear attachments are created successfully");
+}
+
+void RouteEditor::create_editor_gui()
+{
+    editor_gui = EditorGui::create(gui_settings, route_dir);
+    if (!editor_gui)
+    {
+        Journal::instance()->error("Failed to create editor GUI");
+        std::exit(EXIT_FAILURE);
+    }
+
+    Journal::instance()->info("Editor GUI is created successfully");
+}
+
+void RouteEditor::create_render_gui()
+{
+    render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
+    if (!render_gui)
+    {
+        Journal::instance()->error("Failed to create render GUI");
+        std::exit(EXIT_FAILURE);
+    }
+
+    Journal::instance()->info("Render GUI is created successfully");
 }
 
 void RouteEditor::create_render_graph()

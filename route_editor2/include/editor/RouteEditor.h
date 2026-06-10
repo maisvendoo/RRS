@@ -127,7 +127,7 @@ private:
     void create_vsg_options();
 
     /**
-     * @brief Create an event handler object.
+     * @brief Create an EventHandler object.
      *
      * If an error occured during initialization,
      * exit the program with std::exit (check the log file
@@ -136,7 +136,7 @@ private:
     void create_event_handler();
 
     /**
-     * @brief Create a camera object.
+     * @brief Create a Camera object.
      *
      * If an error occured during initialization,
      * exit the program with std::exit (check the log file
@@ -172,7 +172,7 @@ private:
     void create_scene_view();
 
     /**
-     * @brief Create a clear attachments object.
+     * @brief Create a ClearAttachments object.
      *
      * If an error occured during initialization,
      * exit the program with std::exit (check the log file
@@ -181,7 +181,25 @@ private:
     void create_clear_attachments();
 
     /**
-     * @brief Create a render graph object.
+     * @brief Create an EditorGui object.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
+    void create_editor_gui();
+
+    /**
+     * @brief Create a RenderGui object.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
+    void create_render_gui();
+
+    /**
+     * @brief Create a RenderGraph object.
      *
      * If an error occured during initialization,
      * exit the program with std::exit (check the log file
@@ -190,7 +208,7 @@ private:
     void create_render_graph();
 
     /**
-     * @brief Create a command graph object.
+     * @brief Create a CommandGraph object.
      *
      * If an error occured during initialization,
      * exit the program with std::exit (check the log file
@@ -199,7 +217,7 @@ private:
     void create_command_graph();
 
     /**
-     * @brief Create a resource hints object.
+     * @brief Create a ResourceHints object.
      *
      * Set numLightsRange based on scene settings.
      * If an error occured during initialization,
@@ -209,7 +227,7 @@ private:
     void create_resource_hints();
 
     /**
-     * @brief Create a viewer object.
+     * @brief Create a Viewer object.
      *
      * Assign window and all appropriate event handlers to viewer.
      *
