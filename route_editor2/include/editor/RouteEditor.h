@@ -127,6 +127,24 @@ private:
     void create_vsg_options();
 
     /**
+     * @brief Create an event handler object.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
+    void create_event_handler();
+
+    /**
+     * @brief Create a camera object.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
+    void create_camera();
+
+    /**
      * @brief Create a VSG window based on the window_settings.
      *
      * If an error occured during initialization,

@@ -25,8 +25,6 @@ Camera::Camera(
 
     projectionMatrix = perspective;
     viewMatrix = look_at;
-
-    Journal::instance()->info("Camera is created successfully");
 }
 
 Camera::~Camera() = default;

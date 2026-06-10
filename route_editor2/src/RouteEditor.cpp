@@ -45,8 +45,8 @@ RouteEditor::RouteEditor()
     print_settings();
     create_vsg_options();
     create_window();
-    event_handler = EventHandler::create();
-    camera = Camera::create(camera_settings, window->extent2D());
+    create_event_handler();
+    create_camera();
     create_scenegraph();
     create_scene_view();
     create_clear_attachments();
@@ -139,6 +139,30 @@ void RouteEditor::create_vsg_options()
     }
 
     Journal::instance()->info("VSG options are initialized successfully");
+}
+
+void RouteEditor::create_event_handler()
+{
+    event_handler = EventHandler::create();
+    if (!event_handler)
+    {
+        Journal::instance()->error("Failed to create event handler");
+        std::exit(EXIT_FAILURE);
+    }
+
+    Journal::instance()->info("Event handler is created successfully");
+}
+
+void RouteEditor::create_camera()
+{
+    camera = Camera::create(camera_settings, window->extent2D());
+    if (!camera)
+    {
+        Journal::instance()->error("Failed to create camera");
+        std::exit(EXIT_FAILURE);
+    }
+
+    Journal::instance()->info("Camera is created successfully");
 }
 
 void RouteEditor::create_window()
