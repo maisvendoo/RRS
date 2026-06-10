@@ -11,6 +11,7 @@ StateManager::StateManager()
     route_not_selected_state = std::make_unique<RouteNotSelectedState>();
     basic_editor_state = std::make_unique<BasicEditorState>();
     editor_state = &route_not_selected_state;
+    deferred_editor_state = &route_not_selected_state;
 }
 
 StateManager::~StateManager() = default;
@@ -20,12 +21,17 @@ const std::unique_ptr<EditorState>& StateManager::get_editor_state() const
     return *editor_state;
 }
 
-void StateManager::set_state_route_not_selected()
+void StateManager::defer_switch_to_route_not_selected_state()
 {
-    editor_state = &route_not_selected_state;
+    deferred_editor_state = &route_not_selected_state;
 }
 
-void StateManager::set_state_basic_editor_state()
+void StateManager::defer_switch_to_basic_editor_state()
 {
-    editor_state = &basic_editor_state;
+    deferred_editor_state = &basic_editor_state;
+}
+
+void StateManager::update()
+{
+    editor_state = deferred_editor_state;
 }

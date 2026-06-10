@@ -68,6 +68,8 @@ void RouteEditor::run()
         viewer->update();
         viewer->recordAndSubmit();
         viewer->present();
+
+        state_manager.update();
     }
 }
 
