@@ -15,9 +15,9 @@ IOController::IOController(QObject *parent) : QObject(parent)
 //------------------------------------------------------------------------------
 void IOController::setPressedKey(uint16_t keyBase)
 {
-    if (KeySymbolsRRS.count(keyPress.keyBase))
+    if (KeySymbolsRRS.count(keyBase))
     {
-        auto result = _pressed_keys.insert(keyPress.keyBase);
+        auto result = _pressed_keys.insert(keyBase);
         if (result.second)
         {
             processControl(CTRL_TYPE_KEYBOARD);
@@ -30,7 +30,7 @@ void IOController::setPressedKey(uint16_t keyBase)
 //------------------------------------------------------------------------------
 void IOController::setReleasedKey(uint16_t keyBase)
 {
-    if (_pressed_keys.erase(keyRelease.keyBase))
+    if (_pressed_keys.erase(keyBase))
     {
         processControl(CTRL_TYPE_KEYBOARD);
     }
