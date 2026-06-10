@@ -1,5 +1,4 @@
 #include    <io-controller.h>
-#include    <core/get_module.h>
 #include    <key-symbols.h>
 
 //------------------------------------------------------------------------------
@@ -97,11 +96,8 @@ void IOController::processControl(const ControlType &ctrl_type)
 
     case CTRL_TYPE_CTRL_PANEL:
 
+        processControlPanelInput();
+
         break;
     }
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-GET_MODULE(IOController)
