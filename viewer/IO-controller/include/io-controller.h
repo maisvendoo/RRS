@@ -22,6 +22,8 @@ public:
 
     void setReleasedKey(uint16_t keyBase);
 
+    virtual void step(float t, float dt);
+
 protected:
 
     /// Массив нажатых клавиш
