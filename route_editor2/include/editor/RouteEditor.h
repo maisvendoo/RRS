@@ -14,6 +14,7 @@
 class Camera;
 class EditorGui;
 class EventHandler;
+class Keyboard;
 
 namespace vsg
 {
@@ -72,6 +73,7 @@ private:
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
+    vsg::ref_ptr<Keyboard> keyboard;
     vsg::ref_ptr<EventHandler> event_handler;
     vsg::ref_ptr<Camera> camera;
     vsg::ref_ptr<vsg::Group> scenegraph;
@@ -154,6 +156,15 @@ private:
      * (default - "logs/editor.log") for possible errors).
      */
     void create_window();
+
+    /**
+     * @brief Create a Keyboard object.
+     *
+     * If an error occured during initialization,
+     * exit the program with std::exit (check the log file
+     * (default - "logs/editor.log") for possible errors).
+     */
+    void create_keyboard();
 
     /**
      * @brief Create a scenegraph object.

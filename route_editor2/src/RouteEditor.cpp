@@ -3,6 +3,7 @@
 #include "editor/Camera.h"
 #include "editor/EditorGui.h"
 #include "editor/EventHandler.h"
+#include "editor/Keyboard.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/GuiSettings.h"
 #include "editor/settings/SceneSettings.h"
@@ -45,6 +46,7 @@ RouteEditor::RouteEditor()
     print_settings();
     create_vsg_options();
     create_window();
+    create_keyboard();
     create_event_handler();
     create_camera();
     create_scenegraph();
@@ -199,6 +201,18 @@ void RouteEditor::create_window()
     Journal::instance()->info("Window is created successfully");
 }
 
+void RouteEditor::create_keyboard()
+{
+    keyboard = Keyboard::create();
+    if (!keyboard)
+    {
+        Journal::instance()->error("Failed to create keyboard");
+        std::exit(EXIT_FAILURE);
+    }
+
+    Journal::instance()->info("Keyboard is created successfully");
+}
+
 void RouteEditor::create_scenegraph()
 {
     scenegraph = vsg::Group::create();
@@ -324,6 +338,7 @@ void RouteEditor::create_viewer()
     viewer->addWindow(window);
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(vsg::CloseHandler::create(viewer));
+    viewer->addEventHandler(keyboard);
     viewer->addEventHandler(event_handler);
     viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
     viewer->compile(resource_hints);
