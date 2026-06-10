@@ -32,6 +32,10 @@
 
 		<AutopilotModule>vl60-autopilot</AutopilotModule>
 		<AutopilotConfig>vl60pk-autopilot</AutopilotConfig>
+
+		<IOControllerModule>vl60-iocontroller</IOControllerModule>
+		<IOControllerConfig>vl60pk-iocontroller</IOControllerConfig>
+
 	</Vehicle>
 
 

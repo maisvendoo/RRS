@@ -17,6 +17,9 @@
 #include <string>
 #include <vector>
 
+#include <io-controller.h>
+#include <core/load_module.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -77,6 +80,8 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 
     // Vehicle 3d-models
     load_models(cfg_path, cfg, options);
+
+    load_io_controller_module(cfg_path, cfg);
 
     // Check old config format
     if (transform->children.size() == 0)
@@ -343,6 +348,47 @@ bool VehicleExterior::load_cabine_model(const std::string &cfg_path, CfgReader &
     cabine_pagedLOD->options = options;
     cabine_node->addChild(cabine_pagedLOD);
     animated_nodes.push_back(cabine_pagedLOD);
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, CfgReader &cfg)
+{
+    QString secName = "Vehicle";
+    QString module_name = "";
+
+    if (!cfg.getString(secName, "IOControllerModule", module_name))
+    {
+        LOG_WARN("Not found IOConttrollerModule setting in vehicle config");
+        return false;
+    }
+
+    QString custom_modules_dir = "";
+    if (!cfg.getString(secName, "CustomModulesDir", custom_modules_dir))
+    {
+        LOG_WARN("Not found CustomModulesDir setting in vehicle config");
+        return false;
+    }
+
+    const FileSystem &fs = FileSystem::getInstance();
+    auto modules_dir = fs.getModulesDir();
+
+    auto module_path = fs.toNativeSeparators(modules_dir + fs.separator()
+                                            + custom_modules_dir.toStdString() + fs.separator()
+                                            + module_name.toStdString());
+
+    io_ctrl = LOAD_MODULE(IOController, module_path.c_str());
+
+    if (io_ctrl == nullptr)
+    {
+        LOG_ERROR("Not found IOController module %s", module_path.c_str());
+        return false;
+    }
+
+    LOG_INFO("IOController module %s loaded successfully", module_path.c_str());
 
     return true;
 }
