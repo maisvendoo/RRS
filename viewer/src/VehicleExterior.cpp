@@ -81,6 +81,7 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
     // Vehicle 3d-models
     load_models(cfg_path, cfg, options);
 
+    // Load IOContrroler module
     load_io_controller_module(cfg_path, cfg);
 
     // Check old config format
@@ -389,6 +390,29 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
     }
 
     LOG_INFO("IOController module %s loaded successfully", module_path.c_str());
+
+    QString module_config_name = "";
+
+    if (cfg.getString(secName, "IOControllerConfig", module_config_name))
+    {
+        auto module_config_path = fs.toNativeSeparators(cfg_path + fs.separator() + module_config_name.toStdString() + ".xml");
+
+        CfgReader module_cfg;
+
+        if (!module_cfg.load(QString(module_config_path.c_str())))
+        {
+            LOG_WARN("IOController config %s is not found. IOController in defualt settings", module_config_path.c_str());
+        }
+        else
+        {
+            io_ctrl->load_config(module_cfg);
+            LOG_INFO("IOController config %s is loaded successfully", module_config_path.c_str());
+        }
+    }
+    else
+    {
+        LOG_WARN("IOController config setting is not exist. IOController in defualt settings");
+    }
 
     return true;
 }

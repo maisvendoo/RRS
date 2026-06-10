@@ -1,5 +1,6 @@
 #include    <io-controller.h>
 #include    <key-symbols.h>
+#include    <CfgReader.h>
 
 //------------------------------------------------------------------------------
 //
@@ -41,6 +42,14 @@ void IOController::setReleasedKey(uint16_t keyBase)
 void IOController::step(float t, float dt)
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool IOController::load_config(CfgReader &cfg)
+{
+    return true;
 }
 
 //------------------------------------------------------------------------------

@@ -5,6 +5,8 @@
 #include    <QObject>
 #include    <set>
 
+class CfgReader;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -23,6 +25,8 @@ public:
     void setReleasedKey(uint16_t keyBase);
 
     virtual void step(float t, float dt);
+
+    virtual bool load_config(CfgReader &cfg);
 
 protected:
 
