@@ -1,6 +1,7 @@
 #ifndef ROUTE_EDITOR_H
 #define ROUTE_EDITOR_H
 
+#include "editor/StateManager.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/GuiSettings.h"
 #include "editor/settings/SceneSettings.h"
@@ -66,6 +67,7 @@ private:
     scene_settings_t scene_settings;
     gui_settings_t gui_settings;
 
+    StateManager state_manager;
     std::string route_dir;
 
     vsg::ref_ptr<vsg::Options> vsg_options;

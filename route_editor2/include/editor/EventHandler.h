@@ -5,10 +5,8 @@
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
 
-#include <memory>
-
-class EditorState;
 class Keyboard;
+class StateManager;
 
 namespace vsg
 {
@@ -23,19 +21,22 @@ class KeyReleaseEvent;
 class EventHandler : public vsg::Inherit<vsg::Visitor, EventHandler>
 {
 public:
-    EventHandler();
+    explicit EventHandler(StateManager& state_manager);
+
     ~EventHandler();
 
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
+
     virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;
+
     virtual void apply(vsg::FocusInEvent& focusIn) override;
+
     virtual void apply(vsg::FocusOutEvent& focusOut) override;
 
 private:
+    StateManager& state_manager;
+
     vsg::ref_ptr<Keyboard> keyboard;
-    std::unique_ptr<EditorState>* editor_state;
-    std::unique_ptr<EditorState> route_not_selected_state;
-    std::unique_ptr<EditorState> basic_editor_state;
 };
 
 #endif // EDITOR_EVENT_HANDLER_H

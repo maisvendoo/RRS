@@ -141,7 +141,7 @@ void RouteEditor::create_vsg_options()
 
 void RouteEditor::create_event_handler()
 {
-    event_handler = EventHandler::create();
+    event_handler = EventHandler::create(state_manager);
     if (!event_handler)
     {
         Journal::instance()->error("Failed to create event handler");
