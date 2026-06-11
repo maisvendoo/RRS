@@ -61,7 +61,7 @@ void EditorGui::draw_menu_bar() const
             {
                 IGFD::FileDialogConfig config;
                 config.path = FileSystem::getInstance().getRouteRootDir();
-                ImGuiFileDialog::Instance()->LoadDialog("LoadRouteKey",
+                ImGuiFileDialog::Instance()->OpenDialog("LoadRouteKey",
                     "Load route", nullptr, config);
             }
 
@@ -99,7 +99,7 @@ void EditorGui::draw_load_route_file_dialog() const
                 !std::filesystem::exists(route_dir + "/topology") ||
                 !std::filesystem::exists(route_dir + "/objects.ref"))
             {
-                ImGui::LoadPopup("InvalidRoute");
+                ImGui::OpenPopup("InvalidRoute");
             }
             else
             {
