@@ -12,8 +12,13 @@
 #include <filesystem>
 #include <string>
 
-EditorGui::EditorGui(const gui_settings_t& gui_settings, std::string& route_dir)
-    : route_dir(route_dir)
+EditorGui::EditorGui(
+    const gui_settings_t& gui_settings,
+    StateManager& state_manager,
+    std::string& route_dir
+)
+    : state_manager(state_manager)
+    , route_dir(route_dir)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
