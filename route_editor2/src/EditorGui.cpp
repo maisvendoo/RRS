@@ -1,6 +1,8 @@
 #include "editor/EditorGui.h"
 
+#include "editor/StateManager.h"
 #include "editor/settings/GuiSettings.h"
+#include "editor/states/EditorState.h"
 
 #include <filesystem.h>
 
@@ -75,7 +77,7 @@ void EditorGui::draw_status_bar() const
     if (ImGui::BeginViewportSideBar("StatusBar", viewport, ImGuiDir_Down,
         ImGui::GetFrameHeight() * 1.4f, ImGuiWindowFlags_NoScrollbar))
     {
-        ImGui::Text("Status bar");
+        state_manager.get_editor_state()->fill_status_bar();
         ImGui::End();
     }
 }

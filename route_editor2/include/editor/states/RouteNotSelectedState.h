@@ -5,6 +5,10 @@
 
 class RouteNotSelectedState : public EditorState
 {
+public:
+    virtual ~RouteNotSelectedState() override;
+
+    virtual void fill_status_bar() const override;
 };
 
 #endif // EDITOR_ROUTE_NOT_SELECTED_STATE_H

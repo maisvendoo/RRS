@@ -3,6 +3,10 @@
 
 class EditorState
 {
+public:
+    virtual ~EditorState();
+
+    virtual void fill_status_bar() const;
 };
 
 #endif // EDITOR_STATE_H
