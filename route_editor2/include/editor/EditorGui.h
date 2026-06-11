@@ -40,7 +40,7 @@ private:
 
     void draw_status_bar() const;
 
-    void draw_open_route_file_dialog() const;
+    void draw_load_route_file_dialog() const;
 
     void draw_invalid_route_popup() const;
 };

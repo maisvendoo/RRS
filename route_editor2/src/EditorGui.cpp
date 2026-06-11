@@ -42,7 +42,7 @@ void EditorGui::record(vsg::CommandBuffer&) const
 
     draw_menu_bar();
     draw_status_bar();
-    draw_open_route_file_dialog();
+    draw_load_route_file_dialog();
     draw_invalid_route_popup();
 }
 
@@ -57,12 +57,12 @@ void EditorGui::draw_menu_bar() const
                 // TODO
             }
 
-            if (ImGui::MenuItem("Open route"))
+            if (ImGui::MenuItem("Load route"))
             {
                 IGFD::FileDialogConfig config;
                 config.path = FileSystem::getInstance().getRouteRootDir();
-                ImGuiFileDialog::Instance()->OpenDialog("OpenRouteKey",
-                    "Open route", nullptr, config);
+                ImGuiFileDialog::Instance()->LoadDialog("LoadRouteKey",
+                    "Load route", nullptr, config);
             }
 
             ImGui::EndMenu();
@@ -82,12 +82,12 @@ void EditorGui::draw_status_bar() const
     }
 }
 
-void EditorGui::draw_open_route_file_dialog() const
+void EditorGui::draw_load_route_file_dialog() const
 {
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
 
-    if (ImGuiFileDialog::Instance()->Display("OpenRouteKey",
+    if (ImGuiFileDialog::Instance()->Display("LoadRouteKey",
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoCollapse))
     {
@@ -99,7 +99,7 @@ void EditorGui::draw_open_route_file_dialog() const
                 !std::filesystem::exists(route_dir + "/topology") ||
                 !std::filesystem::exists(route_dir + "/objects.ref"))
             {
-                ImGui::OpenPopup("InvalidRoute");
+                ImGui::LoadPopup("InvalidRoute");
             }
             else
             {
