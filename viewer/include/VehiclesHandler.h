@@ -97,6 +97,8 @@ public slots:
 signals:
     void updated();
 
+    void sigSendVehicleControlCommand(const QByteArray &data);
+
 private:
     void updateDebugString();
 

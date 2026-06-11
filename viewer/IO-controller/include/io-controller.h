@@ -28,6 +28,10 @@ public:
 
     virtual bool load_config(CfgReader &cfg);
 
+signals:
+
+    void sigSendVehicleControlCommand(const QByteArray &data);
+
 protected:
 
     /// Массив нажатых клавиш

@@ -6,6 +6,7 @@
 #include "simulator-update-struct.h"
 #include "sound-manager.h"
 #include "VehicleExterior.h"
+#include "io-controller.h"
 
 #include <vsg/app/Viewer.h>
 #include <vsg/core/ref_ptr.h>
@@ -433,6 +434,12 @@ bool VehiclesHandler::load(
         vehicle_exterior.cullnode->bound = vsg::dsphere(0.0, 0.0, 0.0, veh_len);
         vehicle_exterior.cullnode->child = vehicle_exterior.transform;
         vehicles_node->addChild(vehicle_exterior.cullnode);
+
+        if (vehicle_exterior.io_ctrl != nullptr)
+        {
+            connect(vehicle_exterior.io_ctrl, &IOController::sigSendVehicleControlCommand,
+                    this, &VehiclesHandler::sigSendVehicleControlCommand);
+        }
     }
 
     return true;

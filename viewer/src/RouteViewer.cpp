@@ -992,7 +992,7 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 
     GUIparams->status = QString("Загрузка подвижного состава...");
 
-    is_vehicles = vehicles_handler->load(data, settings, options);
+    is_vehicles = vehicles_handler->load(data, settings, options);    
 
     GUIparams->status = QString("");
 
@@ -1014,6 +1014,9 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 
     connect(tcp_client.get(), &TcpClient::setVehicleControlled,
             vehicles_handler.get(), &VehiclesHandler::slotGetVehicleControlled);
+
+    connect(vehicles_handler.get(), &VehiclesHandler::sigSendVehicleControlCommand,
+            tcp_client.get(), &TcpClient::slotSendVehicleControlCommand);
 
     connect(vehicles_handler.get(), &VehiclesHandler::updated,
             this, &RouteViewer::slotUpdated);

@@ -269,6 +269,24 @@ void TcpServer::process_client_request(client_data_t &client_data)
         break;
     }
 
+    case STYPE_SEND_VEHICLE_CONTROL_COMMAND:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        int vehicle_idx = 0;
+        stream >> vehicle_idx;
+
+        uint16_t id = 0;
+        stream >> id;
+
+        float value = 0.0f;
+        stream >> value;
+
+        emit sigSetVehicleControlCommand(vehicle_idx, id, value);
+
+        break;
+    }
+
     case STYPE_EMPTY_DATA:
     default:
 

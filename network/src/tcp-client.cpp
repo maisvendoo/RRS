@@ -403,6 +403,9 @@ void TcpClient::slotReceive()
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpClient::slotAcceptError(QAbstractSocket::SocketError error)
 {
     Q_UNUSED(error);
@@ -410,4 +413,19 @@ void TcpClient::slotAcceptError(QAbstractSocket::SocketError error)
     {
         emit sendLogMessage("Socket error: " + socket->errorString());
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpClient::slotSendVehicleControlCommand(const QByteArray &data)
+{
+    if (!canSend()) return;
+
+    network_data_t request;
+    request.stype = STYPE_SEND_VEHICLE_CONTROL_COMMAND;
+    request.data = data;
+
+    socket->write(request.serialize());
+    socket->flush();
 }
