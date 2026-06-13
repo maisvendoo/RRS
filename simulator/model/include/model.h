@@ -251,7 +251,7 @@ private slots:
     /// Связывание сигналов и слотов для загрузки сценария в модули автоведения
     void slotUpdateTrainTimetable(int train_idx);
 
-    void slotSetVehicleControlCommand(int vehicle_idx, uint16_t id, float value);
+    void slotSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t id, float value);
 };
 
 #endif // MODEL_H

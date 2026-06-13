@@ -1,5 +1,5 @@
 #include    <io-controller.h>
-#include    <key-symbols.h>
+#include    <io-controller-keymap.h>
 #include    <CfgReader.h>
 
 //------------------------------------------------------------------------------
