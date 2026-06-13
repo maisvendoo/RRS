@@ -20,8 +20,8 @@ struct io_control_input_t
     /// Значение управляющего сигнала
     float value = 0.0f;
 
-    /// Имя назначенной клавиши
-    QString keyName = "";
+    /// Код назначенной клавиши
+    uint16_t keyCode = 0;
     /// Имя объекта в 3D-модели
     QString contolledObjectName = "";
 
