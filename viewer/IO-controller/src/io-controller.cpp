@@ -49,6 +49,27 @@ void IOController::step(float t, float dt)
 //------------------------------------------------------------------------------
 bool IOController::load_config(CfgReader &cfg)
 {
+    auto secNode = cfg.getFirstSection("Control");
+
+    while (!secNode.isNull())
+    {
+        io_control_input_t ic_input;
+
+        int control_ID = 0;
+        cfg.getInt(secNode, "ID", control_ID);
+        ic_input.id = static_cast<uint16_t>(control_ID);
+
+        QString keyName = "";
+        cfg.getString(secNode, "KeyName", keyName);
+        ic_input.keyCode = KeySymbolsRRSMap.value(keyName, KEY_Undefined);
+
+        cfg.getString(secNode, "ObjectName", ic_input.contolledObjectName);
+
+        io_control_inputs.insert(ic_input.keyCode, ic_input.contolledObjectName, ic_input);
+
+        secNode = cfg.getNextSection();
+    }
+
     return true;
 }
 

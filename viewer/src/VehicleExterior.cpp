@@ -19,6 +19,7 @@
 
 #include <io-controller.h>
 #include <core/load_module.h>
+#include <QFileInfo>
 
 //------------------------------------------------------------------------------
 //
@@ -358,16 +359,19 @@ bool VehicleExterior::load_cabine_model(const std::string &cfg_path, CfgReader &
 //------------------------------------------------------------------------------
 bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, CfgReader &cfg)
 {
+    QString custom_modules_dir = "";
+    cfg.getString("Vehicle", "CustomModulesDir", custom_modules_dir);
+
+    QFileInfo cfgFileInfo(QString(cfg_path.c_str()));
+    QDir cfg_dir = cfgFileInfo.absoluteDir();
+
     // Просматриваем все кабины в конфиге
     auto secNode = cfg.getFirstSection("Cabine");
 
     while (!secNode.isNull())
     {
         QString module_name = "";
-        cfg.getString(secNode, "IOControllerModule", module_name);
-
-        QString custom_modules_dir = "";
-        cfg.getString(secNode, "CustomModulesDir", custom_modules_dir);
+        cfg.getString(secNode, "IOControllerModule", module_name);        
 
         const FileSystem &fs = FileSystem::getInstance();
         auto modules_dir = fs.getModulesDir();
@@ -386,7 +390,8 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
 
             if (cfg.getString(secNode, "IOControllerConfig", module_config_name))
             {
-                auto module_config_path = fs.toNativeSeparators(cfg_path + fs.separator() + module_config_name.toStdString() + ".xml");
+
+                auto module_config_path = fs.toNativeSeparators(cfg_dir.absolutePath().toStdString() + fs.separator() + module_config_name.toStdString() + ".xml");
 
                 CfgReader module_cfg;
 

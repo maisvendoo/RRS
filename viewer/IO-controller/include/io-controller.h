@@ -2,8 +2,11 @@
 #define     IO_CONTROLLER_H
 
 #include    <io-controller-export.h>
+#include    <io-controller-input.h>
 #include    <QObject>
 #include    <set>
+
+#include    <dual-key-hash.h>
 
 class CfgReader;
 
@@ -36,6 +39,10 @@ protected:
 
     /// Массив нажатых клавиш
     std::set<uint16_t> _pressed_keys;
+
+    /// Здесь обеспечивается доступ к значению сигнала контрола
+    /// как по коду нажатой кавиши, так и по имени объекта, кликнутого мышью
+    DualKeyHash<uint16_t, QString, io_control_input_t> io_control_inputs;
 
     enum ControlType
     {
