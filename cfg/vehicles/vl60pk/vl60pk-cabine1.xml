@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	
+	<!-- Кабина 1 -->
+	
+	<!-- Токоприемники -->
+	<Control>
+		<ID>100</ID>
+		<KeyName>KEY_U</KeyName>
+		<ObjectName>Cab1_Tumbler_Pnt</ObjectName>
+	</Control>
+
+	<!-- Токоприемник передний -->
+	<Control>
+		<ID>101</ID>
+		<KeyName>KEY_I</KeyName>
+		<ObjectName>Cab1_Tumbler_Pnt1</ObjectName>
+	</Control>
+
+	<!-- Токоприемник задний -->
+	<Control>
+		<ID>102</ID>
+		<KeyName>KEY_O</KeyName>
+		<ObjectName>Cab1_Tumbler_Pnt2</ObjectName>
+	</Control>	
+
+</Config>
