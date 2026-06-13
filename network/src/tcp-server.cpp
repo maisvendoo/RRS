@@ -276,13 +276,16 @@ void TcpServer::process_client_request(client_data_t &client_data)
         int vehicle_idx = 0;
         stream >> vehicle_idx;
 
+        int cab_idx = 0;
+        stream >> cab_idx;
+
         uint16_t id = 0;
         stream >> id;
 
         float value = 0.0f;
         stream >> value;
 
-        emit sigSetVehicleControlCommand(vehicle_idx, id, value);
+        emit sigSetVehicleControlCommand(vehicle_idx, cab_idx, id, value);
 
         break;
     }

@@ -65,7 +65,7 @@ signals:
 
     void sigSetSimSpeed(int speed_factor);
 
-    void sigSetVehicleControlCommand(int vehicle_idx, uint16_t id, float value);
+    void sigSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t id, float value);
 
 private:
 

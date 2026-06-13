@@ -13,6 +13,8 @@ struct io_control_input_t
 {
     /// Индекс управляемой ПЕ
     int controlled_vehicle_idx = 0;
+    /// Индекс активной кабины управляемой ПЕ
+    int cabine_idx = 0;
     /// Идентификатор сигнала управления в массиве сигналов ПЕ
     uint16_t id = 0;
     /// Значение управляющего сигнала
@@ -35,6 +37,7 @@ struct io_control_input_t
 
         // Серверу передаем только эти значения
         stream << controlled_vehicle_idx;
+        stream << cabine_idx;
         stream << id;
         stream << value;
 
@@ -46,6 +49,7 @@ struct io_control_input_t
         QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> controlled_vehicle_idx;
+        stream >> cabine_idx;
         stream >> id;
         stream >> value;
     }

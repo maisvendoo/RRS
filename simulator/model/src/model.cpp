@@ -380,7 +380,7 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::slotSetVehicleControlCommand(int vehicle_idx, uint16_t id, float value)
+void Model::slotSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t id, float value)
 {
 
 }
