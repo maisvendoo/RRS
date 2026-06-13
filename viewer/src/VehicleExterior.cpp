@@ -358,60 +358,60 @@ bool VehicleExterior::load_cabine_model(const std::string &cfg_path, CfgReader &
 //------------------------------------------------------------------------------
 bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, CfgReader &cfg)
 {
-    QString secName = "Vehicle";
-    QString module_name = "";
+    // Просматриваем все кабины в конфиге
+    auto secNode = cfg.getFirstSection("Cabine");
 
-    if (!cfg.getString(secName, "IOControllerModule", module_name))
+    while (!secNode.isNull())
     {
-        LOG_WARN("Not found IOConttrollerModule setting in vehicle config");
-        return false;
-    }
+        QString module_name = "";
+        cfg.getString(secNode, "IOControllerModule", module_name);
 
-    QString custom_modules_dir = "";
-    if (!cfg.getString(secName, "CustomModulesDir", custom_modules_dir))
-    {
-        LOG_WARN("Not found CustomModulesDir setting in vehicle config");
-        return false;
-    }
+        QString custom_modules_dir = "";
+        cfg.getString(secNode, "CustomModulesDir", custom_modules_dir);
 
-    const FileSystem &fs = FileSystem::getInstance();
-    auto modules_dir = fs.getModulesDir();
+        const FileSystem &fs = FileSystem::getInstance();
+        auto modules_dir = fs.getModulesDir();
 
-    auto module_path = fs.toNativeSeparators(modules_dir + fs.separator()
-                                            + custom_modules_dir.toStdString() + fs.separator()
-                                            + module_name.toStdString());
+        auto module_path = fs.toNativeSeparators(modules_dir + fs.separator()
+                                                + custom_modules_dir.toStdString() + fs.separator()
+                                                + module_name.toStdString());
 
-    io_ctrl = LOAD_MODULE(IOController, module_path.c_str());
+        auto *io_control = LOAD_MODULE(IOController, module_path.c_str());
 
-    if (io_ctrl == nullptr)
-    {
-        LOG_ERROR("Not found IOController module %s", module_path.c_str());
-        return false;
-    }
-
-    LOG_INFO("IOController module %s loaded successfully", module_path.c_str());
-
-    QString module_config_name = "";
-
-    if (cfg.getString(secName, "IOControllerConfig", module_config_name))
-    {
-        auto module_config_path = fs.toNativeSeparators(cfg_path + fs.separator() + module_config_name.toStdString() + ".xml");
-
-        CfgReader module_cfg;
-
-        if (!module_cfg.load(QString(module_config_path.c_str())))
+        if (io_control != nullptr)
         {
-            LOG_WARN("IOController config %s is not found. IOController in defualt settings", module_config_path.c_str());
+            LOG_INFO("IOController module %s loaded successfully", module_path.c_str());
+
+            QString module_config_name = "";
+
+            if (cfg.getString(secNode, "IOControllerConfig", module_config_name))
+            {
+                auto module_config_path = fs.toNativeSeparators(cfg_path + fs.separator() + module_config_name.toStdString() + ".xml");
+
+                CfgReader module_cfg;
+
+                if (!module_cfg.load(QString(module_config_path.c_str())))
+                {
+                    LOG_WARN("IOController config %s is not found. IOController in defualt settings", module_config_path.c_str());
+                }
+                else
+                {
+                    io_control->load_config(module_cfg);
+                    LOG_INFO("IOController config %s is loaded successfully", module_config_path.c_str());
+                }
+            }
+            else
+            {
+                LOG_WARN("IOController config setting is not exist. IOController in defualt settings");
+            }
         }
         else
         {
-            io_ctrl->load_config(module_cfg);
-            LOG_INFO("IOController config %s is loaded successfully", module_config_path.c_str());
+            LOG_ERROR("Not found IOController module %s", module_path.c_str());
         }
-    }
-    else
-    {
-        LOG_WARN("IOController config setting is not exist. IOController in defualt settings");
+
+        io_controls.push_back(io_control);
+        secNode = cfg.getNextSection();
     }
 
     return true;

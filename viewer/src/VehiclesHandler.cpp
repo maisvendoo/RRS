@@ -435,10 +435,16 @@ bool VehiclesHandler::load(
         vehicle_exterior.cullnode->child = vehicle_exterior.transform;
         vehicles_node->addChild(vehicle_exterior.cullnode);
 
-        if (vehicle_exterior.io_ctrl != nullptr)
+        if (!vehicle_exterior.io_controls.empty())
         {
-            connect(vehicle_exterior.io_ctrl, &IOController::sigSendVehicleControlCommand,
-                    this, &VehiclesHandler::sigSendVehicleControlCommand);
+            for (auto *io_control : vehicle_exterior.io_controls)
+            {
+                if (io_control != nullptr)
+                {
+                    connect(io_control, &IOController::sigSendVehicleControlCommand,
+                            this, &VehiclesHandler::sigSendVehicleControlCommand);
+                }
+            }
         }
     }
 

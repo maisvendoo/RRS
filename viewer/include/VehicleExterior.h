@@ -48,7 +48,7 @@ public:
     size_t controlled_cabine_idx = 0;
 
     /// Контроллер ввода/вывода
-    IOController *io_ctrl = nullptr;
+    std::vector<IOController *> io_controls = {nullptr};
 
     void step(float t, float dt);
     void step(float t, float dt, std::vector<float> *server_signals);
