@@ -36,6 +36,8 @@ private:
     ImGuiViewport* viewport;
 
 private:
+    void add_ttf_font(const char* filename, float size);
+
     void draw_menu_bar() const;
 
     void draw_status_bar() const;

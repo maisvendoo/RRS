@@ -27,12 +27,7 @@ EditorGui::EditorGui(
     io.IniFilename = nullptr;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    const FileSystem& fs = FileSystem::getInstance();
-
-    const char* const font_name = "JetBrainsMono-Regular.ttf";
-    const std::string font_path = fs.combinePath(fs.getFontsDir(), font_name);
-
-    io.Fonts->AddFontFromFileTTF(font_path.c_str(), gui_settings.font_size);
+    add_ttf_font("JetBrainsMono-Regular.ttf", gui_settings.font_size);
 
     viewport = ImGui::GetMainViewport();
 }
@@ -45,6 +40,14 @@ void EditorGui::record(vsg::CommandBuffer&) const
     draw_status_bar();
     draw_load_route_file_dialog();
     draw_invalid_route_popup();
+}
+
+void EditorGui::add_ttf_font(const char* filename, float size)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    const FileSystem& fs = FileSystem::getInstance();
+    const std::string font_path = fs.combinePath(fs.getFontsDir(), filename);
+    io.Fonts->AddFontFromFileTTF(font_path.c_str(), size);
 }
 
 void EditorGui::draw_menu_bar() const
