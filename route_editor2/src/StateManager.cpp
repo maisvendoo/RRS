@@ -4,6 +4,8 @@
 #include "editor/states/EditorState.h"
 #include "editor/states/RouteNotLoadedState.h"
 
+#include <Journal.h>
+
 #include <memory>
 #include <string>
 
@@ -25,11 +27,15 @@ const std::unique_ptr<EditorState>& StateManager::get_editor_state() const
 void StateManager::defer_switch_to_route_not_loaded_state()
 {
     deferred_editor_state = &route_not_loaded_state;
+
+    Journal::instance()->info("Deferred switch to state 'RouteNotLoaded'");
 }
 
 void StateManager::defer_switch_to_basic_editor_state()
 {
     deferred_editor_state = &basic_editor_state;
+
+    Journal::instance()->info("Deferred switch to state 'BasicEditorState'");
 }
 
 void StateManager::update()
