@@ -12,7 +12,7 @@ public:
      * @brief Check if key is pressed once (it is not held down for some time).
      *
      * @param[in] key The keyboard key.
-     * @param[in] ignore_handled_keys Ignore keys the already were handled by
+     * @param[in] ignore_handled_keys Ignore keys that already were handled by
      *            other handlers.
      * @return true if key is pressed only once.
      * @return false - otherwise.
