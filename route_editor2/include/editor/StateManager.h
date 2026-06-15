@@ -2,13 +2,14 @@
 #define EDITOR_STATE_MANAGER_H
 
 #include <memory>
+#include <string>
 
 class EditorState;
 
 class StateManager
 {
 public:
-    StateManager();
+    explicit StateManager(const std::string& route_dir);
 
     ~StateManager();
 

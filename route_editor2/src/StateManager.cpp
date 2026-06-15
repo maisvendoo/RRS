@@ -5,11 +5,12 @@
 #include "editor/states/RouteNotLoadedState.h"
 
 #include <memory>
+#include <string>
 
-StateManager::StateManager()
+StateManager::StateManager(const std::string& route_dir)
 {
     route_not_loaded_state = std::make_unique<RouteNotLoadedState>();
-    basic_editor_state = std::make_unique<BasicEditorState>();
+    basic_editor_state = std::make_unique<BasicEditorState>(route_dir);
     editor_state = &route_not_loaded_state;
     deferred_editor_state = &route_not_loaded_state;
 }
