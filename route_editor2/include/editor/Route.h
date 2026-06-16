@@ -1,9 +1,12 @@
 #ifndef EDITOR_ROUTE_H
 #define EDITOR_ROUTE_H
 
+#include "editor/RouteMapTransformation.h"
+
 #include <map>
 #include <string>
 #include <thread>
+#include <vector>
 
 class Route
 {
@@ -19,9 +22,11 @@ public:
 private:
     using Label = std::string;
     using RelativePath = std::string;
+    using Transformations = std::vector<RouteMapTransformation>;
 
 private:
     std::map<Label, RelativePath> objects_ref;
+    std::map<Label, Transformations> route_map;
 
 private:
     void load_static_objects(const std::string& route_dir);

@@ -71,8 +71,6 @@ bool Route::load_objects_ref(const std::string& route_dir)
         }
     }
 
-    // objects_ref_file.close();
-
     Journal::instance()->info(QString("objects.ref file %1 is successfully loaded")
         .arg(to_qstring(objects_ref_path)));
 
