@@ -1,4 +1,4 @@
-#include "editor/RouteLoader.h"
+#include "editor/Route.h"
 
 #include <Journal.h>
 #include <core/string_funcs.h>
@@ -11,7 +11,7 @@
 #include <string>
 #include <thread>
 
-void RouteLoader::start_load_route(const std::string& route_dir)
+void Route::start_load(const std::string& route_dir)
 {
     load_static_objects_thread = std::thread([this, &route_dir]() -> void {
         load_static_objects(route_dir);
@@ -22,13 +22,13 @@ void RouteLoader::start_load_route(const std::string& route_dir)
     });
 }
 
-void RouteLoader::load_static_objects(const std::string& route_dir)
+void Route::load_static_objects(const std::string& route_dir)
 {
     load_objects_ref(route_dir);
     load_route_map(route_dir);
 }
 
-bool RouteLoader::load_objects_ref(const std::string& route_dir)
+bool Route::load_objects_ref(const std::string& route_dir)
 {
     const FileSystem& fs = FileSystem::getInstance();
 
@@ -61,10 +61,10 @@ bool RouteLoader::load_objects_ref(const std::string& route_dir)
     return true;
 }
 
-void RouteLoader::load_route_map(const std::string& route_dir)
+void Route::load_route_map(const std::string& route_dir)
 {
 }
 
-void RouteLoader::load_topology(const std::string& route_dir)
+void Route::load_topology(const std::string& route_dir)
 {
 }

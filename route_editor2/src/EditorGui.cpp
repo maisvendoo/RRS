@@ -1,6 +1,6 @@
 #include "editor/EditorGui.h"
 
-#include "editor/RouteLoader.h"
+#include "editor/Route.h"
 #include "editor/StateManager.h"
 #include "editor/settings/GuiSettings.h"
 #include "editor/states/EditorState.h"
@@ -19,11 +19,11 @@ EditorGui::EditorGui(
     const gui_settings_t& gui_settings,
     StateManager& state_manager,
     std::string& route_dir,
-    RouteLoader& route_loader
+    Route& route
 )
     : state_manager(state_manager)
     , route_dir(route_dir)
-    , route_loader(route_loader)
+    , route(route)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -111,7 +111,7 @@ void EditorGui::draw_load_route_file_dialog() const
             else
             {
                 state_manager.defer_switch_to_basic_editor_state();
-                route_loader.start_load_route(route_dir);
+                route.start_load(route_dir);
                 ImGuiFileDialog::Instance()->Close();
             }
         }
