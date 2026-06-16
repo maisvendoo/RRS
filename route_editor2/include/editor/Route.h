@@ -22,11 +22,10 @@ public:
 private:
     using Label = std::string;
     using RelativePath = std::string;
-    using Transformations = std::vector<RouteMapTransformation>;
 
 private:
     std::map<Label, RelativePath> objects_ref;
-    std::map<Label, Transformations> route_map;
+    std::map<Label, std::vector<RouteMapTransformation>> route_map;
 
 private:
     void load_static_objects(const std::string& route_dir);
@@ -35,7 +34,9 @@ private:
 
     void print_objects_ref_in_journal() const;
 
-    void load_route_map(const std::string& route_dir);
+    bool load_route_map(const std::string& route_dir);
+
+    void print_route_map_in_journal() const;
 
     void load_topology(const std::string& route_dir);
 };
