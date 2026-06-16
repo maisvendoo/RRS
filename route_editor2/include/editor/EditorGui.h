@@ -9,6 +9,7 @@
 struct gui_settings_t;
 
 class ImGuiViewport;
+class RouteLoader;
 class StateManager;
 
 namespace vsg
@@ -29,11 +30,13 @@ public:
      * @param[in] gui_settings
      * @param[in] state_manager
      * @param[in] route_dir
+     * @param[in] route_loader
      */
     EditorGui(
         const gui_settings_t& gui_settings,
         StateManager& state_manager,
-        std::string& route_dir
+        std::string& route_dir,
+        RouteLoader& route_loader
     );
 
     /**
@@ -46,6 +49,7 @@ public:
 private:
     StateManager& state_manager;
     std::string& route_dir;
+    RouteLoader& route_loader;
 
     ImGuiViewport* viewport;
 

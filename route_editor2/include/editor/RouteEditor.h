@@ -1,6 +1,7 @@
 #ifndef ROUTE_EDITOR_H
 #define ROUTE_EDITOR_H
 
+#include "editor/RouteLoader.h"
 #include "editor/StateManager.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/GuiSettings.h"
@@ -70,6 +71,7 @@ private:
 
     StateManager state_manager;
     std::string route_dir;
+    RouteLoader route_loader;
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;

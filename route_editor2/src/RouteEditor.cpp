@@ -263,7 +263,7 @@ void RouteEditor::create_clear_attachments()
 
 void RouteEditor::create_editor_gui()
 {
-    editor_gui = EditorGui::create(gui_settings, state_manager, route_dir);
+    editor_gui = EditorGui::create(gui_settings, state_manager, route_dir, route_loader);
     if (!editor_gui)
     {
         Journal::instance()->error("Failed to create editor GUI");
