@@ -75,6 +75,8 @@ void RouteEditor::run()
 
         state_manager.update();
     }
+
+    route.join_threads();
 }
 
 void RouteEditor::initialize_journal(const char* filename) const

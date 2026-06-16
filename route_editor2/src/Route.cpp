@@ -22,6 +22,19 @@ void Route::start_load(const std::string& route_dir)
     });
 }
 
+void Route::join_threads()
+{
+    if (load_static_objects_thread.joinable())
+    {
+        load_static_objects_thread.join();
+    }
+
+    if (load_topology_thread.joinable())
+    {
+        load_topology_thread.join();
+    }
+}
+
 void Route::load_static_objects(const std::string& route_dir)
 {
     load_objects_ref(route_dir);
@@ -50,15 +63,31 @@ bool Route::load_objects_ref(const std::string& route_dir)
     while (std::getline(objects_ref_file, line))
     {
         std::istringstream iss(std::move(line));
-        std::string label, relative_path;
+        Label label;
+        RelativePath relative_path;
         if (iss >> label >> relative_path)
         {
-            Journal::instance()->info(QString("label: \"%1\"; relative_path: \"%2\"")
-                .arg(label.c_str()).arg(relative_path.c_str()));
+            objects_ref[label] = relative_path;
         }
     }
 
+    // objects_ref_file.close();
+
+    Journal::instance()->info(QString("objects.ref file %1 is successfully loaded")
+        .arg(to_qstring(objects_ref_path)));
+
+    print_objects_ref_in_journal();
+
     return true;
+}
+
+void Route::print_objects_ref_in_journal() const
+{
+    for (const auto& [label, relative_path] : objects_ref)
+    {
+        Journal::instance()->info(QString("label: \"%1\"; relative_path: \"%2\"")
+            .arg(to_qstring(label)).arg(to_qstring(relative_path)));
+    }
 }
 
 void Route::load_route_map(const std::string& route_dir)
