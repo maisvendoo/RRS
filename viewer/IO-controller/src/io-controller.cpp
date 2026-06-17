@@ -59,6 +59,10 @@ bool IOController::load_config(CfgReader &cfg)
         cfg.getInt(secNode, "ID", control_ID);
         ic_input.id = static_cast<uint16_t>(control_ID);
 
+        double value = 0.0;
+        cfg.getDouble(secNode, "value", value);
+        ic_input.value = static_cast<float>(value);
+
         QString keyName = "";
         cfg.getString(secNode, "KeyName", keyName);
         ic_input.keyCode = KeySymbolsRRSMap.value(keyName, KEY_Undefined);

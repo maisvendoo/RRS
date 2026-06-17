@@ -382,7 +382,22 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 //------------------------------------------------------------------------------
 void Model::slotSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t id, float value)
 {
-
+    for (auto *train : trains)
+    {
+        for (auto *vehicle : *(train->getVehicles()))
+        {
+            if (vehicle_idx == vehicle->getModelIndex())
+            {
+                if (!vehicle->control_inputs.empty())
+                {
+                    if (cab_idx < vehicle->control_inputs.size())
+                    {
+                        vehicle->control_inputs[cab_idx][id] = value;
+                    }
+                }
+            }
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

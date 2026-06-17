@@ -208,6 +208,8 @@ public:
         auto_start_autopilot = false;
     }
 
+    std::vector<QMap<int, float>> control_inputs;
+
 signals:
 
     void sigGetTrainParams(int train_idx, double &train_len, double &train_mass);

@@ -1015,6 +1015,51 @@ void Vehicle::loadConfiguration(QString cfg_path)
         Journal::instance()->error("File " + cfg_path + " is't found");
     }
 
+    auto cabNode = cfg.getFirstSection("Cabine");
+
+    QFileInfo cfgFileInfo(cfg_path);
+    QString cfg_dir = cfgFileInfo.absolutePath();
+
+    while (!cabNode.isNull())
+    {
+        QString cabine_cfg_name = "";
+        cfg.getString(cabNode, "IOControllerConfig", cabine_cfg_name);
+
+        CfgReader cabCfg;
+
+        QMap<int, float> inputs;
+
+        QString cabCfgPath = cfg_dir + QDir::separator() + cabine_cfg_name + ".xml";
+
+        if (cabCfg.load(cabCfgPath))
+        {
+            auto controlNode = cabCfg.getFirstSection("Control");
+
+            while (!controlNode.isNull())
+            {
+                int id = 0;
+                cabCfg.getInt(controlNode, "ID", id);
+
+                double value = 0.0;
+                cabCfg.getDouble(controlNode, "value", value);
+
+                inputs.insert(id, static_cast<float>(value));
+
+                Journal::instance()->info(QString("Init control ID=%1 value=%2").arg(id, 4).arg(value, 5, 'f', 2));
+
+                controlNode = cabCfg.getNextSection();
+            }
+        }
+        else
+        {
+            Journal::instance()->error("File " + cabCfgPath + " not found");
+        }
+
+        control_inputs.push_back(inputs);
+
+        cabNode = cfg.getNextSection();
+    }
+
     Q_a.resize(s);
     Q_a.shrink_to_fit();
     std::fill(Q_a.begin(), Q_a.end(), 0.0);
