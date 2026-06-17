@@ -8,6 +8,8 @@ struct scene_settings_t
     /// Maximum number of light sources in a scene.
     int num_lights;
 
+    int max_object_count;
+
     /**
      * @brief Construct a new scene_settings_t object
      *        and initialize it with default values.
