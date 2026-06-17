@@ -390,7 +390,7 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t 
             {
                 if (!vehicle->control_inputs.empty())
                 {
-                    if (cab_idx < vehicle->control_inputs.size())
+                    if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())
                     {
                         vehicle->control_inputs[cab_idx][id] = value;
                     }
