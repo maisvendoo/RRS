@@ -159,8 +159,6 @@ void Route::print_route_map_in_journal() const
     {
         for (const RouteMapTransformation& transformation : transformations)
         {
-            const vsg::dvec3 translation = transformation.translation;
-            const vsg::dvec3 rotation = transformation.rotation;
             Journal::instance()->info(QString("%1{%2, %3, %4}    {%5, %6, %7}")
                 .arg(label, -32)
                 .arg(transformation.translation.x, 10, 'f', 3)
