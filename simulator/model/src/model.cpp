@@ -312,7 +312,7 @@ void Model::buildAutostartQueue(Train *train)
 
     if (scnmgr->isTrainAutostarted(train->getTrainIndex()))
     {
-        for (auto vehicle : *(train->getVehicles()))
+        for (Vehicle* vehicle : train->getVehicles())
         {
             if (!vehicle->getAutopilot().empty())
             {
@@ -336,7 +336,7 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 
     autopilot_timetable_t timetable = scnmgr->loadTrainTimetable(train_idx);
 
-    for (auto vehicle : *(train->getVehicles()))
+    for (Vehicle* vehicle : train->getVehicles())
     {
         if (!vehicle->getAutopilot().empty())
         {
@@ -849,7 +849,7 @@ Train *Model::addTrain(const init_data_t &init_data)
         Journal::instance()->info(QString("Train #%1 initialized successfully").arg(trains.size()));
 
         //train->setTrainIndex(trains.size());
-        for (auto vehicle : *(train->getVehicles()))
+        for (Vehicle* vehicle : train->getVehicles())
         {
             vehicle->setModelIndex(vehicles.size());
             vehicles.push_back(vehicle);
@@ -860,7 +860,7 @@ Train *Model::addTrain(const init_data_t &init_data)
         tp.traj_coord = init_data.init_coord;
         tp.dir = init_data.direction;
 
-        if (topology->addTrain(tp, train->getVehicles()))
+        if (topology->addTrain(tp, &train->getVehicles()))
         {
             train->setTrainIndex(trains.size());
             Journal::instance()->info("Train added to topology successfully");

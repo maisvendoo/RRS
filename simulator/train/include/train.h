@@ -84,9 +84,9 @@ public:
     /// Get last vehicle
     Vehicle* getLastVehicle() const;
 
-    state_vector_t getStateVector();
+    const state_vector_t& getStateVector() const;
 
-    std::vector<std::vector<Joint*>> getJoints();
+    const std::vector<std::vector<Joint*>>& getJoints() const;
 
     double getVelocity(size_t i = 0) const;
 
@@ -101,7 +101,7 @@ public:
 
     QString getTrainID();
 
-    std::vector<Vehicle*>* getVehicles();
+    std::vector<Vehicle*>& getVehicles();
 
     void setTopology(Topology* topology);
 
@@ -110,7 +110,7 @@ public:
         this->name = name;
     }
 
-    std::string getName() const
+    const std::string& getName() const
     {
         return this->name;
     }
