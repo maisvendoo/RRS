@@ -18,8 +18,12 @@
 #include <thread>
 #include <utility>
 
-Route::Route(const std::unique_ptr<ObjectManager>& object_manager)
+Route::Route(
+    const std::unique_ptr<ObjectManager>& object_manager,
+    const double& view_distance
+)
     : object_manager(object_manager)
+    , view_distance(view_distance)
 {
 }
 

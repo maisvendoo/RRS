@@ -14,7 +14,10 @@ class ObjectManager;
 class Route
 {
 public:
-    explicit Route(const std::unique_ptr<ObjectManager>& object_manager);
+    Route(
+        const std::unique_ptr<ObjectManager>& object_manager,
+        const double& view_distance
+    );
 
     std::thread load_static_objects_thread;
     std::thread load_topology_thread;
@@ -30,6 +33,7 @@ private:
 
 private:
     const std::unique_ptr<ObjectManager>& object_manager;
+    const double& view_distance;
 
     std::map<Label, RelativePath> objects_ref;
     std::map<Label, std::vector<RouteMapTransform>> route_map;
