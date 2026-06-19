@@ -142,7 +142,15 @@ bool Route::load_route_map(const std::string& route_dir)
         RouteMapTransform transform;
         if (iss >> label >> transform.translation >> transform.rotation)
         {
-            route_map[label].push_back(transform);
+            if (objects_ref.find(label) == objects_ref.end())
+            {
+                Journal::instance()->warning(QString("Failed to find label %1 in objects.ref")
+                    .arg(to_qstring(label)));
+            }
+            else
+            {
+                route_map[label].push_back(transform);
+            }
         }
     }
 
