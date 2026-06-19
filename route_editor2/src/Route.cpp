@@ -18,6 +18,11 @@
 #include <thread>
 #include <utility>
 
+Route::Route(const std::unique_ptr<ObjectManager>& object_manager)
+    : object_manager(object_manager)
+{
+}
+
 void Route::start_load(const std::string& route_dir)
 {
     load_static_objects_thread = std::thread([this, &route_dir]() -> void {

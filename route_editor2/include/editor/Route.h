@@ -4,13 +4,18 @@
 #include "editor/RouteMapTransformation.h"
 
 #include <map>
+#include <memory>
 #include <string>
 #include <thread>
 #include <vector>
 
+class ObjectManager;
+
 class Route
 {
 public:
+    explicit Route(const std::unique_ptr<ObjectManager>& object_manager);
+
     std::thread load_static_objects_thread;
     std::thread load_topology_thread;
 
@@ -24,6 +29,8 @@ private:
     using RelativePath = std::string;
 
 private:
+    const std::unique_ptr<ObjectManager>& object_manager;
+
     std::map<Label, RelativePath> objects_ref;
     std::map<Label, std::vector<RouteMapTransformation>> route_map;
 

@@ -5,6 +5,7 @@
 #include "editor/EventHandler.h"
 #include "editor/Keyboard.h"
 #include "editor/ObjectManager.h"
+#include "editor/Route.h"
 #include "editor/StateManager.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/GuiSettings.h"
@@ -44,6 +45,7 @@
 
 RouteEditor::RouteEditor()
     : state_manager(route_dir)
+    , route(object_manager)
 {
     initialize_journal();
     read_settings();
