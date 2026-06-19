@@ -1,7 +1,7 @@
 #ifndef EDITOR_ROUTE_H
 #define EDITOR_ROUTE_H
 
-#include "editor/RouteMapTransformation.h"
+#include "editor/RouteMapTransform.h"
 
 #include <map>
 #include <memory>
@@ -32,7 +32,7 @@ private:
     const std::unique_ptr<ObjectManager>& object_manager;
 
     std::map<Label, RelativePath> objects_ref;
-    std::map<Label, std::vector<RouteMapTransformation>> route_map;
+    std::map<Label, std::vector<RouteMapTransform>> route_map;
 
 private:
     void load_static_objects(const std::string& route_dir);

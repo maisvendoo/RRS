@@ -1,6 +1,6 @@
 #include "editor/Route.h"
 
-#include "editor/RouteMapTransformation.h"
+#include "editor/RouteMapTransform.h"
 
 #include <Journal.h>
 #include <core/string_funcs.h>
@@ -139,10 +139,10 @@ bool Route::load_route_map(const std::string& route_dir)
 
         std::istringstream iss(std::move(line));
         Label label;
-        RouteMapTransformation transformation;
-        if (iss >> label >> transformation.translation >> transformation.rotation)
+        RouteMapTransform transform;
+        if (iss >> label >> transform.translation >> transform.rotation)
         {
-            route_map[label].push_back(transformation);
+            route_map[label].push_back(transform);
         }
     }
 
@@ -160,18 +160,18 @@ void Route::print_route_map_in_journal() const
         .arg("Label", -32)
         .arg("Translation", -40));
 
-    for (const auto& [label, transformations] : route_map)
+    for (const auto& [label, transforms] : route_map)
     {
-        for (const RouteMapTransformation& transformation : transformations)
+        for (const RouteMapTransform& transform : transforms)
         {
             Journal::instance()->info(QString("%1{%2, %3, %4}    {%5, %6, %7}")
                 .arg(label, -32)
-                .arg(transformation.translation.x, 10, 'f', 3)
-                .arg(transformation.translation.y, 10, 'f', 3)
-                .arg(transformation.translation.z, 10, 'f', 3)
-                .arg(transformation.rotation.x, 10, 'f', 3)
-                .arg(transformation.rotation.y, 10, 'f', 3)
-                .arg(transformation.rotation.z, 10, 'f', 3));
+                .arg(transform.translation.x, 10, 'f', 3)
+                .arg(transform.translation.y, 10, 'f', 3)
+                .arg(transform.translation.z, 10, 'f', 3)
+                .arg(transform.rotation.x, 10, 'f', 3)
+                .arg(transform.rotation.y, 10, 'f', 3)
+                .arg(transform.rotation.z, 10, 'f', 3));
         }
     }
 }
