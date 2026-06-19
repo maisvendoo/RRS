@@ -10,12 +10,14 @@
 
 #include <vsg/core/ref_ptr.h>
 
+#include <memory>
 #include <string>
 
 class Camera;
 class EditorGui;
 class EventHandler;
 class Keyboard;
+class ObjectManager;
 
 namespace vsg
 {
@@ -72,6 +74,7 @@ private:
     StateManager state_manager;
     std::string route_dir;
     Route route;
+    std::unique_ptr<ObjectManager> object_manager;
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
@@ -119,6 +122,8 @@ private:
     void read_settings(const char* filename = "editor-settings.xml");
 
     void print_settings() const;
+
+    void create_object_manager();
 
     /**
      * @brief Create a VSG options object.

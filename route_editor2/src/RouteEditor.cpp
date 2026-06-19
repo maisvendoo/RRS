@@ -4,6 +4,7 @@
 #include "editor/EditorGui.h"
 #include "editor/EventHandler.h"
 #include "editor/Keyboard.h"
+#include "editor/ObjectManager.h"
 #include "editor/StateManager.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/GuiSettings.h"
@@ -39,6 +40,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <memory>
 
 RouteEditor::RouteEditor()
     : state_manager(route_dir)
@@ -46,6 +48,7 @@ RouteEditor::RouteEditor()
     initialize_journal();
     read_settings();
     print_settings();
+    create_object_manager();
     create_vsg_options();
     create_window();
     create_keyboard();
@@ -133,6 +136,18 @@ void RouteEditor::print_settings() const
     camera_settings.print_in_journal();
     scene_settings.print_in_journal();
     gui_settings.print_in_journal();
+}
+
+void RouteEditor::create_object_manager()
+{
+    object_manager = std::make_unique<ObjectManager>(scene_settings.max_object_count);
+    if (!object_manager)
+    {
+        Journal::instance()->error("Failed to create object manager");
+        std::exit(EXIT_FAILURE);
+    }
+
+    Journal::instance()->info("Object manager is created successfully");
 }
 
 void RouteEditor::create_vsg_options()
