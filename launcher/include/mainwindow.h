@@ -17,11 +17,8 @@
 
 #include    <QMainWindow>
 #include    <QIcon>
-#include    <QToolBox>
 #include    <QProcess>
 #include    <QTimer>
-#include    <QDateEdit>
-#include    <QTimeEdit>
 
 #include    <train-info.h>
 #include    <route-info.h>
@@ -30,8 +27,13 @@
 #include    <gpu-info.h>
 #include    <CfgEditor.h>
 
-#include    "graphsettingswindow.h"
 #include    "winver.h"
+
+class GraphSettingsWindow;
+
+class QDateEdit;
+class QTimeEdit;
+class QToolBox;
 
 //------------------------------------------------------------------------------
 //
@@ -196,7 +198,7 @@ private:
 
     bool start_viewer_allowed = false;
 
-    GraphSettingsWindow *graphSettingsWindow = new GraphSettingsWindow(this);
+    GraphSettingsWindow* graphSettingsWindow;
 
     [[maybe_unused]] RequireWindowsVersion winver;
 
@@ -236,7 +238,7 @@ private slots:
 
     void slotAddActiveTrain();
 
-    void slotDeleteActiveTrain();    
+    void slotDeleteActiveTrain();
 
     void slotTrainConfigChanged();
 
@@ -280,7 +282,7 @@ private slots:
 
     void slotOnScenarioSelection(int cur_idx);
 
-    void slotSaveTrainsConfigAsScenario();   
+    void slotSaveTrainsConfigAsScenario();
 };
 
 

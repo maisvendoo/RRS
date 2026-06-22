@@ -18,6 +18,7 @@
 #include    "ui_mainwindow.h"
 
 #include    <QPushButton>
+#include    <QToolBox>
 #include    <QDir>
 #include    <QDirIterator>
 #include    <QStringList>
@@ -44,6 +45,7 @@ const   QString MainWindow::AUTO_START_ROUTE_MAP = "AutoStartRouteMap";
 //------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , graphSettingsWindow(new GraphSettingsWindow(this))
 {
     ui->setupUi(this);
 
