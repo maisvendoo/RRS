@@ -48,19 +48,19 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->pbGraphCancel, &QPushButton::released,
             this, &GraphSettingsWindow::slotCancelSettings);
 
-    connect(ui->cbWindowDecoration, &QCheckBox::stateChanged, this, [this](int){
+    connect(ui->cbWindowDecoration, &QCheckBox::checkStateChanged, this, [this](){
         ui->pbGraphApply->setEnabled(true);
     });
 
-    connect(ui->cbFullScreenMode, &QCheckBox::stateChanged, this, [this](int){
+    connect(ui->cbFullScreenMode, &QCheckBox::checkStateChanged, this, [this](){
         ui->pbGraphApply->setEnabled(true);
     });
 
-    connect(ui->sbWindowWidth, &QSpinBox::valueChanged, this, [this](int){
+    connect(ui->sbWindowWidth, &QSpinBox::valueChanged, this, [this](){
         ui->pbGraphApply->setEnabled(true);
     });
 
-    connect(ui->sbWindowHeight, &QSpinBox::valueChanged, this, [this](int){
+    connect(ui->sbWindowHeight, &QSpinBox::valueChanged, this, [this](){
         ui->pbGraphApply->setEnabled(true);
     });
 
@@ -121,7 +121,7 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
         ui->pbGraphApply->setEnabled(true);
     });
 
-    connect(ui->cbShowShadows, &QCheckBox::stateChanged, this, [this](int){
+    connect(ui->cbShowShadows, &QCheckBox::checkStateChanged, this, [this](int){
 
         if (ui->cbShowShadows->checkState() == Qt::CheckState::Checked)
         {
@@ -147,11 +147,7 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
 
         if (idx > 0 && idx < shadowMapResolution.size())
         {
-            auto resolution = shadowMapResolution[idx];
-
-            int index = 0;
-            findSetting(SHADOW_RESOLUTION, fd_list, index);
-            fd_list[index] = QPair<QString, QVariant>(SHADOW_RESOLUTION, resolution);
+            changeSetting(SHADOW_RESOLUTION, fd_list, shadowMapResolution[idx]);
         }
     });
 }
@@ -190,8 +186,8 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
             best_gpu_idx = i;
         }
 
-        ui->cbListGPU->addItem(gpu_info.deviceName);        
-    }    
+        ui->cbListGPU->addItem(gpu_info.deviceName);
+    }
 
     // Если видюха еще не настраивалась никогда
     if (current_gpu_idx == -1)
@@ -338,38 +334,38 @@ void GraphSettingsWindow::ulockShadowsSettings(Ui::GraphSettingsWindow *ui, bool
 //------------------------------------------------------------------------------
 void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::GraphSettingsWindow *ui)
 {
-    ui->sbWindowWidth->setValue(findSetting(WIDTH, fd_list).second.toInt());
-    ui->sbWindowHeight->setValue(findSetting(HEIGHT, fd_list).second.toInt());
+    ui->sbWindowWidth->setValue(getSetting(WIDTH, fd_list).toInt());
+    ui->sbWindowHeight->setValue(getSetting(HEIGHT, fd_list).toInt());
 
-    findSetting(FULLSCREEN, fd_list).second == 1 ?
+    getSetting(FULLSCREEN, fd_list).toInt() == 1 ?
         ui->cbFullScreenMode->setCheckState(Qt::CheckState::Checked) :
         ui->cbFullScreenMode->setCheckState(Qt::CheckState::Unchecked);
 
-    findSetting(WIN_DECOR, fd_list).second == 1 ?
+    getSetting(WIN_DECOR, fd_list).toInt() == 1 ?
         ui->cbWindowDecoration->setCheckState(Qt::CheckState::Checked) :
         ui->cbWindowDecoration->setCheckState(Qt::CheckState::Unchecked);
 
-    findSetting(VSYNC, fd_list).second == 1 ?
+    getSetting(VSYNC, fd_list).toInt() == 1 ?
         ui->cbLimitFPS->setCheckState(Qt::CheckState::Unchecked) :
         ui->cbLimitFPS->setCheckState(Qt::CheckState::Checked);
 
-    ui->sbMaxFPS->setValue(findSetting(MAX_FPS, fd_list).second.toInt());
+    ui->sbMaxFPS->setValue(getSetting(MAX_FPS, fd_list).toInt());
 
-    ui->cbListGPU->setCurrentIndex(findSetting(PHYSICAL_DEVICE, fd_list).second.toInt());
+    ui->cbListGPU->setCurrentIndex(getSetting(PHYSICAL_DEVICE, fd_list).toInt());
 
-    ui->sbDisplayNumber->setValue(findSetting(SCREEN_NUM, fd_list).second.toInt());
+    ui->sbDisplayNumber->setValue(getSetting(SCREEN_NUM, fd_list).toInt());
 
-    ui->sbViewDistance->setValue(findSetting(VIEW_DIST, fd_list).second.toInt());
+    ui->sbViewDistance->setValue(getSetting(VIEW_DIST, fd_list).toInt());
 
-    int samples = findSetting(SAMPLES, fd_list).second.toInt();
+    int samples = getSetting(SAMPLES, fd_list).toInt();
     int s = qRound(std::log2(samples));
-    ui->hsMSAA->setValue(s);    
+    ui->hsMSAA->setValue(s);
 
-    bool shadow = findSetting(SHADOW, fd_list).second.toBool();
+    bool shadow = getSetting(SHADOW, fd_list).toBool();
     shadow ? ui->cbShowShadows->setCheckState(Qt::CheckState::Checked) : ui->cbShowShadows->setCheckState(Qt::CheckState::Unchecked);
     ui->cbSwadowsQuality->setEnabled(true);
 
-    int shadows_preset = findSetting(SHADOWS_PRESET, fd_list).second.toInt();
+    int shadows_preset = getSetting(SHADOWS_PRESET, fd_list).toInt();
 
     if (shadows_preset > 0 && shadows_preset < ui->cbSwadowsQuality->count())
     {
@@ -387,16 +383,16 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
 
     for (size_t i = 0; i < shadowMapResolution.size(); ++i)
     {
-        if (shadowMapResolution[i] == findSetting(SHADOW_RESOLUTION, fd_list).second.toInt())
+        if (shadowMapResolution[i] == getSetting(SHADOW_RESOLUTION, fd_list).toInt())
         {
             ui->cbShadowsMap->setCurrentIndex(i);
         }
     }
 
-    ui->hsShadowsCascades->setValue(findSetting(SHADOW_CASCADE, fd_list).second.toInt());
+    ui->hsShadowsCascades->setValue(getSetting(SHADOW_CASCADE, fd_list).toInt());
     ui->lShadowsCascades->setText(QString("%1").arg(ui->hsShadowsCascades->value()));
 
-    ui->hsShadowsDistance->setValue(findSetting(SHADOW_DISTANCE, fd_list).second.toInt());
+    ui->hsShadowsDistance->setValue(getSetting(SHADOW_DISTANCE, fd_list).toInt());
     ui->lShadowsDistance->setText(QString("%2").arg(ui->hsShadowsDistance->value()));
 
     ui->pbGraphApply->setEnabled(false);
@@ -408,74 +404,21 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
 void GraphSettingsWindow::applyGraphSettings(FieldsDataList &fd_list,
                                              Ui::GraphSettingsWindow *ui)
 {
-    int idx = 0;
-
-    findSetting(WIDTH, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(WIDTH, ui->sbWindowWidth->value());
-
-    findSetting(HEIGHT, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(HEIGHT, ui->sbWindowHeight->value());
-
-    findSetting(FULLSCREEN, fd_list, idx);
-    if (ui->cbFullScreenMode->checkState() == Qt::CheckState::Checked)
-    {
-        fd_list[idx] = QPair<QString, QVariant>(FULLSCREEN, 1);
-    }
-    else
-    {
-        fd_list[idx] = QPair<QString, QVariant>(FULLSCREEN, 0);
-    }
-
-    findSetting(VSYNC, fd_list, idx);
-    if (ui->cbLimitFPS->checkState() == Qt::CheckState::Checked)
-    {
-        fd_list[idx] = QPair<QString, QVariant>(VSYNC, 0);
-    }
-    else
-    {
-        fd_list[idx] = QPair<QString, QVariant>(VSYNC, 1);
-    }
-
-    findSetting(MAX_FPS, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(MAX_FPS, ui->sbMaxFPS->value());
-
-    findSetting(PHYSICAL_DEVICE, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(PHYSICAL_DEVICE, ui->cbListGPU->currentIndex());
-
-    findSetting(WIN_DECOR, fd_list, idx);
-    if (ui->cbWindowDecoration->checkState() == Qt::CheckState::Checked)
-    {
-        fd_list[idx] = QPair<QString, QVariant>(WIN_DECOR, 1);
-    }
-    else
-    {
-        fd_list[idx] = QPair<QString, QVariant>(WIN_DECOR, 0);
-    }
-
-    findSetting(SCREEN_NUM, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(SCREEN_NUM, ui->sbDisplayNumber->value());
-
-    findSetting(VIEW_DIST, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(VIEW_DIST, ui->sbViewDistance->value());
-
-    findSetting(SAMPLES, fd_list, idx);
-    int samples = (1 << ui->hsMSAA->value());
-    fd_list[idx] = QPair<QString, QVariant>(SAMPLES, samples);
-
-    findSetting(SHADOW, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(SHADOW, ui->cbShowShadows->checkState() == Qt::CheckState::Checked ? true : false);
-
-    findSetting(SHADOW_RESOLUTION, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(SHADOW_RESOLUTION, shadowMapResolution[ui->cbShadowsMap->currentIndex()]);
-
-    findSetting(SHADOW_CASCADE, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(SHADOW_CASCADE, ui->hsShadowsCascades->value());
-
-    findSetting(SHADOW_DISTANCE, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(SHADOW_DISTANCE, ui->hsShadowsDistance->value());
-
-    findSetting(SHADOWS_PRESET, fd_list, idx);
-    fd_list[idx] = QPair<QString, QVariant>(SHADOWS_PRESET, ui->cbSwadowsQuality->currentIndex());
+    changeSetting(WIDTH, fd_list, ui->sbWindowWidth->value());
+    changeSetting(HEIGHT, fd_list, ui->sbWindowHeight->value());
+    changeSetting(FULLSCREEN, fd_list, static_cast<int>(ui->cbFullScreenMode->checkState() == Qt::CheckState::Checked));
+    changeSetting(VSYNC, fd_list, static_cast<int>(ui->cbLimitFPS->checkState() != Qt::CheckState::Checked));
+    changeSetting(MAX_FPS, fd_list, ui->sbMaxFPS->value());
+    changeSetting(PHYSICAL_DEVICE, fd_list, ui->cbListGPU->currentIndex());
+    changeSetting(WIN_DECOR, fd_list, static_cast<int>(ui->cbWindowDecoration->checkState() == Qt::CheckState::Checked));
+    changeSetting(SCREEN_NUM, fd_list, ui->sbDisplayNumber->value());
+    changeSetting(VIEW_DIST, fd_list, ui->sbViewDistance->value());
+    changeSetting(SAMPLES, fd_list, 1 << ui->hsMSAA->value());
+    changeSetting(SHADOW, fd_list, static_cast<int>(ui->cbShowShadows->checkState() == Qt::CheckState::Checked));
+    changeSetting(SHADOW_RESOLUTION, fd_list, shadowMapResolution[ui->cbShadowsMap->currentIndex()]);
+    changeSetting(SHADOW_CASCADE, fd_list, ui->hsShadowsCascades->value());
+    changeSetting(SHADOW_DISTANCE, fd_list, ui->hsShadowsDistance->value());
+    changeSetting(SHADOWS_PRESET, fd_list, ui->cbSwadowsQuality->currentIndex());
 }
 
 //------------------------------------------------------------------------------
@@ -503,7 +446,7 @@ void GraphSettingsWindow::showEvent(QShowEvent *event)
 //------------------------------------------------------------------------------
 void GraphSettingsWindow::setDefaultSettingsForChangedGPU(int gpu_idx)
 {
-    auto &gpu_info = gpus_info[gpu_idx];    
+    auto &gpu_info = gpus_info[gpu_idx];
 
     applyGraphSettings(fd_list, ui);
     updateGraphSettings(fd_list, ui);

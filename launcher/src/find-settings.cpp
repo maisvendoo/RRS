@@ -1,35 +1,40 @@
-#include    <find-settings.h>
+#include    "find-settings.h"
+
+#include    <CfgEditor.h>
+
+#include    <QString>
+#include    <QVariant>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QPair<QString, QVariant> findSetting(QString setting,
-                                     FieldsDataList &fd_list,
-                                     int &idx)
+void changeSetting(const QString& setting, FieldsDataList& fd_list,
+    const QVariant& new_value)
 {
-    QPair<QString, QVariant> pair;
-
-    for (int i = 0; i < fd_list.size(); ++i)
+    for (auto& pair : fd_list)
     {
-        pair = fd_list[i];
-
         if (pair.first == setting)
         {
-            idx = i;
-            return pair;
+            pair.second = new_value;
+            return;
         }
     }
-
-    return pair;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QPair<QString, QVariant> findSetting(QString setting, FieldsDataList &fd_list)
+const QVariant& getSetting(const QString& setting,
+    const FieldsDataList& fd_list)
 {
-    int idx = 0;
-    QPair<QString, QVariant> pair = findSetting(setting, fd_list, idx);
+    for (const auto& pair : fd_list)
+    {
+        if (pair.first == setting)
+        {
+            return pair.second;
+        }
+    }
 
-    return pair;
+    static QVariant variant;
+    return variant;
 }
