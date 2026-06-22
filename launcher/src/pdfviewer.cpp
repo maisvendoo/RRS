@@ -2,6 +2,9 @@
 #include    <QPdfDocument>
 #include    <QApplication>
 #include    <QScrollBar>
+#include    <QLabel>
+#include    <QVBoxLayout>
+#include    <QWheelEvent>
 
 //------------------------------------------------------------------------------
 //
@@ -19,7 +22,7 @@ PdfViewer::PdfViewer(QWidget *parent) : QScrollArea(parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
-    setStyleSheet("QScrollArea { border: none; background: transparent; }");    
+    setStyleSheet("QScrollArea { border: none; background: transparent; }");
 }
 
 //------------------------------------------------------------------------------
