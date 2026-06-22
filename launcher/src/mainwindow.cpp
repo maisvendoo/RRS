@@ -61,10 +61,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->lwTrains, &QListWidget::itemSelectionChanged,
             this, &MainWindow::slotTrainSelection);
 
-    connect(ui->cbStartDateManually, &QCheckBox::stateChanged,
+    connect(ui->cbStartDateManually, &QCheckBox::checkStateChanged,
             this, &MainWindow::slotStartDateManuallyChanged);
 
-    connect(ui->cbStartTimeManually, &QCheckBox::stateChanged,
+    connect(ui->cbStartTimeManually, &QCheckBox::checkStateChanged,
             this, &MainWindow::slotStartTimeManuallyChanged);
 
     connect(ui->pbStartServer, &QPushButton::pressed,
