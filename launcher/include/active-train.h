@@ -9,15 +9,10 @@
 //------------------------------------------------------------------------------
 struct active_train_t
 {
-    bool is_active = false;
     train_info_t train_info;
     train_position_t train_position;
+    bool is_active = false;
     bool is_autopilot_on = false;
-
-    active_train_t()
-    {
-
-    }
 };
 
-#endif
+#endif // ACTIVE_TRAIN_H
