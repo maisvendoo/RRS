@@ -105,11 +105,11 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget* parent) : QMainWindow(parent)
         if (idx < static_cast<int>(shadowsPresets.size()))
         {
             ulockShadowsSettings(ui, false);
-            auto sp = shadowsPresets[idx];
+            auto shadow_preset = shadowsPresets[idx];
 
-            ui->cbShadowsMap->setCurrentIndex(sp.resolution_idx);
-            ui->hsShadowsCascades->setValue(sp.cascades);
-            ui->hsShadowsDistance->setValue(sp.distanse);
+            ui->cbShadowsMap->setCurrentIndex(shadow_preset.resolution_idx);
+            ui->hsShadowsCascades->setValue(shadow_preset.cascades);
+            ui->hsShadowsDistance->setValue(shadow_preset.distanse);
         }
         else
         {
@@ -166,7 +166,7 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
 
     for (size_t i = 0; i < gpus_info.size(); ++i)
     {
-        auto &gpu_info = gpus_info[i];
+        const auto& gpu_info = gpus_info[i];
 
         if (gpu_info.score > max_score)
         {
@@ -194,7 +194,7 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
     {
         ui->cbListGPU->setCurrentIndex(current_gpu_idx);
 
-        auto &gpu_info = gpus_info[current_gpu_idx];
+        const auto& gpu_info = gpus_info[current_gpu_idx];
 
         // Устанавливаем максимальный уровень сглаживания MSAA который обеспечивает GPU
         int s = qRound(std::log2(gpu_info.framebufferColorSamplesCounts));
@@ -325,17 +325,20 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
     ui->sbWindowWidth->setValue(getSetting(WIDTH, fd_list).toInt());
     ui->sbWindowHeight->setValue(getSetting(HEIGHT, fd_list).toInt());
 
-    getSetting(FULLSCREEN, fd_list).toInt() == 1 ?
-        ui->cbFullScreenMode->setCheckState(Qt::CheckState::Checked) :
-        ui->cbFullScreenMode->setCheckState(Qt::CheckState::Unchecked);
+    ui->cbFullScreenMode->setCheckState(
+        getSetting(FULLSCREEN, fd_list).toInt() == 1
+        ? Qt::CheckState::Checked
+        : Qt::CheckState::Unchecked);
 
-    getSetting(WIN_DECOR, fd_list).toInt() == 1 ?
-        ui->cbWindowDecoration->setCheckState(Qt::CheckState::Checked) :
-        ui->cbWindowDecoration->setCheckState(Qt::CheckState::Unchecked);
+    ui->cbWindowDecoration->setCheckState(
+        getSetting(WIN_DECOR, fd_list).toInt() == 1
+        ? Qt::CheckState::Checked
+        : Qt::CheckState::Unchecked);
 
-    getSetting(VSYNC, fd_list).toInt() == 1 ?
-        ui->cbLimitFPS->setCheckState(Qt::CheckState::Unchecked) :
-        ui->cbLimitFPS->setCheckState(Qt::CheckState::Checked);
+    ui->cbLimitFPS->setCheckState(
+        getSetting(VSYNC, fd_list).toInt() == 1
+        ? Qt::CheckState::Unchecked
+        : Qt::CheckState::Checked);
 
     ui->sbMaxFPS->setValue(getSetting(MAX_FPS, fd_list).toInt());
 
