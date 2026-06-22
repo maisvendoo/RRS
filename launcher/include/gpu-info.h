@@ -2,8 +2,9 @@
 #define     GPU_INFO_H
 
 #include    <QString>
-#include    <vector>
+
 #include    <cstdint>
+#include    <vector>
 
 //------------------------------------------------------------------------------
 //
@@ -32,4 +33,4 @@ struct gpu_info_t
 //------------------------------------------------------------------------------
 using gpus_info_list_t = std::vector<gpu_info_t>;
 
-#endif
+#endif // GPU_INFO_H

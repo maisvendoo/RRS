@@ -365,7 +365,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="cbSwadowsQuality">
+            <widget class="QComboBox" name="cbShadowsQuality">
              <property name="enabled">
               <bool>false</bool>
              </property>

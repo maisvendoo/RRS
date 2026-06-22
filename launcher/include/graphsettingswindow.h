@@ -1,9 +1,20 @@
 #ifndef     GRAPHSETTINGSWINDOW_H
 #define     GRAPHSETTINGSWINDOW_H
 
-#include    <QMainWindow>
-#include    <gpu-info.h>
+#include    "gpu-info.h"
+
 #include    <CfgEditor.h>
+
+#include    <QMainWindow>
+#include    <QObject>
+#include    <QString>
+
+#include    <cstddef>
+#include    <cstdint>
+#include    <vector>
+
+class       QShowEvent;
+class       QWidget;
 
 //------------------------------------------------------------------------------
 //
@@ -22,11 +33,11 @@ class GraphSettingsWindow : public QMainWindow
 
 public:
 
-    explicit GraphSettingsWindow(QWidget *parent = nullptr);
+    explicit GraphSettingsWindow(QWidget* parent = nullptr);
 
-    ~GraphSettingsWindow();
+    virtual ~GraphSettingsWindow() override;
 
-    void setSettingsGPU(const gpus_info_list_t &gpus_info);
+    void setSettingsGPU(const gpus_info_list_t& gpus_info);
 
 private:
 
@@ -34,45 +45,45 @@ private:
 
     int current_gpu_idx = -1;
 
-    Ui::GraphSettingsWindow *ui;
+    Ui::GraphSettingsWindow* ui;
 
     FieldsDataList fd_list;
 
     QString settings_path = "";
 
-    static const   QString WIDTH;
-    static const   QString HEIGHT;
-    static const   QString FULLSCREEN;
-    static const   QString FOV_Y;
-    static const   QString ZNEAR;
-    static const   QString ZFAR;
-    static const   QString SCREEN_NUM;
-    static const   QString WIN_DECOR;
-    static const   QString DOUBLE_BUFF;
-    static const   QString VSYNC;
-    static const   QString NOTIFY_LEVEL;
-    static const   QString VIEW_DIST;
-    static const   QString MAX_FPS;
-    static const   QString PHYSICAL_DEVICE;
-    static const   QString SAMPLES;
-    static const   QString DEPTH_FORMAT;
-    static const   QString SHADOW;
-    static const   QString SHADOWS_PRESET;
-    static const   QString SHADOW_DISTANCE;
-    static const   QString SHADOW_CASCADE;
-    static const   QString SHADOW_RESOLUTION;
+    static const QString WIDTH;
+    static const QString HEIGHT;
+    static const QString FULLSCREEN;
+    static const QString FOV_Y;
+    static const QString ZNEAR;
+    static const QString ZFAR;
+    static const QString SCREEN_NUM;
+    static const QString WIN_DECOR;
+    static const QString DOUBLE_BUFF;
+    static const QString VSYNC;
+    static const QString NOTIFY_LEVEL;
+    static const QString VIEW_DIST;
+    static const QString MAX_FPS;
+    static const QString PHYSICAL_DEVICE;
+    static const QString SAMPLES;
+    static const QString DEPTH_FORMAT;
+    static const QString SHADOW;
+    static const QString SHADOWS_PRESET;
+    static const QString SHADOW_DISTANCE;
+    static const QString SHADOW_CASCADE;
+    static const QString SHADOW_RESOLUTION;
 
-    void loadGraphicsSettings(QString file_name);
+    void loadGraphicsSettings(const QString& file_name);
 
-    void updateGraphSettings(FieldsDataList &fd_list,
-                             Ui::GraphSettingsWindow *ui);
+    void updateGraphSettings(FieldsDataList& fd_list,
+        Ui::GraphSettingsWindow* ui);
 
-    void applyGraphSettings(FieldsDataList &fd_list,
-                            Ui::GraphSettingsWindow *ui);
+    void applyGraphSettings(FieldsDataList& fd_list,
+        Ui::GraphSettingsWindow* ui);
 
-    void saveGraphSettings(FieldsDataList &fd_list);
+    void saveGraphSettings(FieldsDataList& fd_list);
 
-    void showEvent(QShowEvent *event) override;
+    virtual void showEvent(QShowEvent* event) override;
 
     void setDefaultSettingsForChangedGPU(int gpu_idx);
 
@@ -92,7 +103,7 @@ private:
         {2, 4, 300}
     };
 
-    void ulockShadowsSettings(Ui::GraphSettingsWindow *ui, bool lock);
+    void ulockShadowsSettings(Ui::GraphSettingsWindow* ui, bool lock);
 
 private slots:
 

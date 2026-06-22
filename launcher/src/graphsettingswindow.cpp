@@ -10,32 +10,32 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-const   QString GraphSettingsWindow::WIDTH = "Width";
-const   QString GraphSettingsWindow::HEIGHT = "Height";
-const   QString GraphSettingsWindow::FULLSCREEN = "FullScreen";
-const   QString GraphSettingsWindow::FOV_Y = "FovY";
-const   QString GraphSettingsWindow::ZNEAR = "zNear";
-const   QString GraphSettingsWindow::ZFAR = "zFar";
-const   QString GraphSettingsWindow::SCREEN_NUM = "ScreenNumber";
-const   QString GraphSettingsWindow::WIN_DECOR = "WindowDecoration";
-const   QString GraphSettingsWindow::DOUBLE_BUFF = "DoubleBuffer";
-const   QString GraphSettingsWindow::VSYNC = "VSync";
-const   QString GraphSettingsWindow::NOTIFY_LEVEL = "NofifyLevel";
-const   QString GraphSettingsWindow::VIEW_DIST = "ViewDistance";
-const   QString GraphSettingsWindow::MAX_FPS = "MaxFPS";
-const   QString GraphSettingsWindow::PHYSICAL_DEVICE = "PhysicalDevice";
-const   QString GraphSettingsWindow::SAMPLES = "Samples";
-const   QString GraphSettingsWindow::DEPTH_FORMAT = "depthFormat";
-const   QString GraphSettingsWindow::SHADOW = "Shadow";
-const   QString GraphSettingsWindow::SHADOWS_PRESET = "ShadowsPreset";
-const   QString GraphSettingsWindow::SHADOW_DISTANCE = "ShadowDistance";
-const   QString GraphSettingsWindow::SHADOW_CASCADE = "ShadowCascade";
-const   QString GraphSettingsWindow::SHADOW_RESOLUTION = "ShadowResolution";
+const QString GraphSettingsWindow::WIDTH = "Width";
+const QString GraphSettingsWindow::HEIGHT = "Height";
+const QString GraphSettingsWindow::FULLSCREEN = "FullScreen";
+const QString GraphSettingsWindow::FOV_Y = "FovY";
+const QString GraphSettingsWindow::ZNEAR = "zNear";
+const QString GraphSettingsWindow::ZFAR = "zFar";
+const QString GraphSettingsWindow::SCREEN_NUM = "ScreenNumber";
+const QString GraphSettingsWindow::WIN_DECOR = "WindowDecoration";
+const QString GraphSettingsWindow::DOUBLE_BUFF = "DoubleBuffer";
+const QString GraphSettingsWindow::VSYNC = "VSync";
+const QString GraphSettingsWindow::NOTIFY_LEVEL = "NofifyLevel";
+const QString GraphSettingsWindow::VIEW_DIST = "ViewDistance";
+const QString GraphSettingsWindow::MAX_FPS = "MaxFPS";
+const QString GraphSettingsWindow::PHYSICAL_DEVICE = "PhysicalDevice";
+const QString GraphSettingsWindow::SAMPLES = "Samples";
+const QString GraphSettingsWindow::DEPTH_FORMAT = "depthFormat";
+const QString GraphSettingsWindow::SHADOW = "Shadow";
+const QString GraphSettingsWindow::SHADOWS_PRESET = "ShadowsPreset";
+const QString GraphSettingsWindow::SHADOW_DISTANCE = "ShadowDistance";
+const QString GraphSettingsWindow::SHADOW_CASCADE = "ShadowCascade";
+const QString GraphSettingsWindow::SHADOW_RESOLUTION = "ShadowResolution";
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
+GraphSettingsWindow::GraphSettingsWindow(QWidget* parent) : QMainWindow(parent)
     , ui(new Ui::GraphSettingsWindow)
 {
     ui->setupUi(this);
@@ -65,26 +65,25 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
     });
 
     connect(ui->cbLimitFPS, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state){
-
         ui->pbGraphApply->setEnabled(true);
         ui->sbMaxFPS->setEnabled(state == Qt::Checked);
     });
 
-    connect(ui->sbMaxFPS, &QSpinBox::valueChanged, this, [this](int){
+    connect(ui->sbMaxFPS, &QSpinBox::valueChanged, this, [this](){
         ui->pbGraphApply->setEnabled(true);
     });
 
-    connect(ui->sbViewDistance, &QSpinBox::valueChanged, this, [this](int){
+    connect(ui->sbViewDistance, &QSpinBox::valueChanged, this, [this](){
         ui->pbGraphApply->setEnabled(true);
     });
 
-    connect(ui->sbDisplayNumber, &QSpinBox::valueChanged, this, [this](int){
+    connect(ui->sbDisplayNumber, &QSpinBox::valueChanged, this, [this](){
         ui->pbGraphApply->setEnabled(true);
     });
 
-    connect(ui->hsMSAA, &QSlider::valueChanged, this, [this](int){
+    connect(ui->hsMSAA, &QSlider::valueChanged, this, [this](int value){
         ui->pbGraphApply->setEnabled(true);
-        ui->lMSAA->setText(QString("%1x").arg((1 << ui->hsMSAA->value())));
+        ui->lMSAA->setText(QString("%1x").arg((1 << value)));
     });
 
     loadGraphicsSettings("settings");
@@ -92,19 +91,18 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
     connect(ui->cbListGPU, &QComboBox::currentIndexChanged,
             this, &GraphSettingsWindow::slotOnChangeCurrentGPU);
 
-    ui->cbSwadowsQuality->addItem(tr("Low"));
-    ui->cbSwadowsQuality->addItem(tr("Medium"));
-    ui->cbSwadowsQuality->addItem(tr("High"));
-    ui->cbSwadowsQuality->addItem(tr("Ultra"));
-    ui->cbSwadowsQuality->addItem(tr("Custom"));
+    ui->cbShadowsQuality->addItem(tr("Low"));
+    ui->cbShadowsQuality->addItem(tr("Medium"));
+    ui->cbShadowsQuality->addItem(tr("High"));
+    ui->cbShadowsQuality->addItem(tr("Ultra"));
+    ui->cbShadowsQuality->addItem(tr("Custom"));
 
     ui->cbShadowsMap->addItem(tr("Low"));
     ui->cbShadowsMap->addItem(tr("Medium"));
     ui->cbShadowsMap->addItem(tr("High"));
 
-    connect(ui->cbSwadowsQuality, &QComboBox::currentIndexChanged, this, [this](int idx){
-
-        if (idx < shadowsPresets.size())
+    connect(ui->cbShadowsQuality, &QComboBox::currentIndexChanged, this, [this](int idx){
+        if (idx < static_cast<int>(shadowsPresets.size()))
         {
             ulockShadowsSettings(ui, false);
             auto sp = shadowsPresets[idx];
@@ -121,17 +119,8 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
         ui->pbGraphApply->setEnabled(true);
     });
 
-    connect(ui->cbShowShadows, &QCheckBox::checkStateChanged, this, [this](int){
-
-        if (ui->cbShowShadows->checkState() == Qt::CheckState::Checked)
-        {
-            ui->cbSwadowsQuality->setEnabled(true);
-        }
-        else
-        {
-            ui->cbSwadowsQuality->setEnabled(false);
-        }
-
+    connect(ui->cbShowShadows, &QCheckBox::checkStateChanged, this, [this](){
+        ui->cbShadowsQuality->setEnabled(ui->cbShowShadows->checkState() == Qt::CheckState::Checked);
         ui->pbGraphApply->setEnabled(true);
     });
 
@@ -144,8 +133,7 @@ GraphSettingsWindow::GraphSettingsWindow(QWidget *parent) : QMainWindow(parent)
     });
 
     connect(ui->cbShadowsMap, &QComboBox::currentIndexChanged, this, [this](int idx){
-
-        if (idx > 0 && idx < shadowMapResolution.size())
+        if (idx > 0 && idx < static_cast<int>(shadowMapResolution.size()))
         {
             changeSetting(SHADOW_RESOLUTION, fd_list, shadowMapResolution[idx]);
         }
@@ -173,7 +161,7 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
     }
 
     // Выбираем самый производительный GPU из найденных в качестве текущего
-    int max_score = 0;
+    uint32_t max_score = 0;
     int best_gpu_idx = -1;
 
     for (size_t i = 0; i < gpus_info.size(); ++i)
@@ -202,7 +190,7 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
         saveGraphSettings(fd_list);
     }
 
-    if (current_gpu_idx > 0 && current_gpu_idx < gpus_info.size())
+    if (current_gpu_idx > 0 && static_cast<size_t>(current_gpu_idx) < gpus_info.size())
     {
         ui->cbListGPU->setCurrentIndex(current_gpu_idx);
 
@@ -221,7 +209,7 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void GraphSettingsWindow::loadGraphicsSettings(QString file_name)
+void GraphSettingsWindow::loadGraphicsSettings(const QString& file_name)
 {
     FileSystem &fs = FileSystem::getInstance();
     QString config_dir = QString(fs.getConfigDir().c_str());
@@ -363,16 +351,16 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
 
     bool shadow = getSetting(SHADOW, fd_list).toBool();
     shadow ? ui->cbShowShadows->setCheckState(Qt::CheckState::Checked) : ui->cbShowShadows->setCheckState(Qt::CheckState::Unchecked);
-    ui->cbSwadowsQuality->setEnabled(true);
+    ui->cbShadowsQuality->setEnabled(true);
 
     int shadows_preset = getSetting(SHADOWS_PRESET, fd_list).toInt();
 
-    if (shadows_preset > 0 && shadows_preset < ui->cbSwadowsQuality->count())
+    if (shadows_preset > 0 && shadows_preset < ui->cbShadowsQuality->count())
     {
-        ui->cbSwadowsQuality->setCurrentIndex(shadows_preset);
+        ui->cbShadowsQuality->setCurrentIndex(shadows_preset);
     }
 
-    if (shadows_preset >= shadowsPresets.size())
+    if (shadows_preset >= static_cast<int>(shadowsPresets.size()))
     {
         ulockShadowsSettings(ui, true);
     }
@@ -383,7 +371,7 @@ void GraphSettingsWindow::updateGraphSettings(FieldsDataList &fd_list, Ui::Graph
 
     for (size_t i = 0; i < shadowMapResolution.size(); ++i)
     {
-        if (shadowMapResolution[i] == getSetting(SHADOW_RESOLUTION, fd_list).toInt())
+        if (shadowMapResolution[i] == static_cast<unsigned int>(getSetting(SHADOW_RESOLUTION, fd_list).toInt()))
         {
             ui->cbShadowsMap->setCurrentIndex(i);
         }
@@ -418,7 +406,7 @@ void GraphSettingsWindow::applyGraphSettings(FieldsDataList &fd_list,
     changeSetting(SHADOW_RESOLUTION, fd_list, shadowMapResolution[ui->cbShadowsMap->currentIndex()]);
     changeSetting(SHADOW_CASCADE, fd_list, ui->hsShadowsCascades->value());
     changeSetting(SHADOW_DISTANCE, fd_list, ui->hsShadowsDistance->value());
-    changeSetting(SHADOWS_PRESET, fd_list, ui->cbSwadowsQuality->currentIndex());
+    changeSetting(SHADOWS_PRESET, fd_list, ui->cbShadowsQuality->currentIndex());
 }
 
 //------------------------------------------------------------------------------
@@ -444,9 +432,9 @@ void GraphSettingsWindow::showEvent(QShowEvent *event)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void GraphSettingsWindow::setDefaultSettingsForChangedGPU(int gpu_idx)
+void GraphSettingsWindow::setDefaultSettingsForChangedGPU(int/* gpu_idx*/)
 {
-    auto &gpu_info = gpus_info[gpu_idx];
+    // auto &gpu_info = gpus_info[gpu_idx];
 
     applyGraphSettings(fd_list, ui);
     updateGraphSettings(fd_list, ui);
