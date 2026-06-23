@@ -1,12 +1,15 @@
 #include "editor/states/BasicEditorState.h"
 
+#include <vsg/core/ref_ptr.h>
 #include <vsg/ui/KeyEvent.h>
 #include <vsgImGui/imgui.h>
 
 #include <string>
 
-BasicEditorState::BasicEditorState(const std::string& route_dir)
-    : route_dir(route_dir)
+BasicEditorState::BasicEditorState(const vsg::ref_ptr<Keyboard>& keyboard,
+    const std::string& route_dir)
+    : keyboard(keyboard)
+    , route_dir(route_dir)
 {
 }
 

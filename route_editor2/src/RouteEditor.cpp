@@ -44,7 +44,7 @@
 #include <memory>
 
 RouteEditor::RouteEditor()
-    : state_manager(route_dir)
+    : state_manager(keyboard, route_dir)
     , route(object_manager, camera_settings.view_distance)
 {
     initialize_journal();

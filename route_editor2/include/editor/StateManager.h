@@ -1,15 +1,19 @@
 #ifndef EDITOR_STATE_MANAGER_H
 #define EDITOR_STATE_MANAGER_H
 
+#include <vsg/core/ref_ptr.h>
+
 #include <memory>
 #include <string>
 
 class EditorState;
+class Keyboard;
 
 class StateManager
 {
 public:
-    explicit StateManager(const std::string& route_dir);
+    explicit StateManager(const vsg::ref_ptr<Keyboard>& keyboard,
+        const std::string& route_dir);
 
     ~StateManager();
 

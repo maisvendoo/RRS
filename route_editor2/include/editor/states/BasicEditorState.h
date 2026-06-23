@@ -3,14 +3,17 @@
 
 #include "editor/states/EditorState.h"
 
+#include <vsg/core/ref_ptr.h>
 #include <vsg/ui/KeyEvent.h>
 
 #include <string>
 
+class Keyboard;
+
 class BasicEditorState : public EditorState
 {
 public:
-    explicit BasicEditorState(const std::string& route_dir);
+    explicit BasicEditorState(const vsg::ref_ptr<Keyboard>& keyboard, const std::string& route_dir);
 
     virtual ~BasicEditorState() override;
 
@@ -21,6 +24,7 @@ public:
     virtual void handle_key_release(vsg::KeySymbol key) const override;
 
 private:
+    const vsg::ref_ptr<Keyboard>& keyboard;
     const std::string& route_dir;
 };
 
