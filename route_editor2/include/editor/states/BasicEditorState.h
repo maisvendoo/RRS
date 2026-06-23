@@ -3,6 +3,8 @@
 
 #include "editor/states/EditorState.h"
 
+#include <vsg/ui/KeyEvent.h>
+
 #include <string>
 
 class BasicEditorState : public EditorState
@@ -13,6 +15,10 @@ public:
     virtual ~BasicEditorState() override;
 
     virtual void fill_status_bar() const override;
+
+    virtual void handle_key_press(vsg::KeySymbol key) const override;
+
+    virtual void handle_key_release(vsg::KeySymbol key) const override;
 
 private:
     const std::string& route_dir;
