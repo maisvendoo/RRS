@@ -69,10 +69,12 @@ void WorldCulling::add(const vsg::dvec3 point, vsg::ref_ptr<vsg::Node> node)
 //------------------------------------------------------------------------------
 WorldCulling::tile_index_t WorldCulling::get_index(const double tile_size, const vsg::dvec3 point) const
 {
+    const double inverse_tile_size = 1.0 / tile_size;
+
     return {
-        static_cast<int>(std::round(point.x / tile_size)),
-        static_cast<int>(std::round(point.y / tile_size)),
-        static_cast<int>(std::round(point.z / tile_size))
+        static_cast<int>(std::round(point.x * inverse_tile_size)),
+        static_cast<int>(std::round(point.y * inverse_tile_size)),
+        static_cast<int>(std::round(point.z * inverse_tile_size))
     };
 }
 
