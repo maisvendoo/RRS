@@ -45,7 +45,7 @@
 
 RouteEditor::RouteEditor()
     : state_manager(keyboard, route_dir)
-    , route(object_manager, camera_settings.view_distance)
+    , route(object_manager, camera_settings.view_distance, vsg_options)
 {
     initialize_journal();
     read_settings();

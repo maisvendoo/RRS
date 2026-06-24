@@ -6,13 +6,16 @@
 #include <core/string_funcs.h>
 #include <filesystem.h>
 
+#include <vsg/core/ref_ptr.h>
 #include <vsg/io/stream.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/PagedLOD.h>
 
 #include <QString>
 
 #include <algorithm>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -20,10 +23,12 @@
 
 Route::Route(
     const std::unique_ptr<ObjectManager>& object_manager,
-    const double& view_distance
+    const double& view_distance,
+    const vsg::ref_ptr<vsg::Options>& vsg_options
 )
     : object_manager(object_manager)
     , view_distance(view_distance)
+    , vsg_options(vsg_options)
 {
 }
 
@@ -162,6 +167,15 @@ bool Route::load_route_map(const std::string& route_dir)
         .arg(to_qstring(route_map_path)));
 
     print_route_map_in_journal();
+
+    for (const auto& [label, transforms] : route_map)
+    {
+        const auto paged_lod = vsg::PagedLOD::create();
+        paged_lod->filename = fs.combinePath(route_dir, objects_ref[label]);
+        paged_lod->bound = {vsg::dvec3(0.0, 0.0, 0.0), view_distance};
+        paged_lod->children.front() = {0.1, nullptr};
+        paged_lod->options = vsg_options;
+    }
 
     return true;
 }

@@ -3,6 +3,8 @@
 
 #include "editor/RouteMapTransform.h"
 
+#include <vsg/core/ref_ptr.h>
+
 #include <map>
 #include <memory>
 #include <string>
@@ -11,12 +13,20 @@
 
 class ObjectManager;
 
+namespace vsg
+{
+
+class Options;
+
+}
+
 class Route
 {
 public:
     Route(
         const std::unique_ptr<ObjectManager>& object_manager,
-        const double& view_distance
+        const double& view_distance,
+        const vsg::ref_ptr<vsg::Options>& vsg_options
     );
 
     std::thread load_static_objects_thread;
@@ -34,6 +44,7 @@ private:
 private:
     const std::unique_ptr<ObjectManager>& object_manager;
     const double& view_distance;
+    const vsg::ref_ptr<vsg::Options>& vsg_options;
 
     std::map<Label, RelativePath> objects_ref;
     std::map<Label, std::vector<RouteMapTransform>> route_map;
