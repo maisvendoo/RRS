@@ -75,6 +75,19 @@ void EditorGui::draw_menu_bar() const
             ImGui::EndMenu();
         }
 
+        if (ImGui::BeginMenu("Test"))
+        {
+            if (ImGui::MenuItem("Test 1"))
+            {
+            }
+
+            if (ImGui::MenuItem("Test 2"))
+            {
+            }
+
+            ImGui::EndMenu();
+        }
+
         ImGui::EndMainMenuBar();
     }
 }
