@@ -7,6 +7,7 @@
 
 #include <filesystem.h>
 
+#include <vsg/app/CloseHandler.h>
 #include <ImGuiFileDialog.h>
 #include <vsgImGui/imgui.h>
 #include <vsgImGui/imgui_internal.h>
@@ -19,11 +20,13 @@ EditorGui::EditorGui(
     const gui_settings_t& gui_settings,
     StateManager& state_manager,
     std::string& route_dir,
-    Route& route
+    Route& route,
+    const vsg::ref_ptr<vsg::CloseHandler>& close_handler
 )
     : state_manager(state_manager)
     , route_dir(route_dir)
     , route(route)
+    , close_handler(close_handler)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -70,6 +73,11 @@ void EditorGui::draw_menu_bar() const
                 config.path = FileSystem::getInstance().getRouteRootDir();
                 ImGuiFileDialog::Instance()->OpenDialog("LoadRouteKey",
                     "Load route", nullptr, config);
+            }
+
+            if (ImGui::MenuItem("Quit", "Alt + F4"))
+            {
+                close_handler->close();
             }
 
             ImGui::EndMenu();

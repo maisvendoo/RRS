@@ -23,6 +23,7 @@ namespace vsg
 {
 
 class ClearAttachments;
+class CloseHandler;
 class CommandGraph;
 class Group;
 class Options;
@@ -78,6 +79,7 @@ private:
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
+    vsg::ref_ptr<vsg::CloseHandler> close_handler;
     vsg::ref_ptr<Keyboard> keyboard;
     vsg::ref_ptr<EventHandler> event_handler;
     vsg::ref_ptr<Camera> camera;

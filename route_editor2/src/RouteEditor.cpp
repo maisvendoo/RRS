@@ -283,7 +283,7 @@ void RouteEditor::create_clear_attachments()
 
 void RouteEditor::create_editor_gui()
 {
-    editor_gui = EditorGui::create(gui_settings, state_manager, route_dir, route);
+    editor_gui = EditorGui::create(gui_settings, state_manager, route_dir, route, close_handler);
     if (!editor_gui)
     {
         Journal::instance()->error("Failed to create editor GUI");
@@ -360,7 +360,7 @@ void RouteEditor::create_viewer()
     viewer->addWindow(window);
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
 
-    const auto close_handler = vsg::CloseHandler::create(viewer);
+    close_handler = vsg::CloseHandler::create(viewer);
     close_handler->closeKey = vsg::KEY_Undefined;
     viewer->addEventHandler(close_handler);
 

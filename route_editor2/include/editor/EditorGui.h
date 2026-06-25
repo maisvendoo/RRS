@@ -15,6 +15,7 @@ class StateManager;
 namespace vsg
 {
 
+class CloseHandler;
 class CommandBuffer;
 
 }
@@ -36,7 +37,8 @@ public:
         const gui_settings_t& gui_settings,
         StateManager& state_manager,
         std::string& route_dir,
-        Route& route
+        Route& route,
+        const vsg::ref_ptr<vsg::CloseHandler>& close_handler
     );
 
     /**
@@ -50,6 +52,7 @@ private:
     StateManager& state_manager;
     std::string& route_dir;
     Route& route;
+    const vsg::ref_ptr<vsg::CloseHandler>& close_handler;
 
     ImGuiViewport* viewport;
 
