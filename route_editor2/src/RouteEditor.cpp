@@ -254,7 +254,7 @@ void RouteEditor::create_event_handler()
 
 void RouteEditor::create_camera()
 {
-    camera = Camera::create(camera_settings, window->extent2D());
+    camera = Camera::create(camera_settings, window->extent2D(), keyboard);
     if (!camera)
     {
         Journal::instance()->error("Failed to create camera");

@@ -15,12 +15,15 @@
 
 Camera::Camera(
     const camera_settings_t& camera_settings,
-    VkExtent2D window_extent
+    VkExtent2D window_extent,
+    const vsg::ref_ptr<Keyboard>& keyboard
 )
+    : camera_settings(camera_settings)
+    , keyboard(keyboard)
 {
-    create_perspective(camera_settings, window_extent);
-    create_orthographic(camera_settings);
-    create_look_at(camera_settings);
+    create_perspective(window_extent);
+    create_orthographic();
+    create_look_at();
     create_viewport_state(window_extent);
 
     projectionMatrix = perspective;
@@ -28,6 +31,10 @@ Camera::Camera(
 }
 
 Camera::~Camera() = default;
+
+void Camera::update(double delta_time)
+{
+}
 
 const vsg::ref_ptr<vsg::Perspective>& Camera::get_perspective() const
 {
@@ -44,10 +51,7 @@ const vsg::ref_ptr<vsg::LookAt>& Camera::get_look_at() const
     return look_at;
 }
 
-void Camera::create_perspective(
-    const camera_settings_t& camera_settings,
-    VkExtent2D window_extent
-)
+void Camera::create_perspective(VkExtent2D window_extent)
 {
     perspective = vsg::Perspective::create(
         camera_settings.fovy_degrees,
@@ -66,7 +70,7 @@ void Camera::create_perspective(
     Journal::instance()->info("Perspective projection matrix is created successfully");
 }
 
-void Camera::create_orthographic(const camera_settings_t& camera_settings)
+void Camera::create_orthographic()
 {
     orthographic = vsg::Orthographic::create(
         -1.0,
@@ -86,7 +90,7 @@ void Camera::create_orthographic(const camera_settings_t& camera_settings)
     Journal::instance()->info("Orthographic projection matrix is created successfully");
 }
 
-void Camera::create_look_at(const camera_settings_t& camera_settings)
+void Camera::create_look_at()
 {
     look_at = vsg::LookAt::create();
     if (!look_at)

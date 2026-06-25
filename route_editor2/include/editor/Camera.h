@@ -7,6 +7,7 @@
 
 #include <vulkan/vulkan_core.h>
 
+class Keyboard;
 struct camera_settings_t;
 
 namespace vsg
@@ -37,18 +38,27 @@ public:
      * @param[in] camera_settings The camera settings object.
      * @param[in] window_extent Window extent from the VSG window object.
      */
-    Camera(const camera_settings_t& camera_settings, VkExtent2D window_extent);
+    Camera(
+        const camera_settings_t& camera_settings,
+        VkExtent2D window_extent,
+        const vsg::ref_ptr<Keyboard>& keyboard
+    );
 
     /**
      * @brief Destroy the Camera object.
      */
     ~Camera();
 
+    void update(double delta_time);
+
     const vsg::ref_ptr<vsg::Perspective>& get_perspective() const;
     const vsg::ref_ptr<vsg::Orthographic>& get_orthographic() const;
     const vsg::ref_ptr<vsg::LookAt>& get_look_at() const;
 
 private:
+    const camera_settings_t& camera_settings;
+    const vsg::ref_ptr<Keyboard>& keyboard;
+
     /// Perspective projection matrix.
     vsg::ref_ptr<vsg::Perspective> perspective;
 
@@ -66,13 +76,9 @@ private:
      * exit the program with std::exit (check the log file
      * (default - "logs/editor.log") for possible errors).
      *
-     * @param[in] camera_settings The camera settings object.
      * @param[in] window_extent Window extent from the VSG window object.
      */
-    void create_perspective(
-        const camera_settings_t& camera_settings,
-        VkExtent2D window_extent
-    );
+    void create_perspective(VkExtent2D window_extent);
 
     /**
      * @brief Create an Orthographic object.
@@ -80,10 +86,8 @@ private:
      * If an error occured during initialization,
      * exit the program with std::exit (check the log file
      * (default - "logs/editor.log") for possible errors).
-     *
-     * @param[in] camera_settings The camera settings object.
      */
-    void create_orthographic(const camera_settings_t& camera_settings);
+    void create_orthographic();
 
     /**
      * @brief Create a LookAt object.
@@ -93,10 +97,8 @@ private:
      * If an error occured during initialization,
      * exit the program with std::exit (check the log file
      * (default - "logs/editor.log") for possible errors).
-     *
-     * @param[in] camera_settings The camera settings object.
      */
-    void create_look_at(const camera_settings_t& camera_settings);
+    void create_look_at();
 
     /**
      * @brief Create a ViewportState object based on specified window extent.
