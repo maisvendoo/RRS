@@ -27,7 +27,7 @@ public:
 
     void defer_switch_to_basic_editor_state();
 
-    void update();
+    void update(double delta_time);
 
 private:
     std::unique_ptr<EditorState>* editor_state;

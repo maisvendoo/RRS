@@ -13,6 +13,8 @@ public:
     virtual void handle_key_press(vsg::KeySymbol key) const;
 
     virtual void handle_key_release(vsg::KeySymbol key) const;
+
+    virtual void update(double delta_time) const;
 };
 
 #endif // EDITOR_STATE_H

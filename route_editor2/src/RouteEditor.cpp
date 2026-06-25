@@ -102,7 +102,12 @@ void RouteEditor::run()
             ts = tts;
         }
 
-        state_manager.update();
+        static double prev_simulation_time = viewer->getFrameStamp()->simulationTime;
+        const double simulation_time = viewer->getFrameStamp()->simulationTime;
+        const double delta_time = simulation_time - prev_simulation_time;
+        prev_simulation_time = simulation_time;
+
+        state_manager.update(delta_time);
     }
 
     route.join_threads();

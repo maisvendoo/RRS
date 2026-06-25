@@ -28,6 +28,8 @@ public:
 
     virtual void handle_key_release(vsg::KeySymbol key) const override;
 
+    virtual void update(double delta_time) const override;
+
 private:
     const vsg::ref_ptr<Keyboard>& keyboard;
     const std::string& route_dir;

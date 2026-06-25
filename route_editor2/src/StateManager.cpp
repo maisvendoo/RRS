@@ -44,7 +44,8 @@ void StateManager::defer_switch_to_basic_editor_state()
     Journal::instance()->info("Deferred switch to state 'BasicEditorState'");
 }
 
-void StateManager::update()
+void StateManager::update(double delta_time)
 {
     editor_state = deferred_editor_state;
+    (*editor_state)->update(delta_time);
 }

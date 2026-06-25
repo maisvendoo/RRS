@@ -15,3 +15,7 @@ void EditorState::handle_key_press(vsg::KeySymbol key) const
 void EditorState::handle_key_release(vsg::KeySymbol key) const
 {
 }
+
+void EditorState::update(double delta_time) const
+{
+}

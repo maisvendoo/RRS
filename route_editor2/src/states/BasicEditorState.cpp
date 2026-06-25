@@ -1,5 +1,8 @@
 #include "editor/states/BasicEditorState.h"
 
+#include "editor/Camera.h"
+#include "editor/Keyboard.h"
+
 #include <vsg/core/ref_ptr.h>
 #include <vsg/ui/KeyEvent.h>
 #include <vsgImGui/imgui.h>
@@ -29,5 +32,9 @@ void BasicEditorState::handle_key_press(vsg::KeySymbol key) const
 }
 
 void BasicEditorState::handle_key_release(vsg::KeySymbol key) const
+{
+}
+
+void BasicEditorState::update(double delta_time) const
 {
 }
