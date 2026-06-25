@@ -139,6 +139,8 @@ private:
      */
     void create_vsg_options();
 
+    void configure_shaders();
+
     /**
      * @brief Create an EventHandler object.
      *

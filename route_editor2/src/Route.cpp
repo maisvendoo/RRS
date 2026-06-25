@@ -8,7 +8,10 @@
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/stream.h>
+#include <vsg/maths/common.h>
+#include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
 
 #include <QString>
@@ -34,9 +37,10 @@ Route::Route(
 
 void Route::start_load(const std::string& route_dir)
 {
-    load_static_objects_thread = std::thread([this, &route_dir]() -> void {
-        load_static_objects(route_dir);
-    });
+    load_static_objects(route_dir);
+    // load_static_objects_thread = std::thread([this, &route_dir]() -> void {
+    //     load_static_objects(route_dir);
+    // });
 
     load_topology_thread = std::thread([this, &route_dir]() -> void {
         load_topology(route_dir);
@@ -175,6 +179,19 @@ bool Route::load_route_map(const std::string& route_dir)
         paged_lod->bound = {vsg::dvec3(0.0, 0.0, 0.0), view_distance};
         paged_lod->children.front() = {0.1, nullptr};
         paged_lod->options = vsg_options;
+
+        for (const auto& transform : transforms)
+        {
+            const auto rotation = -transform.rotation;
+
+            const auto matrix_transform = vsg::MatrixTransform::create();
+            matrix_transform->matrix = vsg::translate(transform.translation) *
+                vsg::rotate(vsg::radians(rotation.z), vsg::dvec3(0.0, 0.0, 1.0)) *
+                vsg::rotate(vsg::radians(rotation.y), vsg::dvec3(0.0, 1.0, 0.0)) *
+                vsg::rotate(vsg::radians(rotation.x), vsg::dvec3(1.0, 0.0, 0.0));
+            matrix_transform->addChild(paged_lod);
+            temp_transforms.emplace_back(matrix_transform);
+        }
     }
 
     return true;

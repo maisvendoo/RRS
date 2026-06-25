@@ -19,9 +19,11 @@
 #include <core/string_funcs.h>
 #include <filesystem.h>
 #include <graphics/common.h>
+#include <graphics/shader_funcs.h>
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
+#include <vsg/app/CompileManager.h>
 #include <vsg/app/RenderGraph.h>
 #include <vsg/app/View.h>
 #include <vsg/app/Viewer.h>
@@ -31,8 +33,15 @@
 #include <vsg/io/Options.h>
 #include <vsg/maths/vec4.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/state/ColorBlendState.h>
+#include <vsg/state/DepthStencilState.h>
+#include <vsg/state/InputAssemblyState.h>
+#include <vsg/state/MultisampleState.h>
+#include <vsg/state/RasterizationState.h>
 #include <vsg/state/ResourceHints.h>
+#include <vsg/state/VertexInputState.h>
 #include <vsg/ui/KeyEvent.h>
+#include <vsg/utils/ShaderSet.h>
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
 
@@ -53,6 +62,7 @@ RouteEditor::RouteEditor()
     print_settings();
     create_object_manager();
     create_vsg_options();
+    configure_shaders();
     create_window();
     create_keyboard();
     create_event_handler();
@@ -78,6 +88,20 @@ void RouteEditor::run()
         viewer->update();
         viewer->recordAndSubmit();
         viewer->present();
+
+        static size_t ts = 0;
+        size_t tts = route.temp_transforms.size();
+        if (tts != ts)
+        {
+            vsg::CompileResult res;
+            for (size_t i = ts; i < tts; ++i)
+            {
+                res.add(viewer->compileManager->compile(route.temp_transforms[i]));
+                scenegraph->addChild(route.temp_transforms[i]);
+            }
+            vsg::updateViewer(*viewer, res);
+            ts = tts;
+        }
 
         state_manager.update();
     }
@@ -163,6 +187,53 @@ void RouteEditor::create_vsg_options()
     }
 
     Journal::instance()->info("VSG options are initialized successfully");
+}
+
+void RouteEditor::configure_shaders()
+{
+    const auto flat_shader = vsg::createFlatShadedShaderSet(vsg_options);
+    const auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(vsg_options);
+    const auto phong_shader = vsg::createPhongShaderSet(vsg_options);
+
+    const FileSystem& fs = FileSystem::getInstance();
+    const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
+
+    const auto vert_shader = read_shader(shaders_dir.c_str(), "standard.vert", vsg_options);
+
+    configure_shader_set(shaders_dir.c_str(), vert_shader,
+        "standard_flat_shaded.frag", vsg_options, "flat", flat_shader);
+
+    configure_shader_set(shaders_dir.c_str(), vert_shader,
+        "standard_pbr.frag", vsg_options, "pbr", pbr_shader);
+
+    configure_shader_set(shaders_dir.c_str(), vert_shader,
+        "standard_phong.frag", vsg_options, "phong", phong_shader);
+
+    const auto rasterization_state = vsg::RasterizationState::create();
+    rasterization_state->cullMode = VK_CULL_MODE_NONE;
+
+    const vsg::GraphicsPipelineStates default_graphics_pipeline_states = {
+        vsg::VertexInputState::create(),
+        vsg::InputAssemblyState::create(),
+        rasterization_state,
+        vsg::ColorBlendState::create(),
+        vsg::DepthStencilState::create(),
+        vsg::MultisampleState::create()
+    };
+
+    flat_shader->defaultGraphicsPipelineStates =
+        default_graphics_pipeline_states;
+
+    pbr_shader->defaultGraphicsPipelineStates =
+        default_graphics_pipeline_states;
+
+    phong_shader->defaultGraphicsPipelineStates =
+        default_graphics_pipeline_states;
+
+    vsg_options->shaderSets.clear();
+    vsg_options->shaderSets["flat"] = flat_shader;
+    vsg_options->shaderSets["pbr"] = pbr_shader;
+    vsg_options->shaderSets["phong"] = phong_shader;
 }
 
 void RouteEditor::create_event_handler()
