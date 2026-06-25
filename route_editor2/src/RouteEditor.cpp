@@ -93,13 +93,12 @@ void RouteEditor::run()
         size_t tts = route.temp_transforms.size();
         if (tts != ts)
         {
-            vsg::CompileResult res;
+            scenegraph->children.reserve(tts);
             for (size_t i = ts; i < tts; ++i)
             {
-                res.add(viewer->compileManager->compile(route.temp_transforms[i]));
                 scenegraph->addChild(route.temp_transforms[i]);
             }
-            vsg::updateViewer(*viewer, res);
+            vsg::updateViewer(*viewer, viewer->compileManager->compile(scenegraph));
             ts = tts;
         }
 
