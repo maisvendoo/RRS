@@ -8,12 +8,17 @@
 
 #include <string>
 
+class Camera;
 class Keyboard;
 
 class BasicEditorState : public EditorState
 {
 public:
-    explicit BasicEditorState(const vsg::ref_ptr<Keyboard>& keyboard, const std::string& route_dir);
+    BasicEditorState(
+        const vsg::ref_ptr<Keyboard>& keyboard,
+        const std::string& route_dir,
+        const vsg::ref_ptr<Camera>& camera
+    );
 
     virtual ~BasicEditorState() override;
 
@@ -26,6 +31,7 @@ public:
 private:
     const vsg::ref_ptr<Keyboard>& keyboard;
     const std::string& route_dir;
+    const vsg::ref_ptr<Camera>& camera;
 };
 
 #endif // BASIC_EDITOR_STATE_H

@@ -6,10 +6,14 @@
 
 #include <string>
 
-BasicEditorState::BasicEditorState(const vsg::ref_ptr<Keyboard>& keyboard,
-    const std::string& route_dir)
+BasicEditorState::BasicEditorState(
+    const vsg::ref_ptr<Keyboard>& keyboard,
+    const std::string& route_dir,
+    const vsg::ref_ptr<Camera>& camera
+)
     : keyboard(keyboard)
     , route_dir(route_dir)
+    , camera(camera)
 {
 }
 

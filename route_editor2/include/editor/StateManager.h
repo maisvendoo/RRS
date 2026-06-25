@@ -6,14 +6,18 @@
 #include <memory>
 #include <string>
 
+class Camera;
 class EditorState;
 class Keyboard;
 
 class StateManager
 {
 public:
-    explicit StateManager(const vsg::ref_ptr<Keyboard>& keyboard,
-        const std::string& route_dir);
+    StateManager(
+        const vsg::ref_ptr<Keyboard>& keyboard,
+        const std::string& route_dir,
+        const vsg::ref_ptr<Camera>& camera
+    );
 
     ~StateManager();
 
