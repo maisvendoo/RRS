@@ -32,6 +32,7 @@
 #include <vsg/maths/vec4.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/state/ResourceHints.h>
+#include <vsg/ui/KeyEvent.h>
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
 
@@ -358,7 +359,11 @@ void RouteEditor::create_viewer()
 
     viewer->addWindow(window);
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
-    viewer->addEventHandler(vsg::CloseHandler::create(viewer));
+
+    const auto close_handler = vsg::CloseHandler::create(viewer);
+    close_handler->closeKey = vsg::KEY_Undefined;
+    viewer->addEventHandler(close_handler);
+
     viewer->addEventHandler(keyboard);
     viewer->addEventHandler(event_handler);
     viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
