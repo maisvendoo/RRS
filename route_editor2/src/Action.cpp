@@ -4,6 +4,14 @@
 
 using ActionNames = std::array<const char*, TOTAL_ACTIONS>;
 
+static ActionNames get_action_names();
+
+const char* to_c_string(Action action)
+{
+    static ActionNames action_names = get_action_names();
+    return action_names[action];
+}
+
 ActionNames get_action_names()
 {
     ActionNames action_names;
@@ -25,10 +33,4 @@ ActionNames get_action_names()
     action_names[ACTION_SAVE_ROUTE] = "Save route";
 
     return action_names;
-}
-
-const char* to_c_string(Action action)
-{
-    static ActionNames action_names = get_action_names();
-    return action_names[action];
 }

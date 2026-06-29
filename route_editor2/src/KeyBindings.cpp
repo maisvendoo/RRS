@@ -1,0 +1,96 @@
+#include "editor/KeyBindings.h"
+
+#include "editor/Action.h"
+
+#include <CfgReader.h>
+#include <Journal.h>
+
+#include <vsg/ui/KeyEvent.h>
+
+#include <QRegularExpression>
+#include <QString>
+#include <QStringList>
+#include <Qt>
+#include <QtTypes>
+
+#include <array>
+#include <map>
+#include <string>
+
+using ActionSettingNames = std::array<const char*, TOTAL_ACTIONS>;
+using ModkeyMap = std::map<std::string, vsg::KeyModifier>;
+
+static const ModkeyMap modkey_map = {
+    {"alt", vsg::MODKEY_Alt},
+    {"ctrl", vsg::MODKEY_Control},
+    {"shift", vsg::MODKEY_Shift}
+};
+
+static ActionSettingNames get_action_setting_names();
+
+void KeyBindings::read(CfgReader& cfg)
+{
+    static const ActionSettingNames action_setting_names = get_action_setting_names();
+
+    const QString section = "Keys";
+
+    for (int i = 0; i < TOTAL_ACTIONS; ++i)
+    {
+        const char* const setting_name = action_setting_names[i];
+
+        QString line;
+        if (!cfg.getString(section, setting_name, line))
+        {
+            Journal::instance()->error(QString("Failed to find key binding %1")
+                .arg(setting_name));
+            continue;
+        }
+
+        line = line.toLower();
+
+        const QStringList strings = line.split(QRegularExpression("[ +]"),
+            Qt::SkipEmptyParts);
+
+        const qsizetype strings_size = strings.size();
+        if (strings_size <= 0)
+        {
+            continue;
+        }
+
+        KeyBinding& binding = bindings[i];
+        binding.key = static_cast<vsg::KeySymbol>(
+            strings.back().front().toLatin1());
+
+        for (qsizetype j = 0; j < strings_size - 1; ++j)
+        {
+            const auto found_it = modkey_map.find(strings[j].toStdString());
+            if (found_it != modkey_map.cend())
+            {
+                binding.modifiers |= found_it->second;
+            }
+        }
+    }
+}
+
+ActionSettingNames get_action_setting_names()
+{
+    ActionSettingNames action_setting_names;
+
+    action_setting_names[ACTION_MOVE_CAMERA_FORWARD] = "MoveCameraForward";
+    action_setting_names[ACTION_MOVE_CAMERA_BACKWARD] = "MoveCameraBackward";
+    action_setting_names[ACTION_MOVE_CAMERA_LEFT] = "MoveCameraLeft";
+    action_setting_names[ACTION_MOVE_CAMERA_RIGHT] = "MoveCameraRight";
+    action_setting_names[ACTION_TRANSLATE_OBJECTS] = "MoveObjects";
+    action_setting_names[ACTION_ROTATE_OBJECTS] = "RotateObjects";
+    action_setting_names[ACTION_SCALE_OBJECTS] = "ScaleObjects";
+    action_setting_names[ACTION_COPY_OBJECTS] = "CopyObjects";
+    action_setting_names[ACTION_PASTE_OBJECTS] = "PasteObjects";
+    action_setting_names[ACTION_HIDE_OBJECTS] = "HideObjects";
+    action_setting_names[ACTION_SHOW_OBJECTS] = "ShowObjects";
+    action_setting_names[ACTION_DELETE_OBJECTS] = "DeleteObjects";
+    action_setting_names[ACTION_UNDO_COMMAND] = "UndoCommand";
+    action_setting_names[ACTION_REDO_COMMAND] = "RedoCommand";
+    action_setting_names[ACTION_SAVE_ROUTE] = "SaveRoute";
+
+    return action_setting_names;
+}
