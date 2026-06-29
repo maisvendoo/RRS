@@ -157,6 +157,7 @@ void RouteEditor::read_settings(const char* filename)
     camera_settings.read(cfg);
     scene_settings.read(cfg);
     gui_settings.read(cfg);
+    key_bindings.read(cfg);
 
     Journal::instance()->info("Settings are readed successfully");
 }
@@ -254,7 +255,8 @@ void RouteEditor::create_event_handler()
 
 void RouteEditor::create_camera()
 {
-    camera = Camera::create(camera_settings, window->extent2D(), keyboard);
+    camera = Camera::create(camera_settings, window->extent2D(), keyboard,
+        key_bindings);
     if (!camera)
     {
         Journal::instance()->error("Failed to create camera");

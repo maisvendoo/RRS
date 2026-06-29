@@ -1,6 +1,7 @@
 #ifndef ROUTE_EDITOR_H
 #define ROUTE_EDITOR_H
 
+#include "editor/KeyBindings.h"
 #include "editor/Route.h"
 #include "editor/StateManager.h"
 #include "editor/settings/CameraSettings.h"
@@ -71,6 +72,7 @@ private:
     camera_settings_t camera_settings;
     scene_settings_t scene_settings;
     gui_settings_t gui_settings;
+    KeyBindings key_bindings;
 
     StateManager state_manager;
     std::string route_dir;

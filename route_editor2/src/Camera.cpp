@@ -16,10 +16,12 @@
 Camera::Camera(
     const camera_settings_t& camera_settings,
     VkExtent2D window_extent,
-    const vsg::ref_ptr<Keyboard>& keyboard
+    const vsg::ref_ptr<Keyboard>& keyboard,
+    const KeyBindings& key_bindings
 )
     : camera_settings(camera_settings)
     , keyboard(keyboard)
+    , key_bindings(key_bindings)
 {
     create_perspective(window_extent);
     create_orthographic();
