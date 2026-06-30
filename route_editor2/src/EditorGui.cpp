@@ -7,8 +7,8 @@
 
 #include <filesystem.h>
 
-#include <vsg/app/CloseHandler.h>
 #include <ImGuiFileDialog.h>
+#include <vsg/app/CloseHandler.h>
 #include <vsgImGui/imgui.h>
 #include <vsgImGui/imgui_internal.h>
 

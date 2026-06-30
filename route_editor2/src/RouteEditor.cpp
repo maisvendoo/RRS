@@ -31,6 +31,7 @@
 #include <vsg/app/WindowTraits.h>
 #include <vsg/commands/ClearAttachments.h>
 #include <vsg/io/Options.h>
+#include <vsg/lighting/AmbientLight.h>
 #include <vsg/maths/vec4.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/state/ColorBlendState.h>
@@ -227,12 +228,8 @@ void RouteEditor::configure_shaders()
     };
 
     flat_shader->defaultGraphicsPipelineStates =
-        default_graphics_pipeline_states;
-
-    pbr_shader->defaultGraphicsPipelineStates =
-        default_graphics_pipeline_states;
-
-    phong_shader->defaultGraphicsPipelineStates =
+        pbr_shader->defaultGraphicsPipelineStates =
+        phong_shader->defaultGraphicsPipelineStates =
         default_graphics_pipeline_states;
 
     vsg_options->shaderSets.clear();
@@ -320,6 +317,12 @@ void RouteEditor::create_scenegraph()
         Journal::instance()->error("Failed to create scenegraph");
         std::exit(EXIT_FAILURE);
     }
+
+    const auto ambient_light = vsg::AmbientLight::create();
+    ambient_light->color = {1.0, 1.0, 1.0};
+    ambient_light->intensity = 1.0f;
+
+    scenegraph->addChild(ambient_light);
 
     Journal::instance()->info("Scenegraph is created successfully");
 }
