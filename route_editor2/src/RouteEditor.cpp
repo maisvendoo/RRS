@@ -435,13 +435,13 @@ void RouteEditor::create_viewer()
     }
 
     viewer->addWindow(window);
-    viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
 
     close_handler = vsg::CloseHandler::create(viewer);
     close_handler->closeKey = vsg::KEY_Undefined;
     viewer->addEventHandler(close_handler);
 
     viewer->addEventHandler(keyboard);
+    viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(event_handler);
     viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
     viewer->compile(resource_hints);

@@ -9,6 +9,7 @@
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/ViewMatrix.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec3.h>
 #include <vsg/state/ViewportState.h>
 
 #include <vulkan/vulkan_core.h>
@@ -38,6 +39,18 @@ Camera::~Camera() = default;
 
 void Camera::update(double delta_time)
 {
+    const vsg::dvec3 movement = camera_settings.move_speed * delta_time * (
+        front * (
+            static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_FORWARD)) -
+            static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_BACKWARD))
+        ) + right * (
+            static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_RIGHT)) -
+            static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_LEFT))
+        )
+    );
+
+    look_at->eye += movement;
+    look_at->center += movement;
 }
 
 const vsg::ref_ptr<vsg::Perspective>& Camera::get_perspective() const
@@ -98,6 +111,8 @@ void Camera::create_look_at()
     }
 
     look_at->eye.z = look_at->center.z = camera_settings.initial_height;
+    front = look_at->center - look_at->eye;
+    right = vsg::cross(front, look_at->up);
 
     Journal::instance()->info("LookAt view matrix is created successfully");
 }

@@ -64,6 +64,9 @@ private:
     const vsg::ref_ptr<Keyboard>& keyboard;
     const KeyBindings& key_bindings;
 
+    vsg::dvec3 front;
+    vsg::dvec3 right;
+
     /// Perspective projection matrix.
     vsg::ref_ptr<vsg::Perspective> perspective;
 
