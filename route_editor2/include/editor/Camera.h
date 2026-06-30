@@ -7,7 +7,6 @@
 
 #include <vulkan/vulkan_core.h>
 
-struct KeyBindings;
 class Keyboard;
 struct camera_settings_t;
 
@@ -39,13 +38,11 @@ public:
      * @param[in] camera_settings The camera settings object.
      * @param[in] window_extent Window extent from the VSG window object.
      * @param[in] keyboard The keyboard object.
-     * @param[in] key_bindings The key bindings.
      */
     Camera(
         const camera_settings_t& camera_settings,
         VkExtent2D window_extent,
-        const vsg::ref_ptr<Keyboard>& keyboard,
-        const KeyBindings& key_bindings
+        const vsg::ref_ptr<Keyboard>& keyboard
     );
 
     /**
@@ -62,7 +59,6 @@ public:
 private:
     const camera_settings_t& camera_settings;
     const vsg::ref_ptr<Keyboard>& keyboard;
-    const KeyBindings& key_bindings;
 
     vsg::dvec3 front;
     vsg::dvec3 right;

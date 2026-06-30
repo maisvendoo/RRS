@@ -19,12 +19,10 @@
 Camera::Camera(
     const camera_settings_t& camera_settings,
     VkExtent2D window_extent,
-    const vsg::ref_ptr<Keyboard>& keyboard,
-    const KeyBindings& key_bindings
+    const vsg::ref_ptr<Keyboard>& keyboard
 )
     : camera_settings(camera_settings)
     , keyboard(keyboard)
-    , key_bindings(key_bindings)
 {
     create_perspective(window_extent);
     create_orthographic();
@@ -111,6 +109,7 @@ void Camera::create_look_at()
     }
 
     look_at->eye.z = look_at->center.z = camera_settings.initial_height;
+
     front = look_at->center - look_at->eye;
     right = vsg::cross(front, look_at->up);
 
