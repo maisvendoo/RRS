@@ -26,8 +26,7 @@ public:
      * @param[in] key The keyboard key.
      * @param[in] ignore_handled_keys Ignore keys that already were handled by
      *            other handlers.
-     * @return true if key is pressed only once.
-     * @return false - otherwise.
+     * @return True if key is pressed only once. False - otherwise.
      */
     bool pressed_once(vsg::KeySymbol key, bool ignore_handled_keys = true) const;
 

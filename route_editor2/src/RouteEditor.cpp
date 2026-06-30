@@ -296,6 +296,7 @@ void RouteEditor::create_window()
     }
 
     window->clearColor() = vsg::vec4(0.03f, 0.03f, 0.03f, 1.0f);
+
     Journal::instance()->info("Window is created successfully");
 }
 
