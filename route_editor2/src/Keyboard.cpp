@@ -1,6 +1,27 @@
 #include "editor/Keyboard.h"
 
+#include "editor/Action.h"
+#include "editor/KeyBindings.h"
+
 #include <vsg/ui/KeyEvent.h>
+#include <vsg/ui/Keyboard.h>
+
+Keyboard::Keyboard(const KeyBindings& key_bindings)
+    : key_bindings(key_bindings)
+{
+}
+
+void Keyboard::apply(vsg::KeyPressEvent& keyPress)
+{
+    vsg::Keyboard::apply(keyPress);
+    modifiers = keyPress.keyModifier;
+}
+
+void Keyboard::apply(vsg::KeyReleaseEvent& keyRelease)
+{
+    vsg::Keyboard::apply(keyRelease);
+    modifiers = keyRelease.keyModifier;
+}
 
 bool Keyboard::pressed_once(vsg::KeySymbol key, bool ignore_handled_keys) const
 {
@@ -27,4 +48,20 @@ bool Keyboard::pressed_once(vsg::KeySymbol key, bool ignore_handled_keys) const
     }
 
     return true;
+}
+
+bool Keyboard::pressed(Action action, bool ignore_handled_keys) const
+{
+    const KeyBinding& binding = key_bindings.bindings[action];
+
+    return vsg::Keyboard::pressed(binding.key, ignore_handled_keys) &&
+        (binding.modifiers == modifiers);
+}
+
+bool Keyboard::pressed_once(Action action, bool ignore_handled_keys) const
+{
+    const KeyBinding& binding = key_bindings.bindings[action];
+
+    return pressed_once(binding.key, ignore_handled_keys) &&
+        (binding.modifiers == modifiers);
 }

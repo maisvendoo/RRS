@@ -302,7 +302,7 @@ void RouteEditor::create_window()
 
 void RouteEditor::create_keyboard()
 {
-    keyboard = Keyboard::create();
+    keyboard = Keyboard::create(key_bindings);
     if (!keyboard)
     {
         Journal::instance()->error("Failed to create keyboard");

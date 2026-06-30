@@ -1,5 +1,6 @@
 #include "editor/Camera.h"
 
+#include "editor/Keyboard.h"
 #include "editor/settings/CameraSettings.h"
 
 #include <Journal.h>
