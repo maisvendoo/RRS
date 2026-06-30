@@ -54,14 +54,14 @@ bool Keyboard::pressed(Action action, bool ignore_handled_keys) const
 {
     const KeyBinding& binding = key_bindings.bindings[action];
 
-    return vsg::Keyboard::pressed(binding.key, ignore_handled_keys) &&
-        (binding.modifiers == modifiers);
+    return (binding.modifiers == modifiers) &&
+        vsg::Keyboard::pressed(binding.key, ignore_handled_keys);
 }
 
 bool Keyboard::pressed_once(Action action, bool ignore_handled_keys) const
 {
     const KeyBinding& binding = key_bindings.bindings[action];
 
-    return pressed_once(binding.key, ignore_handled_keys) &&
-        (binding.modifiers == modifiers);
+    return (binding.modifiers == modifiers) &&
+        pressed_once(binding.key, ignore_handled_keys);
 }

@@ -1,5 +1,6 @@
 #include "editor/Camera.h"
 
+#include "editor/Action.h"
 #include "editor/Keyboard.h"
 #include "editor/settings/CameraSettings.h"
 
@@ -75,14 +76,8 @@ void Camera::create_perspective(VkExtent2D window_extent)
 
 void Camera::create_orthographic()
 {
-    orthographic = vsg::Orthographic::create(
-        -1.0,
-        1.0,
-        -1.0,
-        1.0,
-        camera_settings.zNear,
-        camera_settings.view_distance
-    );
+    orthographic = vsg::Orthographic::create(-1.0, 1.0, -1.0, 1.0,
+        camera_settings.zNear, camera_settings.view_distance);
 
     if (!orthographic)
     {
