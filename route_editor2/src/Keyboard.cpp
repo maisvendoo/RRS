@@ -14,13 +14,19 @@ Keyboard::Keyboard(const KeyBindings& key_bindings)
 void Keyboard::apply(vsg::KeyPressEvent& keyPress)
 {
     vsg::Keyboard::apply(keyPress);
-    modifiers = keyPress.keyModifier;
+
+    modifiers = keyPress.keyModifier & (
+        vsg::MODKEY_Alt | vsg::MODKEY_Control | vsg::MODKEY_Shift
+    );
 }
 
 void Keyboard::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     vsg::Keyboard::apply(keyRelease);
-    modifiers = keyRelease.keyModifier;
+
+    modifiers = keyRelease.keyModifier & (
+        vsg::MODKEY_Alt | vsg::MODKEY_Control | vsg::MODKEY_Shift
+    );
 }
 
 bool Keyboard::pressed_once(vsg::KeySymbol key, bool ignore_handled_keys) const
