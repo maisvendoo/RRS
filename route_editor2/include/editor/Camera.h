@@ -19,6 +19,11 @@ class Perspective;
 
 }
 
+extern template class vsg::ref_ptr<Keyboard>;
+extern template class vsg::ref_ptr<vsg::LookAt>;
+extern template class vsg::ref_ptr<vsg::Orthographic>;
+extern template class vsg::ref_ptr<vsg::Perspective>;
+
 class Camera : public vsg::Inherit<vsg::Camera, Camera>
 {
 public:
