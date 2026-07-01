@@ -10,12 +10,15 @@
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/ViewMatrix.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/common.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/state/ViewportState.h>
 #include <vsg/ui/PointerEvent.h>
 
 #include <vulkan/vulkan_core.h>
 
+#include <algorithm>
+#include <cmath>
 #include <cstdlib>
 
 Camera::Camera(
@@ -39,8 +42,27 @@ Camera::Camera(
 
 Camera::~Camera() = default;
 
-void Camera::handle_mouse_move(int x, int y)
+void Camera::handle_mouse_move(int delta_x, int delta_y)
 {
+    if (mouse->get_button_mask() != vsg::BUTTON_MASK_3)
+    {
+        return;
+    }
+
+    yaw_degrees += camera_settings.rotate_speed * delta_x;
+    pitch_degrees -= camera_settings.rotate_speed * delta_y;
+    pitch_degrees = std::clamp(pitch_degrees, -89.0, 89.0);
+
+    const double yaw_radians = vsg::radians(yaw_degrees);
+    const double pitch_radians = vsg::radians(pitch_degrees);
+
+    front = vsg::normalize(vsg::dvec3(
+        std::sin(yaw_radians) * std::cos(pitch_radians),
+        std::cos(yaw_radians) * std::cos(pitch_radians),
+        std::sin(pitch_radians)
+    ));
+
+    right = vsg::normalize(vsg::cross(front, look_at->up));
 }
 
 void Camera::update(double delta_time)
@@ -61,7 +83,7 @@ void Camera::update(double delta_time)
     );
 
     look_at->eye += movement;
-    look_at->center += movement;
+    look_at->center = look_at->eye + front;
 }
 
 const vsg::ref_ptr<vsg::Perspective>& Camera::get_perspective() const

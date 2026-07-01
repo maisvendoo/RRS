@@ -16,7 +16,7 @@ void EditorState::handle_key_release(vsg::KeySymbol key) const
 {
 }
 
-void EditorState::handle_mouse_move(int x, int y) const
+void EditorState::handle_mouse_move(int delta_x, int delta_y) const
 {
 }
 

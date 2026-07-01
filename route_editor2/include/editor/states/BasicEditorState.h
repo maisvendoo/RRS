@@ -28,7 +28,7 @@ public:
 
     virtual void handle_key_release(vsg::KeySymbol key) const override;
 
-    virtual void handle_mouse_move(int x, int y) const override;
+    virtual void handle_mouse_move(int delta_x, int delta_y) const override;
 
     virtual void update(double delta_time) const override;
 

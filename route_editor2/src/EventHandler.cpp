@@ -40,5 +40,12 @@ void EventHandler::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    state_manager.get_editor_state()->handle_mouse_move(moveEvent.x, moveEvent.y);
+    static int prev_x = moveEvent.x;
+    static int prev_y = moveEvent.y;
+    const int delta_x = moveEvent.x - prev_x;
+    const int delta_y = moveEvent.y - prev_y;
+    prev_x = moveEvent.x;
+    prev_y = moveEvent.y;
+
+    state_manager.get_editor_state()->handle_mouse_move(delta_x, delta_y);
 }

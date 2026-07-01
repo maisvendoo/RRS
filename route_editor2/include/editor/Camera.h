@@ -53,7 +53,7 @@ public:
      */
     ~Camera();
 
-    void handle_mouse_move(int x, int y);
+    void handle_mouse_move(int delta_x, int delta_y);
 
     void update(double delta_time);
 
@@ -65,6 +65,9 @@ private:
     const camera_settings_t& camera_settings;
     const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
+
+    double yaw_degrees = 0.0;
+    double pitch_degrees = 0.0;
 
     vsg::dvec3 front;
     vsg::dvec3 right;
