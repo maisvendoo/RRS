@@ -55,6 +55,14 @@
 #include <cstdlib>
 #include <memory>
 
+#define CHECK_INITIALIZATION(object)                                    \
+    if (!object)                                                        \
+    {                                                                   \
+        Journal::instance()->error("Failed to initialize "#object);     \
+        std::exit(EXIT_FAILURE);                                        \
+    }                                                                   \
+    Journal::instance()->info(#object" is initialized successfully")
+
 RouteEditor::RouteEditor()
     : state_manager(keyboard, route_dir, camera)
     , route(object_manager, camera_settings.view_distance, vsg_options)
@@ -176,25 +184,13 @@ void RouteEditor::print_settings() const
 void RouteEditor::create_object_manager()
 {
     object_manager = std::make_unique<ObjectManager>(scene_settings.max_object_count);
-    if (!object_manager)
-    {
-        Journal::instance()->error("Failed to create object manager");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Object manager is created successfully");
+    CHECK_INITIALIZATION(object_manager);
 }
 
 void RouteEditor::create_vsg_options()
 {
     vsg_options = create_default_vsg_options();
-    if (!vsg_options)
-    {
-        Journal::instance()->error("Failed to initialize VSG options");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("VSG options are initialized successfully");
+    CHECK_INITIALIZATION(vsg_options);
 }
 
 void RouteEditor::configure_shaders()
@@ -243,36 +239,19 @@ void RouteEditor::configure_shaders()
 void RouteEditor::create_event_handler()
 {
     event_handler = EventHandler::create(state_manager);
-    if (!event_handler)
-    {
-        Journal::instance()->error("Failed to create event handler");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Event handler is created successfully");
+    CHECK_INITIALIZATION(event_handler);
 }
 
 void RouteEditor::create_camera()
 {
     camera = Camera::create(camera_settings, window->extent2D(), keyboard);
-    if (!camera)
-    {
-        Journal::instance()->error("Failed to create camera");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Camera is created successfully");
+    CHECK_INITIALIZATION(camera);
 }
 
 void RouteEditor::create_window()
 {
     const auto window_traits = vsg::WindowTraits::create();
-    if (!window_traits)
-    {
-        Journal::instance()->error("Failed to create window traits");
-        std::exit(EXIT_FAILURE);
-    }
-    Journal::instance()->info("Window traits is created successfully");
+    CHECK_INITIALIZATION(window_traits);
 
     window_traits->x = window_settings.pos_x;
     window_traits->y = window_settings.pos_y;
@@ -288,69 +267,41 @@ void RouteEditor::create_window()
     window_traits->samples = get_vk_sample_count_flag(window_settings.samples);
 
     window = vsg::Window::create(window_traits);
-    if (!window)
-    {
-        Journal::instance()->error("Failed to create window");
-        std::exit(EXIT_FAILURE);
-    }
+    CHECK_INITIALIZATION(window);
 
     window->clearColor() = vsg::vec4(0.03f, 0.03f, 0.03f, 1.0f);
-
-    Journal::instance()->info("Window is created successfully");
 }
 
 void RouteEditor::create_mouse()
 {
     mouse = Mouse::create();
-    if (!mouse)
-    {
-        Journal::instance()->error("Failed to create mouse");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Mouse is created successfully");
+    CHECK_INITIALIZATION(mouse);
 }
 
 void RouteEditor::create_keyboard()
 {
     keyboard = Keyboard::create(key_bindings);
-    if (!keyboard)
-    {
-        Journal::instance()->error("Failed to create keyboard");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Keyboard is created successfully");
+    CHECK_INITIALIZATION(keyboard);
 }
 
 void RouteEditor::create_scenegraph()
 {
-    scenegraph = vsg::Group::create();
-    if (!scenegraph)
-    {
-        Journal::instance()->error("Failed to create scenegraph");
-        std::exit(EXIT_FAILURE);
-    }
-
     const auto ambient_light = vsg::AmbientLight::create();
-    ambient_light->color = {1.0, 1.0, 1.0};
+    CHECK_INITIALIZATION(ambient_light);
+
+    ambient_light->color = {1.0f, 1.0f, 1.0f};
     ambient_light->intensity = 1.0f;
 
-    scenegraph->addChild(ambient_light);
+    scenegraph = vsg::Group::create();
+    CHECK_INITIALIZATION(scenegraph);
 
-    Journal::instance()->info("Scenegraph is created successfully");
+    scenegraph->addChild(ambient_light);
 }
 
 void RouteEditor::create_scene_view()
 {
     scene_view = vsg::View::create(camera, scenegraph);
-    if (!scene_view)
-    {
-        Journal::instance()->error("Failed to create scene view");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Scene view is created successfully");
+    CHECK_INITIALIZATION(scene_view);
 }
 
 void RouteEditor::create_clear_attachments()
@@ -365,104 +316,64 @@ void RouteEditor::create_clear_attachments()
         vsg::ClearAttachments::Attachments{clear_attachment},
         vsg::ClearAttachments::Rects{clear_rect}
     );
-
-    if (!clear_attachments)
-    {
-        Journal::instance()->error("Failed to create clear attachments");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Clear attachments are created successfully");
+    CHECK_INITIALIZATION(clear_attachments);
 }
 
 void RouteEditor::create_editor_gui()
 {
     editor_gui = EditorGui::create(gui_settings, state_manager, route_dir, route, close_handler);
-    if (!editor_gui)
-    {
-        Journal::instance()->error("Failed to create editor GUI");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Editor GUI is created successfully");
+    CHECK_INITIALIZATION(editor_gui);
 }
 
 void RouteEditor::create_render_gui()
 {
     render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
-    if (!render_gui)
-    {
-        Journal::instance()->error("Failed to create render GUI");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Render GUI is created successfully");
+    CHECK_INITIALIZATION(render_gui);
 }
 
 void RouteEditor::create_render_graph()
 {
     render_graph = vsg::RenderGraph::create(window);
-    if (!render_graph)
-    {
-        Journal::instance()->error("Failed to create render graph");
-        std::exit(EXIT_FAILURE);
-    }
+    CHECK_INITIALIZATION(render_graph);
 
     render_graph->addChild(scene_view);
     render_graph->addChild(clear_attachments);
     render_graph->addChild(render_gui);
-
-    Journal::instance()->info("Render graph is created successfully");
 }
 
 void RouteEditor::create_command_graph()
 {
     command_graph = vsg::CommandGraph::create(window, render_graph);
-    if (!command_graph)
-    {
-        Journal::instance()->error("Failed to create command graph");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Command graph is created successfully");
+    CHECK_INITIALIZATION(command_graph);
 }
 
 void RouteEditor::create_resource_hints()
 {
     resource_hints = vsg::ResourceHints::create();
-    if (!resource_hints)
-    {
-        Journal::instance()->error("Failed to create resource hints");
-        std::exit(EXIT_FAILURE);
-    }
+    CHECK_INITIALIZATION(resource_hints);
 
     const unsigned int num_lights = static_cast<unsigned int>(scene_settings.num_lights);
     resource_hints->numLightsRange = {num_lights, num_lights + 1};
-
-    Journal::instance()->info("Resource hints is created successfully");
 }
 
 void RouteEditor::create_viewer()
 {
     viewer = vsg::Viewer::create();
-    if (!viewer)
-    {
-        Journal::instance()->error("Failed to create viewer");
-        std::exit(EXIT_FAILURE);
-    }
+    CHECK_INITIALIZATION(viewer);
 
     viewer->addWindow(window);
 
     close_handler = vsg::CloseHandler::create(viewer);
-    close_handler->closeKey = vsg::KEY_Undefined;
-    viewer->addEventHandler(close_handler);
+    CHECK_INITIALIZATION(close_handler);
 
+    close_handler->closeKey = vsg::KEY_Undefined;
+
+
+    viewer->addEventHandler(close_handler);
     viewer->addEventHandler(mouse);
     viewer->addEventHandler(keyboard);
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(event_handler);
     viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
     viewer->compile(resource_hints);
-
-    Journal::instance()->info("Viewer is created successfully");
 }
