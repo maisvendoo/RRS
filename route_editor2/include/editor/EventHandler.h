@@ -9,6 +9,7 @@ namespace vsg
 
 class KeyPressEvent;
 class KeyReleaseEvent;
+class MoveEvent;
 
 }
 
@@ -24,6 +25,8 @@ public:
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
 
     virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;
+
+    virtual void apply(vsg::MoveEvent& moveEvent) override;
 
 private:
     StateManager& state_manager;

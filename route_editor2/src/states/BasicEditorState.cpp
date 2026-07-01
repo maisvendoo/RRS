@@ -35,6 +35,10 @@ void BasicEditorState::handle_key_release(vsg::KeySymbol key) const
 {
 }
 
+void BasicEditorState::handle_mouse_move(int x, int y) const
+{
+}
+
 void BasicEditorState::update(double delta_time) const
 {
     camera->update(delta_time);

@@ -14,6 +14,8 @@ public:
 
     virtual void handle_key_release(vsg::KeySymbol key) const;
 
+    virtual void handle_mouse_move(int x, int y) const;
+
     virtual void update(double delta_time) const;
 };
 
