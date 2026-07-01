@@ -18,6 +18,7 @@ class Camera;
 class EditorGui;
 class EventHandler;
 class Keyboard;
+class Mouse;
 class ObjectManager;
 
 namespace vsg
@@ -82,6 +83,7 @@ private:
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
     vsg::ref_ptr<vsg::CloseHandler> close_handler;
+    vsg::ref_ptr<Mouse> mouse;
     vsg::ref_ptr<Keyboard> keyboard;
     vsg::ref_ptr<EventHandler> event_handler;
     vsg::ref_ptr<Camera> camera;
@@ -169,6 +171,8 @@ private:
      * (default - "logs/editor.log") for possible errors).
      */
     void create_window();
+
+    void create_mouse();
 
     /**
      * @brief Create a Keyboard object.

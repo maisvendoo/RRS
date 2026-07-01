@@ -4,6 +4,7 @@
 #include "editor/EditorGui.h"
 #include "editor/EventHandler.h"
 #include "editor/Keyboard.h"
+#include "editor/Mouse.h"
 #include "editor/ObjectManager.h"
 #include "editor/Route.h"
 #include "editor/StateManager.h"
@@ -65,6 +66,7 @@ RouteEditor::RouteEditor()
     create_vsg_options();
     configure_shaders();
     create_window();
+    create_mouse();
     create_keyboard();
     create_event_handler();
     create_camera();
@@ -297,6 +299,18 @@ void RouteEditor::create_window()
     Journal::instance()->info("Window is created successfully");
 }
 
+void RouteEditor::create_mouse()
+{
+    mouse = Mouse::create();
+    if (!mouse)
+    {
+        Journal::instance()->error("Failed to create mouse");
+        std::exit(EXIT_FAILURE);
+    }
+
+    Journal::instance()->info("Mouse is created successfully");
+}
+
 void RouteEditor::create_keyboard()
 {
     keyboard = Keyboard::create(key_bindings);
@@ -443,6 +457,7 @@ void RouteEditor::create_viewer()
     close_handler->closeKey = vsg::KEY_Undefined;
     viewer->addEventHandler(close_handler);
 
+    viewer->addEventHandler(mouse);
     viewer->addEventHandler(keyboard);
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(event_handler);
