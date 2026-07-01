@@ -53,8 +53,21 @@ public:
      */
     ~Camera();
 
+    /**
+     * Handle mouse movement and update yaw, pitch and camera's vectors
+     * accordingly.
+     *
+     * @param[in] delta_x Mouse delta x.
+     * @param[in] delta_y Mouse delta y.
+     */
     void handle_mouse_move(int delta_x, int delta_y);
 
+    /**
+     * Check keys that responsible for camera movement and update camera
+     * position accordingly.
+     *
+     * @param[in] delta_time Delta time (in seconds).
+     */
     void update(double delta_time);
 
     const vsg::ref_ptr<vsg::Perspective>& get_perspective() const;
