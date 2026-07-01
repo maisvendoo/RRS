@@ -12,6 +12,7 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/state/ViewportState.h>
+#include <vsg/ui/PointerEvent.h>
 
 #include <vulkan/vulkan_core.h>
 
@@ -44,6 +45,11 @@ void Camera::handle_mouse_move(int x, int y)
 
 void Camera::update(double delta_time)
 {
+    if (mouse->get_button_mask() != vsg::BUTTON_MASK_3)
+    {
+        return;
+    }
+
     const vsg::dvec3 movement = camera_settings.move_speed * delta_time * (
         front * (
             static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_FORWARD)) -
