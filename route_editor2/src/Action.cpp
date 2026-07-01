@@ -2,8 +2,6 @@
 
 #include <array>
 
-extern template class std::array<const char*, TOTAL_ACTIONS>;
-
 using ActionNames = std::array<const char*, TOTAL_ACTIONS>;
 
 static ActionNames get_action_names();
