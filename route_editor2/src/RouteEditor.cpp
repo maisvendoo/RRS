@@ -244,7 +244,7 @@ void RouteEditor::create_event_handler()
 
 void RouteEditor::create_camera()
 {
-    camera = Camera::create(camera_settings, window->extent2D(), keyboard);
+    camera = Camera::create(camera_settings, window->extent2D(), mouse, keyboard);
     CHECK_INITIALIZATION(camera);
 }
 

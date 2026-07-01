@@ -2,6 +2,7 @@
 
 #include "editor/Action.h"
 #include "editor/Keyboard.h"
+#include "editor/Mouse.h"
 #include "editor/settings/CameraSettings.h"
 
 #include <Journal.h>
@@ -19,9 +20,11 @@
 Camera::Camera(
     const camera_settings_t& camera_settings,
     VkExtent2D window_extent,
+    const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard
 )
     : camera_settings(camera_settings)
+    , mouse(mouse)
     , keyboard(keyboard)
 {
     create_perspective(window_extent);
@@ -34,6 +37,10 @@ Camera::Camera(
 }
 
 Camera::~Camera() = default;
+
+void Camera::handle_mouse_move(int x, int y)
+{
+}
 
 void Camera::update(double delta_time)
 {

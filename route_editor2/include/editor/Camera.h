@@ -8,6 +8,7 @@
 #include <vulkan/vulkan_core.h>
 
 class Keyboard;
+class Mouse;
 struct camera_settings_t;
 
 namespace vsg
@@ -37,11 +38,13 @@ public:
      *
      * @param[in] camera_settings The camera settings object.
      * @param[in] window_extent Window extent from the VSG window object.
+     * @param[in] mouse The mouse object.
      * @param[in] keyboard The keyboard object.
      */
     Camera(
         const camera_settings_t& camera_settings,
         VkExtent2D window_extent,
+        const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard
     );
 
@@ -49,6 +52,8 @@ public:
      * @brief Destroy the Camera object.
      */
     ~Camera();
+
+    void handle_mouse_move(int x, int y);
 
     void update(double delta_time);
 
@@ -58,6 +63,7 @@ public:
 
 private:
     const camera_settings_t& camera_settings;
+    const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
 
     vsg::dvec3 front;
