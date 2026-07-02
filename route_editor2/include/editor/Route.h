@@ -4,7 +4,6 @@
 #include "editor/RouteMapTransform.h"
 
 #include <vsg/core/ref_ptr.h>
-#include <vsg/nodes/MatrixTransform.h>
 
 #include <map>
 #include <memory>
@@ -32,7 +31,8 @@ public:
 
     std::thread load_static_objects_thread;
     std::thread load_topology_thread;
-    std::vector<vsg::ref_ptr<vsg::MatrixTransform>> temp_transforms;
+
+    bool just_loaded = false;
 
 public:
     void start_load(const std::string& route_dir);

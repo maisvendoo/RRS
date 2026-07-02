@@ -21,6 +21,12 @@ public:
 
     ~ObjectManager();
 
+    void add_paged_lod(const vsg::ref_ptr<vsg::PagedLOD>& paged_lod);
+
+    void add_matrix_transform(const vsg::ref_ptr<vsg::MatrixTransform>& matrix_transform);
+
+    const std::vector<vsg::ref_ptr<vsg::MatrixTransform>>& get_transforms() const;
+
 private:
     std::size_t max_object_count;
 

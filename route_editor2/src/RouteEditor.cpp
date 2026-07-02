@@ -35,6 +35,7 @@
 #include <vsg/lighting/AmbientLight.h>
 #include <vsg/maths/vec4.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
 #include <vsg/state/InputAssemblyState.h>
@@ -100,17 +101,17 @@ void RouteEditor::run()
         viewer->recordAndSubmit();
         viewer->present();
 
-        static size_t ts = 0;
-        size_t tts = route.temp_transforms.size();
-        if (tts != ts)
+        if (route.just_loaded)
         {
-            scenegraph->children.reserve(tts);
-            for (size_t i = ts; i < tts; ++i)
+            const auto& transforms = object_manager->get_transforms();
+            scenegraph->children.reserve(transforms.size());
+            for (const auto& transform : transforms)
             {
-                scenegraph->addChild(route.temp_transforms[i]);
+              scenegraph->addChild(transform);
             }
             vsg::updateViewer(*viewer, viewer->compileManager->compile(scenegraph));
-            ts = tts;
+
+            route.just_loaded = false;
         }
 
         static double prev_simulation_time = viewer->getFrameStamp()->simulationTime;
