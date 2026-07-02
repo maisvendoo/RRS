@@ -4,11 +4,21 @@
 
 void Mouse::apply(vsg::ButtonPressEvent& buttonPress)
 {
+    if (buttonPress.handled)
+    {
+        return;
+    }
+
     button_mask = buttonPress.mask;
 }
 
 void Mouse::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
+    if (buttonRelease.handled)
+    {
+        return;
+    }
+
     button_mask = buttonRelease.mask;
 }
 
