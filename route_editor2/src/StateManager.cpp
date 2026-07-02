@@ -1,6 +1,7 @@
 #include "editor/StateManager.h"
 
 #include "editor/states/BasicEditorState.h"
+#include "editor/states/BoxSelectionState.h"
 #include "editor/states/EditorState.h"
 #include "editor/states/RouteNotLoadedState.h"
 
@@ -19,6 +20,7 @@ StateManager::StateManager(
 {
     route_not_loaded_state = std::make_unique<RouteNotLoadedState>();
     basic_editor_state = std::make_unique<BasicEditorState>(keyboard, route_dir, camera);
+    box_selection_state = std::make_unique<BoxSelectionState>();
     editor_state = &route_not_loaded_state;
     deferred_editor_state = &route_not_loaded_state;
 }
@@ -42,6 +44,13 @@ void StateManager::defer_switch_to_basic_editor_state()
     deferred_editor_state = &basic_editor_state;
 
     Journal::instance()->info("Deferred switch to state 'BasicEditorState'");
+}
+
+void StateManager::defer_switch_to_box_selection_state()
+{
+    deferred_editor_state = &box_selection_state;
+
+    Journal::instance()->info("Deferred switch to state 'BoxSelectionState'");
 }
 
 void StateManager::update(double delta_time)
