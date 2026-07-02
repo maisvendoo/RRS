@@ -8,13 +8,13 @@
 #include <string>
 
 class Camera;
-// class Keyboard;
+class Keyboard;
 
 class BasicEditorState : public EditorState
 {
 public:
     BasicEditorState(
-        // const vsg::ref_ptr<Keyboard>& keyboard,
+        const vsg::ref_ptr<Keyboard>& keyboard,
         const std::string& route_dir,
         const vsg::ref_ptr<Camera>& camera
     );
@@ -32,7 +32,7 @@ public:
     virtual void update(double delta_time) const override;
 
 private:
-    // const vsg::ref_ptr<Keyboard>& keyboard;
+    const vsg::ref_ptr<Keyboard>& keyboard;
     const std::string& route_dir;
     const vsg::ref_ptr<Camera>& camera;
 };

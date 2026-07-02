@@ -1,7 +1,7 @@
 #include "editor/states/BasicEditorState.h"
 
 #include "editor/Camera.h"
-// #include "editor/Keyboard.h"
+#include "editor/Keyboard.h"
 
 #include <vsg/core/ref_ptr.h>
 #include <vsgImGui/imgui.h>
@@ -9,12 +9,12 @@
 #include <string>
 
 BasicEditorState::BasicEditorState(
-    // const vsg::ref_ptr<Keyboard>& keyboard,
+    const vsg::ref_ptr<Keyboard>& keyboard,
     const std::string& route_dir,
     const vsg::ref_ptr<Camera>& camera
 )
-    // : keyboard(keyboard)
-    : route_dir(route_dir)
+    : keyboard(keyboard)
+    , route_dir(route_dir)
     , camera(camera)
 {
 }

@@ -13,13 +13,13 @@
 #include <string>
 
 StateManager::StateManager(
-    // const vsg::ref_ptr<Keyboard>& keyboard,
+    const vsg::ref_ptr<Keyboard>& keyboard,
     const std::string& route_dir,
     const vsg::ref_ptr<Camera>& camera
 )
 {
     route_not_loaded_state = std::make_unique<RouteNotLoadedState>();
-    basic_editor_state = std::make_unique<BasicEditorState>(/*keyboard, */route_dir, camera);
+    basic_editor_state = std::make_unique<BasicEditorState>(keyboard, route_dir, camera);
     box_selection_state = std::make_unique<BoxSelectionState>();
     editor_state = &route_not_loaded_state;
     deferred_editor_state = &route_not_loaded_state;
