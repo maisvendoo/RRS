@@ -10,6 +10,7 @@
 class Camera;
 class Keyboard;
 class Mouse;
+class StateManager;
 
 class BasicEditorState : public EditorState
 {
@@ -18,7 +19,8 @@ public:
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         const std::string& route_dir,
-        const vsg::ref_ptr<Camera>& camera
+        const vsg::ref_ptr<Camera>& camera,
+        StateManager& state_manager
     );
 
     virtual ~BasicEditorState() override;
@@ -38,6 +40,7 @@ private:
     const vsg::ref_ptr<Keyboard>& keyboard;
     const std::string& route_dir;
     const vsg::ref_ptr<Camera>& camera;
+    StateManager& state_manager;
 };
 
 #endif // BASIC_EDITOR_STATE_H
