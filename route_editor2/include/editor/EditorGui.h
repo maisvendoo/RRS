@@ -29,9 +29,10 @@ public:
      * Create ImGui context and add font from fonts directory.
      *
      * @param[in] gui_settings
-     * @param[in] state_manager
-     * @param[in] route_dir
-     * @param[in] route
+     * @param[in,out] state_manager
+     * @param[out] route_dir
+     * @param[out] route
+     * @param[out] close_handler
      */
     EditorGui(
         const gui_settings_t& gui_settings,
