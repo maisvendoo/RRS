@@ -9,11 +9,13 @@
 class Camera;
 class EditorState;
 class Keyboard;
+class Mouse;
 
 class StateManager
 {
 public:
     StateManager(
+        const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         const std::string& route_dir,
         const vsg::ref_ptr<Camera>& camera

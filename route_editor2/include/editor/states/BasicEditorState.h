@@ -9,11 +9,13 @@
 
 class Camera;
 class Keyboard;
+class Mouse;
 
 class BasicEditorState : public EditorState
 {
 public:
     BasicEditorState(
+        const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         const std::string& route_dir,
         const vsg::ref_ptr<Camera>& camera
@@ -32,6 +34,7 @@ public:
     virtual void update(double delta_time) const override;
 
 private:
+    const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
     const std::string& route_dir;
     const vsg::ref_ptr<Camera>& camera;
