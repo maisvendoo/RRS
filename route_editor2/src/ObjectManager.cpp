@@ -3,7 +3,9 @@
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
 
-ObjectManager::ObjectManager(int max_object_count)
+#include <cstddef>
+
+ObjectManager::ObjectManager(std::size_t max_object_count)
     : max_object_count(max_object_count)
 {
     paged_lods.reserve(max_object_count);

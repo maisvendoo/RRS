@@ -183,7 +183,9 @@ void RouteEditor::print_settings() const
 
 void RouteEditor::create_object_manager()
 {
-    object_manager = std::make_unique<ObjectManager>(scene_settings.max_object_count);
+    object_manager = std::make_unique<ObjectManager>(
+        static_cast<std::size_t>(scene_settings.max_object_count)
+    );
     CHECK_INITIALIZATION(object_manager);
 }
 
