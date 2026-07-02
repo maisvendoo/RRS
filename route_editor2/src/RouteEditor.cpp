@@ -65,7 +65,7 @@
     Journal::instance()->info(#object" is initialized successfully")
 
 RouteEditor::RouteEditor()
-    : state_manager(keyboard, route_dir, camera)
+    : state_manager(/*keyboard, */route_dir, camera)
     , route(object_manager, camera_settings.view_distance, vsg_options)
 {
     initialize_journal();

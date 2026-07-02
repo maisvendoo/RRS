@@ -42,15 +42,15 @@ Camera::Camera(
 
 Camera::~Camera() = default;
 
-void Camera::handle_mouse_move(int delta_x, int delta_y)
+void Camera::handle_mouse_move()
 {
     if (mouse->get_button_mask() != vsg::BUTTON_MASK_3)
     {
         return;
     }
 
-    yaw_degrees += camera_settings.rotate_speed * delta_x;
-    pitch_degrees -= camera_settings.rotate_speed * delta_y;
+    yaw_degrees += camera_settings.rotate_speed * mouse->get_delta_x();
+    pitch_degrees -= camera_settings.rotate_speed * mouse->get_delta_y();
     pitch_degrees = std::clamp(pitch_degrees, -89.0, 89.0);
 
     const double yaw_radians = vsg::radians(yaw_degrees);

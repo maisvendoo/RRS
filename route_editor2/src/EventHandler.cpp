@@ -20,7 +20,7 @@ void EventHandler::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    state_manager.get_editor_state()->handle_key_press(keyPress.keyBase);
+    state_manager.get_editor_state()->handle_key_press();
 }
 
 void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
@@ -30,7 +30,27 @@ void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
         return;
     }
 
-    state_manager.get_editor_state()->handle_key_release(keyRelease.keyBase);
+    state_manager.get_editor_state()->handle_key_release();
+}
+
+void EventHandler::apply(vsg::ButtonPressEvent& buttonPress)
+{
+    if (buttonPress.handled)
+    {
+        return;
+    }
+
+    state_manager.get_editor_state()->handle_button_press();
+}
+
+void EventHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
+{
+    if (buttonRelease.handled)
+    {
+        return;
+    }
+
+    state_manager.get_editor_state()->handle_button_release();
 }
 
 void EventHandler::apply(vsg::MoveEvent& moveEvent)
@@ -40,12 +60,5 @@ void EventHandler::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    static int prev_x = moveEvent.x;
-    static int prev_y = moveEvent.y;
-    const int delta_x = moveEvent.x - prev_x;
-    const int delta_y = moveEvent.y - prev_y;
-    prev_x = moveEvent.x;
-    prev_y = moveEvent.y;
-
-    state_manager.get_editor_state()->handle_mouse_move(delta_x, delta_y);
+    state_manager.get_editor_state()->handle_mouse_move();
 }

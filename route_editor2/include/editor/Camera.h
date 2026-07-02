@@ -56,11 +56,8 @@ public:
     /**
      * Handle mouse movement and update yaw, pitch and camera's vectors
      * accordingly.
-     *
-     * @param[in] delta_x Mouse delta x.
-     * @param[in] delta_y Mouse delta y.
      */
-    void handle_mouse_move(int delta_x, int delta_y);
+    void handle_mouse_move();
 
     /**
      * Check keys that responsible for camera movement and update camera
