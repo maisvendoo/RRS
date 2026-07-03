@@ -25,8 +25,7 @@ StateManager::StateManager(
     basic_editor_state = std::make_unique<BasicEditorState>(
         mouse, keyboard, route_dir, camera, *this);
     box_selection_state = std::make_unique<BoxSelectionState>(
-        mouse, *this
-    );
+        mouse, *this);
     editor_state = &route_not_loaded_state;
     deferred_editor_state = &route_not_loaded_state;
 }
