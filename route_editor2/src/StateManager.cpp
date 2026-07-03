@@ -17,7 +17,8 @@ StateManager::StateManager(
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
     const std::string& route_dir,
-    const vsg::ref_ptr<Camera>& camera
+    const vsg::ref_ptr<Camera>& camera,
+    const vsg::ref_ptr<vsg::Options>& vsg_options
 )
     : mouse(mouse)
 {
@@ -25,7 +26,7 @@ StateManager::StateManager(
     basic_editor_state = std::make_unique<BasicEditorState>(
         mouse, keyboard, route_dir, camera, *this);
     box_selection_state = std::make_unique<BoxSelectionState>(
-        mouse, *this);
+        mouse, *this, vsg_options);
     editor_state = &route_not_loaded_state;
     deferred_editor_state = &route_not_loaded_state;
 }

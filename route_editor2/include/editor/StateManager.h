@@ -11,6 +11,13 @@ class EditorState;
 class Keyboard;
 class Mouse;
 
+namespace vsg
+{
+
+class Options;
+
+}
+
 class StateManager
 {
 public:
@@ -18,7 +25,8 @@ public:
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         const std::string& route_dir,
-        const vsg::ref_ptr<Camera>& camera
+        const vsg::ref_ptr<Camera>& camera,
+        const vsg::ref_ptr<vsg::Options>& vsg_options
     );
 
     ~StateManager();

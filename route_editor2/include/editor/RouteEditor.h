@@ -3,7 +3,6 @@
 
 #include "editor/KeyBindings.h"
 #include "editor/Route.h"
-#include "editor/StateManager.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/GuiSettings.h"
 #include "editor/settings/SceneSettings.h"
@@ -20,6 +19,7 @@ class EventHandler;
 class Keyboard;
 class Mouse;
 class ObjectManager;
+class StateManager;
 
 namespace vsg
 {
@@ -75,7 +75,7 @@ private:
     gui_settings_t gui_settings;
     KeyBindings key_bindings;
 
-    StateManager state_manager;
+    std::unique_ptr<StateManager> state_manager;
     std::string route_dir;
     Route route;
     std::unique_ptr<ObjectManager> object_manager;
@@ -182,6 +182,8 @@ private:
      * (default - "logs/editor.log") for possible errors).
      */
     void create_keyboard();
+
+    void create_state_manager();
 
     /**
      * @brief Create a scenegraph object.

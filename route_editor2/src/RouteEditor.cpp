@@ -65,8 +65,7 @@
     Journal::instance()->info(#object" is initialized successfully")
 
 RouteEditor::RouteEditor()
-    : state_manager(mouse, keyboard, route_dir, camera)
-    , route(object_manager, camera_settings.view_distance, vsg_options)
+    : route(object_manager, camera_settings.view_distance, vsg_options)
 {
     initialize_journal();
     read_settings();
@@ -77,6 +76,7 @@ RouteEditor::RouteEditor()
     create_window();
     create_mouse();
     create_keyboard();
+    create_state_manager();
     create_event_handler();
     create_camera();
     create_scenegraph();
@@ -119,7 +119,7 @@ void RouteEditor::run()
         const double delta_time = simulation_time - prev_simulation_time;
         prev_simulation_time = simulation_time;
 
-        state_manager.update(delta_time);
+        state_manager->update(delta_time);
     }
 
     route.join_threads();
@@ -241,7 +241,7 @@ void RouteEditor::configure_shaders()
 
 void RouteEditor::create_event_handler()
 {
-    event_handler = EventHandler::create(state_manager);
+    event_handler = EventHandler::create(*state_manager);
     CHECK_INITIALIZATION(event_handler);
 }
 
@@ -287,6 +287,13 @@ void RouteEditor::create_keyboard()
     CHECK_INITIALIZATION(keyboard);
 }
 
+void RouteEditor::create_state_manager()
+{
+    state_manager = std::make_unique<StateManager>(mouse, keyboard, route_dir,
+        camera, vsg_options);
+    CHECK_INITIALIZATION(state_manager);
+}
+
 void RouteEditor::create_scenegraph()
 {
     const auto ambient_light = vsg::AmbientLight::create();
@@ -324,7 +331,8 @@ void RouteEditor::create_clear_attachments()
 
 void RouteEditor::create_editor_gui()
 {
-    editor_gui = EditorGui::create(gui_settings, state_manager, route_dir, route, close_handler);
+    editor_gui = EditorGui::create(gui_settings, *state_manager, route_dir,
+        route, close_handler);
     CHECK_INITIALIZATION(editor_gui);
 }
 

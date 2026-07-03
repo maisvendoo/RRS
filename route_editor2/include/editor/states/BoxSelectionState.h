@@ -8,6 +8,14 @@
 class Mouse;
 class StateManager;
 
+namespace vsg
+{
+
+class Options;
+class StateGroup;
+
+};
+
 class BoxSelectionState : public EditorState
 {
 public:
@@ -19,7 +27,8 @@ public:
 public:
     BoxSelectionState(
         const vsg::ref_ptr<Mouse>& mouse,
-        StateManager& state_manager
+        StateManager& state_manager,
+        const vsg::ref_ptr<vsg::Options>& vsg_options
     );
 
     virtual ~BoxSelectionState() override;
@@ -33,6 +42,9 @@ public:
 private:
     const vsg::ref_ptr<Mouse>& mouse;
     StateManager& state_manager;
+    const vsg::ref_ptr<vsg::Options>& vsg_options;
+
+    vsg::ref_ptr<vsg::StateGroup> state_group;
 };
 
 #endif // EDITOR_BOX_SELECTION_STATE_H

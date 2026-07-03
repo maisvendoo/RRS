@@ -3,16 +3,65 @@
 #include "editor/Mouse.h"
 #include "editor/StateManager.h"
 
+#include <graphics/pipeline_funcs.h>
+
+#include <filesystem.h>
+
+#include <vsg/io/Options.h>
+#include <vsg/nodes/StateGroup.h>
+#include <vsg/state/ColorBlendState.h>
+#include <vsg/state/DepthStencilState.h>
+#include <vsg/state/Descriptor.h>
+#include <vsg/state/DescriptorBuffer.h>
+#include <vsg/state/DescriptorSetLayout.h>
+#include <vsg/state/InputAssemblyState.h>
+#include <vsg/state/MultisampleState.h>
+#include <vsg/state/RasterizationState.h>
+#include <vsg/state/VertexInputState.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsgImGui/imgui.h>
 
+#include <vulkan/vulkan_core.h>
+
+#include <string>
+
 BoxSelectionState::BoxSelectionState(
     const vsg::ref_ptr<Mouse>& mouse,
-    StateManager& state_manager
+    StateManager& state_manager,
+    const vsg::ref_ptr<vsg::Options>& vsg_options
 )
     : mouse(mouse)
     , state_manager(state_manager)
+    , vsg_options(vsg_options)
 {
+    const FileSystem& fs = FileSystem::getInstance();
+    const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
+
+    state_group = create_state_group_with_custom_pipeline(
+        shaders_dir.c_str(),
+        "box_selection.vert",
+        "box_selection.frag",
+        vsg_options,
+        vsg::VertexInputState::Bindings{
+            VkVertexInputBindingDescription{0, sizeof(vsg::vec2), VK_VERTEX_INPUT_RATE_VERTEX},
+            VkVertexInputBindingDescription{1, sizeof(vsg::vec4), VK_VERTEX_INPUT_RATE_VERTEX}
+        },
+        vsg::VertexInputState::Attributes{
+            VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32_SFLOAT, 0},
+            VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32B32A32_SFLOAT, 0}
+        },
+        vsg::DescriptorSetLayoutBindings{
+            {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr}
+        },
+        vsg::Descriptors{
+            vsg::DescriptorBuffer::create(nullptr, 0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+        },
+        vsg::InputAssemblyState::create(),
+        vsg::RasterizationState::create(),
+        vsg::MultisampleState::create(),
+        vsg::ColorBlendState::create(),
+        vsg::DepthStencilState::create()
+    );
 }
 
 BoxSelectionState::~BoxSelectionState() = default;
