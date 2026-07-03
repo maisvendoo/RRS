@@ -7,7 +7,12 @@
 
 #include <filesystem.h>
 
+#include <vsg/core/Array.h>
+#include <vsg/core/Data.h>
+#include <vsg/core/Value.h>
 #include <vsg/io/Options.h>
+#include <vsg/maths/vec4.h>
+#include <vsg/nodes/Geometry.h>
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
@@ -37,24 +42,30 @@ BoxSelectionState::BoxSelectionState(
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
+    const auto translation = vsg::vec2Value::create(0.0f, 0.0f);
+    translation->properties.dataVariance = vsg::DYNAMIC_DATA;
+    const auto scale = vsg::vec2Value::create(1.0f, 1.0f);
+    scale->properties.dataVariance = vsg::DYNAMIC_DATA;
+
     state_group = create_state_group_with_custom_pipeline(
         shaders_dir.c_str(),
         "box_selection.vert",
         "box_selection.frag",
         vsg_options,
         vsg::VertexInputState::Bindings{
-            VkVertexInputBindingDescription{0, sizeof(vsg::vec2), VK_VERTEX_INPUT_RATE_VERTEX},
-            VkVertexInputBindingDescription{1, sizeof(vsg::vec4), VK_VERTEX_INPUT_RATE_VERTEX}
+            VkVertexInputBindingDescription{0, sizeof(vsg::vec2),
+                VK_VERTEX_INPUT_RATE_VERTEX}
         },
         vsg::VertexInputState::Attributes{
-            VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32_SFLOAT, 0},
-            VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32B32A32_SFLOAT, 0}
+            VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32_SFLOAT, 0}
         },
         vsg::DescriptorSetLayoutBindings{
-            {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr}
+            {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1,
+                VK_SHADER_STAGE_VERTEX_BIT, nullptr}
         },
         vsg::Descriptors{
-            vsg::DescriptorBuffer::create(nullptr, 0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+            vsg::DescriptorBuffer::create(vsg::DataList{translation, scale},
+                0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
         },
         vsg::InputAssemblyState::create(),
         vsg::RasterizationState::create(),
@@ -62,6 +73,18 @@ BoxSelectionState::BoxSelectionState(
         vsg::ColorBlendState::create(),
         vsg::DepthStencilState::create()
     );
+
+    const auto vertices = vsg::vec2Array::create(4);
+    vertices->at(0) = {-0.5, -0.5};
+    vertices->at(1) = {-0.5,  0.5};
+    vertices->at(2) = { 0.5, -0.5};
+    vertices->at(3) = { 0.5,  0.5};
+
+    const auto geometry = vsg::Geometry::create();
+    geometry->assignArrays(vsg::DataList{vertices});
+    geometry->commands.push_back(vsg::Draw::create(4, 1, 0, 0));
+
+    state_group->addChild(geometry);
 }
 
 BoxSelectionState::~BoxSelectionState() = default;
