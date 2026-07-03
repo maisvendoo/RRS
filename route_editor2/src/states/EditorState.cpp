@@ -22,7 +22,7 @@ void EditorState::handle_button_release() const
 {
 }
 
-void EditorState::handle_mouse_move() const
+void EditorState::handle_mouse_move()
 {
 }
 

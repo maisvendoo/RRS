@@ -11,6 +11,12 @@ class StateManager;
 class BoxSelectionState : public EditorState
 {
 public:
+    int begin_x;
+    int begin_y;
+    int end_x;
+    int end_y;
+
+public:
     BoxSelectionState(
         const vsg::ref_ptr<Mouse>& mouse,
         StateManager& state_manager
@@ -21,6 +27,8 @@ public:
     virtual void fill_status_bar() const override;
 
     virtual void handle_button_release() const override;
+
+    virtual void handle_mouse_move() override;
 
 private:
     const vsg::ref_ptr<Mouse>& mouse;

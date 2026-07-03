@@ -34,6 +34,8 @@ public:
     void update(double delta_time);
 
 private:
+    const vsg::ref_ptr<Mouse>& mouse;
+
     std::unique_ptr<EditorState>* editor_state;
     std::unique_ptr<EditorState>* deferred_editor_state;
     std::unique_ptr<EditorState> route_not_loaded_state;

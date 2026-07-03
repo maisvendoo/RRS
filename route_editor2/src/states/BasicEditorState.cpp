@@ -30,7 +30,11 @@ BasicEditorState::~BasicEditorState() = default;
 
 void BasicEditorState::fill_status_bar() const
 {
-    ImGui::Text("Basic editor state    Current route: %s\n", route_dir.c_str());
+    ImGui::Text("Basic editor state");
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+    ImGui::Text("Current route: %s\n", route_dir.c_str());
 }
 
 void BasicEditorState::handle_key_press() const
@@ -53,7 +57,7 @@ void BasicEditorState::handle_button_release() const
 {
 }
 
-void BasicEditorState::handle_mouse_move() const
+void BasicEditorState::handle_mouse_move()
 {
     camera->handle_mouse_move();
 }

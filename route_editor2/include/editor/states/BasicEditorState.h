@@ -31,7 +31,7 @@ public:
     virtual void handle_key_release() const override;
     virtual void handle_button_press() const override;
     virtual void handle_button_release() const override;
-    virtual void handle_mouse_move() const override;
+    virtual void handle_mouse_move() override;
 
     virtual void update(double delta_time) const override;
 
