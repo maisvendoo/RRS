@@ -17,7 +17,7 @@ class BasicEditorState : public EditorState
 public:
     BasicEditorState(
         const vsg::ref_ptr<Mouse>& mouse,
-        const vsg::ref_ptr<const Keyboard>& keyboard,
+        const vsg::ref_ptr<Keyboard>& keyboard,
         StateManager& state_manager,
         const vsg::ref_ptr<Camera>& camera,
         const std::string& route_dir

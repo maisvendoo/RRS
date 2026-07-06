@@ -32,7 +32,7 @@ class StateManager
 public:
     StateManager(
         const vsg::ref_ptr<Mouse>& mouse,
-        const vsg::ref_ptr<const Keyboard>& keyboard,
+        const vsg::ref_ptr<Keyboard>& keyboard,
         const std::string& route_dir,
         const vsg::ref_ptr<Camera>& camera,
         const vsg::ref_ptr<vsg::Options>& vsg_options
@@ -47,8 +47,6 @@ public:
     void update(double delta_time);
 
 private:
-    const vsg::ref_ptr<Mouse>& mouse;
-
     EnumEditorState current_state_index;
     EnumEditorState deferred_state_index;
     std::array<std::unique_ptr<EditorState>, TOTAL_EDITOR_STATES> editor_states;

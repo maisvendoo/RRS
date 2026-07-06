@@ -21,12 +21,11 @@ static EditorStateNames get_editor_state_names();
 
 StateManager::StateManager(
     const vsg::ref_ptr<Mouse>& mouse,
-    const vsg::ref_ptr<const Keyboard>& keyboard,
+    const vsg::ref_ptr<Keyboard>& keyboard,
     const std::string& route_dir,
     const vsg::ref_ptr<Camera>& camera,
     const vsg::ref_ptr<vsg::Options>& vsg_options
 )
-    : mouse(mouse)
 {
     editor_states[EDITOR_STATE_ROUTE_NOT_LOADED] =
         std::make_unique<RouteNotLoadedState>(mouse, keyboard, *this);
@@ -59,7 +58,7 @@ void StateManager::update(double delta_time)
     {
         static EditorStateNames editor_state_names = get_editor_state_names();
         Journal::instance()->info(QString("state manager: switch to '%1'")
-            .arg(editor_state_names[current_state_index]));
+            .arg(editor_state_names[deferred_state_index]));
         current_state_index = deferred_state_index;
         editor_states[current_state_index]->on_activate();
     }

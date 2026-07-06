@@ -29,7 +29,7 @@ public:
 public:
     BoxSelectionState(
         const vsg::ref_ptr<Mouse>& mouse,
-        const vsg::ref_ptr<const Keyboard>& keyboard,
+        const vsg::ref_ptr<Keyboard>& keyboard,
         StateManager& state_manager,
         const vsg::ref_ptr<const vsg::Options>& vsg_options
     );
