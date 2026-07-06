@@ -3,6 +3,7 @@
 #include "editor/states/BasicEditorState.h"
 #include "editor/states/BoxSelectionState.h"
 #include "editor/states/EditorState.h"
+#include "editor/states/NavigationState.h"
 #include "editor/states/RouteNotLoadedState.h"
 
 #include <Journal.h>
@@ -31,6 +32,9 @@ StateManager::StateManager(
 
     editor_states[EDITOR_STATE_BASIC] = std::make_unique<BasicEditorState>(
         mouse, keyboard, *this, camera, route_dir);
+
+    editor_states[EDITOR_STATE_NAVIGATION] = std::make_unique<NavigationState>(
+        mouse, keyboard, *this);
 
     editor_states[EDITOR_STATE_BOX_SELECTION] =
         std::make_unique<BoxSelectionState>(mouse, keyboard, *this,
@@ -70,6 +74,7 @@ EditorStateNames get_editor_state_names()
 
     editor_state_names[EDITOR_STATE_ROUTE_NOT_LOADED] = "RouteNotLoadedState";
     editor_state_names[EDITOR_STATE_BASIC] = "BasicEditorState";
+    editor_state_names[EDITOR_STATE_NAVIGATION] = "NavigationState";
     editor_state_names[EDITOR_STATE_BOX_SELECTION] = "BoxSelectionState";
 
     return editor_state_names;

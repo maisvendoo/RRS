@@ -36,9 +36,22 @@ void BasicEditorState::handle_key_release() const
 
 void BasicEditorState::handle_button_press() const
 {
-    if (mouse->get_button_mask() == vsg::BUTTON_MASK_1)
+    switch (mouse->get_button_mask())
     {
-        state_manager.defer_switch(EDITOR_STATE_BOX_SELECTION);
+        case vsg::BUTTON_MASK_1:
+        {
+            state_manager.defer_switch(EDITOR_STATE_BOX_SELECTION);
+            return;
+        }
+        case vsg::BUTTON_MASK_3:
+        {
+            state_manager.defer_switch(EDITOR_STATE_NAVIGATION);
+            return;
+        }
+        default:
+        {
+            return;
+        }
     }
 }
 
