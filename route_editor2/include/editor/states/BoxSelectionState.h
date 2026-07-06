@@ -13,6 +13,7 @@ namespace vsg
 
 class Options;
 class StateGroup;
+class Switch;
 
 };
 
@@ -39,11 +40,14 @@ public:
 
     virtual void handle_mouse_move() override;
 
+    const vsg::ref_ptr<vsg::Switch>& get_switch_node() const;
+
 private:
     const vsg::ref_ptr<Mouse>& mouse;
     StateManager& state_manager;
     const vsg::ref_ptr<vsg::Options>& vsg_options;
 
+    vsg::ref_ptr<vsg::Switch> switch_node;
     vsg::ref_ptr<vsg::StateGroup> state_group;
 };
 

@@ -9,11 +9,14 @@
 
 #include <vsg/core/Array.h>
 #include <vsg/core/Data.h>
+#include <vsg/core/Mask.h>
 #include <vsg/core/Value.h>
+#include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
 #include <vsg/maths/vec4.h>
 #include <vsg/nodes/Geometry.h>
 #include <vsg/nodes/StateGroup.h>
+#include <vsg/nodes/Switch.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
 #include <vsg/state/Descriptor.h>
@@ -47,6 +50,9 @@ BoxSelectionState::BoxSelectionState(
     const auto scale = vsg::vec2Value::create(1.0f, 1.0f);
     scale->properties.dataVariance = vsg::DYNAMIC_DATA;
 
+    const auto input_assembly_state = vsg::InputAssemblyState::create();
+    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+
     state_group = create_state_group_with_custom_pipeline(
         shaders_dir.c_str(),
         "box_selection.vert",
@@ -67,7 +73,7 @@ BoxSelectionState::BoxSelectionState(
             vsg::DescriptorBuffer::create(vsg::DataList{translation, scale},
                 0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
         },
-        vsg::InputAssemblyState::create(),
+        input_assembly_state,
         vsg::RasterizationState::create(),
         vsg::MultisampleState::create(),
         vsg::ColorBlendState::create(),
@@ -85,6 +91,9 @@ BoxSelectionState::BoxSelectionState(
     geometry->commands.push_back(vsg::Draw::create(4, 1, 0, 0));
 
     state_group->addChild(geometry);
+
+    switch_node = vsg::Switch::create();
+    switch_node->addChild(vsg::MASK_ALL, state_group);
 }
 
 BoxSelectionState::~BoxSelectionState() = default;
@@ -114,4 +123,9 @@ void BoxSelectionState::handle_mouse_move()
 {
     end_x = mouse->get_pos_x();
     end_y = mouse->get_pos_y();
+}
+
+const vsg::ref_ptr<vsg::Switch>& BoxSelectionState::get_switch_node() const
+{
+    return switch_node;
 }
