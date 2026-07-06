@@ -34,7 +34,7 @@ StateManager::StateManager(
         mouse, keyboard, *this, camera, route_dir);
 
     editor_states[EDITOR_STATE_NAVIGATION] = std::make_unique<NavigationState>(
-        mouse, keyboard, *this);
+        mouse, keyboard, *this, camera);
 
     editor_states[EDITOR_STATE_BOX_SELECTION] =
         std::make_unique<BoxSelectionState>(mouse, keyboard, *this,

@@ -61,12 +61,11 @@ void BasicEditorState::handle_button_release() const
 
 void BasicEditorState::handle_mouse_move()
 {
-    camera->handle_mouse_move();
 }
 
 void BasicEditorState::update(double delta_time) const
 {
-    camera->update(delta_time);
+    static_cast<void>(delta_time);
 }
 
 void BasicEditorState::fill_status_bar() const

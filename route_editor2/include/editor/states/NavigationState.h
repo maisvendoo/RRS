@@ -5,6 +5,7 @@
 
 #include <vsg/core/ref_ptr.h>
 
+class Camera;
 class Keyboard;
 class Mouse;
 class StateManager;
@@ -15,7 +16,8 @@ public:
     NavigationState(
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
-        StateManager& state_manager
+        StateManager& state_manager,
+        const vsg::ref_ptr<Camera>& camera
     );
 
     virtual ~NavigationState() override;
@@ -28,7 +30,12 @@ public:
 
     virtual void handle_mouse_move() override;
 
+    virtual void update(double delta_time) const override;
+
     virtual void fill_status_bar() const override;
+
+private:
+    const vsg::ref_ptr<Camera>& camera;
 };
 
 #endif // EDITOR_NAVIGATION_STATE_H

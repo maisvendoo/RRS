@@ -15,20 +15,20 @@ EventHandler::~EventHandler() = default;
 
 void EventHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    if (keyPress.handled)
-    {
-        return;
-    }
+    // if (keyPress.handled)
+    // {
+    //     return;
+    // }
 
     state_manager.get_editor_state()->handle_key_press();
 }
 
 void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
-    if (keyRelease.handled)
-    {
-        return;
-    }
+    // if (keyRelease.handled)
+    // {
+    //     return;
+    // }
 
     state_manager.get_editor_state()->handle_key_release();
 }

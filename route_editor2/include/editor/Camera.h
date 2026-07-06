@@ -4,6 +4,7 @@
 #include <vsg/app/Camera.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec3.h>
 
 #include <vulkan/vulkan_core.h>
 
@@ -53,6 +54,8 @@ public:
      */
     ~Camera();
 
+    void update_move_direction();
+
     /**
      * Handle mouse movement and update yaw, pitch and camera's vectors
      * accordingly.
@@ -75,6 +78,8 @@ private:
     const camera_settings_t& camera_settings;
     const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
+
+    vsg::dvec3 move_direction = {0.0, 0.0, 0.0};
 
     double yaw_degrees = 0.0;
     double pitch_degrees = 0.0;

@@ -42,13 +42,30 @@ Camera::Camera(
 
 Camera::~Camera() = default;
 
+void Camera::update_move_direction()
+{
+    const double forward_move_direction =
+        static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_FORWARD)) -
+        static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_BACKWARD));
+
+    const double right_move_direction =
+        static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_RIGHT)) -
+        static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_LEFT));
+
+    if ((std::abs(forward_move_direction) > 1.0e-6) ||
+        (std::abs(right_move_direction) > 1.0e-6))
+    {
+        move_direction = vsg::normalize(front * forward_move_direction +
+            right * right_move_direction);
+    }
+    else
+    {
+        move_direction = {0.0, 0.0, 0.0};
+    }
+}
+
 void Camera::handle_mouse_move()
 {
-    if (mouse->get_button_mask() != vsg::BUTTON_MASK_3)
-    {
-        return;
-    }
-
     yaw_degrees += camera_settings.rotate_speed * mouse->get_delta_x();
     pitch_degrees -= camera_settings.rotate_speed * mouse->get_delta_y();
     pitch_degrees = std::clamp(pitch_degrees, -89.0, 89.0);
@@ -63,26 +80,13 @@ void Camera::handle_mouse_move()
     ));
 
     right = vsg::normalize(vsg::cross(front, look_at->up));
+
+    update_move_direction();
 }
 
 void Camera::update(double delta_time)
 {
-    if (mouse->get_button_mask() != vsg::BUTTON_MASK_3)
-    {
-        return;
-    }
-
-    const vsg::dvec3 movement = camera_settings.move_speed * delta_time * (
-        front * (
-            static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_FORWARD)) -
-            static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_BACKWARD))
-        ) + right * (
-            static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_RIGHT)) -
-            static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_LEFT))
-        )
-    );
-
-    look_at->eye += movement;
+    look_at->eye += camera_settings.move_speed * delta_time * move_direction;
     look_at->center = look_at->eye + front;
 }
 
