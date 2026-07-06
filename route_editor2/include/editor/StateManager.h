@@ -1,6 +1,7 @@
 #ifndef EDITOR_STATE_MANAGER_H
 #define EDITOR_STATE_MANAGER_H
 
+#include <array>
 #include <vsg/core/ref_ptr.h>
 
 #include <memory>
@@ -18,11 +19,19 @@ class Options;
 
 }
 
+enum EnumEditorState
+{
+    EDITOR_STATE_ROUTE_NOT_LOADED,
+    EDITOR_STATE_BASIC,
+    EDITOR_STATE_BOX_SELECTION,
+    TOTAL_EDITOR_STATES
+};
+
 class StateManager
 {
 public:
     StateManager(
-        const vsg::ref_ptr<const Mouse>& mouse,
+        const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<const Keyboard>& keyboard,
         const std::string& route_dir,
         const vsg::ref_ptr<Camera>& camera,
@@ -33,22 +42,16 @@ public:
 
     const std::unique_ptr<EditorState>& get_editor_state() const;
 
-    void defer_switch_to_route_not_loaded_state();
-
-    void defer_switch_to_basic_editor_state();
-
-    void defer_switch_to_box_selection_state();
+    void defer_switch(EnumEditorState state);
 
     void update(double delta_time);
 
 private:
-    const vsg::ref_ptr<const Mouse>& mouse;
+    const vsg::ref_ptr<Mouse>& mouse;
 
-    std::unique_ptr<EditorState>* editor_state;
-    std::unique_ptr<EditorState>* deferred_editor_state;
-    std::unique_ptr<EditorState> route_not_loaded_state;
-    std::unique_ptr<EditorState> basic_editor_state;
-    std::unique_ptr<EditorState> box_selection_state;
+    EnumEditorState current_state_index;
+    EnumEditorState deferred_state_index;
+    std::array<std::unique_ptr<EditorState>, TOTAL_EDITOR_STATES> editor_states;
 };
 
 #endif // EDITOR_STATE_MANAGER_H

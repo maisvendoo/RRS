@@ -12,7 +12,7 @@
 #include <string>
 
 BasicEditorState::BasicEditorState(
-    const vsg::ref_ptr<const Mouse>& mouse,
+    const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<const Keyboard>& keyboard,
     StateManager& state_manager,
     const vsg::ref_ptr<Camera>& camera,
@@ -38,7 +38,7 @@ void BasicEditorState::handle_button_press() const
 {
     if (mouse->get_button_mask() == vsg::BUTTON_MASK_1)
     {
-        state_manager.defer_switch_to_box_selection_state();
+        state_manager.defer_switch(EDITOR_STATE_BOX_SELECTION);
     }
 }
 

@@ -28,13 +28,15 @@ public:
 
 public:
     BoxSelectionState(
-        const vsg::ref_ptr<const Mouse>& mouse,
+        const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<const Keyboard>& keyboard,
         StateManager& state_manager,
         const vsg::ref_ptr<const vsg::Options>& vsg_options
     );
 
     virtual ~BoxSelectionState() override;
+
+    virtual void on_activate() override;
 
     virtual void handle_button_release() const override;
 

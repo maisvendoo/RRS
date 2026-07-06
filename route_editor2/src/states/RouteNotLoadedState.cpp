@@ -8,7 +8,7 @@
 #include <vsgImGui/imgui.h>
 
 RouteNotLoadedState::RouteNotLoadedState(
-    const vsg::ref_ptr<const Mouse>& mouse,
+    const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<const Keyboard>& keyboard,
     StateManager& state_manager
 )

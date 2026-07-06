@@ -11,12 +11,14 @@ class EditorState
 {
 public:
     EditorState(
-        const vsg::ref_ptr<const Mouse>& mouse,
+        const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<const Keyboard>& keyboard,
         StateManager& state_manager
     );
 
     virtual ~EditorState();
+
+    virtual void on_activate();
 
     virtual void handle_key_press() const;
 
@@ -33,7 +35,7 @@ public:
     virtual void fill_status_bar() const;
 
 protected:
-    const vsg::ref_ptr<const Mouse>& mouse;
+    const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<const Keyboard>& keyboard;
     StateManager& state_manager;
 };

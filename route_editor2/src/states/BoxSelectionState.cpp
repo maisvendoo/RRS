@@ -35,7 +35,7 @@
 #include <string>
 
 BoxSelectionState::BoxSelectionState(
-    const vsg::ref_ptr<const Mouse>& mouse,
+    const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<const Keyboard>& keyboard,
     StateManager& state_manager,
     const vsg::ref_ptr<const vsg::Options>& vsg_options
@@ -104,11 +104,17 @@ BoxSelectionState::BoxSelectionState(
 
 BoxSelectionState::~BoxSelectionState() = default;
 
+void BoxSelectionState::on_activate()
+{
+    begin_x = end_x = mouse->get_pos_x();
+    begin_y = end_y = mouse->get_pos_y();
+}
+
 void BoxSelectionState::handle_button_release() const
 {
     if (!(mouse->get_button_mask() & vsg::BUTTON_MASK_1))
     {
-        state_manager.defer_switch_to_basic_editor_state();
+        state_manager.defer_switch(EDITOR_STATE_BASIC);
     }
 }
 

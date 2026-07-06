@@ -3,7 +3,7 @@
 #include <vsg/core/ref_ptr.h>
 
 EditorState::EditorState(
-    const vsg::ref_ptr<const Mouse>& mouse,
+    const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<const Keyboard>& keyboard,
     StateManager& state_manager
 )
@@ -14,6 +14,10 @@ EditorState::EditorState(
 }
 
 EditorState::~EditorState() = default;
+
+void EditorState::on_activate()
+{
+}
 
 void EditorState::handle_key_press() const
 {
