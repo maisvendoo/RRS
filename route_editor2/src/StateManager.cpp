@@ -1,6 +1,5 @@
 #include "editor/StateManager.h"
 
-#include "editor/Mouse.h"
 #include "editor/states/BasicEditorState.h"
 #include "editor/states/BoxSelectionState.h"
 #include "editor/states/EditorState.h"
@@ -22,8 +21,8 @@ static EditorStateNames get_editor_state_names();
 StateManager::StateManager(
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
-    const std::string& route_dir,
     const vsg::ref_ptr<Camera>& camera,
+    const std::string& route_dir,
     const vsg::ref_ptr<vsg::Options>& vsg_options
 )
 {
@@ -42,11 +41,6 @@ StateManager::StateManager(
 
 StateManager::~StateManager() = default;
 
-const std::unique_ptr<EditorState>& StateManager::get_editor_state() const
-{
-    return editor_states[current_state_index];
-}
-
 void StateManager::defer_switch(EnumEditorState state)
 {
     deferred_state_index = state;
@@ -63,6 +57,11 @@ void StateManager::update(double delta_time)
         editor_states[current_state_index]->on_activate();
     }
     editor_states[current_state_index]->update(delta_time);
+}
+
+const std::unique_ptr<EditorState>& StateManager::get_editor_state() const
+{
+    return editor_states[current_state_index];
 }
 
 EditorStateNames get_editor_state_names()

@@ -1,9 +1,9 @@
 #ifndef EDITOR_STATE_MANAGER_H
 #define EDITOR_STATE_MANAGER_H
 
-#include <array>
 #include <vsg/core/ref_ptr.h>
 
+#include <array>
 #include <memory>
 #include <string>
 
@@ -33,18 +33,18 @@ public:
     StateManager(
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
-        const std::string& route_dir,
         const vsg::ref_ptr<Camera>& camera,
+        const std::string& route_dir,
         const vsg::ref_ptr<vsg::Options>& vsg_options
     );
 
     ~StateManager();
 
-    const std::unique_ptr<EditorState>& get_editor_state() const;
-
     void defer_switch(EnumEditorState state);
 
     void update(double delta_time);
+
+    const std::unique_ptr<EditorState>& get_editor_state() const;
 
 private:
     EnumEditorState current_state_index;

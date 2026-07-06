@@ -289,8 +289,8 @@ void RouteEditor::create_keyboard()
 
 void RouteEditor::create_state_manager()
 {
-    state_manager = std::make_unique<StateManager>(mouse, keyboard, route_dir,
-        camera, vsg_options);
+    state_manager = std::make_unique<StateManager>(mouse, keyboard, camera,
+        route_dir, vsg_options);
     CHECK_INITIALIZATION(state_manager);
 }
 
