@@ -1,9 +1,20 @@
 #include "editor/states/RouteNotLoadedState.h"
 
+#include "editor/states/EditorState.h"
+
 #include <filesystem.h>
 
 #include <ImGuiFileDialog.h>
 #include <vsgImGui/imgui.h>
+
+RouteNotLoadedState::RouteNotLoadedState(
+    const vsg::ref_ptr<const Mouse>& mouse,
+    const vsg::ref_ptr<const Keyboard>& keyboard,
+    StateManager& state_manager
+)
+    : EditorState(mouse, keyboard, state_manager)
+{
+}
 
 RouteNotLoadedState::~RouteNotLoadedState() = default;
 

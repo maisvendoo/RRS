@@ -2,18 +2,19 @@
 
 #include "editor/Mouse.h"
 #include "editor/StateManager.h"
-
-#include <graphics/pipeline_funcs.h>
+#include "editor/states/EditorState.h"
 
 #include <filesystem.h>
+#include <graphics/pipeline_funcs.h>
 
+#include <vsg/commands/Draw.h>
 #include <vsg/core/Array.h>
 #include <vsg/core/Data.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/Value.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
-#include <vsg/maths/vec4.h>
+#include <vsg/maths/vec2.h>
 #include <vsg/nodes/Geometry.h>
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/nodes/Switch.h>
@@ -34,19 +35,19 @@
 #include <string>
 
 BoxSelectionState::BoxSelectionState(
-    const vsg::ref_ptr<Mouse>& mouse,
+    const vsg::ref_ptr<const Mouse>& mouse,
+    const vsg::ref_ptr<const Keyboard>& keyboard,
     StateManager& state_manager,
-    const vsg::ref_ptr<vsg::Options>& vsg_options
+    const vsg::ref_ptr<const vsg::Options>& vsg_options
 )
-    : mouse(mouse)
-    , state_manager(state_manager)
-    , vsg_options(vsg_options)
+    : EditorState(mouse, keyboard, state_manager)
 {
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
     const auto translation = vsg::vec2Value::create(0.0f, 0.0f);
     translation->properties.dataVariance = vsg::DYNAMIC_DATA;
+
     const auto scale = vsg::vec2Value::create(1.0f, 1.0f);
     scale->properties.dataVariance = vsg::DYNAMIC_DATA;
 
@@ -59,19 +60,24 @@ BoxSelectionState::BoxSelectionState(
         "box_selection.frag",
         vsg_options,
         vsg::VertexInputState::Bindings{
-            VkVertexInputBindingDescription{0, sizeof(vsg::vec2),
-                VK_VERTEX_INPUT_RATE_VERTEX}
+            VkVertexInputBindingDescription{
+                0, sizeof(vsg::vec2), VK_VERTEX_INPUT_RATE_VERTEX
+            }
         },
         vsg::VertexInputState::Attributes{
-            VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32_SFLOAT, 0}
+            VkVertexInputAttributeDescription{
+                0, 0, VK_FORMAT_R32G32_SFLOAT, 0
+            }
         },
-        vsg::DescriptorSetLayoutBindings{
-            {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1,
-                VK_SHADER_STAGE_VERTEX_BIT, nullptr}
-        },
+        vsg::DescriptorSetLayoutBindings{{
+            0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            1, VK_SHADER_STAGE_VERTEX_BIT, nullptr
+        }},
         vsg::Descriptors{
-            vsg::DescriptorBuffer::create(vsg::DataList{translation, scale},
-                0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+            vsg::DescriptorBuffer::create(
+                vsg::DataList{translation, scale}, 0, 0,
+                VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+            )
         },
         input_assembly_state,
         vsg::RasterizationState::create(),
@@ -98,19 +104,6 @@ BoxSelectionState::BoxSelectionState(
 
 BoxSelectionState::~BoxSelectionState() = default;
 
-void BoxSelectionState::fill_status_bar() const
-{
-    ImGui::Text("Box selection state");
-    ImGui::SameLine();
-    ImGui::Text("|");
-    ImGui::SameLine();
-    ImGui::Text("Begin pos: %dx%d\n", begin_x, begin_y);
-    ImGui::SameLine();
-    ImGui::Text("|");
-    ImGui::SameLine();
-    ImGui::Text("End pos: %dx%d\n", end_x, end_y);
-}
-
 void BoxSelectionState::handle_button_release() const
 {
     if (!(mouse->get_button_mask() & vsg::BUTTON_MASK_1))
@@ -125,7 +118,15 @@ void BoxSelectionState::handle_mouse_move()
     end_y = mouse->get_pos_y();
 }
 
-const vsg::ref_ptr<vsg::Switch>& BoxSelectionState::get_switch_node() const
+void BoxSelectionState::fill_status_bar() const
 {
-    return switch_node;
+    ImGui::Text("Box selection state");
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+    ImGui::Text("Begin pos: %dx%d\n", begin_x, begin_y);
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+    ImGui::Text("End pos: %dx%d\n", end_x, end_y);
 }

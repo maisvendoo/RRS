@@ -16,31 +16,32 @@ class BasicEditorState : public EditorState
 {
 public:
     BasicEditorState(
-        const vsg::ref_ptr<Mouse>& mouse,
-        const vsg::ref_ptr<Keyboard>& keyboard,
-        const std::string& route_dir,
+        const vsg::ref_ptr<const Mouse>& mouse,
+        const vsg::ref_ptr<const Keyboard>& keyboard,
+        StateManager& state_manager,
         const vsg::ref_ptr<Camera>& camera,
-        StateManager& state_manager
+        const std::string& route_dir
     );
 
     virtual ~BasicEditorState() override;
 
-    virtual void fill_status_bar() const override;
-
     virtual void handle_key_press() const override;
+
     virtual void handle_key_release() const override;
+
     virtual void handle_button_press() const override;
+
     virtual void handle_button_release() const override;
+
     virtual void handle_mouse_move() override;
 
     virtual void update(double delta_time) const override;
 
+    virtual void fill_status_bar() const override;
+
 private:
-    const vsg::ref_ptr<Mouse>& mouse;
-    const vsg::ref_ptr<Keyboard>& keyboard;
-    const std::string& route_dir;
     const vsg::ref_ptr<Camera>& camera;
-    StateManager& state_manager;
+    const std::string& route_dir;
 };
 
 #endif // BASIC_EDITOR_STATE_H

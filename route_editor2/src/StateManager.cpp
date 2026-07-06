@@ -9,24 +9,29 @@
 #include <Journal.h>
 
 #include <vsg/core/ref_ptr.h>
+#include <vsg/io/Options.h>
 
 #include <memory>
 #include <string>
 
 StateManager::StateManager(
-    const vsg::ref_ptr<Mouse>& mouse,
-    const vsg::ref_ptr<Keyboard>& keyboard,
+    const vsg::ref_ptr<const Mouse>& mouse,
+    const vsg::ref_ptr<const Keyboard>& keyboard,
     const std::string& route_dir,
     const vsg::ref_ptr<Camera>& camera,
     const vsg::ref_ptr<vsg::Options>& vsg_options
 )
     : mouse(mouse)
 {
-    route_not_loaded_state = std::make_unique<RouteNotLoadedState>();
+    route_not_loaded_state = std::make_unique<RouteNotLoadedState>(
+        mouse, keyboard, *this
+    );
     basic_editor_state = std::make_unique<BasicEditorState>(
-        mouse, keyboard, route_dir, camera, *this);
+        mouse, keyboard, *this, camera, route_dir
+    );
     box_selection_state = std::make_unique<BoxSelectionState>(
-        mouse, *this, vsg_options);
+        mouse, keyboard, *this, vsg_options
+    );
     editor_state = &route_not_loaded_state;
     deferred_editor_state = &route_not_loaded_state;
 }

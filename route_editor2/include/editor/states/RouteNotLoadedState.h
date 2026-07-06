@@ -3,9 +3,21 @@
 
 #include "editor/states/EditorState.h"
 
+#include <vsg/core/ref_ptr.h>
+
+class Keyboard;
+class Mouse;
+class StateManager;
+
 class RouteNotLoadedState : public EditorState
 {
 public:
+    RouteNotLoadedState(
+        const vsg::ref_ptr<const Mouse>& mouse,
+        const vsg::ref_ptr<const Keyboard>& keyboard,
+        StateManager& state_manager
+    );
+
     virtual ~RouteNotLoadedState() override;
 
     virtual void fill_status_bar() const override;

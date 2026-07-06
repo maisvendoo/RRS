@@ -1,10 +1,19 @@
 #include "editor/states/EditorState.h"
 
-EditorState::~EditorState() = default;
+#include <vsg/core/ref_ptr.h>
 
-void EditorState::fill_status_bar() const
+EditorState::EditorState(
+    const vsg::ref_ptr<const Mouse>& mouse,
+    const vsg::ref_ptr<const Keyboard>& keyboard,
+    StateManager& state_manager
+)
+    : mouse(mouse)
+    , keyboard(keyboard)
+    , state_manager(state_manager)
 {
 }
+
+EditorState::~EditorState() = default;
 
 void EditorState::handle_key_press() const
 {
@@ -28,5 +37,9 @@ void EditorState::handle_mouse_move()
 
 void EditorState::update(double delta_time) const
 {
-    (void)delta_time;
+    static_cast<void>(delta_time);
+}
+
+void EditorState::fill_status_bar() const
+{
 }
