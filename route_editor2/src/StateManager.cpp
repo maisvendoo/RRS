@@ -35,37 +35,34 @@ StateManager::StateManager(
         std::make_unique<BoxSelectionState>(mouse, keyboard, *this,
             vsg_options);
 
-    current_state_index = deferred_state_index = EDITOR_STATE_ROUTE_NOT_LOADED;
+    current_state = deferred_state =
+        &editor_states[EDITOR_STATE_ROUTE_NOT_LOADED];
 }
 
 StateManager::~StateManager() = default;
 
 void StateManager::defer_switch(EnumEditorState state)
 {
-    deferred_state_index = state;
+    deferred_state = &editor_states[state];
 }
 
 void StateManager::update(double delta_time)
 {
-    const auto& current_state = editor_states[current_state_index];
-
-    if (current_state_index != deferred_state_index)
+    if (current_state != deferred_state)
     {
-        const auto& deferred_state = editor_states[deferred_state_index];
-
         Journal::instance()->info(QString("'%1' -> '%2'")
-            .arg(current_state->get_name())
-            .arg(deferred_state->get_name()));
+            .arg((*current_state)->get_name())
+            .arg((*deferred_state)->get_name()));
 
-        current_state->on_deactivate();
-        current_state_index = deferred_state_index;
-        deferred_state->on_activate();
+        (*current_state)->on_deactivate();
+        current_state = deferred_state;
+        (*deferred_state)->on_activate();
     }
 
-    current_state->update(delta_time);
+    (*current_state)->update(delta_time);
 }
 
 const std::unique_ptr<EditorState>& StateManager::get_editor_state() const
 {
-    return editor_states[current_state_index];
+    return *current_state;
 }

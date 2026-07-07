@@ -48,8 +48,8 @@ public:
     const std::unique_ptr<EditorState>& get_editor_state() const;
 
 private:
-    EnumEditorState current_state_index;
-    EnumEditorState deferred_state_index;
+    const std::unique_ptr<EditorState>* current_state;
+    const std::unique_ptr<EditorState>* deferred_state;
     std::array<std::unique_ptr<EditorState>, TOTAL_EDITOR_STATES> editor_states;
 };
 
