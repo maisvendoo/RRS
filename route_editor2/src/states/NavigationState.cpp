@@ -17,6 +17,7 @@ NavigationState::NavigationState(
     : EditorState(mouse, keyboard, state_manager)
     , camera(camera)
 {
+    name = "NavigationState";
 }
 
 NavigationState::~NavigationState() = default;

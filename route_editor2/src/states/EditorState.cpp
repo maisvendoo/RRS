@@ -10,6 +10,7 @@ EditorState::EditorState(
     : mouse(mouse)
     , keyboard(keyboard)
     , state_manager(state_manager)
+    , name("EditorState")
 {
 }
 
@@ -50,4 +51,9 @@ void EditorState::update(double delta_time) const
 
 void EditorState::fill_status_bar() const
 {
+}
+
+const char* EditorState::get_name() const
+{
+    return name;
 }

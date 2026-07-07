@@ -19,6 +19,7 @@ BasicEditorState::BasicEditorState(
     : EditorState(mouse, keyboard, state_manager)
     , route_dir(route_dir)
 {
+    name = "BasicEditorState";
 }
 
 BasicEditorState::~BasicEditorState() = default;

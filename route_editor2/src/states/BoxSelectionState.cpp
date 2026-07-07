@@ -42,6 +42,8 @@ BoxSelectionState::BoxSelectionState(
 )
     : EditorState(mouse, keyboard, state_manager)
 {
+    name = "BoxSelectionState";
+
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 

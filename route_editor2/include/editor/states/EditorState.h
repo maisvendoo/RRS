@@ -36,10 +36,14 @@ public:
 
     virtual void fill_status_bar() const;
 
+    const char* get_name() const;
+
 protected:
     const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
     StateManager& state_manager;
+
+    const char* name;
 };
 
 #endif // EDITOR_STATE_H

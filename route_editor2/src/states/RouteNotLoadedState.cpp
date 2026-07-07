@@ -14,6 +14,7 @@ RouteNotLoadedState::RouteNotLoadedState(
 )
     : EditorState(mouse, keyboard, state_manager)
 {
+    name = "RouteNotLoadedState";
 }
 
 RouteNotLoadedState::~RouteNotLoadedState() = default;
