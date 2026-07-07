@@ -53,7 +53,8 @@ void StateManager::update(double delta_time)
     {
         const auto& deferred_state = editor_states[deferred_state_index];
 
-        Journal::instance()->info(QString("state manager: switch to '%1'")
+        Journal::instance()->info(QString("'%1' -> '%2'")
+            .arg(current_state->get_name())
             .arg(deferred_state->get_name()));
 
         current_state->on_deactivate();
