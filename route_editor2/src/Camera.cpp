@@ -3,9 +3,8 @@
 #include "editor/Action.h"
 #include "editor/Keyboard.h"
 #include "editor/Mouse.h"
+#include "editor/check_initialization.h"
 #include "editor/settings/CameraSettings.h"
-
-#include <Journal.h>
 
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/ViewMatrix.h>
@@ -19,7 +18,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstdlib>
 
 Camera::Camera(
     const camera_settings_t& camera_settings,
@@ -114,55 +112,29 @@ void Camera::create_perspective(VkExtent2D window_extent)
         camera_settings.zNear,
         camera_settings.view_distance
     );
-
-    if (!perspective)
-    {
-        Journal::instance()->error("Failed to create perspective projection matrix");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Perspective projection matrix is created successfully");
+    CHECK_INITIALIZATION(perspective);
 }
 
 void Camera::create_orthographic()
 {
     orthographic = vsg::Orthographic::create(-1.0, 1.0, -1.0, 1.0,
         camera_settings.zNear, camera_settings.view_distance);
-
-    if (!orthographic)
-    {
-        Journal::instance()->error("Failed to create orthographic projection matrix");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Orthographic projection matrix is created successfully");
+    CHECK_INITIALIZATION(orthographic);
 }
 
 void Camera::create_look_at()
 {
     look_at = vsg::LookAt::create();
-    if (!look_at)
-    {
-        Journal::instance()->error("Failed to create LookAt view matrix");
-        std::exit(EXIT_FAILURE);
-    }
+    CHECK_INITIALIZATION(look_at);
 
     look_at->eye.z = look_at->center.z = camera_settings.initial_height;
 
     front = look_at->center - look_at->eye;
     right = vsg::cross(front, look_at->up);
-
-    Journal::instance()->info("LookAt view matrix is created successfully");
 }
 
 void Camera::create_viewport_state(VkExtent2D window_extent)
 {
     viewportState = vsg::ViewportState::create(window_extent);
-    if (!viewportState)
-    {
-        Journal::instance()->error("Failed to create viewport state");
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->info("Viewport state is created successfully");
+    CHECK_INITIALIZATION(viewportState);
 }

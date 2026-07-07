@@ -8,6 +8,7 @@
 #include "editor/ObjectManager.h"
 #include "editor/Route.h"
 #include "editor/StateManager.h"
+#include "editor/check_initialization.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/GuiSettings.h"
 #include "editor/settings/SceneSettings.h"
@@ -55,14 +56,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <memory>
-
-#define CHECK_INITIALIZATION(object)                                    \
-    if (!object)                                                        \
-    {                                                                   \
-        Journal::instance()->error("Failed to initialize "#object);     \
-        std::exit(EXIT_FAILURE);                                        \
-    }                                                                   \
-    Journal::instance()->info(#object" is initialized successfully")
 
 RouteEditor::RouteEditor()
     : route(object_manager, camera_settings.view_distance, vsg_options)
