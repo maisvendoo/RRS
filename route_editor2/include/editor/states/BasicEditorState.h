@@ -7,7 +7,6 @@
 
 #include <string>
 
-class Camera;
 class Keyboard;
 class Mouse;
 class StateManager;
@@ -19,7 +18,6 @@ public:
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         StateManager& state_manager,
-        const vsg::ref_ptr<Camera>& camera,
         const std::string& route_dir
     );
 
@@ -40,7 +38,6 @@ public:
     virtual void fill_status_bar() const override;
 
 private:
-    const vsg::ref_ptr<Camera>& camera;
     const std::string& route_dir;
 };
 

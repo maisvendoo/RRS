@@ -31,7 +31,7 @@ StateManager::StateManager(
         std::make_unique<RouteNotLoadedState>(mouse, keyboard, *this);
 
     editor_states[EDITOR_STATE_BASIC] = std::make_unique<BasicEditorState>(
-        mouse, keyboard, *this, camera, route_dir);
+        mouse, keyboard, *this, route_dir);
 
     editor_states[EDITOR_STATE_NAVIGATION] = std::make_unique<NavigationState>(
         mouse, keyboard, *this, camera);

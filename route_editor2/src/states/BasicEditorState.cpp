@@ -1,6 +1,5 @@
 #include "editor/states/BasicEditorState.h"
 
-#include "editor/Camera.h"
 #include "editor/Mouse.h"
 #include "editor/StateManager.h"
 #include "editor/states/EditorState.h"
@@ -15,11 +14,9 @@ BasicEditorState::BasicEditorState(
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
     StateManager& state_manager,
-    const vsg::ref_ptr<Camera>& camera,
     const std::string& route_dir
 )
     : EditorState(mouse, keyboard, state_manager)
-    , camera(camera)
     , route_dir(route_dir)
 {
 }
