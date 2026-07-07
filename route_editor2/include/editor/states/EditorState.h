@@ -20,6 +20,8 @@ public:
 
     virtual void on_activate();
 
+    virtual void on_deactivate();
+
     virtual void handle_key_press() const;
 
     virtual void handle_key_release() const;

@@ -19,6 +19,10 @@ void EditorState::on_activate()
 {
 }
 
+void EditorState::on_deactivate()
+{
+}
+
 void EditorState::handle_key_press() const
 {
 }

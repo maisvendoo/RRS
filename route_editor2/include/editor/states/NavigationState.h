@@ -22,6 +22,8 @@ public:
 
     virtual ~NavigationState() override;
 
+    virtual void on_activate() override;
+
     virtual void handle_key_press() const override;
 
     virtual void handle_key_release() const override;

@@ -21,6 +21,11 @@ NavigationState::NavigationState(
 
 NavigationState::~NavigationState() = default;
 
+void NavigationState::on_activate()
+{
+    camera->update_move_direction();
+}
+
 void NavigationState::handle_key_press() const
 {
     camera->update_move_direction();

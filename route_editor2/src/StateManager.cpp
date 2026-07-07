@@ -57,6 +57,8 @@ void StateManager::update(double delta_time)
         static EditorStateNames editor_state_names = get_editor_state_names();
         Journal::instance()->info(QString("state manager: switch to '%1'")
             .arg(editor_state_names[deferred_state_index]));
+
+        editor_states[current_state_index]->on_deactivate();
         current_state_index = deferred_state_index;
         editor_states[current_state_index]->on_activate();
     }
