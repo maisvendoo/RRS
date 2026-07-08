@@ -14,6 +14,7 @@ class StateManager;
 namespace vsg
 {
 
+class Group;
 class Options;
 class StateGroup;
 class Switch;
@@ -33,12 +34,15 @@ public:
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         StateManager& state_manager,
-        const vsg::ref_ptr<vsg::Options>& vsg_options
+        const vsg::ref_ptr<vsg::Options>& vsg_options,
+        const vsg::ref_ptr<vsg::Group>& gui_group
     );
 
     virtual ~BoxSelectionState() override;
 
     virtual void on_activate() override;
+
+    virtual void on_deactivate() override;
 
     virtual void handle_button_release() const override;
 

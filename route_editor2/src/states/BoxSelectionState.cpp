@@ -38,7 +38,8 @@ BoxSelectionState::BoxSelectionState(
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
     StateManager& state_manager,
-    const vsg::ref_ptr<vsg::Options>& vsg_options
+    const vsg::ref_ptr<vsg::Options>& vsg_options,
+    const vsg::ref_ptr<vsg::Group>& gui_group
 )
     : EditorState(mouse, keyboard, state_manager)
 {
@@ -113,7 +114,9 @@ BoxSelectionState::BoxSelectionState(
     state_group->addChild(geometry);
 
     switch_node = vsg::Switch::create();
-    switch_node->addChild(vsg::MASK_ALL, state_group);
+    switch_node->addChild(vsg::MASK_OFF, state_group);
+
+    gui_group->addChild(switch_node);
 }
 
 BoxSelectionState::~BoxSelectionState() = default;
@@ -122,6 +125,13 @@ void BoxSelectionState::on_activate()
 {
     begin_x = end_x = mouse->get_pos_x();
     begin_y = end_y = mouse->get_pos_y();
+
+    switch_node->setAllChildren(true);
+}
+
+void BoxSelectionState::on_deactivate()
+{
+    switch_node->setAllChildren(false);
 }
 
 void BoxSelectionState::handle_button_release() const

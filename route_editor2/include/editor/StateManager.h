@@ -13,6 +13,7 @@ class Mouse;
 namespace vsg
 {
 
+class Group;
 class Options;
 
 }
@@ -25,7 +26,8 @@ public:
         const vsg::ref_ptr<Keyboard>& keyboard,
         const vsg::ref_ptr<Camera>& camera,
         const std::string& route_dir,
-        const vsg::ref_ptr<vsg::Options>& vsg_options
+        const vsg::ref_ptr<vsg::Options>& vsg_options,
+        const vsg::ref_ptr<vsg::Group>& gui_group
     );
 
     ~StateManager();

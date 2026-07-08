@@ -19,13 +19,15 @@ StateManager::StateManager(
     const vsg::ref_ptr<Keyboard>& keyboard,
     const vsg::ref_ptr<Camera>& camera,
     const std::string& route_dir,
-    const vsg::ref_ptr<vsg::Options>& vsg_options
+    const vsg::ref_ptr<vsg::Options>& vsg_options,
+    const vsg::ref_ptr<vsg::Group>& gui_group
 )
 {
     route_not_loaded_state = new RouteNotLoadedState(mouse, keyboard, *this);
     basic_editor_state = new BasicEditorState(mouse, keyboard, *this, route_dir);
     navigation_state = new NavigationState(mouse, keyboard, *this, camera);
-    box_selection_state = new BoxSelectionState(mouse, keyboard, *this, vsg_options);
+    box_selection_state = new BoxSelectionState(mouse, keyboard, *this,
+        vsg_options, gui_group);
 
     current_state = deferred_state = route_not_loaded_state;
 }

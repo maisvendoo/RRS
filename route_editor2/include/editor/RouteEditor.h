@@ -87,6 +87,7 @@ private:
     vsg::ref_ptr<Keyboard> keyboard;
     vsg::ref_ptr<EventHandler> event_handler;
     vsg::ref_ptr<Camera> camera;
+    vsg::ref_ptr<vsg::Group> gui_group;
     vsg::ref_ptr<vsg::Group> scenegraph;
     vsg::ref_ptr<vsg::View> scene_view;
     vsg::ref_ptr<vsg::ClearAttachments> clear_attachments;
@@ -182,6 +183,8 @@ private:
      * (default - "logs/editor.log") for possible errors).
      */
     void create_keyboard();
+
+    void create_gui_group();
 
     void create_state_manager();
 

@@ -69,6 +69,7 @@ RouteEditor::RouteEditor()
     create_window();
     create_mouse();
     create_keyboard();
+    create_gui_group();
     create_state_manager();
     create_event_handler();
     create_camera();
@@ -280,10 +281,16 @@ void RouteEditor::create_keyboard()
     CHECK_INITIALIZATION(keyboard);
 }
 
+void RouteEditor::create_gui_group()
+{
+    gui_group = vsg::Group::create();
+    CHECK_INITIALIZATION(gui_group);
+}
+
 void RouteEditor::create_state_manager()
 {
     state_manager = std::make_unique<StateManager>(mouse, keyboard, camera,
-        route_dir, vsg_options);
+        route_dir, vsg_options, gui_group);
     CHECK_INITIALIZATION(state_manager);
 }
 
@@ -341,6 +348,8 @@ void RouteEditor::create_render_graph()
     CHECK_INITIALIZATION(render_graph);
 
     render_graph->addChild(scene_view);
+    render_graph->addChild(clear_attachments);
+    render_graph->addChild(gui_group);
     render_graph->addChild(clear_attachments);
     render_graph->addChild(render_gui);
 }
