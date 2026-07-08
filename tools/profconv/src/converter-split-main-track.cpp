@@ -121,8 +121,8 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 zds_branch_2_2_t branch2minus2 = zds_branch_2_2_t();
                 branch2minus2.id1 = id;
                 branch2minus2.id2 = id2;
-                calcBranch22(&branch2minus2, true);
-                branch_2minus2_data.push_back(new zds_branch_2_2_t(branch2minus2));
+                if (calcBranch22(&branch2minus2, true))
+                    branch_2minus2_data.push_back(new zds_branch_2_2_t(branch2minus2));
             }
         }
         // Добавляем съезды "2+2", найденные в branch_tracks
@@ -224,8 +224,8 @@ void ZDSimConverter::findSplitsMainTrajectory1()
                 zds_branch_2_2_t branch2plus2 = zds_branch_2_2_t();
                 branch2plus2.id1 = id + 1;
                 branch2plus2.id2 = id2;
-                calcBranch22(&branch2plus2, false);
-                branch_2plus2_data.push_back(new zds_branch_2_2_t(branch2plus2));
+                if (calcBranch22(&branch2plus2, false))
+                    branch_2plus2_data.push_back(new zds_branch_2_2_t(branch2plus2));
             }
         }
 
