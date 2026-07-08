@@ -116,7 +116,7 @@ void BoxSelectionState::handle_button_release() const
 {
     if (!(mouse->get_button_mask() & vsg::BUTTON_MASK_1))
     {
-        state_manager.defer_switch(EDITOR_STATE_BASIC);
+        state_manager.defer_switch_to_basic_editor_state();
     }
 }
 

@@ -131,7 +131,7 @@ void EditorGui::draw_load_route_file_dialog() const
             }
             else
             {
-                state_manager.defer_switch(EDITOR_STATE_BASIC);
+                state_manager.defer_switch_to_basic_editor_state();
                 route.start_load(route_dir);
                 ImGuiFileDialog::Instance()->Close();
             }

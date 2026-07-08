@@ -41,7 +41,7 @@ void NavigationState::handle_button_release() const
 {
     if (!(mouse->get_button_mask() & vsg::BUTTON_MASK_3))
     {
-        state_manager.defer_switch(EDITOR_STATE_BASIC);
+        state_manager.defer_switch_to_basic_editor_state();
     }
 }
 

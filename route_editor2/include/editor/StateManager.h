@@ -3,8 +3,6 @@
 
 #include <vsg/core/ref_ptr.h>
 
-#include <array>
-#include <memory>
 #include <string>
 
 class Camera;
@@ -19,15 +17,6 @@ class Options;
 
 }
 
-enum EnumEditorState
-{
-    EDITOR_STATE_ROUTE_NOT_LOADED,
-    EDITOR_STATE_BASIC,
-    EDITOR_STATE_NAVIGATION,
-    EDITOR_STATE_BOX_SELECTION,
-    TOTAL_EDITOR_STATES
-};
-
 class StateManager
 {
 public:
@@ -41,16 +30,26 @@ public:
 
     ~StateManager();
 
-    void defer_switch(EnumEditorState state);
+    void defer_switch_to_route_not_loaded_state();
+
+    void defer_switch_to_basic_editor_state();
+
+    void defer_switch_to_navigation_state();
+
+    void defer_switch_to_box_selection_state();
 
     void update(double delta_time);
 
-    const std::unique_ptr<EditorState>& get_editor_state() const;
+    EditorState* get_editor_state() const;
 
 private:
-    const std::unique_ptr<EditorState>* current_state;
-    const std::unique_ptr<EditorState>* deferred_state;
-    std::array<std::unique_ptr<EditorState>, TOTAL_EDITOR_STATES> editor_states;
+    EditorState* current_state;
+    EditorState* deferred_state;
+
+    EditorState* route_not_loaded_state;
+    EditorState* basic_editor_state;
+    EditorState* navigation_state;
+    EditorState* box_selection_state;
 };
 
 #endif // EDITOR_STATE_MANAGER_H

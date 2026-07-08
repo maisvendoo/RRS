@@ -38,12 +38,12 @@ void BasicEditorState::handle_button_press() const
     {
         case vsg::BUTTON_MASK_1:
         {
-            state_manager.defer_switch(EDITOR_STATE_BOX_SELECTION);
+            state_manager.defer_switch_to_box_selection_state();
             return;
         }
         case vsg::BUTTON_MASK_3:
         {
-            state_manager.defer_switch(EDITOR_STATE_NAVIGATION);
+            state_manager.defer_switch_to_navigation_state();
             return;
         }
         default:
