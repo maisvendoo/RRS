@@ -146,6 +146,47 @@ void BoxSelectionState::handle_mouse_move()
 {
     end_x = mouse->get_pos_x();
     end_y = mouse->get_pos_y();
+
+    int min_x, max_x;
+    int min_y, max_y;
+
+    if (begin_x < end_x)
+    {
+        min_x = begin_x;
+        max_x = end_x;
+    }
+    else
+    {
+        min_x = end_x;
+        max_x = begin_x;
+    }
+
+    if (begin_y < end_y)
+    {
+        min_y = begin_y;
+        max_y = end_y;
+    }
+    else
+    {
+        min_y = end_y;
+        max_y = begin_y;
+    }
+
+    const float inverted_window_width = 1.0f / 3400.0f;
+    const float inverted_window_height = 1.0f / 1300.0f;
+
+    const float x1 = min_x * inverted_window_width * 2.0f - 1.0f;
+    const float y1 = min_y * inverted_window_height * 2.0f - 1.0f;
+    const float x2 = max_x * inverted_window_width * 2.0f - 1.0f;
+    const float y2 = max_y * inverted_window_height * 2.0f - 1.0f;
+
+    const float sx = x2 - x1;
+    const float sy = y2 - y1;
+    const float tx = (x1 + x2) * 0.5;
+    const float ty = (y1 + y2) * 0.5;
+
+    transform_value->set({{tx, ty}, {sx, sy}});
+    transform_value->dirty();
 }
 
 void BoxSelectionState::fill_status_bar() const
