@@ -47,14 +47,27 @@ BoxSelectionState::BoxSelectionState(
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
-    const auto translation = vsg::vec2Value::create(0.0f, 0.0f);
-    translation->properties.dataVariance = vsg::DYNAMIC_DATA;
-
-    const auto scale = vsg::vec2Value::create(1.0f, 1.0f);
-    scale->properties.dataVariance = vsg::DYNAMIC_DATA;
+    transform_value = vsg::Value<Transform>::create();
+    transform_value->set({{0.0, 0.0}, {1.0, 1.0}});
+    transform_value->properties.dataVariance = vsg::DYNAMIC_DATA;
 
     const auto input_assembly_state = vsg::InputAssemblyState::create();
     input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+
+    const auto color_blend_state = vsg::ColorBlendState::create();
+    color_blend_state->attachments = {{
+        true,                                   // blending enabled
+        VK_BLEND_FACTOR_SRC_ALPHA,              // srcColorBlendFactor
+        VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,    // dstColorBlendFactor
+        VK_BLEND_OP_ADD,                        // colorBlendOp
+        VK_BLEND_FACTOR_ONE,                    // srcAlphaBlendFactor
+        VK_BLEND_FACTOR_ZERO,                   // dstAlphaBlendFactor
+        VK_BLEND_OP_ADD,                        // alphaBlendOp
+        VK_COLOR_COMPONENT_R_BIT |
+            VK_COLOR_COMPONENT_G_BIT |
+            VK_COLOR_COMPONENT_B_BIT |
+            VK_COLOR_COMPONENT_A_BIT
+    }};
 
     state_group = create_state_group_with_custom_pipeline(
         shaders_dir.c_str(),
@@ -77,14 +90,13 @@ BoxSelectionState::BoxSelectionState(
         }},
         vsg::Descriptors{
             vsg::DescriptorBuffer::create(
-                vsg::DataList{translation, scale}, 0, 0,
-                VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+                transform_value, 0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
             )
         },
         input_assembly_state,
         vsg::RasterizationState::create(),
         vsg::MultisampleState::create(),
-        vsg::ColorBlendState::create(),
+        color_blend_state,
         vsg::DepthStencilState::create()
     );
 

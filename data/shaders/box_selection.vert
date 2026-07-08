@@ -14,5 +14,5 @@ layout(binding = 0) uniform Transform
 } transform;
 
 void main() {
-    gl_Position = vec4(inPosition * transform.scale + transform.translation, 0.0, 1.0);
+    gl_Position = vec4(inPosition * transform.scale + transform.translation, 0.001, 1.0);
 }

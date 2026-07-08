@@ -3,7 +3,9 @@
 
 #include "editor/states/EditorState.h"
 
+#include <vsg/core/Value.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec2.h>
 
 class Keyboard;
 class Mouse;
@@ -45,8 +47,16 @@ public:
     virtual void fill_status_bar() const override;
 
 private:
+    struct Transform
+    {
+        vsg::vec2 translation;
+        vsg::vec2 scale;
+    };
+
+private:
     vsg::ref_ptr<vsg::Switch> switch_node;
     vsg::ref_ptr<vsg::StateGroup> state_group;
+    vsg::ref_ptr<vsg::Value<Transform>> transform_value;
 };
 
 #endif // EDITOR_BOX_SELECTION_STATE_H
