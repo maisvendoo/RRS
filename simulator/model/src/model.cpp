@@ -384,7 +384,7 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t 
 {
     for (auto *train : trains)
     {
-        for (auto *vehicle : *(train->getVehicles()))
+        for (auto *vehicle : train->getVehicles())
         {
             if (vehicle_idx == vehicle->getModelIndex())
             {
