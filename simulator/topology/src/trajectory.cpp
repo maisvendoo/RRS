@@ -68,10 +68,18 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
         QDir::separator() + traj_name + ".traj";
 
     std::vector<std::string> lines;
-    const bool result = get_non_empty_lines_from_file(path, lines);
-    if (!result || lines.empty())
+    if (!get_non_empty_lines_from_file(path, lines))
     {
         return false;
+    }
+
+    if (lines.size() < 2)
+    {
+        Journal::instance()->error(QString("TOPOLOGY WARNING: No tracks in trajectory %1").arg(traj_name));
+        if (solve_errors)
+        {
+            return false;
+        }
     }
 
     dvec3 p0;

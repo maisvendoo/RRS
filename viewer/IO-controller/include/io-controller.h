@@ -2,12 +2,18 @@
 #define     IO_CONTROLLER_H
 
 #include    <io-controller-export.h>
+#include    <io-controller-input.h>
 #include    <QObject>
+#include    <set>
+
+#include    <dual-key-hash.h>
+
+class CfgReader;
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class IOController : public QObject
+class IO_CONTROLLER_EXPORT IOController : public QObject
 {
     Q_OBJECT
 
@@ -17,9 +23,47 @@ public:
 
     ~IOController() = default;
 
+    void setPressedKey(uint16_t keyBase);
+
+    void setReleasedKey(uint16_t keyBase);
+
+    virtual void step(float t, float dt);
+
+    virtual bool load_config(CfgReader &cfg);
+
+signals:
+
+    void sigSendVehicleControlCommand(const QByteArray &data);
+
 protected:
 
+    /// Массив нажатых клавиш
+    std::set<uint16_t> _pressed_keys;
 
+    /// Здесь обеспечивается доступ к значению сигнала контрола
+    /// как по коду нажатой кавиши, так и по имени объекта, кликнутого мышью
+    DualKeyHash<uint16_t, QString, io_control_input_t> io_control_inputs;
+
+    enum ControlType
+    {
+        CTRL_TYPE_KEYBOARD,
+        CTRL_TYPE_MOUSE,
+        CTRL_TYPE_CTRL_PANEL
+    };
+
+    /// Обработка клавиатурного управления
+    virtual void processKeyBoardInput();
+
+    /// Обработка управления мышью
+    virtual void processMouseInput();
+
+    /// Обработка управления с пульта тренажера
+    virtual void processControlPanelInput();
+
+private:
+
+    /// Обработка управления
+    void processControl(const ControlType &ctrl_type);
 };
 
 #endif

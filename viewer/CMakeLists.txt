@@ -52,6 +52,7 @@ target_link_libraries(${TARGET} PRIVATE
     parsing
     graphics
     core
+    io-controller
 )
 
 target_include_directories(${TARGET} PRIVATE

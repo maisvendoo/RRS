@@ -157,6 +157,14 @@ void TopologyCheck::check_trajectory(Trajectory *traj)
         check_ends_and_point(traj, track.begin_point, point_num);
         ++point_num;
     }
+
+    if (point_num == 1)
+    {
+        LOG_WARN("Warn: no tracks in trajectory %s",
+                 traj->getName().toStdString().c_str());
+        return;
+    }
+
     check_ends_and_point(traj, traj->getLastTrack().end_point, point_num);
 
 //    LOG_INFO("Info: Check trajectory %s", traj->getName().toStdString().c_str());

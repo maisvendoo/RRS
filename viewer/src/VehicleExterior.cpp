@@ -17,6 +17,10 @@
 #include <string>
 #include <vector>
 
+#include <io-controller.h>
+#include <core/load_module.h>
+#include <QFileInfo>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -77,6 +81,9 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 
     // Vehicle 3d-models
     load_models(cfg_path, cfg, options);
+
+    // Load IOContrroler module
+    load_io_controller_module(cfg_path, cfg);
 
     // Check old config format
     if (transform->children.size() == 0)
@@ -343,6 +350,74 @@ bool VehicleExterior::load_cabine_model(const std::string &cfg_path, CfgReader &
     cabine_pagedLOD->options = options;
     cabine_node->addChild(cabine_pagedLOD);
     animated_nodes.push_back(cabine_pagedLOD);
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, CfgReader &cfg)
+{
+    QString custom_modules_dir = "";
+    cfg.getString("Vehicle", "CustomModulesDir", custom_modules_dir);
+
+    QFileInfo cfgFileInfo(QString(cfg_path.c_str()));
+    QDir cfg_dir = cfgFileInfo.absoluteDir();
+
+    // Просматриваем все кабины в конфиге
+    auto secNode = cfg.getFirstSection("Cabine");
+
+    while (!secNode.isNull())
+    {
+        QString module_name = "";
+        cfg.getString(secNode, "IOControllerModule", module_name);        
+
+        const FileSystem &fs = FileSystem::getInstance();
+        auto modules_dir = fs.getModulesDir();
+
+        auto module_path = fs.toNativeSeparators(modules_dir + fs.separator()
+                                                + custom_modules_dir.toStdString() + fs.separator()
+                                                + module_name.toStdString());
+
+        auto *io_control = LOAD_MODULE(IOController, module_path.c_str());
+
+        if (io_control != nullptr)
+        {
+            LOG_INFO("IOController module %s loaded successfully", module_path.c_str());
+
+            QString module_config_name = "";
+
+            if (cfg.getString(secNode, "IOControllerConfig", module_config_name))
+            {
+
+                auto module_config_path = fs.toNativeSeparators(cfg_dir.absolutePath().toStdString() + fs.separator() + module_config_name.toStdString() + ".xml");
+
+                CfgReader module_cfg;
+
+                if (!module_cfg.load(QString(module_config_path.c_str())))
+                {
+                    LOG_WARN("IOController config %s is not found. IOController in defualt settings", module_config_path.c_str());
+                }
+                else
+                {
+                    io_control->load_config(module_cfg);
+                    LOG_INFO("IOController config %s is loaded successfully", module_config_path.c_str());
+                }
+            }
+            else
+            {
+                LOG_WARN("IOController config setting is not exist. IOController in defualt settings");
+            }
+        }
+        else
+        {
+            LOG_ERROR("Not found IOController module %s", module_path.c_str());
+        }
+
+        io_controls.push_back(io_control);
+        secNode = cfg.getNextSection();
+    }
 
     return true;
 }

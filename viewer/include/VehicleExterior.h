@@ -7,6 +7,7 @@
 #include <vsg/nodes/MatrixTransform.h>
 
 class SoundManager;
+class IOController;
 //class AnimatedPagedLOD;       // Forward declare не работает,
 #include "AnimatedPagedLOD.h"   // VehiclesHandler ругается на incomplete use
 
@@ -46,6 +47,8 @@ public:
     /// Фактический индекс кабины
     size_t controlled_cabine_idx = 0;
 
+    /// Контроллер ввода/вывода
+    std::vector<IOController *> io_controls = {nullptr};
 
     void step(float t, float dt);
     void step(float t, float dt, std::vector<float> *server_signals);
@@ -69,6 +72,9 @@ private:
     /// Методы под старый формат конфига с параметрами <ExtModelName> и <CabineModel>
     bool load_body_model(const std::string& cfg_path, CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
     bool load_cabine_model(const std::string& cfg_path, CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
+
+    /// Загрузка модуля ввода/вывода
+    bool load_io_controller_module(const std::string &cfg_path, CfgReader &cfg);
 };
 
 #endif // VEHICLE_EXTERIOR_H

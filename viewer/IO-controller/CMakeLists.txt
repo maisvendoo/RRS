@@ -50,6 +50,9 @@ target_include_directories (${TARGET} PRIVATE ../../common-headers)
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Core)
 target_link_libraries (${TARGET} Qt6::Xml)
+target_link_libraries (${TARGET} core)
+target_link_libraries (${TARGET} CfgReader)
+target_link_libraries (${TARGET} filesystem)
 
 #if (WIN32)
 

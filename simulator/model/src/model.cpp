@@ -380,6 +380,29 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::slotSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t id, float value)
+{
+    for (auto *train : trains)
+    {
+        for (auto *vehicle : *(train->getVehicles()))
+        {
+            if (vehicle_idx == vehicle->getModelIndex())
+            {
+                if (!vehicle->control_inputs.empty())
+                {
+                    if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())
+                    {
+                        vehicle->control_inputs[cab_idx][id] = value;
+                    }
+                }
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::processAutostartQueue()
 {
     if (vehicles_for_autostart.empty())
@@ -1018,6 +1041,8 @@ void Model::initTcpServer()
     connect(tcp_server, &TcpServer::sigRenameTrain, this, &Model::slotRenameTrainInModel);
 
     connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
+
+    connect(tcp_server, &TcpServer::sigSetVehicleControlCommand, this, &Model::slotSetVehicleControlCommand);
 
     Journal::instance()->info("TCP server is initialized successfully");
 }
