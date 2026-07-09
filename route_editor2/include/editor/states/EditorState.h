@@ -7,10 +7,18 @@ class Keyboard;
 class Mouse;
 class StateManager;
 
+namespace vsg
+{
+
+class Window;
+
+}
+
 class EditorState
 {
 public:
     EditorState(
+        const vsg::ref_ptr<vsg::Window>& window,
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         StateManager& state_manager
@@ -41,6 +49,7 @@ public:
     const char* get_name() const;
 
 protected:
+    const vsg::ref_ptr<vsg::Window>& window;
     const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
     StateManager& state_manager;

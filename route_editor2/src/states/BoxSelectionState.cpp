@@ -7,6 +7,7 @@
 #include <filesystem.h>
 #include <graphics/pipeline_funcs.h>
 
+#include <vsg/app/Window.h>
 #include <vsg/commands/Draw.h>
 #include <vsg/core/Array.h>
 #include <vsg/core/Data.h>
@@ -35,13 +36,14 @@
 #include <string>
 
 BoxSelectionState::BoxSelectionState(
+    const vsg::ref_ptr<vsg::Window>& window,
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
     StateManager& state_manager,
     const vsg::ref_ptr<vsg::Options>& vsg_options,
     const vsg::ref_ptr<vsg::Group>& gui_group
 )
-    : EditorState(mouse, keyboard, state_manager)
+    : EditorState(window, mouse, keyboard, state_manager)
 {
     name = "BoxSelectionState";
 
@@ -176,8 +178,8 @@ void BoxSelectionState::handle_mouse_move()
         max_y = begin_y;
     }
 
-    const float inverted_window_width = 1.0f / 3400.0f;
-    const float inverted_window_height = 1.0f / 1300.0f;
+    const float inverted_window_width = 1.0f / window->extent2D().width;
+    const float inverted_window_height = 1.0f / window->extent2D().height;
 
     const float x1 = min_x * inverted_window_width * 2.0f - 1.0f;
     const float y1 = min_y * inverted_window_height * 2.0f - 1.0f;

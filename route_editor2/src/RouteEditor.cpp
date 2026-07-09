@@ -289,8 +289,8 @@ void RouteEditor::create_gui_group()
 
 void RouteEditor::create_state_manager()
 {
-    state_manager = std::make_unique<StateManager>(mouse, keyboard, camera,
-        route_dir, vsg_options, gui_group);
+    state_manager = std::make_unique<StateManager>(window, mouse, keyboard,
+        camera, route_dir, vsg_options, gui_group);
     CHECK_INITIALIZATION(state_manager);
 }
 

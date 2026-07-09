@@ -9,10 +9,18 @@ class Keyboard;
 class Mouse;
 class StateManager;
 
+namespace vsg
+{
+
+class Window;
+
+}
+
 class RouteNotLoadedState : public EditorState
 {
 public:
     RouteNotLoadedState(
+        const vsg::ref_ptr<vsg::Window>& window,
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         StateManager& state_manager

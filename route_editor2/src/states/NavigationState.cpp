@@ -9,12 +9,13 @@
 #include <vsgImGui/imgui.h>
 
 NavigationState::NavigationState(
+    const vsg::ref_ptr<vsg::Window>& window,
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
     StateManager& state_manager,
     const vsg::ref_ptr<Camera>& camera
 )
-    : EditorState(mouse, keyboard, state_manager)
+    : EditorState(window, mouse, keyboard, state_manager)
     , camera(camera)
 {
     name = "NavigationState";

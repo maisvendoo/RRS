@@ -3,11 +3,13 @@
 #include <vsg/core/ref_ptr.h>
 
 EditorState::EditorState(
+    const vsg::ref_ptr<vsg::Window>& window,
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
     StateManager& state_manager
 )
-    : mouse(mouse)
+    : window(window)
+    , mouse(mouse)
     , keyboard(keyboard)
     , state_manager(state_manager)
     , name("EditorState")

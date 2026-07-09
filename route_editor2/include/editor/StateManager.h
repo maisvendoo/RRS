@@ -15,6 +15,7 @@ namespace vsg
 
 class Group;
 class Options;
+class Window;
 
 }
 
@@ -22,6 +23,7 @@ class StateManager
 {
 public:
     StateManager(
+        const vsg::ref_ptr<vsg::Window>& window,
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         const vsg::ref_ptr<Camera>& camera,
