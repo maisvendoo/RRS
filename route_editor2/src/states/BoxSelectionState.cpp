@@ -134,6 +134,10 @@ void BoxSelectionState::on_deactivate()
     switch_node->setAllChildren(false);
 }
 
+void BoxSelectionState::handle_window_resize() const
+{
+}
+
 void BoxSelectionState::handle_button_release() const
 {
     if (!(mouse->get_button_mask() & vsg::BUTTON_MASK_1))

@@ -44,6 +44,8 @@ public:
 
     virtual void on_deactivate() override;
 
+    virtual void handle_window_resize() const override;
+
     virtual void handle_button_release() const override;
 
     virtual void handle_mouse_move() override;

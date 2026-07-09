@@ -13,12 +13,20 @@ EventHandler::EventHandler(StateManager& state_manager)
 
 EventHandler::~EventHandler() = default;
 
+void EventHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
+{
+    static_cast<void>(configureWindow);
+
+    state_manager.get_editor_state()->handle_window_resize();
+}
+
 void EventHandler::apply(vsg::KeyPressEvent& keyPress)
 {
     // if (keyPress.handled)
     // {
     //     return;
     // }
+    static_cast<void>(keyPress);
 
     state_manager.get_editor_state()->handle_key_press();
 }
@@ -29,6 +37,7 @@ void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
     // {
     //     return;
     // }
+    static_cast<void>(keyRelease);
 
     state_manager.get_editor_state()->handle_key_release();
 }

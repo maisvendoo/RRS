@@ -9,6 +9,7 @@ namespace vsg
 
 class ButtonPressEvent;
 class ButtonReleaseEvent;
+class ConfigureWindowEvent;
 class KeyPressEvent;
 class KeyReleaseEvent;
 class MoveEvent;
@@ -23,6 +24,8 @@ public:
     explicit EventHandler(StateManager& state_manager);
 
     virtual ~EventHandler() override;
+
+    virtual void apply(vsg::ConfigureWindowEvent& configureWindow) override;
 
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
 
