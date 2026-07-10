@@ -39,19 +39,13 @@
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
-#include <vsg/state/ImageInfo.h>
-#include <vsg/state/ImageView.h>
 #include <vsg/state/InputAssemblyState.h>
 #include <vsg/state/MultisampleState.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/ResourceHints.h>
-#include <vsg/state/Sampler.h>
 #include <vsg/state/VertexInputState.h>
 #include <vsg/ui/KeyEvent.h>
 #include <vsg/utils/ShaderSet.h>
-#include <vsg/vk/Context.h>
-#include <vsg/vk/Framebuffer.h>
-#include <vsg/vk/RenderPass.h>
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
 
@@ -88,138 +82,6 @@ RouteEditor::RouteEditor()
     create_command_graph();
     create_resource_hints();
     create_viewer();
-
-    const auto context = vsg::Context::create(window->getOrCreateDevice());
-    const VkExtent2D target_extent = window->extent2D();
-    const auto color_image_info = vsg::ImageInfo::create();
-    const auto depth_image_info = vsg::ImageInfo::create();
-
-    const auto device = context->device;
-    VkExtent3D attachment_extent{target_extent.width, target_extent.height, 1};
-
-    const auto color_image = vsg::Image::create();
-    color_image->imageType = VK_IMAGE_TYPE_2D;
-    color_image->format = VK_FORMAT_R8G8B8A8_SRGB;
-    color_image->extent = attachment_extent;
-    color_image->mipLevels = 1;
-    color_image->arrayLayers = 1;
-    color_image->samples = VK_SAMPLE_COUNT_1_BIT;
-    color_image->tiling = VK_IMAGE_TILING_OPTIMAL;
-    color_image->usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-    color_image->initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    color_image->flags = 0;
-    color_image->sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    const auto color_image_view = vsg::createImageView(*context, color_image, VK_IMAGE_ASPECT_COLOR_BIT);
-
-    const auto color_sampler = vsg::Sampler::create();
-    color_sampler->flags = 0;
-    color_sampler->magFilter = VK_FILTER_LINEAR;
-    color_sampler->minFilter = VK_FILTER_LINEAR;
-    color_sampler->mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-    color_sampler->addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    color_sampler->addressModeV = color_sampler->addressModeU;
-    color_sampler->addressModeW = color_sampler->addressModeU;
-    color_sampler->mipLodBias = 0.0f;
-    color_sampler->maxAnisotropy = 1.0f;
-    color_sampler->minLod = 0.0f;
-    color_sampler->maxLod = 1.0f;
-    color_sampler->borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-
-    color_image_info->imageView = color_image_view;
-    color_image_info->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    color_image_info->sampler = color_sampler;
-
-    const VkFormat depth_format = VK_FORMAT_D32_SFLOAT;
-
-    const auto depth_image = vsg::Image::create();
-    depth_image->imageType = VK_IMAGE_TYPE_2D;
-    depth_image->extent = attachment_extent;
-    depth_image->mipLevels = 1;
-    depth_image->arrayLayers = 1;
-    depth_image->samples = VK_SAMPLE_COUNT_1_BIT;
-    depth_image->format = depth_format;
-    depth_image->tiling = VK_IMAGE_TILING_OPTIMAL;
-    depth_image->usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    depth_image->initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    depth_image->flags = 0;
-    depth_image->sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    depth_image_info->sampler = nullptr;
-    depth_image_info->imageView = vsg::createImageView(*context, depth_image, VK_IMAGE_ASPECT_DEPTH_BIT);
-    depth_image_info->imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-
-    vsg::RenderPass::Attachments attachments(2);
-    // Color attachment
-    attachments[0].format = VK_FORMAT_R8G8B8A8_SRGB;
-    attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
-    attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachments[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    // Depth attachment
-    attachments[1].format = depth_format;
-    attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
-    attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-    const vsg::AttachmentReference color_reference = {0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
-    const vsg::AttachmentReference depth_reference = {1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
-    vsg::RenderPass::Subpasses subpass_description(1);
-    subpass_description[0].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass_description[0].colorAttachments.emplace_back(color_reference);
-    subpass_description[0].depthStencilAttachments.emplace_back(depth_reference);
-
-    vsg::RenderPass::Dependencies dependencies(2);
-
-    // XXX This dependency is copied from the offscreenrender.cpp
-    // example. I don't completely understand it, but I think its
-    // purpose is to create a barrier if some earlier render pass was
-    // using this framebuffer's attachment as a texture.
-    dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
-    dependencies[0].dstSubpass = 0;
-    dependencies[0].srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-    dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependencies[0].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-    // This is the heart of what makes Vulkan offscreen rendering
-    // work: render passes that follow are blocked from using this
-    // passes' color attachment in their fragment shaders until all
-    // this pass' color writes are finished.
-    dependencies[1].srcSubpass = 0;
-    dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
-    dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-    dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-    const auto render_pass = vsg::RenderPass::create(device, attachments, subpass_description, dependencies);
-
-    const auto framebuffer = vsg::Framebuffer::create(render_pass,
-        vsg::ImageViews{color_image_info->imageView,
-        depth_image_info->imageView}, target_extent.width,
-        target_extent.height, 1);
-
-    const auto offscreen_render_graph = vsg::RenderGraph::create();
-    offscreen_render_graph->renderArea.offset = VkOffset2D{0, 0};
-    offscreen_render_graph->renderArea.extent = target_extent;
-    offscreen_render_graph->framebuffer = framebuffer;
-
-    offscreen_render_graph->clearValues.resize(2);
-    offscreen_render_graph->clearValues[0].color = vsg::sRGB_to_linear(0.4f, 0.2f, 0.4f, 1.0f);
-    offscreen_render_graph->clearValues[1].depthStencil = VkClearDepthStencilValue{0.0f, 0};
-
-    const auto offscreen_view = vsg::View::create(camera, scenegraph);
-    offscreen_render_graph->addChild(offscreen_view);
 }
 
 RouteEditor::~RouteEditor() = default;
