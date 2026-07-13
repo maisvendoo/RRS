@@ -38,22 +38,10 @@ bool Keyboard::pressed_once(vsg::KeySymbol key, bool ignore_handled_keys) const
     }
 
     const auto& keyHistory = itr->second;
-    if (keyHistory.timeOfKeyRelease != keyHistory.timeOfFirstKeyPress)
-    {
-        return false;
-    }
 
-    if (keyHistory.timeOfLastKeyPress != keyHistory.timeOfFirstKeyPress)
-    {
-        return false;
-    }
-
-    if (ignore_handled_keys && keyHistory.handled)
-    {
-        return false;
-    }
-
-    return true;
+    return (keyHistory.timeOfKeyRelease == keyHistory.timeOfFirstKeyPress) &&
+        (keyHistory.timeOfLastKeyPress == keyHistory.timeOfFirstKeyPress) &&
+        (!(ignore_handled_keys && keyHistory.handled));
 }
 
 bool Keyboard::pressed(Action action, bool ignore_handled_keys) const
