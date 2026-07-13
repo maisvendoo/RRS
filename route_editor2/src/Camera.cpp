@@ -42,16 +42,16 @@ Camera::~Camera() = default;
 
 void Camera::update_move_direction()
 {
-    const double forward_move_direction =
-        static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_FORWARD)) -
-        static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_BACKWARD));
+    const int forward_move_direction =
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_FORWARD)) -
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_BACKWARD));
 
-    const double right_move_direction =
-        static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_RIGHT)) -
-        static_cast<double>(keyboard->pressed(ACTION_MOVE_CAMERA_LEFT));
+    const int right_move_direction =
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_RIGHT)) -
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_LEFT));
 
-    if ((std::abs(forward_move_direction) > 1.0e-6) ||
-        (std::abs(right_move_direction) > 1.0e-6))
+    if ((forward_move_direction != 0) ||
+        (right_move_direction != 0))
     {
         move_direction = vsg::normalize(front * forward_move_direction +
             right * right_move_direction);
