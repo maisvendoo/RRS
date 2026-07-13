@@ -10,6 +10,7 @@
 namespace vsg
 {
 
+class Geometry;
 class MatrixTransform;
 class PagedLOD;
 
@@ -31,6 +32,8 @@ public:
     void push_matrix_transform(const vsg::ref_ptr<vsg::MatrixTransform>& matrix_transform);
 
     const std::vector<vsg::ref_ptr<vsg::MatrixTransform>>& get_transforms() const;
+
+    vsg::ref_ptr<vsg::Geometry> create_geometry_for_selection_buffer() const;
 
 private:
     std::size_t max_object_count;
