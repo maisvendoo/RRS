@@ -4,6 +4,7 @@
 #include <vsg/core/ref_ptr.h>
 
 #include <cstddef>
+#include <string>
 #include <vector>
 
 namespace vsg
@@ -21,15 +22,21 @@ public:
 
     ~ObjectManager();
 
-    void add_paged_lod(const vsg::ref_ptr<vsg::PagedLOD>& paged_lod);
+    void push_label(const std::string& label);
 
-    void add_matrix_transform(const vsg::ref_ptr<vsg::MatrixTransform>& matrix_transform);
+    void push_path(const std::string& path);
+
+    void push_paged_lod(const vsg::ref_ptr<vsg::PagedLOD>& paged_lod);
+
+    void push_matrix_transform(const vsg::ref_ptr<vsg::MatrixTransform>& matrix_transform);
 
     const std::vector<vsg::ref_ptr<vsg::MatrixTransform>>& get_transforms() const;
 
 private:
     std::size_t max_object_count;
 
+    std::vector<std::string> labels;
+    std::vector<std::string> paths;
     std::vector<vsg::ref_ptr<vsg::PagedLOD>> paged_lods;
     std::vector<vsg::ref_ptr<vsg::MatrixTransform>> transforms;
 };

@@ -191,8 +191,10 @@ bool Route::load_route_map(const std::string& route_dir)
                 vsg::rotate(vsg::radians(rotation.y), vsg::dvec3(0.0, 1.0, 0.0)) *
                 vsg::rotate(vsg::radians(rotation.x), vsg::dvec3(1.0, 0.0, 0.0));
             matrix_transform->addChild(paged_lod);
-            object_manager->add_paged_lod(paged_lod);
-            object_manager->add_matrix_transform(matrix_transform);
+            object_manager->push_label(label);
+            object_manager->push_path(paged_lod->filename);
+            object_manager->push_paged_lod(paged_lod);
+            object_manager->push_matrix_transform(matrix_transform);
         }
     }
 
