@@ -5,6 +5,7 @@
 #include "editor/StateManager.h"
 #include "editor/states/EditorState.h"
 
+#include <vsg/app/ViewMatrix.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsgImGui/imgui.h>
 
@@ -59,4 +60,9 @@ void NavigationState::update(double delta_time) const
 void NavigationState::fill_status_bar() const
 {
     ImGui::Text("Navigation state");
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+    ImGui::Text("Pos: {%.3f, %.3f, %.3f}\n", camera->get_look_at()->eye.x,
+        camera->get_look_at()->eye.y, camera->get_look_at()->eye.z);
 }
