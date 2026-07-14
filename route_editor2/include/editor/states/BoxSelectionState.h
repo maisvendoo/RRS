@@ -71,6 +71,9 @@ private:
     vsg::ref_ptr<vsg::Switch> switch_node;
     vsg::ref_ptr<vsg::StateGroup> state_group;
     vsg::ref_ptr<vsg::Value<Transform>> transform_value;
+
+private:
+    void update_selection();
 };
 
 #endif // EDITOR_BOX_SELECTION_STATE_H

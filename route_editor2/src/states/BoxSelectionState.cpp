@@ -132,12 +132,14 @@ void BoxSelectionState::on_activate()
     begin_x = end_x = mouse->get_pos_x();
     begin_y = end_y = mouse->get_pos_y();
 
+    update_selection();
+
     switch_node->setAllChildren(true);
 }
 
 void BoxSelectionState::on_deactivate()
 {
-    object_manager->create_geometry_for_selection_buffer();
+    // object_manager->create_geometry_for_selection_buffer();
     switch_node->setAllChildren(false);
 }
 
@@ -158,6 +160,24 @@ void BoxSelectionState::handle_mouse_move()
     end_x = mouse->get_pos_x();
     end_y = mouse->get_pos_y();
 
+    update_selection();
+}
+
+void BoxSelectionState::fill_status_bar() const
+{
+    ImGui::Text("Box selection state");
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+    ImGui::Text("Begin pos: %dx%d\n", begin_x, begin_y);
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+    ImGui::Text("End pos: %dx%d\n", end_x, end_y);
+}
+
+void BoxSelectionState::update_selection()
+{
     int min_x, max_x;
     int min_y, max_y;
 
@@ -198,17 +218,4 @@ void BoxSelectionState::handle_mouse_move()
 
     transform_value->set({{tx, ty}, {sx, sy}});
     transform_value->dirty();
-}
-
-void BoxSelectionState::fill_status_bar() const
-{
-    ImGui::Text("Box selection state");
-    ImGui::SameLine();
-    ImGui::Text("|");
-    ImGui::SameLine();
-    ImGui::Text("Begin pos: %dx%d\n", begin_x, begin_y);
-    ImGui::SameLine();
-    ImGui::Text("|");
-    ImGui::SameLine();
-    ImGui::Text("End pos: %dx%d\n", end_x, end_y);
 }
