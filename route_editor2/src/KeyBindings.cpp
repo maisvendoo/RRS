@@ -13,25 +13,35 @@
 #include <Qt>
 #include <QtTypes>
 
-#include <array>
 #include <map>
 #include <string>
 
-using ActionSettingNames = std::array<const char*, TOTAL_ACTIONS>;
-using ModkeyMap = std::map<std::string, vsg::KeyModifier>;
+static constexpr const char* action_setting_names[TOTAL_ACTIONS] = {
+    "MoveCameraForward",
+    "MoveCameraBackward",
+    "MoveCameraLeft",
+    "MoveCameraRight",
+    "MoveObjects",
+    "RotateObjects",
+    "ScaleObjects",
+    "CopyObjects",
+    "PasteObjects",
+    "HideObjects",
+    "ShowObjects",
+    "DeleteObjects",
+    "UndoCommand",
+    "RedoCommand",
+    "SaveRoute"
+};
 
-static const ModkeyMap modkey_map = {
+static const std::map<std::string, vsg::KeyModifier> modkey_map = {
     {"alt", vsg::MODKEY_Alt},
     {"ctrl", vsg::MODKEY_Control},
     {"shift", vsg::MODKEY_Shift}
 };
 
-static ActionSettingNames get_action_setting_names();
-
 void KeyBindings::read(CfgReader& cfg)
 {
-    static const ActionSettingNames action_setting_names = get_action_setting_names();
-
     const QString section = "Keys";
 
     for (int i = 0; i < TOTAL_ACTIONS; ++i)
@@ -70,27 +80,4 @@ void KeyBindings::read(CfgReader& cfg)
             }
         }
     }
-}
-
-ActionSettingNames get_action_setting_names()
-{
-    ActionSettingNames action_setting_names;
-
-    action_setting_names[ACTION_MOVE_CAMERA_FORWARD] = "MoveCameraForward";
-    action_setting_names[ACTION_MOVE_CAMERA_BACKWARD] = "MoveCameraBackward";
-    action_setting_names[ACTION_MOVE_CAMERA_LEFT] = "MoveCameraLeft";
-    action_setting_names[ACTION_MOVE_CAMERA_RIGHT] = "MoveCameraRight";
-    action_setting_names[ACTION_TRANSLATE_OBJECTS] = "MoveObjects";
-    action_setting_names[ACTION_ROTATE_OBJECTS] = "RotateObjects";
-    action_setting_names[ACTION_SCALE_OBJECTS] = "ScaleObjects";
-    action_setting_names[ACTION_COPY_OBJECTS] = "CopyObjects";
-    action_setting_names[ACTION_PASTE_OBJECTS] = "PasteObjects";
-    action_setting_names[ACTION_HIDE_OBJECTS] = "HideObjects";
-    action_setting_names[ACTION_SHOW_OBJECTS] = "ShowObjects";
-    action_setting_names[ACTION_DELETE_OBJECTS] = "DeleteObjects";
-    action_setting_names[ACTION_UNDO_COMMAND] = "UndoCommand";
-    action_setting_names[ACTION_REDO_COMMAND] = "RedoCommand";
-    action_setting_names[ACTION_SAVE_ROUTE] = "SaveRoute";
-
-    return action_setting_names;
 }
