@@ -3,12 +3,14 @@
 
 #include <vsg/core/ref_ptr.h>
 
+#include <memory>
 #include <string>
 
 class Camera;
 class EditorState;
 class Keyboard;
 class Mouse;
+class ObjectManager;
 
 namespace vsg
 {
@@ -29,7 +31,8 @@ public:
         const vsg::ref_ptr<Camera>& camera,
         const std::string& route_dir,
         const vsg::ref_ptr<vsg::Options>& vsg_options,
-        const vsg::ref_ptr<vsg::Group>& gui_group
+        const vsg::ref_ptr<vsg::Group>& gui_group,
+        const std::unique_ptr<ObjectManager>& object_manager
     );
 
     ~StateManager();

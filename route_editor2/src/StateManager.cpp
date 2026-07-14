@@ -11,6 +11,7 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
 
+#include <memory>
 #include <new>
 #include <string>
 
@@ -21,7 +22,8 @@ StateManager::StateManager(
     const vsg::ref_ptr<Camera>& camera,
     const std::string& route_dir,
     const vsg::ref_ptr<vsg::Options>& vsg_options,
-    const vsg::ref_ptr<vsg::Group>& gui_group
+    const vsg::ref_ptr<vsg::Group>& gui_group,
+    const std::unique_ptr<ObjectManager>& object_manager
 )
 {
     route_not_loaded_state = new RouteNotLoadedState(window, mouse, keyboard,
@@ -31,7 +33,7 @@ StateManager::StateManager(
     navigation_state = new NavigationState(window, mouse, keyboard, *this,
         camera);
     box_selection_state = new BoxSelectionState(window, mouse, keyboard, *this,
-        vsg_options, gui_group);
+        vsg_options, gui_group, object_manager);
 
     current_state = deferred_state = route_not_loaded_state;
 }

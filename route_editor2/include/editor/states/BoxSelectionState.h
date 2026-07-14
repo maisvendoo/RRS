@@ -7,8 +7,11 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec2.h>
 
+#include <memory>
+
 class Keyboard;
 class Mouse;
+class ObjectManager;
 class StateManager;
 
 namespace vsg
@@ -37,7 +40,8 @@ public:
         const vsg::ref_ptr<Keyboard>& keyboard,
         StateManager& state_manager,
         const vsg::ref_ptr<vsg::Options>& vsg_options,
-        const vsg::ref_ptr<vsg::Group>& gui_group
+        const vsg::ref_ptr<vsg::Group>& gui_group,
+        const std::unique_ptr<ObjectManager>& object_manager
     );
 
     virtual ~BoxSelectionState() override;
@@ -62,6 +66,8 @@ private:
     };
 
 private:
+    const std::unique_ptr<ObjectManager>& object_manager;
+
     vsg::ref_ptr<vsg::Switch> switch_node;
     vsg::ref_ptr<vsg::StateGroup> state_group;
     vsg::ref_ptr<vsg::Value<Transform>> transform_value;

@@ -1,6 +1,7 @@
 #include "editor/states/BoxSelectionState.h"
 
 #include "editor/Mouse.h"
+#include "editor/ObjectManager.h"
 #include "editor/StateManager.h"
 #include "editor/states/EditorState.h"
 
@@ -33,6 +34,7 @@
 
 #include <vulkan/vulkan_core.h>
 
+#include <memory>
 #include <string>
 
 BoxSelectionState::BoxSelectionState(
@@ -41,9 +43,11 @@ BoxSelectionState::BoxSelectionState(
     const vsg::ref_ptr<Keyboard>& keyboard,
     StateManager& state_manager,
     const vsg::ref_ptr<vsg::Options>& vsg_options,
-    const vsg::ref_ptr<vsg::Group>& gui_group
+    const vsg::ref_ptr<vsg::Group>& gui_group,
+    const std::unique_ptr<ObjectManager>& object_manager
 )
     : EditorState(window, mouse, keyboard, state_manager)
+    , object_manager(object_manager)
 {
     name = "BoxSelectionState";
 
@@ -133,6 +137,7 @@ void BoxSelectionState::on_activate()
 
 void BoxSelectionState::on_deactivate()
 {
+    object_manager->create_geometry_for_selection_buffer();
     switch_node->setAllChildren(false);
 }
 

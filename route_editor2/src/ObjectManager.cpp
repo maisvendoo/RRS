@@ -105,6 +105,8 @@ const std::vector<vsg::ref_ptr<vsg::MatrixTransform>>& ObjectManager::get_transf
 
 vsg::ref_ptr<vsg::Geometry> ObjectManager::create_geometry_for_selection_buffer() const
 {
+    std::size_t count = 0;
+
     const std::size_t paged_lods_size = paged_lods.size();
     for (std::size_t i = 0; i < paged_lods_size; ++i)
     {
@@ -124,7 +126,11 @@ vsg::ref_ptr<vsg::Geometry> ObjectManager::create_geometry_for_selection_buffer(
 
         const auto colors = vsg::vec4Array::create(fav.positions->size(),
             vsg::vec4(r, g, b, a));
+
+        ++count;
     }
+
+    printf("count: %zu\n", count);
 
     return {};
 }
