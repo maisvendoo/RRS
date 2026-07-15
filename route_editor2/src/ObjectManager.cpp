@@ -14,6 +14,7 @@ ObjectManager::ObjectManager(std::size_t max_object_count)
     paths.reserve(max_object_count);
     paged_lods.reserve(max_object_count);
     transforms.reserve(max_object_count);
+    is_selected.reserve(max_object_count);
 }
 
 ObjectManager::~ObjectManager() = default;
@@ -36,14 +37,10 @@ void ObjectManager::push_paged_lod(const vsg::ref_ptr<vsg::PagedLOD>& paged_lod)
 void ObjectManager::push_matrix_transform(const vsg::ref_ptr<vsg::MatrixTransform>& matrix_transform)
 {
     transforms.push_back(matrix_transform);
+    is_selected.push_back(false);
 }
 
 const std::vector<vsg::ref_ptr<vsg::MatrixTransform>>& ObjectManager::get_transforms() const
 {
     return transforms;
-}
-
-void ObjectManager::check_intersections_and_select_objects(const vsg::ref_ptr<Camera>& camera,
-    int x1, int y1, int x2, int y2)
-{
 }

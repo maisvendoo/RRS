@@ -9,7 +9,6 @@
 
 #include <memory>
 
-class Camera;
 class Keyboard;
 class Mouse;
 class ObjectManager;
@@ -42,8 +41,7 @@ public:
         StateManager& state_manager,
         const vsg::ref_ptr<vsg::Options>& vsg_options,
         const vsg::ref_ptr<vsg::Group>& gui_group,
-        const std::unique_ptr<ObjectManager>& object_manager,
-        const vsg::ref_ptr<Camera>& camera
+        const std::unique_ptr<ObjectManager>& object_manager
     );
 
     virtual ~BoxSelectionState() override;
@@ -69,7 +67,6 @@ private:
 
 private:
     const std::unique_ptr<ObjectManager>& object_manager;
-    const vsg::ref_ptr<Camera>& camera;
 
     vsg::ref_ptr<vsg::Switch> switch_node;
     vsg::ref_ptr<vsg::StateGroup> state_group;
