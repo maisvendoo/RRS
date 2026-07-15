@@ -139,7 +139,6 @@ void BoxSelectionState::on_activate()
 
 void BoxSelectionState::on_deactivate()
 {
-    // object_manager->create_geometry_for_selection_buffer();
     switch_node->setAllChildren(false);
 }
 
