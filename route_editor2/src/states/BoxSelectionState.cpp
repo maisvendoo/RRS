@@ -44,10 +44,12 @@ BoxSelectionState::BoxSelectionState(
     StateManager& state_manager,
     const vsg::ref_ptr<vsg::Options>& vsg_options,
     const vsg::ref_ptr<vsg::Group>& gui_group,
-    const std::unique_ptr<ObjectManager>& object_manager
+    const std::unique_ptr<ObjectManager>& object_manager,
+    const vsg::ref_ptr<Camera>& camera
 )
     : EditorState(window, mouse, keyboard, state_manager)
     , object_manager(object_manager)
+    , camera(camera)
 {
     name = "BoxSelectionState";
 
@@ -139,6 +141,33 @@ void BoxSelectionState::on_activate()
 
 void BoxSelectionState::on_deactivate()
 {
+    int min_x, max_x;
+    int min_y, max_y;
+
+    if (begin_x < end_x)
+    {
+        min_x = begin_x;
+        max_x = end_x;
+    }
+    else
+    {
+        min_x = end_x;
+        max_x = begin_x;
+    }
+
+    if (begin_y < end_y)
+    {
+        min_y = begin_y;
+        max_y = end_y;
+    }
+    else
+    {
+        min_y = end_y;
+        max_y = begin_y;
+    }
+
+    object_manager->check_intersections_and_select_objects(camera, min_x, min_y, max_x, max_y);
+
     switch_node->setAllChildren(false);
 }
 

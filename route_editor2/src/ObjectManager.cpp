@@ -43,6 +43,7 @@ const std::vector<vsg::ref_ptr<vsg::MatrixTransform>>& ObjectManager::get_transf
     return transforms;
 }
 
-void ObjectManager::check_intersections_and_select_objects(int x1, int y1, int x2, int y2)
+void ObjectManager::check_intersections_and_select_objects(const vsg::ref_ptr<Camera>& camera,
+    int x1, int y1, int x2, int y2)
 {
 }

@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+class Camera;
+
 namespace vsg
 {
 
@@ -32,7 +34,8 @@ public:
 
     const std::vector<vsg::ref_ptr<vsg::MatrixTransform>>& get_transforms() const;
 
-    void check_intersections_and_select_objects(int x1, int y1, int x2, int y2);
+    void check_intersections_and_select_objects(const vsg::ref_ptr<Camera>& camera,
+        int x1, int y1, int x2, int y2);
 
 private:
     std::size_t max_object_count;

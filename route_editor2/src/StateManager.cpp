@@ -33,7 +33,7 @@ StateManager::StateManager(
     navigation_state = new NavigationState(window, mouse, keyboard, *this,
         camera);
     box_selection_state = new BoxSelectionState(window, mouse, keyboard, *this,
-        vsg_options, gui_group, object_manager);
+        vsg_options, gui_group, object_manager, camera);
 
     current_state = deferred_state = route_not_loaded_state;
 }
