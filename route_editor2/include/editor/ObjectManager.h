@@ -10,6 +10,7 @@
 namespace vsg
 {
 
+class Commands;
 class MatrixTransform;
 class PagedLOD;
 
@@ -30,6 +31,8 @@ public:
 
     void push_matrix_transform(const vsg::ref_ptr<vsg::MatrixTransform>& matrix_transform);
 
+    void push_draw_commands_for_selection(const vsg::ref_ptr<vsg::Commands>& commands);
+
     const std::vector<vsg::ref_ptr<vsg::MatrixTransform>>& get_transforms() const;
 
 private:
@@ -39,6 +42,7 @@ private:
     std::vector<std::string> paths;
     std::vector<vsg::ref_ptr<vsg::PagedLOD>> paged_lods;
     std::vector<vsg::ref_ptr<vsg::MatrixTransform>> transforms;
+    std::vector<vsg::ref_ptr<vsg::Commands>> draw_commands_for_selection;
     std::vector<bool> is_selected;
 };
 

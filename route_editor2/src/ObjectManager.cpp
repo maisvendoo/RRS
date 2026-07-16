@@ -1,8 +1,10 @@
 #include "editor/ObjectManager.h"
 
+#include <vsg/commands/Commands.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/state/PushConstants.h>
 
 #include <cstddef>
 #include <string>
@@ -14,6 +16,7 @@ ObjectManager::ObjectManager(std::size_t max_object_count)
     paths.reserve(max_object_count);
     paged_lods.reserve(max_object_count);
     transforms.reserve(max_object_count);
+    draw_commands_for_selection.reserve(max_object_count);
     is_selected.reserve(max_object_count);
 }
 
@@ -38,6 +41,11 @@ void ObjectManager::push_matrix_transform(const vsg::ref_ptr<vsg::MatrixTransfor
 {
     transforms.push_back(matrix_transform);
     is_selected.push_back(false);
+}
+
+void ObjectManager::push_draw_commands_for_selection(const vsg::ref_ptr<vsg::Commands>& commands)
+{
+    draw_commands_for_selection.push_back(commands);
 }
 
 const std::vector<vsg::ref_ptr<vsg::MatrixTransform>>& ObjectManager::get_transforms() const

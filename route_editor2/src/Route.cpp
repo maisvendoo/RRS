@@ -7,23 +7,89 @@
 #include <core/string_funcs.h>
 #include <filesystem.h>
 
+#include <vsg/commands/BindIndexBuffer.h>
+#include <vsg/commands/BindVertexBuffers.h>
+#include <vsg/commands/Commands.h>
+#include <vsg/commands/DrawIndexed.h>
+#include <vsg/core/Array.h>
+#include <vsg/core/Data.h>
+#include <vsg/core/Inherit.h>
+#include <vsg/core/Object.h>
+#include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/io/read.h>
 #include <vsg/io/stream.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/VertexIndexDraw.h>
+#include <vsg/state/PushConstants.h>
 
 #include <QString>
 
 #include <algorithm>
+#include <cstddef>
 #include <fstream>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <thread>
 #include <utility>
+
+class FindArraysVisitor : public vsg::Inherit<vsg::Visitor, FindArraysVisitor>
+{
+public:
+    vsg::ref_ptr<vsg::vec3Array> positions;
+    vsg::ref_ptr<vsg::ushortArray> ushort_indices;
+    vsg::ref_ptr<vsg::uintArray> uint_indices;
+
+public:
+    virtual void apply(vsg::Object& object) override
+    {
+        object.traverse(*this);
+    }
+
+    virtual void apply(vsg::VertexIndexDraw& vid) override
+    {
+        for (const auto& buffer_info : vid.arrays)
+        {
+            const auto data = buffer_info->data;
+            if (const auto array = data->cast<vsg::vec3Array>())
+            {
+                positions = array;
+            }
+
+            ushort_indices = vid.indices->data->cast<vsg::ushortArray>();
+            uint_indices = vid.indices->data->cast<vsg::uintArray>();
+        }
+    }
+
+    vsg::ref_ptr<vsg::Data> get_indices() const
+    {
+        if (ushort_indices)
+        {
+            return ushort_indices;
+        }
+        else
+        {
+            return uint_indices;
+        }
+    }
+
+    std::size_t get_indices_size() const
+    {
+        if (ushort_indices)
+        {
+            return ushort_indices->size();
+        }
+        else
+        {
+            return uint_indices->size();
+        }
+    }
+};
 
 Route::Route(
     const std::unique_ptr<ObjectManager>& object_manager,
@@ -181,6 +247,14 @@ bool Route::load_route_map(const std::string& route_dir)
         paged_lod->children.front() = {0.1, nullptr};
         paged_lod->options = vsg_options;
 
+        const auto node = vsg::read_cast<vsg::Node>(paged_lod->filename, vsg_options);
+        const auto fav = FindArraysVisitor::create();
+        node->accept(*fav);
+        const auto draw_commands_for_selection = vsg::Commands::create();
+        draw_commands_for_selection->addChild(vsg::BindVertexBuffers::create(0, vsg::DataList{fav->positions}));
+        draw_commands_for_selection->addChild(vsg::BindIndexBuffer::create(fav->get_indices()));
+        draw_commands_for_selection->addChild(vsg::DrawIndexed::create(fav->get_indices_size(), 1, 0, 0, 0));
+
         for (const auto& transform : transforms)
         {
             const auto rotation = -transform.rotation;
@@ -191,10 +265,12 @@ bool Route::load_route_map(const std::string& route_dir)
                 vsg::rotate(vsg::radians(rotation.y), vsg::dvec3(0.0, 1.0, 0.0)) *
                 vsg::rotate(vsg::radians(rotation.x), vsg::dvec3(1.0, 0.0, 0.0));
             matrix_transform->addChild(paged_lod);
+
             object_manager->push_label(label);
             object_manager->push_path(paged_lod->filename);
             object_manager->push_paged_lod(paged_lod);
             object_manager->push_matrix_transform(matrix_transform);
+            object_manager->push_draw_commands_for_selection(draw_commands_for_selection);
         }
     }
 
