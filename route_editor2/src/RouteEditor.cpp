@@ -13,6 +13,7 @@
 #include "editor/settings/GuiSettings.h"
 #include "editor/settings/SceneSettings.h"
 #include "editor/settings/WindowSettings.h"
+#include "graphics/pipeline_funcs.h"
 
 #include <CfgReader.h>
 #include <Journal.h>
@@ -32,15 +33,20 @@
 #include <vsg/app/Window.h>
 #include <vsg/app/WindowTraits.h>
 #include <vsg/commands/ClearAttachments.h>
+#include <vsg/core/Data.h>
 #include <vsg/io/Options.h>
 #include <vsg/lighting/AmbientLight.h>
 #include <vsg/maths/vec4.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/StateGroup.h>
+#include <vsg/state/BindDescriptorSet.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
+#include <vsg/state/Descriptor.h>
 #include <vsg/state/InputAssemblyState.h>
 #include <vsg/state/MultisampleState.h>
+#include <vsg/state/PushConstants.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/ResourceHints.h>
 #include <vsg/state/VertexInputState.h>
@@ -48,6 +54,9 @@
 #include <vsg/utils/ShaderSet.h>
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
+#include <vsg/commands/Commands.h>
+#include <vsg/nodes/Node.h>
+#include <vsg/core/Value.h>
 
 #include <QString>
 
@@ -86,8 +95,17 @@ RouteEditor::RouteEditor()
 
 RouteEditor::~RouteEditor() = default;
 
+struct RGB
+{
+    uint r;
+    uint g;
+    uint b;
+};
+
 void RouteEditor::run()
 {
+
+
     while (viewer->advanceToNextFrame())
     {
         viewer->handleEvents();
@@ -97,15 +115,78 @@ void RouteEditor::run()
 
         if (route.just_loaded)
         {
-            const auto& transforms = object_manager->get_transforms();
-            scenegraph->children.reserve(transforms.size());
-            for (const auto& transform : transforms)
-            {
-              scenegraph->addChild(transform);
-            }
-            vsg::updateViewer(*viewer, viewer->compileManager->compile(scenegraph));
+            // const auto& transforms = object_manager->get_transforms();
+            // scenegraph->children.reserve(transforms.size());
+            // for (const auto& transform : transforms)
+            // {
+            //   scenegraph->addChild(transform);
+            // }
+            // vsg::updateViewer(*viewer, viewer->compileManager->compile(scenegraph));
 
             route.just_loaded = false;
+
+            const auto& draw_commands_for_selection = object_manager->draw_commands_for_selection;
+
+            const FileSystem& fs = FileSystem::getInstance();
+            const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
+            const auto vertex_shader{read_shader(shaders_dir.c_str(), "selection.vert", vsg_options)};
+            const auto fragment_shader{read_shader(shaders_dir.c_str(), "selection.frag", vsg_options)};
+
+            const auto descriptor_set_layout{vsg::DescriptorSetLayout::create()};
+
+            const vsg::PushConstantRanges push_constant_ranges{
+                {VK_SHADER_STAGE_VERTEX_BIT, 0, 128},
+                {VK_SHADER_STAGE_FRAGMENT_BIT, 128, 24}
+            };
+
+            const auto bindings = vsg::VertexInputState::Bindings{
+                VkVertexInputBindingDescription{
+                    0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX
+                }
+            };
+            const auto attributes = vsg::VertexInputState::Attributes{
+                VkVertexInputAttributeDescription{
+                    0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0
+                }
+            };
+
+            const vsg::GraphicsPipelineStates pipeline_states{
+                vsg::VertexInputState::create(bindings, attributes),
+                vsg::InputAssemblyState::create(),
+                vsg::RasterizationState::create(),
+                vsg::MultisampleState::create(),
+                vsg::ColorBlendState::create(),
+                vsg::DepthStencilState::create()
+            };
+
+            const auto pipeline_layout{vsg::PipelineLayout::create(vsg::DescriptorSetLayouts{descriptor_set_layout}, push_constant_ranges)};
+            const auto graphics_pipeline{vsg::GraphicsPipeline::create(pipeline_layout, vsg::ShaderStages{vertex_shader, fragment_shader}, pipeline_states)};
+            const auto bind_graphics_pipeline{vsg::BindGraphicsPipeline::create(graphics_pipeline)};
+
+            const auto descriptor_set{vsg::DescriptorSet::create(descriptor_set_layout, vsg::Descriptors{})};
+            const auto bind_descriptor_set{vsg::BindDescriptorSet::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, descriptor_set)};
+
+            const auto state_group{vsg::StateGroup::create()};
+            state_group->add(bind_graphics_pipeline);
+            state_group->add(bind_descriptor_set);
+
+            for (uint32_t i = 0; i < draw_commands_for_selection.size(); ++i)
+            {
+                const auto push_constants = vsg::PushConstants::create();
+                push_constants->stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+                push_constants->offset = 128;
+                const auto rgb_value = vsg::Value<RGB>::create();
+                rgb_value->set(RGB{(i >> 8) & 0xFF, i & 0xFF, (i >> 16) & 0xFF});
+                push_constants->data = rgb_value;
+                push_constants->data->properties.dataVariance = vsg::DYNAMIC_DATA;
+                push_constants->data->dirty();
+
+                state_group->addChild(push_constants);
+                state_group->addChild(draw_commands_for_selection[i]);
+            }
+
+            scenegraph->addChild(state_group);
+            vsg::updateViewer(*viewer, viewer->compileManager->compile(scenegraph));
         }
 
         static double prev_simulation_time = viewer->getFrameStamp()->simulationTime;

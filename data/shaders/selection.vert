@@ -13,6 +13,6 @@ layout(push_constant) uniform VertexPushConstants {
 } pc_vert;
 
 void main() {
-    gl_Position = pc_vert.projection * pc_vert.ModelView * vec4(inPosition,
+    gl_Position = pc_vert.projection * pc_vert.modelView * vec4(inPosition,
         1.0);
 }

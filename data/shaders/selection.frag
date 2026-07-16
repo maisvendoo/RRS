@@ -7,10 +7,8 @@ layout(push_constant) uniform FragmentPushConstants {
     uint r;
     uint g;
     uint b;
-    uint a;
 } pc_frag;
 
 void main() {
-    outColor = vec4(pc_frag.r / 255.0, pc_frag.g / 255.0, pc_frag.b / 255.0,
-        pc_frag.a / 255.0);
+    outColor = vec4(pc_frag.r / 255.0, pc_frag.g / 255.0, pc_frag.b / 255.0, 1.0);
 }

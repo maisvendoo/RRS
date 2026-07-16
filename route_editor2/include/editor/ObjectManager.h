@@ -35,7 +35,7 @@ public:
 
     const std::vector<vsg::ref_ptr<vsg::MatrixTransform>>& get_transforms() const;
 
-private:
+// private:
     std::size_t max_object_count;
 
     std::vector<std::string> labels;
