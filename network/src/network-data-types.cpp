@@ -2,6 +2,9 @@
 
 #include <QBuffer>
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 network_data_t::network_data_t()
     : stype(STYPE_EMPTY_DATA)
     , data_size(0)
@@ -9,6 +12,9 @@ network_data_t::network_data_t()
 {
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 QByteArray network_data_t::serialize()
 {
     QByteArray tmp_data;
@@ -16,13 +22,19 @@ QByteArray network_data_t::serialize()
     buff.open(QIODevice::WriteOnly);
     QDataStream stream(&buff);
 
-    stream << data.size() + sizeof(data_size) + sizeof(stype);
+    // Ожидаемый размер пакета - поле под собственно размер, затем тип пакета,
+    // затем стандратная сериализация QByteArray - длина данных и сами данные.
+    // Наши данные не превысят 2^32-2 байт, их длина сериализуется одним quint32
+    stream << sizeof(data_size) + sizeof(stype) + sizeof(quint32) + data.size();
     stream << stype;
     stream << data;
 
     return buff.data();
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void network_data_t::deserialize(QByteArray &data)
 {
     QBuffer buff(&data);
@@ -32,13 +44,11 @@ void network_data_t::deserialize(QByteArray &data)
     stream >> data_size;
     stream >> stype;
     stream >> this->data;
-
-    // Контрольная сериализация полученных данных
-    QByteArray tmp = this->serialize();
-    // Удаляем из полученного блока фактически сериализованное
-    data = data.mid(tmp.size());
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 client_data_t::client_data_t()
     : id(0)
     , pos_update_interval(0.0)
