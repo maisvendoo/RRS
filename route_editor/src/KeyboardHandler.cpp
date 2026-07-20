@@ -15,17 +15,17 @@ KeyboardHandler::KeyboardHandler(const KeyBindings& key_bindings)
 
 void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    key_state_bits_.set(keyPress.keyBase, true);
+    vsg::Keyboard::apply(keyPress);
 }
 
 void KeyboardHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
-    key_state_bits_.set(keyRelease.keyBase, false);
+    vsg::Keyboard::apply(keyRelease);
 }
 
 bool KeyboardHandler::get_key_state(vsg::KeySymbol key) const
 {
-    return key_state_bits_.test(key);
+    return pressed(key, false);
 }
 
 bool KeyboardHandler::get_shift_state() const

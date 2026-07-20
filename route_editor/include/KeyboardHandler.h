@@ -5,13 +5,13 @@
 #include "KeyBinding.h"
 
 #include <vsg/core/Inherit.h>
-#include <vsg/core/Visitor.h>
 #include <vsg/ui/KeyEvent.h>
+#include <vsg/ui/Keyboard.h>
 
 #include <bitset>
 #include <cstdint>
 
-class KeyboardHandler : public vsg::Inherit<vsg::Visitor, KeyboardHandler>
+class KeyboardHandler : public vsg::Inherit<vsg::Keyboard, KeyboardHandler>
 {
 public:
     explicit KeyboardHandler(const KeyBindings& key_bindings);
