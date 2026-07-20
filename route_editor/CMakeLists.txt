@@ -30,18 +30,17 @@ target_sources(route_editor
             ${INCLUDES}
 )
 
-target_link_libraries(route_editor
-    PRIVATE
-        Qt6::Core
-        vsg::vsg
-        vsgXchange::vsgXchange
-        vsgImGui::vsgImGui
-        CfgReader
-        Journal
-        core
-        filesystem
-        graphics
-        topology
+target_link_libraries(route_editor PRIVATE
+    Qt6::Core
+    vsg::vsg
+    vsgXchange::vsgXchange
+    vsgImGui::vsgImGui
+    CfgReader
+    Journal
+    core
+    filesystem
+    graphics
+    topology
 )
 
 if(MSVC)
