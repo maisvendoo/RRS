@@ -416,7 +416,7 @@ void StationSignal::check_train_route()
     // Смотрим траекторию за текущим коннектором
     cur_dir = signal_dir;
     traj = cur_conn->getNextTraj(cur_dir);
-    if (traj && ((traj == ref_trajectory_shunt) || !traj->isBusy()))
+    if (traj && !traj->isBusy())
     {
         // Если траектория свободна, разрешаем размыкание маневрого маршрута
         is_lock_route = false;
@@ -461,16 +461,11 @@ void StationSignal::check_train_route()
             }
         }
 
-        // Нашли целевую траекторию
-        if (traj == ref_trajectory_shunt)
-        {
-            // Радостно включаем реле контроля маневрового маршрута
-            is_shunt_route = true;
-        }
-
         // Проверяем занятость траектории
         if (traj->isBusy())
         {
+            // Разрешаем маневровый маршрут до занятой траектории
+            is_shunt_route = true;
             return;
         }
 
