@@ -23,6 +23,7 @@ static ActionNames get_action_names()
     action_names[ACTION_UNDO_COMMAND] = "Undo command";
     action_names[ACTION_REDO_COMMAND] = "Redo command";
     action_names[ACTION_SAVE_ROUTE] = "Save route";
+    action_names[ACTION_CHANGE_PROJECTION_MATRIX] = "Camera: change projection matrix";
 
     return action_names;
 }

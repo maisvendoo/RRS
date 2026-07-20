@@ -11,6 +11,7 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
+#include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 
@@ -80,6 +81,7 @@ struct EditorContext
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;
 
     vsg::ref_ptr<vsg::Perspective> perspective;
+    vsg::ref_ptr<vsg::Orthographic> orthographic;
     vsg::ref_ptr<vsg::LookAt> look_at;
     vsg::ref_ptr<vsg::Camera> camera;
     vsg::ref_ptr<CameraHandler> camera_handler;

@@ -65,6 +65,7 @@ static int get_binding_state(vsg::ref_ptr<KeyboardHandler> keyboard_handler,
 CameraHandler::CameraHandler(
     const camera_settings_t& camera_settings,
     vsg::ref_ptr<vsg::Perspective>& perspective,
+    vsg::ref_ptr<vsg::Orthographic>& orthographic,
     vsg::ref_ptr<vsg::LookAt>& look_at,
     vsg::ref_ptr<vsg::Camera>& camera,
     VkExtent2D window_extent,
@@ -74,18 +75,29 @@ CameraHandler::CameraHandler(
 )
     : camera_settings(camera_settings)
     , perspective(perspective)
+    , orthographic(orthographic)
     , look_at(look_at)
     , camera(camera)
     , mouse_handler(mouse_handler)
     , keyboard_handler(keyboard_handler)
     , delta_time(delta_time)
 {
+    const double window_width = static_cast<double>(window_extent.width);
+    const double window_height = static_cast<double>(window_extent.height);
+
     perspective = vsg::Perspective::create(
         camera_settings.fovy,
-        static_cast<double>(window_extent.width) /
-            static_cast<double>(window_extent.height),
+        window_width / window_height,
         camera_settings.zNear,
         camera_settings.view_distance
+    );
+
+
+    constexpr double scale = 50.0;
+
+    orthographic = vsg::Orthographic::create(
+        -1.0 * scale, 1.0 * scale, -1.0 * scale, 1.0 * scale,
+        camera_settings.zNear, camera_settings.view_distance
     );
 
     const double initial_height = camera_settings.initial_height;
@@ -95,7 +107,7 @@ CameraHandler::CameraHandler(
         vsg::dvec3(0.0, 1.0, initial_height),
         vsg::dvec3(0.0, 0.0, 1.0));
 
-    camera = vsg::Camera::create(perspective, look_at,
+    camera = vsg::Camera::create(orthographic, look_at,
         vsg::ViewportState::create(window_extent));
 
     calculate_front();

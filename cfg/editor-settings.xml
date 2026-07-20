@@ -113,5 +113,6 @@
         <UndoCommand>Ctrl + Z</UndoCommand>
         <RedoCommand>Ctrl + Y</RedoCommand>
         <SaveRoute>Ctrl + S</SaveRoute>
+        <ChangeProjectionMatrix>O</ChangeProjectionMatrix>
     </Keys>
 </Config>
