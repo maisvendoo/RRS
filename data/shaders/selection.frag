@@ -3,12 +3,11 @@
 
 layout(location = 0) out vec4 outColor;
 
-layout(push_constant) uniform FragmentPushConstants {
-    uint r;
-    uint g;
-    uint b;
-} pc_frag;
+layout(binding = 0) uniform Color
+{
+    vec3 value;
+} color;
 
 void main() {
-    outColor = vec4(pc_frag.r / 255.0, pc_frag.g / 255.0, pc_frag.b / 255.0, 1.0);
+    outColor = vec4(color.value, 1.0);
 }

@@ -7,12 +7,11 @@ out gl_PerVertex {
     vec4 gl_Position;
 };
 
-layout(push_constant) uniform VertexPushConstants {
+layout(push_constant) uniform PushConstants {
     mat4 projection;
     mat4 modelView;
-} pc_vert;
+} pc;
 
 void main() {
-    gl_Position = pc_vert.projection * pc_vert.modelView * vec4(inPosition,
-        1.0);
+    gl_Position = pc.projection * pc.modelView * vec4(inPosition, 1.0);
 }

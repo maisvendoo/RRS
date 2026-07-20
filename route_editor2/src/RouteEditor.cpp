@@ -44,6 +44,7 @@
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
 #include <vsg/state/Descriptor.h>
+#include <vsg/state/DescriptorBuffer.h>
 #include <vsg/state/InputAssemblyState.h>
 #include <vsg/state/MultisampleState.h>
 #include <vsg/state/PushConstants.h>
@@ -97,9 +98,7 @@ RouteEditor::~RouteEditor() = default;
 
 struct RGB
 {
-    uint r;
-    uint g;
-    uint b;
+    float value[3];
 };
 
 void RouteEditor::run()
@@ -126,17 +125,26 @@ void RouteEditor::run()
             route.just_loaded = false;
 
             const auto& draw_commands_for_selection = object_manager->draw_commands_for_selection;
+            const auto& transforms = object_manager->transforms;
+            for (uint32_t i = 0; i < transforms.size(); ++i)
+            {
+                transforms[i]->children = {draw_commands_for_selection[i]};
+            }
 
             const FileSystem& fs = FileSystem::getInstance();
             const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
             const auto vertex_shader{read_shader(shaders_dir.c_str(), "selection.vert", vsg_options)};
             const auto fragment_shader{read_shader(shaders_dir.c_str(), "selection.frag", vsg_options)};
 
-            const auto descriptor_set_layout{vsg::DescriptorSetLayout::create()};
+            const auto descriptor_set_layout{vsg::DescriptorSetLayout::create(
+                vsg::DescriptorSetLayoutBindings{{
+                    0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                    1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr
+                }}
+            )};
 
             const vsg::PushConstantRanges push_constant_ranges{
                 {VK_SHADER_STAGE_VERTEX_BIT, 0, 128},
-                {VK_SHADER_STAGE_FRAGMENT_BIT, 128, 24}
             };
 
             const auto bindings = vsg::VertexInputState::Bindings{
@@ -163,26 +171,27 @@ void RouteEditor::run()
             const auto graphics_pipeline{vsg::GraphicsPipeline::create(pipeline_layout, vsg::ShaderStages{vertex_shader, fragment_shader}, pipeline_states)};
             const auto bind_graphics_pipeline{vsg::BindGraphicsPipeline::create(graphics_pipeline)};
 
-            const auto descriptor_set{vsg::DescriptorSet::create(descriptor_set_layout, vsg::Descriptors{})};
-            const auto bind_descriptor_set{vsg::BindDescriptorSet::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, descriptor_set)};
-
             const auto state_group{vsg::StateGroup::create()};
             state_group->add(bind_graphics_pipeline);
-            state_group->add(bind_descriptor_set);
+            // state_group->add(bind_descriptor_set);
 
             for (uint32_t i = 0; i < draw_commands_for_selection.size(); ++i)
             {
-                const auto push_constants = vsg::PushConstants::create();
-                push_constants->stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-                push_constants->offset = 128;
-                const auto rgb_value = vsg::Value<RGB>::create();
-                rgb_value->set(RGB{(i >> 8) & 0xFF, i & 0xFF, (i >> 16) & 0xFF});
-                push_constants->data = rgb_value;
-                push_constants->data->properties.dataVariance = vsg::DYNAMIC_DATA;
-                push_constants->data->dirty();
-
-                state_group->addChild(push_constants);
-                state_group->addChild(draw_commands_for_selection[i]);
+                const auto rgba_value = vsg::Value<RGB>::create();
+                rgba_value->properties.dataVariance = vsg::DYNAMIC_DATA;
+                rgba_value->set(RGB{
+                    ((i >> 0) & 0xFF) / 255.0f,
+                    ((i >> 8) & 0xFF) / 255.0f,
+                    ((i >> 16) & 0xFF) / 255.0f,
+                });
+                const auto descriptor_set{vsg::DescriptorSet::create(descriptor_set_layout, vsg::Descriptors{
+                    vsg::DescriptorBuffer::create(
+                        rgba_value, 0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+                    )
+                })};
+                const auto bind_descriptor_set{vsg::BindDescriptorSet::create(VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, descriptor_set)};
+                state_group->add(bind_descriptor_set);
+                state_group->addChild(transforms[i]);
             }
 
             scenegraph->addChild(state_group);
