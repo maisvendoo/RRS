@@ -2,7 +2,7 @@
 
 #include "Action.h"
 #include "KeyboardHandler.h"
-#include "MouseHandler.h"
+#include "Mouse.h"
 
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
@@ -69,7 +69,7 @@ CameraHandler::CameraHandler(
     vsg::ref_ptr<vsg::LookAt>& look_at,
     vsg::ref_ptr<vsg::Camera>& camera,
     VkExtent2D window_extent,
-    vsg::ref_ptr<MouseHandler>& mouse_handler,
+    vsg::ref_ptr<Mouse>& mouse,
     vsg::ref_ptr<KeyboardHandler>& keyboard_handler,
     double& delta_time
 )
@@ -78,7 +78,7 @@ CameraHandler::CameraHandler(
     , orthographic(orthographic)
     , look_at(look_at)
     , camera(camera)
-    , mouse_handler(mouse_handler)
+    , mouse(mouse)
     , keyboard_handler(keyboard_handler)
     , delta_time(delta_time)
 {
@@ -118,12 +118,12 @@ CameraHandler::CameraHandler(
 
 void CameraHandler::apply(vsg::MoveEvent& moveEvent)
 {
-    if (moveEvent.handled || !mouse_handler->get_is_rmb_pressed())
+    if (moveEvent.handled || !mouse->is_rmb_pressed())
     {
         return;
     }
 
-    const vsg::ivec2 delta_mouse_pos = mouse_handler->get_delta_pos();
+    const vsg::ivec2 delta_mouse_pos = mouse->get_delta_pos();
     const double rotate_speed = camera_settings.rotate_speed;
 
     yaw_deg_ += delta_mouse_pos.x * rotate_speed;
@@ -151,7 +151,7 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
 
 void CameraHandler::apply(vsg::FrameEvent&)
 {
-    if (!mouse_handler->get_is_rmb_pressed())
+    if (!mouse->is_rmb_pressed())
     {
         return;
     }

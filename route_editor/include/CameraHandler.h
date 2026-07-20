@@ -2,7 +2,7 @@
 #define CAMERA_HANDLER_H
 
 #include "KeyboardHandler.h"
-#include "MouseHandler.h"
+#include "Mouse.h"
 #include "settings/CameraSettings.h"
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/core/Inherit.h>
@@ -30,7 +30,7 @@ public:
         vsg::ref_ptr<vsg::LookAt>& look_at,
         vsg::ref_ptr<vsg::Camera>& camera,
         VkExtent2D window_extent,
-        vsg::ref_ptr<MouseHandler>& mouse_handler,
+        vsg::ref_ptr<Mouse>& mouse,
         vsg::ref_ptr<KeyboardHandler>& keyboard_handler,
         double& delta_time
     );
@@ -63,7 +63,7 @@ private:
     vsg::ref_ptr<vsg::Orthographic>& orthographic;
     vsg::ref_ptr<vsg::LookAt>& look_at;
     vsg::ref_ptr<vsg::Camera>& camera;
-    vsg::ref_ptr<MouseHandler>& mouse_handler;
+    vsg::ref_ptr<Mouse>& mouse;
     vsg::ref_ptr<KeyboardHandler>& keyboard_handler;
     double& delta_time;
 

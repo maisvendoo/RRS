@@ -1,11 +1,11 @@
-#include "MouseHandler.h"
+#include "Mouse.h"
 
 #include "MouseButton.h"
 
 #include <vsg/maths/vec2.h>
 #include <vsg/ui/PointerEvent.h>
 
-void MouseHandler::apply(vsg::ButtonPressEvent& buttonPress)
+void Mouse::apply(vsg::ButtonPressEvent& buttonPress)
 {
     if (buttonPress.handled)
     {
@@ -36,7 +36,7 @@ void MouseHandler::apply(vsg::ButtonPressEvent& buttonPress)
     }
 }
 
-void MouseHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
+void Mouse::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
     if (buttonRelease.handled)
     {
@@ -67,7 +67,7 @@ void MouseHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
     }
 }
 
-void MouseHandler::apply(vsg::MoveEvent& moveEvent)
+void Mouse::apply(vsg::MoveEvent& moveEvent)
 {
     if (moveEvent.handled)
     {
@@ -82,27 +82,27 @@ void MouseHandler::apply(vsg::MoveEvent& moveEvent)
     prev_pos = pos_;
 }
 
-vsg::ivec2 MouseHandler::get_pos() const
+vsg::ivec2 Mouse::get_pos() const
 {
     return pos_;
 }
 
-vsg::ivec2 MouseHandler::get_delta_pos() const
+vsg::ivec2 Mouse::get_delta_pos() const
 {
     return delta_pos_;
 }
 
-bool MouseHandler::get_is_lmb_pressed() const
+bool Mouse::is_lmb_pressed() const
 {
     return is_lmb_pressed_;
 }
 
-bool MouseHandler::get_is_mmb_pressed() const
+bool Mouse::is_mmb_pressed() const
 {
     return is_mmb_pressed_;
 }
 
-bool MouseHandler::get_is_rmb_pressed() const
+bool Mouse::is_rmb_pressed() const
 {
     return is_rmb_pressed_;
 }

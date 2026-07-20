@@ -1,5 +1,5 @@
-#ifndef MOUSE_HANDLER_H
-#define MOUSE_HANDLER_H
+#ifndef MOUSE_H
+#define MOUSE_H
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
@@ -14,10 +14,10 @@ class MoveEvent;
 
 }
 
-class MouseHandler : public vsg::Inherit<vsg::Visitor, MouseHandler>
+class Mouse : public vsg::Inherit<vsg::Visitor, Mouse>
 {
 public:
-    virtual ~MouseHandler() = default;
+    virtual ~Mouse() = default;
 
     virtual void apply(vsg::ButtonPressEvent& buttonPress) override;
     virtual void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
@@ -27,9 +27,9 @@ public:
     // Must be called only from MoveEvents
     vsg::ivec2 get_delta_pos() const;
 
-    bool get_is_lmb_pressed() const;
-    bool get_is_mmb_pressed() const;
-    bool get_is_rmb_pressed() const;
+    bool is_lmb_pressed() const;
+    bool is_mmb_pressed() const;
+    bool is_rmb_pressed() const;
 
 private:
     vsg::ivec2 pos_ = {0, 0};
@@ -40,4 +40,4 @@ private:
     bool is_rmb_pressed_ = false;
 };
 
-#endif // MOUSE_HANDLER_H
+#endif // MOUSE_H

@@ -4,7 +4,7 @@
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
-#include "MouseHandler.h"
+#include "Mouse.h"
 #include "ObjectSelector.h"
 #include "Outline.h"
 #include "Route.h"

@@ -7,7 +7,7 @@
 #include "IntersectionHandler.h"
 #include "KeyboardHandler.h"
 #include "Mask.h"
-#include "MouseHandler.h"
+#include "Mouse.h"
 #include "Route.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
@@ -48,7 +48,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
 {
     (void)keyPress;
 
-    if (context_.mouse_handler->get_is_rmb_pressed())
+    if (context_.mouse->is_rmb_pressed())
     {
         return;
     }
@@ -101,7 +101,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         context_.gizmo->get_curr_pos(), &front_plane_up_);
 
     const auto intersector = context_.intersection_handler->apply_(
-        context_.mouse_handler->get_pos());
+        context_.mouse->get_pos());
 
     if (!intersector)
     {
@@ -156,12 +156,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     if (state_ != State::INITIAL)
     {
-        if (context_.mouse_handler->get_is_lmb_pressed())
+        if (context_.mouse->is_lmb_pressed())
         {
             confirm_keyboard_transformation();
             return;
         }
-        else if (context_.mouse_handler->get_is_rmb_pressed())
+        else if (context_.mouse->is_rmb_pressed())
         {
             cancel_keyboard_transformation();
             return;
