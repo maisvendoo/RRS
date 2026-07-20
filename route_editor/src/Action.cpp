@@ -1,6 +1,6 @@
 #include "Action.h"
 
-constexpr const char* action_names[TOTAL_ACTIONS] = {
+static constexpr const char* action_names[TOTAL_ACTIONS] = {
     "Camera: move forward",
     "Camera: move backward",
     "Camera: move left",

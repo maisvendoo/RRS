@@ -14,13 +14,29 @@
 #include <Qt>
 #include <QtTypes>
 
-#include <iterator>
 #include <map>
 #include <string>
 
-settings_t::settings_t()
-{
-}
+static constexpr const char* action_setting_names[TOTAL_ACTIONS] = {
+    "MoveCameraForward",
+    "MoveCameraBackward",
+    "MoveCameraLeft",
+    "MoveCameraRight",
+    "MoveObjects",
+    "RotateObjects",
+    "ScaleObjects",
+    "CopyObjects",
+    "PasteObjects",
+    "HideObjects",
+    "ShowObjects",
+    "DeleteObjects",
+    "UndoCommand",
+    "RedoCommand",
+    "SaveRoute",
+    "ChangeProjectionMatrix"
+};
+
+settings_t::settings_t() = default;
 
 void settings_t::read(const std::string& cfg_path)
 {
@@ -36,53 +52,23 @@ void settings_t::read(const std::string& cfg_path)
     gizmo_settings.read(cfg);
     gui_settings.read(cfg);
 
-    QString section = "Keys";
-
-    using ActionSettingNameMap = std::map<Action, const char*>;
-    using ActionSettingNamePair = ActionSettingNameMap::value_type;
-
-    constexpr ActionSettingNamePair action_setting_name_map_data[] = {
-        {ACTION_MOVE_CAMERA_FORWARD, "MoveCameraForward"},
-        {ACTION_MOVE_CAMERA_BACKWARD, "MoveCameraBackward"},
-        {ACTION_MOVE_CAMERA_LEFT, "MoveCameraLeft"},
-        {ACTION_MOVE_CAMERA_RIGHT, "MoveCameraRight"},
-        {ACTION_TRANSLATE_OBJECTS, "MoveObjects"},
-        {ACTION_ROTATE_OBJECTS, "RotateObjects"},
-        {ACTION_SCALE_OBJECTS, "ScaleObjects"},
-        {ACTION_COPY_OBJECTS, "CopyObjects"},
-        {ACTION_PASTE_OBJECTS, "PasteObjects"},
-        {ACTION_HIDE_OBJECTS, "HideObjects"},
-        {ACTION_SHOW_OBJECTS, "ShowObjects"},
-        {ACTION_DELETE_OBJECTS, "DeleteObjects"},
-        {ACTION_UNDO_COMMAND, "UndoCommand"},
-        {ACTION_REDO_COMMAND, "RedoCommand"},
-        {ACTION_SAVE_ROUTE, "SaveRoute"},
-        {ACTION_CHANGE_PROJECTION_MATRIX, "ChangeProjectionMatrix"}
-    };
-
-    static_assert(sizeof action_setting_name_map_data /
-        sizeof(ActionSettingNamePair) == TOTAL_ACTIONS);
-
-    const ActionSettingNameMap action_setting_name_map(
-        std::begin(action_setting_name_map_data),
-        std::end(action_setting_name_map_data));
-
-    const std::map<std::string, vsg::KeyModifier>
-    key_modifier_setting_name_map = {
-        {"shift", vsg::MODKEY_Shift},
+    const std::map<std::string, vsg::KeyModifier> modifier_name_map = {
+        {"alt", vsg::MODKEY_Alt},
         {"ctrl", vsg::MODKEY_Control},
-        {"alt", vsg::MODKEY_Alt}
+        {"shift", vsg::MODKEY_Shift}
     };
 
-    for (const auto& [action, setting_name] : action_setting_name_map)
+    for (int i = 0; i < TOTAL_ACTIONS; ++i)
     {
+        const Action action = static_cast<Action>(i);
+        const char* const setting_name = action_setting_names[i];
+
         QString line;
 
-        if (!cfg.getString(section, setting_name, line))
+        if (!cfg.getString("Keys", setting_name, line))
         {
             Journal::instance()->error(QString("Failed to find key setting %1")
                 .arg(setting_name));
-
             continue;
         }
 
@@ -103,10 +89,8 @@ void settings_t::read(const std::string& cfg_path)
 
         for (qsizetype i = 0; i < string_size - 1; ++i)
         {
-            const auto found_it = key_modifier_setting_name_map.find(
-                strings[i].toStdString());
-
-            if (found_it != key_modifier_setting_name_map.cend())
+            const auto found_it = modifier_name_map.find(strings[i].toStdString());
+            if (found_it != modifier_name_map.cend())
             {
                 key_binding.modifiers |= found_it->second;
             }
