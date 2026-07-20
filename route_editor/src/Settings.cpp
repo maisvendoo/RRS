@@ -56,7 +56,8 @@ void settings_t::read(const std::string& cfg_path)
         {ACTION_DELETE_OBJECTS, "DeleteObjects"},
         {ACTION_UNDO_COMMAND, "UndoCommand"},
         {ACTION_REDO_COMMAND, "RedoCommand"},
-        {ACTION_SAVE_ROUTE, "SaveRoute"}
+        {ACTION_SAVE_ROUTE, "SaveRoute"},
+        {ACTION_CHANGE_PROJECTION_MATRIX, "ChangeProjectionMatrix"}
     };
 
     static_assert(sizeof action_setting_name_map_data /

@@ -84,10 +84,11 @@ CameraHandler::CameraHandler(
 {
     const double window_width = static_cast<double>(window_extent.width);
     const double window_height = static_cast<double>(window_extent.height);
+    const double aspect_ratio = window_width / window_height;
 
     perspective = vsg::Perspective::create(
         camera_settings.fovy,
-        window_width / window_height,
+        aspect_ratio,
         camera_settings.zNear,
         camera_settings.view_distance
     );
@@ -96,7 +97,7 @@ CameraHandler::CameraHandler(
     constexpr double scale = 50.0;
 
     orthographic = vsg::Orthographic::create(
-        -1.0 * scale, 1.0 * scale, -1.0 * scale, 1.0 * scale,
+        -1.0 * scale * aspect_ratio, 1.0 * scale * aspect_ratio, -1.0 * scale, 1.0 * scale,
         camera_settings.zNear, camera_settings.view_distance
     );
 
@@ -107,7 +108,7 @@ CameraHandler::CameraHandler(
         vsg::dvec3(0.0, 1.0, initial_height),
         vsg::dvec3(0.0, 0.0, 1.0));
 
-    camera = vsg::Camera::create(orthographic, look_at,
+    camera = vsg::Camera::create(perspective, look_at,
         vsg::ViewportState::create(window_extent));
 
     calculate_front();
@@ -171,6 +172,18 @@ void CameraHandler::apply(vsg::FrameEvent&)
     look_at->eye += right_ * move_speed * static_cast<double>(
         get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_RIGHT) -
         get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_LEFT));
+
+    if (get_binding_state(keyboard_handler, ACTION_CHANGE_PROJECTION_MATRIX))
+    {
+        if (camera->projectionMatrix == perspective)
+        {
+            camera->projectionMatrix = orthographic;
+        }
+        else
+        {
+            camera->projectionMatrix = perspective;
+        }
+    }
 
     look_at->center = look_at->eye + front_;
 }
