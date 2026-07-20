@@ -118,27 +118,21 @@ CameraHandler::CameraHandler(
 
 void CameraHandler::apply(vsg::MoveEvent& moveEvent)
 {
-    if (moveEvent.handled)
+    if (moveEvent.handled || !mouse_handler->get_is_rmb_pressed())
     {
         return;
     }
 
-    if (mouse_handler->get_is_rmb_pressed())
-    {
-        const vsg::ivec2 delta_mouse_pos =
-            mouse_handler->get_delta_pos();
+    const vsg::ivec2 delta_mouse_pos = mouse_handler->get_delta_pos();
+    const double rotate_speed = camera_settings.rotate_speed;
 
-        const double rotate_speed = camera_settings.rotate_speed;
+    yaw_deg_ += delta_mouse_pos.x * rotate_speed;
+    pitch_deg_ -= delta_mouse_pos.y * rotate_speed;
+    pitch_deg_ = std::clamp(pitch_deg_, -89.0, 89.0);
 
-        yaw_deg_ += delta_mouse_pos.x * rotate_speed;
-
-        pitch_deg_ -= delta_mouse_pos.y * rotate_speed;
-        pitch_deg_ = std::clamp(pitch_deg_, -89.0, 89.0);
-
-        calculate_front();
-        calculate_right();
-        calculate_up();
-    }
+    calculate_front();
+    calculate_right();
+    calculate_up();
 }
 
 void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
