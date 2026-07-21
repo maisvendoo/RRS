@@ -335,11 +335,12 @@ void EditorGui::show_stations_conf() const
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                context_.look_at->eye = translation +
+                context_.camera_handler->get_look_at()->eye = translation +
                     vsg::dvec3(0.0, 0.0, 50.0);
 
-                context_.look_at->center = context_.look_at->eye
-                    + context_.camera_handler->get_front();
+                context_.camera_handler->get_look_at()->center =
+                    context_.camera_handler->get_look_at()->eye +
+                    context_.camera_handler->get_front();
             }
             ImGui::TableNextColumn();
             ImGui::Text(number_format, translation.x);
@@ -397,12 +398,14 @@ void EditorGui::show_waypoints_conf() const
 
                     double h = 5.0;
 
-                    context_.look_at->eye = vsg::dvec3(pos.x + pd.up.x * h,
-                                                      pos.y + pd.up.y * h,
-                                                      pos.z + pd.up.z * h);
+                    context_.camera_handler->get_look_at()->eye =
+                        vsg::dvec3(pos.x + pd.up.x * h,
+                            pos.y + pd.up.y * h,
+                            pos.z + pd.up.z * h);
 
-                    context_.look_at->center = context_.look_at->eye
-                        + context_.camera_handler->get_front();
+                    context_.camera_handler->get_look_at()->center =
+                        context_.camera_handler->get_look_at()->eye +
+                        context_.camera_handler->get_front();
                 }
             }
             ImGui::TableNextColumn();
@@ -670,7 +673,8 @@ void EditorGui::add_object(
 ) const
 {
     const auto object = RouteObject::create(context_, paged_lod, label,
-        context_.look_at->eye + context_.camera_handler->get_front() * 20.0);
+        context_.camera_handler->get_look_at()->eye +
+        context_.camera_handler->get_front() * 20.0);
 
     context_.commands.push(new AddObject(context_, object), true);
 }
