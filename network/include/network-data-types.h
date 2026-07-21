@@ -9,7 +9,7 @@ class QTcpSocket;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-enum StructureType
+enum StructureType : uint8_t
 {
     STYPE_EMPTY_DATA,
 
@@ -65,11 +65,14 @@ struct network_data_t
 {
     network_data_t();
 
+    /// Размер данных
+    uint32_t data_size;
+
     /// Тип передаваемой/принимаемой структуры
     StructureType stype;
 
-    /// Размер данных
-    qsizetype data_size;
+    /// Сжатие
+    bool is_compression;
 
     /// Сериализованные данные
     QByteArray data;

@@ -25,7 +25,7 @@ find_package(Qt6 COMPONENTS Network REQUIRED)
 
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
-file (GLOB SOURCES "./src/*.cpp")
+file (GLOB SOURCES "./src/*.cpp" "./src/*.c")
 
 # Компиляция библиотеки
 add_library (${TARGET} SHARED)
