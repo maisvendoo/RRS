@@ -64,7 +64,6 @@ static int get_binding_state(vsg::ref_ptr<KeyboardHandler> keyboard_handler,
 
 CameraHandler::CameraHandler(
     const camera_settings_t& camera_settings,
-    vsg::ref_ptr<vsg::Orthographic>& orthographic,
     vsg::ref_ptr<vsg::LookAt>& look_at,
     vsg::ref_ptr<vsg::Camera>& camera,
     VkExtent2D window_extent,
@@ -73,7 +72,6 @@ CameraHandler::CameraHandler(
     double& delta_time
 )
     : camera_settings(camera_settings)
-    , orthographic(orthographic)
     , look_at(look_at)
     , camera(camera)
     , mouse(mouse)
