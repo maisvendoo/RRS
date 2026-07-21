@@ -107,8 +107,14 @@ void Camera::handle_mouse_move()
     {
         return;
     }
+}
 
-    // TODO
+void Camera::handle_mouse_scroll()
+{
+}
+
+void Camera::update(double delta_time)
+{
 }
 
 void Camera::apply(vsg::MoveEvent& moveEvent)

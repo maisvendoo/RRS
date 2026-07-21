@@ -10,6 +10,7 @@ namespace vsg
 class ButtonPressEvent;
 class ButtonReleaseEvent;
 class MoveEvent;
+class ScrollWheelEvent;
 
 }
 
@@ -21,6 +22,7 @@ public:
     virtual void apply(vsg::ButtonPressEvent& buttonPress) override;
     virtual void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
     virtual void apply(vsg::MoveEvent& moveEvent) override;
+    virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;
 
     int get_pos_x() const;
     int get_pos_y() const;
@@ -37,6 +39,7 @@ private:
     int pos_y;
     int delta_x;
     int delta_y;
+    int scroll;
 
     bool is_lmb_pressed_ = false;
     bool is_mmb_pressed_ = false;

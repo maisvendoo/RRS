@@ -3,6 +3,7 @@
 #include "MouseButton.h"
 
 #include <vsg/ui/PointerEvent.h>
+#include <vsg/ui/ScrollWheelEvent.h>
 
 void Mouse::apply(vsg::ButtonPressEvent& buttonPress)
 {
@@ -84,6 +85,16 @@ void Mouse::apply(vsg::MoveEvent& moveEvent)
 
     prev_x = pos_x;
     prev_y = pos_y;
+}
+
+void Mouse::apply(vsg::ScrollWheelEvent& scrollWheel)
+{
+    if (scrollWheel.handled)
+    {
+        return;
+    }
+
+    scroll = scrollWheel.delta.y;
 }
 
 int Mouse::get_pos_x() const
