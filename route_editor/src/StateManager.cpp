@@ -1,6 +1,6 @@
 #include "StateManager.h"
 
-#include "states/CameraNavigationState.h"
+#include "states/NavigationState.h"
 #include "states/GizmoRotateState.h"
 #include "states/GizmoScaleState.h"
 #include "states/GizmoTranslateState.h"
@@ -14,7 +14,7 @@ StateManager::StateManager()
 {
     select_route_state = new SelectRouteState;
     initial_state = new InitialState;
-    navigation_state = new CameraNavigationState;
+    navigation_state = new NavigationState;
     keyboard_translate_state = new KeyboardTranslateState;
     keyboard_rotate_state = new KeyboardRotateState;
     keyboard_scale_state = new KeyboardScaleState;
