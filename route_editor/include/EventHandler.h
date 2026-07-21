@@ -9,9 +9,10 @@ class StateManager;
 namespace vsg
 {
 
-class FrameEvent;
 class KeyPressEvent;
 class KeyReleaseEvent;
+class MoveEvent;
+class ScrollWheelEvent;
 
 }
 
@@ -23,7 +24,10 @@ public:
 
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
     virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;
-    virtual void apply(vsg::FrameEvent& frameEvent) override;
+    virtual void apply(vsg::MoveEvent& moveEvent) override;
+    virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;
+
+    void update(double delta_time);
 
 private:
     StateManager& state_manager;

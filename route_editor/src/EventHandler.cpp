@@ -20,7 +20,17 @@ void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
     state_manager.get_editor_state()->handle_key_release(keyRelease);
 }
 
-void EventHandler::apply(vsg::FrameEvent& frameEvent)
+void EventHandler::apply(vsg::MoveEvent& moveEvent)
 {
-    (void)frameEvent;
+    (void)moveEvent;
+}
+
+void EventHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
+{
+    (void)scrollWheel;
+}
+
+void EventHandler::update(double delta_time)
+{
+    (void)delta_time;
 }
