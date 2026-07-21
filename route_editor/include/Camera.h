@@ -1,7 +1,7 @@
 #ifndef CAMERA_HANDLER_H
 #define CAMERA_HANDLER_H
 
-#include "KeyboardHandler.h"
+#include "Keyboard.h"
 #include "Mouse.h"
 #include "settings/CameraSettings.h"
 #include <vsg/app/ProjectionMatrix.h>
@@ -28,7 +28,7 @@ public:
         const camera_settings_t& camera_settings,
         VkExtent2D window_extent,
         vsg::ref_ptr<Mouse>& mouse,
-        vsg::ref_ptr<KeyboardHandler>& keyboard_handler,
+        vsg::ref_ptr<Keyboard>& keyboard,
         double& delta_time
     );
 
@@ -66,7 +66,7 @@ private:
     vsg::ref_ptr<vsg::LookAt> look_at;
     vsg::ref_ptr<vsg::Camera> camera;
     vsg::ref_ptr<Mouse>& mouse;
-    vsg::ref_ptr<KeyboardHandler>& keyboard_handler;
+    vsg::ref_ptr<Keyboard>& keyboard;
     double& delta_time;
 
     double yaw_deg_ = 0.0;

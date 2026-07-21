@@ -5,7 +5,7 @@
 #include "EditorContext.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
-#include "KeyboardHandler.h"
+#include "Keyboard.h"
 #include "Mask.h"
 #include "Mouse.h"
 #include "Route.h"
@@ -64,11 +64,11 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    const auto keyboard_handler = context_.keyboard_handler;
+    const auto keyboard = context_.keyboard;
 
-    const auto get_binding_state = [keyboard_handler](Action action) -> bool
+    const auto get_binding_state = [keyboard](Action action) -> bool
     {
-        return keyboard_handler->get_binding_state(action);
+        return keyboard->get_binding_state(action);
     };
 
     if (get_binding_state(ACTION_COPY_OBJECTS))
@@ -194,7 +194,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // while there were selected objects,
         // deselect them all
         if (!selected_objects.empty() &&
-            !context_.keyboard_handler->get_shift_state())
+            !context_.keyboard->get_shift_state())
         {
             SelectObjects* const select_objects_command =
                 new SelectObjects(context_);
@@ -359,7 +359,7 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
     RouteObjects& objects_to_deselect =
         select_objects_command->objects_to_deselect;
 
-    if (context_.keyboard_handler->get_shift_state())
+    if (context_.keyboard->get_shift_state())
     {
         if (object->get_is_selected())
         {

@@ -1,4 +1,4 @@
-#include "KeyboardHandler.h"
+#include "Keyboard.h"
 
 #include "Action.h"
 #include "EditorContext.h"
@@ -8,43 +8,43 @@
 
 #include <cstdint>
 
-KeyboardHandler::KeyboardHandler(const KeyBindings& key_bindings)
+Keyboard::Keyboard(const KeyBindings& key_bindings)
     : key_bindings_{key_bindings}
 {
 }
 
-void KeyboardHandler::apply(vsg::KeyPressEvent& keyPress)
+void Keyboard::apply(vsg::KeyPressEvent& keyPress)
 {
     vsg::Keyboard::apply(keyPress);
 }
 
-void KeyboardHandler::apply(vsg::KeyReleaseEvent& keyRelease)
+void Keyboard::apply(vsg::KeyReleaseEvent& keyRelease)
 {
     vsg::Keyboard::apply(keyRelease);
 }
 
-bool KeyboardHandler::get_key_state(vsg::KeySymbol key) const
+bool Keyboard::get_key_state(vsg::KeySymbol key) const
 {
     return pressed(key, false);
 }
 
-bool KeyboardHandler::get_shift_state() const
+bool Keyboard::get_shift_state() const
 {
     return get_key_state(vsg::KEY_Shift_L) || get_key_state(vsg::KEY_Shift_R);
 }
 
-bool KeyboardHandler::get_ctrl_state() const
+bool Keyboard::get_ctrl_state() const
 {
     return get_key_state(vsg::KEY_Control_L) ||
         get_key_state(vsg::KEY_Control_R);
 }
 
-bool KeyboardHandler::get_alt_state() const
+bool Keyboard::get_alt_state() const
 {
     return get_key_state(vsg::KEY_Alt_L) || get_key_state(vsg::KEY_Alt_R);
 }
 
-bool KeyboardHandler::get_binding_state(Action action) const
+bool Keyboard::get_binding_state(Action action) const
 {
     const KeyBinding key_binding = key_bindings_.at(action);
 

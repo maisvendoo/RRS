@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
-#include "KeyboardHandler.h"
+#include "Keyboard.h"
 #include "Mouse.h"
 #include "ObjectSelector.h"
 #include "Outline.h"

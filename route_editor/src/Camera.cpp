@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 #include "Action.h"
-#include "KeyboardHandler.h"
+#include "Keyboard.h"
 #include "Mouse.h"
 
 #include <vsg/app/Camera.h>
@@ -56,22 +56,22 @@ static vsg::ref_ptr<vsg::Commands> create_quad(
     return commands;
 }
 
-static int get_binding_state(vsg::ref_ptr<KeyboardHandler> keyboard_handler,
+static int get_binding_state(vsg::ref_ptr<Keyboard> keyboard,
     Action action)
 {
-    return static_cast<int>(keyboard_handler->get_binding_state(action));
+    return static_cast<int>(keyboard->get_binding_state(action));
 }
 
 Camera::Camera(
     const camera_settings_t& camera_settings,
     VkExtent2D window_extent,
     vsg::ref_ptr<Mouse>& mouse,
-    vsg::ref_ptr<KeyboardHandler>& keyboard_handler,
+    vsg::ref_ptr<Keyboard>& keyboard,
     double& delta_time
 )
     : camera_settings(camera_settings)
     , mouse(mouse)
-    , keyboard_handler(keyboard_handler)
+    , keyboard(keyboard)
     , delta_time(delta_time)
 {
     const double window_width = static_cast<double>(window_extent.width);
@@ -151,14 +151,14 @@ void Camera::apply(vsg::FrameEvent&)
         delta_time;
 
     look_at->eye += front_ * move_speed * static_cast<double>(
-        get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_FORWARD) -
-        get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_BACKWARD));
+        get_binding_state(keyboard, ACTION_MOVE_CAMERA_FORWARD) -
+        get_binding_state(keyboard, ACTION_MOVE_CAMERA_BACKWARD));
 
     look_at->eye += right_ * move_speed * static_cast<double>(
-        get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_RIGHT) -
-        get_binding_state(keyboard_handler, ACTION_MOVE_CAMERA_LEFT));
+        get_binding_state(keyboard, ACTION_MOVE_CAMERA_RIGHT) -
+        get_binding_state(keyboard, ACTION_MOVE_CAMERA_LEFT));
 
-    if (get_binding_state(keyboard_handler, ACTION_CHANGE_PROJECTION_MATRIX))
+    if (get_binding_state(keyboard, ACTION_CHANGE_PROJECTION_MATRIX))
     {
         if (camera->projectionMatrix == perspective)
         {

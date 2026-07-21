@@ -11,11 +11,11 @@
 #include <bitset>
 #include <cstdint>
 
-class KeyboardHandler : public vsg::Inherit<vsg::Keyboard, KeyboardHandler>
+class Keyboard : public vsg::Inherit<vsg::Keyboard, Keyboard>
 {
 public:
-    explicit KeyboardHandler(const KeyBindings& key_bindings);
-    virtual ~KeyboardHandler() = default;
+    explicit Keyboard(const KeyBindings& key_bindings);
+    virtual ~Keyboard() = default;
 
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
     virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;

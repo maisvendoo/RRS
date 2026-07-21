@@ -2,7 +2,7 @@
 
 #include "Action.h"
 #include "Journal.h"
-#include "KeyboardHandler.h"
+#include "Keyboard.h"
 #include "RouteObject.h"
 #include "commands/CommandList.h"
 #include "filesystem.h"
@@ -16,13 +16,13 @@
 #include <string>
 
 UndoRedoSaveHandler::UndoRedoSaveHandler(
-    vsg::ref_ptr<KeyboardHandler>& keyboard_handler,
+    vsg::ref_ptr<Keyboard>& keyboard,
     CommandList& commands,
     const std::string& route_dir,
     std::mutex& static_objects_mutex,
     const RouteObjects& static_objects
 )
-    : keyboard_handler_{keyboard_handler}
+    : keyboard_{keyboard}
     , commands_{commands}
     , route_dir_{route_dir}
     , static_objects_mutex_{static_objects_mutex}
@@ -34,15 +34,15 @@ void UndoRedoSaveHandler::apply(vsg::KeyPressEvent& keyPress)
 {
     (void)keyPress;
 
-    if (keyboard_handler_->get_binding_state(ACTION_UNDO_COMMAND))
+    if (keyboard_->get_binding_state(ACTION_UNDO_COMMAND))
     {
         commands_.undo();
     }
-    else if (keyboard_handler_->get_binding_state(ACTION_REDO_COMMAND))
+    else if (keyboard_->get_binding_state(ACTION_REDO_COMMAND))
     {
         commands_.redo();
     }
-    else if (keyboard_handler_->get_binding_state(ACTION_SAVE_ROUTE))
+    else if (keyboard_->get_binding_state(ACTION_SAVE_ROUTE))
     {
         save_route();
     }

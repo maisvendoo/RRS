@@ -7,7 +7,7 @@
 #include "EventHandler.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
-#include "KeyboardHandler.h"
+#include "Keyboard.h"
 #include "Mask.h"
 #include "Mouse.h"
 #include "ObjectSelector.h"
@@ -72,16 +72,16 @@ bool RouteEditor::initialize()
     }
 
     context_.mouse = Mouse::create();
-    context_.keyboard_handler = KeyboardHandler::create(context_.settings.key_bindings);
+    context_.keyboard = Keyboard::create(context_.settings.key_bindings);
     auto undo_redo_save_handler = UndoRedoSaveHandler::create(
-        context_.keyboard_handler, context_.commands, context_.route_dir,
+        context_.keyboard, context_.commands, context_.route_dir,
         context_.static_objects_mutex, context_.static_objects);
 
     context_.camera = Camera::create(
         context_.settings.camera_settings,
         context_.window->extent2D(),
         context_.mouse,
-        context_.keyboard_handler,
+        context_.keyboard,
         context_.delta_time
     );
 
@@ -135,7 +135,7 @@ bool RouteEditor::initialize()
     viewer_->addEventHandler(vsg::CloseHandler::create(viewer_));
     viewer_->addEventHandler(window_handler_);
     viewer_->addEventHandler(context_.mouse);
-    viewer_->addEventHandler(context_.keyboard_handler);
+    viewer_->addEventHandler(context_.keyboard);
     viewer_->addEventHandler(undo_redo_save_handler);
 
     viewer_->addEventHandler(EventHandler::create());

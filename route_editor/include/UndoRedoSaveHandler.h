@@ -11,7 +11,7 @@
 #include <string>
 
 class CommandList;
-class KeyboardHandler;
+class Keyboard;
 
 namespace vsg
 {
@@ -20,12 +20,12 @@ class KeyPressEvent;
 
 }
 
-// This is temp class to move out functionality from KeyboardHandler
+// This is temp class to move out functionality from Keyboard
 class UndoRedoSaveHandler : public vsg::Inherit<vsg::Visitor, UndoRedoSaveHandler>
 {
 public:
     UndoRedoSaveHandler(
-        vsg::ref_ptr<KeyboardHandler>& keyboard_handler,
+        vsg::ref_ptr<Keyboard>& keyboard,
         CommandList& commands,
         const std::string& route_dir,
         std::mutex& static_objects_mutex,
@@ -38,7 +38,7 @@ private:
     void save_route() const;
 
 private:
-    vsg::ref_ptr<KeyboardHandler> keyboard_handler_;
+    vsg::ref_ptr<Keyboard> keyboard_;
     CommandList& commands_;
     const std::string& route_dir_;
     std::mutex& static_objects_mutex_;
