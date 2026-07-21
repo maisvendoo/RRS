@@ -20,3 +20,16 @@ void State::handle_key_press()
 void State::handle_key_release()
 {
 }
+
+void State::handle_mouse_move()
+{
+}
+
+void State::handle_mouse_scroll()
+{
+}
+
+void State::update(double delta_time)
+{
+    static_cast<void>(delta_time);
+}

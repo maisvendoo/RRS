@@ -24,15 +24,17 @@ void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 
 void EventHandler::apply(vsg::MoveEvent& moveEvent)
 {
-    (void)moveEvent;
+    static_cast<void>(moveEvent);
+    state_manager.get_editor_state()->handle_mouse_move();
 }
 
 void EventHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
 {
-    (void)scrollWheel;
+    static_cast<void>(scrollWheel);
+    state_manager.get_editor_state()->handle_mouse_scroll();
 }
 
 void EventHandler::update(double delta_time)
 {
-    (void)delta_time;
+    state_manager.get_editor_state()->update(delta_time);
 }

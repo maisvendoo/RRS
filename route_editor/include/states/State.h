@@ -20,6 +20,12 @@ public:
 
     virtual void handle_key_release();
 
+    virtual void handle_mouse_move();
+
+    virtual void handle_mouse_scroll();
+
+    virtual void update(double delta_time);
+
 protected:
     const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
