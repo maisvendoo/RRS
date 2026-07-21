@@ -72,16 +72,16 @@ bool RouteEditor::initialize()
     }
 
     mouse = Mouse::create();
-    context_.keyboard = Keyboard::create(context_.settings.key_bindings);
+    keyboard = Keyboard::create(context_.settings.key_bindings);
     auto undo_redo_save_handler = UndoRedoSaveHandler::create(
-        context_.keyboard, context_.commands, context_.route_dir,
+        keyboard, context_.commands, context_.route_dir,
         context_.static_objects_mutex, context_.static_objects);
 
     context_.camera = Camera::create(
         context_.settings.camera_settings,
         context_.window->extent2D(),
         mouse,
-        context_.keyboard,
+        keyboard,
         context_.delta_time
     );
 
@@ -127,11 +127,11 @@ bool RouteEditor::initialize()
 
     viewer_ = vsg::Viewer::create();
 
-    context_.object_selector = ObjectSelector::create(context_, mouse);
+    context_.object_selector = ObjectSelector::create(context_, mouse, keyboard);
 
     viewer_->addWindow(context_.window);
 
-    viewer_->addEventHandler(context_.keyboard);
+    viewer_->addEventHandler(keyboard);
     viewer_->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer_->addEventHandler(vsg::CloseHandler::create(viewer_));
     viewer_->addEventHandler(window_handler_);

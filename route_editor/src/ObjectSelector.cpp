@@ -29,9 +29,14 @@
 
 #include <cmath>
 
-ObjectSelector::ObjectSelector(EditorContext& context, const vsg::ref_ptr<Mouse>& mouse)
+ObjectSelector::ObjectSelector(
+    EditorContext& context,
+    const vsg::ref_ptr<Mouse>& mouse,
+    const vsg::ref_ptr<Keyboard>& keyboard
+)
     : context_(context)
     , mouse(mouse)
+    , keyboard(keyboard)
 {
     context.gizmo = Gizmo::create(context, context.settings.gizmo_settings, context.intersection_handler);
 
@@ -64,8 +69,6 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     {
         return;
     }
-
-    const auto keyboard = context_.keyboard;
 
     if (keyboard->pressed(ACTION_COPY_OBJECTS))
     {
@@ -189,8 +192,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // If we clicked on empty space without shift
         // while there were selected objects,
         // deselect them all
-        if (!selected_objects.empty() &&
-            !context_.keyboard->get_shift_state())
+        if (!selected_objects.empty() && !keyboard->get_shift_state())
         {
             SelectObjects* const select_objects_command =
                 new SelectObjects(context_);
@@ -355,7 +357,7 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
     RouteObjects& objects_to_deselect =
         select_objects_command->objects_to_deselect;
 
-    if (context_.keyboard->get_shift_state())
+    if (keyboard->get_shift_state())
     {
         if (object->get_is_selected())
         {
