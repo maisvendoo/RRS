@@ -3,6 +3,8 @@
 
 #include "EditorContext.h"
 
+class Mouse;
+
 class RouteEditor
 {
 public:
@@ -21,6 +23,7 @@ private:
     EditorContext context_;
     vsg::ref_ptr<vsg::Viewer> viewer_;
     vsg::ref_ptr<WindowHandler> window_handler_;
+    vsg::ref_ptr<Mouse> mouse;
 };
 
 #endif // ROUTE_EDITOR_H

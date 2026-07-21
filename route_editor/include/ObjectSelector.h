@@ -7,6 +7,7 @@
 #include <vsg/maths/vec3.h>
 
 struct EditorContext;
+class Mouse;
 class RouteObject;
 class SingleSwitch;
 
@@ -23,7 +24,7 @@ class MoveEvent;
 class ObjectSelector : public vsg::Inherit<vsg::Visitor, ObjectSelector>
 {
 public:
-    ObjectSelector(EditorContext& context);
+    ObjectSelector(EditorContext& context, const vsg::ref_ptr<Mouse>& mouse);
 
     void apply(vsg::KeyPressEvent& keyPress) override;
     void apply(vsg::ButtonPressEvent& buttonPress) override;
@@ -48,6 +49,7 @@ private:
     State state_ = State::INITIAL;
 
     EditorContext& context_;
+    const vsg::ref_ptr<Mouse>& mouse;
 
     vsg::dvec3 prev_intersect_pos_;
     vsg::dvec3 total_translation_;

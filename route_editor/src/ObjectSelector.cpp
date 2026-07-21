@@ -29,8 +29,9 @@
 
 #include <cmath>
 
-ObjectSelector::ObjectSelector(EditorContext& context)
+ObjectSelector::ObjectSelector(EditorContext& context, const vsg::ref_ptr<Mouse>& mouse)
     : context_(context)
+    , mouse(mouse)
 {
     context.gizmo = Gizmo::create(context, context.settings.gizmo_settings, context.intersection_handler);
 
@@ -48,7 +49,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
 {
     (void)keyPress;
 
-    if (context_.mouse->is_rmb_pressed())
+    if (mouse->is_rmb_pressed())
     {
         return;
     }
@@ -96,7 +97,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         context_.gizmo->get_curr_pos(), &front_plane_up_);
 
     const auto intersector = context_.intersection_handler->apply_(
-        context_.mouse->get_pos());
+        mouse->get_pos());
 
     if (!intersector)
     {
@@ -151,12 +152,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     if (state_ != State::INITIAL)
     {
-        if (context_.mouse->is_lmb_pressed())
+        if (mouse->is_lmb_pressed())
         {
             confirm_keyboard_transformation();
             return;
         }
-        else if (context_.mouse->is_rmb_pressed())
+        else if (mouse->is_rmb_pressed())
         {
             cancel_keyboard_transformation();
             return;

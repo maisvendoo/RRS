@@ -23,7 +23,6 @@ class Camera;
 class Gizmo;
 class IntersectionHandler;
 class Keyboard;
-class Mouse;
 class ObjectSelector;
 class OutlineBuilder;
 class Route;
@@ -74,7 +73,6 @@ struct EditorContext
 
     vsg::ref_ptr<vsg::Window> window;
 
-    vsg::ref_ptr<Mouse> mouse;
     vsg::ref_ptr<Keyboard> keyboard;
 
     vsg::ref_ptr<Camera> camera;
