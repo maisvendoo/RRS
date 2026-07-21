@@ -91,9 +91,9 @@ LSIntersectorRefPtr IntersectionHandler::apply_(
     return LSIntersector::create(*camera, moveEvent.x, moveEvent.y);
 }
 
-LSIntersectorRefPtr IntersectionHandler::apply_(vsg::ivec2 mouse_pos) const
+LSIntersectorRefPtr IntersectionHandler::apply_(int mouse_x, int mouse_y) const
 {
-    return LSIntersector::create(*camera, mouse_pos.x, mouse_pos.y);
+    return LSIntersector::create(*camera, mouse_x, mouse_y);
 }
 
 LSIntersectorRefPtr IntersectionHandler::get_lmb_intersector() const

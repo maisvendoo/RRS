@@ -2,7 +2,6 @@
 
 #include "MouseButton.h"
 
-#include <vsg/maths/vec2.h>
 #include <vsg/ui/PointerEvent.h>
 
 void Mouse::apply(vsg::ButtonPressEvent& buttonPress)
@@ -74,22 +73,34 @@ void Mouse::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    static vsg::ivec2 prev_pos = {moveEvent.x, moveEvent.y};
+    static int prev_x = moveEvent.x;
+    static int prev_y = moveEvent.y;
 
-    pos_ = {moveEvent.x, moveEvent.y};
-    delta_pos_ = pos_ - prev_pos;
+    pos_x = moveEvent.x;
+    pos_y = moveEvent.y;
 
-    prev_pos = pos_;
+    delta_x = pos_x - prev_x;
+    delta_y = pos_y - prev_y;
+
+    prev_x = pos_x;
+    prev_y = pos_y;
 }
 
-vsg::ivec2 Mouse::get_pos() const
+int Mouse::get_pos_x() const
 {
-    return pos_;
+    return pos_x;
 }
-
-vsg::ivec2 Mouse::get_delta_pos() const
+int Mouse::get_pos_y() const
 {
-    return delta_pos_;
+    return pos_y;
+}
+int Mouse::get_delta_x() const
+{
+    return delta_x;
+}
+int Mouse::get_delta_y() const
+{
+    return delta_y;
 }
 
 bool Mouse::is_lmb_pressed() const

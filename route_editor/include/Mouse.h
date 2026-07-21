@@ -3,7 +3,6 @@
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
-#include <vsg/maths/vec2.h>
 
 namespace vsg
 {
@@ -23,17 +22,21 @@ public:
     virtual void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
     virtual void apply(vsg::MoveEvent& moveEvent) override;
 
-    vsg::ivec2 get_pos() const;
+    int get_pos_x() const;
+    int get_pos_y() const;
     // Must be called only from MoveEvents
-    vsg::ivec2 get_delta_pos() const;
+    int get_delta_x() const;
+    int get_delta_y() const;
 
     bool is_lmb_pressed() const;
     bool is_mmb_pressed() const;
     bool is_rmb_pressed() const;
 
 private:
-    vsg::ivec2 pos_ = {0, 0};
-    vsg::ivec2 delta_pos_ = {0, 0};
+    int pos_x;
+    int pos_y;
+    int delta_x;
+    int delta_y;
 
     bool is_lmb_pressed_ = false;
     bool is_mmb_pressed_ = false;

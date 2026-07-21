@@ -30,7 +30,7 @@ public:
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
 
     LSIntersectorRefPtr apply_(const vsg::MoveEvent& moveEvent) const;
-    LSIntersectorRefPtr apply_(vsg::ivec2 mouse_pos) const;
+    LSIntersectorRefPtr apply_(int mouse_x, int mouse_y) const;
 
     LSIntersectorRefPtr get_lmb_intersector() const;
     LSIntersectorRefPtr get_mmb_intersector() const;

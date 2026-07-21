@@ -34,6 +34,8 @@ public:
 
     virtual ~Camera() = default;
 
+    void handle_mouse_move();
+
     virtual void apply(vsg::MoveEvent& moveEvent) override;
     virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;
     virtual void apply(vsg::FrameEvent& frame) override;

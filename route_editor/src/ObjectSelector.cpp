@@ -100,7 +100,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         context_.gizmo->get_curr_pos(), &front_plane_up_);
 
     const auto intersector = context_.intersection_handler->apply_(
-        mouse->get_pos());
+        mouse->get_pos_x(), mouse->get_pos_y());
 
     if (!intersector)
     {
