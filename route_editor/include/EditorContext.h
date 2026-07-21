@@ -34,7 +34,6 @@ class WindowHandler;
 namespace vsg
 {
 
-class Camera;
 class Options;
 class PagedLOD;
 class Window;
@@ -78,7 +77,6 @@ struct EditorContext
     vsg::ref_ptr<Mouse> mouse;
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;
 
-    vsg::ref_ptr<vsg::Camera> camera;
     vsg::ref_ptr<CameraHandler> camera_handler;
 
     vsg::ref_ptr<IntersectionHandler> intersection_handler;

@@ -11,7 +11,7 @@
 
 #include <algorithm>
 
-IntersectionHandler::IntersectionHandler(vsg::ref_ptr<vsg::Camera>& camera)
+IntersectionHandler::IntersectionHandler(const vsg::ref_ptr<vsg::Camera>& camera)
     : camera(camera)
 {
 }

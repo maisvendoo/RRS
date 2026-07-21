@@ -64,14 +64,12 @@ static int get_binding_state(vsg::ref_ptr<KeyboardHandler> keyboard_handler,
 
 CameraHandler::CameraHandler(
     const camera_settings_t& camera_settings,
-    vsg::ref_ptr<vsg::Camera>& camera,
     VkExtent2D window_extent,
     vsg::ref_ptr<Mouse>& mouse,
     vsg::ref_ptr<KeyboardHandler>& keyboard_handler,
     double& delta_time
 )
     : camera_settings(camera_settings)
-    , camera(camera)
     , mouse(mouse)
     , keyboard_handler(keyboard_handler)
     , delta_time(delta_time)

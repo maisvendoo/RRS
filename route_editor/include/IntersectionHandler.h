@@ -24,7 +24,7 @@ class IntersectionHandler : public vsg::Inherit<
     vsg::Visitor, IntersectionHandler>
 {
 public:
-    explicit IntersectionHandler(vsg::ref_ptr<vsg::Camera>& camera);
+    explicit IntersectionHandler(const vsg::ref_ptr<vsg::Camera>& camera);
 
     void apply(vsg::ButtonPressEvent& buttonPress) override;
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
@@ -43,7 +43,7 @@ public:
         LSIntersectorRefPtr intersector);
 
 private:
-    vsg::ref_ptr<vsg::Camera>& camera;
+    const vsg::ref_ptr<vsg::Camera>& camera;
 
     LSIntersectorRefPtr lmb_intersector_;
     LSIntersectorRefPtr mmb_intersector_;
