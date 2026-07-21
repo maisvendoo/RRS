@@ -5,6 +5,7 @@
 #include "Mouse.h"
 #include "settings/CameraSettings.h"
 #include <vsg/app/ProjectionMatrix.h>
+#include <vsg/app/ViewMatrix.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
@@ -44,6 +45,11 @@ public:
     const vsg::dvec3& get_front() const;
     const vsg::dvec3& get_right() const;
     const vsg::dvec3& get_up() const;
+
+    const vsg::ref_ptr<vsg::Perspective>& get_perspective() const { return perspective; }
+    const vsg::ref_ptr<vsg::Orthographic>& get_orthographic() const { return orthographic; }
+    const vsg::ref_ptr<vsg::LookAt>& get_look_at() const { return look_at; }
+    const vsg::ref_ptr<vsg::Camera>& get_camera() const { return camera; }
 
     // Create plane perpedicular to camera normal and passing through
     // specified point to test for intersections

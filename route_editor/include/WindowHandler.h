@@ -5,6 +5,7 @@
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
 
+class CameraHandler;
 struct window_settings_t;
 
 namespace vsg
@@ -23,15 +24,13 @@ public:
     WindowHandler(
         const window_settings_t& window_settings,
         vsg::ref_ptr<vsg::Window>& window,
-        vsg::ref_ptr<vsg::Perspective>& perspective,
-        vsg::ref_ptr<vsg::Camera>& camera
+        const vsg::ref_ptr<CameraHandler>& camera_handler
     );
 
     virtual void apply(vsg::ConfigureWindowEvent& configureWindow) override;
 
 private:
-    vsg::ref_ptr<vsg::Perspective>& perspective_;
-    vsg::ref_ptr<vsg::Camera>& camera_;
+    const vsg::ref_ptr<CameraHandler>& camera_handler;
 };
 
 #endif // WINDOW_HANDLER_H
