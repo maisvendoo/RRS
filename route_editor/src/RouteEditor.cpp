@@ -7,6 +7,8 @@
 #include "EventHandler.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
+#include "Journal.h"
+#include "JournalFile.h"
 #include "Keyboard.h"
 #include "Mask.h"
 #include "Mouse.h"
@@ -22,6 +24,8 @@
 #include "filesystem.h"
 #include "graphics/common.h"
 #include "graphics/shader_funcs.h"
+
+#include <core/string_funcs.h>
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
@@ -56,6 +60,8 @@ RouteEditor::~RouteEditor() = default;
 
 bool RouteEditor::initialize()
 {
+    initialize_journal();
+
     const FileSystem& fs = FileSystem::getInstance();
     context_.settings.read(fs.combinePath(
         fs.getConfigDir(), "editor-settings.xml"));
@@ -192,6 +198,31 @@ void RouteEditor::run()
     {
         context_.load_topology_thread.join();
     }
+}
+
+void RouteEditor::initialize_journal(const char* filename) const
+{
+    const FileSystem& fs = FileSystem::getInstance();
+
+    JournalFile* const journal_file = new(std::nothrow) JournalFile(
+        to_qstring(fs.combinePath(fs.getLogsDir(), filename)),
+        JournalLevel::All
+    );
+
+    if (!journal_file)
+    {
+        std::fputs("Failed to allocate memory for JournalFile\n", stderr);
+        std::exit(EXIT_FAILURE);
+    }
+
+    Journal::instance()->addStorage(journal_file);
+
+    const QString dash_line = QString('=').repeated(80);
+
+    Journal::instance()->message(dash_line);
+    Journal::instance()->message("Started new session");
+    Journal::instance()->message("Journal subsystem is initialized successfully");
+    Journal::instance()->message(dash_line);
 }
 
 void RouteEditor::configure_shaders()

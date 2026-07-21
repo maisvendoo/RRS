@@ -19,6 +19,7 @@ public:
     void run();
 
 private:
+    void initialize_journal(const char* filename = "editor.log") const;
     void configure_shaders();
     void compile_models();
     void handle_deferred_selection();
