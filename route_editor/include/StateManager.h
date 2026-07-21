@@ -36,7 +36,7 @@ private:
     State* current_state;
     State* deferred_state;
 
-    State* select_route_state;
+    State* route_not_loaded_state;
     State* initial_state;
     State* navigation_state;
 

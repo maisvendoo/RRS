@@ -8,7 +8,7 @@
 #include "states/KeyboardRotateState.h"
 #include "states/KeyboardScaleState.h"
 #include "states/KeyboardTranslateState.h"
-#include "states/SelectRouteState.h"
+#include "states/RouteNotLoadedState.h"
 
 #include <vsg/core/ref_ptr.h>
 
@@ -17,7 +17,7 @@ StateManager::StateManager(
     const vsg::ref_ptr<Keyboard>& keyboard
 )
 {
-    select_route_state = new SelectRouteState(mouse, keyboard);
+    route_not_loaded_state = new RouteNotLoadedState(mouse, keyboard);
     initial_state = new InitialState(mouse, keyboard);
     navigation_state = new NavigationState(mouse, keyboard);
     keyboard_translate_state = new KeyboardTranslateState(mouse, keyboard);
@@ -27,8 +27,8 @@ StateManager::StateManager(
     gizmo_rotate_state = new GizmoRotateState(mouse, keyboard);
     gizmo_scale_state = new GizmoScaleState(mouse, keyboard);
 
-    current_state = select_route_state;
-    deferred_state = select_route_state;
+    current_state = route_not_loaded_state;
+    deferred_state = route_not_loaded_state;
 }
 
 StateManager::~StateManager()
@@ -41,12 +41,12 @@ StateManager::~StateManager()
     delete keyboard_translate_state;
     delete navigation_state;
     delete initial_state;
-    delete select_route_state;
+    delete route_not_loaded_state;
 }
 
 void StateManager::defer_switch_to_route_not_loaded_state()
 {
-    deferred_state = select_route_state;
+    deferred_state = route_not_loaded_state;
 }
 
 void StateManager::defer_switch_to_basic_editor_state()
