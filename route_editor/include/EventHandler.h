@@ -4,8 +4,6 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 
-#include <memory>
-
 class CameraNavigationState;
 class GizmoRotateState;
 class GizmoScaleState;
@@ -20,6 +18,7 @@ class State;
 namespace vsg
 {
 
+class FrameEvent;
 class KeyPressEvent;
 class KeyReleaseEvent;
 
@@ -33,18 +32,23 @@ public:
 
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
     virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;
+    virtual void apply(vsg::FrameEvent& frameEvent) override;
 
 private:
-    std::unique_ptr<State>* state_;
-    std::unique_ptr<State> select_route_state_;
-    std::unique_ptr<State> initial_state_;
-    std::unique_ptr<State> camera_navigation_state_;
-    std::unique_ptr<State> keyboard_translate_state_;
-    std::unique_ptr<State> keyboard_rotate_state_;
-    std::unique_ptr<State> keyboard_scale_state_;
-    std::unique_ptr<State> gizmo_translate_state_;
-    std::unique_ptr<State> gizmo_rotate_state_;
-    std::unique_ptr<State> gizmo_scale_state_;
+    State* current_state;
+    State* deferred_state;
+
+    State* select_route_state;
+    State* initial_state;
+    State* navigation_state;
+
+    State* keyboard_translate_state;
+    State* keyboard_rotate_state;
+    State* keyboard_scale_state;
+
+    State* gizmo_translate_state;
+    State* gizmo_rotate_state;
+    State* gizmo_scale_state;
 };
 
 #endif // EVENT_HANDLER_H

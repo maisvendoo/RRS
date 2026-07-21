@@ -11,30 +11,46 @@
 #include "states/SelectRouteState.h"
 #include "states/State.h"
 
-#include <memory>
-
 EventHandler::EventHandler()
-    : select_route_state_(std::make_unique<SelectRouteState>())
-    , initial_state_(std::make_unique<InitialState>())
-    , camera_navigation_state_(std::make_unique<CameraNavigationState>())
-    , keyboard_translate_state_(std::make_unique<KeyboardTranslateState>())
-    , keyboard_rotate_state_(std::make_unique<KeyboardRotateState>())
-    , keyboard_scale_state_(std::make_unique<KeyboardScaleState>())
-    , gizmo_translate_state_(std::make_unique<GizmoTranslateState>())
-    , gizmo_rotate_state_(std::make_unique<GizmoRotateState>())
-    , gizmo_scale_state_(std::make_unique<GizmoScaleState>())
 {
-    state_ = &select_route_state_;
+    select_route_state = new SelectRouteState;
+    initial_state = new InitialState;
+    navigation_state = new CameraNavigationState;
+    keyboard_translate_state = new KeyboardTranslateState;
+    keyboard_rotate_state = new KeyboardRotateState;
+    keyboard_scale_state = new KeyboardScaleState;
+    gizmo_translate_state = new GizmoTranslateState;
+    gizmo_rotate_state = new GizmoRotateState;
+    gizmo_scale_state = new GizmoScaleState;
+
+    current_state = select_route_state;
+    deferred_state = select_route_state;
 }
 
-EventHandler::~EventHandler() = default;
+EventHandler::~EventHandler()
+{
+    delete gizmo_scale_state;
+    delete gizmo_rotate_state;
+    delete gizmo_translate_state;
+    delete keyboard_scale_state;
+    delete keyboard_rotate_state;
+    delete keyboard_translate_state;
+    delete navigation_state;
+    delete initial_state;
+    delete select_route_state;
+}
 
 void EventHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    (*state_)->handle_key_press(keyPress);
+    current_state->handle_key_press(keyPress);
 }
 
 void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
-    (*state_)->handle_key_release(keyRelease);
+    current_state->handle_key_release(keyRelease);
+}
+
+void EventHandler::apply(vsg::FrameEvent& frameEvent)
+{
+    (void)frameEvent;
 }
