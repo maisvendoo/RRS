@@ -1,4 +1,4 @@
-#include "CameraHandler.h"
+#include "Camera.h"
 
 #include "Action.h"
 #include "KeyboardHandler.h"
@@ -62,7 +62,7 @@ static int get_binding_state(vsg::ref_ptr<KeyboardHandler> keyboard_handler,
     return static_cast<int>(keyboard_handler->get_binding_state(action));
 }
 
-CameraHandler::CameraHandler(
+Camera::Camera(
     const camera_settings_t& camera_settings,
     VkExtent2D window_extent,
     vsg::ref_ptr<Mouse>& mouse,
@@ -107,7 +107,7 @@ CameraHandler::CameraHandler(
     calculate_up();
 }
 
-void CameraHandler::apply(vsg::MoveEvent& moveEvent)
+void Camera::apply(vsg::MoveEvent& moveEvent)
 {
     if (moveEvent.handled || !mouse->is_rmb_pressed())
     {
@@ -126,7 +126,7 @@ void CameraHandler::apply(vsg::MoveEvent& moveEvent)
     calculate_up();
 }
 
-void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
+void Camera::apply(vsg::ScrollWheelEvent& scrollWheel)
 {
     if (scrollWheel.handled)
     {
@@ -140,7 +140,7 @@ void CameraHandler::apply(vsg::ScrollWheelEvent& scrollWheel)
     fovy = std::clamp(fovy, camera_settings.fovy_min, camera_settings.fovy_max);
 }
 
-void CameraHandler::apply(vsg::FrameEvent&)
+void Camera::apply(vsg::FrameEvent&)
 {
     if (!mouse->is_rmb_pressed())
     {
@@ -173,24 +173,24 @@ void CameraHandler::apply(vsg::FrameEvent&)
     look_at->center = look_at->eye + front_;
 }
 
-const vsg::dvec3& CameraHandler::get_front() const
+const vsg::dvec3& Camera::get_front() const
 {
     return front_;
 }
 
-const vsg::dvec3& CameraHandler::get_right() const
+const vsg::dvec3& Camera::get_right() const
 {
     return right_;
 }
 
-const vsg::dvec3& CameraHandler::get_up() const
+const vsg::dvec3& Camera::get_up() const
 {
     return up_;
 }
 
 // Create plane perpedicular to camera normal passing through
 // specified point to test for intersections
-vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
+vsg::ref_ptr<vsg::Node> Camera::create_front_plane(
     const vsg::dvec3& point,
     vsg::dvec3* up_out
 ) const
@@ -233,7 +233,7 @@ vsg::ref_ptr<vsg::Node> CameraHandler::create_front_plane(
     return create_quad(p0, p1, p2, p3);
 }
 
-void CameraHandler::calculate_front()
+void Camera::calculate_front()
 {
     const double yaw_rad = vsg::radians(yaw_deg_);
     const double pitch_rad = vsg::radians(pitch_deg_);
@@ -245,12 +245,12 @@ void CameraHandler::calculate_front()
     ));
 }
 
-void CameraHandler::calculate_right()
+void Camera::calculate_right()
 {
     right_ = vsg::normalize(vsg::cross(front_, look_at->up));
 }
 
-void CameraHandler::calculate_up()
+void Camera::calculate_up()
 {
     up_ = vsg::normalize(vsg::cross(right_, front_));
 }

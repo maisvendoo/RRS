@@ -1,7 +1,7 @@
 #include "EditorGui.h"
 
 #include "Action.h"
-#include "CameraHandler.h"
+#include "Camera.h"
 #include "EditorContext.h"
 #include "EditorState.h"
 #include "Gizmo.h"
@@ -335,12 +335,12 @@ void EditorGui::show_stations_conf() const
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                context_.camera_handler->get_look_at()->eye = translation +
+                context_.camera->get_look_at()->eye = translation +
                     vsg::dvec3(0.0, 0.0, 50.0);
 
-                context_.camera_handler->get_look_at()->center =
-                    context_.camera_handler->get_look_at()->eye +
-                    context_.camera_handler->get_front();
+                context_.camera->get_look_at()->center =
+                    context_.camera->get_look_at()->eye +
+                    context_.camera->get_front();
             }
             ImGui::TableNextColumn();
             ImGui::Text(number_format, translation.x);
@@ -398,14 +398,14 @@ void EditorGui::show_waypoints_conf() const
 
                     double h = 5.0;
 
-                    context_.camera_handler->get_look_at()->eye =
+                    context_.camera->get_look_at()->eye =
                         vsg::dvec3(pos.x + pd.up.x * h,
                             pos.y + pd.up.y * h,
                             pos.z + pd.up.z * h);
 
-                    context_.camera_handler->get_look_at()->center =
-                        context_.camera_handler->get_look_at()->eye +
-                        context_.camera_handler->get_front();
+                    context_.camera->get_look_at()->center =
+                        context_.camera->get_look_at()->eye +
+                        context_.camera->get_front();
                 }
             }
             ImGui::TableNextColumn();
@@ -487,7 +487,7 @@ void EditorGui::show_camera_settings() const
     if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &settings.camera_settings.fovy,
         &settings.camera_settings.fovy_min, &settings.camera_settings.fovy_max, "%.3f"))
     {
-        context_.camera_handler->get_perspective()->fieldOfViewY = settings.camera_settings.fovy;
+        context_.camera->get_perspective()->fieldOfViewY = settings.camera_settings.fovy;
     }
 
     ImGui::End();
@@ -673,8 +673,8 @@ void EditorGui::add_object(
 ) const
 {
     const auto object = RouteObject::create(context_, paged_lod, label,
-        context_.camera_handler->get_look_at()->eye +
-        context_.camera_handler->get_front() * 20.0);
+        context_.camera->get_look_at()->eye +
+        context_.camera->get_front() * 20.0);
 
     context_.commands.push(new AddObject(context_, object), true);
 }

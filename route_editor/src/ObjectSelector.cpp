@@ -1,7 +1,7 @@
 #include "ObjectSelector.h"
 
 #include "Action.h"
-#include "CameraHandler.h"
+#include "Camera.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
@@ -97,7 +97,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    const auto front_plane = context_.camera_handler->create_front_plane(
+    const auto front_plane = context_.camera->create_front_plane(
         context_.gizmo->get_curr_pos(), &front_plane_up_);
 
     const auto intersector = context_.intersection_handler->apply_(
@@ -291,7 +291,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
             double prev_acos = acos(vsg::dot(prev_vec, front_plane_up_));
             double curr_acos = acos(vsg::dot(curr_vec, front_plane_up_));
 
-            const vsg::dvec3& front = context_.camera_handler->get_front();
+            const vsg::dvec3& front = context_.camera->get_front();
 
             if (prev_vec != front_plane_up_ && prev_vec != -front_plane_up_ &&
                 vsg::dot(vsg::cross(prev_vec, front_plane_up_), front) < 0.0)
@@ -424,7 +424,7 @@ void ObjectSelector::confirm_keyboard_transformation()
                 new RotateObjects(
                     context_, context_.selected_objects,
                     context_.gizmo->get_curr_pos(),
-                    context_.camera_handler->get_front(),
+                    context_.camera->get_front(),
                     total_rotation_rad_
                 ),
                 false

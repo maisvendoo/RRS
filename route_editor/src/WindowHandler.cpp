@@ -1,6 +1,6 @@
 #include "WindowHandler.h"
 
-#include "CameraHandler.h"
+#include "Camera.h"
 #include "EditorContext.h"
 #include "Journal.h"
 #include "settings/WindowSettings.h"
@@ -19,9 +19,9 @@ static VkSampleCountFlags samples_bit_flag(int samples);
 WindowHandler::WindowHandler(
         const window_settings_t& window_settings,
         vsg::ref_ptr<vsg::Window>& window,
-        const vsg::ref_ptr<CameraHandler>& camera_handler
+        const vsg::ref_ptr<Camera>& camera
     )
-    : camera_handler(camera_handler)
+    : camera(camera)
 {
     const auto window_traits = vsg::WindowTraits::create();
     window_traits->x = window_settings.pos_x;
@@ -50,12 +50,12 @@ void WindowHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
     const std::uint32_t width{configureWindow.width};
     const std::uint32_t height{configureWindow.height};
 
-    if (camera_handler)
+    if (camera)
     {
-        camera_handler->get_perspective()->aspectRatio =
+        camera->get_perspective()->aspectRatio =
             static_cast<double>(width) / static_cast<double>(height);
 
-        camera_handler->get_camera()->viewportState->set(0, 0, width, height);
+        camera->get_camera()->viewportState->set(0, 0, width, height);
     }
 }
 

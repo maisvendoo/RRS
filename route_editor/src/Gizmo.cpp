@@ -1,6 +1,6 @@
 #include "Gizmo.h"
 
-#include "CameraHandler.h"
+#include "Camera.h"
 #include "EditorContext.h"
 #include "IntersectionHandler.h"
 #include "Mask.h"
@@ -201,7 +201,7 @@ bool Gizmo::handle_intersections()
     }
 
     const vsg::dvec3& world_intersection = intersection->worldIntersection;
-    const vsg::dvec3& camera_front = context_.camera_handler->get_front();
+    const vsg::dvec3& camera_front = context_.camera->get_front();
 
     const double arrow_x_dot = std::abs(vsg::dot(camera_front, X_AXIS_POSITIVEd));
     const double arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVEd));
@@ -329,8 +329,8 @@ void Gizmo::update_visibility()
         ? vsg::MASK_OFF
         : MASK_GUI1 | MASK_CLICKABLE;
 
-    const vsg::dvec3& camera_pos = context_.camera_handler->get_look_at()->eye;
-    const double fov_rad = vsg::radians(context_.camera_handler->get_perspective()->fieldOfViewY);
+    const vsg::dvec3& camera_pos = context_.camera->get_look_at()->eye;
+    const double fov_rad = vsg::radians(context_.camera->get_perspective()->fieldOfViewY);
 
     const double distance_to_camera = vsg::length(curr_pos_ - camera_pos);
     const double tan_half_fov = std::tan(fov_rad * 0.5);

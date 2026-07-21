@@ -21,10 +21,10 @@ class ScrollWheelEvent;
 
 }
 
-class CameraHandler : public vsg::Inherit<vsg::Visitor, CameraHandler>
+class Camera : public vsg::Inherit<vsg::Visitor, Camera>
 {
 public:
-    CameraHandler(
+    Camera(
         const camera_settings_t& camera_settings,
         VkExtent2D window_extent,
         vsg::ref_ptr<Mouse>& mouse,
@@ -32,7 +32,7 @@ public:
         double& delta_time
     );
 
-    virtual ~CameraHandler() = default;
+    virtual ~Camera() = default;
 
     virtual void apply(vsg::MoveEvent& moveEvent) override;
     virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;

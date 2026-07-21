@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-class CameraHandler;
+class Camera;
 class Gizmo;
 class IntersectionHandler;
 class KeyboardHandler;
@@ -77,7 +77,7 @@ struct EditorContext
     vsg::ref_ptr<Mouse> mouse;
     vsg::ref_ptr<KeyboardHandler> keyboard_handler;
 
-    vsg::ref_ptr<CameraHandler> camera_handler;
+    vsg::ref_ptr<Camera> camera;
 
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
 
