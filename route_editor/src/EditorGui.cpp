@@ -484,7 +484,7 @@ void EditorGui::show_camera_settings() const
     if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &settings.camera_settings.fovy,
         &settings.camera_settings.fovy_min, &settings.camera_settings.fovy_max, "%.3f"))
     {
-        context_.perspective->fieldOfViewY = settings.camera_settings.fovy;
+        context_.camera_handler->get_perspective()->fieldOfViewY = settings.camera_settings.fovy;
     }
 
     ImGui::End();

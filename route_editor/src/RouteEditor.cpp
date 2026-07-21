@@ -80,7 +80,6 @@ bool RouteEditor::initialize()
 
     context_.camera_handler = CameraHandler::create(
         context_.settings.camera_settings,
-        context_.perspective,
         context_.orthographic,
         context_.look_at,
         context_.camera,
