@@ -16,6 +16,7 @@
 #include "SceneGraph.h"
 #include "Settings.h"
 #include "SingleSwitch.h"
+#include "StateManager.h"
 #include "UndoRedoSaveHandler.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
@@ -138,7 +139,8 @@ bool RouteEditor::initialize()
     viewer_->addEventHandler(mouse);
     viewer_->addEventHandler(undo_redo_save_handler);
 
-    viewer_->addEventHandler(EventHandler::create());
+    state_manager = std::make_unique<StateManager>();
+    viewer_->addEventHandler(EventHandler::create(*state_manager));
 
     viewer_->addEventHandler(context_.camera);
     viewer_->addEventHandler(context_.intersection_handler);

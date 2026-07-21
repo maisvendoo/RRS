@@ -3,8 +3,11 @@
 
 #include "EditorContext.h"
 
+#include <memory>
+
 class Keyboard;
 class Mouse;
+class StateManager;
 
 class RouteEditor
 {
@@ -26,6 +29,7 @@ private:
     vsg::ref_ptr<WindowHandler> window_handler_;
     vsg::ref_ptr<Mouse> mouse;
     vsg::ref_ptr<Keyboard> keyboard;
+    std::unique_ptr<StateManager> state_manager;
 };
 
 #endif // ROUTE_EDITOR_H
