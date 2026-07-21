@@ -34,15 +34,15 @@ void UndoRedoSaveHandler::apply(vsg::KeyPressEvent& keyPress)
 {
     (void)keyPress;
 
-    if (keyboard_->get_binding_state(ACTION_UNDO_COMMAND))
+    if (keyboard_->pressed(ACTION_UNDO_COMMAND))
     {
         commands_.undo();
     }
-    else if (keyboard_->get_binding_state(ACTION_REDO_COMMAND))
+    else if (keyboard_->pressed(ACTION_REDO_COMMAND))
     {
         commands_.redo();
     }
-    else if (keyboard_->get_binding_state(ACTION_SAVE_ROUTE))
+    else if (keyboard_->pressed(ACTION_SAVE_ROUTE))
     {
         save_route();
     }

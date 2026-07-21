@@ -44,8 +44,33 @@ bool Keyboard::get_alt_state() const
     return modifiers & vsg::MODKEY_Alt;
 }
 
-bool Keyboard::get_binding_state(Action action) const
+bool Keyboard::pressed_once(vsg::KeySymbol key, bool ignore_handled_keys) const
 {
-    const KeyBinding& key_binding = key_bindings_.at(action);
-    return (modifiers == key_binding.modifiers) && pressed(key_binding.key);
+    auto itr = keyState.find(key);
+    if (itr == keyState.end())
+    {
+        return false;
+    }
+
+    const auto& keyHistory = itr->second;
+
+    return (keyHistory.timeOfKeyRelease == keyHistory.timeOfFirstKeyPress) &&
+        (keyHistory.timeOfLastKeyPress == keyHistory.timeOfFirstKeyPress) &&
+        (!(ignore_handled_keys && keyHistory.handled));
+}
+
+bool Keyboard::pressed(Action action, bool ignore_handled_keys) const
+{
+    const KeyBinding& binding = key_bindings_.at(action);
+
+    return (binding.modifiers == modifiers) &&
+        vsg::Keyboard::pressed(binding.key, ignore_handled_keys);
+}
+
+bool Keyboard::pressed_once(Action action, bool ignore_handled_keys) const
+{
+    const KeyBinding& binding = key_bindings_.at(action);
+
+    return (binding.modifiers == modifiers) &&
+        pressed_once(binding.key, ignore_handled_keys);
 }

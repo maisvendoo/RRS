@@ -56,12 +56,6 @@ static vsg::ref_ptr<vsg::Commands> create_quad(
     return commands;
 }
 
-static int get_binding_state(vsg::ref_ptr<Keyboard> keyboard,
-    Action action)
-{
-    return static_cast<int>(keyboard->get_binding_state(action));
-}
-
 Camera::Camera(
     const camera_settings_t& camera_settings,
     VkExtent2D window_extent,
@@ -151,14 +145,14 @@ void Camera::apply(vsg::FrameEvent&)
         delta_time;
 
     look_at->eye += front_ * move_speed * static_cast<double>(
-        get_binding_state(keyboard, ACTION_MOVE_CAMERA_FORWARD) -
-        get_binding_state(keyboard, ACTION_MOVE_CAMERA_BACKWARD));
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_FORWARD)) -
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_BACKWARD)));
 
     look_at->eye += right_ * move_speed * static_cast<double>(
-        get_binding_state(keyboard, ACTION_MOVE_CAMERA_RIGHT) -
-        get_binding_state(keyboard, ACTION_MOVE_CAMERA_LEFT));
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_RIGHT)) -
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_LEFT)));
 
-    if (get_binding_state(keyboard, ACTION_CHANGE_PROJECTION_MATRIX))
+    if (keyboard->pressed(ACTION_CHANGE_PROJECTION_MATRIX))
     {
         if (camera->projectionMatrix == perspective)
         {

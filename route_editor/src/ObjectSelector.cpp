@@ -66,30 +66,25 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
 
     const auto keyboard = context_.keyboard;
 
-    const auto get_binding_state = [keyboard](Action action) -> bool
-    {
-        return keyboard->get_binding_state(action);
-    };
-
-    if (get_binding_state(ACTION_COPY_OBJECTS))
+    if (keyboard->pressed(ACTION_COPY_OBJECTS))
     {
         context_.copied_objects = selected_objects;
         return;
     }
-    else if (get_binding_state(ACTION_PASTE_OBJECTS))
+    else if (keyboard->pressed(ACTION_PASTE_OBJECTS))
     {
         context_.commands.push(new PasteObjects(context_), true);
         return;
     }
-    else if (get_binding_state(ACTION_DELETE_OBJECTS))
+    else if (keyboard->pressed(ACTION_DELETE_OBJECTS))
     {
         context_.commands.push(new DeleteObjects(context_), true);
         return;
     }
 
-    const bool pressed_action_move = get_binding_state(ACTION_TRANSLATE_OBJECTS);
-    const bool pressed_action_rotate = get_binding_state(ACTION_ROTATE_OBJECTS);
-    const bool pressed_action_scale = get_binding_state(ACTION_SCALE_OBJECTS);
+    const bool pressed_action_move = keyboard->pressed(ACTION_TRANSLATE_OBJECTS);
+    const bool pressed_action_rotate = keyboard->pressed(ACTION_ROTATE_OBJECTS);
+    const bool pressed_action_scale = keyboard->pressed(ACTION_SCALE_OBJECTS);
 
     if (!pressed_action_move && !pressed_action_rotate &&
         !pressed_action_scale)

@@ -22,7 +22,10 @@ public:
     bool get_shift_state() const;
     bool get_ctrl_state() const;
     bool get_alt_state() const;
-    bool get_binding_state(Action action) const;
+
+    bool pressed_once(vsg::KeySymbol key, bool ignore_handled_keys = true) const;
+    bool pressed(Action action, bool ignore_handled_keys = true) const;
+    bool pressed_once(Action action, bool ignore_handled_keys = true) const;
 
 private:
     const KeyBindings& key_bindings_;
