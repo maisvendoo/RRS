@@ -13,12 +13,10 @@ State::State(
 
 State::~State() = default;
 
-void State::handle_key_press(vsg::KeyPressEvent& keyPress)
+void State::handle_key_press()
 {
-    (void)keyPress;
 }
 
-void State::handle_key_release(vsg::KeyReleaseEvent& keyRelease)
+void State::handle_key_release()
 {
-    (void)keyRelease;
 }

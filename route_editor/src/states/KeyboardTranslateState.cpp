@@ -10,7 +10,6 @@ KeyboardTranslateState::KeyboardTranslateState(
 
 KeyboardTranslateState::~KeyboardTranslateState() = default;
 
-void KeyboardTranslateState::handle_key_press(vsg::KeyPressEvent& keyPress)
+void KeyboardTranslateState::handle_key_press()
 {
-    (void)keyPress;
 }

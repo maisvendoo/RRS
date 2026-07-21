@@ -10,7 +10,6 @@ InitialState::InitialState(
 
 InitialState::~InitialState() = default;
 
-void InitialState::handle_key_press(vsg::KeyPressEvent& keyPress)
+void InitialState::handle_key_press()
 {
-    (void)keyPress;
 }

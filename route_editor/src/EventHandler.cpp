@@ -12,12 +12,14 @@ EventHandler::~EventHandler() = default;
 
 void EventHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    state_manager.get_editor_state()->handle_key_press(keyPress);
+    static_cast<void>(keyPress);
+    state_manager.get_editor_state()->handle_key_press();
 }
 
 void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
-    state_manager.get_editor_state()->handle_key_release(keyRelease);
+    static_cast<void>(keyRelease);
+    state_manager.get_editor_state()->handle_key_release();
 }
 
 void EventHandler::apply(vsg::MoveEvent& moveEvent)

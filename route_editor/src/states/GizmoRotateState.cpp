@@ -10,7 +10,6 @@ GizmoRotateState::GizmoRotateState(
 
 GizmoRotateState::~GizmoRotateState() = default;
 
-void GizmoRotateState::handle_key_press(vsg::KeyPressEvent& keyPress)
+void GizmoRotateState::handle_key_press()
 {
-    (void)keyPress;
 }

@@ -10,7 +10,6 @@ KeyboardScaleState::KeyboardScaleState(
 
 KeyboardScaleState::~KeyboardScaleState() = default;
 
-void KeyboardScaleState::handle_key_press(vsg::KeyPressEvent& keyPress)
+void KeyboardScaleState::handle_key_press()
 {
-    (void)keyPress;
 }

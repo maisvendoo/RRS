@@ -6,14 +6,6 @@
 class Keyboard;
 class Mouse;
 
-namespace vsg
-{
-
-class KeyPressEvent;
-class KeyReleaseEvent;
-
-}
-
 class State
 {
 public:
@@ -24,9 +16,9 @@ public:
 
     virtual ~State();
 
-    virtual void handle_key_press(vsg::KeyPressEvent& keyPress);
+    virtual void handle_key_press();
 
-    virtual void handle_key_release(vsg::KeyReleaseEvent& keyRelease);
+    virtual void handle_key_release();
 
 protected:
     const vsg::ref_ptr<Mouse>& mouse;

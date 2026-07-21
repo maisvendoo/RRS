@@ -8,13 +8,6 @@
 class Keyboard;
 class Mouse;
 
-namespace vsg
-{
-
-class KeyPressEvent;
-
-}
-
 class InitialState : public State
 {
 public:
@@ -23,7 +16,7 @@ public:
         const vsg::ref_ptr<Keyboard>& keyboard
     );
     virtual ~InitialState() override;
-    virtual void handle_key_press(vsg::KeyPressEvent& keyPress) override;
+    virtual void handle_key_press() override;
 };
 
 #endif // INITIAL_STATE_H

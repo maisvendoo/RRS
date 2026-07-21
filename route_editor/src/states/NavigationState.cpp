@@ -10,7 +10,6 @@ NavigationState::NavigationState(
 
 NavigationState::~NavigationState() = default;
 
-void NavigationState::handle_key_press(vsg::KeyPressEvent& keyPress)
+void NavigationState::handle_key_press()
 {
-    (void)keyPress;
 }
