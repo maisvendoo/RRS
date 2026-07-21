@@ -139,7 +139,7 @@ bool RouteEditor::initialize()
     viewer_->addEventHandler(mouse);
     viewer_->addEventHandler(undo_redo_save_handler);
 
-    state_manager = std::make_unique<StateManager>();
+    state_manager = std::make_unique<StateManager>(mouse, keyboard);
     viewer_->addEventHandler(EventHandler::create(*state_manager));
 
     viewer_->addEventHandler(context_.camera);

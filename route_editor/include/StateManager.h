@@ -1,12 +1,20 @@
 #ifndef STATE_MANAGER_H
 #define STATE_MANAGER_H
 
+#include <vsg/core/ref_ptr.h>
+
+class Keyboard;
+class Mouse;
 class State;
 
 class StateManager
 {
 public:
-    StateManager();
+    StateManager(
+        const vsg::ref_ptr<Mouse>& mouse,
+        const vsg::ref_ptr<Keyboard>& keyboard
+    );
+
     ~StateManager();
 
     void defer_switch_to_route_not_loaded_state();

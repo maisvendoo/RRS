@@ -10,17 +10,22 @@
 #include "states/KeyboardTranslateState.h"
 #include "states/SelectRouteState.h"
 
-StateManager::StateManager()
+#include <vsg/core/ref_ptr.h>
+
+StateManager::StateManager(
+    const vsg::ref_ptr<Mouse>& mouse,
+    const vsg::ref_ptr<Keyboard>& keyboard
+)
 {
-    select_route_state = new SelectRouteState;
-    initial_state = new InitialState;
-    navigation_state = new NavigationState;
-    keyboard_translate_state = new KeyboardTranslateState;
-    keyboard_rotate_state = new KeyboardRotateState;
-    keyboard_scale_state = new KeyboardScaleState;
-    gizmo_translate_state = new GizmoTranslateState;
-    gizmo_rotate_state = new GizmoRotateState;
-    gizmo_scale_state = new GizmoScaleState;
+    select_route_state = new SelectRouteState(mouse, keyboard);
+    initial_state = new InitialState(mouse, keyboard);
+    navigation_state = new NavigationState(mouse, keyboard);
+    keyboard_translate_state = new KeyboardTranslateState(mouse, keyboard);
+    keyboard_rotate_state = new KeyboardRotateState(mouse, keyboard);
+    keyboard_scale_state = new KeyboardScaleState(mouse, keyboard);
+    gizmo_translate_state = new GizmoTranslateState(mouse, keyboard);
+    gizmo_rotate_state = new GizmoRotateState(mouse, keyboard);
+    gizmo_scale_state = new GizmoScaleState(mouse, keyboard);
 
     current_state = select_route_state;
     deferred_state = select_route_state;
