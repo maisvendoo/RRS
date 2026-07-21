@@ -131,11 +131,11 @@ bool RouteEditor::initialize()
 
     viewer_->addWindow(context_.window);
 
+    viewer_->addEventHandler(context_.keyboard);
     viewer_->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer_->addEventHandler(vsg::CloseHandler::create(viewer_));
     viewer_->addEventHandler(window_handler_);
     viewer_->addEventHandler(context_.mouse);
-    viewer_->addEventHandler(context_.keyboard);
     viewer_->addEventHandler(undo_redo_save_handler);
 
     viewer_->addEventHandler(EventHandler::create());
