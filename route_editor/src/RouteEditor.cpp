@@ -7,7 +7,6 @@
 #include "EventHandler.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
-#include "Keyboard.h"
 #include "KeyboardHandler.h"
 #include "Mask.h"
 #include "Mouse.h"
@@ -139,8 +138,7 @@ bool RouteEditor::initialize()
     viewer_->addEventHandler(context_.keyboard_handler);
     viewer_->addEventHandler(undo_redo_save_handler);
 
-    static Keyboard keyboard(context_.settings.key_bindings);
-    viewer_->addEventHandler(EventHandler::create(&keyboard));
+    viewer_->addEventHandler(EventHandler::create());
 
     viewer_->addEventHandler(context_.camera);
     viewer_->addEventHandler(context_.intersection_handler);

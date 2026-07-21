@@ -1,6 +1,5 @@
 #include "EventHandler.h"
 
-#include "Keyboard.h"
 #include "states/CameraNavigationState.h"
 #include "states/GizmoRotateState.h"
 #include "states/GizmoScaleState.h"
@@ -14,9 +13,8 @@
 
 #include <memory>
 
-EventHandler::EventHandler(Keyboard* keyboard)
-    : keyboard_(keyboard)
-    , select_route_state_(std::make_unique<SelectRouteState>())
+EventHandler::EventHandler()
+    : select_route_state_(std::make_unique<SelectRouteState>())
     , initial_state_(std::make_unique<InitialState>())
     , camera_navigation_state_(std::make_unique<CameraNavigationState>())
     , keyboard_translate_state_(std::make_unique<KeyboardTranslateState>())
@@ -33,12 +31,10 @@ EventHandler::~EventHandler() = default;
 
 void EventHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-    keyboard_->handle_key_press(keyPress);
     (*state_)->handle_key_press(keyPress);
 }
 
 void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
-    keyboard_->handle_key_release(keyRelease);
     (*state_)->handle_key_release(keyRelease);
 }
