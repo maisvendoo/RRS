@@ -1,5 +1,5 @@
-#ifndef KEY_BINDING_H
-#define KEY_BINDING_H
+#ifndef KEY_BINDINGS_H
+#define KEY_BINDINGS_H
 
 #include "Action.h"
 
@@ -16,4 +16,4 @@ struct KeyBinding
 
 using KeyBindings = std::array<KeyBinding, TOTAL_ACTIONS>;
 
-#endif // KEY_BINDING_H
+#endif // KEY_BINDINGS_H

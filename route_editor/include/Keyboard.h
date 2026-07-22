@@ -2,7 +2,7 @@
 #define KEYBOARD_H
 
 #include "Action.h"
-#include "KeyBinding.h"
+#include "KeyBindings.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/ui/KeyEvent.h>

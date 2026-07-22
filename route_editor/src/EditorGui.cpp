@@ -6,7 +6,7 @@
 #include "EditorState.h"
 #include "Gizmo.h"
 #include "Journal.h"
-#include "KeyBinding.h"
+#include "KeyBindings.h"
 #include "ObjectSelector.h"
 #include "Route.h"
 #include "RouteObject.h"

@@ -2,7 +2,7 @@
 
 #include "Action.h"
 #include "Journal.h"
-#include "KeyBinding.h"
+#include "KeyBindings.h"
 
 #include <CfgReader.h>
 

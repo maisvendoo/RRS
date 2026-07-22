@@ -1,12 +1,9 @@
 #include "Keyboard.h"
 
 #include "Action.h"
-#include "EditorContext.h"
-#include "KeyBinding.h"
+#include "KeyBindings.h"
 
 #include <vsg/ui/KeyEvent.h>
-
-#include <cstdint>
 
 Keyboard::Keyboard(const KeyBindings& key_bindings)
     : key_bindings_{key_bindings}

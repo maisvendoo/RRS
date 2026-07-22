@@ -1,7 +1,7 @@
 #ifndef EDITOR_SETTINGS_H
 #define EDITOR_SETTINGS_H
 
-#include "KeyBinding.h"
+#include "KeyBindings.h"
 
 #include <string>
 
