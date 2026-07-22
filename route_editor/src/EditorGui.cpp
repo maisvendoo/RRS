@@ -11,7 +11,6 @@
 #include "Route.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
-#include "Settings.h"
 #include "filesystem.h"
 #include "rail-signal.h"
 #include "switch.h"
@@ -82,11 +81,13 @@ static bool drag_double3(const char* label, double* data, float speed = 1.0f,
 EditorGui::EditorGui(
     EditorContext& context,
     camera_settings_t& camera_settings,
-    gui_settings_t& gui_settings
+    gui_settings_t& gui_settings,
+    const KeyBindings& key_bindings
 )
     : context_(context)
     , camera_settings(camera_settings)
     , gui_settings(gui_settings)
+    , key_bindings(key_bindings)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -468,14 +469,14 @@ void EditorGui::show_key_bindings() const
 
             for (const auto& [modifier, name] : test_map)
             {
-                if (context_.settings.key_bindings[i].modifiers & modifier)
+                if (key_bindings.modifiers[i] & modifier)
                 {
                     label += name;
                     label += " + ";
                 }
             }
 
-            label += std::toupper(context_.settings.key_bindings[i].key);
+            label += std::toupper(key_bindings.keys[i]);
             ImGui::Text("%s", label.c_str());
         }
 

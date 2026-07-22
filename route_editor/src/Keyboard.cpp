@@ -58,16 +58,12 @@ bool Keyboard::pressed_once(vsg::KeySymbol key, bool ignore_handled_keys) const
 
 bool Keyboard::pressed(Action action, bool ignore_handled_keys) const
 {
-    const KeyBinding& binding = key_bindings_.at(action);
-
-    return (binding.modifiers == modifiers) &&
-        vsg::Keyboard::pressed(binding.key, ignore_handled_keys);
+    return (key_bindings_.modifiers[action] == modifiers) &&
+        vsg::Keyboard::pressed(key_bindings_.keys[action], ignore_handled_keys);
 }
 
 bool Keyboard::pressed_once(Action action, bool ignore_handled_keys) const
 {
-    const KeyBinding& binding = key_bindings_.at(action);
-
-    return (binding.modifiers == modifiers) &&
-        pressed_once(binding.key, ignore_handled_keys);
+    return (key_bindings_.modifiers[action] == modifiers) &&
+        pressed_once(key_bindings_.keys[action], ignore_handled_keys);
 }

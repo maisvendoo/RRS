@@ -1,7 +1,6 @@
 #include "WindowHandler.h"
 
 #include "Camera.h"
-#include "EditorContext.h"
 #include "Journal.h"
 #include "settings/WindowSettings.h"
 

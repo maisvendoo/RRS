@@ -2,6 +2,7 @@
 #define ROUTE_EDITOR_H
 
 #include "EditorContext.h"
+#include "KeyBindings.h"
 #include "settings/CameraSettings.h"
 #include "settings/GizmoSettings.h"
 #include "settings/GuiSettings.h"
@@ -42,6 +43,7 @@ private:
     gui_settings_t gui_settings;
     scene_settings_t scene_settings;
     window_settings_t window_settings;
+    KeyBindings key_bindings;
 };
 
 #endif // ROUTE_EDITOR_H

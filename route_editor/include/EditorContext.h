@@ -6,7 +6,6 @@
 #include "EditorState.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
-#include "Settings.h"
 
 #include <atomic>
 #include <mutex>
@@ -65,7 +64,6 @@ struct EditorContext
     ~EditorContext();
 
     EditorState state = EditorState::SELECT_ROUTE;
-    settings_t settings;
     CommandList commands;
 
     vsg::ref_ptr<vsg::Options> options;

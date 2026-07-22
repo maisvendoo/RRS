@@ -5,7 +5,6 @@
 #include "IntersectionHandler.h"
 #include "Mask.h"
 #include "RouteObject.h"
-#include "Settings.h"
 #include "SingleSwitch.h"
 #include "commands/CommandList.h"
 #include "commands/TranslateObjects.h"

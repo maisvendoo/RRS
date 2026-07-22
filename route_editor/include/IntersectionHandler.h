@@ -9,8 +9,6 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec2.h>
 
-struct EditorContext;
-
 namespace vsg
 {
 

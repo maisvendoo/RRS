@@ -1,6 +1,5 @@
 #include "IntersectionHandler.h"
 
-#include "EditorContext.h"
 #include "LSIntersector.h"
 #include "Mask.h"
 

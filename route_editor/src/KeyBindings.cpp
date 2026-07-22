@@ -1,10 +1,9 @@
-#include "Settings.h"
-
-#include "Action.h"
-#include "Journal.h"
 #include "KeyBindings.h"
 
+#include "Action.h"
+
 #include <CfgReader.h>
+#include <Journal.h>
 
 #include <vsg/ui/KeyEvent.h>
 
@@ -36,32 +35,31 @@ static constexpr const char* action_setting_names[TOTAL_ACTIONS] = {
     "ChangeProjectionMatrix"
 };
 
-settings_t::settings_t() = default;
+static const std::map<std::string, vsg::KeyModifier> modifier_map = {
+    {"alt", vsg::MODKEY_Alt},
+    {"ctrl", vsg::MODKEY_Control},
+    {"shift", vsg::MODKEY_Shift}
+};
 
-void settings_t::read(const std::string& cfg_path)
+KeyBindings::KeyBindings()
 {
-    CfgReader cfg;
-    if (!cfg.load(cfg_path.c_str()))
-    {
-        return;
-    }
-
-    const std::map<std::string, vsg::KeyModifier> modifier_name_map = {
-        {"alt", vsg::MODKEY_Alt},
-        {"ctrl", vsg::MODKEY_Control},
-        {"shift", vsg::MODKEY_Shift}
-    };
-
     for (int i = 0; i < TOTAL_ACTIONS; ++i)
     {
-        const Action action = static_cast<Action>(i);
+        keys[i] = static_cast<vsg::KeySymbol>(0);
+        modifiers[i] = 0;
+    }
+}
+
+void KeyBindings::read(CfgReader& cfg)
+{
+    for (int i = 0; i < TOTAL_ACTIONS; ++i)
+    {
         const char* const setting_name = action_setting_names[i];
 
         QString line;
-
         if (!cfg.getString("Keys", setting_name, line))
         {
-            Journal::instance()->error(QString("Failed to find key setting %1")
+            Journal::instance()->error(QString("Failed to find key binding %1")
                 .arg(setting_name));
             continue;
         }
@@ -71,22 +69,20 @@ void settings_t::read(const std::string& cfg_path)
         const QStringList strings = line.split(QRegularExpression("[ +]"),
             Qt::SkipEmptyParts);
 
-        const qsizetype string_size = strings.size();
-        if (string_size <= 0)
+        const qsizetype strings_size = strings.size();
+        if (strings_size <= 0)
         {
             continue;
         }
 
-        KeyBinding& key_binding = key_bindings[action];
-        key_binding.key = static_cast<vsg::KeySymbol>(
-            strings.back().front().toLatin1());
+        keys[i] = static_cast<vsg::KeySymbol>(strings.back().front().toLatin1());
 
-        for (qsizetype i = 0; i < string_size - 1; ++i)
+        for (qsizetype j = 0; j < strings_size; ++j)
         {
-            const auto found_it = modifier_name_map.find(strings[i].toStdString());
-            if (found_it != modifier_name_map.cend())
+            const auto found_it = modifier_map.find(strings[j].toStdString());
+            if (found_it != modifier_map.cend())
             {
-                key_binding.modifiers |= found_it->second;
+                modifiers[i] |= found_it->second;
             }
         }
     }

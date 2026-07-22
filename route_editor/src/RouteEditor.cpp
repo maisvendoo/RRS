@@ -17,7 +17,6 @@
 #include "Outline.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
-#include "Settings.h"
 #include "SingleSwitch.h"
 #include "StateManager.h"
 #include "UndoRedoSaveHandler.h"
@@ -77,7 +76,7 @@ bool RouteEditor::initialize()
     }
 
     mouse = Mouse::create();
-    keyboard = Keyboard::create(context_.settings.key_bindings);
+    keyboard = Keyboard::create(key_bindings);
     auto undo_redo_save_handler = UndoRedoSaveHandler::create(
         keyboard, context_.commands, context_.route_dir,
         context_.static_objects_mutex, context_.static_objects);
@@ -114,7 +113,7 @@ bool RouteEditor::initialize()
     const auto gui_view2 = vsg::View::create(context_.camera->get_camera(), context_.scene_graph);
     gui_view2->mask = MASK_GUI2;
 
-    const auto editor_gui = EditorGui::create(context_, camera_settings, gui_settings);
+    const auto editor_gui = EditorGui::create(context_, camera_settings, gui_settings, key_bindings);
 
     const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
 
@@ -225,8 +224,6 @@ void RouteEditor::initialize_journal(const char* filename) const
 void RouteEditor::read_settings()
 {
     const FileSystem& fs = FileSystem::getInstance();
-    context_.settings.read(fs.combinePath(
-        fs.getConfigDir(), "editor-settings.xml"));
     std::string cfg_path = fs.combinePath(fs.getConfigDir(), "editor-settings.xml");
     CfgReader cfg;
     if (!cfg.load(cfg_path.c_str()))
@@ -238,6 +235,7 @@ void RouteEditor::read_settings()
     gui_settings.read(cfg);
     scene_settings.read(cfg);
     window_settings.read(cfg);
+    key_bindings.read(cfg);
 }
 
 void RouteEditor::configure_shaders()

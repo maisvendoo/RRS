@@ -1,6 +1,7 @@
 #ifndef EDITOR_GUI_H
 #define EDITOR_GUI_H
 
+#include "KeyBindings.h"
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
@@ -26,7 +27,8 @@ public:
     EditorGui(
         EditorContext& context,
         camera_settings_t& camera_settings,
-        gui_settings_t& gui_settings
+        gui_settings_t& gui_settings,
+        const KeyBindings& key_bindings
     );
 
     ~EditorGui();
@@ -76,6 +78,7 @@ private:
     EditorContext& context_;
     camera_settings_t& camera_settings;
     gui_settings_t& gui_settings;
+    const KeyBindings& key_bindings;
 
     ImGuiWindowFlags window_flags_;
     ImGuiViewport* viewport;
