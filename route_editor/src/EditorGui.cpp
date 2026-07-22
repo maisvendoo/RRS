@@ -26,6 +26,7 @@
 #include "commands/RotateObjects.h"
 #include "commands/ScaleObjects.h"
 #include "commands/TranslateObjects.h"
+#include "settings/GuiSettings.h"
 
 #include "ImGuiFileDialog.h"
 
@@ -78,20 +79,25 @@ static bool drag_double3(const char* label, double* data, float speed = 1.0f,
         speed, min, max, "%.3f", flags);
 }
 
-EditorGui::EditorGui(EditorContext& context, camera_settings_t& camera_settings)
+EditorGui::EditorGui(
+    EditorContext& context,
+    camera_settings_t& camera_settings,
+    gui_settings_t& gui_settings
+)
     : context_(context)
     , camera_settings(camera_settings)
+    , gui_settings(gui_settings)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
 
     add_ttf_font("JetBrainsMono-Regular.ttf",
-        context.settings.gui_settings.font_size, nullptr,
+        gui_settings.font_size, nullptr,
         io.Fonts->GetGlyphRangesCyrillic());
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    if (!context.settings.gui_settings.is_editable)
+    if (!gui_settings.is_editable)
     {
         window_flags_ |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     }
@@ -142,8 +148,6 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
         }
         default:
         {
-            gui_settings_t& gui_settings = context_.settings.gui_settings;
-
             ImGui::Begin("Settings", nullptr, window_flags_);
             ImGui::Checkbox("Show objects.ref", &gui_settings.show_objects_ref);
             ImGui::Checkbox("Show route1.map", &gui_settings.show_route_map);

@@ -2,7 +2,6 @@
 #define EDITOR_SETTINGS_H
 
 #include "KeyBinding.h"
-#include "settings/GuiSettings.h"
 #include "settings/SceneSettings.h"
 #include "settings/WindowSettings.h"
 
@@ -12,7 +11,6 @@ struct settings_t
 {
     window_settings_t window_settings;
     scene_settings_t scene_settings;
-    gui_settings_t gui_settings;
 
     KeyBindings key_bindings;
 

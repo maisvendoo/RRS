@@ -11,6 +11,7 @@
 class RouteObject;
 struct EditorContext;
 struct camera_settings_t;
+struct gui_settings_t;
 
 namespace vsg
 {
@@ -22,7 +23,12 @@ class CommandBuffer;
 class EditorGui : public vsg::Inherit<vsg::Command, EditorGui>
 {
 public:
-    EditorGui(EditorContext& context, camera_settings_t& camera_settings);
+    EditorGui(
+        EditorContext& context,
+        camera_settings_t& camera_settings,
+        gui_settings_t& gui_settings
+    );
+
     ~EditorGui();
 
     void record(vsg::CommandBuffer& command_buffer) const override;
@@ -69,6 +75,7 @@ private:
 private:
     EditorContext& context_;
     camera_settings_t& camera_settings;
+    gui_settings_t& gui_settings;
 
     ImGuiWindowFlags window_flags_;
     ImGuiViewport* viewport;

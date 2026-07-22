@@ -115,7 +115,7 @@ bool RouteEditor::initialize()
     const auto gui_view2 = vsg::View::create(context_.camera->get_camera(), context_.scene_graph);
     gui_view2->mask = MASK_GUI2;
 
-    const auto editor_gui = EditorGui::create(context_, camera_settings);
+    const auto editor_gui = EditorGui::create(context_, camera_settings, gui_settings);
 
     const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
 
@@ -237,6 +237,7 @@ void RouteEditor::read_settings()
     }
     camera_settings.read(cfg);
     gizmo_settings.read(cfg);
+    gui_settings.read(cfg);
 }
 
 void RouteEditor::configure_shaders()

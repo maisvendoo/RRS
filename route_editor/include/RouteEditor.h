@@ -4,6 +4,7 @@
 #include "EditorContext.h"
 #include "settings/CameraSettings.h"
 #include "settings/GizmoSettings.h"
+#include "settings/GuiSettings.h"
 
 #include <memory>
 
@@ -36,6 +37,7 @@ private:
     std::unique_ptr<StateManager> state_manager;
     camera_settings_t camera_settings;
     gizmo_settings_t gizmo_settings;
+    gui_settings_t gui_settings;
 };
 
 #endif // ROUTE_EDITOR_H

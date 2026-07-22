@@ -48,7 +48,6 @@ void settings_t::read(const std::string& cfg_path)
 
     window_settings.read(cfg);
     scene_settings.read(cfg);
-    gui_settings.read(cfg);
 
     const std::map<std::string, vsg::KeyModifier> modifier_name_map = {
         {"alt", vsg::MODKEY_Alt},
