@@ -2,14 +2,11 @@
 #define EDITOR_SETTINGS_H
 
 #include "KeyBinding.h"
-#include "settings/WindowSettings.h"
 
 #include <string>
 
 struct settings_t
 {
-    window_settings_t window_settings;
-
     KeyBindings key_bindings;
 
     settings_t();

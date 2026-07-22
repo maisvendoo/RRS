@@ -6,6 +6,7 @@
 #include "settings/GizmoSettings.h"
 #include "settings/GuiSettings.h"
 #include "settings/SceneSettings.h"
+#include "settings/WindowSettings.h"
 
 #include <memory>
 
@@ -40,6 +41,7 @@ private:
     gizmo_settings_t gizmo_settings;
     gui_settings_t gui_settings;
     scene_settings_t scene_settings;
+    window_settings_t window_settings;
 };
 
 #endif // ROUTE_EDITOR_H

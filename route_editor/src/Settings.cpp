@@ -46,8 +46,6 @@ void settings_t::read(const std::string& cfg_path)
         return;
     }
 
-    window_settings.read(cfg);
-
     const std::map<std::string, vsg::KeyModifier> modifier_name_map = {
         {"alt", vsg::MODKEY_Alt},
         {"ctrl", vsg::MODKEY_Control},

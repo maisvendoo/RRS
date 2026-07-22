@@ -69,8 +69,7 @@ bool RouteEditor::initialize()
 
     configure_shaders();
 
-    window_handler_ = WindowHandler::create(context_.settings.window_settings,
-        context_.window, context_.camera);
+    window_handler_ = WindowHandler::create(window_settings, context_.window, context_.camera);
 
     if (!context_.window)
     {
@@ -238,6 +237,7 @@ void RouteEditor::read_settings()
     gizmo_settings.read(cfg);
     gui_settings.read(cfg);
     scene_settings.read(cfg);
+    window_settings.read(cfg);
 }
 
 void RouteEditor::configure_shaders()
