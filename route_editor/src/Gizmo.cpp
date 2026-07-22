@@ -46,10 +46,16 @@ static constexpr vsg::dvec3 X_AXIS_POSITIVEd = {1.0, 0.0, 0.0};
 static constexpr vsg::dvec3 Y_AXIS_POSITIVEd = {0.0, 1.0, 0.0};
 static constexpr vsg::dvec3 Z_AXIS_POSITIVEd = {0.0, 0.0, 1.0};
 
-Gizmo::Gizmo(EditorContext& context, const gizmo_settings_t& gizmo_settings, vsg::ref_ptr<IntersectionHandler>& intersection_handler)
+Gizmo::Gizmo(
+    EditorContext& context,
+    const gizmo_settings_t& gizmo_settings,
+    vsg::ref_ptr<IntersectionHandler>& intersection_handler,
+    const vsg::ref_ptr<Camera>& camera
+)
     : context_(context)
     , gizmo_settings(gizmo_settings)
     , intersection_handler(intersection_handler)
+    , camera(camera)
 {
     builder_.shaderSet = vsg::createFlatShadedShaderSet();
 
@@ -200,7 +206,7 @@ bool Gizmo::handle_intersections()
     }
 
     const vsg::dvec3& world_intersection = intersection->worldIntersection;
-    const vsg::dvec3& camera_front = context_.camera->get_front();
+    const vsg::dvec3& camera_front = camera->get_front();
 
     const double arrow_x_dot = std::abs(vsg::dot(camera_front, X_AXIS_POSITIVEd));
     const double arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVEd));
@@ -328,8 +334,8 @@ void Gizmo::update_visibility()
         ? vsg::MASK_OFF
         : MASK_GUI1 | MASK_CLICKABLE;
 
-    const vsg::dvec3& camera_pos = context_.camera->get_look_at()->eye;
-    const double fov_rad = vsg::radians(context_.camera->get_perspective()->fieldOfViewY);
+    const vsg::dvec3& camera_pos = camera->get_look_at()->eye;
+    const double fov_rad = vsg::radians(camera->get_perspective()->fieldOfViewY);
 
     const double distance_to_camera = vsg::length(curr_pos_ - camera_pos);
     const double tan_half_fov = std::tan(fov_rad * 0.5);

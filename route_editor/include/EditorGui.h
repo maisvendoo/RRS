@@ -10,6 +10,7 @@
 
 #include <cstddef>
 
+class Camera;
 class RouteObject;
 struct EditorContext;
 struct camera_settings_t;
@@ -30,7 +31,8 @@ public:
         camera_settings_t& camera_settings,
         gui_settings_t& gui_settings,
         const KeyBindings& key_bindings,
-        StateManager& state_manager
+        StateManager& state_manager,
+        const vsg::ref_ptr<Camera>& camera
     );
 
     ~EditorGui();
@@ -81,6 +83,7 @@ private:
     gui_settings_t& gui_settings;
     const KeyBindings& key_bindings;
     StateManager& state_manager;
+    const vsg::ref_ptr<Camera>& camera;
 
     ImGuiWindowFlags window_flags_;
     ImGuiViewport* viewport;

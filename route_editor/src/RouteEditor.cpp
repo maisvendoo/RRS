@@ -68,7 +68,7 @@ bool RouteEditor::initialize()
 
     configure_shaders();
 
-    window_handler_ = WindowHandler::create(window_settings, context_.window, context_.camera);
+    window_handler_ = WindowHandler::create(window_settings, context_.window, camera);
 
     if (!context_.window)
     {
@@ -81,7 +81,7 @@ bool RouteEditor::initialize()
         keyboard, context_.commands, context_.route_dir,
         context_.static_objects_mutex, context_.static_objects);
 
-    context_.camera = Camera::create(
+    camera = Camera::create(
         camera_settings,
         context_.window->extent2D(),
         mouse,
@@ -89,12 +89,12 @@ bool RouteEditor::initialize()
         context_.delta_time
     );
 
-    context_.intersection_handler = IntersectionHandler::create(context_.camera->get_camera());
+    context_.intersection_handler = IntersectionHandler::create(camera->get_camera());
     context_.scene_graph = SceneGraph::create(context_, camera_settings);
 
     context_.outline_builder = OutlineBuilder::create();
 
-    const auto scene_view = vsg::View::create(context_.camera->get_camera(), context_.scene_graph);
+    const auto scene_view = vsg::View::create(camera->get_camera(), context_.scene_graph);
     scene_view->mask = MASK_SCENE;
 
     VkClearValue clear_value{};
@@ -107,15 +107,15 @@ bool RouteEditor::initialize()
         vsg::ClearAttachments::Attachments{attachment},
         vsg::ClearAttachments::Rects{rect});
 
-    const auto gui_view1 = vsg::View::create(context_.camera->get_camera(), context_.scene_graph);
+    const auto gui_view1 = vsg::View::create(camera->get_camera(), context_.scene_graph);
     gui_view1->mask = MASK_GUI1;
 
-    const auto gui_view2 = vsg::View::create(context_.camera->get_camera(), context_.scene_graph);
+    const auto gui_view2 = vsg::View::create(camera->get_camera(), context_.scene_graph);
     gui_view2->mask = MASK_GUI2;
 
     state_manager = std::make_unique<StateManager>(mouse, keyboard);
     const auto editor_gui = EditorGui::create(context_, camera_settings,
-        gui_settings, key_bindings, *state_manager);
+        gui_settings, key_bindings, *state_manager, camera);
 
     const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
 
@@ -133,7 +133,8 @@ bool RouteEditor::initialize()
 
     viewer_ = vsg::Viewer::create();
 
-    context_.object_selector = ObjectSelector::create(context_, mouse, keyboard, gizmo_settings);
+    context_.object_selector = ObjectSelector::create(context_, mouse, keyboard,
+        gizmo_settings, camera);
 
     viewer_->addWindow(context_.window);
 
@@ -146,7 +147,7 @@ bool RouteEditor::initialize()
 
     viewer_->addEventHandler(EventHandler::create(*state_manager));
 
-    viewer_->addEventHandler(context_.camera);
+    viewer_->addEventHandler(camera);
     viewer_->addEventHandler(context_.intersection_handler);
     viewer_->addEventHandler(context_.object_selector);
 

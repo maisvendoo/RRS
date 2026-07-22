@@ -1,6 +1,7 @@
 #ifndef OBJECT_SELECTOR_H
 #define OBJECT_SELECTOR_H
 
+#include "Camera.h"
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
@@ -30,7 +31,8 @@ public:
         EditorContext& context,
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
-        const gizmo_settings_t& gizmo_settings
+        const gizmo_settings_t& gizmo_settings,
+        const vsg::ref_ptr<Camera>& camera
     );
 
     void apply(vsg::KeyPressEvent& keyPress) override;
@@ -58,6 +60,7 @@ private:
     EditorContext& context_;
     const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
+    const vsg::ref_ptr<Camera>& camera;
 
     vsg::dvec3 prev_intersect_pos_;
     vsg::dvec3 total_translation_;

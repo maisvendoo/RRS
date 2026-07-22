@@ -44,6 +44,7 @@ private:
     scene_settings_t scene_settings;
     window_settings_t window_settings;
     KeyBindings key_bindings;
+    vsg::ref_ptr<Camera> camera;
 };
 
 #endif // ROUTE_EDITOR_H

@@ -86,13 +86,15 @@ EditorGui::EditorGui(
     camera_settings_t& camera_settings,
     gui_settings_t& gui_settings,
     const KeyBindings& key_bindings,
-    StateManager& state_manager
+    StateManager& state_manager,
+    const vsg::ref_ptr<Camera>& camera
 )
     : context_(context)
     , camera_settings(camera_settings)
     , gui_settings(gui_settings)
     , key_bindings(key_bindings)
     , state_manager(state_manager)
+    , camera(camera)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -342,12 +344,12 @@ void EditorGui::show_stations_conf() const
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                context_.camera->get_look_at()->eye = translation +
+                camera->get_look_at()->eye = translation +
                     vsg::dvec3(0.0, 0.0, 50.0);
 
-                context_.camera->get_look_at()->center =
-                    context_.camera->get_look_at()->eye +
-                    context_.camera->get_front();
+                camera->get_look_at()->center =
+                    camera->get_look_at()->eye +
+                    camera->get_front();
             }
             ImGui::TableNextColumn();
             ImGui::Text(number_format, translation.x);
@@ -405,14 +407,14 @@ void EditorGui::show_waypoints_conf() const
 
                     double h = 5.0;
 
-                    context_.camera->get_look_at()->eye =
+                    camera->get_look_at()->eye =
                         vsg::dvec3(pos.x + pd.up.x * h,
                             pos.y + pd.up.y * h,
                             pos.z + pd.up.z * h);
 
-                    context_.camera->get_look_at()->center =
-                        context_.camera->get_look_at()->eye +
-                        context_.camera->get_front();
+                    camera->get_look_at()->center =
+                        camera->get_look_at()->eye +
+                        camera->get_front();
                 }
             }
             ImGui::TableNextColumn();
@@ -493,7 +495,7 @@ void EditorGui::show_camera_settings() const
     if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &camera_settings.fovy,
         &camera_settings.fovy_min, &camera_settings.fovy_max, "%.3f"))
     {
-        context_.camera->get_perspective()->fieldOfViewY = camera_settings.fovy;
+        camera->get_perspective()->fieldOfViewY = camera_settings.fovy;
     }
 
     ImGui::End();
@@ -679,8 +681,8 @@ void EditorGui::add_object(
 ) const
 {
     const auto object = RouteObject::create(context_, paged_lod, label,
-        context_.camera->get_look_at()->eye +
-        context_.camera->get_front() * 20.0);
+        camera->get_look_at()->eye +
+        camera->get_front() * 20.0);
 
     context_.commands.push(new AddObject(context_, object), true);
 }

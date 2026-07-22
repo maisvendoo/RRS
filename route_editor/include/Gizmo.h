@@ -1,6 +1,7 @@
 #ifndef GIZMO_H
 #define GIZMO_H
 
+#include "Camera.h"
 #include "IntersectionHandler.h"
 #include "SingleSwitch.h"
 #include "settings/GizmoSettings.h"
@@ -25,7 +26,12 @@ class Node;
 class Gizmo : public vsg::Inherit<SingleSwitch, Gizmo>
 {
 public:
-    Gizmo(EditorContext& context, const gizmo_settings_t& gizmo_settings, vsg::ref_ptr<IntersectionHandler>& intersection_handler);
+    Gizmo(
+        EditorContext& context,
+        const gizmo_settings_t& gizmo_settings,
+        vsg::ref_ptr<IntersectionHandler>& intersection_handler,
+        const vsg::ref_ptr<Camera>& camera
+    );
 
     bool handle_intersections();
 
@@ -41,6 +47,7 @@ private:
     EditorContext& context_;
     const gizmo_settings_t& gizmo_settings;
     vsg::ref_ptr<IntersectionHandler>& intersection_handler;
+    const vsg::ref_ptr<Camera>& camera;
 
     vsg::Builder builder_;
     vsg::ref_ptr<vsg::MatrixTransform> matrix_transform_;

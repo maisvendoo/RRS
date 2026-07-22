@@ -70,8 +70,6 @@ struct EditorContext
 
     vsg::ref_ptr<vsg::Window> window;
 
-    vsg::ref_ptr<Camera> camera;
-
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
 
     vsg::ref_ptr<SceneGraph> scene_graph;
