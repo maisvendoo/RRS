@@ -1,5 +1,6 @@
 #include "StateManager.h"
 
+#include "Journal.h"
 #include "states/NavigationState.h"
 #include "states/GizmoRotateState.h"
 #include "states/GizmoScaleState.h"
@@ -98,9 +99,16 @@ void StateManager::update(double delta_time)
 {
     if (current_state != deferred_state)
     {
-        // TODO
+        Journal::instance()->info(QString("'%1' -> '%2'")
+            .arg(current_state->get_name())
+            .arg(deferred_state->get_name()));
+
+        current_state->on_deactivate();
+        current_state = deferred_state;
+        deferred_state->on_activate();
     }
-    // TODO
+
+    current_state->update(delta_time);
 }
 
 State* StateManager::get_editor_state() const

@@ -13,3 +13,8 @@ KeyboardScaleState::~KeyboardScaleState() = default;
 void KeyboardScaleState::handle_key_press()
 {
 }
+
+const char* KeyboardScaleState::get_name() const
+{
+    return "KeyboardScaleState";
+}

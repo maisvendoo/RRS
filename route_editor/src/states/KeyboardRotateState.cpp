@@ -13,3 +13,8 @@ KeyboardRotateState::~KeyboardRotateState() = default;
 void KeyboardRotateState::handle_key_press()
 {
 }
+
+const char* KeyboardRotateState::get_name() const
+{
+    return "KeyboardRotateState";
+}

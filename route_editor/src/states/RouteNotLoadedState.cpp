@@ -28,3 +28,8 @@ void RouteNotLoadedState::fill_status_bar() const
             "Load route", nullptr, config);
     }
 }
+
+const char* RouteNotLoadedState::get_name() const
+{
+    return "RouteNotLoadedState";
+}

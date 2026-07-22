@@ -13,3 +13,8 @@ InitialState::~InitialState() = default;
 void InitialState::handle_key_press()
 {
 }
+
+const char* InitialState::get_name() const
+{
+    return "InitialState";
+}

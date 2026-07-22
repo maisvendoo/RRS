@@ -16,6 +16,10 @@ public:
 
     virtual ~State();
 
+    virtual void on_activate();
+
+    virtual void on_deactivate();
+
     virtual void handle_key_press();
 
     virtual void handle_key_release();
@@ -27,6 +31,8 @@ public:
     virtual void update(double delta_time);
 
     virtual void fill_status_bar() const;
+
+    virtual const char* get_name() const;
 
 protected:
     const vsg::ref_ptr<Mouse>& mouse;

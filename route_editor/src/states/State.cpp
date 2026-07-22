@@ -13,6 +13,14 @@ State::State(
 
 State::~State() = default;
 
+void State::on_activate()
+{
+}
+
+void State::on_deactivate()
+{
+}
+
 void State::handle_key_press()
 {
 }
@@ -36,4 +44,9 @@ void State::update(double delta_time)
 
 void State::fill_status_bar() const
 {
+}
+
+const char* State::get_name() const
+{
+    return "State";
 }

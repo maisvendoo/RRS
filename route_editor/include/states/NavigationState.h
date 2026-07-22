@@ -17,6 +17,7 @@ public:
     );
     virtual ~NavigationState() override;
     virtual void handle_key_press() override;
+    virtual const char* get_name() const override;
 };
 
 #endif // NAVIGATION_STATE_H
