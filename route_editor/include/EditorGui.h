@@ -69,6 +69,15 @@ private:
     EditorContext& context_;
 
     ImGuiWindowFlags window_flags_;
+    ImGuiViewport* viewport;
+
+private:
+    void add_ttf_font(
+        const char* filename,
+        float size_pixels,
+        const ImFontConfig* font_cfg = nullptr,
+        const ImWchar* glyph_ranges = nullptr
+    );
 };
 
 #endif // EDITOR_GUI_H

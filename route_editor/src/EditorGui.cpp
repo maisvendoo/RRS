@@ -84,13 +84,9 @@ EditorGui::EditorGui(EditorContext& context)
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
 
-    const FileSystem& fs = FileSystem::getInstance();
-
-    const char* const font_name = "JetBrainsMono-Regular.ttf";
-    const auto font_path = fs.combinePath(fs.getFontsDir(), font_name);
-
-    io.Fonts->AddFontFromFileTTF(font_path.c_str(), context.settings.gui_settings.font_size,
-        nullptr, io.Fonts->GetGlyphRangesCyrillic());
+    add_ttf_font("JetBrainsMono-Regular.ttf",
+        context.settings.gui_settings.font_size, nullptr,
+        io.Fonts->GetGlyphRangesCyrillic());
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
@@ -103,6 +99,8 @@ EditorGui::EditorGui(EditorContext& context)
     style.FrameBorderSize = 1.0f;
     style.ScrollbarSize = 16.0f;
     style.GrabMinSize = 16.0f;
+
+    viewport = ImGui::GetMainViewport();
 }
 
 EditorGui::~EditorGui()
@@ -113,6 +111,25 @@ EditorGui::~EditorGui()
 void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 {
     (void)command_buffer;
+
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("New route"))
+            {
+                // TODO
+            }
+
+            if (ImGui::MenuItem("Load route"))
+            {
+
+            }
+
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
 
     switch (context_.state)
     {
@@ -799,4 +816,18 @@ void EditorGui::handle_scale_drag(
             context_.gizmo->get_curr_pos(), total_scale), false);
         dragging = false;
     }
+}
+
+void EditorGui::add_ttf_font(
+    const char* filename,
+    float size_pixels,
+    const ImFontConfig* font_cfg,
+    const ImWchar* glyph_ranges
+)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    const FileSystem& fs = FileSystem::getInstance();
+    const std::string font_path = fs.combinePath(fs.getFontsDir(), filename);
+    io.Fonts->AddFontFromFileTTF(font_path.c_str(), size_pixels, font_cfg,
+        glyph_ranges);
 }
