@@ -1,5 +1,5 @@
-#ifndef INITIAL_STATE_H
-#define INITIAL_STATE_H
+#ifndef BASIC_EDITOR_STATE_H
+#define BASIC_EDITOR_STATE_H
 
 #include "states/State.h"
 
@@ -8,16 +8,16 @@
 class Keyboard;
 class Mouse;
 
-class InitialState : public State
+class BasicEditorState : public State
 {
 public:
-    InitialState(
+    BasicEditorState(
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard
     );
-    virtual ~InitialState() override;
+    virtual ~BasicEditorState() override;
     virtual void handle_key_press() override;
     virtual const char* get_name() const override;
 };
 
-#endif // INITIAL_STATE_H
+#endif // BASIC_EDITOR_STATE_H

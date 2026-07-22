@@ -5,7 +5,7 @@
 #include "states/GizmoRotateState.h"
 #include "states/GizmoScaleState.h"
 #include "states/GizmoTranslateState.h"
-#include "states/InitialState.h"
+#include "states/BasicEditorState.h"
 #include "states/KeyboardRotateState.h"
 #include "states/KeyboardScaleState.h"
 #include "states/KeyboardTranslateState.h"
@@ -19,7 +19,7 @@ StateManager::StateManager(
 )
 {
     route_not_loaded_state = new RouteNotLoadedState(mouse, keyboard);
-    initial_state = new InitialState(mouse, keyboard);
+    basic_editor_state = new BasicEditorState(mouse, keyboard);
     navigation_state = new NavigationState(mouse, keyboard);
     keyboard_translate_state = new KeyboardTranslateState(mouse, keyboard);
     keyboard_rotate_state = new KeyboardRotateState(mouse, keyboard);
@@ -41,7 +41,7 @@ StateManager::~StateManager()
     delete keyboard_rotate_state;
     delete keyboard_translate_state;
     delete navigation_state;
-    delete initial_state;
+    delete basic_editor_state;
     delete route_not_loaded_state;
 }
 
@@ -52,7 +52,7 @@ void StateManager::defer_switch_to_route_not_loaded_state()
 
 void StateManager::defer_switch_to_basic_editor_state()
 {
-    deferred_state = initial_state;
+    deferred_state = basic_editor_state;
 }
 
 void StateManager::defer_switch_to_navigation_state()

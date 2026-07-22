@@ -37,7 +37,7 @@ private:
     State* deferred_state;
 
     State* route_not_loaded_state;
-    State* initial_state;
+    State* basic_editor_state;
     State* navigation_state;
 
     State* keyboard_translate_state;
