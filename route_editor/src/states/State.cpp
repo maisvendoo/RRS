@@ -33,3 +33,7 @@ void State::update(double delta_time)
 {
     static_cast<void>(delta_time);
 }
+
+void State::fill_status_bar() const
+{
+}

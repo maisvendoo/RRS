@@ -5,6 +5,7 @@
 #include "EditorContext.h"
 #include "EditorState.h"
 #include "Gizmo.h"
+#include "states/State.h"
 #include "Journal.h"
 #include "KeyBindings.h"
 #include "ObjectSelector.h"
@@ -95,6 +96,7 @@ EditorGui::EditorGui(
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = nullptr;
 
     add_ttf_font("JetBrainsMono-Regular.ttf",
         gui_settings.font_size, nullptr,
@@ -147,13 +149,13 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
     }
 
     draw_status_bar();
+    draw_load_route_file_dialog();
+    draw_invalid_route_popup();
 
     switch (context_.state)
     {
         case EditorState::SELECT_ROUTE:
         {
-            select_route();
-
             return;
         }
         default:
@@ -222,30 +224,6 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 
             return;
         }
-    }
-}
-
-void EditorGui::select_route() const
-{
-    static bool dialog_opened = false;
-    if (!dialog_opened)
-    {
-        IGFD::FileDialogConfig config;
-        config.path = "../routes";
-        ImGuiFileDialog::Instance()->OpenDialog(
-            "select_route", "Select route", nullptr, config);
-        dialog_opened = true;
-    }
-
-    if (ImGuiFileDialog::Instance()->Display("select_route"))
-    {
-        if (ImGuiFileDialog::Instance()->IsOk())
-        {
-            context_.route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
-            context_.state = EditorState::LOAD_ROUTE;
-        }
-
-        ImGuiFileDialog::Instance()->Close();
     }
 }
 
@@ -867,7 +845,70 @@ void EditorGui::draw_status_bar() const
 
     if (ImGui::Begin("StatusBar", nullptr, flags))
     {
-        ImGui::Text("Status bar");
+        state_manager.get_editor_state()->fill_status_bar();
         ImGui::End();
+    }
+}
+
+void EditorGui::draw_load_route_file_dialog() const
+{
+    if (ImGuiFileDialog::Instance()->IsOpened("LoadRouteKey"))
+    {
+        ImGui::SetNextWindowPos(viewport->WorkPos);
+        ImGui::SetNextWindowSize(ImVec2(
+            viewport->WorkSize.x,
+            viewport->WorkSize.y - ImGui::GetFrameHeight() * 1.5
+        ));
+    }
+
+    if (ImGuiFileDialog::Instance()->Display("LoadRouteKey",
+        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoCollapse))
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            context_.route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
+            if (!std::filesystem::exists(context_.route_dir + "/models") ||
+                !std::filesystem::exists(context_.route_dir + "/textures") ||
+                !std::filesystem::exists(context_.route_dir + "/topology") ||
+                !std::filesystem::exists(context_.route_dir + "/objects.ref"))
+            {
+                ImGui::OpenPopup("InvalidRoute");
+            }
+            else
+            {
+                // state_manager.defer_switch_to_basic_editor_state();
+                // route.start_load(route_dir);
+                context_.state = EditorState::LOAD_ROUTE;
+                ImGuiFileDialog::Instance()->Close();
+            }
+        }
+        else
+        {
+            ImGuiFileDialog::Instance()->Close();
+        }
+    }
+}
+
+void EditorGui::draw_invalid_route_popup() const
+{
+    if (ImGui::BeginPopupModal("InvalidRoute", nullptr,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
+    {
+        ImGui::Text(
+            "Invalid route!\n"
+            "Route must contain:\n"
+            "models/\n"
+            "textures/\n"
+            "topology/\n"
+            "objects.ref"
+        );
+
+        if (ImGui::Button("OK", ImVec2(-FLT_MIN, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
     }
 }

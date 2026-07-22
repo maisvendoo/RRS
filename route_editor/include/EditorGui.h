@@ -38,7 +38,6 @@ public:
     void record(vsg::CommandBuffer& command_buffer) const override;
 
 private:
-    void select_route() const;
     void show_objects_ref() const;
     void show_route_map() const;
     void show_stations_conf() const;
@@ -95,6 +94,10 @@ private:
     );
 
     void draw_status_bar() const;
+
+    void draw_load_route_file_dialog() const;
+
+    void draw_invalid_route_popup() const;
 };
 
 #endif // EDITOR_GUI_H

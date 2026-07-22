@@ -26,6 +26,8 @@ public:
 
     virtual void update(double delta_time);
 
+    virtual void fill_status_bar() const;
+
 protected:
     const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
