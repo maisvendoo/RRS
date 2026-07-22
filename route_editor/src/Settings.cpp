@@ -48,7 +48,6 @@ void settings_t::read(const std::string& cfg_path)
 
     window_settings.read(cfg);
     scene_settings.read(cfg);
-    camera_settings.read(cfg);
     gizmo_settings.read(cfg);
     gui_settings.read(cfg);
 

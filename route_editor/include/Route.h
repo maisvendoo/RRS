@@ -5,11 +5,12 @@
 #include <vsg/nodes/Switch.h>
 
 struct EditorContext;
+struct camera_settings_t;
 
 class Route : public vsg::Inherit<vsg::Switch, Route>
 {
 public:
-    Route(EditorContext& context);
+    Route(EditorContext& context, const camera_settings_t& camera_settings);
 
 private:
     bool load_objects_ref();
@@ -22,6 +23,7 @@ private:
 
 private:
     EditorContext& context_;
+    const camera_settings_t& camera_settings;
 };
 
 #endif // ROUTE_H

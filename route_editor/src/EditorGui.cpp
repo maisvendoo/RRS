@@ -78,8 +78,9 @@ static bool drag_double3(const char* label, double* data, float speed = 1.0f,
         speed, min, max, "%.3f", flags);
 }
 
-EditorGui::EditorGui(EditorContext& context)
+EditorGui::EditorGui(EditorContext& context, camera_settings_t& camera_settings)
     : context_(context)
+    , camera_settings(camera_settings)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -487,21 +488,20 @@ void EditorGui::show_camera_settings() const
     constexpr double min = 0.0;
 
     ImGui::Text("Move speed:");
-    drag_double("##move_speed", &context_.settings.camera_settings.move_speed, &min);
+    drag_double("##move_speed", &camera_settings.move_speed, &min);
 
     ImGui::Text("Rotate speed:");
-    drag_double("##rotate_speed", &context_.settings.camera_settings.rotate_speed, &min);
+    drag_double("##rotate_speed", &camera_settings.rotate_speed, &min);
 
     ImGui::Text("Zoom power:");
-    drag_double("##zoom_power", &context_.settings.camera_settings.zoom_power, &min);
+    drag_double("##zoom_power", &camera_settings.zoom_power, &min);
 
     ImGui::Text("FovY:");
 
-    settings_t& settings = context_.settings;
-    if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &settings.camera_settings.fovy,
-        &settings.camera_settings.fovy_min, &settings.camera_settings.fovy_max, "%.3f"))
+    if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &camera_settings.fovy,
+        &camera_settings.fovy_min, &camera_settings.fovy_max, "%.3f"))
     {
-        context_.camera->get_perspective()->fieldOfViewY = settings.camera_settings.fovy;
+        context_.camera->get_perspective()->fieldOfViewY = camera_settings.fovy;
     }
 
     ImGui::End();

@@ -2,6 +2,7 @@
 #define ROUTE_EDITOR_H
 
 #include "EditorContext.h"
+#include "settings/CameraSettings.h"
 
 #include <memory>
 
@@ -20,6 +21,7 @@ public:
 
 private:
     void initialize_journal(const char* filename = "editor.log") const;
+    void read_settings();
     void configure_shaders();
     void compile_models();
     void handle_deferred_selection();
@@ -31,6 +33,7 @@ private:
     vsg::ref_ptr<Mouse> mouse;
     vsg::ref_ptr<Keyboard> keyboard;
     std::unique_ptr<StateManager> state_manager;
+    camera_settings_t camera_settings;
 };
 
 #endif // ROUTE_EDITOR_H

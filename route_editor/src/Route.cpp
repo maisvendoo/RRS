@@ -6,7 +6,6 @@
 #include "PagedLodMap.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
-#include "Settings.h"
 #include "filesystem.h"
 #include "graphics/pipeline_funcs.h"
 #include "rail-signal.h"
@@ -14,6 +13,7 @@
 #include "topology.h"
 #include "trajectory.h"
 #include "vec3.h"
+#include "settings/CameraSettings.h"
 
 #include <CfgReader.h>
 
@@ -61,8 +61,9 @@ static vsg::dvec3 to_vsg_vec3(dvec3 vec)
     return vsg::dvec3{vec.x, vec.y, vec.z};
 }
 
-Route::Route(EditorContext& context)
+Route::Route(EditorContext& context, const camera_settings_t& camera_settings)
     : context_(context)
+    , camera_settings(camera_settings)
 {
     const bool success = load_objects_ref() && load_route_map()
         && load_stations_conf() && load_waypoints_conf();
@@ -81,7 +82,7 @@ Route::Route(EditorContext& context)
             ref.relative_path);
 
         paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
-            context.settings.camera_settings.view_distance);
+            camera_settings.view_distance);
 
         paged_lod->children.front() = {0.1, nullptr};
         paged_lod->options = context.options;
@@ -381,7 +382,7 @@ bool Route::load_topology()
                 new_paged_lod->filename = signal_model_path;
 
                 new_paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
-                    context_.settings.camera_settings.view_distance);
+                    camera_settings.view_distance);
 
                 new_paged_lod->children.front() = {0.1, nullptr};
                 new_paged_lod->options = context_.options;

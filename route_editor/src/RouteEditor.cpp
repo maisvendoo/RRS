@@ -1,6 +1,7 @@
 #include "RouteEditor.h"
 
 #include "Camera.h"
+#include "CfgReader.h"
 #include "EditorContext.h"
 #include "EditorGui.h"
 #include "EditorState.h"
@@ -62,9 +63,7 @@ bool RouteEditor::initialize()
 {
     initialize_journal();
 
-    const FileSystem& fs = FileSystem::getInstance();
-    context_.settings.read(fs.combinePath(
-        fs.getConfigDir(), "editor-settings.xml"));
+    read_settings();
 
     context_.options = create_default_vsg_options();
 
@@ -85,7 +84,7 @@ bool RouteEditor::initialize()
         context_.static_objects_mutex, context_.static_objects);
 
     context_.camera = Camera::create(
-        context_.settings.camera_settings,
+        camera_settings,
         context_.window->extent2D(),
         mouse,
         keyboard,
@@ -93,7 +92,7 @@ bool RouteEditor::initialize()
     );
 
     context_.intersection_handler = IntersectionHandler::create(context_.camera->get_camera());
-    context_.scene_graph = SceneGraph::create(context_);
+    context_.scene_graph = SceneGraph::create(context_, camera_settings);
 
     context_.outline_builder = OutlineBuilder::create();
 
@@ -116,7 +115,7 @@ bool RouteEditor::initialize()
     const auto gui_view2 = vsg::View::create(context_.camera->get_camera(), context_.scene_graph);
     gui_view2->mask = MASK_GUI2;
 
-    const auto editor_gui = EditorGui::create(context_);
+    const auto editor_gui = EditorGui::create(context_, camera_settings);
 
     const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
 
@@ -223,6 +222,20 @@ void RouteEditor::initialize_journal(const char* filename) const
     Journal::instance()->message("Started new session");
     Journal::instance()->message("Journal subsystem is initialized successfully");
     Journal::instance()->message(dash_line);
+}
+
+void RouteEditor::read_settings()
+{
+    const FileSystem& fs = FileSystem::getInstance();
+    context_.settings.read(fs.combinePath(
+        fs.getConfigDir(), "editor-settings.xml"));
+    std::string cfg_path = fs.combinePath(fs.getConfigDir(), "editor-settings.xml");
+    CfgReader cfg;
+    if (!cfg.load(cfg_path.c_str()))
+    {
+        return;
+    }
+    camera_settings.read(cfg);
 }
 
 void RouteEditor::configure_shaders()

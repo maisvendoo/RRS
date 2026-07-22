@@ -2,7 +2,6 @@
 #define EDITOR_SETTINGS_H
 
 #include "KeyBinding.h"
-#include "settings/CameraSettings.h"
 #include "settings/GizmoSettings.h"
 #include "settings/GuiSettings.h"
 #include "settings/SceneSettings.h"
@@ -14,7 +13,6 @@ struct settings_t
 {
     window_settings_t window_settings;
     scene_settings_t scene_settings;
-    camera_settings_t camera_settings;
     gizmo_settings_t gizmo_settings;
     gui_settings_t gui_settings;
 

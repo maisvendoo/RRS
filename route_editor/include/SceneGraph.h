@@ -6,6 +6,7 @@
 #include <vsg/nodes/Switch.h>
 
 struct EditorContext;
+struct camera_settings_t;
 
 namespace vsg
 {
@@ -17,12 +18,13 @@ class AmbientLight;
 class SceneGraph : public vsg::Inherit<vsg::Switch, SceneGraph>
 {
 public:
-    SceneGraph(EditorContext& context);
+    SceneGraph(EditorContext& context, const camera_settings_t& camera_settings);
 
     void load_route();
 
 private:
     EditorContext& context_;
+    const camera_settings_t& camera_settings;
 
     vsg::ref_ptr<vsg::AmbientLight> ambient_light_;
 };
