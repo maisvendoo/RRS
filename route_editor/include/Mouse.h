@@ -4,6 +4,8 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 
+#include <cstdint>
+
 namespace vsg
 {
 
@@ -35,15 +37,12 @@ public:
     bool is_rmb_pressed() const;
 
 private:
+    std::uint16_t button_mask;
     int pos_x;
     int pos_y;
     int delta_x;
     int delta_y;
     int scroll;
-
-    bool is_lmb_pressed_ = false;
-    bool is_mmb_pressed_ = false;
-    bool is_rmb_pressed_ = false;
 };
 
 #endif // MOUSE_H

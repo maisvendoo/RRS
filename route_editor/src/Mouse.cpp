@@ -1,7 +1,5 @@
 #include "Mouse.h"
 
-#include "MouseButton.h"
-
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/ui/ScrollWheelEvent.h>
 
@@ -12,28 +10,7 @@ void Mouse::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    switch (buttonPress.button)
-    {
-        case MOUSE_BUTTON_LEFT:
-        {
-            is_lmb_pressed_ = true;
-            return;
-        }
-        case MOUSE_BUTTON_MIDDLE:
-        {
-            is_mmb_pressed_ = true;
-            return;
-        }
-        case MOUSE_BUTTON_RIGHT:
-        {
-            is_rmb_pressed_ = true;
-            return;
-        }
-        default:
-        {
-            return;
-        }
-    }
+    button_mask = buttonPress.mask;
 }
 
 void Mouse::apply(vsg::ButtonReleaseEvent& buttonRelease)
@@ -43,28 +20,7 @@ void Mouse::apply(vsg::ButtonReleaseEvent& buttonRelease)
         return;
     }
 
-    switch (buttonRelease.button)
-    {
-        case MOUSE_BUTTON_LEFT:
-        {
-            is_lmb_pressed_ = false;
-            return;
-        }
-        case MOUSE_BUTTON_MIDDLE:
-        {
-            is_mmb_pressed_ = false;
-            return;
-        }
-        case MOUSE_BUTTON_RIGHT:
-        {
-            is_rmb_pressed_ = false;
-            return;
-        }
-        default:
-        {
-            return;
-        }
-    }
+    button_mask = buttonRelease.mask;
 }
 
 void Mouse::apply(vsg::MoveEvent& moveEvent)
@@ -116,15 +72,15 @@ int Mouse::get_delta_y() const
 
 bool Mouse::is_lmb_pressed() const
 {
-    return is_lmb_pressed_;
+    return button_mask & vsg::BUTTON_MASK_1;
 }
 
 bool Mouse::is_mmb_pressed() const
 {
-    return is_mmb_pressed_;
+    return button_mask & vsg::BUTTON_MASK_2;
 }
 
 bool Mouse::is_rmb_pressed() const
 {
-    return is_rmb_pressed_;
+    return button_mask & vsg::BUTTON_MASK_3;
 }

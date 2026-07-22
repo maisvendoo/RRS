@@ -3,7 +3,6 @@
 #include "EditorContext.h"
 #include "LSIntersector.h"
 #include "Mask.h"
-#include "MouseButton.h"
 
 #include <vsg/app/Camera.h>
 #include <vsg/maths/vec2.h>
@@ -28,27 +27,19 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
 
     intersector->traversalMask = MASK_CLICKABLE;
 
-    switch (buttonPress.button)
+    if (buttonPress.mask & vsg::BUTTON_MASK_1)
     {
-        case MOUSE_BUTTON_LEFT:
-        {
-            lmb_intersector_ = intersector;
-            return;
-        }
-        case MOUSE_BUTTON_MIDDLE:
-        {
-            mmb_intersector_ = intersector;
-            return;
-        }
-        case MOUSE_BUTTON_RIGHT:
-        {
-            rmb_intersector_ = intersector;
-            return;
-        }
-        default:
-        {
-            return;
-        }
+        lmb_intersector_ = intersector;
+    }
+
+    if (buttonPress.mask & vsg::BUTTON_MASK_2)
+    {
+        mmb_intersector_ = intersector;
+    }
+
+    if (buttonPress.mask & vsg::BUTTON_MASK_3)
+    {
+        rmb_intersector_ = intersector;
     }
 }
 
@@ -59,27 +50,19 @@ void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
         return;
     }
 
-    switch (buttonRelease.button)
+    if (!(buttonRelease.mask & vsg::BUTTON_MASK_1))
     {
-        case MOUSE_BUTTON_LEFT:
-        {
-            lmb_intersector_ = nullptr;
-            return;
-        }
-        case MOUSE_BUTTON_MIDDLE:
-        {
-            mmb_intersector_ = nullptr;
-            return;
-        }
-        case MOUSE_BUTTON_RIGHT:
-        {
-            rmb_intersector_ = nullptr;
-            return;
-        }
-        default:
-        {
-            return;
-        }
+        lmb_intersector_ = nullptr;
+    }
+
+    if (!(buttonRelease.mask & vsg::BUTTON_MASK_2))
+    {
+        mmb_intersector_ = nullptr;
+    }
+
+    if (!(buttonRelease.mask & vsg::BUTTON_MASK_3))
+    {
+        rmb_intersector_ = nullptr;
     }
 }
 
