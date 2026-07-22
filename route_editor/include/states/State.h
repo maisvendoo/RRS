@@ -24,6 +24,10 @@ public:
 
     virtual void handle_key_release();
 
+    virtual void handle_button_press();
+
+    virtual void handle_button_release();
+
     virtual void handle_mouse_move();
 
     virtual void handle_mouse_scroll();

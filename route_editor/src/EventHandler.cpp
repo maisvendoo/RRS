@@ -22,6 +22,19 @@ void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
     state_manager.get_editor_state()->handle_key_release();
 }
 
+void EventHandler::apply(vsg::ButtonPressEvent& buttonPress)
+{
+    static_cast<void>(buttonPress);
+    state_manager.get_editor_state()->handle_button_press();
+}
+
+void EventHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
+{
+    static_cast<void>(buttonRelease);
+    state_manager.get_editor_state()->handle_button_release();
+}
+
+
 void EventHandler::apply(vsg::MoveEvent& moveEvent)
 {
     static_cast<void>(moveEvent);

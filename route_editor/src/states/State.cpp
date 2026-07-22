@@ -29,6 +29,14 @@ void State::handle_key_release()
 {
 }
 
+void State::handle_button_press()
+{
+}
+
+void State::handle_button_release()
+{
+}
+
 void State::handle_mouse_move()
 {
 }
