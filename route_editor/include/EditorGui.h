@@ -2,6 +2,7 @@
 #define EDITOR_GUI_H
 
 #include "KeyBindings.h"
+#include "StateManager.h"
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
@@ -28,7 +29,8 @@ public:
         EditorContext& context,
         camera_settings_t& camera_settings,
         gui_settings_t& gui_settings,
-        const KeyBindings& key_bindings
+        const KeyBindings& key_bindings,
+        StateManager& state_manager
     );
 
     ~EditorGui();
@@ -79,6 +81,7 @@ private:
     camera_settings_t& camera_settings;
     gui_settings_t& gui_settings;
     const KeyBindings& key_bindings;
+    StateManager& state_manager;
 
     ImGuiWindowFlags window_flags_;
     ImGuiViewport* viewport;
@@ -90,6 +93,8 @@ private:
         const ImFontConfig* font_cfg = nullptr,
         const ImWchar* glyph_ranges = nullptr
     );
+
+    void draw_status_bar() const;
 };
 
 #endif // EDITOR_GUI_H

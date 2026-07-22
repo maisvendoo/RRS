@@ -11,6 +11,7 @@
 #include "Route.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
+#include "StateManager.h"
 #include "filesystem.h"
 #include "rail-signal.h"
 #include "switch.h"
@@ -27,7 +28,7 @@
 #include "commands/TranslateObjects.h"
 #include "settings/GuiSettings.h"
 
-#include "ImGuiFileDialog.h"
+#include <ImGuiFileDialog.h>
 
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/RecordTraversal.h>
@@ -53,6 +54,7 @@
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/VertexInputState.h>
 #include <vsg/ui/KeyEvent.h>
+
 #include <vsgImGui/imgui.h>
 
 #include <algorithm>
@@ -82,12 +84,14 @@ EditorGui::EditorGui(
     EditorContext& context,
     camera_settings_t& camera_settings,
     gui_settings_t& gui_settings,
-    const KeyBindings& key_bindings
+    const KeyBindings& key_bindings,
+    StateManager& state_manager
 )
     : context_(context)
     , camera_settings(camera_settings)
     , gui_settings(gui_settings)
     , key_bindings(key_bindings)
+    , state_manager(state_manager)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -131,13 +135,18 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
 
             if (ImGui::MenuItem("Load route"))
             {
-
+                IGFD::FileDialogConfig config;
+                config.path = FileSystem::getInstance().getRouteRootDir();
+                ImGuiFileDialog::Instance()->OpenDialog("LoadRouteKey",
+                    "Load route", nullptr, config);
             }
 
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }
+
+    draw_status_bar();
 
     switch (context_.state)
     {
@@ -835,4 +844,30 @@ void EditorGui::add_ttf_font(
     const std::string font_path = fs.combinePath(fs.getFontsDir(), filename);
     io.Fonts->AddFontFromFileTTF(font_path.c_str(), size_pixels, font_cfg,
         glyph_ranges);
+}
+
+void EditorGui::draw_status_bar() const
+{
+    ImGui::SetNextWindowPos(ImVec2(
+        viewport->Pos.x,
+        viewport->Pos.y + viewport->Size.y - ImGui::GetFrameHeight() * 1.5
+    ));
+    ImGui::SetNextWindowSize(ImVec2(
+        viewport->Size.x,
+        ImGui::GetFrameHeight() * 1.5
+    ));
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
+    // ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs |
+    // ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse |
+    // ImGuiWindowFlags_NoSavedSettings |
+    // ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoBackground;
+    // ImGuiWindowFlags_MenuBar;
+
+    if (ImGui::Begin("StatusBar", nullptr, flags))
+    {
+        ImGui::Text("Status bar");
+        ImGui::End();
+    }
 }

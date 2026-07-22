@@ -113,7 +113,9 @@ bool RouteEditor::initialize()
     const auto gui_view2 = vsg::View::create(context_.camera->get_camera(), context_.scene_graph);
     gui_view2->mask = MASK_GUI2;
 
-    const auto editor_gui = EditorGui::create(context_, camera_settings, gui_settings, key_bindings);
+    state_manager = std::make_unique<StateManager>(mouse, keyboard);
+    const auto editor_gui = EditorGui::create(context_, camera_settings,
+        gui_settings, key_bindings, *state_manager);
 
     const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
 
@@ -142,7 +144,6 @@ bool RouteEditor::initialize()
     viewer_->addEventHandler(mouse);
     viewer_->addEventHandler(undo_redo_save_handler);
 
-    state_manager = std::make_unique<StateManager>(mouse, keyboard);
     viewer_->addEventHandler(EventHandler::create(*state_manager));
 
     viewer_->addEventHandler(context_.camera);
