@@ -25,7 +25,7 @@ class Node;
 class Gizmo : public vsg::Inherit<SingleSwitch, Gizmo>
 {
 public:
-    Gizmo(EditorContext& context, gizmo_settings_t& gizmo_settings, vsg::ref_ptr<IntersectionHandler>& intersection_handler);
+    Gizmo(EditorContext& context, const gizmo_settings_t& gizmo_settings, vsg::ref_ptr<IntersectionHandler>& intersection_handler);
 
     bool handle_intersections();
 
@@ -39,7 +39,7 @@ public:
 
 private:
     EditorContext& context_;
-    gizmo_settings_t& gizmo_settings;
+    const gizmo_settings_t& gizmo_settings;
     vsg::ref_ptr<IntersectionHandler>& intersection_handler;
 
     vsg::Builder builder_;

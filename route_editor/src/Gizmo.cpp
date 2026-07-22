@@ -47,7 +47,7 @@ static constexpr vsg::dvec3 X_AXIS_POSITIVEd = {1.0, 0.0, 0.0};
 static constexpr vsg::dvec3 Y_AXIS_POSITIVEd = {0.0, 1.0, 0.0};
 static constexpr vsg::dvec3 Z_AXIS_POSITIVEd = {0.0, 0.0, 1.0};
 
-Gizmo::Gizmo(EditorContext& context, gizmo_settings_t& gizmo_settings, vsg::ref_ptr<IntersectionHandler>& intersection_handler)
+Gizmo::Gizmo(EditorContext& context, const gizmo_settings_t& gizmo_settings, vsg::ref_ptr<IntersectionHandler>& intersection_handler)
     : context_(context)
     , gizmo_settings(gizmo_settings)
     , intersection_handler(intersection_handler)
@@ -343,7 +343,7 @@ void Gizmo::update_position()
 {
     curr_pos_ = {0.0, 0.0, 0.0};
 
-    if (context_.settings.gizmo_settings.to_center)
+    if (gizmo_settings.to_center)
     {
         for (const auto& object : context_.selected_objects)
         {

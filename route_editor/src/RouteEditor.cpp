@@ -133,7 +133,7 @@ bool RouteEditor::initialize()
 
     viewer_ = vsg::Viewer::create();
 
-    context_.object_selector = ObjectSelector::create(context_, mouse, keyboard);
+    context_.object_selector = ObjectSelector::create(context_, mouse, keyboard, gizmo_settings);
 
     viewer_->addWindow(context_.window);
 
@@ -236,6 +236,7 @@ void RouteEditor::read_settings()
         return;
     }
     camera_settings.read(cfg);
+    gizmo_settings.read(cfg);
 }
 
 void RouteEditor::configure_shaders()

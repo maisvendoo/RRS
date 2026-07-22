@@ -11,6 +11,7 @@ class Keyboard;
 class Mouse;
 class RouteObject;
 class SingleSwitch;
+struct gizmo_settings_t;
 
 namespace vsg
 {
@@ -28,7 +29,8 @@ public:
     ObjectSelector(
         EditorContext& context,
         const vsg::ref_ptr<Mouse>& mouse,
-        const vsg::ref_ptr<Keyboard>& keyboard
+        const vsg::ref_ptr<Keyboard>& keyboard,
+        const gizmo_settings_t& gizmo_settings
     );
 
     void apply(vsg::KeyPressEvent& keyPress) override;

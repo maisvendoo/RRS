@@ -32,13 +32,14 @@
 ObjectSelector::ObjectSelector(
     EditorContext& context,
     const vsg::ref_ptr<Mouse>& mouse,
-    const vsg::ref_ptr<Keyboard>& keyboard
+    const vsg::ref_ptr<Keyboard>& keyboard,
+    const gizmo_settings_t& gizmo_settings
 )
     : context_(context)
     , mouse(mouse)
     , keyboard(keyboard)
 {
-    context.gizmo = Gizmo::create(context, context.settings.gizmo_settings, context.intersection_handler);
+    context.gizmo = Gizmo::create(context, gizmo_settings, context.intersection_handler);
 
     front_plane_switch_ = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);

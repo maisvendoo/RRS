@@ -3,6 +3,7 @@
 
 #include "EditorContext.h"
 #include "settings/CameraSettings.h"
+#include "settings/GizmoSettings.h"
 
 #include <memory>
 
@@ -34,6 +35,7 @@ private:
     vsg::ref_ptr<Keyboard> keyboard;
     std::unique_ptr<StateManager> state_manager;
     camera_settings_t camera_settings;
+    gizmo_settings_t gizmo_settings;
 };
 
 #endif // ROUTE_EDITOR_H
