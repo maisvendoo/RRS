@@ -70,6 +70,11 @@ int Mouse::get_delta_y() const
     return delta_y;
 }
 
+std::uint16_t Mouse::get_button_mask() const
+{
+    return button_mask;
+}
+
 bool Mouse::is_lmb_pressed() const
 {
     return button_mask & vsg::BUTTON_MASK_1;
