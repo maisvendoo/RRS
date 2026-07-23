@@ -70,6 +70,21 @@ Camera::Camera(
     const double window_height = static_cast<double>(window_extent.height);
     const double aspect_ratio = window_width / window_height;
 
+    double radius = camera_settings.view_distance;
+
+    double halfDim = 100.0;
+    double halfHeight, halfWidth;
+    if (window_width > window_height)
+    {
+        halfHeight = halfDim;
+        halfWidth = halfDim * aspect_ratio;
+    }
+    else
+    {
+        halfWidth = halfDim;
+        halfHeight = halfDim / aspect_ratio;
+    }
+
     perspective = vsg::Perspective::create(
         camera_settings.fovy,
         aspect_ratio,
@@ -77,12 +92,8 @@ Camera::Camera(
         camera_settings.view_distance
     );
 
-    constexpr double scale = 50.0;
-
-    orthographic = vsg::Orthographic::create(
-        -1.0 * scale * aspect_ratio, 1.0 * scale * aspect_ratio, -1.0 * scale, 1.0 * scale,
-        camera_settings.zNear, camera_settings.view_distance
-    );
+    orthographic = vsg::Orthographic::create(-halfWidth, halfWidth, -halfHeight, halfHeight,
+        0.0, radius);
 
     const double initial_height = camera_settings.initial_height;
 
