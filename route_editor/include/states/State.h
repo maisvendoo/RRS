@@ -36,6 +36,8 @@ public:
 
     virtual void update(double delta_time);
 
+    virtual void draw_gui() const;
+
     virtual void fill_status_bar() const;
 
     virtual const char* get_name() const;

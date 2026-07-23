@@ -153,6 +153,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
     draw_status_bar();
     draw_load_route_file_dialog();
     draw_invalid_route_popup();
+    state_manager.get_editor_state()->draw_gui();
 
     switch (context_.state)
     {
