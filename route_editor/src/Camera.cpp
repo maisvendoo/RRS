@@ -60,13 +60,11 @@ Camera::Camera(
     const camera_settings_t& camera_settings,
     VkExtent2D window_extent,
     vsg::ref_ptr<Mouse>& mouse,
-    vsg::ref_ptr<Keyboard>& keyboard,
-    double& delta_time
+    vsg::ref_ptr<Keyboard>& keyboard
 )
     : camera_settings(camera_settings)
     , mouse(mouse)
     , keyboard(keyboard)
-    , delta_time(delta_time)
 {
     const double window_width = static_cast<double>(window_extent.width);
     const double window_height = static_cast<double>(window_extent.height);
@@ -96,78 +94,18 @@ Camera::Camera(
     camera = vsg::Camera::create(perspective, look_at,
         vsg::ViewportState::create(window_extent));
 
-    calculate_front();
-    calculate_right();
-    calculate_up();
-}
-
-void Camera::handle_mouse_move()
-{
-    if (!mouse->is_rmb_pressed())
-    {
-        return;
-    }
-}
-
-void Camera::handle_mouse_scroll()
-{
-}
-
-void Camera::update(double delta_time)
-{
-}
-
-void Camera::apply(vsg::MoveEvent& moveEvent)
-{
-    if (moveEvent.handled || !mouse->is_rmb_pressed())
-    {
-        return;
-    }
-
-    const double rotate_speed = camera_settings.rotate_speed;
-
-    yaw_deg_ += mouse->get_delta_x() * rotate_speed;
-    pitch_deg_ -= mouse->get_delta_y() * rotate_speed;
-    pitch_deg_ = std::clamp(pitch_deg_, -89.0, 89.0);
+    this->projectionMatrix = perspective;
+    this->viewMatrix = look_at;
+    this->viewportState = vsg::ViewportState::create(window_extent);
 
     calculate_front();
     calculate_right();
     calculate_up();
 }
 
-void Camera::apply(vsg::ScrollWheelEvent& scrollWheel)
+void Camera::handle_key_press()
 {
-    if (scrollWheel.handled)
-    {
-        return;
-    }
-
-    const double zoom_power = camera_settings.zoom_power;
-
-    double& fovy = perspective->fieldOfViewY;
-    fovy -= scrollWheel.delta.y * zoom_power;
-    fovy = std::clamp(fovy, camera_settings.fovy_min, camera_settings.fovy_max);
-}
-
-void Camera::apply(vsg::FrameEvent&)
-{
-    if (!mouse->is_rmb_pressed())
-    {
-        return;
-    }
-
-    const double move_speed = camera_settings.move_speed *
-        delta_time;
-
-    look_at->eye += front_ * move_speed * static_cast<double>(
-        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_FORWARD)) -
-        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_BACKWARD)));
-
-    look_at->eye += right_ * move_speed * static_cast<double>(
-        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_RIGHT)) -
-        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_LEFT)));
-
-    if (keyboard->pressed(ACTION_CHANGE_PROJECTION_MATRIX))
+    if (keyboard->pressed_once(ACTION_CHANGE_PROJECTION_MATRIX))
     {
         if (camera->projectionMatrix == perspective)
         {
@@ -177,9 +115,65 @@ void Camera::apply(vsg::FrameEvent&)
         {
             camera->projectionMatrix = perspective;
         }
-    }
 
+        if (projectionMatrix == perspective)
+        {
+            projectionMatrix = orthographic;
+        }
+        else
+        {
+            projectionMatrix = perspective;
+        }
+    }
+}
+
+void Camera::update_move_direction()
+{
+    const int forward_move_direction =
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_FORWARD)) -
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_BACKWARD));
+
+    const int right_move_direction =
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_RIGHT)) -
+        static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_LEFT));
+
+    if ((forward_move_direction == 0) && (right_move_direction == 0))
+    {
+        move_direction = {0.0, 0.0, 0.0};
+    }
+    else
+    {
+        move_direction = vsg::normalize(front_ * forward_move_direction +
+            right_ * right_move_direction);
+    }
+}
+
+void Camera::handle_mouse_move()
+{
+    const double rotate_speed = camera_settings.rotate_speed;
+
+    yaw_deg_ += mouse->get_delta_x() * rotate_speed;
+    pitch_deg_ -= mouse->get_delta_y() * rotate_speed;
+    pitch_deg_ = std::clamp(pitch_deg_, -89.0, 89.0);
+
+    calculate_front();
+    calculate_right();
+    calculate_up();
+
+    update_move_direction();
+}
+
+void Camera::update(double delta_time)
+{
+    look_at->eye += camera_settings.move_speed * delta_time * move_direction;
     look_at->center = look_at->eye + front_;
+}
+
+void Camera::handle_mouse_scroll()
+{
+    double& fovy = perspective->fieldOfViewY;
+    fovy -= mouse->get_scroll() * camera_settings.zoom_power;
+    fovy = std::clamp(fovy, camera_settings.fovy_min, camera_settings.fovy_max);
 }
 
 const vsg::dvec3& Camera::get_front() const

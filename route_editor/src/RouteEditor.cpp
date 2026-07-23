@@ -85,16 +85,15 @@ bool RouteEditor::initialize()
         camera_settings,
         context_.window->extent2D(),
         mouse,
-        keyboard,
-        context_.delta_time
+        keyboard
     );
 
-    context_.intersection_handler = IntersectionHandler::create(camera->get_camera());
+    context_.intersection_handler = IntersectionHandler::create(camera);
     context_.scene_graph = SceneGraph::create(context_, camera_settings);
 
     context_.outline_builder = OutlineBuilder::create();
 
-    const auto scene_view = vsg::View::create(camera->get_camera(), context_.scene_graph);
+    const auto scene_view = vsg::View::create(camera, context_.scene_graph);
     scene_view->mask = MASK_SCENE;
 
     VkClearValue clear_value{};
@@ -107,13 +106,13 @@ bool RouteEditor::initialize()
         vsg::ClearAttachments::Attachments{attachment},
         vsg::ClearAttachments::Rects{rect});
 
-    const auto gui_view1 = vsg::View::create(camera->get_camera(), context_.scene_graph);
+    const auto gui_view1 = vsg::View::create(camera, context_.scene_graph);
     gui_view1->mask = MASK_GUI1;
 
-    const auto gui_view2 = vsg::View::create(camera->get_camera(), context_.scene_graph);
+    const auto gui_view2 = vsg::View::create(camera, context_.scene_graph);
     gui_view2->mask = MASK_GUI2;
 
-    state_manager = std::make_unique<StateManager>(mouse, keyboard);
+    state_manager = std::make_unique<StateManager>(mouse, keyboard, camera);
     const auto editor_gui = EditorGui::create(context_, camera_settings,
         gui_settings, key_bindings, *state_manager, camera);
 
@@ -147,7 +146,6 @@ bool RouteEditor::initialize()
 
     viewer_->addEventHandler(EventHandler::create(*state_manager));
 
-    viewer_->addEventHandler(camera);
     viewer_->addEventHandler(context_.intersection_handler);
     viewer_->addEventHandler(context_.object_selector);
 
@@ -168,8 +166,9 @@ void RouteEditor::run()
     while (viewer_->advanceToNextFrame())
     {
         static double prev_time = viewer_->getFrameStamp()->simulationTime;
-        double curr_time = viewer_->getFrameStamp()->simulationTime;
-        context_.delta_time = curr_time - prev_time;
+        const double curr_time = viewer_->getFrameStamp()->simulationTime;
+        const double delta_time = curr_time - prev_time;
+        context_.delta_time = delta_time;
         prev_time = curr_time;
 
         if (context_.state == EditorState::LOAD_ROUTE)
@@ -182,6 +181,8 @@ void RouteEditor::run()
         viewer_->update();
         viewer_->recordAndSubmit();
         viewer_->present();
+
+        state_manager->update(delta_time);
 
         compile_models();
         handle_deferred_selection();

@@ -21,13 +21,19 @@ class EventHandler : public vsg::Inherit<vsg::Visitor, EventHandler>
 {
 public:
     explicit EventHandler(StateManager& state_manager);
+
     virtual ~EventHandler() override;
 
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
+
     virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;
+
     virtual void apply(vsg::ButtonPressEvent& buttonPress) override;
+
     virtual void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
+
     virtual void apply(vsg::MoveEvent& moveEvent) override;
+
     virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;
 
     void update(double delta_time);

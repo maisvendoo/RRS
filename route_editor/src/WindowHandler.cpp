@@ -54,7 +54,7 @@ void WindowHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
         camera->get_perspective()->aspectRatio =
             static_cast<double>(width) / static_cast<double>(height);
 
-        camera->get_camera()->viewportState->set(0, 0, width, height);
+        camera->viewportState->set(0, 0, width, height);
     }
 }
 

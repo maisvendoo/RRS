@@ -15,12 +15,13 @@
 
 StateManager::StateManager(
     const vsg::ref_ptr<Mouse>& mouse,
-    const vsg::ref_ptr<Keyboard>& keyboard
+    const vsg::ref_ptr<Keyboard>& keyboard,
+    const vsg::ref_ptr<Camera>& camera
 )
 {
     route_not_loaded_state = new RouteNotLoadedState(mouse, keyboard, *this);
-    basic_editor_state = new BasicEditorState(mouse, keyboard, *this);
-    navigation_state = new NavigationState(mouse, keyboard, *this);
+    basic_editor_state = new BasicEditorState(mouse, keyboard, *this, camera);
+    navigation_state = new NavigationState(mouse, keyboard, *this, camera);
     keyboard_translate_state = new KeyboardTranslateState(mouse, keyboard, *this);
     keyboard_rotate_state = new KeyboardRotateState(mouse, keyboard, *this);
     keyboard_scale_state = new KeyboardScaleState(mouse, keyboard, *this);

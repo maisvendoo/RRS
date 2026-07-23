@@ -3,6 +3,7 @@
 
 #include <vsg/core/ref_ptr.h>
 
+class Camera;
 class Keyboard;
 class Mouse;
 class State;
@@ -12,7 +13,8 @@ class StateManager
 public:
     StateManager(
         const vsg::ref_ptr<Mouse>& mouse,
-        const vsg::ref_ptr<Keyboard>& keyboard
+        const vsg::ref_ptr<Keyboard>& keyboard,
+        const vsg::ref_ptr<Camera>& camera
     );
 
     ~StateManager();

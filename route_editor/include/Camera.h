@@ -4,6 +4,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "settings/CameraSettings.h"
+#include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/ViewMatrix.h>
 #include <vsg/core/Inherit.h>
@@ -14,33 +15,27 @@
 namespace vsg
 {
 
-class FrameEvent;
-class MoveEvent;
 class Node;
-class ScrollWheelEvent;
 
 }
 
-class Camera : public vsg::Inherit<vsg::Visitor, Camera>
+class Camera : public vsg::Inherit<vsg::Camera, Camera>
 {
 public:
     Camera(
         const camera_settings_t& camera_settings,
         VkExtent2D window_extent,
         vsg::ref_ptr<Mouse>& mouse,
-        vsg::ref_ptr<Keyboard>& keyboard,
-        double& delta_time
+        vsg::ref_ptr<Keyboard>& keyboard
     );
 
     virtual ~Camera() = default;
 
+    void handle_key_press();
+    void update_move_direction();
     void handle_mouse_move();
-    void handle_mouse_scroll();
     void update(double delta_time);
-
-    virtual void apply(vsg::MoveEvent& moveEvent) override;
-    virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;
-    virtual void apply(vsg::FrameEvent& frame) override;
+    void handle_mouse_scroll();
 
     const vsg::dvec3& get_front() const;
     const vsg::dvec3& get_right() const;
@@ -49,7 +44,6 @@ public:
     const vsg::ref_ptr<vsg::Perspective>& get_perspective() const { return perspective; }
     const vsg::ref_ptr<vsg::Orthographic>& get_orthographic() const { return orthographic; }
     const vsg::ref_ptr<vsg::LookAt>& get_look_at() const { return look_at; }
-    const vsg::ref_ptr<vsg::Camera>& get_camera() const { return camera; }
 
     // Create plane perpedicular to camera normal and passing through
     // specified point to test for intersections
@@ -71,7 +65,6 @@ private:
     vsg::ref_ptr<vsg::Camera> camera;
     vsg::ref_ptr<Mouse>& mouse;
     vsg::ref_ptr<Keyboard>& keyboard;
-    double& delta_time;
 
     double yaw_deg_ = 0.0;
     double pitch_deg_ = 0.0;
@@ -79,6 +72,8 @@ private:
     vsg::dvec3 front_;
     vsg::dvec3 right_;
     vsg::dvec3 up_;
+
+    vsg::dvec3 move_direction = {0.0, 0.0, 0.0};
 };
 
 #endif // CAMERA_HANDLER_H

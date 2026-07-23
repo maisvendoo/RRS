@@ -1,5 +1,6 @@
 #include "IntersectionHandler.h"
 
+#include "Camera.h"
 #include "LSIntersector.h"
 #include "Mask.h"
 
@@ -9,7 +10,7 @@
 
 #include <algorithm>
 
-IntersectionHandler::IntersectionHandler(const vsg::ref_ptr<vsg::Camera>& camera)
+IntersectionHandler::IntersectionHandler(const vsg::ref_ptr<Camera>& camera)
     : camera(camera)
 {
 }

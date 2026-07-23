@@ -32,6 +32,7 @@ public:
     int get_delta_x() const;
     int get_delta_y() const;
     std::uint16_t get_button_mask() const;
+    int get_scroll() const { return scroll; }
 
     bool is_lmb_pressed() const;
     bool is_mmb_pressed() const;
