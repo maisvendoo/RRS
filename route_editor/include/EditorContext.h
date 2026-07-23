@@ -63,7 +63,6 @@ struct EditorContext
     EditorContext();
     ~EditorContext();
 
-    EditorState state = EditorState::SELECT_ROUTE;
     CommandList commands;
 
     vsg::ref_ptr<vsg::Options> options;

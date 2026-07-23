@@ -87,7 +87,8 @@ EditorGui::EditorGui(
     gui_settings_t& gui_settings,
     const KeyBindings& key_bindings,
     StateManager& state_manager,
-    const vsg::ref_ptr<Camera>& camera
+    const vsg::ref_ptr<Camera>& camera,
+    EditorState& editor_state
 )
     : context_(context)
     , camera_settings(camera_settings)
@@ -95,6 +96,7 @@ EditorGui::EditorGui(
     , key_bindings(key_bindings)
     , state_manager(state_manager)
     , camera(camera)
+    , editor_state(editor_state)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -155,7 +157,7 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
     draw_invalid_route_popup();
     state_manager.get_editor_state()->draw_gui();
 
-    switch (context_.state)
+    switch (editor_state)
     {
         case EditorState::SELECT_ROUTE:
         {
@@ -881,7 +883,7 @@ void EditorGui::draw_load_route_file_dialog() const
             else
             {
                 state_manager.defer_switch_to_basic_editor_state();
-                context_.state = EditorState::LOAD_ROUTE;
+                editor_state = EditorState::LOAD_ROUTE;
                 ImGuiFileDialog::Instance()->Close();
             }
         }

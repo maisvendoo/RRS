@@ -1,6 +1,7 @@
 #ifndef EDITOR_GUI_H
 #define EDITOR_GUI_H
 
+#include "EditorState.h"
 #include "KeyBindings.h"
 #include "StateManager.h"
 #include <vsg/commands/Command.h>
@@ -32,7 +33,8 @@ public:
         gui_settings_t& gui_settings,
         const KeyBindings& key_bindings,
         StateManager& state_manager,
-        const vsg::ref_ptr<Camera>& camera
+        const vsg::ref_ptr<Camera>& camera,
+        EditorState& editor_state
     );
 
     ~EditorGui();
@@ -84,6 +86,7 @@ private:
     const KeyBindings& key_bindings;
     StateManager& state_manager;
     const vsg::ref_ptr<Camera>& camera;
+    EditorState& editor_state;
 
     ImGuiWindowFlags window_flags_;
     ImGuiViewport* viewport;

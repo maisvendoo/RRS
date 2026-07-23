@@ -114,7 +114,7 @@ bool RouteEditor::initialize()
 
     state_manager = std::make_unique<StateManager>(mouse, keyboard, camera);
     const auto editor_gui = EditorGui::create(context_, camera_settings,
-        gui_settings, key_bindings, *state_manager, camera);
+        gui_settings, key_bindings, *state_manager, camera, editor_state);
 
     const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
 
@@ -171,10 +171,10 @@ void RouteEditor::run()
         context_.delta_time = delta_time;
         prev_time = curr_time;
 
-        if (context_.state == EditorState::LOAD_ROUTE)
+        if (editor_state == EditorState::LOAD_ROUTE)
         {
             context_.scene_graph->load_route();
-            context_.state = EditorState::EDIT_ROUTE;
+            editor_state = EditorState::EDIT_ROUTE;
         }
 
         viewer_->handleEvents();
@@ -227,12 +227,15 @@ void RouteEditor::initialize_journal(const char* filename) const
 void RouteEditor::read_settings()
 {
     const FileSystem& fs = FileSystem::getInstance();
-    std::string cfg_path = fs.combinePath(fs.getConfigDir(), "editor-settings.xml");
+    const std::string cfg_path = fs.combinePath(fs.getConfigDir(),
+        "editor-settings.xml");
+
     CfgReader cfg;
     if (!cfg.load(cfg_path.c_str()))
     {
         return;
     }
+
     camera_settings.read(cfg);
     gizmo_settings.read(cfg);
     gui_settings.read(cfg);

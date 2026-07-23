@@ -45,6 +45,7 @@ private:
     window_settings_t window_settings;
     KeyBindings key_bindings;
     vsg::ref_ptr<Camera> camera;
+    EditorState editor_state = EditorState::SELECT_ROUTE;
 };
 
 #endif // ROUTE_EDITOR_H
