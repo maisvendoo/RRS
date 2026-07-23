@@ -78,7 +78,7 @@ bool RouteEditor::initialize()
     mouse = Mouse::create();
     keyboard = Keyboard::create(key_bindings);
     auto undo_redo_save_handler = UndoRedoSaveHandler::create(
-        keyboard, context_.commands, context_.route_dir,
+        keyboard, command_list, context_.route_dir,
         context_.static_objects_mutex, context_.static_objects);
 
     camera = Camera::create(
@@ -114,7 +114,7 @@ bool RouteEditor::initialize()
 
     state_manager = std::make_unique<StateManager>(mouse, keyboard, camera);
     const auto editor_gui = EditorGui::create(context_, camera_settings,
-        gui_settings, key_bindings, *state_manager, camera, editor_state);
+        gui_settings, key_bindings, *state_manager, camera, editor_state, command_list);
 
     const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
 
@@ -133,7 +133,7 @@ bool RouteEditor::initialize()
     viewer_ = vsg::Viewer::create();
 
     context_.object_selector = ObjectSelector::create(context_, mouse, keyboard,
-        gizmo_settings, camera);
+        gizmo_settings, camera, command_list);
 
     viewer_->addWindow(context_.window);
 

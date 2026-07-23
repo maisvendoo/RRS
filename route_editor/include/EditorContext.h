@@ -2,8 +2,6 @@
 #define EDITOR_CONTEXT_H
 
 #include "MutexedVector.h"
-#include "commands/CommandList.h"
-#include "EditorState.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
 
@@ -62,8 +60,6 @@ struct EditorContext
 {
     EditorContext();
     ~EditorContext();
-
-    CommandList commands;
 
     vsg::ref_ptr<vsg::Options> options;
 

@@ -34,14 +34,16 @@ ObjectSelector::ObjectSelector(
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
     const gizmo_settings_t& gizmo_settings,
-    const vsg::ref_ptr<Camera>& camera
+    const vsg::ref_ptr<Camera>& camera,
+    CommandList& command_list
 )
     : context_(context)
     , mouse(mouse)
     , keyboard(keyboard)
     , camera(camera)
+    , command_list(command_list)
 {
-    context.gizmo = Gizmo::create(context, gizmo_settings, context.intersection_handler, camera);
+    context.gizmo = Gizmo::create(context, gizmo_settings, context.intersection_handler, camera, command_list);
 
     front_plane_switch_ = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
@@ -80,12 +82,12 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     }
     else if (keyboard->pressed(ACTION_PASTE_OBJECTS))
     {
-        context_.commands.push(new PasteObjects(context_), true);
+        command_list.push(new PasteObjects(context_), true);
         return;
     }
     else if (keyboard->pressed(ACTION_DELETE_OBJECTS))
     {
-        context_.commands.push(new DeleteObjects(context_), true);
+        command_list.push(new DeleteObjects(context_), true);
         return;
     }
 
@@ -203,7 +205,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
             select_objects_command->objects_to_deselect = selected_objects;
             select_objects_command->update_description();
 
-            context_.commands.push(select_objects_command, true);
+            command_list.push(select_objects_command, true);
         }
 
         return;
@@ -405,7 +407,7 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
 
     select_objects_command->update_description();
 
-    context_.commands.push(select_objects_command, true);
+    command_list.push(select_objects_command, true);
 }
 
 void ObjectSelector::confirm_keyboard_transformation()
@@ -414,14 +416,14 @@ void ObjectSelector::confirm_keyboard_transformation()
     {
         case State::KEYBOARD_GRAB:
         {
-            context_.commands.push(new TranslateObjects(
+            command_list.push(new TranslateObjects(
                 context_, context_.selected_objects, total_translation_), false);
 
             break;
         }
         case State::KEYBOARD_ROTATE:
         {
-            context_.commands.push(
+            command_list.push(
                 new RotateObjects(
                     context_, context_.selected_objects,
                     context_.gizmo->get_curr_pos(),
@@ -435,7 +437,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         }
         case State::KEYBOARD_SCALE:
         {
-            context_.commands.push(new ScaleObjects(context_, context_.selected_objects,
+            command_list.push(new ScaleObjects(context_, context_.selected_objects,
                 context_.gizmo->get_curr_pos(), total_scale_), false);
 
             break;

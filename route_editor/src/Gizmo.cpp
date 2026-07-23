@@ -50,12 +50,14 @@ Gizmo::Gizmo(
     EditorContext& context,
     const gizmo_settings_t& gizmo_settings,
     vsg::ref_ptr<IntersectionHandler>& intersection_handler,
-    const vsg::ref_ptr<Camera>& camera
+    const vsg::ref_ptr<Camera>& camera,
+    CommandList& command_list
 )
     : context_(context)
     , gizmo_settings(gizmo_settings)
     , intersection_handler(intersection_handler)
     , camera(camera)
+    , command_list(command_list)
 {
     builder_.shaderSet = vsg::createFlatShadedShaderSet();
 
@@ -250,7 +252,7 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
         return;
     }
 
-    context_.commands.push(new TranslateObjects(
+    command_list.push(new TranslateObjects(
         context_, context_.selected_objects, total_translation_), false);
 
     active_arrow_ = nullptr;

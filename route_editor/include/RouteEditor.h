@@ -2,7 +2,9 @@
 #define ROUTE_EDITOR_H
 
 #include "EditorContext.h"
+#include "EditorState.h"
 #include "KeyBindings.h"
+#include "commands/CommandList.h"
 #include "settings/CameraSettings.h"
 #include "settings/GizmoSettings.h"
 #include "settings/GuiSettings.h"
@@ -46,6 +48,7 @@ private:
     KeyBindings key_bindings;
     vsg::ref_ptr<Camera> camera;
     EditorState editor_state = EditorState::SELECT_ROUTE;
+    CommandList command_list;
 };
 
 #endif // ROUTE_EDITOR_H

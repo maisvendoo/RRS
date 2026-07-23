@@ -88,7 +88,8 @@ EditorGui::EditorGui(
     const KeyBindings& key_bindings,
     StateManager& state_manager,
     const vsg::ref_ptr<Camera>& camera,
-    EditorState& editor_state
+    EditorState& editor_state,
+    CommandList& command_list
 )
     : context_(context)
     , camera_settings(camera_settings)
@@ -97,6 +98,7 @@ EditorGui::EditorGui(
     , state_manager(state_manager)
     , camera(camera)
     , editor_state(editor_state)
+    , command_list(command_list)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -657,8 +659,8 @@ void EditorGui::show_selected_objects_properties() const
 void EditorGui::show_commands() const
 {
     ImGui::Begin("Commands");
-    auto active = context_.commands.get_active();
-    auto curr = context_.commands.get_tail();
+    auto active = command_list.get_active();
+    auto curr = command_list.get_tail();
     while (curr)
     {
         if (curr == active)
@@ -687,7 +689,7 @@ void EditorGui::add_object(
         camera->get_look_at()->eye +
         camera->get_front() * 20.0);
 
-    context_.commands.push(new AddObject(context_, object), true);
+    command_list.push(new AddObject(context_, object), true);
 }
 
 void EditorGui::save_objects_matrixes() const
@@ -722,7 +724,7 @@ void EditorGui::handle_translation_drag(
 
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
-        context_.commands.push(new TranslateObjects(context_, {object},
+        command_list.push(new TranslateObjects(context_, {object},
             total_translation), false);
         dragging = false;
     }
@@ -774,7 +776,7 @@ void EditorGui::handle_rotation_drag(
             radians = vsg::radians(total_rotation_deg.z);
         }
 
-        context_.commands.push(new RotateObjects(context_, {object},
+        command_list.push(new RotateObjects(context_, {object},
             context_.gizmo->get_curr_pos(), axis, radians), false);
         dragging = false;
     }
@@ -809,7 +811,7 @@ void EditorGui::handle_scale_drag(
 
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
-        context_.commands.push(new ScaleObjects(context_, {object},
+        command_list.push(new ScaleObjects(context_, {object},
             context_.gizmo->get_curr_pos(), total_scale), false);
         dragging = false;
     }

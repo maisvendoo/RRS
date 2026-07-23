@@ -7,6 +7,7 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 
+class CommandList;
 struct EditorContext;
 class Keyboard;
 class Mouse;
@@ -32,7 +33,8 @@ public:
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         const gizmo_settings_t& gizmo_settings,
-        const vsg::ref_ptr<Camera>& camera
+        const vsg::ref_ptr<Camera>& camera,
+        CommandList& command_list
     );
 
     void apply(vsg::KeyPressEvent& keyPress) override;
@@ -61,6 +63,7 @@ private:
     const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
     const vsg::ref_ptr<Camera>& camera;
+    CommandList& command_list;
 
     vsg::dvec3 prev_intersect_pos_;
     vsg::dvec3 total_translation_;

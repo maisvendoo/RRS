@@ -11,6 +11,7 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/utils/Builder.h>
 
+class CommandList;
 struct EditorContext;
 
 namespace vsg
@@ -30,7 +31,8 @@ public:
         EditorContext& context,
         const gizmo_settings_t& gizmo_settings,
         vsg::ref_ptr<IntersectionHandler>& intersection_handler,
-        const vsg::ref_ptr<Camera>& camera
+        const vsg::ref_ptr<Camera>& camera,
+        CommandList& command_list
     );
 
     bool handle_intersections();
@@ -48,6 +50,7 @@ private:
     const gizmo_settings_t& gizmo_settings;
     vsg::ref_ptr<IntersectionHandler>& intersection_handler;
     const vsg::ref_ptr<Camera>& camera;
+    CommandList& command_list;
 
     vsg::Builder builder_;
     vsg::ref_ptr<vsg::MatrixTransform> matrix_transform_;
