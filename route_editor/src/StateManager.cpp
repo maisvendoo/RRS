@@ -18,15 +18,15 @@ StateManager::StateManager(
     const vsg::ref_ptr<Keyboard>& keyboard
 )
 {
-    route_not_loaded_state = new RouteNotLoadedState(mouse, keyboard);
-    basic_editor_state = new BasicEditorState(mouse, keyboard);
-    navigation_state = new NavigationState(mouse, keyboard);
-    keyboard_translate_state = new KeyboardTranslateState(mouse, keyboard);
-    keyboard_rotate_state = new KeyboardRotateState(mouse, keyboard);
-    keyboard_scale_state = new KeyboardScaleState(mouse, keyboard);
-    gizmo_translate_state = new GizmoTranslateState(mouse, keyboard);
-    gizmo_rotate_state = new GizmoRotateState(mouse, keyboard);
-    gizmo_scale_state = new GizmoScaleState(mouse, keyboard);
+    route_not_loaded_state = new RouteNotLoadedState(mouse, keyboard, *this);
+    basic_editor_state = new BasicEditorState(mouse, keyboard, *this);
+    navigation_state = new NavigationState(mouse, keyboard, *this);
+    keyboard_translate_state = new KeyboardTranslateState(mouse, keyboard, *this);
+    keyboard_rotate_state = new KeyboardRotateState(mouse, keyboard, *this);
+    keyboard_scale_state = new KeyboardScaleState(mouse, keyboard, *this);
+    gizmo_translate_state = new GizmoTranslateState(mouse, keyboard, *this);
+    gizmo_rotate_state = new GizmoRotateState(mouse, keyboard, *this);
+    gizmo_scale_state = new GizmoScaleState(mouse, keyboard, *this);
 
     current_state = route_not_loaded_state;
     deferred_state = route_not_loaded_state;

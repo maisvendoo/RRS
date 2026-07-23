@@ -7,18 +7,21 @@
 
 class Keyboard;
 class Mouse;
+class StateManager;
 
 class RouteNotLoadedState : public State
 {
 public:
     RouteNotLoadedState(
         const vsg::ref_ptr<Mouse>& mouse,
-        const vsg::ref_ptr<Keyboard>& keyboard
+        const vsg::ref_ptr<Keyboard>& keyboard,
+        StateManager& state_manager
     );
 
     virtual ~RouteNotLoadedState() override;
 
     virtual void fill_status_bar() const override;
+
     virtual const char* get_name() const override;
 };
 

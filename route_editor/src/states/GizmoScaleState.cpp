@@ -2,9 +2,10 @@
 
 GizmoScaleState::GizmoScaleState(
     const vsg::ref_ptr<Mouse>& mouse,
-    const vsg::ref_ptr<Keyboard>& keyboard
+    const vsg::ref_ptr<Keyboard>& keyboard,
+    StateManager& state_manager
 )
-    : State(mouse, keyboard)
+    : State(mouse, keyboard, state_manager)
 {
 }
 

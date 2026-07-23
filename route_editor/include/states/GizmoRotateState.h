@@ -7,16 +7,21 @@
 
 class Keyboard;
 class Mouse;
+class StateManager;
 
 class GizmoRotateState : public State
 {
 public:
     GizmoRotateState(
         const vsg::ref_ptr<Mouse>& mouse,
-        const vsg::ref_ptr<Keyboard>& keyboard
+        const vsg::ref_ptr<Keyboard>& keyboard,
+        StateManager& state_manager
     );
+
     virtual ~GizmoRotateState() override;
+
     virtual void handle_key_press() override;
+
     virtual const char* get_name() const override;
 };
 

@@ -1,14 +1,16 @@
 #include "states/BasicEditorState.h"
 
 #include <vsg/ui/PointerEvent.h>
+#include <vsgImGui/imgui.h>
 
 #include "Mouse.h"
 
 BasicEditorState::BasicEditorState(
     const vsg::ref_ptr<Mouse>& mouse,
-    const vsg::ref_ptr<Keyboard>& keyboard
+    const vsg::ref_ptr<Keyboard>& keyboard,
+    StateManager& state_manager
 )
-    : State(mouse, keyboard)
+    : State(mouse, keyboard, state_manager)
 {
 }
 
@@ -24,6 +26,11 @@ void BasicEditorState::handle_button_press()
     {
         // TODO
     }
+}
+
+void BasicEditorState::fill_status_bar() const
+{
+    ImGui::Text("BasicEditorState");
 }
 
 const char* BasicEditorState::get_name() const
