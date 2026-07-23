@@ -10,7 +10,11 @@ struct camera_settings_t;
 class Route : public vsg::Inherit<vsg::Switch, Route>
 {
 public:
-    Route(EditorContext& context, const camera_settings_t& camera_settings);
+    Route(
+        EditorContext& context,
+        const camera_settings_t& camera_settings,
+        const vsg::ref_ptr<vsg::Options>& vsg_options
+    );
 
 private:
     bool load_objects_ref();
@@ -24,6 +28,7 @@ private:
 private:
     EditorContext& context_;
     const camera_settings_t& camera_settings;
+    const vsg::ref_ptr<vsg::Options>& vsg_options;
 };
 
 #endif // ROUTE_H

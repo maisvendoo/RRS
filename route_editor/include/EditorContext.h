@@ -16,7 +16,6 @@
 #include <memory>
 #include <string>
 
-class Camera;
 class Gizmo;
 class IntersectionHandler;
 class ObjectSelector;
@@ -29,7 +28,6 @@ class WindowHandler;
 namespace vsg
 {
 
-class Options;
 class PagedLOD;
 class Window;
 
@@ -60,8 +58,6 @@ struct EditorContext
 {
     EditorContext();
     ~EditorContext();
-
-    vsg::ref_ptr<vsg::Options> options;
 
     vsg::ref_ptr<vsg::Window> window;
 

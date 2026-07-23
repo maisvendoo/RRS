@@ -64,7 +64,7 @@ bool RouteEditor::initialize()
 
     read_settings();
 
-    context_.options = create_default_vsg_options();
+    vsg_options = create_default_vsg_options();
 
     configure_shaders();
 
@@ -89,7 +89,7 @@ bool RouteEditor::initialize()
     );
 
     context_.intersection_handler = IntersectionHandler::create(camera);
-    context_.scene_graph = SceneGraph::create(context_, camera_settings);
+    context_.scene_graph = SceneGraph::create(context_, camera_settings, vsg_options);
 
     context_.outline_builder = OutlineBuilder::create();
 
@@ -246,23 +246,23 @@ void RouteEditor::read_settings()
 
 void RouteEditor::configure_shaders()
 {
-    const auto flat_shader = vsg::createFlatShadedShaderSet(context_.options);
-    const auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(context_.options);
-    const auto phong_shader = vsg::createPhongShaderSet(context_.options);
+    const auto flat_shader = vsg::createFlatShadedShaderSet(vsg_options);
+    const auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(vsg_options);
+    const auto phong_shader = vsg::createPhongShaderSet(vsg_options);
 
     const FileSystem& fs = FileSystem::getInstance();
     const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
-    const auto vert_shader = read_shader(shaders_dir.c_str(), "standard.vert", context_.options);
+    const auto vert_shader = read_shader(shaders_dir.c_str(), "standard.vert", vsg_options);
 
     configure_shader_set(shaders_dir.c_str(), vert_shader,
-        "standard_flat_shaded.frag", context_.options, "flat", flat_shader);
+        "standard_flat_shaded.frag", vsg_options, "flat", flat_shader);
 
     configure_shader_set(shaders_dir.c_str(), vert_shader,
-        "standard_pbr.frag", context_.options, "pbr", pbr_shader);
+        "standard_pbr.frag", vsg_options, "pbr", pbr_shader);
 
     configure_shader_set(shaders_dir.c_str(), vert_shader,
-        "standard_phong.frag", context_.options, "phong", phong_shader);
+        "standard_phong.frag", vsg_options, "phong", phong_shader);
 
     const auto rasterization_state = vsg::RasterizationState::create();
     rasterization_state->cullMode = VK_CULL_MODE_NONE;
@@ -285,10 +285,10 @@ void RouteEditor::configure_shaders()
     phong_shader->defaultGraphicsPipelineStates =
         default_graphics_pipeline_states;
 
-    context_.options->shaderSets.clear();
-    context_.options->shaderSets["flat"] = flat_shader;
-    context_.options->shaderSets["pbr"] = pbr_shader;
-    context_.options->shaderSets["phong"] = phong_shader;
+    vsg_options->shaderSets.clear();
+    vsg_options->shaderSets["flat"] = flat_shader;
+    vsg_options->shaderSets["pbr"] = pbr_shader;
+    vsg_options->shaderSets["phong"] = phong_shader;
 }
 
 void RouteEditor::compile_models()

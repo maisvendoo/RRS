@@ -61,9 +61,14 @@ static vsg::dvec3 to_vsg_vec3(dvec3 vec)
     return vsg::dvec3{vec.x, vec.y, vec.z};
 }
 
-Route::Route(EditorContext& context, const camera_settings_t& camera_settings)
+Route::Route(
+    EditorContext& context,
+    const camera_settings_t& camera_settings,
+    const vsg::ref_ptr<vsg::Options>& vsg_options
+)
     : context_(context)
     , camera_settings(camera_settings)
+    , vsg_options(vsg_options)
 {
     const bool success = load_objects_ref() && load_route_map()
         && load_stations_conf() && load_waypoints_conf();
@@ -85,7 +90,7 @@ Route::Route(EditorContext& context, const camera_settings_t& camera_settings)
             camera_settings.view_distance);
 
         paged_lod->children.front() = {0.1, nullptr};
-        paged_lod->options = context.options;
+        paged_lod->options = vsg_options;
 
         ref.paged_lod = paged_lod;
     }
@@ -385,7 +390,7 @@ bool Route::load_topology()
                     camera_settings.view_distance);
 
                 new_paged_lod->children.front() = {0.1, nullptr};
-                new_paged_lod->options = context_.options;
+                new_paged_lod->options = vsg_options;
 
                 paged_lod_it = paged_lods.emplace(signal_model_path,
                     new_paged_lod).first;
@@ -436,7 +441,7 @@ bool Route::load_topology()
         shaders_dir_path.c_str(),
         "traj_line.vert",
         "traj_line.frag",
-        context_.options,
+        vsg_options,
         vsg::VertexInputState::Bindings{
             VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
             VkVertexInputBindingDescription{1, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX}

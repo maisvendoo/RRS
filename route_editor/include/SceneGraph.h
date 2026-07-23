@@ -18,13 +18,18 @@ class AmbientLight;
 class SceneGraph : public vsg::Inherit<vsg::Switch, SceneGraph>
 {
 public:
-    SceneGraph(EditorContext& context, const camera_settings_t& camera_settings);
+    SceneGraph(
+        EditorContext& context,
+        const camera_settings_t& camera_settings,
+        const vsg::ref_ptr<vsg::Options>& vsg_options
+    );
 
     void load_route();
 
 private:
     EditorContext& context_;
     const camera_settings_t& camera_settings;
+    const vsg::ref_ptr<vsg::Options>& vsg_options;
 
     vsg::ref_ptr<vsg::AmbientLight> ambient_light_;
 };

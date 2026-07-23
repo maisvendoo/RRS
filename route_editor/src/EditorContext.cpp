@@ -1,6 +1,5 @@
 #include "EditorContext.h"
 
-#include "Camera.h"
 #include "Gizmo.h"
 #include "IntersectionHandler.h"
 #include "ObjectSelector.h"

@@ -1,6 +1,7 @@
 #ifndef ROUTE_EDITOR_H
 #define ROUTE_EDITOR_H
 
+#include "Camera.h"
 #include "EditorContext.h"
 #include "EditorState.h"
 #include "KeyBindings.h"
@@ -12,6 +13,7 @@
 #include "settings/WindowSettings.h"
 
 #include <memory>
+#include <vsg/io/Options.h>
 
 class Keyboard;
 class Mouse;
@@ -49,6 +51,7 @@ private:
     vsg::ref_ptr<Camera> camera;
     EditorState editor_state = EditorState::SELECT_ROUTE;
     CommandList command_list;
+    vsg::ref_ptr<vsg::Options> vsg_options;
 };
 
 #endif // ROUTE_EDITOR_H
