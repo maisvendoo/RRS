@@ -103,9 +103,6 @@ Camera::Camera(
         vsg::dvec3(0.0, 1.0, initial_height),
         vsg::dvec3(0.0, 0.0, 1.0));
 
-    camera = vsg::Camera::create(perspective, look_at,
-        vsg::ViewportState::create(window_extent));
-
     this->projectionMatrix = perspective;
     this->viewMatrix = look_at;
     this->viewportState = vsg::ViewportState::create(window_extent);
@@ -119,15 +116,6 @@ void Camera::handle_key_press()
 {
     if (keyboard->pressed_once(ACTION_CHANGE_PROJECTION_MATRIX))
     {
-        if (camera->projectionMatrix == perspective)
-        {
-            camera->projectionMatrix = orthographic;
-        }
-        else
-        {
-            camera->projectionMatrix = perspective;
-        }
-
         if (projectionMatrix == perspective)
         {
             projectionMatrix = orthographic;
