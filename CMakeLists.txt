@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.29)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project (RRS VERSION 1.9.2)
+project (RRS VERSION 1.9.3)
 
 # RPATH configuration for finding shared libraries at runtime
 if(APPLE)
