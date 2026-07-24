@@ -465,7 +465,23 @@ void StationSignal::check_train_route()
         if (traj->isBusy())
         {
             // Разрешаем маневровый маршрут до занятой траектории
-            is_shunt_route = true;
+            if (lock_relay->getContactState(LR_NEUTRAL_NO_ROUTE))
+            {
+                // Пока светофор закрыт, разрешаем его открыть
+                is_shunt_route = true;
+
+                // По команде открыть - запоминаем, до какой занятой траектории
+                if (is_open_shunt_button_pressed)
+                    ref_trajectory_shunt = traj;
+                else
+                    ref_trajectory_shunt = nullptr;
+            }
+            else
+            {
+                // Разрешаем маневровый маршрут уже открытого светофора
+                // только до запомненной траектории, иначе закрываем
+                is_shunt_route = (ref_trajectory_shunt == traj);
+            }
             return;
         }
 
