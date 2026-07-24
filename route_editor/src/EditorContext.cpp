@@ -3,9 +3,7 @@
 #include "Gizmo.h"
 #include "ObjectSelector.h"
 #include "Outline.h"
-#include "Route.h"
 #include "topology.h"
-#include "WindowHandler.h"
 
 #include <vsg/commands/ClearAttachments.h>
 #include <vsg/nodes/PagedLOD.h>

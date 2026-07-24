@@ -19,7 +19,6 @@
 class Gizmo;
 class ObjectSelector;
 class OutlineBuilder;
-class Route;
 class Topology;
 
 namespace vsg
@@ -54,8 +53,6 @@ struct EditorContext
 {
     EditorContext();
     ~EditorContext();
-
-    vsg::ref_ptr<Route> route;
 
     RouteObjects static_objects;
     std::mutex static_objects_mutex;

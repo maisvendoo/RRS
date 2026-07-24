@@ -19,6 +19,7 @@ class Camera;
 class IntersectionHandler;
 class Keyboard;
 class Mouse;
+class Route;
 class SceneGraph;
 class StateManager;
 class WindowHandler;
@@ -59,6 +60,7 @@ private:
     vsg::ref_ptr<vsg::Window> window;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
     vsg::ref_ptr<SceneGraph> scene_graph;
+    vsg::ref_ptr<Route> route;
 };
 
 #endif // ROUTE_EDITOR_H

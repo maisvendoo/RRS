@@ -16,7 +16,7 @@
 #include <string>
 
 UndoRedoSaveHandler::UndoRedoSaveHandler(
-    vsg::ref_ptr<Keyboard>& keyboard,
+    const vsg::ref_ptr<Keyboard>& keyboard,
     CommandList& commands,
     const std::string& route_dir,
     std::mutex& static_objects_mutex,

@@ -530,7 +530,7 @@ bool Route::load_topology()
 
     group->addChild(state_group);
 
-    context_.compile_infos.emplace_back(CompileInfo{context_.route,
+    context_.compile_infos.emplace_back(CompileInfo{vsg::ref_ptr(this),
         group, vsg::Mask{MASK_GUI2}});
 
     return true;

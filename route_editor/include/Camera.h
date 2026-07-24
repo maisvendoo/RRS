@@ -1,21 +1,22 @@
 #ifndef CAMERA_HANDLER_H
 #define CAMERA_HANDLER_H
 
-#include "Keyboard.h"
-#include "Mouse.h"
-#include "settings/CameraSettings.h"
 #include <vsg/app/Camera.h>
-#include <vsg/app/ProjectionMatrix.h>
-#include <vsg/app/ViewMatrix.h>
 #include <vsg/core/Inherit.h>
-#include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
+
+class Keyboard;
+class Mouse;
+struct camera_settings_t;
 
 namespace vsg
 {
 
+class LookAt;
 class Node;
+class Orthographic;
+class Perspective;
 
 }
 
@@ -25,8 +26,8 @@ public:
     Camera(
         const camera_settings_t& camera_settings,
         VkExtent2D window_extent,
-        vsg::ref_ptr<Mouse>& mouse,
-        vsg::ref_ptr<Keyboard>& keyboard
+        const vsg::ref_ptr<Mouse>& mouse,
+        const vsg::ref_ptr<Keyboard>& keyboard
     );
 
     virtual ~Camera() = default;
@@ -47,11 +48,11 @@ public:
 
     const vsg::dvec3& get_up() const;
 
-    const vsg::ref_ptr<vsg::Perspective>& get_perspective() const { return perspective; }
+    const vsg::ref_ptr<vsg::Perspective>& get_perspective() const;
 
-    const vsg::ref_ptr<vsg::Orthographic>& get_orthographic() const { return orthographic; }
+    const vsg::ref_ptr<vsg::Orthographic>& get_orthographic() const;
 
-    const vsg::ref_ptr<vsg::LookAt>& get_look_at() const { return look_at; }
+    const vsg::ref_ptr<vsg::LookAt>& get_look_at() const;
 
     // Create plane perpedicular to camera normal and passing through
     // specified point to test for intersections
@@ -73,8 +74,8 @@ private:
     vsg::ref_ptr<vsg::Orthographic> orthographic;
     vsg::ref_ptr<vsg::LookAt> look_at;
     vsg::ref_ptr<vsg::Camera> camera;
-    vsg::ref_ptr<Mouse>& mouse;
-    vsg::ref_ptr<Keyboard>& keyboard;
+    const vsg::ref_ptr<Mouse>& mouse;
+    const vsg::ref_ptr<Keyboard>& keyboard;
 
     double yaw_deg_ = 0.0;
     double pitch_deg_ = 0.0;

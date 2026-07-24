@@ -3,6 +3,7 @@
 #include "Action.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "settings/CameraSettings.h"
 
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
@@ -59,8 +60,8 @@ static vsg::ref_ptr<vsg::Commands> create_quad(
 Camera::Camera(
     const camera_settings_t& camera_settings,
     VkExtent2D window_extent,
-    vsg::ref_ptr<Mouse>& mouse,
-    vsg::ref_ptr<Keyboard>& keyboard
+    const vsg::ref_ptr<Mouse>& mouse,
+    const vsg::ref_ptr<Keyboard>& keyboard
 )
     : camera_settings(camera_settings)
     , mouse(mouse)
@@ -200,6 +201,21 @@ const vsg::dvec3& Camera::get_right() const
 const vsg::dvec3& Camera::get_up() const
 {
     return up_;
+}
+
+const vsg::ref_ptr<vsg::Perspective>& Camera::get_perspective() const
+{
+    return perspective;
+}
+
+const vsg::ref_ptr<vsg::Orthographic>& Camera::get_orthographic() const
+{
+    return orthographic;
+}
+
+const vsg::ref_ptr<vsg::LookAt>& Camera::get_look_at() const
+{
+    return look_at;
 }
 
 // Create plane perpedicular to camera normal passing through

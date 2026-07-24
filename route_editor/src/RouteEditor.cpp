@@ -89,7 +89,7 @@ bool RouteEditor::initialize()
     );
 
     intersection_handler = IntersectionHandler::create(camera);
-    scene_graph = SceneGraph::create(context_, camera_settings, vsg_options, context_.route);
+    scene_graph = SceneGraph::create(context_, camera_settings, vsg_options, route);
 
     context_.outline_builder = OutlineBuilder::create();
 
@@ -115,7 +115,7 @@ bool RouteEditor::initialize()
     state_manager = std::make_unique<StateManager>(mouse, keyboard, camera);
     const auto editor_gui = EditorGui::create(context_, camera_settings,
         gui_settings, key_bindings, *state_manager, camera, editor_state,
-        command_list, context_.route);
+        command_list, route);
 
     const auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
 
@@ -134,7 +134,7 @@ bool RouteEditor::initialize()
     viewer_ = vsg::Viewer::create();
 
     context_.object_selector = ObjectSelector::create(context_, mouse, keyboard,
-        gizmo_settings, camera, command_list, intersection_handler, scene_graph, context_.route);
+        gizmo_settings, camera, command_list, intersection_handler, scene_graph, route);
 
     viewer_->addWindow(window);
 

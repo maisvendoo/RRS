@@ -27,6 +27,7 @@
 #include "commands/RotateObjects.h"
 #include "commands/ScaleObjects.h"
 #include "commands/TranslateObjects.h"
+#include "settings/CameraSettings.h"
 #include "settings/GuiSettings.h"
 
 #include <ImGuiFileDialog.h>
