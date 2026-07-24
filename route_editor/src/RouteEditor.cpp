@@ -89,7 +89,7 @@ bool RouteEditor::initialize()
     );
 
     intersection_handler = IntersectionHandler::create(camera);
-    scene_graph = SceneGraph::create(context_, camera_settings, vsg_options, route);
+    scene_graph = SceneGraph::create(context_, camera_settings, vsg_options, route, context_.route_dir);
 
     context_.outline_builder = OutlineBuilder::create();
 

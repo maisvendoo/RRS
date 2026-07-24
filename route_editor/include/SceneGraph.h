@@ -23,7 +23,8 @@ public:
         EditorContext& context,
         const camera_settings_t& camera_settings,
         const vsg::ref_ptr<vsg::Options>& vsg_options,
-        vsg::ref_ptr<Route>& route
+        vsg::ref_ptr<Route>& route,
+        const std::string& route_dir
     );
 
     void load_route();
@@ -33,6 +34,7 @@ private:
     const camera_settings_t& camera_settings;
     const vsg::ref_ptr<vsg::Options>& vsg_options;
     vsg::ref_ptr<Route>& route;
+    const std::string& route_dir;
 
     vsg::ref_ptr<vsg::AmbientLight> ambient_light_;
 };

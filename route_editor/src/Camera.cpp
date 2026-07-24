@@ -257,9 +257,9 @@ void Camera::calculate_front()
     const double pitch_rad = vsg::radians(pitch_deg_);
 
     front_ = vsg::normalize(vsg::dvec3(
-        sin(yaw_rad) * cos(pitch_rad),
-        cos(yaw_rad) * cos(pitch_rad),
-        sin(pitch_rad)
+        std::sin(yaw_rad) * std::cos(pitch_rad),
+        std::cos(yaw_rad) * std::cos(pitch_rad),
+        std::sin(pitch_rad)
     ));
 }
 

@@ -64,11 +64,13 @@ static vsg::dvec3 to_vsg_vec3(dvec3 vec)
 Route::Route(
     EditorContext& context,
     const camera_settings_t& camera_settings,
-    const vsg::ref_ptr<vsg::Options>& vsg_options
+    const vsg::ref_ptr<vsg::Options>& vsg_options,
+    const std::string& route_dir
 )
     : context_(context)
     , camera_settings(camera_settings)
     , vsg_options(vsg_options)
+    , route_dir(route_dir)
 {
     const bool success = load_objects_ref() && load_route_map()
         && load_stations_conf() && load_waypoints_conf();
@@ -83,7 +85,7 @@ Route::Route(
     for (auto& [label, ref] : context.objects_ref)
     {
         const auto paged_lod = vsg::PagedLOD::create();
-        paged_lod->filename = fs.combinePath(context.route_dir,
+        paged_lod->filename = fs.combinePath(route_dir,
             ref.relative_path);
 
         paged_lod->bound = vsg::dsphere(vsg::dvec3(0.0, 0.0, 0.0),
@@ -107,7 +109,7 @@ bool Route::load_objects_ref()
     const FileSystem& fs = FileSystem::getInstance();
 
     const std::string objects_ref_path = fs.combinePath(
-        context_.route_dir, "objects.ref");
+        route_dir, "objects.ref");
 
     std::ifstream objects_ref_file(objects_ref_path);
     if (!objects_ref_file)
@@ -138,7 +140,7 @@ bool Route::load_route_map()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string route_map_path = fs.combinePath(context_.route_dir,
+    const std::string route_map_path = fs.combinePath(route_dir,
         "topology", "map", "route1.map");
 
     std::ifstream route_map_file(route_map_path);
@@ -190,7 +192,7 @@ bool Route::load_stations_conf()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string stations_conf_path = fs.combinePath(context_.route_dir,
+    const std::string stations_conf_path = fs.combinePath(route_dir,
         "topology", "stations.conf");
 
     std::ifstream stations_conf_file(stations_conf_path);
@@ -226,7 +228,7 @@ bool Route::load_waypoints_conf()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string waypoints_conf_path = fs.combinePath(context_.route_dir,
+    const std::string waypoints_conf_path = fs.combinePath(route_dir,
         "topology", "waypoints.conf");
 
     std::ifstream waypoints_conf_file(waypoints_conf_path);
@@ -300,7 +302,7 @@ bool Route::load_topology()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string cfg_path = fs.combinePath(context_.route_dir,
+    const std::string cfg_path = fs.combinePath(route_dir,
         "topology", "models-config.xml");
 
     CfgReader cfg;

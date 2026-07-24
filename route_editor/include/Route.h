@@ -4,6 +4,8 @@
 #include <vsg/core/Inherit.h>
 #include <vsg/nodes/Switch.h>
 
+#include <string>
+
 struct EditorContext;
 struct camera_settings_t;
 
@@ -13,7 +15,8 @@ public:
     Route(
         EditorContext& context,
         const camera_settings_t& camera_settings,
-        const vsg::ref_ptr<vsg::Options>& vsg_options
+        const vsg::ref_ptr<vsg::Options>& vsg_options,
+        const std::string& route_dir
     );
 
 private:
@@ -29,6 +32,7 @@ private:
     EditorContext& context_;
     const camera_settings_t& camera_settings;
     const vsg::ref_ptr<vsg::Options>& vsg_options;
+    const std::string& route_dir;
 };
 
 #endif // ROUTE_H
