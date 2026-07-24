@@ -61,6 +61,7 @@ private:
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::ref_ptr<Route> route;
+    std::string route_dir;
 };
 
 #endif // ROUTE_EDITOR_H

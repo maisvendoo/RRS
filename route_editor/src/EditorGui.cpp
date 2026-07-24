@@ -91,7 +91,8 @@ EditorGui::EditorGui(
     const vsg::ref_ptr<Camera>& camera,
     EditorState& editor_state,
     CommandList& command_list,
-    const vsg::ref_ptr<Route>& route
+    const vsg::ref_ptr<Route>& route,
+    std::string& route_dir
 )
     : context_(context)
     , camera_settings(camera_settings)
@@ -102,6 +103,7 @@ EditorGui::EditorGui(
     , editor_state(editor_state)
     , command_list(command_list)
     , route(route)
+    , route_dir(route_dir)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -876,11 +878,11 @@ void EditorGui::draw_load_route_file_dialog() const
     {
         if (ImGuiFileDialog::Instance()->IsOk())
         {
-            context_.route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
-            if (!std::filesystem::exists(context_.route_dir + "/models") ||
-                !std::filesystem::exists(context_.route_dir + "/textures") ||
-                !std::filesystem::exists(context_.route_dir + "/topology") ||
-                !std::filesystem::exists(context_.route_dir + "/objects.ref"))
+            route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
+            if (!std::filesystem::exists(route_dir + "/models") ||
+                !std::filesystem::exists(route_dir + "/textures") ||
+                !std::filesystem::exists(route_dir + "/topology") ||
+                !std::filesystem::exists(route_dir + "/objects.ref"))
             {
                 ImGui::OpenPopup("InvalidRoute");
             }

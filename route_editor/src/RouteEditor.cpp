@@ -78,7 +78,7 @@ bool RouteEditor::initialize()
     mouse = Mouse::create();
     keyboard = Keyboard::create(key_bindings);
     auto undo_redo_save_handler = UndoRedoSaveHandler::create(
-        keyboard, command_list, context_.route_dir,
+        keyboard, command_list, route_dir,
         context_.static_objects_mutex, context_.static_objects);
 
     camera = Camera::create(
@@ -89,7 +89,7 @@ bool RouteEditor::initialize()
     );
 
     intersection_handler = IntersectionHandler::create(camera);
-    scene_graph = SceneGraph::create(context_, camera_settings, vsg_options, route, context_.route_dir);
+    scene_graph = SceneGraph::create(context_, camera_settings, vsg_options, route, route_dir);
 
     context_.outline_builder = OutlineBuilder::create();
 
@@ -115,7 +115,7 @@ bool RouteEditor::initialize()
     state_manager = std::make_unique<StateManager>(mouse, keyboard, camera);
     const auto editor_gui = EditorGui::create(context_, camera_settings,
         gui_settings, key_bindings, *state_manager, camera, editor_state,
-        command_list, route);
+        command_list, route, route_dir);
 
     const auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
 
@@ -128,8 +128,7 @@ bool RouteEditor::initialize()
     render_graph_->addChild(clear_attachments_);
     render_graph_->addChild(render_gui);
 
-    const auto command_graph = vsg::CommandGraph::create(window,
-        render_graph_);
+    const auto command_graph = vsg::CommandGraph::create(window, render_graph_);
 
     viewer_ = vsg::Viewer::create();
 

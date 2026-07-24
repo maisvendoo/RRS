@@ -83,8 +83,6 @@ struct EditorContext
     std::map<std::string, vsg::dvec3> stations_conf;
     std::map<std::string, WaypointData> waypoints_conf;
 
-    std::string route_dir;
-
     double delta_time = 0.0;
 
     RouteObjects deferred_selection;

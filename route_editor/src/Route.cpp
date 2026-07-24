@@ -339,7 +339,7 @@ bool Route::load_topology()
     context_.topology_mutex.unlock();
 
     const auto directory_name = std::filesystem::path(
-        context_.route_dir).filename();
+        route_dir).filename();
 
     if (!context_.topology->load(directory_name.string().c_str()))
     {
