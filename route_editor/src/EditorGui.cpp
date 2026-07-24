@@ -89,7 +89,8 @@ EditorGui::EditorGui(
     StateManager& state_manager,
     const vsg::ref_ptr<Camera>& camera,
     EditorState& editor_state,
-    CommandList& command_list
+    CommandList& command_list,
+    const vsg::ref_ptr<Route>& route
 )
     : context_(context)
     , camera_settings(camera_settings)
@@ -99,6 +100,7 @@ EditorGui::EditorGui(
     , camera(camera)
     , editor_state(editor_state)
     , command_list(command_list)
+    , route(route)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -238,7 +240,7 @@ void EditorGui::show_objects_ref() const
 {
     ImGui::Begin("objects_ref", nullptr, window_flags_);
 
-    if (!context_.route)
+    if (!route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -289,7 +291,7 @@ void EditorGui::show_route_map() const
 {
     ImGui::Begin("route1.map", nullptr, window_flags_);
 
-    if (!context_.route)
+    if (!route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -510,7 +512,6 @@ void EditorGui::show_topology() const
 {
     ImGui::Begin("Topology", nullptr, window_flags_);
 
-    const auto route = context_.route;
     if (!route)
     {
         ImGui::Text("There is no route yet");
@@ -689,7 +690,7 @@ void EditorGui::add_object(
         camera->get_look_at()->eye +
         camera->get_front() * 20.0);
 
-    command_list.push(new AddObject(context_, object), true);
+    command_list.push(new AddObject(context_, object, route), true);
 }
 
 void EditorGui::save_objects_matrixes() const

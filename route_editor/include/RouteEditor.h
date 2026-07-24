@@ -21,6 +21,7 @@ class Keyboard;
 class Mouse;
 class SceneGraph;
 class StateManager;
+class WindowHandler;
 
 class RouteEditor
 {

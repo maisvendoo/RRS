@@ -37,7 +37,8 @@ ObjectSelector::ObjectSelector(
     const vsg::ref_ptr<Camera>& camera,
     CommandList& command_list,
     const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
-    const vsg::ref_ptr<SceneGraph>& scene_graph
+    const vsg::ref_ptr<SceneGraph>& scene_graph,
+    const vsg::ref_ptr<Route>& route
 )
     : context_(context)
     , mouse(mouse)
@@ -46,6 +47,7 @@ ObjectSelector::ObjectSelector(
     , command_list(command_list)
     , intersection_handler(intersection_handler)
     , scene_graph(scene_graph)
+    , route(route)
 {
     context.gizmo = Gizmo::create(context, gizmo_settings, intersection_handler, camera, command_list);
 
@@ -86,12 +88,12 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     }
     else if (keyboard->pressed(ACTION_PASTE_OBJECTS))
     {
-        command_list.push(new PasteObjects(context_), true);
+        command_list.push(new PasteObjects(context_, route), true);
         return;
     }
     else if (keyboard->pressed(ACTION_DELETE_OBJECTS))
     {
-        command_list.push(new DeleteObjects(context_), true);
+        command_list.push(new DeleteObjects(context_, route), true);
         return;
     }
 

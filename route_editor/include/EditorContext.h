@@ -21,7 +21,6 @@ class ObjectSelector;
 class OutlineBuilder;
 class Route;
 class Topology;
-class WindowHandler;
 
 namespace vsg
 {

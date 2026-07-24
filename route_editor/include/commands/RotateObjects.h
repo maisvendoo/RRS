@@ -14,7 +14,9 @@ public:
         const vsg::dvec3& pivot, const vsg::dvec3& axis, double radians);
 
     virtual ~RotateObjects() override = default;
+
     virtual void execute() override;
+
     virtual void update_description() override;
 
 private:

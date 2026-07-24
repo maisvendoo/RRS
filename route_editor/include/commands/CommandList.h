@@ -21,10 +21,13 @@ public:
     ~CommandList();
 
     void push(Command* command, bool execute);
+
     void undo();
+
     void redo();
 
     const CommandNode* get_active() const;
+
     const CommandNode* get_tail() const;
 
 private:

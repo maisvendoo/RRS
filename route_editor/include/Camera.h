@@ -32,17 +32,25 @@ public:
     virtual ~Camera() = default;
 
     void handle_key_press();
+
     void update_move_direction();
+
     void handle_mouse_move();
+
     void update(double delta_time);
+
     void handle_mouse_scroll();
 
     const vsg::dvec3& get_front() const;
+
     const vsg::dvec3& get_right() const;
+
     const vsg::dvec3& get_up() const;
 
     const vsg::ref_ptr<vsg::Perspective>& get_perspective() const { return perspective; }
+
     const vsg::ref_ptr<vsg::Orthographic>& get_orthographic() const { return orthographic; }
+
     const vsg::ref_ptr<vsg::LookAt>& get_look_at() const { return look_at; }
 
     // Create plane perpedicular to camera normal and passing through
@@ -54,7 +62,9 @@ public:
 
 private:
     void calculate_front();
+
     void calculate_right();
+
     void calculate_up();
 
 private:

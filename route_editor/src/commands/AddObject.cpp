@@ -1,9 +1,9 @@
 #include "commands/AddObject.h"
 
-#include "commands/Command.h"
+#include "Route.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
-#include "Route.h"
+#include "commands/Command.h"
 
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
@@ -11,11 +11,15 @@
 #include <algorithm>
 #include <cstdio>
 
-AddObject::AddObject(EditorContext& context,
-    vsg::ref_ptr<RouteObject> object)
+AddObject::AddObject(
+    EditorContext& context,
+    vsg::ref_ptr<RouteObject> object,
+    const vsg::ref_ptr<Route>& route
+)
     : Command(context)
     , object_to_add_(object)
     , objects_to_deselect_(context.selected_objects)
+    , route(route)
 {
     update_description();
 }
@@ -28,7 +32,7 @@ void AddObject::execute()
     }
 
     context_.compile_infos.emplace_back(CompileInfo{
-        context_.route, object_to_add_, vsg::MASK_ALL});
+        route, object_to_add_, vsg::MASK_ALL});
 
     context_.static_objects_mutex.lock();
     context_.static_objects.emplace_back(object_to_add_);
@@ -51,8 +55,6 @@ void AddObject::undo()
     --context_.static_objects_count;
     --context_.total_static_objects_count;
 
-    const auto route = context_.route;
-
     route->children.erase(
         std::find_if(route->children.begin(), route->children.end(),
             [this](const vsg::Switch::Child& child) {
@@ -66,7 +68,7 @@ void AddObject::undo()
         object->select();
     }
 
-    context_.compile_infos.emplace_back(CompileInfo{nullptr, context_.route});
+    context_.compile_infos.emplace_back(CompileInfo{nullptr, route});
 
     context_.gizmo->update_visibility();
 }

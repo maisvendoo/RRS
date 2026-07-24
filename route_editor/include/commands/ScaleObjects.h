@@ -14,7 +14,9 @@ public:
         const vsg::dvec3& pivot, const vsg::dvec3& scale);
 
     virtual ~ScaleObjects() override = default;
+
     virtual void execute() override;
+
     virtual void update_description() override;
 
 private:

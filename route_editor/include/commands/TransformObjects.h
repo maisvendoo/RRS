@@ -1,8 +1,8 @@
 #ifndef TRANSFORM_OBJECTS_H
 #define TRANSFORM_OBJECTS_H
 
-#include "commands/Command.h"
 #include "RouteObject.h"
+#include "commands/Command.h"
 
 #include <vsg/maths/mat4.h>
 
@@ -14,7 +14,9 @@ class TransformObjects : public Command
 {
 public:
     TransformObjects(EditorContext& context, const RouteObjects& objects);
+
     virtual ~TransformObjects() override = default;
+
     virtual void undo() override;
 
 protected:

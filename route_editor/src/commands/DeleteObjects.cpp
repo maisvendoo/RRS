@@ -11,9 +11,13 @@
 #include <algorithm>
 #include <cstdio>
 
-DeleteObjects::DeleteObjects(EditorContext& context)
+DeleteObjects::DeleteObjects(
+    EditorContext& context,
+    const vsg::ref_ptr<Route>& route
+)
     : Command(context)
     , objects_(context.selected_objects)
+    , route(route)
 {
     update_description();
 }
@@ -32,8 +36,6 @@ void DeleteObjects::execute()
         --context_.static_objects_count;
         --context_.total_static_objects_count;
 
-        const auto route = context_.route;
-
         route->children.erase(
             std::find_if(route->children.begin(), route->children.end(),
                 [object](const vsg::Switch::Child& child) {
@@ -43,7 +45,7 @@ void DeleteObjects::execute()
         );
     }
 
-    context_.compile_infos.emplace_back(CompileInfo{nullptr, context_.route});
+    context_.compile_infos.emplace_back(CompileInfo{nullptr, route});
 
     context_.gizmo->update_visibility();
 }
@@ -53,7 +55,7 @@ void DeleteObjects::undo()
     for (const auto& object : objects_)
     {
         context_.compile_infos.emplace_back(CompileInfo{
-            context_.route, object, vsg::MASK_ALL});
+            route, object, vsg::MASK_ALL});
 
         context_.static_objects_mutex.lock();
         context_.static_objects.emplace_back(object);

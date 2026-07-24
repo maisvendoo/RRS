@@ -12,10 +12,14 @@
 #include <algorithm>
 #include <cstdio>
 
-PasteObjects::PasteObjects(EditorContext& context)
+PasteObjects::PasteObjects(
+    EditorContext& context,
+    const vsg::ref_ptr<Route>& route
+)
     : Command(context)
     , objects_to_paste_(context.copied_objects)
     , objects_to_deselect_(context.selected_objects)
+    , route(route)
 {
     update_description();
 }
@@ -38,7 +42,7 @@ void PasteObjects::execute()
     for (const auto& pasted_object : pasted_objects_)
     {
         context_.compile_infos.emplace_back(CompileInfo{
-            context_.route, pasted_object, vsg::MASK_ALL});
+            route, pasted_object, vsg::MASK_ALL});
 
         context_.static_objects_mutex.lock();
         context_.static_objects.emplace_back(pasted_object);
@@ -67,8 +71,6 @@ void PasteObjects::undo()
         --context_.static_objects_count;
         --context_.total_static_objects_count;
 
-        const auto route = context_.route;
-
         route->children.erase(
             std::find_if(route->children.begin(), route->children.end(),
                 [pasted_object](const vsg::Switch::Child& child) {
@@ -83,7 +85,7 @@ void PasteObjects::undo()
         object->select();
     }
 
-    context_.compile_infos.emplace_back(CompileInfo{nullptr, context_.route});
+    context_.compile_infos.emplace_back(CompileInfo{nullptr, route});
 
     context_.gizmo->update_visibility();
 }

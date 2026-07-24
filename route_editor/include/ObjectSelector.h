@@ -38,7 +38,8 @@ public:
         const vsg::ref_ptr<Camera>& camera,
         CommandList& command_list,
         const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
-        const vsg::ref_ptr<SceneGraph>& scene_graph
+        const vsg::ref_ptr<SceneGraph>& scene_graph,
+        const vsg::ref_ptr<Route>& route
     );
 
     void apply(vsg::KeyPressEvent& keyPress) override;
@@ -70,6 +71,7 @@ private:
     CommandList& command_list;
     const vsg::ref_ptr<IntersectionHandler>& intersection_handler;
     const vsg::ref_ptr<SceneGraph>& scene_graph;
+    const vsg::ref_ptr<Route>& route;
 
     vsg::dvec3 prev_intersect_pos_;
     vsg::dvec3 total_translation_;

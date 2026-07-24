@@ -3,6 +3,7 @@
 
 #include "EditorState.h"
 #include "KeyBindings.h"
+#include "Route.h"
 #include "StateManager.h"
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
@@ -36,7 +37,8 @@ public:
         StateManager& state_manager,
         const vsg::ref_ptr<Camera>& camera,
         EditorState& editor_state,
-        CommandList& command_list
+        CommandList& command_list,
+        const vsg::ref_ptr<Route>& route
     );
 
     ~EditorGui();
@@ -90,6 +92,7 @@ private:
     const vsg::ref_ptr<Camera>& camera;
     EditorState& editor_state;
     CommandList& command_list;
+    const vsg::ref_ptr<Route>& route;
 
     ImGuiWindowFlags window_flags_;
     ImGuiViewport* viewport;
