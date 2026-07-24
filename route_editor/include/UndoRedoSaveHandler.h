@@ -38,7 +38,7 @@ private:
     void save_route() const;
 
 private:
-    vsg::ref_ptr<Keyboard> keyboard_;
+    const vsg::ref_ptr<Keyboard>& keyboard_;
     CommandList& commands_;
     const std::string& route_dir_;
     std::mutex& static_objects_mutex_;

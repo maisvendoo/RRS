@@ -59,7 +59,7 @@ static vsg::ref_ptr<vsg::Commands> create_quad(
 
 Camera::Camera(
     const camera_settings_t& camera_settings,
-    VkExtent2D window_extent,
+    const VkExtent2D& window_extent,
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard
 )
