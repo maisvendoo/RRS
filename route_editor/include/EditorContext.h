@@ -20,7 +20,6 @@ class Gizmo;
 class ObjectSelector;
 class OutlineBuilder;
 class Route;
-class SceneGraph;
 class Topology;
 class WindowHandler;
 
@@ -57,7 +56,6 @@ struct EditorContext
     EditorContext();
     ~EditorContext();
 
-    vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::ref_ptr<Route> route;
 
     RouteObjects static_objects;

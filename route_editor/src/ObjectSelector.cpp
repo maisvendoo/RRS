@@ -36,7 +36,8 @@ ObjectSelector::ObjectSelector(
     const gizmo_settings_t& gizmo_settings,
     const vsg::ref_ptr<Camera>& camera,
     CommandList& command_list,
-    const vsg::ref_ptr<IntersectionHandler>& intersection_handler
+    const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
+    const vsg::ref_ptr<SceneGraph>& scene_graph
 )
     : context_(context)
     , mouse(mouse)
@@ -44,16 +45,17 @@ ObjectSelector::ObjectSelector(
     , camera(camera)
     , command_list(command_list)
     , intersection_handler(intersection_handler)
+    , scene_graph(scene_graph)
 {
     context.gizmo = Gizmo::create(context, gizmo_settings, intersection_handler, camera, command_list);
 
     front_plane_switch_ = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
 
-    context.scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE},
+    scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE},
         context.gizmo);
 
-    context.scene_graph->addChild(vsg::Mask{MASK_CLICKABLE},
+    scene_graph->addChild(vsg::Mask{MASK_CLICKABLE},
         front_plane_switch_);
 }
 
@@ -191,7 +193,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    context_.scene_graph->accept(*intersector);
+    scene_graph->accept(*intersector);
 
     auto& intersections = intersector->intersections;
     if (intersections.empty())

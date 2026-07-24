@@ -3,6 +3,7 @@
 
 #include "Camera.h"
 #include "IntersectionHandler.h"
+#include "SceneGraph.h"
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
@@ -36,7 +37,8 @@ public:
         const gizmo_settings_t& gizmo_settings,
         const vsg::ref_ptr<Camera>& camera,
         CommandList& command_list,
-        const vsg::ref_ptr<IntersectionHandler>& intersection_handler
+        const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
+        const vsg::ref_ptr<SceneGraph>& scene_graph
     );
 
     void apply(vsg::KeyPressEvent& keyPress) override;
@@ -67,6 +69,7 @@ private:
     const vsg::ref_ptr<Camera>& camera;
     CommandList& command_list;
     const vsg::ref_ptr<IntersectionHandler>& intersection_handler;
+    const vsg::ref_ptr<SceneGraph>& scene_graph;
 
     vsg::dvec3 prev_intersect_pos_;
     vsg::dvec3 total_translation_;

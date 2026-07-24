@@ -25,5 +25,5 @@ void SceneGraph::load_route()
     context_.route = Route::create(context_, camera_settings, vsg_options);
 
     context_.compile_infos.emplace_back(CompileInfo{
-        context_.scene_graph, context_.route, vsg::MASK_ALL});
+        vsg::ref_ptr(this), context_.route, vsg::MASK_ALL});
 }

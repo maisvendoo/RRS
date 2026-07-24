@@ -4,7 +4,6 @@
 #include "ObjectSelector.h"
 #include "Outline.h"
 #include "Route.h"
-#include "SceneGraph.h"
 #include "topology.h"
 #include "WindowHandler.h"
 

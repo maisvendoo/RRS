@@ -89,11 +89,11 @@ bool RouteEditor::initialize()
     );
 
     intersection_handler = IntersectionHandler::create(camera);
-    context_.scene_graph = SceneGraph::create(context_, camera_settings, vsg_options);
+    scene_graph = SceneGraph::create(context_, camera_settings, vsg_options);
 
     context_.outline_builder = OutlineBuilder::create();
 
-    const auto scene_view = vsg::View::create(camera, context_.scene_graph);
+    const auto scene_view = vsg::View::create(camera, scene_graph);
     scene_view->mask = MASK_SCENE;
 
     VkClearValue clear_value{};
@@ -106,10 +106,10 @@ bool RouteEditor::initialize()
         vsg::ClearAttachments::Attachments{attachment},
         vsg::ClearAttachments::Rects{rect});
 
-    const auto gui_view1 = vsg::View::create(camera, context_.scene_graph);
+    const auto gui_view1 = vsg::View::create(camera, scene_graph);
     gui_view1->mask = MASK_GUI1;
 
-    const auto gui_view2 = vsg::View::create(camera, context_.scene_graph);
+    const auto gui_view2 = vsg::View::create(camera, scene_graph);
     gui_view2->mask = MASK_GUI2;
 
     state_manager = std::make_unique<StateManager>(mouse, keyboard, camera);
@@ -133,7 +133,7 @@ bool RouteEditor::initialize()
     viewer_ = vsg::Viewer::create();
 
     context_.object_selector = ObjectSelector::create(context_, mouse, keyboard,
-        gizmo_settings, camera, command_list, intersection_handler);
+        gizmo_settings, camera, command_list, intersection_handler, scene_graph);
 
     viewer_->addWindow(window);
 
@@ -173,7 +173,7 @@ void RouteEditor::run()
 
         if (editor_state == EditorState::LOAD_ROUTE)
         {
-            context_.scene_graph->load_route();
+            scene_graph->load_route();
             editor_state = EditorState::EDIT_ROUTE;
         }
 

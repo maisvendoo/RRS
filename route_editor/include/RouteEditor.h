@@ -1,10 +1,8 @@
 #ifndef ROUTE_EDITOR_H
 #define ROUTE_EDITOR_H
 
-#include "Camera.h"
 #include "EditorContext.h"
 #include "EditorState.h"
-#include "IntersectionHandler.h"
 #include "KeyBindings.h"
 #include "commands/CommandList.h"
 #include "settings/CameraSettings.h"
@@ -13,11 +11,15 @@
 #include "settings/SceneSettings.h"
 #include "settings/WindowSettings.h"
 
-#include <memory>
 #include <vsg/io/Options.h>
 
+#include <memory>
+
+class Camera;
+class IntersectionHandler;
 class Keyboard;
 class Mouse;
+class SceneGraph;
 class StateManager;
 
 class RouteEditor
@@ -55,6 +57,7 @@ private:
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
     vsg::ref_ptr<IntersectionHandler> intersection_handler;
+    vsg::ref_ptr<SceneGraph> scene_graph;
 };
 
 #endif // ROUTE_EDITOR_H
