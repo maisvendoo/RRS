@@ -1,7 +1,6 @@
 #include "EditorContext.h"
 
 #include "Gizmo.h"
-#include "IntersectionHandler.h"
 #include "ObjectSelector.h"
 #include "Outline.h"
 #include "Route.h"

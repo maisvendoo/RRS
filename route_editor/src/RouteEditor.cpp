@@ -68,9 +68,9 @@ bool RouteEditor::initialize()
 
     configure_shaders();
 
-    window_handler_ = WindowHandler::create(window_settings, context_.window, camera);
+    window_handler_ = WindowHandler::create(window_settings, window, camera);
 
-    if (!context_.window)
+    if (!window)
     {
         return false;
     }
@@ -83,12 +83,12 @@ bool RouteEditor::initialize()
 
     camera = Camera::create(
         camera_settings,
-        context_.window->extent2D(),
+        window->extent2D(),
         mouse,
         keyboard
     );
 
-    context_.intersection_handler = IntersectionHandler::create(camera);
+    intersection_handler = IntersectionHandler::create(camera);
     context_.scene_graph = SceneGraph::create(context_, camera_settings, vsg_options);
 
     context_.outline_builder = OutlineBuilder::create();
@@ -99,7 +99,7 @@ bool RouteEditor::initialize()
     VkClearValue clear_value{};
     clear_value.depthStencil = {0.0f, 0};
     VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clear_value};
-    const VkExtent2D& extent = context_.window->extent2D();
+    const VkExtent2D& extent = window->extent2D();
     VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, extent}, 0, 1};
 
     const auto clear_attachments_ = vsg::ClearAttachments::create(
@@ -116,9 +116,9 @@ bool RouteEditor::initialize()
     const auto editor_gui = EditorGui::create(context_, camera_settings,
         gui_settings, key_bindings, *state_manager, camera, editor_state, command_list);
 
-    const auto render_gui = vsgImGui::RenderImGui::create(context_.window, editor_gui);
+    const auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
 
-    const auto render_graph_ = vsg::RenderGraph::create(context_.window);
+    const auto render_graph_ = vsg::RenderGraph::create(window);
     render_graph_->addChild(scene_view);
     render_graph_->addChild(clear_attachments_);
     render_graph_->addChild(gui_view1);
@@ -127,15 +127,15 @@ bool RouteEditor::initialize()
     render_graph_->addChild(clear_attachments_);
     render_graph_->addChild(render_gui);
 
-    const auto command_graph = vsg::CommandGraph::create(context_.window,
+    const auto command_graph = vsg::CommandGraph::create(window,
         render_graph_);
 
     viewer_ = vsg::Viewer::create();
 
     context_.object_selector = ObjectSelector::create(context_, mouse, keyboard,
-        gizmo_settings, camera, command_list);
+        gizmo_settings, camera, command_list, intersection_handler);
 
-    viewer_->addWindow(context_.window);
+    viewer_->addWindow(window);
 
     viewer_->addEventHandler(keyboard);
     viewer_->addEventHandler(vsgImGui::SendEventsToImGui::create());
@@ -146,7 +146,7 @@ bool RouteEditor::initialize()
 
     viewer_->addEventHandler(EventHandler::create(*state_manager));
 
-    viewer_->addEventHandler(context_.intersection_handler);
+    viewer_->addEventHandler(intersection_handler);
     viewer_->addEventHandler(context_.object_selector);
 
     viewer_->assignRecordAndSubmitTaskAndPresentation({command_graph});

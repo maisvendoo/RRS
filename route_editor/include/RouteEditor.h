@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "EditorContext.h"
 #include "EditorState.h"
+#include "IntersectionHandler.h"
 #include "KeyBindings.h"
 #include "commands/CommandList.h"
 #include "settings/CameraSettings.h"
@@ -52,6 +53,8 @@ private:
     EditorState editor_state = EditorState::SELECT_ROUTE;
     CommandList command_list;
     vsg::ref_ptr<vsg::Options> vsg_options;
+    vsg::ref_ptr<vsg::Window> window;
+    vsg::ref_ptr<IntersectionHandler> intersection_handler;
 };
 
 #endif // ROUTE_EDITOR_H

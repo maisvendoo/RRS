@@ -30,7 +30,7 @@ public:
     Gizmo(
         EditorContext& context,
         const gizmo_settings_t& gizmo_settings,
-        vsg::ref_ptr<IntersectionHandler>& intersection_handler,
+        const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
         const vsg::ref_ptr<Camera>& camera,
         CommandList& command_list
     );
@@ -48,7 +48,7 @@ public:
 private:
     EditorContext& context_;
     const gizmo_settings_t& gizmo_settings;
-    vsg::ref_ptr<IntersectionHandler>& intersection_handler;
+    const vsg::ref_ptr<IntersectionHandler>& intersection_handler;
     const vsg::ref_ptr<Camera>& camera;
     CommandList& command_list;
 

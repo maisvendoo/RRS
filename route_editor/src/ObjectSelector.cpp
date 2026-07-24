@@ -35,15 +35,17 @@ ObjectSelector::ObjectSelector(
     const vsg::ref_ptr<Keyboard>& keyboard,
     const gizmo_settings_t& gizmo_settings,
     const vsg::ref_ptr<Camera>& camera,
-    CommandList& command_list
+    CommandList& command_list,
+    const vsg::ref_ptr<IntersectionHandler>& intersection_handler
 )
     : context_(context)
     , mouse(mouse)
     , keyboard(keyboard)
     , camera(camera)
     , command_list(command_list)
+    , intersection_handler(intersection_handler)
 {
-    context.gizmo = Gizmo::create(context, gizmo_settings, context.intersection_handler, camera, command_list);
+    context.gizmo = Gizmo::create(context, gizmo_settings, intersection_handler, camera, command_list);
 
     front_plane_switch_ = SingleSwitch::create(
         vsg::Mask{MASK_CLICKABLE}, nullptr);
@@ -104,7 +106,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     const auto front_plane = camera->create_front_plane(
         context_.gizmo->get_curr_pos(), &front_plane_up_);
 
-    const auto intersector = context_.intersection_handler->apply_(
+    const auto intersector = intersection_handler->apply_(
         mouse->get_pos_x(), mouse->get_pos_y());
 
     if (!intersector)
@@ -115,7 +117,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     front_plane->accept(*intersector);
 
     const auto intersection =
-        context_.intersection_handler->get_closest_intersection(intersector);
+        intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {
@@ -182,7 +184,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     }
 
     const auto intersector =
-        context_.intersection_handler->get_lmb_intersector();
+        intersection_handler->get_lmb_intersector();
 
     if (!intersector)
     {
@@ -212,7 +214,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     }
 
     const auto intersection =
-        context_.intersection_handler->get_closest_intersection(intersector);
+        intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {
@@ -245,12 +247,12 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    const auto intersector = context_.intersection_handler->apply_(moveEvent);
+    const auto intersector = intersection_handler->apply_(moveEvent);
 
     front_plane_switch_->node->accept(*intersector);
 
     const auto intersection =
-        context_.intersection_handler->get_closest_intersection(intersector);
+        intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {

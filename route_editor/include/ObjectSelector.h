@@ -2,6 +2,7 @@
 #define OBJECT_SELECTOR_H
 
 #include "Camera.h"
+#include "IntersectionHandler.h"
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
@@ -34,7 +35,8 @@ public:
         const vsg::ref_ptr<Keyboard>& keyboard,
         const gizmo_settings_t& gizmo_settings,
         const vsg::ref_ptr<Camera>& camera,
-        CommandList& command_list
+        CommandList& command_list,
+        const vsg::ref_ptr<IntersectionHandler>& intersection_handler
     );
 
     void apply(vsg::KeyPressEvent& keyPress) override;
@@ -64,6 +66,7 @@ private:
     const vsg::ref_ptr<Keyboard>& keyboard;
     const vsg::ref_ptr<Camera>& camera;
     CommandList& command_list;
+    const vsg::ref_ptr<IntersectionHandler>& intersection_handler;
 
     vsg::dvec3 prev_intersect_pos_;
     vsg::dvec3 total_translation_;

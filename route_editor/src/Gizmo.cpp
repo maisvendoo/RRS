@@ -49,7 +49,7 @@ static constexpr vsg::dvec3 Z_AXIS_POSITIVEd = {0.0, 0.0, 1.0};
 Gizmo::Gizmo(
     EditorContext& context,
     const gizmo_settings_t& gizmo_settings,
-    vsg::ref_ptr<IntersectionHandler>& intersection_handler,
+    const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
     const vsg::ref_ptr<Camera>& camera,
     CommandList& command_list
 )
@@ -271,12 +271,12 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
         return;
     }
 
-    const auto intersector = context_.intersection_handler->apply_(moveEvent);
+    const auto intersector = intersection_handler->apply_(moveEvent);
 
     this->accept(*intersector);
 
     const auto intersection =
-        context_.intersection_handler->get_closest_intersection(intersector);
+        intersection_handler->get_closest_intersection(intersector);
 
     if (!intersection)
     {
