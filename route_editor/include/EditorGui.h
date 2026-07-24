@@ -2,21 +2,22 @@
 #define EDITOR_GUI_H
 
 #include "EditorState.h"
-#include "KeyBindings.h"
-#include "Route.h"
-#include "StateManager.h"
-#include <string>
+
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsgImGui/imgui.h>
 
 #include <cstddef>
+#include <string>
 
 class Camera;
 class CommandList;
-class RouteObject;
 struct EditorContext;
+struct KeyBindings;
+class Route;
+class RouteObject;
+class StateManager;
 struct camera_settings_t;
 struct gui_settings_t;
 
