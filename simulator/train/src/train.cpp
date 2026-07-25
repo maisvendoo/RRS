@@ -5,6 +5,7 @@
 #include    "physics.h"
 #include    "Journal.h"
 #include    <vehicle-controller.h>
+#include    <core/load_module.h>
 
 //------------------------------------------------------------------------------
 //
@@ -35,7 +36,7 @@ bool Train::init(const init_data_t& init_data, int model_vehicles_count)
     FileSystem &fs = FileSystem::getInstance();
     QString solver_path = QString(fs.getLibraryDir().c_str()) + fs.separator() + solver_config.method;
 
-    train_motion_solver = loadSolver(solver_path);
+    train_motion_solver = LOAD_MODULE(Solver, solver_path);
 
     if (train_motion_solver == nullptr)
     {
@@ -104,7 +105,7 @@ bool Train::init(const solver_config_t& solver_config, std::vector<Vehicle*>& ve
     FileSystem &fs = FileSystem::getInstance();
     QString solver_path = QString(fs.getLibraryDir().c_str()) + fs.separator() + solver_config.method;
 
-    train_motion_solver = loadSolver(solver_path);
+    train_motion_solver = LOAD_MODULE(Solver, solver_path);
 
     if (train_motion_solver == nullptr)
     {
@@ -1100,9 +1101,9 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
             {
                 Journal::instance()->info("==== Vehicle loading ====");
 
-                Vehicle *vehicle = loadVehicle(QString(fs.getModulesDir().c_str()) +
-                                               fs.separator() +
-                                               relModulePath);
+                Vehicle *vehicle = LOAD_MODULE(Vehicle,
+                    QString(fs.getModulesDir().c_str()) +
+                    fs.separator() + relModulePath);
 
                 if (vehicle == nullptr)
                 {
@@ -1353,8 +1354,8 @@ void Train::loadJointModule(Device* con_fwd, Device* con_bwd, std::vector<Joint*
     QString joint_module_name = "";
     cfg.getString(secName, "ModuleName", joint_module_name);
 
-    Joint* joint = loadJoint(QString(joint_module_dir +
-                             fs.separator() + joint_module_name));
+    Joint* joint = LOAD_MODULE(Joint,
+        QString(joint_module_dir + fs.separator() + joint_module_name));
     if (joint == nullptr)
         return;
 

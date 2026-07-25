@@ -2,6 +2,7 @@
 #include    "speedmap.h"
 #include    "topology-connector-device.h"
 #include    "trajectory.h"
+#include    <core/get_module.h>
 
 #include    "physics.h"
 
@@ -399,4 +400,4 @@ void TrajectorySpeedMap::load_config(CfgReader &cfg)
     }
 }
 
-GET_TRAJECTORY_DEVICE(TrajectorySpeedMap)
+GET_MODULE(TrajectorySpeedMap)

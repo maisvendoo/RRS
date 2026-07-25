@@ -1,7 +1,9 @@
 #ifndef     SIMSPEED_COMMAND_H
 #define     SIMSPEED_COMMAND_H
 
-#include    <QBuffer>
+#include    <QByteArray>
+#include    <QDataStream>
+#include    <QIODevice>
 
 //------------------------------------------------------------------------------
 //
@@ -13,23 +15,19 @@ struct simspeed_command_t
     QByteArray serialize()
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << speed_factor;
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> speed_factor;
     }
 };
 
-#endif
+#endif // SIMSPEED_COMMAND_H

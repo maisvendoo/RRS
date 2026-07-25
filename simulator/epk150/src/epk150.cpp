@@ -10,6 +10,7 @@
 #include    <Journal.h>
 */
 #include    "physics.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -149,4 +150,4 @@ void AutoTrainStopEPK150::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-GET_AUTO_TRAIN_STOP(AutoTrainStopEPK150)
+GET_MODULE(AutoTrainStopEPK150)

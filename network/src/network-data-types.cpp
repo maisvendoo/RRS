@@ -1,6 +1,5 @@
 #include "network-data-types.h"
 
-
 #include <QBuffer>
 #include "lz4.h"
 #include <QByteArray>
@@ -24,9 +23,7 @@ network_data_t::network_data_t()
 QByteArray network_data_t::serialize()
 {
     QByteArray tmp_data;
-    QBuffer buff(&tmp_data);
-    buff.open(QIODevice::WriteOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&tmp_data, QIODevice::WriteOnly);
 
     is_compression = (data.size() > 250);
     while (is_compression)
@@ -62,7 +59,7 @@ QByteArray network_data_t::serialize()
     stream << is_compression;
     stream << data;
 
-    return buff.data();
+    return tmp_data;
 }
 
 //------------------------------------------------------------------------------
@@ -70,9 +67,7 @@ QByteArray network_data_t::serialize()
 //------------------------------------------------------------------------------
 void network_data_t::deserialize(QByteArray &data)
 {
-    QBuffer buff(&data);
-    buff.open(QIODevice::ReadOnly);
-    QDataStream stream(&buff);
+    QDataStream stream(&data, QIODevice::ReadOnly);
 
     stream >> data_size;
     stream >> stype;

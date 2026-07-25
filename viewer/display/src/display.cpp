@@ -3,7 +3,6 @@
 #include "display-types.h"
 
 #include <QApplication>
-#include <QLibrary>
 #include <QString>
 #include <QThread>
 #include <QWidget>
@@ -109,24 +108,4 @@ QString AbstractDisplay::getConfigDir() const
 bool AbstractDisplay::isRepaint() const
 {
     return need_repaint;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-AbstractDisplay* loadDisplay(QString lib_path)
-{
-    AbstractDisplay* display = nullptr;
-
-    QLibrary lib(lib_path);
-    if (lib.load())
-    {
-        GetDisplay getDisplay = reinterpret_cast<GetDisplay>(lib.resolve("getDisplay"));
-        if (getDisplay)
-        {
-            display = getDisplay();
-        }
-    }
-
-    return display;
 }

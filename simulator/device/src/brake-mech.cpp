@@ -14,8 +14,6 @@
 
 #include    "brake-mech.h"
 
-#include    <QLibrary>
-
 #include    "physics.h"
 
 //------------------------------------------------------------------------------
@@ -265,26 +263,4 @@ double BrakeMech::phi(double K, double v)
     }
 
     return fric_coeff;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-BrakeMech *loadBrakeMech(QString lib_path)
-{
-    BrakeMech *brake_mech = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetBrakeMech getBrakeMech = reinterpret_cast<GetBrakeMech>(lib.resolve("getBrakeMech"));
-
-        if (getBrakeMech)
-        {
-            brake_mech = getBrakeMech();
-        }
-    }
-
-    return brake_mech;
 }

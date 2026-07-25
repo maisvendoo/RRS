@@ -1,5 +1,3 @@
-#include    <QLibrary>
-
 #include    "pneumo-hose-epb.h"
 
 #include    "CfgReader.h"
@@ -170,26 +168,4 @@ void PneumoHoseEPB::load_config(CfgReader &cfg)
         setLinesNumber(static_cast<size_t>(num));
 
     PneumoHose::load_config(cfg);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-PneumoHoseEPB *loadPneumoHoseEPB(QString lib_path)
-{
-    PneumoHoseEPB *hose_epb = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetPneumoHoseEPB getPneumoHoseEPB = reinterpret_cast<GetPneumoHoseEPB>(lib.resolve("getPneumoHoseEPB"));
-
-        if (getPneumoHoseEPB)
-        {
-            hose_epb = getPneumoHoseEPB();
-        }
-    }
-
-    return hose_epb;
 }

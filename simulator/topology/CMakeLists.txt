@@ -10,8 +10,8 @@ project (${TARGET})
 # Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
+# set(CMAKE_AUTORCC ON)
+# set(CMAKE_AUTOUIC ON)
 
 # Путь, куда надо сложить собранное
 set (LIBRARY_OUTPUT_PATH "../../../lib")
@@ -62,3 +62,4 @@ target_link_libraries (${TARGET} PUBLIC CfgReader)
 target_link_libraries (${TARGET} PUBLIC device)
 target_link_libraries (${TARGET} PUBLIC vehicle)
 target_link_libraries (${TARGET} PUBLIC parsing)
+target_link_libraries (${TARGET} PUBLIC core)

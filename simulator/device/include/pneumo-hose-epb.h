@@ -55,35 +55,4 @@ protected:
 
 };
 
-/*!
- * \typedef
- * \brief getPneumoHoseEPB() signature
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef PneumoHoseEPB* (*GetPneumoHoseEPB)();
-
-/*!
- * \def
- * \brief Macro for getPneumoHoseEPB() generation
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_PNEUMO_HOSE_EPB(ClassName) \
-    extern "C" PneumoHoseEPB *getPneumoHoseEPB() \
-    {\
-        return new (ClassName)(); \
-    }
-
-/*!
- * \fn
- * \brief Load PneumoHoseEPB from library
- */
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" DEVICE_EXPORT PneumoHoseEPB *loadPneumoHoseEPB(QString lib_path);
-
 #endif // PNEUMO_HOSE_EPB_H

@@ -1,5 +1,7 @@
 #include    "euler2.h"
 
+#include    <core/get_module.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -68,4 +70,4 @@ void Euler2Solver::setODEsize(size_t n)
     Y1.resize(n);
 }
 
-GET_SOLVER(Euler2Solver)
+GET_MODULE(Euler2Solver)

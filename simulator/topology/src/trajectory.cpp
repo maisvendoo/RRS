@@ -1,8 +1,10 @@
 #include    "trajectory.h"
-// #include    "parse_file_funcs.h"
+
+#include    "core/load_module.h"
 #include    "switch.h"
 #include    "topology-types.h"
 #include    "vec3.h"
+
 #include    <topology-trajectory-device.h>
 
 #include    <cstddef>
@@ -146,23 +148,42 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
 
     const FileSystem& fs = FileSystem::getInstance();
 
+    static QHash<QString, GetModuleFuncPtr> get_module_funcs;
+
     for (module_cfg_t& mc : modules)
     {
         // Загружаем dll модуль путевой инфраструктуры
         QString module_path = QString(fs.getModulesDir().c_str()) +
                                       QDir::separator() +
                                       mc.module_name;
-        TrajectoryDevice* module = loadTrajectoryDevice(module_path);
 
-        if (module  == nullptr)
+        GetModuleFuncPtr get_module_func;
+
+        const auto found_it = get_module_funcs.find(module_path);
+        if (found_it == get_module_funcs.end())
         {
-            Journal::instance()->error(
-                "Fail to load module " + mc.module_name + " for trajectory " + traj_name);
+            get_module_func = load_get_module_func(module_path);
+            get_module_funcs[module_path] = get_module_func;
+        }
+        else
+        {
+            get_module_func = found_it.value();
+        }
+
+        if (!get_module_func)
+        {
+            Journal::instance()->error("Failed to load module " + mc.module_name + " for trajectory " + traj_name);
             continue;
         }
 
-        Journal::instance()->info(
-            "Loaded module " + mc.module_name + " for trajectory " + traj_name);
+        TrajectoryDevice* module = (TrajectoryDevice*)get_module_func();
+        if (!module)
+        {
+            Journal::instance()->error("Failed to load module " + mc.module_name + " for trajectory " + traj_name);
+            continue;
+        }
+
+        Journal::instance()->info("Loaded module " + mc.module_name + " for trajectory " + traj_name);
 
         // Указываем модулю, что он относится к этой траектории
         module->setTrajectory(this);

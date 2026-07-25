@@ -4,6 +4,7 @@
 #include    "physics.h"
 
 #include    "device.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -186,4 +187,4 @@ void JointCouplingSA3::load_config(CfgReader &cfg)
         dx_t0 = T0 / ck;
 }
 
-GET_JOINT(JointCouplingSA3)
+GET_MODULE(JointCouplingSA3)

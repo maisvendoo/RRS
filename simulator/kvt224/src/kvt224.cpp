@@ -2,8 +2,8 @@
 
 #include    <sstream>
 
-#include    "physics.h"
 #include    "key-symbols.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -236,4 +236,4 @@ bool LocoCrane224::isPositionNumberChanged()
     return cur_pos != prev_pos;
 }
 
-GET_LOCO_CRANE(LocoCrane224)
+GET_MODULE(LocoCrane224)

@@ -3,8 +3,8 @@ set (TARGET viewer)
 project (${TARGET})
 
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
+# set(CMAKE_AUTORCC ON)
+# set(CMAKE_AUTOUIC ON)
 
 set (EXECUTABLE_OUTPUT_PATH "../../bin")
 
@@ -50,6 +50,7 @@ target_link_libraries(${TARGET} PRIVATE
     topology
     parsing
     graphics
+    core
 )
 
 target_include_directories(${TARGET} PRIVATE

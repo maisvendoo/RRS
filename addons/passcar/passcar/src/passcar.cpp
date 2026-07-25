@@ -1,6 +1,7 @@
 #include    "passcar.h"
 #include    "passcar-signals.h"
 #include    "filesystem.h"
+#include    <core/get_module.h>
 
 #include    "CfgReader.h"
 
@@ -121,4 +122,4 @@ void PassCar::step(const double& t, const double& dt)
         stepRegistrator(t, dt);
 }
 
-GET_VEHICLE(PassCar)
+GET_MODULE(PassCar)

@@ -123,23 +123,4 @@ protected:
     virtual void stepKeysControl(double t, double dt) override;
 };
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-using GetAutoTrainStop = AutoTrainStop*(*)();
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#define GET_AUTO_TRAIN_STOP(ClassName) \
-    extern "C" AutoTrainStop* getAutoTrainStop() \
-    { \
-        return new (ClassName) (); \
-    }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" DEVICE_EXPORT AutoTrainStop* loadAutoTrainStop(QString lib_path);
-
 #endif // AUTOMATIC_TRAIN_STOP_H

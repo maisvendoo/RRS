@@ -3,10 +3,10 @@
 
 #include <datetime.h>
 
-#include <QString>
 #include <QByteArray>
-#include <QBuffer>
 #include <QDataStream>
+#include <QIODevice>
+#include <QString>
 
 #include <vector>
 
@@ -22,9 +22,7 @@ struct simulator_update_players_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << static_cast<std::uint32_t>(clients_id.size());
         for (auto id : clients_id)
@@ -44,14 +42,12 @@ struct simulator_update_players_t final
             stream << veh;
         }
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         std::uint32_t num;
 
@@ -99,9 +95,7 @@ struct simulator_vehicle_pos_update_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         // Сериализация с плотной упаковкой данных
         serialize_position(stream, position_x);
@@ -133,6 +127,7 @@ struct simulator_vehicle_pos_update_t final
         tmp = static_cast<float>(up_z);
         stream << tmp;
 
+<<<<<<< HEAD
         return buff.data();
 */
         return data;
@@ -140,9 +135,7 @@ struct simulator_vehicle_pos_update_t final
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         deserialize_position(stream, position_x);
         deserialize_position(stream, position_y);
@@ -370,9 +363,7 @@ struct simulator_update_pos_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << speed_factor;
         stream << sim_time.serialize();
@@ -383,14 +374,12 @@ struct simulator_update_pos_t final
             stream << vehicle_pos.serialize();
         }
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> speed_factor;
 
@@ -430,9 +419,7 @@ struct simulator_vehicle_update_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << orientation;
         stream << train_id;
@@ -454,14 +441,12 @@ struct simulator_vehicle_update_t final
             stream << timetableData;
         }
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> orientation;
         stream >> train_id;
@@ -498,9 +483,7 @@ struct simulator_vehicles_update_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << static_cast<std::uint32_t>(vehicles.size());
 
@@ -509,14 +492,12 @@ struct simulator_vehicles_update_t final
             stream << vehicle.serialize();
         }
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         std::uint32_t num;
         stream >> num;
@@ -546,21 +527,18 @@ struct simulator_train_update_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << first_vehicle_id;
         stream << last_vehicle_id;
         stream << train_name;
-        return buff.data();
+
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> first_vehicle_id;
         stream >> last_vehicle_id;
@@ -578,9 +556,7 @@ struct simulator_trains_update_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << static_cast<std::uint32_t>(trains.size());
 
@@ -589,14 +565,12 @@ struct simulator_trains_update_t final
             stream << train.serialize();
         }
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         std::uint32_t num;
         stream >> num;
@@ -627,23 +601,19 @@ struct simulator_vehicle_controlled_update_t final
     QByteArray serialize() const
     {
         QByteArray data;
-        QBuffer buff(&data);
-        buff.open(QIODevice::WriteOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << current_vehicle;
         stream << currentDebugMsg;
         stream << controlled_vehicle;
         stream << controlledDebugMsg;
 
-        return buff.data();
+        return data;
     }
 
     void deserialize(QByteArray& data)
     {
-        QBuffer buff(&data);
-        buff.open(QIODevice::ReadOnly);
-        QDataStream stream(&buff);
+        QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> current_vehicle;
         stream >> currentDebugMsg;

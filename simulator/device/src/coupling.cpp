@@ -1,5 +1,3 @@
-#include    <QLibrary>
-
 #include    "coupling.h"
 
 #include    "CfgReader.h"
@@ -158,26 +156,4 @@ void Coupling::load_config(CfgReader &cfg)
     QString secName = "Device";
 
     cfg.getString(secName, "Name", name);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-Coupling *loadCoupling(QString lib_path)
-{
-    Coupling *coupling = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetCoupling getCoupling = reinterpret_cast<GetCoupling>(lib.resolve("getCoupling"));
-
-        if (getCoupling)
-        {
-            coupling = getCoupling();
-        }
-    }
-
-    return coupling;
 }

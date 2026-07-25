@@ -1,6 +1,7 @@
 #include    "evr305.h"
 
 #include    "physics.h"
+#include    "core/get_module.h"
 
 //------------------------------------------------------------------------------
 //
@@ -171,4 +172,4 @@ void EVR305::step(double t, double dt)
     ElectroAirDistributor::step(t, dt);
 }
 
-GET_ELECTRO_AIRDISTRIBUTOR(EVR305)
+GET_MODULE(EVR305)

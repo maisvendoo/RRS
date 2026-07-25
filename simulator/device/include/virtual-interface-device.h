@@ -57,20 +57,4 @@ protected:
     feedback_signals_t  feedback_signals;
 };
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-typedef VirtualInterfaceDevice* (*GetInterfaceDevice)();
-
-#define GET_INTERFACE_DEVICE(ClassName) \
-    extern "C" VirtualInterfaceDevice *getInterfaceDevice() \
-    { \
-        return new (ClassName) (); \
-    }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-extern "C" DEVICE_EXPORT VirtualInterfaceDevice *loadInterfaceDevice(QString lib_path);
-
 #endif // VIRTUAL_INTERFACE_DEVICE_H

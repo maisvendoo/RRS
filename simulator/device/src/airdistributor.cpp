@@ -1,7 +1,5 @@
 #include    "airdistributor.h"
 
-#include    <QLibrary>
-
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -55,26 +53,4 @@ void AirDistributor::setSRpressure(double value) noexcept
 double AirDistributor::getSRflow() const noexcept
 {
     return QSR;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-AirDistributor* loadAirDistributor(QString lib_path)
-{
-    AirDistributor* airdist = nullptr;
-
-    QLibrary lib(lib_path);
-
-    if (lib.load())
-    {
-        GetAirDistributor getAirDistributor = reinterpret_cast<GetAirDistributor>(lib.resolve("getAirDistributor"));
-
-        if (getAirDistributor)
-        {
-            airdist = getAirDistributor();
-        }
-    }
-
-    return airdist;
 }

@@ -1,5 +1,7 @@
 #include    "euler.h"
 
+#include    <core/get_module.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -48,4 +50,4 @@ bool EulerSolver::step(OdeSystem *ode_sys,
     return true;
 }
 
-GET_SOLVER(EulerSolver)
+GET_MODULE(EulerSolver)
