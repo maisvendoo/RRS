@@ -15,8 +15,8 @@ ShuntingSignal::ShuntingSignal(QObject* parent) : Signal(parent)
     signal_relay_shunt = new Relay(NUM_SRS_CONTACTS);
     lock_relay_shunt = new Relay(NUM_LRS_CONTACTS);
 
-    open_timer = new Timer(1.0, false);
-    close_timer = new Timer(1.0, false);
+    open_timer = new Timer(1.25, false);
+    close_timer = new Timer(1.25, false);
 
     connect(open_timer, &Timer::process, this, &ShuntingSignal::slotOpenTimerShunt);
     connect(close_timer, &Timer::process, this, &ShuntingSignal::slotCloseTimer);
