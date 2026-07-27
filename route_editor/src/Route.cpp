@@ -476,38 +476,14 @@ bool Route::load_topology()
         std::vector<vsg::dvec3> points;
         points.reserve(points_size);
 
-        // printf("trajectory: %s\n", trajectory->getName().toStdString().c_str());
-
-        vsg::Builder builder;
-        constexpr float marker_size{0.5f};
-        constexpr vsg::vec3 offset1{-marker_size, -marker_size, 1.0f};
-        constexpr vsg::vec3 offset2{ marker_size,  marker_size, 6.0f};
-        vsg::GeometryInfo gi;
-        gi.color.set(0.0f, 1.0f, 1.0f, 0.5f);
-
         for (const track_t& track : tracks)
         {
-            // printf("    begin_point:    %.3f %.3f %.3f\n", track.begin_point.x, track.begin_point.y, track.begin_point.z);
-            // printf("    end_point:      %.3f %.3f %.3f\n", track.end_point.x, track.end_point.y, track.end_point.z);
-            // printf("    len:            %.3f\n", track.len);
-            // printf("    traj_coord:     %.3f\n", track.traj_coord);
-            // printf("    railway_coord0: %.3f\n", track.railway_coord0);
-            // printf("    railway_coord1: %.3f\n", track.railway_coord1);
-            // printf("----------------------------------------\n");
-
             const dvec3& p = track.begin_point;
             points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
-
-            vsg::vec3 pf;
-            pf.x = p.x;
-            pf.y = p.y;
-            pf.z = p.z;
-            gi.set(vsg::box{pf + offset1, pf + offset2});
-            // group->addChild(builder.createBox(gi));
         }
+
         const dvec3& p = tracks.back().end_point;
         points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
-        // printf("--------------------------------------------------------------------------------\n");
 
         const auto vertices = vsg::vec3Array::create(points_size);
         const auto colors = vsg::vec3Array::create(points_size);
