@@ -61,15 +61,11 @@ RouteEditor::~RouteEditor() = default;
 bool RouteEditor::initialize()
 {
     initialize_journal();
-
     read_settings();
-
-    vsg_options = create_default_vsg_options();
-
+    create_vsg_options();
     configure_shaders();
 
     window_handler_ = WindowHandler::create(window_settings, window, camera);
-
     if (!window)
     {
         return false;
@@ -77,19 +73,17 @@ bool RouteEditor::initialize()
 
     mouse = Mouse::create();
     keyboard = Keyboard::create(key_bindings);
-    auto undo_redo_save_handler = UndoRedoSaveHandler::create(
-        keyboard, command_list, route_dir,
-        context_.static_objects_mutex, context_.static_objects);
 
-    camera = Camera::create(
-        camera_settings,
-        window->extent2D(),
-        mouse,
-        keyboard
-    );
+    auto undo_redo_save_handler = UndoRedoSaveHandler::create(keyboard,
+        command_list, route_dir, context_.static_objects_mutex,
+        context_.static_objects);
+
+    camera = Camera::create(camera_settings, window->extent2D(), mouse,
+        keyboard);
 
     intersection_handler = IntersectionHandler::create(camera);
-    scene_graph = SceneGraph::create(context_, camera_settings, vsg_options, route, route_dir);
+    scene_graph = SceneGraph::create(context_, camera_settings, vsg_options,
+        route, route_dir);
 
     context_.outline_builder = OutlineBuilder::create();
 
@@ -133,7 +127,8 @@ bool RouteEditor::initialize()
     viewer_ = vsg::Viewer::create();
 
     context_.object_selector = ObjectSelector::create(context_, mouse, keyboard,
-        gizmo_settings, camera, command_list, intersection_handler, scene_graph, route);
+        gizmo_settings, camera, command_list, intersection_handler, scene_graph,
+        route);
 
     viewer_->addWindow(window);
 
@@ -151,7 +146,8 @@ bool RouteEditor::initialize()
 
     viewer_->assignRecordAndSubmitTaskAndPresentation({command_graph});
 
-    const uint32_t num_lights = static_cast<uint32_t>(scene_settings.num_lights);
+    const uint32_t num_lights = static_cast<uint32_t>(
+        scene_settings.num_lights);
 
     auto resource_hints = vsg::ResourceHints::create();
     resource_hints->numLightsRange = {num_lights, num_lights + 1};
@@ -241,6 +237,15 @@ void RouteEditor::read_settings()
     scene_settings.read(cfg);
     window_settings.read(cfg);
     key_bindings.read(cfg);
+}
+
+void RouteEditor::create_vsg_options()
+{
+    vsg_options = vsg::Options::create();
+    vsg_options->sharedObjects = vsg::SharedObjects::create();
+    vsg_options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
+    vsg_options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
+    vsg_options->add(vsgXchange::all::create());
 }
 
 void RouteEditor::configure_shaders()
