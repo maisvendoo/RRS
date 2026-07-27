@@ -92,22 +92,6 @@ void ShuntingSignal::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ShuntingSignal::setRefTrajectory(Trajectory* trajectory)
-{
-    ref_trajectory_shunt = trajectory;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-Trajectory* ShuntingSignal::getRefTrajectory() const
-{
-    return ref_trajectory_shunt;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void ShuntingSignal::slotPressOpenShunting()
 {
     is_open_shunt_button_pressed = true;
@@ -296,7 +280,7 @@ void ShuntingSignal::check_shunt_route()
     // Смотрим траекторию за текущим коннектором
     cur_dir = signal_dir;
     traj = cur_conn->getNextTraj(cur_dir);
-    if (traj && ((traj == ref_trajectory_shunt) || !traj->isBusy()))
+    if (traj && !traj->isBusy())
     {
         // Если траектория свободна, разрешаем размыкание маневрого маршрута
         is_lock_route = false;
@@ -341,17 +325,11 @@ void ShuntingSignal::check_shunt_route()
             }
         }
 
-        // Нашли целевую траекторию
-        if (traj == ref_trajectory_shunt)
-        {
-            // Радостно включаем реле контроля маршрута и заканчиваем
-            is_shunt_route = true;
-            return;
-        }
-
         // Проверяем занятость траектории
         if (traj->isBusy())
         {
+            // Разрешаем маневровый маршрут до занятой траектории
+            is_shunt_route = true;
             return;
         }
 

@@ -1184,6 +1184,7 @@ void Model::tcpFeedBack(bool need_trains_feedback)
 //------------------------------------------------------------------------------
 void Model::controlStep()
 {
+    // Сбрасываем предыдущее управление и требования выводить дебаг-строку
     for (const auto& c : controlled_clients)
     {
         int id = c.prev_vehicle_controlled;
@@ -1205,6 +1206,7 @@ void Model::controlStep()
         }
     }
 
+    // Задаём новое управление и требования выводить дебаг-строку
     for (const auto& c : controlled_clients)
     {
         std::uint16_t id = c.vehicle_control_by_keyboard.controlled_vehicle;
@@ -1212,12 +1214,17 @@ void Model::controlStep()
         {
             std::uint16_t cab_id = c.vehicle_control_by_keyboard.controlled_cabine_idx;
             vehicles[id]->setKeyboardControl(cab_id, c.vehicle_control_by_keyboard.pressed_keys);
-            vehicles[id]->setNeedDebugMsg(c.vehicle_control_by_keyboard.need_debug_msg);
-        }
-        id = c.vehicle_control_by_keyboard.current_vehicle;
-        if (id < vehicles.size())
-        {
-            vehicles[id]->setNeedDebugMsg(c.vehicle_control_by_keyboard.need_debug_msg);
+
+            if (c.vehicle_control_by_keyboard.need_debug_msg)
+            {
+                vehicles[id]->setNeedDebugMsg(true);
+
+                id = c.vehicle_control_by_keyboard.current_vehicle;
+                if (id < vehicles.size())
+                {
+                    vehicles[id]->setNeedDebugMsg(true);
+                }
+            }
         }
     }
 }

@@ -24,9 +24,6 @@ public:
     /// Шаг симуляции
     virtual void step(double t, double dt) override;
 
-    void setRefTrajectory(Trajectory* trajectory);
-    Trajectory* getRefTrajectory() const;
-
 public slots:
 
     void slotPressOpenShunting();
@@ -40,9 +37,6 @@ private slots:
     void slotCloseTimer();
 
 private:
-
-    /// Целевая траектория маневрового маршрута
-    Trajectory* ref_trajectory_shunt = nullptr;
 
     enum
     {
