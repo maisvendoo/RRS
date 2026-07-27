@@ -472,8 +472,10 @@ void TcpServer::slotReceive()
         recvBuff.append(socket->readAll());
     }
 
-    while (recvBuff.size() > 0)
+    // Если прислали данных не меньше, чем стандартное начало пакета - будем читать
+    while (recvBuff.size() >= (sizeof(wait_data_size) + sizeof(StructureType)))
     {
+        // Если ждём новый пакет - читаем его ожидаемый размер
         if (is_first_data)
         {
             QDataStream stream(&recvBuff, QIODevice::ReadOnly);
@@ -483,7 +485,8 @@ void TcpServer::slotReceive()
             is_first_data = false;
         }
 
-        if (recvBuff.size() > wait_data_size)
+        // Если прислали данных не меньше, чем ожидается - забираем их
+        if (recvBuff.size() >= wait_data_size)
         {
             // Десериализуем принятые данные в структуру сетевого пакета
             client_data->received_data.deserialize(recvBuff);
@@ -491,10 +494,15 @@ void TcpServer::slotReceive()
             // Обработка принятого сетевого пакета
             process_client_request(*client_data);
 
+            // Оставляем в буфере только непрочитанный хвост
+            recvBuff = recvBuff.mid(wait_data_size);
+
+            // Снова ждём новый пакет
             is_first_data = true;
         }
         else
         {
+            // Данных пока прислали недостаточно - выходим, ждём следующих
             break;
         }
     }

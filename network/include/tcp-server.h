@@ -101,7 +101,7 @@ private:
 
     QByteArray trains_state;
 
-    qsizetype wait_data_size = 0;
+    uint32_t wait_data_size = 0;
 
     bool is_first_data = true;
 
