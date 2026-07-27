@@ -168,7 +168,6 @@ void RouteEditor::run()
         static double prev_time = viewer_->getFrameStamp()->simulationTime;
         const double curr_time = viewer_->getFrameStamp()->simulationTime;
         const double delta_time = curr_time - prev_time;
-        context_.delta_time = delta_time;
         prev_time = curr_time;
 
         if (editor_state == EditorState::LOAD_ROUTE)
