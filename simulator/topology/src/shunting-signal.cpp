@@ -167,7 +167,7 @@ bool ShuntingSignal::check_and_lock_switch_fwd(Switch* sw, bool lock)
             sw->setRefStateFwd(IN_ROUTE_MINUS);
             sw->setRouteBySignalFwd(this);
         }
-        if (sw->getStateFwd() > 0)
+        else if (sw->getStateFwd() > 0)
         {
             sw->setRefStateFwd(IN_ROUTE_PLUS);
             sw->setRouteBySignalFwd(this);
@@ -183,7 +183,7 @@ bool ShuntingSignal::check_and_lock_switch_fwd(Switch* sw, bool lock)
             sw->setRefStateFwd(STATE_MINUS);
             sw->setRouteBySignalFwd(nullptr);
         }
-        if (sw->getStateFwd() > 0)
+        else if (sw->getStateFwd() > 0)
         {
             sw->setRefStateFwd(STATE_PLUS);
             sw->setRouteBySignalFwd(nullptr);
@@ -226,7 +226,7 @@ bool ShuntingSignal::check_and_lock_switch_bwd(Switch* sw, bool lock)
             sw->setRefStateBwd(IN_ROUTE_MINUS);
             sw->setRouteBySignalBwd(this);
         }
-        if (sw->getStateBwd() > 0)
+        else if (sw->getStateBwd() > 0)
         {
             sw->setRefStateBwd(IN_ROUTE_PLUS);
             sw->setRouteBySignalBwd(this);
@@ -242,7 +242,7 @@ bool ShuntingSignal::check_and_lock_switch_bwd(Switch* sw, bool lock)
             sw->setRefStateBwd(STATE_MINUS);
             sw->setRouteBySignalBwd(nullptr);
         }
-        if (sw->getStateBwd() > 0)
+        else if (sw->getStateBwd() > 0)
         {
             sw->setRefStateBwd(STATE_PLUS);
             sw->setRouteBySignalBwd(nullptr);
