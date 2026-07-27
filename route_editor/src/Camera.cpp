@@ -152,9 +152,9 @@ void Camera::handle_mouse_move()
 {
     const double rotate_speed = camera_settings.rotate_speed;
 
-    yaw_deg_ += mouse->get_delta_x() * rotate_speed;
-    pitch_deg_ -= mouse->get_delta_y() * rotate_speed;
-    pitch_deg_ = std::clamp(pitch_deg_, -89.0, 89.0);
+    yaw_degrees += mouse->get_delta_x() * rotate_speed;
+    pitch_degrees -= mouse->get_delta_y() * rotate_speed;
+    pitch_degrees = std::clamp(pitch_degrees, -89.0, 89.0);
 
     calculate_front();
     calculate_right();
@@ -253,8 +253,8 @@ vsg::ref_ptr<vsg::Node> Camera::create_front_plane(
 
 void Camera::calculate_front()
 {
-    const double yaw_rad = vsg::radians(yaw_deg_);
-    const double pitch_rad = vsg::radians(pitch_deg_);
+    const double yaw_rad = vsg::radians(yaw_degrees);
+    const double pitch_rad = vsg::radians(pitch_degrees);
 
     front_ = vsg::normalize(vsg::dvec3(
         std::sin(yaw_rad) * std::cos(pitch_rad),

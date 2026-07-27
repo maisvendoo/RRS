@@ -172,7 +172,8 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
         }
         default:
         {
-            ImGui::Begin("Settings", nullptr, window_flags_);
+            ImGui::SetNextWindowPos(viewport->WorkPos);
+            ImGui::Begin("Settings", nullptr, window_flags_ | ImGuiWindowFlags_AlwaysAutoResize);
             ImGui::Checkbox("Show objects.ref", &gui_settings.show_objects_ref);
             ImGui::Checkbox("Show route1.map", &gui_settings.show_route_map);
             ImGui::Checkbox("Show stations", &gui_settings.show_stations_conf);
