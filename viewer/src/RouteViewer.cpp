@@ -57,6 +57,9 @@
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
 #include <vsgXchange/all.h>
+#include <vsg/ui/Keyboard.h>
+
+#include <InputRouteHandler.h>
 
 #include <QApplication>
 
@@ -730,7 +733,12 @@ void RouteViewer::initViewer()
 
     viewer->addWindow(window);
 
+    auto keyboard = vsg::Keyboard::create();
+
     auto upd_server_control = UpdateControlToServerHandler::create(tcp_client.get());
+
+    auto input_route_handler = InputRouteHandler::create();
+    input_route_handler->setKeyboard(keyboard);
 
     upd_viewer_handler = UpdateViewerHandler::create(
         upd_server_control,
@@ -741,6 +749,8 @@ void RouteViewer::initViewer()
         vehicles_handler.get(),
         settings
     );
+
+    upd_viewer_handler->setKeyboard(keyboard);
 
     auto upd_sound_manager_handler = UpdateSoundManagerHandler::create(lookAt, sound_manager.get());
     auto upd_statistis_handler = UpdateStatisticsHandler::create();
@@ -754,6 +764,7 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(upd_sound_manager_handler);
     viewer->addEventHandler(upd_statistis_handler);
     viewer->addEventHandler(close_viewer_handler);
+    viewer->addEventHandler(input_route_handler);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
 

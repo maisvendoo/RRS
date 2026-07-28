@@ -30,7 +30,7 @@ UpdateViewerHandler::UpdateViewerHandler(
 )
     : Inherit()
     , _settings(settings)
-    , _keyboard(vsg::Keyboard::create())
+    , _keyboard(nullptr)//vsg::Keyboard::create())
     , _upd_server_control(upd_server_control)
     , _camera(camera)
     , _shadow_region(shadow_region)

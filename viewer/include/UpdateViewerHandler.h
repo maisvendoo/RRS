@@ -70,6 +70,11 @@ public:
     void apply(vsg::TouchUpEvent& touchUp) override;
     void apply(vsg::TouchMoveEvent& touchMove) override;
 
+    void setKeyboard(vsg::ref_ptr<vsg::Keyboard> keyboard)
+    {
+        _keyboard = keyboard;
+    }
+
 private:
     /// compute non-dimensional window coordinate (-1, 1) from event coords
     vsg::dvec2 ndc(const vsg::PointerEvent& event) const;

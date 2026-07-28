@@ -28,6 +28,8 @@ public:
 
     void apply(vsg::KeyReleaseEvent& keyRelease) override;
 
+    void apply(vsg::FrameEvent &frame) override;
+
     void setKeyboard(vsg::ref_ptr<vsg::Keyboard> keyboard);
 
     void setActiveController(IOController *io_controller);
@@ -45,6 +47,16 @@ private:
     std::set<uint16_t> m_pressedKeys;
 
     bool m_hasFocus = true;
+
+    double _previousTime = 0.0;
+
+    bool isControlKey(uint16_t key);
+
+    void processKeyForController(uint16_t keyBase, bool pressed);
+
+    void updateController(float dt);
+
+    void resetControllerState();
 };
 
 #endif
