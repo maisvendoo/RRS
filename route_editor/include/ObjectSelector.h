@@ -8,6 +8,7 @@
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
+#include <vulkan/vulkan_core.h>
 
 class CommandList;
 struct EditorContext;
@@ -39,7 +40,8 @@ public:
         CommandList& command_list,
         const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
         const vsg::ref_ptr<SceneGraph>& scene_graph,
-        const vsg::ref_ptr<Route>& route
+        const vsg::ref_ptr<Route>& route,
+        const VkExtent2D& window_extent
     );
 
     void apply(vsg::KeyPressEvent& keyPress) override;
@@ -72,6 +74,7 @@ private:
     const vsg::ref_ptr<IntersectionHandler>& intersection_handler;
     const vsg::ref_ptr<SceneGraph>& scene_graph;
     const vsg::ref_ptr<Route>& route;
+    const VkExtent2D& window_extent;
 
     vsg::dvec3 prev_intersect_pos_;
     vsg::dvec3 total_translation_;

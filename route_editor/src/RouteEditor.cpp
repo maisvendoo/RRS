@@ -128,7 +128,7 @@ bool RouteEditor::initialize()
 
     context_.object_selector = ObjectSelector::create(context_, mouse, keyboard,
         gizmo_settings, camera, command_list, intersection_handler, scene_graph,
-        route);
+        route, window->extent2D());
 
     viewer_->addWindow(window);
 

@@ -22,6 +22,7 @@
 
 #include <vsg/core/Mask.h>
 #include <vsg/maths/common.h>
+#include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/KeyEvent.h>
@@ -38,7 +39,8 @@ ObjectSelector::ObjectSelector(
     CommandList& command_list,
     const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
     const vsg::ref_ptr<SceneGraph>& scene_graph,
-    const vsg::ref_ptr<Route>& route
+    const vsg::ref_ptr<Route>& route,
+    const VkExtent2D& window_extent
 )
     : context_(context)
     , mouse(mouse)
@@ -48,6 +50,7 @@ ObjectSelector::ObjectSelector(
     , intersection_handler(intersection_handler)
     , scene_graph(scene_graph)
     , route(route)
+    , window_extent(window_extent)
 {
     context.gizmo = Gizmo::create(context, gizmo_settings, intersection_handler, camera, command_list);
 
@@ -110,27 +113,21 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     const auto front_plane = camera->create_front_plane(
         context_.gizmo->get_curr_pos(), &front_plane_up_);
 
-    const auto intersector = intersection_handler->apply_(
-        mouse->get_pos_x(), mouse->get_pos_y());
-
-    if (!intersector)
-    {
-        return;
-    }
-
-    front_plane->accept(*intersector);
-
-    const auto intersection =
-        intersection_handler->get_closest_intersection(intersector);
-
-    if (!intersection)
-    {
-        return;
-    }
-
-    prev_intersect_pos_ = intersection->worldIntersection;
-
-    intersector->intersections.clear();
+    double mx = mouse->get_pos_x();
+    double my = mouse->get_pos_y();
+    mx = mx / window_extent.width * 2.0 - 1.0;
+    my = my / window_extent.height * 2.0 - 1.0;
+    vsg::dvec3 m1 = {mx, my, 0.0};
+    vsg::dvec3 m2 = {mx, my, 1.0};
+    vsg::dmat4 inv_pm = camera->get_perspective()->inverse();
+    vsg::dmat4 inv_vm = camera->get_look_at()->inverse();
+    m1 = inv_vm * inv_pm * m1;
+    m2 = inv_vm * inv_pm * m2;
+    vsg::dvec3 f = camera->get_front();
+    vsg::dvec3 g = context_.gizmo->get_curr_pos();
+    vsg::dvec3 s = m2 - m1;
+    double t = -(f.x * m1.x - f.x * g.x + f.y * m1.y - f.y * g.y + f.z * m1.z - f.z * g.z) / (f.x * s.x + f.y * s.y + f.z * s.z);
+    prev_intersect_pos_ = {m1.x + s.x * t, m1.y + s.y * t, m1.z + s.z * t};
 
     total_translation_ = {0.0, 0.0, 0.0};
     total_rotation_rad_ = 0.0;
