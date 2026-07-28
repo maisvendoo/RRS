@@ -4,6 +4,7 @@
 #include <vsg/app/Camera.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
 
 class Keyboard;
@@ -14,7 +15,6 @@ namespace vsg
 {
 
 class LookAt;
-class Node;
 class Orthographic;
 class Perspective;
 
@@ -54,12 +54,9 @@ public:
 
     const vsg::ref_ptr<vsg::LookAt>& get_look_at() const;
 
-    // Create plane perpedicular to camera normal and passing through
-    // specified point to test for intersections
-    vsg::ref_ptr<vsg::Node> create_front_plane(
-        const vsg::dvec3& point,
-        vsg::dvec3* up_out = nullptr
-    ) const;
+    const vsg::dmat4& get_inverse_projection_matrix() const;
+
+    const vsg::dmat4& get_inverse_view_matrix() const;
 
 private:
     void calculate_front();
@@ -67,6 +64,10 @@ private:
     void calculate_right();
 
     void calculate_up();
+
+    void calculate_inverse_projection_matrix();
+
+    void calculate_inverse_view_matrix();
 
 private:
     const camera_settings_t& camera_settings;
@@ -76,6 +77,9 @@ private:
     vsg::ref_ptr<vsg::Perspective> perspective;
     vsg::ref_ptr<vsg::Orthographic> orthographic;
     vsg::ref_ptr<vsg::LookAt> look_at;
+
+    vsg::dmat4 inverse_projection_matrix;
+    vsg::dmat4 inverse_view_matrix;
 
     double yaw_degrees = 0.0;
     double pitch_degrees = 0.0;

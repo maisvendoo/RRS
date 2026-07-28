@@ -54,14 +54,8 @@ ObjectSelector::ObjectSelector(
 {
     context.gizmo = Gizmo::create(context, gizmo_settings, intersection_handler, camera, command_list);
 
-    front_plane_switch_ = SingleSwitch::create(
-        vsg::Mask{MASK_CLICKABLE}, nullptr);
-
     scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE},
         context.gizmo);
-
-    scene_graph->addChild(vsg::Mask{MASK_CLICKABLE},
-        front_plane_switch_);
 }
 
 void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
@@ -110,30 +104,36 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    const auto front_plane = camera->create_front_plane(
-        context_.gizmo->get_curr_pos(), &front_plane_up_);
+    const double normalized_mouse_x = static_cast<double>(mouse->get_pos_x()) /
+        window_extent.width * 2.0 - 1.0;
+    const double normalized_mouse_y = static_cast<double>(mouse->get_pos_y()) /
+        window_extent.height * 2.0 - 1.0;
 
-    double mx = mouse->get_pos_x();
-    double my = mouse->get_pos_y();
-    mx = mx / window_extent.width * 2.0 - 1.0;
-    my = my / window_extent.height * 2.0 - 1.0;
-    vsg::dvec3 m1 = {mx, my, 0.0};
-    vsg::dvec3 m2 = {mx, my, 1.0};
-    vsg::dmat4 inv_pm = camera->get_perspective()->inverse();
-    vsg::dmat4 inv_vm = camera->get_look_at()->inverse();
-    m1 = inv_vm * inv_pm * m1;
-    m2 = inv_vm * inv_pm * m2;
-    vsg::dvec3 f = camera->get_front();
-    vsg::dvec3 g = context_.gizmo->get_curr_pos();
-    vsg::dvec3 s = m2 - m1;
-    double t = -(f.x * m1.x - f.x * g.x + f.y * m1.y - f.y * g.y + f.z * m1.z - f.z * g.z) / (f.x * s.x + f.y * s.y + f.z * s.z);
-    prev_intersect_pos_ = {m1.x + s.x * t, m1.y + s.y * t, m1.z + s.z * t};
+    const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();
+    const vsg::dmat4& inverse_view_matrix = camera->get_inverse_view_matrix();
+
+    const vsg::dvec3 mouse_world1 = inverse_view_matrix *
+        inverse_projection_matrix *
+        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 0.0);
+
+    const vsg::dvec3 mouse_world2 = inverse_view_matrix *
+        inverse_projection_matrix *
+        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 1.0);
+
+    const vsg::dvec3& f = camera->get_front();
+    const vsg::dvec3& g = context_.gizmo->get_curr_pos();
+    const vsg::dvec3 s = mouse_world2 - mouse_world1;
+
+    const double t = -(f.x * mouse_world1.x - f.x * g.x + f.y * mouse_world1.y -
+        f.y * g.y + f.z * mouse_world1.z - f.z * g.z) /
+        (f.x * s.x + f.y * s.y + f.z * s.z);
+
+    prev_intersect_pos_ = {mouse_world1.x + s.x * t, mouse_world1.y + s.y * t,
+        mouse_world1.z + s.z * t};
 
     total_translation_ = {0.0, 0.0, 0.0};
     total_rotation_rad_ = 0.0;
     total_scale_ = {1.0, 1.0, 1.0};
-
-    context_.compile_infos.emplace_back(CompileInfo{front_plane_switch_, front_plane});
 
     for (const auto& object : selected_objects)
     {
@@ -243,26 +243,39 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
     context_.gizmo->apply(moveEvent);
 
-    if (state_ == State::INITIAL || !front_plane_switch_->node)
+    if (state_ == State::INITIAL)
     {
         return;
     }
 
-    const auto intersector = intersection_handler->apply_(moveEvent);
+    const double normalized_mouse_x = static_cast<double>(mouse->get_pos_x()) /
+        window_extent.width * 2.0 - 1.0;
+    const double normalized_mouse_y = static_cast<double>(mouse->get_pos_y()) /
+        window_extent.height * 2.0 - 1.0;
 
-    front_plane_switch_->node->accept(*intersector);
+    const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();
+    const vsg::dmat4& inverse_view_matrix = camera->get_inverse_view_matrix();
 
-    const auto intersection =
-        intersection_handler->get_closest_intersection(intersector);
+    const vsg::dvec3 mouse_world1 = inverse_view_matrix *
+        inverse_projection_matrix *
+        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 0.0);
 
-    if (!intersection)
-    {
-        return;
-    }
+    const vsg::dvec3 mouse_world2 = inverse_view_matrix *
+        inverse_projection_matrix *
+        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 1.0);
 
-    const vsg::dvec3& world_intersection = intersection->worldIntersection;
+    const vsg::dvec3& f = camera->get_front();
+    const vsg::dvec3& g = context_.gizmo->get_curr_pos();
+    const vsg::dvec3 s = mouse_world2 - mouse_world1;
 
-    intersector->intersections.clear();
+    const double t = -(f.x * mouse_world1.x - f.x * g.x + f.y * mouse_world1.y -
+        f.y * g.y + f.z * mouse_world1.z - f.z * g.z) /
+        (f.x * s.x + f.y * s.y + f.z * s.z);
+
+    const vsg::dvec3 world_intersection = {mouse_world1.x + s.x * t, mouse_world1.y + s.y * t,
+        mouse_world1.z + s.z * t};
+
+    const vsg::dvec3& camera_up = camera->get_up();
 
     switch (state_)
     {
@@ -294,19 +307,19 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 
             prev_intersect_pos_ = world_intersection;
 
-            double prev_acos = acos(vsg::dot(prev_vec, front_plane_up_));
-            double curr_acos = acos(vsg::dot(curr_vec, front_plane_up_));
+            double prev_acos = acos(vsg::dot(prev_vec, camera_up));
+            double curr_acos = acos(vsg::dot(curr_vec, camera_up));
 
             const vsg::dvec3& front = camera->get_front();
 
-            if (prev_vec != front_plane_up_ && prev_vec != -front_plane_up_ &&
-                vsg::dot(vsg::cross(prev_vec, front_plane_up_), front) < 0.0)
+            if (prev_vec != camera_up && prev_vec != -camera_up &&
+                vsg::dot(vsg::cross(prev_vec, camera_up), front) < 0.0)
             {
                 prev_acos = 2 * vsg::PI - prev_acos;
             }
 
-            if (curr_vec != front_plane_up_ && curr_vec != -front_plane_up_ &&
-                vsg::dot(vsg::cross(curr_vec, front_plane_up_), front) < 0.0)
+            if (curr_vec != camera_up && curr_vec != -camera_up &&
+                vsg::dot(vsg::cross(curr_vec, camera_up), front) < 0.0)
             {
                 curr_acos = 2 * vsg::PI - curr_acos;
             }
@@ -452,7 +465,6 @@ void ObjectSelector::confirm_keyboard_transformation()
     }
 
     state_ = State::INITIAL;
-    front_plane_switch_->node = nullptr;
 }
 
 void ObjectSelector::cancel_keyboard_transformation()
@@ -463,5 +475,4 @@ void ObjectSelector::cancel_keyboard_transformation()
     }
 
     state_ = State::INITIAL;
-    front_plane_switch_->node = nullptr;
 }

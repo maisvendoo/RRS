@@ -8,18 +8,13 @@
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/ViewMatrix.h>
-#include <vsg/app/Window.h>
-#include <vsg/commands/Commands.h>
-#include <vsg/core/Array.h>
-#include <vsg/core/Data.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/common.h>
+#include <vsg/maths/mat4.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec2.h>
 #include <vsg/maths/vec3.h>
-#include <vsg/nodes/VertexIndexDraw.h>
 #include <vsg/state/ViewportState.h>
-#include <vsg/ui/ApplicationEvent.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/ui/ScrollWheelEvent.h>
 
@@ -27,35 +22,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstdint>
-
-static vsg::ref_ptr<vsg::Commands> create_quad(
-    const vsg::dvec3& p0, const vsg::dvec3& p1,
-    const vsg::dvec3& p2, const vsg::dvec3& p3
-)
-{
-    const auto vertices = vsg::vec3Array::create(4);
-    vertices->at(0) = p0;
-    vertices->at(1) = p1;
-    vertices->at(2) = p2;
-    vertices->at(3) = p3;
-
-    const auto indices = vsg::ushortArray::create({
-        0, 1, 2,
-        2, 1, 3
-    });
-
-    const auto vid = vsg::VertexIndexDraw::create();
-    vid->assignArrays(vsg::DataList{vertices});
-    vid->assignIndices(indices);
-    vid->indexCount = static_cast<uint32_t>(indices->size());
-    vid->instanceCount = 1;
-
-    const auto commands = vsg::Commands::create();
-    commands->addChild(vid);
-
-    return commands;
-}
 
 Camera::Camera(
     const camera_settings_t& camera_settings,
@@ -110,6 +76,8 @@ Camera::Camera(
     calculate_front();
     calculate_right();
     calculate_up();
+    calculate_inverse_projection_matrix();
+    calculate_inverse_view_matrix();
 }
 
 void Camera::handle_key_press()
@@ -124,6 +92,7 @@ void Camera::handle_key_press()
         {
             projectionMatrix = perspective;
         }
+        calculate_inverse_projection_matrix();
     }
 }
 
@@ -167,6 +136,7 @@ void Camera::update(double delta_time)
 {
     look_at->eye += camera_settings.move_speed * delta_time * move_direction;
     look_at->center = look_at->eye + front_;
+    calculate_inverse_view_matrix();
 }
 
 void Camera::handle_mouse_scroll()
@@ -174,6 +144,7 @@ void Camera::handle_mouse_scroll()
     double& fovy = perspective->fieldOfViewY;
     fovy -= mouse->get_scroll() * camera_settings.zoom_power;
     fovy = std::clamp(fovy, camera_settings.fovy_min, camera_settings.fovy_max);
+    calculate_inverse_projection_matrix();
 }
 
 const vsg::dvec3& Camera::get_front() const
@@ -206,49 +177,14 @@ const vsg::ref_ptr<vsg::LookAt>& Camera::get_look_at() const
     return look_at;
 }
 
-// Create plane perpedicular to camera normal passing through
-// specified point to test for intersections
-vsg::ref_ptr<vsg::Node> Camera::create_front_plane(
-    const vsg::dvec3& point,
-    vsg::dvec3* up_out
-) const
+const vsg::dmat4& Camera::get_inverse_projection_matrix() const
 {
-    constexpr double angle_rad = vsg::radians(80.0);
+    return inverse_projection_matrix;
+}
 
-    const vsg::dvec3& camera_pos = look_at->eye;
-
-    const auto get_dir = [&](int yaw_dir, int pitch_dir) -> vsg::dvec3
-    {
-        const double yaw_angle_rad = angle_rad * yaw_dir;
-        const double pitch_angle_rad = angle_rad * pitch_dir;
-
-        return vsg::rotate(yaw_angle_rad, up_) *
-            vsg::rotate(-pitch_angle_rad, right_) * front_;
-    };
-
-    const vsg::dvec3 p0_dir = get_dir(-1, -1);
-    const vsg::dvec3 p1_dir = get_dir( 1, -1);
-    const vsg::dvec3 p2_dir = get_dir(-1,  1);
-    const vsg::dvec3 p3_dir = get_dir( 1,  1);
-
-    const vsg::dvec3 camera_to_point = point - camera_pos;
-
-    const double camera_norm_length = vsg::length(camera_to_point) *
-        vsg::dot(front_, vsg::normalize(camera_to_point));
-
-    const double dist = camera_norm_length / vsg::dot(front_, p0_dir);
-
-    const vsg::dvec3 p0 = camera_pos + p0_dir * dist;
-    const vsg::dvec3 p1 = camera_pos + p1_dir * dist;
-    const vsg::dvec3 p2 = camera_pos + p2_dir * dist;
-    const vsg::dvec3 p3 = camera_pos + p3_dir * dist;
-
-    if (up_out)
-    {
-        *up_out = vsg::normalize(p2 - p0);
-    }
-
-    return create_quad(p0, p1, p2, p3);
+const vsg::dmat4& Camera::get_inverse_view_matrix() const
+{
+    return inverse_view_matrix;
 }
 
 void Camera::calculate_front()
@@ -271,4 +207,21 @@ void Camera::calculate_right()
 void Camera::calculate_up()
 {
     up_ = vsg::normalize(vsg::cross(right_, front_));
+}
+
+void Camera::calculate_inverse_projection_matrix()
+{
+    if (projectionMatrix == perspective)
+    {
+        inverse_projection_matrix = perspective->inverse();
+    }
+    else
+    {
+        inverse_projection_matrix = orthographic->inverse();
+    }
+}
+
+void Camera::calculate_inverse_view_matrix()
+{
+    inverse_view_matrix = look_at->inverse();
 }

@@ -80,8 +80,6 @@ private:
     vsg::dvec3 total_translation_;
     double total_rotation_rad_;
     vsg::dvec3 total_scale_;
-    vsg::ref_ptr<SingleSwitch> front_plane_switch_;
-    vsg::dvec3 front_plane_up_;
 };
 
 #endif // OBJECT_SELECTOR_H
