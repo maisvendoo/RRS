@@ -4,6 +4,7 @@
 #include <vsg/core/ref_ptr.h>
 
 class Camera;
+class CommandList;
 class Keyboard;
 class Mouse;
 class State;
@@ -14,7 +15,8 @@ public:
     StateManager(
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
-        const vsg::ref_ptr<Camera>& camera
+        const vsg::ref_ptr<Camera>& camera,
+        CommandList& command_list
     );
 
     ~StateManager();

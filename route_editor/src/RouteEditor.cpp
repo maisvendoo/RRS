@@ -19,7 +19,7 @@
 #include "SceneGraph.h"
 #include "SingleSwitch.h"
 #include "StateManager.h"
-#include "UndoRedoSaveHandler.h"
+#include "SaveHandler.h"
 #include "WindowHandler.h"
 #include "filesystem.h"
 #include "graphics/common.h"
@@ -74,9 +74,8 @@ bool RouteEditor::initialize()
     mouse = Mouse::create();
     keyboard = Keyboard::create(key_bindings);
 
-    auto undo_redo_save_handler = UndoRedoSaveHandler::create(keyboard,
-        command_list, route_dir, context_.static_objects_mutex,
-        context_.static_objects);
+    auto save_handler = SaveHandler::create(keyboard,
+        route_dir, context_.static_objects_mutex, context_.static_objects);
 
     camera = Camera::create(camera_settings, window->extent2D(), mouse,
         keyboard);
@@ -106,7 +105,7 @@ bool RouteEditor::initialize()
     const auto gui_view2 = vsg::View::create(camera, scene_graph);
     gui_view2->mask = MASK_GUI2;
 
-    state_manager = std::make_unique<StateManager>(mouse, keyboard, camera);
+    state_manager = std::make_unique<StateManager>(mouse, keyboard, camera, command_list);
     const auto editor_gui = EditorGui::create(context_, camera_settings,
         gui_settings, key_bindings, *state_manager, camera, editor_state,
         command_list, route, route_dir);
@@ -137,7 +136,7 @@ bool RouteEditor::initialize()
     viewer_->addEventHandler(vsg::CloseHandler::create(viewer_));
     viewer_->addEventHandler(window_handler_);
     viewer_->addEventHandler(mouse);
-    viewer_->addEventHandler(undo_redo_save_handler);
+    viewer_->addEventHandler(save_handler);
 
     viewer_->addEventHandler(EventHandler::create(*state_manager));
 
