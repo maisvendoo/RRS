@@ -22,7 +22,7 @@ public:
     OutlineBuilder();
 
     vsg::ref_ptr<vsg::Node> create_outline(
-        vsg::ref_ptr<vsg::PagedLOD> paged_lod);
+        const vsg::ref_ptr<vsg::PagedLOD>& paged_lod);
 
 private:
     vsg::ref_ptr<vsg::Options> options_;

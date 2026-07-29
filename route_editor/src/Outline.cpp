@@ -62,7 +62,7 @@ OutlineBuilder::OutlineBuilder()
 }
 
 vsg::ref_ptr<vsg::Node> OutlineBuilder::create_outline(
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod)
+    const vsg::ref_ptr<vsg::PagedLOD>& paged_lod)
 {
     if (!paged_lod->pending)
     {

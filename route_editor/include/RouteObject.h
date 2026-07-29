@@ -30,7 +30,7 @@ class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 public:
     RouteObject(
         EditorContext& context,
-        vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+        const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
         const std::string& label,
         const vsg::dvec3& translation,
         const vsg::dvec3& rotation_deg = {0.0, 0.0, 0.0},

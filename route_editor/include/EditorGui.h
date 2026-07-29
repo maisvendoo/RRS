@@ -62,7 +62,7 @@ private:
     void show_commands() const;
 
     void add_object(
-        vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+        const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
         const std::string& label
     ) const;
 
@@ -70,19 +70,19 @@ private:
 
     void handle_translation_drag(
         std::size_t index,
-        vsg::ref_ptr<RouteObject> object,
+        const vsg::ref_ptr<RouteObject>& object,
         bool& dragging
     ) const;
 
     void handle_rotation_drag(
         std::size_t index,
-        vsg::ref_ptr<RouteObject> object,
+        const vsg::ref_ptr<RouteObject>& object,
         bool& dragging
     ) const;
 
     void handle_scale_drag(
         std::size_t index,
-        vsg::ref_ptr<RouteObject> object,
+        const vsg::ref_ptr<RouteObject>& object,
         bool& dragging
     ) const;
 

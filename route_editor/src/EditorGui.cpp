@@ -686,7 +686,7 @@ void EditorGui::show_commands() const
 }
 
 void EditorGui::add_object(
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
     const std::string& label
 ) const
 {
@@ -707,7 +707,7 @@ void EditorGui::save_objects_matrixes() const
 
 void EditorGui::handle_translation_drag(
     size_t index,
-    vsg::ref_ptr<RouteObject> object,
+    const vsg::ref_ptr<RouteObject>& object,
     bool& dragging
 ) const
 {
@@ -737,7 +737,7 @@ void EditorGui::handle_translation_drag(
 
 void EditorGui::handle_rotation_drag(
     std::size_t index,
-    vsg::ref_ptr<RouteObject> object,
+    const vsg::ref_ptr<RouteObject>& object,
     bool& dragging
 ) const
 {
@@ -789,7 +789,7 @@ void EditorGui::handle_rotation_drag(
 
 void EditorGui::handle_scale_drag(
     size_t index,
-    vsg::ref_ptr<RouteObject> object,
+    const vsg::ref_ptr<RouteObject>& object,
     bool& dragging
 ) const
 {

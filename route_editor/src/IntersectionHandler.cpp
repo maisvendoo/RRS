@@ -66,14 +66,6 @@ void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
     }
 }
 
-LSIntersectorRefPtr IntersectionHandler::apply_(
-    const vsg::MoveEvent& moveEvent
-) const
-{
-
-    return LSIntersector::create(*camera, moveEvent.x, moveEvent.y);
-}
-
 LSIntersectorRefPtr IntersectionHandler::apply_(int mouse_x, int mouse_y) const
 {
     return LSIntersector::create(*camera, mouse_x, mouse_y);

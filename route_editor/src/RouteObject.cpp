@@ -38,7 +38,7 @@ static vsg::dvec3 to_euler_deg(const vsg::dquat& q)
 
 RouteObject::RouteObject(
     EditorContext& context,
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
     const std::string& label,
     const vsg::dvec3& translation,
     const vsg::dvec3& rotation_deg,

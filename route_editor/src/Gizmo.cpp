@@ -24,28 +24,6 @@
 
 #include <cmath>
 
-#define IF_CHECK_INTERSECTION(axis, dot1, dot2, plane1, plane2)             \
-    if (node == arrow_##axis##_)                                            \
-    {                                                                       \
-        click_pos_.axis = world_intersection.axis;                          \
-                                                                            \
-        active_arrow_ = arrow_##axis##_;                                    \
-                                                                            \
-        active_plain_switch_ = (arrow_##dot1##_dot > arrow_##dot2##_dot)    \
-            ? plane_##plane1##_switch_                                      \
-            : plane_##plane2##_switch_;                                     \
-                                                                            \
-        active_line_switch_ = line_##axis##_switch_;                        \
-    }
-
-static constexpr vsg::vec3 X_AXIS_POSITIVEf = {1.0f, 0.0f, 0.0f};
-static constexpr vsg::vec3 Y_AXIS_POSITIVEf = {0.0f, 1.0f, 0.0f};
-static constexpr vsg::vec3 Z_AXIS_POSITIVEf = {0.0f, 0.0f, 1.0f};
-
-static constexpr vsg::dvec3 X_AXIS_POSITIVEd = {1.0, 0.0, 0.0};
-static constexpr vsg::dvec3 Y_AXIS_POSITIVEd = {0.0, 1.0, 0.0};
-static constexpr vsg::dvec3 Z_AXIS_POSITIVEd = {0.0, 0.0, 1.0};
-
 Gizmo::Gizmo(
     EditorContext& context,
     const gizmo_settings_t& gizmo_settings,
@@ -72,13 +50,13 @@ Gizmo::Gizmo(
     state_info.two_sided = true;
     state_info.blending = true;
 
-    const auto rotate_geometry_info = [&](vsg::GeometryInfo& geometry_info,
+    const auto rotate_geometry_info = [](vsg::GeometryInfo& geometry_info,
         vsg::vec3 direction) -> void
     {
-        if (vsg::length(vsg::cross(Z_AXIS_POSITIVEf, direction)) > 0.001f)
+        if (vsg::length(vsg::cross(vsg::vec3(0.0f, 0.0f, 1.0f), direction)) > 0.001f)
         {
-            const vsg::vec3 axis = vsg::cross(Z_AXIS_POSITIVEf, direction);
-            const float angle = std::acos(vsg::dot(Z_AXIS_POSITIVEf, direction));
+            const vsg::vec3 axis = vsg::cross(vsg::vec3(0.0f, 0.0f, 1.0f), direction);
+            const float angle = std::acos(vsg::dot(vsg::vec3(0.0f, 0.0f, 1.0f), direction));
             geometry_info.transform = vsg::rotate(angle, axis);
         }
     };
@@ -151,27 +129,25 @@ Gizmo::Gizmo(
         return builder_.createCylinder(geometry_info, state_info);
     };
 
-    arrow_x_ = create_arrow(X_AXIS_POSITIVEf, arrow_x_color);
-    arrow_y_ = create_arrow(Y_AXIS_POSITIVEf, arrow_y_color);
-    arrow_z_ = create_arrow(Z_AXIS_POSITIVEf, arrow_z_color);
+    arrow_x_ = create_arrow(vsg::vec3(1.0f, 0.0f, 0.0f), arrow_x_color);
+    arrow_y_ = create_arrow(vsg::vec3(0.0f, 1.0f, 0.0f), arrow_y_color);
+    arrow_z_ = create_arrow(vsg::vec3(0.0f, 0.0f, 1.0f), arrow_z_color);
 
-    plane_yz_switch_ = SingleSwitch::create(vsg::MASK_OFF,
-        create_plane(X_AXIS_POSITIVEf));
+    const auto plane_yz = create_plane(vsg::vec3(1.0f, 0.0f, 0.0f));
+    const auto plane_xz = create_plane(vsg::vec3(0.0f, 1.0f, 0.0f));
+    const auto plane_xy = create_plane(vsg::vec3(0.0f, 0.0f, 1.0f));
 
-    plane_xz_switch_ = SingleSwitch::create(vsg::MASK_OFF,
-        create_plane(Y_AXIS_POSITIVEf));
+    plane_yz_switch_ = SingleSwitch::create(vsg::MASK_OFF, plane_yz);
+    plane_xz_switch_ = SingleSwitch::create(vsg::MASK_OFF, plane_xz);
+    plane_xy_switch_ = SingleSwitch::create(vsg::MASK_OFF, plane_xy);
 
-    plane_xy_switch_ = SingleSwitch::create(vsg::MASK_OFF,
-        create_plane(Z_AXIS_POSITIVEf));
+    const auto line_x = create_line(vsg::vec3(1.0f, 0.0f, 0.0f), arrow_x_color);
+    const auto line_y = create_line(vsg::vec3(0.0f, 1.0f, 0.0f), arrow_y_color);
+    const auto line_z = create_line(vsg::vec3(0.0f, 0.0f, 1.0f), arrow_z_color);
 
-    line_x_switch_ = SingleSwitch::create(vsg::MASK_OFF,
-        create_line(X_AXIS_POSITIVEf, arrow_x_color));
-
-    line_y_switch_ = SingleSwitch::create(vsg::MASK_OFF,
-        create_line(Y_AXIS_POSITIVEf, arrow_y_color));
-
-    line_z_switch_ = SingleSwitch::create(vsg::MASK_OFF,
-        create_line(Z_AXIS_POSITIVEf, arrow_z_color));
+    line_x_switch_ = SingleSwitch::create(vsg::MASK_OFF, line_x);
+    line_y_switch_ = SingleSwitch::create(vsg::MASK_OFF, line_y);
+    line_z_switch_ = SingleSwitch::create(vsg::MASK_OFF, line_z);
 
     matrix_transform_ = vsg::MatrixTransform::create();
     matrix_transform_->addChild(arrow_x_);
@@ -192,7 +168,6 @@ Gizmo::Gizmo(
 bool Gizmo::handle_intersections()
 {
     const auto intersector = intersection_handler->get_lmb_intersector();
-
     if (!intersector)
     {
         return false;
@@ -201,7 +176,6 @@ bool Gizmo::handle_intersections()
     this->accept(*intersector);
 
     const auto intersection = intersection_handler->get_closest_intersection(intersector);
-
     if (!intersection)
     {
         return false;
@@ -210,17 +184,41 @@ bool Gizmo::handle_intersections()
     const vsg::dvec3& world_intersection = intersection->worldIntersection;
     const vsg::dvec3& camera_front = camera->get_front();
 
-    const double arrow_x_dot = std::abs(vsg::dot(camera_front, X_AXIS_POSITIVEd));
-    const double arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS_POSITIVEd));
-    const double arrow_z_dot = std::abs(vsg::dot(camera_front, Z_AXIS_POSITIVEd));
+    const double arrow_x_dot = std::abs(vsg::dot(camera_front, vsg::dvec3(1.0, 0.0, 0.0)));
+    const double arrow_y_dot = std::abs(vsg::dot(camera_front, vsg::dvec3(0.0, 1.0, 0.0)));
+    const double arrow_z_dot = std::abs(vsg::dot(camera_front, vsg::dvec3(0.0, 0.0, 1.0)));
 
     for (const vsg::Node* const node : intersection->nodePath)
     {
         click_pos_ = curr_pos_;
 
-        IF_CHECK_INTERSECTION(x, y, z, xz, xy)
-        else IF_CHECK_INTERSECTION(y, x, z, yz, xy)
-        else IF_CHECK_INTERSECTION(z, x, y, yz, xz)
+        if (node == arrow_x_)
+        {
+            click_pos_.x = world_intersection.x;
+            active_arrow_ = arrow_x_;
+            active_plain_switch_ = (arrow_y_dot > arrow_z_dot)
+                ? plane_xz_switch_
+                : plane_xy_switch_;
+            active_line_switch_ = line_x_switch_;
+        }
+        else if (node == arrow_y_)
+        {
+            click_pos_.y = world_intersection.y;
+            active_arrow_ = arrow_y_;
+            active_plain_switch_ = (arrow_x_dot > arrow_z_dot)
+                ? plane_yz_switch_
+                : plane_xy_switch_;
+            active_line_switch_ = line_y_switch_;
+        }
+        else if (node == arrow_z_)
+        {
+            click_pos_.z = world_intersection.z;
+            active_arrow_ = arrow_z_;
+            active_plain_switch_ = (arrow_x_dot > arrow_y_dot)
+                ? plane_yz_switch_
+                : plane_xz_switch_;
+            active_line_switch_ = line_z_switch_;
+        }
         else
         {
             continue;
@@ -271,7 +269,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
         return;
     }
 
-    const auto intersector = intersection_handler->apply_(moveEvent);
+    const auto intersector = intersection_handler->apply_(moveEvent.x, moveEvent.y);
 
     this->accept(*intersector);
 
