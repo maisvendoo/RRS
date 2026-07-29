@@ -737,7 +737,7 @@ void RouteViewer::initViewer()
 
     auto upd_server_control = UpdateControlToServerHandler::create(tcp_client.get());
 
-    auto input_route_handler = InputRouteHandler::create();
+    input_route_handler = InputRouteHandler::create();
     input_route_handler->setKeyboard(keyboard);
 
     upd_viewer_handler = UpdateViewerHandler::create(
@@ -758,6 +758,9 @@ void RouteViewer::initViewer()
 
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
     close_viewer_handler->closeKey = vsg::KEY_Undefined;
+
+    connect(vehicles_handler.get(), &VehiclesHandler::sigCurrentVehicleChanged,
+            this, &RouteViewer::slotOnCurrentVehicleChanged);
 
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(upd_server_control);
@@ -1004,7 +1007,9 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 
     GUIparams->status = QString("Загрузка подвижного состава...");
 
-    is_vehicles = vehicles_handler->load(data, settings, options);    
+    is_vehicles = vehicles_handler->load(data, settings, options);
+
+    slotOnCurrentVehicleChanged(vehicles_handler->getCurrentVehicleIndex(), -1);
 
     GUIparams->status = QString("");
 
@@ -1050,4 +1055,39 @@ void RouteViewer::slotUpdated()
     // Камера в кабину ПЕ через фиктивное нажатие F1
     vsg::KeyPressEvent keyPress(window, viewer->getFrameStamp()->time, vsg::KEY_F1, vsg::KEY_F1, vsg::MODKEY_OFF);
     upd_viewer_handler->apply(keyPress);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
+{
+    if (!input_route_handler || !vehicles_handler)
+    {
+        return;
+    }
+
+    VehicleExterior* vehicle = vehicles_handler->getVehicle(newIndex);
+
+    if (!vehicle)
+    {
+        input_route_handler->clearActiveController();
+        LOG_INFO("RouteViewer: No vehicle at index %d", newIndex);
+        std::cout << "RouteViewer: No vehicle at index " << newIndex << std::endl;
+        return;
+    }
+
+    // Есть ли у ПЕ собственный IOController
+    if (!vehicle->io_controls.empty() && vehicle->io_controls[0])
+    {
+        // Активируем контроллер в маршрутизаторе
+        input_route_handler->setActiveController(vehicle->io_controls[0]);
+        LOG_INFO("RouteViewer: Activated IOController for vehicle %d (index %d)",
+                 newIndex, newIndex);
+    } else
+    {
+        // Нет контроллера - используем legacy-режим
+        input_route_handler->clearActiveController();
+        LOG_INFO("RouteViewer: No IOController for vehicle %d, using legacy mode", newIndex);
+    }
 }
