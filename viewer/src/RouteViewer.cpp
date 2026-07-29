@@ -743,6 +743,7 @@ void RouteViewer::initViewer()
     upd_viewer_handler = UpdateViewerHandler::create(
         upd_server_control,
         camera,
+        keyboard,
         shadow_region,
         screenshot_writer.get(),
         traffic_lights_handler.get(),

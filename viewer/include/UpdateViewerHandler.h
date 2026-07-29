@@ -48,6 +48,7 @@ public:
     UpdateViewerHandler(
         vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
         vsg::ref_ptr<vsg::Camera> camera,
+        vsg::ref_ptr<vsg::Keyboard> keyboard,
         vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
         ScreenshotWriter* screenshot_writer,
         TrafficLightsHandler* sig_handler,
