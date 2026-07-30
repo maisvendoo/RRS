@@ -29,6 +29,7 @@
 #include <vsg/ui/PointerEvent.h>
 
 #include <cmath>
+#include <vsg/utils/LineSegmentIntersector.h>
 
 ObjectSelector::ObjectSelector(
     EditorContext& context,
@@ -47,7 +48,6 @@ ObjectSelector::ObjectSelector(
     , keyboard(keyboard)
     , camera(camera)
     , command_list(command_list)
-    , intersection_handler(intersection_handler)
     , scene_graph(scene_graph)
     , route(route)
     , window_extent(window_extent)
@@ -177,6 +177,11 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     const RouteObjects& selected_objects = context_.selected_objects;
 
+    if (!(buttonPress.button == 1 && buttonPress.mask == vsg::BUTTON_MASK_1))
+    {
+        return;
+    }
+
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
     if (!selected_objects.empty() && context_.gizmo->handle_intersections())
@@ -184,9 +189,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    const auto intersector =
-        intersection_handler->get_lmb_intersector();
-
+    const auto intersector = vsg::LineSegmentIntersector::create(*camera, buttonPress.x, buttonPress.y);
     if (!intersector)
     {
         return;
@@ -214,15 +217,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    const auto intersection =
-        intersection_handler->get_closest_intersection(intersector);
-
-    if (!intersection)
-    {
-        return;
-    }
-
-    for (const vsg::Node* const node : intersection->nodePath)
+    for (const vsg::Node* const node : intersections.front()->nodePath)
     {
         if (const RouteObject* const object = node->cast<RouteObject>())
         {
