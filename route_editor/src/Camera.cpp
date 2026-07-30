@@ -37,21 +37,6 @@ Camera::Camera(
     const double window_height = static_cast<double>(window_extent.height);
     const double aspect_ratio = window_width / window_height;
 
-    double radius = camera_settings.view_distance;
-
-    double halfDim = 100.0;
-    double halfHeight, halfWidth;
-    if (window_width > window_height)
-    {
-        halfHeight = halfDim;
-        halfWidth = halfDim * aspect_ratio;
-    }
-    else
-    {
-        halfWidth = halfDim;
-        halfHeight = halfDim / aspect_ratio;
-    }
-
     perspective = vsg::Perspective::create(
         camera_settings.fovy,
         aspect_ratio,
@@ -59,8 +44,7 @@ Camera::Camera(
         camera_settings.view_distance
     );
 
-    orthographic = vsg::Orthographic::create(-halfWidth, halfWidth, -halfHeight, halfHeight,
-        0.0, radius);
+    create_orthographic_projection(window_width, window_height, aspect_ratio);
 
     const double initial_height = camera_settings.initial_height;
 
@@ -73,6 +57,8 @@ Camera::Camera(
     this->viewMatrix = look_at;
     this->viewportState = vsg::ViewportState::create(window_extent);
 
+    another_projection_matrix = orthographic;
+
     calculate_front();
     calculate_right();
     calculate_up();
@@ -84,14 +70,7 @@ void Camera::handle_key_press()
 {
     if (keyboard->pressed_once(ACTION_CHANGE_PROJECTION_MATRIX))
     {
-        if (projectionMatrix == perspective)
-        {
-            projectionMatrix = orthographic;
-        }
-        else
-        {
-            projectionMatrix = perspective;
-        }
+        std::swap(projectionMatrix, another_projection_matrix);
         calculate_inverse_projection_matrix();
     }
 }
@@ -132,19 +111,19 @@ void Camera::handle_mouse_move()
     update_move_direction();
 }
 
-void Camera::update(double delta_time)
-{
-    look_at->eye += camera_settings.move_speed * delta_time * move_direction;
-    look_at->center = look_at->eye + front_;
-    calculate_inverse_view_matrix();
-}
-
 void Camera::handle_mouse_scroll()
 {
     double& fovy = perspective->fieldOfViewY;
     fovy -= mouse->get_scroll() * camera_settings.zoom_power;
     fovy = std::clamp(fovy, camera_settings.fovy_min, camera_settings.fovy_max);
     calculate_inverse_projection_matrix();
+}
+
+void Camera::update(double delta_time)
+{
+    look_at->eye += camera_settings.move_speed * delta_time * move_direction;
+    look_at->center = look_at->eye + front_;
+    calculate_inverse_view_matrix();
 }
 
 const vsg::dvec3& Camera::get_front() const
@@ -187,15 +166,37 @@ const vsg::dmat4& Camera::get_inverse_view_matrix() const
     return inverse_view_matrix;
 }
 
+void Camera::create_orthographic_projection(double window_width,
+    double window_height, double aspect_ratio)
+{
+    const double radius = camera_settings.view_distance;
+
+    const double halfDim = 100.0;
+    double halfHeight, halfWidth;
+    if (window_width > window_height)
+    {
+        halfHeight = halfDim;
+        halfWidth = halfDim * aspect_ratio;
+    }
+    else
+    {
+        halfWidth = halfDim;
+        halfHeight = halfDim / aspect_ratio;
+    }
+
+    orthographic = vsg::Orthographic::create(-halfWidth, halfWidth,
+        -halfHeight, halfHeight, 0.0, radius);
+}
+
 void Camera::calculate_front()
 {
-    const double yaw_rad = vsg::radians(yaw_degrees);
-    const double pitch_rad = vsg::radians(pitch_degrees);
+    const double yaw_radians = vsg::radians(yaw_degrees);
+    const double pitch_radians = vsg::radians(pitch_degrees);
 
     front_ = vsg::normalize(vsg::dvec3(
-        std::sin(yaw_rad) * std::cos(pitch_rad),
-        std::cos(yaw_rad) * std::cos(pitch_rad),
-        std::sin(pitch_rad)
+        std::sin(yaw_radians) * std::cos(pitch_radians),
+        std::cos(yaw_radians) * std::cos(pitch_radians),
+        std::sin(pitch_radians)
     ));
 }
 
@@ -211,14 +212,7 @@ void Camera::calculate_up()
 
 void Camera::calculate_inverse_projection_matrix()
 {
-    if (projectionMatrix == perspective)
-    {
-        inverse_projection_matrix = perspective->inverse();
-    }
-    else
-    {
-        inverse_projection_matrix = orthographic->inverse();
-    }
+    inverse_projection_matrix = projectionMatrix->inverse();
 }
 
 void Camera::calculate_inverse_view_matrix()
