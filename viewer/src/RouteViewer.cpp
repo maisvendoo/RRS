@@ -1078,6 +1078,8 @@ void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
 
     auto cab_idx = vehicle->controlled_cabine_idx;
 
+    LOG_INFO("RouteViewer: Curr. vehicle %d cabine %d IOControllers count: %d", newIndex, cab_idx, vehicle->io_controls.size());
+
     // Есть ли у ПЕ собственный IOController
     if (!vehicle->io_controls.empty() && vehicle->io_controls[cab_idx])
     {
