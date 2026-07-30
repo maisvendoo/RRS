@@ -23,14 +23,15 @@ class WindowHandler : public vsg::Inherit<vsg::Visitor, WindowHandler>
 public:
     WindowHandler(
         const window_settings_t& window_settings,
-        vsg::ref_ptr<vsg::Window>& window,
-        const vsg::ref_ptr<Camera>& camera
+        vsg::ref_ptr<vsg::Window>& window
     );
 
     virtual void apply(vsg::ConfigureWindowEvent& configureWindow) override;
 
+    void set_camera(const vsg::ref_ptr<Camera>& camera) { this->camera = camera; }
+
 private:
-    const vsg::ref_ptr<Camera>& camera;
+    vsg::ref_ptr<Camera> camera;
 };
 
 #endif // WINDOW_HANDLER_H

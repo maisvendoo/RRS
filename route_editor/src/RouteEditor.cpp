@@ -65,7 +65,7 @@ bool RouteEditor::initialize()
     create_vsg_options();
     configure_shaders();
 
-    window_handler_ = WindowHandler::create(window_settings, window, camera);
+    window_handler_ = WindowHandler::create(window_settings, window);
     if (!window)
     {
         return false;
@@ -79,6 +79,7 @@ bool RouteEditor::initialize()
 
     camera = Camera::create(camera_settings, window->extent2D(), mouse,
         keyboard);
+    window_handler_->set_camera(camera);
 
     intersection_handler = IntersectionHandler::create(camera);
     scene_graph = SceneGraph::create(context_, camera_settings, vsg_options,
