@@ -21,10 +21,6 @@
 #include <cmath>
 #include <string>
 
-static constexpr vsg::dvec3 AXIS_X_POSITIVE = {1.0, 0.0, 0.0};
-static constexpr vsg::dvec3 AXIS_Y_POSITIVE = {0.0, 1.0, 0.0};
-static constexpr vsg::dvec3 AXIS_Z_POSITIVE = {0.0, 0.0, 1.0};
-
 static vsg::dvec3 to_euler_deg(const vsg::dquat& q)
 {
     return vsg::dvec3{
@@ -233,10 +229,14 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
 
 void RouteObject::update_matrix()
 {
+    constexpr vsg::dvec3 X_AXIS = {1.0, 0.0, 0.0};
+    constexpr vsg::dvec3 Y_AXIS = {0.0, 1.0, 0.0};
+    constexpr vsg::dvec3 Z_AXIS = {0.0, 0.0, 1.0};
+
     matrix = vsg::translate(translation_) *
-             vsg::rotate(vsg::radians(rotation_deg_.z), AXIS_Z_POSITIVE) *
-             vsg::rotate(vsg::radians(rotation_deg_.y), AXIS_Y_POSITIVE) *
-             vsg::rotate(vsg::radians(rotation_deg_.x), AXIS_X_POSITIVE) *
+             vsg::rotate(vsg::radians(rotation_deg_.z), Z_AXIS) *
+             vsg::rotate(vsg::radians(rotation_deg_.y), Y_AXIS) *
+             vsg::rotate(vsg::radians(rotation_deg_.x), X_AXIS) *
              vsg::scale(scale_);
 
     update_bounds();

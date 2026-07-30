@@ -104,9 +104,9 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    const double normalized_mouse_x = static_cast<double>(mouse->get_pos_x()) /
+    const double normalized_mouse_x = static_cast<double>(mouse->get_x()) /
         window_extent.width * 2.0 - 1.0;
-    const double normalized_mouse_y = static_cast<double>(mouse->get_pos_y()) /
+    const double normalized_mouse_y = static_cast<double>(mouse->get_y()) /
         window_extent.height * 2.0 - 1.0;
 
     const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();
@@ -248,9 +248,9 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    const double normalized_mouse_x = static_cast<double>(mouse->get_pos_x()) /
+    const double normalized_mouse_x = static_cast<double>(mouse->get_x()) /
         window_extent.width * 2.0 - 1.0;
-    const double normalized_mouse_y = static_cast<double>(mouse->get_pos_y()) /
+    const double normalized_mouse_y = static_cast<double>(mouse->get_y()) /
         window_extent.height * 2.0 - 1.0;
 
     const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();

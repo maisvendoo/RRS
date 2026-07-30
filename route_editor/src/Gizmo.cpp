@@ -24,6 +24,20 @@
 
 #include <cmath>
 
+static void rotate_geometry_info(
+    vsg::GeometryInfo& geometry_info,
+    vsg::vec3 direction
+)
+{
+    constexpr vsg::vec3 Z_AXIS = {0.0f, 0.0f, 1.0f};
+    if (vsg::length(vsg::cross(Z_AXIS, direction)) > 0.001f)
+    {
+        const vsg::vec3 axis = vsg::cross(Z_AXIS, direction);
+        const float angle = std::acos(vsg::dot(Z_AXIS, direction));
+        geometry_info.transform = vsg::rotate(angle, axis);
+    }
+}
+
 Gizmo::Gizmo(
     EditorContext& context,
     const gizmo_settings_t& gizmo_settings,
@@ -49,17 +63,6 @@ Gizmo::Gizmo(
     vsg::StateInfo state_info;
     state_info.two_sided = true;
     state_info.blending = true;
-
-    const auto rotate_geometry_info = [](vsg::GeometryInfo& geometry_info,
-        vsg::vec3 direction) -> void
-    {
-        if (vsg::length(vsg::cross(vsg::vec3(0.0f, 0.0f, 1.0f), direction)) > 0.001f)
-        {
-            const vsg::vec3 axis = vsg::cross(vsg::vec3(0.0f, 0.0f, 1.0f), direction);
-            const float angle = std::acos(vsg::dot(vsg::vec3(0.0f, 0.0f, 1.0f), direction));
-            geometry_info.transform = vsg::rotate(angle, axis);
-        }
-    };
 
     const auto create_arrow = [&](vsg::vec3 direction,
         vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
@@ -129,21 +132,25 @@ Gizmo::Gizmo(
         return builder_.createCylinder(geometry_info, state_info);
     };
 
-    arrow_x_ = create_arrow(vsg::vec3(1.0f, 0.0f, 0.0f), arrow_x_color);
-    arrow_y_ = create_arrow(vsg::vec3(0.0f, 1.0f, 0.0f), arrow_y_color);
-    arrow_z_ = create_arrow(vsg::vec3(0.0f, 0.0f, 1.0f), arrow_z_color);
+    constexpr vsg::vec3 X_AXIS = {1.0f, 0.0f, 0.0f};
+    constexpr vsg::vec3 Y_AXIS = {0.0f, 1.0f, 0.0f};
+    constexpr vsg::vec3 Z_AXIS = {0.0f, 0.0f, 1.0f};
 
-    const auto plane_yz = create_plane(vsg::vec3(1.0f, 0.0f, 0.0f));
-    const auto plane_xz = create_plane(vsg::vec3(0.0f, 1.0f, 0.0f));
-    const auto plane_xy = create_plane(vsg::vec3(0.0f, 0.0f, 1.0f));
+    const auto plane_yz = create_plane(X_AXIS);
+    const auto plane_xz = create_plane(Y_AXIS);
+    const auto plane_xy = create_plane(Z_AXIS);
+
+    const auto line_x = create_line(X_AXIS, arrow_x_color);
+    const auto line_y = create_line(Y_AXIS, arrow_y_color);
+    const auto line_z = create_line(Z_AXIS, arrow_z_color);
+
+    arrow_x_ = create_arrow(X_AXIS, arrow_x_color);
+    arrow_y_ = create_arrow(Y_AXIS, arrow_y_color);
+    arrow_z_ = create_arrow(Z_AXIS, arrow_z_color);
 
     plane_yz_switch_ = SingleSwitch::create(vsg::MASK_OFF, plane_yz);
     plane_xz_switch_ = SingleSwitch::create(vsg::MASK_OFF, plane_xz);
     plane_xy_switch_ = SingleSwitch::create(vsg::MASK_OFF, plane_xy);
-
-    const auto line_x = create_line(vsg::vec3(1.0f, 0.0f, 0.0f), arrow_x_color);
-    const auto line_y = create_line(vsg::vec3(0.0f, 1.0f, 0.0f), arrow_y_color);
-    const auto line_z = create_line(vsg::vec3(0.0f, 0.0f, 1.0f), arrow_z_color);
 
     line_x_switch_ = SingleSwitch::create(vsg::MASK_OFF, line_x);
     line_y_switch_ = SingleSwitch::create(vsg::MASK_OFF, line_y);
@@ -184,9 +191,13 @@ bool Gizmo::handle_intersections()
     const vsg::dvec3& world_intersection = intersection->worldIntersection;
     const vsg::dvec3& camera_front = camera->get_front();
 
-    const double arrow_x_dot = std::abs(vsg::dot(camera_front, vsg::dvec3(1.0, 0.0, 0.0)));
-    const double arrow_y_dot = std::abs(vsg::dot(camera_front, vsg::dvec3(0.0, 1.0, 0.0)));
-    const double arrow_z_dot = std::abs(vsg::dot(camera_front, vsg::dvec3(0.0, 0.0, 1.0)));
+    constexpr vsg::dvec3 X_AXIS = {1.0, 0.0, 0.0};
+    constexpr vsg::dvec3 Y_AXIS = {0.0, 1.0, 0.0};
+    constexpr vsg::dvec3 Z_AXIS = {0.0, 0.0, 1.0};
+
+    const double arrow_x_dot = std::abs(vsg::dot(camera_front, X_AXIS));
+    const double arrow_y_dot = std::abs(vsg::dot(camera_front, Y_AXIS));
+    const double arrow_z_dot = std::abs(vsg::dot(camera_front, Z_AXIS));
 
     for (const vsg::Node* const node : intersection->nodePath)
     {

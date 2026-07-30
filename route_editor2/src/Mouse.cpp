@@ -27,14 +27,14 @@ void Mouse::apply(vsg::MoveEvent& moveEvent)
     static int prev_x = moveEvent.x;
     static int prev_y = moveEvent.y;
 
-    pos_x = moveEvent.x;
-    pos_y = moveEvent.y;
+    x = moveEvent.x;
+    y = moveEvent.y;
 
-    delta_x = pos_x - prev_x;
-    delta_y = pos_y - prev_y;
+    delta_x = x - prev_x;
+    delta_y = y - prev_y;
 
-    prev_x = pos_x;
-    prev_y = pos_y;
+    prev_x = x;
+    prev_y = y;
 }
 
 vsg::ButtonMask Mouse::get_button_mask() const
@@ -42,14 +42,14 @@ vsg::ButtonMask Mouse::get_button_mask() const
     return button_mask;
 }
 
-int Mouse::get_pos_x() const
+int Mouse::get_x() const
 {
-    return pos_x;
+    return x;
 }
 
-int Mouse::get_pos_y() const
+int Mouse::get_y() const
 {
-    return pos_y;
+    return y;
 }
 
 int Mouse::get_delta_x() const

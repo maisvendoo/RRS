@@ -129,8 +129,8 @@ BoxSelectionState::~BoxSelectionState() = default;
 
 void BoxSelectionState::on_activate()
 {
-    begin_x = end_x = mouse->get_pos_x();
-    begin_y = end_y = mouse->get_pos_y();
+    begin_x = end_x = mouse->get_x();
+    begin_y = end_y = mouse->get_y();
 
     update_selection();
 
@@ -156,8 +156,8 @@ void BoxSelectionState::handle_button_release() const
 
 void BoxSelectionState::handle_mouse_move()
 {
-    end_x = mouse->get_pos_x();
-    end_y = mouse->get_pos_y();
+    end_x = mouse->get_x();
+    end_y = mouse->get_y();
 
     update_selection();
 }

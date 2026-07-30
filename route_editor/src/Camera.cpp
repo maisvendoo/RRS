@@ -91,8 +91,8 @@ void Camera::update_move_direction()
     }
     else
     {
-        move_direction = front_ * forward_move_direction +
-            right_ * right_move_direction;
+        move_direction = front * forward_move_direction +
+            right * right_move_direction;
 
         if (projectionMatrix == orthographic)
         {
@@ -129,23 +129,23 @@ void Camera::handle_mouse_scroll()
 void Camera::update(double delta_time)
 {
     look_at->eye += camera_settings.move_speed * delta_time * move_direction;
-    look_at->center = look_at->eye + front_;
+    look_at->center = look_at->eye + front;
     calculate_inverse_view_matrix();
 }
 
 const vsg::dvec3& Camera::get_front() const
 {
-    return front_;
+    return front;
 }
 
 const vsg::dvec3& Camera::get_right() const
 {
-    return right_;
+    return right;
 }
 
 const vsg::dvec3& Camera::get_up() const
 {
-    return up_;
+    return up;
 }
 
 const vsg::ref_ptr<vsg::Perspective>& Camera::get_perspective() const
@@ -200,7 +200,7 @@ void Camera::calculate_front()
     const double yaw_radians = vsg::radians(yaw_degrees);
     const double pitch_radians = vsg::radians(pitch_degrees);
 
-    front_ = vsg::normalize(vsg::dvec3(
+    front = vsg::normalize(vsg::dvec3(
         std::sin(yaw_radians) * std::cos(pitch_radians),
         std::cos(yaw_radians) * std::cos(pitch_radians),
         std::sin(pitch_radians)
@@ -209,12 +209,12 @@ void Camera::calculate_front()
 
 void Camera::calculate_right()
 {
-    right_ = vsg::normalize(vsg::cross(front_, look_at->up));
+    right = vsg::normalize(vsg::cross(front, look_at->up));
 }
 
 void Camera::calculate_up()
 {
-    up_ = vsg::normalize(vsg::cross(right_, front_));
+    up = vsg::normalize(vsg::cross(right, front));
 }
 
 void Camera::calculate_inverse_projection_matrix()

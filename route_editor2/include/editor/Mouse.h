@@ -16,9 +16,9 @@ public:
 
     vsg::ButtonMask get_button_mask() const;
 
-    int get_pos_x() const;
+    int get_x() const;
 
-    int get_pos_y() const;
+    int get_y() const;
 
     int get_delta_x() const;
 
@@ -26,8 +26,8 @@ public:
 
 private:
     vsg::ButtonMask button_mask = vsg::BUTTON_MASK_OFF;
-    int pos_x;
-    int pos_y;
+    int x;
+    int y;
     int delta_x;
     int delta_y;
 };

@@ -89,9 +89,9 @@ private:
     double yaw_degrees = 0.0;
     double pitch_degrees = 0.0;
 
-    vsg::dvec3 front_;
-    vsg::dvec3 right_;
-    vsg::dvec3 up_;
+    vsg::dvec3 front;
+    vsg::dvec3 right;
+    vsg::dvec3 up;
 
     vsg::dvec3 move_direction = {0.0, 0.0, 0.0};
 };

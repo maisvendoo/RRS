@@ -1,20 +1,9 @@
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef EDITOR_MOUSE_H
+#define EDITOR_MOUSE_H
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
-
-#include <cstdint>
-
-namespace vsg
-{
-
-class ButtonPressEvent;
-class ButtonReleaseEvent;
-class MoveEvent;
-class ScrollWheelEvent;
-
-}
+#include <vsg/ui/PointerEvent.h>
 
 class Mouse : public vsg::Inherit<vsg::Visitor, Mouse>
 {
@@ -26,25 +15,23 @@ public:
     virtual void apply(vsg::MoveEvent& moveEvent) override;
     virtual void apply(vsg::ScrollWheelEvent& scrollWheel) override;
 
-    int get_pos_x() const;
-    int get_pos_y() const;
-    // Must be called only from MoveEvents
-    int get_delta_x() const;
-    int get_delta_y() const;
-    std::uint16_t get_button_mask() const;
-    int get_scroll() const { return scroll; }
-
-    bool is_lmb_pressed() const;
-    bool is_mmb_pressed() const;
-    bool is_rmb_pressed() const;
+    vsg::ButtonMask get_button_mask() const { return button_mask; }
+    bool is_lmb_pressed() const { return button_mask & vsg::BUTTON_MASK_1; }
+    bool is_mmb_pressed() const { return button_mask & vsg::BUTTON_MASK_2; }
+    bool is_rmb_pressed() const { return button_mask & vsg::BUTTON_MASK_3; }
+    int get_x() const { return x; }
+    int get_y() const { return y; }
+    int get_delta_x() const { return delta_x; }
+    int get_delta_y() const { return delta_y; }
+    float get_scroll() const { return scroll; }
 
 private:
-    std::uint16_t button_mask;
-    int pos_x;
-    int pos_y;
+    vsg::ButtonMask button_mask;
+    int x;
+    int y;
     int delta_x;
     int delta_y;
-    int scroll;
+    float scroll;
 };
 
-#endif // MOUSE_H
+#endif // EDITOR_MOUSE_H
