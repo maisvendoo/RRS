@@ -91,8 +91,15 @@ void Camera::update_move_direction()
     }
     else
     {
-        move_direction = vsg::normalize(front_ * forward_move_direction +
-            right_ * right_move_direction);
+        move_direction = front_ * forward_move_direction +
+            right_ * right_move_direction;
+
+        if (projectionMatrix == orthographic)
+        {
+            move_direction.z = 0.0;
+        }
+
+        move_direction = vsg::normalize(move_direction);
     }
 }
 
