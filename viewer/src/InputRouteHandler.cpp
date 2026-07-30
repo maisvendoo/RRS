@@ -28,12 +28,15 @@ void InputRouteHandler::apply(vsg::KeyPressEvent &keyPress)
 
     if (!isControlKey(keyBase))
     {
-        keyPress.handled = false;
+        //keyPress.handled = false;
         return;
     }
 
-    processKeyForController(keyBase, true);
-    keyPress.handled = true;
+    //processKeyForController(keyBase, true);
+    //keyPress.handled = true;
+
+    m_activeIOController->setPressedKey(keyBase);
+    LOG_DEBUG("InputRouteHandler: Control key pressed 0x%04X", keyBase);
 }
 
 //------------------------------------------------------------------------------
@@ -51,12 +54,14 @@ void InputRouteHandler::apply(vsg::KeyReleaseEvent &keyRelease)
 
     if (!isControlKey(keyBase))
     {
-        keyRelease.handled = false;
+        //keyRelease.handled = false;
         return;
     }
 
-    processKeyForController(keyBase, true);
-    keyRelease.handled = true;
+    //processKeyForController(keyBase, false);
+    //keyRelease.handled = true;
+    m_activeIOController->setReleasedKey(keyBase);
+    LOG_DEBUG("InputRouteHandler: Control key released 0x%04X", keyBase);
 }
 
 //------------------------------------------------------------------------------
@@ -141,29 +146,17 @@ void InputRouteHandler::processKeyForController(uint16_t keyBase, bool pressed)
     if (!m_activeIOController)
     {
         return;
-    }
-
-    if (!KeySymbolsRRS.count(keyBase))
-    {
-        LOG_WARN("InputRouteHandler: Unknown key 0x%04X", keyBase);
-        return;
-    }
+    }    
 
     if (pressed)
     {
-        if(m_pressedKeys.insert(keyBase).second)
-        {
-            m_activeIOController->setPressedKey(keyBase);
-            LOG_DEBUG("InputRouteHandler: Control key pressed 0x%04X", keyBase);
-        }
+        m_activeIOController->setPressedKey(keyBase);
+        LOG_DEBUG("InputRouteHandler: Control key pressed 0x%04X", keyBase);
     }
     else
     {
-        if (m_pressedKeys.erase(keyBase))
-        {
-            m_activeIOController->setReleasedKey(keyBase);
-            LOG_DEBUG("InputRouteHandler: Control key released 0x%04X", keyBase);
-        }
+        m_activeIOController->setReleasedKey(keyBase);
+        LOG_DEBUG("InputRouteHandler: Control key released 0x%04X", keyBase);
     }
 }
 
