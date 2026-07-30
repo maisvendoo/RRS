@@ -31,16 +31,6 @@ void IntersectionHandler::apply(vsg::ButtonPressEvent& buttonPress)
     {
         lmb_intersector_ = intersector;
     }
-
-    if (buttonPress.mask & vsg::BUTTON_MASK_2)
-    {
-        mmb_intersector_ = intersector;
-    }
-
-    if (buttonPress.mask & vsg::BUTTON_MASK_3)
-    {
-        rmb_intersector_ = intersector;
-    }
 }
 
 void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
@@ -54,16 +44,6 @@ void IntersectionHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
     {
         lmb_intersector_ = nullptr;
     }
-
-    if (!(buttonRelease.mask & vsg::BUTTON_MASK_2))
-    {
-        mmb_intersector_ = nullptr;
-    }
-
-    if (!(buttonRelease.mask & vsg::BUTTON_MASK_3))
-    {
-        rmb_intersector_ = nullptr;
-    }
 }
 
 LSIntersectorRefPtr IntersectionHandler::apply_(int mouse_x, int mouse_y) const
@@ -74,16 +54,6 @@ LSIntersectorRefPtr IntersectionHandler::apply_(int mouse_x, int mouse_y) const
 LSIntersectorRefPtr IntersectionHandler::get_lmb_intersector() const
 {
     return lmb_intersector_;
-}
-
-LSIntersectorRefPtr IntersectionHandler::get_mmb_intersector() const
-{
-    return mmb_intersector_;
-}
-
-LSIntersectorRefPtr IntersectionHandler::get_rmb_intersector() const
-{
-    return rmb_intersector_;
 }
 
 void IntersectionHandler::sort_intersections(LSIntersectorRefPtr intersector)

@@ -31,8 +31,6 @@ public:
     LSIntersectorRefPtr apply_(int mouse_x, int mouse_y) const;
 
     LSIntersectorRefPtr get_lmb_intersector() const;
-    LSIntersectorRefPtr get_mmb_intersector() const;
-    LSIntersectorRefPtr get_rmb_intersector() const;
 
     static void sort_intersections(LSIntersectorRefPtr intersector);
     static void sort_intersections(LSIntersections& intersections);
@@ -44,8 +42,6 @@ private:
     const vsg::ref_ptr<Camera>& camera;
 
     LSIntersectorRefPtr lmb_intersector_;
-    LSIntersectorRefPtr mmb_intersector_;
-    LSIntersectorRefPtr rmb_intersector_;
 };
 
 #endif // INTERSECTION_HANDLER_H
