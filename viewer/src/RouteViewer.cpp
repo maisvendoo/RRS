@@ -1072,16 +1072,17 @@ void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
     if (!vehicle)
     {
         input_route_handler->clearActiveController();
-        LOG_INFO("RouteViewer: No vehicle at index %d", newIndex);
-        std::cout << "RouteViewer: No vehicle at index " << newIndex << std::endl;
+        LOG_INFO("RouteViewer: No vehicle at index %d", newIndex);        
         return;
     }
 
+    auto cab_idx = vehicle->controlled_cabine_idx;
+
     // Есть ли у ПЕ собственный IOController
-    if (!vehicle->io_controls.empty() && vehicle->io_controls[0])
+    if (!vehicle->io_controls.empty() && vehicle->io_controls[cab_idx])
     {
         // Активируем контроллер в маршрутизаторе
-        input_route_handler->setActiveController(vehicle->io_controls[0]);
+        input_route_handler->setActiveController(vehicle->io_controls[cab_idx]);
         LOG_INFO("RouteViewer: Activated IOController for vehicle %d (index %d)",
                  newIndex, newIndex);
     } else
