@@ -24,32 +24,6 @@
 
 #include <cmath>
 
-static void rotate_geometry_info(
-    vsg::GeometryInfo& geometry_info,
-    vsg::vec3 direction
-)
-{
-    constexpr vsg::vec3 z_axis = {0.0f, 0.0f, 1.0f};
-    if (vsg::length(vsg::cross(z_axis, direction)) > 0.001f)
-    {
-        const vsg::vec3 axis = vsg::cross(z_axis, direction);
-        const float angle = std::acos(vsg::dot(z_axis, direction));
-        geometry_info.transform = vsg::rotate(angle, axis);
-    }
-}
-
-static vsg::ref_ptr<vsg::Node> create_arrow(vsg::Builder& builder,
-    vsg::vec3 direction, float length, float thickness, vsg::vec3 color,
-    float opacity, vsg::StateInfo& state_info)
-{
-    vsg::GeometryInfo geometry_info(vsg::box(
-        vsg::vec3(-thickness, -thickness, 0.0f),
-        vsg::vec3( thickness,  thickness, length)
-    ));
-
-    rotate_geometry_info(geometry_info, direction);
-}
-
 Gizmo::Gizmo(
     EditorContext& context,
     const gizmo_settings_t& gizmo_settings,
@@ -75,6 +49,17 @@ Gizmo::Gizmo(
     vsg::StateInfo state_info;
     state_info.two_sided = true;
     state_info.blending = true;
+
+    const auto rotate_geometry_info = [](vsg::GeometryInfo& geometry_info,
+        vsg::vec3 direction) -> void
+    {
+        if (vsg::length(vsg::cross(vsg::vec3(0.0f, 0.0f, 1.0f), direction)) > 0.001f)
+        {
+            const vsg::vec3 axis = vsg::cross(vsg::vec3(0.0f, 0.0f, 1.0f), direction);
+            const float angle = std::acos(vsg::dot(vsg::vec3(0.0f, 0.0f, 1.0f), direction));
+            geometry_info.transform = vsg::rotate(angle, axis);
+        }
+    };
 
     const auto create_arrow = [&](vsg::vec3 direction,
         vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
