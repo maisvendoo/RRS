@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "EditorContext.h"
 #include "Mask.h"
+#include "Mouse.h"
 #include "RouteObject.h"
 #include "SingleSwitch.h"
 #include "commands/CommandList.h"
@@ -43,12 +44,16 @@ Gizmo::Gizmo(
     EditorContext& context,
     const gizmo_settings_t& gizmo_settings,
     const vsg::ref_ptr<Camera>& camera,
-    CommandList& command_list
+    CommandList& command_list,
+    const vsg::ref_ptr<Mouse>& mouse,
+    const VkExtent2D& window_extent
 )
     : context_(context)
     , gizmo_settings(gizmo_settings)
     , camera(camera)
     , command_list(command_list)
+    , mouse(mouse)
+    , window_extent(window_extent)
 {
     builder_.shaderSet = vsg::createFlatShadedShaderSet();
 
@@ -162,6 +167,79 @@ bool Gizmo::handle_intersections(
     const vsg::ref_ptr<vsg::LineSegmentIntersector>& intersector
 )
 {
+    constexpr vsg::dvec3 arrow_directions[3] = {
+        vsg::dvec3(1.0, 0.0, 0.0),
+        vsg::dvec3(0.0, 1.0, 0.0),
+        vsg::dvec3(0.0, 0.0, 1.0)
+    };
+
+    double arrow_dots[3];
+    for (int i = 0; i < 3; ++i)
+    {
+        arrow_dots[i] = std::abs(vsg::dot(camera->get_front(), arrow_directions[i]));
+    }
+
+    // const double normalized_mouse_x = static_cast<double>(mouse->get_x()) /
+    //     window_extent.width * 2.0 - 1.0;
+    // const double normalized_mouse_y = static_cast<double>(mouse->get_y()) /
+    //     window_extent.height * 2.0 - 1.0;
+
+    // const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();
+    // const vsg::dmat4& inverse_view_matrix = camera->get_inverse_view_matrix();
+
+    // const vsg::dvec3 mouse_world1 = inverse_view_matrix *
+    //     inverse_projection_matrix *
+    //     vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 0.0);
+
+    // const vsg::dvec3 mouse_world2 = inverse_view_matrix *
+    //     inverse_projection_matrix *
+    //     vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 1.0);
+
+    // const double x_min = curr_pos_.x;
+    // const double x_max = curr_pos_.x + gizmo_settings.arrow_length;
+    // const double C_y = curr_pos_.y;
+    // const double C_z = curr_pos_.z;
+    // const double x1 = mouse_world1.x;
+    // const double y1 = mouse_world1.y;
+    // const double z1 = mouse_world1.z;
+    // const vsg::dvec3 v = mouse_world2 - mouse_world1;
+    // const double R = gizmo_settings.arrow_thickness;
+
+    // const double A = (v.y * v.y + v.z * v.z);
+    // const double B = 2 * ((y1 - C_y) * v.y + (z1 - C_z) * v.z);
+    // const double C = std::pow(y1 - C_y, 2.0) + std::pow(z1 - C_z, 2.0) - R * R;
+
+    // double D = B * B - 4 * A * C;
+    // if (D >= 0.0)
+    // {
+    //     double sqrtd = std::sqrt(D);
+    //     double t1 = (-B + sqrtd) / (2 * A);
+    //     double t2 = (-B + sqrtd) / (2 * A);
+    //     double t = std::abs(t1) < std::abs(t2) ? t1 : t2;
+    //     const vsg::dvec3 intersection = {mouse_world1 + v * t};
+    //     if (intersection.x >= x_min && intersection.x <= x_max)
+    //     {
+    //         printf("Intersection!!!!!\n");
+    //         active_arrow_index = 0;
+    //         active_plain_index = (arrow_dots[1] > arrow_dots[2]) ? 1 : 2;
+    //         vsg::dvec3 click_pos = curr_pos_;
+    //         click_pos[active_arrow_index] =
+    //             intersection[active_arrow_index];
+
+    //         prev_intersect_pos_ = click_pos;
+    //         total_translation_.set(0.0, 0.0, 0.0);
+
+    //         plane_switches[active_plain_index]->mask = MASK_CLICKABLE;
+    //         line_switches[active_arrow_index]->mask = MASK_GUI1;
+
+    //         for (const auto& object : context_.selected_objects)
+    //         {
+    //             object->save_matrix();
+    //         }
+    //         return true;
+    //     }
+    // }
+
     this->accept(*intersector);
 
     auto& intersections = intersector->intersections;
@@ -177,18 +255,6 @@ bool Gizmo::handle_intersections(
     );
 
     const auto& intersection = intersections.front();
-
-    constexpr vsg::dvec3 arrow_directions[3] = {
-        vsg::dvec3(1.0, 0.0, 0.0),
-        vsg::dvec3(0.0, 1.0, 0.0),
-        vsg::dvec3(0.0, 0.0, 1.0)
-    };
-
-    double arrow_dots[3];
-    for (int i = 0; i < 3; ++i)
-    {
-        arrow_dots[i] = std::abs(vsg::dot(camera->get_front(), arrow_directions[i]));
-    }
 
     for (const vsg::Node* const node : intersection->nodePath)
     {

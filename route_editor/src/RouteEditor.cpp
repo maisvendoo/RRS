@@ -124,7 +124,7 @@ bool RouteEditor::initialize()
 
     viewer_ = vsg::Viewer::create();
 
-    gizmo = Gizmo::create(context_, gizmo_settings, camera, command_list);
+    gizmo = Gizmo::create(context_, gizmo_settings, camera, command_list, mouse, window->extent2D());
     scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo);
 
     context_.object_selector = ObjectSelector::create(context_, mouse, keyboard,

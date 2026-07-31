@@ -31,7 +31,9 @@ public:
         EditorContext& context,
         const gizmo_settings_t& gizmo_settings,
         const vsg::ref_ptr<Camera>& camera,
-        CommandList& command_list
+        CommandList& command_list,
+        const vsg::ref_ptr<Mouse>& mouse,
+        const VkExtent2D& window_extent
     );
 
     bool handle_intersections(
@@ -51,6 +53,8 @@ private:
     const gizmo_settings_t& gizmo_settings;
     const vsg::ref_ptr<Camera>& camera;
     CommandList& command_list;
+    const vsg::ref_ptr<Mouse>& mouse;
+    const VkExtent2D& window_extent;
 
     vsg::Builder builder_;
     vsg::ref_ptr<vsg::MatrixTransform> matrix_transform_;
