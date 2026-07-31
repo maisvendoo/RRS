@@ -392,8 +392,12 @@ bool VehiclesHandler::selectControlVehicle() noexcept
         // Берём контроль над данной кабиной
         vehicle->controlled_cabine_idx = vehicle->current_cabine_idx;
 
-        return (controlled_vehicle != prev_contr_vehicle) ||
-               (vehicle->controlled_cabine_idx != prev_contr_cabine);
+        if ((controlled_vehicle != prev_contr_vehicle) ||
+            (vehicle->controlled_cabine_idx != prev_contr_cabine))
+        {
+            notifyVehicleChanged();
+            return true;
+        }
     }
     return false;
 }
@@ -467,13 +471,19 @@ bool VehiclesHandler::load(
 
         if (!vehicle_exterior.io_controls.empty())
         {
+            int cab_idx = 0;
+
             for (auto *io_control : vehicle_exterior.io_controls)
             {
                 if (io_control != nullptr)
                 {
+                    io_control->vehicle_idx = i;
+                    io_control->cabine_idx = cab_idx;
                     connect(io_control, &IOController::sigSendVehicleControlCommand,
                             this, &VehiclesHandler::sigSendVehicleControlCommand);
                 }
+
+                cab_idx++;
             }
         }
     }

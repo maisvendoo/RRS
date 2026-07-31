@@ -31,6 +31,10 @@ public:
 
     virtual bool load_config(CfgReader &cfg);
 
+    int vehicle_idx = -1;
+
+    int cabine_idx = -1;
+
 signals:
 
     void sigSendVehicleControlCommand(const QByteArray &data);
