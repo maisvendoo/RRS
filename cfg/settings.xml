@@ -75,7 +75,7 @@
         <!-- Пресет настроек теней: 0 - Низкий; 1 - Средний; 2 - Высокий; 3 - Ультра; 4 - Пользовательский -->
         <ShadowsPreset>0</ShadowsPreset>
         <!-- Дальность прорисовки теней, м -->
-        <ShadowDistance>30.0</ShadowDistance>
+        <ShadowDistance>30</ShadowDistance>
         <!-- Количество каскадных карт теней -->
         <ShadowCascade>1</ShadowCascade>
         <!-- Разрешение карт теней -->
