@@ -477,8 +477,7 @@ bool VehiclesHandler::load(
             {
                 if (io_control != nullptr)
                 {
-                    io_control->vehicle_idx = i;
-                    io_control->cabine_idx = cab_idx;
+                    io_control->setCabineIndex(i, cab_idx);
                     connect(io_control, &IOController::sigSendVehicleControlCommand,
                             this, &VehiclesHandler::sigSendVehicleControlCommand);
                 }

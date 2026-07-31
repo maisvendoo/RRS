@@ -31,9 +31,7 @@ public:
 
     virtual bool load_config(CfgReader &cfg);
 
-    int vehicle_idx = -1;
-
-    int cabine_idx = -1;
+    void setCabineIndex(int vehicle_idx, int cab_idx);
 
 signals:
 
