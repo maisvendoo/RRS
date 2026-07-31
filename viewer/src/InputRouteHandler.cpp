@@ -32,11 +32,8 @@ void InputRouteHandler::apply(vsg::KeyPressEvent &keyPress)
         return;
     }
 
-    //processKeyForController(keyBase, true);
-    //keyPress.handled = true;
-
-    m_activeIOController->setPressedKey(keyBase);
-    LOG_DEBUG("InputRouteHandler: Control key pressed 0x%04X", keyBase);
+    processKeyForController(keyBase, true);
+    //keyPress.handled = true;    
 }
 
 //------------------------------------------------------------------------------
@@ -58,10 +55,8 @@ void InputRouteHandler::apply(vsg::KeyReleaseEvent &keyRelease)
         return;
     }
 
-    //processKeyForController(keyBase, false);
+    processKeyForController(keyBase, false);
     //keyRelease.handled = true;
-    m_activeIOController->setReleasedKey(keyBase);
-    LOG_DEBUG("InputRouteHandler: Control key released 0x%04X", keyBase);
 }
 
 //------------------------------------------------------------------------------
@@ -151,12 +146,12 @@ void InputRouteHandler::processKeyForController(uint16_t keyBase, bool pressed)
     if (pressed)
     {
         m_activeIOController->setPressedKey(keyBase);
-        LOG_DEBUG("InputRouteHandler: Control key pressed 0x%04X", keyBase);
+        LOG_INFO("InputRouteHandler: Control key pressed 0x%04X", keyBase);
     }
     else
     {
         m_activeIOController->setReleasedKey(keyBase);
-        LOG_DEBUG("InputRouteHandler: Control key released 0x%04X", keyBase);
+        LOG_INFO("InputRouteHandler: Control key released 0x%04X", keyBase);
     }
 }
 
