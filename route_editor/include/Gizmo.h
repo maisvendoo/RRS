@@ -54,15 +54,9 @@ private:
 
     vsg::Builder builder_;
     vsg::ref_ptr<vsg::MatrixTransform> matrix_transform_;
-    vsg::ref_ptr<vsg::Node> arrow_x_;
-    vsg::ref_ptr<vsg::Node> arrow_y_;
-    vsg::ref_ptr<vsg::Node> arrow_z_;
-    vsg::ref_ptr<SingleSwitch> plane_yz_switch_;
-    vsg::ref_ptr<SingleSwitch> plane_xz_switch_;
-    vsg::ref_ptr<SingleSwitch> plane_xy_switch_;
-    vsg::ref_ptr<SingleSwitch> line_x_switch_;
-    vsg::ref_ptr<SingleSwitch> line_y_switch_;
-    vsg::ref_ptr<SingleSwitch> line_z_switch_;
+    vsg::ref_ptr<vsg::Node> arrows[3];
+    vsg::ref_ptr<SingleSwitch> plane_switches[3];
+    vsg::ref_ptr<SingleSwitch> line_switches[3];
 
     vsg::dvec3 curr_pos_;
     vsg::dvec3 click_pos_;
@@ -70,9 +64,8 @@ private:
     vsg::dvec3 total_translation_;
     double scale_;
 
-    vsg::ref_ptr<vsg::Node> active_arrow_;
-    vsg::ref_ptr<SingleSwitch> active_plain_switch_;
-    vsg::ref_ptr<SingleSwitch> active_line_switch_;
+    int active_arrow_index = -1;
+    int active_plain_index = -1;
 };
 
 #endif // GIZMO_H
