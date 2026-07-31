@@ -16,7 +16,6 @@
 #include <memory>
 
 class Camera;
-class IntersectionHandler;
 class Keyboard;
 class Mouse;
 class Route;
@@ -66,7 +65,6 @@ private:
     CommandList command_list;
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
-    vsg::ref_ptr<IntersectionHandler> intersection_handler;
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::ref_ptr<Route> route;
     std::string route_dir;

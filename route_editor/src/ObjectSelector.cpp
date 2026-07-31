@@ -4,7 +4,6 @@
 #include "Camera.h"
 #include "EditorContext.h"
 #include "Gizmo.h"
-#include "IntersectionHandler.h"
 #include "Keyboard.h"
 #include "Mask.h"
 #include "Mouse.h"
@@ -38,7 +37,6 @@ ObjectSelector::ObjectSelector(
     const gizmo_settings_t& gizmo_settings,
     const vsg::ref_ptr<Camera>& camera,
     CommandList& command_list,
-    const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
     const vsg::ref_ptr<SceneGraph>& scene_graph,
     const vsg::ref_ptr<Route>& route,
     const VkExtent2D& window_extent
@@ -52,7 +50,7 @@ ObjectSelector::ObjectSelector(
     , route(route)
     , window_extent(window_extent)
 {
-    context.gizmo = Gizmo::create(context, gizmo_settings, intersection_handler, camera, command_list);
+    context.gizmo = Gizmo::create(context, gizmo_settings, camera, command_list);
 
     scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE},
         context.gizmo);
@@ -182,15 +180,18 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
-    // If we have selected objects and clicked on Gizmo,
-    // handle Gizmo intersection (start moving objects with Gizmo)
-    if (!selected_objects.empty() && context_.gizmo->handle_intersections())
+    const auto intersector = vsg::LineSegmentIntersector::create(*camera,
+        buttonPress.x, buttonPress.y);
+    if (!intersector)
     {
         return;
     }
+    intersector->traversalMask = MASK_CLICKABLE;
 
-    const auto intersector = vsg::LineSegmentIntersector::create(*camera, buttonPress.x, buttonPress.y);
-    if (!intersector)
+    // If we have selected objects and clicked on Gizmo,
+    // handle Gizmo intersection (start moving objects with Gizmo)
+    if (!selected_objects.empty() &&
+        context_.gizmo->handle_intersections(intersector))
     {
         return;
     }

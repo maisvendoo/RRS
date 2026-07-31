@@ -2,7 +2,6 @@
 
 #include "Camera.h"
 #include "EditorContext.h"
-#include "IntersectionHandler.h"
 #include "Mask.h"
 #include "RouteObject.h"
 #include "SingleSwitch.h"
@@ -20,6 +19,7 @@
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/Builder.h>
+#include <vsg/utils/LineSegmentIntersector.h>
 #include <vsg/utils/ShaderSet.h>
 
 #include <cmath>
@@ -41,13 +41,11 @@ static void rotate_geometry_info(
 Gizmo::Gizmo(
     EditorContext& context,
     const gizmo_settings_t& gizmo_settings,
-    const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
     const vsg::ref_ptr<Camera>& camera,
     CommandList& command_list
 )
     : context_(context)
     , gizmo_settings(gizmo_settings)
-    , intersection_handler(intersection_handler)
     , camera(camera)
     , command_list(command_list)
 {
@@ -172,21 +170,25 @@ Gizmo::Gizmo(
     update_visibility();
 }
 
-bool Gizmo::handle_intersections()
+bool Gizmo::handle_intersections(
+    const vsg::ref_ptr<vsg::LineSegmentIntersector>& intersector
+)
 {
-    const auto intersector = intersection_handler->get_lmb_intersector();
-    if (!intersector)
-    {
-        return false;
-    }
-
     this->accept(*intersector);
 
-    const auto intersection = intersection_handler->get_closest_intersection(intersector);
-    if (!intersection)
+    auto& intersections = intersector->intersections;
+    if (intersections.empty())
     {
         return false;
     }
+
+    std::sort(intersections.begin(), intersections.end(),
+        [](const auto& lhs, const auto& rhs) -> bool {
+            return (lhs->ratio) < (rhs->ratio);
+        }
+    );
+
+    const auto& intersection = intersections.front();
 
     const vsg::dvec3& world_intersection = intersection->worldIntersection;
     const vsg::dvec3& camera_front = camera->get_front();
@@ -249,7 +251,7 @@ bool Gizmo::handle_intersections()
         break;
     }
 
-    intersector->intersections.clear();
+    intersections.clear();
 
     return true;
 }
@@ -280,17 +282,29 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
         return;
     }
 
-    const auto intersector = intersection_handler->apply_(moveEvent.x, moveEvent.y);
-
-    this->accept(*intersector);
-
-    const auto intersection =
-        intersection_handler->get_closest_intersection(intersector);
-
-    if (!intersection)
+    const auto intersector = vsg::LineSegmentIntersector::create(*camera,
+        moveEvent.x, moveEvent.y);
+    if (!intersector)
     {
         return;
     }
+    intersector->traversalMask = MASK_CLICKABLE;
+
+    this->accept(*intersector);
+
+    auto& intersections = intersector->intersections;
+    if (intersections.empty())
+    {
+        return;
+    }
+
+    std::sort(intersections.begin(), intersections.end(),
+        [](const auto& lhs, const auto& rhs) -> bool {
+            return (lhs->ratio) < (rhs->ratio);
+        }
+    );
+
+    const auto& intersection = intersections.front();
 
     const vsg::dvec3& world_intersection = intersection->worldIntersection;
 

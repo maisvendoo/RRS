@@ -7,7 +7,6 @@
 #include "EditorState.h"
 #include "EventHandler.h"
 #include "Gizmo.h"
-#include "IntersectionHandler.h"
 #include "Journal.h"
 #include "JournalFile.h"
 #include "Keyboard.h"
@@ -81,7 +80,6 @@ bool RouteEditor::initialize()
         keyboard);
     window_handler_->set_camera(camera);
 
-    intersection_handler = IntersectionHandler::create(camera);
     scene_graph = SceneGraph::create(context_, camera_settings, vsg_options,
         route, route_dir);
 
@@ -127,8 +125,7 @@ bool RouteEditor::initialize()
     viewer_ = vsg::Viewer::create();
 
     context_.object_selector = ObjectSelector::create(context_, mouse, keyboard,
-        gizmo_settings, camera, command_list, intersection_handler, scene_graph,
-        route, window->extent2D());
+        gizmo_settings, camera, command_list, scene_graph, route, window->extent2D());
 
     viewer_->addWindow(window);
 
@@ -141,7 +138,6 @@ bool RouteEditor::initialize()
 
     viewer_->addEventHandler(EventHandler::create(*state_manager));
 
-    viewer_->addEventHandler(intersection_handler);
     viewer_->addEventHandler(context_.object_selector);
 
     viewer_->assignRecordAndSubmitTaskAndPresentation({command_graph});

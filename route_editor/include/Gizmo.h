@@ -2,7 +2,6 @@
 #define GIZMO_H
 
 #include "Camera.h"
-#include "IntersectionHandler.h"
 #include "SingleSwitch.h"
 #include "settings/GizmoSettings.h"
 
@@ -10,6 +9,7 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/utils/Builder.h>
+#include <vsg/utils/LineSegmentIntersector.h>
 
 class CommandList;
 struct EditorContext;
@@ -30,12 +30,13 @@ public:
     Gizmo(
         EditorContext& context,
         const gizmo_settings_t& gizmo_settings,
-        const vsg::ref_ptr<IntersectionHandler>& intersection_handler,
         const vsg::ref_ptr<Camera>& camera,
         CommandList& command_list
     );
 
-    bool handle_intersections();
+    bool handle_intersections(
+        const vsg::ref_ptr<vsg::LineSegmentIntersector>& intersector
+    );
 
     void apply(const vsg::ButtonReleaseEvent& buttonRelease);
     void apply(const vsg::MoveEvent& moveEvent);
@@ -48,7 +49,6 @@ public:
 private:
     EditorContext& context_;
     const gizmo_settings_t& gizmo_settings;
-    const vsg::ref_ptr<IntersectionHandler>& intersection_handler;
     const vsg::ref_ptr<Camera>& camera;
     CommandList& command_list;
 
