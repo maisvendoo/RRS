@@ -14,12 +14,14 @@
 AddObject::AddObject(
     EditorContext& context,
     vsg::ref_ptr<RouteObject> object,
-    const vsg::ref_ptr<Route>& route
+    const vsg::ref_ptr<Route>& route,
+    const vsg::ref_ptr<Gizmo>& gizmo
 )
     : Command(context)
     , object_to_add_(object)
     , objects_to_deselect_(context.selected_objects)
     , route(route)
+    , gizmo(gizmo)
 {
     update_description();
 }
@@ -70,7 +72,7 @@ void AddObject::undo()
 
     context_.compile_infos.emplace_back(CompileInfo{nullptr, route});
 
-    context_.gizmo->update_visibility();
+    gizmo->update_visibility();
 }
 
 void AddObject::update_description()

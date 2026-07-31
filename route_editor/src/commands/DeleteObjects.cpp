@@ -13,11 +13,13 @@
 
 DeleteObjects::DeleteObjects(
     EditorContext& context,
-    const vsg::ref_ptr<Route>& route
+    const vsg::ref_ptr<Route>& route,
+    const vsg::ref_ptr<Gizmo>& gizmo
 )
     : Command(context)
     , objects_(context.selected_objects)
     , route(route)
+    , gizmo(gizmo)
 {
     update_description();
 }
@@ -47,7 +49,7 @@ void DeleteObjects::execute()
 
     context_.compile_infos.emplace_back(CompileInfo{nullptr, route});
 
-    context_.gizmo->update_visibility();
+    gizmo->update_visibility();
 }
 
 void DeleteObjects::undo()
@@ -67,7 +69,7 @@ void DeleteObjects::undo()
         object->select();
     }
 
-    context_.gizmo->update_visibility();
+    gizmo->update_visibility();
 }
 
 void DeleteObjects::update_description()

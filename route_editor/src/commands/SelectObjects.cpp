@@ -7,8 +7,12 @@
 
 #include <cstdio>
 
-SelectObjects::SelectObjects(EditorContext& context)
+SelectObjects::SelectObjects(
+    EditorContext& context,
+    const vsg::ref_ptr<Gizmo>& gizmo
+)
     : Command(context)
+    , gizmo(gizmo)
 {
 }
 
@@ -24,7 +28,7 @@ void SelectObjects::execute()
         object->deselect();
     }
 
-    context_.gizmo->update_visibility();
+    gizmo->update_visibility();
 }
 
 void SelectObjects::undo()
@@ -39,7 +43,7 @@ void SelectObjects::undo()
         object->select();
     }
 
-    context_.gizmo->update_visibility();
+    gizmo->update_visibility();
 }
 
 void SelectObjects::update_description()

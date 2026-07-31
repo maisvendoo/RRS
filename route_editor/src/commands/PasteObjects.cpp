@@ -14,12 +14,14 @@
 
 PasteObjects::PasteObjects(
     EditorContext& context,
-    const vsg::ref_ptr<Route>& route
+    const vsg::ref_ptr<Route>& route,
+    const vsg::ref_ptr<Gizmo>& gizmo
 )
     : Command(context)
     , objects_to_paste_(context.copied_objects)
     , objects_to_deselect_(context.selected_objects)
     , route(route)
+    , gizmo(gizmo)
 {
     update_description();
 }
@@ -54,7 +56,7 @@ void PasteObjects::execute()
         pasted_object->select();
     }
 
-    context_.gizmo->update_visibility();
+    gizmo->update_visibility();
 }
 
 void PasteObjects::undo()
@@ -87,7 +89,7 @@ void PasteObjects::undo()
 
     context_.compile_infos.emplace_back(CompileInfo{nullptr, route});
 
-    context_.gizmo->update_visibility();
+    gizmo->update_visibility();
 }
 
 void PasteObjects::update_description()

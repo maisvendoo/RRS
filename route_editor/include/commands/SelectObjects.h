@@ -9,7 +9,10 @@ struct EditorContext;
 class SelectObjects : public Command
 {
 public:
-    explicit SelectObjects(EditorContext& context);
+    SelectObjects(
+        EditorContext& context,
+        const vsg::ref_ptr<Gizmo>& gizmo
+    );
 
     virtual ~SelectObjects() override = default;
 
@@ -22,6 +25,9 @@ public:
 public:
     RouteObjects objects_to_select;
     RouteObjects objects_to_deselect;
+
+private:
+    const vsg::ref_ptr<Gizmo>& gizmo;
 };
 
 #endif // SELECT_OBJECTS_H

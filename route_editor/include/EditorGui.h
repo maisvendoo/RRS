@@ -14,6 +14,7 @@
 class Camera;
 class CommandList;
 struct EditorContext;
+class Gizmo;
 struct KeyBindings;
 class Route;
 class RouteObject;
@@ -41,7 +42,8 @@ public:
         EditorState& editor_state,
         CommandList& command_list,
         const vsg::ref_ptr<Route>& route,
-        std::string& route_dir
+        std::string& route_dir,
+        const vsg::ref_ptr<Gizmo>& gizmo
     );
 
     ~EditorGui();
@@ -97,6 +99,7 @@ private:
     CommandList& command_list;
     const vsg::ref_ptr<Route>& route;
     std::string& route_dir;
+    const vsg::ref_ptr<Gizmo>& gizmo;
 
     ImGuiWindowFlags window_flags_;
     ImGuiViewport* viewport;

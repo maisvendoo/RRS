@@ -24,7 +24,8 @@ public:
         const camera_settings_t& camera_settings,
         const vsg::ref_ptr<vsg::Options>& vsg_options,
         vsg::ref_ptr<Route>& route,
-        const std::string& route_dir
+        const std::string& route_dir,
+        const vsg::ref_ptr<Gizmo>& gizmo
     );
 
     void load_route();
@@ -35,6 +36,7 @@ private:
     const vsg::ref_ptr<vsg::Options>& vsg_options;
     vsg::ref_ptr<Route>& route;
     const std::string& route_dir;
+    const vsg::ref_ptr<Gizmo>& gizmo;
 
     vsg::ref_ptr<vsg::AmbientLight> ambient_light_;
 };

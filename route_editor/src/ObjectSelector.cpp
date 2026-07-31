@@ -10,7 +10,6 @@
 #include "Route.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
-#include "SingleSwitch.h"
 #include "commands/CommandList.h"
 #include "commands/DeleteObjects.h"
 #include "commands/PasteObjects.h"
@@ -34,12 +33,12 @@ ObjectSelector::ObjectSelector(
     EditorContext& context,
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
-    const gizmo_settings_t& gizmo_settings,
     const vsg::ref_ptr<Camera>& camera,
     CommandList& command_list,
     const vsg::ref_ptr<SceneGraph>& scene_graph,
     const vsg::ref_ptr<Route>& route,
-    const VkExtent2D& window_extent
+    const VkExtent2D& window_extent,
+    const vsg::ref_ptr<Gizmo>& gizmo
 )
     : context_(context)
     , mouse(mouse)
@@ -49,11 +48,8 @@ ObjectSelector::ObjectSelector(
     , scene_graph(scene_graph)
     , route(route)
     , window_extent(window_extent)
+    , gizmo(gizmo)
 {
-    context.gizmo = Gizmo::create(context, gizmo_settings, camera, command_list);
-
-    scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE},
-        context.gizmo);
 }
 
 void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
@@ -83,12 +79,12 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     }
     else if (keyboard->pressed(ACTION_PASTE_OBJECTS))
     {
-        command_list.push(new PasteObjects(context_, route), true);
+        command_list.push(new PasteObjects(context_, route, gizmo), true);
         return;
     }
     else if (keyboard->pressed(ACTION_DELETE_OBJECTS))
     {
-        command_list.push(new DeleteObjects(context_, route), true);
+        command_list.push(new DeleteObjects(context_, route, gizmo), true);
         return;
     }
 
@@ -119,7 +115,7 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 1.0);
 
     const vsg::dvec3& f = camera->get_front();
-    const vsg::dvec3& g = context_.gizmo->get_curr_pos();
+    const vsg::dvec3& g = gizmo->get_curr_pos();
     const vsg::dvec3 s = mouse_world2 - mouse_world1;
 
     const double t = -(f.x * mouse_world1.x - f.x * g.x + f.y * mouse_world1.y -
@@ -191,7 +187,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
     if (!selected_objects.empty() &&
-        context_.gizmo->handle_intersections(intersector))
+        gizmo->handle_intersections(intersector))
     {
         return;
     }
@@ -207,7 +203,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         if (!selected_objects.empty() && !keyboard->get_shift_state())
         {
             SelectObjects* const select_objects_command =
-                new SelectObjects(context_);
+                new SelectObjects(context_, gizmo);
 
             select_objects_command->objects_to_deselect = selected_objects;
             select_objects_command->update_description();
@@ -232,12 +228,12 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
-    context_.gizmo->apply(buttonRelease);
+    gizmo->apply(buttonRelease);
 }
 
 void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
-    context_.gizmo->apply(moveEvent);
+    gizmo->apply(moveEvent);
 
     if (state_ == State::INITIAL)
     {
@@ -261,7 +257,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 1.0);
 
     const vsg::dvec3& f = camera->get_front();
-    const vsg::dvec3& g = context_.gizmo->get_curr_pos();
+    const vsg::dvec3& g = gizmo->get_curr_pos();
     const vsg::dvec3 s = mouse_world2 - mouse_world1;
 
     const double t = -(f.x * mouse_world1.x - f.x * g.x + f.y * mouse_world1.y -
@@ -291,7 +287,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         }
         case State::KEYBOARD_ROTATE:
         {
-            const vsg::dvec3& gizmo_pos = context_.gizmo->get_curr_pos();
+            const vsg::dvec3& gizmo_pos = gizmo->get_curr_pos();
 
             if (world_intersection == gizmo_pos)
             {
@@ -332,7 +328,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         }
         case State::KEYBOARD_SCALE:
         {
-            const vsg::dvec3& gizmo_pos = context_.gizmo->get_curr_pos();
+            const vsg::dvec3& gizmo_pos = gizmo->get_curr_pos();
 
             if (world_intersection == gizmo_pos)
             {
@@ -366,7 +362,7 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
 {
     SelectObjects* const select_objects_command =
-        new SelectObjects(context_);
+        new SelectObjects(context_, gizmo);
 
     RouteObjects& objects_to_select =
         select_objects_command->objects_to_select;
@@ -438,7 +434,7 @@ void ObjectSelector::confirm_keyboard_transformation()
             command_list.push(
                 new RotateObjects(
                     context_, context_.selected_objects,
-                    context_.gizmo->get_curr_pos(),
+                    gizmo->get_curr_pos(),
                     camera->get_front(),
                     total_rotation_rad_
                 ),
@@ -450,7 +446,7 @@ void ObjectSelector::confirm_keyboard_transformation()
         case State::KEYBOARD_SCALE:
         {
             command_list.push(new ScaleObjects(context_, context_.selected_objects,
-                context_.gizmo->get_curr_pos(), total_scale_), false);
+                gizmo->get_curr_pos(), total_scale_), false);
 
             break;
         }

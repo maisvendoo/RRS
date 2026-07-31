@@ -12,6 +12,7 @@
 #include <string>
 
 struct EditorContext;
+class Gizmo;
 class RouteObject;
 class SingleSwitch;
 
@@ -31,6 +32,7 @@ public:
     RouteObject(
         EditorContext& context,
         const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
+        const vsg::ref_ptr<Gizmo>& gizmo,
         const std::string& label,
         const vsg::dvec3& translation,
         const vsg::dvec3& rotation_deg = {0.0, 0.0, 0.0},
@@ -93,6 +95,7 @@ private:
 
     vsg::ref_ptr<SingleSwitch> paged_lod_switch_;
     vsg::ref_ptr<vsg::PagedLOD> paged_lod_;
+    const vsg::ref_ptr<Gizmo>& gizmo;
     vsg::ref_ptr<SingleSwitch> outline_switch_;
 };
 

@@ -12,7 +12,8 @@ class PasteObjects : public Command
 public:
     PasteObjects(
         EditorContext& context,
-        const vsg::ref_ptr<Route>& route
+        const vsg::ref_ptr<Route>& route,
+        const vsg::ref_ptr<Gizmo>& gizmo
     );
 
     virtual ~PasteObjects() override = default;
@@ -28,6 +29,7 @@ private:
     RouteObjects pasted_objects_;
     const RouteObjects objects_to_deselect_;
     const vsg::ref_ptr<Route>& route;
+    const vsg::ref_ptr<Gizmo>& gizmo;
 };
 
 #endif // PASTE_OBJECTS_H

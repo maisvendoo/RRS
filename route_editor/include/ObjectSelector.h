@@ -11,11 +11,11 @@
 
 class CommandList;
 struct EditorContext;
+class Gizmo;
 class Keyboard;
 class Mouse;
 class RouteObject;
 class SingleSwitch;
-struct gizmo_settings_t;
 
 namespace vsg
 {
@@ -34,12 +34,12 @@ public:
         EditorContext& context,
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
-        const gizmo_settings_t& gizmo_settings,
         const vsg::ref_ptr<Camera>& camera,
         CommandList& command_list,
         const vsg::ref_ptr<SceneGraph>& scene_graph,
         const vsg::ref_ptr<Route>& route,
-        const VkExtent2D& window_extent
+        const VkExtent2D& window_extent,
+        const vsg::ref_ptr<Gizmo>& gizmo
     );
 
     void apply(vsg::KeyPressEvent& keyPress) override;
@@ -72,6 +72,7 @@ private:
     const vsg::ref_ptr<SceneGraph>& scene_graph;
     const vsg::ref_ptr<Route>& route;
     const VkExtent2D& window_extent;
+    const vsg::ref_ptr<Gizmo>& gizmo;
 
     vsg::dvec3 prev_intersect_pos_;
     vsg::dvec3 total_translation_;

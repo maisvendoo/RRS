@@ -92,7 +92,8 @@ EditorGui::EditorGui(
     EditorState& editor_state,
     CommandList& command_list,
     const vsg::ref_ptr<Route>& route,
-    std::string& route_dir
+    std::string& route_dir,
+    const vsg::ref_ptr<Gizmo>& gizmo
 )
     : context_(context)
     , camera_settings(camera_settings)
@@ -104,6 +105,7 @@ EditorGui::EditorGui(
     , command_list(command_list)
     , route(route)
     , route_dir(route_dir)
+    , gizmo(gizmo)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -690,11 +692,11 @@ void EditorGui::add_object(
     const std::string& label
 ) const
 {
-    const auto object = RouteObject::create(context_, paged_lod, label,
+    const auto object = RouteObject::create(context_, paged_lod, gizmo, label,
         camera->get_look_at()->eye +
         camera->get_front() * 20.0);
 
-    command_list.push(new AddObject(context_, object, route), true);
+    command_list.push(new AddObject(context_, object, route, gizmo), true);
 }
 
 void EditorGui::save_objects_matrixes() const
@@ -782,7 +784,7 @@ void EditorGui::handle_rotation_drag(
         }
 
         command_list.push(new RotateObjects(context_, {object},
-            context_.gizmo->get_curr_pos(), axis, radians), false);
+            gizmo->get_curr_pos(), axis, radians), false);
         dragging = false;
     }
 }
@@ -817,7 +819,7 @@ void EditorGui::handle_scale_drag(
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
         command_list.push(new ScaleObjects(context_, {object},
-            context_.gizmo->get_curr_pos(), total_scale), false);
+            gizmo->get_curr_pos(), total_scale), false);
         dragging = false;
     }
 }

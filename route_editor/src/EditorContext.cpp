@@ -1,6 +1,5 @@
 #include "EditorContext.h"
 
-#include "Gizmo.h"
 #include "ObjectSelector.h"
 #include "Outline.h"
 #include "topology.h"

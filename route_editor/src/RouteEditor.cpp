@@ -81,7 +81,7 @@ bool RouteEditor::initialize()
     window_handler_->set_camera(camera);
 
     scene_graph = SceneGraph::create(context_, camera_settings, vsg_options,
-        route, route_dir);
+        route, route_dir, gizmo);
 
     context_.outline_builder = OutlineBuilder::create();
 
@@ -107,7 +107,7 @@ bool RouteEditor::initialize()
     state_manager = std::make_unique<StateManager>(mouse, keyboard, camera, command_list);
     const auto editor_gui = EditorGui::create(context_, camera_settings,
         gui_settings, key_bindings, *state_manager, camera, editor_state,
-        command_list, route, route_dir);
+        command_list, route, route_dir, gizmo);
 
     const auto render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
 
@@ -124,8 +124,11 @@ bool RouteEditor::initialize()
 
     viewer_ = vsg::Viewer::create();
 
+    gizmo = Gizmo::create(context_, gizmo_settings, camera, command_list);
+    scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE}, gizmo);
+
     context_.object_selector = ObjectSelector::create(context_, mouse, keyboard,
-        gizmo_settings, camera, command_list, scene_graph, route, window->extent2D());
+        camera, command_list, scene_graph, route, window->extent2D(), gizmo);
 
     viewer_->addWindow(window);
 
@@ -340,6 +343,6 @@ void RouteEditor::handle_deferred_selection()
 
     if (context_.deferred_selection.size() != size)
     {
-        context_.gizmo->update_visibility();
+        gizmo->update_visibility();
     }
 }

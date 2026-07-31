@@ -16,7 +16,6 @@
 #include <memory>
 #include <string>
 
-class Gizmo;
 class ObjectSelector;
 class OutlineBuilder;
 class Topology;
@@ -74,7 +73,6 @@ struct EditorContext
     std::thread load_static_objects_thread;
     std::thread load_topology_thread;
 
-    vsg::ref_ptr<Gizmo> gizmo;
     vsg::ref_ptr<ObjectSelector> object_selector;
     vsg::ref_ptr<OutlineBuilder> outline_builder;
 

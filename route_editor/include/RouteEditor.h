@@ -68,6 +68,7 @@ private:
     vsg::ref_ptr<SceneGraph> scene_graph;
     vsg::ref_ptr<Route> route;
     std::string route_dir;
+    vsg::ref_ptr<Gizmo> gizmo;
 };
 
 #endif // ROUTE_EDITOR_H

@@ -12,7 +12,8 @@ class DeleteObjects : public Command
 public:
     DeleteObjects(
         EditorContext& context,
-        const vsg::ref_ptr<Route>& route
+        const vsg::ref_ptr<Route>& route,
+        const vsg::ref_ptr<Gizmo>& gizmo
     );
 
     virtual ~DeleteObjects() override = default;
@@ -26,6 +27,7 @@ public:
 private:
     const RouteObjects objects_;
     const vsg::ref_ptr<Route>& route;
+    const vsg::ref_ptr<Gizmo>& gizmo;
 };
 
 #endif // DELETE_OBJECTS_H

@@ -65,12 +65,14 @@ Route::Route(
     EditorContext& context,
     const camera_settings_t& camera_settings,
     const vsg::ref_ptr<vsg::Options>& vsg_options,
-    const std::string& route_dir
+    const std::string& route_dir,
+    const vsg::ref_ptr<Gizmo>& gizmo
 )
     : context_(context)
     , camera_settings(camera_settings)
     , vsg_options(vsg_options)
     , route_dir(route_dir)
+    , gizmo(gizmo)
 {
     const bool success = load_objects_ref() && load_route_map()
         && load_stations_conf() && load_waypoints_conf();
@@ -285,7 +287,7 @@ void Route::load_static_objects()
         for (const auto& transform : transforms)
         {
             const auto object = RouteObject::create(context_,
-                ref_it->second.paged_lod, label, transform.translation,
+                ref_it->second.paged_lod, gizmo, label, transform.translation,
                 -transform.rotation_deg);
 
             context_.compile_infos.emplace_back(CompileInfo{
@@ -411,7 +413,7 @@ bool Route::load_topology()
                 vsg::degrees(atan2(-right.y, right.x))
             };
 
-            const auto object = RouteObject::create(context_, paged_lod,
+            const auto object = RouteObject::create(context_, paged_lod, gizmo,
                 signal_model_name, pos, -rotation_deg);
 
             context_.compile_infos.emplace_back(CompileInfo{

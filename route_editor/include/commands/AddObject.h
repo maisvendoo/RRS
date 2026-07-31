@@ -22,7 +22,8 @@ public:
     AddObject(
         EditorContext& context,
         vsg::ref_ptr<RouteObject> object,
-        const vsg::ref_ptr<Route>& route
+        const vsg::ref_ptr<Route>& route,
+        const vsg::ref_ptr<Gizmo>& gizmo
     );
 
     virtual ~AddObject() override = default;
@@ -37,6 +38,7 @@ private:
     const vsg::ref_ptr<RouteObject> object_to_add_;
     const RouteObjects objects_to_deselect_;
     const vsg::ref_ptr<Route>& route;
+    const vsg::ref_ptr<Gizmo>& gizmo;
 };
 
 #endif // ADD_OBJECT_H
