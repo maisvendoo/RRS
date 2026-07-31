@@ -30,10 +30,44 @@ void IOController::setPressedKey(uint16_t keyBase)
 //------------------------------------------------------------------------------
 void IOController::setReleasedKey(uint16_t keyBase)
 {
-    if (_pressed_keys.erase(keyBase))
+    // Если массив нажатых клавиш пустой
+    // отправляем пустое управление
+    if (_pressed_keys.empty())
     {
-        processControl(CTRL_TYPE_KEYBOARD);
+        return;
     }
+
+    // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
+    // отправляем пустое управление
+    constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
+    std::size_t modifiers_size = 0;
+    for (std::uint16_t key : modifier_keys)
+    {
+        if (_pressed_keys.count(key))
+        {
+            ++modifiers_size;
+        }
+    }
+
+    if (_pressed_keys.size() == modifiers_size)
+    {
+        return;
+    }
+
+    std::vector<uint16_t> pressed_keys;
+
+    for (auto key : _pressed_keys)
+    {
+        // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
+        if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
+        {
+            continue;
+        }
+
+        pressed_keys.push_back(key);
+    }
+
+    keysProcess(pressed_keys);
 }
 
 //------------------------------------------------------------------------------
@@ -75,6 +109,14 @@ bool IOController::load_config(CfgReader &cfg)
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::keysProcess(std::vector<uint16_t> &pressed_keys)
+{
+
 }
 
 //------------------------------------------------------------------------------

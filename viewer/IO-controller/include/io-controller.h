@@ -55,16 +55,18 @@ protected:
         CTRL_TYPE_CTRL_PANEL
     };
 
-    /// Обработка клавиатурного управления
-    virtual void processKeyBoardInput();
-
-    /// Обработка управления мышью
-    virtual void processMouseInput();
-
-    /// Обработка управления с пульта тренажера
-    virtual void processControlPanelInput();
+    virtual void keysProcess(std::vector<uint16_t> &pressed_keys);
 
 private:
+
+    /// Обработка клавиатурного управления (Общая для всех часть)
+    void processKeyBoardInput();
+
+    /// Обработка управления мышью (Общая для всех часть)
+    void processMouseInput();
+
+    /// Обработка управления с пульта тренажера (Общая для всех часть)
+    void processControlPanelInput();
 
     /// Обработка управления
     void processControl(const ControlType &ctrl_type);
