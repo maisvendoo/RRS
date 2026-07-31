@@ -369,27 +369,40 @@ void Gizmo::update_visibility()
     matrix_transform_->matrix = vsg::translate(curr_pos_) * vsg::scale(scale_);
 }
 
+static vsg::dvec3 calculate_position_pivot(
+    const RouteObjects& selected_objects
+)
+{
+    vsg::dvec3 pos = {0.0, 0.0, 0.0};
+    for (const auto& object : selected_objects)
+    {
+        pos += object->get_translation();
+    }
+    pos /= selected_objects.size();
+    return pos;
+}
+
+static vsg::dvec3 calculate_position_center(
+    const RouteObjects& selected_objects
+)
+{
+    vsg::dvec3 pos = {0.0, 0.0, 0.0};
+    for (const auto& object : selected_objects)
+    {
+        const vsg::dbox& bounds = object->get_bounds();
+        pos += (bounds.min + bounds.max) * 0.5;
+    }
+    pos /= selected_objects.size();
+    return pos;
+}
+
+static vsg::dvec3(*calculate_position_funcs[2])(const RouteObjects& selected_objects) = {
+    calculate_position_pivot, calculate_position_center
+};
+
 void Gizmo::update_position()
 {
-    curr_pos_ = {0.0, 0.0, 0.0};
-
-    if (gizmo_settings.to_center)
-    {
-        for (const auto& object : context_.selected_objects)
-        {
-            const vsg::dbox& bounds = object->get_bounds();
-            curr_pos_ += (bounds.min + bounds.max) * 0.5;
-        }
-    }
-    else
-    {
-        for (const auto& object : context_.selected_objects)
-        {
-            curr_pos_ += object->get_translation();
-        }
-    }
-
-    curr_pos_ /= context_.selected_objects.size();
-
+    curr_pos_ = calculate_position_funcs[static_cast<int>(
+        gizmo_settings.to_center)](context_.selected_objects);
     matrix_transform_->matrix = vsg::translate(curr_pos_) * vsg::scale(scale_);
 }
