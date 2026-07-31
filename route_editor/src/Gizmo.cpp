@@ -212,11 +212,11 @@ bool Gizmo::handle_intersections(
             continue;
         }
 
-        click_pos_ = curr_pos_;
-        click_pos_[active_arrow_index] =
+        vsg::dvec3 click_pos = curr_pos_;
+        click_pos[active_arrow_index] =
             intersection->worldIntersection[active_arrow_index];
 
-        prev_intersect_pos_ = click_pos_;
+        prev_intersect_pos_ = click_pos;
         total_translation_.set(0.0, 0.0, 0.0);
 
         plane_switches[active_plain_index]->mask = MASK_CLICKABLE;
