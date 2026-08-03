@@ -54,7 +54,7 @@ void IOController::setReleasedKey(uint16_t keyBase)
         return;
     }
 
-    std::vector<uint16_t> pressed_keys;
+    std::set<uint16_t> pressed_keys;
 
     for (auto key : _pressed_keys)
     {
@@ -64,7 +64,7 @@ void IOController::setReleasedKey(uint16_t keyBase)
             continue;
         }
 
-        pressed_keys.push_back(key);
+        pressed_keys.insert(key);
     }
 
     keysProcess(pressed_keys);
@@ -103,7 +103,7 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "ObjectName", ic_input.contolledObjectName);
 
-        io_control_inputs.insert(ic_input.keyCode, ic_input.contolledObjectName, ic_input);
+        io_control_inputs.insert(ic_input.id, ic_input.contolledObjectName, ic_input);
 
         secNode = cfg.getNextSection();
     }
@@ -114,7 +114,7 @@ bool IOController::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::keysProcess(std::vector<uint16_t> &pressed_keys)
+void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 {
 
 }

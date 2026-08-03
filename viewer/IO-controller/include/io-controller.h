@@ -55,7 +55,7 @@ protected:
         CTRL_TYPE_CTRL_PANEL
     };
 
-    virtual void keysProcess(std::vector<uint16_t> &pressed_keys);
+    virtual void keysProcess(std::set<uint16_t> &pressed_keys);
 
 private:
 

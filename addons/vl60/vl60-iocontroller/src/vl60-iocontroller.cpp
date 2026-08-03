@@ -12,7 +12,7 @@ VL60IOController::VL60IOController() : IOController(nullptr)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void VL60IOController::keysProcess(std::vector<uint16_t> &pressed_keys)
+void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 {
     if (pressed_keys.empty())
     {
