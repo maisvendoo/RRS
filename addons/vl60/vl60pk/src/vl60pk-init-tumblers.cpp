@@ -149,7 +149,7 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         cu_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Токоприемник задний"
-        pant2_tumbler[cab_idx].setKeySymbolOn(KEY_O);
+        /*pant2_tumbler[cab_idx].setKeySymbolOn(KEY_O);
         pant2_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
         pant2_tumbler[cab_idx].setKeySymbolOff(KEY_O);
         pant2_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
@@ -160,7 +160,7 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         pant1_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
         pant1_tumbler[cab_idx].setKeySymbolOff(KEY_I);
         pant1_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        pant1_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        pant1_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);*/
 
         // Триггер тумблера "Токоприемники"
         /*pants_tumbler[cab_idx].setKeySymbolOn(KEY_U);

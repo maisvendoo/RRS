@@ -138,6 +138,33 @@ void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void IOController::processTumbler(const uint16_t &control_id,
+                                  const std::set<uint16_t> &pressed_keys)
+{
+    // Проверяем конкретный контрол
+    auto io_ctrl = io_control_inputs.getByKey1(control_id);
+
+    // Нажата ли его клавиша
+    if (getKeyState(pressed_keys, io_ctrl->keyCode))
+    {
+        // Какой модификатор?
+        if (isShift(pressed_keys))
+        {
+            io_ctrl->value = 1.0f;
+        }
+
+        if (isControl(pressed_keys))
+        {
+            io_ctrl->value = 0.0f;
+        }
+
+        emit sigSendVehicleControlCommand(io_ctrl->serialize());
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::processKeyBoardInput()
 {
     // Уходим, если ничего не нажато
