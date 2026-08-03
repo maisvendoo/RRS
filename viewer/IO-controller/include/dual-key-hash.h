@@ -93,6 +93,23 @@ public:
     }
 
     int size() const { return m_byKey1.size(); }
+
+    // Итераторы для первого ключа
+    auto begin() { return m_byKey1.begin(); }
+    auto end()   { return m_byKey1.end(); }
+    auto cbegin() const { return m_byKey1.cbegin(); }
+    auto cend()   const { return m_byKey1.cend(); }
+
+    // Или метод для получения всех элементов
+    QList<std::tuple<Key1, Key2, Value>> getAll() const
+    {
+        QList<std::tuple<Key1, Key2, Value>> result;
+        for (auto it = m_byKey1.cbegin(); it != m_byKey1.cend(); ++it)
+        {
+            result.append(std::make_tuple(it.key(), it.value()->k2, it.value()->value));
+        }
+        return result;
+    }
 };
 
 #endif
