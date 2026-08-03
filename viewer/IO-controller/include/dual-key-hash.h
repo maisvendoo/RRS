@@ -110,6 +110,30 @@ public:
         }
         return result;
     }
+
+    // Обновить значение по первому ключу
+    bool updateByKey1(const Key1& k1, const Value& newValue)
+    {
+        auto it = m_byKey1.find(k1);
+        if (it != m_byKey1.end())
+        {
+            it.value()->value = newValue;
+            return true;
+        }
+        return false;
+    }
+
+    // Обновить значение по второму ключу
+    bool updateByKey2(const Key2& k2, const Value& newValue)
+    {
+        auto it = m_byKey2.find(k2);
+        if (it != m_byKey2.end())
+        {
+            it.value()->value = newValue;
+            return true;
+        }
+        return false;
+    }
 };
 
 #endif

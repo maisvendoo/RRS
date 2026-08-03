@@ -120,13 +120,15 @@ void IOController::setCabineIndex(int vehicle_idx, int cab_idx)
     {
         value.controlled_vehicle_idx = vehicle_idx;
         value.cabine_idx = cab_idx;
+
+        io_control_inputs.updateByKey1(key1, value);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::keysProcess(std::vector<uint16_t> &pressed_keys)
+void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 {
     (void) pressed_keys;
 }
