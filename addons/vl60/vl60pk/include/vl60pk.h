@@ -563,6 +563,8 @@ private:
     /// Моделирование приборов безопасности
     void stepSafetyDevices(const double& t, const double& dt);
 
+    void stepControls(const double &t, const double &dt);
+
     /// Автоведение
     void stepAutopilot(double t, double dt);
 

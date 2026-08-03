@@ -138,6 +138,8 @@ void VL60pk::step(const double &t, const double &dt)
 
     stepSafetyDevices(t, dt);
 
+    stepControls(t, dt);
+
     autoStartTimer->step(t, dt);
 }
 

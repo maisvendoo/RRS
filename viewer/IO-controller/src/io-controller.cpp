@@ -68,6 +68,8 @@ void IOController::setReleasedKey(uint16_t keyBase)
     }
 
     keysProcess(pressed_keys);
+
+    _pressed_keys.clear();
 }
 
 //------------------------------------------------------------------------------

@@ -163,11 +163,11 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         pant1_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Токоприемники"
-        pants_tumbler[cab_idx].setKeySymbolOn(KEY_U);
+        /*pants_tumbler[cab_idx].setKeySymbolOn(KEY_U);
         pants_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
         pants_tumbler[cab_idx].setKeySymbolOff(KEY_U);
         pants_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        pants_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        pants_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);*/
 
         // Триггер тумблера "ГВ вкл. Возврат защиты"
         gv_return_tumbler[cab_idx].setKeySymbolOn(KEY_P);
