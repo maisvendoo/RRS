@@ -112,6 +112,7 @@ void IOController::processTumbler(const uint16_t &control_id,
         if (isShift(pressed_keys))
         {
             io_ctrl->value = 1.0f;
+            io_control_inputs.updateByKey1(control_id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
             return;
         }
@@ -119,6 +120,7 @@ void IOController::processTumbler(const uint16_t &control_id,
         if (isControl(pressed_keys))
         {
             io_ctrl->value = 0.0f;
+            io_control_inputs.updateByKey1(control_id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
             return;
         }        
