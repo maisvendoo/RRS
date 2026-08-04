@@ -33,7 +33,7 @@ static bool get_non_empty_lines_from_file(
         std::string line;
         std::getline(file, line);
 
-        if (!line.empty())
+        if (!line.empty() && line != "\r")
         {
             lines.emplace_back(std::move(line));
         }
