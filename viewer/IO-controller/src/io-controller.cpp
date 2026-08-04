@@ -30,46 +30,7 @@ void IOController::setPressedKey(uint16_t keyBase)
 //------------------------------------------------------------------------------
 void IOController::setReleasedKey(uint16_t keyBase)
 {
-    // Если массив нажатых клавиш пустой
-    // отправляем пустое управление
-    if (_pressed_keys.empty())
-    {
-        return;
-    }
-
-    // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
-    // отправляем пустое управление
-    constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
-    std::size_t modifiers_size = 0;
-    for (std::uint16_t key : modifier_keys)
-    {
-        if (_pressed_keys.count(key))
-        {
-            ++modifiers_size;
-        }
-    }
-
-    if (_pressed_keys.size() == modifiers_size)
-    {
-        return;
-    }
-
-    std::set<uint16_t> pressed_keys;
-
-    for (auto key : _pressed_keys)
-    {
-        // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
-        if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
-        {
-            continue;
-        }
-
-        pressed_keys.insert(key);
-    }
-
-    keysProcess(pressed_keys);
-
-    _pressed_keys.clear();
+    _pressed_keys.erase(keyBase);
 }
 
 //------------------------------------------------------------------------------
@@ -151,14 +112,16 @@ void IOController::processTumbler(const uint16_t &control_id,
         if (isShift(pressed_keys))
         {
             io_ctrl->value = 1.0f;
+            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+            return;
         }
 
         if (isControl(pressed_keys))
         {
             io_ctrl->value = 0.0f;
-        }
-
-        emit sigSendVehicleControlCommand(io_ctrl->serialize());
+            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+            return;
+        }        
     }
 }
 
@@ -172,6 +135,38 @@ void IOController::processKeyBoardInput()
     {
         return;
     }
+
+    // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
+    // отправляем пустое управление
+    constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
+    std::size_t modifiers_size = 0;
+    for (std::uint16_t key : modifier_keys)
+    {
+        if (_pressed_keys.count(key))
+        {
+            ++modifiers_size;
+        }
+    }
+
+    if (_pressed_keys.size() == modifiers_size)
+    {
+        return;
+    }
+
+    std::set<uint16_t> pressed_keys;
+
+    for (auto key : _pressed_keys)
+    {
+        // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
+        if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
+        {
+            continue;
+        }
+
+        pressed_keys.insert(key);
+    }
+
+    keysProcess(pressed_keys);
 }
 
 //------------------------------------------------------------------------------
