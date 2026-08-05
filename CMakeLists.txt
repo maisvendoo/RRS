@@ -18,38 +18,53 @@ endif()
 # No lib prefix in all shared libraries
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
+option (CLIENT_BUILD "Build for client usage" ON)
+
 add_subdirectory (CfgReader)
 add_subdirectory (CfgEditor)
 add_subdirectory (filesystem)
-add_subdirectory (graphics)
+
 add_subdirectory (libJournal)
 add_subdirectory (network)
 add_subdirectory (parsing)
+add_subdirectory (core)
 
 add_subdirectory (simulator)
 
+<<<<<<< HEAD
 add_subdirectory (sound-manager)
 add_subdirectory (viewer)
 
 add_subdirectory (route_editor)
 add_subdirectory (core)
 
+=======
+>>>>>>> 59af7fea (Натройка сборки для клиента или сервера через опцию cmake CLIENT_BUILD)
 add_subdirectory (addons/passcar)
 add_subdirectory (addons/freightcar)
 add_subdirectory (addons/vl60)
 
-add_subdirectory (launcher)
+if (CLIENT_BUILD)
+    add_subdirectory (graphics)
+    add_subdirectory (sound-manager)
+    add_subdirectory (viewer)
 
-add_subdirectory (tools/dmd2gltf)
-add_subdirectory (tools/profconv)
-add_subdirectory (tools/pathconv)
-add_subdirectory (tools/offset-parallel-gen)
-add_subdirectory (tools/offset-spline-gen)
-add_subdirectory (tools/topologycheck)
-add_subdirectory (tools/routeconv)
-add_subdirectory (tools/route-map)
-add_subdirectory (tools/route-transform)
-add_subdirectory (tools/texture-compressor)
+    add_subdirectory (route_editor)
+    add_subdirectory (route_editor2)
+
+    add_subdirectory (launcher)
+
+    add_subdirectory (tools/dmd2gltf)
+    add_subdirectory (tools/profconv)
+    add_subdirectory (tools/pathconv)
+    add_subdirectory (tools/offset-parallel-gen)
+    add_subdirectory (tools/offset-spline-gen)
+    add_subdirectory (tools/topologycheck)
+    add_subdirectory (tools/routeconv)
+    add_subdirectory (tools/route-map)
+    add_subdirectory (tools/route-transform)
+    add_subdirectory (tools/texture-compressor)
+endif()
 
 include(CMakePackageConfigHelpers)
 
