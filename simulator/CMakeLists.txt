@@ -19,8 +19,6 @@ add_subdirectory (scenario-manager)
 add_subdirectory (model)
 add_subdirectory (simulator)
 
-add_subdirectory (modbus)
-
 add_subdirectory (krm395)
 add_subdirectory (krm130)
 add_subdirectory (vr242)
@@ -43,9 +41,13 @@ add_subdirectory (trajectory-speedmap)
 add_subdirectory (connector-ALSN)
 add_subdirectory (trajectory-ALSN)
 
-# Подключаем только в релиз, чтобы не собирать отладочные библиотеки движка SFML
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_subdirectory (freejoy)
+if (CLIENT_BUILD)
+    # Подключаем только в релиз, чтобы не собирать отладочные библиотеки движка SFML
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_subdirectory (freejoy)
+    endif()
+
+    add_subdirectory (modbus)
 endif()
 
 install(FILES ../common-headers/sound-signal.h DESTINATION sdk/include)
