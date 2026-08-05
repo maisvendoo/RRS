@@ -31,15 +31,6 @@ add_subdirectory (core)
 
 add_subdirectory (simulator)
 
-<<<<<<< HEAD
-add_subdirectory (sound-manager)
-add_subdirectory (viewer)
-
-add_subdirectory (route_editor)
-add_subdirectory (core)
-
-=======
->>>>>>> 59af7fea (Натройка сборки для клиента или сервера через опцию cmake CLIENT_BUILD)
 add_subdirectory (addons/passcar)
 add_subdirectory (addons/freightcar)
 add_subdirectory (addons/vl60)
@@ -50,7 +41,7 @@ if (CLIENT_BUILD)
     add_subdirectory (viewer)
 
     add_subdirectory (route_editor)
-    add_subdirectory (route_editor2)
+    #add_subdirectory (route_editor2)
 
     add_subdirectory (launcher)
 
