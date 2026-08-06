@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Server>
+        <Port>12345</Port>
+        <MaxClients>10</MaxClients>
+        <TimeoutSeconds>30</TimeoutSeconds>
+        <AutoRestart>true</AutoRestart>
+        <RestartDelaySeconds>5</RestartDelaySeconds>
+    </Server>
+    <Paths>
+        <!-- Пути относительно каталога bin -->
+        <SimulatorPath>simulator</SimulatorPath>
+        <RoutesPath>../routes</RoutesPath>
+        <LogFile>../logs/server.log</LogFile>
+        <PidFile>../server.pid</PidFile>
+    </Paths>
+    <Logging>
+        <Level>info</Level>
+        <MaxFileSize>10485760</MaxFileSize>
+        <MaxBackupFiles>5</MaxBackupFiles>
+    </Logging>
+    <Security>
+        <User>simulator</User>
+        <Group>simulator</Group>
+        <Umask>027</Umask>
+    </Security>
+</Config>
