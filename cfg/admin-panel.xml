@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Client>
+        <DefaultHost>127.0.0.1</DefaultHost>
+        <DefaultPort>12345</DefaultPort>
+        <AutoConnect>false</AutoConnect>
+        <ReconnectAttempts>3</ReconnectAttempts>
+        <ReconnectDelaySeconds>5</ReconnectDelaySeconds>
+        <HeartbeatInterval>30</HeartbeatInterval>
+    </Client>
+    <Window>
+        <Width>600</Width>
+        <Height>500</Height>
+        <SaveGeometry>true</SaveGeometry>
+        <Style>dark</Style>
+    </Window>
+    <Logging>
+        <Level>info</Level>
+        <File>admin-panel.log</File>
+    </Logging>
+</Config>

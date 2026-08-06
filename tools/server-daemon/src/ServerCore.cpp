@@ -4,20 +4,12 @@
 //  (c) SimulatorServer 2026
 //
 //------------------------------------------------------------------------------
-/*!
- *  \file
- *  \brief Server core
- *  \copyright SimulatorServer
- *  \date 2026
- */
 
 #include    "ServerCore.h"
 #include    <QDateTime>
 #include    <QCoreApplication>
 #include    <QTextStream>
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 ServerCore::ServerCore(QObject* parent)
     : QObject(parent)
@@ -26,13 +18,11 @@ ServerCore::ServerCore(QObject* parent)
 {
     Config& config = Config::instance();
 
-    // Загрузка маршрутов
     if (!m_routeManager.loadRoutes(config.getRoutesPath()))
     {
         qWarning() << "No routes loaded";
     }
 
-    // Подключение сигналов симулятора
     connect(&m_simulatorController, &SimulatorController::simulationError,
             this, &ServerCore::onSimulationError);
 
@@ -45,13 +35,11 @@ ServerCore::ServerCore(QObject* parent)
     connect(&m_simulatorController, &SimulatorController::simulationStopped,
             this, &ServerCore::onSimulationStopped);
 
-    // Таймер для heartbeat
     m_heartbeatTimer = new QTimer(this);
     m_heartbeatTimer->setInterval(30000);
     connect(m_heartbeatTimer, &QTimer::timeout,
             this, &ServerCore::onHeartbeat);
 
-    // Таймер для статуса
     m_statusTimer = new QTimer(this);
     m_statusTimer->setInterval(60000);
     connect(m_statusTimer, &QTimer::timeout,
@@ -59,15 +47,11 @@ ServerCore::ServerCore(QObject* parent)
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 ServerCore::~ServerCore()
 {
     stop();
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 bool ServerCore::start()
 {
@@ -100,8 +84,6 @@ bool ServerCore::start()
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void ServerCore::stop()
 {
     if (!m_initialized)
@@ -111,7 +93,6 @@ void ServerCore::stop()
 
     m_server->close();
 
-    // Отключаем всех клиентов
     QMutexLocker locker(&m_clientsMutex);
     for (ProtocolHandler* client : m_clients.values())
     {
@@ -120,13 +101,11 @@ void ServerCore::stop()
     m_clients.clear();
     locker.unlock();
 
-    // Останавливаем симуляцию
     m_simulatorController.stopSimulation();
 
     m_heartbeatTimer->stop();
     m_statusTimer->stop();
 
-    // Удаляем PID файл
     QFile::remove(Config::instance().getPidFile());
 
     m_initialized = false;
@@ -137,16 +116,12 @@ void ServerCore::stop()
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 int ServerCore::getClientCount() const
 {
-    QMutexLocker locker(&m_clientsMutex);  // Теперь работает, т.к. m_clientsMutex объявлен как mutable
+    QMutexLocker locker(&m_clientsMutex);
     return m_clients.size();
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void ServerCore::onNewConnection()
 {
@@ -182,10 +157,13 @@ void ServerCore::onNewConnection()
 
     // Отправляем список маршрутов
     handleGetRoutes(handler);
+
+    // Отправляем текущий статус новому клиенту с задержкой
+    QTimer::singleShot(100, this, [this, handler]() {
+        sendCurrentStatus(handler);
+    });
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void ServerCore::onClientMessage(const QJsonObject& message, ProtocolHandler* client)
 {
@@ -193,8 +171,6 @@ void ServerCore::onClientMessage(const QJsonObject& message, ProtocolHandler* cl
     processMessage(client, message);
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void ServerCore::onClientDisconnected(ProtocolHandler* client)
 {
@@ -217,7 +193,38 @@ void ServerCore::onClientDisconnected(ProtocolHandler* client)
 }
 
 //-----------------------------------------------------------------------------
-//
+void ServerCore::sendCurrentStatus(ProtocolHandler* client)          // <-- ДОБАВИТЬ
+{
+    if (!client || !client->isConnected())
+    {
+        return;
+    }
+
+    QJsonObject status;
+    status["running"] = m_simulatorController.isRunning();
+
+    if (m_simulatorController.isRunning())
+    {
+        status["route"] = m_simulatorController.getCurrentRoute();
+        status["scenario"] = m_simulatorController.getCurrentScenario();
+        status["uptime_seconds"] = m_simulatorController.getUptimeSeconds();
+    }
+    else
+    {
+        status["route"] = "";
+        status["scenario"] = "";
+        status["uptime_seconds"] = 0;
+    }
+
+    QJsonObject message;
+    message["type"] = "STATUS";
+    message["status"] = status;
+
+    client->sendMessage(message);
+
+    qDebug() << "Sent current status to client: running=" << m_simulatorController.isRunning();
+}
+
 //-----------------------------------------------------------------------------
 void ServerCore::onSimulationOutput(const QString& output)
 {
@@ -225,13 +232,10 @@ void ServerCore::onSimulationOutput(const QString& output)
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void ServerCore::onSimulationError(const QString& error)
 {
     qWarning() << "Simulation error:" << error;
 
-    // Отправляем ошибку всем клиентам
     QMutexLocker locker(&m_clientsMutex);
     for (ProtocolHandler* client : m_clients.values())
     {
@@ -239,8 +243,6 @@ void ServerCore::onSimulationError(const QString& error)
     }
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void ServerCore::onSimulationStarted()
 {
@@ -251,8 +253,25 @@ void ServerCore::onSimulationStarted()
     emit simulationStarted(m_simulatorController.getCurrentRoute(),
                           m_simulatorController.getCurrentScenario());
 
-    // Оповещаем всех клиентов
     QMutexLocker locker(&m_clientsMutex);
+
+    // Отправляем статус
+    QJsonObject status;
+    status["running"] = true;
+    status["route"] = m_simulatorController.getCurrentRoute();
+    status["scenario"] = m_simulatorController.getCurrentScenario();
+    status["uptime_seconds"] = 0;
+
+    QJsonObject message;
+    message["type"] = "STATUS";
+    message["status"] = status;
+
+    for (ProtocolHandler* client : m_clients.values())
+    {
+        client->sendMessage(message);
+    }
+
+    // Отправляем уведомление
     QJsonObject notification;
     notification["type"] = "SIMULATION_STARTED";
     notification["route"] = m_simulatorController.getCurrentRoute();
@@ -265,16 +284,31 @@ void ServerCore::onSimulationStarted()
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void ServerCore::onSimulationStopped()
 {
     qInfo() << "Simulation stopped";
 
     emit simulationStopped();
 
-    // Оповещаем всех клиентов
     QMutexLocker locker(&m_clientsMutex);
+
+    // Отправляем статус
+    QJsonObject status;
+    status["running"] = false;
+    status["route"] = "";
+    status["scenario"] = "";
+    status["uptime_seconds"] = 0;
+
+    QJsonObject message;
+    message["type"] = "STATUS";
+    message["status"] = status;
+
+    for (ProtocolHandler* client : m_clients.values())
+    {
+        client->sendMessage(message);
+    }
+
+    // Отправляем уведомление
     QJsonObject notification;
     notification["type"] = "SIMULATION_STOPPED";
 
@@ -285,12 +319,8 @@ void ServerCore::onSimulationStopped()
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void ServerCore::onHeartbeat()
 {
-    // Проверяем активность клиентов
-    // Удаляем отключенных
     QMutexLocker locker(&m_clientsMutex);
 
     QList<QTcpSocket*> toRemove;
@@ -309,8 +339,6 @@ void ServerCore::onHeartbeat()
     }
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void ServerCore::writePidFile()
 {
@@ -331,8 +359,6 @@ void ServerCore::writePidFile()
     }
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void ServerCore::processMessage(ProtocolHandler* client, const QJsonObject& message)
 {
@@ -367,7 +393,7 @@ void ServerCore::processMessage(ProtocolHandler* client, const QJsonObject& mess
     }
     else if (type == "HEARTBEAT")
     {
-        // Просто игнорируем
+        // Игнорируем
     }
     else
     {
@@ -375,8 +401,6 @@ void ServerCore::processMessage(ProtocolHandler* client, const QJsonObject& mess
     }
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void ServerCore::handleGetRoutes(ProtocolHandler* client)
 {
@@ -392,7 +416,6 @@ void ServerCore::handleGetRoutes(ProtocolHandler* client)
         routeObj["version"] = route.version;
         routeObj["road"] = route.road;
 
-        // Количество сценариев
         ScenarioManager tempManager;
         if (tempManager.loadScenarios(route.routePath))
         {
@@ -409,8 +432,6 @@ void ServerCore::handleGetRoutes(ProtocolHandler* client)
     client->sendRouteList(routesArray);
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void ServerCore::handleGetScenarios(ProtocolHandler* client, const QString& route)
 {
@@ -431,8 +452,8 @@ void ServerCore::handleGetScenarios(ProtocolHandler* client, const QString& rout
     for (const ScenarioInfo& scenario : m_scenarioManager.getScenarios())
     {
         QJsonObject scenarioObj;
-        scenarioObj["name"] = scenario.name;           // Имя сценария
-        scenarioObj["dirName"] = scenario.dirName;     // Имя каталога (для запуска)
+        scenarioObj["name"] = scenario.name;
+        scenarioObj["dirName"] = scenario.dirName;
         scenarioObj["description"] = scenario.description;
         scenarioObj["route"] = scenario.route;
         scenariosArray.append(scenarioObj);
@@ -442,13 +463,14 @@ void ServerCore::handleGetScenarios(ProtocolHandler* client, const QString& rout
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void ServerCore::handleStartSimulation(ProtocolHandler* client,
                                        const QString& route,
                                        const QString& scenario)
 {
-    // Проверяем существование маршрута
+    qDebug() << "=== SERVER: Received START_SIMULATION ===";
+    qDebug() << "  route:" << route;
+    qDebug() << "  scenario:" << scenario;
+
     RouteInfo routeInfo = m_routeManager.getRouteByName(route);
     if (routeInfo.name.isEmpty())
     {
@@ -456,7 +478,6 @@ void ServerCore::handleStartSimulation(ProtocolHandler* client,
         return;
     }
 
-    // Проверяем существование сценария
     if (!m_scenarioManager.loadScenarios(routeInfo.routePath))
     {
         client->sendError("Could not load scenarios for route: " + route);
@@ -470,7 +491,6 @@ void ServerCore::handleStartSimulation(ProtocolHandler* client,
         return;
     }
 
-    // Проверяем, не запущена ли уже симуляция
     if (m_simulatorController.isRunning())
     {
         client->sendError("Simulation is already running. Stop it first.");
@@ -479,12 +499,13 @@ void ServerCore::handleStartSimulation(ProtocolHandler* client,
 
     Config& config = Config::instance();
 
-    // Передаем только имена папок без кавычек
+    qInfo() << "Starting simulation: route=" << routeInfo.name << " scenario=" << scenarioInfo.dirName;
+
     bool success = m_simulatorController.startSimulation(
-        routeInfo.name,              // только имя папки маршрута
-        scenarioInfo.dirName,        // только имя папки сценария
+        routeInfo.name,
+        scenarioInfo.dirName,
         config.getSimulatorPath()
-        );
+    );
 
     if (success)
     {
@@ -498,8 +519,6 @@ void ServerCore::handleStartSimulation(ProtocolHandler* client,
     }
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void ServerCore::handleStopSimulation(ProtocolHandler* client)
 {
@@ -522,8 +541,6 @@ void ServerCore::handleStopSimulation(ProtocolHandler* client)
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void ServerCore::handleGetStatus(ProtocolHandler* client)
 {
     QJsonObject status;
@@ -535,6 +552,12 @@ void ServerCore::handleGetStatus(ProtocolHandler* client)
         status["scenario"] = m_simulatorController.getCurrentScenario();
         status["uptime_seconds"] = m_simulatorController.getUptimeSeconds();
     }
+    else
+    {
+        status["route"] = "";
+        status["scenario"] = "";
+        status["uptime_seconds"] = 0;
+    }
 
     status["clients_connected"] = getClientCount();
     status["server_uptime"] = m_initialized ?
@@ -543,8 +566,6 @@ void ServerCore::handleGetStatus(ProtocolHandler* client)
     client->sendStatus(status);
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void ServerCore::handleGetInfo(ProtocolHandler* client)
 {

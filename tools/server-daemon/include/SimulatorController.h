@@ -13,6 +13,7 @@
 #include    <QString>
 #include    <QTimer>
 #include    <QDateTime>
+#include    <QFile>
 
 //-----------------------------------------------------------------------------
 class SimulatorController : public QObject
@@ -57,6 +58,7 @@ private:
     QTimer*     m_timeoutTimer;
     bool        m_isStarting;
     qint64      m_startTime;
+    bool        m_isStopping;
 };
 
 #endif // SIMULATORCONTROLLER_H

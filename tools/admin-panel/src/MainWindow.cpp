@@ -223,8 +223,8 @@ void MainWindow::onConnected()
     // Загрузка маршрутов
     m_client->loadRoutes();
 
-    // Запрос статуса
-    m_client->getStatus();
+    // Статус запросим после загрузки маршрутов
+    qDebug() << "Connected, loading routes...";
 }
 
 //-----------------------------------------------------------------------------
@@ -275,12 +275,15 @@ void MainWindow::onRoutesLoaded()
         ui->listRoutes->addItem(item);
     }
 
-    // Если есть маршруты, выбираем первый
     if (ui->listRoutes->count() > 0)
     {
         ui->listRoutes->setCurrentRow(0);
         onRouteSelected(ui->listRoutes->currentItem());
     }
+
+    // ПОСЛЕ ЗАГРУЗКИ МАРШРУТОВ ЗАПРАШИВАЕМ СТАТУС
+    m_client->getStatus();
+    qDebug() << "Routes loaded, requesting status...";
 }
 
 //-----------------------------------------------------------------------------
@@ -330,17 +333,23 @@ void MainWindow::onStatusUpdated(bool running, const QString& route, const QStri
 {
     m_isSimulationRunning = running;
 
+    qDebug() << "UI status update: running=" << running
+             << "route=" << route << "scenario=" << scenario;
+
     if (running)
     {
-        setStatus("Simulation running: " + route + " / " + scenario);
+        QString statusText = "Simulation running: " + route + " / " + scenario;
+        setStatus(statusText);
         ui->btnStart->setText("Stop Simulation");
         ui->btnStart->setChecked(true);
+        ui->btnStart->setEnabled(true);
     }
     else
     {
         setStatus("Simulation stopped");
         ui->btnStart->setText("Start Simulation");
         ui->btnStart->setChecked(false);
+        ui->btnStart->setEnabled(!m_currentRoute.isEmpty() && !m_currentScenario.isEmpty());
     }
 
     updateUI();

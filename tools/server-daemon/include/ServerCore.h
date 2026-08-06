@@ -4,12 +4,6 @@
 //  (c) SimulatorServer 2026
 //
 //------------------------------------------------------------------------------
-/*!
- *  \file
- *  \brief Server core
- *  \copyright SimulatorServer
- *  \date 2026
- */
 
 #ifndef     SERVERCORE_H
 #define     SERVERCORE_H
@@ -19,7 +13,6 @@
 #include    <QTcpSocket>
 #include    <QMap>
 #include    <QMutex>
-#include    <QMutexLocker>
 #include    <QTimer>
 #include    <QFile>
 #include    <QHostAddress>
@@ -33,8 +26,6 @@
 #include    "ProtocolHandler.h"
 #include    "Config.h"
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 class ServerCore : public QObject
 {
@@ -82,6 +73,7 @@ private:
     void handleStopSimulation(ProtocolHandler* client);
     void handleGetStatus(ProtocolHandler* client);
     void handleGetInfo(ProtocolHandler* client);
+    void sendCurrentStatus(ProtocolHandler* client);     // <-- ДОБАВИТЬ
 
     QTcpServer*                         m_server;
     RouteManager                        m_routeManager;
@@ -89,7 +81,7 @@ private:
     SimulatorController                 m_simulatorController;
 
     QMap<QTcpSocket*, ProtocolHandler*> m_clients;
-    mutable QMutex                      m_clientsMutex;  // mutable для использования в const-методах
+    mutable QMutex                      m_clientsMutex;
 
     QTimer*                             m_heartbeatTimer;
     QTimer*                             m_statusTimer;

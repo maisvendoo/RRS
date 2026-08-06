@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     QString configPath = parser.value(configOption);
     if (configPath.isEmpty())
     {
-        configPath = "../cfg/server-config.xml";
+        configPath = "../cfg/daemon-config.xml";
     }
 
     if (!Config::instance().load(configPath))
