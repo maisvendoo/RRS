@@ -43,10 +43,28 @@ bool RouteManager::loadRoutes(const QString& routesPath)
     {
         QString routePath = routesDir.absolutePath() + "/" + dirName;
         QString descriptionFile = routePath + "/description.xml";
+        QString scenariosPath = routePath + "/scenarios";
 
+        // Проверяем наличие description.xml
         if (!QFile::exists(descriptionFile))
         {
-            qWarning() << "No description.xml in route:" << dirName;
+            qWarning() << "Skipping route" << dirName << "- no description.xml";
+            continue;
+        }
+
+        // Проверяем наличие папки scenarios
+        if (!QFile::exists(scenariosPath))
+        {
+            qWarning() << "Skipping route" << dirName << "- no scenarios folder";
+            continue;
+        }
+
+        // Проверяем, что в папке scenarios есть подкаталоги (сценарии)
+        QDir scenariosDir(scenariosPath);
+        QStringList scenarioDirs = scenariosDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        if (scenarioDirs.isEmpty())
+        {
+            qWarning() << "Skipping route" << dirName << "- scenarios folder is empty";
             continue;
         }
 
@@ -58,7 +76,8 @@ bool RouteManager::loadRoutes(const QString& routesPath)
         {
             m_routes.append(info);
             qInfo() << "Loaded route:" << info.title
-                    << "(version:" << info.version << ")";
+                    << "(version:" << info.version
+                    << ", scenarios:" << scenarioDirs.size() << ")";
         }
     }
 
