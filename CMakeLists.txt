@@ -36,7 +36,6 @@ add_subdirectory (addons/freightcar)
 add_subdirectory (addons/vl60)
 
 add_subdirectory (tools/server-daemon)
-add_subdirectory (tools/admin-panel)
 
 if (CLIENT_BUILD)
     add_subdirectory (graphics)
@@ -58,6 +57,7 @@ if (CLIENT_BUILD)
     add_subdirectory (tools/route-map)
     add_subdirectory (tools/route-transform)
     add_subdirectory (tools/texture-compressor)
+    add_subdirectory (tools/admin-panel)
 endif()
 
 include(CMakePackageConfigHelpers)
