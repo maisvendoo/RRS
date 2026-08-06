@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
     <Server>
-        <Port>12345</Port>
+        <Port>1982</Port>
         <MaxClients>10</MaxClients>
         <TimeoutSeconds>30</TimeoutSeconds>
         <AutoRestart>true</AutoRestart>

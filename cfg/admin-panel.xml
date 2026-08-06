@@ -2,7 +2,7 @@
 <Config>
     <Client>
         <DefaultHost>127.0.0.1</DefaultHost>
-        <DefaultPort>12345</DefaultPort>
+        <DefaultPort>1982</DefaultPort>
         <AutoConnect>false</AutoConnect>
         <ReconnectAttempts>3</ReconnectAttempts>
         <ReconnectDelaySeconds>5</ReconnectDelaySeconds>

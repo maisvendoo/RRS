@@ -4,21 +4,17 @@
 //  (c) SimulatorClient 2026
 //
 //------------------------------------------------------------------------------
-/*!
- *  \file
- *  \brief Main window
- *  \copyright SimulatorClient
- *  \date 2026
- */
 
 #include    "MainWindow.h"
 #include    "ui_mainwindow.h"
+#include    "CfgReader.h"
 #include    <QMessageBox>
 #include    <QCloseEvent>
 #include    <QDebug>
+#include    <QCoreApplication>
+#include    <QDir>
+#include    <QFile>
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -58,12 +54,13 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_client, &ClientCore::simulationStopped,
             this, &MainWindow::onSimulationStopped);
 
+    // Загрузка конфига
+    loadConfig();
+
     setStatus("Disconnected", true);
     updateUI();
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
@@ -71,7 +68,62 @@ MainWindow::~MainWindow()
 }
 
 //-----------------------------------------------------------------------------
-//
+void MainWindow::loadConfig()
+{
+    // Путь к конфигу: ../cfg/admin-panel.xml
+    QString basePath = QCoreApplication::applicationDirPath();
+    QDir baseDir(basePath);
+    baseDir.cdUp();
+    QString configPath = baseDir.absolutePath() + "/cfg/admin-panel.xml";
+    
+    qDebug() << "Looking for config:" << configPath;
+    
+    if (!QFile::exists(configPath))
+    {
+        qWarning() << "Config not found:" << configPath;
+        qWarning() << "Using default values: 127.0.0.1:12345";
+        return;
+    }
+    
+    qDebug() << "Config found:" << configPath;
+    
+    CfgReader cfg;
+    if (!cfg.load(configPath))
+    {
+        qWarning() << "Failed to load config:" << configPath;
+        return;
+    }
+    
+    QDomNode clientNode = cfg.getFirstSection("Client");
+    if (clientNode.isNull())
+    {
+        qWarning() << "Client section not found in config";
+        return;
+    }
+    
+    // Чтение хоста
+    QString host;
+    if (cfg.getString(clientNode, "DefaultHost", host))
+    {
+        if (!host.isEmpty())
+        {
+            ui->editHost->setText(host);
+            qDebug() << "Loaded host:" << host;
+        }
+    }
+    
+    // Чтение порта
+    int port;
+    if (cfg.getInt(clientNode, "DefaultPort", port))
+    {
+        if (port > 0 && port < 65536)
+        {
+            ui->editPort->setText(QString::number(port));
+            qDebug() << "Loaded port:" << port;
+        }
+    }
+}
+
 //-----------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent* event)
 {
@@ -82,8 +134,6 @@ void MainWindow::closeEvent(QCloseEvent* event)
     event->accept();
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::onConnectButtonClicked()
 {
@@ -120,8 +170,6 @@ void MainWindow::onConnectButtonClicked()
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void MainWindow::onRouteSelected(QListWidgetItem* item)
 {
     if (!item)
@@ -145,8 +193,6 @@ void MainWindow::onRouteSelected(QListWidgetItem* item)
     }
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::onStartButtonClicked()
 {
@@ -187,11 +233,14 @@ void MainWindow::onStartButtonClicked()
         scenarioDirName = m_currentScenario;
     }
 
+    qDebug() << "Sending start simulation: route=" << m_currentRoute << " scenario=" << scenarioDirName;
+
+    ui->btnStart->setEnabled(false);
+    ui->btnStart->setText("Starting...");
+    
     m_client->startSimulation(m_currentRoute, scenarioDirName);
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::onScenarioChanged(int index)
 {
@@ -204,8 +253,6 @@ void MainWindow::onScenarioChanged(int index)
     m_currentScenario = ui->comboScenarios->itemData(index).toString();
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::onConnected()
 {
@@ -223,12 +270,9 @@ void MainWindow::onConnected()
     // Загрузка маршрутов
     m_client->loadRoutes();
 
-    // Статус запросим после загрузки маршрутов
     qDebug() << "Connected, loading routes...";
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::onDisconnected()
 {
@@ -251,16 +295,13 @@ void MainWindow::onDisconnected()
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void MainWindow::onError(const QString& error)
 {
     setStatus("Error: " + error, true);
     QMessageBox::critical(this, "Error", error);
+    ui->btnStart->setEnabled(true);
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::onRoutesLoaded()
 {
@@ -281,13 +322,11 @@ void MainWindow::onRoutesLoaded()
         onRouteSelected(ui->listRoutes->currentItem());
     }
 
-    // ПОСЛЕ ЗАГРУЗКИ МАРШРУТОВ ЗАПРАШИВАЕМ СТАТУС
+    // После загрузки маршрутов запрашиваем статус
     m_client->getStatus();
     qDebug() << "Routes loaded, requesting status...";
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::onScenariosLoaded()
 {
@@ -310,9 +349,7 @@ void MainWindow::onScenariosLoaded()
         {
             displayText += " - " + scenario.description;
         }
-        // Сохраняем имя и dirName
         ui->comboScenarios->addItem(displayText, scenario.name);
-        // Сохраняем dirName в дополнительную роль
         ui->comboScenarios->setItemData(ui->comboScenarios->count() - 1, scenario.dirName, Qt::UserRole + 1);
     }
 
@@ -327,13 +364,11 @@ void MainWindow::onScenariosLoaded()
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void MainWindow::onStatusUpdated(bool running, const QString& route, const QString& scenario)
 {
     m_isSimulationRunning = running;
 
-    qDebug() << "UI status update: running=" << running
+    qDebug() << "UI status update: running=" << running 
              << "route=" << route << "scenario=" << scenario;
 
     if (running)
@@ -356,19 +391,18 @@ void MainWindow::onStatusUpdated(bool running, const QString& route, const QStri
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void MainWindow::onSimulationStarted()
 {
     m_isSimulationRunning = true;
     setStatus("Simulation started");
     ui->btnStart->setText("Stop Simulation");
     ui->btnStart->setChecked(true);
+    ui->btnStart->setEnabled(true);
     updateUI();
+    
+    m_client->getStatus();
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::onSimulationStopped()
 {
@@ -376,11 +410,10 @@ void MainWindow::onSimulationStopped()
     setStatus("Simulation stopped");
     ui->btnStart->setText("Start Simulation");
     ui->btnStart->setChecked(false);
+    ui->btnStart->setEnabled(true);
     updateUI();
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::updateUI()
 {
@@ -389,22 +422,30 @@ void MainWindow::updateUI()
 
     ui->listRoutes->setEnabled(connected && !running);
     ui->comboScenarios->setEnabled(connected && !running && ui->comboScenarios->count() > 0);
-    ui->btnStart->setEnabled(connected && !m_currentRoute.isEmpty() && !m_currentScenario.isEmpty());
+    ui->btnStart->setEnabled(connected);
 
     if (connected)
     {
-        ui->btnStart->setText(running ? "Stop Simulation" : "Start Simulation");
-        ui->btnStart->setChecked(running);
+        if (running)
+        {
+            ui->btnStart->setText("Stop Simulation");
+            ui->btnStart->setChecked(true);
+        }
+        else
+        {
+            ui->btnStart->setText("Start Simulation");
+            ui->btnStart->setChecked(false);
+            ui->btnStart->setEnabled(!m_currentRoute.isEmpty() && !m_currentScenario.isEmpty());
+        }
     }
     else
     {
         ui->btnStart->setText("Start Simulation");
         ui->btnStart->setChecked(false);
+        ui->btnStart->setEnabled(false);
     }
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::setStatus(const QString& status, bool isError)
 {
@@ -431,15 +472,11 @@ void MainWindow::setStatus(const QString& status, bool isError)
 }
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void MainWindow::loadScenarios(const QString& route)
 {
     m_client->loadScenarios(route);
 }
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 void MainWindow::updateRouteInfo(const RouteData& route)
 {

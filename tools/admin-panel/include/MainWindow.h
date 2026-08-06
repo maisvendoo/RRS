@@ -4,12 +4,6 @@
 //  (c) SimulatorClient 2026
 //
 //------------------------------------------------------------------------------
-/*!
- *  \file
- *  \brief Main window
- *  \copyright SimulatorClient
- *  \date 2026
- */
 
 #ifndef     MAINWINDOW_H
 #define     MAINWINDOW_H
@@ -23,8 +17,6 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 class MainWindow : public QMainWindow
 {
@@ -60,9 +52,9 @@ private:
 
     void updateUI();
     void setStatus(const QString& status, bool isError = false);
-    void loadRoutes();
     void loadScenarios(const QString& route);
     void updateRouteInfo(const RouteData& route);
+    void loadConfig();
 
     Ui::MainWindow*     ui;
     ClientCore*         m_client;
