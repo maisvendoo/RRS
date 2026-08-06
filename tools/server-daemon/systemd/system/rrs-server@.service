@@ -1,9 +1,6 @@
 [Unit]
 Description=RRS Railway Simulator Server for %I
 After=network.target
-After=network-online.target
-Wants=network-online.target
-StartLimitIntervalSec=0
 
 [Service]
 Type=simple
@@ -12,24 +9,13 @@ Group=%I
 WorkingDirectory=/home/%I/RRS-sources/bin
 ExecStart=/home/%I/RRS-sources/bin/server-daemon
 ExecStop=/bin/kill -TERM $MAINPID
-ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartSec=10
-StartLimitBurst=5
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=rrs-server-%I
-LimitNOFILE=65536
-LimitNPROC=65536
+SyslogIdentifier=rrs-server
 
-# Переменные окружения
 Environment="QT_QPA_PLATFORM=offscreen"
-Environment="HOME=/home/%I"
-Environment="PATH=/usr/local/bin:/usr/bin:/bin:/home/%I/RRS-sources/bin"
-
-# Безопасность (упрощенная для обычного пользователя)
-NoNewPrivileges=true
-PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target
