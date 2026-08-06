@@ -1,0 +1,42 @@
+[Unit]
+Description=RRS Railway Simulator Server for %I
+After=network.target
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=%I
+Group=%I
+WorkingDirectory=/home/%I/RRS/bin
+ExecStart=/home/%I/RRS-sources/bin/server-daemon
+ExecStop=/bin/kill -TERM $MAINPID
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=rrs-server-%I
+LimitNOFILE=65536
+LimitNPROC=65536
+
+Environment="QT_QPA_PLATFORM=offscreen"
+Environment="HOME=/home/%I"
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/%I/RRS/logs /home/%I/RRS/routes /home/%I/RRS/cfg /home/%I/RRS/bin
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictNamespaces=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
