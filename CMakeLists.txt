@@ -36,6 +36,7 @@ add_subdirectory (addons/freightcar)
 add_subdirectory (addons/vl60)
 
 add_subdirectory (tools/server-daemon)
+add_subdirectory (tools/admin-panel)
 
 if (CLIENT_BUILD)
     add_subdirectory (graphics)

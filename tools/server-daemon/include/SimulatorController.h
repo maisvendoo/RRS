@@ -4,12 +4,6 @@
 //  (c) SimulatorServer 2026
 //
 //------------------------------------------------------------------------------
-/*!
- *  \file
- *  \brief Simulator controller
- *  \copyright SimulatorServer
- *  \date 2026
- */
 
 #ifndef     SIMULATORCONTROLLER_H
 #define     SIMULATORCONTROLLER_H
@@ -20,8 +14,6 @@
 #include    <QTimer>
 #include    <QDateTime>
 
-//-----------------------------------------------------------------------------
-//
 //-----------------------------------------------------------------------------
 class SimulatorController : public QObject
 {
@@ -65,7 +57,6 @@ private:
     QTimer*     m_timeoutTimer;
     bool        m_isStarting;
     qint64      m_startTime;
-    QString     m_simulatorPath;
 };
 
 #endif // SIMULATORCONTROLLER_H

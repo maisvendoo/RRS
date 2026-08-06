@@ -431,9 +431,9 @@ void ServerCore::handleGetScenarios(ProtocolHandler* client, const QString& rout
     for (const ScenarioInfo& scenario : m_scenarioManager.getScenarios())
     {
         QJsonObject scenarioObj;
-        scenarioObj["name"] = scenario.name;
+        scenarioObj["name"] = scenario.name;           // Имя сценария
+        scenarioObj["dirName"] = scenario.dirName;     // Имя каталога (для запуска)
         scenarioObj["description"] = scenario.description;
-        scenarioObj["type"] = scenario.type;
         scenarioObj["route"] = scenario.route;
         scenariosArray.append(scenarioObj);
     }
@@ -464,7 +464,7 @@ void ServerCore::handleStartSimulation(ProtocolHandler* client,
     }
 
     ScenarioInfo scenarioInfo = m_scenarioManager.getScenarioByName(scenario);
-    if (scenarioInfo.name.isEmpty())
+    if (scenarioInfo.dirName.isEmpty())
     {
         client->sendError("Scenario not found: " + scenario);
         return;
@@ -477,17 +477,20 @@ void ServerCore::handleStartSimulation(ProtocolHandler* client,
         return;
     }
 
-    // Запускаем симуляцию
     Config& config = Config::instance();
+
+    // Передаем только имена папок без кавычек
     bool success = m_simulatorController.startSimulation(
-        route, scenario, config.getSimulatorPath()
-    );
+        routeInfo.name,              // только имя папки маршрута
+        scenarioInfo.dirName,        // только имя папки сценария
+        config.getSimulatorPath()
+        );
 
     if (success)
     {
         client->sendSuccess("Simulation started successfully");
         qInfo() << "Simulation started by" << client->getClientAddress()
-                << "route:" << route << "scenario:" << scenario;
+                << "route:" << routeInfo.name << "scenario:" << scenarioInfo.dirName;
     }
     else
     {

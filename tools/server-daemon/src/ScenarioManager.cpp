@@ -39,29 +39,33 @@ bool ScenarioManager::loadScenarios(const QString& routePath)
         return false;
     }
 
-    QStringList filters;
-    filters << "*.xml";
-    QFileInfoList scenarioFiles = scenariosDir.entryInfoList(filters, QDir::Files);
+    // Получаем список подкаталогов в папке scenarios
+    QStringList scenarioDirs = scenariosDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
 
-    if (scenarioFiles.isEmpty())
+    if (scenarioDirs.isEmpty())
     {
-        qWarning() << "No scenario files found in:" << scenariosPath;
+        qWarning() << "No scenario directories found in:" << scenariosPath;
         return false;
     }
 
     QString routeName = QFileInfo(routePath).fileName();
 
-    for (const QFileInfo& fileInfo : scenarioFiles)
+    for (const QString& dirName : scenarioDirs)
     {
+        QString scenarioPath = scenariosDir.absolutePath() + "/" + dirName;
+        
         ScenarioInfo info;
-        info.fileName = fileInfo.fileName();
-        info.filePath = fileInfo.absoluteFilePath();
+        info.dirName = dirName;
+        info.name = dirName;  // По умолчанию имя = имя каталога
+        info.path = scenarioPath;
+        info.route = routeName;
+        info.description = "";
 
-        if (parseScenarioFile(fileInfo.absoluteFilePath(), info, routeName))
-        {
-            m_scenarios.append(info);
-            qInfo() << "Loaded scenario:" << info.name << "from" << info.fileName;
-        }
+        // Загружаем информацию о сценарии
+        loadScenarioInfo(scenarioPath, info, routeName);
+
+        m_scenarios.append(info);
+        qInfo() << "Loaded scenario:" << info.name;
     }
 
     return !m_scenarios.isEmpty();
@@ -70,19 +74,46 @@ bool ScenarioManager::loadScenarios(const QString& routePath)
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool ScenarioManager::parseScenarioFile(const QString& filePath, ScenarioInfo& info, const QString& route)
+bool ScenarioManager::loadScenarioInfo(const QString& scenarioPath, ScenarioInfo& info, const QString& routeName)
+{
+    // Пытаемся найти файл описания сценария
+    QString descFile = scenarioPath + "/description.xml";
+    if (!QFile::exists(descFile))
+    {
+        descFile = scenarioPath + "/scenario.xml";
+    }
+    
+    if (QFile::exists(descFile))
+    {
+        return parseScenarioDescription(descFile, info);
+    }
+    
+    // Если файла описания нет, используем имя папки как имя сценария
+    info.name = info.dirName;
+    info.description = "";
+    info.route = routeName;
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+bool ScenarioManager::parseScenarioDescription(const QString& filePath, ScenarioInfo& info)
 {
     CfgReader cfg;
 
     if (!cfg.load(filePath))
     {
-        qWarning() << "Failed to load scenario file:" << filePath;
+        qWarning() << "Failed to load scenario description:" << filePath;
         return false;
     }
 
+    // Пробуем получить секцию Scenario
     QDomNode rootNode = cfg.getFirstSection("Scenario");
     if (rootNode.isNull())
     {
+        // Пробуем Config
         rootNode = cfg.getFirstSection("Config");
         if (rootNode.isNull())
         {
@@ -91,29 +122,23 @@ bool ScenarioManager::parseScenarioFile(const QString& filePath, ScenarioInfo& i
         }
     }
 
+    // Получаем имя сценария (если указано)
     QString name;
     if (cfg.getString(rootNode, "Name", name))
     {
-        info.name = name;
-    }
-    else
-    {
-        info.name = QFileInfo(filePath).baseName();
+        if (!name.isEmpty())
+        {
+            info.name = name;
+        }
     }
 
+    // Получаем описание
     QString description;
     if (cfg.getString(rootNode, "Description", description))
     {
         info.description = description;
     }
 
-    QString type;
-    if (cfg.getString(rootNode, "Type", type))
-    {
-        info.type = type;
-    }
-
-    info.route = route;
     return true;
 }
 
@@ -124,7 +149,7 @@ ScenarioInfo ScenarioManager::getScenarioByName(const QString& name) const
 {
     for (const ScenarioInfo& scenario : m_scenarios)
     {
-        if (scenario.name == name || scenario.fileName == name)
+        if (scenario.name == name || scenario.dirName == name)
         {
             return scenario;
         }
@@ -138,9 +163,9 @@ ScenarioInfo ScenarioManager::getScenarioByName(const QString& name) const
 QString ScenarioManager::getScenarioPath(const QString& scenarioName) const
 {
     ScenarioInfo info = getScenarioByName(scenarioName);
-    if (info.fileName.isEmpty())
+    if (info.dirName.isEmpty())
     {
         return QString();
     }
-    return m_currentRoutePath + "/scenarios/" + info.fileName;
+    return m_currentRoutePath + "/scenarios/" + info.dirName;
 }

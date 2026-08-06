@@ -26,12 +26,11 @@
 //-----------------------------------------------------------------------------
 struct ScenarioInfo
 {
-    QString     name;           // Имя сценария
-    QString     fileName;       // Имя файла сценария
+    QString     name;           // Имя сценария (из description.xml или имя папки)
+    QString     dirName;        // Имя каталога сценария
     QString     description;    // Описание сценария
     QString     route;          // Маршрут, к которому относится сценарий
-    QString     type;           // Тип сценария (если есть)
-    QString     filePath;       // Полный путь к файлу сценария
+    QString     path;           // Полный путь к каталогу сценария
 };
 
 //-----------------------------------------------------------------------------
@@ -55,7 +54,8 @@ public:
 
 private:
 
-    bool parseScenarioFile(const QString& filePath, ScenarioInfo& info, const QString& route);
+    bool parseScenarioDescription(const QString& filePath, ScenarioInfo& info);
+    bool loadScenarioInfo(const QString& scenarioPath, ScenarioInfo& info, const QString& routeName);
 
     QVector<ScenarioInfo>   m_scenarios;
     QString                 m_currentRoutePath;

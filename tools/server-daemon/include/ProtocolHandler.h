@@ -1,15 +1,9 @@
 //------------------------------------------------------------------------------
 //
-//  Protocol handler
+//  Protocol handler for server
 //  (c) SimulatorServer 2026
 //
 //------------------------------------------------------------------------------
-/*!
- *  \file
- *  \brief Protocol handler
- *  \copyright SimulatorServer
- *  \date 2026
- */
 
 #ifndef     PROTOCOLHANDLER_H
 #define     PROTOCOLHANDLER_H
@@ -42,13 +36,12 @@ public:
 
     QTcpSocket* getSocket() const { return m_socket; }
     QString getClientAddress() const;
-    bool isConnected() const { return m_socket && m_socket->state() == QTcpSocket::ConnectedState; }
+    bool isConnected() const;  // <-- ТОЛЬКО ОДНО ОБЪЯВЛЕНИЕ
 
 signals:
 
     void messageReceived(const QJsonObject& message);
     void clientDisconnected();
-    void heartbeat();
 
 private slots:
 

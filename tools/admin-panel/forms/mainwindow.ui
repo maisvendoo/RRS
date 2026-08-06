@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Railway Simulator Client</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QMainWindow {
+        background-color: #2b2b2b;
+    }
+    QGroupBox {
+        color: #ffffff;
+        border: 1px solid #555;
+        border-radius: 5px;
+        margin-top: 10px;
+        padding-top: 10px;
+        font-weight: bold;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        left: 10px;
+        padding: 0 5px 0 5px;
+    }
+    QLabel {
+        color: #e0e0e0;
+    }
+    QLineEdit {
+        background-color: #3c3c3c;
+        color: #ffffff;
+        border: 1px solid #555;
+        border-radius: 3px;
+        padding: 5px;
+    }
+    QLineEdit:focus {
+        border: 1px solid #4a90d9;
+    }
+    QPushButton {
+        background-color: #4a90d9;
+        color: #ffffff;
+        border: none;
+        border-radius: 3px;
+        padding: 8px 16px;
+        font-weight: bold;
+    }
+    QPushButton:hover {
+        background-color: #5a9ee9;
+    }
+    QPushButton:pressed {
+        background-color: #3a80c9;
+    }
+    QPushButton:disabled {
+        background-color: #555;
+        color: #888;
+    }
+    QPushButton#btnConnect {
+        background-color: #4CAF50;
+    }
+    QPushButton#btnConnect:hover {
+        background-color: #5CBF60;
+    }
+    QPushButton#btnConnect:checked {
+        background-color: #f44336;
+    }
+    QPushButton#btnConnect:checked:hover {
+        background-color: #ff5555;
+    }
+    QPushButton#btnStart {
+        background-color: #ff9800;
+    }
+    QPushButton#btnStart:hover {
+        background-color: #ffa82a;
+    }
+    QPushButton#btnStart:checked {
+        background-color: #f44336;
+    }
+    QPushButton#btnStart:checked:hover {
+        background-color: #ff5555;
+    }
+    QListWidget {
+        background-color: #3c3c3c;
+        color: #e0e0e0;
+        border: 1px solid #555;
+        border-radius: 3px;
+        padding: 5px;
+    }
+    QListWidget::item:selected {
+        background-color: #4a90d9;
+        color: #ffffff;
+    }
+    QListWidget::item:hover {
+        background-color: #4a4a4a;
+    }
+    QComboBox {
+        background-color: #3c3c3c;
+        color: #e0e0e0;
+        border: 1px solid #555;
+        border-radius: 3px;
+        padding: 5px;
+    }
+    QComboBox::drop-down {
+        border: none;
+    }
+    QComboBox::down-arrow {
+        image: none;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #e0e0e0;
+        margin-right: 5px;
+    }
+    QComboBox QAbstractItemView {
+        background-color: #3c3c3c;
+        color: #e0e0e0;
+        selection-background-color: #4a90d9;
+        border: 1px solid #555;
+    }
+    QStatusBar {
+        color: #e0e0e0;
+        background-color: #2b2b2b;
+    }
+    QStatusBar::item {
+        border: none;
+    }
+   </string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QGroupBox" name="groupConnection">
+      <property name="title">
+       <string>Connection</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelHost">
+         <property name="text">
+          <string>Host:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="editHost">
+         <property name="text">
+          <string>127.0.0.1</string>
+         </property>
+         <property name="placeholderText">
+          <string>IP address</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="labelPort">
+         <property name="text">
+          <string>Port:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLineEdit" name="editPort">
+         <property name="text">
+          <string>12345</string>
+         </property>
+         <property name="placeholderText">
+          <string>Port</string>
+         </property>
+         <property name="inputMask">
+          <string>00000</string>
+         </property>
+         <property name="maxLength">
+          <number>5</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="4">
+        <widget class="QPushButton" name="btnConnect">
+         <property name="text">
+          <string>Connect</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="objectName">
+          <string>btnConnect</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupRoutes">
+      <property name="title">
+       <string>Routes</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QListWidget" name="listRoutes">
+         <property name="minimumHeight">
+          <number>150</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupScenario">
+         <property name="title">
+          <string>Scenario</string>
+         </property>
+         <property name="minimumWidth">
+          <number>150</number>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLabel" name="labelScenarioInfo">
+            <property name="text">
+             <string>Select scenario:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboScenarios">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelRouteInfo">
+            <property name="text">
+             <string>Route info</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font-weight: normal; font-size: 10pt; color: #aaa;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupControl">
+      <property name="title">
+       <string>Control</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnStart">
+         <property name="text">
+          <string>Start Simulation</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="objectName">
+          <string>btnStart</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupStatus">
+      <property name="title">
+       <string>Status</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="labelStatus">
+         <property name="text">
+          <string>Disconnected</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold; color: #f44336;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

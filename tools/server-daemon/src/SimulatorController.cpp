@@ -37,9 +37,7 @@ SimulatorController::~SimulatorController()
     stopSimulation();
 }
 
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool SimulatorController::startSimulation(const QString& route,
                                           const QString& scenario,
                                           const QString& simulatorPath)
@@ -50,18 +48,17 @@ bool SimulatorController::startSimulation(const QString& route,
         return false;
     }
 
-    m_simulatorPath = simulatorPath;
-    QString command = QString("%1 --route=%2 --scenario=%3")
-                      .arg(simulatorPath)
-                      .arg(route)
-                      .arg(scenario);
+    // Формируем команду без кавычек
+    QStringList arguments;
+    arguments << "--route=" + route;
+    arguments << "--scenario=" + scenario;
 
-    qInfo() << "Starting simulation:" << command;
+    qInfo() << "Starting simulation:" << simulatorPath << arguments.join(" ");
 
     m_process = new QProcess(this);
     m_process->setProcessChannelMode(QProcess::MergedChannels);
     m_process->setProgram(simulatorPath);
-    m_process->setArguments(QStringList() << "--route=" + route << "--scenario=" + scenario);
+    m_process->setArguments(arguments);
 
     connect(m_process, &QProcess::finished,
             this, &SimulatorController::onProcessFinished);
@@ -200,3 +197,4 @@ void SimulatorController::checkProcessTimeout()
         }
     }
 }
+
