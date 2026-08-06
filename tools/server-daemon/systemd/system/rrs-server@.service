@@ -9,7 +9,7 @@ StartLimitIntervalSec=0
 Type=simple
 User=%I
 Group=%I
-WorkingDirectory=/home/%I/RRS/bin
+WorkingDirectory=/home/%I/RRS-sources/bin
 ExecStart=/home/%I/RRS-sources/bin/server-daemon
 ExecStop=/bin/kill -TERM $MAINPID
 ExecReload=/bin/kill -HUP $MAINPID
@@ -22,21 +22,14 @@ SyslogIdentifier=rrs-server-%I
 LimitNOFILE=65536
 LimitNPROC=65536
 
+# Переменные окружения
 Environment="QT_QPA_PLATFORM=offscreen"
 Environment="HOME=/home/%I"
+Environment="PATH=/usr/local/bin:/usr/bin:/bin:/home/%I/RRS-sources/bin"
 
+# Безопасность (упрощенная для обычного пользователя)
 NoNewPrivileges=true
 PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=read-only
-ReadWritePaths=/home/%I/RRS/logs /home/%I/RRS/routes /home/%I/RRS/cfg /home/%I/RRS/bin
-ProtectKernelTunables=true
-ProtectKernelModules=true
-ProtectControlGroups=true
-RestrictRealtime=true
-RestrictNamespaces=true
-MemoryDenyWriteExecute=true
-LockPersonality=true
 
 [Install]
 WantedBy=multi-user.target
