@@ -27,7 +27,7 @@ public:
 
     bool startSimulation(const QString& route, const QString& scenario, const QString& simulatorPath);
     bool stopSimulation();
-    bool isRunning() const { return m_process && m_process->state() == QProcess::Running; }
+    bool isRunning() const;
     bool isStarting() const { return m_isStarting; }
 
     QString getCurrentRoute() const { return m_currentRoute; }
@@ -52,6 +52,14 @@ private slots:
 
 private:
 
+    enum class ProcessState
+    {
+        Stopped,
+        Starting,
+        Running,
+        Crashed
+    };
+
     QProcess*   m_process;
     QString     m_currentRoute;
     QString     m_currentScenario;
@@ -59,6 +67,7 @@ private:
     bool        m_isStarting;
     qint64      m_startTime;
     bool        m_isStopping;
+    ProcessState m_processState;
 };
 
 #endif // SIMULATORCONTROLLER_H

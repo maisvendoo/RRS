@@ -27,11 +27,12 @@ ProtocolHandler::ProtocolHandler(QTcpSocket* socket, QObject* parent)
 //-----------------------------------------------------------------------------
 ProtocolHandler::~ProtocolHandler()
 {
+    qInfo() << "ProtocolHandler destructor for client:" << getClientAddress();
+
     if (m_socket)
     {
         m_socket->disconnectFromHost();
         m_socket->close();
-        // Не удаляем m_socket, он принадлежит QTcpServer
         m_socket = nullptr;
     }
 
@@ -175,8 +176,10 @@ void ProtocolHandler::onReadyRead()
 //-----------------------------------------------------------------------------
 void ProtocolHandler::onDisconnected()
 {
+    qInfo() << "Client disconnected:" << getClientAddress();
     emit clientDisconnected();
-    deleteLater();
+    // Не удаляем себя здесь, удаление произойдет в ServerCore
+    // deleteLater(); // УБРАТЬ!
 }
 
 //-----------------------------------------------------------------------------

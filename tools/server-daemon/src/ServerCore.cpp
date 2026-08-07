@@ -99,10 +99,14 @@ void ServerCore::stop()
     // Отключаем всех клиентов
     {
         QMutexLocker locker(&m_clientsMutex);
-        for (ProtocolHandler* client : m_clients.values())
+        for (auto it = m_clients.begin(); it != m_clients.end(); ++it)
         {
-            client->disconnect();
-            client->deleteLater();
+            ProtocolHandler* handler = it.value();
+            if (handler)
+            {
+                handler->disconnect();
+                handler->deleteLater();
+            }
         }
         m_clients.clear();
     }
@@ -120,7 +124,6 @@ void ServerCore::stop()
     m_initialized = false;
 
     qInfo() << "Server stopped";
-
     emit serverStopped();
 }
 
@@ -144,15 +147,15 @@ void ServerCore::onNewConnection()
 
     connect(handler, &ProtocolHandler::messageReceived,
             this, [this, handler](const QJsonObject& msg)
-    {
-        onClientMessage(msg, handler);
-    });
+            {
+                onClientMessage(msg, handler);
+            });
 
     connect(handler, &ProtocolHandler::clientDisconnected,
             this, [this, handler]()
-    {
-        onClientDisconnected(handler);
-    });
+            {
+                onClientDisconnected(handler);
+            });
 
     {
         QMutexLocker locker(&m_clientsMutex);
@@ -167,7 +170,7 @@ void ServerCore::onNewConnection()
     // Отправляем список маршрутов
     handleGetRoutes(handler);
 
-    // Отправляем текущий статус новому клиенту с задержкой
+    // Отправляем текущий статус
     QTimer::singleShot(100, this, [this, handler]() {
         sendCurrentStatus(handler);
     });
@@ -189,7 +192,9 @@ void ServerCore::onClientDisconnected(ProtocolHandler* client)
     }
 
     QString address = client->getClientAddress();
+    qInfo() << "Client disconnected:" << address;
 
+    // Удаляем клиента из списка
     {
         QMutexLocker locker(&m_clientsMutex);
         QTcpSocket* socket = qobject_cast<QTcpSocket*>(client->parent());
@@ -199,11 +204,19 @@ void ServerCore::onClientDisconnected(ProtocolHandler* client)
         }
     }
 
-    qInfo() << "Client disconnected:" << address;
     emit clientDisconnected(address);
 
-    // Не удаляем client через deleteLater, он сам удалится через ProtocolHandler
-    // client->deleteLater(); // Убрать, чтобы не было двойного удаления
+    // Если клиентов не осталось, останавливаем симуляцию
+    {
+        QMutexLocker locker(&m_clientsMutex);
+        if (m_clients.isEmpty())
+        {
+            qInfo() << "All clients disconnected, stopping simulation...";
+            m_simulatorController.stopSimulation();
+        }
+    }
+
+    // client удалится автоматически через deleteLater в ProtocolHandler
 }
 
 //-----------------------------------------------------------------------------
@@ -340,7 +353,8 @@ void ServerCore::onHeartbeat()
     QList<QTcpSocket*> toRemove;
     for (auto it = m_clients.begin(); it != m_clients.end(); ++it)
     {
-        if (!it.value()->isConnected())
+        ProtocolHandler* handler = it.value();
+        if (!handler || !handler->isConnected())
         {
             toRemove.append(it.key());
         }
@@ -349,7 +363,19 @@ void ServerCore::onHeartbeat()
     for (QTcpSocket* socket : toRemove)
     {
         ProtocolHandler* handler = m_clients.take(socket);
-        handler->deleteLater();
+        if (handler)
+        {
+            qInfo() << "Removing dead client:" << handler->getClientAddress();
+            handler->disconnect();
+            handler->deleteLater();
+        }
+    }
+
+    // Если клиентов не осталось, останавливаем симуляцию
+    if (m_clients.isEmpty() && m_simulatorController.isRunning())
+    {
+        qInfo() << "All clients disconnected (heartbeat), stopping simulation...";
+        m_simulatorController.stopSimulation();
     }
 }
 
@@ -541,6 +567,8 @@ void ServerCore::handleStopSimulation(ProtocolHandler* client)
         client->sendError("No simulation running");
         return;
     }
+
+    qInfo() << "Stopping simulation by client request";
 
     bool success = m_simulatorController.stopSimulation();
     if (success)

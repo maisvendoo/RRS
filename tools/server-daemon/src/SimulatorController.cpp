@@ -16,6 +16,7 @@ SimulatorController::SimulatorController(QObject* parent)
     , m_isStarting(false)
     , m_startTime(0)
     , m_isStopping(false)
+    , m_processState(ProcessState::Stopped)
 {
     m_timeoutTimer = new QTimer(this);
     m_timeoutTimer->setSingleShot(true);
@@ -34,10 +35,18 @@ bool SimulatorController::startSimulation(const QString& route,
                                           const QString& scenario,
                                           const QString& simulatorPath)
 {
-    if (isRunning())
+    if (m_processState == ProcessState::Running || m_processState == ProcessState::Starting)
     {
         emit simulationError("Simulation is already running");
         return false;
+    }
+
+    // Очищаем предыдущий процесс если он есть
+    if (m_process)
+    {
+        m_process->disconnect();
+        m_process->deleteLater();
+        m_process = nullptr;
     }
 
     if (!QFile::exists(simulatorPath))
@@ -68,6 +77,7 @@ bool SimulatorController::startSimulation(const QString& route,
     m_currentScenario = scenario;
     m_isStarting = true;
     m_isStopping = false;
+    m_processState = ProcessState::Starting;
     m_startTime = QDateTime::currentMSecsSinceEpoch();
     m_timeoutTimer->start(5000);
 
@@ -76,11 +86,14 @@ bool SimulatorController::startSimulation(const QString& route,
     if (!m_process->waitForStarted(3000))
     {
         emit simulationError("Failed to start simulator process");
+        m_process->disconnect();
         m_process->deleteLater();
         m_process = nullptr;
+        m_processState = ProcessState::Stopped;
         return false;
     }
     
+    m_processState = ProcessState::Running;
     emit simulationStarted();
     return true;
 }
@@ -97,57 +110,70 @@ bool SimulatorController::stopSimulation()
 
     if (!m_process)
     {
-        return false;
+        m_processState = ProcessState::Stopped;
+        qInfo() << "No process to stop";
+        return true;
     }
 
-    if (m_process->state() == QProcess::Running)
+    if (m_process->state() != QProcess::Running && m_process->state() != QProcess::Starting)
     {
-        m_isStopping = true;
-        qInfo() << "Stopping simulation...";
-        
-        // Отключаем все сигналы от процесса
+        qInfo() << "Process not running, state:" << m_process->state();
         m_process->disconnect();
-        
-        // Пытаемся завершить процесс
-        m_process->terminate();
-        if (!m_process->waitForFinished(3000))
-        {
-            qWarning() << "Process didn't terminate, killing...";
-            m_process->kill();
-            m_process->waitForFinished(1000);
-        }
-        
-        // Безопасно удаляем процесс
         m_process->deleteLater();
         m_process = nullptr;
-        m_isStopping = false;
-    }
-    else
-    {
-        // Процесс уже не запущен
-        m_process->deleteLater();
-        m_process = nullptr;
+        m_processState = ProcessState::Stopped;
+        return true;
     }
 
+    m_isStopping = true;
+    qInfo() << "Stopping simulation (PID:" << m_process->processId() << ")...";
+
+    // Отключаем сигналы, чтобы избежать race conditions
+    m_process->disconnect();
+
+    // Пытаемся завершить процесс
+    m_process->terminate();
+
+    // Ждем завершения с таймаутом
+    bool finished = m_process->waitForFinished(5000);
+
+    if (!finished)
+    {
+        qWarning() << "Process didn't terminate, killing...";
+        m_process->kill();
+        m_process->waitForFinished(2000);
+    }
+
+    // Очищаем
+    m_process->deleteLater();
+    m_process = nullptr;
+    m_isStopping = false;
     m_isStarting = false;
     m_startTime = 0;
-    
+    m_processState = ProcessState::Stopped;
+
     emit simulationStopped();
     qInfo() << "Simulation stopped successfully";
-    
+
     return true;
 }
 
 //-----------------------------------------------------------------------------
 qint64 SimulatorController::getUptimeSeconds() const
 {
-    if (!isRunning() || m_startTime == 0)
+    if (m_processState != ProcessState::Running || m_startTime == 0)
     {
         return 0;
     }
 
     qint64 now = QDateTime::currentMSecsSinceEpoch();
     return (now - m_startTime) / 1000;
+}
+
+//-----------------------------------------------------------------------------
+bool SimulatorController::isRunning() const
+{
+    return m_processState == ProcessState::Running && m_process && m_process->state() == QProcess::Running;
 }
 
 //-----------------------------------------------------------------------------
@@ -163,6 +189,7 @@ void SimulatorController::onProcessFinished(int exitCode, QProcess::ExitStatus e
     if (!m_process)
     {
         qInfo() << "Process already deleted";
+        m_processState = ProcessState::Stopped;
         return;
     }
 
@@ -175,17 +202,20 @@ void SimulatorController::onProcessFinished(int exitCode, QProcess::ExitStatus e
     {
         if (exitCode == 0)
         {
+            m_processState = ProcessState::Stopped;
             emit simulationStopped();
         }
         else
         {
             qWarning() << "Simulator exited with code:" << exitCode;
+            m_processState = ProcessState::Stopped;
             emit simulationStopped();
         }
     }
     else
     {
         qWarning() << "Simulator crashed!";
+        m_processState = ProcessState::Crashed;
         emit simulationError("Simulator crashed");
         emit simulationStopped();
     }
@@ -212,6 +242,7 @@ void SimulatorController::onProcessError(QProcess::ProcessError error)
     if (!m_process)
     {
         qInfo() << "Process already deleted";
+        m_processState = ProcessState::Stopped;
         return;
     }
 
@@ -240,6 +271,7 @@ void SimulatorController::onProcessError(QProcess::ProcessError error)
         emit simulationError(errorMsg);
     }
 
+    m_processState = ProcessState::Stopped;
     emit simulationStopped();
 
     if (m_process)
@@ -253,7 +285,7 @@ void SimulatorController::onProcessError(QProcess::ProcessError error)
 //-----------------------------------------------------------------------------
 void SimulatorController::onProcessOutput()
 {
-    if (m_process && !m_isStopping)
+    if (m_process && !m_isStopping && m_processState == ProcessState::Running)
     {
         QString output = m_process->readAllStandardOutput();
         if (!output.isEmpty())
@@ -271,6 +303,7 @@ void SimulatorController::checkProcessTimeout()
         m_isStarting = false;
         if (m_process->state() != QProcess::Running)
         {
+            m_processState = ProcessState::Stopped;
             emit simulationError("Simulation start timed out");
             m_process->disconnect();
             m_process->deleteLater();
