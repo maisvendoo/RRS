@@ -91,21 +91,30 @@ void ServerCore::stop()
         return;
     }
 
+    qInfo() << "Stopping server...";
+
+    // Закрываем сервер для новых подключений
     m_server->close();
 
-    QMutexLocker locker(&m_clientsMutex);
-    for (ProtocolHandler* client : m_clients.values())
+    // Отключаем всех клиентов
     {
-        client->deleteLater();
+        QMutexLocker locker(&m_clientsMutex);
+        for (ProtocolHandler* client : m_clients.values())
+        {
+            client->disconnect();
+            client->deleteLater();
+        }
+        m_clients.clear();
     }
-    m_clients.clear();
-    locker.unlock();
 
+    // Останавливаем симуляцию
     m_simulatorController.stopSimulation();
 
+    // Останавливаем таймеры
     m_heartbeatTimer->stop();
     m_statusTimer->stop();
 
+    // Удаляем PID файл
     QFile::remove(Config::instance().getPidFile());
 
     m_initialized = false;
@@ -174,6 +183,11 @@ void ServerCore::onClientMessage(const QJsonObject& message, ProtocolHandler* cl
 //-----------------------------------------------------------------------------
 void ServerCore::onClientDisconnected(ProtocolHandler* client)
 {
+    if (!client)
+    {
+        return;
+    }
+
     QString address = client->getClientAddress();
 
     {
@@ -186,10 +200,10 @@ void ServerCore::onClientDisconnected(ProtocolHandler* client)
     }
 
     qInfo() << "Client disconnected:" << address;
-
     emit clientDisconnected(address);
 
-    client->deleteLater();
+    // Не удаляем client через deleteLater, он сам удалится через ProtocolHandler
+    // client->deleteLater(); // Убрать, чтобы не было двойного удаления
 }
 
 //-----------------------------------------------------------------------------

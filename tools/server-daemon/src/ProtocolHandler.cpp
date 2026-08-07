@@ -29,7 +29,15 @@ ProtocolHandler::~ProtocolHandler()
 {
     if (m_socket)
     {
+        m_socket->disconnectFromHost();
         m_socket->close();
+        // Не удаляем m_socket, он принадлежит QTcpServer
+        m_socket = nullptr;
+    }
+
+    if (m_heartbeatTimer)
+    {
+        m_heartbeatTimer->stop();
     }
 }
 
