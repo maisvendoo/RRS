@@ -76,16 +76,11 @@ void MainWindow::loadConfig()
     baseDir.cdUp();
     QString configPath = baseDir.absolutePath() + "/cfg/admin-panel.xml";
     
-    qDebug() << "Looking for config:" << configPath;
-    
     if (!QFile::exists(configPath))
     {
         qWarning() << "Config not found:" << configPath;
-        qWarning() << "Using default values: 127.0.0.1:12345";
         return;
     }
-    
-    qDebug() << "Config found:" << configPath;
     
     CfgReader cfg;
     if (!cfg.load(configPath))
@@ -101,25 +96,21 @@ void MainWindow::loadConfig()
         return;
     }
     
-    // Чтение хоста
     QString host;
     if (cfg.getString(clientNode, "DefaultHost", host))
     {
         if (!host.isEmpty())
         {
             ui->editHost->setText(host);
-            qDebug() << "Loaded host:" << host;
         }
     }
     
-    // Чтение порта
     int port;
     if (cfg.getInt(clientNode, "DefaultPort", port))
     {
         if (port > 0 && port < 65536)
         {
             ui->editPort->setText(QString::number(port));
-            qDebug() << "Loaded port:" << port;
         }
     }
 }
@@ -146,7 +137,7 @@ void MainWindow::onConnectButtonClicked()
     QString host = ui->editHost->text().trimmed();
     if (host.isEmpty())
     {
-        QMessageBox::warning(this, "Error", "Please enter host address");
+        setStatus("Error: Please enter host address", true);
         return;
     }
 
@@ -154,7 +145,7 @@ void MainWindow::onConnectButtonClicked()
     int port = ui->editPort->text().toInt(&ok);
     if (!ok || port <= 0 || port > 65535)
     {
-        QMessageBox::warning(this, "Error", "Please enter valid port number");
+        setStatus("Error: Please enter valid port number", true);
         return;
     }
 
@@ -165,7 +156,6 @@ void MainWindow::onConnectButtonClicked()
     {
         setStatus("Connection failed", true);
         ui->btnConnect->setEnabled(true);
-        QMessageBox::warning(this, "Error", "Failed to connect to server");
     }
 }
 
@@ -182,7 +172,6 @@ void MainWindow::onRouteSelected(QListWidgetItem* item)
     m_currentRoute = routeName;
     loadScenarios(routeName);
 
-    // Обновляем информацию о маршруте
     for (const RouteData& route : m_client->getRoutes())
     {
         if (route.name == routeName)
@@ -198,7 +187,7 @@ void MainWindow::onStartButtonClicked()
 {
     if (!m_isConnected)
     {
-        QMessageBox::warning(this, "Error", "Not connected to server");
+        setStatus("Error: Not connected to server", true);
         return;
     }
 
@@ -210,17 +199,16 @@ void MainWindow::onStartButtonClicked()
 
     if (m_currentRoute.isEmpty())
     {
-        QMessageBox::warning(this, "Error", "Please select a route");
+        setStatus("Error: Please select a route", true);
         return;
     }
 
     if (m_currentScenario.isEmpty())
     {
-        QMessageBox::warning(this, "Error", "Please select a scenario");
+        setStatus("Error: Please select a scenario", true);
         return;
     }
 
-    // Получаем dirName сценария (имя каталога)
     int index = ui->comboScenarios->currentIndex();
     if (index < 0)
     {
@@ -232,8 +220,6 @@ void MainWindow::onStartButtonClicked()
     {
         scenarioDirName = m_currentScenario;
     }
-
-    qDebug() << "Sending start simulation: route=" << m_currentRoute << " scenario=" << scenarioDirName;
 
     ui->btnStart->setEnabled(false);
     ui->btnStart->setText("Starting...");
@@ -267,10 +253,7 @@ void MainWindow::onConnected()
     setStatus("Connected");
     updateUI();
 
-    // Загрузка маршрутов
     m_client->loadRoutes();
-
-    qDebug() << "Connected, loading routes...";
 }
 
 //-----------------------------------------------------------------------------
@@ -298,8 +281,8 @@ void MainWindow::onDisconnected()
 void MainWindow::onError(const QString& error)
 {
     setStatus("Error: " + error, true);
-    QMessageBox::critical(this, "Error", error);
     ui->btnStart->setEnabled(true);
+    ui->btnConnect->setEnabled(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -322,9 +305,7 @@ void MainWindow::onRoutesLoaded()
         onRouteSelected(ui->listRoutes->currentItem());
     }
 
-    // После загрузки маршрутов запрашиваем статус
     m_client->getStatus();
-    qDebug() << "Routes loaded, requesting status...";
 }
 
 //-----------------------------------------------------------------------------
@@ -368,13 +349,9 @@ void MainWindow::onStatusUpdated(bool running, const QString& route, const QStri
 {
     m_isSimulationRunning = running;
 
-    qDebug() << "UI status update: running=" << running 
-             << "route=" << route << "scenario=" << scenario;
-
     if (running)
     {
-        QString statusText = "Simulation running: " + route + " / " + scenario;
-        setStatus(statusText);
+        setStatus("Simulation running: " + route + " / " + scenario);
         ui->btnStart->setText("Stop Simulation");
         ui->btnStart->setChecked(true);
         ui->btnStart->setEnabled(true);
