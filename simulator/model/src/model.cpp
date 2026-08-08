@@ -1020,6 +1020,9 @@ void Model::initTcpServer()
     connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
 
     Journal::instance()->info("TCP server is initialized successfully");
+
+    update_pos_data.vehicles.resize(vehicles.size());
+    update_vehicles.vehicles.resize(vehicles.size());
 }
 
 //------------------------------------------------------------------------------
@@ -1043,8 +1046,8 @@ void Model::prepareFeedBack(bool need_trains_feedback)
 
     update_pos_data.speed_factor = speed_factor;
     update_pos_data.sim_time = sim_time;
-    update_pos_data.vehicles.resize(vehicles.size());
-    update_vehicles.vehicles.resize(vehicles.size());
+    //update_pos_data.vehicles.resize(vehicles.size());
+    //update_vehicles.vehicles.resize(vehicles.size());
     i = 0;
 
     for (auto vehicle : vehicles)
@@ -1139,10 +1142,10 @@ void Model::tcpFeedBack(bool need_trains_feedback)
 
     double realtime_seconds = std::chrono::duration<double, std::chrono::seconds::period>(process_timepoint - start_timepoint).count();
     tcp_server->updateVehiclesPos(update_pos_data.serialize(), realtime_seconds);
-    update_pos_data = simulator_update_pos_t();
+    //update_pos_data = simulator_update_pos_t();
 
     tcp_server->updateVehiclesState(update_vehicles.serialize(), realtime_seconds);
-    update_vehicles = simulator_vehicles_update_t();
+    //update_vehicles = simulator_vehicles_update_t();
 
     tcp_server->updatePlayers(update_players.serialize(), realtime_seconds);
     update_players = simulator_update_players_t();
