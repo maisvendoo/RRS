@@ -157,6 +157,9 @@ bool Model::init(const simulator_command_line_t &command_line)
     tcp_server->setVehiclesInfo(vehicles_info.serialize());
     Journal::instance()->info("Ready vehicles info for server");
 
+    update_pos_data.vehicles.resize(vehicles.size());
+    update_vehicles.vehicles.resize(vehicles.size());
+
     prepareFeedBack(true);
     tcpFeedBack(true);
 
@@ -1019,10 +1022,7 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
 
-    Journal::instance()->info("TCP server is initialized successfully");
-
-    update_pos_data.vehicles.resize(vehicles.size());
-    update_vehicles.vehicles.resize(vehicles.size());
+    Journal::instance()->info("TCP server is initialized successfully");    
 }
 
 //------------------------------------------------------------------------------
