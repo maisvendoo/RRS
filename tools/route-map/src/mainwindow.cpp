@@ -1123,22 +1123,16 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
 
     for (size_t i = 0; i < update_trains.trains.size(); ++i)
     {
+        QString train_name = QString("#%1 ").arg(i, -2) + update_trains.trains[i].train_name;
+
         TrainLabel *train_label = new TrainLabel(map);
         train_label->setAlignment(Qt::AlignHCenter);
         train_label->setStyleSheet("color: white;");
-
-        QString train_name = update_trains.trains[i].train_name;
-
-        if (!train_name.isEmpty())
-            train_label->setText(train_name);
-        else
-            train_label->setText("0000");
-
+        train_label->setText(train_name);
         train_label->first_vehicle_idx = update_trains.trains[i].first_vehicle_id;
         train_label->train_idx = i;
 
         connect(train_label, &TrainLabel::popUpMenu, this, &MainWindow::slotRenameTrainMenu);
-
         map->train_labels.push_back(train_label);
 
         QAction *action_train = new QAction(train_name);
@@ -1150,12 +1144,6 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
         connect(action_train, &QAction::triggered, this, [mw, vehicle_idx]{
             mw->slotSetVehicleAtCenter(vehicle_idx);
         });
-    }
-
-    if (!update_trains.trains.empty())
-    {
-        int vehicle_idx = update_trains.trains[0].first_vehicle_id;
-        map->slotSetVehicleAtCenter(0);
     }
 }
 
