@@ -887,6 +887,23 @@ Train *Model::addTrain(const init_data_t &init_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::initTraffic(const init_data_t &init_data)
+{
+    traffic_machine = new TrafficMachine();
+
+    FileSystem &fs = FileSystem::getInstance();
+    std::string route_dir_path = fs.combinePath(fs.getRouteRootDir(), init_data.route_dir_name.toStdString());
+
+    if (!traffic_machine->init(route_dir_path.c_str()))
+    {
+        Journal::instance()->error("Failed traffic initialization in route" +
+                                   QString(route_dir_path.c_str()));
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::initTopology(const init_data_t &init_data)
 {
     Journal::instance()->info("==== Route topology loading ====");

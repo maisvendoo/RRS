@@ -36,6 +36,8 @@
 
 #include    <virtual-interface-device.h>
 
+#include    <traffic-machine.h>
+
 #include    <topology.h>
 
 #include    <tcp-server.h>
@@ -152,7 +154,10 @@ private:
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
 
-    Vehicle* vehicle_controlled_by_panel = nullptr;    
+    Vehicle* vehicle_controlled_by_panel = nullptr;
+
+    /// Система трафика
+    TrafficMachine  *traffic_machine = nullptr;
 
     /// Топология
     Topology *topology = new Topology();
