@@ -30,4 +30,8 @@ void register_handlers()
 {
     signal(SIGSEGV, handle_sigsegv);
     signal(SIGFPE, handle_sigfpe);
+
+#ifndef Q_OS_WIN
+    signal(SIGPIPE, SIG_IGN)
+#endif
 }
