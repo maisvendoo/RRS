@@ -613,6 +613,9 @@ void TcpServer::updateVehiclesPos(QByteArray vehicles_pos, double t)
 //------------------------------------------------------------------------------
 void TcpServer::updateVehiclesState(QByteArray vehicles_state, double t)
 {
+    // Сохраняем эти данные для выдачи по запросу
+    this->vehicles_state = vehicles_state;
+
     if (clients_for_vehicles_updates.empty())
     {
         return;
@@ -621,9 +624,6 @@ void TcpServer::updateVehiclesState(QByteArray vehicles_state, double t)
     network_data_t net_data;
     net_data.stype = STYPE_VEHICLES_STATE_UPDATE;
     net_data.data = vehicles_state;
-
-    // Сохраняем эти данные для выдачи по запросу
-    this->vehicles_state = vehicles_state;
 
     for (auto client_socket : clients_for_vehicles_updates)
     {
@@ -670,6 +670,9 @@ void TcpServer::updateVehicleControlled(QByteArray vehicles_state, int client_id
 //------------------------------------------------------------------------------
 void TcpServer::updateTrainsInfo(QByteArray trains_state)
 {
+    // Сохраняем эти данные для выдачи по запросу
+    this->trains_state = trains_state;
+
     if (clients_for_trains_updates.empty())
     {
         return;
@@ -678,9 +681,6 @@ void TcpServer::updateTrainsInfo(QByteArray trains_state)
     network_data_t net_data;
     net_data.stype = STYPE_TRAINS_UPDATE;
     net_data.data = trains_state;
-
-    // Сохраняем эти данные для выдачи по запросу
-    this->trains_state = trains_state;
 
     for (auto client_socket : clients_for_trains_updates)
     {
