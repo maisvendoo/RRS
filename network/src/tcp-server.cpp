@@ -388,31 +388,37 @@ void TcpServer::remove_client(QTcpSocket* socket)
     if (!socket)
         return;
 
-    if (clients_data.contains(socket))
+    // Проверяем, не удалён ли уже сокет
+    if (!clients_data.contains(socket))
     {
-        client_data_t *client_data = &clients_data[socket];
-        int client_id = client_data->id;
-
-        // Удаляем из всех контейнеров
-        clients_data.remove(socket);
-        clients_for_players_info_updates.remove(socket);
-        clients_for_topology_updates.remove(socket);
-        clients_for_signals_updates.remove(socket);
-        clients_for_vehicles_pos_updates.remove(socket);
-        clients_for_vehicles_updates.remove(socket);
-        clients_for_vehicle_controlled_updates.remove(socket);
-        clients_for_trains_updates.remove(socket);
-
-        emit sigResetVehicleControl(client_id);
-
-        Journal::instance()->info(QString("Removed client #%1")
-                                      .arg(client_id));
+        // Сокет уже удалён из списка - возможно, повторный вызов
+        Journal::instance()->warning("Attempting to remove already removed socket");
+        return;
     }
 
-    // Закрываем и удаляем сокет
+    client_data_t *client_data = &clients_data[socket];
+    int client_id = client_data->id;
+
+    // Удаляем из всех контейнеров
+    clients_data.remove(socket);
+    clients_for_players_info_updates.remove(socket);
+    clients_for_topology_updates.remove(socket);
+    clients_for_signals_updates.remove(socket);
+    clients_for_vehicles_pos_updates.remove(socket);
+    clients_for_vehicles_updates.remove(socket);
+    clients_for_vehicle_controlled_updates.remove(socket);
+    clients_for_trains_updates.remove(socket);
+
+    emit sigResetVehicleControl(client_id);
+
+    Journal::instance()->info(QString("Removed client #%1")
+                                  .arg(client_id));
+
+    // Закрываем сокет, если он ещё открыт
     if (socket->isOpen())
         socket->close();
 
+    // Безопасно удаляем сокет
     socket->deleteLater();
 }
 
@@ -479,27 +485,7 @@ void TcpServer::slotClientDisconnected()
         return;
     }
 
-    if (clients_data.contains(socket))
-    {
-        client_data_t *client_data = &clients_data[socket];        
-
-        clients_data.remove(socket);
-        clients_for_players_info_updates.remove(socket);
-        clients_for_topology_updates.remove(socket);
-        clients_for_signals_updates.remove(socket);
-        clients_for_vehicles_pos_updates.remove(socket);
-        clients_for_vehicles_updates.remove(socket);
-        clients_for_vehicle_controlled_updates.remove(socket);
-        clients_for_trains_updates.remove(socket);
-
-        emit sigResetVehicleControl(client_data->id);
-
-        Journal::instance()->info(QString("Disconnected client #%1")
-                                      .arg(client_data->id));
-    }
-
-    socket->close();
-    socket->deleteLater();
+    remove_client(socket);
 }
 
 //------------------------------------------------------------------------------
@@ -509,16 +495,18 @@ void TcpServer::slotReceive()
 {
     QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
 
-    client_data_t *client_data;
-
-    if (clients_data.contains(socket))
-    {
-        client_data = &clients_data[socket];
-    }
-    else
+    if (!socket)
     {
         return;
     }
+
+    // Проверяем, существует ли ещё сокет в списке
+    if (!clients_data.contains(socket))
+        return;
+
+    client_data_t *client_data;
+
+    client_data = &clients_data[socket];
 
     while (socket->bytesAvailable())
     {
