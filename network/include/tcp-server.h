@@ -121,6 +121,8 @@ private:
 
     void send_trains_info(client_data_t &client_data);
 
+    void send_data(QTcpSocket* client_socket, network_data_t& net_data);
+
 public slots:
 
     void slotNewConnection();
