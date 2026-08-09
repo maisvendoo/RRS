@@ -32,7 +32,7 @@ void VL60k::stepPneumoSupply(const double& t, const double& dt)
     FL_flow += horn[CAB1]->getFLflow() + horn[CAB2]->getFLflow();
     FL_flow += sand_system->getFLflow();
     FL_flow += brake_lock[CAB1]->getFLflow();
-    FL_flow += brake_lock[CAB1]->getFLflow();
+    FL_flow += brake_lock[CAB2]->getFLflow();
 
     anglecock_fl_fwd->setHoseFlow(hose_fl_fwd->getFlow());
     FL_flow += anglecock_fl_fwd->getFlowToPipe();
