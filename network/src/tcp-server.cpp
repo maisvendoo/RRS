@@ -356,6 +356,12 @@ void TcpServer::send_data(QPointer<QTcpSocket> client_socket, network_data_t& ne
     if (client_socket.isNull())
         return;
 
+    // Пытаемся привести к QObject для проверки валидности
+    QObject *obj = dynamic_cast<QObject*>(client_socket.data());
+
+    if (!obj)
+        return;
+
     // Проверяем, что сокет всё ещё в списке клиентов
     if (!clients_data.contains(client_socket))
         return;
@@ -426,11 +432,14 @@ void TcpServer::slotClientDisconnected()
 {
     QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
 
+    if (!socket)
+    {
+        return;
+    }
+
     if (clients_data.contains(socket))
     {
-        client_data_t *client_data = &clients_data[socket];
-
-        client_data->socket->close();
+        client_data_t *client_data = &clients_data[socket];        
 
         clients_data.remove(socket);
         clients_for_players_info_updates.remove(socket);
@@ -446,6 +455,9 @@ void TcpServer::slotClientDisconnected()
         Journal::instance()->info(QString("Disconnected client #%1")
                                       .arg(client_data->id));
     }
+
+    socket->close();
+    socket->deleteLater();
 }
 
 //------------------------------------------------------------------------------
