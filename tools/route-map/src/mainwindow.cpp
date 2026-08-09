@@ -1151,12 +1151,6 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
             mw->slotSetVehicleAtCenter(vehicle_idx);
         });
     }
-
-    if (!update_trains.trains.empty())
-    {
-        int vehicle_idx = update_trains.trains[0].first_vehicle_id;
-        map->slotSetVehicleAtCenter(0);
-    }
 }
 
 //------------------------------------------------------------------------------
