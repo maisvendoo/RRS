@@ -101,7 +101,7 @@ struct client_data_t
     double controlled_update_prev_time;
     double players_update_interval;
     double players_update_prev_time;
-    QPointer<QTcpSocket> socket;
+    QTcpSocket* socket;
     network_data_t received_data;
 };
 

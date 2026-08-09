@@ -350,28 +350,70 @@ void TcpServer::send_trains_info(client_data_t &client_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpServer::send_data(QPointer<QTcpSocket> client_socket, network_data_t& net_data)
+void TcpServer::send_data(QTcpSocket *client_socket, network_data_t& net_data)
 {
-    // Проверяем, что сокет существует (не удалён)
-    if (client_socket.isNull())
+    QPointer<QTcpSocket> safe_socket(client_socket);
+
+    if (safe_socket.isNull())
         return;
 
-    // Пытаемся привести к QObject для проверки валидности
-    QObject *obj = dynamic_cast<QObject*>(client_socket.data());
-
-    if (!obj)
-        return;
-
-    // Проверяем, что сокет всё ещё в списке клиентов
     if (!clients_data.contains(client_socket))
         return;
 
-    // Проверяем, что сокет подключён
-    if (client_socket->state() != QAbstractSocket::ConnectedState)
+    // Проверяем состояние сокета
+    if (!safe_socket->isOpen() || !safe_socket->isValid() ||
+        safe_socket->state() != QAbstractSocket::ConnectedState)
+    {
+        remove_client(client_socket);
+        return;
+    }
+
+    // Отправляем данные без принудительного flush()
+    qint64 bytesWritten = safe_socket->write(net_data.serialize());
+
+    if (bytesWritten == -1)
+    {
+        Journal::instance()->warning(QString("Failed to write to socket: %1")
+                                         .arg(safe_socket->errorString()));
+        remove_client(client_socket);
+        return;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::remove_client(QTcpSocket* socket)
+{
+    if (!socket)
         return;
 
-    client_socket->write(net_data.serialize());
-    client_socket->flush();
+    if (clients_data.contains(socket))
+    {
+        client_data_t *client_data = &clients_data[socket];
+        int client_id = client_data->id;
+
+        // Удаляем из всех контейнеров
+        clients_data.remove(socket);
+        clients_for_players_info_updates.remove(socket);
+        clients_for_topology_updates.remove(socket);
+        clients_for_signals_updates.remove(socket);
+        clients_for_vehicles_pos_updates.remove(socket);
+        clients_for_vehicles_updates.remove(socket);
+        clients_for_vehicle_controlled_updates.remove(socket);
+        clients_for_trains_updates.remove(socket);
+
+        emit sigResetVehicleControl(client_id);
+
+        Journal::instance()->info(QString("Removed client #%1")
+                                      .arg(client_id));
+    }
+
+    // Закрываем и удаляем сокет
+    if (socket->isOpen())
+        socket->close();
+
+    socket->deleteLater();
 }
 
 //------------------------------------------------------------------------------
