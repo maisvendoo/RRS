@@ -350,13 +350,22 @@ void TcpServer::send_trains_info(client_data_t &client_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpServer::send_data(QTcpSocket* client_socket, network_data_t& net_data)
+void TcpServer::send_data(QPointer<QTcpSocket> client_socket, network_data_t& net_data)
 {
-    if (client_socket->state() == QAbstractSocket::ConnectedState)
-    {
-        client_socket->write(net_data.serialize());
-        client_socket->flush();
-    }
+    // Проверяем, что сокет существует (не удалён)
+    if (client_socket.isNull())
+        return;
+
+    // Проверяем, что сокет всё ещё в списке клиентов
+    if (!clients_data.contains(client_socket))
+        return;
+
+    // Проверяем, что сокет подключён
+    if (client_socket->state() != QAbstractSocket::ConnectedState)
+        return;
+
+    client_socket->write(net_data.serialize());
+    client_socket->flush();
 }
 
 //------------------------------------------------------------------------------

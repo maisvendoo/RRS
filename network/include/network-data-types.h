@@ -3,8 +3,10 @@
 
 #include <QByteArray>
 #include <QtTypes>
+#include <QPointer>
 
 class QTcpSocket;
+
 
 //------------------------------------------------------------------------------
 //
@@ -99,7 +101,7 @@ struct client_data_t
     double controlled_update_prev_time;
     double players_update_interval;
     double players_update_prev_time;
-    QTcpSocket* socket;
+    QPointer<QTcpSocket> socket;
     network_data_t received_data;
 };
 
