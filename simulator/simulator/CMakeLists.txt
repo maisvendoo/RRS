@@ -51,6 +51,7 @@ target_link_libraries (${TARGET} Qt6::Core)
 target_link_libraries (${TARGET} Qt6::Xml)
 target_link_libraries (${TARGET} Qt6::Network)
 # и со своими не забываем
+target_link_libraries (${TARGET} system)
 target_link_libraries (${TARGET} CfgReader)
 target_link_libraries (${TARGET} filesystem)
 target_link_libraries (${TARGET} device)

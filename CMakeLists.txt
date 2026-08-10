@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 3.29)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 project (RRS VERSION 1.9.3)
 
@@ -20,6 +21,7 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 option (CLIENT_BUILD "Build for client usage" ON)
 
+add_subdirectory (system)
 add_subdirectory (CfgReader)
 add_subdirectory (CfgEditor)
 add_subdirectory (filesystem)
