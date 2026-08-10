@@ -15,6 +15,7 @@
 #include    "mainwindow.h"
 #include    <QApplication>
 #include    <QTranslator>
+#include    <crash-handler.h>
 
 /*!
  * \fn
@@ -25,6 +26,8 @@
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
+    setup_crash_handler("../logs/launcher-crash.log");
+
     QApplication a(argc, argv);
     QTranslator translator;
 
