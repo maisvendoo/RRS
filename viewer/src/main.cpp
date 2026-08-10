@@ -11,6 +11,8 @@
 #include <exception>
 #include <string>
 
+#include <crash-handler.h>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -28,6 +30,8 @@ int main(int argc, char* argv[])
 {
     try
     {
+        setup_crash_handler("../logs/viewer-crash.log");
+
         initialize_logger();
         print_command_line_arguments(argc, argv);
 

@@ -51,6 +51,7 @@ target_link_libraries(${TARGET} PRIVATE
     parsing
     graphics
     core
+    system
 )
 
 target_include_directories(${TARGET} PRIVATE
