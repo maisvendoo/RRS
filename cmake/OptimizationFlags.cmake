@@ -36,6 +36,43 @@ target_compile_options(optflags INTERFACE
     >
 )
 
+# ================================================
+# НОВЫЕ ФЛАГИ ДЛЯ CRASH-HANDLER
+# ================================================
+
+# Релиз с отладочными символами (RelWithDebInfo)
+# Это позволяет получать осмысленные стектрейсы в продакшене
+target_compile_options(optflags INTERFACE
+    $<$<CONFIG:RelWithDebInfo>:
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
+            -g                    # отладочные символы
+            -fno-omit-frame-pointer
+        >
+    >
+)
+
+# Для всех Unix-конфигураций добавляем -rdynamic для backtrace
+# Это нужно для получения имен функций в стектрейсе
+if(UNIX)
+    target_compile_options(optflags INTERFACE
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
+            $<$<CONFIG:Debug,RelWithDebInfo>:
+                -rdynamic
+            >
+        >
+    )
+    
+    # Добавляем флаги линковщика
+    target_link_options(optflags INTERFACE
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:
+            $<$<CONFIG:Debug,RelWithDebInfo>:
+                -rdynamic
+                -Wl,--build-id=sha1
+            >
+        >
+    )
+endif()
+
 # Предупреждение о -march=native при кросс-компиляции
 if(CMAKE_CROSSCOMPILING AND NOT DEFINED ALLOW_NATIVE_ARCH)
     message(WARNING " -march=native отключён при кросс-компиляции. "
