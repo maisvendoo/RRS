@@ -26,7 +26,7 @@
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-    setup_crash_handler();
+    setup_crash_handler("../logs/simulator-crash.log");
     init_journal();
 
     AppCore app(argc, argv);

@@ -18,18 +18,19 @@
 #endif
 
 //------------------------------------------------------------------------------
+// Глобальная переменная для хранения имени файла лога
+//------------------------------------------------------------------------------
+static char log_file_path[256] = "../logs/crash.log";
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 static void removeOldLogFile()
 {
-    const char* log_path = "../logs/crash.log";
-
 #ifdef _WIN32
-    // Windows: используем DeleteFileA
-    DeleteFileA(log_path);
+    DeleteFileA(log_file_path);
 #else
-    // Linux/macOS: используем unlink
-    unlink(log_path);
+    unlink(log_file_path);
 #endif
 }
 
@@ -38,7 +39,7 @@ static void removeOldLogFile()
 //------------------------------------------------------------------------------
 static void initLogFile()
 {
-    // Создаем директорию
+    // Создаем директорию ../logs если её нет
 #ifdef _WIN32
     mkdir("../logs");
 #else
@@ -49,7 +50,7 @@ static void initLogFile()
     removeOldLogFile();
 
     // Создаем новый файл
-    FILE* file = fopen("../logs/crash.log", "w");
+    FILE* file = fopen(log_file_path, "w");
     if (file)
     {
         time_t now = time(nullptr);
@@ -59,7 +60,8 @@ static void initLogFile()
 
         fprintf(file, "========================================\n");
         fprintf(file, "=== Crash Handler Initialized ===\n");
-        fprintf(file, "=== Log file created at: %s ===\n", timestamp);
+        fprintf(file, "=== Log file: %s ===\n", log_file_path);
+        fprintf(file, "=== Created at: %s ===\n", timestamp);
         fprintf(file, "========================================\n\n");
         fflush(file);
         fclose(file);
@@ -71,7 +73,7 @@ static void initLogFile()
 //------------------------------------------------------------------------------
 static void writeToFile(const char* msg)
 {
-    FILE* file = fopen("../logs/crash.log", "a");
+    FILE* file = fopen(log_file_path, "a");
     if (file)
     {
         fputs(msg, file);
@@ -468,8 +470,15 @@ static LONG WINAPI windowsExceptionHandler(_EXCEPTION_POINTERS* ex)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void setup_crash_handler()
+void setup_crash_handler(const char* log_filename)
 {
+    // Сохраняем имя файла лога
+    if (log_filename != nullptr && strlen(log_filename) > 0)
+    {
+        strncpy(log_file_path, log_filename, sizeof(log_file_path) - 1);
+        log_file_path[sizeof(log_file_path) - 1] = '\0';
+    }
+
     // Удаляем старый лог и создаем новый
     initLogFile();
 

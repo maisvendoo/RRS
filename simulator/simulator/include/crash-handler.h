@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-void setup_crash_handler();
+void setup_crash_handler(const char* log_filename);
 
 #ifdef __cplusplus
 }
