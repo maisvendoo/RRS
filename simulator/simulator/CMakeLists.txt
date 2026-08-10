@@ -8,8 +8,6 @@ project (${TARGET})
 # Qt-шное барахло для запуска метаобъектного компилятора
 # сборки ресурсов и генерации кода UI при работе с формами
 set(CMAKE_AUTOMOC ON)
-# set(CMAKE_AUTORCC ON)
-# set(CMAKE_AUTOUIC ON)
 
 # Путь, куда надо сложить собранное
 set (EXECUTABLE_OUTPUT_PATH "../../../bin")
@@ -43,6 +41,10 @@ target_include_directories (${TARGET} PRIVATE ../../common-headers)
 target_include_directories (${TARGET} PRIVATE ../train/include)
 target_include_directories (${TARGET} PRIVATE ../model/include)
 target_include_directories (${TARGET} PRIVATE ../scenario-manager/include)
+
+if(WIN32)
+    target_link_libraries(simulator psapi)
+endif()
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Core)

@@ -13,9 +13,9 @@
  * \date 01/09/2018
  */
 
-#include    "main.h"
-#include    "exceptions.h"
-#include    "sim-journal.h"
+#include    <main.h>
+#include    <crash-handler.h>
+#include    <sim-journal.h>
 
 /*!
  * \fn
@@ -26,8 +26,8 @@
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
+    setup_crash_handler();
     init_journal();
-    register_handlers();
 
     AppCore app(argc, argv);
 
