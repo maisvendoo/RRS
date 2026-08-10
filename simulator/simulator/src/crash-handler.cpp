@@ -5,6 +5,8 @@
 #include    <ctime>
 #include    <csignal>
 #include    <sys/stat.h>
+#include    <cstdarg>
+#include    <cstdint>
 
 #ifdef _WIN32
     #include <windows.h>
