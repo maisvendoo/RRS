@@ -53,8 +53,8 @@ target_link_libraries (${TARGET} Qt6::Gui)
 target_link_libraries (${TARGET} Qt6::Widgets)
 
 # и со своими не забываем
+target_link_libraries (${TARGET} system)
 target_link_libraries (${TARGET} CfgReader)
-target_link_libraries (${TARGET} CfgEditor)
 target_link_libraries (${TARGET} filesystem)
 target_link_libraries (${TARGET} network)
 target_link_libraries (${TARGET} topology)
