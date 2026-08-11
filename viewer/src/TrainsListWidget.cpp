@@ -114,11 +114,15 @@ void TrainsListWidget::syncSelectionWithCurrentTrain()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TrainsListWidget::renderTrainsList()
 {
     auto *handler = _params->vehicles_handler;
+    auto *viewer_handler = _params->viewer_handler;
 
-    if (!handler)
+    if (!handler || !viewer_handler)
     {
         return;
     }
@@ -132,22 +136,7 @@ void TrainsListWidget::renderTrainsList()
     const int current_vehicle_id = handler->getCurrentVehicleIndex();
     const int controlled_vehicle_id = handler->getControlledVehicleIndex();
 
-    // Находим ID поезда для текущего и управляемого вагона
-    int current_train_id = -1;
-    int controlled_train_id = -1;
-
-    const auto& vehicles = handler->getVehicles();
     const auto& trains = handler->getTrainsInfo();
-
-    if (current_vehicle_id >= 0 && static_cast<size_t>(current_vehicle_id) < vehicles.size())
-    {
-        current_train_id = vehicles[current_vehicle_id].train_id;
-    }
-
-    if (controlled_vehicle_id >= 0 && static_cast<size_t>(controlled_vehicle_id) < vehicles.size())
-    {
-        controlled_train_id = vehicles[controlled_vehicle_id].train_id;
-    }
 
     // Расчёт размеров окна
     const float item_height = ImGui::GetTextLineHeightWithSpacing();
@@ -155,15 +144,18 @@ void TrainsListWidget::renderTrainsList()
     const float button_height = ImGui::GetFrameHeightWithSpacing() * 1.5f;
     const float padding = 10.0f;
 
-    // Максимальная высота - 60% от высоты экрана
-    const float max_height = ImGui::GetIO().DisplaySize.y * 0.6f;
+    // Минимальная высота - чтобы виджет был крупнее
+    const float min_height = ImGui::GetIO().DisplaySize.y * 0.4f;  // 40% от экрана минимум
+
+    // Максимальная высота - 85% от высоты экрана
+    const float max_height = ImGui::GetIO().DisplaySize.y * 0.85f;
 
     // Высота списка: заголовок + элементы + кнопка + отступы
     const float list_height = _cached_trains_ids.size() * item_height;
-    const float total_height = std::min(
-        header_height + list_height + button_height + padding * 3,
-        max_height
-        );
+    float total_height = header_height + list_height + button_height + padding * 3;
+
+    // Применяем минимальную и максимальную высоту
+    total_height = std::clamp(total_height, min_height, max_height);
 
     // Ширина окна
     const float window_width = 350.0f;
@@ -205,42 +197,36 @@ void TrainsListWidget::renderTrainsList()
     {
         const int first_vehicle_id = _cached_trains_ids[i];
 
-        // Находим ID поезда и его имя
-        int train_id = -1;
+        // Находим имя поезда
         QString train_name = "Поезд";
-
         for (const auto& train : trains)
         {
             if (train.first_vehicle_id == first_vehicle_id)
             {
-                train_id = train.last_vehicle_id; // используем last_vehicle_id как идентификатор поезда
                 train_name = train.train_name;
                 break;
             }
         }
 
-        if (train_id < 0)
-            continue;
-
         // Формируем строку для отображения
         std::string display_text;
         if (train_name.isEmpty() || train_name == "Поезд")
         {
-            display_text = QString("Поезд #%1").arg(train_id).toStdString();
+            display_text = QString("Поезд #%1").arg(first_vehicle_id).toStdString();
         }
         else
         {
-            display_text = QString("%1 (ID: %2)").arg(train_name).arg(train_id).toStdString();
+            display_text = QString("%1 (ID: %2)").arg(train_name).arg(first_vehicle_id).toStdString();
         }
 
         // Определяем цвет текста
         ImVec4 text_color = ImVec4(0.6f, 0.6f, 0.6f, 1.0f); // серый по умолчанию
 
-        if (train_id == current_train_id)
+        if (first_vehicle_id == current_vehicle_id)
         {
             text_color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); // жёлтый - текущий
         }
-        else if (train_id == controlled_train_id && train_id != current_train_id)
+        else if (first_vehicle_id == controlled_vehicle_id)
         {
             text_color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f); // зелёный - управляемый
         }
@@ -260,7 +246,7 @@ void TrainsListWidget::renderTrainsList()
         if (ImGui::IsItemHovered())
         {
             ImGui::SetTooltip("Кликните для переключения на поезд %s",
-                              train_name.isEmpty() ? QString("№%1").arg(train_id).toStdString().c_str() : train_name.toStdString().c_str());
+                              train_name.isEmpty() ? QString("№%1").arg(first_vehicle_id).toStdString().c_str() : train_name.toStdString().c_str());
         }
 
         ImGui::PopID();
@@ -270,7 +256,7 @@ void TrainsListWidget::renderTrainsList()
     ImGui::EndChild();
 
     // Кнопка "Вернуться к управляемому поезду"
-    const bool has_controlled = (controlled_train_id >= 0 && controlled_train_id != current_train_id);
+    const bool has_controlled = (controlled_vehicle_id >= 0 && controlled_vehicle_id != current_vehicle_id);
 
     ImGui::Separator();
 
@@ -278,7 +264,6 @@ void TrainsListWidget::renderTrainsList()
     {
         if (ImGui::Button("Вернуться к управляемому поезду", ImVec2(window_width - padding * 2, 0)))
         {
-            // Просто выбираем управляемый поезд
             if (controlled_vehicle_id >= 0)
             {
                 selectTrain(controlled_vehicle_id);
