@@ -188,6 +188,8 @@ void TrainsListWidget::renderTrainsList()
     window_flags |= ImGuiWindowFlags_NoTitleBar;
     window_flags |= ImGuiWindowFlags_NoResize;
     window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoNavInputs;
+    window_flags |= ImGuiWindowFlags_NoNavFocus;
 
     bool open = true;
 
