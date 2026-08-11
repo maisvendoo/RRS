@@ -44,9 +44,9 @@ bool Train::init(const init_data_t& init_data, int model_vehicles_count)
         return false;
     }
 
-    Journal::instance()->info("Loaded solver: " + solver_path);
-    Journal::instance()->info(QString("Created Solver object at address: 0x%1")
-                                  .arg(reinterpret_cast<quint64>(train_motion_solver), 0, 16));
+    Journal::instance()->info(QString("Created Solver object at address: 0x%1; loaded from: %2")
+                                  .arg(reinterpret_cast<quint64>(train_motion_solver), 0, 16)
+                                  .arg(solver_path));
 
     QString full_config_path = QString(fs.getTrainsDir().c_str()) +
             fs.separator() +
@@ -113,9 +113,9 @@ bool Train::init(const solver_config_t& solver_config, std::vector<Vehicle*>& ve
         return false;
     }
 
-    Journal::instance()->info("Loaded solver: " + solver_path);
-    Journal::instance()->info(QString("Created Solver object at address: 0x%1")
-                                  .arg(reinterpret_cast<quint64>(train_motion_solver), 0, 16));
+    Journal::instance()->info(QString("Created Solver object at address: 0x%1; loaded from: %2")
+                                  .arg(reinterpret_cast<quint64>(train_motion_solver), 0, 16)
+                                  .arg(solver_path));
 
     this->vehicles = vehicles;
     this->y = state_vector;
@@ -131,27 +131,11 @@ bool Train::init(const solver_config_t& solver_config, std::vector<Vehicle*>& ve
     }
     dydt.resize(ode_order);
 
-    Journal::instance()->info(QString("New uncoupled train! Size of vehicles %1, joints %2, state_vector %3")
+    Journal::instance()->info(QString("New uncoupled train! Address: 0x%1; size of vehicles %2, joints %3, state_vector %4")
+                                  .arg(reinterpret_cast<quint64>(this), 0, 16)
                                   .arg(this->vehicles.size(), 4)
                                   .arg(this->joints_list.size(), 4)
                                   .arg(y.size(), 4));
-/*
-    double train_coord_begin = y[0];
-    Journal::instance()->info(QString("Vehicle   0 (#%1) coordinate[  0]: %2 (  0.000)")
-                                  .arg(vehicles.front()->getModelIndex(), 4)
-                                  .arg(y[0], 7, 'f', 3));
-    for (size_t i = 1; i < vehicles.size(); ++i)
-    {
-        size_t state_idx = vehicles[i]->getStateIndex();
-        double coord = y[state_idx] - train_coord_begin;
-        Journal::instance()->info(QString("Vehicle %1 (#%2) coordinate[%3]: %4 (%5)")
-                                      .arg(i, 3)
-                                      .arg(vehicles[i]->getModelIndex(), 4)
-                                      .arg(vehicles[i]->getStateIndex(), 4)
-                                      .arg(y[state_idx], 7, 'f', 3)
-                                      .arg(coord, 7, 'f', 3));
-    }
-*/
     return true;
 }
 
@@ -177,41 +161,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
         other_veh_distances.push_back(abs(other_coord - other_begin));
         other_begin = other_coord;
     }
-/*
-    // ОТЛАДКА
-    double train1_coord_begin = y[0];
-    Journal::instance()->info(QString("Vehicle   0 (#%1) coordinate[  0]: %2 (  0.000)")
-                                  .arg(vehicles.front()->getModelIndex(), 4)
-                                  .arg(y[0], 7, 'f', 3));
-    for (size_t i = 1; i < vehicles.size(); ++i)
-    {
-        size_t state_idx = vehicles[i]->getStateIndex();
-        double coord = y[state_idx] - train1_coord_begin;
-        Journal::instance()->info(QString("Vehicle %1 (#%2) coordinate[%3]: %4 (%5)")
-                                      .arg(i, 3)
-                                      .arg(vehicles[i]->getModelIndex(), 4)
-                                      .arg(vehicles[i]->getStateIndex(), 4)
-                                      .arg(y[state_idx], 7, 'f', 3)
-                                      .arg(coord, 7, 'f', 3));
-    }
 
-    // ОТЛАДКА
-    double train2_coord_begin = other_y[0];
-    Journal::instance()->info(QString("Vehicle   0 (#%1) coordinate[  0]: %2 (  0.000)")
-                                  .arg(other_vehicles.front()->getModelIndex(), 4)
-                                  .arg(other_y[0], 7, 'f', 3));
-    for (size_t i = 1; i < other_vehicles.size(); ++i)
-    {
-        size_t state_idx = other_vehicles[i]->getStateIndex();
-        double coord = other_y[state_idx] - train2_coord_begin;
-        Journal::instance()->info(QString("Vehicle %1 (#%2) coordinate[%3]: %4 (%5)")
-                                      .arg(i, 3)
-                                      .arg(other_vehicles[i]->getModelIndex(), 4)
-                                      .arg(other_vehicles[i]->getStateIndex(), 4)
-                                      .arg(other_y[state_idx], 7, 'f', 3)
-                                      .arg(coord, 7, 'f', 3));
-    }
-*/
     // Массив межвагонных связей поезда, с которым сцепляемся
     std::vector<std::vector<Joint*>> other_joints_list = other_train->getJoints();
 
@@ -530,30 +480,6 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
     ode_order = y.size();
     train_motion_solver->setODEsize(ode_order);
     dydt.resize(ode_order);
-/*
-    // Отладка
-    Journal::instance()->info(QString("Trains coupled! Train #%1: new size of vehicles %2, joints %3, state_vector %4")
-                                  .arg(train_idx, 3)
-                                  .arg(vehicles.size(), 4)
-                                  .arg(joints_list.size(), 4)
-                                  .arg(y.size(), 4));
-
-    double train_coord_begin = y[0];
-    Journal::instance()->info(QString("Vehicle   0 (#%1) coordinate[  0]: %2 (  0.000)")
-                                  .arg(vehicles.front()->getModelIndex(), 4)
-                                  .arg(y[0], 7, 'f', 3));
-    for (size_t i = 1; i < vehicles.size(); ++i)
-    {
-        size_t state_idx = vehicles[i]->getStateIndex();
-        double coord = y[state_idx] - train_coord_begin;
-        Journal::instance()->info(QString("Vehicle %1 (#%2) coordinate[%3]: %4 (%5)")
-                                      .arg(i, 3)
-                                      .arg(vehicles[i]->getModelIndex(), 4)
-                                      .arg(vehicles[i]->getStateIndex(), 4)
-                                      .arg(y[state_idx], 7, 'f', 3)
-                                      .arg(coord, 7, 'f', 3));
-    }
-*/
 }
 
 //------------------------------------------------------------------------------
@@ -585,24 +511,7 @@ Train* Train::uncouple(double uncoupling_distance)
                                       .arg(i, 3)
                                       .arg(vehicles[i]->getModelIndex(), 4)
                                       .arg(distance, 7, 'f', 3));
-/*
-        // ОТЛАДКА
-        double train_coord_begin = y[0];
-        Journal::instance()->info(QString("Vehicle   0 (#%1) coordinate[  0]: %2 (  0.000)")
-                                      .arg(vehicles.front()->getModelIndex(), 4)
-                                      .arg(y[0], 7, 'f', 3));
-        for (size_t j = 1; j < vehicles.size(); ++j)
-        {
-            size_t state_idx = vehicles[j]->getStateIndex();
-            double coord = y[state_idx] - train_coord_begin;
-            Journal::instance()->info(QString("Vehicle %1 (#%2) coordinate[%3]: %4 (%5)")
-                                          .arg(j, 3)
-                                          .arg(vehicles[j]->getModelIndex(), 4)
-                                          .arg(vehicles[j]->getStateIndex(), 4)
-                                          .arg(y[state_idx], 7, 'f', 3)
-                                          .arg(coord, 7, 'f', 3));
-        }
-*/
+
         Train* new_train = new Train();
         new_train->setTopology(topology);
 
@@ -661,25 +570,7 @@ Train* Train::uncouple(double uncoupling_distance)
                                       .arg(vehicles.size(), 4)
                                       .arg(joints_list.size(), 4)
                                       .arg(y.size(), 4));
-/*
-        train_coord_begin = y[0];
-        Journal::instance()->info(QString("Vehicle   0 (#%1) coordinate[  0]: %2 (  0.000)")
-                                      .arg(vehicles.front()->getModelIndex(), 4)
-                                      .arg(y[0], 7, 'f', 3));
-        for (size_t i = 1; i < vehicles.size(); ++i)
-        {
-            size_t state_idx = vehicles[i]->getStateIndex();
-            double coord = y[state_idx] - train_coord_begin;
-            Journal::instance()->info(QString("Vehicle %1 (#%2) coordinate[%3]: %4 (%5)")
-                                          .arg(i, 3)
-                                          .arg(vehicles[i]->getModelIndex(), 4)
-                                          .arg(vehicles[i]->getStateIndex(), 4)
-                                          .arg(y[state_idx], 7, 'f', 3)
-                                          .arg(coord, 7, 'f', 3));
-        }
-*/
-        Journal::instance()->info(QString("Created Train object at address: 0x%1")
-                                      .arg(reinterpret_cast<quint64>(new_train), 0, 16));
+
         if (new_train->init(solver_config, new_vehicles, new_y, new_joints_list))
             return new_train;
         return nullptr;
@@ -924,13 +815,6 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
                 (first->getDirection() == -1) ?
                     first->addBackwardForce(-force) :
                     first->addForwardForce(-force);
-                /* ОТЛАДКА
-                Journal::instance()->info(QString("Train #%1: Head (#%2) with velocity%3km/h should stop at distance%4m by force%5kN")
-                                          .arg(train_idx, 3)
-                                          .arg(first->getModelIndex(), 3)
-                                          .arg(velocity * Physics::kmh, 7, 'f', 1)
-                                          .arg(distance, 7, 'f', 3)
-                                          .arg(force / 1000.0, 12, 'f', 1));*/
             }
         }
 
@@ -944,13 +828,6 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
                 (last->getDirection() == -1) ?
                     last->addForwardForce(-force) :
                     last->addBackwardForce(-force);
-                /* ОТЛАДКА
-                Journal::instance()->info(QString("Train #%1: Tail (#%2) with velocity%3km/h should stop at distance%4m by force%5kN")
-                                          .arg(train_idx, 3)
-                                          .arg(last->getModelIndex(), 3)
-                                          .arg(-velocity * Physics::kmh, 7, 'f', 1)
-                                          .arg(distance, 7, 'f', 3)
-                                          .arg(force / 1000.0, 12, 'f', 1));*/
             }
         }
 
