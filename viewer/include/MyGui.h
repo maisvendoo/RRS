@@ -8,6 +8,8 @@
 #include <vsg/core/observer_ptr.h>
 #include <QString>
 
+#include <TrainsListWidget.h>
+
 struct simulator_time_t;
 class NewSkybox;
 class Skybox;
@@ -86,6 +88,10 @@ public:
 
 private:
     vsg::ref_ptr<GUIParams> params;
+
+    TrainsListWidget *_trains_list_widget = nullptr;
+
+    TrainsListWidgetParams _trains_list_params;
 
     float font_size = 20.0f;    
 

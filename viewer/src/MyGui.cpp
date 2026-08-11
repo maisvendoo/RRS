@@ -1,6 +1,5 @@
 #include "MyGui.h"
 
-#include "Logger.h"
 #include "filesystem.h"
 #include "datetime.h"
 
@@ -43,6 +42,9 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
                                  io.Fonts->GetGlyphRangesCyrillic());
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    _trains_list_params.vehicles_handler = params->vehicles_handler;
+    _trains_list_widget = new TrainsListWidget(&_trains_list_params);
 }
 
 //------------------------------------------------------------------------------
@@ -622,6 +624,11 @@ void MyGui::showPauseState() const
 void MyGui::showHUD() const
 {
     showTimetable();
+
+    if (_trains_list_widget)
+    {
+        _trains_list_widget->show();
+    }
 }
 
 //------------------------------------------------------------------------------

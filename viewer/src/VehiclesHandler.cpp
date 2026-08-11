@@ -441,6 +441,19 @@ bool VehiclesHandler::load(
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VehiclesHandler::setCurrentVehicle(int vehicle_idx)
+{
+    if (vehicle_idx < 0 || static_cast<size_t>(vehicle_idx) >= vehicles.size())
+    {
+        return;
+    }
+
+    cur_vehicle = vehicle_idx;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VehiclesHandler::slotGetTrainsData(QByteArray &data)
 {
     update_trains.deserialize(data);

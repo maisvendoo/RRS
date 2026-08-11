@@ -88,6 +88,13 @@ public:
         return timetable;
     }
 
+    const std::vector<simulator_train_update_t>& getTrainsInfo() const
+    {
+        return update_trains.trains;
+    }
+
+    void setCurrentVehicle(int vehicle_idx);
+
 public slots:
     void slotGetTrainsData(QByteArray& data);
     void slotGetVehiclesPosData(QByteArray& data);

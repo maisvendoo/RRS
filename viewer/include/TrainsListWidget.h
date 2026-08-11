@@ -12,7 +12,7 @@
 struct TrainsListWidgetParams
 {
     VehiclesHandler *vehicles_handler = nullptr;
-    bool is_show = false;
+    bool is_visible = true;
 };
 
 //------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ private:
 
     void renderTrainsList();
 
-    void selectTrain(int train_id);
+    void selectTrain(int first_vehicle_id);
 };
 
 #endif
