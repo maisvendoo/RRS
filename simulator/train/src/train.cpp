@@ -565,6 +565,47 @@ Train* Train::uncouple(double uncoupling_distance)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Train::reverse()
+{
+    if (vehicles.size() == 1)
+    {
+        vehicles[0]->setDirection(-vehicles[0]->getDirection());
+        return;
+    }
+
+    state_vector_t new_y;
+    new_y.reserve(y.size());
+
+    for (size_t i = vehicles.size(); i > 0; --i)
+    {
+        Vehicle* vehicle = vehicles[i - 1];
+        vehicle->setDirection(-vehicle->getDirection());
+
+        size_t idx = vehicle->getStateIndex();
+        size_t s = vehicle->getDegressOfFreedom();
+
+        new_y.push_back(-y[idx]);
+        for (size_t j = idx + 1; j < idx + 2 * s; ++j)
+        {
+            new_y.push_back(y[j]);
+        }
+    }
+    for (size_t i = joints_list.size(); i > 0; --i)
+    {
+        for (auto joint : joints_list[i - 1])
+        {
+            joint->swapDevicesLinks();
+        }
+    }
+
+    y.swap(new_y);
+    std::reverse(vehicles.begin(), vehicles.end());
+    std::reverse(joints_list.begin(), joints_list.end());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Train::setDistanceToEndOfTrajectory(bool is_train_head, double distance)
 {
     if (is_train_head)

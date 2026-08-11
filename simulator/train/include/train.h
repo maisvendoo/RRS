@@ -66,6 +66,9 @@ public:
     /// Train uncoupling
     Train* uncouple(double uncoupling_distance);
 
+    /// Swap the head and the tail of Train
+    void reverse();
+
     /// Set distance to stop the train before end of trajectory
     void setDistanceToEndOfTrajectory(bool is_train_head, double distance);
 
