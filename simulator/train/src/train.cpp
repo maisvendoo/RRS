@@ -279,14 +279,6 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                 {
                     joint->swapDevicesLinks();
                 }
-                /* По идее после разворота порядка вагонов
-                 * надо развернуть и межвагонные связи,
-                 * но почему-то правильно работает как раз без всякого разворота
-                for (auto joint : other_joints_list[i - 1])
-                {
-                    joint->swapDevicesLinks();
-                }
-                */
             }
         }
         else
@@ -455,14 +447,6 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                 {
                     joint->swapDevicesLinks();
                 }
-                /* По идее после разворота порядка вагонов
-                 * надо развернуть и межвагонные связи,
-                 * но почему-то правильно работает как раз без всякого разворота
-                for (auto joint : other_joints_list[i - 1])
-                {
-                    joint->swapDevicesLinks();
-                }
-                */
             }
         }
 
