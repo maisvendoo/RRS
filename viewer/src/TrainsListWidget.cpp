@@ -72,7 +72,43 @@ void TrainsListWidget::updateCachedTrainsList()
         }
     }
 
+    // Синхронизируем выделение с текущим поездом
+    syncSelectionWithCurrentTrain();
+
     _initialized = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainsListWidget::syncSelectionWithCurrentTrain()
+{
+    auto *handler = _params->vehicles_handler;
+    if (!handler)
+        return;
+
+    const int current_vehicle_id = handler->getCurrentVehicleIndex();
+
+    // Проверяем, что current_vehicle_id есть в кэше
+    bool found = false;
+    for (int id : _cached_trains_ids)
+    {
+        if (id == current_vehicle_id)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (found)
+    {
+        _selected_train_id = current_vehicle_id;
+    }
+    else
+    {
+        // Если текущий поезд не найден в списке, сбрасываем выделение
+        _selected_train_id = -1;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -242,11 +278,10 @@ void TrainsListWidget::renderTrainsList()
     {
         if (ImGui::Button("Вернуться к управляемому поезду", ImVec2(window_width - padding * 2, 0)))
         {
-            handler->returnToControlledVehicle();
-            // Обновляем выделение
+            // Просто выбираем управляемый поезд
             if (controlled_vehicle_id >= 0)
             {
-                _selected_train_id = controlled_vehicle_id;
+                selectTrain(controlled_vehicle_id);
             }
         }
     }

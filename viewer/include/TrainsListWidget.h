@@ -42,6 +42,8 @@ private:
 
     void updateCachedTrainsList();
 
+    void syncSelectionWithCurrentTrain();
+
     void renderTrainsList();
 
     void selectTrain(int first_vehicle_id);
