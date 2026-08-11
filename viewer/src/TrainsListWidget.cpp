@@ -25,6 +25,7 @@ void TrainsListWidget::show()
     }
 
     updateCachedTrainsList();
+    syncSelectionWithCurrentTrain();
     renderTrainsList();
 }
 
@@ -114,9 +115,6 @@ void TrainsListWidget::syncSelectionWithCurrentTrain()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void TrainsListWidget::renderTrainsList()
 {
     auto *handler = _params->vehicles_handler;
@@ -132,9 +130,25 @@ void TrainsListWidget::renderTrainsList()
         return;
     }
 
-    // Получаем информацию о текущем и управляемом поездах
+    // Получаем информацию о текущем и управляемом вагонах
     const int current_vehicle_id = handler->getCurrentVehicleIndex();
     const int controlled_vehicle_id = handler->getControlledVehicleIndex();
+
+    // Получаем train_id для текущего и управляемого вагонов
+    const auto& vehicles = handler->getVehicles();
+
+    int current_train_id = -1;
+    int controlled_train_id = -1;
+
+    if (current_vehicle_id >= 0 && static_cast<size_t>(current_vehicle_id) < vehicles.size())
+    {
+        current_train_id = vehicles[current_vehicle_id].train_id;
+    }
+
+    if (controlled_vehicle_id >= 0 && static_cast<size_t>(controlled_vehicle_id) < vehicles.size())
+    {
+        controlled_train_id = vehicles[controlled_vehicle_id].train_id;
+    }
 
     const auto& trains = handler->getTrainsInfo();
 
@@ -193,14 +207,20 @@ void TrainsListWidget::renderTrainsList()
 
     ImGui::BeginChild("##TrainsListScroll", ImVec2(0, scroll_height), true);
 
+    // Делаем подсветку при наведении полупрозрачной
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.3f));
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.2f, 0.2f, 0.2f, 0.2f));
+
     for (size_t i = 0; i < _cached_trains_ids.size(); ++i)
     {
         const int first_vehicle_id = _cached_trains_ids[i];
 
-        // Находим имя поезда
+        // Находим имя поезда и его train_id (индекс в векторе trains)
         QString train_name = "Поезд";
+        int train_id = -1;
         for (const auto& train : trains)
         {
+            ++train_id;
             if (train.first_vehicle_id == first_vehicle_id)
             {
                 train_name = train.train_name;
@@ -219,16 +239,17 @@ void TrainsListWidget::renderTrainsList()
             display_text = QString("%1 (ID: %2)").arg(train_name).arg(first_vehicle_id).toStdString();
         }
 
-        // Определяем цвет текста
+        // Определяем цвет
         ImVec4 text_color = ImVec4(0.6f, 0.6f, 0.6f, 1.0f); // серый по умолчанию
 
-        if (first_vehicle_id == current_vehicle_id)
+        // Сравниваем train_id поезда из списка с train_id текущего и управляемого вагонов
+        if (train_id == current_train_id)
         {
-            text_color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); // жёлтый - текущий
+            text_color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); // ЖЁЛТЫЙ - текущий поезд
         }
-        else if (first_vehicle_id == controlled_vehicle_id)
+        else if (train_id == controlled_train_id)
         {
-            text_color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f); // зелёный - управляемый
+            text_color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f); // ЗЕЛЁНЫЙ - управляемый поезд
         }
 
         ImGui::PushStyleColor(ImGuiCol_Text, text_color);
@@ -253,10 +274,12 @@ void TrainsListWidget::renderTrainsList()
         ImGui::PopStyleColor();
     }
 
+    ImGui::PopStyleColor(2);  // Убираем стили подсветки
+
     ImGui::EndChild();
 
     // Кнопка "Вернуться к управляемому поезду"
-    const bool has_controlled = (controlled_vehicle_id >= 0 && controlled_vehicle_id != current_vehicle_id);
+    const bool has_controlled = (controlled_train_id >= 0 && controlled_train_id != current_train_id);
 
     ImGui::Separator();
 
