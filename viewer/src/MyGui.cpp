@@ -42,7 +42,7 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
                                  NULL,
                                  io.Fonts->GetGlyphRangesCyrillic());
 
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
     _trains_list_params.vehicles_handler = params->vehicles_handler;
     _trains_list_params.viewer_handler = params->viewer_handler;
