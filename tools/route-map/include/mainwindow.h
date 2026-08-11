@@ -133,7 +133,7 @@ private slots:
 
     void slotGetTrainsInfo(QByteArray& data);
 
-    void slotRenameTrainMenu();
+    void slotTrainMenu();
 
     void slotSetSimSpeed(bool is_cheked);
 

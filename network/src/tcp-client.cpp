@@ -186,7 +186,7 @@ void TcpClient::sendReverseTrain(int train_idx)
     if (!canSend()) return;
 
     network_data_t request;
-    request.stype = STYPE_COMMAND_RENAME_TRAIN;
+    request.stype = STYPE_COMMAND_REVERSE_TRAIN;
 
     QDataStream stream(&request.data, QIODevice::WriteOnly);
 

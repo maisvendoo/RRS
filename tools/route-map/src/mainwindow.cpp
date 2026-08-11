@@ -1132,7 +1132,7 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
         train_label->first_vehicle_idx = update_trains.trains[i].first_vehicle_id;
         train_label->train_idx = i;
 
-        connect(train_label, &TrainLabel::popUpMenu, this, &MainWindow::slotRenameTrainMenu);
+        connect(train_label, &TrainLabel::popUpMenu, this, &MainWindow::slotTrainMenu);
         map->train_labels.push_back(train_label);
 
         QAction *action_train = new QAction(train_name);
@@ -1150,16 +1150,18 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotRenameTrainMenu()
+void MainWindow::slotTrainMenu()
 {
     TrainLabel *train_label = dynamic_cast<TrainLabel *>(sender());
+    int train_idx = train_label->train_idx;
 
     QMenu *menu = new QMenu(this);
 
+    // Меню переименования поезда
     QAction *rename = new QAction(tr("Rename"), this);
     menu->addAction(rename);
 
-    connect(rename, &QAction::triggered, this, [this, train_label]{
+    connect(rename, &QAction::triggered, this, [this, train_idx]{
 
         bool ok = false;
         QString new_name = QInputDialog::getText(
@@ -1172,8 +1174,16 @@ void MainWindow::slotRenameTrainMenu()
             );
 
         if (ok && !new_name.isEmpty()) {
-            this->tcp_client->sendNewTrainName(train_label->train_idx, new_name);
+            this->tcp_client->sendNewTrainName(train_idx, new_name);
         }
+    });
+
+    // Меню разворота головы-хвоста поезда
+    QAction *reverse = new QAction(tr("Reverse"), this);
+    menu->addAction(reverse);
+
+    connect(reverse, &QAction::triggered, this, [this, train_idx]{
+            this->tcp_client->sendReverseTrain(train_idx);
     });
 
     menu->exec(QCursor::pos());
