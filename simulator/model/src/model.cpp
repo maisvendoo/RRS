@@ -1003,6 +1003,8 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::sigRenameTrain, this, &Model::slotRenameTrainInModel);
 
+    connect(tcp_server, &TcpServer::sigReverseTrain, this, &Model::slotReverseTrain);
+
     connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
 
     Journal::instance()->info("TCP server is initialized successfully");    
@@ -1378,13 +1380,33 @@ void Model::slotRenameTrainInModel(int train_idx, QString new_name)
 
     if (t_idx >= trains.size())
     {
-        Journal::instance()->error(QString("Rename train: Train index out of range (%1)").arg(t_idx, 4));
+        Journal::instance()->error(QString("Rename train: Train index out of range (%1/%2)").arg(t_idx).arg(trains.size()));
         return;
     }
 
     trains[t_idx]->setName(new_name.toStdString());
 
-    Journal::instance()->info(QString("Rename train: Train %1 has new name %2").arg(t_idx, 4).arg(new_name));
+    Journal::instance()->info(QString("Rename train: Train #%1 has new name %2").arg(t_idx).arg(new_name));
+
+    is_trains_changed = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotReverseTrain(int train_idx)
+{
+    size_t t_idx = static_cast<size_t>(train_idx);
+
+    if (t_idx >= trains.size())
+    {
+        Journal::instance()->error(QString("Reverse train: Train index out of range (%1/%2)").arg(t_idx).arg(trains.size()));
+        return;
+    }
+
+    trains[t_idx]->reverse();
+
+    Journal::instance()->info(QString("Reverse train #%1").arg(t_idx));
 
     is_trains_changed = true;
 }

@@ -238,6 +238,8 @@ private slots:
 
     void slotRenameTrainInModel(int train_idx, QString new_name);
 
+    void slotReverseTrain(int train_idx);
+
     void slotGetTrainParams(int train_idx, double &train_len, double &train_mass);
 
     /// Связывание сигналов и слотов для загрузки сценария в модули автоведения
