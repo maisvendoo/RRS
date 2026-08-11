@@ -9,6 +9,7 @@
 #include "UpdateStatisticsHandler.h"
 #include "UpdateControlToServerHandler.h"
 #include "VehiclesHandler.h"
+#include "UpdateViewerHandler.h"
 #include <tcp-client.h>
 
 #include <vsg/io/Options.h>
@@ -44,6 +45,7 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
     _trains_list_params.vehicles_handler = params->vehicles_handler;
+    _trains_list_params.viewer_handler = params->viewer_handler;
     _trains_list_widget = new TrainsListWidget(&_trains_list_params);
 }
 
@@ -624,6 +626,12 @@ void MyGui::showPauseState() const
 void MyGui::showHUD() const
 {
     showTimetable();
+
+    // Обновляем указатель на vehicles_handler при каждом кадре
+    if (params->vehicles_handler != _trains_list_params.vehicles_handler)
+    {
+        _trains_list_params.vehicles_handler = params->vehicles_handler;
+    }
 
     if (_trains_list_widget)
     {

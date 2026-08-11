@@ -95,6 +95,11 @@ public:
 
     void setCurrentVehicle(int vehicle_idx);
 
+    const std::vector<VehicleExterior>& getVehicles() const
+    {
+        return vehicles;
+    }
+
 public slots:
     void slotGetTrainsData(QByteArray& data);
     void slotGetVehiclesPosData(QByteArray& data);

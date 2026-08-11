@@ -2,6 +2,7 @@
 #define     TRAINS_LIST_WIDGET
 
 #include    <VehiclesHandler.h>
+#include    <UpdateViewerHandler.h>
 #include    <vsgImGui/imgui.h>
 #include    <QString>
 #include    <vector>
@@ -12,6 +13,7 @@
 struct TrainsListWidgetParams
 {
     VehiclesHandler *vehicles_handler = nullptr;
+    UpdateViewerHandler* viewer_handler = nullptr;
     bool is_visible = true;
 };
 

@@ -802,6 +802,7 @@ void RouteViewer::initViewer()
 
     GUIparams->viewer = viewer;
     GUIparams->vehicles_handler = vehicles_handler.get();
+    GUIparams->viewer_handler = upd_viewer_handler.get();
     GUIparams->statistics_handler = upd_statistis_handler.get();
     GUIparams->controls_handler = upd_server_control.get();
 

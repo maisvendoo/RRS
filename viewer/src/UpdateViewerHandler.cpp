@@ -598,6 +598,17 @@ void UpdateViewerHandler::changeCurrentVehicle()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void UpdateViewerHandler::forceUpdateCamera()
+{
+    if (_current_manipulator)
+    {
+        _current_manipulator->resetView();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void UpdateViewerHandler::changeCurrentCabine()
 {
     VehicleExterior* vehicle = _vehicles_handler->getCurrentVehicle();

@@ -15,6 +15,7 @@ class NewSkybox;
 class Skybox;
 class Sun;
 class VehiclesHandler;
+class UpdateViewerHandler;
 class UpdateStatisticsHandler;
 class UpdateControlToServerHandler;
 class TcpClient;
@@ -30,6 +31,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     // Skybox *skybox = nullptr;
     NewSkybox* new_skybox = nullptr;  // Owned by RouteViewer
     VehiclesHandler *vehicles_handler = nullptr;
+    UpdateViewerHandler *viewer_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
     UpdateControlToServerHandler *controls_handler = nullptr;
     TcpClient *tcp_client = nullptr;
@@ -89,9 +91,9 @@ public:
 private:
     vsg::ref_ptr<GUIParams> params;
 
-    TrainsListWidget *_trains_list_widget = nullptr;
+    mutable TrainsListWidget *_trains_list_widget = nullptr;
 
-    TrainsListWidgetParams _trains_list_params;
+    mutable TrainsListWidgetParams _trains_list_params;
 
     float font_size = 20.0f;    
 

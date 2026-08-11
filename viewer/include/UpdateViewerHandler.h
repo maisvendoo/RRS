@@ -70,6 +70,10 @@ public:
     void apply(vsg::TouchUpEvent& touchUp) override;
     void apply(vsg::TouchMoveEvent& touchMove) override;
 
+    void changeCurrentVehicle();
+
+    void forceUpdateCamera();
+
 private:
     /// compute non-dimensional window coordinate (-1, 1) from event coords
     vsg::dvec2 ndc(const vsg::PointerEvent& event) const;
@@ -82,7 +86,6 @@ private:
     bool isCtrl() const;
     bool isShift() const;
 
-    void changeCurrentVehicle();
 
     void changeCurrentCabine();
 
