@@ -63,6 +63,8 @@ signals:
 
     void sigRenameTrain(int train_idx, QString new_name);
 
+    void sigReverseTrain(int train_idx);
+
     void sigSetSimSpeed(int speed_factor);
 
 private:

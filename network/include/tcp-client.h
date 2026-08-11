@@ -49,6 +49,8 @@ public:
 
     void sendNewTrainName(int train_idx, const QString &new_name);
 
+    void sendReverseTrain(int train_idx);
+
     void sendSimSpeedCommand(int speed_factor);
 
     bool isConnected() const;

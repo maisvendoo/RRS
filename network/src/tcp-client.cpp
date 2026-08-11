@@ -181,6 +181,24 @@ void TcpClient::sendNewTrainName(int train_idx, const QString &new_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendReverseTrain(int train_idx)
+{
+    if (!canSend()) return;
+
+    network_data_t request;
+    request.stype = STYPE_COMMAND_RENAME_TRAIN;
+
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
+
+    stream << train_idx;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpClient::sendSimSpeedCommand(int speed_factor)
 {
     if (!canSend()) return;

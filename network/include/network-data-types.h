@@ -57,7 +57,8 @@ enum StructureType : uint8_t
     STYPE_VEHICLE_CONTROLLED_UPDATE,
 
     STYPE_COMMAND_RENAME_TRAIN,
-    STYPE_COMMAND_SET_SIMULATION_SPEED
+    STYPE_COMMAND_SET_SIMULATION_SPEED,
+    STYPE_COMMAND_REVERSE_TRAIN
 };
 
 //------------------------------------------------------------------------------

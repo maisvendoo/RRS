@@ -258,7 +258,23 @@ void TcpServer::process_client_request(client_data_t &client_data)
 
         break;
     }
+    case STYPE_COMMAND_REVERSE_TRAIN:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
 
+        int train_idx = -1;
+        stream >> train_idx;
+
+        if (train_idx < 0)
+        {
+            //Journal::instance()->error("Reverse train: Invalide train index");
+            break;
+        }
+
+        emit sigReverseTrain(train_idx);
+
+        break;
+    }
     case STYPE_COMMAND_SET_SIMULATION_SPEED:
     {
         simspeed_command_t sc;
