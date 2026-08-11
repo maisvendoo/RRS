@@ -97,10 +97,6 @@ public:
 
     size_t getVehiclesNumber() const;
 
-    QString getClientName();
-
-    QString getTrainID();
-
     std::vector<Vehicle*>* getVehicles();
 
     void setTopology(Topology* topology);
@@ -160,12 +156,6 @@ private:
 
     /// Motion ODE's solver
     Solver*     train_motion_solver = nullptr;
-
-    /// Имя сетевого клиента для ВЖД
-    QString     client_name;
-
-    /// Идентификатор поезда для ВЖД
-    QString     train_id;
 
     /// All train's vehicles
     std::vector<Vehicle*> vehicles;

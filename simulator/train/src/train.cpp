@@ -710,22 +710,6 @@ size_t Train::getVehiclesNumber() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString Train::getClientName()
-{
-    return client_name;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-QString Train::getTrainID()
-{
-    return train_id;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 std::vector<Vehicle*>* Train::getVehicles()
 {
     return &vehicles;
@@ -882,16 +866,6 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
         if (!cfg.getBool("Common", "NoAir", no_air))
         {
             no_air = false;
-        }
-
-        if (!cfg.getString("Common", "ClientName", client_name))
-        {
-            client_name = "";
-        }
-
-        if (!cfg.getString("Common", "TrainID", train_id))
-        {
-            train_id = "";
         }
 
         QDomNode vehicle_node = cfg.getFirstSection("Vehicle");
