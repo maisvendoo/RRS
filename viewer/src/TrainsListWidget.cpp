@@ -270,6 +270,7 @@ void TrainsListWidget::selectTrain(int first_vehicle_id)
 
     if (!handler || !viewer_handler)
     {
+        LOG_INFO("ERROR!!!");
         return;
     }
 
@@ -279,7 +280,6 @@ void TrainsListWidget::selectTrain(int first_vehicle_id)
     {
         handler->setCurrentVehicle(first_vehicle_id);
         viewer_handler->changeCurrentVehicle();
-        viewer_handler->forceUpdateCamera();
         LOG_INFO("Swithced to train with first vehicle %d", first_vehicle_id);
     }
 }

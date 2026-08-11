@@ -633,6 +633,11 @@ void MyGui::showHUD() const
         _trains_list_params.vehicles_handler = params->vehicles_handler;
     }
 
+    if (params->viewer_handler != _trains_list_params.viewer_handler)
+    {
+        _trains_list_params.viewer_handler = params->viewer_handler;
+    }
+
     if (_trains_list_widget)
     {
         _trains_list_widget->show();

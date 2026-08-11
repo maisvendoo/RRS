@@ -72,8 +72,6 @@ public:
 
     void changeCurrentVehicle();
 
-    void forceUpdateCamera();
-
 private:
     /// compute non-dimensional window coordinate (-1, 1) from event coords
     vsg::dvec2 ndc(const vsg::PointerEvent& event) const;
