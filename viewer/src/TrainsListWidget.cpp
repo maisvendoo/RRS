@@ -234,11 +234,11 @@ void TrainsListWidget::renderTrainsList()
         std::string display_text;
         if (train_name.isEmpty() || train_name == "Поезд")
         {
-            display_text = QString("Поезд #%1").arg(first_vehicle_id).toStdString();
+            display_text = QString("#%1 Поезд #%2").arg(train_id).arg(first_vehicle_id).toStdString();
         }
         else
         {
-            display_text = QString("%1 (ID: %2)").arg(train_name).arg(first_vehicle_id).toStdString();
+            display_text = QString("#%1 %2 (ID: %3)").arg(train_id).arg(train_name).arg(first_vehicle_id).toStdString();
         }
 
         // Определяем цвет
