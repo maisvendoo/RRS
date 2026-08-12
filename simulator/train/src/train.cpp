@@ -567,29 +567,44 @@ Train* Train::uncouple(double uncoupling_distance)
 //------------------------------------------------------------------------------
 void Train::reverse()
 {
+    // Поезд из единственной ПЕ - примитивный разворот ориентации
     if (vehicles.size() == 1)
     {
         vehicles[0]->setDirection(-vehicles[0]->getDirection());
         return;
     }
 
+    // Заготовка под разворот вектора состояния
     state_vector_t new_y;
     new_y.reserve(y.size());
 
+    // Проходим по ПЕ, от хвоста к голове
     for (size_t i = vehicles.size(); i > 0; --i)
     {
+        // Текущий индекс и количество величин (степеней свободы) в векторе состояния
         Vehicle* vehicle = vehicles[i - 1];
-        vehicle->setDirection(-vehicle->getDirection());
-
         size_t idx = vehicle->getStateIndex();
         size_t s = vehicle->getDegressOfFreedom();
 
+        // Разворачиваем ориентацию
+        vehicle->setDirection(-vehicle->getDirection());
+        // Новый индекс в векторе состояния после разворота
+        vehicle->setStateIndex(new_y.size());
+
+        // Добавляем величины этой ПЕ в новый вектор состояния
+        // Координату и скорость берём с противоположным знаком
         new_y.push_back(-y[idx]);
-        for (size_t j = idx + 1; j < idx + 2 * s; ++j)
+        for (size_t j = idx + 1; j < idx + s; ++j)
+        {
+            new_y.push_back(y[j]);
+        }
+        new_y.push_back(-y[idx + s]);
+        for (size_t j = idx + s + 1; j < idx + 2 * s; ++j)
         {
             new_y.push_back(y[j]);
         }
     }
+    // Разворачиваем межвагонные связи
     for (size_t i = joints_list.size(); i > 0; --i)
     {
         for (auto joint : joints_list[i - 1])
@@ -598,7 +613,9 @@ void Train::reverse()
         }
     }
 
+    // Присваиваем новый вектор состояния
     y.swap(new_y);
+    // Разворачиваем порядок хранения указателей на ПЕ и межвагонные связи
     std::reverse(vehicles.begin(), vehicles.end());
     std::reverse(joints_list.begin(), joints_list.end());
 }
