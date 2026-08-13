@@ -6,6 +6,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 project (RRS VERSION 1.9.3)
 
+add_library(optflags INTERFACE)
+
+# Подключаем флаги
+include(cmake/OptimizationFlags.cmake)
+
 # RPATH configuration for finding shared libraries at runtime
 if(APPLE)
     set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
@@ -128,3 +133,10 @@ install(
         ${CMAKE_CURRENT_BINARY_DIR}/RRSConfigVersion.cmake
     DESTINATION sdk/lib/cmake
 )
+
+get_property(all_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+foreach(target ${all_targets})
+    if(TARGET ${target} AND NOT target STREQUAL "optflags")
+        target_link_libraries(${target} PRIVATE optflags)
+    endif()
+endforeach()
