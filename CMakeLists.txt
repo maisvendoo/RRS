@@ -133,10 +133,3 @@ install(
         ${CMAKE_CURRENT_BINARY_DIR}/RRSConfigVersion.cmake
     DESTINATION sdk/lib/cmake
 )
-
-get_property(all_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
-foreach(target ${all_targets})
-    if(TARGET ${target} AND NOT target STREQUAL "optflags")
-        target_link_libraries(${target} PRIVATE optflags)
-    endif()
-endforeach()

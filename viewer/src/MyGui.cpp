@@ -473,7 +473,7 @@ void MyGui::showNoControlled() const
     bool open_ptr = true;
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
-    ImGui::Begin(u8"Состояние управления", &open_ptr, window_flags);
+    ImGui::Begin(u8"Состояние управления ПЕ", &open_ptr, window_flags);
     ImGui::PopStyleColor();
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     ImGui::Text(u8"%s", text);
@@ -509,7 +509,7 @@ void MyGui::showNoCabineControl() const
     bool open_ptr = true;
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
-    ImGui::Begin(u8"Состояние управления", &open_ptr, window_flags);
+    ImGui::Begin(u8"Состояние управления кабиной", &open_ptr, window_flags);
     ImGui::PopStyleColor();
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     ImGui::Text(u8"%s", text);
