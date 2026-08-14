@@ -11,6 +11,22 @@ message(STATUS "Configuring build settings...")
 message(STATUS "========================================")
 
 # ============================================
+# 1. POSITION INDEPENDENT CODE (-fPIC)
+# ============================================
+
+# Включаем -fPIC для всех целей на Unix (нужно для shared libraries)
+if(UNIX)
+    # Для всех целей (включая статические библиотеки)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    
+    # Дополнительно для GCC/Clang
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+        add_compile_options(-fPIC)
+        message(STATUS "  - -fPIC enabled for all targets")
+    endif()
+endif()
+
+# ============================================
 # 1. УРОВЕНЬ ОПТИМИЗАЦИИ ДЛЯ RELEASE
 # ============================================
 
