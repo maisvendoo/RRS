@@ -11,7 +11,51 @@ message(STATUS "Configuring build settings...")
 message(STATUS "========================================")
 
 # ============================================
-# 1. ОТЛАДОЧНЫЕ СИМВОЛЫ ДЛЯ RELWITHDEBINFO
+# 1. УРОВЕНЬ ОПТИМИЗАЦИИ ДЛЯ RELEASE
+# ============================================
+
+# Опция для выбора уровня оптимизации в Release
+# Возможные значения: O0, O1, O2, O3, Os, Ofast
+set(RELEASE_OPTIMIZATION_LEVEL "O3" CACHE STRING 
+    "Optimization level for Release builds (O0, O1, O2, O3, Os, Ofast)")
+
+# Проверка корректности значения
+if(NOT RELEASE_OPTIMIZATION_LEVEL MATCHES "^(O0|O1|O2|O3|Os|Ofast)$")
+    message(WARNING "  - Invalid RELEASE_OPTIMIZATION_LEVEL: ${RELEASE_OPTIMIZATION_LEVEL}")
+    message(WARNING "  - Using default: O3")
+    set(RELEASE_OPTIMIZATION_LEVEL "O3" CACHE STRING 
+        "Optimization level for Release builds (O0, O1, O2, O3, Os, Ofast)" FORCE)
+endif()
+
+# Применяем уровень оптимизации для Release
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+        add_compile_options(-${RELEASE_OPTIMIZATION_LEVEL})
+        message(STATUS "  - Release optimization level: -${RELEASE_OPTIMIZATION_LEVEL}")
+        
+        # Дополнительные флаги для высоких уровней оптимизации
+        if(RELEASE_OPTIMIZATION_LEVEL STREQUAL "O3" OR RELEASE_OPTIMIZATION_LEVEL STREQUAL "Ofast")
+            add_compile_options(
+                -funroll-loops
+                -ffinite-math-only
+                -fno-signed-zeros
+            )
+            message(STATUS "  - Additional optimizations enabled (unroll-loops, fast-math)")
+        endif()
+        
+        # Для Ofast добавляем еще больше агрессивных оптимизаций
+        if(RELEASE_OPTIMIZATION_LEVEL STREQUAL "Ofast")
+            add_compile_options(
+                -fno-math-errno
+                -fno-trapping-math
+            )
+            message(STATUS "  - Ofast: aggressive math optimizations enabled")
+        endif()
+    endif()
+endif()
+
+# ============================================
+# 2. ОТЛАДОЧНЫЕ СИМВОЛЫ ДЛЯ RELWITHDEBINFO
 # ============================================
 
 # Добавляем отладочные символы для RelWithDebInfo
@@ -33,7 +77,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 endif()
 
 # ============================================
-# 2. ADDRESS SANITIZER (ASan) ДЛЯ DEBUG
+# 3. ADDRESS SANITIZER (ASan) ДЛЯ DEBUG
 # ============================================
 
 option(ENABLE_ASAN "Enable Address Sanitizer for Debug builds" OFF)
@@ -68,7 +112,7 @@ if(ENABLE_ASAN)
 endif()
 
 # ============================================
-# 3. ДОПОЛНИТЕЛЬНЫЕ ОПЦИИ
+# 4. ДОПОЛНИТЕЛЬНЫЕ ОПЦИИ
 # ============================================
 
 # Можно добавить свои флаги через переменную окружения
