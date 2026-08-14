@@ -6,6 +6,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 project (RRS VERSION 1.9.3)
 
+# Подключаем дополнительные настройки
+include(cmake/BuildConfiguration.cmake)
+
 # RPATH configuration for finding shared libraries at runtime
 if(APPLE)
     set(CMAKE_INSTALL_RPATH "@executable_path/../lib")

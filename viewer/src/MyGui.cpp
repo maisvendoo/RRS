@@ -42,7 +42,7 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
                                  NULL,
                                  io.Fonts->GetGlyphRangesCyrillic());
 
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
     _trains_list_params.vehicles_handler = params->vehicles_handler;
     _trains_list_params.viewer_handler = params->viewer_handler;
@@ -473,7 +473,7 @@ void MyGui::showNoControlled() const
     bool open_ptr = true;
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
-    ImGui::Begin(u8"Состояние управления", &open_ptr, window_flags);
+    ImGui::Begin(u8"Состояние управления ПЕ", &open_ptr, window_flags);
     ImGui::PopStyleColor();
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     ImGui::Text(u8"%s", text);
@@ -509,7 +509,7 @@ void MyGui::showNoCabineControl() const
     bool open_ptr = true;
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
-    ImGui::Begin(u8"Состояние управления", &open_ptr, window_flags);
+    ImGui::Begin(u8"Состояние управления кабиной", &open_ptr, window_flags);
     ImGui::PopStyleColor();
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     ImGui::Text(u8"%s", text);
