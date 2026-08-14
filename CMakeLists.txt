@@ -6,10 +6,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 project (RRS VERSION 1.9.3)
 
-add_library(optflags INTERFACE)
-
-# Подключаем флаги
-include(cmake/OptimizationFlags.cmake)
+# Подключаем дополнительные настройки
+include(cmake/BuildConfiguration.cmake)
 
 # RPATH configuration for finding shared libraries at runtime
 if(APPLE)
