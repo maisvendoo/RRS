@@ -106,6 +106,8 @@ client_data_t::client_data_t()
     , controlled_update_prev_time(0.0)
     , players_update_interval(0.0)
     , players_update_prev_time(0.0)
+    , profile_update_interval(0.0)
+    , profile_update_prev_time(0.0)
     , socket(nullptr)
     , received_data()
 {

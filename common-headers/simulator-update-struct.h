@@ -622,4 +622,137 @@ struct simulator_vehicle_controlled_update_t final
     }
 };
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_train_profile_point_t final
+{
+    /// Дистанция от середины поезда вдоль пути, м (вперёд по ходу - «+», назад - «-»)
+    float distance = 0.0f;
+
+    /// Высота пути, м
+    float elevation = 0.0f;
+
+    /// Железнодорожный пикетаж в этой точке, м
+    float railway_coord = 0.0f;
+
+    /// Уклон профиля на сегменте, в тысячных
+    float inclination = 0.0f;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << distance;
+        stream << elevation;
+        stream << railway_coord;
+        stream << inclination;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> distance;
+        stream >> elevation;
+        stream >> railway_coord;
+        stream >> inclination;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_train_profile_update_t final
+{
+    /// Индекс поезда на текущий кадр
+    int train_id = 0;
+
+    /// Модель-индекс средней ПЕ - точка отсчёта профиля (distance = 0)
+    int middle_vehicle_id = 0;
+
+    /// Направление движения: +1 вперёд по профилю, -1 назад
+    int direction = 1;
+
+    /// Скорость поезда, м/с
+    float speed = 0.0f;
+
+    /// Фактические протяжённости профиля назад и вперёд, м
+    float backward = 0.0f;
+    float forward = 0.0f;
+
+    /// Вершины ломаной профиля, упорядочены по distance от -backward до +forward
+    std::vector<simulator_train_profile_point_t> profile;
+
+    /// Смещения вагонов от средней ПЕ, м;
+    /// индекс = модель-индекс ПЕ, размер = общее число ПЕ
+    std::vector<float> vehicle_offsets;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << train_id;
+        stream << middle_vehicle_id;
+        stream << direction;
+        stream << speed;
+        stream << backward;
+        stream << forward;
+
+        stream << static_cast<std::uint32_t>(profile.size());
+        for (const auto& point : profile)
+        {
+            stream << point.serialize();
+        }
+
+        stream << static_cast<std::uint32_t>(vehicle_offsets.size());
+        for (float offset : vehicle_offsets)
+        {
+            stream << offset;
+        }
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> train_id;
+        stream >> middle_vehicle_id;
+        stream >> direction;
+        stream >> speed;
+        stream >> backward;
+        stream >> forward;
+
+        std::uint32_t num = 0;
+        stream >> num;
+
+        profile.clear();
+        profile.resize(num);
+
+        for (auto& point : profile)
+        {
+            QByteArray point_data;
+            stream >> point_data;
+
+            point.deserialize(point_data);
+        }
+
+        stream >> num;
+
+        vehicle_offsets.clear();
+        vehicle_offsets.resize(num);
+
+        for (auto& offset : vehicle_offsets)
+        {
+            stream >> offset;
+        }
+    }
+};
+
 #endif // SIMULATOR_UPDATE_STRUCT_H
