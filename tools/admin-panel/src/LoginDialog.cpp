@@ -71,8 +71,8 @@ bool LoginDialog::getCredentials(QWidget* parent, QString& username, QString& pa
 {
     LoginDialog dialog(parent);
 
-    // Наследуем стиль основного окна
-    dialog.setStyleSheet(parent ? parent->styleSheet() : QString());
+    // Общая тема оформления применяется через QApplication,
+    // диалог наследует её автоматически
 
     if (dialog.exec() != QDialog::Accepted)
     {

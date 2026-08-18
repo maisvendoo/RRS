@@ -7,6 +7,7 @@
 
 #include    <QApplication>
 #include    <QFile>
+#include    <QDir>
 #include    <QDebug>
 
 #include    "MainWindow.h"
@@ -18,13 +19,22 @@ int main(int argc, char *argv[])
     app.setApplicationName("AdminPanel");
     app.setApplicationVersion("1.0.0");
 
-    // Загрузка стилей
-    QFile styleFile(":/resources/styles.qss");
-    if (styleFile.exists() && styleFile.open(QFile::ReadOnly))
+    // Загрузка общей темы оформления проекта (../themes/dark-jedy.qss)
+    QString basePath = QCoreApplication::applicationDirPath();
+    QDir baseDir(basePath);
+    baseDir.cdUp();
+    QString themePath = baseDir.absolutePath() + "/themes/dark-jedy.qss";
+
+    QFile themeFile(themePath);
+    if (themeFile.exists() && themeFile.open(QFile::ReadOnly))
     {
-        QString style = QLatin1String(styleFile.readAll());
+        QString style = QLatin1String(themeFile.readAll());
         app.setStyleSheet(style);
-        styleFile.close();
+        themeFile.close();
+    }
+    else
+    {
+        qWarning() << "Theme file not found:" << themePath;
     }
 
     MainWindow window;
