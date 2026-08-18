@@ -26,6 +26,9 @@
 //------------------------------------------------------------------------------
 void VL60pk::slotAutoStart()
 {
+    if (autostart_mode != AUTOSTART_ON)
+        return;
+
     if (start_count < triggers.size())
     {
         if ((triggers[start_count] == &gv_tumbler[autostart_cab]) &&
