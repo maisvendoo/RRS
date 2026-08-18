@@ -34,6 +34,7 @@ public:
     void sendSuccess(const QString& message);
     void sendStatus(const QJsonObject& status);
     void sendAuthSuccess();
+    void sendAuthFailed(const QString& reason);
 
     QTcpSocket* getSocket() const { return m_socket; }
     QString getClientAddress() const;

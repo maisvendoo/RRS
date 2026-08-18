@@ -33,6 +33,8 @@ public:
     void startSimulation(const QString& route, const QString& scenario);
     void stopSimulation();
     void getStatus();
+    void authenticate(const QString& username, const QString& password);
+    bool isAuthenticated() const;
 
 signals:
     void connected();
@@ -44,6 +46,8 @@ signals:
     void statusReceived(const QJsonObject& status);
     void simulationStarted();
     void simulationStopped();
+    void authSucceeded();
+    void authFailed(const QString& reason);
     void messageReceived(const QJsonObject& message);
 
 private slots:
@@ -57,6 +61,7 @@ private:
     QTimer*         m_heartbeatTimer;
     QString         m_host;
     quint16         m_port;
+    bool            m_authenticated;
 };
 
 #endif // PROTOCOLHANDLER_H

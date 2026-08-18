@@ -446,7 +446,7 @@ void ServerCore::handleAuth(ProtocolHandler* client, const QJsonObject& message)
     {
         client->setAuthenticated(false);
         qWarning() << "Authentication failed for client:" << client->getClientAddress();
-        client->sendError("Authentication failed");
+        client->sendAuthFailed("Authentication failed");
     }
 }
 
