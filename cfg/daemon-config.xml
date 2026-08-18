@@ -24,4 +24,8 @@
         <Group>simulator</Group>
         <Umask>027</Umask>
     </Security>
+    <Auth>
+        <Username>admin</Username>
+        <Password>admin</Password>
+    </Auth>
 </Config>
