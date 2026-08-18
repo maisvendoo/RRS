@@ -29,6 +29,11 @@ ClientCore::ClientCore(QObject* parent)
     connect(m_protocol, &ProtocolHandler::error,
             this, &ClientCore::onError);
 
+    connect(m_protocol, &ProtocolHandler::authSucceeded,
+            this, &ClientCore::onAuthSucceeded);
+    connect(m_protocol, &ProtocolHandler::authFailed,
+            this, &ClientCore::onAuthFailed);
+
     connect(m_protocol, &ProtocolHandler::routesReceived,
             this, &ClientCore::onRoutesReceived);
     connect(m_protocol, &ProtocolHandler::scenariosReceived,
@@ -133,6 +138,25 @@ void ClientCore::getStatus()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
+void ClientCore::authenticate(const QString& username, const QString& password)
+{
+    if (isConnected())
+    {
+        m_protocol->authenticate(username, password);
+    }
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+bool ClientCore::isAuthenticated() const
+{
+    return m_protocol->isAuthenticated();
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
 void ClientCore::onConnected()
 {
     qInfo() << "Connected to server";
@@ -147,6 +171,24 @@ void ClientCore::onDisconnected()
     m_simulationRunning = false;
     qInfo() << "Disconnected from server";
     emit disconnected();
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+void ClientCore::onAuthSucceeded()
+{
+    qInfo() << "Authenticated successfully";
+    emit authSucceeded();
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+void ClientCore::onAuthFailed(const QString& reason)
+{
+    qWarning() << "Authentication failed:" << reason;
+    emit authFailed(reason);
 }
 
 //-----------------------------------------------------------------------------

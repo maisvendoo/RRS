@@ -15,6 +15,7 @@ ProtocolHandler::ProtocolHandler(QObject* parent)
     : QObject(parent)
     , m_socket(new QTcpSocket(this))
     , m_port(0)
+    , m_authenticated(false)
 {
     connect(m_socket, &QTcpSocket::connected, this, &ProtocolHandler::connected);
     connect(m_socket, &QTcpSocket::readyRead, this, &ProtocolHandler::onReadyRead);
@@ -79,6 +80,7 @@ void ProtocolHandler::disconnectFromServer()
     {
         m_socket->disconnectFromHost();
         m_heartbeatTimer->stop();
+        m_authenticated = false;
     }
 }
 
@@ -157,6 +159,22 @@ void ProtocolHandler::getStatus()
 }
 
 //-----------------------------------------------------------------------------
+void ProtocolHandler::authenticate(const QString& username, const QString& password)
+{
+    QJsonObject message;
+    message["type"] = "AUTH";
+    message["username"] = username;
+    message["password"] = password;
+    sendMessage(message);
+}
+
+//-----------------------------------------------------------------------------
+bool ProtocolHandler::isAuthenticated() const
+{
+    return m_authenticated;
+}
+
+//-----------------------------------------------------------------------------
 void ProtocolHandler::onReadyRead()
 {
     m_buffer.append(m_socket->readAll());
@@ -230,6 +248,16 @@ void ProtocolHandler::onReadyRead()
         else if (type == "SUCCESS")
         {
             emit messageReceived(obj);
+        }
+        else if (type == "AUTH_SUCCESS")
+        {
+            m_authenticated = true;
+            emit authSucceeded();
+        }
+        else if (type == "AUTH_FAILED")
+        {
+            m_authenticated = false;
+            emit authFailed(obj["message"].toString());
         }
         else if (type == "ERROR")
         {

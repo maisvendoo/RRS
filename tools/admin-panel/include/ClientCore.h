@@ -67,6 +67,8 @@ public:
     void startSimulation(const QString& route, const QString& scenario);
     void stopSimulation();
     void getStatus();
+    void authenticate(const QString& username, const QString& password);
+    bool isAuthenticated() const;
 
     QVector<RouteData> getRoutes() const { return m_routes; }
     QVector<ScenarioData> getScenarios() const { return m_scenarios; }
@@ -76,6 +78,9 @@ signals:
     void connected();
     void disconnected();
     void error(const QString& error);
+
+    void authSucceeded();
+    void authFailed(const QString& reason);
 
     void routesLoaded();
     void scenariosLoaded();
@@ -88,6 +93,8 @@ private slots:
     void onConnected();
     void onDisconnected();
     void onError(const QString& error);
+    void onAuthSucceeded();
+    void onAuthFailed(const QString& reason);
     void onRoutesReceived(const QJsonArray& routes);
     void onScenariosReceived(const QJsonArray& scenarios);
     void onStatusReceived(const QJsonObject& status);

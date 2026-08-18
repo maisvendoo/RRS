@@ -111,6 +111,15 @@ void ProtocolHandler::sendAuthSuccess()
 }
 
 //-----------------------------------------------------------------------------
+void ProtocolHandler::sendAuthFailed(const QString& reason)
+{
+    QJsonObject message;
+    message["type"] = "AUTH_FAILED";
+    message["message"] = reason;
+    sendMessage(message);
+}
+
+//-----------------------------------------------------------------------------
 QString ProtocolHandler::getClientAddress() const
 {
     if (m_socket)
