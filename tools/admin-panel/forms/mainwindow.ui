@@ -66,9 +66,6 @@
          <property name="text">
           <string>Connect</string>
          </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
          <property name="objectName">
           <string>btnConnect</string>
          </property>
@@ -158,9 +155,6 @@
         <widget class="QPushButton" name="btnStart">
          <property name="text">
           <string>Start Simulation</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
          </property>
          <property name="enabled">
           <bool>false</bool>
