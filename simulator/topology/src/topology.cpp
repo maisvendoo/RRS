@@ -9,6 +9,8 @@
 #include    <topology.h>
 
 #include    <cassert>
+#include    <algorithm>
+#include    <cmath>
 #include    <QDir>
 #include    <QDirIterator>
 #include    <QFile>
@@ -1897,4 +1899,215 @@ void Topology::slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_n
     size_t train_idx = vehicle_control[vehicle_idx]->getTrainIndex();
 
     emit sigChangeTrajStateByTrain(static_cast<int>(train_idx), is_busy, traj_name);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+namespace
+{
+
+/// Поиск индекса трека, содержащего траекторную координату
+int findTrackIndex(const std::vector<track_t>& tracks, double coord)
+{
+    if (tracks.empty())
+        return 0;
+
+    int lo = 0;
+    int hi = static_cast<int>(tracks.size()) - 1;
+    while (lo < hi)
+    {
+        int mid = (lo + hi) / 2;
+        if (coord < tracks[mid].traj_coord)
+            hi = mid;
+        else if (coord >= tracks[mid].traj_coord + tracks[mid].len)
+            lo = mid + 1;
+        else
+            return mid;
+    }
+    return lo;
+}
+
+/// Точка профиля в траекторной координате
+profile_segment_t pointAtCoord(const Trajectory* traj, double coord, dir_t orient, double distance)
+{
+    profile_segment_t point;
+
+    profile_point_t pp = traj->getPosition(coord, orient);
+
+    point.distance = distance;
+    point.elevation = pp.position.z;
+    point.railway_coord = pp.railway_coord;
+
+    return point;
+}
+
+/// Вершины ломаной профиля на границах треков и в конечной точке
+/// на отрезке траектории от coord до stop_coord в направлении orient
+void emitTrackBoundaries(const Trajectory* traj, double coord, double stop_coord, dir_t orient,
+                         double traveled, int kind, std::vector<profile_segment_t>& out)
+{
+    const std::vector<track_t>& tracks = traj->getTracks();
+    if (tracks.empty())
+        return;
+
+    const double eps = 1e-9;
+
+    if (orient == FWD)
+    {
+        double cursor = coord;
+        int ti = findTrackIndex(tracks, cursor);
+        while (ti < static_cast<int>(tracks.size()))
+        {
+            const track_t& track = tracks[ti];
+            double far = track.traj_coord + track.len;
+            if (far - cursor < eps)
+            {
+                ++ti;
+                continue;
+            }
+            if (far >= stop_coord - eps)
+                break;
+            out.push_back(pointAtCoord(traj, far, orient, kind * (traveled + (far - coord))));
+            cursor = far;
+            ++ti;
+        }
+        out.push_back(pointAtCoord(traj, stop_coord, orient, kind * (traveled + (stop_coord - coord))));
+    }
+    else
+    {
+        double cursor = coord;
+        int ti = findTrackIndex(tracks, cursor);
+        while (ti >= 0)
+        {
+            const track_t& track = tracks[ti];
+            double near = track.traj_coord;
+            if (cursor - near < eps)
+            {
+                --ti;
+                continue;
+            }
+            if (near <= stop_coord + eps)
+                break;
+            out.push_back(pointAtCoord(traj, near, orient, kind * (traveled + (coord - near))));
+            cursor = near;
+            --ti;
+        }
+        out.push_back(pointAtCoord(traj, stop_coord, orient, kind * (traveled + (coord - stop_coord))));
+    }
+}
+
+/// Ход по топологии в направлении orient с накоплением вершин профиля;
+/// kind=+1 - дистанции положительные (вперёд), kind=-1 - отрицательные (назад)
+void walkProfile(Trajectory*& traj, double& coord, dir_t& orient,
+                 double limit_m, int kind, std::vector<profile_segment_t>& out)
+{
+    if (traj == nullptr || limit_m <= 0.0)
+        return;
+
+    const double eps = 1e-9;
+    double traveled = 0.0;
+
+    int guard = 0;
+    const int max_iters = 100000;
+
+    while ((traveled < limit_m - eps) && (guard < max_iters))
+    {
+        ++guard;
+
+        double exit_coord = 0.0;
+        double within_traj = 0.0;
+        if (orient == FWD)
+        {
+            exit_coord = traj->getLength();
+            within_traj = exit_coord - coord;
+        }
+        else
+        {
+            exit_coord = 0.0;
+            within_traj = coord - exit_coord;
+        }
+
+        if (within_traj > eps)
+        {
+            double step = std::min(limit_m - traveled, within_traj);
+            double stop_coord = (orient == FWD) ? (coord + step) : (coord - step);
+            emitTrackBoundaries(traj, coord, stop_coord, orient, traveled, kind, out);
+            traveled += step;
+            if (traveled >= limit_m - eps)
+                break;
+            coord = stop_coord;
+        }
+
+        // Переход через стрелку на следующую траекторию
+        dir_t exit_dir = orient;
+        const Switch* next_sw = traj->getNextSwitch(exit_dir);
+        if (next_sw == nullptr)
+            break;
+        Trajectory* next_traj = next_sw->getNextTraj(exit_dir);
+        if (next_traj == nullptr)
+            break;
+        if (exit_dir != orient)
+            orient = static_cast<dir_t>(-orient);
+        coord = (exit_dir == BWD) ? next_traj->getLength() : 0.0;
+        traj = next_traj;
+    }
+}
+
+/// Расчёт уклонов по готовой ломаной профиля
+void calcInclinations(std::vector<profile_segment_t>& points)
+{
+    for (size_t i = 1; i < points.size(); ++i)
+    {
+        double d_dist = points[i].distance - points[i - 1].distance;
+        if (std::abs(d_dist) > 1e-9)
+            points[i - 1].inclination = (points[i].elevation - points[i - 1].elevation) / d_dist * 1000.0;
+        else
+            points[i - 1].inclination = 0.0;
+    }
+    if (!points.empty())
+        points.back().inclination = points.size() > 1 ? points[points.size() - 2].inclination : 0.0;
+}
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
+                          double backward_m, double forward_m,
+                          profile_segments_t& out) const
+{
+    if (traj == nullptr)
+        return false;
+
+    std::vector<profile_segment_t> fwd_points;
+    std::vector<profile_segment_t> bwd_points;
+
+    // Ход вперёд
+    Trajectory* fwd_traj = traj;
+    double fwd_coord = coord;
+    dir_t fwd_orient = orient;
+    walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points);
+
+    // Ход назад
+    Trajectory* bwd_traj = traj;
+    double bwd_coord = coord;
+    dir_t bwd_orient = static_cast<dir_t>(-orient);
+    walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points);
+
+    // Сборка профиля: назад (по убыванию) + точка отсчёта + вперёд
+    out.points.clear();
+    out.points.reserve(bwd_points.size() + 1 + fwd_points.size());
+    for (size_t i = bwd_points.size(); i > 0; --i)
+        out.points.push_back(bwd_points[i - 1]);
+    out.points.push_back(pointAtCoord(traj, coord, orient, 0.0));
+    out.points.insert(out.points.end(), fwd_points.begin(), fwd_points.end());
+
+    out.backward = bwd_points.empty() ? 0.0 : std::abs(bwd_points.back().distance);
+    out.forward = fwd_points.empty() ? 0.0 : fwd_points.back().distance;
+
+    calcInclinations(out.points);
+
+    return true;
 }

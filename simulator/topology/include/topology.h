@@ -50,6 +50,12 @@ public:
                                qint8 dir,
                                bool check_busy = true);
 
+    /// Получить распрямлённый профиль пути вокруг точки (traj, coord):
+    /// траектории вперёд и назад от точки на backward_m/forward_m метров
+    bool getProfile(Trajectory *traj, double coord, dir_t orient,
+                    double backward_m, double forward_m,
+                    profile_segments_t &out) const;
+
     /// Шаг симуляции
     void step(double t, double dt);
 
