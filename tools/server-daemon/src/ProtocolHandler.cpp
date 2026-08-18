@@ -14,6 +14,7 @@ ProtocolHandler::ProtocolHandler(QTcpSocket* socket, QObject* parent)
     : QObject(parent)
     , m_socket(socket)
     , m_lastActivity(QDateTime::currentMSecsSinceEpoch())
+    , m_authenticated(false)
 {
     connect(m_socket, &QTcpSocket::readyRead, this, &ProtocolHandler::onReadyRead);
     connect(m_socket, &QTcpSocket::disconnected, this, &ProtocolHandler::onDisconnected);
@@ -102,6 +103,14 @@ void ProtocolHandler::sendStatus(const QJsonObject& status)
 }
 
 //-----------------------------------------------------------------------------
+void ProtocolHandler::sendAuthSuccess()
+{
+    QJsonObject message;
+    message["type"] = "AUTH_SUCCESS";
+    sendMessage(message);
+}
+
+//-----------------------------------------------------------------------------
 QString ProtocolHandler::getClientAddress() const
 {
     if (m_socket)
@@ -115,6 +124,18 @@ QString ProtocolHandler::getClientAddress() const
 bool ProtocolHandler::isConnected() const
 {
     return m_socket && m_socket->state() == QTcpSocket::ConnectedState;
+}
+
+//-----------------------------------------------------------------------------
+bool ProtocolHandler::isAuthenticated() const
+{
+    return m_authenticated;
+}
+
+//-----------------------------------------------------------------------------
+void ProtocolHandler::setAuthenticated(bool authenticated)
+{
+    m_authenticated = authenticated;
 }
 
 //-----------------------------------------------------------------------------
