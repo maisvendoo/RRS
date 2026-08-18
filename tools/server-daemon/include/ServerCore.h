@@ -67,6 +67,7 @@ private slots:
 private:
 
     void processMessage(ProtocolHandler* client, const QJsonObject& message);
+    void handleAuth(ProtocolHandler* client, const QJsonObject& message);
     void handleGetRoutes(ProtocolHandler* client);
     void handleGetScenarios(ProtocolHandler* client, const QString& route);
     void handleStartSimulation(ProtocolHandler* client, const QString& route, const QString& scenario);

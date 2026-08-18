@@ -33,10 +33,13 @@ public:
     void sendError(const QString& error);
     void sendSuccess(const QString& message);
     void sendStatus(const QJsonObject& status);
+    void sendAuthSuccess();
 
     QTcpSocket* getSocket() const { return m_socket; }
     QString getClientAddress() const;
     bool isConnected() const;  // <-- ТОЛЬКО ОДНО ОБЪЯВЛЕНИЕ
+    bool isAuthenticated() const;
+    void setAuthenticated(bool authenticated);
 
 signals:
 
@@ -55,6 +58,7 @@ private:
     QByteArray      m_buffer;
     QTimer*         m_heartbeatTimer;
     qint64          m_lastActivity;
+    bool            m_authenticated;
 };
 
 #endif // PROTOCOLHANDLER_H

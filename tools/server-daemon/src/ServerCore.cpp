@@ -387,7 +387,11 @@ void ServerCore::processMessage(ProtocolHandler* client, const QJsonObject& mess
 {
     QString type = message["type"].toString();
 
-    if (type == "GET_ROUTES")
+    if (type == "AUTH")
+    {
+        handleAuth(client, message);
+    }
+    else if (type == "GET_ROUTES")
     {
         handleGetRoutes(client);
     }
@@ -421,6 +425,28 @@ void ServerCore::processMessage(ProtocolHandler* client, const QJsonObject& mess
     else
     {
         client->sendError("Unknown command type: " + type);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void ServerCore::handleAuth(ProtocolHandler* client, const QJsonObject& message)
+{
+    QString username = message["username"].toString();
+    QString password = message["password"].toString();
+
+    Config& config = Config::instance();
+
+    if (username == config.getAuthUsername() && password == config.getAuthPassword())
+    {
+        client->setAuthenticated(true);
+        qInfo() << "Client authenticated:" << client->getClientAddress();
+        client->sendAuthSuccess();
+    }
+    else
+    {
+        client->setAuthenticated(false);
+        qWarning() << "Authentication failed for client:" << client->getClientAddress();
+        client->sendError("Authentication failed");
     }
 }
 
@@ -490,6 +516,12 @@ void ServerCore::handleStartSimulation(ProtocolHandler* client,
                                        const QString& route,
                                        const QString& scenario)
 {
+    if (!client->isAuthenticated())
+    {
+        client->sendError("Not authenticated. Please login first.");
+        return;
+    }
+
     qDebug() << "=== SERVER: Received START_SIMULATION ===";
     qDebug() << "  route:" << route;
     qDebug() << "  scenario:" << scenario;
@@ -545,6 +577,12 @@ void ServerCore::handleStartSimulation(ProtocolHandler* client,
 //-----------------------------------------------------------------------------
 void ServerCore::handleStopSimulation(ProtocolHandler* client)
 {
+    if (!client->isAuthenticated())
+    {
+        client->sendError("Not authenticated. Please login first.");
+        return;
+    }
+
     if (!m_simulatorController.isRunning())
     {
         client->sendError("No simulation running");
