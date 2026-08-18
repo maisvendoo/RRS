@@ -206,16 +206,6 @@ void ServerCore::onClientDisconnected(ProtocolHandler* client)
 
     emit clientDisconnected(address);
 
-    // Если клиентов не осталось, останавливаем симуляцию
-    {
-        QMutexLocker locker(&m_clientsMutex);
-        if (m_clients.isEmpty())
-        {
-            qInfo() << "All clients disconnected, stopping simulation...";
-            m_simulatorController.stopSimulation();
-        }
-    }
-
     // client удалится автоматически через deleteLater в ProtocolHandler
 }
 
@@ -369,13 +359,6 @@ void ServerCore::onHeartbeat()
             handler->disconnect();
             handler->deleteLater();
         }
-    }
-
-    // Если клиентов не осталось, останавливаем симуляцию
-    if (m_clients.isEmpty() && m_simulatorController.isRunning())
-    {
-        qInfo() << "All clients disconnected (heartbeat), stopping simulation...";
-        m_simulatorController.stopSimulation();
     }
 }
 
