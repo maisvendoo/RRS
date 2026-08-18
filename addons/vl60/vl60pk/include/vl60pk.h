@@ -508,6 +508,8 @@ private:
 
     bool initAutostartProgram(int cab_autostart_request);
 
+    void buildAutostartTriggers(int cab);
+
     bool initAutostopProgram(int cab_autostop_request);
 
     void initAutopilot(const QString& modules_dir, const QString& custom_cfg_dir);

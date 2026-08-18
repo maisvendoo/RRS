@@ -175,24 +175,32 @@ bool VL60pk::initAutostartProgram(int cab_autostart_request)
     epk[CAB2]->setControl();
 
     start_count = 0;
-    triggers.clear();
-    triggers.reserve(15);
-    triggers.push_back(&pants_tumbler[autostart_cab]);
-    triggers.push_back(&pant2_tumbler[autostart_cab]);
-    triggers.push_back(&gv_tumbler[autostart_cab]);
-    triggers.push_back(&gv_return_tumbler[autostart_cab]);
-    triggers.push_back(&fr_tumbler[autostart_cab]);
-    triggers.push_back(&mk_tumbler[autostart_cab]);
-
-    for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
-        triggers.push_back(&mv_tumblers[autostart_cab][i]);
-
-    triggers.push_back(&cu_tumbler[autostart_cab]);
-
-    if (!epk[autostart_cab]->isKeyOn())
-        triggers.push_back(&rb[autostart_cab][RBS]);
+    buildAutostartTriggers(autostart_cab);
 
     autostart_mode = AUTOSTART_ON;
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60pk::buildAutostartTriggers(int cab)
+{
+    triggers.clear();
+    triggers.reserve(15);
+    triggers.push_back(&pants_tumbler[cab]);
+    triggers.push_back(&pant2_tumbler[cab]);
+    triggers.push_back(&gv_tumbler[cab]);
+    triggers.push_back(&gv_return_tumbler[cab]);
+    triggers.push_back(&fr_tumbler[cab]);
+    triggers.push_back(&mk_tumbler[cab]);
+
+    for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
+        triggers.push_back(&mv_tumblers[cab][i]);
+
+    triggers.push_back(&cu_tumbler[cab]);
+
+    if (!epk[cab]->isKeyOn())
+        triggers.push_back(&rb[cab][RBS]);
 }
