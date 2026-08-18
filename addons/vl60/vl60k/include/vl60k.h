@@ -402,6 +402,15 @@ private:
     size_t  start_count = 0;
     size_t  autostart_cab = 0;
 
+    /// Режим автоматического запуска/останова
+    enum AutostartMode
+    {
+        AUTOSTART_IDLE = 0, ///< Нет активной программы
+        AUTOSTART_ON   = 1, ///< Выполняется автозапуск
+        AUTOSTART_OFF  = 2  ///< Выполняется автоостанов
+    };
+    AutostartMode autostart_mode = AUTOSTART_IDLE;
+
     /// Устройство безопасности УКБМ
     SafetyDevice *safety_device[CABS_NUM] = {nullptr, nullptr};
 
@@ -475,6 +484,8 @@ private:
     void initControl(const QString& modules_dir, const QString& custom_cfg_dir);
 
     bool initAutostartProgram(int cab_autostart_request);
+
+    bool initAutostopProgram(int cab_autostop_request);
 
     void initAutopilot(const QString& modules_dir, const QString& custom_cfg_dir);
 
@@ -552,6 +563,8 @@ private:
 private slots:
 
     void slotAutoStart();
+
+    void slotAutoStop();
 
     void slotInitTrainForAutopilot();
 };

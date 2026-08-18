@@ -52,6 +52,7 @@ void VL60k::slotAutoStart()
     {
         autoStartTimer->stop();
         start_count = 0;
+        autostart_mode = AUTOSTART_IDLE;
         controller[autostart_cab]->setReversHandlePos(REVERS_FORWARD);
 
         controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
@@ -67,6 +68,14 @@ void VL60k::slotAutoStart()
             autopilot_switcher[CAB2].set();
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60k::slotAutoStop()
+{
+    // Реализация автоостанова будет добавлена в последующих слайсах
 }
 
 //------------------------------------------------------------------------------
