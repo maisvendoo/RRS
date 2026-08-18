@@ -204,3 +204,12 @@ void VL60pk::buildAutostartTriggers(int cab)
     if (!epk[cab]->isKeyOn())
         triggers.push_back(&rb[cab][RBS]);
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VL60pk::initAutostopProgram(int cab_autostop_request)
+{
+    // Реализация автоостанова будет добавлена в последующих слайсах
+    return false;
+}
