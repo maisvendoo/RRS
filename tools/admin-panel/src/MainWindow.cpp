@@ -257,7 +257,6 @@ void MainWindow::onConnected()
 {
     m_isConnected = true;
     ui->btnConnect->setText("Disconnect");
-    ui->btnConnect->setChecked(true);
     ui->btnConnect->setEnabled(true);
 
     ui->editHost->setEnabled(false);
@@ -318,7 +317,6 @@ void MainWindow::onDisconnected()
     m_isSimulationRunning = false;
     m_authenticated = false;
     ui->btnConnect->setText("Connect");
-    ui->btnConnect->setChecked(false);
     ui->btnConnect->setEnabled(true);
 
     ui->editHost->setEnabled(true);
@@ -409,14 +407,12 @@ void MainWindow::onStatusUpdated(bool running, const QString& route, const QStri
     {
         setStatus("Simulation running: " + route + " / " + scenario);
         ui->btnStart->setText("Stop Simulation");
-        ui->btnStart->setChecked(true);
         ui->btnStart->setEnabled(true);
     }
     else
     {
         setStatus("Simulation stopped");
         ui->btnStart->setText("Start Simulation");
-        ui->btnStart->setChecked(false);
         ui->btnStart->setEnabled(!m_currentRoute.isEmpty() && !m_currentScenario.isEmpty());
     }
 
@@ -429,7 +425,6 @@ void MainWindow::onSimulationStarted()
     m_isSimulationRunning = true;
     setStatus("Simulation started");
     ui->btnStart->setText("Stop Simulation");
-    ui->btnStart->setChecked(true);
     ui->btnStart->setEnabled(true);
     updateUI();
     
@@ -442,7 +437,6 @@ void MainWindow::onSimulationStopped()
     m_isSimulationRunning = false;
     setStatus("Simulation stopped");
     ui->btnStart->setText("Start Simulation");
-    ui->btnStart->setChecked(false);
     ui->btnStart->setEnabled(true);
     updateUI();
 }
@@ -462,20 +456,17 @@ void MainWindow::updateUI()
         if (running)
         {
             ui->btnStart->setText("Stop Simulation");
-            ui->btnStart->setChecked(true);
             ui->btnStart->setEnabled(true);
         }
         else
         {
             ui->btnStart->setText("Start Simulation");
-            ui->btnStart->setChecked(false);
             ui->btnStart->setEnabled(!m_currentRoute.isEmpty() && !m_currentScenario.isEmpty());
         }
     }
     else
     {
         ui->btnStart->setText("Start Simulation");
-        ui->btnStart->setChecked(false);
         ui->btnStart->setEnabled(false);
     }
 }
