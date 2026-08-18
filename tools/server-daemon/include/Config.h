@@ -54,6 +54,12 @@ public:
     QString getGroup() const { return m_group; }
     int getUmask() const { return m_umask; }
 
+    QString getAuthUsername() const { return m_authUsername; }
+    QString getAuthPassword() const { return m_authPassword; }
+
+    void setAuthUsername(const QString& username) { m_authUsername = username; }
+    void setAuthPassword(const QString& password) { m_authPassword = password; }
+
     // Сеттеры
     void setServerPort(quint16 port) { m_serverPort = port; }
     void setMaxClients(int clients) { m_maxClients = clients; }
@@ -87,6 +93,10 @@ private:
     QString     m_user;
     QString     m_group;
     int         m_umask;
+
+    // Auth (plain text)
+    QString     m_authUsername;
+    QString     m_authPassword;
 };
 
 #endif // CONFIG_H

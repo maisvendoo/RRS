@@ -126,10 +126,31 @@ bool Config::load(const QString& configPath)
         }
     }
 
+    // Auth section
+    QDomNode authNode = cfg.getFirstSection("Auth");
+    if (!authNode.isNull())
+    {
+        if (!cfg.getString(authNode, "Username", m_authUsername))
+        {
+            m_authUsername = "admin";
+        }
+
+        if (!cfg.getString(authNode, "Password", m_authPassword))
+        {
+            m_authPassword = "admin";
+        }
+    }
+    else
+    {
+        m_authUsername = "admin";
+        m_authPassword = "admin";
+    }
+
     qInfo() << "Configuration loaded from:" << configPath;
     qInfo() << "  Port:" << m_serverPort;
     qInfo() << "  Routes path:" << m_routesPath;
     qInfo() << "  Simulator path:" << m_simulatorPath;
+    qInfo() << "  Auth username:" << m_authUsername;
 
     return true;
 }
