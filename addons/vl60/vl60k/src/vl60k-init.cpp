@@ -209,6 +209,33 @@ void VL60k::buildAutostartTriggers(int cab)
 //------------------------------------------------------------------------------
 bool VL60k::initAutostopProgram(int cab_autostop_request)
 {
-    // Реализация автоостанова будет добавлена в последующих слайсах
-    return false;
+    if (autoStartTimer->isStarted())
+        return false;
+
+    if ((cab_autostop_request != CAB1) && (cab_autostop_request != CAB2))
+        return false;
+
+    // Во второй кабине не должно быть реверсивной рукоятки
+    if (controller[(cab_autostop_request == CAB1) ? CAB2 : CAB1]->isReversHandle())
+        return false;
+
+    // Реверсивная рукоятка должна быть в запрашиваемой кабине
+    if (!controller[cab_autostop_request]->isReversHandle())
+        return false;
+
+    autostart_cab = cab_autostop_request;
+
+    controller[CAB1]->setControl();
+    controller[CAB2]->setControl();
+    brake_lock[CAB1]->setControl();
+    brake_lock[CAB2]->setControl();
+    epk[CAB1]->setControl();
+    epk[CAB2]->setControl();
+
+    start_count = 0;
+    buildAutostartTriggers(autostart_cab);
+
+    autostart_mode = AUTOSTART_OFF;
+
+    return true;
 }
