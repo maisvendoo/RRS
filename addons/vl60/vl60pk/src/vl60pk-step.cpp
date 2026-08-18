@@ -95,6 +95,9 @@ void VL60pk::slotAutoStop()
 
         controller[autostart_cab]->setReversHandlePos(REVERS_ZERO);
 
+        // Отключаем ЭПК, ключ остаётся в замке
+        epk[autostart_cab]->setKeyOn(false);
+
         controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
         controller[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
         brake_lock[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
