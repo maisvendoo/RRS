@@ -42,6 +42,9 @@ private slots:
     void onDisconnected();
     void onError(const QString& error);
 
+    void onAuthSucceeded();
+    void onAuthFailed(const QString& reason);
+
     void onRoutesLoaded();
     void onScenariosLoaded();
     void onStatusUpdated(bool running, const QString& route, const QString& scenario);
@@ -55,6 +58,7 @@ private:
     void loadScenarios(const QString& route);
     void updateRouteInfo(const RouteData& route);
     void loadConfig();
+    void requestCredentials();
 
     Ui::MainWindow*     ui;
     ClientCore*         m_client;
@@ -62,6 +66,7 @@ private:
     QString             m_currentScenario;
     bool                m_isConnected;
     bool                m_isSimulationRunning;
+    bool                m_authenticated;
 };
 
 #endif // MAINWINDOW_H

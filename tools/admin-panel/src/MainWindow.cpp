@@ -8,6 +8,7 @@
 #include    "MainWindow.h"
 #include    "ui_mainwindow.h"
 #include    "CfgReader.h"
+#include    "LoginDialog.h"
 #include    <QMessageBox>
 #include    <QCloseEvent>
 #include    <QDebug>
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget* parent)
     , m_client(new ClientCore(this))
     , m_isConnected(false)
     , m_isSimulationRunning(false)
+    , m_authenticated(false)
 {
     ui->setupUi(this);
 
@@ -42,6 +44,11 @@ MainWindow::MainWindow(QWidget* parent)
             this, &MainWindow::onDisconnected);
     connect(m_client, &ClientCore::error,
             this, &MainWindow::onError);
+
+    connect(m_client, &ClientCore::authSucceeded,
+            this, &MainWindow::onAuthSucceeded);
+    connect(m_client, &ClientCore::authFailed,
+            this, &MainWindow::onAuthFailed);
 
     connect(m_client, &ClientCore::routesLoaded,
             this, &MainWindow::onRoutesLoaded);
@@ -191,6 +198,12 @@ void MainWindow::onStartButtonClicked()
         return;
     }
 
+    if (!m_authenticated)
+    {
+        setStatus("Error: Authorization required", true);
+        return;
+    }
+
     if (m_isSimulationRunning)
     {
         m_client->stopSimulation();
@@ -254,6 +267,48 @@ void MainWindow::onConnected()
     updateUI();
 
     m_client->loadRoutes();
+    requestCredentials();
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::requestCredentials()
+{
+    QString username;
+    QString password;
+
+    if (!LoginDialog::getCredentials(this, username, password))
+    {
+        setStatus("Authorization required", true);
+        updateUI();
+        return;
+    }
+
+    if (username.isEmpty() || password.isEmpty())
+    {
+        setStatus("Error: username and password are required", true);
+        requestCredentials();
+        return;
+    }
+
+    setStatus("Authorizing...");
+    m_client->authenticate(username, password);
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::onAuthSucceeded()
+{
+    m_authenticated = true;
+    setStatus("Authorized");
+    updateUI();
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::onAuthFailed(const QString& reason)
+{
+    m_authenticated = false;
+    setStatus("Error: " + reason, true);
+    updateUI();
+    requestCredentials();
 }
 
 //-----------------------------------------------------------------------------
@@ -261,6 +316,7 @@ void MainWindow::onDisconnected()
 {
     m_isConnected = false;
     m_isSimulationRunning = false;
+    m_authenticated = false;
     ui->btnConnect->setText("Connect");
     ui->btnConnect->setChecked(false);
     ui->btnConnect->setEnabled(true);
@@ -396,17 +452,18 @@ void MainWindow::updateUI()
 {
     bool connected = m_isConnected;
     bool running = m_isSimulationRunning;
+    bool auth = m_authenticated;
 
     ui->listRoutes->setEnabled(connected && !running);
     ui->comboScenarios->setEnabled(connected && !running && ui->comboScenarios->count() > 0);
-    ui->btnStart->setEnabled(connected);
 
-    if (connected)
+    if (connected && auth)
     {
         if (running)
         {
             ui->btnStart->setText("Stop Simulation");
             ui->btnStart->setChecked(true);
+            ui->btnStart->setEnabled(true);
         }
         else
         {
