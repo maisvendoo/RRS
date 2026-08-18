@@ -78,6 +78,7 @@ void VL60pk::initialization()
 
     autoStartTimer = new Timer(0.5, false);
     connect(autoStartTimer, &Timer::process, this, &VL60pk::slotAutoStart);
+    connect(autoStartTimer, &Timer::process, this, &VL60pk::slotAutoStop);
 }
 
 //------------------------------------------------------------------------------

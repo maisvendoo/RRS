@@ -192,5 +192,7 @@ bool VL60pk::initAutostartProgram(int cab_autostart_request)
     if (!epk[autostart_cab]->isKeyOn())
         triggers.push_back(&rb[autostart_cab][RBS]);
 
+    autostart_mode = AUTOSTART_ON;
+
     return true;
 }
