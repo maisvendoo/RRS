@@ -206,6 +206,9 @@ void MainWindow::onStartButtonClicked()
 
     if (m_isSimulationRunning)
     {
+        ui->btnStart->setEnabled(false);
+        ui->btnStart->setText("Stopping...");
+        setStatus("Stopping simulation...");
         m_client->stopSimulation();
         return;
     }
