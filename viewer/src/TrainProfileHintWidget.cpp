@@ -187,6 +187,8 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
     const int current_vehicle = _params->vehicles_handler->getCurrentVehicleIndex();
     const int controlled_vehicle = _params->vehicles_handler->getControlledVehicleIndex();
 
+    const simulator_vehicles_info_t& vehicles_info = _params->vehicles_handler->getVehiclesInfo();
+
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     const ImU32 color_uncontrolled = IM_COL32(64, 128, 0, 255);
@@ -198,19 +200,28 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
         const int model_index = first_vehicle_id + static_cast<int>(i);
         const float offset = offsets[i];
 
+        // Длина вагона - из данных о подвижном составе (модель-индекс совпадает)
+        float vehicle_length = 20.0f;
+        if (model_index >= 0 && static_cast<size_t>(model_index) < vehicles_info.vehicles.size())
+        {
+            vehicle_length = static_cast<float>(vehicles_info.vehicles[model_index].vehicle_length);
+        }
+        const float half_len = vehicle_length * 0.5f;
+
         ImU32 color = color_uncontrolled;
         if (model_index == controlled_vehicle)
             color = color_controlled;
         else if (model_index == current_vehicle)
             color = color_current;
 
-        const float rel = elevationAt(offset, _profile.profile) - plot.origin_elev;
-        const float x = plot.map_x(offset);
-        const float y = plot.map_y(rel);
+        // Вагон рисуется сегментом вдоль линии профиля на свою длину
+        const float d0 = offset - half_len;
+        const float d1 = offset + half_len;
+        const float rel0 = elevationAt(d0, _profile.profile) - plot.origin_elev;
+        const float rel1 = elevationAt(d1, _profile.profile) - plot.origin_elev;
 
-        const float half_w = 3.0f;
-        const float half_h = 7.0f;
-        draw_list->AddRectFilled(ImVec2(x - half_w, y - half_h),
-                                 ImVec2(x + half_w, y + half_h), color);
+        draw_list->AddLine(ImVec2(plot.map_x(d0), plot.map_y(rel0)),
+                           ImVec2(plot.map_x(d1), plot.map_y(rel1)),
+                           color, 5.0f);
     }
 }

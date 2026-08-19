@@ -95,6 +95,11 @@ public:
         return update_trains.trains;
     }
 
+    const simulator_vehicles_info_t& getVehiclesInfo() const
+    {
+        return vehicles_info;
+    }
+
     void setCurrentVehicle(int vehicle_idx);
 
     const std::vector<VehicleExterior>& getVehicles() const
