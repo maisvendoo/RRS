@@ -1,0 +1,153 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "buffers": [
+        {
+            "uri": "bin/floorL.bin",
+            "byteLength": 6704
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 2064,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 2064,
+            "byteLength": 2064,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 4128,
+            "byteLength": 1376,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 5504,
+            "byteLength": 1200,
+            "target": 34963
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 172,
+            "type": "VEC3",
+            "max": [
+                10,
+                0,
+                50.8645
+            ],
+            "min": [
+                -49.999,
+                -20,
+                -150.864
+            ]
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 172,
+            "type": "VEC3",
+            "max": [
+                0.0399688,
+                0.99997,
+                0.590957
+            ],
+            "min": [
+                -0.0399686,
+                0.806687,
+                -0.590979
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 172,
+            "type": "VEC2",
+            "max": [
+                0.99372,
+                1.00104
+            ],
+            "min": [
+                0.000466575,
+                0.002671
+            ]
+        },
+        {
+            "bufferView": 3,
+            "componentType": 5125,
+            "count": 300,
+            "type": "SCALAR",
+            "max": [
+                171
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "images": [
+        {
+            "uri": "../textures/trava.bmp"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0,
+                    "texCoord": 0
+                }
+            }
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
+                    },
+                    "indices": 3,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [ 0 ]
+        }
+    ],
+    "scene": 0
+}

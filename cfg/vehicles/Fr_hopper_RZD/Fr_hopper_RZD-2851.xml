@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+
+		<EmptyMass>21300</EmptyMass>
+		<PayloadMass>70000</PayloadMass>
+		<Length>14.5</Length>
+		<WheelDiameter>0.95</WheelDiameter>
+		<MainResist>default</MainResist>
+		<NumAxis>4</NumAxis>
+		<WheelInertia>100.0</WheelInertia>
+		<SoundDir>freight</SoundDir>
+
+		<BrakepipeLeak>3e-6</BrakepipeLeak>
+
+		<CouplingModule>sa3</CouplingModule>
+		<CouplingConfig>sa3</CouplingConfig>
+
+		<AirDistModule>vr483</AirDistModule>
+		<AirDistConfig>vr483</AirDistConfig>
+
+		<!-- <ElectroAirDistModule></ElectroAirDistModule> -->
+		<!-- <ElectroAirDistConfig></ElectroAirDistConfig> -->
+
+		<SupplyReservoirVolume>0.078</SupplyReservoirVolume>
+		<SupplyReservoirLeak>1e-6</SupplyReservoirLeak>
+
+		<BrakepipeAnglecockConfig>pneumo-anglecock-BP</BrakepipeAnglecockConfig>
+
+		<!-- <BrakepipeHoseModule></BrakepipeHoseModule> -->
+		<BrakepipeHoseConfig>pneumo-hose-BP</BrakepipeHoseConfig>
+
+		<BrakeAutomodeModule>ar265</BrakeAutomodeModule>
+		<BrakeAutomodeConfig>ar265</BrakeAutomodeConfig>
+
+		<BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
+
+	</Vehicle>
+
+
+	<Cabine>
+		<DriverPos>2.0 5.4 2.2</DriverPos>
+		<DriverDir>30.0</DriverDir>
+	</Cabine>
+
+	<Cabine>
+		<DriverPos>-2.0 -5.4 2.2</DriverPos>
+		<DriverDir>-150.0</DriverDir>
+	</Cabine>
+
+
+	<Model>
+		<ModelName>FrWag_hopper_1/Fr_hopper-1.gltf</ModelName>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/Disk_end_of_train_fwd.gltf</ModelName>
+		<ModelShift>-1.05 6.74 1.18</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/Disk_end_of_train_bwd.gltf</ModelName>
+		<ModelShift>1.05 -6.74 1.18</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>0.8 -6.03 0.0</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>0.8 4.17 0.0</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>-0.8 6.03 0.0</ModelShift>
+		<ModelRotate>0.0 0.0 180.0</ModelRotate>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>-0.8 -4.17 0.0</ModelShift>
+		<ModelRotate>0.0 0.0 180.0</ModelRotate>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+</Config>

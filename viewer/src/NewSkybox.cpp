@@ -1,0 +1,514 @@
+#include "NewSkybox.h"
+
+#include "CfgReader.h"
+#include "Logger.h"
+#include "datetime.h"
+#include "filesystem.h"
+#include "graphics/pipeline_funcs.h"
+
+#include <vsg/app/RecordTraversal.h>
+#include <vsg/commands/BindIndexBuffer.h>
+#include <vsg/commands/BindVertexBuffers.h>
+#include <vsg/commands/Commands.h>
+#include <vsg/commands/DrawIndexed.h>
+#include <vsg/core/Array.h>
+#include <vsg/core/Array2D.h>
+#include <vsg/core/ConstVisitor.h>
+#include <vsg/core/Data.h>
+#include <vsg/core/Object.h>
+#include <vsg/core/Value.h>
+#include <vsg/core/Visitor.h>
+#include <vsg/core/ref_ptr.h>
+#include <vsg/io/FileSystem.h>
+#include <vsg/io/ReaderWriter.h>
+#include <vsg/io/read.h>
+#include <vsg/maths/common.h>
+#include <vsg/maths/transform.h>
+#include <vsg/maths/vec3.h>
+#include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/StateGroup.h>
+#include <vsg/nodes/VertexIndexDraw.h>
+#include <vsg/state/BindDescriptorSet.h>
+#include <vsg/state/ColorBlendState.h>
+#include <vsg/state/DepthStencilState.h>
+#include <vsg/state/Descriptor.h>
+#include <vsg/state/DescriptorBuffer.h>
+#include <vsg/state/DescriptorImage.h>
+#include <vsg/state/DescriptorSet.h>
+#include <vsg/state/DescriptorSetLayout.h>
+#include <vsg/state/GraphicsPipeline.h>
+#include <vsg/state/InputAssemblyState.h>
+#include <vsg/state/MultisampleState.h>
+#include <vsg/state/PipelineLayout.h>
+#include <vsg/state/RasterizationState.h>
+#include <vsg/state/Sampler.h>
+#include <vsg/state/ShaderStage.h>
+#include <vsg/state/VertexInputState.h>
+
+#include <QDomNode>
+#include <QString>
+#include <QStringList>
+
+#include <cstddef>
+#include <cstring>
+#include <string>
+#include <vector>
+
+NewSkybox::NewSkybox(const std::string& skybox_config_filepath, vsg::ref_ptr<vsg::Options> options)
+{
+    CfgReader cfg;
+    if (cfg.load(skybox_config_filepath.c_str()))
+    {
+        init_textures(cfg, options);
+        if (textures.empty())
+        {
+            LOG_WARN("Failed to init skybox textures. Skybox config: %s", skybox_config_filepath.c_str());
+            return;
+        }
+
+        init_model(cfg, options);
+    }
+    else
+    {
+        LOG_WARN("Failed to open skybox config: %s", skybox_config_filepath.c_str());
+    }
+}
+
+vsg::ref_ptr<vsg::Node> NewSkybox::getNode() const
+{
+    return state_group;
+}
+
+void NewSkybox::set_fog(double fog_density)
+{
+    if (!fog_value)
+        return;
+
+    fog_density = std::max(fog_density, 0.0);
+
+    // Пропускаем обновление при незаметном изменении (uniform.dirty
+    // expensive: пересоздание буфера)
+    if (std::abs(fog_density - last_fog_density) < 1.0e-6)
+        return;
+
+    last_fog_density = fog_density;
+
+    // Цвет тумана: светло-серый со слабой примесью неба.
+    // Плотность 1/м -> степень замутнения через экспоненту
+    vsg::vec4& value = fog_value->value();
+    value = vsg::vec4(0.72f, 0.75f, 0.79f, static_cast<float>(fog_density));
+    fog_value->dirty();
+}
+
+void NewSkybox::set_date_time(const simulator_time_t& sim_time)
+{
+    is_sun_rise = sim_time.time.hour() < 13;
+}
+
+void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degrees)
+{
+    // Обновлять не чаще 1 раза в секунду
+    auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast<std::chrono::seconds>(now - last_update).count() < 1)
+    {
+        return;  // Пропускаем обновление
+    }
+    last_update = now;
+
+    // Поворот модели скайбокса в используемую систему координат,
+    // и поворот для отрисовки солнца в той же стороне, где источник солнечного света
+    transform->matrix = vsg::rotate(vsg::radians(90.0), vsg::dvec3{1.0, 0.0, 0.0}) *
+                        vsg::rotate(vsg::radians(90.0 + azimuth_degrees), vsg::dvec3{0.0, -1.0, 0.0});
+
+    // Выбор текстур по углу возвышения солнца над/под горизонтом
+    if (std::abs(altitude_degrees) > 90.0)
+    {
+        return;
+    }
+
+    auto angle_in_interval = [](const double& begin,
+                                const double& end,
+                                const double& cur_angle,
+                                const bool& is_cur_angle_rise) -> float
+    {
+        if ((begin < end) == is_cur_angle_rise)
+        {
+            const float mix_value = (cur_angle - begin) / (end - begin);
+            return std::clamp(mix_value, 0.0f, 1.0f);
+        }
+        return 0.0f;
+    };
+
+    float max1 = 0.0f;
+    float max2 = 0.0f;
+    int texture1_id = -1;
+    int texture2_id = -1;
+    int id = 0;
+    for (texture_t& tt : textures)
+    {
+        // Проверям, с какой интенсивностью должна отображаться текстура
+        float mix_value_appear =
+            angle_in_interval(tt.angle_appear_begin, tt.angle_appear_end, altitude_degrees, is_sun_rise);
+        float mix_value_disappear =
+            angle_in_interval(tt.angle_disappear_begin, tt.angle_disappear_end, altitude_degrees, is_sun_rise);
+
+        // Корректируем полученное значение в случае перехода через полдень
+        if ((tt.angle_appear_begin < tt.angle_appear_end) &&
+            (tt.angle_disappear_begin > tt.angle_disappear_end))
+        {
+            mix_value_appear += static_cast<float>(!is_sun_rise);
+        }
+
+        // Корректируем полученное значение в случае перехода через полночь
+        if ((tt.angle_appear_begin > tt.angle_appear_end) &&
+            (tt.angle_disappear_begin < tt.angle_disappear_end))
+        {
+            mix_value_appear += static_cast<float>(is_sun_rise);
+        }
+
+        tt.mix_value = mix_value_appear - mix_value_disappear;
+
+        // Сохраняем id двух текстур с максимальным значением
+        if (max1 < tt.mix_value)
+        {
+            if (max2 < max1)
+            {
+                max2 = max1;
+                texture2_id = texture1_id;
+            }
+            max1 = tt.mix_value;
+            texture1_id = id;
+        }
+        else
+        {
+            if (max2 < tt.mix_value)
+            {
+                max2 = tt.mix_value;
+                texture2_id = id;
+            }
+        }
+        ++id;
+    }
+
+    if (texture2_id < 0)
+    {
+        if (texture1_id < 0)
+        {
+            // Нет активных текстур
+            for (texture_t& tt : textures)
+            {
+                tt.use_id = 0;
+            }
+            return;
+        }
+
+        // Активна только одна текстура, передаём её в первую текстуру шейдера
+        if (textures[texture1_id].use_id != 1)
+        {
+            std::memcpy(texture1_data->dataPointer(),
+                        textures[texture1_id].texture->dataPointer(),
+                        textures[texture1_id].texture->dataSize());
+            texture1_data->dirty();
+        }
+
+        // Передаём в шейдер отображение первой текстуры полностью
+        if (mix_value->value() != 0.0f)
+        {
+            mix_value->set(0.0f);
+            mix_value->dirty();
+        }
+
+        for (texture_t& tt : textures)
+        {
+            tt.use_id = 0;
+        }
+        textures[texture1_id].use_id = 1;
+    }
+    else
+    {
+        // Активны две текстуры, передаём их в шейдер
+        if (textures[texture1_id].use_id != 1)
+        {
+            std::memcpy(texture1_data->dataPointer(),
+                        textures[texture1_id].texture->dataPointer(),
+                        textures[texture1_id].texture->dataSize());
+            texture1_data->dirty();
+        }
+
+        if (textures[texture2_id].use_id != 2)
+        {
+            std::memcpy(texture2_data->dataPointer(),
+                        textures[texture2_id].texture->dataPointer(),
+                        textures[texture2_id].texture->dataSize());
+            texture2_data->dirty();
+        }
+
+        // Передаём в шейдер смешение текстур
+        const float sum = max1 + max2;
+        const float mix = max2 / sum;
+        constexpr float eps = 1.0f / 256.0f;
+        if (std::abs(mix_value->value() - mix) > eps)
+        {
+            mix_value->set(mix);
+            mix_value->dirty();
+        }
+
+        for (texture_t& tt : textures)
+        {
+            tt.use_id = 0;
+        }
+        textures[texture1_id].use_id = 1;
+        textures[texture2_id].use_id = 2;
+    }
+}
+
+class FindArraysVisitor : public vsg::Visitor
+{
+public:
+    void apply(vsg::Object& object) override
+    {
+        object.traverse(*this);
+    }
+
+    void apply(vsg::VertexIndexDraw& vid) override
+    {
+        for (auto& buffer_info : vid.arrays)
+        {
+            auto data = buffer_info->data;
+            if (auto array = data.cast<vsg::vec3Array>())
+            {
+                positions = array;
+            }
+            else if (auto array = data.cast<vsg::vec2Array>())
+            {
+                tex_coords = array;
+            }
+        }
+
+        ushort_indices = vid.indices->data->cast<vsg::ushortArray>();
+        uint_indices = vid.indices->data->cast<vsg::uintArray>();
+    }
+
+    vsg::ref_ptr<vsg::Data> get_indices() const
+    {
+        if (ushort_indices)
+        {
+            return ushort_indices;
+        }
+        else
+        {
+            return uint_indices;
+        }
+    }
+
+    std::size_t get_indices_size() const
+    {
+        if (ushort_indices)
+        {
+            return ushort_indices->size();
+        }
+        else
+        {
+            return uint_indices->size();
+        }
+    }
+
+public:
+    vsg::ref_ptr<vsg::vec3Array> positions;
+    vsg::ref_ptr<vsg::vec2Array> tex_coords;
+    vsg::ref_ptr<vsg::ushortArray> ushort_indices;
+    vsg::ref_ptr<vsg::uintArray> uint_indices;
+};
+
+void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
+{
+    // Получаем пути к шейдерам скайбокса
+    const FileSystem& fs = FileSystem::getInstance();
+    const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
+
+    const auto depth_stencil_state = vsg::DepthStencilState::create();
+    depth_stencil_state->depthTestEnable = VK_TRUE;
+    depth_stencil_state->depthWriteEnable = VK_FALSE;
+    depth_stencil_state->depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL;
+
+    texture1_data = vsg::clone(textures[0].texture);
+    texture2_data = vsg::clone(textures[0].texture);
+    texture1_data->properties.dataVariance = vsg::DYNAMIC_DATA;
+    texture2_data->properties.dataVariance = vsg::DYNAMIC_DATA;
+
+    const auto sampler = vsg::Sampler::create();
+
+    mix_value = vsg::floatValue::create(0.0f);
+    mix_value->properties.dataVariance = vsg::DYNAMIC_DATA;
+
+    // Туман (ТЗ "Видимость и погода"): rgb - цвет, a - плотность, 1/м
+    fog_value = vsg::vec4Value::create(vsg::vec4(0.72f, 0.75f, 0.79f, 0.0f));
+    fog_value->properties.dataVariance = vsg::DYNAMIC_DATA;
+
+    state_group = create_state_group_with_custom_pipeline(
+        shaders_dir_path.c_str(),
+        "new_skybox.vert",
+        "new_skybox.frag",
+        options,
+        vsg::VertexInputState::Bindings{
+            VkVertexInputBindingDescription{0, sizeof(vsg::vec3), VK_VERTEX_INPUT_RATE_VERTEX},
+            VkVertexInputBindingDescription{1, sizeof(vsg::vec2), VK_VERTEX_INPUT_RATE_VERTEX}
+        },
+        vsg::VertexInputState::Attributes{
+            VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
+            VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32_SFLOAT,    0}
+        },
+        vsg::DescriptorSetLayoutBindings{
+            {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+            {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+            {2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+            {3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
+        },
+        vsg::Descriptors{
+            vsg::DescriptorImage::create(sampler, texture1_data, 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER),
+            vsg::DescriptorImage::create(sampler, texture2_data, 1, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER),
+            vsg::DescriptorBuffer::create(            mix_value, 2, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER),
+            vsg::DescriptorBuffer::create(            fog_value, 3, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+        },
+        vsg::InputAssemblyState::create(),
+        vsg::RasterizationState::create(),
+        vsg::MultisampleState::create(),
+        vsg::ColorBlendState::create(),
+        depth_stencil_state
+    );
+
+    // Загружаем модель скайбокса
+    QString model_filename = "sky.gltf";
+    cfg.getString("Model", "Filename", model_filename);
+
+    std::string model_path = fs.getDataDir();
+    model_path = fs.combinePath(model_path, "models");
+    model_path = fs.combinePath(model_path, "default-objects");
+    model_path = fs.combinePath(model_path, model_filename.toStdString());
+
+    if (!vsg::fileExists(model_path))
+    {
+        LOG_WARN("Failed to find skybox file: %s", model_path.c_str());
+        return;
+    }
+
+    auto loaded = vsg::read(model_path, options);
+    auto node = loaded.cast<vsg::Node>();
+    if (!node)
+    {
+        LOG_WARN("Failed to load skybox model from file: %s", model_path.c_str());
+
+        auto error = loaded.cast<vsg::ReadError>();
+        if (error)
+        {
+            LOG_WARN(error->message.c_str());
+        }
+
+        return;
+    }
+
+    FindArraysVisitor fav;
+    node->accept(fav);
+
+    auto draw_commands = vsg::Commands::create();
+    draw_commands->addChild(vsg::BindVertexBuffers::create(0, vsg::DataList{fav.positions, fav.tex_coords}));
+    draw_commands->addChild(vsg::BindIndexBuffer::create(fav.get_indices()));
+    draw_commands->addChild(vsg::DrawIndexed::create(fav.get_indices_size(), 1, 0, 0, 0));
+
+    transform = vsg::MatrixTransform::create();
+    transform->matrix = vsg::rotate(vsg::radians(90.0), vsg::dvec3{1.0, 0.0, 0.0});
+
+    transform->addChild(draw_commands);
+    state_group->addChild(transform);
+}
+
+void NewSkybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
+{
+    FileSystem& fs = FileSystem::getInstance();
+    std::string textures_dir_path = fs.getDataDir();
+    textures_dir_path = fs.combinePath(textures_dir_path, "models");
+    textures_dir_path = fs.combinePath(textures_dir_path, "default-objects");
+    textures_dir_path = fs.combinePath(textures_dir_path, "textures");
+
+    // Читаем из конфига имена файлов текстур и их сезон, время суток
+    QDomNode sec_node = cfg.getFirstSection("Texture");
+    while (!sec_node.isNull())
+    {
+        QString texture_filename = "sky_day.bmp";
+        cfg.getString(sec_node, "Filename", texture_filename);
+        const std::string texture_path = fs.combinePath(textures_dir_path, texture_filename.toStdString());
+
+        // Ищем файл текстуры
+        if (!vsg::fileExists(texture_path))
+        {
+            LOG_WARN("Failed to find skybox texture file: %s", texture_path.c_str());
+
+            sec_node = cfg.getNextSection();
+            continue;
+        }
+
+        // Загружаем файл текстуры
+        auto loaded = vsg::read(texture_path, options);
+        auto data = loaded->cast<vsg::ubvec4Array2D>();
+        if (!data)
+        {
+            LOG_WARN("Failed to load skybox texture from file: %s", texture_path.c_str());
+
+            auto error = loaded->cast<vsg::ReadError>();
+            if (error)
+            {
+                LOG_WARN(error->message.c_str());
+            }
+
+            sec_node = cfg.getNextSection();
+            continue;
+        }
+
+        // Проверяем, что новая текстура совпадает по размеру с остальными
+        if (!textures.empty())
+        {
+            auto texture = textures[0].texture;
+            if ((data->width() != texture->width()) || (data->height() != texture->height()))
+            {
+                LOG_WARN("Failed to apply skybox texture from file: %s", texture_path.c_str());
+
+                sec_node = cfg.getNextSection();
+                continue;
+            }
+        }
+
+        LOG_INFO("Loaded skybox texture from file: %s", texture_path.c_str());
+
+        texture_t tt{};
+        tt.texture = data;
+        tt.filename = texture_filename.toStdString();
+
+        if (!cfg.getDouble(sec_node, "SunAltitudeAngleAppearBegin", tt.angle_appear_begin) ||
+            !cfg.getDouble(sec_node, "SunAltitudeAngleAppearEnd", tt.angle_appear_end) ||
+            !cfg.getDouble(sec_node, "SunAltitudeAngleDisappearBegin", tt.angle_disappear_begin) ||
+            !cfg.getDouble(sec_node, "SunAltitudeAngleDisappearEnd", tt.angle_disappear_end))
+        {
+            LOG_WARN("Failed to read sun altitude angles from config for skybox texture: %s", texture_path.c_str());
+
+            sec_node = cfg.getNextSection();
+            continue;
+        }
+
+        if ((std::abs(tt.angle_appear_begin) > 90.0) ||
+            (std::abs(tt.angle_appear_end) > 90.0) ||
+            (std::abs(tt.angle_disappear_begin) > 90.0) ||
+            (std::abs(tt.angle_disappear_end) > 90.0) ||
+            (tt.angle_appear_begin == tt.angle_appear_end) ||
+            (tt.angle_disappear_begin == tt.angle_disappear_end))
+        {
+            LOG_WARN("Invalid sun altitude angles for skybox texture: %s", texture_path.c_str());
+
+            sec_node = cfg.getNextSection();
+            continue;
+        }
+
+        LOG_INFO("Loaded skybox texture: %s", texture_path.c_str());
+        textures.emplace_back(tt);
+        sec_node = cfg.getNextSection();
+    }
+}

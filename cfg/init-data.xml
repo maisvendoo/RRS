@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<InitData>
+		<!-- Имя папки с маршрутом в /routes -->
+		<RouteDirectory>experimental-polygon</RouteDirectory>
+		<!-- Имя конфиг-файла поезда в /cfg/trains -->
+		<TrainConfig>vl60pk-1543-T65_17</TrainConfig>
+		<!-- Имя файла с траекторией в routes/<RouteDirectory>/topology/trajectories -->
+		<TrajectoryName>route1_0001_1</TrajectoryName>
+		<!-- Направление движения по маршруту: 1 - туда, -1 - обратно -->
+		<Direction>1</Direction>
+		<!-- Координата положения головы поезда на траектории при запуске симуляции -->
+		<InitCoord>785.0</InitCoord>
+		<!-- Скорость поезда при запуске симуляции -->
+		<InitVelocity>0.0</InitVelocity>
+		<!-- Коэффициент к трению колесо-рельс: меньше 1.0 - уменьшить, больше 1.0 - увеличить -->
+		<CoeffToWheelRailFriction>1.0</CoeffToWheelRailFriction>
+		<!-- Шаг синхронизации симуляции, мс -->
+		<IntegrationTimeInterval>15</IntegrationTimeInterval>
+
+		<DebugPrint>0</DebugPrint>
+
+		<!-- Интегрированный отладчик Lua-скриптов -->
+		<LuaDebug>0</LuaDebug>
+
+		<!-- Скорость симуляции -->
+		<SimulationSpeed>1.0</SimulationSpeed>
+	</InitData>
+</Config>

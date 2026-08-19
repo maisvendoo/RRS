@@ -1,0 +1,42 @@
+#pragma once
+#ifndef UPDATE_CONTROL_TO_SERVER_HANDLER_H
+#define UPDATE_CONTROL_TO_SERVER_HANDLER_H
+
+#include <vsg/ui/KeyEvent.h>
+#include <cstdint>
+#include <set>
+
+class TcpClient;
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+class UpdateControlToServerHandler final : public vsg::Inherit<vsg::Visitor, UpdateControlToServerHandler>
+{
+public:
+    explicit UpdateControlToServerHandler(TcpClient *tc);
+
+    void apply(vsg::KeyPressEvent& keyPress) override;
+    void apply(vsg::KeyReleaseEvent& keyRelease) override;
+    void apply(vsg::FocusInEvent& focusIn) override;
+    void apply(vsg::FocusOutEvent& focusOut) override;
+    void changeCurrentVehicle(int current_idx, int controlled_idx, int cabine_idx);
+    void setNeedDebugMsg(bool is_needed);
+
+    void setSpeedFactor(int speed_factor);
+
+private:
+
+    void sendControlToServer();
+    void sendEmptyControlToServer();
+
+    TcpClient *_tcp_client = nullptr;
+
+    std::uint16_t _current_idx = 0;
+    std::uint16_t _controlled_idx = 0;
+    std::uint16_t _controlled_cabine_idx = 0;
+    bool _is_needed_debug_msg = false;
+    std::set<std::uint16_t> _pressed_keys = {};
+};
+
+#endif // UPDATE_CONTROL_TO_SERVER_HANDLER_H

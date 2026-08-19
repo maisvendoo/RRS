@@ -1,0 +1,16 @@
+#ifndef     ROUTE_SIGNAL_H
+#define     ROUTE_SIGNAL_H
+
+#include    "enter-signal.h"
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+class TOPOLOGY_EXPORT RouteSignal : public EnterSignal
+{
+public:
+    RouteSignal(QObject *parent = nullptr);
+    virtual ~RouteSignal() override;
+};
+
+#endif // ROUTE_SIGNAL_H

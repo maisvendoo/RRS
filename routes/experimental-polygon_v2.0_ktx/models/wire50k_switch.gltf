@@ -1,0 +1,156 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 1838,
+      "max": [
+        0.419385,
+        8.87103,
+        0.133653
+      ],
+      "min": [
+        -1.54663,
+        6.48997,
+        -50.0059
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 1838,
+      "max": [
+        1,
+        1,
+        1
+      ],
+      "min": [
+        -1,
+        -1,
+        -1
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 1838,
+      "max": [
+        0.997783,
+        0.8647
+      ],
+      "min": [
+        0.0726362,
+        0.411795
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5125,
+      "count": 3426,
+      "max": [
+        1837
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 22056,
+      "byteOffset": 0,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 22056,
+      "byteOffset": 22056,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 14704,
+      "byteOffset": 44112,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 13704,
+      "byteOffset": 58816,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 72520,
+      "uri": "bin/wire50k_switch.bin"
+    }
+  ],
+  "images": [
+    {
+      "uri": "..\\textures\\KontSet_1.ktx2"
+    }
+  ],
+  "materials": [
+    {
+      "alphaMode": "BLEND",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    }
+  ]
+}

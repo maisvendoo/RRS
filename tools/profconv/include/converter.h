@@ -1,0 +1,266 @@
+//------------------------------------------------------------------------------
+//
+//      Conversion processor
+//      (c) maisvendoo, 20/12/2018
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Conversion processor
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 20/12/2018
+ */
+
+#ifndef     CONVERTER_H
+#define     CONVERTER_H
+
+#include    <vector>
+
+#include    "cmdparser.hpp"
+//#include    "zds-profile-dat-struct.h"
+#include    "zds-objects-ref-struct.h"
+#include    "zds-route-map-struct.h"
+#include    "zds-route-trk-struct.h"
+#include    "zds-signals-at-route-map-struct.h"
+#include    "zds-start-kilometers-dat-struct.h"
+#include    "zds-speeds-dat-struct.h"
+#include    "zds-svetofor-dat-struct.h"
+#include    "zds-branch-tracks-dat-struct.h"
+#include    "trajectory_struct.h"
+#include    "power_line_element.h"
+#include    "neutral_insertion.h"
+
+#include    <fstream>
+#include    <QTextStream>
+#include    <QRegularExpression>
+
+#define     DIR_TOPOLOGY     std::string("topology")
+#define     DIR_TRAJECTORIES std::string("trajectories")
+#define     DIR_ROUTE1MAP    std::string("map")
+#define     DIR_ALSN_MAP     std::string("trajectory-ALSN")
+#define     DIR_SPEEDMAP     std::string("trajectory-speedmap")
+#define     FILE_TOPOLOGY    std::string("topology.xml")
+#define     FILE_DEFAULT_OBJ std::string("models-config.xml")
+#define     FILE_START_POINT std::string("waypoints.conf")
+#define     FILE_STATIONS    std::string("stations.conf")
+#define     FILE_ROUTE1MAP   std::string("route1.map")
+#define     FILE_NO_ALSN     std::string("ALSN_no_signal.xml")
+#define     FILE_ALSN_25HZ   std::string("ALSN_25Hz.xml")
+#define     FILE_ALSN_50HZ   std::string("ALSN_50Hz.xml")
+#define     FILE_TRAJ_EXTENTION   std::string(".traj")
+#define     FILE_BACKUP_EXTENTION std::string(".bak")
+#define     FILE_BACKUP_PREFIX    std::string("~")
+#define     CONFIGNODE_TRAJ_2LVL  std::string("Trajectory")
+#define     CONFIGNODE_TRAJ_3LVL  std::string("Name")
+#define     DELIMITER_SYMBOL char('\t')
+#define     ADD_ZDS_TRACK_NUMBER_TO_FILENAME bool(true)
+
+/// Регулярное выражение Perl \s+ - один или более пробельных символов (пробелов или табуляций)
+const QRegularExpression RE_zds_separartors = QRegularExpression("\\s+");
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+class ZDSimConverter
+{
+public:
+
+    ZDSimConverter();
+
+    ~ZDSimConverter();
+
+    int run(int argc, char *argv[]);
+
+private:
+
+    size_t railway_coord_sections1 = 0;
+
+    size_t railway_coord_sections2 = 0;
+
+    std::string ZDSrouteDir = "";
+
+    std::string routeDir = "";
+
+    std::string topologyDir = "";
+
+    std::string trajectoriesDir = "";
+
+    std::string route1mapDir = "";
+
+    std::string ALSN_Dir = "";
+
+    std::string speedmapDir = "";
+
+    zds_objects_ref_data_t  objects_data;
+
+    zds_route_map_data_t    route_map_data;
+
+    zds_route_map_data_t    map_data_objects_no_info;
+
+    zds_route_map_data_t    map_data_objects_with_info;
+
+    zds_signals_at_map_data_t   signals_line_data;
+
+    zds_signals_at_map_data_t   signals_enter_data;
+
+    zds_signals_at_map_data_t   signals_exit_data;
+
+    zds_signals_at_map_data_t   signals_povt_data;
+
+    zds_signals_at_map_data_t   signals_maneurous_data;
+
+    zds_trajectory_data_t   tracks_data1;
+
+    zds_trajectory_data_t   tracks_data2;
+
+    zds_start_km_data_t start_km_data;
+
+    zds_speeds_data_t   speeds_data1;
+
+    zds_speeds_data_t   speeds_data2;
+
+    zds_signals_data_t  signals_data1;
+
+    zds_signals_data_t  signals_data2;
+
+    zds_signals_data_t  signals_reverse_data1;
+
+    zds_signals_data_t  signals_reverse_data2;
+
+    zds_branch_track_data_t branch_track_data1;
+
+    zds_branch_track_data_t branch_track_data2;
+
+    zds_branch_2_2_data_t branch_2minus2_data;
+
+    zds_branch_2_2_data_t branch_2plus2_data;
+
+    route_trajectories_t trajectories1;
+
+    route_trajectories_t trajectories2;
+
+    route_connectors_t split_data1;
+
+    route_connectors_t split_data2;
+
+    route_connectors_t branch_connectors;
+
+    start_point_data_t start_points;
+
+    speedmap_data_t   speedmap_data;
+
+    std::vector<power_line_element_t> power_line1;
+
+    std::vector<power_line_element_t> power_line2;
+
+    std::vector<neutral_insertion_t> neutral_insertions;
+
+    void configure_parser(cli::Parser &parser);
+
+    void parse_command_line(cli::Parser &parser);
+
+    void configure_path(const std::string &input_path, const std::string &output_path);
+
+    QString fileToQString(const std::string &path);
+
+    bool conversion();
+
+    zds_track_t getNearestTrack(dvec3 point, const zds_trajectory_data_t &tracks_data, float &coord);
+
+    double calcCurvature(const zds_trajectory_data_t &tracks_data, size_t idx);
+
+    double calcCurvature(const zds_track_t &track0, const zds_track_t &track1);
+
+    bool readRouteMAP(const std::string &path, zds_route_map_data_t &map_data);
+
+    bool readRouteMAP(QTextStream &stream, zds_route_map_data_t &map_data);
+
+    bool readObjectsRef(const std::string &path, zds_objects_ref_data_t &objects_data);
+
+    bool readObjectsRef(QTextStream &stream, zds_objects_ref_data_t &objects_data);
+
+    void findSignalsAtMap();
+
+    bool findTrackNearToSignal(zds_signal_position_t *signal, int dir);
+
+    bool readRouteTRK(const std::string &path, zds_trajectory_data_t &track_data, const int &dir);
+
+    bool readRouteTRK(std::ifstream &stream, zds_trajectory_data_t &track_data, const int &dir);
+
+    void writeProfileData(const zds_trajectory_data_t &tracks_data,
+                          const std::string &file_name);
+
+    void createPowerLine(const std::vector<zds_track_t> &tracks_data,
+                         std::vector<power_line_element_t> &power_line);
+
+    bool findNeutralInsertions(std::vector<neutral_insertion_t> ni);
+
+    bool readStartKilometersDAT(const std::string &path, zds_start_km_data_t &waypoints);
+
+    bool readStartKilometersDAT(QTextStream &stream, zds_start_km_data_t &waypoints);
+
+    void writeStationsOld(const std::string &filename, const zds_start_km_data_t &waypoints);
+
+    bool readSpeedsDAT(const std::string &path, zds_speeds_data_t &speeds_data, const int &dir);
+
+    bool readSpeedsDAT(QTextStream &stream, zds_speeds_data_t &speeds_data, const int &dir);
+
+    void writeOldSpeeds(const std::string &filename, const zds_speeds_data_t &speeds_data);
+
+    bool readSvetoforDAT(const std::string &path, zds_signals_data_t &signals_data, const int &dir);
+
+    bool readSvetoforDAT(QTextStream &stream, zds_signals_data_t &signals_data, const int &dir);
+
+    bool readBranchTracksDAT(const std::string &path, const int &dir);
+
+    bool readBranchTracksDAT(QTextStream &stream, const int &dir);
+
+    bool checkIsToOtherMain(zds_branch_point_t* branch_point, bool is_add_2minus2);
+
+    bool findFromOtherMain(zds_branch_point_t* branch_point);
+
+    bool calcBranchTrack1(zds_branch_track_t* branch_track);
+
+    bool calcBranchTrack2(zds_branch_track_t* branch_track);
+
+    bool calcBranch22(zds_branch_2_2_t* branch22, bool is_2minus2);
+
+    void findSplitsMainTrajectory1();
+
+    void findSplitsMainTrajectory2();
+
+    void addOrCreateSplit(route_connectors_t &split_data, const split_zds_trajectory_t &split_point);
+
+    void splitMainTrajectory(const int &dir);
+
+    void splitAndNameBranch(zds_branch_track_t* branch_track, const int &dir, size_t num_trajectories);
+
+    void nameBranch22(zds_branch_2_2_t* branch_track, const int &dir, size_t num_trajectories);
+
+    void findStartPointsBySignals(const route_connectors_t &connectors);
+
+    bool createSpeedMap();
+
+    void writeSignalsForDebug();
+
+    void writeSplitsForDebug(const route_connectors_t &connectors, const int &dir);
+
+    void writeTopologyTrajectory(const trajectory_t* trajectory);
+
+    void writeTopologyConnectors();
+
+    void writeStartPoints(const start_point_data_t &start_points);
+
+    void writeStations(const zds_start_km_data_t &waypoints);
+
+    void writeMap();
+
+    void writeModelsConfig();
+
+    void writeSpeedmap();
+
+    void writeALSN();
+};
+
+#endif // CONVERTER_H

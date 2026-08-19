@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		<Order>1</Order>
+		<SubStepNum>1</SubStepNum>
+		<Solver>euler</Solver>
+
+		<!-- Номинальное напряжение -->
+		<U_nom>3000.0</U_nom>
+
+		<!-- Номинальная угловая скорость -->
+		<omega0>192.0</omega0>
+
+		<!-- Сопротивление двигателя -->
+		<R>56.9</R>
+
+		<!-- Харакстеристика магнитного поля двигателя -->
+		<cPhi>14.2</cPhi>
+
+		<!-- Момент инерции ротора -->
+		<J>2.0</J>
+
+		<!-- Момент сопротивления вращению ротора -->
+		<Mxx>50.0</Mxx>
+
+		<!-- Коэффициент перехода от скорости ротора к производимому давлению -->
+		<K_pressure>0.0061</K_pressure>
+
+		<!-- Коэффициент потока в питательную магистраль -->
+		<K_flow>0.02</K_flow>
+
+		<RegulateSoundByOnOff>0</RegulateSoundByOnOff>
+		<RegulateSoundByPitch>1</RegulateSoundByPitch>
+
+	</Device>
+</Config>

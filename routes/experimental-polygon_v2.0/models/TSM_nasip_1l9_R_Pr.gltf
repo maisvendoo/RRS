@@ -1,0 +1,153 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "buffers": [
+        {
+            "uri": "bin/TSM_nasip_1l9_R_Pr.bin",
+            "byteLength": 90720
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 30240,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 30240,
+            "byteLength": 30240,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 60480,
+            "byteLength": 20160,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 80640,
+            "byteLength": 10080,
+            "target": 34963
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 2520,
+            "type": "VEC3",
+            "max": [
+                23.7583,
+                -0.2,
+                7.97363
+            ],
+            "min": [
+                -18.7334,
+                -10.2206,
+                -97.6844
+            ]
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 2520,
+            "type": "VEC3",
+            "max": [
+                0.701214,
+                1,
+                0.6403
+            ],
+            "min": [
+                -0.70469,
+                0.575315,
+                -0.584875
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 2520,
+            "type": "VEC2",
+            "max": [
+                0.374769,
+                1
+            ],
+            "min": [
+                0,
+                0
+            ]
+        },
+        {
+            "bufferView": 3,
+            "componentType": 5125,
+            "count": 2520,
+            "type": "SCALAR",
+            "max": [
+                2519
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "images": [
+        {
+            "uri": "../textures/nasip_TSM.bmp"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0,
+                    "texCoord": 0
+                }
+            }
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
+                    },
+                    "indices": 3,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [ 0 ]
+        }
+    ],
+    "scene": 0
+}

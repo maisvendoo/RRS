@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Config>
+    <!-- Настройки окна -->
+    <Window>
+        <!-- Заголовок окна -->
+        <Title>Route Editor</Title>
+        <!-- Положение окна, пикс. -->
+        <PosX>50</PosX>
+        <PosY>50</PosY>
+        <!-- Размер окна, пикс. -->
+        <Width>1800</Width>
+        <Height>900</Height>
+        <!-- Номер монитора; 0 - для монитора по-умолчанию -->
+        <ScreenNumber>0</ScreenNumber>
+        <!-- Мультисемплинг (сглаживание) -->
+        <Samples>8</Samples>
+        <!-- Полноэкранный режим: 1 - включен; 0 - оконный режим -->
+        <FullScreen>0</FullScreen>
+        <!-- Вертикальная синхронизация: 1 - включена; 0 - отключена -->
+        <VSync>1</VSync>
+        <!-- Двойная буферизация: 1 - включена; 0 - отключена -->
+        <DoubleBuffer>1</DoubleBuffer>
+    </Window>
+    <!-- Настройки сцены -->
+    <Scene>
+        <!-- Допустимое количество источников света в сцене -->
+        <NumLights>200</NumLights>
+    </Scene>
+    <!-- Настройки камеры -->
+    <Camera>
+        <!-- Ближняя плоскость отсечения, м. -->
+        <zNear>0.1</zNear>
+        <!-- Дальняя плоскость отсечения (дальность видимости), м. -->
+        <ViewDistance>2000.0</ViewDistance>
+        <!-- Угол поля зрения, град. -->
+        <FovY>90</FovY>
+        <FovYMin>30</FovYMin>
+        <FovYMax>120</FovYMax>
+        <!-- Начальная высота камеры -->
+        <InitialHeight>5.0</InitialHeight>
+        <!-- Скорость перемещения камеры -->
+        <MoveSpeed>100.0</MoveSpeed>
+        <!-- Скорость вращения камеры -->
+        <RotateSpeed>0.3</RotateSpeed>
+        <!-- Сила приближения/отдаления камеры -->
+        <ZoomPower>25.0</ZoomPower>
+    </Camera>
+    <!-- Настройки гизмо -->
+    <Gizmo>
+        <!-- Длина стрелок гизмо -->
+        <ArrowLength>3.0</ArrowLength>
+        <!-- Толщина стрелок гизмо-->
+        <ArrowThickness>0.05</ArrowThickness>
+        <!-- Цвет оси X гизмо -->
+        <XAxisColorR>0.859</XAxisColorR>
+        <XAxisColorG>0.188</XAxisColorG>
+        <XAxisColorB>0.143</XAxisColorB>
+        <!-- Цвет оси Y гизмо -->
+        <YAxisColorR>0.533</YAxisColorR>
+        <YAxisColorG>0.820</YAxisColorG>
+        <YAxisColorB>0.298</YAxisColorB>
+        <!-- Цвет оси Z гизмо -->
+        <ZAxisColorR>0.188</ZAxisColorR>
+        <ZAxisColorG>0.438</ZAxisColorG>
+        <ZAxisColorB>0.859</ZAxisColorB>
+        <!-- Непрозрачность гизмо -->
+        <Opacity>1.0</Opacity>
+        <!-- Центрировать гизмо -->
+        <ToCenter>0</ToCenter>
+    </Gizmo>
+    <!-- Настройки GUI (графического интерфейса пользователя) -->
+    <GUI>
+        <!-- Размер шрифта GUI -->
+        <FontSize>20.0</FontSize>
+        <!-- Можно ли перемещать и менять размер GUI -->
+        <IsEditable>1</IsEditable>
+        <!-- Отображать список моделей в objects.ref после загрузки маршрута -->
+        <ShowObjectsRef>1</ShowObjectsRef>
+        <!-- Отображать список объектов в route1.map после загрузки маршрута -->
+        <!-- !!!Сейчас на больших маршрутах тормозит!!! -->
+        <ShowRouteMap>0</ShowRouteMap>
+        <!-- Отображать список станций -->
+        <ShowStationsConf>1</ShowStationsConf>
+        <!-- Отображать вэйпоинты -->
+        <ShowWaypointsConf>1</ShowWaypointsConf>
+        <!-- Отображать привязки клавиш и кнопок управления -->
+        <ShowKeyBindings>1</ShowKeyBindings>
+        <!-- Отображать настройки камеры -->
+        <ShowCameraSettings>1</ShowCameraSettings>
+        <!-- Отображать топологию -->
+        <ShowTopology>0</ShowTopology>
+        <!-- Отображать свойства выделенных объектов -->
+        <ShowSelectedObjectsProperties>1</ShowSelectedObjectsProperties>
+        <!-- Отображать очередь выполненных команд -->
+        <ShowCommands>1</ShowCommands>
+    </GUI>
+    <!-- Настройки клавиатурных комбинаций управления -->
+    <Keys>
+        <MoveCameraForward>W</MoveCameraForward>
+        <MoveCameraBackward>S</MoveCameraBackward>
+        <MoveCameraLeft>A</MoveCameraLeft>
+        <MoveCameraRight>D</MoveCameraRight>
+        <MoveObjects>G</MoveObjects>
+        <RotateObjects>R</RotateObjects>
+        <ScaleObjects>S</ScaleObjects>
+        <HideObjects>H</HideObjects>
+        <ShowObjects>Alt + H</ShowObjects>
+        <CopyObjects>Ctrl + C</CopyObjects>
+        <PasteObjects>Ctrl + V</PasteObjects>
+        <DeleteObjects>X</DeleteObjects>
+        <UndoCommand>Ctrl + Z</UndoCommand>
+        <RedoCommand>Ctrl + Y</RedoCommand>
+        <SaveRoute>Ctrl + S</SaveRoute>
+    </Keys>
+</Config>

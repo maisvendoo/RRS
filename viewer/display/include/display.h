@@ -1,0 +1,77 @@
+//------------------------------------------------------------------------------
+//
+//
+//
+//
+//------------------------------------------------------------------------------
+#ifndef DISPLAY_H
+#define DISPLAY_H
+
+#include "display-export.h"
+#include "display-types.h"
+
+#include <QWidget>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+class DISPLAY_EXPORT AbstractDisplay : public QWidget
+{
+public:
+    AbstractDisplay(QWidget* parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
+
+    virtual ~AbstractDisplay();
+
+    /// Инициализация дисплея
+    virtual void init();
+
+    /// Обновление дисплея
+    virtual void update(double t, double dt);
+
+    /// Указать ID сигнала основной анимации текстуры
+    void setAnimationSignalID(std::int32_t index);
+
+    /// Задать входной сигнал
+    void setInputSignal(size_t index, float value);
+
+    /// Задать массив входных сигналов
+    void setInputSignals(const display_signals_t& input_signals);
+
+    /// Получить выходной сигнал
+    float getOutputSignal(size_t index);
+
+    /// Получить массив выходных сигналов
+    display_signals_t getOutputSignals();
+
+    /// Задать каталог с конфигурационными файлами
+    void setConfigDir(QString config_dir);
+
+    /// Получить путь к каталогу с конфигами
+    QString getConfigDir() const;
+
+    /// Флаг для необходимости обновления текстуры в графическом движке
+    bool isRepaint() const;
+
+protected:
+    /// Входные сигналы, отображаемые на интерфейсе дисплея и управляющие его поведением
+    display_signals_t input_signals = display_signals_t();
+
+    /// Выходные (командные) сигналы, передаваемые с дисплея
+    display_signals_t output_signals = display_signals_t();
+
+    /// Путь к каталогу конфигурации
+    QString config_dir = "";
+
+    /// ID сигнала основной анимации текстуры
+    std::int32_t signal_id = -1;
+
+    /// Флаг для необходимости обновления текстуры в графическом движке
+    bool need_repaint = true;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+#define TO_BOOL(SignalName) static_cast<bool>(SignalName)
+
+#endif // DISPLAY_H

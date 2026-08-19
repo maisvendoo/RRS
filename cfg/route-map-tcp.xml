@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Client>
+		<HostAddr>127.0.0.1</HostAddr>
+		<port>1992</port>
+		<ReconnectInterval>500</ReconnectInterval>
+		<ShowServerAddr>1</ShowServerAddr>
+
+		<!-- Интервал обновления положений подвижного состава, мс -->
+		<VehiclesPosUpdateInterval>70</VehiclesPosUpdateInterval>
+	</Client>
+	<RouteMap>
+		<!-- Длина отрисовки выбранной траектории стрелки, м -->
+		<SwitchLength>35.0</SwitchLength>
+		<!-- Радиус у схематичного отображения сигналов светофоров, м -->
+		<SignalRadius>2.0</SignalRadius>
+		<!-- Смещение схематичного светофора вправо от оси пути, м -->
+		<SignalOffset>2.5</SignalOffset>
+	</RouteMap>
+</Config>

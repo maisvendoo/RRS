@@ -1,0 +1,389 @@
+//------------------------------------------------------------------------------
+//
+//      Abstract class for train devices
+//      (c) maisvendoo, 27/12/2018
+//
+//------------------------------------------------------------------------------
+/*!
+ * \file
+ * \brief Abstract class for train devices
+ * \copyright maisvendoo
+ * \author maisvendoo
+ * \date 27/12/2018
+ */
+
+#include    "device.h"
+
+#include    "filesystem.h"
+#include    "Journal.h"
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Device::Device(QObject *parent) : QObject(parent)
+{
+    qRegisterMetaType<state_vector_t>();
+
+    memory_alloc(1);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Device::~Device()
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::step(double t, double dt)
+{
+    preStep(y, t);
+
+    stepKeysControl(t, dt);
+
+    stepExternalControl(t, dt);
+
+    stepDiscrete(t, dt);
+
+    // Шаг решателя
+    double _dt;
+    if (max_step_dt > Physics::ZERO)
+    {
+        double min_sub_step_num = min(ceil(dt / max_step_dt), static_cast<double>(sub_step_num));
+        _dt = dt / min_sub_step_num;
+        sub_step_num = static_cast<int>(min_sub_step_num);
+    }
+    else
+    {
+        _dt = dt / static_cast<double>(sub_step_num);
+    }
+
+    // Решатель Эйлера
+    for (size_t i = 0; i < sub_step_num; ++i)
+    {
+        ode_system(y, dydt, t + static_cast<double>(i) * _dt);
+
+        for (size_t j = 0; j < y.size(); ++j)
+        {
+            y[j] = y[j] + dydt[j] * _dt;
+        }
+    }
+
+    postStep(y, t + dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::link()
+{
+    is_linked = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::unlink()
+{
+    is_linked = false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Device::isLinked() const
+{
+    return is_linked;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::setInputSignal(size_t idx, double value)
+{
+    if (idx < input_signals.size())
+        input_signals[idx] = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Device::getOutputSignal(size_t idx) const
+{
+    if (idx < output_signals.size())
+        return output_signals[idx];
+    else
+        return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::setName(QString value)
+{
+    name = value;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Device::getName() const
+{
+    return name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::setY(size_t i, double value)
+{
+    if (i < y.size())
+    {
+        y[i] = value;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Device::getY(size_t i) const noexcept
+{
+    return (i < y.size()) ? y[i] : 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::read_config(const QString &filename, const QString &dir_path)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    CfgReader cfg;
+
+    // Custom config from path
+    if (dir_path != "")
+    {
+        QString cfg_path = dir_path + QDir::separator() + filename + ".xml";
+
+        if (cfg.load(cfg_path))
+        {
+            Journal::instance()->info("Loaded file: " + cfg_path);
+
+            load_configuration(cfg);
+            load_config(cfg);
+            return;
+        }
+        else
+        {
+            Journal::instance()->error("File " + filename + ".xml is't found at custom path " + dir_path);
+        }
+    }
+
+    // Custom config from vehicle's subdirectory
+    if (custom_cfg_dir != "")
+    {
+        QString cfg_dir = fs.getVehiclesDir().c_str();
+        cfg_dir += fs.separator() + custom_cfg_dir;
+        QString cfg_path = cfg_dir + QDir::separator() + filename + ".xml";
+
+        if (cfg.load(cfg_path))
+        {
+            Journal::instance()->info("Loaded file: " + cfg_path);
+
+            load_configuration(cfg);
+            load_config(cfg);
+            return;
+        }
+        else
+        {
+            Journal::instance()->error("File " + filename + ".xml is't found at custom path " + cfg_dir);
+        }
+    }
+
+    // Config from default directory
+    QString cfg_dir = fs.getDevicesDir().c_str();
+    QString cfg_path = cfg_dir + QDir::separator() + filename + ".xml";
+
+    if (cfg.load(cfg_path))
+    {
+        Journal::instance()->info("Loaded file: " + cfg_path);
+
+        load_configuration(cfg);
+        load_config(cfg);
+        return;
+    }
+    Journal::instance()->error("File " + filename + ".xml is't found at default path " + cfg_dir);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::load_configuration(CfgReader &cfg)
+{
+    QString secName = "Device";
+
+    cfg.getString(secName, "Name", name);
+
+    int tmp = 0;
+    if (!cfg.getInt(secName, "Order", tmp))
+    {
+        tmp = 1;
+    }
+    memory_alloc(tmp);
+
+    sub_step_num = 1;
+    if (!cfg.getInt(secName, "SubStepNum", tmp))
+    {
+        sub_step_num = 1;
+    }
+    else
+    {
+        if (tmp > 0)
+        {
+            sub_step_num = tmp;
+        }
+    }
+
+    double max_dt = 0.0;
+    if (cfg.getDouble(secName, "MaxStep", max_dt) && (max_dt > Physics::ZERO))
+    {
+        max_step_dt = max_dt;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Device::getDebugMsg() const
+{
+    return QString();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::setControl(std::set<uint16_t>* keys,
+                        control_signals_t* control_signals)
+{
+    this->pressed_keys = keys;
+    this->control_signals = control_signals;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::setFeedbackPointer(feedback_signals_t* feedback_ptr)
+{
+    feedback = feedback_ptr;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+sound_state_t Device::getSoundState(size_t idx) const
+{
+    (void) idx;
+    return sound_state_t();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float Device::getSoundSignal(size_t idx) const
+{
+    (void) idx;
+    return sound_state_t::createSoundSignal(false);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::setCustomConfigDir(const QString &path)
+{
+    custom_cfg_dir = path;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Device::getCustomConfigDir() const
+{
+    return custom_cfg_dir;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::ode_system(const state_vector_t& Y, state_vector_t& dYdt, double t)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(Y)
+    Q_UNUSED(dYdt)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::load_config(CfgReader &cfg)
+{
+    Q_UNUSED(cfg)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::preStep(state_vector_t &Y, double t)
+{
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::postStep(state_vector_t &Y, double t)
+{
+    Q_UNUSED(Y)
+    Q_UNUSED(t)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::memory_alloc(int order)
+{
+    y.resize(static_cast<size_t>(order));
+    dydt.resize(static_cast<size_t>(order));
+
+    std::fill(y.begin(), y.end(), 0.0);
+    std::fill(dydt.begin(), dydt.end(), 0.0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::stepKeysControl(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::stepExternalControl(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Device::stepDiscrete(double t, double dt)
+{
+    Q_UNUSED(t)
+    Q_UNUSED(dt)
+}

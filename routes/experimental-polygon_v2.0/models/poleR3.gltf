@@ -1,0 +1,153 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "buffers": [
+        {
+            "uri": "bin/poleR3.bin",
+            "byteLength": 9860
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 2712,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 2712,
+            "byteLength": 2712,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 5424,
+            "byteLength": 1808,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 7232,
+            "byteLength": 2628,
+            "target": 34963
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 226,
+            "type": "VEC3",
+            "max": [
+                699.97,
+                -0.000419617,
+                50.8646
+            ],
+            "min": [
+                -34.8425,
+                -20.175,
+                -150.864
+            ]
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 226,
+            "type": "VEC3",
+            "max": [
+                0.00700391,
+                1,
+                0.599426
+            ],
+            "min": [
+                -0.828016,
+                0.542563,
+                -0.599472
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 226,
+            "type": "VEC2",
+            "max": [
+                16.8821,
+                5.1203
+            ],
+            "min": [
+                -4.29988,
+                0
+            ]
+        },
+        {
+            "bufferView": 3,
+            "componentType": 5125,
+            "count": 657,
+            "type": "SCALAR",
+            "max": [
+                225
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "images": [
+        {
+            "uri": "../textures/pole3.bmp"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0,
+                    "texCoord": 0
+                }
+            }
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
+                    },
+                    "indices": 3,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [ 0 ]
+        }
+    ],
+    "scene": 0
+}

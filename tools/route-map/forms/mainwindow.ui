@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="10,1">
+      <item>
+       <widget class="QWidget" name="Map" native="true"/>
+      </item>
+      <item>
+       <widget class="QPlainTextEdit" name="ptLog">
+        <property name="textInteractionFlags">
+         <set>Qt::TextSelectableByMouse</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="mStations">
+    <property name="title">
+     <string>Stations</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionShowTrajName"/>
+    <addaction name="actionShowConnName"/>
+    <addaction name="actionShow_trajectories_tooltips"/>
+    <addaction name="actionShow_server_time"/>
+   </widget>
+   <widget class="QMenu" name="mTrains">
+    <property name="title">
+     <string>Trains</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="mSimSpeed">
+    <property name="title">
+     <string>Simulation speed</string>
+    </property>
+    <addaction name="actionPause"/>
+    <addaction name="action_x1"/>
+    <addaction name="action_x2"/>
+    <addaction name="action_x4"/>
+    <addaction name="action_x8"/>
+    <addaction name="action_x16"/>
+   </widget>
+   <addaction name="mStations"/>
+   <addaction name="mTrains"/>
+   <addaction name="mSimSpeed"/>
+   <addaction name="menuView"/>
+  </widget>
+  <action name="actionShowTrajName">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show trajectories names</string>
+   </property>
+  </action>
+  <action name="actionShowConnName">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show connectors names</string>
+   </property>
+  </action>
+  <action name="action_x1">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x1 (Real time)</string>
+   </property>
+  </action>
+  <action name="action_x2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x2</string>
+   </property>
+  </action>
+  <action name="action_x4">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x4</string>
+   </property>
+  </action>
+  <action name="action_x8">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x8</string>
+   </property>
+  </action>
+  <action name="action_x16">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x16</string>
+   </property>
+  </action>
+  <action name="action_x32">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>x32</string>
+   </property>
+  </action>
+  <action name="actionShow_trajectories_tooltips">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show trajectories tooltips</string>
+   </property>
+  </action>
+  <action name="actionShow_server_time">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show server time</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

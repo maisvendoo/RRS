@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Trajectory>
+		<Name>track_a_m45-2n</Name>
+	</Trajectory>
+	<Trajectory>
+		<Name>track_a-d_1x8-3x6</Name>
+	</Trajectory>
+	<Trajectory>
+		<Name>track_a-d_2n-1x8</Name>
+	</Trajectory>
+	<Trajectory>
+		<Name>track_a-d_3x6-5x4</Name>
+	</Trajectory>
+	<Trajectory>
+		<Name>track_a-d_5x4-7x2</Name>
+	</Trajectory>
+	<Trajectory>
+		<Name>track_a-d_7x2-ch</Name>
+	</Trajectory>
+	<Trajectory>
+		<Name>track_d_ch-2</Name>
+	</Trajectory>
+	<Trajectory>
+		<Name>track_d_2-p1</Name>
+	</Trajectory>
+	<Trajectory>
+		<Name>track_d_p1</Name>
+	</Trajectory>
+	<Trajectory>
+		<Name>track_d_p1-1</Name>
+	</Trajectory>
+	<Trajectory>
+		<Name>track_d_1-n</Name>
+	</Trajectory>
+	<SpeedMap>
+		<SpeedLimit>90 -1 9999999</SpeedLimit>
+	</SpeedMap>
+</Config>

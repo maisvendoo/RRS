@@ -1,0 +1,2550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Switch>
+		<Name>stA_Ч</Name>
+		<bwdPlusTraj>track_a_per-ch</bwdPlusTraj>
+		<fwdPlusTraj>track_a_ch-m12</fwdPlusTraj>
+		<SignalLiterFwd>Ч</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YG+RY+W_2+2+1_entr</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧД</Name>
+		<bwdPlusTraj>track_a_per-chd</bwdPlusTraj>
+		<fwdPlusTraj>track_a_chd-m6</fwdPlusTraj>
+		<SignalLiterFwd>ЧД</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YG+RY+W_2+2+1_DL_entr</SignalModelFwd>
+		<RelPosVectorFwd>-2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Н</Name>
+		<bwdPlusTraj>track_a_m1-n</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_n-1</fwdPlusTraj>
+		<SignalLiterBwd>Н</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YG+RY+W_2+2+1_entr</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_НД</Name>
+		<bwdPlusTraj>track_a_m3-nd</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_nd-22</fwdPlusTraj>
+		<SignalLiterBwd>НД</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YG+RY+W_2+2+1_DL_entr</SignalModelBwd>
+		<RelPosVectorBwd>-2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_2Н</Name>
+		<bwdPlusTraj>track_a_m45-2n</bwdPlusTraj>
+		<fwdPlusTraj>track_a-d_2n-1x8</fwdPlusTraj>
+		<SignalLiterBwd>2Н</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM2_YG+RY+W_2+2+1_entr</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_2</Name>
+		<bwdPlusTraj>track_a_m2-2</bwdPlusTraj>
+		<fwdPlusTraj>track_a_2-4</fwdPlusTraj>
+		<fwdMinusTraj>track_a_2-6</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_6</Name>
+		<bwdPlusTraj>track_a_m4-6</bwdPlusTraj>
+		<fwdPlusTraj>track_a_6-m8</fwdPlusTraj>
+		<bwdMinusTraj>track_a_2-6</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_4</Name>
+		<bwdPlusTraj>track_a_2-4</bwdPlusTraj>
+		<fwdPlusTraj>track_a_4-m10</fwdPlusTraj>
+		<fwdMinusTraj>track_a_4-10</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_10</Name>
+		<bwdPlusTraj>track_a_m6-10</bwdPlusTraj>
+		<fwdPlusTraj>track_a_10-12</fwdPlusTraj>
+		<bwdMinusTraj>track_a_4-10</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_8</Name>
+		<bwdPlusTraj>track_a_m12-8</bwdPlusTraj>
+		<fwdPlusTraj>track_a_8-46</fwdPlusTraj>
+		<fwdMinusTraj>track_a_8-12</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_46</Name>
+		<bwdPlusTraj>track_a_8-46</bwdPlusTraj>
+		<fwdPlusTraj>track_a_46-m24</fwdPlusTraj>
+		<fwdMinusTraj>track_a_46-p6</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_50</Name>
+		<bwdPlusTraj>track_a_m48-50</bwdPlusTraj>
+		<fwdPlusTraj>track_a_50-54</fwdPlusTraj>
+		<fwdMinusTraj>track_a_50-52</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_54</Name>
+		<bwdPlusTraj>track_a_m66-54</bwdPlusTraj>
+		<fwdPlusTraj>track_a_54-52</fwdPlusTraj>
+		<fwdMinusTrajReversed>track_a_50-54</fwdMinusTrajReversed>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_56</Name>
+		<bwdPlusTraj>track_a_m52-56</bwdPlusTraj>
+		<fwdPlusTraj>track_a_56-60</fwdPlusTraj>
+		<fwdMinusTraj>track_a_56-58</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_58</Name>
+		<bwdPlusTraj>track_a_m54-58</bwdPlusTraj>
+		<fwdPlusTraj>track_a_58-m58</fwdPlusTraj>
+		<bwdMinusTraj>track_a_56-58</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_60</Name>
+		<bwdPlusTraj>track_a_56-60</bwdPlusTraj>
+		<fwdPlusTraj>track_a_60-m60</fwdPlusTraj>
+		<fwdMinusTraj>track_a_60-62</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_62</Name>
+		<bwdPlusTraj>track_a_64-62</bwdPlusTraj>
+		<fwdPlusTraj>track_a_62-m62</fwdPlusTraj>
+		<bwdMinusTraj>track_a_60-62</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_64</Name>
+		<bwdPlusTraj>track_a_m56-64</bwdPlusTraj>
+		<fwdPlusTraj>track_a_64-62</fwdPlusTraj>
+		<fwdMinusTraj>track_a_64-66</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_66</Name>
+		<bwdPlusTraj>track_a_pt-66</bwdPlusTraj>
+		<fwdPlusTraj>track_a_66-m64</fwdPlusTraj>
+		<bwdMinusTraj>track_a_64-66</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_12</Name>
+		<bwdPlusTraj>track_a_10-12</bwdPlusTraj>
+		<fwdPlusTraj>track_a_12-m</fwdPlusTraj>
+		<bwdMinusTraj>track_a_8-12</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_52</Name>
+		<bwdPlusTraj>track_a_50-52</bwdPlusTraj>
+		<fwdPlusTraj>track_a_52-m50</fwdPlusTraj>
+		<bwdMinusTraj>track_a_54-52</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_14</Name>
+		<bwdPlusTraj>track_a_m-14</bwdPlusTraj>
+		<fwdPlusTraj>track_a_14-16</fwdPlusTraj>
+		<fwdMinusTraj>track_a_14-18</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_18</Name>
+		<bwdPlusTraj>track_a_14-18</bwdPlusTraj>
+		<fwdPlusTraj>track_a_18-22</fwdPlusTraj>
+		<bwdMinusTraj>track_a_m18-18</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_16</Name>
+		<bwdPlusTraj>track_a_14-16</bwdPlusTraj>
+		<fwdPlusTraj>track_a_16-20</fwdPlusTraj>
+		<fwdMinusTraj>track_a_16-p3</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_22</Name>
+		<bwdPlusTraj>track_a_m20-22</bwdPlusTraj>
+		<fwdPlusTraj>track_a_22-m42</fwdPlusTraj>
+		<bwdMinusTraj>track_a_18-22</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_20</Name>
+		<bwdPlusTraj>track_a_16-20</bwdPlusTraj>
+		<fwdPlusTraj>track_a_20-p1</fwdPlusTraj>
+		<fwdMinusTraj>track_a_20-24</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_24</Name>
+		<bwdPlusTraj>track_a_m22-24</bwdPlusTraj>
+		<fwdPlusTraj>track_a_24-26</fwdPlusTraj>
+		<bwdMinusTraj>track_a_20-24</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_26</Name>
+		<bwdPlusTraj>track_a_24-26</bwdPlusTraj>
+		<fwdPlusTraj>track_a_26-p2</fwdPlusTraj>
+		<fwdMinusTraj>track_a_26-p4</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_29</Name>
+		<bwdPlusTraj>track_a_p5-29</bwdPlusTraj>
+		<fwdPlusTraj>track_a_29-m17</fwdPlusTraj>
+		<fwdMinusTraj>track_a_29-27</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_27</Name>
+		<bwdPlusTraj>track_a_29-27</bwdPlusTraj>
+		<fwdPlusTraj>track_a_27-25</fwdPlusTraj>
+		<bwdMinusTraj>track_a_p3-27</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_25</Name>
+		<bwdPlusTraj>track_a_p1-25</bwdPlusTraj>
+		<fwdPlusTraj>track_a_25-23</fwdPlusTraj>
+		<bwdMinusTraj>track_a_27-25</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_23</Name>
+		<bwdPlusTraj>track_a_25-23</bwdPlusTraj>
+		<fwdPlusTraj>track_a_23-m15</fwdPlusTraj>
+		<fwdMinusTraj>track_a_23-21</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_21</Name>
+		<bwdPlusTraj>track_a_p2-21</bwdPlusTraj>
+		<fwdPlusTraj>track_a_21-19</fwdPlusTraj>
+		<bwdMinusTraj>track_a_23-21</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_17</Name>
+		<bwdPlusTraj>track_a_m-17</bwdPlusTraj>
+		<fwdPlusTraj>track_a_17-p2</fwdPlusTraj>
+		<fwdMinusTraj>track_a_17-15</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_15</Name>
+		<bwdPlusTraj>track_a_m9-15</bwdPlusTraj>
+		<fwdPlusTraj>track_a_15-13</fwdPlusTraj>
+		<bwdMinusTraj>track_a_17-15</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_13</Name>
+		<bwdPlusTraj>track_a_15-13</bwdPlusTraj>
+		<fwdPlusTraj>track_a_13-p1</fwdPlusTraj>
+		<fwdMinusTraj>track_a_13-11</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_11</Name>
+		<bwdPlusTraj>track_a_m7-11</bwdPlusTraj>
+		<fwdPlusTraj>track_a_11-p5</fwdPlusTraj>
+		<bwdMinusTraj>track_a_13-11</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_19</Name>
+		<bwdPlusTraj>track_a_21-19</bwdPlusTraj>
+		<fwdPlusTraj>track_a_19-m</fwdPlusTraj>
+		<bwdMinusTraj>track_a_p4-19</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_9</Name>
+		<bwdPlusTraj>track_a_p2-9</bwdPlusTraj>
+		<fwdPlusTraj>track_a_9-m19</fwdPlusTraj>
+		<fwdMinusTraj>track_a_9-7</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_7</Name>
+		<bwdPlusTraj>track_a_p1-7</bwdPlusTraj>
+		<fwdPlusTraj>track_a_7-5</fwdPlusTraj>
+		<bwdMinusTraj>track_a_9-7</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_3</Name>
+		<bwdPlusTraj>track_a_5-3</bwdPlusTraj>
+		<fwdPlusTraj>track_a_3-31</fwdPlusTraj>
+		<fwdMinusTraj>track_a_3-1</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_1</Name>
+		<bwdPlusTraj>track_a_m5-1</bwdPlusTraj>
+		<fwdPlusTraj>track_a_1-m3</fwdPlusTraj>
+		<bwdMinusTraj>track_a_3-1</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_31</Name>
+		<bwdPlusTraj>track_a_3-31</bwdPlusTraj>
+		<fwdPlusTraj>track_a_31-m1</fwdPlusTraj>
+		<fwdMinusTraj>track_a_31-k</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_5</Name>
+		<bwdPlusTraj>track_a_7-5</bwdPlusTraj>
+		<fwdPlusTraj>track_a_5-3</fwdPlusTraj>
+		<bwdMinusTraj>track_a_p5-5</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М2</Name>
+		<bwdPlusTraj>track_a_pt-m2</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m2-2</fwdPlusTraj>
+		<SignalLiterFwd>M2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_MM1_WR_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М4</Name>
+		<bwdPlusTraj>track_a_pt-m4</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m4-6</fwdPlusTraj>
+		<SignalLiterFwd>M4</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_MM2_WR_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М6</Name>
+		<bwdPlusTraj>track_a_chd-m6</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m6-10</fwdPlusTraj>
+		<SignalLiterFwd>M6</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М12</Name>
+		<bwdPlusTraj>track_a_ch-m12</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m12-8</fwdPlusTraj>
+		<SignalLiterFwd>M12</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М20</Name>
+		<bwdPlusTraj>track_a_m8-m20</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m20-22</fwdPlusTraj>
+		<SignalLiterFwd>M20</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_MM2_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М18</Name>
+		<bwdPlusTraj>track_a_m10-m18</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m18-18</fwdPlusTraj>
+		<SignalLiterFwd>M18</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_MM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М22</Name>
+		<bwdPlusTraj>track_a_m24-m22</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m22-24</fwdPlusTraj>
+		<SignalLiterFwd>M22</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М48</Name>
+		<bwdPlusTraj>track_a_m46-m48</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m48-50</fwdPlusTraj>
+		<SignalLiterFwd>M48</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М52</Name>
+		<bwdPlusTraj>track_a_m50-m52</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m52-56</fwdPlusTraj>
+		<SignalLiterFwd>M52</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М56</Name>
+		<bwdPlusTraj>track_a_pt-m56</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m56-64</fwdPlusTraj>
+		<SignalLiterFwd>M56</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М54</Name>
+		<bwdPlusTraj>track_a_pt-m54</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m54-58</fwdPlusTraj>
+		<SignalLiterFwd>M54</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М8</Name>
+		<bwdPlusTraj>track_a_6-m8</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m8-m20</fwdPlusTraj>
+		<SignalLiterBwd>M8</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М58</Name>
+		<bwdPlusTraj>track_a_58-m58</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m58-pt</fwdPlusTraj>
+		<SignalLiterBwd>M58</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М60</Name>
+		<bwdPlusTraj>track_a_60-m60</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m60-pt</fwdPlusTraj>
+		<SignalLiterBwd>M60</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М62</Name>
+		<bwdPlusTraj>track_a_62-m62</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m62-pt</fwdPlusTraj>
+		<SignalLiterBwd>M62</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М64</Name>
+		<bwdPlusTraj>track_a_66-m64</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m64-pt</fwdPlusTraj>
+		<SignalLiterBwd>M64</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М10</Name>
+		<bwdPlusTraj>track_a_4-m10</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m10-m18</fwdPlusTraj>
+		<SignalLiterBwd>M10</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М46</Name>
+		<bwdPlusTraj>track_a_48-m46</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m46-m48</fwdPlusTraj>
+		<SignalLiterBwd>M46</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М50</Name>
+		<bwdPlusTraj>track_a_52-m50</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m50-m52</fwdPlusTraj>
+		<SignalLiterBwd>M50</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М16-М14</Name>
+		<bwdPlusTraj>track_a_12-m</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m-14</fwdPlusTraj>
+		<SignalLiterFwd>M16</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>M14</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М24</Name>
+		<bwdPlusTraj>track_a_46-m24</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m24-m22</fwdPlusTraj>
+		<SignalLiterBwd>M24</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М17</Name>
+		<bwdPlusTraj>track_a_29-m17</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m17-m7</fwdPlusTraj>
+		<SignalLiterBwd>M17</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М15</Name>
+		<bwdPlusTraj>track_a_23-m15</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m15-m9</fwdPlusTraj>
+		<SignalLiterBwd>M15</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М11-М13</Name>
+		<bwdPlusTraj>track_a_19-m</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m-17</fwdPlusTraj>
+		<SignalLiterFwd>M11</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>M13</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М7</Name>
+		<bwdPlusTraj>track_a_m17-m7</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m7-11</fwdPlusTraj>
+		<SignalLiterFwd>M7</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М9</Name>
+		<bwdPlusTraj>track_a_m15-m9</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m9-15</fwdPlusTraj>
+		<SignalLiterFwd>M9</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М5</Name>
+		<bwdPlusTraj>track_a_m19-m5</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m5-1</fwdPlusTraj>
+		<SignalLiterFwd>M5</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М19</Name>
+		<bwdPlusTraj>track_a_9-m19</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m19-m5</fwdPlusTraj>
+		<SignalLiterBwd>M19</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М3</Name>
+		<bwdPlusTraj>track_a_1-m3</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m3-nd</fwdPlusTraj>
+		<SignalLiterBwd>M3</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М1</Name>
+		<bwdPlusTraj>track_a_31-m1</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m1-n</fwdPlusTraj>
+		<SignalLiterBwd>M1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Н1</Name>
+		<bwdPlusTraj>track_a_20-p1</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p1a</fwdPlusTraj>
+		<SignalLiterBwd>Н1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Н2</Name>
+		<bwdPlusTraj>track_a_26-p2</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p2a</fwdPlusTraj>
+		<SignalLiterBwd>Н2</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WxR_3+3_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Н3</Name>
+		<bwdPlusTraj>track_a_16-p3</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p3a</fwdPlusTraj>
+		<SignalLiterBwd>Н3</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Н4</Name>
+		<bwdPlusTraj>track_a_26-p4</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p4a</fwdPlusTraj>
+		<SignalLiterBwd>Н4</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М42</Name>
+		<bwdPlusTraj>track_a_22-m42</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m42-m44</fwdPlusTraj>
+		<SignalLiterBwd>M42</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Н6</Name>
+		<bwdPlusTraj>track_a_46-p6</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p6</fwdPlusTraj>
+		<SignalLiterBwd>Н6</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_НМ5</Name>
+		<bwdPlusTraj>track_a_11-p5</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p5b</fwdPlusTraj>
+		<SignalLiterBwd>НМ5</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_НМ7Б</Name>
+		<bwdPlusTraj>track_a_63-p7</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p7b</fwdPlusTraj>
+		<SignalLiterBwd>НМ7Б</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGx+RYW_3+3_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_НМ6Б</Name>
+		<bwdPlusTraj>track_a_61-p6</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p6b</fwdPlusTraj>
+		<SignalLiterBwd>НМ6Б</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGR_3_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Н5</Name>
+		<bwdPlusTraj>track_a_44-p5</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p5a</fwdPlusTraj>
+		<SignalLiterBwd>Н5</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_НМ1</Name>
+		<bwdPlusTraj>track_a_13-p1</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p1b</fwdPlusTraj>
+		<SignalLiterBwd>НМ1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_НМ2</Name>
+		<bwdPlusTraj>track_a_17-p2</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p2b</fwdPlusTraj>
+		<SignalLiterBwd>НМ2</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ1</Name>
+		<bwdPlusTraj>track_a_p1a</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p1-25</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ1</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ2</Name>
+		<bwdPlusTraj>track_a_p2a</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p2-21</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_RM1_YGR+YW_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 9.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ3</Name>
+		<bwdPlusTraj>track_a_p3a</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p3-27</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ3</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ4</Name>
+		<bwdPlusTraj>track_a_p4a</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p4-19</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ4</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ5</Name>
+		<bwdPlusTraj>track_a_p5a</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p5-29</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ5</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М44</Name>
+		<bwdPlusTraj>track_a_m42-m44</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m44-44</fwdPlusTraj>
+		<SignalLiterFwd>M44</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М66</Name>
+		<bwdPlusTraj>track_a_pt-m66</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m66-54</fwdPlusTraj>
+		<SignalLiterFwd>M66</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Ч2</Name>
+		<bwdPlusTraj>track_a_p2b</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p2-9</fwdPlusTraj>
+		<SignalLiterFwd>Ч2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Ч1</Name>
+		<bwdPlusTraj>track_a_p1b</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p1-7</fwdPlusTraj>
+		<SignalLiterFwd>Ч1</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Ч5</Name>
+		<bwdPlusTraj>track_a_p5b</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p5-5</fwdPlusTraj>
+		<SignalLiterFwd>Ч5</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_22</Name>
+		<bwdPlusTraj>track_a-b_nd-22</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_22-20</fwdPlusTraj>
+		<SignalLiterFwd>22</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>22</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_20</Name>
+		<bwdPlusTraj>track_a-b_22-20</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_20-18</fwdPlusTraj>
+		<SignalLiterFwd>20</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>20</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_18</Name>
+		<bwdPlusTraj>track_a-b_20-18</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_18-16</fwdPlusTraj>
+		<SignalLiterFwd>18</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>18</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_16</Name>
+		<bwdPlusTraj>track_a-b_18-16</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_16-14</fwdPlusTraj>
+		<SignalLiterFwd>16</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>16</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_14</Name>
+		<bwdPlusTraj>track_a-b_16-14</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_14-12</fwdPlusTraj>
+		<SignalLiterFwd>14</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>14</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_12</Name>
+		<bwdPlusTraj>track_a-b_14-12</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_12-10</fwdPlusTraj>
+		<SignalLiterFwd>12</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>12</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_10</Name>
+		<bwdPlusTraj>track_a-b_12-10</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_10-8</fwdPlusTraj>
+		<SignalLiterFwd>10</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>10</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_8</Name>
+		<bwdPlusTraj>track_a-b_10-8</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_8-6</fwdPlusTraj>
+		<SignalLiterFwd>8</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>8</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_6</Name>
+		<bwdPlusTraj>track_a-b_8-6</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_6-4</fwdPlusTraj>
+		<SignalLiterFwd>6</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>6</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_4</Name>
+		<bwdPlusTraj>track_a-b_6-4</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_4-2</fwdPlusTraj>
+		<SignalLiterFwd>4</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>4</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_2</Name>
+		<bwdPlusTraj>track_a-b_4-2</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_2-ch</fwdPlusTraj>
+		<SignalLiterFwd>2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_T_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>2</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_1</Name>
+		<bwdPlusTraj>track_a-b_n-1</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_1-3</fwdPlusTraj>
+		<SignalLiterBwd>1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_T_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>1</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_3</Name>
+		<bwdPlusTraj>track_a-b_1-3</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_3-5</fwdPlusTraj>
+		<SignalLiterBwd>3</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>3</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_5</Name>
+		<bwdPlusTraj>track_a-b_3-5</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_5-7</fwdPlusTraj>
+		<SignalLiterBwd>5</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>5</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_7</Name>
+		<bwdPlusTraj>track_a-b_5-7</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_7-9</fwdPlusTraj>
+		<SignalLiterBwd>7</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>7</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_9</Name>
+		<bwdPlusTraj>track_a-b_7-9</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_9-11</fwdPlusTraj>
+		<SignalLiterBwd>9</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>9</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_11</Name>
+		<bwdPlusTraj>track_a-b_9-11</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_11-13</fwdPlusTraj>
+		<SignalLiterBwd>11</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>11</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_13</Name>
+		<bwdPlusTraj>track_a-b_11-13</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_13-15</fwdPlusTraj>
+		<SignalLiterBwd>13</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>13</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_15</Name>
+		<bwdPlusTraj>track_a-b_13-15</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_15-17</fwdPlusTraj>
+		<SignalLiterBwd>15</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>15</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_17</Name>
+		<bwdPlusTraj>track_a-b_15-17</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_17-19</fwdPlusTraj>
+		<SignalLiterBwd>17</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>17</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_19</Name>
+		<bwdPlusTraj>track_a-b_17-19</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_19-21</fwdPlusTraj>
+		<SignalLiterBwd>19</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>19</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stB_21</Name>
+		<bwdPlusTraj>track_a-b_19-21</bwdPlusTraj>
+		<fwdPlusTraj>track_a-b_21-chd</fwdPlusTraj>
+		<SignalLiterBwd>21</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>21</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_44</Name>
+		<bwdPlusTraj>track_a_m44-44</bwdPlusTraj>
+		<fwdPlusTraj>track_a_44-p5</fwdPlusTraj>
+		<fwdMinusTraj>track_a_44-m40</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_28</Name>
+		<bwdPlusTraj>track_a_m26-28</bwdPlusTraj>
+		<fwdPlusTraj>track_a_28-m30</fwdPlusTraj>
+		<fwdMinusTraj>track_a_28-30</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_30</Name>
+		<bwdPlusTraj>track_a_pt-30</bwdPlusTraj>
+		<fwdPlusTraj>track_a_30-m32</fwdPlusTraj>
+		<bwdMinusTraj>track_a_28-30</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_40</Name>
+		<bwdPlusTraj>track_a_m-40</bwdPlusTraj>
+		<fwdPlusTraj>track_a_40-p9</fwdPlusTraj>
+		<fwdMinusTraj>track_a_40-42</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_42</Name>
+		<bwdPlusTraj>track_a_m38-42</bwdPlusTraj>
+		<fwdPlusTraj>track_a_42-48</fwdPlusTraj>
+		<bwdMinusTraj>track_a_40-42</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_38</Name>
+		<bwdPlusTraj>track_a_m28-38</bwdPlusTraj>
+		<fwdPlusTraj>track_a_38-34</fwdPlusTraj>
+		<fwdMinusTraj>track_a_38-36</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_48</Name>
+		<bwdPlusTraj>track_a_42-48</bwdPlusTraj>
+		<fwdPlusTraj>track_a_48-p11</fwdPlusTraj>
+		<fwdMinusTraj>track_a_48-m46</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_36</Name>
+		<bwdPlusTraj>track_a_32-36</bwdPlusTraj>
+		<fwdPlusTraj>track_a_36-m</fwdPlusTraj>
+		<bwdMinusTraj>track_a_38-36</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_32</Name>
+		<bwdPlusTraj>track_a_m32-32</bwdPlusTraj>
+		<fwdPlusTraj>track_a_32-36</fwdPlusTraj>
+		<fwdMinusTraj>track_a_32-34</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_34</Name>
+		<bwdPlusTraj>track_a_38-34</bwdPlusTraj>
+		<fwdPlusTraj>track_a_34-p7</fwdPlusTraj>
+		<bwdMinusTraj>track_a_32-34</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_33</Name>
+		<bwdPlusTraj>track_a_m23-33</bwdPlusTraj>
+		<fwdPlusTraj>track_a_33-m</fwdPlusTraj>
+		<bwdMinusTraj>track_a_65-33</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_35</Name>
+		<bwdPlusTraj>track_a_m-35</bwdPlusTraj>
+		<fwdPlusTraj>track_a_35-37</fwdPlusTraj>
+		<fwdMinusTraj>track_a_35-m33</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_37</Name>
+		<bwdPlusTraj>track_a_39-37</bwdPlusTraj>
+		<fwdPlusTraj>track_a_37-m</fwdPlusTraj>
+		<bwdMinusTraj>track_a_35-37</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_41</Name>
+		<bwdPlusTraj>track_a_p11-41</bwdPlusTraj>
+		<fwdPlusTraj>track_a_41-m31</fwdPlusTraj>
+		<fwdMinusTraj>track_a_41-39</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_39</Name>
+		<bwdPlusTraj>track_a_p9-39</bwdPlusTraj>
+		<fwdPlusTraj>track_a_39-37</fwdPlusTraj>
+		<bwdMinusTraj>track_a_41-39</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_43</Name>
+		<bwdPlusTraj>track_a_m-43</bwdPlusTraj>
+		<fwdPlusTraj>track_a_43-47</fwdPlusTraj>
+		<fwdMinusTraj>track_a_43-45</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_45</Name>
+		<bwdPlusTraj>track_a_m35-45</bwdPlusTraj>
+		<fwdPlusTraj>track_a_45-m39</fwdPlusTraj>
+		<bwdMinusTraj>track_a_43-45</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_47</Name>
+		<bwdPlusTraj>track_a_43-47</bwdPlusTraj>
+		<fwdPlusTraj>track_a_47-p2t</fwdPlusTraj>
+		<fwdMinusTraj>track_a_47-49</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_49</Name>
+		<bwdPlusTraj>track_a_m37-49</bwdPlusTraj>
+		<fwdPlusTraj>track_a_49-p1t</fwdPlusTraj>
+		<bwdMinusTraj>track_a_47-49</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_53</Name>
+		<bwdPlusTraj>track_a_p1t-53</bwdPlusTraj>
+		<fwdPlusTraj>track_a_53-51</fwdPlusTraj>
+		<fwdMinusTraj>track_a_53-55</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_51</Name>
+		<bwdPlusTraj>track_a_p2t-51</bwdPlusTraj>
+		<fwdPlusTraj>track_a_51-57</fwdPlusTraj>
+		<bwdMinusTraj>track_a_53-51</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_57</Name>
+		<bwdPlusTraj>track_a_51-57</bwdPlusTraj>
+		<fwdPlusTraj>track_a_57-m47</fwdPlusTraj>
+		<fwdMinusTraj>track_a_57-55</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_55</Name>
+		<bwdPlusTraj>track_a_53-55</bwdPlusTraj>
+		<fwdPlusTraj>track_a_55-m45</fwdPlusTraj>
+		<bwdMinusTraj>track_a_57-55</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_59</Name>
+		<bwdPlusTraj>track_a_m49-59</bwdPlusTraj>
+		<fwdPlusTraj>track_a_59-m51</fwdPlusTraj>
+		<fwdMinusTraj>track_a_59-m53</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_61</Name>
+		<bwdPlusTraj>track_a_p6-61</bwdPlusTraj>
+		<fwdPlusTraj>track_a_61-p6</fwdPlusTraj>
+		<fwdMinusTraj>track_a_61-63</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stA_63</Name>
+		<bwdPlusTraj>track_a_p7-63</bwdPlusTraj>
+		<fwdPlusTraj>track_a_63-p7</fwdPlusTraj>
+		<bwdMinusTraj>track_a_61-63</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_65</Name>
+		<bwdPlusTraj>track_a_p7-65</bwdPlusTraj>
+		<fwdPlusTraj>track_a_65-33</fwdPlusTraj>
+		<bwdMinusTraj>track_a_p6-65</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М26</Name>
+		<bwdPlusTraj>track_a_chk-m26</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m26-28</fwdPlusTraj>
+		<SignalLiterFwd>M26</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М30</Name>
+		<bwdPlusTraj>track_a_28-m30</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m30-m38</fwdPlusTraj>
+		<SignalLiterBwd>M30</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М32</Name>
+		<bwdPlusTraj>track_a_30-m32</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m32-32</fwdPlusTraj>
+		<SignalLiterFwd>M32</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М38</Name>
+		<bwdPlusTraj>track_a_m30-m38</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m38-42</fwdPlusTraj>
+		<SignalLiterFwd>M38</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М28</Name>
+		<bwdPlusTraj>track_a_m40-m28</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m28-38</fwdPlusTraj>
+		<SignalLiterFwd>M28</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М40</Name>
+		<bwdPlusTraj>track_a_44-m40</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m40-m28</fwdPlusTraj>
+		<SignalLiterBwd>M40</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М34-М36</Name>
+		<bwdPlusTraj>track_a_36-m</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m-40</fwdPlusTraj>
+		<SignalLiterBwd>M34</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>M36</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М21</Name>
+		<bwdPlusTraj>track_a_31-k</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m21-m23</fwdPlusTraj>
+		<SignalLiterBwd>M21</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М23</Name>
+		<bwdPlusTraj>track_a_m21-m23</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m23-33</fwdPlusTraj>
+		<SignalLiterFwd>M23</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М27-М29</Name>
+		<bwdPlusTraj>track_a_33-m</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m-35</fwdPlusTraj>
+		<SignalLiterFwd>M27</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>M29</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М49-М51</Name>
+		<bwdPlusTraj>track_a_37-m</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m-43</fwdPlusTraj>
+		<SignalLiterFwd>M49</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>M51</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М35</Name>
+		<bwdPlusTraj>track_a_m31-m35</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m35-45</fwdPlusTraj>
+		<SignalLiterFwd>M35</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М31</Name>
+		<bwdPlusTraj>track_a_41-m31</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m31-m35</fwdPlusTraj>
+		<SignalLiterBwd>M31</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М39</Name>
+		<bwdPlusTraj>track_a_45-m39</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m39-nk</fwdPlusTraj>
+		<SignalLiterBwd>M39</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М37</Name>
+		<bwdPlusTraj>track_a_m33-m37</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m37-49</fwdPlusTraj>
+		<SignalLiterFwd>M37</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М33</Name>
+		<bwdPlusTraj>track_a_35-m33</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m33-m37</fwdPlusTraj>
+		<SignalLiterBwd>M33</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М47</Name>
+		<bwdPlusTraj>track_a_57-m47</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m47-m49</fwdPlusTraj>
+		<SignalLiterBwd>M47</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М45</Name>
+		<bwdPlusTraj>track_a_55-m45</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m45-2n</fwdPlusTraj>
+		<SignalLiterBwd>M45</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М49</Name>
+		<bwdPlusTraj>track_a_m47-m49</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m49-59</fwdPlusTraj>
+		<SignalLiterFwd>M49</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М51</Name>
+		<bwdPlusTraj>track_a_59-m51</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m51-pt</fwdPlusTraj>
+		<SignalLiterBwd>M51</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_М53</Name>
+		<bwdPlusTraj>track_a_59-m53</bwdPlusTraj>
+		<fwdPlusTraj>track_a_m53-pt</fwdPlusTraj>
+		<SignalLiterBwd>M53</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ11</Name>
+		<bwdPlusTraj>track_a_p11</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p11-41</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ11</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ9</Name>
+		<bwdPlusTraj>track_a_p9</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p9-39</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ9</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ6А</Name>
+		<bwdPlusTraj>track_a_p6</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p6-61</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ6А</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGx+RYW_3+3_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ7А</Name>
+		<bwdPlusTraj>track_a_p7a</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p7-63</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ7А</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGR_3_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ7Б</Name>
+		<bwdPlusTraj>track_a_p7b</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p7-65</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ7Б</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧМ6Б</Name>
+		<bwdPlusTraj>track_a_p6b</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p6-65</fwdPlusTraj>
+		<SignalLiterFwd>ЧМ6Б</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_НК</Name>
+		<bwdPlusTraj>track_a_m39-nk</bwdPlusTraj>
+		<fwdPlusTraj>track_akol_nk-6x1</fwdPlusTraj>
+		<SignalLiterBwd>НК</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YG+RY+W_2+2+1_entr</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_НМ2Т</Name>
+		<bwdPlusTraj>track_a_47-p2t</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p2t</fwdPlusTraj>
+		<SignalLiterBwd>НМ2Т</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WxR_3+3_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_НМ1Т</Name>
+		<bwdPlusTraj>track_a_49-p1t</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p1t</fwdPlusTraj>
+		<SignalLiterBwd>НМ1Т</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WxR_3+3_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Ч1Т</Name>
+		<bwdPlusTraj>track_a_p1t</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p1t-53</fwdPlusTraj>
+		<SignalLiterFwd>Ч1Т</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM2_YGR+YW_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Ч2Т</Name>
+		<bwdPlusTraj>track_a_p2t</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p2t-51</fwdPlusTraj>
+		<SignalLiterFwd>Ч2Т</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WxR_3+3_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Н7</Name>
+		<bwdPlusTraj>track_a_34-p7</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p7a</fwdPlusTraj>
+		<SignalLiterBwd>Н7</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WxR_3+3_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Н9</Name>
+		<bwdPlusTraj>track_a_40-p9</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p9</fwdPlusTraj>
+		<SignalLiterBwd>Н9</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WxR_3+3_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_Н11</Name>
+		<bwdPlusTraj>track_a_48-p11</bwdPlusTraj>
+		<fwdPlusTraj>track_a_p11</fwdPlusTraj>
+		<SignalLiterBwd>Н11</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGx+RYW_3+3_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA_ЧК</Name>
+		<bwdPlusTraj>track_akol_2x5-chk</bwdPlusTraj>
+		<fwdPlusTraj>track_a_chk-m26</fwdPlusTraj>
+		<SignalLiterFwd>ЧК</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YG+RY+W_2+2+1_entr</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>kol_1-6</Name>
+		<bwdPlusTraj>track_akol_nk-6x1</bwdPlusTraj>
+		<fwdPlusTraj>track_akol_6x1-4x3</fwdPlusTraj>
+		<SignalLiterFwd>6</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_T_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>kol_3-4</Name>
+		<bwdPlusTraj>track_akol_6x1-4x3</bwdPlusTraj>
+		<fwdPlusTraj>track_akol_4x3-2x5</fwdPlusTraj>
+		<SignalLiterFwd>4</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>3</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>kol_5-2</Name>
+		<bwdPlusTraj>track_akol_4x3-2x5</bwdPlusTraj>
+		<fwdPlusTraj>track_akol_2x5-chk</fwdPlusTraj>
+		<SignalLiterFwd>2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_T_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>5</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB_Ч</Name>
+		<bwdPlusTraj>track_a-b_2-ch</bwdPlusTraj>
+		<fwdPlusTraj>track_b_ch-m2</fwdPlusTraj>
+		<SignalLiterFwd>Ч</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YG+RY+W_2+2+1_entr</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB_ЧД</Name>
+		<bwdPlusTraj>track_a-b_21-chd</bwdPlusTraj>
+		<fwdPlusTraj>track_b_chd-m4</fwdPlusTraj>
+		<SignalLiterFwd>ЧД</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YG+RY+W_2+2+1_DL_entr</SignalModelFwd>
+		<RelPosVectorFwd>-2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB_Н1</Name>
+		<bwdPlusTraj>track_b_8-p1</bwdPlusTraj>
+		<fwdPlusTraj>track_b_p1</fwdPlusTraj>
+		<SignalLiterBwd>Н1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB_Н2</Name>
+		<bwdPlusTraj>track_b_12-p2</bwdPlusTraj>
+		<fwdPlusTraj>track_b_p2</fwdPlusTraj>
+		<SignalLiterBwd>Н2</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB_Н3</Name>
+		<bwdPlusTraj>track_b_8-p3</bwdPlusTraj>
+		<fwdPlusTraj>track_b_p3</fwdPlusTraj>
+		<SignalLiterBwd>Н3</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB_Н4</Name>
+		<bwdPlusTraj>track_b_12-p4</bwdPlusTraj>
+		<fwdPlusTraj>track_b_p4</fwdPlusTraj>
+		<SignalLiterBwd>Н4</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB_Ч1</Name>
+		<bwdPlusTraj>track_b_p1</bwdPlusTraj>
+		<fwdPlusTraj>track_b_p1-11</fwdPlusTraj>
+		<SignalLiterFwd>Ч1</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB_Ч2</Name>
+		<bwdPlusTraj>track_b_p2</bwdPlusTraj>
+		<fwdPlusTraj>track_b_p2-7</fwdPlusTraj>
+		<SignalLiterFwd>Ч2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB_Ч3</Name>
+		<bwdPlusTraj>track_b_p3</bwdPlusTraj>
+		<fwdPlusTraj>track_b_p3-11</fwdPlusTraj>
+		<SignalLiterFwd>Ч3</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB_Ч4</Name>
+		<bwdPlusTraj>track_b_p4</bwdPlusTraj>
+		<fwdPlusTraj>track_b_p4-7</fwdPlusTraj>
+		<SignalLiterFwd>Ч4</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB_2</Name>
+		<bwdPlusTraj>track_b_m2-2</bwdPlusTraj>
+		<fwdPlusTraj>track_b_2-10</fwdPlusTraj>
+		<fwdMinusTraj>track_b_2-4</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stB_4</Name>
+		<bwdPlusTraj>track_b_m4-4</bwdPlusTraj>
+		<fwdPlusTraj>track_b_4-6</fwdPlusTraj>
+		<bwdMinusTraj>track_b_2-4</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stB_6</Name>
+		<bwdPlusTraj>track_b_4-6</bwdPlusTraj>
+		<fwdPlusTraj>track_b_6-8</fwdPlusTraj>
+		<fwdMinusTraj>track_b_6-10</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stB_10</Name>
+		<bwdPlusTraj>track_b_2-10</bwdPlusTraj>
+		<fwdPlusTraj>track_b_10-m6</fwdPlusTraj>
+		<bwdMinusTraj>track_b_6-10</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stB_8</Name>
+		<bwdPlusTraj>track_b_6-8</bwdPlusTraj>
+		<fwdPlusTraj>track_b_8-p1</fwdPlusTraj>
+		<fwdMinusTraj>track_b_8-p3</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stB_12</Name>
+		<bwdPlusTraj>track_b_m6-12</bwdPlusTraj>
+		<fwdPlusTraj>track_b_12-p2</fwdPlusTraj>
+		<fwdMinusTraj>track_b_12-p4</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stB_3</Name>
+		<bwdPlusTraj>track_b_5-3</bwdPlusTraj>
+		<fwdPlusTraj>track_b_3-m3</fwdPlusTraj>
+		<fwdMinusTraj>track_b_3-1</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stB_1</Name>
+		<bwdPlusTraj>track_b_9-1</bwdPlusTraj>
+		<fwdPlusTraj>track_b_1-m1</fwdPlusTraj>
+		<bwdMinusTraj>track_b_3-1</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stB_9</Name>
+		<bwdPlusTraj>track_b_m5-9</bwdPlusTraj>
+		<fwdPlusTraj>track_b_9-1</fwdPlusTraj>
+		<fwdMinusTraj>track_b_9-5</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stB_5</Name>
+		<bwdPlusTraj>track_b_7-5</bwdPlusTraj>
+		<fwdPlusTraj>track_b_5-3</fwdPlusTraj>
+		<bwdMinusTraj>track_b_9-5</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stB_7</Name>
+		<bwdPlusTraj>track_b_p2-7</bwdPlusTraj>
+		<fwdPlusTraj>track_b_7-5</fwdPlusTraj>
+		<bwdMinusTraj>track_b_p4-7</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stB_11</Name>
+		<bwdPlusTraj>track_b_p1-11</bwdPlusTraj>
+		<fwdPlusTraj>track_b_11-m5</fwdPlusTraj>
+		<bwdMinusTraj>track_b_p3-11</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stB_М2</Name>
+		<bwdPlusTraj>track_b_ch-m2</bwdPlusTraj>
+		<fwdPlusTraj>track_b_m2-2</fwdPlusTraj>
+		<SignalLiterFwd>M2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB_М4</Name>
+		<bwdPlusTraj>track_b_chd-m4</bwdPlusTraj>
+		<fwdPlusTraj>track_b_m4-4</fwdPlusTraj>
+		<SignalLiterFwd>M4</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB_М6</Name>
+		<bwdPlusTraj>track_b_10-m6</bwdPlusTraj>
+		<fwdPlusTraj>track_b_m6-12</fwdPlusTraj>
+		<SignalLiterFwd>M6</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB_М5</Name>
+		<bwdPlusTraj>track_b_11-m5</bwdPlusTraj>
+		<fwdPlusTraj>track_b_m5-9</fwdPlusTraj>
+		<SignalLiterBwd>M5</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB_М3</Name>
+		<bwdPlusTraj>track_b_3-m3</bwdPlusTraj>
+		<fwdPlusTraj>track_b_m3-nd</fwdPlusTraj>
+		<SignalLiterBwd>M3</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB_М1</Name>
+		<bwdPlusTraj>track_b_1-m1</bwdPlusTraj>
+		<fwdPlusTraj>track_b_m1-n</fwdPlusTraj>
+		<SignalLiterBwd>M1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB_Н</Name>
+		<bwdPlusTraj>track_b_m1-n</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_n-1</fwdPlusTraj>
+		<SignalLiterBwd>Н</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YG+RY+W_2+2+1_entr</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB_НД</Name>
+		<bwdPlusTraj>track_b_m3-nd</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_nd-22</fwdPlusTraj>
+		<SignalLiterBwd>НД</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YG+RY+W_2+2+1_DL_entr</SignalModelBwd>
+		<RelPosVectorBwd>-2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stD_Ч</Name>
+		<bwdPlusTraj>track_a-d_7x2-ch</bwdPlusTraj>
+		<fwdPlusTraj>track_d_ch-2</fwdPlusTraj>
+		<SignalLiterFwd>Ч</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM2_YG+RY+W_2+2+1_entr</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stD_2</Name>
+		<bwdPlusTraj>track_d_ch-2</bwdPlusTraj>
+		<fwdPlusTraj>track_d_2-p1</fwdPlusTraj>
+		<fwdMinusTraj>track_d_2-4</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stD_4</Name>
+		<bwdPlusTraj>track_d_pt-4</bwdPlusTraj>
+		<fwdPlusTraj>track_d_4-p2</fwdPlusTraj>
+		<bwdMinusTraj>track_d_2-4</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stD_3</Name>
+		<bwdPlusTraj>track_d_p2-3</bwdPlusTraj>
+		<fwdPlusTraj>track_d_3-pt</fwdPlusTraj>
+		<fwdMinusTraj>track_d_3-1</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stD_1</Name>
+		<bwdPlusTraj>track_d_p1-1</bwdPlusTraj>
+		<fwdPlusTraj>track_d_1-n</fwdPlusTraj>
+		<bwdMinusTraj>track_d_3-1</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stD_Н1</Name>
+		<bwdPlusTraj>track_d_2-p1</bwdPlusTraj>
+		<fwdPlusTraj>track_d_p1</fwdPlusTraj>
+		<SignalLiterBwd>Н1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM2_YG+RW_2+2_exit</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stD_Н2</Name>
+		<bwdPlusTraj>track_d_4-p2</bwdPlusTraj>
+		<fwdPlusTraj>track_d_p2</fwdPlusTraj>
+		<SignalLiterBwd>Н2</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM2_YGR+YW_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stD_Ч1</Name>
+		<bwdPlusTraj>track_d_p1</bwdPlusTraj>
+		<fwdPlusTraj>track_d_p1-1</fwdPlusTraj>
+		<SignalLiterFwd>Ч1</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM2_YG+RW_2+2_exit</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stD_Ч2</Name>
+		<bwdPlusTraj>track_d_p2</bwdPlusTraj>
+		<fwdPlusTraj>track_d_p2-3</fwdPlusTraj>
+		<SignalLiterFwd>Ч2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM2_YGR+YW_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stD_1-8</Name>
+		<bwdPlusTraj>track_a-d_2n-1x8</bwdPlusTraj>
+		<fwdPlusTraj>track_a-d_1x8-3x6</fwdPlusTraj>
+		<SignalLiterFwd>8</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM2_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM2_YGR_3_T_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stD_3-6</Name>
+		<bwdPlusTraj>track_a-d_1x8-3x6</bwdPlusTraj>
+		<fwdPlusTraj>track_a-d_3x6-5x4</fwdPlusTraj>
+		<SignalLiterFwd>6</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM2_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>3</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM2_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stD_5-4</Name>
+		<bwdPlusTraj>track_a-d_3x6-5x4</bwdPlusTraj>
+		<fwdPlusTraj>track_a-d_5x4-7x2</fwdPlusTraj>
+		<SignalLiterFwd>4</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM2_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>5</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM2_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stA-stD_7-2</Name>
+		<bwdPlusTraj>track_a-d_5x4-7x2</bwdPlusTraj>
+		<fwdPlusTraj>track_a-d_7x2-ch</fwdPlusTraj>
+		<SignalLiterFwd>2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM2_YGR_3_T_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>7</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM2_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_22</Name>
+		<bwdPlusTraj>track_b-c_nd-22</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_22-20</fwdPlusTraj>
+		<SignalLiterFwd>22</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>22</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_20</Name>
+		<bwdPlusTraj>track_b-c_22-20</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_20-18</fwdPlusTraj>
+		<SignalLiterFwd>20</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>20</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_18</Name>
+		<bwdPlusTraj>track_b-c_20-18</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_18-16</fwdPlusTraj>
+		<SignalLiterFwd>18</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>18</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_16</Name>
+		<bwdPlusTraj>track_b-c_18-16</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_16-14</fwdPlusTraj>
+		<SignalLiterFwd>16</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>16</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_14</Name>
+		<bwdPlusTraj>track_b-c_16-14</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_14-12</fwdPlusTraj>
+		<SignalLiterFwd>14</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>14</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_12</Name>
+		<bwdPlusTraj>track_b-c_14-12</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_12-10</fwdPlusTraj>
+		<SignalLiterFwd>12</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>12</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_10</Name>
+		<bwdPlusTraj>track_b-c_12-10</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_10-8</fwdPlusTraj>
+		<SignalLiterFwd>10</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>10</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_8</Name>
+		<bwdPlusTraj>track_b-c_10-8</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_8-6</fwdPlusTraj>
+		<SignalLiterFwd>8</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>8</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_6</Name>
+		<bwdPlusTraj>track_b-c_8-6</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_6-4</fwdPlusTraj>
+		<SignalLiterFwd>6</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>6</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_4</Name>
+		<bwdPlusTraj>track_b-c_6-4</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_4-2</fwdPlusTraj>
+		<SignalLiterFwd>4</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>4</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_2</Name>
+		<bwdPlusTraj>track_b-c_4-2</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_2-ch</fwdPlusTraj>
+		<SignalLiterFwd>2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR_3_T_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+		<SignalLiterBwd>2</SignalLiterBwd>
+		<SignalModelBwd>empty_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_1</Name>
+		<bwdPlusTraj>track_b-c_n-1</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_1-3</fwdPlusTraj>
+		<SignalLiterBwd>1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_T_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>1</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_3</Name>
+		<bwdPlusTraj>track_b-c_1-3</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_3-5</fwdPlusTraj>
+		<SignalLiterBwd>3</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>3</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_5</Name>
+		<bwdPlusTraj>track_b-c_3-5</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_5-7</fwdPlusTraj>
+		<SignalLiterBwd>5</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>5</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_7</Name>
+		<bwdPlusTraj>track_b-c_5-7</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_7-9</fwdPlusTraj>
+		<SignalLiterBwd>7</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>7</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_9</Name>
+		<bwdPlusTraj>track_b-c_7-9</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_9-11</fwdPlusTraj>
+		<SignalLiterBwd>9</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>9</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_11</Name>
+		<bwdPlusTraj>track_b-c_9-11</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_11-13</fwdPlusTraj>
+		<SignalLiterBwd>11</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>11</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_13</Name>
+		<bwdPlusTraj>track_b-c_11-13</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_13-15</fwdPlusTraj>
+		<SignalLiterBwd>13</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>13</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_15</Name>
+		<bwdPlusTraj>track_b-c_13-15</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_15-17</fwdPlusTraj>
+		<SignalLiterBwd>15</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>15</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_17</Name>
+		<bwdPlusTraj>track_b-c_15-17</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_17-19</fwdPlusTraj>
+		<SignalLiterBwd>17</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>17</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_19</Name>
+		<bwdPlusTraj>track_b-c_17-19</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_19-21</fwdPlusTraj>
+		<SignalLiterBwd>19</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>19</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stB-stC_21</Name>
+		<bwdPlusTraj>track_b-c_19-21</bwdPlusTraj>
+		<fwdPlusTraj>track_b-c_21-chd</fwdPlusTraj>
+		<SignalLiterBwd>21</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR_3_line</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+		<SignalLiterFwd>21</SignalLiterFwd>
+		<SignalModelFwd>empty_line</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stC_Ч</Name>
+		<bwdPlusTraj>track_b-c_2-ch</bwdPlusTraj>
+		<fwdPlusTraj>track_c_ch-m2</fwdPlusTraj>
+		<SignalLiterFwd>Ч</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YG+RY+W_2+2+1_entr</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stC_ЧД</Name>
+		<bwdPlusTraj>track_b-c_21-chd</bwdPlusTraj>
+		<fwdPlusTraj>track_c_chd-m4</fwdPlusTraj>
+		<SignalLiterFwd>ЧД</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YG+RY+W_2+2+1_DL_entr</SignalModelFwd>
+		<RelPosVectorFwd>-2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stC_Н1</Name>
+		<bwdPlusTraj>track_c_8-p1</bwdPlusTraj>
+		<fwdPlusTraj>track_c_p1</fwdPlusTraj>
+		<SignalLiterBwd>Н1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stC_Н2</Name>
+		<bwdPlusTraj>track_c_12-p2</bwdPlusTraj>
+		<fwdPlusTraj>track_c_p2</fwdPlusTraj>
+		<SignalLiterBwd>Н2</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stC_Н3</Name>
+		<bwdPlusTraj>track_c_8-p3</bwdPlusTraj>
+		<fwdPlusTraj>track_c_p3</fwdPlusTraj>
+		<SignalLiterBwd>Н3</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stC_Н4</Name>
+		<bwdPlusTraj>track_c_12-p4</bwdPlusTraj>
+		<fwdPlusTraj>track_c_p4</fwdPlusTraj>
+		<SignalLiterBwd>Н4</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stC_Ч1</Name>
+		<bwdPlusTraj>track_c_p1</bwdPlusTraj>
+		<fwdPlusTraj>track_c_p1-11</fwdPlusTraj>
+		<SignalLiterFwd>Ч1</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stC_Ч2</Name>
+		<bwdPlusTraj>track_c_p2</bwdPlusTraj>
+		<fwdPlusTraj>track_c_p2-7</fwdPlusTraj>
+		<SignalLiterFwd>Ч2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_MM1_YGR+YW_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stC_Ч3</Name>
+		<bwdPlusTraj>track_c_p3</bwdPlusTraj>
+		<fwdPlusTraj>track_c_p3-11</fwdPlusTraj>
+		<SignalLiterFwd>Ч3</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stC_Ч4</Name>
+		<bwdPlusTraj>track_c_p4</bwdPlusTraj>
+		<fwdPlusTraj>track_c_p4-7</fwdPlusTraj>
+		<SignalLiterFwd>Ч4</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_P_KM1_YGY+WR_3+2_rout</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stC_2</Name>
+		<bwdPlusTraj>track_c_m2-2</bwdPlusTraj>
+		<fwdPlusTraj>track_c_2-10</fwdPlusTraj>
+		<fwdMinusTraj>track_c_2-4</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stC_4</Name>
+		<bwdPlusTraj>track_c_m4-4</bwdPlusTraj>
+		<fwdPlusTraj>track_c_4-6</fwdPlusTraj>
+		<bwdMinusTraj>track_c_2-4</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stC_6</Name>
+		<bwdPlusTraj>track_c_4-6</bwdPlusTraj>
+		<fwdPlusTraj>track_c_6-8</fwdPlusTraj>
+		<fwdMinusTraj>track_c_6-10</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stC_10</Name>
+		<bwdPlusTraj>track_c_2-10</bwdPlusTraj>
+		<fwdPlusTraj>track_c_10-m6</fwdPlusTraj>
+		<bwdMinusTraj>track_c_6-10</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stC_8</Name>
+		<bwdPlusTraj>track_c_6-8</bwdPlusTraj>
+		<fwdPlusTraj>track_c_8-p1</fwdPlusTraj>
+		<fwdMinusTraj>track_c_8-p3</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stC_12</Name>
+		<bwdPlusTraj>track_c_m6-12</bwdPlusTraj>
+		<fwdPlusTraj>track_c_12-p2</fwdPlusTraj>
+		<fwdMinusTraj>track_c_12-p4</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stC_3</Name>
+		<bwdPlusTraj>track_c_5-3</bwdPlusTraj>
+		<fwdPlusTraj>track_c_3-m3</fwdPlusTraj>
+		<fwdMinusTraj>track_c_3-1</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stC_1</Name>
+		<bwdPlusTraj>track_c_9-1</bwdPlusTraj>
+		<fwdPlusTraj>track_c_1-m1</fwdPlusTraj>
+		<bwdMinusTraj>track_c_3-1</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stC_9</Name>
+		<bwdPlusTraj>track_c_m5-9</bwdPlusTraj>
+		<fwdPlusTraj>track_c_9-1</fwdPlusTraj>
+		<fwdMinusTraj>track_c_9-5</fwdMinusTraj>
+		<state_fwd>1</state_fwd>
+	</Switch>
+	<Switch>
+		<Name>stC_5</Name>
+		<bwdPlusTraj>track_c_7-5</bwdPlusTraj>
+		<fwdPlusTraj>track_c_5-3</fwdPlusTraj>
+		<bwdMinusTraj>track_c_9-5</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stC_7</Name>
+		<bwdPlusTraj>track_c_p2-7</bwdPlusTraj>
+		<fwdPlusTraj>track_c_7-5</fwdPlusTraj>
+		<bwdMinusTraj>track_c_p4-7</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stC_11</Name>
+		<bwdPlusTraj>track_c_p1-11</bwdPlusTraj>
+		<fwdPlusTraj>track_c_11-m5</fwdPlusTraj>
+		<bwdMinusTraj>track_c_p3-11</bwdMinusTraj>
+		<state_bwd>1</state_bwd>
+	</Switch>
+	<Switch>
+		<Name>stC_М2</Name>
+		<bwdPlusTraj>track_c_ch-m2</bwdPlusTraj>
+		<fwdPlusTraj>track_c_m2-2</fwdPlusTraj>
+		<SignalLiterFwd>M2</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stC_М4</Name>
+		<bwdPlusTraj>track_c_chd-m4</bwdPlusTraj>
+		<fwdPlusTraj>track_c_m4-4</fwdPlusTraj>
+		<SignalLiterFwd>M4</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stC_М6</Name>
+		<bwdPlusTraj>track_c_10-m6</bwdPlusTraj>
+		<fwdPlusTraj>track_c_m6-12</fwdPlusTraj>
+		<SignalLiterFwd>M6</SignalLiterFwd>
+		<SignalModelFwd>RM_sig_M_KM1_WB_2_shnt</SignalModelFwd>
+		<RelPosVectorFwd>2.5 0.0 0.0</RelPosVectorFwd>
+		<RelRotVectorFwd>0.0 0.0 0.0</RelRotVectorFwd>
+	</Switch>
+	<Switch>
+		<Name>stC_М5</Name>
+		<bwdPlusTraj>track_c_11-m5</bwdPlusTraj>
+		<fwdPlusTraj>track_c_m5-9</fwdPlusTraj>
+		<SignalLiterBwd>M5</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stC_М3</Name>
+		<bwdPlusTraj>track_c_3-m3</bwdPlusTraj>
+		<fwdPlusTraj>track_c_m3-nd</fwdPlusTraj>
+		<SignalLiterBwd>M3</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stC_М1</Name>
+		<bwdPlusTraj>track_c_1-m1</bwdPlusTraj>
+		<fwdPlusTraj>track_c_m1-n</fwdPlusTraj>
+		<SignalLiterBwd>M1</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_M_KM1_WB_2_shnt</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stC_Н</Name>
+		<bwdPlusTraj>track_c_m1-n</bwdPlusTraj>
+		<fwdPlusTraj>track_c_n-per</fwdPlusTraj>
+		<SignalLiterBwd>Н</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YG+RY+W_2+2+1_entr</SignalModelBwd>
+		<RelPosVectorBwd>2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+	<Switch>
+		<Name>stC_НД</Name>
+		<bwdPlusTraj>track_c_m3-nd</bwdPlusTraj>
+		<fwdPlusTraj>track_c_nd-per</fwdPlusTraj>
+		<SignalLiterBwd>НД</SignalLiterBwd>
+		<SignalModelBwd>RM_sig_P_MM1_YG+RY+W_2+2+1_DL_entr</SignalModelBwd>
+		<RelPosVectorBwd>-2.5 0.0 0.0</RelPosVectorBwd>
+		<RelRotVectorBwd>0.0 0.0 0.0</RelRotVectorBwd>
+	</Switch>
+</Config>

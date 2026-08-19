@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Server>
+		<Name>Local</Name>
+		<HostAddr>127.0.0.1</HostAddr>
+		<port>1992</port>
+	</Server>
+</Config>

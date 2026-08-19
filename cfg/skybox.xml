@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Config>
+
+	<Model>
+		<Filename>sky.gltf</Filename>
+	</Model>
+
+	<!-- День -->
+	<Texture>
+		<Filename>sky_day.bmp</Filename>
+		<SunAltitudeAngleAppearBegin>9</SunAltitudeAngleAppearBegin>
+		<SunAltitudeAngleAppearEnd>15</SunAltitudeAngleAppearEnd>
+		<SunAltitudeAngleDisappearBegin>15</SunAltitudeAngleDisappearBegin>
+		<SunAltitudeAngleDisappearEnd>9</SunAltitudeAngleDisappearEnd>
+	</Texture>
+
+	<!-- Закат -->
+	<Texture>
+		<Filename>sky_sunset.bmp</Filename>
+		<SunAltitudeAngleAppearBegin>15</SunAltitudeAngleAppearBegin>
+		<SunAltitudeAngleAppearEnd>9</SunAltitudeAngleAppearEnd>
+		<SunAltitudeAngleDisappearBegin>3</SunAltitudeAngleDisappearBegin>
+		<SunAltitudeAngleDisappearEnd>-3</SunAltitudeAngleDisappearEnd>
+	</Texture>
+
+	<!-- Сумерки -->
+	<Texture>
+		<Filename>sky_sunsetTwilight.bmp</Filename>
+		<SunAltitudeAngleAppearBegin>3</SunAltitudeAngleAppearBegin>
+		<SunAltitudeAngleAppearEnd>-3</SunAltitudeAngleAppearEnd>
+		<SunAltitudeAngleDisappearBegin>-9</SunAltitudeAngleDisappearBegin>
+		<SunAltitudeAngleDisappearEnd>-15</SunAltitudeAngleDisappearEnd>
+	</Texture>
+
+	<!-- Ночь -->
+	<Texture>
+		<Filename>sky_night.bmp</Filename>
+		<SunAltitudeAngleAppearBegin>-9</SunAltitudeAngleAppearBegin>
+		<SunAltitudeAngleAppearEnd>-15</SunAltitudeAngleAppearEnd>
+		<SunAltitudeAngleDisappearBegin>-15</SunAltitudeAngleDisappearBegin>
+		<SunAltitudeAngleDisappearEnd>-9</SunAltitudeAngleDisappearEnd>
+	</Texture>
+
+	<!-- Рассвет -->
+	<Texture>
+		<Filename>sky_sunriseDawn.bmp</Filename>
+		<SunAltitudeAngleAppearBegin>-15</SunAltitudeAngleAppearBegin>
+		<SunAltitudeAngleAppearEnd>-9</SunAltitudeAngleAppearEnd>
+		<SunAltitudeAngleDisappearBegin>-3</SunAltitudeAngleDisappearBegin>
+		<SunAltitudeAngleDisappearEnd>3</SunAltitudeAngleDisappearEnd>
+	</Texture>
+
+	<!-- Восход -->
+	<Texture>
+		<Filename>sky_sunrise.bmp</Filename>
+		<SunAltitudeAngleAppearBegin>-3</SunAltitudeAngleAppearBegin>
+		<SunAltitudeAngleAppearEnd>3</SunAltitudeAngleAppearEnd>
+		<SunAltitudeAngleDisappearBegin>9</SunAltitudeAngleDisappearBegin>
+		<SunAltitudeAngleDisappearEnd>15</SunAltitudeAngleDisappearEnd>
+	</Texture>
+
+</Config>

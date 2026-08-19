@@ -1,0 +1,1 @@
+simulator.exe --route=..\routes\experimental-polygon --train-config=vl60pk-1543-T65_17 -p branch1_0002_2_12_22 -x 785 -o

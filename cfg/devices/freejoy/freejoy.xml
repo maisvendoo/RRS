@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<Common>
+		<RBS_Button_ID>18</RBS_Button_ID>
+		<Release_Button_ID>16</Release_Button_ID>
+	</Common>
+
+	<LocoCrane>
+		<AxisXmin>77</AxisXmin>
+		<AxisXmax>-87</AxisXmax>
+	</LocoCrane>
+
+	<BrakeCranePos>
+		<Pos>0</Pos>
+		<AxisYmin>89</AxisYmin>
+		<AxisYmax>92</AxisYmax>
+	</BrakeCranePos>
+
+	<BrakeCranePos>
+		<Pos>1</Pos>
+		<AxisYmin>33</AxisYmin>
+		<AxisYmax>36</AxisYmax>
+	</BrakeCranePos>
+
+	<BrakeCranePos>
+		<Pos>2</Pos>
+		<AxisYmin>5</AxisYmin>
+		<AxisYmax>8</AxisYmax>
+	</BrakeCranePos>
+
+	<BrakeCranePos>
+		<Pos>3</Pos>
+		<AxisYmin>-11</AxisYmin>
+		<AxisYmax>-8</AxisYmax>
+	</BrakeCranePos>
+
+	<BrakeCranePos>
+		<Pos>4</Pos>
+		<AxisYmin>-18</AxisYmin>
+		<AxisYmax>-16</AxisYmax>
+	</BrakeCranePos>
+
+	<BrakeCranePos>
+		<Pos>5</Pos>
+		<AxisYmin>-35</AxisYmin>
+		<AxisYmax>-32</AxisYmax>
+	</BrakeCranePos>
+
+	<BrakeCranePos>
+		<Pos>6</Pos>
+		<AxisYmin>-89</AxisYmin>
+		<AxisYmax>-86</AxisYmax>
+	</BrakeCranePos>
+
+</Config>

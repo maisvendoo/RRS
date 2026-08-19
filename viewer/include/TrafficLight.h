@@ -1,0 +1,58 @@
+#pragma once
+#ifndef TRAFFIC_LIGHT_H
+#define TRAFFIC_LIGHT_H
+
+#include "signal-types.h"
+
+#include <vsg/core/Object.h>
+#include <vsg/nodes/MatrixTransform.h>
+
+#include <QString>
+
+#include <string>
+
+class QByteArray;
+class AnimatedPagedLOD;
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+class TrafficLight final
+{
+public:
+    vsg::ref_ptr<vsg::MatrixTransform> transform = vsg::MatrixTransform::create();
+    vsg::dvec3  position = vsg::dvec3(0.0, 0.0, 0.0);
+    vsg::dvec3  orth = vsg::dvec3(0.0, 1.0, 0.0);
+    vsg::dvec3  up = vsg::dvec3(0.0, 0.0, 1.0);
+    vsg::dvec3  right = vsg::dvec3(1.0, 0.0, 0.0);
+
+    TrafficLight();
+
+    void step(float t, float dt);
+
+    void deserialize(QByteArray& data);
+
+    const QString& getConnectorName() const noexcept;
+    int8_t getSignalDirection() const noexcept;
+    const QString& getLetter() const noexcept;
+    const QString& getModelName() const noexcept;
+
+    bool loadSignal(std::string& models_dir_path,
+                    std::string& animations_dir,
+                    vsg::ref_ptr<vsg::Options> options);
+
+private:
+    QString connector_name = "";
+    std::int8_t signal_dir = 0;
+    QString letter = "";
+    QString signal_model = "";
+
+    lens_state_t lens_state;
+    lens_state_t old_lens_state;
+
+    vsg::ref_ptr<AnimatedPagedLOD> animated_pagedLOD;
+
+    std::vector<float> server_signals;
+};
+
+#endif // TRAFFIC_LIGHT_H

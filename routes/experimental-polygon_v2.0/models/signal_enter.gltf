@@ -1,0 +1,154 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "buffers": [
+        {
+            "uri": "bin/signal_enter.bin",
+            "byteLength": 75920
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 22404,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 22404,
+            "byteLength": 22404,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 44808,
+            "byteLength": 14936,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 59744,
+            "byteLength": 16176,
+            "target": 34963
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 1867,
+            "type": "VEC3",
+            "max": [
+                0.320487,
+                7.65052,
+                0.761263
+            ],
+            "min": [
+                -3.75709,
+                -0.00701118,
+                -3.20493
+            ]
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 1867,
+            "type": "VEC3",
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 1867,
+            "type": "VEC2",
+            "max": [
+                0.999462,
+                1.34372
+            ],
+            "min": [
+                0.000664471,
+                0.000299216
+            ]
+        },
+        {
+            "bufferView": 3,
+            "componentType": 5125,
+            "count": 4044,
+            "type": "SCALAR",
+            "max": [
+                1866
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "images": [
+        {
+            "uri": "../textures/IMR.tga"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0,
+                    "texCoord": 0
+                }
+            },
+            "alphaMode": "BLEND"
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
+                    },
+                    "indices": 3,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [ 0 ]
+        }
+    ],
+    "scene": 0
+}

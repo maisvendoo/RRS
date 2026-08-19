@@ -1,0 +1,230 @@
+#include    "vr292.h"
+
+#include    "math-funcs.h"
+#include    "core/get_module.h"
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+AirDist292::AirDist292() : AirDistributor ()
+{
+    p.fill(0.0);
+    K.fill(0.0);
+    A.fill(0.0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AirDist292::init(double pBP, double pFL)
+{
+    (void) pBP;
+    (void) pFL;
+}
+
+#ifndef NDEBUG
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString AirDist292::getDebugMsg() const
+{
+    is_upd = false;
+    return DebugMsg;
+}
+#endif
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AirDist292::preStep(state_vector_t &Y, double t)
+{
+    (void) t;
+
+    // Условное положение магистрального поршня и отсекательного золотника
+    // с учётом трения
+    disjunction_z_pos = std::clamp(disjunction_z_pos,
+                            pSR - pBP - (disjunction_z_eps / 2.0),
+                            pSR - pBP + (disjunction_z_eps / 2.0));
+
+    // Условное положение главного золотника
+    // с учётом зазора
+    main_z_pos = std::clamp(main_z_pos,
+                     disjunction_z_pos - (main_z_eps / 2.0),
+                     disjunction_z_pos + (main_z_eps / 2.0));
+
+    // Поток из тормозной магистрали в запасный резервуар
+    double Q_bp_sr = 0.0;
+    // Проверяем связь запасного резезвуара и тормозной магистрали
+    // через три отверстия диаметром 1.25 мм
+    if (disjunction_z_pos < p[1])
+    {
+        // Коэффициент перетока через зазор между пояском поршня и втулкой
+        double K_2 = K[2] * std::clamp(A[1] * (disjunction_z_pos - p[2]), 0.0, 1.0);
+        // Поток из тормозной магистрали в запасный резервуар
+        Q_bp_sr = (K[1] + K_2) * (pBP - pSR);
+    }
+
+    // Потоки камеры дополнительной разрядки ТМ
+    double Q_bp_atm = 0.0;
+    double Q_bp_kd = 0.0;
+    double Q_kd_atm = 0.0;
+    // Потоки магистрали тормозных цилиндров
+    double Q_sr_bc = 0.0;
+    double Q_bc_atm = 0.0;
+
+    // Проверяем, что главный золотник не в отпускном положении
+    // (управляющие КДР и ТЦ каналы золотника совпадают с зеркалом)
+    if (main_z_pos > p[3])
+    {
+        // Проверяем, что главный золотник не в экстренном положении
+        if (main_z_pos < p[4])
+        {
+            // Проверяем взаимное положение золотников
+            double z_diff = disjunction_z_pos - main_z_pos;
+
+            // Поток из запасного резервуара в магистраль тормозных цилиндров
+            Q_sr_bc = K[5] * std::clamp(A[2] * z_diff, 0.0, 1.0) * (pSR - pBC);
+
+            // Управление камерой КДР с небольшой мёртвой зоной
+            z_diff = dead_zone(z_diff, -p[5], p[5]);
+
+            // Поток из тормозной магистрали в камеру дополнительной разрядки ТМ
+            Q_bp_kd = K[3] * std::clamp(A[2] * z_diff, 0.0, 1.0) * (pBP - Y[KDR]);
+            // Поток из камеры дополнительной разрядки ТМ в атмосферу
+            Q_kd_atm = K[4] * nf(z_diff) * Y[KDR];
+        }
+        else
+        {
+            switch (long_train_mode) {
+            case 0:
+            {
+                // Открытие срывного клапана экстренного торможения
+                double v_emerg = std::clamp(A[0] * (pBP - pBC - p[0]), 0.0, 1.0);
+                // Поток экстренной разрядки тормозной магистрали
+                Q_bp_atm = K[0] * v_emerg * pBP;
+
+                // Поток из запасного резервуара в магистраль тормозных цилиндров
+                Q_sr_bc = K[6] * (pSR - pBC);
+                break;
+            }
+            case 1:
+            {
+                // Открытие срывного клапана экстренного торможения
+                double v_emerg = std::clamp(A[0] * (pBP - pBC - p[0]), 0.0, 1.0);
+                // Поток экстренной разрядки тормозной магистрали
+                Q_bp_atm = K[0] * v_emerg * pBP;
+
+                // Поток из запасного резервуара в магистраль тормозных цилиндров
+                Q_sr_bc = K[7] * (pSR - pBC);
+                break;
+            }
+            case 2:
+            default:
+            {
+                // Поток из запасного резервуара в магистраль тормозных цилиндров
+                Q_sr_bc = K[7] * (pSR - pBC);
+                break;
+            }
+            }
+
+            // Поток из камеры дополнительной разрядки ТМ в атмосферу
+            Q_kd_atm = K[4] * Y[KDR];
+        }
+    }
+    else
+    {
+        // Разрядка магистрали тормозных цилиндров в атмосферу
+        Q_bc_atm = K[8] * pBC;
+        // Поток из камеры дополнительной разрядки ТМ в атмосферу
+        Q_kd_atm = K[4] * Y[KDR];
+    }
+
+    // Поток в тормозную магистраль
+    QBP = - Q_bp_sr - Q_bp_kd - Q_bp_atm;
+
+    // Поток в магистраль тормозных цилиндров
+    QBC = Q_sr_bc - Q_bc_atm;
+
+    // Поток в запасный резервуар
+    QSR = Q_bp_sr - Q_sr_bc;
+
+    // Поток в камеру дополнительной разрядки ТМ
+    Qkd = Q_bp_kd - Q_kd_atm;
+
+#ifndef NDEBUG
+    if (is_upd)
+        return;
+
+//    QString("  time  ; pBP   ; pBC   ; pSR   ; pKDR  ; BPsr   ; BPkdr  ; KDRatm ; SRbc   ; BCatm  ; BPatm  ; mainS  ; disjZ  ; zdiff  ; zdA2 ; dopSR; vemrg");
+    DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16;%17")
+            .arg(t, 8, 'f', 3)
+            .arg(10*pBP, 7, 'f', 5)
+            .arg(10*pBC, 7, 'f', 5)         //%3
+            .arg(10*pSR, 7, 'f', 5)
+            .arg(10*Y[KDR], 7, 'f', 5)
+            .arg(10000*Q_bp_sr, 8, 'f', 5)  //%6
+            .arg(10000*Q_bp_kd, 8, 'f', 5)
+            .arg(10000*Q_kd_atm, 8, 'f', 5)
+            .arg(10000*Q_sr_bc, 8, 'f', 5)  //%9
+            .arg(10000*Q_bc_atm, 8, 'f', 5)
+            .arg(10000*Q_bp_atm, 8, 'f', 5)
+            .arg(main_z_pos, 8, 'f', 5)     //%12
+            .arg(disjunction_z_pos, 8, 'f', 5)
+            .arg(disjunction_z_pos - main_z_pos, 8, 'f', 5)
+            .arg(std::clamp(A[2] * (disjunction_z_pos - main_z_pos), -1.0, 1.0), 6, 'f', 3) //%15
+            .arg(std::clamp(A[1] * (disjunction_z_pos - p[2]), 0.0, 1.0), 6, 'f', 3)
+            .arg((main_z_pos > p[4])*std::clamp(A[0] * (pBP - pBC - p[0]), 0.0, 1.0), 6, 'f', 3);
+    is_upd = true;
+#endif
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AirDist292::ode_system(const state_vector_t &Y,
+                            state_vector_t &dYdt,
+                            double t)
+{
+    (void) Y;
+    (void) t;
+
+    dYdt[KDR] = Qkd / Vkd;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void AirDist292::load_config(CfgReader &cfg)
+{
+    QString secName = "Device";
+
+    cfg.getInt(secName, "LongTrainMode", long_train_mode);
+
+    double tmp = 0.0;
+    cfg.getDouble(secName, "Vkd", tmp);
+    if (tmp > 1e-3)
+        Vkd = tmp;
+
+    cfg.getDouble(secName, "main_z_eps", main_z_eps);
+
+    for (size_t i = 0; i < p.size(); ++i)
+    {
+        QString coeff = QString("p%1").arg(i);
+        cfg.getDouble(secName, coeff, p[i]);
+    }
+
+    for (size_t i = 0; i < K.size(); ++i)
+    {
+        QString coeff = QString("K%1").arg(i);
+        cfg.getDouble(secName, coeff, K[i]);
+    }
+
+    for (size_t i = 0; i < A.size(); ++i)
+    {
+        QString coeff = QString("A%1").arg(i);
+        cfg.getDouble(secName, coeff, A[i]);
+    }
+
+}
+
+GET_MODULE(AirDist292)

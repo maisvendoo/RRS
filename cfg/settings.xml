@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Config>
+    <Client>
+        <!-- ip-адрес, порт сервера -->
+        <HostAddr>127.0.0.1</HostAddr>
+        <port>1992</port>
+        <!-- Интервал попыток подключения к серверу, мс -->
+        <ReconnectInterval>500</ReconnectInterval>
+        <!-- Интервал обновления положений подвижного состава, мс -->
+        <VehiclesPosUpdateInterval>70</VehiclesPosUpdateInterval>
+        <!-- Интервал обновления состояний подвижного состава, мс -->
+        <VehiclesStateUpdateInterval>100</VehiclesStateUpdateInterval>
+        <!-- Интервал обновления отладочной строки, мс -->
+        <VehicleControlledUpdateInterval>70</VehicleControlledUpdateInterval>
+        <!-- Дополнительная задержка клиента для сглаживания неравномерного приёма сетевых пакетов, мс -->
+        <ClientDelay>100</ClientDelay>
+        <!-- Разрешение показывать IP-адрес сервера -->
+        <ShowServerAddr>1</ShowServerAddr>
+    </Client>
+    <Viewer>
+        <!-- Запись в лог-файл: INFO - все сообщения, WARN - только ошибки, FATAL - только критические ошибки -->
+        <NotifyLevel>INFO</NotifyLevel>
+        <!-- Ограничение на количество загруженных в память моделей -->
+        <TargetPagedLODs>4000</TargetPagedLODs>
+        <!-- Количество фоновых потоков для загрузки 3d-моделей (1 .. N) -->
+        <ReadThreads>1</ReadThreads>
+        <!-- Количество вспомогательных потоков для загрузки текстур 3d-моделей (0 .. N) -->
+        <OperationsThreads>1</OperationsThreads>
+        <!-- 1 - отключение автоматического создания ограничивающей сферы для загружаемых 3d-моделей -->
+        <DisableCullNode>0</DisableCullNode>
+        <!-- 1 - отключение нативного загрузчика моделей формата .gltf в VulkanSceneGraph -->
+        <DisableNativeGLTF>0</DisableNativeGLTF>
+        <!-- 1 - отрисовка всех полигонов моделей с обеих сторон -->
+        <DrawModelsTwoSided>0</DrawModelsTwoSided>
+        <!-- Минимальная доля от высоты окна, от которой начинают отрисовываться 3d-модели (0.0 - 1.0) -->
+        <CullingScreenRatio>0.005</CullingScreenRatio>
+        <!-- Размер крупномасштабной сетки для отсечения видимости объектов маршрута, м -->
+        <LargeScaleTileSize>4000.0</LargeScaleTileSize>
+        <!-- Размер мелкомасштабной сетки для отсечения видимости объектов маршрута, м -->
+        <SmallScaleTileSize>32000.0</SmallScaleTileSize>
+        <!-- Заголовок окна -->
+        <Name>Russian Railway Simulator (RRS)</Name>
+        <!-- Оформление окна: 1 - отображение рамки и заголовка; 0 - режим окна без рамки -->
+        <WindowDecoration>1</WindowDecoration>
+        <!-- Положение окна, пикс. -->
+        <posX>50</posX>
+        <posY>50</posY>
+        <!-- Размер окна, пикс. -->
+        <Width>1280</Width>
+        <Height>720</Height>
+        <!-- Физическое устройство, выполняющее рендеринг (видеокарта) -->
+        <PhysicalDevice>-1</PhysicalDevice>
+        <!-- Номер монитора; 0 для монитора по умолчанию -->
+        <ScreenNumber>0</ScreenNumber>
+        <!-- Полноэкранный режим: 1 - включен; 0 - оконный режим -->
+        <FullScreen>0</FullScreen>
+        <!-- Вертикальная синхронизация: 1 - включена; 0 - отключена -->
+        <VSync>1</VSync>
+        <!-- Двойная буферизация: 1 - включена; 0 - отключена -->
+        <DoubleBuffer>1</DoubleBuffer>
+        <!-- Мультисемплирование (сглаживание) -->
+        <Samples>2</Samples>
+        <!-- Точность буфера глубины: 0 - низкая (производительность, возможны артефакты); 1 - средняя; 2 - высокая; 3 - ультра -->
+        <depthFormat>2</depthFormat>
+        <!-- Ограничение частоты кадров; 0 - без ограничения -->
+        <MaxFPS>60</MaxFPS>
+        <!-- Угол поля зрения по умолчанию, град. -->
+        <FovY>55</FovY>
+        <!-- Ближняя плоскость отсечения, м -->
+        <zNear>0.1</zNear>
+        <!-- Дальняя плоскость отсечения (дальность видимости), м -->
+        <ViewDistance>2000</ViewDistance>
+        <!-- Тени: 1 - включены; 0 - отключены -->
+        <Shadow>0</Shadow>
+        <!-- Пресет настроек теней: 0 - Низкий; 1 - Средний; 2 - Высокий; 3 - Ультра; 4 - Пользовательский -->
+        <ShadowsPreset>0</ShadowsPreset>
+        <!-- Дальность прорисовки теней, м -->
+        <ShadowDistance>30.0</ShadowDistance>
+        <!-- Количество каскадных карт теней -->
+        <ShadowCascade>1</ShadowCascade>
+        <!-- Разрешение карт теней -->
+        <ShadowResolution>1024</ShadowResolution>
+        <!-- Допустимое количество источников света в сцене -->
+        <NumLights>200</NumLights>
+        <!-- Яркость общего освещения -->
+        <AmbientIntensity>0.5</AmbientIntensity>
+        <!-- Цвет общего освещения (RGB, 0.0 - 1.0) -->
+        <AmbientColor>1.0 1.0 1.0</AmbientColor>
+        <!-- Яркость солнечного освещения -->
+        <SunIntensity>5.0</SunIntensity>
+        <!-- Цвет солнечного освещения (RGB, 0.0 - 1.0) -->
+        <SunColor>1.0 1.0 1.0</SunColor>
+        <!-- Направление (азимут) солнечного освещения, град. -->
+        <SunAzimuth>45</SunAzimuth>
+        <!-- Высота солнечного освещения над горизонтом, град. -->
+        <SunAltitude>45</SunAltitude>
+        <!-- Включить отладочные слои Vulkan -->
+        <EnableDebugLayer>0</EnableDebugLayer>
+        <!-- Включить отладочные сообщения Vulkan -->
+        <EnableDebugUtils>0</EnableDebugUtils>
+        <!-- Ограничение объема используемой памяти GPU (от 0.0 до 1.0) -->
+        <GPUAllocatedMemoryLimit>1.0</GPUAllocatedMemoryLimit>
+    </Viewer>
+</Config>

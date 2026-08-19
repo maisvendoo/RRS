@@ -1,0 +1,73 @@
+#include    "passcar.h"
+
+#include "airdistributor.h"
+#include "electro-airdistributor.h"
+#include "pneumo-anglecock.h"
+#include "pneumo-hose-epb.h"
+#include "reservoir.h"
+#include <brake-shoes.h>
+
+//------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------
+void PassCar::initBrakeDevices(double p0, double pBP, double pFL)
+{
+    (void) p0;
+
+    // Инициализация давления в тормозной магистрали
+    brakepipe->setY(0, pBP);
+
+    // Инициализация давления в воздухораспределителе
+    if (air_dist != nullptr)
+        air_dist->init(pBP, pFL);
+
+    // Инициализация давления в электровоздухораспределителе
+    if (electro_air_dist != nullptr)
+        electro_air_dist->init(pBP, pFL);
+
+    // Инициализация давления в запасном резервуаре
+    supply_reservoir->setY(0, pBP);
+
+    // Инициализация давления в концевых кранах тормозной магистрали
+    anglecock_bp_fwd->setPipePressure(pBP);
+    anglecock_bp_bwd->setPipePressure(pBP);
+
+    // Инициализация давления в рукавах тормозной магистрали
+    hose_bp_fwd->setPressure(pBP);
+    hose_bp_bwd->setPressure(pBP);
+
+    // Включение трёх красных огней на торцевых стенках
+    red_lamps_end_of_train_fwd.setInitState(prev_vehicle == nullptr);
+    red_lamps_end_of_train_bwd.setInitState(next_vehicle == nullptr);
+
+    // Состояние рукавов и концевых кранов тормозной магистрали
+    if (hose_bp_fwd->isLinked())
+    {
+        hose_bp_fwd->connect();
+        anglecock_bp_fwd->open();
+    }
+    else
+    {
+        anglecock_bp_fwd->close();
+    }
+
+    if (hose_bp_bwd->isLinked())
+    {
+        hose_bp_bwd->connect();
+        anglecock_bp_bwd->open();
+    }
+    else
+    {
+        anglecock_bp_bwd->close();
+    }
+
+    // Инициализация тормозных башмаков
+    for (size_t i = 0; i < num_axis; ++i)
+    {
+        BrakeShoes *bs = new BrakeShoes;
+        bs->read_config("brake-shoes");
+        brake_shoes.push_back(bs);
+    }
+
+    is_brake_shoes ? brake_shoes_set.set() : brake_shoes_set.reset();
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
+        <U_nom>50.0</U_nom>
+        <R>48.1</R>
+        <T>0.2</T>
+        <level_off>0.6</level_off>
+        <level_on>0.7</level_on>
+
+        <Id_max>2000.0</Id_max>
+
+    </Device>
+</Config>

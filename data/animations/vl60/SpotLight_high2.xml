@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<LightAnimation>
+		<SignalID>107</SignalID>
+		<Duration>10.0</Duration>
+		<!-- Цвет источника (RGB, 0.0 - 1.0) -->
+		<Color>1.0 0.8 0.4</Color>
+		<!-- Максимальная яркость -->
+		<MaxIntensity>100000.0</MaxIntensity>
+		<!-- Угол внутреннего конуса (до него максимальная яркость), 0 - 90 град. -->
+		<InnerAngle>0.0</InnerAngle>
+		<!-- Угол внешнего конуса (после него нулевая яркость), 0 - 90 град. -->
+		<OuterAngle>4.0</OuterAngle>
+		<!-- Радиус источника света, м -->
+		<Radius>0.0</Radius>
+		<!-- Поворот луча по вертикали относительно дефолтного положения, град. -->
+		<VRotation>0.0</VRotation>
+		<!-- Поворот луча по горизонтали относительно дефолтного положения, град. -->
+		<HRotation>0.0</HRotation>
+	</LightAnimation>
+
+	<KeyPoint>
+		<Param>0.0</Param>
+		<Value>0.0</Value>
+	</KeyPoint>
+
+	<KeyPoint>
+		<Param>0.5</Param>
+		<Value>0.4</Value>
+	</KeyPoint>
+
+	<KeyPoint>
+		<Param>1.0</Param>
+		<Value>1.0</Value>
+	</KeyPoint>
+
+</Config>

@@ -1,0 +1,154 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "buffers": [
+        {
+            "uri": "bin/v_forest26r.bin",
+            "byteLength": 32832
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 10368,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 10368,
+            "byteLength": 10368,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 20736,
+            "byteLength": 6912,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 27648,
+            "byteLength": 5184,
+            "target": 34963
+        }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 864,
+            "type": "VEC3",
+            "max": [
+                44.3078,
+                18.1009,
+                11.0588
+            ],
+            "min": [
+                1.19026,
+                -6.81253,
+                -105.165
+            ]
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 864,
+            "type": "VEC3",
+            "max": [
+                0.999994,
+                0.07984,
+                0.995512
+            ],
+            "min": [
+                -0.999994,
+                -0.0798401,
+                -0.995512
+            ]
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5126,
+            "count": 864,
+            "type": "VEC2",
+            "max": [
+                0.998967,
+                0.998723
+            ],
+            "min": [
+                0.000485674,
+                0.000453625
+            ]
+        },
+        {
+            "bufferView": 3,
+            "componentType": 5125,
+            "count": 1296,
+            "type": "SCALAR",
+            "max": [
+                863
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "images": [
+        {
+            "uri": "../textures/v_forest444.tga"
+        }
+    ],
+    "samplers": [
+        {
+            "magFilter": 9729,
+            "minFilter": 9987,
+            "wrapS": 10497,
+            "wrapT": 10497
+        }
+    ],
+    "textures": [
+        {
+            "sampler": 0,
+            "source": 0
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0,
+                    "texCoord": 0
+                }
+            },
+            "alphaMode": "BLEND"
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
+                    },
+                    "indices": 3,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [ 0 ]
+        }
+    ],
+    "scene": 0
+}

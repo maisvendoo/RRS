@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Order>0</Order>
+
+        <!-- Давление сигнала на включение компрессора -->
+        <Min_pressure>0.75</Min_pressure>
+
+        <!-- Давление сигнала на отключение компрессора -->
+        <Max_pressure>0.9</Max_pressure>
+
+    </Device>
+</Config>

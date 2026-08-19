@@ -1,0 +1,140 @@
+QWidget {
+	background-color: #404040;
+	color: #ffffff;
+}
+
+QTextBrowser {
+    background-color: #404040;  
+    color: #ffffff;             
+}
+
+QPushButton {
+	background-color: #00aa00;
+	color: #ffffff; /* Добавил цвет текста для кнопки */
+}
+
+QPushButton::pressed {
+	background-color: #ffb140;
+}
+
+QPushButton::disabled {
+	background-color: #606060;
+	color: #888888; /* Добавил цвет текста для неактивной кнопки */
+}
+
+QListWidget {
+	background-color: #606060;
+}
+
+/* Выделение пункта в списке (например, в выборе маршрута) */
+QListWidget::item:selected {
+	background-color: #ffb140;
+	color: #000000;
+}
+
+QPlainTextEdit {
+	background-color: #606060;
+}
+
+QLineEdit {
+	background-color: #606060;
+}
+
+QSpinBox {
+	background-color: #606060;
+}
+
+QDoubleSpinBox {
+	background-color: #606060;
+}
+
+/* --- Главное меню (Вкладки) --- */
+QTabBar::tab:selected {
+	/* Принудительно оранжевый фон для активной вкладки */
+	background: #ffb140; 
+	color: #000000; /* Черный текст для контраста на оранжевом */
+}
+
+QTabBar::tab:!selected {
+	background: #606060;
+	color: #ffffff;
+}
+
+QToolBox::tab {
+	background: #606060;
+}
+
+QTabWidget::pane { 
+	border: 0; 
+}
+
+QComboBox {
+	background-color: #606060;
+	color: #ffffff;
+	border: 1px solid #404040;
+	padding: 2px;
+}
+
+QComboBox:focus {
+	background-color: #ffb140;
+	color: #000000;
+}
+
+QComboBox QAbstractItemView::item:selected {
+	background-color: #ffb140;
+	color: #000000;
+}
+
+
+QDateTimeEdit::disabled {
+	color: #888888;
+}
+
+QToolButton:checked {
+    background-color: #ffb140;
+    color: #000000;
+}
+
+/* Если "Settings" это элемент меню */
+QMenuBar::item:selected {
+    background-color: #ffb140;
+    color: #000000;
+}
+
+/* Делаем фон меток внутри MapWidget прозрачным */
+MapWidget QLabel {
+    background-color: transparent;
+    border: none; /* Убираем рамку, если есть */
+}
+
+/* --- Выпадающее меню (QMenu) и QAction внутри него --- */
+QMenu {
+    background-color: #606060;
+    border: 1px solid #404040;
+}
+
+QMenu::item {
+    background-color: transparent;
+    padding: 4px 16px;
+    color: #ffffff;
+    border: 1px solid transparent; /* Убирает артефакты отрисовки на Windows */
+}
+
+QMenu::item:hover,
+QMenu::item:selected {
+    background-color: #ffb140;
+    color: #000000;
+}
+
+/* --- Если QAction добавлен в тулбар (QToolBar) --- */
+QToolBar QToolButton:hover {
+    background-color: #ffb140;
+    color: #000000;
+}
+
+/* --- Разделители в меню (если есть) --- */
+QMenu::separator {
+    height: 1px;
+    background-color: #404040;
+    margin: 4px 0;
+}

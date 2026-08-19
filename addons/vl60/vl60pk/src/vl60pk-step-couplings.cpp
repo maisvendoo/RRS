@@ -1,0 +1,42 @@
+#include    "vl60pk.h"
+
+#include "coupling.h"
+#include "coupling-operating-rod.h"
+
+//------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------
+void VL60pk::preStepCouplings(const double& t)
+{
+    (void) t;
+
+    // Координата и скорость переднего сцепного устройства (по оси сцепления)
+    coupling_fwd->setCoord(train_coord + dir * length / 2.0);
+    coupling_fwd->setVelocity(dir * velocity);
+
+    // Координата и скорость заднего сцепного устройства (по оси сцепления)
+    coupling_bwd->setCoord(train_coord - dir * length / 2.0);
+    coupling_bwd->setVelocity(dir * velocity);
+}
+
+//------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------
+void VL60pk::stepCouplings(const double& t, const double& dt)
+{
+    // Управление передним сцепным устройством
+    oper_rod_fwd->setCouplingForce(coupling_fwd->getCurrentForce());
+    oper_rod_fwd->step(t, dt);
+    coupling_fwd->setCouplingOperatingState(oper_rod_fwd->getOperatingState());
+    coupling_fwd->step(t, dt);
+    // Добавляем усилие от переднего сцепного устройства на данном шаге
+    F_fwd += coupling_fwd->getCurrentForce();
+
+    // Управление задним сцепным устройством
+    oper_rod_bwd->setCouplingForce(coupling_bwd->getCurrentForce());
+    oper_rod_bwd->step(t, dt);
+    coupling_bwd->setCouplingOperatingState(oper_rod_bwd->getOperatingState());
+    coupling_bwd->step(t, dt);
+    // Добавляем усилие от заднего сцепного устройства на данном шаге
+    F_bwd += coupling_bwd->getCurrentForce();
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Joint>
+        <ModuleName>joint-pneumo-hose-epb</ModuleName>
+
+        <!-- Начальное состояние соединения рукавов: 0 - разъединены, 1 - соединены -->
+        <initConnectionState>1</initConnectionState>
+    </Joint>
+</Config>

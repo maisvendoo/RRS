@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+		<EmptyMass>136000</EmptyMass>
+		<PayloadMass>2000</PayloadMass>
+		<Length>21.0</Length>
+		<WheelDiameter>1.236</WheelDiameter>
+		<MainResist>loco-resist</MainResist>
+		<WheelRailFriction>loco-AC</WheelRailFriction>
+		<NumAxis>6</NumAxis>
+		<WheelInertia>100.0</WheelInertia>
+		<SoundDir>vl60</SoundDir>
+
+		<ReductorCoeff>3.83</ReductorCoeff>
+
+		<CouplingModule>sa3</CouplingModule>
+		<CouplingConfig>sa3</CouplingConfig>
+
+		<BrakeCraneModule>krm395</BrakeCraneModule>
+		<BrakeCraneConfig>krm395</BrakeCraneConfig>
+
+		<LocoCraneModule>kvt254</LocoCraneModule>
+		<LocoCraneConfig>kvt254</LocoCraneConfig>
+
+		<AirDistModule>vr483</AirDistModule>
+		<AirDistConfig>vr483</AirDistConfig>
+
+		<CustomModulesDir>vl60</CustomModulesDir>
+
+		<AutopilotModule>vl60-autopilot</AutopilotModule>
+		<AutopilotConfig>vl60k-autopilot</AutopilotConfig>
+	</Vehicle>
+
+
+	<Cabine>
+		<DriverPos>0.8 8.4 3.2</DriverPos>
+		<DriverDir>0.0</DriverDir>
+	</Cabine>
+
+	<Cabine>
+		<DriverPos>-0.8 -8.4 3.2</DriverPos>
+		<DriverDir>180.0</DriverDir>
+	</Cabine>
+
+
+	<Model>
+		<ModelName>VL60k-1737/VL60k-1737.gltf</ModelName>
+		<AnimationsConfigDir>vl60</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>VL60k-1737/VL60k-cabview.gltf</ModelName>
+		<ModelShift>0.0 0.0 0.005</ModelShift>
+		<AnimationsConfigDir>vl60</AnimationsConfigDir>
+	</Model>
+<!-- Закомментировал, пока не реализовано в коде
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>0.8 -2.95 0.312</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>0.8 7.45 0.312</ModelShift>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>-0.8 -7.45 0.312</ModelShift>
+		<ModelRotate>0.0 0.0 180.0</ModelRotate>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>default-objects/rail_skid.gltf</ModelName>
+		<ModelShift>-0.8 2.95 0.312</ModelShift>
+		<ModelRotate>0.0 0.0 180.0</ModelRotate>
+		<AnimationsConfigDir>freight</AnimationsConfigDir>
+	</Model>
+-->
+</Config>
