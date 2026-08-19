@@ -132,6 +132,15 @@ static void collectGridMarks(const std::vector<simulator_train_profile_point_t>&
         if (rc0 <= 0.5f || rc1 <= 0.5f)
             continue;
 
+        // Искусственный участок: сглаживание интерполирует километраж через
+        // обрыв данных, создавая плавный (но фиктивный) рост на 500 м и более
+        // на коротком отрезке. Реальный километраж растёт ~1 м на 1 м пути,
+        // поэтому такие участки отсеиваем по непропорциональному скачку
+        const float span_d = std::abs(d1 - d0);
+        const float span_rc = std::abs(rc1 - rc0);
+        if (span_d > 1e-6f && span_rc > 5.0f * span_d)
+            continue;
+
         const float lo = std::min(rc0, rc1);
         const float hi = std::max(rc0, rc1);
         if (hi - lo < 1e-6f)
