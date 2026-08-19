@@ -48,6 +48,7 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
     _trains_list_params.viewer_handler = params->viewer_handler;
     _trains_list_widget = new TrainsListWidget(&_trains_list_params);
 
+    _train_profile_params.vehicles_handler = params->vehicles_handler;
     _train_profile_widget = new TrainProfileHintWidget(&_train_profile_params);
 }
 
@@ -627,6 +628,11 @@ void MyGui::showPauseState() const
 //------------------------------------------------------------------------------
 void MyGui::showHUD() const
 {
+    if (params->vehicles_handler != _train_profile_params.vehicles_handler)
+    {
+        _train_profile_params.vehicles_handler = params->vehicles_handler;
+    }
+
     if (_train_profile_widget)
     {
         _train_profile_widget->show(hudTopOffset(), 300.0f);

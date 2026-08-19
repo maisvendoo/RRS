@@ -24,6 +24,17 @@ void TrainProfileHintWidget::show(float top_y, float bottom_y)
         return;
     }
 
+    // Получаем профиль пути текущего поезда
+    _profile_valid = false;
+    if (_params->vehicles_handler)
+    {
+        const int train_id = _params->vehicles_handler->getCurrentTrainIndex();
+        if (train_id >= 0)
+        {
+            _profile_valid = _params->vehicles_handler->getTrainProfile(train_id, _profile);
+        }
+    }
+
     ImGui::SetNextWindowPos(ImVec2(0.0f, top_y));
     ImGui::SetNextWindowSize(ImVec2(display_size.x, bottom_y - top_y));
 
