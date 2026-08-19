@@ -88,6 +88,44 @@ static float elevationAt(float distance,
 }
 
 //------------------------------------------------------------------------------
+// Километраж пути на заданной дистанции от середины поезда (линейная интерполяция)
+//------------------------------------------------------------------------------
+static float railwayCoordAt(float distance,
+                            const std::vector<simulator_train_profile_point_t>& points)
+{
+    if (points.empty())
+        return 0.0f;
+
+    size_t i = 0;
+    while (i < points.size() && points[i].distance < distance)
+        ++i;
+
+    if (i == 0)
+        return points.front().railway_coord;
+    if (i >= points.size())
+        return points.back().railway_coord;
+
+    const float d0 = points[i - 1].distance;
+    const float d1 = points[i].distance;
+    const float k = (d1 - d0) > 1e-9f ? (distance - d0) / (d1 - d0) : 0.0f;
+    return points[i - 1].railway_coord + k * (points[i].railway_coord - points[i - 1].railway_coord);
+}
+
+//------------------------------------------------------------------------------
+// Формат подписи метки сетки: "километр пикет" (пикет = 100 м)
+//------------------------------------------------------------------------------
+static void formatKmPiket(float railway_coord, char *buf, size_t buf_size)
+{
+    int km = static_cast<int>(railway_coord) / 1000;
+    int piket = (static_cast<int>(railway_coord) % 1000) / 100;
+#ifdef _WIN32
+    snprintf(buf, buf_size, "%dкм %dпк", km, piket);
+#else
+    std::snprintf(buf, buf_size, "%dкм %dпк", km, piket);
+#endif
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void TrainProfileHintWidget::drawProfile() const
@@ -168,6 +206,33 @@ void TrainProfileHintWidget::drawProfile() const
     // Вертикальный масштаб: кривая занимает половину высоты окна, центр поезда - в центре
     const float band_height = (y1 - y0) * 0.5f;
     plot.y_scale = band_height / rel_span;
+
+    // Координатная сетка: вертикальные метки на всю высоту виджета
+    // с фиксированным шагом и подписями "километр пикет"
+    const float grid_step = 1000.0f;
+    if (grid_step > 1e-6f)
+    {
+        const ImU32 grid_col = IM_COL32(90, 90, 90, 150);
+        const ImU32 label_col = IM_COL32(190, 190, 190, 220);
+        const ImFont* font = ImGui::GetFont();
+        const float label_y = y1 - font->FontSize;
+
+        const int i_first = static_cast<int>(std::ceil(-req_backward / grid_step));
+        const int i_last = static_cast<int>(std::floor(req_forward / grid_step));
+        for (int i = i_first; i <= i_last; ++i)
+        {
+            const float d = i * grid_step;
+            const float gx = plot.map_x(d);
+
+            draw_list->AddLine(ImVec2(gx, y0), ImVec2(gx, y1), grid_col, 1.0f);
+
+            char label[32];
+            formatKmPiket(railwayCoordAt(d, points), label, sizeof(label));
+            const float text_w = ImGui::CalcTextSize(label).x;
+            const float tx = std::max(x0, std::min(gx - text_w * 0.5f, x1 - text_w));
+            draw_list->AddText(ImVec2(tx, label_y), label_col, label);
+        }
+    }
 
     // Базовая линия на уровне середины поезда (rel = 0)
     if (0.0f >= plot.rel_min && 0.0f <= plot.rel_max)
