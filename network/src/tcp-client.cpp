@@ -319,6 +319,10 @@ void TcpClient::process_received_data(network_data_t &net_data)
         emit setTrainInfo(net_data.data);
         break;
 
+    case STYPE_TRAIN_PROFILE_UPDATE:
+        emit setTrainProfile(net_data.data);
+        break;
+
     default:
 
         break;

@@ -478,6 +478,36 @@ void VehiclesHandler::slotGetTrainsData(QByteArray &data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VehiclesHandler::slotGetTrainProfileData(QByteArray &data)
+{
+    simulator_train_profile_update_t profile;
+    profile.deserialize(data);
+
+    QMutexLocker locker(&profiles_mutex);
+    train_profiles.insert(profile.train_id, profile);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VehiclesHandler::getTrainProfile(int train_id,
+                                     simulator_train_profile_update_t& out) const
+{
+    QMutexLocker locker(&profiles_mutex);
+
+    auto it = train_profiles.constFind(train_id);
+    if (it == train_profiles.constEnd())
+    {
+        return false;
+    }
+
+    out = it.value();
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VehiclesHandler::slotGetVehiclesPosData(QByteArray& data)
 {
     const size_t slot = pos_write.load(std::memory_order_relaxed) % POS_BUF_SIZE;

@@ -91,6 +91,8 @@ signals:
 
     void setVehicleControlled(QByteArray &vehicle_controlled);
 
+    void setTrainProfile(QByteArray &profile_data);
+
     void sendLogMessage(QString msg);
 
     void connectionAbandoned();

@@ -1016,6 +1016,9 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     connect(tcp_client.get(), &TcpClient::setVehicleControlled,
             vehicles_handler.get(), &VehiclesHandler::slotGetVehicleControlled);
 
+    connect(tcp_client.get(), &TcpClient::setTrainProfile,
+            vehicles_handler.get(), &VehiclesHandler::slotGetTrainProfileData, Qt::DirectConnection);
+
     connect(vehicles_handler.get(), &VehiclesHandler::updated,
             this, &RouteViewer::slotUpdated);
 
@@ -1026,6 +1029,7 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, static_cast<double>(settings.vehicles_pos_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, static_cast<double>(settings.vehicles_state_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE, static_cast<double>(settings.vehicle_controled_update_interval) * 0.001);
+    tcp_client->sendRequest(STYPE_REQUEST_TRAIN_PROFILE_UPDATE, static_cast<double>(settings.train_profile_update_interval) * 0.001);
 }
 
 //------------------------------------------------------------------------------

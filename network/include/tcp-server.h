@@ -41,6 +41,14 @@ public:
 
     void updateTrainsInfo(QByteArray trains_state);
 
+    void updateTrainProfile(QByteArray profile_data, double t);
+
+    /// Есть ли клиенты, запросившие обновление профилей поездов
+    bool hasTrainProfileSubscribers() const
+    {
+        return !clients_for_train_profile_updates.empty();
+    }
+
 signals:
 
     void requestTopologyData(QByteArray &topology_data);
@@ -90,6 +98,8 @@ private:
     QSet<QTcpSocket*> clients_for_vehicles_updates;
 
     QSet<QTcpSocket*> clients_for_vehicle_controlled_updates;
+
+    QSet<QTcpSocket*> clients_for_train_profile_updates;
 
     QByteArray recvBuff;
 

@@ -1120,6 +1120,81 @@ void Model::prepareFeedBack(bool need_trains_feedback)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::prepareProfilesFeedback()
+{
+    const double backward_m = 4000.0;
+    const double forward_m = 4000.0;
+
+    update_profiles.clear();
+    update_profiles.reserve(trains.size());
+
+    for (size_t i = 0; i < trains.size(); ++i)
+    {
+        Train* train = trains[i];
+
+        std::vector<Vehicle*>* vlist = train->getVehicles();
+        if ((vlist == nullptr) || vlist->empty())
+            continue;
+
+        // Средняя ПЕ поезда - точка отсчёта профиля
+        Vehicle* mid_vehicle = (*vlist)[vlist->size() / 2];
+
+        auto vc_it = topology->vc_table.find(mid_vehicle);
+        if (vc_it == topology->vc_table.end())
+            continue;
+        VehicleController* vc = vc_it->second;
+
+        QString traj_name;
+        double coord = 0.0;
+        vc->slotGetVehicleTrajPosition(&traj_name, &coord);
+        dir_t orient = vc->getOrientation();
+
+        Trajectory* traj = topology->getTrajectoriesList()->value(traj_name);
+        if (traj == nullptr)
+            continue;
+
+        profile_segments_t profile;
+        if (!topology->getProfile(traj, coord, orient, backward_m, forward_m, profile))
+            continue;
+
+        if (profile.points.empty())
+            continue;
+
+        simulator_train_profile_update_t upd;
+        upd.train_id = static_cast<int>(i);
+        upd.middle_vehicle_id = static_cast<int>(mid_vehicle->getModelIndex());
+        upd.direction = static_cast<int>(orient);
+        upd.speed = static_cast<float>(mid_vehicle->getVelocity());
+        upd.backward = static_cast<float>(profile.backward);
+        upd.forward = static_cast<float>(profile.forward);
+
+        upd.profile.reserve(profile.points.size());
+        for (const profile_segment_t& p : profile.points)
+        {
+            simulator_train_profile_point_t point;
+            point.distance = static_cast<float>(p.distance);
+            point.elevation = static_cast<float>(p.elevation);
+            point.railway_coord = static_cast<float>(p.railway_coord);
+            point.inclination = static_cast<float>(p.inclination);
+            upd.profile.push_back(point);
+        }
+
+        // Смещения вагонов от средней ПЕ вдоль поезда
+        const double mid_train_coord = mid_vehicle->getTrainCoord();
+        upd.vehicle_offsets.reserve(vlist->size());
+        for (Vehicle* vehicle : *vlist)
+        {
+            upd.vehicle_offsets.push_back(
+                static_cast<float>(vehicle->getTrainCoord() - mid_train_coord));
+        }
+
+        update_profiles.push_back(upd);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::tcpFeedBack(bool need_trains_feedback)
 {
     if (need_trains_feedback)
@@ -1137,6 +1212,18 @@ void Model::tcpFeedBack(bool need_trains_feedback)
 
     tcp_server->updatePlayers(update_players.serialize(), realtime_seconds);
     update_players = simulator_update_players_t();
+
+    // Профили путей поездов: пересчёт и рассылка не чаще заданного интервала
+    if (tcp_server->hasTrainProfileSubscribers() &&
+        (realtime_seconds - profiles_update_prev_time) > profiles_update_interval)
+    {
+        profiles_update_prev_time = realtime_seconds;
+        prepareProfilesFeedback();
+        for (const auto& profile : update_profiles)
+        {
+            tcp_server->updateTrainProfile(profile.serialize(), realtime_seconds);
+        }
+    }
 
     for (auto с_id = controlled_clients.keyBegin(); с_id != controlled_clients.keyEnd(); ++с_id)
     {

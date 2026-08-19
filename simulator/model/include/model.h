@@ -129,6 +129,14 @@ private:
     simulator_vehicles_update_t update_vehicles = simulator_vehicles_update_t();
     /// Feedback with player's current and controlled vehicles
     simulator_update_players_t  update_players = simulator_update_players_t();
+
+    /// Feedback with trains' path profiles
+    std::vector<simulator_train_profile_update_t> update_profiles;
+
+    /// Профили пересчитываются не чаще этого реального интервала, с
+    static constexpr double profiles_update_interval = 1.0;
+    /// Время последнего пересчёта профилей
+    double profiles_update_prev_time = 0.0;
     /// Vehicle control and feedback with debug message
     struct controlled_client_t
     {
@@ -214,6 +222,9 @@ private:
 
     /// Подготовка данных перед передачей серверу для рассылки клиентам
     void prepareFeedBack(bool need_trains_feedback);
+
+    /// Подготовка профилей пути всех поездов для рассылки клиентам
+    void prepareProfilesFeedback();
 
     /// TCP feedback
     void tcpFeedBack(bool need_trains_feedback);

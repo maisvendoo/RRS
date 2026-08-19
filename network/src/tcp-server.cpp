@@ -143,6 +143,17 @@ void TcpServer::process_client_request(client_data_t &client_data)
         send_vehicles_info(client_data);
         break;
     }
+    case STYPE_REQUEST_TRAIN_PROFILE_UPDATE:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        stream >> client_data.profile_update_interval;
+
+        /*Journal::instance()->info(QString("Received train profile update request for #%1 with interval %2")
+                                      .arg(client_data.id).arg(client_data.profile_update_interval, 5, 'f', 3));*/
+        clients_for_train_profile_updates.insert(client_data.socket);
+        break;
+    }
     case STYPE_REQUEST_TRAINS_UPDATE:
     {
         client_data.received_data.data.clear();
@@ -729,6 +740,30 @@ void TcpServer::updateVehicleControlled(QByteArray vehicles_state, int client_id
             clients_data[client_socket].controlled_update_prev_time = t;
             send_data(client_socket, net_data);
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::updateTrainProfile(QByteArray profile_data, double t)
+{
+    Q_UNUSED(t);
+
+    // Интервальная дельта и пересчёт обеспечиваются на стороне модели
+    // (Model::tcpFeedBack), здесь профили рассылаются всем подписчикам
+    if (clients_for_train_profile_updates.empty())
+    {
+        return;
+    }
+
+    network_data_t net_data;
+    net_data.stype = STYPE_TRAIN_PROFILE_UPDATE;
+    net_data.data = profile_data;
+
+    for (auto client_socket : clients_for_train_profile_updates)
+    {
+        send_data(client_socket, net_data);
     }
 }
 
