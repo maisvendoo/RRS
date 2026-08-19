@@ -112,16 +112,23 @@ static float railwayCoordAt(float distance,
 }
 
 //------------------------------------------------------------------------------
-// Формат подписи метки сетки: "километр пикет" (пикет = 100 м)
+// Формат подписи метки сетки: "километр пикет" (пикет = 100 м).
+// Для ровного километра пикет не выводится
 //------------------------------------------------------------------------------
 static void formatKmPiket(float railway_coord, char *buf, size_t buf_size)
 {
     int km = static_cast<int>(railway_coord) / 1000;
     int piket = (static_cast<int>(railway_coord) % 1000) / 100;
 #ifdef _WIN32
-    snprintf(buf, buf_size, "%dкм %dпк", km, piket);
+    if (piket == 0)
+        snprintf(buf, buf_size, "%dкм", km);
+    else
+        snprintf(buf, buf_size, "%dкм %dпк", km, piket);
 #else
-    std::snprintf(buf, buf_size, "%dкм %dпк", km, piket);
+    if (piket == 0)
+        std::snprintf(buf, buf_size, "%dкм", km);
+    else
+        std::snprintf(buf, buf_size, "%dкм %dпк", km, piket);
 #endif
 }
 
@@ -207,9 +214,11 @@ void TrainProfileHintWidget::drawProfile() const
     const float band_height = (y1 - y0) * 0.5f;
     plot.y_scale = band_height / rel_span;
 
-    // Координатная сетка: вертикальные метки на всю высоту виджета
-    // с фиксированным шагом и подписями реального километража пути
-    const float grid_step = 1000.0f;
+    // Координатная сетка: вертикальные метки на всю высоту виджета,
+    // привязанные к километровым/пикетным столбам (абсолютный километраж
+    // пути), поэтому подпись на конкретной метке не меняется при движении
+    // поезда
+    const float grid_step = 500.0f;
     if (grid_step > 1e-6f)
     {
         const ImU32 grid_col = IM_COL32(90, 90, 90, 150);
@@ -217,16 +226,17 @@ void TrainProfileHintWidget::drawProfile() const
         const ImFont* font = ImGui::GetFont();
         const float label_y = y1 - font->FontSize;
 
-        const int i_first = static_cast<int>(std::ceil(-req_backward / grid_step));
-        const int i_last = static_cast<int>(std::floor(req_forward / grid_step));
+        // Километраж середины поезда - точка отсчёта для позиций меток
+        const float rc_mid = railwayCoordAt(0.0f, points);
+        const int i_first = static_cast<int>(std::ceil((rc_mid - req_backward) / grid_step));
+        const int i_last = static_cast<int>(std::floor((rc_mid + req_forward) / grid_step));
         for (int i = i_first; i <= i_last; ++i)
         {
-            const float d = i * grid_step;
-            const float gx = plot.map_x(d);
+            const float rc = i * grid_step;
+            const float gx = plot.map_x(rc - rc_mid);
 
             draw_list->AddLine(ImVec2(gx, y0), ImVec2(gx, y1), grid_col, 1.0f);
 
-            const float rc = railwayCoordAt(d, points);
             // Если километр и пикет равны 0 - подпись не рисуем, отметку оставляем
             if (rc < 100.0f)
                 continue;
