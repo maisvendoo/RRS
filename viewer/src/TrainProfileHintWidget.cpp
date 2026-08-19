@@ -206,7 +206,8 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
         {
             vehicle_length = static_cast<float>(vehicles_info.vehicles[model_index].vehicle_length);
         }
-        const float half_len = vehicle_length * 0.5f;
+        // Половина длины вагона с небольшим видимым зазором между вагонами
+        const float half_len = vehicle_length * 0.5f * 0.9f;
 
         ImU32 color = color_uncontrolled;
         if (model_index == controlled_vehicle)
