@@ -31,6 +31,7 @@ private:
     struct PlotTransform
     {
         float cx = 0.0f;
+        float cy = 0.0f;
         float x0 = 0.0f;
         float x1 = 0.0f;
         float y0 = 0.0f;
@@ -42,7 +43,7 @@ private:
         float y_scale = 1.0f;
 
         float map_x(float d) const { return cx + d * x_scale; }
-        float map_y(float rel) const { return y1 - (rel - rel_min) * y_scale; }
+        float map_y(float rel) const { return cy - rel * y_scale; }
     };
 
     void drawProfile() const;

@@ -107,6 +107,7 @@ void TrainProfileHintWidget::drawProfile() const
 
     PlotTransform plot;
     plot.cx = (x0 + x1) * 0.5f;
+    plot.cy = (y0 + y1) * 0.5f;
     plot.x0 = x0;
     plot.x1 = x1;
     plot.y0 = y0;
@@ -136,13 +137,17 @@ void TrainProfileHintWidget::drawProfile() const
     }
     plot.rel_min -= 0.05f * rel_span;
     plot.rel_max += 0.05f * rel_span;
+    rel_span = plot.rel_max - plot.rel_min;
 
     // Горизонтальный масштаб: центр (distance = 0) - середина окна, весь профиль помещается
     const float d_min = points.front().distance;
     const float d_max = points.back().distance;
     const float half_extent = std::max(std::abs(d_min), std::abs(d_max));
     plot.x_scale = (half_extent > 1e-6f) ? (x1 - x0) / (2.0f * half_extent) : 1.0f;
-    plot.y_scale = (y1 - y0) / rel_span;
+
+    // Вертикальный масштаб: кривая занимает половину высоты окна, центр поезда - в центре
+    const float band_height = (y1 - y0) * 0.5f;
+    plot.y_scale = band_height / rel_span;
 
     // Базовая линия на уровне середины поезда (rel = 0)
     if (0.0f >= plot.rel_min && 0.0f <= plot.rel_max)
