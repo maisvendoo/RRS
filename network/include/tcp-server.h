@@ -49,6 +49,25 @@ public:
         return !clients_for_train_profile_updates.empty();
     }
 
+    /// Максимальные запрошенные дальности профиля назад/вперёд, м,
+    /// по всем подписчикам
+    void getTrainProfileExtents(double &backward_m, double &forward_m) const
+    {
+        backward_m = 4000.0;
+        forward_m = 4000.0;
+        for (auto client_socket : clients_for_train_profile_updates)
+        {
+            auto it = clients_data.find(client_socket);
+            if (it == clients_data.end())
+                continue;
+            const client_data_t &client = it.value();
+            if (client.profile_backward > backward_m)
+                backward_m = client.profile_backward;
+            if (client.profile_forward > forward_m)
+                forward_m = client.profile_forward;
+        }
+    }
+
 signals:
 
     void requestTopologyData(QByteArray &topology_data);

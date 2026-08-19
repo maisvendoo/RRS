@@ -442,6 +442,7 @@ void TcpServer::remove_client(QTcpSocket* socket)
     clients_for_vehicles_updates.remove(socket);
     clients_for_vehicle_controlled_updates.remove(socket);
     clients_for_trains_updates.remove(socket);
+    clients_for_train_profile_updates.remove(socket);
 
     emit sigResetVehicleControl(client_id);
 

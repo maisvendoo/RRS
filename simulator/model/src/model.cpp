@@ -1122,8 +1122,10 @@ void Model::prepareFeedBack(bool need_trains_feedback)
 //------------------------------------------------------------------------------
 void Model::prepareProfilesFeedback()
 {
-    const double backward_m = 4000.0;
-    const double forward_m = 4000.0;
+    // Дальности профиля - максимум запросов всех подписчиков
+    double backward_m = 4000.0;
+    double forward_m = 4000.0;
+    tcp_server->getTrainProfileExtents(backward_m, forward_m);
 
     update_profiles.clear();
     update_profiles.reserve(trains.size());
