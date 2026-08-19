@@ -1452,8 +1452,8 @@ void Model::debugProfileCheck()
 
     Journal::instance()->info("=== PROFILE DEBUG ===");
 
-    const double backward_m = 3000.0;
-    const double forward_m = 3000.0;
+    const double backward_m = 4000.0;
+    const double forward_m = 4000.0;
 
     for (Train* train : trains)
     {
@@ -1592,6 +1592,33 @@ void Model::debugProfileCheck()
         else
         {
             Journal::instance()->warning(QString("PROFILE cannot open %1").arg(csv_path));
+        }
+
+        // Выгрузка траекторий профиля
+        std::vector<std::pair<double, double>> traj_ranges;
+        std::vector<std::string> traj_names;
+        topology->debugProfileTrajectories(traj, coord, orient, backward_m, forward_m,
+                                           traj_ranges, traj_names);
+        QString trajs_path = QString::fromStdString(fs.combinePath(
+            fs.getLogsDir(), QString("profile_train_%1_trajs.csv")
+                                 .arg(QString(train->getName().c_str())).toStdString()));
+        QFile trajs_file(trajs_path);
+        if (trajs_file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+        {
+            QTextStream tout(&trajs_file);
+            tout << "begin,end,name\n";
+            for (size_t i = 0; i < traj_ranges.size(); ++i)
+            {
+                tout << QString::number(traj_ranges[i].first, 'f', 1) << ','
+                     << QString::number(traj_ranges[i].second, 'f', 1) << ','
+                     << QString::fromStdString(traj_names[i]) << '\n';
+            }
+            trajs_file.close();
+            Journal::instance()->info(QString("PROFILE trajectories: %1").arg(trajs_path));
+        }
+        else
+        {
+            Journal::instance()->warning(QString("PROFILE cannot open %1").arg(trajs_path));
         }
     }
 }

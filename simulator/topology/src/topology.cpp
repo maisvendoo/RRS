@@ -1907,7 +1907,17 @@ void Topology::slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_n
 namespace
 {
     //------------------------------------------------------------------------------
-    //
+    // Сегмент профиля с именем траектории
+    //------------------------------------------------------------------------------
+    struct traj_segment_t
+    {
+        double begin;
+        double end;
+        QString name;
+    };
+
+    //------------------------------------------------------------------------------
+    // Индекс участка (track_t), содержащего координату
     //------------------------------------------------------------------------------
     int findTrackIndex(const std::vector<track_t>& tracks, double coord)
     {
@@ -1930,7 +1940,7 @@ namespace
     }
 
     //------------------------------------------------------------------------------
-    //
+    // Точка профиля в заданной координате траектории
     //------------------------------------------------------------------------------
     profile_segment_t pointAtCoord(const Trajectory* traj, double coord, dir_t orient, double distance)
     {
@@ -1946,7 +1956,7 @@ namespace
     }
 
     //------------------------------------------------------------------------------
-    //
+    // Точки профиля на границах участков (track_t) траектории
     //------------------------------------------------------------------------------
     void emitTrackBoundaries(const Trajectory* traj, double coord, double stop_coord, dir_t orient,
                              double traveled, int kind, std::vector<profile_segment_t>& out)
@@ -2002,16 +2012,27 @@ namespace
     }
 
     //------------------------------------------------------------------------------
-    //
+    // Обход топологии от точки отсчёта на заданную дистанцию
     //------------------------------------------------------------------------------
     void walkProfile(Trajectory*& traj, double& coord, dir_t& orient,
-                     double limit_m, int kind, std::vector<profile_segment_t>& out)
+                     double limit_m, int kind, std::vector<profile_segment_t>& out,
+                     std::vector<traj_segment_t>* segments)
     {
         if (traj == nullptr || limit_m <= 0.0)
             return;
 
         const double eps = 1e-9;
         double traveled = 0.0;
+        double seg_begin = 0.0;
+
+        auto close_segment = [segments, &traveled, &traj, kind, &seg_begin]()
+        {
+            if (segments == nullptr)
+                return;
+            double end = kind * traveled;
+            if (std::abs(end - seg_begin) > 1e-9)
+                segments->push_back({seg_begin, end, traj->getName()});
+        };
 
         int guard = 0;
         const int max_iters = 100000;
@@ -2049,18 +2070,42 @@ namespace
             const Switch* next_sw = traj->getNextSwitch(exit_dir);
             if (next_sw == nullptr)
                 break;
+
+            // Проверка сопряжения стрелки с ветвью входа: если состояние стрелки
+            // не установлено на ветвь, по которой движется поезд, дальнейшего пути нет
+            bool aligned = false;
+            const auto entry_ways = (exit_dir == FWD) ? switch_bwd_ways_t
+                                                      : switch_fwd_ways_t;
+            for (Switch_way_t way : entry_ways)
+            {
+                if (next_sw->trajectories[way] != traj)
+                    continue;
+                Switch_state_t entry_state = (exit_dir == FWD) ? next_sw->getStateBwd()
+                                                               : next_sw->getStateFwd();
+                const bool is_plus = (way == SW_BWD_PLUS) || (way == SW_FWD_PLUS);
+                aligned = is_plus ? (entry_state > 0) : (entry_state < 0);
+                break;
+            }
+            if (!aligned)
+                break;
+
             Trajectory* next_traj = next_sw->getNextTraj(exit_dir);
             if (next_traj == nullptr)
                 break;
             if (exit_dir != orient)
                 orient = static_cast<dir_t>(-orient);
             coord = (exit_dir == BWD) ? next_traj->getLength() : 0.0;
+
+            close_segment();
             traj = next_traj;
+            seg_begin = kind * traveled;
         }
+
+        close_segment();
     }
 
     //------------------------------------------------------------------------------
-    //
+    // Расчёт уклонов по высотам соседних точек профиля
     //------------------------------------------------------------------------------
     void calcInclinations(std::vector<profile_segment_t>& points)
     {
@@ -2077,7 +2122,7 @@ namespace
     }
 
     //------------------------------------------------------------------------------
-    //
+    // Ресемплинг ломаной на равномерную сетку и гауссово сглаживание высот
     //------------------------------------------------------------------------------
     void smoothProfile(std::vector<profile_segment_t>& points, size_t keep_idx,
                        double resample_step, double window_half, double sigma)
@@ -2086,6 +2131,8 @@ namespace
             return;
 
         const double eps = 1e-9;
+        const double keep_dist = points[keep_idx].distance;
+        const double keep_elev = points[keep_idx].elevation;
 
         // Ресемплинг исходной ломаной на равномерную сетку
         std::vector<profile_segment_t> grid;
@@ -2115,6 +2162,35 @@ namespace
 
             if (dd >= points.back().distance - eps)
                 break;
+        }
+
+        // Гарантируем наличие узла в точке отсчёта (distance == keep_dist)
+        bool has_keep = false;
+        for (const profile_segment_t& g : grid)
+        {
+            if (std::abs(g.distance - keep_dist) <= eps)
+            {
+                has_keep = true;
+                break;
+            }
+        }
+        if (!has_keep)
+        {
+            size_t seg = 1;
+            while ((seg + 1 < grid.size()) && (grid[seg].distance < keep_dist - eps))
+                ++seg;
+            const profile_segment_t& a = grid[seg - 1];
+            const profile_segment_t& b = grid[seg];
+            double t = (b.distance - a.distance) > eps
+                       ? (keep_dist - a.distance) / (b.distance - a.distance) : 0.0;
+            t = std::clamp(t, 0.0, 1.0);
+
+            profile_segment_t p;
+            p.distance = keep_dist;
+            p.elevation = a.elevation + t * (b.elevation - a.elevation);
+            p.railway_coord = a.railway_coord + t * (b.railway_coord - a.railway_coord);
+            p.inclination = 0.0;
+            grid.insert(grid.begin() + seg, p);
         }
 
         if (grid.size() < 3)
@@ -2153,8 +2229,6 @@ namespace
         }
 
         // Точка отсчёта и её окрестность восстанавливаем точно
-        const double keep_dist = points[keep_idx].distance;
-        const double keep_elev = points[keep_idx].elevation;
         const double blend = 0.5 * window_half;
 
         size_t keep_grid = 0;
@@ -2191,7 +2265,7 @@ namespace
 }
 
 //------------------------------------------------------------------------------
-//
+// Профиль пути поезда: обход вперёд и назад от точки отсчёта и сглаживание
 //------------------------------------------------------------------------------
 bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
                           double backward_m, double forward_m,
@@ -2207,13 +2281,13 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     Trajectory* fwd_traj = traj;
     double fwd_coord = coord;
     dir_t fwd_orient = orient;
-    walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points);
+    walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points, nullptr);
 
     // Ход назад
     Trajectory* bwd_traj = traj;
     double bwd_coord = coord;
     dir_t bwd_orient = static_cast<dir_t>(-orient);
-    walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points);
+    walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points, nullptr);
 
     // Сборка профиля: назад (по убыванию) + точка отсчёта + вперёд
     out.points.clear();
@@ -2236,4 +2310,43 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     calcInclinations(out.points);
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+// Отладка: траектории, через которые проходит профиль (диапазоны и имена)
+//------------------------------------------------------------------------------
+void Topology::debugProfileTrajectories(Trajectory* traj, double coord, dir_t orient,
+                                        double backward_m, double forward_m,
+                                        std::vector<std::pair<double, double>>& ranges,
+                                        std::vector<std::string>& names) const
+{
+    ranges.clear();
+    names.clear();
+
+    std::vector<traj_segment_t> fwd_seg;
+    std::vector<traj_segment_t> bwd_seg;
+    std::vector<profile_segment_t> fwd_points;
+    std::vector<profile_segment_t> bwd_points;
+
+    Trajectory* fwd_traj = traj;
+    double fwd_coord = coord;
+    dir_t fwd_orient = orient;
+    walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points, &fwd_seg);
+
+    Trajectory* bwd_traj = traj;
+    double bwd_coord = coord;
+    dir_t bwd_orient = static_cast<dir_t>(-orient);
+    walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points, &bwd_seg);
+
+    // Собираем в порядке профиля: назад (по убыванию), затем вперёд
+    for (size_t i = bwd_seg.size(); i > 0; --i)
+    {
+        ranges.push_back({bwd_seg[i - 1].begin, bwd_seg[i - 1].end});
+        names.push_back(bwd_seg[i - 1].name.toStdString());
+    }
+    for (const traj_segment_t& seg : fwd_seg)
+    {
+        ranges.push_back({seg.begin, seg.end});
+        names.push_back(seg.name.toStdString());
+    }
 }
