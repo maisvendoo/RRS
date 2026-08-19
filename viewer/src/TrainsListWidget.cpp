@@ -161,24 +161,25 @@ void TrainsListWidget::renderTrainsList()
     // Минимальная высота - чтобы виджет был крупнее
     const float min_height = ImGui::GetIO().DisplaySize.y * 0.4f;  // 40% от экрана минимум
 
-    // Максимальная высота - 85% от высоты экрана
-    const float max_height = ImGui::GetIO().DisplaySize.y * 0.85f;
+    // Максимальная высота - вплоть до низа экрана ниже виджета профиля пути
+    const float top_y = 300.0f;
+    const float max_height = std::max(0.0f, ImGui::GetIO().DisplaySize.y - top_y - 20.0f);
 
     // Высота списка: заголовок + элементы + кнопка + отступы
     const float list_height = _cached_trains_ids.size() * item_height;
     float total_height = header_height + list_height + button_height + padding * 3;
 
     // Применяем минимальную и максимальную высоту
-    total_height = std::clamp(total_height, min_height, max_height);
+    total_height = std::clamp(total_height, std::min(min_height, max_height), max_height);
 
     // Ширина окна
     const float window_width = 350.0f;
 
-    // Позиционирование: справа, по центру по вертикали
+    // Позиционирование: справа, под виджетом профиля пути (встык к нему снизу)
     const ImVec2 display_size = ImGui::GetIO().DisplaySize;
     const ImVec2 window_pos(
         display_size.x - window_width - 20.0f,  // отступ справа 20px
-        (display_size.y - total_height) * 0.5f   // центрирование по вертикали
+        top_y
         );
 
     ImGui::SetNextWindowSize(ImVec2(window_width, total_height));
