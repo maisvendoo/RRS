@@ -134,9 +134,7 @@ static bool distanceAtRailwayCoord(float railway_coord,
         // Километраж растёт непропорционально длине участка - обрыв в данных
         if ((d1 - d0) > 1e-9f && (rc1 - rc0) > 3.0f * (d1 - d0))
             continue;
-        if (railway_coord < rc0)
-            break;
-        if (railway_coord <= rc1)
+        if (railway_coord >= rc0 && railway_coord <= rc1)
         {
             const float span = rc1 - rc0;
             const float t = (span > 1e-9f) ? (railway_coord - rc0) / span : 0.0f;
