@@ -2226,8 +2226,8 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     // Сглаживание изломов скользящим окном для визуализации
     const size_t origin_idx = bwd_points.size();
     const double resample_step = 5.0;
-    const double smooth_window = 30.0;
-    const double smooth_sigma = 12.0;
+    const double smooth_window = 100.0;
+    const double smooth_sigma = 40.0;
     smoothProfile(out.points, origin_idx, resample_step, smooth_window, smooth_sigma);
 
     calcInclinations(out.points);
