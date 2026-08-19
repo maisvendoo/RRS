@@ -24,7 +24,7 @@ public:
 
     ~TrainProfileHintWidget() = default;
 
-    void show(float top_y, float bottom_y);
+    void show(float top_y, float bottom_y, float left_inset = 0.0f, float right_inset = 0.0f);
 
 private:
 

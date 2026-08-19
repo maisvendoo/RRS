@@ -15,7 +15,8 @@ TrainProfileHintWidget::TrainProfileHintWidget(TrainProfileHintWidgetParams *par
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TrainProfileHintWidget::show(float top_y, float bottom_y)
+void TrainProfileHintWidget::show(float top_y, float bottom_y,
+                                  float left_inset, float right_inset)
 {
     if (!_params || !_params->is_visible)
     {
@@ -39,8 +40,9 @@ void TrainProfileHintWidget::show(float top_y, float bottom_y)
         }
     }
 
-    ImGui::SetNextWindowPos(ImVec2(0.0f, top_y));
-    ImGui::SetNextWindowSize(ImVec2(display_size.x, bottom_y - top_y));
+    ImGui::SetNextWindowPos(ImVec2(left_inset, top_y));
+    ImGui::SetNextWindowSize(ImVec2(display_size.x - left_inset - right_inset,
+                                    bottom_y - top_y));
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
