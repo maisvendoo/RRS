@@ -113,8 +113,9 @@ static float railwayCoordAtMid(const std::vector<simulator_train_profile_point_t
 //------------------------------------------------------------------------------
 // Дистанция от середины поезда до точки с заданным километражем
 // (по данным траектории, которыми заполнен профиль).
-// Участки с обрывом километража (railway_coord не возрастает) не являются
-// опорой для столбов - они пропускаются
+// Участки с обрывом километража пропускаются: railway_coord должен расти
+// пропорционально длине участка (километраж измеряется в метрах пути),
+// иначе это артефакт данных, а не опора для столба
 //------------------------------------------------------------------------------
 static bool distanceAtRailwayCoord(float railway_coord,
                                    const std::vector<simulator_train_profile_point_t>& points,
@@ -124,7 +125,14 @@ static bool distanceAtRailwayCoord(float railway_coord,
     {
         const float rc0 = points[i - 1].railway_coord;
         const float rc1 = points[i].railway_coord;
+        const float d0 = points[i - 1].distance;
+        const float d1 = points[i].distance;
+
+        // Километраж не возрастает - обрыв
         if (rc1 <= rc0)
+            continue;
+        // Километраж растёт непропорционально длине участка - обрыв в данных
+        if ((d1 - d0) > 1e-9f && (rc1 - rc0) > 3.0f * (d1 - d0))
             continue;
         if (railway_coord < rc0)
             break;
@@ -132,7 +140,7 @@ static bool distanceAtRailwayCoord(float railway_coord,
         {
             const float span = rc1 - rc0;
             const float t = (span > 1e-9f) ? (railway_coord - rc0) / span : 0.0f;
-            distance = points[i - 1].distance + t * (points[i].distance - points[i - 1].distance);
+            distance = d0 + t * (d1 - d0);
             return true;
         }
     }
