@@ -208,9 +208,7 @@ void TrainProfileHintWidget::drawProfile() const
     plot.y_scale = band_height / rel_span;
 
     // Координатная сетка: вертикальные метки на всю высоту виджета
-    // с фиксированным шагом и подписями "километр пикет". Сетка привязана
-    // к абсолютному километражу пути, поэтому подпись на конкретной метке
-    // не меняется при движении поезда
+    // с фиксированным шагом и подписями реального километража пути
     const float grid_step = 1000.0f;
     if (grid_step > 1e-6f)
     {
@@ -219,16 +217,16 @@ void TrainProfileHintWidget::drawProfile() const
         const ImFont* font = ImGui::GetFont();
         const float label_y = y1 - font->FontSize;
 
-        const float rc_mid = railwayCoordAt(0.0f, points);
-        const int i_first = static_cast<int>(std::ceil((rc_mid - req_backward) / grid_step));
-        const int i_last = static_cast<int>(std::floor((rc_mid + req_forward) / grid_step));
+        const int i_first = static_cast<int>(std::ceil(-req_backward / grid_step));
+        const int i_last = static_cast<int>(std::floor(req_forward / grid_step));
         for (int i = i_first; i <= i_last; ++i)
         {
-            const float rc = i * grid_step;
-            const float gx = plot.map_x(rc - rc_mid);
+            const float d = i * grid_step;
+            const float gx = plot.map_x(d);
 
             draw_list->AddLine(ImVec2(gx, y0), ImVec2(gx, y1), grid_col, 1.0f);
 
+            const float rc = railwayCoordAt(d, points);
             // Если километр и пикет равны 0 - подпись не рисуем, отметку оставляем
             if (rc < 100.0f)
                 continue;
