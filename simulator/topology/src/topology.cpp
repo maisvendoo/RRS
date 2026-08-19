@@ -2012,11 +2012,56 @@ namespace
     }
 
     //------------------------------------------------------------------------------
+    // Единицы подвижного состава, занимающие пройденный участок траектории
+    //------------------------------------------------------------------------------
+    void collectVehicles(const Trajectory* traj, double entry_coord, double stop_coord, dir_t orient,
+                         double traveled, int kind, std::vector<profile_vehicle_t>& out)
+    {
+        const QMap<size_t, std::array<double, 2>>& busy = traj->getVehiclesCoords();
+        if (busy.isEmpty())
+            return;
+
+        const double w_lo = std::min(entry_coord, stop_coord);
+        const double w_hi = std::max(entry_coord, stop_coord);
+
+        for (auto it = busy.constBegin(); it != busy.constEnd(); ++it)
+        {
+            const double vb = it.value()[0];
+            const double ve = it.value()[1];
+
+            // Пересечение интервала ПЕ с пройденным диапазоном координат
+            const double ov_b = std::max(vb, w_lo);
+            const double ov_e = std::min(ve, w_hi);
+            if (ov_e <= ov_b)
+                continue;
+
+            double d0, d1;
+            if (orient == FWD)
+            {
+                d0 = kind * (traveled + (ov_b - entry_coord));
+                d1 = kind * (traveled + (ov_e - entry_coord));
+            }
+            else
+            {
+                d0 = kind * (traveled + (entry_coord - ov_b));
+                d1 = kind * (traveled + (entry_coord - ov_e));
+            }
+
+            profile_vehicle_t v;
+            v.vehicle_id = it.key();
+            v.begin_distance = std::min(d0, d1);
+            v.end_distance = std::max(d0, d1);
+            out.push_back(v);
+        }
+    }
+
+    //------------------------------------------------------------------------------
     // Обход топологии от точки отсчёта на заданную дистанцию
     //------------------------------------------------------------------------------
     void walkProfile(Trajectory*& traj, double& coord, dir_t& orient,
                      double limit_m, int kind, std::vector<profile_segment_t>& out,
-                     std::vector<traj_segment_t>* segments)
+                     std::vector<traj_segment_t>* segments,
+                     std::vector<profile_vehicle_t>* vehicles)
     {
         if (traj == nullptr || limit_m <= 0.0)
             return;
@@ -2059,6 +2104,8 @@ namespace
                 double step = std::min(limit_m - traveled, within_traj);
                 double stop_coord = (orient == FWD) ? (coord + step) : (coord - step);
                 emitTrackBoundaries(traj, coord, stop_coord, orient, traveled, kind, out);
+                if (vehicles != nullptr)
+                    collectVehicles(traj, coord, stop_coord, orient, traveled, kind, *vehicles);
                 traveled += step;
                 if (traveled >= limit_m - eps)
                     break;
@@ -2276,18 +2323,20 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
 
     std::vector<profile_segment_t> fwd_points;
     std::vector<profile_segment_t> bwd_points;
+    std::vector<profile_vehicle_t> fwd_vehicles;
+    std::vector<profile_vehicle_t> bwd_vehicles;
 
     // Ход вперёд
     Trajectory* fwd_traj = traj;
     double fwd_coord = coord;
     dir_t fwd_orient = orient;
-    walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points, nullptr);
+    walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points, nullptr, &fwd_vehicles);
 
     // Ход назад
     Trajectory* bwd_traj = traj;
     double bwd_coord = coord;
     dir_t bwd_orient = static_cast<dir_t>(-orient);
-    walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points, nullptr);
+    walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points, nullptr, &bwd_vehicles);
 
     // Сборка профиля: назад (по убыванию) + точка отсчёта + вперёд
     out.points.clear();
@@ -2299,6 +2348,38 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
 
     out.backward = bwd_points.empty() ? 0.0 : std::abs(bwd_points.back().distance);
     out.forward = fwd_points.empty() ? 0.0 : fwd_points.back().distance;
+
+    // Сборка подвижного состава на профиле: назад (по убыванию) + вперёд
+    out.vehicles.clear();
+    out.vehicles.reserve(bwd_vehicles.size() + fwd_vehicles.size());
+    for (size_t i = bwd_vehicles.size(); i > 0; --i)
+        out.vehicles.push_back(bwd_vehicles[i - 1]);
+    out.vehicles.insert(out.vehicles.end(), fwd_vehicles.begin(), fwd_vehicles.end());
+
+    // Упорядочивание по begin_distance
+    std::sort(out.vehicles.begin(), out.vehicles.end(),
+              [](const profile_vehicle_t& a, const profile_vehicle_t& b)
+              {
+                  return a.begin_distance < b.begin_distance;
+              });
+
+    // Слияние интервалов одной ПЕ, пересекающих точку отсчёта или стрелку
+    // (вагон разбит на части по траекториям - объединяем в один интервал)
+    std::vector<profile_vehicle_t> merged;
+    merged.reserve(out.vehicles.size());
+    for (const profile_vehicle_t& v : out.vehicles)
+    {
+        if (!merged.empty() && merged.back().vehicle_id == v.vehicle_id
+            && v.begin_distance <= merged.back().end_distance + 1e-6)
+        {
+            merged.back().end_distance = std::max(merged.back().end_distance, v.end_distance);
+        }
+        else
+        {
+            merged.push_back(v);
+        }
+    }
+    out.vehicles = std::move(merged);
 
     // Сглаживание изломов скользящим окном для визуализации
     const size_t origin_idx = bwd_points.size();

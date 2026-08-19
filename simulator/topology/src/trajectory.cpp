@@ -462,6 +462,14 @@ void Trajectory::getBusyCoords(double &busy_begin_coord, double &busy_end_coord)
 }
 
 //------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+const QMap<size_t, std::array<double, 2>>& Trajectory::getVehiclesCoords() const
+{
+    return vehicles_coords;
+}
+
+//------------------------------------------------------------------------------
 // Вернуть все треки траектории
 //------------------------------------------------------------------------------
 const std::vector<track_t>& Trajectory::getTracks() const

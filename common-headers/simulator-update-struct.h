@@ -666,6 +666,42 @@ struct simulator_train_profile_point_t final
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct simulator_train_profile_vehicle_t final
+{
+    /// Модель-индекс ПЕ, занимающей участок профиля
+    int vehicle_id = 0;
+
+    /// Начало занимаемого интервала по дистанции профиля, м
+    float begin_distance = 0.0f;
+
+    /// Конец занимаемого интервала по дистанции профиля, м
+    float end_distance = 0.0f;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << vehicle_id;
+        stream << begin_distance;
+        stream << end_distance;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> vehicle_id;
+        stream >> begin_distance;
+        stream >> end_distance;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 struct simulator_train_profile_update_t final
 {
     /// Индекс поезда на текущий кадр
@@ -687,9 +723,9 @@ struct simulator_train_profile_update_t final
     /// Вершины ломаной профиля, упорядочены по distance от -backward до +forward
     std::vector<simulator_train_profile_point_t> profile;
 
-    /// Смещения вагонов от средней ПЕ, м;
-    /// индекс = модель-индекс ПЕ, размер = общее число ПЕ
-    std::vector<float> vehicle_offsets;
+    /// Единицы подвижного состава, занимающие участки профиля
+    /// (включая вагоны других поездов), упорядочены по begin_distance
+    std::vector<simulator_train_profile_vehicle_t> vehicles;
 
     QByteArray serialize() const
     {
@@ -709,10 +745,10 @@ struct simulator_train_profile_update_t final
             stream << point.serialize();
         }
 
-        stream << static_cast<std::uint32_t>(vehicle_offsets.size());
-        for (float offset : vehicle_offsets)
+        stream << static_cast<std::uint32_t>(vehicles.size());
+        for (const auto& vehicle : vehicles)
         {
-            stream << offset;
+            stream << vehicle.serialize();
         }
 
         return data;
@@ -745,12 +781,15 @@ struct simulator_train_profile_update_t final
 
         stream >> num;
 
-        vehicle_offsets.clear();
-        vehicle_offsets.resize(num);
+        vehicles.clear();
+        vehicles.resize(num);
 
-        for (auto& offset : vehicle_offsets)
+        for (auto& vehicle : vehicles)
         {
-            stream >> offset;
+            QByteArray vehicle_data;
+            stream >> vehicle_data;
+
+            vehicle.deserialize(vehicle_data);
         }
     }
 };

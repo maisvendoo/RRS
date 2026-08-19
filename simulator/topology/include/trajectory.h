@@ -79,6 +79,9 @@ public:
     /// если пустая, busy_begin_coord = length; busy_end_coord = 0.0
     void getBusyCoords(double &busy_begin_coord, double &busy_end_coord) const;
 
+    /// Занятость подвижным составом: модель-индекс ПЕ -> интервал координат
+    const QMap<size_t, std::array<double, 2>>& getVehiclesCoords() const;
+
     /// Вернуть все треки траектории
     const std::vector<track_t>& getTracks() const;
 

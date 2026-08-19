@@ -179,20 +179,12 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
     if (!_params->vehicles_handler)
         return;
 
-    const std::vector<float>& offsets = _profile.vehicle_offsets;
-    if (offsets.empty())
+    const std::vector<simulator_train_profile_vehicle_t>& vehicles = _profile.vehicles;
+    if (vehicles.empty())
         return;
-
-    // Диапазон model-индексов вагонов поезда
-    const std::vector<simulator_train_update_t>& trains = _params->vehicles_handler->getTrainsInfo();
-    if (_profile.train_id < 0 || static_cast<size_t>(_profile.train_id) >= trains.size())
-        return;
-    const int first_vehicle_id = trains[_profile.train_id].first_vehicle_id;
 
     const int current_vehicle = _params->vehicles_handler->getCurrentVehicleIndex();
     const int controlled_vehicle = _params->vehicles_handler->getControlledVehicleIndex();
-
-    const simulator_vehicles_info_t& vehicles_info = _params->vehicles_handler->getVehiclesInfo();
 
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
@@ -200,19 +192,9 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
     const ImU32 color_current = IM_COL32(192, 192, 0, 255);
     const ImU32 color_controlled = IM_COL32(192, 64, 64, 255);
 
-    for (size_t i = 0; i < offsets.size(); ++i)
+    for (const auto& vehicle : vehicles)
     {
-        const int model_index = first_vehicle_id + static_cast<int>(i);
-        const float offset = offsets[i];
-
-        // Длина вагона - из данных о подвижном составе (модель-индекс совпадает)
-        float vehicle_length = 20.0f;
-        if (model_index >= 0 && static_cast<size_t>(model_index) < vehicles_info.vehicles.size())
-        {
-            vehicle_length = static_cast<float>(vehicles_info.vehicles[model_index].vehicle_length);
-        }
-        // Половина длины вагона с небольшим видимым зазором между вагонами
-        const float half_len = vehicle_length * 0.5f * 0.9f;
+        const int model_index = vehicle.vehicle_id;
 
         ImU32 color = color_uncontrolled;
         if (model_index == controlled_vehicle)
@@ -220,9 +202,9 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
         else if (model_index == current_vehicle)
             color = color_current;
 
-        // Вагон рисуется сегментом вдоль линии профиля на свою длину
-        const float d0 = offset - half_len;
-        const float d1 = offset + half_len;
+        // Вагон рисуется сегментом вдоль линии профиля на занимаемый интервал
+        const float d0 = vehicle.begin_distance;
+        const float d1 = vehicle.end_distance;
         const float rel0 = elevationAt(d0, _profile.profile) - plot.origin_elev;
         const float rel1 = elevationAt(d1, _profile.profile) - plot.origin_elev;
 

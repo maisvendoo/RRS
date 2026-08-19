@@ -1179,13 +1179,15 @@ void Model::prepareProfilesFeedback()
             upd.profile.push_back(point);
         }
 
-        // Смещения вагонов от средней ПЕ вдоль поезда
-        const double mid_train_coord = mid_vehicle->getTrainCoord();
-        upd.vehicle_offsets.reserve(vlist->size());
-        for (Vehicle* vehicle : *vlist)
+        // Единицы подвижного состава на профиле (включая вагоны других поездов)
+        upd.vehicles.reserve(profile.vehicles.size());
+        for (const profile_vehicle_t& pv : profile.vehicles)
         {
-            upd.vehicle_offsets.push_back(
-                static_cast<float>(vehicle->getTrainCoord() - mid_train_coord));
+            simulator_train_profile_vehicle_t vehicle;
+            vehicle.vehicle_id = static_cast<int>(pv.vehicle_id);
+            vehicle.begin_distance = static_cast<float>(pv.begin_distance);
+            vehicle.end_distance = static_cast<float>(pv.end_distance);
+            upd.vehicles.push_back(vehicle);
         }
 
         update_profiles.push_back(upd);
