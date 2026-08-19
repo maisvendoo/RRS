@@ -635,7 +635,8 @@ void MyGui::showHUD() const
 
     if (_train_profile_widget)
     {
-        _train_profile_widget->show(hudTopOffset(), 300.0f, 20.0f, 20.0f);
+        // Небольшой отступ снизу до расписания и списка поездов (их верх - y = 300)
+        _train_profile_widget->show(hudTopOffset(), 300.0f - 10.0f, 20.0f, 20.0f);
     }
 
     showTimetable();
