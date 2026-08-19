@@ -218,6 +218,9 @@ private:
     /// TCP feedback
     void tcpFeedBack(bool need_trains_feedback);
 
+    /// Временная отладочная проверка расчёта профиля пути (RRS_PROFILE_DEBUG)
+    void debugProfileCheck();
+
     void controlStep();
 
     int speed_factor = 1;
