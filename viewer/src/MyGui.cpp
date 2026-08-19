@@ -47,6 +47,8 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
     _trains_list_params.vehicles_handler = params->vehicles_handler;
     _trains_list_params.viewer_handler = params->viewer_handler;
     _trains_list_widget = new TrainsListWidget(&_trains_list_params);
+
+    _train_profile_widget = new TrainProfileHintWidget(&_train_profile_params);
 }
 
 //------------------------------------------------------------------------------
@@ -625,6 +627,11 @@ void MyGui::showPauseState() const
 //------------------------------------------------------------------------------
 void MyGui::showHUD() const
 {
+    if (_train_profile_widget)
+    {
+        _train_profile_widget->show(hudTopOffset(), 300.0f);
+    }
+
     showTimetable();
 
     // Обновляем указатель на vehicles_handler при каждом кадре
@@ -820,4 +827,46 @@ void MyGui::check_date_time() const
         --params->year;
         params->month = 12;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float MyGui::hudTopOffset() const
+{
+    float top = 0.0f;
+
+    if (params->is_no_controlled)
+    {
+        const char *text = "Нажмите Enter для управления данной ПЕ";
+        const float h = ImGui::CalcTextSize(text).y + 20.0f;
+        if (h > top)
+            top = h;
+    }
+
+    if (params->is_no_cabine_control && params->vehicles_handler)
+    {
+        VehicleExterior* cur = params->vehicles_handler->getCurrentVehicle();
+        if (cur)
+        {
+            std::string msg = QString("Нажмите Enter для управления из кабины %1")
+                                  .arg(cur->current_cabine_idx + 1).toStdString();
+            const float h = ImGui::CalcTextSize(msg.c_str()).y + 20.0f;
+            if (h > top)
+                top = h;
+        }
+    }
+
+    if (params->is_show_statistics && params->statistics_handler)
+    {
+        QString text = QString("Device: %1 ").arg(params->physicalDeviceName);
+        text += QString("FPS:%1 (lowest:%2)")
+                    .arg(params->statistics_handler->getAverageFPS(), 6, 'f', 1)
+                    .arg(params->statistics_handler->getLowestFPS(), 6, 'f', 1);
+        const float h = ImGui::CalcTextSize(text.toStdString().c_str()).y + 20.0f;
+        if (h > top)
+            top = h;
+    }
+
+    return (top > 0.0f) ? top + 2.0f : 8.0f;
 }

@@ -9,6 +9,7 @@
 #include <QString>
 
 #include <TrainsListWidget.h>
+#include <TrainProfileHintWidget.h>
 
 struct simulator_time_t;
 class NewSkybox;
@@ -95,6 +96,10 @@ private:
 
     mutable TrainsListWidgetParams _trains_list_params;
 
+    mutable TrainProfileHintWidget *_train_profile_widget = nullptr;
+
+    mutable TrainProfileHintWidgetParams _train_profile_params;
+
     float font_size = 20.0f;    
 
     void showStatus() const;
@@ -118,6 +123,8 @@ private:
     void showHUD() const;
 
     void showTimetable() const;
+
+    float hudTopOffset() const;
 
     void printObject(const vsg::ref_ptr<vsg::Object>& object) const;
 
