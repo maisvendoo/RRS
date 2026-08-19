@@ -35,6 +35,9 @@ public:
 
     void sendRequest(StructureType stype, double update_interval = 0.0);
 
+    /// Запрос подписки на профили путей поездов с дальностями вперёд/назад, м
+    void sendTrainProfileRequest(double update_interval, double backward_m, double forward_m);
+
     void sendSwitchCommand(QByteArray switch_command);
 
     void sendSignalCommand(QByteArray signal_command);

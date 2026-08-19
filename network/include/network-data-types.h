@@ -107,6 +107,8 @@ struct client_data_t
     double players_update_prev_time;
     double profile_update_interval;
     double profile_update_prev_time;
+    double profile_backward;
+    double profile_forward;
     QTcpSocket* socket;
     network_data_t received_data;
 };

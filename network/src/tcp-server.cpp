@@ -149,6 +149,13 @@ void TcpServer::process_client_request(client_data_t &client_data)
 
         stream >> client_data.profile_update_interval;
 
+        // Дальности профиля назад/вперёд (появились позже интервала)
+        if (!stream.atEnd())
+        {
+            stream >> client_data.profile_backward;
+            stream >> client_data.profile_forward;
+        }
+
         /*Journal::instance()->info(QString("Received train profile update request for #%1 with interval %2")
                                       .arg(client_data.id).arg(client_data.profile_update_interval, 5, 'f', 3));*/
         clients_for_train_profile_updates.insert(client_data.socket);

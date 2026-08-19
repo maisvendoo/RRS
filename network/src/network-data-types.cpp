@@ -108,6 +108,8 @@ client_data_t::client_data_t()
     , players_update_prev_time(0.0)
     , profile_update_interval(1.0)
     , profile_update_prev_time(0.0)
+    , profile_backward(4000.0)
+    , profile_forward(4000.0)
     , socket(nullptr)
     , received_data()
 {

@@ -72,6 +72,26 @@ void TcpClient::sendRequest(StructureType stype, double update_interval)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendTrainProfileRequest(double update_interval, double backward_m, double forward_m)
+{
+    if (!canSend()) return;
+
+    network_data_t request;
+    request.stype = STYPE_REQUEST_TRAIN_PROFILE_UPDATE;
+
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
+
+    stream << update_interval;
+    stream << backward_m;
+    stream << forward_m;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpClient::sendSwitchCommand(QByteArray switch_command)
 {
     if (!canSend()) return;

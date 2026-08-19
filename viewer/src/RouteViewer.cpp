@@ -1031,7 +1031,9 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, static_cast<double>(settings.vehicles_pos_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, static_cast<double>(settings.vehicles_state_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE, static_cast<double>(settings.vehicle_controled_update_interval) * 0.001);
-    tcp_client->sendRequest(STYPE_REQUEST_TRAIN_PROFILE_UPDATE, static_cast<double>(settings.train_profile_update_interval) * 0.001);
+    tcp_client->sendTrainProfileRequest(static_cast<double>(settings.train_profile_update_interval) * 0.001,
+                                        settings.train_profile_backward,
+                                        settings.train_profile_forward);
 }
 
 //------------------------------------------------------------------------------
