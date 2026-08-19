@@ -720,6 +720,11 @@ struct simulator_train_profile_update_t final
     float backward = 0.0f;
     float forward = 0.0f;
 
+    /// Запрошенные протяжённости профиля назад и вперёд, м
+    /// (горизонтальный масштаб отображения соответствует им)
+    float backward_requested = 0.0f;
+    float forward_requested = 0.0f;
+
     /// Вершины ломаной профиля, упорядочены по distance от -backward до +forward
     std::vector<simulator_train_profile_point_t> profile;
 
@@ -738,6 +743,8 @@ struct simulator_train_profile_update_t final
         stream << speed;
         stream << backward;
         stream << forward;
+        stream << backward_requested;
+        stream << forward_requested;
 
         stream << static_cast<std::uint32_t>(profile.size());
         for (const auto& point : profile)
@@ -764,6 +771,8 @@ struct simulator_train_profile_update_t final
         stream >> speed;
         stream >> backward;
         stream >> forward;
+        stream >> backward_requested;
+        stream >> forward_requested;
 
         std::uint32_t num = 0;
         stream >> num;

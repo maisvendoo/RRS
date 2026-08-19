@@ -1167,6 +1167,8 @@ void Model::prepareProfilesFeedback()
         upd.speed = static_cast<float>(mid_vehicle->getVelocity());
         upd.backward = static_cast<float>(profile.backward);
         upd.forward = static_cast<float>(profile.forward);
+        upd.backward_requested = static_cast<float>(backward_m);
+        upd.forward_requested = static_cast<float>(forward_m);
 
         upd.profile.reserve(profile.points.size());
         for (const profile_segment_t& p : profile.points)
