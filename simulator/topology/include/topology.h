@@ -59,12 +59,6 @@ public:
                     double backward_m, double forward_m,
                     profile_segments_t &out) const;
 
-    /// Временная отладка: траектории, через которые проходит профиль
-    void debugProfileTrajectories(Trajectory *traj, double coord, dir_t orient,
-                                  double backward_m, double forward_m,
-                                  std::vector<std::pair<double, double>> &ranges,
-                                  std::vector<std::string> &names) const;
-
     /// Шаг симуляции
     void step(double t, double dt);
 
