@@ -88,39 +88,18 @@ static float elevationAt(float distance,
 }
 
 //------------------------------------------------------------------------------
-// Километраж пути в точке середины поезда (distance = 0)
+// Сборка меток координатной сетки. Километраж берётся напрямую из данных
+// траектории (в .traj каждой дуговой координате соответствует свой километраж):
+// для каждого сегмента профиля, где километраж задан, для каждого значения,
+// кратного grid_step, попадающего в интервал между концами сегмента, дистанция
+// вычисляется линейной интерполяцией. Километраж может как расти, так и убывать
+// вдоль пути и меняться скачком - это нормально. Пропускаются только участки,
+// где километраж отсутствует (нули вместо значений): это артефакт данных,
+// а не опора для столба
 //------------------------------------------------------------------------------
-static float railwayCoordAtMid(const std::vector<simulator_train_profile_point_t>& points)
-{
-    if (points.empty())
-        return 0.0f;
-
-    size_t i = 0;
-    while (i < points.size() && points[i].distance < 0.0f)
-        ++i;
-
-    if (i == 0)
-        return points.front().railway_coord;
-    if (i >= points.size())
-        return points.back().railway_coord;
-
-    const float d0 = points[i - 1].distance;
-    const float d1 = points[i].distance;
-    const float k = (d1 - d0) > 1e-9f ? (0.0f - d0) / (d1 - d0) : 0.0f;
-    return points[i - 1].railway_coord + k * (points[i].railway_coord - points[i - 1].railway_coord);
-}
-
-//------------------------------------------------------------------------------
-// Дистанция от середины поезда до точки с заданным километражем.
-// Километраж берётся напрямую из данных траектории (в .traj каждой дуговой
-// координате соответствует свой километраж), между известными значениями -
-// линейная интерполяция. Километраж может меняться скачком - это нормально.
-// Пропускаются только участки, где километраж отсутствует (нули вместо
-// значений): это артефакт данных, а не опора для столба
-//------------------------------------------------------------------------------
-static bool distanceAtRailwayCoord(float railway_coord,
-                                   const std::vector<simulator_train_profile_point_t>& points,
-                                   float &distance)
+static void collectGridMarks(const std::vector<simulator_train_profile_point_t>& points,
+                             float grid_step,
+                             std::vector<std::pair<float, float>>& out)
 {
     for (size_t i = 1; i < points.size(); ++i)
     {
@@ -129,21 +108,24 @@ static bool distanceAtRailwayCoord(float railway_coord,
         const float d0 = points[i - 1].distance;
         const float d1 = points[i].distance;
 
-        // Километраж не растёт вдоль пути - обрыв
-        if (rc1 <= rc0)
+        // Километраж отсутствует на участке (нули вместо значений) - обрыв
+        if (rc0 <= 0.5f || rc1 <= 0.5f)
             continue;
-        // Километраж отсутствует на участке (нули вместо значений)
-        if (std::min(rc0, rc1) <= 0.5f && std::max(rc0, rc1) > 1000.0f)
+
+        const float lo = std::min(rc0, rc1);
+        const float hi = std::max(rc0, rc1);
+        if (hi - lo < 1e-6f)
             continue;
-        if (railway_coord >= rc0 && railway_coord <= rc1)
+
+        const int k_first = static_cast<int>(std::ceil(lo / grid_step));
+        const int k_last = static_cast<int>(std::floor(hi / grid_step));
+        for (int k = k_first; k <= k_last; ++k)
         {
-            const float span = rc1 - rc0;
-            const float t = (span > 1e-9f) ? (railway_coord - rc0) / span : 0.0f;
-            distance = d0 + t * (d1 - d0);
-            return true;
+            const float rc = k * grid_step;
+            const float t = (rc - rc0) / (rc1 - rc0);
+            out.emplace_back(rc, d0 + t * (d1 - d0));
         }
     }
-    return false;
 }
 
 //------------------------------------------------------------------------------
@@ -250,9 +232,9 @@ void TrainProfileHintWidget::drawProfile() const
     plot.y_scale = band_height / rel_span;
 
     // Координатная сетка: вертикальные метки на всю высоту виджета,
-    // привязанные к километровым/пикетным столбам (абсолютный километраж
-    // пути), поэтому подпись на конкретной метке не меняется при движении
-    // поезда
+    // привязанные к километровым/пикетным столбам. Километраж берётся
+    // напрямую из данных траектории (профиль заполнен railway_coord из .traj),
+    // поэтому подписи и позиции меток - реальный километраж пути
     const float grid_step = 500.0f;
     if (grid_step > 1e-6f)
     {
@@ -261,22 +243,13 @@ void TrainProfileHintWidget::drawProfile() const
         const ImFont* font = ImGui::GetFont();
         const float label_y = y1 - font->FontSize;
 
-        // Километровые/пикетные столбы ищутся по километражу из данных
-        // траектории (профиль заполнен railway_coord из .traj), поэтому
-        // подписи и позиции меток - реальный километраж пути, а не пересчёт
-        // от положения поезда
-        const float rc_mid = railwayCoordAtMid(points);
-        const float rc_lo = rc_mid - req_backward;
-        const float rc_hi = rc_mid + req_forward;
-        const int i_first = static_cast<int>(std::ceil(rc_lo / grid_step));
-        const int i_last = static_cast<int>(std::floor(rc_hi / grid_step));
-        for (int i = i_first; i <= i_last; ++i)
-        {
-            const float rc = i * grid_step;
+        std::vector<std::pair<float, float>> marks;
+        collectGridMarks(points, grid_step, marks);
 
-            float d = 0.0f;
-            if (!distanceAtRailwayCoord(rc, points, d))
-                continue;
+        for (const auto& mark : marks)
+        {
+            const float rc = mark.first;
+            const float d = mark.second;
 
             const float gx = plot.map_x(d);
 
