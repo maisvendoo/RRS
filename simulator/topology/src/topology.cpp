@@ -1906,284 +1906,287 @@ void Topology::slotTrajChangeState(int vehicle_idx, bool is_busy, QString traj_n
 //------------------------------------------------------------------------------
 namespace
 {
-
-/// Поиск индекса трека, содержащего траекторную координату
-int findTrackIndex(const std::vector<track_t>& tracks, double coord)
-{
-    if (tracks.empty())
-        return 0;
-
-    int lo = 0;
-    int hi = static_cast<int>(tracks.size()) - 1;
-    while (lo < hi)
+    //------------------------------------------------------------------------------
+    //
+    //------------------------------------------------------------------------------
+    int findTrackIndex(const std::vector<track_t>& tracks, double coord)
     {
-        int mid = (lo + hi) / 2;
-        if (coord < tracks[mid].traj_coord)
-            hi = mid;
-        else if (coord >= tracks[mid].traj_coord + tracks[mid].len)
-            lo = mid + 1;
-        else
-            return mid;
-    }
-    return lo;
-}
+        if (tracks.empty())
+            return 0;
 
-/// Точка профиля в траекторной координате
-profile_segment_t pointAtCoord(const Trajectory* traj, double coord, dir_t orient, double distance)
-{
-    profile_segment_t point;
-
-    profile_point_t pp = traj->getPosition(coord, orient);
-
-    point.distance = distance;
-    point.elevation = pp.position.z;
-    point.railway_coord = pp.railway_coord;
-
-    return point;
-}
-
-/// Вершины ломаной профиля на границах треков и в конечной точке
-/// на отрезке траектории от coord до stop_coord в направлении orient
-void emitTrackBoundaries(const Trajectory* traj, double coord, double stop_coord, dir_t orient,
-                         double traveled, int kind, std::vector<profile_segment_t>& out)
-{
-    const std::vector<track_t>& tracks = traj->getTracks();
-    if (tracks.empty())
-        return;
-
-    const double eps = 1e-9;
-
-    if (orient == FWD)
-    {
-        double cursor = coord;
-        int ti = findTrackIndex(tracks, cursor);
-        while (ti < static_cast<int>(tracks.size()))
+        int lo = 0;
+        int hi = static_cast<int>(tracks.size()) - 1;
+        while (lo < hi)
         {
-            const track_t& track = tracks[ti];
-            double far = track.traj_coord + track.len;
-            if (far - cursor < eps)
-            {
-                ++ti;
-                continue;
-            }
-            if (far >= stop_coord - eps)
-                break;
-            out.push_back(pointAtCoord(traj, far, orient, kind * (traveled + (far - coord))));
-            cursor = far;
-            ++ti;
+            int mid = (lo + hi) / 2;
+            if (coord < tracks[mid].traj_coord)
+                hi = mid;
+            else if (coord >= tracks[mid].traj_coord + tracks[mid].len)
+                lo = mid + 1;
+            else
+                return mid;
         }
-        out.push_back(pointAtCoord(traj, stop_coord, orient, kind * (traveled + (stop_coord - coord))));
+        return lo;
     }
-    else
+
+    //------------------------------------------------------------------------------
+    //
+    //------------------------------------------------------------------------------
+    profile_segment_t pointAtCoord(const Trajectory* traj, double coord, dir_t orient, double distance)
     {
-        double cursor = coord;
-        int ti = findTrackIndex(tracks, cursor);
-        while (ti >= 0)
-        {
-            const track_t& track = tracks[ti];
-            double near = track.traj_coord;
-            if (cursor - near < eps)
-            {
-                --ti;
-                continue;
-            }
-            if (near <= stop_coord + eps)
-                break;
-            out.push_back(pointAtCoord(traj, near, orient, kind * (traveled + (coord - near))));
-            cursor = near;
-            --ti;
-        }
-        out.push_back(pointAtCoord(traj, stop_coord, orient, kind * (traveled + (coord - stop_coord))));
+        profile_segment_t point;
+
+        profile_point_t pp = traj->getPosition(coord, orient);
+
+        point.distance = distance;
+        point.elevation = pp.position.z;
+        point.railway_coord = pp.railway_coord;
+
+        return point;
     }
-}
 
-/// Ход по топологии в направлении orient с накоплением вершин профиля;
-/// kind=+1 - дистанции положительные (вперёд), kind=-1 - отрицательные (назад)
-void walkProfile(Trajectory*& traj, double& coord, dir_t& orient,
-                 double limit_m, int kind, std::vector<profile_segment_t>& out)
-{
-    if (traj == nullptr || limit_m <= 0.0)
-        return;
-
-    const double eps = 1e-9;
-    double traveled = 0.0;
-
-    int guard = 0;
-    const int max_iters = 100000;
-
-    while ((traveled < limit_m - eps) && (guard < max_iters))
+    //------------------------------------------------------------------------------
+    //
+    //------------------------------------------------------------------------------
+    void emitTrackBoundaries(const Trajectory* traj, double coord, double stop_coord, dir_t orient,
+                             double traveled, int kind, std::vector<profile_segment_t>& out)
     {
-        ++guard;
+        const std::vector<track_t>& tracks = traj->getTracks();
+        if (tracks.empty())
+            return;
 
-        double exit_coord = 0.0;
-        double within_traj = 0.0;
+        const double eps = 1e-9;
+
         if (orient == FWD)
         {
-            exit_coord = traj->getLength();
-            within_traj = exit_coord - coord;
+            double cursor = coord;
+            int ti = findTrackIndex(tracks, cursor);
+            while (ti < static_cast<int>(tracks.size()))
+            {
+                const track_t& track = tracks[ti];
+                double far = track.traj_coord + track.len;
+                if (far - cursor < eps)
+                {
+                    ++ti;
+                    continue;
+                }
+                if (far >= stop_coord - eps)
+                    break;
+                out.push_back(pointAtCoord(traj, far, orient, kind * (traveled + (far - coord))));
+                cursor = far;
+                ++ti;
+            }
+            out.push_back(pointAtCoord(traj, stop_coord, orient, kind * (traveled + (stop_coord - coord))));
         }
         else
         {
-            exit_coord = 0.0;
-            within_traj = coord - exit_coord;
+            double cursor = coord;
+            int ti = findTrackIndex(tracks, cursor);
+            while (ti >= 0)
+            {
+                const track_t& track = tracks[ti];
+                double near = track.traj_coord;
+                if (cursor - near < eps)
+                {
+                    --ti;
+                    continue;
+                }
+                if (near <= stop_coord + eps)
+                    break;
+                out.push_back(pointAtCoord(traj, near, orient, kind * (traveled + (coord - near))));
+                cursor = near;
+                --ti;
+            }
+            out.push_back(pointAtCoord(traj, stop_coord, orient, kind * (traveled + (coord - stop_coord))));
         }
+    }
 
-        if (within_traj > eps)
+    //------------------------------------------------------------------------------
+    //
+    //------------------------------------------------------------------------------
+    void walkProfile(Trajectory*& traj, double& coord, dir_t& orient,
+                     double limit_m, int kind, std::vector<profile_segment_t>& out)
+    {
+        if (traj == nullptr || limit_m <= 0.0)
+            return;
+
+        const double eps = 1e-9;
+        double traveled = 0.0;
+
+        int guard = 0;
+        const int max_iters = 100000;
+
+        while ((traveled < limit_m - eps) && (guard < max_iters))
         {
-            double step = std::min(limit_m - traveled, within_traj);
-            double stop_coord = (orient == FWD) ? (coord + step) : (coord - step);
-            emitTrackBoundaries(traj, coord, stop_coord, orient, traveled, kind, out);
-            traveled += step;
-            if (traveled >= limit_m - eps)
+            ++guard;
+
+            double exit_coord = 0.0;
+            double within_traj = 0.0;
+            if (orient == FWD)
+            {
+                exit_coord = traj->getLength();
+                within_traj = exit_coord - coord;
+            }
+            else
+            {
+                exit_coord = 0.0;
+                within_traj = coord - exit_coord;
+            }
+
+            if (within_traj > eps)
+            {
+                double step = std::min(limit_m - traveled, within_traj);
+                double stop_coord = (orient == FWD) ? (coord + step) : (coord - step);
+                emitTrackBoundaries(traj, coord, stop_coord, orient, traveled, kind, out);
+                traveled += step;
+                if (traveled >= limit_m - eps)
+                    break;
+                coord = stop_coord;
+            }
+
+            // Переход через стрелку на следующую траекторию
+            dir_t exit_dir = orient;
+            const Switch* next_sw = traj->getNextSwitch(exit_dir);
+            if (next_sw == nullptr)
                 break;
-            coord = stop_coord;
-        }
-
-        // Переход через стрелку на следующую траекторию
-        dir_t exit_dir = orient;
-        const Switch* next_sw = traj->getNextSwitch(exit_dir);
-        if (next_sw == nullptr)
-            break;
-        Trajectory* next_traj = next_sw->getNextTraj(exit_dir);
-        if (next_traj == nullptr)
-            break;
-        if (exit_dir != orient)
-            orient = static_cast<dir_t>(-orient);
-        coord = (exit_dir == BWD) ? next_traj->getLength() : 0.0;
-        traj = next_traj;
-    }
-}
-
-/// Расчёт уклонов по готовой ломаной профиля
-void calcInclinations(std::vector<profile_segment_t>& points)
-{
-    for (size_t i = 1; i < points.size(); ++i)
-    {
-        double d_dist = points[i].distance - points[i - 1].distance;
-        if (std::abs(d_dist) > 1e-9)
-            points[i - 1].inclination = (points[i].elevation - points[i - 1].elevation) / d_dist * 1000.0;
-        else
-            points[i - 1].inclination = 0.0;
-    }
-    if (!points.empty())
-        points.back().inclination = points.size() > 1 ? points[points.size() - 2].inclination : 0.0;
-}
-
-/// Сглаживание изломов ломаной профиля скользящим окном по дистанции
-/// (гауссово взвешивание высоты): профиль ресемплируется на равномерную
-/// сетку с шагом resample_step, затем высота каждой точки заменяется
-/// взвешенным средним по окну ±window_half с сигмой sigma. Это даёт
-/// гарантированный плавный переход на всех изломах. keep_idx - индекс
-/// точки отсчёта (середина поезда): её высота и небольшая окрестность
-/// восстанавливаются точно, чтобы сохранить точку отсчёта
-void smoothProfile(std::vector<profile_segment_t>& points, size_t keep_idx,
-                   double resample_step, double window_half, double sigma)
-{
-    if (points.size() < 2)
-        return;
-
-    const double eps = 1e-9;
-
-    // Ресемплинг исходной ломаной на равномерную сетку
-    std::vector<profile_segment_t> grid;
-    grid.reserve(static_cast<size_t>((points.back().distance - points.front().distance) / resample_step) + 2);
-
-    for (double d = points.front().distance; d <= points.back().distance + eps; d += resample_step)
-    {
-        double dd = std::min(d, points.back().distance);
-
-        // Поиск отрезка исходной ломаной, содержащего dd
-        size_t seg = 1;
-        while (seg + 1 < points.size() && points[seg].distance < dd - eps)
-            ++seg;
-        const profile_segment_t& a = points[seg - 1];
-        const profile_segment_t& b = points[seg];
-
-        double t = (b.distance - a.distance) > eps
-                   ? (dd - a.distance) / (b.distance - a.distance) : 0.0;
-        t = std::clamp(t, 0.0, 1.0);
-
-        profile_segment_t p;
-        p.distance = dd;
-        p.elevation = a.elevation + t * (b.elevation - a.elevation);
-        p.railway_coord = a.railway_coord + t * (b.railway_coord - a.railway_coord);
-        p.inclination = 0.0;
-        grid.push_back(p);
-
-        if (dd >= points.back().distance - eps)
-            break;
-    }
-
-    if (grid.size() < 3)
-        return;
-
-    // Гауссово сглаживание высоты по дистанции
-    std::vector<double> smooth_z(grid.size());
-    const double var = sigma * sigma;
-
-    for (size_t i = 0; i < grid.size(); ++i)
-    {
-        double z_sum = 0.0;
-        double w_sum = 0.0;
-        double di = grid[i].distance;
-
-        for (size_t j = i; j < grid.size(); ++j)
-        {
-            double dx = grid[j].distance - di;
-            if (dx > window_half)
+            Trajectory* next_traj = next_sw->getNextTraj(exit_dir);
+            if (next_traj == nullptr)
                 break;
-            double w = std::exp(-dx * dx / (2.0 * var));
-            z_sum += w * grid[j].elevation;
-            w_sum += w;
+            if (exit_dir != orient)
+                orient = static_cast<dir_t>(-orient);
+            coord = (exit_dir == BWD) ? next_traj->getLength() : 0.0;
+            traj = next_traj;
         }
-        for (size_t j = i; j > 0; --j)
+    }
+
+    //------------------------------------------------------------------------------
+    //
+    //------------------------------------------------------------------------------
+    void calcInclinations(std::vector<profile_segment_t>& points)
+    {
+        for (size_t i = 1; i < points.size(); ++i)
         {
-            double dx = di - grid[j - 1].distance;
-            if (dx > window_half)
+            double d_dist = points[i].distance - points[i - 1].distance;
+            if (std::abs(d_dist) > 1e-9)
+                points[i - 1].inclination = (points[i].elevation - points[i - 1].elevation) / d_dist * 1000.0;
+            else
+                points[i - 1].inclination = 0.0;
+        }
+        if (!points.empty())
+            points.back().inclination = points.size() > 1 ? points[points.size() - 2].inclination : 0.0;
+    }
+
+    //------------------------------------------------------------------------------
+    //
+    //------------------------------------------------------------------------------
+    void smoothProfile(std::vector<profile_segment_t>& points, size_t keep_idx,
+                       double resample_step, double window_half, double sigma)
+    {
+        if (points.size() < 2)
+            return;
+
+        const double eps = 1e-9;
+
+        // Ресемплинг исходной ломаной на равномерную сетку
+        std::vector<profile_segment_t> grid;
+        grid.reserve(static_cast<size_t>((points.back().distance - points.front().distance) / resample_step) + 2);
+
+        for (double d = points.front().distance; d <= points.back().distance + eps; d += resample_step)
+        {
+            double dd = std::min(d, points.back().distance);
+
+            // Поиск отрезка исходной ломаной, содержащего dd
+            size_t seg = 1;
+            while (seg + 1 < points.size() && points[seg].distance < dd - eps)
+                ++seg;
+            const profile_segment_t& a = points[seg - 1];
+            const profile_segment_t& b = points[seg];
+
+            double t = (b.distance - a.distance) > eps
+                       ? (dd - a.distance) / (b.distance - a.distance) : 0.0;
+            t = std::clamp(t, 0.0, 1.0);
+
+            profile_segment_t p;
+            p.distance = dd;
+            p.elevation = a.elevation + t * (b.elevation - a.elevation);
+            p.railway_coord = a.railway_coord + t * (b.railway_coord - a.railway_coord);
+            p.inclination = 0.0;
+            grid.push_back(p);
+
+            if (dd >= points.back().distance - eps)
                 break;
-            double w = std::exp(-dx * dx / (2.0 * var));
-            z_sum += w * grid[j - 1].elevation;
-            w_sum += w;
         }
 
-        smooth_z[i] = z_sum / w_sum;
-    }
+        if (grid.size() < 3)
+            return;
 
-    // Точка отсчёта и её окрестность восстанавливаем точно
-    const double keep_dist = points[keep_idx].distance;
-    const double keep_elev = points[keep_idx].elevation;
-    const double blend = 0.5 * window_half;
+        // Гауссово сглаживание высоты по дистанции
+        std::vector<double> smooth_z(grid.size());
+        const double var = sigma * sigma;
 
-    size_t keep_grid = 0;
-    double min_d = std::abs(grid[0].distance - keep_dist);
-    for (size_t i = 1; i < grid.size(); ++i)
-    {
-        double d = std::abs(grid[i].distance - keep_dist);
-        if (d < min_d)
+        for (size_t i = 0; i < grid.size(); ++i)
         {
-            min_d = d;
-            keep_grid = i;
-        }
-    }
+            double z_sum = 0.0;
+            double w_sum = 0.0;
+            double di = grid[i].distance;
 
-    for (size_t i = 0; i < grid.size(); ++i)
-    {
-        double dist = std::abs(grid[i].distance - keep_dist);
-        if (dist <= blend)
+            for (size_t j = i; j < grid.size(); ++j)
+            {
+                double dx = grid[j].distance - di;
+                if (dx > window_half)
+                    break;
+                double w = std::exp(-dx * dx / (2.0 * var));
+                z_sum += w * grid[j].elevation;
+                w_sum += w;
+            }
+            for (size_t j = i; j > 0; --j)
+            {
+                double dx = di - grid[j - 1].distance;
+                if (dx > window_half)
+                    break;
+                double w = std::exp(-dx * dx / (2.0 * var));
+                z_sum += w * grid[j - 1].elevation;
+                w_sum += w;
+            }
+
+            smooth_z[i] = z_sum / w_sum;
+        }
+
+        // Точка отсчёта и её окрестность восстанавливаем точно
+        const double keep_dist = points[keep_idx].distance;
+        const double keep_elev = points[keep_idx].elevation;
+        const double blend = 0.5 * window_half;
+
+        size_t keep_grid = 0;
+        double min_d = std::abs(grid[0].distance - keep_dist);
+        for (size_t i = 1; i < grid.size(); ++i)
         {
-            double w = 1.0 - dist / blend;
-            grid[i].elevation = w * keep_elev + (1.0 - w) * smooth_z[i];
+            double d = std::abs(grid[i].distance - keep_dist);
+            if (d < min_d)
+            {
+                min_d = d;
+                keep_grid = i;
+            }
         }
-        else
+
+        for (size_t i = 0; i < grid.size(); ++i)
         {
-            grid[i].elevation = smooth_z[i];
+            double dist = std::abs(grid[i].distance - keep_dist);
+            if (dist <= blend)
+            {
+                double w = 1.0 - dist / blend;
+                grid[i].elevation = w * keep_elev + (1.0 - w) * smooth_z[i];
+            }
+            else
+            {
+                grid[i].elevation = smooth_z[i];
+            }
         }
+
+        grid[keep_grid].elevation = keep_elev;
+
+        points = std::move(grid);
     }
-
-    grid[keep_grid].elevation = keep_elev;
-
-    points = std::move(grid);
-}
 
 }
 
