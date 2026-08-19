@@ -26,6 +26,9 @@ void RouteViewer::loadNetworkSettings(CfgReader& cfg, const QString& section)
     cfg.getInt(section, "VehicleControlledUpdateInterval", settings.vehicle_controled_update_interval);
     cfg.getInt(section, "ClientDelay", settings.client_delay);
     cfg.getBool(section, "ShowServerAddr", settings.tcp_config.show_server_addr);
+
+    cfg.getDouble(section, "TrainProfileBackward", settings.train_profile_backward);
+    cfg.getDouble(section, "TrainProfileForward", settings.train_profile_forward);
 }
 
 //------------------------------------------------------------------------------

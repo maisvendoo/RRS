@@ -73,6 +73,10 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 
     bool is_no_cabine_control = false;
 
+    /// Дальность профиля пути назад/вперёд от середины поезда, м (запрос к серверу)
+    double train_profile_backward = 4000.0;
+    double train_profile_forward = 4000.0;
+
     QString status = "";
     QString physicalDeviceName = "";
 };

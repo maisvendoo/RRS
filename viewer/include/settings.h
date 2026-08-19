@@ -20,6 +20,8 @@ struct settings_t final
     int vehicles_state_update_interval = 100;   ///< Interval for vehicles states update, ms
     int vehicle_controled_update_interval = 70; ///< Interval for vehicle controlled debug strings update, ms
     int train_profile_update_interval = 1000;    ///< Interval for trains' path profiles update, ms
+    double train_profile_backward = 4000.0;      ///< Profile extent backward from train middle, m
+    double train_profile_forward = 4000.0;       ///< Profile extent forward from train middle, m
     int client_delay = 100;                     ///< Client delay for smoothing network's delays
 
     std::string route_dir_name;        ///< Route directory name

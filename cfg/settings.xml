@@ -14,6 +14,10 @@
         <VehicleControlledUpdateInterval>70</VehicleControlledUpdateInterval>
         <!-- Дополнительная задержка клиента для сглаживания неравномерного приёма сетевых пакетов, мс -->
         <ClientDelay>100</ClientDelay>
+        <!-- Дальность профиля пути назад от середины поезда, м -->
+        <TrainProfileBackward>4000</TrainProfileBackward>
+        <!-- Дальность профиля пути вперёд от середины поезда, м -->
+        <TrainProfileForward>4000</TrainProfileForward>
         <!-- Разрешение показывать IP-адрес сервера -->
         <ShowServerAddr>1</ShowServerAddr>
     </Client>

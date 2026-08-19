@@ -11,6 +11,9 @@ struct TrainProfileHintWidgetParams
 {
     VehiclesHandler *vehicles_handler = nullptr;
     bool is_visible = true;
+    /// Запрошенные дальности профиля назад/вперёд от середины поезда, м
+    float backward_m = 4000.0f;
+    float forward_m = 4000.0f;
 };
 
 //------------------------------------------------------------------------------

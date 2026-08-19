@@ -114,13 +114,32 @@ void TrainProfileHintWidget::drawProfile() const
     plot.y0 = y0;
     plot.y1 = y1;
 
+    // Запрошенный диапазон отображения: настраиваемый клиентом, не более того,
+    // что запрошено у сервера (серверный диапазон может быть меньше, если
+    // подписка уже передала меньшие дальности)
+    const float cfg_backward = std::max(_params->backward_m, 0.0f);
+    const float cfg_forward = std::max(_params->forward_m, 0.0f);
+    const float req_backward = std::min(cfg_backward, std::max(_profile.backward_requested, 0.0f));
+    const float req_forward = std::min(cfg_forward, std::max(_profile.forward_requested, 0.0f));
+
     // Отсчётная высота - середина поезда (distance = 0)
     plot.origin_elev = elevationAt(0.0f, points);
 
-    // Диапазоны по вертикали (относительная высота)
-    plot.rel_min = points.front().elevation - plot.origin_elev;
-    plot.rel_max = plot.rel_min;
+    // Отбор точек профиля в пределах запрошенного диапазона
+    std::vector<simulator_train_profile_point_t> clipped;
+    clipped.reserve(points.size());
     for (const auto& p : points)
+    {
+        if (p.distance >= -req_backward && p.distance <= req_forward)
+            clipped.push_back(p);
+    }
+    if (clipped.size() < 2)
+        return;
+
+    // Диапазоны по вертикали (относительная высота)
+    plot.rel_min = clipped.front().elevation - plot.origin_elev;
+    plot.rel_max = plot.rel_min;
+    for (const auto& p : clipped)
     {
         const float rel = p.elevation - plot.origin_elev;
         if (rel < plot.rel_min)
@@ -143,8 +162,6 @@ void TrainProfileHintWidget::drawProfile() const
     // Горизонтальный масштаб: центр (distance = 0) - середина окна,
     // масштаб соответствует запрошенному диапазону вперёд/назад даже если
     // обход упёрся в непроходимую стрелку
-    const float req_backward = std::max(_profile.backward_requested, 0.0f);
-    const float req_forward = std::max(_profile.forward_requested, 0.0f);
     const float half_extent = std::max(req_backward, req_forward);
     plot.x_scale = (half_extent > 1e-6f) ? (x1 - x0) / (2.0f * half_extent) : 1.0f;
 
@@ -162,8 +179,8 @@ void TrainProfileHintWidget::drawProfile() const
 
     // Кривая профиля
     std::vector<ImVec2> poly;
-    poly.reserve(points.size());
-    for (const auto& p : points)
+    poly.reserve(clipped.size());
+    for (const auto& p : clipped)
     {
         poly.emplace_back(plot.map_x(p.distance),
                           plot.map_y(p.elevation - plot.origin_elev));
@@ -195,6 +212,12 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
     const ImU32 color_current = IM_COL32(192, 192, 0, 255);
     const ImU32 color_controlled = IM_COL32(192, 64, 64, 255);
 
+    // Запрошенный диапазон отображения (как в drawProfile)
+    const float cfg_backward = std::max(_params->backward_m, 0.0f);
+    const float cfg_forward = std::max(_params->forward_m, 0.0f);
+    const float req_backward = std::min(cfg_backward, std::max(_profile.backward_requested, 0.0f));
+    const float req_forward = std::min(cfg_forward, std::max(_profile.forward_requested, 0.0f));
+
     for (const auto& vehicle : vehicles)
     {
         const int model_index = vehicle.vehicle_id;
@@ -207,11 +230,16 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
 
         // Вагон рисуется сегментом вдоль линии профиля на занимаемый интервал;
         // длину рисовки уменьшаем на ширину зазора, чтобы между вагонами был
-        // видимый промежуток, а общая длина поезда не менялась
+        // видимый промежуток, а общая длина поезда не менялась.
+        // Интервал обрезаем по запрошенному диапазону отображения
         const float span = vehicle.end_distance - vehicle.begin_distance;
         const float gap = span * 0.1f;
-        const float d0 = vehicle.begin_distance + gap * 0.5f;
-        const float d1 = vehicle.end_distance - gap * 0.5f;
+        float d0 = vehicle.begin_distance + gap * 0.5f;
+        float d1 = vehicle.end_distance - gap * 0.5f;
+        d0 = std::max(d0, -req_backward);
+        d1 = std::min(d1, req_forward);
+        if (d1 <= d0)
+            continue;
         const float rel0 = elevationAt(d0, _profile.profile) - plot.origin_elev;
         const float rel1 = elevationAt(d1, _profile.profile) - plot.origin_elev;
 

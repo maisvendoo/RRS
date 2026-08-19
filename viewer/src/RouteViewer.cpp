@@ -328,6 +328,8 @@ void RouteViewer::initVsgOptions()
     options->setValue("disable_gltf", settings.disable_native_gltf_loader);
 
     GUIparams = GUIParams::create();
+    GUIparams->train_profile_backward = settings.train_profile_backward;
+    GUIparams->train_profile_forward = settings.train_profile_forward;
 }
 
 //------------------------------------------------------------------------------
