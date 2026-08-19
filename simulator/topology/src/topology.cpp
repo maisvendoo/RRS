@@ -2069,6 +2069,122 @@ void calcInclinations(std::vector<profile_segment_t>& points)
         points.back().inclination = points.size() > 1 ? points[points.size() - 2].inclination : 0.0;
 }
 
+/// Сглаживание изломов ломаной профиля скользящим окном по дистанции
+/// (гауссово взвешивание высоты): профиль ресемплируется на равномерную
+/// сетку с шагом resample_step, затем высота каждой точки заменяется
+/// взвешенным средним по окну ±window_half с сигмой sigma. Это даёт
+/// гарантированный плавный переход на всех изломах. keep_idx - индекс
+/// точки отсчёта (середина поезда): её высота и небольшая окрестность
+/// восстанавливаются точно, чтобы сохранить точку отсчёта
+void smoothProfile(std::vector<profile_segment_t>& points, size_t keep_idx,
+                   double resample_step, double window_half, double sigma)
+{
+    if (points.size() < 2)
+        return;
+
+    const double eps = 1e-9;
+
+    // Ресемплинг исходной ломаной на равномерную сетку
+    std::vector<profile_segment_t> grid;
+    grid.reserve(static_cast<size_t>((points.back().distance - points.front().distance) / resample_step) + 2);
+
+    for (double d = points.front().distance; d <= points.back().distance + eps; d += resample_step)
+    {
+        double dd = std::min(d, points.back().distance);
+
+        // Поиск отрезка исходной ломаной, содержащего dd
+        size_t seg = 1;
+        while (seg + 1 < points.size() && points[seg].distance < dd - eps)
+            ++seg;
+        const profile_segment_t& a = points[seg - 1];
+        const profile_segment_t& b = points[seg];
+
+        double t = (b.distance - a.distance) > eps
+                   ? (dd - a.distance) / (b.distance - a.distance) : 0.0;
+        t = std::clamp(t, 0.0, 1.0);
+
+        profile_segment_t p;
+        p.distance = dd;
+        p.elevation = a.elevation + t * (b.elevation - a.elevation);
+        p.railway_coord = a.railway_coord + t * (b.railway_coord - a.railway_coord);
+        p.inclination = 0.0;
+        grid.push_back(p);
+
+        if (dd >= points.back().distance - eps)
+            break;
+    }
+
+    if (grid.size() < 3)
+        return;
+
+    // Гауссово сглаживание высоты по дистанции
+    std::vector<double> smooth_z(grid.size());
+    const double var = sigma * sigma;
+
+    for (size_t i = 0; i < grid.size(); ++i)
+    {
+        double z_sum = 0.0;
+        double w_sum = 0.0;
+        double di = grid[i].distance;
+
+        for (size_t j = i; j < grid.size(); ++j)
+        {
+            double dx = grid[j].distance - di;
+            if (dx > window_half)
+                break;
+            double w = std::exp(-dx * dx / (2.0 * var));
+            z_sum += w * grid[j].elevation;
+            w_sum += w;
+        }
+        for (size_t j = i; j > 0; --j)
+        {
+            double dx = di - grid[j - 1].distance;
+            if (dx > window_half)
+                break;
+            double w = std::exp(-dx * dx / (2.0 * var));
+            z_sum += w * grid[j - 1].elevation;
+            w_sum += w;
+        }
+
+        smooth_z[i] = z_sum / w_sum;
+    }
+
+    // Точка отсчёта и её окрестность восстанавливаем точно
+    const double keep_dist = points[keep_idx].distance;
+    const double keep_elev = points[keep_idx].elevation;
+    const double blend = 0.5 * window_half;
+
+    size_t keep_grid = 0;
+    double min_d = std::abs(grid[0].distance - keep_dist);
+    for (size_t i = 1; i < grid.size(); ++i)
+    {
+        double d = std::abs(grid[i].distance - keep_dist);
+        if (d < min_d)
+        {
+            min_d = d;
+            keep_grid = i;
+        }
+    }
+
+    for (size_t i = 0; i < grid.size(); ++i)
+    {
+        double dist = std::abs(grid[i].distance - keep_dist);
+        if (dist <= blend)
+        {
+            double w = 1.0 - dist / blend;
+            grid[i].elevation = w * keep_elev + (1.0 - w) * smooth_z[i];
+        }
+        else
+        {
+            grid[i].elevation = smooth_z[i];
+        }
+    }
+
+    grid[keep_grid].elevation = keep_elev;
+
+    points = std::move(grid);
+}
+
 }
 
 //------------------------------------------------------------------------------
@@ -2106,6 +2222,13 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
 
     out.backward = bwd_points.empty() ? 0.0 : std::abs(bwd_points.back().distance);
     out.forward = fwd_points.empty() ? 0.0 : fwd_points.back().distance;
+
+    // Сглаживание изломов скользящим окном для визуализации
+    const size_t origin_idx = bwd_points.size();
+    const double resample_step = 5.0;
+    const double smooth_window = 30.0;
+    const double smooth_sigma = 12.0;
+    smoothProfile(out.points, origin_idx, resample_step, smooth_window, smooth_sigma);
 
     calcInclinations(out.points);
 

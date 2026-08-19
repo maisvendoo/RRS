@@ -22,6 +22,9 @@
 #include    <vehicle-controller.h>
 #include    <core/load_module.h>
 
+#include    <QFile>
+#include    <QTextStream>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -1449,8 +1452,8 @@ void Model::debugProfileCheck()
 
     Journal::instance()->info("=== PROFILE DEBUG ===");
 
-    const double backward_m = 500.0;
-    const double forward_m = 500.0;
+    const double backward_m = 3000.0;
+    const double forward_m = 3000.0;
 
     for (Train* train : trains)
     {
@@ -1562,6 +1565,33 @@ void Model::debugProfileCheck()
                                           .arg(p.elevation, 0, 'f', 3)
                                           .arg(p.railway_coord, 0, 'f', 3)
                                           .arg(p.inclination, 0, 'f', 2));
+        }
+
+        // Выгрузка полного профиля в CSV для оценки правдоподобности
+        FileSystem& fs = FileSystem::getInstance();
+        QString csv_path = QString::fromStdString(fs.combinePath(
+            fs.getLogsDir(), QString("profile_train_%1.csv")
+                                 .arg(QString(train->getName().c_str())).toStdString()));
+        QFile csv(csv_path);
+        if (csv.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+        {
+            double origin_elev = profile.points[origin_idx].elevation;
+            QTextStream out(&csv);
+            out << "distance,elevation,rel_elevation,railway_coord,inclination\n";
+            for (const profile_segment_t& p : profile.points)
+            {
+                out << QString::number(p.distance, 'f', 3) << ','
+                    << QString::number(p.elevation, 'f', 3) << ','
+                    << QString::number(p.elevation - origin_elev, 'f', 3) << ','
+                    << QString::number(p.railway_coord, 'f', 3) << ','
+                    << QString::number(p.inclination, 'f', 2) << '\n';
+            }
+            csv.close();
+            Journal::instance()->info(QString("PROFILE saved: %1").arg(csv_path));
+        }
+        else
+        {
+            Journal::instance()->warning(QString("PROFILE cannot open %1").arg(csv_path));
         }
     }
 }
