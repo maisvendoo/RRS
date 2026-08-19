@@ -88,27 +88,32 @@ static float elevationAt(float distance,
 }
 
 //------------------------------------------------------------------------------
-// Километраж пути на заданной дистанции от середины поезда (линейная интерполяция)
+// Дистанция от середины поезда до точки с заданным километражем
+// (по данным траектории, которыми заполнен профиль)
 //------------------------------------------------------------------------------
-static float railwayCoordAt(float distance,
-                            const std::vector<simulator_train_profile_point_t>& points)
+static float distanceAtRailwayCoord(float railway_coord,
+                                    const std::vector<simulator_train_profile_point_t>& points)
 {
     if (points.empty())
         return 0.0f;
 
-    size_t i = 0;
-    while (i < points.size() && points[i].distance < distance)
-        ++i;
+    for (size_t i = 1; i < points.size(); ++i)
+    {
+        const float rc0 = points[i - 1].railway_coord;
+        const float rc1 = points[i].railway_coord;
+        if ((railway_coord - rc0) * (railway_coord - rc1) <= 0.0f)
+        {
+            const float span = rc1 - rc0;
+            if (std::abs(span) > 1e-9f)
+            {
+                const float t = (railway_coord - rc0) / span;
+                return points[i - 1].distance + t * (points[i].distance - points[i - 1].distance);
+            }
+            return points[i - 1].distance;
+        }
+    }
 
-    if (i == 0)
-        return points.front().railway_coord;
-    if (i >= points.size())
-        return points.back().railway_coord;
-
-    const float d0 = points[i - 1].distance;
-    const float d1 = points[i].distance;
-    const float k = (d1 - d0) > 1e-9f ? (distance - d0) / (d1 - d0) : 0.0f;
-    return points[i - 1].railway_coord + k * (points[i].railway_coord - points[i - 1].railway_coord);
+    return points.back().distance;
 }
 
 //------------------------------------------------------------------------------
@@ -226,14 +231,19 @@ void TrainProfileHintWidget::drawProfile() const
         const ImFont* font = ImGui::GetFont();
         const float label_y = y1 - font->FontSize;
 
-        // Километраж середины поезда - точка отсчёта для позиций меток
-        const float rc_mid = railwayCoordAt(0.0f, points);
-        const int i_first = static_cast<int>(std::ceil((rc_mid - req_backward) / grid_step));
-        const int i_last = static_cast<int>(std::floor((rc_mid + req_forward) / grid_step));
+        // Километровые/пикетные столбы ищутся по километражу из данных
+        // траектории (профиль заполнен railway_coord из .traj), поэтому
+        // подписи и позиции меток - реальный километраж пути, а не пересчёт
+        // от положения поезда
+        const float rc_lo = clipped.front().railway_coord;
+        const float rc_hi = clipped.back().railway_coord;
+        const int i_first = static_cast<int>(std::ceil(rc_lo / grid_step));
+        const int i_last = static_cast<int>(std::floor(rc_hi / grid_step));
         for (int i = i_first; i <= i_last; ++i)
         {
             const float rc = i * grid_step;
-            const float gx = plot.map_x(rc - rc_mid);
+            const float d = distanceAtRailwayCoord(rc, points);
+            const float gx = plot.map_x(d);
 
             draw_list->AddLine(ImVec2(gx, y0), ImVec2(gx, y1), grid_col, 1.0f);
 
