@@ -202,9 +202,13 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
         else if (model_index == current_vehicle)
             color = color_current;
 
-        // Вагон рисуется сегментом вдоль линии профиля на занимаемый интервал
-        const float d0 = vehicle.begin_distance;
-        const float d1 = vehicle.end_distance;
+        // Вагон рисуется сегментом вдоль линии профиля на занимаемый интервал;
+        // длину рисовки уменьшаем на ширину зазора, чтобы между вагонами был
+        // видимый промежуток, а общая длина поезда не менялась
+        const float span = vehicle.end_distance - vehicle.begin_distance;
+        const float gap = span * 0.1f;
+        const float d0 = vehicle.begin_distance + gap * 0.5f;
+        const float d1 = vehicle.end_distance - gap * 0.5f;
         const float rel0 = elevationAt(d0, _profile.profile) - plot.origin_elev;
         const float rel1 = elevationAt(d1, _profile.profile) - plot.origin_elev;
 
