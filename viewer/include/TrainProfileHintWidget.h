@@ -28,6 +28,8 @@ public:
 
 private:
 
+    void drawProfile() const;
+
     TrainProfileHintWidgetParams *_params;
 
     simulator_train_profile_update_t _profile;
