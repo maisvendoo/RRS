@@ -531,7 +531,6 @@ void MainWindow::slotGetTopologyModulesData(QByteArray& modules_data)
 void MainWindow::slotGetTopologyModuleUpdate(QByteArray& module_update)
 {
     topology->slotTrajModuleUpdate(module_update);
-    ui->ptLog->appendPlainText(QString("Update %1").arg(count++));
 }
 
 //------------------------------------------------------------------------------

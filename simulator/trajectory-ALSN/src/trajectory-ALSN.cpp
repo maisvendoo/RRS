@@ -193,11 +193,6 @@ void TrajectoryALSN::deserialize(QByteArray& data)
 //------------------------------------------------------------------------------
 void TrajectoryALSN::getDrawElements(std::vector<draw_line_t>& lines, std::vector<draw_circle_t>& circles, const double scale)
 {
-    if (trajectory->getName() == "track_bat_nps-cho3")
-    {
-        int a = 2;
-        ++a;
-    }
     lines.reserve(trajectory->getTracks().size() * 2 + 2);
 
     // Вспомогательная функция для добавления параллельной треку линии в список отрисовки
