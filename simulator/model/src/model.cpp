@@ -1215,6 +1215,16 @@ void Model::prepareProfilesFeedback()
             upd.stations.push_back(station);
         }
 
+        // Ограничения скорости на профиле
+        upd.speed_limits.reserve(profile.speed_limits.size());
+        for (const profile_speed_limit_t& psl : profile.speed_limits)
+        {
+            simulator_train_profile_speed_limit_t sl;
+            sl.distance = static_cast<float>(psl.distance);
+            sl.speed_kmh = static_cast<float>(psl.speed_kmh);
+            upd.speed_limits.push_back(sl);
+        }
+
         update_profiles.push_back(upd);
     }
 }
