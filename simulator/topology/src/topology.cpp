@@ -86,6 +86,7 @@ bool Topology::load(QString route_dir, bool solve_errors)
 
         traj_list.insert(name, traj);
         connect(traj, &Trajectory::sendTrajBusyState, this, &Topology::sendTrajBusyState);
+        connect(traj, &Trajectory::sendModuleUpdate, this, &Topology::sendModuleUpdate);
     }
 
     if (traj_list.empty())
@@ -826,6 +827,27 @@ QByteArray Topology::serialize() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QByteArray Topology::serialize_modules() const
+{
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+
+    // Указываем число траекторий
+    stream << static_cast<uint32_t>(traj_list.size());
+
+    // Складываем в буфер сериализованную информацию о путевой инфраструктуре траекторий
+    for (const Trajectory* traj : traj_list)
+    {
+        stream << traj->getName();
+        stream << traj->serialize_modules();
+    }
+
+    return data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::deserialize(QByteArray& data)
 {
     QDataStream stream(&data, QIODevice::ReadOnly);
@@ -879,6 +901,40 @@ void Topology::deserialize(QByteArray& data)
         sw->deserialize(conn_data, traj_list);
 
         switches.insert(sw->getName(), sw);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::deserialize_modules(QByteArray& data)
+{
+    QDataStream stream(&data, QIODevice::ReadOnly);
+
+    // Число траекторий
+    uint32_t traj_count = 0;
+    stream >> traj_count;
+
+    // Добавляем модули в траектории
+    for (uint32_t i = 0; i < traj_count; ++i)
+    {
+        QString traj_name;
+        stream >> traj_name;
+
+        QByteArray modules_data;
+        stream >> modules_data;
+
+        if (traj_name.isEmpty())
+        {
+            continue;
+        }
+
+        Trajectory* traj = traj_list.value(traj_name, nullptr);
+
+        if (traj)
+        {
+            traj->deserialize_modules(modules_data);
+        }
     }
 }
 
@@ -1885,6 +1941,34 @@ void Topology::slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString
     }
 
     emit sigGetTrajState(vehicle_idx, station_idx, start_traj_name, traj_name, request_type, !route_seg.trajectories.empty());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Topology::slotTrajModuleUpdate(QByteArray& traj_module_data)
+{
+    QDataStream stream(&traj_module_data, QIODevice::ReadOnly);
+
+    QString traj_name;
+    stream >> traj_name;
+    std::uint32_t module_idx;
+    stream >> module_idx;
+    QByteArray modules_data;
+    stream >> modules_data;
+
+    if (traj_name.isEmpty())
+    {
+        return;
+    }
+
+    Trajectory* traj = traj_list.value(traj_name, nullptr);
+    if (!traj)
+    {
+        return;
+    }
+
+    traj->deserializeModuleUpdate(module_idx, modules_data);
 }
 
 //------------------------------------------------------------------------------

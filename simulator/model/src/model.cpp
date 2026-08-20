@@ -959,7 +959,11 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::requestTopologyData, this, &Model::slotGetTopologyData);
 
+    connect(tcp_server, &TcpServer::requestTopologyModules, this, &Model::slotGetTopologyModules);
+
     connect(topology, &Topology::sendTrajBusyState, tcp_server, &TcpServer::slotSendTrajBusyState);
+
+    connect(topology, &Topology::sendModuleUpdate, tcp_server, &TcpServer::slotSendTopologyModuleState);
 
     connect(topology, &Topology::sendSwitchState, tcp_server, &TcpServer::slotSendSwitchState);
 
@@ -1418,6 +1422,14 @@ void Model::slotTrainStepDone(int idx)
 void Model::slotGetTopologyData(QByteArray &topology_data)
 {
     topology_data = topology->serialize();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotGetTopologyModules(QByteArray &topology_modules)
+{
+    topology_modules = topology->serialize_modules();
 }
 
 //------------------------------------------------------------------------------
