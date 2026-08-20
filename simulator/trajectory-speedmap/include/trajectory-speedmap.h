@@ -22,6 +22,9 @@ public:
     std::vector<double> *getLimitEnds();
     double getTrajLength();
 
+    /// Ограничения скорости на траектории
+    std::vector<speed_limit_interval_t> getSpeedLimits() const override;
+
 protected:
 
     /// Ограничения скорости на траектории

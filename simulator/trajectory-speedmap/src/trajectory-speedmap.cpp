@@ -400,4 +400,22 @@ void TrajectorySpeedMap::load_config(CfgReader &cfg)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::vector<speed_limit_interval_t> TrajectorySpeedMap::getSpeedLimits() const
+{
+    std::vector<speed_limit_interval_t> result;
+    result.reserve(limits.size());
+    for (size_t i = 0; i < limits.size(); ++i)
+    {
+        speed_limit_interval_t sl;
+        sl.begin = limit_begins[i];
+        sl.end = limit_ends[i];
+        sl.speed_kmh = limits[i];
+        result.push_back(sl);
+    }
+    return result;
+}
+
 GET_MODULE(TrajectorySpeedMap)

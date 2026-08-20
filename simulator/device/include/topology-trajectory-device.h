@@ -10,6 +10,16 @@ class Trajectory;
 class ConnectorDevice;
 
 //------------------------------------------------------------------------------
+// Интервал ограничения скорости на траектории (для профиля пути)
+//------------------------------------------------------------------------------
+struct speed_limit_interval_t
+{
+    double begin = 0.0;
+    double end = 0.0;
+    double speed_kmh = 0.0;
+};
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 class DEVICE_EXPORT TrajectoryDevice : public QObject
@@ -54,6 +64,9 @@ public:
 
     /// Device configuration
     virtual void load_config(CfgReader &cfg);
+
+    /// Ограничения скорости на траектории (для профиля пути)
+    virtual std::vector<speed_limit_interval_t> getSpeedLimits() const { return {}; }
 
 protected:
 

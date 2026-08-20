@@ -23,6 +23,8 @@
 #include    <Journal.h>
 #include    <filesystem.h>
 
+#include    <topology-trajectory-device.h>
+
 #include    <queue>
 
 //------------------------------------------------------------------------------
@@ -2119,6 +2121,44 @@ namespace
     }
 
     //------------------------------------------------------------------------------
+    // Ограничения скорости на пройденном участке траектории
+    //------------------------------------------------------------------------------
+    void collectSpeedLimits(const Trajectory* traj, double entry_coord, double stop_coord, dir_t orient,
+                           double traveled, int kind, std::vector<profile_speed_limit_t>& out)
+    {
+        const std::vector<TrajectoryDevice*>& devices = traj->getTrajectoryDevices();
+        if (devices.empty())
+            return;
+
+        const double w_lo = std::min(entry_coord, stop_coord);
+        const double w_hi = std::max(entry_coord, stop_coord);
+
+        for (const TrajectoryDevice* dev : devices)
+        {
+            std::vector<speed_limit_interval_t> intervals = dev->getSpeedLimits();
+            if (intervals.empty())
+                continue;
+
+            for (const speed_limit_interval_t& sl : intervals)
+            {
+                // Интервал ограничения пересекается с пройденным диапазоном
+                const double ov_b = std::max(sl.begin, w_lo);
+                const double ov_e = std::min(sl.end, w_hi);
+                if (ov_e <= ov_b)
+                    continue;
+
+                // Ставим метку в начале интервала (на entry в зону)
+                profile_speed_limit_t ps;
+                ps.distance = (orient == FWD)
+                    ? kind * (traveled + (ov_b - entry_coord))
+                    : kind * (traveled + (entry_coord - ov_b));
+                ps.speed_kmh = sl.speed_kmh;
+                out.push_back(ps);
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------
     // Обход топологии от точки отсчёта на заданную дистанцию
     //------------------------------------------------------------------------------
     void walkProfile(Trajectory*& traj, double& coord, dir_t& orient,
@@ -2127,7 +2167,8 @@ namespace
                      std::vector<profile_vehicle_t>* vehicles,
                      std::vector<profile_signal_t>* signal_list,
                      const topology_stations_list_t* stations,
-                     std::vector<profile_station_t>* station_list)
+                     std::vector<profile_station_t>* station_list,
+                     std::vector<profile_speed_limit_t>* speed_limits)
     {
         if (traj == nullptr || limit_m <= 0.0)
             return;
@@ -2174,6 +2215,8 @@ namespace
                     collectVehicles(traj, coord, stop_coord, orient, traveled, kind, *vehicles);
                 if (station_list != nullptr && stations != nullptr)
                     collectStations(traj, coord, stop_coord, orient, traveled, kind, *stations, *station_list);
+                if (speed_limits != nullptr)
+                    collectSpeedLimits(traj, coord, stop_coord, orient, traveled, kind, *speed_limits);
                 traveled += step;
                 if (traveled >= limit_m - eps)
                     break;
@@ -2286,7 +2329,7 @@ namespace
         }
         if (!points.empty())
             points.back().inclination = points.size() > 1 ? points[points.size() - 2].inclination : 0.0;
-    }
+}
 
     //------------------------------------------------------------------------------
     // Ресемплинг ломаной на равномерную сетку и гауссово сглаживание высот
@@ -2458,6 +2501,8 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     std::vector<profile_signal_t> bwd_signals;
     std::vector<profile_station_t> fwd_stations;
     std::vector<profile_station_t> bwd_stations;
+    std::vector<profile_speed_limit_t> fwd_speed_limits;
+    std::vector<profile_speed_limit_t> bwd_speed_limits;
 
     // Ход вперёд
     Trajectory* fwd_traj = traj;
@@ -2465,7 +2510,7 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     dir_t fwd_orient = orient;
     walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points,
                 nullptr, &fwd_vehicles, &fwd_signals,
-                &stations, &fwd_stations);
+                &stations, &fwd_stations, &fwd_speed_limits);
 
     // Ход назад
     Trajectory* bwd_traj = traj;
@@ -2473,7 +2518,7 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     dir_t bwd_orient = static_cast<dir_t>(-orient);
     walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points,
                 nullptr, &bwd_vehicles, &bwd_signals,
-                &stations, &bwd_stations);
+                &stations, &bwd_stations, &bwd_speed_limits);
 
     // Сборка профиля: назад (по убыванию) + точка отсчёта + вперёд
     out.points.clear();
@@ -2538,6 +2583,18 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     out.stations.insert(out.stations.end(), fwd_stations.begin(), fwd_stations.end());
     std::sort(out.stations.begin(), out.stations.end(),
               [](const profile_station_t& a, const profile_station_t& b)
+              {
+                  return a.distance < b.distance;
+              });
+
+    // Сборка ограничений скорости: назад (по убыванию) + вперёд, упорядочены по distance
+    out.speed_limits.clear();
+    out.speed_limits.reserve(bwd_speed_limits.size() + fwd_speed_limits.size());
+    for (size_t i = bwd_speed_limits.size(); i > 0; --i)
+        out.speed_limits.push_back(bwd_speed_limits[i - 1]);
+    out.speed_limits.insert(out.speed_limits.end(), fwd_speed_limits.begin(), fwd_speed_limits.end());
+    std::sort(out.speed_limits.begin(), out.speed_limits.end(),
+              [](const profile_speed_limit_t& a, const profile_speed_limit_t& b)
               {
                   return a.distance < b.distance;
               });
