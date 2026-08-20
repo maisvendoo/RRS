@@ -1194,6 +1194,17 @@ void Model::prepareProfilesFeedback()
             upd.vehicles.push_back(vehicle);
         }
 
+        // Светофоры на профиле (попутные по ходу движения поезда)
+        upd.signal_list.reserve(profile.signal_list.size());
+        for (const profile_signal_t& ps : profile.signal_list)
+        {
+            simulator_train_profile_signal_t signal;
+            signal.distance = static_cast<float>(ps.distance);
+            signal.connector_name = ps.connector_name;
+            signal.signal_dir = ps.signal_dir;
+            upd.signal_list.push_back(signal);
+        }
+
         update_profiles.push_back(upd);
     }
 }

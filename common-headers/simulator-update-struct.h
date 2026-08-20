@@ -702,6 +702,42 @@ struct simulator_train_profile_vehicle_t final
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct simulator_train_profile_signal_t final
+{
+    /// Дистанция светофора от середины поезда, м (вперёд по ходу - «+», назад - «-»)
+    float distance = 0.0f;
+
+    /// Имя коннектора (стрелки), на котором установлен светофор
+    QString connector_name = "";
+
+    /// Направление светофора относительно коннектора (FWD=1, BWD=-1)
+    std::int8_t signal_dir = 0;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << distance;
+        stream << connector_name;
+        stream << signal_dir;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> distance;
+        stream >> connector_name;
+        stream >> signal_dir;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 struct simulator_train_profile_update_t final
 {
     /// Индекс поезда на текущий кадр
@@ -732,6 +768,10 @@ struct simulator_train_profile_update_t final
     /// (включая вагоны других поездов), упорядочены по begin_distance
     std::vector<simulator_train_profile_vehicle_t> vehicles;
 
+    /// Светофоры на профиле (попутные по ходу движения поезда),
+    /// упорядочены по distance
+    std::vector<simulator_train_profile_signal_t> signal_list;
+
     QByteArray serialize() const
     {
         QByteArray data;
@@ -756,6 +796,12 @@ struct simulator_train_profile_update_t final
         for (const auto& vehicle : vehicles)
         {
             stream << vehicle.serialize();
+        }
+
+        stream << static_cast<std::uint32_t>(signal_list.size());
+        for (const auto& signal : signal_list)
+        {
+            stream << signal.serialize();
         }
 
         return data;
@@ -799,6 +845,19 @@ struct simulator_train_profile_update_t final
             stream >> vehicle_data;
 
             vehicle.deserialize(vehicle_data);
+        }
+
+        stream >> num;
+
+        signal_list.clear();
+        signal_list.resize(num);
+
+        for (auto& signal : signal_list)
+        {
+            QByteArray signal_data;
+            stream >> signal_data;
+
+            signal.deserialize(signal_data);
         }
     }
 };
