@@ -56,6 +56,8 @@ private:
 
     void drawTrain(const PlotTransform& plot) const;
 
+    void drawTrainNames(const PlotTransform& plot) const;
+
     void drawSignals(const PlotTransform& plot) const;
 
     TrainProfileHintWidgetParams *_params;

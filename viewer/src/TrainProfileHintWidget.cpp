@@ -418,6 +418,8 @@ void TrainProfileHintWidget::drawProfile() const
     drawSignals(plot);
 
     drawTrain(plot);
+
+    drawTrainNames(plot);
 }
 
 //------------------------------------------------------------------------------
@@ -475,6 +477,133 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
         draw_list->AddLine(ImVec2(plot.map_x(d0), plot.map_y(rel0)),
                            ImVec2(plot.map_x(d1), plot.map_y(rel1)),
                            color, 5.0f);
+    }
+}
+
+//------------------------------------------------------------------------------
+// Отрисовка имён поездов над их составами на профиле. Имена берутся из
+// данных о поездах вьювера (VehiclesHandler::getTrainsInfo), где поезд задан
+// диапазоном model-index своих ПЕ. ПЕ профиля группируются по принадлежности
+// к поезду, интервалы соседних ПЕ одного поезда сливаются, имя рисуется над
+// центром видимой части состава
+//------------------------------------------------------------------------------
+void TrainProfileHintWidget::drawTrainNames(const PlotTransform& plot) const
+{
+    if (!_params->vehicles_handler)
+        return;
+
+    const auto& trains_info = _params->vehicles_handler->getTrainsInfo();
+    if (trains_info.empty())
+        return;
+
+    const std::vector<simulator_train_profile_vehicle_t>& vehicles = _profile.vehicles;
+    if (vehicles.empty())
+        return;
+
+    // Запрошенный диапазон отображения (как в drawTrain)
+    const float cfg_backward = std::max(_params->backward_m, 0.0f);
+    const float cfg_forward = std::max(_params->forward_m, 0.0f);
+    const float req_backward = std::min(cfg_backward, std::max(_profile.backward_requested, 0.0f));
+    const float req_forward = std::min(cfg_forward, std::max(_profile.forward_requested, 0.0f));
+
+    // Диапазоны model-index ПЕ поездов из данных вьювера
+    struct train_range_t
+    {
+        int begin_id = 0;
+        int end_id = 0;
+        QString name;
+    };
+    std::vector<train_range_t> ranges;
+    ranges.reserve(trains_info.size());
+    for (const auto& info : trains_info)
+    {
+        train_range_t range;
+        range.begin_id = std::min(info.first_vehicle_id, info.last_vehicle_id);
+        range.end_id = std::max(info.first_vehicle_id, info.last_vehicle_id);
+        range.name = info.train_name;
+        ranges.push_back(range);
+    }
+
+    // Группировка ПЕ профиля по поездам: для каждой ПЕ находим поезд по
+    // model-index, соседние ПЕ одного поезда сливаем в один интервал
+    struct train_group_t
+    {
+        int train_index = -1;
+        QString name;
+        float begin = 0.0f;
+        float end = 0.0f;
+    };
+    std::vector<train_group_t> groups;
+
+    for (const auto& vehicle : vehicles)
+    {
+        const int model_index = vehicle.vehicle_id;
+
+        int matched_index = -1;
+        for (size_t i = 0; i < ranges.size(); ++i)
+        {
+            if (model_index >= ranges[i].begin_id && model_index <= ranges[i].end_id)
+            {
+                matched_index = static_cast<int>(i);
+                break;
+            }
+        }
+        if (matched_index < 0 || ranges[matched_index].name.isEmpty())
+            continue;
+
+        if (!groups.empty() && groups.back().train_index == matched_index
+            && vehicle.begin_distance <= groups.back().end + 1e-3f)
+        {
+            groups.back().end = std::max(groups.back().end, vehicle.end_distance);
+        }
+        else
+        {
+            train_group_t group;
+            group.train_index = matched_index;
+            group.name = ranges[matched_index].name;
+            group.begin = vehicle.begin_distance;
+            group.end = vehicle.end_distance;
+            groups.push_back(group);
+        }
+    }
+
+    if (groups.empty())
+        return;
+
+    const int current_train_index = _params->vehicles_handler->getCurrentTrainIndex();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    const float text_offset_y = 12.0f;  // отступ подписи над линией профиля
+
+    for (const auto& group : groups)
+    {
+        // Обрезаем интервал поезда по видимой области
+        const float g0 = std::max(group.begin, -req_backward);
+        const float g1 = std::min(group.end, req_forward);
+        if (g1 <= g0)
+            continue;
+
+        // Центр видимой части состава и высота профиля в этой точке
+        const float center = 0.5f * (g0 + g1);
+        const float rel = elevationAt(center, _profile.profile) - plot.origin_elev;
+        const float x = plot.map_x(center);
+        const float y = plot.map_y(rel);
+
+        // Текущий поезд выделяем жёлтым, остальные - белым
+        const bool is_current = (group.train_index == current_train_index);
+        const ImU32 color = is_current ? IM_COL32(255, 230, 0, 255)
+                                       : IM_COL32(255, 255, 255, 255);
+
+        const std::string label = group.name.toStdString();
+        const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
+        const float tx = x - text_size.x * 0.5f;
+        const float ty = y - text_offset_y - text_size.y;
+
+        // Тёмная подложка для читаемости на фоне профиля
+        draw_list->AddRectFilled(ImVec2(tx - 3.0f, ty - 2.0f),
+                                 ImVec2(tx + text_size.x + 3.0f, ty + text_size.y + 2.0f),
+                                 IM_COL32(0, 0, 0, 160));
+        draw_list->AddText(ImVec2(tx, ty), color, label.c_str());
     }
 }
 
