@@ -16,7 +16,11 @@ public:
 
     /// Шаг симуляции
     void step(double t, double dt) override;
-
+/* TODO
+    QByteArray serialize() const override;
+    void deserialize(QByteArray& data) override;
+    void getDrawElements(std::vector<draw_line_t>& lines, std::vector<draw_circle_t>& circles, const double scale) override;
+*/
     std::vector<double> *getLimits();
     std::vector<double> *getLimitBegins();
     std::vector<double> *getLimitEnds();

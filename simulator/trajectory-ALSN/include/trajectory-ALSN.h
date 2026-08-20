@@ -18,17 +18,32 @@ public:
     /// Шаг симуляции
     void step(double t, double dt) override;
 
+    QByteArray serialize() const override;
+    void deserialize(QByteArray& data) override;
+    void getDrawElements(std::vector<draw_line_t>& lines, std::vector<draw_circle_t>& circles, const double scale) override;
+
     void setNextSignalInfo(std::int8_t dir, ALSN code, double distance, const QString& liter);
 
-protected:
+private:
 
     /// Несущая частота сигнала, Гц
     double frequency = 0.0;
 
     /// Код от сигнала спереди
     ALSN code_from_fwd = ALSN::NO_CODE;
+    ALSN prev_code_from_fwd = ALSN::NO_CODE;
     /// Код от сигнала сзади
     ALSN code_from_bwd = ALSN::NO_CODE;
+    ALSN prev_code_from_bwd = ALSN::NO_CODE;
+
+    /// Координаты занятого участка траектории
+    /// (от начала первой ПЕ до конца последней ПЕ);
+    /// между ними сигнала АЛСН нет,
+    /// так как он зашунтирован колёсными парами
+    double busy_begin_coord = -1.0;
+    double prev_busy_begin_coord = -1.0;
+    double busy_end_coord = -1.0;
+    double prev_busy_end_coord = -1.0;
 
     /// Дистанция до сигнала спереди на следующих траекториях
     double distance_fwd = 0.0;
@@ -42,8 +57,6 @@ protected:
 
     /// Инициализация и чтение конфигурационного файла
     void load_config(CfgReader &cfg) override;
-
-private:
 
     /// Очистка
     void clear_code();

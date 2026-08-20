@@ -1,7 +1,9 @@
 #ifndef     ALSN_H
 #define     ALSN_H
 
-enum ALSN
+#include <cstdint>
+
+enum ALSN : std::uint8_t
 {
     NO_CODE = 0,
     RED_YELLOW = 1,

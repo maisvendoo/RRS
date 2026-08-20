@@ -304,7 +304,40 @@ void TrajectorySpeedMap::step(double t, double dt)
         device.device->setInputSignal(SpeedMap::INPUT_NEXT_DISTANCE, distance_to_next_limit);
     }
 }
+/*
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QByteArray TrajectorySpeedMap::serialize() const
+{
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
+    // Кладем в буфер имя модуля
+    stream << name;
+
+    return data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrajectorySpeedMap::deserialize(QByteArray& data)
+{
+    QDataStream stream(&data, QIODevice::ReadOnly);
+
+    // Восстанавливаем имя
+    stream >> name;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrajectorySpeedMap::getDrawElements(std::vector<draw_line_t>& lines, std::vector<draw_circle_t>& circles, const double scale)
+{
+
+}
+*/
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
