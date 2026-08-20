@@ -2119,39 +2119,53 @@ namespace
             if (next_sw == nullptr)
                 break;
 
-            // Сбор попутного сигнала, установленного на стрелке: при движении
-            // вперёд берём сигнал FWD стрелки, при движении назад - BWD.
-            // Сигнал стоит на траектории перед коннектором (см. Signal::calcPosition),
-            // поэтому его можно собрать только если он установлен на ветви, по которой
-            // движется поезд (иначе это сигнал соседнего пути)
+            // Сбор попутного сигнала, установленного на стрелке: это сигнал той
+            // ветви, по которой поезд подходит к стрелке (см. Signal::calcPosition).
+            // При движении вперёд это текущая траектория и сигнал FWD стрелки;
+            // при движении назад - это уже проследованная ветвь за стрелкой и тот
+            // же попутный сигнал FWD, оставшийся позади поезда
             if (signal_list != nullptr)
             {
-                const Signal* signal = (kind > 0) ? next_sw->getSignalFwd()
-                                                  : next_sw->getSignalBwd();
-                if (signal != nullptr)
-                {
-                    const Trajectory* signal_traj = nullptr;
-                    if (kind > 0)
-                    {
-                        signal_traj = next_sw->trajectories[SW_BWD_PLUS]
-                            ? next_sw->trajectories[SW_BWD_PLUS]
-                            : next_sw->trajectories[SW_BWD_MINUS];
-                    }
-                    else
-                    {
-                        signal_traj = next_sw->trajectories[SW_FWD_PLUS]
-                            ? next_sw->trajectories[SW_FWD_PLUS]
-                            : next_sw->trajectories[SW_FWD_MINUS];
-                    }
+                const Signal* signal = nullptr;
+                const Trajectory* signal_traj = nullptr;
+                const Trajectory* passed_traj = nullptr;
 
-                    if (signal_traj == traj)
-                    {
-                        profile_signal_t ps;
-                        ps.distance = kind * traveled;
-                        ps.connector_name = signal->getConnectorName();
-                        ps.signal_dir = signal->getDirection();
-                        signal_list->push_back(ps);
-                    }
+                if (kind > 0)
+                {
+                    signal = next_sw->getSignalFwd();
+                    signal_traj = next_sw->trajectories[SW_BWD_PLUS]
+                        ? next_sw->trajectories[SW_BWD_PLUS]
+                        : next_sw->trajectories[SW_BWD_MINUS];
+                }
+                else
+                {
+                    // Ветвь, по которой поезд уже проехал стрелку, определяем так же,
+                    // как переход на следующую траекторию при обходе назад
+                    dir_t passed_dir = exit_dir;
+                    passed_traj = next_sw->getNextTraj(passed_dir);
+                    const bool on_bwd_branch =
+                        (passed_traj == next_sw->trajectories[SW_BWD_PLUS])
+                        || (passed_traj == next_sw->trajectories[SW_BWD_MINUS]);
+                    signal = on_bwd_branch ? next_sw->getSignalFwd()
+                                           : next_sw->getSignalBwd();
+                    signal_traj = on_bwd_branch
+                        ? (next_sw->trajectories[SW_BWD_PLUS]
+                            ? next_sw->trajectories[SW_BWD_PLUS]
+                            : next_sw->trajectories[SW_BWD_MINUS])
+                        : (next_sw->trajectories[SW_FWD_PLUS]
+                            ? next_sw->trajectories[SW_FWD_PLUS]
+                            : next_sw->trajectories[SW_FWD_MINUS]);
+                }
+
+                const Trajectory* matched_traj = (kind > 0) ? traj : passed_traj;
+                if ((signal != nullptr) && (matched_traj != nullptr)
+                    && (signal_traj == matched_traj))
+                {
+                    profile_signal_t ps;
+                    ps.distance = kind * traveled;
+                    ps.connector_name = signal->getConnectorName();
+                    ps.signal_dir = signal->getDirection();
+                    signal_list->push_back(ps);
                 }
             }
 
