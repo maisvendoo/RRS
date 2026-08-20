@@ -96,6 +96,8 @@ static float elevationAt(float distance,
 //------------------------------------------------------------------------------
 static int signalLensCount(const QString& model)
 {
+    if (model.isEmpty() || model.startsWith("empty_"))
+        return 0;
     if (model.endsWith("line"))
         return 3;
     if (model.endsWith("entr") || model.endsWith("rout"))
@@ -535,6 +537,12 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
             continue;
 
         const QString model = traffic_light->getModelName();
+
+        // Модели empty_* - заглушки для цепей АЛСН на неправильном пути,
+        // не являются попутными сигналами и не должны отображаться
+        if (model.isEmpty() || model.startsWith("empty_"))
+            continue;
+
         const lens_state_t& lens = traffic_light->getLensState();
 
         // Набор линз и порядок их следования снизу вверх (как в tools/route-map)

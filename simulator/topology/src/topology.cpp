@@ -2159,7 +2159,9 @@ namespace
 
                 const Trajectory* matched_traj = (kind > 0) ? traj : passed_traj;
                 if ((signal != nullptr) && (matched_traj != nullptr)
-                    && (signal_traj == matched_traj))
+                    && (signal_traj == matched_traj)
+                    && (!signal->getSignalModel().isEmpty())
+                    && (!signal->getSignalModel().startsWith("empty_")))
                 {
                     profile_signal_t ps;
                     ps.distance = kind * traveled;
