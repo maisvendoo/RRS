@@ -2,7 +2,6 @@
 #define     TOPOLOGY_TYPES_H
 
 #include    "topology-export.h"
-#include    "signal-types.h"
 
 #include    <QByteArray>
 #include    <QString>
@@ -93,14 +92,11 @@ struct TOPOLOGY_EXPORT profile_signal_t
     /// Дистанция светофора от точки отсчёта профиля, м (вперёд по ходу - «+», назад - «-»)
     double distance = 0.0;
 
-    /// Тип светофора (суффикс модели: line/entr/rout/exit/shnt)
-    QString signal_type = "";
+    /// Имя коннектора (стрелки), на котором установлен светофор
+    QString connector_name = "";
 
-    /// Состояние линз светофора
-    lens_state_t lens = {};
-
-    /// Литер светофора
-    QString letter = "";
+    /// Направление светофора относительно коннектора (FWD=1, BWD=-1)
+    std::int8_t signal_dir = 0;
 };
 
 //------------------------------------------------------------------------------

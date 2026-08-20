@@ -2148,9 +2148,8 @@ namespace
                     {
                         profile_signal_t ps;
                         ps.distance = kind * traveled;
-                        ps.signal_type = signal->getSignalType();
-                        ps.lens = signal->getAllLensState();
-                        ps.letter = signal->getLetter();
+                        ps.connector_name = signal->getConnectorName();
+                        ps.signal_dir = signal->getDirection();
                         signal_list->push_back(ps);
                     }
                 }
