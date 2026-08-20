@@ -60,6 +60,8 @@ private:
 
     void drawSignals(const PlotTransform& plot) const;
 
+    void drawStations(const PlotTransform& plot) const;
+
     TrainProfileHintWidgetParams *_params;
 
     simulator_train_profile_update_t _profile;

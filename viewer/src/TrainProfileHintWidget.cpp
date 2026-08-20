@@ -420,6 +420,8 @@ void TrainProfileHintWidget::drawProfile() const
     drawTrain(plot);
 
     drawTrainNames(plot);
+
+    drawStations(plot);
 }
 
 //------------------------------------------------------------------------------
@@ -600,6 +602,48 @@ void TrainProfileHintWidget::drawTrainNames(const PlotTransform& plot) const
         const float ty = y - text_offset_y - text_size.y;
 
         draw_list->AddText(ImVec2(tx, ty), color, label.c_str());
+    }
+}
+
+//------------------------------------------------------------------------------
+// Отрисовка названий станций на профиле. Станции приходят из обновления
+// профиля (модель передаёт станции, попадающие на траектории профиля).
+// Название рисуется под линией профиля без подложки, как литеры светофоров
+//------------------------------------------------------------------------------
+void TrainProfileHintWidget::drawStations(const PlotTransform& plot) const
+{
+    const std::vector<simulator_train_profile_station_t>& stations = _profile.stations;
+    if (stations.empty())
+        return;
+
+    const float cfg_backward = std::max(_params->backward_m, 0.0f);
+    const float cfg_forward = std::max(_params->forward_m, 0.0f);
+    const float req_backward = std::min(cfg_backward, std::max(_profile.backward_requested, 0.0f));
+    const float req_forward = std::min(cfg_forward, std::max(_profile.forward_requested, 0.0f));
+
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    const float text_offset_y = 12.0f;  // отступ подписи под линией профиля
+    const ImU32 text_col = IM_COL32(0, 200, 255, 255);  // голубой, как литеры светофоров
+
+    for (const auto& station : stations)
+    {
+        if (station.distance < -req_backward || station.distance > req_forward)
+            continue;
+
+        const std::string label = station.name.toStdString();
+        if (label.empty())
+            continue;
+
+        const float x = plot.map_x(station.distance);
+        const float rel = elevationAt(station.distance, _profile.profile) - plot.origin_elev;
+        const float y_base = plot.map_y(rel);
+
+        const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
+        const float tx = x - text_size.x * 0.5f;
+        const float ty = y_base + text_offset_y;
+
+        draw_list->AddText(ImVec2(tx, ty), text_col, label.c_str());
     }
 }
 
