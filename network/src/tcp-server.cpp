@@ -105,6 +105,15 @@ void TcpServer::process_client_request(client_data_t &client_data)
         clients_for_topology_updates.insert(client_data.socket);
         break;
     }
+    case STYPE_REQUEST_TOPOLOGY_MODULES:
+    {
+        client_data.received_data.data.clear();
+
+        //Journal::instance()->info(QString("Received topology modules request for #%1").arg(client_data.id));
+        send_topology_modules(client_data);
+        clients_for_topology_modules_updates.insert(client_data.socket);
+        break;
+    }
 /*    case STYPE_REQUEST_TOPOLOGY_UPDATE:
     {
         client_data.received_data.data.clear();
@@ -342,6 +351,22 @@ void TcpServer::send_topology_data(client_data_t &client_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpServer::send_topology_modules(client_data_t &client_data)
+{
+    QByteArray data;
+    emit requestTopologyModules(data);
+
+    network_data_t net_data;
+    net_data.stype = STYPE_TOPOLOGY_MODULES;
+    net_data.data = data;
+
+    client_data.socket->write(net_data.serialize());
+    client_data.socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpServer::send_signals_data(client_data_t &client_data)
 {
     QByteArray data;
@@ -437,6 +462,7 @@ void TcpServer::remove_client(QTcpSocket* socket)
     clients_data.remove(socket);
     clients_for_players_info_updates.remove(socket);
     clients_for_topology_updates.remove(socket);
+    clients_for_topology_modules_updates.remove(socket);
     clients_for_signals_updates.remove(socket);
     clients_for_vehicles_pos_updates.remove(socket);
     clients_for_vehicles_updates.remove(socket);
@@ -619,6 +645,26 @@ void TcpServer::slotSendTrajBusyState(QByteArray busy_state)
     net_data.data = busy_state;
 
     for (auto client_socket : clients_for_topology_updates)
+    {
+        send_data(client_socket, net_data);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::slotSendTopologyModuleState(QByteArray module_state)
+{
+    if (clients_for_topology_modules_updates.empty())
+    {
+        return;
+    }
+
+    network_data_t net_data;
+    net_data.stype = STYPE_TOPOLOGY_MODULE_UPDATE;
+    net_data.data = module_state;
+
+    for (auto client_socket : clients_for_topology_modules_updates)
     {
         send_data(client_socket, net_data);
     }

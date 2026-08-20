@@ -61,7 +61,11 @@ enum StructureType : uint8_t
     STYPE_COMMAND_REVERSE_TRAIN,
 
     STYPE_REQUEST_TRAIN_PROFILE_UPDATE,
-    STYPE_TRAIN_PROFILE_UPDATE
+    STYPE_TRAIN_PROFILE_UPDATE,
+
+    STYPE_REQUEST_TOPOLOGY_MODULES,
+    STYPE_TOPOLOGY_MODULES,
+    STYPE_TOPOLOGY_MODULE_UPDATE
 };
 
 //------------------------------------------------------------------------------
