@@ -385,8 +385,13 @@ void TrainProfileHintWidget::drawProfile() const
 
             draw_list->AddLine(ImVec2(gx, y0), ImVec2(gx, y1), grid_col, 1.0f);
 
-            // Если километр и пикет равны 0 - подпись не рисуем, отметку оставляем
+            // Текстовую подпись рисуем только на целых километрах; на пикетах
+            // (в том числе пятом, шаг сетки 500 м) оставляем только вертикальную линию
             if (rc < 100.0f)
+                continue;
+
+            const int piket = (static_cast<int>(rc) % 1000) / 100;
+            if (piket != 0)
                 continue;
 
             const QString label = formatKmPiket(rc);
