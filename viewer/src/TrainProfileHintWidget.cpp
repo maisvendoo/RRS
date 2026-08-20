@@ -197,21 +197,13 @@ static void collectGridMarks(const std::vector<simulator_train_profile_point_t>&
 // Формат подписи метки сетки: "километр пикет" (пикет = 100 м).
 // Для ровного километра пикет не выводится
 //------------------------------------------------------------------------------
-static void formatKmPiket(float railway_coord, char *buf, size_t buf_size)
+static QString formatKmPiket(float railway_coord)
 {
     int km = static_cast<int>(railway_coord) / 1000;
     int piket = (static_cast<int>(railway_coord) % 1000) / 100;
-#ifdef _WIN32
     if (piket == 0)
-        snprintf(buf, buf_size, "%dкм", km);
-    else
-        snprintf(buf, buf_size, "%dкм %dпк", km, piket);
-#else
-    if (piket == 0)
-        std::snprintf(buf, buf_size, "%dкм", km);
-    else
-        std::snprintf(buf, buf_size, "%dкм %dпк", km, piket);
-#endif
+        return QString("%1км").arg(km);
+    return QString("%1км %2пк").arg(km).arg(piket);
 }
 
 //------------------------------------------------------------------------------
@@ -324,11 +316,10 @@ void TrainProfileHintWidget::drawProfile() const
             if (rc < 100.0f)
                 continue;
 
-            char label[32];
-            formatKmPiket(rc, label, sizeof(label));
-            const float text_w = ImGui::CalcTextSize(label).x;
+            const QString label = formatKmPiket(rc);
+            const float text_w = ImGui::CalcTextSize(label.toStdString().c_str()).x;
             const float tx = std::max(x0, std::min(gx - text_w * 0.5f, x1 - text_w));
-            draw_list->AddText(ImVec2(tx, label_y), label_col, label);
+            draw_list->AddText(ImVec2(tx, label_y), label_col, label.toStdString().c_str());
         }
     }
 
