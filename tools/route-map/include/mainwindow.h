@@ -46,7 +46,7 @@ public:
     ~MainWindow();
 
 private:
-
+    int count = 0;
     Ui::MainWindow *ui;
 
     tcp_config_t tcp_config;
@@ -60,6 +60,8 @@ private:
     Topology *topology = new Topology;
 
     Trajectory* route_begin_trajectory = nullptr;
+
+    QAction* menu_view_separator = {};
 
     int route_dir = 0;
 
@@ -102,6 +104,10 @@ private slots:
     void slotGetVehicleInfoData(QByteArray &data);
 
     void slotGetTopologyData(QByteArray &topology_data);
+
+    void slotGetTopologyModulesData(QByteArray& modules_data);
+
+    void slotGetTopologyModuleUpdate(QByteArray& module_update);
 
     void slotGetSignalsData(QByteArray &sig_data);
 

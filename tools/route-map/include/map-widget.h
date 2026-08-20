@@ -62,6 +62,8 @@ public:
 
     std::vector<TrainLabel *> train_labels;
 
+    QMap<QString, QAction*> menu_view_topology_modules;
+
     struct switch_menu_t {
         QMenu* menu = nullptr;
         QAction* action = nullptr;
@@ -213,10 +215,12 @@ private:
     bool show_sim_time = false;
     QString sim_time = "";
 
-    void paintEvent(QPaintEvent *event);    
+    void paintEvent(QPaintEvent *event);
 
     void drawTrajectory(Trajectory* traj, QPainter& painter,
                         QPointF& cursor_pos, double& distance2);
+
+    void drawTrajectoryModules(Trajectory* traj, QPainter& painter);
 
     void drawTrains(simulator_update_pos_t *train_data, QPainter& painter);
 

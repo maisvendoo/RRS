@@ -7,6 +7,7 @@
 #include    <signal-command.h>
 #include    <switch.h>
 #include    <switch-state.h>
+#include    <topology-trajectory-device.h>
 
 #include    <QByteArray>
 #include    <QClipboard>
@@ -71,6 +72,12 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
 
     connect(tcp_client, &TcpClient::setTrainInfo,
             this, &MainWindow::slotGetTrainsInfo);
+
+    connect(tcp_client, &TcpClient::setTopologyModules,
+            this, &MainWindow::slotGetTopologyModulesData);
+
+    connect(tcp_client, &TcpClient::setTopologyModuleUpdate,
+            this, &MainWindow::slotGetTopologyModuleUpdate);
 
     for (auto action : ui->mSimSpeed->actions())
     {
@@ -409,7 +416,6 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 
     updateStations();
     map->slotStationAtCenter(0);
-    map->slotPlayerAtCenter(0);
 
     if ( (topology->getTrajectoriesList() == nullptr) || (topology->getConnectorsList() == nullptr) )
     {
@@ -435,6 +441,18 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
         delete tl;
     }
     map->traj_labels.clear();
+
+    if (menu_view_separator)
+    {
+        ui->menuView->removeAction(menu_view_separator);
+        delete menu_view_separator;
+    }
+    for (auto action_view_module : map->menu_view_topology_modules)
+    {
+        ui->menuView->removeAction(action_view_module);
+        delete action_view_module;
+    }
+    map->menu_view_topology_modules.clear();
 
     for (auto traj : *topology->getTrajectoriesList())
     {
@@ -470,6 +488,50 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     // Запрос серверу на загрузку сигналов
     tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
     ui->ptLog->appendPlainText(tr("Send request for signals data loading..."));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetTopologyModulesData(QByteArray& modules_data)
+{
+    topology->deserialize_modules(modules_data);
+
+    for (auto traj : *topology->getTrajectoriesList())
+    {
+        for (auto device : traj->getTrajectoryDevices())
+        {
+            QString module_name = device->getName();
+            if (module_name.isEmpty())
+            {
+                continue;
+            }
+            if (map->menu_view_topology_modules.find(module_name) == map->menu_view_topology_modules.end())
+            {
+                QAction* action_view_module = new QAction(module_name, ui->menuView);
+                map->menu_view_topology_modules.insert(module_name, action_view_module);
+            }
+        }
+    }
+
+    if (!map->menu_view_topology_modules.empty())
+    {
+        menu_view_separator = ui->menuView->addSeparator();
+        for (auto action_view_module : map->menu_view_topology_modules)
+        {
+            action_view_module->setCheckable(true);
+            ui->menuView->addAction(action_view_module);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetTopologyModuleUpdate(QByteArray& module_update)
+{
+    topology->slotTrajModuleUpdate(module_update);
+    ui->ptLog->appendPlainText(QString("Update %1").arg(count++));
 }
 
 //------------------------------------------------------------------------------
@@ -610,6 +672,8 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
                             static_cast<double>(vehicles_pos_update_interval) / 1000.0);
     ui->ptLog->appendPlainText(tr("Send request for continuous vehicles update"));
 
+    // Запрос серверу на модули путевой инфраструктуры
+    tcp_client->sendRequest(STYPE_REQUEST_TOPOLOGY_MODULES);
 }
 
 //------------------------------------------------------------------------------
