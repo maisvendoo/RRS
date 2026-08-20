@@ -23,6 +23,7 @@
 #include    <Journal.h>
 #include    <filesystem.h>
 
+#include    "speed-limit-source.h"
 #include    <topology-trajectory-device.h>
 
 #include    <queue>
@@ -2133,9 +2134,13 @@ namespace
         const double w_lo = std::min(entry_coord, stop_coord);
         const double w_hi = std::max(entry_coord, stop_coord);
 
-        for (const TrajectoryDevice* dev : devices)
+        for (TrajectoryDevice* dev : devices)
         {
-            std::vector<speed_limit_interval_t> intervals = dev->getSpeedLimits();
+            SpeedLimitSource* sls = dynamic_cast<SpeedLimitSource*>(dev);
+            if (sls == nullptr)
+                continue;
+
+            std::vector<speed_limit_interval_t> intervals = sls->getSpeedLimits();
             if (intervals.empty())
                 continue;
 
