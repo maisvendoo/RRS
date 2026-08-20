@@ -599,10 +599,6 @@ void TrainProfileHintWidget::drawTrainNames(const PlotTransform& plot) const
         const float tx = x - text_size.x * 0.5f;
         const float ty = y - text_offset_y - text_size.y;
 
-        // Тёмная подложка для читаемости на фоне профиля
-        draw_list->AddRectFilled(ImVec2(tx - 3.0f, ty - 2.0f),
-                                 ImVec2(tx + text_size.x + 3.0f, ty + text_size.y + 2.0f),
-                                 IM_COL32(0, 0, 0, 160));
         draw_list->AddText(ImVec2(tx, ty), color, label.c_str());
     }
 }
