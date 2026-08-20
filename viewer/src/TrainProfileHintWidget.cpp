@@ -527,7 +527,10 @@ void TrainProfileHintWidget::drawTrainNames(const PlotTransform& plot) const
     }
 
     // Группировка ПЕ профиля по поездам: для каждой ПЕ находим поезд по
-    // model-index, соседние ПЕ одного поезда сливаем в один интервал
+    // model-index и объединяем в общий интервал состава. Все интервалы одного
+    // поезда сливаются в одну группу независимо от разрывов между ними
+    // (например, при пересечении точкой отсчёта профиля), чтобы имя поезда
+    // рисовалось один раз над центром всего состава
     struct train_group_t
     {
         int train_index = -1;
@@ -553,12 +556,18 @@ void TrainProfileHintWidget::drawTrainNames(const PlotTransform& plot) const
         if (matched_index < 0 || ranges[matched_index].name.isEmpty())
             continue;
 
-        if (!groups.empty() && groups.back().train_index == matched_index
-            && vehicle.begin_distance <= groups.back().end + 1e-3f)
+        bool merged = false;
+        for (auto& group : groups)
         {
-            groups.back().end = std::max(groups.back().end, vehicle.end_distance);
+            if (group.train_index == matched_index)
+            {
+                group.begin = std::min(group.begin, vehicle.begin_distance);
+                group.end = std::max(group.end, vehicle.end_distance);
+                merged = true;
+                break;
+            }
         }
-        else
+        if (!merged)
         {
             train_group_t group;
             group.train_index = matched_index;
