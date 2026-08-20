@@ -427,6 +427,8 @@ void TrainProfileHintWidget::drawProfile() const
     drawTrainNames(plot);
 
     drawStations(plot);
+
+    drawSpeedLimits(plot);
 }
 
 //------------------------------------------------------------------------------
@@ -782,5 +784,50 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
             draw_list->AddText(ImVec2(x - text_w * 0.5f, y_top - 16.0f),
                                IM_COL32(255, 255, 255, 255), label.c_str());
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
+{
+    const std::vector<simulator_train_profile_speed_limit_t>& limits = _profile.speed_limits;
+    if (limits.empty())
+        return;
+
+    const float cfg_backward = std::max(_params->backward_m, 0.0f);
+    const float cfg_forward = std::max(_params->forward_m, 0.0f);
+    const float req_backward = std::min(cfg_backward, std::max(_profile.backward_requested, 0.0f));
+    const float req_forward = std::min(cfg_forward, std::max(_profile.forward_requested, 0.0f));
+
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    const float bar_height = 30.0f;
+    const float bar_width = 4.0f;
+    const ImU32 bar_col = IM_COL32(255, 165, 0, 230);
+    const ImU32 text_col = IM_COL32(255, 255, 255, 255);
+
+    for (const auto& sl : limits)
+    {
+        if (sl.distance < -req_backward || sl.distance > req_forward)
+            continue;
+
+        const float x = plot.map_x(sl.distance);
+        const float rel = elevationAt(sl.distance, _profile.profile) - plot.origin_elev;
+        const float y_base = plot.map_y(rel);
+
+        const float x0 = x - bar_width * 0.5f;
+        const float x1 = x + bar_width * 0.5f;
+        const float y_top = y_base - bar_height;
+
+        draw_list->AddRectFilled(ImVec2(x0, y_top), ImVec2(x1, y_base), bar_col);
+
+        const std::string label = std::to_string(static_cast<int>(sl.speed_kmh));
+        const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
+        const float tx = x - text_size.x * 0.5f;
+        const float ty = y_top - text_size.y - 2.0f;
+
+        draw_list->AddText(ImVec2(tx, ty), text_col, label.c_str());
     }
 }

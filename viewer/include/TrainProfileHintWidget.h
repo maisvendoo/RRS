@@ -62,6 +62,8 @@ private:
 
     void drawStations(const PlotTransform& plot) const;
 
+    void drawSpeedLimits(const PlotTransform& plot) const;
+
     TrainProfileHintWidgetParams *_params;
 
     simulator_train_profile_update_t _profile;
