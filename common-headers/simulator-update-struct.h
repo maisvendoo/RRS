@@ -738,6 +738,37 @@ struct simulator_train_profile_signal_t final
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct simulator_train_profile_station_t final
+{
+    /// Дистанция станции от середины поезда, м (вперёд по ходу - «+», назад - «-»)
+    float distance = 0.0f;
+
+    /// Название станции
+    QString name = "";
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << distance;
+        stream << name;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> distance;
+        stream >> name;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 struct simulator_train_profile_update_t final
 {
     /// Индекс поезда на текущий кадр
@@ -772,6 +803,9 @@ struct simulator_train_profile_update_t final
     /// упорядочены по distance
     std::vector<simulator_train_profile_signal_t> signal_list;
 
+    /// Станции на профиле, упорядочены по distance
+    std::vector<simulator_train_profile_station_t> stations;
+
     QByteArray serialize() const
     {
         QByteArray data;
@@ -802,6 +836,12 @@ struct simulator_train_profile_update_t final
         for (const auto& signal : signal_list)
         {
             stream << signal.serialize();
+        }
+
+        stream << static_cast<std::uint32_t>(stations.size());
+        for (const auto& station : stations)
+        {
+            stream << station.serialize();
         }
 
         return data;
@@ -858,6 +898,19 @@ struct simulator_train_profile_update_t final
             stream >> signal_data;
 
             signal.deserialize(signal_data);
+        }
+
+        stream >> num;
+
+        stations.clear();
+        stations.resize(num);
+
+        for (auto& station : stations)
+        {
+            QByteArray station_data;
+            stream >> station_data;
+
+            station.deserialize(station_data);
         }
     }
 };

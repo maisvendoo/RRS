@@ -1205,6 +1205,16 @@ void Model::prepareProfilesFeedback()
             upd.signal_list.push_back(signal);
         }
 
+        // Станции на профиле
+        upd.stations.reserve(profile.stations.size());
+        for (const profile_station_t& pst : profile.stations)
+        {
+            simulator_train_profile_station_t station;
+            station.distance = static_cast<float>(pst.distance);
+            station.name = pst.name;
+            upd.stations.push_back(station);
+        }
+
         update_profiles.push_back(upd);
     }
 }
