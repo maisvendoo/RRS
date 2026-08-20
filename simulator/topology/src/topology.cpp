@@ -2073,7 +2073,10 @@ namespace
             return;
 
         const double eps = 1e-9;
-        const double max_station_dist = 50.0;
+        // Порог захвата станций: расстояние от оси пути поезда. Берём с запасом,
+        // т.к. на многопутных участках станция может стоять у соседнего пути
+        // (например, блок-пост между путями главного хода на расстоянии ~50 м)
+        const double max_station_dist = 100.0;
 
         const double w_lo = std::min(entry_coord, stop_coord);
         const double w_hi = std::max(entry_coord, stop_coord);
