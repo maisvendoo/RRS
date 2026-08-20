@@ -89,30 +89,36 @@ static float elevationAt(float distance,
 
 //------------------------------------------------------------------------------
 // Сборка меток координатной сетки. Километраж берётся напрямую из данных
-// траектории (в .traj каждой дуговой координате соответствует свой километраж):
-// для каждого сегмента профиля, где километраж задан, для каждого значения,
-// кратного grid_step, попадающего в интервал между концами сегмента, дистанция
-// вычисляется линейной интерполяцией. Километраж может как расти, так и убывать
-// вдоль пути и меняться скачком - это нормально. На участках, где километраж
-// отсутствует (нули вместо значений), вертикальные метки расставляются с тем же
-// шагом grid_step по дистанции; подпись для них не выводится, так как
-// километраж на участке неизвестен
+// траектории (в .traj каждой дуговой координате соответствует свой километраж).
+// Участки, где километраж отсутствует (нули вместо значений), линейно
+// продолжаются от последнего реального значения до следующего - километраж
+// может меняться скачком, это нормально. Для каждого значения, кратного
+// grid_step, попадающего в интервал между концами сегмента, дистанция
+// вычисляется линейной интерполяцией. Если во всём профиле километраж
+// отсутствует (нет ни одного реального значения), метки расставляются
+// равномерно с шагом grid_step по дистанции
 //------------------------------------------------------------------------------
 static void collectGridMarks(const std::vector<simulator_train_profile_point_t>& points,
                              float grid_step,
                              std::vector<std::pair<float, float>>& out)
 {
-    for (size_t i = 1; i < points.size(); ++i)
+    bool any_real_km = false;
+    for (const auto& p : points)
     {
-        const float rc0 = points[i - 1].railway_coord;
-        const float rc1 = points[i].railway_coord;
-        const float d0 = points[i - 1].distance;
-        const float d1 = points[i].distance;
-
-        // Километраж отсутствует на участке (нули вместо значений) - метки
-        // расставляем равномерно с шагом grid_step по дистанции
-        if (rc0 <= 0.5f && rc1 <= 0.5f)
+        if (p.railway_coord > 0.5f)
         {
+            any_real_km = true;
+            break;
+        }
+    }
+
+    // Километраж отсутствует во всём профиле - метки по дистанции
+    if (!any_real_km)
+    {
+        for (size_t i = 1; i < points.size(); ++i)
+        {
+            const float d0 = points[i - 1].distance;
+            const float d1 = points[i].distance;
             const float span = d1 - d0;
             if (span <= 0.0f)
                 continue;
@@ -120,25 +126,55 @@ static void collectGridMarks(const std::vector<simulator_train_profile_point_t>&
             const int k_first = static_cast<int>(std::ceil(d0 / grid_step));
             const int k_last = static_cast<int>(std::floor(d1 / grid_step));
             for (int k = k_first; k <= k_last; ++k)
-            {
-                const float d = k * grid_step;
-                out.emplace_back(0.0f, d);
-            }
+                out.emplace_back(0.0f, k * grid_step);
+        }
+        return;
+    }
+
+    // Продлеваем километраж через участки с обрывом данных (нули):
+    // линейная интерполяция между реальными значениями по обе стороны
+    std::vector<simulator_train_profile_point_t> bridged = points;
+
+    size_t i = 0;
+    while (i < bridged.size())
+    {
+        if (bridged[i].railway_coord > 0.5f)
+        {
+            ++i;
             continue;
         }
 
-        // Километраж задан только с одной стороны участка - обрыв данных,
-        // интерполировать через него нельзя
-        if (rc0 <= 0.5f || rc1 <= 0.5f)
-            continue;
+        size_t start = i;
+        size_t end = i;
+        while (end < bridged.size() && bridged[end].railway_coord <= 0.5f)
+            ++end;
 
-        // Искусственный участок: сглаживание интерполирует километраж через
-        // обрыв данных, создавая плавный (но фиктивный) рост на 500 м и более
-        // на коротком отрезке. Реальный километраж растёт ~1 м на 1 м пути,
-        // поэтому такие участки отсеиваем по непропорциональному скачку
-        const float span_d = std::abs(d1 - d0);
-        const float span_rc = std::abs(rc1 - rc0);
-        if (span_d > 1e-6f && span_rc > 5.0f * span_d)
+        if (start > 0 && end < bridged.size())
+        {
+            const float rc_a = bridged[start - 1].railway_coord;
+            const float rc_b = bridged[end].railway_coord;
+            const float d_a = bridged[start - 1].distance;
+            const float d_b = bridged[end].distance;
+            const float span = d_b - d_a;
+            for (size_t j = start; j < end; ++j)
+            {
+                const float t = (span > 1e-6f) ? (bridged[j].distance - d_a) / span : 0.0f;
+                bridged[j].railway_coord = rc_a + t * (rc_b - rc_a);
+            }
+        }
+
+        i = end;
+    }
+
+    for (size_t i = 1; i < bridged.size(); ++i)
+    {
+        const float rc0 = bridged[i - 1].railway_coord;
+        const float rc1 = bridged[i].railway_coord;
+        const float d0 = bridged[i - 1].distance;
+        const float d1 = bridged[i].distance;
+
+        // Километраж всё ещё отсутствует (нули по краям профиля)
+        if (rc0 <= 0.5f || rc1 <= 0.5f)
             continue;
 
         const float lo = std::min(rc0, rc1);

@@ -2203,7 +2203,13 @@ namespace
             profile_segment_t p;
             p.distance = dd;
             p.elevation = a.elevation + t * (b.elevation - a.elevation);
-            p.railway_coord = a.railway_coord + t * (b.railway_coord - a.railway_coord);
+            // Километраж не интерполируем через обрыв данных (нули вместо
+            // значений): иначе ресемплинг создаёт фиктивный плавный километраж
+            // между реальными значениями по разные стороны обрыва
+            if (a.railway_coord <= 0.5 || b.railway_coord <= 0.5)
+                p.railway_coord = 0.0;
+            else
+                p.railway_coord = a.railway_coord + t * (b.railway_coord - a.railway_coord);
             p.inclination = 0.0;
             grid.push_back(p);
 
@@ -2235,7 +2241,10 @@ namespace
             profile_segment_t p;
             p.distance = keep_dist;
             p.elevation = a.elevation + t * (b.elevation - a.elevation);
-            p.railway_coord = a.railway_coord + t * (b.railway_coord - a.railway_coord);
+            if (a.railway_coord <= 0.5 || b.railway_coord <= 0.5)
+                p.railway_coord = 0.0;
+            else
+                p.railway_coord = a.railway_coord + t * (b.railway_coord - a.railway_coord);
             p.inclination = 0.0;
             grid.insert(grid.begin() + seg, p);
         }
