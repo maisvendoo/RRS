@@ -91,6 +91,34 @@ static float elevationAt(float distance,
 }
 
 //------------------------------------------------------------------------------
+// Число линз светофора по суффиксу модели (как в tools/route-map).
+// Возвращает 0 для неизвестного типа - такой светофор не рисуется
+//------------------------------------------------------------------------------
+static int signalLensCount(const QString& model)
+{
+    if (model.endsWith("line"))
+        return 3;
+    if (model.endsWith("entr") || model.endsWith("rout"))
+        return 5;
+    if (model.endsWith("exit"))
+        return 4;
+    if (model.endsWith("shnt"))
+        return 2;
+    return 0;
+}
+
+//------------------------------------------------------------------------------
+// Высота мачты светофора на виджете, px (от высоты профиля до верхней линзы).
+// Литер рисуется над мачтой отдельно (см. drawSignals)
+//------------------------------------------------------------------------------
+static float signalHeightPx(int lens_count)
+{
+    const float lens_r = 4.0f;
+    const float lens_gap = 2.0f * lens_r;
+    return (lens_count + 1) * lens_gap + 8.0f;
+}
+
+//------------------------------------------------------------------------------
 // Сборка меток координатной сетки. Километраж берётся напрямую из данных
 // траектории (в .traj каждой дуговой координате соответствует свой километраж).
 // Участки, где километраж отсутствует (нули вместо значений), линейно
@@ -290,6 +318,46 @@ void TrainProfileHintWidget::drawProfile() const
     // Вертикальный масштаб: кривая занимает половину высоты окна, центр поезда - в центре
     const float band_height = (y1 - y0) * 0.5f;
     plot.y_scale = band_height / rel_span;
+
+    // Светофоры рисуются вертикально вверх от высоты профиля (мачта, линзы,
+    // литер). Чтобы они помещались в окно, верхний предел диапазона расширяем
+    // на высоту самого высокого светофора. Высота в метрах зависит от
+    // вертикального масштаба, поэтому уточняем итеративно (3 прохода)
+    if (_params->traffic_lights_handler)
+    {
+        for (int pass = 0; pass < 3; ++pass)
+        {
+            float rel_top_max = plot.rel_max;
+            for (const auto& sig : _profile.signal_list)
+            {
+                if (sig.distance < -req_backward || sig.distance > req_forward)
+                    continue;
+
+                TrafficLight* traffic_light = _params->traffic_lights_handler
+                    ->findSignal(sig.connector_name, sig.signal_dir);
+                if (traffic_light == nullptr)
+                    continue;
+
+                const int lens_count = signalLensCount(traffic_light->getModelName());
+                if (lens_count <= 0)
+                    continue;
+
+                const float height_px = signalHeightPx(lens_count)
+                                        + (traffic_light->getLetter().isEmpty() ? 0.0f : 16.0f);
+                const float rel_sig = elevationAt(sig.distance, _profile.profile)
+                                      - plot.origin_elev;
+                const float rel_top = rel_sig + height_px / plot.y_scale;
+                rel_top_max = std::max(rel_top_max, rel_top);
+            }
+
+            if (rel_top_max <= plot.rel_max)
+                break;
+
+            plot.rel_max = rel_top_max;
+            rel_span = plot.rel_max - plot.rel_min;
+            plot.y_scale = band_height / rel_span;
+        }
+    }
 
     // Координатная сетка: вертикальные метки на всю высоту виджета,
     // привязанные к километровым/пикетным столбам. Километраж берётся
@@ -496,7 +564,8 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
         const float rel = elevationAt(sig.distance, _profile.profile) - plot.origin_elev;
         const float y_base = plot.map_y(rel);
 
-        const float mast_h = (spec.size() + 1) * lens_gap + 8.0f;
+        const bool has_letter = !traffic_light->getLetter().isEmpty();
+        const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
         const float y_top = y_base - mast_h;
 
         // Мачта и перекладина
