@@ -49,6 +49,7 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
     _trains_list_widget = new TrainsListWidget(&_trains_list_params);
 
     _train_profile_params.vehicles_handler = params->vehicles_handler;
+    _train_profile_params.traffic_lights_handler = params->traffic_lights_handler;
     _train_profile_params.backward_m = static_cast<float>(params->train_profile_backward);
     _train_profile_params.forward_m = static_cast<float>(params->train_profile_forward);
     _train_profile_widget = new TrainProfileHintWidget(&_train_profile_params);

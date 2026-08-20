@@ -111,6 +111,14 @@ const QString& TrafficLight::getModelName() const noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+const lens_state_t& TrafficLight::getLensState() const noexcept
+{
+    return lens_state;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool TrafficLight::loadSignal(std::string &models_dir_path,
                               std::string &animations_dir,
                               vsg::ref_ptr<vsg::Options> options)

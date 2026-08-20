@@ -807,6 +807,7 @@ void RouteViewer::initViewer()
     GUIparams->viewer_handler = upd_viewer_handler.get();
     GUIparams->statistics_handler = upd_statistis_handler.get();
     GUIparams->controls_handler = upd_server_control.get();
+    GUIparams->traffic_lights_handler = traffic_lights_handler.get();
 
     is_ready = true;
 }

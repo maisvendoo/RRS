@@ -1,5 +1,8 @@
 #include <TrainProfileHintWidget.h>
 
+#include <TrafficLightsHandler.h>
+#include <TrafficLight.h>
+
 #include <algorithm>
 #include <vector>
 
@@ -342,6 +345,8 @@ void TrainProfileHintWidget::drawProfile() const
     draw_list->AddPolyline(poly.data(), static_cast<int>(poly.size()),
                            IM_COL32(0x00, 0x66, 0xCC, 255), 0, 2.0f);
 
+    drawSignals(plot);
+
     drawTrain(plot);
 }
 
@@ -400,5 +405,122 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
         draw_list->AddLine(ImVec2(plot.map_x(d0), plot.map_y(rel0)),
                            ImVec2(plot.map_x(d1), plot.map_y(rel1)),
                            color, 5.0f);
+    }
+}
+
+//------------------------------------------------------------------------------
+// Отрисовка попутных светофоров на профиле. Данные о светофорах берутся из
+// TrafficLightsHandler, куда они загружаются при старте вьювера (в том числе
+// актуальное состояние линз, обновляемое по сети). Светофор рисуется
+// вертикально: мачта от высоты профиля вверх, линзы снизу вверх, литер сверху
+//------------------------------------------------------------------------------
+void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
+{
+    if (!_params->traffic_lights_handler)
+        return;
+
+    const std::vector<simulator_train_profile_signal_t>& sig_list = _profile.signal_list;
+    if (sig_list.empty())
+        return;
+
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    const float cfg_backward = std::max(_params->backward_m, 0.0f);
+    const float cfg_forward = std::max(_params->forward_m, 0.0f);
+    const float req_backward = std::min(cfg_backward, std::max(_profile.backward_requested, 0.0f));
+    const float req_forward = std::min(cfg_forward, std::max(_profile.forward_requested, 0.0f));
+
+    const float lens_r = 4.0f;
+    const float lens_gap = 2.0f * lens_r;
+    const ImU32 mast_col = IM_COL32(220, 220, 220, 255);
+    const ImU32 off_col = IM_COL32(24, 24, 24, 255);
+
+    // Состав и порядок линз для каждого типа светофора (снизу вверх)
+    struct lens_spec_t
+    {
+        int lens;
+        ImU32 lit_color;
+    };
+
+    const auto lens_color = [](int lens) -> ImU32
+    {
+        switch (lens)
+        {
+            case RED_LENS:           return IM_COL32(255, 0, 0, 255);
+            case YELLOW_LENS:        return IM_COL32(255, 255, 0, 255);
+            case GREEN_LENS:         return IM_COL32(0, 255, 0, 255);
+            case WHITE_LENS:         return IM_COL32(255, 255, 196, 255);
+            case BLUE_LENS:          return IM_COL32(0, 96, 255, 255);
+            case BOTTOM_YELLOW_LENS: return IM_COL32(255, 255, 0, 255);
+            default:                 return IM_COL32(255, 255, 196, 255);
+        }
+    };
+
+    for (const auto& sig : sig_list)
+    {
+        if (sig.distance < -req_backward || sig.distance > req_forward)
+            continue;
+
+        TrafficLight* traffic_light = _params->traffic_lights_handler
+            ->findSignal(sig.connector_name, sig.signal_dir);
+        if (traffic_light == nullptr)
+            continue;
+
+        const QString model = traffic_light->getModelName();
+        const lens_state_t& lens = traffic_light->getLensState();
+
+        // Набор линз и порядок их следования снизу вверх (как в tools/route-map)
+        std::vector<lens_spec_t> spec;
+        if (model.endsWith("line"))
+            spec = {{RED_LENS, lens_color(RED_LENS)},
+                    {GREEN_LENS, lens_color(GREEN_LENS)},
+                    {YELLOW_LENS, lens_color(YELLOW_LENS)}};
+        else if (model.endsWith("entr") || model.endsWith("rout"))
+            spec = {{WHITE_LENS, lens_color(WHITE_LENS)},
+                    {BOTTOM_YELLOW_LENS, lens_color(BOTTOM_YELLOW_LENS)},
+                    {RED_LENS, lens_color(RED_LENS)},
+                    {GREEN_LENS, lens_color(GREEN_LENS)},
+                    {YELLOW_LENS, lens_color(YELLOW_LENS)}};
+        else if (model.endsWith("exit"))
+            spec = {{WHITE_LENS, lens_color(WHITE_LENS)},
+                    {RED_LENS, lens_color(RED_LENS)},
+                    {GREEN_LENS, lens_color(GREEN_LENS)},
+                    {YELLOW_LENS, lens_color(YELLOW_LENS)}};
+        else if (model.endsWith("shnt"))
+            spec = {{BLUE_LENS, lens_color(BLUE_LENS)},
+                    {WHITE_LENS, lens_color(WHITE_LENS)}};
+        else
+            continue;
+
+        const float x = plot.map_x(sig.distance);
+        const float rel = elevationAt(sig.distance, _profile.profile) - plot.origin_elev;
+        const float y_base = plot.map_y(rel);
+
+        const float mast_h = (spec.size() + 1) * lens_gap + 8.0f;
+        const float y_top = y_base - mast_h;
+
+        // Мачта и перекладина
+        draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_top), mast_col, 1.5f);
+        draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), mast_col, 1.5f);
+
+        // Линзы снизу вверх: горящая - ярким цветом, погашенная - тёмной
+        for (size_t i = 0; i < spec.size(); ++i)
+        {
+            const float ly = y_base - (i + 1) * lens_gap;
+            const bool lit = static_cast<size_t>(spec[i].lens) < lens.size()
+                && lens[static_cast<size_t>(spec[i].lens)];
+            const ImU32 col = lit ? spec[i].lit_color : off_col;
+            draw_list->AddCircleFilled(ImVec2(x, ly), lens_r, col, 16);
+        }
+
+        // Литер над верхней линзой
+        const QString letter = traffic_light->getLetter();
+        if (!letter.isEmpty())
+        {
+            const std::string label = letter.toStdString();
+            const float text_w = ImGui::CalcTextSize(label.c_str()).x;
+            draw_list->AddText(ImVec2(x - text_w * 0.5f, y_top - 16.0f),
+                               IM_COL32(255, 255, 255, 255), label.c_str());
+        }
     }
 }

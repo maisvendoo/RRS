@@ -35,6 +35,9 @@ public:
     bool load(QByteArray& data, const std::string& route_dir_full_path,
               vsg::ref_ptr<WorldCulling> world_culling, vsg::ref_ptr<vsg::Options> options);
 
+    /// Поиск светофора по имени коннектора и направлению (FWD/BWD)
+    TrafficLight* findSignal(const QString& connector_name, std::int8_t signal_dir) const;
+
 private:
     void deserialize(QByteArray& data);
     void deserialize_signals(const char* signals_type, QDataStream& data_stream);

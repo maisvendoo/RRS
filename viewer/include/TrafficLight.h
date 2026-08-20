@@ -36,6 +36,7 @@ public:
     int8_t getSignalDirection() const noexcept;
     const QString& getLetter() const noexcept;
     const QString& getModelName() const noexcept;
+    const lens_state_t& getLensState() const noexcept;
 
     bool loadSignal(std::string& models_dir_path,
                     std::string& animations_dir,

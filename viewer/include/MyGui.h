@@ -20,6 +20,7 @@ class UpdateViewerHandler;
 class UpdateStatisticsHandler;
 class UpdateControlToServerHandler;
 class TcpClient;
+class TrafficLightsHandler;
 
 struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 {
@@ -35,6 +36,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     UpdateViewerHandler *viewer_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
     UpdateControlToServerHandler *controls_handler = nullptr;
+    TrafficLightsHandler *traffic_lights_handler = nullptr;
     TcpClient *tcp_client = nullptr;
 
     vsg::ref_ptr<Sun> sun;

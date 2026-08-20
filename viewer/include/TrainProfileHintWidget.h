@@ -4,12 +4,15 @@
 #include <VehiclesHandler.h>
 #include <vsgImGui/imgui.h>
 
+class TrafficLightsHandler;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct TrainProfileHintWidgetParams
 {
     VehiclesHandler *vehicles_handler = nullptr;
+    TrafficLightsHandler *traffic_lights_handler = nullptr;
     bool is_visible = true;
     /// Запрошенные дальности профиля назад/вперёд от середины поезда, м
     float backward_m = 4000.0f;
@@ -52,6 +55,8 @@ private:
     void drawProfile() const;
 
     void drawTrain(const PlotTransform& plot) const;
+
+    void drawSignals(const PlotTransform& plot) const;
 
     TrainProfileHintWidgetParams *_params;
 
