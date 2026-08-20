@@ -636,6 +636,11 @@ void MyGui::showHUD() const
         _train_profile_params.vehicles_handler = params->vehicles_handler;
     }
 
+    if (params->traffic_lights_handler != _train_profile_params.traffic_lights_handler)
+    {
+        _train_profile_params.traffic_lights_handler = params->traffic_lights_handler;
+    }
+
     if (_train_profile_widget)
     {
         // Небольшой отступ снизу до расписания и списка поездов (их верх - y = 300)
