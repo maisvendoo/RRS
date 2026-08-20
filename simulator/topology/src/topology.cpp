@@ -2056,13 +2056,75 @@ namespace
     }
 
     //------------------------------------------------------------------------------
+    // Станции на пройденном участке траектории: для каждого трека ищем станцию,
+    // проекция которой на ось трека попадает в пределы трека, а удаление станции
+    // от оси пути не превышает заданного порога
+    //------------------------------------------------------------------------------
+    void collectStations(const Trajectory* traj, double entry_coord, double stop_coord, dir_t orient,
+                         double traveled, int kind,
+                         const topology_stations_list_t& stations,
+                         std::vector<profile_station_t>& out)
+    {
+        if (stations.isEmpty())
+            return;
+
+        const std::vector<track_t>& tracks = traj->getTracks();
+        if (tracks.empty())
+            return;
+
+        const double eps = 1e-9;
+        const double max_station_dist = 50.0;
+
+        const double w_lo = std::min(entry_coord, stop_coord);
+        const double w_hi = std::max(entry_coord, stop_coord);
+
+        for (const track_t& track : tracks)
+        {
+            const double t_lo = track.traj_coord;
+            const double t_hi = track.traj_coord + track.len;
+
+            // Трек не пересекает пройденный диапазон
+            if ((t_hi <= w_lo + eps) || (t_lo >= w_hi - eps))
+                continue;
+
+            for (const topology_station_t& st : stations)
+            {
+                // Проекция станции на ось трека в плане (высоту не учитываем)
+                const double dx = st.pos_x - track.begin_point.x;
+                const double dy = st.pos_y - track.begin_point.y;
+                const double proj = dx * track.orth.x + dy * track.orth.y;
+
+                if ((proj < -eps) || (proj > track.len + eps))
+                    continue;
+
+                // Перпендикулярное удаление станции от оси пути в плане
+                const double perp_x = dx - proj * track.orth.x;
+                const double perp_y = dy - proj * track.orth.y;
+                if (std::sqrt(perp_x * perp_x + perp_y * perp_y) > max_station_dist)
+                    continue;
+
+                const double st_coord = track.traj_coord + proj;
+
+                profile_station_t ps;
+                ps.distance = (orient == FWD)
+                    ? kind * (traveled + (st_coord - entry_coord))
+                    : kind * (traveled + (entry_coord - st_coord));
+                ps.name = st.name;
+                out.push_back(ps);
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------
     // Обход топологии от точки отсчёта на заданную дистанцию
     //------------------------------------------------------------------------------
     void walkProfile(Trajectory*& traj, double& coord, dir_t& orient,
                      double limit_m, int kind, std::vector<profile_segment_t>& out,
                      std::vector<traj_segment_t>* segments,
                      std::vector<profile_vehicle_t>* vehicles,
-                     std::vector<profile_signal_t>* signal_list)
+                     std::vector<profile_signal_t>* signal_list,
+                     const topology_stations_list_t* stations,
+                     std::vector<profile_station_t>* station_list)
     {
         if (traj == nullptr || limit_m <= 0.0)
             return;
@@ -2107,6 +2169,8 @@ namespace
                 emitTrackBoundaries(traj, coord, stop_coord, orient, traveled, kind, out);
                 if (vehicles != nullptr)
                     collectVehicles(traj, coord, stop_coord, orient, traveled, kind, *vehicles);
+                if (station_list != nullptr && stations != nullptr)
+                    collectStations(traj, coord, stop_coord, orient, traveled, kind, *stations, *station_list);
                 traveled += step;
                 if (traveled >= limit_m - eps)
                     break;
@@ -2389,20 +2453,24 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     std::vector<profile_vehicle_t> bwd_vehicles;
     std::vector<profile_signal_t> fwd_signals;
     std::vector<profile_signal_t> bwd_signals;
+    std::vector<profile_station_t> fwd_stations;
+    std::vector<profile_station_t> bwd_stations;
 
     // Ход вперёд
     Trajectory* fwd_traj = traj;
     double fwd_coord = coord;
     dir_t fwd_orient = orient;
     walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points,
-                nullptr, &fwd_vehicles, &fwd_signals);
+                nullptr, &fwd_vehicles, &fwd_signals,
+                &stations, &fwd_stations);
 
     // Ход назад
     Trajectory* bwd_traj = traj;
     double bwd_coord = coord;
     dir_t bwd_orient = static_cast<dir_t>(-orient);
     walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points,
-                nullptr, &bwd_vehicles, &bwd_signals);
+                nullptr, &bwd_vehicles, &bwd_signals,
+                &stations, &bwd_stations);
 
     // Сборка профиля: назад (по убыванию) + точка отсчёта + вперёд
     out.points.clear();
@@ -2447,7 +2515,7 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     }
     out.vehicles = std::move(merged);
 
-    // Сборка сигналов: назад (по убыванию) + вперёд, упорядочены по distance
+    // Сортировка сигналов: назад (по убыванию) + вперёд, упорядочены по distance
     out.signal_list.clear();
     out.signal_list.reserve(bwd_signals.size() + fwd_signals.size());
     for (size_t i = bwd_signals.size(); i > 0; --i)
@@ -2455,6 +2523,18 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     out.signal_list.insert(out.signal_list.end(), fwd_signals.begin(), fwd_signals.end());
     std::sort(out.signal_list.begin(), out.signal_list.end(),
               [](const profile_signal_t& a, const profile_signal_t& b)
+              {
+                  return a.distance < b.distance;
+              });
+
+    // Сборка станций: назад (по убыванию) + вперёд, упорядочены по distance
+    out.stations.clear();
+    out.stations.reserve(bwd_stations.size() + fwd_stations.size());
+    for (size_t i = bwd_stations.size(); i > 0; --i)
+        out.stations.push_back(bwd_stations[i - 1]);
+    out.stations.insert(out.stations.end(), fwd_stations.begin(), fwd_stations.end());
+    std::sort(out.stations.begin(), out.stations.end(),
+              [](const profile_station_t& a, const profile_station_t& b)
               {
                   return a.distance < b.distance;
               });
