@@ -2061,7 +2061,8 @@ namespace
     void walkProfile(Trajectory*& traj, double& coord, dir_t& orient,
                      double limit_m, int kind, std::vector<profile_segment_t>& out,
                      std::vector<traj_segment_t>* segments,
-                     std::vector<profile_vehicle_t>* vehicles)
+                     std::vector<profile_vehicle_t>* vehicles,
+                     std::vector<profile_signal_t>* signal_list)
     {
         if (traj == nullptr || limit_m <= 0.0)
             return;
@@ -2117,6 +2118,43 @@ namespace
             const Switch* next_sw = traj->getNextSwitch(exit_dir);
             if (next_sw == nullptr)
                 break;
+
+            // Сбор попутного сигнала, установленного на стрелке: при движении
+            // вперёд берём сигнал FWD стрелки, при движении назад - BWD.
+            // Сигнал стоит на траектории перед коннектором (см. Signal::calcPosition),
+            // поэтому его можно собрать только если он установлен на ветви, по которой
+            // движется поезд (иначе это сигнал соседнего пути)
+            if (signal_list != nullptr)
+            {
+                const Signal* signal = (kind > 0) ? next_sw->getSignalFwd()
+                                                  : next_sw->getSignalBwd();
+                if (signal != nullptr)
+                {
+                    const Trajectory* signal_traj = nullptr;
+                    if (kind > 0)
+                    {
+                        signal_traj = next_sw->trajectories[SW_BWD_PLUS]
+                            ? next_sw->trajectories[SW_BWD_PLUS]
+                            : next_sw->trajectories[SW_BWD_MINUS];
+                    }
+                    else
+                    {
+                        signal_traj = next_sw->trajectories[SW_FWD_PLUS]
+                            ? next_sw->trajectories[SW_FWD_PLUS]
+                            : next_sw->trajectories[SW_FWD_MINUS];
+                    }
+
+                    if (signal_traj == traj)
+                    {
+                        profile_signal_t ps;
+                        ps.distance = kind * traveled;
+                        ps.signal_type = signal->getSignalType();
+                        ps.lens = signal->getAllLensState();
+                        ps.letter = signal->getLetter();
+                        signal_list->push_back(ps);
+                    }
+                }
+            }
 
             // Проверка сопряжения стрелки с ветвью входа: если состояние стрелки
             // не установлено на ветвь, по которой движется поезд, дальнейшего пути нет
@@ -2334,18 +2372,22 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     std::vector<profile_segment_t> bwd_points;
     std::vector<profile_vehicle_t> fwd_vehicles;
     std::vector<profile_vehicle_t> bwd_vehicles;
+    std::vector<profile_signal_t> fwd_signals;
+    std::vector<profile_signal_t> bwd_signals;
 
     // Ход вперёд
     Trajectory* fwd_traj = traj;
     double fwd_coord = coord;
     dir_t fwd_orient = orient;
-    walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points, nullptr, &fwd_vehicles);
+    walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points,
+                nullptr, &fwd_vehicles, &fwd_signals);
 
     // Ход назад
     Trajectory* bwd_traj = traj;
     double bwd_coord = coord;
     dir_t bwd_orient = static_cast<dir_t>(-orient);
-    walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points, nullptr, &bwd_vehicles);
+    walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points,
+                nullptr, &bwd_vehicles, &bwd_signals);
 
     // Сборка профиля: назад (по убыванию) + точка отсчёта + вперёд
     out.points.clear();
@@ -2389,6 +2431,18 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
         }
     }
     out.vehicles = std::move(merged);
+
+    // Сборка сигналов: назад (по убыванию) + вперёд, упорядочены по distance
+    out.signal_list.clear();
+    out.signal_list.reserve(bwd_signals.size() + fwd_signals.size());
+    for (size_t i = bwd_signals.size(); i > 0; --i)
+        out.signal_list.push_back(bwd_signals[i - 1]);
+    out.signal_list.insert(out.signal_list.end(), fwd_signals.begin(), fwd_signals.end());
+    std::sort(out.signal_list.begin(), out.signal_list.end(),
+              [](const profile_signal_t& a, const profile_signal_t& b)
+              {
+                  return a.distance < b.distance;
+              });
 
     // Сглаживание изломов скользящим окном для визуализации
     const size_t origin_idx = bwd_points.size();

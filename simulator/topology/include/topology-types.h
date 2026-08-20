@@ -2,6 +2,7 @@
 #define     TOPOLOGY_TYPES_H
 
 #include    "topology-export.h"
+#include    "signal-types.h"
 
 #include    <QByteArray>
 #include    <QString>
@@ -87,6 +88,24 @@ struct TOPOLOGY_EXPORT profile_vehicle_t
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct TOPOLOGY_EXPORT profile_signal_t
+{
+    /// Дистанция светофора от точки отсчёта профиля, м (вперёд по ходу - «+», назад - «-»)
+    double distance = 0.0;
+
+    /// Тип светофора (суффикс модели: line/entr/rout/exit/shnt)
+    QString signal_type = "";
+
+    /// Состояние линз светофора
+    lens_state_t lens = {};
+
+    /// Литер светофора
+    QString letter = "";
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 struct TOPOLOGY_EXPORT profile_segments_t
 {
     /// Фактические протяжённости профиля назад и вперёд, м
@@ -99,6 +118,9 @@ struct TOPOLOGY_EXPORT profile_segments_t
     /// Единицы подвижного состава на профиле (включая другие поезда),
     /// упорядочены по begin_distance
     std::vector<profile_vehicle_t> vehicles;
+
+    /// Светофоры на профиле, упорядочены по distance
+    std::vector<profile_signal_t> signal_list;
 };
 
 #endif // TOPOLOGY_TYPES_H
