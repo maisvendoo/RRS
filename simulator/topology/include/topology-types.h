@@ -114,6 +114,18 @@ struct TOPOLOGY_EXPORT profile_station_t
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct TOPOLOGY_EXPORT profile_speed_limit_t
+{
+    /// Дистанция от точки отсчёта профиля, м (вперёд по ходу - «+», назад - «-»)
+    double distance = 0.0;
+
+    /// Ограничение скорости, км/ч
+    double speed_kmh = 0.0;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 struct TOPOLOGY_EXPORT profile_segments_t
 {
     /// Фактические протяжённости профиля назад и вперёд, м
@@ -132,6 +144,9 @@ struct TOPOLOGY_EXPORT profile_segments_t
 
     /// Станции на профиле, упорядочены по distance
     std::vector<profile_station_t> stations;
+
+    /// Ограничения скорости на профиле, упорядочены по distance
+    std::vector<profile_speed_limit_t> speed_limits;
 };
 
 #endif // TOPOLOGY_TYPES_H

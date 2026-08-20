@@ -769,6 +769,37 @@ struct simulator_train_profile_station_t final
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct simulator_train_profile_speed_limit_t final
+{
+    /// Дистанция от середины поезда вдоль пути, м (вперёд по ходу - «+», назад - «-»)
+    float distance = 0.0f;
+
+    /// Ограничение скорости, км/ч
+    float speed_kmh = 0.0f;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << distance;
+        stream << speed_kmh;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> distance;
+        stream >> speed_kmh;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 struct simulator_train_profile_update_t final
 {
     /// Индекс поезда на текущий кадр
@@ -806,6 +837,9 @@ struct simulator_train_profile_update_t final
     /// Станции на профиле, упорядочены по distance
     std::vector<simulator_train_profile_station_t> stations;
 
+    /// Ограничения скорости на профиле, упорядочены по distance
+    std::vector<simulator_train_profile_speed_limit_t> speed_limits;
+
     QByteArray serialize() const
     {
         QByteArray data;
@@ -842,6 +876,12 @@ struct simulator_train_profile_update_t final
         for (const auto& station : stations)
         {
             stream << station.serialize();
+        }
+
+        stream << static_cast<std::uint32_t>(speed_limits.size());
+        for (const auto& sl : speed_limits)
+        {
+            stream << sl.serialize();
         }
 
         return data;
@@ -911,6 +951,19 @@ struct simulator_train_profile_update_t final
             stream >> station_data;
 
             station.deserialize(station_data);
+        }
+
+        stream >> num;
+
+        speed_limits.clear();
+        speed_limits.resize(num);
+
+        for (auto& sl : speed_limits)
+        {
+            QByteArray sl_data;
+            stream >> sl_data;
+
+            sl.deserialize(sl_data);
         }
     }
 };
