@@ -381,7 +381,7 @@ void TrainProfileHintWidget::drawProfile() const
         const ImU32 grid_col = IM_COL32(90, 90, 90, 150);
         const ImU32 label_col = IM_COL32(190, 190, 190, 220);
         const ImFont* font = ImGui::GetFont();
-        const float label_y = y1 - font->FontSize;
+        const float label_y = y1 - font->LegacySize;
 
         std::vector<std::pair<float, float>> marks;
         collectGridMarks(points, grid_step, marks);
