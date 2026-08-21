@@ -631,6 +631,69 @@ void MyGui::showPauseState() const
 //------------------------------------------------------------------------------
 void MyGui::showHUD() const
 {
+    // Тулбар с кнопками включения/выключения виджетов
+    const float bar_height = hudTopOffset();
+    const ImVec2 display_size = ImGui::GetIO().DisplaySize;
+
+    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
+    ImGui::SetNextWindowSize(ImVec2(display_size.x, bar_height));
+
+    ImGuiWindowFlags bar_flags = 0;
+    bar_flags |= ImGuiWindowFlags_NoTitleBar;
+    bar_flags |= ImGuiWindowFlags_NoResize;
+    bar_flags |= ImGuiWindowFlags_NoCollapse;
+
+    bool open_ptr = true;
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.5f));
+    ImGui::Begin(u8"Панель HUD", &open_ptr, bar_flags);
+    ImGui::PopStyleColor();
+
+    const float btn_w = 130.0f;
+    const float btn_h = bar_height - 4.0f;
+    const float total_w = btn_w * 3 + 8.0f * 2;
+
+    ImGui::SetCursorPosX((display_size.x - total_w) * 0.5f);
+    ImGui::SetCursorPosY(2.0f);
+
+    // Кнопка "Профиль"
+    ImGui::PushID("hud_profile");
+    if (params->hud_show_profile)
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 0.8f));
+    if (ImGui::Button(u8"Профиль", ImVec2(btn_w, btn_h)))
+        params->hud_show_profile = !params->hud_show_profile;
+    if (params->hud_show_profile)
+        ImGui::PopStyleColor();
+    ImGui::PopID();
+
+    ImGui::SameLine();
+    ImGui::SetCursorPosY(2.0f);
+
+    // Кнопка "График"
+    ImGui::PushID("hud_timetable");
+    if (params->hud_show_timetable)
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 0.8f));
+    if (ImGui::Button(u8"График", ImVec2(btn_w, btn_h)))
+        params->hud_show_timetable = !params->hud_show_timetable;
+    if (params->hud_show_timetable)
+        ImGui::PopStyleColor();
+    ImGui::PopID();
+
+    ImGui::SameLine();
+    ImGui::SetCursorPosY(2.0f);
+
+    // Кнопка "Список поездов"
+    ImGui::PushID("hud_list");
+    if (params->hud_show_trains_list)
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 0.8f));
+    if (ImGui::Button(u8"Список", ImVec2(btn_w, btn_h)))
+        params->hud_show_trains_list = !params->hud_show_trains_list;
+    if (params->hud_show_trains_list)
+        ImGui::PopStyleColor();
+    ImGui::PopID();
+
+    ImGui::End();
+
+    // Виджеты HUD
     if (params->vehicles_handler != _train_profile_params.vehicles_handler)
     {
         _train_profile_params.vehicles_handler = params->vehicles_handler;
@@ -641,13 +704,15 @@ void MyGui::showHUD() const
         _train_profile_params.traffic_lights_handler = params->traffic_lights_handler;
     }
 
-    if (_train_profile_widget)
+    if (_train_profile_widget && params->hud_show_profile)
     {
-        // Небольшой отступ снизу до расписания и списка поездов (их верх - y = 300)
-        _train_profile_widget->show(hudTopOffset(), 300.0f - 10.0f, 20.0f, 20.0f);
+        _train_profile_widget->show(bar_height, 300.0f - 10.0f, 20.0f, 20.0f);
     }
 
-    showTimetable();
+    if (params->hud_show_timetable)
+    {
+        showTimetable();
+    }
 
     // Обновляем указатель на vehicles_handler при каждом кадре
     if (params->vehicles_handler != _trains_list_params.vehicles_handler)
@@ -660,7 +725,7 @@ void MyGui::showHUD() const
         _trains_list_params.viewer_handler = params->viewer_handler;
     }
 
-    if (_trains_list_widget)
+    if (_trains_list_widget && params->hud_show_trains_list)
     {
         _trains_list_widget->show();
     }
