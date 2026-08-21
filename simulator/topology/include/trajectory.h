@@ -106,8 +106,10 @@ public:
     virtual void step(double t, double dt);
 
     QByteArray serialize() const;
+    QByteArray serialize_modules() const;
 
     void deserialize(QByteArray &data);
+    void deserialize_modules(QByteArray &data);
 
     /// Поиск новой траектории, траекторной координаты и смены ориентации,
     /// возвращает false, если координата за пределы топологии (за тупик)
@@ -117,9 +119,16 @@ public:
     /// Получить положение ПЕ на траектории
     profile_point_t getPosition(double traj_coord, int direction) const;
 
+    void deserializeModuleUpdate(std::uint32_t module_idx, QByteArray& module_data);
+
+public slots:
+
+    void slotSendModuleUpdate(QByteArray module_data);
+
 signals:
 
     void sendTrajBusyState(QByteArray busy_data);
+    void sendModuleUpdate(QByteArray module_data);
 
     /// Сигнал для модели, сообщающий индекс ПЕ, занявшей траекторию
     void sigTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name);

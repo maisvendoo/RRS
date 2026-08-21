@@ -241,6 +241,8 @@ private slots:
 
     void slotGetTopologyData(QByteArray &topology_data);
 
+    void slotGetTopologyModules(QByteArray &topology_modules);
+
     void slotGetSignalsData(QByteArray &signals_data);
 
     void slotGetVehicleControlByKeyboard(QByteArray &control_data, int client_id);

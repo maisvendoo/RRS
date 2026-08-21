@@ -63,7 +63,10 @@ public:
     void step(double t, double dt);
 
     QByteArray serialize() const;
-    void deserialize(QByteArray &data);
+    QByteArray serialize_modules() const;
+
+    void deserialize(QByteArray& data);
+    void deserialize_modules(QByteArray& data);
 
     traj_list_t *getTrajectoriesList();
     const traj_list_t* getTrajectoriesList() const;
@@ -82,6 +85,8 @@ signals:
     void sendSwitchState(QByteArray sw_data);
 
     void sendTrajBusyState(QByteArray busy_data);
+
+    void sendModuleUpdate(QByteArray module_data);
 
     void sigSetOpenSignalsQueue(std::vector<std::pair<QString, int>> conn_list, bool for_train, bool for_shunting);
 
@@ -177,6 +182,8 @@ public slots:
                             double *lenght);
 
     void slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString start_traj_name, QString traj_name, int dir, int request_type);
+
+    void slotTrajModuleUpdate(QByteArray& traj_module_data);
 
 private slots:
 

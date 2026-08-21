@@ -152,7 +152,7 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
 
     for (module_cfg_t& mc : modules)
     {
-        // Загружаем dll модуль путевой инфраструктуры
+        // Загружаем модуль путевой инфраструктуры
         QString module_path = QString(fs.getModulesDir().c_str()) +
                                       QDir::separator() +
                                       mc.module_name;
@@ -189,10 +189,14 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
         module->setTrajectory(this);
 
         // Конфигурируем модуль
+        module->setModuleFilename(mc.module_name);
         module->load_config(mc.cfg);
 
         // Добавляем модуль в список оборудования путевой инфраструктуры
         devices.push_back(module);
+
+        // Модули могут просить рассылку обновления своего состояния
+        connect(module, &TrajectoryDevice::sendUpdate, this, &Trajectory::slotSendModuleUpdate);
     }
 
     return true;
@@ -632,6 +636,26 @@ QByteArray Trajectory::serialize() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QByteArray Trajectory::serialize_modules() const
+{
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+
+    // Кладем в буфер количество модулей путевой инфраструктуры
+    stream << static_cast<uint32_t>(devices.size());
+
+    // Последовательно сериализум треки
+    for (const TrajectoryDevice* device : devices)
+    {
+        stream << device->getModuleFilename();
+        stream << device->serialize();
+    }
+    return data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Trajectory::deserialize(QByteArray& data)
 {
     QDataStream stream(&data, QIODevice::ReadOnly);
@@ -656,6 +680,73 @@ void Trajectory::deserialize(QByteArray& data)
         track.deserialize(track_data);
 
         tracks.push_back(track);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::deserialize_modules(QByteArray& data)
+{
+    QDataStream stream(&data, QIODevice::ReadOnly);
+
+    // Восстанавливаем количество модулей путевой инфраструктуры
+    uint32_t devices_count;
+    stream >> devices_count;
+
+    if (devices_count == 0)
+        return;
+
+    const FileSystem& fs = FileSystem::getInstance();
+    static QHash<QString, GetModuleFuncPtr> get_module_funcs;
+
+    for (quint32 i = 0; i < devices_count; ++i)
+    {
+        QString module_filename;
+        stream >> module_filename;
+
+        // Загружаем модуль путевой инфраструктуры
+        QString module_path = QString(fs.getModulesDir().c_str()) +
+                              QDir::separator() +
+                              module_filename;
+
+        GetModuleFuncPtr get_module_func;
+
+        const auto found_it = get_module_funcs.find(module_path);
+        if (found_it == get_module_funcs.end())
+        {
+            get_module_func = load_get_module_func(module_path);
+            get_module_funcs[module_path] = get_module_func;
+        }
+        else
+        {
+            get_module_func = found_it.value();
+        }
+
+        if (!get_module_func)
+        {
+            devices.push_back(nullptr);
+            continue;
+        }
+
+        TrajectoryDevice* module = (TrajectoryDevice*)get_module_func();
+        if (!module)
+        {
+            devices.push_back(nullptr);
+            continue;
+        }
+
+        // Указываем модулю, что он относится к этой траектории
+        module->setTrajectory(this);
+
+        // Конфигурируем модуль
+        QByteArray module_data;
+        stream >> module_data;
+        module->deserialize(module_data);
+        module->setModuleFilename(module_filename);
+
+        // Добавляем модуль в список оборудования путевой инфраструктуры
+        devices.push_back(module);
     }
 }
 
@@ -849,6 +940,39 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction) const
         pp.right = normalize(pp.right);
         pp.up = normalize(pp.up);
         return pp;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::deserializeModuleUpdate(std::uint32_t module_idx, QByteArray& module_data)
+{
+    if ((module_idx < devices.size()) && devices[module_idx])
+    {
+        devices[module_idx]->deserialize(module_data);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::slotSendModuleUpdate(QByteArray module_data)
+{
+    for (std::uint32_t i = 0; i < devices.size(); ++i)
+    {
+        if (sender() == devices[i])
+        {
+            QByteArray data;
+            QDataStream stream(&data, QIODevice::WriteOnly);
+
+            stream << name;
+            stream << i;
+            stream << module_data;
+
+            emit sendModuleUpdate(data);
+            break;
+        }
     }
 }
 

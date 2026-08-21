@@ -96,6 +96,10 @@ signals:
 
     void setTrainProfile(QByteArray &profile_data);
 
+    void setTopologyModules(QByteArray &modules_data);
+
+    void setTopologyModuleUpdate(QByteArray &module_update);
+
     void sendLogMessage(QString msg);
 
     void connectionAbandoned();

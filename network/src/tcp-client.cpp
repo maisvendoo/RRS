@@ -343,6 +343,14 @@ void TcpClient::process_received_data(network_data_t &net_data)
         emit setTrainProfile(net_data.data);
         break;
 
+    case STYPE_TOPOLOGY_MODULES:
+        emit setTopologyModules(net_data.data);
+        break;
+
+    case STYPE_TOPOLOGY_MODULE_UPDATE:
+        emit setTopologyModuleUpdate(net_data.data);
+        break;
+
     default:
 
         break;
@@ -453,6 +461,9 @@ void TcpClient::slotReceive()
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpClient::slotAcceptError(QAbstractSocket::SocketError error)
 {
     Q_UNUSED(error);
