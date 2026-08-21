@@ -2595,23 +2595,26 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
                   return a.distance < b.distance;
               });
 
-    // Сборка ограничений скорости: назад (по убыванию) + вперёд, упорядочены по distance
+    // Сборка ограничений скорости: назад (по убыванию) + вперёд
     out.speed_limits.clear();
     out.speed_limits.reserve(bwd_speed_limits.size() + fwd_speed_limits.size());
     for (size_t i = bwd_speed_limits.size(); i > 0; --i)
         out.speed_limits.push_back(bwd_speed_limits[i - 1]);
     out.speed_limits.insert(out.speed_limits.end(), fwd_speed_limits.begin(), fwd_speed_limits.end());
-    std::sort(out.speed_limits.begin(), out.speed_limits.end(),
-              [](const profile_speed_limit_t& a, const profile_speed_limit_t& b)
-              {
-                  return a.distance < b.distance;
-              });
 
-    // Слияние последовательных интервалов с одинаковой скоростью
+    // Достраивание end_distance до начала следующего интервала
+    // (гарантия непрерывности ленты ограничений)
     {
         const double eps = 1e-6;
         if (!out.speed_limits.empty())
         {
+            std::sort(out.speed_limits.begin(), out.speed_limits.end(),
+                      [](const profile_speed_limit_t& a, const profile_speed_limit_t& b)
+                      {
+                          return a.distance < b.distance;
+                      });
+
+            // Слияние одинаковых, идущих подряд
             std::vector<profile_speed_limit_t> merged;
             merged.reserve(out.speed_limits.size());
             merged.push_back(out.speed_limits[0]);
@@ -2625,18 +2628,16 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
                 }
                 else
                 {
-                    // Если между интервалами зазор — заполняем его предыдущим значением
-                    if (out.speed_limits[i].distance > merged.back().end_distance + eps)
-                    {
-                        profile_speed_limit_t fill;
-                        fill.distance = merged.back().end_distance;
-                        fill.end_distance = out.speed_limits[i].distance;
-                        fill.speed_kmh = merged.back().speed_kmh;
-                        merged.push_back(fill);
-                    }
                     merged.push_back(out.speed_limits[i]);
                 }
             }
+
+            // end_distance каждого интервала = начало следующего (или out.forward для последнего)
+            for (size_t i = 0; i + 1 < merged.size(); ++i)
+                merged[i].end_distance = merged[i + 1].distance;
+            if (!merged.empty())
+                merged.back().end_distance = std::max(merged.back().end_distance, out.forward);
+
             out.speed_limits = std::move(merged);
         }
     }
