@@ -809,7 +809,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
 
     const float zone_height = 20.0f;
     const float y_bottom = y_base + zone_height;
-    const ImU32 col = IM_COL32(255, 165, 0, 230);
+    const ImU32 col = IM_COL32(90, 90, 90, 150);
 
     for (const auto& sl : limits)
     {
