@@ -635,8 +635,12 @@ void MyGui::showHUD() const
     const float bar_height = hudTopOffset();
     const ImVec2 display_size = ImGui::GetIO().DisplaySize;
 
-    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
-    ImGui::SetNextWindowSize(ImVec2(display_size.x, bar_height));
+    const float btn_w = 130.0f;
+    const float btn_h = bar_height - 4.0f;
+    const float total_w = btn_w * 3 + 8.0f * 2;
+
+    ImGui::SetNextWindowPos(ImVec2((display_size.x - total_w) * 0.5f, 0.0f));
+    ImGui::SetNextWindowSize(ImVec2(total_w, bar_height));
 
     ImGuiWindowFlags bar_flags = 0;
     bar_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -649,11 +653,6 @@ void MyGui::showHUD() const
     ImGui::Begin(u8"Панель HUD", &open_ptr, bar_flags);
     ImGui::PopStyleColor();
 
-    const float btn_w = 130.0f;
-    const float btn_h = bar_height - 4.0f;
-    const float total_w = btn_w * 3 + 8.0f * 2;
-
-    ImGui::SetCursorPosX((display_size.x - total_w) * 0.5f);
     ImGui::SetCursorPosY(2.0f);
 
     // Кнопка "Профиль"
