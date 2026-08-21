@@ -635,9 +635,7 @@ void MyGui::showHUD() const
     const float bar_height = hudTopOffset();
     const ImVec2 display_size = ImGui::GetIO().DisplaySize;
 
-    const float btn_w = 130.0f;
-    const float btn_h = bar_height - 4.0f;
-    const float total_w = btn_w * 3 + 8.0f * 2;
+    const float total_w = 400.0f;
 
     ImGui::SetNextWindowPos(ImVec2((display_size.x - total_w) * 0.5f, 0.0f));
     ImGui::SetNextWindowSize(ImVec2(total_w, bar_height));
@@ -653,12 +651,18 @@ void MyGui::showHUD() const
     ImGui::Begin(u8"Панель HUD", &open_ptr, bar_flags);
     ImGui::PopStyleColor();
 
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 0.4f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.4f, 0.4f, 0.5f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 0.6f));
+
+    float btn_w = (ImGui::GetWindowWidth() - 16.0f) / 3.0f;
+    float btn_h = ImGui::GetWindowHeight() - 4.0f;
     ImGui::SetCursorPosY(2.0f);
 
     // Кнопка "Профиль"
     ImGui::PushID("hud_profile");
     if (!params->hud_show_profile)
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 0.8f));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 0.4f));
     if (ImGui::Button(u8"Профиль", ImVec2(btn_w, btn_h)))
         params->hud_show_profile = !params->hud_show_profile;
     if (!params->hud_show_profile)
@@ -700,12 +704,16 @@ void MyGui::showHUD() const
     // Кнопка "Поезда"
     ImGui::PushID("hud_list");
     if (!params->hud_show_trains_list)
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 0.8f));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 0.4f));
     if (ImGui::Button(u8"Поезда", ImVec2(btn_w, btn_h)))
         params->hud_show_trains_list = !params->hud_show_trains_list;
     if (!params->hud_show_trains_list)
         ImGui::PopStyleColor();
     ImGui::PopID();
+
+    ImGui::PopStyleColor(); // Button
+    ImGui::PopStyleColor(); // ButtonHovered
+    ImGui::PopStyleColor(); // ButtonActive
 
     ImGui::End();
 
