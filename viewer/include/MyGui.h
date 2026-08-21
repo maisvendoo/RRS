@@ -71,6 +71,11 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool prev_F7 = false;
     bool is_show_HUD = false;
 
+    /// Флаги видимости виджетов HUD
+    bool hud_show_profile = true;
+    bool hud_show_timetable = true;
+    bool hud_show_trains_list = true;
+
     bool is_no_controlled = false;
 
     bool is_no_cabine_control = false;
