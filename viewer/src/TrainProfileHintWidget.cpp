@@ -420,6 +420,8 @@ void TrainProfileHintWidget::drawProfile() const
     draw_list->AddPolyline(poly.data(), static_cast<int>(poly.size()),
                            IM_COL32(0x00, 0x66, 0xCC, 255), 0, 2.0f);
 
+    drawSpeedLimits(plot);
+
     drawSignals(plot);
 
     drawTrain(plot);
@@ -427,8 +429,6 @@ void TrainProfileHintWidget::drawProfile() const
     drawTrainNames(plot);
 
     drawStations(plot);
-
-    drawSpeedLimits(plot);
 }
 
 //------------------------------------------------------------------------------
