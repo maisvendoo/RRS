@@ -685,7 +685,7 @@ void MyGui::showHUD() const
     ImGui::PushID("hud_list");
     if (params->hud_show_trains_list)
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 0.8f));
-    if (ImGui::Button(u8"Список", ImVec2(btn_w, btn_h)))
+    if (ImGui::Button(u8"Поезда", ImVec2(btn_w, btn_h)))
         params->hud_show_trains_list = !params->hud_show_trains_list;
     if (params->hud_show_trains_list)
         ImGui::PopStyleColor();
