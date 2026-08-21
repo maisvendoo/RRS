@@ -2638,7 +2638,24 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
             if (!merged.empty())
                 merged.back().end_distance = std::max(merged.back().end_distance, out.forward);
 
-            out.speed_limits = std::move(merged);
+            // Финальное слияние: соседние с одинаковой скоростью — склеиваем
+            {
+                std::vector<profile_speed_limit_t> final;
+                final.reserve(merged.size());
+                final.push_back(merged[0]);
+                for (size_t i = 1; i < merged.size(); ++i)
+                {
+                    if (std::abs(merged[i].speed_kmh - final.back().speed_kmh) < eps)
+                    {
+                        final.back().end_distance = merged[i].end_distance;
+                    }
+                    else
+                    {
+                        final.push_back(merged[i]);
+                    }
+                }
+                out.speed_limits = std::move(final);
+            }
         }
     }
 
