@@ -807,11 +807,9 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
 
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    const float zone_height = 20.0f;  // высота зоны под базовой линией
+    const float zone_height = 20.0f;
     const float y_bottom = y_base + zone_height;
-    const ImU32 line_col = IM_COL32(255, 165, 0, 200);
-    const ImU32 fill_col = IM_COL32(255, 165, 0, 60);
-    const ImU32 text_col = IM_COL32(255, 255, 255, 220);
+    const ImU32 col = IM_COL32(255, 165, 0, 230);
 
     for (const auto& sl : limits)
     {
@@ -820,7 +818,6 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         if (d1 <= d0 || d1 < -req_backward || d0 > req_forward)
             continue;
 
-        // Обрезаем по видимой области
         const float c0 = std::max(d0, -req_backward);
         const float c1 = std::min(d1, req_forward);
         if (c1 <= c0)
@@ -829,19 +826,21 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         const float x0 = plot.map_x(c0);
         const float x1 = plot.map_x(c1);
 
-        // Заливка зоны
-        draw_list->AddRectFilled(ImVec2(x0, y_base), ImVec2(x1, y_bottom), fill_col);
+        // Рамка
+        draw_list->AddRect(ImVec2(x0, y_base), ImVec2(x1, y_bottom), col, 0.0f, 0, 1.5f);
 
-        // Вертикальные линии границ
-        draw_list->AddLine(ImVec2(x0, y_base), ImVec2(x0, y_bottom), line_col, 1.5f);
-        draw_list->AddLine(ImVec2(x1, y_base), ImVec2(x1, y_bottom), line_col, 1.5f);
+        // Вертикальные линии от рамки до линии профиля
+        const float rel0 = elevationAt(c0, _profile.profile) - plot.origin_elev;
+        const float rel1 = elevationAt(c1, _profile.profile) - plot.origin_elev;
+        draw_list->AddLine(ImVec2(x0, plot.map_y(rel0)), ImVec2(x0, y_base), col, 1.0f);
+        draw_list->AddLine(ImVec2(x1, plot.map_y(rel1)), ImVec2(x1, y_base), col, 1.0f);
 
-        // Подпись скорости по центру интервала
+        // Подпись по центру зоны
         const std::string label = std::to_string(static_cast<int>(sl.speed_kmh));
         const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
         const float tx = (x0 + x1) * 0.5f - text_size.x * 0.5f;
         const float ty = y_base + (zone_height - text_size.y) * 0.5f;
 
-        draw_list->AddText(ImVec2(tx, ty), text_col, label.c_str());
+        draw_list->AddText(ImVec2(tx, ty), col, label.c_str());
     }
 }
