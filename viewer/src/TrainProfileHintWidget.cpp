@@ -811,7 +811,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     const float y_bottom = y_base + zone_height;
     const ImU32 col = IM_COL32(90, 90, 90, 150);
     const ImU32 fill_col = IM_COL32(90, 90, 90, 40);
-    const ImU32 text_col = IM_COL32(255, 165, 0, 230);
+    const ImU32 text_col = IM_COL32(255, 0, 0, 255);
 
     for (const auto& sl : limits)
     {
@@ -835,8 +835,8 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         // Вертикальные линии от рамки до линии профиля
         const float rel0 = elevationAt(c0, _profile.profile) - plot.origin_elev;
         const float rel1 = elevationAt(c1, _profile.profile) - plot.origin_elev;
-        draw_list->AddLine(ImVec2(x0, plot.map_y(rel0)), ImVec2(x0, y_base), col, 1.0f);
-        draw_list->AddLine(ImVec2(x1, plot.map_y(rel1)), ImVec2(x1, y_base), col, 1.0f);
+        draw_list->AddLine(ImVec2(x0, plot.map_y(rel0)), ImVec2(x0, y_base), text_col, 1.5f);
+        draw_list->AddLine(ImVec2(x1, plot.map_y(rel1)), ImVec2(x1, y_base), text_col, 1.5f);
 
         // Подпись по центру зоны
         const std::string label = std::to_string(static_cast<int>(sl.speed_kmh));
