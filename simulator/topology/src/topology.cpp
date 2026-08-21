@@ -2152,11 +2152,14 @@ namespace
                 if (ov_e <= ov_b)
                     continue;
 
-                // Ставим метку в начале интервала (на entry в зону)
+                // Метка на entry в зону
                 profile_speed_limit_t ps;
                 ps.distance = (orient == FWD)
                     ? kind * (traveled + (ov_b - entry_coord))
                     : kind * (traveled + (entry_coord - ov_b));
+                ps.end_distance = (orient == FWD)
+                    ? kind * (traveled + (ov_e - entry_coord))
+                    : kind * (traveled + (entry_coord - ov_e));
                 ps.speed_kmh = sl.speed_kmh;
                 out.push_back(ps);
             }
@@ -2603,6 +2606,29 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
               {
                   return a.distance < b.distance;
               });
+
+    // Слияние последовательных интервалов с одинаковой скоростью
+    if (out.speed_limits.size() > 1)
+    {
+        std::vector<profile_speed_limit_t> merged;
+        merged.reserve(out.speed_limits.size());
+        merged.push_back(out.speed_limits[0]);
+        for (size_t i = 1; i < out.speed_limits.size(); ++i)
+        {
+            const double eps = 1e-6;
+            if (std::abs(out.speed_limits[i].speed_kmh - merged.back().speed_kmh) < eps
+                && out.speed_limits[i].distance <= merged.back().end_distance + eps)
+            {
+                merged.back().end_distance = std::max(merged.back().end_distance,
+                                                      out.speed_limits[i].end_distance);
+            }
+            else
+            {
+                merged.push_back(out.speed_limits[i]);
+            }
+        }
+        out.speed_limits = std::move(merged);
+    }
 
     // Сглаживание изломов скользящим окном для визуализации
     const size_t origin_idx = bwd_points.size();

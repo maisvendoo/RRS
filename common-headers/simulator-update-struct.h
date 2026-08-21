@@ -774,6 +774,9 @@ struct simulator_train_profile_speed_limit_t final
     /// Дистанция от середины поезда вдоль пути, м (вперёд по ходу - «+», назад - «-»)
     float distance = 0.0f;
 
+    /// Конец интервала ограничения, м
+    float end_distance = 0.0f;
+
     /// Ограничение скорости, км/ч
     float speed_kmh = 0.0f;
 
@@ -783,6 +786,7 @@ struct simulator_train_profile_speed_limit_t final
         QDataStream stream(&data, QIODevice::WriteOnly);
 
         stream << distance;
+        stream << end_distance;
         stream << speed_kmh;
 
         return data;
@@ -793,6 +797,7 @@ struct simulator_train_profile_speed_limit_t final
         QDataStream stream(&data, QIODevice::ReadOnly);
 
         stream >> distance;
+        stream >> end_distance;
         stream >> speed_kmh;
     }
 };

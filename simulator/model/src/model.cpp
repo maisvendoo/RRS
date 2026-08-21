@@ -1221,6 +1221,7 @@ void Model::prepareProfilesFeedback()
         {
             simulator_train_profile_speed_limit_t sl;
             sl.distance = static_cast<float>(psl.distance);
+            sl.end_distance = static_cast<float>(psl.end_distance);
             sl.speed_kmh = static_cast<float>(psl.speed_kmh);
             upd.speed_limits.push_back(sl);
         }

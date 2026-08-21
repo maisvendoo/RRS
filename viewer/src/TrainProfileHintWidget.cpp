@@ -813,23 +813,16 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     const ImU32 fill_col = IM_COL32(255, 165, 0, 60);
     const ImU32 text_col = IM_COL32(255, 255, 255, 220);
 
-    for (size_t i = 0; i < limits.size(); ++i)
+    for (const auto& sl : limits)
     {
-        const float d0 = limits[i].distance;
-        if (d0 > req_forward)
-            break;
-
-        // Конец интервала — следующая метка или край окна
-        const float d1 = (i + 1 < limits.size())
-            ? std::min(limits[i + 1].distance, req_forward)
-            : req_forward;
-
-        if (d1 <= d0 || d1 < -req_backward)
+        const float d0 = sl.distance;
+        const float d1 = sl.end_distance;
+        if (d1 <= d0 || d1 < -req_backward || d0 > req_forward)
             continue;
 
         // Обрезаем по видимой области
         const float c0 = std::max(d0, -req_backward);
-        const float c1 = std::max(d1, -req_backward);
+        const float c1 = std::min(d1, req_forward);
         if (c1 <= c0)
             continue;
 
@@ -844,7 +837,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         draw_list->AddLine(ImVec2(x1, y_base), ImVec2(x1, y_bottom), line_col, 1.5f);
 
         // Подпись скорости по центру интервала
-        const std::string label = std::to_string(static_cast<int>(limits[i].speed_kmh));
+        const std::string label = std::to_string(static_cast<int>(sl.speed_kmh));
         const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
         const float tx = (x0 + x1) * 0.5f - text_size.x * 0.5f;
         const float ty = y_base + (zone_height - text_size.y) * 0.5f;

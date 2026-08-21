@@ -119,6 +119,9 @@ struct TOPOLOGY_EXPORT profile_speed_limit_t
     /// Дистанция от точки отсчёта профиля, м (вперёд по ходу - «+», назад - «-»)
     double distance = 0.0;
 
+    /// Конец интервала ограничения, м (вперёд по ходу - «+», назад - «-»)
+    double end_distance = 0.0;
+
     /// Ограничение скорости, км/ч
     double speed_kmh = 0.0;
 };
