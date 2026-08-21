@@ -416,6 +416,7 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
 
     updateStations();
     map->slotStationAtCenter(0);
+    map->slotPlayerAtCenter(0);
 
     if ( (topology->getTrajectoriesList() == nullptr) || (topology->getConnectorsList() == nullptr) )
     {
