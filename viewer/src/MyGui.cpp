@@ -642,6 +642,7 @@ void MyGui::showHUD() const
     bar_flags |= ImGuiWindowFlags_NoTitleBar;
     bar_flags |= ImGuiWindowFlags_NoResize;
     bar_flags |= ImGuiWindowFlags_NoCollapse;
+    bar_flags |= ImGuiWindowFlags_NoScrollbar;
 
     bool open_ptr = true;
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.5f));
