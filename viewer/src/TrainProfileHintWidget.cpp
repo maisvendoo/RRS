@@ -159,7 +159,13 @@ static void collectGridMarks(const std::vector<simulator_train_profile_point_t>&
             const int k_first = static_cast<int>(std::ceil(d0 / grid_step));
             const int k_last = static_cast<int>(std::floor(d1 / grid_step));
             for (int k = k_first; k <= k_last; ++k)
-                out.emplace_back(0.0f, k * grid_step);
+            {
+                const float rc = 0.0f;
+                const float d = k * grid_step;
+                if (!out.empty() && std::abs(out.back().second - d) < 0.5f)
+                    continue;
+                out.emplace_back(rc, d);
+            }
         }
         return;
     }
@@ -220,6 +226,10 @@ static void collectGridMarks(const std::vector<simulator_train_profile_point_t>&
         for (int k = k_first; k <= k_last; ++k)
         {
             const float rc = k * grid_step;
+            // Дедупликация: не добавляем метку, если последняя добавленная
+            // имеет тот же railway_coord (с точностью до шага)
+            if (!out.empty() && std::abs(out.back().first - rc) < 0.5f)
+                continue;
             const float t = (rc - rc0) / (rc1 - rc0);
             out.emplace_back(rc, d0 + t * (d1 - d0));
         }
