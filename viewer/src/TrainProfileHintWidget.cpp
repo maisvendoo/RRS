@@ -849,6 +849,12 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
                                      ImVec2(bg_x1, bg_y1),
                                      IM_COL32(255, 255, 255, 255));
 
+        // Жирный шрифт через наложение
+        const float bold_off = 1.0f;
+        draw_list->AddText(ImVec2(tx - bold_off, ty), text_col, label.c_str());
+        draw_list->AddText(ImVec2(tx + bold_off, ty), text_col, label.c_str());
+        draw_list->AddText(ImVec2(tx, ty - bold_off), text_col, label.c_str());
+        draw_list->AddText(ImVec2(tx, ty + bold_off), text_col, label.c_str());
         draw_list->AddText(ImVec2(tx, ty), text_col, label.c_str());
 
         // Вертикальные линии от линии профиля до низа ленты (поверх подложки)
