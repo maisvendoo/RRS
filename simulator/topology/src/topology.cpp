@@ -2608,26 +2608,37 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
               });
 
     // Слияние последовательных интервалов с одинаковой скоростью
-    if (out.speed_limits.size() > 1)
     {
-        std::vector<profile_speed_limit_t> merged;
-        merged.reserve(out.speed_limits.size());
-        merged.push_back(out.speed_limits[0]);
-        for (size_t i = 1; i < out.speed_limits.size(); ++i)
+        const double eps = 1e-6;
+        if (!out.speed_limits.empty())
         {
-            const double eps = 1e-6;
-            if (std::abs(out.speed_limits[i].speed_kmh - merged.back().speed_kmh) < eps
-                && out.speed_limits[i].distance <= merged.back().end_distance + eps)
+            std::vector<profile_speed_limit_t> merged;
+            merged.reserve(out.speed_limits.size());
+            merged.push_back(out.speed_limits[0]);
+            for (size_t i = 1; i < out.speed_limits.size(); ++i)
             {
-                merged.back().end_distance = std::max(merged.back().end_distance,
-                                                      out.speed_limits[i].end_distance);
+                if (std::abs(out.speed_limits[i].speed_kmh - merged.back().speed_kmh) < eps
+                    && out.speed_limits[i].distance <= merged.back().end_distance + eps)
+                {
+                    merged.back().end_distance = std::max(merged.back().end_distance,
+                                                          out.speed_limits[i].end_distance);
+                }
+                else
+                {
+                    // Если между интервалами зазор — заполняем его предыдущим значением
+                    if (out.speed_limits[i].distance > merged.back().end_distance + eps)
+                    {
+                        profile_speed_limit_t fill;
+                        fill.distance = merged.back().end_distance;
+                        fill.end_distance = out.speed_limits[i].distance;
+                        fill.speed_kmh = merged.back().speed_kmh;
+                        merged.push_back(fill);
+                    }
+                    merged.push_back(out.speed_limits[i]);
+                }
             }
-            else
-            {
-                merged.push_back(out.speed_limits[i]);
-            }
+            out.speed_limits = std::move(merged);
         }
-        out.speed_limits = std::move(merged);
     }
 
     // Сглаживание изломов скользящим окном для визуализации
