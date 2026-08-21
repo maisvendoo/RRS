@@ -810,6 +810,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     const float zone_height = 20.0f;
     const float y_bottom = y_base + zone_height;
     const ImU32 col = IM_COL32(90, 90, 90, 150);
+    const ImU32 text_col = IM_COL32(255, 165, 0, 230);
 
     for (const auto& sl : limits)
     {
@@ -841,6 +842,6 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         const float tx = (x0 + x1) * 0.5f - text_size.x * 0.5f;
         const float ty = y_base + (zone_height - text_size.y) * 0.5f;
 
-        draw_list->AddText(ImVec2(tx, ty), col, label.c_str());
+        draw_list->AddText(ImVec2(tx, ty), text_col, label.c_str());
     }
 }
