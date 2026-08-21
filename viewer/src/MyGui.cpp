@@ -647,19 +647,22 @@ void MyGui::showHUD() const
     bar_flags |= ImGuiWindowFlags_NoScrollbar;
 
     bool open_ptr = true;
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.5f));
     ImGui::Begin(u8"Панель HUD", &open_ptr, bar_flags);
     ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 0.4f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.4f, 0.4f, 0.5f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 0.6f));
 
-    float btn_w = (ImGui::GetWindowWidth() - 16.0f) / 3.0f;
+    float gap = 8.0f;
+    float pad = gap;
+    float btn_w = (total_w - pad * 2 - gap * 2) / 3.0f;
     float btn_h = ImGui::GetWindowHeight() - 4.0f;
-    ImGui::SetCursorPosY(2.0f);
 
-    // Кнопка "Профиль"
+    ImGui::SetCursorPos(ImVec2(pad, 2.0f));
     ImGui::PushID("hud_profile");
     if (!params->hud_show_profile)
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 0.4f));
@@ -669,8 +672,7 @@ void MyGui::showHUD() const
         ImGui::PopStyleColor();
     ImGui::PopID();
 
-    ImGui::SameLine();
-    ImGui::SetCursorPosY(2.0f);
+    ImGui::SetCursorPos(ImVec2(pad + (btn_w + gap), 2.0f));
 
     // Кнопка "График" — неактивна, если данных нет
     const bool has_timetable = (params->vehicles_handler)
@@ -698,8 +700,7 @@ void MyGui::showHUD() const
     }
     ImGui::PopID();
 
-    ImGui::SameLine();
-    ImGui::SetCursorPosY(2.0f);
+    ImGui::SetCursorPos(ImVec2(pad + (btn_w + gap) * 2, 2.0f));
 
     // Кнопка "Поезда"
     ImGui::PushID("hud_list");
