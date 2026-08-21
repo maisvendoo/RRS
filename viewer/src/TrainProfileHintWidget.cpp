@@ -848,9 +848,11 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         const float pad = 2.0f;
         const float bg_x0 = std::max(tx - pad, x0);
         const float bg_x1 = std::min(tx + text_size.x + pad, x1);
-        if (bg_x1 > bg_x0)
-            draw_list->AddRectFilled(ImVec2(bg_x0, ty - pad),
-                                     ImVec2(bg_x1, ty + text_size.y + pad),
+        const float bg_y0 = std::max(ty - pad, y_base);
+        const float bg_y1 = std::min(ty + text_size.y + pad, y_bottom);
+        if (bg_x1 > bg_x0 && bg_y1 > bg_y0)
+            draw_list->AddRectFilled(ImVec2(bg_x0, bg_y0),
+                                     ImVec2(bg_x1, bg_y1),
                                      IM_COL32(255, 255, 255, 255));
 
         draw_list->AddText(ImVec2(tx, ty), text_col, label.c_str());
