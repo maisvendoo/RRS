@@ -810,6 +810,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     const float zone_height = 20.0f;
     const float y_bottom = y_base + zone_height;
     const ImU32 col = IM_COL32(90, 90, 90, 150);
+    const ImU32 fill_col = IM_COL32(90, 90, 90, 40);
     const ImU32 text_col = IM_COL32(255, 165, 0, 230);
 
     for (const auto& sl : limits)
@@ -827,7 +828,8 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         const float x0 = plot.map_x(c0);
         const float x1 = plot.map_x(c1);
 
-        // Рамка
+        // Заливка + рамка
+        draw_list->AddRectFilled(ImVec2(x0, y_base), ImVec2(x1, y_bottom), fill_col);
         draw_list->AddRect(ImVec2(x0, y_base), ImVec2(x1, y_bottom), col, 0.0f, 0, 1.5f);
 
         // Вертикальные линии от рамки до линии профиля
