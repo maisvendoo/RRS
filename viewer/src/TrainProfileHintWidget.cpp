@@ -801,32 +801,53 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     const float req_backward = std::min(cfg_backward, std::max(_profile.backward_requested, 0.0f));
     const float req_forward = std::min(cfg_forward, std::max(_profile.forward_requested, 0.0f));
 
+    // Базовая линия (y = 0) — уровень середины поезда
+    const float y_base = (0.0f >= plot.rel_min && 0.0f <= plot.rel_max)
+        ? plot.map_y(0.0f) : (plot.y0 + plot.y1) * 0.5f;
+
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    const float bar_height = 30.0f;
-    const float bar_width = 4.0f;
-    const ImU32 bar_col = IM_COL32(255, 165, 0, 230);
-    const ImU32 text_col = IM_COL32(255, 255, 255, 255);
+    const float zone_height = 20.0f;  // высота зоны под базовой линией
+    const float y_bottom = y_base + zone_height;
+    const ImU32 line_col = IM_COL32(255, 165, 0, 200);
+    const ImU32 fill_col = IM_COL32(255, 165, 0, 60);
+    const ImU32 text_col = IM_COL32(255, 255, 255, 220);
 
-    for (const auto& sl : limits)
+    for (size_t i = 0; i < limits.size(); ++i)
     {
-        if (sl.distance < -req_backward || sl.distance > req_forward)
+        const float d0 = limits[i].distance;
+        if (d0 > req_forward)
+            break;
+
+        // Конец интервала — следующая метка или край окна
+        const float d1 = (i + 1 < limits.size())
+            ? std::min(limits[i + 1].distance, req_forward)
+            : req_forward;
+
+        if (d1 <= d0 || d1 < -req_backward)
             continue;
 
-        const float x = plot.map_x(sl.distance);
-        const float rel = elevationAt(sl.distance, _profile.profile) - plot.origin_elev;
-        const float y_base = plot.map_y(rel);
+        // Обрезаем по видимой области
+        const float c0 = std::max(d0, -req_backward);
+        const float c1 = std::max(d1, -req_backward);
+        if (c1 <= c0)
+            continue;
 
-        const float x0 = x - bar_width * 0.5f;
-        const float x1 = x + bar_width * 0.5f;
-        const float y_top = y_base - bar_height;
+        const float x0 = plot.map_x(c0);
+        const float x1 = plot.map_x(c1);
 
-        draw_list->AddRectFilled(ImVec2(x0, y_top), ImVec2(x1, y_base), bar_col);
+        // Заливка зоны
+        draw_list->AddRectFilled(ImVec2(x0, y_base), ImVec2(x1, y_bottom), fill_col);
 
-        const std::string label = std::to_string(static_cast<int>(sl.speed_kmh));
+        // Вертикальные линии границ
+        draw_list->AddLine(ImVec2(x0, y_base), ImVec2(x0, y_bottom), line_col, 1.5f);
+        draw_list->AddLine(ImVec2(x1, y_base), ImVec2(x1, y_bottom), line_col, 1.5f);
+
+        // Подпись скорости по центру интервала
+        const std::string label = std::to_string(static_cast<int>(limits[i].speed_kmh));
         const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
-        const float tx = x - text_size.x * 0.5f;
-        const float ty = y_top - text_size.y - 2.0f;
+        const float tx = (x0 + x1) * 0.5f - text_size.x * 0.5f;
+        const float ty = y_base + (zone_height - text_size.y) * 0.5f;
 
         draw_list->AddText(ImVec2(tx, ty), text_col, label.c_str());
     }
