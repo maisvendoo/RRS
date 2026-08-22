@@ -394,6 +394,7 @@ void MapWidget::drawTrajectoryModules(Trajectory *traj, QPainter &painter)
                 QPen pen;
                 pen.setColor(QColor(int(line.color.r), int(line.color.g), int(line.color.b)));
                 pen.setWidth(line.width);
+                pen.setCapStyle(Qt::FlatCap);
                 painter.setPen(pen);
 
                 QPoint p0 = coord_transform(line.begin_point);

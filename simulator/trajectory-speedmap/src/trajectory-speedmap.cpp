@@ -304,7 +304,7 @@ void TrajectorySpeedMap::step(double t, double dt)
         device.device->setInputSignal(SpeedMap::INPUT_NEXT_DISTANCE, distance_to_next_limit);
     }
 }
-/*
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -315,6 +315,18 @@ QByteArray TrajectorySpeedMap::serialize() const
 
     // Кладем в буфер имя модуля
     stream << name;
+
+    // Число участков ограничения скорости
+    uint32_t limits_count = static_cast<uint32_t>(limits.size());
+    stream << limits_count;
+
+    // Параметры ограничений скорости
+    for (uint32_t i = 0; i < limits_count; ++i)
+    {
+        stream << limits[i];
+        stream << limit_begins[i];
+        stream << limit_ends[i];
+    }
 
     return data;
 }
@@ -328,6 +340,21 @@ void TrajectorySpeedMap::deserialize(QByteArray& data)
 
     // Восстанавливаем имя
     stream >> name;
+
+    // Восстанавливаем число треков
+    uint32_t limits_count;
+    stream >> limits_count;
+    limits.resize(limits_count);
+    limit_begins.resize(limits_count);
+    limit_ends.resize(limits_count);
+
+    // Восстанавливаем параметры ограничений скорости
+    for (uint32_t i = 0; i < limits_count; ++i)
+    {
+        stream >> limits[i];
+        stream >> limit_begins[i];
+        stream >> limit_ends[i];
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -335,9 +362,93 @@ void TrajectorySpeedMap::deserialize(QByteArray& data)
 //------------------------------------------------------------------------------
 void TrajectorySpeedMap::getDrawElements(std::vector<draw_line_t>& lines, std::vector<draw_circle_t>& circles, const double scale)
 {
+    if (limits.empty())
+    {
+        return;
+    }
 
+    // Ширина отрисовки ограничения - с учётом масштаба карты
+    int width = std::ceil(2.0 * scale);
+
+    // Вспомогательная функция для преобразования ограничения в цвет
+    auto calc_color = [](double speed_limit) -> vec3
+    {
+        if (speed_limit <= 60.0)
+        {
+            return {1.0f, static_cast<float>(speed_limit / 60.0), 0.0f};
+        }
+        if (speed_limit <= 120.0)
+        {
+            return {1.0f - static_cast<float>((speed_limit - 60.0) / 60.0), 1.0f, 0.0f};
+        }
+
+        return {0.0f, 1.0f, std::tanh(static_cast<float>(speed_limit - 120.0))};
+    };
+
+    uint32_t i = 0;
+    dvec3 begin_point = {0.0, 0.0, 0.0};
+    dvec3 end_point = {0.0, 0.0, 0.0};
+    for (const track_t& track : trajectory->getTracks())
+    {
+        while (true)
+        {
+            if (limit_begins[i] <= track.traj_coord)
+            {
+                begin_point = track.begin_point;
+            }
+            else
+            {
+                if (limit_begins[i] < track.traj_coord + track.len)
+                {
+                    const double length_to_begin = limit_begins[i] - track.traj_coord;
+                    begin_point = track.begin_point + track.orth * length_to_begin;
+                }
+                else
+                {
+                    begin_point = track.end_point;
+                }
+            }
+
+            if (limit_ends[i] < track.traj_coord + track.len)
+            {
+                const double length_to_end = limit_ends[i] - track.traj_coord;
+                if (length_to_end > 1e-5)
+                {
+                    end_point = track.begin_point + track.orth * length_to_end;
+
+                    lines.emplace_back(draw_line_t());
+                    draw_line_t& line = lines.back();
+                    line.begin_point = begin_point;
+                    line.end_point = end_point;
+                    line.width = width;
+                    line.color = calc_color(limits[i]);
+                }
+
+                ++i;
+                if (i >= limits.size())
+                {
+                    break;
+                }
+            }
+            else
+            {
+                if (begin_point != track.end_point)
+                {
+                    end_point = track.end_point;
+
+                    lines.emplace_back(draw_line_t());
+                    draw_line_t& line = lines.back();
+                    line.begin_point = begin_point;
+                    line.end_point = end_point;
+                    line.width = width;
+                    line.color = calc_color(limits[i]);
+                }
+                break;
+            }
+        }
+    }
 }
-*/
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
