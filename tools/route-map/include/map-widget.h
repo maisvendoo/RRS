@@ -220,8 +220,6 @@ private:
     void drawTrajectory(Trajectory* traj, QPainter& painter,
                         QPointF& cursor_pos, double& distance2);
 
-    void drawTrajectoryModules(Trajectory* traj, QPainter& painter);
-
     void drawTrains(simulator_update_pos_t *train_data, QPainter& painter);
 
     void drawTrainNames(simulator_update_pos_t *train_data, QPainter& painter);

@@ -294,10 +294,8 @@ void MapWidget::paintEvent(QPaintEvent *event)
 //
 //------------------------------------------------------------------------------
 void MapWidget::drawTrajectory(Trajectory* traj, QPainter& painter,
-                               QPointF& cursor_pos, double& distance2)
+                                QPointF& cursor_pos, double& distance2)
 {
-    drawTrajectoryModules(traj, painter);
-
     QPen pen;
 
     pen.setWidth(1);
@@ -361,59 +359,6 @@ void MapWidget::drawTrajectory(Trajectory* traj, QPainter& painter,
         else
         {
             traj_label->hide();
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MapWidget::drawTrajectoryModules(Trajectory *traj, QPainter &painter)
-{
-    if (menu_view_topology_modules.isEmpty())
-    {
-        return;
-    }
-
-    for (TrajectoryDevice* device : traj->getTrajectoryDevices())
-    {
-        QString module_name = device->getName();
-        QAction* action_view_module = menu_view_topology_modules.value(module_name, nullptr);
-        if (action_view_module && action_view_module->isChecked())
-        {
-            std::vector<draw_line_t> lines;
-            std::vector<draw_circle_t> circles;
-            device->getDrawElements(lines, circles, scale);
-
-            for (auto& line : lines)
-            {
-                line.color.r = std::clamp(line.color.r, 0.0f, 1.0f) * 255.0f;
-                line.color.g = std::clamp(line.color.g, 0.0f, 1.0f) * 255.0f;
-                line.color.b = std::clamp(line.color.b, 0.0f, 1.0f) * 255.0f;
-
-                QPen pen;
-                pen.setColor(QColor(int(line.color.r), int(line.color.g), int(line.color.b)));
-                pen.setWidth(line.width);
-                pen.setCapStyle(Qt::FlatCap);
-                painter.setPen(pen);
-
-                QPoint p0 = coord_transform(line.begin_point);
-                QPoint p1 = coord_transform(line.end_point);
-
-                painter.drawLine(p0, p1);
-            }
-
-            for (auto& circle : circles)
-            {
-                circle.color.r = std::clamp(circle.color.r, 0.0f, 1.0f) * 255.0f;
-                circle.color.g = std::clamp(circle.color.g, 0.0f, 1.0f) * 255.0f;
-                circle.color.b = std::clamp(circle.color.b, 0.0f, 1.0f) * 255.0f;
-                painter.setBrush(QColor(int(circle.color.r), int(circle.color.g), int(circle.color.b)));
-
-                QPoint point = coord_transform(circle.point);
-
-                painter.drawEllipse(point, circle.radius, circle.radius);
-            }
         }
     }
 }

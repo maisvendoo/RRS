@@ -11,6 +11,7 @@
 #include    <simulator-update-struct.h>
 #include    <background-widget.h>
 #include    <map-widget.h>
+#include    <modules-hints-widget.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -74,6 +75,8 @@ private:
     std::vector<double> vehicles_half_length;
 
     BackGroundWidget *bg;
+
+    ModulesHintsWidget *modules_hints;
 
     MapWidget *map;
 

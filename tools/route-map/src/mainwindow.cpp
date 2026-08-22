@@ -90,6 +90,8 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
 
     bg = new BackGroundWidget(ui->Map);
 
+    modules_hints = new ModulesHintsWidget(ui->Map);
+
     map = new MapWidget(ui->Map);
     map->stations = topology->getStationsList();
     map->traj_list = topology->getTrajectoriesList();
@@ -98,6 +100,11 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     map->train_data = &train_data;
     map->vehicles_half_length = &vehicles_half_length;
     map->players_data = &players_data;
+
+    modules_hints->traj_list = map->traj_list;
+    modules_hints->menu_view_topology_modules = &map->menu_view_topology_modules;
+
+    map->raise();
 
     connect(map, &MapWidget::sigOpenSignalMenu,
             this, &MainWindow::slotSignalControlMenu);
@@ -249,6 +256,11 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     map->resize(ui->Map->width(), ui->Map->height());
     map->update();
+
+    modules_hints->resize(ui->Map->width(), ui->Map->height());
+    modules_hints->setScale(map->getScale());
+    modules_hints->setShift(map->getShift());
+    modules_hints->update();
 
     bg->resize(ui->Map->width(), ui->Map->height());
     bg->setScale(map->getScale());
