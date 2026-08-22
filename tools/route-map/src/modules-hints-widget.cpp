@@ -27,13 +27,7 @@ void ModulesHintsWidget::paintEvent(QPaintEvent *event)
 {
     (void)event;
 
-    if (traj_list == nullptr)
-    {
-        return;
-    }
-
-    if ((menu_view_topology_modules == nullptr) ||
-        menu_view_topology_modules->isEmpty())
+    if ((traj_list == nullptr) || menu_view_topology_modules.isEmpty())
     {
         return;
     }
@@ -57,7 +51,7 @@ void ModulesHintsWidget::drawTrajectoryModules(Trajectory *traj, QPainter &paint
     for (TrajectoryDevice* device : traj->getTrajectoryDevices())
     {
         QString module_name = device->getName();
-        QAction* action_view_module = menu_view_topology_modules->value(module_name, nullptr);
+        QAction* action_view_module = menu_view_topology_modules.value(module_name, nullptr);
         if (action_view_module && action_view_module->isChecked())
         {
             std::vector<draw_line_t> lines;

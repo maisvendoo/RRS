@@ -62,8 +62,6 @@ public:
 
     std::vector<TrainLabel *> train_labels;
 
-    QMap<QString, QAction*> menu_view_topology_modules;
-
     struct switch_menu_t {
         QMenu* menu = nullptr;
         QAction* action = nullptr;

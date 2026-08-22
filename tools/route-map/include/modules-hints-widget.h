@@ -21,7 +21,7 @@ public:
 
     traj_list_t *traj_list = nullptr;
 
-    QMap<QString, QAction*> *menu_view_topology_modules = nullptr;
+    QMap<QString, QAction*> menu_view_topology_modules;
 
     void resize(int width, int height)
     {

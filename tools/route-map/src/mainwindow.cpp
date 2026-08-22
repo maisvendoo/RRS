@@ -91,6 +91,7 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     bg = new BackGroundWidget(ui->Map);
 
     modules_hints = new ModulesHintsWidget(ui->Map);
+    modules_hints->traj_list = topology->getTrajectoriesList();
 
     map = new MapWidget(ui->Map);
     map->stations = topology->getStationsList();
@@ -101,8 +102,6 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     map->vehicles_half_length = &vehicles_half_length;
     map->players_data = &players_data;
 
-    modules_hints->traj_list = map->traj_list;
-    modules_hints->menu_view_topology_modules = &map->menu_view_topology_modules;
 
     map->raise();
 
@@ -460,12 +459,12 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
         ui->menuView->removeAction(menu_view_separator);
         delete menu_view_separator;
     }
-    for (auto action_view_module : map->menu_view_topology_modules)
+    for (auto action_view_module : modules_hints->menu_view_topology_modules)
     {
         ui->menuView->removeAction(action_view_module);
         delete action_view_module;
     }
-    map->menu_view_topology_modules.clear();
+    modules_hints->menu_view_topology_modules.clear();
 
     for (auto traj : *topology->getTrajectoriesList())
     {
@@ -519,18 +518,18 @@ void MainWindow::slotGetTopologyModulesData(QByteArray& modules_data)
             {
                 continue;
             }
-            if (map->menu_view_topology_modules.find(module_name) == map->menu_view_topology_modules.end())
+            if (modules_hints->menu_view_topology_modules.find(module_name) == modules_hints->menu_view_topology_modules.end())
             {
                 QAction* action_view_module = new QAction(module_name, ui->menuView);
-                map->menu_view_topology_modules.insert(module_name, action_view_module);
+                modules_hints->menu_view_topology_modules.insert(module_name, action_view_module);
             }
         }
     }
 
-    if (!map->menu_view_topology_modules.empty())
+    if (!modules_hints->menu_view_topology_modules.empty())
     {
         menu_view_separator = ui->menuView->addSeparator();
-        for (auto action_view_module : map->menu_view_topology_modules)
+        for (auto action_view_module : modules_hints->menu_view_topology_modules)
         {
             action_view_module->setCheckable(true);
             ui->menuView->addAction(action_view_module);
