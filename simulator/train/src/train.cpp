@@ -567,10 +567,13 @@ Train* Train::uncouple(double uncoupling_distance)
 //------------------------------------------------------------------------------
 void Train::reverse()
 {
-    // Поезд из единственной ПЕ - примитивный разворот ориентации
+    // Поезд из единственной ПЕ - примитивный разворот ориентации и движения
     if (vehicles.size() == 1)
     {
+        size_t s = vehicles[0]->getDegressOfFreedom();
         vehicles[0]->setDirection(-vehicles[0]->getDirection());
+        y[0] = -y[0];
+        y[s] = -y[s];
         return;
     }
 
