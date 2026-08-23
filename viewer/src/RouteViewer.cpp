@@ -9,6 +9,7 @@
 #include "RouteLoader.h"
 #include "ScreenshotWriter.h"
 // #include "Skybox.h"
+#include "StationsHandler.h"
 #include "Sun.h"
 #include "TrafficLightsHandler.h"
 #include "UpdateControlToServerHandler.h"
@@ -151,6 +152,7 @@ void RouteViewer::initialize(int argc, char* argv[])
     screenshot_writer = std::make_unique<ScreenshotWriter>("screenshot.jpg");
 
     traffic_lights_handler = std::make_unique<TrafficLightsHandler>();
+    stations_handler = std::make_unique<StationsHandler>();
     vehicles_handler = std::make_unique<VehiclesHandler>(settings, sound_manager.get());
 
     initVsgOptions();
@@ -994,6 +996,15 @@ void RouteViewer::slotGetStationsData(QByteArray &stations_data)
 {
     LOG_INFO("Got stations data from server (%lld bytes)",
              static_cast<long long>(stations_data.size()));
+
+    if (is_stations)
+    {
+        LOG_WARN("Get stations data again");
+        return;
+    }
+    is_stations = true;
+
+    this->stations_handler->load(stations_data);
 }
 
 //------------------------------------------------------------------------------
