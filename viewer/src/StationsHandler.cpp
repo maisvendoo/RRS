@@ -86,15 +86,15 @@ void StationsHandler::createSceneGraph(vsg::ref_ptr<vsg::Options> options)
 
     for (const auto& station : stations)
     {
-        const vsg::dvec3 station_pos(station.pos_x, station.pos_y, station.pos_z);
 
         auto layout = vsg::StandardLayout::create();
-        layout->position = vsg::vec3(static_cast<float>(station_pos.x),
-                                     static_cast<float>(station_pos.y),
-                                     static_cast<float>(station_pos.z + 10.0));
+        layout->position = vsg::vec3(static_cast<float>(station.pos_x),
+                                     static_cast<float>(station.pos_y),
+                                     static_cast<float>(station.pos_z + 10.0));
         layout->horizontal = vsg::vec3(STATION_NAME_SIZE, 0.0f, 0.0f);
-        layout->vertical = vsg::vec3(0.0f, 0.0f, STATION_NAME_SIZE);
+        layout->vertical = vsg::vec3(0.0f, STATION_NAME_SIZE, 0.0f);
         layout->horizontalAlignment = vsg::StandardLayout::CENTER_ALIGNMENT;
+        layout->billboard = true;
 
         auto text = vsg::Text::create();
         text->text = vsg::wstringValue::create(station.name.toStdWString());
@@ -103,7 +103,7 @@ void StationsHandler::createSceneGraph(vsg::ref_ptr<vsg::Options> options)
         text->setup(0, options);
 
         auto cull_node = vsg::CullNode::create();
-        cull_node->bound = vsg::dsphere(station_pos, STATION_CULLING_RADIUS);
+        cull_node->bound = vsg::dsphere(station.pos_x, station.pos_y, station.pos_z, STATION_CULLING_RADIUS);
         cull_node->child = text;
 
         group->addChild(cull_node);
