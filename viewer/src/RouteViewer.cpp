@@ -25,6 +25,7 @@
 #include "graphics/shader_funcs.h"
 
 #include <vsg/app/CloseHandler.h>
+#include <vsg/app/Viewer.h>
 #include <vsg/app/CommandGraph.h>
 #include <vsg/app/RenderGraph.h>
 #include <vsg/app/View.h>
@@ -69,6 +70,42 @@
 #include <AltSoundLocker.h>
 
 #include <iostream>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+/// Операция подключения скомпилированного подграфа в сцену.
+/// Выполняется в фазе update, чтобы не пересекаться с рендером в других потоках.
+struct Merge final : public vsg::Inherit<vsg::Operation, Merge>
+{
+    Merge(vsg::ref_ptr<vsg::Viewer> in_viewer,
+          vsg::ref_ptr<vsg::Group> in_root,
+          vsg::ref_ptr<vsg::Node> in_subgraph,
+          const vsg::CompileResult& in_compile_result) :
+        root(in_root),
+        subgraph(in_subgraph),
+        compile_result(in_compile_result)
+    {
+        viewer = in_viewer;
+    }
+
+    void run() override
+    {
+        // Превращаем observer_ptr в ref_ptr, чтобы проверить живость viewer'а
+        if (vsg::ref_ptr<vsg::Viewer> ref_viewer = viewer;
+            ref_viewer && root && subgraph)
+        {
+            updateViewer(*ref_viewer, compile_result);
+
+            root->addChild(subgraph);
+        }
+    }
+
+    vsg::observer_ptr<vsg::Viewer> viewer;
+    vsg::ref_ptr<vsg::Group> root;
+    vsg::ref_ptr<vsg::Node> subgraph;
+    vsg::CompileResult compile_result;
+};
 
 //------------------------------------------------------------------------------
 //
@@ -1004,7 +1041,33 @@ void RouteViewer::slotGetStationsData(QByteArray &stations_data)
     }
     is_stations = true;
 
-    this->stations_handler->load(stations_data);
+    if (!stations_handler->load(stations_data, options))
+    {
+        LOG_WARN("Fail to load stations data");
+        return;
+    }
+
+    auto stations_node = stations_handler->getRootNode();
+
+    // Компилируем подграф до подключения его в сцену
+    if (!viewer->compileManager)
+    {
+        LOG_ERROR("No compile manager in viewer");
+        return;
+    }
+
+    auto compile_result = viewer->compileManager->compile(stations_node);
+    if (!compile_result)
+    {
+        LOG_ERROR("Fail to compile stations scene graph (VkResult %d)",
+                  compile_result.result);
+        return;
+    }
+
+    // Подключаем подграф в сцену и обновляем viewer в фазе update
+    viewer->addUpdateOperation(
+        Merge::create(viewer, root, stations_node, compile_result),
+        vsg::UpdateOperations::ONE_TIME);
 }
 
 //------------------------------------------------------------------------------
