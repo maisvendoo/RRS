@@ -30,6 +30,10 @@ public:
     {
         this->vehicles_info = data;
     }
+    void setStationsData(QByteArray data)
+    {
+        this->stations_data = data;
+    }
 
     void updatePlayers(QByteArray players_data, double t);
 
@@ -73,8 +77,6 @@ signals:
     void requestTopologyData(QByteArray &topology_data);
 
     void requestSignalsData(QByteArray &signals_data);
-
-    void requestStationsData(QByteArray &stations_data);
 
     void requestTopologyModules(QByteArray& modules_data);
 
@@ -131,6 +133,8 @@ private:
     QByteArray route_info;
 
     QByteArray vehicles_info;
+
+    QByteArray stations_data;
 
     QByteArray vehicles_state;
 

@@ -144,6 +144,9 @@ bool Model::init(const simulator_command_line_t &command_line)
     tcp_server->setRouteInfo(route_info.serialize());
     Journal::instance()->info("Ready route info for server");
 
+    tcp_server->setStationsData(topology->serialize_stations());
+    Journal::instance()->info("Ready stations data for server");
+
     simulator_vehicles_info_t vehicles_info;
     vehicles_info.vehicles.resize(vehicles.size());
     size_t i = 0;
@@ -969,8 +972,6 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::requestSignalsData, this, &Model::slotGetSignalsData);
 
-    connect(tcp_server, &TcpServer::requestStationsData, this, &Model::slotGetStationsData);
-
     for (auto signal : topology->getSignalsData()->line_signals)
     {
         connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
@@ -1451,14 +1452,6 @@ void Model::slotGetTopologyModules(QByteArray &topology_modules)
 void Model::slotGetSignalsData(QByteArray &signals_data)
 {
     signals_data = topology->getSignalsData()->serialize();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void Model::slotGetStationsData(QByteArray &stations_data)
-{
-    stations_data = topology->serialize_stations();
 }
 
 //------------------------------------------------------------------------------

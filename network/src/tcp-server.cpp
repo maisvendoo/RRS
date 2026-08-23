@@ -393,12 +393,9 @@ void TcpServer::send_signals_data(client_data_t &client_data)
 //------------------------------------------------------------------------------
 void TcpServer::send_stations_data(client_data_t &client_data)
 {
-    QByteArray data;
-    emit requestStationsData(data);
-
     network_data_t net_data;
     net_data.stype = STYPE_STATIONS_DATA;
-    net_data.data = data;
+    net_data.data = stations_data;
 
     client_data.socket->write(net_data.serialize());
     client_data.socket->flush();
