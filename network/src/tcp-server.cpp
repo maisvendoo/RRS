@@ -135,6 +135,14 @@ void TcpServer::process_client_request(client_data_t &client_data)
         clients_for_signals_updates.insert(client_data.socket);
         break;
     }
+    case STYPE_REQUEST_STATIONS_DATA:
+    {
+        client_data.received_data.data.clear();
+
+        //Journal::instance()->info(QString("Received stations data request for #%1").arg(client_data.id));
+        send_stations_data(client_data);
+        break;
+    }
 /*    case STYPE_REQUEST_SIGNALS_UPDATE:
     {
         client_data.received_data.data.clear();
@@ -374,6 +382,22 @@ void TcpServer::send_signals_data(client_data_t &client_data)
 
     network_data_t net_data;
     net_data.stype = STYPE_SIGNALS_DATA;
+    net_data.data = data;
+
+    client_data.socket->write(net_data.serialize());
+    client_data.socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::send_stations_data(client_data_t &client_data)
+{
+    QByteArray data;
+    emit requestStationsData(data);
+
+    network_data_t net_data;
+    net_data.stype = STYPE_STATIONS_DATA;
     net_data.data = data;
 
     client_data.socket->write(net_data.serialize());

@@ -822,6 +822,7 @@ void RouteViewer::initTcpClient()
     connect(tcp_client.get(), &TcpClient::connected, this, &RouteViewer::slotConnectedToSimulator);
     connect(tcp_client.get(), &TcpClient::setRouteInfo, this, &RouteViewer::slotGetRouteInfoData);
     connect(tcp_client.get(), &TcpClient::setSignalsData, this, &RouteViewer::slotGetSignalsData);
+    connect(tcp_client.get(), &TcpClient::setStationsData, this, &RouteViewer::slotGetStationsData);
     connect(tcp_client.get(), &TcpClient::setVehiclesInfo, this, &RouteViewer::slotGetVehicleInfoData);
     connect(tcp_client.get(), &TcpClient::sendLogMessage, this, &RouteViewer::slotRecvLogMessage);
     connect(tcp_client.get(), &TcpClient::connectionAbandoned, this, [this]() {
@@ -928,6 +929,9 @@ void RouteViewer::slotConnectedToSimulator()
     LOG_INFO("Connected to server...OK");
     LOG_INFO("Send request for route info");
     tcp_client->sendRequest(STYPE_REQUEST_ROUTE_INFO);
+
+    LOG_INFO("Send request for stations data");
+    tcp_client->sendRequest(STYPE_REQUEST_STATIONS_DATA);
 }
 
 //------------------------------------------------------------------------------
@@ -981,6 +985,15 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 
     LOG_INFO("Send request for vehicles info");
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotGetStationsData(QByteArray &stations_data)
+{
+    LOG_INFO("Got stations data from server (%lld bytes)",
+             static_cast<long long>(stations_data.size()));
 }
 
 //------------------------------------------------------------------------------

@@ -96,6 +96,8 @@ private slots:
 
     void slotGetSignalsData(QByteArray &sig_data);
 
+    void slotGetStationsData(QByteArray &stations_data);
+
     void slotGetVehicleInfoData(QByteArray &data);
 
     void slotUpdated();

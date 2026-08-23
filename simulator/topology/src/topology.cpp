@@ -851,6 +851,26 @@ QByteArray Topology::serialize_modules() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QByteArray Topology::serialize_stations() const
+{
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+
+    // Указываем число станций
+    stream << static_cast<uint32_t>(stations.size());
+
+    // Складываем в буфер сериализованную информацию о станциях
+    for (const auto& station : stations)
+    {
+        stream << station.serialize();
+    }
+
+    return data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Topology::deserialize(QByteArray& data)
 {
     QDataStream stream(&data, QIODevice::ReadOnly);

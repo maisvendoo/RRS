@@ -74,6 +74,8 @@ signals:
 
     void requestSignalsData(QByteArray &signals_data);
 
+    void requestStationsData(QByteArray &stations_data);
+
     void requestTopologyModules(QByteArray& modules_data);
 
     void sigSwitchCommand(QByteArray& switch_command);
@@ -149,6 +151,8 @@ private:
     //void send_topology_state(client_data_t &client_data);
 
     void send_signals_data(client_data_t &client_data);
+
+    void send_stations_data(client_data_t &client_data);
 
     //void send_signals_state(client_data_t &client_data);
 

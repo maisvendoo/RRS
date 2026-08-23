@@ -245,6 +245,8 @@ private slots:
 
     void slotGetSignalsData(QByteArray &signals_data);
 
+    void slotGetStationsData(QByteArray &stations_data);
+
     void slotGetVehicleControlByKeyboard(QByteArray &control_data, int client_id);
 
     void slotResetVehicleControlByKeyboard(int client_id);

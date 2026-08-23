@@ -302,6 +302,10 @@ void TcpClient::process_received_data(network_data_t &net_data)
     case STYPE_SIGNALS_DATA:
         emit setSignalsData(net_data.data);
         break;
+
+    case STYPE_STATIONS_DATA:
+        emit setStationsData(net_data.data);
+        break;
 /*
     case STYPE_SIGNALS_STATE:
         emit setSignalsState(net_data.data);

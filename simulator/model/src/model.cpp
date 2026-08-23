@@ -969,6 +969,8 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::requestSignalsData, this, &Model::slotGetSignalsData);
 
+    connect(tcp_server, &TcpServer::requestStationsData, this, &Model::slotGetStationsData);
+
     for (auto signal : topology->getSignalsData()->line_signals)
     {
         connect(signal, &Signal::sendDataUpdate, tcp_server, &TcpServer::slotUpdateSignal);
@@ -1449,6 +1451,14 @@ void Model::slotGetTopologyModules(QByteArray &topology_modules)
 void Model::slotGetSignalsData(QByteArray &signals_data)
 {
     signals_data = topology->getSignalsData()->serialize();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotGetStationsData(QByteArray &stations_data)
+{
+    stations_data = topology->serialize_stations();
 }
 
 //------------------------------------------------------------------------------

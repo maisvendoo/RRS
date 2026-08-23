@@ -76,6 +76,8 @@ signals:
 
     void setSignalsData(QByteArray &signals_data);
 
+    void setStationsData(QByteArray &stations_data);
+
     //void setSignalsState(QByteArray &signals_state);
 
     void updateSignal(QByteArray signal_data);

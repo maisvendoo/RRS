@@ -64,6 +64,7 @@ public:
 
     QByteArray serialize() const;
     QByteArray serialize_modules() const;
+    QByteArray serialize_stations() const;
 
     void deserialize(QByteArray& data);
     void deserialize_modules(QByteArray& data);

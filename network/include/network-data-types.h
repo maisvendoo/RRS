@@ -65,7 +65,10 @@ enum StructureType : uint8_t
 
     STYPE_REQUEST_TOPOLOGY_MODULES,
     STYPE_TOPOLOGY_MODULES,
-    STYPE_TOPOLOGY_MODULE_UPDATE
+    STYPE_TOPOLOGY_MODULE_UPDATE,
+
+    STYPE_REQUEST_STATIONS_DATA,
+    STYPE_STATIONS_DATA
 };
 
 //------------------------------------------------------------------------------
