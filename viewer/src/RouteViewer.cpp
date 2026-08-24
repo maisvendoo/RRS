@@ -1049,7 +1049,7 @@ void RouteViewer::slotGetStationsData(QByteArray &stations_data)
         return;
     }
 
-    stations_handler->setVisible(GUIparams->hud_show_stations);
+    stations_handler->setVisible(GUIparams->is_show_HUD && GUIparams->hud_show_stations);
 
     auto stations_node = stations_handler->getRootNode();
 

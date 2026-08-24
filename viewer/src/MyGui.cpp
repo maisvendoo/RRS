@@ -133,6 +133,14 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     if (ImGui::IsKeyPressed(ImGuiKey_F7) && !params->prev_F7 && !is_modified_key)
     {
         params->is_show_HUD = !params->is_show_HUD;
+
+        // При глобальном скрытии HUD прячем подписи станций вне зависимости
+        // от состояния кнопки; при показе возвращаем согласно кнопке
+        if (params->stations_handler)
+        {
+            params->stations_handler->setVisible(
+                params->is_show_HUD && params->hud_show_stations);
+        }
     }
     params->prev_F7 = ImGui::IsKeyPressed(ImGuiKey_F7);
 
