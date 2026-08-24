@@ -2354,10 +2354,23 @@ namespace
 
                 if (kind > 0)
                 {
+                    // Пробуем сигнал FWD на BWD-ветви (поезд подходит к стрелке
+                    // со стороны BWD — штатный случай при движении «туда»)
                     signal = next_sw->getSignalFwd();
                     signal_traj = next_sw->trajectories[SW_BWD_PLUS]
                         ? next_sw->trajectories[SW_BWD_PLUS]
                         : next_sw->trajectories[SW_BWD_MINUS];
+                    // Если не совпало — пробуем сигнал BWD на FWD-ветви (поезд
+                    // подходит к стрелке со стороны FWD — при движении «обратно»)
+                    if (!(signal != nullptr && signal_traj == traj
+                        && !signal->getSignalModel().isEmpty()
+                        && !signal->getSignalModel().startsWith("empty_")))
+                    {
+                        signal = next_sw->getSignalBwd();
+                        signal_traj = next_sw->trajectories[SW_FWD_PLUS]
+                            ? next_sw->trajectories[SW_FWD_PLUS]
+                            : next_sw->trajectories[SW_FWD_MINUS];
+                    }
                 }
                 else
                 {
