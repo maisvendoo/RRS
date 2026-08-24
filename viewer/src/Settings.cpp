@@ -81,6 +81,35 @@ void RouteViewer::loadModelsSettings(CfgReader& cfg, const QString& section)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void RouteViewer::loadStationsTextSettings(CfgReader& cfg, const QString& section)
+{
+    double fontSize = 0.0;
+    cfg.getDouble(section, "StationsTextFontSize", fontSize);
+    if (fontSize > 0.0)
+    {
+        settings.stations_text_font_size = fontSize;
+    }
+
+    QString shift = "0.0 0.0 15.0";
+    if (cfg.getString(section, "StationsTextShift", shift))
+    {
+        std::istringstream stream(shift.toStdString());
+        stream >> settings.stations_text_shift.x
+            >> settings.stations_text_shift.y
+            >> settings.stations_text_shift.z;
+    }
+
+    double scaleDistance = -1.0;
+    cfg.getDouble(section, "StationsTextScaleDistance", scaleDistance);
+    if (scaleDistance >= 0.0)
+    {
+        settings.stations_text_scale_distance = scaleDistance;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 {
     QString name = "viewer";

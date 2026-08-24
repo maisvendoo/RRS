@@ -324,6 +324,7 @@ void RouteViewer::loadSettings()
         section = "Viewer";
         loadLoggerSettings(cfg, section);
         loadModelsSettings(cfg, section);
+        loadStationsTextSettings(cfg, section);
         loadWindowSettings(cfg, section);
         loadLightSettings(cfg, section);
         loadCameraSettings(cfg, section);
