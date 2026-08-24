@@ -21,6 +21,7 @@ class UpdateStatisticsHandler;
 class UpdateControlToServerHandler;
 class TcpClient;
 class TrafficLightsHandler;
+class StationsHandler;
 
 struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 {
@@ -37,6 +38,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     UpdateStatisticsHandler *statistics_handler = nullptr;
     UpdateControlToServerHandler *controls_handler = nullptr;
     TrafficLightsHandler *traffic_lights_handler = nullptr;
+    StationsHandler *stations_handler = nullptr;
     TcpClient *tcp_client = nullptr;
 
     vsg::ref_ptr<Sun> sun;
@@ -75,6 +77,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool hud_show_profile = true;
     bool hud_show_timetable = true;
     bool hud_show_trains_list = true;
+    bool hud_show_stations = true;
 
     bool is_no_controlled = false;
 

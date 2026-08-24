@@ -33,6 +33,13 @@ public:
         return root;
     }
 
+    /// Включение/выключение отображения подписей станций
+    void setVisible(bool visible)
+    {
+        if (root)
+            root->setAllChildren(visible);
+    }
+
 private:
     void deserialize(QByteArray& data);
 

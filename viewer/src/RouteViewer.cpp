@@ -848,6 +848,7 @@ void RouteViewer::initViewer()
     GUIparams->statistics_handler = upd_statistis_handler.get();
     GUIparams->controls_handler = upd_server_control.get();
     GUIparams->traffic_lights_handler = traffic_lights_handler.get();
+    GUIparams->stations_handler = stations_handler.get();
 
     is_ready = true;
 }
@@ -1047,6 +1048,8 @@ void RouteViewer::slotGetStationsData(QByteArray &stations_data)
         LOG_WARN("Fail to load stations data");
         return;
     }
+
+    stations_handler->setVisible(GUIparams->hud_show_stations);
 
     auto stations_node = stations_handler->getRootNode();
 
