@@ -75,11 +75,11 @@
         <!-- Дальняя плоскость отсечения (дальность видимости), м -->
         <ViewDistance>2000</ViewDistance>
         <!-- Размер шрифта для подписей станций в сцене -->
-        <StationsTextFontSize>30</StationsTextFontSize>
+        <StationsTextFontSize>10.0</StationsTextFontSize>
         <!-- Смещение подписей станций -->
         <StationsTextShift>0.0 0.0 15.0</StationsTextShift>
         <!-- Дистанция, после которой подписи станций уменьшаются с расстоянием -->
-        <StationsTextScaleDistance>50.0</StationsTextScaleDistance>
+        <StationsTextScaleDistance>500.0</StationsTextScaleDistance>
         <!-- Тени: 1 - включены; 0 - отключены -->
         <Shadow>0</Shadow>
         <!-- Пресет настроек теней: 0 - Низкий; 1 - Средний; 2 - Высокий; 3 - Ультра; 4 - Пользовательский -->

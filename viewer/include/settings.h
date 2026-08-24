@@ -38,9 +38,9 @@ struct settings_t final
     double culling_tiles_size_0 = 4000.0;   ///< Large-scale tile size for cascade culling of route objects, m
     double culling_tiles_size_1 = 32000.0;  ///< Small-scale tile size for cascade culling of route objects, m
 
-    double stations_text_font_size = 30.0;              ///< Font size of station name labels in scene
+    double stations_text_font_size = 10.0;              ///< Font size of station name labels in scene
     vsg::dvec3 stations_text_shift = {0.0, 0.0, 15.0};  ///< Station name labels shift, m
-    double stations_text_scale_distance = 50.0;         ///< Distance after which station name labels are scaled down with distance, m
+    double stations_text_scale_distance = 500.0;         ///< Distance after which station name labels are scaled down with distance, m
 
     std::string name = "viewer";///< Window title
     int x = 50;                 ///< Window horizontal position

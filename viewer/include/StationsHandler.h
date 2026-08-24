@@ -39,13 +39,13 @@ private:
     void createSceneGraph(vsg::ref_ptr<vsg::Options> options);
 
     /// Размер шрифта подписей станций, м
-    double stations_text_font_size = 30.0;
+    double stations_text_font_size = 10.0;
 
     /// Смещение подписей станций относительно позиции станции, м
     vsg::dvec3 stations_text_shift = {0.0, 0.0, 15.0};
 
     /// Дистанция, после которой подписи станций уменьшаются с расстоянием, м
-    double stations_text_scale_distance = 50.0;
+    double stations_text_scale_distance = 500.0;
 
     /// Список станций
     topology_stations_list_t stations;
