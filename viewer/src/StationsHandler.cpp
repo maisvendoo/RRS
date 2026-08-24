@@ -11,6 +11,7 @@
 #include <vsg/io/read.h>
 #include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/Group.h>
+#include <vsg/nodes/Switch.h>
 #include <vsg/text/Font.h>
 #include <vsg/text/StandardLayout.h>
 #include <vsg/text/Text.h>
@@ -18,7 +19,7 @@
 namespace
 {
     /// Радиус сферы отсечения станции, м
-    constexpr double STATION_CULLING_RADIUS = 50.0;
+    constexpr double STATION_CULLING_COEFF = 5.0;
 }
 
 //------------------------------------------------------------------------------
@@ -39,17 +40,30 @@ bool StationsHandler::load(QByteArray& stations_data, vsg::ref_ptr<vsg::Options>
 {
     deserialize(stations_data);
 
-    LOG_INFO("Loaded %lld stations", static_cast<long long>(stations.size()));
-
     if (stations.empty())
     {
         LOG_WARN("Stations list is empty");
         return false;
     }
 
-    createSceneGraph(options);
+    return createSceneGraph(options);
+}
 
-    return root != nullptr;
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+vsg::ref_ptr<vsg::Node> StationsHandler::getRootNode() const
+{
+    return root;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void StationsHandler::setVisible(bool visible)
+{
+    if (root)
+        root->setAllChildren(visible);
 }
 
 //------------------------------------------------------------------------------
@@ -79,7 +93,7 @@ void StationsHandler::deserialize(QByteArray& data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void StationsHandler::createSceneGraph(vsg::ref_ptr<vsg::Options> options)
+bool StationsHandler::createSceneGraph(vsg::ref_ptr<vsg::Options> options)
 {
     FileSystem& fs = FileSystem::getInstance();
     const std::string font_path = fs.combinePath(fs.getFontsDir(), "JetBrainsMono-Regular.ttf");
@@ -88,7 +102,7 @@ void StationsHandler::createSceneGraph(vsg::ref_ptr<vsg::Options> options)
     if (!font)
     {
         LOG_ERROR("Fail to load station names font: %s", font_path.c_str());
-        return;
+        return false;
     }
 
     auto group = vsg::Group::create();
@@ -116,7 +130,8 @@ void StationsHandler::createSceneGraph(vsg::ref_ptr<vsg::Options> options)
         text->setup(0, options);
 
         auto cull_node = vsg::CullNode::create();
-        cull_node->bound = vsg::dsphere(station.pos_x, station.pos_y, station.pos_z, STATION_CULLING_RADIUS);
+        cull_node->bound = vsg::dsphere(station.pos_x, station.pos_y, station.pos_z,
+                                        STATION_CULLING_COEFF * stations_text_font_size);
         cull_node->child = text;
 
         group->addChild(cull_node);
@@ -127,4 +142,6 @@ void StationsHandler::createSceneGraph(vsg::ref_ptr<vsg::Options> options)
 
     LOG_INFO("Created scene graph for %lld stations",
              static_cast<long long>(group->children.size()));
+
+    return true;
 }

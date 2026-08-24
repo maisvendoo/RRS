@@ -5,7 +5,6 @@
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
-#include <vsg/nodes/Switch.h>
 
 class QByteArray;
 
@@ -14,6 +13,8 @@ struct settings_t;
 namespace vsg
 {
     class Options;
+    class Switch;
+    class Node;
 }
 
 //------------------------------------------------------------------------------
@@ -28,22 +29,16 @@ public:
     bool load(QByteArray& stations_data, vsg::ref_ptr<vsg::Options> options);
 
     /// Корневой узел графа сцены станций
-    vsg::ref_ptr<vsg::Switch> getRootNode() const
-    {
-        return root;
-    }
+    vsg::ref_ptr<vsg::Node> getRootNode() const;
 
     /// Включение/выключение отображения подписей станций
-    void setVisible(bool visible)
-    {
-        if (root)
-            root->setAllChildren(visible);
-    }
+    void setVisible(bool visible);
 
 private:
+
     void deserialize(QByteArray& data);
 
-    void createSceneGraph(vsg::ref_ptr<vsg::Options> options);
+    bool createSceneGraph(vsg::ref_ptr<vsg::Options> options);
 
     /// Размер шрифта подписей станций, м
     double stations_text_font_size = 10.0;
