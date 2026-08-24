@@ -2,6 +2,7 @@
 
 #include "Logger.h"
 #include "filesystem.h"
+#include "settings.h"
 
 #include <QDataStream>
 #include <QIODevice>
@@ -18,9 +19,17 @@ namespace
 {
     /// Радиус сферы отсечения станции, м
     constexpr double STATION_CULLING_RADIUS = 50.0;
+}
 
-    /// Высота текста имени станции, м
-    constexpr float STATION_NAME_SIZE = 50.0f;
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+StationsHandler::StationsHandler(const settings_t& settings)
+    : stations_text_font_size(static_cast<double>(settings.stations_text_font_size))
+    , stations_text_shift(settings.stations_text_shift)
+    , stations_text_scale_distance(settings.stations_text_scale_distance)
+{
+
 }
 
 //------------------------------------------------------------------------------
@@ -84,17 +93,21 @@ void StationsHandler::createSceneGraph(vsg::ref_ptr<vsg::Options> options)
 
     auto group = vsg::Group::create();
 
+    const float text_height = static_cast<float>(stations_text_font_size);
+
     for (const auto& station : stations)
     {
+        // Позиция подписи - сумма координат станции и смещения
+        const vsg::dvec3 label_position = vsg::dvec3(station.pos_x, station.pos_y, station.pos_z) +
+                                          stations_text_shift;
 
         auto layout = vsg::StandardLayout::create();
-        layout->position = vsg::vec3(static_cast<float>(station.pos_x),
-                                     static_cast<float>(station.pos_y),
-                                     static_cast<float>(station.pos_z + 10.0));
-        layout->horizontal = vsg::vec3(STATION_NAME_SIZE, 0.0f, 0.0f);
-        layout->vertical = vsg::vec3(0.0f, STATION_NAME_SIZE, 0.0f);
+        layout->position = vsg::vec3(label_position);
+        layout->horizontal = vsg::vec3(text_height, 0.0f, 0.0f);
+        layout->vertical = vsg::vec3(0.0f, text_height, 0.0f);
         layout->horizontalAlignment = vsg::StandardLayout::CENTER_ALIGNMENT;
         layout->billboard = true;
+        layout->billboardAutoScaleDistance = static_cast<float>(stations_text_scale_distance);
 
         auto text = vsg::Text::create();
         text->text = vsg::wstringValue::create(station.name.toStdWString());

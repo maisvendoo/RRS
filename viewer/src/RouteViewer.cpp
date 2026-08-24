@@ -189,7 +189,7 @@ void RouteViewer::initialize(int argc, char* argv[])
     screenshot_writer = std::make_unique<ScreenshotWriter>("screenshot.jpg");
 
     traffic_lights_handler = std::make_unique<TrafficLightsHandler>();
-    stations_handler = std::make_unique<StationsHandler>();
+    stations_handler = std::make_unique<StationsHandler>(settings);
     vehicles_handler = std::make_unique<VehiclesHandler>(settings, sound_manager.get());
 
     initVsgOptions();
