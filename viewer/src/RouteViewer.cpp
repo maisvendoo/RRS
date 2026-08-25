@@ -820,8 +820,8 @@ void RouteViewer::initViewer()
     // Указываем допустимое количество источников света
     resourceHints->numLightsRange = {static_cast<uint32_t>(settings.num_lights),
                                      static_cast<uint32_t>(settings.num_lights + 1)};
-    /*auto compileResult = */viewer->compile(resourceHints);
-    /*if (!compileResult)
+    auto compileResult = viewer->compile(resourceHints);
+    if (!compileResult)
     {
         LOG_WARN("Viewer compile returned empty result — some resources may not have been compiled");
     }
@@ -833,7 +833,7 @@ void RouteViewer::initViewer()
     if (memPolls)
     {
         memPolls->allocatedMemoryLimit = std::clamp(settings.allocatedMemoryLimit, 0.0, 1.0);
-    }*/
+    }
 
     // Создаём вспомогательные потоки для чтения текстур 3d-моделей
     uint32_t numOpThreads = std::min(settings.operation_threads, numThreads);

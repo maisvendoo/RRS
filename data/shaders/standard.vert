@@ -6,30 +6,14 @@
 #define VIEW_DESCRIPTOR_SET 0
 #define MATERIAL_DESCRIPTOR_SET 1
 
-#if defined(VSG_TEXTURECOORD_0)
-    layout(location = 2) in vec2 vsg_TexCoord0;
-#endif
-
-#if defined(VSG_TEXTURECOORD_1)
-    layout(location = 3) in vec2 vsg_TexCoord1;
-#endif
-
-#if defined(VSG_TEXTURECOORD_2)
-    layout(location = 4) in vec2 vsg_TexCoord2;
-#endif
-
 #if defined(VSG_TEXTURECOORD_3)
-    layout(location = 5) in vec2 vsg_TexCoord3;
-#endif
-
-#if defined(VSG_TEXTURECOORD_3)
-    #define VSG_TEXCOORD_COUNT 4
+#define VSG_TEXCOORD_COUNT 4
 #elif defined(VSG_TEXTURECOORD_2)
-    #define VSG_TEXCOORD_COUNT 3
+#define VSG_TEXCOORD_COUNT 3
 #elif defined(VSG_TEXTURECOORD_1)
-    #define VSG_TEXCOORD_COUNT 2
+#define VSG_TEXCOORD_COUNT 2
 #else
-    #define VSG_TEXCOORD_COUNT 1
+#define VSG_TEXCOORD_COUNT 1
 #endif
 
 layout(push_constant) uniform PushConstants {
@@ -39,6 +23,23 @@ layout(push_constant) uniform PushConstants {
 
 layout(location = 0) in vec3 vsg_Vertex;
 layout(location = 1) in vec3 vsg_Normal;
+
+#if defined(VSG_TEXTURECOORD_0)
+layout(location = 2) in vec2 vsg_TexCoord0;
+#endif
+
+#if defined(VSG_TEXTURECOORD_1)
+layout(location = 3) in vec2 vsg_TexCoord1;
+#endif
+
+#if defined(VSG_TEXTURECOORD_2)
+layout(location = 4) in vec2 vsg_TexCoord2;
+#endif
+
+#if defined(VSG_TEXTURECOORD_3)
+layout(location = 5) in vec2 vsg_TexCoord3;
+#endif
+
 layout(location = 6) in vec4 vsg_Color;
 
 #ifdef VSG_DISPLACEMENT_MAP
