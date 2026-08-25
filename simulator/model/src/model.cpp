@@ -1156,7 +1156,7 @@ void Model::prepareProfilesFeedback()
         QString traj_name;
         double coord = 0.0;
         vc->slotGetVehicleTrajPosition(&traj_name, &coord);
-        dir_t orient = vc->getOrientation();
+        dir_t orient = static_cast<dir_t>(vc->getOrientation() * mid_vehicle->getDirection());
 
         Trajectory* traj = topology->getTrajectoriesList()->value(traj_name);
         if (traj == nullptr)
