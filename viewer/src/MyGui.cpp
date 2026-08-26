@@ -695,6 +695,7 @@ void MyGui::showHUD() const
     if (!has_timetable)
     {
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_inactive);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, params->hud_button_inactive);
         ImGui::PushStyleColor(ImGuiCol_Text, params->hud_button_inactive_text);
     }
     else if (params->hud_show_timetable)
@@ -705,6 +706,7 @@ void MyGui::showHUD() const
         params->hud_show_timetable = !params->hud_show_timetable;
     if (!has_timetable)
     {
+        ImGui::PopStyleColor();
         ImGui::PopStyleColor();
         ImGui::PopStyleColor();
     }
@@ -735,6 +737,7 @@ void MyGui::showHUD() const
     if (!has_stations)
     {
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_inactive);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, params->hud_button_inactive);
         ImGui::PushStyleColor(ImGuiCol_Text, params->hud_button_inactive_text);
     }
     else if (params->hud_show_stations)
@@ -748,6 +751,7 @@ void MyGui::showHUD() const
     }
     if (!has_stations)
     {
+        ImGui::PopStyleColor();
         ImGui::PopStyleColor();
         ImGui::PopStyleColor();
     }
