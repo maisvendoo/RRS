@@ -52,3 +52,26 @@ bool solve_quadratic_equation(double a, double b, double c,
 
     return true;
 }
+
+bool calculate_intersection_line_and_plane(
+    vsg::dvec3 line_orig, vsg::dvec3 line_dir,
+    vsg::dvec3 plane_point, vsg::dvec3 plane_norm,
+    vsg::dvec3& out
+)
+{
+    const vsg::dvec3 orig = line_orig;
+    const vsg::dvec3 dir = line_dir;
+    const vsg::dvec3 point = plane_point;
+    const vsg::dvec3 norm = plane_norm;
+
+    const double denom = vsg::dot(norm, dir);
+    if (std::abs(denom) < 1.0e-6)
+    {
+        return false;
+    }
+
+    const double t = -(vsg::dot(norm, orig) - vsg::dot(norm, point)) / denom;
+    out = orig + dir * t;
+
+    return true;
+}

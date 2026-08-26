@@ -24,4 +24,10 @@ void calculate_mouse_world_coordinates(
 bool solve_quadratic_equation(double a, double b, double c,
     double& x1, double& x2);
 
+bool calculate_intersection_line_and_plane(
+    vsg::dvec3 line_orig, vsg::dvec3 line_dir,
+    vsg::dvec3 plane_point, vsg::dvec3 plane_norm,
+    vsg::dvec3& out
+);
+
 #endif // EDITOR_MATH_H

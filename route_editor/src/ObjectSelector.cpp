@@ -112,16 +112,9 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 1.0,
         inv_view_mat, inv_proj_mat, mouse_world2);
 
-    const vsg::dvec3& f = camera->get_front();
-    const vsg::dvec3& g = gizmo->get_curr_pos();
-    const vsg::dvec3 s = mouse_world2 - mouse_world1;
-
-    const double t = -(f.x * mouse_world1.x - f.x * g.x + f.y * mouse_world1.y -
-        f.y * g.y + f.z * mouse_world1.z - f.z * g.z) /
-        (f.x * s.x + f.y * s.y + f.z * s.z);
-
-    prev_intersect_pos_ = {mouse_world1.x + s.x * t, mouse_world1.y + s.y * t,
-        mouse_world1.z + s.z * t};
+    calculate_intersection_line_and_plane(mouse_world1,
+        mouse_world2 - mouse_world1, gizmo->get_curr_pos(), camera->get_front(),
+        prev_intersect_pos_);
 
     total_translation_ = {0.0, 0.0, 0.0};
     total_rotation_rad_ = 0.0;
