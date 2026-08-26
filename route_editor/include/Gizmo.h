@@ -9,7 +9,6 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/utils/Builder.h>
-#include <vsg/utils/LineSegmentIntersector.h>
 
 class CommandList;
 struct EditorContext;
@@ -36,9 +35,7 @@ public:
         const VkExtent2D& window_extent
     );
 
-    bool handle_intersections(
-        const vsg::ref_ptr<vsg::LineSegmentIntersector>& intersector
-    );
+    bool handle_intersections();
 
     void apply(const vsg::ButtonReleaseEvent& buttonRelease);
     void apply(const vsg::MoveEvent& moveEvent);

@@ -9,7 +9,6 @@
 #include "commands/CommandList.h"
 #include "commands/TranslateObjects.h"
 
-#include <cstdlib>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
@@ -25,6 +24,8 @@
 #include <vsg/utils/ShaderSet.h>
 
 #include <cmath>
+#include <cstdlib>
+#include <limits>
 
 static void rotate_geometry_info(
     vsg::GeometryInfo& geometry_info,
@@ -163,9 +164,7 @@ Gizmo::Gizmo(
     update_visibility();
 }
 
-bool Gizmo::handle_intersections(
-    const vsg::ref_ptr<vsg::LineSegmentIntersector>& intersector
-)
+bool Gizmo::handle_intersections()
 {
     constexpr vsg::dvec3 arrow_directions[3] = {
         vsg::dvec3(1.0, 0.0, 0.0),
@@ -179,108 +178,213 @@ bool Gizmo::handle_intersections(
         arrow_dots[i] = std::abs(vsg::dot(camera->get_front(), arrow_directions[i]));
     }
 
-    // const double normalized_mouse_x = static_cast<double>(mouse->get_x()) /
-    //     window_extent.width * 2.0 - 1.0;
-    // const double normalized_mouse_y = static_cast<double>(mouse->get_y()) /
-    //     window_extent.height * 2.0 - 1.0;
+    // Положение мыши нормализованное [-1.0; 1.0]
+    const double normalized_mouse_x = static_cast<double>(mouse->get_x()) /
+        window_extent.width * 2.0 - 1.0;
 
-    // const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();
-    // const vsg::dmat4& inverse_view_matrix = camera->get_inverse_view_matrix();
+    const double normalized_mouse_y = static_cast<double>(mouse->get_y()) /
+        window_extent.height * 2.0 - 1.0;
 
-    // const vsg::dvec3 mouse_world1 = inverse_view_matrix *
-    //     inverse_projection_matrix *
-    //     vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 0.0);
+    const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();
+    const vsg::dmat4& inverse_view_matrix = camera->get_inverse_view_matrix();
 
-    // const vsg::dvec3 mouse_world2 = inverse_view_matrix *
-    //     inverse_projection_matrix *
-    //     vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 1.0);
+    const vsg::dvec3 ray_origin = inverse_view_matrix *
+        inverse_projection_matrix *
+        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 0.0);
 
-    // const double x_min = curr_pos_.x;
-    // const double x_max = curr_pos_.x + gizmo_settings.arrow_length;
-    // const double C_y = curr_pos_.y;
-    // const double C_z = curr_pos_.z;
-    // const double x1 = mouse_world1.x;
-    // const double y1 = mouse_world1.y;
-    // const double z1 = mouse_world1.z;
-    // const vsg::dvec3 v = mouse_world2 - mouse_world1;
-    // const double R = gizmo_settings.arrow_thickness;
+    const vsg::dvec3 ray_end = inverse_view_matrix *
+        inverse_projection_matrix *
+        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 1.0);
 
-    // const double A = (v.y * v.y + v.z * v.z);
-    // const double B = 2 * ((y1 - C_y) * v.y + (z1 - C_z) * v.z);
-    // const double C = std::pow(y1 - C_y, 2.0) + std::pow(z1 - C_z, 2.0) - R * R;
+    const vsg::dvec3 ray_dir = ray_end - ray_origin;
 
-    // double D = B * B - 4 * A * C;
-    // if (D >= 0.0)
-    // {
-    //     double sqrtd = std::sqrt(D);
-    //     double t1 = (-B + sqrtd) / (2 * A);
-    //     double t2 = (-B + sqrtd) / (2 * A);
-    //     double t = std::abs(t1) < std::abs(t2) ? t1 : t2;
-    //     const vsg::dvec3 intersection = {mouse_world1 + v * t};
-    //     if (intersection.x >= x_min && intersection.x <= x_max)
-    //     {
-    //         printf("Intersection!!!!!\n");
-    //         active_arrow_index = 0;
-    //         active_plain_index = (arrow_dots[1] > arrow_dots[2]) ? 1 : 2;
-    //         vsg::dvec3 click_pos = curr_pos_;
-    //         click_pos[active_arrow_index] =
-    //             intersection[active_arrow_index];
+    const double R_cyl = gizmo_settings.arrow_thickness * scale_;
+    const double R_cone = gizmo_settings.arrow_thickness * 3.0 * scale_;
+    const double H_cyl = gizmo_settings.arrow_length * scale_;
+    const double H_cone = gizmo_settings.arrow_thickness * 15.0 * scale_;
 
-    //         prev_intersect_pos_ = click_pos;
-    //         total_translation_.set(0.0, 0.0, 0.0);
+    constexpr double EPSILON = 1e-9;
+    double closest_t = std::numeric_limits<double>::max();
+    int hit_arrow_index = -1;
+    vsg::dvec3 hit_point;
 
-    //         plane_switches[active_plain_index]->mask = MASK_CLICKABLE;
-    //         line_switches[active_arrow_index]->mask = MASK_GUI1;
-
-    //         for (const auto& object : context_.selected_objects)
-    //         {
-    //             object->save_matrix();
-    //         }
-    //         return true;
-    //     }
-    // }
-
-    this->accept(*intersector);
-
-    auto& intersections = intersector->intersections;
-    if (intersections.empty())
+    for (int axis = 0; axis < 3; ++axis)
     {
-        return false;
-    }
+        const vsg::dvec3 axis_start = curr_pos_;
+        const vsg::dvec3 axis_dir = arrow_directions[axis];
 
-    std::sort(intersections.begin(), intersections.end(),
-        [](const auto& lhs, const auto& rhs) -> bool {
-            return (lhs->ratio) < (rhs->ratio);
-        }
-    );
+        vsg::dvec3 local_origin, local_dir;
 
-    const auto& intersection = intersections.front();
-
-    for (const vsg::Node* const node : intersection->nodePath)
-    {
-        if (node == arrows[0])
+        if (axis == 0)
         {
-            active_arrow_index = 0;
-            active_plain_index = (arrow_dots[1] > arrow_dots[2]) ? 1 : 2;
+            local_origin = ray_origin - axis_start;
+            local_dir = ray_dir;
         }
-        else if (node == arrows[1])
+        else if (axis == 1)
         {
-            active_arrow_index = 1;
-            active_plain_index = (arrow_dots[2] > arrow_dots[0]) ? 2 : 0;
-        }
-        else if (node == arrows[2])
-        {
-            active_arrow_index = 2;
-            active_plain_index = (arrow_dots[0] > arrow_dots[1]) ? 0 : 1;
+            local_origin = vsg::dvec3(
+                ray_origin.y - axis_start.y,
+                ray_origin.x - axis_start.x,
+                ray_origin.z - axis_start.z
+            );
+            local_dir = vsg::dvec3(ray_dir.y, ray_dir.x, ray_dir.z);
         }
         else
         {
-            continue;
+            local_origin = vsg::dvec3(
+                ray_origin.z - axis_start.z,
+                ray_origin.y - axis_start.y,
+                ray_origin.x - axis_start.x
+            );
+            local_dir = vsg::dvec3(ray_dir.z, ray_dir.y, ray_dir.x);
+        }
+
+        const double A_cyl = local_dir.y * local_dir.y + local_dir.z * local_dir.z;
+
+        if (std::abs(A_cyl) > EPSILON)
+        {
+            const double B_cyl = 2.0 * (local_origin.y * local_dir.y + local_origin.z * local_dir.z);
+            const double C_cyl = local_origin.y * local_origin.y + local_origin.z * local_origin.z - R_cyl * R_cyl;
+            const double D_cyl = B_cyl * B_cyl - 4.0 * A_cyl * C_cyl;
+
+            if (D_cyl >= 0.0)
+            {
+                const double sqrtD = std::sqrt(D_cyl);
+                const double t1 = (-B_cyl - sqrtD) / (2.0 * A_cyl);
+                const double t2 = (-B_cyl + sqrtD) / (2.0 * A_cyl);
+
+                const double ts[2] = {t1, t2};
+                for (double t : ts)
+                {
+                    if (t >= 0.0 && t < closest_t)
+                    {
+                        const double x_hit = local_origin.x + t * local_dir.x;
+                        if (x_hit >= 0.0 && x_hit <= H_cyl)
+                        {
+                            closest_t = t;
+                            hit_arrow_index = axis;
+                            hit_point = ray_origin + ray_dir * t;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (std::abs(local_dir.x) > EPSILON)
+        {
+            double t_cap = -local_origin.x / local_dir.x;
+            if (t_cap >= 0.0 && t_cap < closest_t)
+            {
+                const double y_hit = local_origin.y + t_cap * local_dir.y;
+                const double z_hit = local_origin.z + t_cap * local_dir.z;
+                if (y_hit * y_hit + z_hit * z_hit <= R_cyl * R_cyl)
+                {
+                    closest_t = t_cap;
+                    hit_arrow_index = axis;
+                    hit_point = ray_origin + ray_dir * t_cap;
+                }
+            }
+
+            t_cap = (H_cyl - local_origin.x) / local_dir.x;
+            if (t_cap >= 0.0 && t_cap < closest_t)
+            {
+                const double y_hit = local_origin.y + t_cap * local_dir.y;
+                const double z_hit = local_origin.z + t_cap * local_dir.z;
+                if (y_hit * y_hit + z_hit * z_hit <= R_cyl * R_cyl)
+                {
+                    closest_t = t_cap;
+                    hit_arrow_index = axis;
+                    hit_point = ray_origin + ray_dir * t_cap;
+                }
+            }
+        }
+
+        const vsg::dvec3 cone_origin = local_origin - vsg::dvec3(H_cyl, 0.0, 0.0);
+
+        const double A_cone = local_dir.y * local_dir.y + local_dir.z * local_dir.z -
+                             (R_cone / H_cone) * (R_cone / H_cone) * local_dir.x * local_dir.x;
+        const double B_cone = 2.0 * (cone_origin.y * local_dir.y + cone_origin.z * local_dir.z -
+                             (R_cone / H_cone) * (R_cone / H_cone) * cone_origin.x * local_dir.x);
+        const double C_cone = cone_origin.y * cone_origin.y + cone_origin.z * cone_origin.z -
+                             (R_cone / H_cone) * (R_cone / H_cone) * cone_origin.x * cone_origin.x;
+
+        if (std::abs(A_cone) > EPSILON)
+        {
+            const double D_cone = B_cone * B_cone - 4.0 * A_cone * C_cone;
+
+            if (D_cone >= 0.0)
+            {
+                const double sqrtD = std::sqrt(D_cone);
+                const double t1 = (-B_cone - sqrtD) / (2.0 * A_cone);
+                const double t2 = (-B_cone + sqrtD) / (2.0 * A_cone);
+
+                const double ts[2] = {t1, t2};
+                for (double t : ts)
+                {
+                    if (t >= 0.0 && t < closest_t)
+                    {
+                        const double x_hit = cone_origin.x + t * local_dir.x;
+                        if (x_hit >= 0.0 && x_hit <= H_cone)
+                        {
+                            closest_t = t;
+                            hit_arrow_index = axis;
+                            hit_point = ray_origin + ray_dir * t;
+                        }
+                    }
+                }
+            }
+        }
+        else if (std::abs(A_cone) <= EPSILON && std::abs(B_cone) > EPSILON)
+        {
+            const double t = -C_cone / B_cone;
+            if (t >= 0.0 && t < closest_t)
+            {
+                const double x_hit = cone_origin.x + t * local_dir.x;
+                if (x_hit >= 0.0 && x_hit <= H_cone)
+                {
+                    closest_t = t;
+                    hit_arrow_index = axis;
+                    hit_point = ray_origin + ray_dir * t;
+                }
+            }
+        }
+
+        if (std::abs(local_dir.x) > EPSILON)
+        {
+            const double t_base = (H_cyl - local_origin.x) / local_dir.x;
+            if (t_base >= 0.0 && t_base < closest_t)
+            {
+                const double y_hit = local_origin.y + t_base * local_dir.y;
+                const double z_hit = local_origin.z + t_base * local_dir.z;
+                if (y_hit * y_hit + z_hit * z_hit <= R_cone * R_cone)
+                {
+                    closest_t = t_base;
+                    hit_arrow_index = axis;
+                    hit_point = ray_origin + ray_dir * t_base;
+                }
+            }
+        }
+    }
+
+    if (hit_arrow_index >= 0)
+    {
+        active_arrow_index = hit_arrow_index;
+
+        if (hit_arrow_index == 0)
+        {
+            active_plain_index = (arrow_dots[1] > arrow_dots[2]) ? 1 : 2;
+        }
+        else if (hit_arrow_index == 1)
+        {
+            active_plain_index = (arrow_dots[2] > arrow_dots[0]) ? 2 : 0;
+        }
+        else
+        {
+            active_plain_index = (arrow_dots[0] > arrow_dots[1]) ? 0 : 1;
         }
 
         vsg::dvec3 click_pos = curr_pos_;
-        click_pos[active_arrow_index] =
-            intersection->worldIntersection[active_arrow_index];
+        click_pos[active_arrow_index] = hit_point[active_arrow_index];
 
         prev_intersect_pos_ = click_pos;
         total_translation_.set(0.0, 0.0, 0.0);
@@ -293,12 +397,10 @@ bool Gizmo::handle_intersections(
             object->save_matrix();
         }
 
-        break;
+        return true;
     }
 
-    intersections.clear();
-
-    return true;
+    return false;
 }
 
 void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)

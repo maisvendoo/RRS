@@ -186,8 +186,7 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
 
     // If we have selected objects and clicked on Gizmo,
     // handle Gizmo intersection (start moving objects with Gizmo)
-    if (!selected_objects.empty() &&
-        gizmo->handle_intersections(intersector))
+    if (!selected_objects.empty() && gizmo->handle_intersections())
     {
         return;
     }
