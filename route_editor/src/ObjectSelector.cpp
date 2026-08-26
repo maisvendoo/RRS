@@ -17,6 +17,7 @@
 #include "commands/ScaleObjects.h"
 #include "commands/SelectObjects.h"
 #include "commands/TranslateObjects.h"
+#include "editor_math.h"
 
 #include <vsg/core/Mask.h>
 #include <vsg/maths/common.h>
@@ -98,21 +99,20 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    const double normalized_mouse_x = static_cast<double>(mouse->get_x()) /
-        window_extent.width * 2.0 - 1.0;
-    const double normalized_mouse_y = static_cast<double>(mouse->get_y()) /
-        window_extent.height * 2.0 - 1.0;
+    double norm_mouse_x, norm_mouse_y;
+    normalize_mouse_coordinates(mouse->get_x(), mouse->get_y(), window_extent,
+        norm_mouse_x, norm_mouse_y);
 
     const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();
     const vsg::dmat4& inverse_view_matrix = camera->get_inverse_view_matrix();
 
     const vsg::dvec3 mouse_world1 = inverse_view_matrix *
         inverse_projection_matrix *
-        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 0.0);
+        vsg::dvec3(norm_mouse_x, norm_mouse_y, 0.0);
 
     const vsg::dvec3 mouse_world2 = inverse_view_matrix *
         inverse_projection_matrix *
-        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 1.0);
+        vsg::dvec3(norm_mouse_x, norm_mouse_y, 1.0);
 
     const vsg::dvec3& f = camera->get_front();
     const vsg::dvec3& g = gizmo->get_curr_pos();

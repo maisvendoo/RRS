@@ -8,6 +8,7 @@
 #include "SingleSwitch.h"
 #include "commands/CommandList.h"
 #include "commands/TranslateObjects.h"
+#include "editor_math.h"
 
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
@@ -179,22 +180,20 @@ bool Gizmo::handle_intersections()
     }
 
     // Положение мыши нормализованное [-1.0; 1.0]
-    const double normalized_mouse_x = static_cast<double>(mouse->get_x()) /
-        window_extent.width * 2.0 - 1.0;
-
-    const double normalized_mouse_y = static_cast<double>(mouse->get_y()) /
-        window_extent.height * 2.0 - 1.0;
+    double norm_mouse_x, norm_mouse_y;
+    normalize_mouse_coordinates(mouse->get_x(), mouse->get_y(), window_extent,
+        norm_mouse_x, norm_mouse_y);
 
     const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();
     const vsg::dmat4& inverse_view_matrix = camera->get_inverse_view_matrix();
 
     const vsg::dvec3 ray_origin = inverse_view_matrix *
         inverse_projection_matrix *
-        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 0.0);
+        vsg::dvec3(norm_mouse_x, norm_mouse_y, 0.0);
 
     const vsg::dvec3 ray_end = inverse_view_matrix *
         inverse_projection_matrix *
-        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 1.0);
+        vsg::dvec3(norm_mouse_x, norm_mouse_y, 1.0);
 
     const vsg::dvec3 ray_dir = ray_end - ray_origin;
 
@@ -245,15 +244,10 @@ bool Gizmo::handle_intersections()
         {
             const double B_cyl = 2.0 * (local_origin.y * local_dir.y + local_origin.z * local_dir.z);
             const double C_cyl = local_origin.y * local_origin.y + local_origin.z * local_origin.z - R_cyl * R_cyl;
-            const double D_cyl = B_cyl * B_cyl - 4.0 * A_cyl * C_cyl;
 
-            if (D_cyl >= 0.0)
+            double ts[2];
+            if (solve_quadratic_equation(A_cyl, B_cyl, C_cyl, ts[0], ts[1]))
             {
-                const double sqrtD = std::sqrt(D_cyl);
-                const double t1 = (-B_cyl - sqrtD) / (2.0 * A_cyl);
-                const double t2 = (-B_cyl + sqrtD) / (2.0 * A_cyl);
-
-                const double ts[2] = {t1, t2};
                 for (double t : ts)
                 {
                     if (t >= 0.0 && t < closest_t)
@@ -310,15 +304,9 @@ bool Gizmo::handle_intersections()
 
         if (std::abs(A_cone) > EPSILON)
         {
-            const double D_cone = B_cone * B_cone - 4.0 * A_cone * C_cone;
-
-            if (D_cone >= 0.0)
+            double ts[2];
+            if (solve_quadratic_equation(A_cone, B_cone, C_cone, ts[0], ts[1]))
             {
-                const double sqrtD = std::sqrt(D_cone);
-                const double t1 = (-B_cone - sqrtD) / (2.0 * A_cone);
-                const double t2 = (-B_cone + sqrtD) / (2.0 * A_cone);
-
-                const double ts[2] = {t1, t2};
                 for (double t : ts)
                 {
                     if (t >= 0.0 && t < closest_t)
