@@ -49,6 +49,8 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
     _trains_list_params.viewer_handler = params->viewer_handler;
     _trains_list_params.hud_background = params->hud_background;
     _trains_list_params.hud_text = params->hud_text;
+    _trains_list_params.hud_current_train = params->hud_current_train;
+    _trains_list_params.hud_controlled_train = params->hud_controlled_train;
     _trains_list_widget = new TrainsListWidget(&_trains_list_params);
 
     _train_profile_params.vehicles_handler = params->vehicles_handler;
@@ -493,7 +495,7 @@ void MyGui::showNoControlled() const
     ImGui::PushStyleColor(ImGuiCol_WindowBg, params->hud_background);
     ImGui::Begin(u8"Состояние управления ПЕ", &open_ptr, window_flags);
     ImGui::PopStyleColor();
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Text, params->hud_warning_text);
     ImGui::Text(u8"%s", text);
     ImGui::PopStyleColor();
     ImGui::End();
@@ -529,7 +531,7 @@ void MyGui::showNoCabineControl() const
     ImGui::PushStyleColor(ImGuiCol_WindowBg, params->hud_background);
     ImGui::Begin(u8"Состояние управления кабиной", &open_ptr, window_flags);
     ImGui::PopStyleColor();
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Text, params->hud_warning_text);
     ImGui::Text(u8"%s", text);
     ImGui::PopStyleColor();
     ImGui::End();
@@ -621,7 +623,7 @@ void MyGui::showPauseState() const
     ImGui::PopStyleColor();
 
     // Красный цвет текста
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Text, params->hud_warning_text);
 
     // Построчное центрирование текста
     QStringList lines = text.split('\n');
@@ -879,27 +881,27 @@ void MyGui::showTimetable() const
             station_info += "\n";
         }
 
-        ImVec4 textColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+        ImVec4 textColor = params->hud_timetable_future;
 
         if (timetable.stations[i].arr_delay || timetable.stations[i].dep_delay)
         {
-            textColor = ImVec4(1.0f, 0.5f, 0.31f, 1.0f);
+            textColor = params->hud_timetable_delay;
         }
         else
         {
             if (i < timetable.curr_station_idx)
             {
-                textColor = ImVec4(0.0f, 0.5f, 0.0f, 1.0f);
+                textColor = params->hud_timetable_past;
             }
             else
             {
-                textColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+                textColor = params->hud_timetable_future;
             }
         }
 
         if (i == timetable.curr_station_idx)
         {
-            textColor = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+            textColor = params->hud_timetable_current;
         }
 
         ImGui::PushStyleColor(ImGuiCol_Text, textColor);

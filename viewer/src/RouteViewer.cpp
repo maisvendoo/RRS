@@ -386,6 +386,21 @@ void RouteViewer::initVsgOptions()
                                             settings.hud_button_inactive.z, settings.hud_button_inactive.w);
     GUIparams->hud_button_inactive_text = ImVec4(settings.hud_button_inactive_text.x, settings.hud_button_inactive_text.y,
                                                  settings.hud_button_inactive_text.z, settings.hud_button_inactive_text.w);
+
+    GUIparams->hud_current_train = ImVec4(settings.hud_current_train.x, settings.hud_current_train.y,
+                                          settings.hud_current_train.z, settings.hud_current_train.w);
+    GUIparams->hud_controlled_train = ImVec4(settings.hud_controlled_train.x, settings.hud_controlled_train.y,
+                                             settings.hud_controlled_train.z, settings.hud_controlled_train.w);
+    GUIparams->hud_warning_text = ImVec4(settings.hud_warning_text.x, settings.hud_warning_text.y,
+                                         settings.hud_warning_text.z, settings.hud_warning_text.w);
+    GUIparams->hud_timetable_delay = ImVec4(settings.hud_timetable_delay.x, settings.hud_timetable_delay.y,
+                                            settings.hud_timetable_delay.z, settings.hud_timetable_delay.w);
+    GUIparams->hud_timetable_past = ImVec4(settings.hud_timetable_past.x, settings.hud_timetable_past.y,
+                                           settings.hud_timetable_past.z, settings.hud_timetable_past.w);
+    GUIparams->hud_timetable_current = ImVec4(settings.hud_timetable_current.x, settings.hud_timetable_current.y,
+                                              settings.hud_timetable_current.z, settings.hud_timetable_current.w);
+    GUIparams->hud_timetable_future = ImVec4(settings.hud_timetable_future.x, settings.hud_timetable_future.y,
+                                             settings.hud_timetable_future.z, settings.hud_timetable_future.w);
 }
 
 //------------------------------------------------------------------------------

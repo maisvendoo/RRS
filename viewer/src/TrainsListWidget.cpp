@@ -248,11 +248,11 @@ void TrainsListWidget::renderTrainsList()
         // Сравниваем train_id поезда из списка с train_id текущего и управляемого вагонов
         if (train_id == current_train_id)
         {
-            text_color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); // ЖЁЛТЫЙ - текущий поезд
+            text_color = _params->hud_current_train;
         }
         else if (train_id == controlled_train_id)
         {
-            text_color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f); // ЗЕЛЁНЫЙ - управляемый поезд
+            text_color = _params->hud_controlled_train;
         }
 
         ImGui::PushStyleColor(ImGuiCol_Text, text_color);
