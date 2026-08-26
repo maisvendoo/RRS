@@ -1,17 +1,18 @@
 #ifndef GIZMO_H
 #define GIZMO_H
 
-#include "Camera.h"
 #include "SingleSwitch.h"
-#include "settings/GizmoSettings.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/utils/Builder.h>
 
+class Camera;
 class CommandList;
 struct EditorContext;
+class Mouse;
+struct gizmo_settings_t;
 
 namespace vsg
 {

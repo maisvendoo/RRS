@@ -9,6 +9,7 @@
 #include "commands/CommandList.h"
 #include "commands/TranslateObjects.h"
 #include "editor_math.h"
+#include "settings/GizmoSettings.h"
 
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
