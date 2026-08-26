@@ -1,10 +1,25 @@
 #ifndef EDITOR_MATH_H
 #define EDITOR_MATH_H
 
-struct VkExtent2D;
+#include <vsg/maths/mat4.h>
+#include <vsg/maths/vec3.h>
+
+#include <vulkan/vulkan_core.h>
 
 void normalize_mouse_coordinates(int x, int y, VkExtent2D extent,
     double& norm_x, double& norm_y);
+
+void calculate_mouse_world_coordinates(
+    int x, int y, double z, VkExtent2D extent,
+    const vsg::dmat4& inv_view_mat, const vsg::dmat4& inv_proj_mat,
+    vsg::dvec3& out
+);
+
+void calculate_mouse_world_coordinates(
+    double norm_x, double norm_y, double z,
+    const vsg::dmat4& inv_view_mat, const vsg::dmat4& inv_proj_mat,
+    vsg::dvec3& out
+);
 
 bool solve_quadratic_equation(double a, double b, double c,
     double& x1, double& x2);

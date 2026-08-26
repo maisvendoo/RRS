@@ -184,16 +184,14 @@ bool Gizmo::handle_intersections()
     normalize_mouse_coordinates(mouse->get_x(), mouse->get_y(), window_extent,
         norm_mouse_x, norm_mouse_y);
 
-    const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();
-    const vsg::dmat4& inverse_view_matrix = camera->get_inverse_view_matrix();
+    const vsg::dmat4& inv_proj_mat = camera->get_inverse_projection_matrix();
+    const vsg::dmat4& inv_view_mat = camera->get_inverse_view_matrix();
 
-    const vsg::dvec3 ray_origin = inverse_view_matrix *
-        inverse_projection_matrix *
-        vsg::dvec3(norm_mouse_x, norm_mouse_y, 0.0);
-
-    const vsg::dvec3 ray_end = inverse_view_matrix *
-        inverse_projection_matrix *
-        vsg::dvec3(norm_mouse_x, norm_mouse_y, 1.0);
+    vsg::dvec3 ray_origin, ray_end;
+    calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 0.0,
+        inv_view_mat, inv_proj_mat, ray_origin);
+    calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 1.0,
+        inv_view_mat, inv_proj_mat, ray_end);
 
     const vsg::dvec3 ray_dir = ray_end - ray_origin;
 
