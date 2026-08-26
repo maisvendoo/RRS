@@ -5,6 +5,7 @@
 #include "tcp-client.h"
 
 #include <vsg/maths/vec3.h>
+#include <vsg/maths/vec4.h>
 
 #include <cmath>
 #include <string>
@@ -124,6 +125,15 @@ struct settings_t final
     bool enableDebugLayer = false;
     bool enableDebugUtils = false;
     double allocatedMemoryLimit = 1.0;
+
+    // Цвета виджетов интерфейса (HUD), RGBA в диапазоне 0.0 - 1.0
+    vsg::vec4 hud_background = {0.0f, 0.0f, 0.0f, 0.8f};            ///< Фон виджетов интерфейса
+    vsg::vec4 hud_text = {1.0f, 1.0f, 1.0f, 1.0f};                 ///< Текст интерфейса
+    vsg::vec4 hud_button_off = {1.0f, 0.75f, 0.75f, 0.8f};         ///< Ненажатые кнопки
+    vsg::vec4 hud_button_on = {0.75f, 1.0f, 0.75f, 0.8f};          ///< Нажатые кнопки
+    vsg::vec4 hud_button_hovered = {1.0f, 1.0f, 0.75f, 0.8f};      ///< Кнопки при наведении
+    vsg::vec4 hud_button_inactive = {0.3f, 0.3f, 0.3f, 0.8f};      ///< Неактивные кнопки
+    vsg::vec4 hud_button_inactive_text = {0.5f, 0.5f, 0.5f, 1.0f}; ///< Текст неактивных кнопок
 };
 
 #endif // VIEWER_SETTINGS_H

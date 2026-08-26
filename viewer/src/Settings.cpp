@@ -110,6 +110,30 @@ void RouteViewer::loadStationsTextSettings(CfgReader& cfg, const QString& sectio
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void RouteViewer::loadHUDSettings(CfgReader& cfg, const QString& section)
+{
+    auto readColor = [&](const QString& key, vsg::vec4& color, const vsg::vec4& def)
+    {
+        QString value = QString("%1 %2 %3 %4").arg(def.x).arg(def.y).arg(def.z).arg(def.w);
+        if (cfg.getString(section, key, value))
+        {
+            std::istringstream stream(value.toStdString());
+            stream >> color.x >> color.y >> color.z >> color.w;
+        }
+    };
+
+    readColor("HUDBackground",          settings.hud_background,          settings.hud_background);
+    readColor("HUDText",                settings.hud_text,                settings.hud_text);
+    readColor("HUDButtonOff",           settings.hud_button_off,          settings.hud_button_off);
+    readColor("HUDButtonOn",            settings.hud_button_on,           settings.hud_button_on);
+    readColor("HUDButtonHovered",       settings.hud_button_hovered,      settings.hud_button_hovered);
+    readColor("HUDButtonInactive",      settings.hud_button_inactive,     settings.hud_button_inactive);
+    readColor("HUDButtonInactiveText",  settings.hud_button_inactive_text, settings.hud_button_inactive_text);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 {
     QString name = "viewer";

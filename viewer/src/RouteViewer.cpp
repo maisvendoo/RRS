@@ -326,6 +326,7 @@ void RouteViewer::loadSettings()
         loadModelsSettings(cfg, section);
         loadStationsTextSettings(cfg, section);
         loadWindowSettings(cfg, section);
+        loadHUDSettings(cfg, section);
         loadLightSettings(cfg, section);
         loadCameraSettings(cfg, section);
         loadFreeCameraSettings(cfg, section);
@@ -370,6 +371,21 @@ void RouteViewer::initVsgOptions()
     GUIparams = GUIParams::create();
     GUIparams->train_profile_backward = settings.train_profile_backward;
     GUIparams->train_profile_forward = settings.train_profile_forward;
+
+    GUIparams->hud_background = ImVec4(settings.hud_background.x, settings.hud_background.y,
+                                       settings.hud_background.z, settings.hud_background.w);
+    GUIparams->hud_text = ImVec4(settings.hud_text.x, settings.hud_text.y,
+                                 settings.hud_text.z, settings.hud_text.w);
+    GUIparams->hud_button_off = ImVec4(settings.hud_button_off.x, settings.hud_button_off.y,
+                                       settings.hud_button_off.z, settings.hud_button_off.w);
+    GUIparams->hud_button_on = ImVec4(settings.hud_button_on.x, settings.hud_button_on.y,
+                                      settings.hud_button_on.z, settings.hud_button_on.w);
+    GUIparams->hud_button_hovered = ImVec4(settings.hud_button_hovered.x, settings.hud_button_hovered.y,
+                                           settings.hud_button_hovered.z, settings.hud_button_hovered.w);
+    GUIparams->hud_button_inactive = ImVec4(settings.hud_button_inactive.x, settings.hud_button_inactive.y,
+                                            settings.hud_button_inactive.z, settings.hud_button_inactive.w);
+    GUIparams->hud_button_inactive_text = ImVec4(settings.hud_button_inactive_text.x, settings.hud_button_inactive_text.y,
+                                                 settings.hud_button_inactive_text.z, settings.hud_button_inactive_text.w);
 }
 
 //------------------------------------------------------------------------------
