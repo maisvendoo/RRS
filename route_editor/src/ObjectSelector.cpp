@@ -103,8 +103,8 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     normalize_mouse_coordinates(mouse->get_x(), mouse->get_y(), window_extent,
         norm_mouse_x, norm_mouse_y);
 
-    const vsg::dmat4& inv_proj_mat = camera->get_inverse_projection_matrix();
     const vsg::dmat4& inv_view_mat = camera->get_inverse_view_matrix();
+    const vsg::dmat4& inv_proj_mat = camera->get_inverse_projection_matrix();
 
     vsg::dvec3 mouse_world1, mouse_world2;
     calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 0.0,
@@ -230,32 +230,23 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    const double normalized_mouse_x = static_cast<double>(mouse->get_x()) /
-        window_extent.width * 2.0 - 1.0;
-    const double normalized_mouse_y = static_cast<double>(mouse->get_y()) /
-        window_extent.height * 2.0 - 1.0;
+    double norm_mouse_x, norm_mouse_y;
+    normalize_mouse_coordinates(mouse->get_x(), mouse->get_y(), window_extent,
+        norm_mouse_x, norm_mouse_y);
 
-    const vsg::dmat4& inverse_projection_matrix = camera->get_inverse_projection_matrix();
-    const vsg::dmat4& inverse_view_matrix = camera->get_inverse_view_matrix();
+    const vsg::dmat4& inv_view_mat = camera->get_inverse_view_matrix();
+    const vsg::dmat4& inv_proj_mat = camera->get_inverse_projection_matrix();
 
-    const vsg::dvec3 mouse_world1 = inverse_view_matrix *
-        inverse_projection_matrix *
-        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 0.0);
+    vsg::dvec3 mouse_world1, mouse_world2;
+    calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 0.0,
+        inv_view_mat, inv_proj_mat, mouse_world1);
+    calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 1.0,
+        inv_view_mat, inv_proj_mat, mouse_world2);
 
-    const vsg::dvec3 mouse_world2 = inverse_view_matrix *
-        inverse_projection_matrix *
-        vsg::dvec3(normalized_mouse_x, normalized_mouse_y, 1.0);
-
-    const vsg::dvec3& f = camera->get_front();
-    const vsg::dvec3& g = gizmo->get_curr_pos();
-    const vsg::dvec3 s = mouse_world2 - mouse_world1;
-
-    const double t = -(f.x * mouse_world1.x - f.x * g.x + f.y * mouse_world1.y -
-        f.y * g.y + f.z * mouse_world1.z - f.z * g.z) /
-        (f.x * s.x + f.y * s.y + f.z * s.z);
-
-    const vsg::dvec3 world_intersection = {mouse_world1.x + s.x * t, mouse_world1.y + s.y * t,
-        mouse_world1.z + s.z * t};
+    vsg::dvec3 world_intersection;
+    calculate_intersection_line_and_plane(mouse_world1,
+        mouse_world2 - mouse_world1, gizmo->get_curr_pos(), camera->get_front(),
+        world_intersection);
 
     const vsg::dvec3& camera_up = camera->get_up();
 
