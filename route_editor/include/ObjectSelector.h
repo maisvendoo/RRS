@@ -1,20 +1,21 @@
 #ifndef OBJECT_SELECTOR_H
 #define OBJECT_SELECTOR_H
 
-#include "Camera.h"
-#include "SceneGraph.h"
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
 #include <vulkan/vulkan_core.h>
 
+class Camera;
 class CommandList;
 struct EditorContext;
 class Gizmo;
 class Keyboard;
 class Mouse;
+class Route;
 class RouteObject;
+class SceneGraph;
 class SingleSwitch;
 
 namespace vsg

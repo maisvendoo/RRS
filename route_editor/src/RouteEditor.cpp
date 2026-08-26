@@ -14,6 +14,7 @@
 #include "Mouse.h"
 #include "ObjectSelector.h"
 #include "Outline.h"
+#include "Route.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
 #include "SingleSwitch.h"

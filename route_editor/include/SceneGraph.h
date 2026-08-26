@@ -1,12 +1,13 @@
 #ifndef SCENE_GRAPH_H
 #define SCENE_GRAPH_H
 
-#include "Route.h"
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/nodes/Switch.h>
 
 struct EditorContext;
+class Gizmo;
+class Route;
 struct camera_settings_t;
 
 namespace vsg
