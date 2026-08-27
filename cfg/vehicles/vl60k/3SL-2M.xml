@@ -6,9 +6,13 @@
 		<Solver>euler</Solver>
 
 		<MaxSpeed>150</MaxSpeed>
-		<WearGap>0.0</WearGap>
 		<SoundSpeed>2.0</SoundSpeed>
-		<FreqCoeff>2.0</FreqCoeff>
+
+		<CycleTime>3.0</CycleTime>
+		<GearWear>0.03</GearWear>
+		<HoldingSlip>0.02</HoldingSlip>
+		<ClockJitter>0.01</ClockJitter>
+		<FallSpeed>0.5</FallSpeed>
 
 	</Device>
 </Config>

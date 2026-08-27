@@ -22,10 +22,8 @@ public:
 
     float getShaftPos() const;
 
-    /// Состояние звука работы
     virtual sound_state_t getSoundState(size_t idx = 0) const;
 
-    /// Сигнал состояния звука работы
     virtual float getSoundSignal(size_t idx = 0) const;
 
     double getVelocity() const
@@ -35,37 +33,40 @@ public:
 
 private:
 
-    /// Угловая скорость вращения колесной пары
     double omega;
 
-    /// Передаточное число червячного редуктора
     double ip;
 
-    /// Угловая скорость вращения вала
-    double omega_s;
-
-    /// Показатель износа - величина разбега стрелки, км/ч
-    double wear_gap;
-
-    /// Максимальна скорость на шкале
     double max_speed;
 
-    /// Сигнал для анимации положения стрелки
     float arrow_pos;
 
-    /// Диаметр бандажа
     double Dk;
 
-    /// Скорость начала работы звука скоростемера
     double speed_begin_sound;
     double omega_begin_sound;
 
-    /// Сигнал положения вала
     float shaft_pos;
 
-    double freq_coeff;
-
     double velocity = 0.0;
+
+    double seg_height[3];
+    int    lifting_idx;
+    int    holding_idx;
+    int    falling_idx;
+
+    double cycle_time;
+    double phase;
+    double t_prev;
+
+    double gear_wear;
+    double holding_slip;
+    double clock_jitter;
+    double fall_speed;
+
+    double phase_velocity;
+
+    double shaft_angle;
 
     void preStep(state_vector_t &Y, double t);
 
