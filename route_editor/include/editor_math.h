@@ -30,4 +30,11 @@ bool calculate_intersection_line_and_plane(
     vsg::dvec3& out
 );
 
+bool calculate_intersection_mouse_and_plane(
+    int x, int y, VkExtent2D extent,
+    const vsg::dmat4& inv_view_mat, const vsg::dmat4& inv_proj_mat,
+    vsg::dvec3 plane_point, vsg::dvec3 plane_norm,
+    vsg::dvec3& out
+);
+
 #endif // EDITOR_MATH_H

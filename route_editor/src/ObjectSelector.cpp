@@ -99,22 +99,10 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    double norm_mouse_x, norm_mouse_y;
-    normalize_mouse_coordinates(mouse->get_x(), mouse->get_y(), window_extent,
-        norm_mouse_x, norm_mouse_y);
-
-    const vsg::dmat4& inv_view_mat = camera->get_inverse_view_matrix();
-    const vsg::dmat4& inv_proj_mat = camera->get_inverse_projection_matrix();
-
-    vsg::dvec3 mouse_world1, mouse_world2;
-    calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 0.0,
-        inv_view_mat, inv_proj_mat, mouse_world1);
-    calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 1.0,
-        inv_view_mat, inv_proj_mat, mouse_world2);
-
-    calculate_intersection_line_and_plane(mouse_world1,
-        mouse_world2 - mouse_world1, gizmo->get_curr_pos(), camera->get_front(),
-        prev_intersect_pos_);
+    calculate_intersection_mouse_and_plane(mouse->get_x(), mouse->get_y(),
+        window_extent, camera->get_inverse_view_matrix(),
+        camera->get_inverse_projection_matrix(), gizmo->get_curr_pos(),
+        camera->get_front(), prev_intersect_pos_);
 
     total_translation_ = {0.0, 0.0, 0.0};
     total_rotation_rad_ = 0.0;
@@ -167,6 +155,13 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
 
+    // If we have selected objects and clicked on Gizmo,
+    // handle Gizmo intersection (start moving objects with Gizmo)
+    if (!selected_objects.empty() && gizmo->handle_intersections())
+    {
+        return;
+    }
+
     const auto intersector = vsg::LineSegmentIntersector::create(*camera,
         buttonPress.x, buttonPress.y);
     if (!intersector)
@@ -174,13 +169,6 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         return;
     }
     intersector->traversalMask = MASK_CLICKABLE;
-
-    // If we have selected objects and clicked on Gizmo,
-    // handle Gizmo intersection (start moving objects with Gizmo)
-    if (!selected_objects.empty() && gizmo->handle_intersections())
-    {
-        return;
-    }
 
     scene_graph->accept(*intersector);
 
@@ -230,23 +218,11 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
         return;
     }
 
-    double norm_mouse_x, norm_mouse_y;
-    normalize_mouse_coordinates(mouse->get_x(), mouse->get_y(), window_extent,
-        norm_mouse_x, norm_mouse_y);
-
-    const vsg::dmat4& inv_view_mat = camera->get_inverse_view_matrix();
-    const vsg::dmat4& inv_proj_mat = camera->get_inverse_projection_matrix();
-
-    vsg::dvec3 mouse_world1, mouse_world2;
-    calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 0.0,
-        inv_view_mat, inv_proj_mat, mouse_world1);
-    calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 1.0,
-        inv_view_mat, inv_proj_mat, mouse_world2);
-
     vsg::dvec3 world_intersection;
-    calculate_intersection_line_and_plane(mouse_world1,
-        mouse_world2 - mouse_world1, gizmo->get_curr_pos(), camera->get_front(),
-        world_intersection);
+    calculate_intersection_mouse_and_plane(mouse->get_x(), mouse->get_y(),
+        window_extent, camera->get_inverse_view_matrix(),
+        camera->get_inverse_projection_matrix(), gizmo->get_curr_pos(),
+        camera->get_front(), world_intersection);
 
     const vsg::dvec3& camera_up = camera->get_up();
 
