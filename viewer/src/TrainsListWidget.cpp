@@ -239,7 +239,7 @@ void TrainsListWidget::renderTrainsList()
         }
         else
         {
-            display_text = QString("#%1 %2 (ID: %3)").arg(train_id).arg(train_name).arg(first_vehicle_id).toStdString();
+            display_text = QString("#%1 %2").arg(train_id).arg(train_name).toStdString();
         }
 
         // Определяем цвет
