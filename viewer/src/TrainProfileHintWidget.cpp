@@ -845,7 +845,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         // Подпись по центру зоны
         const std::string label = std::to_string(static_cast<int>(sl.speed_kmh));
         const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
-        const float tx = (x0 + x1) * 0.5f - text_size.x * 0.5f;
+        const float tx = x0 + pad;
         const float ty = y_base + (zone_height - text_size.y) * 0.5f;
 
         // Белая непрозрачная подложка под текст (не выходит за границы ленты)
