@@ -194,7 +194,7 @@ void TrainsListWidget::renderTrainsList()
 
     bool open = true;
 
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.85f));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, _params->hud_background);
     ImGui::Begin("##TrainsList", &open, window_flags);
     ImGui::PopStyleColor();
 
@@ -243,16 +243,16 @@ void TrainsListWidget::renderTrainsList()
         }
 
         // Определяем цвет
-        ImVec4 text_color = ImVec4(0.6f, 0.6f, 0.6f, 1.0f); // серый по умолчанию
+        ImVec4 text_color = _params->hud_text; // цвет текста по умолчанию из конфигурации
 
         // Сравниваем train_id поезда из списка с train_id текущего и управляемого вагонов
         if (train_id == current_train_id)
         {
-            text_color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); // ЖЁЛТЫЙ - текущий поезд
+            text_color = _params->hud_current_train;
         }
         else if (train_id == controlled_train_id)
         {
-            text_color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f); // ЗЕЛЁНЫЙ - управляемый поезд
+            text_color = _params->hud_controlled_train;
         }
 
         ImGui::PushStyleColor(ImGuiCol_Text, text_color);

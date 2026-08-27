@@ -110,6 +110,39 @@ void RouteViewer::loadStationsTextSettings(CfgReader& cfg, const QString& sectio
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void RouteViewer::loadHUDSettings(CfgReader& cfg, const QString& section)
+{
+    auto readColor = [&](const QString& key, vsg::vec4& color)
+    {
+        QString value = QString("%1 %2 %3 %4").arg(color.r).arg(color.g).arg(color.b).arg(color.a);
+        if (cfg.getString(section, key, value))
+        {
+            std::istringstream stream(value.toStdString());
+            stream >> color.r >> color.g >> color.b >> color.a;
+        }
+    };
+
+    readColor("HUDBackground",          settings.hud_background);
+    readColor("HUDText",                settings.hud_text);
+    readColor("HUDButtonOff",           settings.hud_button_off);
+    readColor("HUDButtonOn",            settings.hud_button_on);
+    readColor("HUDButtonHovered",       settings.hud_button_hovered);
+    readColor("HUDButtonInactive",      settings.hud_button_inactive);
+    readColor("HUDButtonInactiveText",  settings.hud_button_inactive_text);
+
+    readColor("HUDCurrentTrain",        settings.hud_current_train);
+    readColor("HUDControlledTrain",     settings.hud_controlled_train);
+    readColor("HUDWarningText",         settings.hud_warning_text);
+
+    readColor("HUDTimetableDelay",      settings.hud_timetable_delay);
+    readColor("HUDTimetablePast",       settings.hud_timetable_past);
+    readColor("HUDTimetableCurrent",    settings.hud_timetable_current);
+    readColor("HUDTimetableFuture",     settings.hud_timetable_future);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 {
     QString name = "viewer";

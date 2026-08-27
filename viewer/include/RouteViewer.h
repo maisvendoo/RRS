@@ -61,6 +61,7 @@ private:
     void loadModelsSettings(CfgReader& cfg, const QString& section);
     void loadStationsTextSettings(CfgReader& cfg, const QString& section);
     void loadWindowSettings(CfgReader& cfg, const QString& section);
+    void loadHUDSettings(CfgReader& cfg, const QString& section);
     void loadLightSettings(CfgReader& cfg, const QString& section);
     void loadCameraSettings(CfgReader& cfg, const QString& section);
     void loadFreeCameraSettings(CfgReader& cfg, const QString& section);

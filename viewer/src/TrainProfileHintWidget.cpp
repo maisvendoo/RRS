@@ -54,7 +54,7 @@ void TrainProfileHintWidget::show(float top_y, float bottom_y,
 
     bool open_ptr = true;
 
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, _params->hud_background);
     ImGui::Begin(u8"Профиль пути поезда", &open_ptr, window_flags);
     ImGui::PopStyleColor();
 

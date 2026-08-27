@@ -74,6 +74,34 @@
         <zNear>0.1</zNear>
         <!-- Дальняя плоскость отсечения (дальность видимости), м -->
         <ViewDistance>2000</ViewDistance>
+        <!-- Цвет фона виджетов интерфейса (RGBA, 0.0 - 1.0) -->
+        <HUDBackground>0.0 0.0 0.0 0.8</HUDBackground>
+        <!-- Цвет текста интерфейса (RGBA, 0.0 - 1.0) -->
+        <HUDText>1.0 1.0 1.0 1.0</HUDText>
+        <!-- Цвет ненажатых кнопок интерфейса (RGBA, 0.0 - 1.0) -->
+        <HUDButtonOff>1.0 0.75 0.75 0.8</HUDButtonOff>
+        <!-- Цвет нажатых кнопок интерфейса (RGBA, 0.0 - 1.0) -->
+        <HUDButtonOn>0.75 1.0 0.75 0.8</HUDButtonOn>
+        <!-- Цвет кнопок интерфейса при наведении курсора (RGBA, 0.0 - 1.0) -->
+        <HUDButtonHovered>1.0 1.0 0.75 0.8</HUDButtonHovered>
+         <!-- Цвет неактивных кнопок интерфейса (RGBA, 0.0 - 1.0) -->
+        <HUDButtonInactive>0.3 0.3 0.3 0.8</HUDButtonInactive>
+        <!-- Цвет текста неактивных кнопок интерфейса (RGBA, 0.0 - 1.0) -->
+        <HUDButtonInactiveText>0.5 0.5 0.5 1.0</HUDButtonInactiveText>
+        <!-- Цвет текста текущего поезда в списке (RGBA, 0.0 - 1.0) -->
+        <HUDCurrentTrain>1.0 1.0 0.0 1.0</HUDCurrentTrain>
+        <!-- Цвет текста управляемого поезда в списке (RGBA, 0.0 - 1.0) -->
+        <HUDControlledTrain>0.0 1.0 0.0 1.0</HUDControlledTrain>
+        <!-- Цвет текста предупреждений (пауза, нет управления и т.п.) (RGBA, 0.0 - 1.0) -->
+        <HUDWarningText>1.0 0.0 0.0 1.0</HUDWarningText>
+        <!-- Цвет строк графика: пройдено с задержкой (RGBA, 0.0 - 1.0) -->
+        <HUDTimetableDelay>1.0 0.5 0.31 1.0</HUDTimetableDelay>
+        <!-- Цвет строк графика: пройдено по расписанию (RGBA, 0.0 - 1.0) -->
+        <HUDTimetablePast>0.0 0.5 0.0 1.0</HUDTimetablePast>
+        <!-- Цвет строк графика: текущая (RGBA, 0.0 - 1.0) -->
+        <HUDTimetableCurrent>1.0 1.0 0.0 1.0</HUDTimetableCurrent>
+        <!-- Цвет строк графика: будущие (RGBA, 0.0 - 1.0) -->
+        <HUDTimetableFuture>0.5 0.5 0.5 1.0</HUDTimetableFuture>
         <!-- Размер шрифта для подписей станций в сцене -->
         <StationsTextFontSize>10.0</StationsTextFontSize>
         <!-- Смещение подписей станций -->

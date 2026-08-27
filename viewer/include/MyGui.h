@@ -87,6 +87,26 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     double train_profile_backward = 4000.0;
     double train_profile_forward = 4000.0;
 
+    /// Цвета виджетов интерфейса (HUD), RGBA в диапазоне 0.0 - 1.0
+    ImVec4 hud_background = ImVec4(0.0f, 0.0f, 0.0f, 0.8f);
+    ImVec4 hud_text = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImVec4 hud_button_off = ImVec4(1.0f, 0.75f, 0.75f, 0.8f);
+    ImVec4 hud_button_on = ImVec4(0.75f, 1.0f, 0.75f, 0.8f);
+    ImVec4 hud_button_hovered = ImVec4(1.0f, 1.0f, 0.75f, 0.8f);
+    ImVec4 hud_button_inactive = ImVec4(0.3f, 0.3f, 0.3f, 0.8f);
+    ImVec4 hud_button_inactive_text = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+
+    // Цвета выделения поездов и предупреждений
+    ImVec4 hud_current_train = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+    ImVec4 hud_controlled_train = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+    ImVec4 hud_warning_text = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+    // Цвета строк графика
+    ImVec4 hud_timetable_delay = ImVec4(1.0f, 0.5f, 0.31f, 1.0f);
+    ImVec4 hud_timetable_past = ImVec4(0.0f, 0.5f, 0.0f, 1.0f);
+    ImVec4 hud_timetable_current = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+    ImVec4 hud_timetable_future = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+
     QString status = "";
     QString physicalDeviceName = "";
 };

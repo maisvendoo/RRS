@@ -15,6 +15,12 @@ struct TrainsListWidgetParams
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateViewerHandler* viewer_handler = nullptr;
     bool is_visible = true;
+
+    /// Цвета виджетов интерфейса (HUD), RGBA в диапазоне 0.0 - 1.0
+    ImVec4 hud_background = ImVec4(0.0f, 0.0f, 0.0f, 0.8f);
+    ImVec4 hud_text = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImVec4 hud_current_train = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+    ImVec4 hud_controlled_train = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
 };
 
 //------------------------------------------------------------------------------

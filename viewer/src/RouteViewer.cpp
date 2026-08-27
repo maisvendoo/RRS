@@ -326,6 +326,7 @@ void RouteViewer::loadSettings()
         loadModelsSettings(cfg, section);
         loadStationsTextSettings(cfg, section);
         loadWindowSettings(cfg, section);
+        loadHUDSettings(cfg, section);
         loadLightSettings(cfg, section);
         loadCameraSettings(cfg, section);
         loadFreeCameraSettings(cfg, section);
@@ -370,6 +371,36 @@ void RouteViewer::initVsgOptions()
     GUIparams = GUIParams::create();
     GUIparams->train_profile_backward = settings.train_profile_backward;
     GUIparams->train_profile_forward = settings.train_profile_forward;
+
+    GUIparams->hud_background = ImVec4(settings.hud_background.x, settings.hud_background.y,
+                                       settings.hud_background.z, settings.hud_background.w);
+    GUIparams->hud_text = ImVec4(settings.hud_text.x, settings.hud_text.y,
+                                 settings.hud_text.z, settings.hud_text.w);
+    GUIparams->hud_button_off = ImVec4(settings.hud_button_off.x, settings.hud_button_off.y,
+                                       settings.hud_button_off.z, settings.hud_button_off.w);
+    GUIparams->hud_button_on = ImVec4(settings.hud_button_on.x, settings.hud_button_on.y,
+                                      settings.hud_button_on.z, settings.hud_button_on.w);
+    GUIparams->hud_button_hovered = ImVec4(settings.hud_button_hovered.x, settings.hud_button_hovered.y,
+                                           settings.hud_button_hovered.z, settings.hud_button_hovered.w);
+    GUIparams->hud_button_inactive = ImVec4(settings.hud_button_inactive.x, settings.hud_button_inactive.y,
+                                            settings.hud_button_inactive.z, settings.hud_button_inactive.w);
+    GUIparams->hud_button_inactive_text = ImVec4(settings.hud_button_inactive_text.x, settings.hud_button_inactive_text.y,
+                                                 settings.hud_button_inactive_text.z, settings.hud_button_inactive_text.w);
+
+    GUIparams->hud_current_train = ImVec4(settings.hud_current_train.x, settings.hud_current_train.y,
+                                          settings.hud_current_train.z, settings.hud_current_train.w);
+    GUIparams->hud_controlled_train = ImVec4(settings.hud_controlled_train.x, settings.hud_controlled_train.y,
+                                             settings.hud_controlled_train.z, settings.hud_controlled_train.w);
+    GUIparams->hud_warning_text = ImVec4(settings.hud_warning_text.x, settings.hud_warning_text.y,
+                                         settings.hud_warning_text.z, settings.hud_warning_text.w);
+    GUIparams->hud_timetable_delay = ImVec4(settings.hud_timetable_delay.x, settings.hud_timetable_delay.y,
+                                            settings.hud_timetable_delay.z, settings.hud_timetable_delay.w);
+    GUIparams->hud_timetable_past = ImVec4(settings.hud_timetable_past.x, settings.hud_timetable_past.y,
+                                           settings.hud_timetable_past.z, settings.hud_timetable_past.w);
+    GUIparams->hud_timetable_current = ImVec4(settings.hud_timetable_current.x, settings.hud_timetable_current.y,
+                                              settings.hud_timetable_current.z, settings.hud_timetable_current.w);
+    GUIparams->hud_timetable_future = ImVec4(settings.hud_timetable_future.x, settings.hud_timetable_future.y,
+                                             settings.hud_timetable_future.z, settings.hud_timetable_future.w);
 }
 
 //------------------------------------------------------------------------------
