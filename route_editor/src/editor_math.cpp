@@ -95,3 +95,35 @@ bool calculate_intersection_mouse_and_plane(
     return calculate_intersection_line_and_plane(mouse_world1,
         mouse_world2 - mouse_world1, plane_point, plane_norm, out);
 }
+
+bool calculate_closest_intersection_line_and_cylinder_x(
+    vsg::dvec3 line_orig, vsg::dvec3 line_dir,
+    vsg::dvec3 cylinder_base_center, vsg::dvec3 cylinder_radius,
+    vsg::dvec3 cylinder_height,
+    vsg::dvec3& out
+)
+{
+    const vsg::dvec3 orig = line_orig;
+    const vsg::dvec3 dir = line_dir;
+    const vsg::dvec3 center = cylinder_base_center;
+    const vsg::dvec3 R = cylinder_radius;
+    const vsg::dvec3 H = cylinder_height;
+
+    const double A = dir.y * dir.y + dir.z * dir.z;
+    const double B = 2.0 * (orig.y * dir.y - dir.y * center.y + orig.z * dir.z - dir.z * center.z);
+    const double C = (orig.y - center.y) * (orig.y - center.y) + (orig.z - center.z) * (orig.z - center.z);
+
+    double t1, t2;
+    if (!solve_quadratic_equation(
+        dir.y * dir.y + dir.z * dir.z,
+        2.0 * (orig.y * dir.y - dir.y * center.y + orig.z * dir.z - dir.z * center.z),
+        (orig.y - center.y) * (orig.y - center.y) + (orig.z - center.z) * (orig.z - center.z),
+        t1, t2))
+    {
+        return false;
+    }
+
+
+
+    return true;
+}

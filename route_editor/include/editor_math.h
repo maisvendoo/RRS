@@ -37,4 +37,11 @@ bool calculate_intersection_mouse_and_plane(
     vsg::dvec3& out
 );
 
+bool calculate_closest_intersection_line_and_cylinder_x(
+    vsg::dvec3 line_orig, vsg::dvec3 line_dir,
+    vsg::dvec3 cylinder_base_center, vsg::dvec3 cylinder_radius,
+    vsg::dvec3 cylinder_height,
+    vsg::dvec3& out
+);
+
 #endif // EDITOR_MATH_H
