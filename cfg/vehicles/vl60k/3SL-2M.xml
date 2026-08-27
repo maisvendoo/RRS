@@ -1,18 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Device>
-		<Order>2</Order>
+		<Order>3</Order>
 		<SubStepNum>1</SubStepNum>
 		<Solver>euler</Solver>
 
-		<MaxSpeed>150</MaxSpeed>
+		<!-- Максимальное значение скорости на шкале, км/ч -->
+		<MaxSpeed>150.0</MaxSpeed>
+
+		<!-- Шаг фиксации скорости, км/ч -->
+		<SpeedStep>2.5</SpeedStep>
+
+		<!-- Скорость начала работы тикающего звука скоростемера, км/ч -->
 		<SoundSpeed>2.0</SoundSpeed>
 
-		<CycleTime>3.0</CycleTime>
-		<GearWear>0.03</GearWear>
-		<HoldingSlip>0.02</HoldingSlip>
-		<ClockJitter>0.01</ClockJitter>
-		<FallSpeed>0.5</FallSpeed>
+		<!-- Время фиксации скорости одним сегментом -->
+		<CycleTime>1.0</CycleTime>
+
+		<!-- Расчётный диаметр колеса, м -->
+		<WheelNominalDiameter>1.180</WheelNominalDiameter>
+		<!-- Настройка:
+		0 - использовать действительный диаметр колеса, без искажения скорости
+		1 - использовать расчётный диаметр колеса, искажающий сскорость в зависимости от износа бандажа, как на реальном приборе -->
+		<UseNominalDiameter>0</UseNominalDiameter>
+
+		<!-- Броски скоростемера на плюс шаг фиксации скорости, от 0 (никогда) до 100 (регулярно) -->
+		<VelocityRandomPlus>0</VelocityRandomPlus>
+
+		<!-- Броски скоростемера на минус шаг фиксации скорости, от 0 (никогда) до 100 (регулярно) -->
+		<VelocityRandomMinus>50</VelocityRandomMinus>
 
 	</Device>
 </Config>
