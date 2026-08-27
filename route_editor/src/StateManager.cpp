@@ -1,6 +1,5 @@
 #include "StateManager.h"
 
-#include "Journal.h"
 #include "states/NavigationState.h"
 #include "states/GizmoRotateState.h"
 #include "states/GizmoScaleState.h"
@@ -10,91 +9,42 @@
 #include "states/KeyboardScaleState.h"
 #include "states/KeyboardTranslateState.h"
 #include "states/RouteNotLoadedState.h"
+#include "states/State.h"
+
+#include <Journal.h>
 
 #include <vsg/core/ref_ptr.h>
 
+#include <QString>
+
+#include <memory>
+
 StateManager::StateManager(
-    const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
+    const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Camera>& camera,
     CommandList& command_list
 )
 {
-    route_not_loaded_state = new RouteNotLoadedState(mouse, keyboard, *this);
-    basic_editor_state = new BasicEditorState(mouse, keyboard, *this, camera, command_list);
-    navigation_state = new NavigationState(mouse, keyboard, *this, camera);
-    keyboard_translate_state = new KeyboardTranslateState(mouse, keyboard, *this);
-    keyboard_rotate_state = new KeyboardRotateState(mouse, keyboard, *this);
-    keyboard_scale_state = new KeyboardScaleState(mouse, keyboard, *this);
-    gizmo_translate_state = new GizmoTranslateState(mouse, keyboard, *this);
-    gizmo_rotate_state = new GizmoRotateState(mouse, keyboard, *this);
-    gizmo_scale_state = new GizmoScaleState(mouse, keyboard, *this);
+    states[STATE_ROUTE_NOT_LOADED] = std::make_unique<RouteNotLoadedState>(mouse, keyboard, *this);
+    states[STATE_BASIC] = std::make_unique<BasicEditorState>(mouse, keyboard, *this, camera, command_list);
+    states[STATE_NAVIGATION] = std::make_unique<NavigationState>(mouse, keyboard, *this, camera);
+    states[STATE_KEYBOARD_TRANSLATE] = std::make_unique<KeyboardTranslateState>(mouse, keyboard, *this);
+    states[STATE_KEYBOARD_ROTATE] = std::make_unique<KeyboardRotateState>(mouse, keyboard, *this);
+    states[STATE_KEYBOARD_SCALE] = std::make_unique<KeyboardScaleState>(mouse, keyboard, *this);
+    states[STATE_GIZMO_TRANSLATE] = std::make_unique<GizmoTranslateState>(mouse, keyboard, *this);
+    states[STATE_GIZMO_ROTATE] = std::make_unique<GizmoRotateState>(mouse, keyboard, *this);
+    states[STATE_GIZMO_SCALE] = std::make_unique<GizmoScaleState>(mouse, keyboard, *this);
 
-    current_state = route_not_loaded_state;
-    deferred_state = route_not_loaded_state;
+    current_state = &states[STATE_ROUTE_NOT_LOADED];
+    deferred_state = &states[STATE_ROUTE_NOT_LOADED];
 }
 
-StateManager::~StateManager()
-{
-    delete gizmo_scale_state;
-    delete gizmo_rotate_state;
-    delete gizmo_translate_state;
-    delete keyboard_scale_state;
-    delete keyboard_rotate_state;
-    delete keyboard_translate_state;
-    delete navigation_state;
-    delete basic_editor_state;
-    delete route_not_loaded_state;
-}
+StateManager::~StateManager() = default;
 
-void StateManager::defer_switch_to_route_not_loaded_state()
+void StateManager::defer_switch_to(StateEnum state)
 {
-    deferred_state = route_not_loaded_state;
-}
-
-void StateManager::defer_switch_to_basic_editor_state()
-{
-    deferred_state = basic_editor_state;
-}
-
-void StateManager::defer_switch_to_navigation_state()
-{
-    deferred_state = navigation_state;
-}
-
-void StateManager::defer_switch_to_box_selection_state()
-{
-    // TODO
-}
-
-void StateManager::defer_switch_to_keyboard_translate_state()
-{
-    deferred_state = keyboard_translate_state;
-}
-
-void StateManager::defer_switch_to_keyboard_rotate_state()
-{
-    deferred_state = keyboard_rotate_state;
-}
-
-void StateManager::defer_switch_to_keyboard_scale_state()
-{
-    deferred_state = keyboard_scale_state;
-}
-
-void StateManager::defer_switch_to_gizmo_translate_state()
-{
-    deferred_state = gizmo_translate_state;
-}
-
-void StateManager::defer_switch_to_gizmo_rotate_state()
-{
-    deferred_state = gizmo_rotate_state;
-}
-
-void StateManager::defer_switch_to_gizmo_scale_state()
-{
-    deferred_state = gizmo_scale_state;
+    deferred_state = &states[state];
 }
 
 void StateManager::update(double delta_time)
@@ -102,19 +52,19 @@ void StateManager::update(double delta_time)
     if (current_state != deferred_state)
     {
         Journal::instance()->info(QString("'%1' -> '%2'")
-            .arg(current_state->get_name())
-            .arg(deferred_state->get_name()));
+            .arg((*current_state)->get_name())
+            .arg((*deferred_state)->get_name()));
 
-        current_state->on_deactivate();
+        (*current_state)->on_deactivate();
         current_state = deferred_state;
-        deferred_state->on_activate();
+        (*deferred_state)->on_activate();
     }
 
-    current_state->update(delta_time);
+    (*current_state)->update(delta_time);
 }
 
-State* StateManager::get_editor_state() const
+const std::unique_ptr<State>& StateManager::get_editor_state() const
 {
-    return current_state;
+    return *current_state;
 }
 

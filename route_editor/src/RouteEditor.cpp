@@ -105,7 +105,7 @@ bool RouteEditor::initialize()
     const auto gui_view2 = vsg::View::create(camera, scene_graph);
     gui_view2->mask = MASK_GUI2;
 
-    state_manager = std::make_unique<StateManager>(mouse, keyboard, camera, command_list);
+    state_manager = std::make_unique<StateManager>(keyboard, mouse, camera, command_list);
     const auto editor_gui = EditorGui::create(context_, camera_settings,
         gui_settings, key_bindings, *state_manager, camera, editor_state,
         command_list, route, route_dir, gizmo);

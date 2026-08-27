@@ -38,7 +38,7 @@ void NavigationState::handle_button_release()
 {
     if (!mouse->is_rmb_pressed())
     {
-        state_manager.defer_switch_to_basic_editor_state();
+        state_manager.defer_switch_to(STATE_BASIC);
     }
 }
 

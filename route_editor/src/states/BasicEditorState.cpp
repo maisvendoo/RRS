@@ -51,7 +51,7 @@ void BasicEditorState::handle_button_press()
         }
         case vsg::BUTTON_MASK_3:
         {
-            state_manager.defer_switch_to_navigation_state();
+            state_manager.defer_switch_to(STATE_NAVIGATION);
             return;
         }
         default:

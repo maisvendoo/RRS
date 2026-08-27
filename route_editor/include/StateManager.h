@@ -3,54 +3,51 @@
 
 #include <vsg/core/ref_ptr.h>
 
+#include <array>
+#include <memory>
+
 class Camera;
 class CommandList;
 class Keyboard;
 class Mouse;
 class State;
 
+enum StateEnum
+{
+    STATE_ROUTE_NOT_LOADED,
+    STATE_BASIC,
+    STATE_NAVIGATION,
+    STATE_KEYBOARD_TRANSLATE,
+    STATE_KEYBOARD_ROTATE,
+    STATE_KEYBOARD_SCALE,
+    STATE_GIZMO_TRANSLATE,
+    STATE_GIZMO_ROTATE,
+    STATE_GIZMO_SCALE,
+    TOTAL_STATE_COUNT
+};
+
 class StateManager
 {
 public:
     StateManager(
-        const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
+        const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Camera>& camera,
         CommandList& command_list
     );
 
     ~StateManager();
 
-    void defer_switch_to_route_not_loaded_state();
-    void defer_switch_to_basic_editor_state();
-    void defer_switch_to_navigation_state();
-    void defer_switch_to_box_selection_state();
-    void defer_switch_to_keyboard_translate_state();
-    void defer_switch_to_keyboard_rotate_state();
-    void defer_switch_to_keyboard_scale_state();
-    void defer_switch_to_gizmo_translate_state();
-    void defer_switch_to_gizmo_rotate_state();
-    void defer_switch_to_gizmo_scale_state();
+    void defer_switch_to(StateEnum state);
 
     void update(double delta_time);
 
-    State* get_editor_state() const;
+    const std::unique_ptr<State>& get_editor_state() const;
 
 private:
-    State* current_state;
-    State* deferred_state;
-
-    State* route_not_loaded_state;
-    State* basic_editor_state;
-    State* navigation_state;
-
-    State* keyboard_translate_state;
-    State* keyboard_rotate_state;
-    State* keyboard_scale_state;
-
-    State* gizmo_translate_state;
-    State* gizmo_rotate_state;
-    State* gizmo_scale_state;
+    std::array<std::unique_ptr<State>, TOTAL_STATE_COUNT> states;
+    std::unique_ptr<State>* current_state;
+    std::unique_ptr<State>* deferred_state;
 };
 
 #endif // STATE_MANAGER_H
