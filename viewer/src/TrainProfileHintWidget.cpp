@@ -842,14 +842,15 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         draw_list->AddRectFilled(ImVec2(x0, y_base), ImVec2(x1, y_bottom), fill_col);
         draw_list->AddRect(ImVec2(x0, y_base), ImVec2(x1, y_bottom), col, 0.0f, 0, 1.5f);
 
+        const float pad = 2.0f;
+
         // Подпись в начале зоны
         const std::string label = std::to_string(static_cast<int>(sl.speed_kmh));
         const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
-        const float tx = x0 + 2.0f;
+        const float tx = x0 + pad;
         const float ty = y_base + (zone_height - text_size.y) * 0.5f;
 
         // Белая непрозрачная подложка под текст (не выходит за границы ленты)
-        const float pad = 2.0f;
         const float bg_x0 = std::max(tx - pad, x0);
         const float bg_x1 = std::min(tx + text_size.x + pad, x1);
         const float bg_y0 = std::max(ty - pad, y_base);
