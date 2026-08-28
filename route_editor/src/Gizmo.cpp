@@ -206,15 +206,15 @@ bool Gizmo::handle_intersections()
     int hit_arrow_index = -1;
     vsg::dvec3 hit_point;
 
-    for (int i = 0; i < 3; ++i)
-    {
-        if (calculate_closest_intersection_line_and_cylinder(i, ray_origin,
-            ray_dir, vsg::dvec3(0.0, 0.0, 0.0), R_cyl, H_cyl, hit_point))
-        {
-            hit_arrow_index = i;
-            break;
-        }
-    }
+    // for (int i = 0; i < 3; ++i)
+    // {
+    //     if (calculate_closest_intersection_line_and_cylinder(i, ray_origin,
+    //         ray_dir, vsg::dvec3(0.0, 0.0, 0.0), R_cyl, H_cyl, hit_point))
+    //     {
+    //         hit_arrow_index = i;
+    //         break;
+    //     }
+    // }
 
     for (int axis = 0; axis < 3; ++axis)
     {
