@@ -5,6 +5,7 @@
 
 #include <vulkan/vulkan_core.h>
 
+#include <algorithm>
 #include <cmath>
 
 void normalize_mouse_coordinates(int x, int y, VkExtent2D extent,
@@ -38,6 +39,11 @@ void calculate_mouse_world_coordinates(
 bool solve_quadratic_equation(double a, double b, double c,
     double& x1, double& x2)
 {
+    if (a < 1.0e-6)
+    {
+        return false;
+    }
+
     const double D = b * b - 4 * a * c;
     if (D < 0.0)
     {
@@ -96,34 +102,81 @@ bool calculate_intersection_mouse_and_plane(
         mouse_world2 - mouse_world1, plane_point, plane_norm, out);
 }
 
-bool calculate_closest_intersection_line_and_cylinder_x(
+bool calculate_closest_intersection_line_and_cylinder(
+    int axis_index,
     vsg::dvec3 line_orig, vsg::dvec3 line_dir,
-    vsg::dvec3 cylinder_base_center, vsg::dvec3 cylinder_radius,
-    vsg::dvec3 cylinder_height,
+    vsg::dvec3 cylinder_base_center, double cylinder_radius,
+    double cylinder_height,
     vsg::dvec3& out
 )
 {
+    int axis1, axis2;
+    switch (axis_index)
+    {
+        case 0:
+        {
+            axis1 = 1;
+            axis2 = 2;
+            break;
+        }
+        case 1:
+        {
+            axis1 = 0;
+            axis2 = 2;
+            break;
+        }
+        case 2:
+        {
+            axis1 = 0;
+            axis2 = 1;
+            break;
+        }
+        default:
+        {
+            return false;
+        }
+    }
+
     const vsg::dvec3 orig = line_orig;
     const vsg::dvec3 dir = line_dir;
     const vsg::dvec3 center = cylinder_base_center;
-    const vsg::dvec3 R = cylinder_radius;
-    const vsg::dvec3 H = cylinder_height;
+    const double R = cylinder_radius;
+    const double H = cylinder_height;
 
-    const double A = dir.y * dir.y + dir.z * dir.z;
-    const double B = 2.0 * (orig.y * dir.y - dir.y * center.y + orig.z * dir.z - dir.z * center.z);
-    const double C = (orig.y - center.y) * (orig.y - center.y) + (orig.z - center.z) * (orig.z - center.z);
+    const double A = dir[axis1] * dir[axis1] + dir[axis2] * dir[axis2];
+    const double B = 2.0 * (orig[axis1] * dir[axis1] - dir[axis1] * center[axis1] +
+        orig[axis2] * dir[axis2] - dir[axis2] * center[axis2]);
+    const double C = (orig[axis1] - center[axis1]) * (orig[axis1] - center[axis1]) +
+        (orig[axis2] - center[axis2]) * (orig[axis2] - center[axis2]) - R * R;
 
     double t1, t2;
-    if (!solve_quadratic_equation(
-        dir.y * dir.y + dir.z * dir.z,
-        2.0 * (orig.y * dir.y - dir.y * center.y + orig.z * dir.z - dir.z * center.z),
-        (orig.y - center.y) * (orig.y - center.y) + (orig.z - center.z) * (orig.z - center.z),
-        t1, t2))
+    if (!solve_quadratic_equation(A, B, C, t1, t2))
     {
         return false;
     }
 
+    const vsg::dvec3 p1 = orig + dir * t1;
+    const vsg::dvec3 p2 = orig + dir * t2;
 
+    if (p1[axis_index] < center[axis_index] || p1[axis_index] > center[axis_index] + H)
+    {
+        t1 = -1.0;
+    }
+
+    if (p2[axis_index] < center[axis_index] || p2[axis_index] > center[axis_index] + H)
+    {
+        t2 = -1.0;
+    }
+
+    if (t1 < 0.0 && t2 < 0.0)
+    {
+        return false;
+    }
+
+    double t = std::min(t1, t2);
+    t = (t < 0.0) ? std::max(t1, t2) : t;
+
+    out = orig + dir * t;
 
     return true;
 }

@@ -168,7 +168,7 @@ Gizmo::Gizmo(
 
 bool Gizmo::handle_intersections()
 {
-    constexpr vsg::dvec3 arrow_directions[3] = {
+    constexpr vsg::dvec3 arrow_directions[] = {
         vsg::dvec3(1.0, 0.0, 0.0),
         vsg::dvec3(0.0, 1.0, 0.0),
         vsg::dvec3(0.0, 0.0, 1.0)
@@ -180,13 +180,13 @@ bool Gizmo::handle_intersections()
         arrow_dots[i] = std::abs(vsg::dot(camera->get_front(), arrow_directions[i]));
     }
 
-    // Положение мыши нормализованное [-1.0; 1.0]
+    // Normalized mouse coordinates [-1.0; 1.0]
     double norm_mouse_x, norm_mouse_y;
     normalize_mouse_coordinates(mouse->get_x(), mouse->get_y(), window_extent,
         norm_mouse_x, norm_mouse_y);
 
-    const vsg::dmat4& inv_proj_mat = camera->get_inverse_projection_matrix();
     const vsg::dmat4& inv_view_mat = camera->get_inverse_view_matrix();
+    const vsg::dmat4& inv_proj_mat = camera->get_inverse_projection_matrix();
 
     vsg::dvec3 ray_origin, ray_end;
     calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 0.0,
@@ -205,6 +205,16 @@ bool Gizmo::handle_intersections()
     double closest_t = std::numeric_limits<double>::max();
     int hit_arrow_index = -1;
     vsg::dvec3 hit_point;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        if (calculate_closest_intersection_line_and_cylinder(i, ray_origin,
+            ray_dir, vsg::dvec3(0.0, 0.0, 0.0), R_cyl, H_cyl, hit_point))
+        {
+            hit_arrow_index = i;
+            break;
+        }
+    }
 
     for (int axis = 0; axis < 3; ++axis)
     {
