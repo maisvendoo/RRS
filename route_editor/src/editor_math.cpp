@@ -93,9 +93,9 @@ bool calculate_intersection_mouse_and_plane(
     normalize_mouse_coordinates(x, y, extent, norm_x, norm_y);
 
     vsg::dvec3 mouse_world1, mouse_world2;
-    calculate_mouse_world_coordinates(norm_x, norm_y, 0.0, extent,
+    calculate_mouse_world_coordinates(norm_x, norm_y, 0.0,
         inv_view_mat, inv_proj_mat, mouse_world1);
-    calculate_mouse_world_coordinates(norm_x, norm_y, 1.0, extent,
+    calculate_mouse_world_coordinates(norm_x, norm_y, 1.0,
         inv_view_mat, inv_proj_mat, mouse_world2);
 
     return calculate_intersection_line_and_plane(mouse_world1,
