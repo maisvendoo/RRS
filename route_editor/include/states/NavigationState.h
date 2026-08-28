@@ -34,10 +34,6 @@ public:
 
     virtual void update(double delta_time) override;
 
-    virtual void fill_status_bar() const override;
-
-    virtual const char* get_name() const override;
-
 private:
     const vsg::ref_ptr<Camera>& camera;
 };

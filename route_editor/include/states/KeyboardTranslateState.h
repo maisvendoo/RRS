@@ -21,8 +21,6 @@ public:
     virtual ~KeyboardTranslateState() override;
 
     virtual void handle_key_press() override;
-
-    virtual const char* get_name() const override;
 };
 
 #endif // KEYBOARD_TRANSLATE_STATE_H

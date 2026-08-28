@@ -21,8 +21,6 @@ public:
     virtual ~GizmoRotateState() override;
 
     virtual void handle_key_press() override;
-
-    virtual const char* get_name() const override;
 };
 
 #endif // GIZMO_ROTATE_STATE_H

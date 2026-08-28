@@ -7,15 +7,11 @@ GizmoScaleState::GizmoScaleState(
 )
     : State(mouse, keyboard, state_manager)
 {
+    name = "GizmoScaleState";
 }
 
 GizmoScaleState::~GizmoScaleState() = default;
 
 void GizmoScaleState::handle_key_press()
 {
-}
-
-const char* GizmoScaleState::get_name() const
-{
-    return "GizmoScaleState";
 }

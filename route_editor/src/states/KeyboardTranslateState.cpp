@@ -7,15 +7,11 @@ KeyboardTranslateState::KeyboardTranslateState(
 )
     : State(mouse, keyboard, state_manager)
 {
+    name = "KeyboardTranslateState";
 }
 
 KeyboardTranslateState::~KeyboardTranslateState() = default;
 
 void KeyboardTranslateState::handle_key_press()
 {
-}
-
-const char* KeyboardTranslateState::get_name() const
-{
-    return "KeyboardTranslateState";
 }

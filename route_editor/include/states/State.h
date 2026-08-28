@@ -3,6 +3,8 @@
 
 #include <vsg/core/ref_ptr.h>
 
+#include <string>
+
 class Keyboard;
 class Mouse;
 class StateManager;
@@ -40,12 +42,13 @@ public:
 
     virtual void fill_status_bar() const;
 
-    virtual const char* get_name() const;
+    const std::string& get_name() const;
 
 protected:
     const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
     StateManager& state_manager;
+    std::string name;
 };
 
 #endif // EDITOR_STATE_H2

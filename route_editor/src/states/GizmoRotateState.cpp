@@ -7,15 +7,11 @@ GizmoRotateState::GizmoRotateState(
 )
     : State(mouse, keyboard, state_manager)
 {
+    name = "GizmoRotateState";
 }
 
 GizmoRotateState::~GizmoRotateState() = default;
 
 void GizmoRotateState::handle_key_press()
 {
-}
-
-const char* GizmoRotateState::get_name() const
-{
-    return "GizmoRotateState";
 }

@@ -21,8 +21,6 @@ public:
     virtual ~RouteNotLoadedState() override;
 
     virtual void fill_status_bar() const override;
-
-    virtual const char* get_name() const override;
 };
 
 #endif // ROUTE_NOT_LOADED_STATE_H

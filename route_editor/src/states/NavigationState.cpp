@@ -15,6 +15,7 @@ NavigationState::NavigationState(
     : State(mouse, keyboard, state_manager)
     , camera(camera)
 {
+    name = "NavigationState";
 }
 
 NavigationState::~NavigationState() = default;
@@ -50,14 +51,4 @@ void NavigationState::handle_mouse_move()
 void NavigationState::update(double delta_time)
 {
     camera->update(delta_time);
-}
-
-void NavigationState::fill_status_bar() const
-{
-    ImGui::Text("NavigationState");
-}
-
-const char* NavigationState::get_name() const
-{
-    return "NavigationState";
 }

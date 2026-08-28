@@ -21,6 +21,7 @@ BasicEditorState::BasicEditorState(
     , camera(camera)
     , command_list(command_list)
 {
+    name = "BasicEditorState";
 }
 
 BasicEditorState::~BasicEditorState() = default;
@@ -64,14 +65,4 @@ void BasicEditorState::handle_button_press()
 void BasicEditorState::handle_mouse_scroll()
 {
     camera->handle_mouse_scroll();
-}
-
-void BasicEditorState::fill_status_bar() const
-{
-    ImGui::Text("BasicEditorState");
-}
-
-const char* BasicEditorState::get_name() const
-{
-    return "BasicEditorState";
 }

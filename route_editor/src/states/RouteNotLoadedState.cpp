@@ -13,14 +13,14 @@ RouteNotLoadedState::RouteNotLoadedState(
 )
     : State(mouse, keyboard, state_manager)
 {
+    name = "RouteNotLoadedState";
 }
 
 RouteNotLoadedState::~RouteNotLoadedState() = default;
 
 void RouteNotLoadedState::fill_status_bar() const
 {
-    ImGui::Text("Route is not loaded");
-    ImGui::SameLine();
+    State::fill_status_bar();
     if (ImGui::Button("Load route"))
     {
         IGFD::FileDialogConfig config;
@@ -28,9 +28,4 @@ void RouteNotLoadedState::fill_status_bar() const
         ImGuiFileDialog::Instance()->OpenDialog("LoadRouteKey",
             "Load route", nullptr, config);
     }
-}
-
-const char* RouteNotLoadedState::get_name() const
-{
-    return "RouteNotLoadedState";
 }

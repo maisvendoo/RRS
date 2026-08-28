@@ -7,15 +7,11 @@ GizmoTranslateState::GizmoTranslateState(
 )
     : State(mouse, keyboard, state_manager)
 {
+    name = "GizmoTranslateState";
 }
 
 GizmoTranslateState::~GizmoTranslateState() = default;
 
 void GizmoTranslateState::handle_key_press()
 {
-}
-
-const char* GizmoTranslateState::get_name() const
-{
-    return "GizmoTranslateState";
 }

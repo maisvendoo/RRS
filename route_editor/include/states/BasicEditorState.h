@@ -30,10 +30,6 @@ public:
 
     virtual void handle_mouse_scroll() override;
 
-    virtual void fill_status_bar() const override;
-
-    virtual const char* get_name() const override;
-
 private:
     const vsg::ref_ptr<Camera>& camera;
     CommandList& command_list;

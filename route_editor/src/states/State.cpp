@@ -1,6 +1,7 @@
 #include "states/State.h"
 
 #include <vsg/core/ref_ptr.h>
+#include <vsgImGui/imgui.h>
 
 State::State(
     const vsg::ref_ptr<Mouse>& mouse,
@@ -58,9 +59,11 @@ void State::draw_gui() const
 
 void State::fill_status_bar() const
 {
+    ImGui::Text("%s", name.c_str());
+    ImGui::SameLine();
 }
 
-const char* State::get_name() const
+const std::string& State::get_name() const
 {
-    return "State";
+    return name;
 }
