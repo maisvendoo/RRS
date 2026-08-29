@@ -119,11 +119,17 @@ void RouteViewer::loadHUDSettings(CfgReader& cfg, const QString& section)
         {
             std::istringstream stream(value.toStdString());
             stream >> color.r >> color.g >> color.b >> color.a;
+
+            color.r = std::clamp(color.r, 0.0f, 1.0f);
+            color.g = std::clamp(color.g, 0.0f, 1.0f);
+            color.b = std::clamp(color.b, 0.0f, 1.0f);
+            color.a = std::clamp(color.a, 0.0f, 1.0f);
         }
     };
 
     readColor("HUDBackground",          settings.hud_background);
     readColor("HUDText",                settings.hud_text);
+    readColor("HUDWarningText",         settings.hud_warning_text);
     readColor("HUDButtonOff",           settings.hud_button_off);
     readColor("HUDButtonOn",            settings.hud_button_on);
     readColor("HUDButtonHovered",       settings.hud_button_hovered);
@@ -132,7 +138,6 @@ void RouteViewer::loadHUDSettings(CfgReader& cfg, const QString& section)
 
     readColor("HUDCurrentTrain",        settings.hud_current_train);
     readColor("HUDControlledTrain",     settings.hud_controlled_train);
-    readColor("HUDWarningText",         settings.hud_warning_text);
 
     readColor("HUDTimetableDelay",      settings.hud_timetable_delay);
     readColor("HUDTimetablePast",       settings.hud_timetable_past);
@@ -147,7 +152,7 @@ void RouteViewer::loadHUDSettings(CfgReader& cfg, const QString& section)
     readColor("HUDTrainProfileCurrent",           settings.hud_train_profile_current);
     readColor("HUDTrainProfileControlled",        settings.hud_train_profile_controlled);
     readColor("HUDTrainProfileStationText",       settings.hud_train_profile_station_text);
-    readColor("HUDTrainProfileMast",              settings.hud_train_profile_mast);
+    readColor("HUDTrainProfileSignalBody",        settings.hud_train_profile_signal_body);
     readColor("HUDTrainProfileSignalLetter",      settings.hud_train_profile_signal_letter);
     readColor("HUDTrainProfileSpeedLimitBorder",  settings.hud_train_profile_speed_limit_border);
     readColor("HUDTrainProfileSpeedLimitFill",    settings.hud_train_profile_speed_limit_fill);

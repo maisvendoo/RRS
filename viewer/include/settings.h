@@ -127,40 +127,40 @@ struct settings_t final
     double allocatedMemoryLimit = 1.0;
 
     // Цвета виджетов интерфейса (HUD), RGBA в диапазоне 0.0 - 1.0
-    vsg::vec4 hud_background = {0.0f, 0.0f, 0.0f, 0.8f};           ///< Фон виджетов интерфейса
-    vsg::vec4 hud_text = {1.0f, 1.0f, 1.0f, 1.0f};                 ///< Текст интерфейса
-    vsg::vec4 hud_button_off = {1.0f, 0.75f, 0.75f, 0.8f};         ///< Ненажатые кнопки
-    vsg::vec4 hud_button_on = {0.75f, 1.0f, 0.75f, 0.8f};          ///< Нажатые кнопки
-    vsg::vec4 hud_button_hovered = {1.0f, 1.0f, 0.75f, 0.8f};      ///< Кнопки при наведении
-    vsg::vec4 hud_button_inactive = {0.3f, 0.3f, 0.3f, 0.8f};      ///< Неактивные кнопки
-    vsg::vec4 hud_button_inactive_text = {0.5f, 0.5f, 0.5f, 1.0f}; ///< Текст неактивных кнопок
+    vsg::vec4 hud_background = {0.0f, 0.0f, 0.0f, 0.8f};            ///< Фон виджетов интерфейса
+    vsg::vec4 hud_text = {1.0f, 1.0f, 1.0f, 1.0f};                  ///< Текст интерфейса
+    vsg::vec4 hud_warning_text = {1.0f, 0.0f, 0.0f, 1.0f};          ///< Текст предупреждений
+    vsg::vec4 hud_button_off = {1.0f, 0.75f, 0.75f, 0.8f};          ///< Ненажатые кнопки
+    vsg::vec4 hud_button_on = {0.75f, 1.0f, 0.75f, 0.8f};           ///< Нажатые кнопки
+    vsg::vec4 hud_button_hovered = {1.0f, 1.0f, 0.75f, 0.8f};       ///< Кнопки при наведении
+    vsg::vec4 hud_button_inactive = {0.3f, 0.3f, 0.3f, 0.8f};       ///< Неактивные кнопки
+    vsg::vec4 hud_button_inactive_text = {0.5f, 0.5f, 0.5f, 1.0f};  ///< Текст неактивных кнопок
 
-    // Цвета выделения поездов и предупреждений, RGBA в диапазоне 0.0 - 1.0
-    vsg::vec4 hud_current_train = {1.0f, 1.0f, 0.0f, 1.0f};       ///< Текущий поезд
-    vsg::vec4 hud_controlled_train = {0.0f, 1.0f, 0.0f, 1.0f};    ///< Управляемый поезд
-    vsg::vec4 hud_warning_text = {1.0f, 0.0f, 0.0f, 1.0f};        ///< Текст предупреждений
+    // Цвета выделения поездов, RGBA в диапазоне 0.0 - 1.0
+    vsg::vec4 hud_current_train = {1.0f, 1.0f, 0.0f, 1.0f};     ///< Текущий поезд
+    vsg::vec4 hud_controlled_train = {0.0f, 1.0f, 0.0f, 1.0f};  ///< Управляемый поезд
 
     // Цвета строк графика (HUD), RGBA в диапазоне 0.0 - 1.0
-    vsg::vec4 hud_timetable_delay = {1.0f, 0.5f, 0.31f, 1.0f};    ///< Пройдено с опозданием
-    vsg::vec4 hud_timetable_past = {0.0f, 0.5f, 0.0f, 1.0f};      ///< Пройдено по расписанию
-    vsg::vec4 hud_timetable_current = {1.0f, 1.0f, 0.0f, 1.0f};   ///< Текущая
-    vsg::vec4 hud_timetable_future = {0.5f, 0.5f, 0.5f, 1.0f};    ///< Будущие
+    vsg::vec4 hud_timetable_delay = {1.0f, 0.5f, 0.25f, 1.0f};  ///< Пройдено с опозданием
+    vsg::vec4 hud_timetable_past = {0.0f, 0.5f, 0.0f, 1.0f};    ///< Пройдено по расписанию
+    vsg::vec4 hud_timetable_current = {1.0f, 1.0f, 0.0f, 1.0f}; ///< Текущая
+    vsg::vec4 hud_timetable_future = {0.5f, 0.5f, 0.5f, 1.0f};  ///< Будущие
 
-    // Цвета виджета профиля пути (TrainProfileHintWidget), RGBA в диапазоне 0.0 - 1.0
-    vsg::vec4 hud_train_profile_grid = {0.353f, 0.353f, 0.353f, 0.588f};               ///< Линии координатной сетки
-    vsg::vec4 hud_train_profile_grid_label = {0.745f, 0.745f, 0.745f, 0.863f};         ///< Подписи километража сетки
-    vsg::vec4 hud_train_profile_baseline = {0.502f, 0.502f, 0.502f, 1.0f};             ///< Базовая линия профиля (rel=0)
-    vsg::vec4 hud_train_profile_curve = {0.0f, 0.4f, 0.8f, 1.0f};                       ///< Кривая профиля пути
-    vsg::vec4 hud_train_profile_uncontrolled = {0.251f, 0.502f, 0.0f, 1.0f};           ///< Неуправляемый поезд
-    vsg::vec4 hud_train_profile_current = {0.753f, 0.753f, 0.0f, 1.0f};                ///< Текущий поезд
-    vsg::vec4 hud_train_profile_controlled = {0.753f, 0.251f, 0.251f, 1.0f};           ///< Управляемый поезд
-    vsg::vec4 hud_train_profile_station_text = {0.0f, 0.784f, 1.0f, 1.0f};             ///< Названия станций
-    vsg::vec4 hud_train_profile_mast = {0.863f, 0.863f, 0.863f, 1.0f};                  ///< Мачта светофора
-    vsg::vec4 hud_train_profile_signal_letter = {1.0f, 1.0f, 1.0f, 1.0f};               ///< Литеры светофора
-    vsg::vec4 hud_train_profile_speed_limit_border = {0.353f, 0.353f, 0.353f, 0.588f}; ///< Рамка зоны ограничения скорости
-    vsg::vec4 hud_train_profile_speed_limit_fill = {0.353f, 0.353f, 0.353f, 0.157f};    ///< Заливка зоны ограничения скорости
-    vsg::vec4 hud_train_profile_speed_limit_text = {1.0f, 0.0f, 0.0f, 1.0f};           ///< Текст ограничения скорости
-    vsg::vec4 hud_train_profile_speed_limit_bg = {1.0f, 1.0f, 1.0f, 1.0f};              ///< Подложка текста ограничения скорости
+    // Цвета виджета профиля пути, RGBA в диапазоне 0.0 - 1.0
+    vsg::vec4 hud_train_profile_grid = {0.5f, 0.5f, 0.5f, 0.25f};                   ///< Засечки километража
+    vsg::vec4 hud_train_profile_grid_label = {0.75f, 0.75f, 0.75f, 0.75f};          ///< Подписи километража
+    vsg::vec4 hud_train_profile_baseline = {0.5f, 0.5f, 0.5f, 0.5f};                ///< Базовая линия
+    vsg::vec4 hud_train_profile_curve = {0.0f, 0.4f, 0.8f, 1.0f};                   ///< Линия профиля пути
+    vsg::vec4 hud_train_profile_uncontrolled = {0.25f, 0.5f, 0.0f, 1.0f};           ///< ПЕ на профиле
+    vsg::vec4 hud_train_profile_current = {0.75f, 0.75f, 0.0f, 1.0f};               ///< Текущая ПЕ на профиле
+    vsg::vec4 hud_train_profile_controlled = {1.0f, 0.0f, 0.0f, 1.0f};              ///< Управляемая ПЕ на профиле
+    vsg::vec4 hud_train_profile_station_text = {0.0f, 0.75f, 1.0f, 1.0f};           ///< Названия станций
+    vsg::vec4 hud_train_profile_signal_body = {1.0f, 1.0f, 1.0f, 1.0f};             ///< Мачта светофора
+    vsg::vec4 hud_train_profile_signal_letter = {1.0f, 1.0f, 1.0f, 1.0f};           ///< Литеры светофора
+    vsg::vec4 hud_train_profile_speed_limit_border = {0.25f, 0.25f, 0.25f, 0.5f};   ///< Рамка зоны ограничения скорости
+    vsg::vec4 hud_train_profile_speed_limit_fill = {0.25f, 0.25f, 0.25f, 0.125f};   ///< Заливка зоны ограничения скорости
+    vsg::vec4 hud_train_profile_speed_limit_text = {1.0f, 0.0f, 0.0f, 1.0f};        ///< Текст ограничения скорости
+    vsg::vec4 hud_train_profile_speed_limit_bg = {1.0f, 1.0f, 1.0f, 1.0f};          ///< Подложка текста ограничения скорости
 };
 
 #endif // VIEWER_SETTINGS_H

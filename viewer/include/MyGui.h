@@ -116,7 +116,7 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     ImVec4 hud_train_profile_current = ImVec4(0.753f, 0.753f, 0.0f, 1.0f);
     ImVec4 hud_train_profile_controlled = ImVec4(0.753f, 0.251f, 0.251f, 1.0f);
     ImVec4 hud_train_profile_station_text = ImVec4(0.0f, 0.784f, 1.0f, 1.0f);
-    ImVec4 hud_train_profile_mast = ImVec4(0.863f, 0.863f, 0.863f, 1.0f);
+    ImVec4 hud_train_profile_signal_body = ImVec4(0.863f, 0.863f, 0.863f, 1.0f);
     ImVec4 hud_train_profile_signal_letter = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     ImVec4 hud_train_profile_speed_limit_border = ImVec4(0.353f, 0.353f, 0.353f, 0.588f);
     ImVec4 hud_train_profile_speed_limit_fill = ImVec4(0.353f, 0.353f, 0.353f, 0.157f);

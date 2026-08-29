@@ -66,7 +66,7 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
     _train_profile_params.hud_train_profile_current = params->hud_train_profile_current;
     _train_profile_params.hud_train_profile_controlled = params->hud_train_profile_controlled;
     _train_profile_params.hud_train_profile_station_text = params->hud_train_profile_station_text;
-    _train_profile_params.hud_train_profile_mast = params->hud_train_profile_mast;
+    _train_profile_params.hud_train_profile_signal_body = params->hud_train_profile_signal_body;
     _train_profile_params.hud_train_profile_signal_letter = params->hud_train_profile_signal_letter;
     _train_profile_params.hud_train_profile_speed_limit_border = params->hud_train_profile_speed_limit_border;
     _train_profile_params.hud_train_profile_speed_limit_fill = params->hud_train_profile_speed_limit_fill;

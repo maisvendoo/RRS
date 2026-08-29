@@ -697,8 +697,8 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
 
     const float lens_r = 4.0f;
     const float lens_gap = 2.0f * lens_r;
-    const ImU32 mast_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_mast);
-    const ImU32 off_col = IM_COL32(24, 24, 24, 255);
+    const ImU32 signal_body_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_signal_body);
+    const ImU32 off_col = IM_COL32(0, 0, 0, 255);
 
     // Состав и порядок линз для каждого типа светофора (снизу вверх)
     struct lens_spec_t
@@ -772,8 +772,8 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
         const float y_top = y_base - mast_h;
 
         // Мачта и перекладина
-        draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_top), mast_col, 1.5f);
-        draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), mast_col, 1.5f);
+        draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_top), signal_body_col, 1.5f);
+        draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), signal_body_col, 1.5f);
 
         // Линзы снизу вверх: горящая - ярким цветом, погашенная - тёмной
         for (size_t i = 0; i < spec.size(); ++i)

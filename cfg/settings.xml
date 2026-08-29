@@ -78,6 +78,8 @@
         <HUDBackground>0.0 0.0 0.0 0.8</HUDBackground>
         <!-- Цвет текста интерфейса (RGBA, 0.0 - 1.0) -->
         <HUDText>1.0 1.0 1.0 1.0</HUDText>
+        <!-- Цвет текста предупреждений (пауза, нет управления и т.п.) (RGBA, 0.0 - 1.0) -->
+        <HUDWarningText>1.0 0.0 0.0 1.0</HUDWarningText>
         <!-- Цвет ненажатых кнопок интерфейса (RGBA, 0.0 - 1.0) -->
         <HUDButtonOff>1.0 0.75 0.75 0.8</HUDButtonOff>
         <!-- Цвет нажатых кнопок интерфейса (RGBA, 0.0 - 1.0) -->
@@ -92,40 +94,38 @@
         <HUDCurrentTrain>1.0 1.0 0.0 1.0</HUDCurrentTrain>
         <!-- Цвет текста управляемого поезда в списке (RGBA, 0.0 - 1.0) -->
         <HUDControlledTrain>0.0 1.0 0.0 1.0</HUDControlledTrain>
-        <!-- Цвет текста предупреждений (пауза, нет управления и т.п.) (RGBA, 0.0 - 1.0) -->
-        <HUDWarningText>1.0 0.0 0.0 1.0</HUDWarningText>
         <!-- Цвет строк графика: пройдено с задержкой (RGBA, 0.0 - 1.0) -->
-        <HUDTimetableDelay>1.0 0.5 0.31 1.0</HUDTimetableDelay>
+        <HUDTimetableDelay>1.0 0.5 0.25 1.0</HUDTimetableDelay>
         <!-- Цвет строк графика: пройдено по расписанию (RGBA, 0.0 - 1.0) -->
         <HUDTimetablePast>0.0 0.5 0.0 1.0</HUDTimetablePast>
         <!-- Цвет строк графика: текущая (RGBA, 0.0 - 1.0) -->
         <HUDTimetableCurrent>1.0 1.0 0.0 1.0</HUDTimetableCurrent>
         <!-- Цвет строк графика: будущие (RGBA, 0.0 - 1.0) -->
         <HUDTimetableFuture>0.5 0.5 0.5 1.0</HUDTimetableFuture>
-        <!-- Цвет линий координатной сетки профиля пути (RGBA, 0.0 - 1.0) -->
-        <HUDTrainProfileGrid>0.353 0.353 0.353 0.588</HUDTrainProfileGrid>
-        <!-- Цвет подписей километража сетки профиля пути (RGBA, 0.0 - 1.0) -->
-        <HUDTrainProfileGridLabel>0.745 0.745 0.745 0.863</HUDTrainProfileGridLabel>
-        <!-- Цвет базовой линии профиля пути (rel=0) (RGBA, 0.0 - 1.0) -->
-        <HUDTrainProfileBaseline>0.502 0.502 0.502 1.0</HUDTrainProfileBaseline>
-        <!-- Цвет кривой профиля пути (RGBA, 0.0 - 1.0) -->
+        <!-- Цвет засечек километража на профиле пути (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileGrid>0.5 0.5 0.5 0.25</HUDTrainProfileGrid>
+        <!-- Цвет подписей километража на профиле пути (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileGridLabel>0.75 0.75 0.75 0.75</HUDTrainProfileGridLabel>
+        <!-- Цвет базовой линии (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileBaseline>0.5 0.5 0.5 0.5</HUDTrainProfileBaseline>
+        <!-- Цвет линии профиля пути (RGBA, 0.0 - 1.0) -->
         <HUDTrainProfileCurve>0.0 0.4 0.8 1.0</HUDTrainProfileCurve>
-        <!-- Цвет неуправляемого поезда на профиле (RGBA, 0.0 - 1.0) -->
-        <HUDTrainProfileUncontrolled>0.251 0.502 0.0 1.0</HUDTrainProfileUncontrolled>
-        <!-- Цвет текущего поезда на профиле (RGBA, 0.0 - 1.0) -->
-        <HUDTrainProfileCurrent>0.753 0.753 0.0 1.0</HUDTrainProfileCurrent>
-        <!-- Цвет управляемого поезда на профиле (RGBA, 0.0 - 1.0) -->
-        <HUDTrainProfileControlled>0.753 0.251 0.251 1.0</HUDTrainProfileControlled>
-        <!-- Цвет названий станций на профиле (RGBA, 0.0 - 1.0) -->
-        <HUDTrainProfileStationText>0.0 0.784 1.0 1.0</HUDTrainProfileStationText>
-        <!-- Цвет мачты светофора (RGBA, 0.0 - 1.0) -->
-        <HUDTrainProfileMast>0.863 0.863 0.863 1.0</HUDTrainProfileMast>
+        <!-- Цвет ПЕ на профиле (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileUncontrolled>0.25 0.5 0.0 1.0</HUDTrainProfileUncontrolled>
+        <!-- Цвет текущей ПЕ на профиле (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileCurrent>0.75 0.75 0.0 1.0</HUDTrainProfileCurrent>
+        <!-- Цвет управляемой ПЕ на профиле (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileControlled>1.0 0.0 0.0 1.0</HUDTrainProfileControlled>
+        <!-- Цвет подписей станций на профиле (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileStationText>0.0 0.75 1.0 1.0</HUDTrainProfileStationText>
+        <!-- Цвет мачт светофоров (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileSignalBody>1.0 1.0 1.0 1.0</HUDTrainProfileSignalBody>
         <!-- Цвет литер светофоров (RGBA, 0.0 - 1.0) -->
         <HUDTrainProfileSignalLetter>1.0 1.0 1.0 1.0</HUDTrainProfileSignalLetter>
         <!-- Цвет рамки зоны ограничения скорости (RGBA, 0.0 - 1.0) -->
-        <HUDTrainProfileSpeedLimitBorder>0.353 0.353 0.353 0.588</HUDTrainProfileSpeedLimitBorder>
+        <HUDTrainProfileSpeedLimitBorder>0.25 0.25 0.25 0.5</HUDTrainProfileSpeedLimitBorder>
         <!-- Цвет заливки зоны ограничения скорости (RGBA, 0.0 - 1.0) -->
-        <HUDTrainProfileSpeedLimitFill>0.353 0.353 0.353 0.157</HUDTrainProfileSpeedLimitFill>
+        <HUDTrainProfileSpeedLimitFill>0.25 0.25 0.25 0.125</HUDTrainProfileSpeedLimitFill>
         <!-- Цвет текста ограничения скорости (RGBA, 0.0 - 1.0) -->
         <HUDTrainProfileSpeedLimitText>1.0 0.0 0.0 1.0</HUDTrainProfileSpeedLimitText>
         <!-- Цвет подложки текста ограничения скорости (RGBA, 0.0 - 1.0) -->

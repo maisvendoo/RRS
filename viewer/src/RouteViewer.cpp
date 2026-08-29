@@ -418,8 +418,8 @@ void RouteViewer::initVsgOptions()
                                                       settings.hud_train_profile_controlled.z, settings.hud_train_profile_controlled.w);
     GUIparams->hud_train_profile_station_text = ImVec4(settings.hud_train_profile_station_text.x, settings.hud_train_profile_station_text.y,
                                                        settings.hud_train_profile_station_text.z, settings.hud_train_profile_station_text.w);
-    GUIparams->hud_train_profile_mast = ImVec4(settings.hud_train_profile_mast.x, settings.hud_train_profile_mast.y,
-                                               settings.hud_train_profile_mast.z, settings.hud_train_profile_mast.w);
+    GUIparams->hud_train_profile_signal_body = ImVec4(settings.hud_train_profile_signal_body.x, settings.hud_train_profile_signal_body.y,
+                                                      settings.hud_train_profile_signal_body.z, settings.hud_train_profile_signal_body.w);
     GUIparams->hud_train_profile_signal_letter = ImVec4(settings.hud_train_profile_signal_letter.x, settings.hud_train_profile_signal_letter.y,
                                                         settings.hud_train_profile_signal_letter.z, settings.hud_train_profile_signal_letter.w);
     GUIparams->hud_train_profile_speed_limit_border = ImVec4(settings.hud_train_profile_speed_limit_border.x, settings.hud_train_profile_speed_limit_border.y,
