@@ -58,6 +58,20 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
     _train_profile_params.backward_m = static_cast<float>(params->train_profile_backward);
     _train_profile_params.forward_m = static_cast<float>(params->train_profile_forward);
     _train_profile_params.hud_background = params->hud_background;
+    _train_profile_params.hud_train_profile_grid = params->hud_train_profile_grid;
+    _train_profile_params.hud_train_profile_grid_label = params->hud_train_profile_grid_label;
+    _train_profile_params.hud_train_profile_baseline = params->hud_train_profile_baseline;
+    _train_profile_params.hud_train_profile_curve = params->hud_train_profile_curve;
+    _train_profile_params.hud_train_profile_uncontrolled = params->hud_train_profile_uncontrolled;
+    _train_profile_params.hud_train_profile_current = params->hud_train_profile_current;
+    _train_profile_params.hud_train_profile_controlled = params->hud_train_profile_controlled;
+    _train_profile_params.hud_train_profile_station_text = params->hud_train_profile_station_text;
+    _train_profile_params.hud_train_profile_mast = params->hud_train_profile_mast;
+    _train_profile_params.hud_train_profile_signal_letter = params->hud_train_profile_signal_letter;
+    _train_profile_params.hud_train_profile_speed_limit_border = params->hud_train_profile_speed_limit_border;
+    _train_profile_params.hud_train_profile_speed_limit_fill = params->hud_train_profile_speed_limit_fill;
+    _train_profile_params.hud_train_profile_speed_limit_text = params->hud_train_profile_speed_limit_text;
+    _train_profile_params.hud_train_profile_speed_limit_bg = params->hud_train_profile_speed_limit_bg;
     _train_profile_widget = new TrainProfileHintWidget(&_train_profile_params);
 }
 

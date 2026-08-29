@@ -102,6 +102,34 @@
         <HUDTimetableCurrent>1.0 1.0 0.0 1.0</HUDTimetableCurrent>
         <!-- Цвет строк графика: будущие (RGBA, 0.0 - 1.0) -->
         <HUDTimetableFuture>0.5 0.5 0.5 1.0</HUDTimetableFuture>
+        <!-- Цвет линий координатной сетки профиля пути (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileGrid>0.353 0.353 0.353 0.588</HUDTrainProfileGrid>
+        <!-- Цвет подписей километража сетки профиля пути (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileGridLabel>0.745 0.745 0.745 0.863</HUDTrainProfileGridLabel>
+        <!-- Цвет базовой линии профиля пути (rel=0) (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileBaseline>0.502 0.502 0.502 1.0</HUDTrainProfileBaseline>
+        <!-- Цвет кривой профиля пути (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileCurve>0.0 0.4 0.8 1.0</HUDTrainProfileCurve>
+        <!-- Цвет неуправляемого поезда на профиле (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileUncontrolled>0.251 0.502 0.0 1.0</HUDTrainProfileUncontrolled>
+        <!-- Цвет текущего поезда на профиле (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileCurrent>0.753 0.753 0.0 1.0</HUDTrainProfileCurrent>
+        <!-- Цвет управляемого поезда на профиле (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileControlled>0.753 0.251 0.251 1.0</HUDTrainProfileControlled>
+        <!-- Цвет названий станций на профиле (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileStationText>0.0 0.784 1.0 1.0</HUDTrainProfileStationText>
+        <!-- Цвет мачты светофора (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileMast>0.863 0.863 0.863 1.0</HUDTrainProfileMast>
+        <!-- Цвет литер светофоров (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileSignalLetter>1.0 1.0 1.0 1.0</HUDTrainProfileSignalLetter>
+        <!-- Цвет рамки зоны ограничения скорости (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileSpeedLimitBorder>0.353 0.353 0.353 0.588</HUDTrainProfileSpeedLimitBorder>
+        <!-- Цвет заливки зоны ограничения скорости (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileSpeedLimitFill>0.353 0.353 0.353 0.157</HUDTrainProfileSpeedLimitFill>
+        <!-- Цвет текста ограничения скорости (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileSpeedLimitText>1.0 0.0 0.0 1.0</HUDTrainProfileSpeedLimitText>
+        <!-- Цвет подложки текста ограничения скорости (RGBA, 0.0 - 1.0) -->
+        <HUDTrainProfileSpeedLimitBg>1.0 1.0 1.0 1.0</HUDTrainProfileSpeedLimitBg>
         <!-- Размер шрифта для подписей станций в сцене -->
         <StationsTextFontSize>10.0</StationsTextFontSize>
         <!-- Смещение подписей станций -->

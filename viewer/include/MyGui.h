@@ -107,6 +107,22 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     ImVec4 hud_timetable_current = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
     ImVec4 hud_timetable_future = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
 
+    // Цвета виджета профиля пути (RGBA, 0.0 - 1.0)
+    ImVec4 hud_train_profile_grid = ImVec4(0.353f, 0.353f, 0.353f, 0.588f);
+    ImVec4 hud_train_profile_grid_label = ImVec4(0.745f, 0.745f, 0.745f, 0.863f);
+    ImVec4 hud_train_profile_baseline = ImVec4(0.502f, 0.502f, 0.502f, 1.0f);
+    ImVec4 hud_train_profile_curve = ImVec4(0.0f, 0.4f, 0.8f, 1.0f);
+    ImVec4 hud_train_profile_uncontrolled = ImVec4(0.251f, 0.502f, 0.0f, 1.0f);
+    ImVec4 hud_train_profile_current = ImVec4(0.753f, 0.753f, 0.0f, 1.0f);
+    ImVec4 hud_train_profile_controlled = ImVec4(0.753f, 0.251f, 0.251f, 1.0f);
+    ImVec4 hud_train_profile_station_text = ImVec4(0.0f, 0.784f, 1.0f, 1.0f);
+    ImVec4 hud_train_profile_mast = ImVec4(0.863f, 0.863f, 0.863f, 1.0f);
+    ImVec4 hud_train_profile_signal_letter = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImVec4 hud_train_profile_speed_limit_border = ImVec4(0.353f, 0.353f, 0.353f, 0.588f);
+    ImVec4 hud_train_profile_speed_limit_fill = ImVec4(0.353f, 0.353f, 0.353f, 0.157f);
+    ImVec4 hud_train_profile_speed_limit_text = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+    ImVec4 hud_train_profile_speed_limit_bg = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+
     QString status = "";
     QString physicalDeviceName = "";
 };

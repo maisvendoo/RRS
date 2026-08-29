@@ -400,7 +400,36 @@ void RouteViewer::initVsgOptions()
     GUIparams->hud_timetable_current = ImVec4(settings.hud_timetable_current.x, settings.hud_timetable_current.y,
                                               settings.hud_timetable_current.z, settings.hud_timetable_current.w);
     GUIparams->hud_timetable_future = ImVec4(settings.hud_timetable_future.x, settings.hud_timetable_future.y,
-                                             settings.hud_timetable_future.z, settings.hud_timetable_future.w);
+                                              settings.hud_timetable_future.z, settings.hud_timetable_future.w);
+
+    GUIparams->hud_train_profile_grid = ImVec4(settings.hud_train_profile_grid.x, settings.hud_train_profile_grid.y,
+                                               settings.hud_train_profile_grid.z, settings.hud_train_profile_grid.w);
+    GUIparams->hud_train_profile_grid_label = ImVec4(settings.hud_train_profile_grid_label.x, settings.hud_train_profile_grid_label.y,
+                                                     settings.hud_train_profile_grid_label.z, settings.hud_train_profile_grid_label.w);
+    GUIparams->hud_train_profile_baseline = ImVec4(settings.hud_train_profile_baseline.x, settings.hud_train_profile_baseline.y,
+                                                   settings.hud_train_profile_baseline.z, settings.hud_train_profile_baseline.w);
+    GUIparams->hud_train_profile_curve = ImVec4(settings.hud_train_profile_curve.x, settings.hud_train_profile_curve.y,
+                                                settings.hud_train_profile_curve.z, settings.hud_train_profile_curve.w);
+    GUIparams->hud_train_profile_uncontrolled = ImVec4(settings.hud_train_profile_uncontrolled.x, settings.hud_train_profile_uncontrolled.y,
+                                                        settings.hud_train_profile_uncontrolled.z, settings.hud_train_profile_uncontrolled.w);
+    GUIparams->hud_train_profile_current = ImVec4(settings.hud_train_profile_current.x, settings.hud_train_profile_current.y,
+                                                  settings.hud_train_profile_current.z, settings.hud_train_profile_current.w);
+    GUIparams->hud_train_profile_controlled = ImVec4(settings.hud_train_profile_controlled.x, settings.hud_train_profile_controlled.y,
+                                                      settings.hud_train_profile_controlled.z, settings.hud_train_profile_controlled.w);
+    GUIparams->hud_train_profile_station_text = ImVec4(settings.hud_train_profile_station_text.x, settings.hud_train_profile_station_text.y,
+                                                       settings.hud_train_profile_station_text.z, settings.hud_train_profile_station_text.w);
+    GUIparams->hud_train_profile_mast = ImVec4(settings.hud_train_profile_mast.x, settings.hud_train_profile_mast.y,
+                                               settings.hud_train_profile_mast.z, settings.hud_train_profile_mast.w);
+    GUIparams->hud_train_profile_signal_letter = ImVec4(settings.hud_train_profile_signal_letter.x, settings.hud_train_profile_signal_letter.y,
+                                                        settings.hud_train_profile_signal_letter.z, settings.hud_train_profile_signal_letter.w);
+    GUIparams->hud_train_profile_speed_limit_border = ImVec4(settings.hud_train_profile_speed_limit_border.x, settings.hud_train_profile_speed_limit_border.y,
+                                                             settings.hud_train_profile_speed_limit_border.z, settings.hud_train_profile_speed_limit_border.w);
+    GUIparams->hud_train_profile_speed_limit_fill = ImVec4(settings.hud_train_profile_speed_limit_fill.x, settings.hud_train_profile_speed_limit_fill.y,
+                                                           settings.hud_train_profile_speed_limit_fill.z, settings.hud_train_profile_speed_limit_fill.w);
+    GUIparams->hud_train_profile_speed_limit_text = ImVec4(settings.hud_train_profile_speed_limit_text.x, settings.hud_train_profile_speed_limit_text.y,
+                                                           settings.hud_train_profile_speed_limit_text.z, settings.hud_train_profile_speed_limit_text.w);
+    GUIparams->hud_train_profile_speed_limit_bg = ImVec4(settings.hud_train_profile_speed_limit_bg.x, settings.hud_train_profile_speed_limit_bg.y,
+                                                         settings.hud_train_profile_speed_limit_bg.z, settings.hud_train_profile_speed_limit_bg.w);
 }
 
 //------------------------------------------------------------------------------

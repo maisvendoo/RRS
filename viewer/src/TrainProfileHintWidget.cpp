@@ -378,8 +378,8 @@ void TrainProfileHintWidget::drawProfile() const
     const float grid_step = 500.0f;
     if (grid_step > 1e-6f)
     {
-        const ImU32 grid_col = IM_COL32(90, 90, 90, 150);
-        const ImU32 label_col = IM_COL32(190, 190, 190, 220);
+        const ImU32 grid_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_grid);
+        const ImU32 label_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_grid_label);
         const ImFont* font = ImGui::GetFont();
         const float label_y = y1 - font->LegacySize;
 
@@ -416,7 +416,7 @@ void TrainProfileHintWidget::drawProfile() const
     {
         const float y_base = plot.map_y(0.0f);
         draw_list->AddLine(ImVec2(x0, y_base), ImVec2(x1, y_base),
-                           IM_COL32(128, 128, 128, 255), 1.0f);
+                           ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_baseline), 1.0f);
     }
 
     // Кривая профиля
@@ -428,7 +428,7 @@ void TrainProfileHintWidget::drawProfile() const
                           plot.map_y(p.elevation - plot.origin_elev));
     }
     draw_list->AddPolyline(poly.data(), static_cast<int>(poly.size()),
-                           IM_COL32(0x00, 0x66, 0xCC, 255), 0, 2.0f);
+                           ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_curve), 0, 2.0f);
 
     drawSpeedLimits(plot);
 
@@ -458,9 +458,9 @@ void TrainProfileHintWidget::drawTrain(const PlotTransform& plot) const
 
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    const ImU32 color_uncontrolled = IM_COL32(64, 128, 0, 255);
-    const ImU32 color_current = IM_COL32(192, 192, 0, 255);
-    const ImU32 color_controlled = IM_COL32(192, 64, 64, 255);
+    const ImU32 color_uncontrolled = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_uncontrolled);
+    const ImU32 color_current = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_current);
+    const ImU32 color_controlled = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_controlled);
 
     // Запрошенный диапазон отображения (как в drawProfile)
     const float cfg_backward = std::max(_params->backward_m, 0.0f);
@@ -650,7 +650,7 @@ void TrainProfileHintWidget::drawStations(const PlotTransform& plot) const
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     const float text_offset_y = 12.0f;  // отступ подписи под линией профиля
-    const ImU32 text_col = IM_COL32(0, 200, 255, 255);  // голубой, как литеры светофоров
+    const ImU32 text_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_station_text);  // голубой, как литеры светофоров
 
     for (const auto& station : stations)
     {
@@ -697,7 +697,7 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
 
     const float lens_r = 4.0f;
     const float lens_gap = 2.0f * lens_r;
-    const ImU32 mast_col = IM_COL32(220, 220, 220, 255);
+    const ImU32 mast_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_mast);
     const ImU32 off_col = IM_COL32(24, 24, 24, 255);
 
     // Состав и порядок линз для каждого типа светофора (снизу вверх)
@@ -792,7 +792,7 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
             const std::string label = letter.toStdString();
             const float text_w = ImGui::CalcTextSize(label.c_str()).x;
             draw_list->AddText(ImVec2(x - text_w * 0.5f, y_top - 16.0f),
-                               IM_COL32(255, 255, 255, 255), label.c_str());
+                               ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_signal_letter), label.c_str());
         }
     }
 }
@@ -819,9 +819,9 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
 
     const float zone_height = 20.0f;
     const float y_bottom = y_base + zone_height;
-    const ImU32 col = IM_COL32(90, 90, 90, 150);
-    const ImU32 fill_col = IM_COL32(90, 90, 90, 40);
-    const ImU32 text_col = IM_COL32(255, 0, 0, 255);
+    const ImU32 col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_border);
+    const ImU32 fill_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_fill);
+    const ImU32 text_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_text);
 
     for (const auto& sl : limits)
     {
@@ -858,7 +858,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         if (bg_x1 > bg_x0 && bg_y1 > bg_y0)
             draw_list->AddRectFilled(ImVec2(bg_x0, bg_y0),
                                      ImVec2(bg_x1, bg_y1),
-                                     IM_COL32(255, 255, 255, 255));
+                                     ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_bg));
 
         // Жирный шрифт через наложение
         const float bold_off = 1.0f;

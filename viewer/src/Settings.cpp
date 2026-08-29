@@ -138,6 +138,21 @@ void RouteViewer::loadHUDSettings(CfgReader& cfg, const QString& section)
     readColor("HUDTimetablePast",       settings.hud_timetable_past);
     readColor("HUDTimetableCurrent",    settings.hud_timetable_current);
     readColor("HUDTimetableFuture",     settings.hud_timetable_future);
+
+    readColor("HUDTrainProfileGrid",              settings.hud_train_profile_grid);
+    readColor("HUDTrainProfileGridLabel",         settings.hud_train_profile_grid_label);
+    readColor("HUDTrainProfileBaseline",          settings.hud_train_profile_baseline);
+    readColor("HUDTrainProfileCurve",             settings.hud_train_profile_curve);
+    readColor("HUDTrainProfileUncontrolled",      settings.hud_train_profile_uncontrolled);
+    readColor("HUDTrainProfileCurrent",           settings.hud_train_profile_current);
+    readColor("HUDTrainProfileControlled",        settings.hud_train_profile_controlled);
+    readColor("HUDTrainProfileStationText",       settings.hud_train_profile_station_text);
+    readColor("HUDTrainProfileMast",              settings.hud_train_profile_mast);
+    readColor("HUDTrainProfileSignalLetter",      settings.hud_train_profile_signal_letter);
+    readColor("HUDTrainProfileSpeedLimitBorder",  settings.hud_train_profile_speed_limit_border);
+    readColor("HUDTrainProfileSpeedLimitFill",    settings.hud_train_profile_speed_limit_fill);
+    readColor("HUDTrainProfileSpeedLimitText",    settings.hud_train_profile_speed_limit_text);
+    readColor("HUDTrainProfileSpeedLimitBg",      settings.hud_train_profile_speed_limit_bg);
 }
 
 //------------------------------------------------------------------------------

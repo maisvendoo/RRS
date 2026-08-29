@@ -145,6 +145,22 @@ struct settings_t final
     vsg::vec4 hud_timetable_past = {0.0f, 0.5f, 0.0f, 1.0f};      ///< Пройдено по расписанию
     vsg::vec4 hud_timetable_current = {1.0f, 1.0f, 0.0f, 1.0f};   ///< Текущая
     vsg::vec4 hud_timetable_future = {0.5f, 0.5f, 0.5f, 1.0f};    ///< Будущие
+
+    // Цвета виджета профиля пути (TrainProfileHintWidget), RGBA в диапазоне 0.0 - 1.0
+    vsg::vec4 hud_train_profile_grid = {0.353f, 0.353f, 0.353f, 0.588f};               ///< Линии координатной сетки
+    vsg::vec4 hud_train_profile_grid_label = {0.745f, 0.745f, 0.745f, 0.863f};         ///< Подписи километража сетки
+    vsg::vec4 hud_train_profile_baseline = {0.502f, 0.502f, 0.502f, 1.0f};             ///< Базовая линия профиля (rel=0)
+    vsg::vec4 hud_train_profile_curve = {0.0f, 0.4f, 0.8f, 1.0f};                       ///< Кривая профиля пути
+    vsg::vec4 hud_train_profile_uncontrolled = {0.251f, 0.502f, 0.0f, 1.0f};           ///< Неуправляемый поезд
+    vsg::vec4 hud_train_profile_current = {0.753f, 0.753f, 0.0f, 1.0f};                ///< Текущий поезд
+    vsg::vec4 hud_train_profile_controlled = {0.753f, 0.251f, 0.251f, 1.0f};           ///< Управляемый поезд
+    vsg::vec4 hud_train_profile_station_text = {0.0f, 0.784f, 1.0f, 1.0f};             ///< Названия станций
+    vsg::vec4 hud_train_profile_mast = {0.863f, 0.863f, 0.863f, 1.0f};                  ///< Мачта светофора
+    vsg::vec4 hud_train_profile_signal_letter = {1.0f, 1.0f, 1.0f, 1.0f};               ///< Литеры светофора
+    vsg::vec4 hud_train_profile_speed_limit_border = {0.353f, 0.353f, 0.353f, 0.588f}; ///< Рамка зоны ограничения скорости
+    vsg::vec4 hud_train_profile_speed_limit_fill = {0.353f, 0.353f, 0.353f, 0.157f};    ///< Заливка зоны ограничения скорости
+    vsg::vec4 hud_train_profile_speed_limit_text = {1.0f, 0.0f, 0.0f, 1.0f};           ///< Текст ограничения скорости
+    vsg::vec4 hud_train_profile_speed_limit_bg = {1.0f, 1.0f, 1.0f, 1.0f};              ///< Подложка текста ограничения скорости
 };
 
 #endif // VIEWER_SETTINGS_H
