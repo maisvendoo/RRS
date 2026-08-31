@@ -1,7 +1,7 @@
 #ifndef EDITOR_CONTEXT_H
 #define EDITOR_CONTEXT_H
 
-#include "MutexedVector.h"
+#include "ThreadSafeVector.h"
 #include "RouteMap.h"
 #include "RouteObjects.h"
 
@@ -63,7 +63,7 @@ struct EditorContext
     RouteObjects copied_objects;
     RouteObjects hidden_objects;
 
-    MutexedVector<CompileInfo> compile_infos;
+    ThreadSafeVector<CompileInfo> compile_infos;
 
     std::unique_ptr<Topology> topology;
     std::mutex topology_mutex;
