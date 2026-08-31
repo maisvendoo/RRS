@@ -1,7 +1,10 @@
 #include    "sl2m.h"
 
-/// Передаточное число червячного редуктора, ед.
-constexpr double ip = Physics::PI * 3.0 / 50.0;
+/// Соотношение расчётного диаметра колеса и передаточного числа редуктора:
+/// 30 оборотов вала привода на 1000 метров пройденного пути, ~10.62
+constexpr double Do_i = 1000.0 / 30.0 / Physics::PI;
+/// Коэффициент к переходу от вращения колеса расчётного радиуса к вращению вала
+constexpr double ip = 2.0 / Do_i;
 
 //------------------------------------------------------------------------------
 //
@@ -56,7 +59,7 @@ float SL2M::getArrowPos() const
 //------------------------------------------------------------------------------
 float SL2M::getShaftPos() const
 {
-    return static_cast<float>(getY(SHAFT_ANGLE));
+    return static_cast<float>(getY(SHAFT_ANGLE) / 2.0 / Physics::PI);
 }
 
 //------------------------------------------------------------------------------
@@ -146,7 +149,7 @@ void SL2M::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
     const double r_calc = use_nominal_diameter ? r_nominal : r_wheel;
 
     // Вращение вала привода от колеса через червячный редуктор
-    dYdt[SHAFT_ANGLE] = omega * ip;
+    dYdt[SHAFT_ANGLE] = omega * r_calc * ip;
 
     // Подъём текущего сегмента для фиксации скорости за последнюю секунду
     dYdt[VELOCITY_CURRENTSEGMENT] = std::abs(omega) * r_calc / cycle_time;
