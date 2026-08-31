@@ -230,20 +230,21 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                 other_veh->setNextVehicle(veh) :
                 other_veh->setPrevVehicle(veh);
 
+            // Добавляем ПЕ и их вектор состояния в обратном порядке
             for (size_t i = other_vehicles.size(); i > 0; --i)
             {
                 Vehicle* vehicle = other_vehicles[i - 1];
-                new_vehicles.push_back(vehicle);
-
                 size_t old_idx = vehicle->getStateIndex();
                 size_t s = vehicle->getDegressOfFreedom();
+
                 for (size_t j = old_idx; j < old_idx + 2 * s; ++j)
                 {
                     new_y.push_back(other_y[j]);
                 }
-
                 vehicle->setStateIndex(new_ode_order);
                 new_ode_order += 2 * s;
+
+                new_vehicles.push_back(vehicle);
             }
 
             // Новые поездные координаты для прицепленных ПЕ
@@ -253,8 +254,6 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
             for (size_t i = 0; i < other_vehicles.size(); ++i)
             {
                 Vehicle* vehicle = other_vehicles[i];
-                vehicle->setTrainIndex(train_idx);
-
                 size_t model_idx = vehicle->getModelIndex();
                 size_t idx = vehicle->getStateIndex();
 
@@ -269,6 +268,10 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                 new_y[idx] = train_coord + other_veh_distances[i];
                 vc.setInitPathCoord(vehicle->getDirection() * new_y[idx]);
                 train_coord = new_y[idx];
+
+                // Новый индекс поезда
+                vc.setTrainIndex(train_idx);
+                vehicle->setTrainIndex(train_idx);
             }
 
             for (size_t i = other_joints_list.size(); i > 0; --i)
@@ -295,6 +298,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                 other_veh->setPrevVehicle(veh) :
                 other_veh->setNextVehicle(veh);
 
+            // Добавляем ПЕ и их вектор состояния
             new_vehicles = other_vehicles;
             new_y = other_y;
             new_ode_order = other_y.size();
@@ -306,8 +310,6 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
             for (size_t i = other_vehicles.size(); i > 0; --i)
             {
                 Vehicle* vehicle = other_vehicles[i - 1];
-                vehicle->setTrainIndex(train_idx);
-
                 size_t model_idx = vehicle->getModelIndex();
                 size_t idx = vehicle->getStateIndex();
 
@@ -320,6 +322,10 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                 new_y[idx] = train_coord + other_veh_distances[i - 1];
                 vc.setInitPathCoord(vehicle->getDirection() * new_y[idx]);
                 train_coord = new_y[idx];
+
+                // Новый индекс поезда
+                vc.setTrainIndex(train_idx);
+                vehicle->setTrainIndex(train_idx);
             }
 
             new_joints_list = other_joints_list;
@@ -362,6 +368,7 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                 other_veh->setNextVehicle(veh) :
                 other_veh->setPrevVehicle(veh);
 
+            // Добавляем ПЕ и их вектор состояния
             new_vehicles = other_vehicles;
             new_y = other_y;
 
@@ -372,8 +379,6 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
             for (size_t i = 0; i < other_vehicles.size(); ++i)
             {
                 Vehicle* vehicle = other_vehicles[i];
-                vehicle->setTrainIndex(train_idx);
-
                 size_t model_idx = vehicle->getModelIndex();
                 size_t idx = vehicle->getStateIndex();
                 vehicle->setStateIndex(idx + y.size());
@@ -387,6 +392,10 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                 new_y[idx] = train_coord - other_veh_distances[i];
                 vc.setInitPathCoord(vehicle->getDirection() * new_y[idx]);
                 train_coord = new_y[idx];
+
+                // Новый индекс поезда
+                vc.setTrainIndex(train_idx);
+                vehicle->setTrainIndex(train_idx);
             }
 
             new_joints_list = other_joints_list;
@@ -412,15 +421,16 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
             for (size_t i = other_vehicles.size(); i > 0; --i)
             {
                 Vehicle* vehicle = other_vehicles[i - 1];
-                new_vehicles.push_back(vehicle);
-
                 size_t model_idx = vehicle->getModelIndex();
                 size_t idx = vehicle->getStateIndex();
                 size_t s = vehicle->getDegressOfFreedom();
+
+                // Добавляем ПЕ и их вектор состояния в обратном порядке
                 for (size_t j = idx; j < idx + 2 * s; ++j)
                 {
                     new_y.push_back(other_y[j]);
                 }
+                new_vehicles.push_back(vehicle);
 
                 // На всякий случай актуализируем положение ПЕ в топологии
                 // по старой дуговой координате
@@ -434,9 +444,12 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
                 vc.setInitPathCoord(vehicle->getDirection() * new_y[new_ode_order]);
                 train_coord = new_y[new_ode_order];
 
-                vehicle->setTrainIndex(train_idx);
                 vehicle->setStateIndex(new_ode_order + y.size());
                 new_ode_order += 2 * s;
+
+                // Новый индекс поезда
+                vc.setTrainIndex(train_idx);
+                vehicle->setTrainIndex(train_idx);
             }
 
             for (size_t i = other_joints_list.size(); i > 0; --i)
@@ -644,12 +657,9 @@ void Train::setTrainIndex(size_t idx)
     {
         vehicle->setTrainIndex(idx);
 
-        VehicleController * vc = topology->vc_table[vehicle];
-
-        if (vc != nullptr)
-        {
-            vc->setTrainIndex(idx);
-        }
+        size_t model_idx = vehicle->getModelIndex();
+        VehicleController& vc = topology->getVehicleController(model_idx);
+        vc.setTrainIndex(idx);
     }
 }
 
@@ -722,10 +732,32 @@ double Train::getVelocity(size_t i) const
     {
         size_t idx = vehicles[i]->getStateIndex();
         size_t s = vehicles[i]->getDegressOfFreedom();
-        return y[idx + s];
+        double dir = static_cast<double>(vehicles[i]->getDirection());
+        return dir * y[idx + s];
+    }
+    return 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Train::getVelocity() const
+{
+    if (vehicles.size() == 2)
+    {
+        // Если поезд из двух ПЕ, принимаем за скорость поезда более медленную,
+        // так как более быстрая вероятно сейчас отцепляется
+        const double v0 = getVelocity(0);
+        const double v1 = getVelocity(1);
+        if (abs(v0) < abs(v1))
+        {
+            return v0;
+        }
+        return v1;
     }
 
-    return 0.0;
+    // Принимаем за скорость поезда скорость ПЕ в середине
+    return getVelocity(vehicles.size() / 2);
 }
 
 //------------------------------------------------------------------------------
@@ -876,7 +908,7 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
             {
                 size_t model_idx = vehicle->getModelIndex();
                 size_t idx = vehicle->getStateIndex();
-                auto& vc = topology->getVehicleController(model_idx);
+                VehicleController& vc = topology->getVehicleController(model_idx);
                 vc.setPathCoord(vehicle->getDirection() * y[idx]);
                 *(vehicle->getProfilePoint()) = vc.getPosition();
             }

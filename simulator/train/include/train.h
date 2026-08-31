@@ -91,11 +91,13 @@ public:
 
     std::vector<std::vector<Joint*>> getJoints();
 
-    double getVelocity(size_t i = 0) const;
-
-    /// Get train mass
+    /// Скорость i-той ПЕ в поезде, м/с
+    double getVelocity(size_t i) const;
+    /// Скорость поезда, м/с
+    double getVelocity() const;
+    /// Масса поезда, кг
     double getMass() const;
-    /// Get train length
+    /// Длина поезда, м
     double getLength() const;
 
     size_t getVehiclesNumber() const;

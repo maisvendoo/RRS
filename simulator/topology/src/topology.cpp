@@ -333,7 +333,6 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
     {
         VehicleController *vc = new VehicleController;
         Vehicle* const curr_vehicle = (*vehicles)[i];
-        const Vehicle* const prev_vehicle = (i == 0) ? nullptr : (*vehicles)[i - 1];
 
         // Смещаем координату центра данной ПЕ
         // на половину её длины и половину длины предыдущей ПЕ
@@ -341,7 +340,7 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
         traj_coord -= static_cast<double>(dir) * L / 2.0;
         if (i != 0)
         {
-            traj_coord -= static_cast<double>(dir) * prev_vehicle->getLength() / 2.0;
+            traj_coord -= static_cast<double>(dir) * (*vehicles)[i - 1]->getLength() / 2.0;
         }
 
         if (Trajectory::findTrajectoryAtCoord(cur_traj, traj_coord, dir))
@@ -366,7 +365,6 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
             vc->setInitPathCoord(curr_vehicle->getDirection() * curr_vehicle->getTrainCoord());
 
             vehicle_control.push_back(vc);
-            vc_table[curr_vehicle] = vc;
 
             Journal::instance()->info(QString("Vehcile #%1").arg(idx) +
                                       " at traj: " + cur_traj->getName() +
@@ -384,16 +382,12 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
             // Очищаем ранее размещённые контроллеры этого поезда
             for (auto it = vehicle_control.begin() + initial_vc_count; it != vehicle_control.end(); ++it)
             {
-                for (auto vt = vc_table.begin(); vt != vc_table.end(); ++vt)
-                {
-                    if (vt->second == *it) { vc_table.erase(vt); break; }
-                }
                 delete *it;
             }
             vehicle_control.erase(vehicle_control.begin() + initial_vc_count, vehicle_control.end());
             return false;
         }
-   }
+    }
 
     return true;
 }

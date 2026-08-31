@@ -95,8 +95,6 @@ bool Model::init(const simulator_command_line_t &command_line)
             // Даем начальное имя поезду
             train->setName(scnmgr->getTrainName(train_idx));
 
-            trains.push_back(train);
-
             buildAutostartQueue(train);
 
             QThread *thread = new QThread();
@@ -857,7 +855,7 @@ Train *Model::addTrain(const init_data_t &init_data)
     {
         Journal::instance()->info(QString("Train #%1 initialized successfully").arg(trains.size()));
 
-        //train->setTrainIndex(trains.size());
+        const size_t initial_veh_count = vehicles.size();
         for (auto vehicle : *(train->getVehicles()))
         {
             vehicle->setModelIndex(vehicles.size());
@@ -871,23 +869,26 @@ Train *Model::addTrain(const init_data_t &init_data)
 
         if (topology->addTrain(tp, train->getVehicles()))
         {
-            train->setTrainIndex(trains.size());
             Journal::instance()->info("Train added to topology successfully");
-        }
-        else
-        {
-            Journal::instance()->critical("CAN'T INITIALIZE TRAIN AT TOPOLOGY");
-            delete train;
-            return nullptr;
+
+            train->setTrainIndex(trains.size());
+            trains.push_back(train);
+
+            return train;
         }
 
-        return train;
-    }
-    else
-    {
-        Journal::instance()->error("Can't initialize Train");
+        Journal::instance()->critical("CAN'T INITIALIZE TRAIN AT TOPOLOGY");
+        for (auto it = vehicles.begin() + initial_veh_count; it != vehicles.end(); ++it)
+        {
+            delete *it;
+        }
+        vehicles.erase(vehicles.begin() + initial_veh_count, vehicles.end());
+        delete train;
         return nullptr;
     }
+
+    Journal::instance()->error("Can't initialize Train");
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -1148,15 +1149,12 @@ void Model::prepareProfilesFeedback()
         // Средняя ПЕ поезда - точка отсчёта профиля
         Vehicle* mid_vehicle = (*vlist)[vlist->size() / 2];
 
-        auto vc_it = topology->vc_table.find(mid_vehicle);
-        if (vc_it == topology->vc_table.end())
-            continue;
-        VehicleController* vc = vc_it->second;
+        VehicleController& vc= topology->getVehicleController(mid_vehicle->getModelIndex());
 
         QString traj_name;
         double coord = 0.0;
-        vc->slotGetVehicleTrajPosition(&traj_name, &coord);
-        dir_t orient = static_cast<dir_t>(vc->getOrientation() * mid_vehicle->getDirection());
+        vc.slotGetVehicleTrajPosition(&traj_name, &coord);
+        dir_t orient = static_cast<dir_t>(vc.getOrientation() * mid_vehicle->getDirection());
 
         Trajectory* traj = topology->getTrajectoriesList()->value(traj_name);
         if (traj == nullptr)

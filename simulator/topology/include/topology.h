@@ -43,10 +43,6 @@ public:
     /// Вернуть контроллер конкретной ПЕ
     VehicleController& getVehicleController(size_t idx);
 
-    /// Хэш-таблица указателей на вайкл контроллеры по указателю на вайкл
-    /// (для удобства смены индекса поезда у контролов из поезда)
-    std::unordered_map<Vehicle *, VehicleController *> vc_table;
-
     /// Нахождение пути в графе траекторий
     route_segment_t find_route(Trajectory *start_traj,
                                Trajectory *target_traj,
