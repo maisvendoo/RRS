@@ -1,10 +1,11 @@
 #ifndef DELETE_OBJECTS_H
 #define DELETE_OBJECTS_H
 
-#include "RouteObject.h"
+#include "RouteObjects.h"
 #include "commands/Command.h"
 
 struct EditorContext;
+class Gizmo;
 class Route;
 
 class DeleteObjects : public Command

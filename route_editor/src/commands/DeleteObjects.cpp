@@ -4,6 +4,7 @@
 #include "EditorContext.h"
 #include "Gizmo.h"
 #include "Route.h"
+#include "RouteObject.h"
 
 #include <vsg/core/Mask.h>
 #include <vsg/nodes/Switch.h>

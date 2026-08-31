@@ -1,10 +1,11 @@
 #ifndef SELECT_OBJECTS_H
 #define SELECT_OBJECTS_H
 
-#include "RouteObject.h"
+#include "RouteObjects.h"
 #include "commands/Command.h"
 
 struct EditorContext;
+class Gizmo;
 
 class SelectObjects : public Command
 {

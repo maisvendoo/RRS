@@ -3,7 +3,7 @@
 
 #include "MutexedVector.h"
 #include "RouteMap.h"
-#include "RouteObject.h"
+#include "RouteObjects.h"
 
 #include <atomic>
 #include <mutex>
@@ -23,6 +23,7 @@ class Topology;
 namespace vsg
 {
 
+class Node;
 class PagedLOD;
 
 }

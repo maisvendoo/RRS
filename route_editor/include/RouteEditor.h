@@ -16,6 +16,7 @@
 #include <memory>
 
 class Camera;
+class Gizmo;
 class Keyboard;
 class Mouse;
 class Route;

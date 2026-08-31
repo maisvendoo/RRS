@@ -1,12 +1,13 @@
 #ifndef ADD_OBJECT_H
 #define ADD_OBJECT_H
 
-#include "RouteObject.h"
+#include "RouteObjects.h"
 #include "commands/Command.h"
 
 #include <vsg/core/ref_ptr.h>
 
 struct EditorContext;
+class Gizmo;
 class Route;
 
 namespace vsg

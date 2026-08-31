@@ -1,10 +1,11 @@
 #ifndef PASTE_OBJECTS_H
 #define PASTE_OBJECTS_H
 
-#include "RouteObject.h"
+#include "RouteObjects.h"
 #include "commands/Command.h"
 
 struct EditorContext;
+class Gizmo;
 class Route;
 
 class PasteObjects : public Command
