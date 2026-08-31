@@ -5,7 +5,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "StateManager.h"
-#include "commands/CommandList.h"
+#include "commands/CommandManager.h"
 
 #include <vsg/ui/PointerEvent.h>
 #include <vsgImGui/imgui.h>
@@ -15,11 +15,11 @@ BasicEditorState::BasicEditorState(
     const vsg::ref_ptr<Keyboard>& keyboard,
     StateManager& state_manager,
     const vsg::ref_ptr<Camera>& camera,
-    CommandList& command_list
+    CommandManager& command_manager
 )
     : State(mouse, keyboard, state_manager)
     , camera(camera)
-    , command_list(command_list)
+    , command_manager(command_manager)
 {
     name = "BasicEditorState";
 }
@@ -30,11 +30,11 @@ void BasicEditorState::handle_key_press()
 {
     if (keyboard->pressed_once(ACTION_UNDO_COMMAND))
     {
-        command_list.undo();
+        command_manager.undo();
     }
     else if (keyboard->pressed_once(ACTION_REDO_COMMAND))
     {
-        command_list.redo();
+        command_manager.redo();
     }
     else
     {

@@ -14,7 +14,7 @@
 #include "StateManager.h"
 #include "commands/AddObject.h"
 #include "commands/Command.h"
-#include "commands/CommandList.h"
+#include "commands/CommandManager.h"
 #include "commands/RotateObjects.h"
 #include "commands/ScaleObjects.h"
 #include "commands/TranslateObjects.h"
@@ -62,6 +62,8 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdio>
+#include <functional>
+#include <memory>
 #include <mutex>
 #include <string>
 
@@ -90,7 +92,7 @@ EditorGui::EditorGui(
     StateManager& state_manager,
     const vsg::ref_ptr<Camera>& camera,
     EditorState& editor_state,
-    CommandList& command_list,
+    CommandManager& command_manager,
     const vsg::ref_ptr<Route>& route,
     std::string& route_dir,
     const vsg::ref_ptr<Gizmo>& gizmo
@@ -102,7 +104,7 @@ EditorGui::EditorGui(
     , state_manager(state_manager)
     , camera(camera)
     , editor_state(editor_state)
-    , command_list(command_list)
+    , command_manager(command_manager)
     , route(route)
     , route_dir(route_dir)
     , gizmo(gizmo)
@@ -666,24 +668,18 @@ void EditorGui::show_selected_objects_properties() const
 void EditorGui::show_commands() const
 {
     ImGui::Begin("Commands");
-    auto active = command_list.get_active();
-    auto curr = command_list.get_tail();
-    while (curr)
-    {
-        if (curr == active)
-        {
-            ImGui::TextColored(ImVec4{0.2f, 1.0f, 0.3f, 1.0f}, "%s",
-                curr->command->get_description());
-            ImGui::Separator();
-        }
-        else
-        {
-            ImGui::Text("%s", curr->command->get_description());
-            ImGui::Separator();
-        }
 
-        curr = curr->prev;
-    }
+    command_manager.for_each_command([](const std::unique_ptr<::Command>& command) -> void {
+        ImGui::Text("%s", command->get_description());
+        ImGui::Separator();
+    });
+
+    command_manager.for_each_undone([](const std::unique_ptr<::Command>& command) -> void {
+        ImGui::TextColored(ImVec4{0.3f, 0.3f, 0.3f, 1.0f}, "%s",
+            command->get_description());
+        ImGui::Separator();
+    });
+
     ImGui::End();
 }
 
@@ -696,7 +692,9 @@ void EditorGui::add_object(
         camera->get_look_at()->eye +
         camera->get_front() * 20.0);
 
-    command_list.push(new AddObject(context_, object, route, gizmo), true);
+    auto command = std::make_unique<AddObject>(context_, object, route, gizmo);
+    command->execute();
+    command_manager.push(std::move(command));
 }
 
 void EditorGui::save_objects_matrixes() const
@@ -731,8 +729,10 @@ void EditorGui::handle_translation_drag(
 
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
-        command_list.push(new TranslateObjects(context_, {object},
-            total_translation), false);
+        auto command = std::make_unique<TranslateObjects>(context_,
+            RouteObjects{object}, total_translation);
+        command_manager.push(std::move(command));
+
         dragging = false;
     }
 }
@@ -783,8 +783,10 @@ void EditorGui::handle_rotation_drag(
             radians = vsg::radians(total_rotation_deg.z);
         }
 
-        command_list.push(new RotateObjects(context_, {object},
-            gizmo->get_curr_pos(), axis, radians), false);
+        auto command = std::make_unique<RotateObjects>(context_,
+            RouteObjects{object}, gizmo->get_curr_pos(), axis, radians);
+        command_manager.push(std::move(command));
+
         dragging = false;
     }
 }
@@ -818,8 +820,10 @@ void EditorGui::handle_scale_drag(
 
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
-        command_list.push(new ScaleObjects(context_, {object},
-            gizmo->get_curr_pos(), total_scale), false);
+        auto command = std::make_unique<ScaleObjects>(context_,
+            RouteObjects{object}, gizmo->get_curr_pos(), total_scale);
+        command_manager.push(std::move(command));
+
         dragging = false;
     }
 }

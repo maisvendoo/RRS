@@ -9,7 +9,7 @@
 #include <vsg/utils/Builder.h>
 
 class Camera;
-class CommandList;
+class CommandManager;
 struct EditorContext;
 class Mouse;
 struct gizmo_settings_t;
@@ -31,7 +31,7 @@ public:
         EditorContext& context,
         const gizmo_settings_t& gizmo_settings,
         const vsg::ref_ptr<Camera>& camera,
-        CommandList& command_list,
+        CommandManager& command_manager,
         const vsg::ref_ptr<Mouse>& mouse,
         const VkExtent2D& window_extent
     );
@@ -50,7 +50,7 @@ private:
     EditorContext& context_;
     const gizmo_settings_t& gizmo_settings;
     const vsg::ref_ptr<Camera>& camera;
-    CommandList& command_list;
+    CommandManager& command_manager;
     const vsg::ref_ptr<Mouse>& mouse;
     const VkExtent2D& window_extent;
 

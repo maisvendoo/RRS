@@ -4,7 +4,7 @@
 #include "EditorContext.h"
 #include "EditorState.h"
 #include "KeyBindings.h"
-#include "commands/CommandList.h"
+#include "commands/CommandManager.h"
 #include "settings/CameraSettings.h"
 #include "settings/GizmoSettings.h"
 #include "settings/GuiSettings.h"
@@ -62,7 +62,7 @@ private:
     KeyBindings key_bindings;
     vsg::ref_ptr<Camera> camera;
     EditorState editor_state = EditorState::SELECT_ROUTE;
-    CommandList command_list;
+    CommandManager command_manager;
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
     vsg::ref_ptr<SceneGraph> scene_graph;

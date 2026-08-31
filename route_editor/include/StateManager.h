@@ -7,7 +7,7 @@
 #include <memory>
 
 class Camera;
-class CommandList;
+class CommandManager;
 class Keyboard;
 class Mouse;
 class State;
@@ -33,7 +33,7 @@ public:
         const vsg::ref_ptr<Keyboard>& keyboard,
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Camera>& camera,
-        CommandList& command_list
+        CommandManager& command_manager
     );
 
     ~StateManager();

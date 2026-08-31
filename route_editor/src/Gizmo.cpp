@@ -6,7 +6,7 @@
 #include "Mouse.h"
 #include "RouteObject.h"
 #include "SingleSwitch.h"
-#include "commands/CommandList.h"
+#include "commands/CommandManager.h"
 #include "commands/TranslateObjects.h"
 #include "editor_math.h"
 #include "settings/GizmoSettings.h"
@@ -28,6 +28,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <limits>
+#include <memory>
 
 static void rotate_geometry_info(
     vsg::GeometryInfo& geometry_info,
@@ -47,14 +48,14 @@ Gizmo::Gizmo(
     EditorContext& context,
     const gizmo_settings_t& gizmo_settings,
     const vsg::ref_ptr<Camera>& camera,
-    CommandList& command_list,
+    CommandManager& command_manager,
     const vsg::ref_ptr<Mouse>& mouse,
     const VkExtent2D& window_extent
 )
     : context_(context)
     , gizmo_settings(gizmo_settings)
     , camera(camera)
-    , command_list(command_list)
+    , command_manager(command_manager)
     , mouse(mouse)
     , window_extent(window_extent)
 {
@@ -407,8 +408,9 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
         return;
     }
 
-    command_list.push(new TranslateObjects(
-        context_, context_.selected_objects, total_translation_), false);
+    auto command = std::make_unique<TranslateObjects>(context_,
+        context_.selected_objects, total_translation_);
+    command_manager.push(std::move(command));
 
     plane_switches[active_plain_index]->mask = vsg::MASK_OFF;
     line_switches[active_arrow_index]->mask = vsg::MASK_OFF;

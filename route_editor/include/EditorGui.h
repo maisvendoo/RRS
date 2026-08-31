@@ -12,7 +12,7 @@
 #include <string>
 
 class Camera;
-class CommandList;
+class CommandManager;
 struct EditorContext;
 class Gizmo;
 struct KeyBindings;
@@ -40,7 +40,7 @@ public:
         StateManager& state_manager,
         const vsg::ref_ptr<Camera>& camera,
         EditorState& editor_state,
-        CommandList& command_list,
+        CommandManager& command_manager,
         const vsg::ref_ptr<Route>& route,
         std::string& route_dir,
         const vsg::ref_ptr<Gizmo>& gizmo
@@ -96,7 +96,7 @@ private:
     StateManager& state_manager;
     const vsg::ref_ptr<Camera>& camera;
     EditorState& editor_state;
-    CommandList& command_list;
+    CommandManager& command_manager;
     const vsg::ref_ptr<Route>& route;
     std::string& route_dir;
     const vsg::ref_ptr<Gizmo>& gizmo;

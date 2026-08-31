@@ -23,11 +23,11 @@ StateManager::StateManager(
     const vsg::ref_ptr<Keyboard>& keyboard,
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Camera>& camera,
-    CommandList& command_list
+    CommandManager& command_manager
 )
 {
     states[STATE_ROUTE_NOT_LOADED] = std::make_unique<RouteNotLoadedState>(mouse, keyboard, *this);
-    states[STATE_BASIC] = std::make_unique<BasicEditorState>(mouse, keyboard, *this, camera, command_list);
+    states[STATE_BASIC] = std::make_unique<BasicEditorState>(mouse, keyboard, *this, camera, command_manager);
     states[STATE_NAVIGATION] = std::make_unique<NavigationState>(mouse, keyboard, *this, camera);
     states[STATE_KEYBOARD_TRANSLATE] = std::make_unique<KeyboardTranslateState>(mouse, keyboard, *this);
     states[STATE_KEYBOARD_ROTATE] = std::make_unique<KeyboardRotateState>(mouse, keyboard, *this);

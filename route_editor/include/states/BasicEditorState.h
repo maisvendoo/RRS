@@ -6,7 +6,7 @@
 #include <vsg/core/ref_ptr.h>
 
 class Camera;
-class CommandList;
+class CommandManager;
 class Keyboard;
 class Mouse;
 class StateManager;
@@ -19,7 +19,7 @@ public:
         const vsg::ref_ptr<Keyboard>& keyboard,
         StateManager& state_manager,
         const vsg::ref_ptr<Camera>& camera,
-        CommandList& command_list
+        CommandManager& command_manager
     );
 
     virtual ~BasicEditorState() override;
@@ -32,7 +32,7 @@ public:
 
 private:
     const vsg::ref_ptr<Camera>& camera;
-    CommandList& command_list;
+    CommandManager& command_manager;
 };
 
 #endif // BASIC_EDITOR_STATE_H

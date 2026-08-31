@@ -8,7 +8,7 @@
 #include <vulkan/vulkan_core.h>
 
 class Camera;
-class CommandList;
+class CommandManager;
 struct EditorContext;
 class Gizmo;
 class Keyboard;
@@ -36,7 +36,7 @@ public:
         const vsg::ref_ptr<Mouse>& mouse,
         const vsg::ref_ptr<Keyboard>& keyboard,
         const vsg::ref_ptr<Camera>& camera,
-        CommandList& command_list,
+        CommandManager& command_manager,
         const vsg::ref_ptr<SceneGraph>& scene_graph,
         const vsg::ref_ptr<Route>& route,
         const VkExtent2D& window_extent,
@@ -69,7 +69,7 @@ private:
     const vsg::ref_ptr<Mouse>& mouse;
     const vsg::ref_ptr<Keyboard>& keyboard;
     const vsg::ref_ptr<Camera>& camera;
-    CommandList& command_list;
+    CommandManager& command_manager;
     const vsg::ref_ptr<SceneGraph>& scene_graph;
     const vsg::ref_ptr<Route>& route;
     const VkExtent2D& window_extent;

@@ -10,7 +10,7 @@
 #include "Route.h"
 #include "RouteObject.h"
 #include "SceneGraph.h"
-#include "commands/CommandList.h"
+#include "commands/CommandManager.h"
 #include "commands/DeleteObjects.h"
 #include "commands/PasteObjects.h"
 #include "commands/RotateObjects.h"
@@ -26,16 +26,18 @@
 #include <vsg/nodes/Node.h>
 #include <vsg/ui/KeyEvent.h>
 #include <vsg/ui/PointerEvent.h>
+#include <vsg/utils/LineSegmentIntersector.h>
 
 #include <cmath>
-#include <vsg/utils/LineSegmentIntersector.h>
+#include <memory>
+#include <utility>
 
 ObjectSelector::ObjectSelector(
     EditorContext& context,
     const vsg::ref_ptr<Mouse>& mouse,
     const vsg::ref_ptr<Keyboard>& keyboard,
     const vsg::ref_ptr<Camera>& camera,
-    CommandList& command_list,
+    CommandManager& command_manager,
     const vsg::ref_ptr<SceneGraph>& scene_graph,
     const vsg::ref_ptr<Route>& route,
     const VkExtent2D& window_extent,
@@ -45,7 +47,7 @@ ObjectSelector::ObjectSelector(
     , mouse(mouse)
     , keyboard(keyboard)
     , camera(camera)
-    , command_list(command_list)
+    , command_manager(command_manager)
     , scene_graph(scene_graph)
     , route(route)
     , window_extent(window_extent)
@@ -80,12 +82,16 @@ void ObjectSelector::apply(vsg::KeyPressEvent& keyPress)
     }
     else if (keyboard->pressed(ACTION_PASTE_OBJECTS))
     {
-        command_list.push(new PasteObjects(context_, route, gizmo), true);
+        auto command = std::make_unique<PasteObjects>(context_, route, gizmo);
+        command->execute();
+        command_manager.push(std::move(command));
         return;
     }
     else if (keyboard->pressed(ACTION_DELETE_OBJECTS))
     {
-        command_list.push(new DeleteObjects(context_, route, gizmo), true);
+        auto command = std::make_unique<DeleteObjects>(context_, route, gizmo);
+        command->execute();
+        command_manager.push(std::move(command));
         return;
     }
 
@@ -180,13 +186,11 @@ void ObjectSelector::apply(vsg::ButtonPressEvent& buttonPress)
         // deselect them all
         if (!selected_objects.empty() && !keyboard->get_shift_state())
         {
-            SelectObjects* const select_objects_command =
-                new SelectObjects(context_, gizmo);
-
-            select_objects_command->objects_to_deselect = selected_objects;
-            select_objects_command->update_description();
-
-            command_list.push(select_objects_command, true);
+            auto command = std::make_unique<SelectObjects>(context_, gizmo);
+            command->objects_to_deselect = selected_objects;
+            command->update_description();
+            command->execute();
+            command_manager.push(std::move(command));
         }
 
         return;
@@ -318,24 +322,17 @@ void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 
 void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
 {
-    SelectObjects* const select_objects_command =
-        new SelectObjects(context_, gizmo);
-
-    RouteObjects& objects_to_select =
-        select_objects_command->objects_to_select;
-
-    RouteObjects& objects_to_deselect =
-        select_objects_command->objects_to_deselect;
+    auto command = std::make_unique<SelectObjects>(context_, gizmo);
 
     if (keyboard->get_shift_state())
     {
         if (object->get_is_selected())
         {
-            objects_to_deselect.emplace_back(object);
+            command->objects_to_deselect.emplace_back(object);
         }
         else
         {
-            objects_to_select.emplace_back(object);
+            command->objects_to_select.emplace_back(object);
         }
     }
     else
@@ -344,13 +341,13 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
 
         if (selected_objects.empty())
         {
-            objects_to_select.emplace_back(object);
+            command->objects_to_select.emplace_back(object);
         }
         else if (object->get_is_selected())
         {
             if (selected_objects.size() == 1)
             {
-                objects_to_deselect.emplace_back(object);
+                command->objects_to_deselect.emplace_back(object);
             }
             else
             {
@@ -358,21 +355,22 @@ void ObjectSelector::select_object(vsg::ref_ptr<RouteObject> object)
                 {
                     if (selected_object != object)
                     {
-                        objects_to_deselect.emplace_back(selected_object);
+                        command->objects_to_deselect.emplace_back(selected_object);
                     }
                 }
             }
         }
         else
         {
-            objects_to_select.emplace_back(object);
-            objects_to_deselect = selected_objects;
+            command->objects_to_select.emplace_back(object);
+            command->objects_to_deselect = selected_objects;
         }
     }
 
-    select_objects_command->update_description();
+    command->update_description();
+    command->execute();
 
-    command_list.push(select_objects_command, true);
+    command_manager.push(std::move(command));
 }
 
 void ObjectSelector::confirm_keyboard_transformation()
@@ -381,29 +379,26 @@ void ObjectSelector::confirm_keyboard_transformation()
     {
         case State::KEYBOARD_GRAB:
         {
-            command_list.push(new TranslateObjects(
-                context_, context_.selected_objects, total_translation_), false);
+            auto command = std::make_unique<TranslateObjects>(context_,
+                context_.selected_objects, total_translation_);
+            command_manager.push(std::move(command));
 
             break;
         }
         case State::KEYBOARD_ROTATE:
         {
-            command_list.push(
-                new RotateObjects(
-                    context_, context_.selected_objects,
-                    gizmo->get_curr_pos(),
-                    camera->get_front(),
-                    total_rotation_rad_
-                ),
-                false
-            );
+            auto command = std::make_unique<RotateObjects>(context_,
+                context_.selected_objects, gizmo->get_curr_pos(),
+                camera->get_front(), total_rotation_rad_);
+            command_manager.push(std::move(command));
 
             break;
         }
         case State::KEYBOARD_SCALE:
         {
-            command_list.push(new ScaleObjects(context_, context_.selected_objects,
-                gizmo->get_curr_pos(), total_scale_), false);
+            auto command = std::make_unique<ScaleObjects>(context_,
+                context_.selected_objects, gizmo->get_curr_pos(), total_scale_);
+            command_manager.push(std::move(command));
 
             break;
         }
