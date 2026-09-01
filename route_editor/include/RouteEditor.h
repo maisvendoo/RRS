@@ -4,6 +4,7 @@
 #include "EditorContext.h"
 #include "EditorState.h"
 #include "KeyBindings.h"
+#include "ObjectManager.h"
 #include "commands/CommandManager.h"
 #include "settings/CameraSettings.h"
 #include "settings/GizmoSettings.h"
@@ -70,6 +71,7 @@ private:
     vsg::ref_ptr<Route> route;
     std::string route_dir;
     vsg::ref_ptr<Gizmo> gizmo;
+    std::unique_ptr<ObjectManager> object_manager;
 };
 
 #endif // ROUTE_EDITOR_H

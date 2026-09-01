@@ -3,6 +3,7 @@
 #include "EditorContext.h"
 #include "Journal.h"
 #include "Mask.h"
+#include "ObjectManager.h"
 #include "PagedLodMap.h"
 #include "RouteMap.h"
 #include "RouteObject.h"
@@ -66,13 +67,15 @@ Route::Route(
     const camera_settings_t& camera_settings,
     const vsg::ref_ptr<vsg::Options>& vsg_options,
     const std::string& route_dir,
-    const vsg::ref_ptr<Gizmo>& gizmo
+    const vsg::ref_ptr<Gizmo>& gizmo,
+    ObjectManager& object_manager
 )
     : context_(context)
     , camera_settings(camera_settings)
     , vsg_options(vsg_options)
     , route_dir(route_dir)
     , gizmo(gizmo)
+    , object_manager(object_manager)
 {
     const bool success = load_objects_ref() && load_route_map()
         && load_stations_conf() && load_waypoints_conf();

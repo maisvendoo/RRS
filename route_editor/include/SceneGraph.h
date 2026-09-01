@@ -7,6 +7,7 @@
 
 struct EditorContext;
 class Gizmo;
+class ObjectManager;
 class Route;
 struct camera_settings_t;
 
@@ -26,7 +27,8 @@ public:
         const vsg::ref_ptr<vsg::Options>& vsg_options,
         vsg::ref_ptr<Route>& route,
         const std::string& route_dir,
-        const vsg::ref_ptr<Gizmo>& gizmo
+        const vsg::ref_ptr<Gizmo>& gizmo,
+        ObjectManager& object_manager
     );
 
     void load_route();
@@ -38,6 +40,7 @@ private:
     vsg::ref_ptr<Route>& route;
     const std::string& route_dir;
     const vsg::ref_ptr<Gizmo>& gizmo;
+    ObjectManager& object_manager;
 
     vsg::ref_ptr<vsg::AmbientLight> ambient_light_;
 };

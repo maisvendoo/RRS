@@ -8,6 +8,7 @@
 
 struct EditorContext;
 class Gizmo;
+class ObjectManager;
 struct camera_settings_t;
 
 class Route : public vsg::Inherit<vsg::Switch, Route>
@@ -18,7 +19,8 @@ public:
         const camera_settings_t& camera_settings,
         const vsg::ref_ptr<vsg::Options>& vsg_options,
         const std::string& route_dir,
-        const vsg::ref_ptr<Gizmo>& gizmo
+        const vsg::ref_ptr<Gizmo>& gizmo,
+        ObjectManager& object_manager
     );
 
 private:
@@ -36,6 +38,7 @@ private:
     const vsg::ref_ptr<vsg::Options>& vsg_options;
     const std::string& route_dir;
     const vsg::ref_ptr<Gizmo>& gizmo;
+    ObjectManager& object_manager;
 };
 
 #endif // ROUTE_H

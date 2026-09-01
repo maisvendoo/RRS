@@ -53,6 +53,7 @@
 
 #include <vulkan/vulkan_core.h>
 
+#include <memory>
 #include <string>
 
 RouteEditor::RouteEditor() = default;
@@ -81,8 +82,10 @@ bool RouteEditor::initialize()
         keyboard);
     window_handler_->set_camera(camera);
 
+    object_manager = std::make_unique<ObjectManager>(1000000);
+
     scene_graph = SceneGraph::create(context_, camera_settings, vsg_options,
-        route, route_dir, gizmo);
+        route, route_dir, gizmo, *object_manager);
 
     context_.outline_builder = OutlineBuilder::create();
 
