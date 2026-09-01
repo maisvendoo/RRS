@@ -28,6 +28,7 @@
 #include <vsg/maths/common.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/PagedLOD.h>
 #include <vsg/nodes/Geometry.h>
 #include <vsg/nodes/StateGroup.h>
@@ -299,6 +300,23 @@ void Route::load_static_objects()
             std::lock_guard<std::mutex> lock_guard(context_.static_objects_mutex);
             context_.static_objects.emplace_back(object);
             ++context_.static_objects_count;
+
+            constexpr vsg::dvec3 X_AXIS = {1.0, 0.0, 0.0};
+            constexpr vsg::dvec3 Y_AXIS = {0.0, 1.0, 0.0};
+            constexpr vsg::dvec3 Z_AXIS = {0.0, 0.0, 1.0};
+
+            auto matrix_transform = vsg::MatrixTransform::create();
+            matrix_transform->children = {ref_it->second.paged_lod};
+            matrix_transform->matrix = vsg::translate(transform.translation) *
+                vsg::rotate(vsg::radians(transform.rotation_deg.z), Z_AXIS) *
+                vsg::rotate(vsg::radians(transform.rotation_deg.y), Y_AXIS) *
+                vsg::rotate(vsg::radians(transform.rotation_deg.x), X_AXIS);
+
+            object_manager.labels.push_back(label);
+            object_manager.relative_paths.push_back(ref_it->second.relative_path);
+            object_manager.matrix_transforms.push_back(matrix_transform);
+            object_manager.initial_matrixes.push_back(matrix_transform->matrix);
+            object_manager.is_selected.push_back(false);
         }
     }
 }
