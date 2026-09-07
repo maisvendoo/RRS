@@ -368,7 +368,7 @@ void MainWindow::slotCopmpress()
         args << "-o";
     }
 
-    if (ui->cbNoRewrite)
+    if (ui->cbNoRewrite->isChecked())
     {
         args << "-i";
     }
