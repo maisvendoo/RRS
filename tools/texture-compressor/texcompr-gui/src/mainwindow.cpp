@@ -158,6 +158,11 @@ void MainWindow::launchNextProcess()
             args << "-i";
         }
 
+        if (ui->cbDeleteSrcTexDir->isChecked())
+        {
+            args << "-d";
+        }
+
         proc->setArguments(args);
 
         // Асинхронные соединения
