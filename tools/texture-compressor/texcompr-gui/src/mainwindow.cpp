@@ -163,6 +163,13 @@ void MainWindow::launchNextProcess()
             args << "-d";
         }
 
+        // При параллельной обработке с удалением исходников принудительно
+        // включаем -i, чтобы избежать гонки за общие текстуры
+        if (ui->cbDeleteSrcTexDir->isChecked() && !ui->cbNoRewriteKtxDir->isChecked())
+        {
+            args << "-i";
+        }
+
         proc->setArguments(args);
 
         // Асинхронные соединения
