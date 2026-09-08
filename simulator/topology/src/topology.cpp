@@ -2358,8 +2358,7 @@ namespace
                     // подходит к стрелке со стороны FWD — при движении «обратно»)
                     if (!(signal != nullptr && signal_traj == traj
                         && !signal->getSignalModel().isEmpty()
-                        && !signal->getSignalModel().startsWith("empty_")
-                        && !signal->getSignalModel().endsWith("shnt")))
+                        && !signal->getSignalModel().startsWith("empty_")))
                     {
                         signal = next_sw->getSignalBwd();
                         signal_traj = next_sw->trajectories[SW_FWD_PLUS]
@@ -2391,8 +2390,7 @@ namespace
                 if ((signal != nullptr) && (matched_traj != nullptr)
                     && (signal_traj == matched_traj)
                     && (!signal->getSignalModel().isEmpty())
-                    && (!signal->getSignalModel().startsWith("empty_"))
-                    && (!signal->getSignalModel().endsWith("shnt")))
+                    && (!signal->getSignalModel().startsWith("empty_")))
                 {
                     profile_signal_t ps;
                     ps.distance = kind * traveled;
