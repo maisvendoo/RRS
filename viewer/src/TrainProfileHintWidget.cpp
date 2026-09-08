@@ -763,15 +763,27 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
         else
             continue;
 
-        const float x = plot.map_x(sig.distance);
+const float x = plot.map_x(sig.distance);
         const float rel = elevationAt(sig.distance, _profile.profile) - plot.origin_elev;
         const float y_base = plot.map_y(rel);
 
-        const bool has_letter = !traffic_light->getLetter().isEmpty();
+        // Мачта и перекладина (до проверки any_lit, чтобы тёмный корпус оставался всегда, но ...)
+        // лучше тоже скрывать для непопутных сигналов, поэтому всю отрисовку —
+        // после проверки горящих линз
         const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
         const float y_top = y_base - mast_h;
 
-        // Мачта и перекладина
+        // Если ни одна линза не горит — сигнал направлен против движения, не рисуем
+        bool any_lit = false;
+        for (size_t i = 0; i < spec.size() && !any_lit; ++i)
+        {
+            if (static_cast<size_t>(spec[i].lens) < lens.size()
+                && lens[static_cast<size_t>(spec[i].lens)])
+                any_lit = true;
+        }
+        if (!any_lit)
+            continue;
+
         draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_top), signal_body_col, 1.5f);
         draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), signal_body_col, 1.5f);
 
@@ -785,7 +797,7 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
             draw_list->AddCircleFilled(ImVec2(x, ly), lens_r, col, 16);
         }
 
-        // Литер над верхней линзой
+// Литер над верхней линзой
         const QString letter = traffic_light->getLetter();
         if (!letter.isEmpty())
         {
