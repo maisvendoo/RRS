@@ -2390,8 +2390,7 @@ namespace
                 if ((signal != nullptr) && (matched_traj != nullptr)
                     && (signal_traj == matched_traj)
                     && (!signal->getSignalModel().isEmpty())
-                    && (!signal->getSignalModel().startsWith("empty_"))
-                    && (signal->getDirection() == static_cast<std::int8_t>(kind)))
+                    && (!signal->getSignalModel().startsWith("empty_")))
                 {
                     profile_signal_t ps;
                     ps.distance = kind * traveled;
