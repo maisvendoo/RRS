@@ -830,14 +830,12 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     const float req_backward = std::min(cfg_backward, std::max(_profile.backward_requested, 0.0f));
     const float req_forward = std::min(cfg_forward, std::max(_profile.forward_requested, 0.0f));
 
-    // Базовая линия (y = 0) — уровень середины поезда
-    const float y_base = (0.0f >= plot.rel_min && 0.0f <= plot.rel_max)
-        ? plot.map_y(0.0f) : (plot.y0 + plot.y1) * 0.5f;
-
+    // Зона ограничений — в самом низу виджета
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     const float zone_height = 20.0f;
-    const float y_bottom = y_base + zone_height;
+    const float y_bottom = plot.y1;
+    const float y_base = y_bottom - zone_height;
     const ImU32 col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_border);
     const ImU32 fill_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_fill);
     const ImU32 text_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_text);
