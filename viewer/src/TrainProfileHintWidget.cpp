@@ -773,8 +773,15 @@ const float x = plot.map_x(sig.distance);
 const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
         const float y_top = y_base - mast_h;
 
-        draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_top), signal_body_col, 1.5f);
-        draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), signal_body_col, 1.5f);
+        const ImU32 body_col = sig.is_oncoming
+            ? IM_COL32(192, 192, 192, 200)
+            : signal_body_col;
+        const ImU32 letter_col = sig.is_oncoming
+            ? IM_COL32(192, 192, 192, 200)
+            : ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_signal_letter);
+
+        draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_top), body_col, 1.5f);
+        draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), body_col, 1.5f);
 
         // Линзы снизу вверх: для непопутных сигналов (is_oncoming) — все погашены
         for (size_t i = 0; i < spec.size(); ++i)
@@ -793,8 +800,16 @@ const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
         {
             const std::string label = letter.toStdString();
             const float text_w = ImGui::CalcTextSize(label.c_str()).x;
-            draw_list->AddText(ImVec2(x - text_w * 0.5f, y_top - 16.0f),
-                               ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_signal_letter), label.c_str());
+            const float tx = x - text_w * 0.5f;
+            const float ty = y_top - 16.0f;
+            draw_list->AddText(ImVec2(tx, ty), letter_col, label.c_str());
+            // Черточка для непопутных
+            if (sig.is_oncoming)
+            {
+                draw_list->AddLine(ImVec2(tx - 2.0f, ty + text_w * 0.5f),
+                                   ImVec2(tx + text_w + 2.0f, ty + text_w * 0.5f),
+                                   letter_col, 1.5f);
+            }
         }
     }
 }
