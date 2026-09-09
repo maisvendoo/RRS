@@ -774,10 +774,10 @@ const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
         const float y_top = y_base - mast_h;
 
         const ImU32 body_col = sig.is_oncoming
-            ? IM_COL32(128, 128, 128, 200)
+            ? IM_COL32(32, 32, 32, 220)
             : signal_body_col;
         const ImU32 letter_col = sig.is_oncoming
-            ? IM_COL32(128, 128, 128, 200)
+            ? IM_COL32(32, 32, 32, 220)
             : ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_signal_letter);
 
         // Мачта: от профиля до нижней линзы, потом от верхней линзы до литера
@@ -793,7 +793,7 @@ const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
             const float ly = y_base - (i + 1) * lens_gap;
             if (sig.is_oncoming)
             {
-                draw_list->AddCircle(ImVec2(x, ly), lens_r, IM_COL32(128, 128, 128, 200), 16, 1.5f);
+                draw_list->AddCircle(ImVec2(x, ly), lens_r, IM_COL32(32, 32, 32, 220), 16, 1.5f);
             }
             else
             {
