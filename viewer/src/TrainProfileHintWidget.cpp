@@ -780,7 +780,11 @@ const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
             ? IM_COL32(192, 192, 192, 200)
             : ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_signal_letter);
 
-        draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_top), body_col, 1.5f);
+        // Мачта: от профиля до нижней линзы, потом от верхней линзы до литера
+        const float y_lowest = y_base - lens_gap;
+        const float y_highest = y_base - static_cast<float>(spec.size()) * lens_gap;
+        draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_lowest), body_col, 1.5f);
+        draw_list->AddLine(ImVec2(x, y_highest), ImVec2(x, y_top), body_col, 1.5f);
         draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), body_col, 1.5f);
 
         // Линзы снизу вверх: для непопутных сигналов (is_oncoming) — все светло-серые
