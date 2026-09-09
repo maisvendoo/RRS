@@ -776,13 +776,12 @@ const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
         draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_top), signal_body_col, 1.5f);
         draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), signal_body_col, 1.5f);
 
-        // Линзы снизу вверх: горящая - ярким цветом, погашенная - тёмной
-        // Сигналы, направленные против движения (ни одна линза не горит),
-        // рисуются полностью погасшими
+        // Линзы снизу вверх: для непопутных сигналов (is_oncoming) — все погашены
         for (size_t i = 0; i < spec.size(); ++i)
         {
             const float ly = y_base - (i + 1) * lens_gap;
-            const bool lit = static_cast<size_t>(spec[i].lens) < lens.size()
+            const bool lit = !sig.is_oncoming
+                && static_cast<size_t>(spec[i].lens) < lens.size()
                 && lens[static_cast<size_t>(spec[i].lens)];
             const ImU32 col = lit ? spec[i].lit_color : off_col;
             draw_list->AddCircleFilled(ImVec2(x, ly), lens_r, col, 16);

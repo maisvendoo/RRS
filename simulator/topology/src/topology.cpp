@@ -2370,6 +2370,7 @@ namespace
                     ps.distance = kind * traveled;
                     ps.connector_name = sig->getConnectorName();
                     ps.signal_dir = sig->getDirection();
+                    ps.is_oncoming = (sig->getDirection() != static_cast<std::int8_t>(kind));
                     signal_list->push_back(ps);
                 };
 

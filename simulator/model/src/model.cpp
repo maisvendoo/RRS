@@ -1207,6 +1207,7 @@ void Model::prepareProfilesFeedback()
             signal.distance = static_cast<float>(ps.distance);
             signal.connector_name = ps.connector_name;
             signal.signal_dir = ps.signal_dir;
+            signal.is_oncoming = ps.is_oncoming;
             upd.signal_list.push_back(signal);
         }
 

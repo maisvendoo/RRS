@@ -713,6 +713,9 @@ struct simulator_train_profile_signal_t final
     /// Направление светофора относительно коннектора (FWD=1, BWD=-1)
     std::int8_t signal_dir = 0;
 
+    /// Сигнал направлен против движения поезда (все линзы погашены)
+    bool is_oncoming = false;
+
     QByteArray serialize() const
     {
         QByteArray data;
@@ -721,6 +724,7 @@ struct simulator_train_profile_signal_t final
         stream << distance;
         stream << connector_name;
         stream << signal_dir;
+        stream << is_oncoming;
 
         return data;
     }
@@ -732,6 +736,7 @@ struct simulator_train_profile_signal_t final
         stream >> distance;
         stream >> connector_name;
         stream >> signal_dir;
+        stream >> is_oncoming;
     }
 };
 
