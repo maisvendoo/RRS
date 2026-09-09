@@ -2282,6 +2282,7 @@ namespace
         const double eps = 1e-9;
         double traveled = 0.0;
         double seg_begin = 0.0;
+        const dir_t train_dir = orient;
 
         auto close_segment = [segments, &traveled, &traj, kind, &seg_begin]()
         {
@@ -2385,8 +2386,8 @@ namespace
                     signal_list->push_back(ps);
                 };
 
-                addSig(sf, tf, (sf && sf->getDirection() != static_cast<std::int8_t>(kind)));
-                addSig(sb, tb, (sb && sb->getDirection() != static_cast<std::int8_t>(kind)));
+                addSig(sf, tf, (sf && sf->getDirection() != static_cast<std::int8_t>(train_dir)));
+                addSig(sb, tb, (sb && sb->getDirection() != static_cast<std::int8_t>(train_dir)));
             }
 
             if (exit_dir != orient)
