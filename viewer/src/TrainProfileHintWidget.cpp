@@ -519,33 +519,19 @@ void TrainProfileHintWidget::drawTrainNames(const PlotTransform& plot) const
     if (vehicles.empty())
         return;
 
+    // Все ПЕ вьювера с их train_id (индекс поезда, в который вцеплена ПЕ)
+    const auto& all_vehicles = _params->vehicles_handler->getVehicles();
+
     // Запрошенный диапазон отображения (как в drawTrain)
     const float cfg_backward = std::max(_params->backward_m, 0.0f);
     const float cfg_forward = std::max(_params->forward_m, 0.0f);
     const float req_backward = std::min(cfg_backward, std::max(_profile.backward_requested, 0.0f));
     const float req_forward = std::min(cfg_forward, std::max(_profile.forward_requested, 0.0f));
 
-    // Диапазоны model-index ПЕ поездов из данных вьювера
-    struct train_range_t
-    {
-        int begin_id = 0;
-        int end_id = 0;
-        QString name;
-    };
-    std::vector<train_range_t> ranges;
-    ranges.reserve(trains_info.size());
-    for (const auto& info : trains_info)
-    {
-        train_range_t range;
-        range.begin_id = std::min(info.first_vehicle_id, info.last_vehicle_id);
-        range.end_id = std::max(info.first_vehicle_id, info.last_vehicle_id);
-        range.name = info.train_name;
-        ranges.push_back(range);
-    }
-
-    // Группировка ПЕ профиля по поездам: для каждой ПЕ находим поезд по
-    // model-index и объединяем в общий интервал состава. Все интервалы одного
-    // поезда сливаются в одну группу независимо от разрывов между ними
+    // Группировка ПЕ профиля по поездам: для каждой ПЕ берём её train_id из
+    // вьювера (принадлежность конкретной ПЕ к поезду, а не диапазон id) и
+    // объединяем в общий интервал состава. Все интервалы одного поезда
+    // сливаются в одну группу независимо от разрывов между ними
     // (например, при пересечении точкой отсчёта профиля), чтобы имя поезда
     // рисовалось один раз над центром всего состава
     struct train_group_t
@@ -561,22 +547,20 @@ void TrainProfileHintWidget::drawTrainNames(const PlotTransform& plot) const
     {
         const int model_index = vehicle.vehicle_id;
 
-        int matched_index = -1;
-        for (size_t i = 0; i < ranges.size(); ++i)
-        {
-            if (model_index >= ranges[i].begin_id && model_index <= ranges[i].end_id)
-            {
-                matched_index = static_cast<int>(i);
-                break;
-            }
-        }
-        if (matched_index < 0 || ranges[matched_index].name.isEmpty())
+        // Принадлежность ПЕ поезду — по train_id конкретной ПЕ
+        if (model_index < 0 || static_cast<size_t>(model_index) >= all_vehicles.size())
+            continue;
+        const int train_id = all_vehicles[model_index].train_id;
+        if (train_id < 0 || static_cast<size_t>(train_id) >= trains_info.size())
+            continue;
+        const QString name = trains_info[train_id].train_name;
+        if (name.isEmpty())
             continue;
 
         bool merged = false;
         for (auto& group : groups)
         {
-            if (group.train_index == matched_index)
+            if (group.train_index == train_id)
             {
                 group.begin = std::min(group.begin, vehicle.begin_distance);
                 group.end = std::max(group.end, vehicle.end_distance);
@@ -587,8 +571,8 @@ void TrainProfileHintWidget::drawTrainNames(const PlotTransform& plot) const
         if (!merged)
         {
             train_group_t group;
-            group.train_index = matched_index;
-            group.name = ranges[matched_index].name;
+            group.train_index = train_id;
+            group.name = name;
             group.begin = vehicle.begin_distance;
             group.end = vehicle.end_distance;
             groups.push_back(group);
