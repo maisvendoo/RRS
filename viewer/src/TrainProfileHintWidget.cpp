@@ -833,7 +833,11 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     // Зона ограничений — в самом низу виджета
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    const float zone_height = 20.0f;
+    // Высота полосы = 2 × (высота шрифта + отступы)
+    const float font_h = ImGui::CalcTextSize("80").y;
+    const float pad = 3.0f;
+    const float label_h = font_h + pad * 2.0f;
+    const float zone_height = label_h * 2.0f;
     const float y_bottom = plot.y1;
     const float y_base = y_bottom - zone_height;
     const ImU32 col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_border);
@@ -860,38 +864,56 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         draw_list->AddRectFilled(ImVec2(x0, y_base), ImVec2(x1, y_bottom), fill_col);
         draw_list->AddRect(ImVec2(x0, y_base), ImVec2(x1, y_bottom), col, 0.0f, 0, 1.5f);
 
-        const float pad = 2.0f;
+        // Вертикальные линии с градиентом от красного у профиля до серого в зоне
+        const float rel0 = elevationAt(c0, _profile.profile) - plot.origin_elev;
+        const float rel1 = elevationAt(c1, _profile.profile) - plot.origin_elev;
+        draw_list->AddRectFilledMultiColor(ImVec2(x0 - 1.0f, plot.map_y(rel0)), ImVec2(x0 + 1.0f, y_bottom), no_col, no_col, text_col, text_col);
+        draw_list->AddRectFilledMultiColor(ImVec2(x1 - 1.0f, plot.map_y(rel1)), ImVec2(x1 + 1.0f, y_bottom), no_col, no_col, text_col, text_col);
+    }
 
-        // Подпись в начале зоны
+    // Подписи в шахматном порядке
+    int label_idx = 0;
+    for (const auto& sl : limits)
+    {
+        const float d0 = sl.distance;
+        const float d1 = sl.end_distance;
+        if (d1 <= d0 || d1 < -req_backward || d0 > req_forward)
+            continue;
+
+        const float c0 = std::max(d0, -req_backward);
+        const float c1 = std::min(d1, req_forward);
+        if (c1 <= c0)
+            continue;
+
+        const float x0 = plot.map_x(c0);
+        const float x1 = plot.map_x(c1);
+
         const std::string label = std::to_string(static_cast<int>(sl.speed_kmh));
         const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
-        const float tx = x0 + pad;
-        const float ty = y_base + (zone_height - text_size.y) * 0.5f;
 
-        // Белая непрозрачная подложка под текст (не выходит за границы ленты)
-        const float bg_x0 = std::max(tx - pad, x0);
-        const float bg_x1 = std::min(tx + text_size.x + pad, x1);
-        const float bg_y0 = std::max(ty - pad, y_base);
-        const float bg_y1 = std::min(ty + text_size.y + pad, y_bottom);
-        if (bg_x1 > bg_x0 && bg_y1 > bg_y0)
-            draw_list->AddRectFilled(ImVec2(bg_x0, bg_y0),
-                                     ImVec2(bg_x1, bg_y1),
+        // Шахматный порядок: чётные — низ, нечётные — верх
+        const float ty = (label_idx % 2 == 0)
+            ? y_bottom - label_h + pad
+            : y_base + pad;
+
+        // Белый фон по ширине текста, прижат к левому краю зоны
+        const float bx0 = x0 + pad;
+        const float bx1 = std::min(bx0 + text_size.x + pad, x1);
+        const float by0 = ty - pad;
+        const float by1 = ty + text_size.y + pad;
+        if (bx1 > bx0 && by1 > by0)
+            draw_list->AddRectFilled(ImVec2(bx0, by0),
+                                     ImVec2(bx1, by1),
                                      ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_bg));
 
         // Жирный шрифт через наложение
         const float bold_off = 1.0f;
-        draw_list->AddText(ImVec2(tx - bold_off, ty), text_col, label.c_str());
-        draw_list->AddText(ImVec2(tx + bold_off, ty), text_col, label.c_str());
-        draw_list->AddText(ImVec2(tx, ty - bold_off), text_col, label.c_str());
-        draw_list->AddText(ImVec2(tx, ty + bold_off), text_col, label.c_str());
-        draw_list->AddText(ImVec2(tx, ty), text_col, label.c_str());
+        draw_list->AddText(ImVec2(x0 + pad - bold_off, ty), text_col, label.c_str());
+        draw_list->AddText(ImVec2(x0 + pad + bold_off, ty), text_col, label.c_str());
+        draw_list->AddText(ImVec2(x0 + pad, ty - bold_off), text_col, label.c_str());
+        draw_list->AddText(ImVec2(x0 + pad, ty + bold_off), text_col, label.c_str());
+        draw_list->AddText(ImVec2(x0 + pad, ty), text_col, label.c_str());
 
-        // Вертикальные линии от линии профиля до низа ленты (поверх подложки)
-        const float rel0 = elevationAt(c0, _profile.profile) - plot.origin_elev;
-        const float rel1 = elevationAt(c1, _profile.profile) - plot.origin_elev;
-        //draw_list->AddLine(ImVec2(x0, plot.map_y(rel0)), ImVec2(x0, y_bottom), text_col, 1.5f);
-        //draw_list->AddLine(ImVec2(x1, plot.map_y(rel1)), ImVec2(x1, y_bottom), text_col, 1.5f);
-        draw_list->AddRectFilledMultiColor(ImVec2(x0 - 1.0f, plot.map_y(rel0)), ImVec2(x0 + 1.0f, y_bottom), no_col, no_col, text_col, text_col);
-        draw_list->AddRectFilledMultiColor(ImVec2(x1 - 1.0f, plot.map_y(rel1)), ImVec2(x1 + 1.0f, y_bottom), no_col, no_col, text_col, text_col);
+        ++label_idx;
     }
 }
