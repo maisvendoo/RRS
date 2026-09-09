@@ -381,7 +381,7 @@ if (sig.distance < -req_backward + 5.0f || sig.distance > req_forward - 5.0f)
         const ImU32 grid_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_grid);
         const ImU32 label_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_grid_label);
         const ImFont* font = ImGui::GetFont();
-        const float label_y = y1 - font->LegacySize;
+        const float label_y = y0;
 
         std::vector<std::pair<float, float>> marks;
         collectGridMarks(points, grid_step, marks);
