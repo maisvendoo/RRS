@@ -721,26 +721,22 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
         }
     };
 
-    for (const auto& sig : sig_list)
+// Отрисовка одного сигнала с заданными цветами
+    auto drawOneSignal = [&](const simulator_train_profile_signal_t& sig,
+                             const ImU32 body_color, const ImU32 letter_color,
+                             bool draw_lit)
     {
-        if (sig.distance < -req_backward || sig.distance > req_forward)
-            continue;
-
         TrafficLight* traffic_light = _params->traffic_lights_handler
             ->findSignal(sig.connector_name, sig.signal_dir);
         if (traffic_light == nullptr)
-            continue;
+            return;
 
         const QString model = traffic_light->getModelName();
-
-        // Модели empty_* - заглушки для цепей АЛСН на неправильном пути,
-        // не являются попутными сигналами и не должны отображаться
         if (model.isEmpty() || model.startsWith("empty_"))
-            continue;
+            return;
 
         const lens_state_t& lens = traffic_light->getLensState();
 
-        // Набор линз и порядок их следования снизу вверх (как в tools/route-map)
         std::vector<lens_spec_t> spec;
         if (model.endsWith("line"))
             spec = {{RED_LENS, lens_color(RED_LENS)},
@@ -761,58 +757,66 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
             spec = {{BLUE_LENS, lens_color(BLUE_LENS)},
                     {WHITE_LENS, lens_color(WHITE_LENS)}};
         else
-            continue;
+            return;
 
-const float x = plot.map_x(sig.distance);
+        const float x = plot.map_x(sig.distance);
         const float rel = elevationAt(sig.distance, _profile.profile) - plot.origin_elev;
         const float y_base = plot.map_y(rel);
 
-        // Мачта и перекладина (до проверки any_lit, чтобы тёмный корпус оставался всегда, но ...)
-        // лучше тоже скрывать для непопутных сигналов, поэтому всю отрисовку —
-        // после проверки горящих линз
-const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
+        const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
         const float y_top = y_base - mast_h;
 
-        const ImU32 body_col = sig.is_oncoming
-            ? IM_COL32(32, 32, 32, 220)
-            : signal_body_col;
-        const ImU32 letter_col = sig.is_oncoming
-            ? IM_COL32(32, 32, 32, 220)
-            : ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_signal_letter);
-
-        // Мачта: от профиля до нижней линзы, потом от верхней линзы до литера
         const float y_lowest = y_base - lens_gap;
         const float y_highest = y_base - static_cast<float>(spec.size()) * lens_gap;
-        draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_lowest), body_col, 1.5f);
-        draw_list->AddLine(ImVec2(x, y_highest), ImVec2(x, y_top), body_col, 1.5f);
-        draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), body_col, 1.5f);
+        draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_lowest), body_color, 1.5f);
+        draw_list->AddLine(ImVec2(x, y_highest), ImVec2(x, y_top), body_color, 1.5f);
+        draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), body_color, 1.5f);
 
-        // Линзы снизу вверх: для непопутных сигналов (is_oncoming) — все светло-серые
         for (size_t i = 0; i < spec.size(); ++i)
         {
             const float ly = y_base - (i + 1) * lens_gap;
-            if (sig.is_oncoming)
-            {
-                draw_list->AddCircle(ImVec2(x, ly), lens_r, IM_COL32(32, 32, 32, 220), 16, 1.5f);
-            }
-            else
+            if (draw_lit)
             {
                 const bool lit = static_cast<size_t>(spec[i].lens) < lens.size()
                     && lens[static_cast<size_t>(spec[i].lens)];
                 const ImU32 col = lit ? spec[i].lit_color : off_col;
                 draw_list->AddCircleFilled(ImVec2(x, ly), lens_r, col, 16);
             }
+            else
+            {
+                draw_list->AddCircle(ImVec2(x, ly), lens_r, body_color, 16, 1.5f);
+            }
         }
 
-        // Литер над верхней линзой
         const QString letter = traffic_light->getLetter();
         if (!letter.isEmpty())
         {
             const std::string label = letter.toStdString();
             const float text_w = ImGui::CalcTextSize(label.c_str()).x;
             draw_list->AddText(ImVec2(x - text_w * 0.5f, y_top - 16.0f),
-                               letter_col, label.c_str());
+                               letter_color, label.c_str());
         }
+    };
+
+    // Проход 1: непопутные (is_oncoming) — рисуются первыми (под попутными)
+    for (const auto& sig : sig_list)
+    {
+        if (sig.distance < -req_backward || sig.distance > req_forward)
+            continue;
+        if (!sig.is_oncoming)
+            continue;
+        drawOneSignal(sig, IM_COL32(32, 32, 32, 220), IM_COL32(32, 32, 32, 220), false);
+    }
+
+    // Проход 2: попутные — сверху
+    for (const auto& sig : sig_list)
+    {
+        if (sig.distance < -req_backward || sig.distance > req_forward)
+            continue;
+        if (sig.is_oncoming)
+            continue;
+        drawOneSignal(sig, signal_body_col,
+                      ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_signal_letter), true);
     }
 }
 
