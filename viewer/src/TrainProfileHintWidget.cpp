@@ -800,16 +800,8 @@ const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
         {
             const std::string label = letter.toStdString();
             const float text_w = ImGui::CalcTextSize(label.c_str()).x;
-            const float tx = x - text_w * 0.5f;
-            const float ty = y_top - 16.0f;
-            draw_list->AddText(ImVec2(tx, ty), letter_col, label.c_str());
-            // Черточка для непопутных
-            if (sig.is_oncoming)
-            {
-                draw_list->AddLine(ImVec2(tx - 2.0f, ty + text_w * 0.5f),
-                                   ImVec2(tx + text_w + 2.0f, ty + text_w * 0.5f),
-                                   letter_col, 1.5f);
-            }
+            draw_list->AddText(ImVec2(x - text_w * 0.5f, y_top - 16.0f),
+                               letter_col, label.c_str());
         }
     }
 }
