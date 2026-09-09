@@ -896,12 +896,12 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
             ? y_bottom - label_h + pad
             : y_base + pad;
 
-        // Белый фон по ширине текста, прижат к левому краю зоны
+        // Белый фон по ширине текста (всегда, обрезается по границе зоны)
         const float bx0 = x0 + pad;
         const float bx1 = std::min(bx0 + text_size.x + pad, x1);
         const float by0 = ty - pad;
         const float by1 = ty + text_size.y + pad;
-        if (bx1 > bx0 && by1 > by0)
+        if (by1 > by0)
             draw_list->AddRectFilled(ImVec2(bx0, by0),
                                      ImVec2(bx1, by1),
                                      ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_bg));
