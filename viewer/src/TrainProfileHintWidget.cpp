@@ -342,7 +342,7 @@ void TrainProfileHintWidget::drawProfile() const
             float rel_top_max = plot.rel_max;
             for (const auto& sig : _profile.signal_list)
             {
-                if (sig.distance < -req_backward || sig.distance > req_forward)
+if (sig.distance < -req_backward + 5.0f || sig.distance > req_forward - 5.0f)
                     continue;
 
                 TrafficLight* traffic_light = _params->traffic_lights_handler
