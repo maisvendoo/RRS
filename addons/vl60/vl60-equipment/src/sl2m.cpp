@@ -199,7 +199,7 @@ void SL2M::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "WheelNominalDiameter", tmp);
     if (tmp > Physics::ZERO)
     {
-        r_nominal = tmp / 2000.0;
+        r_nominal = tmp / 2.0;
     }
 
     cfg.getBool(secName, "UseNominalDiameter", use_nominal_diameter);
