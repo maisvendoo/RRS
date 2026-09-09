@@ -787,12 +787,17 @@ const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
         for (size_t i = 0; i < spec.size(); ++i)
         {
             const float ly = y_base - (i + 1) * lens_gap;
-            const ImU32 col = sig.is_oncoming
-                ? IM_COL32(192, 192, 192, 200)
-                : (static_cast<size_t>(spec[i].lens) < lens.size()
-                    && lens[static_cast<size_t>(spec[i].lens)]
-                    ? spec[i].lit_color : off_col);
-            draw_list->AddCircleFilled(ImVec2(x, ly), lens_r, col, 16);
+            if (sig.is_oncoming)
+            {
+                draw_list->AddCircle(ImVec2(x, ly), lens_r, IM_COL32(192, 192, 192, 200), 16, 1.5f);
+            }
+            else
+            {
+                const bool lit = static_cast<size_t>(spec[i].lens) < lens.size()
+                    && lens[static_cast<size_t>(spec[i].lens)];
+                const ImU32 col = lit ? spec[i].lit_color : off_col;
+                draw_list->AddCircleFilled(ImVec2(x, ly), lens_r, col, 16);
+            }
         }
 
         // Литер над верхней линзой
