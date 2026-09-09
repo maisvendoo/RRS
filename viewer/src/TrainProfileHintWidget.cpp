@@ -633,7 +633,7 @@ void TrainProfileHintWidget::drawStations(const PlotTransform& plot) const
 
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    const float text_offset_y = 12.0f;  // отступ подписи под линией профиля
+    const float text_offset_y = 20.0f;  // отступ подписи под линией профиля
     const ImU32 text_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_station_text);  // голубой, как литеры светофоров
 
     for (const auto& station : stations)
@@ -705,7 +705,7 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
         }
     };
 
-// Отрисовка одного сигнала с заданными цветами
+    // Отрисовка одного сигнала с заданными цветами
     auto drawOneSignal = [&](const simulator_train_profile_signal_t& sig,
                              const ImU32 body_color, const ImU32 letter_color,
                              bool draw_lit)
@@ -746,15 +746,12 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
         const float x = plot.map_x(sig.distance);
         const float rel = elevationAt(sig.distance, _profile.profile) - plot.origin_elev;
         const float y_base = plot.map_y(rel);
+        const float y_lowest = y_base - lens_r - 1.0f;
 
-        const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
-        const float y_top = y_base - mast_h;
-
-        const float y_lowest = y_base - lens_gap;
-        const float y_highest = y_base - static_cast<float>(spec.size()) * lens_gap;
         draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_lowest), body_color, 1.5f);
-        draw_list->AddLine(ImVec2(x, y_highest), ImVec2(x, y_top), body_color, 1.5f);
         draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), body_color, 1.5f);
+
+        const QString letter = traffic_light->getLetter();
 
         for (size_t i = 0; i < spec.size(); ++i)
         {
@@ -768,17 +765,32 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
             }
             else
             {
-                draw_list->AddCircle(ImVec2(x, ly), lens_r, body_color, 16, 1.5f);
+                draw_list->AddCircle(ImVec2(x, ly), lens_r, body_color, 16, 3.0f);
             }
         }
 
-        const QString letter = traffic_light->getLetter();
         if (!letter.isEmpty())
         {
             const std::string label = letter.toStdString();
-            const float text_w = ImGui::CalcTextSize(label.c_str()).x;
-            draw_list->AddText(ImVec2(x - text_w * 0.5f, y_top - 16.0f),
-                               letter_color, label.c_str());
+            const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
+
+            if (draw_lit)
+            {
+                const float y_top = y_base - lens_gap * (static_cast<float>(spec.size()) + 1.0f);
+                const float y_liter = y_top - lens_gap;
+                draw_list->AddLine(ImVec2(x, y_liter), ImVec2(x, y_top), letter_color, 1.5f);
+
+                draw_list->AddText(ImVec2(x - text_size.x * 0.5f, y_liter - text_size.y),
+                                   letter_color, label.c_str());
+            }
+            else
+            {
+                const float y_liter = y_base + lens_r;
+                draw_list->AddLine(ImVec2(x, y_liter), ImVec2(x, y_base), letter_color, 1.5f);
+
+                draw_list->AddText(ImVec2(x - text_size.x * 0.5f, y_liter),
+                                   letter_color, label.c_str());
+            }
         }
     };
 
@@ -789,7 +801,7 @@ void TrainProfileHintWidget::drawSignals(const PlotTransform& plot) const
             continue;
         if (!sig.is_oncoming)
             continue;
-        drawOneSignal(sig, IM_COL32(32, 32, 32, 220), IM_COL32(32, 32, 32, 220), false);
+        drawOneSignal(sig, IM_COL32(0, 0, 0, 127), IM_COL32(96, 96, 96, 127), false);
     }
 
     // Проход 2: попутные — сверху
@@ -827,6 +839,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     const ImU32 col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_border);
     const ImU32 fill_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_fill);
     const ImU32 text_col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_text);
+    const ImU32 no_col = IM_COL32(0, 0, 0, 0);
 
     for (const auto& sl : limits)
     {
