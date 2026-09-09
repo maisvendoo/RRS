@@ -783,14 +783,15 @@ const float mast_h = signalHeightPx(static_cast<int>(spec.size()));
         draw_list->AddLine(ImVec2(x, y_base), ImVec2(x, y_top), body_col, 1.5f);
         draw_list->AddLine(ImVec2(x - lens_r, y_base), ImVec2(x + lens_r, y_base), body_col, 1.5f);
 
-        // Линзы снизу вверх: для непопутных сигналов (is_oncoming) — все погашены
+        // Линзы снизу вверх: для непопутных сигналов (is_oncoming) — все светло-серые
         for (size_t i = 0; i < spec.size(); ++i)
         {
             const float ly = y_base - (i + 1) * lens_gap;
-            const bool lit = !sig.is_oncoming
-                && static_cast<size_t>(spec[i].lens) < lens.size()
-                && lens[static_cast<size_t>(spec[i].lens)];
-            const ImU32 col = lit ? spec[i].lit_color : off_col;
+            const ImU32 col = sig.is_oncoming
+                ? IM_COL32(192, 192, 192, 200)
+                : (static_cast<size_t>(spec[i].lens) < lens.size()
+                    && lens[static_cast<size_t>(spec[i].lens)]
+                    ? spec[i].lit_color : off_col);
             draw_list->AddCircleFilled(ImVec2(x, ly), lens_r, col, 16);
         }
 
