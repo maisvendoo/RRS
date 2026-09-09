@@ -889,7 +889,9 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         // Вертикальные линии от линии профиля до низа ленты (поверх подложки)
         const float rel0 = elevationAt(c0, _profile.profile) - plot.origin_elev;
         const float rel1 = elevationAt(c1, _profile.profile) - plot.origin_elev;
-        draw_list->AddLine(ImVec2(x0, plot.map_y(rel0)), ImVec2(x0, y_bottom), text_col, 1.5f);
-        draw_list->AddLine(ImVec2(x1, plot.map_y(rel1)), ImVec2(x1, y_bottom), text_col, 1.5f);
+        //draw_list->AddLine(ImVec2(x0, plot.map_y(rel0)), ImVec2(x0, y_bottom), text_col, 1.5f);
+        //draw_list->AddLine(ImVec2(x1, plot.map_y(rel1)), ImVec2(x1, y_bottom), text_col, 1.5f);
+        draw_list->AddRectFilledMultiColor(ImVec2(x0 - 1.0f, plot.map_y(rel0)), ImVec2(x0 + 1.0f, y_bottom), no_col, no_col, text_col, text_col);
+        draw_list->AddRectFilledMultiColor(ImVec2(x1 - 1.0f, plot.map_y(rel1)), ImVec2(x1 + 1.0f, y_bottom), no_col, no_col, text_col, text_col);
     }
 }
