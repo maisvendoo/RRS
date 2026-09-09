@@ -837,7 +837,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     const float font_h = ImGui::CalcTextSize("80").y;
     const float pad = 3.0f;
     const float label_h = font_h + pad * 2.0f;
-    const float zone_height = label_h * 2.0f;
+    const float zone_height = font_h * 2.0f + 14.0f;
     const float y_bottom = plot.y1;
     const float y_base = y_bottom - zone_height;
     const ImU32 col = ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_border);
@@ -898,7 +898,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
 
         // Белый фон по ширине текста (всегда, обрезается по границе зоны)
         const float bx0 = x0 + pad;
-        const float bx1 = std::min(bx0 + text_size.x + pad, x1);
+        const float bx1 = bx0 + text_size.x + pad;
         const float by0 = ty - pad;
         const float by1 = ty + text_size.y + pad;
         if (by1 > by0)
