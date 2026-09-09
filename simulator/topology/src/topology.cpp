@@ -2360,31 +2360,33 @@ namespace
             // Сбор всех сигналов на стрелке — попутных и непопутных
             if (signal_list != nullptr)
             {
-                auto addSig = [&](const Signal* sig, const Trajectory* st)
+                const Signal* sf = next_sw->getSignalFwd();
+                const Trajectory* tf = next_sw->trajectories[SW_BWD_PLUS]
+                    ? next_sw->trajectories[SW_BWD_PLUS]
+                    : next_sw->trajectories[SW_BWD_MINUS];
+                const Signal* sb = next_sw->getSignalBwd();
+                const Trajectory* tb = next_sw->trajectories[SW_FWD_PLUS]
+                    ? next_sw->trajectories[SW_FWD_PLUS]
+                    : next_sw->trajectories[SW_FWD_MINUS];
+
+                auto addSig = [&](const Signal* sig, const Trajectory* st, bool oncoming)
                 {
                     if (!sig || !st) return;
                     if (sig->getSignalModel().isEmpty()) return;
                     if (sig->getSignalModel().startsWith("empty_")) return;
                     if (st != traj && st != next_traj) return;
+                    // Если на стрелке есть оба сигнала — непопутный не рисуем
+                    if (oncoming && sf && sb) return;
                     profile_signal_t ps;
                     ps.distance = kind * traveled;
                     ps.connector_name = sig->getConnectorName();
                     ps.signal_dir = sig->getDirection();
-                    ps.is_oncoming = (sig->getDirection() != static_cast<std::int8_t>(kind));
+                    ps.is_oncoming = oncoming;
                     signal_list->push_back(ps);
                 };
 
-                const Signal* sf = next_sw->getSignalFwd();
-                const Trajectory* tf = next_sw->trajectories[SW_BWD_PLUS]
-                    ? next_sw->trajectories[SW_BWD_PLUS]
-                    : next_sw->trajectories[SW_BWD_MINUS];
-                addSig(sf, tf);
-
-                const Signal* sb = next_sw->getSignalBwd();
-                const Trajectory* tb = next_sw->trajectories[SW_FWD_PLUS]
-                    ? next_sw->trajectories[SW_FWD_PLUS]
-                    : next_sw->trajectories[SW_FWD_MINUS];
-                addSig(sb, tb);
+                addSig(sf, tf, (sf && sf->getDirection() != static_cast<std::int8_t>(kind)));
+                addSig(sb, tb, (sb && sb->getDirection() != static_cast<std::int8_t>(kind)));
             }
 
             if (exit_dir != orient)
