@@ -2274,7 +2274,8 @@ namespace
                      std::vector<profile_signal_t>* signal_list,
                      const topology_stations_list_t* stations,
                      std::vector<profile_station_t>* station_list,
-                     std::vector<profile_speed_limit_t>* speed_limits)
+                     std::vector<profile_speed_limit_t>* speed_limits,
+                     dir_t train_orient)
     {
         if (traj == nullptr || limit_m <= 0.0)
             return;
@@ -2385,8 +2386,8 @@ namespace
                     signal_list->push_back(ps);
                 };
 
-                addSig(sf, tf, (sf && sf->getDirection() != static_cast<std::int8_t>(kind)));
-                addSig(sb, tb, (sb && sb->getDirection() != static_cast<std::int8_t>(kind)));
+                addSig(sf, tf, (sf && sf->getDirection() != static_cast<std::int8_t>(train_orient)));
+                addSig(sb, tb, (sb && sb->getDirection() != static_cast<std::int8_t>(train_orient)));
             }
 
             if (exit_dir != orient)
@@ -2597,7 +2598,7 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     dir_t fwd_orient = orient;
     walkProfile(fwd_traj, fwd_coord, fwd_orient, forward_m, +1, fwd_points,
                 nullptr, &fwd_vehicles, &fwd_signals,
-                &stations, &fwd_stations, &fwd_speed_limits);
+                &stations, &fwd_stations, &fwd_speed_limits, orient);
 
     // Ход назад
     Trajectory* bwd_traj = traj;
@@ -2605,7 +2606,7 @@ bool Topology::getProfile(Trajectory* traj, double coord, dir_t orient,
     dir_t bwd_orient = static_cast<dir_t>(-orient);
     walkProfile(bwd_traj, bwd_coord, bwd_orient, backward_m, -1, bwd_points,
                 nullptr, &bwd_vehicles, &bwd_signals,
-                &stations, &bwd_stations, &bwd_speed_limits);
+                &stations, &bwd_stations, &bwd_speed_limits, orient);
 
     // Сборка профиля: назад (по убыванию) + точка отсчёта + вперёд
     out.points.clear();
