@@ -15,6 +15,10 @@
     #include <unistd.h>
     #include <execinfo.h>
     #include <dlfcn.h>
+    #ifdef __APPLE__
+        #include <mach-o/dyld.h>
+        #include <sys/sysctl.h>
+    #endif
 #endif
 
 //------------------------------------------------------------------------------
@@ -207,7 +211,7 @@ static void writeStackTraceWithModules(void* stack[], unsigned short frames)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 static void writeStackTraceWithModules()
 {
     void* buffer[32];
@@ -230,16 +234,6 @@ static void writeStackTraceWithModules()
                              i, (unsigned long long)(uintptr_t)buffer[i],
                              module_name, (unsigned long long)offset);
     }
-}
-#endif
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-#ifdef __APPLE__
-static void writeStackTraceWithModules()
-{
-
 }
 #endif
 
@@ -301,14 +295,33 @@ static void writeCrashReport(const char* reason)
 
 #elif __APPLE__
     writeToFile("  OS: macOS\n");
+    char os_ver[256] = {0};
+    size_t os_ver_len = sizeof(os_ver);
+    if (sysctlbyname("kern.osversion", os_ver, &os_ver_len, NULL, 0) == 0)
+    {
+        writeToFileFormatted("  Darwin version: %s\n", os_ver);
+    }
 #endif
 
     writeToFileFormatted("  Architecture: %d-bit\n", (int)(sizeof(void*) == 8 ? 64 : 32));
     writeToFile("\n");
 
-// Загруженные модули (только Windows)
+// Загруженные модули (только Windows/macOS)
 #ifdef _WIN32
     writeLoadedModules();
+#elif defined(__APPLE__)
+    writeToFile("=== Loaded Modules ===\n");
+    for (uint32_t i = 0; i < _dyld_image_count() && i < 50; ++i)
+    {
+        const char* name = _dyld_get_image_name(i);
+        if (name)
+        {
+            const char* short_name = strrchr(name, '/');
+            short_name = short_name ? short_name + 1 : name;
+            writeToFileFormatted("  %s\n", short_name);
+        }
+    }
+    writeToFile("\n");
 #endif
 
     // Стек вызовов
