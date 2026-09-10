@@ -1279,7 +1279,7 @@ void RouteViewer::slotGetTrainsData(QByteArray &data)
 
     train_labels_node = new_node;
 
-    train_labels_handler->setVisible(GUIparams->hud_show_train_labels);
+    train_labels_handler->setVisible(GUIparams->is_show_HUD && GUIparams->hud_show_train_labels);
 }
 
 //------------------------------------------------------------------------------

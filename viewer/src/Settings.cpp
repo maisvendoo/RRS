@@ -119,7 +119,7 @@ void RouteViewer::loadTrainLabelsTextSettings(CfgReader& cfg, const QString& sec
         settings.train_labels_text_font_size = fontSize;
     }
 
-    QString shift = "0.0 0.0 12.0";
+    QString shift = "0.0 0.0 5.5";
     if (cfg.getString(section, "TrainLabelsTextShift", shift))
     {
         std::istringstream stream(shift.toStdString());
