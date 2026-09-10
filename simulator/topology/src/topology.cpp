@@ -2377,8 +2377,6 @@ namespace
                     if (sig->getSignalModel().isEmpty()) return;
                     if (sig->getSignalModel().startsWith("empty_")) return;
                     if (st != traj && st != next_traj) return;
-                    // Если на стрелке есть оба сигнала — непопутный не рисуем
-                    if (oncoming && sf && sb) return;
                     profile_signal_t ps;
                     ps.distance = kind * traveled;
                     ps.connector_name = sig->getConnectorName();
