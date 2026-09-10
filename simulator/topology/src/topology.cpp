@@ -2385,8 +2385,8 @@ namespace
                     signal_list->push_back(ps);
                 };
 
-                addSig(sf, tf, (sf && sf->getDirection() != static_cast<std::int8_t>(train_dir)));
-                addSig(sb, tb, (sb && sb->getDirection() != static_cast<std::int8_t>(train_dir)));
+                addSig(sf, tf, (sf && sf->getDirection() != static_cast<std::int8_t>(train_orient)));
+                addSig(sb, tb, (sb && sb->getDirection() != static_cast<std::int8_t>(train_orient)));
             }
 
             if (exit_dir != orient)
