@@ -161,6 +161,11 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
             params->stations_handler->setVisible(
                 params->is_show_HUD && params->hud_show_stations);
         }
+        if (params->train_labels_handler)
+        {
+            params->train_labels_handler->setVisible(
+                params->is_show_HUD && params->hud_show_train_labels);
+        }
     }
     params->prev_F7 = ImGui::IsKeyPressed(ImGuiKey_F7);
 

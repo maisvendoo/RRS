@@ -21,8 +21,8 @@
 
 namespace
 {
-    /// Коэффициент ширины символа относительно высоты шрифта (для сферы отсечения)
-    constexpr double LABEL_CHAR_WIDTH_COEFF = 0.6;
+    /// Радиус сферы отсечения подписи поезда относительно размера шрифта
+    constexpr double TRAIN_LABEL_CULLING_COEFF = 5.0;
 
     /// Наименование поезда для отображения в подписи (при пустом имени - "Поезд #N")
     QString labelDisplayName(const simulator_train_update_t& train, int train_id)
@@ -78,10 +78,11 @@ bool TrainLabelsHandler::setup(vsg::ref_ptr<vsg::Options> options,
         label.display_name = name.toStdString();
 
         auto layout = vsg::StandardLayout::create();
+        layout->horizontalAlignment = vsg::StandardLayout::CENTER_ALIGNMENT;
         layout->position = vsg::vec3(0.0f, 0.0f, 0.0f);
         layout->horizontal = vsg::vec3(text_height, 0.0f, 0.0f);
         layout->vertical = vsg::vec3(0.0f, text_height, 0.0f);
-        layout->horizontalAlignment = vsg::StandardLayout::CENTER_ALIGNMENT;
+        //layout->outlineWidth = 0.5f;
         layout->billboard = true;
         layout->billboardAutoScaleDistance = static_cast<float>(labels_text_scale_distance);
 
@@ -96,8 +97,7 @@ bool TrainLabelsHandler::setup(vsg::ref_ptr<vsg::Options> options,
 
         label.cull_node = vsg::CullNode::create();
         label.cull_node->bound = vsg::dsphere(0.0, 0.0, 0.0,
-                                              labels_text_font_size *
-                                                  (1.0 + LABEL_CHAR_WIDTH_COEFF * label.display_name.length()));
+                                              labels_text_font_size * TRAIN_LABEL_CULLING_COEFF);
         label.cull_node->child = label.transform;
 
         group->addChild(label.cull_node);

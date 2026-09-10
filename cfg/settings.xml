@@ -136,6 +136,12 @@
         <StationsTextShift>0.0 0.0 15.0</StationsTextShift>
         <!-- Дистанция, после которой подписи станций уменьшаются с расстоянием -->
         <StationsTextScaleDistance>500.0</StationsTextScaleDistance>
+        <!-- Размер шрифта для подписей поездов в сцене -->
+        <TrainLabelsTextFontSize>8.0</TrainLabelsTextFontSize>
+        <!-- Смещение подписей поездов над первым вагоном -->
+        <TrainLabelsTextShift>0.0 0.0 5.5</TrainLabelsTextShift>
+        <!-- Дистанция, после которой подписи поездов уменьшаются с расстоянием -->
+        <TrainLabelsTextScaleDistance>500.0</TrainLabelsTextScaleDistance>
         <!-- Тени: 1 - включены; 0 - отключены -->
         <Shadow>0</Shadow>
         <!-- Пресет настроек теней: 0 - Низкий; 1 - Средний; 2 - Высокий; 3 - Ультра; 4 - Пользовательский -->

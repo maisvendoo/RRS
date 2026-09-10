@@ -18,7 +18,7 @@
 
 namespace
 {
-    /// Радиус сферы отсечения станции, м
+    /// Радиус сферы отсечения подписи станции относительно размера шрифта
     constexpr double STATION_CULLING_COEFF = 5.0;
 }
 
@@ -116,10 +116,11 @@ bool StationsHandler::createSceneGraph(vsg::ref_ptr<vsg::Options> options)
                                           stations_text_shift;
 
         auto layout = vsg::StandardLayout::create();
+        layout->horizontalAlignment = vsg::StandardLayout::CENTER_ALIGNMENT;
         layout->position = vsg::vec3(label_position);
         layout->horizontal = vsg::vec3(text_height, 0.0f, 0.0f);
         layout->vertical = vsg::vec3(0.0f, text_height, 0.0f);
-        layout->horizontalAlignment = vsg::StandardLayout::CENTER_ALIGNMENT;
+        //layout->outlineWidth = 0.5f;
         layout->billboard = true;
         layout->billboardAutoScaleDistance = static_cast<float>(stations_text_scale_distance);
 
