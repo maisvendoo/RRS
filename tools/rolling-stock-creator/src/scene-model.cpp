@@ -2,9 +2,11 @@
 
 #include "graphics/common.h"
 
+#include <vsg/animation/AnimationGroup.h>
 #include <vsg/io/FileSystem.h>
 #include <vsg/io/Options.h>
 #include <vsg/io/read.h>
+#include <vsg/nodes/CullNode.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/Node.h>
 #include <vsg/utils/ComputeBounds.h>
@@ -84,6 +86,51 @@ bool isWheelRole(MeshRole role)
     return role == MeshRole::Wheel;
 }
 
+//------------------------------------------------------------------------------
+/// Обход графа: собирает анимации glTF из узлов vsg::AnimationGroup
+/// (загрузчик vsgXchange glTF оборачивает анимированную сцену
+/// в AnimationGroup, возможно под CullNode/CullGroup)
+//------------------------------------------------------------------------------
+class CollectAnimationsVisitor final
+    : public vsg::Inherit<vsg::Visitor, CollectAnimationsVisitor>
+{
+public:
+    vsg::Animations animations;
+
+    void apply(vsg::AnimationGroup& group) override
+    {
+        for (const vsg::ref_ptr<vsg::Animation>& animation : group.animations)
+        {
+            if (animation)
+            {
+                animations.push_back(animation);
+            }
+        }
+
+        // Дети AnimationGroup — через общий обход групп
+        apply(static_cast<vsg::Group&>(group));
+    }
+
+    void apply(vsg::Group& group) override
+    {
+        for (const vsg::ref_ptr<vsg::Node>& child : group.children)
+        {
+            if (child)
+            {
+                child->accept(*this);
+            }
+        }
+    }
+
+    void apply(vsg::CullNode& node) override
+    {
+        if (node.child)
+        {
+            node.child->accept(*this);
+        }
+    }
+};
+
 } // namespace
 
 //------------------------------------------------------------------------------
@@ -154,6 +201,12 @@ bool SceneModel::loadModel(const QString& path, QString* error)
     // Сводный AABB всей модели
     nodeBounds(root_.get(), overall_min_, overall_max_);
 
+    // Анимации glTF из узлов vsg::AnimationGroup
+    CollectAnimationsVisitor collector;
+    root_->accept(collector);
+    animations_.assign(collector.animations.begin(),
+                       collector.animations.end());
+
     // Корень загруженной модели может сам быть группой — обходим детей
     if (vsg::Group* group = root_->cast<vsg::Group>(); group != nullptr)
     {
@@ -195,6 +248,7 @@ bool SceneModel::isLoaded() const
 void SceneModel::clear()
 {
     nodes_.clear();
+    animations_.clear();
     root_ = nullptr;
     model_path_.clear();
     overall_min_ = vsg::dvec3(0.0, 0.0, 0.0);
@@ -257,6 +311,15 @@ const std::vector<SceneNodeInfo>& SceneModel::nodes() const
 std::vector<SceneNodeInfo>& SceneModel::nodes()
 {
     return nodes_;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+const std::vector<vsg::ref_ptr<vsg::Animation>>&
+SceneModel::animations() const
+{
+    return animations_;
 }
 
 //------------------------------------------------------------------------------

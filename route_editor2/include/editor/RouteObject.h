@@ -12,6 +12,8 @@
 #include <string>
 
 struct EditorContext;
+#include <vsg/core/Mask.h>
+
 class RouteObject;
 class SingleSwitch;
 
@@ -67,9 +69,23 @@ public:
     void save_matrix();
     void set_matrix(const vsg::dmat4& matrix);
 
+    /// Текущая модель объекта (подмена при смене метки, mass replace)
+    vsg::ref_ptr<vsg::PagedLOD> get_paged_lod() const;
+
+    /// Подменить модель объекта (окно «Mass edit»): заменяет дочерний
+    /// PagedLOD и ставит узел на перекомпиляцию
+    void replace_model(vsg::ref_ptr<vsg::PagedLOD> paged_lod);
+
 public:
     /// Метка объекта (ключ из objects.ref)
     std::string label;
+
+    /// Маска видимости узла (переключение видимости, слои)
+    vsg::Mask mask = vsg::MASK_ALL;
+
+    /// Слой объекта (окно «Слои»): "default" или заданный вручную;
+    /// хранится в track-edit.conf, секция <Layer>
+    std::string layer = "default";
 
 private:
     void update_matrix();

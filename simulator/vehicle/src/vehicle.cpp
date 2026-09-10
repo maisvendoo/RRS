@@ -317,14 +317,6 @@ BrakeShoeSystem& Vehicle::getBrakeShoes()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-DieselEngineSystem& Vehicle::getDiesel()
-{
-    return diesel;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 EnergyMeterSystem& Vehicle::getEnergy()
 {
     return energy;
@@ -1704,16 +1696,15 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
     // генератора, разряд от вспомогательных потребителей (ТЗ
     // "Деповское питание"). Стояночная нагрузка низковольтной сети
     {
-        const double aux_load = diesel.isRunning() ? 0.0 : 2000.0;
-        depot_power.step(dt, aux_load, diesel.isRunning(),
-                         abs(velocity) > 0.1);
+        const double aux_load = 2000.0;
+        depot_power.step(dt, aux_load, false, abs(velocity) > 0.1);
     }
 
     // Снабжение (ТЗ "Снабжение локомотива"): порционная подача
     // топлива/масла/ОЖ/песка через штатные API систем-приёмников.
     // Движение при подключении обрывает рукав (Critical, отмена);
     // блокировка тяги - isMovementBlocked() у потребителя
-    service_system.step(dt, velocity, diesel, sand);
+    service_system.step(dt, velocity, sand);
 
     // Конденсат пневмосистемы (ТЗ "Конденсат/влажность"): точка росы
     // по Магнусу, влага при зарядке магистрали, замерзание/оттаивание
@@ -1726,15 +1717,6 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
                                adhesion.getHumidity(),
                                !derailment.isDerailed(),
                                abs(velocity) < 0.3);
-    }
-
-    // Дизель: тепловая модель, расход, дымность (ТЗ "Тепловая модель
-    // дизеля"). Работает только при запущенном двигателе (start/stop -
-    // от кабины тепловоза). Температура воздуха - от погодной системы
-    if (diesel.isRunning() && (lod_full || thermal_tick))
-    {
-        diesel.step(lod_full ? dt : thermal_dt,
-                    adhesion.getAirTemperature(), abs(velocity));
     }
 
     // Учёт электроэнергии от фактической силы на ободе (ТЗ "Расход
@@ -1914,8 +1896,8 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
     {
         bool fire_nearby = false;
 
-        const Vehicle* prev = getPrevVehicle();
-        const Vehicle* next = getNextVehicle();
+        Vehicle* prev = getPrevVehicle();
+        Vehicle* next = getNextVehicle();
 
         if (prev != nullptr && prev->getHazard().isOnFire())
             fire_nearby = true;
@@ -2404,9 +2386,6 @@ void Vehicle::loadConfiguration(QString cfg_path)
 
         // Тормозные колодки (секция BrakeShoes)
         brake_shoes.loadConfig(cfg_path, num_axis);
-
-        // Дизель (секция Diesel; тепловозы)
-        diesel.loadConfig(cfg_path);
 
         // Учёт энергии (секция Energy)
         energy.loadConfig(cfg_path);

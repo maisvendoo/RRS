@@ -54,7 +54,10 @@
 #include <string>
 #include <vector>
 
-NewSkybox::NewSkybox(const std::string& skybox_config_filepath, vsg::ref_ptr<vsg::Options> options)
+NewSkybox::NewSkybox(const std::string& skybox_config_filepath,
+                     vsg::ref_ptr<vsg::Options> options,
+                     bool hd_textures)
+    : use_hd_textures(hd_textures)
 {
     CfgReader cfg;
     if (cfg.load(skybox_config_filepath.c_str()))
@@ -430,13 +433,43 @@ void NewSkybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options
     textures_dir_path = fs.combinePath(textures_dir_path, "default-objects");
     textures_dir_path = fs.combinePath(textures_dir_path, "textures");
 
+    // HD-вариант текстуры для пресетов High/Ultra (ТЗ "Графика"):
+    // суффикс "_hd" перед расширением ("sky_day.bmp" -> "sky_day_hd.bmp")
+    const auto hd_texture_filename = [](const std::string& filename) -> std::string
+    {
+        const std::size_t dot_pos = filename.find_last_of('.');
+        if ((dot_pos == std::string::npos) || (dot_pos == 0))
+        {
+            return std::string();
+        }
+
+        return filename.substr(0, dot_pos) + "_hd" + filename.substr(dot_pos);
+    };
+
     // Читаем из конфига имена файлов текстур и их сезон, время суток
     QDomNode sec_node = cfg.getFirstSection("Texture");
     while (!sec_node.isNull())
     {
         QString texture_filename = "sky_day.bmp";
         cfg.getString(sec_node, "Filename", texture_filename);
-        const std::string texture_path = fs.combinePath(textures_dir_path, texture_filename.toStdString());
+
+        const std::string base_filename = texture_filename.toStdString();
+        std::string texture_path = fs.combinePath(textures_dir_path, base_filename);
+
+        // Prefer HD variant if enabled and available; silently fall back to the
+        // regular texture when the HD file is missing (High/Ultra presets)
+        if (use_hd_textures)
+        {
+            const std::string hd_filename = hd_texture_filename(base_filename);
+            if (!hd_filename.empty())
+            {
+                const std::string hd_path = fs.combinePath(textures_dir_path, hd_filename);
+                if (vsg::fileExists(hd_path))
+                {
+                    texture_path = hd_path;
+                }
+            }
+        }
 
         // Ищем файл текстуры
         if (!vsg::fileExists(texture_path))

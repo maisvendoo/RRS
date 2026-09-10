@@ -6,7 +6,6 @@
 
 #include    "vehicle-service.h"
 
-#include    "vehicle-diesel.h"
 #include    "vehicle-sand.h"
 
 #include    <CfgReader.h>
@@ -18,7 +17,6 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ServiceSystem::ServiceSystem() = default;
 
 //------------------------------------------------------------------------------
 //
@@ -140,7 +138,6 @@ void ServiceSystem::setInZone(bool in_zone_)
 //------------------------------------------------------------------------------
 void ServiceSystem::step(double dt,
                          double velocity,
-                         DieselEngineSystem& diesel,
                          SandSystem& sand)
 {
     if (dt <= 0.0)
@@ -182,7 +179,7 @@ void ServiceSystem::step(double dt,
     }
 
     // Ресурс должен быть доступен на этой ПЕ (например, песок у вагона)
-    if (!resourceAvailable(resource, diesel, sand))
+    if (!resourceAvailable(resource, sand))
     {
         state = State::Aborted;
         last_error = "Resource not available on this vehicle";
@@ -194,7 +191,7 @@ void ServiceSystem::step(double dt,
         return;
     }
 
-    const double level = currentLevel(diesel, sand);
+    const double level = currentLevel(sand);
     last_level = level;
 
     // База прогресса фиксируется на первом шаге после подключения
@@ -235,12 +232,12 @@ void ServiceSystem::step(double dt,
 
     const double portion = std::max(0.0, rate_per_sec / 60.0 * dt);
 
-    const double before = currentLevel(diesel, sand);
+    const double before = currentLevel(sand);
 
-    deliverPortion(portion, diesel, sand);
+    deliverPortion(portion, sand);
     delivered += portion;
 
-    const double after = currentLevel(diesel, sand);
+    const double after = currentLevel(sand);
 
     // Автоматическая остановка при заполнении (ТЗ, п.3): бак полон,
     // либо уровень перестал расти (клапан отсечки колонки)
@@ -258,80 +255,43 @@ void ServiceSystem::step(double dt,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-double ServiceSystem::currentLevel(DieselEngineSystem& diesel,
-                                   SandSystem& sand) const
+double ServiceSystem::currentLevel(SandSystem& sand) const
 {
+    // Дизельных ПС в симуляторе нет: топливо/масло/ОЖ не заполняются
     switch (resource)
     {
-    case Resource::Fuel:
-        return diesel.getFuelLevel();
-
-    case Resource::Oil:
-        return diesel.getOilLevel();
-
-    case Resource::Coolant:
-        return diesel.getCoolantLevel();
-
     case Resource::Sand:
         return (sand.getCapacity() > 0.0)
                 ? sand.getAmount() / sand.getCapacity()
                 : 1.0;
-    }
 
-    return 1.0;
+    default:
+        return 1.0;
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 bool ServiceSystem::resourceAvailable(Resource resource,
-                                      DieselEngineSystem& diesel,
                                       SandSystem& sand) const
 {
-    switch (resource)
-    {
-    case Resource::Fuel:
-    case Resource::Oil:
-    case Resource::Coolant:
-        // Топливо/масло/ОЖ есть только у ПЕ с дизелем
-        return diesel.isConfigured();
-
-    case Resource::Sand:
-        return sand.isEnabled();
-    }
-
-    return false;
+    // Дизельных ПС в симуляторе нет: доступен только песок
+    return (resource == Resource::Sand) && sand.isEnabled();
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void ServiceSystem::deliverPortion(double portion,
-                                   DieselEngineSystem& diesel,
                                    SandSystem& sand) const
 {
     if (portion <= 0.0)
         return;
 
-    // Штатные API систем-приёмников: малые порции, ёмкость не превышается
-    switch (resource)
-    {
-    case Resource::Fuel:
-        diesel.refuel(portion, 0.0);
-        break;
-
-    case Resource::Oil:
-        diesel.refuel(0.0, portion);
-        break;
-
-    case Resource::Coolant:
-        diesel.topUpCoolant(portion);
-        break;
-
-    case Resource::Sand:
+    // Штатный API системы-приёмника: малые порции, ёмкость не превышается
+    if (resource == Resource::Sand)
         sand.refill(portion);
-        break;
-    }
 }
 
 //------------------------------------------------------------------------------

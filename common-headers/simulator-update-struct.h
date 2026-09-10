@@ -101,6 +101,15 @@ struct simulator_vehicle_pos_update_t final
     float   cam_tilt_roll = 0.0f;   ///< Наклон крен, рад
     float   cam_tilt_pitch = 0.0f;  ///< Наклон тангаж, рад
 
+    /// Дымность ПЕ для рендера частиц (ТЗ "Частицы"): уровень 0..4 -
+    /// Smoke из DieselEngineSystem/SteamEngineSystem; код цвета дыма:
+    /// 0 - нет, 1 - чёрный, 2 - синий, 3 - белый, 4 - серый.
+    /// Заполняется сервером из Vehicle::getSteam()/getDiesel()
+    /// (паровоз имеет приоритет). Добавлено В КОНЕЦ для обратной
+    /// совместимости протокола
+    quint8  smoke_level = 0;
+    quint8  smoke_color = 0;
+
     QByteArray serialize() const
     {
         QByteArray data;
@@ -125,6 +134,10 @@ struct simulator_vehicle_pos_update_t final
         stream << cam_offset_z;
         stream << cam_tilt_roll;
         stream << cam_tilt_pitch;
+
+        // Дымность ПЭ для рендера частиц (добавлено в конец)
+        stream << smoke_level;
+        stream << smoke_color;
 /*
         stream << position_x;
         stream << position_y;
@@ -154,6 +167,8 @@ struct simulator_vehicle_pos_update_t final
         cam_offset_z = 0.0f;
         cam_tilt_roll = 0.0f;
         cam_tilt_pitch = 0.0f;
+        smoke_level = 0;
+        smoke_color = 0;
 
         QDataStream stream(&data, QIODevice::ReadOnly);
 
@@ -177,6 +192,13 @@ struct simulator_vehicle_pos_update_t final
             stream >> cam_offset_z;
             stream >> cam_tilt_roll;
             stream >> cam_tilt_pitch;
+        }
+
+        // Дымность ПЭ: хвост блока нового протокола
+        if (!stream.atEnd())
+        {
+            stream >> smoke_level;
+            stream >> smoke_color;
         }
 /*
         stream >> position_x;
@@ -440,8 +462,24 @@ struct simulator_update_pos_t final
     float visibility_m = 10000.0f;  ///< Дальность видимости, м
     float fog_density = 0.0f;       ///< Плотность тумана, 1/м
 
+    /// Погода для эффектов рендера (ТЗ "Частицы"): тип погоды 0..15 -
+    /// значения согласованы с weather::Type (simulator/weather/include/
+    /// weather-system.h); интенсивность 0..1 и ветер (скорость, м/с;
+    /// направление - азимут, рад). Добавлено В КОНЕЦ для обратной
+    /// совместимости протокола
+    quint8  weather_type = 0;
+    float   weather_intensity = 0.0f;
+    float   wind_speed = 0.0f;
+    float   wind_direction = 0.0f;
+
     /// Физические звуковые события последнего шага (ТЗ "Аудиосистема")
     std::vector<simulator_sound_event_t> sound_events;
+
+    /// Служебное предупреждение игроку (кассета регистрации: начало/
+    /// окончание записи, ТЗ "Кассеты"). notice_id растёт при каждом
+    /// новом сообщении; 0 - сообщений ещё не было
+    quint32 notice_id = 0;
+    QString notice = "";
 
     QByteArray serialize() const
     {
@@ -466,6 +504,16 @@ struct simulator_update_pos_t final
         {
             stream << event.serialize();
         }
+
+        stream << notice_id;
+        stream << notice;
+
+        // Погода для эффектов рендера: самый хвост протокола, читается
+        // только если данные ещё остались (старый сервер их не пришлёт)
+        stream << weather_type;
+        stream << weather_intensity;
+        stream << wind_speed;
+        stream << wind_direction;
 
         return data;
     }
@@ -498,6 +546,12 @@ struct simulator_update_pos_t final
         visibility_m = 10000.0f;
         fog_density = 0.0f;
         sound_events.clear();
+        notice_id = 0;
+        notice.clear();
+        weather_type = 0;
+        weather_intensity = 0.0f;
+        wind_speed = 0.0f;
+        wind_direction = 0.0f;
 
         if (!stream.atEnd())
         {
@@ -516,6 +570,22 @@ struct simulator_update_pos_t final
                 stream >> event_data;
                 event.deserialize(event_data);
             }
+        }
+
+        // Предупреждение (кассета): хвост нового протокола
+        if (!stream.atEnd())
+        {
+            stream >> notice_id;
+            stream >> notice;
+        }
+
+        // Погода для эффектов рендера: хвост нового протокола
+        if (!stream.atEnd())
+        {
+            stream >> weather_type;
+            stream >> weather_intensity;
+            stream >> wind_speed;
+            stream >> wind_direction;
         }
     }
 };

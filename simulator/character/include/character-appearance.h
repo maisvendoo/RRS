@@ -73,7 +73,7 @@ public:
     Gender getGender() const;
 
     /// Доступные слоты
-    static const QStringList& slots();
+    static const QStringList& slotList();
 
 private:
 
@@ -85,7 +85,7 @@ private:
     /// Базовые цвета формы (п.8)
     QStringList uniform_colors_ = {"dark_blue", "grey", "black"};
 
-    const Item empty_item_;
+    const Item empty_item_ = {};
 };
 
 #endif // CHARACTER_APPEARANCE_H

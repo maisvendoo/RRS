@@ -27,6 +27,7 @@ add_subdirectory (network)
 add_subdirectory (parsing)
 
 add_subdirectory (simulator)
+add_subdirectory (simulator/session)
 
 add_subdirectory (sound-manager)
 add_subdirectory (viewer)
@@ -39,9 +40,9 @@ add_subdirectory (addons/passcar)
 add_subdirectory (addons/freightcar)
 add_subdirectory (addons/vl60)
 
-add_subdirectory (launcher)
+# add_subdirectory (launcher)  # Qt6 Pdf отсутствует под MinGW
 
-add_subdirectory (tools/dmd2gltf)
+# add_subdirectory (tools/dmd2gltf)  # нужен libktx, отложено
 add_subdirectory (tools/collider-gen)
 add_subdirectory (tools/profconv)
 add_subdirectory (tools/pathconv)
@@ -51,8 +52,9 @@ add_subdirectory (tools/topologycheck)
 add_subdirectory (tools/routeconv)
 add_subdirectory (tools/route-map)
 add_subdirectory (tools/route-transform)
-add_subdirectory (tools/texture-compressor)
+# add_subdirectory (tools/texture-compressor)  # нужен libktx, отложено
 add_subdirectory (tools/rolling-stock-creator)
+add_subdirectory (tools/osm-import)
 
 include(CMakePackageConfigHelpers)
 

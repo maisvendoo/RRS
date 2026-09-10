@@ -24,13 +24,21 @@
 #include    <cstddef>
 #include    <vector>
 
-class VehicleLateralDynamics;
-class VehicleVerticalDynamics;
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
+class VEHICLE_EXPORT VehicleLateralDynamics;
+class VEHICLE_EXPORT VehicleVerticalDynamics;
 
 //------------------------------------------------------------------------------
 /// Система схода единицы подвижного состава
 //------------------------------------------------------------------------------
-class VehicleDerailment
+class VEHICLE_EXPORT VehicleDerailment
 {
 public:
 

@@ -19,10 +19,18 @@
 
 #include    <cstddef>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Опасный груз единицы подвижного состава
 //------------------------------------------------------------------------------
-class VehicleHazard
+class VEHICLE_EXPORT VehicleHazard
 {
 public:
 

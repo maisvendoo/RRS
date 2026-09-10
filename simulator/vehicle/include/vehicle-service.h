@@ -23,13 +23,20 @@
 
 #include    <cstddef>
 
-class DieselEngineSystem;
-class SandSystem;
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
+class VEHICLE_EXPORT SandSystem;
 
 //------------------------------------------------------------------------------
 /// Система снабжения единицы ПС (заправочные колонки депо/ПТО)
 //------------------------------------------------------------------------------
-class ServiceSystem
+class VEHICLE_EXPORT ServiceSystem
 {
 public:
 
@@ -70,10 +77,9 @@ public:
     /// выезд из зоны с рукавом - обрыв
     void setInZone(bool in_zone);
 
-    /// Шаг: dt - время, velocity - скорость ПЕ; diesel и sand - реальные
-    /// системы-приёмники ресурса (порционная подача через их API)
-    void step(double dt, double velocity,
-              DieselEngineSystem& diesel, SandSystem& sand);
+    /// Шаг: dt - время, velocity - скорость ПЕ; sand - реальная
+    /// система-приёмник ресурса (порционная подача через её API)
+    void step(double dt, double velocity, SandSystem& sand);
 
     //--------- Состояние (для UI/сценариев) ---------
 
@@ -103,17 +109,15 @@ public:
 private:
 
     /// Текущий уровень выбранного ресурса 0..1
-    double currentLevel(DieselEngineSystem& diesel, SandSystem& sand) const;
+    double currentLevel(SandSystem& sand) const;
 
-    /// Ресурс доступен на этой ПЕ (топливо/масло/ОЖ - нужен дизель,
-    /// песок - настроенная песочница)
+    /// Ресурс доступен на этой ПЕ (топливо/масло/ОЖ недоступны -
+    /// дизельных ПС нет; песок - настроенная песочница)
     bool resourceAvailable(Resource resource,
-                           DieselEngineSystem& diesel,
                            SandSystem& sand) const;
 
     /// Подать порцию ресурса (л или кг) в систему-приёмник
     void deliverPortion(double portion,
-                        DieselEngineSystem& diesel,
                         SandSystem& sand) const;
 
     bool enabled = true;

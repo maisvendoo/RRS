@@ -111,6 +111,34 @@ collision::ColliderEntry makeEntry(const std::string& label,
         return entry;
     }
 
+    // Широкие протяжённые объекты (жёсткие поперечины, пролёты,
+    // декорации во всю ширину станции): авто-AABB превращает их
+    // в гигантские "невидимые стены", мешающие пешему режиму -
+    // считаем декорациями без коллайдера (землю несёт mesh-слой)
+    if (extent.x > 15.0 || extent.y > 15.0)
+    {
+        entry.type = collision::ColliderType::None;
+        return entry;
+    }
+
+    // Придорожные объекты (знаки, сваи, мелкие строения): авто-AABB
+    // в разы толще реальной опоры и залезает в габарит подвижного
+    // состава. Сужаем поперечник бокса до стойки - вертикаль
+    // (extent.z) и высота остаются настоящими
+    const double max_xy = std::max(extent.x, extent.y);
+
+    if (max_xy > 1.0)
+    {
+        entry.type = collision::ColliderType::Box;
+        const double slim = std::min(0.35, max_xy);
+        entry.half_extents = collision::Vec3f(static_cast<float>(slim),
+                                              static_cast<float>(slim),
+                                              static_cast<float>(extent.z));
+        entry.layer = collision::Layer::Infrastructure;
+        entry.profile = "default";
+        return entry;
+    }
+
     // Остальное - параллелепипед по AABB
     entry.type = collision::ColliderType::Box;
     entry.half_extents = collision::Vec3f(static_cast<float>(extent.x),

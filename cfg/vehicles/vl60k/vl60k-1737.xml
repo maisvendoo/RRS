@@ -35,12 +35,33 @@
 	<Cabine>
 		<DriverPos>0.8 8.4 3.2</DriverPos>
 		<DriverDir>0.0</DriverDir>
+		<!-- Точка выхода в пешей режим (ТЗ "walking") -->
+		<ExitPos>0.8 10.2 1.1</ExitPos>
+		<ExitDir>0.0</ExitDir>
+		<!-- Сиденье помощника (посадка по E) -->
+		<AssistantPos>-0.9 7.9 3.2</AssistantPos>
 	</Cabine>
 
 	<Cabine>
 		<DriverPos>-0.8 -8.4 3.2</DriverPos>
 		<DriverDir>180.0</DriverDir>
+		<!-- Точка выхода в пешей режим (ТЗ "walking") -->
+		<ExitPos>-0.8 -10.2 1.1</ExitPos>
+		<ExitDir>180.0</ExitDir>
+		<!-- Сиденье помощника (посадка по E) -->
+		<AssistantPos>0.9 -7.9 3.2</AssistantPos>
 	</Cabine>
+
+	<!-- Физическая модель токоприёмника (Т-5М1): контакт/дуги/износ,
+	     Uks с провалами напряжения и нейтральными вставками.
+	     Активна на маршрутах с catenary.conf -->
+	<Pantograph>
+		<StaticForce>70</StaticForce>
+		<AeroCoeff>0.09</AeroCoeff>
+		<WireReaction>25</WireReaction>
+		<MinContactForce>20</MinContactForce>
+		<WindSensitivity>0.02</WindSensitivity>
+	</Pantograph>
 
 
 	<Model>

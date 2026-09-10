@@ -27,7 +27,12 @@ class MatrixTransform;
 class NewSkybox
 {
 public:
-    NewSkybox(const std::string& skybox_config_filepath, vsg::ref_ptr<vsg::Options> options = {});
+    /// hd_textures — пресеты High/Ultra (ТЗ "Графика"): предпочитать
+    /// HD-варианты текстур "<имя>_hd.<ext>"; при отсутствии файла
+    /// молча используется обычная текстура
+    NewSkybox(const std::string& skybox_config_filepath,
+              vsg::ref_ptr<vsg::Options> options = {},
+              bool hd_textures = false);
 
     vsg::ref_ptr<vsg::Node> getNode() const;
 
@@ -44,6 +49,9 @@ private:
 
 private:
     bool is_sun_rise = false;
+
+    /// Prefer HD texture variants "<name>_hd.<ext>" (High/Ultra presets)
+    bool use_hd_textures = false;
 
     struct texture_t
     {

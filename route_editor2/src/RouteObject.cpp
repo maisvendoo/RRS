@@ -157,8 +157,13 @@ RouteObjectsIterator RouteObject::deselect()
 
 vsg::ref_ptr<RouteObject> RouteObject::copy() const
 {
-    return RouteObject::create(context_, paged_lod_, label,
+    auto object = RouteObject::create(context_, paged_lod_, label,
         translation_, rotation_deg_, scale_);
+
+    // Копия наследует слой оригинала (окно «Слои»)
+    object->layer = layer;
+
+    return object;
 }
 
 void RouteObject::save_matrix()
@@ -172,6 +177,28 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
 
     decompose_matrix();
     update_bounds();
+}
+
+vsg::ref_ptr<vsg::PagedLOD> RouteObject::get_paged_lod() const
+{
+    return paged_lod_;
+}
+
+void RouteObject::replace_model(vsg::ref_ptr<vsg::PagedLOD> paged_lod)
+{
+    if (!paged_lod || paged_lod == paged_lod_)
+    {
+        return;
+    }
+
+    paged_lod_ = paged_lod;
+    paged_lod_switch_->node = paged_lod;
+
+    update_bounds();
+
+    // Перекомпиляция узла с новой моделью (паттерн CompileInfo)
+    context_.compile_infos.emplace_back(CompileInfo{
+        nullptr, vsg::ref_ptr<RouteObject>(this)});
 }
 
 void RouteObject::update_matrix()

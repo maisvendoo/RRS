@@ -48,6 +48,7 @@ target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../../common-headers)
 target_include_directories (${TARGET} PRIVATE ../train/include)
 target_include_directories (${TARGET} PRIVATE ../scenario-manager/include)
+target_include_directories (${TARGET} PRIVATE ../session/include)
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Xml)
 # и со своими не забываем
@@ -69,4 +70,7 @@ target_link_libraries (${TARGET} conductor)
 target_link_libraries (${TARGET} perf)
 target_link_libraries (${TARGET} player)
 target_link_libraries (${TARGET} character)
+target_link_libraries (${TARGET} cassette)
+target_link_libraries (${TARGET} session)
+# Автосохранения сессии (ТЗ "RP-сервер", п.5-8)
 

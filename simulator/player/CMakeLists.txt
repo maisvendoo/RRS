@@ -37,8 +37,8 @@ target_sources(${TARGET}
             ${INCLUDES}
 )
 
-# Пешая ходьба использует мир коллизий (raycast) - чистый C++ без Qt
-target_link_libraries (${TARGET} PUBLIC collision)
+# Пешая ходьба использует мир коллизий (raycast) и чтение конфига [Player]
+target_link_libraries (${TARGET} PUBLIC collision CfgReader)
 
 install(TARGETS ${TARGET}
     EXPORT ${TARGET}Targets

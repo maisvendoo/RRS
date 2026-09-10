@@ -17,10 +17,18 @@
 #include    <cstddef>
 #include    <vector>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Компонентные повреждения единицы подвижного состава
 //------------------------------------------------------------------------------
-class VehicleDamageSystem
+class VEHICLE_EXPORT VehicleDamageSystem
 {
 public:
 

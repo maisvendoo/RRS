@@ -22,10 +22,18 @@
 
 #include    <QString>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Конденсат и лёд в пневматической системе единицы ПС
 //------------------------------------------------------------------------------
-class CondensateSystem
+class VEHICLE_EXPORT CondensateSystem
 {
 public:
 

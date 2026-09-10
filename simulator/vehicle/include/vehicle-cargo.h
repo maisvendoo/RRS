@@ -16,13 +16,22 @@
 #define     VEHICLE_CARGO_H
 
 #include    <QString>
+#include    <QStringList>
 
 #include    <cstddef>
+
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
 
 //------------------------------------------------------------------------------
 /// Груз вагона
 //------------------------------------------------------------------------------
-class CargoSystem
+class VEHICLE_EXPORT CargoSystem
 {
 public:
 

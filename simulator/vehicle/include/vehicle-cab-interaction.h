@@ -23,6 +23,14 @@
 #include    <cstddef>
 #include <vector>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Тип интерактивного элемента кабины
 //------------------------------------------------------------------------------
@@ -38,7 +46,7 @@ enum class CabElementType
 //------------------------------------------------------------------------------
 /// Реестр интерактивных элементов кабины
 //------------------------------------------------------------------------------
-class CabInteractionRegistry
+class VEHICLE_EXPORT CabInteractionRegistry
 {
 public:
 

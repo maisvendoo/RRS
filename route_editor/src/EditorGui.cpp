@@ -353,7 +353,7 @@ void EditorGui::show_stations_conf() const
     ImGui::End();
 }
 
-// TODO: Сделать, чтобы реальные позиции грузились один раз?
+// Позиции точек вычисляются только по клику на метку (не каждый кадр)
 void EditorGui::show_waypoints_conf() const
 {
     if (!context_.topology_loaded)

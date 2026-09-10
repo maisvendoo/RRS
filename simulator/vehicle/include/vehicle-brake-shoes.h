@@ -20,10 +20,18 @@
 #include    <cstddef>
 #include <vector>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Система тормозных колодок единицы ПС
 //------------------------------------------------------------------------------
-class BrakeShoeSystem
+class VEHICLE_EXPORT BrakeShoeSystem
 {
 public:
 

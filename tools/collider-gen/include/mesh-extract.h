@@ -9,6 +9,7 @@
 #define     MESH_EXTRACT_H
 
 #include    <collision-types.h>
+#include    <collision-shape.h>
 
 #include    <vsg/core/ref_ptr.h>
 #include    <vsg/maths/box.h>

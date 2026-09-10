@@ -20,10 +20,18 @@
 
 #include    <cstddef>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Учёт энергии единицы ПС
 //------------------------------------------------------------------------------
-class EnergyMeterSystem
+class VEHICLE_EXPORT EnergyMeterSystem
 {
 public:
 

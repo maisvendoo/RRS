@@ -566,7 +566,7 @@ bool loadTrackProfileConfig(const QString& route_dir,
         }
         else
         {
-            named_irregularities.push_back({traj_name, item});
+            out.named_irregularities.push_back({traj_name, item});
         }
 
         irregularity_node = cfg.getNextSection();

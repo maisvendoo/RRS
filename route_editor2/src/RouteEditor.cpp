@@ -4,10 +4,20 @@
 #include "editor/EditorContext.h"
 #include "editor/EditorGui.h"
 #include "editor/EventHandler.h"
+#include "editor/Gizmo.h"
 #include "editor/IntersectionHandler.h"
+#include "editor/KeyBindings.h"
 #include "editor/ObjectSelector.h"
 #include "editor/Route.h"
+#include <vsg/nodes/Geometry.h>
+#include <vsg/nodes/StateGroup.h>
+#include <vsg/commands/DrawIndexed.h>
+
+
+#include <cmath>
+#include <vector>
 #include "editor/SingleSwitch.h"
+#include "editor/TrajectoryPicker.h"
 #include "editor/states/EditorState.h"
 
 #include <CfgReader.h>
@@ -54,6 +64,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <memory>
 
 RouteEditor::RouteEditor()
 {
@@ -87,6 +98,7 @@ RouteEditor::RouteEditor()
 
     editor_gui = EditorGui::create(*context, gui_settings);
     render_gui = vsgImGui::RenderImGui::create(window, editor_gui);
+    context->render_gui = render_gui;
 
     create_render_graph();
     create_command_graph();
@@ -167,6 +179,7 @@ void RouteEditor::read_settings(const char* filename)
     camera_settings.read(cfg);
     scene_settings.read(cfg);
     gui_settings.read(cfg);
+    gizmo_settings.read(cfg);
 
     Journal::instance()->info("Settings are readed successfully");
 }
@@ -268,8 +281,72 @@ void RouteEditor::create_window()
         std::exit(EXIT_FAILURE);
     }
 
-    window->clearColor() = vsg::vec4(0.03f, 0.03f, 0.03f, 1.0f);
+    window->clearColor() = vsg::vec4(0.55f, 0.70f, 0.85f, 1.0f);
     Journal::instance()->info("Window is created successfully");
+}
+
+/// Опорная сетка земли (как тайловая сетка TSRE): 10x10 км, шаг 100 м,
+/// каждые 500 м - ярче; даёт точку отсчёта в пустых маршрутах
+//------------------------------------------------------------------------------
+static vsg::ref_ptr<vsg::Node> create_ground_grid(
+    vsg::ref_ptr<const vsg::Options> options)
+{
+    const double half = 5000.0;
+    const double step = 100.0;
+
+    std::vector<vsg::vec3> vertices;
+    std::vector<vsg::vec3> colors;
+    std::vector<unsigned short> indices;
+
+    unsigned short index = 0;
+
+    for (double v = -half; v <= half + 1.0; v += step)
+    {
+        const bool major = (std::fmod(v, 500.0) < 0.5) || (std::fmod(v, 500.0) > 499.5);
+        const vsg::vec3 color = major ? vsg::vec3(0.28f, 0.30f, 0.34f)
+                                      : vsg::vec3(0.16f, 0.17f, 0.20f);
+
+        // Линия вдоль Y
+        vertices.push_back({static_cast<float>(-half), static_cast<float>(v), 0.0f});
+        vertices.push_back({static_cast<float>(half), static_cast<float>(v), 0.0f});
+        colors.push_back(color);
+        colors.push_back(color);
+        indices.push_back(index++);
+        indices.push_back(index++);
+
+        // Линия вдоль X
+        vertices.push_back({static_cast<float>(v), static_cast<float>(-half), 0.0f});
+        vertices.push_back({static_cast<float>(v), static_cast<float>(half), 0.0f});
+        colors.push_back(color);
+        colors.push_back(color);
+        indices.push_back(index++);
+        indices.push_back(index++);
+    }
+
+    const auto vertex_array = vsg::vec3Array::create(vertices.size());
+    const auto color_array = vsg::vec3Array::create(colors.size());
+    const auto index_array = vsg::ushortArray::create(indices.size());
+
+    for (std::size_t i = 0; i < vertices.size(); ++i)
+    {
+        vertex_array->at(i) = vertices[i];
+        color_array->at(i) = colors[i];
+    }
+
+    for (std::size_t i = 0; i < indices.size(); ++i)
+    {
+        index_array->at(i) = indices[i];
+    }
+
+    const auto geometry = vsg::Geometry::create();
+    geometry->assignArrays(vsg::DataList{vertex_array, color_array});
+    geometry->assignIndices(index_array);
+    geometry->commands.push_back(vsg::DrawIndexed::create(
+        static_cast<uint32_t>(indices.size()), 1, 0, 0, 0));
+
+    const auto state_group = create_trajectory_lines_state_group(options);
+    state_group->addChild(geometry);
+    return state_group;
 }
 
 void RouteEditor::create_scenegraph()
@@ -283,6 +360,9 @@ void RouteEditor::create_scenegraph()
 
     const auto ambient_light = vsg::AmbientLight::create();
     scenegraph->addChild(ambient_light);
+
+    // Сетка земли: постоянный элемент сцены (и для пустых маршрутов)
+    scenegraph->addChild(create_ground_grid(context->options));
 
     context->scenegraph = scenegraph;
 
@@ -305,6 +385,29 @@ void RouteEditor::create_handlers()
 {
     context->intersection_handler = IntersectionHandler::create(camera);
     context->object_selector = ObjectSelector::create(*context);
+    context->trajectory_picker = TrajectoryPicker::create(*context);
+
+    // Гизмо трансформаций (G - цикл режимов): узел вешаем в сцену,
+    // видимость включает/выключает сам по режиму. MeasureTool живёт
+    // в самом EditorContext (создаётся его конструктором)
+    context->gizmo = Gizmo::create(*context, gizmo_settings);
+    context->scenegraph->addChild(context->gizmo);
+
+    // Переназначаемые клавиши из настроек редактора (нет секции -
+    // останутся значения по умолчанию)
+    {
+        const FileSystem& fs = FileSystem::getInstance();
+
+        const QString cfg_path = to_qstring(
+                    fs.combinePath(fs.getConfigDir(), "editor-settings.xml"));
+
+        CfgReader cfg;
+
+        if (cfg.load(cfg_path))
+        {
+            context->key_bindings.read(cfg);
+        }
+    }
 
     event_handler = EventHandler::create(*context);
     context->event_handler = event_handler;

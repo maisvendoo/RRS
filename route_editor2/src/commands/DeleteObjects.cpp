@@ -11,9 +11,24 @@
 #include <cstdio>
 
 DeleteObjects::DeleteObjects(EditorContext& context)
-    : Command(context)
-    , objects_(context.selected_objects)
+    : DeleteObjects(context, context.selected_objects)
 {
+}
+
+DeleteObjects::DeleteObjects(EditorContext& context,
+    const RouteObjects& objects)
+    : Command(context)
+    , objects_(objects)
+{
+    // Выделение после undo восстанавливается только для тех объектов,
+    // которые были выделены до удаления
+    was_selected_.reserve(objects.size());
+
+    for (const auto& object : objects_)
+    {
+        was_selected_.push_back(object->get_is_selected());
+    }
+
     update_description();
 }
 
@@ -21,7 +36,12 @@ void DeleteObjects::execute()
 {
     for (const auto& object : objects_)
     {
-        object->deselect();
+        // Снять выделение, если объект был выделен (список для mass
+        // delete может содержать и невыделенные объекты)
+        if (object->get_is_selected())
+        {
+            object->deselect();
+        }
 
         {
             std::lock_guard<std::mutex> lock_guard(context_.static_objects_mutex);
@@ -51,6 +71,7 @@ void DeleteObjects::execute()
 
 void DeleteObjects::undo()
 {
+    std::size_t i = 0;
     for (const auto& object : objects_)
     {
         context_.compile_infos.emplace_back(CompileInfo{
@@ -64,7 +85,11 @@ void DeleteObjects::undo()
         ++context_.static_objects_count;
         ++context_.total_static_objects_count;
 
-        object->select();
+        if (was_selected_[i])
+        {
+            object->select();
+        }
+        ++i;
     }
 }
 

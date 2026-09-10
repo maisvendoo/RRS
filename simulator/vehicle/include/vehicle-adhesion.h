@@ -21,10 +21,18 @@
 #include    <cstddef>
 #include <vector>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Состояние сцепления колёс с рельсами для единицы ПС
 //------------------------------------------------------------------------------
-class WheelRailAdhesion
+class VEHICLE_EXPORT WheelRailAdhesion
 {
 public:
 

@@ -2,6 +2,7 @@
 #define ROUTE_EDITOR_H
 
 #include "editor/settings/CameraSettings.h"
+#include "editor/settings/GizmoSettings.h"
 #include "editor/settings/GuiSettings.h"
 #include "editor/settings/SceneSettings.h"
 #include "editor/settings/WindowSettings.h"
@@ -64,6 +65,7 @@ private:
     camera_settings_t camera_settings;
     scene_settings_t scene_settings;
     gui_settings_t gui_settings;
+    gizmo_settings_t gizmo_settings;
 
     EditorContext* context = nullptr;
 

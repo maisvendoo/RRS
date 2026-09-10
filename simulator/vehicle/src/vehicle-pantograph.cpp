@@ -30,7 +30,6 @@ std::uint32_t mix32(std::uint32_t value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PantographSystem::PantographSystem() = default;
 
 //------------------------------------------------------------------------------
 //
@@ -41,13 +40,30 @@ void PantographSystem::loadConfig(QString cfg_path)
     if (!cfg.load(cfg_path))
         return;
 
-    const QString sec = "Pantograph";
+    // Нет секции [Pantograph] - физическая модель токоприёмника не
+    // активна: ПС работает по legacy-схеме (Uks задаёт модуль ПС)
+    QDomNode sec = cfg.getFirstSection("Pantograph");
 
-    cfg.getDouble(sec, "StaticForce", static_force);
-    cfg.getDouble(sec, "AeroCoeff", aero_coeff);
-    cfg.getDouble(sec, "WireReaction", wire_reaction);
-    cfg.getDouble(sec, "MinContactForce", min_contact_force);
-    cfg.getDouble(sec, "WindSensitivity", wind_sensitivity);
+    if (sec.isNull())
+        return;
+
+    configured = true;
+
+    const QString sec_name = "Pantograph";
+
+    cfg.getDouble(sec_name, "StaticForce", static_force);
+    cfg.getDouble(sec_name, "AeroCoeff", aero_coeff);
+    cfg.getDouble(sec_name, "WireReaction", wire_reaction);
+    cfg.getDouble(sec_name, "MinContactForce", min_contact_force);
+    cfg.getDouble(sec_name, "WindSensitivity", wind_sensitivity);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool PantographSystem::isConfigured() const
+{
+    return configured;
 }
 
 //------------------------------------------------------------------------------
@@ -102,8 +118,9 @@ void PantographSystem::step(double dt, double speed, double wind_speed,
 
     if (!stable && wire_voltage > 100.0)
     {
-        // Стохастика через хэш времени (воспроизводимо на шаге)
-        const auto tick = static_cast<std::uint32_t>(arc_timer * 1000.0);
+        // Стохастика через хэш полного времени (воспроизводимо на шаге,
+        // без повторения паттерна при сбросе секундного окна)
+        const auto tick = static_cast<std::uint32_t>(total_time * 1000.0);
         const double u = static_cast<double>(mix32(tick + 1u)) / 4294967296.0;
         contact = u > 0.5;
     }
@@ -114,20 +131,21 @@ void PantographSystem::step(double dt, double speed, double wind_speed,
         if (!contact && wire_voltage > 100.0)
         {
             ++arcs_total;
-            arc_window += dt;
+            ++arc_window_count;
         }
     }
 
     contact_ok = contact;
 
-    // Частота дуг за скользящее окно 1 с
-    arc_timer += dt;
+    // Частота дуг (шт/с) за скользящее окно 1 с
+    total_time += dt;
+    arc_window_time += dt;
 
-    if (arc_timer >= 1.0)
+    if (arc_window_time >= 1.0)
     {
-        arc_rate = arc_window / arc_timer;
-        arc_timer = 0.0;
-        arc_window = 0.0;
+        arc_rate = static_cast<double>(arc_window_count) / arc_window_time;
+        arc_window_time = 0.0;
+        arc_window_count = 0;
     }
 
     // Износ вставки: от силы прижима и пробега

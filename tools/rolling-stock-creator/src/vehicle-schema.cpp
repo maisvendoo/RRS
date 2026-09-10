@@ -57,6 +57,7 @@ const std::vector<SectionSpec>& vehicleSchema()
                 real ("Length",          1.0,   100.0,      "15.0",    QCoreApplication::translate("Schema", "Длина по осям автосцепок, м"), true),
                 integer("NumAxis",       2,     16,         "4",       QCoreApplication::translate("Schema", "Число осей"), true),
                 real ("WheelDiameter",   0.3,   2.5,        "0.95",    QCoreApplication::translate("Schema", "Диаметр колеса, м"), true),
+                real ("MaxSpeed",        1.0,   600.0,      "100.0",   QCoreApplication::translate("Schema", "Конструкционная (поездная) скорость, км/ч")),
                 real ("WheelInertia",    0.0,   10000.0,    "100.0",   QCoreApplication::translate("Schema", "Момент инерции колеса, кг*м^2")),
                 text ("MainResist",      "default", QCoreApplication::translate("Schema", "Конфиг основного сопротивления движению")),
                 text ("WheelRailFriction", "default", QCoreApplication::translate("Schema", "Конфиг сцепления колеса с рельсом")),

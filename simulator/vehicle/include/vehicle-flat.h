@@ -24,16 +24,24 @@
 #include    <cstddef>
 #include <vector>
 
-class VehicleVerticalDynamics;
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
+class VEHICLE_EXPORT VehicleVerticalDynamics;
 
 //------------------------------------------------------------------------------
 /// Система ползунов колёсных пар единицы ПС
 //------------------------------------------------------------------------------
-class WheelFlatSystem
+class VEHICLE_EXPORT WheelFlatSystem
 {
 public:
 
-    VehicleFlatSystem() = default;
+    WheelFlatSystem() = default;
 
     /// Загрузка секции [FlatSpot]
     void loadConfig(QString cfg_path, std::size_t num_axis);

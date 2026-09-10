@@ -31,12 +31,16 @@ public:
     /// \param model_path   путь к glTF-модели (пустой — модель не копируется)
     /// \param collision    параметры секции [Collision] (для отчёта)
     /// \param points       физические точки (для отчёта)
+    /// \param sounds_dir   папка поиска звуковых файлов из секций
+    ///                     <Sound> (поле «Папка звуков» либо папка конфига);
+    ///                     найденные файлы копируются в <пакет>/sounds/
     static ExportResult exportPackage(const QString& target_dir,
                                       const QString& vehicle_name,
                                       const QString& config_xml,
                                       const QString& model_path,
                                       const SceneModel::CollisionParams& collision,
-                                      const std::vector<PhysPoint>& points);
+                                      const std::vector<PhysPoint>& points,
+                                      const QString& sounds_dir);
 };
 
 #endif // EXPORT_PIPELINE_H

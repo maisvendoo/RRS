@@ -25,10 +25,18 @@
 #include <utility>
 #include <vector>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Аэродинамика тоннеля для единицы ПС
 //------------------------------------------------------------------------------
-class TunnelAerodynamics
+class VEHICLE_EXPORT TunnelAerodynamics
 {
 public:
 

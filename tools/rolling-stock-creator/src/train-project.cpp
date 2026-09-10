@@ -65,6 +65,7 @@ bool TrainProject::load(const QString& file_path, QString* error)
                     object.value(QStringLiteral("displayName")).toString();
             node.visible =
                     object.value(QStringLiteral("visible")).toBool(true);
+            node.tag = object.value(QStringLiteral("tag")).toString();
             nodes.push_back(node);
         }
     }
@@ -106,7 +107,7 @@ bool TrainProject::load(const QString& file_path, QString* error)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool TrainProject::save(const QString& file_path, QString* error) const
+bool TrainProject::save(const QString& file_path, QString* error)
 {
     QJsonObject root;
     root.insert(QStringLiteral("version"), 1);
@@ -124,6 +125,7 @@ bool TrainProject::save(const QString& file_path, QString* error) const
         object.insert(QStringLiteral("role"), node.roleKey);
         object.insert(QStringLiteral("displayName"), node.displayName);
         object.insert(QStringLiteral("visible"), node.visible);
+        object.insert(QStringLiteral("tag"), node.tag);
         nodes_array.append(object);
     }
 

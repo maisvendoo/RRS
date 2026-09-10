@@ -20,6 +20,7 @@ struct ProjectNode
     QString roleKey;         ///< Ключ игровой роли (mesh-roles.h)
     QString displayName;     ///< Display-имя объекта
     bool visible = true;     ///< Видимость меша
+    QString tag;             ///< Пользовательская метка узла (ТЗ п.32-34)
 };
 
 struct ExportSettings
@@ -36,7 +37,7 @@ public:
     bool load(const QString& file_path, QString* error = nullptr);
 
     /// Сохранить проект в JSON-файл
-    bool save(const QString& file_path, QString* error = nullptr) const;
+    bool save(const QString& file_path, QString* error = nullptr);
 
     /// Путь к файлу проекта (после load/save)
     const QString& filePath() const;

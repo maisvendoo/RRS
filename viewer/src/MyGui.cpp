@@ -1,4 +1,5 @@
 #include "MyGui.h"
+#include "CabElements.h"
 
 #include "Logger.h"
 #include "filesystem.h"
@@ -133,6 +134,9 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         showHUD();
     }
 
+    // Подсказка органа кабины под курсором (Alt удерживается)
+    showCabTooltip();
+
     // Диагностика составов (ТЗ "Промт статистики вагонов"):
     // F3 - вкл/выкл окна, F4 - свёрнутый/полный режим.
     // Камеры внешняя/свободная перенесены на Shift+F3/Shift+F4
@@ -223,6 +227,13 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     {
         showDebugMsg();
     }
+
+    // Предупреждение кассеты регистрации (ТЗ "Кассеты"): всплывает
+    // по центру экрана на ~5 с при вставке/извлечении (Ctrl+R)
+    showCassetteNotice();
+
+    // Автоподсказка посадки на сиденье (E)
+    drawWalkHint();
 
     if (params->is_no_controlled)
     {
@@ -419,7 +430,9 @@ void MyGui::showSettings() const
         ImGui::Checkbox("Set sun intensity manually", &(params->sun->use_gui_sun_intensity));
         if (params->sun->use_gui_sun_intensity)
         {
-            ImGui::SliderFloat("Sun intensity", &(params->sun->sun->intensity), 0.0f, 10.0f, "%.3f");
+            // Диапазон до 15: HDR-пресеты High/Ultra задают 10-12
+            // (ACES-тонмаппинг сжимает значения в LDR)
+            ImGui::SliderFloat("Sun intensity", &(params->sun->sun->intensity), 0.0f, 15.0f, "%.3f");
         }
         else
         {
@@ -462,6 +475,7 @@ void MyGui::showGraphicsSettings() const
         "Low",
         "High",
         "Ultra",
+        "Extreme",
         "Custom"
     };
 
@@ -471,7 +485,7 @@ void MyGui::showGraphicsSettings() const
                      preset_names, IM_ARRAYSIZE(preset_names)))
     {
         // Диапазон придерживаем на всякий случай
-        current_preset = std::clamp(current_preset, 0, 4);
+        current_preset = std::clamp(current_preset, 0, 5);
         params->graphics_preset_index = current_preset;
 
         if (params->route_viewer)
@@ -485,10 +499,123 @@ void MyGui::showGraphicsSettings() const
         }
     }
 
+    // Статусы тиров нового качества (ТЗ "Графика"): PBR и ACES-тонмаппинг
+    // определяются пресетом и «запекаются» в шейдер-сеты при старте —
+    // в GUI только чтение
+    ImGui::Text(u8"PBR-материалы: %s", params->graphics_use_pbr ? u8"вкл" : u8"выкл");
+    ImGui::Text(u8"ACES-тонмаппинг: %s", params->graphics_use_aces_tonemap ? u8"вкл" : u8"выкл");
+
+    // SSAO: флаг доступен только в Ultra. Сам пасс пост-обработки SSAO
+    // в VSG 1.1.x отсутствует и находится в разработке (см.
+    // graphics-settings.h), на картинку пока не влияет
+    const bool is_ultra =
+            (params->graphics_preset_index == static_cast<int>(gfx::Preset::Ultra));
+
+    bool ssao_enabled = params->graphics_use_ssao;
+
+    if (is_ultra)
+    {
+        if (ImGui::Checkbox(u8"SSAO (в разработке)", &ssao_enabled))
+        {
+            if (params->route_viewer)
+            {
+                params->route_viewer->setGraphicsSsaoEnabled(ssao_enabled);
+            }
+        }
+    }
+    else
+    {
+        ImGui::BeginDisabled(true);
+        ImGui::Checkbox(u8"SSAO", &ssao_enabled);
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+        ImGui::TextDisabled(u8"(только Ultra, в разработке)");
+    }
+
+    // Пост-процесс пресета Extreme (ТЗ "Графика"): Bloom/SSAO/SSR/Туман —
+    // реальные проходы цепочки, активны только на Extreme (образец
+    // блокировки — BeginDisabled, как у SSAO-чекбокса выше). Изменения
+    // применяются после перезапуска (цепочка собирается при старте)
+    const bool is_extreme =
+            (params->graphics_preset_index == static_cast<int>(gfx::Preset::Extreme));
+
+    bool bloom_enabled = params->graphics_use_bloom;
+    bool ssao_pass_enabled = params->graphics_use_ssao_pass;
+    bool fog_enabled = params->graphics_use_volumetric_fog;
+    bool ssr_enabled = params->graphics_use_ssr;
+    float postprocess_scale = params->graphics_postprocess_scale;
+
+    if (is_extreme)
+    {
+        if (ImGui::Checkbox(u8"Bloom", &bloom_enabled) && params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPostprocessFlag("use_bloom",
+                                                             bloom_enabled);
+        }
+
+        if (ImGui::Checkbox(u8"SSAO (пост-процесс)", &ssao_pass_enabled) && params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPostprocessFlag("use_ssao_pass",
+                                                             ssao_pass_enabled);
+        }
+
+        if (ImGui::Checkbox(u8"SSR (отражения)", &ssr_enabled) && params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPostprocessFlag("use_ssr",
+                                                             ssr_enabled);
+        }
+
+        if (ImGui::Checkbox(u8"Туман", &fog_enabled) && params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPostprocessFlag("use_volumetric_fog",
+                                                             fog_enabled);
+        }
+
+        if (ImGui::SliderFloat(u8"Масштаб пост-процесса", &postprocess_scale,
+                               0.5f, 1.0f, "%.2f") && params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPostprocessScale(postprocess_scale);
+        }
+    }
+    else
+    {
+        ImGui::BeginDisabled(true);
+        ImGui::Checkbox(u8"Bloom", &bloom_enabled);
+        ImGui::Checkbox(u8"SSAO (пост-процесс)", &ssao_pass_enabled);
+        ImGui::Checkbox(u8"SSR (отражения)", &ssr_enabled);
+        ImGui::Checkbox(u8"Туман", &fog_enabled);
+        ImGui::SliderFloat(u8"Масштаб пост-процесса", &postprocess_scale,
+                           0.5f, 1.0f, "%.2f");
+        ImGui::EndDisabled();
+        ImGui::TextDisabled(u8"(только Extreme)");
+    }
+
     if (params->graphics_needs_restart)
     {
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.3f, 1.0f));
         ImGui::TextWrapped(u8"Сглаживание и настройки теней применятся после перезапуска");
+        ImGui::PopStyleColor();
+    }
+
+    // PBR/ACES запекаются в пайплайн при старте: если смена пресета
+    // затронула HDR-тир, перезапуск обязателен (текст — по образцу
+    // сообщения про MSAA/тени выше)
+    if (params->graphics_needs_restart &&
+        ((params->graphics_preset_index == static_cast<int>(gfx::Preset::High)) ||
+         (params->graphics_preset_index == static_cast<int>(gfx::Preset::Ultra)) ||
+         (params->graphics_preset_index == static_cast<int>(gfx::Preset::Extreme)) ||
+         params->graphics_use_pbr || params->graphics_use_aces_tonemap))
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.3f, 1.0f));
+        ImGui::TextWrapped(u8"PBR и ACES-тонмаппинг применятся после перезапуска");
+        ImGui::PopStyleColor();
+    }
+
+    // Пост-процесс собирается в командный граф при старте
+    if (params->graphics_needs_restart && params->graphics_use_postprocess)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.3f, 1.0f));
+        ImGui::TextWrapped(u8"Пост-процесс применится после перезапуска");
         ImGui::PopStyleColor();
     }
 }
@@ -700,10 +827,122 @@ void MyGui::showDiagnostics() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::drawWalkHint() const
+{
+    if (params->walk_hint.isEmpty())
+        return;
+
+    const std::string text = params->walk_hint.toStdString();
+    const char* c_text = text.c_str();
+
+    ImVec2 text_size = ImGui::CalcTextSize(c_text);
+
+    ImGuiIO& io = ImGui::GetIO();
+    const float w = text_size.x + 30.0f;
+    const float h = text_size.y + 14.0f;
+
+    ImGui::SetNextWindowPos(ImVec2((io.DisplaySize.x - w) / 2.0f,
+                                   io.DisplaySize.y * 0.62f));
+    ImGui::SetNextWindowSize(ImVec2(w, h));
+
+    ImGuiWindowFlags flags = 0;
+    flags |= ImGuiWindowFlags_NoTitleBar;
+    flags |= ImGuiWindowFlags_NoResize;
+    flags |= ImGuiWindowFlags_NoCollapse;
+    flags |= ImGuiWindowFlags_NoInputs;
+    flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg,
+                          ImVec4(0.05f, 0.25f, 0.10f, 0.85f));
+    ImGui::Begin(u8"Подсказка", &open_ptr, flags);
+    ImGui::PopStyleColor();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 1.0f, 0.9f, 1.0f));
+    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - text_size.x) * 0.5f);
+    ImGui::TextUnformatted(c_text);
+    ImGui::PopStyleColor();
+    ImGui::End();
+}
+
+void MyGui::showCassetteNotice() const
+{
+    if (!params->vehicles_handler)
+    {
+        return;
+    }
+
+    const quint32 notice_id = params->vehicles_handler->getCassetteNoticeId();
+
+    if (notice_id == 0 || notice_id == prev_cassette_notice_id)
+    {
+        // Показ ещё активного предупреждения (таймер затухания)
+        if (notice_shown_until > ImGui::GetTime() && !cassette_notice_text.isEmpty())
+        {
+            drawCassetteNotice(cassette_notice_text);
+        }
+        return;
+    }
+
+    // Новое предупреждение от симулятора
+    prev_cassette_notice_id = notice_id;
+    cassette_notice_text = params->vehicles_handler->getCassetteNotice();
+    notice_shown_until = ImGui::GetTime() + 5.0;
+
+    if (!cassette_notice_text.isEmpty())
+    {
+        drawCassetteNotice(cassette_notice_text);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::drawCassetteNotice(const QString& text) const
+{
+    const std::string std_text = text.toStdString();
+    const char* c_text = std_text.c_str();
+
+    ImVec2 text_size = ImGui::CalcTextSize(c_text);
+
+    ImGuiIO& io = ImGui::GetIO();
+    const float w = text_size.x + 40.0f;
+    const float h = text_size.y + 24.0f;
+
+    ImGui::SetNextWindowPos(ImVec2((io.DisplaySize.x - w) / 2.0f,
+                                   io.DisplaySize.y * 0.22f));
+    ImGui::SetNextWindowSize(ImVec2(w, h));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoInputs;
+    window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.55f, 0.05f, 0.05f, 0.85f));
+    ImGui::Begin(u8"Предупреждение", &open_ptr, window_flags);
+    ImGui::PopStyleColor();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    // Текст по центру строки
+    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - text_size.x) * 0.5f);
+    ImGui::TextUnformatted(c_text);
+
+    ImGui::PopStyleColor();
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MyGui::showNoControlled() const
 {
-    const char *text = "Нажмите Enter для управления данной ПЕ";
-    ImVec2 text_size = ImGui::CalcTextSize(text);
+    const char *text = "Нажмите Enter для управления данной ПЕ";    ImVec2 text_size = ImGui::CalcTextSize(text);
 
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(text_size.x + 20, text_size.y + 20));
@@ -1048,4 +1287,53 @@ void MyGui::check_date_time() const
         --params->year;
         params->month = 12;
     }
+}
+
+//------------------------------------------------------------------------------
+// Подсказка органа кабины (Alt): имя, назначение, состояние
+//------------------------------------------------------------------------------
+void MyGui::showCabTooltip() const
+{
+    const CabTooltipState& tip = cabTooltip();
+
+    if (!tip.active)
+    {
+        return;
+    }
+
+    const float pad = 12.0f;
+    const ImVec2 pos(tip.x + pad, tip.y + pad);
+
+    ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
+    ImGui::SetNextWindowBgAlpha(0.85f);
+
+    const int flags = ImGuiWindowFlags_NoTitleBar |
+                      ImGuiWindowFlags_NoResize |
+                      ImGuiWindowFlags_NoMove |
+                      ImGuiWindowFlags_NoCollapse |
+                      ImGuiWindowFlags_AlwaysAutoResize |
+                      ImGuiWindowFlags_NoSavedSettings |
+                      ImGuiWindowFlags_NoNav |
+                      ImGuiWindowFlags_NoFocusOnAppearing;
+
+    if (ImGui::Begin("##cab_tooltip", nullptr, flags))
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.85f, 0.4f, 1.0f));
+        ImGui::TextUnformatted(tip.title.c_str());
+        ImGui::PopStyleColor();
+
+        // Только название прибора + что произойдёт при нажатии:
+        // расширенные пояснения (Hint) убраны как неактуальные
+        if (!tip.state_text.empty())
+        {
+            ImGui::TextDisabled("%s", tip.state_text.c_str());
+        }
+
+        if (!tip.action_text.empty())
+        {
+            ImGui::TextDisabled("%s", tip.action_text.c_str());
+        }
+    }
+
+    ImGui::End();
 }

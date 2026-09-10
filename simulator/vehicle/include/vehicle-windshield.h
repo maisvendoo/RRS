@@ -26,10 +26,18 @@
 #include    <cstdint>
 #include    <vector>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Лобовое стекло кабины
 //------------------------------------------------------------------------------
-class WindshieldSystem
+class VEHICLE_EXPORT WindshieldSystem
 {
 public:
 

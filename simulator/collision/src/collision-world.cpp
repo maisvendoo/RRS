@@ -206,22 +206,21 @@ struct LayerPairMatrix
         allow(Layer::Track, Layer::Bogie);
         allow(Layer::Track, Layer::Train);
 
-        // Инфраструктура
-        allow(Layer::Infrastructure, Layer::Train);
-        allow(Layer::Infrastructure, Layer::Bogie);
-        allow(Layer::Infrastructure, Layer::Wheel);
+        // Инфраструктура: с ПС НЕ контактирует - придорожные объекты
+        // (опоры, столбики, здания) стоят по сетке без учёта кривых и
+        // могут задевать габарит при нормальном следовании; контакт
+        // остаётся только для игрока (пешех mode) и автотранспорта
         allow(Layer::Infrastructure, Layer::RoadVehicle);
         allow(Layer::Infrastructure, Layer::Player);
 
-        // Контактная сеть (пантографы - часть слоя Train)
-        allow(Layer::ContactNetwork, Layer::Train);
+        // Контактная сеть: с ПС не контактирует (провода без
+        // коллайдеров, токосъём считается логикой, не физикой)
 
         // Декорации
         allow(Layer::Decoration, Layer::RoadVehicle);
         allow(Layer::Decoration, Layer::Player);
 
-        // Растительность
-        allow(Layer::Vegetation, Layer::Train);
+        // Растительность: деревья/кусты ПС не останавливают
         allow(Layer::Vegetation, Layer::RoadVehicle);
         allow(Layer::Vegetation, Layer::Player);
 
@@ -320,7 +319,7 @@ private:
         event.layer_a = static_cast<Layer>(body1.GetObjectLayer());
         event.layer_b = static_cast<Layer>(body2.GetObjectLayer());
 
-        const JPH::Vec3 normal = manifold.GetWorldSpaceNormal();
+        const JPH::Vec3 normal = manifold.mWorldSpaceNormal;
         event.normal = Vec3f(normal.GetX(), normal.GetY(), normal.GetZ());
         event.penetration = manifold.mPenetrationDepth;
 

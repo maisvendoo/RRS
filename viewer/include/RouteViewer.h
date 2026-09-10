@@ -1,8 +1,10 @@
 #ifndef ROUTE_VIEWER_H
 #define ROUTE_VIEWER_H
 
+#include "Sun.h"
 #include "settings.h"
 #include "graphics-settings.h"
+#include <vsg/nodes/Group.h>
 
 #include <vsg/core/ref_ptr.h>
 #include <memory>
@@ -15,7 +17,6 @@ struct GUIParams;
 class  QByteArray;
 class  ScreenshotWriter;
 class  SoundManager;
-class  Sun;
 class  TcpClient;
 class  TrafficLightsHandler;
 class  UpdateViewerHandler;
@@ -28,16 +29,24 @@ namespace vsg
 class AmbientLight;
 class Camera;
 class CommandGraph;
-class Group;
 class LookAt;
 class Options;
 class RegionOfInterest;
 class ShadowSettings;
+class SpotLight;
 class View;
 class Viewer;
 class Window;
 class WindowTraits;
 class PhysicalDevice;
+
+}
+
+namespace graphics
+{
+
+class ParticleSystem;
+class PostProcessChain;
 
 }
 
@@ -67,6 +76,21 @@ public:
     /// Требуется ли перезапуск для полного применения пресета
     bool isGraphicsRestartRequired() const;
 
+    /// Включение/выключение SSAO-флага пресета (Ultra). Флаг
+    /// декларативный: пасс пост-обработки SSAO в VSG 1.1.x отсутствует
+    /// и находится в разработке (см. комментарий к use_ssao
+    /// в graphics-settings.h), на картинку пока не влияет
+    void setGraphicsSsaoEnabled(bool enabled);
+
+    /// Включение/выключение эффекта пост-процесса пресета Extreme
+    /// (use_bloom/use_ssao_pass/use_volumetric_fog). Цепочка
+    /// собирается при старте — изменение требует перезапуска
+    void setGraphicsPostprocessFlag(const std::string& name, bool enabled);
+
+    /// Масштаб пост-процесса (0.5-1.0, только Extreme): разрешение
+    /// offscreen-буфера сцены. Применяется после перезапуска
+    void setGraphicsPostprocessScale(double scale);
+
 private:
     void loadSettings();
     void loadNetworkSettings(CfgReader& cfg, const QString& section);
@@ -79,6 +103,7 @@ private:
     void loadCabineCameraSettings(CfgReader& cfg, const QString& section);
     void loadExternalCameraSettings(CfgReader& cfg, const QString& section);
     void loadFollowCameraSettings(CfgReader& cfg, const QString& section);
+    void loadWalkCameraSettings(CfgReader& cfg, const QString& section);
     void loadGraphicsSettings(CfgReader& cfg, const QString& section);
 
     void configureLogLevel() const;
@@ -98,8 +123,16 @@ private:
     /// Перенос QualityParams в settings_t (сэмплы, тени, дистанция, LOD)
     void applyGraphicsQualityParams();
 
+    /// Обновление статусов тиров нового качества (PBR/ACES/SSAO) в GUI
+    void updateGraphicsTierGuiParams();
+
     /// Сохранение выбранного пресета в settings.xml (ключ GraphicsPreset)
     void saveGraphicsPresetToConfig(const std::string& preset_name);
+
+    /// Сохранение настроек пост-процесса Extreme в settings.xml
+    /// (PostprocessScale/PostprocessBloom/PostprocessSsao/
+    /// PostprocessFog/Ssr)
+    void savePostprocessSettingsToConfig() const;
 
     /// Обновление дальности видимости на лету (дальняя плоскость камеры)
     void applyViewDistance(double distance_m);
@@ -111,11 +144,23 @@ private:
     /// Динамическое качество: время кадра в ядро настроек (ТЗ)
     void adaptGraphicsQuality(double frame_ms);
 
+    /// Адаптивный масштаб пост-процесса (только Extreme, ТЗ "Графика"):
+    /// FPS < 30 в течение 3 с — postprocess_scale -0.1 (мин 0.4),
+    /// FPS > 55 в течение 5 с — +0.1 (макс 1.0). Offscreen-таргеты
+    /// цепочки пересоздаются через существующий механизм needs_restart
+    void adaptPostProcessScale(double frame_ms);
+
     void initLights();
     void configureShaders();
 
     void initView();
     void initCommandGraph();
+
+    /// Альтернативный командный граф пресета Extreme (use_postprocess):
+    /// offscreen-сцена -> проходы эффектов PostProcessChain -> финальный
+    /// квад + ImGui в главном RenderGraph окна
+    void initPostProcessCommandGraph();
+
     void initViewer();
 
     void initTcpClient();
@@ -170,6 +215,16 @@ private:
     vsg::ref_ptr<WorldCulling>           world_culling;
     vsg::ref_ptr<AnimatedDatabasePager>  database_pager;
 
+    /// Динамический свет фар (ТЗ "Частицы", High+): создаётся в
+    /// initLights только на пресетах High/Ultra/Extreme, позиция/
+    /// направление обновляются VehiclesHandler::step
+    vsg::ref_ptr<vsg::SpotLight>         headlight;
+
+    /// Частицы (High+): дым/пар из выхлопной трубы и брызги из-под
+    /// колёс. На Legacy/Low не создаются вовсе
+    std::unique_ptr<graphics::ParticleSystem> smoke_particles;
+    std::unique_ptr<graphics::ParticleSystem> splash_particles;
+
     //--------- Настройки графики (ТЗ "Графика") ---------
     gfx::GraphicsSettings graphics_settings;    ///< Ядро пресетов качества
 
@@ -188,6 +243,31 @@ private:
     bool startup_shadow = false;
     int startup_shadow_cascade = 1;
     int startup_shadow_resolution = 1;
+
+    /// PBR/ACES-тир «запечён» в шейдер-сеты при старте: смена пресета
+    /// в/из High/Ultra требует перезапуска (шейдеры пересобираются
+    /// только при инициализации)
+    bool startup_hdr_tier = false;
+
+    /// Пост-процессинговая цепочка «запекается» в командный граф при
+    /// старте (шейдеры/буферы проходов): смена в/из Extreme и переключение
+    /// эффектов требуют перезапуска
+    bool startup_postprocess = false;
+
+    /// Динамический свет/частицы (ТЗ "Частицы") «запекаются» при старте:
+    /// фары-прожектор и пулы частиц создаются только на High/Ultra/
+    /// Extreme, смена тиры требует перезапуска
+    bool startup_dynamic_fx = false;
+
+    /// Цепочка пост-обработки пресета Extreme (создаётся только в ветке
+    /// use_postprocess; прочие пресеты не трогают её вовсе)
+    std::unique_ptr<graphics::PostProcessChain> postprocess;
+
+    /// Адаптивный масштаб пост-процесса: накопленное время устойчиво
+    /// низкого (<30) и высокого (>55) FPS; между порогами — гистерезис
+    /// (обоих счётчика нулируются, качество не меняется)
+    double postprocess_low_fps_time_ms = 0.0;
+    double postprocess_high_fps_time_ms = 0.0;
 
     void checkPhysicalDeviceProperties();
 };

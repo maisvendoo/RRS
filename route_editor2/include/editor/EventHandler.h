@@ -1,6 +1,8 @@
 #ifndef EDITOR_EVENT_HANDLER_H
 #define EDITOR_EVENT_HANDLER_H
 
+#include "editor/Gizmo.h"
+
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/core/ref_ptr.h>
@@ -33,6 +35,12 @@ class ScrollWheelEvent;
  * Q/E — вниз/вверх, колесо — зум (Ctrl+колесо — скорость),
  * ЛКМ — выбор объектов, Delete — удаление,
  * Ctrl+Z/Ctrl+Y — undo/redo, Ctrl+S — сохранение route1.map.
+ *
+ * Команды берутся из таблицы переназначаемых клавиш
+ * (context.key_bindings, окно «Клавиши»); P/Esc режима «Пути»
+ * и клавиши инструментов G/R/T (гизмо), M (измерение),
+ * N (новый путь), Backspace (удалить точку пути),
+ * X/[/] (привязка к сетке) остались прямыми.
  */
 class EventHandler : public vsg::Inherit<vsg::Visitor, EventHandler>
 {
@@ -63,6 +71,27 @@ public:
 private:
     void handle_shortcuts(vsg::KeyPressEvent& keyPress);
 
+    /// Захват следующей клавиши для назначения (окно «Клавиши»)
+    void capture_key_binding(vsg::KeyPressEvent& keyPress);
+
+    /// Фокус камеры на выделении (клавиша F, промт п.47)
+    void focus_on_selection();
+
+    /// Переключение гизмо по циклу translate -> rotate -> scale -> off
+    void cycle_gizmo();
+
+    /// Прямой выбор режима гизмо (клавиши по таблице привязок)
+    void set_gizmo_mode(GizmoMode mode);
+
+    /// Начать отслеживание рамки выделения (зажатие ЛКМ)
+    void start_selection_rect(const vsg::ButtonPressEvent& buttonPress);
+
+    /// Завершить рамку выделения (отпускание ЛКМ)
+    void finish_selection_rect();
+
+    /// Выделить объекты, чьи центры попали в рамку
+    void select_objects_in_rect(bool ctrl_add);
+
     void update_camera_vectors();
 
     void move_camera();
@@ -75,6 +104,9 @@ private:
     bool is_lmb_pressed_ = false;
     bool is_mmb_pressed_ = false;
     bool is_rmb_pressed_ = false;
+
+    /// Ctrl был зажат в момент начала рамки выделения (добавление)
+    bool rect_ctrl_add_ = false;
 
     vsg::ivec2 mouse_pos_ = {0, 0};
     vsg::ivec2 delta_mouse_pos_ = {0, 0};

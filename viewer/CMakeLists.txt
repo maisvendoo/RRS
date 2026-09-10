@@ -54,12 +54,17 @@ target_link_libraries(${TARGET} PRIVATE
     graphics-core
     core
     io-controller
+    # Пешая ходьба (ТЗ "walking"): физика игрока + мир коллизий
+    player
+    collision
 )
 
 target_include_directories(${TARGET} PRIVATE
     ../common-headers
     ../sound-manager/include
     ../simulator/graphics-core/include
+    ../simulator/player/include
+    ../simulator/collision/include
     display/include
     ./include
 )

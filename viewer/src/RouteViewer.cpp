@@ -21,6 +21,8 @@
 #include "graphics/common.h"
 #include "sound-manager.h"
 #include "tcp-client.h"
+#include "graphics/particles.h"
+#include "graphics/postprocess.h"
 #include "graphics/shader_funcs.h"
 
 #include <vsg/app/CloseHandler.h>
@@ -35,6 +37,7 @@
 #include <vsg/lighting/DirectionalLight.h>
 #include <vsg/lighting/HardShadows.h>
 #include <vsg/lighting/SoftShadows.h>
+#include <vsg/lighting/SpotLight.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
@@ -157,6 +160,13 @@ void RouteViewer::initialize(int argc, char* argv[])
     LOG_INFO("Created TcpClient");
 
     sound_manager = std::make_unique<SoundManager>();
+
+    if (!settings.sound_enabled)
+    {
+        sound_manager->setEnabled(false);
+        LOG_INFO("Sound disabled by settings.xml (Sound/Enabled=0)");
+    }
+
     LOG_INFO("Created SoundManager");
 
     screenshot_writer = std::make_unique<ScreenshotWriter>("screenshot.jpg");
@@ -314,6 +324,13 @@ void RouteViewer::loadSettings()
         loadCabineCameraSettings(cfg, section);
         loadExternalCameraSettings(cfg, section);
         loadFollowCameraSettings(cfg, section);
+        loadWalkCameraSettings(cfg, section);
+
+        // Звук: Sound/Enabled=0 - полная тишина (отладка без звука)
+        section = "Sound";
+        int sound_enabled = 1;
+        cfg.getInt(section, "Enabled", sound_enabled);
+        settings.sound_enabled = (sound_enabled != 0);
     }
 }
 
@@ -397,6 +414,18 @@ static VkSampleCountFlags samples_bit_flag(int s)
     {
         return VK_SAMPLE_COUNT_1_BIT;
     }
+}
+
+//------------------------------------------------------------------------------
+// Тира динамических эффектов (ТЗ "Частицы"): фары-прожектор, частицы
+// дыма/брызг и модуляция ambient тенями облаков создаются ТОЛЬКО на
+// High/Ultra/Extreme. Custom (=5) и Legacy/Low не включают их вовсе
+//------------------------------------------------------------------------------
+static bool preset_high_tier(gfx::Preset preset)
+{
+    return (preset == gfx::Preset::High) ||
+           (preset == gfx::Preset::Ultra) ||
+           (preset == gfx::Preset::Extreme);
 }
 
 //------------------------------------------------------------------------------
@@ -643,10 +672,19 @@ void RouteViewer::initGraphicsSettings(const vsg::PhysicalDevice* physDev)
     startup_shadow_cascade = settings.shadow_cascade;
     startup_shadow_resolution = settings.shadow_resolution;
 
+    // PBR/ACES-тир запекается в шейдер-сеты при старте (configureShaders)
+    const gfx::QualityParams& startup_params = graphics_settings.getParams();
+    startup_hdr_tier = (startup_params.use_pbr && startup_params.use_aces_tonemap);
+
+    // Пост-процессинговая цепочка Extreme запекается в командный граф
+    // при старте (initCommandGraph)
+    startup_postprocess = startup_params.use_postprocess;
+
     graphics_needs_restart = false;
 
     // Настройки для GUI
     GUIparams->graphics_preset_index = static_cast<int>(graphics_settings.getPreset());
+    updateGraphicsTierGuiParams();
 }
 
 //------------------------------------------------------------------------------
@@ -665,6 +703,9 @@ void RouteViewer::applyGraphicsQualityParams()
         settings.view_distance = user_settings.view_distance;
         settings.cullingScreenHeightRatio = user_settings.cullingScreenHeightRatio;
         settings.targetPagedLODs = user_settings.targetPagedLODs;
+        // Пресетные HDR-значения тоже возвращаем к пользовательским
+        settings.sun_intensity = user_settings.sun_intensity;
+        settings.shadow_distance = user_settings.shadow_distance;
         return;
     }
 
@@ -678,6 +719,19 @@ void RouteViewer::applyGraphicsQualityParams()
     settings.shadow = params.shadows;
     settings.shadow_cascade = params.shadow_cascades;
     settings.shadow_resolution = std::min(params.shadow_resolution, gpu_max_texture_size);
+
+    // Новый тиры High/Ultra (ТЗ "Графика"): HDR-интенсивность солнца
+    // под ACES-тонмаппинг и дистанция теней пресета (150/300 м).
+    // Значения <=0 (Legacy/Low) не трогают пользовательские настройки
+    if (params.sun_intensity > 0.0)
+    {
+        settings.sun_intensity = params.sun_intensity;
+    }
+
+    if (params.shadow_distance_m > 0.0)
+    {
+        settings.shadow_distance = params.shadow_distance_m;
+    }
 
     // Дальность видимости: масштабируем пользовательское значение
     // от базы (текущий дефолт настроек 2000 м), но не уменьшаем его
@@ -712,6 +766,13 @@ void RouteViewer::applyGraphicsQualityParams()
         settings.targetPagedLODs = 96000;
         break;
 
+    case gfx::Preset::Extreme:
+        // Как Ultra: детальный LOD, пост-процесс цепочки не влияет
+        // на агрессивность куллинга
+        settings.cullingScreenHeightRatio = 0.002;
+        settings.targetPagedLODs = 96000;
+        break;
+
     case gfx::Preset::Custom:
         break;
     }
@@ -736,7 +797,7 @@ void RouteViewer::saveGraphicsPresetToConfig(const std::string& preset_name)
     }
 
     QDomDocument doc;
-    const bool is_parsed = doc.setContent(&file);
+    const bool is_parsed = static_cast<bool>(doc.setContent(&file));
     file.close();
 
     if (!is_parsed || doc.documentElement().tagName() != "Config")
@@ -856,6 +917,98 @@ void RouteViewer::adaptGraphicsQuality(double frame_ms)
     {
         applyViewDistance(settings.view_distance * (new_distance / prev_distance));
     }
+
+    // Адаптивный масштаб пост-процесса (только Extreme, ТЗ "Графика")
+    adaptPostProcessScale(frame_ms);
+}
+
+//------------------------------------------------------------------------------
+// Адаптивный масштаб пост-процесса (только Extreme): при FPS < 30
+// в течение 3 с — postprocess_scale -0.1 (мин 0.4), при FPS > 55
+// в течение 5 с — +0.1 (макс 1.0); между порогами — гистерезис.
+//
+// Offscreen-таргеты цепочки (image/view/framebuffer проходов) имеют
+// фиксированный extent и «запекаются» при старте, поэтому пересоздаём
+// их через существующий механизм needs_restart: значение уже в
+// settings и сохранено в конфиг — перезапуск подхватит его без
+// участия пользователя
+//------------------------------------------------------------------------------
+void RouteViewer::adaptPostProcessScale(double frame_ms)
+{
+    // Только живая цепочка Extreme: у прочих пресетов postprocess == nullptr
+    if (!postprocess || !graphics_settings.getParams().use_postprocess ||
+        (frame_ms <= 0.0))
+    {
+        postprocess_low_fps_time_ms = 0.0;
+        postprocess_high_fps_time_ms = 0.0;
+        return;
+    }
+
+    // Пользовательский лимит FPS не выше порога роста: адаптация
+    // боролась бы с сознательным ограничением кадровой частоты
+    if ((settings.max_fps > 0) && (settings.max_fps <= 55))
+    {
+        postprocess_low_fps_time_ms = 0.0;
+        postprocess_high_fps_time_ms = 0.0;
+        return;
+    }
+
+    constexpr double LOW_FPS = 30.0;
+    constexpr double HIGH_FPS = 55.0;
+    constexpr double LOW_FPS_HOLD_MS = 3000.0;
+    constexpr double HIGH_FPS_HOLD_MS = 5000.0;
+    constexpr double SCALE_STEP = 0.1;
+    constexpr double SCALE_MIN = 0.4;
+    constexpr double SCALE_MAX = 1.0;
+
+    const double fps = 1000.0 / frame_ms;
+    double new_scale = settings.postprocess_scale;
+
+    if (fps < LOW_FPS)
+    {
+        postprocess_low_fps_time_ms += frame_ms;
+        postprocess_high_fps_time_ms = 0.0;
+
+        if (postprocess_low_fps_time_ms >= LOW_FPS_HOLD_MS)
+        {
+            postprocess_low_fps_time_ms = 0.0;
+            new_scale = std::max(SCALE_MIN, new_scale - SCALE_STEP);
+        }
+    }
+    else if (fps > HIGH_FPS)
+    {
+        postprocess_high_fps_time_ms += frame_ms;
+        postprocess_low_fps_time_ms = 0.0;
+
+        if (postprocess_high_fps_time_ms >= HIGH_FPS_HOLD_MS)
+        {
+            postprocess_high_fps_time_ms = 0.0;
+            new_scale = std::min(SCALE_MAX, new_scale + SCALE_STEP);
+        }
+    }
+    else
+    {
+        // Зона гистерезиса 30..55 FPS — качество не меняем
+        postprocess_low_fps_time_ms = 0.0;
+        postprocess_high_fps_time_ms = 0.0;
+    }
+
+    if (std::abs(new_scale - settings.postprocess_scale) < 1.0e-6)
+    {
+        return;
+    }
+
+    settings.postprocess_scale = new_scale;
+    GUIparams->graphics_postprocess_scale = static_cast<float>(new_scale);
+
+    // Пересоздание offscreen-таргетов — механизмом needs_restart;
+    // значение сохраняем, чтобы перезапуск применил его автоматически
+    graphics_needs_restart = true;
+    GUIparams->graphics_needs_restart = true;
+    savePostprocessSettingsToConfig();
+
+    LOG_WARN("Adaptive quality: postprocess scale %.2f (FPS %.0f)",
+             settings.postprocess_scale, fps);
 }
 
 //------------------------------------------------------------------------------
@@ -864,6 +1017,186 @@ void RouteViewer::adaptGraphicsQuality(double frame_ms)
 gfx::Preset RouteViewer::getGraphicsPreset() const
 {
     return graphics_settings.getPreset();
+}
+
+//------------------------------------------------------------------------------
+// Статусы тиров нового качества (PBR/ACES/SSAO/пост-процесс) для GUI
+//------------------------------------------------------------------------------
+void RouteViewer::updateGraphicsTierGuiParams()
+{
+    const gfx::QualityParams& params = graphics_settings.getParams();
+
+    GUIparams->graphics_use_pbr = params.use_pbr;
+    GUIparams->graphics_use_aces_tonemap = params.use_aces_tonemap;
+    GUIparams->graphics_use_ssao = params.use_ssao;
+    GUIparams->graphics_use_postprocess = params.use_postprocess;
+
+    // Эффективное состояние эффектов: флаг пресета + пользовательский
+    // переключатель из settings.xml (совпадает с конфигурацией цепочки)
+    GUIparams->graphics_use_bloom =
+            params.use_bloom && settings.postprocess_bloom;
+    GUIparams->graphics_use_ssao_pass =
+            params.use_ssao_pass && settings.postprocess_ssao;
+    GUIparams->graphics_use_volumetric_fog =
+            params.use_volumetric_fog && settings.postprocess_fog;
+    GUIparams->graphics_use_ssr =
+            params.use_ssr && settings.postprocess_ssr;
+    GUIparams->graphics_postprocess_scale =
+            static_cast<float>(settings.postprocess_scale);
+}
+
+//------------------------------------------------------------------------------
+// Флаг SSAO (только Ultra). Декларативный: пасс пост-обработки SSAO
+// в VSG 1.1.x отсутствует и находится в разработке, на картинку
+// пока не влияет (см. комментарий к use_ssao в graphics-settings.h)
+//------------------------------------------------------------------------------
+void RouteViewer::setGraphicsSsaoEnabled(bool enabled)
+{
+    graphics_settings.setParam("use_ssao", enabled ? 1 : 0);
+    updateGraphicsTierGuiParams();
+
+    LOG_INFO("SSAO flag %s (pass is not implemented yet)",
+             enabled ? "enabled" : "disabled");
+}
+
+//------------------------------------------------------------------------------
+// Флаг эффекта пост-процесса (только Extreme): Bloom/SSAO/SSR/Туман.
+// Цепочка (шейдеры/буферы проходов) собирается при старте, поэтому
+// изменение применяется после перезапуска; флаг сохраняется в конфиг
+//------------------------------------------------------------------------------
+void RouteViewer::setGraphicsPostprocessFlag(const std::string& name,
+                                             bool enabled)
+{
+    // Пользовательское значение в settings (переживает перезапуск)
+    if (name == "use_bloom")
+    {
+        settings.postprocess_bloom = enabled;
+    }
+    else if (name == "use_ssao_pass")
+    {
+        settings.postprocess_ssao = enabled;
+    }
+    else if (name == "use_volumetric_fog")
+    {
+        settings.postprocess_fog = enabled;
+    }
+    else if (name == "use_ssr")
+    {
+        settings.postprocess_ssr = enabled;
+    }
+    else
+    {
+        LOG_WARN("Unknown post-process flag: %s", name.c_str());
+        return;
+    }
+
+    // Сессионное значение ядра (статусы GUI)
+    graphics_settings.setParam(name, enabled ? 1 : 0);
+
+    graphics_needs_restart = true;
+    GUIparams->graphics_needs_restart = true;
+    updateGraphicsTierGuiParams();
+    savePostprocessSettingsToConfig();
+
+    LOG_INFO("Post-process %s %s (restart required)", name.c_str(),
+             enabled ? "enabled" : "disabled");
+}
+
+//------------------------------------------------------------------------------
+// Масштаб пост-процесса (0.5-1.0, только Extreme): разрешение
+// offscreen-буфера сцены. Применяется после перезапуска, сохраняется
+// в конфиг
+//------------------------------------------------------------------------------
+void RouteViewer::setGraphicsPostprocessScale(double scale)
+{
+    settings.postprocess_scale = std::clamp(scale, 0.5, 1.0);
+
+    graphics_needs_restart = true;
+    GUIparams->graphics_needs_restart = true;
+    updateGraphicsTierGuiParams();
+    savePostprocessSettingsToConfig();
+
+    LOG_INFO("Post-process scale %.2f (restart required)",
+             settings.postprocess_scale);
+}
+
+//------------------------------------------------------------------------------
+// Сохранение настроек пост-процесса в settings.xml (по образцу
+// saveGraphicsPresetToConfig: секция Viewer, текстовые элементы)
+//------------------------------------------------------------------------------
+void RouteViewer::savePostprocessSettingsToConfig() const
+{
+    const FileSystem& fs = FileSystem::getInstance();
+    const QString cfg_path = QString::fromStdString(
+        fs.getConfigDir() + fs.separator() + "settings.xml");
+
+    QFile file(cfg_path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        LOG_WARN("Fail to open settings.xml for writing post-process settings");
+        return;
+    }
+
+    QDomDocument doc;
+    const bool is_parsed = static_cast<bool>(doc.setContent(&file));
+    file.close();
+
+    if (!is_parsed || doc.documentElement().tagName() != "Config")
+    {
+        LOG_WARN("Fail to parse settings.xml for writing post-process settings");
+        return;
+    }
+
+    QDomElement root = doc.documentElement();
+
+    QDomElement section = root.firstChildElement("Viewer");
+    if (section.isNull())
+    {
+        section = doc.createElement("Viewer");
+        root.appendChild(section);
+    }
+
+    const auto set_field = [&doc, &section](const char* field_name,
+                                            const QString& value)
+    {
+        QDomElement field = section.firstChildElement(field_name);
+        if (field.isNull())
+        {
+            field = doc.createElement(field_name);
+            section.appendChild(field);
+        }
+
+        QDomText text_node = field.firstChild().toText();
+        if (text_node.isNull())
+        {
+            text_node = doc.createTextNode(value);
+            field.appendChild(text_node);
+        }
+        else
+        {
+            text_node.setData(value);
+        }
+    };
+
+    set_field("PostprocessScale",
+              QString::number(settings.postprocess_scale, 'f', 2));
+    set_field("PostprocessBloom",
+              settings.postprocess_bloom ? "true" : "false");
+    set_field("PostprocessSsao",
+              settings.postprocess_ssao ? "true" : "false");
+    set_field("PostprocessFog",
+              settings.postprocess_fog ? "true" : "false");
+    set_field("Ssr",
+              settings.postprocess_ssr ? "true" : "false");
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+    {
+        LOG_WARN("Fail to write post-process settings to settings.xml");
+        return;
+    }
+
+    file.write(doc.toString().toUtf8());
+    file.close();
 }
 
 //------------------------------------------------------------------------------
@@ -897,16 +1230,36 @@ void RouteViewer::setGraphicsPreset(gfx::Preset preset, bool save_to_config)
         database_pager->targetMaxNumPagedLODWithHighResSubgraphs = settings.targetPagedLODs;
     }
 
+    // Тени от облаков (ТЗ "Частицы"): модуляция ambient пересчитывается
+    // каждый кадр в Sun::update, поэтому переключается на лету.
+    // При уходе с High+ ambient возвращается к немодулированному значению
+    if (sun)
+    {
+        sun->cloud_shadows = preset_high_tier(preset);
+    }
+
     // --- Требующие пересоздания окна/пайплайна: применится после перезапуска ---
+    // PBR/ACES-тир запечён в шейдер-сеты при старте (configureShaders),
+    // поэтому переход в/из High/Ultra тоже требует перезапуска.
+    // Пост-процессинговая цепочка Extreme собирается в командный граф
+    // при старте — её включение/выключение тоже требует перезапуска.
+    // Фары/частицы (ТЗ "Частицы") запекаются в сцену при старте — так же
+    const gfx::QualityParams& new_params = graphics_settings.getParams();
+    const bool new_hdr_tier = (new_params.use_pbr && new_params.use_aces_tonemap);
+
     graphics_needs_restart =
         (settings.samples != startup_samples) ||
         (settings.shadow != startup_shadow) ||
         (settings.shadow_cascade != startup_shadow_cascade) ||
-        (settings.shadow_resolution != startup_shadow_resolution);
+        (settings.shadow_resolution != startup_shadow_resolution) ||
+        (new_hdr_tier != startup_hdr_tier) ||
+        (new_params.use_postprocess != startup_postprocess) ||
+        (preset_high_tier(preset) != startup_dynamic_fx);
 
     settings.graphics_preset = gfx::presetToString(preset);
     GUIparams->graphics_preset_index = static_cast<int>(preset);
     GUIparams->graphics_needs_restart = graphics_needs_restart;
+    updateGraphicsTierGuiParams();
 
     if (save_to_config)
     {
@@ -975,7 +1328,12 @@ void RouteViewer::initScenegraph()
     //     // root->addChild(skybox->getNode());
     // }
 
-    skybox = std::make_unique<NewSkybox>(cfg_path, options);
+    // HD-небо пресетов High/Ultra (ТЗ "Графика"): NewSkybox предпочтёт
+    // HD-варианты текстур "<имя>_hd.<ext>"; если таких файлов нет —
+    // молча используются обычные текстуры
+    const bool skybox_hd = graphics_settings.getParams().skybox_hd;
+
+    skybox = std::make_unique<NewSkybox>(cfg_path, options, skybox_hd);
     GUIparams->new_skybox = skybox.get();
 
     if (auto node = skybox->getNode())
@@ -994,11 +1352,11 @@ void RouteViewer::initLights()
     // Если тени включены, создаём настройки с количеством каскадов
     if (settings.shadow)
     {
-        // Тип теней по пресету (ТЗ "Графика"): High/Ultra — мягкие,
-        // Legacy/Low/Custom — жёсткие (существующий путь)
-        const gfx::Preset preset = graphics_settings.getPreset();
-
-        if ((preset == gfx::Preset::High) || (preset == gfx::Preset::Ultra))
+        // Тип теней по пресету (ТЗ "Графика"): High/Ultra (флаг
+        // soft_shadows) — мягкие vsg::SoftShadows (PCF-подобное
+        // смягчение границ), Legacy/Low/Custom — жёсткие
+        // vsg::HardShadows (существующий путь)
+        if (graphics_settings.getParams().soft_shadows)
         {
             shadowSettings = vsg::SoftShadows::create(settings.shadow_cascade);
         }
@@ -1035,6 +1393,85 @@ void RouteViewer::initLights()
     // Настраиваем солнечное освещение
     sun->sun->color = vsg::vec3(settings.sun_color);
     sun->sun->shadowSettings = shadowSettings;
+
+    //------------------------------------------------------------------
+    // Динамические эффекты пресетов High/Ultra/Extreme (ТЗ "Частицы"):
+    // фары-прожектор локомотива, частицы дыма/брызг и модуляция ambient
+    // тенями облаков. Legacy/Low/Custom не создают их вовсе. Узлы
+    // добавляются в сцену ДО viewer->compile() (initViewer), чтобы
+    // буферы частиц попали в TransferTask вьювера
+    //------------------------------------------------------------------
+    const bool fx_tier = preset_high_tier(graphics_settings.getPreset());
+    startup_dynamic_fx = fx_tier;
+
+    // Тени от облаков: модуляция интенсивности ambient лёгким шумом
+    // (сумма синусов, вычисляется в Sun::update каждый кадр);
+    // переключается на лету в setGraphicsPreset
+    sun->cloud_shadows = fx_tier;
+
+    if (fx_tier)
+    {
+        // Яркость фар по пресету: 5-10, максимум — HDR-тиру Extreme
+        float headlight_intensity = 6.0f;
+
+        switch (graphics_settings.getPreset())
+        {
+        case gfx::Preset::Ultra:
+            headlight_intensity = 8.0f;
+            break;
+
+        case gfx::Preset::Extreme:
+            headlight_intensity = 10.0f;
+            break;
+
+        default:
+            break;
+        }
+
+        if (settings.headlights)
+        {
+            headlight = vsg::SpotLight::create();
+            headlight->name = "headlight";
+            headlight->color = vsg::vec3(1.0f, 0.95f, 0.85f);   // тёплый белый
+            headlight->intensity = 0.0f;    // до первого обновления step()
+            headlight->innerAngle = vsg::radians(22.0);
+            headlight->outerAngle = vsg::radians(30.0);         // конус 30°
+            headlight->radius = 0.0;       // площадной источник выключен
+
+            // Дальняя граница 100-200 м: у vsg::SpotLight (VSG 1.1.13,
+            // vsg/lighting/SpotLight.h) НЕТ поля дальности — radius это
+            // радиус площадного источника, а не отсечка. Затухание 1/d²
+            // и конус 30° дают сопоставимый эффект;
+            // TODO: cutoff-множитель при появлении поля в VSG
+
+            root->addChild(headlight);
+
+            // Позицию/направление обновляет VehiclesHandler::step по
+            // интерполированным осям управляемой ПЕ
+            vehicles_handler->set_headlight(headlight, headlight_intensity);
+        }
+
+        // Пулы частиц: 64 спрайта на систему (CPU-side, дёшево).
+        // Камера — источник матриц GPU-биллборда
+        smoke_particles = std::make_unique<graphics::ParticleSystem>(64, camera);
+        splash_particles = std::make_unique<graphics::ParticleSystem>(64, camera);
+
+        if (auto node = smoke_particles->getNode())
+        {
+            root->addChild(node);
+        }
+
+        if (auto node = splash_particles->getNode())
+        {
+            root->addChild(node);
+        }
+
+        vehicles_handler->set_particle_systems(smoke_particles.get(),
+                                               splash_particles.get());
+
+        LOG_INFO("Dynamic fx tier: headlight %s, smoke/splash particles on",
+                 settings.headlights ? "on" : "off");
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -1042,7 +1479,11 @@ void RouteViewer::initLights()
 //------------------------------------------------------------------------------
 void RouteViewer::configureShaders()
 {
-    // За основу берём встроенные комплекты вершинного и фрагментного шейдера
+    // За основу берём встроенные комплекты вершинного и фрагментного шейдера.
+    // Для High/Ultra (use_pbr) основой PBR-набора остаётся
+    // vsg::createPhysicsBasedRenderingShaderSet(): он регистрируется
+    // как options->shaderSets["pbr"], и загрузчик vsgXchange::gltf
+    // автоматически пишет glTF-моделям metallic/roughness-потоки
     auto flat_shader = vsg::createFlatShadedShaderSet(options);
     auto pbr_shader = vsg::createPhysicsBasedRenderingShaderSet(options);
     auto phong_shader = vsg::createPhongShaderSet(options);
@@ -1051,14 +1492,50 @@ void RouteViewer::configureShaders()
     FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir_path = fs.getDataDir() + fs.separator() + "shaders";
 
-    const auto vertex_shader = read_shader(shaders_dir_path.c_str(), "standard.vert", options);
+    // Новый HDR-тир (High/Ultra, ТЗ "Графика"): ACES-тонмаппинг инжектится
+    // в GLSL-исходники фрагментных шейдеров обёрткой исходного main().
+    // Legacy/Low/Custom-по-умолчанию (оба флага false) идут по прежнему
+    // пути — шейдеры загружаются и подставляются как есть, без изменений
+    const gfx::QualityParams& quality_params = graphics_settings.getParams();
+    const bool hdr_tier = quality_params.use_pbr && quality_params.use_aces_tonemap;
 
-    configure_shader_set(shaders_dir_path.c_str(), vertex_shader,
-        "standard_flat_shaded.frag", options, "flat", flat_shader);
-    configure_shader_set(shaders_dir_path.c_str(), vertex_shader,
-        "standard_pbr.frag", options, "PBR", pbr_shader);
-    configure_shader_set(shaders_dir_path.c_str(), vertex_shader,
-        "standard_phong.frag", options, "Phong", phong_shader);
+    if (hdr_tier)
+    {
+        LOG_INFO("HDR tier enabled: PBR shader set + ACES tonemapping + sun intensity %.1f",
+                 settings.sun_intensity);
+
+        const auto vertex_shader = read_shader(shaders_dir_path.c_str(), "standard.vert", options);
+        const std::string tonemap_glsl = gfx::aces_tonemap_shader_fragment();
+
+        // Каждый шейдер оборачивается независимо: сбой инжекта в одном
+        // не отключает остальные (шейдер останется без тонмаппинга)
+        const auto wrap = [&tonemap_glsl](vsg::ref_ptr<vsg::ShaderStage> frag_shader) -> vsg::ref_ptr<vsg::ShaderStage>
+        {
+            wrap_fragment_shader_with_tonemap(frag_shader, tonemap_glsl);
+            return frag_shader;
+        };
+
+        configure_shader_set(vertex_shader,
+            wrap(read_shader(shaders_dir_path.c_str(), "standard_flat_shaded.frag", options)),
+            "flat", flat_shader);
+        configure_shader_set(vertex_shader,
+            wrap(read_shader(shaders_dir_path.c_str(), "standard_pbr.frag", options)),
+            "PBR", pbr_shader);
+        configure_shader_set(vertex_shader,
+            wrap(read_shader(shaders_dir_path.c_str(), "standard_phong.frag", options)),
+            "Phong", phong_shader);
+    }
+    else
+    {
+        const auto vertex_shader = read_shader(shaders_dir_path.c_str(), "standard.vert", options);
+
+        configure_shader_set(shaders_dir_path.c_str(), vertex_shader,
+            "standard_flat_shaded.frag", options, "flat", flat_shader);
+        configure_shader_set(shaders_dir_path.c_str(), vertex_shader,
+            "standard_pbr.frag", options, "PBR", pbr_shader);
+        configure_shader_set(shaders_dir_path.c_str(), vertex_shader,
+            "standard_phong.frag", options, "Phong", phong_shader);
+    }
 
     // Можем по своему настроить стадии графического конвейера
     auto vertexInputState = vsg::VertexInputState::create();
@@ -1167,12 +1644,111 @@ void RouteViewer::initView()
 //------------------------------------------------------------------------------
 void RouteViewer::initCommandGraph()
 {
+    // Пресет Extreme (use_postprocess): альтернативный командный граф —
+    // сцена рендерится в offscreen HDR-буфер, эффекты применяются
+    // полноэкранными проходами PostProcessChain, финальный квад выводит
+    // результат в swapchain ДО отрисовки GUI. Все прочие пресеты
+    // (Legacy/Low/High/Ultra/Custom) идут по прежнему пути без
+    // изменений: один RenderGraph(окно, вид) + ImGui
+    if (graphics_settings.getParams().use_postprocess)
+    {
+        initPostProcessCommandGraph();
+        return;
+    }
+
     auto renderGraph = vsg::RenderGraph::create(window, view);
 
     auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
     renderGraph->addChild(renderImGui);
 
     commandGraph = vsg::CommandGraph::create(window, renderGraph);
+}
+
+//------------------------------------------------------------------------------
+// Командный граф пресета Extreme (ТЗ "Графика", UE-подобный тир):
+//   CommandGraph(окно)
+//   |- RenderGraph: сцена -> offscreen HDR (R16G16B16A16_SFLOAT + D32)
+//   |- RenderGraph: проходы Bloom/SSAO/SSR/Туман (half/quarter-res)
+//   |- RenderGraph(окно): финальный квад (композиция) + RenderImGui
+//
+// Порядок исполнения: offscreen-сцена -> эффекты -> вывод в окно.
+// Финальный квад встроен в ГЛАВНЫЙ RenderGraph окна первым ребёнком
+// (до RenderImGui; очистка аттачментов окна делает сам конструктор
+// RenderGraph(окно) через clearValues), сэмплит offscreen-текстуры
+// цепочки через сэмплер (совместимо с MSAA окна: rasterizationSamples
+// пайплайна квада = framebufferSamples окна), GUI рисуется только
+// в окно — offscreen-цепочку не затрагивает
+//------------------------------------------------------------------------------
+void RouteViewer::initPostProcessCommandGraph()
+{
+    const auto device = window->getOrCreateDevice();
+
+    // Масштаб пост-процесса: разрешение offscreen-буфера сцены.
+    // Нижняя граница 0.4 — минимум адаптивного качества (масштаб мог
+    // быть снижен adaptPostProcessScale до перезапуска)
+    const double scale = std::clamp(settings.postprocess_scale, 0.4, 1.0);
+    const VkExtent2D window_extent = window->extent2D();
+    const VkExtent2D scene_extent{
+        std::max(1u, static_cast<std::uint32_t>(
+                         static_cast<double>(window_extent.width) * scale)),
+        std::max(1u, static_cast<std::uint32_t>(
+                         static_cast<double>(window_extent.height) * scale))};
+
+    const gfx::QualityParams& params = graphics_settings.getParams();
+
+    // Эффекты: флаги пресета по умолчанию включены, пользовательские
+    // переключатели из settings.xml переопределяют их (переживают
+    // перезапуск — пресет при старте переприменяется)
+    graphics::PostProcessConfig config;
+    config.bloom = params.use_bloom && settings.postprocess_bloom;
+    config.ssao = params.use_ssao_pass && settings.postprocess_ssao;
+    config.volumetric_fog = params.use_volumetric_fog && settings.postprocess_fog;
+    config.ssr = params.use_ssr && settings.postprocess_ssr;
+    config.scale = scale;
+
+    postprocess = std::make_unique<graphics::PostProcessChain>(config);
+
+    // 1. Проход сцены в offscreen (подгоняет viewport камеры под extent)
+    auto sceneGraph = postprocess->createSceneRenderGraph(
+        view.get(), device.get(), scene_extent);
+
+    // 2. Полноэкранные проходы эффектов (матрицы камеры и направление
+    //    солнца уходят в шейдеры push-константами на каждый кадр)
+    postprocess->createEffectPasses(
+        device.get(), camera.get(), sun->sun.get(), scene_extent);
+
+    // 3. Главный граф окна: финальный квад (композиция) + GUI
+    auto renderGraph = vsg::RenderGraph::create(window);
+
+    if (auto finalQuad = postprocess->createFinalQuad(window.get()))
+    {
+        renderGraph->addChild(finalQuad);
+    }
+
+    auto renderImGui = vsgImGui::RenderImGui::create(window, MyGui::create(GUIparams, options));
+    renderGraph->addChild(renderImGui);
+
+    // 4. Сборка: сцена -> эффекты -> вывод в окно
+    commandGraph = vsg::CommandGraph::create(window);
+
+    if (sceneGraph)
+    {
+        commandGraph->addChild(sceneGraph);
+    }
+
+    for (const auto& pass : postprocess->effectPasses())
+    {
+        commandGraph->addChild(pass);
+    }
+
+    commandGraph->addChild(renderGraph);
+
+    LOG_INFO("Post-process chain: bloom %s, SSAO %s, volumetric fog %s, SSR %s, scale %.2f",
+             postprocess->hasBloom() ? "on" : "off",
+             postprocess->hasSsao() ? "on" : "off",
+             postprocess->hasFog() ? "on" : "off",
+             postprocess->hasSsr() ? "on" : "off",
+             scale);
 }
 
 //------------------------------------------------------------------------------
@@ -1193,7 +1769,8 @@ void RouteViewer::initViewer()
         screenshot_writer.get(),
         traffic_lights_handler.get(),
         vehicles_handler.get(),
-        settings
+        settings,
+        GUIparams
     );
 
     auto upd_sound_manager_handler = UpdateSoundManagerHandler::create(lookAt, sound_manager.get());

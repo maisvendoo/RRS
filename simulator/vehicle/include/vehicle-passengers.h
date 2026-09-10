@@ -18,10 +18,18 @@
 
 #include    <cstddef>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Пассажирский вагон
 //------------------------------------------------------------------------------
-class PassengerSystem
+class VEHICLE_EXPORT PassengerSystem
 {
 public:
 

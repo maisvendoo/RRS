@@ -30,10 +30,18 @@
 #include    <cstddef>
 #include <vector>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Износ колёсных пар единицы ПС
 //------------------------------------------------------------------------------
-class WheelWearSystem
+class VEHICLE_EXPORT WheelWearSystem
 {
 public:
 

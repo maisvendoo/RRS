@@ -21,10 +21,18 @@
 
 #include    <cstddef>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Деповское питание и аккумуляторная батарея ПЕ
 //------------------------------------------------------------------------------
-class DepotPowerSystem
+class VEHICLE_EXPORT DepotPowerSystem
 {
 public:
 
@@ -48,6 +56,20 @@ public:
     /// Включить/выключить вводной аппарат локомотива (после появления
     /// напряжения - шаг 8 последовательности игрока, ТЗ п.4)
     void setInputBreaker(bool on);
+
+    /// Вводной аппарат включён
+    bool isInputBreakerOn() const;
+
+    /// Источник депо в зоне досягаемости (зона service.conf с ресурсом
+    /// power; модель отмечает стоящие внутри ПЕ). cable_length - длина
+    /// кабеля источника из конфига зоны, м
+    void setSourceNearby(bool nearby, double cable_length = 25.0);
+
+    /// Источник депо рядом с ПЕ (кабель дотянется)
+    bool isSourceNearby() const;
+
+    /// Длина кабеля ближайшего источника, м
+    double getNearbyCableLength() const;
 
     /// Кабель подключён
     bool isCableConnected() const;
@@ -102,6 +124,10 @@ private:
     double source_max_power = 30000.0;   ///< Вт
     double cable_length = 25.0;          ///< м
     bool source_on = false;
+
+    /// Источник в зоне досягаемости (маршрутная колонка депо)
+    bool source_nearby = false;
+    double nearby_cable_length = 25.0;   ///< м
 
     bool cable_connected = false;
     bool external_power = false;

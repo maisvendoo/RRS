@@ -8,9 +8,12 @@
 #include "VehicleExterior.h"
 #include "io-controller.h"
 
+#include "graphics/particles.h"
+
 #include <vsg/app/Viewer.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Options.h>
+#include <vsg/lighting/SpotLight.h>
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
@@ -20,13 +23,59 @@
 #include <QObject>
 #include <QString>
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
+#include <cmath>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
 
 class QByteArray;
+
+namespace
+{
+
+//------------------------------------------------------------------------------
+// Коды погоды протокола: значения согласованы с weather::Type
+// (simulator/weather/include/weather-system.h). Клиент не линкуется
+// с библиотекой погоды, поэтому сравнивает числа
+//------------------------------------------------------------------------------
+constexpr quint8 WEATHER_TYPE_RAIN = 3;            ///< Rain
+constexpr quint8 WEATHER_TYPE_HEAVY_RAIN = 4;      ///< HeavyRain (ливень)
+constexpr quint8 WEATHER_TYPE_THUNDERSTORM = 13;   ///< гроза = ливень + ветер
+
+//------------------------------------------------------------------------------
+// Геометрия источников эффектов (ТЗ "Частицы"), м:
+//  - выхлопная труба: над центром ПЕ и вперёд по ходу;
+//  - колёсные пары: колея 1520 мм, точка контакта у головки рельса.
+/// TODO: сдвиг трубы/число колёсных пар брать из конфига конкретной ПЕ
+//------------------------------------------------------------------------------
+constexpr double SMOKE_STACK_HEIGHT = 4.5;
+constexpr double SMOKE_STACK_FORWARD = 2.0;
+
+constexpr double WHEEL_LATERAL = 0.76;
+constexpr double WHEEL_HEIGHT = 0.2;
+
+//------------------------------------------------------------------------------
+// Цвет дыма по коду протокола (0 - нет, 1 - чёрный, 2 - синий,
+// 3 - белый, 4 - серый): тёмный при нагрузке, белый при холодном
+// пуске (дизель) / уносе воды (паровоз)
+//------------------------------------------------------------------------------
+vsg::vec3 smoke_color_rgb(quint8 code)
+{
+    switch (code)
+    {
+    case 1: return vsg::vec3(0.08f, 0.08f, 0.08f);   // black
+    case 2: return vsg::vec3(0.25f, 0.30f, 0.45f);   // blue
+    case 3: return vsg::vec3(0.85f, 0.85f, 0.88f);   // white
+    case 4: return vsg::vec3(0.55f, 0.55f, 0.58f);   // gray
+    default: return vsg::vec3(0.7f, 0.7f, 0.7f);
+    }
+}
+
+} // namespace
 
 //------------------------------------------------------------------------------
 //
@@ -159,6 +208,92 @@ double VehiclesHandler::getWeatherVisibility() const noexcept
 double VehiclesHandler::getWeatherFogDensity() const noexcept
 {
     return weather_fog_density.load(std::memory_order_relaxed);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+quint8 VehiclesHandler::getWeatherType() const noexcept
+{
+    return weather_type.load(std::memory_order_relaxed);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+vsg::dvec3 VehiclesHandler::getWindVector() const noexcept
+{
+    const double speed = weather_wind_speed.load(std::memory_order_relaxed);
+
+    if (speed <= 0.0)
+    {
+        // Нет данных о погоде (старый сервер/штиль): константа 2 м/с
+        return vsg::dvec3(2.0, 0.0, 0.0);
+    }
+
+    const double azimuth = weather_wind_direction.load(std::memory_order_relaxed);
+
+    // Азимут ветра - от севера по часовой стрелке; мировые оси:
+    // X - восток, Y - север (Z вверх)
+    return vsg::dvec3(speed * std::sin(azimuth),
+                      speed * std::cos(azimuth),
+                      0.0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VehiclesHandler::isRainWeather() const noexcept
+{
+    const quint8 type = weather_type.load(std::memory_order_relaxed);
+
+    return (type == WEATHER_TYPE_RAIN) ||
+           (type == WEATHER_TYPE_HEAVY_RAIN) ||
+           (type == WEATHER_TYPE_THUNDERSTORM);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehiclesHandler::set_headlight(vsg::ref_ptr<vsg::SpotLight> light, float intensity) noexcept
+{
+    headlight = std::move(light);
+    headlight_intensity = intensity;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehiclesHandler::setHeadlightsEnabled(bool enabled) noexcept
+{
+    headlights_enabled = enabled;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehiclesHandler::set_particle_systems(graphics::ParticleSystem* smoke,
+                                           graphics::ParticleSystem* splash) noexcept
+{
+    smoke_particles = smoke;
+    splash_particles = splash;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+quint32 VehiclesHandler::getCassetteNoticeId() const noexcept
+{
+    return cassette_notice_id.load(std::memory_order_acquire);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString VehiclesHandler::getCassetteNotice() const noexcept
+{
+    std::lock_guard<std::mutex> lock(notice_mutex);
+    return cassette_notice;
 }
 
 //------------------------------------------------------------------------------
@@ -339,6 +474,213 @@ void VehiclesHandler::step(double t, double dt)
             }
         }
     }
+
+    // Динамический свет и частицы (ТЗ "Частицы", High+): фары, дым,
+    // брызги. Оси ПЕ уже интерполированы выше; 64 частицы на CPU дёшево
+    updateVehicleEffects(dt, frame_cur);
+}
+
+//------------------------------------------------------------------------------
+// Динамический свет и частицы (ТЗ "Частицы"):
+//  - фары: SpotLight управляемой ПЕ (создаётся RouteViewer на High+,
+//    здесь только позиция/направление по интерполированным осям);
+//  - дым/пар: выхлопная труба текущей ПЕ, цвет/интенсивность из
+//    smoke_level/smoke_color (сервер переносит их из
+//    DieselEngineSystem/SteamEngineSystem, паровоз в приоритете);
+//  - брызги: нижние точки колёсных пар текущей ПЕ в дождь/ливень,
+//    количество и скорость пропорциональны скорости ПЕ.
+// Все системы создаются только на пресетах High/Ultra/Extreme —
+// на Legacy/Low указатели пустые и метод практически ничего не делает
+//------------------------------------------------------------------------------
+void VehiclesHandler::updateVehicleEffects(double dt, const simulator_update_pos_t& frame)
+{
+    // ПСЧ визуального разброса (скорости/жизни частиц): фиксированный
+    // seed - детерминированная картинка без затрат на энтропию.
+    // Метод вызывается только из потока рендера (step)
+    static std::mt19937 effect_rng(42u);
+    std::uniform_real_distribution<double> unit_dist(0.0, 1.0);
+
+    //--------- Фары управляемой ПЕ ---------
+
+    if (headlight)
+    {
+        int light_idx = controlled_vehicle;
+
+        if (light_idx < 0 || static_cast<std::size_t>(light_idx) >= vehicles.size())
+        {
+            light_idx = cur_vehicle;
+        }
+
+        if (light_idx >= 0 && static_cast<std::size_t>(light_idx) < vehicles.size())
+        {
+            const VehicleExterior& veh = vehicles[light_idx];
+
+            // Направление "вперёд" кабины: локальная +Y ПЕ по знаку
+            // ориентации (1 - вперёд, -1 - назад)
+            const double dir = (veh.orientation >= 0) ? 1.0 : -1.0;
+
+            const std::size_t idx = static_cast<std::size_t>(light_idx);
+            const double length = (idx < vehicle_lengths.size())
+                                  ? vehicle_lengths[idx]
+                                  : 20.0;
+
+            // Фара у торца кузова на высоте лобового стекла
+            headlight->position = veh.position +
+                                  veh.up * 1.5 +
+                                  veh.orth * (dir * length * 0.45);
+
+            // Оси ПЕ нормализованы при интерполяции
+            headlight->direction = veh.orth * dir;
+
+            // TODO: мост к реальному тумблеру фар конкретной ПЕ
+            // (пока глобальный флаг settings.headlights)
+            headlight->intensity = headlights_enabled ? headlight_intensity : 0.0f;
+        }
+        else
+        {
+            headlight->intensity = 0.0f;
+        }
+    }
+
+    if (!smoke_particles && !splash_particles)
+    {
+        return;
+    }
+
+    //--------- Дым/пар из выхлопной трубы текущей ПЕ ---------
+
+    const bool cur_valid = (cur_vehicle >= 0) &&
+                           (static_cast<std::size_t>(cur_vehicle) < vehicles.size()) &&
+                           (static_cast<std::size_t>(cur_vehicle) < frame.vehicles.size());
+
+    if (smoke_particles && cur_valid)
+    {
+        const std::size_t idx = static_cast<std::size_t>(cur_vehicle);
+        const VehicleExterior& veh = vehicles[idx];
+        const auto& veh_state = frame.vehicles[idx];
+
+        if (veh_state.smoke_level > 0)
+        {
+            // Уровень 1..4 -> 0.25..1: плотнее дым - интенсивнее выброс
+            const double intensity = std::min(veh_state.smoke_level, quint8(4)) / 4.0;
+
+            // 6..30 частиц/с
+            const double rate = 6.0 + 24.0 * intensity;
+
+            const double dir = (veh.orientation >= 0) ? 1.0 : -1.0;
+
+            // Труба: над центром ПЕ, сдвинута к кабине по ходу движения
+            const vsg::dvec3 pipe = veh.position +
+                                    veh.up * SMOKE_STACK_HEIGHT +
+                                    veh.orth * (dir * SMOKE_STACK_FORWARD);
+
+            const vsg::dvec3 wind = getWindVector();
+            const vsg::vec3 color = smoke_color_rgb(veh_state.smoke_color);
+
+            smoke_emit_accum += rate * dt;
+
+            while (smoke_emit_accum >= 1.0)
+            {
+                smoke_emit_accum -= 1.0;
+
+                graphics::ParticleSystem::Spawn spawn;
+
+                spawn.position = vsg::vec3(pipe);
+
+                // Вверх 2..5 м/с (сильнее при интенсивном дыме) + ветер
+                spawn.velocity = vsg::vec3(
+                    wind +
+                    veh.up * (2.0 + 3.0 * intensity) +
+                    veh.orth * ((unit_dist(effect_rng) - 0.5) * 0.6) +
+                    veh.right * ((unit_dist(effect_rng) - 0.5) * 0.6));
+
+                spawn.color = color;
+                spawn.alpha = static_cast<float>(0.25 + 0.30 * intensity);
+                spawn.size_begin = 0.5f;    // рост 0.5 -> 3 м за жизнь
+                spawn.size_end = 3.0f;
+                spawn.lifetime = static_cast<float>(3.0 + 3.0 * unit_dist(effect_rng));
+
+                smoke_particles->emitParticles(spawn);
+            }
+        }
+    }
+
+    //--------- Брызги из-под колёс в дождь ---------
+
+    if (splash_particles && cur_valid && isRainWeather())
+    {
+        const std::size_t idx = static_cast<std::size_t>(cur_vehicle);
+        const VehicleExterior& veh = vehicles[idx];
+
+        const double speed = vsg::length(veh.velocity);
+
+        if (speed > 0.5)
+        {
+            const double dir = (veh.orientation >= 0) ? 1.0 : -1.0;
+            const double length = (idx < vehicle_lengths.size())
+                                  ? vehicle_lengths[idx]
+                                  : 20.0;
+
+            // Две колёсные пары (тележки) по два колеса: точки у
+            // головки рельса. TODO: конфиг осевых формул конкретной ПЕ
+            const double along_offsets[2] = {length * 0.3, -length * 0.3};
+
+            const double side_offsets[2] = {-WHEEL_LATERAL, WHEEL_LATERAL};
+
+            // На колесо 0..20 частиц/с, пропорционально скорости ПЕ
+            const double wheel_rate = std::clamp(speed * 1.0, 0.0, 20.0);
+
+            for (double along : along_offsets)
+            {
+                for (double side : side_offsets)
+                {
+                    const vsg::dvec3 wheel = veh.position +
+                                             veh.right * side +
+                                             veh.orth * (dir * along) +
+                                             veh.up * WHEEL_HEIGHT;
+
+                    splash_emit_accum += wheel_rate * dt;
+
+                    while (splash_emit_accum >= 1.0)
+                    {
+                        splash_emit_accum -= 1.0;
+
+                        graphics::ParticleSystem::Spawn spawn;
+
+                        spawn.position = vsg::vec3(wheel);
+
+                        // Вверх 1..3 м/с + снос скоростью ПЕ и ветром
+                        spawn.velocity = vsg::vec3(
+                            veh.velocity * 0.3 +
+                            veh.up * (1.0 + 2.0 * unit_dist(effect_rng)) +
+                            veh.right * ((unit_dist(effect_rng) - 0.5) * 1.5) +
+                            veh.orth * ((unit_dist(effect_rng) - 0.5) * 1.5));
+
+                        // Полупрозрачный белый, маленькие капли
+                        spawn.color = vsg::vec3(0.8f, 0.85f, 0.92f);
+                        spawn.alpha = 0.35f;
+                        spawn.size_begin = 0.1f;   // 0.1 -> 0.3 м
+                        spawn.size_end = 0.3f;
+                        spawn.lifetime = static_cast<float>(0.5 + 0.5 * unit_dist(effect_rng));
+
+                        splash_particles->emitParticles(spawn);
+                    }
+                }
+            }
+        }
+    }
+
+    // Шаг симуляции пулов (движение/рост/fade) — каждый кадр, даже без
+    // спавна: живые частицы обязаны догорать
+    if (smoke_particles)
+    {
+        smoke_particles->step(dt);
+    }
+
+    if (splash_particles)
+    {
+        splash_particles->step(dt);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -467,6 +809,30 @@ bool VehiclesHandler::returnToControlledVehicle() noexcept
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool VehiclesHandler::selectVehicle(int idx) noexcept
+{
+    if (idx < 0 || static_cast<size_t>(idx) >= vehicles.size())
+        return false;
+
+    if (idx == cur_vehicle)
+        return true;
+
+    cur_vehicle = idx;
+    vehicles[cur_vehicle].current_cabine_idx = 0;
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+int VehiclesHandler::getVehiclesCount() const noexcept
+{
+    return static_cast<int>(vehicles.size());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool VehiclesHandler::load(
     QByteArray& data,
     const settings_t& settings,
@@ -486,11 +852,16 @@ bool VehiclesHandler::load(
     vehicles.reserve(vehicle_count);
     vehicles_node->children.reserve(vehicle_count);
 
+    // Длины ПЕ: позиции фар и колёсных пар (ТЗ "Частицы")
+    vehicle_lengths.reserve(vehicle_count);
+
     for (std::size_t i = 0; i < vehicle_count; ++i)
     {
         const std::string cfg_dir = vehicles_info.vehicles[i].vehicle_config_dir.toStdString();
         const std::string cfg_file = vehicles_info.vehicles[i].vehicle_config_file.toStdString();
         const double veh_len = vehicles_info.vehicles[i].vehicle_length;
+
+        vehicle_lengths.push_back(veh_len);
 
         vehicles.emplace_back(VehicleExterior());
         VehicleExterior& vehicle_exterior = vehicles.back();
@@ -570,6 +941,23 @@ void VehiclesHandler::slotGetVehiclesPosData(QByteArray& data)
     // Погода от симулятора (ТЗ "Видимость и погода")
     weather_visibility.store(pos_buf[slot].visibility_m, std::memory_order_relaxed);
     weather_fog_density.store(pos_buf[slot].fog_density, std::memory_order_relaxed);
+
+    // Погода для эффектов рендера (ТЗ "Частицы"): тип/интенсивность/
+    // ветер. Старый сервер хвост не пришлёт - останутся прежние значения
+    weather_type.store(pos_buf[slot].weather_type, std::memory_order_relaxed);
+    weather_wind_speed.store(pos_buf[slot].wind_speed, std::memory_order_relaxed);
+    weather_wind_direction.store(pos_buf[slot].wind_direction, std::memory_order_relaxed);
+
+    // Предупреждение кассеты регистрации ("Запись параметров движения
+    // начата/окончена", ТЗ "Кассеты"): id обновляем после текста,
+    // чтобы читатель не увидел новый id со старым текстом
+    if (pos_buf[slot].notice_id > 0)
+    {
+        std::lock_guard<std::mutex> lock(notice_mutex);
+        cassette_notice = pos_buf[slot].notice;
+        cassette_notice_id.store(pos_buf[slot].notice_id,
+                                 std::memory_order_release);
+    }
 
     // Физические звуковые события (ТЗ "Аудиосистема"): копим для
     // разбора в кадре (OpenAL-контекст - поток рендера)

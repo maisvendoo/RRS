@@ -122,6 +122,17 @@ bool GraphicsSettings::setParam(const std::string& name, double value)
     {
         params_.internal_resolution = std::clamp(value, 0.25, 2.0);
     }
+    else if (name == "sun_intensity")
+    {
+        // HDR-интенсивность солнца пресета; <=0 - использовать
+        // пользовательское значение из настроек
+        params_.sun_intensity = std::max(0.0, value);
+    }
+    else if (name == "shadow_distance_m")
+    {
+        // Дистанция теней пресета; <=0 - пользовательское значение
+        params_.shadow_distance_m = std::max(0.0, value);
+    }
     else
     {
         return false;
@@ -201,6 +212,46 @@ bool GraphicsSettings::setParam(const std::string& name, int value)
     else if (name == "wet_surfaces")
     {
         params_.wet_surfaces = (value != 0);
+    }
+    else if (name == "use_pbr")
+    {
+        params_.use_pbr = (value != 0);
+    }
+    else if (name == "use_aces_tonemap")
+    {
+        params_.use_aces_tonemap = (value != 0);
+    }
+    else if (name == "use_ssao")
+    {
+        params_.use_ssao = (value != 0);
+    }
+    else if (name == "soft_shadows")
+    {
+        params_.soft_shadows = (value != 0);
+    }
+    else if (name == "skybox_hd")
+    {
+        params_.skybox_hd = (value != 0);
+    }
+    else if (name == "use_postprocess")
+    {
+        params_.use_postprocess = (value != 0);
+    }
+    else if (name == "use_bloom")
+    {
+        params_.use_bloom = (value != 0);
+    }
+    else if (name == "use_ssao_pass")
+    {
+        params_.use_ssao_pass = (value != 0);
+    }
+    else if (name == "use_volumetric_fog")
+    {
+        params_.use_volumetric_fog = (value != 0);
+    }
+    else if (name == "use_ssr")
+    {
+        params_.use_ssr = (value != 0);
     }
     else
     {
@@ -333,7 +384,15 @@ void GraphicsSettings::applyPreset()
 
     case Preset::High:
         params_ = QualityParams();
-        params_.shadow_cascades = 3;
+        // Новый тиры (ТЗ "Графика", TSW/UE5): PBR + ACES + HDR-солнце,
+        // мягкие тени, HD-небо. Тени: 2 каскада 2048, дистанция 150 м.
+        params_.use_pbr = true;
+        params_.use_aces_tonemap = true;
+        params_.soft_shadows = true;
+        params_.skybox_hd = true;
+        params_.sun_intensity = 10.0;
+        params_.shadow_distance_m = 150.0;
+        params_.shadow_cascades = 2;
         params_.shadow_resolution = 2048;
         params_.msaa_samples = 4;
         params_.ssao = true;
@@ -350,6 +409,16 @@ void GraphicsSettings::applyPreset()
 
     case Preset::Ultra:
         params_ = QualityParams();
+        // Максимум: PBR + ACES + HDR-солнце 12, 4 каскада 4096,
+        // дистанция теней 300 м, HD-небо + декларативный SSAO-флаг
+        // (сам пасс в разработке - см. комментарий к use_ssao)
+        params_.use_pbr = true;
+        params_.use_aces_tonemap = true;
+        params_.use_ssao = true;
+        params_.soft_shadows = true;
+        params_.skybox_hd = true;
+        params_.sun_intensity = 12.0;
+        params_.shadow_distance_m = 300.0;
         params_.shadow_cascades = 4;
         params_.shadow_resolution = 4096;
         params_.msaa_samples = 8;
@@ -362,6 +431,41 @@ void GraphicsSettings::applyPreset()
         params_.weather_effects = true;
         params_.wet_surfaces = true;
         params_.texture_budget_mb = 1536;
+        params_.draw_distance_m = 8000.0;
+        params_.vegetation_density = 1.5;
+        break;
+
+    case Preset::Extreme:
+        params_ = QualityParams();
+        // UE-подобный тир: всё от Ultra + РЕАЛЬНЫЙ пост-процесс
+        // (graphics::PostProcessChain в рендере): offscreen-сцена в HDR,
+        // Bloom/SSAO/SSR/объёмный туман полноэкранными проходами
+        // half/quarter res, финальная композиция в swapchain до GUI.
+        // Тени: 4 каскада 4096, дистанция 300 м, HD-небо, HDR-солнце 12
+        params_.use_pbr = true;
+        params_.use_aces_tonemap = true;
+        params_.use_ssao = true;
+        params_.use_postprocess = true;
+        params_.use_bloom = true;
+        params_.use_ssao_pass = true;
+        params_.use_volumetric_fog = true;
+        params_.use_ssr = true;
+        params_.soft_shadows = true;
+        params_.skybox_hd = true;
+        params_.sun_intensity = 12.0;
+        params_.shadow_distance_m = 300.0;
+        params_.shadow_cascades = 4;
+        params_.shadow_resolution = 4096;
+        params_.msaa_samples = 8;
+        params_.ssao = true;
+        params_.ssr = true;
+        params_.volumetric_fog = true;
+        params_.taa = true;
+        params_.hdr = true;
+        params_.decals = true;
+        params_.weather_effects = true;
+        params_.wet_surfaces = true;
+        params_.texture_budget_mb = 2048;
         params_.draw_distance_m = 8000.0;
         params_.vegetation_density = 1.5;
         break;
@@ -393,6 +497,7 @@ std::string presetToString(Preset preset)
     case Preset::Low:       return "Low";
     case Preset::High:      return "High";
     case Preset::Ultra:     return "Ultra";
+    case Preset::Extreme:   return "Extreme";
     case Preset::Custom:    return "Custom";
     }
 
@@ -408,9 +513,43 @@ Preset presetFromString(const std::string& name, Preset default_preset)
     if (name == "Low")          return Preset::Low;
     if (name == "High")         return Preset::High;
     if (name == "Ultra")        return Preset::Ultra;
+    if (name == "Extreme")      return Preset::Extreme;
     if (name == "Custom")       return Preset::Custom;
 
     return default_preset;
+}
+
+//------------------------------------------------------------------------------
+// GLSL-фрагмент ACES-тонмаппинга (пресеты High/Ultra). Строка
+// дописывается в конец GLSL-исходника фрагментного шейдера после того,
+// как рендерер переименовал исходный void main() в
+// rrs_tonemap_original_main() (см. wrap_fragment_shader_with_tonemap
+// в graphics/shader_funcs). Формула - публичная аппроксимация ACES
+// filmic curve (Narkowicz 2015):
+//     x * (2.51*x + 0.03) / (x * (2.43*x + 0.59) + 0.14)
+// Только базовые операции vec3/float - совместимо с 420/450 core,
+// как шейдеры проекта в data/shaders.
+//------------------------------------------------------------------------------
+std::string aces_tonemap_shader_fragment()
+{
+    return
+        "// ------------------------------------------------------------------\n"
+        "// RRS: ACES filmic tonemapping, аппроксимация Narkowicz 2015.\n"
+        "// Инжектится в конец шейдера пресетами High/Ultra; исходный main\n"
+        "// переименован в rrs_tonemap_original_main().\n"
+        "// ------------------------------------------------------------------\n"
+        "vec3 rrs_aces_tonemap(vec3 x)\n"
+        "{\n"
+        "    return clamp((x * (2.51 * x + 0.03)) /\n"
+        "                 (x * (2.43 * x + 0.59) + 0.14),\n"
+        "                 vec3(0.0), vec3(1.0));\n"
+        "}\n"
+        "\n"
+        "void main()\n"
+        "{\n"
+        "    rrs_tonemap_original_main();\n"
+        "    outColor = vec4(rrs_aces_tonemap(outColor.rgb), outColor.a);\n"
+        "}\n";
 }
 
 } // namespace gfx

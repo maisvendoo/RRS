@@ -758,3 +758,14 @@ void SoundManager::playSoundEvent(unsigned event_type,
     }
     event_active_sources = std::min(active, event_pool_max_sources);
 }
+
+//------------------------------------------------------------------------------
+// Глобальное выключение звука: гейн слушателя OpenAL в ноль
+//------------------------------------------------------------------------------
+void SoundManager::setEnabled(bool enabled)
+{
+    if (context_ != nullptr)
+    {
+        alcMakeContextCurrent(enabled ? context_ : nullptr);
+    }
+}

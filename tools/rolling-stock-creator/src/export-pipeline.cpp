@@ -2,8 +2,10 @@
 
 #include <QDate>
 #include <QDir>
+#include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
+#include <QSet>
 #include <QTextStream>
 
 //------------------------------------------------------------------------------
@@ -65,6 +67,65 @@ bool copyFileOverwrite(const QString& source, const QString& target,
     return true;
 }
 
+/// Собрать пути звуковых файлов из секций <Sound> конфигурации:
+/// атрибут File каждой секции + вариации Variants (через ';')
+QStringList soundFilesFromConfig(const QString& config_xml)
+{
+    QStringList files;
+
+    QDomDocument config_doc;
+
+    if (!config_doc.setContent(config_xml.toUtf8()))
+    {
+        return files;
+    }
+
+    const QDomElement root = config_doc.documentElement();
+
+    if (root.isNull())
+    {
+        return files;
+    }
+
+    for (QDomNode node = root.firstChild(); !node.isNull();
+         node = node.nextSibling())
+    {
+        if (!node.isElement() ||
+            node.toElement().tagName() != QStringLiteral("Sound"))
+        {
+            continue;
+        }
+
+        const QDomElement element = node.toElement();
+
+        const QString file = element.attribute(
+                    QStringLiteral("File")).trimmed();
+
+        if (!file.isEmpty())
+        {
+            files << file;
+        }
+
+        const QString variants = element.attribute(
+                    QStringLiteral("Variants"));
+
+        for (const QString& variant :
+             variants.split(';', Qt::SkipEmptyParts))
+        {
+            const QString trimmed = variant.trimmed();
+
+            if (!trimmed.isEmpty())
+            {
+                files << trimmed;
+            }
+        }
+    }
+
+    files.removeDuplicates();
+
+    return files;
+}
+
 /// Текст инструкции по подключению пакета
 QString readmeText(const QString& vehicle_name,
                    const SceneModel::CollisionParams& collision,
@@ -81,7 +142,8 @@ QString readmeText(const QString& vehicle_name,
     stream << "СОСТАВ ПАКЕТА\n";
     stream << "  " << vehicle_name << ".xml — конфигурация ПС ";
     stream << "(секции [Vehicle], [Cabine], [Collision] и др.)\n";
-    stream << "  model/ — glTF-модель и её ресурсы\n\n";
+    stream << "  model/ — glTF-модель и её ресурсы\n";
+    stream << "  sounds/ — файлы звуков из секций <Sound> конфигурации\n\n";
 
     stream << "ПОДКЛЮЧЕНИЕ К ИГРЕ\n";
     stream << "1. Конфигурацию скопируйте в <корень игры>/cfg/vehicles/";
@@ -160,7 +222,8 @@ ExportResult ExportPipeline::exportPackage(const QString& target_dir,
                                            const QString& config_xml,
                                            const QString& model_path,
                                            const SceneModel::CollisionParams& collision,
-                                           const std::vector<PhysPoint>& points)
+                                           const std::vector<PhysPoint>& points,
+                                           const QString& sounds_dir)
 {
     ExportResult result;
 
@@ -293,6 +356,76 @@ ExportResult ExportPipeline::exportPackage(const QString& target_dir,
     {
         result.warnings << QStringLiteral("Модель не задана — пакет "
                                           "содержит только конфигурацию");
+    }
+
+    // 2.5 Звуки из секций <Sound> (промт п.28): файлы копируются
+    // в <пакет>/sounds/ с сохранением имён; относительные пути
+    // ищутся в папке звуков (поле «Папка звуков» / папка конфига)
+    {
+        const QStringList sound_files = soundFilesFromConfig(config_xml);
+
+        if (!sound_files.isEmpty())
+        {
+            const QString sounds_dir_path =
+                    QDir(package_dir).absoluteFilePath(
+                        QStringLiteral("sounds"));
+
+            if (!QDir().mkpath(sounds_dir_path))
+            {
+                result.warnings << QStringLiteral("Не удалось создать папку: %1")
+                                       .arg(sounds_dir_path);
+            }
+            else
+            {
+                QSet<QString> copied;
+
+                for (const QString& sound_file : sound_files)
+                {
+                    QFileInfo source_info(sound_file);
+
+                    if (!source_info.isAbsolute())
+                    {
+                        // Относительный путь — от папки звуков
+                        source_info = QFileInfo(
+                                    QDir(sounds_dir).absoluteFilePath(
+                                        sound_file));
+                    }
+
+                    const QString target_name = source_info.fileName();
+
+                    if (copied.contains(target_name))
+                    {
+                        continue;
+                    }
+
+                    if (!source_info.exists())
+                    {
+                        result.warnings << QStringLiteral(
+                                            "Файл звука не найден: %1 "
+                                            "(поиск в %2)")
+                                            .arg(sound_file, sounds_dir);
+                        continue;
+                    }
+
+                    QString copy_error;
+
+                    if (copyFileOverwrite(
+                                source_info.absoluteFilePath(),
+                                QDir(sounds_dir_path).absoluteFilePath(
+                                    target_name), &copy_error))
+                    {
+                        copied.insert(target_name);
+                        result.messages << QStringLiteral(
+                                            "Скопирован звук: %1")
+                                            .arg(target_name);
+                    }
+                    else
+                    {
+                        result.warnings << copy_error;
+                    }
+                }
+            }
+        }
     }
 
     // 3. Инструкция по подключению

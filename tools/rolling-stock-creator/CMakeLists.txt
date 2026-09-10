@@ -19,6 +19,9 @@ find_package(Qt6 COMPONENTS Xml REQUIRED)
 find_package(Qt6 COMPONENTS Gui REQUIRED)
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
+find_package(vsg REQUIRED)
+find_package(vsgXchange REQUIRED)
+
 # Пути к заголовкам и сорцам
 file (GLOB INCLUDES "./include/*.h")
 file (GLOB SOURCES "./src/*.cpp")
@@ -31,12 +34,15 @@ else()
 endif()
 
 # Указываем пути поиска заголовков
-target_include_directories (${TARGET} PRIVATE ./include/)
+target_include_directories (${TARGET} PRIVATE ./include/ ../../graphics/include/)
 
 # Компонуемся с библиотеками Qt6
 target_link_libraries (${TARGET} Qt6::Xml)
 target_link_libraries (${TARGET} Qt6::Gui)
 target_link_libraries (${TARGET} Qt6::Widgets)
+target_link_libraries (${TARGET} vsg::vsg)
+target_link_libraries (${TARGET} vsgXchange::vsgXchange)
+target_link_libraries (${TARGET} graphics)
 
 # и с нашими не забываем
 target_link_libraries (${TARGET} CfgReader)

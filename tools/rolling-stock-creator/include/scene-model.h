@@ -14,6 +14,7 @@
 namespace vsg
 {
 
+class Animation;
 class Group;
 class Node;
 
@@ -97,6 +98,11 @@ public:
     const std::vector<SceneNodeInfo>& nodes() const;
     std::vector<SceneNodeInfo>& nodes();
 
+    /// Анимации glTF-модели, собранные при загрузке из узлов
+    /// vsg::AnimationGroup (загрузчик vsgXchange оборачивает
+    /// анимированную сцену в AnimationGroup)
+    const std::vector<vsg::ref_ptr<vsg::Animation>>& animations() const;
+
     /// Узел по пути ("0/2/1"); nullptr, если не найден
     SceneNodeInfo* nodeByPath(const QString& path);
 
@@ -120,6 +126,7 @@ private:
     QString model_path_;
     vsg::ref_ptr<vsg::Node> root_;
     std::vector<SceneNodeInfo> nodes_;
+    std::vector<vsg::ref_ptr<vsg::Animation>> animations_;
     vsg::dvec3 overall_min_ = vsg::dvec3(0.0, 0.0, 0.0);
     vsg::dvec3 overall_max_ = vsg::dvec3(0.0, 0.0, 0.0);
     bool loaded_ = false;

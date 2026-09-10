@@ -104,7 +104,20 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(map, &MapWidget::sigSelectNearestTrajectory,
             this, &MainWindow::slotSelectTrajectory);
 
-    load_config("../cfg/route-map-tcp.xml");
+    // Конфиг ищем относительно папки exe (а не текущей директории:
+    // запуск двойным кликом из другого каталога ломал путь)
+    const QString cfg_path =
+            QCoreApplication::applicationDirPath() +
+            "/../cfg/route-map-tcp.xml";
+
+    if (QFile::exists(cfg_path))
+    {
+        load_config(cfg_path);
+    }
+    else
+    {
+        load_config("../cfg/route-map-tcp.xml");
+    }
 
     overrideByCommandLine(cmd_line);
 

@@ -20,12 +20,20 @@
 #include    <cstddef>
 #include <vector>
 
-class WheelRailAdhesion;
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
+class VEHICLE_EXPORT WheelRailAdhesion;
 
 //------------------------------------------------------------------------------
 /// Система пескоподачи локомотива
 //------------------------------------------------------------------------------
-class SandSystem
+class VEHICLE_EXPORT SandSystem
 {
 public:
 

@@ -16,6 +16,8 @@
 #ifndef     MODEL_H
 #define     MODEL_H
 
+#include <array>
+#include <map>
 #include    <QtGlobal>
 #include    <QObject>
 #include    <QThread>
@@ -45,6 +47,7 @@
 #include    <collision-world-loader.h>
 #include    <catenary-system.h>
 #include    <weather-system.h>
+#include    <cassette-recorder.h>
 #include    <vehicle-sound-events.h>
 #include    <simulation-lod.h>
 #include    <perf-profiler.h>
@@ -53,6 +56,8 @@
 #include    <tcp-server.h>
 
 #include    <scenario-manager.h>
+
+#include    <session-save-manager.h>
 
 #if defined(MODEL_LIB)
     #define MODEL_EXPORT Q_DECL_EXPORT
@@ -106,6 +111,13 @@ public:
     /// Доставлено груза (заказы точек разгрузки, ТЗ п.18), т
     double getDeliveredTonnes() const;
 
+    /// Загрузка сейва сессии (ТЗ "RP-сервер", п.5): применяется при
+    /// старте до создания поездов. Полный путь к файлу сейва
+    bool loadSession(const QString &path);
+
+    /// Список файлов сейвов сессии (новые раньше) - для пульта организатора
+    QStringList sessionSaveFiles() const;
+
 public slots:
 
     /// Messages output
@@ -129,6 +141,26 @@ signals:
     void step(const simulator_time_t& current_time, const double& integration_time);
 
     void sigInitTimetable();
+
+    /// Рассылка клиентам через сетевой поток (ТЗ "RP-сервер", п.7):
+    /// сервер сети живёт в отдельном потоке с высшим приоритетом,
+    /// модель передаёт данные сигналами (queued), не блокируя физику
+    void sigTcpUpdateTrainsInfo(QByteArray trains_state);
+
+    void sigTcpUpdateVehiclesPos(QByteArray vehicles_pos, double t);
+
+    void sigTcpUpdateVehiclesState(QByteArray vehicles_state, double t);
+
+    void sigTcpUpdatePlayers(QByteArray players_data, double t);
+
+    void sigTcpUpdateVehicleControlled(QByteArray vehicles_state, int client_id, double t);
+
+    void sigTcpUpdateDiagnostics(QByteArray diagnostics_data, double t);
+
+    /// Обновление кэша топологии/сигналов для новых клиентов
+    void sigTcpTopologyData(QByteArray topology_data);
+
+    void sigTcpSignalsData(QByteArray signals_data);
 
 private:
 
@@ -176,8 +208,29 @@ private:
         int prev_cab_controlled = -1;
         controlled_t vehicle_control_by_keyboard = controlled_t();
         simulator_vehicle_controlled_update_t vehicle_controlled = simulator_vehicle_controlled_update_t();
+        /// Табельный номер игрока (ТЗ "RP-сервер", п.9; -1 - неизвестен)
+        int tab_number = -1;
     };
     QMap<int, controlled_client_t> controlled_clients;
+
+    /// Табельные номера подключённых клиентов (client_id -> табельный,
+    /// ТЗ "RP-сервер", п.9): приходят от клиента при подключении
+    QMap<int, int> client_tabs;
+
+    /// "Зависший" поезд отключившегося клиента (ТЗ "RP-сервер", п.6):
+    /// поезд НЕ удаляется, остаётся в последнем корректном состоянии
+    struct hanging_client_t
+    {
+        int vehicle_idx = -1;           ///< Управляемая ПЕ
+        int cab_idx = -1;               ///< Кабина управления
+        int tab_number = -1;            ///< Табельный номер игрока
+        double disconnect_time = 0.0;   ///< Момент отключения, с (realtime)
+        bool emergency = false;         ///< Включено экстренное торможение
+    };
+    QMap<int, hanging_client_t> hanging_clients;
+
+    /// Таймаут ожидания вернувшегося игрока, с (ТЗ п.6)
+    double hanging_timeout = 300.0;
 
     /// All vehicles
     std::vector<Vehicle *> vehicles;
@@ -240,6 +293,16 @@ private:
     /// Шаг операций погрузки/разгрузки (позиционирование + автозапуск)
     void stepLoadingOperations(double dt);
 
+    /// Сервисные клавиши деповского питания K/L/O по фронту нажатия
+    /// (ТЗ "Деповское питание", п.4: кабель -> питание -> вводной).
+    /// Клавиши приходят клиенту управляемой ПЕ - детект фронтов здесь,
+    /// блокировки последовательности - внутри DepotPowerSystem
+    void stepDepotPowerKeys(size_t vehicle_idx,
+                            const std::vector<std::uint16_t>& pressed_keys);
+
+    /// Предыдущее состояние сервисных клавиш по ПЕ (детект фронтов)
+    std::map<size_t, std::array<bool, 3>> depot_key_prev;
+
     /// Зона тоннеля: [начало, конец] в пикетаже, м
     std::vector<std::pair<double, double>> tunnel_zones;
 
@@ -252,10 +315,30 @@ private:
         bool oil = false;
         bool coolant = false;
         bool sand = false;
+        bool power = false;         ///< Колонка деповского питания 380 В
+        double cable_length = 25.0; ///< Длина кабеля колонки, м
     };
 
     /// Зоны заправки маршрута (service.conf)
     std::vector<ServiceZone> service_zones;
+
+    /// Кассета регистрации (ТЗ "Кассеты"): запись .kr для управляемой
+    /// ПЕ. Вставка/извлечение - Ctrl+R (переключатель, без физического
+    /// объекта в мире; параметры записи одинаковы для всех дополнений)
+    CassetteRecorderSystem cassette;
+    double cassette_sample_timer = 0.0;   ///< таймер выборок 2 Гц
+    double cassette_time = 0.0;           ///< время с начала записи
+    double cassette_prev_speed = 0.0;     ///< для ускорения разностью
+    bool cassette_key_prev = false;       ///< фронт Ctrl+R
+
+    /// Предупреждение игроку (в поз-апдейте клиенту): "Запись
+    /// параметров движения начата/окончена"
+    quint32 cassette_notice_id = 0;
+    QString cassette_notice = "";
+    void notifyCassette(const QString& message);
+
+    /// Шаг кассеты регистрации (снимок + сброс на диск)
+    void stepCassette(double dt);
 
     /// Загрузка зон тоннелей (tunnel.conf) и раздача ПЕ
     void initTunnelZones(const init_data_t& init_data);
@@ -299,6 +382,29 @@ private:
 
     /// TCP-server
     TcpServer   *tcp_server = new TcpServer;
+
+    /// Поток сетевого ввода/вывода (ТЗ "RP-сервер", п.7: высший приоритет)
+    QThread     *tcp_thread = nullptr;
+
+    /// Автосохранение сессии (ТЗ "RP-сервер", п.5, 7, 8): снимки
+    /// пишет фоновый поток с низшим приоритетом
+    SessionSaveManager *session_saves = new SessionSaveManager(this);
+
+    /// Таймер автосохранения, с (realtime)
+    double session_save_timer = 0.0;
+
+    /// Момент последнего шага подсистем сессии, с (realtime)
+    double session_prev_realtime = 0.0;
+
+    /// Таймер обновления кэша топологии/сигналов, с
+    double tcp_cache_timer = 0.0;
+
+    /// Сейв, загруженный организатором (ТЗ п.5): применяется при старте
+    /// до создания поездов (позиции/скорости), стрелки - после постановки
+    session::session_state_t pending_session;
+
+    /// Загруженный сейв ждёт применения
+    bool is_session_pending = false;
 
     /// Менеджер сценариев
     ScenarioManager *scnmgr = new ScenarioManager;
@@ -357,6 +463,33 @@ private:
     /// Инициализация TCP-сервера
     void initTcpServer();
 
+    /// Инициализация автосохранений сессии и серверного лога
+    /// (ТЗ "RP-сервер", п.4, 5)
+    void initSessionSaves();
+
+    /// Сбор полного снимка сессии (вызывается в потоке модели)
+    session::session_state_t captureSessionState();
+
+    /// Применение загруженного сейва к расстановке: позиции, скорости,
+    /// табельные номера (до создания поездов)
+    void applySessionToInitDatas();
+
+    /// Применение состояний стрелок и клиентов из сейва (после
+    /// постановки поездов на топологию)
+    void applySessionSwitchStates();
+
+    /// Шаг подсистем сессии: таймер автосохранения (ТЗ п.5) и обновление
+    /// кэша топологии/сигналов для новых клиентов
+    void stepSessionSaves(double realtime_seconds);
+
+    /// Шаг "зависших" поездов (ТЗ п.6): таймаут без игрока -
+    /// экстренное торможение состава
+    void stepHangingClients(double realtime_seconds);
+
+    /// Восстановление управления игроку по табельному номеру (ТЗ п.6, 9):
+    /// true - найден "зависший" поезд, управление возвращено
+    bool restoreClientByTabNumber(int client_id, int tab_number);
+
     /// Подготовка данных перед передачей серверу для рассылки клиентам
     void prepareFeedBack(bool need_trains_feedback);
 
@@ -380,7 +513,7 @@ private slots:
 
     void slotGetSignalsData(QByteArray &signals_data);
 
-    void slotGetVehicleControlByKeyboard(QByteArray &control_data, int client_id);
+    void slotGetVehicleControlByKeyboard(QByteArray control_data, int client_id);
 
     void slotResetVehicleControlByKeyboard(int client_id);
 
@@ -392,6 +525,16 @@ private slots:
     void slotUpdateTrainTimetable(int train_idx);
 
     void slotSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t id, float value);
+
+    /// Табельный номер клиента при подключении (ТЗ "RP-сервер", п.9):
+    /// автоназначение поезда / восстановление "зависшего" (п.6)
+    void slotClientTabNumber(int client_id, int tab_number);
+
+    /// Организатор: закрепить поезд за игроком по табельному (ТЗ п.2, 9)
+    void slotSetTrainTab(int train_idx, int tab_number);
+
+    /// Организатор: загрузить сейв сессии (ТЗ п.5)
+    void slotLoadSession(QString path);
 };
 
 #endif // MODEL_H

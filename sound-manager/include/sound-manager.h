@@ -25,6 +25,10 @@ public:
     SoundManager(QObject* parent = nullptr);
     ~SoundManager();
 
+    /// Глобальное включение/выключение звука (контекст OpenAL):
+    /// Sound/Enabled=0 в settings.xml - полная тишина
+    void setEnabled(bool enabled);
+
     /// Загрузка звуков для единицы подвижного состава.
     /// Возвращает список порядковых номеров загруженных звуков
     std::vector<std::size_t> loadVehicleSounds(const std::string& sound_dir);

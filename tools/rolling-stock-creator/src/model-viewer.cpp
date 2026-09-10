@@ -2,6 +2,8 @@
 
 #include "graphics/common.h"
 
+#include <vsg/animation/Animation.h>
+#include <vsg/animation/AnimationManager.h>
 #include <vsg/app/Camera.h>
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/CommandGraph.h>
@@ -34,8 +36,6 @@
 //  через vsg::Builder и пересобираются задачами в потоке рендера.
 //
 //------------------------------------------------------------------------------
-namespace
-{
 
 //------------------------------------------------------------------------------
 /// Орбит-камера: параметры орбиты + обработчик событий мыши
@@ -419,7 +419,120 @@ vsg::ref_ptr<vsg::Node> buildMarkersGroup(const std::vector<PhysPoint>& points,
     return group;
 }
 
-} // namespace
+//------------------------------------------------------------------------------
+/// Построить трёхцветные стрелки осей XYZ в центре модели (промт п.38):
+/// X — красная (вправо), Y — зелёная (вдоль пути), Z — синяя (вверх).
+/// Стрелки — цилиндр + конус через vsg::Builder (по образцу сетки),
+/// геометрия строится вдоль локальной Z и поворачивается на целевую ось
+//------------------------------------------------------------------------------
+vsg::ref_ptr<vsg::Node> buildAxesMarker(const vsg::dvec3& center,
+                                        double scene_radius)
+{
+    auto builder = vsg::Builder::create();
+    auto group = vsg::Group::create();
+
+    vsg::StateInfo state;
+    state.lighting = true;
+
+    // Длина стрелок масштабируется под модель, но в разумных пределах
+    const double length = std::clamp(0.55 * scene_radius, 0.8, 4.0);
+    const double shaft_length = 0.65 * length;
+    const double tip_length = length - shaft_length;
+    const double shaft_radius = std::max(0.015, 0.018 * length);
+    const double tip_radius = 3.0 * shaft_radius;
+
+    struct AxisSpec
+    {
+        vsg::vec4 color;     ///< Цвет стрелки
+        vsg::vec3 direction; ///< Направление оси в мире
+        vsg::mat4 rotation;  ///< Поворот локальной Z на направление оси
+    };
+
+    const AxisSpec axes[3] =
+    {
+        // X (вправо): поворот вокруг Y на +90 град переводит Z в X
+        {vsg::vec4(0.9f, 0.2f, 0.2f, 1.0f),
+         vsg::vec3(1.0f, 0.0f, 0.0f),
+         vsg::rotate(vsg::radians(90.0f), vsg::vec3(0.0f, 1.0f, 0.0f))},
+        // Y (вдоль пути): поворот вокруг X на -90 град переводит Z в Y
+        {vsg::vec4(0.2f, 0.9f, 0.2f, 1.0f),
+         vsg::vec3(0.0f, 1.0f, 0.0f),
+         vsg::rotate(vsg::radians(-90.0f), vsg::vec3(1.0f, 0.0f, 0.0f))},
+        // Z (вверх): без поворота
+        {vsg::vec4(0.2f, 0.4f, 1.0f, 1.0f),
+         vsg::vec3(0.0f, 0.0f, 1.0f),
+         vsg::rotate(vsg::radians(0.0f), vsg::vec3(0.0f, 0.0f, 1.0f))}
+    };
+
+    const vsg::vec3 origin(static_cast<float>(center.x),
+                           static_cast<float>(center.y),
+                           static_cast<float>(center.z));
+
+    for (const AxisSpec& axis : axes)
+    {
+        // Стержень — цилиндр вдоль оси
+        vsg::GeometryInfo shaft_info;
+        shaft_info.position = origin + axis.direction *
+                static_cast<float>(0.5 * shaft_length);
+        shaft_info.dx = vsg::vec3(static_cast<float>(2.0 * shaft_radius),
+                                  0.0f, 0.0f);
+        shaft_info.dy = vsg::vec3(0.0f,
+                                  static_cast<float>(2.0 * shaft_radius),
+                                  0.0f);
+        shaft_info.dz = vsg::vec3(0.0f, 0.0f,
+                                  static_cast<float>(shaft_length));
+        shaft_info.transform = axis.rotation;
+        shaft_info.color = axis.color;
+        group->addChild(builder->createCylinder(shaft_info, state));
+
+        // Кончик — конус (строится вдоль локальной Z, как цилиндр)
+        vsg::GeometryInfo tip_info;
+        tip_info.position = origin + axis.direction *
+                static_cast<float>(shaft_length + 0.5 * tip_length);
+        tip_info.dx = vsg::vec3(static_cast<float>(2.0 * tip_radius),
+                                0.0f, 0.0f);
+        tip_info.dy = vsg::vec3(0.0f,
+                                static_cast<float>(2.0 * tip_radius),
+                                0.0f);
+        tip_info.dz = vsg::vec3(0.0f, 0.0f,
+                                static_cast<float>(tip_length));
+        tip_info.transform = axis.rotation;
+        tip_info.color = axis.color;
+        group->addChild(builder->createCone(tip_info, state));
+    }
+
+    return group;
+}
+
+//------------------------------------------------------------------------------
+/// Построить полупрозрачный бокс габарита 1Т (промт п.38):
+/// 3.7 м по ширине (X) x 5.3 м по высоте (Z), низ на уровне головки
+/// рельса (z=0), длина по Y — из bbox модели; blending как у коллизий
+//------------------------------------------------------------------------------
+vsg::ref_ptr<vsg::Node> buildGabaritMarker(double length, double center_y)
+{
+    constexpr double gabarit_width = 3.7;  ///< Габарит 1Т: полная ширина, м
+    constexpr double gabarit_height = 5.3; ///< Габарит 1Т: высота от УГР, м
+
+    auto builder = vsg::Builder::create();
+
+    vsg::StateInfo state;
+    state.lighting = true;
+    state.two_sided = true;
+    state.blending = true;
+
+    vsg::GeometryInfo info;
+    info.position = vsg::vec3(0.0f, static_cast<float>(center_y),
+                              static_cast<float>(0.5 * gabarit_height));
+    info.dx = vsg::vec3(static_cast<float>(gabarit_width), 0.0f, 0.0f);
+    info.dy = vsg::vec3(0.0f, static_cast<float>(length), 0.0f);
+    info.dz = vsg::vec3(0.0f, 0.0f,
+                        static_cast<float>(gabarit_height));
+    info.color = vsg::vec4(0.2f, 0.85f, 0.3f, 0.16f);
+
+    return builder->createBox(info, state);
+}
+
 
 //------------------------------------------------------------------------------
 //
@@ -667,6 +780,165 @@ void ModelViewer::setPointMarkers(const std::vector<PhysPoint>& points,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ModelViewer::setComMarker(bool visible, const vsg::dvec3& position,
+                               double radius)
+{
+    postTask([this, visible, position, radius]()
+    {
+        if (objects_ == nullptr || objects_->com_slot == nullptr ||
+            objects_->viewer == nullptr)
+        {
+            return;
+        }
+
+        objects_->com_slot->children.clear();
+
+        if (visible)
+        {
+            auto builder = vsg::Builder::create();
+
+            vsg::StateInfo state;
+            state.lighting = true;
+            state.two_sided = true;
+            state.blending = true;
+
+            // Жёлтая полупрозрачная сфера — центр масс (ТЗ п.14)
+            vsg::GeometryInfo info;
+            info.position = vsg::vec3(static_cast<float>(position.x),
+                                      static_cast<float>(position.y),
+                                      static_cast<float>(position.z));
+            info.dx = vsg::vec3(static_cast<float>(2.0 * radius), 0.0f, 0.0f);
+            info.dy = vsg::vec3(0.0f, static_cast<float>(2.0 * radius), 0.0f);
+            info.dz = vsg::vec3(0.0f, 0.0f,
+                                static_cast<float>(2.0 * radius));
+            info.color = vsg::vec4(1.0f, 0.85f, 0.1f, 0.95f);
+
+            objects_->com_slot->addChild(builder->createSphere(info, state));
+            objects_->viewer->compile();
+        }
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ModelViewer::setAxesMarker(bool visible)
+{
+    postTask([this, visible]()
+    {
+        if (objects_ == nullptr || objects_->axes_slot == nullptr ||
+            objects_->viewer == nullptr)
+        {
+            return;
+        }
+
+        objects_->axes_slot->children.clear();
+
+        if (visible)
+        {
+            objects_->axes_slot->addChild(
+                        buildAxesMarker(objects_->scene_center,
+                                        objects_->scene_radius));
+            objects_->viewer->compile();
+        }
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ModelViewer::setGabaritMarker(bool visible, double length)
+{
+    postTask([this, visible, length]()
+    {
+        if (objects_ == nullptr || objects_->gabarit_slot == nullptr ||
+            objects_->viewer == nullptr)
+        {
+            return;
+        }
+
+        objects_->gabarit_slot->children.clear();
+
+        if (visible)
+        {
+            objects_->gabarit_slot->addChild(
+                        buildGabaritMarker(std::max(length, 1.0),
+                                           objects_->scene_center.y));
+            objects_->viewer->compile();
+        }
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ModelViewer::playAnimation(vsg::ref_ptr<vsg::Animation> animation,
+                                double speed, bool loop)
+{
+    postTask([this, animation, speed, loop]()
+    {
+        if (objects_ == nullptr || objects_->viewer == nullptr ||
+            animation == nullptr)
+        {
+            return;
+        }
+
+        // Параметры проигрывания: скорость и режим повтора
+        animation->speed = speed;
+        animation->mode = loop ? vsg::Animation::REPEAT
+                               : vsg::Animation::ONCE;
+
+        // AnimationManager создан конструктором vsg::Viewer и обновляется
+        // в Viewer::update() каждого кадра
+        if (objects_->viewer->animationManager != nullptr)
+        {
+            objects_->viewer->animationManager->play(animation);
+        }
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ModelViewer::stopAnimation(vsg::ref_ptr<vsg::Animation> animation)
+{
+    postTask([this, animation]()
+    {
+        if (objects_ == nullptr || objects_->viewer == nullptr ||
+            animation == nullptr)
+        {
+            return;
+        }
+
+        if (objects_->viewer->animationManager != nullptr)
+        {
+            objects_->viewer->animationManager->stop(animation);
+        }
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ModelViewer::stopAllAnimations()
+{
+    postTask([this]()
+    {
+        if (objects_ == nullptr || objects_->viewer == nullptr)
+        {
+            return;
+        }
+
+        if (objects_->viewer->animationManager != nullptr)
+        {
+            objects_->viewer->animationManager->stop();
+        }
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void ModelViewer::setGridVisible(bool visible)
 {
     postTask([this, visible]()
@@ -792,6 +1064,7 @@ void ModelViewer::renderLoop(vsg::ref_ptr<vsg::Node> scene,
     const double scene_radius = std::max(0.5 * vsg::length(scene_size), 1.0);
 
     objects.scene_radius = scene_radius;
+    objects.scene_center = scene_center;
     objects.window_aspect = static_cast<double>(window->extent2D().width) /
                             static_cast<double>(window->extent2D().height);
 
@@ -814,6 +1087,16 @@ void ModelViewer::renderLoop(vsg::ref_ptr<vsg::Node> scene,
 
     objects.markers_slot = vsg::Group::create();
     objects.root->addChild(objects.markers_slot);
+
+    objects.com_slot = vsg::Group::create();
+    objects.root->addChild(objects.com_slot);
+
+    // Слоты дебаг-вида (промт п.38): стрелки осей и бокс габарита
+    objects.axes_slot = vsg::Group::create();
+    objects.root->addChild(objects.axes_slot);
+
+    objects.gabarit_slot = vsg::Group::create();
+    objects.root->addChild(objects.gabarit_slot);
 
     objects.grid_content = buildGrid(scene_radius);
     objects.grid_slot->addChild(objects.grid_content);

@@ -108,6 +108,7 @@ client_data_t::client_data_t()
     , players_update_prev_time(0.0)
     , diagnostics_update_interval(0.0)
     , diagnostics_update_prev_time(0.0)
+    , tab_number(-1)
     , socket(nullptr)
     , received_data()
 {

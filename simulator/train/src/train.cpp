@@ -1188,9 +1188,9 @@ bool Train::lodCommandsChanged()
 
     for (const Vehicle* vehicle : vehicles)
     {
-        const auto& signals = vehicle->getControlSignalsRef().analogSignal;
+        const auto& analog = vehicle->getControlSignalsRef().analogSignal;
 
-        for (const signal_t& signal : signals)
+        for (const signal_t& signal : analog)
         {
             if (signal.is_active)
                 checksum += signal.cur_value;

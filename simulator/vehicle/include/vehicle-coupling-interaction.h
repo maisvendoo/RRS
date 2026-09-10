@@ -22,12 +22,20 @@
 
 #include    <cstddef>
 
-class VehicleDamageSystem;
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
+class VEHICLE_EXPORT VehicleDamageSystem;
 
 //------------------------------------------------------------------------------
 /// Интерактивная сцепка ПЕ (оба конца)
 //------------------------------------------------------------------------------
-class CouplingInteraction
+class VEHICLE_EXPORT CouplingInteraction
 {
 public:
 

@@ -36,7 +36,6 @@
 #include    "vehicle-adhesion.h"
 #include    "vehicle-sand.h"
 #include    "vehicle-brake-shoes.h"
-#include    "vehicle-diesel.h"
 #include    "vehicle-energy.h"
 #include    "vehicle-pantograph.h"
 #include    "vehicle-depot-power.h"
@@ -52,6 +51,8 @@
 #include    "vehicle-wheel-wear.h"
 #include    "vehicle-tunnel.h"
 #include    "vehicle-wsp.h"
+
+#include    <catenary-system.h>
 
 #include    <simulation-lod.h>
 
@@ -217,10 +218,6 @@ public:
 
     /// Система тормозных колодок (нагрев/износ/fade)
     BrakeShoeSystem& getBrakeShoes();
-
-    /// Дизельный двигатель (для тепловозов; null-паттерн: если
-    /// NominalPower в конфиге 0 - дизеля нет)
-    DieselEngineSystem& getDiesel();
 
     /// Учёт электроэнергии и статистика рейса
     EnergyMeterSystem& getEnergy();
@@ -551,9 +548,6 @@ protected:
 
     /// Тормозные колодки
     BrakeShoeSystem brake_shoes;
-
-    /// Дизель (тепловозы; при NominalPower=0 - отсутствует)
-    DieselEngineSystem diesel;
 
     /// Учёт электроэнергии (электровозы)
     EnergyMeterSystem energy;

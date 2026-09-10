@@ -18,6 +18,12 @@ gui_settings_t::gui_settings_t()
     , show_topology(true)
     , show_selected_objects_properties(true)
     , show_commands(true)
+    , show_validator(false)
+    , show_model_browser(false)
+    , show_mass_edit(false)
+    , show_layers(false)
+    , show_prefabs(false)
+    , show_minimap(false)
 {
 }
 
@@ -37,6 +43,12 @@ void gui_settings_t::read(CfgReader& cfg)
     cfg.getBool(section, "ShowSelectedObjectsProperties",
         show_selected_objects_properties);
     cfg.getBool(section, "ShowCommands", show_commands);
+    cfg.getBool(section, "ShowValidator", show_validator);
+    cfg.getBool(section, "ShowModelBrowser", show_model_browser);
+    cfg.getBool(section, "ShowMassEdit", show_mass_edit);
+    cfg.getBool(section, "ShowLayers", show_layers);
+    cfg.getBool(section, "ShowPrefabs", show_prefabs);
+    cfg.getBool(section, "ShowMinimap", show_minimap);
 }
 
 void gui_settings_t::print_in_journal() const
@@ -58,4 +70,10 @@ void gui_settings_t::print_in_journal() const
     journal->debug("    show_selected_objects_properties: " +
         to_qstring(show_selected_objects_properties));
     journal->debug("    show_commands: " + to_qstring(show_commands));
+    journal->debug("    show_validator: " + to_qstring(show_validator));
+    journal->debug("    show_model_browser: " +
+        to_qstring(show_model_browser));
+    journal->debug("    show_mass_edit: " + to_qstring(show_mass_edit));
+    journal->debug("    show_layers: " + to_qstring(show_layers));
+    journal->debug("    show_prefabs: " + to_qstring(show_prefabs));
 }

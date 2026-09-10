@@ -59,7 +59,9 @@ public:
         const std::uint32_t base = appendVertices(positions);
 
         std::vector<std::uint32_t> indices;
-        if (!readIndices(*vid.indices, vid.firstIndex, vid.indexCount, indices))
+        if (!vid.indices || !vid.indices->data)
+            return;
+        if (!readIndices(*vid.indices->data, vid.firstIndex, vid.indexCount, indices))
             return;
 
         // Модели маршрутов - треугольные сетки (dmd2gltf триангулирует)
@@ -100,12 +102,14 @@ public:
 private:
 
     static const vsg::vec3Array* findPositions(
-        const std::vector<vsg::ref_ptr<vsg::Data>>& arrays)
+        const vsg::BufferInfoList& arrays)
     {
         // vsgXchange кладёт POSITION первым массивом, но перестрахуемся
-        for (const auto& data : arrays)
+        for (const auto& info : arrays)
         {
-            if (auto positions = data.cast<vsg::vec3Array>())
+            if (!info || !info->data)
+                continue;
+            if (auto positions = info->data.cast<vsg::vec3Array>())
                 return positions.get();
         }
         return nullptr;

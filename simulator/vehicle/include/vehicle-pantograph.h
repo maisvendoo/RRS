@@ -17,10 +17,18 @@
 
 #include    <cstddef>
 
+#ifndef VEHICLE_EXPORT
+    #if defined(VEHICLE_LIB)
+        #define VEHICLE_EXPORT Q_DECL_EXPORT
+    #else
+        #define VEHICLE_EXPORT Q_DECL_IMPORT
+    #endif
+#endif
+
 //------------------------------------------------------------------------------
 /// Токоприёмник ПЕ
 //------------------------------------------------------------------------------
-class PantographSystem
+class VEHICLE_EXPORT PantographSystem
 {
 public:
 
@@ -28,6 +36,11 @@ public:
 
     /// Загрузка секции [Pantograph]
     void loadConfig(QString cfg_path);
+
+    /// Секция [Pantograph] есть в конфиге: физическая модель
+    /// токоприёмника активна (гейт Uks, дуги, износ). Без секции ПС
+    /// работает по legacy-схеме - Uks задаёт модуль ПС (как в апстриме)
+    bool isConfigured() const;
 
     /// Поднять / опустить
     void setRaised(bool raised);
@@ -54,6 +67,9 @@ private:
 
     bool raised = false;
 
+    /// Секция [Pantograph] найдена в конфиге ПС
+    bool configured = false;
+
     /// Статический прижим, Н
     double static_force = 70.0;
 
@@ -75,9 +91,10 @@ private:
 
     /// Дуги
     unsigned long arcs_total = 0;
-    double arc_window = 0.0;    ///< с дуг за последнее окно
-    double arc_timer = 0.0;
+    unsigned long arc_window_count = 0;    ///< дуг за последнее окно 1 с
+    double arc_window_time = 0.0;          ///< длительность окна, с
     double arc_rate = 0.0;
+    double total_time = 0.0;
 
     double wear = 0.0;
 };

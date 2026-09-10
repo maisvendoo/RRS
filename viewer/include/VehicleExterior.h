@@ -10,6 +10,7 @@ class SoundManager;
 class IOController;
 //class AnimatedPagedLOD;       // Forward declare не работает,
 #include "AnimatedPagedLOD.h"   // VehiclesHandler ругается на incomplete use
+#include "CabElements.h"
 
 //------------------------------------------------------------------------------
 //
@@ -28,6 +29,14 @@ public:
     vsg::dvec3  velocity = vsg::dvec3(0.0, 0.0, 0.0);
     std::vector<vsg::dvec3>  driver_pos = {vsg::dvec3(0.0, 0.0, 0.0)};
     std::vector<double>  driver_dir = {0};
+
+    /// Точки выхода из кабин (пешая ходьба, ТЗ "walking"): спавн игрока
+    /// при выходе; при отсутствии <ExitPos> - у двери, сдвиг от DriverPos
+    std::vector<vsg::dvec3>  exit_pos = {};
+    std::vector<double>  exit_dir = {};
+
+    /// Сиденье помощника в кабинах (посадка по E, ТЗ ходьба)
+    std::vector<vsg::dvec3>  assistant_pos = {};
     int         train_id = 0;
     int         orientation = 1;
     int         prev_vehicle = -1;
@@ -35,6 +44,20 @@ public:
 
     std::vector<size_t> sounds_id = {};
     std::vector<vsg::ref_ptr<AnimatedPagedLOD>> animated_nodes;
+
+    /// Интерактивные органы кабины из [CabElement] конфига ПС
+    std::vector<CabElement> cab_elements = {};
+
+    /// Текущее значение анимационного сигнала (состояние органа),
+    /// -1 - сигнала нет. Для тултипа Alt-режима
+    float getCabSignal(int signal_id) const;
+
+    /// СЫРОЕ значение сигнала от сервера (без анимационного
+    /// сглаживания): мгновенное состояние органа для клика, -1 - нет
+    float getRawSignal(int signal_id) const;
+
+    /// Последний набор аналоговых сигналов сервера
+    const std::vector<float>* last_server_signals = nullptr;
 
     vsg::dvec3  saved_cabine_cam_shift = vsg::dvec3(0.0, 0.0, 0.0);
     double      saved_cabine_cam_right = 0.0;
@@ -64,6 +87,10 @@ public:
                      const std::string& cfg_file,
                      SoundManager *sm,
                      vsg::ref_ptr<vsg::Options> options);
+
+    /// Мировая позиция локальной точки ПЕ (x - вправо, y - вперёд,
+    /// z - вверх от центра ПЕ) по текущим интерполированным осям
+    vsg::dvec3 worldFromLocal(const vsg::dvec3& local) const;
 
 private:
 

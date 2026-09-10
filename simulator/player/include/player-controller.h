@@ -16,6 +16,8 @@
 
 #include    <collision-world.h>
 
+#include    <QString>
+
 #include    <cstddef>
 
 //------------------------------------------------------------------------------
@@ -26,6 +28,9 @@ class PlayerController
 public:
 
     PlayerController() = default;
+
+    /// Загрузка параметров из секции [Player] конфигурации
+    void loadConfig(QString cfg_path);
 
     /// Шаг: wish_x/wish_y - желаемое движение в локальных осях (-1..1,
     /// x - вправо, y - вперёд), jump - прыжок, sprint - спринт,
@@ -51,8 +56,27 @@ public:
     /// Горизонтальная скорость, м/с
     double getSpeed() const;
 
+    /// Вертикальная скорость, м/с (отрицательная - падение)
+    double getVerticalVelocity() const;
+
+    /// Приземлился на этом шаге (фронтом касания земли)
+    bool justLanded() const;
+
+    /// Скорость удара при приземлении, м/с (для проседания камеры)
+    double getLandingImpact() const;
+
+    /// В спринте (для расширения FOV камеры, ТЗ п.12)
+    bool isSprinting() const;
+
+    /// В приседе
+    bool isCrouched() const;
+
     /// Телепорт (спавн/вход в кабину)
     void teleport(const collision::Vec3f& position);
+
+    /// Смотрит в направлении yaw (рад). Yaw задаётся камерой
+    void setYaw(double yaw);
+    double getYaw() const;
 
 private:
 
@@ -72,6 +96,13 @@ private:
 
     bool grounded_ = false;
     bool crouched_ = false;
+    bool sprinting_ = false;
+
+    double yaw_ = 0.0;
+
+    /// Приземление на последнем шаге (фронтом перехода земля/воздух)
+    bool just_landed_ = false;
+    double landing_impact_ = 0.0;
 
     /// Скорости, м/с
     double walk_speed_ = 1.6;

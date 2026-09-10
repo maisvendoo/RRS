@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>RRS — Расшифровка кассет регистрации (.kr)</title>
+<!--
+  Программа расшифровки кассет регистрации (ТЗ "Кассеты", промт 2).
+  Отдельная страница ТЧМИ: открывает файл .kr, проверяет целостность
+  (CRC32 блоков, мастер-хеш SHA-256, подпись), расшифровывает AES-256-CBC
+  встроенным ключом и отображает: графики каналов, дискретные состояния,
+  лог нажатий, профиль пути, нарушения скорости (протокол).
+
+  Формат полностью соответствует CassetteRecorderSystem (simulator/cassette):
+    заголовок: magic16 + ver u16 + flag u8 + crc32
+    блок 0 (bootstrap, открытый): серийник кассеты
+    блоки: [id u32][len u32][AES-шифр][crc32(id+len+шифр)]
+    ключ сессии: sha256(мастер-ключ || серийник)
+    IV блока:     sha256(серийник || offset блока u64le)[0..16]
+  Все данные — из файла кассеты, демонстрационных значений нет.
+-->
+<style>
+:root{
+  --bg:#2b2b2e; --panel:#1e1e21; --grid:#3c3c40; --txt:#c8c8c8;
+  --accent:#39c2ff; --ok:#4caf50; --warn:#ffb300; --err:#ff5252;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:13px/1.4 "Consolas","DejaVu Sans Mono",monospace}
+header{background:var(--panel);padding:8px 14px;display:flex;
+  gap:18px;align-items:center;border-bottom:1px solid var(--grid)}
+header h1{font-size:15px;margin:0;color:#fff;font-weight:600}
+button{background:#0e5a80;color:#fff;border:1px solid #1e7fb0;
+  padding:5px 14px;font:inherit;cursor:pointer}
+button:hover{background:#14719f}
+input[type=file]{color:var(--txt)}
+#layout{display:flex;height:calc(100vh - 40px)}
+#charts{flex:1;overflow-y:auto;padding:8px}
+#side{width:330px;background:var(--panel);overflow-y:auto;
+  border-left:1px solid var(--grid);padding:8px;font-size:12px}
+.block{background:var(--panel);border:1px solid var(--grid);
+  margin-bottom:8px;padding:6px}
+.block h3{margin:0 0 6px;font-size:12px;color:var(--accent);
+  text-transform:uppercase;letter-spacing:1px}
+canvas{width:100%;display:block;background:#151517;cursor:crosshair}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{border:1px solid var(--grid);padding:2px 5px;text-align:left;
+  white-space:nowrap}
+th{background:#111;position:sticky;top:0}
+tr:hover td{background:#2f3b44}
+.tag-ok{color:var(--ok)} .tag-err{color:var(--err);font-weight:bold}
+.tag-warn{color:var(--warn)}
+#statusbar{position:fixed;bottom:0;left:0;right:0;background:#111;
+  border-top:1px solid var(--grid);padding:4px 10px;font-size:12px;
+  display:flex;gap:16px;flex-wrap:wrap;white-space:nowrap}
+#empty{color:#777;padding:60px;text-align:center;font-size:15px}
+label.chk{display:block;padding:1px 0}
+.small{color:#888;font-size:11px}
+#btnlog{max-height:260px;overflow:auto}
+.tabs{display:flex;gap:4px;margin-bottom:8px}
+.tabs button{padding:3px 10px;background:#333}
+.tabs button.active{background:#0e5a80}
+.violation{cursor:pointer;padding:3px 5px;border-bottom:1px solid var(--grid)}
+.violation:hover{background:#2f3b44}
+</style>
+</head>
+<body>
+<header>
+  <h1>РАСШИФРОВКА КАССЕТ РЕГИСТРАЦИИ — RRS (ТЧМИ)</h1>
+  <input type="file" id="file" accept=".kr">
+  <button id="csv">Экспорт CSV</button>
+  <button id="printproto">Печать протокола</button>
+  <span class="small" id="fileinfo"></span>
+</header>
+
+<div id="empty">Откройте файл кассеты (.kr): Файл → выбор файла.<br>
+Кассеты создаёт движок RRS в папке Cassettes/ при управлении локомотивом
+(извлечение — Ctrl+R).</div>
+
+<div id="layout" style="display:none">
+  <div id="charts">
+    <div class="block">
+      <h3>Скорость, км/ч — факт / допустимая / превышение</h3>
+      <canvas id="g-speed" height="170"></canvas>
+    </div>
+    <div class="block">
+      <h3>Давления, кгс/см² — ТМ / УР / ТЦ / НМ</h3>
+      <canvas id="g-press" height="170"></canvas>
+    </div>
+    <div class="block">
+      <h3>Электрические — ток ТЭД, А / напряжение КС, В</h3>
+      <canvas id="g-elec" height="170"></canvas>
+    </div>
+    <div class="block">
+      <h3>Дискретные состояния (ЭПК / тяга / рекуперация / песок / экстренное)</h3>
+      <canvas id="g-disc" height="120"></canvas>
+    </div>
+    <div class="block">
+      <h3>Профиль пути — уклон, ‰ (координата снизу)</h3>
+      <canvas id="g-profile" height="120"></canvas>
+    </div>
+  </div>
+
+  <div id="side">
+    <div class="block">
+      <h3>Информация о поездке</h3>
+      <table id="meta"></table>
+    </div>
+    <div class="block">
+      <h3>Целостность кассеты</h3>
+      <div id="integrity"></div>
+    </div>
+    <div class="block">
+      <h3>Каналы</h3>
+      <div id="legend"></div>
+    </div>
+    <div class="block">
+      <h3>Протокол: нарушения (превышение скорости)</h3>
+      <div id="violations" class="small">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="block" id="btnblock" style="display:none;margin:8px">
+  <h3>Лог нажатий кнопок и управления</h3>
+  <button id="printlog" style="margin-bottom:6px">Печать лога</button>
+  <input id="btnfilter" placeholder="фильтр по действию..."
+    style="width:280px;background:#111;color:var(--txt);border:1px solid var(--grid);padding:3px 6px">
+  <div class="small" id="btnsummary"></div>
+  <div id="btnlog" style="max-height:300px;overflow:auto">
+    <table id="btn-table"></table>
+  </div>
+</div>
+
+<div id="statusbar">
+  <span id="sb-time">Время: —</span>
+  <span id="sb-signal">Светофор: —</span>
+  <span id="sb-dir">Напр.: —</span>
+  <span id="sb-coord">Координата: —</span>
+  <span id="sb-speed">Скорость: —</span>
+  <span id="sb-limit">Доп.: —</span>
+  <span id="sb-tm">ТМ: —</span>
+  <span id="sb-er">УР: —</span>
+  <span id="sb-tc">ТЦ: —</span>
+  <span id="sb-nm">НМ: —</span>
+  <span id="sb-i">Ток: —</span>
+  <span id="sb-u">Uкс: —</span>
+</div>
+
+<script>
+"use strict";
+
+// Мастер-ключ формата — тот же, что в kr-crypto CassetteRecorderSystem.
+// Хранится в программе расшифровки (ТЗ п.8), в файле кассеты его нет.
+const MASTER_KEY = new Uint8Array([
+  0x8e,0x12,0x7a,0x45,0xd3,0x6b,0x9f,0x21,
+  0xc8,0x54,0x0e,0x77,0x3b,0xaa,0x91,0x2d,
+  0x64,0xf0,0x18,0xc5,0x9e,0x37,0x72,0x0b,
+  0xad,0x49,0x86,0xe1,0x53,0x0c,0xbf,0x25
+]);
+const MAGIC = "RRS-KR-CASSETTE\0";
+const BLOCK = {BOOTSTRAP:0, SESSION:1, ANALOG:5, DISCRETE:6, BUTTON:7, PATH:8, INTEGRITY:9, SIGNALS:10};
+const END_MARKER = "KR-END\0\0";
+
+const DISCRETE_NAMES = ["EPK","RB","SAUT","TSKBM","Компрессор","Вентилятор",
+  "Песок","Тяга","Рекуперация","Экстренное","Свисток","Двери",
+  "Освещение","Печь","Крыша","БВ"];
+
+//---------------------------- low level -------------------------------------
+function crc32(bytes){
+  let c, table = crc32.table;
+  if(!table){
+    table = crc32.table = new Uint32Array(256);
+    for(let n = 0; n < 256; ++n){
+      c = n;
+      for(let k = 0; k < 8; ++k)
+        c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      table[n] = c >>> 0;
+    }
+  }
+  let crc = 0xFFFFFFFF;
+  for(let i = 0; i < bytes.length; ++i)
+    crc = table[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+async function sha256(bytes){
+  return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+}
+
+function concatBytes(arrays){
+  let n = 0;
+  for(const a of arrays) n += a.length;
+  const out = new Uint8Array(n);
+  let off = 0;
+  for(const a of arrays){ out.set(a, off); off += a.length; }
+  return out;
+}
+
+function utf8(str){ return new TextEncoder().encode(str); }
+
+async function aesCbcDecrypt(key, iv, cipher){
+  const k = await crypto.subtle.importKey("raw", key, {name:"AES-CBC"},
+                                          false, ["decrypt"]);
+  const plain = await crypto.subtle.decrypt({name:"AES-CBC", iv: iv}, k, cipher);
+  return new Uint8Array(plain);   // WebCrypto снимает PKCS#7
+}
+
+//-------------------------------- reader -------------------------------------
+class Reader{
+  constructor(bytes){ this.b = bytes; this.o = 0; this.view =
+    new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength); }
+  u8(){ return this.view.getUint8(this.o++); }
+  u16(){ const v = this.view.getUint16(this.o, true); this.o += 2; return v; }
+  u32(){ const v = this.view.getUint32(this.o, true); this.o += 4; return v; }
+  u64(){ const lo = this.view.getUint32(this.o, true);
+         const hi = this.view.getUint32(this.o + 4, true);
+         this.o += 8; return hi * 4294967296 + lo; }
+  f32(){ const v = this.view.getFloat32(this.o, true); this.o += 4; return v; }
+  f64(){ const v = this.view.getFloat64(this.o, true); this.o += 8; return v; }
+  string(){
+    const len = this.u16();
+    const s = new TextDecoder().decode(this.b.subarray(this.o, this.o + len));
+    this.o += len; return s;
+  }
+  bytes(n){ const v = this.b.subarray(this.o, this.o + n); this.o += n; return v; }
+  varint(){
+    let result = 0, shift = 0, byte;
+    do{
+      byte = this.b[this.o++];
+      result |= (byte & 0x7F) << shift;
+      shift += 7;
+    } while(byte & 0x80);
+    if(result >= Number(1n << 63n)) result -= Number(1n << 64n);
+    return (result >>> 1) ^ -(result & 1);   // zigzag
+  }
+  eof(){ return this.o >= this.b.length; }
+}
+
+//------------------------------- состояние -----------------------------------
+const state = {
+  meta: null, serial: null, sessionKey: null,
+  channels: new Map(),     // id -> {times:[], values:[]}
+  discrete: [],            // {t, mask}
+  buttons: [],
+  path: [],                // {t, coord, gradient, curvature, limit}
+  signals: [],             // {t, coord, aspect} ближайший светофор впереди
+  integrity: [],
+  completed: false,
+  badBlocks: 0, totalBlocks: 0,
+  cursorT: null, tMax: 0,
+  manualViols: [],   // вручную добавленные {start, text, m:true}
+  deletedAuto: [],   // ключи удалённых автоматических
+  show: new Map()          // id -> bool (график)
+};
+
+const ASPECT = ["К","КЖ","Ж","З","Б"];
+const CH = {SPEED:1, DIR:13, ALLOWED:2, TM:3, TC:4, NM:5, CURRENT:6, VOLTAGE:7,
+            F_T:8, F_B:9, POS:10, ACCEL:11, ER:12};
+
+//------------------------------ разбор .kr -----------------------------------
+async function parseKr(bytes){
+  const checks = state.integrity;
+  const r = new Reader(bytes);
+
+  // Заголовок
+  const magicBytes = r.bytes(16);
+  let ok = new TextDecoder().decode(magicBytes) === MAGIC;
+  checks.push({name:"MagicBytes (сигнатура RRS-KR)", ok});
+  if(!ok) throw new Error("Это не файл кассеты RRS (.kr)");
+
+  const version = r.u16();
+  checks.push({name:"Версия формата (" + version + ")",
+               ok: version === 1});
+
+  r.u8();  // флаг шифрования (всегда 1)
+
+  const headerCrc = r.u32();
+  const calcHeaderCrc = crc32(bytes.subarray(0, 19));
+  checks.push({name:"CRC32 заголовка", ok: headerCrc === calcHeaderCrc});
+
+  let sawIntegrity = false;
+  let finished = false;
+
+  while(!r.eof()){
+    const blockStart = r.o;
+
+    const id = r.u32();
+    const len = r.u32();
+
+    if(r.o + len + 4 > bytes.length){
+      checks.push({name:"Файл обрезан (блок " + id + " без CRC)",
+                   ok:false});
+      break;
+    }
+
+    const cipher = r.bytes(len);
+    const crc = r.u32();
+    ++state.totalBlocks;
+
+    const calcCrc = crc32(concatBytes(
+        [new Uint8Array(new Uint32Array([id]).buffer),
+         new Uint8Array(new Uint32Array([len]).buffer), cipher]));
+    const crcOk = crc === calcCrc;
+    if(!crcOk) ++state.badBlocks;
+
+    // IV блока: sha256(серийник || смещение блока u64le)[0..16]
+    const seqBytes = new Uint8Array(8);
+    new DataView(seqBytes.buffer).setUint32(0, blockStart, true);
+
+    let plain = null;
+    if(crcOk && state.serial !== null){
+      try{
+        plain = await aesCbcDecrypt(state.sessionKey,
+            (await sha256(concatBytes([utf8(state.serial), seqBytes]))).slice(0, 16),
+            cipher);
+      }catch(e){
+        // неверный ключ/повреждено: блок пропускаем
+      }
+    }
+
+    // Обработка блоков
+    if(id === BLOCK.BOOTSTRAP){
+      // Открытый серийник: из него выводится ключ сессии
+      const p = new Reader(cipher);
+      state.serial = p.string();
+      state.sessionKey = await sha256(concatBytes([MASTER_KEY, utf8(state.serial)]));
+    }
+    else if(id === BLOCK.SESSION && plain){
+      const p = new Reader(plain);
+      state.serial = p.string();
+      state.sessionKey = await sha256(concatBytes([MASTER_KEY, utf8(state.serial)]));
+      const loco = p.string();
+      const start = p.string();
+      const mass = p.f64();
+      const axles = p.f64();
+
+      const analogCount = p.u16();
+      const analog = [];
+      for(let i = 0; i < analogCount; ++i){
+        const c = {id: p.u16(), name: p.string(), unit: p.string(),
+                   min: p.f32(), max: p.f32(), rate: p.f32()};
+        analog.push(c);
+        state.channels.set(c.id, {times: [], values: [], meta: c});
+        state.show.set(c.id, true);
+      }
+      const discCount = p.u16();
+      const discrete = [];
+      for(let i = 0; i < discCount; ++i) discrete.push(p.string());
+
+      try {
+        state.meta.train_number = p.string();
+        state.meta.driver_tab = p.string();
+        state.meta.category = p.string();
+        state.meta.loco_number = p.string();
+        state.meta.usl_wagons = p.f64();
+      } catch(e) { /* старая кассета без хвоста */ }
+      state.meta = Object.assign({loco, start, mass, axles, analog, discrete}, state.meta || {});
+    }
+    else if(id === BLOCK.ANALOG && plain){
+      const p = new Reader(plain);
+      const cid = p.u16();
+      const t0 = p.f32();
+      const count = p.u32();
+      const ch = state.channels.get(cid);
+      if(ch){
+        const rate = ch.meta ? ch.meta.rate : 2.0;
+        let acc = 0;
+        for(let i = 0; i < count; ++i){
+          acc += p.varint() / 100.0;
+          ch.times.push(t0 + i / rate);
+          ch.values.push(acc);
+          if(t0 + i / rate > state.tMax) state.tMax = t0 + i / rate;
+        }
+      }
+    }
+    else if(id === BLOCK.DISCRETE && plain){
+      const p = new Reader(plain);
+      const count = p.u32();
+      for(let i = 0; i < count; ++i){
+        const t = p.f32();
+        state.discrete.push({t, mask: p.u32()});
+        if(t > state.tMax) state.tMax = t;
+      }
+    }
+    else if(id === BLOCK.BUTTON && plain){
+      const p = new Reader(plain);
+      const count = p.u32();
+      for(let i = 0; i < count; ++i){
+        state.buttons.push({
+          t: p.f64(), coord: p.f64(), speed: p.f32(),
+          action_id: p.u16(), name: p.string(), param: p.string(),
+          prev: p.u8(), next: p.u8(), dur: p.f32()
+        });
+      }
+    }
+    else if(id === BLOCK.PATH && plain){
+      const p = new Reader(plain);
+      const count = p.u32();
+      for(let i = 0; i < count; ++i){
+        state.path.push({t: p.f64(), coord: p.f64(),
+          gradient: p.f32(), curvature: p.f32(), limit: p.f32()});
+      }
+    }
+    else if(id === BLOCK.SIGNALS && plain){
+      // Светофор впереди: {t, coord, aspect(0-кр/1-жёлт/2-зел)}
+      const p = new Reader(plain);
+      const count = p.u32();
+      for(let i = 0; i < count; ++i){
+        state.signals.push({t: p.f32(), coord: p.f64(), aspect: p.u8(),
+          dist: p.u32(), kind: p.u8()});
+      }
+    }
+    else if(id === BLOCK.INTEGRITY && plain && plain.length === 72){
+      // Мастер-хеш: SHA-256 всех байтов файла до этого блока
+      const storedHash = plain.slice(0, 32);
+      const actualHash = await sha256(bytes.subarray(0, blockStart));
+      checks.push({name:"Мастер-хеш SHA-256 (целостность данных)",
+        ok: storedHash.every((b, i) => b === actualHash[i])});
+
+      const fingerprint = plain.slice(32, 40);
+      const actualFp = (await sha256(state.sessionKey)).slice(0, 8);
+      checks.push({name:"Отпечаток ключа сессии",
+        ok: fingerprint.every((b, i) => b === actualFp[i])});
+
+      const signature = plain.slice(40, 72);
+      const actualSig = await sha256(concatBytes(
+          [MASTER_KEY, actualHash, utf8("RRS-KR-SIG")]));
+      checks.push({name:"Цифровая подпись (файл создан RRS)",
+        ok: signature.every((b, i) => b === actualSig[i])});
+
+      sawIntegrity = true;
+    }
+  }
+
+  // Футер: KR-END + CRC32 файла
+  const tail = bytes.slice(bytes.length - 12);
+  const endOk = new TextDecoder().decode(tail.slice(0, 8)) === END_MARKER;
+  if(endOk){
+    const fileCrc = new DataView(tail.buffer, tail.byteOffset + 8, 4)
+                    .getUint32(0, true);
+    checks.push({name:"Общая CRC32 файла",
+      ok: fileCrc === crc32(bytes.subarray(0, bytes.length - 4))});
+    finished = true;
+  }
+
+  state.completed = finished;
+  checks.push({name:"Запись корректно завершена (футер)",
+    ok: finished, warnOnly: !finished &&
+      (state.badBlocks === 0),
+    detail: finished ? "" : "данные до последнего сброса на диск"});
+
+  if(state.badBlocks > 0)
+    checks.push({name:"CRC32 блоков (" + state.badBlocks + " из " +
+      state.totalBlocks + " повреждены)", ok:false});
+
+  if(!sawIntegrity)
+    checks.push({name:"Блок целостности", ok:false,
+      detail:"запись не завершена (извлечение без Ctrl+R/краш)"});
+}
+
+//----------------------------- нарушения -------------------------------------
+// Все проверки протокола: {start, end, text} - клик мотает курсор
+function computeViolations(){
+  const speed = state.channels.get(CH.SPEED);
+  const out = [];
+
+  if(!speed) return out;
+
+  //--- 1. Превышение скорости по ограничениям профиля пути ---
+  if(state.path.length){
+    let ep = null;
+    for(let i = 0; i < speed.times.length; ++i){
+      const t = speed.times[i];
+      const v = speed.values[i];
+      const limit = limitAt(t);
+      if(limit > 0 && v > limit + 1.0){
+        if(!ep) ep = {start: t, end: t, vmax: v, limit};
+        else{ ep.end = t; ep.vmax = Math.max(ep.vmax, v); }
+      }else if(ep){
+        out.push(viol(ep.start, ep.end,
+          "Превышение скорости: доп. " + ep.limit + " / факт " +
+          ep.vmax.toFixed(1) + " км/ч"));
+        ep = null;
+      }
+    }
+    if(ep) out.push(viol(ep.start, state.tMax,
+      "Превышение скорости: доп. " + ep.limit + " / факт " +
+      ep.vmax.toFixed(1) + " км/ч"));
+  }
+
+  //--- 2. Движение под красный сигнал (<400 м, лимит 20) + проезд ---
+  const sig = sigAtFactory();
+  if(sig){
+    // Подъезд к красному быстрее 20 км/ч
+    let ep = null;
+    for(let i = 0; i < speed.times.length; ++i){
+      const t = speed.times[i];
+      const v = speed.values[i];
+      const s = sig(t);
+      const dist = (s && s.aspect === 0) ? s.coord - coordAt(t) : -1;
+      if(dist > 0 && dist <= 400 && v > 20 + 1.0){
+        if(!ep) ep = {start: t, end: t, v: v, d: dist};
+        else{ ep.end = t; ep.v = Math.max(ep.v, v); ep.d = Math.min(ep.d, dist); }
+      }else if(ep){
+        out.push(viol(ep.start, ep.end,
+          "Скорость под красный светофор: " + ep.v.toFixed(1) +
+          " км/ч за " + ep.d.toFixed(0) + " м до сигнала (лимит 20)"));
+        ep = null;
+      }
+    }
+    if(ep) out.push(viol(ep.start, state.tMax,
+      "Скорость под красный светофор: " + ep.v.toFixed(1) +
+      " км/ч за " + ep.d.toFixed(0) + " м до сигнала (лимит 20)"));
+
+    // Проезд красного: пересечение позиции сигнала при красном
+    for(let i = 1; i < speed.times.length; ++i){
+      const t = speed.times[i];
+      const s = sig(t);
+      if(!s || s.aspect !== 0) continue;
+      const c0 = coordAt(speed.times[i - 1]);
+      const c1 = coordAt(t);
+      if(c0 < s.coord && c1 >= s.coord){
+        out.push(viol(t, t,
+          "ПРОЕЗД НА КРАСНЫЙ (сигнал " + kmPcM(s.coord) +
+          ", скорость " + speed.values[i].toFixed(0) + " км/ч)"));
+      }
+    }
+  }
+
+  //--- 3. Срыв ЭПК / движение без ЭПК ---
+  if(state.discrete.length){
+    let prevOn = (state.discrete[0].mask & 1) !== 0;
+    let offSince = null;
+    for(let i = 1; i < state.discrete.length; ++i){
+      const ev = state.discrete[i];
+      const on = (ev.mask & 1) !== 0;
+      const v = sampleAt(CH.SPEED, ev.t);
+
+      if(prevOn && !on && v !== null && v > 1.0){
+        out.push(viol(ev.t, ev.t, "Срыв ЭПК (при скорости " +
+          v.toFixed(0) + " км/ч)"));
+      }
+
+      if(!on && v !== null && v > 1.0){
+        if(offSince === null) offSince = ev.t;
+        else if(ev.t - offSince > 5.0){
+          out.push(viol(offSince, ev.t, "Движение без включённого ЭПК"));
+          offSince = "done";
+        }
+      }else if(on){
+        offSince = null;
+      }
+      prevOn = on;
+    }
+  }
+
+  //--- 4. Торможение при включённой тяге ---
+  {
+    const tc = state.channels.get(CH.TC);
+    let ep = null;
+    for(let i = 0; i < speed.times.length; ++i){
+      const t = speed.times[i];
+      const traction = bitAt(t, 7);            // TractionMode
+      const emg = bitAt(t, 9);                 // EmergencyBrake
+      const tcP = tc ? sampleAt(CH.TC, t) : null;
+      const braking = emg || (tcP !== null && tcP > 0.3);
+      if(traction && braking){
+        if(!ep) ep = {start: t, end: t};
+        else ep.end = t;
+      }else if(ep){
+        if(ep.end - ep.start >= 2.0)
+          out.push(viol(ep.start, ep.end, "Торможение при тяге"));
+        ep = null;
+      }
+    }
+    if(ep && ep.end - ep.start >= 2.0)
+      out.push(viol(ep.start, state.tMax, "Торможение при тяге"));
+  }
+
+  //--- 5. Скатывание: движение назад ---
+  {
+    const dir = state.channels.get(CH.DIR);
+    if(dir){
+      let ep = null;
+      for(let i = 0; i < dir.times.length; ++i){
+        const back = dir.values[i] < 0 &&
+          Math.abs(sampleAt(CH.SPEED, dir.times[i]) || 0) > 1;
+        if(back){ if(!ep) ep = {s: dir.times[i], e: dir.times[i]};
+          else ep.e = dir.times[i]; }
+        else if(ep){ if(ep.e - ep.s >= 2)
+          out.push(viol(ep.s, ep.e, "Скатывание (движение назад)"));
+          ep = null; }
+      }
+      if(ep && ep.e - ep.s >= 2)
+        out.push(viol(ep.s, state.tMax, "Скатывание (движение назад)"));
+    }
+  }
+  //--- 6. Выключение ЭПК / САУТ / ТСКБМ ---
+  if(state.discrete.length){
+    let prev = state.discrete[0].mask;
+    for(let i = 1; i < state.discrete.length; ++i){
+      const ev = state.discrete[i];
+      const was = prev, now = ev.mask;
+      const v = sampleAt(CH.SPEED, ev.t);
+      if((was & 1) && !(now & 1))
+        out.push(viol(ev.t, ev.t, (v !== null && v > 1) ?
+          "Срыв ЭПК" : "Выключение ЭПК"));
+      prev = now;
+    }
+    // САУТ (бит2) / ТСКБМ (бит3) выкл в движении >30 с
+    for(const bit of [2, 3]){
+      const name = bit === 2 ? "САУТ" : "ТСКБМ";
+      let off = null;
+      for(let i = 0; i < state.discrete.length; ++i){
+        const ev = state.discrete[i];
+        const on = (ev.mask >> bit) & 1;
+        const v = sampleAt(CH.SPEED, ev.t);
+        if(!on && v !== null && Math.abs(v) > 3){
+          if(off === null) off = ev.t;
+        } else if(on){
+          if(off !== null && ev.t - off > 30)
+            out.push(viol(off, ev.t,
+              "Следование с выключенной " + name));
+          off = null;
+        }
+      }
+    }
+  }
+  //--- 7. Переходы АЛСН: К->Б, З/Ж->Б, З->КЖ ---
+  for(let i = 1; i < state.signals.length; ++i){
+    const a = state.signals[i-1], b = state.signals[i];
+    if(a.aspect === b.aspect) continue;
+    const v = sampleAt(CH.SPEED, b.t);
+    if(v === null || Math.abs(v) < 3) continue;
+    if(a.aspect === 0 && b.aspect === 4)
+      out.push(viol(b.t, b.t, "Выключение красного сигнала АЛСН (К→Б)"));
+    else if((a.aspect === 3 || a.aspect === 2) && b.aspect === 4)
+      out.push(viol(b.t, b.t, "Сбой кодов АЛСН (" +
+        ASPECT[a.aspect] + "→Б)"));
+    else if(a.aspect === 3 && b.aspect === 1)
+      out.push(viol(b.t, b.t, "Перекрытие сигнала (З→КЖ)"));
+  }
+  return out;
+}
+function violKey(v){ return v.start.toFixed(2) + "|" + v.text; }
+function getViolations(){
+  const auto = computeViolations()
+    .filter(v => !state.deletedAuto.includes(violKey(v)));
+  return auto.concat(state.manualViols)
+    .sort((a, b) => a.start - b.start);
+}
+function saveViols(){
+  try {
+    localStorage.setItem("kr_" + state.serial, JSON.stringify({
+      manual: state.manualViols, deleted: state.deletedAuto}));
+  } catch(e) {}
+}
+function loadViols(){
+  try {
+    const s = localStorage.getItem("kr_" + state.serial);
+    if (s){
+      const o = JSON.parse(s);
+      state.manualViols = (o.manual || []).map(v =>
+        ({start: v.start, end: v.start, text: v.text, m: true}));
+      state.deletedAuto = o.deleted || [];
+    }
+  } catch(e) {}
+}
+function viol(start, end, text){
+  return {start, end, text};
+}
+
+// Ближайший светофор впереди по ходу в момент t (из блока Signals)
+function sigAt(t){ const f = sigAtFactory(); return f ? f(t) : null; }
+function sigAtFactory(){
+  const s = state.signals;
+  if(!s || s.length === 0) return null;
+  return function(t){
+    let rec = s[0];
+    for(let i = 0; i < s.length; ++i){
+      if(s[i].t <= t) rec = s[i];
+      else break;
+    }
+    return rec;
+  };
+}
+
+function limitAt(t){
+  // Лимит скорости по пути (кусочно-постоянный по записям профиля)
+  let limit = 0;
+  for(let i = 0; i < state.path.length; ++i){
+    if(state.path[i].t <= t) limit = state.path[i].limit;
+    else break;
+  }
+  return limit;
+}
+
+function coordAt(t){
+  let coord = 0;
+  for(let i = 0; i < state.path.length; ++i){
+    if(state.path[i].t <= t) coord = state.path[i].coord;
+    else break;
+  }
+  return coord;
+}
+
+function kmPcM(m){
+  const km = Math.floor(m / 1000);
+  const pc = Math.floor((m - km * 1000) / 100);
+  const rest = Math.round(m - km * 1000 - pc * 100);
+  return km + " км " + pc + " пк " + rest + " м";
+}
+
+function hhmmss(t, base){
+  const d = base ? new Date(base) : new Date(0, 0, 0, 0, 0, 0);
+  const total = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds() + t;
+  const h = Math.floor(total / 3600) % 24;
+  const m = Math.floor(total / 60) % 60;
+  const s = Math.floor(total) % 60;
+  return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") +
+         ":" + String(s).padStart(2, "0");
+}
+
+//------------------------------ графики --------------------------------------
+function sampleAt(cid, t){
+  const ch = state.channels.get(cid);
+  if(!ch || ch.times.length === 0) return null;
+  // двоичный поиск ближайшего
+  let lo = 0, hi = ch.times.length - 1;
+  while(hi - lo > 1){
+    const mid = (lo + hi) >> 1;
+    if(ch.times[mid] <= t) lo = mid; else hi = mid;
+  }
+  return ch.values[lo];
+}
+
+function drawChart(canvas, seriesList, opts){
+  const ctx = canvas.getContext("2d");
+  const W = canvas.clientWidth, H = canvas.height;
+  canvas.width = W;
+  ctx.fillStyle = "#151517";
+  ctx.fillRect(0, 0, W, H);
+
+  const padL = 46, padR = 8, padT = 6, padB = 16;
+  const t0 = 0, t1 = Math.max(state.tMax, 1);
+
+  // авто-масштаб Y
+  let ymin = Infinity, ymax = -Infinity;
+  for(const s of seriesList)
+    for(const v of s.ch.values){
+      if(v < ymin) ymin = v;
+      if(v > ymax) ymax = v;
+    }
+  if(opts && opts.ymin !== undefined) ymin = opts.ymin;
+  if(opts && opts.ymax !== undefined) ymax = opts.ymax;
+  if(!isFinite(ymin) || ymin === ymax){ ymin = 0; ymax = 1; }
+  const dy = (ymax - ymin) * 0.08;
+  ymin -= dy; ymax += dy;
+
+  const X = t => padL + (t - t0) / (t1 - t0) * (W - padL - padR);
+  const Y = v => H - padB - (v - ymin) / (ymax - ymin) * (H - padT - padB);
+
+  // сетка
+  ctx.strokeStyle = "#2c2c30";
+  ctx.fillStyle = "#777";
+  ctx.font = "10px monospace";
+  for(let i = 0; i <= 5; ++i){
+    const v = ymin + (ymax - ymin) * i / 5;
+    const y = Y(v);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+    ctx.fillText(v.toFixed(opts && opts.yfmt === 0 ? 0 : 1), 4, y + 3);
+  }
+  for(let i = 0; i <= 6; ++i){
+    const t = t0 + (t1 - t0) * i / 6;
+    const x = X(t);
+    ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, H - padB); ctx.stroke();
+    ctx.fillText(hhmmss(t), x - 22, H - 3);
+  }
+
+  // серии
+  for(const s of seriesList){
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    let started = false;
+    for(let i = 0; i < s.ch.times.length; ++i){
+      const x = X(s.ch.times[i]);
+      const y = Y(s.ch.values[i]);
+      if(!started){ ctx.moveTo(x, y); started = true; }
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // допустимая скорость (ступенчатая) и зоны превышения
+  if(opts && opts.speedCheck){
+    const speed = state.channels.get(CH.SPEED);
+    if(speed && state.path.length){
+      // ступенчатый лимит
+      ctx.strokeStyle = "#ff5252";
+      ctx.setLineDash([6, 3]);
+      ctx.beginPath();
+      let px = padL, py = null;
+      for(const p of state.path){
+        const x = X(p.t), y = Y(p.limit);
+        if(py === null){ ctx.moveTo(x, y); py = y; }
+        else{ ctx.lineTo(x, py); ctx.lineTo(x, y); py = y; }
+      }
+      ctx.lineTo(W - padR, py);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // заливка превышений
+      ctx.fillStyle = "rgba(255,60,60,0.25)";
+      let inViol = false, xStart = 0;
+      for(let i = 0; i < speed.times.length; ++i){
+        const limit = limitAt(speed.times[i]);
+        const v = speed.values[i];
+        const x = X(speed.times[i]);
+        if(limit > 0 && v > limit + 1.0){
+          if(!inViol){ inViol = true; xStart = x; }
+        }else if(inViol){
+          inViol = false;
+          ctx.fillRect(xStart, padT, x - xStart, H - padT - padB);
+        }
+      }
+      if(inViol) ctx.fillRect(xStart, padT, W - padR - xStart, H - padT - padB);
+    }
+  }
+
+  // курсор
+  if(state.cursorT !== null){
+    ctx.strokeStyle = "#39c2ff";
+    ctx.beginPath();
+    ctx.moveTo(X(state.cursorT), padT);
+    ctx.lineTo(X(state.cursorT), H - padB);
+    ctx.stroke();
+  }
+
+  // клик = переместить курсор (на любом графике)
+  canvas.onclick = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const t = t0 + (e.clientX - rect.left - padL) /
+              (W - padL - padR) * (t1 - t0);
+    state.cursorT = Math.min(Math.max(t, 0), t1);
+    renderAll();
+  };
+}
+
+function bitAt(t, bit){
+  let mask = 0;
+  for(let i = 0; i < state.discrete.length; ++i){
+    if(state.discrete[i].t <= t) mask = state.discrete[i].mask;
+    else break;
+  }
+  return (mask & (1 << bit)) !== 0;
+}
+
+function drawDiscrete(canvas){
+  const ctx = canvas.getContext("2d");
+  const W = canvas.clientWidth, H = canvas.height;
+  canvas.width = W;
+  ctx.fillStyle = "#151517"; ctx.fillRect(0, 0, W, H);
+  const padL = 90;
+  const t1 = Math.max(state.tMax, 1);
+  const bits = [[0, "#39c2ff", "ЭПК"], [7, "#4caf50", "Тяга"],
+                [8, "#ffb300", "Рекуперация"], [6, "#c9a0dc", "Песок"],
+                [9, "#ff5252", "Экстренное"]];
+  const rowH = (H - 8) / bits.length;
+  ctx.font = "11px monospace";
+
+  bits.forEach((row, idx) => {
+    const [bit, color, name] = row;
+    const y0 = 4 + idx * rowH;
+    ctx.fillStyle = "#999";
+    ctx.fillText(name, 6, y0 + rowH / 2 + 4);
+
+    if(state.discrete.length === 0) return;
+    // полосы по состоянию бита
+    let prevOn = null, xStart = padL;
+    for(let i = 0; i < state.discrete.length; ++i){
+      const t = state.discrete[i].t;
+      const on = (state.discrete[i].mask & (1 << bit)) !== 0;
+      const x = padL + t / t1 * (W - padL - 8);
+      if(prevOn !== null && on !== prevOn){
+        if(prevOn){
+          ctx.fillStyle = color;
+          ctx.fillRect(xStart, y0 + 4, x - xStart, rowH - 8);
+        }
+        xStart = x;
+      }
+      prevOn = on;
+    }
+    if(prevOn){
+      ctx.fillStyle = color;
+      ctx.fillRect(xStart, y0 + 4, W - 8 - xStart, rowH - 8);
+    }
+  });
+
+  if(state.cursorT !== null){
+    ctx.strokeStyle = "#39c2ff";
+    ctx.beginPath();
+    ctx.moveTo(padL + state.cursorT / t1 * (W - padL - 8), 2);
+    ctx.lineTo(padL + state.cursorT / t1 * (W - padL - 8), H - 2);
+    ctx.stroke();
+  }
+  canvas.onclick = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    state.cursorT = (e.clientX - rect.left - padL) /
+                    (rect.width - padL - 8) * t1;
+    renderAll();
+  };
+}
+
+function drawProfile(canvas){
+  const ctx = canvas.getContext("2d");
+  const W = canvas.clientWidth, H = canvas.height;
+  canvas.width = W;
+  ctx.fillStyle = "#151517"; ctx.fillRect(0, 0, W, H);
+  if(state.path.length === 0) return;
+  const padL = 46, padB = 16, padT = 6;
+  const t1 = Math.max(state.tMax, 1);
+  let gmin = 0, gmax = 0;
+  for(const p of state.path){
+    gmin = Math.min(gmin, p.gradient);
+    gmax = Math.max(gmax, p.gradient);
+  }
+  if(gmin === gmax){ gmin -= 1; gmax += 1; }
+  const Y = g => H - padB - (g - gmin) / (gmax - gmin) * (H - padT - padB);
+
+  ctx.strokeStyle = "#666";
+  ctx.beginPath(); ctx.moveTo(padL, Y(0)); ctx.lineTo(W - 8, Y(0)); ctx.stroke();
+
+  ctx.strokeStyle = "#39c2ff";
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  state.path.forEach((p, i) => {
+    const x = padL + p.t / t1 * (W - padL - 8);
+    const y = Y(p.gradient);
+    if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // координатная ось снизу (каждая ~10-я точка)
+  ctx.fillStyle = "#777"; ctx.font = "10px monospace";
+  for(let i = 0; i < state.path.length; i += Math.max(1,
+      Math.floor(state.path.length / 8))){
+    const p = state.path[i];
+    const x = padL + p.t / t1 * (W - padL - 8);
+    ctx.fillText(kmPcM(p.coord), x - 30, H - 3);
+  }
+
+  if(state.cursorT !== null){
+    ctx.strokeStyle = "#39c2ff";
+    ctx.beginPath();
+    ctx.moveTo(padL + state.cursorT / t1 * (W - padL - 8), padT);
+    ctx.lineTo(padL + state.cursorT / t1 * (W - padL - 8), H - padB);
+    ctx.stroke();
+  }
+  canvas.onclick = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    state.cursorT = (e.clientX - rect.left - padL) /
+                    (rect.width - padL - 8) * t1;
+    renderAll();
+  };
+}
+
+//------------------------------ интерфейс -------------------------------------
+function renderAll(){
+  if(!state.meta) return;
+  const ch = id => state.channels.get(id);
+
+  drawChart(document.getElementById("g-speed"),
+    [ch(CH.SPEED) ? {ch: ch(CH.SPEED), color: "#0066FF"} : null,
+     ch(CH.ALLOWED) ? {ch: ch(CH.ALLOWED), color: "#FF0000"} : null]
+    .filter(Boolean), {ymin: 0, speedCheck: true});
+
+  drawChart(document.getElementById("g-press"),
+    [ch(CH.TM) ? {ch: ch(CH.TM), color: "#FF0000"} : null,
+     ch(CH.ER) ? {ch: ch(CH.ER), color: "#0066FF"} : null,
+     ch(CH.TC) ? {ch: ch(CH.TC), color: "#9933FF"} : null,
+     ch(CH.NM) ? {ch: ch(CH.NM), color: "#FFFFFF"} : null]
+    .filter(Boolean), {ymin: 0});
+
+  drawChart(document.getElementById("g-elec"),
+    [ch(CH.CURRENT) ? {ch: ch(CH.CURRENT), color: "#00CC00"} : null,
+     ch(CH.VOLTAGE) ? {ch: ch(CH.VOLTAGE), color: "#00CCFF"} : null]
+    .filter(Boolean), {ymin: 0});
+
+  drawDiscrete(document.getElementById("g-disc"));
+  drawProfile(document.getElementById("g-profile"));
+
+  // статус-бар
+  const t = state.cursorT === null ? state.tMax : state.cursorT;
+  const set = (id, v) => document.getElementById(id).textContent = v;
+  set("sb-time", "Время: " + hhmmss(t, state.meta && state.meta.start));
+  {
+    const s = state.signals.length ? sigAt(t) : null;
+    set("sb-signal", "Светофор: " + (s ? ASPECT[s.aspect] +
+      (s.dist ? " · " + s.dist + " м" : "") : "—"));
+  }
+  {
+    const dir = sampleAt(CH.DIR, t);
+    set("sb-dir", "Напр.: " + (dir === null ? "—" :
+      (dir < 0 ? "назад" : "вперёд")));
+  }
+  set("sb-coord", "Координата: " + kmPcM(coordAt(t)));
+  set("sb-speed", "Скорость: " + fmt(sampleAt(CH.SPEED, t), 1) + " км/ч");
+
+  // Допустимая скорость рядом с фактической: берём лимит из профиля
+  // пути (та же ступенчатая линия на графике), при отсутствии -
+  // из канала AllowedSpeed. Красная подсветка при превышении
+  {
+    let limit = limitAt(t);
+    if (!limit)
+      limit = sampleAt(CH.ALLOWED, t);
+
+    const speed = sampleAt(CH.SPEED, t);
+    const exceeded = (limit !== null && speed !== null &&
+                      speed > limit + 1.0);
+
+    set("sb-limit", "Доп.: " + (limit === null ? "—" :
+        limit.toFixed(0) + " км/ч"));
+    document.getElementById("sb-limit").style.color =
+        exceeded ? "var(--err)" : "";
+    document.getElementById("sb-limit").style.fontWeight =
+        exceeded ? "bold" : "";
+  }
+
+  set("sb-tm", "ТМ: " + fmt(sampleAt(CH.TM, t), 2) + " кгс/см²");
+  set("sb-er", "УР: " + fmt(sampleAt(CH.ER, t), 2) + " кгс/см²");
+  set("sb-tc", "ТЦ: " + fmt(sampleAt(CH.TC, t), 2) + " кгс/см²");
+  set("sb-nm", "НМ: " + fmt(sampleAt(CH.NM, t), 2) + " кгс/см²");
+  set("sb-i", "Ток: " + fmt(sampleAt(CH.CURRENT, t), 0) + " А");
+  set("sb-u", "Uкс: " + fmt(sampleAt(CH.VOLTAGE, t), 0) + " В");
+}
+
+function fmt(v, d){
+  return (v === null || v === undefined) ? "—" : v.toFixed(d);
+}
+
+function renderMeta(){
+  const rows = [
+    ["Локомотив", state.meta.loco],
+    ["Начало записи", state.meta.start],
+    ["Масса поезда", state.meta.mass.toFixed(1) + " т"],
+    ["Серийный номер", state.serial],
+    ["Сэмплов", totalSamples()],
+    ["Нажатий", state.buttons.length],
+    ["Запись", state.completed ? "завершена" : "НЕ завершена"],
+  ];
+  document.getElementById("meta").innerHTML = rows.map(r =>
+    "<tr><th>" + r[0] + "</th><td>" + r[1] + "</td></tr>").join("");
+}
+
+function totalSamples(){
+  let n = 0;
+  state.channels.forEach(c => n += c.values.length);
+  return n;
+}
+
+function renderIntegrity(){
+  document.getElementById("integrity").innerHTML =
+    state.integrity.map(c =>
+      "<div class='" + (c.ok ? "tag-ok" :
+        (c.warnOnly ? "tag-warn" : "tag-err")) + "'>" +
+      (c.ok ? "✓" : (c.warnOnly ? "⚠" : "✗")) + " " + c.name +
+      (c.detail ? " — " + c.detail : "") + "</div>").join("");
+}
+
+function renderLegend(){
+  const el = document.getElementById("legend");
+  el.innerHTML = "";
+  state.meta.analog.forEach(c => {
+    const lab = document.createElement("label");
+    lab.className = "chk";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = true;
+    cb.onchange = () => state.show.set(c.id, cb.checked);
+    lab.appendChild(cb);
+    lab.appendChild(document.createTextNode(
+      " " + c.name + " [" + c.unit + "] = " +
+      fmt(sampleAt(c.id, state.cursorT ?? state.tMax), 2)));
+    el.appendChild(lab);
+  });
+}
+
+function renderViolations(){
+  const el = document.getElementById("violations");
+  const v = getViolations();
+  if(v.length === 0){
+    el.innerHTML = "<div class='small'>— нарушений не выявлено</div>";
+  } else {
+    el.innerHTML = "";
+    v.forEach((x, i) => {
+      const div = document.createElement("div");
+      div.className = "violation";
+      div.textContent = "№" + (i + 1) + "  " + hhmmss(x.start) +
+        "  " + kmPcM(coordAt(x.start)) + "  " + x.text +
+        (x.m ? "  [вручную]" : "") +
+        (x.end > x.start
+          ? "  (" + (x.end - x.start).toFixed(0) + " с)" : "");
+
+      const del = document.createElement("span");
+      del.textContent = " [×]";
+      del.style.color = "#ff5252";
+      del.style.cursor = "pointer";
+      del.title = "Убрать из протокола";
+      del.onclick = (e) => {
+        e.stopPropagation();
+        if (x.m)
+          state.manualViols = state.manualViols.filter(m => m !== x);
+        else
+          state.deletedAuto.push(violKey(x));
+        saveViols();
+        renderViolations();
+      };
+      div.appendChild(del);
+
+      div.onclick = () => { state.cursorT = x.start; renderAll(); };
+      el.appendChild(div);
+    });
+  }
+
+  // Ручное добавление (на время курсора или своё)
+  const form = document.createElement("div");
+  form.style.marginTop = "6px";
+  form.innerHTML =
+    "<button id='mv-add' style='background:#0e5a80;color:#fff;" +
+    "border:1px solid #1e7fb0;padding:2px 10px;cursor:pointer'>" +
+    "+ Добавить нарушение</button>" +
+    "<span class='small'>  — на время курсора (или своё)</span>";
+  el.appendChild(form);
+  document.getElementById("mv-add").onclick = () => {
+    const t = prompt("Время нарушения, сек (пусто - позиция курсора):",
+      Math.round(state.cursorT === null ? state.tMax : state.cursorT));
+    if (t === null) return;
+    const start = parseFloat(t);
+    if (isNaN(start) || start < 0) { alert("Некорректное время"); return; }
+    const txt = prompt("Формулировка нарушения:");
+    if (!txt) return;
+    state.manualViols.push({start, end: start, text: txt, m: true});
+    saveViols();
+    renderViolations();
+  };
+}
+
+function renderButtons(){
+  const filter = document.getElementById("btnfilter").value.toLowerCase();
+  const table = document.getElementById("btn-table");
+  const rows = state.buttons
+    .filter(b => b.name.toLowerCase().includes(filter))
+    .slice(0, 2000);
+  table.innerHTML = "<tr><th>№</th><th>Время</th><th>Координата</th>" +
+    "<th>Скорость</th><th>Действие</th><th>Параметр</th>" +
+    "<th>Было</th><th>Стало</th><th>Удержание</th></tr>" +
+    rows.map((b, i) =>
+      "<tr data-t='" + b.t + "'><td>" + (i + 1) + "</td><td>" +
+      hhmmss(b.t) + "</td><td>" + kmPcM(b.coord) + "</td><td>" +
+      b.speed.toFixed(0) + "</td><td>" + b.name + "</td><td>" +
+      (b.param || "—") + "</td><td>" + b.prev + "</td><td>" +
+      b.next + "</td><td>" + b.dur.toFixed(1) + " с</td></tr>").join("");
+
+  // клик по строке -> курсор к моменту
+  table.querySelectorAll("tr[data-t]").forEach(tr => {
+    tr.onclick = () => { state.cursorT = +tr.dataset.t; renderAll(); };
+  });
+
+  const summary = "Всего действий: " + state.buttons.length;
+  document.getElementById("btnsummary").textContent = summary;
+}
+
+function printWindow(title, bodyHtml){
+  const w = window.open("", "_blank", "width=900,height=700");
+  if(!w){ alert("Разрешите всплывающие окна для печати"); return; }
+  w.document.open();
+  w.document.write(
+    '<html><head><title>' + title + '</title>' +
+    '<style>' +
+    'body{font:12px/1.45 "Times New Roman",serif;margin:24px;' +
+    'color:#000;background:#fff}' +
+    'h1{font-size:16px;text-align:center;margin:0 0 4px}' +
+    'h2{font-size:13px;margin:14px 0 4px}' +
+    'table{width:100%;border-collapse:collapse;font-size:11px}' +
+    'th,td{border:1px solid #000;padding:2px 5px;text-align:left}' +
+    'th{background:#eee}' +
+    '.meta td{border:none;padding:1px 4px}' +
+    '.sign{margin-top:28px}' +
+    '.foot{position:fixed;bottom:12px;left:24px;right:24px;' +
+    'font-size:10px;border-top:1px solid #000;padding-top:4px;' +
+    'display:flex;justify-content:space-between}' +
+    '@media print{.foot{position:static}}' +
+    '</style></head><body>' + bodyHtml +
+    '<div class="foot"><span>RRS — расшифровка кассет регистрации</span>' +
+    '<span>' + (state.meta && state.meta.start ? state.meta.start : "") +
+    '</span></div>' +
+    '</body></html>');
+  w.document.close();
+  setTimeout(() => { w.focus(); w.print(); }, 300);
+}
+
+function esc(s){
+  return String(s === undefined || s === null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function protoHeader(){
+  const m = state.meta || {};
+  const rows = [
+    ["Номер поезда", m.train_number], ["Категория", m.category],
+    ["Локомотив", m.loco + (m.loco_number ? " №" + m.loco_number : "")],
+    ["Масса поезда, т", m.mass ? m.mass.toFixed(1) : ""],
+    ["Начало записи", m.start],
+    ["Таб. номер машиниста", m.driver_tab],
+    ["Длина, осей / усл. вагонов",
+      m.axles + (m.usl_wagons ? " / " + m.usl_wagons.toFixed(1) : "")]
+  ];
+  return rows.map(r =>
+    "<tr><td><b>" + esc(r[0]) + ":</b></td><td>" + esc(r[1]) +
+    "</td></tr>").join("");
+}
+
+function printProtocol(){
+  const v = getViolations();
+  const ok = state.integrity.filter(c => c.ok).length;
+  const body =
+    '<h1>ПРОТОКОЛ РАСШИФРОВКИ КАССЕТЫ РЕГИСТРАЦИИ</h1>' +
+    '<div>Серийный номер кассеты: ' + esc(state.serial) +
+    ' &nbsp; Проверка целостности: ' + ok + ' из ' +
+    state.integrity.length + ' пройдено</div>' +
+    '<h2>Данные о поездке и бригаде</h2>' +
+    '<table class="meta">' + protoHeader() + '</table>' +
+    '<h2>Выявленные нарушения (' + v.length +
+      (state.deletedAuto.length ?
+        '; автоматически снято: ' + state.deletedAuto.length
+        : '') + ')</h2>' +
+    (v.length ?
+      '<table><tr><th>№</th><th>Время</th><th>Координата</th>' +
+      '<th>Нарушение</th><th>Длит., с</th></tr>' +
+      v.map((x, i) =>
+        '<tr><td>' + (i + 1) + '</td><td>' + hhmmss(x.start) + '</td>' +
+        '<td>' + kmPcM(coordAt(x.start)) + '</td><td>' + esc(x.text) +
+        (x.m ? ' [вручную]' : '') + '</td><td>' + (x.end > x.start ?
+          (x.end - x.start).toFixed(0) : "—") + '</td></tr>').join("") +
+      '</table>'
+      : '<div>Нарушений не выявлено</div>') +
+    '<h2>Сводка лога нажатий</h2>' +
+    '<div>' + document.getElementById("btnsummary").textContent +
+    '; нажатий РБ: ' +
+    state.buttons.filter(b => /РБ/.test(b.name)).length + '</div>' +
+    '<div class="sign">Расшифровщик: __________________ / ' +
+    '_______________ (дата: ______)</div>';
+  printWindow("Протокол расшифровки", body);
+}
+
+function printButtonLog(){
+  const rows = state.buttons.map((b, i) =>
+    '<tr><td>' + (i + 1) + '</td><td>' + hhmmss(b.t) + '</td>' +
+    '<td>' + kmPcM(b.coord) + '</td><td>' + b.speed.toFixed(0) + '</td>' +
+    '<td>' + esc(b.name) + '</td><td>' + esc(b.param || "—") + '</td>' +
+    '<td>' + b.prev + '</td><td>' + b.next + '</td></tr>').join("");
+  const body =
+    '<h1>ЛОГ НАЖАТИЙ КНОПОК И УПРАВЛЕНИЯ</h1>' +
+    '<table class="meta">' + protoHeader() + '</table>' +
+    '<h2>Нажатия (' + state.buttons.length + ')</h2>' +
+    '<table><tr><th>№</th><th>Время</th><th>Координата</th>' +
+    '<th>Скорость</th><th>Действие</th><th>Параметр</th>' +
+    '<th>Было</th><th>Стало</th></tr>' + rows + '</table>';
+  printWindow("Лог нажатий", body);
+}
+
+function exportCsv(){
+  let csv = "t";
+  const order = [];
+  state.meta.analog.forEach(c => { order.push(c); csv += ";" + c.name; });
+  csv += "\n";
+  const grid = [];
+  const speed = state.channels.get(CH.SPEED);
+  if(speed) for(const t of speed.times) grid.push(t);
+  for(const t of grid){
+    csv += t.toFixed(2);
+    for(const c of order)
+      csv += ";" + (sampleAt(c.id, t) ?? "").toString().replace(".", ",");
+    csv += "\n";
+  }
+  const blob = new Blob(["\uFEFF" + csv], {type: "text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = (state.serial || "cassette") + ".csv";
+  a.click();
+}
+
+//------------------------------ загрузка -------------------------------------
+document.getElementById("file").onchange = async (e) => {
+  const f = e.target.files[0];
+  if(!f) return;
+  document.getElementById("fileinfo").textContent =
+    "Чтение " + f.name + " (" + (f.size / 1024).toFixed(1) + " КБ)...";
+
+  try{
+    // сброс состояния
+    state.meta = null; state.serial = null; state.sessionKey = null;
+    state.channels = new Map(); state.discrete = []; state.buttons = [];
+    state.path = []; state.signals = []; state.integrity = []; state.completed = false;
+    state.badBlocks = 0; state.totalBlocks = 0; state.cursorT = null;
+    state.tMax = 0; state.show = new Map();
+
+    await parseKr(new Uint8Array(await f.arrayBuffer()));
+
+    if(!state.meta){
+      // блок метаданных повреждён/не читается
+      throw new Error("Блок метаданных не расшифрован - файл повреждён");
+    }
+
+    document.getElementById("empty").style.display = "none";
+    document.getElementById("layout").style.display = "flex";
+    document.getElementById("btnblock").style.display = "block";
+    document.getElementById("fileinfo").textContent = f.name;
+
+    state.manualViols = [];
+    state.deletedAuto = [];
+    loadViols();
+    renderMeta();
+    renderIntegrity();
+    renderViolations();
+    renderButtons();
+    renderAll();
+    renderLegend();
+  }catch(err){
+    document.getElementById("fileinfo").innerHTML =
+      "<span class='tag-err'>Ошибка: " + err.message + "</span>";
+    if(state.integrity.length) renderIntegrity();
+  }
+};
+
+document.getElementById("btnfilter").oninput = renderButtons;
+document.getElementById("csv").onclick = exportCsv;
+document.getElementById("printproto").onclick = printProtocol;
+document.getElementById("printlog").onclick = printButtonLog;
+window.addEventListener("resize", () => { if(state.meta) renderAll(); });
+</script>
+</body>
+</html>

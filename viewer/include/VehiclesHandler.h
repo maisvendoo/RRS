@@ -7,7 +7,10 @@
 #include <autopilot-timetable.h>
 #include <VehicleExterior.h>
 
+#include <vsg/lighting/SpotLight.h>
+
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
 
 #include <QObject>
@@ -26,7 +29,13 @@ class QByteArray;
 namespace vsg
 {
     class Options;
+
     class Viewer;
+}
+
+namespace graphics
+{
+    class ParticleSystem;
 }
 
 //------------------------------------------------------------------------------
@@ -62,6 +71,24 @@ public:
     /// Плотность тумана по погоде, 1/м
     double getWeatherFogDensity() const noexcept;
 
+    /// Тип погоды для эффектов рендера (ТЗ "Частицы"): значения
+    /// согласованы с weather::Type (simulator/weather/include/
+    /// weather-system.h); 0 — старый сервер без данных о погоде
+    quint8 getWeatherType() const noexcept;
+
+    /// Ветер для систем частиц, м/с (мировой вектор). При отсутствии
+    /// данных о погоде (старый сервер/штиль) — константа 2 м/с
+    vsg::dvec3 getWindVector() const noexcept;
+
+    /// Идёт дождь/ливень (брызги из-под колёс, ТЗ "Частицы")
+    bool isRainWeather() const noexcept;
+
+    /// Предупреждение кассеты регистрации (ТЗ "Кассеты"): номер
+    /// растёт при каждом новом сообщении ("Запись параметров
+    /// движения начата/окончена")
+    quint32 getCassetteNoticeId() const noexcept;
+    QString getCassetteNotice() const noexcept;
+
     /// Снимок диагностики составов (ТЗ "Промт статистики вагонов"):
     /// копия последнего полученного снимка для окна F3/F4
     simulator_diagnostics_update_t getDiagnostics() const noexcept;
@@ -76,6 +103,12 @@ public:
     bool selectControlVehicle() noexcept;
     bool returnToControlledVehicle() noexcept;
 
+    /// Выбор ПЕ по индексу (вход в кабину в пешем режиме, ТЗ "walking")
+    bool selectVehicle(int idx) noexcept;
+
+    /// Число загруженных ПЕ
+    int getVehiclesCount() const noexcept;
+
     bool load(
         QByteArray& data,
         const settings_t& settings,
@@ -83,6 +116,21 @@ public:
     );
 
     void set_camera_pos(const vsg::dvec3* camera_pos) noexcept { this->camera_pos = camera_pos; }
+
+    /// Динамический свет фар (ТЗ "Частицы"/динамический свет, High+):
+    /// SpotLight создаётся RouteViewer при инициализации (до
+    /// viewer->compile()), здесь хранится и обновляется по осям
+    /// управляемой ПЕ в step(). intensity — «запечённая» яркость
+    /// пресета (гасится в ноль при выключенных фарах)
+    void set_headlight(vsg::ref_ptr<vsg::SpotLight> light, float intensity) noexcept;
+
+    /// Вкл/выкл фар (TODO: мост к реальному тумблеру ПЕ)
+    void setHeadlightsEnabled(bool enabled) noexcept;
+
+    /// Системы частиц (High+): дым/пар из выхлопной трубы и брызги
+    /// из-под колёс. Создаются RouteViewer, обновляются в step()
+    void set_particle_systems(graphics::ParticleSystem* smoke,
+                              graphics::ParticleSystem* splash) noexcept;
 
     /// Получить данные о графике движения, если таковые имеются в текущей ПЕ
     autopilot_timetable_t getTimetable()
@@ -117,6 +165,11 @@ private:
     /// Advance interpolation read head when client_time catches up
     void advanceInterpolation(double client_time);
 
+    /// Динамический свет и частицы (ТЗ "Частицы", High+): фары
+    /// управляемой ПЕ, дым/пар из трубы и брызги из-под колёс
+    /// текущей ПЕ. Вызывается из step() после интерполяции осей
+    void updateVehicleEffects(double dt, const simulator_update_pos_t& frame);
+
 private:
     SoundManager* sound_manager;
     const vsg::dvec3* camera_pos = nullptr;
@@ -139,6 +192,35 @@ private:
     /// потоком из pos-обновления, читается кадром для far plane/тумана
     std::atomic<double> weather_visibility{10000.0};
     std::atomic<double> weather_fog_density{0.0};
+
+    /// Погода для эффектов рендера (ТЗ "Частицы"): тип (коды
+    /// weather::Type), интенсивность и ветер. 0/штиль — старый сервер
+    /// без данных; getWindVector() тогда даёт константу 2 м/с
+    std::atomic<quint8> weather_type{0};
+    std::atomic<double> weather_wind_speed{0.0};
+    std::atomic<double> weather_wind_direction{0.0};
+
+    /// Динамический свет фар (High+; null на Legacy/Low)
+    vsg::ref_ptr<vsg::SpotLight> headlight;
+    float headlight_intensity = 0.0f;
+    bool headlights_enabled = true;
+
+    /// Системы частиц (High+; null на Legacy/Low)
+    graphics::ParticleSystem* smoke_particles = nullptr;
+    graphics::ParticleSystem* splash_particles = nullptr;
+
+    /// Длина каждой ПЕ (м) из info-пакета: позиция фар и колёсных пар
+    std::vector<double> vehicle_lengths;
+
+    /// Накопитель частоты спавна (частицы/с, дробное до целого)
+    double smoke_emit_accum = 0.0;
+    double splash_emit_accum = 0.0;
+
+    /// Предупреждение кассеты (ТЗ "Кассеты"): id атомарный (фронт),
+    /// текст под мьютексом
+    std::atomic<quint32> cassette_notice_id{0};
+    QString cassette_notice;
+    mutable std::mutex notice_mutex;
 
     /// Физические звуковые события (ТЗ "Аудиосистема"): сетевой поток
     /// складывает, кадр разбирает в пул SoundManager (OpenAL-контекст
@@ -177,11 +259,13 @@ private:
     /// Debug message for current and controlled vehicles from server
     QString debug_message;
 
-    /// Train exterior scene group
-    vsg::ref_ptr<vsg::Group> vehicles_node = vsg::Group::create();
-
+public:
     /// Info about vehicles exterior
     std::vector<VehicleExterior> vehicles;
+
+private:
+    /// Train exterior scene group
+    vsg::ref_ptr<vsg::Group> vehicles_node = vsg::Group::create();
 };
 
 #endif // VEHICLES_HANDLER_H

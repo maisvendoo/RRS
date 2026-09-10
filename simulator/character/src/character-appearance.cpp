@@ -34,7 +34,6 @@ std::uint32_t mix32(std::uint32_t value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-CharacterAppearance::CharacterAppearance() = default;
 
 //------------------------------------------------------------------------------
 //
@@ -85,7 +84,7 @@ void CharacterAppearance::setGender(Gender gender)
 bool CharacterAppearance::equip(const QString& slot, const Item& item)
 {
     // Слота нет - нельзя
-    if (!slots().contains(slot))
+    if (!slotList().contains(slot))
         return false;
 
     // Предмет скрывает слоты (шапка прячет волосы, п.10)
@@ -263,7 +262,7 @@ CharacterAppearance::Gender CharacterAppearance::getGender() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-const QStringList& CharacterAppearance::slots()
+const QStringList& CharacterAppearance::slotList()
 {
     return kSlots;
 }

@@ -5,6 +5,7 @@
 #include "scene-model.h"
 
 #include <vsg/core/ref_ptr.h>
+#include <vsg/nodes/Group.h>
 #include <vsg/maths/vec3.h>
 
 #include <atomic>
@@ -18,6 +19,7 @@
 namespace vsg
 {
 
+class Animation;
 class Camera;
 class Group;
 class LookAt;
@@ -71,6 +73,33 @@ public:
     void setPointMarkers(const std::vector<PhysPoint>& points,
                          double marker_radius);
 
+    /// Маркер центра масс: жёлтая сфера в заданной точке модели
+    /// (visible=false — скрыть маркер)
+    void setComMarker(bool visible, const vsg::dvec3& position,
+                      double radius);
+
+    /// Дебаг-вид (промт п.38): трёхцветные стрелки осей XYZ
+    /// в центре модели (X — красная, Y — зелёная, Z — синяя);
+    /// строится по образцу сетки/маркеров (vsg::Builder)
+    void setAxesMarker(bool visible);
+
+    /// Дебаг-вид (промт п.38): полупрозрачный бокс габарита 1Т
+    /// (3.7 м по ширине X, 5.3 м по высоте Z, низ на уровне УГР),
+    /// длина — по bbox модели (blending, по образцу превью коллизий)
+    void setGabaritMarker(bool visible, double length);
+
+    /// Запустить проигрывание анимации glTF в вьюпорте
+    /// (speed — множитель скорости, loop — зацикливание;
+    /// обновлением управляет vsg::AnimationManager вьювера)
+    void playAnimation(vsg::ref_ptr<vsg::Animation> animation,
+                       double speed, bool loop);
+
+    /// Остановить проигрывание конкретной анимации
+    void stopAnimation(vsg::ref_ptr<vsg::Animation> animation);
+
+    /// Остановить все проигрываемые анимации
+    void stopAllAnimations();
+
     /// Показать/скрыть сетку и оси
     void setGridVisible(bool visible);
 
@@ -91,9 +120,13 @@ private:
         vsg::ref_ptr<vsg::Node> grid_content;     ///< Содержимое сетки и осей
         vsg::ref_ptr<vsg::Group> collision_slot;  ///< Слот превью коллизий
         vsg::ref_ptr<vsg::Group> markers_slot;    ///< Слот маркеров точек
+        vsg::ref_ptr<vsg::Group> com_slot;        ///< Слот маркера центра масс
+        vsg::ref_ptr<vsg::Group> axes_slot;       ///< Слот стрелок осей ПС (дебаг-вид)
+        vsg::ref_ptr<vsg::Group> gabarit_slot;    ///< Слот бокса габарита (дебаг-вид)
         vsg::ref_ptr<vsg::Camera> camera;         ///< Камера вьюпорта
         vsg::ref_ptr<vsg::LookAt> look_at;        ///< Матрица взгляда камеры
         OrbitCamera* orbit = nullptr;             ///< Параметры орбит-камеры
+        vsg::dvec3 scene_center = vsg::dvec3(0.0, 0.0, 0.0); ///< Центр bbox сцены, м
         double scene_radius = 10.0;               ///< Радиус модели, м
         double window_aspect = 1.6;               ///< Соотношение сторон окна
         bool grid_visible = true;                 ///< Сетка видима

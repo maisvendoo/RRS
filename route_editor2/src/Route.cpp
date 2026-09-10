@@ -3,6 +3,8 @@
 #include "editor/EditorContext.h"
 #include "editor/Mask.h"
 #include "editor/RouteObject.h"
+#include "editor/TrackFurniture.h"
+#include "editor/TrackProfile.h"
 #include "editor/settings/CameraSettings.h"
 
 #include <Journal.h>
@@ -59,12 +61,14 @@ static vsg::dvec3 to_vsg_vec3(dvec3 vec)
 }
 
 /// Сборка state group с шейдерами линий траекторий (traj_line.vert/frag)
-static vsg::ref_ptr<vsg::StateGroup> create_trajectory_lines_state_group(
+vsg::ref_ptr<vsg::StateGroup> create_trajectory_lines_state_group(
     vsg::ref_ptr<const vsg::Options> options);
 
 Route::Route(EditorContext& context)
     : context_(context)
 {
+    load_geo_anchor();
+
     const bool success = load_objects_ref() && load_route_map()
         && load_stations_conf() && load_waypoints_conf();
 
@@ -72,6 +76,24 @@ Route::Route(EditorContext& context)
     {
         return;
     }
+
+    // Выбор траектории и подсветка предыдущего маршрута не действуют
+    // в новом: сбрасываем до запуска фоновых потоков
+    context_.selected_trajectory = nullptr;
+    context_.selected_trajectory_name.clear();
+    context_.trajectory_highlight_switch = vsg::Switch::create();
+    context_.build_preview_switch = vsg::Switch::create();
+
+    // Профили участков пути (track-edit.conf, отсутствие файла - не ошибка)
+    load_track_profiles();
+
+    // Группа сгенерированного обвеса пути (окно «Путь» -> «Генерация»):
+    // опоры КС, платформы, километровые столбики; сама группа пуста
+    // до генерации/восстановления из конфига
+    context_.generated_group = vsg::Group::create();
+    context_.generated_items.clear();
+
+    this->addChild(vsg::MASK_ALL, context_.generated_group);
 
     const FileSystem& fs = FileSystem::getInstance();
 
@@ -97,6 +119,28 @@ Route::Route(EditorContext& context)
 
     context.load_topology_thread = std::thread(
         &Route::load_topology, this);
+}
+
+//------------------------------------------------------------------------------
+/// Гео-якорь маршрута: Latitude/Longitude из description.xml (центр
+/// области импорта; для импортированных OSM/GPX - реальный)
+//------------------------------------------------------------------------------
+void Route::load_geo_anchor()
+{
+    const FileSystem& fs = FileSystem::getInstance();
+
+    const std::string path = fs.combinePath(context_.route_dir,
+                                            "description.xml");
+
+    CfgReader cfg;
+
+    if (!cfg.load(QString::fromStdString(path)))
+    {
+        return;
+    }
+
+    cfg.getDouble("Route", "Latitude", context_.route_latitude);
+    cfg.getDouble("Route", "Longitude", context_.route_longitude);
 }
 
 bool Route::load_objects_ref()
@@ -267,6 +311,18 @@ bool Route::load_waypoints_conf()
     return true;
 }
 
+bool Route::load_track_profiles()
+{
+    const FileSystem& fs = FileSystem::getInstance();
+
+    const std::string track_edit_path = fs.combinePath(context_.route_dir,
+        "track-edit.conf");
+
+    // Глобальная функция из TrackProfile.h (не путать с методом):
+    // профили + отложенный обвес + слои объектов
+    return ::load_track_edit_config(track_edit_path, context_);
+}
+
 void Route::load_static_objects()
 {
     for (const auto& [label, transforms] : context_.route_map)
@@ -282,6 +338,19 @@ void Route::load_static_objects()
             const auto object = RouteObject::create(context_,
                 ref_it->second.paged_lod, label, transform.translation,
                 -transform.rotation_deg);
+
+            // Слой объекта из track-edit.conf (секция Layer): запись
+            // опознаётся по метке и позиции
+            for (const LayerConfig& layer_config : context_.layer_configs)
+            {
+                if (layer_config.object_label == label &&
+                    vsg::length(transform.translation -
+                        layer_config.position) < 0.01)
+                {
+                    object->layer = layer_config.name;
+                    break;
+                }
+            }
 
             context_.compile_infos.emplace_back(CompileInfo{
                 vsg::ref_ptr(this), object, vsg::MASK_ALL});
@@ -476,10 +545,226 @@ bool Route::load_topology()
     const auto group = vsg::Group::create();
     group->addChild(state_group);
 
+    // Подсветка выбранной траектории (режим "Пути", клавиша P):
+    // вторая геометрия цианом поверх жёлтых линий, включается
+    // по требованию в update_trajectory_highlight
+    if (context_.trajectory_highlight_switch)
+    {
+        const auto highlight_state_group =
+            create_trajectory_lines_state_group(context_.options);
+
+        highlight_state_group->addChild(context_.trajectory_highlight_switch);
+        highlight_state_group->addChild(context_.build_preview_switch);
+
+        group->addChild(highlight_state_group);
+    }
+
     context_.compile_infos.emplace_back(CompileInfo{
         vsg::ref_ptr(this), group, vsg::MASK_ALL});
 
+    // Восстановление сгенерированного обвеса пути из track-edit.conf:
+    // построение требует сэмплирования траекторий, поэтому выполняется
+    // только сейчас - после загрузки топологии
+    TrackFurniture::restore_all(context_);
+
     return true;
+}
+
+void Route::select_trajectory(const std::string& name)
+{
+    Trajectory* trajectory = nullptr;
+
+    {
+        std::lock_guard<std::mutex> lock_guard(context_.topology_mutex);
+
+        if (context_.topology && !name.empty())
+        {
+            const traj_list_t* const traj_list =
+                context_.topology->getTrajectoriesList();
+
+            const auto traj_it = traj_list->find(QString::fromStdString(name));
+
+            if (traj_it != traj_list->cend())
+            {
+                trajectory = traj_it.value();
+            }
+        }
+    }
+
+    if (trajectory != nullptr)
+    {
+        context_.selected_trajectory = trajectory;
+        context_.selected_trajectory_name = name;
+    }
+    else
+    {
+        context_.selected_trajectory = nullptr;
+        context_.selected_trajectory_name.clear();
+    }
+
+    update_trajectory_highlight(trajectory);
+}
+
+void Route::update_trajectory_highlight(const Trajectory* trajectory)
+{
+    const auto highlight_switch = context_.trajectory_highlight_switch;
+
+    if (!highlight_switch)
+    {
+        return;
+    }
+
+    // Убираем предыдущую подсветку (по образцу DeleteObjects)
+    if (!highlight_switch->children.empty())
+    {
+        highlight_switch->children.clear();
+
+        context_.compile_infos.emplace_back(CompileInfo{
+            nullptr, vsg::ref_ptr(this)});
+    }
+
+    if (trajectory == nullptr)
+    {
+        return;
+    }
+
+    const auto& tracks = trajectory->getTracks();
+
+    if (tracks.empty())
+    {
+        return;
+    }
+
+    const std::size_t tracks_size = tracks.size();
+    const std::size_t points_size = tracks_size + 1;
+
+    std::vector<vsg::dvec3> points;
+    points.reserve(points_size);
+
+    for (const track_t& track : tracks)
+    {
+        const dvec3& p = track.begin_point;
+        points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
+    }
+    const dvec3& p = tracks.back().end_point;
+    points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
+
+    const auto vertices = vsg::vec3Array::create(points_size);
+    const auto colors = vsg::vec3Array::create(points_size);
+    const auto indices = vsg::ushortArray::create(points_size);
+
+    for (std::size_t i = 0; i < points_size; ++i)
+    {
+        // Чуть приподнимаем подсветку над жёлтой линией,
+        // чтобы не конфликтовать с ней по глубине
+        vertices->at(i) = points[i] + vsg::dvec3{0.0, 0.0, 0.3};
+
+        // Цвет циан: выделенная траектория подсвечивается им
+        colors->at(i) = {0.0f, 1.0f, 1.0f};
+        indices->at(i) = static_cast<unsigned short>(i);
+    }
+
+    const auto geometry = vsg::Geometry::create();
+    geometry->assignArrays(vsg::DataList{vertices, colors});
+    geometry->assignIndices(indices);
+    geometry->commands.push_back(vsg::DrawIndexed::create(
+        points_size, 1, 0, 0, 0
+    ));
+
+    highlight_switch->addChild(vsg::MASK_ALL, geometry);
+
+    context_.compile_infos.emplace_back(CompileInfo{
+        highlight_switch, geometry, vsg::MASK_ALL});
+}
+
+void Route::show_build_preview(const Trajectory* trajectory,
+                                double begin_m, double end_m)
+{
+    const auto preview_switch = context_.build_preview_switch;
+
+    if (!preview_switch)
+    {
+        return;
+    }
+
+    // Убираем предыдущее превью
+    if (!preview_switch->children.empty())
+    {
+        preview_switch->children.clear();
+
+        context_.compile_infos.emplace_back(CompileInfo{
+            nullptr, vsg::ref_ptr(this)});
+    }
+
+    if (trajectory == nullptr)
+    {
+        return;
+    }
+
+    const double length = trajectory->getLength();
+
+    begin_m = std::max(0.0, std::min(begin_m, length));
+    end_m = std::max(0.0, std::min(end_m, length));
+
+    if (end_m < begin_m)
+    {
+        std::swap(begin_m, end_m);
+    }
+
+    if (end_m - begin_m < 0.5)
+    {
+        return;
+    }
+
+    // Точки полосы каждые 5 м (минимум начало и конец)
+    const std::size_t points_size = std::max<std::size_t>(
+                2, static_cast<std::size_t>((end_m - begin_m) / 5.0) + 1);
+
+    const auto vertices = vsg::vec3Array::create(points_size);
+    const auto colors = vsg::vec3Array::create(points_size);
+    const auto indices = vsg::ushortArray::create(points_size);
+
+    for (std::size_t i = 0; i < points_size; ++i)
+    {
+        const double coord = begin_m +
+                (end_m - begin_m) * static_cast<double>(i) /
+                static_cast<double>(points_size - 1);
+
+        const auto point = to_vsg_vec3(trajectory->getPosition(coord, 1).position);
+
+        vertices->at(i) = vsg::vec3(point + vsg::dvec3{0.0, 0.0, 0.6});
+
+        // Оранжевая полоса стройки
+        colors->at(i) = {1.0f, 0.55f, 0.0f};
+        indices->at(i) = static_cast<unsigned short>(i);
+    }
+
+    const auto geometry = vsg::Geometry::create();
+    geometry->assignArrays(vsg::DataList{vertices, colors});
+    geometry->assignIndices(indices);
+    geometry->commands.push_back(vsg::DrawIndexed::create(
+        points_size, 1, 0, 0, 0
+    ));
+
+    preview_switch->addChild(vsg::MASK_ALL, geometry);
+
+    context_.compile_infos.emplace_back(CompileInfo{
+        preview_switch, geometry, vsg::MASK_ALL});
+}
+
+void Route::hide_build_preview()
+{
+    const auto preview_switch = context_.build_preview_switch;
+
+    if (!preview_switch || preview_switch->children.empty())
+    {
+        return;
+    }
+
+    preview_switch->children.clear();
+
+    context_.compile_infos.emplace_back(CompileInfo{
+        nullptr, vsg::ref_ptr(this)});
 }
 
 vsg::ref_ptr<vsg::StateGroup> create_trajectory_lines_state_group(

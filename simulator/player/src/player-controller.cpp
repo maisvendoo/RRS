@@ -6,8 +6,40 @@
 
 #include    "player-controller.h"
 
+#include    <CfgReader.h>
+
 #include    <algorithm>
 #include    <cmath>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PlayerController::loadConfig(QString cfg_path)
+{
+    CfgReader cfg;
+    if (!cfg.load(cfg_path))
+        return;
+
+    const QString sec = "Player";
+
+    double dvalue = 0.0;
+    if (cfg.getDouble(sec, "Radius", dvalue))
+        radius_ = static_cast<float>(dvalue);
+
+    cfg.getDouble(sec, "WalkSpeed", walk_speed_);
+    cfg.getDouble(sec, "SprintSpeed", sprint_speed_);
+    cfg.getDouble(sec, "CrouchSpeed", crouch_speed_);
+    cfg.getDouble(sec, "Acceleration", accelerate_);
+    cfg.getDouble(sec, "Friction", friction_);
+    cfg.getDouble(sec, "JumpSpeed", jump_speed_);
+    cfg.getDouble(sec, "Gravity", gravity_);
+    cfg.getDouble(sec, "StepHeight", step_height_);
+    cfg.getDouble(sec, "EyeHeightStand", eye_height_stand_);
+    cfg.getDouble(sec, "EyeHeightCrouch", eye_height_crouch_);
+
+    eye_height_ = eye_height_stand_;
+    eye_height_target_ = eye_height_stand_;
+}
 
 //------------------------------------------------------------------------------
 //
@@ -21,6 +53,9 @@ void PlayerController::step(double dt,
                             double yaw,
                             collision::CollisionWorld* world)
 {
+    yaw_ = yaw;
+    sprinting_ = sprint && !crouch;
+
     //--- Присед: плавная смена высоты глаз (ТЗ, п.4, 16) ---
     // Вставание из приседа - только если над головой свободно:
     // луч вверх до макушки стоя (глаза + запас на голову)
@@ -69,7 +104,9 @@ void PlayerController::step(double dt,
         target_speed = sprint_speed_;
 
     //--- Проверка земли лучом вниз ---
+    const bool was_grounded = grounded_;
     grounded_ = false;
+    just_landed_ = false;
 
     if (world != nullptr)
     {
@@ -79,13 +116,38 @@ void PlayerController::step(double dt,
         const collision::Vec3f down(0.0f, 0.0f, -1.0f);
         const float probe = radius_ + 0.15f;
 
-        if (world->raycast(position_, down, probe, point, normal))
+        // Дальний луч: страховка от проваливания (маршруты без
+        // colliders.conf, дыры в геометрии) - ищем землю до 100 м ниже
+        bool hit = world->raycast(position_, down, probe, point, normal);
+
+        if (!hit && velocity_.z < 0.0f)
+        {
+            hit = world->raycast(position_, down, 100.0f, point, normal);
+        }
+
+        // Совсем нет геометрии - бесконечный пол на z = 0 (как без мира)
+        if (!hit && position_.z <= radius_)
+        {
+            position_.z = radius_;
+            grounded_ = true;
+            velocity_.z = 0.0f;
+        }
+
+        if (hit)
         {
             // Крутые склоны не держат (ТЗ, п.9): нормаль близка
             // к вертикали - стоять можно
             if (normal.z > 0.7)
             {
                 grounded_ = true;
+
+                // Приземление (ТЗ, п.13): фронт воздух -> земля;
+                // скорость удара - вертикальная скорость до касания
+                if (!was_grounded && velocity_.z < 0.0f)
+                {
+                    just_landed_ = true;
+                    landing_impact_ = -static_cast<double>(velocity_.z);
+                }
 
                 // Стоим на поверхности
                 position_.z = point.z + radius_;
@@ -98,6 +160,12 @@ void PlayerController::step(double dt,
         // Без мира: бесконечный пол на z = 0
         if (position_.z <= radius_)
         {
+            if (!was_grounded && velocity_.z < 0.0f)
+            {
+                just_landed_ = true;
+                landing_impact_ = -static_cast<double>(velocity_.z);
+            }
+
             position_.z = radius_;
             grounded_ = true;
             velocity_.z = 0.0f;
@@ -243,6 +311,62 @@ double PlayerController::getSpeed() const
 {
     return std::sqrt(static_cast<double>(velocity_.x) * velocity_.x +
                      static_cast<double>(velocity_.y) * velocity_.y);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PlayerController::getVerticalVelocity() const
+{
+    return velocity_.z;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool PlayerController::justLanded() const
+{
+    return just_landed_;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PlayerController::getLandingImpact() const
+{
+    return landing_impact_;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool PlayerController::isSprinting() const
+{
+    return sprinting_;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool PlayerController::isCrouched() const
+{
+    return crouched_;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PlayerController::setYaw(double yaw)
+{
+    yaw_ = yaw;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PlayerController::getYaw() const
+{
+    return yaw_;
 }
 
 //------------------------------------------------------------------------------

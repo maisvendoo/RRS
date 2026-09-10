@@ -15,6 +15,7 @@
 
 #include    "model.h"
 #include "rail-signal.h"
+#include "key-symbols.h"
 
 #include    <algorithm>
 #include    <cmath>
@@ -23,8 +24,21 @@
 #include    <CfgReader.h>
 #include    <Journal.h>
 #include    <JournalFile.h>
+#include    <JournalAsyncFile.h>
 #include    <vehicle-controller.h>
+#include    <vehicle-telemetry.h>
+
+class Train;
+
+/// Снятие ЭТ "зависшего" поезда при взятии управления (определение ниже)
+static void Model_releaseHangingEmergency(std::vector<Train*>& trains, Vehicle* vehicle);
 #include    <core/load_module.h>
+
+#include    <QDir>
+#include    <QFileInfo>
+
+#include    <switch.h>
+
 
 //------------------------------------------------------------------------------
 //
@@ -39,7 +53,15 @@ Model::Model(QObject *parent) : QObject(parent)
 //------------------------------------------------------------------------------
 Model::~Model()
 {
-
+    // Остановка сетевого потока (ТЗ "RP-сервер", п.7): сокеты живут
+    // в нём, останавливаем до разрушения данных
+    if (tcp_thread != nullptr)
+    {
+        tcp_thread->quit();
+        tcp_thread->wait(5000);
+        delete tcp_thread;
+        tcp_thread = nullptr;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -47,6 +69,31 @@ Model::~Model()
 //------------------------------------------------------------------------------
 bool Model::init(const simulator_command_line_t &command_line)
 {
+    // ТЗ "RP-сервер", п.7: разделение потоков по приоритетам.
+    // Поток физики (модели и поездов) - средний приоритет; сеть -
+    // высший (поднимается в initTcpServer); запись логов и сейвов -
+    // низший (JournalAsyncFile, SessionSaveManager)
+    QThread::currentThread()->setPriority(QThread::NormalPriority);
+
+    // ТЗ "RP-сервер", п.4: серверный лог - отдельный файл
+    // logs/server.log, асинхронная запись (очередь + фоновый поток
+    // с низшим приоритетом, ТЗ п.7)
+    {
+        FileSystem &fs = FileSystem::getInstance();
+
+        const QString server_log = QDir(QString(fs.getLogsDir().c_str()))
+                .filePath("server.log");
+
+        Journal::instance()->addStorage(
+                    new JournalAsyncFile(server_log, JournalLevel::All));
+
+        Journal::instance()->info("Server log started: " + server_log);
+    }
+
+    // Автосохранения сессии (ТЗ "RP-сервер", п.5, 8): настраиваются до
+    // создания поездов, автозагрузка ставит сейв в очередь применения
+    initSessionSaves();
+
     init_data_t init_data;
 
     // Load initial data configuration
@@ -106,6 +153,10 @@ bool Model::init(const simulator_command_line_t &command_line)
 
     init_data.start_datetime = scnmgr->getStartDateTime();
 
+    // Сейв от организатора (ТЗ "RP-сервер", п.5): применяем к расстановке
+    // ДО создания поездов - позиции, скорости и направление постановки
+    applySessionToInitDatas();
+
     // Create all trains
     for (size_t i = 0; i < init_datas.size(); ++i)
     {
@@ -119,6 +170,13 @@ bool Model::init(const simulator_command_line_t &command_line)
 
             // Даем начальное имя поезду
             train->setName(scnmgr->getTrainName(train_idx));
+
+            // Табельный номер игрока из сейва/расстановки (ТЗ "RP-сервер", п.9)
+            if (is_session_pending &&
+                (train_idx < pending_session.trains.size()))
+            {
+                train->setTabNumber(pending_session.trains.at(train_idx).tab_number);
+            }
 
             // Метка поезда для сообщений проводников в журнале
             // (пустое имя не затирает метку "поезд #N" из setTrainIndex)
@@ -141,7 +199,8 @@ bool Model::init(const simulator_command_line_t &command_line)
 
             slotUpdateTrainTimetable(train_idx);
 
-            thread->start();
+            // Потоки физики поездов - средний приоритет (ТЗ "RP-сервер", п.7)
+            thread->start(QThread::NormalPriority);
         }
     }
 
@@ -162,6 +221,10 @@ bool Model::init(const simulator_command_line_t &command_line)
         vehicle->getTunnel().setZones(tunnel_zones);
     }
 
+    // Состояния стрелок и клиенты из сейва (ТЗ "RP-сервер", п.5):
+    // после постановки поездов, чтобы расстановка не перевела стрелки
+    applySessionSwitchStates();
+
     initControlPanel("control-panel");
 
     //initTraffic(init_data);
@@ -173,6 +236,17 @@ bool Model::init(const simulator_command_line_t &command_line)
         sim_time = simulator_time_t(init_data.start_datetime);
     }
     sim_time.simulation_seconds = start_time;
+
+    // Серверное время из загруженного сейва (ТЗ "RP-сервер", п.5)
+    if (is_session_pending)
+    {
+        sim_time = simulator_time_t(server_date_t(pending_session.date_data),
+                                    server_time_t(pending_session.time_data),
+                                    pending_session.simulation_seconds);
+
+        Journal::instance()->info("Server time restored from session save: " +
+                                  sim_time.getString(false));
+    }
 
     Journal::instance()->info("==== Info to server ====");
     simulator_route_info_t route_info = simulator_route_info_t();
@@ -208,12 +282,14 @@ bool Model::init(const simulator_command_line_t &command_line)
     tcp_server->setVehiclesInfo(vehicles_info.serialize());
     Journal::instance()->info("Ready vehicles info for server");
 
+    // Сетевой поток поднимается до первой рассылки: обратная связь
+    // идёт сигналами (queued) в поток сервера сети (ТЗ "RP-сервер", п.7)
+    initTcpServer();
+
     prepareFeedBack(true);
     tcpFeedBack(true);
 
     Journal::instance()->info("Ready trains and vehicles state for server");
-
-    initTcpServer();
 
     Journal::instance()->info("Simulator model and server are initialized successfully");
 
@@ -1286,6 +1362,11 @@ void Model::initServicePoints(const init_data_t& init_data)
         zone.coolant = res.isEmpty() || res.contains("coolant");
         zone.sand = res.isEmpty() || res.contains("sand");
 
+        // Колонка деповского питания 380 В (ТЗ "Деповское питание"):
+        // зона досягаемости кабеля для подключения игроком (K/L/O)
+        zone.power = res.contains("power");
+        cfg.getDouble(node, "CableLength", zone.cable_length);
+
         if (zone.end > zone.begin)
         {
             service_zones.push_back(zone);
@@ -1312,19 +1393,89 @@ void Model::stepServiceZones()
         const bool standing = std::abs(vehicle->getVelocity()) < 0.3;
 
         bool in_zone = false;
+        bool power_zone = false;
+        double cable_length = 25.0;
 
         for (const auto& zone : service_zones)
         {
             if (coord >= zone.begin && coord <= zone.end)
             {
                 in_zone = true;
+
+                if (zone.power)
+                {
+                    power_zone = true;
+                    cable_length = zone.cable_length;
+                }
+
                 break;
             }
         }
 
         // Подключение колонки возможно только на стоянке внутри зоны
         vehicle->getService().setInZone(in_zone && standing);
+
+        // Колонка деповского питания: кабель дотянется только стоя
+        // внутри зоны (подключение - клавишей K, ТЗ "Деповское питание")
+        vehicle->getDepotPower().setSourceNearby(power_zone && standing,
+                                                 cable_length);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::stepDepotPowerKeys(size_t vehicle_idx,
+                               const std::vector<std::uint16_t>& pressed_keys)
+{
+    if (vehicle_idx >= vehicles.size())
+        return;
+
+    Vehicle* vehicle = vehicles[vehicle_idx];
+
+    auto& depot_power = vehicle->getDepotPower();
+
+    auto key_pressed = [&pressed_keys](std::uint16_t key) -> bool
+    {
+        return std::find(pressed_keys.begin(), pressed_keys.end(), key) !=
+                pressed_keys.end();
+    };
+
+    const bool key_cable = key_pressed(KEY_K);
+    const bool key_source = key_pressed(KEY_L);
+    const bool key_breaker = key_pressed(KEY_O);
+
+    auto& prev = depot_key_prev[vehicle_idx];
+
+    const bool standing = std::abs(vehicle->getVelocity()) < 0.5;
+
+    if (key_cable && !prev[0])
+    {
+        if (!depot_power.isCableConnected())
+        {
+            if (standing && depot_power.isSourceNearby())
+                depot_power.connectCable(depot_power.getNearbyCableLength());
+        }
+        else
+        {
+            depot_power.disconnectCable();
+        }
+    }
+
+    if (key_source && !prev[1])
+    {
+        depot_power.setSourcePower(!depot_power.isExternalPower());
+    }
+
+    if (key_breaker && !prev[2])
+    {
+        depot_power.setInputBreaker(!depot_power.isInputBreakerOn());
+    }
+
+    prev = {key_cable, key_source, key_breaker};
 }
 
 //------------------------------------------------------------------------------
@@ -1781,13 +1932,22 @@ void Model::initTcpServer()
 
     tcp_server->init(QString(cfg_path.c_str()));
 
-    connect(tcp_server, &TcpServer::requestTopologyData, this, &Model::slotGetTopologyData);
+    // Кэш топологии/сигналов для новых клиентов: сервер сети живёт в
+    // отдельном потоке (ТЗ "RP-сервер", п.7), поэтому данные передаются
+    // ему заранее, а не забираются из модели по ссылке из сетевого потока
+    tcp_server->updateTopologyData(topology->serialize());
+    tcp_server->updateSignalsData(topology->getSignalsData()->serialize());
+
+    // Сетевой поток: высший приоритет (ТЗ "RP-сервер", п.7 - сетевой
+    // ввод/вывод не должен блокироваться физикой и записью на диск).
+    // TcpServer без родителя - просто переносится в свой поток
+    tcp_thread = new QThread();
+    tcp_server->moveToThread(tcp_thread);
+    tcp_thread->start(QThread::HighPriority);
 
     connect(topology, &Topology::sendTrajBusyState, tcp_server, &TcpServer::slotSendTrajBusyState);
 
     connect(topology, &Topology::sendSwitchState, tcp_server, &TcpServer::slotSendSwitchState);
-
-    connect(tcp_server, &TcpServer::requestSignalsData, this, &Model::slotGetSignalsData);
 
     for (auto signal : topology->getSignalsData()->line_signals)
     {
@@ -1824,7 +1984,9 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::sigShuntingRouteCommand, topology, &Topology::slotShuntingRouteCommand);
 
-    connect(tcp_server, &TcpServer::sigVehicleControl, this, &Model::slotGetVehicleControlByKeyboard);
+    // Управление забирается напрямую из буфера сервера в process()
+    // (queued-доставка сигнала из сетевого потока ненадёжна)
+    // connect оставлен пустым намеренно
 
     connect(tcp_server, &TcpServer::sigResetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
 
@@ -1833,6 +1995,35 @@ void Model::initTcpServer()
     connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
 
     connect(tcp_server, &TcpServer::sigSetVehicleControlCommand, this, &Model::slotSetVehicleControlCommand);
+
+    // Табельные номера: автоназначение и восстановление "зависших"
+    // поездов (ТЗ "RP-сервер", п.6, 9)
+    connect(tcp_server, &TcpServer::sigClientTabNumber, this, &Model::slotClientTabNumber);
+
+    connect(tcp_server, &TcpServer::sigSetTrainTab, this, &Model::slotSetTrainTab);
+
+    connect(tcp_server, &TcpServer::sigLoadSession, this, &Model::slotLoadSession);
+
+    // Рассылка клиентам: модель (поток физики) отдаёт данные сигналами,
+    // запись в сокеты выполняет сетевой поток (ТЗ п.7)
+    connect(this, &Model::sigTcpUpdateTrainsInfo, tcp_server, &TcpServer::updateTrainsInfo);
+
+    connect(this, &Model::sigTcpUpdateVehiclesPos, tcp_server, &TcpServer::updateVehiclesPos);
+
+    connect(this, &Model::sigTcpUpdateVehiclesState, tcp_server, &TcpServer::updateVehiclesState);
+
+    connect(this, &Model::sigTcpUpdatePlayers, tcp_server, &TcpServer::updatePlayers);
+
+    connect(this, &Model::sigTcpUpdateVehicleControlled, tcp_server, &TcpServer::updateVehicleControlled);
+
+    connect(this, &Model::sigTcpUpdateDiagnostics, tcp_server, &TcpServer::updateDiagnostics);
+
+    // Периодическое обновление кэша топологии/сигналов для новых клиентов
+    connect(this, &Model::sigTcpTopologyData, tcp_server, &TcpServer::updateTopologyData);
+
+    connect(this, &Model::sigTcpSignalsData, tcp_server, &TcpServer::updateSignalsData);
+
+    Journal::instance()->info(QString("TCP server moved to network thread (HighPriority, TZ p.7)"));
 
     Journal::instance()->info("TCP server is initialized successfully");
 }
@@ -1929,12 +2120,25 @@ void Model::prepareFeedBack(bool need_trains_feedback)
     }
 
     // Погода для рендера клиента (ТЗ "Видимость и погода"): дальняя
-    // плоскость камеры и туман едут вместе с позициями ПЕ
+    // плоскость камеры и туман едут вместе с позициями ПЕ.
+    // Дополнительно (ТЗ "Частицы"): тип/интенсивность погоды и ветер
+    // для систем частиц клиента (дым из трубы, брызги из-под колёс)
     {
         const auto& wstate = weather_system.getState();
         update_pos_data.visibility_m = static_cast<float>(wstate.visibility);
         update_pos_data.fog_density = static_cast<float>(wstate.fog_density);
+        update_pos_data.weather_type = static_cast<quint8>(wstate.type);
+        update_pos_data.weather_intensity =
+                static_cast<float>(wstate.intensity);
+        update_pos_data.wind_speed = static_cast<float>(wstate.wind_speed);
+        update_pos_data.wind_direction =
+                static_cast<float>(wstate.wind_direction);
     }
+
+    // Предупреждение кассеты регистрации (Ctrl+R): "Запись параметров
+    // движения начата/окончена" (ТЗ "Кассеты")
+    update_pos_data.notice_id = cassette_notice_id;
+    update_pos_data.notice = cassette_notice;
 
     // Звуковые события последнего шага физики (ТЗ "Аудиосистема"):
     // раздаются клиентам вместе с позициями (события несут мировые
@@ -2054,9 +2258,11 @@ void Model::tcpFeedBack(bool need_trains_feedback)
 {
     double realtime_seconds = std::chrono::duration<double, std::chrono::seconds::period>(process_timepoint - start_timepoint).count();
 
+    // Рассылка идёт сигналами в сетевой поток (ТЗ "RP-сервер", п.7):
+    // запись в сокеты не блокирует шаг физики
     if (need_trains_feedback)
     {
-        tcp_server->updateTrainsInfo(update_trains.serialize());
+        emit sigTcpUpdateTrainsInfo(update_trains.serialize());
         update_trains = simulator_trains_update_t();
     }
 
@@ -2065,22 +2271,23 @@ void Model::tcpFeedBack(bool need_trains_feedback)
     {
         diagnostics_prev_send_time = realtime_seconds;
         prepareDiagnostics();
-        tcp_server->updateDiagnostics(update_diagnostics.serialize(),
-                                      realtime_seconds);
+        emit sigTcpUpdateDiagnostics(update_diagnostics.serialize(),
+                                     realtime_seconds);
     }
 
-    tcp_server->updateVehiclesPos(update_pos_data.serialize(), realtime_seconds);
+    emit sigTcpUpdateVehiclesPos(update_pos_data.serialize(), realtime_seconds);
     update_pos_data = simulator_update_pos_t();
 
-    tcp_server->updateVehiclesState(update_vehicles.serialize(), realtime_seconds);
+    emit sigTcpUpdateVehiclesState(update_vehicles.serialize(), realtime_seconds);
     update_vehicles = simulator_vehicles_update_t();
 
-    tcp_server->updatePlayers(update_players.serialize(), realtime_seconds);
+    emit sigTcpUpdatePlayers(update_players.serialize(), realtime_seconds);
     update_players = simulator_update_players_t();
 
     for (auto с_id = controlled_clients.keyBegin(); с_id != controlled_clients.keyEnd(); ++с_id)
     {
-        tcp_server->updateVehicleControlled(controlled_clients[*с_id].vehicle_controlled.serialize(), (*с_id), realtime_seconds);
+        emit sigTcpUpdateVehicleControlled(controlled_clients[*с_id].vehicle_controlled.serialize(),
+                                           (*с_id), realtime_seconds);
         controlled_clients[*с_id].vehicle_controlled = simulator_vehicle_controlled_update_t();
     }
 }
@@ -2116,10 +2323,29 @@ void Model::controlStep()
     for (const auto& c : controlled_clients)
     {
         std::uint16_t id = c.vehicle_control_by_keyboard.controlled_vehicle;
+
+        // Человек взял управление ПЕ - гасим сценарный автопилот этого
+        // поезда (иначе бот продолжает дёргать краны/тумблеры поверх
+        // ручного управления). OffAutopilot у самой ПЕ выключит
+        // программу автозапуска
+        if ((id < vehicles.size()) &&
+            (id != c.prev_vehicle_controlled))
+        {
+            vehicles[id]->OffAutopilot();
+
+            // Взятие управления "зависшего" поезда снимает ЭТ
+            // (ТЗ "RP-сервер", п.6): игрок вернулся за этой же ПЕ
+            Model_releaseHangingEmergency(trains, vehicles[id]);
+        }
+
         if (id < vehicles.size())
         {
             std::uint16_t cab_id = c.vehicle_control_by_keyboard.controlled_cabine_idx;
             vehicles[id]->setKeyboardControl(cab_id, c.vehicle_control_by_keyboard.pressed_keys);
+
+            // Сервисные клавиши деповского питания (K/L/O по фронту)
+            stepDepotPowerKeys(static_cast<size_t>(id),
+                               c.vehicle_control_by_keyboard.pressed_keys);
 
             if (c.vehicle_control_by_keyboard.need_debug_msg)
             {
@@ -2138,9 +2364,206 @@ void Model::controlStep()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::notifyCassette(const QString& message)
+{
+    ++cassette_notice_id;
+    cassette_notice = message;
+
+    Journal::instance()->warning("[CASSETTE] " + message);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::stepCassette(double dt)
+{
+    if (!cassette.isEnabled())
+        return;
+
+    // Управляемая ПЕ (первый клиент): кассета пишется для её поезда.
+    // Физического объекта-кассеты в мире нет: кассета "вставлена",
+    // пока идёт запись; параметры записи одинаковы для всех дополнений
+    Vehicle* controlled = nullptr;
+    static const std::vector<std::uint16_t> no_keys;
+    const std::vector<std::uint16_t>* controlled_keys = &no_keys;
+
+    for (const auto& c : controlled_clients)
+    {
+        const int id = c.vehicle_control_by_keyboard.controlled_vehicle;
+
+        if (id >= 0 && id < static_cast<int>(vehicles.size()))
+        {
+            controlled = vehicles[static_cast<size_t>(id)];
+            controlled_keys = &c.vehicle_control_by_keyboard.pressed_keys;
+            break;
+        }
+    }
+
+    const bool is_recording =
+            (cassette.getState() == CassetteRecorderSystem::State::Recording);
+
+    // Ctrl+R - вставить/извлечь кассету (по фронту нажатия): клавиши
+    // читаем из набора клиента (модификаторы ПЕ - protected, как в апстриме)
+    auto key_held = [controlled_keys](std::uint16_t key) -> bool
+    {
+        return std::find(controlled_keys->begin(), controlled_keys->end(), key) !=
+                controlled_keys->end();
+    };
+
+    const bool ctrl_r = (controlled != nullptr) &&
+            (key_held(KEY_Control_L) || key_held(KEY_Control_R)) &&
+            key_held(KEY_R);
+
+    if (ctrl_r && !cassette_key_prev)
+    {
+        if (is_recording)
+        {
+            cassette.stop();
+            notifyCassette("Запись параметров движения окончена");
+            cassette_key_prev = ctrl_r;
+            return;
+        }
+
+        cassette.start(controlled->getConfigName(),
+                       controlled->getMass() / 1000.0, 0.0);
+
+        if (cassette.getState() == CassetteRecorderSystem::State::Recording)
+        {
+            // Новая кассета - время записи с нуля
+            cassette_time = 0.0;
+            cassette_sample_timer = 0.0;
+            cassette_prev_speed = 0.0;
+
+            notifyCassette("Запись параметров движения начата");
+        }
+    }
+
+    cassette_key_prev = ctrl_r;
+
+    // Управляемая ПЕ ушла при активной записи - корректно закрываем
+    if (controlled == nullptr)
+    {
+        if (cassette.getState() == CassetteRecorderSystem::State::Recording)
+        {
+            cassette.stop();
+            notifyCassette("Запись параметров движения окончена");
+        }
+
+        return;
+    }
+
+    if (cassette.getState() != CassetteRecorderSystem::State::Recording)
+    {
+        // Кассета не вставлена - не пишем (вставка только по Ctrl+R)
+        return;
+    }
+
+    // Снимок 2 Гц (скорость/ТМ по ТЗ п.2); остальные каналы пишутся
+    // той же частотой - декимация на стороне расшифровщика
+    cassette_sample_timer += dt;
+    cassette_time += dt;
+
+    if (cassette_sample_timer < 0.5)
+    {
+        cassette.step(dt);
+        return;
+    }
+
+    cassette_sample_timer = 0.0;
+
+    CassetteFrame frame;
+
+    // Направление движения (+1/-1): детектор скатывания (ТЗ кассеты)
+    frame.direction = (controlled->getVelocity() < 0.0) ? -1.0 : 1.0;
+
+    const profile_point_t* point = controlled->getProfilePoint();
+
+    const double speed_ms = std::abs(controlled->getVelocity());
+    frame.actual_speed = speed_ms * 3.6;
+    frame.coordinate = point->railway_coord;
+    frame.gradient = point->inclination * 1000.0;
+    frame.curvature = point->curvature;
+
+    // Ускорение конечной разностью по выборкам (2 Гц)
+    frame.acceleration = (speed_ms - cassette_prev_speed) / 0.5;
+    cassette_prev_speed = speed_ms;
+
+    // Давления (ТЗ "Кассеты", п.2): источники привязывает аддон
+    // (кран машиниста / приборы ПС); без источника (вагоны) - 0.
+    // Пневматика считается в МПа, формат кассеты - кгс/см2
+    // (1 кгс/см2 = 0.0980665 МПа)
+    constexpr double MPA_TO_KGS_CM2 = 1.0 / 0.0980665;
+
+    auto& telemetry = VehicleTelemetry::instance();
+    const double er = telemetry.equalizingReservoirPressure(controlled);
+    frame.equalizing_reservoir_pressure = (er > 0.0) ? er * MPA_TO_KGS_CM2 : 0.0;
+
+    const double bp = telemetry.brakePipePressure(controlled);
+    frame.brake_pipe_pressure = (bp > 0.0) ? bp * MPA_TO_KGS_CM2 : 0.0;
+
+    const double bc = telemetry.brakeCylinderPressure(controlled);
+    frame.brake_cylinder_pressure = (bc > 0.0) ? bc * MPA_TO_KGS_CM2 : 0.0;
+
+    const double mr = telemetry.mainReservoirPressure(controlled);
+    frame.main_reservoir_pressure = (mr > 0.0) ? mr * MPA_TO_KGS_CM2 : 0.0;
+
+    // Электрические каналы
+    frame.overhead_voltage = controlled->getPantograph().isRaised()
+            ? 25000.0 : 0.0;
+
+    // Ток ТЭД: реальный Ia моторов от аддона; без источника -
+    // линейный ток из энергомера (P/U)
+    const double ia = telemetry.tractionCurrent(controlled);
+    frame.traction_current = (ia > 0.0)
+            ? ia
+            : controlled->getEnergy().getCurrent();
+    frame.roof_raised = controlled->getPantograph().isRaised();
+
+    // Тяга/торможение: сила из фактической мощности на ободе (P = F*v)
+    const double power_kw = controlled->getEnergy().getPower();
+    const double force_n = power_kw * 1000.0 / std::max(speed_ms, 1.0);
+
+    frame.traction_force = std::max(force_n, 0.0) / 9806.65;
+    frame.brake_force = std::abs(std::min(force_n, 0.0)) / 9806.65;
+    frame.traction_mode = force_n > 1000.0;
+    frame.regen_mode = force_n < -1000.0;
+
+    // Вспомогательные машины и системы
+    frame.compressor = false;
+    frame.fan = false;
+    frame.sand = controlled->getSand().isFeeding();
+
+    cassette.sample(cassette_time, frame);
+    cassette.step(dt);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::process()
 {
+    // Клавиатурное управление клиентами: забираем накопленное сетевым
+    // потоком (мьютекс-буфер, потокобезопасно)
+    if (tcp_server != nullptr)
+    {
+        const auto pending = tcp_server->takePendingControl();
+
+        for (const auto& pair : pending)
+        {
+            slotGetVehicleControlByKeyboard(pair.second, pair.first);
+        }
+    }
+
     process_timepoint = std::chrono::steady_clock::now();
+
+    // Подсистемы сервера (ТЗ "RP-сервер", п.5-6): автосохранения и
+    // "зависшие" поезда обслуживаются по realtime, в том числе на паузе
+    const double realtime_seconds = std::chrono::duration<double,
+            std::chrono::seconds::period>(process_timepoint - start_timepoint).count();
+
+    stepHangingClients(realtime_seconds);
+
+    stepSessionSaves(realtime_seconds);
 
     if (speed_factor == 0)
     {
@@ -2306,6 +2729,10 @@ void Model::process()
 
     controlStep();
 
+    // Кассета регистрации (ТЗ "Кассеты"): снимок с управляемой ПЕ,
+    // периодический сброс на диск; Ctrl+R - извлечь кассету
+    stepCassette(integration_time);
+
     // Шаг всех поездов: поезда живут в своих потоках, шаг выдаётся
     // сигналом ниже, завершение фиксируется slotTrainStepDone. Замер
     // секции physics_trains (ТЗ "Оптимизация") - честный полный цикл
@@ -2396,17 +2823,37 @@ void Model::slotGetSignalsData(QByteArray &signals_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data, int client_id)
+void Model::slotGetVehicleControlByKeyboard(QByteArray control_data, int client_id)
 {
     controlled_client_t c = controlled_client_t();
     c.vehicle_control_by_keyboard.deserialize(control_data);
+
+    // Табельный номер сохраняется за клиентом (ТЗ "RP-сервер", п.9):
+    // пришёл при подключении - переживает перезагрузки управления
+    c.tab_number = client_tabs.value(client_id, -1);
+
     if (controlled_clients.contains(client_id))
     {
         c.prev_vehicle_controlled = controlled_clients[client_id].vehicle_control_by_keyboard.controlled_vehicle;
         c.prev_cab_controlled = controlled_clients[client_id].vehicle_control_by_keyboard.controlled_cabine_idx;
     }
     controlled_clients.insert(client_id, c);
-/*
+
+    QString keys_str = "";
+    for (auto k : c.vehicle_control_by_keyboard.pressed_keys)
+    {
+        keys_str += QString(" %1").arg(k, 0, 16);
+    }
+
+    Journal::instance()->info(
+        QString("CTRL client=%1 controlled=%2 cab=%3 keys=%4:%5")
+            .arg(client_id)
+            .arg(c.vehicle_control_by_keyboard.controlled_vehicle)
+            .arg(c.vehicle_control_by_keyboard.controlled_cabine_idx)
+            .arg(c.vehicle_control_by_keyboard.pressed_keys.size())
+            .arg(keys_str));
+
+#if 0
     QString msg = "Get keyboard: controlled ";
     msg += QString::number(c.vehicle_control_by_keyboard.controlled_vehicle);
     msg += " | current ";
@@ -2421,7 +2868,7 @@ void Model::slotGetVehicleControlByKeyboard(QByteArray &control_data, int client
         msg += QString::number(key_id);
     }
     Journal::instance()->info(msg);
-*/
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -2447,6 +2894,35 @@ void Model::slotResetVehicleControlByKeyboard(int client_id)
         {
             if (controlled_clients[client_id].vehicle_control_by_keyboard.need_debug_msg)
                 vehicles[id]->setNeedDebugMsg(false);
+        }
+
+        // ТЗ "RP-сервер", п.6: клиент отключился - поезд НЕ удаляется.
+        // ПЕ остаётся в последнем корректном состоянии: скорость
+        // сохраняется, управление отключается (выше), а состав
+        // дожидается игрока (hanging_timeout) либо плавно останавливается
+        // экстренным торможением (stepHangingClients)
+        const int veh_idx = controlled_clients[client_id]
+                .vehicle_control_by_keyboard.controlled_vehicle;
+
+        if ((veh_idx >= 0) && (veh_idx < static_cast<int>(vehicles.size())))
+        {
+            hanging_client_t hanging;
+
+            hanging.vehicle_idx = veh_idx;
+            hanging.cab_idx = controlled_clients[client_id]
+                    .vehicle_control_by_keyboard.controlled_cabine_idx;
+            hanging.tab_number = controlled_clients[client_id].tab_number;
+            hanging.disconnect_time = std::chrono::duration<double,
+                    std::chrono::seconds::period>(process_timepoint - start_timepoint).count();
+            hanging.emergency = false;
+
+            hanging_clients.insert(client_id, hanging);
+
+            Journal::instance()->warning(QString("Client #%1 (tab %2) lost connection: vehicle #%3 is frozen, emergency brake in %4 s")
+                                             .arg(client_id)
+                                             .arg(hanging.tab_number)
+                                             .arg(hanging.vehicle_idx)
+                                             .arg(static_cast<int>(hanging_timeout)));
         }
 
         controlled_clients.remove(client_id);
@@ -2492,4 +2968,625 @@ void Model::slotGetTrainParams(int train_idx, double &train_len, double &train_m
 
     train_len = train->getLength();
     train_mass = train->getMass();
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.4, 5: инициализация автосохранений сессии
+//------------------------------------------------------------------------------
+void Model::initSessionSaves()
+{
+    Journal::instance()->info("==== Session autosave initialization ====");
+
+    FileSystem &fs = FileSystem::getInstance();
+
+    const QString cfg_path = QString(fs.getConfigDir().c_str()) +
+            QDir::separator() + "session.xml";
+
+    // Корень сервера: каталог на уровень вверх от бинарника (как logs)
+    const QString base_dir = QFileInfo(QString(fs.getLogsDir().c_str()))
+            .absolutePath();
+
+    session_saves->init(cfg_path, base_dir);
+
+    // ТЗ п.5: автозагрузка последнего корректного сейва (если разрешена
+    // конфигом). Повреждённые сейвы пропускаются самим менеджером
+    // (откат к предыдущему валидному, ТЗ п.8)
+    if (session_saves->isAutoloadEnabled())
+    {
+        QString error = "";
+        const QString latest = session_saves->latestValidSave(&error);
+
+        if (!latest.isEmpty())
+        {
+            loadSession(latest);
+        }
+        else
+        {
+            Journal::instance()->info("Session autosave: no valid save to autoload");
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.5: загрузка сейва (проверка CRC32 внутри менеджера)
+//------------------------------------------------------------------------------
+bool Model::loadSession(const QString &path)
+{
+    session::session_state_t state;
+    QString error = "";
+
+    if (!session_saves->loadSession(path, state, &error))
+    {
+        Journal::instance()->error("Session load FAILED: " + path +
+                                   " (" + error + ")");
+        return false;
+    }
+
+    // Полное состояние применяется только до создания поездов: после
+    // старта симуляции поезд уже расставлен (ТЗ п.5 - организатор
+    // перезапускает сервер и грузит последний корректный сейв)
+    if (is_simulation_started || !trains.empty())
+    {
+        Journal::instance()->warning("Session load rejected: simulation is "
+                                     "already started, restart server to apply save");
+        return false;
+    }
+
+    pending_session = state;
+    is_session_pending = true;
+
+    Journal::instance()->info("Session save queued for load: " + path);
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QStringList Model::sessionSaveFiles() const
+{
+    return session_saves->saveFiles();
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.5: сбор полного снимка сессии (в потоке модели)
+//------------------------------------------------------------------------------
+session::session_state_t Model::captureSessionState()
+{
+    session::session_state_t state;
+
+    // Серверное время
+    state.date_data = sim_time.date.data();
+    state.time_data = static_cast<std::uint32_t>(sim_time.time.data());
+    state.simulation_seconds = sim_time.simulation_seconds;
+    state.time_string = sim_time.getString(false);
+
+    state.route_name = topology->getRouteName();
+
+    // Поезда: позиция/скорость всех ПЕ + состояния устройств
+    for (size_t i = 0; i < trains.size(); ++i)
+    {
+        Train *train = trains[i];
+
+        if ((train == nullptr) || (train->getVehicles() == nullptr))
+        {
+            continue;
+        }
+
+        session::train_state_t train_state;
+
+        train_state.train_idx = static_cast<int>(i);
+        train_state.name = QString::fromStdString(train->getName());
+        train_state.tab_number = train->getTabNumber();
+
+        Vehicle *head = train->getFirstVehicle();
+
+        if ((head != nullptr) && (head->getModelIndex() < vehicles.size()))
+        {
+            train_state.train_config = head->getConfigName();
+
+            // Позиция головной ПЕ: траектория + дуговая координата
+            VehicleController &vc = topology->getVehicleController(head->getModelIndex());
+
+            QString traj_name = "";
+            double traj_coord = 0.0;
+
+            vc.slotGetVehicleTrajPosition(&traj_name, &traj_coord);
+
+            train_state.trajectory_name = traj_name;
+            train_state.init_coord = traj_coord;
+            train_state.direction = static_cast<int>(vc.getOrientation());
+            train_state.init_velocity = head->getVelocity() * Physics::kmh;
+        }
+
+        for (auto vehicle : *(train->getVehicles()))
+        {
+            session::vehicle_state_t vehicle_state;
+
+            vehicle_state.model_index = static_cast<int>(vehicle->getModelIndex());
+            vehicle_state.railway_coord = vehicle->getProfilePoint()->railway_coord;
+            vehicle_state.velocity_kmh = vehicle->getVelocity() * Physics::kmh;
+            vehicle_state.config_name = vehicle->getConfigName();
+
+            // Состояния устройств ключевых ПЕ (ТЗ п.5)
+            vehicle_state.er_pressure = VehicleTelemetry::instance()
+                        .equalizingReservoirPressure(vehicle);
+            vehicle_state.pantograph_up = vehicle->getPantograph().isRaised();
+
+            if (vehicle->getModelIndex() < vehicles.size())
+            {
+                VehicleController &vc = topology->getVehicleController(vehicle->getModelIndex());
+
+                QString traj_name = "";
+                double traj_coord = 0.0;
+
+                vc.slotGetVehicleTrajPosition(&traj_name, &traj_coord);
+
+                vehicle_state.traj_name = traj_name;
+                vehicle_state.traj_coord = traj_coord;
+                vehicle_state.traj_dir = static_cast<int>(vc.getOrientation());
+            }
+
+            train_state.vehicles.push_back(vehicle_state);
+        }
+
+        state.trains.push_back(train_state);
+    }
+
+    // Состояния стрелок (топология)
+    const sw_list_t *switches = topology->getConnectorsList();
+
+    for (auto it = switches->cbegin(); it != switches->cend(); ++it)
+    {
+        const Switch *sw = it.value();
+
+        if (sw == nullptr)
+        {
+            continue;
+        }
+
+        session::switch_state_t switch_state;
+
+        switch_state.name = sw->getName();
+        switch_state.state_fwd = static_cast<int>(sw->getStateFwd());
+        switch_state.state_bwd = static_cast<int>(sw->getStateBwd());
+        switch_state.ref_state_fwd = static_cast<int>(sw->getRefStateFwd());
+        switch_state.ref_state_bwd = static_cast<int>(sw->getRefStateBwd());
+
+        state.switches.push_back(switch_state);
+    }
+
+    // Клиенты: подключённые и "зависшие" (ТЗ п.6, 9)
+    for (auto it = controlled_clients.cbegin(); it != controlled_clients.cend(); ++it)
+    {
+        session::client_state_t client_state;
+
+        client_state.client_id = it.key();
+        client_state.tab_number = it.value().tab_number;
+        client_state.vehicle_idx = it.value().vehicle_control_by_keyboard.controlled_vehicle;
+        client_state.cab_idx = it.value().vehicle_control_by_keyboard.controlled_cabine_idx;
+        client_state.connected = true;
+
+        state.clients.push_back(client_state);
+    }
+
+    for (auto it = hanging_clients.cbegin(); it != hanging_clients.cend(); ++it)
+    {
+        session::client_state_t client_state;
+
+        client_state.client_id = it.key();
+        client_state.tab_number = it.value().tab_number;
+        client_state.vehicle_idx = it.value().vehicle_idx;
+        client_state.cab_idx = it.value().cab_idx;
+        client_state.connected = false;
+
+        state.clients.push_back(client_state);
+    }
+
+    return state;
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.5: применение сейва к расстановке (до поездов)
+//------------------------------------------------------------------------------
+void Model::applySessionToInitDatas()
+{
+    if (!is_session_pending)
+    {
+        return;
+    }
+
+    // Маршрут сейва обязан совпадать с загруженным
+    if (pending_session.route_name != topology->getRouteName())
+    {
+        Journal::instance()->warning(QString("Session save is for route \"%1\", current is \"%2\": save ignored")
+                                         .arg(pending_session.route_name)
+                                         .arg(topology->getRouteName()));
+
+        // Сейв чужого маршрута не применяется ни частично
+        is_session_pending = false;
+
+        return;
+    }
+
+    for (const auto &saved : pending_session.trains)
+    {
+        if ((saved.train_idx < 0) || (saved.train_idx >= static_cast<int>(init_datas.size())))
+        {
+            Journal::instance()->warning(QString("Session save: train #%1 is out of current placement, skipped")
+                                             .arg(saved.train_idx));
+            continue;
+        }
+
+        init_data_t &init_data = init_datas[saved.train_idx];
+
+        init_data.trajectory_name = saved.trajectory_name;
+        init_data.init_coord = saved.init_coord;
+        init_data.direction = saved.direction;
+        init_data.init_velocity = saved.init_velocity;
+
+        Journal::instance()->info(QString("Session save: train #%1 (tab %2) restored at %3 %4 m, velocity %5 km/h")
+                                      .arg(saved.train_idx)
+                                      .arg(saved.tab_number)
+                                      .arg(saved.trajectory_name)
+                                      .arg(saved.init_coord, 8, 'f', 1)
+                                      .arg(saved.init_velocity, 6, 'f', 1));
+    }
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.5: стрелки и клиенты из сейва (после постановки)
+//------------------------------------------------------------------------------
+void Model::applySessionSwitchStates()
+{
+    if (!is_session_pending)
+    {
+        return;
+    }
+
+    sw_list_t *switches = topology->getConnectorsList();
+
+    int applied = 0;
+
+    for (const auto &saved : pending_session.switches)
+    {
+        if (!switches->contains(saved.name))
+        {
+            continue;
+        }
+
+        Switch *sw = switches->value(saved.name);
+
+        if (sw == nullptr)
+        {
+            continue;
+        }
+
+        sw->setStateFwd(static_cast<Switch_state_t>(saved.state_fwd));
+        sw->setStateBwd(static_cast<Switch_state_t>(saved.state_bwd));
+        sw->setRefStateFwd(static_cast<Switch_state_t>(saved.ref_state_fwd));
+        sw->setRefStateBwd(static_cast<Switch_state_t>(saved.ref_state_bwd));
+
+        ++applied;
+    }
+
+    Journal::instance()->info(QString("Session save: %1 of %2 switch states restored")
+                                  .arg(applied)
+                                  .arg(pending_session.switches.size()));
+
+    // Клиенты из сейва становятся "зависшими": таймаут экстренного
+    // торможения (ТЗ п.6) начинается заново, вернувшийся игрок
+    // получит управление по табельному номеру (п.9)
+    for (const auto &client : pending_session.clients)
+    {
+        if ((client.vehicle_idx < 0) ||
+            (client.vehicle_idx >= static_cast<int>(vehicles.size())))
+        {
+            continue;
+        }
+
+        hanging_client_t hanging;
+
+        hanging.vehicle_idx = client.vehicle_idx;
+        hanging.cab_idx = client.cab_idx;
+        hanging.tab_number = client.tab_number;
+        hanging.disconnect_time = std::chrono::duration<double,
+                std::chrono::seconds::period>(process_timepoint - start_timepoint).count();
+        hanging.emergency = false;
+
+        hanging_clients.insert(client.client_id, hanging);
+    }
+
+    // Сейв применён полностью
+    is_session_pending = false;
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.5: шаг подсистем сессии (по realtime)
+//------------------------------------------------------------------------------
+void Model::stepSessionSaves(double realtime_seconds)
+{
+    // Обновление кэша топологии/сигналов для новых клиентов
+    // (сервер сети живёт в своём потоке, ТЗ п.7)
+    const double dt = realtime_seconds - session_prev_realtime;
+    session_prev_realtime = realtime_seconds;
+
+    if (dt < 0.0)
+    {
+        return;
+    }
+
+    tcp_cache_timer += dt;
+
+    if (tcp_cache_timer >= 10.0)
+    {
+        tcp_cache_timer = 0.0;
+
+        emit sigTcpTopologyData(topology->serialize());
+        emit sigTcpSignalsData(topology->getSignalsData()->serialize());
+    }
+
+    // Автосохранение не реже раза в save_interval секунд (ТЗ п.5:
+    // не реже одного раза в 10 минут). Снимок собирается здесь (поток
+    // модели), запись идёт в фоновом потоке (ТЗ п.7)
+    if (!session_saves->isEnabled())
+    {
+        return;
+    }
+
+    session_save_timer += dt;
+
+    if (session_save_timer >= static_cast<double>(session_saves->saveInterval()))
+    {
+        session_save_timer = 0.0;
+
+        session_saves->saveAsync(captureSessionState());
+    }
+}
+
+//------------------------------------------------------------------------------
+// ЭТ "зависшего" поезда через штатный интерфейс управления ПЕ
+// (ТЗ "RP-сервер", п.6): кран машиниста аналоговым сигналом
+// CS_BRAKE_CRANE переводится в положение VI (экстренное), как от
+// внешнего пульта. Отключение возвращает управление клавиатуре
+//------------------------------------------------------------------------------
+static void setHangingEmergencyBrake(Vehicle* vehicle, bool active)
+{
+    control_signals_t cs;
+
+    cs.analogSignal[CS_BRAKE_CRANE].is_active = active;
+    cs.analogSignal[CS_BRAKE_CRANE].cur_value = 6.0f;
+
+    vehicle->setControlSignals(cs);
+}
+
+//------------------------------------------------------------------------------
+// Снятие ЭТ "зависшего" поезда, если эта ПЕ входит в него
+//------------------------------------------------------------------------------
+static void Model_releaseHangingEmergency(std::vector<Train*>& trains, Vehicle* vehicle)
+{
+    if ((vehicle == nullptr) || (vehicle->getTrainIndex() >= trains.size()))
+    {
+        return;
+    }
+
+    Train* train = trains[vehicle->getTrainIndex()];
+
+    if (train == nullptr)
+    {
+        return;
+    }
+
+    for (auto v : *(train->getVehicles()))
+    {
+        setHangingEmergencyBrake(v, false);
+    }
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.6: "зависшие" поезда - таймаут и экстренное торможение
+//------------------------------------------------------------------------------
+void Model::stepHangingClients(double realtime_seconds)
+{
+    if (hanging_clients.isEmpty())
+    {
+        return;
+    }
+
+    for (auto it = hanging_clients.begin(); it != hanging_clients.end(); ++it)
+    {
+        hanging_client_t &hanging = it.value();
+
+        if (hanging.emergency)
+        {
+            continue;
+        }
+
+        if ((hanging.vehicle_idx < 0) ||
+            (hanging.vehicle_idx >= static_cast<int>(vehicles.size())))
+        {
+            continue;
+        }
+
+        if ((realtime_seconds - hanging.disconnect_time) < hanging_timeout)
+        {
+            continue;
+        }
+
+        // Игрок не вернулся: состав останавливается экстренным
+        // торможением через интерфейс управления ПЕ (ТЗ п.6)
+        Vehicle *vehicle = vehicles[hanging.vehicle_idx];
+
+        size_t train_idx = vehicle->getTrainIndex();
+
+        if ((train_idx < trains.size()) && (trains[train_idx] != nullptr))
+        {
+            for (auto v : *(trains[train_idx]->getVehicles()))
+            {
+                setHangingEmergencyBrake(v, true);
+            }
+        }
+
+        hanging.emergency = true;
+
+        Journal::instance()->warning(QString("Hanging train: player with tab %1 did not return in %2 s, emergency brake applied to vehicle #%3")
+                                         .arg(hanging.tab_number)
+                                         .arg(static_cast<int>(hanging_timeout))
+                                         .arg(hanging.vehicle_idx));
+    }
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.6, 9: восстановление "зависшего" поезда по табельному
+//------------------------------------------------------------------------------
+bool Model::restoreClientByTabNumber(int client_id, int tab_number)
+{
+    for (auto it = hanging_clients.begin(); it != hanging_clients.end(); ++it)
+    {
+        hanging_client_t &hanging = it.value();
+
+        if (hanging.tab_number != tab_number)
+        {
+            continue;
+        }
+
+        if ((hanging.vehicle_idx < 0) ||
+            (hanging.vehicle_idx >= static_cast<int>(vehicles.size())))
+        {
+            hanging_clients.erase(it);
+            return false;
+        }
+
+        // Поезд этого игрока: снимаем экстренное торможение (п.6)
+        Vehicle *vehicle = vehicles[hanging.vehicle_idx];
+
+        size_t train_idx = vehicle->getTrainIndex();
+
+        if ((train_idx < trains.size()) && (trains[train_idx] != nullptr))
+        {
+            for (auto v : *(trains[train_idx]->getVehicles()))
+            {
+                setHangingEmergencyBrake(v, false);
+            }
+        }
+
+        // Восстановление управления: игрок продолжает с того же места
+        controlled_client_t &client = controlled_clients[client_id];
+
+        client.tab_number = tab_number;
+        client.vehicle_control_by_keyboard.controlled_vehicle =
+                static_cast<std::uint16_t>(hanging.vehicle_idx);
+        client.vehicle_control_by_keyboard.current_vehicle =
+                static_cast<std::uint16_t>(hanging.vehicle_idx);
+        client.vehicle_control_by_keyboard.controlled_cabine_idx =
+                static_cast<std::uint16_t>(hanging.cab_idx > 0 ? hanging.cab_idx : 0);
+
+        Journal::instance()->info(QString("Player with tab %1 returned: control of vehicle #%2 restored")
+                                      .arg(tab_number)
+                                      .arg(hanging.vehicle_idx));
+
+        hanging_clients.erase(it);
+
+        return true;
+    }
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.9: табельный номер клиента при подключении
+//------------------------------------------------------------------------------
+void Model::slotClientTabNumber(int client_id, int tab_number)
+{
+    if (tab_number <= 0)
+    {
+        return;
+    }
+
+    // Табельный запоминается за подключением: он переживает перезагрузки
+    // управления клиентом (см. slotGetVehicleControlByKeyboard)
+    client_tabs.insert(client_id, tab_number);
+
+    if (controlled_clients.contains(client_id))
+    {
+        controlled_clients[client_id].tab_number = tab_number;
+    }
+
+    Journal::instance()->info(QString("Client #%1 identified by tab number %2")
+                                  .arg(client_id)
+                                  .arg(tab_number));
+
+    // 1) "Зависший" поезд этого игрока: возврат управления (ТЗ п.6)
+    if (restoreClientByTabNumber(client_id, tab_number))
+    {
+        return;
+    }
+
+    // 2) Автоназначение по расстановке организатора (ТЗ п.9): поезд с
+    // этим табельным закреплён - клиент автоматически получает его ПЕ
+    for (size_t i = 0; i < trains.size(); ++i)
+    {
+        Train *train = trains[i];
+
+        if ((train == nullptr) || (train->getTabNumber() != tab_number))
+        {
+            continue;
+        }
+
+        Vehicle *head = train->getFirstVehicle();
+
+        if (head == nullptr)
+        {
+            break;
+        }
+
+        controlled_client_t &client = controlled_clients[client_id];
+
+        client.tab_number = tab_number;
+        client.vehicle_control_by_keyboard.controlled_vehicle =
+                static_cast<std::uint16_t>(head->getModelIndex());
+        client.vehicle_control_by_keyboard.current_vehicle =
+                static_cast<std::uint16_t>(head->getModelIndex());
+        client.vehicle_control_by_keyboard.controlled_cabine_idx = 0;
+
+        Journal::instance()->info(QString("Client #%1 (tab %2) is auto-assigned to train #%3 (vehicle #%4)")
+                                      .arg(client_id)
+                                      .arg(tab_number)
+                                      .arg(i)
+                                      .arg(head->getModelIndex()));
+
+        break;
+    }
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.2, 9: организатор закрепляет поезд за игроком
+//------------------------------------------------------------------------------
+void Model::slotSetTrainTab(int train_idx, int tab_number)
+{
+    const size_t idx = static_cast<size_t>(train_idx);
+
+    if (idx >= trains.size())
+    {
+        Journal::instance()->error(QString("Set train tab: train index %1 is out of range")
+                                       .arg(train_idx));
+        return;
+    }
+
+    trains[idx]->setTabNumber(tab_number);
+
+    // Клиенты узнают о смене привязки через обычный апдейт списка поездов
+    is_trains_changed = true;
+
+    Journal::instance()->info(QString("Organizer: train #%1 is assigned to player with tab %2")
+                                  .arg(train_idx)
+                                  .arg(tab_number));
+}
+
+//------------------------------------------------------------------------------
+// ТЗ "RP-сервер", п.5: команда организатора на загрузку сейва
+//------------------------------------------------------------------------------
+void Model::slotLoadSession(QString path)
+{
+    loadSession(path);
 }

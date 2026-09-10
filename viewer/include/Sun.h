@@ -26,6 +26,13 @@ public:
 
     bool use_gui_sun_intensity = false;
 
+    /// Тени от облаков (ТЗ "Частицы", пресеты High/Ultra/Extreme):
+    /// плавная модуляция интенсивности ambient лёгким детерминированным
+    /// шумом (сумма синусов нескольких частот, периоды 30-60 с).
+    /// Legacy/Low/Custom не включают — ambient у них не трогается.
+    /// При ручной настройке ambient из GUI модуляция не применяется
+    bool cloud_shadows = false;
+
     float azimuth_deg = 0.0;
     float altitude_deg = 0.0;
 

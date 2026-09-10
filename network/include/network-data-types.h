@@ -60,7 +60,13 @@ enum StructureType : uint8_t
 
     // Новые типы добавляются ТОЛЬКО В КОНЕЦ (обратная совместимость)
     STYPE_REQUEST_DIAGNOSTICS_UPDATE,   ///< Запрос снимка диагностики (F3/F4)
-    STYPE_DIAGNOSTICS_UPDATE            ///< Снимок диагностики составов
+    STYPE_DIAGNOSTICS_UPDATE,           ///< Снимок диагностики составов
+
+    // ТЗ "RP-сервер" (п.5, 6, 9): табельный номер, назначение игрока
+    // на поезд, загрузка сейва сессии организатором
+    STYPE_SEND_TAB_NUMBER,              ///< Клиент сообщает табельный номер
+    STYPE_COMMAND_SET_TRAIN_TAB,        ///< Организатор: назначить табельный поезду
+    STYPE_COMMAND_LOAD_SESSION          ///< Организатор: загрузить сейв сессии
 };
 
 //------------------------------------------------------------------------------
@@ -106,6 +112,7 @@ struct client_data_t
     double players_update_prev_time;
     double diagnostics_update_interval;      ///< Интервал снимков диагностики, с
     double diagnostics_update_prev_time;     ///< Время последнего снимка, с
+    int tab_number = -1;                     ///< Табельный номер игрока (ТЗ "RP-сервер", п.9; -1 - неизвестен)
     QTcpSocket* socket;
     network_data_t received_data;
 };
