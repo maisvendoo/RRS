@@ -31,6 +31,7 @@ add_library (${TARGET} SHARED ${SOURCES} ${INCLUDES} ${EQP_SOURCES} ${EQP_INCLUD
 # Указываем пути поиска заголовков
 target_include_directories (${TARGET} PRIVATE ./include/)
 target_include_directories (${TARGET} PRIVATE ../vl60-equipment/include/)
+target_include_directories (${TARGET} PRIVATE ../vl60-iocontroller/include/)
 target_include_directories (${TARGET} PRIVATE ../../../common-headers)
 
 # Компонуемся с библиотеками Qt6

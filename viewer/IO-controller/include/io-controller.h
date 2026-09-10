@@ -31,6 +31,8 @@ public:
 
     virtual bool load_config(CfgReader &cfg);
 
+    void setCabineIndex(int vehicle_idx, int cab_idx);
+
 signals:
 
     void sigSendVehicleControlCommand(const QByteArray &data);
@@ -51,16 +53,21 @@ protected:
         CTRL_TYPE_CTRL_PANEL
     };
 
-    /// Обработка клавиатурного управления
-    virtual void processKeyBoardInput();
+    virtual void keysProcess(std::set<uint16_t> &pressed_keys);
 
-    /// Обработка управления мышью
-    virtual void processMouseInput();
-
-    /// Обработка управления с пульта тренажера
-    virtual void processControlPanelInput();
+    // Обработка контрола типа "тумблер" (с фиксацией)
+    void processTumbler(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
 
 private:
+
+    /// Обработка клавиатурного управления (Общая для всех часть)
+    void processKeyBoardInput();
+
+    /// Обработка управления мышью (Общая для всех часть)
+    void processMouseInput();
+
+    /// Обработка управления с пульта тренажера (Общая для всех часть)
+    void processControlPanelInput();
 
     /// Обработка управления
     void processControl(const ControlType &ctrl_type);

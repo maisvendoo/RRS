@@ -147,6 +147,8 @@ public:
         return timetable;
     }
 
+    VehicleExterior* getVehicle(int index);
+
 public slots:
     void slotGetTrainsData(QByteArray& data);
     void slotGetVehiclesPosData(QByteArray& data);
@@ -158,6 +160,8 @@ signals:
     void updated();
 
     void sigSendVehicleControlCommand(const QByteArray &data);
+
+    void sigCurrentVehicleChanged(int newIndex, int oldIndex);
 
 private:
     void updateDebugString();
@@ -266,6 +270,10 @@ public:
 private:
     /// Train exterior scene group
     vsg::ref_ptr<vsg::Group> vehicles_node = vsg::Group::create();
+
+    int m_prevVehicleIndex = -1;
+
+    void notifyVehicleChanged();
 };
 
 #endif // VEHICLES_HANDLER_H

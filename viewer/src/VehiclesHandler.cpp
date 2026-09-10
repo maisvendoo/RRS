@@ -702,7 +702,13 @@ bool VehiclesHandler::selectNextTrain() noexcept
         cur_vehicle = update_trains.trains[new_train_id].first_vehicle_id;
     }
 
-    return (cur_vehicle != prev_cur_vehicle);
+    if (cur_vehicle != prev_cur_vehicle)
+    {
+        notifyVehicleChanged();
+        return true;
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
@@ -723,7 +729,13 @@ bool VehiclesHandler::selectPrevTrain() noexcept
         cur_vehicle = update_trains.trains[new_train_id].first_vehicle_id;
     }
 
-    return (cur_vehicle != prev_cur_vehicle);
+    if (cur_vehicle != prev_cur_vehicle)
+    {
+        notifyVehicleChanged();
+        return true;
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
@@ -745,7 +757,13 @@ bool VehiclesHandler::selectNextVehicle() noexcept
         cur_vehicle = update_trains.trains[cur_train_id].last_vehicle_id;
     }
 
-    return (cur_vehicle != prev_cur_vehicle);
+    if (cur_vehicle != prev_cur_vehicle)
+    {
+        notifyVehicleChanged();
+        return true;
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
@@ -767,7 +785,13 @@ bool VehiclesHandler::selectPrevVehicle() noexcept
         cur_vehicle = update_trains.trains[cur_train_id].first_vehicle_id;
     }
 
-    return (cur_vehicle != prev_cur_vehicle);
+    if (cur_vehicle != prev_cur_vehicle)
+    {
+        notifyVehicleChanged();
+        return true;
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
@@ -787,8 +811,12 @@ bool VehiclesHandler::selectControlVehicle() noexcept
         // Берём контроль над данной кабиной
         vehicle->controlled_cabine_idx = vehicle->current_cabine_idx;
 
-        return (controlled_vehicle != prev_contr_vehicle) ||
-               (vehicle->controlled_cabine_idx != prev_contr_cabine);
+        if ((controlled_vehicle != prev_contr_vehicle) ||
+            (vehicle->controlled_cabine_idx != prev_contr_cabine))
+        {
+            notifyVehicleChanged();
+            return true;
+        }
     }
     return false;
 }
@@ -803,7 +831,13 @@ bool VehiclesHandler::returnToControlledVehicle() noexcept
     // Возврат к управляемому вагону
     cur_vehicle = controlled_vehicle;
 
-    return (cur_vehicle != prev_cur_vehicle);
+    if (cur_vehicle != prev_cur_vehicle)
+    {
+        notifyVehicleChanged();
+        return true;
+    }
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
@@ -885,18 +919,36 @@ bool VehiclesHandler::load(
 
         if (!vehicle_exterior.io_controls.empty())
         {
+            int cab_idx = 0;
+
             for (auto *io_control : vehicle_exterior.io_controls)
             {
                 if (io_control != nullptr)
                 {
+                    io_control->setCabineIndex(i, cab_idx);
                     connect(io_control, &IOController::sigSendVehicleControlCommand,
                             this, &VehiclesHandler::sigSendVehicleControlCommand);
                 }
+
+                cab_idx++;
             }
         }
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+VehicleExterior *VehiclesHandler::getVehicle(int index)
+{
+    if (index >= 0 && static_cast<size_t>(index) < vehicles.size())
+    {
+        return &vehicles[index];
+    }
+
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -1067,6 +1119,22 @@ void VehiclesHandler::advanceInterpolation(double client_time)
     {
         pos_read_prev = pos_read;
         ++pos_read;
+    }
+}
+
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehiclesHandler::notifyVehicleChanged()
+{
+    int newIndex = cur_vehicle;
+    int oldIndex = m_prevVehicleIndex;
+
+    if (newIndex != oldIndex)
+    {
+        m_prevVehicleIndex = newIndex;
+        emit sigCurrentVehicleChanged(newIndex, oldIndex);
     }
 }
 

@@ -39,8 +39,6 @@
 
 #include    <virtual-interface-device.h>
 
-#include    <traffic-machine.h>
-
 #include    <topology.h>
 
 #include    <collision-world.h>
@@ -244,10 +242,7 @@ private:
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
 
-    Vehicle* vehicle_controlled_by_panel = nullptr;
-
-    /// Система трафика
-    TrafficMachine  *traffic_machine = nullptr;
+    Vehicle* vehicle_controlled_by_panel = nullptr;    
 
     /// Топология
     Topology *topology = new Topology();
@@ -439,10 +434,7 @@ private:
     void initControlPanel(QString cfg_path);
 
     /// Инициализация поезда
-    Train *addTrain(const init_data_t &init_data);
-
-    /// Инициализация трафика
-    void initTraffic(const init_data_t &init_data);
+    Train *addTrain(const init_data_t &init_data);    
 
     /// Инициализация топологии
     void initTopology(const init_data_t &init_data);
