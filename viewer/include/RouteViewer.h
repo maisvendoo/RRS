@@ -17,6 +17,7 @@ class  StationsHandler;
 class  Sun;
 class  TcpClient;
 class  TrafficLightsHandler;
+class  TrainLabelsHandler;
 class  UpdateViewerHandler;
 class  VehiclesHandler;
 class  WorldCulling;
@@ -29,6 +30,7 @@ class Camera;
 class CommandGraph;
 class Group;
 class LookAt;
+class Node;
 class Options;
 class RegionOfInterest;
 class ShadowSettings;
@@ -60,6 +62,7 @@ private:
     void loadLoggerSettings(CfgReader& cfg, const QString& section);
     void loadModelsSettings(CfgReader& cfg, const QString& section);
     void loadStationsTextSettings(CfgReader& cfg, const QString& section);
+    void loadTrainLabelsTextSettings(CfgReader& cfg, const QString& section);
     void loadWindowSettings(CfgReader& cfg, const QString& section);
     void loadHUDSettings(CfgReader& cfg, const QString& section);
     void loadLightSettings(CfgReader& cfg, const QString& section);
@@ -103,6 +106,8 @@ private slots:
 
     void slotGetVehicleInfoData(QByteArray &data);
 
+    void slotGetTrainsData(QByteArray &data);
+
     void slotUpdated();
 
 private:
@@ -123,6 +128,7 @@ private:
     std::unique_ptr<ScreenshotWriter>      screenshot_writer;
     std::unique_ptr<StationsHandler>       stations_handler;
     std::unique_ptr<TrafficLightsHandler>  traffic_lights_handler;
+    std::unique_ptr<TrainLabelsHandler>    train_labels_handler;
     std::unique_ptr<VehiclesHandler>       vehicles_handler;
     std::unique_ptr<NewSkybox>             skybox;
 
@@ -140,7 +146,11 @@ private:
     vsg::ref_ptr<vsg::RegionOfInterest>  shadow_region;
     vsg::ref_ptr<Sun>                    sun;
     vsg::ref_ptr<WorldCulling>           world_culling;
-void checkPhysicalDeviceProperties();
+
+    /// Подключённый в сцену узел подписей поездов (для удаления при пересоздании)
+    vsg::ref_ptr<vsg::Node>              train_labels_node;
+
+    void checkPhysicalDeviceProperties();
 };
 
 #endif // ROUTE_VIEWER_H

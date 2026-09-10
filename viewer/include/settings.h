@@ -43,6 +43,10 @@ struct settings_t final
     vsg::dvec3 stations_text_shift = {0.0, 0.0, 15.0};  ///< Station name labels shift, m
     double stations_text_scale_distance = 500.0;         ///< Distance after which station name labels are scaled down with distance, m
 
+    double train_labels_text_font_size = 8.0;                    ///< Font size of train name labels in scene
+    vsg::dvec3 train_labels_text_shift = {0.0, 0.0, 12.0};       ///< Train name labels shift above the first wagon, m
+    double train_labels_text_scale_distance = 500.0;             ///< Distance after which train name labels are scaled down with distance, m
+
     std::string name = "viewer";///< Window title
     int x = 50;                 ///< Window horizontal position
     int y = 50;                 ///< Window vertical position

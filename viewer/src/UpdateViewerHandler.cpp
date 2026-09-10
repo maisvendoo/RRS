@@ -8,6 +8,7 @@
 #include "CameraVehicleManipulator.h"
 #include "ScreenshotWriter.h"
 #include "TrafficLightsHandler.h"
+#include "TrainLabelsHandler.h"
 #include "VehiclesHandler.h"
 #include "settings.h"
 
@@ -25,6 +26,7 @@ UpdateViewerHandler::UpdateViewerHandler(
     vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
     ScreenshotWriter* screenshot_writer,
     TrafficLightsHandler* sig_handler,
+    TrainLabelsHandler* train_labels_handler,
     VehiclesHandler* veh_handler,
     settings_t& settings
 )
@@ -36,6 +38,7 @@ UpdateViewerHandler::UpdateViewerHandler(
     , _shadow_region(shadow_region)
     , _screenshot_writer(screenshot_writer)
     , _sig_handler(sig_handler)
+    , _train_labels_handler(train_labels_handler)
     , _vehicles_handler(veh_handler)
 {
     _free_manipulator = new CameraFreeManipulator(_keyboard, _camera, _settings);
@@ -72,6 +75,13 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
         _sig_handler->step(static_cast<float>(t), static_cast<float>(dt));
 
         _vehicles_handler->step(t, dt);
+
+        // Обновляем позиции подписей поездов вслед за первыми вагонами
+        if (_train_labels_handler)
+        {
+            _train_labels_handler->step(_vehicles_handler->getVehicles(),
+                                        _vehicles_handler->getTrainsInfo());
+        }
 
         _current_manipulator->frameEvent(dt);
 

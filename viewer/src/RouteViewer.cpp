@@ -1,5 +1,7 @@
 #include "RouteViewer.h"
 
+#include <algorithm>
+
 #include "AnimatedDatabasePager.h"
 #include "CfgReader.h"
 #include "Logger.h"
@@ -12,6 +14,7 @@
 #include "StationsHandler.h"
 #include "Sun.h"
 #include "TrafficLightsHandler.h"
+#include "TrainLabelsHandler.h"
 #include "UpdateControlToServerHandler.h"
 #include "UpdateSoundManagerHandler.h"
 #include "UpdateStatisticsHandler.h"
@@ -110,6 +113,31 @@ struct Merge final : public vsg::Inherit<vsg::Operation, Merge>
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+/// Операция удаления подграфа из сцены в фазе update
+struct RemoveFromParent final : public vsg::Inherit<vsg::Operation, RemoveFromParent>
+{
+    RemoveFromParent(vsg::ref_ptr<vsg::Group> in_parent, vsg::ref_ptr<vsg::Node> in_child)
+        : parent(in_parent), child(in_child)
+    {
+    }
+
+    void run() override
+    {
+        // vsg::Group в этой версии VSG не предоставляет removeChild() — удаляем вручную
+        if (parent && child)
+        {
+            auto& children = parent->children;
+            children.erase(std::remove(children.begin(), children.end(), child), children.end());
+        }
+    }
+
+    vsg::ref_ptr<vsg::Group> parent;
+    vsg::ref_ptr<vsg::Node> child;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 RouteViewer::RouteViewer(QObject* parent)
     : QObject(parent)
 {
@@ -190,6 +218,7 @@ void RouteViewer::initialize(int argc, char* argv[])
 
     traffic_lights_handler = std::make_unique<TrafficLightsHandler>();
     stations_handler = std::make_unique<StationsHandler>(settings);
+    train_labels_handler = std::make_unique<TrainLabelsHandler>(settings);
     vehicles_handler = std::make_unique<VehiclesHandler>(settings, sound_manager.get());
 
     initVsgOptions();
@@ -325,6 +354,7 @@ void RouteViewer::loadSettings()
         loadLoggerSettings(cfg, section);
         loadModelsSettings(cfg, section);
         loadStationsTextSettings(cfg, section);
+        loadTrainLabelsTextSettings(cfg, section);
         loadWindowSettings(cfg, section);
         loadHUDSettings(cfg, section);
         loadLightSettings(cfg, section);
@@ -840,6 +870,7 @@ void RouteViewer::initViewer()
         shadow_region,
         screenshot_writer.get(),
         traffic_lights_handler.get(),
+        train_labels_handler.get(),
         vehicles_handler.get(),
         settings
     );
@@ -909,6 +940,7 @@ void RouteViewer::initViewer()
     GUIparams->controls_handler = upd_server_control.get();
     GUIparams->traffic_lights_handler = traffic_lights_handler.get();
     GUIparams->stations_handler = stations_handler.get();
+    GUIparams->train_labels_handler = train_labels_handler.get();
 
     is_ready = true;
 }
@@ -1159,6 +1191,11 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     connect(tcp_client.get(), &TcpClient::setTrainInfo,
             vehicles_handler.get(), &VehiclesHandler::slotGetTrainsData);
 
+    // Слот вызывается после slotGetTrainsData (порядок подключения сохраняется),
+    // поэтому данные о поездах уже десериализованы в vehicles_handler
+    connect(tcp_client.get(), &TcpClient::setTrainInfo,
+            this, &RouteViewer::slotGetTrainsData);
+
     // Position and state data use DirectConnection — the SPSC ring buffer
     // and atomic flags make these safe without locks
     connect(tcp_client.get(), &TcpClient::setVehiclesPositions,
@@ -1186,6 +1223,63 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     tcp_client->sendTrainProfileRequest(static_cast<double>(settings.train_profile_update_interval) * 0.001,
                                         settings.train_profile_backward,
                                         settings.train_profile_forward);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotGetTrainsData(QByteArray &data)
+{
+    if (!is_vehicles || !train_labels_handler || !viewer || !root)
+        return;
+
+    // Данные о поездах уже десериализованы в vehicles_handler
+    const auto& trains = vehicles_handler->getTrainsInfo();
+    if (trains.empty())
+        return;
+
+    // Подписи уже созданы, список поездов не изменился — выходим
+    if (train_labels_node && !train_labels_handler->needRebuild(trains))
+        return;
+
+    if (!train_labels_handler->setup(options, trains))
+    {
+        LOG_WARN("Fail to create train name labels");
+        return;
+    }
+
+    auto new_node = train_labels_handler->getRootNode();
+
+    // Удаляем старый подграф подписей из сцены
+    if (train_labels_node)
+    {
+        viewer->addUpdateOperation(
+            RemoveFromParent::create(root, train_labels_node),
+            vsg::UpdateOperations::ONE_TIME);
+    }
+
+    if (!viewer->compileManager)
+    {
+        LOG_ERROR("No compile manager in viewer");
+        return;
+    }
+
+    auto compile_result = viewer->compileManager->compile(new_node);
+    if (!compile_result)
+    {
+        LOG_ERROR("Fail to compile train name labels (VkResult %d)",
+                  compile_result.result);
+        return;
+    }
+
+    // Подключаем подграф в сцену и обновляем viewer в фазе update
+    viewer->addUpdateOperation(
+        Merge::create(viewer, root, new_node, compile_result),
+        vsg::UpdateOperations::ONE_TIME);
+
+    train_labels_node = new_node;
+
+    train_labels_handler->setVisible(GUIparams->hud_show_train_labels);
 }
 
 //------------------------------------------------------------------------------
