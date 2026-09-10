@@ -11,6 +11,7 @@
 #include "VehiclesHandler.h"
 #include "UpdateViewerHandler.h"
 #include "StationsHandler.h"
+#include "TrainLabelsHandler.h"
 #include <tcp-client.h>
 
 #include <vsg/io/Options.h>
@@ -663,7 +664,7 @@ void MyGui::showHUD() const
     const float bar_height = hudTopOffset();
     const ImVec2 display_size = ImGui::GetIO().DisplaySize;
 
-    const float total_w = 480.0f;
+    const float total_w = 600.0f;
 
     ImGui::SetNextWindowPos(ImVec2((display_size.x - total_w) * 0.5f, 0.0f));
     ImGui::SetNextWindowSize(ImVec2(total_w, bar_height));
@@ -687,7 +688,9 @@ void MyGui::showHUD() const
 
     float gap = 8.0f;
     float pad = gap;
-    float btn_w = (total_w - pad * 2 - gap * 3) / 4.0f;
+    // Последняя кнопка ("Номера поездов") делается шире остальных
+    float last_btn_w = 185.0f;
+    float btn_w = (total_w - pad * 2 - gap * 3 - last_btn_w) / 4.0f;
     float btn_h = ImGui::GetWindowHeight() - 4.0f;
 
     ImGui::SetCursorPos(ImVec2(pad, 2.0f));
@@ -770,6 +773,39 @@ void MyGui::showHUD() const
         ImGui::PopStyleColor();
     }
     else if (params->hud_show_stations)
+    {
+        ImGui::PopStyleColor();
+    }
+    ImGui::PopID();
+
+    ImGui::SetCursorPos(ImVec2(pad + (btn_w + gap) * 4, 2.0f));
+
+    // Кнопка "Номера поездов" — переключает подписи поездов в сцене
+    const bool has_train_labels = (params->train_labels_handler != nullptr)
+        && (params->train_labels_handler->getRootNode() != nullptr);
+    ImGui::PushID("hud_train_labels");
+    if (!has_train_labels)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_inactive);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, params->hud_button_inactive);
+        ImGui::PushStyleColor(ImGuiCol_Text, params->hud_button_inactive_text);
+    }
+    else if (params->hud_show_train_labels)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
+    }
+    if (ImGui::Button(u8"Номера поездов", ImVec2(last_btn_w, btn_h)) && has_train_labels)
+    {
+        params->hud_show_train_labels = !params->hud_show_train_labels;
+        params->train_labels_handler->setVisible(params->hud_show_train_labels);
+    }
+    if (!has_train_labels)
+    {
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
+    }
+    else if (params->hud_show_train_labels)
     {
         ImGui::PopStyleColor();
     }

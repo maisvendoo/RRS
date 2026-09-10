@@ -110,6 +110,35 @@ void RouteViewer::loadStationsTextSettings(CfgReader& cfg, const QString& sectio
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void RouteViewer::loadTrainLabelsTextSettings(CfgReader& cfg, const QString& section)
+{
+    double fontSize = 0.0;
+    cfg.getDouble(section, "TrainLabelsTextFontSize", fontSize);
+    if (fontSize > 0.0)
+    {
+        settings.train_labels_text_font_size = fontSize;
+    }
+
+    QString shift = "0.0 0.0 12.0";
+    if (cfg.getString(section, "TrainLabelsTextShift", shift))
+    {
+        std::istringstream stream(shift.toStdString());
+        stream >> settings.train_labels_text_shift.x
+            >> settings.train_labels_text_shift.y
+            >> settings.train_labels_text_shift.z;
+    }
+
+    double scaleDistance = -1.0;
+    cfg.getDouble(section, "TrainLabelsTextScaleDistance", scaleDistance);
+    if (scaleDistance >= 0.0)
+    {
+        settings.train_labels_text_scale_distance = scaleDistance;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::loadHUDSettings(CfgReader& cfg, const QString& section)
 {
     auto readColor = [&](const QString& key, vsg::vec4& color)
