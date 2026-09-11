@@ -261,6 +261,24 @@ void CabMouseHandler::updateTooltip()
                     tip.state_text = buf;
                 }
             }
+            else if (input.type == "Crane254")
+            {
+                // Рукоятка 0..1 задаёт целевое давление ТЦ (kvt254:
+                // k1=0.4 МПа); показываем его в кгс/см² вместо процентов
+                char buf[64];
+
+                if (state < -0.01f)
+                {
+                    std::snprintf(buf, sizeof(buf), u8"целевое: отпускное (выпуск ТЦ)");
+                }
+                else
+                {
+                    const float p_target = state * 0.4f * 10.2f;
+                    std::snprintf(buf, sizeof(buf), u8"целевое: %.1f кгс/см²", p_target);
+                }
+
+                tip.state_text = buf;
+            }
             else if (!input.state_names.isEmpty())
             {
                 const QStringList names =
