@@ -447,6 +447,16 @@ void VehiclesHandler::step(double t, double dt)
             vehicles[i].next_vehicle = state_front.vehicles[i].next_vehicle;
 
             vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), &(state_front.vehicles[i].analogSignal));
+
+            // Текущие сигналы ПЕ - в IOController (состояния органов
+            // для кликов мышью и подсказок)
+            for (auto *io_control : vehicles[i].io_controls)
+            {
+                if (io_control != nullptr)
+                {
+                    io_control->setVehicleSignals(&(state_front.vehicles[i].analogSignal));
+                }
+            }
         }
         else
         {

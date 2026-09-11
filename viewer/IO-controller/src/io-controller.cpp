@@ -66,6 +66,25 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "ObjectName", ic_input.contolledObjectName);
 
+        // Метаданные органа: подсказка и семантика клика мышью
+        cfg.getString(secNode, "Name", ic_input.name);
+        cfg.getString(secNode, "Type", ic_input.type);
+
+        int signal_id = -1;
+        if (cfg.getInt(secNode, "SignalID", signal_id))
+        {
+            ic_input.signal_id = signal_id;
+        }
+
+        int signal_id2 = -1;
+        if (cfg.getInt(secNode, "SignalID2", signal_id2))
+        {
+            ic_input.signal_id2 = signal_id2;
+        }
+
+        cfg.getString(secNode, "StateMode", ic_input.state_mode);
+        cfg.getString(secNode, "StateNames", ic_input.state_names);
+
         io_control_inputs.insert(ic_input.id, ic_input.contolledObjectName, ic_input);
 
         secNode = cfg.getNextSection();
@@ -94,6 +113,107 @@ void IOController::setCabineIndex(int vehicle_idx, int cab_idx)
 void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 {
     (void) pressed_keys;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::setVehicleSignals(const std::vector<float> *vehicle_signals)
+{
+    this->vehicle_signals = vehicle_signals;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float IOController::getVehicleSignal(int signal_id) const
+{
+    if ((vehicle_signals == nullptr) || (signal_id < 0) ||
+        (static_cast<size_t>(signal_id) >= vehicle_signals->size()))
+    {
+        return -1.0f;
+    }
+
+    return (*vehicle_signals)[static_cast<size_t>(signal_id)];
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::optional<io_control_input_t> IOController::getInputByObject(const QString &object_name) const
+{
+    return io_control_inputs.getByKey2(object_name);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool IOController::findControl(const std::string &node_name, io_control_input_t &out) const
+{
+    if (node_name.empty())
+    {
+        return false;
+    }
+
+    const QString node = QString::fromStdString(node_name);
+
+    for (const auto &[key1, key2, value] : io_control_inputs.getAll())
+    {
+        if (key2.isEmpty())
+        {
+            continue;
+        }
+
+        if ((node == key2) || node.endsWith(key2))
+        {
+            out = value;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::mouseClick(const QString &object_name, int button)
+{
+    auto io_ctrl = io_control_inputs.getByKey2(object_name);
+
+    if (!io_ctrl.has_value())
+    {
+        return;
+    }
+
+    processMouseControl(io_ctrl.value(), button);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::processMouseControl(io_control_input_t &io_ctrl, int button)
+{
+    (void) button;
+
+    // Общая часть для органов-переключателей: клик (любая кнопка)
+    // переключает состояние, целевое значение вычисляется по текущему
+    // сигналу ПЭ - источник истины на сервере
+    if ((io_ctrl.type == "Toggle") || (io_ctrl.type == "Button"))
+    {
+        float cur = getVehicleSignal(io_ctrl.signal_id);
+        io_ctrl.value = (cur < 0.5f) ? 1.0f : 0.0f;
+        emitControl(io_ctrl);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::emitControl(const io_control_input_t &io_ctrl)
+{
+    io_control_inputs.updateByKey1(io_ctrl.id, io_ctrl);
+    emit sigSendVehicleControlCommand(io_ctrl.serialize());
 }
 
 //------------------------------------------------------------------------------

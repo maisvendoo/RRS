@@ -10,7 +10,6 @@ class SoundManager;
 class IOController;
 //class AnimatedPagedLOD;       // Forward declare не работает,
 #include "AnimatedPagedLOD.h"   // VehiclesHandler ругается на incomplete use
-#include "CabElements.h"
 
 //------------------------------------------------------------------------------
 //
@@ -46,7 +45,6 @@ public:
     std::vector<vsg::ref_ptr<AnimatedPagedLOD>> animated_nodes;
 
     /// Интерактивные органы кабины из [CabElement] конфига ПС
-    std::vector<CabElement> cab_elements = {};
 
     /// Текущее значение анимационного сигнала (состояние органа),
     /// -1 - сигнала нет. Для тултипа Alt-режима

@@ -20,6 +20,7 @@
 
 #include <QString>
 
+#include <QMap>
 #include <array>
 
 #include <vl60-autopilot-types.h>
@@ -577,6 +578,12 @@ private:
     void stepSafetyDevices(const double& t, const double& dt);
 
     void stepControls(const double &t, const double &dt);
+
+    /// Применение одной команды управления к устройствам
+    void applyControlCommand(int cab_idx, int id, float value);
+
+    /// Предыдущие значения команд (детектор фронта в stepControls)
+    std::array<QMap<int, float>, CABS_NUM> prev_control_values;
 
     /// Автоведение
     void stepAutopilot(double t, double dt);

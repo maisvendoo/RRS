@@ -12,7 +12,6 @@
 #include <collision-world.h>
 #include <collision-object.h>
 
-#include "CabElements.h" 
 
 #include <cstdint>
 #include <map>
@@ -224,22 +223,13 @@ private:
     // подсказка и клик -> инжект штатной клавиши устройства ---
 
     /// Alt удерживается (режим подсказок кабины)
-    bool altHeld() const;
 
     /// Пикинг органа под курсором (Alt удерживается)
-    void pickCabElement(int x, int y);
 
     /// Клик по органу: primary - ЛКМ (включить/вперёд), иначе ПКМ
-    void clickCabElement(bool primary);
 
     /// Подсказка Alt: обновление состояния (каждый кадр, пикинг ~20 Гц)
-    void stepCabInteraction(double t);
 
-    const CabElement* _cab_pick_element = nullptr;
-    VehicleExterior* _cab_pick_vehicle = nullptr;
-    double _last_cab_pick_time = 0.0;
-    float _cab_pointer_x = 0.0f;
-    float _cab_pointer_y = 0.0f;
 
     bool _wasPausePhysicallyPressed = false;
     void setPause();

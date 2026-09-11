@@ -64,6 +64,7 @@
 #include <vsg/ui/Keyboard.h>
 
 #include <InputRouteHandler.h>
+#include <CabMouseHandler.h>
 
 #include <QApplication>
 #include <QDomDocument>
@@ -1770,6 +1771,11 @@ void RouteViewer::initViewer()
     input_route_handler = InputRouteHandler::create();
     input_route_handler->setKeyboard(keyboard);
 
+    // Взаимодействие мышью с органами кабины (архитектура IOController:
+    // клик -> команда управления, подсказка по Alt+наведению)
+    cab_mouse_handler = CabMouseHandler::create(camera, keyboard,
+                                                vehicles_handler.get());
+
     upd_viewer_handler = UpdateViewerHandler::create(
         upd_server_control,
         camera,
@@ -1794,6 +1800,7 @@ void RouteViewer::initViewer()
             this, &RouteViewer::slotOnCurrentVehicleChanged);
 
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
+    viewer->addEventHandler(cab_mouse_handler);
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
     viewer->addEventHandler(upd_sound_manager_handler);

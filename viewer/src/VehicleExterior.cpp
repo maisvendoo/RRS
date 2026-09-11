@@ -95,13 +95,7 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 
     // Интерактивные органы кабины (клик по Alt, ТЗ "Взаимодействие
     // с элементами кабины")
-    cab_elements = loadCabElements(cfg_path);
 
-    if (!cab_elements.empty())
-    {
-        LOG_INFO("Cab interaction: %u elements from %s",
-                 static_cast<unsigned>(cab_elements.size()), cfg_path.c_str());
-    }
 
     transform->setValue("name", cfg_file);
     return (transform->children.size() > 0);

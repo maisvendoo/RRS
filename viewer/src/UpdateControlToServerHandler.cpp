@@ -179,18 +179,9 @@ void UpdateControlToServerHandler::sendControlToServer()
     controlled.controlled_cabine_idx = _controlled_cabine_idx;
     controlled.need_debug_msg = _is_needed_debug_msg;
 
-    // Alt в момент клика по органу - режим подсказок клиента, он не
-    // должен попадать в набор (тумблеры различают MODIFIER_OnlyAlt)
-    const bool alt_suppressed = _inject_suppress_alt && !_injected_keys.empty();
-
     // Отправляем массив управляющих клавиш
     for (auto key : _pressed_keys)
     {
-        if (alt_suppressed && ((key == KEY_Alt_L) || (key == KEY_Alt_R)))
-        {
-            continue;
-        }
-
         // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
         if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
         {
@@ -221,48 +212,6 @@ void UpdateControlToServerHandler::sendEmptyControlToServer()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void UpdateControlToServerHandler::injectKeys(const std::vector<std::uint16_t>& keys,
-                                              int duration_ms,
-                                              bool suppress_alt)
-{
-    if (keys.empty())
-        return;
-
-    // Перекрытие кликов (быстрое ЛКМ после ПКМ и наоборот): прежний
-    // инжект снимается МГНОВЕННО, иначе сервер видит W+S / A+D
-    // одновременно и рычаги гасят друг друга
-    if (!_injected_keys.empty())
-    {
-        for (auto key : _injected_keys)
-        {
-            _pressed_keys.erase(key);
-        }
-
-        _injected_keys.clear();
-    }
-
-    for (auto key : keys)
-    {
-        if (key == 0)
-            continue;
-
-        _injected_keys.push_back(key);
-
-        if (_pressed_keys.insert(key).second)
-        {
-            // новое нажатие
-        }
-    }
-
-    _injected_duration = duration_ms / 1000.0;
-    _injected_until = -1.0;   // якорем станет первый кадр (FrameEvent)
-    _inject_suppress_alt = suppress_alt;
-
-    sendControlToServer();
-}
 
 //------------------------------------------------------------------------------
 //
@@ -280,29 +229,6 @@ void UpdateControlToServerHandler::apply(vsg::FrameEvent& frame)
         if (t - _last_resend_time >= 0.5)
         {
             _last_resend_time = t;
-            sendControlToServer();
-        }
-    }
-
-    // Снятие программного нажатия органа кабины: клавиши держались
-    // дольше инжекта - отпускаем (клик != удержание)
-    if (!_injected_keys.empty())
-    {
-        const double t = frame.frameStamp->simulationTime;
-
-        if (_injected_until < 0.0)
-        {
-            _injected_until = t + _injected_duration;
-        }
-        else if (t >= _injected_until)
-        {
-            for (auto key : _injected_keys)
-            {
-                _pressed_keys.erase(key);
-            }
-
-            _injected_keys.clear();
-            _inject_suppress_alt = false;
             sendControlToServer();
         }
     }

@@ -25,6 +25,21 @@ struct io_control_input_t
     /// Имя объекта в 3D-модели
     QString contolledObjectName = "";
 
+    /// Отображаемое имя органа управления (подсказка по Alt+наведению)
+    QString name = "";
+    /// Тип органа (Toggle, Button, Crane395, Crane254, KM, Revers,
+    /// Lock367, Lever, Gauge - семантика задаётся аддоном)
+    QString type = "";
+    /// Сигнал ПЕ с текущим состоянием органа (для тултипа и
+    /// вычисления целевого значения при клике мышью)
+    int signal_id = -1;
+    /// Второй сигнал (например, реверс: вставлена ли рукоятка)
+    int signal_id2 = -1;
+    /// Режим расшифровки состояния (norm, centered, kme)
+    QString state_mode = "";
+    /// Имена состояний через ';'
+    QString state_names = "";
+
     io_control_input_t()
     {
 

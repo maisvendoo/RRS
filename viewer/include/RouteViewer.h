@@ -21,6 +21,7 @@ class  TcpClient;
 class  TrafficLightsHandler;
 class  UpdateViewerHandler;
 class  InputRouteHandler;
+class  CabMouseHandler;
 class  VehiclesHandler;
 class  WorldCulling;
 
@@ -195,6 +196,7 @@ private:
     vsg::ref_ptr<GUIParams>             GUIparams;
     vsg::ref_ptr<UpdateViewerHandler>   upd_viewer_handler;
     vsg::ref_ptr<InputRouteHandler>     input_route_handler;
+    vsg::ref_ptr<CabMouseHandler>       cab_mouse_handler;
 
     std::unique_ptr<TcpClient>             tcp_client;
     std::unique_ptr<SoundManager>          sound_manager;

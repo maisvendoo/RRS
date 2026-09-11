@@ -31,15 +31,6 @@ public:
     /// Включение сбрасывает накопленные нажатия и шлёт пустое управление
     void setControlSuppressed(bool suppressed);
 
-    /// Программное нажатие клавиш органа кабины (клик мышью по Alt,
-    /// ТЗ "Взаимодействие с элементами кабины"): клавиши добавляются
-    /// к отправляемому набору на duration_ms и снимаются автоматически.
-    /// suppress_alt - убрать Alt из посылаемого набора на время нажатия
-    /// (тумблеры различают модификаторы Only-*)
-    void injectKeys(const std::vector<std::uint16_t>& keys,
-                    int duration_ms,
-                    bool suppress_alt);
-
 private:
 
     double _last_resend_time = 0.0;
@@ -56,13 +47,6 @@ private:
     bool _is_control_suppressed = false;
     std::set<std::uint16_t> _pressed_keys = {};
 
-    /// Активное программное нажатие (клик по органу кабины).
-    /// _injected_until < 0 - якорение на ближайшем кадре (duration
-    /// в _injected_duration), затем абсолютное время снятия
-    std::vector<std::uint16_t> _injected_keys = {};
-    double _injected_until = 0.0;
-    double _injected_duration = 0.0;
-    bool _inject_suppress_alt = false;
 };
 
 #endif // UPDATE_CONTROL_TO_SERVER_HANDLER_H
