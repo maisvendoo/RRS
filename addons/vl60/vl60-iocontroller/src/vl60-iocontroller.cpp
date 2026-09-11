@@ -108,14 +108,17 @@ void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int butt
 
     if (io_ctrl.type == "Crane254")
     {
-        // Положение -1..+1 шагом 1: ЛКМ - торможение, ПКМ - отпуск
-        if (cur < -1.5f)
+        // Положение рукоятки 0..1 задаёт ЦЕЛЕВОЕ давление ТЦ
+        // (kvt254: k1=0.4 МПа = 4.0 кгс/см² на полном ходе). Один клик -
+        // ступень 0.5 кгс/см² (= 0.125 хода); ПКМ ниже нуля - отпускное
+        if (cur < -0.1f)
         {
             return;
         }
 
-        float pos = cur + (primary ? 1.0f : -1.0f);
-        pos = std::clamp(pos, -1.0f, 1.0f);
+        const float step = 0.125f;
+        float pos = cur + (primary ? step : -step);
+        pos = std::clamp(pos, -0.05f, 1.0f);
         io_ctrl.value = pos;
         emitControl(io_ctrl);
         return;
