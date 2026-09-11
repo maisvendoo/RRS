@@ -1,3 +1,4 @@
+#include    <cmath>
 #include    <vl60pk.h>
 #include    <vl60-controls.h>
 
@@ -137,7 +138,7 @@ void VL60pk::applyControlCommand(int cab_idx, int id, float value)
     // Кран машиниста 395: позиция I..VI (0..6)
     case CTRL_CRANE_395:
         brake_crane[cab_idx]->setHandlePosition(
-                    static_cast<int>(value + 0.5f));
+                    static_cast<int>(std::lround(value)));
         return;
 
     // Кран вспомогательный 254
@@ -148,13 +149,13 @@ void VL60pk::applyControlCommand(int cab_idx, int id, float value)
     // КМЭ главная рукоятка: позиция 0..33
     case CTRL_KM_MAIN:
         controller[cab_idx]->setMainHandlePos(
-                    static_cast<int>(value + 0.5f));
+                    static_cast<int>(std::lround(value)));
         return;
 
     // КМЭ реверс: 0 - назад, 1 - ноль, 2 - вперёд
     case CTRL_KM_REVERS:
         controller[cab_idx]->setReversHandlePos(
-                    static_cast<int>(value + 0.5f));
+                    static_cast<int>(std::lround(value)));
         return;
 
     // Вставка/извлечение реверсивной рукоятки
@@ -170,7 +171,7 @@ void VL60pk::applyControlCommand(int cab_idx, int id, float value)
     // Комбинированный кран: -1 - двойная тяга, 0 - поездное, +1 - экстренное
     case CTRL_CRANE_COMBINE:
         brake_lock[cab_idx]->setCombineCranePosition(
-                    static_cast<int>(value + 0.5f));
+                    static_cast<int>(std::lround(value)));
         return;
 
     default:

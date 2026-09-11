@@ -198,10 +198,18 @@ void IOController::processMouseControl(io_control_input_t &io_ctrl, int button)
 
     // Общая часть для органов-переключателей: клик (любая кнопка)
     // переключает состояние, целевое значение вычисляется по текущему
-    // сигналу ПЭ - источник истины на сервере
-    if ((io_ctrl.type == "Toggle") || (io_ctrl.type == "Button"))
+    // сигналу ПЭ - источник истины на сервере. Если сигнал ещё не
+    // пришёл (=-1) - переключаем по локальному кэшу значения
+    if ((io_ctrl.type == "Toggle") || (io_ctrl.type == "Button") ||
+        (io_ctrl.type == "Lock367"))
     {
         float cur = getVehicleSignal(io_ctrl.signal_id);
+
+        if (cur < 0.0f)
+        {
+            cur = io_ctrl.value;
+        }
+
         io_ctrl.value = (cur < 0.5f) ? 1.0f : 0.0f;
         emitControl(io_ctrl);
     }

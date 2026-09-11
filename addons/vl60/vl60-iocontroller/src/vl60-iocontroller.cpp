@@ -80,7 +80,7 @@ int VL60IOController::kmPosBySignal(float signal) const
 void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int button)
 {
     const bool primary = (button == 1);
-    const float cur = getVehicleSignal(io_ctrl.signal_id);
+    float cur = getVehicleSignal(io_ctrl.signal_id);
 
     // Тумблеры и кнопки - в базовом классе (переключение по сигналу)
     if ((io_ctrl.type == "Toggle") || (io_ctrl.type == "Button"))
@@ -173,23 +173,12 @@ void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int butt
         return;
     }
 
-    if (io_ctrl.type == "Lock367")
-    {
-        // Поворот ключа блокировки: переключение по текущему состоянию
-        if (cur >= 0.0f)
-        {
-            io_ctrl.value = (cur < 0.5f) ? 1.0f : 0.0f;
-            emitControl(io_ctrl);
-        }
-        return;
-    }
-
     if (io_ctrl.type == "Lever")
     {
         // Комбинированный кран: -1 двойная тяга / 0 поездное / +1 экстренное
         if (cur < -1.5f)
         {
-            return;
+            cur = io_ctrl.value;
         }
 
         float pos = cur + (primary ? 1.0f : -1.0f);
