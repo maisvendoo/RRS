@@ -319,12 +319,17 @@ void Model::buildAutostartQueue(Train *train)
 
     if (scnmgr->isTrainAutostarted(train->getTrainIndex()))
     {
-        for (auto vehicle : *(train->getVehicles()))
+        auto vehicles = *(train->getVehicles());
+        if (!vehicles.front()->getAutopilot().empty())
         {
-            if (!vehicle->getAutopilot().empty())
-            {
-                vehicles_for_autostart.push(vehicle);
-            }
+            vehicles_for_autostart.push(vehicles.front());
+            return;
+        }
+
+        if (!vehicles.back()->getAutopilot().empty())
+        {
+            vehicles_for_autostart.push(vehicles.back());
+            return;
         }
     }
 }
