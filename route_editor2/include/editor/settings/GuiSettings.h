@@ -16,6 +16,12 @@ struct gui_settings_t
     bool show_topology;
     bool show_selected_objects_properties;
     bool show_commands;
+    bool show_validator;
+    bool show_model_browser;
+    bool show_mass_edit;
+    bool show_layers;
+    bool show_prefabs;
+    bool show_minimap;
 
     /**
      * @brief Construct a new gui_settings_t object
