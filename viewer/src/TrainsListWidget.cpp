@@ -169,7 +169,8 @@ void TrainsListWidget::renderTrainsList()
     // Высота списка: заголовок + элементы + кнопки + отступы
     const float list_height = _cached_trains_ids.size() * item_height;
     const bool has_reverse_btn = (current_train_id >= 0 && _params->tcp_client);
-    float total_height = header_height + list_height + button_height * (1 + (has_reverse_btn ? 1 : 0)) + padding * 3;
+    const float btn_gap = has_reverse_btn ? ImGui::GetFrameHeight() * 0.5f : 0.0f;
+    float total_height = header_height + list_height + button_height * (1 + (has_reverse_btn ? 1 : 0)) + btn_gap + padding * 3;
 
     // Применяем минимальную и максимальную высоту
     total_height = std::clamp(total_height, std::min(min_height, max_height), max_height);
@@ -309,6 +310,8 @@ void TrainsListWidget::renderTrainsList()
     // Кнопка "Изменить направление поезда"
     if (current_train_id >= 0 && _params->tcp_client)
     {
+        ImGui::Dummy(ImVec2(0.0f, ImGui::GetFrameHeight() * 0.5f));
+
         if (ImGui::Button("Изменить направление поезда", ImVec2(window_width - padding * 2, 0)))
         {
             _params->tcp_client->sendReverseTrain(current_train_id);
