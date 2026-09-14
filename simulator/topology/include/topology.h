@@ -144,15 +144,15 @@ public slots:
 
     void slotGetSwitchState(QByteArray &switch_data);
 
-    void slotSwitchCommand(QByteArray& switch_data);
+    void slotSwitchCommand(QByteArray  switch_data);
 
-    void slotSignalCommand(QByteArray& signal_data);
+    void slotSignalCommand(QByteArray  signal_data);
 
-    void slotBuildRouteCommand(QByteArray& route_data);
+    void slotBuildRouteCommand(QByteArray  route_data);
 
-    void slotTrainRouteCommand(QByteArray& route_data);
+    void slotTrainRouteCommand(QByteArray  route_data);
 
-    void slotShuntingRouteCommand(QByteArray& route_data);
+    void slotShuntingRouteCommand(QByteArray  route_data);
 
     void slotGetTrajState(QString traj_name, bool &is_busy, bool &in_route);
 
