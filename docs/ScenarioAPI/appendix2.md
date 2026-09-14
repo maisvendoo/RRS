@@ -97,7 +97,7 @@ setTimeTrigger("12:01", actionRenameTrain(train134.name, "136"))
 
 **Пример 8**. Разворот поезда в заданное время
 
-Полный исходный код примера находится в сценарии [reverse_train](../../routes/experimental-polygon_v2.0/scenarios/reverse_train/main.lua) маршрута "Испытательный полигон".
+Полный исходный код примера находится в сценарии [reverse_train](../../routes/experimental-polygon_v2.0_ktx/scenarios/reverse_train/main.lua) маршрута "Испытательный полигон".
 
 Сценарий демонстрирует использование action-функции `actionReverseTrain` совместно с временными триггерами. Основные шаги:
 
