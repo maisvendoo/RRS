@@ -166,9 +166,10 @@ void TrainsListWidget::renderTrainsList()
     const float top_y = 300.0f;
     const float max_height = std::max(0.0f, ImGui::GetIO().DisplaySize.y - top_y - 20.0f);
 
-    // Высота списка: заголовок + элементы + кнопка + отступы
+    // Высота списка: заголовок + элементы + кнопки + отступы
     const float list_height = _cached_trains_ids.size() * item_height;
-    float total_height = header_height + list_height + button_height + padding * 3;
+    const bool has_reverse_btn = (current_train_id >= 0 && _params->tcp_client);
+    float total_height = header_height + list_height + button_height * (1 + (has_reverse_btn ? 1 : 0)) + padding * 3;
 
     // Применяем минимальную и максимальную высоту
     total_height = std::clamp(total_height, std::min(min_height, max_height), max_height);
@@ -204,9 +205,10 @@ void TrainsListWidget::renderTrainsList()
     ImGui::Separator();
 
     // Список поездов с прокруткой
+    const int num_buttons = 1 + (has_reverse_btn ? 1 : 0);
     const float scroll_height = std::max(
         0.0f,
-        total_height - header_height - button_height - padding * 3
+        total_height - header_height - button_height * num_buttons - padding * 3
         );
 
     ImGui::BeginChild("##TrainsListScroll", ImVec2(0, scroll_height), true);
