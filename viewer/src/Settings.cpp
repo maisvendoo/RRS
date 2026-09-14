@@ -207,6 +207,22 @@ void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 
     cfg.getInt(section, "PhysicalDevice", settings.physical_device);
 
+    uint32_t vendor_id = 0;
+    {
+        int tmp = 0;
+        cfg.getInt(section, "PhysicalDeviceVendorID", tmp);
+        vendor_id = static_cast<uint32_t>(tmp);
+    }
+    settings.physical_device_vendor_id = vendor_id;
+
+    uint32_t device_id = 0;
+    {
+        int tmp = 0;
+        cfg.getInt(section, "PhysicalDeviceDeviceID", tmp);
+        device_id = static_cast<uint32_t>(tmp);
+    }
+    settings.physical_device_device_id = device_id;
+
     int screenNumber = 0;
     cfg.getInt(section, "ScreenNumber", screenNumber);
     if (screenNumber >= 0)

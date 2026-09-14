@@ -570,13 +570,34 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
         // Поучаем список физических устройств
         auto physDevs = instance->getPhysicalDevices();
 
-        // Защита от дурака
-        if (settings.physical_device < 0 || settings.physical_device > physDevs.size() - 1)
+        // Пытаемся найти GPU по аппаратному ID (vendor + device)
+        vsg::ref_ptr<vsg::PhysicalDevice> physDev;
+        bool found_by_id = false;
+
+        if (settings.physical_device_vendor_id != 0 && settings.physical_device_device_id != 0)
         {
-            settings.physical_device = 0;
+            for (auto& dev : physDevs)
+            {
+                auto props = dev->getProperties();
+                if (props.vendorID == settings.physical_device_vendor_id &&
+                    props.deviceID == settings.physical_device_device_id)
+                {
+                    physDev = dev;
+                    found_by_id = true;
+                    break;
+                }
+            }
         }
 
-        auto physDev = physDevs[settings.physical_device];
+        // Fallback на старый индекс, если не нашли по ID
+        if (!found_by_id)
+        {
+            if (settings.physical_device < 0 || settings.physical_device > static_cast<int>(physDevs.size()) - 1)
+            {
+                settings.physical_device = 0;
+            }
+            physDev = physDevs[settings.physical_device];
+        }
 
         auto props = physDev->getProperties();
         GUIparams->physicalDeviceName = QString(props.deviceName);
