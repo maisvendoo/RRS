@@ -1,6 +1,7 @@
 #ifndef MY_GUI_H
 #define MY_GUI_H
 
+#include "Sun.h"
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
@@ -10,8 +11,8 @@
 
 struct simulator_time_t;
 class NewSkybox;
+class RouteViewer;
 class Skybox;
-class Sun;
 class VehiclesHandler;
 class UpdateStatisticsHandler;
 class UpdateControlToServerHandler;
@@ -31,6 +32,27 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     UpdateStatisticsHandler *statistics_handler = nullptr;
     UpdateControlToServerHandler *controls_handler = nullptr;
     TcpClient *tcp_client = nullptr;
+
+    // Владелец — применяется пресет графики из GUI
+    RouteViewer* route_viewer = nullptr;
+    int graphics_preset_index = 1;        ///< Текущий пресет: 0-Legacy...5-Custom
+    bool graphics_needs_restart = false;  ///< Полное применение после перезапуска
+
+    // Статусы тиров нового качества High/Ultra/Extreme:
+    // PBR/ACES определяются пресетом и запекаются при старте (только
+    // чтение в GUI); SSAO — флаг Ultra (пасс в разработке)
+    bool graphics_use_pbr = false;
+    bool graphics_use_aces_tonemap = false;
+    bool graphics_use_ssao = false;
+
+    // Пост-процесс пресета Extreme: чекбоксы эффектов и масштаб
+    // (активны только на Extreme, изменения — после перезапуска)
+    bool graphics_use_postprocess = false;
+    bool graphics_use_bloom = false;
+    bool graphics_use_ssao_pass = false;
+    bool graphics_use_volumetric_fog = false;
+    bool graphics_use_ssr = false;
+    float graphics_postprocess_scale = 0.75f;
 
     vsg::ref_ptr<Sun> sun;
 
@@ -64,11 +86,23 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool prev_F7 = false;
     bool is_show_HUD = false;
 
+    /// Окно диагностики составов:
+    /// F3 - вкл/выкл, F4 - свёрнутый/полный режим
+    bool prev_F3 = false;
+    bool is_show_diagnostics = false;
+
+    bool prev_F4 = false;
+    bool diagnostics_full_mode = false;
+
     bool is_no_controlled = false;
 
     bool is_no_cabine_control = false;
 
     QString status = "";
+
+    /// Автоподсказка пешего режима ("E — Сесть на место машиниста"):
+    /// заполняется UpdateViewerHandler каждый кадр, рисуется MyGui
+    QString walk_hint = "";
     QString physicalDeviceName = "";
 };
 
@@ -97,7 +131,30 @@ private:
 
     void showSettings() const;
 
+    void showGraphicsSettings() const;
+
     void showDebugMsg() const;
+
+    /// Диагностика составов (F3/F4)
+    void showDiagnostics() const;
+
+    /// Предупреждение кассеты регистрации: всплывает
+    /// при вставке/извлечении по Ctrl+R ("Запись параметров движения
+    /// начата/окончена"), живёт ~5 с
+    void showCassetteNotice() const;
+
+    /// Автоподсказка посадки на сиденье (прицел в пешем режиме)
+    void drawWalkHint() const;
+
+    /// Подсказка органа кабины при наведении (Alt, /// "Взаимодействие с элементами кабины"): имя, назначение,
+    /// состояние и клавиши мыши
+    void showCabTooltip() const;
+    void drawCassetteNotice(const QString& text) const;
+
+    // record() константный (vsg::Command) - состояние вывода mutable
+    mutable quint32 prev_cassette_notice_id = 0;
+    mutable QString cassette_notice_text = "";
+    mutable double notice_shown_until = 0.0;
 
     void showNoControlled() const;
 
