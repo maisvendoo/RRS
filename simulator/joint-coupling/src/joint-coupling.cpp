@@ -6,6 +6,85 @@
 #include    "device.h"
 #include    "core/get_module.h"
 
+#include    <algorithm>
+#include    <cmath>
+
+namespace
+{
+
+//------------------------------------------------------------------------------
+/// Разбор табличной характеристики "x1:F1;x2:F2;..." (м -> Н)
+//------------------------------------------------------------------------------
+bool parseCurve(const QString& text, std::vector<std::pair<double, double>>& curve)
+{
+    curve.clear();
+
+    const QString cleaned = text.simplified();
+    if (cleaned.isEmpty())
+        return false;
+
+    const QStringList points = cleaned.split(';', Qt::SkipEmptyParts);
+
+    for (const QString& point : points)
+    {
+        const QStringList coords = point.split(':');
+
+        if (coords.size() != 2)
+            continue;
+
+        bool ok_x = false;
+        bool ok_f = false;
+
+        const double x = coords[0].toDouble(&ok_x);
+        const double f = coords[1].toDouble(&ok_f);
+
+        if (ok_x && ok_f && x >= 0.0)
+            curve.emplace_back(x, f);
+    }
+
+    std::sort(curve.begin(), curve.end());
+
+    return !curve.empty();
+}
+
+//------------------------------------------------------------------------------
+/// Линейная интерполяция с экстраполяцией последним наклоном
+//------------------------------------------------------------------------------
+double interpCurve(const std::vector<std::pair<double, double>>& curve,
+                   double x)
+{
+    if (curve.empty())
+        return 0.0;
+
+    if (curve.size() == 1)
+        return curve.front().second;
+
+    if (x <= curve.front().first)
+    {
+        const double k = (curve[1].second - curve[0].second) /
+                std::max(curve[1].first - curve[0].first, 1e-9);
+        return curve[0].second + k * (x - curve.front().first);
+    }
+
+    for (size_t i = 1; i < curve.size(); ++i)
+    {
+        if (x <= curve[i].first)
+        {
+            const double k = (curve[i].second - curve[i-1].second) /
+                    std::max(curve[i].first - curve[i-1].first, 1e-9);
+            return curve[i-1].second + k * (x - curve[i-1].first);
+        }
+    }
+
+    const size_t last = curve.size() - 1;
+    const double k = (curve[last].second - curve[last-1].second) /
+            std::max(curve[last].first - curve[last-1].first, 1e-9);
+
+    return curve[last].second + k * (x - curve[last].first);
+}
+
+} // namespace
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -17,6 +96,16 @@ JointCoupling::JointCoupling() : Joint()
   , lambda(0.11)
   , fk(0.1)
   , ck(5.0e8)
+  , max_tension(2.5e6)
+  , max_compression(2.0e6)
+  , damage_force(1.6e6)
+  , break_energy(300.0e3)
+  , damping_tension(0.0)
+  , damping_compression(0.0)
+  , damage(0.0)
+  , broken(false)
+  , cur_force(0.0)
+  , cur_rel_velocity(0.0)
 {
     devices.resize(NUM_CONNECTORS);
 /*
@@ -41,7 +130,6 @@ JointCoupling::~JointCoupling()
 void JointCoupling::step(double t, double dt)
 {
     Q_UNUSED(t)
-    Q_UNUSED(dt)
 //    msg = QString("%1").arg(t,7,'f',3);
 
     // Расчёт взаимного расположения и скорости
@@ -53,13 +141,41 @@ void JointCoupling::step(double t, double dt)
     double v_bwd = devices[BWD]->getOutputSignal(COUPL_OUTPUT_VELOCITY);
     double dv = v_fwd - v_bwd;
 
-    // Управление сцеплением
-    if (   (devices[FWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == 1.0)
-        || (devices[BWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == 1.0) )
+    cur_rel_velocity = dv;
+
+    // Разрушенная сцепка не передаёт усилий
+    if (broken)
+        is_connected = false;
+
+    // Несовместимая пара не сцепляется вовсе (coupling)
+    if (coupler_type == 3)
+        is_connected = false;
+
+    // Управление сцеплением (разрушенная сцепка не сцепляется вновь).
+    // Совместимость типов и предел скорости соударения (coupling)
+    // применяются ТОЛЬКО к моменту начального сцепления: уже соединённая
+    // пара не размыкается ударной перегрузкой (|dv| выше предела при
+    // экстренном торможении)
+    if (   !broken
+        && !is_connected
+        && (   (devices[FWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == 1.0)
+            || (devices[BWD]->getOutputSignal(COUPL_OUTPUT_REF_STATE) == 1.0) ) )
     {
         // Проверяем что сцепки близко
         if (ds < delta / 2.0)
-            is_connected = true;
+        {
+            // 0/2 - совместимые, 1 - винтовая (ползучая скорость),
+            // 3 - несовместимая пара
+            const bool compatible = (coupler_type != 3);
+
+            const double coupling_speed_limit =
+                    (coupler_type == 1) ? std::min(max_coupling_speed, 0.3)
+                                        : max_coupling_speed;
+
+            const bool speed_ok = std::abs(dv) < coupling_speed_limit;
+
+            is_connected = compatible && speed_ok;
+        }
     }
 
     // Управление расцеплением
@@ -83,6 +199,10 @@ void JointCoupling::step(double t, double dt)
 
         // Расчёт усилия в сцепке
         force = calc_force(ds, dv);
+
+        // Накопление повреждений и разрушение при перегрузке
+        updateDamage(force, dv, dt);
+
         // Зазор в сцепках в данный момент
         ds_delta = std::clamp(ds, -delta / 2.0, delta / 2.0);
         // Смещение сцепок и поглощающих аппаратов в данный момент
@@ -110,6 +230,8 @@ void JointCoupling::step(double t, double dt)
         }
     }
 
+    cur_force = force;
+
     // Усилия в сцепках
     devices[FWD]->setInputSignal(COUPL_INPUT_FORCE, force);
     devices[BWD]->setInputSignal(COUPL_INPUT_FORCE, force);
@@ -121,7 +243,6 @@ void JointCoupling::step(double t, double dt)
     // Смещение сцепок и поглощающих аппаратов в данный момент
     devices[FWD]->setInputSignal(COUPL_INPUT_SHIFT, ds_shift / 2.0);
     devices[BWD]->setInputSignal(COUPL_INPUT_SHIFT, ds_shift / 2.0);
-
 /*
     if (abs(ds) > 0.005)
         reg->print(msg);
@@ -131,34 +252,134 @@ void JointCoupling::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool JointCoupling::isConnected() const
+{
+    return is_connected;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool JointCoupling::isBroken() const
+{
+    return broken;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double JointCoupling::getForce() const
+{
+    return cur_force;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double JointCoupling::getRelVelocity() const
+{
+    return cur_rel_velocity;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double JointCoupling::getDamage() const
+{
+    return damage;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double JointCoupling::calc_force(double ds, double dv)
 {
+    // Защита от физического взрыва: нечисловые входы не дают усилия
+    if (!std::isfinite(ds) || !std::isfinite(dv))
+        return 0.0;
+
     // Вычитание зазора в сцепке
     double x = dead_zone(ds, -delta / 2.0, delta / 2.0);
-    // Сжатие поглощающих аппаратов
-    double x_c = std::clamp(x, -lambda * 2.0, lambda * 2.0);
-    // Усилие упругих элементов в поглощающих аппаратах
-    double force_c = x_c * c;
-    // Сила трения фрикционных элементов в поглощающих аппаратах
-    double force_f = Physics::fricForce(abs(x_c) * c * f, dv);
-    // Сжатие конструкций за вычетом сжатия поглощающих аппаратов
-    double x_ck = dead_zone(x_c, -lambda * 2.0, lambda * 2.0);
-    // Усилие от упругости конструкций
-    double force_ck = ck * x_ck;
-    // Потери на пластические деформации конструкций
-    double force_fk = Physics::fricForce(abs(x) * ck * fk, dv);
-/*
-    msg += QString("%1;%2;%3;%4;%5;%6;%7;%8")
-                   .arg(ds,10,'f',6)
-                   .arg(dv,10,'f',6)
-                   .arg(x_c,10,'f',6)
-                   .arg(force_c,10,'f',3)
-                   .arg(force_f,10,'f',3)
-                   .arg(x,10,'f',6)
-                   .arg(force_ck,10,'f',3)
-                   .arg(force_c + force_ck,10,'f',3);
-*/
-    return force_c + force_f + force_ck + force_fk;
+
+    double force = 0.0;
+
+    if (!tension_curve.empty() || !compression_curve.empty())
+    {
+        // Табличная нелинейная характеристика
+        if (x >= 0.0)
+            force = tension_curve.empty() ? 0.0 : interpCurve(tension_curve, x);
+        else
+            force = compression_curve.empty() ? 0.0 :
+                    -interpCurve(compression_curve, -x);
+    }
+    else
+    {
+        // Сжатие поглощающих аппаратов
+        double x_c = std::clamp(x, -lambda * 2.0, lambda * 2.0);
+        // Усилие упругих элементов в поглощающих аппаратах
+        double force_c = x_c * c;
+        // Сила трения фрикционных элементов в поглощающих аппаратах
+        double force_f = Physics::fricForce(abs(x_c) * c * f, dv);
+        // Сжатие конструкций за вычетом сжатия поглощающих аппаратов
+        double x_ck = dead_zone(x_c, -lambda * 2.0, lambda * 2.0);
+        // Усилие от упругости конструкций
+        double force_ck = ck * x_ck;
+        // Потери на пластические деформации конструкций
+        double force_fk = Physics::fricForce(abs(x) * ck * fk, dv);
+
+        force = force_c + force_f + force_ck + force_fk;
+    }
+
+    // Вязкое демпфирование, отдельное на растяжение и сжатие (п.9)
+    force += ((dv > 0.0) ? damping_tension : damping_compression) * dv;
+
+    // Ограничение физически невозможных усилий (п.27)
+    const double limit = std::max(3.0 * std::max(max_tension, max_compression),
+                                  100.0e6);
+
+    return std::clamp(force, -limit, limit);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void JointCoupling::updateDamage(double force, double dv, double dt)
+{
+    const double abs_force = abs(force);
+
+    // Предел прочности по знаку нагрузки: растяжение или сжатие
+    const double limit = std::max( (force >= 0.0) ? max_tension : max_compression,
+                                   1.0);
+
+    // Мгновенное разрушение только при катастрофическом превышении
+    // предела прочности (двойное превышение). Обычная перегрузка выше
+    // предела не рвёт сцепку мгновенно
+    if (abs_force > 2.0 * limit)
+    {
+        damage = 1.0;
+    }
+    else if (abs_force > limit)
+    {
+        // Быстрое накопление повреждений при сверхпредельной нагрузке:
+        // темп растёт с относительным превышением предела
+        damage += (abs_force / limit - 1.0) * dt * 10.0;
+    }
+    else if (abs_force > damage_force)
+    {
+        // Накопление усталости: работа повреждающей части силы
+        // относительно сцепок (не разрушать сразу)
+        const double work_rate = (abs_force - damage_force) *
+                std::max(abs(dv), 0.05);
+
+        damage += work_rate * dt / std::max(break_energy, 1.0);
+    }
+
+    if (damage >= 1.0)
+    {
+        damage = 1.0;
+        broken = true;
+        is_connected = false;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -174,6 +395,36 @@ void JointCoupling::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "lambda", lambda);
     cfg.getDouble(secName, "fk", fk);
     cfg.getDouble(secName, "ck", ck);
+
+    // Пределы прочности и износ
+    cfg.getDouble(secName, "MaxTension", max_tension);
+    cfg.getDouble(secName, "MaxCompression", max_compression);
+    cfg.getDouble(secName, "DamageForce", damage_force);
+    cfg.getDouble(secName, "BreakEnergy", break_energy);
+
+    // Табличные нелинейные характеристики и демпфирование
+    //
+    QString curve_str = "";
+    if (cfg.getString(secName, "TensionCurve", curve_str))
+        parseCurve(curve_str, tension_curve);
+    if (cfg.getString(secName, "CompressionCurve", curve_str))
+        parseCurve(curve_str, compression_curve);
+
+    cfg.getDouble(secName, "DampingTension", damping_tension);
+    cfg.getDouble(secName, "DampingCompression", damping_compression);
+
+    QString type_str = "";
+    if (cfg.getString(secName, "CouplerType", type_str))
+    {
+        if (type_str == "screw")
+            coupler_type = 1;
+        else if (type_str == "incompatible")
+            coupler_type = 3;
+        else
+            coupler_type = 0;
+    }
+
+    cfg.getDouble(secName, "MaxCouplingSpeed", max_coupling_speed);
 }
 
 GET_MODULE(JointCoupling)
