@@ -92,6 +92,24 @@ struct simulator_vehicle_pos_update_t final
     double  up_y = 0.0;
     double  up_z = 1.0;
 
+    /// Реакция камеры от физики.
+    /// Новые поля добавлены В КОНЕЦ для обратной совместимости:
+    /// старый клиент просто не читает хвост вложенного блока
+    float   cam_offset_x = 0.0f;    ///< Смещение головы: X - продольное, м
+    float   cam_offset_y = 0.0f;    ///< Y - поперечное, м
+    float   cam_offset_z = 0.0f;    ///< Z - вертикальное, м
+    float   cam_tilt_roll = 0.0f;   ///< Наклон крен, рад
+    float   cam_tilt_pitch = 0.0f;  ///< Наклон тангаж, рад
+
+    /// Дымность ПЕ для рендера частиц: уровень 0..4 -
+    /// Smoke из DieselEngineSystem/SteamEngineSystem; код цвета дыма:
+    /// 0 - нет, 1 - чёрный, 2 - синий, 3 - белый, 4 - серый.
+    /// Заполняется сервером из Vehicle::getSteam()/getDiesel()
+    /// (паровоз имеет приоритет). Добавлено В КОНЕЦ для обратной
+    /// совместимости протокола
+    quint8  smoke_level = 0;
+    quint8  smoke_color = 0;
+
     QByteArray serialize() const
     {
         QByteArray data;
@@ -109,6 +127,17 @@ struct simulator_vehicle_pos_update_t final
 
         serialize_vector(stream, orth_x, orth_y, orth_z, max_orth);
         serialize_vector(stream, up_x, up_y, up_z, max_up);
+
+        // Реакция камеры от физики (добавлено в конец, см. комментарий выше)
+        stream << cam_offset_x;
+        stream << cam_offset_y;
+        stream << cam_offset_z;
+        stream << cam_tilt_roll;
+        stream << cam_tilt_pitch;
+
+        // Дымность ПЭ для рендера частиц (добавлено в конец)
+        stream << smoke_level;
+        stream << smoke_color;
 /*
         stream << position_x;
         stream << position_y;
@@ -132,6 +161,15 @@ struct simulator_vehicle_pos_update_t final
 
     void deserialize(QByteArray& data)
     {
+        // Значения по умолчанию: старый сервер не пришлёт эти поля
+        cam_offset_x = 0.0f;
+        cam_offset_y = 0.0f;
+        cam_offset_z = 0.0f;
+        cam_tilt_roll = 0.0f;
+        cam_tilt_pitch = 0.0f;
+        smoke_level = 0;
+        smoke_color = 0;
+
         QDataStream stream(&data, QIODevice::ReadOnly);
 
         deserialize_position(stream, position_x);
@@ -145,6 +183,23 @@ struct simulator_vehicle_pos_update_t final
 
         deserialize_vector(stream, orth_x, orth_y, orth_z, max_orth);
         deserialize_vector(stream, up_x, up_y, up_z, max_up);
+
+        // Реакция камеры от физики: хвост блока, отсутствует у старого сервера
+        if (!stream.atEnd())
+        {
+            stream >> cam_offset_x;
+            stream >> cam_offset_y;
+            stream >> cam_offset_z;
+            stream >> cam_tilt_roll;
+            stream >> cam_tilt_pitch;
+        }
+
+        // Дымность ПЭ: хвост блока нового протокола
+        if (!stream.atEnd())
+        {
+            stream >> smoke_level;
+            stream >> smoke_color;
+        }
 /*
         stream >> position_x;
         stream >> position_y;
@@ -349,6 +404,51 @@ private:
 };
 
 //------------------------------------------------------------------------------
+// Физическое звуковое событие для аудиосистемы клиента
+// ( wire-представление SoundEvent из simulator: типы 0..9 совпадают
+//   с SoundEventType в vehicle-sound-events.h )
+//------------------------------------------------------------------------------
+struct simulator_sound_event_t final
+{
+    quint8  type = 0;           ///< Тип события (SoundEventType)
+    float   x = 0.0f;           ///< Мировая позиция, м
+    float   y = 0.0f;
+    float   z = 0.0f;
+    float   intensity = 0.0f;   ///< Сила/громкость 0..1
+    float   rate_hz = 0.0f;     ///< Частота повтора, Гц
+    quint32 vehicle_idx = 0;    ///< Индекс ПЕ-источника
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << type;
+        stream << x;
+        stream << y;
+        stream << z;
+        stream << intensity;
+        stream << rate_hz;
+        stream << vehicle_idx;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> type;
+        stream >> x;
+        stream >> y;
+        stream >> z;
+        stream >> intensity;
+        stream >> rate_hz;
+        stream >> vehicle_idx;
+    }
+};
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct simulator_update_pos_t final
@@ -356,6 +456,29 @@ struct simulator_update_pos_t final
     int speed_factor = 1;
     simulator_time_t sim_time;
     std::vector<simulator_vehicle_pos_update_t> vehicles;
+
+    /// Погода. Новые поля добавлены В КОНЕЦ
+    /// структуры для обратной совместимости протокола
+    float visibility_m = 10000.0f;  ///< Дальность видимости, м
+    float fog_density = 0.0f;       ///< Плотность тумана, 1/м
+
+    /// Погода для эффектов рендера: тип погоды 0..15 -
+    /// значения согласованы с weather::Type (simulator/weather/include/
+    /// weather-system.h); интенсивность 0..1 и ветер (скорость, м/с;
+    /// направление - азимут, рад). Добавлено В КОНЕЦ для обратной
+    /// совместимости протокола
+    quint8  weather_type = 0;
+    float   weather_intensity = 0.0f;
+    float   wind_speed = 0.0f;
+    float   wind_direction = 0.0f;
+
+    /// Физические звуковые события последнего шага
+    std::vector<simulator_sound_event_t> sound_events;
+
+    /// Служебное предупреждение игроку (кассета регистрации: начало/ / окончание записи). notice_id растёт при каждом
+    /// новом сообщении; 0 - сообщений ещё не было
+    quint32 notice_id = 0;
+    QString notice = "";
 
     QByteArray serialize() const
     {
@@ -370,6 +493,26 @@ struct simulator_update_pos_t final
         {
             stream << vehicle_pos.serialize();
         }
+
+        // Погода и звуковые события (добавлено в конец, см. выше)
+        stream << visibility_m;
+        stream << fog_density;
+
+        stream << static_cast<std::uint32_t>(sound_events.size());
+        for (const auto& event : sound_events)
+        {
+            stream << event.serialize();
+        }
+
+        stream << notice_id;
+        stream << notice;
+
+        // Погода для эффектов рендера: самый хвост протокола, читается
+        // только если данные ещё остались (старый сервер их не пришлёт)
+        stream << weather_type;
+        stream << weather_intensity;
+        stream << wind_speed;
+        stream << wind_direction;
 
         return data;
     }
@@ -396,6 +539,52 @@ struct simulator_update_pos_t final
             stream >> vehicle_data;
 
             vehicle.deserialize(vehicle_data);
+        }
+
+        // Погода и звуковые события: хвост пакета, отсутствует у старого сервера
+        visibility_m = 10000.0f;
+        fog_density = 0.0f;
+        sound_events.clear();
+        notice_id = 0;
+        notice.clear();
+        weather_type = 0;
+        weather_intensity = 0.0f;
+        wind_speed = 0.0f;
+        wind_direction = 0.0f;
+
+        if (!stream.atEnd())
+        {
+            stream >> visibility_m;
+            stream >> fog_density;
+        }
+
+        if (!stream.atEnd())
+        {
+            stream >> num;
+            sound_events.resize(num);
+
+            for (auto& event : sound_events)
+            {
+                QByteArray event_data;
+                stream >> event_data;
+                event.deserialize(event_data);
+            }
+        }
+
+        // Предупреждение (кассета): хвост нового протокола
+        if (!stream.atEnd())
+        {
+            stream >> notice_id;
+            stream >> notice;
+        }
+
+        // Погода для эффектов рендера: хвост нового протокола
+        if (!stream.atEnd())
+        {
+            stream >> weather_type;
+            stream >> weather_intensity;
+            stream >> wind_speed;
+            stream >> wind_direction;
         }
     }
 };
@@ -616,6 +805,184 @@ struct simulator_vehicle_controlled_update_t final
         stream >> currentDebugMsg;
         stream >> controlled_vehicle;
         stream >> controlledDebugMsg;
+    }
+};
+
+//------------------------------------------------------------------------------
+// Диагностика вагона (F3/F4).
+// Компактное wire-представление Train::VehicleDiagnostics
+//------------------------------------------------------------------------------
+struct simulator_vehicle_diagnostics_t final
+{
+    int     vehicle_idx = 0;
+    float   mass_t = 0.0f;             ///< Масса, т
+    float   speed_kmh = 0.0f;          ///< Скорость, км/ч
+    float   force_kn = 0.0f;           ///< Продольное усилие сцепок, кН
+    float   vertical_accel = 0.0f;     ///< Вертикальное ускорение, м/с^2
+    float   lateral_accel = 0.0f;      ///< Поперечное ускорение, м/с^2
+    float   body_damage = 0.0f;        ///< Повреждение кузова 0..1
+    float   bogie_damage = 0.0f;       ///< Повреждение ходовой 0..1
+    float   brake_efficiency = 1.0f;   ///< Эффективность колодок 1..0
+    float   shoe_temperature = 20.0f;  ///< Температура колодок, °C
+    float   rail_coord_m = 0.0f;       ///< Пикетаж, м
+    float   inclination = 0.0f;        ///< Уклон, промилле
+    quint8  derailed = 0;              ///< Сход
+    quint8  coupled_fwd = 1;           ///< Сцеплена спереди
+    quint8  coupled_bwd = 1;           ///< Сцеплена сзади
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << vehicle_idx;
+        stream << mass_t;
+        stream << speed_kmh;
+        stream << force_kn;
+        stream << vertical_accel;
+        stream << lateral_accel;
+        stream << body_damage;
+        stream << bogie_damage;
+        stream << brake_efficiency;
+        stream << shoe_temperature;
+        stream << rail_coord_m;
+        stream << inclination;
+        stream << derailed;
+        stream << coupled_fwd;
+        stream << coupled_bwd;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> vehicle_idx;
+        stream >> mass_t;
+        stream >> speed_kmh;
+        stream >> force_kn;
+        stream >> vertical_accel;
+        stream >> lateral_accel;
+        stream >> body_damage;
+        stream >> bogie_damage;
+        stream >> brake_efficiency;
+        stream >> shoe_temperature;
+        stream >> rail_coord_m;
+        stream >> inclination;
+        stream >> derailed;
+        stream >> coupled_fwd;
+        stream >> coupled_bwd;
+    }
+};
+
+//------------------------------------------------------------------------------
+// Сводка продольной динамики состава (Train::LongitudinalStats)
+//------------------------------------------------------------------------------
+struct simulator_train_diagnostics_t final
+{
+    int     first_vehicle_id = 0;
+    int     last_vehicle_id = 0;
+    QString train_name = "";
+    float   train_mass_t = 0.0f;       ///< Масса состава, т
+    float   train_length_m = 0.0f;     ///< Длина состава, м
+    float   max_tension_kn = 0.0f;     ///< Максимум растяжения сцепок, кН
+    float   max_compression_kn = 0.0f; ///< Максимум сжатия сцепок, кН
+    float   max_abs_force_kn = 0.0f;   ///< Максимум |усилия|, кН
+    qint32  overloaded_joints = 0;     ///< Перегруженные сцепки
+    qint32  broken_joints = 0;         ///< Разрушенные сцепки
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << first_vehicle_id;
+        stream << last_vehicle_id;
+        stream << train_name;
+        stream << train_mass_t;
+        stream << train_length_m;
+        stream << max_tension_kn;
+        stream << max_compression_kn;
+        stream << max_abs_force_kn;
+        stream << overloaded_joints;
+        stream << broken_joints;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> first_vehicle_id;
+        stream >> last_vehicle_id;
+        stream >> train_name;
+        stream >> train_mass_t;
+        stream >> train_length_m;
+        stream >> max_tension_kn;
+        stream >> max_compression_kn;
+        stream >> max_abs_force_kn;
+        stream >> overloaded_joints;
+        stream >> broken_joints;
+    }
+};
+
+//------------------------------------------------------------------------------
+// Снимок диагностики всех составов (отправляется раз в 0.5 с)
+//------------------------------------------------------------------------------
+struct simulator_diagnostics_update_t final
+{
+    std::vector<simulator_train_diagnostics_t> trains;
+    std::vector<simulator_vehicle_diagnostics_t> vehicles;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << static_cast<std::uint32_t>(trains.size());
+        for (const auto& train : trains)
+        {
+            stream << train.serialize();
+        }
+
+        stream << static_cast<std::uint32_t>(vehicles.size());
+        for (const auto& vehicle : vehicles)
+        {
+            stream << vehicle.serialize();
+        }
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        std::uint32_t num;
+
+        stream >> num;
+        trains.clear();
+        trains.resize(num);
+
+        for (auto& train : trains)
+        {
+            QByteArray train_data;
+            stream >> train_data;
+            train.deserialize(train_data);
+        }
+
+        stream >> num;
+        vehicles.clear();
+        vehicles.resize(num);
+
+        for (auto& vehicle : vehicles)
+        {
+            QByteArray vehicle_data;
+            stream >> vehicle_data;
+            vehicle.deserialize(vehicle_data);
+        }
     }
 };
 

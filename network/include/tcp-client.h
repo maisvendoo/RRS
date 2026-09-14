@@ -89,6 +89,9 @@ signals:
 
     void setVehicleControlled(QByteArray &vehicle_controlled);
 
+    /// Снимок диагностики составов
+    void setDiagnosticsData(QByteArray &diagnostics_data);
+
     void sendLogMessage(QString msg);
 
     void connectionAbandoned();
