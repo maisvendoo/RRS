@@ -2,6 +2,7 @@
 #define CAMERA_CABINE_MANIPULATOR_H
 
 #include "CameraAbstract.h"
+#include "CabSway.h"
 
 class CameraCabineManipulator final : public CameraAbstract
 {
@@ -74,6 +75,10 @@ private:
 
     bool is_reset = true;
     VehicleExterior *_prev_current_vehicle = nullptr;
+
+    /// Раскачка кабины в движении (покачивание кузова на рессорах):
+    /// дополняет физическую реакцию cam_motion, чисто визуальная
+    CabSway _sway;
 };
 
 #endif // CAMERA_CABINE_MANIPULATOR_H
