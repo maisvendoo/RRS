@@ -855,6 +855,11 @@ void MyGui::showHUD() const
         _trains_list_params.viewer_handler = params->viewer_handler;
     }
 
+    if (params->tcp_client != _trains_list_params.tcp_client)
+    {
+        _trains_list_params.tcp_client = params->tcp_client;
+    }
+
     if (_trains_list_widget && params->hud_show_trains_list)
     {
         _trains_list_widget->show();
