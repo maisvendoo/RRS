@@ -3,7 +3,48 @@
 #include "sound-manager.h"
 
 #include <algorithm>
+#include <chrono>
 #include <sstream>
+
+//------------------------------------------------------------------------------
+// Число типов физических звуковых событий (SoundEventType)
+//------------------------------------------------------------------------------
+static constexpr size_t SOUND_EVENT_TYPES_COUNT = 10;
+
+//------------------------------------------------------------------------------
+// Имена секций конфигурации sound-events.conf по типу события
+//------------------------------------------------------------------------------
+static const char* sound_event_type_names[SOUND_EVENT_TYPES_COUNT] =
+{
+    "FlatImpact",       // Удар ползуна о рельс
+    "FlangeContact",    // Скрежет гребня
+    "CouplerImpact",    // Удар в сцепке
+    "CouplerBreak",     // Разрыв сцепки
+    "DerailmentScrape", // Скрежет сошедшей ПЕ
+    "PantographArc",    // Дуга токоприёмника
+    "SandFlow",         // Поток песка
+    "WheelSlip",        // Боксование/юз
+    "JointImpact",      // Стук на стыке
+    "BrakeSqueal"       // Свист колодок
+};
+
+//------------------------------------------------------------------------------
+// Файлы по умолчанию: ближайшие по смыслу из поставки data/sounds.
+// Ключ File в конфиге позволяет заменить на специализированный
+//------------------------------------------------------------------------------
+static const char* sound_event_default_files[SOUND_EVENT_TYPES_COUNT] =
+{
+    "vl60/ezda.wav",          // FlatImpact - стук хода
+    "vl60/brake_scr.wav",     // FlangeContact - скрежет металла
+    "vl60/254-chelk.wav",     // CouplerImpact - щелчок удара
+    "vl60/254_vypusk.wav",    // CouplerBreak - резкий выпуск воздуха
+    "freight/departure.wav",  // DerailmentScrape - низкий гул волочения
+    "vl60/gvon.wav",          // PantographArc - включение ГВ (треск)
+    "vl60/compr.wav",         // SandFlow - шипение
+    "vl60/brake_scr.wav",     // WheelSlip - визг
+    "vl60/254-chelk.wav",     // JointImpact - стук стыка
+    "vl60/brake_scr.wav"      // BrakeSqueal - свист
+};
 
 //------------------------------------------------------------------------------
 //
@@ -259,6 +300,11 @@ void SoundManager::setListenerPosition(float x, float y, float z)
 {
     ALfloat pos[3] = {x, y, z};
     alListenerfv(AL_POSITION, pos);
+
+    // Позиция слушателя нужна пулу событий для дистанционной отсечки
+    listener_x = x;
+    listener_y = y;
+    listener_z = z;
     //log_->notify("Sound Manager: ListenerPosition " + QString("%1 %2 %3").arg(x).arg(y).arg(z).toStdString());
 }
 
@@ -468,5 +514,258 @@ void SoundManager::setPitch(size_t idx, float pitch)
     {
         sounds[idx].sound->play();
         sounds[idx].prev_state = 1;
+    }
+}
+
+//------------------------------------------------------------------------------
+// Монотонное время, с
+//------------------------------------------------------------------------------
+double SoundManager::monotonicTime() const
+{
+    return std::chrono::duration<double>(
+                std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+//------------------------------------------------------------------------------
+// Загрузка пула физических звуковых событий: data/sounds/sound-events.conf.
+// Секция на тип события: File/MinVolume/MaxDistance/Cooldown,
+// секция Pool: MaxSources. Отсутствие конфига/файла - не ошибка:
+// событие тихо пропускается, warning в журнал выдаётся однократно
+//------------------------------------------------------------------------------
+void SoundManager::initEventSounds()
+{
+    event_pool_loaded = true;
+    event_sounds.resize(SOUND_EVENT_TYPES_COUNT);
+
+    FileSystem &fs = FileSystem::getInstance();
+    const std::string sounds_dir = fs.getSoundsDir();
+    const std::string cfg_path = sounds_dir + fs.separator() + "sound-events.conf";
+
+    CfgReader cfg;
+
+    if (cfg.load(QString(cfg_path.c_str())))
+    {
+        int tmp_int = static_cast<int>(event_pool_max_sources);
+        cfg.getInt("Pool", "MaxSources", tmp_int);
+        event_pool_max_sources = std::clamp(tmp_int, 1, 64);
+
+        for (size_t i = 0; i < SOUND_EVENT_TYPES_COUNT; ++i)
+        {
+            EventSound& event_sound = event_sounds[i];
+            const QString sec_name = sound_event_type_names[i];
+
+            QString file = "";
+            if (cfg.getString(sec_name, "File", file) && !file.isEmpty())
+            {
+                event_sound.filename = file.toStdString();
+            }
+            else
+            {
+                event_sound.filename = sound_event_default_files[i];
+            }
+
+            double tmp = 0.0;
+            if (cfg.getDouble(sec_name, "MinVolume", tmp))
+            {
+                event_sound.min_volume = static_cast<float>(std::clamp(tmp, 0.0, 1.0));
+            }
+
+            tmp = 0.0;
+            if (cfg.getDouble(sec_name, "MaxDistance", tmp) && (tmp > 0.0))
+            {
+                event_sound.max_distance = static_cast<float>(tmp);
+            }
+
+            tmp = 0.0;
+            if (cfg.getDouble(sec_name, "Cooldown", tmp) && (tmp >= 0.0))
+            {
+                event_sound.cooldown = tmp;
+            }
+        }
+    }
+    else
+    {
+        log_->notify("Sound Manager: sound-events.conf not found, "
+                     "event sounds use defaults");
+    }
+
+    // Загрузка wav-файлов пула (отсутствие файла - тихий пропуск)
+    for (size_t i = 0; i < SOUND_EVENT_TYPES_COUNT; ++i)
+    {
+        EventSound& event_sound = event_sounds[i];
+
+        const QString sound_name = QString(sounds_dir.c_str()) +
+                QDir::separator() + QString(event_sound.filename.c_str());
+
+        auto found_sound_it = loaded_sounds.find(sound_name.toStdString());
+        if (found_sound_it != loaded_sounds.end())
+        {
+            event_sound.sound = new ASound(*found_sound_it->second, log_);
+        }
+        else
+        {
+            ASound* sound = new ASound(sound_name, log_);
+
+            if (sound->getLastError().isEmpty())
+            {
+                event_sound.sound = sound;
+                loaded_sounds.emplace(sound_name.toStdString(), sound);
+            }
+            else
+            {
+                delete sound;
+                event_sound.sound = nullptr;
+            }
+        }
+
+        if (event_sound.sound != nullptr)
+        {
+            event_sound.sound->setLoop(false);
+        }
+    }
+
+    log_->notify(QString("Sound Manager: event pool initialized "
+                         "(max sources: %1)").arg(
+                     static_cast<int>(event_pool_max_sources)).toStdString());
+}
+
+//------------------------------------------------------------------------------
+// Воспроизведение физического звукового события через пул источников
+//: приоритет по интенсивности и дистанции,
+// отсечка дальних (MaxDistance), перезарядка (Cooldown) и
+// виртуализация - тайминги живут даже без реального источника
+//------------------------------------------------------------------------------
+void SoundManager::playSoundEvent(unsigned event_type,
+                                  float x, float y, float z,
+                                  float intensity,
+                                  float rate_hz)
+{
+    if (!event_pool_loaded)
+    {
+        initEventSounds();
+    }
+
+    if (event_type >= event_sounds.size())
+    {
+        return;
+    }
+
+    EventSound& event_sound = event_sounds[event_type];
+    const double now = monotonicTime();
+
+    // Виртуализация: время последнего пуска обновляется независимо от
+    // того, будет ли реальное воспроизведение (состояние без источника)
+    if ((now - event_sound.last_play_time) < event_sound.cooldown)
+    {
+        return;
+    }
+
+    // Дистанционная отсечка: дальние события не играют вовсе
+    const float dx = x - listener_x;
+    const float dy = y - listener_y;
+    const float dz = z - listener_z;
+    const float distance = std::sqrt(dx * dx + dy * dy + dz * dz);
+
+    if (distance > event_sound.max_distance)
+    {
+        return;
+    }
+
+    // Порог интенсивности события (тихие события не играем)
+    if (intensity < event_sound.min_volume)
+    {
+        return;
+    }
+
+    // Отсутствие файла - тихий пропуск с однократным warning в журнал
+    if (event_sound.sound == nullptr)
+    {
+        if (!event_sound.missing_warned)
+        {
+            event_sound.missing_warned = true;
+            log_->notify(QString("Sound Manager: no wav for event '%1' "
+                                 "(file '%2') - skipped silently")
+                         .arg(sound_event_type_names[event_type])
+                         .arg(event_sound.filename.c_str()).toStdString());
+        }
+        event_sound.last_play_time = now;
+        return;
+    }
+
+    // Приоритет события: громкое и близкое важнее тихого и дальнего
+    const float distance_factor = 1.0f - (distance / event_sound.max_distance);
+    const float priority = std::clamp(intensity, 0.0f, 1.0f) *
+            std::clamp(distance_factor, 0.0f, 1.0f);
+
+    // Лимит реальных источников: вытесняем самый тихий из звучащих,
+    // если новый приоритет выше; иначе событие виртуально пропускаем
+    if (event_active_sources >= event_pool_max_sources)
+    {
+        size_t weakest = event_sounds.size();
+        float weakest_priority = priority;
+
+        for (size_t i = 0; i < event_sounds.size(); ++i)
+        {
+            const EventSound& candidate = event_sounds[i];
+
+            if ((candidate.sound != nullptr) &&
+                candidate.sound->isPlaying() &&
+                (candidate.last_playing_priority < weakest_priority))
+            {
+                weakest_priority = candidate.last_playing_priority;
+                weakest = i;
+            }
+        }
+
+        if (weakest >= event_sounds.size())
+        {
+            // Все звучащие важнее - тихий пропуск (виртуализация)
+            event_sound.last_play_time = now;
+            return;
+        }
+
+        event_sounds[weakest].sound->stop();
+        event_active_sources -= (weakest == event_type) ? 0 : 1;
+    }
+
+    // Частота повтора события задаёт тональность источника
+    // (удары ползуна/стыков ускоряются со скоростью)
+    float pitch = 1.0f;
+
+    if (rate_hz > 1.0f)
+    {
+        pitch = std::clamp(rate_hz / 5.0f, 0.5f, 2.0f);
+    }
+
+    event_sound.sound->stop();
+    event_sound.sound->setPosition(x, y, z);
+    event_sound.sound->setVolume(std::clamp(intensity, 0.0f, 1.0f));
+    event_sound.sound->setPitch(pitch);
+    event_sound.sound->play();
+
+    event_sound.last_play_time = now;
+    event_sound.last_playing_priority = priority;
+    ++event_active_sources;
+
+    // Освобождение источников, законченных предыдущим шагом
+    size_t active = 0;
+    for (const auto& candidate : event_sounds)
+    {
+        if ((candidate.sound != nullptr) && candidate.sound->isPlaying())
+        {
+            ++active;
+        }
+    }
+    event_active_sources = std::min(active, event_pool_max_sources);
+}
+
+//------------------------------------------------------------------------------
+// Глобальное выключение звука: гейн слушателя OpenAL в ноль
+//------------------------------------------------------------------------------
+void SoundManager::setEnabled(bool enabled)
+{
+    if (context_ != nullptr)
+    {
+        alcMakeContextCurrent(enabled ? context_ : nullptr);
     }
 }
