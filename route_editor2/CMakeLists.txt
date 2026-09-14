@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Qt6 COMPONENTS Core REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Network REQUIRED)
 find_package(vsg REQUIRED)
 find_package(vsgXchange REQUIRED)
 find_package(vsgImGui REQUIRED)
@@ -32,6 +32,8 @@ target_sources(route_editor2
 
 target_link_libraries(route_editor2 PRIVATE
     Qt6::Core
+    Qt6::Network
+    Qt6::Gui
     vsg::vsg
     vsgXchange::vsgXchange
     vsgImGui::vsgImGui
