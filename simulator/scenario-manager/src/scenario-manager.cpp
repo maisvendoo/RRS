@@ -974,6 +974,25 @@ void ScenarioManager::taskRenameTrain(const std::string &old_name, const std::st
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ScenarioManager::taskReverseTrain(const std::string &train_name)
+{
+    setTask([train_name, this] {
+
+        int train_idx = findTrainByName(train_name);
+
+        if (train_idx == -1)
+        {
+            Journal::instance()->error(QString("LUA DEBUG: Train %1 for reverse not found").arg(train_name.c_str()));
+            return;
+        }
+
+        emit sigReverseTrain(train_idx);
+    });
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 int ScenarioManager::findTrainByName(const std::string &name)
 {
     for (auto& train_data : train_datas)
@@ -1325,6 +1344,12 @@ void ScenarioManager::sys_functions_registration()
     });
 
     Journal::instance()->info("renameTrain method binding...OK");
+
+    lua.set_function("reverseTrain", [this](const std::string &train_name){
+        this->taskReverseTrain(train_name);
+    });
+
+    Journal::instance()->info("reverseTrain method binding...OK");
 }
 
 //------------------------------------------------------------------------------
