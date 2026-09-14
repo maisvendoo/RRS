@@ -1,4 +1,5 @@
 #include    <TrainsListWidget.h>
+#include    <tcp-client.h>
 #include    <Logger.h>
 
 //------------------------------------------------------------------------------
@@ -301,6 +302,15 @@ void TrainsListWidget::renderTrainsList()
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
         ImGui::TextDisabled("Управляемый поезд: текущий");
         ImGui::PopStyleColor();
+    }
+
+    // Кнопка "Изменить направление поезда"
+    if (current_train_id >= 0 && _params->tcp_client)
+    {
+        if (ImGui::Button("Изменить направление поезда", ImVec2(window_width - padding * 2, 0)))
+        {
+            _params->tcp_client->sendReverseTrain(current_train_id);
+        }
     }
 
     ImGui::End();

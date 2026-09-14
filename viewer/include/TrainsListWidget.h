@@ -7,6 +7,8 @@
 #include    <QString>
 #include    <vector>
 
+class TcpClient;
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -14,6 +16,7 @@ struct TrainsListWidgetParams
 {
     VehiclesHandler *vehicles_handler = nullptr;
     UpdateViewerHandler* viewer_handler = nullptr;
+    TcpClient *tcp_client = nullptr;
     bool is_visible = true;
 
     /// Цвета виджетов интерфейса (HUD), RGBA в диапазоне 0.0 - 1.0

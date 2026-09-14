@@ -48,6 +48,7 @@ MyGui::MyGui(vsg::ref_ptr<GUIParams> in_params, [[maybe_unused]] vsg::ref_ptr<vs
 
     _trains_list_params.vehicles_handler = params->vehicles_handler;
     _trains_list_params.viewer_handler = params->viewer_handler;
+    _trains_list_params.tcp_client = params->tcp_client;
     _trains_list_params.hud_background = params->hud_background;
     _trains_list_params.hud_text = params->hud_text;
     _trains_list_params.hud_current_train = params->hud_current_train;
