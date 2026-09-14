@@ -51,13 +51,20 @@ target_link_libraries(${TARGET} PRIVATE
     topology
     parsing
     graphics
+    graphics-core
     core
     io-controller
+    # Пешая ходьба: физика игрока + мир коллизий
+    player
+    collision
 )
 
 target_include_directories(${TARGET} PRIVATE
     ../common-headers
     ../sound-manager/include
+    ../simulator/graphics-core/include
+    ../simulator/player/include
+    ../simulator/collision/include
     display/include
     ./include
 )

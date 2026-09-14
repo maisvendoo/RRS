@@ -19,18 +19,55 @@
 #include    <QObject>
 #include    <QtGlobal>
 #include    <mutex>
+#include    <functional>
 
 #include    "datetime.h"
 #include    "control-signals.h"
 #include    "feedback-signals.h"
 
 #include    "profile-point.h"
+#include    "vehicle-collision.h"
+#include    "vehicle-dynamics.h"
+#include    "vehicle-lateral-dynamics.h"
+#include    "vehicle-derailment.h"
+#include    "vehicle-damage.h"
+#include    "vehicle-hazard.h"
+#include    "vehicle-flat.h"
+#include    "vehicle-adhesion.h"
+#include    "vehicle-sand.h"
+#include    "vehicle-brake-shoes.h"
+#include    "vehicle-energy.h"
+#include    "vehicle-pantograph.h"
+#include    "vehicle-depot-power.h"
+#include    "vehicle-coupling-interaction.h"
+#include    "vehicle-sound-events.h"
+#include    "vehicle-windshield.h"
+#include    "vehicle-camera-motion.h"
+#include    "vehicle-cab-interaction.h"
+#include    "vehicle-cargo.h"
+#include    "vehicle-passengers.h"
+#include    "vehicle-service.h"
+#include    "vehicle-condensate.h"
+#include    "vehicle-wheel-wear.h"
+#include    "vehicle-tunnel.h"
+#include    "vehicle-wsp.h"
+
+#include    <catenary-system.h>
+
+#include    <simulation-lod.h>
+
 #include    "device-list.h"
 
 #include    "physics.h"
 #include    "solver-types.h"
 
 #include    <autopilot.h>
+
+namespace collision
+{
+    class CollisionWorld;
+    struct CollisionEvent;
+}
 
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT
@@ -98,6 +135,185 @@ public:
     void setPayloadCoeff(double payload_coeff);
 
     void setTrainCoord(double value);
+
+    /// Создать коллайдеры ПЕ в мире коллизий (вызывается моделью
+    /// после расстановки всех ПЕ на топологии)
+    void createCollisionBodies(collision::CollisionWorld* world);
+
+    /// Синхронизировать коллайдеры с текущим положением на траектории
+    void syncCollisionPose();
+
+    /// Реакция на контакт коллайдера ПЕ с препятствием (вызывается моделью)
+    void onCollisionContact(const collision::CollisionEvent& event);
+
+    /// Снять аварийное состояние после прекращения контакта
+    void resetCollisionState();
+
+    /// ПЕ в аварийном состоянии после столкновения
+    bool isCollided() const;
+
+    /// Повреждение кузова (0.0 - цел, 1.0 - разрушен)
+    float getBodyDamage() const;
+
+    /// Повреждение ходовой части (0.0 - цела, 1.0 - разрушена)
+    float getBogieDamage() const;
+
+    /// Сброс повреждений (ремонт)
+    void resetDamage();
+
+    /// Привязать источник высоты рельса (контроллер ПЕ на топологии).
+    /// Вызывается один раз после расстановки ПЕ
+    void setRailHeightSource(VehicleVerticalDynamics::RailHeightFn fn);
+
+    /// Источник высоты рельса уже привязан
+    bool hasRailHeightSource() const;
+
+    /// Привязать источник боковых неровностей пути (для поперечной динамики)
+    void setLateralOffsetSource(VehicleLateralDynamics::LateralOffsetFn fn);
+
+    /// Источник боковых неровностей уже привязан
+    bool hasLateralOffsetSource() const;
+
+    /// Привязать источник возвышения наружного рельса (cant, мм; Б16).
+    /// Возвращает возвышение по абсолютной координате пути (топология
+    /// через контроллер ПЕ). Паттерн - как у rail height
+    void setLateralCantSource(std::function<double(double)> fn);
+
+    /// Источник возвышения уже привязан
+    bool hasCantSource() const;
+
+    /// Вертикальная динамика ПС (колебания от неровностей пути)
+    VehicleVerticalDynamics& getVerticalDynamics();
+
+    /// Поперечная динамика ПС (виляние, крип, критерий схода)
+    VehicleLateralDynamics& getLateralDynamics();
+
+    /// Система схода с рельсов (постепенная, по физическим датчикам)
+    VehicleDerailment& getDerailment();
+
+    /// ПЕ сошла с рельсов (хотя бы одна ось)
+    bool isDerailed() const;
+
+    /// Рывок сцепки от сошедшего соседа: боковая составляющая дёргающего
+    /// удара разгружает колёса (цепной сход)
+    void onCouplerJerk(double energy);
+
+    /// Сброс состояния схода (восстановление после аварии)
+    void resetDerailment();
+
+    /// Компонентная система повреждений ПЕ
+    VehicleDamageSystem& getDamageSystem();
+
+    /// Система опасного груза (утечка/пожар/взрыв)
+    VehicleHazard& getHazard();
+
+    /// Система ползунов колёсных пар (юз -> ползун -> удары при обороте)
+    WheelFlatSystem& getFlatSpots();
+
+    /// Система сцепления колёс с рельсами (погода/загрязнение/песок)
+    WheelRailAdhesion& getAdhesion();
+
+    /// Система пескоподачи (бункер, форсунки, автоматика)
+    SandSystem& getSand();
+
+    /// Система тормозных колодок (нагрев/износ/fade)
+    BrakeShoeSystem& getBrakeShoes();
+
+    /// Учёт электроэнергии и статистика рейса
+    EnergyMeterSystem& getEnergy();
+
+    /// Токоприёмник (контакт с КС, дуги)
+    PantographSystem& getPantograph();
+
+    /// Деповское питание 380 В и аккумуляторная батарея
+    DepotPowerSystem& getDepotPower();
+
+    /// Интерактивная сцепка (рукава, краны, рычаг СА-3)
+    CouplingInteraction& getCouplingInteraction();
+
+    /// Ветер для токоприёмника (от погоды)
+    void applyWindToPantograph(double wind_speed);
+
+    /// Собрать физические звуковые события ПЕ с последнего опроса
+    /// (мост физика -> аудиосистема)
+    void collectSoundEvents(std::vector<SoundEvent>& out);
+
+    /// Лобовое стекло кабины (грязь/дворники/омыватель/лёд)
+    WindshieldSystem& getWindshield();
+
+    /// Физическая реакция машиниста (камера на физике кузова)
+    CameraMotionFromPhysics& getCameraMotion();
+
+    /// Реестр интерактивных элементов кабины (подсказки Alt)
+    CabInteractionRegistry& getCabInteraction();
+
+    /// Грузовая система вагона (погрузка/разгрузка с изменением массы)
+    CargoSystem& getCargo();
+
+    /// Пассажирская система вагона (посадка/высадка)
+    PassengerSystem& getPassengers();
+
+    /// Система снабжения (заправка топливом/маслом/ОЖ/песком на / стоянке через колонки депо/ПТО)
+    ServiceSystem& getService();
+
+    /// Конденсат и лёд в пневматической системе (точка росы, влага,
+    /// замерзание, слив; тормозная волна деградирует при льде)
+    CondensateSystem& getCondensate();
+
+    /// Износ колёсных пар (пробег/тоннаж/боксование/торможения -> / профиль -> коничность -> виляние)
+    WheelWearSystem& getWheelWear();
+
+    /// Аэродинамика тоннеля ("воздушный поршень"; зоны тоннелей
+    /// маршрута загружает модель через setZones)
+    TunnelAerodynamics& getTunnel();
+
+    /// Противоюзная система WSP (модуляция тормозного момента осей)
+    WSPSystem& getWSP();
+
+    /// Обточка колёсных пар в депо: сброс ползунов + уменьшение
+    /// диаметра от износа
+    void reprofileWheels();
+
+    /// Интенсивность осадков (от погоды, для стекла)
+    void setRainIntensity(double intensity);
+
+    /// Уровень детализации симуляции ПЕ:
+    /// L0 полный; L1 пропускает дорогие визуальные/тепловые подсистемы;
+    /// L2 только продольная модель; L3 заморозка
+    void setSimulationLOD(perf::SimLOD lod);
+    perf::SimLOD getSimulationLOD() const;
+
+    /// Группа СМЕ (0 - не в СМЕ)
+    int getSMEGroup() const;
+
+    /// Текущие управляющие сигналы (для передачи по СМЕ)
+    const control_signals_t& getControlSignalsRef() const;
+
+    /// Головной локомотив СМЕ
+    bool isSMELead() const;
+
+    /// Источник питания КС: (пикетаж, ток) -> состояние питания
+    void setCatenaryFeed(std::function<catenary::FeedState(double, double)> fn);
+
+    /// Сколько сеть готова принять рекуперации от этой ПЕ, Вт
+    /// (считается моделью: подстанция + потребители секции)
+    void setRegenAcceptance(double accept_w, bool accepted);
+
+    /// Источник питания КС привязан
+    bool getCatenaryFeedActive() const;
+
+    /// Ремонт: сброс повреждений и последствий аварии
+    void repair();
+
+    /// Высота центра масс над уровнем осей колёсных пар, м
+    double getMassCenterHeight() const;
+
+    /// Продольное смещение центра масс от середины ПЕ, м
+    /// (положительное - к переду поезда)
+    double getMassCenterLongitudinal() const;
+
+    /// Поперечное смещение центра масс, м (положительное - вправо)
+    double getMassCenterLateral() const;
 
     void setVelocity(double value);
 
@@ -300,6 +516,194 @@ protected:
     /// Position at world and on railway
     profile_point_t profile_point_data = profile_point_t();
 
+    /// Коллайдеры ПЕ (кузов, тележки, колёсные пары)
+    VehicleCollision colliders;
+
+    /// Вертикальная динамика ПС (неровности пути -> подвеска -> кузов)
+    VehicleVerticalDynamics vertical_dynamics;
+
+    /// Поперечная динамика ПС (виляние, коничность, крип, Y/Q)
+    VehicleLateralDynamics lateral_dynamics;
+
+    /// Система схода с рельсов
+    VehicleDerailment derailment;
+
+    /// Компонентные повреждения (сцепки/ходовая/колёса/тормоза/кузов/
+    /// электро/силовая/ёмкости), 0..1 каждый
+    VehicleDamageSystem damage_system;
+
+    /// Опасный груз: утечки, пожар, взрыв
+    VehicleHazard hazard;
+
+    /// Ползуны колёсных пар
+    WheelFlatSystem flat_spots;
+
+    /// Сцепление колёс с рельсами (погода, загрязнение, самоочистка)
+    WheelRailAdhesion adhesion;
+
+    /// Пескоподача
+    SandSystem sand;
+
+    /// Тормозные колодки
+    BrakeShoeSystem brake_shoes;
+
+    /// Учёт электроэнергии (электровозы)
+    EnergyMeterSystem energy;
+
+    /// Токоприёмник
+    PantographSystem pantograph;
+
+    /// Деповское питание и АБ
+    DepotPowerSystem depot_power;
+
+    /// Система многих единиц: группа и роль (секция [SME])
+    int sme_group = 0;
+    bool sme_lead = false;
+
+    /// Интерактивная сцепка/рукава/краны
+    CouplingInteraction coupling_interaction;
+
+    /// Лобовое стекло кабины
+    WindshieldSystem windshield;
+
+    /// Реакция тела машиниста
+    CameraMotionFromPhysics camera_motion;
+
+    /// Реестр интерактивной кабины
+    CabInteractionRegistry cab_interaction;
+
+    /// Груз
+    CargoSystem cargo;
+
+    /// Пассажиры
+    PassengerSystem passengers;
+
+    /// Система снабжения (колонки депо/ПТО)
+    ServiceSystem service_system;
+
+    /// Конденсат/лёд пневмосистемы
+    CondensateSystem condensate_system;
+
+    /// Износ колёсных пар
+    WheelWearSystem wheel_wear;
+
+    /// Аэродинамика тоннеля
+    TunnelAerodynamics tunnel_aero;
+
+    /// Противоюзная система: модуляция
+    /// тормозного момента осей при юзе, множитель применяется при
+    /// чтении Q_r в ОДУ без мутации самого Q_r
+    WSPSystem wsp;
+
+    /// Источник возвышения наружного рельса, мм (топология через
+    /// контроллер ПЕ); пусто - возвышения нет
+    std::function<double(double)> cant_source;
+
+    /// Возвышение наружного рельса под центром ПЕ последнего шага, мм
+    double rail_cant_mm = 0.0;
+
+    /// Локальные часы ПЕ (время симуляции последнего шага), с - для
+    /// кулдаунов звуковых событий
+    double sim_clock = 0.0;
+
+    /// Кулдауны звуковых событий по типам (индекс - SoundEventType):
+    /// подавление спама, подготовка к аудио-потребителю. last - время
+    /// последнего отправленного события типа
+    double sound_event_last_time[10] = {};
+
+    /// Интенсивность осадков от погоды
+    double rain_intensity = 0.0;
+
+    /// Продольное ускорение (для реакции машиниста), м/с^2
+    double longitudinal_accel = 0.0;
+    double prev_velocity = 0.0;
+
+    /// База ЦМ из конфига (груз добавляет сдвиг сверху)
+    double mass_center_longitudinal_base = 0.0;
+    double mass_center_lateral_base = 0.0;
+
+    /// Уровень детализации симуляции
+    perf::SimLOD sim_lod = perf::SimLOD::L0_Full;
+
+    /// Аккумуляторы адаптивных частот (п.4): термо 10 Гц, износ 5 Гц
+    double thermal_accum = 0.0;
+    double wear_accum = 0.0;
+
+    /// Скорость ветра от погоды (токоприёмник)
+    double wind_speed_for_pantograph = 0.0;
+
+    /// Параметры ветровой нагрузки на кузов (секция [WindLoad], /// "43-47"): боковая площадь, Cd, плотность воздуха,
+    /// детерминированные порывы и высота приложения силы
+    bool wind_load_enabled = true;
+    double wind_lateral_area = 0.0;   ///< 0 - автоматически length * 3.7
+    double wind_drag_coeff = 1.1;
+    double wind_air_density = 1.225;
+    double wind_gust_period = 37.0;   ///< период порыва, с
+    double wind_gust_min = 0.6;       ///< минимум модуля порыва (доля)
+    double wind_app_height = 1.8;     ///< высота приложения, м
+
+    /// Счётчики для детекта новых событий между опросами
+    unsigned long last_flat_impacts = 0;
+    unsigned long last_panto_arcs = 0;
+    unsigned long last_joint_impacts = 0;  ///< стуки осей на стыках
+    double prev_coupler_fwd = 0.0;         ///< сила сцепки на прошлом опросе, Н
+    double prev_coupler_bwd = 0.0;
+
+    /// Источник питания КС (привязывается моделью)
+    std::function<catenary::FeedState(double, double)> catenary_feed;
+
+    /// Проезд нейтральной вставки под током уже зафиксирован (на ПЕ)
+    bool neutral_fault_reported = false;
+
+    /// Приём рекуперации сетью (считается моделью по секции), Вт
+    double regen_accept_w = 0.0;
+    bool regen_accepted = false;
+
+    /// Сила тяги/торможения на ободе последнего шага ОДУ (для учёта
+    /// энергии: P = F*v)
+    double last_wheel_traction = 0.0;
+
+    /// Применять fade колодок к реактивным (тормозным) моментам ПЕ.
+    /// Локомотивам с электротормозом - выключить и использовать
+    /// getAxleEfficiency в пневматической части
+    bool brake_shoes_apply_reactive = true;
+
+    /// Множитель тормозного момента оси от fade колодок
+    /// (температура/износ), применяется при чтении Q_r в ОДУ
+    std::vector<double> brake_fade_eff = {1.0};
+
+    /// Центр масс: высота над осями, м
+    double mass_center_height = 1.8;
+    /// Продольное смещение от середины ПЕ, м (+ к переду)
+    double mass_center_longitudinal = 0.0;
+    /// Поперечное смещение, м (+ вправо)
+    double mass_center_lateral = 0.0;
+
+    /// Статическое распределение нагрузки по осям от продольного
+    /// смещения центра масс (сумма множителей = num_axis)
+    std::vector<double> axle_load_share;
+
+    /// ПЕ в аварийном состоянии после столкновения с препятствием
+    bool is_collided = false;
+
+    /// Повреждение кузова (0.0 - цел, 1.0 - разрушен)
+    float body_damage = 0.0f;
+    /// Повреждение ходовой части (0.0 - цела, 1.0 - разрушена)
+    float bogie_damage = 0.0f;
+    /// Энергия удара, разрушающая кузов, Дж
+    double body_damage_threshold = 10.0e6;
+    /// Энергия удара, разрушающая ходовую, Дж
+    double bogie_damage_threshold = 3.0e6;
+    /// Коэффициент доп. сопротивления от повреждений (доля от веса)
+    double damage_resist_coeff = 0.05;
+
+    /// Накопление повреждений от контакта коллайдера
+    void applyCollisionDamage(const collision::CollisionEvent& event);
+
+    /// Пересчёт статического распределения нагрузки по осям
+    /// по продольному смещению центра масс
+    void calcAxleLoadShare();
+
     /// Direction relative to train: 1 - co-directional, -1 - reversed
     std::int8_t dir = 1;
 
@@ -399,6 +803,10 @@ private:
 
     /// Default configuration load
     void loadConfiguration(QString cfg_path);
+
+    /// Пересчёт боковой ветровой нагрузки на кузов и подача её в
+    /// поперечную динамику (детерминированные порывы по времени)
+    void updateWindLoad(double time_s);
 
     /// Load main resistence coefficients
     void loadMainResist(QString cfg_path, QString main_resist_cfg);

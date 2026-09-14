@@ -26,6 +26,9 @@
 //------------------------------------------------------------------------------
 void VL60pk::slotAutoStart()
 {
+    if (autostart_mode != AUTOSTART_ON)
+        return;
+
     if (start_count < triggers.size())
     {
         if ((triggers[start_count] == &gv_tumbler[autostart_cab]) &&
@@ -53,6 +56,7 @@ void VL60pk::slotAutoStart()
     {
         autoStartTimer->stop();
         start_count = 0;
+        autostart_mode = AUTOSTART_IDLE;
         controller[autostart_cab]->setReversHandlePos(REVERS_FORWARD);
 
         controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
@@ -67,6 +71,41 @@ void VL60pk::slotAutoStart()
             autopilot_switcher[autostart_cab].set();
             //autopilot_switcher[CAB2].set();
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60pk::slotAutoStop()
+{
+    if (autostart_mode != AUTOSTART_OFF)
+        return;
+
+    if (start_count < triggers.size())
+    {
+        triggers[triggers.size() - 1 - start_count]->reset();
+        start_count++;
+    }
+    else
+    {
+        autoStartTimer->stop();
+        start_count = 0;
+        autostart_mode = AUTOSTART_IDLE;
+
+        controller[autostart_cab]->setReversHandlePos(REVERS_ZERO);
+
+        // Отключаем ЭПК, ключ остаётся в замке
+        epk[autostart_cab]->setKeyOn(false);
+
+        controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        controller[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
+        brake_lock[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        brake_lock[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
+        epk[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        epk[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
+
+        autopilot_switcher[autostart_cab].reset();
     }
 }
 

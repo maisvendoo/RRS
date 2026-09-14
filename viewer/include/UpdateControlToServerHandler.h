@@ -20,12 +20,19 @@ public:
     void apply(vsg::KeyReleaseEvent& keyRelease) override;
     void apply(vsg::FocusInEvent& focusIn) override;
     void apply(vsg::FocusOutEvent& focusOut) override;
+    void apply(vsg::FrameEvent& frame) override;
     void changeCurrentVehicle(int current_idx, int controlled_idx, int cabine_idx);
     void setNeedDebugMsg(bool is_needed);
 
     void setSpeedFactor(int speed_factor);
 
+    /// Подавить пересылку управляющих клавиш на сервер (пешая ходьба, / : WASD/Space/E управляют игроком, а не поездом).
+    /// Включение сбрасывает накопленные нажатия и шлёт пустое управление
+    void setControlSuppressed(bool suppressed);
+
 private:
+
+    double _last_resend_time = 0.0;
 
     void sendControlToServer();
     void sendEmptyControlToServer();
@@ -36,7 +43,9 @@ private:
     std::uint16_t _controlled_idx = 0;
     std::uint16_t _controlled_cabine_idx = 0;
     bool _is_needed_debug_msg = false;
+    bool _is_control_suppressed = false;
     std::set<std::uint16_t> _pressed_keys = {};
+
 };
 
 #endif // UPDATE_CONTROL_TO_SERVER_HANDLER_H

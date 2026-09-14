@@ -7,7 +7,10 @@
 #include <autopilot-timetable.h>
 #include <VehicleExterior.h>
 
+#include <vsg/lighting/SpotLight.h>
+
 #include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec3.h>
 #include <vsg/nodes/Group.h>
 
 #include <QObject>
@@ -15,6 +18,7 @@
 
 #include <array>
 #include <atomic>
+#include <mutex>
 #include <vector>
 
 struct settings_t;
@@ -25,7 +29,13 @@ class QByteArray;
 namespace vsg
 {
     class Options;
+
     class Viewer;
+}
+
+namespace graphics
+{
+    class ParticleSystem;
 }
 
 //------------------------------------------------------------------------------
@@ -55,6 +65,34 @@ public:
 
     QString getDebugMessage() const noexcept;
 
+    /// Дальность видимости по погоде, м
+    double getWeatherVisibility() const noexcept;
+
+    /// Плотность тумана по погоде, 1/м
+    double getWeatherFogDensity() const noexcept;
+
+    /// Тип погоды для эффектов рендера: значения
+    /// согласованы с weather::Type (simulator/weather/include/
+    /// weather-system.h); 0 — старый сервер без данных о погоде
+    quint8 getWeatherType() const noexcept;
+
+    /// Ветер для систем частиц, м/с (мировой вектор). При отсутствии
+    /// данных о погоде (старый сервер/штиль) — константа 2 м/с
+    vsg::dvec3 getWindVector() const noexcept;
+
+    /// Идёт дождь/ливень (брызги из-под колёс)
+    bool isRainWeather() const noexcept;
+
+    /// Предупреждение кассеты регистрации: номер
+    /// растёт при каждом новом сообщении ("Запись параметров
+    /// движения начата/окончена")
+    quint32 getCassetteNoticeId() const noexcept;
+    QString getCassetteNotice() const noexcept;
+
+    /// Снимок диагностики составов:
+    /// копия последнего полученного снимка для окна F3/F4
+    simulator_diagnostics_update_t getDiagnostics() const noexcept;
+
     void step(double t, double dt);
 
     bool selectNextTrain() noexcept;
@@ -65,6 +103,12 @@ public:
     bool selectControlVehicle() noexcept;
     bool returnToControlledVehicle() noexcept;
 
+    /// Выбор ПЕ по индексу (вход в кабину в пешем режиме)
+    bool selectVehicle(int idx) noexcept;
+
+    /// Число загруженных ПЕ
+    int getVehiclesCount() const noexcept;
+
     bool load(
         QByteArray& data,
         const settings_t& settings,
@@ -72,6 +116,21 @@ public:
     );
 
     void set_camera_pos(const vsg::dvec3* camera_pos) noexcept { this->camera_pos = camera_pos; }
+
+    /// Динамический свет фар (/динамический свет, High+):
+    /// SpotLight создаётся RouteViewer при инициализации (до
+    /// viewer->compile()), здесь хранится и обновляется по осям
+    /// управляемой ПЕ в step(). intensity — «запечённая» яркость
+    /// пресета (гасится в ноль при выключенных фарах)
+    void set_headlight(vsg::ref_ptr<vsg::SpotLight> light, float intensity) noexcept;
+
+    /// Вкл/выкл фар (TODO: мост к реальному тумблеру ПЕ)
+    void setHeadlightsEnabled(bool enabled) noexcept;
+
+    /// Системы частиц (High+): дым/пар из выхлопной трубы и брызги
+    /// из-под колёс. Создаются RouteViewer, обновляются в step()
+    void set_particle_systems(graphics::ParticleSystem* smoke,
+                              graphics::ParticleSystem* splash) noexcept;
 
     /// Получить данные о графике движения, если таковые имеются в текущей ПЕ
     autopilot_timetable_t getTimetable()
@@ -88,22 +147,32 @@ public:
         return timetable;
     }
 
+    VehicleExterior* getVehicle(int index);
+
 public slots:
     void slotGetTrainsData(QByteArray& data);
     void slotGetVehiclesPosData(QByteArray& data);
     void slotGetVehiclesStateData(QByteArray& data);
     void slotGetVehicleControlled(QByteArray& data);
+    void slotGetDiagnosticsData(QByteArray& data);
 
 signals:
     void updated();
 
     void sigSendVehicleControlCommand(const QByteArray &data);
 
+    void sigCurrentVehicleChanged(int newIndex, int oldIndex);
+
 private:
     void updateDebugString();
 
     /// Advance interpolation read head when client_time catches up
     void advanceInterpolation(double client_time);
+
+    /// Динамический свет и частицы (High+): фары
+    /// управляемой ПЕ, дым/пар из трубы и брызги из-под колёс
+    /// текущей ПЕ. Вызывается из step() после интерполяции осей
+    void updateVehicleEffects(double dt, const simulator_update_pos_t& frame);
 
 private:
     SoundManager* sound_manager;
@@ -122,6 +191,51 @@ private:
     std::atomic<double> ref_time{0.0};
     std::atomic<double> time_difference{0.0};
     double settings_delay = 0.17;
+
+    /// Погода от симулятора: пишется сетевым
+    /// потоком из pos-обновления, читается кадром для far plane/тумана
+    std::atomic<double> weather_visibility{10000.0};
+    std::atomic<double> weather_fog_density{0.0};
+
+    /// Погода для эффектов рендера: тип (коды
+    /// weather::Type), интенсивность и ветер. 0/штиль — старый сервер
+    /// без данных; getWindVector() тогда даёт константу 2 м/с
+    std::atomic<quint8> weather_type{0};
+    std::atomic<double> weather_wind_speed{0.0};
+    std::atomic<double> weather_wind_direction{0.0};
+
+    /// Динамический свет фар (High+; null на Legacy/Low)
+    vsg::ref_ptr<vsg::SpotLight> headlight;
+    float headlight_intensity = 0.0f;
+    bool headlights_enabled = true;
+
+    /// Системы частиц (High+; null на Legacy/Low)
+    graphics::ParticleSystem* smoke_particles = nullptr;
+    graphics::ParticleSystem* splash_particles = nullptr;
+
+    /// Длина каждой ПЕ (м) из info-пакета: позиция фар и колёсных пар
+    std::vector<double> vehicle_lengths;
+
+    /// Накопитель частоты спавна (частицы/с, дробное до целого)
+    double smoke_emit_accum = 0.0;
+    double splash_emit_accum = 0.0;
+
+    /// Предупреждение кассеты: id атомарный (фронт),
+    /// текст под мьютексом
+    std::atomic<quint32> cassette_notice_id{0};
+    QString cassette_notice;
+    mutable std::mutex notice_mutex;
+
+    /// Физические звуковые события: сетевой поток
+    /// складывает, кадр разбирает в пул SoundManager (OpenAL-контекст
+    /// живёт в потоке рендера)
+    std::mutex sound_events_mutex;
+    std::vector<simulator_sound_event_t> pending_sound_events;
+
+    /// Диагностика составов (F3/F4): двойной буфер
+    simulator_diagnostics_update_t diagnostics_front;
+    simulator_diagnostics_update_t diagnostics_back;
+    std::atomic<bool> is_new_diagnostics{false};
 
     /// Data about trains, received from server
     simulator_trains_update_t update_trains;
@@ -149,11 +263,17 @@ private:
     /// Debug message for current and controlled vehicles from server
     QString debug_message;
 
+public:
+    /// Info about vehicles exterior
+    std::vector<VehicleExterior> vehicles;
+
+private:
     /// Train exterior scene group
     vsg::ref_ptr<vsg::Group> vehicles_node = vsg::Group::create();
 
-    /// Info about vehicles exterior
-    std::vector<VehicleExterior> vehicles;
+    int m_prevVehicleIndex = -1;
+
+    void notifyVehicleChanged();
 };
 
 #endif // VEHICLES_HANDLER_H
