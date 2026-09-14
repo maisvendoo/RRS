@@ -24,6 +24,8 @@ const   QString GraphSettingsWindow::NOTIFY_LEVEL = "NofifyLevel";
 const   QString GraphSettingsWindow::VIEW_DIST = "ViewDistance";
 const   QString GraphSettingsWindow::MAX_FPS = "MaxFPS";
 const   QString GraphSettingsWindow::PHYSICAL_DEVICE = "PhysicalDevice";
+const   QString GraphSettingsWindow::PHYSICAL_DEVICE_VENDOR_ID = "PhysicalDeviceVendorID";
+const   QString GraphSettingsWindow::PHYSICAL_DEVICE_DEVICE_ID = "PhysicalDeviceDeviceID";
 const   QString GraphSettingsWindow::SAMPLES = "Samples";
 const   QString GraphSettingsWindow::DEPTH_FORMAT = "depthFormat";
 const   QString GraphSettingsWindow::SHADOW = "Shadow";
@@ -441,6 +443,16 @@ void GraphSettingsWindow::applyGraphSettings(FieldsDataList &fd_list,
 
     findSetting(PHYSICAL_DEVICE, fd_list, idx);
     fd_list[idx] = QPair<QString, QVariant>(PHYSICAL_DEVICE, ui->cbListGPU->currentIndex());
+
+    int gpu_idx = ui->cbListGPU->currentIndex();
+    if (gpu_idx >= 0 && gpu_idx < static_cast<int>(gpus_info.size()))
+    {
+        findSetting(PHYSICAL_DEVICE_VENDOR_ID, fd_list, idx);
+        fd_list[idx] = QPair<QString, QVariant>(PHYSICAL_DEVICE_VENDOR_ID, static_cast<uint32_t>(gpus_info[gpu_idx].vendorID));
+
+        findSetting(PHYSICAL_DEVICE_DEVICE_ID, fd_list, idx);
+        fd_list[idx] = QPair<QString, QVariant>(PHYSICAL_DEVICE_DEVICE_ID, static_cast<uint32_t>(gpus_info[gpu_idx].deviceID));
+    }
 
     findSetting(WIN_DECOR, fd_list, idx);
     if (ui->cbWindowDecoration->checkState() == Qt::CheckState::Checked)
