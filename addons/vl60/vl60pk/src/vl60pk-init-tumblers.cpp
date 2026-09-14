@@ -142,14 +142,14 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         radio_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Цепи управления"
-        cu_tumbler[cab_idx].setKeySymbolOn(KEY_Y);
-        cu_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        cu_tumbler[cab_idx].setKeySymbolOff(KEY_Y);
-        cu_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        cu_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // cu_tumbler[cab_idx].setKeySymbolOn(KEY_Y);
+//         cu_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+//         cu_tumbler[cab_idx].setKeySymbolOff(KEY_Y);
+//         cu_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+//         cu_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Токоприемник задний"
-        pant2_tumbler[cab_idx].setKeySymbolOn(KEY_O);
+        /*pant2_tumbler[cab_idx].setKeySymbolOn(KEY_O);
         pant2_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
         pant2_tumbler[cab_idx].setKeySymbolOff(KEY_O);
         pant2_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
@@ -160,14 +160,14 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         pant1_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
         pant1_tumbler[cab_idx].setKeySymbolOff(KEY_I);
         pant1_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        pant1_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        pant1_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);*/
 
         // Триггер тумблера "Токоприемники"
-        pants_tumbler[cab_idx].setKeySymbolOn(KEY_U);
+        /*pants_tumbler[cab_idx].setKeySymbolOn(KEY_U);
         pants_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
         pants_tumbler[cab_idx].setKeySymbolOff(KEY_U);
         pants_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        pants_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        pants_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);*/
 
         // Триггер тумблера "ГВ вкл. Возврат защиты"
         gv_return_tumbler[cab_idx].setKeySymbolOn(KEY_P);
@@ -177,66 +177,66 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         gv_return_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "ГВ вкл/выкл"
-        gv_tumbler[cab_idx].setKeySymbolOn(KEY_P);
-        gv_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        gv_tumbler[cab_idx].setKeySymbolOff(KEY_P);
-        gv_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        gv_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // gv_tumbler[cab_idx].setKeySymbolOn(KEY_P);
+//         gv_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+//         gv_tumbler[cab_idx].setKeySymbolOff(KEY_P);
+//         gv_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+//         gv_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Ближний ряд тумблеров приборной панели машиниста
         // Триггер тумблера "Автоматическая подача песка"
         autosand_tumbler[cab_idx].setInitState(false);
 
         // Триггеры тумблеров "Вентилятор 1-6"
-        mv_tumblers[cab_idx][MV1].setKeySymbolOn(KEY_1);
-        mv_tumblers[cab_idx][MV1].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV1].setKeySymbolOff(KEY_1);
-        mv_tumblers[cab_idx][MV1].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV1].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // mv_tumblers[cab_idx][MV1].setKeySymbolOn(KEY_1);
+//         mv_tumblers[cab_idx][MV1].setKeyModifierOn(MODIFIER_OnlyShift);
+//         mv_tumblers[cab_idx][MV1].setKeySymbolOff(KEY_1);
+//         mv_tumblers[cab_idx][MV1].setKeyModifierOff(MODIFIER_OnlyControl);
+//         mv_tumblers[cab_idx][MV1].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        mv_tumblers[cab_idx][MV2].setKeySymbolOn(KEY_2);
-        mv_tumblers[cab_idx][MV2].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV2].setKeySymbolOff(KEY_2);
-        mv_tumblers[cab_idx][MV2].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV2].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // mv_tumblers[cab_idx][MV2].setKeySymbolOn(KEY_2);
+//         mv_tumblers[cab_idx][MV2].setKeyModifierOn(MODIFIER_OnlyShift);
+//         mv_tumblers[cab_idx][MV2].setKeySymbolOff(KEY_2);
+//         mv_tumblers[cab_idx][MV2].setKeyModifierOff(MODIFIER_OnlyControl);
+//         mv_tumblers[cab_idx][MV2].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        mv_tumblers[cab_idx][MV3].setKeySymbolOn(KEY_3);
-        mv_tumblers[cab_idx][MV3].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV3].setKeySymbolOff(KEY_3);
-        mv_tumblers[cab_idx][MV3].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV3].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // mv_tumblers[cab_idx][MV3].setKeySymbolOn(KEY_3);
+//         mv_tumblers[cab_idx][MV3].setKeyModifierOn(MODIFIER_OnlyShift);
+//         mv_tumblers[cab_idx][MV3].setKeySymbolOff(KEY_3);
+//         mv_tumblers[cab_idx][MV3].setKeyModifierOff(MODIFIER_OnlyControl);
+//         mv_tumblers[cab_idx][MV3].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        mv_tumblers[cab_idx][MV4].setKeySymbolOn(KEY_4);
-        mv_tumblers[cab_idx][MV4].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV4].setKeySymbolOff(KEY_4);
-        mv_tumblers[cab_idx][MV4].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV4].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // mv_tumblers[cab_idx][MV4].setKeySymbolOn(KEY_4);
+//         mv_tumblers[cab_idx][MV4].setKeyModifierOn(MODIFIER_OnlyShift);
+//         mv_tumblers[cab_idx][MV4].setKeySymbolOff(KEY_4);
+//         mv_tumblers[cab_idx][MV4].setKeyModifierOff(MODIFIER_OnlyControl);
+//         mv_tumblers[cab_idx][MV4].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        mv_tumblers[cab_idx][MV5].setKeySymbolOn(KEY_5);
-        mv_tumblers[cab_idx][MV5].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV5].setKeySymbolOff(KEY_5);
-        mv_tumblers[cab_idx][MV5].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV5].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // mv_tumblers[cab_idx][MV5].setKeySymbolOn(KEY_5);
+//         mv_tumblers[cab_idx][MV5].setKeyModifierOn(MODIFIER_OnlyShift);
+//         mv_tumblers[cab_idx][MV5].setKeySymbolOff(KEY_5);
+//         mv_tumblers[cab_idx][MV5].setKeyModifierOff(MODIFIER_OnlyControl);
+//         mv_tumblers[cab_idx][MV5].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        mv_tumblers[cab_idx][MV6].setKeySymbolOn(KEY_6);
-        mv_tumblers[cab_idx][MV6].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV6].setKeySymbolOff(KEY_6);
-        mv_tumblers[cab_idx][MV6].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV6].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // mv_tumblers[cab_idx][MV6].setKeySymbolOn(KEY_6);
+//         mv_tumblers[cab_idx][MV6].setKeyModifierOn(MODIFIER_OnlyShift);
+//         mv_tumblers[cab_idx][MV6].setKeySymbolOff(KEY_6);
+//         mv_tumblers[cab_idx][MV6].setKeyModifierOff(MODIFIER_OnlyControl);
+//         mv_tumblers[cab_idx][MV6].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Компрессор"
-        mk_tumbler[cab_idx].setKeySymbolOn(KEY_7);
-        mk_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        mk_tumbler[cab_idx].setKeySymbolOff(KEY_7);
-        mk_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        mk_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // mk_tumbler[cab_idx].setKeySymbolOn(KEY_7);
+//         mk_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+//         mk_tumbler[cab_idx].setKeySymbolOff(KEY_7);
+//         mk_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+//         mk_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Фазорасщепитель"
-        fr_tumbler[cab_idx].setKeySymbolOn(KEY_T);
-        fr_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        fr_tumbler[cab_idx].setKeySymbolOff(KEY_T);
-        fr_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        fr_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // fr_tumbler[cab_idx].setKeySymbolOn(KEY_T);
+//         fr_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+//         fr_tumbler[cab_idx].setKeySymbolOff(KEY_T);
+//         fr_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+//         fr_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Ряд тумблеров на приборной панели помощника машиниста
         // Триггер тумблера "Тифон"
@@ -249,11 +249,11 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         P_cab_heat_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Тусклое освещение кабины"
-        P_cab_light_low_tumbler[cab_idx].setKeySymbolOn(KEY_K);
-        P_cab_light_low_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        P_cab_light_low_tumbler[cab_idx].setKeySymbolOff(KEY_K);
-        P_cab_light_low_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        P_cab_light_low_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // P_cab_light_low_tumbler[cab_idx].setKeySymbolOn(KEY_K);
+//         P_cab_light_low_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+//         P_cab_light_low_tumbler[cab_idx].setKeySymbolOff(KEY_K);
+//         P_cab_light_low_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+//         P_cab_light_low_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Яркое освещение кабины"
         P_cab_light_high_tumbler[cab_idx].setKeySymbolOn(KEY_K);
@@ -269,25 +269,25 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         P_light_chassis_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Освещение приборов"
-        P_light_devices_tumbler[cab_idx].setKeySymbolOn(KEY_L);
-        P_light_devices_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        P_light_devices_tumbler[cab_idx].setKeySymbolOff(KEY_L);
-        P_light_devices_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        P_light_devices_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // P_light_devices_tumbler[cab_idx].setKeySymbolOn(KEY_L);
+//         P_light_devices_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+//         P_light_devices_tumbler[cab_idx].setKeySymbolOff(KEY_L);
+//         P_light_devices_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+//         P_light_devices_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Фонарь левый буферный"
-        P_bufferlight_L_tumbler[cab_idx].setKeySymbolOn(KEY_G);
-        P_bufferlight_L_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        P_bufferlight_L_tumbler[cab_idx].setKeySymbolOff(KEY_G);
-        P_bufferlight_L_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        P_bufferlight_L_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // P_bufferlight_L_tumbler[cab_idx].setKeySymbolOn(KEY_G);
+//         P_bufferlight_L_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+//         P_bufferlight_L_tumbler[cab_idx].setKeySymbolOff(KEY_G);
+//         P_bufferlight_L_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+//         P_bufferlight_L_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Фонарь правый буферный"
-        P_bufferlight_R_tumbler[cab_idx].setKeySymbolOn(KEY_J);
-        P_bufferlight_R_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        P_bufferlight_R_tumbler[cab_idx].setKeySymbolOff(KEY_J);
-        P_bufferlight_R_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        P_bufferlight_R_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // P_bufferlight_R_tumbler[cab_idx].setKeySymbolOn(KEY_J);
+//         P_bufferlight_R_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+//         P_bufferlight_R_tumbler[cab_idx].setKeySymbolOff(KEY_J);
+//         P_bufferlight_R_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+//         P_bufferlight_R_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера в резерве
         P_reserv2_tumbler[cab_idx].setInitState(false);
@@ -332,11 +332,11 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         rb[cab_idx][RBP].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Тумблер ЭПТ
-        epb_switch[cab_idx].setKeySymbolOn(KEY_V);
-        epb_switch[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        epb_switch[cab_idx].setKeySymbolOff(KEY_V);
-        epb_switch[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        epb_switch[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // epb_switch[cab_idx].setKeySymbolOn(KEY_V);
+//         epb_switch[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+//         epb_switch[cab_idx].setKeySymbolOff(KEY_V);
+//         epb_switch[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+//         epb_switch[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Тумблер "Маневровый/Поездной"
         tumbler_shunting_mode[cab_idx].setKeySymbolOn(KEY_Tilde);

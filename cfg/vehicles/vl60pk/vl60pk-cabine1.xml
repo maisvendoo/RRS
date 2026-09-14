@@ -1,30 +1,339 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Config>
-	
-	<!-- Кабина 1 -->
-	
-	<!-- Токоприемники -->
-	<Control>
-		<ID>100</ID>
-		<value>0.0</value>
-		<KeyName>KEY_U</KeyName>
-		<ObjectName>Cab1_Tumbler_Pnt</ObjectName>
-	</Control>
-
-	<!-- Токоприемник передний -->
-	<Control>
-		<ID>101</ID>
-		<value>0.0</value>
-		<KeyName>KEY_I</KeyName>
-		<ObjectName>Cab1_Tumbler_Pnt1</ObjectName>
-	</Control>
-
-	<!-- Токоприемник задний -->
-	<Control>
-		<ID>102</ID>
-		<value>0.0</value>
-		<KeyName>KEY_O</KeyName>
-		<ObjectName>Cab1_Tumbler_Pnt2</ObjectName>
-	</Control>	
-
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<Control>
+		<ID>100</ID>
+		<value>0.0</value>
+		<KeyName>KEY_U</KeyName>
+		<ObjectName>Cab1_Tumbler_Pnt</ObjectName>
+		<Name>Токоприёмники (общий)</Name>
+		<Type>Toggle</Type>
+		<SignalID>67</SignalID>
+	</Control>
+
+	<Control>
+		<ID>101</ID>
+		<value>0.0</value>
+		<KeyName>KEY_I</KeyName>
+		<ObjectName>Cab1_Tumbler_Pnt1</ObjectName>
+		<Name>Токоприёмник передний</Name>
+		<Type>Toggle</Type>
+		<SignalID>65</SignalID>
+	</Control>
+
+	<Control>
+		<ID>102</ID>
+		<value>0.0</value>
+		<KeyName>KEY_O</KeyName>
+		<ObjectName>Cab1_Tumbler_Pnt2</ObjectName>
+		<Name>Токоприёмник задний</Name>
+		<Type>Toggle</Type>
+		<SignalID>66</SignalID>
+	</Control>
+
+	<Control>
+		<ID>103</ID>
+		<value>0.0</value>
+		<KeyName>KEY_Y</KeyName>
+		<ObjectName>Cab1_Tumbler_CU</ObjectName>
+		<Name>Цепи управления</Name>
+		<Type>Toggle</Type>
+		<SignalID>64</SignalID>
+	</Control>
+
+	<Control>
+		<ID>104</ID>
+		<value>0.0</value>
+		<KeyName>KEY_P</KeyName>
+		<ObjectName>Cab1_Tumbler_GVon</ObjectName>
+		<Name>Главный выключатель (ГВ)</Name>
+		<Type>Toggle</Type>
+		<SignalID>69</SignalID>
+	</Control>
+
+	<Control>
+		<ID>105</ID>
+		<value>0.0</value>
+		<ObjectName>Cab1_Tumbler_GVonoff</ObjectName>
+		<Name>Возврат защиты ГВ</Name>
+		<Type>Button</Type>
+		<SignalID>68</SignalID>
+	</Control>
+
+	<Control>
+		<ID>106</ID>
+		<value>0.0</value>
+		<KeyName>KEY_T</KeyName>
+		<ObjectName>Cab1_Tumbler_FR</ObjectName>
+		<Name>Фазорасщепитель</Name>
+		<Type>Toggle</Type>
+		<SignalID>79</SignalID>
+	</Control>
+
+	<Control>
+		<ID>107</ID>
+		<value>0.0</value>
+		<KeyName>KEY_7</KeyName>
+		<ObjectName>Cab1_Tumbler_MK</ObjectName>
+		<Name>Мотор-компрессор</Name>
+		<Type>Toggle</Type>
+		<SignalID>78</SignalID>
+	</Control>
+
+	<Control>
+		<ID>108</ID>
+		<value>0.0</value>
+		<KeyName>KEY_1</KeyName>
+		<ObjectName>Cab1_Tumbler_MV1</ObjectName>
+		<Name>Мотор-вентилятор 1</Name>
+		<Type>Toggle</Type>
+		<SignalID>77</SignalID>
+	</Control>
+
+	<Control>
+		<ID>109</ID>
+		<value>0.0</value>
+		<KeyName>KEY_2</KeyName>
+		<ObjectName>Cab1_Tumbler_MV2</ObjectName>
+		<Name>Мотор-вентилятор 2</Name>
+		<Type>Toggle</Type>
+		<SignalID>76</SignalID>
+	</Control>
+
+	<Control>
+		<ID>110</ID>
+		<value>0.0</value>
+		<KeyName>KEY_3</KeyName>
+		<ObjectName>Cab1_Tumbler_MV3</ObjectName>
+		<Name>Мотор-вентилятор 3</Name>
+		<Type>Toggle</Type>
+		<SignalID>75</SignalID>
+	</Control>
+
+	<Control>
+		<ID>111</ID>
+		<value>0.0</value>
+		<KeyName>KEY_4</KeyName>
+		<ObjectName>Cab1_Tumbler_MV4</ObjectName>
+		<Name>Мотор-вентилятор 4</Name>
+		<Type>Toggle</Type>
+		<SignalID>74</SignalID>
+	</Control>
+
+	<Control>
+		<ID>112</ID>
+		<value>0.0</value>
+		<KeyName>KEY_5</KeyName>
+		<ObjectName>Cab1_Tumbler_MV5</ObjectName>
+		<Name>Мотор-вентилятор 5</Name>
+		<Type>Toggle</Type>
+		<SignalID>73</SignalID>
+	</Control>
+
+	<Control>
+		<ID>113</ID>
+		<value>0.0</value>
+		<KeyName>KEY_6</KeyName>
+		<ObjectName>Cab1_Tumbler_MV6</ObjectName>
+		<Name>Мотор-вентилятор 6</Name>
+		<Type>Toggle</Type>
+		<SignalID>72</SignalID>
+	</Control>
+
+	<Control>
+		<ID>114</ID>
+		<value>0.0</value>
+		<KeyName>KEY_V</KeyName>
+		<ObjectName>Cab1_ept_onOff</ObjectName>
+		<Name>ЭПТ (электропневматическое торможение)</Name>
+		<Type>Toggle</Type>
+		<SignalID>70</SignalID>
+	</Control>
+
+	<Control>
+		<ID>115</ID>
+		<value>0.0</value>
+		<KeyName>KEY_K</KeyName>
+		<ObjectName>Cab1_Tumbler_svet1</ObjectName>
+		<Name>Освещение кабины (тусклое)</Name>
+		<Type>Toggle</Type>
+		<SignalID>83</SignalID>
+	</Control>
+
+	<Control>
+		<ID>116</ID>
+		<value>0.0</value>
+		<ObjectName>Cab1_Tumbler_svet2</ObjectName>
+		<Name>Освещение кабины (яркое)</Name>
+		<Type>Toggle</Type>
+		<SignalID>84</SignalID>
+	</Control>
+
+	<Control>
+		<ID>117</ID>
+		<value>0.0</value>
+		<KeyName>KEY_L</KeyName>
+		<ObjectName>Cab1_Tumbler_svetPribor</ObjectName>
+		<Name>Освещение приборов</Name>
+		<Type>Toggle</Type>
+		<SignalID>87</SignalID>
+	</Control>
+
+	<Control>
+		<ID>118</ID>
+		<value>0.0</value>
+		<KeyName>KEY_G</KeyName>
+		<ObjectName>Cab1_Tumbler_buferL</ObjectName>
+		<Name>Буферные фонари слева</Name>
+		<Type>Toggle</Type>
+		<SignalID>88</SignalID>
+	</Control>
+
+	<Control>
+		<ID>119</ID>
+		<value>0.0</value>
+		<KeyName>KEY_J</KeyName>
+		<ObjectName>Cab1_Tumbler_buferR</ObjectName>
+		<Name>Буферные фонари справа</Name>
+		<Type>Toggle</Type>
+		<SignalID>89</SignalID>
+	</Control>
+
+	<Control>
+		<ID>120</ID>
+		<value>0.0</value>
+		<ObjectName>Cab1_Tumbl_BF-color_L</ObjectName>
+		<Name>Буферные фонари слева: белый/красный</Name>
+		<Type>Toggle</Type>
+		<SignalID>92</SignalID>
+	</Control>
+
+	<Control>
+		<ID>121</ID>
+		<value>0.0</value>
+		<ObjectName>Cab1_Tumbl_BF-color_R</ObjectName>
+		<Name>Буферные фонари справа: белый/красный</Name>
+		<Type>Toggle</Type>
+		<SignalID>93</SignalID>
+	</Control>
+
+	<Control>
+		<ID>130</ID>
+		<value>0.0</value>
+		<ObjectName>Cab1_Kran395-ruk</ObjectName>
+		<Name>Кран машиниста 395</Name>
+		<Type>Crane395</Type>
+		<SignalID>57</SignalID>
+		<StateMode>norm</StateMode>
+		<StateNames>I - зарядка и отпуск;II - поездное;III - перекрыша без питания;IV - перекрыша с питанием;Va - торможение замедленным темпом;V - служебное торможение;VI - экстренное торможение</StateNames>
+	</Control>
+
+	<Control>
+		<ID>131</ID>
+		<value>0.0</value>
+		<ObjectName>Cab1_Kran254-ruk</ObjectName>
+		<Name>Кран вспомогательный 254</Name>
+		<Type>Crane254</Type>
+		<SignalID>58</SignalID>
+	</Control>
+
+	<Control>
+		<ID>132</ID>
+		<value>0.0</value>
+		<ObjectName>Cab1_Kontroller</ObjectName>
+		<Name>Контроллер машиниста (КМЭ)</Name>
+		<Type>KM</Type>
+		<SignalID>53</SignalID>
+		<StateMode>kme</StateMode>
+	</Control>
+
+	<Control>
+		<ID>133</ID>
+		<value>0.0</value>
+		<ObjectName>Cab1_revers</ObjectName>
+		<Name>Реверсивная рукоятка</Name>
+		<Type>Revers</Type>
+		<SignalID>52</SignalID>
+		<SignalID2>51</SignalID2>
+		<StateMode>centered</StateMode>
+		<StateNames>Назад;Нейтраль;Вперёд</StateNames>
+	</Control>
+
+	<Control>
+		<ID>135</ID>
+		<value>0.0</value>
+		<ObjectName>Cab1_Kluch_367</ObjectName>
+		<Name>Блокировочный ключ 367</Name>
+		<Type>Lock367</Type>
+		<SignalID>55</SignalID>
+		<SignalID2>54</SignalID2>
+	</Control>
+
+	<Control>
+		<ID>136</ID>
+		<value>0.0</value>
+		<ObjectName>Cab1_Kran_kombin</ObjectName>
+		<Name>Комбинированный кран</Name>
+		<Type>Lever</Type>
+		<SignalID>56</SignalID>
+		<StateMode>centered</StateMode>
+		<StateNames>Двойная тяга;Поездное;Экстренное торможение</StateNames>
+	</Control>
+
+	<Control>
+		<ObjectName>Cab1_Tumbler_tifon</ObjectName>
+		<Name>Тифон</Name>
+		<Type>Gauge</Type>
+		<SignalID>80</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>Cab1_Tumbler_svistok</ObjectName>
+		<Name>Свисток</Name>
+		<Type>Gauge</Type>
+		<SignalID>81</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>Cab1_Tumbler_pechi1</ObjectName>
+		<Name>Обогрев кабины</Name>
+		<Type>Gauge</Type>
+		<SignalID>82</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>Cab1_Tumbler_APP</ObjectName>
+		<Name>АЛСН (APP)</Name>
+		<Type>Gauge</Type>
+		<SignalID>71</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>Cab1_Tumbler_alsn</ObjectName>
+		<Name>АЛСН</Name>
+		<Type>Gauge</Type>
+		<SignalID>91</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>Cab1_Knopka-RB-1</ObjectName>
+		<Name>Кнопка РБ (бдительность)</Name>
+		<Type>Gauge</Type>
+		<SignalID>95</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>Cab1_Knopka-RBS</ObjectName>
+		<Name>Кнопка РБС</Name>
+		<Type>Gauge</Type>
+		<SignalID>94</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>Cab1_Knopka-RBP</ObjectName>
+		<Name>Кнопка РБП</Name>
+		<Type>Gauge</Type>
+		<SignalID>96</SignalID>
+	</Control>
+
 </Config>
