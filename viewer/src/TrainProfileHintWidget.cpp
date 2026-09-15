@@ -880,7 +880,6 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     }
 
     // Подписи в шахматном порядке
-    float last_label_right[2] = {0.0f, 0.0f};
     int label_idx = 0;
     for (const auto& sl : limits)
     {
@@ -897,45 +896,32 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
         const float x0 = plot.map_x(c0);
         const float x1 = plot.map_x(c1);
 
-        // Пропускаем подпись для слишком короткого интервала (< 20 м)
-        const bool skip = (c1 - c0) < 20.0f;
+        const std::string label = std::to_string(static_cast<int>(sl.speed_kmh));
+        const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
 
-        if (!skip)
-        {
-            const std::string label = std::to_string(static_cast<int>(sl.speed_kmh));
-            const ImVec2 text_size = ImGui::CalcTextSize(label.c_str());
+        // Шахматный порядок: чётные — низ, нечётные — верх
+        const float ty = (label_idx % 2 == 0)
+            ? y_bottom - label_h + pad
+            : y_base + pad;
 
-            // Шахматный порядок: чётные — низ, нечётные — верх
-            const float ty = (label_idx % 2 == 0)
-                ? y_bottom - label_h + pad
-                : y_base + pad;
+        // Белый фон по ширине текста (всегда, обрезается по границе зоны)
+        const float bx0 = x0 + pad;
+        const float bx1 = bx0 + text_size.x + pad;
+        const float by0 = ty - pad;
+        const float by1 = ty + text_size.y + pad;
+        if (by1 > by0)
+            draw_list->AddRectFilled(ImVec2(bx0, by0),
+                                     ImVec2(bx1, by1),
+                                     ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_bg));
 
-            // Проверка перекрытия с предыдущей меткой в том же ряду
-            const float label_x = x0 + pad;
-            const int row = label_idx % 2;
-            if (label_x + text_size.x + pad >= last_label_right[row])
-            {
-                // Белый фон по ширине текста (всегда, обрезается по границе зоны)
-                const float bx0 = x0 + pad;
-                const float bx1 = bx0 + text_size.x + pad;
-                const float by0 = ty - pad;
-                const float by1 = ty + text_size.y + pad;
-                if (by1 > by0)
-                    draw_list->AddRectFilled(ImVec2(bx0, by0),
-                                             ImVec2(bx1, by1),
-                                             ImGui::ColorConvertFloat4ToU32(_params->hud_train_profile_speed_limit_bg));
+        // Жирный шрифт через наложение
+        const float bold_off = 1.0f;
+        draw_list->AddText(ImVec2(x0 + pad - bold_off, ty), text_col, label.c_str());
+        draw_list->AddText(ImVec2(x0 + pad + bold_off, ty), text_col, label.c_str());
+        draw_list->AddText(ImVec2(x0 + pad, ty - bold_off), text_col, label.c_str());
+        draw_list->AddText(ImVec2(x0 + pad, ty + bold_off), text_col, label.c_str());
+        draw_list->AddText(ImVec2(x0 + pad, ty), text_col, label.c_str());
 
-                // Жирный шрифт через наложение
-                const float bold_off = 1.0f;
-                draw_list->AddText(ImVec2(x0 + pad - bold_off, ty), text_col, label.c_str());
-                draw_list->AddText(ImVec2(x0 + pad + bold_off, ty), text_col, label.c_str());
-                draw_list->AddText(ImVec2(x0 + pad, ty - bold_off), text_col, label.c_str());
-                draw_list->AddText(ImVec2(x0 + pad, ty + bold_off), text_col, label.c_str());
-                draw_list->AddText(ImVec2(x0 + pad, ty), text_col, label.c_str());
-
-                last_label_right[row] = label_x + text_size.x + pad;
-                ++label_idx;
-            }
-        }
+        ++label_idx;
     }
 }
