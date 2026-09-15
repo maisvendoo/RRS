@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Vehicle>
+		<EmptyMass>132000</EmptyMass>
+		<PayloadMass>1000</PayloadMass>
+		<Length>22.532</Length>
+		<WheelDiameter>1.25</WheelDiameter>
+		<MainResist>loco-resist</MainResist>
+		<WheelRailFriction>loco-AC</WheelRailFriction>
+		<NumAxis>6</NumAxis>
+		<WheelInertia>100.0</WheelInertia>
+		<SoundDir>ep1m</SoundDir>
+		<AnimationsConfigDir>ep1m</AnimationsConfigDir>
+
+		<ReductorCoeff>3.38</ReductorCoeff>
+
+		<isRegistratorOn>0</isRegistratorOn>
+
+		<CustomModulesDir>ep1m</CustomModulesDir>
+
+		<AutopilotModule>ep1m-autopilot</AutopilotModule>
+		<AutopilotConfig>ep1m-autopilot</AutopilotConfig>
+
+	</Vehicle>
+
+
+	<Cabine>
+		<DriverPos>0.635 9.291 3.2</DriverPos>
+		<DriverDir>0.0</DriverDir>
+		<IOControllerModule>ep1m-iocontroller</IOControllerModule>
+		<IOControllerConfig>ep1m-cabine1</IOControllerConfig>
+	</Cabine>
+
+	<Cabine>
+		<DriverPos>-0.635 -9.291 3.2</DriverPos>
+		<DriverDir>180.0</DriverDir>
+		<IOControllerModule>ep1m-iocontroller</IOControllerModule>
+		<IOControllerConfig>ep1m-cabine2</IOControllerConfig>
+	</Cabine>
+
+
+	<Model>
+		<ModelName>ep1m/ep1m-735.gltf</ModelName>
+		<AnimationsConfigDir>ep1m</AnimationsConfigDir>
+	</Model>
+
+	<Model>
+		<ModelName>ep1m/ep1m-cabview.gltf</ModelName>
+		<AnimationsConfigDir>ep1m</AnimationsConfigDir>
+	</Model>
+
+</Config>

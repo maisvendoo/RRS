@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Main>
+		<!-- Размеры окна -->
+		<sizeWindow_X>1024</sizeWindow_X>
+		<sizeWindow_Y>1024</sizeWindow_Y>
+	</Main>
+</Config>

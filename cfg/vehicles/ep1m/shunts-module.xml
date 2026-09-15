@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+
+        <Step0>0.970</Step0>
+        <Step1>0.700</Step1>
+        <Step2>0.530</Step2>
+        <Step3>0.425</Step3>
+
+    </Device>
+</Config>

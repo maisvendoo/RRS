@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<!-- БИЛ-УТ -->
+	<Display>
+		<ModuleDir>ep1m</ModuleDir>
+		<Module>club-u-display</Module>
+		<SurfaceName>Display_KLUB</SurfaceName>
+		<UpdateInterval>0.2</UpdateInterval>
+		
+		<Corner1>0.0 1.0</Corner1>
+		<Corner2>0.0 0.0</Corner2>
+		<Corner3>1.0 1.0</Corner3>
+		<Corner4>1.0 0.0</Corner4>
+		<Corner5>1.0 1.0</Corner5>
+		<Corner6>0.0 0.0</Corner6>
+	</Display> 
+
+	<Display>
+		<ModuleDir>ep1m</ModuleDir>
+		<Module>msud-display</Module>
+		<SurfaceName>Display_MSUD</SurfaceName>
+		<UpdateInterval>0.2</UpdateInterval>
+
+		<Corner1>0.0 0.0</Corner1>
+		<Corner2>1.0 0.0</Corner2>
+		<Corner3>1.0 1.0</Corner3>
+		<Corner4>1.0 1.0</Corner4>
+		<Corner5>0.0 1.0</Corner5>
+		<Corner6>0.0 0.0</Corner6>
+	</Display>
+
+</Config>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<Common>
+		<ChargingPressure>0.5</ChargingPressure>
+		<InitMainResPressure>0.75</InitMainResPressure>
+		<NoAir>0</NoAir>
+
+		<Title>ЭП1М-735 + 10 вагонов (видеосъёмка)</Title>
+		<Description>Пассажирский электровоз ЭП1М с двухэтажными вагонами 61-4492</Description>
+	</Common>
+
+	<Vehicle>
+		<ModuleDir>ep1m</ModuleDir>
+		<Module>ep1m</Module>
+		<ModuleConfigDir>ep1m</ModuleConfigDir>
+		<ModuleConfig>ep1m-735</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
+		<ModuleConfigDir>Dvuxetagki</ModuleConfigDir>
+		<ModuleConfig>Dvuxetagki-61-4492_1</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>10</Count>
+		<PayloadCoeff>0.6</PayloadCoeff>
+	</Vehicle>
+
+</Config>

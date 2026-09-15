@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		<Order>1</Order>
+		<SubStepNum>1</SubStepNum>
+		<Solver>euler</Solver>
+
+		<!-- Время перемещения рукоятки контроллера на 1% тягового/тормозного сектора, с -->
+		<handle_motion_time>0.1</handle_motion_time>
+
+		<!-- Коэффициент ускорения контроллера с нажатым Shift -->
+		<handle_high_speed_coeff>8</handle_high_speed_coeff>
+
+		<!-- Время перемещения регулятора скорости на 1 шаг, с -->
+		<refV_motion_time>0.1</refV_motion_time>
+
+		<!-- Коэффициент ускорения регулятора скорости с нажатым Shift -->
+		<refV_high_speed_coeff>8</refV_high_speed_coeff>
+	</Device>
+</Config>

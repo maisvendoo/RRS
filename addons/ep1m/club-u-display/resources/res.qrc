@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/rcc">
+        <file alias="led-6x8-dots">KLUBU.ttf</file>
+        <file alias="led-7seg-italic">DSEG7ClassicMini-Italic.ttf</file>
+
+        <file alias="klub_bil_saut_display">img/ep1m_9_RGBA.png</file>
+
+        <file alias="ind_vigilance">img/ind_vigilance.png</file>
+        <file alias="ind_cassette">img/cassette.png</file>
+        <file alias="ind_M">img/ind_M.png</file>
+        <file alias="ind_P">img/ind_P.png</file>
+        <file alias="ind_zapret_otpuska">img/ind_zapret_otpuska.png</file>
+        <file alias="ind_straight">img/straight.png</file>
+        <file alias="ind_side">img/side.png</file>
+
+        <file alias="alsn_green">leds/alsn_green.png</file>
+        <file alias="alsn_yellow">leds/alsn_yellow.png</file>
+        <file alias="alsn_yellow_red">leds/alsn_yellow_red.png</file>
+        <file alias="alsn_red">leds/alsn_red.png</file>
+        <file alias="alsn_white">leds/alsn_white.png</file>
+
+        <file alias="SAUT_on">img/SAUT_on.png</file>
+        <file alias="SAUT_off">img/SAUT_off.png</file>
+        <file alias="SAUT_zapret_otpuska">img/SAUT_zapret_otpuska.png</file>
+    </qresource>
+</RCC>

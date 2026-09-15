@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Display>
+		<SignalID>145</SignalID>
+		<Duration>10.0</Duration>
+		<EmissionColor>1.0 1.0 1.0</EmissionColor>
+		<Color>1.0 1.0 1.0</Color>
+		<RepaintColor>0</RepaintColor>
+		<RepaintEmissive>1</RepaintEmissive>
+		<ModuleDir>ep1m</ModuleDir>
+		<Module>club-u-display</Module>
+		<ModuleConfigDir>vehicles</ModuleConfigDir>
+		<ModuleConfigSubDir>ep1m</ModuleConfigSubDir>
+	</Display>
+</Config>

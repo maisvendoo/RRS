@@ -1,5 +1,7 @@
 #include    <CabMouseHandler.h>
 
+#include    <ProcVisibleAnimation.h>
+
 #include    <VehiclesHandler.h>
 #include    <VehicleExterior.h>
 #include    <Logger.h>
@@ -66,11 +68,32 @@ void CabMouseHandler::apply(vsg::ButtonPressEvent& buttonPress)
                 io_ctrl->mouseClick(input.contolledObjectName,
                                     static_cast<int>(buttonPress.button));
 
+                // Моментальные кнопки (тифон, свисток, песок, РБ...):
+                // удержание мыши = удержание кнопки, отпускание шлёт 0
+                if (input.type == "Button")
+                {
+                    _held_button_ctrl = io_ctrl;
+                    _held_button_name = input.contolledObjectName;
+                }
+
                 // Клик по органу не должен крутить камеру
                 buttonPress.handled = true;
                 return;
             }
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CabMouseHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
+{
+    if (_held_button_ctrl != nullptr)
+    {
+        _held_button_ctrl->mouseRelease(_held_button_name);
+        _held_button_ctrl = nullptr;
+        _held_button_name.clear();
     }
 }
 
@@ -146,6 +169,15 @@ bool CabMouseHandler::pickControl(int x, int y,
 
     vsg::ref_ptr<vsg::LineSegmentIntersector> intersector;
 
+    for (int pass = 0; pass < 2; ++pass)
+    {
+        // Второй проход: временно показываем скрытые анимации видимости -
+        // спрятанные ключи и рукоятки должны кликаться по их месту в гнезде
+        if (pass == 1)
+        {
+            ProcVisibleAnimation::forceShowAllHidden();
+        }
+
     for (auto& off : offsets)
     {
         intersector = vsg::LineSegmentIntersector::create(*_camera, x + off[0], y + off[1]);
@@ -180,10 +212,21 @@ bool CabMouseHandler::pickControl(int x, int y,
                             LOG_INFO("CabPick HIT: %s @(%d %d)", node_name.c_str(), x, y);
                         }
 
+                        if (pass == 1)
+                        {
+                            ProcVisibleAnimation::restoreAllHidden();
+                        }
+
                         return true;
                     }
                 }
             }
+        }
+    }
+
+        if (pass == 1)
+        {
+            ProcVisibleAnimation::restoreAllHidden();
         }
     }
 

@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<!-- Ключ блокировки панели тумблеров -->
+	<Control>
+		<ID>100</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_IS_TUMBLERS_KEY</ObjectName>
+		<Name>Ключ блокировки панели тумблеров</Name>
+		<Type>PanelKey</Type>
+		<SignalID>234</SignalID>
+		<SignalID2>235</SignalID2>
+	</Control>
+
+	<Control>
+		<ID>101</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_MSUD</ObjectName>
+		<Name>МСУД</Name>
+		<Type>Toggle</Type>
+		<SignalID>236</SignalID>
+	</Control>
+
+	<Control>
+		<ID>102</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_LOCK_VVK</ObjectName>
+		<Name>Блокирование ВВК</Name>
+		<Type>Toggle</Type>
+		<SignalID>237</SignalID>
+	</Control>
+
+	<Control>
+		<ID>103</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_PANT1</ObjectName>
+		<Name>Токоприёмник 1</Name>
+		<Type>Toggle</Type>
+		<SignalID>238</SignalID>
+	</Control>
+
+	<Control>
+		<ID>104</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_PANT2</ObjectName>
+		<Name>Токоприёмник 2</Name>
+		<Type>Toggle</Type>
+		<SignalID>239</SignalID>
+	</Control>
+
+	<Control>
+		<ID>105</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_RETURN_PROTECTION</ObjectName>
+		<Name>Возврат защиты</Name>
+		<Type>Button</Type>
+		<SignalID>240</SignalID>
+	</Control>
+
+	<Control>
+		<ID>106</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_MAIN_SWITCH</ObjectName>
+		<Name>Главный выключатель</Name>
+		<Type>Toggle</Type>
+		<SignalID>241</SignalID>
+	</Control>
+
+	<Control>
+		<ID>107</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_AUX_DEVICES</ObjectName>
+		<Name>Вспомогательные машины</Name>
+		<Type>Toggle</Type>
+		<SignalID>242</SignalID>
+	</Control>
+
+	<Control>
+		<ID>108</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_COMPRESSOR</ObjectName>
+		<Name>Компрессор</Name>
+		<Type>Toggle</Type>
+		<SignalID>243</SignalID>
+	</Control>
+
+	<Control>
+		<ID>109</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_FAN1</ObjectName>
+		<Name>Вентилятор 1</Name>
+		<Type>Toggle</Type>
+		<SignalID>244</SignalID>
+	</Control>
+
+	<Control>
+		<ID>110</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_FAN2</ObjectName>
+		<Name>Вентилятор 2</Name>
+		<Type>Toggle</Type>
+		<SignalID>245</SignalID>
+	</Control>
+
+	<Control>
+		<ID>111</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_FAN3</ObjectName>
+		<Name>Вентилятор 3</Name>
+		<Type>Toggle</Type>
+		<SignalID>246</SignalID>
+	</Control>
+
+	<Control>
+		<ID>112</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_TUMBLER_EPB</ObjectName>
+		<Name>ЭПТ</Name>
+		<Type>Toggle</Type>
+		<SignalID>247</SignalID>
+	</Control>
+
+	<Control>
+		<ID>113</ID>
+		<value>0.0</value>
+		<KeyName>KEY_6</KeyName>
+		<ObjectName>CAB2_TOOGLE_MPK_1_OR_2</ObjectName>
+		<Name>Выбор комплекта МПК-1/МПК-2</Name>
+		<Type>Toggle</Type>
+		<SignalID>252</SignalID>
+	</Control>
+
+	<Control>
+		<ID>114</ID>
+		<value>1.0</value>
+		<KeyName>KEY_F</KeyName>
+		<ObjectName>CAB2_TOOGLE_MANUAL_OR_AUTO</ObjectName>
+		<Name>Режим управления: ручной/автоматический</Name>
+		<Type>Toggle</Type>
+		<SignalID>255</SignalID>
+	</Control>
+
+	<Control>
+		<ID>115</ID>
+		<value>0.0</value>
+		<KeyName>KEY_G</KeyName>
+		<ObjectName>CAB2_TOOGLE_BUFFERLIGHT_L</ObjectName>
+		<Name>Буферный фонарь левый</Name>
+		<Type>Toggle</Type>
+		<SignalID>263</SignalID>
+	</Control>
+
+	<Control>
+		<ID>116</ID>
+		<value>0.0</value>
+		<KeyName>KEY_J</KeyName>
+		<ObjectName>CAB2_TOOGLE_BUFFERLIGHT_R</ObjectName>
+		<Name>Буферный фонарь правый</Name>
+		<Type>Toggle</Type>
+		<SignalID>264</SignalID>
+	</Control>
+
+	<Control>
+		<ID>117</ID>
+		<value>1.0</value>
+		<KeyName>KEY_G</KeyName>
+		<ObjectName>CAB2_TOOGLE_BUFFERCOLOR_L</ObjectName>
+		<Name>Буферный фонарь левый: белый/красный</Name>
+		<Type>Toggle</Type>
+		<SignalID>262</SignalID>
+	</Control>
+
+	<Control>
+		<ID>118</ID>
+		<value>1.0</value>
+		<KeyName>KEY_J</KeyName>
+		<ObjectName>CAB2_TOOGLE_BUFFERCOLOR_R</ObjectName>
+		<Name>Буферный фонарь правый: белый/красный</Name>
+		<Type>Toggle</Type>
+		<SignalID>265</SignalID>
+	</Control>
+
+	<Control>
+		<ID>119</ID>
+		<value>0.0</value>
+		<KeyName>KEY_H</KeyName>
+		<ObjectName>CAB2_TUMBLER_SPOTLIGHT_LOW</ObjectName>
+		<Name>Прожектор тусклый</Name>
+		<Type>Toggle</Type>
+		<SignalID>275</SignalID>
+	</Control>
+
+	<Control>
+		<ID>120</ID>
+		<value>0.0</value>
+		<KeyName>KEY_H</KeyName>
+		<ObjectName>CAB2_TUMBLER_SPOTLIGHT_HIGH</ObjectName>
+		<Name>Прожектор яркий</Name>
+		<Type>Toggle</Type>
+		<SignalID>276</SignalID>
+	</Control>
+
+	<Control>
+		<ID>121</ID>
+		<value>0.0</value>
+		<KeyName>KEY_K</KeyName>
+		<ObjectName>CAB2_TOOGLE_CAB_LIGHT_LOW</ObjectName>
+		<Name>Освещение кабины тусклое</Name>
+		<Type>Toggle</Type>
+		<SignalID>277</SignalID>
+	</Control>
+
+	<Control>
+		<ID>122</ID>
+		<value>0.0</value>
+		<KeyName>KEY_K</KeyName>
+		<ObjectName>CAB2_TOOGLE_CAB_LIGHT_HIGH</ObjectName>
+		<Name>Освещение кабины яркое</Name>
+		<Type>Toggle</Type>
+		<SignalID>278</SignalID>
+	</Control>
+
+	<Control>
+		<ID>123</ID>
+		<value>0.0</value>
+		<KeyName>KEY_Backslash</KeyName>
+		<ObjectName>CAB2_TOOGLE_CAB_LIGHT_GREEN</ObjectName>
+		<Name>Освещение кабины: зелёный свет</Name>
+		<Type>Toggle</Type>
+		<SignalID>279</SignalID>
+	</Control>
+
+	<Control>
+		<ID>124</ID>
+		<value>0.0</value>
+		<KeyName>KEY_L</KeyName>
+		<ObjectName>CAB2_TOOGLE_DEVICES_LIGHT</ObjectName>
+		<Name>Освещение приборов и пульта</Name>
+		<Type>Toggle</Type>
+		<SignalID>280</SignalID>
+	</Control>
+
+	<Control>
+		<ID>125</ID>
+		<value>1.0</value>
+		<KeyName>KEY_5</KeyName>
+		<ObjectName>CAB2_TOOGLE_BATTERY_OR_EPB_VOLTAGE</ObjectName>
+		<Name>Напряжение батареи / СПН ЭПТ</Name>
+		<Type>Toggle</Type>
+		<SignalID>289</SignalID>
+	</Control>
+
+	<Control>
+		<ID>126</ID>
+		<value>1.0</value>
+		<KeyName>KEY_8</KeyName>
+		<ObjectName>CAB2_TOOGLE_SIGNAL_PANEL</ObjectName>
+		<Name>Сигнализация БС-002</Name>
+		<Type>Toggle</Type>
+		<SignalID>298</SignalID>
+	</Control>
+
+	<Control>
+		<ID>127</ID>
+		<value>1.0</value>
+		<KeyName>KEY_7</KeyName>
+		<ObjectName>CAB2_TOOGLE_PCHF</ObjectName>
+		<Name>ПЧФ (преобразователь частоты фаз)</Name>
+		<Type>Toggle</Type>
+		<SignalID>299</SignalID>
+	</Control>
+
+	<!-- Кран машиниста 395 -->
+	<Control>
+		<ID>140</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_BRAKE_CRANE_HANDLE_POS</ObjectName>
+		<Name>Кран машиниста 395</Name>
+		<Type>Crane395</Type>
+		<SignalID>226</SignalID>
+		<StateMode>norm</StateMode>
+		<StateNames>I - зарядка и отпуск;II - поездное;III - перекрыша без питания;IV - перекрыша с питанием;Va - торможение замедленным темпом;V - служебное торможение;VI - экстренное торможение</StateNames>
+	</Control>
+
+	<!-- Кран вспомогательного тормоза -->
+	<Control>
+		<ID>141</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_LOCO_CRANE_HANDLE_POS</ObjectName>
+		<Name>Кран вспомогательного тормоза</Name>
+		<Type>Crane254</Type>
+		<SignalID>227</SignalID>
+	</Control>
+
+	<!-- Контроллер КМ-35 -->
+	<Control>
+		<ID>142</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_KM_MAIN_HANDLE_POS</ObjectName>
+		<Name>Контроллер машиниста (главная рукоятка)</Name>
+		<Type>KMLevel</Type>
+		<SignalID>232</SignalID>
+	</Control>
+
+	<Control>
+		<ID>144</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_REVERS_HANDLE_POS</ObjectName>
+		<Name>Реверсивная рукоятка</Name>
+		<Type>Revers</Type>
+		<SignalID>231</SignalID>
+		<SignalID2>230</SignalID2>
+		<StateMode>centered</StateMode>
+		<StateNames>Назад;Нейтраль;Вперёд</StateNames>
+	</Control>
+
+	<!-- УБТ-367 -->
+	<Control>
+		<ID>145</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_UBT_KEY_HANDLE_POS</ObjectName>
+		<Name>Блокировочный ключ 367</Name>
+		<Type>Lock367</Type>
+		<SignalID>224</SignalID>
+		<SignalID2>223</SignalID2>
+	</Control>
+
+	<Control>
+		<ID>146</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_UBT_COMBINE_CRANE_POS</ObjectName>
+		<Name>Комбинированный кран</Name>
+		<Type>Lever</Type>
+		<SignalID>225</SignalID>
+		<StateMode>centered</StateMode>
+		<StateNames>Двойная тяга;Поездное;Экстренное торможение</StateNames>
+	</Control>
+
+	<!-- Ключ ЭПК -->
+	<Control>
+		<ID>147</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_AUTOSTOP_IS_KEY</ObjectName>
+		<Name>Ключ ЭПК</Name>
+		<Type>AutostopKey</Type>
+		<SignalID>228</SignalID>
+		<SignalID2>229</SignalID2>
+	</Control>
+
+	<!-- Неинтерактивные (только подсказка) -->
+	<Control>
+		<ID>153</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_BUTTON_RB</ObjectName>
+		<Name>Кнопка РБ (бдительность)</Name>
+		<Type>Button</Type>
+		<SignalID>301</SignalID>
+	</Control>
+
+	<Control>
+		<ID>154</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_BUTTON_RBS</ObjectName>
+		<Name>Кнопка РБС</Name>
+		<Type>Button</Type>
+		<SignalID>302</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>CAB2_BUTTON_RBP</ObjectName>
+		<Name>Кнопка РБП</Name>
+		<Type>Gauge</Type>
+		<SignalID>303</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>CAB2_BUTTON_RELEASE_BRAKES</ObjectName>
+		<Name>Кнопка "Отпуск тормозов"</Name>
+		<Type>Gauge</Type>
+		<SignalID>293</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>CAB2_BUTTON_COMPRESSOR</ObjectName>
+		<Name>Кнопка "Компрессор"</Name>
+		<Type>Gauge</Type>
+		<SignalID>296</SignalID>
+	</Control>
+
+	<Control>
+		<ID>150</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_BUTTON_TYPHON</ObjectName>
+		<Name>Тифон</Name>
+		<Type>Button</Type>
+		<SignalID>249</SignalID>
+	</Control>
+
+	<Control>
+		<ID>151</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_BUTTON_WHISTLE</ObjectName>
+		<Name>Свисток</Name>
+		<Type>Button</Type>
+		<SignalID>248</SignalID>
+	</Control>
+
+	<Control>
+		<ID>152</ID>
+		<value>0.0</value>
+		<ObjectName>CAB2_BUTTON_SAND</ObjectName>
+		<Name>Кнопка "Песок"</Name>
+		<Type>Button</Type>
+		<SignalID>250</SignalID>
+	</Control>
+
+	<Control>
+		<ObjectName>CAB2_UBT_DOOR</ObjectName>
+		<Name>Дверца тумбы УБТ</Name>
+		<Type>Gauge</Type>
+		<SignalID>222</SignalID>
+	</Control>
+
+</Config>

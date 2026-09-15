@@ -1,0 +1,14 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/rcc">
+        <file alias="msud-ttf">smwtexttwonc.ttf</file>
+
+        <file alias="msud-fon">fon.png</file>
+
+        <file alias="man11">man11.png</file>
+        <file alias="man12">man12.png</file>
+        <file alias="man21">man21.png</file>
+        <file alias="man22">man22.png</file>
+
+    </qresource>
+</RCC>

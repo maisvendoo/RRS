@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<Common>
+		<ChargingPressure>0.5</ChargingPressure>
+		<InitMainResPressure>0.9</InitMainResPressure>
+		<NoAir>0</NoAir>
+
+		<Title>ЭП1М-735 (резервом)</Title>
+		<Description>Пассажирский электровоз переменного тока производства НЭВЗ</Description>
+	</Common>
+
+	<Vehicle>
+		<ModuleDir>ep1m</ModuleDir>
+		<Module>ep1m</Module>
+		<ModuleConfigDir>ep1m</ModuleConfigDir>
+		<ModuleConfig>ep1m-735</ModuleConfig>
+		<IsOrientationForward>1</IsOrientationForward>
+		<Count>1</Count>
+		<PayloadCoeff>1</PayloadCoeff>
+	</Vehicle>
+
+</Config>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		<Order>2</Order>
+		<SubStepNum>6</SubStepNum>
+		<Solver>euler</Solver>
+
+		<Ra>0.007</Ra>
+		<Rf>0.03</Rf>
+		<Rd>0.0</Rd>
+		<Rb>0.083</Rb>
+		<Ta>0.5</Ta>
+		<Tf>0.5</Tf>
+		<omega_nom>105.2</omega_nom>
+	</Device>
+</Config>

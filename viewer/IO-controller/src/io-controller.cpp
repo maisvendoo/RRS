@@ -177,6 +177,25 @@ bool IOController::findControl(const std::string &node_name, io_control_input_t 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::mouseRelease(const QString &object_name)
+{
+    auto io_ctrl = io_control_inputs.getByKey2(object_name);
+
+    if (!io_ctrl.has_value())
+    {
+        return;
+    }
+
+    if (io_ctrl.value().type == "Button")
+    {
+        io_ctrl.value().value = 0.0f;
+        emitControl(io_ctrl.value());
+    }
+}
+
 void IOController::mouseClick(const QString &object_name, int button)
 {
     auto io_ctrl = io_control_inputs.getByKey2(object_name);

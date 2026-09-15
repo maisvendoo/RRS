@@ -35,6 +35,7 @@ add_subdirectory (simulator/session)
 add_subdirectory (addons/passcar)
 add_subdirectory (addons/freightcar)
 add_subdirectory (addons/vl60)
+add_subdirectory (addons/ep1m)
 
 if (CLIENT_BUILD)
     add_subdirectory (graphics)

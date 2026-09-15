@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Device>
+		<Order>1</Order>
+		<SubStepNum>1</SubStepNum>
+		<Solver>euler</Solver>
+
+		<p_kp1>0.15</p_kp1>
+		<p_kp5>0.70</p_kp5>
+
+	</Device>
+</Config>

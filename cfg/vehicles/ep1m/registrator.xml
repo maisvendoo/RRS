@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Interval>0.1</Interval>
+        <FileName>reg_data</FileName>
+    </Device>
+</Config>

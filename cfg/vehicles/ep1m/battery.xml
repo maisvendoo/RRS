@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Order>1</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
+        <Emax>57.0</Emax>
+        <Emin>42.0</Emin>
+        <r>0.03</r>
+        <Rd>0.55</Rd>
+        <Capacity>125</Capacity>
+
+    </Device>
+</Config>

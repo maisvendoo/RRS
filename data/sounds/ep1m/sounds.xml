@@ -1,0 +1,3677 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<!-- Озвучка реле -->
+	<!-- Контактор KM5 -->
+	<Sound>
+		<SignalID>372</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.52 5.95 3.25</LocalPosition>
+	</Sound>
+
+	<!-- Вентиль защиты ВЗ-6 -->
+	<Sound>
+		<SignalID>373</SignalID>
+		<Filename>lock_vvk.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.00 2.16 2.94</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV44 -->
+	<Sound>
+		<SignalID>374</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.40 -3.16 4.10</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV39 -->
+	<Sound>
+		<SignalID>375</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.00 -7.56 3.35</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV21 -->
+	<Sound>
+		<SignalID>376</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.00 -7.56 3.35</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV22 -->
+	<Sound>
+		<SignalID>377</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.00 -7.56 3.35</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV23 -->
+	<Sound>
+		<SignalID>378</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.53 5.21 2.69</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV41 -->
+	<Sound>
+		<SignalID>379</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.00 -7.56 3.35</LocalPosition>
+	</Sound>
+
+	<!-- Контактор KM7 -->
+	<Sound>
+		<SignalID>380</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.64 -6.53 3.31</LocalPosition>
+	</Sound>
+
+	<!-- Контактор KM8 -->
+	<Sound>
+		<SignalID>381</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.64 -6.53 3.31</LocalPosition>
+	</Sound>
+
+	<!-- Контактор KM9 -->
+	<Sound>
+		<SignalID>382</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.64 -6.53 3.31</LocalPosition>
+	</Sound>
+
+	<!-- Контактор KM11 -->
+	<Sound>
+		<SignalID>383</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.64 -6.53 3.31</LocalPosition>
+	</Sound>
+
+	<!-- Контактор KM12 -->
+	<Sound>
+		<SignalID>384</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.64 -6.53 3.31</LocalPosition>
+	</Sound>
+
+	<!-- Контактор KM13 -->
+	<Sound>
+		<SignalID>385</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.64 -6.53 3.31</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KM43 -->
+	<Sound>
+		<SignalID>386</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.00 -7.56 3.35</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV11 -->
+	<Sound>
+		<SignalID>387</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.95 8.63 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV12 -->
+	<Sound>
+		<SignalID>388</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.95 8.63 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV13 -->
+	<Sound>
+		<SignalID>389</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.95 8.63 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV14 -->
+	<Sound>
+		<SignalID>390</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.95 8.63 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Реле промежуточное KV15 -->
+	<Sound>
+		<SignalID>391</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.00 -7.56 3.35</LocalPosition>
+	</Sound>
+
+	<!-- Реле выдержки времени KT10 -->
+	<Sound>
+		<SignalID>392</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.64 -6.53 3.31</LocalPosition>
+	</Sound>
+
+	<!-- Реле выдержки времени KT1 -->
+	<Sound>
+		<SignalID>393</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.95 8.63 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Контактор KM41 -->
+	<Sound>
+		<SignalID>394</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 0.0</LocalPosition>
+	</Sound>
+
+	<!-- Контактор KM42 -->
+	<Sound>
+		<SignalID>395</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 0.0</LocalPosition>
+	</Sound>
+
+	<!-- Реле выдержки времени KT4 -->
+	<Sound>
+		<SignalID>396</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.00 -7.56 3.35</LocalPosition>
+	</Sound>
+
+	<!-- Реле выдержки времени KT5 -->
+	<Sound>
+		<SignalID>397</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.00 -7.56 3.35</LocalPosition>
+	</Sound>
+
+	<!-- Контактор KM14 -->
+	<Sound>
+		<SignalID>398</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.64 -6.53 3.31</LocalPosition>
+	</Sound>
+
+	<!-- Контактор K1 -->
+	<Sound>
+		<SignalID>399</SignalID>
+		<Filename>relay.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.53 5.21 2.69</LocalPosition>
+	</Sound>
+
+
+
+	<!-- Кабина 1 -->
+	<!-- Свисток -->
+	<Sound>
+		<SignalID>400</SignalID>
+		<Filename>svistok.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.8 8.6 4.6</LocalPosition>
+	</Sound>
+
+	<!-- Тифон -->
+	<Sound>
+		<SignalID>401</SignalID>
+		<Filename>tifon.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.0 10.0 4.4</LocalPosition>
+	</Sound>
+
+	<!-- Вставить реверсивку -->
+	<Sound>
+		<SignalID>402</SignalID>
+		<Filename>revers_input.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.44 10.00 2.76</LocalPosition>
+	</Sound>
+
+	<!-- Извлечь реверсивку -->
+	<Sound>
+		<SignalID>403</SignalID>
+		<Filename>revers_output.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.44 10.00 2.76</LocalPosition>
+	</Sound>
+
+	<!-- Реверсивная рукоятка КМ -->
+	<Sound>
+		<SignalID>404</SignalID>
+		<Filename>revers.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.44 10.00 2.76</LocalPosition>
+	</Sound>
+
+	<!-- Главная рукоятка КМ -->
+	<Sound>
+		<SignalID>405</SignalID>
+		<Filename>km.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.53 10.0 2.78</LocalPosition>
+	</Sound>
+
+	<!-- TODO Вставить рукоятку в устройство блокировки тормозов -->
+	<Sound>
+		<SignalID>406</SignalID>
+		<Filename>revers_input.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 8.9 2.4</LocalPosition>
+	</Sound>
+
+	<!-- TODO Извлечь рукоятку из устройства блокировки тормозов -->
+	<Sound>
+		<SignalID>407</SignalID>
+		<Filename>revers_output.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 8.9 2.4</LocalPosition>
+	</Sound>
+
+	<!-- Щелчок блокировки тормозных приборов -->
+	<Sound>
+		<SignalID>408</SignalID>
+		<Filename>ubt-367-ruk.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Щелчок комбинированного крана -->
+	<Sound>
+		<SignalID>409</SignalID>
+		<Filename>komb-kran.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Опорожнение тормозной магистрали от комбинированного крана -->
+	<Sound>
+		<SignalID>410</SignalID>
+		<Filename>395_vypusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Щелчок рукоятки крана 395 -->
+	<Sound>
+		<SignalID>411</SignalID>
+		<Filename>395-chelk.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 9.7 2.8</LocalPosition>
+	</Sound>
+
+	<!-- Стабилизатор крана 395 -->
+	<Sound>
+		<SignalID>412</SignalID>
+		<Filename>395_2.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>0.3</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Наполнение уравнительного резервуара крана 395 -->
+	<Sound>
+		<SignalID>413</SignalID>
+		<Filename>395_1.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Опорожнение уравнительного резервуара крана 395 -->
+	<Sound>
+		<SignalID>414</SignalID>
+		<Filename>395_5.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Наполнение тормозной магистрали от крана 395 -->
+	<Sound>
+		<SignalID>415</SignalID>
+		<Filename>395_vpusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Опорожнение тормозной магистрали от крана 395 -->
+	<Sound>
+		<SignalID>416</SignalID>
+		<Filename>395_vypusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.2 9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Щелчок рукоятки крана 215 -->
+	<Sound>
+		<SignalID>417</SignalID>
+		<Filename>254-chelk.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 9.8 2.9</LocalPosition>
+	</Sound>
+
+	<!-- Наполнение магистрали тормозных цилиндров от крана 215 -->
+	<Sound>
+		<SignalID>418</SignalID>
+		<Filename>254_vpusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 9.8 2.8</LocalPosition>
+	</Sound>
+
+	<!-- Опорожнение магистрали тормозных цилиндров от крана 215 -->
+	<Sound>
+		<SignalID>419</SignalID>
+		<Filename>254_vypusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.3 9.8 2.8</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МСУД включение -->
+	<Sound>
+		<SignalID>420</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.77 10.15 2.74</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МСУД выключение -->
+	<Sound>
+		<SignalID>421</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.77 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер блокировка ВВК включение -->
+	<Sound>
+		<SignalID>422</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.80 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер блокировка ВВК выключение -->
+	<Sound>
+		<SignalID>423</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.80 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер передний токоприемник включение -->
+	<Sound>
+		<SignalID>424</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.83 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер передний токоприемник выключение -->
+	<Sound>
+		<SignalID>425</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.83 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер задний токоприемник включение -->
+	<Sound>
+		<SignalID>426</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.86 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер задний токоприемник выключение -->
+	<Sound>
+		<SignalID>427</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.86 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер возврат защиты включение -->
+	<Sound>
+		<SignalID>428</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.89 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер возврат защиты выключение -->
+	<Sound>
+		<SignalID>429</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.89 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ГВ включение -->
+	<Sound>
+		<SignalID>430</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.92 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ГВ выключение -->
+	<Sound>
+		<SignalID>431</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.92 10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер вспом. машины включение -->
+	<Sound>
+		<SignalID>432</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.92 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер вспом. машины выключение -->
+	<Sound>
+		<SignalID>433</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.92 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер компрессор включение -->
+	<Sound>
+		<SignalID>434</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.89 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер компрессор выключение -->
+	<Sound>
+		<SignalID>435</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.89 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ1 включение -->
+	<Sound>
+		<SignalID>436</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.86 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ1 выключение -->
+	<Sound>
+		<SignalID>437</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.86 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ2 включение -->
+	<Sound>
+		<SignalID>438</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.83 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ2 выключение -->
+	<Sound>
+		<SignalID>439</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.83 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ3 включение -->
+	<Sound>
+		<SignalID>440</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.80 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ3 выключение -->
+	<Sound>
+		<SignalID>441</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.80 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ЭПТ включение -->
+	<Sound>
+		<SignalID>442</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.77 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ЭПТ выключение -->
+	<Sound>
+		<SignalID>443</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.77 9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ панели тумблеров вставить -->
+	<Sound>
+		<SignalID>444</SignalID>
+		<Filename>revers_input.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.95 10.00 2.75</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ панели тумблеров извлечь -->
+	<Sound>
+		<SignalID>445</SignalID>
+		<Filename>revers_output.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.95 10.00 2.75</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ панели тумблеров разблокировать -->
+	<Sound>
+		<SignalID>446</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.95 10.00 2.75</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ панели тумблеров заблокировать -->
+	<Sound>
+		<SignalID>447</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.95 10.00 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Включение КЛУБ и зуммер -->
+	<Sound>
+		<SignalID>448</SignalID>
+		<Filename>klub_On.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.8 9.5 2.69</LocalPosition>
+	</Sound>
+
+	<!-- Включение КЛУБ и зуммер -->
+	<Sound>
+		<SignalID>449</SignalID>
+		<Filename>klub_buttons.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.8 9.5 2.69</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ ЭПК вставить -->
+	<Sound>
+		<SignalID>450</SignalID>
+		<Filename>revers_input.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.17 8.93 2.62</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ ЭПК извлечь -->
+	<Sound>
+		<SignalID>451</SignalID>
+		<Filename>revers_output.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.17 8.93 2.62</LocalPosition>
+	</Sound>
+
+	<!-- Ключ ЭПК вкл. -->
+	<Sound>
+		<SignalID>452</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.17 8.93 2.62</LocalPosition>
+	</Sound>
+
+	<!-- Ключ ЭПК выкл. -->
+	<Sound>
+		<SignalID>453</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.17 8.93 2.62</LocalPosition>
+	</Sound>
+
+	<!-- Свисток ЭПК -->
+	<Sound>
+		<SignalID>454</SignalID>
+		<Filename>epk.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.17 8.93 2.62</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Автоматическая подача песка" вкл-->
+	<Sound>
+		<SignalID>455</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.07 10.09 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Автоматическая подача песка" выкл-->
+	<Sound>
+		<SignalID>456</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.07 10.09 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Подача песка при экстренном торможении" вкл-->
+	<Sound>
+		<SignalID>457</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.11 10.09 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Подача песка при экстренном торможении" выкл-->
+	<Sound>
+		<SignalID>458</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.11 10.09 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "МПК" вкл-->
+	<Sound>
+		<SignalID>459</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.07 10.02 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "МПК" выкл-->
+	<Sound>
+		<SignalID>460</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.07 10.02 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Авторегулирование" вкл-->
+	<Sound>
+		<SignalID>461</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.11 10.02 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Авторегулирование" выкл-->
+	<Sound>
+		<SignalID>462</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>1.11 10.02 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Левый буферный белый/красный" вверх-->
+	<Sound>
+		<SignalID>463</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Левый буферный белый/красный" вниз-->
+	<Sound>
+		<SignalID>464</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Левый буферный" вкл-->
+	<Sound>
+		<SignalID>465</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.16 9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Левый буферный" выкл-->
+	<Sound>
+		<SignalID>466</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.16 9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Правый буферный" вкл-->
+	<Sound>
+		<SignalID>467</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.13 9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Правый буферный" выкл-->
+	<Sound>
+		<SignalID>468</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.13 9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Правый буферный белый/красный" вверх-->
+	<Sound>
+		<SignalID>469</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.10 9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Правый буферный белый/красный" вниз-->
+	<Sound>
+		<SignalID>470</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.10 9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение ходовой" вкл-->
+	<Sound>
+		<SignalID>471</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.12 10.12 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение ходовой" выкл-->
+	<Sound>
+		<SignalID>472</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.12 10.12 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Прожектор тускло" вкл-->
+	<Sound>
+		<SignalID>473</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.17 10.16 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Прожектор тускло" выкл-->
+	<Sound>
+		<SignalID>474</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.17 10.16 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Прожектор ярко" вкл-->
+	<Sound>
+		<SignalID>475</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.19 10.18 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Прожектор ярко" выкл-->
+	<Sound>
+		<SignalID>476</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.19 10.18 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины тускло" вкл-->
+	<Sound>
+		<SignalID>477</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.02 10.02 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины тускло" выкл-->
+	<Sound>
+		<SignalID>478</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.02 10.02 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины ярко" вкл-->
+	<Sound>
+		<SignalID>479</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.05 10.05 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины ярко" выкл-->
+	<Sound>
+		<SignalID>480</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.05 10.05 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины зелёный" вкл-->
+	<Sound>
+		<SignalID>481</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.08 10.08 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины зелёный" выкл-->
+	<Sound>
+		<SignalID>482</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.08 10.08 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение приборов" вкл-->
+	<Sound>
+		<SignalID>483</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.03 9.99 2.90</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение приборов" выкл-->
+	<Sound>
+		<SignalID>484</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.03 9.99 2.90</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Напряжение цепей управления или ЭПТ" вверх-->
+	<Sound>
+		<SignalID>485</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.22 10.10 2.84</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Напряжение цепей управления или ЭПТ" вниз-->
+	<Sound>
+		<SignalID>486</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.22 10.10 2.84</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Сигнализация" вкл-->
+	<Sound>
+		<SignalID>487</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.19 9.83 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Сигнализация" выкл-->
+	<Sound>
+		<SignalID>488</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.19 9.83 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ПЧФ вкл-->
+	<Sound>
+		<SignalID>489</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.19 9.77 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ПЧФ выкл-->
+	<Sound>
+		<SignalID>490</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.19 9.77 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Регулятор яркости подсветки -->
+	<Sound>
+		<SignalID>491</SignalID>
+		<Filename>switcher.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.89 10.04 2.90</LocalPosition>
+	</Sound>
+
+	<!-- Мотор-компрессор -->
+	<Sound>
+		<SignalID>492</SignalID>
+		<Filename>compressor.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.06 -2.66 2.46</LocalPosition>
+	</Sound>
+
+
+
+	<!-- МВ1 пониженная частота -->
+	<Sound>
+		<SignalID>493</SignalID>
+		<Filename>mv_low.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.06 3.79 4.75</LocalPosition>
+	</Sound>
+
+	<!-- МВ1 нормальная частота -->
+	<Sound>
+		<SignalID>494</SignalID>
+		<Filename>mv_norm.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.06 3.79 4.75</LocalPosition>
+	</Sound>
+
+	<!-- МВ2 пониженная частота -->
+	<Sound>
+		<SignalID>495</SignalID>
+		<Filename>mv_low.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.51 0.22 3.99</LocalPosition>
+	</Sound>
+
+	<!-- МВ2 нормальная частота -->
+	<Sound>
+		<SignalID>496</SignalID>
+		<Filename>mv_norm.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.51 0.22 3.99</LocalPosition>
+	</Sound>
+
+	<!-- МВ3 пониженная частота -->
+	<Sound>
+		<SignalID>497</SignalID>
+		<Filename>mv_low.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.04 -4.69 4.74</LocalPosition>
+	</Sound>
+
+	<!-- МВ3 нормальная частота -->
+	<Sound>
+		<SignalID>498</SignalID>
+		<Filename>mv_norm.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.04 -4.69 4.74</LocalPosition>
+	</Sound>
+
+	<!-- МВ охлаждения блока балластных резисторов -->
+	<Sound>
+		<SignalID>499</SignalID>
+		<Filename>mv_norm.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.58 -1.28 2.61</LocalPosition>
+	</Sound>
+
+
+
+	<!-- Кабина 1 -->
+	<!-- Свисток -->
+	<Sound>
+		<SignalID>500</SignalID>
+		<Filename>svistok.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.8 -8.6 4.6</LocalPosition>
+	</Sound>
+
+	<!-- Тифон -->
+	<Sound>
+		<SignalID>501</SignalID>
+		<Filename>tifon.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.0 -10.0 4.4</LocalPosition>
+	</Sound>
+
+	<!-- Вставить реверсивку -->
+	<Sound>
+		<SignalID>502</SignalID>
+		<Filename>revers_input.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.44 -10.00 2.76</LocalPosition>
+	</Sound>
+
+	<!-- Извлечь реверсивку -->
+	<Sound>
+		<SignalID>503</SignalID>
+		<Filename>revers_output.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.44 -10.00 2.76</LocalPosition>
+	</Sound>
+
+	<!-- Реверсивная рукоятка КМ -->
+	<Sound>
+		<SignalID>504</SignalID>
+		<Filename>revers.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.44 -10.00 2.76</LocalPosition>
+	</Sound>
+
+	<!-- Главная рукоятка КМ -->
+	<Sound>
+		<SignalID>505</SignalID>
+		<Filename>km.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.53 -10.0 2.78</LocalPosition>
+	</Sound>
+
+	<!-- TODO Вставить рукоятку в устройство блокировки тормозов -->
+	<Sound>
+		<SignalID>506</SignalID>
+		<Filename>revers_input.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -8.9 2.4</LocalPosition>
+	</Sound>
+
+	<!-- TODO Извлечь рукоятку из устройства блокировки тормозов -->
+	<Sound>
+		<SignalID>507</SignalID>
+		<Filename>revers_output.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -8.9 2.4</LocalPosition>
+	</Sound>
+
+	<!-- Щелчок блокировки тормозных приборов -->
+	<Sound>
+		<SignalID>508</SignalID>
+		<Filename>ubt-367-ruk.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Щелчок комбинированного крана -->
+	<Sound>
+		<SignalID>509</SignalID>
+		<Filename>komb-kran.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Опорожнение тормозной магистрали от комбинированного крана -->
+	<Sound>
+		<SignalID>510</SignalID>
+		<Filename>395_vypusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Щелчок рукоятки крана 395 -->
+	<Sound>
+		<SignalID>511</SignalID>
+		<Filename>395-chelk.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -9.7 2.8</LocalPosition>
+	</Sound>
+
+	<!-- Стабилизатор крана 395 -->
+	<Sound>
+		<SignalID>512</SignalID>
+		<Filename>395_2.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>0.3</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Наполнение уравнительного резервуара крана 395 -->
+	<Sound>
+		<SignalID>513</SignalID>
+		<Filename>395_1.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Опорожнение уравнительного резервуара крана 395 -->
+	<Sound>
+		<SignalID>514</SignalID>
+		<Filename>395_5.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Наполнение тормозной магистрали от крана 395 -->
+	<Sound>
+		<SignalID>515</SignalID>
+		<Filename>395_vpusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Опорожнение тормозной магистрали от крана 395 -->
+	<Sound>
+		<SignalID>516</SignalID>
+		<Filename>395_vypusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.2 -9.7 2.7</LocalPosition>
+	</Sound>
+
+	<!-- Щелчок рукоятки крана 215 -->
+	<Sound>
+		<SignalID>517</SignalID>
+		<Filename>254-chelk.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.3 -9.8 2.9</LocalPosition>
+	</Sound>
+
+	<!-- Наполнение магистрали тормозных цилиндров от крана 215 -->
+	<Sound>
+		<SignalID>518</SignalID>
+		<Filename>254_vpusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.3 -9.8 2.8</LocalPosition>
+	</Sound>
+
+	<!-- Опорожнение магистрали тормозных цилиндров от крана 215 -->
+	<Sound>
+		<SignalID>519</SignalID>
+		<Filename>254_vypusk.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.3 -9.8 2.8</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МСУД включение -->
+	<Sound>
+		<SignalID>520</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.77 -10.15 2.74</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МСУД выключение -->
+	<Sound>
+		<SignalID>521</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.77 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер блокировка ВВК включение -->
+	<Sound>
+		<SignalID>522</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.80 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер блокировка ВВК выключение -->
+	<Sound>
+		<SignalID>523</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.80 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер передний токоприемник включение -->
+	<Sound>
+		<SignalID>524</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.83 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер передний токоприемник выключение -->
+	<Sound>
+		<SignalID>525</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.83 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер задний токоприемник включение -->
+	<Sound>
+		<SignalID>526</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.86 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер задний токоприемник выключение -->
+	<Sound>
+		<SignalID>527</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.86 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер возврат защиты включение -->
+	<Sound>
+		<SignalID>528</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.89 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер возврат защиты выключение -->
+	<Sound>
+		<SignalID>529</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.89 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ГВ включение -->
+	<Sound>
+		<SignalID>530</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.92 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ГВ выключение -->
+	<Sound>
+		<SignalID>531</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.92 -10.06 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер вспом. машины включение -->
+	<Sound>
+		<SignalID>532</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.92 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер вспом. машины выключение -->
+	<Sound>
+		<SignalID>533</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.92 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер компрессор включение -->
+	<Sound>
+		<SignalID>534</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.89 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер компрессор выключение -->
+	<Sound>
+		<SignalID>535</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.89 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ1 включение -->
+	<Sound>
+		<SignalID>536</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.86 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ1 выключение -->
+	<Sound>
+		<SignalID>537</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.86 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ2 включение -->
+	<Sound>
+		<SignalID>538</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.83 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ2 выключение -->
+	<Sound>
+		<SignalID>539</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.83 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ3 включение -->
+	<Sound>
+		<SignalID>540</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.80 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер МВ3 выключение -->
+	<Sound>
+		<SignalID>541</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.80 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ЭПТ включение -->
+	<Sound>
+		<SignalID>542</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.77 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ЭПТ выключение -->
+	<Sound>
+		<SignalID>543</SignalID>
+		<Filename>tumbler.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.77 -9.93 2.77</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ панели тумблеров вставить -->
+	<Sound>
+		<SignalID>544</SignalID>
+		<Filename>revers_input.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.95 -10.00 2.75</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ панели тумблеров извлечь -->
+	<Sound>
+		<SignalID>545</SignalID>
+		<Filename>revers_output.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.95 -10.00 2.75</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ панели тумблеров разблокировать -->
+	<Sound>
+		<SignalID>546</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.95 -10.00 2.75</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ панели тумблеров заблокировать -->
+	<Sound>
+		<SignalID>547</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.95 -10.00 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Включение КЛУБ и зуммер -->
+	<Sound>
+		<SignalID>548</SignalID>
+		<Filename>klub_On.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.8 -9.5 2.69</LocalPosition>
+	</Sound>
+
+	<!-- Включение КЛУБ и зуммер -->
+	<Sound>
+		<SignalID>549</SignalID>
+		<Filename>klub_buttons.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.8 -9.5 2.69</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ ЭПК вставить -->
+	<Sound>
+		<SignalID>550</SignalID>
+		<Filename>revers_input.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.17 -8.93 2.62</LocalPosition>
+	</Sound>
+
+	<!-- TODO Ключ ЭПК извлечь -->
+	<Sound>
+		<SignalID>551</SignalID>
+		<Filename>revers_output.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.17 -8.93 2.62</LocalPosition>
+	</Sound>
+
+	<!-- Ключ ЭПК вкл. -->
+	<Sound>
+		<SignalID>552</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.17 -8.93 2.62</LocalPosition>
+	</Sound>
+
+	<!-- Ключ ЭПК выкл. -->
+	<Sound>
+		<SignalID>553</SignalID>
+		<Filename>epk_vkl.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.17 -8.93 2.62</LocalPosition>
+	</Sound>
+
+	<!-- Свисток ЭПК -->
+	<Sound>
+		<SignalID>554</SignalID>
+		<Filename>epk.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.17 -8.93 2.62</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Автоматическая подача песка" вкл-->
+	<Sound>
+		<SignalID>555</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.07 -10.09 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Автоматическая подача песка" выкл-->
+	<Sound>
+		<SignalID>556</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.07 -10.09 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Подача песка при экстренном торможении" вкл-->
+	<Sound>
+		<SignalID>557</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.11 -10.09 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Подача песка при экстренном торможении" выкл-->
+	<Sound>
+		<SignalID>558</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.11 -10.09 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "МПК" вкл-->
+	<Sound>
+		<SignalID>559</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.07 -10.02 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "МПК" выкл-->
+	<Sound>
+		<SignalID>560</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.07 -10.02 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Авторегулирование" вкл-->
+	<Sound>
+		<SignalID>561</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.11 -10.02 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Авторегулирование" выкл-->
+	<Sound>
+		<SignalID>562</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-1.11 -10.02 2.75</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Левый буферный белый/красный" вверх-->
+	<Sound>
+		<SignalID>563</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.19 -9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Левый буферный белый/красный" вниз-->
+	<Sound>
+		<SignalID>564</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.19 -9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Левый буферный" вкл-->
+	<Sound>
+		<SignalID>565</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.16 -9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Левый буферный" выкл-->
+	<Sound>
+		<SignalID>566</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.16 -9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Правый буферный" вкл-->
+	<Sound>
+		<SignalID>567</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.13 -9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Правый буферный" выкл-->
+	<Sound>
+		<SignalID>568</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.13 -9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Правый буферный белый/красный" вверх-->
+	<Sound>
+		<SignalID>569</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.10 -9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Правый буферный белый/красный" вниз-->
+	<Sound>
+		<SignalID>570</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.10 -9.94 2.91</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение ходовой" вкл-->
+	<Sound>
+		<SignalID>571</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.12 -10.12 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение ходовой" выкл-->
+	<Sound>
+		<SignalID>572</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.12 -10.12 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Прожектор тускло" вкл-->
+	<Sound>
+		<SignalID>573</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.17 -10.16 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Прожектор тускло" выкл-->
+	<Sound>
+		<SignalID>574</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.17 -10.16 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Прожектор ярко" вкл-->
+	<Sound>
+		<SignalID>575</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 -10.18 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Прожектор ярко" выкл-->
+	<Sound>
+		<SignalID>576</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 -10.18 2.93</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины тускло" вкл-->
+	<Sound>
+		<SignalID>577</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.02 -10.02 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины тускло" выкл-->
+	<Sound>
+		<SignalID>578</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.02 -10.02 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины ярко" вкл-->
+	<Sound>
+		<SignalID>579</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.05 -10.05 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины ярко" выкл-->
+	<Sound>
+		<SignalID>580</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.05 -10.05 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины зелёный" вкл-->
+	<Sound>
+		<SignalID>581</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.08 -10.08 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение кабины зелёный" выкл-->
+	<Sound>
+		<SignalID>582</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.08 -10.08 2.96</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение приборов" вкл-->
+	<Sound>
+		<SignalID>583</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.03 -9.99 2.90</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Освещение приборов" выкл-->
+	<Sound>
+		<SignalID>584</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.03 -9.99 2.90</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Напряжение цепей управления или ЭПТ" вверх-->
+	<Sound>
+		<SignalID>585</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.22 -10.10 2.84</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Напряжение цепей управления или ЭПТ" вниз-->
+	<Sound>
+		<SignalID>586</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.22 -10.10 2.84</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Сигнализация" вкл-->
+	<Sound>
+		<SignalID>587</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 -9.83 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер "Сигнализация" выкл-->
+	<Sound>
+		<SignalID>588</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 -9.83 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ПЧФ вкл-->
+	<Sound>
+		<SignalID>589</SignalID>
+		<Filename>small_tumbler_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 -9.77 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Тумблер ПЧФ выкл-->
+	<Sound>
+		<SignalID>590</SignalID>
+		<Filename>small_tumbler_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 -9.77 2.77</LocalPosition>
+	</Sound>
+
+	<!-- Регулятор яркости подсветки -->
+	<Sound>
+		<SignalID>591</SignalID>
+		<Filename>switcher.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.89 -10.04 2.90</LocalPosition>
+	</Sound>
+
+
+
+	<!-- Передний токоприемник подъем -->
+	<Sound>
+		<SignalID>592</SignalID>
+		<Filename>TPUp.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 7.2 5.19</LocalPosition>
+	</Sound>
+
+	<!-- Передний токоприемник опускание -->
+	<Sound>
+		<SignalID>593</SignalID>
+		<Filename>TPDown.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 7.2 5.19</LocalPosition>
+	</Sound>
+
+	<!-- Задний токоприемник подъем -->
+	<Sound>
+		<SignalID>594</SignalID>
+		<Filename>TPUp.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 -7.2 5.19</LocalPosition>
+	</Sound>
+
+	<!-- Задний токоприемник опускание -->
+	<Sound>
+		<SignalID>595</SignalID>
+		<Filename>TPDown.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 -7.2 5.19</LocalPosition>
+	</Sound>
+
+	<!-- Главный выключатель включение -->
+	<Sound>
+		<SignalID>596</SignalID>
+		<Filename>gv_on.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.68 1.42 5.05</LocalPosition>
+	</Sound>
+
+	<!-- Главный выключатель выключение -->
+	<Sound>
+		<SignalID>597</SignalID>
+		<Filename>gv_off.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>0</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.68 1.42 5.05</LocalPosition>
+	</Sound>
+
+	<!-- Тяговый трансформатор -->
+	<Sound>
+		<SignalID>598</SignalID>
+		<Filename>trans.wav</Filename>
+		<InitVolume>0.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.32 2.16 2.94</LocalPosition>
+	</Sound>
+
+	<!-- Перестуки -->
+	<Sound>
+		<SignalID>599</SignalID>
+		<Filename>5-10.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>600</SignalID>
+		<Filename>10-20.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>601</SignalID>
+		<Filename>20-30.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>602</SignalID>
+		<Filename>30-40.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>603</SignalID>
+		<Filename>40-50.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>604</SignalID>
+		<Filename>50-60.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>605</SignalID>
+		<Filename>60-70.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>606</SignalID>
+		<Filename>70-80.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>607</SignalID>
+		<Filename>80-90.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>608</SignalID>
+		<Filename>90-100.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>609</SignalID>
+		<Filename>100-110.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>610</SignalID>
+		<Filename>110-120.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>611</SignalID>
+		<Filename>120-130.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>612</SignalID>
+		<Filename>130-140.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>613</SignalID>
+		<Filename>140-~.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 0.0 2.5</LocalPosition>
+	</Sound>
+
+	<!-- Тяговые электродвигатели -->
+	<Sound>
+		<SignalID>614</SignalID>
+		<Filename>TED/ted_4-6.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>615</SignalID>
+		<Filename>TED/ted_6-8.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>616</SignalID>
+		<Filename>TED/ted_8-10.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>617</SignalID>
+		<Filename>TED/ted_10-12.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>618</SignalID>
+		<Filename>TED/ted_12-14.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>619</SignalID>
+		<Filename>TED/ted_14-16.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>620</SignalID>
+		<Filename>TED/ted_16-18.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>621</SignalID>
+		<Filename>TED/ted_18-20.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>622</SignalID>
+		<Filename>TED/ted_20-22.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>623</SignalID>
+		<Filename>TED/ted_22-24.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>624</SignalID>
+		<Filename>TED/ted_24-26.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>625</SignalID>
+		<Filename>TED/ted_26-28.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>626</SignalID>
+		<Filename>TED/ted_28-30.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>627</SignalID>
+		<Filename>TED/ted_30-32.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>628</SignalID>
+		<Filename>TED/ted_32-34.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>629</SignalID>
+		<Filename>TED/ted_34-36.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>630</SignalID>
+		<Filename>TED/ted_36-38.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>631</SignalID>
+		<Filename>TED/ted_38-40.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>632</SignalID>
+		<Filename>TED/ted_40-42.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>633</SignalID>
+		<Filename>TED/ted_42-44.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>634</SignalID>
+		<Filename>TED/ted_44-46.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>635</SignalID>
+		<Filename>TED/ted_46-48.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>636</SignalID>
+		<Filename>TED/ted_48-50.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>637</SignalID>
+		<Filename>TED/ted_50-52.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>638</SignalID>
+		<Filename>TED/ted_52-54.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>639</SignalID>
+		<Filename>TED/ted_54-56.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>640</SignalID>
+		<Filename>TED/ted_56-58.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>641</SignalID>
+		<Filename>TED/ted_58-60.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>642</SignalID>
+		<Filename>TED/ted_60-62.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>643</SignalID>
+		<Filename>TED/ted_62-64.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>644</SignalID>
+		<Filename>TED/ted_64-66.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>645</SignalID>
+		<Filename>TED/ted_66-68.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>646</SignalID>
+		<Filename>TED/ted_68-70.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>647</SignalID>
+		<Filename>TED/ted_70-72.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>648</SignalID>
+		<Filename>TED/ted_72-74.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>649</SignalID>
+		<Filename>TED/ted_74-76.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>650</SignalID>
+		<Filename>TED/ted_76-78.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>651</SignalID>
+		<Filename>TED/ted_78-80.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>652</SignalID>
+		<Filename>TED/ted_80-82.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>653</SignalID>
+		<Filename>TED/ted_82-84.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>654</SignalID>
+		<Filename>TED/ted_84-86.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>655</SignalID>
+		<Filename>TED/ted_86-88.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>656</SignalID>
+		<Filename>TED/ted_88-90.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>657</SignalID>
+		<Filename>TED/ted_90-92.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>658</SignalID>
+		<Filename>TED/ted_92-94.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>659</SignalID>
+		<Filename>TED/ted_94-96.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>660</SignalID>
+		<Filename>TED/ted_96-98.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>661</SignalID>
+		<Filename>TED/ted_98-100.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>662</SignalID>
+		<Filename>TED/ted_100-102.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>663</SignalID>
+		<Filename>TED/ted_102-104.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>664</SignalID>
+		<Filename>TED/ted_104-106.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>665</SignalID>
+		<Filename>TED/ted_106-108.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>666</SignalID>
+		<Filename>TED/ted_108-110.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>667</SignalID>
+		<Filename>TED/ted_110-112.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>668</SignalID>
+		<Filename>TED/ted_112-114.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>669</SignalID>
+		<Filename>TED/ted_114-116.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>670</SignalID>
+		<Filename>TED/ted_116-118.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>671</SignalID>
+		<Filename>TED/ted_118-120.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>672</SignalID>
+		<Filename>TED/ted_120-122.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>673</SignalID>
+		<Filename>TED/ted_122-124.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>674</SignalID>
+		<Filename>TED/ted_124-126.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>675</SignalID>
+		<Filename>TED/ted_126-128.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>676</SignalID>
+		<Filename>TED/ted_128-130.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>677</SignalID>
+		<Filename>TED/ted_130-132.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>678</SignalID>
+		<Filename>TED/ted_132-134.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>679</SignalID>
+		<Filename>TED/ted_134-136.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>680</SignalID>
+		<Filename>TED/ted_136-138.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<Sound>
+		<SignalID>681</SignalID>
+		<Filename>TED/ted_138-140.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>-0.19 0.86 0.81</LocalPosition>
+	</Sound>
+
+	<!-- Песочница спереди -->
+	<Sound>
+		<SignalID>682</SignalID>
+		<Filename>sandbox.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 8.3 0.0</LocalPosition>
+	</Sound>
+
+	<!-- Песочница сзади -->
+	<Sound>
+		<SignalID>682</SignalID>
+		<Filename>sandbox.wav</Filename>
+		<InitVolume>1.0</InitVolume>
+		<MaxVolume>1.0</MaxVolume>
+		<InitPitch>1.0</InitPitch>
+		<Loop>1</Loop>
+		<PlayOnStart>0</PlayOnStart>
+		<LocalPosition>0.0 -8.3 0.0</LocalPosition>
+	</Sound>
+
+</Config>

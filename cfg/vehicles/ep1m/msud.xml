@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <Device>
+        <Order>4</Order>
+        <SubStepNum>1</SubStepNum>
+        <Solver>euler</Solver>
+
+        <FanSwitchTimeout>80.0</FanSwitchTimeout>
+        <FanBustInterval>2.5</FanBustInterval>
+        <FanRunoutTime>10.0</FanRunoutTime>
+        <FanSwitchCurrentMin>480.0</FanSwitchCurrentMin>
+        <FanSwitchCurrentMax>480.0</FanSwitchCurrentMax>
+        <Ignore_Off_PCHF>false</Ignore_Off_PCHF>
+        <TC_min_press>0.11</TC_min_press>
+        <AlphaMin>9.0</AlphaMin>
+        <AlphaMax>90.0</AlphaMax>
+
+        <Ktp>0.001</Ktp>
+        <Kti>0.01</Kti>
+        <Ktv>1000.0</Ktv>
+        <Ktvi>0.0</Ktvi>
+
+        <Krp>0.001</Krp>
+        <Kri>0.01</Kri>
+        <Krv>500.0</Krv>
+        <Krvi>10.0</Krvi>
+
+        <Ib_max>950.0</Ib_max>
+
+        <If_max>845.0</If_max>
+
+        <Ia_max>1300.0</Ia_max>
+
+        <Vp>72.0</Vp>
+
+        <Vmax>140.0</Vmax>
+    </Device>
+
+    <!-- Диапазон напряжений зон ВИП -->
+    <Zone>
+        <Umin>0.0</Umin>
+        <Umax>350.0</Umax>
+    </Zone>
+
+    <Zone>
+        <Umin>350.0</Umin>
+        <Umax>700.0</Umax>
+    </Zone>
+
+    <Zone>
+        <Umin>700.0</Umin>
+        <Umax>1050.0</Umax>
+    </Zone>
+
+    <Zone>
+        <Umin>1050.0</Umin>
+        <Umax>1400.0</Umax>
+    </Zone>
+
+</Config>

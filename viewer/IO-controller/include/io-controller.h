@@ -53,6 +53,10 @@ public:
     /// Клик мышью по органу: button 1 - ЛКМ, 3 - ПКМ
     void mouseClick(const QString &object_name, int button);
 
+    /// Отпускание кнопки мыши после нажатия органу типа Button
+    /// (моментальные кнопки: удержание мыши = удержание кнопки)
+    void mouseRelease(const QString &object_name);
+
 signals:
 
     void sigSendVehicleControlCommand(const QByteArray &data);
