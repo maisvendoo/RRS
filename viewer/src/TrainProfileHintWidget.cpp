@@ -216,6 +216,14 @@ static void collectGridMarks(const std::vector<simulator_train_profile_point_t>&
         if (rc0 <= 0.5f || rc1 <= 0.5f)
             continue;
 
+        // Аномальный градиент километража относительно расстояния —
+        // артефакт данных (стык траекторий, некорректный километраж).
+        // Пропускаем сегмент, чтобы не плодить десятки линий сетки
+        // на коротком интервале
+        const float grad = std::abs(rc1 - rc0) / std::max(d1 - d0, 1e-6f);
+        if (grad > 3.0f)
+            continue;
+
         const float lo = std::min(rc0, rc1);
         const float hi = std::max(rc0, rc1);
         if (hi - lo < 1e-6f)
