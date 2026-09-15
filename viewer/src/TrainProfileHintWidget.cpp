@@ -854,7 +854,7 @@ void TrainProfileHintWidget::drawSpeedLimits(const PlotTransform& plot) const
     const ImU32 no_col = IM_COL32(0, 0, 0, 0);
 
     float last_border_x = -1e6f;
-    const float border_min_gap = 10.0f;
+    const float border_min_gap = 5.0f;
 
     for (const auto& sl : limits)
     {
