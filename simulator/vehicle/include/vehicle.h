@@ -37,7 +37,6 @@
 #include    "vehicle-sand.h"
 #include    "vehicle-brake-shoes.h"
 #include    "vehicle-energy.h"
-#include    "vehicle-pantograph.h"
 #include    "vehicle-depot-power.h"
 #include    "vehicle-coupling-interaction.h"
 #include    "vehicle-sound-events.h"
@@ -195,7 +194,7 @@ public:
     bool isDerailed() const;
 
     /// Рывок сцепки от сошедшего соседа: боковая составляющая дёргающего
-    /// удара разгружает колёса (цепной сход)
+    /// удара разгружает колёса (цепной сход, ТЗ "Физика после схода", п.21)
     void onCouplerJerk(double energy);
 
     /// Сброс состояния схода (восстановление после аварии)
@@ -222,20 +221,19 @@ public:
     /// Учёт электроэнергии и статистика рейса
     EnergyMeterSystem& getEnergy();
 
-    /// Токоприёмник (контакт с КС, дуги)
-    PantographSystem& getPantograph();
-
     /// Деповское питание 380 В и аккумуляторная батарея
     DepotPowerSystem& getDepotPower();
 
     /// Интерактивная сцепка (рукава, краны, рычаг СА-3)
     CouplingInteraction& getCouplingInteraction();
 
-    /// Ветер для токоприёмника (от погоды)
-    void applyWindToPantograph(double wind_speed);
+    /// Скорость ветра (контекст погоды для устройств модуля ПЕ)
+    void setWindSpeed(double wind_speed);
+
+    double getWindSpeed() const;
 
     /// Собрать физические звуковые события ПЕ с последнего опроса
-    /// (мост физика -> аудиосистема)
+    /// (мост физика -> аудиосистема, ТЗ "Аудиосистема")
     void collectSoundEvents(std::vector<SoundEvent>& out);
 
     /// Лобовое стекло кабины (грязь/дворники/омыватель/лёд)
@@ -253,14 +251,16 @@ public:
     /// Пассажирская система вагона (посадка/высадка)
     PassengerSystem& getPassengers();
 
-    /// Система снабжения (заправка топливом/маслом/ОЖ/песком на / стоянке через колонки депо/ПТО)
+    /// Система снабжения (заправка топливом/маслом/ОЖ/песком на
+    /// стоянке через колонки депо/ПТО, ТЗ "Снабжение локомотива")
     ServiceSystem& getService();
 
     /// Конденсат и лёд в пневматической системе (точка росы, влага,
     /// замерзание, слив; тормозная волна деградирует при льде)
     CondensateSystem& getCondensate();
 
-    /// Износ колёсных пар (пробег/тоннаж/боксование/торможения -> / профиль -> коничность -> виляние)
+    /// Износ колёсных пар (пробег/тоннаж/боксование/торможения ->
+    /// профиль -> коничность -> виляние, ТЗ "43-47", п.1)
     WheelWearSystem& getWheelWear();
 
     /// Аэродинамика тоннеля ("воздушный поршень"; зоны тоннелей
@@ -271,13 +271,13 @@ public:
     WSPSystem& getWSP();
 
     /// Обточка колёсных пар в депо: сброс ползунов + уменьшение
-    /// диаметра от износа
+    /// диаметра от износа (ТЗ "43-47", п.1)
     void reprofileWheels();
 
     /// Интенсивность осадков (от погоды, для стекла)
     void setRainIntensity(double intensity);
 
-    /// Уровень детализации симуляции ПЕ:
+    /// Уровень детализации симуляции ПЕ (ТЗ "Оптимизация", п.2-5):
     /// L0 полный; L1 пропускает дорогие визуальные/тепловые подсистемы;
     /// L2 только продольная модель; L3 заморозка
     void setSimulationLOD(perf::SimLOD lod);
@@ -295,12 +295,26 @@ public:
     /// Источник питания КС: (пикетаж, ток) -> состояние питания
     void setCatenaryFeed(std::function<catenary::FeedState(double, double)> fn);
 
+    /// Состояние питания КС в точке ПЕ (контекст инфраструктуры;
+    /// физику контакта полоза считает модуль ПЕ своими устройствами)
+    catenary::FeedState getOverheadFeed(double current_a) const;
+
     /// Сколько сеть готова принять рекуперации от этой ПЕ, Вт
     /// (считается моделью: подстанция + потребители секции)
     void setRegenAcceptance(double accept_w, bool accepted);
 
     /// Источник питания КС привязан
     bool getCatenaryFeedActive() const;
+
+    /// Полоз поднят (данные модуля; телеметрия/кассета/рекуперация)
+    void setPantographRaised(bool raised);
+
+    bool isPantographRaised() const;
+
+    /// Контакт полоза с проводом устойчив (данные модуля)
+    void setPantographContactOk(bool ok);
+
+    bool isPantographContactOk() const;
 
     /// Ремонт: сброс повреждений и последствий аварии
     void repair();
@@ -550,9 +564,6 @@ protected:
     /// Учёт электроэнергии (электровозы)
     EnergyMeterSystem energy;
 
-    /// Токоприёмник
-    PantographSystem pantograph;
-
     /// Деповское питание и АБ
     DepotPowerSystem depot_power;
 
@@ -590,7 +601,7 @@ protected:
     /// Аэродинамика тоннеля
     TunnelAerodynamics tunnel_aero;
 
-    /// Противоюзная система: модуляция
+    /// Противоюзная система (ТЗ "Сцепление", п.10-11): модуляция
     /// тормозного момента осей при юзе, множитель применяется при
     /// чтении Q_r в ОДУ без мутации самого Q_r
     WSPSystem wsp;
@@ -622,17 +633,22 @@ protected:
     double mass_center_longitudinal_base = 0.0;
     double mass_center_lateral_base = 0.0;
 
-    /// Уровень детализации симуляции
+    /// Уровень детализации симуляции (ТЗ "Оптимизация")
     perf::SimLOD sim_lod = perf::SimLOD::L0_Full;
 
     /// Аккумуляторы адаптивных частот (п.4): термо 10 Гц, износ 5 Гц
     double thermal_accum = 0.0;
     double wear_accum = 0.0;
 
-    /// Скорость ветра от погоды (токоприёмник)
-    double wind_speed_for_pantograph = 0.0;
+    /// Скорость ветра от погоды (контекст для устройств модуля)
+    double wind_speed = 0.0;
 
-    /// Параметры ветровой нагрузки на кузов (секция [WindLoad], /// "43-47"): боковая площадь, Cd, плотность воздуха,
+    /// Состояние полоза: данные модуля ПЕ (телеметрия/кассета/рекуперация)
+    bool pantograph_raised = false;
+    bool pantograph_contact_ok = false;
+
+    /// Параметры ветровой нагрузки на кузов (секция [WindLoad], ТЗ
+    /// "43-47", п.2): боковая площадь, Cd, плотность воздуха,
     /// детерминированные порывы и высота приложения силы
     bool wind_load_enabled = true;
     double wind_lateral_area = 0.0;   ///< 0 - автоматически length * 3.7
@@ -672,7 +688,7 @@ protected:
     /// (температура/износ), применяется при чтении Q_r в ОДУ
     std::vector<double> brake_fade_eff = {1.0};
 
-    /// Центр масс: высота над осями, м
+    /// Центр масс (ТЗ "Продольная динамика", п.5): высота над осями, м
     double mass_center_height = 1.8;
     /// Продольное смещение от середины ПЕ, м (+ к переду)
     double mass_center_longitudinal = 0.0;

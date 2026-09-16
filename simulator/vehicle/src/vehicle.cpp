@@ -208,7 +208,8 @@ void Vehicle::applyCollisionDamage(const collision::CollisionEvent& event)
     if (energy <= 0.0)
         return;
 
-    // Зона удара по направлению нормали в локальных осях ПЕ (// "Реалистичный сход ПС", : место контакта влияет на повреждения)
+    // Зона удара по направлению нормали в локальных осях ПЕ (ТЗ
+    // "Реалистичный сход ПС", п.17: место контакта влияет на повреждения)
     const double lateral = std::abs(r.x * event.normal.x +
                                     r.y * event.normal.y +
                                     r.z * event.normal.z) / o_len;
@@ -242,7 +243,7 @@ void Vehicle::applyCollisionDamage(const collision::CollisionEvent& event)
     damage_system.applyImpact(energy, zone);
 
     // Боковой удар с высокой энергией - импульс на разгрузку колёс:
-    // связь столкновения с системой схода
+    // связь столкновения с системой схода (ТЗ, п.2, 14)
     if (zone == VehicleDamageSystem::ImpactZone::Side && energy > 200e3)
     {
         derailment.applyLateralImpact(energy, event.normal.x, event.normal.y,
@@ -324,14 +325,6 @@ EnergyMeterSystem& Vehicle::getEnergy()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PantographSystem& Vehicle::getPantograph()
-{
-    return pantograph;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 DepotPowerSystem& Vehicle::getDepotPower()
 {
     return depot_power;
@@ -364,9 +357,49 @@ CouplingInteraction& Vehicle::getCouplingInteraction()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::applyWindToPantograph(double wind_speed)
+void Vehicle::setWindSpeed(double wind_speed)
 {
-    wind_speed_for_pantograph = wind_speed;
+    this->wind_speed = wind_speed;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::getWindSpeed() const
+{
+    return wind_speed;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setPantographRaised(bool raised)
+{
+    pantograph_raised = raised;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::isPantographRaised() const
+{
+    return pantograph_raised;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setPantographContactOk(bool ok)
+{
+    pantograph_contact_ok = ok;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::isPantographContactOk() const
+{
+    return pantograph_contact_ok;
 }
 
 //------------------------------------------------------------------------------
@@ -578,18 +611,6 @@ void Vehicle::collectSoundEvents(std::vector<SoundEvent>& out)
         out.push_back(ev);
     }
 
-    // Дуги токоприёмника
-    if (pantograph.getArcRate() > 0.05 &&
-        allow(SoundEventType::PantographArc, 0.5))
-    {
-        SoundEvent ev;
-        ev.type = SoundEventType::PantographArc;
-        ev.x = pos.x; ev.y = pos.y; ev.z = pos.z + 5.0;
-        ev.intensity = std::min(1.0, pantograph.getArcRate() * 2.0);
-        ev.vehicle_idx = model_idx;
-        out.push_back(ev);
-    }
-
     // Поток песка
     if (sand.isFeeding() && allow(SoundEventType::SandFlow, 0.5))
     {
@@ -622,7 +643,7 @@ void Vehicle::collectSoundEvents(std::vector<SoundEvent>& out)
         }
     }
 
-    // Стук на стыках пути: счётчик ударов осей
+    // Стук на стыках пути (ТЗ "43-47", п.6-8): счётчик ударов осей
     // вертикальной динамики монотонный - новые удары = дельта между
     // опросами. Интенсивность от силы заброса ускорения колёсной пары
     // и скорости (нагруженное колесо бьёт сильнее), частота - от
@@ -709,6 +730,19 @@ void Vehicle::setCatenaryFeed(
         std::function<catenary::FeedState(double, double)> fn)
 {
     catenary_feed = std::move(fn);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+catenary::FeedState Vehicle::getOverheadFeed(double current_a) const
+{
+    if (catenary_feed)
+    {
+        return catenary_feed(profile_point_data.railway_coord, current_a);
+    }
+
+    return catenary::FeedState();
 }
 
 //------------------------------------------------------------------------------
@@ -1409,7 +1443,7 @@ void Vehicle::getAcceleration(state_vector_t& Y, state_vector_t& dYdt, const dou
         }
     }
 
-    // Сила на ободе для учёта энергии (P = F * v)
+    // Сила на ободе для учёта энергии (P = F * v, ТЗ "Расход энергии")
     last_wheel_traction = F_wheels;
 
     // Calculate main resistance force
@@ -1485,7 +1519,7 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
     // Локальные часы для кулдаунов звуковых событий
     sim_clock = t.simulation_seconds;
 
-    //=== Уровни детализации симуляции ===
+    //=== Уровни детализации симуляции (ТЗ "Оптимизация", п.2-5) ===
     const bool lod_full = (sim_lod == perf::SimLOD::L0_Full);
     const bool lod_ge1 = (sim_lod <= perf::SimLOD::L1_Simplified);
 
@@ -1526,7 +1560,7 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
         rail_cant_mm = cant_source(static_cast<double>(dir) * train_coord);
     }
 
-    // Вертикальная динамика: неровности пути -> подвеска -> кузов.
+    // Вертикальная динамика: неровности пути -> подвеска -> кузов (ТЗ).
     // Возвышение наружного рельса входит как смещение сторон в контакте
     // колёс (статический крен), продольное ускорение - как момент
     // тангажа кузова (клюёт носом при торможении).
@@ -1539,7 +1573,7 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
                                rail_cant_mm, longitudinal_accel);
     }
 
-    // Боковая ветровая нагрузка на кузов: сила
+    // Боковая ветровая нагрузка на кузов (ТЗ "43-47", п.2): сила
     // передаётся в поперечную динамику ДО её шага (смещение кузова,
     // крен и разгрузка колёс тем же механизмом, что центробежная)
     updateWindLoad(t.simulation_seconds);
@@ -1550,7 +1584,7 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
     tunnel_aero.step(dt, velocity, length);
 
     // Поперечная динамика: виляние от коничности + крип + неровности
-    // плана линии. Трение - текущее
+    // плана линии (ТЗ "Поперечная динамика"). Трение - текущее
     // колесо-рельс с учётом погодного коэффициента и песка (усреднение
     // по осям: поперечная модель получает один коэффициент трения)
     if (lateral_dynamics.isEnabled() && lateral_dynamics.isReady() &&
@@ -1573,7 +1607,7 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
         const double friction = psi_coeff * wheelrailFriction(velocity) *
                 adhesion_factor;
 
-        // Нагрузки осей от вертикальной динамики (связь систем)
+        // Нагрузки осей от вертикальной динамики (связь систем, ТЗ п.33)
         std::vector<double> load_factors;
 
         if (vertical_dynamics.isEnabled() && vertical_dynamics.isReady())
@@ -1594,7 +1628,7 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
     }
 
     // Система схода: постепенная, по датчикам поперечной и вертикальной
-    // динамики
+    // динамики (ТЗ "Динамика ПС", п.11-12)
     if (derailment.isEnabled())
     {
         derailment.step(dt, lateral_dynamics, vertical_dynamics, num_axis);
@@ -1607,7 +1641,7 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
     }
 
     // Опрокидывание: физический критерий по боковому ускорению и центру
-    // масс
+    // масс (ТЗ "Физика после схода", п.10)
     if (derailment.isEnabled())
     {
         const bool was_rollover = derailment.isRollover();
@@ -1626,7 +1660,7 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
     //=== Адаптивные частоты (аккумуляторы выше, у LOD-блока) ===
 
     // Сцепление колёс с рельсами: эволюция поверхности под погодой
-    // и самоочисткой проходами осей
+    // и самоочисткой проходами осей (ТЗ "Сцепление колёс с рельсами")
     if (lod_full || wear_tick)
     {
         adhesion.step(lod_full ? dt : wear_dt, velocity, num_axis);
@@ -1635,10 +1669,11 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
     // Интерактивная сцепка: контроль обрыва рукавов при движении
     coupling_interaction.step(dt, velocity, damage_system);
 
-    // Груз и пассажиры: физическое изменение массы ПЕ: payload = груз + пассажиры; ЦМ груза смещает осевые
+    // Груз и пассажиры: физическое изменение массы ПЕ (ТЗ "Погрузка",
+    // п.3, 32): payload = груз + пассажиры; ЦМ груза смещает осевые
     // нагрузки и центр масс (п.4).
     // Полная масса = тара + фактическая масса груза/пассажиров без
-    // обрезания по PayloadMass.
+    // обрезания по PayloadMass (ТЗ "Продольная динамика", п.2).
     // Если у ПЕ нет динамических систем загрузки - сохраняем
     // коэффициент, заданный конфигом поезда (setPayloadCoeff),
     // иначе он стирался бы на каждом шаге
@@ -1691,19 +1726,20 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
                        vertical_dynamics.getBodyRoll());
 
     // Деповское питание и батарея: заряд от внешнего источника или
-    // генератора, разряд от вспомогательных потребителей (// "Деповское питание"). Стояночная нагрузка низковольтной сети
+    // генератора, разряд от вспомогательных потребителей (ТЗ
+    // "Деповское питание"). Стояночная нагрузка низковольтной сети
     {
         const double aux_load = 2000.0;
         depot_power.step(dt, aux_load, false, abs(velocity) > 0.1);
     }
 
-    // Снабжение: порционная подача
+    // Снабжение (ТЗ "Снабжение локомотива"): порционная подача
     // топлива/масла/ОЖ/песка через штатные API систем-приёмников.
     // Движение при подключении обрывает рукав (Critical, отмена);
     // блокировка тяги - isMovementBlocked() у потребителя
     service_system.step(dt, velocity, sand);
 
-    // Конденсат пневмосистемы: точка росы
+    // Конденсат пневмосистемы (ТЗ "Конденсат/влажность"): точка росы
     // по Магнусу, влага при зарядке магистрали, замерзание/оттаивание
     // (термо-тик). Деградация тормозной волны - через
     // getBrakeResponseFactor() у тормозных устройств
@@ -1716,57 +1752,14 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
                                abs(velocity) < 0.3);
     }
 
-    // Учёт электроэнергии от фактической силы на ободе. Приём рекуперации ограничен сетью
-    // (подстанция + потребители секции)
+    // Учёт электроэнергии от фактической силы на ободе (ТЗ "Расход
+    // топлива и электроэнергии"). Приём рекуперации ограничен сетью
+    // (подстанция + потребители секции, ТЗ "Рекуперация", п.5-7)
     energy.step(dt, last_wheel_traction, velocity, Uks,
                 regen_accept_w, regen_accepted);
 
-    // Питание от КС через токоприёмник:
-    // напряжение в точке с провалом от тока/расстояния до подстанции;
-    // потеря контакта/нейтральная вставка -> 0
-    if (pantograph.isRaised() && catenary_feed)
-    {
-        const catenary::FeedState feed =
-                catenary_feed(profile_point_data.railway_coord,
-                              energy.getCurrent());
-
-        pantograph.step(dt, velocity, wind_speed_for_pantograph,
-                        feed.voltage);
-
-        Uks = (pantograph.isContactOk() && feed.powered) ? feed.voltage : 0.0;
-
-        // Проезд нейтральной вставки под током (#17):
-        // включённый БВ при проходе нейтралки - ошибка машиниста
-        if (feed.in_neutral && energy.getCurrent() > 30.0)
-        {
-            Uks = 0.0;
-
-            if (!neutral_fault_reported)
-            {
-                neutral_fault_reported = true;
-                Journal::instance()->critical(QString(
-                    "[CATENARY] Vehicle #%1 crossing NEUTRAL INSERT "
-                    "under power - main switch fault!")
-                    .arg(model_idx));
-
-                damage_system.addDamage(
-                            VehicleDamageSystem::Component::Electrical, 0.3);
-            }
-        }
-        else if (!feed.in_neutral)
-        {
-            neutral_fault_reported = false;
-        }
-    }
-    else
-    {
-        // Токоприёмник опущен / нет КС - питания нет (сброс, иначе
-        // Uks "залипал" на последнем значении)
-        Uks = 0.0;
-    }
-
     // Тормозные колодки: нагрев от реальной работы тормоза, охлаждение,
-    // износ, fade. Температура воздуха - от
+    // износ, fade (ТЗ "Тормозные колодки"). Температура воздуха - от
     // погоды (охлаждение зависит от среды, п.3/17)
     if (brake_shoes.isEnabled() && (lod_full || thermal_tick))
     {
@@ -1795,14 +1788,14 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
             brake_fade_eff[i] = 1.0;
     }
 
-    // Противоюзная система: модуляция
+    // Противоюзная система (ТЗ "Сцепление", п.10-11): модуляция
     // тормозного момента осей при юзе. Множитель применяется в
     // getAcceleration при чтении Q_r (по образцу brake_fade_eff),
     // сам Q_r не мутируется
     wsp.step(dt, velocity, wheel_omega, rk);
 
     // Пескоподача: расход из бункера, эффект на сцепление осей
-    //. Автоматика - по пробуксовке осей.
+    // (ТЗ "Подача песка"). Автоматика - по пробуксовке осей.
     // Только у ПЕ с настроенной секцией [Sand] (локомотивы)
     if (sand.isEnabled())
     {
@@ -1829,16 +1822,16 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
     }
 
     // Ползуны: образование при юзе + периодические удары при обороте
-    // колёсной пары
+    // колёсной пары (ТЗ "Ползун")
     if (flat_spots.isEnabled() && (lod_full || wear_tick))
     {
         flat_spots.step(lod_full ? dt : wear_dt, wheel_rotation_angle,
                         wheel_omega, rk, velocity, vertical_dynamics);
     }
 
-    // Износ колёсных пар: аккумуляторы энергии
+    // Износ колёсных пар (ТЗ "43-47", п.1): аккумуляторы энергии
     // заполняются каждый кадр (дёшево), пересчёт износа - на wear-тике
-    //
+    // (ТЗ "Оптимизация", п.16)
     if (wheel_wear.isEnabled() && num_axis > 0)
     {
         for (size_t i = 0; i < num_axis; ++i)
@@ -1954,7 +1947,8 @@ void Vehicle::integrationPreStep(state_vector_t& Y, const double& t)
     }
 
     // Движение после схода с рельсов: огромное сопротивление движению
-    // по шпалам/балласту + интенсивное замедление (уточняется в)
+    // по шпалам/балласту + интенсивное замедление (ТЗ "Динамика ПС", п.13;
+    // уточняется в ТЗ "Физика после схода")
     if (derailment.isDerailed())
     {
         const double derailed_resist =
@@ -2174,7 +2168,8 @@ void Vehicle::mainResistCoeffs()
 //------------------------------------------------------------------------------
 double Vehicle::mainResist(const double& velocity)
 {
-    // Основное сопротивление + "воздушный поршень" тоннеля (// "43-47"): прибавка плавно растёт при входе ПЕ в тоннель
+    // Основное сопротивление + "воздушный поршень" тоннеля (ТЗ
+    // "43-47", п.3): прибавка плавно растёт при входе ПЕ в тоннель
     // и падает при выходе (getResistanceForce = 0 вне зон)
     return full_mass * (  W_coef
                         + W_coef_v * std::abs(velocity)
@@ -2384,9 +2379,6 @@ void Vehicle::loadConfiguration(QString cfg_path)
         // Учёт энергии (секция Energy)
         energy.loadConfig(cfg_path);
 
-        // Токоприёмник (секция Pantograph)
-        pantograph.loadConfig(cfg_path);
-
         // Деповское питание и АБ (секции DepotPower/Battery)
         depot_power.loadConfig(cfg_path);
 
@@ -2422,7 +2414,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
         // Аэродинамика тоннеля (секция TunnelAero; зоны задаёт модель)
         tunnel_aero.loadConfig(cfg_path);
 
-        // Противоюзная система (секция WSP)
+        // Противоюзная система (секция WSP; ТЗ "Сцепление", п.10-11)
         wsp.loadConfig(cfg_path, num_axis);
 
         // Ветровая нагрузка на кузов (секция WindLoad)
@@ -2549,7 +2541,7 @@ void Vehicle::updateWindLoad(double time_s)
 {
     // Нет поперечной динамики или данных о ветре - разгружаем канал
     if (!wind_load_enabled || !lateral_dynamics.isEnabled() ||
-            wind_speed_for_pantograph <= 0.1)
+            wind_speed <= 0.1)
     {
         if (lateral_dynamics.getWindLateralForce() != 0.0)
             lateral_dynamics.setWindLateralForce(0.0, wind_app_height);
@@ -2558,20 +2550,21 @@ void Vehicle::updateWindLoad(double time_s)
     }
 
     // Боковая площадь кузова: из конфига или длина x типовая высота
-    // габарита кузова 3.7 м
+    // габарита кузова 3.7 м (ТЗ "43-47", п.2)
     const double area = (wind_lateral_area > 0.0)
             ? wind_lateral_area
             : length * 3.7;
 
     // Скорость потока: скорость ветра от погоды (м/с)
-    const double v = wind_speed_for_pantograph;
+    const double v = wind_speed;
 
-    // F = 0.5 * rho * Cd * A * V^2
+    // F = 0.5 * rho * Cd * A * V^2 (ТЗ "43-47", п.2)
     const double force = 0.5 * wind_air_density * wind_drag_coeff *
             area * v * v;
 
     // Порывы/направление: детерминированная модуляция по времени
-    // (сдвиг фазы по индексу ПЕ - соседние кузова не качатся синхронно,, "порывы"). Знак задаёт сторону (вправо/влево)
+    // (сдвиг фазы по индексу ПЕ - соседние кузова не качатся синхронно,
+    // ТЗ "43-47", п.2 "порывы"). Знак задаёт сторону (вправо/влево)
     const double phase = 2.0 * Physics::PI * time_s / wind_gust_period +
             1.7 * static_cast<double>(model_idx);
 

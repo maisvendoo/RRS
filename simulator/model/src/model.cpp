@@ -2344,7 +2344,7 @@ void Model::stepCassette(double dt)
     frame.main_reservoir_pressure = (mr > 0.0) ? mr * MPA_TO_KGS_CM2 : 0.0;
 
     // Электрические каналы
-    frame.overhead_voltage = controlled->getPantograph().isRaised()
+    frame.overhead_voltage = controlled->isPantographRaised()
             ? 25000.0 : 0.0;
 
     // Ток ТЭД: реальный Ia моторов от аддона; без источника -
@@ -2353,7 +2353,7 @@ void Model::stepCassette(double dt)
     frame.traction_current = (ia > 0.0)
             ? ia
             : controlled->getEnergy().getCurrent();
-    frame.roof_raised = controlled->getPantograph().isRaised();
+    frame.roof_raised = controlled->isPantographRaised();
 
     // Тяга/торможение: сила из фактической мощности на ободе (P = F*v)
     const double power_kw = controlled->getEnergy().getPower();
@@ -2467,7 +2467,7 @@ void Model::process()
                             static_cast<int>(wstate.type)),
                         wstate.intensity);
             vehicle->getAdhesion().setTemperature(wstate.temperature);
-            vehicle->applyWindToPantograph(wstate.wind_speed);
+            vehicle->setWindSpeed(wstate.wind_speed);
             vehicle->setRainIntensity(wstate.intensity);
         }
     }
@@ -2482,8 +2482,8 @@ void Model::process()
         {
             // Отрыв полоза (дуга) - ПЕ не питается от КС и не может
             // отдавать энергию: контакт токоприёмника обязателен
-            if (!vehicle->getPantograph().isRaised() ||
-                !vehicle->getPantograph().isContactOk() ||
+            if (!vehicle->isPantographRaised() ||
+                !vehicle->isPantographContactOk() ||
                 !vehicle->getCatenaryFeedActive())
             {
                 continue;
@@ -2509,8 +2509,8 @@ void Model::process()
             // Без устойчивого контакта приём рекуперации невозможен:
             // энергия уходит в реостаты ПЕ, а не "возвращается" в КС
             // при отрыве полоза
-            if (!vehicle->getPantograph().isRaised() ||
-                !vehicle->getPantograph().isContactOk() ||
+            if (!vehicle->isPantographRaised() ||
+                !vehicle->isPantographContactOk() ||
                 !vehicle->getCatenaryFeedActive())
             {
                 vehicle->setRegenAcceptance(0.0, false);
@@ -2946,7 +2946,7 @@ session::session_state_t Model::captureSessionState()
             // Состояния устройств ключевых ПЕ
             vehicle_state.er_pressure = VehicleTelemetry::instance()
                         .equalizingReservoirPressure(vehicle);
-            vehicle_state.pantograph_up = vehicle->getPantograph().isRaised();
+            vehicle_state.pantograph_up = vehicle->isPantographRaised();
 
             if (vehicle->getModelIndex() < vehicles.size())
             {
