@@ -18,13 +18,32 @@ void EP1m::stepPowerCircuit(const double& t, const double& dt)
                           tumbler_pant2 &&
                           kv44->getContactState(2));
 
+    // Данные полоза для телеметрии/кассеты/рекуперации
+    setPantographRaised(tumbler_pant1 || tumbler_pant2);
+
+    // Напряжение КС в точке ПЕ - контекст инфраструктуры через Vehicle
+    const bool is_raised = pant[PANT1]->isUp() || pant[PANT2]->isUp();
+
+    if (is_raised && getCatenaryFeedActive())
+    {
+        const auto feed = getOverheadFeed(getEnergy().getCurrent());
+
+        Uks = feed.powered ? feed.voltage : 0.0;
+        setPantographContactOk(true);
+    }
+    else
+    {
+        Uks = 0.0;
+        setPantographContactOk(false);
+    }
+
+    setUks(Uks);
+
     for (size_t i = 0; i < pant.size(); ++i)
     {
         pant[i]->setUks(Uks);
         pant[i]->step(t, dt);
     }
-
-    getPantograph().setRaised(tumbler_pant1 || tumbler_pant2);
 
     Ukr = max(pant[PANT1]->getUout(), pant[PANT2]->getUout());
 

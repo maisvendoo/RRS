@@ -325,14 +325,6 @@ EnergyMeterSystem& Vehicle::getEnergy()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-PantographSystem& Vehicle::getPantograph()
-{
-    return pantograph;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 DepotPowerSystem& Vehicle::getDepotPower()
 {
     return depot_power;
@@ -365,9 +357,49 @@ CouplingInteraction& Vehicle::getCouplingInteraction()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Vehicle::applyWindToPantograph(double wind_speed)
+void Vehicle::setWindSpeed(double wind_speed)
 {
-    wind_speed_for_pantograph = wind_speed;
+    this->wind_speed = wind_speed;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Vehicle::getWindSpeed() const
+{
+    return wind_speed;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setPantographRaised(bool raised)
+{
+    pantograph_raised = raised;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::isPantographRaised() const
+{
+    return pantograph_raised;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::setPantographContactOk(bool ok)
+{
+    pantograph_contact_ok = ok;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::isPantographContactOk() const
+{
+    return pantograph_contact_ok;
 }
 
 //------------------------------------------------------------------------------
@@ -579,18 +611,6 @@ void Vehicle::collectSoundEvents(std::vector<SoundEvent>& out)
         out.push_back(ev);
     }
 
-    // Дуги токоприёмника
-    if (pantograph.getArcRate() > 0.05 &&
-        allow(SoundEventType::PantographArc, 0.5))
-    {
-        SoundEvent ev;
-        ev.type = SoundEventType::PantographArc;
-        ev.x = pos.x; ev.y = pos.y; ev.z = pos.z + 5.0;
-        ev.intensity = std::min(1.0, pantograph.getArcRate() * 2.0);
-        ev.vehicle_idx = model_idx;
-        out.push_back(ev);
-    }
-
     // Поток песка
     if (sand.isFeeding() && allow(SoundEventType::SandFlow, 0.5))
     {
@@ -710,6 +730,19 @@ void Vehicle::setCatenaryFeed(
         std::function<catenary::FeedState(double, double)> fn)
 {
     catenary_feed = std::move(fn);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+catenary::FeedState Vehicle::getOverheadFeed(double current_a) const
+{
+    if (catenary_feed)
+    {
+        return catenary_feed(profile_point_data.railway_coord, current_a);
+    }
+
+    return catenary::FeedState();
 }
 
 //------------------------------------------------------------------------------
@@ -1725,50 +1758,6 @@ void Vehicle::integrationProcess(const simulator_time_t& t, const double& dt)
     energy.step(dt, last_wheel_traction, velocity, Uks,
                 regen_accept_w, regen_accepted);
 
-    // Питание от КС через токоприёмник (ТЗ "Контактная сеть"):
-    // напряжение в точке с провалом от тока/расстояния до подстанции;
-    // потеря контакта/нейтральная вставка -> 0
-    if (pantograph.isRaised() && catenary_feed)
-    {
-        const catenary::FeedState feed =
-                catenary_feed(profile_point_data.railway_coord,
-                              energy.getCurrent());
-
-        pantograph.step(dt, velocity, wind_speed_for_pantograph,
-                        feed.voltage);
-
-        Uks = (pantograph.isContactOk() && feed.powered) ? feed.voltage : 0.0;
-
-        // Проезд нейтральной вставки под током (п.21-23 ТЗ #17):
-        // включённый БВ при проходе нейтралки - ошибка машиниста
-        if (feed.in_neutral && energy.getCurrent() > 30.0)
-        {
-            Uks = 0.0;
-
-            if (!neutral_fault_reported)
-            {
-                neutral_fault_reported = true;
-                Journal::instance()->critical(QString(
-                    "[CATENARY] Vehicle #%1 crossing NEUTRAL INSERT "
-                    "under power - main switch fault!")
-                    .arg(model_idx));
-
-                damage_system.addDamage(
-                            VehicleDamageSystem::Component::Electrical, 0.3);
-            }
-        }
-        else if (!feed.in_neutral)
-        {
-            neutral_fault_reported = false;
-        }
-    }
-    else
-    {
-        // Токоприёмник опущен / нет КС - питания нет (сброс, иначе
-        // Uks "залипал" на последнем значении)
-        Uks = 0.0;
-    }
-
     // Тормозные колодки: нагрев от реальной работы тормоза, охлаждение,
     // износ, fade (ТЗ "Тормозные колодки"). Температура воздуха - от
     // погоды (охлаждение зависит от среды, п.3/17)
@@ -2390,9 +2379,6 @@ void Vehicle::loadConfiguration(QString cfg_path)
         // Учёт энергии (секция Energy)
         energy.loadConfig(cfg_path);
 
-        // Токоприёмник (секция Pantograph)
-        pantograph.loadConfig(cfg_path);
-
         // Деповское питание и АБ (секции DepotPower/Battery)
         depot_power.loadConfig(cfg_path);
 
@@ -2555,7 +2541,7 @@ void Vehicle::updateWindLoad(double time_s)
 {
     // Нет поперечной динамики или данных о ветре - разгружаем канал
     if (!wind_load_enabled || !lateral_dynamics.isEnabled() ||
-            wind_speed_for_pantograph <= 0.1)
+            wind_speed <= 0.1)
     {
         if (lateral_dynamics.getWindLateralForce() != 0.0)
             lateral_dynamics.setWindLateralForce(0.0, wind_app_height);
@@ -2570,7 +2556,7 @@ void Vehicle::updateWindLoad(double time_s)
             : length * 3.7;
 
     // Скорость потока: скорость ветра от погоды (м/с)
-    const double v = wind_speed_for_pantograph;
+    const double v = wind_speed;
 
     // F = 0.5 * rho * Cd * A * V^2 (ТЗ "43-47", п.2)
     const double force = 0.5 * wind_air_density * wind_drag_coeff *

@@ -125,18 +125,38 @@ void VL60k::stepPantographsControl(const double& t, const double& dt)
     pantographs[0]->setState(is_PANT1_ON);
     pantographs[1]->setState(is_PANT2_ON);
 
-    // Мост к базовой физической модели токоприёмника (ТЗ "Контактная
-    // сеть"): состояние "поднят" - для расчёта Uks (провалы напряжения,
-    // нейтральные вставки, потеря контакта). Сама модель живёт в
-    // базовом Vehicle и активна при наличии [Pantograph] в конфиге ПС
-    getPantograph().setRaised(is_PANT1_ON || is_PANT2_ON);
+    // Данные полоза для телеметрии/кассеты/рекуперации
+    setPantographRaised(is_PANT1_ON || is_PANT2_ON);
 
     for (auto pant : pantographs)
     {
-        // Задаем текущее напряжение КС (пока что через константу)
-        pant->setUks(Uks);
         // Моделируем работу токоприемников
         pant->step(t, dt);
+    }
+
+    // Напряжение КС в точке ПЕ (провалы от тока/подстанции, нейтральные
+    // вставки) - контекст инфраструктуры через Vehicle, физика полоза -
+    // собственное устройство ПЕ
+    const bool is_raised = pantographs[0]->isUp() || pantographs[1]->isUp();
+
+    if (is_raised && getCatenaryFeedActive())
+    {
+        const auto feed = getOverheadFeed(getEnergy().getCurrent());
+
+        Uks = feed.powered ? feed.voltage : 0.0;
+        setPantographContactOk(true);
+    }
+    else
+    {
+        Uks = 0.0;
+        setPantographContactOk(false);
+    }
+
+    setUks(Uks);
+
+    for (auto pant : pantographs)
+    {
+        pant->setUks(Uks);
     }
 }
 

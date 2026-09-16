@@ -37,7 +37,6 @@
 #include    "vehicle-sand.h"
 #include    "vehicle-brake-shoes.h"
 #include    "vehicle-energy.h"
-#include    "vehicle-pantograph.h"
 #include    "vehicle-depot-power.h"
 #include    "vehicle-coupling-interaction.h"
 #include    "vehicle-sound-events.h"
@@ -222,17 +221,16 @@ public:
     /// Учёт электроэнергии и статистика рейса
     EnergyMeterSystem& getEnergy();
 
-    /// Токоприёмник (контакт с КС, дуги)
-    PantographSystem& getPantograph();
-
     /// Деповское питание 380 В и аккумуляторная батарея
     DepotPowerSystem& getDepotPower();
 
     /// Интерактивная сцепка (рукава, краны, рычаг СА-3)
     CouplingInteraction& getCouplingInteraction();
 
-    /// Ветер для токоприёмника (от погоды, ТЗ "Видимость и погода")
-    void applyWindToPantograph(double wind_speed);
+    /// Скорость ветра (контекст погоды для устройств модуля ПЕ)
+    void setWindSpeed(double wind_speed);
+
+    double getWindSpeed() const;
 
     /// Собрать физические звуковые события ПЕ с последнего опроса
     /// (мост физика -> аудиосистема, ТЗ "Аудиосистема")
@@ -297,12 +295,26 @@ public:
     /// Источник питания КС: (пикетаж, ток) -> состояние питания
     void setCatenaryFeed(std::function<catenary::FeedState(double, double)> fn);
 
+    /// Состояние питания КС в точке ПЕ (контекст инфраструктуры;
+    /// физику контакта полоза считает модуль ПЕ своими устройствами)
+    catenary::FeedState getOverheadFeed(double current_a) const;
+
     /// Сколько сеть готова принять рекуперации от этой ПЕ, Вт
     /// (считается моделью: подстанция + потребители секции)
     void setRegenAcceptance(double accept_w, bool accepted);
 
     /// Источник питания КС привязан
     bool getCatenaryFeedActive() const;
+
+    /// Полоз поднят (данные модуля; телеметрия/кассета/рекуперация)
+    void setPantographRaised(bool raised);
+
+    bool isPantographRaised() const;
+
+    /// Контакт полоза с проводом устойчив (данные модуля)
+    void setPantographContactOk(bool ok);
+
+    bool isPantographContactOk() const;
 
     /// Ремонт: сброс повреждений и последствий аварии
     void repair();
@@ -552,9 +564,6 @@ protected:
     /// Учёт электроэнергии (электровозы)
     EnergyMeterSystem energy;
 
-    /// Токоприёмник
-    PantographSystem pantograph;
-
     /// Деповское питание и АБ
     DepotPowerSystem depot_power;
 
@@ -631,8 +640,12 @@ protected:
     double thermal_accum = 0.0;
     double wear_accum = 0.0;
 
-    /// Скорость ветра от погоды (токоприёмник)
-    double wind_speed_for_pantograph = 0.0;
+    /// Скорость ветра от погоды (контекст для устройств модуля)
+    double wind_speed = 0.0;
+
+    /// Состояние полоза: данные модуля ПЕ (телеметрия/кассета/рекуперация)
+    bool pantograph_raised = false;
+    bool pantograph_contact_ok = false;
 
     /// Параметры ветровой нагрузки на кузов (секция [WindLoad], ТЗ
     /// "43-47", п.2): боковая площадь, Cd, плотность воздуха,
