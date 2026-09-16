@@ -20,6 +20,7 @@
 
 #include <QString>
 
+#include <QMap>
 #include <array>
 
 #include <vl60-autopilot-types.h>
@@ -424,6 +425,15 @@ private:
     size_t  start_count = 0;
     size_t  autostart_cab = 0;
 
+    /// Режим автоматического запуска/останова
+    enum AutostartMode
+    {
+        AUTOSTART_IDLE = 0, ///< Нет активной программы
+        AUTOSTART_ON   = 1, ///< Выполняется автозапуск
+        AUTOSTART_OFF  = 2  ///< Выполняется автоостанов
+    };
+    AutostartMode autostart_mode = AUTOSTART_IDLE;
+
     /// Устройство безопасности УКБМ
     SafetyDevice *safety_device[CABS_NUM] = {nullptr, nullptr};
 
@@ -499,6 +509,10 @@ private:
 
     bool initAutostartProgram(int cab_autostart_request);
 
+    void buildAutostartTriggers(int cab);
+
+    bool initAutostopProgram(int cab_autostop_request);
+
     void initAutopilot(const QString& modules_dir, const QString& custom_cfg_dir);
 
     void prepareCabineForAutopilot(int my_cab_idx, int other_cab_idx);
@@ -563,6 +577,14 @@ private:
     /// Моделирование приборов безопасности
     void stepSafetyDevices(const double& t, const double& dt);
 
+    void stepControls(const double &t, const double &dt);
+
+    /// Применение одной команды управления к устройствам
+    void applyControlCommand(int cab_idx, int id, float value);
+
+    /// Предыдущие значения команд (детектор фронта в stepControls)
+    std::array<QMap<int, float>, CABS_NUM> prev_control_values;
+
     /// Автоведение
     void stepAutopilot(double t, double dt);
 
@@ -579,6 +601,8 @@ private:
 private slots:
 
     void slotAutoStart();
+
+    void slotAutoStop();
 
     void slotInitTrainForAutopilot();
 };

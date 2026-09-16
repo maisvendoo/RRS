@@ -185,8 +185,17 @@ void TcpServer::process_client_request(client_data_t &client_data)
         stream >> client_data.controlled_update_interval;
 
         /*Journal::instance()->info(QString("Received vehicle controlled update request for #%1 with interval %2")
-                                      .arg(client_data.id).arg(client_data.state_update_interval, 5, 'f', 3));*/
+                                      .arg(client_data.id).arg(client_data.controlled_update_interval, 5, 'f', 3));*/
         clients_for_vehicle_controlled_updates.insert(client_data.socket);
+        break;
+    }
+    case STYPE_REQUEST_DIAGNOSTICS_UPDATE:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        stream >> client_data.diagnostics_update_interval;
+
+        clients_for_diagnostics_updates.insert(client_data.socket);
         break;
     }
     case STYPE_COMMAND_SWITCH_CONTROL:
@@ -198,36 +207,43 @@ void TcpServer::process_client_request(client_data_t &client_data)
     }
     case STYPE_COMMAND_SIGNAL_CONTROL:
     {
-        /*Journal::instance()->info(QString("Received signal command from #%1")
-                                      .arg(client_data.id));*/
+        Journal::instance()->info(QString("Received signal command from #%1")
+                                      .arg(client_data.id));
         emit sigSignalCommand(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_BUILD_ROUTE:
     {
-        /*Journal::instance()->info(QString("Received build route command from #%1")
-                                      .arg(client_data.id));*/
+        Journal::instance()->info(QString("Received build route command from #%1")
+                                      .arg(client_data.id));
         emit sigBuildRouteCommand(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_TRAIN_ROUTE:
     {
-        /*Journal::instance()->info(QString("Received train route command from #%1")
-                                      .arg(client_data.id));*/
+        Journal::instance()->info(QString("Received train route command from #%1")
+                                      .arg(client_data.id));
         emit sigTrainRouteCommand(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_SHUNTING_ROUTE:
     {
-        /*Journal::instance()->info(QString("Received shunting route command from #%1")
-                                      .arg(client_data.id));*/
+        Journal::instance()->info(QString("Received shunting route command from #%1")
+                                      .arg(client_data.id));
         emit sigShuntingRouteCommand(client_data.received_data.data);
         break;
     }
     case STYPE_COMMAND_VEHICLE_CONTROL:
     {
-        /*Journal::instance()->info(QString("Received vehicle control command from #%1")
-                                      .arg(client_data.id));*/
+        // Буфер под мьютексом: физика заберёт пакет на очередном тике
+        // (takePendingControl). Прямая queued-доставка сигнала в модель
+        // не работает надёжно - см.
+        {
+            QMutexLocker lock(&pending_control_mutex);
+            pending_control.append(qMakePair(client_data.id,
+                                             client_data.received_data.data));
+        }
+
         emit sigVehicleControl(client_data.received_data.data, client_data.id);
         break;
     }
@@ -290,6 +306,76 @@ void TcpServer::process_client_request(client_data_t &client_data)
         break;
     }
 
+    case STYPE_SEND_TAB_NUMBER:
+    {
+        // Табельный номер игрока: связан с ID
+        // пользователя на сайте, по нему выполняется автоназначение
+        // поезда и восстановление "зависшего" поезда (п.6)
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        int tab_number = -1;
+        stream >> tab_number;
+
+        client_data.tab_number = tab_number;
+
+        Journal::instance()->info(QString("Client #%1 (tab %2) sends tab number")
+                                      .arg(client_data.id)
+                                      .arg(tab_number));
+
+        emit sigClientTabNumber(client_data.id, tab_number);
+        break;
+    }
+
+    case STYPE_COMMAND_SET_TRAIN_TAB:
+    {
+        // Организатор: закрепить поезд за игроком по табельному номеру
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        int train_idx = -1;
+        stream >> train_idx;
+
+        int tab_number = -1;
+        stream >> tab_number;
+
+        if (train_idx < 0)
+        {
+            Journal::instance()->error(QString("Set train tab: invalid train index from client #%1")
+                                           .arg(client_data.id));
+            break;
+        }
+
+        Journal::instance()->info(QString("Organizer command from client #%1: set train #%2 tab %3")
+                                      .arg(client_data.id)
+                                      .arg(train_idx)
+                                      .arg(tab_number));
+
+        emit sigSetTrainTab(train_idx, tab_number);
+        break;
+    }
+
+    case STYPE_COMMAND_LOAD_SESSION:
+    {
+        // Организатор: загрузить сейв сессии
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        QString path = "";
+        stream >> path;
+
+        if (path.isEmpty())
+        {
+            Journal::instance()->error(QString("Load session: empty path from client #%1")
+                                           .arg(client_data.id));
+            break;
+        }
+
+        Journal::instance()->info(QString("Organizer command from client #%1: load session %2")
+                                      .arg(client_data.id)
+                                      .arg(path));
+
+        emit sigLoadSession(path);
+        break;
+    }
+
     case STYPE_EMPTY_DATA:
     default:
 
@@ -315,12 +401,11 @@ void TcpServer::send_route_info(client_data_t &client_data)
 //------------------------------------------------------------------------------
 void TcpServer::send_topology_data(client_data_t &client_data)
 {
-    QByteArray data;
-    emit requestTopologyData(data);
-
+    // Топология отдаётся из кэша: модель обновляет его слотом из своего
+    // потока (- сервер сети не лезет в модель)
     network_data_t net_data;
     net_data.stype = STYPE_TOPOLOGY_DATA;
-    net_data.data = data;
+    net_data.data = topology_data;
 
     client_data.socket->write(net_data.serialize());
     client_data.socket->flush();
@@ -331,15 +416,28 @@ void TcpServer::send_topology_data(client_data_t &client_data)
 //------------------------------------------------------------------------------
 void TcpServer::send_signals_data(client_data_t &client_data)
 {
-    QByteArray data;
-    emit requestSignalsData(data);
-
     network_data_t net_data;
     net_data.stype = STYPE_SIGNALS_DATA;
-    net_data.data = data;
+    net_data.data = signals_data;
 
     client_data.socket->write(net_data.serialize());
     client_data.socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::updateTopologyData(QByteArray topology_data)
+{
+    this->topology_data = topology_data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::updateSignalsData(QByteArray signals_data)
+{
+    this->signals_data = signals_data;
 }
 
 //------------------------------------------------------------------------------
@@ -389,8 +487,15 @@ void TcpServer::slotNewConnection()
     connect(client_data.socket, &QTcpSocket::readyRead,
             this, &TcpServer::slotReceive);
 
-    Journal::instance()->info(QString("Connected client with id %1")
-                                  .arg(client_data.id));
+    // Ошибки обмена (лог ошибок обмена пакетами)
+    connect(client_data.socket, &QAbstractSocket::errorOccurred,
+            this, &TcpServer::slotSocketError);
+
+    // кто подключился - IP:порт, идентификатор и (позже) табельный
+    Journal::instance()->info(QString("Connected client #%1 from %2:%3")
+                                  .arg(client_data.id)
+                                  .arg(client_data.socket->peerAddress().toString())
+                                  .arg(client_data.socket->peerPort()));
 
     Journal::instance()->info(QString("Server receive buffer size: %1")
                                   .arg(client_data.socket->readBufferSize()));
@@ -431,6 +536,13 @@ void TcpServer::slotClientDisconnected()
     {
         client_data_t *client_data = &clients_data[socket];
 
+        // кто отключился - IP + табельный (если успел представиться)
+        Journal::instance()->info(QString("Disconnected client #%1 (tab %2) from %3:%4")
+                                      .arg(client_data->id)
+                                      .arg(client_data->tab_number)
+                                      .arg(socket->peerAddress().toString())
+                                      .arg(socket->peerPort()));
+
         client_data->socket->close();
 
         clients_data.remove(socket);
@@ -441,12 +553,33 @@ void TcpServer::slotClientDisconnected()
         clients_for_vehicles_updates.remove(socket);
         clients_for_vehicle_controlled_updates.remove(socket);
         clients_for_trains_updates.remove(socket);
+        clients_for_diagnostics_updates.remove(socket);
 
         emit sigResetVehicleControl(client_data->id);
-
-        Journal::instance()->info(QString("Disconnected client with id %1")
-                                      .arg(client_data->id));
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::slotSocketError(QAbstractSocket::SocketError)
+{
+    QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
+
+    if (socket == nullptr)
+    {
+        return;
+    }
+
+    if (!clients_data.contains(socket))
+    {
+        return;
+    }
+
+    // ошибки обмена пакетами - в серверный лог
+    Journal::instance()->error(QString("Socket error on client #%1: %2")
+                                   .arg(clients_data[socket].id)
+                                   .arg(socket->errorString()));
 }
 
 //------------------------------------------------------------------------------
@@ -483,6 +616,21 @@ void TcpServer::slotReceive()
             stream >> wait_data_size;
 
             is_first_data = false;
+
+            // Защита от мусора в канале: слишком большой заявленный размер
+            // пакета означает повреждение потока - буфер сбрасывается,
+            // ошибка попадает в серверный лог
+            if (wait_data_size > MAX_PACKET_SIZE)
+            {
+                Journal::instance()->error(QString("Receive error on client #%1: declared packet size %2 is invalid, buffer dropped")
+                                               .arg(client_data->id)
+                                               .arg(wait_data_size));
+
+                recvBuff.clear();
+                wait_data_size = 0;
+                is_first_data = true;
+                break;
+            }
         }
 
         // Если прислали данных не меньше, чем ожидается - забираем их
@@ -677,6 +825,27 @@ void TcpServer::updateVehicleControlled(QByteArray vehicles_state, int client_id
             .arg(clients_data[client_socket].id).arg(t, 5, 'f', 3).arg(t - prev_t, 5, 'f', 3).arg(net_data.data.size()));
 */
             clients_data[client_socket].controlled_update_prev_time = t;
+            client_socket->write(net_data.serialize());
+            client_socket->flush();
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::updateDiagnostics(QByteArray diagnostics_data, double t)
+{
+    network_data_t net_data;
+    net_data.stype = STYPE_DIAGNOSTICS_UPDATE;
+    net_data.data = diagnostics_data;
+
+    for (auto client_socket : clients_for_diagnostics_updates)
+    {
+        double prev_t = clients_data[client_socket].diagnostics_update_prev_time;
+        if ((t - prev_t) > clients_data[client_socket].diagnostics_update_interval)
+        {
+            clients_data[client_socket].diagnostics_update_prev_time = t;
             client_socket->write(net_data.serialize());
             client_socket->flush();
         }

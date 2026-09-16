@@ -10,6 +10,8 @@
 #include    "topology-defines.h"
 #include    "track.h"
 
+#include    <rail-profile.h>
+
 #include    <profile-point.h>
 
 class Signal;
@@ -114,6 +116,27 @@ public:
     /// Получить положение ПЕ на траектории
     profile_point_t getPosition(double traj_coord, int direction) const;
 
+    /// Вертикальное смещение рельса от неровностей пути в точке
+    /// traj_coord, м. side: 0 - левый рельс, 1 - правый.
+    /// Профиль детерминирован: одинаков для всех ПЕ и повторных проездов
+    double getRailHeight(double traj_coord, int side) const;
+
+    /// Возвышение наружного рельса в точке traj_coord, мм (Б16).
+    /// Линейная интерполяция между cant_mm соседних треков: переходный
+    /// отвод возвышения растянут на длину граничного трека.
+    /// Знак: "+" - левый рельс выше, "-" - правый
+    double getCant(double traj_coord) const;
+
+    /// Боковое смещение оси пути от неровностей плана линии, м
+    double getLateralOffset(double traj_coord) const;
+
+    /// Повреждение пути сходом ПЕ:
+    /// масштаб неровностей растёт, влияя на следующие поезда
+    void damageTrack(double factor);
+
+    /// Накопление тоннажа на путь от прохода ПЕ (износ / рельсов): mass_tonnes - масса ПЕ, т; distance_m - пройденный путь, м
+    void addTonnage(double traj_coord, double mass_tonnes, double distance_m);
+
 signals:
 
     void sendTrajBusyState(QByteArray busy_data);
@@ -152,6 +175,21 @@ private:
     Switch* bwd_switch = nullptr;
 
     std::vector<track_t> tracks;
+
+    /// Профиль вертикальных неровностей пути данной траектории
+    track::RailProfile rail_profile;
+
+    /// Построение профиля неровностей пути (конфиг маршрута кэшируется)
+    void loadRailProfile(const QString& route_dir);
+
+    /// Неровность стрелочного перевода уже поставлена у конца/начала
+    /// траектории (защита от повторной генерации при перепривязке стрелок)
+    bool switch_irreg_fwd = false;
+    bool switch_irreg_bwd = false;
+
+    /// Автогенерация неровности крестовины у конца (fwd=true) или начала
+    /// траектории, подключённого к стрелке
+    void generateSwitchIrregularity(bool at_fwd_end);
 
     /// Оборудование путевой инфраструктуры на этой траектории
     std::vector<TrajectoryDevice *> devices;

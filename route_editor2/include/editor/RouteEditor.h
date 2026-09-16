@@ -2,12 +2,14 @@
 #define ROUTE_EDITOR_H
 
 #include "editor/settings/CameraSettings.h"
+#include "editor/settings/GizmoSettings.h"
 #include "editor/settings/GuiSettings.h"
 #include "editor/settings/SceneSettings.h"
 #include "editor/settings/WindowSettings.h"
 
 #include <vsg/core/ref_ptr.h>
 
+struct EditorContext;
 class Camera;
 class EditorGui;
 class EventHandler;
@@ -63,6 +65,9 @@ private:
     camera_settings_t camera_settings;
     scene_settings_t scene_settings;
     gui_settings_t gui_settings;
+    gizmo_settings_t gizmo_settings;
+
+    EditorContext* context = nullptr;
 
     vsg::ref_ptr<vsg::Options> vsg_options;
     vsg::ref_ptr<vsg::Window> window;
@@ -78,117 +83,77 @@ private:
     vsg::ref_ptr<vsg::ResourceHints> resource_hints;
     vsg::ref_ptr<vsg::Viewer> viewer;
 
+    double prev_frame_time = 0.0;
+
 private:
     /**
      * @brief Initialize Journal subsystem.
-     *
-     * Add additional storage for the editor to Journal
-     * subsystem in the default logs directory with the
-     * specified filename and start writing to it.
-     *
-     * If an error occured during initialization,
-     * exit the program with std::exit (check stderr
-     * (standard error output stream) for possible errors).
-     *
-     * @param[in] filename Log filename (default - "editor.log").
      */
     void initialize_journal(const char* filename = "editor.log") const;
 
     /**
      * @brief Read the editor settings.
-     *
-     * Create a CfgReader and read the editor settings from the config file
-     * in the default configs directory with the specified filename.
-     *
-     * If an error occured, it usually means that CfgReader was
-     * unable to load the config file. Check the log file
-     * (default - "logs/editor.log") for possible errors.
-     *
-     * @param[in] filename Config filename (default = "editor-settings.xml").
      */
     void read_settings(const char* filename = "editor-settings.xml");
 
     void print_settings() const;
 
     /**
-     * @brief Create a VSG options object.
-     *
-     * Create a default VSG options object (with configured paths,
-     * vsg::SharedObjects and vsgXchange included).
-     *
-     * If an error occured during initialization,
-     * exit the program with std::exit (check the log file
-     * (default - "logs/editor.log") for possible errors).
+     * @brief Create a VSG options object (paths, vsgXchange, shader sets).
      */
     void create_vsg_options();
 
     /**
+     * @brief Configure shader sets for gltf models
+     *        (flat/pbr/phong, как в старом редакторе).
+     */
+    void configure_shaders();
+
+    /**
      * @brief Create a VSG window based on the window_settings.
-     *
-     * If an error occured during initialization,
-     * exit the program with std::exit (check the log file
-     * (default - "logs/editor.log") for possible errors).
      */
     void create_window();
 
     /**
-     * @brief Create a scenegraph object.
-     *
-     * If an error occured during initialization,
-     * exit the program with std::exit (check the log file
-     * (default - "logs/editor.log") for possible errors).
+     * @brief Create a scenegraph with ambient light.
      */
     void create_scenegraph();
 
     /**
      * @brief Create a scene view object.
-     *
-     * If an error occured during initialization,
-     * exit the program with std::exit (check the log file
-     * (default - "logs/editor.log") for possible errors).
      */
     void create_scene_view();
 
     /**
+     * @brief Create editor handlers (events, intersections, selection).
+     */
+    void create_handlers();
+
+    /**
      * @brief Create a render graph object.
-     *
-     * If an error occured during initialization,
-     * exit the program with std::exit (check the log file
-     * (default - "logs/editor.log") for possible errors).
      */
     void create_render_graph();
 
     /**
      * @brief Create a command graph object.
-     *
-     * If an error occured during initialization,
-     * exit the program with std::exit (check the log file
-     * (default - "logs/editor.log") for possible errors).
      */
     void create_command_graph();
 
     /**
      * @brief Create a resource hints object.
-     *
-     * Set numLightsRange based on scene settings.
-     * If an error occured during initialization,
-     * exit the program with std::exit (check the log file
-     * (default - "logs/editor.log") for possible errors).
      */
     void create_resource_hints();
 
     /**
      * @brief Create a viewer object.
-     *
-     * Assign window and all appropriate event handlers to viewer.
-     *
-     * Compile viewer with resource hints.
-     *
-     * If an error occured during initialization,
-     * exit the program with std::exit (check the log file
-     * (default - "logs/editor.log") for possible errors).
      */
     void create_viewer();
+
+    /// Загрузить маршрут в сцену (состояние LOAD_ROUTE)
+    void load_route();
+
+    /// Скомпилировать узлы, добавленные в сцену с прошлого кадра
+    void compile_models();
 };
 
 #endif // ROUTE_EDITOR_H

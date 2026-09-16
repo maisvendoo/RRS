@@ -125,6 +125,73 @@ profile_point_t VehicleController::getPosition()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+double VehicleController::getRailHeightAt(double path_coord, int side)
+{
+    if (current_traj == nullptr)
+        return 0.0;
+
+    return current_traj->getRailHeight(path_coord, side);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double VehicleController::getLateralOffsetAt(double path_coord)
+{
+    if (current_traj == nullptr)
+        return 0.0;
+
+    return current_traj->getLateralOffset(path_coord);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double VehicleController::getCantAt(double path_coord)
+{
+    if (current_traj == nullptr)
+        return 0.0;
+
+    return current_traj->getCant(path_coord);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehicleController::damageTrack(double factor)
+{
+    if (current_traj == nullptr)
+        return;
+
+    current_traj->damageTrack(factor);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehicleController::addTonnage(double path_coord, double mass_tonnes,
+                                   double distance_m)
+{
+    if (current_traj == nullptr)
+        return;
+
+    current_traj->addTonnage(path_coord, mass_tonnes, distance_m);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString VehicleController::getCurrentTrajectoryName() const
+{
+    if (current_traj == nullptr)
+        return QString();
+
+    return current_traj->getName();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 int VehicleController::getNearestVehicle(double& distance, double search_distance, dir_t direction)
 {
     distance = 0.0;

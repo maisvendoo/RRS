@@ -17,7 +17,9 @@ add_library(graphics STATIC)
 target_sources(graphics
     PRIVATE
         src/common.cpp
+        src/particles.cpp
         src/pipeline_funcs.cpp
+        src/postprocess.cpp
         src/shader_funcs.cpp
 
     PUBLIC
@@ -26,7 +28,9 @@ target_sources(graphics
             include
         FILES
             include/graphics/common.h
+            include/graphics/particles.h
             include/graphics/pipeline_funcs.h
+            include/graphics/postprocess.h
             include/graphics/shader_funcs.h
 )
 

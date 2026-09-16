@@ -26,6 +26,9 @@
 //------------------------------------------------------------------------------
 void VL60pk::slotAutoStart()
 {
+    if (autostart_mode != AUTOSTART_ON)
+        return;
+
     if (start_count < triggers.size())
     {
         if ((triggers[start_count] == &gv_tumbler[autostart_cab]) &&
@@ -53,6 +56,7 @@ void VL60pk::slotAutoStart()
     {
         autoStartTimer->stop();
         start_count = 0;
+        autostart_mode = AUTOSTART_IDLE;
         controller[autostart_cab]->setReversHandlePos(REVERS_FORWARD);
 
         controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
@@ -73,6 +77,41 @@ void VL60pk::slotAutoStart()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VL60pk::slotAutoStop()
+{
+    if (autostart_mode != AUTOSTART_OFF)
+        return;
+
+    if (start_count < triggers.size())
+    {
+        triggers[triggers.size() - 1 - start_count]->reset();
+        start_count++;
+    }
+    else
+    {
+        autoStartTimer->stop();
+        start_count = 0;
+        autostart_mode = AUTOSTART_IDLE;
+
+        controller[autostart_cab]->setReversHandlePos(REVERS_ZERO);
+
+        // Отключаем ЭПК, ключ остаётся в замке
+        epk[autostart_cab]->setKeyOn(false);
+
+        controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        controller[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
+        brake_lock[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        brake_lock[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
+        epk[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        epk[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
+
+        autopilot_switcher[autostart_cab].reset();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void VL60pk::stepPantographsControl(const double& t, const double& dt)
 {
     // Подъем переднего токоприемника
@@ -86,12 +125,37 @@ void VL60pk::stepPantographsControl(const double& t, const double& dt)
     pantographs[0]->setState(is_PANT1_ON);
     pantographs[1]->setState(is_PANT2_ON);
 
+    // Данные полоза для телеметрии/кассеты/рекуперации
+    setPantographRaised(is_PANT1_ON || is_PANT2_ON);
+
     for (auto pant : pantographs)
     {
-        // Задаем текущее напряжение КС (пока что через константу)
-        pant->setUks(Uks);
         // Моделируем работу токоприемников
         pant->step(t, dt);
+    }
+
+    // Напряжение КС в точке ПЕ (провалы от тока/подстанции, нейтральные
+    // вставки) - контекст инфраструктуры через Vehicle
+    const bool is_raised = pantographs[0]->isUp() || pantographs[1]->isUp();
+
+    if (is_raised && getCatenaryFeedActive())
+    {
+        const auto feed = getOverheadFeed(getEnergy().getCurrent());
+
+        Uks = feed.powered ? feed.voltage : 0.0;
+        setPantographContactOk(true);
+    }
+    else
+    {
+        Uks = 0.0;
+        setPantographContactOk(false);
+    }
+
+    setUks(Uks);
+
+    for (auto pant : pantographs)
+    {
+        pant->setUks(Uks);
     }
 }
 

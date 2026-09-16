@@ -43,6 +43,7 @@ void VehicleExterior::step(float t, float dt)
 //------------------------------------------------------------------------------
 void VehicleExterior::step(float t, float dt, std::vector<float>* server_signals)
 {
+    last_server_signals = server_signals;
     for (const auto& animated_pagedLOD : animated_nodes)
     {
         if (animated_pagedLOD->children[0].node)
@@ -92,6 +93,9 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
         load_cabine_model(cfg_path, cfg, options);
     }
 
+    // Интерактивные органы кабины (клик по Alt)
+
+
     transform->setValue("name", cfg_file);
     return (transform->children.size() > 0);
 }
@@ -110,6 +114,9 @@ bool VehicleExterior::load_cabine_positions(const std::string &cfg_path, CfgRead
 
     driver_pos.clear();
     driver_dir.clear();
+    exit_pos.clear();
+    exit_dir.clear();
+    assistant_pos.clear();
 
     while (true)
     {
@@ -126,11 +133,49 @@ bool VehicleExterior::load_cabine_positions(const std::string &cfg_path, CfgRead
         cfg.getDouble(secNode, "DriverDir", dd);
         driver_dir.push_back(vsg::radians(dd));
 
+        // Точка выхода из кабины (пешая ходьба): опциональна. По
+        // умолчанию - у борта напротив кабины (сдвиг вправо от места
+        // машиниста на ширину прохода + вниз на высоту пола)
+        vsg::dvec3 ep = dp + vsg::dvec3(1.6, 0.0, -1.2);
+        QString ExitPos = "";
+        if (cfg.getString(secNode, "ExitPos", ExitPos))
+        {
+            std::istringstream ss(ExitPos.toStdString());
+            ss >> ep.x >> ep.y >> ep.z;
+        }
+        exit_pos.push_back(ep);
+
+        double ed = dd;
+        cfg.getDouble(secNode, "ExitDir", ed);
+        exit_dir.push_back(vsg::radians(ed));
+
+        // Сиденье помощника (посадка по E, ходьба): без <AssistantPos> -
+        // типовое расположение напротив машиниста (левее и чуть назад)
+        vsg::dvec3 asist = dp + vsg::dvec3(-1.7, -0.6, 0.0);
+        QString AssistPos = "";
+        if (cfg.getString(secNode, "AssistantPos", AssistPos))
+        {
+            std::istringstream ss(AssistPos.toStdString());
+            ss >> asist.x >> asist.y >> asist.z;
+        }
+        assistant_pos.push_back(asist);
+
         secNode = cfg.getNextSection();
         if (secNode.isNull())
             return true;
     }
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+vsg::dvec3 VehicleExterior::worldFromLocal(const vsg::dvec3& local) const
+{
+    return position
+            + right * local.x
+            + orth * local.y
+            + up * local.z;
 }
 
 //------------------------------------------------------------------------------
@@ -368,6 +413,8 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
     // Просматриваем все кабины в конфиге
     auto secNode = cfg.getFirstSection("Cabine");
 
+    io_controls.clear();
+
     while (!secNode.isNull())
     {
         QString module_name = "";
@@ -397,7 +444,7 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
 
                 if (!module_cfg.load(QString(module_config_path.c_str())))
                 {
-                    LOG_WARN("IOController config %s is not found. IOController in defualt settings", module_config_path.c_str());
+                    LOG_WARN("IOController config %s is not found. IOController in default settings", module_config_path.c_str());
                 }
                 else
                 {
@@ -407,7 +454,7 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
             }
             else
             {
-                LOG_WARN("IOController config setting is not exist. IOController in defualt settings");
+                LOG_WARN("IOController config setting is not exist. IOController in default settings");
             }
         }
         else
@@ -415,9 +462,51 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
             LOG_ERROR("Not found IOController module %s", module_path.c_str());
         }
 
+        LOG_INFO("IOController: io_controls size: %d", io_controls.size());
+
         io_controls.push_back(io_control);
         secNode = cfg.getNextSection();
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+// Текущее значение анимационного сигнала состояния органа кабины
+//------------------------------------------------------------------------------
+float VehicleExterior::getCabSignal(int signal_id) const
+{
+    if (signal_id < 0)
+        return -1.0f;
+
+    for (const auto& animated_pagedLOD : animated_nodes)
+    {
+        if (animated_pagedLOD->children[0].node && animated_pagedLOD->animations_map)
+        {
+            std::lock_guard<std::mutex> lock(animated_pagedLOD->animations_map->mutex);
+
+            auto range = animated_pagedLOD->animations_map->animations.equal_range(signal_id);
+
+            for (auto it = range.first; it != range.second; ++it)
+            {
+                return it->second->getCurSignal();
+            }
+        }
+    }
+
+    return -1.0f;
+}
+
+//------------------------------------------------------------------------------
+// Сырое значение сигнала сервера (мгновенное состояние органа)
+//------------------------------------------------------------------------------
+float VehicleExterior::getRawSignal(int signal_id) const
+{
+    if ((signal_id < 0) || (last_server_signals == nullptr) ||
+        (static_cast<std::size_t>(signal_id) >= last_server_signals->size()))
+    {
+        return -1.0f;
+    }
+
+    return (*last_server_signals)[static_cast<std::size_t>(signal_id)];
 }

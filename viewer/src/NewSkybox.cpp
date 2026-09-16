@@ -54,7 +54,10 @@
 #include <string>
 #include <vector>
 
-NewSkybox::NewSkybox(const std::string& skybox_config_filepath, vsg::ref_ptr<vsg::Options> options)
+NewSkybox::NewSkybox(const std::string& skybox_config_filepath,
+                     vsg::ref_ptr<vsg::Options> options,
+                     bool hd_textures)
+    : use_hd_textures(hd_textures)
 {
     CfgReader cfg;
     if (cfg.load(skybox_config_filepath.c_str()))
@@ -79,6 +82,27 @@ vsg::ref_ptr<vsg::Node> NewSkybox::getNode() const
     return state_group;
 }
 
+void NewSkybox::set_fog(double fog_density)
+{
+    if (!fog_value)
+        return;
+
+    fog_density = std::max(fog_density, 0.0);
+
+    // Пропускаем обновление при незаметном изменении (uniform.dirty
+    // expensive: пересоздание буфера)
+    if (std::abs(fog_density - last_fog_density) < 1.0e-6)
+        return;
+
+    last_fog_density = fog_density;
+
+    // Цвет тумана: светло-серый со слабой примесью неба.
+    // Плотность 1/м -> степень замутнения через экспоненту
+    vsg::vec4& value = fog_value->value();
+    value = vsg::vec4(0.72f, 0.75f, 0.79f, static_cast<float>(fog_density));
+    fog_value->dirty();
+}
+
 void NewSkybox::set_date_time(const simulator_time_t& sim_time)
 {
     is_sun_rise = sim_time.time.hour() < 13;
@@ -87,7 +111,6 @@ void NewSkybox::set_date_time(const simulator_time_t& sim_time)
 void NewSkybox::set_sun_direction(double azimuth_degrees, double altitude_degrees)
 {
     // Обновлять не чаще 1 раза в секунду
-    static auto last_update = std::chrono::steady_clock::now();
     auto now = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<std::chrono::seconds>(now - last_update).count() < 1)
     {
@@ -321,6 +344,10 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
     mix_value = vsg::floatValue::create(0.0f);
     mix_value->properties.dataVariance = vsg::DYNAMIC_DATA;
 
+    // Туман: rgb - цвет, a - плотность, 1/м
+    fog_value = vsg::vec4Value::create(vsg::vec4(0.72f, 0.75f, 0.79f, 0.0f));
+    fog_value->properties.dataVariance = vsg::DYNAMIC_DATA;
+
     state_group = create_state_group_with_custom_pipeline(
         shaders_dir_path.c_str(),
         "new_skybox.vert",
@@ -337,12 +364,14 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
         vsg::DescriptorSetLayoutBindings{
             {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
             {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-            {2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
+            {2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+            {3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
         },
         vsg::Descriptors{
             vsg::DescriptorImage::create(sampler, texture1_data, 0, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER),
             vsg::DescriptorImage::create(sampler, texture2_data, 1, 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER),
-            vsg::DescriptorBuffer::create(            mix_value, 2, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+            vsg::DescriptorBuffer::create(            mix_value, 2, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER),
+            vsg::DescriptorBuffer::create(            fog_value, 3, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
         },
         vsg::InputAssemblyState::create(),
         vsg::RasterizationState::create(),
@@ -404,13 +433,43 @@ void NewSkybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options
     textures_dir_path = fs.combinePath(textures_dir_path, "default-objects");
     textures_dir_path = fs.combinePath(textures_dir_path, "textures");
 
+    // HD-вариант текстуры для пресетов High/Ultra:
+    // суффикс "_hd" перед расширением ("sky_day.bmp" -> "sky_day_hd.bmp")
+    const auto hd_texture_filename = [](const std::string& filename) -> std::string
+    {
+        const std::size_t dot_pos = filename.find_last_of('.');
+        if ((dot_pos == std::string::npos) || (dot_pos == 0))
+        {
+            return std::string();
+        }
+
+        return filename.substr(0, dot_pos) + "_hd" + filename.substr(dot_pos);
+    };
+
     // Читаем из конфига имена файлов текстур и их сезон, время суток
     QDomNode sec_node = cfg.getFirstSection("Texture");
     while (!sec_node.isNull())
     {
         QString texture_filename = "sky_day.bmp";
         cfg.getString(sec_node, "Filename", texture_filename);
-        const std::string texture_path = fs.combinePath(textures_dir_path, texture_filename.toStdString());
+
+        const std::string base_filename = texture_filename.toStdString();
+        std::string texture_path = fs.combinePath(textures_dir_path, base_filename);
+
+        // Prefer HD variant if enabled and available; silently fall back to the
+        // regular texture when the HD file is missing (High/Ultra presets)
+        if (use_hd_textures)
+        {
+            const std::string hd_filename = hd_texture_filename(base_filename);
+            if (!hd_filename.empty())
+            {
+                const std::string hd_path = fs.combinePath(textures_dir_path, hd_filename);
+                if (vsg::fileExists(hd_path))
+                {
+                    texture_path = hd_path;
+                }
+            }
+        }
 
         // Ищем файл текстуры
         if (!vsg::fileExists(texture_path))

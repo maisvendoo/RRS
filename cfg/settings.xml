@@ -75,7 +75,7 @@
         <!-- Пресет настроек теней: 0 - Низкий; 1 - Средний; 2 - Высокий; 3 - Ультра; 4 - Пользовательский -->
         <ShadowsPreset>0</ShadowsPreset>
         <!-- Дальность прорисовки теней, м -->
-        <ShadowDistance>30.0</ShadowDistance>
+        <ShadowDistance>30</ShadowDistance>
         <!-- Количество каскадных карт теней -->
         <ShadowCascade>1</ShadowCascade>
         <!-- Разрешение карт теней -->
@@ -100,5 +100,71 @@
         <EnableDebugUtils>0</EnableDebugUtils>
         <!-- Ограничение объема используемой памяти GPU (от 0.0 до 1.0) -->
         <GPUAllocatedMemoryLimit>1.0</GPUAllocatedMemoryLimit>
+
+        <!-- ПЕШАЯ ХОДЬБА: камера от 1-го лица
+             (F7 - вход/выход, E - вход в кабину ближайшей ПЕ) -->
+        <!-- Прирост FOV при беге, град -->
+        <WalkFovBoost>8.0</WalkFovBoost>
+        <!-- Скорость смены FOV, 1/с -->
+        <WalkFovSpeed>6.0</WalkFovSpeed>
+        <!-- Покачивание головы при ходьбе/беге, м -->
+        <WalkBobAmplitude>0.045</WalkBobAmplitude>
+        <WalkBobAmplitudeRun>0.085</WalkBobAmplitudeRun>
+        <!-- Частота шагов при ходьбе/беге, Гц -->
+        <WalkBobFrequency>9.0</WalkBobFrequency>
+        <WalkBobFrequencyRun>12.0</WalkBobFrequencyRun>
+        <!-- Проседание камеры при приземлении: макс. величина, м -->
+        <WalkLandingMax>0.25</WalkLandingMax>
+        <WalkLandingCoeff>0.04</WalkLandingCoeff>
+        <WalkLandingRecovery>6.0</WalkLandingRecovery>
+        <!-- Чувствительность обзора мышью, рад/ед. NDC -->
+        <WalkMouseSensitivity>0.0022</WalkMouseSensitivity>
+        <!-- Дистанция до двери при входе по наведению (Ctrl+Enter), м -->
+        <WalkInteractDistance>6.0</WalkInteractDistance>
+
+        <!-- РАСКАЧКА КАБИНЫ В ДВИЖЕНИИ: непрерывное покачивание кузова
+             на рессорах, дополняет физическую реакцию камеры; на стоянке
+             - полный покой. Частоты задаются скоростью и фиксированными
+             длинами волн (f = v/lambda), настраиваются амплитуды -->
+        <!-- Включена: 1 - да; 0 - нет -->
+        <CabineSwayEnabled>1</CabineSwayEnabled>
+        <!-- Скорость полной амплитуды, м/с (~25 = 90 км/ч) -->
+        <CabineSwayRefSpeed>25.0</CabineSwayRefSpeed>
+        <!-- Ниже этой скорости покой (плавный вход), м/с -->
+        <CabineSwayMinSpeed>0.3</CabineSwayMinSpeed>
+        <!-- Лимит смещения камеры от раскачки, м -->
+        <CabineSwayMaxOffset>0.025</CabineSwayMaxOffset>
+        <!-- Амплитуды при полной скорости: подпрыгивание /
+             галопирование (вертикаль), виляние (поперёк), м;
+             покачивание / клевки (крен / тангаж), рад -->
+        <CabineSwayBounceAmp>0.006</CabineSwayBounceAmp>
+        <CabineSwayGallopAmp>0.008</CabineSwayGallopAmp>
+        <CabineSwayHuntAmp>0.005</CabineSwayHuntAmp>
+        <CabineSwayRollAmp>0.005</CabineSwayRollAmp>
+        <CabineSwayPitchAmp>0.003</CabineSwayPitchAmp>
     </Viewer>
+    <!-- Параметры физики пешего игрока -->
+    <Player>
+        <!-- Радиус капсулы игрока, м -->
+        <Radius>0.3</Radius>
+        <!-- Скорость ходьбы / бега / приседа, м/с -->
+        <WalkSpeed>1.6</WalkSpeed>
+        <SprintSpeed>5.0</SprintSpeed>
+        <CrouchSpeed>0.8</CrouchSpeed>
+        <!-- Ускорение / трение, м/с^2 -->
+        <Acceleration>30.0</Acceleration>
+        <Friction>12.0</Friction>
+        <!-- Начальная скорость прыжка, м/с -->
+        <JumpSpeed>4.5</JumpSpeed>
+        <!-- Гравитация, м/с^2 -->
+        <Gravity>9.81</Gravity>
+        <!-- Высота ступеньки, м -->
+        <StepHeight>0.4</StepHeight>
+        <!-- Высота глаз стоя / в приседе над центром капсулы, м -->
+        <EyeHeightStand>1.35</EyeHeightStand>
+        <EyeHeightCrouch>0.65</EyeHeightCrouch>
+    </Player>
+	<Sound>
+		<Enabled>1</Enabled>
+	</Sound>
 </Config>

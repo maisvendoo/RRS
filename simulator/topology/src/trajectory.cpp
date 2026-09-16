@@ -11,6 +11,10 @@
 #include    <cstdio>
 #include    <filesystem.h>
 
+#include    <algorithm>
+#include    <functional>
+#include    <mutex>
+
 #include    <Journal.h>
 #include    <fstream>
 #include    <sstream>
@@ -33,7 +37,7 @@ static bool get_non_empty_lines_from_file(
         std::string line;
         std::getline(file, line);
 
-        if (!line.empty())
+        if (!line.empty() && line != "\r")
         {
             lines.emplace_back(std::move(line));
         }
@@ -41,6 +45,18 @@ static bool get_non_empty_lines_from_file(
 
     return true;
 }
+
+//------------------------------------------------------------------------------
+/// Общий кэш конфигурации профилей пути маршрута: читается один раз при
+/// загрузке первой траектории (loadRailProfile), далее используется
+/// всеми траекториями, в т.ч. при генерации неровностей стрелок
+//------------------------------------------------------------------------------
+namespace
+{
+track::TrackProfileConfig shared_profile_config;
+std::once_flag shared_profile_once;
+bool shared_profile_loaded = false;
+} // namespace
 
 //------------------------------------------------------------------------------
 //
@@ -139,6 +155,9 @@ bool Trajectory::load(const QString &route_dir, const QString &traj_name,
     // Заполняем имя траектории (по имени файла, где она хранится)
     name = traj_name;
 
+    // Профиль вертикальных неровностей пути
+    loadRailProfile(route_dir);
+
     // Загрузка модулей к траектории
     if (modules.empty())
     {
@@ -220,6 +239,13 @@ double Trajectory::getLength() const
 void Trajectory::setFwdSwitch(Switch *switch_ptr)
 {
     fwd_switch = switch_ptr;
+
+    // Неровность крестовины у конца, подключённого к стрелке
+    // (генерация после привязки: конфиг уже загружен loadRailProfile)
+    if (switch_ptr != nullptr)
+    {
+        generateSwitchIrregularity(true);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -228,6 +254,11 @@ void Trajectory::setFwdSwitch(Switch *switch_ptr)
 void Trajectory::setBwdSwitch(Switch *switch_ptr)
 {
     bwd_switch = switch_ptr;
+
+    if (switch_ptr != nullptr)
+    {
+        generateSwitchIrregularity(false);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -842,6 +873,198 @@ profile_point_t Trajectory::getPosition(double traj_coord, int direction) const
         pp.up = normalize(pp.up);
         return pp;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::loadRailProfile(const QString& route_dir)
+{
+    // Конфиг профилей маршрута читается один раз на все траектории
+    std::call_once(shared_profile_once, [&route_dir]()
+    {
+        QString error;
+        if (!track::loadTrackProfileConfig(route_dir,
+                                           shared_profile_config,
+                                           &error))
+        {
+            Journal::instance()->warning(
+                "Track profile config not loaded: " + error);
+        }
+
+        shared_profile_loaded = true;
+    });
+
+    //--- Возвышение наружного рельса (Б16): свойство ПУТИ ---
+    // Трекам, НАЧИНАЮЩИМСЯ внутри зоны [Cant], назначается постоянное
+    // возвышение зоны; getCant() линейно интерполирует между соседними
+    // треками - граничные треки дают переходный отвод возвышения
+    // (длина отвода = длина трека). Знак CantMm: "+" - левый рельс выше
+    for (track_t& track : tracks)
+    {
+        track.cant_mm = 0.0;
+
+        for (const track::CantZone& zone : shared_profile_config.cants)
+        {
+            const bool zone_here = zone.traj_name.isEmpty() ||
+                    zone.traj_name == "*" || zone.traj_name == name;
+
+            if (zone_here &&
+                track.traj_coord >= zone.begin &&
+                track.traj_coord < zone.end)
+            {
+                // Перекрывающиеся зоны суммируются (редкий случай)
+                track.cant_mm += zone.cant_mm;
+            }
+        }
+    }
+
+    if (!shared_profile_config.enabled)
+        return;
+
+    // Состояние пути: персональное для траектории или общий уровень
+    track::Condition condition = shared_profile_config.condition;
+
+    for (const auto& traj_condition : shared_profile_config.traj_conditions)
+    {
+        if (traj_condition.first == name)
+        {
+            condition = traj_condition.second;
+            break;
+        }
+    }
+
+    // Явные неровности: общие для всех путей и привязанные к этой траектории
+    std::vector<track::Irregularity> irregularities =
+            shared_profile_config.explicit_irregularities;
+
+    for (const auto& named : shared_profile_config.named_irregularities)
+    {
+        if (named.first == name)
+            irregularities.push_back(named.second);
+    }
+
+    rail_profile.generate(name.toStdString(),
+                          len,
+                          irregularities,
+                          shared_profile_config.joints,
+                          shared_profile_config.noise,
+                          condition,
+                          shared_profile_config.seed);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Trajectory::getRailHeight(double traj_coord, int side) const
+{
+    const double coord = std::min(len, std::max(0.0, traj_coord));
+    return rail_profile.railHeight(coord, side);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Trajectory::getLateralOffset(double traj_coord) const
+{
+    const double coord = std::min(len, std::max(0.0, traj_coord));
+    return rail_profile.lateralOffset(coord);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double Trajectory::getCant(double traj_coord) const
+{
+    if (tracks.empty())
+        return 0.0;
+
+    // Бинарный поиск трека, содержащего координату: треки отсортированы
+    // по возрастанию traj_coord (координата начала трека)
+    const auto upper = std::upper_bound(tracks.begin(),
+                                        tracks.end(),
+                                        traj_coord,
+                                        [](double value, const track_t& track)
+    {
+        return value < track.traj_coord;
+    });
+
+    const auto idx = static_cast<std::size_t>(
+                (upper == tracks.begin()) ? 0 : (upper - tracks.begin()) - 1);
+
+    const track_t& cur = tracks[idx];
+    const double next_cant = (idx + 1 < tracks.size())
+            ? tracks[idx + 1].cant_mm
+            : cur.cant_mm;
+
+    // Линейная интерполяция возвышения по длине трека: значение на
+    // начале трека -> значение на начале следующего. На граничном треке
+    // это переходный отвод возвышения (плавный вход/выход кривой)
+    const double rel = (cur.len > 1e-6)
+            ? std::min(std::max((traj_coord - cur.traj_coord) / cur.len, 0.0), 1.0)
+            : 0.0;
+
+    return cur.cant_mm + (next_cant - cur.cant_mm) * rel;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::generateSwitchIrregularity(bool at_fwd_end)
+{
+    // Топология знает стрелки: у траектории, подключённой к стрелке,
+    // зона перевода (остряки - крестовина - контррельсы) лежит у
+    // соответствующего конца. Ставим неровность Switch (двойной импульс
+    // + жёсткий удар крестовины) центром зоны у конца траектории
+    if (!shared_profile_loaded ||
+        !shared_profile_config.enabled ||
+        !shared_profile_config.switch_irregularity)
+    {
+        return;
+    }
+
+    bool& placed = at_fwd_end ? switch_irreg_fwd : switch_irreg_bwd;
+
+    if (placed)
+        return;
+
+    const double zone_len = std::max(shared_profile_config.switch_length, 1.0);
+
+    if (len < 2.0 * zone_len)
+        return;
+
+    track::Irregularity sw;
+    sw.type = track::IrregularityType::Switch;
+    sw.side = track::RailSide::Both;
+    sw.amplitude = shared_profile_config.switch_amplitude;
+    sw.length = zone_len;
+    sw.coord = at_fwd_end ? (len - 0.5 * zone_len) : (0.5 * zone_len);
+    // Износ крестовины: детерминированный разброс по имени траектории
+    // и стороне подключения (паттерн автогенерации стыков)
+    const std::uint32_t bits = static_cast<std::uint32_t>(
+                std::hash<std::string>{}(name.toStdString()) ^
+                (at_fwd_end ? 0x9e3779b9u : 0x85ebca6bu));
+    sw.wear = 0.3 + 0.7 * static_cast<double>(bits % 1000u) / 1000.0;
+
+    rail_profile.addIrregularity(sw);
+    placed = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::damageTrack(double factor)
+{
+    rail_profile.degradeTrack(factor);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Trajectory::addTonnage(double traj_coord, double mass_tonnes,
+                            double distance_m)
+{
+    rail_profile.addPassage(traj_coord, mass_tonnes, distance_m);
 }
 
 //------------------------------------------------------------------------------
