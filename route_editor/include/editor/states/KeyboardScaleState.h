@@ -17,6 +17,7 @@ public:
 
 private:
     vsg::dvec3 scale;
+    vsg::dvec3 gizmo_pos;
 
 private:
     virtual void confirm_transform() const override;

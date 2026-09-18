@@ -17,6 +17,8 @@ public:
 
 private:
     double rotation_rad;
+    vsg::dvec3 gizmo_pos;
+    vsg::dvec3 camera_front;
 
 private:
     virtual void confirm_transform() const override;

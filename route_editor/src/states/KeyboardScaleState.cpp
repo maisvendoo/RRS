@@ -22,18 +22,18 @@ KeyboardScaleState::~KeyboardScaleState() = default;
 
 void KeyboardScaleState::on_activate()
 {
+    const auto& gizmo = editor_context.gizmo;
+
     KeyboardTransformState::on_activate();
     scale = {1.0, 1.0, 1.0};
+    gizmo_pos = gizmo->get_curr_pos();
 }
 
 void KeyboardScaleState::handle_mouse_move()
 {
-    const auto& gizmo = editor_context.gizmo;
     const auto& selected_objects = editor_context.selected_objects;
 
     const vsg::dvec3 world_intersection = calculate_world_intersection();
-    const vsg::dvec3& gizmo_pos = gizmo->get_curr_pos();
-
     if (vsg::length(world_intersection - gizmo_pos) < 1.0e-6f)
     {
         return;
