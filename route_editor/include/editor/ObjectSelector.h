@@ -3,24 +3,13 @@
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
-#include <vsg/core/ref_ptr.h>
-#include <vsg/maths/vec3.h>
-#include <vulkan/vulkan_core.h>
 
-class Camera;
-class CommandManager;
 struct EditorContext;
-class Gizmo;
-class Route;
-class RouteObject;
-class SingleSwitch;
 
 namespace vsg
 {
 
-class ButtonPressEvent;
 class ButtonReleaseEvent;
-class KeyPressEvent;
 class MoveEvent;
 
 }
