@@ -206,7 +206,7 @@ private:
 
     std::vector<QProcess *> toolProcs;
 
-    QMainWindow *helpWindow = new QMainWindow(this);
+    QMainWindow *helpWindow = new QMainWindow(nullptr);
 
     void centerWindow(QWidget* window);
 
