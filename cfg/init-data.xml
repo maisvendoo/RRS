@@ -16,7 +16,7 @@
 		<!-- Коэффициент к трению колесо-рельс: меньше 1.0 - уменьшить, больше 1.0 - увеличить -->
 		<CoeffToWheelRailFriction>1.0</CoeffToWheelRailFriction>
 		<!-- Шаг синхронизации симуляции, мс -->
-		<IntegrationTimeInterval>15</IntegrationTimeInterval>
+		<IntegrationTimeInterval>45</IntegrationTimeInterval>
 
 		<DebugPrint>0</DebugPrint>
 
