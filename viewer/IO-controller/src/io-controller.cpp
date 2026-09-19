@@ -64,6 +64,12 @@ bool IOController::load_config(CfgReader &cfg)
         cfg.getString(secNode, "KeyName", keyName);
         ic_input.keyCode = KeySymbolsRRSMap.value(keyName, KEY_Undefined);
 
+        QString keyModOnName = "";
+        cfg.getString(secNode, "KeyModOnName", ic_input.keyModOnName);
+
+        QString keyModOffName = "";
+        cfg.getString(secNode, "KeyModOffName", ic_input.keyModOffName);
+
         cfg.getString(secNode, "ObjectName", ic_input.contolledObjectName);
 
         io_control_inputs.insert(ic_input.id, ic_input.contolledObjectName, ic_input);
@@ -99,6 +105,29 @@ void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool IOController::checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys)
+{
+    if (modKeyName == "Shift")
+    {
+        return isShift(pressed_keys);
+    }
+
+    if (modKeyName == "Control")
+    {
+        return isControl(pressed_keys);
+    }
+
+    if (modKeyName == "Alt")
+    {
+        return isAlt(pressed_keys);
+    }
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::processTumbler(const uint16_t &control_id,
                                   const std::set<uint16_t> &pressed_keys)
 {
@@ -108,8 +137,8 @@ void IOController::processTumbler(const uint16_t &control_id,
     // Нажата ли его клавиша
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
-        // Какой модификатор?
-        if (isShift(pressed_keys))
+        // Нажат модификатор включения?
+        if (checkModKey(io_ctrl->keyModOnName, pressed_keys))
         {
             io_ctrl->value = 1.0f;
             io_control_inputs.updateByKey1(control_id, io_ctrl.value());
@@ -117,7 +146,8 @@ void IOController::processTumbler(const uint16_t &control_id,
             return;
         }
 
-        if (isControl(pressed_keys))
+        // Нажат модификатор выключения?
+        if (checkModKey(io_ctrl->keyModOffName, pressed_keys))
         {
             io_ctrl->value = 0.0f;
             io_control_inputs.updateByKey1(control_id, io_ctrl.value());

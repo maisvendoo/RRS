@@ -55,6 +55,9 @@ protected:
 
     virtual void keysProcess(std::set<uint16_t> &pressed_keys);
 
+    // Проверка модификатора
+    bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
+
     // Обработка контрола типа "тумблер" (с фиксацией)
     void processTumbler(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
 

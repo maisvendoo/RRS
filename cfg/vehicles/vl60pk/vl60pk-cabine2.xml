@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	
-	<!-- Кабина 1 -->
+	<!-- Кабина 2 -->
 	
 	<!-- Токоприемники -->
 	<Control>
 		<ID>100</ID>
 		<value>0.0</value>
 		<KeyName>KEY_U</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_Pnt</ObjectName>
 	</Control>
 
@@ -16,6 +18,8 @@
 		<ID>101</ID>
 		<value>0.0</value>
 		<KeyName>KEY_I</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
 		<ObjectName>Cab2_Tumbler_Pnt1</ObjectName>
 	</Control>
 
@@ -24,6 +28,8 @@
 		<ID>102</ID>
 		<value>0.0</value>
 		<KeyName>KEY_O</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
 		<ObjectName>Cab2_Tumbler_Pnt2</ObjectName>
 	</Control>	
 
