@@ -58,4 +58,15 @@
 		<ObjectName>Cab1_Tumbler_GVon</ObjectName>
 	</Control>
 
+	<!-- Фазорасщепитель -->
+	<Control>
+		<ID>105</ID>
+		<Name>Фазорасщепитель</Name>
+		<value>0.0</value>
+		<KeyName>KEY_T</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_FR</ObjectName>
+	</Control>
+
 </Config>

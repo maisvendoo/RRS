@@ -232,11 +232,12 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         mk_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Фазорасщепитель"
-        fr_tumbler[cab_idx].setKeySymbolOn(KEY_T);
-        fr_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        fr_tumbler[cab_idx].setKeySymbolOff(KEY_T);
-        fr_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        fr_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //fr_tumbler[cab_idx].setKeySymbolOn(KEY_T);
+        //fr_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        //fr_tumbler[cab_idx].setKeySymbolOff(KEY_T);
+        //fr_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        //fr_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Ряд тумблеров на приборной панели помощника машиниста
         // Триггер тумблера "Тифон"

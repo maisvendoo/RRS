@@ -27,6 +27,9 @@ void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
     processTumbler(CTRL_MAIN_SWITCH_ON, pressed_keys);
     // Возврат защиты ГВ
     processButton(CTRL_RETURN_PROTECTION, pressed_keys);
+
+    // Фазорасщепитель
+    processTumbler(CTRL_TUMBLER_FR, pressed_keys);
 }
 
 //------------------------------------------------------------------------------
