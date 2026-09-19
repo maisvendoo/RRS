@@ -170,7 +170,7 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         pants_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);*/
 
         // Триггер тумблера "ГВ вкл. Возврат защиты"
-        gv_return_tumbler[cab_idx].setKeySymbolOn(KEY_P);
+        /*gv_return_tumbler[cab_idx].setKeySymbolOn(KEY_P);
         gv_return_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
         gv_return_tumbler[cab_idx].setKeySymbolOff(KEY_Undefined);
         gv_return_tumbler[cab_idx].setKeyModifierOff(KEY_Undefined);
@@ -181,7 +181,7 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         gv_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
         gv_tumbler[cab_idx].setKeySymbolOff(KEY_P);
         gv_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        gv_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        gv_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);*/
 
         // Ближний ряд тумблеров приборной панели машиниста
         // Триггер тумблера "Автоматическая подача песка"

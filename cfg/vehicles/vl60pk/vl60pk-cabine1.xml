@@ -36,4 +36,26 @@
 		<ObjectName>Cab1_Tumbler_Pnt2</ObjectName>
 	</Control>	
 
+	<!-- Включение ГВ -->
+	<Control>
+		<ID>103</ID>
+		<Name>Включение ГВ</Name>
+		<value>0.0</value>
+		<KeyName>KEY_P</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_GVonoff</ObjectName>
+	</Control>
+
+	<!-- Возврат защиты ГВ -->
+	<Control>
+		<ID>104</ID>
+		<Name>Возврат защиты ГВ</Name>
+		<value>0.0</value>
+		<KeyName>KEY_P</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+		<KeyModOffName>Alt</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_GVon</ObjectName>
+	</Control>
+
 </Config>

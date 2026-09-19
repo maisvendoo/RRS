@@ -16,5 +16,11 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         bool is_pnt2 = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_PNT2]);
         is_pnt2 ? pant2_tumbler[cab_idx].set() : pant2_tumbler[cab_idx].reset();
+
+        bool is_main_switch_on = static_cast<bool>(control_inputs[cab_idx][CTRL_MAIN_SWITCH_ON]);
+        is_main_switch_on ? gv_tumbler[cab_idx].set() : gv_tumbler[cab_idx].reset();
+
+        bool is_main_switch_return = static_cast<bool>(control_inputs[cab_idx][CTRL_RETURN_PROTECTION]);
+        is_main_switch_return ? gv_return_tumbler[cab_idx].set() : gv_return_tumbler[cab_idx].reset();
     }
 }

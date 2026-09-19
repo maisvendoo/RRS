@@ -31,6 +31,7 @@ void IOController::setPressedKey(uint16_t keyBase)
 void IOController::setReleasedKey(uint16_t keyBase)
 {
     _pressed_keys.erase(keyBase);
+    processControl(CTRL_TYPE_KEYBOARD);
 }
 
 //------------------------------------------------------------------------------
@@ -155,6 +156,29 @@ void IOController::processTumbler(const uint16_t &control_id,
             return;
         }        
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::processButton(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys)
+{
+    auto io_ctrl = io_control_inputs.getByKey1(control_id);
+
+    if (getKeyState(pressed_keys, io_ctrl->keyCode))
+    {
+        if (checkModKey(io_ctrl->keyModOnName, pressed_keys) || io_ctrl->keyModOnName.isEmpty())
+        {
+            io_ctrl->value = 1.0f;
+        }
+    }
+    else
+    {
+        io_ctrl->value = 0.0f;
+    }
+
+    io_control_inputs.updateByKey1(control_id, io_ctrl.value());
+    emit sigSendVehicleControlCommand(io_ctrl->serialize());
 }
 
 //------------------------------------------------------------------------------

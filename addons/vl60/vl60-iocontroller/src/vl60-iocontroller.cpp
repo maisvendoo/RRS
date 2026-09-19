@@ -25,8 +25,13 @@ void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
     processTumbler(CTRL_TUMBLER_PNT, pressed_keys);
     // Передний токоприемник
     processTumbler(CTRL_TUMBLER_PNT1, pressed_keys);
-    // ЗАдний токоприемник
+    // Задний токоприемник
     processTumbler(CTRL_TUMBLER_PNT2, pressed_keys);
+
+    // Включение ГВ
+    processTumbler(CTRL_MAIN_SWITCH_ON, pressed_keys);
+    // Возврат защиты ГВ
+    processButton(CTRL_RETURN_PROTECTION, pressed_keys);
 }
 
 //------------------------------------------------------------------------------
