@@ -28,6 +28,8 @@ struct io_control_input_t
     QString keyModOffName = "";
     /// Имя объекта в 3D-модели
     QString contolledObjectName = "";
+    /// Имя контрола
+    QString name = "";
 
     io_control_input_t()
     {

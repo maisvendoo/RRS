@@ -52,6 +52,8 @@ bool IOController::load_config(CfgReader &cfg)
     {
         io_control_input_t ic_input;
 
+        cfg.getString(secNode, "Name", ic_input.name);
+
         int control_ID = 0;
         cfg.getInt(secNode, "ID", control_ID);
         ic_input.id = static_cast<uint16_t>(control_ID);
@@ -64,10 +66,8 @@ bool IOController::load_config(CfgReader &cfg)
         cfg.getString(secNode, "KeyName", keyName);
         ic_input.keyCode = KeySymbolsRRSMap.value(keyName, KEY_Undefined);
 
-        QString keyModOnName = "";
         cfg.getString(secNode, "KeyModOnName", ic_input.keyModOnName);
 
-        QString keyModOffName = "";
         cfg.getString(secNode, "KeyModOffName", ic_input.keyModOffName);
 
         cfg.getString(secNode, "ObjectName", ic_input.contolledObjectName);

@@ -6,6 +6,7 @@
 	<!-- Токоприемники -->
 	<Control>
 		<ID>100</ID>
+		<Name>Токоприемники</Name>
 		<value>0.0</value>
 		<KeyName>KEY_U</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
@@ -16,6 +17,7 @@
 	<!-- Токоприемник передний -->
 	<Control>
 		<ID>101</ID>
+		<Name>Токоприемник передний</Name>
 		<value>0.0</value>
 		<KeyName>KEY_I</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
@@ -26,6 +28,7 @@
 	<!-- Токоприемник задний -->
 	<Control>
 		<ID>102</ID>
+		<Name>Токоприемник задний</Name>
 		<value>0.0</value>
 		<KeyName>KEY_O</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
