@@ -30,10 +30,7 @@ void IOController::setPressedKey(uint16_t keyBase)
 //------------------------------------------------------------------------------
 void IOController::setReleasedKey(uint16_t keyBase)
 {
-    if (_pressed_keys.erase(keyBase))
-    {
-        processControl(CTRL_TYPE_KEYBOARD);
-    }
+    _pressed_keys.erase(keyBase);
 }
 
 //------------------------------------------------------------------------------
@@ -69,12 +66,65 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "ObjectName", ic_input.contolledObjectName);
 
-        io_control_inputs.insert(ic_input.keyCode, ic_input.contolledObjectName, ic_input);
+        io_control_inputs.insert(ic_input.id, ic_input.contolledObjectName, ic_input);
 
         secNode = cfg.getNextSection();
     }
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::setCabineIndex(int vehicle_idx, int cab_idx)
+{
+    for (auto &[key1, key2, value] : io_control_inputs.getAll())
+    {
+        value.controlled_vehicle_idx = vehicle_idx;
+        value.cabine_idx = cab_idx;
+
+        io_control_inputs.updateByKey1(key1, value);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
+{
+    (void) pressed_keys;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::processTumbler(const uint16_t &control_id,
+                                  const std::set<uint16_t> &pressed_keys)
+{
+    // Проверяем конкретный контрол
+    auto io_ctrl = io_control_inputs.getByKey1(control_id);
+
+    // Нажата ли его клавиша
+    if (getKeyState(pressed_keys, io_ctrl->keyCode))
+    {
+        // Какой модификатор?
+        if (isShift(pressed_keys))
+        {
+            io_ctrl->value = 1.0f;
+            io_control_inputs.updateByKey1(control_id, io_ctrl.value());
+            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+            return;
+        }
+
+        if (isControl(pressed_keys))
+        {
+            io_ctrl->value = 0.0f;
+            io_control_inputs.updateByKey1(control_id, io_ctrl.value());
+            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+            return;
+        }        
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -87,6 +137,38 @@ void IOController::processKeyBoardInput()
     {
         return;
     }
+
+    // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
+    // отправляем пустое управление
+    constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
+    std::size_t modifiers_size = 0;
+    for (std::uint16_t key : modifier_keys)
+    {
+        if (_pressed_keys.count(key))
+        {
+            ++modifiers_size;
+        }
+    }
+
+    if (_pressed_keys.size() == modifiers_size)
+    {
+        return;
+    }
+
+    std::set<uint16_t> pressed_keys;
+
+    for (auto key : _pressed_keys)
+    {
+        // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
+        if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
+        {
+            continue;
+        }
+
+        pressed_keys.insert(key);
+    }
+
+    keysProcess(pressed_keys);
 }
 
 //------------------------------------------------------------------------------

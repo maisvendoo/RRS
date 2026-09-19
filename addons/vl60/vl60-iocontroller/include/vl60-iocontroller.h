@@ -16,6 +16,7 @@ public:
 
 private:
 
+    void keysProcess(std::set<uint16_t> &pressed_keys) override;
 };
 
 #endif

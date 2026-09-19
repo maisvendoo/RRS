@@ -23,6 +23,7 @@
 UpdateViewerHandler::UpdateViewerHandler(
     vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
     vsg::ref_ptr<vsg::Camera> camera,
+    vsg::ref_ptr<vsg::Keyboard> keyboard,
     vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
     ScreenshotWriter* screenshot_writer,
     TrafficLightsHandler* sig_handler,
@@ -32,7 +33,7 @@ UpdateViewerHandler::UpdateViewerHandler(
 )
     : Inherit()
     , _settings(settings)
-    , _keyboard(vsg::Keyboard::create())
+    , _keyboard(keyboard)
     , _upd_server_control(upd_server_control)
     , _camera(camera)
     , _shadow_region(shadow_region)

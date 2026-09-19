@@ -110,6 +110,14 @@ public:
     /// Получить профиль пути поезда по его индексу (train_id)
     bool getTrainProfile(int train_id, simulator_train_profile_update_t& out) const;
 
+
+    VehicleExterior* getVehicle(int index);
+
+    int getVehiclesCount() const
+    {
+        return static_cast<int>(vehicles.size());
+    }
+
 public slots:
     void slotGetTrainsData(QByteArray& data);
     void slotGetVehiclesPosData(QByteArray& data);
@@ -121,6 +129,8 @@ signals:
     void updated();
 
     void sigSendVehicleControlCommand(const QByteArray &data);
+
+    void sigCurrentVehicleChanged(int newIndex, int oldIndex);
 
 private:
     void updateDebugString();
@@ -181,6 +191,10 @@ private:
 
     /// Info about vehicles exterior
     std::vector<VehicleExterior> vehicles;
+
+    int m_prevVehicleIndex = -1;
+
+    void notifyVehicleChanged();
 };
 
 #endif // VEHICLES_HANDLER_H

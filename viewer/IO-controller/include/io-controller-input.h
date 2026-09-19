@@ -12,9 +12,9 @@
 struct io_control_input_t
 {
     /// Индекс управляемой ПЕ
-    int controlled_vehicle_idx = 0;
+    int controlled_vehicle_idx = -1;
     /// Индекс активной кабины управляемой ПЕ
-    int cabine_idx = 0;
+    int cabine_idx = -1;
     /// Идентификатор сигнала управления в массиве сигналов ПЕ
     uint16_t id = 0;
     /// Значение управляющего сигнала

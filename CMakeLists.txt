@@ -48,7 +48,7 @@ if (CLIENT_BUILD)
     add_subdirectory (viewer)
 
     add_subdirectory (route_editor)
-    #add_subdirectory (route_editor2)
+    add_subdirectory (route_editor2)
 
     add_subdirectory (launcher)
 
@@ -63,6 +63,7 @@ if (CLIENT_BUILD)
     add_subdirectory (tools/route-transform)
     add_subdirectory (tools/texture-compressor)
     add_subdirectory (tools/admin-panel)
+
 endif()
 
 include(CMakePackageConfigHelpers)

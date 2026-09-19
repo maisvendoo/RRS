@@ -6,6 +6,7 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsg/core/Visitor.h>
 #include <vsg/maths/vec2.h>
+#include <vsg/ui/Keyboard.h>
 
 #include <cstdint>
 #include <map>
@@ -26,8 +27,7 @@ namespace vsg
     class Camera;
     class FocusInEvent;
     class FocusOutEvent;
-    class FrameEvent;
-    class Keyboard;
+    class FrameEvent;    
     class KeyPressEvent;
     class KeyReleaseEvent;
     class MoveEvent;
@@ -49,6 +49,7 @@ public:
     UpdateViewerHandler(
         vsg::ref_ptr<UpdateControlToServerHandler> upd_server_control,
         vsg::ref_ptr<vsg::Camera> camera,
+        vsg::ref_ptr<vsg::Keyboard> keyboard,
         vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
         ScreenshotWriter* screenshot_writer,
         TrafficLightsHandler* sig_handler,
@@ -73,6 +74,11 @@ public:
     void apply(vsg::TouchMoveEvent& touchMove) override;
 
     void changeCurrentVehicle();
+
+    void setKeyboard(vsg::ref_ptr<vsg::Keyboard> keyboard)
+    {
+        _keyboard = keyboard;
+    }
 
 private:
     /// compute non-dimensional window coordinate (-1, 1) from event coords

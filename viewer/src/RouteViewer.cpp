@@ -62,6 +62,9 @@
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
 #include <vsgXchange/all.h>
+#include <vsg/ui/Keyboard.h>
+
+#include <InputRouteHandler.h>
 
 #include <QApplication>
 
@@ -883,11 +886,17 @@ void RouteViewer::initViewer()
 
     viewer->addWindow(window);
 
+    auto keyboard = vsg::Keyboard::create();
+
     auto upd_server_control = UpdateControlToServerHandler::create(tcp_client.get());
+
+    input_route_handler = InputRouteHandler::create();
+    input_route_handler->setKeyboard(keyboard);
 
     upd_viewer_handler = UpdateViewerHandler::create(
         upd_server_control,
         camera,
+        keyboard,
         shadow_region,
         screenshot_writer.get(),
         traffic_lights_handler.get(),
@@ -896,11 +905,16 @@ void RouteViewer::initViewer()
         settings
     );
 
+    upd_viewer_handler->setKeyboard(keyboard);
+
     auto upd_sound_manager_handler = UpdateSoundManagerHandler::create(lookAt, sound_manager.get());
     auto upd_statistis_handler = UpdateStatisticsHandler::create();
 
     auto close_viewer_handler = vsg::CloseHandler::create(viewer);
     close_viewer_handler->closeKey = vsg::KEY_Undefined;
+
+    connect(vehicles_handler.get(), &VehiclesHandler::sigCurrentVehicleChanged,
+            this, &RouteViewer::slotOnCurrentVehicleChanged);
 
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(upd_server_control);
@@ -908,6 +922,7 @@ void RouteViewer::initViewer()
     viewer->addEventHandler(upd_sound_manager_handler);
     viewer->addEventHandler(upd_statistis_handler);
     viewer->addEventHandler(close_viewer_handler);
+    viewer->addEventHandler(input_route_handler);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({commandGraph});
 
@@ -1200,7 +1215,9 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 
     GUIparams->status = QString("Загрузка подвижного состава...");
 
-    is_vehicles = vehicles_handler->load(data, settings, options);    
+    is_vehicles = vehicles_handler->load(data, settings, options);
+
+    slotOnCurrentVehicleChanged(vehicles_handler->getCurrentVehicleIndex(), -1);
 
     GUIparams->status = QString("");
 
@@ -1314,4 +1331,42 @@ void RouteViewer::slotUpdated()
     // Камера в кабину ПЕ через фиктивное нажатие F1
     vsg::KeyPressEvent keyPress(window, viewer->getFrameStamp()->time, vsg::KEY_F1, vsg::KEY_F1, vsg::MODKEY_OFF);
     upd_viewer_handler->apply(keyPress);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
+{
+    if (!input_route_handler || !vehicles_handler)
+    {
+        return;
+    }
+
+    VehicleExterior* vehicle = vehicles_handler->getVehicle(newIndex);
+
+    if (!vehicle)
+    {
+        input_route_handler->clearActiveController();
+        LOG_INFO("RouteViewer: No vehicle at index %d", newIndex);        
+        return;
+    }
+
+    auto cab_idx = vehicle->controlled_cabine_idx;
+
+    LOG_INFO("RouteViewer: Curr. vehicle %d cabine %d IOControllers count: %d", newIndex, cab_idx, vehicle->io_controls.size());
+
+    // Есть ли у ПЕ собственный IOController
+    if (!vehicle->io_controls.empty() && vehicle->io_controls[cab_idx])
+    {
+        // Активируем контроллер в маршрутизаторе
+        input_route_handler->setActiveController(vehicle->io_controls[cab_idx]);
+        LOG_INFO("RouteViewer: Activated IOController for vehicle %d (index %d)",
+                 newIndex, newIndex);
+    } else
+    {
+        // Нет контроллера - используем legacy-режим
+        input_route_handler->clearActiveController();
+        LOG_INFO("RouteViewer: No IOController for vehicle %d, using legacy mode", newIndex);
+    }
 }
