@@ -186,40 +186,38 @@ void IOController::processButton(const uint16_t &control_id, const std::set<uint
 //------------------------------------------------------------------------------
 void IOController::processKeyBoardInput()
 {
-    // Уходим, если ничего не нажато
-    if (_pressed_keys.empty())
-    {
-        return;
-    }
-
-    // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
-    // отправляем пустое управление
-    constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
-    std::size_t modifiers_size = 0;
-    for (std::uint16_t key : modifier_keys)
-    {
-        if (_pressed_keys.count(key))
-        {
-            ++modifiers_size;
-        }
-    }
-
-    if (_pressed_keys.size() == modifiers_size)
-    {
-        return;
-    }
-
     std::set<uint16_t> pressed_keys;
 
-    for (auto key : _pressed_keys)
+    if (!_pressed_keys.empty())
     {
-        // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
-        if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
+        // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
+        // отправляем пустое управление
+        constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
+        std::size_t modifiers_size = 0;
+        for (std::uint16_t key : modifier_keys)
         {
-            continue;
+            if (_pressed_keys.count(key))
+            {
+                ++modifiers_size;
+            }
         }
 
-        pressed_keys.insert(key);
+        if (_pressed_keys.size() == modifiers_size)
+        {
+            keysProcess(pressed_keys);
+            return;
+        }
+
+        for (auto key : _pressed_keys)
+        {
+            // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
+            if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
+            {
+                continue;
+            }
+
+            pressed_keys.insert(key);
+        }
     }
 
     keysProcess(pressed_keys);

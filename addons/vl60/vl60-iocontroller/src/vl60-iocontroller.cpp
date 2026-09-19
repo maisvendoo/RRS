@@ -16,11 +16,6 @@ VL60IOController::VL60IOController() : IOController(nullptr)
 //------------------------------------------------------------------------------
 void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 {
-    if (pressed_keys.empty())
-    {
-        return;
-    }
-
     // Управление токоприемниками
     processTumbler(CTRL_TUMBLER_PNT, pressed_keys);
     // Передний токоприемник
