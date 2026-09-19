@@ -11,6 +11,7 @@
 #include    <simulator-update-struct.h>
 #include    <background-widget.h>
 #include    <map-widget.h>
+#include    <modules-hints-widget.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -46,7 +47,7 @@ public:
     ~MainWindow();
 
 private:
-
+    int count = 0;
     Ui::MainWindow *ui;
 
     tcp_config_t tcp_config;
@@ -61,6 +62,8 @@ private:
 
     Trajectory* route_begin_trajectory = nullptr;
 
+    QAction* menu_view_separator = {};
+
     int route_dir = 0;
 
     bool is_menu_shows = false;
@@ -72,6 +75,8 @@ private:
     std::vector<double> vehicles_half_length;
 
     BackGroundWidget *bg;
+
+    ModulesHintsWidget *modules_hints;
 
     MapWidget *map;
 
@@ -103,6 +108,10 @@ private slots:
 
     void slotGetTopologyData(QByteArray &topology_data);
 
+    void slotGetTopologyModulesData(QByteArray& modules_data);
+
+    void slotGetTopologyModuleUpdate(QByteArray& module_update);
+
     void slotGetSignalsData(QByteArray &sig_data);
 
     void slotGetPlayersData(QByteArray &players_update);
@@ -133,7 +142,7 @@ private slots:
 
     void slotGetTrainsInfo(QByteArray& data);
 
-    void slotRenameTrainMenu();
+    void slotTrainMenu();
 
     void slotSetSimSpeed(bool is_cheked);
 

@@ -15,6 +15,7 @@ class CameraAbstract;
 class ScreenshotWriter;
 struct settings_t;
 class TrafficLightsHandler;
+class TrainLabelsHandler;
 class UpdateControlToServerHandler;
 class VehiclesHandler;
 
@@ -51,6 +52,7 @@ public:
         vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
         ScreenshotWriter* screenshot_writer,
         TrafficLightsHandler* sig_handler,
+        TrainLabelsHandler* train_labels_handler,
         VehiclesHandler* veh_handler,
         settings_t& settings
     );
@@ -70,6 +72,8 @@ public:
     void apply(vsg::TouchUpEvent& touchUp) override;
     void apply(vsg::TouchMoveEvent& touchMove) override;
 
+    void changeCurrentVehicle();
+
 private:
     /// compute non-dimensional window coordinate (-1, 1) from event coords
     vsg::dvec2 ndc(const vsg::PointerEvent& event) const;
@@ -82,7 +86,6 @@ private:
     bool isCtrl() const;
     bool isShift() const;
 
-    void changeCurrentVehicle();
 
     void changeCurrentCabine();
 
@@ -111,6 +114,7 @@ private:
 
     ScreenshotWriter* _screenshot_writer = nullptr;
     TrafficLightsHandler* _sig_handler = nullptr;
+    TrainLabelsHandler* _train_labels_handler = nullptr;
     VehiclesHandler* _vehicles_handler = nullptr;
 
     bool _wasPausePhysicallyPressed = false;

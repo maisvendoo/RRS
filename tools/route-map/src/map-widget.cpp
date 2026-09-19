@@ -1,4 +1,8 @@
 #include    <map-widget.h>
+
+#include    <rail-signal.h>
+#include    <topology-trajectory-device.h>
+
 #include    <QPainter>
 #include    <QMenu>
 #include    <QTreeWidget>
@@ -290,7 +294,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
 //
 //------------------------------------------------------------------------------
 void MapWidget::drawTrajectory(Trajectory* traj, QPainter& painter,
-                               QPointF& cursor_pos, double& distance2)
+                                QPointF& cursor_pos, double& distance2)
 {
     QPen pen;
 

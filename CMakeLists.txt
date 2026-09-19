@@ -2,8 +2,12 @@ cmake_minimum_required (VERSION 3.29)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-project (RRS VERSION 1.9.2)
+project (RRS VERSION 1.9.4)
+
+# Подключаем дополнительные настройки
+include(cmake/BuildConfiguration.cmake)
 
 # RPATH configuration for finding shared libraries at runtime
 if(APPLE)
@@ -18,39 +22,48 @@ endif()
 # No lib prefix in all shared libraries
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
+option (CLIENT_BUILD "Build for client usage" ON)
+
+add_subdirectory (system)
 add_subdirectory (CfgReader)
 add_subdirectory (CfgEditor)
 add_subdirectory (filesystem)
-add_subdirectory (graphics)
+
 add_subdirectory (libJournal)
 add_subdirectory (network)
 add_subdirectory (parsing)
+add_subdirectory (core)
 
 add_subdirectory (simulator)
-
-add_subdirectory (sound-manager)
-add_subdirectory (viewer)
-
-add_subdirectory (route_editor)
-add_subdirectory (route_editor2)
-add_subdirectory (core)
 
 add_subdirectory (addons/passcar)
 add_subdirectory (addons/freightcar)
 add_subdirectory (addons/vl60)
 
-add_subdirectory (launcher)
+add_subdirectory (tools/server-daemon)
 
-add_subdirectory (tools/dmd2gltf)
-add_subdirectory (tools/profconv)
-add_subdirectory (tools/pathconv)
-add_subdirectory (tools/offset-parallel-gen)
-add_subdirectory (tools/offset-spline-gen)
-add_subdirectory (tools/topologycheck)
-add_subdirectory (tools/routeconv)
-add_subdirectory (tools/route-map)
-add_subdirectory (tools/route-transform)
-add_subdirectory (tools/texture-compressor)
+if (CLIENT_BUILD)
+    add_subdirectory (graphics)
+    add_subdirectory (sound-manager)
+    add_subdirectory (viewer)
+
+    add_subdirectory (route_editor)
+    #add_subdirectory (route_editor2)
+
+    add_subdirectory (launcher)
+
+    add_subdirectory (tools/dmd2gltf)
+    add_subdirectory (tools/profconv)
+    add_subdirectory (tools/pathconv)
+    add_subdirectory (tools/offset-parallel-gen)
+    add_subdirectory (tools/offset-spline-gen)
+    add_subdirectory (tools/topologycheck)
+    add_subdirectory (tools/routeconv)
+    add_subdirectory (tools/route-map)
+    add_subdirectory (tools/route-transform)
+    add_subdirectory (tools/texture-compressor)
+    add_subdirectory (tools/admin-panel)
+endif()
 
 include(CMakePackageConfigHelpers)
 

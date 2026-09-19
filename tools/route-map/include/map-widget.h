@@ -213,7 +213,7 @@ private:
     bool show_sim_time = false;
     QString sim_time = "";
 
-    void paintEvent(QPaintEvent *event);    
+    void paintEvent(QPaintEvent *event);
 
     void drawTrajectory(Trajectory* traj, QPainter& painter,
                         QPointF& cursor_pos, double& distance2);

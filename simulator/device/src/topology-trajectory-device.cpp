@@ -153,3 +153,44 @@ void TrajectoryDevice::load_config(CfgReader &cfg)
 {
     (void) cfg;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QByteArray TrajectoryDevice::serialize() const
+{
+    return QByteArray("");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrajectoryDevice::deserialize(QByteArray& data)
+{
+    (void) data;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrajectoryDevice::getDrawElements(std::vector<draw_line_t>& lines, std::vector<draw_circle_t>& circles, const double scale)
+{
+    (void) lines;
+    (void) circles;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TrajectoryDevice::setModuleFilename(const QString &filename)
+{
+    module_filename = filename;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString TrajectoryDevice::getModuleFilename() const
+{
+    return module_filename;
+}

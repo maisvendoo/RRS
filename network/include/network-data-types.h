@@ -3,8 +3,10 @@
 
 #include <QByteArray>
 #include <QtTypes>
+#include <QPointer>
 
 class QTcpSocket;
+
 
 //------------------------------------------------------------------------------
 //
@@ -56,7 +58,20 @@ enum StructureType : uint8_t
 
     STYPE_COMMAND_RENAME_TRAIN,
     STYPE_COMMAND_SET_SIMULATION_SPEED,
-    STYPE_SEND_VEHICLE_CONTROL_COMMAND
+
+    STYPE_SEND_VEHICLE_CONTROL_COMMAND,
+
+    STYPE_COMMAND_REVERSE_TRAIN,
+
+    STYPE_REQUEST_TRAIN_PROFILE_UPDATE,
+    STYPE_TRAIN_PROFILE_UPDATE,
+
+    STYPE_REQUEST_TOPOLOGY_MODULES,
+    STYPE_TOPOLOGY_MODULES,
+    STYPE_TOPOLOGY_MODULE_UPDATE,
+
+    STYPE_REQUEST_STATIONS_DATA,
+    STYPE_STATIONS_DATA
 };
 
 //------------------------------------------------------------------------------
@@ -100,6 +115,10 @@ struct client_data_t
     double controlled_update_prev_time;
     double players_update_interval;
     double players_update_prev_time;
+    double profile_update_interval;
+    double profile_update_prev_time;
+    double profile_backward;
+    double profile_forward;
     QTcpSocket* socket;
     network_data_t received_data;
 };

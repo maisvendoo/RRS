@@ -54,6 +54,8 @@ private:
     static const   QString VIEW_DIST;
     static const   QString MAX_FPS;
     static const   QString PHYSICAL_DEVICE;
+    static const   QString PHYSICAL_DEVICE_VENDOR_ID;
+    static const   QString PHYSICAL_DEVICE_DEVICE_ID;
     static const   QString SAMPLES;
     static const   QString DEPTH_FORMAT;
     static const   QString SHADOW;

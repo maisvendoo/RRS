@@ -45,6 +45,9 @@ private slots:
 
 protected:
 
+    /// Целевая траектория маневрового маршрута
+    Trajectory* ref_trajectory_shunt = nullptr;
+
     enum
     {
         CALL_OPENED = 0,

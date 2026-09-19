@@ -5,9 +5,31 @@
 #include    <QMap>
 #include    <device.h>
 #include    <device-list.h>
+#include    <vec3.h>
 
 class Trajectory;
 class ConnectorDevice;
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct draw_circle_t
+{
+    dvec3 point;
+    vec3 color;
+    int radius;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct draw_line_t
+{
+    dvec3 begin_point;
+    dvec3 end_point;
+    vec3 color;
+    int width;
+};
 
 //------------------------------------------------------------------------------
 //
@@ -55,6 +77,14 @@ public:
     /// Device configuration
     virtual void load_config(CfgReader &cfg);
 
+    virtual QByteArray serialize() const;
+    virtual void deserialize(QByteArray& data);
+
+    virtual void getDrawElements(std::vector<draw_line_t>& lines, std::vector<draw_circle_t>& circles, const double scale);
+
+    QString getModuleFilename() const;
+    void setModuleFilename(const QString &filename);
+
 protected:
 
     Trajectory *trajectory = nullptr;
@@ -74,6 +104,15 @@ protected:
     state_vector_t input_signals = {};
     /// Output signals
     state_vector_t output_signals = {};
+
+private:
+
+    /// Name of module
+    QString module_filename = "";
+
+signals:
+
+    void sendUpdate(QByteArray module_data);
 };
 
 #endif // TRAJECTORYDEVICE_H

@@ -53,6 +53,7 @@ target_link_libraries(${TARGET} PRIVATE
     graphics
     core
     io-controller
+    system
 )
 
 target_include_directories(${TARGET} PRIVATE

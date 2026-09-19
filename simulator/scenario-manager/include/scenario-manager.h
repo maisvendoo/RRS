@@ -97,6 +97,9 @@ signals:
     /// Переименовать поезд в модели
     void sigRenameTrainInModel(int train_idx, QString new_name);    
 
+    /// Развернуть поезд
+    void sigReverseTrain(int train_idx);
+
     void sigUpdateTrainTimetable(int train_idx);
 
     void sigSetTimeForAutopilot(QString time);
@@ -215,6 +218,9 @@ private:
 
     /// Установка задачи переименования поезда
     void taskRenameTrain(const std::string &old_name, const std::string &new_name);
+
+    /// Установка задачи разворота поезда
+    void taskReverseTrain(const std::string &train_name);
 
     /// Найти индекc поезда по имени
     int findTrainByName(const std::string &name);

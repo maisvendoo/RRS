@@ -72,6 +72,26 @@ void TcpClient::sendRequest(StructureType stype, double update_interval)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendTrainProfileRequest(double update_interval, double backward_m, double forward_m)
+{
+    if (!canSend()) return;
+
+    network_data_t request;
+    request.stype = STYPE_REQUEST_TRAIN_PROFILE_UPDATE;
+
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
+
+    stream << update_interval;
+    stream << backward_m;
+    stream << forward_m;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpClient::sendSwitchCommand(QByteArray switch_command)
 {
     if (!canSend()) return;
@@ -181,6 +201,24 @@ void TcpClient::sendNewTrainName(int train_idx, const QString &new_name)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendReverseTrain(int train_idx)
+{
+    if (!canSend()) return;
+
+    network_data_t request;
+    request.stype = STYPE_COMMAND_REVERSE_TRAIN;
+
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
+
+    stream << train_idx;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpClient::sendSimSpeedCommand(int speed_factor)
 {
     if (!canSend()) return;
@@ -264,6 +302,10 @@ void TcpClient::process_received_data(network_data_t &net_data)
     case STYPE_SIGNALS_DATA:
         emit setSignalsData(net_data.data);
         break;
+
+    case STYPE_STATIONS_DATA:
+        emit setStationsData(net_data.data);
+        break;
 /*
     case STYPE_SIGNALS_STATE:
         emit setSignalsState(net_data.data);
@@ -299,6 +341,18 @@ void TcpClient::process_received_data(network_data_t &net_data)
 
     case STYPE_TRAINS_UPDATE:
         emit setTrainInfo(net_data.data);
+        break;
+
+    case STYPE_TRAIN_PROFILE_UPDATE:
+        emit setTrainProfile(net_data.data);
+        break;
+
+    case STYPE_TOPOLOGY_MODULES:
+        emit setTopologyModules(net_data.data);
+        break;
+
+    case STYPE_TOPOLOGY_MODULE_UPDATE:
+        emit setTopologyModuleUpdate(net_data.data);
         break;
 
     default:

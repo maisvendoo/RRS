@@ -105,6 +105,15 @@ void TcpServer::process_client_request(client_data_t &client_data)
         clients_for_topology_updates.insert(client_data.socket);
         break;
     }
+    case STYPE_REQUEST_TOPOLOGY_MODULES:
+    {
+        client_data.received_data.data.clear();
+
+        //Journal::instance()->info(QString("Received topology modules request for #%1").arg(client_data.id));
+        send_topology_modules(client_data);
+        clients_for_topology_modules_updates.insert(client_data.socket);
+        break;
+    }
 /*    case STYPE_REQUEST_TOPOLOGY_UPDATE:
     {
         client_data.received_data.data.clear();
@@ -126,6 +135,14 @@ void TcpServer::process_client_request(client_data_t &client_data)
         clients_for_signals_updates.insert(client_data.socket);
         break;
     }
+    case STYPE_REQUEST_STATIONS_DATA:
+    {
+        client_data.received_data.data.clear();
+
+        //Journal::instance()->info(QString("Received stations data request for #%1").arg(client_data.id));
+        send_stations_data(client_data);
+        break;
+    }
 /*    case STYPE_REQUEST_SIGNALS_UPDATE:
     {
         client_data.received_data.data.clear();
@@ -141,6 +158,24 @@ void TcpServer::process_client_request(client_data_t &client_data)
 
         //Journal::instance()->info(QString("Received vehicles info request for #%1").arg(client_data.id));
         send_vehicles_info(client_data);
+        break;
+    }
+    case STYPE_REQUEST_TRAIN_PROFILE_UPDATE:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        stream >> client_data.profile_update_interval;
+
+        // Дальности профиля назад/вперёд (появились позже интервала)
+        if (!stream.atEnd())
+        {
+            stream >> client_data.profile_backward;
+            stream >> client_data.profile_forward;
+        }
+
+        /*Journal::instance()->info(QString("Received train profile update request for #%1 with interval %2")
+                                      .arg(client_data.id).arg(client_data.profile_update_interval, 5, 'f', 3));*/
+        clients_for_train_profile_updates.insert(client_data.socket);
         break;
     }
     case STYPE_REQUEST_TRAINS_UPDATE:
@@ -258,7 +293,23 @@ void TcpServer::process_client_request(client_data_t &client_data)
 
         break;
     }
+    case STYPE_COMMAND_REVERSE_TRAIN:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
 
+        int train_idx = -1;
+        stream >> train_idx;
+
+        if (train_idx < 0)
+        {
+            //Journal::instance()->error("Reverse train: Invalide train index");
+            break;
+        }
+
+        emit sigReverseTrain(train_idx);
+
+        break;
+    }
     case STYPE_COMMAND_SET_SIMULATION_SPEED:
     {
         simspeed_command_t sc;
@@ -329,6 +380,22 @@ void TcpServer::send_topology_data(client_data_t &client_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpServer::send_topology_modules(client_data_t &client_data)
+{
+    QByteArray data;
+    emit requestTopologyModules(data);
+
+    network_data_t net_data;
+    net_data.stype = STYPE_TOPOLOGY_MODULES;
+    net_data.data = data;
+
+    client_data.socket->write(net_data.serialize());
+    client_data.socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpServer::send_signals_data(client_data_t &client_data)
 {
     QByteArray data;
@@ -337,6 +404,19 @@ void TcpServer::send_signals_data(client_data_t &client_data)
     network_data_t net_data;
     net_data.stype = STYPE_SIGNALS_DATA;
     net_data.data = data;
+
+    client_data.socket->write(net_data.serialize());
+    client_data.socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::send_stations_data(client_data_t &client_data)
+{
+    network_data_t net_data;
+    net_data.stype = STYPE_STATIONS_DATA;
+    net_data.data = stations_data;
 
     client_data.socket->write(net_data.serialize());
     client_data.socket->flush();
@@ -371,6 +451,83 @@ void TcpServer::send_trains_info(client_data_t &client_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpServer::send_data(QTcpSocket *client_socket, network_data_t& net_data)
+{
+    QPointer<QTcpSocket> safe_socket(client_socket);
+
+    if (safe_socket.isNull())
+        return;
+
+    if (!clients_data.contains(client_socket))
+        return;
+
+    // Проверяем состояние сокета
+    if (!safe_socket->isOpen() || !safe_socket->isValid() ||
+        safe_socket->state() != QAbstractSocket::ConnectedState)
+    {
+        remove_client(client_socket);
+        return;
+    }
+
+    // Отправляем данные без принудительного flush()
+    qint64 bytesWritten = safe_socket->write(net_data.serialize());
+
+    if (bytesWritten == -1)
+    {
+        Journal::instance()->warning(QString("Failed to write to socket: %1")
+                                         .arg(safe_socket->errorString()));
+        remove_client(client_socket);
+        return;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::remove_client(QTcpSocket* socket)
+{
+    if (!socket)
+        return;
+
+    // Проверяем, не удалён ли уже сокет
+    if (!clients_data.contains(socket))
+    {
+        // Сокет уже удалён из списка - возможно, повторный вызов
+        Journal::instance()->warning("Attempting to remove already removed socket");
+        return;
+    }
+
+    client_data_t *client_data = &clients_data[socket];
+    int client_id = client_data->id;
+
+    // Удаляем из всех контейнеров
+    clients_data.remove(socket);
+    clients_for_players_info_updates.remove(socket);
+    clients_for_topology_updates.remove(socket);
+    clients_for_topology_modules_updates.remove(socket);
+    clients_for_signals_updates.remove(socket);
+    clients_for_vehicles_pos_updates.remove(socket);
+    clients_for_vehicles_updates.remove(socket);
+    clients_for_vehicle_controlled_updates.remove(socket);
+    clients_for_trains_updates.remove(socket);
+    clients_for_train_profile_updates.remove(socket);
+
+    emit sigResetVehicleControl(client_id);
+
+    Journal::instance()->info(QString("Removed client #%1")
+                                  .arg(client_id));
+
+    // Закрываем сокет, если он ещё открыт
+    if (socket->isOpen())
+        socket->close();
+
+    // Безопасно удаляем сокет
+    socket->deleteLater();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpServer::slotNewConnection()
 {
     client_data_t client_data;
@@ -389,11 +546,10 @@ void TcpServer::slotNewConnection()
     connect(client_data.socket, &QTcpSocket::readyRead,
             this, &TcpServer::slotReceive);
 
-    Journal::instance()->info(QString("Connected client with id %1")
-                                  .arg(client_data.id));
-
-    Journal::instance()->info(QString("Server receive buffer size: %1")
-                                  .arg(client_data.socket->readBufferSize()));
+    Journal::instance()->info(QString("Connected #%1 client %2:%3")
+                                  .arg(client_data.id)
+                                  .arg(client_data.socket->peerAddress().toString())
+                                  .arg(client_data.socket->peerPort()));
 /*
     topology_data.clear();
     emit setTopologyData(topology_data);
@@ -427,26 +583,12 @@ void TcpServer::slotClientDisconnected()
 {
     QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
 
-    if (clients_data.contains(socket))
+    if (!socket)
     {
-        client_data_t *client_data = &clients_data[socket];
-
-        client_data->socket->close();
-
-        clients_data.remove(socket);
-        clients_for_players_info_updates.remove(socket);
-        clients_for_topology_updates.remove(socket);
-        clients_for_signals_updates.remove(socket);
-        clients_for_vehicles_pos_updates.remove(socket);
-        clients_for_vehicles_updates.remove(socket);
-        clients_for_vehicle_controlled_updates.remove(socket);
-        clients_for_trains_updates.remove(socket);
-
-        emit sigResetVehicleControl(client_data->id);
-
-        Journal::instance()->info(QString("Disconnected client with id %1")
-                                      .arg(client_data->id));
+        return;
     }
+
+    remove_client(socket);
 }
 
 //------------------------------------------------------------------------------
@@ -456,16 +598,18 @@ void TcpServer::slotReceive()
 {
     QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
 
-    client_data_t *client_data;
-
-    if (clients_data.contains(socket))
-    {
-        client_data = &clients_data[socket];
-    }
-    else
+    if (!socket)
     {
         return;
     }
+
+    // Проверяем, существует ли ещё сокет в списке
+    if (!clients_data.contains(socket))
+        return;
+
+    client_data_t *client_data;
+
+    client_data = &clients_data[socket];
 
     while (socket->bytesAvailable())
     {
@@ -513,18 +657,18 @@ void TcpServer::slotReceive()
 //------------------------------------------------------------------------------
 void TcpServer::slotSendSwitchState(QByteArray sw_state)
 {
+    if (clients_for_topology_updates.empty())
+    {
+        return;
+    }
+
     network_data_t net_data;
     net_data.stype = STYPE_SWITCH_UPDATE;
     net_data.data = sw_state;
 
     for (auto client_socket : clients_for_topology_updates)
     {
-/*
-        if (clients_data.contains(client_socket))
-            Journal::instance()->info(QString("Updated switch state for %1").arg(clients_data[client_socket].id));
-*/
-        client_socket->write(net_data.serialize());
-        client_socket->flush();
+        send_data(client_socket, net_data);
     }
 }
 
@@ -533,17 +677,38 @@ void TcpServer::slotSendSwitchState(QByteArray sw_state)
 //------------------------------------------------------------------------------
 void TcpServer::slotSendTrajBusyState(QByteArray busy_state)
 {
+    if (clients_for_topology_updates.empty())
+    {
+        return;
+    }
+
     network_data_t net_data;
     net_data.stype = STYPE_TRAJ_BUSY_UPDATE;
     net_data.data = busy_state;
 
     for (auto client_socket : clients_for_topology_updates)
     {
-/*
-        Journal::instance()->info(QString("Updated busy status for %1").arg(clients_data[client_socket].id));
-*/
-        client_socket->write(net_data.serialize());
-        client_socket->flush();
+        send_data(client_socket, net_data);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::slotSendTopologyModuleState(QByteArray module_state)
+{
+    if (clients_for_topology_modules_updates.empty())
+    {
+        return;
+    }
+
+    network_data_t net_data;
+    net_data.stype = STYPE_TOPOLOGY_MODULE_UPDATE;
+    net_data.data = module_state;
+
+    for (auto client_socket : clients_for_topology_modules_updates)
+    {
+        send_data(client_socket, net_data);
     }
 }
 
@@ -552,17 +717,18 @@ void TcpServer::slotSendTrajBusyState(QByteArray busy_state)
 //------------------------------------------------------------------------------
 void TcpServer::slotUpdateSignal(QByteArray signal_data)
 {
+    if (clients_for_signals_updates.empty())
+    {
+        return;
+    }
+
     network_data_t net_data;
     net_data.stype = STYPE_SIGNAL_UPDATE;
     net_data.data = signal_data;
 
     for (auto client_socket : clients_for_signals_updates)
     {
-/*
-        Journal::instance()->info(QString("Updated signals for %1").arg(clients_data[client_socket].id));
-*/
-        client_socket->write(net_data.serialize());
-        client_socket->flush();
+        send_data(client_socket, net_data);
     }
 }
 
@@ -571,26 +737,22 @@ void TcpServer::slotUpdateSignal(QByteArray signal_data)
 //------------------------------------------------------------------------------
 void TcpServer::updatePlayers(QByteArray players_data, double t)
 {
+    if (clients_for_players_info_updates.empty())
+    {
+        return;
+    }
+
     network_data_t net_data;
     net_data.stype = STYPE_PLAYERS_UPDATE;
     net_data.data = players_data;
 
     for (auto client_socket : clients_for_players_info_updates)
     {
-/*
-        Journal::instance()->info(QString("Updated players at vehicles: data size = %1")
-            .arg(net_data.data.size()));
-*/
         double prev_t = clients_data[client_socket].players_update_prev_time;
         if ((t - prev_t) > clients_data[client_socket].players_update_interval)
         {
-/*
-            Journal::instance()->info(QString("Updated players at vehicles for %1: t = %2 | dt = %3")
-                .arg(clients_data[client_socket].id).arg(t, 5, 'f', 3).arg(t - prev_t, 5, 'f', 3));
-*/
             clients_data[client_socket].players_update_prev_time = t;
-            client_socket->write(net_data.serialize());
-            client_socket->flush();
+            send_data(client_socket, net_data);
         }
     }
 }
@@ -600,26 +762,22 @@ void TcpServer::updatePlayers(QByteArray players_data, double t)
 //------------------------------------------------------------------------------
 void TcpServer::updateVehiclesPos(QByteArray vehicles_pos, double t)
 {
+    if (clients_for_vehicles_pos_updates.empty())
+    {
+        return;
+    }
+
     network_data_t net_data;
     net_data.stype = STYPE_VEHICLES_POS_UPDATE;
     net_data.data = vehicles_pos;
 
     for (auto client_socket : clients_for_vehicles_pos_updates)
     {
-/*
-        Journal::instance()->info(QString("Updated vehicles positions: data size = %1")
-            .arg(net_data.data.size()));
-*/
         double prev_t = clients_data[client_socket].pos_update_prev_time;
         if ((t - prev_t) > clients_data[client_socket].pos_update_interval)
         {
-/*
-            Journal::instance()->info(QString("Updated vehicles positions for %1: t = %2 | dt = %3")
-                .arg(clients_data[client_socket].id).arg(t, 5, 'f', 3).arg(t - prev_t, 5, 'f', 3));
-*/
             clients_data[client_socket].pos_update_prev_time = t;
-            client_socket->write(net_data.serialize());
-            client_socket->flush();
+            send_data(client_socket, net_data);
         }
     }
 }
@@ -629,29 +787,25 @@ void TcpServer::updateVehiclesPos(QByteArray vehicles_pos, double t)
 //------------------------------------------------------------------------------
 void TcpServer::updateVehiclesState(QByteArray vehicles_state, double t)
 {
+    // Сохраняем эти данные для выдачи по запросу
+    this->vehicles_state = vehicles_state;
+
+    if (clients_for_vehicles_updates.empty())
+    {
+        return;
+    }
+
     network_data_t net_data;
     net_data.stype = STYPE_VEHICLES_STATE_UPDATE;
     net_data.data = vehicles_state;
 
-    // Сохраняем эти данные для выдачи по запросу
-    this->vehicles_state = vehicles_state;
-
     for (auto client_socket : clients_for_vehicles_updates)
     {
-/*
-        Journal::instance()->info(QString("Updated vehicles states: data size = %1")
-            .arg(net_data.data.size()));
-*/
         double prev_t = clients_data[client_socket].state_update_prev_time;
         if ((t - prev_t) > clients_data[client_socket].state_update_interval)
         {
-/*
-            Journal::instance()->info(QString("Updated vehicles state for %1: t = %2 | dt = %3")
-                .arg(clients_data[client_socket].id).arg(t, 5, 'f', 3).arg(t - prev_t, 5, 'f', 3));
-*/
             clients_data[client_socket].state_update_prev_time = t;
-            client_socket->write(net_data.serialize());
-            client_socket->flush();
+            send_data(client_socket, net_data);
         }
     }
 }
@@ -661,6 +815,11 @@ void TcpServer::updateVehiclesState(QByteArray vehicles_state, double t)
 //------------------------------------------------------------------------------
 void TcpServer::updateVehicleControlled(QByteArray vehicles_state, int client_id, double t)
 {
+    if (clients_for_vehicle_controlled_updates.empty())
+    {
+        return;
+    }
+
     network_data_t net_data;
     net_data.stype = STYPE_VEHICLE_CONTROLLED_UPDATE;
     net_data.data = vehicles_state;
@@ -668,18 +827,39 @@ void TcpServer::updateVehicleControlled(QByteArray vehicles_state, int client_id
     for (auto client_socket : clients_for_vehicle_controlled_updates)
     {
         if (clients_data[client_socket].id != client_id)
+        {
             continue;
+        }
         double prev_t = clients_data[client_socket].controlled_update_prev_time;
         if ((t - prev_t) > clients_data[client_socket].controlled_update_interval)
         {
-/*
-        Journal::instance()->info(QString("Updated vehicle controlled for %1: t = %2 | dt = %3 | data size = %4")
-            .arg(clients_data[client_socket].id).arg(t, 5, 'f', 3).arg(t - prev_t, 5, 'f', 3).arg(net_data.data.size()));
-*/
             clients_data[client_socket].controlled_update_prev_time = t;
-            client_socket->write(net_data.serialize());
-            client_socket->flush();
+            send_data(client_socket, net_data);
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::updateTrainProfile(QByteArray profile_data, double t)
+{
+    Q_UNUSED(t);
+
+    // Интервальная дельта и пересчёт обеспечиваются на стороне модели
+    // (Model::tcpFeedBack), здесь профили рассылаются всем подписчикам
+    if (clients_for_train_profile_updates.empty())
+    {
+        return;
+    }
+
+    network_data_t net_data;
+    net_data.stype = STYPE_TRAIN_PROFILE_UPDATE;
+    net_data.data = profile_data;
+
+    for (auto client_socket : clients_for_train_profile_updates)
+    {
+        send_data(client_socket, net_data);
     }
 }
 
@@ -688,16 +868,20 @@ void TcpServer::updateVehicleControlled(QByteArray vehicles_state, int client_id
 //------------------------------------------------------------------------------
 void TcpServer::updateTrainsInfo(QByteArray trains_state)
 {
+    // Сохраняем эти данные для выдачи по запросу
+    this->trains_state = trains_state;
+
+    if (clients_for_trains_updates.empty())
+    {
+        return;
+    }
+
     network_data_t net_data;
     net_data.stype = STYPE_TRAINS_UPDATE;
     net_data.data = trains_state;
 
-    // Сохраняем эти данные для выдачи по запросу
-    this->trains_state = trains_state;
-
     for (auto client_socket : clients_for_trains_updates)
     {
-        client_socket->write(net_data.serialize());
-        client_socket->flush();
+        send_data(client_socket, net_data);
     }
 }

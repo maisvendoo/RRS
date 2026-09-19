@@ -3,6 +3,9 @@
 
 #include    <QObject>
 #include    <unordered_map>
+#include    <vector>
+#include    <string>
+#include    <utility>
 
 #include    <topology-export.h>
 #include    <topology-types.h>
@@ -40,21 +43,27 @@ public:
     /// Вернуть контроллер конкретной ПЕ
     VehicleController& getVehicleController(size_t idx);
 
-    /// Хэш-таблица указателей на вайкл контроллеры по указателю на вайкл
-    /// (для удобства смены индекса поезда у контролов из поезда)
-    std::unordered_map<Vehicle *, VehicleController *> vc_table;
-
     /// Нахождение пути в графе траекторий
     route_segment_t find_route(Trajectory *start_traj,
                                Trajectory *target_traj,
                                qint8 dir,
                                bool check_busy = true);
 
+    /// Получить распрямлённый профиль пути вокруг точки (traj, coord):
+    /// траектории вперёд и назад от точки на backward_m/forward_m метров
+    bool getProfile(Trajectory *traj, double coord, dir_t orient,
+                    double backward_m, double forward_m,
+                    profile_segments_t &out) const;
+
     /// Шаг симуляции
     void step(double t, double dt);
 
     QByteArray serialize() const;
-    void deserialize(QByteArray &data);
+    QByteArray serialize_modules() const;
+    QByteArray serialize_stations() const;
+
+    void deserialize(QByteArray& data);
+    void deserialize_modules(QByteArray& data);
 
     traj_list_t *getTrajectoriesList();
     const traj_list_t* getTrajectoriesList() const;
@@ -73,6 +82,8 @@ signals:
     void sendSwitchState(QByteArray sw_data);
 
     void sendTrajBusyState(QByteArray busy_data);
+
+    void sendModuleUpdate(QByteArray module_data);
 
     void sigSetOpenSignalsQueue(std::vector<std::pair<QString, int>> conn_list, bool for_train, bool for_shunting);
 
@@ -168,6 +179,8 @@ public slots:
                             double *lenght);
 
     void slotGetTrajStateRequest(int vehicle_idx, int station_idx, QString start_traj_name, QString traj_name, int dir, int request_type);
+
+    void slotTrajModuleUpdate(QByteArray& traj_module_data);
 
 private slots:
 

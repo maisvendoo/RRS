@@ -36,8 +36,6 @@
 
 #include    <virtual-interface-device.h>
 
-#include    <traffic-machine.h>
-
 #include    <topology.h>
 
 #include    <tcp-server.h>
@@ -131,6 +129,14 @@ private:
     simulator_vehicles_update_t update_vehicles = simulator_vehicles_update_t();
     /// Feedback with player's current and controlled vehicles
     simulator_update_players_t  update_players = simulator_update_players_t();
+
+    /// Feedback with trains' path profiles
+    std::vector<simulator_train_profile_update_t> update_profiles;
+
+    /// Профили пересчитываются не чаще этого реального интервала, с
+    static constexpr double profiles_update_interval = 1.0;
+    /// Время последнего пересчёта профилей
+    double profiles_update_prev_time = 0.0;
     /// Vehicle control and feedback with debug message
     struct controlled_client_t
     {
@@ -154,10 +160,7 @@ private:
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
 
-    Vehicle* vehicle_controlled_by_panel = nullptr;
-
-    /// Система трафика
-    TrafficMachine  *traffic_machine = nullptr;
+    Vehicle* vehicle_controlled_by_panel = nullptr;    
 
     /// Топология
     Topology *topology = new Topology();
@@ -205,10 +208,7 @@ private:
     void initControlPanel(QString cfg_path);
 
     /// Инициализация поезда
-    Train *addTrain(const init_data_t &init_data);
-
-    /// Инициализация трафика
-    void initTraffic(const init_data_t &init_data);
+    Train *addTrain(const init_data_t &init_data);    
 
     /// Инициализация топологии
     void initTopology(const init_data_t &init_data);
@@ -222,6 +222,9 @@ private:
 
     /// Подготовка данных перед передачей серверу для рассылки клиентам
     void prepareFeedBack(bool need_trains_feedback);
+
+    /// Подготовка профилей пути всех поездов для рассылки клиентам
+    void prepareProfilesFeedback();
 
     /// TCP feedback
     void tcpFeedBack(bool need_trains_feedback);
@@ -238,6 +241,8 @@ private slots:
 
     void slotGetTopologyData(QByteArray &topology_data);
 
+    void slotGetTopologyModules(QByteArray &topology_modules);
+
     void slotGetSignalsData(QByteArray &signals_data);
 
     void slotGetVehicleControlByKeyboard(QByteArray &control_data, int client_id);
@@ -245,6 +250,8 @@ private slots:
     void slotResetVehicleControlByKeyboard(int client_id);
 
     void slotRenameTrainInModel(int train_idx, QString new_name);
+
+    void slotReverseTrain(int train_idx);
 
     void slotGetTrainParams(int train_idx, double &train_len, double &train_mass);
 

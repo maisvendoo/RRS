@@ -66,6 +66,9 @@ public:
     /// Train uncoupling
     Train* uncouple(double uncoupling_distance);
 
+    /// Swap the head and the tail of Train
+    void reverse();
+
     /// Set distance to stop the train before end of trajectory
     void setDistanceToEndOfTrajectory(bool is_train_head, double distance);
 
@@ -88,18 +91,16 @@ public:
 
     std::vector<std::vector<Joint*>> getJoints();
 
-    double getVelocity(size_t i = 0) const;
-
-    /// Get train mass
+    /// Скорость i-той ПЕ в поезде, м/с
+    double getVelocity(size_t i) const;
+    /// Скорость поезда, м/с
+    double getVelocity() const;
+    /// Масса поезда, кг
     double getMass() const;
-    /// Get train length
+    /// Длина поезда, м
     double getLength() const;
 
     size_t getVehiclesNumber() const;
-
-    QString getClientName();
-
-    QString getTrainID();
 
     std::vector<Vehicle*>* getVehicles();
 
@@ -160,12 +161,6 @@ private:
 
     /// Motion ODE's solver
     Solver*     train_motion_solver = nullptr;
-
-    /// Имя сетевого клиента для ВЖД
-    QString     client_name;
-
-    /// Идентификатор поезда для ВЖД
-    QString     train_id;
 
     /// All train's vehicles
     std::vector<Vehicle*> vehicles;

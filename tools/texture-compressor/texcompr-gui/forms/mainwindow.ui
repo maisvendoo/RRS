@@ -313,16 +313,23 @@
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QCheckBox" name="cbOverWriteGltfDir">
-              <property name="text">
-               <string>Overwrite GLTF file</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
+<item>
+              <widget class="QCheckBox" name="cbOverWriteGltfDir">
+               <property name="text">
+                <string>Overwrite GLTF file</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="cbDeleteSrcTexDir">
+               <property name="text">
+                <string>Delete source texture</string>
+               </property>
+              </widget>
+             </item>
             <item>
              <widget class="QPlainTextEdit" name="ptDirLog">
               <property name="readOnly">

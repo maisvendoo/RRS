@@ -1,24 +1,17 @@
 #include    "sl2m.h"
 
-#include    "physics.h"
+/// Соотношение расчётного диаметра колеса и передаточного числа редуктора:
+/// 30 оборотов вала привода на 1000 метров пройденного пути, ~10.62
+constexpr double Do_i = 1000.0 / 30.0 / Physics::PI;
+/// Коэффициент к переходу от вращения колеса расчётного радиуса к вращению вала
+constexpr double ip = 2.0 / Do_i;
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 SL2M::SL2M(QObject *parent) : Device(parent)
-    , omega(0.0)
-    , ip(3.0 * Physics::PI / 50.0)
-    , omega_s(0.0)
-    , wear_gap(1.0)
-    , max_speed(150.0)
-    , arrow_pos(0.0f)
-    , Dk(1.25)
-    , speed_begin_sound(2.0)
-    , omega_begin_sound(speed_begin_sound * 2.0 / Dk / Physics::kmh)
-    , shaft_pos(0.0)
-    , freq_coeff(1.0)
 {
-
+    random_value = static_cast<std::uint8_t>(std::time(0) & 0xFF);
 }
 
 //------------------------------------------------------------------------------
@@ -40,10 +33,17 @@ void SL2M::setOmega(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void SL2M::setWheelDiameter(double diam)
+void SL2M::setWheelDiameter(double d)
 {
-    Dk = diam;
-    omega_begin_sound = speed_begin_sound * 2.0 / Dk / Physics::kmh;
+    r_wheel = d / 2.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double SL2M::getVelocity() const
+{
+    return velocity;
 }
 
 //------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ void SL2M::setWheelDiameter(double diam)
 //------------------------------------------------------------------------------
 float SL2M::getArrowPos() const
 {
-    return arrow_pos;
+    return static_cast<float>(velocity) / max_speed;
 }
 
 //------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ float SL2M::getArrowPos() const
 //------------------------------------------------------------------------------
 float SL2M::getShaftPos() const
 {
-    return shaft_pos;
+    return static_cast<float>(getY(SHAFT_ANGLE) / 2.0 / Physics::PI);
 }
 
 //------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ float SL2M::getShaftPos() const
 sound_state_t SL2M::getSoundState(size_t idx) const
 {
     (void) idx;
-    return sound_state_t(abs(omega) >= omega_begin_sound);
+    return sound_state_t(velocity >= speed_begin_sound);
 }
 
 //------------------------------------------------------------------------------
@@ -77,7 +77,16 @@ sound_state_t SL2M::getSoundState(size_t idx) const
 float SL2M::getSoundSignal(size_t idx) const
 {
     (void) idx;
-    return sound_state_t::createSoundSignal(abs(omega) >= omega_begin_sound);
+    return sound_state_t::createSoundSignal(velocity >= speed_begin_sound);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::uint8_t SL2M::random_next()
+{
+    random_value = static_cast<std::uint8_t>((101 * random_value + 103) & 0xFF);
+    return random_value;
 }
 
 //------------------------------------------------------------------------------
@@ -85,18 +94,46 @@ float SL2M::getSoundSignal(size_t idx) const
 //------------------------------------------------------------------------------
 void SL2M::preStep(state_vector_t &Y, double t)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(t)
+    // Подъём фиксирующего скорость сегмента ограничен
+    while (Y[VELOCITY_CURRENTSEGMENT] > max_speed)
+    {
+        Y[VELOCITY_CURRENTSEGMENT] -= velocity_segment_step;
+    }
 
-    omega_s = ip * omega;
+    // Скорость, максимальная из зарегистрированных текущим или предыдущим сегментом
+    velocity = std::max(Y[VELOCITY_CURRENTSEGMENT], velocity_previous_segment);
 
-    velocity = abs(omega) * Dk / 2.0 + min(1000.0 * abs(omega), wear_gap) * sin(Y[1]);
+    // Раз в секунду - переход к следующему сегменту
+    if (Y[TIMER_NEXT_SEGMENT] >= cycle_time)
+    {
+        // Обнуляем таймер
+        Y[TIMER_NEXT_SEGMENT] = 0.0;
 
-    arrow_pos = static_cast<float>(min(velocity * Physics::kmh / max_speed, 1.0));
+        // Количество засечек, на которое поднялся сегмент за прошедшую секунду
+        double step_num = std::round(Y[VELOCITY_CURRENTSEGMENT] / velocity_segment_step);
 
-    double shaft_angle = Y[0];
+        // Случайный перескок на соседнюю засечку
+        if ((velocity_random_plus || velocity_random_minus) && (step_num > 1.0))
+        {
+            random_next();
+            if (random_value < velocity_random_minus)
+            {
+                // Выпало маленькое число - бросок в минус
+                step_num -= 1.0;
+            }
+            else if (random_value > (255 - velocity_random_plus))
+            {
+                // Выпало большое число - бросок в плюс
+                step_num += 1.0;
+            }
+        }
 
-    shaft_pos = static_cast<float>(shaft_angle / 2.0 / Physics::PI);
+        // Следующую секунду этот сегмент будет удерживаться фиксирующим роликом
+        velocity_previous_segment = step_num * velocity_segment_step;
+
+        // А подниматься для фиксации скорости будет очередной сегмент, с нуля
+        Y[VELOCITY_CURRENTSEGMENT] = 0.0;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -104,11 +141,21 @@ void SL2M::preStep(state_vector_t &Y, double t)
 //------------------------------------------------------------------------------
 void SL2M::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 {
-    Q_UNUSED(Y)
-    Q_UNUSED(t)
+    (void)Y;
+    (void)t;
 
-    dYdt[0] = omega_s;
-    dYdt[1] = freq_coeff * omega;
+    // Настройка: расчёт скорости по реальному диаметру колеса с учётом износа,
+    // либо по расчётному диаметру, с соответствующим искажением, как в реальности
+    const double r_calc = use_nominal_diameter ? r_nominal : r_wheel;
+
+    // Вращение вала привода от колеса через червячный редуктор
+    dYdt[SHAFT_ANGLE] = omega * r_calc * ip;
+
+    // Подъём текущего сегмента для фиксации скорости за последнюю секунду
+    dYdt[VELOCITY_CURRENTSEGMENT] = std::abs(omega) * r_calc / cycle_time;
+
+    // Таймер. Просто таймер.
+    dYdt[TIMER_NEXT_SEGMENT] = 1.0;
 }
 
 //------------------------------------------------------------------------------
@@ -117,15 +164,57 @@ void SL2M::ode_system(const state_vector_t &Y, state_vector_t &dYdt, double t)
 void SL2M::load_config(CfgReader &cfg)
 {
     QString secName = "Device";
+    double tmp;
+    int random_shift;
 
-    cfg.getDouble(secName, "MaxSpeed", max_speed);
-    cfg.getDouble(secName, "WearGap", wear_gap);
+    tmp = 0.0;
+    cfg.getDouble(secName, "MaxSpeed", tmp);
+    if (tmp > Physics::ZERO)
+    {
+        max_speed = tmp / Physics::kmh;
+    }
 
-    wear_gap = wear_gap / Physics::kmh;
+    tmp = 0.0;
+    cfg.getDouble(secName, "SpeedStep", tmp);
+    if (tmp > Physics::ZERO)
+    {
+        velocity_segment_step = tmp / Physics::kmh;
+    }
 
-    cfg.getDouble(secName, "SoundSpeed", speed_begin_sound);
+    tmp = 0.0;
+    cfg.getDouble(secName, "SoundSpeed", tmp);
+    if (tmp > Physics::ZERO)
+    {
+        speed_begin_sound = tmp / Physics::kmh;
+    }
 
-    cfg.getDouble(secName, "FreqCoeff", freq_coeff);
+    tmp = 0.0;
+    cfg.getDouble(secName, "CycleTime", tmp);
+    if (tmp > Physics::ZERO)
+    {
+        cycle_time = tmp;
+    }
+
+    tmp = 0.0;
+    cfg.getDouble(secName, "WheelNominalDiameter", tmp);
+    if (tmp > Physics::ZERO)
+    {
+        r_nominal = tmp / 2.0;
+    }
+
+    cfg.getBool(secName, "UseNominalDiameter", use_nominal_diameter);
+
+    random_shift = 0;
+    cfg.getInt(secName, "VelocityRandomPlus", random_shift);
+    if ((random_shift > 0) && (random_shift <= 100))
+    {
+        velocity_random_plus = random_shift;
+    }
+
+    random_shift = 0;
+    cfg.getInt(secName, "VelocityRandomMinus", random_shift);
+    if ((random_shift > 0) && (random_shift <= 100))
+    {
+        velocity_random_minus = random_shift;
+    }
 }
-
-

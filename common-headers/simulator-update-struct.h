@@ -109,24 +109,7 @@ struct simulator_vehicle_pos_update_t final
 
         serialize_vector(stream, orth_x, orth_y, orth_z, max_orth);
         serialize_vector(stream, up_x, up_y, up_z, max_up);
-/*
-        stream << position_x;
-        stream << position_y;
-        stream << position_z;
-        float tmp;
-        tmp = static_cast<float>(orth_x);
-        stream << tmp;
-        tmp = static_cast<float>(orth_y);
-        stream << tmp;
-        tmp = static_cast<float>(orth_z);
-        stream << tmp;
-        tmp = static_cast<float>(up_x);
-        stream << tmp;
-        tmp = static_cast<float>(up_y);
-        stream << tmp;
-        tmp = static_cast<float>(up_z);
-        stream << tmp;
-*/
+
         return data;
     }
 
@@ -616,6 +599,362 @@ struct simulator_vehicle_controlled_update_t final
         stream >> currentDebugMsg;
         stream >> controlled_vehicle;
         stream >> controlledDebugMsg;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_train_profile_point_t final
+{
+    /// Дистанция от середины поезда вдоль пути, м (вперёд по ходу - «+», назад - «-»)
+    float distance = 0.0f;
+
+    /// Высота пути, м
+    float elevation = 0.0f;
+
+    /// Железнодорожный пикетаж в этой точке, м
+    float railway_coord = 0.0f;
+
+    /// Уклон профиля на сегменте, в тысячных
+    float inclination = 0.0f;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << distance;
+        stream << elevation;
+        stream << railway_coord;
+        stream << inclination;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> distance;
+        stream >> elevation;
+        stream >> railway_coord;
+        stream >> inclination;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_train_profile_vehicle_t final
+{
+    /// Модель-индекс ПЕ, занимающей участок профиля
+    int vehicle_id = 0;
+
+    /// Начало занимаемого интервала по дистанции профиля, м
+    float begin_distance = 0.0f;
+
+    /// Конец занимаемого интервала по дистанции профиля, м
+    float end_distance = 0.0f;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << vehicle_id;
+        stream << begin_distance;
+        stream << end_distance;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> vehicle_id;
+        stream >> begin_distance;
+        stream >> end_distance;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_train_profile_signal_t final
+{
+    /// Дистанция светофора от середины поезда, м (вперёд по ходу - «+», назад - «-»)
+    float distance = 0.0f;
+
+    /// Имя коннектора (стрелки), на котором установлен светофор
+    QString connector_name = "";
+
+    /// Направление светофора относительно коннектора (FWD=1, BWD=-1)
+    std::int8_t signal_dir = 0;
+
+    /// Сигнал направлен против движения поезда (все линзы погашены)
+    bool is_oncoming = false;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << distance;
+        stream << connector_name;
+        stream << signal_dir;
+        stream << is_oncoming;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> distance;
+        stream >> connector_name;
+        stream >> signal_dir;
+        stream >> is_oncoming;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_train_profile_station_t final
+{
+    /// Дистанция станции от середины поезда, м (вперёд по ходу - «+», назад - «-»)
+    float distance = 0.0f;
+
+    /// Название станции
+    QString name = "";
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << distance;
+        stream << name;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> distance;
+        stream >> name;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_train_profile_speed_limit_t final
+{
+    /// Дистанция от середины поезда вдоль пути, м (вперёд по ходу - «+», назад - «-»)
+    float distance = 0.0f;
+
+    /// Конец интервала ограничения, м
+    float end_distance = 0.0f;
+
+    /// Ограничение скорости, км/ч
+    float speed_kmh = 0.0f;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << distance;
+        stream << end_distance;
+        stream << speed_kmh;
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> distance;
+        stream >> end_distance;
+        stream >> speed_kmh;
+    }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+struct simulator_train_profile_update_t final
+{
+    /// Индекс поезда на текущий кадр
+    int train_id = 0;
+
+    /// Модель-индекс средней ПЕ - точка отсчёта профиля (distance = 0)
+    int middle_vehicle_id = 0;
+
+    /// Направление движения: +1 вперёд по профилю, -1 назад
+    int direction = 1;
+
+    /// Скорость поезда, м/с
+    float speed = 0.0f;
+
+    /// Фактические протяжённости профиля назад и вперёд, м
+    float backward = 0.0f;
+    float forward = 0.0f;
+
+    /// Запрошенные протяжённости профиля назад и вперёд, м
+    /// (горизонтальный масштаб отображения соответствует им)
+    float backward_requested = 0.0f;
+    float forward_requested = 0.0f;
+
+    /// Вершины ломаной профиля, упорядочены по distance от -backward до +forward
+    std::vector<simulator_train_profile_point_t> profile;
+
+    /// Единицы подвижного состава, занимающие участки профиля
+    /// (включая вагоны других поездов), упорядочены по begin_distance
+    std::vector<simulator_train_profile_vehicle_t> vehicles;
+
+    /// Светофоры на профиле (попутные по ходу движения поезда),
+    /// упорядочены по distance
+    std::vector<simulator_train_profile_signal_t> signal_list;
+
+    /// Станции на профиле, упорядочены по distance
+    std::vector<simulator_train_profile_station_t> stations;
+
+    /// Ограничения скорости на профиле, упорядочены по distance
+    std::vector<simulator_train_profile_speed_limit_t> speed_limits;
+
+    QByteArray serialize() const
+    {
+        QByteArray data;
+        QDataStream stream(&data, QIODevice::WriteOnly);
+
+        stream << train_id;
+        stream << middle_vehicle_id;
+        stream << direction;
+        stream << speed;
+        stream << backward;
+        stream << forward;
+        stream << backward_requested;
+        stream << forward_requested;
+
+        stream << static_cast<std::uint32_t>(profile.size());
+        for (const auto& point : profile)
+        {
+            stream << point.serialize();
+        }
+
+        stream << static_cast<std::uint32_t>(vehicles.size());
+        for (const auto& vehicle : vehicles)
+        {
+            stream << vehicle.serialize();
+        }
+
+        stream << static_cast<std::uint32_t>(signal_list.size());
+        for (const auto& signal : signal_list)
+        {
+            stream << signal.serialize();
+        }
+
+        stream << static_cast<std::uint32_t>(stations.size());
+        for (const auto& station : stations)
+        {
+            stream << station.serialize();
+        }
+
+        stream << static_cast<std::uint32_t>(speed_limits.size());
+        for (const auto& sl : speed_limits)
+        {
+            stream << sl.serialize();
+        }
+
+        return data;
+    }
+
+    void deserialize(QByteArray& data)
+    {
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        stream >> train_id;
+        stream >> middle_vehicle_id;
+        stream >> direction;
+        stream >> speed;
+        stream >> backward;
+        stream >> forward;
+        stream >> backward_requested;
+        stream >> forward_requested;
+
+        std::uint32_t num = 0;
+        stream >> num;
+
+        profile.clear();
+        profile.resize(num);
+
+        for (auto& point : profile)
+        {
+            QByteArray point_data;
+            stream >> point_data;
+
+            point.deserialize(point_data);
+        }
+
+        stream >> num;
+
+        vehicles.clear();
+        vehicles.resize(num);
+
+        for (auto& vehicle : vehicles)
+        {
+            QByteArray vehicle_data;
+            stream >> vehicle_data;
+
+            vehicle.deserialize(vehicle_data);
+        }
+
+        stream >> num;
+
+        signal_list.clear();
+        signal_list.resize(num);
+
+        for (auto& signal : signal_list)
+        {
+            QByteArray signal_data;
+            stream >> signal_data;
+
+            signal.deserialize(signal_data);
+        }
+
+        stream >> num;
+
+        stations.clear();
+        stations.resize(num);
+
+        for (auto& station : stations)
+        {
+            QByteArray station_data;
+            stream >> station_data;
+
+            station.deserialize(station_data);
+        }
+
+        stream >> num;
+
+        speed_limits.clear();
+        speed_limits.resize(num);
+
+        for (auto& sl : speed_limits)
+        {
+            QByteArray sl_data;
+            stream >> sl_data;
+
+            sl.deserialize(sl_data);
+        }
     }
 };
 

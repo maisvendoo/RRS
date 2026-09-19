@@ -38,6 +38,9 @@ private slots:
 
 private:
 
+    /// Целевая траектория маневрового маршрута
+    Trajectory* ref_trajectory_shunt = nullptr;
+
     enum
     {
         CRS_ALLOW_ROUTE = 0,

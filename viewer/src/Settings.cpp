@@ -26,6 +26,9 @@ void RouteViewer::loadNetworkSettings(CfgReader& cfg, const QString& section)
     cfg.getInt(section, "VehicleControlledUpdateInterval", settings.vehicle_controled_update_interval);
     cfg.getInt(section, "ClientDelay", settings.client_delay);
     cfg.getBool(section, "ShowServerAddr", settings.tcp_config.show_server_addr);
+
+    cfg.getDouble(section, "TrainProfileBackward", settings.train_profile_backward);
+    cfg.getDouble(section, "TrainProfileForward", settings.train_profile_forward);
 }
 
 //------------------------------------------------------------------------------
@@ -78,6 +81,117 @@ void RouteViewer::loadModelsSettings(CfgReader& cfg, const QString& section)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void RouteViewer::loadStationsTextSettings(CfgReader& cfg, const QString& section)
+{
+    double fontSize = 0.0;
+    cfg.getDouble(section, "StationsTextFontSize", fontSize);
+    if (fontSize > 0.0)
+    {
+        settings.stations_text_font_size = fontSize;
+    }
+
+    QString shift = "0.0 0.0 15.0";
+    if (cfg.getString(section, "StationsTextShift", shift))
+    {
+        std::istringstream stream(shift.toStdString());
+        stream >> settings.stations_text_shift.x
+            >> settings.stations_text_shift.y
+            >> settings.stations_text_shift.z;
+    }
+
+    double scaleDistance = -1.0;
+    cfg.getDouble(section, "StationsTextScaleDistance", scaleDistance);
+    if (scaleDistance >= 0.0)
+    {
+        settings.stations_text_scale_distance = scaleDistance;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::loadTrainLabelsTextSettings(CfgReader& cfg, const QString& section)
+{
+    double fontSize = 0.0;
+    cfg.getDouble(section, "TrainLabelsTextFontSize", fontSize);
+    if (fontSize > 0.0)
+    {
+        settings.train_labels_text_font_size = fontSize;
+    }
+
+    QString shift = "0.0 0.0 5.5";
+    if (cfg.getString(section, "TrainLabelsTextShift", shift))
+    {
+        std::istringstream stream(shift.toStdString());
+        stream >> settings.train_labels_text_shift.x
+            >> settings.train_labels_text_shift.y
+            >> settings.train_labels_text_shift.z;
+    }
+
+    double scaleDistance = -1.0;
+    cfg.getDouble(section, "TrainLabelsTextScaleDistance", scaleDistance);
+    if (scaleDistance >= 0.0)
+    {
+        settings.train_labels_text_scale_distance = scaleDistance;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::loadHUDSettings(CfgReader& cfg, const QString& section)
+{
+    auto readColor = [&](const QString& key, vsg::vec4& color)
+    {
+        QString value = QString("%1 %2 %3 %4").arg(color.r).arg(color.g).arg(color.b).arg(color.a);
+        if (cfg.getString(section, key, value))
+        {
+            std::istringstream stream(value.toStdString());
+            stream >> color.r >> color.g >> color.b >> color.a;
+
+            color.r = std::clamp(color.r, 0.0f, 1.0f);
+            color.g = std::clamp(color.g, 0.0f, 1.0f);
+            color.b = std::clamp(color.b, 0.0f, 1.0f);
+            color.a = std::clamp(color.a, 0.0f, 1.0f);
+        }
+    };
+
+    readColor("HUDBackground",          settings.hud_background);
+    readColor("HUDText",                settings.hud_text);
+    readColor("HUDWarningText",         settings.hud_warning_text);
+    readColor("HUDButtonOff",           settings.hud_button_off);
+    readColor("HUDButtonOn",            settings.hud_button_on);
+    readColor("HUDButtonHovered",       settings.hud_button_hovered);
+    readColor("HUDButtonInactive",      settings.hud_button_inactive);
+    readColor("HUDButtonInactiveText",  settings.hud_button_inactive_text);
+
+    readColor("HUDCurrentTrain",        settings.hud_current_train);
+    readColor("HUDControlledTrain",     settings.hud_controlled_train);
+
+    readColor("HUDTimetableDelay",      settings.hud_timetable_delay);
+    readColor("HUDTimetablePast",       settings.hud_timetable_past);
+    readColor("HUDTimetableCurrent",    settings.hud_timetable_current);
+    readColor("HUDTimetableFuture",     settings.hud_timetable_future);
+
+    readColor("HUDTrainProfileGrid",              settings.hud_train_profile_grid);
+    readColor("HUDTrainProfileGridLabel",         settings.hud_train_profile_grid_label);
+    readColor("HUDTrainProfileBaseline",          settings.hud_train_profile_baseline);
+    readColor("HUDTrainProfileCurve",             settings.hud_train_profile_curve);
+    readColor("HUDTrainProfileUncontrolled",      settings.hud_train_profile_uncontrolled);
+    readColor("HUDTrainProfileCurrent",           settings.hud_train_profile_current);
+    readColor("HUDTrainProfileControlled",        settings.hud_train_profile_controlled);
+    readColor("HUDTrainProfileStationText",       settings.hud_train_profile_station_text);
+    readColor("HUDTrainProfileSignalBody",        settings.hud_train_profile_signal_body);
+    readColor("HUDTrainProfileSignalLetter",      settings.hud_train_profile_signal_letter);
+    readColor("HUDTrainProfileSpeedLimitBorder",  settings.hud_train_profile_speed_limit_border);
+    readColor("HUDTrainProfileSpeedLimitFill",    settings.hud_train_profile_speed_limit_fill);
+    readColor("HUDTrainProfileSpeedLimitText",    settings.hud_train_profile_speed_limit_text);
+    readColor("HUDTrainProfileSpeedLimitBg",      settings.hud_train_profile_speed_limit_bg);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 {
     QString name = "viewer";
@@ -92,6 +206,22 @@ void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
     cfg.getInt(section, "Height", settings.height);
 
     cfg.getInt(section, "PhysicalDevice", settings.physical_device);
+
+    uint32_t vendor_id = 0;
+    {
+        int tmp = 0;
+        cfg.getInt(section, "PhysicalDeviceVendorID", tmp);
+        vendor_id = static_cast<uint32_t>(tmp);
+    }
+    settings.physical_device_vendor_id = vendor_id;
+
+    uint32_t device_id = 0;
+    {
+        int tmp = 0;
+        cfg.getInt(section, "PhysicalDeviceDeviceID", tmp);
+        device_id = static_cast<uint32_t>(tmp);
+    }
+    settings.physical_device_device_id = device_id;
 
     int screenNumber = 0;
     cfg.getInt(section, "ScreenNumber", screenNumber);

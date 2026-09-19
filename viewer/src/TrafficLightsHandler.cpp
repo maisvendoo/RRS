@@ -175,6 +175,17 @@ void TrafficLightsHandler::printSignalInfo(const TrafficLight* tl) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+TrafficLight* TrafficLightsHandler::findSignal(const QString& connector_name,
+                                               std::int8_t signal_dir) const
+{
+    return (signal_dir == -1)
+        ? traffic_lights_bwd.value(connector_name, nullptr)
+        : traffic_lights_fwd.value(connector_name, nullptr);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TrafficLightsHandler::slotUpdateSignal(QByteArray data)
 {
     QDataStream stream(&data, QIODevice::ReadOnly);
