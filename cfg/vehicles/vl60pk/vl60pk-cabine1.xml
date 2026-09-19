@@ -69,4 +69,15 @@
 		<ObjectName>Cab1_Tumbler_FR</ObjectName>
 	</Control>
 
+	<!-- Компрессор -->
+	<Control>
+		<ID>106</ID>
+		<Name>Компрессор</Name>
+		<value>0.0</value>
+		<KeyName>KEY_7</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_MK</ObjectName>
+	</Control>
+
 </Config>

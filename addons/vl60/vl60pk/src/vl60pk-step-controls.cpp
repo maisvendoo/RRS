@@ -25,5 +25,8 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         bool is_fr = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_FR]);
         is_fr ? fr_tumbler[cab_idx].set() : fr_tumbler[cab_idx].reset();
+
+        bool is_mk = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_MK]);
+        is_mk ? mk_tumbler[cab_idx].set() : mk_tumbler[cab_idx].reset();
     }
 }

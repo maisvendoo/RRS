@@ -12,6 +12,7 @@ enum
     CTRL_MAIN_SWITCH_ON = 103,
     CTRL_RETURN_PROTECTION = 104,
     CTRL_TUMBLER_FR = 105,
+    CTRL_TUMBLER_MK = 106,
 };
 
 #endif

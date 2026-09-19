@@ -225,11 +225,12 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         mv_tumblers[cab_idx][MV6].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Компрессор"
-        mk_tumbler[cab_idx].setKeySymbolOn(KEY_7);
-        mk_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        mk_tumbler[cab_idx].setKeySymbolOff(KEY_7);
-        mk_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        mk_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //mk_tumbler[cab_idx].setKeySymbolOn(KEY_7);
+        //mk_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        //mk_tumbler[cab_idx].setKeySymbolOff(KEY_7);
+        //mk_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        //mk_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Фазорасщепитель"
         // Управление через IOController (stepControls)

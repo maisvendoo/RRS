@@ -30,6 +30,9 @@ void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 
     // Фазорасщепитель
     processTumbler(CTRL_TUMBLER_FR, pressed_keys);
+
+    // Компрессор
+    processTumbler(CTRL_TUMBLER_MK, pressed_keys);
 }
 
 //------------------------------------------------------------------------------
