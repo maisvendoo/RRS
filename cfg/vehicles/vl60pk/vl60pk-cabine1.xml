@@ -87,4 +87,76 @@
 		<ObjectName>Cab1_Tumbler_MK</ObjectName>
 	</Control>
 
+	<!-- Вентилятор 1 -->
+	<Control>
+		<ID>107</ID>
+		<Name>Вентилятор 1</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_1</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_MV1</ObjectName>
+	</Control>
+
+	<!-- Вентилятор 2 -->
+	<Control>
+		<ID>108</ID>
+		<Name>Вентилятор 2</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_2</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_MV2</ObjectName>
+	</Control>
+
+	<!-- Вентилятор 3 -->
+	<Control>
+		<ID>109</ID>
+		<Name>Вентилятор 3</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_3</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_MV3</ObjectName>
+	</Control>
+
+	<!-- Вентилятор 4 -->
+	<Control>
+		<ID>110</ID>
+		<Name>Вентилятор 4</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_4</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_MV4</ObjectName>
+	</Control>
+
+	<!-- Вентилятор 5 -->
+	<Control>
+		<ID>111</ID>
+		<Name>Вентилятор 5</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_5</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_MV5</ObjectName>
+	</Control>
+
+	<!-- Вентилятор 6 -->
+	<Control>
+		<ID>112</ID>
+		<Name>Вентилятор 6</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_6</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_MV6</ObjectName>
+	</Control>
+
 </Config>

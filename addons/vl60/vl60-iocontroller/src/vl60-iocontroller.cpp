@@ -33,6 +33,14 @@ void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 
     // Компрессор
     processTumbler(CTRL_TUMBLER_MK, pressed_keys);
+
+    // Вентиляторы
+    processTumbler(CTRL_TUMBLER_MV1, pressed_keys);
+    processTumbler(CTRL_TUMBLER_MV2, pressed_keys);
+    processTumbler(CTRL_TUMBLER_MV3, pressed_keys);
+    processTumbler(CTRL_TUMBLER_MV4, pressed_keys);
+    processTumbler(CTRL_TUMBLER_MV5, pressed_keys);
+    processTumbler(CTRL_TUMBLER_MV6, pressed_keys);
 }
 
 //------------------------------------------------------------------------------

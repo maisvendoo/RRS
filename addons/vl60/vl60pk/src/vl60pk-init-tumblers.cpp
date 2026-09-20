@@ -188,41 +188,42 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         autosand_tumbler[cab_idx].setInitState(false);
 
         // Триггеры тумблеров "Вентилятор 1-6"
-        mv_tumblers[cab_idx][MV1].setKeySymbolOn(KEY_1);
-        mv_tumblers[cab_idx][MV1].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV1].setKeySymbolOff(KEY_1);
-        mv_tumblers[cab_idx][MV1].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV1].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //mv_tumblers[cab_idx][MV1].setKeySymbolOn(KEY_1);
+        //mv_tumblers[cab_idx][MV1].setKeyModifierOn(MODIFIER_OnlyShift);
+        //mv_tumblers[cab_idx][MV1].setKeySymbolOff(KEY_1);
+        //mv_tumblers[cab_idx][MV1].setKeyModifierOff(MODIFIER_OnlyControl);
+        //mv_tumblers[cab_idx][MV1].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        mv_tumblers[cab_idx][MV2].setKeySymbolOn(KEY_2);
-        mv_tumblers[cab_idx][MV2].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV2].setKeySymbolOff(KEY_2);
-        mv_tumblers[cab_idx][MV2].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV2].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //mv_tumblers[cab_idx][MV2].setKeySymbolOn(KEY_2);
+        //mv_tumblers[cab_idx][MV2].setKeyModifierOn(MODIFIER_OnlyShift);
+        //mv_tumblers[cab_idx][MV2].setKeySymbolOff(KEY_2);
+        //mv_tumblers[cab_idx][MV2].setKeyModifierOff(MODIFIER_OnlyControl);
+        //mv_tumblers[cab_idx][MV2].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        mv_tumblers[cab_idx][MV3].setKeySymbolOn(KEY_3);
-        mv_tumblers[cab_idx][MV3].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV3].setKeySymbolOff(KEY_3);
-        mv_tumblers[cab_idx][MV3].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV3].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //mv_tumblers[cab_idx][MV3].setKeySymbolOn(KEY_3);
+        //mv_tumblers[cab_idx][MV3].setKeyModifierOn(MODIFIER_OnlyShift);
+        //mv_tumblers[cab_idx][MV3].setKeySymbolOff(KEY_3);
+        //mv_tumblers[cab_idx][MV3].setKeyModifierOff(MODIFIER_OnlyControl);
+        //mv_tumblers[cab_idx][MV3].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        mv_tumblers[cab_idx][MV4].setKeySymbolOn(KEY_4);
-        mv_tumblers[cab_idx][MV4].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV4].setKeySymbolOff(KEY_4);
-        mv_tumblers[cab_idx][MV4].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV4].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //mv_tumblers[cab_idx][MV4].setKeySymbolOn(KEY_4);
+        //mv_tumblers[cab_idx][MV4].setKeyModifierOn(MODIFIER_OnlyShift);
+        //mv_tumblers[cab_idx][MV4].setKeySymbolOff(KEY_4);
+        //mv_tumblers[cab_idx][MV4].setKeyModifierOff(MODIFIER_OnlyControl);
+        //mv_tumblers[cab_idx][MV4].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        mv_tumblers[cab_idx][MV5].setKeySymbolOn(KEY_5);
-        mv_tumblers[cab_idx][MV5].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV5].setKeySymbolOff(KEY_5);
-        mv_tumblers[cab_idx][MV5].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV5].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //mv_tumblers[cab_idx][MV5].setKeySymbolOn(KEY_5);
+        //mv_tumblers[cab_idx][MV5].setKeyModifierOn(MODIFIER_OnlyShift);
+        //mv_tumblers[cab_idx][MV5].setKeySymbolOff(KEY_5);
+        //mv_tumblers[cab_idx][MV5].setKeyModifierOff(MODIFIER_OnlyControl);
+        //mv_tumblers[cab_idx][MV5].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        mv_tumblers[cab_idx][MV6].setKeySymbolOn(KEY_6);
-        mv_tumblers[cab_idx][MV6].setKeyModifierOn(MODIFIER_OnlyShift);
-        mv_tumblers[cab_idx][MV6].setKeySymbolOff(KEY_6);
-        mv_tumblers[cab_idx][MV6].setKeyModifierOff(MODIFIER_OnlyControl);
-        mv_tumblers[cab_idx][MV6].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //mv_tumblers[cab_idx][MV6].setKeySymbolOn(KEY_6);
+        //mv_tumblers[cab_idx][MV6].setKeyModifierOn(MODIFIER_OnlyShift);
+        //mv_tumblers[cab_idx][MV6].setKeySymbolOff(KEY_6);
+        //mv_tumblers[cab_idx][MV6].setKeyModifierOff(MODIFIER_OnlyControl);
+        //mv_tumblers[cab_idx][MV6].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Компрессор"
         // Управление через IOController (stepControls)
