@@ -1,7 +1,6 @@
 #include    <MouseControlHandler.h>
 
 #include    <VehiclesHandler.h>
-#include    <ProcVisibleAnimation.h>
 #include    <Logger.h>
 
 #include    <vsg/utils/LineSegmentIntersector.h>
@@ -105,7 +104,30 @@ bool MouseControlHandler::pickControl(int x,
                     continue;
                 }
 
-                LOG_INFO("Find intersection with: %s", node_name.c_str());
+                //LOG_INFO("Find intersection with: %s", node_name.c_str());
+
+                for (auto *io_controller : vehicle->io_controls)
+                {
+                    if (io_controller == nullptr)
+                    {
+                        continue;
+                    }
+
+                    io_controller->findControl(node_name, input);
+
+                    if (input.id == 0)
+                    {
+                        continue;
+                    }
+
+                    if (_last_hit_object != node_name)
+                    {
+                        _last_hit_object = node_name;
+                        LOG_INFO("Clicked: %s state: %3.1f", node_name.c_str(), input.value);
+                    }
+
+                    return true;
+                }
             }
         }
     }

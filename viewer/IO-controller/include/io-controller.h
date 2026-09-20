@@ -33,6 +33,8 @@ public:
 
     void setCabineIndex(int vehicle_idx, int cab_idx);
 
+    bool findControl(const std::string &node_name, io_control_input_t &out) const;
+
 signals:
 
     void sigSendVehicleControlCommand(const QByteArray &data);

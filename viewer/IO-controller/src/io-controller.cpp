@@ -98,6 +98,35 @@ void IOController::setCabineIndex(int vehicle_idx, int cab_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool IOController::findControl(const std::string &node_name, io_control_input_t &out) const
+{
+    if (node_name.empty())
+    {
+        return false;
+    }
+
+    const QString node = QString::fromStdString(node_name);
+
+    for (const auto &[key1, key2, value] : io_control_inputs.getAll())
+    {
+        if (key2.isEmpty())
+        {
+            continue;
+        }
+
+        if ((node == key2) || node.endsWith(key2))
+        {
+            out = value;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 {
     (void) pressed_keys;
