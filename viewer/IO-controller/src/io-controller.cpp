@@ -55,6 +55,8 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "Name", ic_input.name);
 
+        cfg.getString(secNode, "Type", ic_input.type);
+
         int control_ID = 0;
         cfg.getInt(secNode, "ID", control_ID);
         ic_input.id = static_cast<uint16_t>(control_ID);
@@ -122,6 +124,59 @@ bool IOController::findControl(const std::string &node_name, io_control_input_t 
     }
 
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::mouseButtonPress(io_control_input_t input, uint32_t button)
+{
+    auto io_ctrl = io_control_inputs.getByKey1(input.id);
+
+    if (input.type == "Toggle")
+    {
+        if (button == 1 && !input.toBool())
+        {
+            io_ctrl->value = 1.0f;
+            io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+        }
+
+        if (button == 3 && input.toBool())
+        {
+            io_ctrl->value = 0.0f;
+            io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+        }
+    }
+
+    if (input.type == "Button")
+    {
+        if (button == 1)
+        {
+            io_ctrl->value = 1.0f;
+            io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::mouseButtonRelease(io_control_input_t input, uint32_t button)
+{
+    auto io_ctrl = io_control_inputs.getByKey1(input.id);
+
+    if (input.type == "Button")
+    {
+        if (button == 1)
+        {
+            io_ctrl->value = 0.0f;
+            io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -35,6 +35,10 @@ public:
 
     bool findControl(const std::string &node_name, io_control_input_t &out) const;
 
+    void mouseButtonPress(io_control_input_t input, uint32_t button);
+
+    void mouseButtonRelease(io_control_input_t input, uint32_t button);
+
 signals:
 
     void sigSendVehicleControlCommand(const QByteArray &data);

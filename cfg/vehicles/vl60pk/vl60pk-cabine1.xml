@@ -7,6 +7,7 @@
 	<Control>
 		<ID>100</ID>
 		<Name>Токоприемники</Name>
+		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_U</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
@@ -18,6 +19,7 @@
 	<Control>
 		<ID>101</ID>
 		<Name>Токоприемник передний</Name>
+		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_I</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
@@ -29,6 +31,7 @@
 	<Control>
 		<ID>102</ID>
 		<Name>Токоприемник задний</Name>
+		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_O</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
@@ -40,6 +43,7 @@
 	<Control>
 		<ID>103</ID>
 		<Name>Включение ГВ</Name>
+		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_P</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
@@ -51,6 +55,7 @@
 	<Control>
 		<ID>104</ID>
 		<Name>Возврат защиты ГВ</Name>
+		<Type>Button</Type>
 		<value>0.0</value>
 		<KeyName>KEY_P</KeyName>
 		<KeyModOnName>Alt</KeyModOnName>
@@ -62,6 +67,7 @@
 	<Control>
 		<ID>105</ID>
 		<Name>Фазорасщепитель</Name>
+		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_T</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>

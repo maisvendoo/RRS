@@ -47,7 +47,7 @@ private:
     std::string _last_hit_object = "";
 
     bool pickControl(int x, int y,
-                     IOController* io_ctrl,
+                     IOController *&io_ctrl,
                      io_control_input_t& input);
 
 };

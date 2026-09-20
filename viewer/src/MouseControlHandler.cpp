@@ -48,8 +48,28 @@ void MouseControlHandler::apply(vsg::ButtonPressEvent &buttonPress)
 
     if (buttonPress.button == 1 || buttonPress.button == 3)
     {
-        io_control_input_t io_ctrl;
-        pickControl(static_cast<int>(buttonPress.x), static_cast<int>(buttonPress.y), nullptr, io_ctrl);
+        io_control_input_t input;
+        IOController *io_controller = nullptr;
+
+        if (pickControl(static_cast<int>(buttonPress.x),
+                        static_cast<int>(buttonPress.y),
+                        io_controller,
+                        input))
+        {
+            if (input.id == 0)
+            {
+                return;
+            }
+
+            if (io_controller == nullptr)
+            {
+                return;
+            }
+
+            io_controller->mouseButtonPress(input, buttonPress.button);
+
+            buttonPress.handled = true;
+        }
     }
 }
 
@@ -58,7 +78,36 @@ void MouseControlHandler::apply(vsg::ButtonPressEvent &buttonPress)
 //------------------------------------------------------------------------------
 void MouseControlHandler::apply(vsg::ButtonReleaseEvent &buttonRelease)
 {
+    if (buttonRelease.handled)
+    {
+        return;
+    }
 
+    if (buttonRelease.button == 1 || buttonRelease.button == 3)
+    {
+        io_control_input_t input;
+        IOController *io_controller = nullptr;
+
+        if (pickControl(static_cast<int>(buttonRelease.x),
+                        static_cast<int>(buttonRelease.y),
+                        io_controller,
+                        input))
+        {
+            if (input.id == 0)
+            {
+                return;
+            }
+
+            if (io_controller == nullptr)
+            {
+                return;
+            }
+
+            io_controller->mouseButtonRelease(input, buttonRelease.button);
+
+            buttonRelease.handled = true;
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -66,7 +115,7 @@ void MouseControlHandler::apply(vsg::ButtonReleaseEvent &buttonRelease)
 //------------------------------------------------------------------------------
 bool MouseControlHandler::pickControl(int x,
                                       int y,
-                                      IOController *io_ctrl,
+                                      IOController* &io_ctrl,
                                       io_control_input_t &input)
 {
     VehicleExterior *vehicle = _vehicles_handler->getCurrentVehicle();
@@ -104,8 +153,6 @@ bool MouseControlHandler::pickControl(int x,
                     continue;
                 }
 
-                //LOG_INFO("Find intersection with: %s", node_name.c_str());
-
                 for (auto *io_controller : vehicle->io_controls)
                 {
                     if (io_controller == nullptr)
@@ -119,6 +166,9 @@ bool MouseControlHandler::pickControl(int x,
                     {
                         continue;
                     }
+
+                    // Сохраняем актуальный контроллер ввода
+                    io_ctrl = io_controller;
 
                     if (_last_hit_object != node_name)
                     {

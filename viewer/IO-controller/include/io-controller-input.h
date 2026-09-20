@@ -30,6 +30,8 @@ struct io_control_input_t
     QString contolledObjectName = "";
     /// Имя контрола
     QString name = "";
+    /// Тип контрола
+    QString type = "";
 
     io_control_input_t()
     {
