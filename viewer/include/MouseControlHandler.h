@@ -45,6 +45,11 @@ private:
     bool _pointer_valid = false;
 
     std::string _last_hit_object = "";
+
+    bool pickControl(int x, int y,
+                     IOController* io_ctrl,
+                     io_control_input_t& input);
+
 };
 
 #endif

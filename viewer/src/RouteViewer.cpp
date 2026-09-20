@@ -26,6 +26,7 @@
 #include "sound-manager.h"
 #include "tcp-client.h"
 #include "graphics/shader_funcs.h"
+#include "MouseControlHandler.h"
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/Viewer.h>
@@ -893,6 +894,11 @@ void RouteViewer::initViewer()
     input_route_handler = InputRouteHandler::create();
     input_route_handler->setKeyboard(keyboard);
 
+    // Создаем обработчик мышки
+    mouse_control_handler = MouseControlHandler::create(camera,
+                                                        keyboard,
+                                                        vehicles_handler.get());
+
     upd_viewer_handler = UpdateViewerHandler::create(
         upd_server_control,
         camera,
@@ -917,6 +923,7 @@ void RouteViewer::initViewer()
             this, &RouteViewer::slotOnCurrentVehicleChanged);
 
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
+    viewer->addEventHandler(mouse_control_handler);
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
     viewer->addEventHandler(upd_sound_manager_handler);

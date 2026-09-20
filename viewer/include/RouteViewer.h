@@ -22,6 +22,7 @@ class  UpdateViewerHandler;
 class  InputRouteHandler;
 class  VehiclesHandler;
 class  WorldCulling;
+class  MouseControlHandler;
 
 namespace vsg
 {
@@ -153,6 +154,8 @@ private:
 
     /// Подключённый в сцену узел подписей поездов (для удаления при пересоздании)
     vsg::ref_ptr<vsg::Node>              train_labels_node;
+
+    vsg::ref_ptr<MouseControlHandler>   mouse_control_handler;
 
     void checkPhysicalDeviceProperties();
 };
