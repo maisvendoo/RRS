@@ -79,6 +79,7 @@
 	<Control>
 		<ID>106</ID>
 		<Name>Компрессор</Name>
+		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_7</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
