@@ -222,6 +222,18 @@ void IOController::processTumbler(const uint16_t &control_id,
     // Нажата ли его клавиша
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
+        // Модификаторы включения и отключения одинаковы
+        if (io_ctrl->keyModOnName == io_ctrl->keyModOffName)
+        {
+            if (checkModKey(io_ctrl->keyModOnName, pressed_keys))
+            {
+                io_ctrl->value = 1.0f - io_ctrl->value;
+                io_control_inputs.updateByKey1(control_id, io_ctrl.value());
+                emit sigSendVehicleControlCommand(io_ctrl->serialize());
+                return;
+            }
+        }
+
         // Нажат модификатор включения?
         if (checkModKey(io_ctrl->keyModOnName, pressed_keys))
         {
