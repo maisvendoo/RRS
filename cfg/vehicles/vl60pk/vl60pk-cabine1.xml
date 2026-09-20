@@ -159,4 +159,40 @@
 		<ObjectName>Cab1_Tumbler_MV6</ObjectName>
 	</Control>
 
+	<!-- Цепи управления -->
+	<Control>
+		<ID>113</ID>
+		<Name>Цепи управления</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_Y</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_CU</ObjectName>
+	</Control>
+
+	<!-- Прожектор яркий -->
+	<Control>
+		<ID>114</ID>
+		<Name>Прожектор яркий</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_H</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+		<KeyModOffName>Alt</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_PRG2</ObjectName>
+	</Control>
+
+	<!-- Прожектор тусклый -->
+	<Control>
+		<ID>115</ID>
+		<Name>Прожектор тусклый</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_H</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_PRG1</ObjectName>
+	</Control>
+
 </Config>

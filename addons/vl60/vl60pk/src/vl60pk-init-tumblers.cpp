@@ -125,28 +125,30 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
 */
         // Дальний ряд тумблеров приборной панели машиниста
         // Триггер тумблера "Прожектор яркий"
-        spotlight_high_tumbler[cab_idx].setKeySymbolOn(KEY_H);
-        spotlight_high_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
-        spotlight_high_tumbler[cab_idx].setKeySymbolOff(KEY_H);
-        spotlight_high_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
-        spotlight_high_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //spotlight_high_tumbler[cab_idx].setKeySymbolOn(KEY_H);
+        //spotlight_high_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
+        //spotlight_high_tumbler[cab_idx].setKeySymbolOff(KEY_H);
+        //spotlight_high_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
+        //spotlight_high_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Прожектор тусклый"
-        spotlight_low_tumbler[cab_idx].setKeySymbolOn(KEY_H);
-        spotlight_low_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        spotlight_low_tumbler[cab_idx].setKeySymbolOff(KEY_H);
-        spotlight_low_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        spotlight_low_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //spotlight_low_tumbler[cab_idx].setKeySymbolOn(KEY_H);
+        //spotlight_low_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        //spotlight_low_tumbler[cab_idx].setKeySymbolOff(KEY_H);
+        //spotlight_low_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        //spotlight_low_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Радиостанция"
         radio_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Цепи управления"
-        cu_tumbler[cab_idx].setKeySymbolOn(KEY_Y);
-        cu_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        cu_tumbler[cab_idx].setKeySymbolOff(KEY_Y);
-        cu_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        cu_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //cu_tumbler[cab_idx].setKeySymbolOn(KEY_Y);
+        //cu_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        //cu_tumbler[cab_idx].setKeySymbolOff(KEY_Y);
+        //cu_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        //cu_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Токоприемник задний"
         /*pant2_tumbler[cab_idx].setKeySymbolOn(KEY_O);

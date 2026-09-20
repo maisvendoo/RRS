@@ -46,5 +46,14 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         bool is_mv6 = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_MV6]);
         is_mv6 ? mv_tumblers[cab_idx][MV6].set() : mv_tumblers[cab_idx][MV6].reset();
+
+        bool is_cu = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_CU]);
+        is_cu ? cu_tumbler[cab_idx].set() : cu_tumbler[cab_idx].reset();
+
+        bool is_spot_high = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_SPOT_HIGH]);
+        is_spot_high ? spotlight_high_tumbler[cab_idx].set() : spotlight_high_tumbler[cab_idx].reset();
+
+        bool is_spot_low = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_SPOT_LOW]);
+        is_spot_low ? spotlight_low_tumbler[cab_idx].set() : spotlight_low_tumbler[cab_idx].reset();
     }
 }

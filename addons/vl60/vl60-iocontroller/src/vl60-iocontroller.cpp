@@ -41,6 +41,13 @@ void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
     processTumbler(CTRL_TUMBLER_MV4, pressed_keys);
     processTumbler(CTRL_TUMBLER_MV5, pressed_keys);
     processTumbler(CTRL_TUMBLER_MV6, pressed_keys);
+
+    // Цепи управления
+    processTumbler(CTRL_TUMBLER_CU, pressed_keys);
+    // Прожектор яркий
+    processTumbler(CTRL_TUMBLER_SPOT_HIGH, pressed_keys);
+    // Прожектор тусклый
+    processTumbler(CTRL_TUMBLER_SPOT_LOW, pressed_keys);
 }
 
 //------------------------------------------------------------------------------
