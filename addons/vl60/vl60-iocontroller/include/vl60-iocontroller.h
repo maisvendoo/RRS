@@ -20,6 +20,9 @@ private:
 
     void processMouseControl(io_control_input_t &io_ctrl, int button) override;
 
+    QString getControlStateText(const io_control_input_t &io_ctrl,
+                                float state) const override;
+
     /// Тумблеры "включено/выключено" (Shift+клавиша / Ctrl+клавиша)
     void processTumblers(const std::set<uint16_t> &pressed_keys);
 

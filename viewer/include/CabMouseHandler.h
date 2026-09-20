@@ -49,6 +49,8 @@ public:
 
     void apply(vsg::ButtonPressEvent& buttonPress) override;
 
+    void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
+
     void apply(vsg::MoveEvent& moveEvent) override;
 
     void apply(vsg::FrameEvent& frame) override;
@@ -65,6 +67,13 @@ private:
                      IOController*& io_ctrl,
                      io_control_input_t& input);
 
+    bool trySyntheticControl(IOController *ctrl,
+                             const std::string &node_name,
+                             float local_x,
+                             float local_y,
+                             IOController *&io_ctrl,
+                             io_control_input_t &input) const;
+
     /// Заполнение подсказки (Alt+наведение)
     void updateTooltip();
 
@@ -78,6 +87,11 @@ private:
 
     /// Последний найденный орган (для логгирования повторов)
     std::string _last_hit_object = "";
+
+    /// Удерживаемая моментальная кнопка (тифон/свисток/песок/РБ):
+    /// отпускание ЛКМ шлёт command "отпустить"
+    IOController* _held_button_ctrl = nullptr;
+    QString _held_button_name = "";
 };
 
 #endif

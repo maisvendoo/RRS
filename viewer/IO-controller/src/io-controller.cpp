@@ -2,6 +2,10 @@
 #include    <io-controller-keymap.h>
 #include    <CfgReader.h>
 
+#include    <QStringList>
+
+#include    <algorithm>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -110,14 +114,6 @@ void IOController::setCabineIndex(int vehicle_idx, int cab_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
-{
-    (void) pressed_keys;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void IOController::setVehicleSignals(const std::vector<float> *vehicle_signals)
 {
     this->vehicle_signals = vehicle_signals;
@@ -177,6 +173,25 @@ bool IOController::findControl(const std::string &node_name, io_control_input_t 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::mouseRelease(const QString &object_name)
+{
+    auto io_ctrl = io_control_inputs.getByKey2(object_name);
+
+    if (!io_ctrl.has_value())
+    {
+        return;
+    }
+
+    if (io_ctrl.value().type == "Button")
+    {
+        io_ctrl.value().value = 0.0f;
+        emitControl(io_ctrl.value());
+    }
+}
+
 void IOController::mouseClick(const QString &object_name, int button)
 {
     auto io_ctrl = io_control_inputs.getByKey2(object_name);
@@ -192,27 +207,91 @@ void IOController::mouseClick(const QString &object_name, int button)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void IOController::processSwitchBySignal(io_control_input_t &io_ctrl)
+{
+    float cur = getVehicleSignal(io_ctrl.signal_id);
+
+    if (cur < 0.0f)
+    {
+        cur = io_ctrl.value;
+    }
+
+    io_ctrl.value = (cur < 0.5f) ? 1.0f : 0.0f;
+    emitControl(io_ctrl);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::processMouseControl(io_control_input_t &io_ctrl, int button)
 {
     (void) button;
 
-    // Общая часть для органов-переключателей: клик (любая кнопка)
-    // переключает состояние, целевое значение вычисляется по текущему
-    // сигналу ПЭ - источник истины на сервере. Если сигнал ещё не
-    // пришёл (=-1) - переключаем по локальному кэшу значения
-    if ((io_ctrl.type == "Toggle") || (io_ctrl.type == "Button") ||
-        (io_ctrl.type == "Lock367"))
+    if ((io_ctrl.type == "Toggle") || (io_ctrl.type == "Button"))
     {
-        float cur = getVehicleSignal(io_ctrl.signal_id);
-
-        if (cur < 0.0f)
-        {
-            cur = io_ctrl.value;
-        }
-
-        io_ctrl.value = (cur < 0.5f) ? 1.0f : 0.0f;
-        emitControl(io_ctrl);
+        processSwitchBySignal(io_ctrl);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString IOController::getControlStateText(const io_control_input_t &io_ctrl,
+                                          float state) const
+{
+    if ((io_ctrl.type == "Toggle") || (io_ctrl.type == "Button"))
+    {
+        return (state > 0.5f) ? QString(u8"состояние: включено")
+                              : QString(u8"состояние: выключено");
+    }
+
+    if (!io_ctrl.state_names.isEmpty())
+    {
+        const QStringList names =
+                io_ctrl.state_names.split(';', Qt::KeepEmptyParts);
+
+        if (!names.isEmpty())
+        {
+            int idx = 0;
+
+            if (io_ctrl.state_mode == "centered")
+            {
+                idx = (state < -0.5f) ? 0
+                    : (state > 0.5f) ? static_cast<int>(names.size() - 1)
+                    : static_cast<int>(names.size() / 2);
+            }
+            else if (io_ctrl.state_mode == "index")
+            {
+                idx = std::min(static_cast<int>(names.size() - 1),
+                               static_cast<int>(state + 0.5f));
+            }
+            else
+            {
+                idx = std::min(static_cast<int>(names.size() - 1),
+                               static_cast<int>(state * names.size()));
+            }
+
+            idx = std::clamp(idx, 0, static_cast<int>(names.size() - 1));
+
+            return u8"положение: " + names[idx];
+        }
+    }
+
+    return QString(u8"положение: %1%").arg(static_cast<int>(state * 100.0f));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString IOController::pickSyntheticControl(const std::string &mesh_name,
+                                           float local_x,
+                                           float local_y) const
+{
+    (void) mesh_name;
+    (void) local_x;
+    (void) local_y;
+
+    return QString();
 }
 
 //------------------------------------------------------------------------------

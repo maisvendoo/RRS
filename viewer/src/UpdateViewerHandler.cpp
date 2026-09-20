@@ -26,9 +26,7 @@
 #include <vsg/ui/TouchEvent.h>
 #include <vsg/nodes/RegionOfInterest.h>
 
-#ifdef _WIN32
-    #include <windows.h>
-#endif
+#include <PlatformInput.h>
 
 #include <algorithm>
 #include <cmath>
@@ -166,18 +164,7 @@ UpdateViewerHandler::~UpdateViewerHandler() noexcept
 //------------------------------------------------------------------------------
 void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
 {
-#ifdef _WIN32
-    // VSG переводит сканкоды в VK через АКТИВНУЮ раскладку: если
-    // пользователь переключится Alt+Shift, WASD и клавиши локомотива
-    // снова превратятся в другие буквы. Держим английскую раскладку
-    // потока постоянно (ввод по-русски в игре не нужен)
-    static HKL en_layout = ::LoadKeyboardLayoutA("00000409", KLF_ACTIVATE);
-
-    if ((en_layout != nullptr) && (::GetKeyboardLayout(0) != en_layout))
-    {
-        ::ActivateKeyboardLayout(en_layout, KLF_SETFORPROCESS);
-    }
-#endif
+    enforceLatinKeyboardLayout();
 
     if (frame.frameStamp->frameCount)
     {
@@ -197,7 +184,7 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
             syncWalkVehicleBodies();
         }
 
-        // Прицел на сиденье + автоподсказка "E - Сесть..." (ходьба)
+        // Прицел на сиденье + автоподсказка "E - Сесть..." (ТЗ ходьба)
         if (_current_manipulator == _walk_manipulator)
         {
             updateSeatHint();
@@ -476,7 +463,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    // E - сесть на сиденье / встать (ходьба): в пешем режиме при
+    // E - сесть на сиденье / встать (ТЗ ходьба): в пешем режиме при
     // наведении на сиденье машиниста (или помощника); сидя - встать
     // Win32 присылает строчные KeySym - принимаем оба регистра
     if (!isCtrl() && !isShift() &&
@@ -561,7 +548,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         }
     }
 
-    // Ctrl+Enter - вход/выход из локомотива:
+    // Ctrl+Enter - вход/выход из локомотива (ТЗ "walking"):
     // из кабины - выход через дверь в пешей режим (спавн у ExitPos);
     // в пешем режиме - вход в кабину ПЕ, на чью дверь наведён взгляд
     if (isCtrl() && !isShift() &&
@@ -588,7 +575,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
 
     // Внешняя и свободная камеры перенесены на Shift+F3/Shift+F4:
     // F3/F4 без модификаторов заняты окном диагностики составов
-    //
+    // (ТЗ "Промт статистики вагонов")
     if (isShift() && !isCtrl())
     {
         switch (keyPress.keyBase)
@@ -753,18 +740,7 @@ void UpdateViewerHandler::apply(vsg::FocusInEvent& focusIn)
         focusIn.accept(*_keyboard);
     }
 
-#ifdef _WIN32
-    // VSG переводит сканкоды в VK через АКТИВНУЮ раскладку
-    // (MapVirtualKeyEx), поэтому в русской раскладке WASD и клавиши
-    // локомотива приходят как другие буквы. Игра управляется
-    // латинскими клавишами - включаем английскую раскладку для окна.
-    static HKL en_layout = ::LoadKeyboardLayoutA("00000409", KLF_ACTIVATE);
-
-    if (en_layout != nullptr)
-    {
-        ::ActivateKeyboardLayout(en_layout, KLF_SETFORPROCESS);
-    }
-#endif
+    enforceLatinKeyboardLayout();
 }
 
 //------------------------------------------------------------------------------

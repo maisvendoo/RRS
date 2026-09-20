@@ -89,6 +89,12 @@ void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int butt
         return;
     }
 
+    if (io_ctrl.type == "Lock367")
+    {
+        processSwitchBySignal(io_ctrl);
+        return;
+    }
+
     if (io_ctrl.type == "Crane395")
     {
         // Сигнал нормализован 0..1 (позиция/6): ЛКМ - к экстренному,
@@ -187,6 +193,44 @@ void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int butt
         emitControl(io_ctrl);
         return;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString VL60IOController::getControlStateText(const io_control_input_t &io_ctrl,
+                                              float state) const
+{
+    if (io_ctrl.state_mode == "kme")
+    {
+        if (state < -0.9f)          return u8"положение: БВ - быстрое выключение";
+        else if (state < -0.1f)     return u8"положение: Ноль";
+        else if (state < 0.1f)      return u8"положение: АВ - автоматическое выключение";
+        else if (state < 0.3f)      return u8"положение: РВ - ручное выключение";
+        else if (state < 0.5f)      return u8"положение: ФВ - фиксация выключения";
+        else if (state < 0.7f)      return u8"положение: ФП - фиксация пуска";
+        else if (state < 0.9f)      return u8"положение: РП - ручной пуск";
+        else if (state < 1.1f)      return u8"положение: АП - автоматический пуск";
+        else
+        {
+            const int pos = static_cast<int>(state * 5.0f - 5.0f + 0.5f);
+            return u8"положение: позиция " + QString::number(std::max(pos, 1));
+        }
+    }
+
+    if (io_ctrl.type == "Crane254")
+    {
+        if (state < -0.01f)
+        {
+            return u8"целевое: отпускное (выпуск ТЦ)";
+        }
+
+        const float p_target = state * 0.4f * 10.2f;
+
+        return u8"целевое: " + QString::number(p_target, 'f', 1) + u8" кгс/см²";
+    }
+
+    return IOController::getControlStateText(io_ctrl, state);
 }
 
 //------------------------------------------------------------------------------

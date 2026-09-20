@@ -46,12 +46,23 @@ public:
     /// Описание органа по имени объекта 3D-модели (подсказки, пикинг)
     std::optional<io_control_input_t> getInputByObject(const QString &object_name) const;
 
+    virtual QString getControlStateText(const io_control_input_t &io_ctrl,
+                                        float state) const;
+
+    virtual QString pickSyntheticControl(const std::string &mesh_name,
+                                         float local_x,
+                                         float local_y) const;
+
     /// Поиск органа по имени ноды меша из 3D-модели: точное совпадение
     /// с ObjectName либо суффикс (имена нод могут иметь префикс)
     bool findControl(const std::string &node_name, io_control_input_t &out) const;
 
     /// Клик мышью по органу: button 1 - ЛКМ, 3 - ПКМ
     void mouseClick(const QString &object_name, int button);
+
+    /// Отпускание кнопки мыши после нажатия органу типа Button
+    /// (моментальные кнопки: удержание мыши = удержание кнопки)
+    void mouseRelease(const QString &object_name);
 
 signals:
 
@@ -76,9 +87,10 @@ protected:
         CTRL_TYPE_CTRL_PANEL
     };
 
-    virtual void keysProcess(std::set<uint16_t> &pressed_keys);
+    virtual void keysProcess(std::set<uint16_t> &pressed_keys) = 0;
 
-    // Обработка контрола типа "тумблер" (с фиксацией)
+    void processSwitchBySignal(io_control_input_t &io_ctrl);
+
     void processTumbler(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
 
     /// Обработка клика мышью по органу (переопределяется аддоном

@@ -1,7 +1,10 @@
 #include    <CabMouseHandler.h>
 
+#include    <ProcVisibleAnimation.h>
+
 #include    <VehiclesHandler.h>
 #include    <VehicleExterior.h>
+#include    <PlatformInput.h>
 #include    <Logger.h>
 
 #include    <vsg/app/Camera.h>
@@ -9,10 +12,6 @@
 
 #include    <algorithm>
 #include    <cmath>
-
-#ifdef _WIN32
-    #include <windows.h>
-#endif
 
 //------------------------------------------------------------------------------
 //
@@ -66,11 +65,32 @@ void CabMouseHandler::apply(vsg::ButtonPressEvent& buttonPress)
                 io_ctrl->mouseClick(input.contolledObjectName,
                                     static_cast<int>(buttonPress.button));
 
+                // Моментальные кнопки (тифон, свисток, песок, РБ...):
+                // удержание мыши = удержание кнопки, отпускание шлёт 0
+                if (input.type == "Button")
+                {
+                    _held_button_ctrl = io_ctrl;
+                    _held_button_name = input.contolledObjectName;
+                }
+
                 // Клик по органу не должен крутить камеру
                 buttonPress.handled = true;
                 return;
             }
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CabMouseHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
+{
+    if (_held_button_ctrl != nullptr)
+    {
+        _held_button_ctrl->mouseRelease(_held_button_name);
+        _held_button_ctrl = nullptr;
+        _held_button_name.clear();
     }
 }
 
@@ -109,16 +129,41 @@ bool CabMouseHandler::altHeld() const
     const bool held = (_keyboard != nullptr) &&
             (_keyboard->pressed(vsg::KEY_Alt_L) || _keyboard->pressed(vsg::KEY_Alt_R));
 
-#ifdef _WIN32
-    // Alt приходит как WM_SYSKEYDOWN и не всегда попадает в vsg::Keyboard -
-    // дублируем опросом физического состояния (Windows)
-    if (!held)
-    {
-        return (::GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
-    }
-#endif
+    return held || isAltPhysicallyPressed();
+}
 
-    return held;
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool CabMouseHandler::trySyntheticControl(IOController *ctrl,
+                                          const std::string &node_name,
+                                          float local_x,
+                                          float local_y,
+                                          IOController *&io_ctrl,
+                                          io_control_input_t &input) const
+{
+    const QString synth_name =
+            ctrl->pickSyntheticControl(node_name, local_x, local_y);
+
+    if (synth_name.isEmpty())
+    {
+        return false;
+    }
+
+    auto synth_input = ctrl->getInputByObject(synth_name);
+
+    if (!synth_input.has_value())
+    {
+        return false;
+    }
+
+    io_ctrl = ctrl;
+    input = synth_input.value();
+
+    return true;
 }
 
 //------------------------------------------------------------------------------
@@ -146,6 +191,15 @@ bool CabMouseHandler::pickControl(int x, int y,
 
     vsg::ref_ptr<vsg::LineSegmentIntersector> intersector;
 
+    for (int pass = 0; pass < 2; ++pass)
+    {
+        // Второй проход: временно показываем скрытые анимации видимости -
+        // спрятанные ключи и рукоятки должны кликаться по их месту в гнезде
+        if (pass == 1)
+        {
+            ProcVisibleAnimation::forceShowAllHidden();
+        }
+
     for (auto& off : offsets)
     {
         intersector = vsg::LineSegmentIntersector::create(*_camera, x + off[0], y + off[1]);
@@ -170,20 +224,48 @@ bool CabMouseHandler::pickControl(int x, int y,
 
                 for (auto* ctrl : veh->io_controls)
                 {
-                    if ((ctrl != nullptr) && ctrl->findControl(node_name, input))
+                    if (ctrl == nullptr)
+                    {
+                        continue;
+                    }
+
+                    if (ctrl->findControl(node_name, input) && (input.id != 0))
                     {
                         io_ctrl = ctrl;
-
-                        if (_last_hit_object != node_name)
-                        {
-                            _last_hit_object = node_name;
-                            LOG_INFO("CabPick HIT: %s @(%d %d)", node_name.c_str(), x, y);
-                        }
-
-                        return true;
                     }
+                    else if (trySyntheticControl(ctrl,
+                                                 node_name,
+                                                 static_cast<float>(hit->localIntersection.x),
+                                                 static_cast<float>(hit->localIntersection.y),
+                                                 io_ctrl,
+                                                 input))
+                    {
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    if (_last_hit_object != node_name)
+                    {
+                        _last_hit_object = node_name;
+                        LOG_INFO("CabPick HIT: %s @(%d %d)", node_name.c_str(), x, y);
+                    }
+
+                    if (pass == 1)
+                    {
+                        ProcVisibleAnimation::restoreAllHidden();
+                    }
+
+                    return true;
                 }
             }
+        }
+    }
+
+        if (pass == 1)
+        {
+            ProcVisibleAnimation::restoreAllHidden();
         }
     }
 
@@ -235,88 +317,8 @@ void CabMouseHandler::updateTooltip()
 
         if (state >= 0.0f)
         {
-            if ((input.type == "Toggle") || (input.type == "Button"))
-            {
-                tip.state_text = (state > 0.5f)
-                        ? u8"состояние: включено"
-                        : u8"состояние: выключено";
-            }
-            else if (input.state_mode == "kme")
-            {
-                // КМЭ-60-044: сигнал нелинеен
-                if (state < -0.9f)          tip.state_text = u8"положение: БВ - быстрое выключение";
-                else if (state < -0.1f)     tip.state_text = u8"положение: Ноль";
-                else if (state < 0.1f)      tip.state_text = u8"положение: АВ - автоматическое выключение";
-                else if (state < 0.3f)      tip.state_text = u8"положение: РВ - ручное выключение";
-                else if (state < 0.5f)      tip.state_text = u8"положение: ФВ - фиксация выключения";
-                else if (state < 0.7f)      tip.state_text = u8"положение: ФП - фиксация пуска";
-                else if (state < 0.9f)      tip.state_text = u8"положение: РП - ручной пуск";
-                else if (state < 1.1f)      tip.state_text = u8"положение: АП - автоматический пуск";
-                else
-                {
-                    const int pos = static_cast<int>(state * 5.0f - 5.0f + 0.5f);
-                    char buf[64];
-                    std::snprintf(buf, sizeof(buf), u8"положение: позиция %d",
-                                  std::max(pos, 1));
-                    tip.state_text = buf;
-                }
-            }
-            else if (input.type == "Crane254")
-            {
-                // Рукоятка 0..1 задаёт целевое давление ТЦ (kvt254:
-                // k1=0.4 МПа); показываем его в кгс/см² вместо процентов
-                char buf[64];
-
-                if (state < -0.01f)
-                {
-                    std::snprintf(buf, sizeof(buf), u8"целевое: отпускное (выпуск ТЦ)");
-                }
-                else
-                {
-                    const float p_target = state * 0.4f * 10.2f;
-                    std::snprintf(buf, sizeof(buf), u8"целевое: %.1f кгс/см²", p_target);
-                }
-
-                tip.state_text = buf;
-            }
-            else if (!input.state_names.isEmpty())
-            {
-                const QStringList names =
-                        input.state_names.split(';', Qt::KeepEmptyParts);
-
-                if (!names.isEmpty())
-                {
-                    int idx = 0;
-
-                    if (input.state_mode == "centered")
-                    {
-                        idx = (state < -0.5f) ? 0
-                            : (state > 0.5f) ? static_cast<int>(names.size() - 1)
-                            : static_cast<int>(names.size() / 2);
-                    }
-                    else if (input.state_mode == "index")
-                    {
-                        idx = std::min(static_cast<int>(names.size() - 1),
-                                       static_cast<int>(state + 0.5f));
-                    }
-                    else
-                    {
-                        // norm: сигнал 0..1 (кран 395: позиция/6)
-                        idx = std::min(static_cast<int>(names.size() - 1),
-                                       static_cast<int>(state * names.size()));
-                    }
-
-                    idx = std::clamp(idx, 0, static_cast<int>(names.size() - 1));
-                    tip.state_text = u8"положение: " + names[idx].toStdString();
-                }
-            }
-            else
-            {
-                char buf[64];
-                std::snprintf(buf, sizeof(buf), u8"положение: %d%%",
-                              static_cast<int>(state * 100.0f));
-                tip.state_text = buf;
-            }
+            tip.state_text = io_ctrl->getControlStateText(input, state)
+                    .toStdString();
         }
     }
 }
