@@ -5,6 +5,7 @@
 #include    <vsg/ui/PointerEvent.h>
 #include    <vsg/ui/KeyEvent.h>
 #include    <vsg/ui/Keyboard.h>
+#include    <vsg/app/Camera.h>
 #include    <vsg/core/Inherit.h>
 #include    <vsg/core/ref_ptr.h>
 
@@ -15,15 +16,15 @@ class   VehiclesHandler;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class MouseHandler : public vsg::Inherit<vsg::Visitor, MouseHandler>
+class MouseControlHandler : public vsg::Inherit<vsg::Visitor, MouseControlHandler>
 {
 public:
 
-    MouseHandler(vsg::ref_ptr<vsg::Camera> camera,
-                 vsg::ref_ptr<vsg::Keyboard> keyboard,
-                 VehiclesHandler *vehicle_handler);
+    MouseControlHandler(vsg::ref_ptr<vsg::Camera> camera,
+                        vsg::ref_ptr<vsg::Keyboard> keyboard,
+                        VehiclesHandler *vehicles_handler);
 
-    ~MouseHandler() = default;
+    ~MouseControlHandler() = default;
 
     void apply(vsg::FrameEvent &frameEvent) override;
 
