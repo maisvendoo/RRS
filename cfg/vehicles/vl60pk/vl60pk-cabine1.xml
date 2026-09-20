@@ -279,4 +279,16 @@
 		<ObjectName>Cab1_Tumbl_BF-color_R</ObjectName>
 	</Control>
 
+	<!-- ЭПТ -->
+	<Control>
+		<ID>123</ID>
+		<Name>ЭПТ</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_V</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_ept_onOff</ObjectName>
+	</Control>
+
 </Config>

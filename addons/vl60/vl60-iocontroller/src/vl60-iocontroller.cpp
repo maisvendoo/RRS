@@ -63,6 +63,9 @@ void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
     processTumbler(CTRL_TUMBLER_BUF_COLOR_L, pressed_keys);
     // Цвет буфера правый
     processTumbler(CTRL_TUMBLER_BUF_COLOR_R, pressed_keys);
+
+    // ЭПТ
+    processTumbler(CTRL_TUMBLER_EPB, pressed_keys);
 }
 
 //------------------------------------------------------------------------------

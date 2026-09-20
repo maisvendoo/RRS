@@ -76,5 +76,8 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         bool is_buf_color_r = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_BUF_COLOR_R]);
         is_buf_color_r ? P_buffercolor_R_toogle[cab_idx].set() : P_buffercolor_R_toogle[cab_idx].reset();
+
+        bool is_epb = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_EPB]);
+        is_epb ? epb_switch[cab_idx].set() : epb_switch[cab_idx].reset();
     }
 }

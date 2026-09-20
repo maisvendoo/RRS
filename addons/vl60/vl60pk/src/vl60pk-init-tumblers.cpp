@@ -340,11 +340,12 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         rb[cab_idx][RBP].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Тумблер ЭПТ
-        epb_switch[cab_idx].setKeySymbolOn(KEY_V);
-        epb_switch[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        epb_switch[cab_idx].setKeySymbolOff(KEY_V);
-        epb_switch[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        epb_switch[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //epb_switch[cab_idx].setKeySymbolOn(KEY_V);
+        //epb_switch[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        //epb_switch[cab_idx].setKeySymbolOff(KEY_V);
+        //epb_switch[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        //epb_switch[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Тумблер "Маневровый/Поездной"
         tumbler_shunting_mode[cab_idx].setKeySymbolOn(KEY_Tilde);
