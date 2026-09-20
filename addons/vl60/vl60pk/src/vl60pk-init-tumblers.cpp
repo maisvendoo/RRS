@@ -254,18 +254,19 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         P_cab_heat_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Тусклое освещение кабины"
-        P_cab_light_low_tumbler[cab_idx].setKeySymbolOn(KEY_K);
-        P_cab_light_low_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        P_cab_light_low_tumbler[cab_idx].setKeySymbolOff(KEY_K);
-        P_cab_light_low_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        P_cab_light_low_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //P_cab_light_low_tumbler[cab_idx].setKeySymbolOn(KEY_K);
+        //P_cab_light_low_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        //P_cab_light_low_tumbler[cab_idx].setKeySymbolOff(KEY_K);
+        //P_cab_light_low_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        //P_cab_light_low_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Яркое освещение кабины"
-        P_cab_light_high_tumbler[cab_idx].setKeySymbolOn(KEY_K);
-        P_cab_light_high_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
-        P_cab_light_high_tumbler[cab_idx].setKeySymbolOff(KEY_K);
-        P_cab_light_high_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
-        P_cab_light_high_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //P_cab_light_high_tumbler[cab_idx].setKeySymbolOn(KEY_K);
+        //P_cab_light_high_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
+        //P_cab_light_high_tumbler[cab_idx].setKeySymbolOff(KEY_K);
+        //P_cab_light_high_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
+        //P_cab_light_high_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера в резерве
         P_reserv1_tumbler[cab_idx].setInitState(false);
@@ -274,25 +275,26 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         P_light_chassis_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Освещение приборов"
-        P_light_devices_tumbler[cab_idx].setKeySymbolOn(KEY_L);
-        P_light_devices_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        P_light_devices_tumbler[cab_idx].setKeySymbolOff(KEY_L);
-        P_light_devices_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        P_light_devices_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //P_light_devices_tumbler[cab_idx].setKeySymbolOn(KEY_L);
+        //P_light_devices_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        //P_light_devices_tumbler[cab_idx].setKeySymbolOff(KEY_L);
+        //P_light_devices_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        //P_light_devices_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Фонарь левый буферный"
-        P_bufferlight_L_tumbler[cab_idx].setKeySymbolOn(KEY_G);
-        P_bufferlight_L_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        P_bufferlight_L_tumbler[cab_idx].setKeySymbolOff(KEY_G);
-        P_bufferlight_L_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        P_bufferlight_L_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //P_bufferlight_L_tumbler[cab_idx].setKeySymbolOn(KEY_G);
+        //P_bufferlight_L_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        //P_bufferlight_L_tumbler[cab_idx].setKeySymbolOff(KEY_G);
+        //P_bufferlight_L_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        //P_bufferlight_L_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера "Фонарь правый буферный"
-        P_bufferlight_R_tumbler[cab_idx].setKeySymbolOn(KEY_J);
-        P_bufferlight_R_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        P_bufferlight_R_tumbler[cab_idx].setKeySymbolOff(KEY_J);
-        P_bufferlight_R_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        P_bufferlight_R_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //P_bufferlight_R_tumbler[cab_idx].setKeySymbolOn(KEY_J);
+        //P_bufferlight_R_tumbler[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        //P_bufferlight_R_tumbler[cab_idx].setKeySymbolOff(KEY_J);
+        //P_bufferlight_R_tumbler[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        //P_bufferlight_R_tumbler[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Триггер тумблера в резерве
         P_reserv2_tumbler[cab_idx].setInitState(false);
@@ -301,20 +303,21 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         P_ALSN_check_tumbler[cab_idx].setInitState(false);
 
         // Триггер тумблера "Левый буферный белый/красный"
-        P_buffercolor_L_toogle[cab_idx].setKeySymbolOn(KEY_G);
-        P_buffercolor_L_toogle[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
-        P_buffercolor_L_toogle[cab_idx].setKeySymbolOff(KEY_G);
-        P_buffercolor_L_toogle[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
-        P_buffercolor_L_toogle[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
-        P_buffercolor_L_toogle[cab_idx].setInitState(true);
+        // Управление через IOController (stepControls)
+        //P_buffercolor_L_toogle[cab_idx].setKeySymbolOn(KEY_G);
+        //P_buffercolor_L_toogle[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
+        //P_buffercolor_L_toogle[cab_idx].setKeySymbolOff(KEY_G);
+        //P_buffercolor_L_toogle[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
+        //P_buffercolor_L_toogle[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //P_buffercolor_L_toogle[cab_idx].setInitState(true);
 
         // Триггер тумблера "Правый буферный белый/красный"
-        P_buffercolor_R_toogle[cab_idx].setKeySymbolOn(KEY_J);
-        P_buffercolor_R_toogle[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
-        P_buffercolor_R_toogle[cab_idx].setKeySymbolOff(KEY_J);
-        P_buffercolor_R_toogle[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
-        P_buffercolor_R_toogle[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
-        P_buffercolor_R_toogle[cab_idx].setInitState(true);
+        //P_buffercolor_R_toogle[cab_idx].setKeySymbolOn(KEY_J);
+        //P_buffercolor_R_toogle[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
+        //P_buffercolor_R_toogle[cab_idx].setKeySymbolOff(KEY_J);
+        //P_buffercolor_R_toogle[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
+        //P_buffercolor_R_toogle[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //P_buffercolor_R_toogle[cab_idx].setInitState(true);
 
 
         // Триггеры рукояток бдительности

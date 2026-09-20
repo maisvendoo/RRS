@@ -55,5 +55,26 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         bool is_spot_low = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_SPOT_LOW]);
         is_spot_low ? spotlight_low_tumbler[cab_idx].set() : spotlight_low_tumbler[cab_idx].reset();
+
+        bool is_cab_light_low = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_CAB_LIGHT_LOW]);
+        is_cab_light_low ? P_cab_light_low_tumbler[cab_idx].set() : P_cab_light_low_tumbler[cab_idx].reset();
+
+        bool is_cab_light_high = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_CAB_LIGHT_HIGH]);
+        is_cab_light_high ? P_cab_light_high_tumbler[cab_idx].set() : P_cab_light_high_tumbler[cab_idx].reset();
+
+        bool is_light_devices = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_LIGHT_DEVICES]);
+        is_light_devices ? P_light_devices_tumbler[cab_idx].set() : P_light_devices_tumbler[cab_idx].reset();
+
+        bool is_buf_light_l = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_BUF_LIGHT_L]);
+        is_buf_light_l ? P_bufferlight_L_tumbler[cab_idx].set() : P_bufferlight_L_tumbler[cab_idx].reset();
+
+        bool is_buf_light_r = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_BUF_LIGHT_R]);
+        is_buf_light_r ? P_bufferlight_R_tumbler[cab_idx].set() : P_bufferlight_R_tumbler[cab_idx].reset();
+
+        bool is_buf_color_l = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_BUF_COLOR_L]);
+        is_buf_color_l ? P_buffercolor_L_toogle[cab_idx].set() : P_buffercolor_L_toogle[cab_idx].reset();
+
+        bool is_buf_color_r = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_BUF_COLOR_R]);
+        is_buf_color_r ? P_buffercolor_R_toogle[cab_idx].set() : P_buffercolor_R_toogle[cab_idx].reset();
     }
 }

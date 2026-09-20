@@ -195,4 +195,88 @@
 		<ObjectName>Cab1_Tumbler_PRG1</ObjectName>
 	</Control>
 
+	<!-- Освещение кабины тусклое -->
+	<Control>
+		<ID>116</ID>
+		<Name>Освещение кабины тусклое</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_K</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_svet1</ObjectName>
+	</Control>
+
+	<!-- Освещение кабины яркое -->
+	<Control>
+		<ID>117</ID>
+		<Name>Освещение кабины яркое</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_K</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+		<KeyModOffName>Alt</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_svet2</ObjectName>
+	</Control>
+
+	<!-- Освещение приборов -->
+	<Control>
+		<ID>118</ID>
+		<Name>Освещение приборов</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_L</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_svetPribor</ObjectName>
+	</Control>
+
+	<!-- Фонарь буферный левый -->
+	<Control>
+		<ID>119</ID>
+		<Name>Фонарь буферный левый</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_G</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_buferL</ObjectName>
+	</Control>
+
+	<!-- Фонарь буферный правый -->
+	<Control>
+		<ID>120</ID>
+		<Name>Фонарь буферный правый</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_J</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Control</KeyModOffName>
+		<ObjectName>Cab1_Tumbler_buferR</ObjectName>
+	</Control>
+
+	<!-- Цвет буфера левый -->
+	<Control>
+		<ID>121</ID>
+		<Name>Цвет буфера левый</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_G</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+		<KeyModOffName>Alt</KeyModOffName>
+		<ObjectName>Cab1_Tumbl_BF-color_L</ObjectName>
+	</Control>
+
+	<!-- Цвет буфера правый -->
+	<Control>
+		<ID>122</ID>
+		<Name>Цвет буфера правый</Name>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_J</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+		<KeyModOffName>Alt</KeyModOffName>
+		<ObjectName>Cab1_Tumbl_BF-color_R</ObjectName>
+	</Control>
+
 </Config>

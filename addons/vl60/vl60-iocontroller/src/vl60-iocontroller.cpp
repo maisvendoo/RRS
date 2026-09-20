@@ -48,6 +48,21 @@ void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
     processTumbler(CTRL_TUMBLER_SPOT_HIGH, pressed_keys);
     // Прожектор тусклый
     processTumbler(CTRL_TUMBLER_SPOT_LOW, pressed_keys);
+
+    // Освещение кабины тусклое
+    processTumbler(CTRL_TUMBLER_CAB_LIGHT_LOW, pressed_keys);
+    // Освещение кабины яркое
+    processTumbler(CTRL_TUMBLER_CAB_LIGHT_HIGH, pressed_keys);
+    // Освещение приборов
+    processTumbler(CTRL_TUMBLER_LIGHT_DEVICES, pressed_keys);
+    // Фонарь буферный левый
+    processTumbler(CTRL_TUMBLER_BUF_LIGHT_L, pressed_keys);
+    // Фонарь буферный правый
+    processTumbler(CTRL_TUMBLER_BUF_LIGHT_R, pressed_keys);
+    // Цвет буфера левый
+    processTumbler(CTRL_TUMBLER_BUF_COLOR_L, pressed_keys);
+    // Цвет буфера правый
+    processTumbler(CTRL_TUMBLER_BUF_COLOR_R, pressed_keys);
 }
 
 //------------------------------------------------------------------------------
