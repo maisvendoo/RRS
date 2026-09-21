@@ -20,7 +20,7 @@ void IOController::setPressedKey(uint16_t keyBase)
         auto result = _pressed_keys.insert(keyBase);
         if (result.second)
         {
-            processControl(CTRL_TYPE_KEYBOARD);
+            processKeyBoardInput();
         }
     }
 }
@@ -30,8 +30,8 @@ void IOController::setPressedKey(uint16_t keyBase)
 //------------------------------------------------------------------------------
 void IOController::setReleasedKey(uint16_t keyBase)
 {
-    _pressed_keys.erase(keyBase);
-    processControl(CTRL_TYPE_KEYBOARD);
+    _pressed_keys.erase(keyBase);    
+    processKeyBoardInput();
 }
 
 //------------------------------------------------------------------------------
@@ -354,37 +354,4 @@ void IOController::processMouseInput(io_control_input_t input, uint32_t button, 
     (void) is_pressed;
 
     /* Место для написания собственного бреда в модулях-наследниках */
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void IOController::processControlPanelInput()
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void IOController::processControl(const ControlType &ctrl_type)
-{
-    // В зависиомсти от типа обрабатываемого управления, вызываем тот или иной
-    // метод обработки, видоизменяющий специфичные для данной ПЕ состяния органов управления.
-    // Вызывается один какой-то метода, в зависиомсти от того, откуда пришел
-    // управляющий сигнал
-    switch (ctrl_type)
-    {
-    case CTRL_TYPE_KEYBOARD:
-
-        processKeyBoardInput();
-
-        break;    
-
-    case CTRL_TYPE_CTRL_PANEL:
-
-        processControlPanelInput();
-
-        break;
-    }
 }

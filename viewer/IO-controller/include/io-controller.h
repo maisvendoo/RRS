@@ -49,13 +49,7 @@ protected:
 
     /// Здесь обеспечивается доступ к значению сигнала контрола
     /// как по коду нажатой кавиши, так и по имени объекта, кликнутого мышью
-    DualKeyHash<uint16_t, QString, io_control_input_t> io_control_inputs;
-
-    enum ControlType
-    {
-        CTRL_TYPE_KEYBOARD,        
-        CTRL_TYPE_CTRL_PANEL
-    };
+    DualKeyHash<uint16_t, QString, io_control_input_t> io_control_inputs;    
 
     /// Обработка управления с клавиатуры в кастомных модулях
     virtual void keysProcess(std::set<uint16_t> &pressed_keys);
@@ -81,13 +75,7 @@ private:
     bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
 
     /// Обработка клавиатурного управления (Общая для всех часть)
-    void processKeyBoardInput();        
-
-    /// Обработка управления с пульта тренажера (Общая для всех часть)
-    void processControlPanelInput();
-
-    /// Обработка управления
-    void processControl(const ControlType &ctrl_type);
+    void processKeyBoardInput();           
 };
 
 #endif
