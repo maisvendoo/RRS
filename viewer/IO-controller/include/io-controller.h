@@ -75,7 +75,11 @@ private:
     bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
 
     /// Обработка клавиатурного управления (Общая для всех часть)
-    void processKeyBoardInput();           
+    void processKeyBoardInput();
+
+    /// Сформировать строку с посказкой горячей клавиши
+    void getHotkeysString(const QString &keyName, io_control_input_t &ic_input);
+    void getUsageString(io_control_input_t &ic_input);
 };
 
 #endif

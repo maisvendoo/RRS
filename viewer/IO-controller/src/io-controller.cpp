@@ -45,6 +45,47 @@ void IOController::step(float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void IOController::getHotkeysString(const QString &keyName, io_control_input_t &ic_input)
+{
+    if (!keyName.isEmpty())
+    {
+        ic_input.hot_keys = "Клавиши: ";
+
+        if (!ic_input.keyModOnName.isEmpty())
+        {
+            ic_input.hot_keys += ic_input.keyModOnName + "+" + keyName.mid(4);
+        }
+
+        if (!ic_input.keyModOffName.isEmpty() && ic_input.keyModOnName != ic_input.keyModOffName)
+        {
+            ic_input.hot_keys += " / " + ic_input.keyModOffName + "+" + keyName.mid(4);
+        }
+    }
+    else
+    {
+        ic_input.hot_keys = QString();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::getUsageString(io_control_input_t &ic_input)
+{
+    if (ic_input.type == "Toggle")
+    {
+        ic_input.usage = "Вкл.: ЛКМ / Выкл: ПКМ";
+    }
+
+    if (ic_input.type == "Button")
+    {
+        ic_input.usage = "Нажать: ЛКМ";
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool IOController::load_config(CfgReader &cfg)
 {
     auto secNode = cfg.getFirstSection("Control");
@@ -57,15 +98,7 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "Type", ic_input.type);
 
-        if (ic_input.type == "Toggle")
-        {
-            ic_input.usage = "Вкл.: ЛКМ / Выкл: ПКМ";
-        }
-
-        if (ic_input.type == "Button")
-        {
-            ic_input.usage = "Нажать: ЛКМ";
-        }
+        getUsageString(ic_input);
 
         cfg.getString(secNode, "Description", ic_input.description);
 
@@ -87,17 +120,7 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "ObjectName", ic_input.contolledObjectName);
 
-        ic_input.hot_keys = "Клавиши: ";
-
-        if (!ic_input.keyModOnName.isEmpty())
-        {
-            ic_input.hot_keys += ic_input.keyModOnName + "+" + keyName.mid(4);
-        }
-
-        if (!ic_input.keyModOffName.isEmpty() && ic_input.keyModOnName != ic_input.keyModOffName)
-        {
-            ic_input.hot_keys += " / " + ic_input.keyModOffName + "+" + keyName.mid(4);
-        }
+        getHotkeysString(keyName, ic_input);
 
         io_control_inputs.insert(ic_input.id, ic_input.contolledObjectName, ic_input);
 
@@ -245,7 +268,7 @@ bool IOController::checkModKey(const QString &modKeyName, const std::set<uint16_
         return isShift(pressed_keys);
     }
 
-    if (modKeyName == "Control")
+    if (modKeyName == "Ctrl")
     {
         return isControl(pressed_keys);
     }

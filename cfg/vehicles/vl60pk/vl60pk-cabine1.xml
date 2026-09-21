@@ -12,7 +12,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_U</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_Pnt</ObjectName>
 	</Control>
 
@@ -25,7 +25,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_I</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_Pnt1</ObjectName>
 	</Control>
 
@@ -38,7 +38,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_O</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_Pnt2</ObjectName>
 	</Control>	
 
@@ -51,7 +51,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_P</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_GVonoff</ObjectName>
 	</Control>
 
@@ -77,7 +77,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_T</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_FR</ObjectName>
 	</Control>
 
@@ -90,7 +90,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_7</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_MK</ObjectName>
 	</Control>
 
@@ -103,7 +103,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_1</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_MV1</ObjectName>
 	</Control>
 
@@ -116,7 +116,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_2</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_MV2</ObjectName>
 	</Control>
 
@@ -129,7 +129,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_3</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_MV3</ObjectName>
 	</Control>
 
@@ -142,7 +142,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_4</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_MV4</ObjectName>
 	</Control>
 
@@ -155,7 +155,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_5</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_MV5</ObjectName>
 	</Control>
 
@@ -168,7 +168,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_6</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_MV6</ObjectName>
 	</Control>
 
@@ -181,7 +181,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_Y</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_CU</ObjectName>
 	</Control>
 
@@ -207,7 +207,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_H</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_PRG1</ObjectName>
 	</Control>
 
@@ -220,7 +220,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_K</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_svet1</ObjectName>
 	</Control>
 
@@ -246,7 +246,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_L</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_svetPribor</ObjectName>
 	</Control>
 
@@ -259,7 +259,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_G</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_buferL</ObjectName>
 	</Control>
 
@@ -272,7 +272,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_J</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_Tumbler_buferR</ObjectName>
 	</Control>
 
@@ -311,7 +311,7 @@
 		<value>0.0</value>
 		<KeyName>KEY_V</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Control</KeyModOffName>
+		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectName>Cab1_ept_onOff</ObjectName>
 	</Control>
 
