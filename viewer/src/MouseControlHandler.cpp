@@ -241,6 +241,8 @@ void MouseControlHandler::updateTooltip()
 
     tip.title = input.name;
     tip.description = input.description;
+    tip.usage = input.usage;
+    tip.hot_keys = input.hot_keys;
 }
 
 //------------------------------------------------------------------------------

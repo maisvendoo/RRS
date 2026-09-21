@@ -25,6 +25,7 @@ struct ControlTooltip
     QString description = "";
     QString state = "";
     QString hot_keys = "";
+    QString usage = "";
 };
 
 //------------------------------------------------------------------------------

@@ -34,6 +34,10 @@ struct io_control_input_t
     QString type = "";
     /// Описание контрола
     QString description = "";
+    /// Использование контрола
+    QString usage = "";
+    /// Описание горячей клавиши
+    QString hot_keys = "";
 
     io_control_input_t()
     {
