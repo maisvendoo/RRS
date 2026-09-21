@@ -342,9 +342,11 @@ void IOController::processKeyBoardInput()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::processMouseInput()
+void IOController::processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed)
 {
-
+    (void) input;
+    (void) button;
+    (void) is_pressed;
 }
 
 //------------------------------------------------------------------------------
@@ -370,13 +372,7 @@ void IOController::processControl(const ControlType &ctrl_type)
 
         processKeyBoardInput();
 
-        break;
-
-    case CTRL_TYPE_MOUSE:
-
-        processMouseInput();
-
-        break;
+        break;    
 
     case CTRL_TYPE_CTRL_PANEL:
 

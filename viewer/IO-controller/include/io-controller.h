@@ -53,12 +53,15 @@ protected:
 
     enum ControlType
     {
-        CTRL_TYPE_KEYBOARD,
-        CTRL_TYPE_MOUSE,
+        CTRL_TYPE_KEYBOARD,        
         CTRL_TYPE_CTRL_PANEL
     };
 
+    /// Обработка управления с клавиатуры в кастомных модулях
     virtual void keysProcess(std::set<uint16_t> &pressed_keys);
+
+    /// Обработка управления мышью в кастомных модулях
+    virtual void processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed);
 
     /// Обработка контрола типа "тумблер" (с фиксацией)
     void processTumbler(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
@@ -78,17 +81,13 @@ private:
     bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
 
     /// Обработка клавиатурного управления (Общая для всех часть)
-    void processKeyBoardInput();
-
-    /// Обработка управления мышью (Общая для всех часть)
-    void processMouseInput();
+    void processKeyBoardInput();        
 
     /// Обработка управления с пульта тренажера (Общая для всех часть)
     void processControlPanelInput();
 
     /// Обработка управления
     void processControl(const ControlType &ctrl_type);
-
 };
 
 #endif
