@@ -173,3 +173,12 @@ bool MouseControlHandler::pickControl(int x,
 
     return false;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+ControlTooltip &getControlTooltip()
+{
+    static ControlTooltip tooltip;
+    return tooltip;
+}

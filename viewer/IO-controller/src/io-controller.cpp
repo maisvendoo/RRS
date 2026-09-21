@@ -57,6 +57,8 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "Type", ic_input.type);
 
+        cfg.getString(secNode, "Description", ic_input.description);
+
         int control_ID = 0;
         cfg.getInt(secNode, "ID", control_ID);
         ic_input.id = static_cast<uint16_t>(control_ID);

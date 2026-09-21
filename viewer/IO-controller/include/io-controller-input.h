@@ -32,6 +32,8 @@ struct io_control_input_t
     QString name = "";
     /// Тип контрола
     QString type = "";
+    /// Описание контрола
+    QString description = "";
 
     io_control_input_t()
     {
