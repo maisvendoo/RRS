@@ -12,6 +12,7 @@
 #include "UpdateViewerHandler.h"
 #include "StationsHandler.h"
 #include "TrainLabelsHandler.h"
+#include "MouseControlHandler.h"
 #include <tcp-client.h>
 
 #include <vsg/io/Options.h>
@@ -260,6 +261,8 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     {
         showPauseState();
     }
+
+    showControlTooltip();
 }
 
 //------------------------------------------------------------------------------
@@ -1042,6 +1045,48 @@ void MyGui::check_date_time() const
         --params->year;
         params->month = 12;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::showControlTooltip() const
+{
+    const ControlTooltip &tip = getControlTooltip();
+
+    if (!tip.is_active)
+    {
+        return;
+    }
+
+    const float pad = 12.0f;
+    const ImVec2 pos(tip.x + pad, tip.y + pad);
+
+    ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
+    ImGui::SetNextWindowBgAlpha(0.85f);
+
+    const int flags = ImGuiWindowFlags_NoTitleBar |
+                      ImGuiWindowFlags_NoResize |
+                      ImGuiWindowFlags_NoMove |
+                      ImGuiWindowFlags_NoCollapse |
+                      ImGuiWindowFlags_AlwaysAutoResize |
+                      ImGuiWindowFlags_NoSavedSettings |
+                      ImGuiWindowFlags_NoNav |
+                      ImGuiWindowFlags_NoFocusOnAppearing;
+
+    if (ImGui::Begin("##cab_tooltip", nullptr, flags))
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.85f, 0.4f, 1.0f));
+        ImGui::TextUnformatted(tip.title.toStdString().c_str());
+        ImGui::PopStyleColor();
+
+        if (!tip.description.isEmpty())
+        {
+            ImGui::TextDisabled("%s", tip.description.toStdString().c_str());
+        }
+    }
+
+    ImGui::End();
 }
 
 //------------------------------------------------------------------------------

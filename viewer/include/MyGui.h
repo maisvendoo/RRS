@@ -182,6 +182,8 @@ private:
     void printObject(const vsg::ref_ptr<vsg::Object>& object) const;
 
     void check_date_time() const;
+
+    void showControlTooltip() const;
 };
 
 #endif // MY_GUI_H
