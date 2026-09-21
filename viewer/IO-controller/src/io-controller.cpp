@@ -58,7 +58,7 @@ void IOController::getHotkeysString(const QString &keyName, io_control_input_t &
 
         if (!ic_input.keyModOffName.isEmpty() && ic_input.keyModOnName != ic_input.keyModOffName)
         {
-            ic_input.hot_keys += " / " + ic_input.keyModOffName + "+" + keyName.mid(4);
+            ic_input.hot_keys += " | " + ic_input.keyModOffName + "+" + keyName.mid(4);
         }
     }
     else
@@ -74,7 +74,7 @@ void IOController::getUsageString(io_control_input_t &ic_input)
 {
     if (ic_input.type == "Toggle")
     {
-        ic_input.usage = "Вкл.: ЛКМ / Выкл: ПКМ";
+        ic_input.usage = "Вкл.: ЛКМ | Выкл: ПКМ";
     }
 
     if (ic_input.type == "Button")
