@@ -1076,13 +1076,24 @@ void MyGui::showControlTooltip() const
 
     if (ImGui::Begin("##cab_tooltip", nullptr, flags))
     {
+        // Заголовок выравнивается по центру окна подсказки
+        const std::string title = tip.title.toStdString();
+        const float title_w = ImGui::CalcTextSize(title.c_str()).x;
+        const float avail_w = ImGui::GetContentRegionAvail().x;
+        if (avail_w > title_w)
+        {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (avail_w - title_w) * 0.5f);
+        }
+
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.85f, 0.4f, 1.0f));
-        ImGui::TextUnformatted(tip.title.toStdString().c_str());
+        ImGui::TextUnformatted(title.c_str());
         ImGui::PopStyleColor();
 
         if (!tip.description.isEmpty())
         {
-            ImGui::TextDisabled("%s", tip.description.toStdString().c_str());
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::TextUnformatted(tip.description.toStdString().c_str());
+            ImGui::PopStyleColor();
         }
     }
 
