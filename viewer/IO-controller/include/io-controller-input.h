@@ -68,4 +68,14 @@ struct io_control_input_t
     }
 };
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+enum
+{
+    IO_CTRL_LEFT_MOUSE_BUTTON = 1,
+    IO_CTRL_MIDDLE_MOUSE_BUTTON = 2,
+    IO_CTRL_RIGHT_MOUSE_BUTTON = 3,
+};
+
 #endif

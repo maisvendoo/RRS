@@ -135,14 +135,14 @@ void IOController::mouseButtonPress(io_control_input_t input, uint32_t button)
 
     if (input.type == "Toggle")
     {
-        if (button == 1 && !input.toBool())
+        if (button == IO_CTRL_LEFT_MOUSE_BUTTON && !input.toBool())
         {
             io_ctrl->value = 1.0f;
             io_control_inputs.updateByKey1(input.id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
         }
 
-        if (button == 3 && input.toBool())
+        if (button == IO_CTRL_RIGHT_MOUSE_BUTTON && input.toBool())
         {
             io_ctrl->value = 0.0f;
             io_control_inputs.updateByKey1(input.id, io_ctrl.value());
@@ -152,7 +152,7 @@ void IOController::mouseButtonPress(io_control_input_t input, uint32_t button)
 
     if (input.type == "Button")
     {
-        if (button == 1)
+        if (button == IO_CTRL_LEFT_MOUSE_BUTTON)
         {
             io_ctrl->value = 1.0f;
             io_control_inputs.updateByKey1(input.id, io_ctrl.value());
@@ -170,7 +170,7 @@ void IOController::mouseButtonRelease(io_control_input_t input, uint32_t button)
 
     if (input.type == "Button")
     {
-        if (button == 1)
+        if (button == IO_CTRL_LEFT_MOUSE_BUTTON)
         {
             io_ctrl->value = 0.0f;
             io_control_inputs.updateByKey1(input.id, io_ctrl.value());
@@ -227,6 +227,7 @@ void IOController::processTumbler(const uint16_t &control_id,
         {
             if (checkModKey(io_ctrl->keyModOnName, pressed_keys))
             {
+                // Просто инвертируем состояние тумблера
                 io_ctrl->value = 1.0f - io_ctrl->value;
                 io_control_inputs.updateByKey1(control_id, io_ctrl.value());
                 emit sigSendVehicleControlCommand(io_ctrl->serialize());

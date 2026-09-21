@@ -46,30 +46,27 @@ void MouseControlHandler::apply(vsg::ButtonPressEvent &buttonPress)
         return;
     }
 
-    if (buttonPress.button == 1 || buttonPress.button == 3)
+    io_control_input_t input;
+    IOController *io_controller = nullptr;
+
+    // Определяем что мы попали в какой-то орган управления,
+    // возвращаем I/O-контроллер его обрабатываниющий и описатель сигнала
+    if (pickControl(static_cast<int>(buttonPress.x),
+                    static_cast<int>(buttonPress.y),
+                    io_controller,
+                    input))
     {
-        io_control_input_t input;
-        IOController *io_controller = nullptr;
-
-        if (pickControl(static_cast<int>(buttonPress.x),
-                        static_cast<int>(buttonPress.y),
-                        io_controller,
-                        input))
+        // Если сигнал или контроллер невалидны - уходим
+        if (input.id == 0 || io_controller == nullptr)
         {
-            if (input.id == 0)
-            {
-                return;
-            }
-
-            if (io_controller == nullptr)
-            {
-                return;
-            }
-
-            io_controller->mouseButtonPress(input, buttonPress.button);
-
-            buttonPress.handled = true;
+            return;
         }
+
+        // Передаем в данные обработчику нажатия кнопки мыши
+        io_controller->mouseButtonPress(input, buttonPress.button);
+
+        // Помечаем нажатие как обработанное
+        buttonPress.handled = true;
     }
 }
 
@@ -83,30 +80,22 @@ void MouseControlHandler::apply(vsg::ButtonReleaseEvent &buttonRelease)
         return;
     }
 
-    if (buttonRelease.button == 1 || buttonRelease.button == 3)
+    io_control_input_t input;
+    IOController *io_controller = nullptr;
+
+    if (pickControl(static_cast<int>(buttonRelease.x),
+                    static_cast<int>(buttonRelease.y),
+                    io_controller,
+                    input))
     {
-        io_control_input_t input;
-        IOController *io_controller = nullptr;
-
-        if (pickControl(static_cast<int>(buttonRelease.x),
-                        static_cast<int>(buttonRelease.y),
-                        io_controller,
-                        input))
+        if (input.id == 0 || io_controller == nullptr)
         {
-            if (input.id == 0)
-            {
-                return;
-            }
-
-            if (io_controller == nullptr)
-            {
-                return;
-            }
-
-            io_controller->mouseButtonRelease(input, buttonRelease.button);
-
-            buttonRelease.handled = true;
+            return;
         }
+
+        io_controller->mouseButtonRelease(input, buttonRelease.button);
+
+        buttonRelease.handled = true;
     }
 }
 
