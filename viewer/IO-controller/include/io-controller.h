@@ -35,9 +35,8 @@ public:
 
     bool findControl(const std::string &node_name, io_control_input_t &out) const;
 
-    void mouseButtonPress(io_control_input_t input, uint32_t button);
-
-    void mouseButtonRelease(io_control_input_t input, uint32_t button);
+    /// Обработка мышиного ввода
+    void mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed);
 
 signals:
 
@@ -61,16 +60,22 @@ protected:
 
     virtual void keysProcess(std::set<uint16_t> &pressed_keys);
 
-    // Проверка модификатора
-    bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
-
-    // Обработка контрола типа "тумблер" (с фиксацией)
+    /// Обработка контрола типа "тумблер" (с фиксацией)
     void processTumbler(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
 
-    // Обработка контрола типа "кнопка" (без фиксации)
+    /// Обработка контрола типа "кнопка" (без фиксации)
     void processButton(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
 
+    /// Обработка мышки на контроле типа "тумблер"
+    void mouseProcessTumbler(io_control_input_t input, uint32_t button, bool is_pressed);
+
+    /// Обработка мышки на контроле типа "кнопка"
+    void mouseProcessButton(io_control_input_t input, uint32_t button, bool is_pressed);
+
 private:
+
+    /// Проверка модификатора
+    bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
 
     /// Обработка клавиатурного управления (Общая для всех часть)
     void processKeyBoardInput();
@@ -83,6 +88,7 @@ private:
 
     /// Обработка управления
     void processControl(const ControlType &ctrl_type);
+
 };
 
 #endif

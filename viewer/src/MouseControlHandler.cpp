@@ -63,7 +63,7 @@ void MouseControlHandler::apply(vsg::ButtonPressEvent &buttonPress)
         }
 
         // Передаем в данные обработчику нажатия кнопки мыши
-        io_controller->mouseButtonPress(input, buttonPress.button);
+        io_controller->mouseInputProcess(input, buttonPress.button, true);
 
         // Помечаем нажатие как обработанное
         buttonPress.handled = true;
@@ -93,7 +93,7 @@ void MouseControlHandler::apply(vsg::ButtonReleaseEvent &buttonRelease)
             return;
         }
 
-        io_controller->mouseButtonRelease(input, buttonRelease.button);
+        io_controller->mouseInputProcess(input, buttonRelease.button, false);
 
         buttonRelease.handled = true;
     }

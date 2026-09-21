@@ -129,7 +129,9 @@ bool IOController::findControl(const std::string &node_name, io_control_input_t 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::mouseButtonPress(io_control_input_t input, uint32_t button)
+void IOController::mouseProcessTumbler(io_control_input_t input,
+                                       uint32_t button,
+                                       bool is_pressed)
 {
     auto io_ctrl = io_control_inputs.getByKey1(input.id);
 
@@ -149,14 +151,39 @@ void IOController::mouseButtonPress(io_control_input_t input, uint32_t button)
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
         }
     }
+}
 
-    if (input.type == "Button")
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::mouseProcessButton(io_control_input_t input,
+                                      uint32_t button,
+                                      bool is_pressed)
+{
+    auto io_ctrl = io_control_inputs.getByKey1(input.id);
+
+    if (is_pressed)
     {
-        if (button == IO_CTRL_LEFT_MOUSE_BUTTON)
+        if (input.type == "Button")
         {
-            io_ctrl->value = 1.0f;
-            io_control_inputs.updateByKey1(input.id, io_ctrl.value());
-            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+            if (button == IO_CTRL_LEFT_MOUSE_BUTTON)
+            {
+                io_ctrl->value = 1.0f;
+                io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+                emit sigSendVehicleControlCommand(io_ctrl->serialize());
+            }
+        }
+    }
+    else
+    {
+        if (input.type == "Button")
+        {
+            if (button == IO_CTRL_LEFT_MOUSE_BUTTON)
+            {
+                io_ctrl->value = 0.0f;
+                io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+                emit sigSendVehicleControlCommand(io_ctrl->serialize());
+            }
         }
     }
 }
@@ -164,19 +191,11 @@ void IOController::mouseButtonPress(io_control_input_t input, uint32_t button)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::mouseButtonRelease(io_control_input_t input, uint32_t button)
+void IOController::mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed)
 {
-    auto io_ctrl = io_control_inputs.getByKey1(input.id);
+    mouseProcessTumbler(input, button, is_pressed);
 
-    if (input.type == "Button")
-    {
-        if (button == IO_CTRL_LEFT_MOUSE_BUTTON)
-        {
-            io_ctrl->value = 0.0f;
-            io_control_inputs.updateByKey1(input.id, io_ctrl.value());
-            emit sigSendVehicleControlCommand(io_ctrl->serialize());
-        }
-    }
+    mouseProcessButton(input, button, is_pressed);
 }
 
 //------------------------------------------------------------------------------
