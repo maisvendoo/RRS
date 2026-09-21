@@ -193,9 +193,14 @@ void IOController::mouseProcessButton(io_control_input_t input,
 //------------------------------------------------------------------------------
 void IOController::mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed)
 {
+    // Обработка контрола типа "тумблер"
     mouseProcessTumbler(input, button, is_pressed);
 
+    // Обработка контрола типа "кнопка"
     mouseProcessButton(input, button, is_pressed);
+
+    // Вызываем кастомную обработку мышеввода
+    processMouseInput(input, button, is_pressed);
 }
 
 //------------------------------------------------------------------------------
@@ -347,6 +352,8 @@ void IOController::processMouseInput(io_control_input_t input, uint32_t button, 
     (void) input;
     (void) button;
     (void) is_pressed;
+
+    /* Место для написания собственного бреда в модулях-наследниках */
 }
 
 //------------------------------------------------------------------------------
