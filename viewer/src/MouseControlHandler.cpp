@@ -24,6 +24,15 @@ MouseControlHandler::MouseControlHandler(vsg::ref_ptr<vsg::Camera> camera,
 void MouseControlHandler::apply(vsg::FrameEvent &frameEvent)
 {
     (void) frameEvent;
+
+    if (is_Alt_pressed)
+    {
+        updateTooltip();
+    }
+    else if (getControlTooltip().is_active)
+    {
+        getControlTooltip().is_active = false;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -102,6 +111,42 @@ void MouseControlHandler::apply(vsg::ButtonReleaseEvent &buttonRelease)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void MouseControlHandler::apply(vsg::KeyPressEvent &keyPress)
+{
+    if (_keyboard)
+    {
+        keyPress.accept(*_keyboard);
+    }
+
+    if (keyPress.keyModified == vsg::KEY_Alt_L || keyPress.keyModified == vsg::KEY_Alt_R)
+    {
+        is_Alt_pressed = true;
+    }
+
+    //LOG_INFO("Alt state: %d", is_Alt_pressed);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MouseControlHandler::apply(vsg::KeyReleaseEvent &keyRelease)
+{
+    if (_keyboard)
+    {
+        keyRelease.accept(*_keyboard);
+    }
+
+    if (keyRelease.keyModified == vsg::KEY_Alt_L || keyRelease.keyModified == vsg::KEY_Alt_R)
+    {
+        is_Alt_pressed = false;
+    }
+
+    //LOG_INFO("Alt state: %d", is_Alt_pressed);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool MouseControlHandler::pickControl(int x,
                                       int y,
                                       IOController* &io_ctrl,
@@ -115,7 +160,7 @@ bool MouseControlHandler::pickControl(int x,
     }
 
     static const int offsets[5][2] = {
-        {0, 0}, {9, 0}, {-9, 0}, {0, -9}
+        {0, 0}, {9, 0}, {-9, 0}, {0, -9}, {0, 9}
     };
 
     vsg::ref_ptr<vsg::LineSegmentIntersector> intersector;
@@ -172,6 +217,30 @@ bool MouseControlHandler::pickControl(int x,
     }
 
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MouseControlHandler::updateTooltip()
+{
+    ControlTooltip &tip = getControlTooltip();
+
+    IOController *io_controller = nullptr;
+    io_control_input_t input;
+
+    tip.is_active = pickControl(static_cast<int>(_pointer_x), static_cast<int>(_pointer_y), io_controller, input);
+
+    if (!tip.is_active)
+    {
+        return;
+    }
+
+    tip.x = _pointer_x;
+    tip.y = _pointer_y;
+
+    tip.title = input.name;
+    tip.description = input.description;
 }
 
 //------------------------------------------------------------------------------
