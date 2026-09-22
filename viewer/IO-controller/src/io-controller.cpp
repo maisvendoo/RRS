@@ -125,6 +125,11 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "KeyModOffName", ic_input.keyModOffName);
 
+        if (ic_input.keyModOffName.isEmpty())
+        {
+            ic_input.keyModOffName = ic_input.keyModOnName;
+        }
+
         getHotkeysString(keyName, ic_input);        
 
         QString object_name_cab1 = "";
@@ -140,18 +145,21 @@ bool IOController::load_config(CfgReader &cfg)
         {
             auto &io_ctrl_inputs = *(io_control_inputs.end() - 1);
             ic_input.cabine_idx = io_control_inputs.size() - 1;
+            ic_input.contolledObjectName = object_name;
             io_ctrl_inputs.insert(ic_input.id, object_name, ic_input);
         }
 
         if (!object_name_cab1.isEmpty() && cabs_num > 0)
         {
             ic_input.cabine_idx = 0;
+            ic_input.contolledObjectName = object_name_cab1;
             io_control_inputs[0].insert(ic_input.id, object_name_cab1, ic_input);
         }
 
         if (!object_name_cab2.isEmpty() && cabs_num > 1)
         {
             ic_input.cabine_idx = 1;
+            ic_input.contolledObjectName = object_name_cab2;
             io_control_inputs[1].insert(ic_input.id, object_name_cab2, ic_input);
         }
 

@@ -69,8 +69,7 @@
 		<Type>Button</Type>
 		<value>0.0</value>
 		<KeyName>KEY_P</KeyName>
-		<KeyModOnName>Alt</KeyModOnName>
-		<KeyModOffName>Alt</KeyModOffName>
+		<KeyModOnName>Alt</KeyModOnName>		
 		<ObjectNameCab1>Cab1_Tumbler_GVon</ObjectNameCab1>
 		<ObjectNameCab2>Cab2_Tumbler_GVon</ObjectNameCab2>
 	</Control>
@@ -209,8 +208,7 @@
 		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_H</KeyName>
-		<KeyModOnName>Alt</KeyModOnName>
-		<KeyModOffName>Alt</KeyModOffName>
+		<KeyModOnName>Alt</KeyModOnName>		
 		<ObjectNameCab1>Cab1_Tumbler_PRG2</ObjectNameCab1>
 		<ObjectNameCab2>Cab2_Tumbler_PRG2</ObjectNameCab2>
 	</Control>
@@ -307,8 +305,7 @@
 		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_G</KeyName>
-		<KeyModOnName>Alt</KeyModOnName>
-		<KeyModOffName>Alt</KeyModOffName>
+		<KeyModOnName>Alt</KeyModOnName>		
 		<ObjectNameCab1>Cab1_Tumbl_BF-color_L</ObjectNameCab1>
 		<ObjectNameCab2>Cab2_Tumbl_BF-color_L</ObjectNameCab2>
 	</Control>
@@ -321,8 +318,7 @@
 		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_J</KeyName>
-		<KeyModOnName>Alt</KeyModOnName>
-		<KeyModOffName>Alt</KeyModOffName>
+		<KeyModOnName>Alt</KeyModOnName>		
 		<ObjectNameCab1>Cab1_Tumbl_BF-color_R</ObjectNameCab1>
 		<ObjectNameCab2>Cab2_Tumbl_BF-color_R</ObjectNameCab2>
 	</Control>
