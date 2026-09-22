@@ -376,4 +376,32 @@
 		<ObjectNameCab2>Cab2_Pult_Revers_Holder</ObjectNameCab2>
 	</Control>
 
+	<!-- ЭПК-150 -->
+	<Control>
+		<ID>125</ID>
+		<Name>ЭПК-150</Name>
+		<Description>Извлечь/Вставить ключ</Description>
+		<Type>Toggle</Type>
+		<value1>1.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_N</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>		
+		<ObjectNameCab1>Cab1_EPK-150</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_EPK-150</ObjectNameCab2>
+	</Control>
+
+	<!-- Блокировка 367 -->
+	<Control>
+		<ID>126</ID>
+		<Name>Блокировка 367</Name>
+		<Description>Извлечь/Вставить рукоятку</Description>
+		<Type>Toggle</Type>
+		<value1>1.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_BackSpace</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>		
+		<ObjectNameCab1>Cab1_BL_367</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_BL_367</ObjectNameCab2>
+	</Control>
+
 </Config>
