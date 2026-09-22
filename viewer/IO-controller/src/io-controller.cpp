@@ -117,8 +117,6 @@ bool IOController::load_config(CfgReader &cfg)
         cfg.getDouble(secNode, "value1", value1);
         double value2 = 0.0;
         cfg.getDouble(secNode, "value2", value2);
-        ic_input.value = static_cast<float>(value1);
-        ic_input.value2 = static_cast<float>(value2);
 
         QString keyName = "";
         cfg.getString(secNode, "KeyName", keyName);
@@ -149,6 +147,7 @@ bool IOController::load_config(CfgReader &cfg)
             auto &io_ctrl_inputs = *(io_control_inputs.end() - 1);
             ic_input.cabine_idx = io_control_inputs.size() - 1;
             ic_input.contolledObjectName = object_name;
+            ic_input.value = value1;
             io_ctrl_inputs.insert(ic_input.id, object_name, ic_input);
         }
 
@@ -156,6 +155,7 @@ bool IOController::load_config(CfgReader &cfg)
         {
             ic_input.cabine_idx = 0;
             ic_input.contolledObjectName = object_name_cab1;
+            ic_input.value = value1;
             io_control_inputs[0].insert(ic_input.id, object_name_cab1, ic_input);
         }
 
@@ -163,6 +163,7 @@ bool IOController::load_config(CfgReader &cfg)
         {
             ic_input.cabine_idx = 1;
             ic_input.contolledObjectName = object_name_cab2;
+            ic_input.value = value2;
             io_control_inputs[1].insert(ic_input.id, object_name_cab2, ic_input);
         }
 

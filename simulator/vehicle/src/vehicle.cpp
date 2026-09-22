@@ -1108,8 +1108,11 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
         int id = 0;
         cfg.getInt(secNode, "ID", id);
 
-        double value = 0.0;
-        cfg.getDouble(secNode, "value", value);
+        double value1 = 0.0;
+        cfg.getDouble(secNode, "value1", value1);
+
+        double value2 = 0.0;
+        cfg.getDouble(secNode, "value2", value2);
 
         QString object_name = "";
         cfg.getString(secNode, "ObjectName", object_name);
@@ -1123,17 +1126,17 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
         if (!object_name.isEmpty())
         {
             auto &inputs = *(control_inputs.end() - 1);
-            inputs.insert(id, value);
+            inputs.insert(id, value1);
         }
 
         if (!object_name_cab1.isEmpty() && cabs_num > 0)
         {
-            control_inputs[0].insert(id, value);
+            control_inputs[0].insert(id, value1);
         }
 
         if (!object_name_cab2.isEmpty() && cabs_num > 1)
         {
-            control_inputs[1].insert(id, value);
+            control_inputs[1].insert(id, value2);
         }
 
         secNode = cfg.getNextSection();
