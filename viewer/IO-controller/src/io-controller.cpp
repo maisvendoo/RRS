@@ -88,8 +88,6 @@ void IOController::getUsageString(io_control_input_t &ic_input)
 //------------------------------------------------------------------------------
 bool IOController::load_config(CfgReader &cfg)
 {
-    auto secNode = cfg.getFirstSection("Control");
-
     cfg.getInt("Common", "CabinesNum", cabs_num);
 
     for (int i = 0; i < cabs_num + 1; ++i)
@@ -97,6 +95,8 @@ bool IOController::load_config(CfgReader &cfg)
         DualKeyHash<uint16_t, QString, io_control_input_t> io_ctrl_inputs;
         io_control_inputs.push_back(io_ctrl_inputs);
     }
+
+    auto secNode = cfg.getFirstSection("Control");
 
     while (!secNode.isNull())
     {
@@ -170,15 +170,18 @@ bool IOController::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::setCabineIndex(int vehicle_idx, int cab_idx)
+void IOController::setVehicleIndex(int vehicle_idx)
 {
-    /*for (auto &[key1, key2, value] : io_control_inputs.getAll())
+    for (int cab_idx = 0; cab_idx < io_control_inputs.size(); ++cab_idx)
     {
-        value.controlled_vehicle_idx = vehicle_idx;
-        value.cabine_idx = cab_idx;
+        for (auto &[key1, key2, value] : io_control_inputs[cab_idx].getAll())
+        {
+            value.controlled_vehicle_idx = vehicle_idx;
+            value.cabine_idx = cab_idx;
 
-        io_control_inputs.updateByKey1(key1, value);
-    }*/
+            io_control_inputs[cab_idx].updateByKey1(key1, value);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -342,6 +345,10 @@ void IOController::processTumbler(size_t cab_idx,
 
     if (!io_ctrl) return;
 
+    fprintf(stderr, "DBG processTumbler cab=%zu id=%u key_match=%d\n",
+            cab_idx, (unsigned)control_id,
+            getKeyState(pressed_keys, io_ctrl->keyCode));
+
     // Нажата ли его клавиша
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
@@ -388,6 +395,9 @@ void IOController::processButton(size_t cab_idx,
     auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
 
     if (!io_ctrl) return;
+
+    fprintf(stderr, "DBG processButton cab=%zu id=%u val=%.1f\n",
+            cab_idx, (unsigned)control_id, io_ctrl->value);
 
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {

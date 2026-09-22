@@ -31,7 +31,12 @@ public:
 
     virtual bool load_config(CfgReader &cfg);
 
-    void setCabineIndex(int vehicle_idx, int cab_idx);
+    void setVehicleIndex(int vehicle_idx);
+
+    void setActirveCabineIndex(int cab_idx)
+    {
+        cabine_idx = cab_idx;
+    }
 
     bool findControl(const std::string &node_name, io_control_input_t &out) const;
 
@@ -52,6 +57,8 @@ protected:
     std::vector<DualKeyHash<uint16_t, QString, io_control_input_t>> io_control_inputs;
 
     int cabs_num = 0;
+
+    int cabine_idx = 0;
 
     /// Обработка управления с клавиатуры в кастомных модулях
     virtual void keysProcess(std::set<uint16_t> &pressed_keys);

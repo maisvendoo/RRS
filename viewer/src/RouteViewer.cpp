@@ -1368,6 +1368,7 @@ void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
     {
         // Активируем контроллер в маршрутизаторе
         input_route_handler->setActiveController(vehicle->io_controller);
+        vehicle->io_controller->setActirveCabineIndex(cab_idx);
         LOG_INFO("RouteViewer: Activated IOController for vehicle %d (index %d)",
                  newIndex, newIndex);
     } else

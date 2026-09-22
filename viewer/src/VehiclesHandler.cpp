@@ -469,6 +469,8 @@ bool VehiclesHandler::load(
 
         if (vehicle_exterior.io_controller != nullptr)
         {
+            vehicle_exterior.io_controller->setVehicleIndex(i);
+
             connect(vehicle_exterior.io_controller, &IOController::sigSendVehicleControlCommand,
                     this, &VehiclesHandler::sigSendVehicleControlCommand);
         }
