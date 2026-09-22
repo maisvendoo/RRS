@@ -51,6 +51,8 @@ protected:
     /// как по коду нажатой кавиши, так и по имени объекта, кликнутого мышью
     std::vector<DualKeyHash<uint16_t, QString, io_control_input_t>> io_control_inputs;
 
+    int cabs_num = 0;
+
     /// Обработка управления с клавиатуры в кастомных модулях
     virtual void keysProcess(std::set<uint16_t> &pressed_keys);
 

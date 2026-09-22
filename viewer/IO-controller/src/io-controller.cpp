@@ -119,7 +119,7 @@ bool IOController::load_config(CfgReader &cfg)
 
         getHotkeysString(keyName, ic_input);
 
-        int cabs_num = 0;
+        cfg.getInt("Common", "CabinesNum", cabs_num);
 
         for (int i = 0; i < cabs_num + 1; ++i)
         {

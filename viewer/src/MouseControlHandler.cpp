@@ -154,7 +154,7 @@ bool MouseControlHandler::pickControl(int x,
 {
     VehicleExterior *vehicle = _vehicles_handler->getCurrentVehicle();
 
-    if (vehicle == nullptr || vehicle->io_controls.empty() || (_camera == nullptr))
+    if (vehicle == nullptr || vehicle->io_controller == nullptr || (_camera == nullptr))
     {
         return false;
     }
@@ -187,31 +187,29 @@ bool MouseControlHandler::pickControl(int x,
                     continue;
                 }
 
-                for (auto *io_controller : vehicle->io_controls)
+                if (vehicle->io_controller == nullptr)
                 {
-                    if (io_controller == nullptr)
-                    {
-                        continue;
-                    }
-
-                    io_controller->findControl(node_name, input);
-
-                    if (input.id == 0)
-                    {
-                        continue;
-                    }
-
-                    // Сохраняем актуальный контроллер ввода
-                    io_ctrl = io_controller;
-
-                    if (_last_hit_object != node_name)
-                    {
-                        _last_hit_object = node_name;
-                        LOG_INFO("Clicked: %s state: %3.1f", node_name.c_str(), input.value);
-                    }
-
-                    return true;
+                    continue;
                 }
+
+                vehicle->io_controller->findControl(node_name, input);
+
+                if (input.id == 0)
+                {
+                    continue;
+                }
+
+                // Сохраняем актуальный контроллер ввода
+                io_ctrl = vehicle->io_controller;
+
+                if (_last_hit_object != node_name)
+                {
+                    _last_hit_object = node_name;
+                    LOG_INFO("Clicked: %s state: %3.1f", node_name.c_str(), input.value);
+                }
+
+                return true;
+
             }
         }
     }
