@@ -83,5 +83,11 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         bool is_revers_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_REVERS_INSERTION]);
         controller[cab_idx]->insertReversHandle(is_revers_insert);
+
+        bool is_epk_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_EPK_INSERTION]);
+        epk[cab_idx]->insertKey(is_epk_insert);
+
+        bool is_lock367_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_LOCK_367_INSERTION]);
+        brake_lock[cab_idx]->insertLockHandle(is_lock367_insert);
     }
 }
