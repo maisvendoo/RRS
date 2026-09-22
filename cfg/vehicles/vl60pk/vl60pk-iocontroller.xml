@@ -337,4 +337,18 @@
 		<ObjectNameCab2>Cab2_ept_onOff</ObjectNameCab2>
 	</Control>
 
+	<!-- Реверсивный вал -->
+	<Control>
+		<ID>124</ID>
+		<Name>Реверсивный вал</Name>
+		<Description>Извлечь/вставить реверсивную рукоятку</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_W</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Pult_Revers_Holder</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Pult_Revers_Holder</ObjectNameCab2>
+	</Control>
+
 </Config>

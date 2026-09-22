@@ -67,6 +67,8 @@ void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
     // ЭПТ
     processTumbler(cabine_idx, CTRL_TUMBLER_EPB, pressed_keys);
 
+    // Установка и извление реверсивки
+    processTumbler(cabine_idx, CTRL_REVERS_INSERTION, pressed_keys);
 }
 
 //------------------------------------------------------------------------------

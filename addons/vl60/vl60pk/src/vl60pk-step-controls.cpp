@@ -1,5 +1,6 @@
 #include    <vl60pk.h>
 #include    <vl60-controls.h>
+#include    <kme-60-044.h>
 
 //------------------------------------------------------------------------------
 //
@@ -79,5 +80,8 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         bool is_epb = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_EPB]);
         is_epb ? epb_switch[cab_idx].set() : epb_switch[cab_idx].reset();
+
+        bool is_revers_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_REVERS_INSERTION]);
+        controller[cab_idx]->insertReversHandle(is_revers_insert);
     }
 }
