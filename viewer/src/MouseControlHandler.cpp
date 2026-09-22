@@ -192,7 +192,10 @@ bool MouseControlHandler::pickControl(int x,
                     continue;
                 }
 
-                vehicle->io_controller->findControl(node_name, input);
+                if (!vehicle->io_controller->findControl(node_name, input))
+                {
+                    continue;
+                }
 
                 if (input.id == 0)
                 {

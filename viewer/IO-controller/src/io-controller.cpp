@@ -90,6 +90,14 @@ bool IOController::load_config(CfgReader &cfg)
 {
     auto secNode = cfg.getFirstSection("Control");
 
+    cfg.getInt("Common", "CabinesNum", cabs_num);
+
+    for (int i = 0; i < cabs_num + 1; ++i)
+    {
+        DualKeyHash<uint16_t, QString, io_control_input_t> io_ctrl_inputs;
+        io_control_inputs.push_back(io_ctrl_inputs);
+    }
+
     while (!secNode.isNull())
     {
         io_control_input_t ic_input;
@@ -117,21 +125,13 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "KeyModOffName", ic_input.keyModOffName);
 
-        getHotkeysString(keyName, ic_input);
-
-        cfg.getInt("Common", "CabinesNum", cabs_num);
-
-        for (int i = 0; i < cabs_num + 1; ++i)
-        {
-            DualKeyHash<uint16_t, QString, io_control_input_t> io_ctrl_inputs;
-            io_control_inputs.push_back(io_ctrl_inputs);
-        }
+        getHotkeysString(keyName, ic_input);        
 
         QString object_name_cab1 = "";
         cfg.getString(secNode, "ObjectNameCab1", object_name_cab1);
 
         QString object_name_cab2 = "";
-        cfg.getString(secNode, "ObjectNameCab2", object_name_cab1);
+        cfg.getString(secNode, "ObjectNameCab2", object_name_cab2);
 
         QString object_name = "";
         cfg.getString(secNode, "ObjectName", object_name);
@@ -143,20 +143,26 @@ bool IOController::load_config(CfgReader &cfg)
             io_ctrl_inputs.insert(ic_input.id, object_name, ic_input);
         }
 
-        if (!object_name_cab1.isEmpty() || cabs_num > 0)
+        if (!object_name_cab1.isEmpty() && cabs_num > 0)
         {
             ic_input.cabine_idx = 0;
             io_control_inputs[0].insert(ic_input.id, object_name_cab1, ic_input);
         }
 
-        if (!object_name_cab2.isEmpty() || cabs_num > 1)
+        if (!object_name_cab2.isEmpty() && cabs_num > 1)
         {
             ic_input.cabine_idx = 1;
             io_control_inputs[1].insert(ic_input.id, object_name_cab2, ic_input);
         }
 
         secNode = cfg.getNextSection();
-    }
+    }    
+
+    // Debug: кол-во контролов
+    if (!io_control_inputs.empty())
+        fprintf(stderr, "DBG IO: cabs_num=%d vec_size=%zu hash0=%d hash1=%d\n",
+                cabs_num, io_control_inputs.size(),
+                io_control_inputs[0].size(), io_control_inputs[1].size());
 
     return true;
 }
@@ -189,6 +195,11 @@ bool IOController::findControl(const std::string &node_name, io_control_input_t 
 
     for (size_t i = 0; i < io_control_inputs.size(); ++i)
     {
+        if (io_control_inputs[i].size() == 0)
+        {
+            continue;
+        }
+
         for (const auto &[key1, key2, value] : io_control_inputs[i].getAll())
         {
             if (key2.isEmpty())
@@ -216,6 +227,8 @@ void IOController::mouseProcessTumbler(io_control_input_t input,
 {
     auto io_ctrl = io_control_inputs[input.cabine_idx].getByKey1(input.id);
 
+    if (!io_ctrl) return;
+
     if (input.type == "Toggle")
     {
         if (button == IO_CTRL_LEFT_MOUSE_BUTTON && !input.toBool())
@@ -242,6 +255,8 @@ void IOController::mouseProcessButton(io_control_input_t input,
                                       bool is_pressed)
 {
     auto io_ctrl = io_control_inputs[input.cabine_idx].getByKey1(input.id);
+
+    if (!io_ctrl) return;
 
     if (is_pressed)
     {
@@ -325,6 +340,8 @@ void IOController::processTumbler(size_t cab_idx,
     // Проверяем конкретный контрол
     auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
 
+    if (!io_ctrl) return;
+
     // Нажата ли его клавиша
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
@@ -369,6 +386,8 @@ void IOController::processButton(size_t cab_idx,
                                  const std::set<uint16_t> &pressed_keys)
 {
     auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
+
+    if (!io_ctrl) return;
 
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
