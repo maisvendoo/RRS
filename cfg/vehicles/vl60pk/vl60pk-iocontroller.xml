@@ -386,8 +386,8 @@
 		<value2>0.0</value2>
 		<KeyName>KEY_N</KeyName>
 		<KeyModOnName>Alt</KeyModOnName>		
-		<ObjectNameCab1>Cab1_EPK-150</ObjectNameCab1>
-		<ObjectNameCab2>Cab2_EPK-150</ObjectNameCab2>
+		<ObjectNameCab1>Cab1_EPK-150_Holder</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_EPK-150_Holder</ObjectNameCab2>
 	</Control>
 
 	<!-- Блокировка 367 -->
@@ -400,8 +400,8 @@
 		<value2>0.0</value2>
 		<KeyName>KEY_BackSpace</KeyName>
 		<KeyModOnName>Alt</KeyModOnName>		
-		<ObjectNameCab1>Cab1_BL_367</ObjectNameCab1>
-		<ObjectNameCab2>Cab2_BL_367</ObjectNameCab2>
+		<ObjectNameCab1>Cab1_Bl_367_Holder</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Bl_367_Holder</ObjectNameCab2>
 	</Control>
 
 </Config>

@@ -1,6 +1,8 @@
 #include    <vl60pk.h>
 #include    <vl60-controls.h>
 #include    <kme-60-044.h>
+#include    <automatic-train-stop.h>
+#include    <pneumo-brake-lock.h>
 
 //------------------------------------------------------------------------------
 //
@@ -88,6 +90,7 @@ void VL60pk::stepControls(const double &t, const double &dt)
         epk[cab_idx]->insertKey(is_epk_insert);
 
         bool is_lock367_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_LOCK_367_INSERTION]);
+        brake_lock[cab_idx]->setStateOn(is_lock367_insert);
         brake_lock[cab_idx]->insertLockHandle(is_lock367_insert);
     }
 }
