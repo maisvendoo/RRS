@@ -1015,7 +1015,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
         Journal::instance()->error("File " + cfg_path + " is't found");
     }
 
-    auto cabNode = cfg.getFirstSection("Cabine");
+    /*auto cabNode = cfg.getFirstSection("Cabine");
 
     QFileInfo cfgFileInfo(cfg_path);
     QString cfg_dir = cfgFileInfo.absolutePath();
@@ -1058,7 +1058,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
         control_inputs.push_back(inputs);
 
         cabNode = cfg.getNextSection();
-    }
+    }*/
 
     Q_a.resize(s);
     Q_a.shrink_to_fit();

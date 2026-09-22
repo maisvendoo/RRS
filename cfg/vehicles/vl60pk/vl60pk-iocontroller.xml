@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<ControlSet>
+		<Name>Кабина 1</Name>
+		<ConfigName>vl60pk-cabine1</ConfigName>
+	</ControlSet>
+
+	<ControlSet>
+		<Name>Кабина 2</Name>
+		<ConfigName>vl60pk-cabine2</ConfigName>
+	</ControlSet>
+
+	<ControlSet>
+		<Name>Внешнее оборудование</Name>
+		<ConfigName>vl60pk-external-controls</ConfigName>
+	</ControlSet>
+
+</Config>
