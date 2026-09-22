@@ -467,21 +467,10 @@ bool VehiclesHandler::load(
         vehicle_exterior.cullnode->child = vehicle_exterior.transform;
         vehicles_node->addChild(vehicle_exterior.cullnode);
 
-        if (!vehicle_exterior.io_controls.empty())
+        if (vehicle_exterior.io_controller != nullptr)
         {
-            int cab_idx = 0;
-
-            for (auto *io_control : vehicle_exterior.io_controls)
-            {
-                if (io_control != nullptr)
-                {
-                    io_control->setCabineIndex(i, cab_idx);
-                    connect(io_control, &IOController::sigSendVehicleControlCommand,
-                            this, &VehiclesHandler::sigSendVehicleControlCommand);
-                }
-
-                cab_idx++;
-            }
+            connect(vehicle_exterior.io_controller, &IOController::sigSendVehicleControlCommand,
+                    this, &VehiclesHandler::sigSendVehicleControlCommand);
         }
     }
 

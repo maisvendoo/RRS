@@ -95,7 +95,6 @@ bool IOController::load_config(CfgReader &cfg)
         io_control_input_t ic_input;
 
         cfg.getString(secNode, "Name", ic_input.name);
-
         cfg.getString(secNode, "Type", ic_input.type);
 
         getUsageString(ic_input);
@@ -118,11 +117,43 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "KeyModOffName", ic_input.keyModOffName);
 
-        cfg.getString(secNode, "ObjectName", ic_input.contolledObjectName);
-
         getHotkeysString(keyName, ic_input);
 
-        io_control_inputs.insert(ic_input.id, ic_input.contolledObjectName, ic_input);
+        int cabs_num = 0;
+
+        for (int i = 0; i < cabs_num + 1; ++i)
+        {
+            DualKeyHash<uint16_t, QString, io_control_input_t> io_ctrl_inputs;
+            io_control_inputs.push_back(io_ctrl_inputs);
+        }
+
+        QString object_name_cab1 = "";
+        cfg.getString(secNode, "ObjectNameCab1", object_name_cab1);
+
+        QString object_name_cab2 = "";
+        cfg.getString(secNode, "ObjectNameCab2", object_name_cab1);
+
+        QString object_name = "";
+        cfg.getString(secNode, "ObjectName", object_name);
+
+        if (!object_name.isEmpty())
+        {
+            auto &io_ctrl_inputs = *(io_control_inputs.end() - 1);
+            ic_input.cabine_idx = io_control_inputs.size() - 1;
+            io_ctrl_inputs.insert(ic_input.id, object_name, ic_input);
+        }
+
+        if (!object_name_cab1.isEmpty() || cabs_num > 0)
+        {
+            ic_input.cabine_idx = 0;
+            io_control_inputs[0].insert(ic_input.id, object_name_cab1, ic_input);
+        }
+
+        if (!object_name_cab2.isEmpty() || cabs_num > 1)
+        {
+            ic_input.cabine_idx = 1;
+            io_control_inputs[1].insert(ic_input.id, object_name_cab2, ic_input);
+        }
 
         secNode = cfg.getNextSection();
     }
@@ -135,13 +166,13 @@ bool IOController::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void IOController::setCabineIndex(int vehicle_idx, int cab_idx)
 {
-    for (auto &[key1, key2, value] : io_control_inputs.getAll())
+    /*for (auto &[key1, key2, value] : io_control_inputs.getAll())
     {
         value.controlled_vehicle_idx = vehicle_idx;
         value.cabine_idx = cab_idx;
 
         io_control_inputs.updateByKey1(key1, value);
-    }
+    }*/
 }
 
 //------------------------------------------------------------------------------
@@ -156,17 +187,20 @@ bool IOController::findControl(const std::string &node_name, io_control_input_t 
 
     const QString node = QString::fromStdString(node_name);
 
-    for (const auto &[key1, key2, value] : io_control_inputs.getAll())
+    for (size_t i = 0; i < io_control_inputs.size(); ++i)
     {
-        if (key2.isEmpty())
+        for (const auto &[key1, key2, value] : io_control_inputs[i].getAll())
         {
-            continue;
-        }
+            if (key2.isEmpty())
+            {
+                continue;
+            }
 
-        if ((node == key2) || node.endsWith(key2))
-        {
-            out = value;
-            return true;
+            if ((node == key2) || node.endsWith(key2))
+            {
+                out = value;
+                return true;
+            }
         }
     }
 
@@ -180,21 +214,21 @@ void IOController::mouseProcessTumbler(io_control_input_t input,
                                        uint32_t button,
                                        bool is_pressed)
 {
-    auto io_ctrl = io_control_inputs.getByKey1(input.id);
+    auto io_ctrl = io_control_inputs[input.cabine_idx].getByKey1(input.id);
 
     if (input.type == "Toggle")
     {
         if (button == IO_CTRL_LEFT_MOUSE_BUTTON && !input.toBool())
         {
             io_ctrl->value = 1.0f;
-            io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+            io_control_inputs[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
         }
 
         if (button == IO_CTRL_RIGHT_MOUSE_BUTTON && input.toBool())
         {
             io_ctrl->value = 0.0f;
-            io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+            io_control_inputs[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
         }
     }
@@ -207,7 +241,7 @@ void IOController::mouseProcessButton(io_control_input_t input,
                                       uint32_t button,
                                       bool is_pressed)
 {
-    auto io_ctrl = io_control_inputs.getByKey1(input.id);
+    auto io_ctrl = io_control_inputs[input.cabine_idx].getByKey1(input.id);
 
     if (is_pressed)
     {
@@ -216,7 +250,7 @@ void IOController::mouseProcessButton(io_control_input_t input,
             if (button == IO_CTRL_LEFT_MOUSE_BUTTON)
             {
                 io_ctrl->value = 1.0f;
-                io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+                io_control_inputs[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
                 emit sigSendVehicleControlCommand(io_ctrl->serialize());
             }
         }
@@ -228,7 +262,7 @@ void IOController::mouseProcessButton(io_control_input_t input,
             if (button == IO_CTRL_LEFT_MOUSE_BUTTON)
             {
                 io_ctrl->value = 0.0f;
-                io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+                io_control_inputs[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
                 emit sigSendVehicleControlCommand(io_ctrl->serialize());
             }
         }
@@ -284,11 +318,12 @@ bool IOController::checkModKey(const QString &modKeyName, const std::set<uint16_
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::processTumbler(const uint16_t &control_id,
+void IOController::processTumbler(size_t cab_idx,
+                                  const uint16_t &control_id,
                                   const std::set<uint16_t> &pressed_keys)
 {
     // Проверяем конкретный контрол
-    auto io_ctrl = io_control_inputs.getByKey1(control_id);
+    auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
 
     // Нажата ли его клавиша
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
@@ -300,7 +335,7 @@ void IOController::processTumbler(const uint16_t &control_id,
             {
                 // Просто инвертируем состояние тумблера
                 io_ctrl->value = 1.0f - io_ctrl->value;
-                io_control_inputs.updateByKey1(control_id, io_ctrl.value());
+                io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
                 emit sigSendVehicleControlCommand(io_ctrl->serialize());
                 return;
             }
@@ -310,7 +345,7 @@ void IOController::processTumbler(const uint16_t &control_id,
         if (checkModKey(io_ctrl->keyModOnName, pressed_keys))
         {
             io_ctrl->value = 1.0f;
-            io_control_inputs.updateByKey1(control_id, io_ctrl.value());
+            io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
             return;
         }
@@ -319,7 +354,7 @@ void IOController::processTumbler(const uint16_t &control_id,
         if (checkModKey(io_ctrl->keyModOffName, pressed_keys))
         {
             io_ctrl->value = 0.0f;
-            io_control_inputs.updateByKey1(control_id, io_ctrl.value());
+            io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
             return;
         }        
@@ -329,9 +364,11 @@ void IOController::processTumbler(const uint16_t &control_id,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::processButton(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys)
+void IOController::processButton(size_t cab_idx,
+                                 const uint16_t &control_id,
+                                 const std::set<uint16_t> &pressed_keys)
 {
-    auto io_ctrl = io_control_inputs.getByKey1(control_id);
+    auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
 
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
@@ -345,7 +382,7 @@ void IOController::processButton(const uint16_t &control_id, const std::set<uint
         io_ctrl->value = 0.0f;
     }
 
-    io_control_inputs.updateByKey1(control_id, io_ctrl.value());
+    io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
     emit sigSendVehicleControlCommand(io_ctrl->serialize());
 }
 

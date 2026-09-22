@@ -49,7 +49,7 @@ protected:
 
     /// Здесь обеспечивается доступ к значению сигнала контрола
     /// как по коду нажатой кавиши, так и по имени объекта, кликнутого мышью
-    DualKeyHash<uint16_t, QString, io_control_input_t> io_control_inputs;    
+    std::vector<DualKeyHash<uint16_t, QString, io_control_input_t>> io_control_inputs;
 
     /// Обработка управления с клавиатуры в кастомных модулях
     virtual void keysProcess(std::set<uint16_t> &pressed_keys);
@@ -58,10 +58,10 @@ protected:
     virtual void processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed);
 
     /// Обработка контрола типа "тумблер" (с фиксацией)
-    void processTumbler(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
+    void processTumbler(size_t cab_idx, const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
 
     /// Обработка контрола типа "кнопка" (без фиксации)
-    void processButton(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
+    void processButton(size_t cab_idx, const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
 
     /// Обработка мышки на контроле типа "тумблер"
     void mouseProcessTumbler(io_control_input_t input, uint32_t button, bool is_pressed);
