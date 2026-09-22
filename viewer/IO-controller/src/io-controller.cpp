@@ -113,9 +113,12 @@ bool IOController::load_config(CfgReader &cfg)
         cfg.getInt(secNode, "ID", control_ID);
         ic_input.id = static_cast<uint16_t>(control_ID);
 
-        double value = 0.0;
-        cfg.getDouble(secNode, "value", value);
-        ic_input.value = static_cast<float>(value);
+        double value1 = 0.0;
+        cfg.getDouble(secNode, "value1", value1);
+        double value2 = 0.0;
+        cfg.getDouble(secNode, "value2", value2);
+        ic_input.value = static_cast<float>(value1);
+        ic_input.value2 = static_cast<float>(value2);
 
         QString keyName = "";
         cfg.getString(secNode, "KeyName", keyName);

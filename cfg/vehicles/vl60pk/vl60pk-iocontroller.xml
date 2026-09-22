@@ -11,7 +11,8 @@
 		<Name>Токоприемники</Name>
 		<Description>Включение цепей управления токоприемниками</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_U</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -25,7 +26,8 @@
 		<Name>Токоприемник передний</Name>
 		<Description>Поднять передний токоприемник</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_I</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -39,7 +41,8 @@
 		<Name>Токоприемник задний</Name>
 		<Description>Поднять задний токоприемник</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_O</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -53,7 +56,8 @@
 		<Name>Включение ГВ</Name>
 		<Description>Включить цепи управление ГВ</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_P</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -67,7 +71,8 @@
 		<Name>Возврат защиты ГВ</Name>
 		<Description>Восстановление защиты</Description>
 		<Type>Button</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_P</KeyName>
 		<KeyModOnName>Alt</KeyModOnName>		
 		<ObjectNameCab1>Cab1_Tumbler_GVon</ObjectNameCab1>
@@ -80,7 +85,8 @@
 		<Name>Фазорасщепитель</Name>
 		<Description>Запуск ращепителя фаз</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_T</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -94,7 +100,8 @@
 		<Name>Компрессор</Name>
 		<Description>Запуск мотор-компрессора</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_7</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -108,7 +115,8 @@
 		<Name>Вентилятор 1</Name>
 		<Description>Запуск мотор-вентилятора 1</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_1</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -122,7 +130,8 @@
 		<Name>Вентилятор 2</Name>
 		<Description>Запуск мотор-вентилятора 2</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_2</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -136,7 +145,8 @@
 		<Name>Вентилятор 3</Name>
 		<Description>Запуск мотор-вентилятора 3</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_3</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -150,7 +160,8 @@
 		<Name>Вентилятор 4</Name>
 		<Description>Запуск мотор-вентилятора 4</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_4</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -164,7 +175,8 @@
 		<Name>Вентилятор 5</Name>
 		<Description>Запуск мотор-вентилятора 5</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_5</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -178,7 +190,8 @@
 		<Name>Вентилятор 6</Name>
 		<Description>Запуск мотор-вентилятора 6</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_6</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -192,7 +205,8 @@
 		<Name>Цепи управления</Name>
 		<Description>Включение цепей управления КМ</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_Y</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -206,7 +220,8 @@
 		<Name>Прожектор яркий</Name>
 		<Description>Включение яркого света прожектора</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_H</KeyName>
 		<KeyModOnName>Alt</KeyModOnName>		
 		<ObjectNameCab1>Cab1_Tumbler_PRG2</ObjectNameCab1>
@@ -219,7 +234,8 @@
 		<Name>Прожектор тусклый</Name>
 		<Description>Включение прожектора (тускло)</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_H</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -233,7 +249,8 @@
 		<Name>Освещение кабины тусклое</Name>
 		<Description>Включение освещения кабины</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_K</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -247,7 +264,8 @@
 		<Name>Освещение кабины яркое</Name>
 		<Description>Включение яркого освещения в кабине</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_K</KeyName>
 		<KeyModOnName>Alt</KeyModOnName>
 		<KeyModOffName>Alt</KeyModOffName>
@@ -261,7 +279,8 @@
 		<Name>Освещение приборов</Name>
 		<Description>Включение подсветки приборов</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_L</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -275,7 +294,8 @@
 		<Name>Фонарь буферный левый</Name>
 		<Description>Включение левого буферного фонаря (БФ)</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_G</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -289,7 +309,8 @@
 		<Name>Фонарь буферный правый</Name>
 		<Description>Включение правого буферного фонаря (БФ)</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_J</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -303,7 +324,8 @@
 		<Name>Цвет буфера левый</Name>
 		<Description>Переключение красного/белого цвета левого БФ</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_G</KeyName>
 		<KeyModOnName>Alt</KeyModOnName>		
 		<ObjectNameCab1>Cab1_Tumbl_BF-color_L</ObjectNameCab1>
@@ -316,7 +338,8 @@
 		<Name>Цвет буфера правый</Name>
 		<Description>Переключение красного/белого цвета правого БФ</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_J</KeyName>
 		<KeyModOnName>Alt</KeyModOnName>		
 		<ObjectNameCab1>Cab1_Tumbl_BF-color_R</ObjectNameCab1>
@@ -329,7 +352,8 @@
 		<Name>ЭПТ</Name>
 		<Description>Включение питания ЭПТ</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_V</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -343,7 +367,8 @@
 		<Name>Реверсивный вал</Name>
 		<Description>Извлечь/вставить реверсивную рукоятку</Description>
 		<Type>Toggle</Type>
-		<value>0.0</value>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
 		<KeyName>KEY_W</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>

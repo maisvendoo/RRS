@@ -19,6 +19,8 @@ struct io_control_input_t
     uint16_t id = 0;
     /// Значение управляющего сигнала
     float value = 0.0f;
+    /// Дополнительное значение
+    float value2 = 0.0f;
 
     /// Код назначенной клавиши
     uint16_t keyCode = 0;
