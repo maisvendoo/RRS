@@ -400,6 +400,10 @@ private:
     /// Default configuration load
     void loadConfiguration(QString cfg_path);
 
+    /// Инициализация области памяти состояния органов управления
+    /// исходя из конфигурации IOController-а
+    void initControlInputs(const QString &fg_path, const QString &io_ctrl_config);
+
     /// Load main resistence coefficients
     void loadMainResist(QString cfg_path, QString main_resist_cfg);
     /// Load wheel-rail friction coefficients
