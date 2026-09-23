@@ -64,6 +64,10 @@ public:
     /// (моментальные кнопки: удержание мыши = удержание кнопки)
     void mouseRelease(const QString &object_name);
 
+    /// Обработка мышиного ввода (точка входа апстримного MouseControlHandler:
+    /// press/release семантика + кастомный хук processMouseInput)
+    void mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed);
+
 signals:
 
     void sigSendVehicleControlCommand(const QByteArray &data);
@@ -79,6 +83,11 @@ protected:
 
     /// Сигналы управляемой ПЕ (обновляются VehiclesHandler-ом)
     const std::vector<float> *vehicle_signals = nullptr;
+
+    /// Фильтр кабины при загрузке конфига: -1 - все записи, иначе
+    /// только своя кабина. Один контроллер обслуживает одну кабину,
+    /// общий xml читают оба (имена мешей кабин различаются)
+    int cabine_filter = -1;
 
     enum ControlType
     {
@@ -103,6 +112,15 @@ protected:
     /// удержание клавиши - нажата, отпускание - отпущена
     void processButton(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
 
+    /// Обработка мышки на контроле типа "тумблер" (пресс-релиз семантика)
+    void mouseProcessTumbler(io_control_input_t input, uint32_t button, bool is_pressed);
+
+    /// Обработка мышки на контроле типа "кнопка" (пресс-релиз семантика)
+    void mouseProcessButton(io_control_input_t input, uint32_t button, bool is_pressed);
+
+    /// Обработка управления мышью в кастомных модулях
+    virtual void processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed);
+
     /// Проверка модификатора по имени из конфига ("Shift", "Control", "Alt")
     bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
 
@@ -126,6 +144,10 @@ private:
 
     /// Обработка управления
     void processControl(const ControlType &ctrl_type);
+
+    /// Сформировать строку с подсказкой горячей клавиши
+    void getHotkeysString(const QString &keyName, io_control_input_t &ic_input);
+    void getUsageString(io_control_input_t &ic_input);
 };
 
 #endif

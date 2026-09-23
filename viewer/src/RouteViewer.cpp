@@ -28,6 +28,7 @@
 #include "graphics/particles.h"
 #include "graphics/postprocess.h"
 #include "graphics/shader_funcs.h"
+#include "MouseControlHandler.h"
 
 #include <vsg/app/CloseHandler.h>
 #include <vsg/app/Viewer.h>
@@ -1926,6 +1927,11 @@ void RouteViewer::initViewer()
     cab_mouse_handler = CabMouseHandler::create(camera, keyboard,
                                                 vehicles_handler.get());
 
+    // Апстримный обработчик press/release-семантики (дополняет клики)
+    mouse_control_handler = MouseControlHandler::create(camera,
+                                                        keyboard,
+                                                        vehicles_handler.get());
+
     upd_viewer_handler = UpdateViewerHandler::create(
         upd_server_control,
         camera,
@@ -1952,6 +1958,7 @@ void RouteViewer::initViewer()
 
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
     viewer->addEventHandler(cab_mouse_handler);
+    viewer->addEventHandler(mouse_control_handler);
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
     viewer->addEventHandler(upd_sound_manager_handler);
@@ -2400,7 +2407,8 @@ void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
     LOG_INFO("RouteViewer: Curr. vehicle %d cabine %d IOControllers count: %d", newIndex, cab_idx, vehicle->io_controls.size());
 
     // Есть ли у ПЕ собственный IOController
-    if (!vehicle->io_controls.empty() && vehicle->io_controls[cab_idx])
+    if (!vehicle->io_controls.empty() && cab_idx < vehicle->io_controls.size()
+        && vehicle->io_controls[cab_idx])
     {
         // Активируем контроллер в маршрутизаторе
         input_route_handler->setActiveController(vehicle->io_controls[cab_idx]);

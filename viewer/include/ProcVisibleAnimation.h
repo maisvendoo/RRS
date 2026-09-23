@@ -1,4 +1,4 @@
-#ifndef PROC_VISIBLE_ANIMATION_H
+﻿#ifndef PROC_VISIBLE_ANIMATION_H
 #define PROC_VISIBLE_ANIMATION_H
 
 #include "ProcAnimation.h"

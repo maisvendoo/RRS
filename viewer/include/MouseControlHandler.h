@@ -16,6 +16,26 @@ class   VehiclesHandler;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+struct ControlTooltip
+{
+    bool is_active = false;
+    float x = 0.0f;
+    float y = 0.0f;
+    QString title = "";
+    QString description = "";
+    QString state = "";
+    QString hot_keys = "";
+    QString usage = "";
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+ControlTooltip &getControlTooltip();
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 class MouseControlHandler : public vsg::Inherit<vsg::Visitor, MouseControlHandler>
 {
 public:
@@ -34,6 +54,10 @@ public:
 
     void apply(vsg::ButtonReleaseEvent &buttonRelease) override;
 
+    void apply(vsg::KeyPressEvent &keyPress) override;
+
+    void apply(vsg::KeyReleaseEvent &keyRelease) override;
+
 private:
 
     vsg::ref_ptr<vsg::Camera> _camera;
@@ -44,7 +68,15 @@ private:
     float _pointer_y = -1.0f;
     bool _pointer_valid = false;
 
+    bool is_Alt_pressed = false;
+
     std::string _last_hit_object = "";
+
+    bool pickControl(int x, int y,
+                     IOController *&io_ctrl,
+                     io_control_input_t& input);
+
+    void updateTooltip();
 };
 
 #endif

@@ -49,6 +49,47 @@ void IOController::step(float t, float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void IOController::getHotkeysString(const QString &keyName, io_control_input_t &ic_input)
+{
+    if (!keyName.isEmpty())
+    {
+        ic_input.hot_keys = "Клавиши: ";
+
+        if (!ic_input.keyModOnName.isEmpty())
+        {
+            ic_input.hot_keys += ic_input.keyModOnName + "+" + keyName.mid(4);
+        }
+
+        if (!ic_input.keyModOffName.isEmpty() && ic_input.keyModOnName != ic_input.keyModOffName)
+        {
+            ic_input.hot_keys += " | " + ic_input.keyModOffName + "+" + keyName.mid(4);
+        }
+    }
+    else
+    {
+        ic_input.hot_keys = QString();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::getUsageString(io_control_input_t &ic_input)
+{
+    if (ic_input.type == "Toggle")
+    {
+        ic_input.usage = "Вкл.: ЛКМ | Выкл: ПКМ";
+    }
+
+    if (ic_input.type == "Button")
+    {
+        ic_input.usage = "Нажать: ЛКМ";
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool IOController::load_config(CfgReader &cfg)
 {
     auto secNode = cfg.getFirstSection("Control");
@@ -57,13 +98,25 @@ bool IOController::load_config(CfgReader &cfg)
     {
         io_control_input_t ic_input;
 
+        cfg.getString(secNode, "Name", ic_input.name);
+        cfg.getString(secNode, "Type", ic_input.type);
+
+        getUsageString(ic_input);
+
+        cfg.getString(secNode, "Description", ic_input.description);
+
         int control_ID = 0;
         cfg.getInt(secNode, "ID", control_ID);
         ic_input.id = static_cast<uint16_t>(control_ID);
 
-        double value = 0.0;
+        double value1 = 0.0;
+        cfg.getDouble(secNode, "value1", value1);
+        double value2 = 0.0;
+        cfg.getDouble(secNode, "value2", value2);
+
+        // Старый формат (cabine*.xml): одиночное начальное значение
+        double value = value1;
         cfg.getDouble(secNode, "value", value);
-        ic_input.value = static_cast<float>(value);
 
         QString keyName = "";
         cfg.getString(secNode, "KeyName", keyName);
@@ -73,12 +126,14 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "KeyModOffName", ic_input.keyModOffName);
 
-        cfg.getString(secNode, "ObjectName", ic_input.contolledObjectName);
+        if (ic_input.keyModOffName.isEmpty())
+        {
+            ic_input.keyModOffName = ic_input.keyModOnName;
+        }
+
+        getHotkeysString(keyName, ic_input);
 
         // Метаданные органа: подсказка и семантика клика мышью
-        cfg.getString(secNode, "Name", ic_input.name);
-        cfg.getString(secNode, "Type", ic_input.type);
-
         int signal_id = -1;
         if (cfg.getInt(secNode, "SignalID", signal_id))
         {
@@ -94,7 +149,36 @@ bool IOController::load_config(CfgReader &cfg)
         cfg.getString(secNode, "StateMode", ic_input.state_mode);
         cfg.getString(secNode, "StateNames", ic_input.state_names);
 
-        io_control_inputs.insert(ic_input.id, ic_input.contolledObjectName, ic_input);
+        // Один контроллер обслуживает одну кабину, общий xml читают
+        // оба: в хэш попадает только своя кабина (имена мешей кабин
+        // различаются, коллизий внутри хэша нет, но фильтр страхует
+        // от дублей id). Общее имя без суффикса кабины забирают все.
+        QString object_name = "";
+        cfg.getString(secNode, "ObjectName", object_name);
+
+        QString object_name_cab1 = "";
+        cfg.getString(secNode, "ObjectNameCab1", object_name_cab1);
+
+        QString object_name_cab2 = "";
+        cfg.getString(secNode, "ObjectNameCab2", object_name_cab2);
+
+        auto insert_for_cab = [&](const QString &mesh_name, int cab, float init_value)
+        {
+            if (mesh_name.isEmpty())
+                return;
+
+            if ((cabine_filter >= 0) && (cabine_filter != cab))
+                return;
+
+            ic_input.cabine_idx = cab;
+            ic_input.contolledObjectName = mesh_name;
+            ic_input.value = init_value;
+            io_control_inputs.insert(ic_input.id, mesh_name, ic_input);
+        };
+
+        insert_for_cab(object_name, 0, static_cast<float>(value));
+        insert_for_cab(object_name_cab1, 0, static_cast<float>(value1));
+        insert_for_cab(object_name_cab2, 1, static_cast<float>(value2));
 
         secNode = cfg.getNextSection();
     }
@@ -107,6 +191,8 @@ bool IOController::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 void IOController::setCabineIndex(int vehicle_idx, int cab_idx)
 {
+    cabine_filter = cab_idx;
+
     for (auto &[key1, key2, value] : io_control_inputs.getAll())
     {
         value.controlled_vehicle_idx = vehicle_idx;
@@ -209,6 +295,87 @@ void IOController::mouseClick(const QString &object_name, int button)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void IOController::mouseProcessTumbler(io_control_input_t input,
+                                       uint32_t button,
+                                       bool is_pressed)
+{
+    auto io_ctrl = io_control_inputs.getByKey1(input.id);
+
+    if (!io_ctrl) return;
+
+    if (input.type == "Toggle")
+    {
+        if (button == IO_CTRL_LEFT_MOUSE_BUTTON && !input.toBool())
+        {
+            io_ctrl->value = 1.0f;
+            io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+        }
+
+        if (button == IO_CTRL_RIGHT_MOUSE_BUTTON && input.toBool())
+        {
+            io_ctrl->value = 0.0f;
+            io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+            emit sigSendVehicleControlCommand(io_ctrl->serialize());
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::mouseProcessButton(io_control_input_t input,
+                                      uint32_t button,
+                                      bool is_pressed)
+{
+    auto io_ctrl = io_control_inputs.getByKey1(input.id);
+
+    if (!io_ctrl) return;
+
+    if (is_pressed)
+    {
+        if (input.type == "Button")
+        {
+            if (button == IO_CTRL_LEFT_MOUSE_BUTTON)
+            {
+                io_ctrl->value = 1.0f;
+                io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+                emit sigSendVehicleControlCommand(io_ctrl->serialize());
+            }
+        }
+    }
+    else
+    {
+        if (input.type == "Button")
+        {
+            if (button == IO_CTRL_LEFT_MOUSE_BUTTON)
+            {
+                io_ctrl->value = 0.0f;
+                io_control_inputs.updateByKey1(input.id, io_ctrl.value());
+                emit sigSendVehicleControlCommand(io_ctrl->serialize());
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed)
+{
+    // Обработка контрола типа "тумблер"
+    mouseProcessTumbler(input, button, is_pressed);
+
+    // Обработка контрола типа "кнопка"
+    mouseProcessButton(input, button, is_pressed);
+
+    // Вызываем кастомную обработку мышеввода
+    processMouseInput(input, button, is_pressed);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::processSwitchBySignal(io_control_input_t &io_ctrl)
 {
     float cur = getVehicleSignal(io_ctrl.signal_id);
@@ -233,6 +400,16 @@ void IOController::processMouseControl(io_control_input_t &io_ctrl, int button)
     {
         processSwitchBySignal(io_ctrl);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed)
+{
+    (void) input;
+    (void) button;
+    (void) is_pressed;
 }
 
 //------------------------------------------------------------------------------
@@ -362,7 +539,6 @@ void IOController::processTumbler(const uint16_t &control_id,
             io_ctrl->value = 0.0f;
             io_control_inputs.updateByKey1(control_id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
-            return;
         }
     }
 }
@@ -453,9 +629,9 @@ void IOController::processControlPanelInput()
 //------------------------------------------------------------------------------
 void IOController::processControl(const ControlType &ctrl_type)
 {
-    // В зависиомсти от типа обрабатываемого управления, вызываем тот или иной
-    // метод обработки, видоизменяющий специфичные для данной ПЕ состяния органов управления.
-    // Вызывается один какой-то метода, в зависиомсти от того, откуда пришел
+    // В зависимости от типа обрабатываемого управления, вызываем тот или иной
+    // метод обработки, видоизменяющий специфичные для данной ПЕ состояния органов управления.
+    // Вызывается один какой-то метода, в зависимости от того, откуда пришел
     // управляющий сигнал
     switch (ctrl_type)
     {

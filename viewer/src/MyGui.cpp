@@ -14,6 +14,7 @@
 #include "UpdateViewerHandler.h"
 #include "StationsHandler.h"
 #include "TrainLabelsHandler.h"
+#include "MouseControlHandler.h"
 #include <tcp-client.h>
 
 #include <vsg/io/Options.h>
@@ -294,6 +295,8 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     {
         showPauseState();
     }
+
+    showControlTooltip();
 }
 
 //------------------------------------------------------------------------------
@@ -1580,6 +1583,73 @@ void MyGui::showCabTooltip() const
     ImGui::End();
 }
 
+//
+//------------------------------------------------------------------------------
+void MyGui::showControlTooltip() const
+{
+    const ControlTooltip &tip = getControlTooltip();
+
+    if (!tip.is_active)
+    {
+        return;
+    }
+
+    const float pad = 12.0f;
+    const ImVec2 pos(tip.x + pad, tip.y + pad);
+
+    ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
+    ImGui::SetNextWindowBgAlpha(0.85f);
+
+    const int flags = ImGuiWindowFlags_NoTitleBar |
+                      ImGuiWindowFlags_NoResize |
+                      ImGuiWindowFlags_NoMove |
+                      ImGuiWindowFlags_NoCollapse |
+                      ImGuiWindowFlags_AlwaysAutoResize |
+                      ImGuiWindowFlags_NoSavedSettings |
+                      ImGuiWindowFlags_NoNav |
+                      ImGuiWindowFlags_NoFocusOnAppearing;
+
+    if (ImGui::Begin("##cab_tooltip", nullptr, flags))
+    {
+        // Заголовок выравнивается по центру окна подсказки
+        const std::string title = tip.title.toStdString();
+        const float title_w = ImGui::CalcTextSize(title.c_str()).x;
+        const float avail_w = ImGui::GetContentRegionAvail().x;
+        if (avail_w > title_w)
+        {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (avail_w - title_w) * 0.5f);
+        }
+
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.85f, 0.4f, 1.0f));
+        ImGui::TextUnformatted(title.c_str());
+        ImGui::PopStyleColor();
+
+        if (!tip.description.isEmpty())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::TextUnformatted(tip.description.toStdString().c_str());
+            ImGui::PopStyleColor();
+        }
+
+        if (!tip.usage.isEmpty())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::TextUnformatted(tip.usage.toStdString().c_str());
+            ImGui::PopStyleColor();
+        }
+
+        if (!tip.hot_keys.isEmpty())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::TextUnformatted(tip.hot_keys.toStdString().c_str());
+            ImGui::PopStyleColor();
+        }
+    }
+
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 float MyGui::hudTopOffset() const

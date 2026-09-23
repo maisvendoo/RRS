@@ -8,9 +8,6 @@
 //------------------------------------------------------------------------------
 AirDist483::AirDist483() : AirDistributor ()
 {
-    k.fill(0.0);
-    A.fill(0.0);
-    p.fill(0.0);
 }
 
 //------------------------------------------------------------------------------
@@ -31,7 +28,6 @@ void AirDist483::init(double pBP, double pFL)
 //------------------------------------------------------------------------------
 QString AirDist483::getDebugMsg() const
 {
-    is_upd = false;
     return DebugMsg;
 }
 #endif
@@ -48,7 +44,7 @@ void AirDist483::load_config(CfgReader &cfg)
     cfg.getInt(secName, "switchPayload", switchPayload);
 
     // Объёмы камер
-    for (size_t i = 0; i < v.size(); ++i)
+    for (size_t i = 0; i < NUM_VOLUMES; ++i)
     {
         double tmp = 0.0;
         QString coeff = QString("v%1").arg(i);
@@ -58,17 +54,17 @@ void AirDist483::load_config(CfgReader &cfg)
     }
 
     // Коэффициенты
-    for (size_t i = 0; i < k.size(); ++i)
+    for (size_t i = 0; i < NUM_COEFFS; ++i)
     {
         QString coeff = QString("k%1").arg(i);
         cfg.getDouble(secName, coeff, k[i]);
     }
-    for (size_t i = 0; i < p.size(); ++i)
+    for (size_t i = 0; i < NUM_PRESSURES; ++i)
     {
         QString coeff = QString("p%1").arg(i);
         cfg.getDouble(secName, coeff, p[i]);
     }
-    for (size_t i = 0; i < A.size(); ++i)
+    for (size_t i = 0; i < NUM_SENSIVITY_COEFFS; ++i)
     {
         QString coeff = QString("A%1").arg(i);
         cfg.getDouble(secName, coeff, A[i]);
@@ -82,70 +78,101 @@ void AirDist483::preStep(state_vector_t &Y, double t)
 {
     (void) t;
 
-    // Y[0] - Давление в рабочей камере (РК)
-    // Y[1] - Давление в золотниковой камере (ЗК)
-    // Y[2] - Давление в каналах дополнительной разрядки (КДР)
-
     // Условное положение диафрагмы - разница давлений в МК и ЗК
-    double poz_d = pBP - Y[ZK];
+    const double poz_d = pBP - Y[ZK];
     // Условное положение главного поршня - разница давлений в РК и ЗК
-    double poz_gp = Y[RK] - Y[ZK];
+    const double poz_gp = Y[RK] - Y[ZK];
 
     // Расчёт перетоков воздуха между разными элементами воздухораспределителя
 
     // Зарядка/отпуск, взаимодействие камер
     // Расход воздуха из ТМ в ЗР через обратный клапан
-    double Q_bp_sr = k[0] * std::clamp((pBP - pSR), 0.0, A[0]);
+    const double Q_bp_sr =   std::clamp(A[A_SR_REFILL] * (pBP - pSR), 0.0, 1.0)
+                           * k[K_SR_REFILL];
     // Расход воздуха между МК и ЗК через плунжер
-    double Q_mk_zk_pl = k[1] * hs_p(poz_d - p[2]) * min((pBP - Y[ZK]), A[1]);
+    const double Q_mk_zk_pl =   hs_p(poz_d - p[P_MK_ZK_PLUNGER])
+                              * std::clamp(A[A_PLUNGER] * (pBP - Y[ZK]), -1.0, 1.0)
+                              * (k[K_PLUNGER] + k[K_MK_PLUNGER]);
     // Расход воздуха между МК и ЗК через клапан мягкости
-    double Q_mk_zk_km = k[2] * hs_p(Y[ZK] - Y[KDR] - p[0]) * std::clamp((pBP - Y[ZK]), -A[2], A[2]);
+    const double Q_mk_zk_km =   hs_p(Y[ZK] - Y[KDR] - p[P_SOFTNESS])
+                              * std::clamp(A[A_SOFTNESS] * (pBP - Y[ZK]), -1.0, 1.0)
+                              * k[K_SOFTNESS];
     // Расход воздуха между ЗК и РК через корпус главного поршня
-    double Q_zk_rk_gp = k[3] * hs_n(poz_gp - p[10]) * (Y[ZK] - Y[RK]);
-    // Коэффициент через отжатую диафрагму режима профиля пути в равнинном режиме
-    double profile_d_coeff = k[4] * static_cast<double>(switchProfile) * hs_p(Y[RK] - p[1]);
+    const double Q_zk_rk_gp =   hs_n(poz_gp - p[P_RK_ZK_SHUTOFF])
+                              * (Y[ZK] - Y[RK])
+                              * k[K_SIDE_HOLE];
+    // Отжатие диафрагмы режима профиля пути в равнинном режиме
+    const double is_flat = static_cast<double>(switchProfile) * hs_p(Y[RK] - p[P_RK_PROFILE]);
     // Расход воздуха между ЗК и РК через плунжер и диафрагму режима профиля пути
-    double Q_zk_rk_pd = profile_d_coeff * hs_p(poz_d - p[3]) * (Y[ZK] - Y[RK]);
+    const double Q_zk_rk_pd =   is_flat * hs_p(poz_d - p[P_ZK_RK_PLUNGER])
+                              * std::clamp(A[A_PLUNGER] * (Y[ZK] - Y[RK]), -1.0, 1.0)
+                              * k[K_RK_PROFILE];
     // Расход воздуха между МК и РК через плунжер и диафрагму режима профиля пути
-    double Q_mk_rk_pd = profile_d_coeff * hs_p(poz_d - p[2]) * (pBP - Y[RK]);
+    const double Q_mk_rk_pd =   is_flat * hs_p(poz_d - p[P_MK_ZK_PLUNGER])
+                              * std::clamp(A[A_PLUNGER] * (pBP - Y[RK]), -1.0, 1.0)
+                              * (k[K_RK_PROFILE] + k[K_MK_PLUNGER]);
 
     // Торможение
     // Расход воздуха из ЗК в КДР при мягкой разрядке через плунжер
-    // Условно считаем поток через промежуточную камеру
-    // с клапаном доп. разрядки МК, с давлением, близким к МК(ТМ)
-    double Q_zk_kdr_pl = k[1] * std::clamp(A[3] * (p[4] - poz_d), 0.0, 1.0) * (Y[ZK] - pBP);
+    // Условно считаем поток в промежуточную камеру с клапаном доп. разрядки МК
+    // с давлением, близким к давлению МК (к давлению ТМ)
+    const double Q_zk_kdr_pl =   std::clamp(A[A_ZK_DISCHARGE] * (p[P_ZK_DISCHARGE] - poz_d), 0.0, 1.0)
+                               * (Y[ZK] - pBP)
+                               * k[K_PLUNGER];
     // Расход воздуха из МК в КДР при дополнительной разрядке
-    double Q_mk_kdr_dop = k[5] * hs_p(p[5] - poz_d) * std::clamp(A[4] * (pBP - Y[KDR] - p[8]), 0.0, 1.0) * (pBP - Y[KDR]);
+    const double Q_mk_kdr_dop =   hs_p(p[P_MK_DISCHARGE] - poz_d)
+                                * std::clamp(A[A_MK_DISCHARGE] * (pBP - Y[KDR] - p[P_MK_KDR_EXTRA]), 0.0, 1.0)
+                                * (pBP - Y[KDR])
+                                * k[K_MK_DISCHARGE];
     // Расход воздуха из ЗК в КДР при дополнительной разрядке
-    // TODO // настроить доп.разрядку ЗК более быстрой и непрерывной
-    // TODO // до возвращения диафрагмы в перекрышу доп.разрядки ТМ,
-    // TODO // т.е. реализовать остановку дутья при несрабатывании на торможение
-    // TODO // не критично, поскольку несрабатывание не реализовано
-    double Q_zk_kdr_dop = k[6] * std::clamp(A[5] * (p[7] - poz_d), 0.0, 1.0) * (Y[ZK] - Y[KDR]);
+    const double Q_zk_kdr_dop =   std::clamp(A[A_ZK_KDR_EXTRA] * (p[P_ZK_KDR_EXTRA] - poz_d), 0.0, 1.0)
+                                * (Y[ZK] - Y[KDR])
+                                * k[K_ZK_KDR_EXTRA];
     // Расход воздуха из КДР в ТЦ
-    double Q_kdr_bc = k[7] * hs_p(p[11] - poz_gp) * (Y[KDR] - pBC);
+    const double Q_kdr_bc =   hs_p(p[P_BC_FILL_BEGIN] - poz_gp)
+                            * (Y[KDR] - pBC)
+                            * k[K_BC_PREFILL];
     // Расход воздуха из КДР в атмосферу через осевой канал уравнительного поршня
-    double Q_kdr_atm = k[8] * hs_p(p[11] - poz_gp) * Y[KDR];
+    const double Q_kdr_atm =   hs_p(p[P_BC_FILL_BEGIN] - poz_gp)
+                             * Y[KDR]
+                             * k[K_BC_DISCHARGE];
     // Расход воздуха из КДР в атмосферу дополнительно через атмосферный клапан
-    double Q_kdr_atm_dop = k[9] * std::clamp(A[6] * (pf(p[6] - poz_d) + pf(Y[KDR] - p[9])), 0.0, 1.0) * Y[KDR];
+    const double Q_kdr_atm_dop =   std::min(A[A_KDR_DISCHARGE] * (pf(p[P_KDR_DISCHARGE] - poz_d) + pf(Y[KDR] - p[P_KDR_EXTRA])), 1.0)
+                                 * Y[KDR]
+                                 * k[K_KDR_EXTRA];
 
     // Уравнительный поршень
     // Относительное положение уравнительного поршня (равновесное главному поршню)
-    double poz_up = std::clamp((poz_gp - p[11]) / (p[13] - p[11]), 0.0, 1.0);
+    const double poz_up = std::clamp((poz_gp - p[P_BC_FILL_BEGIN]) / (p[P_BC_FILL_MAX] - p[P_BC_FILL_BEGIN]), 0.0, 1.0);
+    // Относительное положение уравнительного поршня к переключателю гружёного режима
+    const double poz_up_g = pf(poz_up - (1 - static_cast<double>(switchPayload) / 2.0));
     // Эквивалентное давление на уравнительный поршень от усилия основной пружины
-    double pUP = p[14] + (p[15] - p[14]) * poz_up;
+    const double pUP =   p[P_SPRING_MAIN_BEGIN]
+                       + poz_up * (p[P_SPRING_MAIN_MAX] - p[P_SPRING_MAIN_BEGIN]);
     // Эквивалентное давление на уравнительный поршень от усилия пружины гружёного режима
-    double pUP_g = pf( p[16] + (p[17] - p[16]) * (poz_up - (1 - static_cast<double>(switchPayload) / 2.0)) );
+    const double pUP_g =   p[P_SPRING_LOAD_BEGIN]
+                         + poz_up_g * (p[P_SPRING_LOAD_MAX] - p[P_SPRING_LOAD_BEGIN]);
 
     // Взаимодействие с ТЦ
     // Разница давления в ТЦ и усилий от пружин уравнительного поршня
-    double d_pBC = pUP + pUP_g - pBC;
-    // Расход воздуха из ЗР в ТЦ при быстром наполнении
-    double Q_sr_bc_fast = k[10] * std::clamp(A[7] * d_pBC, 0.0, 1.0) * hs_p(poz_gp - p[11]) * hs_n(poz_gp - p[12]) * (pSR - pBC);
-    // Расход воздуха из ЗР в ТЦ при медленном наполнении
-    double Q_sr_bc_slow = k[11] * std::clamp(A[7] * d_pBC, 0.0, 1.0) * hs_p(poz_gp - p[12]) * (pSR - pBC);
+    const double d_pBC = pUP + pUP_g - pBC;
+    // Уравнительный поршень открывает тормозной клапан
+    const double d_pBC_fill = std::clamp(A[A_DIFF_BC_FILL] * d_pBC, 0.0, 1.0);
+    // Уравнительный поршень открывает атмосферный осевой канал
+    const double d_pBC_empty = std::clamp(-A[A_DIFF_BC_EMPTY] * d_pBC, 0.0, 1.0);
+
     // Расход воздуха из ТЦ в атмосферу
-    double Q_bc_atm = k[8] * max( std::clamp(-A[8] * d_pBC, 0.0, 1.0), hs_n(poz_gp - p[11]) ) * pBC;
+    const double Q_bc_atm =   max( d_pBC_empty, hs_n(poz_gp - p[P_BC_FILL_BEGIN]) )
+                            * pBC
+                            * k[K_BC_DISCHARGE];
+    // Расход воздуха из ЗР в ТЦ при быстром наполнении
+    const double Q_sr_bc_fast =   d_pBC_fill * hs_p(poz_gp - p[P_BC_FILL_BEGIN]) * hs_n(poz_gp - p[P_BC_FILL_SLOW])
+                                * (pSR - pBC)
+                                * k[K_BC_FILL_FAST];
+    // Расход воздуха из ЗР в ТЦ при медленном наполнении
+    const double Q_sr_bc_slow =   d_pBC_fill * hs_p(poz_gp - p[P_BC_FILL_SLOW])
+                                * (pSR - pBC)
+                                * k[K_BC_FILL_SLOW];
 
     // Расход воздуха в РК
     Q[RK] = Q_zk_rk_gp + Q_zk_rk_pd + Q_mk_rk_pd;
@@ -161,11 +188,8 @@ void AirDist483::preStep(state_vector_t &Y, double t)
     QBP = - Q_bp_sr - Q_mk_zk_pl - Q_mk_zk_km - Q_mk_rk_pd - Q_mk_kdr_dop;
 
 #ifndef NDEBUG
-    if (is_upd)
-        return;
-
 //    QString("  time  ; pBP   ; pBC   ; pSR   ; pRK   ; pZK   ; pKDR  ; pBCref; BPsr   ; MKzk km; MKzk pl; ZKrk gp; ZKrk pd; MKrk pd; ZKkdr  ; ZKkdr d; MKkdr d; KDRbc  ; KDRatm ; KDRatmd; SRbc f ; SRbc s ; BCatm  ; poz d ; poz gp; poz up");
-    DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16;%17;%18;%19;%20;%21;%22;%23;%24;%25;26")
+    DebugMsg = QString("%1;%2;%3;%4;%5;%6;%7;%8;%9;%10;%11;%12;%13;%14;%15;%16;%17;%18;%19;%20;%21;%22;%23;%24;%25;%26")
                    .arg(t, 8, 'f', 3)
                    .arg(10*pBP, 7, 'f', 5)
                    .arg(10*pBC, 7, 'f', 5)              //%3
@@ -192,7 +216,6 @@ void AirDist483::preStep(state_vector_t &Y, double t)
                    .arg(poz_d, 7, 'f', 4)            //%24
                    .arg(poz_gp, 7, 'f', 4)
                    .arg(poz_up, 7, 'f', 4);
-    is_upd = true;
 #endif
 }
 

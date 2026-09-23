@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------
+﻿//------------------------------------------------------------------------------
 //
 //      Vehicle base class
 //      (c) maisvendoo, 03/09/2018
@@ -2469,6 +2469,11 @@ void Vehicle::loadConfiguration(QString cfg_path)
         cfg.getDouble("Damage", "BogieDamageThreshold", bogie_damage_threshold);
         cfg.getDouble("Damage", "DamageResistanceCoeff", damage_resist_coeff);
 
+        QString io_ctrl_config_name = "";
+        cfg.getString(secName, "IOControllerConfig", io_ctrl_config_name);
+
+        initControlInputs(cfg_path, io_ctrl_config_name);
+
         // User defined configuration load
         loadConfig(cfg_path);
     }
@@ -2477,7 +2482,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
         Journal::instance()->error("File " + cfg_path + " is't found");
     }
 
-    auto cabNode = cfg.getFirstSection("Cabine");
+    /*auto cabNode = cfg.getFirstSection("Cabine");
 
     QFileInfo cfgFileInfo(cfg_path);
     QString cfg_dir = cfgFileInfo.absolutePath();
@@ -2520,7 +2525,7 @@ void Vehicle::loadConfiguration(QString cfg_path)
         control_inputs.push_back(inputs);
 
         cabNode = cfg.getNextSection();
-    }
+    }*/
 
     Q_a.resize(s);
     Q_a.shrink_to_fit();
@@ -2572,6 +2577,75 @@ void Vehicle::updateWindLoad(double time_s)
             (1.0 - wind_gust_min) * std::sin(phase);
 
     lateral_dynamics.setWindLateralForce(force * gust, wind_app_height);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl_config)
+{
+    QFileInfo cfgFileInfo(сfg_path);
+    QString cfg_dir = cfgFileInfo.absolutePath();
+
+    QString io_ctrl_cfg_path = cfg_dir + QDir::separator() + io_ctrl_config + ".xml";
+
+    CfgReader cfg;
+
+    if (!cfg.load(io_ctrl_cfg_path))
+    {
+        Journal::instance()->error("File: " + io_ctrl_cfg_path + " not found");
+        return;
+    }
+
+    int cabs_num = 0;
+    cfg.getInt("Common", "CabinesNum", cabs_num);
+
+    for (int i = 0; i < cabs_num + 1; ++i)
+    {
+        QMap<int, float> inputs;
+        control_inputs.push_back(inputs);
+    }
+
+    auto secNode = cfg.getFirstSection("Control");
+
+    while (!secNode.isNull())
+    {
+        int id = 0;
+        cfg.getInt(secNode, "ID", id);
+
+        double value1 = 0.0;
+        cfg.getDouble(secNode, "value1", value1);
+
+        double value2 = 0.0;
+        cfg.getDouble(secNode, "value2", value2);
+
+        QString object_name = "";
+        cfg.getString(secNode, "ObjectName", object_name);
+
+        QString object_name_cab1 = "";
+        cfg.getString(secNode, "ObjectNameCab1", object_name_cab1);
+
+        QString object_name_cab2 = "";
+        cfg.getString(secNode, "ObjectNameCab2", object_name_cab2);
+
+        if (!object_name.isEmpty())
+        {
+            auto &inputs = *(control_inputs.end() - 1);
+            inputs.insert(id, value1);
+        }
+
+        if (!object_name_cab1.isEmpty() && cabs_num > 0)
+        {
+            control_inputs[0].insert(id, value1);
+        }
+
+        if (!object_name_cab2.isEmpty() && cabs_num > 1)
+        {
+            control_inputs[1].insert(id, value2);
+        }
+
+        secNode = cfg.getNextSection();
+    }
 }
 
 //------------------------------------------------------------------------------

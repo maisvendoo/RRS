@@ -28,10 +28,16 @@ struct io_control_input_t
     QString keyModOffName = "";
     /// Имя объекта в 3D-модели
     QString contolledObjectName = "";
-
-    /// Отображаемое имя органа управления (подсказка по Alt+наведению)
+    /// Имя контрола
     QString name = "";
+    /// Тип контрола
     QString type = "";
+    /// Описание контрола
+    QString description = "";
+    /// Использование контрола
+    QString usage = "";
+    /// Описание горячей клавиши
+    QString hot_keys = "";
     /// Сигнал ПЕ с текущим состоянием органа (для тултипа и
     /// вычисления целевого значения при клике мышью)
     int signal_id = -1;
@@ -74,6 +80,16 @@ struct io_control_input_t
     {
         return static_cast<bool>(value);
     }
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+enum
+{
+    IO_CTRL_LEFT_MOUSE_BUTTON = 1,
+    IO_CTRL_MIDDLE_MOUSE_BUTTON = 2,
+    IO_CTRL_RIGHT_MOUSE_BUTTON = 3,
 };
 
 #endif

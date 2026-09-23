@@ -1,6 +1,9 @@
 ﻿#include    <cmath>
 #include    <vl60pk.h>
 #include    <vl60-controls.h>
+#include    <kme-60-044.h>
+#include    <automatic-train-stop.h>
+#include    <pneumo-brake-lock.h>
 
 #include    "brake-crane.h"
 #include    "loco-crane.h"
@@ -172,6 +175,31 @@ void VL60pk::applyControlCommand(int cab_idx, int id, float value)
     case CTRL_CRANE_COMBINE:
         brake_lock[cab_idx]->setCombineCranePosition(
                     static_cast<int>(std::lround(value)));
+        return;
+
+    // Вставка/извлечение ключа ЭПК-150
+    case CTRL_EPK_INSERTION:
+        epk[cab_idx]->insertKey(value > 0.5f);
+        return;
+
+    // Поворот ключа ЭПК-150
+    case CTRL_KEY_EPK:
+        epk[cab_idx]->setKeyOn(value > 0.5f);
+        return;
+
+    // Вставка/извлечение рукоятки блокировки 367
+    case CTRL_LOCK_367_INSERTION:
+        brake_lock[cab_idx]->setStateOn(value > 0.5f);
+        brake_lock[cab_idx]->insertLockHandle(value > 0.5f);
+        return;
+
+    // Прожектор яркий/тусклый
+    case CTRL_TUMBLER_SPOT_HIGH:
+        state ? spotlight_high_tumbler[cab_idx].set() : spotlight_high_tumbler[cab_idx].reset();
+        return;
+
+    case CTRL_TUMBLER_SPOT_LOW:
+        state ? spotlight_low_tumbler[cab_idx].set() : spotlight_low_tumbler[cab_idx].reset();
         return;
 
     default:

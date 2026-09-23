@@ -1,4 +1,4 @@
-#include    <key-symbols.h>
+﻿#include    <key-symbols.h>
 #include    <vl60-iocontroller.h>
 #include    <vl60-controls.h>
 #include    <core/get_module.h>
@@ -50,6 +50,13 @@ void VL60IOController::processTumblers(const std::set<uint16_t> &pressed_keys)
     processTumbler(CTRL_TUMBLER_LIGHT_DEVICES, pressed_keys);
     processTumbler(CTRL_TUMBLER_BUFFLIGHT_L, pressed_keys);
     processTumbler(CTRL_TUMBLER_BUFFLIGHT_R, pressed_keys);
+    processTumbler(CTRL_TUMBLER_SPOT_HIGH, pressed_keys);
+    processTumbler(CTRL_TUMBLER_SPOT_LOW, pressed_keys);
+    processTumbler(CTRL_EPK_INSERTION, pressed_keys);
+    processTumbler(CTRL_LOCK_367_INSERTION, pressed_keys);
+    processTumbler(CTRL_KEY_EPK, pressed_keys);
+    processTumbler(CTRL_TUMBLER_BUFFCOLOR_L, pressed_keys);
+    processTumbler(CTRL_TUMBLER_BUFFCOLOR_R, pressed_keys);
 }
 
 //------------------------------------------------------------------------------

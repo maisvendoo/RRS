@@ -112,11 +112,14 @@ void CameraCabineManipulator::mouseMoveEvent(vsg::ButtonMask button_mask, vsg::d
         return;
     }
 
-    if (button_mask & moveButtonMask)
+    if (_keyboard->pressed(vsg::KEY_Shift_L) || _keyboard->pressed(vsg::KEY_Shift_R))
     {
-        const vsg::dvec3 move_delta(-delta.x, delta.y, 0.0);
-        move(move_delta * _cameraMoveCoeff * _settings.cabine_speed_mouse);
-        return;
+        if (button_mask & moveButtonMask)
+        {
+            const vsg::dvec3 move_delta(-delta.x, delta.y, 0.0);
+            move(move_delta * _cameraMoveCoeff * _settings.cabine_speed_mouse);
+            return;
+        }
     }
 
     if (button_mask & rotateButtonMask)
