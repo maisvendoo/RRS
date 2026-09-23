@@ -89,6 +89,9 @@ void VL60pk::stepControls(const double &t, const double &dt)
         bool is_epk_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_EPK_INSERTION]);
         epk[cab_idx]->insertKey(is_epk_insert);
 
+        bool is_key_epk_ON = static_cast<bool>(control_inputs[cab_idx][CTRL_KEY_EPK]);
+        epk[cab_idx]->setKeyOn(is_key_epk_ON);
+
         bool is_lock367_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_LOCK_367_INSERTION]);
         brake_lock[cab_idx]->setStateOn(is_lock367_insert);
         brake_lock[cab_idx]->insertLockHandle(is_lock367_insert);

@@ -404,4 +404,19 @@
 		<ObjectNameCab2>Cab2_Bl_367_Holder</ObjectNameCab2>
 	</Control>
 
+	<!-- Ключ ЭПК -->
+	<Control>
+		<ID>127</ID>
+		<Name>Ключ ЭПК</Name>
+		<Description>Включение ЭПК автостопа</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_N</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>		
+		<ObjectNameCab1>Cab1_Kluch_EPK</ObjectNameCab1>
+		<ObjectNameCab2>Cab1_Kluch_EPK</ObjectNameCab2>
+	</Control>
+
 </Config>

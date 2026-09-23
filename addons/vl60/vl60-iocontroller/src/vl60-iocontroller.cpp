@@ -70,8 +70,11 @@ void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
     // Установка и извление реверсивки
     processTumbler(cabine_idx, CTRL_REVERS_INSERTION, pressed_keys);
 
-    // Ключ ЭПК-150
+    // Извлечь/вставить ключ ЭПК-150
     processTumbler(cabine_idx, CTRL_EPK_INSERTION, pressed_keys);
+    // Поворот ключа ЭПК-150
+    processTumbler(cabine_idx, CTRL_KEY_EPK, pressed_keys);
+
     // Рукоятка блокировки 367
     processTumbler(cabine_idx, CTRL_LOCK_367_INSERTION, pressed_keys);
 }
