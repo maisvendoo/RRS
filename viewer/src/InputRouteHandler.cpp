@@ -146,12 +146,12 @@ void InputRouteHandler::processKeyForController(uint16_t keyBase, bool pressed)
     if (pressed)
     {
         m_activeIOController->setPressedKey(keyBase);
-        LOG_INFO("InputRouteHandler: Control key pressed 0x%04X", keyBase);
+        //LOG_INFO("InputRouteHandler: Control key pressed 0x%04X", keyBase);
     }
     else
     {
         m_activeIOController->setReleasedKey(keyBase);
-        LOG_INFO("InputRouteHandler: Control key released 0x%04X", keyBase);
+        //LOG_INFO("InputRouteHandler: Control key released 0x%04X", keyBase);
     }
 }
 

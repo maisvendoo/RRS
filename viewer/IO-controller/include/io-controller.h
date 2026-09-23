@@ -7,6 +7,7 @@
 #include    <set>
 
 #include    <dual-key-hash.h>
+#include    <QMap>
 
 class CfgReader;
 
@@ -52,6 +53,9 @@ protected:
     /// Массив нажатых клавиш
     std::set<uint16_t> _pressed_keys;
 
+    /// Массив лямбд для вызова идентификаторов
+    QMap<QString, std::function<bool(const std::set<uint16_t> &)>> isModifier;
+
     /// Здесь обеспечивается доступ к значению сигнала контрола
     /// как по коду нажатой кавиши, так и по имени объекта, кликнутого мышью
     std::vector<DualKeyHash<uint16_t, QString, io_control_input_t>> io_control_inputs;
@@ -79,6 +83,9 @@ protected:
     void mouseProcessButton(io_control_input_t input, uint32_t button, bool is_pressed);
 
 private:
+
+    std::map<uint16_t, bool> prev_key_state;
+    std::map<uint16_t, bool> prev_on_active_map;
 
     /// Проверка модификатора
     bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);

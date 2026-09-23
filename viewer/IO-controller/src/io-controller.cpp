@@ -7,7 +7,17 @@
 //------------------------------------------------------------------------------
 IOController::IOController(QObject *parent) : QObject(parent)
 {
+    isModifier["Shift"] = [](const std::set<uint16_t> &pressed_keys) {
+        return isShift(pressed_keys);
+    };
 
+    isModifier["Ctrl"] = [](const std::set<uint16_t> &pressed_keys) {
+        return isControl(pressed_keys);
+    };
+
+    isModifier["Alt"] = [](const std::set<uint16_t> &pressed_keys) {
+        return isAlt(pressed_keys);
+    };
 }
 
 //------------------------------------------------------------------------------
@@ -327,22 +337,35 @@ void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 bool IOController::checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys)
 {
-    if (modKeyName == "Shift")
+    QString modKeys = modKeyName;
+    modKeys.remove(QChar(' '));
+
+    if (modKeys.isEmpty())
     {
-        return isShift(pressed_keys);
+        return true;
     }
 
-    if (modKeyName == "Ctrl")
+    auto tokens = modKeys.split('+');
+
+    if (tokens.size() == 0)
     {
-        return isControl(pressed_keys);
+        return false;
     }
 
-    if (modKeyName == "Alt")
+    bool is_modkey_pressed = true;
+
+    for (const auto &token: tokens)
     {
-        return isAlt(pressed_keys);
+        bool found = isModifier.contains(token);
+        fprintf(stderr, "CHECKMOD: token='%s' found=%d\n",
+                token.toStdString().c_str(), found);
+
+        is_modkey_pressed = is_modkey_pressed && isModifier.value(token, [](const std::set<uint16_t> &){
+            return false;
+        })(pressed_keys);
     }
 
-    return false;
+    return is_modkey_pressed;
 }
 
 //------------------------------------------------------------------------------
@@ -354,22 +377,34 @@ void IOController::processTumbler(size_t cab_idx,
 {
     // Проверяем конкретный контрол
     auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
-
     if (!io_ctrl) return;
 
-    fprintf(stderr, "DBG processTumbler cab=%zu id=%u key_match=%d\n",
-            cab_idx, (unsigned)control_id,
-            getKeyState(pressed_keys, io_ctrl->keyCode));
+    bool current_key_state = getKeyState(pressed_keys, io_ctrl->keyCode);
+    bool &prev = prev_key_state[control_id];
+    bool &prev_on_active = prev_on_active_map[control_id];
 
-    // Нажата ли его клавиша
-    if (getKeyState(pressed_keys, io_ctrl->keyCode))
+    // Клавиша не нажата — сбрасываем флаги
+    if (!current_key_state)
     {
+        prev = false;
+        prev_on_active = false;
+        return;
+    }
+
+    bool current_on_active = checkModKey(io_ctrl->keyModOnName, pressed_keys);
+    bool current_off_active = checkModKey(io_ctrl->keyModOffName, pressed_keys);
+
+    // Фронт нажатия клавиши — срабатываем как обычно
+    if (!prev)
+    {
+        prev = true;
+
         // Модификаторы включения и отключения одинаковы
         if (io_ctrl->keyModOnName == io_ctrl->keyModOffName)
         {
-            if (checkModKey(io_ctrl->keyModOnName, pressed_keys))
+            if (current_on_active)
             {
-                // Просто инвертируем состояние тумблера
+                prev_on_active = true;
                 io_ctrl->value = 1.0f - io_ctrl->value;
                 io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
                 emit sigSendVehicleControlCommand(io_ctrl->serialize());
@@ -378,22 +413,54 @@ void IOController::processTumbler(size_t cab_idx,
         }
 
         // Нажат модификатор включения?
-        if (checkModKey(io_ctrl->keyModOnName, pressed_keys))
+        if (current_on_active)
         {
+            prev_on_active = true;
             io_ctrl->value = 1.0f;
             io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
             return;
         }
 
-        // Нажат модификатор выключения?
-        if (checkModKey(io_ctrl->keyModOffName, pressed_keys))
+        // Нажат модификатор отключения?
+        if (current_off_active)
         {
             io_ctrl->value = 0.0f;
             io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
             return;
-        }        
+        }
+
+        prev_on_active = false;
+        return;
+    }
+
+    // Клавиша уже была нажата — отслеживаем изменение модификаторов
+    // On-модификатор только что стал активен
+    if (current_on_active && !prev_on_active)
+    {
+        prev_on_active = true;
+        io_ctrl->value = 1.0f;
+        io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
+        emit sigSendVehicleControlCommand(io_ctrl->serialize());
+        return;
+    }
+
+    // On был активен — если он пропал, не срабатываем Off
+    // (это было отпускание Shift, а не намеренное нажатие Ctrl)
+    if (prev_on_active && !current_on_active)
+    {
+        prev_on_active = false;
+        return;
+    }
+
+    // On не был активен, Off стал активен — намеренное нажатие Ctrl
+    if (current_off_active && !prev_on_active)
+    {
+        io_ctrl->value = 0.0f;
+        io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
+        emit sigSendVehicleControlCommand(io_ctrl->serialize());
+        return;
     }
 }
 
@@ -406,10 +473,7 @@ void IOController::processButton(size_t cab_idx,
 {
     auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
 
-    if (!io_ctrl) return;
-
-    fprintf(stderr, "DBG processButton cab=%zu id=%u val=%.1f\n",
-            cab_idx, (unsigned)control_id, io_ctrl->value);
+    if (!io_ctrl) return;    
 
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
