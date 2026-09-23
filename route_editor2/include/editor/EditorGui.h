@@ -95,7 +95,7 @@ private:
     /// (промт п.7/29, упрощённо)
     void draw_follow_path_section(const std::string& trajectory_name) const;
 
-    /// Параметрическая стройка растягиванием вдоль пути
+    /// Параметрическая стройка растягиванием вдоль пути (ТЗ п.6/61)
     void draw_build_section(const std::string& trajectory_name) const;
 
     /// Мини-карта (TSRE MapWindow): подложка OSM/спутник, схема путей

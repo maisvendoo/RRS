@@ -344,7 +344,7 @@ void NewSkybox::init_model(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options)
     mix_value = vsg::floatValue::create(0.0f);
     mix_value->properties.dataVariance = vsg::DYNAMIC_DATA;
 
-    // Туман: rgb - цвет, a - плотность, 1/м
+    // Туман (ТЗ "Видимость и погода"): rgb - цвет, a - плотность, 1/м
     fog_value = vsg::vec4Value::create(vsg::vec4(0.72f, 0.75f, 0.79f, 0.0f));
     fog_value->properties.dataVariance = vsg::DYNAMIC_DATA;
 
@@ -433,7 +433,7 @@ void NewSkybox::init_textures(CfgReader& cfg, vsg::ref_ptr<vsg::Options> options
     textures_dir_path = fs.combinePath(textures_dir_path, "default-objects");
     textures_dir_path = fs.combinePath(textures_dir_path, "textures");
 
-    // HD-вариант текстуры для пресетов High/Ultra:
+    // HD-вариант текстуры для пресетов High/Ultra (ТЗ "Графика"):
     // суффикс "_hd" перед расширением ("sky_day.bmp" -> "sky_day_hd.bmp")
     const auto hd_texture_filename = [](const std::string& filename) -> std::string
     {

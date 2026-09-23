@@ -53,14 +53,14 @@ bool ServiceSystem::connectService(const QString& resource)
         return false;
     }
 
-    // Повторное подключение после отмены/завершения разрешено
+    // Повторное подключение после отмены/завершения разрешено (ТЗ, п.10)
     if (state == State::Connected || state == State::Refueling)
     {
         last_error = "Hose already connected";
         return false;
     }
 
-    // Подключение только на стоянке
+    // Подключение только на стоянке (ТЗ, п.9, 11)
     if (std::abs(last_velocity) >= move_threshold)
     {
         last_error = "Cannot connect while moving";
@@ -69,7 +69,7 @@ bool ServiceSystem::connectService(const QString& resource)
         return false;
     }
 
-    // Подключение только в зоне заправочной колонки
+    // Подключение только в зоне заправочной колонки (ТЗ, п.7-8)
     if (!in_zone)
     {
         last_error = "Vehicle is not in service zone";
@@ -148,7 +148,7 @@ void ServiceSystem::step(double dt,
     if (state != State::Connected && state != State::Refueling)
         return;
 
-    // Движение при подключении: обрыв рукава, отмена операции
+    // Движение при подключении: обрыв рукава, отмена операции (ТЗ, п.11)
     if (std::abs(velocity) >= move_threshold)
     {
         state = State::Aborted;
@@ -163,7 +163,7 @@ void ServiceSystem::step(double dt,
         return;
     }
 
-    // Выезд из зоны заправки с подключённым рукавом - обрыв
+    // Выезд из зоны заправки с подключённым рукавом - обрыв (ТЗ, п.8)
     if (!in_zone)
     {
         state = State::Aborted;
@@ -210,7 +210,7 @@ void ServiceSystem::step(double dt,
         return;
     }
 
-    // Рукав подключён и проверен: начинается подача
+    // Рукав подключён и проверен: начинается подача (ТЗ, п.10)
     if (state == State::Connected)
     {
         state = State::Refueling;
@@ -224,7 +224,7 @@ void ServiceSystem::step(double dt,
                  0, 'f', 0));
     }
 
-    // Порционная подача: литраж за шаг (не мгновенно)
+    // Порционная подача: литраж за шаг (ТЗ, п.3: не мгновенно)
     const double rate_per_sec = (resource == Resource::Sand) ? sand_rate :
                              (resource == Resource::Fuel) ? fuel_rate :
                              (resource == Resource::Oil) ? oil_rate :
@@ -239,7 +239,7 @@ void ServiceSystem::step(double dt,
 
     const double after = currentLevel(sand);
 
-    // Автоматическая остановка при заполнении: бак полон,
+    // Автоматическая остановка при заполнении (ТЗ, п.3): бак полон,
     // либо уровень перестал расти (клапан отсечки колонки)
     if (after >= 0.999 || after < before + 1e-9)
     {

@@ -351,7 +351,7 @@ void EventHandler::apply(vsg::ButtonPressEvent& buttonPress)
                 return;
             }
 
-            // Параметрическая стройка: ЛКМ начинает
+            // Параметрическая стройка (ТЗ п.6/61): ЛКМ начинает
             // растягивание вдоль выбранной траектории
             if ((context_.build_mode != EditorContext::BuildMode::None) &&
                 (context_.selected_trajectory != nullptr) &&
@@ -627,7 +627,7 @@ void EventHandler::apply(vsg::MoveEvent& moveEvent)
         }
     }
 
-    // Живое превью стройки при растягивании
+    // Живое превью стройки при растягивании (ТЗ п.6/55)
     if (context_.build_drag_active &&
         (context_.selected_trajectory != nullptr) &&
         (context_.build_mode != EditorContext::BuildMode::None))

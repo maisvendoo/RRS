@@ -46,7 +46,7 @@ bool typeFromName(const QString& text, Type& type)
     if (name == "fog")                     { type = Type::Fog; return true; }
     if (name == "extremeheat")             { type = Type::ExtremeHeat; return true; }
 
-    // Расширенные типы: пасмурно, гроза,
+    // Расширенные типы (ТЗ "PogodniyeUsloviya"): пасмурно, гроза,
     // метель, густой туман ("overcast"/"heavyfog" - синонимы)
     if (name == "cloudy" || name == "overcast")
                                            { type = Type::Cloudy; return true; }
@@ -91,7 +91,7 @@ void WeatherSystem::load(const QString& route_dir)
     cfg.getDouble("Weather", "WindDirection", current_.wind_direction);
     cfg.getDouble("Weather", "TransitionTime", transition_time_);
 
-    // Суточный ход температуры: ключ DayNightCycle=true,
+    // Суточный ход температуры (ТЗ, п.6): ключ DayNightCycle=true,
     // амплитуда DayNightSwing (по умолчанию +/-5 град. C)
     cfg.getBool("Weather", "DayNightCycle", day_night_cycle_);
     cfg.getDouble("Weather", "DayNightSwing", day_night_swing_);
@@ -99,7 +99,7 @@ void WeatherSystem::load(const QString& route_dir)
 
     current_.intensity = std::min(std::max(current_.intensity, 0.0), 1.0);
 
-    // Базы видимости по типам погоды без хардкода: секция
+    // Базы видимости по типам погоды без хардкода (ТЗ): секция
     // [Visibility], для каждого типа - ключ=значение (HeavyRain=2000).
     // Отсутствующие ключи остаются с дефолтами
     const QDomNode vis_node = cfg.getFirstSection("Visibility");
@@ -127,7 +127,7 @@ void WeatherSystem::load(const QString& route_dir)
         }
     }
 
-    // Локальные зоны тумана: повторяемые секции [FogZone] с
+    // Локальные зоны тумана (ТЗ, п.9): повторяемые секции [FogZone] с
     // пикетажем Begin/End и видимостью внутри зоны Visibility
     QDomNode fog_node = cfg.getFirstSection("FogZone");
 
@@ -145,7 +145,7 @@ void WeatherSystem::load(const QString& route_dir)
             cfg.getDouble(fog_node, "Visibility", zone.visibility);
 
             // Осмысленная зона: ненулевой участок и видимость не ниже
-            // минимальной по (50 м)
+            // минимальной по ТЗ (50 м)
             if (zone.end > zone.begin && zone.visibility >= 50.0)
                 fog_zones_.push_back(zone);
         }
@@ -153,7 +153,7 @@ void WeatherSystem::load(const QString& route_dir)
         fog_node = cfg.getNextSection();
     }
 
-    // Высотный туман: секция [HeightFog] - Height (H0, м)
+    // Высотный туман (ТЗ, п.10): секция [HeightFog] - Height (H0, м)
     // и Multiplier (множитель плотности у земли)
     const QDomNode hf_node = cfg.getFirstSection("HeightFog");
 
@@ -189,7 +189,7 @@ void WeatherSystem::setTarget(Type type, double intensity,
     // Температуру целевого состояния не меняем - её задаёт
     // сценарий отдельно через конфиг
 
-    // Ветер при грозе/метели: усиление
+    // Ветер при грозе/метели (ТЗ "PogodniyeUsloviya"): усиление
     // пропорционально интенсивности - до 25 м/с (гроза) и 15 м/с (метель)
     switch (target_.type)
     {
@@ -231,14 +231,14 @@ void WeatherSystem::step(double dt)
     if (!time_set_)
         sim_hours_ += dt / 3600.0;
 
-    // Суточный ход температуры: синус с максимумом в 14:00,
+    // Суточный ход температуры (ТЗ, п.6): синус с максимумом в 14:00,
     // минимумом в 02:00; амплитуда DayNightSwing (по умолчанию 5 град.)
     daynight_delta_ = day_night_cycle_
             ? day_night_swing_ *
               std::sin(kTwoPi * (sim_hours_ - (kDayPeakHour - 6.0)) / 24.0)
             : 0.0;
 
-    // Плавный переход: линейная интерполяция от стартового
+    // Плавный переход (ТЗ, п.5): линейная интерполяция от стартового
     // состояния к целевому по прогрессу
     if (transition_progress_ < 1.0)
     {
@@ -292,7 +292,7 @@ void WeatherSystem::setTime(double hours)
 void WeatherSystem::applyVisibility(State& state)
 {
     // База видимости данного типа: из конфига, при отсутствии ключа -
-    // дефолты (заданы в visibility_base_)
+    // дефолты ТЗ (заданы в visibility_base_)
     const auto it = visibility_base_.find(state.type);
     const double base = (it != visibility_base_.end()) ? it->second
                                                        : 15000.0;
@@ -328,7 +328,7 @@ double WeatherSystem::getVisibility() const
 //------------------------------------------------------------------------------
 double WeatherSystem::getVisibilityAt(double coord) const
 {
-    // Видимость в точке маршрута: глобальная, модифицированная
+    // Видимость в точке маршрута (ТЗ, п.9): глобальная, модифицированная
     // зонами локального тумана. Внутри зоны - min(глобальная, зональная),
     // на границах - линейный фаде длиной 200 м
     double visibility = current_.visibility;
@@ -365,7 +365,7 @@ double WeatherSystem::getFogDensity() const
 //------------------------------------------------------------------------------
 double WeatherSystem::getFogDensityAt(double height) const
 {
-    // Высотный туман: плотность растёт экспоненциально
+    // Высотный туман (ТЗ, п.10): плотность растёт экспоненциально
     // ниже высоты H0. Множитель на глубине d ниже H0:
     // m = Multiplier^(d/H0) - у земли Multiplier, на H0 и выше - 1
     if (!height_fog_enabled_)

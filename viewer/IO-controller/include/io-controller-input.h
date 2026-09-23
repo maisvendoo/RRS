@@ -22,6 +22,10 @@ struct io_control_input_t
 
     /// Код назначенной клавиши
     uint16_t keyCode = 0;
+    /// Имя модификатора включения
+    QString keyModOnName = "";
+    /// Имя модификатора выключения
+    QString keyModOffName = "";
     /// Имя объекта в 3D-модели
     QString contolledObjectName = "";
 

@@ -24,7 +24,7 @@ UpdateControlToServerHandler::UpdateControlToServerHandler(TcpClient* tc)
 namespace
 {
 
-/// Сервисные клавиши деповского питания:
+/// Сервисные клавиши деповского питания (ТЗ "Деповское питание"):
 /// проходят на сервер даже в пешом режиме (подключение кабеля игроком
 /// у розетки ПЕ: K - кабель, L - питание колонки, O - вводной аппарат)
 const std::set<std::uint16_t>& serviceKeys()

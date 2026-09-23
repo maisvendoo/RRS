@@ -35,6 +35,7 @@ void IOController::setPressedKey(uint16_t keyBase)
 void IOController::setReleasedKey(uint16_t keyBase)
 {
     _pressed_keys.erase(keyBase);
+    processControl(CTRL_TYPE_KEYBOARD);
 }
 
 //------------------------------------------------------------------------------
@@ -67,6 +68,10 @@ bool IOController::load_config(CfgReader &cfg)
         QString keyName = "";
         cfg.getString(secNode, "KeyName", keyName);
         ic_input.keyCode = KeySymbolsRRSMap.value(keyName, KEY_Undefined);
+
+        cfg.getString(secNode, "KeyModOnName", ic_input.keyModOnName);
+
+        cfg.getString(secNode, "KeyModOffName", ic_input.keyModOffName);
 
         cfg.getString(secNode, "ObjectName", ic_input.contolledObjectName);
 
@@ -170,9 +175,6 @@ bool IOController::findControl(const std::string &node_name, io_control_input_t 
     return false;
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -306,6 +308,29 @@ void IOController::emitControl(const io_control_input_t &io_ctrl)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool IOController::checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys)
+{
+    if (modKeyName == "Shift")
+    {
+        return isShift(pressed_keys);
+    }
+
+    if (modKeyName == "Control")
+    {
+        return isControl(pressed_keys);
+    }
+
+    if (modKeyName == "Alt")
+    {
+        return isAlt(pressed_keys);
+    }
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::processTumbler(const uint16_t &control_id,
                                   const std::set<uint16_t> &pressed_keys)
 {
@@ -315,8 +340,12 @@ void IOController::processTumbler(const uint16_t &control_id,
     // Нажата ли его клавиша
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
-        // Какой модификатор?
-        if (isShift(pressed_keys))
+        // Модификаторы из конфига; без них - Shift включает, Ctrl выключает
+        const bool mod_on = io_ctrl->keyModOnName.isEmpty()
+                ? isShift(pressed_keys)
+                : checkModKey(io_ctrl->keyModOnName, pressed_keys);
+
+        if (mod_on)
         {
             io_ctrl->value = 1.0f;
             io_control_inputs.updateByKey1(control_id, io_ctrl.value());
@@ -324,14 +353,41 @@ void IOController::processTumbler(const uint16_t &control_id,
             return;
         }
 
-        if (isControl(pressed_keys))
+        const bool mod_off = io_ctrl->keyModOffName.isEmpty()
+                ? isControl(pressed_keys)
+                : checkModKey(io_ctrl->keyModOffName, pressed_keys);
+
+        if (mod_off)
         {
             io_ctrl->value = 0.0f;
             io_control_inputs.updateByKey1(control_id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
             return;
-        }        
+        }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::processButton(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys)
+{
+    auto io_ctrl = io_control_inputs.getByKey1(control_id);
+
+    if (getKeyState(pressed_keys, io_ctrl->keyCode))
+    {
+        if (checkModKey(io_ctrl->keyModOnName, pressed_keys) || io_ctrl->keyModOnName.isEmpty())
+        {
+            io_ctrl->value = 1.0f;
+        }
+    }
+    else
+    {
+        io_ctrl->value = 0.0f;
+    }
+
+    io_control_inputs.updateByKey1(control_id, io_ctrl.value());
+    emit sigSendVehicleControlCommand(io_ctrl->serialize());
 }
 
 //------------------------------------------------------------------------------
@@ -339,40 +395,38 @@ void IOController::processTumbler(const uint16_t &control_id,
 //------------------------------------------------------------------------------
 void IOController::processKeyBoardInput()
 {
-    // Уходим, если ничего не нажато
-    if (_pressed_keys.empty())
-    {
-        return;
-    }
-
-    // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
-    // отправляем пустое управление
-    constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
-    std::size_t modifiers_size = 0;
-    for (std::uint16_t key : modifier_keys)
-    {
-        if (_pressed_keys.count(key))
-        {
-            ++modifiers_size;
-        }
-    }
-
-    if (_pressed_keys.size() == modifiers_size)
-    {
-        return;
-    }
-
     std::set<uint16_t> pressed_keys;
 
-    for (auto key : _pressed_keys)
+    if (!_pressed_keys.empty())
     {
-        // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
-        if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
+        // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
+        // отправляем пустое управление
+        constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
+        std::size_t modifiers_size = 0;
+        for (std::uint16_t key : modifier_keys)
         {
-            continue;
+            if (_pressed_keys.count(key))
+            {
+                ++modifiers_size;
+            }
         }
 
-        pressed_keys.insert(key);
+        if (_pressed_keys.size() == modifiers_size)
+        {
+            keysProcess(pressed_keys);
+            return;
+        }
+
+        for (auto key : _pressed_keys)
+        {
+            // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
+            if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
+            {
+                continue;
+            }
+
+            pressed_keys.insert(key);
+        }
     }
 
     keysProcess(pressed_keys);

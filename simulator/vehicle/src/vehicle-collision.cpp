@@ -161,7 +161,7 @@ void VehicleCollision::addPart(collision::CollisionWorld& world,
     desc.user_data = user_data;
     // Кинематика должна видеть статический мир (события контактов)
     desc.collide_kinematic_vs_static = true;
-    // CCD (P2-12): линейный каст исключает
+    // CCD (ТЗ "Коллизии" п.24, P2-12): линейный каст исключает
     // туннелирование сквозь тонкие препятствия на скорости
     desc.motion_quality = collision::MotionQuality::LinearCast;
 
@@ -212,7 +212,7 @@ void VehicleCollision::createBodies(collision::CollisionWorld& world,
     if (!enabled || !world.isInitialized() || hasBodies())
         return;
 
-    // Дальняя ПС (LOD >= L2): только box кузова
+    // Дальняя ПС (LOD >= L2): только box кузова (ТЗ "Коллизии" п.27)
     const bool detailed = (lod < perf::SimLOD::L2_Aggregated);
 
     // Кузов
@@ -358,7 +358,7 @@ void VehicleCollision::setLod(perf::SimLOD new_lod,
         return;
 
     // Дальняя ПС - только кузов; близкая - полный набор
-    //
+    // (ТЗ "Коллизии" п.27)
     const bool detailed = (lod < perf::SimLOD::L2_Aggregated);
 
     for (Part& part : parts)

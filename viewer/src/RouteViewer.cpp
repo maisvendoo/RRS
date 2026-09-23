@@ -1,5 +1,7 @@
 #include "RouteViewer.h"
 
+#include <algorithm>
+
 #include "AnimatedDatabasePager.h"
 #include "CfgReader.h"
 #include "Logger.h"
@@ -9,8 +11,10 @@
 #include "RouteLoader.h"
 #include "ScreenshotWriter.h"
 // #include "Skybox.h"
+#include "StationsHandler.h"
 #include "Sun.h"
 #include "TrafficLightsHandler.h"
+#include "TrainLabelsHandler.h"
 #include "UpdateControlToServerHandler.h"
 #include "UpdateSoundManagerHandler.h"
 #include "UpdateStatisticsHandler.h"
@@ -26,6 +30,7 @@
 #include "graphics/shader_funcs.h"
 
 #include <vsg/app/CloseHandler.h>
+#include <vsg/app/Viewer.h>
 #include <vsg/app/CommandGraph.h>
 #include <vsg/app/RenderGraph.h>
 #include <vsg/app/View.h>
@@ -80,6 +85,67 @@
 #include <AltSoundLocker.h>
 
 #include <iostream>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+/// Операция подключения скомпилированного подграфа в сцену.
+/// Выполняется в фазе update, чтобы не пересекаться с рендером в других потоках.
+struct Merge final : public vsg::Inherit<vsg::Operation, Merge>
+{
+    Merge(vsg::ref_ptr<vsg::Viewer> in_viewer,
+          vsg::ref_ptr<vsg::Group> in_root,
+          vsg::ref_ptr<vsg::Node> in_subgraph,
+          const vsg::CompileResult& in_compile_result) :
+        root(in_root),
+        subgraph(in_subgraph),
+        compile_result(in_compile_result)
+    {
+        viewer = in_viewer;
+    }
+
+    void run() override
+    {
+        // Превращаем observer_ptr в ref_ptr, чтобы проверить живость viewer'а
+        if (vsg::ref_ptr<vsg::Viewer> ref_viewer = viewer;
+            ref_viewer && root && subgraph)
+        {
+            updateViewer(*ref_viewer, compile_result);
+
+            root->addChild(subgraph);
+        }
+    }
+
+    vsg::observer_ptr<vsg::Viewer> viewer;
+    vsg::ref_ptr<vsg::Group> root;
+    vsg::ref_ptr<vsg::Node> subgraph;
+    vsg::CompileResult compile_result;
+};
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+/// Операция удаления подграфа из сцены в фазе update
+struct RemoveFromParent final : public vsg::Inherit<vsg::Operation, RemoveFromParent>
+{
+    RemoveFromParent(vsg::ref_ptr<vsg::Group> in_parent, vsg::ref_ptr<vsg::Node> in_child)
+        : parent(in_parent), child(in_child)
+    {
+    }
+
+    void run() override
+    {
+        // vsg::Group в этой версии VSG не предоставляет removeChild() — удаляем вручную
+        if (parent && child)
+        {
+            auto& children = parent->children;
+            children.erase(std::remove(children.begin(), children.end(), child), children.end());
+        }
+    }
+
+    vsg::ref_ptr<vsg::Group> parent;
+    vsg::ref_ptr<vsg::Node> child;
+};
 
 //------------------------------------------------------------------------------
 //
@@ -176,6 +242,8 @@ void RouteViewer::initialize(int argc, char* argv[])
     screenshot_writer = std::make_unique<ScreenshotWriter>("screenshot.jpg");
 
     traffic_lights_handler = std::make_unique<TrafficLightsHandler>();
+    stations_handler = std::make_unique<StationsHandler>(settings);
+    train_labels_handler = std::make_unique<TrainLabelsHandler>(settings);
     vehicles_handler = std::make_unique<VehiclesHandler>(settings, sound_manager.get());
 
     initVsgOptions();
@@ -320,8 +388,11 @@ void RouteViewer::loadSettings()
         section = "Viewer";
         loadLoggerSettings(cfg, section);
         loadModelsSettings(cfg, section);
+        loadStationsTextSettings(cfg, section);
+        loadTrainLabelsTextSettings(cfg, section);
         loadWindowSettings(cfg, section);
         loadGraphicsSettings(cfg, section);
+        loadHUDSettings(cfg, section);
         loadLightSettings(cfg, section);
         loadCameraSettings(cfg, section);
         loadFreeCameraSettings(cfg, section);
@@ -371,9 +442,69 @@ void RouteViewer::initVsgOptions()
     options->setValue("disable_gltf", settings.disable_native_gltf_loader);
 
     GUIparams = GUIParams::create();
-
     // GUI применяет пресет графики через владельца
     GUIparams->route_viewer = this;
+    GUIparams->train_profile_backward = settings.train_profile_backward;
+    GUIparams->train_profile_forward = settings.train_profile_forward;
+
+    GUIparams->hud_background = ImVec4(settings.hud_background.x, settings.hud_background.y,
+                                       settings.hud_background.z, settings.hud_background.w);
+    GUIparams->hud_text = ImVec4(settings.hud_text.x, settings.hud_text.y,
+                                 settings.hud_text.z, settings.hud_text.w);
+    GUIparams->hud_button_off = ImVec4(settings.hud_button_off.x, settings.hud_button_off.y,
+                                       settings.hud_button_off.z, settings.hud_button_off.w);
+    GUIparams->hud_button_on = ImVec4(settings.hud_button_on.x, settings.hud_button_on.y,
+                                      settings.hud_button_on.z, settings.hud_button_on.w);
+    GUIparams->hud_button_hovered = ImVec4(settings.hud_button_hovered.x, settings.hud_button_hovered.y,
+                                           settings.hud_button_hovered.z, settings.hud_button_hovered.w);
+    GUIparams->hud_button_inactive = ImVec4(settings.hud_button_inactive.x, settings.hud_button_inactive.y,
+                                            settings.hud_button_inactive.z, settings.hud_button_inactive.w);
+    GUIparams->hud_button_inactive_text = ImVec4(settings.hud_button_inactive_text.x, settings.hud_button_inactive_text.y,
+                                                 settings.hud_button_inactive_text.z, settings.hud_button_inactive_text.w);
+
+    GUIparams->hud_current_train = ImVec4(settings.hud_current_train.x, settings.hud_current_train.y,
+                                          settings.hud_current_train.z, settings.hud_current_train.w);
+    GUIparams->hud_controlled_train = ImVec4(settings.hud_controlled_train.x, settings.hud_controlled_train.y,
+                                             settings.hud_controlled_train.z, settings.hud_controlled_train.w);
+    GUIparams->hud_warning_text = ImVec4(settings.hud_warning_text.x, settings.hud_warning_text.y,
+                                         settings.hud_warning_text.z, settings.hud_warning_text.w);
+    GUIparams->hud_timetable_delay = ImVec4(settings.hud_timetable_delay.x, settings.hud_timetable_delay.y,
+                                            settings.hud_timetable_delay.z, settings.hud_timetable_delay.w);
+    GUIparams->hud_timetable_past = ImVec4(settings.hud_timetable_past.x, settings.hud_timetable_past.y,
+                                           settings.hud_timetable_past.z, settings.hud_timetable_past.w);
+    GUIparams->hud_timetable_current = ImVec4(settings.hud_timetable_current.x, settings.hud_timetable_current.y,
+                                              settings.hud_timetable_current.z, settings.hud_timetable_current.w);
+    GUIparams->hud_timetable_future = ImVec4(settings.hud_timetable_future.x, settings.hud_timetable_future.y,
+                                              settings.hud_timetable_future.z, settings.hud_timetable_future.w);
+
+    GUIparams->hud_train_profile_grid = ImVec4(settings.hud_train_profile_grid.x, settings.hud_train_profile_grid.y,
+                                               settings.hud_train_profile_grid.z, settings.hud_train_profile_grid.w);
+    GUIparams->hud_train_profile_grid_label = ImVec4(settings.hud_train_profile_grid_label.x, settings.hud_train_profile_grid_label.y,
+                                                     settings.hud_train_profile_grid_label.z, settings.hud_train_profile_grid_label.w);
+    GUIparams->hud_train_profile_baseline = ImVec4(settings.hud_train_profile_baseline.x, settings.hud_train_profile_baseline.y,
+                                                   settings.hud_train_profile_baseline.z, settings.hud_train_profile_baseline.w);
+    GUIparams->hud_train_profile_curve = ImVec4(settings.hud_train_profile_curve.x, settings.hud_train_profile_curve.y,
+                                                settings.hud_train_profile_curve.z, settings.hud_train_profile_curve.w);
+    GUIparams->hud_train_profile_uncontrolled = ImVec4(settings.hud_train_profile_uncontrolled.x, settings.hud_train_profile_uncontrolled.y,
+                                                        settings.hud_train_profile_uncontrolled.z, settings.hud_train_profile_uncontrolled.w);
+    GUIparams->hud_train_profile_current = ImVec4(settings.hud_train_profile_current.x, settings.hud_train_profile_current.y,
+                                                  settings.hud_train_profile_current.z, settings.hud_train_profile_current.w);
+    GUIparams->hud_train_profile_controlled = ImVec4(settings.hud_train_profile_controlled.x, settings.hud_train_profile_controlled.y,
+                                                      settings.hud_train_profile_controlled.z, settings.hud_train_profile_controlled.w);
+    GUIparams->hud_train_profile_station_text = ImVec4(settings.hud_train_profile_station_text.x, settings.hud_train_profile_station_text.y,
+                                                       settings.hud_train_profile_station_text.z, settings.hud_train_profile_station_text.w);
+    GUIparams->hud_train_profile_signal_body = ImVec4(settings.hud_train_profile_signal_body.x, settings.hud_train_profile_signal_body.y,
+                                                      settings.hud_train_profile_signal_body.z, settings.hud_train_profile_signal_body.w);
+    GUIparams->hud_train_profile_signal_letter = ImVec4(settings.hud_train_profile_signal_letter.x, settings.hud_train_profile_signal_letter.y,
+                                                        settings.hud_train_profile_signal_letter.z, settings.hud_train_profile_signal_letter.w);
+    GUIparams->hud_train_profile_speed_limit_border = ImVec4(settings.hud_train_profile_speed_limit_border.x, settings.hud_train_profile_speed_limit_border.y,
+                                                             settings.hud_train_profile_speed_limit_border.z, settings.hud_train_profile_speed_limit_border.w);
+    GUIparams->hud_train_profile_speed_limit_fill = ImVec4(settings.hud_train_profile_speed_limit_fill.x, settings.hud_train_profile_speed_limit_fill.y,
+                                                           settings.hud_train_profile_speed_limit_fill.z, settings.hud_train_profile_speed_limit_fill.w);
+    GUIparams->hud_train_profile_speed_limit_text = ImVec4(settings.hud_train_profile_speed_limit_text.x, settings.hud_train_profile_speed_limit_text.y,
+                                                           settings.hud_train_profile_speed_limit_text.z, settings.hud_train_profile_speed_limit_text.w);
+    GUIparams->hud_train_profile_speed_limit_bg = ImVec4(settings.hud_train_profile_speed_limit_bg.x, settings.hud_train_profile_speed_limit_bg.y,
+                                                         settings.hud_train_profile_speed_limit_bg.z, settings.hud_train_profile_speed_limit_bg.w);
 }
 
 //------------------------------------------------------------------------------
@@ -500,7 +631,7 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
         // Поучаем список физических устройств
         auto physDevs = instance->getPhysicalDevices();
 
-        // Защита от пустого списка: physDevs.size() - 1 выше дало бы
+        // Защита от пустого списка: physDevs.size() - 1 ниже дало бы
         // underflow и обращение к physDevs[0] на пустом векторе (UB)
         if (physDevs.empty())
         {
@@ -508,14 +639,34 @@ void RouteViewer::initWindow(bool try_screenNum_exception)
             exit(1);
         }
 
-        // Защита от дурака (сравнение без знакового underflow)
-        if (settings.physical_device < 0 ||
-            static_cast<std::size_t>(settings.physical_device) >= physDevs.size())
+        // Пытаемся найти GPU по аппаратному ID (vendor + device)
+        vsg::ref_ptr<vsg::PhysicalDevice> physDev;
+        bool found_by_id = false;
+
+        if (settings.physical_device_vendor_id != 0 && settings.physical_device_device_id != 0)
         {
-            settings.physical_device = 0;
+            for (auto& dev : physDevs)
+            {
+                auto props = dev->getProperties();
+                if (props.vendorID == settings.physical_device_vendor_id &&
+                    props.deviceID == settings.physical_device_device_id)
+                {
+                    physDev = dev;
+                    found_by_id = true;
+                    break;
+                }
+            }
         }
 
-        auto physDev = physDevs[settings.physical_device];
+        // Fallback на старый индекс, если не нашли по ID
+        if (!found_by_id)
+        {
+            if (settings.physical_device < 0 || settings.physical_device > static_cast<int>(physDevs.size()) - 1)
+            {
+                settings.physical_device = 0;
+            }
+            physDev = physDevs[settings.physical_device];
+        }
 
         auto props = physDev->getProperties();
         GUIparams->physicalDeviceName = QString(props.deviceName);
@@ -1782,6 +1933,7 @@ void RouteViewer::initViewer()
         shadow_region,
         screenshot_writer.get(),
         traffic_lights_handler.get(),
+        train_labels_handler.get(),
         vehicles_handler.get(),
         settings,
         GUIparams
@@ -1855,8 +2007,12 @@ void RouteViewer::initViewer()
 
     GUIparams->viewer = viewer;
     GUIparams->vehicles_handler = vehicles_handler.get();
+    GUIparams->viewer_handler = upd_viewer_handler.get();
     GUIparams->statistics_handler = upd_statistis_handler.get();
     GUIparams->controls_handler = upd_server_control.get();
+    GUIparams->traffic_lights_handler = traffic_lights_handler.get();
+    GUIparams->stations_handler = stations_handler.get();
+    GUIparams->train_labels_handler = train_labels_handler.get();
 
     is_ready = true;
 }
@@ -1871,6 +2027,7 @@ void RouteViewer::initTcpClient()
     connect(tcp_client.get(), &TcpClient::connected, this, &RouteViewer::slotConnectedToSimulator);
     connect(tcp_client.get(), &TcpClient::setRouteInfo, this, &RouteViewer::slotGetRouteInfoData);
     connect(tcp_client.get(), &TcpClient::setSignalsData, this, &RouteViewer::slotGetSignalsData);
+    connect(tcp_client.get(), &TcpClient::setStationsData, this, &RouteViewer::slotGetStationsData);
     connect(tcp_client.get(), &TcpClient::setVehiclesInfo, this, &RouteViewer::slotGetVehicleInfoData);
     connect(tcp_client.get(), &TcpClient::sendLogMessage, this, &RouteViewer::slotRecvLogMessage);
     connect(tcp_client.get(), &TcpClient::connectionAbandoned, this, [this]() {
@@ -1977,6 +2134,9 @@ void RouteViewer::slotConnectedToSimulator()
     LOG_INFO("Connected to server...OK");
     LOG_INFO("Send request for route info");
     tcp_client->sendRequest(STYPE_REQUEST_ROUTE_INFO);
+
+    LOG_INFO("Send request for stations data");
+    tcp_client->sendRequest(STYPE_REQUEST_STATIONS_DATA);
 }
 
 //------------------------------------------------------------------------------
@@ -2035,6 +2195,52 @@ void RouteViewer::slotGetSignalsData(QByteArray &sig_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void RouteViewer::slotGetStationsData(QByteArray &stations_data)
+{
+    LOG_INFO("Got stations data from server (%lld bytes)",
+             static_cast<long long>(stations_data.size()));
+
+    if (is_stations)
+    {
+        LOG_WARN("Get stations data again");
+        return;
+    }
+    is_stations = true;
+
+    if (!stations_handler->load(stations_data, options))
+    {
+        LOG_WARN("Fail to load stations data");
+        return;
+    }
+
+    stations_handler->setVisible(GUIparams->is_show_HUD && GUIparams->hud_show_stations);
+
+    auto stations_node = stations_handler->getRootNode();
+
+    // Компилируем подграф до подключения его в сцену
+    if (!viewer->compileManager)
+    {
+        LOG_ERROR("No compile manager in viewer");
+        return;
+    }
+
+    auto compile_result = viewer->compileManager->compile(stations_node);
+    if (!compile_result)
+    {
+        LOG_ERROR("Fail to compile stations scene graph (VkResult %d)",
+                  compile_result.result);
+        return;
+    }
+
+    // Подключаем подграф в сцену и обновляем viewer в фазе update
+    viewer->addUpdateOperation(
+        Merge::create(viewer, root, stations_node, compile_result),
+        vsg::UpdateOperations::ONE_TIME);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 {
     if (is_vehicles)
@@ -2059,6 +2265,11 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     connect(tcp_client.get(), &TcpClient::setTrainInfo,
             vehicles_handler.get(), &VehiclesHandler::slotGetTrainsData);
 
+    // Слот вызывается после slotGetTrainsData (порядок подключения сохраняется),
+    // поэтому данные о поездах уже десериализованы в vehicles_handler
+    connect(tcp_client.get(), &TcpClient::setTrainInfo,
+            this, &RouteViewer::slotGetTrainsData);
+
     // Position and state data use DirectConnection — the SPSC ring buffer
     // and atomic flags make these safe without locks
     connect(tcp_client.get(), &TcpClient::setVehiclesPositions,
@@ -2078,6 +2289,9 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     connect(vehicles_handler.get(), &VehiclesHandler::sigSendVehicleControlCommand,
             tcp_client.get(), &TcpClient::slotSendVehicleControlCommand);
 
+    connect(tcp_client.get(), &TcpClient::setTrainProfile,
+            vehicles_handler.get(), &VehiclesHandler::slotGetTrainProfileData, Qt::DirectConnection);
+
     connect(vehicles_handler.get(), &VehiclesHandler::updated,
             this, &RouteViewer::slotUpdated);
 
@@ -2088,9 +2302,68 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, static_cast<double>(settings.vehicles_pos_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_STATE_UPDATE, static_cast<double>(settings.vehicles_state_update_interval) * 0.001);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLE_CONTROLLED_UPDATE, static_cast<double>(settings.vehicle_controled_update_interval) * 0.001);
-
     // Диагностика составов: снимок раз в 0.5 с
     tcp_client->sendRequest(STYPE_REQUEST_DIAGNOSTICS_UPDATE, 0.5);
+    tcp_client->sendTrainProfileRequest(static_cast<double>(settings.train_profile_update_interval) * 0.001,
+                                        settings.train_profile_backward,
+                                        settings.train_profile_forward);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void RouteViewer::slotGetTrainsData(QByteArray &data)
+{
+    if (!is_vehicles || !train_labels_handler || !viewer || !root)
+        return;
+
+    // Данные о поездах уже десериализованы в vehicles_handler
+    const auto& trains = vehicles_handler->getTrainsInfo();
+    if (trains.empty())
+        return;
+
+    // Подписи уже созданы, список поездов не изменился — выходим
+    if (train_labels_node && !train_labels_handler->needRebuild(trains))
+        return;
+
+    if (!train_labels_handler->setup(options, trains))
+    {
+        LOG_WARN("Fail to create train name labels");
+        return;
+    }
+
+    auto new_node = train_labels_handler->getRootNode();
+
+    // Удаляем старый подграф подписей из сцены
+    if (train_labels_node)
+    {
+        viewer->addUpdateOperation(
+            RemoveFromParent::create(root, train_labels_node),
+            vsg::UpdateOperations::ONE_TIME);
+    }
+
+    if (!viewer->compileManager)
+    {
+        LOG_ERROR("No compile manager in viewer");
+        return;
+    }
+
+    auto compile_result = viewer->compileManager->compile(new_node);
+    if (!compile_result)
+    {
+        LOG_ERROR("Fail to compile train name labels (VkResult %d)",
+                  compile_result.result);
+        return;
+    }
+
+    // Подключаем подграф в сцену и обновляем viewer в фазе update
+    viewer->addUpdateOperation(
+        Merge::create(viewer, root, new_node, compile_result),
+        vsg::UpdateOperations::ONE_TIME);
+
+    train_labels_node = new_node;
+
+    train_labels_handler->setVisible(GUIparams->is_show_HUD && GUIparams->hud_show_train_labels);
 }
 
 //------------------------------------------------------------------------------

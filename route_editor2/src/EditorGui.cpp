@@ -1232,7 +1232,7 @@ void EditorGui::draw_track_window() const
 
     ImGui::Separator();
 
-    // Параметрическая стройка растягиванием
+    // Параметрическая стройка растягиванием (ТЗ п.6/61)
     draw_build_section(name);
 
     ImGui::Separator();

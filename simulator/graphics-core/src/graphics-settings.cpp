@@ -299,7 +299,7 @@ void GraphicsSettings::adaptFrameTime(double frame_ms)
     if (frame_ms <= 0.0)
         return;
 
-    // Перегрузка: снижаем разрешение и дальность быстро
+    // Перегрузка: снижаем разрешение и дальность быстро (ТЗ)
     if (frame_ms > target_frame_ms_ * 1.3)
     {
         dynamic_resolution_ = std::max(0.6, dynamic_resolution_ - 0.02);
@@ -384,7 +384,7 @@ void GraphicsSettings::applyPreset()
 
     case Preset::High:
         params_ = QualityParams();
-        // Новый тиры (TSW/UE5): PBR + ACES + HDR-солнце,
+        // Новый тиры (ТЗ "Графика", TSW/UE5): PBR + ACES + HDR-солнце,
         // мягкие тени, HD-небо. Тени: 2 каскада 2048, дистанция 150 м.
         params_.use_pbr = true;
         params_.use_aces_tonemap = true;

@@ -54,7 +54,8 @@ void configure_shader_set(
     vsg::ref_ptr<vsg::ShaderSet> shader_set
 );
 
-/// Обёртка тонмаппинга фрагментного шейдера (пресеты High/Ultra, /): переименовывает первый "void main()" исходника в
+/// Обёртка тонмаппинга фрагментного шейдера (пресеты High/Ultra,
+/// ТЗ "Графика"): переименовывает первый "void main()" исходника в
 /// rrs_tonemap_original_main() и дописывает в конец tonemap_glsl
 /// (графикой принимается gfx::aces_tonemap_shader_fragment() — он
 /// определяет новый void main(), использующий outColor).

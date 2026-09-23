@@ -31,7 +31,7 @@ void VL60IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 void VL60IOController::processTumblers(const std::set<uint16_t> &pressed_keys)
 {
-    // Тумблеры с клавишами включения/отключения (Shift+клавиша / Ctrl+клавиша)
+    // ╨в╤Г╨╝╨▒╨╗╨╡╤А╤Л ╤Б ╨║╨╗╨░╨▓╨╕╤И╨░╨╝╨╕ ╨▓╨║╨╗╤О╤З╨╡╨╜╨╕╤П/╨╛╤В╨║╨╗╤О╤З╨╡╨╜╨╕╤П (Shift+╨║╨╗╨░╨▓╨╕╤И╨░ / Ctrl+╨║╨╗╨░╨▓╨╕╤И╨░)
     processTumbler(CTRL_TUMBLER_PNT, pressed_keys);
     processTumbler(CTRL_TUMBLER_PNT1, pressed_keys);
     processTumbler(CTRL_TUMBLER_PNT2, pressed_keys);
@@ -57,21 +57,21 @@ void VL60IOController::processTumblers(const std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 int VL60IOController::kmPosBySignal(float signal) const
 {
-    // Кодирование kme-60-044: -1 БВ; -0.2 Ноль; 0 АВ; 0.2 РВ; 0.4 ФВ;
-    // 0.6 ФП; 0.8 РП; 1.0 АП; выше - тяговые позиции (s*5+2)
+    // ╨Ъ╨╛╨┤╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ kme-60-044: -1 ╨С╨Т; -0.2 ╨Э╨╛╨╗╤М; 0 ╨Р╨Т; 0.2 ╨а╨Т; 0.4 ╨д╨Т;
+    // 0.6 ╨д╨Я; 0.8 ╨а╨Я; 1.0 ╨Р╨Я; ╨▓╤Л╤И╨╡ - ╤В╤П╨│╨╛╨▓╤Л╨╡ ╨┐╨╛╨╖╨╕╤Ж╨╕╨╕ (s*5+2)
     if (signal > 1.1f)
     {
         return static_cast<int>(signal * 5.0f + 2.0f + 0.5f);
     }
 
-    if (signal < -0.9f)  return 0;  // БВ
-    if (signal < -0.1f)  return 1;  // Ноль
-    if (signal < 0.1f)   return 2;  // АВ
-    if (signal < 0.3f)   return 3;  // РВ
-    if (signal < 0.5f)   return 4;  // ФВ
-    if (signal < 0.7f)   return 5;  // ФП
-    if (signal < 0.9f)   return 6;  // РП
-    return 7;                      // АП
+    if (signal < -0.9f)  return 0;  // ╨С╨Т
+    if (signal < -0.1f)  return 1;  // ╨Э╨╛╨╗╤М
+    if (signal < 0.1f)   return 2;  // ╨Р╨Т
+    if (signal < 0.3f)   return 3;  // ╨а╨Т
+    if (signal < 0.5f)   return 4;  // ╨д╨Т
+    if (signal < 0.7f)   return 5;  // ╨д╨Я
+    if (signal < 0.9f)   return 6;  // ╨а╨Я
+    return 7;                      // ╨Р╨Я
 }
 
 //------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int butt
     const bool primary = (button == 1);
     float cur = getVehicleSignal(io_ctrl.signal_id);
 
-    // Тумблеры и кнопки - в базовом классе (переключение по сигналу)
+    // ╨в╤Г╨╝╨▒╨╗╨╡╤А╤Л ╨╕ ╨║╨╜╨╛╨┐╨║╨╕ - ╨▓ ╨▒╨░╨╖╨╛╨▓╨╛╨╝ ╨║╨╗╨░╤Б╤Б╨╡ (╨┐╨╡╤А╨╡╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ ╨┐╨╛ ╤Б╨╕╨│╨╜╨░╨╗╤Г)
     if ((io_ctrl.type == "Toggle") || (io_ctrl.type == "Button"))
     {
         IOController::processMouseControl(io_ctrl, button);
@@ -97,8 +97,8 @@ void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int butt
 
     if (io_ctrl.type == "Crane395")
     {
-        // Сигнал нормализован 0..1 (позиция/6): ЛКМ - к экстренному,
-        // ПКМ - к отпуску
+        // ╨б╨╕╨│╨╜╨░╨╗ ╨╜╨╛╤А╨╝╨░╨╗╨╕╨╖╨╛╨▓╨░╨╜ 0..1 (╨┐╨╛╨╖╨╕╤Ж╨╕╤П/6): ╨Ы╨Ъ╨Ь - ╨║ ╤Н╨║╤Б╤В╤А╨╡╨╜╨╜╨╛╨╝╤Г,
+        // ╨Я╨Ъ╨Ь - ╨║ ╨╛╤В╨┐╤Г╤Б╨║╤Г
         if (cur < 0.0f)
         {
             return;
@@ -114,9 +114,9 @@ void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int butt
 
     if (io_ctrl.type == "Crane254")
     {
-        // Положение рукоятки 0..1 задаёт ЦЕЛЕВОЕ давление ТЦ
-        // (kvt254: k1=0.4 МПа = 4.0 кгс/см² на полном ходе). Один клик -
-        // ступень 0.5 кгс/см² (= 0.125 хода); ПКМ ниже нуля - отпускное
+        // ╨Я╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡ ╤А╤Г╨║╨╛╤П╤В╨║╨╕ 0..1 ╨╖╨░╨┤╨░╤С╤В ╨ж╨Х╨Ы╨Х╨Т╨Ю╨Х ╨┤╨░╨▓╨╗╨╡╨╜╨╕╨╡ ╨в╨ж
+        // (kvt254: k1=0.4 ╨Ь╨Я╨░ = 4.0 ╨║╨│╤Б/╤Б╨╝┬▓ ╨╜╨░ ╨┐╨╛╨╗╨╜╨╛╨╝ ╤Е╨╛╨┤╨╡). ╨Ю╨┤╨╕╨╜ ╨║╨╗╨╕╨║ -
+        // ╤Б╤В╤Г╨┐╨╡╨╜╤М 0.5 ╨║╨│╤Б/╤Б╨╝┬▓ (= 0.125 ╤Е╨╛╨┤╨░); ╨Я╨Ъ╨Ь ╨╜╨╕╨╢╨╡ ╨╜╤Г╨╗╤П - ╨╛╤В╨┐╤Г╤Б╨║╨╜╨╛╨╡
         if (cur < -0.1f)
         {
             return;
@@ -132,7 +132,7 @@ void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int butt
 
     if (io_ctrl.type == "KM")
     {
-        // Главная рукоятка: ЛКМ - позиция вверх, ПКМ - вниз
+        // ╨У╨╗╨░╨▓╨╜╨░╤П ╤А╤Г╨║╨╛╤П╤В╨║╨░: ╨Ы╨Ъ╨Ь - ╨┐╨╛╨╖╨╕╤Ж╨╕╤П ╨▓╨▓╨╡╤А╤Е, ╨Я╨Ъ╨Ь - ╨▓╨╜╨╕╨╖
         if (cur < -1.5f)
         {
             return;
@@ -148,8 +148,8 @@ void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int butt
 
     if (io_ctrl.type == "Revers")
     {
-        // Реверс: сигнал -2..+2 (назад/ноль/вперёд); рукоятка не
-        // вставлена (SignalID2) - ЛКМ вставляет её
+        // ╨а╨╡╨▓╨╡╤А╤Б: ╤Б╨╕╨│╨╜╨░╨╗ -2..+2 (╨╜╨░╨╖╨░╨┤/╨╜╨╛╨╗╤М/╨▓╨┐╨╡╤А╤С╨┤); ╤А╤Г╨║╨╛╤П╤В╨║╨░ ╨╜╨╡
+        // ╨▓╤Б╤В╨░╨▓╨╗╨╡╨╜╨░ (SignalID2) - ╨Ы╨Ъ╨Ь ╨▓╤Б╤В╨░╨▓╨╗╤П╨╡╤В ╨╡╤С
         const float inserted = getVehicleSignal(io_ctrl.signal_id2);
 
         if ((inserted >= 0.0f) && (inserted < 0.5f))
@@ -181,7 +181,7 @@ void VL60IOController::processMouseControl(io_control_input_t &io_ctrl, int butt
 
     if (io_ctrl.type == "Lever")
     {
-        // Комбинированный кран: -1 двойная тяга / 0 поездное / +1 экстренное
+        // ╨Ъ╨╛╨╝╨▒╨╕╨╜╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ ╨║╤А╨░╨╜: -1 ╨┤╨▓╨╛╨╣╨╜╨░╤П ╤В╤П╨│╨░ / 0 ╨┐╨╛╨╡╨╖╨┤╨╜╨╛╨╡ / +1 ╤Н╨║╤Б╤В╤А╨╡╨╜╨╜╨╛╨╡
         if (cur < -1.5f)
         {
             cur = io_ctrl.value;
@@ -203,18 +203,18 @@ QString VL60IOController::getControlStateText(const io_control_input_t &io_ctrl,
 {
     if (io_ctrl.state_mode == "kme")
     {
-        if (state < -0.9f)          return u8"положение: БВ - быстрое выключение";
-        else if (state < -0.1f)     return u8"положение: Ноль";
-        else if (state < 0.1f)      return u8"положение: АВ - автоматическое выключение";
-        else if (state < 0.3f)      return u8"положение: РВ - ручное выключение";
-        else if (state < 0.5f)      return u8"положение: ФВ - фиксация выключения";
-        else if (state < 0.7f)      return u8"положение: ФП - фиксация пуска";
-        else if (state < 0.9f)      return u8"положение: РП - ручной пуск";
-        else if (state < 1.1f)      return u8"положение: АП - автоматический пуск";
+        if (state < -0.9f)          return u8"╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡: ╨С╨Т - ╨▒╤Л╤Б╤В╤А╨╛╨╡ ╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨╕╨╡";
+        else if (state < -0.1f)     return u8"╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡: ╨Э╨╛╨╗╤М";
+        else if (state < 0.1f)      return u8"╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡: ╨Р╨Т - ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╛╨╡ ╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨╕╨╡";
+        else if (state < 0.3f)      return u8"╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡: ╨а╨Т - ╤А╤Г╤З╨╜╨╛╨╡ ╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨╕╨╡";
+        else if (state < 0.5f)      return u8"╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡: ╨д╨Т - ╤Д╨╕╨║╤Б╨░╤Ж╨╕╤П ╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨╕╤П";
+        else if (state < 0.7f)      return u8"╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡: ╨д╨Я - ╤Д╨╕╨║╤Б╨░╤Ж╨╕╤П ╨┐╤Г╤Б╨║╨░";
+        else if (state < 0.9f)      return u8"╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡: ╨а╨Я - ╤А╤Г╤З╨╜╨╛╨╣ ╨┐╤Г╤Б╨║";
+        else if (state < 1.1f)      return u8"╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡: ╨Р╨Я - ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╕╨╣ ╨┐╤Г╤Б╨║";
         else
         {
             const int pos = static_cast<int>(state * 5.0f - 5.0f + 0.5f);
-            return u8"положение: позиция " + QString::number(std::max(pos, 1));
+            return u8"╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡: ╨┐╨╛╨╖╨╕╤Ж╨╕╤П " + QString::number(std::max(pos, 1));
         }
     }
 
@@ -222,12 +222,12 @@ QString VL60IOController::getControlStateText(const io_control_input_t &io_ctrl,
     {
         if (state < -0.01f)
         {
-            return u8"целевое: отпускное (выпуск ТЦ)";
+            return u8"╤Ж╨╡╨╗╨╡╨▓╨╛╨╡: ╨╛╤В╨┐╤Г╤Б╨║╨╜╨╛╨╡ (╨▓╤Л╨┐╤Г╤Б╨║ ╨в╨ж)";
         }
 
         const float p_target = state * 0.4f * 10.2f;
 
-        return u8"целевое: " + QString::number(p_target, 'f', 1) + u8" кгс/см²";
+        return u8"╤Ж╨╡╨╗╨╡╨▓╨╛╨╡: " + QString::number(p_target, 'f', 1) + u8" ╨║╨│╤Б/╤Б╨╝┬▓";
     }
 
     return IOController::getControlStateText(io_ctrl, state);

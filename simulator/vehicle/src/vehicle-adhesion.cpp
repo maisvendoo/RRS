@@ -113,7 +113,7 @@ void WheelRailAdhesion::step(double dt, double velocity, std::size_t num_axis)
         axle_variation.assign(num_axis, 0.0);
         axle_factor.assign(num_axis, 1.0);
 
-        // Детерминированные локальные вариации загрязнения по осям
+        // Детерминированные локальные вариации загрязнения по осям (ТЗ, п.9)
         for (std::size_t i = 0; i < num_axis; ++i)
         {
             const double u = static_cast<double>(mix32(
@@ -147,15 +147,15 @@ void WheelRailAdhesion::step(double dt, double velocity, std::size_t num_axis)
     // Снег на рельсе: до 40%
     factor -= 0.40 * snow;
 
-    // Лёд: до 70% (гололёд - минимальное сцепление)
+    // Лёд: до 70% (гололёд - минимальное сцепление, ТЗ, п.5)
     factor -= 0.70 * ice;
 
-    // Скоростной эффект: плёнка воды при высокой скорости
+    // Скоростной эффект: плёнка воды при высокой скорости (ТЗ, п.14)
     const double speed_factor = 1.0 - 0.10 * wetness *
             std::min(std::abs(velocity) / 40.0, 1.0);
     factor *= speed_factor;
 
-    // Состояние рельса (износ/ржавчина/шлифовка)
+    // Состояние рельса (износ/ржавчина/шлифовка, ТЗ, п.17)
     switch (rail_condition)
     {
     case RailCondition::New:        factor *= 0.95; break; // новые - чуть хуже притёртых
@@ -177,7 +177,7 @@ void WheelRailAdhesion::step(double dt, double velocity, std::size_t num_axis)
         // Локальная вариация загрязнения по осям
         double axle = factor * (1.0 - 0.08 * (axle_variation[i] - 1.0));
 
-        // Песок локально повышает сцепление оси
+        // Песок локально повышает сцепление оси (ТЗ, п.12)
         axle = std::min(axle + sand_boost[i], 1.15);
 
         axle_factor[i] = std::min(std::max(axle, 0.10), 1.15);
@@ -192,7 +192,7 @@ void WheelRailAdhesion::evolveSurface(double dt, double velocity,
 {
     const double abs_v = std::abs(velocity);
 
-    // Осадки меняют состояние поверхности
+    // Осадки меняют состояние поверхности (ТЗ, п.3-6, 18)
     switch (weather)
     {
     case Weather::Dry:
@@ -214,7 +214,7 @@ void WheelRailAdhesion::evolveSurface(double dt, double velocity,
 
     case Weather::Rain:
         wetness += 0.003 * dt * weather_intensity;
-        // Дождь смывает загрязнение (медленно)
+        // Дождь смывает загрязнение (медленно, ТЗ, п.7)
         contamination -= 0.0005 * dt * weather_intensity;
         break;
 
@@ -262,7 +262,7 @@ void WheelRailAdhesion::evolveSurface(double dt, double velocity,
         ice += freeze;
     }
 
-    // Самоочистка проходами колёсных пар: движущийся поезд
+    // Самоочистка проходами колёсных пар (ТЗ, п.7): движущийся поезд
     // очищает рельсы; при продолжающихся осадках - медленнее
     if (abs_v > 0.5)
     {

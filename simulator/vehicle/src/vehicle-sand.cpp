@@ -111,7 +111,7 @@ void SandSystem::step(double dt,
 
     const SandState state = getSandState();
 
-    //--- Автоподача с гистерезисом ---
+    //--- Автоподача с гистерезисом (ТЗ, п.4) ---
 
     if (auto_mode)
     {
@@ -180,7 +180,7 @@ void SandSystem::step(double dt,
 
     if (feeding)
     {
-        // Расход: от режима и состояния
+        // Расход (ТЗ, п.2): от режима и состояния
         const double rate = base_rate * flow_factor;
 
         amount = std::max(0.0, amount - rate * dt);
@@ -191,7 +191,7 @@ void SandSystem::step(double dt,
             Journal::instance()->warning("Sand box is EMPTY");
         }
 
-        //--- Эффект на сцепление: зависит от рельса ---
+        //--- Эффект на сцепление (ТЗ, п.5-6): зависит от рельса ---
         double efficiency = 1.0;
 
         // Мокрый рельс: песок работает хуже; лёд - сильно хуже

@@ -24,6 +24,8 @@ const   QString GraphSettingsWindow::NOTIFY_LEVEL = "NofifyLevel";
 const   QString GraphSettingsWindow::VIEW_DIST = "ViewDistance";
 const   QString GraphSettingsWindow::MAX_FPS = "MaxFPS";
 const   QString GraphSettingsWindow::PHYSICAL_DEVICE = "PhysicalDevice";
+const   QString GraphSettingsWindow::PHYSICAL_DEVICE_VENDOR_ID = "PhysicalDeviceVendorID";
+const   QString GraphSettingsWindow::PHYSICAL_DEVICE_DEVICE_ID = "PhysicalDeviceDeviceID";
 const   QString GraphSettingsWindow::SAMPLES = "Samples";
 const   QString GraphSettingsWindow::DEPTH_FORMAT = "depthFormat";
 const   QString GraphSettingsWindow::SHADOW = "Shadow";
@@ -205,9 +207,47 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
         // Сохраняем настройки
         saveGraphSettings(fd_list);
     }
-
-    if (current_gpu_idx > 0 && current_gpu_idx < gpus_info.size())
+    else
     {
+        // Пытаемся найти GPU по аппаратному ID из конфига
+        int saved_vendor_id = 0;
+        int saved_device_id = 0;
+
+        for (const auto& field : fd_list)
+        {
+            if (field.first == PHYSICAL_DEVICE_VENDOR_ID)
+                saved_vendor_id = field.second.toInt();
+            if (field.first == PHYSICAL_DEVICE_DEVICE_ID)
+                saved_device_id = field.second.toInt();
+        }
+
+        int matched_idx = -1;
+        if (saved_vendor_id != 0 && saved_device_id != 0)
+        {
+            for (size_t i = 0; i < gpus_info.size(); ++i)
+            {
+                if (gpus_info[i].vendorID == static_cast<uint32_t>(saved_vendor_id) &&
+                    gpus_info[i].deviceID == static_cast<uint32_t>(saved_device_id))
+                {
+                    matched_idx = static_cast<int>(i);
+                    break;
+                }
+            }
+        }
+
+        if (matched_idx >= 0)
+        {
+            current_gpu_idx = matched_idx;
+        }
+        else if (current_gpu_idx >= 0 && current_gpu_idx < static_cast<int>(gpus_info.size()))
+        {
+            // Fallback на старый индекс, если не нашли по ID
+        }
+        else
+        {
+            current_gpu_idx = best_gpu_idx;
+        }
+
         ui->cbListGPU->setCurrentIndex(current_gpu_idx);
 
         auto &gpu_info = gpus_info[current_gpu_idx];
@@ -215,10 +255,6 @@ void GraphSettingsWindow::setSettingsGPU(const gpus_info_list_t &gpus_info)
         // Устанавливаем максимальный уровень сглаживания MSAA который обеспечивает GPU
         int s = qRound(std::log2(gpu_info.framebufferColorSamplesCounts));
         ui->hsMSAA->setMaximum(s);
-    }
-    else
-    {
-        return;
     }
 }
 
@@ -286,6 +322,17 @@ void GraphSettingsWindow::loadGraphicsSettings(QString file_name)
 
         cfg.getInt(secName, PHYSICAL_DEVICE, current_gpu_idx);
         fd_list.append(QPair<QString, QVariant>(PHYSICAL_DEVICE, current_gpu_idx));
+
+        {
+            int tmp = 0;
+            cfg.getInt(secName, PHYSICAL_DEVICE_VENDOR_ID, tmp);
+            fd_list.append(QPair<QString, QVariant>(PHYSICAL_DEVICE_VENDOR_ID, tmp));
+        }
+        {
+            int tmp = 0;
+            cfg.getInt(secName, PHYSICAL_DEVICE_DEVICE_ID, tmp);
+            fd_list.append(QPair<QString, QVariant>(PHYSICAL_DEVICE_DEVICE_ID, tmp));
+        }
 
         double view_dist = 0;
         cfg.getDouble(secName, VIEW_DIST, view_dist);
@@ -441,6 +488,16 @@ void GraphSettingsWindow::applyGraphSettings(FieldsDataList &fd_list,
 
     findSetting(PHYSICAL_DEVICE, fd_list, idx);
     fd_list[idx] = QPair<QString, QVariant>(PHYSICAL_DEVICE, ui->cbListGPU->currentIndex());
+
+    int gpu_idx = ui->cbListGPU->currentIndex();
+    if (gpu_idx >= 0 && gpu_idx < static_cast<int>(gpus_info.size()))
+    {
+        findSetting(PHYSICAL_DEVICE_VENDOR_ID, fd_list, idx);
+        fd_list[idx] = QPair<QString, QVariant>(PHYSICAL_DEVICE_VENDOR_ID, static_cast<uint32_t>(gpus_info[gpu_idx].vendorID));
+
+        findSetting(PHYSICAL_DEVICE_DEVICE_ID, fd_list, idx);
+        fd_list[idx] = QPair<QString, QVariant>(PHYSICAL_DEVICE_DEVICE_ID, static_cast<uint32_t>(gpus_info[gpu_idx].deviceID));
+    }
 
     findSetting(WIN_DECOR, fd_list, idx);
     if (ui->cbWindowDecoration->checkState() == Qt::CheckState::Checked)

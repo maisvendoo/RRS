@@ -9,6 +9,7 @@
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
+#include <vsgImGui/imgui.h>
 
 #include <filesystem>
 #include <fstream>
@@ -33,6 +34,14 @@ UndoRedoSaveHandler::UndoRedoSaveHandler(
 void UndoRedoSaveHandler::apply(vsg::KeyPressEvent& keyPress)
 {
     (void)keyPress;
+
+    // Не обрабатываем горячие клавиши, пока пользователь вводит текст
+    // в полях ImGui (иначе Ctrl+Z/Y/S будут срабатывать во время ввода)
+    if (ImGui::GetCurrentContext() != nullptr &&
+        ImGui::GetIO().WantTextInput)
+    {
+        return;
+    }
 
     if (keyboard_handler_->get_binding_state(ACTION_UNDO_COMMAND))
     {
@@ -69,6 +78,15 @@ void UndoRedoSaveHandler::save_route() const
 
     // Перезаписываем рабочую копию
     std::ofstream route_map_file{fs.combinePath(save_dir, "route1.map")};
+
+    if (!route_map_file.is_open())
+    {
+        Journal::instance()->error(
+            QString("Failed to open file %1 for writing")
+                .arg(fs.combinePath(save_dir, "route1.map").c_str()));
+
+        return;
+    }
 
     std::lock_guard<std::mutex> lock_guard{static_objects_mutex_};
     for (const auto& object : static_objects_)

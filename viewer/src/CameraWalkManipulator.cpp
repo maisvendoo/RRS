@@ -414,7 +414,7 @@ void CameraWalkManipulator::frameEvent(double dt)
 
     const double speed = _player.getSpeed();
 
-    //--- Покачивание головы: частота/амплитуда зависят от
+    //--- Покачивание головы (ТЗ п.11): частота/амплитуда зависят от
     // режима движения, при остановке плавно затухают ---
     double bob_target = 0.0;
     double bob_frequency = _settings.walk_bob_frequency;
@@ -439,7 +439,7 @@ void CameraWalkManipulator::frameEvent(double dt)
     _bob_amplitude += (bob_target - _bob_amplitude) * std::min(1.0, 4.0 * dt);
     _bob_phase += speed * bob_frequency * dt;
 
-    //--- Приземление: проседание по скорости удара ---
+    //--- Приземление (ТЗ п.13): проседание по скорости удара ---
     if (_player.justLanded())
     {
         _landing_dip = std::min(_player.getLandingImpact() *
@@ -449,7 +449,7 @@ void CameraWalkManipulator::frameEvent(double dt)
 
     _landing_dip *= std::exp(-_settings.walk_landing_recovery * dt);
 
-    //--- FOV при беге ---
+    //--- FOV при беге (ТЗ п.12) ---
     const double fov_target = _settings.fovy +
             ((_player.isSprinting() && speed > 1.0)
              ? _settings.walk_fov_boost : 0.0);

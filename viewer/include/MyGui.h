@@ -9,14 +9,21 @@
 #include <vsg/core/observer_ptr.h>
 #include <QString>
 
+#include <TrainsListWidget.h>
+#include <TrainProfileHintWidget.h>
+
 struct simulator_time_t;
 class NewSkybox;
 class RouteViewer;
 class Skybox;
 class VehiclesHandler;
+class UpdateViewerHandler;
 class UpdateStatisticsHandler;
 class UpdateControlToServerHandler;
 class TcpClient;
+class TrafficLightsHandler;
+class StationsHandler;
+class TrainLabelsHandler;
 
 struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
 {
@@ -29,8 +36,12 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     // Skybox *skybox = nullptr;
     NewSkybox* new_skybox = nullptr;  // Owned by RouteViewer
     VehiclesHandler *vehicles_handler = nullptr;
+    UpdateViewerHandler *viewer_handler = nullptr;
     UpdateStatisticsHandler *statistics_handler = nullptr;
     UpdateControlToServerHandler *controls_handler = nullptr;
+    TrafficLightsHandler *traffic_lights_handler = nullptr;
+    StationsHandler *stations_handler = nullptr;
+    TrainLabelsHandler *train_labels_handler = nullptr;
     TcpClient *tcp_client = nullptr;
 
     // Владелец — применяется пресет графики из GUI
@@ -86,17 +97,62 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool prev_F7 = false;
     bool is_show_HUD = false;
 
-    /// Окно диагностики составов:
-    /// F3 - вкл/выкл, F4 - свёрнутый/полный режим
+    /// Флаги видимости виджетов HUD
+    /// Окно диагностики составов: F3 - вкл/выкл, F4 - свёрнутый/полный режим
     bool prev_F3 = false;
     bool is_show_diagnostics = false;
-
     bool prev_F4 = false;
     bool diagnostics_full_mode = false;
+
+    bool hud_show_profile = true;
+    bool hud_show_timetable = true;
+    bool hud_show_trains_list = true;
+    bool hud_show_stations = true;
+    bool hud_show_train_labels = true;
 
     bool is_no_controlled = false;
 
     bool is_no_cabine_control = false;
+
+    /// Дальность профиля пути назад/вперёд от середины поезда, м (запрос к серверу)
+    double train_profile_backward = 4000.0;
+    double train_profile_forward = 4000.0;
+
+    /// Цвета виджетов интерфейса (HUD), RGBA в диапазоне 0.0 - 1.0
+    ImVec4 hud_background = ImVec4(0.0f, 0.0f, 0.0f, 0.8f);
+    ImVec4 hud_text = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImVec4 hud_button_off = ImVec4(1.0f, 0.75f, 0.75f, 0.8f);
+    ImVec4 hud_button_on = ImVec4(0.75f, 1.0f, 0.75f, 0.8f);
+    ImVec4 hud_button_hovered = ImVec4(1.0f, 1.0f, 0.75f, 0.8f);
+    ImVec4 hud_button_inactive = ImVec4(0.3f, 0.3f, 0.3f, 0.8f);
+    ImVec4 hud_button_inactive_text = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+
+    // Цвета выделения поездов и предупреждений
+    ImVec4 hud_current_train = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+    ImVec4 hud_controlled_train = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+    ImVec4 hud_warning_text = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+    // Цвета строк графика
+    ImVec4 hud_timetable_delay = ImVec4(1.0f, 0.5f, 0.31f, 1.0f);
+    ImVec4 hud_timetable_past = ImVec4(0.0f, 0.5f, 0.0f, 1.0f);
+    ImVec4 hud_timetable_current = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+    ImVec4 hud_timetable_future = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+
+    // Цвета виджета профиля пути (RGBA, 0.0 - 1.0)
+    ImVec4 hud_train_profile_grid = ImVec4(0.353f, 0.353f, 0.353f, 0.588f);
+    ImVec4 hud_train_profile_grid_label = ImVec4(0.745f, 0.745f, 0.745f, 0.863f);
+    ImVec4 hud_train_profile_baseline = ImVec4(0.502f, 0.502f, 0.502f, 1.0f);
+    ImVec4 hud_train_profile_curve = ImVec4(0.0f, 0.4f, 0.8f, 1.0f);
+    ImVec4 hud_train_profile_uncontrolled = ImVec4(0.251f, 0.502f, 0.0f, 1.0f);
+    ImVec4 hud_train_profile_current = ImVec4(0.753f, 0.753f, 0.0f, 1.0f);
+    ImVec4 hud_train_profile_controlled = ImVec4(0.753f, 0.251f, 0.251f, 1.0f);
+    ImVec4 hud_train_profile_station_text = ImVec4(0.0f, 0.784f, 1.0f, 1.0f);
+    ImVec4 hud_train_profile_signal_body = ImVec4(0.863f, 0.863f, 0.863f, 1.0f);
+    ImVec4 hud_train_profile_signal_letter = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImVec4 hud_train_profile_speed_limit_border = ImVec4(0.353f, 0.353f, 0.353f, 0.588f);
+    ImVec4 hud_train_profile_speed_limit_fill = ImVec4(0.353f, 0.353f, 0.353f, 0.157f);
+    ImVec4 hud_train_profile_speed_limit_text = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+    ImVec4 hud_train_profile_speed_limit_bg = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
     QString status = "";
 
@@ -120,6 +176,14 @@ public:
 
 private:
     vsg::ref_ptr<GUIParams> params;
+
+    mutable TrainsListWidget *_trains_list_widget = nullptr;
+
+    mutable TrainsListWidgetParams _trains_list_params;
+
+    mutable TrainProfileHintWidget *_train_profile_widget = nullptr;
+
+    mutable TrainProfileHintWidgetParams _train_profile_params;
 
     float font_size = 20.0f;    
 
@@ -167,6 +231,8 @@ private:
     void showHUD() const;
 
     void showTimetable() const;
+
+    float hudTopOffset() const;
 
     void printObject(const vsg::ref_ptr<vsg::Object>& object) const;
 

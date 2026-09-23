@@ -32,7 +32,7 @@ void WindshieldSystem::loadConfig(QString cfg_path)
     cfg.getDouble(sec, "WashUse", wash_use);
     cfg.getDouble(sec, "DefrostRate", defrost_rate);
 
-    // Снежная плёнка и дворники
+    // Снежная плёнка и дворники (ТЗ, п.3, 8-10)
     cfg.getDouble(sec, "SnowRate", snow_rate);
     cfg.getBool(sec, "AutoWipers", auto_wipers);
     cfg.getDouble(sec, "WiperDelay", wiper_delay);
@@ -71,7 +71,7 @@ void WindshieldSystem::wash()
     {
         wash_timer = 2.0;
 
-        // Расход на удар: 0.02 доли бака
+        // Расход на удар (ТЗ, п.10): 0.02 доли бака
         washer_fluid = std::max(0.0, washer_fluid - wash_use);
 
         // Дворники сработают через 0.7 с: пара взмахов поверх режима
@@ -98,7 +98,7 @@ void WindshieldSystem::step(double dt, double velocity,
     const double abs_v = std::abs(velocity);
     const double speed_factor = std::min(abs_v / 25.0, 1.0);
 
-    //--- Капли-частицы / снежная плёнка ---
+    //--- Капли-частицы / снежная плёнка (ТЗ, п.2, 8) ---
 
     if (snowing)
     {
@@ -113,7 +113,7 @@ void WindshieldSystem::step(double dt, double velocity,
         stepDroplets(dt, speed_factor);
     }
 
-    //--- Накопление ---
+    //--- Накопление (ТЗ, п.2-7) ---
 
     // Осадки на стекло: сильнее на скорости (встречный поток)
     water_film += rain_rate * rain_intensity * (0.3 + speed_factor) * dt;
@@ -131,7 +131,7 @@ void WindshieldSystem::step(double dt, double velocity,
         dirt += 0.005 * dt;
     }
 
-    //--- Зима: замерзание ---
+    //--- Зима: замерзание (ТЗ, п.14-16) ---
 
     if (air_temperature < -1.0 && (water_film > 0.05 || rain_intensity > 0.3))
     {
@@ -141,7 +141,7 @@ void WindshieldSystem::step(double dt, double velocity,
         ice += freeze;
     }
 
-    // Обогрев греет и сушит (плавит и снежную плёнку)
+    // Обогрев греет и сушит (плавит и снежную плёнку, ТЗ, п.8)
     if (defroster)
     {
         ice -= defrost_rate * dt;
@@ -156,7 +156,7 @@ void WindshieldSystem::step(double dt, double velocity,
 
     ice = std::min(std::max(ice, 0.0), 1.0);
 
-    //--- Авто-режим (ключ AutoWipers) ---
+    //--- Авто-режим (ключ AutoWipers, ТЗ, п.9) ---
 
     if (auto_wipers)
     {
@@ -174,7 +174,7 @@ void WindshieldSystem::step(double dt, double velocity,
         }
     }
 
-    //--- Взмахи дворников (зона очистки) ---
+    //--- Взмахи дворников (зона очистки, ТЗ, п.3) ---
 
     stepWipers(dt, rain_intensity, ice);
 
@@ -182,7 +182,7 @@ void WindshieldSystem::step(double dt, double velocity,
 
     // Дворники работают против воды и грязи, но не льда; износ щёток
     // снижает эффективность и оставляет грязевые полосы. Снег чистится
-    // хуже (x0.5)
+    // хуже (x0.5, ТЗ, п.8)
     if (wiper_mode > 0 && ice < 0.2)
     {
         const double efficiency = (1.0 - 0.6 * wiper_wear) *
@@ -275,7 +275,7 @@ void WindshieldSystem::stepDroplets(double dt, double speed_factor)
         }
     }
 
-    // Слияние близких капель: радиус складывается,
+    // Слияние близких капель (ТЗ, п.2): радиус складывается,
     // время жизни - максимум из двух
     for (std::size_t i = 0; i < droplets_.size(); ++i)
     {
@@ -311,7 +311,7 @@ void WindshieldSystem::stepDroplets(double dt, double speed_factor)
 void WindshieldSystem::stepWipers(double dt, double rain_intensity,
                                   double ice_level)
 {
-    // После омывателя дворники срабатывают с задержкой:
+    // После омывателя дворники срабатывают с задержкой (ТЗ, п.10):
     // пока идёт задержка - взмахов нет
     if (wiper_delay_timer > 0.0)
         wiper_delay_timer -= dt;
@@ -325,7 +325,7 @@ void WindshieldSystem::stepWipers(double dt, double rain_intensity,
     if (mode == 0)
         return;
 
-    // Период взмаха по режиму: низкий 1 Гц, высокий 2 Гц;
+    // Период взмаха по режиму (ТЗ, п.4): низкий 1 Гц, высокий 2 Гц;
     // INT - взмах ~0.5 Гц (период 2 с) с паузой от интенсивности осадков
     const double period = (mode == 3) ? 0.5 :
                           (mode == 2) ? 1.0 : 2.0;
@@ -358,13 +358,13 @@ void WindshieldSystem::stepWipers(double dt, double rain_intensity,
 //------------------------------------------------------------------------------
 void WindshieldSystem::wiperStroke(double ice)
 {
-    // По льду щётки проскальзывают - очистки нет
+    // По льду щётки проскальзывают - очистки нет (ТЗ, п.14-16)
     if (ice >= 0.2)
         return;
 
     const double efficiency = 1.0 - 0.6 * wiper_wear;
 
-    // Капли в зоне снимаются, вне зоны остаются (реалистично)
+    // Капли в зоне снимаются, вне зоны остаются (реалистично, ТЗ, п.3)
     droplets_.erase(std::remove_if(droplets_.begin(), droplets_.end(),
         [this](const Droplet& drop)
         {
@@ -467,7 +467,7 @@ const std::vector<WindshieldSystem::Droplet>& WindshieldSystem::getDroplets() co
 //------------------------------------------------------------------------------
 double WindshieldSystem::getVisibilityFactor() const
 {
-    // Видимость из кабины: грязь + плёнка + лёд + снег
+    // Видимость из кабины: грязь + плёнка + лёд + снег (ТЗ, п.17)
     double factor = 1.0;
 
     factor -= 0.55 * dirt;

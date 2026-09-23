@@ -63,7 +63,7 @@ void main()
 
 #ifdef VSG_DIFFUSE_MAP
     #ifdef VSG_GREYSCALE_DIFFUSE_MAP
-        float v = texture(diffuseMap, texCoordDiffuse);
+        float v = texture(diffuseMap, texCoordDiffuse).s;
         diffuseColor *= vec4(v, v, v, 1);
     #else
         diffuseColor *= texture(diffuseMap, texCoordDiffuse);

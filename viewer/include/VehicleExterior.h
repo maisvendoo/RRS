@@ -29,12 +29,12 @@ public:
     std::vector<vsg::dvec3>  driver_pos = {vsg::dvec3(0.0, 0.0, 0.0)};
     std::vector<double>  driver_dir = {0};
 
-    /// Точки выхода из кабин (пешая ходьба): спавн игрока
+    /// Точки выхода из кабин (пешая ходьба, ТЗ "walking"): спавн игрока
     /// при выходе; при отсутствии <ExitPos> - у двери, сдвиг от DriverPos
     std::vector<vsg::dvec3>  exit_pos = {};
     std::vector<double>  exit_dir = {};
 
-    /// Сиденье помощника в кабинах (посадка по E, ходьба)
+    /// Сиденье помощника в кабинах (посадка по E, ТЗ ходьба)
     std::vector<vsg::dvec3>  assistant_pos = {};
     int         train_id = 0;
     int         orientation = 1;
@@ -62,7 +62,7 @@ public:
     double      saved_cabine_cam_up = 0.0;
     double      saved_cabine_cam_fov = 64.0;
 
-    /// Реакция камеры от физики:
+    /// Реакция камеры от физики (ТЗ "Физическая реакция машиниста"):
     /// смещение головы в локальных осях ПЕ (X - продольное, Y - поперечное,
     /// Z - вертикальное), м; и наклоны (крен/тангаж), рад
     vsg::dvec3  cam_motion_offset = vsg::dvec3(0.0, 0.0, 0.0);

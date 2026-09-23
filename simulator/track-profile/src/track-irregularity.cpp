@@ -80,7 +80,7 @@ double Irregularity::offset(double path_coord) const
     case IrregularityType::Weld:
     {
         // Плавная горка sin^2, амплитуда падает с качеством сварки:
-        // качественный шов практически не ощущается
+        // качественный шов практически не ощущается (ТЗ, п.4)
         const double quality = std::min(1.0, std::max(0.0, this->quality));
         const double amp = amplitude * (1.0 - 0.9 * quality);
         return -amp * sin2Window(path_coord, x0, length);
@@ -88,7 +88,7 @@ double Irregularity::offset(double path_coord) const
 
     case IrregularityType::Depression:
     {
-        // Просадка: плоское дно со сглаженными склонами:
+        // Просадка: плоское дно со сглаженными склонами (ТЗ, п.5):
         // вход [x0, x0+entry], дно, выход [x1-exit, x1]
         double depth = 0.0;
 
@@ -118,7 +118,7 @@ double Irregularity::offset(double path_coord) const
 
     case IrregularityType::Switch:
     {
-        // Стрелочный перевод: тройной удар.
+        // Стрелочный перевод (ТЗ "Неровности пути", п.15): тройной удар.
         // Вход/выход зоны - импульсы формы рельсового стыка с амплитудой
         // x1.5 (стыки перед контррельсами и за крестовиной), в центре -
         // жёсткий удар о крестовину (короткий, двойная амплитуда).

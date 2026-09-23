@@ -1,10 +1,5 @@
 project (simulator)
 
-add_library(optflags INTERFACE)
-
-# Подключаем флаги
-include(../cmake/OptimizationFlags.cmake)
-
 add_subdirectory (physics)
 add_subdirectory (collision)
 add_subdirectory (track-profile)
@@ -15,6 +10,7 @@ add_subdirectory (perf)
 add_subdirectory (graphics-core)
 add_subdirectory (player)
 add_subdirectory (character)
+add_subdirectory (conductor)
 add_subdirectory (device)
 add_subdirectory (solver)
 add_subdirectory (rkf5)

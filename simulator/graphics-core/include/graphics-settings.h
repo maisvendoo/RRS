@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-//      Graphics settings core (масштабируемая графика)
+//      Graphics settings core (масштабируемая графика, ТЗ "Графика")
 //
 //      Одна сцена и одни ресурсы; качество масштабируется пресетами
 //      Legacy / Low / High / Ultra / Extreme (+ Custom). Ядро хранит
@@ -40,7 +40,7 @@ std::string presetToString(Preset preset);
 /// Пресет по имени; при неизвестном имени возвращается default_preset
 Preset presetFromString(const std::string& name, Preset default_preset = Preset::Low);
 
-/// Возможности GPU (заполняются рендерером при старте)
+/// Возможности GPU (заполняются рендерером при старте, ТЗ)
 struct GpuCapabilities
 {
     bool supports_compute = false;
@@ -77,7 +77,7 @@ struct QualityParams
     double internal_resolution = 1.0;///< Для динамического качества
 
     //------------------------------------------------------------------
-    // Новый тиры качества High/Ultra (дух TSW/UE5).
+    // Новый тиры качества High/Ultra (ТЗ "Графика", дух TSW/UE5).
     //
     // Все поля ниже по умолчанию ВЫКЛЮЧЕНЫ: пресеты Legacy/Low и
     // Custom-по-умолчанию идут по прежнему пути рендера без единого
@@ -120,7 +120,7 @@ struct QualityParams
     bool use_ssao = false;
 
     //------------------------------------------------------------------
-    // Пост-процессинговый тир Extreme (UE-подобный).
+    // Пост-процессинговый тир Extreme (UE-подобный, ТЗ "Графика").
     //
     // Реальный пост-процесс на полноэкранных проходах чистого VSG
     // (graphics::PostProcessChain в модуле graphics): сцена рендерится
@@ -199,7 +199,7 @@ public:
     /// задаются через setParam и фиксируются applyPreset(Custom))
     void setPreset(Preset preset);
 
-    /// Авто-выбор пресета по возможностям GPU
+    /// Авто-выбор пресета по возможностям GPU (ТЗ)
     Preset autoDetect(const GpuCapabilities& caps);
 
     Preset getPreset() const;
@@ -225,11 +225,11 @@ public:
     /// (рендерер знает vsync/лимит FPS и уточняет цель)
     void setTargetFrameMs(double frame_ms);
 
-    /// LOD-тир объекта по дистанции: 0 - high, 1 - med,
+    /// LOD-тир объекта по дистанции (ТЗ "Графика"): 0 - high, 1 - med,
     /// 2 - low, 3 - billboard/impostor
     int lodTier(double distance_m) const;
 
-    /// Динамическое качество: при падении FPS снижает разрешение/
+    /// Динамическое качество (ТЗ): при падении FPS снижает разрешение/
     /// дальность/эффекты плавно; recovery_rate возвращает
     void adaptFrameTime(double frame_ms);
 

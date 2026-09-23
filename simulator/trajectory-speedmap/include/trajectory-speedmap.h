@@ -2,11 +2,12 @@
 #define     TRAJECTORY_SPEEDMAP_H
 
 #include    "topology-trajectory-device.h"
+#include    <speed-limit-source.h>
 
 //------------------------------------------------------------------------------
 // Модуль путевой инфраструктуры с картой скоростей на траектории
 //------------------------------------------------------------------------------
-class TrajectorySpeedMap : public TrajectoryDevice
+class TrajectorySpeedMap : public TrajectoryDevice, public SpeedLimitSource
 {
 public:
 
@@ -17,10 +18,16 @@ public:
     /// Шаг симуляции
     void step(double t, double dt) override;
 
+    QByteArray serialize() const override;
+    void deserialize(QByteArray& data) override;
+    void getDrawElements(std::vector<draw_line_t>& lines, std::vector<draw_circle_t>& circles, const double scale) override;
+
     std::vector<double> *getLimits();
     std::vector<double> *getLimitBegins();
     std::vector<double> *getLimitEnds();
     double getTrajLength();
+
+    std::vector<speed_limit_interval_t> getSpeedLimits() const override;
 
 protected:
 

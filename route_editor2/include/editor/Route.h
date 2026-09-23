@@ -23,7 +23,7 @@ public:
     /// обновляет EditorContext (имя + указатель) и подсветку линии
     void select_trajectory(const std::string& name);
 
-    /// Превью полосы параметрической стройки: оранжевая
+    /// Превью полосы параметрической стройки (ТЗ п.6/55): оранжевая
     /// линия вдоль траектории в диапазоне [begin_m, end_m]
     void show_build_preview(const Trajectory* trajectory,
                             double begin_m, double end_m);
@@ -46,7 +46,7 @@ private:
     /// Перестроить линию подсветки выбранной траектории (циан)
     void update_trajectory_highlight(const Trajectory* trajectory);
 
-    /// Превью полосы параметрической стройки: оранжевая
+    /// Превью полосы параметрической стройки (ТЗ п.6/55): оранжевая
 
 private:
     EditorContext& context_;

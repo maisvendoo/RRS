@@ -39,7 +39,7 @@ void BrakeShoeSystem::loadConfig(QString cfg_path, std::size_t num_axis)
 {
     pads.assign(num_axis * 2, Pad());
 
-    // Детерминированные вариации колодок (неравномерный износ)
+    // Детерминированные вариации колодок (неравномерный износ, ТЗ, п.8)
     for (std::size_t i = 0; i < pads.size(); ++i)
     {
         const double u = static_cast<double>(mix32(
@@ -96,7 +96,7 @@ void BrakeShoeSystem::loadConfig(QString cfg_path, std::size_t num_axis)
     cfg.getDouble(sec, "MaxThickness", max_thickness_mm);
     cfg.getDouble(sec, "FrictionCoefficient", friction_coeff);
 
-    // Материал корректирует базовые характеристики -
+    // Материал корректирует базовые характеристики (ТЗ, п.11) -
     // только те, что не заданы в конфиге явно
     switch (type)
     {
@@ -157,7 +157,7 @@ void BrakeShoeSystem::step(double dt,
         const double omega = (i < wheel_omegas.size())
                 ? std::abs(wheel_omegas[i]) : 0.0;
 
-        // Мощность трения тормоза на оси, Вт (реальная работа)
+        // Мощность трения тормоза на оси, Вт (реальная работа, ТЗ, п.2)
         const double brake_power = torque * omega;
 
         for (int s = 0; s < 2; ++s)
@@ -167,7 +167,7 @@ void BrakeShoeSystem::step(double dt,
             //--- Нагрев: доля мощности в колодку, делится на две ---
             const double heat_power = 0.5 * heat_to_shoe * brake_power;
 
-            //--- Охлаждение: конвекция, растёт со скоростью ---
+            //--- Охлаждение: конвекция, растёт со скоростью (ТЗ, п.3) ---
             const double cooling = cooling_coeff *
                     (1.0 + std::abs(velocity) / 20.0) *
                     (pad.temperature - air_temperature);
@@ -175,13 +175,13 @@ void BrakeShoeSystem::step(double dt,
             const double dT = (heat_power - cooling) * dt / thermal_capacity;
             pad.temperature += dT;
 
-            // Экстремальный перегрев: повреждение колодки
+            // Экстремальный перегрев: повреждение колодки (ТЗ, п.4)
             if (pad.temperature > t_critical + 150.0)
             {
                 pad.thickness = std::max(0.0, pad.thickness - 0.001 * dt);
             }
 
-            //--- Износ: от работы и температуры ---
+            //--- Износ: от работы и температуры (ТЗ, п.7) ---
             if (brake_power > 0.0)
             {
                 // Работа на одну колодку - та же доля, что и в нагреве
@@ -202,7 +202,7 @@ void BrakeShoeSystem::step(double dt,
             //--- Эффективность оси: fade + износ + материал ---
             double eff = fadeFactor(pad.temperature);
 
-            // Изношенная колодка теряет эффективность
+            // Изношенная колодка теряет эффективность (ТЗ, п.10)
             if (pad.thickness < min_thickness)
             {
                 eff *= 0.5 + 0.5 * (pad.thickness / min_thickness);

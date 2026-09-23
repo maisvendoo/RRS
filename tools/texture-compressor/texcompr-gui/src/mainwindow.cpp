@@ -158,6 +158,18 @@ void MainWindow::launchNextProcess()
             args << "-i";
         }
 
+        if (ui->cbDeleteSrcTexDir->isChecked())
+        {
+            args << "-d";
+        }
+
+        // При параллельной обработке с удалением исходников принудительно
+        // включаем -i, чтобы избежать гонки за общие текстуры
+        if (ui->cbDeleteSrcTexDir->isChecked() && !ui->cbNoRewriteKtxDir->isChecked())
+        {
+            args << "-i";
+        }
+
         proc->setArguments(args);
 
         // Асинхронные соединения
@@ -368,7 +380,7 @@ void MainWindow::slotCopmpress()
         args << "-o";
     }
 
-    if (ui->cbNoRewrite)
+    if (ui->cbNoRewrite->isChecked())
     {
         args << "-i";
     }

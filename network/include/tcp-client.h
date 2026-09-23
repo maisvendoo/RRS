@@ -35,6 +35,9 @@ public:
 
     void sendRequest(StructureType stype, double update_interval = 0.0);
 
+    /// Запрос подписки на профили путей поездов с дальностями вперёд/назад, м
+    void sendTrainProfileRequest(double update_interval, double backward_m, double forward_m);
+
     void sendSwitchCommand(QByteArray switch_command);
 
     void sendSignalCommand(QByteArray signal_command);
@@ -48,6 +51,8 @@ public:
     void sendVehicleControl(QByteArray vehicle_control_by_keyboard);
 
     void sendNewTrainName(int train_idx, const QString &new_name);
+
+    void sendReverseTrain(int train_idx);
 
     void sendSimSpeedCommand(int speed_factor);
 
@@ -71,6 +76,8 @@ signals:
 
     void setSignalsData(QByteArray &signals_data);
 
+    void setStationsData(QByteArray &stations_data);
+
     //void setSignalsState(QByteArray &signals_state);
 
     void updateSignal(QByteArray signal_data);
@@ -91,6 +98,11 @@ signals:
 
     /// Снимок диагностики составов
     void setDiagnosticsData(QByteArray &diagnostics_data);
+    void setTrainProfile(QByteArray &profile_data);
+
+    void setTopologyModules(QByteArray &modules_data);
+
+    void setTopologyModuleUpdate(QByteArray &module_update);
 
     void sendLogMessage(QString msg);
 

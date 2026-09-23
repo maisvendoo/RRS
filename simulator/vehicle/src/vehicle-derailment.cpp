@@ -112,7 +112,8 @@ void VehicleDerailment::step(double dt,
                 : 0.8;
 
         // Подъём гребня: устойчивое превышение Y/Q у гребня ИЛИ
-        // почти разгруженное колесо, доведённое до гребня (рост боковых сил -> разгрузка колеса -> подъём гребня)
+        // почти разгруженное колесо, доведённое до гребня (ТЗ, п.12:
+        // рост боковых сил -> разгрузка колеса -> подъём гребня)
         const bool overloaded = (yq > limit) &&
                 (y_disp > 0.5 * derail_displacement);
 
@@ -254,7 +255,7 @@ void VehicleDerailment::stepRollover(double dt, double velocity,
     // рассчитывается из шага шпал и скорости
 
     // Физический критерий опрокидывания: боковое ускорение на плече
-    // центра масс против силы тяжести на плече колеи:
+    // центра масс против силы тяжести на плече колеи (ТЗ, п.10):
     // опрокидывание при a_lat * h_cm > g * arm
     const double g = 9.81;
     const double demand = std::abs(lateral_accel) * mass_center_height;
@@ -364,7 +365,7 @@ double VehicleDerailment::getResistanceCoefficient() const
         return 0.6;
 
     // Сопротивление зависит от доли сошедших осей и поверхности
-    //: 1 пара - умеренное, вся ПЕ - большое
+    // (ТЗ "Физика после схода", п.6): 1 пара - умеренное, вся ПЕ - большое
     const double derailed_share = static_cast<double>(
                 std::count(derailed_axles.begin(), derailed_axles.end(), true)) /
             std::max<double>(static_cast<double>(derailed_axles.size()), 1.0);

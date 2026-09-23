@@ -94,7 +94,7 @@ void VehicleHazard::step(double dt,
 {
     explosion_event = false;
 
-    // Прогрессия состояния ёмкости: Normal -> Damaged -> Leak
+    // Прогрессия состояния ёмкости (ТЗ, п.23): Normal -> Damaged -> Leak
     if (cargo == CargoType::Normal)
         return;
 
@@ -163,7 +163,8 @@ void VehicleHazard::step(double dt,
             fire_intensity = std::min(1.0, fire_intensity + fire_growth * dt);
         }
 
-        // Взрыв: критическое состояние ёмкости при пожаре (не случайный эффект - следствие состояния)
+        // Взрыв: критическое состояние ёмкости при пожаре (не случайный
+        // эффект - следствие состояния, ТЗ, п.25)
         if (!exploded &&
             (cargo == CargoType::Explosive || cargo == CargoType::Pressurized) &&
             tank_state >= TankState::Critical &&

@@ -331,7 +331,7 @@ private:
                             static_cast<float>(contact_point.GetY()),
                             static_cast<float>(contact_point.GetZ()));
 
-        //--- Импульс и относительная скорость (P1-5) ---
+        //--- Импульс и относительная скорость (ТЗ "Коллизии" п.8, P1-5) ---
         // Слушатель вызывается ДО солвера (см. комментарий в
         // Jolt/Physics/Collision/ContactListener.h v5.6.0), фактический
         // импульс контакта ещё не вычислен. Оценка - штатная
@@ -627,7 +627,7 @@ CollisionObject CollisionWorld::createObject(const ObjectDesc& desc)
     settings.mIsSensor = desc.profile.is_sensor;
     settings.mCollideKinematicVsNonDynamic = desc.collide_kinematic_vs_static;
     // CCD: LinearCast исключает туннелирование быстрых кинематических
-    // тел ПС сквозь тонкие препятствия (P2-12).
+    // тел ПС сквозь тонкие препятствия (ТЗ "Коллизии" п.24, P2-12).
     // Broadphase поддерживает из коробки: качество движения - свойство
     // тела, фильтры пар не меняются
     settings.mMotionQuality = toJoltMotionQuality(desc.motion_quality);

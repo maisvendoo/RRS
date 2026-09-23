@@ -61,7 +61,7 @@ void VL60pk::initBrakesControl(const QString& modules_dir, const QString& custom
     hose_bc_bwd = new PneumoHose();
     hose_bc_bwd->read_config("pneumo-hose-BC");
 
-    // Телеметрия для кассеты регистрации и сессий:
+    // Телеметрия для кассеты регистрации и сессий (ТЗ "Кассеты"):
     // адресация приборов живёт в VehicleTelemetry, а не в Vehicle.
     // ТМ/ГР из магистрали и главного резервуара, ТЦ - среднее по
     // тележкам, УР - кран I кабины (как у vl60k), ток - средний Ia

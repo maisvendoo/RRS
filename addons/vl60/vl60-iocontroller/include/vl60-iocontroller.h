@@ -1,4 +1,4 @@
-#ifndef     VL60_IO_CONTROLLER_H
+﻿#ifndef     VL60_IO_CONTROLLER_H
 #define     VL60_IO_CONTROLLER_H
 
 #include    <io-controller.h>
@@ -23,10 +23,10 @@ private:
     QString getControlStateText(const io_control_input_t &io_ctrl,
                                 float state) const override;
 
-    /// Тумблеры "включено/выключено" (Shift+клавиша / Ctrl+клавиша)
+    /// ╨в╤Г╨╝╨▒╨╗╨╡╤А╤Л "╨▓╨║╨╗╤О╤З╨╡╨╜╨╛/╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨╛" (Shift+╨║╨╗╨░╨▓╨╕╤И╨░ / Ctrl+╨║╨╗╨░╨▓╨╕╤И╨░)
     void processTumblers(const std::set<uint16_t> &pressed_keys);
 
-    /// Расшифровка сигнала КМЭ (53) в позицию 0..33
+    /// ╨а╨░╤Б╤И╨╕╤Д╤А╨╛╨▓╨║╨░ ╤Б╨╕╨│╨╜╨░╨╗╨░ ╨Ъ╨Ь╨н (53) ╨▓ ╨┐╨╛╨╖╨╕╤Ж╨╕╤О 0..33
     int kmPosBySignal(float signal) const;
 };
 

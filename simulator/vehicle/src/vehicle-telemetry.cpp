@@ -86,3 +86,19 @@ double VehicleTelemetry::tractionCurrent(const Vehicle* vehicle) const
     const Sources* s = sourcesOf(vehicle);
     return (s != nullptr && s->traction_current) ? s->traction_current() : -1.0;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehicleTelemetry::setCassetteRecording(bool recording)
+{
+    cassette_recording = recording;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VehicleTelemetry::isCassetteRecording() const
+{
+    return cassette_recording;
+}

@@ -15,6 +15,8 @@
 
 #include <QObject>
 #include <QString>
+#include <QMap>
+#include <QMutex>
 
 #include <array>
 #include <atomic>
@@ -147,6 +149,27 @@ public:
         return timetable;
     }
 
+    const std::vector<simulator_train_update_t>& getTrainsInfo() const
+    {
+        return update_trains.trains;
+    }
+
+    const simulator_vehicles_info_t& getVehiclesInfo() const
+    {
+        return vehicles_info;
+    }
+
+    void setCurrentVehicle(int vehicle_idx);
+
+    const std::vector<VehicleExterior>& getVehicles() const
+    {
+        return vehicles;
+    }
+
+    /// Получить профиль пути поезда по его индексу (train_id)
+    bool getTrainProfile(int train_id, simulator_train_profile_update_t& out) const;
+
+
     VehicleExterior* getVehicle(int index);
 
 public slots:
@@ -155,6 +178,7 @@ public slots:
     void slotGetVehiclesStateData(QByteArray& data);
     void slotGetVehicleControlled(QByteArray& data);
     void slotGetDiagnosticsData(QByteArray& data);
+    void slotGetTrainProfileData(QByteArray& data);
 
 signals:
     void updated();
@@ -239,6 +263,10 @@ private:
 
     /// Data about trains, received from server
     simulator_trains_update_t update_trains;
+
+    /// Path profiles of trains, received from server (key = train_id)
+    mutable QMutex profiles_mutex;
+    QMap<int, simulator_train_profile_update_t> train_profiles;
 
     /// Vehicle state double buffer
     simulator_vehicles_update_t state_front;

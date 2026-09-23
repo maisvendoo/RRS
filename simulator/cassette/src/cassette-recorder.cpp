@@ -23,7 +23,8 @@ namespace
 {
 
 /// Мастер-ключ формата. Встраивается в симулятор и в программу
-/// расшифровки; в файле кассеты НЕ хранится (без ключа / прочитать данные невозможно). Изменение ломает все старые кассеты
+/// расшифровки; в файле кассеты НЕ хранится (ТЗ п.8: без ключа
+/// прочитать данные невозможно). Изменение ломает все старые кассеты
 const std::uint8_t KR_MASTER_KEY[32] =
 {
     0x8e, 0x12, 0x7a, 0x45, 0xd3, 0x6b, 0x9f, 0x21,
@@ -135,7 +136,7 @@ bool CassetteRecorderSystem::start(const QString& locomotive,
     if (state == State::Recording)
         return true;
 
-    // Каталог и имя файла: Cassettes/<Дата>_<Локомотив>.kr
+    // Каталог и имя файла: Cassettes/<Дата>_<Локомотив>.kr (ТЗ п.1)
     const QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd");
 
     const QString dir = "Cassettes";
@@ -165,7 +166,7 @@ bool CassetteRecorderSystem::start(const QString& locomotive,
     }
 
     // Серийный номер кассеты: метка времени + счётчик инстансов
-    // (уникален в пределах запуска)
+    // (уникален в пределах запуска, ТЗ п.6)
     static std::uint32_t instance_counter = 0;
     ++instance_counter;
 
@@ -199,7 +200,7 @@ bool CassetteRecorderSystem::start(const QString& locomotive,
     putString(bootstrap, serial);
     writePlainBlock(BLOCK_BOOTSTRAP, bootstrap);
 
-    //--- Блок метаданных ---
+    //--- Блок метаданных (ТЗ п.6) ---
     std::vector<std::uint8_t> meta;
 
     putString(meta, serial);
@@ -210,7 +211,7 @@ bool CassetteRecorderSystem::start(const QString& locomotive,
     putLE<double>(meta, train_mass_t);
     putLE<double>(meta, train_length_axles);
 
-    // Список аналоговых каналов: ID, имя, ед., диапазон, Гц
+    // Список аналоговых каналов (ТЗ п.2): ID, имя, ед., диапазон, Гц
     const std::vector<std::uint16_t> analog_ids =
         {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
@@ -249,7 +250,7 @@ bool CassetteRecorderSystem::start(const QString& locomotive,
         putLE<float>(meta, 2.0f);   ///< SampleRate, Гц (скорость/ТМ)
     }
 
-    // Дискретные каналы: 16 битов маски, имена
+    // Дискретные каналы (ТЗ п.3): 16 битов маски, имена
     const char* discrete_names[] =
     {
         "EPK", "RB", "SAUT", "TSKBM", "Compressor", "Fan", "SandSystem",
@@ -304,7 +305,7 @@ void CassetteRecorderSystem::stop()
     flush();
 
     //--- Блок целостности: мастер-хеш SHA-256 всех записанных байтов,
-    // отпечаток ключа сессии и подпись формата ---
+    // отпечаток ключа сессии и подпись формата (ТЗ п.8) ---
     std::vector<std::uint8_t> file_bytes;
 
     file.flush();
@@ -620,7 +621,7 @@ void CassetteRecorderSystem::accumulate(double t, const CassetteFrame& frame)
         frame.ept_mode
     };
 
-    // Дельта-кодирование аналоговых каналов: квантование 0.01
+    // Дельта-кодирование аналоговых каналов (ТЗ п.8): квантование 0.01
     for (std::size_t i = 0; i < analog.size() && i < 15; ++i)
     {
         AnalogSeries& series = analog[i];
@@ -643,7 +644,7 @@ void CassetteRecorderSystem::accumulate(double t, const CassetteFrame& frame)
         series.deltas.push_back(delta);
     }
 
-    // Дискретные каналы: маска 16 битов, события по изменению
+    // Дискретные каналы: маска 16 битов, события по изменению (ТЗ п.3)
     const std::uint32_t mask =
             (frame.epk ? 0x0001u : 0u) |
             (frame.rb_pressed ? 0x0002u : 0u) |
@@ -674,7 +675,7 @@ void CassetteRecorderSystem::accumulate(double t, const CassetteFrame& frame)
 
     discrete_mask_prev = mask;
 
-    // Профиль пути: не чаще 1 Гц
+    // Профиль пути: не чаще 1 Гц (ТЗ п.7)
     if (t - path_last_t >= 1.0)
     {
         path_last_t = t;

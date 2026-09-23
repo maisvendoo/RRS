@@ -64,7 +64,7 @@ void VehicleLateralDynamics::loadConfig(QString cfg_path,
     if (cfg.getDouble(sec, "CreepLateral", value))
         creep_lateral = value;
 
-    // Спиновый крип: коэффициент по
+    // Спиновый крип (ТЗ "Поперечная динамика", п.20): коэффициент по
     // литературе c_spin ~ f33·a·γ (f33 - продольный крип, a - полуось
     // контактного пятна ~7.6 мм, γ - коничность = параметр спина конуса)
     bool spin_set = false;
@@ -221,7 +221,7 @@ void VehicleLateralDynamics::step(double dt,
     const double h = dt / static_cast<double>(substeps);
 
     // Эквивалентное боковое ускорение с учётом возвышения наружного
-    // рельса (Б16):
+    // рельса (Б16, ТЗ "Поперечная динамика" п.14-15):
     //     a_eq = v^2/R - g*h_cant/(2*b),  b - половина колеи.
     // Возвышение наклоняет плоскость пути: составляющая тяжести
     // g*sin(θ) = g*cant/(2b) вычитается из центробежной. Остаток
@@ -256,7 +256,7 @@ void VehicleLateralDynamics::step(double dt,
 
     for (std::size_t i = 0; i < num_axis; ++i)
     {
-        // Угол набегания: рыскание колёсной
+        // Угол набегания (ТЗ "Динамика тележек", п.5-7): рыскание колёсной
         // пары минус направление касательной пути под осью (в кривой
         // касательная поворачивается на curvature * смещение оси)
         const double path_disp = static_cast<double>(dir) * axle_offset[i];
@@ -276,7 +276,8 @@ void VehicleLateralDynamics::step(double dt,
         // Доля ограничена: нагрузка колеса не уходит в минус,
         // но полная разгрузка возможна.
         // Боковой ветер добавляет перенос той же формулой через
-        // эквивалентное ускорение F/m на высоте приложения (ветер -> крен -> разгрузка колёс -> риск схода)
+        // эквивалентное ускорение F/m на высоте приложения (ТЗ "43-47",
+        // п.2: ветер -> крен -> разгрузка колёс -> риск схода)
         const double a_wind = wind_lateral_force /
                 std::max(full_mass, 1000.0);
 
@@ -294,7 +295,7 @@ void VehicleLateralDynamics::step(double dt,
             const double q = static_wheel_load * load_factors[i] *
                     (1.0 + (s == 0 ? -transfer : transfer));
 
-            // Классификация состояния контакта
+            // Классификация состояния контакта (ТЗ, п.12)
             std::uint8_t state = static_cast<std::uint8_t>(ContactState::Rolling);
 
             if (std::abs(axle_rel_y[i]) > flange_clearance)
@@ -436,7 +437,8 @@ void VehicleLateralDynamics::integrateSubstep(double h,
                     h);
         const double relax_psi = std::exp(-h / tau_psi);
 
-        // Радиальная установка тележки в кривой (Б15): наружное колесо идёт по большему радиусу - разность
+        // Радиальная установка тележки в кривой (Б15, ТЗ "Тележки"
+        // п.3/7): наружное колесо идёт по большему радиусу - разность
         // путей колёс за время dt: dS = curvature*v*b_wheel*dt.
         // При общем радиусе качения r0 это разность угловых скоростей
         // колёс dw = curvature*v*b_wheel/r0; продольный крип, гася её,
@@ -476,7 +478,7 @@ void VehicleLateralDynamics::integrateSubstep(double h,
         const double spring_y = -primary_lateral_stiffness * (axle.y - anchor_y) -
                                 primary_lateral_damping * (axle.dy - anchor_dy);
 
-        // Люфт рыскания: внутри зоны усилие не растёт
+        // Люфт рыскания: внутри зоны усилие не растёт (ТЗ, п.17)
         const double yaw_rel = axle.psi - bogie.psi;
         const double yaw_eff = std::abs(yaw_rel) > primary_yaw_free_play
                 ? yaw_rel - std::copysign(primary_yaw_free_play, yaw_rel)
@@ -484,7 +486,7 @@ void VehicleLateralDynamics::integrateSubstep(double h,
 
         const double spring_psi = -primary_yaw_stiffness * yaw_eff;
 
-        //--- Спиновый крип ---
+        //--- Спиновый крип (ТЗ "Поперечная динамика", п.20) ---
         // В кривой контактное пятно вращается в плоскости контакта
         // (спин, w_spin = v/R): момент спинового крипа
         //     M_spin = c_spin * (v/R),  c_spin ~ f33*a*gamma
@@ -550,7 +552,7 @@ void VehicleLateralDynamics::integrateSubstep(double h,
         }
 
         // Возвратный момент тележки к равновесию относительно кузова
-        //, с люфтом поворота (п.17)
+        // (ТЗ, п.16), с люфтом поворота (п.17)
         const double bogie_yaw_rel = bogie.psi - body.psi;
         const double bogie_yaw_eff =
                 std::abs(bogie_yaw_rel) > bogie_yaw_free_play
@@ -604,7 +606,7 @@ void VehicleLateralDynamics::integrateSubstep(double h,
     }
 
     // Кузов: центробежная составляющая + боковая ветровая нагрузка
-    // (ветер давит на боковую поверхность кузова)
+    // (ветер давит на боковую поверхность кузова, ТЗ "43-47", п.2)
     body_force += body_mass * a_curve + wind_lateral_force;
 
     const double accel = body_force / body_mass;
@@ -829,7 +831,7 @@ void VehicleLateralDynamics::setConicity(double value)
     conicity = std::min(std::max(value, 0.0), 0.5);
 
     // Коничность меняет границу виляния: пересчитываем
-    // критическую скорость
+    // критическую скорость (ТЗ, п.29)
     critical_speed = estimateCriticalSpeed();
 }
 

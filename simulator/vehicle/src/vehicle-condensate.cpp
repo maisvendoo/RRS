@@ -76,7 +76,7 @@ void CondensateSystem::step(double dt,
 
     dew_point = dewPointMagnus(air_temp, humidity);
 
-    //--- Температура резервуаров: инерция + нагрев от компрессора
+    //--- Температура резервуаров: инерция + нагрев от компрессора (ТЗ, п.4)
 
     const double target = air_temp +
             (air_charging ? compressor_heating : 0.0);
@@ -84,7 +84,7 @@ void CondensateSystem::step(double dt,
     const double tau = std::max(reservoir_tau, 1.0);
     reservoir_t += (target - reservoir_t) * std::min(dt / tau, 1.0);
 
-    //--- Влага в воздухе системы: растёт при зарядке магистрали
+    //--- Влага в воздухе системы (ТЗ, п.8): растёт при зарядке магистрали
     // (компрессор засасывает влажный атмосферный воздух), медленно
     // осушается продувками/осушителем, когда зарядки нет
 
@@ -93,7 +93,7 @@ void CondensateSystem::step(double dt,
     else
         moisture -= 0.0002 * dt;
 
-    //--- Конденсация: холодный резервуар ниже точки росы
+    //--- Конденсация (ТЗ, п.3, 7): холодный резервуар ниже точки росы
     // осажает воду из воздуха системы
 
     const double sub_dew = dew_point - reservoir_t;
@@ -116,7 +116,7 @@ void CondensateSystem::step(double dt,
 
     moisture = std::min(std::max(moisture, 0.0), 1.0);
 
-    //--- Замерзание/оттаивание: не мгновенно, по скорости
+    //--- Замерзание/оттаивание (ТЗ, п.9, 14): не мгновенно, по скорости
 
     if (reservoir_t < freeze_threshold)
     {
@@ -133,7 +133,7 @@ void CondensateSystem::step(double dt,
                 frozen_fraction - thaw_rate * std::max(warm, 0.1) * dt);
     }
 
-    //--- Слив конденсата: открытый кран или авто-продувка
+    //--- Слив конденсата (ТЗ, п.15): открытый кран или авто-продувка
     // на стоянке (медленнее ручного слива)
 
     const bool draining = drain_open || (auto_drain && standing);
@@ -145,7 +145,7 @@ void CondensateSystem::step(double dt,
     }
 
     // Лёд краном не сливается: сначала оттаять (в тёплом депо)
-    // Предупреждение об обледенении
+    // Предупреждение об обледенении (ТЗ, п.20)
     if (isFrozen() && !freeze_warned)
     {
         freeze_warned = true;
@@ -232,7 +232,7 @@ bool CondensateSystem::isFrozen() const
 double CondensateSystem::getBrakeResponseFactor() const
 {
     // Лёд в рукавах/кранах/воздухораспределителях сужает сечение:
-    // скорость тормозной волны падает до половины
+    // скорость тормозной волны падает до половины (ТЗ, п.10-13)
     const double ice = getIceAmount();
 
     return 1.0 - 0.5 * std::min(std::max(ice, 0.0), 1.0);

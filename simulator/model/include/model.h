@@ -197,6 +197,14 @@ private:
     simulator_diagnostics_update_t update_diagnostics = simulator_diagnostics_update_t();
     /// Время последней отправки диагностики клиенту, с (realtime)
     double diagnostics_prev_send_time = 0.0;
+
+    /// Feedback with trains' path profiles
+    std::vector<simulator_train_profile_update_t> update_profiles;
+
+    /// Профили пересчитываются не чаще этого реального интервала, с
+    static constexpr double profiles_update_interval = 1.0;
+    /// Время последнего пересчёта профилей
+    double profiles_update_prev_time = 0.0;
     /// Vehicle control and feedback with debug message
     struct controlled_client_t
     {
@@ -484,6 +492,8 @@ private:
 
     /// Построение снимка диагностики составов (раз в 0.5 с, F3/F4)
     void prepareDiagnostics();
+    /// Подготовка профилей пути всех поездов для рассылки клиентам
+    void prepareProfilesFeedback();
 
     /// TCP feedback
     void tcpFeedBack(bool need_trains_feedback);
@@ -500,6 +510,8 @@ private slots:
 
     void slotGetTopologyData(QByteArray &topology_data);
 
+    void slotGetTopologyModules(QByteArray &topology_modules);
+
     void slotGetSignalsData(QByteArray &signals_data);
 
     void slotGetVehicleControlByKeyboard(QByteArray control_data, int client_id);
@@ -507,6 +519,8 @@ private slots:
     void slotResetVehicleControlByKeyboard(int client_id);
 
     void slotRenameTrainInModel(int train_idx, QString new_name);
+
+    void slotReverseTrain(int train_idx);
 
     void slotGetTrainParams(int train_idx, double &train_len, double &train_mass);
 

@@ -24,6 +24,7 @@
 #include    <CfgReader.h>
 #include    <Journal.h>
 #include    <JournalFile.h>
+#include    <JournalAsyncFile.h>
 #include    <vehicle-controller.h>
 #include    <vehicle-telemetry.h>
 
@@ -38,6 +39,8 @@ static void Model_releaseHangingEmergency(std::vector<Train*>& trains, Vehicle* 
 
 #include    <switch.h>
 
+#include    <QFile>
+#include    <QTextStream>
 
 //------------------------------------------------------------------------------
 //
@@ -68,12 +71,15 @@ Model::~Model()
 //------------------------------------------------------------------------------
 bool Model::init(const simulator_command_line_t &command_line)
 {
-    // Разделение потоков по приоритетам: поток физики (модели и
-    // поездов) - средний приоритет; сеть - высший (поднимается в
-    // initTcpServer); запись сейвов - низший (SessionSaveManager)
+    // ТЗ "RP-сервер", п.7: разделение потоков по приоритетам.
+    // Поток физики (модели и поездов) - средний приоритет; сеть -
+    // высший (поднимается в initTcpServer); запись логов и сейвов -
+    // низший (JournalAsyncFile, SessionSaveManager)
     QThread::currentThread()->setPriority(QThread::NormalPriority);
 
-    // Серверный лог - отдельный файл logs/server.log
+    // ТЗ "RP-сервер", п.4: серверный лог - отдельный файл
+    // logs/server.log, асинхронная запись (очередь + фоновый поток
+    // с низшим приоритетом, ТЗ п.7)
     {
         FileSystem &fs = FileSystem::getInstance();
 
@@ -81,7 +87,7 @@ bool Model::init(const simulator_command_line_t &command_line)
                 .filePath("server.log");
 
         Journal::instance()->addStorage(
-                    new JournalFile(server_log, JournalLevel::All));
+                    new JournalAsyncFile(server_log, JournalLevel::All));
 
         Journal::instance()->info("Server log started: " + server_log);
     }
@@ -174,6 +180,12 @@ bool Model::init(const simulator_command_line_t &command_line)
                 train->setTabNumber(pending_session.trains.at(train_idx).tab_number);
             }
 
+            // Метка поезда для сообщений проводников в журнале
+            // (пустое имя не затирает метку "поезд #N" из setTrainIndex)
+            if (!train->getName().empty())
+                train->getConductors().setLabel(
+                            QString::fromStdString(train->getName()));
+
             trains.push_back(train);
 
             buildAutostartQueue(train);
@@ -256,6 +268,9 @@ bool Model::init(const simulator_command_line_t &command_line)
     tcp_server->setRouteInfo(route_info.serialize());
     Journal::instance()->info("Ready route info for server");
 
+    tcp_server->setStationsData(topology->serialize_stations());
+    Journal::instance()->info("Ready stations data for server");
+
     simulator_vehicles_info_t vehicles_info;
     vehicles_info.vehicles.resize(vehicles.size());
     size_t i = 0;
@@ -275,6 +290,8 @@ bool Model::init(const simulator_command_line_t &command_line)
     // Сетевой поток поднимается до первой рассылки: обратная связь
     // идёт сигналами (queued) в поток сервера сети
     initTcpServer();
+    update_pos_data.vehicles.resize(vehicles.size());
+    update_vehicles.vehicles.resize(vehicles.size());
 
     prepareFeedBack(true);
     tcpFeedBack(true);
@@ -501,12 +518,17 @@ void Model::buildAutostartQueue(Train *train)
 
     if (scnmgr->isTrainAutostarted(train->getTrainIndex()))
     {
-        for (auto vehicle : *(train->getVehicles()))
+        auto vehicles = *(train->getVehicles());
+        if (!vehicles.front()->getAutopilot().empty())
         {
-            if (!vehicle->getAutopilot().empty())
-            {
-                vehicles_for_autostart.push(vehicle);
-            }
+            vehicles_for_autostart.push(vehicles.front());
+            return;
+        }
+
+        if (!vehicles.back()->getAutopilot().empty())
+        {
+            vehicles_for_autostart.push(vehicles.back());
+            return;
         }
     }
 }
@@ -1060,7 +1082,7 @@ Train *Model::addTrain(const init_data_t &init_data)
     {
         Journal::instance()->info(QString("Train #%1 initialized successfully").arg(trains.size()));
 
-        //train->setTrainIndex(trains.size());
+        const size_t initial_veh_count = vehicles.size();
         for (auto vehicle : *(train->getVehicles()))
         {
             vehicle->setModelIndex(vehicles.size());
@@ -1074,23 +1096,25 @@ Train *Model::addTrain(const init_data_t &init_data)
 
         if (topology->addTrain(tp, train->getVehicles()))
         {
-            train->setTrainIndex(trains.size());
             Journal::instance()->info("Train added to topology successfully");
-        }
-        else
-        {
-            Journal::instance()->critical("CAN'T INITIALIZE TRAIN AT TOPOLOGY");
-            delete train;
-            return nullptr;
+
+            train->setTrainIndex(trains.size());
+            trains.push_back(train);
+
+            return train;
         }
 
-        return train;
-    }
-    else
-    {
-        Journal::instance()->error("Can't initialize Train");
+        Journal::instance()->critical("CAN'T INITIALIZE TRAIN AT TOPOLOGY");
+        for (auto it = vehicles.begin() + initial_veh_count; it != vehicles.end(); ++it)
+        {
+            delete *it;
+        }
+        vehicles.erase(vehicles.begin() + initial_veh_count, vehicles.end());
+        delete train;
         return nullptr;
     }
+
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -1540,6 +1564,143 @@ void Model::stepLoadingOperations(double dt)
         }
     }
 
+    //--- Проводники пассажирских вагонов (ТЗ "Система проводников") ---
+    // Цикл WAITING_FOR_TRAIN -> ... -> DESPAWN запускается для
+    // стоящего в зоне пассажирского поезда; двери и потоки пассажиров
+    // управляются по фазам проводников. Контекст задаётся в потоке
+    // модели ДО выдачи шага поездам (process() не начинает новый тик,
+    // пока все поезда не завершили предыдущий), поэтому доступа
+    // проводников из двух потоков одновременно не бывает
+
+    // Поезд игрока: для оптимизации NPC ACTIVE/INACTIVE (п.19 ТЗ)
+    Vehicle* player_vehicle = vehicles.empty() ? nullptr : vehicles.front();
+
+    const double player_coord = (player_vehicle != nullptr)
+            ? player_vehicle->getProfilePoint()->railway_coord
+            : 0.0;
+
+    for (Train* train : trains)
+    {
+        auto& conductors = train->getConductors();
+
+        if (!conductors.isEnabled() || !conductors.hasConductors())
+            continue;
+
+        const bool stopped = std::abs(train->getVelocity()) <= 0.3;
+
+        // Зона станции: любой пассажирский вагон состава стоит в зоне
+        // точки погрузки (платформа общая для всей остановки)
+        bool in_zone = false;
+        double platform_height = 1.1;
+        int queue = -1;
+
+        if (stopped)
+        {
+            for (auto vehicle : *(train->getVehicles()))
+            {
+                if (!vehicle->getPassengers().isConfigured())
+                    continue;
+
+                auto& vc = topology->getVehicleController(
+                            vehicle->getModelIndex());
+
+                const QString traj_name = vc.getCurrentTrajectoryName();
+
+                if (traj_name.isEmpty())
+                    continue;
+
+                const double coord =
+                        vehicle->getProfilePoint()->railway_coord;
+
+                for (const LoadingPoint& point : loading_points)
+                {
+                    if (traj_name != point.trajectory)
+                        continue;
+
+                    if (coord >= point.begin && coord <= point.end)
+                    {
+                        in_zone = true;
+                        platform_height = point.platform_height;
+                        queue = point.queue;
+                        break;
+                    }
+                }
+
+                if (in_zone)
+                    break;
+            }
+        }
+
+        conductors.setStationZone(in_zone);
+        conductors.setBoardingActive(in_zone && stopped);
+
+        // Близость к игроку: любой вагон состава ближе 300 м
+        bool player_near = false;
+
+        for (auto vehicle : *(train->getVehicles()))
+        {
+            if (std::abs(vehicle->getProfilePoint()->railway_coord -
+                         player_coord) <= 300.0)
+            {
+                player_near = true;
+                break;
+            }
+        }
+
+        conductors.setPlayerNear(player_near);
+
+        // Обслуживание вагонов: платформа, потоки, двери
+        for (auto vehicle : *(train->getVehicles()))
+        {
+            conductor::Conductor* cond = conductors.getConductor(
+                        vehicle->getModelIndex());
+
+            if (cond == nullptr)
+                continue;
+
+            auto& passengers = vehicle->getPassengers();
+
+            // Платформа: высота поверхности над головкой рельса
+            // (тип определяет проводник по разности высот, п.5 ТЗ)
+            conductor::PlatformInfo platform;
+            platform.known = in_zone;
+            platform.height_above_rail = platform_height;
+            platform.side = 1;
+            cond->setPlatform(platform);
+
+            // Состояние потоков (п.16 ТЗ): дверь не закрывается,
+            // пока идёт высадка/посадка
+            cond->setPassengerState(passengers.isBoardingInProgress(),
+                                    passengers.isAlightingInProgress());
+
+            // Двери вагона открывает/закрывает проводник
+            passengers.setDoorsOpen(
+                        cond->getDoorState() == conductor::DoorState::OPEN);
+
+            // Высадка на прибытии: выходят все пассажиры вагона
+            if (cond->fetchBeginAlightingRequest())
+            {
+                const int exiting = passengers.getPassengerCount();
+                passengers.beginAlighting(exiting);
+                cond->markAlightingDelivered(exiting);
+            }
+
+            // Посадка после высадки: очередь из конфига зоны
+            // (ключ Queue, дефолт - половина вместимости)
+            int count = 0;
+
+            if (cond->fetchBeginBoardingRequest(count))
+            {
+                const int waiting = (count > 0) ? count
+                        : ((queue >= 0) ? queue
+                                        : passengers.getCapacity() / 2);
+
+                passengers.beginBoarding(waiting);
+                cond->markBoardingDelivered(waiting);
+            }
+        }
+    }
+
 }
 
 //------------------------------------------------------------------------------
@@ -1736,6 +1897,7 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     connect(topology, &Topology::sigSetOpenSignalsQueue, scnmgr, &ScenarioManager::slotSetOpenSignalsQueue);
     connect(tcp_server, &TcpServer::sigRenameTrain, scnmgr, &ScenarioManager::slotRenameTrain);
     connect(scnmgr, &ScenarioManager::sigRenameTrainInModel, this, &Model::slotRenameTrainInModel);
+    connect(scnmgr, &ScenarioManager::sigReverseTrain, this, &Model::slotReverseTrain);
     connect(topology, &Topology::sigChangeTrajStateByTrain, scnmgr, &ScenarioManager::slotChangeTrajStateByTrain);
     connect(scnmgr, &ScenarioManager::sigGetTrajState, topology, &Topology::slotGetTrajState);
     connect(scnmgr, &ScenarioManager::sigGetNextTrajName, topology, &Topology::slotGetNextTrajName);
@@ -1781,7 +1943,11 @@ void Model::initTcpServer()
     tcp_server->moveToThread(tcp_thread);
     tcp_thread->start(QThread::HighPriority);
 
+    connect(tcp_server, &TcpServer::requestTopologyModules, this, &Model::slotGetTopologyModules);
+
     connect(topology, &Topology::sendTrajBusyState, tcp_server, &TcpServer::slotSendTrajBusyState);
+
+    connect(topology, &Topology::sendModuleUpdate, tcp_server, &TcpServer::slotSendTopologyModuleState);
 
     connect(topology, &Topology::sendSwitchState, tcp_server, &TcpServer::slotSendSwitchState);
 
@@ -1827,6 +1993,8 @@ void Model::initTcpServer()
     connect(tcp_server, &TcpServer::sigResetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
 
     connect(tcp_server, &TcpServer::sigRenameTrain, this, &Model::slotRenameTrainInModel);
+
+    connect(tcp_server, &TcpServer::sigReverseTrain, this, &Model::slotReverseTrain);
 
     connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
 
@@ -1885,8 +2053,8 @@ void Model::prepareFeedBack(bool need_trains_feedback)
 
     update_pos_data.speed_factor = speed_factor;
     update_pos_data.sim_time = sim_time;
-    update_pos_data.vehicles.resize(vehicles.size());
-    update_vehicles.vehicles.resize(vehicles.size());
+    //update_pos_data.vehicles.resize(vehicles.size());
+    //update_vehicles.vehicles.resize(vehicles.size());
     i = 0;
 
     for (auto vehicle : vehicles)
@@ -2090,6 +2258,117 @@ void Model::prepareDiagnostics()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::prepareProfilesFeedback()
+{
+    // Дальности профиля - максимум запросов всех подписчиков
+    double backward_m = 4000.0;
+    double forward_m = 4000.0;
+    tcp_server->getTrainProfileExtents(backward_m, forward_m);
+
+    update_profiles.clear();
+    update_profiles.reserve(trains.size());
+
+    for (size_t i = 0; i < trains.size(); ++i)
+    {
+        Train* train = trains[i];
+
+        std::vector<Vehicle*>* vlist = train->getVehicles();
+        if ((vlist == nullptr) || vlist->empty())
+            continue;
+
+        // Средняя ПЕ поезда - точка отсчёта профиля
+        Vehicle* mid_vehicle = (*vlist)[vlist->size() / 2];
+
+        VehicleController& vc= topology->getVehicleController(mid_vehicle->getModelIndex());
+
+        QString traj_name;
+        double coord = 0.0;
+        vc.slotGetVehicleTrajPosition(&traj_name, &coord);
+        dir_t orient = static_cast<dir_t>(vc.getOrientation() * mid_vehicle->getDirection());
+
+        Trajectory* traj = topology->getTrajectoriesList()->value(traj_name);
+        if (traj == nullptr)
+            continue;
+
+        profile_segments_t profile;
+        if (!topology->getProfile(traj, coord, orient, backward_m, forward_m, profile))
+            continue;
+
+        if (profile.points.empty())
+            continue;
+
+        simulator_train_profile_update_t upd;
+        upd.train_id = static_cast<int>(i);
+        upd.middle_vehicle_id = static_cast<int>(mid_vehicle->getModelIndex());
+        upd.direction = static_cast<int>(orient);
+        upd.speed = static_cast<float>(mid_vehicle->getVelocity());
+        upd.backward = static_cast<float>(profile.backward);
+        upd.forward = static_cast<float>(profile.forward);
+        upd.backward_requested = static_cast<float>(backward_m);
+        upd.forward_requested = static_cast<float>(forward_m);
+
+        upd.profile.reserve(profile.points.size());
+        for (const profile_segment_t& p : profile.points)
+        {
+            simulator_train_profile_point_t point;
+            point.distance = static_cast<float>(p.distance);
+            point.elevation = static_cast<float>(p.elevation);
+            point.railway_coord = static_cast<float>(p.railway_coord);
+            point.inclination = static_cast<float>(p.inclination);
+            upd.profile.push_back(point);
+        }
+
+        // Единицы подвижного состава на профиле (включая вагоны других поездов)
+        upd.vehicles.reserve(profile.vehicles.size());
+        for (const profile_vehicle_t& pv : profile.vehicles)
+        {
+            simulator_train_profile_vehicle_t vehicle;
+            vehicle.vehicle_id = static_cast<int>(pv.vehicle_id);
+            vehicle.begin_distance = static_cast<float>(pv.begin_distance);
+            vehicle.end_distance = static_cast<float>(pv.end_distance);
+            upd.vehicles.push_back(vehicle);
+        }
+
+        // Светофоры на профиле (попутные по ходу движения поезда)
+        upd.signal_list.reserve(profile.signal_list.size());
+        for (const profile_signal_t& ps : profile.signal_list)
+        {
+            simulator_train_profile_signal_t signal;
+            signal.distance = static_cast<float>(ps.distance);
+            signal.connector_name = ps.connector_name;
+            signal.signal_dir = ps.signal_dir;
+            signal.is_oncoming = ps.is_oncoming;
+            upd.signal_list.push_back(signal);
+        }
+
+        // Станции на профиле
+        upd.stations.reserve(profile.stations.size());
+        for (const profile_station_t& pst : profile.stations)
+        {
+            simulator_train_profile_station_t station;
+            station.distance = static_cast<float>(pst.distance);
+            station.name = pst.name;
+            upd.stations.push_back(station);
+        }
+
+        // Ограничения скорости на профиле
+        upd.speed_limits.reserve(profile.speed_limits.size());
+        for (const profile_speed_limit_t& psl : profile.speed_limits)
+        {
+            simulator_train_profile_speed_limit_t sl;
+            sl.distance = static_cast<float>(psl.distance);
+            sl.end_distance = static_cast<float>(psl.end_distance);
+            sl.speed_kmh = static_cast<float>(psl.speed_kmh);
+            upd.speed_limits.push_back(sl);
+        }
+
+        update_profiles.push_back(upd);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::tcpFeedBack(bool need_trains_feedback)
 {
     double realtime_seconds = std::chrono::duration<double, std::chrono::seconds::period>(process_timepoint - start_timepoint).count();
@@ -2119,6 +2398,18 @@ void Model::tcpFeedBack(bool need_trains_feedback)
 
     emit sigTcpUpdatePlayers(update_players.serialize(), realtime_seconds);
     update_players = simulator_update_players_t();
+
+    // Профили путей поездов: пересчёт и рассылка не чаще заданного интервала
+    if (tcp_server->hasTrainProfileSubscribers() &&
+        (realtime_seconds - profiles_update_prev_time) > profiles_update_interval)
+    {
+        profiles_update_prev_time = realtime_seconds;
+        prepareProfilesFeedback();
+        for (const auto& profile : update_profiles)
+        {
+            tcp_server->updateTrainProfile(profile.serialize(), realtime_seconds);
+        }
+    }
 
     for (auto с_id = controlled_clients.keyBegin(); с_id != controlled_clients.keyEnd(); ++с_id)
     {
@@ -2651,6 +2942,14 @@ void Model::slotGetTopologyData(QByteArray &topology_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::slotGetTopologyModules(QByteArray &topology_modules)
+{
+    topology_modules = topology->serialize_modules();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::slotGetSignalsData(QByteArray &signals_data)
 {
     signals_data = topology->getSignalsData()->serialize();
@@ -2774,13 +3073,33 @@ void Model::slotRenameTrainInModel(int train_idx, QString new_name)
 
     if (t_idx >= trains.size())
     {
-        Journal::instance()->error(QString("Rename train: Train index out of range (%1)").arg(t_idx, 4));
+        Journal::instance()->error(QString("Rename train: Train index out of range (%1/%2)").arg(t_idx).arg(trains.size()));
         return;
     }
 
     trains[t_idx]->setName(new_name.toStdString());
 
-    Journal::instance()->info(QString("Rename train: Train %1 has new name %2").arg(t_idx, 4).arg(new_name));
+    Journal::instance()->info(QString("Rename train: Train #%1 has new name %2").arg(t_idx).arg(new_name));
+
+    is_trains_changed = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotReverseTrain(int train_idx)
+{
+    size_t t_idx = static_cast<size_t>(train_idx);
+
+    if (t_idx >= trains.size())
+    {
+        Journal::instance()->error(QString("Reverse train: Train index out of range (%1/%2)").arg(t_idx).arg(trains.size()));
+        return;
+    }
+
+    trains[t_idx]->reverse();
+
+    Journal::instance()->info(QString("Reverse train #%1").arg(t_idx));
 
     is_trains_changed = true;
 }

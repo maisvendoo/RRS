@@ -27,7 +27,7 @@ class MatrixTransform;
 class NewSkybox
 {
 public:
-    /// hd_textures — пресеты High/Ultra: предпочитать
+    /// hd_textures — пресеты High/Ultra (ТЗ "Графика"): предпочитать
     /// HD-варианты текстур "<имя>_hd.<ext>"; при отсутствии файла
     /// молча используется обычная текстура
     NewSkybox(const std::string& skybox_config_filepath,
@@ -39,7 +39,7 @@ public:
     void set_date_time(const simulator_time_t& sim_time);
     void set_sun_direction(double azimuth_degrees, double altitude_degrees);
 
-    /// Туман: плотность, 1/м. Градиент
+    /// Туман (ТЗ "Видимость и погода"): плотность, 1/м. Градиент
     /// неба затухает к цвету тумана (сильнее у горизонта)
     void set_fog(double fog_density);
 

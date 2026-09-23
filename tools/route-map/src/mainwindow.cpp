@@ -7,6 +7,7 @@
 #include    <signal-command.h>
 #include    <switch.h>
 #include    <switch-state.h>
+#include    <topology-trajectory-device.h>
 
 #include    <QByteArray>
 #include    <QClipboard>
@@ -72,6 +73,12 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     connect(tcp_client, &TcpClient::setTrainInfo,
             this, &MainWindow::slotGetTrainsInfo);
 
+    connect(tcp_client, &TcpClient::setTopologyModules,
+            this, &MainWindow::slotGetTopologyModulesData);
+
+    connect(tcp_client, &TcpClient::setTopologyModuleUpdate,
+            this, &MainWindow::slotGetTopologyModuleUpdate);
+
     for (auto action : ui->mSimSpeed->actions())
     {
         connect(action, &QAction::triggered, this, &MainWindow::slotSetSimSpeed);
@@ -83,6 +90,9 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
 
     bg = new BackGroundWidget(ui->Map);
 
+    modules_hints = new ModulesHintsWidget(ui->Map);
+    modules_hints->traj_list = topology->getTrajectoriesList();
+
     map = new MapWidget(ui->Map);
     map->stations = topology->getStationsList();
     map->traj_list = topology->getTrajectoriesList();
@@ -91,6 +101,9 @@ MainWindow::MainWindow(route_map_command_line_t &cmd_line, QWidget *parent): QMa
     map->train_data = &train_data;
     map->vehicles_half_length = &vehicles_half_length;
     map->players_data = &players_data;
+
+
+    map->raise();
 
     connect(map, &MapWidget::sigOpenSignalMenu,
             this, &MainWindow::slotSignalControlMenu);
@@ -242,6 +255,11 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     map->resize(ui->Map->width(), ui->Map->height());
     map->update();
+
+    modules_hints->resize(ui->Map->width(), ui->Map->height());
+    modules_hints->setScale(map->getScale());
+    modules_hints->setShift(map->getShift());
+    modules_hints->update();
 
     bg->resize(ui->Map->width(), ui->Map->height());
     bg->setScale(map->getScale());
@@ -436,6 +454,18 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     }
     map->traj_labels.clear();
 
+    if (menu_view_separator)
+    {
+        ui->menuView->removeAction(menu_view_separator);
+        delete menu_view_separator;
+    }
+    for (auto action_view_module : modules_hints->menu_view_topology_modules)
+    {
+        ui->menuView->removeAction(action_view_module);
+        delete action_view_module;
+    }
+    modules_hints->menu_view_topology_modules.clear();
+
     for (auto traj : *topology->getTrajectoriesList())
     {
         QLabel *traj_label = new QLabel(map);
@@ -470,6 +500,49 @@ void MainWindow::slotGetTopologyData(QByteArray &topology_data)
     // Запрос серверу на загрузку сигналов
     tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
     ui->ptLog->appendPlainText(tr("Send request for signals data loading..."));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetTopologyModulesData(QByteArray& modules_data)
+{
+    topology->deserialize_modules(modules_data);
+
+    for (auto traj : *topology->getTrajectoriesList())
+    {
+        for (auto device : traj->getTrajectoryDevices())
+        {
+            QString module_name = device->getName();
+            if (module_name.isEmpty())
+            {
+                continue;
+            }
+            if (modules_hints->menu_view_topology_modules.find(module_name) == modules_hints->menu_view_topology_modules.end())
+            {
+                QAction* action_view_module = new QAction(module_name, ui->menuView);
+                modules_hints->menu_view_topology_modules.insert(module_name, action_view_module);
+            }
+        }
+    }
+
+    if (!modules_hints->menu_view_topology_modules.empty())
+    {
+        menu_view_separator = ui->menuView->addSeparator();
+        for (auto action_view_module : modules_hints->menu_view_topology_modules)
+        {
+            action_view_module->setCheckable(true);
+            ui->menuView->addAction(action_view_module);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotGetTopologyModuleUpdate(QByteArray& module_update)
+{
+    topology->slotTrajModuleUpdate(module_update);
 }
 
 //------------------------------------------------------------------------------
@@ -610,6 +683,8 @@ void MainWindow::slotGetSignalsData(QByteArray &sig_data)
                             static_cast<double>(vehicles_pos_update_interval) / 1000.0);
     ui->ptLog->appendPlainText(tr("Send request for continuous vehicles update"));
 
+    // Запрос серверу на модули путевой инфраструктуры
+    tcp_client->sendRequest(STYPE_REQUEST_TOPOLOGY_MODULES);
 }
 
 //------------------------------------------------------------------------------
@@ -1123,22 +1198,16 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
 
     for (size_t i = 0; i < update_trains.trains.size(); ++i)
     {
+        QString train_name = QString("#%1 ").arg(i, -2) + update_trains.trains[i].train_name;
+
         TrainLabel *train_label = new TrainLabel(map);
         train_label->setAlignment(Qt::AlignHCenter);
         train_label->setStyleSheet("color: white;");
-
-        QString train_name = update_trains.trains[i].train_name;
-
-        if (!train_name.isEmpty())
-            train_label->setText(train_name);
-        else
-            train_label->setText("0000");
-
+        train_label->setText(train_name);
         train_label->first_vehicle_idx = update_trains.trains[i].first_vehicle_id;
         train_label->train_idx = i;
 
-        connect(train_label, &TrainLabel::popUpMenu, this, &MainWindow::slotRenameTrainMenu);
-
+        connect(train_label, &TrainLabel::popUpMenu, this, &MainWindow::slotTrainMenu);
         map->train_labels.push_back(train_label);
 
         QAction *action_train = new QAction(train_name);
@@ -1151,27 +1220,23 @@ void MainWindow::slotGetTrainsInfo(QByteArray &data)
             mw->slotSetVehicleAtCenter(vehicle_idx);
         });
     }
-
-    if (!update_trains.trains.empty())
-    {
-        int vehicle_idx = update_trains.trains[0].first_vehicle_id;
-        map->slotSetVehicleAtCenter(0);
-    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void MainWindow::slotRenameTrainMenu()
+void MainWindow::slotTrainMenu()
 {
     TrainLabel *train_label = dynamic_cast<TrainLabel *>(sender());
+    int train_idx = train_label->train_idx;
 
     QMenu *menu = new QMenu(this);
 
+    // Меню переименования поезда
     QAction *rename = new QAction(tr("Rename"), this);
     menu->addAction(rename);
 
-    connect(rename, &QAction::triggered, this, [this, train_label]{
+    connect(rename, &QAction::triggered, this, [this, train_idx]{
 
         bool ok = false;
         QString new_name = QInputDialog::getText(
@@ -1184,8 +1249,16 @@ void MainWindow::slotRenameTrainMenu()
             );
 
         if (ok && !new_name.isEmpty()) {
-            this->tcp_client->sendNewTrainName(train_label->train_idx, new_name);
+            this->tcp_client->sendNewTrainName(train_idx, new_name);
         }
+    });
+
+    // Меню разворота головы-хвоста поезда
+    QAction *reverse = new QAction(tr("Reverse"), this);
+    menu->addAction(reverse);
+
+    connect(reverse, &QAction::triggered, this, [this, train_idx]{
+            this->tcp_client->sendReverseTrain(train_idx);
     });
 
     menu->exec(QCursor::pos());

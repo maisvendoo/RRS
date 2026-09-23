@@ -141,8 +141,6 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             ImGui::Checkbox("Show commands", &gui_settings.show_commands);
             ImGui::End();
 
-            ImGui::ShowDemoWindow();
-
             SHOW_WINDOW(show_objects_ref);
             SHOW_WINDOW(show_route_map);
             SHOW_WINDOW(show_stations_conf);
@@ -355,7 +353,7 @@ void EditorGui::show_stations_conf() const
     ImGui::End();
 }
 
-// TODO: Сделать, чтобы реальные позиции грузились один раз?
+// Позиции точек вычисляются только по клику на метку (не каждый кадр)
 void EditorGui::show_waypoints_conf() const
 {
     if (!context_.topology_loaded)
@@ -622,17 +620,17 @@ void EditorGui::show_selected_objects_properties() const
 
     ImGui::Begin("Selected objects", nullptr, window_flags_);
 
-    static bool dragging = false;
-
     std::size_t i = 0;
 
     for (const auto& object : selected_objects)
     {
         ImGui::Text("label: %s", object->label.c_str());
 
-        handle_translation_drag(i, object, dragging);
-        handle_rotation_drag(i, object, dragging);
-        handle_scale_drag(i, object, dragging);
+        ObjectDragState& drag_state = get_drag_state(object.get());
+
+        handle_translation_drag(i, object, drag_state);
+        handle_rotation_drag(i, object, drag_state);
+        handle_scale_drag(i, object, drag_state);
 
         ++i;
     }
@@ -683,44 +681,68 @@ void EditorGui::save_objects_matrixes() const
     }
 }
 
+ObjectDragState& EditorGui::get_drag_state(const RouteObject* object) const
+{
+    // Убираем состояния объектов, которых больше нет в выделении,
+    // чтобы карта не росла бесконечно
+    for (auto it = drag_states_.begin(); it != drag_states_.end(); )
+    {
+        const bool is_selected = std::any_of(
+            context_.selected_objects.cbegin(),
+            context_.selected_objects.cend(),
+            [&it](const vsg::ref_ptr<RouteObject>& selected) -> bool {
+                return selected.get() == it->first;
+            });
+
+        if (!is_selected)
+        {
+            it = drag_states_.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    return drag_states_[object];
+}
+
 void EditorGui::handle_translation_drag(
     size_t index,
     vsg::ref_ptr<RouteObject> object,
-    bool& dragging
+    ObjectDragState& drag_state
 ) const
 {
     std::string label = "translation##" + std::to_string(index);
-    static vsg::dvec3 total_translation = {0.0, 0.0, 0.0};
 
     vsg::dvec3 translation = object->get_translation();
     if (drag_double3(label.c_str(), translation.data()))
     {
-        if (!dragging)
+        if (!drag_state.dragging)
         {
-            total_translation = {0.0, 0.0, 0.0};
+            drag_state.total_translation = {0.0, 0.0, 0.0};
             save_objects_matrixes();
-            dragging = true;
+            drag_state.dragging = true;
         }
-        total_translation += translation - object->get_translation();
+        drag_state.total_translation += translation - object->get_translation();
         object->set_translation(translation);
     }
 
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
         context_.commands.push(new TranslateObjects(context_, {object},
-            total_translation), false);
-        dragging = false;
+            drag_state.total_translation), false);
+        drag_state.dragging = false;
     }
 }
 
 void EditorGui::handle_rotation_drag(
     std::size_t index,
     vsg::ref_ptr<RouteObject> object,
-    bool& dragging
+    ObjectDragState& drag_state
 ) const
 {
     std::string label = "rotation##" + std::to_string(index);
-    static vsg::dvec3 total_rotation_deg = {0.0, 0.0, 0.0};
 
     constexpr double min_rot_deg = -360.0;
     constexpr double max_rot_deg = 360.0;
@@ -728,13 +750,13 @@ void EditorGui::handle_rotation_drag(
     if (drag_double3(label.c_str(), rotation_deg.data(), 1.0f,
         &min_rot_deg, &max_rot_deg, ImGuiSliderFlags_WrapAround))
     {
-        if (!dragging)
+        if (!drag_state.dragging)
         {
-            total_rotation_deg = {0.0, 0.0, 0.0};
+            drag_state.total_rotation_deg = {0.0, 0.0, 0.0};
             save_objects_matrixes();
-            dragging = true;
+            drag_state.dragging = true;
         }
-        total_rotation_deg += rotation_deg - object->get_rotation_deg();
+        drag_state.total_rotation_deg += rotation_deg - object->get_rotation_deg();
         object->set_rotation_deg(rotation_deg);
     }
 
@@ -743,36 +765,40 @@ void EditorGui::handle_rotation_drag(
         vsg::dvec3 axis = {0.0, 0.0, 0.0};
         double radians;
 
-        if (std::abs(total_rotation_deg.x) >= 1.0e-6)
+        if (std::abs(drag_state.total_rotation_deg.x) >= 1.0e-6)
         {
             axis.x = 1.0;
-            radians = vsg::radians(total_rotation_deg.x);
+            radians = vsg::radians(drag_state.total_rotation_deg.x);
         }
-        else if (std::abs(total_rotation_deg.y) >= 1.0e-6)
+        else if (std::abs(drag_state.total_rotation_deg.y) >= 1.0e-6)
         {
             axis.y = 1.0;
-            radians = vsg::radians(total_rotation_deg.y);
+            radians = vsg::radians(drag_state.total_rotation_deg.y);
         }
         else
         {
             axis.z = 1.0;
-            radians = vsg::radians(total_rotation_deg.z);
+            radians = vsg::radians(drag_state.total_rotation_deg.z);
         }
 
+        // Вращаем вокруг центра bbox самого объекта, а не вокруг
+        // текущей позиции гизмо (которая может принадлежать другому объекту)
+        const vsg::dbox& bounds = object->get_bounds();
+        const vsg::dvec3 pivot = 0.5 * (bounds.min + bounds.max);
+
         context_.commands.push(new RotateObjects(context_, {object},
-            context_.gizmo->get_curr_pos(), axis, radians), false);
-        dragging = false;
+            pivot, axis, radians), false);
+        drag_state.dragging = false;
     }
 }
 
 void EditorGui::handle_scale_drag(
     size_t index,
     vsg::ref_ptr<RouteObject> object,
-    bool& dragging
+    ObjectDragState& drag_state
 ) const
 {
     std::string label = "scale##" + std::to_string(index);
-    static vsg::dvec3 total_scale = {1.0, 1.0, 1.0};
 
     const vsg::dvec3& prev_scale = object->get_scale();
     vsg::dvec3 scale = object->get_scale();
@@ -780,22 +806,27 @@ void EditorGui::handle_scale_drag(
     {
         if (vsg::length(scale) > 1.0e-6)
         {
-            if (!dragging)
+            if (!drag_state.dragging)
             {
-                total_scale = {1.0, 1.0, 1.0};
+                drag_state.total_scale = {1.0, 1.0, 1.0};
                 save_objects_matrixes();
-                dragging = true;
+                drag_state.dragging = true;
             }
-            total_scale *= {scale.x / prev_scale.x, scale.y / prev_scale.y,
-                scale.z / prev_scale.z};
+            drag_state.total_scale *= {scale.x / prev_scale.x,
+                scale.y / prev_scale.y, scale.z / prev_scale.z};
             object->set_scale(scale);
         }
     }
 
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
+        // Масштабируем относительно центра bbox самого объекта,
+        // а не текущей позиции гизмо (которая может принадлежать другому объекту)
+        const vsg::dbox& bounds = object->get_bounds();
+        const vsg::dvec3 pivot = 0.5 * (bounds.min + bounds.max);
+
         context_.commands.push(new ScaleObjects(context_, {object},
-            context_.gizmo->get_curr_pos(), total_scale), false);
-        dragging = false;
+            pivot, drag_state.total_scale), false);
+        drag_state.dragging = false;
     }
 }

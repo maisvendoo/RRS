@@ -57,7 +57,7 @@ void CabInteractionRegistry::loadConfig(QString cfg_path)
         cfg.getString(node, "Hint", item.hint);
         cfg.getBool(node, "IsToggle", item.is_toggle);
 
-        //--- Расширенные ключи ---
+        //--- Расширенные ключи (ТЗ "Взаимодействие с кабиной") ---
 
         // Имя меша для сопоставления с элементом (пикинг вьювера)
         cfg.getString(node, "ModelName", item.model_name);

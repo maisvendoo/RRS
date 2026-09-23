@@ -89,9 +89,22 @@ protected:
 
     virtual void keysProcess(std::set<uint16_t> &pressed_keys) = 0;
 
+    /// Общая семантика органа-переключателя: клик меняет состояние на
+    /// противоположное, целевое значение берётся из текущего сигнала ПЕ
+    /// (сервер - источник истины). Какие органы так работают - решает
+    /// модуль локомотива
     void processSwitchBySignal(io_control_input_t &io_ctrl);
 
+    /// Обработка клавиатурного тумблера (с фиксацией):
+    /// Shift+клавиша - включить, Ctrl+клавиша - выключить
     void processTumbler(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
+
+    /// Обработка клавиатурной кнопки (без фиксации):
+    /// удержание клавиши - нажата, отпускание - отпущена
+    void processButton(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
+
+    /// Проверка модификатора по имени из конфига ("Shift", "Control", "Alt")
+    bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
 
     /// Обработка клика мышью по органу (переопределяется аддоном
     /// для специфичной семантики: краны, контроллер машиниста и т.д.)

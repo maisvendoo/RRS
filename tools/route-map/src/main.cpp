@@ -4,12 +4,15 @@
 #include    <QLocale>
 #include    <QTranslator>
 #include    <QCommandLineParser>
+#include    <crash-handler.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
+    setup_crash_handler("../logs/route-map-crash.log");
+
     QApplication a(argc, argv);
 
     a.setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);

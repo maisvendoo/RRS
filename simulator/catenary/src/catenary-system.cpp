@@ -181,7 +181,7 @@ FeedState CatenarySystem::getFeedState(double railway_coord,
 
     if (neutral != nullptr)
     {
-        // Нейтральная вставка: напряжения нет
+        // Нейтральная вставка: напряжения нет (ТЗ, п.10)
         state.in_neutral = true;
         state.powered = false;
         state.voltage = 0.0;
@@ -234,7 +234,7 @@ FeedState CatenarySystem::getFeedState(double railway_coord,
     state.powered = true;
 
     // Приём рекуперации: подстанция с обратимым преобразователем
-    //
+    // (ТЗ "Рекуперация", п.7)
     state.accepts_regen = substation->regen_reception;
     state.max_regen_power = substation->max_regen_power;
 

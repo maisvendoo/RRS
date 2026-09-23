@@ -1,4 +1,4 @@
-#include    <cmath>
+﻿#include    <cmath>
 #include    <vl60pk.h>
 #include    <vl60-controls.h>
 
@@ -17,10 +17,10 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
     for (auto cab_idx : {CAB1, CAB2})
     {
-        // Применяем только ИЗМЕНИВШИЕСЯ команды (по фронту): команда
-        // задаёт целевое состояние органа, автозапуск/автоостанов
-        // и прочие серверные программы работают с устройствами напрямую
-        // и не должны затираться уровнем последней команды
+        // ╨Я╤А╨╕╨╝╨╡╨╜╤П╨╡╨╝ ╤В╨╛╨╗╤М╨║╨╛ ╨Ш╨Ч╨Ь╨Х╨Э╨Ш╨Т╨и╨Ш╨Х╨б╨п ╨║╨╛╨╝╨░╨╜╨┤╤Л (╨┐╨╛ ╤Д╤А╨╛╨╜╤В╤Г): ╨║╨╛╨╝╨░╨╜╨┤╨░
+        // ╨╖╨░╨┤╨░╤С╤В ╤Ж╨╡╨╗╨╡╨▓╨╛╨╡ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╨╡ ╨╛╤А╨│╨░╨╜╨░, ╨░╨▓╤В╨╛╨╖╨░╨┐╤Г╤Б╨║/╨░╨▓╤В╨╛╨╛╤Б╤В╨░╨╜╨╛╨▓
+        // ╨╕ ╨┐╤А╨╛╤З╨╕╨╡ ╤Б╨╡╤А╨▓╨╡╤А╨╜╤Л╨╡ ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╤Л ╤А╨░╨▒╨╛╤В╨░╤О╤В ╤Б ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░╨╝╨╕ ╨╜╨░╨┐╤А╤П╨╝╤Г╤О
+        // ╨╕ ╨╜╨╡ ╨┤╨╛╨╗╨╢╨╜╤Л ╨╖╨░╤В╨╕╤А╨░╤В╤М╤Б╤П ╤Г╤А╨╛╨▓╨╜╨╡╨╝ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨╣ ╨║╨╛╨╝╨░╨╜╨┤╤Л
         for (auto it = control_inputs[cab_idx].cbegin();
              it != control_inputs[cab_idx].cend(); ++it)
         {
@@ -49,7 +49,7 @@ void VL60pk::applyControlCommand(int cab_idx, int id, float value)
 
     switch (id)
     {
-    // Тумблеры: команда задаёт целевое состояние
+    // ╨в╤Г╨╝╨▒╨╗╨╡╤А╤Л: ╨║╨╛╨╝╨░╨╜╨┤╨░ ╨╖╨░╨┤╨░╤С╤В ╤Ж╨╡╨╗╨╡╨▓╨╛╨╡ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╨╡
     case CTRL_TUMBLER_PNT:
         state ? pants_tumbler[cab_idx].set() : pants_tumbler[cab_idx].reset();
         return;
@@ -71,7 +71,7 @@ void VL60pk::applyControlCommand(int cab_idx, int id, float value)
         return;
 
     case CTRL_TUMBLER_GV_RETURN:
-        // Кнопка без фиксации: нажатие - включить, отпускание (value=0) - выключить
+        // ╨Ъ╨╜╨╛╨┐╨║╨░ ╨▒╨╡╨╖ ╤Д╨╕╨║╤Б╨░╤Ж╨╕╨╕: ╨╜╨░╨╢╨░╤В╨╕╨╡ - ╨▓╨║╨╗╤О╤З╨╕╤В╤М, ╨╛╤В╨┐╤Г╤Б╨║╨░╨╜╨╕╨╡ (value=0) - ╨▓╤Л╨║╨╗╤О╤З╨╕╤В╤М
         state ? gv_return_tumbler[cab_idx].set() : gv_return_tumbler[cab_idx].reset();
         return;
 
@@ -135,40 +135,40 @@ void VL60pk::applyControlCommand(int cab_idx, int id, float value)
               : P_buffercolor_R_toogle[cab_idx].reset();
         return;
 
-    // Кран машиниста 395: позиция I..VI (0..6)
+    // ╨Ъ╤А╨░╨╜ ╨╝╨░╤И╨╕╨╜╨╕╤Б╤В╨░ 395: ╨┐╨╛╨╖╨╕╤Ж╨╕╤П I..VI (0..6)
     case CTRL_CRANE_395:
         brake_crane[cab_idx]->setHandlePosition(
                     static_cast<int>(std::lround(value)));
         return;
 
-    // Кран вспомогательный 254
+    // ╨Ъ╤А╨░╨╜ ╨▓╤Б╨┐╨╛╨╝╨╛╨│╨░╤В╨╡╨╗╤М╨╜╤Л╨╣ 254
     case CTRL_CRANE_254:
         loco_crane[cab_idx]->setHandlePosition(static_cast<double>(value));
         return;
 
-    // КМЭ главная рукоятка: позиция 0..33
+    // ╨Ъ╨Ь╨н ╨│╨╗╨░╨▓╨╜╨░╤П ╤А╤Г╨║╨╛╤П╤В╨║╨░: ╨┐╨╛╨╖╨╕╤Ж╨╕╤П 0..33
     case CTRL_KM_MAIN:
         controller[cab_idx]->setMainHandlePos(
                     static_cast<int>(std::lround(value)));
         return;
 
-    // КМЭ реверс: 0 - назад, 1 - ноль, 2 - вперёд
+    // ╨Ъ╨Ь╨н ╤А╨╡╨▓╨╡╤А╤Б: 0 - ╨╜╨░╨╖╨░╨┤, 1 - ╨╜╨╛╨╗╤М, 2 - ╨▓╨┐╨╡╤А╤С╨┤
     case CTRL_KM_REVERS:
         controller[cab_idx]->setReversHandlePos(
                     static_cast<int>(std::lround(value)));
         return;
 
-    // Вставка/извлечение реверсивной рукоятки
+    // ╨Т╤Б╤В╨░╨▓╨║╨░/╨╕╨╖╨▓╨╗╨╡╤З╨╡╨╜╨╕╨╡ ╤А╨╡╨▓╨╡╤А╤Б╨╕╨▓╨╜╨╛╨╣ ╤А╤Г╨║╨╛╤П╤В╨║╨╕
     case CTRL_KM_REVERS_INSERT:
         controller[cab_idx]->insertReversHandle(value > 0.5f);
         return;
 
-    // УБТ-367: поворот ключа блокировки
+    // ╨г╨С╨в-367: ╨┐╨╛╨▓╨╛╤А╨╛╤В ╨║╨╗╤О╤З╨░ ╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨║╨╕
     case CTRL_LOCK_367:
         brake_lock[cab_idx]->setStateOn(value > 0.5f);
         return;
 
-    // Комбинированный кран: -1 - двойная тяга, 0 - поездное, +1 - экстренное
+    // ╨Ъ╨╛╨╝╨▒╨╕╨╜╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ ╨║╤А╨░╨╜: -1 - ╨┤╨▓╨╛╨╣╨╜╨░╤П ╤В╤П╨│╨░, 0 - ╨┐╨╛╨╡╨╖╨┤╨╜╨╛╨╡, +1 - ╤Н╨║╤Б╤В╤А╨╡╨╜╨╜╨╛╨╡
     case CTRL_CRANE_COMBINE:
         brake_lock[cab_idx]->setCombineCranePosition(
                     static_cast<int>(std::lround(value)));

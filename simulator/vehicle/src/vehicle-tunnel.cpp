@@ -136,7 +136,7 @@ double TunnelAerodynamics::getResistanceForce(double velocity) const
     if (!enabled || immersion <= 0.0)
         return 0.0;
 
-    // Формула поршня: скоростной напор на мидель ПЕ,
+    // Формула поршня (ТЗ "43-47", п.3): скоростной напор на мидель ПЕ,
     // усиленный квадратом отношения сечений поезд/тоннель. Чем теснее
     // тоннель, тем сильнее эффект
     const double blockage = std::min(train_area / tunnel_area, 0.9);

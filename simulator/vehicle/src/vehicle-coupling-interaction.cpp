@@ -92,7 +92,7 @@ bool CouplingInteraction::pullUncoupleLever(End end, double speed)
 {
     EndState& state = ends[static_cast<int>(end)];
 
-    // Расцепка на ходу запрещена блокировкой
+    // Расцепка на ходу запрещена блокировкой (ТЗ, п.2)
     if (std::abs(speed) > 0.5)
     {
         Journal::instance()->warning(
@@ -134,7 +134,7 @@ void CouplingInteraction::step(double dt, double velocity,
         if (state.hose_torn)
             continue;
 
-        // Движение с болтающимся рукавом: обрыв
+        // Движение с болтающимся рукавом: обрыв (ТЗ, п.3-5)
         if (state.hose == HoseState::Hanging && abs_v > tear_speed)
         {
             state.hose_torn = true;

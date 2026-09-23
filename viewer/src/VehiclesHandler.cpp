@@ -951,6 +951,19 @@ bool VehiclesHandler::load(
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void VehiclesHandler::setCurrentVehicle(int vehicle_idx)
+{
+    if (vehicle_idx < 0 || static_cast<size_t>(vehicle_idx) >= vehicles.size())
+    {
+        return;
+    }
+
+    cur_vehicle = vehicle_idx;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 VehicleExterior *VehiclesHandler::getVehicle(int index)
 {
     if (index >= 0 && static_cast<size_t>(index) < vehicles.size())
@@ -983,6 +996,36 @@ void VehiclesHandler::slotGetTrainsData(QByteArray &data)
     }
     LOG_INFO("%s", msg.toStdString().c_str());
 */
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehiclesHandler::slotGetTrainProfileData(QByteArray &data)
+{
+    simulator_train_profile_update_t profile;
+    profile.deserialize(data);
+
+    QMutexLocker locker(&profiles_mutex);
+    train_profiles.insert(profile.train_id, profile);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool VehiclesHandler::getTrainProfile(int train_id,
+                                     simulator_train_profile_update_t& out) const
+{
+    QMutexLocker locker(&profiles_mutex);
+
+    auto it = train_profiles.constFind(train_id);
+    if (it == train_profiles.constEnd())
+    {
+        return false;
+    }
+
+    out = it.value();
+    return true;
 }
 
 //------------------------------------------------------------------------------

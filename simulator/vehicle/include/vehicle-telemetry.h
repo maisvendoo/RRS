@@ -70,6 +70,11 @@ public:
     double mainReservoirPressure(const Vehicle* vehicle) const;
     double tractionCurrent(const Vehicle* vehicle) const;
 
+    /// Признак активной записи кассеты регистрации (устанавливает
+    /// модель по Ctrl+R; аддоны читают для индикации на БИЛ)
+    void setCassetteRecording(bool recording);
+    bool isCassetteRecording() const;
+
 private:
 
     VehicleTelemetry() = default;
@@ -77,6 +82,8 @@ private:
     const Sources* sourcesOf(const Vehicle* vehicle) const;
 
     std::unordered_map<const Vehicle*, Sources> registry;
+
+    bool cassette_recording = false;
 };
 
 #endif // VEHICLE_TELEMETRY_H

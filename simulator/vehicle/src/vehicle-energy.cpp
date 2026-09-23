@@ -76,7 +76,7 @@ void EnergyMeterSystem::step(double dt, double traction_force, double velocity,
     }
     else
     {
-        // Электрическое торможение:
+        // Электрическое торможение (ТЗ "Рекуперация", п.2-8):
         // доступная рекуперативная мощность ограничена локомотивом
         // (max_regen_power, ток, минимальная скорость) и сетью
         // (приём подстанции/потребителей). Непринятая часть - реостат
@@ -111,7 +111,7 @@ void EnergyMeterSystem::step(double dt, double traction_force, double velocity,
     }
 
     // Тепловая модель тягового оборудования: рост выше продолжительной
-    // мощности, охлаждение ниже неё
+    // мощности, охлаждение ниже неё (ТЗ, п.9-11)
     const double overload_kw = std::max(std::abs(power_kw) - continuous_power, 0.0);
 
     const double heat_rate = overload_kw / std::max(continuous_power * 2.0, 1.0);

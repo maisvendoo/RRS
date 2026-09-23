@@ -81,6 +81,9 @@ public:
     /// если пустая, busy_begin_coord = length; busy_end_coord = 0.0
     void getBusyCoords(double &busy_begin_coord, double &busy_end_coord) const;
 
+    /// Занятость подвижным составом: модель-индекс ПЕ -> интервал координат
+    const QMap<size_t, std::array<double, 2>>& getVehiclesCoords() const;
+
     /// Вернуть все треки траектории
     const std::vector<track_t>& getTracks() const;
 
@@ -105,8 +108,10 @@ public:
     virtual void step(double t, double dt);
 
     QByteArray serialize() const;
+    QByteArray serialize_modules() const;
 
     void deserialize(QByteArray &data);
+    void deserialize_modules(QByteArray &data);
 
     /// Поиск новой траектории, траекторной координаты и смены ориентации,
     /// возвращает false, если координата за пределы топологии (за тупик)
@@ -136,10 +141,16 @@ public:
 
     /// Накопление тоннажа на путь от прохода ПЕ (износ / рельсов): mass_tonnes - масса ПЕ, т; distance_m - пройденный путь, м
     void addTonnage(double traj_coord, double mass_tonnes, double distance_m);
+    void deserializeModuleUpdate(std::uint32_t module_idx, QByteArray& module_data);
+
+public slots:
+
+    void slotSendModuleUpdate(QByteArray module_data);
 
 signals:
 
     void sendTrajBusyState(QByteArray busy_data);
+    void sendModuleUpdate(QByteArray module_data);
 
     /// Сигнал для модели, сообщающий индекс ПЕ, занявшей траекторию
     void sigTrajChangeState(int vehicle_idx, bool is_busy, QString traj_name);

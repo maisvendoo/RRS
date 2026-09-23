@@ -2,8 +2,12 @@ cmake_minimum_required (VERSION 3.29)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-project (RRS VERSION 1.9.2)
+project (RRS VERSION 1.9.4)
+
+# Подключаем дополнительные настройки
+include(cmake/BuildConfiguration.cmake)
 
 # RPATH configuration for finding shared libraries at runtime
 if(APPLE)
@@ -20,6 +24,7 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 option (CLIENT_BUILD "Build for client usage" ON)
 
+add_subdirectory (system)
 add_subdirectory (CfgReader)
 add_subdirectory (CfgEditor)
 add_subdirectory (filesystem)
@@ -35,6 +40,8 @@ add_subdirectory (simulator/session)
 add_subdirectory (addons/passcar)
 add_subdirectory (addons/freightcar)
 add_subdirectory (addons/vl60)
+
+add_subdirectory (tools/server-daemon)
 
 if (CLIENT_BUILD)
     add_subdirectory (graphics)
@@ -57,7 +64,10 @@ if (CLIENT_BUILD)
     add_subdirectory (tools/route-map)
     add_subdirectory (tools/route-transform)
     # add_subdirectory (tools/texture-compressor)  # нужен libktx, отложено
+    add_subdirectory (tools/rolling-stock-creator)
     add_subdirectory (tools/osm-import)
+    add_subdirectory (tools/admin-panel)
+
 endif()
 
 include(CMakePackageConfigHelpers)

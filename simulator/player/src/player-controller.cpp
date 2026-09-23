@@ -56,7 +56,7 @@ void PlayerController::step(double dt,
     yaw_ = yaw;
     sprinting_ = sprint && !crouch;
 
-    //--- Присед: плавная смена высоты глаз ---
+    //--- Присед: плавная смена высоты глаз (ТЗ, п.4, 16) ---
     // Вставание из приседа - только если над головой свободно:
     // луч вверх до макушки стоя (глаза + запас на голову)
     if (!crouch && crouched_ && world != nullptr)
@@ -95,7 +95,7 @@ void PlayerController::step(double dt,
         wish_dir_y = wish_x * sin_y + wish_y * cos_y;
     }
 
-    //--- Целевая скорость ---
+    //--- Целевая скорость (ТЗ, п.2-4) ---
     double target_speed = walk_speed_;
 
     if (crouch)
@@ -135,13 +135,13 @@ void PlayerController::step(double dt,
 
         if (hit)
         {
-            // Крутые склоны не держат: нормаль близка
+            // Крутые склоны не держат (ТЗ, п.9): нормаль близка
             // к вертикали - стоять можно
             if (normal.z > 0.7)
             {
                 grounded_ = true;
 
-                // Приземление: фронт воздух -> земля;
+                // Приземление (ТЗ, п.13): фронт воздух -> земля;
                 // скорость удара - вертикальная скорость до касания
                 if (!was_grounded && velocity_.z < 0.0f)
                 {
@@ -172,7 +172,7 @@ void PlayerController::step(double dt,
         }
     }
 
-    //--- Прыжок ---
+    //--- Прыжок (ТЗ, п.5) ---
     if (jump && grounded_)
     {
         velocity_.z = static_cast<float>(jump_speed_);
@@ -207,7 +207,7 @@ void PlayerController::step(double dt,
         velocity_.y -= static_cast<float>(velocity_.y * decay);
     }
 
-    //--- Столкновения со стенами: лучи вперёд, скольжение ---
+    //--- Столкновения со стенами: лучи вперёд, скольжение (ТЗ, п.15) ---
     if (world != nullptr)
     {
         collision::Vec3f point;
@@ -235,7 +235,7 @@ void PlayerController::step(double dt,
                     velocity_.y -= dot * normal.y;
                 }
 
-                // Попытка ступеньки: приподняться и пройти.
+                // Попытка ступеньки: приподняться и пройти (ТЗ, п.8).
                 // Поднимаем только если под приподнятой позицией есть
                 // опора (луч вниз не длиннее step_height + радиус),
                 // иначе подъём превращался бы в «лифт» вдоль стены

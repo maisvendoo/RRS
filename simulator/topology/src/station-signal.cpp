@@ -20,8 +20,8 @@ StationSignal::StationSignal(QObject* parent) : TrainSignal(parent)
     lock_relay = new CombineRelay(NUM_LR_NEUTRAL_CONTACTS,
         NUM_LR_PLUS_CONTACTS, NUM_LR_MINUS_CONTACTS);
 
-    open_timer = new Timer(1.0, false);
-    close_timer = new Timer(1.0, false);
+    open_timer = new Timer(1.25, false);
+    close_timer = new Timer(1.25, false);
     blink_timer = new Timer(0.75, false);
 
     connect(open_timer, &Timer::process, this, &StationSignal::slotOpenTimer);
@@ -465,7 +465,23 @@ void StationSignal::check_train_route()
         if (traj->isBusy())
         {
             // Разрешаем маневровый маршрут до занятой траектории
-            is_shunt_route = true;
+            if (lock_relay->getContactState(LR_NEUTRAL_NO_ROUTE))
+            {
+                // Пока светофор закрыт, разрешаем его открыть
+                is_shunt_route = true;
+
+                // По команде открыть - запоминаем, до какой занятой траектории
+                if (is_open_shunt_button_pressed)
+                    ref_trajectory_shunt = traj;
+                else
+                    ref_trajectory_shunt = nullptr;
+            }
+            else
+            {
+                // Разрешаем маневровый маршрут уже открытого светофора
+                // только до запомненной траектории, иначе закрываем
+                is_shunt_route = (ref_trajectory_shunt == traj);
+            }
             return;
         }
 

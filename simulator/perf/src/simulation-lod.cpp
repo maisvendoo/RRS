@@ -26,7 +26,7 @@ void SimulationLODManager::setDistances(double l1, double l2, double l3)
 //------------------------------------------------------------------------------
 SimLOD SimulationLODManager::classify(const TrainActivity& activity)
 {
-    // Критическое правило: физика поезда игрока не
+    // Критическое правило (ТЗ, п.24/27): физика поезда игрока не
     // упрощается ниже L0 никогда
     if (activity.is_player_train)
     {

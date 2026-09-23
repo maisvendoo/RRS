@@ -12,6 +12,7 @@
 #include <collision-world.h>
 #include <collision-object.h>
 
+#include <vsg/ui/Keyboard.h>
 
 #include <cstdint>
 #include <map>
@@ -25,6 +26,7 @@ class CameraWalkManipulator;
 class ScreenshotWriter;
 struct settings_t;
 class TrafficLightsHandler;
+class TrainLabelsHandler;
 class UpdateControlToServerHandler;
 class VehiclesHandler;
 class VehicleExterior;
@@ -36,8 +38,7 @@ namespace vsg
     class Camera;
     class FocusInEvent;
     class FocusOutEvent;
-    class FrameEvent;
-    class Keyboard;
+    class FrameEvent;    
     class KeyPressEvent;
     class KeyReleaseEvent;
     class MoveEvent;
@@ -63,6 +64,7 @@ public:
         vsg::ref_ptr<vsg::RegionOfInterest> shadow_region,
         ScreenshotWriter* screenshot_writer,
         TrafficLightsHandler* sig_handler,
+        TrainLabelsHandler* train_labels_handler,
         VehiclesHandler* veh_handler,
         settings_t& settings,
         GUIParams* gui_params = nullptr
@@ -83,6 +85,8 @@ public:
     void apply(vsg::TouchUpEvent& touchUp) override;
     void apply(vsg::TouchMoveEvent& touchMove) override;
 
+    void changeCurrentVehicle();
+
     void setKeyboard(vsg::ref_ptr<vsg::Keyboard> keyboard)
     {
         _keyboard = keyboard;
@@ -100,7 +104,6 @@ private:
     bool isCtrl() const;
     bool isShift() const;
 
-    void changeCurrentVehicle();
 
     void changeCurrentCabine();
 
@@ -216,6 +219,7 @@ private:
 
     ScreenshotWriter* _screenshot_writer = nullptr;
     TrafficLightsHandler* _sig_handler = nullptr;
+    TrainLabelsHandler* _train_labels_handler = nullptr;
     VehiclesHandler* _vehicles_handler = nullptr;
 
     //--- Alt-взаимодействие с органами кабины: пикинг мешей органов в модели кабины,

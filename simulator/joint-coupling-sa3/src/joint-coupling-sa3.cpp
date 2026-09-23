@@ -15,7 +15,7 @@ namespace
 
 //------------------------------------------------------------------------------
 /// Разбор табличной характеристики "x1:F1;x2:F2;..." (м -> Н).
-/// Точки сортируются по деформации
+/// Точки сортируются по деформации (ТЗ "Упругий стержень", п.5)
 //------------------------------------------------------------------------------
 bool parseCurve(const QString& text, std::vector<std::pair<double, double>>& curve)
 {
@@ -151,19 +151,19 @@ void JointCouplingSA3::step(double t, double dt)
     if (broken)
         is_connected = false;
 
-    // Несовместимая пара не сцепляется вовсе (coupling)
+    // Несовместимая пара не сцепляется вовсе (ТЗ coupling, п.2-3)
     if (coupler_type == 3)
         is_connected = false;
 
     // Сцепление при сближении (разрушенная сцепка не сцепляется вновь).
-    // Ограничения (coupling): тип сцепки и скорость соударения.
+    // Ограничения (ТЗ coupling, п.3-4): тип сцепки и скорость соударения.
     // Применяются ТОЛЬКО к моменту начального сцепления: уже соединённая
     // пара не размыкается ударной перегрузкой (|dv| выше предела при
     // экстренном торможении)
     if (!broken && !is_connected && (ds < Physics::ZERO))
     {
         // 0 - СА-3, 1 - винтовая (ползучая скорость), 2 - переходная,
-        // 3 - несовместимая пара (coupling)
+        // 3 - несовместимая пара (ТЗ coupling, п.2-3)
         const bool compatible = (coupler_type != 3);
 
         const double coupling_speed_limit =
@@ -304,7 +304,7 @@ double JointCouplingSA3::calc_force(double ds, double dv)
     if (!tension_curve.empty() || !compression_curve.empty())
     {
         // Табличная нелинейная характеристика: растяжение и сжатие
-        // задаются отдельно
+        // задаются отдельно (ТЗ "Упругий стержень", п.5-7)
         if (x >= 0.0)
             force = tension_curve.empty() ? 0.0 : interpCurve(tension_curve, x);
         else
@@ -360,7 +360,7 @@ void JointCouplingSA3::updateDamage(double force, double dv, double dt)
 
     // Мгновенное разрушение только при катастрофическом превышении
     // предела прочности (двойное превышение). Обычная перегрузка выше
-    // предела не рвёт сцепку мгновенно
+    // предела не рвёт сцепку мгновенно (ТЗ "Продольная динамика", п.18)
     if (abs_force > 2.0 * limit)
     {
         damage = 1.0;
@@ -376,7 +376,7 @@ void JointCouplingSA3::updateDamage(double force, double dv, double dt)
         // Накопление усталости: работа повреждающей части силы относительно
         // сцепок. Относительная скорость ограничена снизу - статическая
         // перегрузка (длительное растяжение на подъёме) тоже изнашивает
-        // сцепку (не разрушать сразу)
+        // сцепку (ТЗ, п.18: не разрушать сразу)
         const double work_rate = (abs_force - damage_force) *
                 std::max(abs(dv), 0.05);
 
@@ -408,14 +408,14 @@ void JointCouplingSA3::load_config(CfgReader &cfg)
     if (ck > Physics::ZERO)
         dx_t0 = T0 / ck;
 
-    // Пределы прочности и износ
+    // Пределы прочности и износ (ТЗ "Продольная динамика", п.18, 39)
     cfg.getDouble(secName, "MaxTension", max_tension);
     cfg.getDouble(secName, "MaxCompression", max_compression);
     cfg.getDouble(secName, "DamageForce", damage_force);
     cfg.getDouble(secName, "BreakEnergy", break_energy);
 
     // Табличные нелинейные характеристики и демпфирование
-    //
+    // (ТЗ "Упругий стержень", п.5-9)
     QString curve_str = "";
     if (cfg.getString(secName, "TensionCurve", curve_str))
         parseCurve(curve_str, tension_curve);

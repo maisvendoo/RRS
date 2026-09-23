@@ -44,7 +44,7 @@ void DepotPowerSystem::loadConfig(QString cfg_path)
 //------------------------------------------------------------------------------
 bool DepotPowerSystem::connectCable(double distance)
 {
-    // Блокировки: под напряжением подключать нельзя
+    // Блокировки (ТЗ, п.5): под напряжением подключать нельзя
     if (source_on)
     {
         last_error = "Нельзя подключать кабель: источник под напряжением";
@@ -71,7 +71,7 @@ bool DepotPowerSystem::connectCable(double distance)
 //------------------------------------------------------------------------------
 bool DepotPowerSystem::disconnectCable()
 {
-    // Отсоединение под напряжением запрещено: пока источник
+    // Отсоединение под напряжением запрещено (ТЗ, п.5): пока источник
     // включён, на розетке ПЕ есть напряжение - ждём выключения
     if (source_on)
     {
@@ -174,7 +174,7 @@ bool DepotPowerSystem::isExternalPower() const
 bool DepotPowerSystem::isMovementBlocked() const
 {
     // Пока кабель физически подключён - движение запрещено
-    // (потребитель обрежет тягу)
+    // (потребитель обрежет тягу, ТЗ п.14)
     return cable_connected;
 }
 
@@ -248,7 +248,7 @@ void DepotPowerSystem::step(double dt, double aux_load_w,
 {
     external_power = source_on && cable_connected && input_breaker_on;
 
-    // Движение с подключённым кабелем: физический обрыв
+    // Движение с подключённым кабелем (ТЗ, п.14): физический обрыв
     // кабеля + повреждение разъёма локомотива (аварийное событие)
     if (cable_connected && vehicle_moving)
     {

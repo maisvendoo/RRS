@@ -54,6 +54,7 @@ target_link_libraries(${TARGET} PRIVATE
     graphics-core
     core
     io-controller
+    system
     # Пешая ходьба: физика игрока + мир коллизий
     player
     collision

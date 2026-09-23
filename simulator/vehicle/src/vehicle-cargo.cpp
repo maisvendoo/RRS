@@ -76,7 +76,7 @@ bool CargoSystem::startLoading(const QString& type)
         return false;
     }
 
-    // Совместимость груза с вагоном
+    // Совместимость груза с вагоном (ТЗ, п.5)
     if (!allowed_cargo.isEmpty() && !allowed_cargo.contains(type))
     {
         last_error = QString("Груз %1 не совместим с вагоном").arg(type);
@@ -144,7 +144,7 @@ void CargoSystem::step(double dt, double rate_t_per_hour)
 {
     if (state == State::Loading)
     {
-        // Постепенная погрузка: кг/с от оборудования
+        // Постепенная погрузка (ТЗ, п.9): кг/с от оборудования
         const double rate_kg_s = rate_t_per_hour * 1000.0 / 3600.0;
 
         cargo_mass = std::min(max_load_kg, cargo_mass + rate_kg_s * dt);

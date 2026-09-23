@@ -26,6 +26,7 @@
 #include    "solver.h"
 #include    "solver-config.h"
 
+#include    <conductor-system.h>
 #include    <topology.h>
 
 #include    <QByteArray>
@@ -68,6 +69,9 @@ public:
     /// Train uncoupling
     Train* uncouple(double uncoupling_distance);
 
+    /// Swap the head and the tail of Train
+    void reverse();
+
     /// Set distance to stop the train before end of trajectory
     void setDistanceToEndOfTrajectory(bool is_train_head, double distance);
 
@@ -90,11 +94,13 @@ public:
 
     std::vector<std::vector<Joint*>> getJoints();
 
-    double getVelocity(size_t i = 0) const;
-
-    /// Get train mass
+    /// Скорость i-той ПЕ в поезде, м/с
+    double getVelocity(size_t i) const;
+    /// Скорость поезда, м/с
+    double getVelocity() const;
+    /// Масса поезда, кг
     double getMass() const;
-    /// Get train length
+    /// Длина поезда, м
     double getLength() const;
 
     size_t getVehiclesNumber() const;
@@ -170,6 +176,12 @@ public:
     {
         return this->tab_number;
     }
+    /// Система проводников пассажирских вагонов (ТЗ "Система
+    /// проводников"): создаётся по вагонам с настроенной секцией
+    /// [PassengerCar]; контекст станции задаёт модель
+    conductor::ConductorSystem& getConductors();
+    const conductor::ConductorSystem& getConductors() const;
+
     /// Разрешено ли отправление: готовность проводников поезда
     /// (система выключена или проводников нет - true)
     bool isDepartureAllowed() const;
@@ -231,6 +243,10 @@ private:
 
     /// All train's vehicles
     std::vector<Vehicle*> vehicles;
+
+    /// Проводники пассажирских вагонов (ТЗ "Система проводников")
+    conductor::ConductorSystem conductors;
+
     /// All joints between neighbor vehicles
     std::vector<std::vector<Joint*>> joints_list;
 
@@ -241,6 +257,10 @@ private:
 
     /// Train's loading
     bool loadTrain(QString cfg_path, const init_data_t &init_data, int model_vehicles_count = -1);    /// Joints loading
+    /// Создание проводников по текущим вагонам состава
+    /// (пассажирские = с настроенной секцией [PassengerCar]).
+    /// Вызывается при загрузке поезда и при сцепке/расцепке
+    void attachConductors();
     bool loadTrainJoints();
     /// Joints loading
     void loadJoints(device_list_t* cons_fwd, device_list_t* cons_bwd, std::vector<Joint*>& joints);

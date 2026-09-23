@@ -1,0 +1,22 @@
+[Unit]
+Description=RRS Railway Simulator Server for %I
+After=network.target
+
+[Service]
+Type=simple
+User=%I
+Group=%I
+WorkingDirectory=/home/%I/RRS/RRS-sources/bin
+ExecStart=/home/%I/RRS/RRS-sources/bin/server-daemon
+ExecStop=/bin/kill -TERM $MAINPID
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=rrs-server
+
+Environment="QT_QPA_PLATFORM=offscreen"
+Environment="LD_LIBRARY_PATH=/home/%I/RRS/RRS-sources/lib"
+
+[Install]
+WantedBy=multi-user.target

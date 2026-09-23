@@ -90,7 +90,7 @@ void WheelFlatSystem::step(double dt,
         const double omega = (i < wheel_omegas.size()) ? wheel_omegas[i] : 0.0;
         const double angle = (i < wheel_angles.size()) ? wheel_angles[i] : 0.0;
 
-        //--- 1. Образование ползуна при юзе ---
+        //--- 1. Образование ползуна при юзе (ТЗ, п.1-3) ---
 
         if (abs_v > min_speed && r > 0.05)
         {
@@ -168,7 +168,7 @@ void WheelFlatSystem::step(double dt,
                 // Вертикальный импульс в подвеску: колесо "падает" в лыску
                 vertical.applyFlatImpact(i, std::min(drop_speed, 0.4));
 
-                //--- Нагрузка на буксы ---
+                //--- Нагрузка на буксы (ТЗ, п.9-11) ---
 
                 // Износ буксы от ударной перегрузки
                 const double overload = impact_force / 300e3;

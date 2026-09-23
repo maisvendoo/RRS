@@ -1033,6 +1033,7 @@ void MainWindow::loadSettingsGUI()
         QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
 
         this->setStyleSheet(style_sheet);
+        helpWindow->setStyleSheet(style_sheet);
     }
 }
 
@@ -1062,6 +1063,7 @@ void MainWindow::loadConfig()
         QString style_sheet = readStyleSheet(QString(theme_path.c_str()));
 
         this->setStyleSheet(style_sheet);
+        helpWindow->setStyleSheet(style_sheet);
 
         cfg.getInt(secName, "MinWinver", winver.majorVer);
         cfg.getInt(secName, "MinWinBuild_NVIDIA", winver.buildNvidia);

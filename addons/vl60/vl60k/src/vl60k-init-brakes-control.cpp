@@ -38,7 +38,8 @@ void VL60k::initBrakesControl(const QString& modules_dir, const QString& custom_
         loco_crane[cab_idx]->read_config(loco_crane_config_name);
     }
 
-    // Телеметрия для кассеты регистрации и сессий: адресация приборов живёт в VehicleTelemetry, а не в
+    // Телеметрия для кассеты регистрации и сессий (ТЗ "Кассеты",
+    // п.2): адресация приборов живёт в VehicleTelemetry, а не в
     // Vehicle. УР общий на локомотив - кран I кабины, ТМ/ГР из
     // резервуаров, ТЦ - среднее по тележкам, ток - средний Ia моторов
     VehicleTelemetry::Sources telemetry;
