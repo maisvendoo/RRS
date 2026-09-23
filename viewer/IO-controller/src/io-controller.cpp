@@ -178,13 +178,7 @@ bool IOController::load_config(CfgReader &cfg)
         }
 
         secNode = cfg.getNextSection();
-    }    
-
-    // Debug: кол-во контролов
-    if (!io_control_inputs.empty())
-        fprintf(stderr, "DBG IO: cabs_num=%d vec_size=%zu hash0=%d hash1=%d\n",
-                cabs_num, io_control_inputs.size(),
-                io_control_inputs[0].size(), io_control_inputs[1].size());
+    }        
 
     return true;
 }
