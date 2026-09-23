@@ -337,35 +337,7 @@ void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 bool IOController::checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys)
 {
-    QString modKeys = modKeyName;
-    modKeys.remove(QChar(' '));
-
-    if (modKeys.isEmpty())
-    {
-        return true;
-    }
-
-    auto tokens = modKeys.split('+');
-
-    if (tokens.size() == 0)
-    {
-        return false;
-    }
-
-    bool is_modkey_pressed = true;
-
-    for (const auto &token: tokens)
-    {
-        bool found = isModifier.contains(token);
-        fprintf(stderr, "CHECKMOD: token='%s' found=%d\n",
-                token.toStdString().c_str(), found);
-
-        is_modkey_pressed = is_modkey_pressed && isModifier.value(token, [](const std::set<uint16_t> &){
-            return false;
-        })(pressed_keys);
-    }
-
-    return is_modkey_pressed;
+    return isModifier.value(modKeyName, [](const std::set<uint16_t> &) {return false;})(pressed_keys);
 }
 
 //------------------------------------------------------------------------------
@@ -377,34 +349,18 @@ void IOController::processTumbler(size_t cab_idx,
 {
     // Проверяем конкретный контрол
     auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
+
     if (!io_ctrl) return;
 
-    bool current_key_state = getKeyState(pressed_keys, io_ctrl->keyCode);
-    bool &prev = prev_key_state[control_id];
-    bool &prev_on_active = prev_on_active_map[control_id];
-
-    // Клавиша не нажата — сбрасываем флаги
-    if (!current_key_state)
+    // Нажата ли его клавиша
+    if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
-        prev = false;
-        prev_on_active = false;
-        return;
-    }
-
-    bool current_on_active = checkModKey(io_ctrl->keyModOnName, pressed_keys);
-    bool current_off_active = checkModKey(io_ctrl->keyModOffName, pressed_keys);
-
-    // Фронт нажатия клавиши — срабатываем как обычно
-    if (!prev)
-    {
-        prev = true;
-
         // Модификаторы включения и отключения одинаковы
         if (io_ctrl->keyModOnName == io_ctrl->keyModOffName)
         {
-            if (current_on_active)
+            if (checkModKey(io_ctrl->keyModOnName, pressed_keys))
             {
-                prev_on_active = true;
+                // Просто инвертируем состояние тумблера
                 io_ctrl->value = 1.0f - io_ctrl->value;
                 io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
                 emit sigSendVehicleControlCommand(io_ctrl->serialize());
@@ -413,54 +369,22 @@ void IOController::processTumbler(size_t cab_idx,
         }
 
         // Нажат модификатор включения?
-        if (current_on_active)
+        if (checkModKey(io_ctrl->keyModOnName, pressed_keys))
         {
-            prev_on_active = true;
             io_ctrl->value = 1.0f;
             io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
             return;
         }
 
-        // Нажат модификатор отключения?
-        if (current_off_active)
+        // Нажат модификатор выключения?
+        if (checkModKey(io_ctrl->keyModOffName, pressed_keys))
         {
             io_ctrl->value = 0.0f;
             io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
             emit sigSendVehicleControlCommand(io_ctrl->serialize());
             return;
         }
-
-        prev_on_active = false;
-        return;
-    }
-
-    // Клавиша уже была нажата — отслеживаем изменение модификаторов
-    // On-модификатор только что стал активен
-    if (current_on_active && !prev_on_active)
-    {
-        prev_on_active = true;
-        io_ctrl->value = 1.0f;
-        io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
-        emit sigSendVehicleControlCommand(io_ctrl->serialize());
-        return;
-    }
-
-    // On был активен — если он пропал, не срабатываем Off
-    // (это было отпускание Shift, а не намеренное нажатие Ctrl)
-    if (prev_on_active && !current_on_active)
-    {
-        prev_on_active = false;
-        return;
-    }
-
-    // On не был активен, Off стал активен — намеренное нажатие Ctrl
-    if (current_off_active && !prev_on_active)
-    {
-        io_ctrl->value = 0.0f;
-        io_control_inputs[cab_idx].updateByKey1(control_id, io_ctrl.value());
-        emit sigSendVehicleControlCommand(io_ctrl->serialize());
-        return;
     }
 }
 

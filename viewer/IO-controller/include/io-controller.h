@@ -84,9 +84,6 @@ protected:
 
 private:
 
-    std::map<uint16_t, bool> prev_key_state;
-    std::map<uint16_t, bool> prev_on_active_map;
-
     /// Проверка модификатора
     bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
 
