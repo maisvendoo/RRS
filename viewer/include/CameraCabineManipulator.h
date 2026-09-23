@@ -48,7 +48,7 @@ public:
     vsg::KeySymbol moveDownKey = vsg::KEY_Down;
 */
     /// Button mask value used to enable rotating the view, defaults to right mouse button
-    vsg::ButtonMask rotateButtonMask = vsg::BUTTON_MASK_3;
+    vsg::ButtonMask rotateButtonMask = vsg::BUTTON_MASK_2;
 
     /// Button mask value used to moving camera horizontally, defaults to middle mouse button
     vsg::ButtonMask moveButtonMask = vsg::BUTTON_MASK_2;
@@ -74,6 +74,8 @@ private:
 
     bool is_reset = true;
     VehicleExterior *_prev_current_vehicle = nullptr;
+
+    bool is_shift = false;
 };
 
 #endif // CAMERA_CABINE_MANIPULATOR_H
