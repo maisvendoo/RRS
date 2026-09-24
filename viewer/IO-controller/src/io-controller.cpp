@@ -211,14 +211,31 @@ void IOController::create_animations_map(const QStringList &anim_dirs)
             QFileInfo fileInfo(file_name);
             QString animation_name = fileInfo.baseName();
 
-            CfgReader cfg;
+            QDomDocument doc;
 
-            if (!cfg.load(full_anim_path + QDir::separator() + file_name))
+            QFile file(full_anim_path + QDir::separator() + file_name);
+
+            if (!file.open(QIODevice::ReadOnly))
             {
                 continue;
             }
 
+            doc.setContent(&file);
 
+            file.close();
+
+            auto signalIds = doc.elementsByTagName("SignalID");
+
+            if (signalIds.size() > 0)
+            {
+                bool ok = false;
+                int sid = signalIds.at(0).toElement().text().toInt(&ok);
+
+                if (ok)
+                {
+                    animation_signals_map[animation_name] = static_cast<uint16_t>(sid);
+                }
+            }
         }
     }
 }
