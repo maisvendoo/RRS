@@ -1,8 +1,13 @@
 #include    <io-controller.h>
 #include    <io-controller-keymap.h>
 #include    <CfgReader.h>
+#include    <filesystem.h>
 
 #include    <QStringList>
+#include    <QDir>
+#include    <QFile>
+#include    <QFileInfo>
+#include    <QDomDocument>
 
 #include    <algorithm>
 
@@ -11,7 +16,17 @@
 //------------------------------------------------------------------------------
 IOController::IOController(QObject *parent) : QObject(parent)
 {
+    isModifier["Shift"] = [](const std::set<uint16_t> &pressed_keys) {
+        return isShift(pressed_keys);
+    };
 
+    isModifier["Ctrl"] = [](const std::set<uint16_t> &pressed_keys) {
+        return isControl(pressed_keys);
+    };
+
+    isModifier["Alt"] = [](const std::set<uint16_t> &pressed_keys) {
+        return isAlt(pressed_keys);
+    };
 }
 
 //------------------------------------------------------------------------------
@@ -96,7 +111,18 @@ bool IOController::load_config(CfgReader &cfg)
 
     while (!secNode.isNull())
     {
+        int control_ID = 0;
+        cfg.getInt(secNode, "ID", control_ID);
+        uint16_t id = static_cast<uint16_t>(control_ID);
+
+        auto stored = io_control_inputs.getByKey1(id);
+
         io_control_input_t ic_input;
+
+        if (stored.has_value())
+        {
+            ic_input = stored.value();
+        }
 
         cfg.getString(secNode, "Name", ic_input.name);
         cfg.getString(secNode, "Type", ic_input.type);
@@ -105,26 +131,39 @@ bool IOController::load_config(CfgReader &cfg)
 
         cfg.getString(secNode, "Description", ic_input.description);
 
-        int control_ID = 0;
-        cfg.getInt(secNode, "ID", control_ID);
-        ic_input.id = static_cast<uint16_t>(control_ID);
+        ic_input.id = id;
 
         double value1 = 0.0;
         cfg.getDouble(secNode, "value1", value1);
         double value2 = 0.0;
         cfg.getDouble(secNode, "value2", value2);
 
-        // Старый формат (cabine*.xml): одиночное начальное значение
         double value = value1;
         cfg.getDouble(secNode, "value", value);
 
         QString keyName = "";
         cfg.getString(secNode, "KeyName", keyName);
-        ic_input.keyCode = KeySymbolsRRSMap.value(keyName, KEY_Undefined);
 
-        cfg.getString(secNode, "KeyModOnName", ic_input.keyModOnName);
+        if (!keyName.isEmpty())
+        {
+            ic_input.keyCode = KeySymbolsRRSMap.value(keyName, KEY_Undefined);
+        }
 
-        cfg.getString(secNode, "KeyModOffName", ic_input.keyModOffName);
+        QString mod_on = "";
+        cfg.getString(secNode, "KeyModOnName", mod_on);
+
+        if (!mod_on.isEmpty())
+        {
+            ic_input.keyModOnName = mod_on;
+        }
+
+        QString mod_off = "";
+        cfg.getString(secNode, "KeyModOffName", mod_off);
+
+        if (!mod_off.isEmpty())
+        {
+            ic_input.keyModOffName = mod_off;
+        }
 
         if (ic_input.keyModOffName.isEmpty())
         {
@@ -133,7 +172,6 @@ bool IOController::load_config(CfgReader &cfg)
 
         getHotkeysString(keyName, ic_input);
 
-        // Метаданные органа: подсказка и семантика клика мышью
         int signal_id = -1;
         if (cfg.getInt(secNode, "SignalID", signal_id))
         {
@@ -149,10 +187,6 @@ bool IOController::load_config(CfgReader &cfg)
         cfg.getString(secNode, "StateMode", ic_input.state_mode);
         cfg.getString(secNode, "StateNames", ic_input.state_names);
 
-        // Один контроллер обслуживает одну кабину, общий xml читают
-        // оба: в хэш попадает только своя кабина (имена мешей кабин
-        // различаются, коллизий внутри хэша нет, но фильтр страхует
-        // от дублей id). Общее имя без суффикса кабины забирают все.
         QString object_name = "";
         cfg.getString(secNode, "ObjectName", object_name);
 
@@ -162,23 +196,45 @@ bool IOController::load_config(CfgReader &cfg)
         QString object_name_cab2 = "";
         cfg.getString(secNode, "ObjectNameCab2", object_name_cab2);
 
-        auto insert_for_cab = [&](const QString &mesh_name, int cab, float init_value)
+        if (!object_name_cab1.isEmpty())
         {
-            if (mesh_name.isEmpty())
-                return;
+            ic_input.contolledObjectName = object_name_cab1;
+        }
+        else if (!object_name.isEmpty() && ic_input.contolledObjectName.isEmpty())
+        {
+            ic_input.contolledObjectName = object_name;
+        }
 
-            if ((cabine_filter >= 0) && (cabine_filter != cab))
-                return;
+        if (!object_name_cab2.isEmpty())
+        {
+            ic_input.contolledObjectName2 = object_name_cab2;
+        }
+        else if (!object_name.isEmpty() && ic_input.contolledObjectName2.isEmpty()
+                 && ic_input.contolledObjectName != object_name)
+        {
+            ic_input.contolledObjectName2 = object_name;
+        }
 
-            ic_input.cabine_idx = cab;
-            ic_input.contolledObjectName = mesh_name;
-            ic_input.value = init_value;
-            io_control_inputs.insert(ic_input.id, mesh_name, ic_input);
-        };
+        if (ic_input.value == 0.0f)
+        {
+            ic_input.value = static_cast<float>(value);
+        }
 
-        insert_for_cab(object_name, 0, static_cast<float>(value));
-        insert_for_cab(object_name_cab1, 0, static_cast<float>(value1));
-        insert_for_cab(object_name_cab2, 1, static_cast<float>(value2));
+        if (stored.has_value())
+        {
+            io_control_inputs.updateByKey1(id, ic_input);
+        }
+        else
+        {
+            QString key2 = ic_input.contolledObjectName;
+
+            if (key2.isEmpty())
+            {
+                key2 = QString::number(id);
+            }
+
+            io_control_inputs.insert(id, key2, ic_input);
+        }
 
         secNode = cfg.getNextSection();
     }
@@ -189,10 +245,64 @@ bool IOController::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void IOController::create_animations_map(const QStringList &anim_dirs)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    auto data_dir = fs.getDataDir();
+    QString anim_path = QString::fromStdString(data_dir) +
+                        QDir::separator() + "animations";
+
+    for (const auto &anim_dir : anim_dirs)
+    {
+        QString full_anim_path = anim_path + QDir::separator() + anim_dir;
+
+        QDir dir(full_anim_path);
+        QStringList files = dir.entryList(QStringList() << "*.xml", QDir::Files | QDir::NoDotAndDotDot);
+
+        for (const auto &file_name : files)
+        {
+            if (file_name.isEmpty())
+            {
+                continue;
+            }
+
+            QFileInfo fileInfo(file_name);
+            QString animation_name = fileInfo.baseName();
+
+            QDomDocument doc;
+
+            QFile file(full_anim_path + QDir::separator() + file_name);
+
+            if (!file.open(QIODevice::ReadOnly))
+            {
+                continue;
+            }
+
+            doc.setContent(&file);
+
+            file.close();
+
+            auto signalIds = doc.elementsByTagName("SignalID");
+
+            if (signalIds.size() > 0)
+            {
+                bool ok = false;
+                int sid = signalIds.at(0).toElement().text().toInt(&ok);
+
+                if (ok)
+                {
+                    animation_signals_map[animation_name] = static_cast<uint16_t>(sid);
+                }
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::setCabineIndex(int vehicle_idx, int cab_idx)
 {
-    cabine_filter = cab_idx;
-
     for (auto &[key1, key2, value] : io_control_inputs.getAll())
     {
         value.controlled_vehicle_idx = vehicle_idx;
@@ -227,9 +337,63 @@ float IOController::getVehicleSignal(int signal_id) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+float IOController::getSignalValueByName(const QString &objectName) const
+{
+    if (objectName.isEmpty() || feedback_signals == nullptr)
+    {
+        return 0.0f;
+    }
+
+    auto it = animation_signals_map.find(objectName);
+
+    if (it != animation_signals_map.end())
+    {
+        uint16_t signal_id = it.value();
+
+        if (signal_id < feedback_signals->size())
+        {
+            return (*feedback_signals)[signal_id];
+        }
+    }
+
+    return 0.0f;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float IOController::getSignalValueByID(uint16_t control_id, int cab_idx) const
+{
+    auto io_ctrl = io_control_inputs.getByKey1(control_id);
+
+    if (!io_ctrl)
+    {
+        return 0.0f;
+    }
+
+    QString mesh_name = io_ctrl->contolledObjectName;
+
+    if ((cab_idx == 1) && !io_ctrl->contolledObjectName2.isEmpty())
+    {
+        mesh_name = io_ctrl->contolledObjectName2;
+    }
+
+    return getSignalValueByName(mesh_name);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 std::optional<io_control_input_t> IOController::getInputByObject(const QString &object_name) const
 {
-    return io_control_inputs.getByKey2(object_name);
+    io_control_input_t out;
+
+    if (findControl(object_name.toStdString(), out))
+    {
+        return out;
+    }
+
+    return std::nullopt;
 }
 
 //------------------------------------------------------------------------------
@@ -246,16 +410,36 @@ bool IOController::findControl(const std::string &node_name, io_control_input_t 
 
     for (const auto &[key1, key2, value] : io_control_inputs.getAll())
     {
-        if (key2.isEmpty())
+        auto match_name = [&](const QString &mesh_name, int cab) -> bool
         {
-            continue;
-        }
+            if (mesh_name.isEmpty())
+            {
+                return false;
+            }
 
-        if ((node == key2) || node.endsWith(key2))
+            if ((node == mesh_name) || node.endsWith(mesh_name))
+            {
+                out = value;
+                out.cabine_idx = cab;
+                out.contolledObjectName = mesh_name;
+                return true;
+            }
+
+            return false;
+        };
+
+        if (match_name(value.contolledObjectName, 0))
         {
-            out = value;
             return true;
         }
+
+        if (match_name(value.contolledObjectName2, 1))
+        {
+            return true;
+        }
+
+        (void) key1;
+        (void) key2;
     }
 
     return false;
@@ -266,30 +450,26 @@ bool IOController::findControl(const std::string &node_name, io_control_input_t 
 //------------------------------------------------------------------------------
 void IOController::mouseRelease(const QString &object_name)
 {
-    auto io_ctrl = io_control_inputs.getByKey2(object_name);
+    io_control_input_t io_ctrl;
+    findControl(object_name.toStdString(), io_ctrl);
 
-    if (!io_ctrl.has_value())
+    if (io_ctrl.type == "Button")
     {
-        return;
-    }
-
-    if (io_ctrl.value().type == "Button")
-    {
-        io_ctrl.value().value = 0.0f;
-        emitControl(io_ctrl.value());
+        io_ctrl.value = 0.0f;
+        emitControl(io_ctrl);
     }
 }
 
 void IOController::mouseClick(const QString &object_name, int button)
 {
-    auto io_ctrl = io_control_inputs.getByKey2(object_name);
+    io_control_input_t io_ctrl;
 
-    if (!io_ctrl.has_value())
+    if (!findControl(object_name.toStdString(), io_ctrl))
     {
         return;
     }
 
-    processMouseControl(io_ctrl.value(), button);
+    processMouseControl(io_ctrl, button);
 }
 
 //------------------------------------------------------------------------------
@@ -363,13 +543,10 @@ void IOController::mouseProcessButton(io_control_input_t input,
 //------------------------------------------------------------------------------
 void IOController::mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed)
 {
-    // Обработка контрола типа "тумблер"
     mouseProcessTumbler(input, button, is_pressed);
 
-    // Обработка контрола типа "кнопка"
     mouseProcessButton(input, button, is_pressed);
 
-    // Вызываем кастомную обработку мышеввода
     processMouseInput(input, button, is_pressed);
 }
 
@@ -462,20 +639,6 @@ QString IOController::getControlStateText(const io_control_input_t &io_ctrl,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QString IOController::pickSyntheticControl(const std::string &mesh_name,
-                                           float local_x,
-                                           float local_y) const
-{
-    (void) mesh_name;
-    (void) local_x;
-    (void) local_y;
-
-    return QString();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void IOController::emitControl(const io_control_input_t &io_ctrl)
 {
     io_control_inputs.updateByKey1(io_ctrl.id, io_ctrl);
@@ -487,22 +650,7 @@ void IOController::emitControl(const io_control_input_t &io_ctrl)
 //------------------------------------------------------------------------------
 bool IOController::checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys)
 {
-    if (modKeyName == "Shift")
-    {
-        return isShift(pressed_keys);
-    }
-
-    if (modKeyName == "Control")
-    {
-        return isControl(pressed_keys);
-    }
-
-    if (modKeyName == "Alt")
-    {
-        return isAlt(pressed_keys);
-    }
-
-    return false;
+    return isModifier.value(modKeyName, [](const std::set<uint16_t> &) {return false;})(pressed_keys);
 }
 
 //------------------------------------------------------------------------------
@@ -511,13 +659,26 @@ bool IOController::checkModKey(const QString &modKeyName, const std::set<uint16_
 void IOController::processTumbler(const uint16_t &control_id,
                                   const std::set<uint16_t> &pressed_keys)
 {
-    // Проверяем конкретный контрол
     auto io_ctrl = io_control_inputs.getByKey1(control_id);
 
-    // Нажата ли его клавиша
+    if (!io_ctrl)
+    {
+        return;
+    }
+
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
-        // Модификаторы из конфига; без них - Shift включает, Ctrl выключает
+        if (io_ctrl->keyModOnName == io_ctrl->keyModOffName)
+        {
+            if (checkModKey(io_ctrl->keyModOnName, pressed_keys))
+            {
+                io_ctrl->value = 1.0f - io_ctrl->value;
+                io_control_inputs.updateByKey1(control_id, io_ctrl.value());
+                emit sigSendVehicleControlCommand(io_ctrl->serialize());
+                return;
+            }
+        }
+
         const bool mod_on = io_ctrl->keyModOnName.isEmpty()
                 ? isShift(pressed_keys)
                 : checkModKey(io_ctrl->keyModOnName, pressed_keys);
@@ -550,6 +711,11 @@ void IOController::processButton(const uint16_t &control_id, const std::set<uint
 {
     auto io_ctrl = io_control_inputs.getByKey1(control_id);
 
+    if (!io_ctrl)
+    {
+        return;
+    }
+
     if (getKeyState(pressed_keys, io_ctrl->keyCode))
     {
         if (checkModKey(io_ctrl->keyModOnName, pressed_keys) || io_ctrl->keyModOnName.isEmpty())
@@ -575,8 +741,6 @@ void IOController::processKeyBoardInput()
 
     if (!_pressed_keys.empty())
     {
-        // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
-        // отправляем пустое управление
         constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
         std::size_t modifiers_size = 0;
         for (std::uint16_t key : modifier_keys)
@@ -595,7 +759,6 @@ void IOController::processKeyBoardInput()
 
         for (auto key : _pressed_keys)
         {
-            // F-клавиши не отправляем без модификаторов Shift, Ctrl или Alt
             if ((key >= KEY_F1) && (key <= KEY_F12) && (modifiers_size == 0))
             {
                 continue;
@@ -629,10 +792,6 @@ void IOController::processControlPanelInput()
 //------------------------------------------------------------------------------
 void IOController::processControl(const ControlType &ctrl_type)
 {
-    // В зависимости от типа обрабатываемого управления, вызываем тот или иной
-    // метод обработки, видоизменяющий специфичные для данной ПЕ состояния органов управления.
-    // Вызывается один какой-то метода, в зависимости от того, откуда пришел
-    // управляющий сигнал
     switch (ctrl_type)
     {
     case CTRL_TYPE_KEYBOARD:

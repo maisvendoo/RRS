@@ -1,7 +1,5 @@
 #include "ProcVisibleAnimation.h"
 
-#include <algorithm>
-
 #include "CfgReader.h"
 #include "ProcAnimation.h"
 
@@ -17,63 +15,6 @@ ProcVisibleAnimation::ProcVisibleAnimation(vsg::ref_ptr<vsg::Group> group)
     : Inherit()
     , group_node(group)
 {
-}
-
-namespace
-{
-    std::vector<ProcVisibleAnimation*>& visibleRegistry()
-    {
-        static std::vector<ProcVisibleAnimation*> registry;
-        return registry;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ProcVisibleAnimation::forceShowHidden()
-{
-    forced_visible = false;
-
-    if (cur_signal <= 1e-5f)
-    {
-        visible_switch->setAllChildren(true);
-        forced_visible = true;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ProcVisibleAnimation::restoreHidden()
-{
-    if (forced_visible)
-    {
-        visible_switch->setAllChildren(cur_signal > 1e-5f);
-        forced_visible = false;
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ProcVisibleAnimation::forceShowAllHidden()
-{
-    for (auto *anim : visibleRegistry())
-    {
-        anim->forceShowHidden();
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void ProcVisibleAnimation::restoreAllHidden()
-{
-    for (auto *anim : visibleRegistry())
-    {
-        anim->restoreHidden();
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -95,11 +36,6 @@ void ProcVisibleAnimation::setGroup(vsg::ref_ptr<vsg::Group> group)
     }
 
     update(cur_signal);
-
-    if (std::find(visibleRegistry().begin(), visibleRegistry().end(), this) == visibleRegistry().end())
-    {
-        visibleRegistry().push_back(this);
-    }
 }
 
 //------------------------------------------------------------------------------

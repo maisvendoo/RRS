@@ -2404,19 +2404,14 @@ void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
 
     auto cab_idx = vehicle->controlled_cabine_idx;
 
-    LOG_INFO("RouteViewer: Curr. vehicle %d cabine %d IOControllers count: %d", newIndex, cab_idx, vehicle->io_controls.size());
-
-    // Есть ли у ПЕ собственный IOController
-    if (!vehicle->io_controls.empty() && cab_idx < vehicle->io_controls.size()
-        && vehicle->io_controls[cab_idx])
+    if (vehicle->io_controller != nullptr)
     {
-        // Активируем контроллер в маршрутизаторе
-        input_route_handler->setActiveController(vehicle->io_controls[cab_idx]);
+        input_route_handler->setActiveController(vehicle->io_controller);
+        vehicle->io_controller->setCabineIndex(newIndex, static_cast<int>(cab_idx));
         LOG_INFO("RouteViewer: Activated IOController for vehicle %d (index %d)",
                  newIndex, newIndex);
     } else
     {
-        // Нет контроллера - используем legacy-режим
         input_route_handler->clearActiveController();
         LOG_INFO("RouteViewer: No IOController for vehicle %d, using legacy mode", newIndex);
     }

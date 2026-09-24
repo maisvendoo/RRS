@@ -154,7 +154,7 @@ bool MouseControlHandler::pickControl(int x,
 {
     VehicleExterior *vehicle = _vehicles_handler->getCurrentVehicle();
 
-    if (vehicle == nullptr || vehicle->io_controls.empty() || (_camera == nullptr))
+    if (vehicle == nullptr || vehicle->io_controller == nullptr || (_camera == nullptr))
     {
         return false;
     }
@@ -187,36 +187,31 @@ bool MouseControlHandler::pickControl(int x,
                     continue;
                 }
 
-                // Ищем орган по всем контроллерам кабин ПЕ (имена мешей
-                // кабин различаются, совпадёт ровно один)
-                for (auto *cab_controller : vehicle->io_controls)
+                if (vehicle->io_controller == nullptr)
                 {
-                    if (cab_controller == nullptr)
-                    {
-                        continue;
-                    }
-
-                    if (!cab_controller->findControl(node_name, input))
-                    {
-                        continue;
-                    }
-
-                    if (input.id == 0)
-                    {
-                        continue;
-                    }
-
-                    // Сохраняем актуальный контроллер ввода
-                    io_ctrl = cab_controller;
-
-                    if (_last_hit_object != node_name)
-                    {
-                        _last_hit_object = node_name;
-                        LOG_INFO("Clicked: %s state: %3.1f", node_name.c_str(), input.value);
-                    }
-
-                    return true;
+                    continue;
                 }
+
+                if (!vehicle->io_controller->findControl(node_name, input))
+                {
+                    continue;
+                }
+
+                if (input.id == 0)
+                {
+                    continue;
+                }
+
+                // Сохраняем актуальный контроллер ввода
+                io_ctrl = vehicle->io_controller;
+
+                if (_last_hit_object != node_name)
+                {
+                    _last_hit_object = node_name;
+                    //LOG_INFO("Clicked: %s state: %3.1f", node_name.c_str(), input.value);
+                }
+
+                return true;
 
             }
         }
@@ -242,6 +237,11 @@ void MouseControlHandler::updateTooltip()
         return;
     }
 
+    if (io_controller == nullptr)
+    {
+        return;
+    }
+
     tip.x = _pointer_x;
     tip.y = _pointer_y;
 
@@ -249,6 +249,10 @@ void MouseControlHandler::updateTooltip()
     tip.description = input.description;
     tip.usage = input.usage;
     tip.hot_keys = input.hot_keys;
+
+    QString state = QString("Статус: %1").arg(io_controller->getSignalValueByID(input.id, input.cabine_idx), 3, 'f', 1);
+
+    tip.state = state;
 }
 
 //------------------------------------------------------------------------------

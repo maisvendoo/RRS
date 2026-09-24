@@ -67,13 +67,6 @@ private:
                      IOController*& io_ctrl,
                      io_control_input_t& input);
 
-    bool trySyntheticControl(IOController *ctrl,
-                             const std::string &node_name,
-                             float local_x,
-                             float local_y,
-                             IOController *&io_ctrl,
-                             io_control_input_t &input) const;
-
     /// Заполнение подсказки (Alt+наведение)
     void updateTooltip();
 

@@ -1,7 +1,5 @@
 #include    <CabMouseHandler.h>
 
-#include    <ProcVisibleAnimation.h>
-
 #include    <VehiclesHandler.h>
 #include    <VehicleExterior.h>
 #include    <PlatformInput.h>
@@ -135,40 +133,6 @@ bool CabMouseHandler::altHeld() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool CabMouseHandler::trySyntheticControl(IOController *ctrl,
-                                          const std::string &node_name,
-                                          float local_x,
-                                          float local_y,
-                                          IOController *&io_ctrl,
-                                          io_control_input_t &input) const
-{
-    const QString synth_name =
-            ctrl->pickSyntheticControl(node_name, local_x, local_y);
-
-    if (synth_name.isEmpty())
-    {
-        return false;
-    }
-
-    auto synth_input = ctrl->getInputByObject(synth_name);
-
-    if (!synth_input.has_value())
-    {
-        return false;
-    }
-
-    io_ctrl = ctrl;
-    input = synth_input.value();
-
-    return true;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 bool CabMouseHandler::pickControl(int x, int y,
                                   IOController*& io_ctrl,
                                   io_control_input_t& input)
@@ -177,28 +141,16 @@ bool CabMouseHandler::pickControl(int x, int y,
 
     VehicleExterior* veh = _vehicles_handler->getCurrentVehicle();
 
-    if ((veh == nullptr) || veh->io_controls.empty() || (_camera == nullptr))
+    if ((veh == nullptr) || (veh->io_controller == nullptr) || (_camera == nullptr))
     {
         return false;
     }
 
-    // Луч камера->курсор: штатная реализация vsg (viewport+projection).
-    // Малые органы (тумблеры) легко промазать между наведением и кликом -
-    // кидаем веер лучей вокруг курсора, первый элемент выигрывает
     static const int offsets[5][2] = {
         {0, 0}, {9, 0}, {-9, 0}, {0, 9}, {0, -9}
     };
 
     vsg::ref_ptr<vsg::LineSegmentIntersector> intersector;
-
-    for (int pass = 0; pass < 2; ++pass)
-    {
-        // Второй проход: временно показываем скрытые анимации видимости -
-        // спрятанные ключи и рукоятки должны кликаться по их месту в гнезде
-        if (pass == 1)
-        {
-            ProcVisibleAnimation::forceShowAllHidden();
-        }
 
     for (auto& off : offsets)
     {
@@ -222,29 +174,9 @@ bool CabMouseHandler::pickControl(int x, int y,
                     continue;
                 }
 
-                for (auto* ctrl : veh->io_controls)
+                if (veh->io_controller->findControl(node_name, input) && (input.id != 0))
                 {
-                    if (ctrl == nullptr)
-                    {
-                        continue;
-                    }
-
-                    if (ctrl->findControl(node_name, input) && (input.id != 0))
-                    {
-                        io_ctrl = ctrl;
-                    }
-                    else if (trySyntheticControl(ctrl,
-                                                 node_name,
-                                                 static_cast<float>(hit->localIntersection.x),
-                                                 static_cast<float>(hit->localIntersection.y),
-                                                 io_ctrl,
-                                                 input))
-                    {
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    io_ctrl = veh->io_controller;
 
                     if (_last_hit_object != node_name)
                     {
@@ -252,20 +184,9 @@ bool CabMouseHandler::pickControl(int x, int y,
                         LOG_INFO("CabPick HIT: %s @(%d %d)", node_name.c_str(), x, y);
                     }
 
-                    if (pass == 1)
-                    {
-                        ProcVisibleAnimation::restoreAllHidden();
-                    }
-
                     return true;
                 }
             }
-        }
-    }
-
-        if (pass == 1)
-        {
-            ProcVisibleAnimation::restoreAllHidden();
         }
     }
 

@@ -448,14 +448,9 @@ void VehiclesHandler::step(double t, double dt)
 
             vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), &(state_front.vehicles[i].analogSignal));
 
-            // Текущие сигналы ПЕ - в IOController (состояния органов
-            // для кликов мышью и подсказок)
-            for (auto *io_control : vehicles[i].io_controls)
+            if (vehicles[i].io_controller != nullptr)
             {
-                if (io_control != nullptr)
-                {
-                    io_control->setVehicleSignals(&(state_front.vehicles[i].analogSignal));
-                }
+                vehicles[i].io_controller->setVehicleSignals(&(state_front.vehicles[i].analogSignal));
             }
         }
         else
@@ -927,21 +922,11 @@ bool VehiclesHandler::load(
         vehicle_exterior.cullnode->child = vehicle_exterior.transform;
         vehicles_node->addChild(vehicle_exterior.cullnode);
 
-        if (!vehicle_exterior.io_controls.empty())
+        if (vehicle_exterior.io_controller != nullptr)
         {
-            int cab_idx = 0;
-
-            for (auto *io_control : vehicle_exterior.io_controls)
-            {
-                if (io_control != nullptr)
-                {
-                    io_control->setCabineIndex(i, cab_idx);
-                    connect(io_control, &IOController::sigSendVehicleControlCommand,
-                            this, &VehiclesHandler::sigSendVehicleControlCommand);
-                }
-
-                cab_idx++;
-            }
+            vehicle_exterior.io_controller->setCabineIndex(i, 0);
+            connect(vehicle_exterior.io_controller, &IOController::sigSendVehicleControlCommand,
+                    this, &VehiclesHandler::sigSendVehicleControlCommand);
         }
     }
 

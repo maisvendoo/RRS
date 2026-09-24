@@ -44,6 +44,11 @@ void VehicleExterior::step(float t, float dt)
 void VehicleExterior::step(float t, float dt, std::vector<float>* server_signals)
 {
     last_server_signals = server_signals;
+
+    if (io_controller != nullptr)
+    {
+        io_controller->setFeedbackSignals(server_signals);
+    }
     for (const auto& animated_pagedLOD : animated_nodes)
     {
         if (animated_pagedLOD->children[0].node)
@@ -431,6 +436,33 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
 
     auto module_config_path = fs.toNativeSeparators(cfg_dir.absolutePath().toStdString() + fs.separator() + module_config_name.toStdString() + ".xml");
 
+    QStringList animations_dirs;
+
+    auto modelNode = cfg.getFirstSection("Model");
+
+    while (!modelNode.isNull())
+    {
+        QString anim_dir = "";
+        cfg.getString(modelNode, "AnimationsConfigDir", anim_dir);
+
+        if (!animations_dirs.contains(anim_dir) && !anim_dir.isEmpty())
+        {
+            animations_dirs << anim_dir;
+        }
+
+        modelNode = cfg.getNextSection();
+    }
+
+    io_controller = LOAD_MODULE(IOController, module_path.c_str());
+
+    if (io_controller == nullptr)
+    {
+        LOG_ERROR("Not found IOController module %s", module_path.c_str());
+        return true;
+    }
+
+    LOG_INFO("IOController module %s loaded successfully", module_path.c_str());
+
     CfgReader module_cfg;
 
     if (!module_cfg.load(QString(module_config_path.c_str())))
@@ -439,43 +471,10 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
         return true;
     }
 
-    // Число кабин = число секций [Cabine] в конфиге ПЕ
-    int cabines_num = 0;
-    for (auto secNode = cfg.getFirstSection("Cabine"); !secNode.isNull(); secNode = cfg.getNextSection())
-    {
-        ++cabines_num;
-    }
-
-    if (cabines_num <= 0)
-    {
-        cabines_num = 1;
-    }
-
-    io_controls.clear();
-
-    // Один контроллер на кабину: общий xml читают все, каждый
-    // фильтрует записи своей кабины (см. IOController::cabine_filter)
-    for (int cab_idx = 0; cab_idx < cabines_num; ++cab_idx)
-    {
-        auto *io_control = LOAD_MODULE(IOController, module_path.c_str());
-
-        if (io_control == nullptr)
-        {
-            LOG_ERROR("Not found IOController module %s", module_path.c_str());
-            continue;
-        }
-
-        LOG_INFO("IOController module %s loaded successfully", module_path.c_str());
-
-        io_control->setCabineIndex(-1, cab_idx);
-        io_control->load_config(module_cfg);
-        LOG_INFO("IOController config %s is loaded successfully for cabine %d",
-                 module_config_path.c_str(), cab_idx);
-
-        io_controls.push_back(io_control);
-    }
-
-    LOG_INFO("IOController: io_controls size: %d", io_controls.size());
+    io_controller->setCabineIndex(-1, 0);
+    io_controller->load_config(module_cfg);
+    io_controller->create_animations_map(animations_dirs);
+    LOG_INFO("IOController config %s is loaded successfully", module_config_path.c_str());
 
     return true;
 }
