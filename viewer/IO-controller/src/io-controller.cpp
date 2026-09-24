@@ -321,6 +321,41 @@ void IOController::mouseInputProcess(io_control_input_t input, uint32_t button, 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+float IOController::getSignalValue(const QString &objectName) const
+{
+    if (objectName.isEmpty() || feedback_signals == nullptr)
+    {
+        return 0.0f;
+    }
+
+    auto it = animation_signals_map.find(objectName);
+
+    if (it != animation_signals_map.end())
+    {
+        uint16_t signal_id = it.value();
+
+        if (signal_id < feedback_signals->size())
+        {
+            return (*feedback_signals)[signal_id];
+        }
+    }
+
+    return 0.0f;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float IOController::getSignalValue(uint16_t control_id, int cab_idx) const
+{
+    auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
+
+    return getSignalValue(io_ctrl->contolledObjectName);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
 {
     (void) pressed_keys;

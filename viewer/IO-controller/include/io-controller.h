@@ -56,6 +56,12 @@ public:
         feedback_signals = server_signals;
     }
 
+    /// Получить текущее значение сигнала по имени 3D-объекта
+    float getSignalValue(const QString& objectName) const;
+
+    /// Получить текущее значение сигнала по ID контрола
+    float getSignalValue(uint16_t control_id, int cab_idx) const;
+
 signals:
 
     void sigSendVehicleControlCommand(const QByteArray &data);
