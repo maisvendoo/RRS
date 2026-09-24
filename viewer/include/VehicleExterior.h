@@ -30,6 +30,13 @@ public:
     vsg::dvec3  velocity = vsg::dvec3(0.0, 0.0, 0.0);
     std::vector<vsg::dvec3>  driver_pos = {vsg::dvec3(0.0, 0.0, 0.0)};
     std::vector<double>  driver_dir = {0};
+
+    vsg::dvec3 worldFromLocal(const vsg::dvec3& local) const;
+
+    std::vector<vsg::dvec3>  exit_pos = {};
+    std::vector<double>  exit_dir = {};
+
+    std::vector<vsg::dvec3>  assistant_pos = {};
     int         train_id = 0;
     int         orientation = 1;
     int         prev_vehicle = -1;
@@ -81,6 +88,7 @@ private:
 
     /// Загрузка модуля ввода/вывода
     bool load_io_controller_module(const std::string &cfg_path, CfgReader &cfg);
+
 };
 
 #endif // VEHICLE_EXTERIOR_H
