@@ -1,6 +1,7 @@
 #include    <io-controller.h>
 #include    <io-controller-keymap.h>
 #include    <CfgReader.h>
+#include    <filesystem.h>
 
 //------------------------------------------------------------------------------
 //
@@ -186,6 +187,45 @@ bool IOController::load_config(CfgReader &cfg)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void IOController::create_animations_map(const QStringList &anim_dirs)
+{
+    FileSystem &fs = FileSystem::getInstance();
+    auto data_dir = fs.getDataDir();
+    QString anim_path = QString::fromStdString(data_dir) +
+                        QDir::separator() + "animations";
+
+    for (const auto &anim_dir : anim_dirs)
+    {
+        QString full_anim_path = anim_path + QDir::separator() + anim_dir;
+
+        QDir dir(full_anim_path);
+        QStringList files = dir.entryList(QStringList() << "*.xml", QDir::Files | QDir::NoDotAndDotDot);
+
+        for (const auto &file_name : files)
+        {
+            if (file_name.isEmpty())
+            {
+                continue;
+            }
+
+            QFileInfo fileInfo(file_name);
+            QString animation_name = fileInfo.baseName();
+
+            CfgReader cfg;
+
+            if (!cfg.load(full_anim_path + QDir::separator() + file_name))
+            {
+                continue;
+            }
+
+
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::setVehicleIndex(int vehicle_idx)
 {
     for (int cab_idx = 0; cab_idx < io_control_inputs.size(); ++cab_idx)
@@ -321,7 +361,7 @@ void IOController::mouseInputProcess(io_control_input_t input, uint32_t button, 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float IOController::getSignalValue(const QString &objectName) const
+float IOController::getSignalValueByName(const QString &objectName) const
 {
     if (objectName.isEmpty() || feedback_signals == nullptr)
     {
@@ -345,6 +385,14 @@ float IOController::getSignalValue(const QString &objectName) const
             printf("Signal: ID %d State: %3.1f\n", signal_id, state);
             return state;
         }
+        else
+        {
+            printf("Signal ID: %d out or range\n", signal_id);
+        }
+    }
+    else
+    {
+        printf("Signal %s not fount. Signals: %d\n", objectName.toStdString().c_str(), animation_signals_map.size());
     }
 
     return 0.0f;
@@ -353,7 +401,7 @@ float IOController::getSignalValue(const QString &objectName) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float IOController::getSignalValue(uint16_t control_id, int cab_idx) const
+float IOController::getSignalValueByID(uint16_t control_id, int cab_idx) const
 {
     auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
 
@@ -362,9 +410,9 @@ float IOController::getSignalValue(uint16_t control_id, int cab_idx) const
         return 0.0f;
     }
 
-    printf("Signal name: %s\n", io_ctrl->contolledObjectName.toStdString().c_str());
+    //printf("Signal name: %s\n", io_ctrl->contolledObjectName.toStdString().c_str());
 
-    return getSignalValue(io_ctrl->contolledObjectName);
+    return getSignalValueByName(io_ctrl->contolledObjectName);
 }
 
 //------------------------------------------------------------------------------

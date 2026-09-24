@@ -90,24 +90,6 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
     // Load IOContrroler module
     load_io_controller_module(cfg_path, cfg);
 
-    // Построение карты анимаций
-    for (const auto &animated_pagedLOD : animated_nodes)
-    {
-        for (const auto& [signal_id, animation] : animated_pagedLOD->animations_map->animations)
-        {
-            if (!animation->name.empty())
-            {
-                anim_signals_map.insert(QString::fromStdString(animation->name),
-                                        static_cast<uint16_t>(signal_id));
-            }
-        }
-    }
-
-    if (io_controller != nullptr)
-    {
-        io_controller->setAnimationSignalsMap(anim_signals_map);
-    }
-
     // Check old config format
     if (transform->children.size() == 0)
     {
@@ -398,6 +380,25 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
                                             + custom_modules_dir.toStdString() + fs.separator()
                                             + module_name.toStdString());
 
+    // Ищем все имена каталогов анимаций
+    QStringList animations_dirs;
+
+    auto modelNode = cfg.getFirstSection("Model");
+
+    while (!modelNode.isNull())
+    {
+        QString anim_dir = "";
+        cfg.getString(modelNode, "AnimationsConfigDir", anim_dir);
+
+        if (!animations_dirs.contains(anim_dir) && !anim_dir.isEmpty())
+        {
+            animations_dirs << anim_dir;
+        }
+
+        modelNode = cfg.getNextSection();
+    }
+
+
     io_controller = LOAD_MODULE(IOController, module_path.c_str());
 
     if (io_controller != nullptr)
@@ -420,6 +421,7 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
             else
             {
                 io_controller->load_config(module_cfg);
+                io_controller->create_animations_map(animations_dirs);
                 LOG_INFO("IOController config %s is loaded successfully", module_config_path.c_str());
             }
         }

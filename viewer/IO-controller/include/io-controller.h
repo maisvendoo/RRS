@@ -32,6 +32,8 @@ public:
 
     virtual bool load_config(CfgReader &cfg);
 
+    void create_animations_map(const QStringList &anim_dirs);
+
     void setVehicleIndex(int vehicle_idx);
 
     void setActirveCabineIndex(int cab_idx)
@@ -44,12 +46,6 @@ public:
     /// Обработка мышиного ввода
     void mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed);
 
-    /// Задать карту сигналов анимаций
-    void setAnimationSignalsMap(const QMap<QString, uint16_t> &map)
-    {
-        animation_signals_map = map;
-    }
-
     /// Задать массив сигналов анимаций
     void setFeedbackSignals(const std::vector<float> *server_signals)
     {
@@ -57,10 +53,10 @@ public:
     }
 
     /// Получить текущее значение сигнала по имени 3D-объекта
-    float getSignalValue(const QString& objectName) const;
+    float getSignalValueByName(const QString& objectName) const;
 
     /// Получить текущее значение сигнала по ID контрола
-    float getSignalValue(uint16_t control_id, int cab_idx) const;
+    float getSignalValueByID(uint16_t control_id, int cab_idx) const;
 
 signals:
 

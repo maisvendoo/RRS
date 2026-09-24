@@ -60,10 +60,7 @@ public:
                      SoundManager *sm,
                      vsg::ref_ptr<vsg::Options> options);
 
-private:
-
-    /// Карта сигналов анимации
-    QMap<QString, uint16_t> anim_signals_map;
+private:    
 
     /// Загрузка положения камеры в кабинах
     bool load_cabine_positions(const std::string& cfg_path, CfgReader& cfg);
