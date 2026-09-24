@@ -208,7 +208,7 @@ bool MouseControlHandler::pickControl(int x,
                 if (_last_hit_object != node_name)
                 {
                     _last_hit_object = node_name;
-                    LOG_INFO("Clicked: %s state: %3.1f", node_name.c_str(), input.value);
+                    //LOG_INFO("Clicked: %s state: %3.1f", node_name.c_str(), input.value);
                 }
 
                 return true;
@@ -237,6 +237,11 @@ void MouseControlHandler::updateTooltip()
         return;
     }
 
+    if (io_controller == nullptr)
+    {
+        return;
+    }
+
     tip.x = _pointer_x;
     tip.y = _pointer_y;
 
@@ -244,6 +249,10 @@ void MouseControlHandler::updateTooltip()
     tip.description = input.description;
     tip.usage = input.usage;
     tip.hot_keys = input.hot_keys;
+
+    QString state = QString("Статус: %1").arg(io_controller->getSignalValue(input.id, input.cabine_idx), 3, 'f', 1);
+
+    tip.state = state;
 }
 
 //------------------------------------------------------------------------------

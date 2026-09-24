@@ -325,6 +325,11 @@ float IOController::getSignalValue(const QString &objectName) const
 {
     if (objectName.isEmpty() || feedback_signals == nullptr)
     {
+        if (objectName.isEmpty())
+            printf("ERR: Name is empty\n");
+        else
+            printf("ERR: feedback_signals invalid\n");
+
         return 0.0f;
     }
 
@@ -336,7 +341,9 @@ float IOController::getSignalValue(const QString &objectName) const
 
         if (signal_id < feedback_signals->size())
         {
-            return (*feedback_signals)[signal_id];
+            float state = (*feedback_signals)[signal_id];
+            printf("Signal: ID %d State: %3.1f\n", signal_id, state);
+            return state;
         }
     }
 
@@ -349,6 +356,13 @@ float IOController::getSignalValue(const QString &objectName) const
 float IOController::getSignalValue(uint16_t control_id, int cab_idx) const
 {
     auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
+
+    if (!io_ctrl)
+    {
+        return 0.0f;
+    }
+
+    printf("Signal name: %s\n", io_ctrl->contolledObjectName.toStdString().c_str());
 
     return getSignalValue(io_ctrl->contolledObjectName);
 }

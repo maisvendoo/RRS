@@ -1109,6 +1109,13 @@ void MyGui::showControlTooltip() const
             ImGui::TextUnformatted(tip.hot_keys.toStdString().c_str());
             ImGui::PopStyleColor();
         }
+
+        if (!tip.state.isEmpty())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::TextUnformatted(tip.state.toStdString().c_str());
+            ImGui::PopStyleColor();
+        }
     }
 
     ImGui::End();
