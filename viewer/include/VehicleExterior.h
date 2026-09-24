@@ -11,6 +11,8 @@ class IOController;
 //class AnimatedPagedLOD;       // Forward declare не работает,
 #include "AnimatedPagedLOD.h"   // VehiclesHandler ругается на incomplete use
 
+#include <QMap>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -59,6 +61,9 @@ public:
                      vsg::ref_ptr<vsg::Options> options);
 
 private:
+
+    /// Карта сигналов анимации
+    QMap<QString, uint16_t> anim_signals_map;
 
     /// Загрузка положения камеры в кабинах
     bool load_cabine_positions(const std::string& cfg_path, CfgReader& cfg);

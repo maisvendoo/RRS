@@ -43,6 +43,11 @@ void VehicleExterior::step(float t, float dt)
 //------------------------------------------------------------------------------
 void VehicleExterior::step(float t, float dt, std::vector<float>* server_signals)
 {
+    if (io_controller != nullptr)
+    {
+        io_controller->setFeedbackSignals(server_signals);
+    }
+
     for (const auto& animated_pagedLOD : animated_nodes)
     {
         if (animated_pagedLOD->children[0].node)
@@ -84,6 +89,24 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 
     // Load IOContrroler module
     load_io_controller_module(cfg_path, cfg);
+
+    // Построение карты анимаций
+    for (const auto &animated_pagedLOD : animated_nodes)
+    {
+        for (const auto& [signal_id, animation] : animated_pagedLOD->animations_map->animations)
+        {
+            if (!animation->name.empty())
+            {
+                anim_signals_map.insert(QString::fromStdString(animation->name),
+                                        static_cast<uint16_t>(signal_id));
+            }
+        }
+    }
+
+    if (io_controller != nullptr)
+    {
+        io_controller->setAnimationSignalsMap(anim_signals_map);
+    }
 
     // Check old config format
     if (transform->children.size() == 0)

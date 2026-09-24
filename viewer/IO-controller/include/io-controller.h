@@ -44,6 +44,18 @@ public:
     /// Обработка мышиного ввода
     void mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed);
 
+    /// Задать карту сигналов анимаций
+    void setAnimationSignalsMap(const QMap<QString, uint16_t> &map)
+    {
+        animation_signals_map = map;
+    }
+
+    /// Задать массив сигналов анимаций
+    void setFeedbackSignals(const std::vector<float> *server_signals)
+    {
+        feedback_signals = server_signals;
+    }
+
 signals:
 
     void sigSendVehicleControlCommand(const QByteArray &data);
@@ -83,6 +95,12 @@ protected:
     void mouseProcessButton(io_control_input_t input, uint32_t button, bool is_pressed);
 
 private:
+
+    /// Маппинг: имя 3D-объекта → ID сигнала обратной связи из analogSignal
+    QMap<QString, uint16_t> animation_signals_map;
+
+    /// Указатель на массив аналоговых сигналов от симулятора
+    const std::vector<float>* feedback_signals = nullptr;
 
     /// Проверка модификатора
     bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
