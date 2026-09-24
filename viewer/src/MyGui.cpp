@@ -1533,5 +1533,116 @@ void MyGui::check_date_time() const
 }
 
 //------------------------------------------------------------------------------
-// Подсказка органа кабины (Alt): имя, назначение, состояние
+//
 //------------------------------------------------------------------------------
+void MyGui::showControlTooltip() const
+{
+    const ControlTooltip &tip = getControlTooltip();
+
+    if (!tip.is_active)
+    {
+        return;
+    }
+
+    const float pad = 12.0f;
+    const ImVec2 pos(tip.x + pad, tip.y + pad);
+
+    ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
+    ImGui::SetNextWindowBgAlpha(0.85f);
+
+    const int flags = ImGuiWindowFlags_NoTitleBar |
+                      ImGuiWindowFlags_NoResize |
+                      ImGuiWindowFlags_NoMove |
+                      ImGuiWindowFlags_NoCollapse |
+                      ImGuiWindowFlags_AlwaysAutoResize |
+                      ImGuiWindowFlags_NoSavedSettings |
+                      ImGuiWindowFlags_NoNav |
+                      ImGuiWindowFlags_NoFocusOnAppearing;
+
+    if (ImGui::Begin("##cab_tooltip", nullptr, flags))
+    {
+        // ╨Ч╨░╨│╨╛╨╗╨╛╨▓╨╛╨║ ╨▓╤Л╤А╨░╨▓╨╜╨╕╨▓╨░╨╡╤В╤Б╤П ╨┐╨╛ ╤Ж╨╡╨╜╤В╤А╤Г ╨╛╨║╨╜╨░ ╨┐╨╛╨┤╤Б╨║╨░╨╖╨║╨╕
+        const std::string title = tip.title.toStdString();
+        const float title_w = ImGui::CalcTextSize(title.c_str()).x;
+        const float avail_w = ImGui::GetContentRegionAvail().x;
+        if (avail_w > title_w)
+        {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (avail_w - title_w) * 0.5f);
+        }
+
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.85f, 0.4f, 1.0f));
+        ImGui::TextUnformatted(title.c_str());
+        ImGui::PopStyleColor();
+
+        if (!tip.description.isEmpty())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::TextUnformatted(tip.description.toStdString().c_str());
+            ImGui::PopStyleColor();
+        }
+
+        if (!tip.usage.isEmpty())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::TextUnformatted(tip.usage.toStdString().c_str());
+            ImGui::PopStyleColor();
+        }
+
+        if (!tip.hot_keys.isEmpty())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::TextUnformatted(tip.hot_keys.toStdString().c_str());
+            ImGui::PopStyleColor();
+        }
+
+        if (!tip.state.isEmpty())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::TextUnformatted(tip.state.toStdString().c_str());
+            ImGui::PopStyleColor();
+        }
+    }
+
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+float MyGui::hudTopOffset() const
+{
+    // ╨Ю╤В╤Б╤В╤Г╨┐ ╨┐╨╛╤Б╤В╨╛╤П╨╜╨╜╤Л╨╣: ╤А╨╡╨╖╨╡╤А╨▓╨╕╤А╤Г╨╡╨╝ ╨╝╨╡╤Б╤В╨╛ ╨┐╨╛╨┤ ╨▒╨░╨╜╨╜╨╡╤А╤Л ╤Б╤В╨░╤В╤Г╤Б╨░ ╤Г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П ╨╕
+    // ╤Б╤В╨░╤В╨╕╤Б╤В╨╕╨║╤Г, ╨┤╨░╨╢╨╡ ╨╡╤Б╨╗╨╕ ╨╛╨╜╨╕ ╤Б╨╡╨╣╤З╨░╤Б ╨╜╨╡ ╨╛╤В╨╛╨▒╤А╨░╨╢╨░╤О╤В╤Б╤П
+    float top = 0.0f;
+
+    const char *text_no_controlled = "╨Э╨░╨╢╨╝╨╕╤В╨╡ Enter ╨┤╨╗╤П ╤Г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П ╨┤╨░╨╜╨╜╨╛╨╣ ╨Я╨Х";
+    const float h_no_controlled = ImGui::CalcTextSize(text_no_controlled).y + 20.0f;
+    if (h_no_controlled > top)
+        top = h_no_controlled;
+
+    if (params->vehicles_handler)
+    {
+        VehicleExterior* cur = params->vehicles_handler->getCurrentVehicle();
+        if (cur)
+        {
+            std::string msg = QString("╨Э╨░╨╢╨╝╨╕╤В╨╡ Enter ╨┤╨╗╤П ╤Г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П ╨╕╨╖ ╨║╨░╨▒╨╕╨╜╤Л %1")
+                                  .arg(cur->current_cabine_idx + 1).toStdString();
+            const float h_cabine = ImGui::CalcTextSize(msg.c_str()).y + 20.0f;
+            if (h_cabine > top)
+                top = h_cabine;
+        }
+    }
+
+    if (params->statistics_handler)
+    {
+        QString text = QString("Device: %1 ").arg(params->physicalDeviceName);
+        text += QString("FPS:%1 (lowest:%2)")
+                    .arg(params->statistics_handler->getAverageFPS(), 6, 'f', 1)
+                    .arg(params->statistics_handler->getLowestFPS(), 6, 'f', 1);
+        const float h_statistics = ImGui::CalcTextSize(text.toStdString().c_str()).y + 20.0f;
+        if (h_statistics > top)
+            top = h_statistics;
+    }
+
+    return (top > 0.0f) ? top + 2.0f : 8.0f;
+}
