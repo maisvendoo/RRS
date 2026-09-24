@@ -194,13 +194,16 @@ void IOController::create_animations_map(const QStringList &anim_dirs)
     QString anim_path = QString::fromStdString(data_dir) +
                         QDir::separator() + "animations";
 
+    // Просматриваем все каталоги анимаций, заданные в конфиге ПЕ
     for (const auto &anim_dir : anim_dirs)
     {
         QString full_anim_path = anim_path + QDir::separator() + anim_dir;
 
         QDir dir(full_anim_path);
-        QStringList files = dir.entryList(QStringList() << "*.xml", QDir::Files | QDir::NoDotAndDotDot);
+        QStringList files = dir.entryList(QStringList() << "*.xml",
+                                          QDir::Files | QDir::NoDotAndDotDot);
 
+        // Все xml-конкретного каталога
         for (const auto &file_name : files)
         {
             if (file_name.isEmpty())
@@ -209,6 +212,9 @@ void IOController::create_animations_map(const QStringList &anim_dirs)
             }
 
             QFileInfo fileInfo(file_name);
+
+            // Ключ - имя анимации, оно же имя файла, оно же имя узла к которому
+            // привязано мышиное управления
             QString animation_name = fileInfo.baseName();
 
             QDomDocument doc;
@@ -224,6 +230,7 @@ void IOController::create_animations_map(const QStringList &anim_dirs)
 
             file.close();
 
+            // Выдираем из файл SignalID
             auto signalIds = doc.elementsByTagName("SignalID");
 
             if (signalIds.size() > 0)
@@ -233,6 +240,7 @@ void IOController::create_animations_map(const QStringList &anim_dirs)
 
                 if (ok)
                 {
+                    // Сохраняем пару имя - идентификатор
                     animation_signals_map[animation_name] = static_cast<uint16_t>(sid);
                 }
             }
