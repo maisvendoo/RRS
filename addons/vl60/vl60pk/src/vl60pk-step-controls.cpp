@@ -1,208 +1,109 @@
 ﻿#include    <cmath>
 #include    <vl60pk.h>
 #include    <vl60-controls.h>
+#include    <brake-crane.h>
+#include    <loco-crane.h>
 #include    <kme-60-044.h>
 #include    <automatic-train-stop.h>
 #include    <pneumo-brake-lock.h>
-
-#include    "brake-crane.h"
-#include    "loco-crane.h"
-#include    "kme-60-044.h"
-#include    "pneumo-brake-lock.h"
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void VL60pk::stepControls(const double &t, const double &dt)
 {
-    (void) t;
-    (void) dt;
-
     for (auto cab_idx : {CAB1, CAB2})
     {
-        // ╨Я╤А╨╕╨╝╨╡╨╜╤П╨╡╨╝ ╤В╨╛╨╗╤М╨║╨╛ ╨Ш╨Ч╨Ь╨Х╨Э╨Ш╨Т╨и╨Ш╨Х╨б╨п ╨║╨╛╨╝╨░╨╜╨┤╤Л (╨┐╨╛ ╤Д╤А╨╛╨╜╤В╤Г): ╨║╨╛╨╝╨░╨╜╨┤╨░
-        // ╨╖╨░╨┤╨░╤С╤В ╤Ж╨╡╨╗╨╡╨▓╨╛╨╡ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╨╡ ╨╛╤А╨│╨░╨╜╨░, ╨░╨▓╤В╨╛╨╖╨░╨┐╤Г╤Б╨║/╨░╨▓╤В╨╛╨╛╤Б╤В╨░╨╜╨╛╨▓
-        // ╨╕ ╨┐╤А╨╛╤З╨╕╨╡ ╤Б╨╡╤А╨▓╨╡╤А╨╜╤Л╨╡ ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╤Л ╤А╨░╨▒╨╛╤В╨░╤О╤В ╤Б ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░╨╝╨╕ ╨╜╨░╨┐╤А╤П╨╝╤Г╤О
-        // ╨╕ ╨╜╨╡ ╨┤╨╛╨╗╨╢╨╜╤Л ╨╖╨░╤В╨╕╤А╨░╤В╤М╤Б╤П ╤Г╤А╨╛╨▓╨╜╨╡╨╝ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨╣ ╨║╨╛╨╝╨░╨╜╨┤╤Л
-        for (auto it = control_inputs[cab_idx].cbegin();
-             it != control_inputs[cab_idx].cend(); ++it)
-        {
-            int id = it.key();
-            float value = it.value();
+        bool is_pnt = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_PNT]);
+        is_pnt ? pants_tumbler[cab_idx].set() : pants_tumbler[cab_idx].reset();
 
-            if (prev_control_values[cab_idx].contains(id) &&
-                (prev_control_values[cab_idx].value(id) == value))
-            {
-                continue;
-            }
+        bool is_pnt1 = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_PNT1]);
+        is_pnt1 ? pant1_tumbler[cab_idx].set() : pant1_tumbler[cab_idx].reset();
 
-            prev_control_values[cab_idx].insert(id, value);
+        bool is_pnt2 = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_PNT2]);
+        is_pnt2 ? pant2_tumbler[cab_idx].set() : pant2_tumbler[cab_idx].reset();
 
-            applyControlCommand(cab_idx, id, value);
-        }
-    }
-}
+        bool is_main_switch_on = static_cast<bool>(control_inputs[cab_idx][CTRL_MAIN_SWITCH_ON]);
+        is_main_switch_on ? gv_tumbler[cab_idx].set() : gv_tumbler[cab_idx].reset();
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void VL60pk::applyControlCommand(int cab_idx, int id, float value)
-{
-    bool state = (value > 0.5f);
+        bool is_main_switch_return = static_cast<bool>(control_inputs[cab_idx][CTRL_RETURN_PROTECTION]);
+        is_main_switch_return ? gv_return_tumbler[cab_idx].set() : gv_return_tumbler[cab_idx].reset();
 
-    switch (id)
-    {
-    // ╨в╤Г╨╝╨▒╨╗╨╡╤А╤Л: ╨║╨╛╨╝╨░╨╜╨┤╨░ ╨╖╨░╨┤╨░╤С╤В ╤Ж╨╡╨╗╨╡╨▓╨╛╨╡ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╨╡
-    case CTRL_TUMBLER_PNT:
-        state ? pants_tumbler[cab_idx].set() : pants_tumbler[cab_idx].reset();
-        return;
+        bool is_fr = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_FR]);
+        is_fr ? fr_tumbler[cab_idx].set() : fr_tumbler[cab_idx].reset();
 
-    case CTRL_TUMBLER_PNT1:
-        state ? pant1_tumbler[cab_idx].set() : pant1_tumbler[cab_idx].reset();
-        return;
+        bool is_mk = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_MK]);
+        is_mk ? mk_tumbler[cab_idx].set() : mk_tumbler[cab_idx].reset();
 
-    case CTRL_TUMBLER_PNT2:
-        state ? pant2_tumbler[cab_idx].set() : pant2_tumbler[cab_idx].reset();
-        return;
+        bool is_mv1 = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_MV1]);
+        is_mv1 ? mv_tumblers[cab_idx][MV1].set() : mv_tumblers[cab_idx][MV1].reset();
 
-    case CTRL_TUMBLER_CU:
-        state ? cu_tumbler[cab_idx].set() : cu_tumbler[cab_idx].reset();
-        return;
+        bool is_mv2 = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_MV2]);
+        is_mv2 ? mv_tumblers[cab_idx][MV2].set() : mv_tumblers[cab_idx][MV2].reset();
 
-    case CTRL_TUMBLER_GV:
-        state ? gv_tumbler[cab_idx].set() : gv_tumbler[cab_idx].reset();
-        return;
+        bool is_mv3 = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_MV3]);
+        is_mv3 ? mv_tumblers[cab_idx][MV3].set() : mv_tumblers[cab_idx][MV3].reset();
 
-    case CTRL_TUMBLER_GV_RETURN:
-        // ╨Ъ╨╜╨╛╨┐╨║╨░ ╨▒╨╡╨╖ ╤Д╨╕╨║╤Б╨░╤Ж╨╕╨╕: ╨╜╨░╨╢╨░╤В╨╕╨╡ - ╨▓╨║╨╗╤О╤З╨╕╤В╤М, ╨╛╤В╨┐╤Г╤Б╨║╨░╨╜╨╕╨╡ (value=0) - ╨▓╤Л╨║╨╗╤О╤З╨╕╤В╤М
-        state ? gv_return_tumbler[cab_idx].set() : gv_return_tumbler[cab_idx].reset();
-        return;
+        bool is_mv4 = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_MV4]);
+        is_mv4 ? mv_tumblers[cab_idx][MV4].set() : mv_tumblers[cab_idx][MV4].reset();
 
-    case CTRL_TUMBLER_FR:
-        state ? fr_tumbler[cab_idx].set() : fr_tumbler[cab_idx].reset();
-        return;
+        bool is_mv5 = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_MV5]);
+        is_mv5 ? mv_tumblers[cab_idx][MV5].set() : mv_tumblers[cab_idx][MV5].reset();
 
-    case CTRL_TUMBLER_MK:
-        state ? mk_tumbler[cab_idx].set() : mk_tumbler[cab_idx].reset();
-        return;
+        bool is_mv6 = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_MV6]);
+        is_mv6 ? mv_tumblers[cab_idx][MV6].set() : mv_tumblers[cab_idx][MV6].reset();
 
-    case CTRL_TUMBLER_MV1:
-    case CTRL_TUMBLER_MV2:
-    case CTRL_TUMBLER_MV3:
-    case CTRL_TUMBLER_MV4:
-    case CTRL_TUMBLER_MV5:
-    case CTRL_TUMBLER_MV6:
-    {
-        size_t mv_idx = static_cast<size_t>(id - CTRL_TUMBLER_MV1);
-        state ? mv_tumblers[cab_idx][mv_idx].set()
-              : mv_tumblers[cab_idx][mv_idx].reset();
-        return;
-    }
+        bool is_cu = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_CU]);
+        is_cu ? cu_tumbler[cab_idx].set() : cu_tumbler[cab_idx].reset();
 
-    case CTRL_TUMBLER_EPT:
-        state ? epb_switch[cab_idx].set() : epb_switch[cab_idx].reset();
-        return;
+        bool is_spot_high = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_SPOT_HIGH]);
+        is_spot_high ? spotlight_high_tumbler[cab_idx].set() : spotlight_high_tumbler[cab_idx].reset();
 
-    case CTRL_TUMBLER_CAB_LIGHT_LOW:
-        state ? P_cab_light_low_tumbler[cab_idx].set()
-              : P_cab_light_low_tumbler[cab_idx].reset();
-        return;
+        bool is_spot_low = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_SPOT_LOW]);
+        is_spot_low ? spotlight_low_tumbler[cab_idx].set() : spotlight_low_tumbler[cab_idx].reset();
 
-    case CTRL_TUMBLER_CAB_LIGHT_HIGH:
-        state ? P_cab_light_high_tumbler[cab_idx].set()
-              : P_cab_light_high_tumbler[cab_idx].reset();
-        return;
+        bool is_cab_light_low = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_CAB_LIGHT_LOW]);
+        is_cab_light_low ? P_cab_light_low_tumbler[cab_idx].set() : P_cab_light_low_tumbler[cab_idx].reset();
 
-    case CTRL_TUMBLER_LIGHT_DEVICES:
-        state ? P_light_devices_tumbler[cab_idx].set()
-              : P_light_devices_tumbler[cab_idx].reset();
-        return;
+        bool is_cab_light_high = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_CAB_LIGHT_HIGH]);
+        is_cab_light_high ? P_cab_light_high_tumbler[cab_idx].set() : P_cab_light_high_tumbler[cab_idx].reset();
 
-    case CTRL_TUMBLER_BUFFLIGHT_L:
-        state ? P_bufferlight_L_tumbler[cab_idx].set()
-              : P_bufferlight_L_tumbler[cab_idx].reset();
-        return;
+        bool is_light_devices = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_LIGHT_DEVICES]);
+        is_light_devices ? P_light_devices_tumbler[cab_idx].set() : P_light_devices_tumbler[cab_idx].reset();
 
-    case CTRL_TUMBLER_BUFFLIGHT_R:
-        state ? P_bufferlight_R_tumbler[cab_idx].set()
-              : P_bufferlight_R_tumbler[cab_idx].reset();
-        return;
+        bool is_buf_light_l = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_BUF_LIGHT_L]);
+        is_buf_light_l ? P_bufferlight_L_tumbler[cab_idx].set() : P_bufferlight_L_tumbler[cab_idx].reset();
 
-    case CTRL_TUMBLER_BUFFCOLOR_L:
-        state ? P_buffercolor_L_toogle[cab_idx].set()
-              : P_buffercolor_L_toogle[cab_idx].reset();
-        return;
+        bool is_buf_light_r = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_BUF_LIGHT_R]);
+        is_buf_light_r ? P_bufferlight_R_tumbler[cab_idx].set() : P_bufferlight_R_tumbler[cab_idx].reset();
 
-    case CTRL_TUMBLER_BUFFCOLOR_R:
-        state ? P_buffercolor_R_toogle[cab_idx].set()
-              : P_buffercolor_R_toogle[cab_idx].reset();
-        return;
+        bool is_buf_color_l = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_BUF_COLOR_L]);
+        is_buf_color_l ? P_buffercolor_L_toogle[cab_idx].set() : P_buffercolor_L_toogle[cab_idx].reset();
 
-    // ╨Ъ╤А╨░╨╜ ╨╝╨░╤И╨╕╨╜╨╕╤Б╤В╨░ 395: ╨┐╨╛╨╖╨╕╤Ж╨╕╤П I..VI (0..6)
-    case CTRL_CRANE_395:
-        brake_crane[cab_idx]->setHandlePosition(
-                    static_cast<int>(std::lround(value)));
-        return;
+        bool is_buf_color_r = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_BUF_COLOR_R]);
+        is_buf_color_r ? P_buffercolor_R_toogle[cab_idx].set() : P_buffercolor_R_toogle[cab_idx].reset();
 
-    // ╨Ъ╤А╨░╨╜ ╨▓╤Б╨┐╨╛╨╝╨╛╨│╨░╤В╨╡╨╗╤М╨╜╤Л╨╣ 254
-    case CTRL_CRANE_254:
-        loco_crane[cab_idx]->setHandlePosition(static_cast<double>(value));
-        return;
+        bool is_epb = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_EPB]);
+        is_epb ? epb_switch[cab_idx].set() : epb_switch[cab_idx].reset();
 
-    // ╨Ъ╨Ь╨н ╨│╨╗╨░╨▓╨╜╨░╤П ╤А╤Г╨║╨╛╤П╤В╨║╨░: ╨┐╨╛╨╖╨╕╤Ж╨╕╤П 0..33
-    case CTRL_KM_MAIN:
-        controller[cab_idx]->setMainHandlePos(
-                    static_cast<int>(std::lround(value)));
-        return;
+        bool is_revers_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_REVERS_INSERTION]);
+        controller[cab_idx]->insertReversHandle(is_revers_insert);
 
-    // ╨Ъ╨Ь╨н ╤А╨╡╨▓╨╡╤А╤Б: 0 - ╨╜╨░╨╖╨░╨┤, 1 - ╨╜╨╛╨╗╤М, 2 - ╨▓╨┐╨╡╤А╤С╨┤
-    case CTRL_KM_REVERS:
-        controller[cab_idx]->setReversHandlePos(
-                    static_cast<int>(std::lround(value)));
-        return;
+        bool is_epk_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_EPK_INSERTION]);
+        epk[cab_idx]->insertKey(is_epk_insert);
 
-    // ╨Т╤Б╤В╨░╨▓╨║╨░/╨╕╨╖╨▓╨╗╨╡╤З╨╡╨╜╨╕╨╡ ╤А╨╡╨▓╨╡╤А╤Б╨╕╨▓╨╜╨╛╨╣ ╤А╤Г╨║╨╛╤П╤В╨║╨╕
-    case CTRL_KM_REVERS_INSERT:
-        controller[cab_idx]->insertReversHandle(value > 0.5f);
-        return;
+        bool is_key_epk_ON = static_cast<bool>(control_inputs[cab_idx][CTRL_KEY_EPK]);
+        epk[cab_idx]->setKeyOn(is_key_epk_ON);
 
-    // ╨г╨С╨в-367: ╨┐╨╛╨▓╨╛╤А╨╛╤В ╨║╨╗╤О╤З╨░ ╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨║╨╕
-    case CTRL_LOCK_367:
-        brake_lock[cab_idx]->setStateOn(value > 0.5f);
-        return;
+        bool is_lock367_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_LOCK_367_INSERTION]);
+        brake_lock[cab_idx]->setStateOn(is_lock367_insert);
+        brake_lock[cab_idx]->insertLockHandle(is_lock367_insert);
 
-    // ╨Ъ╨╛╨╝╨▒╨╕╨╜╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ ╨║╤А╨░╨╜: -1 - ╨┤╨▓╨╛╨╣╨╜╨░╤П ╤В╤П╨│╨░, 0 - ╨┐╨╛╨╡╨╖╨┤╨╜╨╛╨╡, +1 - ╤Н╨║╤Б╤В╤А╨╡╨╜╨╜╨╛╨╡
-    case CTRL_CRANE_COMBINE:
-        brake_lock[cab_idx]->setCombineCranePosition(
-                    static_cast<int>(std::lround(value)));
-        return;
-
-    // Вставка/извлечение ключа ЭПК-150
-    case CTRL_EPK_INSERTION:
-        epk[cab_idx]->insertKey(value > 0.5f);
-        return;
-
-    // Поворот ключа ЭПК-150
-    case CTRL_KEY_EPK:
-        epk[cab_idx]->setKeyOn(value > 0.5f);
-        return;
-
-    // Вставка/извлечение рукоятки блокировки 367
-    case CTRL_LOCK_367_INSERTION:
-        brake_lock[cab_idx]->setStateOn(value > 0.5f);
-        brake_lock[cab_idx]->insertLockHandle(value > 0.5f);
-        return;
-
-    // Прожектор яркий/тусклый
-    case CTRL_TUMBLER_SPOT_HIGH:
-        state ? spotlight_high_tumbler[cab_idx].set() : spotlight_high_tumbler[cab_idx].reset();
-        return;
-
-    case CTRL_TUMBLER_SPOT_LOW:
-        state ? spotlight_low_tumbler[cab_idx].set() : spotlight_low_tumbler[cab_idx].reset();
-        return;
-
-    default:
-        return;
+        brake_crane[cab_idx]->setHandlePosition(static_cast<int>(std::lround(control_inputs[cab_idx][CTRL_CRANE_395])));
+        loco_crane[cab_idx]->setHandlePosition(static_cast<double>(control_inputs[cab_idx][CTRL_CRANE_254]));
+        controller[cab_idx]->setMainHandlePos(static_cast<int>(std::lround(control_inputs[cab_idx][CTRL_KM_MAIN])));
+        controller[cab_idx]->setReversHandlePos(static_cast<int>(std::lround(control_inputs[cab_idx][CTRL_KM_REVERS])));
+        brake_lock[cab_idx]->setStateOn(control_inputs[cab_idx][CTRL_LOCK_367_TURN] > 0.5f);
+        brake_lock[cab_idx]->setCombineCranePosition(static_cast<int>(std::lround(control_inputs[cab_idx][CTRL_CRANE_COMBINE])));
     }
 }

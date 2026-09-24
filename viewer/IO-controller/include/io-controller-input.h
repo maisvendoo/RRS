@@ -28,7 +28,6 @@ struct io_control_input_t
     QString keyModOffName = "";
     /// Имя объекта в 3D-модели
     QString contolledObjectName = "";
-    QString contolledObjectName2 = "";
     /// Имя контрола
     QString name = "";
     /// Тип контрола
@@ -39,14 +38,6 @@ struct io_control_input_t
     QString usage = "";
     /// Описание горячей клавиши
     QString hot_keys = "";
-    /// Сигнал ПЕ с текущим состоянием органа (для тултипа и
-    /// вычисления целевого значения при клике мышью)
-    int signal_id = -1;
-    /// Второй сигнал (например, реверс: вставлена ли рукоятка)
-    int signal_id2 = -1;
-    QString state_mode = "";
-    /// Имена состояний через ';'
-    QString state_names = "";
 
     io_control_input_t()
     {

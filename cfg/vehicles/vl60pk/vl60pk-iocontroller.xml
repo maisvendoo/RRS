@@ -16,7 +16,6 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_Pnt</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_Pnt</ObjectNameCab2>
-    <SignalID>67</SignalID>
   </Control>
   <!-- Токоприемник передний -->
   <Control>
@@ -31,7 +30,6 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_Pnt1</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_Pnt1</ObjectNameCab2>
-    <SignalID>65</SignalID>
   </Control>
   <!-- Токоприемник задний -->
   <Control>
@@ -46,38 +44,37 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_Pnt2</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_Pnt2</ObjectNameCab2>
-    <SignalID>66</SignalID>
   </Control>
   <!-- Включение ГВ -->
   <Control>
-    <ID>105</ID>
+    <ID>103</ID>
     <Name>Включение ГВ</Name>
     <Description>Включить цепи управление ГВ</Description>
-    <Type>Button</Type>
+    <Type>Toggle</Type>
     <value1>0.0</value1>
     <value2>0.0</value2>
+    <KeyName>KEY_P</KeyName>
+    <KeyModOnName>Shift</KeyModOnName>
+    <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_GVonoff</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_GVonoff</ObjectNameCab2>
-    <SignalID>68</SignalID>
   </Control>
   <!-- Возврат защиты ГВ -->
   <Control>
     <ID>104</ID>
     <Name>Возврат защиты ГВ</Name>
     <Description>Восстановление защиты</Description>
-    <Type>Toggle</Type>
+    <Type>Button</Type>
     <value1>0.0</value1>
     <value2>0.0</value2>
     <KeyName>KEY_P</KeyName>
-    <KeyModOnName>Shift</KeyModOnName>
+    <KeyModOnName>Alt</KeyModOnName>
     <ObjectNameCab1>Cab1_Tumbler_GVon</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_GVon</ObjectNameCab2>
-    <SignalID>69</SignalID>
-    <KeyModOffName>Ctrl</KeyModOffName>
   </Control>
   <!-- Фазорасщепитель -->
   <Control>
-    <ID>106</ID>
+    <ID>105</ID>
     <Name>Фазорасщепитель</Name>
     <Description>Запуск ращепителя фаз</Description>
     <Type>Toggle</Type>
@@ -88,11 +85,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_FR</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_FR</ObjectNameCab2>
-    <SignalID>79</SignalID>
   </Control>
   <!-- Компрессор -->
   <Control>
-    <ID>107</ID>
+    <ID>106</ID>
     <Name>Компрессор</Name>
     <Description>Запуск мотор-компрессора</Description>
     <Type>Toggle</Type>
@@ -103,11 +99,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_MK</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_MK</ObjectNameCab2>
-    <SignalID>78</SignalID>
   </Control>
   <!-- Вентилятор 1 -->
   <Control>
-    <ID>108</ID>
+    <ID>107</ID>
     <Name>Вентилятор 1</Name>
     <Description>Запуск мотор-вентилятора 1</Description>
     <Type>Toggle</Type>
@@ -118,11 +113,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_MV1</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_MV1</ObjectNameCab2>
-    <SignalID>77</SignalID>
   </Control>
   <!-- Вентилятор 2 -->
   <Control>
-    <ID>109</ID>
+    <ID>108</ID>
     <Name>Вентилятор 2</Name>
     <Description>Запуск мотор-вентилятора 2</Description>
     <Type>Toggle</Type>
@@ -133,11 +127,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_MV2</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_MV2</ObjectNameCab2>
-    <SignalID>76</SignalID>
   </Control>
   <!-- Вентилятор 3 -->
   <Control>
-    <ID>110</ID>
+    <ID>109</ID>
     <Name>Вентилятор 3</Name>
     <Description>Запуск мотор-вентилятора 3</Description>
     <Type>Toggle</Type>
@@ -148,11 +141,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_MV3</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_MV3</ObjectNameCab2>
-    <SignalID>75</SignalID>
   </Control>
   <!-- Вентилятор 4 -->
   <Control>
-    <ID>111</ID>
+    <ID>110</ID>
     <Name>Вентилятор 4</Name>
     <Description>Запуск мотор-вентилятора 4</Description>
     <Type>Toggle</Type>
@@ -163,11 +155,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_MV4</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_MV4</ObjectNameCab2>
-    <SignalID>74</SignalID>
   </Control>
   <!-- Вентилятор 5 -->
   <Control>
-    <ID>112</ID>
+    <ID>111</ID>
     <Name>Вентилятор 5</Name>
     <Description>Запуск мотор-вентилятора 5</Description>
     <Type>Toggle</Type>
@@ -178,11 +169,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_MV5</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_MV5</ObjectNameCab2>
-    <SignalID>73</SignalID>
   </Control>
   <!-- Вентилятор 6 -->
   <Control>
-    <ID>113</ID>
+    <ID>112</ID>
     <Name>Вентилятор 6</Name>
     <Description>Запуск мотор-вентилятора 6</Description>
     <Type>Toggle</Type>
@@ -193,11 +183,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_MV6</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_MV6</ObjectNameCab2>
-    <SignalID>72</SignalID>
   </Control>
   <!-- Цепи управления -->
   <Control>
-    <ID>103</ID>
+    <ID>113</ID>
     <Name>Цепи управления</Name>
     <Description>Включение цепей управления КМ</Description>
     <Type>Toggle</Type>
@@ -208,11 +197,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_CU</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_CU</ObjectNameCab2>
-    <SignalID>64</SignalID>
   </Control>
   <!-- Прожектор яркий -->
   <Control>
-    <ID>140</ID>
+    <ID>114</ID>
     <Name>Прожектор яркий</Name>
     <Description>Включение яркого света прожектора</Description>
     <Type>Toggle</Type>
@@ -225,7 +213,7 @@
   </Control>
   <!-- Прожектор тусклый -->
   <Control>
-    <ID>141</ID>
+    <ID>115</ID>
     <Name>Прожектор тусклый</Name>
     <Description>Включение прожектора (тускло)</Description>
     <Type>Toggle</Type>
@@ -239,7 +227,7 @@
   </Control>
   <!-- Освещение кабины тусклое -->
   <Control>
-    <ID>115</ID>
+    <ID>116</ID>
     <Name>Освещение кабины тусклое</Name>
     <Description>Включение освещения кабины</Description>
     <Type>Toggle</Type>
@@ -250,11 +238,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_svet1</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_svet1</ObjectNameCab2>
-    <SignalID>83</SignalID>
   </Control>
   <!-- Освещение кабины яркое -->
   <Control>
-    <ID>116</ID>
+    <ID>117</ID>
     <Name>Освещение кабины яркое</Name>
     <Description>Включение яркого освещения в кабине</Description>
     <Type>Toggle</Type>
@@ -265,11 +252,10 @@
     <KeyModOffName>Alt</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_svet2</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_svet2</ObjectNameCab2>
-    <SignalID>84</SignalID>
   </Control>
   <!-- Освещение приборов -->
   <Control>
-    <ID>117</ID>
+    <ID>118</ID>
     <Name>Освещение приборов</Name>
     <Description>Включение подсветки приборов</Description>
     <Type>Toggle</Type>
@@ -280,11 +266,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_svetPribor</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_svetPribor</ObjectNameCab2>
-    <SignalID>87</SignalID>
   </Control>
   <!-- Фонарь буферный левый -->
   <Control>
-    <ID>118</ID>
+    <ID>119</ID>
     <Name>Фонарь буферный левый</Name>
     <Description>Включение левого буферного фонаря (БФ)</Description>
     <Type>Toggle</Type>
@@ -295,11 +280,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_buferL</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_buferL</ObjectNameCab2>
-    <SignalID>88</SignalID>
   </Control>
   <!-- Фонарь буферный правый -->
   <Control>
-    <ID>119</ID>
+    <ID>120</ID>
     <Name>Фонарь буферный правый</Name>
     <Description>Включение правого буферного фонаря (БФ)</Description>
     <Type>Toggle</Type>
@@ -310,11 +294,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Tumbler_buferR</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbler_buferR</ObjectNameCab2>
-    <SignalID>89</SignalID>
   </Control>
   <!-- Цвет буфера левый -->
   <Control>
-    <ID>120</ID>
+    <ID>121</ID>
     <Name>Цвет буфера левый</Name>
     <Description>Переключение красного/белого цвета левого БФ</Description>
     <Type>Toggle</Type>
@@ -324,11 +307,10 @@
     <KeyModOnName>Alt</KeyModOnName>
     <ObjectNameCab1>Cab1_Tumbl_BF-color_L</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbl_BF-color_L</ObjectNameCab2>
-    <SignalID>92</SignalID>
   </Control>
   <!-- Цвет буфера правый -->
   <Control>
-    <ID>121</ID>
+    <ID>122</ID>
     <Name>Цвет буфера правый</Name>
     <Description>Переключение красного/белого цвета правого БФ</Description>
     <Type>Toggle</Type>
@@ -338,11 +320,10 @@
     <KeyModOnName>Alt</KeyModOnName>
     <ObjectNameCab1>Cab1_Tumbl_BF-color_R</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Tumbl_BF-color_R</ObjectNameCab2>
-    <SignalID>93</SignalID>
   </Control>
   <!-- ЭПТ -->
   <Control>
-    <ID>114</ID>
+    <ID>123</ID>
     <Name>ЭПТ</Name>
     <Description>Включение питания ЭПТ</Description>
     <Type>Toggle</Type>
@@ -353,11 +334,10 @@
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_ept_onOff</ObjectNameCab1>
     <ObjectNameCab2>Cab2_ept_onOff</ObjectNameCab2>
-    <SignalID>70</SignalID>
   </Control>
   <!-- Реверсивный вал -->
   <Control>
-    <ID>134</ID>
+    <ID>124</ID>
     <Name>Реверсивный вал</Name>
     <Description>Извлечь/вставить реверсивную рукоятку</Description>
     <Type>Toggle</Type>
@@ -371,7 +351,7 @@
   </Control>
   <!-- ЭПК-150 -->
   <Control>
-    <ID>137</ID>
+    <ID>125</ID>
     <Name>ЭПК-150</Name>
     <Description>Извлечь/Вставить ключ</Description>
     <Type>Toggle</Type>
@@ -384,7 +364,7 @@
   </Control>
   <!-- Блокировка 367 -->
   <Control>
-    <ID>138</ID>
+    <ID>126</ID>
     <Name>Блокировка 367</Name>
     <Description>Извлечь/Вставить рукоятку</Description>
     <Type>Toggle</Type>
@@ -397,7 +377,7 @@
   </Control>
   <!-- Ключ ЭПК -->
   <Control>
-    <ID>139</ID>
+    <ID>127</ID>
     <Name>Ключ ЭПК</Name>
     <Description>Включение ЭПК автостопа</Description>
     <Type>Toggle</Type>
@@ -407,62 +387,59 @@
     <KeyModOnName>Shift</KeyModOnName>
     <KeyModOffName>Ctrl</KeyModOffName>
     <ObjectNameCab1>Cab1_Kluch_EPK</ObjectNameCab1>
-    <ObjectNameCab2>Cab2_Kluch_EPK</ObjectNameCab2>
+    <ObjectNameCab2>Cab1_Kluch_EPK</ObjectNameCab2>
   </Control>
   <Control>
-    <ID>130</ID>
-    <Name>╨Ъ╤А╨░╨╜ ╨╝╨░╤И╨╕╨╜╨╕╤Б╤В╨░ 395</Name>
+    <value2>0.0</value2>
+    <value1>0.0</value1>
+    <Name>Кран машиниста 395</Name>
+    <ID>142</ID>
     <Type>Crane395</Type>
-    <SignalID>57</SignalID>
-    <StateMode>norm</StateMode>
-    <StateNames>I - ╨╖╨░╤А╤П╨┤╨║╨░ ╨╕ ╨╛╤В╨┐╤Г╤Б╨║;II - ╨┐╨╛╨╡╨╖╨┤╨╜╨╛╨╡;III - ╨┐╨╡╤А╨╡╨║╤А╤Л╤И╨░ ╨▒╨╡╨╖ ╨┐╨╕╤В╨░╨╜╨╕╤П;IV - ╨┐╨╡╤А╨╡╨║╤А╤Л╤И╨░ ╤Б ╨┐╨╕╤В╨░╨╜╨╕╨╡╨╝;Va - ╤В╨╛╤А╨╝╨╛╨╢╨╡╨╜╨╕╨╡ ╨╖╨░╨╝╨╡╨┤╨╗╨╡╨╜╨╜╤Л╨╝ ╤В╨╡╨╝╨┐╨╛╨╝;V - ╤Б╨╗╤Г╨╢╨╡╨▒╨╜╨╛╨╡ ╤В╨╛╤А╨╝╨╛╨╢╨╡╨╜╨╕╨╡;VI - ╤Н╨║╤Б╤В╤А╨╡╨╜╨╜╨╛╨╡ ╤В╨╛╤А╨╝╨╛╨╢╨╡╨╜╨╕╨╡</StateNames>
     <ObjectNameCab1>Cab1_Kran395-ruk</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Kran395-ruk</ObjectNameCab2>
   </Control>
   <Control>
-    <ID>131</ID>
-    <Name>╨Ъ╤А╨░╨╜ ╨▓╤Б╨┐╨╛╨╝╨╛╨│╨░╤В╨╡╨╗╤М╨╜╤Л╨╣ 254</Name>
+    <value2>0.0</value2>
+    <value1>0.0</value1>
+    <Name>Кран вспомогательный 254</Name>
+    <ID>143</ID>
     <Type>Crane254</Type>
-    <SignalID>58</SignalID>
     <ObjectNameCab1>Cab1_Kran254-ruk</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Kran254-ruk</ObjectNameCab2>
   </Control>
   <Control>
-    <ID>132</ID>
-    <Name>╨Ъ╨╛╨╜╤В╤А╨╛╨╗╨╗╨╡╤А ╨╝╨░╤И╨╕╨╜╨╕╤Б╤В╨░ (╨Ъ╨Ь╨н)</Name>
+    <value2>0.0</value2>
+    <value1>0.0</value1>
+    <Name>Контроллер машиниста (КМЭ)</Name>
+    <ID>144</ID>
     <Type>KM</Type>
-    <SignalID>53</SignalID>
-    <StateMode>kme</StateMode>
     <ObjectNameCab1>Cab1_Kontroller</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Kontroller</ObjectNameCab2>
   </Control>
   <Control>
-    <ID>133</ID>
-    <Name>╨а╨╡╨▓╨╡╤А╤Б╨╕╨▓╨╜╨░╤П ╤А╤Г╨║╨╛╤П╤В╨║╨░</Name>
+    <value2>0.0</value2>
+    <value1>0.0</value1>
+    <Name>Реверсивная рукоятка</Name>
+    <ID>145</ID>
     <Type>Revers</Type>
-    <SignalID>52</SignalID>
-    <SignalID2>51</SignalID2>
-    <StateMode>centered</StateMode>
-    <StateNames>╨Э╨░╨╖╨░╨┤;╨Э╨╡╨╣╤В╤А╨░╨╗╤М;╨Т╨┐╨╡╤А╤С╨┤</StateNames>
     <ObjectNameCab1>Cab1_revers</ObjectNameCab1>
     <ObjectNameCab2>Cab2_revers</ObjectNameCab2>
   </Control>
   <Control>
-    <ID>135</ID>
-    <Name>╨С╨╗╨╛╨║╨╕╤А╨╛╨▓╨╛╤З╨╜╤Л╨╣ ╨║╨╗╤О╤З 367</Name>
+    <value2>0.0</value2>
+    <value1>0.0</value1>
+    <Name>Блокировочный ключ 367</Name>
+    <ID>146</ID>
     <Type>Lock367</Type>
-    <SignalID>55</SignalID>
-    <SignalID2>54</SignalID2>
     <ObjectNameCab1>Cab1_Kluch_367</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Kluch_367</ObjectNameCab2>
   </Control>
   <Control>
-    <ID>136</ID>
-    <Name>╨Ъ╨╛╨╝╨▒╨╕╨╜╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ ╨║╤А╨░╨╜</Name>
+    <value2>0.0</value2>
+    <value1>0.0</value1>
+    <Name>Комбинированный кран</Name>
+    <ID>147</ID>
     <Type>Lever</Type>
-    <SignalID>56</SignalID>
-    <StateMode>centered</StateMode>
-    <StateNames>╨Ф╨▓╨╛╨╣╨╜╨░╤П ╤В╤П╨│╨░;╨Я╨╛╨╡╨╖╨┤╨╜╨╛╨╡;╨н╨║╤Б╤В╤А╨╡╨╜╨╜╨╛╨╡ ╤В╨╛╤А╨╝╨╛╨╢╨╡╨╜╨╕╨╡</StateNames>
     <ObjectNameCab1>Cab1_Kran_kombin</ObjectNameCab1>
     <ObjectNameCab2>Cab2_Kran_kombin</ObjectNameCab2>
   </Control>

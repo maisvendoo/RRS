@@ -4,14 +4,10 @@
 #include    <io-controller-export.h>
 #include    <io-controller-input.h>
 #include    <QObject>
-#include    <QMap>
 #include    <set>
-#include    <vector>
-#include    <optional>
-#include    <string>
-#include    <functional>
 
 #include    <dual-key-hash.h>
+#include    <QMap>
 
 class CfgReader;
 
@@ -38,32 +34,28 @@ public:
 
     void create_animations_map(const QStringList &anim_dirs);
 
-    void setCabineIndex(int vehicle_idx, int cab_idx);
+    void setVehicleIndex(int vehicle_idx);
 
-    void setVehicleSignals(const std::vector<float> *vehicle_signals);
-
-    float getVehicleSignal(int signal_id) const;
-
-    std::optional<io_control_input_t> getInputByObject(const QString &object_name) const;
-
-    virtual QString getControlStateText(const io_control_input_t &io_ctrl,
-                                        float state) const;
+    void setActirveCabineIndex(int cab_idx)
+    {
+        cabine_idx = cab_idx;
+    }
 
     bool findControl(const std::string &node_name, io_control_input_t &out) const;
 
-    void mouseClick(const QString &object_name, int button);
-
-    void mouseRelease(const QString &object_name);
-
+    /// Обработка мышиного ввода
     void mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed);
 
+    /// Задать массив сигналов анимаций
     void setFeedbackSignals(const std::vector<float> *server_signals)
     {
         feedback_signals = server_signals;
     }
 
+    /// Получить текущее значение сигнала по имени 3D-объекта
     float getSignalValueByName(const QString& objectName) const;
 
+    /// Получить текущее значение сигнала по ID контрола
     float getSignalValueByID(uint16_t control_id, int cab_idx) const;
 
 signals:
@@ -72,55 +64,53 @@ signals:
 
 protected:
 
+    /// Массив нажатых клавиш
     std::set<uint16_t> _pressed_keys;
 
+    /// Массив лямбд для вызова идентификаторов
     QMap<QString, std::function<bool(const std::set<uint16_t> &)>> isModifier;
 
-    DualKeyHash<uint16_t, QString, io_control_input_t> io_control_inputs;
+    /// Здесь обеспечивается доступ к значению сигнала контрола
+    /// как по коду нажатой кавиши, так и по имени объекта, кликнутого мышью
+    std::vector<DualKeyHash<uint16_t, QString, io_control_input_t>> io_control_inputs;
 
-    const std::vector<float> *vehicle_signals = nullptr;
+    int cabs_num = 0;
 
-    enum ControlType
-    {
-        CTRL_TYPE_KEYBOARD,
-        CTRL_TYPE_MOUSE,
-        CTRL_TYPE_CTRL_PANEL
-    };
+    int cabine_idx = 0;
 
-    virtual void keysProcess(std::set<uint16_t> &pressed_keys) = 0;
+    /// Обработка управления с клавиатуры в кастомных модулях
+    virtual void keysProcess(std::set<uint16_t> &pressed_keys);
 
-    void processSwitchBySignal(io_control_input_t &io_ctrl);
-
-    void processTumbler(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
-
-    void processButton(const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
-
-    void mouseProcessTumbler(io_control_input_t input, uint32_t button, bool is_pressed);
-
-    void mouseProcessButton(io_control_input_t input, uint32_t button, bool is_pressed);
-
+    /// Обработка управления мышью в кастомных модулях
     virtual void processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed);
 
-    bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
+    /// Обработка контрола типа "тумблер" (с фиксацией)
+    void processTumbler(size_t cab_idx, const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
 
-    virtual void processMouseControl(io_control_input_t &io_ctrl, int button);
+    /// Обработка контрола типа "кнопка" (без фиксации)
+    void processButton(size_t cab_idx, const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
 
-    void emitControl(const io_control_input_t &io_ctrl);
+    /// Обработка мышки на контроле типа "тумблер"
+    void mouseProcessTumbler(io_control_input_t input, uint32_t button, bool is_pressed);
+
+    /// Обработка мышки на контроле типа "кнопка"
+    void mouseProcessButton(io_control_input_t input, uint32_t button, bool is_pressed);
 
 private:
 
+    /// Маппинг: имя 3D-объекта → ID сигнала обратной связи из analogSignal
     QMap<QString, uint16_t> animation_signals_map;
 
+    /// Указатель на массив аналоговых сигналов от симулятора
     const std::vector<float>* feedback_signals = nullptr;
 
+    /// Проверка модификатора
+    bool checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys);
+
+    /// Обработка клавиатурного управления (Общая для всех часть)
     void processKeyBoardInput();
 
-    void processMouseInput();
-
-    void processControlPanelInput();
-
-    void processControl(const ControlType &ctrl_type);
-
+    /// Сформировать строку с посказкой горячей клавиши
     void getHotkeysString(const QString &keyName, io_control_input_t &ic_input);
     void getUsageString(io_control_input_t &ic_input);
 };

@@ -1,4 +1,4 @@
-#include "RouteViewer.h"
+﻿#include "RouteViewer.h"
 
 #include <algorithm>
 
@@ -70,7 +70,6 @@
 #include <vsg/ui/Keyboard.h>
 
 #include <InputRouteHandler.h>
-#include <CabMouseHandler.h>
 
 #include <QApplication>
 #include <QDomDocument>
@@ -1922,12 +1921,6 @@ void RouteViewer::initViewer()
     input_route_handler = InputRouteHandler::create();
     input_route_handler->setKeyboard(keyboard);
 
-    // Взаимодействие мышью с органами кабины (архитектура IOController:
-    // клик -> команда управления, подсказка по Alt+наведению)
-    cab_mouse_handler = CabMouseHandler::create(camera, keyboard,
-                                                vehicles_handler.get());
-
-    // Апстримный обработчик press/release-семантики (дополняет клики)
     mouse_control_handler = MouseControlHandler::create(camera,
                                                         keyboard,
                                                         vehicles_handler.get());
@@ -1957,7 +1950,6 @@ void RouteViewer::initViewer()
             this, &RouteViewer::slotOnCurrentVehicleChanged);
 
     viewer->addEventHandler(vsgImGui::SendEventsToImGui::create());
-    viewer->addEventHandler(cab_mouse_handler);
     viewer->addEventHandler(mouse_control_handler);
     viewer->addEventHandler(upd_server_control);
     viewer->addEventHandler(upd_viewer_handler);
@@ -2407,7 +2399,7 @@ void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
     if (vehicle->io_controller != nullptr)
     {
         input_route_handler->setActiveController(vehicle->io_controller);
-        vehicle->io_controller->setCabineIndex(newIndex, static_cast<int>(cab_idx));
+        vehicle->io_controller->setActirveCabineIndex(static_cast<int>(cab_idx));
         LOG_INFO("RouteViewer: Activated IOController for vehicle %d (index %d)",
                  newIndex, newIndex);
     } else

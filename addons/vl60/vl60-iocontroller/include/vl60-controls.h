@@ -6,40 +6,40 @@
 //------------------------------------------------------------------------------
 enum
 {
-    CTRL_TUMBLER_PNT = 100,         ///< ╨в╨╛╨║╨╛╨┐╤А╨╕╤С╨╝╨╜╨╕╨║╨╕ (╨╛╨▒╤Й╨╕╨╣)
-    CTRL_TUMBLER_PNT1 = 101,        ///< ╨в╨╛╨║╨╛╨┐╤А╨╕╤С╨╝╨╜╨╕╨║ ╨┐╨╡╤А╨╡╨┤╨╜╨╕╨╣
-    CTRL_TUMBLER_PNT2 = 102,        ///< ╨в╨╛╨║╨╛╨┐╤А╨╕╤С╨╝╨╜╨╕╨║ ╨╖╨░╨┤╨╜╨╕╨╣
-    CTRL_TUMBLER_CU = 103,          ///< ╨ж╨╡╨┐╨╕ ╤Г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П
-    CTRL_TUMBLER_GV = 104,          ///< ╨У╨╗╨░╨▓╨╜╤Л╨╣ ╨▓╤Л╨║╨╗╤О╤З╨░╤В╨╡╨╗╤М
-    CTRL_TUMBLER_GV_RETURN = 105,   ///< ╨Т╨╛╨╖╨▓╤А╨░╤В ╨╖╨░╤Й╨╕╤В╤Л ╨У╨Т (╨║╨╜╨╛╨┐╨║╨░)
-    CTRL_TUMBLER_FR = 106,          ///< ╨д╨░╨╖╨╛╤А╨░╤Б╤Й╨╡╨┐╨╕╤В╨╡╨╗╤М
-    CTRL_TUMBLER_MK = 107,          ///< ╨Ь╨╛╤В╨╛╤А-╨║╨╛╨╝╨┐╤А╨╡╤Б╤Б╨╛╤А
-    CTRL_TUMBLER_MV1 = 108,         ///< ╨Ь╨╛╤В╨╛╤А-╨▓╨╡╨╜╤В╨╕╨╗╤П╤В╨╛╤А 1
-    CTRL_TUMBLER_MV2 = 109,         ///< ╨Ь╨╛╤В╨╛╤А-╨▓╨╡╨╜╤В╨╕╨╗╤П╤В╨╛╤А 2
-    CTRL_TUMBLER_MV3 = 110,         ///< ╨Ь╨╛╤В╨╛╤А-╨▓╨╡╨╜╤В╨╕╨╗╤П╤В╨╛╤А 3
-    CTRL_TUMBLER_MV4 = 111,         ///< ╨Ь╨╛╤В╨╛╤А-╨▓╨╡╨╜╤В╨╕╨╗╤П╤В╨╛╤А 4
-    CTRL_TUMBLER_MV5 = 112,         ///< ╨Ь╨╛╤В╨╛╤А-╨▓╨╡╨╜╤В╨╕╨╗╤П╤В╨╛╤А 5
-    CTRL_TUMBLER_MV6 = 113,         ///< ╨Ь╨╛╤В╨╛╤А-╨▓╨╡╨╜╤В╨╕╨╗╤П╤В╨╛╤А 6
-    CTRL_TUMBLER_EPT = 114,         ///< ╨н╨Я╨в
-    CTRL_TUMBLER_CAB_LIGHT_LOW = 115,   ///< ╨Ю╤Б╨▓╨╡╤Й╨╡╨╜╨╕╨╡ ╨║╨░╨▒╨╕╨╜╤Л ╤В╤Г╤Б╨║╨╗╨╛╨╡
-    CTRL_TUMBLER_CAB_LIGHT_HIGH = 116,  ///< ╨Ю╤Б╨▓╨╡╤Й╨╡╨╜╨╕╨╡ ╨║╨░╨▒╨╕╨╜╤Л ╤П╤А╨║╨╛╨╡
-    CTRL_TUMBLER_LIGHT_DEVICES = 117,   ///< ╨Ю╤Б╨▓╨╡╤Й╨╡╨╜╨╕╨╡ ╨┐╤А╨╕╨▒╨╛╤А╨╛╨▓
-    CTRL_TUMBLER_BUFFLIGHT_L = 118,     ///< ╨С╤Г╤Д╨╡╤А╨╜╤Л╨╣ ╤Д╨╛╨╜╨░╤А╤М ╨╗╨╡╨▓╤Л╨╣
-    CTRL_TUMBLER_BUFFLIGHT_R = 119,     ///< ╨С╤Г╤Д╨╡╤А╨╜╤Л╨╣ ╤Д╨╛╨╜╨░╤А╤М ╨┐╤А╨░╨▓╤Л╨╣
-    CTRL_TUMBLER_BUFFCOLOR_L = 120,     ///< ╨С╤Г╤Д╨╡╤А╨╜╤Л╨╣ ╤Д╨╛╨╜╨░╤А╤М ╤Б╨╗╨╡╨▓╨░: ╨▒╨╡╨╗╤Л╨╣/╨║╤А╨░╤Б╨╜╤Л╨╣
-    CTRL_TUMBLER_BUFFCOLOR_R = 121,     ///< ╨С╤Г╤Д╨╡╤А╨╜╤Л╨╣ ╤Д╨╛╨╜╨░╤А╤М ╤Б╨┐╤А╨░╨▓╨░: ╨▒╨╡╨╗╤Л╨╣/╨║╤А╨░╤Б╨╜╤Л╨╣
-    CTRL_CRANE_395 = 130,           ///< ╨Ъ╤А╨░╨╜ ╨╝╨░╤И╨╕╨╜╨╕╤Б╤В╨░ 395: ╨┐╨╛╨╖╨╕╤Ж╨╕╤П I..VI (0..6)
-    CTRL_CRANE_254 = 131,           ///< ╨Ъ╤А╨░╨╜ ╨▓╤Б╨┐╨╛╨╝╨╛╨│╨░╤В╨╡╨╗╤М╨╜╤Л╨╣ 254: ╨┐╨╛╨╗╨╛╨╢╨╡╨╜╨╕╨╡
-    CTRL_KM_MAIN = 132,             ///< ╨Ъ╨Ь╨н ╨│╨╗╨░╨▓╨╜╨░╤П ╤А╤Г╨║╨╛╤П╤В╨║╨░: ╨┐╨╛╨╖╨╕╤Ж╨╕╤П 0..33
-    CTRL_KM_REVERS = 133,           ///< ╨Ъ╨Ь╨н ╤А╨╡╨▓╨╡╤А╤Б: 0 - ╨╜╨░╨╖╨░╨┤, 1 - ╨╜╨╛╨╗╤М, 2 - ╨▓╨┐╨╡╤А╤С╨┤
-    CTRL_KM_REVERS_INSERT = 134,    ///< ╨Ъ╨Ь╨н ╤А╨╡╨▓╨╡╤А╤Б╨╕╨▓╨╜╨░╤П ╤А╤Г╨║╨╛╤П╤В╨║╨░: ╨▓╤Б╤В╨░╨▓╨╕╤В╤М/╨╕╨╖╨▓╨╗╨╡╤З╤М
-    CTRL_LOCK_367 = 135,            ///< ╨г╨С╨в-367: ╨┐╨╛╨▓╨╛╤А╨╛╤В ╨║╨╗╤О╤З╨░
-    CTRL_CRANE_COMBINE = 136,        ///< ╨Ъ╨╛╨╝╨▒╨╕╨╜╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ ╨║╤А╨░╨╜: -1..+1
-    CTRL_EPK_INSERTION = 137,
-    CTRL_LOCK_367_INSERTION = 138,
-    CTRL_KEY_EPK = 139,
-    CTRL_TUMBLER_SPOT_HIGH = 140,
-    CTRL_TUMBLER_SPOT_LOW = 141
+    CTRL_TUMBLER_PNT = 100,
+    CTRL_TUMBLER_PNT1 = 101,
+    CTRL_TUMBLER_PNT2 = 102,
+    CTRL_MAIN_SWITCH_ON = 103,
+    CTRL_RETURN_PROTECTION = 104,
+    CTRL_TUMBLER_FR = 105,
+    CTRL_TUMBLER_MK = 106,
+    CTRL_TUMBLER_MV1 = 107,
+    CTRL_TUMBLER_MV2 = 108,
+    CTRL_TUMBLER_MV3 = 109,
+    CTRL_TUMBLER_MV4 = 110,
+    CTRL_TUMBLER_MV5 = 111,
+    CTRL_TUMBLER_MV6 = 112,
+    CTRL_TUMBLER_CU = 113,
+    CTRL_TUMBLER_SPOT_HIGH = 114,
+    CTRL_TUMBLER_SPOT_LOW = 115,
+    CTRL_TUMBLER_CAB_LIGHT_LOW = 116,
+    CTRL_TUMBLER_CAB_LIGHT_HIGH = 117,
+    CTRL_TUMBLER_LIGHT_DEVICES = 118,
+    CTRL_TUMBLER_BUF_LIGHT_L = 119,
+    CTRL_TUMBLER_BUF_LIGHT_R = 120,
+    CTRL_TUMBLER_BUF_COLOR_L = 121,
+    CTRL_TUMBLER_BUF_COLOR_R = 122,
+    CTRL_TUMBLER_EPB = 123,
+    CTRL_REVERS_INSERTION = 124,
+    CTRL_EPK_INSERTION = 125,
+    CTRL_LOCK_367_INSERTION = 126,
+    CTRL_KEY_EPK = 127,
+    CTRL_CRANE_395 = 142,
+    CTRL_CRANE_254 = 143,
+    CTRL_KM_MAIN = 144,
+    CTRL_KM_REVERS = 145,
+    CTRL_LOCK_367_TURN = 146,
+    CTRL_CRANE_COMBINE = 147
 };
 
 #endif

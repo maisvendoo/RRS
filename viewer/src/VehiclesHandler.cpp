@@ -447,11 +447,6 @@ void VehiclesHandler::step(double t, double dt)
             vehicles[i].next_vehicle = state_front.vehicles[i].next_vehicle;
 
             vehicles[i].step(static_cast<float>(t), static_cast<float>(dt), &(state_front.vehicles[i].analogSignal));
-
-            if (vehicles[i].io_controller != nullptr)
-            {
-                vehicles[i].io_controller->setVehicleSignals(&(state_front.vehicles[i].analogSignal));
-            }
         }
         else
         {
@@ -924,7 +919,7 @@ bool VehiclesHandler::load(
 
         if (vehicle_exterior.io_controller != nullptr)
         {
-            vehicle_exterior.io_controller->setCabineIndex(i, 0);
+            vehicle_exterior.io_controller->setVehicleIndex(i);
             connect(vehicle_exterior.io_controller, &IOController::sigSendVehicleControlCommand,
                     this, &VehiclesHandler::sigSendVehicleControlCommand);
         }

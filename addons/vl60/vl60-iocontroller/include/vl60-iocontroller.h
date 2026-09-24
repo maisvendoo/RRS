@@ -16,17 +16,10 @@ public:
 
 private:
 
-    void keysProcess(std::set<uint16_t> &pressed_keys) override;
+    void keysProcess(std::set<uint16_t> &pressed_keys) override;    
 
-    void processMouseControl(io_control_input_t &io_ctrl, int button) override;
+    void processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed) override;
 
-    QString getControlStateText(const io_control_input_t &io_ctrl,
-                                float state) const override;
-
-    /// ╨в╤Г╨╝╨▒╨╗╨╡╤А╤Л "╨▓╨║╨╗╤О╤З╨╡╨╜╨╛/╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨╛" (Shift+╨║╨╗╨░╨▓╨╕╤И╨░ / Ctrl+╨║╨╗╨░╨▓╨╕╤И╨░)
-    void processTumblers(const std::set<uint16_t> &pressed_keys);
-
-    /// ╨а╨░╤Б╤И╨╕╤Д╤А╨╛╨▓╨║╨░ ╤Б╨╕╨│╨╜╨░╨╗╨░ ╨Ъ╨Ь╨н (53) ╨▓ ╨┐╨╛╨╖╨╕╤Ж╨╕╤О 0..33
     int kmPosBySignal(float signal) const;
 };
 

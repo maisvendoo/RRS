@@ -1,4 +1,4 @@
-#ifndef MY_GUI_H
+﻿#ifndef MY_GUI_H
 #define MY_GUI_H
 
 #include "Sun.h"
@@ -212,7 +212,6 @@ private:
 
     /// Подсказка органа кабины при наведении (Alt, /// "Взаимодействие с элементами кабины"): имя, назначение,
     /// состояние и клавиши мыши
-    void showCabTooltip() const;
     void drawCassetteNotice(const QString& text) const;
 
     // record() константный (vsg::Command) - состояние вывода mutable
