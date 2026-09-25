@@ -1,5 +1,10 @@
 #include    "vl60pk.h"
 
+#include "vehicle-telemetry.h"
+#include "brake-mech.h"
+#include "reservoir.h"
+#include "dc-motor.h"
+
 #include    <QDir>
 
 #include "brake-crane.h"
@@ -55,5 +60,40 @@ void VL60pk::initBrakesControl(const QString& modules_dir, const QString& custom
 
     hose_bc_bwd = new PneumoHose();
     hose_bc_bwd->read_config("pneumo-hose-BC");
+
+    // Телеметрия для кассеты регистрации и сессий (ТЗ "Кассеты"):
+    // адресация приборов живёт в VehicleTelemetry, а не в Vehicle.
+    // ТМ/ГР из магистрали и главного резервуара, ТЦ - среднее по
+    // тележкам, УР - кран I кабины (как у vl60k), ток - средний Ia
+    // двигателей (реальный, не линейный)
+    VehicleTelemetry::Sources telemetry;
+    telemetry.brake_pipe = [this]() -> double { return brakepipe->getPressure(); };
+    telemetry.brake_cylinder = [this]() -> double
+    {
+        return 0.5 * (brake_mech[TROLLEY_FWD]->getBCpressure() +
+                      brake_mech[TROLLEY_BWD]->getBCpressure());
+    };
+    telemetry.main_reservoir = [this]() -> double { return main_reservoir->getPressure(); };
+    telemetry.equalizing_reservoir = [this]() -> double
+    {
+        return (brake_crane[CAB1] != nullptr)
+                ? brake_crane[CAB1]->getERpressure()
+                : -1.0;
+    };
+    telemetry.traction_current = [this]() -> double
+    {
+        double sum = 0.0;
+        int n = 0;
+        for (const auto& m : motor)
+        {
+            if (m != nullptr)
+            {
+                sum += m->getIa();
+                ++n;
+            }
+        }
+        return (n > 0) ? sum / n : -1.0;
+    };
+    VehicleTelemetry::instance().bind(this, std::move(telemetry));
     backward_connectors.push_back(hose_bc_bwd);
 }

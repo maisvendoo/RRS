@@ -97,7 +97,12 @@ void Camera::create_look_at(const camera_settings_t& camera_settings)
         std::exit(EXIT_FAILURE);
     }
 
-    look_at->eye.z = look_at->center.z = camera_settings.initial_height;
+    // Начальный взгляд вдоль оси Y (yaw = 0, pitch = 0),
+    // чтобы направление камеры было корректно с самого старта
+    const double height = camera_settings.initial_height;
+    look_at->eye = vsg::dvec3(0.0, 0.0, height);
+    look_at->center = vsg::dvec3(0.0, 1.0, height);
+    look_at->up = vsg::dvec3(0.0, 0.0, 1.0);
 
     Journal::instance()->info("LookAt view matrix is created successfully");
 }

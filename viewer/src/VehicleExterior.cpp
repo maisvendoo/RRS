@@ -115,6 +115,9 @@ bool VehicleExterior::load_cabine_positions(const std::string &cfg_path, CfgRead
 
     driver_pos.clear();
     driver_dir.clear();
+    exit_pos.clear();
+    exit_dir.clear();
+    assistant_pos.clear();
 
     while (true)
     {
@@ -131,11 +134,41 @@ bool VehicleExterior::load_cabine_positions(const std::string &cfg_path, CfgRead
         cfg.getDouble(secNode, "DriverDir", dd);
         driver_dir.push_back(vsg::radians(dd));
 
+        vsg::dvec3 ep = dp + vsg::dvec3(1.6, 0.0, -1.2);
+        QString ExitPos = "";
+        if (cfg.getString(secNode, "ExitPos", ExitPos))
+        {
+            std::istringstream ss(ExitPos.toStdString());
+            ss >> ep.x >> ep.y >> ep.z;
+        }
+        exit_pos.push_back(ep);
+
+        double ed = dd;
+        cfg.getDouble(secNode, "ExitDir", ed);
+        exit_dir.push_back(vsg::radians(ed));
+
+        vsg::dvec3 asist = dp + vsg::dvec3(-1.7, -0.6, 0.0);
+        QString AssistPos = "";
+        if (cfg.getString(secNode, "AssistantPos", AssistPos))
+        {
+            std::istringstream ss(AssistPos.toStdString());
+            ss >> asist.x >> asist.y >> asist.z;
+        }
+        assistant_pos.push_back(asist);
+
         secNode = cfg.getNextSection();
         if (secNode.isNull())
             return true;
     }
     return true;
+}
+
+vsg::dvec3 VehicleExterior::worldFromLocal(const vsg::dvec3& local) const
+{
+    return position
+            + right * local.x
+            + orth * local.y
+            + up * local.z;
 }
 
 //------------------------------------------------------------------------------

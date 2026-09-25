@@ -9,7 +9,9 @@
 #include <QObject>
 
 #include <cstddef>
+#include <chrono>
 #include <map>
+#include <string>
 #include <vector>
 
 //------------------------------------------------------------------------------
@@ -23,6 +25,10 @@ public:
     SoundManager(QObject* parent = nullptr);
     ~SoundManager();
 
+    /// Глобальное включение/выключение звука (контекст OpenAL):
+    /// Sound/Enabled=0 в settings.xml - полная тишина
+    void setEnabled(bool enabled);
+
     /// Загрузка звуков для единицы подвижного состава.
     /// Возвращает список порядковых номеров загруженных звуков
     std::vector<std::size_t> loadVehicleSounds(const std::string& sound_dir);
@@ -34,6 +40,15 @@ public:
     float getLocalPositionX(std::size_t idx);
     float getLocalPositionY(std::size_t idx);
     float getLocalPositionZ(std::size_t idx);
+
+    /// Воспроизвести физическое звуковое событие (ТЗ "Аудиосистема"):
+    /// пул источников с приоритетом по интенсивности/дистанции,
+    /// отсечкой дальних и виртуализацией состояния без источника.
+    /// event_type - значение SoundEventType (0..9)
+    void playSoundEvent(unsigned event_type,
+                        float x, float y, float z,
+                        float intensity,
+                        float rate_hz);
 
     /// Лог-файл
     LogFileHandler* log_ = nullptr;
@@ -50,6 +65,42 @@ private:
 
     /// Уже загруженные звуки
     std::map<std::string, ASound*> loaded_sounds;
+
+    /// Параметры одного типа физических звуковых событий
+    struct EventSound
+    {
+        ASound* sound = nullptr;            ///< Источник (nullptr - файла нет)
+        std::string filename = "";          ///< Файл из data/sounds
+        float min_volume = 0.05f;           ///< Порог интенсивности события
+        float max_distance = 500.0f;        ///< Дистанционная отсечка, м
+        double cooldown = 0.05;             ///< Минимальный пауза между пусками, с
+        double last_play_time = -1.0e9;     ///< Время последнего пуска (виртуально)
+        double last_playing_priority = 0.0; ///< Приоритет последнего пуска
+        bool missing_warned = false;        ///< Warning об отсутствии файла выдан
+    };
+
+    /// Пул физических звуковых событий, индекс = тип (SoundEventType)
+    std::vector<EventSound> event_sounds;
+
+    /// Лимит одновременно звучащих событий (реальных источников), шт
+    size_t event_pool_max_sources = 8;
+
+    /// Число активных источников пула
+    size_t event_active_sources = 0;
+
+    /// Пул инициализирован (конфиг sound-events.conf прочитан)
+    bool event_pool_loaded = false;
+
+    /// Позиция слушателя (для дистанционной отсечки), м
+    float listener_x = 0.0f;
+    float listener_y = 0.0f;
+    float listener_z = 0.0f;
+
+    /// Монотонное время, с
+    double monotonicTime() const;
+
+    /// Загрузка конфигурации пула событий (sound-events.conf)
+    void initEventSounds();
 
     /// Инициализация
     void init();

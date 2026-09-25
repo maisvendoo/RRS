@@ -96,6 +96,8 @@ signals:
 
     void setVehicleControlled(QByteArray &vehicle_controlled);
 
+    /// Снимок диагностики составов
+    void setDiagnosticsData(QByteArray &diagnostics_data);
     void setTrainProfile(QByteArray &profile_data);
 
     void setTopologyModules(QByteArray &modules_data);

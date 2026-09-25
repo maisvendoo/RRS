@@ -1,5 +1,8 @@
+﻿#include    <cmath>
 #include    <vl60pk.h>
 #include    <vl60-controls.h>
+#include    <brake-crane.h>
+#include    <loco-crane.h>
 #include    <kme-60-044.h>
 #include    <automatic-train-stop.h>
 #include    <pneumo-brake-lock.h>
@@ -95,5 +98,12 @@ void VL60pk::stepControls(const double &t, const double &dt)
         bool is_lock367_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_LOCK_367_INSERTION]);
         brake_lock[cab_idx]->setStateOn(is_lock367_insert);
         brake_lock[cab_idx]->insertLockHandle(is_lock367_insert);
+
+        brake_crane[cab_idx]->setHandlePosition(static_cast<int>(std::lround(control_inputs[cab_idx][CTRL_CRANE_395])));
+        loco_crane[cab_idx]->setHandlePosition(static_cast<double>(control_inputs[cab_idx][CTRL_CRANE_254]));
+        controller[cab_idx]->setMainHandlePos(static_cast<int>(std::lround(control_inputs[cab_idx][CTRL_KM_MAIN])));
+        controller[cab_idx]->setReversHandlePos(static_cast<int>(std::lround(control_inputs[cab_idx][CTRL_KM_REVERS])));
+        brake_lock[cab_idx]->setStateOn(control_inputs[cab_idx][CTRL_LOCK_367_TURN] > 0.5f);
+        brake_lock[cab_idx]->setCombineCranePosition(static_cast<int>(std::lround(control_inputs[cab_idx][CTRL_CRANE_COMBINE])));
     }
 }

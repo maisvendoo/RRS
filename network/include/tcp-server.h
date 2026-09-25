@@ -4,6 +4,10 @@
 #include    <QTcpServer>
 #include    <QMap>
 #include    <QSet>
+#include    <QMutex>
+#include    <QPair>
+#include    <QList>
+#include    <QAbstractSocket>
 #include    <network-export.h>
 #include    <network-data-types.h>
 
@@ -35,6 +39,25 @@ public:
         this->stations_data = data;
     }
 
+    /// Забрать накопленные пакеты управления (потокобезопасно).
+    /// Физика забирает их каждый тик: queued-доставка сигналов из
+    /// сетевого потока не работает надёжно, поэтому обмен через
+    /// мьютекс-буфер
+    QList<QPair<int, QByteArray>> takePendingControl()
+    {
+        QMutexLocker lock(&pending_control_mutex);
+        QList<QPair<int, QByteArray>> out = pending_control;
+        pending_control.clear();
+        return out;
+    }
+
+    /// Снимок сериализованной топологии/сигналов для новых клиентов.
+    /// сервер сети живёт в отдельном потоке, поэтому
+    /// данные передаются слотами (queued), а не забираются из модели
+    /// по ссылке из сетевого потока
+    void updateTopologyData(QByteArray topology_data);
+    void updateSignalsData(QByteArray signals_data);
+
     void updatePlayers(QByteArray players_data, double t);
 
     void updateVehiclesPos(QByteArray vehicles_pos, double t);
@@ -45,6 +68,8 @@ public:
 
     void updateTrainsInfo(QByteArray trains_state);
 
+    /// Рассылка снимка диагностики составов
+    void updateDiagnostics(QByteArray diagnostics_data, double t);
     void updateTrainProfile(QByteArray profile_data, double t);
 
     /// Есть ли клиенты, запросившие обновление профилей поездов
@@ -74,21 +99,24 @@ public:
 
 signals:
 
+    // ВАЖНО: сервер сети живёт в отдельном потоке,
+    // поэтому сигналы передают данные ПО ЗНАЧЕНИЮ - Qt не умеет ставить
+    // в очередь аргументы-ссылки (QByteArray&)
+
     void requestTopologyData(QByteArray &topology_data);
 
     void requestSignalsData(QByteArray &signals_data);
 
+    void sigSwitchCommand(QByteArray switch_command);
     void requestTopologyModules(QByteArray& modules_data);
 
-    void sigSwitchCommand(QByteArray& switch_command);
+    void sigSignalCommand(QByteArray signal_command);
 
-    void sigSignalCommand(QByteArray& signal_command);
+    void sigBuildRouteCommand(QByteArray route_command);
 
-    void sigBuildRouteCommand(QByteArray& route_command);
+    void sigTrainRouteCommand(QByteArray route_command);
 
-    void sigTrainRouteCommand(QByteArray& route_command);
-
-    void sigShuntingRouteCommand(QByteArray& route_command);
+    void sigShuntingRouteCommand(QByteArray route_command);
 
     void sigVehicleControl(QByteArray& control_data, int client_id);
 
@@ -102,7 +130,20 @@ signals:
 
     void sigSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t id, float value);
 
+    /// Табельный номер клиента: автоназначение
+    /// поезда при подключении и восстановление "зависшего" (п.6)
+    void sigClientTabNumber(int client_id, int tab_number);
+
+    /// Организатор: назначить поезду табельный номер игрока
+    void sigSetTrainTab(int train_idx, int tab_number);
+
+    /// Организатор: загрузить сейв сессии
+    void sigLoadSession(QString path);
+
 private:
+
+    /// Потолок размера сетевого пакета (защита от мусора в канале, /)
+    static constexpr quint32 MAX_PACKET_SIZE = 100u * 1024u * 1024u;
 
     quint16 port = 1992;
 
@@ -128,6 +169,7 @@ private:
 
     QSet<QTcpSocket*> clients_for_vehicle_controlled_updates;
 
+    QSet<QTcpSocket*> clients_for_diagnostics_updates;
     QSet<QTcpSocket*> clients_for_train_profile_updates;
 
     QByteArray recvBuff;
@@ -141,6 +183,12 @@ private:
     QByteArray vehicles_state;
 
     QByteArray trains_state;
+
+    /// Кэш сериализованной топологии/сигналов для новых клиентов
+    /// (обновляется моделью через слоты)
+    QByteArray topology_data;
+
+    QByteArray signals_data;
 
     uint32_t wait_data_size = 0;
 
@@ -166,6 +214,10 @@ private:
 
     void send_trains_info(client_data_t &client_data);
 
+    /// Буфер пакетов управления от клиентов (сетевой поток пишет,
+    /// физика забирает takePendingControl'ом)
+    QMutex pending_control_mutex;
+    QList<QPair<int, QByteArray>> pending_control;
     void send_data(QTcpSocket *client_socket, network_data_t& net_data);
 
     void remove_client(QTcpSocket* socket);
@@ -177,6 +229,9 @@ public slots:
     void slotClientDisconnected();
 
     void slotReceive();
+
+    /// Ошибки обмена с клиентом
+    void slotSocketError(QAbstractSocket::SocketError socket_error);
 
     void slotSendSwitchState(QByteArray sw_state);
 

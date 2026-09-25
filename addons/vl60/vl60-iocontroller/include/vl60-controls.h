@@ -1,4 +1,4 @@
-#ifndef     VL60_CONTROLS_H
+﻿#ifndef     VL60_CONTROLS_H
 #define     VL60_CONTROLS_H
 
 //------------------------------------------------------------------------------
@@ -34,6 +34,12 @@ enum
     CTRL_EPK_INSERTION = 125,
     CTRL_LOCK_367_INSERTION = 126,
     CTRL_KEY_EPK = 127,
+    CTRL_CRANE_395 = 142,
+    CTRL_CRANE_254 = 143,
+    CTRL_KM_MAIN = 144,
+    CTRL_KM_REVERS = 145,
+    CTRL_LOCK_367_TURN = 146,
+    CTRL_CRANE_COMBINE = 147
 };
 
 #endif

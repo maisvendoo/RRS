@@ -339,6 +339,10 @@ void TcpClient::process_received_data(network_data_t &net_data)
         emit setVehicleControlled(net_data.data);
         break;
 
+    case STYPE_DIAGNOSTICS_UPDATE:
+        emit setDiagnosticsData(net_data.data);
+        break;
+
     case STYPE_TRAINS_UPDATE:
         emit setTrainInfo(net_data.data);
         break;
