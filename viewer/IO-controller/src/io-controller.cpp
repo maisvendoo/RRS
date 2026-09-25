@@ -10,17 +10,7 @@
 //------------------------------------------------------------------------------
 IOController::IOController(QObject *parent) : QObject(parent)
 {
-    isModifier["Shift"] = [](const std::set<uint16_t> &pressed_keys) {
-        return isShift(pressed_keys);
-    };
 
-    isModifier["Ctrl"] = [](const std::set<uint16_t> &pressed_keys) {
-        return isControl(pressed_keys);
-    };
-
-    isModifier["Alt"] = [](const std::set<uint16_t> &pressed_keys) {
-        return isAlt(pressed_keys);
-    };
 }
 
 //------------------------------------------------------------------------------
@@ -353,56 +343,18 @@ void IOController::mouseInputProcess(io_control_input_t input, uint32_t button, 
 //------------------------------------------------------------------------------
 void IOController::setFeedbackSignals(const std::vector<float> *server_signals)
 {
-    feedback_signals = server_signals;
+    if (server_signals == nullptr)
+    {
+        return;
+    }
 
     for (auto *handler : handlers)
     {
         if (handler != nullptr)
         {
-            handler->setFeedbackSignals(feedback_signals);
+            handler->setFeedbackSignals(server_signals);
         }
     }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-float IOController::getSignalValueByName(const QString &objectName) const
-{
-    if (objectName.isEmpty() || feedback_signals == nullptr)
-    {        
-        return 0.0f;
-    }
-
-    auto it = animation_signals_map.find(objectName);
-
-    if (it != animation_signals_map.end())
-    {
-        uint16_t signal_id = it.value();
-
-        if (signal_id < feedback_signals->size())
-        {
-            float state = (*feedback_signals)[signal_id];            
-            return state;
-        }
-    }
-
-    return 0.0f;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-float IOController::getSignalValueByID(uint16_t control_id, int cab_idx) const
-{
-    auto io_ctrl = io_control_inputs[cab_idx].getByKey1(control_id);
-
-    if (!io_ctrl)
-    {
-        return 0.0f;
-    }    
-
-    return getSignalValueByName(io_ctrl->contolledObjectName);
 }
 
 //------------------------------------------------------------------------------
@@ -418,7 +370,7 @@ void IOController::processKeyboardInput(std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
+void IOController::keyboardInputProcess(std::set<uint16_t> &pressed_keys)
 {
     for (auto *handler : handlers)
     {
@@ -429,14 +381,6 @@ void IOController::keysProcess(std::set<uint16_t> &pressed_keys)
     }
 
     processKeyboardInput(pressed_keys);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool IOController::checkModKey(const QString &modKeyName, const std::set<uint16_t> &pressed_keys)
-{
-    return isModifier.value(modKeyName, [](const std::set<uint16_t> &) {return false;})(pressed_keys);
 }
 
 //------------------------------------------------------------------------------
@@ -462,7 +406,7 @@ void IOController::processKeyBoardInput()
 
         if (_pressed_keys.size() == modifiers_size)
         {
-            keysProcess(pressed_keys);
+            keyboardInputProcess(pressed_keys);
             return;
         }
 
@@ -478,7 +422,7 @@ void IOController::processKeyBoardInput()
         }
     }
 
-    keysProcess(pressed_keys);
+    keyboardInputProcess(pressed_keys);
 }
 
 //------------------------------------------------------------------------------

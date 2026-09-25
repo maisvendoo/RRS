@@ -250,9 +250,9 @@ void MouseControlHandler::updateTooltip()
     tip.usage = input.usage;
     tip.hot_keys = input.hot_keys;
 
-    QString state = QString("Статус: %1").arg(io_controller->getSignalValueByID(input.id, input.cabine_idx), 3, 'f', 1);
+    //QString state = QString("Статус: %1").arg(io_controller->getSignalValueByID(input.id, input.cabine_idx), 3, 'f', 1);
 
-    tip.state = state;
+    //tip.state = state;
 }
 
 //------------------------------------------------------------------------------
