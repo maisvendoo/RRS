@@ -34,8 +34,11 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
     cfg.getInt(secNode, "NumPositions", np);
     numPositions = static_cast<uint16_t>(std::max(np, 2));
 
-    cfg.getDouble(secNode, "MinValue", minValue);
-    cfg.getDouble(secNode, "MaxValue", maxValue);
+    double tmp_min = 0.0, tmp_max = 1.0;
+    cfg.getDouble(secNode, "MinValue", tmp_min);
+    cfg.getDouble(secNode, "MaxValue", tmp_max);
+    minValue = static_cast<float>(tmp_min);
+    maxValue = static_cast<float>(tmp_max);
 
     return true;
 }
