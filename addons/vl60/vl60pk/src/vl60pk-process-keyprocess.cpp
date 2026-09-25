@@ -121,8 +121,8 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
 // Пульты в кабинах обрабатываем уже после проверки на невмешательство программы автозапуска
     for (auto cab_idx : {CAB1, CAB2})
     {
-        // Управление контроллером через IOController (stepControls)
-        //controller[cab_idx]->step(t.simulation_seconds, dt);
+        // Шаг контроллера (физика + анимация; клавиатура отключена через setControl(nullptr))
+        controller[cab_idx]->step(t.simulation_seconds, dt);
 /*
         // Дальний ряд тумблеров приборной панели машиниста
         shield223[cab_idx].step(t.simulation_seconds, dt);
