@@ -529,7 +529,7 @@ bool IOController::load_config(CfgReader &cfg)
         secNode = cfg.getNextSection();
     }
 
-    // Создаём handler-ы
+    // Создаём handler-ы по типам, найденным в DualKeyHash
     load_handlers(cfg);
 
     return true;
@@ -537,21 +537,21 @@ bool IOController::load_config(CfgReader &cfg)
 
 void IOController::load_handlers(CfgReader &cfg)
 {
-    // Определяем, какие handler-ы нужны, по типам в конфиге
+    // Определяем нужные handler-ы по типам в уже загруженном DualKeyHash
     bool need_toggle = false;
     bool need_switcher = false;
 
-    auto secNode = cfg.getFirstSection("Control");
-    while (!secNode.isNull())
+    for (const auto& cab_map : io_control_inputs)
     {
-        QString type = "";
-        cfg.getString(secNode, "Type", type);
-        if (type == "Toggle" || type == "Button") need_toggle = true;
-        if (type == "Switcher") need_switcher = true;
-        secNode = cfg.getNextSection();
+        for (const auto& [_, _, input] : cab_map.getAll())
+        {
+            if (input.type == "Toggle" || input.type == "Button")
+                need_toggle = true;
+            if (input.type == "Switcher")
+                need_switcher = true;
+        }
     }
 
-    // Создаём handler-ы и даём им доступ к DualKeyHash
     if (need_toggle)
     {
         ToggleHandler* toggle = new ToggleHandler(this);
@@ -566,7 +566,7 @@ void IOController::load_handlers(CfgReader &cfg)
     if (need_switcher)
     {
         SwitcherHandler* sw = new SwitcherHandler(this);
-        sw->loadConfig(cfg, cabs_num); // загружает расширенные поля
+        sw->loadConfig(cfg, cabs_num);
         sw->setControlInputs(&io_control_inputs);
         sw->setAnimationSignalsMap(animation_signals_map);
         sw->setFeedbackSignals(feedback_signals);
