@@ -307,12 +307,9 @@ void IOController::processKeyboardInput(std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 void IOController::keyboardInputProcess(std::set<uint16_t> &pressed_keys)
 {
-    for (auto &ctrl_handlers : control_handlers)
+    for (const auto &[id, name, handler] : control_handlers[cabine_idx].getAll())
     {
-        for (const auto &[id, name, handler] : ctrl_handlers.getAll())
-        {
-            handler->processKeyInput(pressed_keys);
-        }
+        handler->processKeyInput(pressed_keys);
     }
 
     processKeyboardInput(pressed_keys);
@@ -329,7 +326,12 @@ void IOController::processKeyBoardInput()
     {
         // Если массив нажатых клавиш содержит только Shift, Ctrl, Alt
         // отправляем пустое управление
-        constexpr KeySymbol modifier_keys[] = {KEY_Shift_L, KEY_Shift_R, KEY_Control_L, KEY_Control_R, KEY_Alt_L, KEY_Alt_R};
+        constexpr KeySymbol modifier_keys[] = {KEY_Shift_L,
+                                               KEY_Shift_R,
+                                               KEY_Control_L,
+                                               KEY_Control_R,
+                                               KEY_Alt_L,
+                                               KEY_Alt_R};
         std::size_t modifiers_size = 0;
         for (std::uint16_t key : modifier_keys)
         {
