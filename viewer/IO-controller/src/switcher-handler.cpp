@@ -146,10 +146,10 @@ void SwitcherHandler::step(float t, float dt)
             hold_time -= REPEAT_INTERVAL;
             sendNextPosition(hold_direction);
         }
-        return;
+        // без return — проверяем возврат ниже
     }
 
-    // Пружинный возврат при отпускании клавиши
+    // Пружинный возврат
     int idx = currentIndex();
 
     if (springReturnLow >= 0 && idx == springReturnLow && !spring_low_triggered)
