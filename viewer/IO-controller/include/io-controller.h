@@ -63,7 +63,7 @@ protected:
     /// Массив нажатых клавиш
     std::set<uint16_t> _pressed_keys;    
 
-    /// Здесь обеспечивается доступ к значению сигнала контрола
+    /// Здесь обеспечивается доступ к обработчику контрола
     /// как по коду нажатой кавиши, так и по имени объекта, кликнутого мышью
     std::vector<DualKeyHash<uint16_t, QString, ControlHandler *>> control_handlers;
 
@@ -75,7 +75,10 @@ protected:
     int vehicle_idx = 0;
 
     /// Обработка управления с клавиатуры в кастомных модулях
-    virtual void processKeyboardInput(std::set<uint16_t> &pressed_keys);        
+    virtual void processKeyboardInput(std::set<uint16_t> &pressed_keys);
+
+    /// Создать обработчик контрола
+    virtual ControlHandler *create_handler(QString type, QDomNode secNode, CfgReader &cfg);
 
 private:
 
@@ -89,10 +92,7 @@ private:
     void keyboardInputProcess(std::set<uint16_t> &pressed_keys);
 
     /// Сформировать строку с посказкой горячей клавиши
-    void getHotkeysString(const QString &keyName, ControlHandler *ctrl_handler);
-
-    /// Создать обработчик контрола
-    ControlHandler *create_handler(QString type, QDomNode secNode, CfgReader &cfg);
+    void getHotkeysString(const QString &keyName, ControlHandler *ctrl_handler);    
 };
 
 #endif
