@@ -113,6 +113,8 @@ void SwitcherHandler::processMouseInput(uint32_t button, bool is_pressed)
     {
         hold_direction = 0;
         hold_time = 0.0f;
+        spring_low_triggered = false;
+        spring_high_triggered = false;
         return;
     }
 
