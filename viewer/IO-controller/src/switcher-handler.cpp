@@ -14,35 +14,40 @@ SwitcherHandler::SwitcherHandler(QObject *parent) : ControlHandler(parent)
 }
 
 //------------------------------------------------------------------------------
-//
+// Загрузка конфигурации многопозиционного переключателя
 //------------------------------------------------------------------------------
 bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
 {
     ControlHandler::load_config(cfg, secNode);
 
+    // Клавиша и модификатор для увеличения позиции
     QString keyInc;
     cfg.getString(secNode, "KeyNameInc", keyInc);
     keyCodeInc = KeySymbolsRRSMap.value(keyInc, KEY_Undefined);
     cfg.getString(secNode, "KeyModIncName", keyModIncName);
 
+    // Клавиша и модификатор для уменьшения позиции
     QString keyDec;
     cfg.getString(secNode, "KeyNameDec", keyDec);
     keyCodeDec = KeySymbolsRRSMap.value(keyDec, KEY_Undefined);
     cfg.getString(secNode, "KeyModDecName", keyModDecName);
 
+    // Количество фиксированных позиций (от 2)
     int np = 2;
     cfg.getInt(secNode, "NumPositions", np);
     numPositions = static_cast<uint16_t>(std::max(np, 2));
 
+    // Минимальное и максимальное значение сигнала (0..1 по умолчанию)
     double tmp_min = 0.0, tmp_max = 1.0;
     cfg.getDouble(secNode, "MinValue", tmp_min);
     cfg.getDouble(secNode, "MaxValue", tmp_max);
     minValue = static_cast<float>(tmp_min);
     maxValue = static_cast<float>(tmp_max);
 
+    // Пружинный возврат из крайних положений (опционально)
     int srl = -1, srh = -1;
-    cfg.getInt(secNode, "SpringReturnLow", srl);
-    cfg.getInt(secNode, "SpringReturnHigh", srh);
+    cfg.getInt(secNode, "SpringReturnLow", srl);   // возврат с нижней позиции (+1)
+    cfg.getInt(secNode, "SpringReturnHigh", srh);  // возврат с верхней позиции (-1)
     springReturnLow = srl;
     springReturnHigh = srh;
 
@@ -50,7 +55,7 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
 }
 
 //------------------------------------------------------------------------------
-//
+// Текущий индекс позиции (0..numPositions-1) на основе собственного value
 //------------------------------------------------------------------------------
 int SwitcherHandler::currentIndex() const
 {
@@ -60,14 +65,14 @@ int SwitcherHandler::currentIndex() const
 }
 
 //------------------------------------------------------------------------------
-//
+// Отправить команду на шаг в заданном направлении
 //------------------------------------------------------------------------------
 void SwitcherHandler::sendNextPosition(int direction)
 {
     int idx = currentIndex();
     int new_idx = std::clamp(idx + direction, 0,
                              static_cast<int>(numPositions) - 1);
-    if (new_idx == idx) return;
+    if (new_idx == idx) return;  // уже в крайнем положении
 
     float range = maxValue - minValue;
     float step = range / static_cast<float>(numPositions - 1);
@@ -76,20 +81,22 @@ void SwitcherHandler::sendNextPosition(int direction)
 }
 
 //------------------------------------------------------------------------------
-//
+// Обработка клавиатурного ввода
 //------------------------------------------------------------------------------
 void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
 {
+    // Клавиша увеличения нажата?
     if (getKeyState(pk, keyCodeInc) && isKeyModifier(pk, keyModIncName))
     {
         sendNextPosition(+1);
-        hold_direction = +1;
+        hold_direction = +1;           // запоминаем направление для автоповтора
         hold_time = 0.0f;
-        spring_low_triggered = false;
+        spring_low_triggered = false;  // сбрасываем флаги возврата
         spring_high_triggered = false;
         return;
     }
 
+    // Клавиша уменьшения нажата?
     if (getKeyState(pk, keyCodeDec) && isKeyModifier(pk, keyModDecName))
     {
         sendNextPosition(-1);
@@ -100,12 +107,14 @@ void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
         return;
     }
 
+    // Ни одна клавиша не нажата — сбрасываем удержание
     hold_direction = 0;
     hold_time = 0.0f;
 }
 
 //------------------------------------------------------------------------------
-//
+// Пружинный возврат из крайних положений (БВ → 0, АП → РП)
+// Вызывается при отпускании кнопки мыши, и как страховка из step()
 //------------------------------------------------------------------------------
 void SwitcherHandler::doSpringReturn()
 {
@@ -113,6 +122,7 @@ void SwitcherHandler::doSpringReturn()
 
     int idx = currentIndex();
 
+    // Нижняя крайняя позиция (БВ) — шагнуть вверх
     if (springReturnLow >= 0 && idx == springReturnLow && !spring_low_triggered)
     {
         spring_low_triggered = true;
@@ -123,6 +133,7 @@ void SwitcherHandler::doSpringReturn()
         return;
     }
 
+    // Верхняя крайняя позиция (АП) — шагнуть вниз
     if (springReturnHigh >= 0 && idx == springReturnHigh && !spring_high_triggered)
     {
         spring_high_triggered = true;
@@ -135,10 +146,11 @@ void SwitcherHandler::doSpringReturn()
 }
 
 //------------------------------------------------------------------------------
-//
+// Обработка мышиного ввода
 //------------------------------------------------------------------------------
 void SwitcherHandler::processMouseInput(uint32_t button, bool is_pressed)
 {
+    // Отпускание кнопки — сброс удержания и проверка пружинного возврата
     if (!is_pressed)
     {
         doSpringReturn();
@@ -149,6 +161,7 @@ void SwitcherHandler::processMouseInput(uint32_t button, bool is_pressed)
         return;
     }
 
+    // Нажатие — шаг в соответствующую сторону
     int dir = 0;
     if (button == CTRL_LEFT_MOUSE_BUTTON)  dir = +1;
     if (button == CTRL_RIGHT_MOUSE_BUTTON) dir = -1;
@@ -162,13 +175,13 @@ void SwitcherHandler::processMouseInput(uint32_t button, bool is_pressed)
 }
 
 //------------------------------------------------------------------------------
-//
+// Кадровый шаг: автоповтор при удержании + страховочный spring return
 //------------------------------------------------------------------------------
 void SwitcherHandler::step(float t, float dt)
 {
     (void) t;
 
-    // Автоповтор при удержании
+    // Автоповтор: пока клавиша/кнопка зажата, с заданным интервалом
     if (hold_direction != 0)
     {
         hold_time += dt;
@@ -177,10 +190,11 @@ void SwitcherHandler::step(float t, float dt)
             hold_time -= REPEAT_INTERVAL;
             sendNextPosition(hold_direction);
         }
-        return;
+        return;  // не проверяем spring return, пока зажато
     }
 
-    // Пружинный возврат при hold_direction == 0
+    // Пружинный возврат: при достижении крайней позиции (страховка,
+    // если вызов из processKeyInput/processMouseInput не сработал)
     if (springReturnLow >= 0)
     {
         int idx = currentIndex();
@@ -207,7 +221,7 @@ void SwitcherHandler::step(float t, float dt)
 }
 
 //------------------------------------------------------------------------------
-//
+// Строка подсказки по управлению мышью
 //------------------------------------------------------------------------------
 QString SwitcherHandler::getUsage() const
 {

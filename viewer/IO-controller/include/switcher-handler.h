@@ -4,7 +4,14 @@
 #include    <control-handler.h>
 
 //------------------------------------------------------------------------------
+// SwitcherHandler — многопозиционный переключатель (реверсивная рукоятка,
+// контроллер машиниста). Поддерживает автоповтор при удержании и пружинный
+// возврат из крайних положений.
 //
+// Позиции задаются через NumPositions, MinValue, MaxValue. Клавиши инкремента
+// и декремента — KeyNameInc / KeyNameDec (с опциональными модификаторами).
+// SpringReturnLow / SpringReturnHigh — номера позиций, с которых делать
+// автоматический возврат при отпускании клавиши/кнопки.
 //------------------------------------------------------------------------------
 class SwitcherHandler : public ControlHandler
 {
@@ -24,23 +31,23 @@ public:
 
 private:
 
-    uint16_t keyCodeInc = 0;
-    QString  keyModIncName = "";
-    uint16_t keyCodeDec = 0;
-    QString  keyModDecName = "";
-    uint16_t numPositions = 2;
-    float minValue = 0.0f;
-    float maxValue = 1.0f;
-    int springReturnLow = -1;
-    int springReturnHigh = -1;
+    uint16_t keyCodeInc = 0;          // клавиша увеличения позиции
+    QString  keyModIncName = "";      // модификатор увеличения (опционально)
+    uint16_t keyCodeDec = 0;          // клавиша уменьшения позиции
+    QString  keyModDecName = "";      // модификатор уменьшения (опционально)
+    uint16_t numPositions = 2;        // количество позиций
+    float minValue = 0.0f;            // минимальное значение сигнала
+    float maxValue = 1.0f;            // максимальное значение сигнала
+    int springReturnLow = -1;         // возврат с нижней позиции (+1), -1 = нет
+    int springReturnHigh = -1;        // возврат с верхней позиции (-1), -1 = нет
 
-    int    hold_direction = 0;
-    float  hold_time = 0.0f;
-    bool   spring_low_triggered = false;
-    bool   spring_high_triggered = false;
+    int    hold_direction = 0;        // направление удержания (+1/-1/0)
+    float  hold_time = 0.0f;          // время удержания для автоповтора
+    bool   spring_low_triggered = false;   // флаг: возврат с нижней уже был
+    bool   spring_high_triggered = false;  // флаг: возврат с верхней уже был
 
-    static constexpr float HOLD_DELAY      = 0.3f;
-    static constexpr float REPEAT_INTERVAL = 0.1f;
+    static constexpr float HOLD_DELAY      = 0.3f;   // задержка перед автоповтором
+    static constexpr float REPEAT_INTERVAL = 0.1f;   // интервал автоповтора
 
     int currentIndex() const;
     void sendNextPosition(int direction);
