@@ -1,11 +1,49 @@
 #include    <control-handler.h>
-#include    <CfgReader.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ControlHandler::load_config(CfgReader &cfg, int cabs_num)
+bool ControlHandler::load_config(CfgReader &cfg, QDomNode secNode)
 {
+    cfg.getString(secNode, "Name", name);
+    cfg.getString(secNode, "Description", description);
+
+    int control_ID = 0;
+    cfg.getInt(secNode, "ID", control_ID);
+    id = static_cast<uint16_t>(control_ID);
+
+    QString keyName = "";
+    cfg.getString(secNode, "KeyName", keyName);
+    keyCode = KeySymbolsRRSMap.value(keyName, KEY_Undefined);
+
+    cfg.getString(secNode, "KeyModOnName", keyModOnName);
+
+    cfg.getString(secNode, "KeyModOffName", keyModOffName);
+
+    if (keyModOffName.isEmpty())
+    {
+        keyModOffName = keyModOnName;
+    }
+
+    if (!keyName.isEmpty())
+    {
+        hot_keys = "Клавиши: ";
+
+        if (!keyModOnName.isEmpty())
+        {
+            hot_keys += keyModOnName + "+" + keyName.mid(4);
+        }
+
+        if (!keyModOffName.isEmpty() && keyModOnName != keyModOffName)
+        {
+            hot_keys += " | " + keyModOffName + "+" + keyName.mid(4);
+        }
+    }
+    else
+    {
+        hot_keys = QString();
+    }
+
     return true;
 }
 
@@ -82,16 +120,7 @@ bool ControlHandler::isKeyModifier(const std::set<uint16_t> &keys,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ControlHandler::sendControlSignal(const io_control_input_t &input)
+void ControlHandler::sendControlSignal()
 {
-    /*auto current = (*ctrl_inputs)[input.cabine_idx].getByKey1(input.id);
-
-    if (current)
-    {
-        current->value = input.value;
-        (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, *current);
-    }*/
-
-    (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, input);
-    emit sigSendControlCommand(input.serialize());
+    emit sigSendControlCommand(serialize());
 }

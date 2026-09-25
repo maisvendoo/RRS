@@ -74,7 +74,7 @@ private:
 
     bool pickControl(int x, int y,
                      IOController *&io_ctrl,
-                     io_control_input_t& input);
+                     ControlHandler *&handler);
 
     void updateTooltip();
 };

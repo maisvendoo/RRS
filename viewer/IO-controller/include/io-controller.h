@@ -42,7 +42,7 @@ public:
         cabine_idx = cab_idx;
     }
 
-    bool findControl(const std::string &node_name, io_control_input_t &out) const;
+    bool findControl(const std::string &node_name, ControlHandler *&handler) const;
 
     /// Обработка мышиного ввода
     void mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed);
@@ -61,7 +61,7 @@ protected:
 
     /// Здесь обеспечивается доступ к значению сигнала контрола
     /// как по коду нажатой кавиши, так и по имени объекта, кликнутого мышью
-    std::vector<DualKeyHash<uint16_t, QString, io_control_input_t>> io_control_inputs;
+    std::vector<DualKeyHash<uint16_t, QString, ControlHandler *>> control_handlers;
 
     int cabs_num = 0;
 
@@ -70,10 +70,7 @@ protected:
     int vehicle_idx = 0;
 
     /// Обработка управления с клавиатуры в кастомных модулях
-    virtual void processKeyboardInput(std::set<uint16_t> &pressed_keys);
-
-    /// Обработка управления мышью в кастомных модулях
-    virtual void processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed);
+    virtual void processKeyboardInput(std::set<uint16_t> &pressed_keys);    
 
     /// Обработка контрола типа "тумблер" (с фиксацией)
     void processTumbler(size_t cab_idx, const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
@@ -87,10 +84,6 @@ protected:
     /// Обработка мышки на контроле типа "кнопка"
     void mouseProcessButton(io_control_input_t input, uint32_t button, bool is_pressed);
 
-    QMap<uint16_t, ControlHandler*> handlers;
-
-    void create_handlers();
-
 private:
 
     /// Маппинг: имя 3D-объекта → ID сигнала обратной связи из analogSignal
@@ -102,8 +95,10 @@ private:
     void keyboardInputProcess(std::set<uint16_t> &pressed_keys);
 
     /// Сформировать строку с посказкой горячей клавиши
-    void getHotkeysString(const QString &keyName, io_control_input_t &ic_input);
-    void getUsageString(io_control_input_t &ic_input);
+    void getHotkeysString(const QString &keyName, ControlHandler *ctrl_handler);
+
+    //void getUsageString(io_control_input_t &ic_input);
+    ControlHandler *create_handler(QString type, QDomNode secNode, CfgReader &cfg);
 };
 
 #endif
