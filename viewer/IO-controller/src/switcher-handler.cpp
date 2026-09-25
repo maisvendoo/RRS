@@ -122,7 +122,7 @@ void SwitcherHandler::doSpringReturn()
 
     int idx = currentIndex();
 
-    // Нижняя крайняя позиция (БВ) — шагнуть вверх
+    // Нижняя крайняя позиция — шагнуть вверх
     if (springReturnLow >= 0 && idx == springReturnLow && !spring_low_triggered)
     {
         spring_low_triggered = true;
@@ -133,7 +133,7 @@ void SwitcherHandler::doSpringReturn()
         return;
     }
 
-    // Верхняя крайняя позиция (АП) — шагнуть вниз
+    // Верхняя крайняя позиция — шагнуть вниз
     if (springReturnHigh >= 0 && idx == springReturnHigh && !spring_high_triggered)
     {
         spring_high_triggered = true;
