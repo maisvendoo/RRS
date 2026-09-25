@@ -108,7 +108,8 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
     for (auto cab_idx : {CAB1, CAB2})
     {
         // Контроллер машиниста
-        controller[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //controller[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Устройство блокировки тормозов усл.№ 367
         brake_lock[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);

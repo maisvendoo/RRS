@@ -118,10 +118,11 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
     shield223[CAB1].allowKey(!(shield223[CAB2].isKey()));
     shield225[CAB1].allowKey(!(shield225[CAB2].isKey()));
 */
-    // Пульты в кабинах обрабатываем уже после проверки на невмешательство программы автозапуска
+// Пульты в кабинах обрабатываем уже после проверки на невмешательство программы автозапуска
     for (auto cab_idx : {CAB1, CAB2})
     {
-        controller[cab_idx]->step(t.simulation_seconds, dt);
+        // Управление контроллером через IOController (stepControls)
+        //controller[cab_idx]->step(t.simulation_seconds, dt);
 /*
         // Дальний ряд тумблеров приборной панели машиниста
         shield223[cab_idx].step(t.simulation_seconds, dt);

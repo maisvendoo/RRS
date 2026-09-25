@@ -95,5 +95,13 @@ void VL60pk::stepControls(const double &t, const double &dt)
         bool is_lock367_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_LOCK_367_INSERTION]);
         brake_lock[cab_idx]->setStateOn(is_lock367_insert);
         brake_lock[cab_idx]->insertLockHandle(is_lock367_insert);
+
+        float revers_val = control_inputs[cab_idx][CTRL_REVERS_POSITION];
+        int revers_pos = static_cast<int>(std::round(revers_val * 5.0f));
+        controller[cab_idx]->setReversHandlePos(revers_pos);
+
+        float km_val = control_inputs[cab_idx][CTRL_KM_MAIN_POSITION];
+        int km_pos = static_cast<int>(std::round(km_val * 7.0f));
+        controller[cab_idx]->setMainHandlePos(km_pos);
     }
 }

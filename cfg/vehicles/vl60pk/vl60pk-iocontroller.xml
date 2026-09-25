@@ -419,4 +419,40 @@
 		<ObjectNameCab2>Cab1_Kluch_EPK</ObjectNameCab2>
 	</Control>
 
+	<!-- Реверсивная рукоятка (положение) -->
+	<Control>
+		<ID>128</ID>
+		<Name>Положение реверсора</Name>
+		<Description>Переключение позиций реверсивного вала</Description>
+		<Type>Switcher</Type>
+		<value1>0.1667</value1>
+		<value2>0.1667</value2>
+		<KeyNameInc>KEY_W</KeyNameInc>
+		<KeyNameDec>KEY_S</KeyNameDec>
+		<NumPositions>6</NumPositions>
+		<MinValue>0.0</MinValue>
+		<MaxValue>1.0</MaxValue>
+		<ObjectNameCab1>Cab1_revers_axis</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_revers_axis</ObjectNameCab2>
+	</Control>
+
+	<!-- Контроллер машиниста -->
+	<Control>
+		<ID>129</ID>
+		<Name>Контроллер машиниста</Name>
+		<Description>Главная рукоятка контроллера КМЭ-60-044</Description>
+		<Type>Switcher</Type>
+		<value1>0.125</value1>
+		<value2>0.125</value2>
+		<KeyNameInc>KEY_A</KeyNameInc>
+		<KeyNameDec>KEY_D</KeyNameDec>
+		<NumPositions>8</NumPositions>
+		<MinValue>0.0</MinValue>
+		<MaxValue>1.0</MaxValue>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>7</SpringReturnHigh>
+		<ObjectNameCab1>Cab1_Kontroller</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Kontroller</ObjectNameCab2>
+	</Control>
+
 </Config>
