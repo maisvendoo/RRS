@@ -16,6 +16,8 @@ public:
 
     void processMouseInput(uint32_t button, bool is_pressed) override;
 
+    QString getUsage() const override;
+
 private:
 
     void processTumbler(size_t cab_idx, uint16_t control_id,

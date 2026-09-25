@@ -15,6 +15,8 @@ public:
     void processKeyInput(const std::set<uint16_t>& pressed_keys) override;
 
     void processMouseInput(uint32_t button, bool is_pressed) override;
+
+    QString getUsage() const override;
 };
 
 #endif

@@ -47,3 +47,11 @@ void ButtonHandler::processMouseInput(uint32_t button, bool is_pressed)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString ButtonHandler::getUsage() const
+{
+    return QString("Нажать: ЛКМ | Отпустить: ЛКМ");
+}
+

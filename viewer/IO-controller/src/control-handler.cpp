@@ -52,6 +52,11 @@ bool ControlHandler::load_config(CfgReader &cfg, QDomNode secNode)
 //------------------------------------------------------------------------------
 float ControlHandler::getSignalValue() const
 {
+    if (!animation_signals_map)
+    {
+        return 0.0f;
+    }
+
     if (contolledObjectName.isEmpty() || feedback_signals == nullptr)
     {
         return 0.0f;

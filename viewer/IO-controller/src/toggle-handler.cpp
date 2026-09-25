@@ -61,4 +61,12 @@ void ToggleHandler::processMouseInput(uint32_t button, bool is_pressed)
     }
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString ToggleHandler::getUsage() const
+{
+    return QString("Вкл.: ЛКМ | Выкл.: ПКМ");
+}
+
 

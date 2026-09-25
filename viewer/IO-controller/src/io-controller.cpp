@@ -129,6 +129,7 @@ bool IOController::load_config(CfgReader &cfg)
             ctrl_handler->cabine_idx = control_handlers.size() - 1;
             ctrl_handler->contolledObjectName = object_name;
             ctrl_handler->value = value1;
+            ctrl_handler->setAnimationSignalsMap(&animation_signals_map);
             ctrl_handlers.insert(ctrl_handler->id, object_name, ctrl_handler);
 
             connect(ctrl_handler, &ControlHandler::sigSendControlCommand,
@@ -141,6 +142,7 @@ bool IOController::load_config(CfgReader &cfg)
             ctrl_handler->cabine_idx = 0;
             ctrl_handler->contolledObjectName = object_name_cab1;
             ctrl_handler->value = value1;
+            ctrl_handler->setAnimationSignalsMap(&animation_signals_map);
             control_handlers[0].insert(ctrl_handler->id, object_name_cab1, ctrl_handler);
 
             connect(ctrl_handler, &ControlHandler::sigSendControlCommand,
@@ -153,6 +155,7 @@ bool IOController::load_config(CfgReader &cfg)
             ctrl_handler->cabine_idx = 1;
             ctrl_handler->contolledObjectName = object_name_cab2;
             ctrl_handler->value = value2;
+            ctrl_handler->setAnimationSignalsMap(&animation_signals_map);
             control_handlers[1].insert(ctrl_handler->id, object_name_cab2, ctrl_handler);
 
             connect(ctrl_handler, &ControlHandler::sigSendControlCommand,

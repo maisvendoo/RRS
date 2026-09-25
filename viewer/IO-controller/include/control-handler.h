@@ -7,6 +7,7 @@
 
 #include    <dual-key-hash.h>
 #include    <io-controller-keymap.h>
+#include    <io-controller-export.h>
 
 #include    <CfgReader.h>
 
@@ -23,7 +24,7 @@ enum
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ControlHandler : public QObject
+class IO_CONTROLLER_EXPORT ControlHandler : public QObject
 {
     Q_OBJECT
 
@@ -88,6 +89,12 @@ public:
 
     /// Получить текущее значение сигнала на сервере по имени 3D-объекта
     float getSignalValue() const;
+
+    /// Строка описания использования контрола
+    virtual QString getUsage() const
+    {
+        return QString();
+    }
 
 signals:
 
