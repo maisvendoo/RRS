@@ -35,12 +35,12 @@ void ButtonHandler::processKeyInput(const std::set<uint16_t> &pressed_keys)
 void ButtonHandler::processMouseInput(uint32_t button, bool is_pressed)
 {
 
-    if (is_pressed && button == IO_CTRL_LEFT_MOUSE_BUTTON)
+    if (is_pressed && button == CTRL_LEFT_MOUSE_BUTTON)
     {
         value = 1.0f;
         sendControlSignal();
     }
-    else if (!is_pressed && button == IO_CTRL_LEFT_MOUSE_BUTTON)
+    else if (!is_pressed && button == CTRL_LEFT_MOUSE_BUTTON)
     {
         value = 0.0f;
         sendControlSignal();

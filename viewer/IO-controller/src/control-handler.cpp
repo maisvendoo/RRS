@@ -50,14 +50,14 @@ bool ControlHandler::load_config(CfgReader &cfg, QDomNode secNode)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-float ControlHandler::getSignalValueByName(const QString &objectName) const
+float ControlHandler::getSignalValue() const
 {
-    if (objectName.isEmpty() || feedback_signals == nullptr)
+    if (contolledObjectName.isEmpty() || feedback_signals == nullptr)
     {
         return 0.0f;
     }
 
-    auto it = animation_signals_map->find(objectName);
+    auto it = animation_signals_map->find(contolledObjectName);
 
     if (it != animation_signals_map->end())
     {
@@ -71,21 +71,6 @@ float ControlHandler::getSignalValueByName(const QString &objectName) const
     }
 
     return 0.0f;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-float ControlHandler::getSignalValueByID(uint16_t control_id, int cab_idx) const
-{
-    auto ic_input = (*ctrl_inputs)[cab_idx].getByKey1(control_id);
-
-    if (!ic_input)
-    {
-        return 0.0f;
-    }
-
-    return getSignalValueByName(ic_input->contolledObjectName);
 }
 
 //------------------------------------------------------------------------------

@@ -62,28 +62,6 @@ void InputRouteHandler::apply(vsg::KeyReleaseEvent &keyRelease)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void InputRouteHandler::apply(vsg::FrameEvent &frame)
-{
-    if (!m_activeIOController)
-    {
-        return;
-    }
-
-    if (frame.frameStamp->frameCount)
-    {
-        const double t = frame.frameStamp->simulationTime;
-        const double dt = t - _previousTime;
-        _previousTime = t;
-
-        updateController(static_cast<float>(dt));
-    }
-
-    frame.handled = false;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void InputRouteHandler::setKeyboard(vsg::ref_ptr<vsg::Keyboard> keyboard)
 {
     m_keyboard = keyboard;
@@ -152,17 +130,6 @@ void InputRouteHandler::processKeyForController(uint16_t keyBase, bool pressed)
     {
         m_activeIOController->setReleasedKey(keyBase);
         //LOG_INFO("InputRouteHandler: Control key released 0x%04X", keyBase);
-    }
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void InputRouteHandler::updateController(float dt)
-{
-    if (m_activeIOController)
-    {
-        m_activeIOController->step(0.0f, dt);
     }
 }
 

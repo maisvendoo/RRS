@@ -2,7 +2,6 @@
 #define     IO_CONTROLLER_H
 
 #include    <io-controller-export.h>
-#include    <io-controller-input.h>
 #include    <control-handler.h>
 #include    <QObject>
 #include    <set>
@@ -25,30 +24,32 @@ public:
 
     ~IOController() = default;
 
+    /// Задать нажатую клавишу
     void setPressedKey(uint16_t keyBase);
 
+    /// Задать отпущенную клавишу
     void setReleasedKey(uint16_t keyBase);
 
-    virtual void step(float t, float dt);
+    /// Шаг контролов
+    virtual void step(float t, float dt, const std::vector<float> *server_signals);
 
+    /// Загрузить конфиг
     virtual bool load_config(CfgReader &cfg);
 
+    /// Создать карту анимаций
     void create_animations_map(const QStringList &anim_dirs);
 
+    /// Установить индекс управляемой ПЕ
     void setVehicleIndex(int vehicle_idx);
 
+    /// Установить индекс активной кабины
     void setActirveCabineIndex(int cab_idx)
     {
         cabine_idx = cab_idx;
     }
 
-    bool findControl(const std::string &node_name, ControlHandler *&handler) const;
-
-    /// Обработка мышиного ввода
-    void mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed);
-
-    /// Задать массив сигналов анимаций
-    void setFeedbackSignals(const std::vector<float> *server_signals);    
+    /// Поиск обработчика по имени объекта
+    bool findControlHandler(const std::string &node_name, ControlHandler *&handler) const;
 
 signals:
 
@@ -63,26 +64,15 @@ protected:
     /// как по коду нажатой кавиши, так и по имени объекта, кликнутого мышью
     std::vector<DualKeyHash<uint16_t, QString, ControlHandler *>> control_handlers;
 
+    /// Число кабин
     int cabs_num = 0;
-
+    /// Активная кабина
     int cabine_idx = 0;
-
+    /// Индекс управляемой ПЕ
     int vehicle_idx = 0;
 
     /// Обработка управления с клавиатуры в кастомных модулях
-    virtual void processKeyboardInput(std::set<uint16_t> &pressed_keys);    
-
-    /// Обработка контрола типа "тумблер" (с фиксацией)
-    void processTumbler(size_t cab_idx, const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
-
-    /// Обработка контрола типа "кнопка" (без фиксации)
-    void processButton(size_t cab_idx, const uint16_t &control_id, const std::set<uint16_t> &pressed_keys);
-
-    /// Обработка мышки на контроле типа "тумблер"
-    void mouseProcessTumbler(io_control_input_t input, uint32_t button, bool is_pressed);
-
-    /// Обработка мышки на контроле типа "кнопка"
-    void mouseProcessButton(io_control_input_t input, uint32_t button, bool is_pressed);
+    virtual void processKeyboardInput(std::set<uint16_t> &pressed_keys);        
 
 private:
 
@@ -92,12 +82,13 @@ private:
     /// Обработка клавиатурного управления (Общая для всех часть)
     void processKeyBoardInput();
 
+    /// Обработка клавиатурного ввода
     void keyboardInputProcess(std::set<uint16_t> &pressed_keys);
 
     /// Сформировать строку с посказкой горячей клавиши
     void getHotkeysString(const QString &keyName, ControlHandler *ctrl_handler);
 
-    //void getUsageString(io_control_input_t &ic_input);
+    /// Создать обработчик контрола
     ControlHandler *create_handler(QString type, QDomNode secNode, CfgReader &cfg);
 };
 

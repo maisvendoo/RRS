@@ -196,7 +196,7 @@ bool MouseControlHandler::pickControl(int x, int y, ControlHandler *&handler)
                     continue;
                 }
 
-                if (!vehicle->io_controller->findControl(node_name, handler))
+                if (!vehicle->io_controller->findControlHandler(node_name, handler))
                 {
                     continue;
                 }

@@ -41,9 +41,21 @@ void IOController::setReleasedKey(uint16_t keyBase)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::step(float t, float dt)
+void IOController::step(float t, float dt, const std::vector<float> *server_signals)
 {
+    if (server_signals == nullptr)
+    {
+        return;
+    }
 
+    for (auto &ctrl_handlers : control_handlers)
+    {
+        for (const auto &[id, name, handler] : ctrl_handlers.getAll())
+        {
+            handler->setFeedbackSignals(server_signals);
+            handler->step(t, dt);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -239,7 +251,7 @@ void IOController::setVehicleIndex(int vehicle_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool IOController::findControl(const std::string &node_name, ControlHandler *&handler) const
+bool IOController::findControlHandler(const std::string &node_name, ControlHandler *&handler) const
 {
     if (node_name.empty())
     {
@@ -271,25 +283,6 @@ bool IOController::findControl(const std::string &node_name, ControlHandler *&ha
     }
 
     return false;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void IOController::setFeedbackSignals(const std::vector<float> *server_signals)
-{
-    if (server_signals == nullptr)
-    {
-        return;
-    }
-
-    for (auto &ctrl_handlers : control_handlers)
-    {
-        for (const auto &[id, name, handler] : ctrl_handlers.getAll())
-        {
-            handler->setFeedbackSignals(server_signals);
-        }
-    }
 }
 
 //------------------------------------------------------------------------------

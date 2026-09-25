@@ -46,14 +46,14 @@ void ToggleHandler::processKeyInput(const std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 void ToggleHandler::processMouseInput(uint32_t button, bool is_pressed)
 {
-    if (button == IO_CTRL_LEFT_MOUSE_BUTTON && !toBool())
+    if (button == CTRL_LEFT_MOUSE_BUTTON && !toBool())
     {
         value = 1.0f;
         sendControlSignal();
         return;
     }
 
-    if (button == IO_CTRL_RIGHT_MOUSE_BUTTON && toBool())
+    if (button == CTRL_RIGHT_MOUSE_BUTTON && toBool())
     {
         value = 0.0f;
         sendControlSignal();

@@ -45,7 +45,7 @@ void VehicleExterior::step(float t, float dt, std::vector<float>* server_signals
 {
     if (io_controller != nullptr)
     {
-        io_controller->setFeedbackSignals(server_signals);
+        io_controller->step(t, dt, server_signals);
     }
 
     for (const auto& animated_pagedLOD : animated_nodes)
