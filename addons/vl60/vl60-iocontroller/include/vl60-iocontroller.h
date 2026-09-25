@@ -16,7 +16,7 @@ public:
 
 private:
 
-    void keysProcess(std::set<uint16_t> &pressed_keys) override;    
+    void processKeyboardInput(std::set<uint16_t> &pressed_keys) override;
 };
 
 #endif

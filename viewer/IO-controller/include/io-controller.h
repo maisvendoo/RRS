@@ -3,6 +3,7 @@
 
 #include    <io-controller-export.h>
 #include    <io-controller-input.h>
+#include    <control-handler.h>
 #include    <QObject>
 #include    <set>
 
@@ -47,10 +48,7 @@ public:
     void mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed);
 
     /// Задать массив сигналов анимаций
-    void setFeedbackSignals(const std::vector<float> *server_signals)
-    {
-        feedback_signals = server_signals;
-    }
+    void setFeedbackSignals(const std::vector<float> *server_signals);
 
     /// Получить текущее значение сигнала по имени 3D-объекта
     float getSignalValueByName(const QString& objectName) const;
@@ -78,8 +76,10 @@ protected:
 
     int cabine_idx = 0;
 
+    int vehicle_idx = 0;
+
     /// Обработка управления с клавиатуры в кастомных модулях
-    virtual void keysProcess(std::set<uint16_t> &pressed_keys);
+    virtual void processKeyboardInput(std::set<uint16_t> &pressed_keys);
 
     /// Обработка управления мышью в кастомных модулях
     virtual void processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed);
@@ -96,6 +96,10 @@ protected:
     /// Обработка мышки на контроле типа "кнопка"
     void mouseProcessButton(io_control_input_t input, uint32_t button, bool is_pressed);
 
+    std::vector<ControlHandler*> handlers;
+
+    void load_handlers();
+
 private:
 
     /// Маппинг: имя 3D-объекта → ID сигнала обратной связи из analogSignal
@@ -109,6 +113,8 @@ private:
 
     /// Обработка клавиатурного управления (Общая для всех часть)
     void processKeyBoardInput();
+
+    void keysProcess(std::set<uint16_t> &pressed_keys);
 
     /// Сформировать строку с посказкой горячей клавиши
     void getHotkeysString(const QString &keyName, io_control_input_t &ic_input);
