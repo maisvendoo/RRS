@@ -5,6 +5,7 @@
 
 #include    <toggle-handler.h>
 #include    <button-handler.h>
+#include    <switcher-handler.h>
 
 //------------------------------------------------------------------------------
 //
@@ -83,7 +84,15 @@ ControlHandler *IOController::create_handler(QString type, QDomNode secNode, Cfg
         ctrl_handler = new ButtonHandler();
     }
 
-    ctrl_handler->load_config(cfg, secNode);
+    if (type == "Switcher")
+    {
+        ctrl_handler = new SwitcherHandler();
+    }
+
+    if (ctrl_handler != nullptr)
+    {
+        ctrl_handler->load_config(cfg, secNode);
+    }
 
     return ctrl_handler;
 }
