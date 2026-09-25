@@ -24,8 +24,10 @@
 - **Feedback** — IOController читает текущее положение из `analogSignal`
   через `getSignalValueByName()` (см. `docs/feedback.md`).
 - **Удержание клавиши/кнопки** — автоповтор с задержкой и интервалом.
-- **Логика Switcher** вынесена в отдельный класс `SwitcherHandler`,
-  IOController делегирует ему обработку.
+- **Логика Switcher** — в `SwitcherHandler` (наследник `ControlHandler`).
+- **Состояние** всех контролов хранится в `io_control_inputs` (DualKeyHash),
+  принадлежащем IOController. Handler не дублирует данные, а читает/пишет
+  в DualKeyHash через указатель `ctrl_inputs`.
 
 ## Формат конфига
 
@@ -39,8 +41,9 @@
 | `keyModOffName` | Модификатор уменьшения |
 | `type` | `"Switcher"` |
 
-`keyCodeDec` (клавиша уменьшения) хранится в `SwitcherHandler`,
-не в структуре контрола.
+`keyCodeDec` (клавиша уменьшения) и `numPositions` хранятся в
+`SwitcherHandler` — это расширенные поля, которых нет в
+`io_control_input_t`.
 
 ```xml
 <Control name="ControllerMode" type="Switcher" Description="Контроллер режимов">
@@ -67,8 +70,14 @@
 
 ## Класс SwitcherHandler
 
-Наследует `ControlHandler` (см. `docs/control-handler.md`). Владеет логикой
-всех Switcher-контролов.
+Наследует `ControlHandler` (см. `docs/control-handler.md`).
+
+**Данные:**
+- Основные поля (id, keyCodeInc, keyModIncName, keyModOffName, objectName, value)
+  читаются из `ctrl_inputs` (DualKeyHash).
+- Расширенные поля (`keyCodeDec`, `numPositions`) хранятся в своей карте.
+
+**Логика:** обработка inc/dec, автоповтор при удержании.
 
 **Файл:** `viewer/IO-controller/include/switcher-handler.h`
 
@@ -103,39 +112,27 @@ public:
 
 private:
 
-    /// Данные одного Switcher-контрола
-    struct SwitcherData
+    /// Расширенные данные Switcher (чего нет в io_control_input_t)
+    struct SwitcherExt
     {
-        uint16_t id = 0;
-        uint16_t keyCodeInc = 0;
-        QString  keyModIncName = "";
         uint16_t keyCodeDec = 0;
         QString  keyModDecName = "";
         uint16_t numPositions = 2;
-        QString  objectName = "";
-        float    value = 0.0f;
+    };
 
-        int      cabine_idx = 0;
-        int      controlled_vehicle_idx = 0;
-    };`
-
-    /// Все Switcher-контролы, сгруппированные по кабинам
-    std::vector<QMap<uint16_t, SwitcherData>> switchers;
-
-    /// Поиск по имени 3D-объекта (для мыши)
-    bool findByName(const QString& name, SwitcherData& out) const;
-
-    /// Поиск по ID
-    SwitcherData* findById(int cab_idx, uint16_t control_id);
-
-    /// Отправить положение
-    void sendPosition(SwitcherData& sw, int direction);
+    /// Расширение: control_id → SwitcherExt (ключ — id из DualKeyHash)
+    QMap<uint16_t, SwitcherExt> switcher_ext;
 
     /// Состояние удержания: control_id → (направление, время)
     QMap<uint16_t, std::pair<int, float>> hold_state;
 
     static constexpr float HOLD_DELAY        = 0.3f;
     static constexpr float REPEAT_INTERVAL   = 0.1f;
+
+    /// Отправить следующую позицию
+    void sendNextPosition(const QString& objectName, uint16_t control_id,
+                          int cab_idx, int vehicle_idx, int direction,
+                          uint16_t num_positions);
 };
 
 #endif // SWITCHER_HANDLER_H
@@ -147,7 +144,6 @@ private:
 #include "switcher-handler.h"
 #include <CfgReader.h>
 #include <io-controller-keymap.h>
-#include <QDomNode>
 
 //------------------------------------------------------------------------------
 //
@@ -162,9 +158,6 @@ SwitcherHandler::SwitcherHandler(QObject *parent) : ControlHandler(parent)
 //------------------------------------------------------------------------------
 bool SwitcherHandler::loadConfig(CfgReader &cfg, int cabs_num)
 {
-{
-    switchers.resize(cabs_num + 1);
-
     auto secNode = cfg.getFirstSection("Control");
 
     while (!secNode.isNull())
@@ -174,61 +167,21 @@ bool SwitcherHandler::loadConfig(CfgReader &cfg, int cabs_num)
 
         if (type == "Switcher")
         {
-            SwitcherData sw;
-
             int id = 0;
             cfg.getInt(secNode, "ID", id);
-            sw.id = static_cast<uint16_t>(id);
+
+            SwitcherExt ext;
+
+            QString keyNameDec = "";
+            cfg.getString(secNode, "KeyNameDec", keyNameDec);
+            ext.keyCodeDec = KeySymbolsRRSMap.value(keyNameDec, KEY_Undefined);
+            cfg.getString(secNode, "KeyModDec", ext.keyModDecName);
 
             int num_pos = 2;
             cfg.getInt(secNode, "NumPositions", num_pos);
-            sw.numPositions = static_cast<uint16_t>(num_pos);
+            ext.numPositions = static_cast<uint16_t>(num_pos);
 
-            // Клавиша увеличения
-            QString keyNameInc = "";
-            cfg.getString(secNode, "KeyNameInc", keyNameInc);
-            sw.keyCodeInc = KeySymbolsRRSMap.value(keyNameInc, KEY_Undefined);
-            cfg.getString(secNode, "KeyModInc", sw.keyModIncName);
-
-            // Клавиша уменьшения
-            QString keyNameDec = "";
-            cfg.getString(secNode, "KeyNameDec", keyNameDec);
-            sw.keyCodeDec = KeySymbolsRRSMap.value(keyNameDec, KEY_Undefined);
-            cfg.getString(secNode, "KeyModDec", sw.keyModDecName);
-
-            // Начальное положение
-            double value1 = 0.0;
-            cfg.getDouble(secNode, "value1", value1);
-            sw.value = static_cast<float>(value1);
-
-            // Объекты по кабинам
-            QString objName = "";
-            cfg.getString(secNode, "ObjectName", objName);
-            QString objCab1 = "";
-            cfg.getString(secNode, "ObjectNameCab1", objCab1);
-            QString objCab2 = "";
-            cfg.getString(secNode, "ObjectNameCab2", objCab2);
-
-            if (!objName.isEmpty())
-            {
-                sw.cabine_idx = switchers.size() - 1;
-                sw.objectName = objName;
-                switchers[sw.cabine_idx].insert(sw.id, sw);
-            }
-
-            if (!objCab1.isEmpty() && cabs_num > 0)
-            {
-                sw.cabine_idx = 0;
-                sw.objectName = objCab1;
-                switchers[0].insert(sw.id, sw);
-            }
-
-            if (!objCab2.isEmpty() && cabs_num > 1)
-            {
-                sw.cabine_idx = 1;
-                sw.objectName = objCab2;
-                switchers[1].insert(sw.id, sw);
-            }
+            switcher_ext.insert(static_cast<uint16_t>(id), ext);
         }
 
         secNode = cfg.getNextSection();
@@ -241,37 +194,40 @@ bool SwitcherHandler::loadConfig(CfgReader &cfg, int cabs_num)
 //
 //------------------------------------------------------------------------------
 void SwitcherHandler::processKeyInput(const std::set<uint16_t>& pressed_keys,
-                                      int cabine_idx,
-                                      int vehicle_idx)
+                                      int cabine_idx, int vehicle_idx)
 {
-    if (cabine_idx < 0 || cabine_idx >= static_cast<int>(switchers.size()))
-        return;
+    if (!ctrl_inputs) return;
 
-    for (auto& [id, sw] : switchers[cabine_idx])
+    for (const auto& [id, _, input] : (*ctrl_inputs)[cabine_idx].getAll())
     {
-        sw.controlled_vehicle_idx = vehicle_idx;
+        if (input.type != "Switcher") continue;
 
-        bool inc_down = getKeyState(pressed_keys, sw.keyCodeInc) &&
-                        isKeyModifier(pressed_keys, sw.keyModIncName);
-        bool dec_down = getKeyState(pressed_keys, sw.keyCodeDec) &&
-                        isKeyModifier(pressed_keys, sw.keyModDecName);
+        auto it_ext = switcher_ext.find(id);
+        if (it_ext == switcher_ext.end()) continue;
 
-        if (inc_down)
+        const auto& ext = it_ext.value();
+
+        // inc: keyCode (из DualKeyHash)
+        if (getKeyState(pressed_keys, input.keyCode) &&
+            isKeyModifier(pressed_keys, input.keyModOnName))
         {
-            sendPosition(sw, +1);
-            hold_state[sw.id] = {+1, 0.0f};
+            sendNextPosition(input.contolledObjectName, id,
+                             cabine_idx, vehicle_idx, +1, ext.numPositions);
+            hold_state[id] = {+1, 0.0f};
             return;
         }
-        else if (dec_down)
+
+        // dec: keyCodeDec (из расширения)
+        if (getKeyState(pressed_keys, ext.keyCodeDec) &&
+            isKeyModifier(pressed_keys, ext.keyModDecName))
         {
-            sendPosition(sw, -1);
-            hold_state[sw.id] = {-1, 0.0f};
+            sendNextPosition(input.contolledObjectName, id,
+                             cabine_idx, vehicle_idx, -1, ext.numPositions);
+            hold_state[id] = {-1, 0.0f};
             return;
         }
-        else
-        {
-            hold_state[sw.id] = {0, 0.0f};
-        }
+
+        hold_state[id] = {0, 0.0f};
     }
 }
 
@@ -279,16 +235,11 @@ void SwitcherHandler::processKeyInput(const std::set<uint16_t>& pressed_keys,
 //
 //------------------------------------------------------------------------------
 void SwitcherHandler::processMouseInput(const io_control_input_t& input,
-                                        uint32_t button,
-                                        bool is_pressed)
+                                        uint32_t button, bool is_pressed)
 {
-    SwitcherData sw;
-    if (!findByName(input.contolledObjectName, sw))
-        return;
-
     if (!is_pressed)
     {
-        hold_state[sw.id] = {0, 0.0f};
+        hold_state[input.id] = {0, 0.0f};
         return;
     }
 
@@ -300,8 +251,14 @@ void SwitcherHandler::processMouseInput(const io_control_input_t& input,
     else
         return;
 
-    sendPosition(sw, direction);
-    hold_state[sw.id] = {direction, 0.0f};
+    auto it_ext = switcher_ext.find(input.id);
+    if (it_ext == switcher_ext.end()) return;
+
+    sendNextPosition(input.contolledObjectName, input.id,
+                     input.cabine_idx, input.controlled_vehicle_idx,
+                     direction, it_ext.value().numPositions);
+
+    hold_state[input.id] = {direction, 0.0f};
 }
 
 //------------------------------------------------------------------------------
@@ -321,15 +278,22 @@ void SwitcherHandler::step(float dt)
         if (state.second < HOLD_DELAY + REPEAT_INTERVAL)
             continue;
 
-        for (auto& cab_map : switchers)
+        // Ищем данные в DualKeyHash
+        if (!ctrl_inputs) continue;
+
+        for (size_t cab = 0; cab < ctrl_inputs->size(); ++cab)
         {
-            auto it = cab_map.find(id);
-            if (it != cab_map.end())
-            {
-                sendPosition(it.value(), state.first);
-                state.second = HOLD_DELAY;
-                break;
-            }
+            auto io_ctrl = (*ctrl_inputs)[cab].getByKey1(id);
+            if (!io_ctrl) continue;
+
+            auto it_ext = switcher_ext.find(id);
+            if (it_ext == switcher_ext.end()) break;
+
+            sendNextPosition(io_ctrl->contolledObjectName, id,
+                             cab, io_ctrl->controlled_vehicle_idx,
+                             state.first, it_ext.value().numPositions);
+            state.second = HOLD_DELAY;
+            break;
         }
     }
 }
@@ -337,129 +301,63 @@ void SwitcherHandler::step(float dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void SwitcherHandler::sendPosition(SwitcherData& sw, int direction)
+void SwitcherHandler::sendNextPosition(const QString& objectName,
+                                       uint16_t control_id,
+                                       int cab_idx, int vehicle_idx,
+                                       int direction,
+                                       uint16_t num_positions)
 {
+    if (!ctrl_inputs) return;
+
     // Текущее положение из feedback
-    float current = getSignalValueByName(sw.objectName);
+    float current = getSignalValueByName(objectName);
+
     if (!feedback_signals)
-        current = sw.value;
-
-    float step = 1.0f / static_cast<float>(sw.numPositions - 1);
-    int cur_idx = static_cast<int>(round(current / step));
-    int new_idx = cur_idx + direction;
-
-    if (new_idx < 0 || new_idx >= static_cast<int>(sw.numPositions))
-        return;
-
-    sw.value = static_cast<float>(new_idx) * step;
-
-    // Отправка через базовый класс
-    sendControlSignal(sw.controlled_vehicle_idx, sw.cabine_idx, sw.id, sw.value);
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-bool SwitcherHandler::findByName(const QString& name, SwitcherData& out) const
-{
-    if (name.isEmpty()) return false;
-
-    for (const auto& cab_map : switchers)
     {
-        for (const auto& [id, sw] : cab_map)
-        {
-            if (!sw.objectName.isEmpty() &&
-                (name == sw.objectName || name.endsWith(sw.objectName)))
-            {
-                out = sw;
-                return true;
-            }
-        }
+        auto io_ctrl = (*ctrl_inputs)[cab_idx].getByKey1(control_id);
+        if (io_ctrl)
+            current = io_ctrl->value;
     }
 
-    return false;
-}
+    float step = 1.0f / static_cast<float>(num_positions - 1);
+    int cur_idx = static_cast<int>(round(current / step));
+    int new_idx = std::clamp(cur_idx + direction, 0,
+                             static_cast<int>(num_positions) - 1);
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-SwitcherHandler::SwitcherData* SwitcherHandler::findById(int cab_idx,
-                                                          uint16_t control_id)
-{
-    if (cab_idx < 0 || cab_idx >= static_cast<int>(switchers.size()))
-        return nullptr;
+    if (new_idx == cur_idx) return;
 
-    auto it = switchers[cab_idx].find(control_id);
-    if (it != switchers[cab_idx].end())
-        return &it.value();
+    float new_value = static_cast<float>(new_idx) * step;
 
-    return nullptr;
+    // Обновляем состояние в DualKeyHash
+    (*ctrl_inputs)[cab_idx].updateByKey1(control_id, new_value);
+
+    // Отправляем
+    sendControlSignal(vehicle_idx, cab_idx, control_id, new_value);
 }
 ```
 
 ## Интеграция с IOController
 
-IOController владеет списком `ControlHandler*`. `SwitcherHandler` создаётся
-в `load_config()` и добавляется в общий список.
-
-### В `load_config()`:
+`SwitcherHandler` создаётся в `IOController::load_handlers()`, получает
+указатель на `io_control_inputs`:
 
 ```cpp
-// После загрузки всех контролов в DualKeyHash:
-
-// Создаём и добавляем SwitcherHandler
-SwitcherHandler* sw_handler = new SwitcherHandler(this);
-sw_handler->loadConfig(cfg, cabs_num);
-sw_handler->setAnimationSignalsMap(animation_signals_map);
-sw_handler->setFeedbackSignals(feedback_signals);
-
-connect(sw_handler, &ControlHandler::sigSendControlCommand,
-        this, &IOController::sigSendVehicleControlCommand);
-
-handlers.push_back(sw_handler);
-```
-
-### Делегирование вызовов:
-
-```cpp
-void IOController::processKeyBoardInput()
+// IOController::load_handlers()
+if (need_switcher)
 {
-    // ... фильтрация pressed_keys ...
-
-    for (auto* h : handlers)
-        h->processKeyInput(pressed_keys, cabine_idx, vehicle_idx);
-}
-
-void IOController::mouseInputProcess(io_control_input_t input,
-                                     uint32_t button, bool is_pressed)
-{
-    for (auto* h : handlers)
-        h->processMouseInput(input, button, is_pressed);
-}
-
-void IOController::step(float t, float dt)
-{
-    for (auto* h : handlers)
-        h->step(dt);
-}
-
-void IOController::setFeedbackSignals(const std::vector<float>* signals)
-{
-    feedback_signals = signals;
-    for (auto* h : handlers)
-        h->setFeedbackSignals(signals);
+    SwitcherHandler* sw = new SwitcherHandler(this);
+    sw->loadConfig(cfg, cabs_num);   // загружает расширения
+    sw->setControlInputs(&io_control_inputs);
+    sw->setAnimationSignalsMap(animation_signals_map);
+    sw->setFeedbackSignals(feedback_signals);
+    connect(sw, &ControlHandler::sigSendControlCommand,
+            this, &IOController::sigSendVehicleControlCommand);
+    handlers.push_back(sw);
 }
 ```
 
-### Деструктор:
-
-```cpp
-IOController::~IOController()
-{
-    for (auto* h : handlers)
-        delete h;
-}
-```
+Остальные вызовы (processKeyInput, processMouseInput, step, setFeedbackSignals)
+делегируются через общий список handler-ов — как в `docs/control-handler.md`.
 
 ## Изменения в SwitcherControl (SDK)
 
@@ -577,20 +475,13 @@ void SwitcherControl::setControlSignalID(uint16_t signal_id)
 
 ## Сторона устройства (пример)
 
-В устройстве, использующем `SwitcherControl`, в `loadConfig()`:
-
 ```cpp
 void SomeDevice::loadConfig(QString cfg_path)
 {
-    // ...
-    switcher.setControlInputs(&control_inputs);   // от Vehicle
-    switcher.setControlSignalID(60);              // ID из IOControllerConfig
-    // ...
+    switcher.setControlInputs(&control_inputs);
+    switcher.setControlSignalID(60);
 }
 ```
-
-В `step()` устройства вызов `switcher.step(t, dt)` уже обработает
-и положение из `control_inputs`, и spring return.
 
 ## Поток данных (полный)
 
@@ -600,10 +491,13 @@ Viewer (IOController)                Simulator
 
 Нажатие Key_Inc (Shift+P):
   SwitcherHandler::processKeyInput()
+    читает из DualKeyHash: id=60, keyCode=KEY_P, keyModOnName="Shift"
+    читает из расширения: keyCodeDec=KEY_O, numPositions=4
     getSignalValueByName("Controller_Mode") → 0.33
     new_pos = round(0.33/0.33) + 1 → 2
     value = 2 * 0.33 → 0.66
-    sigSendControlCommand(vehicle_idx, cab_idx, 60, 0.66)
+    пишет в DualKeyHash: updateByKey1(60, 0.66)
+    sendControlSignal(vehicle_idx, cab_idx, 60, 0.66)
        │
        ▼ TCP
                           Model::slotSetVehicleControlCommand()
@@ -625,13 +519,10 @@ Viewer:
   VehicleExterior::step()
     io_controller->setFeedbackSignals(&analogSignal)
     ↓
-  IOController пробрасывает всем handler-ам:
-    for (auto* h : handlers)
-      h->setFeedbackSignals(&analogSignal)
+  IOController пробрасывает всем handler-ам
     ↓
   SwitcherHandler:
-    getSignalValueByName() → 0.66
-  ProcAnimation → analogSignal[signal_id]
+    getSignalValueByName() на следующем нажатии → 0.66
 ```
 
 ## Параметры автоповтора
@@ -644,31 +535,23 @@ Viewer:
 ## Обратная совместимость
 
 - `SwitcherControl`: если `control_inputs == nullptr` — работает по-старому
-  через `pressed_keys`
-- IOController: все изменения в `SwitcherHandler`, существующие типы
-  Toggle/Button не затронуты
-- `io_control_input_t`: поля не добавляются, существующие не изменяются
+- IOController: все изменения в handler-ах, существующие типы Toggle/Button
+  не затронуты
+- `io_control_input_t`: поля не добавляются
 
 ## Влияние на SDK
 
 | Компонент | Файлы | Изменения |
 |---|---|---|
-| `device` | `switcher-control.h`, `switcher-control.cpp` | Добавление новых методов (обратно совместимо) |
+| `device` | `switcher-control.h`, `switcher-control.cpp` | Добавление новых методов |
 | `io-controller` | `control-handler.h` | Базовый класс `ControlHandler` |
 | `io-controller` | `switcher-handler.h`, `switcher-handler.cpp` | Наследник `ControlHandler` |
-| `io-controller` | `io-controller.h`, `io-controller.cpp` | Список `handlers` вместо прямой интеграции |
 
 ## План реализации (слайсы)
 
-1. **ControlHandler — базовый класс:** `control-handler.h` с общей логикой
-   (`getSignalValueByName`, `sendControlSignal`, `getKeyState`, `isKeyModifier`)
-2. **ToggleHandler — рефакторинг:** вынести Toggle/Button из IOController
-   в наследника `ControlHandler`
-3. **IOController — список handler-ов:** заменить прямые вызовы на итерацию
-   по `std::vector<ControlHandler*>`
-4. **SwitcherHandler — база:** наследование от `ControlHandler`,
-   загрузка конфига, `processKeyInput()`, `sendPosition()` (через базовый класс)
-5. **SwitcherHandler — удержание:** `step()` с автоповтором
-6. **SwitcherHandler — мышь:** `processMouseInput()`
-7. **SwitcherControl (SDK):** добавить `control_inputs`, `control_signal_id`,
-   модифицировать `step()`
+1. **ControlHandler** — базовый класс с `ctrl_inputs`, вспомогательными методами
+2. **ToggleHandler** — вынести Toggle/Button из IOController
+3. **IOController** — заполняет DualKeyHash, создаёт handler-ы, делегирует вызовы
+4. **SwitcherHandler** — расширения (keyCodeDec, numPositions), inc/dec, автоповтор
+5. **VL60IOController** — переходит на `toggle_handler->processToggle()`
+6. **SwitcherControl (SDK)** — добавляет чтение из `control_inputs`

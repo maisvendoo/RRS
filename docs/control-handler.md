@@ -6,8 +6,32 @@ IOController исторически монолитен: вся логика Togg
 добавляемого Switcher живёт в одном классе. Это затрудняет расширение.
 
 Решение: выделить базовый класс `ControlHandler` и для каждого типа контрола
-создать отдельного наследника. IOController оперирует списком `ControlHandler*`,
-делегируя им ввод и шаг симуляции.
+создать отдельного наследника. Handler-ы инкапсулируют **только логику**
+обработки ввода (клавиатура, мышь). **Состояние** контролов хранится
+в `io_control_inputs` (DualKeyHash), принадлежащем IOController.
+
+## Принцип разделения
+
+```
+IOController (владелец данных)
+  ├── io_control_inputs (DualKeyHash) — состояние всех контролов
+  │     [cab0][id=100] → io_control_input_t { keyCode, mods, value, ... }
+  │     [cab0][id=60]  → io_control_input_t { type, ... }
+  │     [shared][...]
+  │
+  └── handlers (список ControlHandler*) — только логика
+        ├── ToggleHandler  — processTumbler / processButton
+        └── SwitcherHandler — inc/dec, автоповтор
+```
+
+Handler-ы **не хранят копии данных**. Они получают указатель на
+DualKeyHash и читают/пишут состояние напрямую.
+
+### Исключение
+
+`SwitcherHandler` хранит **только расширенные поля**, которых нет
+в `io_control_input_t` (keyCodeDec, numPositions). Основные поля
+(id, keyCodeInc, objectName) читает из DualKeyHash.
 
 ## Базовый класс ControlHandler
 
@@ -26,6 +50,7 @@ IOController исторически монолитен: вся логика Togg
 #include <vector>
 
 #include <io-controller-input.h>
+#include <dual-key-hash.h>
 
 class CfgReader;
 
@@ -41,6 +66,13 @@ public:
     explicit ControlHandler(QObject *parent = nullptr) : QObject(parent) {}
 
     virtual ~ControlHandler() = default;
+
+    /// Установить указатель на DualKeyHash с данными контролов
+    void setControlInputs(
+        std::vector<DualKeyHash<uint16_t, QString, io_control_input_t>>* inputs)
+    {
+        ctrl_inputs = inputs;
+    }
 
     /// Загрузка конфигурации из IOControllerConfig
     virtual bool loadConfig(CfgReader &cfg, int cabs_num) = 0;
@@ -75,13 +107,16 @@ signals:
 
 protected:
 
+    /// Указатель на DualKeyHash IOController (данные и состояние)
+    std::vector<DualKeyHash<uint16_t, QString, io_control_input_t>>* ctrl_inputs = nullptr;
+
     /// Указатель на массив аналоговых сигналов от симулятора
     const std::vector<float>* feedback_signals = nullptr;
 
     /// Маппинг: имя 3D-объекта → ID сигнала обратной связи
     QMap<QString, uint16_t> animation_signals_map;
 
-    /// Получить значение сигнала по имени объекта
+    /// Получить значение сигнала по имени объекта из feedback_signals
     float getSignalValueByName(const QString& objectName) const
     {
         if (objectName.isEmpty() || !feedback_signals)
@@ -94,7 +129,6 @@ protected:
                 return (*feedback_signals)[it.value()];
         }
 
-        // Fallback: endsWith
         for (auto it = animation_signals_map.begin();
              it != animation_signals_map.end(); ++it)
         {
@@ -145,6 +179,9 @@ protected:
 
 ## Пример: ToggleHandler
 
+Логика обработки Toggle и Button. Не хранит собственных данных —
+читает/пишет состояние в `ctrl_inputs` (DualKeyHash).
+
 **Файл:** `viewer/IO-controller/include/toggle-handler.h`
 
 ```cpp
@@ -164,6 +201,7 @@ public:
 
     explicit ToggleHandler(QObject *parent = nullptr);
 
+    /// loadConfig — ничего не делает, все данные уже загружены в DualKeyHash
     bool loadConfig(CfgReader &cfg, int cabs_num) override;
 
     void processKeyInput(const std::set<uint16_t>& pressed_keys,
@@ -172,33 +210,178 @@ public:
     void processMouseInput(const io_control_input_t& input,
                            uint32_t button, bool is_pressed) override;
 
-private:
-
-    struct ToggleData
-    {
-        uint16_t id = 0;
-        uint16_t keyCode = 0;
-        QString keyModOnName = "";
-        QString keyModOffName = "";
-        float value = 0.0f;
-        QString objectName = "";
-        int cabine_idx = 0;
-        int vehicle_idx = 0;
-    };
-
-    std::vector<QMap<uint16_t, ToggleData>> toggles;
-
-    void processToggle(size_t cab_idx, const uint16_t& control_id,
+    /// Публичные методы для прямого вызова из keysProcess() наследников
+    /// (например, VL60IOController задаёт порядок контролов)
+    void processToggle(size_t cab_idx, uint16_t control_id,
                        const std::set<uint16_t>& pressed_keys);
 
-    void processButton(size_t cab_idx, const uint16_t& control_id,
+    void processButton(size_t cab_idx, uint16_t control_id,
                        const std::set<uint16_t>& pressed_keys);
-
-    ToggleData* findById(int cab_idx, uint16_t id);
-    bool findByName(const QString& name, ToggleData& out) const;
 };
 
 #endif // TOGGLE_HANDLER_H
+```
+
+**Файл:** `viewer/IO-controller/src/toggle-handler.cpp`
+
+```cpp
+#include "toggle-handler.h"
+#include <CfgReader.h>
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+ToggleHandler::ToggleHandler(QObject *parent) : ControlHandler(parent)
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ToggleHandler::loadConfig(CfgReader &cfg, int cabs_num)
+{
+    return true; // данные уже загружены IOController в DualKeyHash
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ToggleHandler::processKeyInput(const std::set<uint16_t>& pressed_keys,
+                                    int cabine_idx, int vehicle_idx)
+{
+    if (!ctrl_inputs) return;
+
+    for (const auto& [id, _, input] : (*ctrl_inputs)[cabine_idx].getAll())
+    {
+        if (input.type == "Toggle")
+            processToggle(cabine_idx, id, pressed_keys);
+        else if (input.type == "Button")
+            processButton(cabine_idx, id, pressed_keys);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ToggleHandler::processToggle(size_t cab_idx, uint16_t control_id,
+                                  const std::set<uint16_t>& pressed_keys)
+{
+    if (!ctrl_inputs) return;
+
+    auto io_ctrl = (*ctrl_inputs)[cab_idx].getByKey1(control_id);
+    if (!io_ctrl || io_ctrl->type != "Toggle") return;
+
+    if (getKeyState(pressed_keys, io_ctrl->keyCode))
+    {
+        if (io_ctrl->keyModOnName == io_ctrl->keyModOffName)
+        {
+            if (isKeyModifier(pressed_keys, io_ctrl->keyModOnName))
+            {
+                io_ctrl->value = 1.0f - io_ctrl->value;
+                (*ctrl_inputs)[cab_idx].updateByKey1(control_id, io_ctrl.value());
+                sendControlSignal(io_ctrl->controlled_vehicle_idx, cab_idx,
+                                  control_id, io_ctrl->value);
+                return;
+            }
+        }
+
+        if (isKeyModifier(pressed_keys, io_ctrl->keyModOnName))
+        {
+            io_ctrl->value = 1.0f;
+            (*ctrl_inputs)[cab_idx].updateByKey1(control_id, io_ctrl.value());
+            sendControlSignal(io_ctrl->controlled_vehicle_idx, cab_idx,
+                              control_id, io_ctrl->value);
+            return;
+        }
+
+        if (isKeyModifier(pressed_keys, io_ctrl->keyModOffName))
+        {
+            io_ctrl->value = 0.0f;
+            (*ctrl_inputs)[cab_idx].updateByKey1(control_id, io_ctrl.value());
+            sendControlSignal(io_ctrl->controlled_vehicle_idx, cab_idx,
+                              control_id, io_ctrl->value);
+            return;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ToggleHandler::processButton(size_t cab_idx, uint16_t control_id,
+                                  const std::set<uint16_t>& pressed_keys)
+{
+    if (!ctrl_inputs) return;
+
+    auto io_ctrl = (*ctrl_inputs)[cab_idx].getByKey1(control_id);
+    if (!io_ctrl || io_ctrl->type != "Button") return;
+
+    if (getKeyState(pressed_keys, io_ctrl->keyCode))
+    {
+        if (isKeyModifier(pressed_keys, io_ctrl->keyModOnName) ||
+            io_ctrl->keyModOnName.isEmpty())
+        {
+            io_ctrl->value = 1.0f;
+        }
+    }
+    else
+    {
+        io_ctrl->value = 0.0f;
+    }
+
+    (*ctrl_inputs)[cab_idx].updateByKey1(control_id, io_ctrl.value());
+    sendControlSignal(io_ctrl->controlled_vehicle_idx, cab_idx,
+                      control_id, io_ctrl->value);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ToggleHandler::processMouseInput(const io_control_input_t& input,
+                                      uint32_t button, bool is_pressed)
+{
+    if (!ctrl_inputs) return;
+
+    auto io_ctrl = (*ctrl_inputs)[input.cabine_idx].getByKey1(input.id);
+    if (!io_ctrl) return;
+
+    if (io_ctrl->type == "Toggle")
+    {
+        if (button == IO_CTRL_LEFT_MOUSE_BUTTON && !input.toBool())
+        {
+            io_ctrl->value = 1.0f;
+            (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
+            sendControlSignal(io_ctrl->controlled_vehicle_idx,
+                              input.cabine_idx, input.id, io_ctrl->value);
+        }
+
+        if (button == IO_CTRL_RIGHT_MOUSE_BUTTON && input.toBool())
+        {
+            io_ctrl->value = 0.0f;
+            (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
+            sendControlSignal(io_ctrl->controlled_vehicle_idx,
+                              input.cabine_idx, input.id, io_ctrl->value);
+        }
+    }
+    else if (io_ctrl->type == "Button")
+    {
+        if (is_pressed && button == IO_CTRL_LEFT_MOUSE_BUTTON)
+        {
+            io_ctrl->value = 1.0f;
+            (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
+            sendControlSignal(io_ctrl->controlled_vehicle_idx,
+                              input.cabine_idx, input.id, io_ctrl->value);
+        }
+        else if (!is_pressed && button == IO_CTRL_LEFT_MOUSE_BUTTON)
+        {
+            io_ctrl->value = 0.0f;
+            (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
+            sendControlSignal(io_ctrl->controlled_vehicle_idx,
+                              input.cabine_idx, input.id, io_ctrl->value);
+        }
+    }
+}
 ```
 
 ## IOController с ControlHandler
@@ -236,6 +419,7 @@ protected:
 
     QMap<QString, std::function<bool(const std::set<uint16_t> &)>> isModifier;
 
+    /// Единое хранилище данных и состояния всех контролов
     std::vector<DualKeyHash<uint16_t, QString, io_control_input_t>> io_control_inputs;
     int cabs_num = 0;
 
@@ -243,7 +427,6 @@ protected:
     virtual void processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed);
 
 private:
-    /// Обработчики всех типов контролов
     std::vector<ControlHandler*> handlers;
 
     QMap<QString, uint16_t> animation_signals_map;
@@ -253,7 +436,6 @@ private:
     void processKeyBoardInput();
 };
 
-// Загрузка модуля
 extern "C" IOController* createIOController()
 {
     return new IOController();
@@ -286,19 +468,68 @@ bool IOController::load_config(CfgReader &cfg)
         io_control_inputs.push_back(io_ctrl_inputs);
     }
 
-    // Загружаем все контролы (для мышиного поиска)
+    // Загружаем ВСЕ контролы в DualKeyHash
     auto secNode = cfg.getFirstSection("Control");
     while (!secNode.isNull())
     {
         io_control_input_t ic_input;
-        // ... общая загрузка id, value1, value2, ObjectName ...
-        // Вставка в DualKeyHash
-        ...
+
+        cfg.getString(secNode, "Type", ic_input.type);
+        cfg.getString(secNode, "Name", ic_input.name);
+        cfg.getString(secNode, "Description", ic_input.description);
+
+        int id = 0;
+        cfg.getInt(secNode, "ID", id);
+        ic_input.id = static_cast<uint16_t>(id);
+
+        double value1 = 0.0, value2 = 0.0;
+        cfg.getDouble(secNode, "value1", value1);
+        cfg.getDouble(secNode, "value2", value2);
+
+        QString keyName = "";
+        cfg.getString(secNode, "KeyName", keyName);
+        ic_input.keyCode = KeySymbolsRRSMap.value(keyName, KEY_Undefined);
+
+        cfg.getString(secNode, "KeyModOnName", ic_input.keyModOnName);
+        cfg.getString(secNode, "KeyModOffName", ic_input.keyModOffName);
+        if (ic_input.keyModOffName.isEmpty())
+            ic_input.keyModOffName = ic_input.keyModOnName;
+
+        QString objName = "";
+        cfg.getString(secNode, "ObjectName", objName);
+        QString objCab1 = "";
+        cfg.getString(secNode, "ObjectNameCab1", objCab1);
+        QString objCab2 = "";
+        cfg.getString(secNode, "ObjectNameCab2", objCab2);
+
+        if (!objName.isEmpty())
+        {
+            ic_input.cabine_idx = io_control_inputs.size() - 1;
+            ic_input.contolledObjectName = objName;
+            ic_input.value = value1;
+            io_control_inputs.back().insert(ic_input.id, objName, ic_input);
+        }
+
+        if (!objCab1.isEmpty() && cabs_num > 0)
+        {
+            ic_input.cabine_idx = 0;
+            ic_input.contolledObjectName = objCab1;
+            ic_input.value = value1;
+            io_control_inputs[0].insert(ic_input.id, objCab1, ic_input);
+        }
+
+        if (!objCab2.isEmpty() && cabs_num > 1)
+        {
+            ic_input.cabine_idx = 1;
+            ic_input.contolledObjectName = objCab2;
+            ic_input.value = value2;
+            io_control_inputs[1].insert(ic_input.id, objCab2, ic_input);
+        }
 
         secNode = cfg.getNextSection();
     }
 
-    // Создаём обработчики
+    // Создаём handler-ы
     load_handlers(cfg);
 
     return true;
@@ -306,49 +537,54 @@ bool IOController::load_config(CfgReader &cfg)
 
 void IOController::load_handlers(CfgReader &cfg)
 {
-    auto secNode = cfg.getFirstSection("Control");
+    // Определяем, какие handler-ы нужны, по типам в конфиге
+    bool need_toggle = false;
+    bool need_switcher = false;
 
+    auto secNode = cfg.getFirstSection("Control");
     while (!secNode.isNull())
     {
         QString type = "";
         cfg.getString(secNode, "Type", type);
-
-        ControlHandler* handler = nullptr;
-
-        if (type == "Toggle" || type == "Button")
-        {
-            handler = new ToggleHandler(this);
-        }
-        else if (type == "Switcher")
-        {
-            // Подключаемся к сигналу
-            SwitcherHandler* sw = new SwitcherHandler(this);
-            handler = sw;
-        }
-
-        if (handler)
-        {
-            handler->loadConfig(cfg, cabs_num);
-            handler->setAnimationSignalsMap(animation_signals_map);
-            handler->setFeedbackSignals(feedback_signals);
-
-            connect(handler, &ControlHandler::sigSendControlCommand,
-                    this, &IOController::sigSendVehicleControlCommand);
-
-            handlers.push_back(handler);
-        }
-
+        if (type == "Toggle" || type == "Button") need_toggle = true;
+        if (type == "Switcher") need_switcher = true;
         secNode = cfg.getNextSection();
+    }
+
+    // Создаём handler-ы и даём им доступ к DualKeyHash
+    if (need_toggle)
+    {
+        ToggleHandler* toggle = new ToggleHandler(this);
+        toggle->setControlInputs(&io_control_inputs);
+        toggle->setAnimationSignalsMap(animation_signals_map);
+        toggle->setFeedbackSignals(feedback_signals);
+        connect(toggle, &ControlHandler::sigSendControlCommand,
+                this, &IOController::sigSendVehicleControlCommand);
+        handlers.push_back(toggle);
+    }
+
+    if (need_switcher)
+    {
+        SwitcherHandler* sw = new SwitcherHandler(this);
+        sw->loadConfig(cfg, cabs_num); // загружает расширенные поля
+        sw->setControlInputs(&io_control_inputs);
+        sw->setAnimationSignalsMap(animation_signals_map);
+        sw->setFeedbackSignals(feedback_signals);
+        connect(sw, &ControlHandler::sigSendControlCommand,
+                this, &IOController::sigSendVehicleControlCommand);
+        handlers.push_back(sw);
     }
 }
 ```
 
-Остальные методы делегируют вызовы всем handler-ам:
+Делегирование вызовов handler-ам:
 
 ```cpp
 void IOController::processKeyBoardInput()
 {
-    // ... существующая фильтрация pressed_keys ...
+    // фильтрация pressed_keys (как сейчас)
+    std::set<uint16_t> pressed_keys;
+    /* ... */
 
     for (auto* handler : handlers)
         handler->processKeyInput(pressed_keys, cabine_idx, vehicle_idx);
@@ -356,10 +592,11 @@ void IOController::processKeyBoardInput()
     keysProcess(pressed_keys);
 }
 
-void IOController::mouseInputProcess(io_control_input_t input, uint32_t button, bool is_pressed)
+void IOController::mouseInputProcess(io_control_input_t input,
+                                     uint32_t button, bool is_pressed)
 {
     for (auto* handler : handlers)
-        handler→processMouseInput(input, button, is_pressed);
+        handler->processMouseInput(input, button, is_pressed);
 
     processMouseInput(input, button, is_pressed);
 }
@@ -367,27 +604,78 @@ void IOController::mouseInputProcess(io_control_input_t input, uint32_t button, 
 void IOController::step(float t, float dt)
 {
     for (auto* handler : handlers)
-        handler→step(dt);
+        handler->step(dt);
 }
 
-void IOController::setFeedbackSignals(const std::vector<float>* signals){
-    feedback_signals = sign als;
+void IOController::setFeedbackSignals(const std::vector<float>* signals)
+{
+    feedback_signals = signals;
     for (auto* handler : handlers)
-        handler→setFeedbackSignals(signals);
+        handler->setFeedbackSignals(signals);
 }
 ```
 
+## Миграция VL60IOController (Вариант 2)
+
+`VL60IOController` — наследник `IOController`, переопределяющий `keysProcess()`.
+При переходе на handler-ы меняет `processTumbler()` на `toggle_handler->processToggle()`:
+
+```cpp
+class VL60IOController : public IOController
+{
+    ToggleHandler* toggle_handler = nullptr;
+
+public:
+    VL60IOController()
+    {
+        // ToggleHandler будет создан в load_config(), получаем ссылку
+    }
+
+    void postInit()
+    {
+        // Находим ToggleHandler в списке handlers
+        for (auto* h : handlers)
+        {
+            toggle_handler = dynamic_cast<ToggleHandler*>(h);
+            if (toggle_handler) break;
+        }
+    }
+
+    void keysProcess(std::set<uint16_t> &pressed_keys) override
+    {
+        toggle_handler->processToggle(cabine_idx, CTRL_TUMBLER_PNT, pressed_keys);
+        toggle_handler->processToggle(cabine_idx, CTRL_TUMBLER_PNT1, pressed_keys);
+        toggle_handler->processToggle(cabine_idx, CTRL_TUMBLER_PNT2, pressed_keys);
+        toggle_handler->processToggle(cabine_idx, CTRL_MAIN_SWITCH_ON, pressed_keys);
+        toggle_handler->processButton(cabine_idx, CTRL_RETURN_PROTECTION, pressed_keys);
+        // ... все ID как сейчас
+    }
+};
+```
+
+Поведение идентично текущему:
+- Данные (keyCode, модификаторы, value) — в DualKeyHash, как и сейчас
+- `processToggle()` — та же логика, что и `processTumbler()`
+- `processButton()` — та же логика, что и `processButton()` в IOController
+- Сигнал отправляется handler-ом, IOController его пробрасывает дальше
+
 ## Преимущества
 
-- **Модульность** — каждый тип контрола в своём классе
-- **Расширяемость** — новый тип = новый наследник ControlHandler
-- **Безопасность** — существующая логика Toggle/Button не меняется при добавлении нового типа
-- **Тестируемость** — каждый handler можно тестировать изолированно
-- **Кастомные модули** — аддоны могут подгружать свои handler-ы через LOAD_MODULE
+| Аспект | Было | Стало |
+|---|---|---|
+| Данные | `io_control_inputs` + дублирование | Только `io_control_inputs` (DualKeyHash) |
+| Логика Toggle | в IOController | ToggleHandler |
+| Логика Switcher | в IOController | SwitcherHandler |
+| Расширение | править IOController | новый наследник ControlHandler |
+| Кастомный порядок | `keysProcess()` override | `toggle_handler->processToggle(id, ...)` |
 
-## Миграция
+## Миграция (этапы)
 
-1. Создать `ControlHandler` с общей логикой (`getSignalValueByName`, `sendControlSignal`, проверка модификаторов)
-2. Вынести Toggle/Button в `ToggleHandler` (логика из `processTumbler`, `processButton`, `mouseProcessTumbler`, `mouseProcessButton`)
-3. `SwitcherHandler` уже наследует `ControlHandler`
-4. IOController оперирует списком handler-ов
+1. **ControlHandler** — базовый класс с `setControlInputs()`, `getSignalValueByName()`,
+   `sendControlSignal()`, `getKeyState()`, `isKeyModifier()`
+2. **ToggleHandler** — логика Toggle/Button, работает через `ctrl_inputs`
+3. **IOController** — `load_config()` заполняет DualKeyHash,
+   `load_handlers()` создаёт handler-ы, передаёт им указатель на DualKeyHash
+4. **IOController** — делегирует `processKeyInput`, `processMouseInput`, `step` handler-ам
+5. **VL60IOController** — `keysProcess()` вызывает `toggle_handler->processToggle()`
+   вместо `processTumbler()`
