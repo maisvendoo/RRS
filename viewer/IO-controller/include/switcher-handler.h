@@ -29,6 +29,8 @@ private:
     uint16_t keyCodeDec = 0;
     QString  keyModDecName = "";
     uint16_t numPositions = 2;
+    float minValue = 0.0f;
+    float maxValue = 1.0f;
 
     int    hold_direction = 0;
     float  hold_time = 0.0f;

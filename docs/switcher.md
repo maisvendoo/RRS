@@ -35,6 +35,8 @@
     <KeyNameDec>KEY_O</KeyNameDec>
     <KeyModDecName>Ctrl</KeyModDecName>
     <NumPositions>4</NumPositions>
+    <MinValue>0.0</MinValue>
+    <MaxValue>1.0</MaxValue>
     <ObjectNameCab1>Crane_Selector</ObjectNameCab1>
     <ObjectNameCab2>Crane_Selector</ObjectNameCab2>
 </Control>
@@ -51,6 +53,8 @@
 | `KeyNameDec` | Клавиша уменьшения позиции |
 | `KeyModDecName` | Модификатор уменьшения (опционально) |
 | `NumPositions` | Количество позиций (>= 2) |
+| `MinValue` | Минимальное значение (по умолч. 0.0) |
+| `MaxValue` | Максимальное значение (по умолч. 1.0) |
 | `ObjectNameCab{1,2}` | Имя 3D-объекта для мышиного ввода |
 
 Модификаторы опциональны — если поле пустое, клавиша срабатывает без модификатора.
@@ -71,7 +75,9 @@ class SwitcherHandler : public ControlHandler
     QString  keyModIncName = "";      // модификатор INC
     uint16_t keyCodeDec = 0;          // клавиша DEC
     QString  keyModDecName = "";      // модификатор DEC
-    uint16_t numPositions = 2;        // число позиций
+    uint16_t numPositions = 2;
+    float minValue = 0.0f;
+    float maxValue = 1.0f;        // число позиций
 
     int    hold_direction = 0;         // направление автоповтора
     float  hold_time = 0.0f;           // таймер автоповтора
@@ -157,12 +163,13 @@ void SwitcherHandler::sendNextPosition(int direction)
     float cur = getSignalValue();
     if (feedback_signals == nullptr) cur = value;
 
-    float step = 1.0f / (numPositions - 1);
-    int idx = static_cast<int>(std::round(cur / step));
+    float range = maxValue - minValue;
+    float step = range / (numPositions - 1);
+    int idx = static_cast<int>(std::round((cur - minValue) / step));
     int new_idx = std::clamp(idx + direction, 0, numPositions - 1);
     if (new_idx == idx) return;
 
-    value = static_cast<float>(new_idx) * step;
+    value = minValue + static_cast<float>(new_idx) * step;
     sendControlSignal();
 }
 ```

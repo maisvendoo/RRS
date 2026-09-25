@@ -34,6 +34,9 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
     cfg.getInt(secNode, "NumPositions", np);
     numPositions = static_cast<uint16_t>(std::max(np, 2));
 
+    cfg.getDouble(secNode, "MinValue", minValue);
+    cfg.getDouble(secNode, "MaxValue", maxValue);
+
     return true;
 }
 
@@ -116,12 +119,13 @@ void SwitcherHandler::sendNextPosition(int direction)
     float cur = getSignalValue();
     if (feedback_signals == nullptr) cur = value;
 
-    float step = 1.0f / static_cast<float>(numPositions - 1);
-    int idx = static_cast<int>(std::round(cur / step));
+    float range = maxValue - minValue;
+    float step = range / static_cast<float>(numPositions - 1);
+    int idx = static_cast<int>(std::round((cur - minValue) / step));
     int new_idx = std::clamp(idx + direction, 0,
                              static_cast<int>(numPositions) - 1);
     if (new_idx == idx) return;
 
-    value = static_cast<float>(new_idx) * step;
+    value = minValue + static_cast<float>(new_idx) * step;
     sendControlSignal();
 }
