@@ -118,6 +118,9 @@ bool IOController::load_config(CfgReader &cfg)
             ctrl_handler->contolledObjectName = object_name;
             ctrl_handler->value = value1;
             ctrl_handlers.insert(ctrl_handler->id, object_name, ctrl_handler);
+
+            connect(ctrl_handler, &ControlHandler::sigSendControlCommand,
+                    this, &IOController::sigSendVehicleControlCommand);
         }
 
         if (!object_name_cab1.isEmpty() && cabs_num > 0)
@@ -127,6 +130,9 @@ bool IOController::load_config(CfgReader &cfg)
             ctrl_handler->contolledObjectName = object_name_cab1;
             ctrl_handler->value = value1;
             control_handlers[0].insert(ctrl_handler->id, object_name_cab1, ctrl_handler);
+
+            connect(ctrl_handler, &ControlHandler::sigSendControlCommand,
+                    this, &IOController::sigSendVehicleControlCommand);
         }
 
         if (!object_name_cab2.isEmpty() && cabs_num > 1)
@@ -136,6 +142,9 @@ bool IOController::load_config(CfgReader &cfg)
             ctrl_handler->contolledObjectName = object_name_cab2;
             ctrl_handler->value = value2;
             control_handlers[1].insert(ctrl_handler->id, object_name_cab2, ctrl_handler);
+
+            connect(ctrl_handler, &ControlHandler::sigSendControlCommand,
+                    this, &IOController::sigSendVehicleControlCommand);
         }
 
         secNode = cfg.getNextSection();
