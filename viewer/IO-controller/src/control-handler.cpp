@@ -82,23 +82,16 @@ bool ControlHandler::isKeyModifier(const std::set<uint16_t> &keys,
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ControlHandler::sendControlSignal(int vehicle_idx,
-                                       int cab_idx,
-                                       uint16_t id,
-                                       float value)
+void ControlHandler::sendControlSignal(const io_control_input_t &input)
 {
-    auto current = (*ctrl_inputs)[cab_idx].getByKey1(id);
+    /*auto current = (*ctrl_inputs)[input.cabine_idx].getByKey1(input.id);
+
     if (current)
     {
-        current->value = value;
-        (*ctrl_inputs)[cab_idx].updateByKey1(id, *current);
-    }
+        current->value = input.value;
+        (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, *current);
+    }*/
 
-    io_control_input_t out;
-    out.controlled_vehicle_idx = vehicle_idx;
-    out.cabine_idx = cab_idx;
-    out.id = id;
-    out.value = value;
-
-    emit sigSendControlCommand(out.serialize());
+    (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, input);
+    emit sigSendControlCommand(input.serialize());
 }

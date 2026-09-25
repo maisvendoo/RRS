@@ -87,9 +87,9 @@ protected:
     /// Обработка мышки на контроле типа "кнопка"
     void mouseProcessButton(io_control_input_t input, uint32_t button, bool is_pressed);
 
-    std::vector<ControlHandler*> handlers;
+    QMap<uint16_t, ControlHandler*> handlers;
 
-    void load_handlers();
+    void create_handlers();
 
 private:
 

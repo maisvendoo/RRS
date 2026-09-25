@@ -78,7 +78,7 @@ protected:
 
     bool isKeyModifier(const std::set<uint16_t>& keys, const QString& modName);
 
-    void sendControlSignal(int vehicle_idx, int cab_idx, uint16_t id, float value);
+    void sendControlSignal(const io_control_input_t &input);
 };
 
 #endif

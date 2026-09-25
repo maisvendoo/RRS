@@ -1,9 +1,9 @@
-#include    <toggle-handler.h>
+#include    <button-handler.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ToggleHandler::ToggleHandler(QObject *parent) : ControlHandler(parent)
+ButtonHandler::ButtonHandler(QObject *parent) : ControlHandler(parent)
 {
 
 }
@@ -11,7 +11,7 @@ ToggleHandler::ToggleHandler(QObject *parent) : ControlHandler(parent)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ToggleHandler::processKeyInput(const std::set<uint16_t> &pressed_keys,
+void ButtonHandler::processKeyInput(const std::set<uint16_t> &pressed_keys,
                                     int cabine_idx,
                                     int vehicle_idx)
 {
@@ -24,37 +24,25 @@ void ToggleHandler::processKeyInput(const std::set<uint16_t> &pressed_keys,
     {
         if (getKeyState(pressed_keys, input.keyCode))
         {
-            if (input.keyModOnName == input.keyModOffName)
-            {
-                if (isKeyModifier(pressed_keys, input.keyModOnName))
-                {
-                    input.value = 1.0f - input.value;
-                    sendControlSignal(input);
-                    return;
-                }
-            }
-
-            if (isKeyModifier(pressed_keys, input.keyModOnName))
+            if (isKeyModifier(pressed_keys, input.keyModOnName) ||
+                input.keyModOnName.isEmpty())
             {
                 input.value = 1.0f;
-                sendControlSignal(input);
-                return;
-            }
-
-            if (isKeyModifier(pressed_keys, input.keyModOffName))
-            {
-                input.value = 0.0f;
-                sendControlSignal(input);
-                return;
             }
         }
+        else
+        {
+            input.value = 0.0f;
+        }
+
+        sendControlSignal(input);
     }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ToggleHandler::processMouseInput(const io_control_input_t &input,
+void ButtonHandler::processMouseInput(const io_control_input_t &input,
                                       uint32_t button,
                                       bool is_pressed)
 {
@@ -66,20 +54,15 @@ void ToggleHandler::processMouseInput(const io_control_input_t &input,
     auto io_ctrl = (*ctrl_inputs)[input.cabine_idx].getByKey1(input.id);
     if (!io_ctrl) return;
 
-
-    if (button == IO_CTRL_LEFT_MOUSE_BUTTON && !input.toBool())
+    if (is_pressed && button == IO_CTRL_LEFT_MOUSE_BUTTON)
     {
         io_ctrl->value = 1.0f;
         sendControlSignal(io_ctrl.value());
-        return;
     }
-
-    if (button == IO_CTRL_RIGHT_MOUSE_BUTTON && input.toBool())
+    else if (!is_pressed && button == IO_CTRL_LEFT_MOUSE_BUTTON)
     {
         io_ctrl->value = 0.0f;
         sendControlSignal(io_ctrl.value());
-        return;
     }
 }
-
 

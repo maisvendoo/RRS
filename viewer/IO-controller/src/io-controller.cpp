@@ -4,6 +4,7 @@
 #include    <filesystem.h>
 
 #include    <toggle-handler.h>
+#include    <button-handler.h>
 
 //------------------------------------------------------------------------------
 //
@@ -173,7 +174,7 @@ bool IOController::load_config(CfgReader &cfg)
         secNode = cfg.getNextSection();
     }
 
-    load_handlers();
+    create_handlers();
 
     return true;
 }
@@ -301,13 +302,13 @@ bool IOController::findControl(const std::string &node_name, io_control_input_t 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void IOController::load_handlers()
+void IOController::create_handlers()
 {
     for (const auto& io_ctrl : io_control_inputs)
     {
         for (const auto & [id, name, input] : io_ctrl.getAll())
         {
-            if (input.type == "Toggle" || input.type == "Button")
+            if (input.type == "Toggle")
             {
                 ToggleHandler *toggle = new ToggleHandler();
                 toggle->setControlInputs(&io_control_inputs);
@@ -316,7 +317,19 @@ void IOController::load_handlers()
                 connect(toggle, &ControlHandler::sigSendControlCommand,
                         this, &IOController::sigSendVehicleControlCommand);
 
-                handlers.push_back(toggle);
+                handlers.insert(id, toggle);
+            }
+
+            if (input.type == "Button")
+            {
+                ButtonHandler *button = new ButtonHandler();
+                button->setControlInputs(&io_control_inputs);
+                button->setAnimationSignalsMap(&animation_signals_map);
+
+                connect(button, &ControlHandler::sigSendControlCommand,
+                        this, &IOController::sigSendVehicleControlCommand);
+
+                handlers.insert(id, button);
             }
         }
     }
