@@ -107,10 +107,41 @@ void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void SwitcherHandler::doSpringReturn()
+{
+    if (springReturnLow < 0 && springReturnHigh < 0) return;
+
+    int idx = currentIndex();
+
+    if (springReturnLow >= 0 && idx == springReturnLow && !spring_low_triggered)
+    {
+        spring_low_triggered = true;
+        float range = maxValue - minValue;
+        float step = range / static_cast<float>(numPositions - 1);
+        value = minValue + static_cast<float>(springReturnLow + 1) * step;
+        sendControlSignal();
+        return;
+    }
+
+    if (springReturnHigh >= 0 && idx == springReturnHigh && !spring_high_triggered)
+    {
+        spring_high_triggered = true;
+        float range = maxValue - minValue;
+        float step = range / static_cast<float>(numPositions - 1);
+        value = minValue + static_cast<float>(springReturnHigh - 1) * step;
+        sendControlSignal();
+        return;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void SwitcherHandler::processMouseInput(uint32_t button, bool is_pressed)
 {
     if (!is_pressed)
     {
+        doSpringReturn();
         hold_direction = 0;
         hold_time = 0.0f;
         spring_low_triggered = false;
@@ -137,7 +168,7 @@ void SwitcherHandler::step(float t, float dt)
 {
     (void) t;
 
-    // Автоповтор при удержании клавиши
+    // Автоповтор при удержании
     if (hold_direction != 0)
     {
         hold_time += dt;
@@ -146,30 +177,32 @@ void SwitcherHandler::step(float t, float dt)
             hold_time -= REPEAT_INTERVAL;
             sendNextPosition(hold_direction);
         }
-        // без return — проверяем возврат ниже
-    }
-
-    // Пружинный возврат
-    int idx = currentIndex();
-
-    if (springReturnLow >= 0 && idx == springReturnLow && !spring_low_triggered)
-    {
-        spring_low_triggered = true;
-        float range = maxValue - minValue;
-        float step = range / static_cast<float>(numPositions - 1);
-        value = minValue + static_cast<float>(springReturnLow + 1) * step;
-        sendControlSignal();
         return;
     }
 
-    if (springReturnHigh >= 0 && idx == springReturnHigh && !spring_high_triggered)
+    // Пружинный возврат при hold_direction == 0
+    if (springReturnLow >= 0)
     {
-        spring_high_triggered = true;
-        float range = maxValue - minValue;
-        float step = range / static_cast<float>(numPositions - 1);
-        value = minValue + static_cast<float>(springReturnHigh - 1) * step;
-        sendControlSignal();
-        return;
+        int idx = currentIndex();
+        if (idx == springReturnLow && !spring_low_triggered)
+        {
+            spring_low_triggered = true;
+            value = minValue + static_cast<float>(springReturnLow + 1) * (maxValue - minValue) / (numPositions - 1);
+            sendControlSignal();
+            return;
+        }
+    }
+
+    if (springReturnHigh >= 0)
+    {
+        int idx = currentIndex();
+        if (idx == springReturnHigh && !spring_high_triggered)
+        {
+            spring_high_triggered = true;
+            value = minValue + static_cast<float>(springReturnHigh - 1) * (maxValue - minValue) / (numPositions - 1);
+            sendControlSignal();
+            return;
+        }
     }
 }
 

@@ -44,6 +44,7 @@ private:
 
     int currentIndex() const;
     void sendNextPosition(int direction);
+    void doSpringReturn();
 };
 
 #endif
