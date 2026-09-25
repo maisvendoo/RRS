@@ -43,7 +43,6 @@ void ToggleHandler::processMouseInput(const io_control_input_t &input,
         if (button == IO_CTRL_LEFT_MOUSE_BUTTON && !input.toBool())
         {
             io_ctrl->value = 1.0f;
-            (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
             sendControlSignal(io_ctrl->controlled_vehicle_idx,
                               input.cabine_idx, input.id, io_ctrl->value);
         }
@@ -51,7 +50,6 @@ void ToggleHandler::processMouseInput(const io_control_input_t &input,
         if (button == IO_CTRL_RIGHT_MOUSE_BUTTON && input.toBool())
         {
             io_ctrl->value = 0.0f;
-            (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
             sendControlSignal(io_ctrl->controlled_vehicle_idx,
                               input.cabine_idx, input.id, io_ctrl->value);
         }
@@ -61,14 +59,12 @@ void ToggleHandler::processMouseInput(const io_control_input_t &input,
         if (is_pressed && button == IO_CTRL_LEFT_MOUSE_BUTTON)
         {
             io_ctrl->value = 1.0f;
-            (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
             sendControlSignal(io_ctrl->controlled_vehicle_idx,
                               input.cabine_idx, input.id, io_ctrl->value);
         }
         else if (!is_pressed && button == IO_CTRL_LEFT_MOUSE_BUTTON)
         {
             io_ctrl->value = 0.0f;
-            (*ctrl_inputs)[input.cabine_idx].updateByKey1(input.id, io_ctrl.value());
             sendControlSignal(io_ctrl->controlled_vehicle_idx,
                               input.cabine_idx, input.id, io_ctrl->value);
         }

@@ -1,5 +1,4 @@
 #include    <control-handler.h>
-#include    <io-controller-keymap.h>
 #include    <CfgReader.h>
 
 //------------------------------------------------------------------------------
@@ -54,19 +53,6 @@ float ControlHandler::getSignalValueByID(uint16_t control_id, int cab_idx) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool ControlHandler::getKeyState(const std::set<uint16_t> &keys, uint16_t key)
-{
-    if (key == 0 || key == KEY_Undefined)
-    {
-        return false;
-    }
-
-    return keys.find(key) != keys.end();
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 bool ControlHandler::isKeyModifier(const std::set<uint16_t> &keys,
                                    const QString &modName)
 {
@@ -101,12 +87,18 @@ void ControlHandler::sendControlSignal(int vehicle_idx,
                                        uint16_t id,
                                        float value)
 {
+    auto current = (*ctrl_inputs)[cab_idx].getByKey1(id);
+    if (current)
+    {
+        current->value = value;
+        (*ctrl_inputs)[cab_idx].updateByKey1(id, *current);
+    }
+
     io_control_input_t out;
     out.controlled_vehicle_idx = vehicle_idx;
     out.cabine_idx = cab_idx;
     out.id = id;
     out.value = value;
 
-    (*ctrl_inputs)[cab_idx].updateByKey1(id, out);
     emit sigSendControlCommand(out.serialize());
 }

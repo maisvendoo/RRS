@@ -7,6 +7,7 @@
 
 #include    <dual-key-hash.h>
 #include    <io-controller-input.h>
+#include    <io-controller-keymap.h>
 
 class CfgReader;
 
@@ -73,7 +74,7 @@ protected:
     /// Получить текущее значение сигнала по ID контрола
     float getSignalValueByID(uint16_t control_id, int cab_idx) const;
 
-    bool getKeyState(const std::set<uint16_t>& keys, uint16_t key);
+    //bool getKeyState(const std::set<uint16_t>& keys, uint16_t key);
 
     bool isKeyModifier(const std::set<uint16_t>& keys, const QString& modName);
 
