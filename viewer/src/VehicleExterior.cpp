@@ -425,6 +425,9 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
                 // Строим карту анимационных сигналов по их конфигам,
                 // не дожидаясь загрузки анимаций при рендеренге
                 io_controller->create_animations_map(animations_dirs);
+                // Выполняем инициализацию
+                io_controller->init();
+
                 LOG_INFO("IOController config %s is loaded successfully", module_config_path.c_str());
             }
         }

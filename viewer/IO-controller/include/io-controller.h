@@ -39,6 +39,9 @@ public:
     /// Создать карту анимаций
     void create_animations_map(const QStringList &anim_dirs);
 
+    /// Инициализация
+    virtual void init() {}
+
     /// Установить индекс управляемой ПЕ
     void setVehicleIndex(int vehicle_idx);
 
