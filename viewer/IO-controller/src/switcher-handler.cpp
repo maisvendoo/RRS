@@ -54,12 +54,9 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
 //------------------------------------------------------------------------------
 int SwitcherHandler::currentIndex() const
 {
-    float cur = getSignalValue();
-    if (feedback_signals == nullptr) cur = value;
-
     float range = maxValue - minValue;
     float step = range / static_cast<float>(numPositions - 1);
-    return static_cast<int>(std::round((cur - minValue) / step));
+    return static_cast<int>(std::round((value - minValue) / step));
 }
 
 //------------------------------------------------------------------------------
