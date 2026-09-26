@@ -408,7 +408,21 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx,
                 {
                     if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())
                     {
-                        vehicle->control_inputs[cab_idx][id] = value;
+                        // Если приоритет пришедшего сигнала
+                        // менее привелигированый - выходим ничего не меняя
+                        if (prioriry > vehicle->control_inputs[cab_idx][id].server_priority)
+                        {
+                            return;
+                        }
+
+                        // Если приоритет пришедшего сигнала
+                        // более привелигированый - перехват управления
+                        if (prioriry < vehicle->control_inputs[cab_idx][id].server_priority)
+                        {
+                            vehicle->control_inputs[cab_idx][id].server_priority = static_cast<ControlPriority>(prioriry);
+                        }
+
+                        vehicle->control_inputs[cab_idx][id].value = value;
                     }
                 }
             }

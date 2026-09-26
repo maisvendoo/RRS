@@ -1097,7 +1097,7 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
 
     for (int i = 0; i < cabs_num + 1; ++i)
     {
-        QMap<int, float> inputs;
+        QMap<int, vehicle_control_signal_t> inputs;
         control_inputs.push_back(inputs);
     }
 
@@ -1125,18 +1125,24 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
 
         if (!object_name.isEmpty())
         {
+            vehicle_control_signal_t input;
+            input.value = value1;
             auto &inputs = *(control_inputs.end() - 1);
-            inputs.insert(id, value1);
+            inputs.insert(id, input);
         }
 
         if (!object_name_cab1.isEmpty() && cabs_num > 0)
         {
-            control_inputs[0].insert(id, value1);
+            vehicle_control_signal_t input;
+            input.value = value1;
+            control_inputs[0].insert(id, input);
         }
 
         if (!object_name_cab2.isEmpty() && cabs_num > 1)
         {
-            control_inputs[1].insert(id, value2);
+            vehicle_control_signal_t input;
+            input.value = value2;
+            control_inputs[1].insert(id, input);
         }
 
         secNode = cfg.getNextSection();

@@ -32,6 +32,8 @@
 
 #include    <autopilot.h>
 
+#include    <vehicle-control-signal.h>
+
 #if defined(VEHICLE_LIB)
     #define VEHICLE_EXPORT  Q_DECL_EXPORT
 #else
@@ -208,7 +210,7 @@ public:
         auto_start_autopilot = false;
     }
 
-    std::vector<QMap<int, float>> control_inputs;
+    std::vector<QMap<int, vehicle_control_signal_t>> control_inputs;
 
 signals:
 
