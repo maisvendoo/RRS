@@ -69,4 +69,14 @@ QString ToggleHandler::getUsage() const
     return QString("Вкл.: ЛКМ | Выкл.: ПКМ");
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString ToggleHandler::getState() const
+{
+    bool state = static_cast<bool>(getSignalValue());
+
+    return state ? QString("ВКЛ") : QString("ВЫКЛ");
+}
+
 

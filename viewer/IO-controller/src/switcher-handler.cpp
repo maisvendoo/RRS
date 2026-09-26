@@ -51,6 +51,10 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
     springReturnLow = srl;
     springReturnHigh = srh;
 
+    QString tmp = "";
+    cfg.getString(secNode, "PositionsNames", tmp);
+    positionNames = tmp.split(',');
+
     return true;
 }
 
@@ -226,4 +230,19 @@ void SwitcherHandler::step(float t, float dt)
 QString SwitcherHandler::getUsage() const
 {
     return QString("ЛКМ — вперёд | ПКМ — назад");
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString SwitcherHandler::getState() const
+{
+    int idx = static_cast<int>(getSignalValue());
+
+    if (positionNames.empty() || idx >= positionNames.size())
+    {
+        return QString("%1").arg(idx, 2);
+    }
+
+    return positionNames[idx];
 }

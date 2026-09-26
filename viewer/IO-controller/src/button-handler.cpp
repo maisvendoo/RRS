@@ -55,3 +55,14 @@ QString ButtonHandler::getUsage() const
     return QString("Нажать: ЛКМ | Отпустить: ЛКМ");
 }
 
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString ButtonHandler::getState() const
+{
+    bool state = static_cast<bool>(getSignalValue());
+
+    return state ? QString("Нажато") : QString("Отпущено");
+}
+

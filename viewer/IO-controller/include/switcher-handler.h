@@ -29,12 +29,15 @@ public:
 
     QString getUsage() const override;
 
-private:
+    QString getState() const override;
 
     uint16_t keyCodeInc = 0;          // клавиша увеличения позиции
     QString  keyModIncName = "";      // модификатор увеличения (опционально)
     uint16_t keyCodeDec = 0;          // клавиша уменьшения позиции
     QString  keyModDecName = "";      // модификатор уменьшения (опционально)
+
+private:
+
     uint16_t numPositions = 2;        // количество позиций
     float minValue = 0.0f;            // минимальное значение сигнала
     float maxValue = 1.0f;            // максимальное значение сигнала
@@ -47,6 +50,9 @@ private:
     float  hold_time = 0.0f;          // время удержания для автоповтора
     bool   spring_low_triggered = false;   // флаг: возврат с нижней уже был
     bool   spring_high_triggered = false;  // флаг: возврат с верхней уже был
+
+    /// Имена позиций, для отображения в статусе
+    QStringList positionNames;
 
     static constexpr float HOLD_DELAY      = 0.3f;   // задержка перед автоповтором
     static constexpr float REPEAT_INTERVAL = 0.1f;   // интервал автоповтора

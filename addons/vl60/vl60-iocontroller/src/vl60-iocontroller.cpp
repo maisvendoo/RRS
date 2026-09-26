@@ -4,6 +4,7 @@
 #include    <core/get_module.h>
 
 #include    <km-state.h>
+#include    <switcher-handler.h>
 
 //------------------------------------------------------------------------------
 //
@@ -53,7 +54,18 @@ void VL60IOController::step(float t, float dt, const std::vector<float> *server_
 //------------------------------------------------------------------------------
 void VL60IOController::processKeyboardInput(std::set<uint16_t> &pressed_keys)
 {
+    for (auto cab_idx : {CAB1, CAB2})
+    {
+        SwitcherHandler * sw = dynamic_cast<SwitcherHandler *>(main_handle[cab_idx]);
 
+        auto keyCode = sw->keyCodeDec;
+
+        if (getKeyState(pressed_keys, keyCode) && isControl(pressed_keys))
+        {
+            main_handle[cab_idx]->value = POS_ZERO;
+            main_handle[cab_idx]->sendControlSignal();
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

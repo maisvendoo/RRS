@@ -17,6 +17,8 @@ public:
     void processMouseInput(uint32_t button, bool is_pressed) override;
 
     QString getUsage() const override;
+
+    QString getState() const override;
 };
 
 #endif

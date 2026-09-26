@@ -18,6 +18,8 @@ public:
 
     QString getUsage() const override;
 
+    QString getState() const override;
+
 private:
 
     void processTumbler(size_t cab_idx, uint16_t control_id,

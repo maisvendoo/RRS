@@ -432,6 +432,7 @@
 		<NumPositions>6</NumPositions>
 		<MinValue>0.0</MinValue>
 		<MaxValue>5.0</MaxValue>
+		<PositionsNames>Назад (ПП),0,Вперед (ПП),ОП1,ОП2,ОП3</PositionsNames>
 		<ObjectNameCab1>Cab1_revers_axis</ObjectNameCab1>
 		<ObjectNameCab2>Cab2_revers_axis</ObjectNameCab2>
 	</Control>
@@ -449,6 +450,7 @@
 		<NumPositions>8</NumPositions>
 		<MinValue>0.0</MinValue>
 		<MaxValue>7.0</MaxValue>
+		<PositionsNames>БВ,0,АВ,РВ,ФВ,ФП,РП,АП</PositionsNames>
 		<SpringReturnLow>0</SpringReturnLow>
 		<SpringReturnHigh>7</SpringReturnHigh>
 		<ObjectNameCab1>Cab1_Kontroller</ObjectNameCab1>

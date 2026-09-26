@@ -99,6 +99,12 @@ public:
         return QString();
     }
 
+    /// Строка статуса контрола
+    virtual QString getState() const
+    {
+        return QString();
+    }
+
     bool toBool() const
     {
         return static_cast<bool>(value);
