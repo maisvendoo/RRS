@@ -65,6 +65,20 @@ void ControllerKME_60_044::insertReversHandle(bool insert)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void ControllerKME_60_044::insertReversHandle(float &insertion_signal)
+{
+    if (!is_reverse_handle_allowed)
+    {
+        insertion_signal = 0.0f;
+        return;
+    }
+
+    insertReversHandle(static_cast<bool>(insertion_signal));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool ControllerKME_60_044::isReversHandle() const
 {
     return is_revers_handle.getState();
@@ -100,6 +114,14 @@ void ControllerKME_60_044::setReversHandlePos(int pos)
 
     revers_pos = pos;
     sounds[REVERS_CHANGE_POS_SOUND].play();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ControllerKME_60_044::setReversHandlePos(float &pos_signal)
+{
+
 }
 
 //------------------------------------------------------------------------------

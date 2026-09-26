@@ -25,11 +25,15 @@ public:
     /// Вставить/извлечь реверсивную рукоятку
     void insertReversHandle(bool insert);
 
+    void insertReversHandle(float &insertion_signal);
+
     /// Признак вставленной реверсивной рукоятки
     bool isReversHandle() const;
 
     /// Задать положение реверсивной рукоятки
     void setReversHandlePos(int pos);
+
+    void setReversHandlePos(float &pos_signal);
 
     /// Положение реверсивной рукоятки
     float getReversHandlePos() const;

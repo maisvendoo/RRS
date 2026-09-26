@@ -83,8 +83,7 @@ void VL60pk::stepControls(const double &t, const double &dt)
         bool is_epb = static_cast<bool>(control_inputs[cab_idx][CTRL_TUMBLER_EPB]);
         is_epb ? epb_switch[cab_idx].set() : epb_switch[cab_idx].reset();
 
-        bool is_revers_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_REVERS_INSERTION]);
-        controller[cab_idx]->insertReversHandle(is_revers_insert);
+        controller[cab_idx]->insertReversHandle(control_inputs[cab_idx][CTRL_REVERS_INSERTION]);
 
         bool is_epk_insert = static_cast<bool>(control_inputs[cab_idx][CTRL_EPK_INSERTION]);
         epk[cab_idx]->insertKey(is_epk_insert);
@@ -97,11 +96,11 @@ void VL60pk::stepControls(const double &t, const double &dt)
         brake_lock[cab_idx]->insertLockHandle(is_lock367_insert);
 
         float revers_val = control_inputs[cab_idx][CTRL_REVERS_POSITION];
-        int revers_pos = static_cast<int>(std::round(revers_val * 5.0f));
+        int revers_pos = static_cast<int>(std::round(revers_val));
         controller[cab_idx]->setReversHandlePos(revers_pos);
 
         float km_val = control_inputs[cab_idx][CTRL_KM_MAIN_POSITION];
-        int km_pos = static_cast<int>(std::round(km_val * 7.0f));
+        int km_pos = static_cast<int>(std::round(km_val));
         controller[cab_idx]->setMainHandlePos(km_pos);
     }
 }
