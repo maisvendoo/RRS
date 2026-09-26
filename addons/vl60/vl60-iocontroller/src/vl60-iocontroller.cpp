@@ -18,6 +18,8 @@ VL60IOController::VL60IOController() : IOController(nullptr)
 //------------------------------------------------------------------------------
 void VL60IOController::init()
 {
+    IOController::init();
+
     // Получаем обработчки, связанные с контроллером машиниста
     for (auto cab_idx : {CAB1, CAB2})
     {
@@ -37,6 +39,8 @@ void VL60IOController::init()
 //------------------------------------------------------------------------------
 void VL60IOController::step(float t, float dt, const std::vector<float> *server_signals)
 {
+    IOController::step(t, dt, server_signals);
+
     for (auto cab_idx : {CAB1, CAB2})
     {
         // Обнуляем положение реверса, если нет реверсивки
