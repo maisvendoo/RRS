@@ -26,6 +26,11 @@
 //------------------------------------------------------------------------------
 void VehicleExterior::step(float t, float dt)
 {
+    if (io_controller != nullptr)
+    {
+        io_controller->step(t, dt);
+    }
+
     for (const auto& animated_pagedLOD : animated_nodes)
     {
         if (animated_pagedLOD->children[0].node)

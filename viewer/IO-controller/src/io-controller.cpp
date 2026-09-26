@@ -42,6 +42,20 @@ void IOController::setReleasedKey(uint16_t keyBase)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void IOController::step(float t, float dt)
+{
+    for (auto &ctrl_handlers : control_handlers)
+    {
+        for (const auto &[id, name, handler] : ctrl_handlers.getAll())
+        {
+            handler->step(t, dt);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::step(float t, float dt, const std::vector<float> *server_signals)
 {
     if (server_signals == nullptr)

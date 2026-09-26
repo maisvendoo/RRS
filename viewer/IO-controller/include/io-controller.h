@@ -33,6 +33,9 @@ public:
     /// Шаг контролов
     virtual void step(float t, float dt, const std::vector<float> *server_signals);
 
+    /// Шаг контролов без сигналов (автоповтор, spring return)
+    void step(float t, float dt);
+
     /// Загрузить конфиг
     virtual bool load_config(CfgReader &cfg);
 
