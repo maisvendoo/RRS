@@ -453,11 +453,21 @@
 		<PositionsNames>БВ,0,АВ,РВ,ФВ,ФП,РП,АП</PositionsNames>
 		<SpringReturnLow>0</SpringReturnLow>
 		<SpringReturnHigh>7</SpringReturnHigh>
+
+		<!-- Настройки сброса до заданной позиции -->
 		<ResetKey>KEY_D</ResetKey>
 		<ResetModkey>Ctrl</ResetModkey>
 		<PositionForReset>1</PositionForReset>
+
+		<!-- Тест установки заданной позиции по комбинации -->
+		<!--
+		<PositionModkey>Alt</PositionModkey>
+		<PositionKeys>KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7,KEY_8</PositionKeys>
+		-->
+		
 		<ObjectNameCab1>Cab1_Kontroller</ObjectNameCab1>
 		<ObjectNameCab2>Cab2_Kontroller</ObjectNameCab2>
+
 	</Control>
 
 </Config>

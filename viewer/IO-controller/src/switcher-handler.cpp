@@ -65,6 +65,28 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
     cfg.getDouble(secNode, "PositionForReset", reset_pos);
     posForReset = static_cast<float>(reset_pos);
 
+    cfg.getString(secNode, "PositionModkey", positionModkey);
+
+    cfg.getString(secNode, "PositionKeys", tmp);
+    QStringList pos_keys = tmp.split(',');
+
+    if (pos_keys.size() == numPositions)
+    {
+        for (int i = 0; i < pos_keys.size(); ++i)
+        {
+            pos_keys[i].remove(' ');
+
+            if (pos_keys[i] != "None")
+            {
+                posKeys.push_back(KeySymbolsRRSMap.value(pos_keys[i], KEY_Undefined));
+            }
+            else
+            {
+                posKeys.push_back(KEY_Undefined);
+            }
+        }
+    }
+
     return true;
 }
 
@@ -129,6 +151,27 @@ void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
             value = posForReset;
             sendControlSignal();
             return;
+        }
+    }
+
+    // Позиция по горячим клавишам
+    if (!positionModkey.isEmpty() && !posKeys.empty())
+    {
+        float range = maxValue - minValue;
+        float step = range / static_cast<float>(numPositions - 1);
+
+        float pos = minValue;
+
+        for (int i = 0; i < posKeys.size(); ++i)
+        {
+            if (getKeyState(pk, posKeys[i]) && isKeyModifier(pk, positionModkey))
+            {
+                value = pos;
+                sendControlSignal();
+                break;
+            }
+
+            pos += step;
         }
     }
 

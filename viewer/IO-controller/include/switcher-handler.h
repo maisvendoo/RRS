@@ -41,6 +41,8 @@ public:
     /// Сьросной модификатор
     QString resetModkey = "";
 
+    QString positionModkey = "";
+
 private:
 
     uint16_t numPositions = 2;        // количество позиций
@@ -61,6 +63,8 @@ private:
 
     /// Имена позиций, для отображения в статусе
     QStringList positionNames;
+
+    std::vector<uint16_t> posKeys;
 
     static constexpr float HOLD_DELAY      = 0.3f;   // задержка перед автоповтором
     static constexpr float REPEAT_INTERVAL = 0.1f;   // интервал автоповтора
