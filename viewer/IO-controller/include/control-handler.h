@@ -99,6 +99,16 @@ public:
         return QString();
     }
 
+    bool toBool() const
+    {
+        return static_cast<bool>(value);
+    }
+
+    int toInt() const
+    {
+        return static_cast<int>(value);
+    }
+
 signals:
 
     void sigSendControlCommand(const QByteArray &data);
@@ -138,12 +148,7 @@ protected:
         stream >> id;
         stream >> value;
         stream >> client_priority;
-    }
-
-    bool toBool() const
-    {
-        return static_cast<bool>(value);
-    }
+    }    
 };
 
 #endif
