@@ -55,6 +55,16 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
     cfg.getString(secNode, "PositionsNames", tmp);
     positionNames = tmp.split(',');
 
+    QString resetKeyName = "";
+    cfg.getString(secNode, "ResetKey", resetKeyName);
+    resetKey = KeySymbolsRRSMap.value(resetKeyName, KEY_Undefined);
+
+    cfg.getString(secNode, "ResetModkey", resetModkey);
+
+    double reset_pos = 0.0;
+    cfg.getDouble(secNode, "PositionForReset", reset_pos);
+    posForReset = static_cast<float>(reset_pos);
+
     return true;
 }
 
@@ -109,6 +119,17 @@ void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
         spring_low_triggered = false;
         spring_high_triggered = false;
         return;
+    }
+
+    // Сброс, если задана подобная настройка
+    if (resetKey != KEY_Undefined)
+    {
+        if (getKeyState(pk, resetKey) && isKeyModifier(pk, resetModkey))
+        {
+            value = posForReset;
+            sendControlSignal();
+            return;
+        }
     }
 
     // Ни одна клавиша не нажата — сбрасываем удержание

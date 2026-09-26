@@ -453,6 +453,9 @@
 		<PositionsNames>БВ,0,АВ,РВ,ФВ,ФП,РП,АП</PositionsNames>
 		<SpringReturnLow>0</SpringReturnLow>
 		<SpringReturnHigh>7</SpringReturnHigh>
+		<ResetKey>KEY_D</ResetKey>
+		<ResetModkey>Ctrl</ResetModkey>
+		<PositionForReset>1</PositionForReset>
 		<ObjectNameCab1>Cab1_Kontroller</ObjectNameCab1>
 		<ObjectNameCab2>Cab2_Kontroller</ObjectNameCab2>
 	</Control>

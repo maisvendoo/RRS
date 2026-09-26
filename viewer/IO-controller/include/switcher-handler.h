@@ -36,6 +36,11 @@ public:
     uint16_t keyCodeDec = 0;          // клавиша уменьшения позиции
     QString  keyModDecName = "";      // модификатор уменьшения (опционально)
 
+    /// Сбросная клавиша
+    uint16_t resetKey = 0;
+    /// Сьросной модификатор
+    QString resetModkey = "";
+
 private:
 
     uint16_t numPositions = 2;        // количество позиций
@@ -50,6 +55,9 @@ private:
     float  hold_time = 0.0f;          // время удержания для автоповтора
     bool   spring_low_triggered = false;   // флаг: возврат с нижней уже был
     bool   spring_high_triggered = false;  // флаг: возврат с верхней уже был
+
+    /// Позиция, до которой будет выполняться сброс
+    float posForReset = 0.0f;
 
     /// Имена позиций, для отображения в статусе
     QStringList positionNames;
