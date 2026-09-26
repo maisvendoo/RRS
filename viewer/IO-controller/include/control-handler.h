@@ -5,6 +5,7 @@
 
 #include    <set>
 
+#include    <control-priority.h>
 #include    <dual-key-hash.h>
 #include    <io-controller-keymap.h>
 #include    <io-controller-export.h>
@@ -30,6 +31,8 @@ class IO_CONTROLLER_EXPORT ControlHandler : public QObject
 
 public:
 
+    /// Приоритет
+    ControlPriority client_priority = CTRL_PRIORITY_FULL;
     /// Индекс управляемой ПЕ
     int controlled_vehicle_idx = -1;
     /// Индекс активной кабины управляемой ПЕ
@@ -121,6 +124,7 @@ protected:
         stream << cabine_idx;
         stream << id;
         stream << value;
+        stream << client_priority;
 
         return data;
     }
@@ -133,6 +137,7 @@ protected:
         stream >> cabine_idx;
         stream >> id;
         stream >> value;
+        stream >> client_priority;
     }
 
     bool toBool() const

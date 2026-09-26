@@ -336,7 +336,10 @@ void TcpServer::process_client_request(client_data_t &client_data)
         float value = 0.0f;
         stream >> value;
 
-        emit sigSetVehicleControlCommand(vehicle_idx, cab_idx, id, value);
+        std::int8_t prioriry = 0;
+        stream >> prioriry;
+
+        emit sigSetVehicleControlCommand(vehicle_idx, cab_idx, id, value, prioriry);
 
         break;
     }
