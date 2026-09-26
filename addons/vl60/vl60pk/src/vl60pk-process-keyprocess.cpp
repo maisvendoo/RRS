@@ -37,7 +37,7 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         // Управляем краном, учитывая возможное наличие внешнего пульта
         // TODO // перенести freejoy во вьювер, его команды передавать по сети,
         // TODO // и также указывая индекс кабины
-        if (control_signals.analogSignal[CS_BRAKE_CRANE].is_active)
+        /*if (control_signals.analogSignal[CS_BRAKE_CRANE].is_active)
         {
             int brake_crane_pos = static_cast<int>(control_signals.analogSignal[CS_BRAKE_CRANE].cur_value);
             brake_crane[cabine_idx]->setHandlePosition(brake_crane_pos);
@@ -70,7 +70,7 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         else
         {
             loco_crane[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
-        }
+        }*/
 
         // Тифон и свисток
         horn[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
