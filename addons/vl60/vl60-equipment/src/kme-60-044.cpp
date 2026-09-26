@@ -65,7 +65,7 @@ void ControllerKME_60_044::insertReversHandle(bool insert)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ControllerKME_60_044::insertReversHandle(float &insertion_signal)
+void ControllerKME_60_044::insertReversHandleSignal(float &insertion_signal)
 {
     if (!is_reverse_handle_allowed)
     {
@@ -119,9 +119,28 @@ void ControllerKME_60_044::setReversHandlePos(int pos)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ControllerKME_60_044::setReversHandlePos(float &pos_signal)
+void ControllerKME_60_044::setReversHandlePosSignal(float &pos_signal)
 {
+    int ref_pos = qRound(pos_signal);
 
+    // Если мы хотим переключить реверсивку внешним сигналом
+    // но этого сделать нельзя
+    if (main_pos != POS_ZERO)
+    {
+        if (revers_pos == REVERS_BACKWARD)
+        {
+            pos_signal = revers_pos;
+            return;
+        }
+
+        if ((revers_pos >= REVERS_FORWARD) && (ref_pos < REVERS_FORWARD))
+        {
+            pos_signal = revers_pos;
+            return;
+        }
+    }
+
+    setReversHandlePos(ref_pos);
 }
 
 //------------------------------------------------------------------------------
@@ -149,6 +168,20 @@ void ControllerKME_60_044::setMainHandlePos(int pos)
 
     main_pos = pos;
     sounds[MAIN_CHANGE_POS_SOUND].play();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ControllerKME_60_044::setMainHandlePosSignal(float &pos_signal)
+{
+    if (revers_pos == REVERS_ZERO)
+    {
+        pos_signal = POS_ZERO;
+        return;
+    }
+
+    setMainHandlePos(qRound(pos_signal));
 }
 
 //------------------------------------------------------------------------------
