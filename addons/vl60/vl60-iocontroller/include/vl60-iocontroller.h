@@ -34,6 +34,10 @@ private:
     ControlHandler *main_handle[CABS_NUM] = {nullptr, nullptr};
 
     void processKeyboardInput(std::set<uint16_t> &pressed_keys) override;
+
+    void lockReversHandle(int cab_idx);
+
+    void lockMainHandle(int cab_idx);
 };
 
 #endif

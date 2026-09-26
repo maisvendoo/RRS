@@ -43,17 +43,8 @@ void VL60IOController::step(float t, float dt, const std::vector<float> *server_
 
     for (auto cab_idx : {CAB1, CAB2})
     {
-        // Обнуляем положение реверса, если нет реверсивки
-        if (!revers_handle_holder[cab_idx]->toBool())
-        {
-            revers_handle[cab_idx]->value = REVERS_ZERO;
-        }
-
-        // Обнуляем положение главной рукоятки при нулевом положении реверса
-        if (revers_handle[cab_idx]->toInt() == REVERS_ZERO)
-        {
-            main_handle[cab_idx]->value = POS_ZERO;
-        }
+        lockReversHandle(cab_idx);
+        lockMainHandle(cab_idx);
     }
 }
 
@@ -63,6 +54,49 @@ void VL60IOController::step(float t, float dt, const std::vector<float> *server_
 void VL60IOController::processKeyboardInput(std::set<uint16_t> &pressed_keys)
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60IOController::lockReversHandle(int cab_idx)
+{
+    int main_pos = main_handle[cab_idx]->getSignalValue();
+    int revers_pos = revers_handle[cab_idx]->getSignalValue();
+
+    float ref_pos = revers_handle[cab_idx]->value;
+
+    if (main_pos != POS_ZERO)
+    {
+        if (revers_pos == REVERS_BACKWARD)
+        {
+            revers_handle[cab_idx]->value = revers_pos;
+            revers_handle[cab_idx]->sendControlSignal();
+            return;
+        }
+
+        if ((revers_pos >= REVERS_FORWARD) && (ref_pos < REVERS_FORWARD))
+        {
+            revers_handle[cab_idx]->value = revers_pos;
+            revers_handle[cab_idx]->sendControlSignal();
+            return;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VL60IOController::lockMainHandle(int cab_idx)
+{
+    int revers_pos = revers_handle[cab_idx]->getSignalValue();
+
+    if (revers_pos == REVERS_ZERO)
+    {
+        main_handle[cab_idx]->value = POS_ZERO;
+        main_handle[cab_idx]->sendControlSignal();
+        return;
+    }
 }
 
 //------------------------------------------------------------------------------

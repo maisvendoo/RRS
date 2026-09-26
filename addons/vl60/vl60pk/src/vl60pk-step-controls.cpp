@@ -84,9 +84,9 @@ void VL60pk::stepControls(const double &t, const double &dt)
         is_epb ? epb_switch[cab_idx].set() : epb_switch[cab_idx].reset();
 
         // Управление контроллером машиниста
-        controller[cab_idx]->insertReversHandleSignal(control_inputs[cab_idx][CTRL_REVERS_INSERTION].value);
-        controller[cab_idx]->setReversHandlePosSignal(control_inputs[cab_idx][CTRL_REVERS_POSITION].value);
-        controller[cab_idx]->setMainHandlePosSignal(control_inputs[cab_idx][CTRL_KM_MAIN_POSITION].value);
+        controller[cab_idx]->insertReversHandle(control_inputs[cab_idx][CTRL_REVERS_INSERTION].toBool());
+        controller[cab_idx]->setReversHandlePos(control_inputs[cab_idx][CTRL_REVERS_POSITION].value);
+        controller[cab_idx]->setMainHandlePos(control_inputs[cab_idx][CTRL_KM_MAIN_POSITION].value);
 
         // Управление ЭПК
         bool is_epk_insert = control_inputs[cab_idx][CTRL_EPK_INSERTION].toBool();

@@ -109,6 +109,8 @@ public:
         return static_cast<int>(value);
     }
 
+    void sendControlSignal();
+
 signals:
 
     void sigSendControlCommand(const QByteArray &data);
@@ -120,9 +122,7 @@ protected:
     const QMap<QString, uint16_t> *animation_signals_map = nullptr;    
 
     /// Проверка нажатого модификатора
-    bool isKeyModifier(const std::set<uint16_t>& keys, const QString& modName);
-
-    void sendControlSignal();
+    bool isKeyModifier(const std::set<uint16_t>& keys, const QString& modName);    
 
     QByteArray serialize() const
     {
