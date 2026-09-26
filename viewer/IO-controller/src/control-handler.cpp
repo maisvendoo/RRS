@@ -84,9 +84,11 @@ float ControlHandler::getSignalValue() const
 bool ControlHandler::isKeyModifier(const std::set<uint16_t> &keys,
                                    const QString &modName)
 {
+    // Имя модификатора пусто,
     if (modName.isEmpty())
     {
-        return true;
+        // ну ок, но тогда ни один не должен быть нажат при этой проверке!
+        return !isAnyModifier(keys);
     }
 
     if (modName == "Shift")
@@ -105,6 +107,14 @@ bool ControlHandler::isKeyModifier(const std::set<uint16_t> &keys,
     }
 
     return false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ControlHandler::isAnyModifier(const std::set<uint16_t> &keys) const
+{
+    return isShift(keys) || isControl(keys) || isAlt(keys);
 }
 
 //------------------------------------------------------------------------------

@@ -122,7 +122,10 @@ protected:
     const QMap<QString, uint16_t> *animation_signals_map = nullptr;    
 
     /// Проверка нажатого модификатора
-    bool isKeyModifier(const std::set<uint16_t>& keys, const QString& modName);    
+    bool isKeyModifier(const std::set<uint16_t>& keys, const QString& modName);
+
+    /// Проверка, а нажат ли какой-нибудь модификатор
+    bool isAnyModifier(const std::set<uint16_t> &keys) const;
 
     QByteArray serialize() const
     {
