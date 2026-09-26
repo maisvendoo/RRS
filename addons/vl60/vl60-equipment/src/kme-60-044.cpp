@@ -249,15 +249,17 @@ void ControllerKME_60_044::preStep(state_vector_t &Y, double t)
 
     state.field_loosen_pos = pf(revers_pos - 2);
 
-    if (main_pos < POS_ZERO)
+    /*if (main_pos < POS_ZERO)
         main_handle_pos = static_cast<float>(main_pos - 2) / 2.0f;
     else
-        main_handle_pos = static_cast<float>(main_pos - 2) / 5.0f;
+        main_handle_pos = static_cast<float>(main_pos - 2) / 5.0f;*/
 
-    if (revers_pos < 0)
+    /*if (revers_pos < 0)
         revers_handle_pos = static_cast<float>(revers_pos - 2);
     else
-        revers_handle_pos = static_cast<float>(revers_pos - 1) / 4.0f;
+        revers_handle_pos = static_cast<float>(revers_pos - 1) / 4.0f;*/
+    main_handle_pos = main_pos;
+    revers_handle_pos = revers_pos;
 }
 
 //------------------------------------------------------------------------------
