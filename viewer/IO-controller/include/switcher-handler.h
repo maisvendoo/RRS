@@ -1,7 +1,7 @@
 #ifndef     SWITCHER_HANDLER_H
 #define     SWITCHER_HANDLER_H
 
-#include    <control-handler.h>
+#include    <range-handler.h>
 
 //------------------------------------------------------------------------------
 // SwitcherHandler — многопозиционный переключатель.
@@ -13,7 +13,7 @@
 // SpringReturnLow / SpringReturnHigh — номера позиций, с которых делать
 // автоматический возврат при отпускании клавиши/кнопки.
 //------------------------------------------------------------------------------
-class SwitcherHandler : public ControlHandler
+class SwitcherHandler : public RangeHandler
 {
 public:
 
@@ -29,17 +29,7 @@ public:
 
     QString getUsage() const override;
 
-    QString getState() const override;
-
-    uint16_t keyCodeInc = 0;          // клавиша увеличения позиции
-    QString  keyModIncName = "";      // модификатор увеличения (опционально)
-    uint16_t keyCodeDec = 0;          // клавиша уменьшения позиции
-    QString  keyModDecName = "";      // модификатор уменьшения (опционально)
-
-    /// Сбросная клавиша
-    uint16_t resetKey = 0;
-    /// Сьросной модификатор
-    QString resetModkey = "";
+    QString getState() const override;    
 
     QString positionModkey = "";
 
@@ -60,16 +50,10 @@ private:
     bool   spring_low_triggered = false;   // флаг: возврат с нижней уже был
     bool   spring_high_triggered = false;  // флаг: возврат с верхней уже был
 
-    /// Позиция, до которой будет выполняться сброс
-    float posForReset = 0.0f;
-
     /// Имена позиций, для отображения в статусе
     QStringList positionNames;
 
-    std::vector<uint16_t> posKeys;
-
-    QString incButtonName = "LEFT_BUTTON";
-    QString decButtonName = "RIGHT_BUTTON";
+    std::vector<uint16_t> posKeys;    
 
     static constexpr float HOLD_DELAY      = 0.3f;   // задержка перед автоповтором
     static constexpr float REPEAT_INTERVAL = 0.1f;   // интервал автоповтора

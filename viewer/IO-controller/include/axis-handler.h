@@ -1,7 +1,7 @@
 #ifndef     AXIS_HANDLER_H
 #define     AXIS_HANDLER_H
 
-#include    <control-handler.h>
+#include    <range-handler.h>
 
 //------------------------------------------------------------------------------
 // AxisHandler — аналоговая ось. Не имеет фиксированных позиций.
@@ -11,7 +11,7 @@
 // SpringReturnLow / SpringReturnHigh — пороги: при отпускании,
 // если значение пересекло порог, оно возвращается к нему.
 //------------------------------------------------------------------------------
-class AxisHandler : public ControlHandler
+class AxisHandler : public RangeHandler
 {
 public:
 

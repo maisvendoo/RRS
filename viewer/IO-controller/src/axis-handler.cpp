@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-AxisHandler::AxisHandler(QObject *parent) : ControlHandler(parent)
+AxisHandler::AxisHandler(QObject *parent) : RangeHandler(parent)
 {
 
 }

@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-SwitcherHandler::SwitcherHandler(QObject *parent) : ControlHandler(parent)
+SwitcherHandler::SwitcherHandler(QObject *parent) : RangeHandler(parent)
 {
 
 }
@@ -18,19 +18,7 @@ SwitcherHandler::SwitcherHandler(QObject *parent) : ControlHandler(parent)
 //------------------------------------------------------------------------------
 bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
 {
-    ControlHandler::load_config(cfg, secNode);
-
-    // Клавиша и модификатор для увеличения позиции
-    QString keyInc;
-    cfg.getString(secNode, "KeyNameInc", keyInc);
-    keyCodeInc = KeySymbolsRRSMap.value(keyInc, KEY_Undefined);
-    cfg.getString(secNode, "KeyModIncName", keyModIncName);
-
-    // Клавиша и модификатор для уменьшения позиции
-    QString keyDec;
-    cfg.getString(secNode, "KeyNameDec", keyDec);
-    keyCodeDec = KeySymbolsRRSMap.value(keyDec, KEY_Undefined);
-    cfg.getString(secNode, "KeyModDecName", keyModDecName);
+    RangeHandler::load_config(cfg, secNode);
 
     // Количество фиксированных позиций (от 2)
     int np = 2;
@@ -64,17 +52,7 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
 
     QString tmp = "";
     cfg.getString(secNode, "PositionsNames", tmp);
-    positionNames = tmp.split(',');
-
-    QString resetKeyName = "";
-    cfg.getString(secNode, "ResetKey", resetKeyName);
-    resetKey = KeySymbolsRRSMap.value(resetKeyName, KEY_Undefined);
-
-    cfg.getString(secNode, "ResetModkey", resetModkey);
-
-    double reset_pos = 0.0;
-    cfg.getDouble(secNode, "PositionForReset", reset_pos);
-    posForReset = static_cast<float>(reset_pos);
+    positionNames = tmp.split(',');    
 
     cfg.getString(secNode, "PositionModkey", positionModkey);
 
@@ -96,10 +74,7 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
                 posKeys.push_back(KEY_Undefined);
             }
         }
-    }
-
-    cfg.getString(secNode, "IncButtonName", incButtonName);
-    cfg.getString(secNode, "DecButtonName", decButtonName);
+    }    
 
     return true;
 }
@@ -131,6 +106,8 @@ void SwitcherHandler::sendNextPosition(int direction)
 //------------------------------------------------------------------------------
 void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
 {
+    RangeHandler::processKeyInput(pk);
+
     // Клавиша увеличения нажата?
     if (getKeyState(pk, keyCodeInc) && isKeyModifier(pk, keyModIncName))
     {
@@ -151,18 +128,7 @@ void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
         spring_low_triggered = false;
         spring_high_triggered = false;
         return;
-    }
-
-    // Сброс, если задана подобная настройка
-    if (resetKey != KEY_Undefined)
-    {
-        if (getKeyState(pk, resetKey) && isKeyModifier(pk, resetModkey))
-        {
-            value = posForReset;
-            sendControlSignal();
-            return;
-        }
-    }
+    }    
 
     // Позиция по горячим клавишам
     if (!positionModkey.isEmpty() && !posKeys.empty())
