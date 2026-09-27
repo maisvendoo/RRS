@@ -25,7 +25,7 @@ void RangeHandler::processKeyInput(const std::set<uint16_t> &pressed_keys)
     }
 
     // Позиция по горячим клавишам
-    /*if (!positionModkey.isEmpty() && !posKeys.empty())
+    if (!positionModkey.isEmpty() && !posKeys.empty())
     {
         for (int i = 0; i < posKeys.size(); ++i)
         {
@@ -36,7 +36,7 @@ void RangeHandler::processKeyInput(const std::set<uint16_t> &pressed_keys)
                 break;
             }
         }
-    }*/
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -79,14 +79,14 @@ bool RangeHandler::load_config(CfgReader &cfg, QDomNode secNode)
     cfg.getString(secNode, "IncButtonName", incButtonName);
     cfg.getString(secNode, "DecButtonName", decButtonName);
 
-    /*cfg.getString(secNode, "PositionModkey", positionModkey);
+    cfg.getString(secNode, "PositionModkey", positionModkey);
     QString tmp = "";
     cfg.getString(secNode, "PositionKeys", tmp);
     QStringList pos_keys = tmp.split(',');
-    pos_keys.remove(' ');
 
     for (auto &pos_key : pos_keys)
     {
+        pos_key.remove(' ');
         pos_key.remove('(');
         pos_key.remove(')');
 
@@ -108,7 +108,7 @@ bool RangeHandler::load_config(CfgReader &cfg, QDomNode secNode)
         }
 
         posKeys.push_back(pos);
-    }*/
+    }
 
     return true;
 }
