@@ -47,6 +47,10 @@ private:
     QString incButtonName = "LEFT_BUTTON";
     QString decButtonName = "RIGHT_BUTTON";
 
+    uint16_t resetKey = KEY_Undefined;
+    QString  resetModkey = "";
+    float    resetValue = 0.0f;
+
     void doSpringReturn();
 };
 

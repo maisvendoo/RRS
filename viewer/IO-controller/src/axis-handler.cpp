@@ -57,6 +57,16 @@ bool AxisHandler::load_config(CfgReader &cfg, QDomNode secNode)
     cfg.getDouble(secNode, "SpringReturnHigh", tmp_sr);
     springReturnHigh = static_cast<float>(tmp_sr);
 
+    // Клавиша сброса в заданное положение
+    QString resetKeyName = "";
+    cfg.getString(secNode, "ResetKey", resetKeyName);
+    resetKey = KeySymbolsRRSMap.value(resetKeyName, KEY_Undefined);
+    cfg.getString(secNode, "ResetModkey", resetModkey);
+
+    double tmp_rv = 0.0;
+    cfg.getDouble(secNode, "ResetValue", tmp_rv);
+    resetValue = static_cast<float>(tmp_rv);
+
     return true;
 }
 
@@ -86,6 +96,18 @@ void AxisHandler::doSpringReturn()
 //------------------------------------------------------------------------------
 void AxisHandler::processKeyInput(const std::set<uint16_t> &pk)
 {
+    // Сброс в заданное положение
+    if (resetKey != KEY_Undefined)
+    {
+        if (getKeyState(pk, resetKey) && isKeyModifier(pk, resetModkey))
+        {
+            value = resetValue;
+            hold_direction = 0;
+            sendControlSignal();
+            return;
+        }
+    }
+
     if (getKeyState(pk, keyCodeInc) && isKeyModifier(pk, keyModIncName))
     {
         hold_direction = +1;
