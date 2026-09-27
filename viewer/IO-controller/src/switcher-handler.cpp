@@ -221,6 +221,8 @@ void SwitcherHandler::doSpringReturn()
 //------------------------------------------------------------------------------
 void SwitcherHandler::processMouseInput(uint32_t button, bool is_pressed)
 {
+    if (!feedback_signals) return;
+
     // Отпускание кнопки — сброс удержания и проверка пружинного возврата
     if (!is_pressed)
     {

@@ -517,4 +517,29 @@
 		<ObjectNameCab2>Cab2_Kran254-ruk</ObjectNameCab2>	    
 	</Control>
 
+	<!-- Комбинированный кран -->
+	<Control>
+		<ID>132</ID>
+		<Name>Комбинированный кран</Name>
+		<Description>Управление комбинированным краном</Description>
+		<Type>Switcher</Type>
+		<value1>0</value1>
+		<value2>0</value2>
+		<KeyNameDec>KEY_BackSpace</KeyNameDec>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameInc>KEY_BackSpace</KeyNameInc>
+		<KeyModDecName>Ctrl</KeyModDecName>
+		<NumPositions>3</NumPositions>
+		<MinValue>-1</MinValue>
+		<MaxValue>1</MaxValue>
+		<PositionsNames>Двойная тяга,Открыт,ЭТ</PositionsNames>	
+
+		<IncButtonName>RIGHT_BUTTON</IncButtonName>
+		<DecButtonName>LEFT_BUTTON</DecButtonName>				
+				
+		<ObjectNameCab1>Cab1_Kran_kombin</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Kran_kombin</ObjectNameCab2>
+
+	</Control>
+
 </Config>

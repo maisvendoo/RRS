@@ -101,6 +101,7 @@ void VL60pk::stepControls(const double &t, const double &dt)
         bool is_lock367_insert = control_inputs[cab_idx][CTRL_LOCK_367_INSERTION].toBool();
         brake_lock[cab_idx]->setStateOn(is_lock367_insert);
         brake_lock[cab_idx]->insertLockHandle(is_lock367_insert);
+        brake_lock[cab_idx]->setCombineCranePosition(control_inputs[cab_idx][CTRL_COMBINE_KRAN].value);
 
         // Кран 395
         brake_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KRM_395].value);

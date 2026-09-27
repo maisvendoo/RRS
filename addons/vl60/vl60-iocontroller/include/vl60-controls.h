@@ -38,6 +38,7 @@ enum
     CTRL_KM_MAIN_POSITION = 129,
     CTRL_KRM_395 = 130,
     CTRL_KVT_254 = 131,
+    CTRL_COMBINE_KRAN = 132,
 };
 
 #endif
