@@ -44,6 +44,17 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
     minValue = static_cast<float>(tmp_min);
     maxValue = static_cast<float>(tmp_max);
 
+    range = maxValue - minValue;
+
+    if (numPositions >= 2)
+    {
+        val_step = range / static_cast<float>(numPositions - 1);
+    }
+    else
+    {
+        val_step = 0.0;
+    }
+
     // Пружинный возврат из крайних положений (опционально)
     int srl = -1, srh = -1;
     cfg.getInt(secNode, "SpringReturnLow", srl);   // возврат с нижней позиции (+1)
@@ -98,9 +109,7 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
 //------------------------------------------------------------------------------
 int SwitcherHandler::currentIndex() const
 {
-    float range = maxValue - minValue;
-    float step = range / static_cast<float>(numPositions - 1);
-    return static_cast<int>(std::round((value - minValue) / step));
+    return static_cast<int>(qAbs(std::round((value - minValue) / val_step)));
 }
 
 //------------------------------------------------------------------------------
@@ -113,9 +122,7 @@ void SwitcherHandler::sendNextPosition(int direction)
                              static_cast<int>(numPositions) - 1);
     if (new_idx == idx) return;  // уже в крайнем положении
 
-    float range = maxValue - minValue;
-    float step = range / static_cast<float>(numPositions - 1);
-    value = minValue + static_cast<float>(new_idx) * step;
+    value = minValue + static_cast<float>(new_idx) * val_step;
     sendControlSignal();
 }
 
@@ -160,9 +167,6 @@ void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
     // Позиция по горячим клавишам
     if (!positionModkey.isEmpty() && !posKeys.empty())
     {
-        float range = maxValue - minValue;
-        float step = range / static_cast<float>(numPositions - 1);
-
         float pos = minValue;
 
         for (int i = 0; i < posKeys.size(); ++i)
@@ -174,7 +178,7 @@ void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
                 break;
             }
 
-            pos += step;
+            pos += val_step;
         }
     }
 
@@ -196,10 +200,8 @@ void SwitcherHandler::doSpringReturn()
     // Нижняя крайняя позиция — шагнуть вверх
     if (springReturnLow >= 0 && idx == springReturnLow && !spring_low_triggered)
     {
-        spring_low_triggered = true;
-        float range = maxValue - minValue;
-        float step = range / static_cast<float>(numPositions - 1);
-        value = minValue + static_cast<float>(springReturnLow + 1) * step;
+        spring_low_triggered = true;        
+        value = minValue + static_cast<float>(springReturnLow + 1) * val_step;
         sendControlSignal();
         return;
     }
@@ -207,10 +209,8 @@ void SwitcherHandler::doSpringReturn()
     // Верхняя крайняя позиция — шагнуть вниз
     if (springReturnHigh >= 0 && idx == springReturnHigh && !spring_high_triggered)
     {
-        spring_high_triggered = true;
-        float range = maxValue - minValue;
-        float step = range / static_cast<float>(numPositions - 1);
-        value = minValue + static_cast<float>(springReturnHigh - 1) * step;
+        spring_high_triggered = true;        
+        value = minValue + static_cast<float>(springReturnHigh - 1) * val_step;
         sendControlSignal();
         return;
     }
@@ -331,7 +331,7 @@ QString SwitcherHandler::getUsage() const
 //------------------------------------------------------------------------------
 QString SwitcherHandler::getState() const
 {
-    int idx = static_cast<int>(getSignalValue());
+    int idx = currentIndex();
 
     if (positionNames.empty() || idx >= positionNames.size())
     {
