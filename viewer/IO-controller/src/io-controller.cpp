@@ -6,6 +6,7 @@
 #include    <toggle-handler.h>
 #include    <button-handler.h>
 #include    <switcher-handler.h>
+#include    <axis-handler.h>
 
 //------------------------------------------------------------------------------
 //
@@ -101,6 +102,11 @@ ControlHandler *IOController::create_handler(QString type, QDomNode secNode, Cfg
     if (type == "Switcher")
     {
         ctrl_handler = new SwitcherHandler();
+    }
+
+    if (type == "Axis")
+    {
+        ctrl_handler = new AxisHandler();
     }
 
     if (ctrl_handler != nullptr)
