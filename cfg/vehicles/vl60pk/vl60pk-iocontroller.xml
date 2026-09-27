@@ -514,7 +514,12 @@
 	    <DecButtonName>LEFT_BUTTON</DecButtonName>
 	    <SpringReturnLow>0.0</SpringReturnLow>
 	    <ObjectNameCab1>Cab1_Kran254-ruk</ObjectNameCab1>
-		<ObjectNameCab2>Cab2_Kran254-ruk</ObjectNameCab2>	    
+		<ObjectNameCab2>Cab2_Kran254-ruk</ObjectNameCab2>
+
+		<!-- Установки заданной позиции по комбинации -->
+		<PositionModkey>Alt</PositionModkey>
+		<PositionKeys>(KEY_8;0),(KEY_9;0.25),(KEY_0;0.5),(KEY_Minus;0.75),(KEY_Equals;1.0)</PositionKeys>
+
 	</Control>
 
 	<!-- Комбинированный кран -->
