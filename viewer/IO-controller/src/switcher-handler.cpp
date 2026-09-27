@@ -87,6 +87,9 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
         }
     }
 
+    cfg.getString(secNode, "IncButtonName", incButtonName);
+    cfg.getString(secNode, "DecButtonName", decButtonName);
+
     return true;
 }
 
@@ -231,8 +234,8 @@ void SwitcherHandler::processMouseInput(uint32_t button, bool is_pressed)
 
     // Нажатие — шаг в соответствующую сторону
     int dir = 0;
-    if (button == CTRL_LEFT_MOUSE_BUTTON)  dir = +1;
-    if (button == CTRL_RIGHT_MOUSE_BUTTON) dir = -1;
+    if (button == getButtonCode(incButtonName))  dir = +1;
+    if (button == getButtonCode(decButtonName)) dir = -1;
     if (dir == 0) return;
 
     sendNextPosition(dir);
@@ -293,7 +296,32 @@ void SwitcherHandler::step(float t, float dt)
 //------------------------------------------------------------------------------
 QString SwitcherHandler::getUsage() const
 {
-    return QString("ЛКМ — вперёд | ПКМ — назад");
+    QString inc;
+    QString dec;
+
+    switch (getButtonCode(incButtonName))
+    {
+    case CTRL_LEFT_MOUSE_BUTTON: inc = "ЛКМ"; break;
+    case CTRL_RIGHT_MOUSE_BUTTON: inc = "ПКМ"; break;
+    case CTRL_MIDDLE_MOUSE_BUTTON: inc = "СКМ"; break;
+    default:
+
+        inc = "Не назначено";
+        break;
+    }
+
+    switch (getButtonCode(decButtonName))
+    {
+    case CTRL_LEFT_MOUSE_BUTTON: dec = "ЛКМ"; break;
+    case CTRL_RIGHT_MOUSE_BUTTON: dec = "ПКМ"; break;
+    case CTRL_MIDDLE_MOUSE_BUTTON: dec = "СКМ"; break;
+    default:
+
+        inc = "Не назначено";
+        break;
+    }
+
+    return QString("Позиция: %1 — увеличение | %2 — уменьшение").arg(inc).arg(dec);
 }
 
 //------------------------------------------------------------------------------

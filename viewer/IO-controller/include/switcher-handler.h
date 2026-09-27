@@ -66,6 +66,9 @@ private:
 
     std::vector<uint16_t> posKeys;
 
+    QString incButtonName = "LEFT_BUTTON";
+    QString decButtonName = "RIGHT_BUTTON";
+
     static constexpr float HOLD_DELAY      = 0.3f;   // задержка перед автоповтором
     static constexpr float REPEAT_INTERVAL = 0.1f;   // интервал автоповтора
 

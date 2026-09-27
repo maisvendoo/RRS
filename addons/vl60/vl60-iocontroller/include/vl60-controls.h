@@ -36,6 +36,7 @@ enum
     CTRL_KEY_EPK = 127,
     CTRL_REVERS_POSITION = 128,
     CTRL_KM_MAIN_POSITION = 129,
+    CTRL_KRM_395 = 130,
 };
 
 #endif

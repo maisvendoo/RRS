@@ -470,4 +470,31 @@
 
 	</Control>
 
+	<!-- Поездной кран машиниста -->
+	<Control>
+		<ID>130</ID>
+		<Name>Поездной кран машиниста 395</Name>
+		<Description>Рукоятка крана. Управление тормозами поезда</Description>
+		<Type>Switcher</Type>
+		<value1>1</value1>
+		<value2>1</value2>
+		<KeyNameDec>KEY_Semicolon</KeyNameDec>
+		<KeyNameInc>KEY_Quote</KeyNameInc>
+		<NumPositions>7</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>6</MaxValue>
+		<PositionsNames>I,II,III,IV,IVa,IV,VI,</PositionsNames>	
+
+		<IncButtonName>RIGHT_BUTTON</IncButtonName>
+		<DecButtonName>LEFT_BUTTON</DecButtonName>		
+
+		<!-- Установки заданной позиции по комбинации -->
+		<PositionModkey>Alt</PositionModkey>
+		<PositionKeys>KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7</PositionKeys>
+				
+		<ObjectNameCab1>Cab1_Kran395-ruk</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Kran395-ruk</ObjectNameCab2>
+
+	</Control>
+
 </Config>

@@ -157,7 +157,30 @@ protected:
         stream >> id;
         stream >> value;
         stream >> client_priority;
-    }    
+    }
+
+    uint32_t getButtonCode(const QString &buttonName) const
+    {
+        QString tmp = buttonName;
+        tmp.remove(' ');
+
+        if (tmp == "LEFT_BUTTON")
+        {
+            return CTRL_LEFT_MOUSE_BUTTON;
+        }
+
+        if (tmp == "MIDDLE_BUTTON")
+        {
+            return CTRL_MIDDLE_MOUSE_BUTTON;
+        }
+
+        if (tmp == "RIGHT_BUTTON")
+        {
+            return CTRL_RIGHT_MOUSE_BUTTON;
+        }
+
+        return 0;
+    }
 };
 
 #endif
