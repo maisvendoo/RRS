@@ -4,6 +4,7 @@
 #include    <automatic-train-stop.h>
 #include    <pneumo-brake-lock.h>
 #include    <brake-crane.h>
+#include    <loco-crane.h>
 
 //------------------------------------------------------------------------------
 //
@@ -103,5 +104,8 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         // Кран 395
         brake_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KRM_395].value);
+
+        // Кран 254
+        loco_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KVT_254].value);
     }
 }

@@ -497,4 +497,24 @@
 
 	</Control>
 
+	<!-- Кран вспомогательного тормоза -->
+	<Control>
+	    <ID>131</ID>
+	    <Type>Axis</Type>
+	    <Name>Кран вспомогательного тормоза 254</Name>
+		<Description>Рукоятка крана. Управление тормозами локомотива</Description>
+	    <MinValue>-0.03</MinValue>
+	    <MaxValue>1.0</MaxValue>
+	    <Speed>1.0</Speed>
+	    <value1>1.0</value1>
+		<value2>1.0</value2>
+	    <KeyNameInc>KEY_Rightbracket</KeyNameInc>
+	    <KeyNameDec>KEY_Leftbracket</KeyNameDec>
+	    <IncButtonName>RIGHT_BUTTON</IncButtonName>
+	    <DecButtonName>LEFT_BUTTON</DecButtonName>
+	    <SpringReturnLow>0.0</SpringReturnLow>
+	    <ObjectNameCab1>Cab1_Kran254-ruk</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Kran254-ruk</ObjectNameCab2>	    
+	</Control>
+
 </Config>
