@@ -14,7 +14,7 @@
 		<value1>0.0</value1>
 		<value2>0.0</value2>
 		<KeyName>KEY_U</KeyName>
-		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOnName>Shift+Ctrl</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
 		<ObjectNameCab1>Cab1_Tumbler_Pnt</ObjectNameCab1>
 		<ObjectNameCab2>Cab2_Tumbler_Pnt</ObjectNameCab2>

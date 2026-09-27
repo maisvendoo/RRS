@@ -91,17 +91,42 @@ bool ControlHandler::isKeyModifier(const std::set<uint16_t> &keys,
         return !isAnyModifier(keys);
     }
 
-    if (modName == "Shift")
+    QString mod_name = modName;
+    mod_name.remove(' ');
+
+    if (mod_name == "Shift+Ctrl")
+    {
+        bool chk = isShift(keys) && isControl(keys);
+        if (chk) printf("Shift+Ctrl pressed\n");
+        return chk;
+    }
+
+    if (mod_name == "Shift+Alt")
+    {
+        return isShift(keys) && isAlt(keys);
+    }
+
+    if (mod_name == "Ctrl+Alt")
+    {
+        return isControl(keys) && isAlt(keys);
+    }
+
+    if (mod_name == "Shift+Ctrl+Alt")
+    {
+        return isShift(keys) && isControl(keys) && isAlt(keys);
+    }
+
+    if (mod_name == "Shift")
     {
         return isShift(keys);
     }
 
-    if (modName == "Ctrl")
+    if (mod_name == "Ctrl")
     {
         return isControl(keys);
     }
 
-    if (modName == "Alt")
+    if (mod_name == "Alt")
     {
         return isAlt(keys);
     }
