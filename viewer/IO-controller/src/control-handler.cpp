@@ -94,6 +94,22 @@ bool ControlHandler::isKeyModifier(const std::set<uint16_t> &keys,
     QString mod_name = modName;
     mod_name.remove(' ');
 
+    {
+        printf("isKeyModifier: modName='%s' size=%zu keys=",
+               modName.toStdString().c_str(), keys.size());
+
+        for (const auto &k : keys)
+        {
+            printf("0x%04X ", k);
+        }
+
+        printf("shift=%d ctrl=%d alt=%d\n",
+               isShift(keys) ? 1 : 0,
+               isControl(keys) ? 1 : 0,
+               isAlt(keys) ? 1 : 0);
+        fflush(stdout);
+    }
+
     if (mod_name == "Shift+Ctrl")
     {
         bool chk = isShift(keys) && isControl(keys);
@@ -148,4 +164,20 @@ bool ControlHandler::isAnyModifier(const std::set<uint16_t> &keys) const
 void ControlHandler::sendControlSignal()
 {
     emit sigSendControlCommand(serialize());
+}
+
+// ------------------------------------------------------------------------------
+// Временный отладочный вывод
+// ------------------------------------------------------------------------------
+void debugKeys(const std::set<uint16_t> &keys, const QString &header)
+{
+    printf("%s: size=%zu keys=", header.toStdString().c_str(), keys.size());
+
+    for (const auto &k : keys)
+    {
+        printf("0x%04X ", k);
+    }
+
+    printf("\n");
+    fflush(stdout);
 }
