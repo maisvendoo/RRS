@@ -23,16 +23,9 @@ public:
 
     void processMouseInput(uint32_t button, bool is_pressed) override;
 
-    void step(float t, float dt) override;
+    void step(float t, float dt) override;    
 
-    QString getUsage() const override;
-
-    QString getState() const override;
-
-    uint16_t keyCodeInc = 0;          // клавиша увеличения
-    QString  keyModIncName = "";      // модификатор увеличения
-    uint16_t keyCodeDec = 0;          // клавиша уменьшения
-    QString  keyModDecName = "";      // модификатор уменьшения
+    QString getState() const override;    
 
 private:
 
@@ -42,14 +35,7 @@ private:
     float springReturnLow = -1.0f;    // нижний порог возврата (-1 = отключен)
     float springReturnHigh = -1.0f;   // верхний порог возврата (-1 = отключен)
 
-    int   hold_direction = 0;         // направление удержания (+1/-1/0)
-
-    QString incButtonName = "LEFT_BUTTON";
-    QString decButtonName = "RIGHT_BUTTON";
-
-    uint16_t resetKey = KEY_Undefined;
-    QString  resetModkey = "";
-    float    resetValue = 0.0f;
+    int   hold_direction = 0;         // направление удержания (+1/-1/0)    
 
     void doSpringReturn();
 };

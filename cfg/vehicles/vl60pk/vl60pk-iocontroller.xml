@@ -490,7 +490,7 @@
 
 		<!-- Установки заданной позиции по комбинации -->
 		<PositionModkey>Alt</PositionModkey>
-		<PositionKeys>KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7</PositionKeys>
+		<PositionKeys>(KEY_1;0),(KEY_2;1),(KEY_3;2),(KEY_4;3),(KEY_5;4),(KEY_6;5),(KEY_7;6)</PositionKeys>
 				
 		<ObjectNameCab1>Cab1_Kran395-ruk</ObjectNameCab1>
 		<ObjectNameCab2>Cab2_Kran395-ruk</ObjectNameCab2>

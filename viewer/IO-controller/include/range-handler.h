@@ -20,6 +20,8 @@ public:
 
     virtual bool load_config(CfgReader &cfg, QDomNode secNode) override;
 
+    QString getUsage() const override;
+
 protected:
 
     struct position_t
@@ -27,6 +29,12 @@ protected:
         float value = 0.0f;
         uint16_t hotKey = 0;
     };
+
+    /// Модификатор для установки в заданную позицию
+    QString positionModkey = "";
+
+    /// Клавиши и позиции для переключения
+    std::vector<position_t> posKeys;
 
     uint16_t keyCodeInc = 0;          // клавиша увеличения позиции
     QString  keyModIncName = "";      // модификатор увеличения (опционально)

@@ -52,29 +52,7 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
 
     QString tmp = "";
     cfg.getString(secNode, "PositionsNames", tmp);
-    positionNames = tmp.split(',');    
-
-    cfg.getString(secNode, "PositionModkey", positionModkey);
-
-    cfg.getString(secNode, "PositionKeys", tmp);
-    QStringList pos_keys = tmp.split(',');
-
-    if (pos_keys.size() == numPositions)
-    {
-        for (int i = 0; i < pos_keys.size(); ++i)
-        {
-            pos_keys[i].remove(' ');
-
-            if (pos_keys[i] != "None")
-            {
-                posKeys.push_back(KeySymbolsRRSMap.value(pos_keys[i], KEY_Undefined));
-            }
-            else
-            {
-                posKeys.push_back(KEY_Undefined);
-            }
-        }
-    }    
+    positionNames = tmp.split(',');            
 
     return true;
 }
@@ -128,25 +106,7 @@ void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
         spring_low_triggered = false;
         spring_high_triggered = false;
         return;
-    }    
-
-    // Позиция по горячим клавишам
-    if (!positionModkey.isEmpty() && !posKeys.empty())
-    {
-        float pos = minValue;
-
-        for (int i = 0; i < posKeys.size(); ++i)
-        {
-            if (getKeyState(pk, posKeys[i]) && isKeyModifier(pk, positionModkey))
-            {
-                value = pos;
-                sendControlSignal();
-                break;
-            }
-
-            pos += val_step;
-        }
-    }
+    }        
 
     // Ни одна клавиша не нажата — сбрасываем удержание
     hold_direction = 0;
@@ -257,39 +217,6 @@ void SwitcherHandler::step(float t, float dt)
             return;
         }
     }
-}
-
-//------------------------------------------------------------------------------
-// Строка подсказки по управлению мышью
-//------------------------------------------------------------------------------
-QString SwitcherHandler::getUsage() const
-{
-    QString inc;
-    QString dec;
-
-    switch (getButtonCode(incButtonName))
-    {
-    case CTRL_LEFT_MOUSE_BUTTON: inc = "ЛКМ"; break;
-    case CTRL_RIGHT_MOUSE_BUTTON: inc = "ПКМ"; break;
-    case CTRL_MIDDLE_MOUSE_BUTTON: inc = "СКМ"; break;
-    default:
-
-        inc = "Не назначено";
-        break;
-    }
-
-    switch (getButtonCode(decButtonName))
-    {
-    case CTRL_LEFT_MOUSE_BUTTON: dec = "ЛКМ"; break;
-    case CTRL_RIGHT_MOUSE_BUTTON: dec = "ПКМ"; break;
-    case CTRL_MIDDLE_MOUSE_BUTTON: dec = "СКМ"; break;
-    default:
-
-        inc = "Не назначено";
-        break;
-    }
-
-    return QString("Позиция: %1 — увеличение | %2 — уменьшение").arg(inc).arg(dec);
 }
 
 //------------------------------------------------------------------------------

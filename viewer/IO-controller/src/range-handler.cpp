@@ -23,6 +23,20 @@ void RangeHandler::processKeyInput(const std::set<uint16_t> &pressed_keys)
             return;
         }
     }
+
+    // Позиция по горячим клавишам
+    /*if (!positionModkey.isEmpty() && !posKeys.empty())
+    {
+        for (int i = 0; i < posKeys.size(); ++i)
+        {
+            if (getKeyState(pressed_keys, posKeys[i].hotKey) && isKeyModifier(pressed_keys, positionModkey))
+            {
+                value = posKeys[i].value;
+                sendControlSignal();
+                break;
+            }
+        }
+    }*/
 }
 
 //------------------------------------------------------------------------------
@@ -65,5 +79,69 @@ bool RangeHandler::load_config(CfgReader &cfg, QDomNode secNode)
     cfg.getString(secNode, "IncButtonName", incButtonName);
     cfg.getString(secNode, "DecButtonName", decButtonName);
 
+    /*cfg.getString(secNode, "PositionModkey", positionModkey);
+    QString tmp = "";
+    cfg.getString(secNode, "PositionKeys", tmp);
+    QStringList pos_keys = tmp.split(',');
+    pos_keys.remove(' ');
+
+    for (auto &pos_key : pos_keys)
+    {
+        pos_key.remove('(');
+        pos_key.remove(')');
+
+        auto tokens = pos_key.split(';');
+
+        if (tokens.size() < 2)
+        {
+            continue;
+        }
+
+        position_t pos;
+        pos.hotKey = KeySymbolsRRSMap.value(tokens[0], KEY_Undefined);
+        bool ok = false;
+        pos.value = tokens[1].toFloat(&ok);
+
+        if (!ok)
+        {
+            continue;
+        }
+
+        posKeys.push_back(pos);
+    }*/
+
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString RangeHandler::getUsage() const
+{
+    QString inc;
+    QString dec;
+
+    switch (getButtonCode(incButtonName))
+    {
+    case CTRL_LEFT_MOUSE_BUTTON: inc = "ЛКМ"; break;
+    case CTRL_RIGHT_MOUSE_BUTTON: inc = "ПКМ"; break;
+    case CTRL_MIDDLE_MOUSE_BUTTON: inc = "СКМ"; break;
+    default:
+
+        inc = "Не назначено";
+        break;
+    }
+
+    switch (getButtonCode(decButtonName))
+    {
+    case CTRL_LEFT_MOUSE_BUTTON: dec = "ЛКМ"; break;
+    case CTRL_RIGHT_MOUSE_BUTTON: dec = "ПКМ"; break;
+    case CTRL_MIDDLE_MOUSE_BUTTON: dec = "СКМ"; break;
+    default:
+
+        dec = "Не назначено";
+        break;
+    }
+
+    return QString("Позиция: %1 — увеличение | %2 — уменьшение").arg(inc).arg(dec);
 }

@@ -25,13 +25,9 @@ public:
 
     void processMouseInput(uint32_t button, bool is_pressed) override;
 
-    void step(float t, float dt) override;
+    void step(float t, float dt) override;    
 
-    QString getUsage() const override;
-
-    QString getState() const override;    
-
-    QString positionModkey = "";
+    QString getState() const override;        
 
 private:
 
@@ -51,9 +47,7 @@ private:
     bool   spring_high_triggered = false;  // флаг: возврат с верхней уже был
 
     /// Имена позиций, для отображения в статусе
-    QStringList positionNames;
-
-    std::vector<uint16_t> posKeys;    
+    QStringList positionNames;     
 
     static constexpr float HOLD_DELAY      = 0.3f;   // задержка перед автоповтором
     static constexpr float REPEAT_INTERVAL = 0.1f;   // интервал автоповтора
