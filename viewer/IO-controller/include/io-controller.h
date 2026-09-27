@@ -95,7 +95,9 @@ private:
     void keyboardInputProcess(std::set<uint16_t> &pressed_keys);
 
     /// Сформировать строку с посказкой горячей клавиши
-    void getHotkeysString(const QString &keyName, ControlHandler *ctrl_handler);    
+    void getHotkeysString(const QString &keyName, ControlHandler *ctrl_handler);
+
+    uint16_t normalizeKey(uint16_t keyBase);
 };
 
 #endif

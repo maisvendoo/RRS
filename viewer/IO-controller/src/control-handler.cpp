@@ -91,58 +91,43 @@ bool ControlHandler::isKeyModifier(const std::set<uint16_t> &keys,
         return !isAnyModifier(keys);
     }
 
-    QString mod_name = modName;
-    mod_name.remove(' ');
-
+    // Составной модификатор (Shift+Ctrl, Shift+Alt, Shift+Ctrl+Alt)
+    if (modName.contains('+'))
     {
-        printf("isKeyModifier: modName='%s' size=%zu keys=",
-               modName.toStdString().c_str(), keys.size());
+        QStringList mods = modName.split('+', Qt::SkipEmptyParts);
 
-        for (const auto &k : keys)
+        bool has_shift = isShift(keys);
+        bool has_ctrl  = isControl(keys);
+        bool has_alt   = isAlt(keys);
+
+        for (const auto &mod : mods)
         {
-            printf("0x%04X ", k);
+            QString m = mod.trimmed();
+
+            if (m == "Shift" && !has_shift) return false;
+            if (m == "Ctrl"  && !has_ctrl)  return false;
+            if (m == "Alt"   && !has_alt)   return false;
         }
 
-        printf("shift=%d ctrl=%d alt=%d\n",
-               isShift(keys) ? 1 : 0,
-               isControl(keys) ? 1 : 0,
-               isAlt(keys) ? 1 : 0);
-        fflush(stdout);
+        // Если указан Shift — он должен быть нажат; если не указан — не должен
+        if (mods.contains("Shift") != has_shift) return false;
+        if (mods.contains("Ctrl")  != has_ctrl)  return false;
+        if (mods.contains("Alt")   != has_alt)   return false;
+
+        return true;
     }
 
-    if (mod_name == "Shift+Ctrl")
-    {
-        bool chk = isShift(keys) && isControl(keys);
-        if (chk) printf("Shift+Ctrl pressed\n");
-        return chk;
-    }
-
-    if (mod_name == "Shift+Alt")
-    {
-        return isShift(keys) && isAlt(keys);
-    }
-
-    if (mod_name == "Ctrl+Alt")
-    {
-        return isControl(keys) && isAlt(keys);
-    }
-
-    if (mod_name == "Shift+Ctrl+Alt")
-    {
-        return isShift(keys) && isControl(keys) && isAlt(keys);
-    }
-
-    if (mod_name == "Shift")
+    if (modName == "Shift")
     {
         return isShift(keys);
     }
 
-    if (mod_name == "Ctrl")
+    if (modName == "Ctrl")
     {
         return isControl(keys);
     }
 
-    if (mod_name == "Alt")
+    if (modName == "Alt")
     {
         return isAlt(keys);
     }

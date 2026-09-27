@@ -21,7 +21,7 @@ IOController::IOController(QObject *parent) : QObject(parent)
 //------------------------------------------------------------------------------
 void IOController::setPressedKey(uint16_t keyBase)
 {
-    if (KeySymbolsRRS.count(keyBase))
+    if (KeySymbolsRRS.count(normalizeKey(keyBase)))
     {
         auto result = _pressed_keys.insert(keyBase);
         if (result.second)
@@ -36,7 +36,7 @@ void IOController::setPressedKey(uint16_t keyBase)
 //------------------------------------------------------------------------------
 void IOController::setReleasedKey(uint16_t keyBase)
 {
-    _pressed_keys.erase(keyBase);    
+    _pressed_keys.erase(normalizeKey(keyBase));
     processKeyBoardInput();
 }
 
@@ -80,6 +80,19 @@ void IOController::step(float t, float dt, const std::vector<float> *server_sign
 void IOController::getHotkeysString(const QString &keyName, ControlHandler *ctrl_handler)
 {
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+uint16_t IOController::normalizeKey(uint16_t keyBase)
+{
+    if (keyBase >= 'A' && keyBase <= 'Z')
+    {
+        return static_cast<uint16_t>(keyBase - 'A' + 'a');
+    }
+
+    return keyBase;
 }
 
 //------------------------------------------------------------------------------
