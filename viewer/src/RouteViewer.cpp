@@ -1355,7 +1355,7 @@ void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
     if (!vehicle)
     {
         input_route_handler->clearActiveController();
-        LOG_INFO("RouteViewer: No vehicle at index %d", newIndex);        
+        LOG_INFO("RouteViewer: No vehicle at index %d", newIndex);
         return;
     }
 

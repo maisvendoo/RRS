@@ -160,7 +160,7 @@ private:
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
 
-    Vehicle* vehicle_controlled_by_panel = nullptr;    
+    Vehicle* vehicle_controlled_by_panel = nullptr;
 
     /// Топология
     Topology *topology = new Topology();
@@ -185,7 +185,7 @@ private:
     std::queue<Vehicle *> vehicles_for_autostart;
 
     /// Построение очереди автозапуска
-    void buildAutostartQueue(Train *train);    
+    void buildAutostartQueue(Train *train);
 
     /// Обработка очереди автозапуска
     void processAutostartQueue();
@@ -208,7 +208,7 @@ private:
     void initControlPanel(QString cfg_path);
 
     /// Инициализация поезда
-    Train *addTrain(const init_data_t &init_data);    
+    Train *addTrain(const init_data_t &init_data);
 
     /// Инициализация топологии
     void initTopology(const init_data_t &init_data);

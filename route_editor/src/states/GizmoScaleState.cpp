@@ -1,8 +1,13 @@
-#include "states/GizmoScaleState.h"
+#include "editor/states/GizmoScaleState.h"
+
+GizmoScaleState::GizmoScaleState(EditorContext& editor_context)
+    : State(editor_context)
+{
+    name = "GizmoScaleState";
+}
 
 GizmoScaleState::~GizmoScaleState() = default;
 
-void GizmoScaleState::handle_key_press(vsg::KeyPressEvent& keyPress)
+void GizmoScaleState::handle_key_press()
 {
-    (void)keyPress;
 }

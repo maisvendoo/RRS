@@ -60,7 +60,7 @@ public:
                      SoundManager *sm,
                      vsg::ref_ptr<vsg::Options> options);
 
-private:    
+private:
 
     /// Загрузка положения камеры в кабинах
     bool load_cabine_positions(const std::string& cfg_path, CfgReader& cfg);

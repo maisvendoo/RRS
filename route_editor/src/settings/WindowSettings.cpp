@@ -1,4 +1,4 @@
-#include "settings/WindowSettings.h"
+#include "editor/settings/WindowSettings.h"
 
 #include <CfgReader.h>
 #include <core/string_funcs.h>

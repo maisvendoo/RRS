@@ -44,7 +44,7 @@ Topology::~Topology() = default;
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool Topology::load(QString route_dir, bool solve_errors)
+bool Topology::load(QString route_dir, bool solve_errors, std::atomic_bool* finish_thread)
 {
     const FileSystem& fs = FileSystem::getInstance();
 
@@ -63,6 +63,14 @@ bool Topology::load(QString route_dir, bool solve_errors)
 
     for (const QString& name : names)
     {
+        if (finish_thread)
+        {
+            if (finish_thread->load())
+            {
+                return false;
+            }
+        }
+
         Trajectory* traj = new Trajectory();
 
         std::vector<module_cfg_t> modules;
