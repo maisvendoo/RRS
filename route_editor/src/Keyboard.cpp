@@ -16,6 +16,17 @@ void Keyboard::apply(vsg::KeyPressEvent& keyPress)
     modifiers = keyPress.keyModifier & (
         vsg::MODKEY_Alt | vsg::MODKEY_Control | vsg::MODKEY_Shift
     );
+
+    auto& actions = editor_context.actions;
+    actions.active_action = -1;
+    for (int i = 0; i < TOTAL_ACTIONS; ++i)
+    {
+        if (pressed_once(static_cast<Action>(i)))
+        {
+            actions.active_action = i;
+            break;
+        }
+    }
 }
 
 void Keyboard::apply(vsg::KeyReleaseEvent& keyRelease)
@@ -24,6 +35,8 @@ void Keyboard::apply(vsg::KeyReleaseEvent& keyRelease)
     modifiers = keyRelease.keyModifier & (
         vsg::MODKEY_Alt | vsg::MODKEY_Control | vsg::MODKEY_Shift
     );
+
+    editor_context.actions.active_action = -1;
 }
 
 bool Keyboard::get_shift_state() const

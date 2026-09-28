@@ -32,72 +32,84 @@ BasicEditorState::~BasicEditorState() = default;
 
 void BasicEditorState::handle_key_press()
 {
-    const auto& keyboard = editor_context.keyboard;
-    const auto& command_manager = editor_context.command_manager;
-    const auto& camera = editor_context.camera;
-    auto& copied_objects = editor_context.copied_objects;
-    const auto& selected_objects = editor_context.selected_objects;
-    const auto& state_manager = editor_context.state_manager;
+    const auto& actions = editor_context.actions;
 
-    if (keyboard->pressed_once(ACTION_UNDO_COMMAND))
+    if (actions.active_action < 0)
     {
-        command_manager->undo();
+        return;
     }
-    else if (keyboard->pressed_once(ACTION_REDO_COMMAND))
-    {
-        command_manager->redo();
-    }
-    else if(keyboard->pressed_once(ACTION_SAVE_ROUTE))
-    {
-        save_route();
-    }
-    else if (keyboard->pressed_once(ACTION_SWAP_PROJECTION_MATRIX))
-    {
-        camera->swap_projection_matrix();
-    }
-    else if (keyboard->pressed_once(ACTION_COPY_OBJECTS))
-    {
-        copied_objects = selected_objects;
-    }
-    else if (keyboard->pressed_once(ACTION_PASTE_OBJECTS))
-    {
-        auto command = std::make_unique<PasteObjectsCommand>(editor_context);
-        command->execute();
-        command_manager->push(std::move(command));
-    }
-    else if (keyboard->pressed(ACTION_DELETE_OBJECTS))
-    {
-        auto command = std::make_unique<DeleteObjectsCommand>(editor_context);
-        command->execute();
-        command_manager->push(std::move(command));
-    }
-    else
-    {
-        const bool pressed_action_move = keyboard->pressed_once(ACTION_TRANSLATE_OBJECTS);
-        const bool pressed_action_rotate = keyboard->pressed_once(ACTION_ROTATE_OBJECTS);
-        const bool pressed_action_scale = keyboard->pressed_once(ACTION_SCALE_OBJECTS);
 
-        if (!pressed_action_move && !pressed_action_rotate && !pressed_action_scale)
+    switch (actions.active_action)
+    {
+        case ACTION_UNDO_COMMAND:
         {
+            editor_context.command_manager->undo();
             return;
         }
-
-        for (const auto& object : selected_objects)
+        case ACTION_REDO_COMMAND:
         {
-            object->save_matrix();
+            editor_context.command_manager->redo();
+            return;
         }
-
-        if (pressed_action_move)
+        case ACTION_SAVE_ROUTE:
         {
-            state_manager->defer_switch_to(STATE_KEYBOARD_TRANSLATE);
+            save_route();
+            return;
         }
-        else if (pressed_action_rotate)
+        case ACTION_SWAP_PROJECTION_MATRIX:
         {
-            state_manager->defer_switch_to(STATE_KEYBOARD_ROTATE);
+            editor_context.camera->swap_projection_matrix();
+            return;
         }
-        else if (pressed_action_scale)
+        case ACTION_COPY_OBJECTS:
         {
-            state_manager->defer_switch_to(STATE_KEYBOARD_SCALE);
+            editor_context.copied_objects = editor_context.selected_objects;
+            return;
+        }
+        case ACTION_PASTE_OBJECTS:
+        {
+            auto command = std::make_unique<PasteObjectsCommand>(editor_context);
+            command->execute();
+            editor_context.command_manager->push(std::move(command));
+            return;
+        }
+        case ACTION_DELETE_OBJECTS:
+        {
+            auto command = std::make_unique<DeleteObjectsCommand>(editor_context);
+            command->execute();
+            editor_context.command_manager->push(std::move(command));
+            return;
+        }
+        case ACTION_TRANSLATE_OBJECTS:
+        {
+            for (const auto& object : editor_context.selected_objects)
+            {
+                object->save_matrix();
+            }
+            editor_context.state_manager->defer_switch_to(STATE_KEYBOARD_TRANSLATE);
+            return;
+        }
+        case ACTION_ROTATE_OBJECTS:
+        {
+            for (const auto& object : editor_context.selected_objects)
+            {
+                object->save_matrix();
+            }
+            editor_context.state_manager->defer_switch_to(STATE_KEYBOARD_ROTATE);
+            return;
+        }
+        case ACTION_SCALE_OBJECTS:
+        {
+            for (const auto& object : editor_context.selected_objects)
+            {
+                object->save_matrix();
+            }
+            editor_context.state_manager->defer_switch_to(STATE_KEYBOARD_SCALE);
+            return;
+        }
+        default:
+        {
+            return;
         }
     }
 }
