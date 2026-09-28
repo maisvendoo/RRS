@@ -7,6 +7,7 @@
 #include <vsg/nodes/MatrixTransform.h>
 
 class SoundManager;
+class IOController;
 //class AnimatedPagedLOD;       // Forward declare не работает,
 #include "AnimatedPagedLOD.h"   // VehiclesHandler ругается на incomplete use
 
@@ -73,6 +74,9 @@ private:
     /// Методы под старый формат конфига с параметрами <ExtModelName> и <CabineModel>
     bool load_body_model(const std::string& cfg_path, CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
     bool load_cabine_model(const std::string& cfg_path, CfgReader& cfg, vsg::ref_ptr<vsg::Options> options);
+
+    /// Загрузка модуля ввода/вывода
+    bool load_io_controller_module(const std::string &cfg_path, CfgReader &cfg);
 };
 
 #endif // VEHICLE_EXTERIOR_H

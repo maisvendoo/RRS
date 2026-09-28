@@ -74,11 +74,13 @@ bool Application::parse_command_line(cli::Parser &parser,
 {
     parser.run_and_exit_if_error();
 
-    cmd_line.model_path = parser.get<std::string>("m");
+    cmd_line.model_path.value = parser.get<std::string>("m");
+    cmd_line.model_path.is_present = !cmd_line.model_path.value.empty();
 
     cmd_line.generate_mipmaps = parser.get<bool>("g");
 
-    cmd_line.skip_textures = parser.get<std::string>("s");
+    cmd_line.skip_textures.value = parser.get<std::string>("s");
+    cmd_line.skip_textures.is_present = !cmd_line.skip_textures.value.empty();
 
     cmd_line.overwrite_gltf = parser.get<bool>("o");
 

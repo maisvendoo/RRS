@@ -6,6 +6,7 @@
 #include "simulator-update-struct.h"
 #include "sound-manager.h"
 #include "VehicleExterior.h"
+#include "io-controller.h"
 
 #include <vsg/app/Viewer.h>
 #include <vsg/core/ref_ptr.h>

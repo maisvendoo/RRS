@@ -17,6 +17,10 @@
 #include <string>
 #include <vector>
 
+#include <io-controller.h>
+#include <core/load_module.h>
+#include <QFileInfo>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -87,6 +91,9 @@ bool VehicleExterior::loadVehicle(const std::string& cfg_dir, const std::string&
 
     // Vehicle 3d-models
     load_models(cfg_path, cfg, options);
+
+    // Load IOContrroler module
+    load_io_controller_module(cfg_path, cfg);
 
     // Check old config format
     if (transform->children.size() == 0)

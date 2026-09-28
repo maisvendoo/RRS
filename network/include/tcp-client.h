@@ -144,6 +144,8 @@ public slots:
     void slotReceive();
 
     void slotAcceptError(QAbstractSocket::SocketError error);
+
+    void slotSendVehicleControlCommand(const QByteArray &data);
 };
 
 #endif

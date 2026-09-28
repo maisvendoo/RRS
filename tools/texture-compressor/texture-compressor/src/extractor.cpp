@@ -85,13 +85,13 @@ bool extract_to_png(const fs::path &src_ktx, const fs::path &out_png)
 int extract_models_textures(const command_line_t &cmd_line)
 {
     // Открываем модель по указанному пути
-    if (!cmd_line.model_path.has_value())
+    if (!cmd_line.model_path.is_present)
     {
         std::cerr << "[ERR] missing path to GLTF-file" << std::endl;
         return -1;
     }
 
-    fs::path gltf_path = cmd_line.model_path.value();
+    fs::path gltf_path = cmd_line.model_path.value;
 
     // Вытаемся открыть поток ввода
     std::ifstream ifs(gltf_path);

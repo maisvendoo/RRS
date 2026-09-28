@@ -265,13 +265,13 @@ std::map<int, TextureSettings> parse_gltf_textures(const json &gltf)
 int compress_model_textures(const command_line_t &cmd_line)
 {
     // Открываем модель по указанному пути
-    if (!cmd_line.model_path.has_value())
+    if (!cmd_line.model_path.is_present)
     {
         std::cerr << "[ERR] missing path to GLTF-file" << std::endl;
         return -1;
     }
 
-    fs::path gltf_path = cmd_line.model_path.value();
+    fs::path gltf_path = cmd_line.model_path.value;
 
     // Вытаемся открыть поток ввода
     std::ifstream ifs(gltf_path);
@@ -303,7 +303,7 @@ int compress_model_textures(const command_line_t &cmd_line)
     auto img_settings = parse_gltf_textures(gltf);
 
     // Формируем список пропускаемых текструр
-    auto skiped_textures = split_by_comma_view(cmd_line.skip_textures.value());
+    auto skiped_textures = split_by_comma_view(cmd_line.skip_textures.value);
 
     if (gltf.contains("images") && gltf["images"].is_array())
     {
