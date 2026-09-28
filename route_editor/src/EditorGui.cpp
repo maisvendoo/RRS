@@ -93,7 +93,7 @@ EditorGui::EditorGui(EditorContext& context)
         nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     if (!gui_settings.is_editable)
     {
