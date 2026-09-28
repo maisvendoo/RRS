@@ -1,8 +1,8 @@
 #ifndef EDITOR_CONTEXT_H
 #define EDITOR_CONTEXT_H
 
+#include "editor/Action.h"
 #include "editor/EditorState.h"
-#include "editor/KeyBindings.h"
 #include "editor/RouteMap.h"
 #include "editor/RouteObjects.h"
 #include "editor/settings/CameraSettings.h"
@@ -19,7 +19,6 @@
 #include <atomic>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -78,7 +77,7 @@ struct EditorContext
     scene_settings_t scene_settings;
     gizmo_settings_t gizmo_settings;
     gui_settings_t gui_settings;
-    KeyBindings key_bindings;
+    Actions actions;
 
     vsg::ref_ptr<Keyboard> keyboard;
     vsg::ref_ptr<Mouse> mouse;
