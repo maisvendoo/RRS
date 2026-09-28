@@ -41,45 +41,6 @@ void BasicEditorState::handle_key_press()
 
     switch (actions.active_action)
     {
-        case ACTION_UNDO_COMMAND:
-        {
-            editor_context.command_manager->undo();
-            return;
-        }
-        case ACTION_REDO_COMMAND:
-        {
-            editor_context.command_manager->redo();
-            return;
-        }
-        case ACTION_SAVE_ROUTE:
-        {
-            save_route();
-            return;
-        }
-        case ACTION_SWAP_PROJECTION_MATRIX:
-        {
-            editor_context.camera->swap_projection_matrix();
-            return;
-        }
-        case ACTION_COPY_OBJECTS:
-        {
-            editor_context.copied_objects = editor_context.selected_objects;
-            return;
-        }
-        case ACTION_PASTE_OBJECTS:
-        {
-            auto command = std::make_unique<PasteObjectsCommand>(editor_context);
-            command->execute();
-            editor_context.command_manager->push(std::move(command));
-            return;
-        }
-        case ACTION_DELETE_OBJECTS:
-        {
-            auto command = std::make_unique<DeleteObjectsCommand>(editor_context);
-            command->execute();
-            editor_context.command_manager->push(std::move(command));
-            return;
-        }
         case ACTION_TRANSLATE_OBJECTS:
         {
             for (const auto& object : editor_context.selected_objects)
@@ -105,6 +66,45 @@ void BasicEditorState::handle_key_press()
                 object->save_matrix();
             }
             editor_context.state_manager->defer_switch_to(STATE_KEYBOARD_SCALE);
+            return;
+        }
+        case ACTION_COPY_OBJECTS:
+        {
+            editor_context.copied_objects = editor_context.selected_objects;
+            return;
+        }
+        case ACTION_PASTE_OBJECTS:
+        {
+            auto command = std::make_unique<PasteObjectsCommand>(editor_context);
+            command->execute();
+            editor_context.command_manager->push(std::move(command));
+            return;
+        }
+        case ACTION_DELETE_OBJECTS:
+        {
+            auto command = std::make_unique<DeleteObjectsCommand>(editor_context);
+            command->execute();
+            editor_context.command_manager->push(std::move(command));
+            return;
+        }
+        case ACTION_UNDO_COMMAND:
+        {
+            editor_context.command_manager->undo();
+            return;
+        }
+        case ACTION_REDO_COMMAND:
+        {
+            editor_context.command_manager->redo();
+            return;
+        }
+        case ACTION_SAVE_ROUTE:
+        {
+            save_route();
+            return;
+        }
+        case ACTION_SWAP_PROJECTION_MATRIX:
+        {
+            editor_context.camera->swap_projection_matrix();
             return;
         }
         default:
