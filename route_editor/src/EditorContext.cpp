@@ -1,22 +1,24 @@
-#include "EditorContext.h"
+#include "editor/EditorContext.h"
 
-#include "CameraHandler.h"
-#include "Gizmo.h"
-#include "IntersectionHandler.h"
-#include "KeyboardHandler.h"
-#include "MouseHandler.h"
-#include "ObjectSelector.h"
-#include "Outline.h"
-#include "Route.h"
-#include "SceneGraph.h"
-#include "topology.h"
-#include "WindowHandler.h"
+#include "editor/Camera.h"
+#include "editor/Gizmo.h"
+#include "editor/Keyboard.h"
+#include "editor/Mouse.h"
+#include "editor/ObjectManager.h"
+#include "editor/ObjectSelector.h"
+#include "editor/Outline.h"
+#include "editor/Route.h"
+#include "editor/RouteObject.h"
+#include "editor/StateManager.h"
+#include "editor/WorldCulling.h"
+#include "editor/commands/CommandManager.h"
 
-#include <vsg/app/Camera.h>
-#include <vsg/app/ProjectionMatrix.h>
-#include <vsg/app/ViewMatrix.h>
+#include <topology.h>
+
+#include <vsg/app/Window.h>
 #include <vsg/commands/ClearAttachments.h>
 #include <vsg/nodes/PagedLOD.h>
 
 EditorContext::EditorContext() = default;
+
 EditorContext::~EditorContext() = default;

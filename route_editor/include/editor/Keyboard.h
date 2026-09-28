@@ -1,0 +1,35 @@
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
+
+#include "editor/Action.h"
+#include "editor/KeyBindings.h"
+
+#include <vsg/core/Inherit.h>
+#include <vsg/ui/KeyEvent.h>
+#include <vsg/ui/Keyboard.h>
+
+#include <cstdint>
+
+class Keyboard : public vsg::Inherit<vsg::Keyboard, Keyboard>
+{
+public:
+    explicit Keyboard(const KeyBindings& key_bindings);
+    virtual ~Keyboard() = default;
+
+    virtual void apply(vsg::KeyPressEvent& keyPress) override;
+    virtual void apply(vsg::KeyReleaseEvent& keyRelease) override;
+
+    bool get_shift_state() const;
+    bool get_ctrl_state() const;
+    bool get_alt_state() const;
+
+    bool pressed_once(vsg::KeySymbol key, bool ignore_handled_keys = true) const;
+    bool pressed(Action action, bool ignore_handled_keys = true) const;
+    bool pressed_once(Action action, bool ignore_handled_keys = true) const;
+
+private:
+    const KeyBindings& key_bindings_;
+    std::uint16_t modifiers = 0;
+};
+
+#endif // KEYBOARD_H

@@ -25,6 +25,12 @@
     <Scene>
         <!-- Допустимое количество источников света в сцене -->
         <NumLights>200</NumLights>
+        <!-- Максимальное количество объектов в сцене (включая топологию и новые объекты) -->
+        <MaxObjectCount>1000000</MaxObjectCount>
+        <!-- Размер крупномасштабной сетки для отсечения видимости объектов маршрута, м -->
+        <LargeScaleTileSize>4000.0</LargeScaleTileSize>
+        <!-- Размер мелкомасштабной сетки для отсечения видимости объектов маршрута, м -->
+        <SmallScaleTileSize>32000.0</SmallScaleTileSize>
     </Scene>
     <!-- Настройки камеры -->
     <Camera>
@@ -111,5 +117,6 @@
         <UndoCommand>Ctrl + Z</UndoCommand>
         <RedoCommand>Ctrl + Y</RedoCommand>
         <SaveRoute>Ctrl + S</SaveRoute>
+        <ChangeProjectionMatrix>O</ChangeProjectionMatrix>
     </Keys>
 </Config>

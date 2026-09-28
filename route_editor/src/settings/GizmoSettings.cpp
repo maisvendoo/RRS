@@ -1,4 +1,4 @@
-#include "settings/GizmoSettings.h"
+#include "editor/settings/GizmoSettings.h"
 
 #include <CfgReader.h>
 

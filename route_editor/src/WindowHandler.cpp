@@ -1,8 +1,10 @@
-#include "WindowHandler.h"
+#include "editor/WindowHandler.h"
 
-#include "EditorContext.h"
-#include "Journal.h"
-#include "Settings.h"
+#include "editor/Camera.h"
+#include "editor/EditorContext.h"
+#include "editor/settings/WindowSettings.h"
+
+#include <Journal.h>
 
 #include <vsg/app/Camera.h>
 #include <vsg/app/ProjectionMatrix.h>
@@ -15,15 +17,12 @@
 
 static VkSampleCountFlags samples_bit_flag(int samples);
 
-WindowHandler::WindowHandler(
-        const window_settings_t& window_settings,
-        vsg::ref_ptr<vsg::Window>& window,
-        vsg::ref_ptr<vsg::Perspective>& perspective,
-        vsg::ref_ptr<vsg::Camera>& camera
-    )
-    : perspective_{perspective}
-    , camera_{camera}
+WindowHandler::WindowHandler(EditorContext& editor_context)
+    : editor_context(editor_context)
 {
+    const auto& window_settings = editor_context.window_settings;
+    auto& window = editor_context.window;
+
     const auto window_traits = vsg::WindowTraits::create();
     window_traits->x = window_settings.pos_x;
     window_traits->y = window_settings.pos_y;
@@ -48,18 +47,19 @@ WindowHandler::WindowHandler(
 
 void WindowHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
 {
+    const auto& camera = editor_context.camera;
+    if (!camera)
+    {
+        return;
+    }
+
     const std::uint32_t width{configureWindow.width};
     const std::uint32_t height{configureWindow.height};
 
-    if (perspective_)
-    {
-        perspective_->aspectRatio = static_cast<double>(width) / static_cast<double>(height);
-    }
+    camera->get_perspective()->aspectRatio =
+        static_cast<double>(width) / static_cast<double>(height);
 
-    if (camera_)
-    {
-        camera_->viewportState->set(0, 0, width, height);
-    }
+    camera->viewportState->set(0, 0, width, height);
 }
 
 VkSampleCountFlags samples_bit_flag(int samples)

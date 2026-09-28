@@ -1,4 +1,4 @@
-#include "settings/CameraSettings.h"
+#include "editor/settings/CameraSettings.h"
 
 #include <CfgReader.h>
 

@@ -48,7 +48,6 @@ if (CLIENT_BUILD)
     add_subdirectory (viewer)
 
     add_subdirectory (route_editor)
-    add_subdirectory (route_editor2)
 
     add_subdirectory (launcher)
 

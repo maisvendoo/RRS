@@ -1,69 +1,22 @@
 #ifndef     COMMAND_LINE_H
 #define     COMMAND_LINE_H
 
+#include    <optional>
 #include    <string>
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-template <class T>
-struct option_t
-{
-private:
-
-
-    bool    is_present;
-
-public:
-
-    T       value;
-
-    option_t()
-        : is_present(false)
-        , value(T())
-    {
-
-    }
-
-    T get()
-    {
-        if (is_present)
-            return value;
-
-        return T();
-    }
-
-    void operator=(T value)
-    {
-        if (value == T())
-        {
-            is_present = false;
-            return;
-        }
-
-        this->value = value;
-        is_present = true;
-    }
-
-    bool isPresent() const
-    {
-        return is_present;
-    }
-};
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 struct cmd_line_t
 {
-    option_t<std::string> input_route_path;
+    std::optional<std::string> input_route_path;
 
-    option_t<double> shift_x;
-    option_t<double> shift_y;
-    option_t<double> shift_z;
+    std::optional<double> shift_x;
+    std::optional<double> shift_y;
+    std::optional<double> shift_z;
 
-    option_t<bool> transform_map;
-    option_t<bool> transform_topology;
+    std::optional<bool> transform_map;
+    std::optional<bool> transform_topology;
 };
 
 #endif // COMMAND_LINE_H

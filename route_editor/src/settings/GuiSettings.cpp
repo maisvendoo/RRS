@@ -1,4 +1,4 @@
-#include "settings/GuiSettings.h"
+#include "editor/settings/GuiSettings.h"
 
 #include <CfgReader.h>
 

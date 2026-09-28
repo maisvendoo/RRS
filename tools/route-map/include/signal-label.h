@@ -2,7 +2,14 @@
 #define     SIGNAL_LABEL_H
 
 #include    <QLabel>
-#include    <rail-signal.h>
+#include    <QObject>
+
+class Signal;
+
+class QAction;
+class QMenu;
+class QMouseEvent;
+class QWidget;
 
 //------------------------------------------------------------------------------
 //

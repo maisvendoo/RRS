@@ -35,7 +35,6 @@ target_compile_options(${TARGET} PRIVATE
 
 add_subdirectory (display)
 add_subdirectory (display-player)
-add_subdirectory (IO-controller)
 
 target_link_libraries(${TARGET} PRIVATE
     Qt6::Widgets

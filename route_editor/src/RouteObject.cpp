@@ -1,10 +1,10 @@
-#include "RouteObject.h"
+#include "editor/RouteObject.h"
 
-#include "EditorContext.h"
-#include "Gizmo.h"
-#include "Mask.h"
-#include "Outline.h"
-#include "SingleSwitch.h"
+#include "editor/EditorContext.h"
+#include "editor/Gizmo.h"
+#include "editor/Mask.h"
+#include "editor/Outline.h"
+#include "editor/SingleSwitch.h"
 
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
@@ -21,10 +21,6 @@
 #include <cmath>
 #include <string>
 
-static constexpr vsg::dvec3 AXIS_X_POSITIVE = {1.0, 0.0, 0.0};
-static constexpr vsg::dvec3 AXIS_Y_POSITIVE = {0.0, 1.0, 0.0};
-static constexpr vsg::dvec3 AXIS_Z_POSITIVE = {0.0, 0.0, 1.0};
-
 static vsg::dvec3 to_euler_deg(const vsg::dquat& q)
 {
     return vsg::dvec3{
@@ -37,15 +33,15 @@ static vsg::dvec3 to_euler_deg(const vsg::dquat& q)
 }
 
 RouteObject::RouteObject(
-    EditorContext& context,
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    EditorContext& editor_context,
+    const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
     const std::string& label,
     const vsg::dvec3& translation,
     const vsg::dvec3& rotation_deg,
     const vsg::dvec3& scale
 )
     : label(label)
-    , context_(context)
+    , editor_context(editor_context)
     , translation_(translation)
     , rotation_deg_(rotation_deg)
     , scale_(scale)
@@ -155,7 +151,7 @@ void RouteObject::hide()
 
     is_hidden_ = true;
 
-    context_.hidden_objects.emplace_back(this);
+    editor_context.hidden_objects.emplace_back(this);
 }
 
 RouteObjectsIterator RouteObject::show()
@@ -164,7 +160,7 @@ RouteObjectsIterator RouteObject::show()
 
     is_hidden_ = false;
 
-    RouteObjects& hidden_objects = context_.hidden_objects;
+    RouteObjects& hidden_objects = editor_context.hidden_objects;
 
     return hidden_objects.erase(std::find(hidden_objects.begin(),
         hidden_objects.end(), vsg::ref_ptr(this)));
@@ -174,24 +170,22 @@ bool RouteObject::select()
 {
     if (!outline_switch_->node)
     {
-        const auto outline = context_.outline_builder->create_outline(
-            paged_lod_);
-
+        auto outline = editor_context.outline_builder->create_outline(paged_lod_);
         if (!outline)
         {
             return false;
         }
 
-        context_.compile_infos.emplace_back(
-            CompileInfo{outline_switch_, outline});
+        editor_context.compile_infos.lock()->emplace_back(CompileInfo{
+            outline_switch_, outline});
     }
 
     outline_switch_->mask = MASK_GUI2;
 
     is_selected_ = true;
 
-    context_.selected_objects.emplace_back(this);
-    context_.gizmo->update_position();
+    editor_context.selected_objects.emplace_back(this);
+    editor_context.gizmo->update_position();
 
     return true;
 }
@@ -202,19 +196,19 @@ RouteObjectsIterator RouteObject::deselect()
 
     is_selected_ = false;
 
-    RouteObjects& selected_objects = context_.selected_objects;
+    auto& selected_objects = editor_context.selected_objects;
 
     const auto it = selected_objects.erase(std::find(selected_objects.begin(),
         selected_objects.end(), vsg::ref_ptr(this)));
 
-    context_.gizmo->update_position();
+    editor_context.gizmo->update_position();
 
     return it;
 }
 
 vsg::ref_ptr<RouteObject> RouteObject::copy() const
 {
-    return RouteObject::create(context_, paged_lod_, label,
+    return RouteObject::create(editor_context, paged_lod_, label,
         translation_, rotation_deg_, scale_);
 }
 
@@ -233,10 +227,14 @@ void RouteObject::set_matrix(const vsg::dmat4& matrix)
 
 void RouteObject::update_matrix()
 {
+    constexpr vsg::dvec3 X_AXIS = {1.0, 0.0, 0.0};
+    constexpr vsg::dvec3 Y_AXIS = {0.0, 1.0, 0.0};
+    constexpr vsg::dvec3 Z_AXIS = {0.0, 0.0, 1.0};
+
     matrix = vsg::translate(translation_) *
-             vsg::rotate(vsg::radians(rotation_deg_.z), AXIS_Z_POSITIVE) *
-             vsg::rotate(vsg::radians(rotation_deg_.y), AXIS_Y_POSITIVE) *
-             vsg::rotate(vsg::radians(rotation_deg_.x), AXIS_X_POSITIVE) *
+             vsg::rotate(vsg::radians(rotation_deg_.z), Z_AXIS) *
+             vsg::rotate(vsg::radians(rotation_deg_.y), Y_AXIS) *
+             vsg::rotate(vsg::radians(rotation_deg_.x), X_AXIS) *
              vsg::scale(scale_);
 
     update_bounds();
@@ -249,7 +247,7 @@ void RouteObject::update_bounds()
     this->accept(compute_bounds);
     bounds_ = compute_bounds.bounds;
 
-    context_.gizmo->update_position();
+    editor_context.gizmo->update_position();
 }
 
 void RouteObject::decompose_matrix()

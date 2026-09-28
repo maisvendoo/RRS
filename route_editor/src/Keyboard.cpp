@@ -1,72 +1,69 @@
-#include "Keyboard.h"
+#include "editor/Keyboard.h"
 
-#include "Action.h"
-#include "KeyBinding.h"
+#include "editor/Action.h"
+#include "editor/KeyBindings.h"
 
 #include <vsg/ui/KeyEvent.h>
 
-#define HANDLE_KEY_MODIFIERS(event, modifiers, op)    \
-    switch (event.keyBase)                            \
-    {                                                 \
-        case vsg::KEY_Alt_L:                          \
-        case vsg::KEY_Alt_R:                          \
-        {                                             \
-            modifiers op vsg::MODKEY_Alt;             \
-            return;                                   \
-        }                                             \
-        case vsg::KEY_Control_L:                      \
-        case vsg::KEY_Control_R:                      \
-        {                                             \
-            modifiers op vsg::MODKEY_Control;         \
-            return;                                   \
-        }                                             \
-        case vsg::KEY_Shift_L:                        \
-        case vsg::KEY_Shift_R:                        \
-        {                                             \
-            modifiers op vsg::MODKEY_Shift;           \
-            return;                                   \
-        }                                             \
-        default:                                      \
-        {                                             \
-            return;                                   \
-        }                                             \
-    }
-
 Keyboard::Keyboard(const KeyBindings& key_bindings)
     : key_bindings_{key_bindings}
-    , active_modifiers_{0}
 {
 }
 
-void Keyboard::handle_key_press(vsg::KeyPressEvent& keyPress)
+void Keyboard::apply(vsg::KeyPressEvent& keyPress)
 {
-    key_states_.set(keyPress.keyBase, true);
-    HANDLE_KEY_MODIFIERS(keyPress, active_modifiers_, |=);
+    vsg::Keyboard::apply(keyPress);
+    modifiers = keyPress.keyModifier & (
+        vsg::MODKEY_Alt | vsg::MODKEY_Control | vsg::MODKEY_Shift
+    );
 }
 
-void Keyboard::handle_key_release(vsg::KeyReleaseEvent& keyRelease)
+void Keyboard::apply(vsg::KeyReleaseEvent& keyRelease)
 {
-    key_states_.set(keyRelease.keyBase, false);
-    HANDLE_KEY_MODIFIERS(keyRelease, active_modifiers_, ^=);
-}
-
-bool Keyboard::get_action_state(Action action) const
-{
-    const KeyBinding key_binding{key_bindings_.at(action)};
-    return key_states_.test(key_binding.key) && (active_modifiers_ == key_binding.modifiers);
-}
-
-bool Keyboard::get_alt_state() const
-{
-    return active_modifiers_ & vsg::MODKEY_Alt;
-}
-
-bool Keyboard::get_ctrl_state() const
-{
-    return active_modifiers_ & vsg::MODKEY_Control;
+    vsg::Keyboard::apply(keyRelease);
+    modifiers = keyRelease.keyModifier & (
+        vsg::MODKEY_Alt | vsg::MODKEY_Control | vsg::MODKEY_Shift
+    );
 }
 
 bool Keyboard::get_shift_state() const
 {
-    return active_modifiers_ & vsg::MODKEY_Shift;
+    return modifiers & vsg::MODKEY_Shift;
+}
+
+bool Keyboard::get_ctrl_state() const
+{
+    return modifiers & vsg::MODKEY_Control;
+}
+
+bool Keyboard::get_alt_state() const
+{
+    return modifiers & vsg::MODKEY_Alt;
+}
+
+bool Keyboard::pressed_once(vsg::KeySymbol key, bool ignore_handled_keys) const
+{
+    auto itr = keyState.find(key);
+    if (itr == keyState.end())
+    {
+        return false;
+    }
+
+    const auto& keyHistory = itr->second;
+
+    return (keyHistory.timeOfKeyRelease == keyHistory.timeOfFirstKeyPress) &&
+        (keyHistory.timeOfLastKeyPress == keyHistory.timeOfFirstKeyPress) &&
+        (!(ignore_handled_keys && keyHistory.handled));
+}
+
+bool Keyboard::pressed(Action action, bool ignore_handled_keys) const
+{
+    return (key_bindings_.modifiers[action] == modifiers) &&
+        vsg::Keyboard::pressed(key_bindings_.keys[action], ignore_handled_keys);
+}
+
+bool Keyboard::pressed_once(Action action, bool ignore_handled_keys) const
+{
+    return (key_bindings_.modifiers[action] == modifiers) &&
+        pressed_once(key_bindings_.keys[action], ignore_handled_keys);
 }

@@ -1,33 +1,36 @@
-#include "EditorGui.h"
+#include "editor/EditorGui.h"
 
-#include "Action.h"
-#include "CameraHandler.h"
-#include "EditorContext.h"
-#include "EditorState.h"
-#include "Gizmo.h"
-#include "Journal.h"
-#include "KeyBinding.h"
-#include "ObjectSelector.h"
-#include "Route.h"
-#include "RouteObject.h"
-#include "SceneGraph.h"
-#include "Settings.h"
-#include "filesystem.h"
-#include "rail-signal.h"
-#include "switch.h"
-#include "topology.h"
-#include "topology-defines.h"
-#include "track.h"
-#include "trajectory.h"
-#include "vec3.h"
-#include "commands/AddObject.h"
-#include "commands/Command.h"
-#include "commands/CommandList.h"
-#include "commands/RotateObjects.h"
-#include "commands/ScaleObjects.h"
-#include "commands/TranslateObjects.h"
+#include "editor/Action.h"
+#include "editor/Camera.h"
+#include "editor/EditorContext.h"
+#include "editor/EditorState.h"
+#include "editor/Gizmo.h"
+#include "editor/KeyBindings.h"
+#include "editor/ObjectSelector.h"
+#include "editor/Route.h"
+#include "editor/RouteObject.h"
+#include "editor/StateManager.h"
+#include "editor/commands/AddObjectCommand.h"
+#include "editor/commands/Command.h"
+#include "editor/commands/CommandManager.h"
+#include "editor/commands/RotateObjectsCommand.h"
+#include "editor/commands/ScaleObjectsCommand.h"
+#include "editor/commands/TranslateObjectsCommand.h"
+#include "editor/settings/CameraSettings.h"
+#include "editor/settings/GuiSettings.h"
+#include "editor/states/State.h"
 
-#include "ImGuiFileDialog.h"
+#include <Journal.h>
+#include <filesystem.h>
+#include <rail-signal.h>
+#include <switch.h>
+#include <topology.h>
+#include <topology-defines.h>
+#include <track.h>
+#include <trajectory.h>
+#include <vec3.h>
+
+#include <ImGuiFileDialog.h>
 
 #include <vsg/app/ProjectionMatrix.h>
 #include <vsg/app/RecordTraversal.h>
@@ -58,10 +61,9 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdio>
-#include <mutex>
+#include <functional>
+#include <memory>
 #include <string>
-
-#define SHOW_WINDOW(setting_name) if (gui_settings.setting_name) setting_name()
 
 static bool drag_double(const char* label, double* data,
     const double* min = nullptr)
@@ -79,33 +81,32 @@ static bool drag_double3(const char* label, double* data, float speed = 1.0f,
 }
 
 EditorGui::EditorGui(EditorContext& context)
-    : context_(context)
+    : editor_context(context)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    // io.IniFilename = nullptr;
 
-    const FileSystem& fs = FileSystem::getInstance();
+    const auto& gui_settings = context.gui_settings;
 
-    const char* const font_name = "JetBrainsMono-Regular.ttf";
-    const auto font_path = fs.combinePath(fs.getFontsDir(), font_name);
-
-    io.Fonts->AddFontFromFileTTF(font_path.c_str(), context.settings.gui_settings.font_size,
+    add_ttf_font("JetBrainsMono-Regular.ttf", gui_settings.font_size,
         nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-    if (!context.settings.gui_settings.is_editable)
+    if (!gui_settings.is_editable)
     {
         window_flags_ |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     }
 
     ImGuiStyle& style = ImGui::GetStyle();
-    style.FrameRounding = 6.0f;
     style.FrameBorderSize = 1.0f;
-    style.WindowRounding = 6.0f;
+    style.FrameRounding = 3.0f;
     style.ScrollbarSize = 16.0f;
     style.GrabMinSize = 16.0f;
-    style.GrabRounding = 6.0f;
+
+    viewport = ImGui::GetMainViewport();
 }
 
 EditorGui::~EditorGui()
@@ -113,22 +114,28 @@ EditorGui::~EditorGui()
     // ImGui::DestroyContext();
 }
 
-void EditorGui::record(vsg::CommandBuffer& command_buffer) const
+void EditorGui::record([[maybe_unused]] vsg::CommandBuffer& command_buffer) const
 {
-    (void)command_buffer;
+    // ImGui::DockSpaceOverViewport(0, viewport);
 
-    switch (context_.state)
+    draw_main_menu_bar();
+    draw_status_bar();
+    draw_invalid_route_popup();
+
+    const auto& state_manager = editor_context.state_manager;
+    state_manager->get_current_editor_state()->draw_gui();
+
+    auto& gui_settings = editor_context.gui_settings;
+
+    switch (editor_context.editor_state)
     {
         case EditorState::SELECT_ROUTE:
         {
-            select_route();
-
             return;
         }
         default:
         {
-            gui_settings_t& gui_settings = context_.settings.gui_settings;
-
+            // ImGui::SetNextWindowPos(viewport->WorkPos);
             ImGui::Begin("Settings", nullptr, window_flags_);
             ImGui::Checkbox("Show objects.ref", &gui_settings.show_objects_ref);
             ImGui::Checkbox("Show route1.map", &gui_settings.show_route_map);
@@ -141,90 +148,33 @@ void EditorGui::record(vsg::CommandBuffer& command_buffer) const
             ImGui::Checkbox("Show commands", &gui_settings.show_commands);
             ImGui::End();
 
-            ImGui::ShowDemoWindow();
+            // ImGui::ShowDemoWindow();
 
-            SHOW_WINDOW(show_objects_ref);
-            SHOW_WINDOW(show_route_map);
-            SHOW_WINDOW(show_stations_conf);
-            SHOW_WINDOW(show_waypoints_conf);
-            SHOW_WINDOW(show_key_bindings);
-            SHOW_WINDOW(show_camera_settings);
-            SHOW_WINDOW(show_topology);
-            SHOW_WINDOW(show_selected_objects_properties);
-            SHOW_WINDOW(show_commands);
-
-            ImGui::Begin("TestProgressBars");
-
-            float fraction = 1.0f;
-            if (context_.total_static_objects_count != 0)
-            {
-                fraction = (float)context_.static_objects_count /
-                    context_.total_static_objects_count;
-            }
-
-            char overlay[64];
-            snprintf(overlay, 64, "%zu / %zu",
-                context_.static_objects_count.load(),
-                context_.total_static_objects_count.load());
-
-            ImGui::ProgressBar(fraction, {200.0f, 30.0f}, overlay);
-
-            if (context_.topology_loaded)
-            {
-                fraction = 1.0f;
-                if (context_.total_topology_objects_count != 0)
-                {
-                    fraction = (float)context_.topology_objects_count /
-                        context_.total_topology_objects_count;
-                }
-
-                snprintf(overlay, 64, "%zu / %zu",
-                    context_.topology_objects_count.load(),
-                    context_.total_topology_objects_count.load());
-
-                ImGui::ProgressBar(fraction, {200.0f, 30.0f}, overlay);
-            }
-            else
-            {
-                ImGui::Text("Topology not yet loaded");
-            }
-
-            ImGui::End();
+            show_objects_ref();
+            show_route_map();
+            show_stations_conf();
+            show_waypoints_conf();
+            show_key_bindings();
+            show_camera_settings();
+            show_topology();
+            show_selected_objects_properties();
+            show_commands();
 
             return;
         }
     }
 }
 
-void EditorGui::select_route() const
-{
-    static bool dialog_opened = false;
-    if (!dialog_opened)
-    {
-        IGFD::FileDialogConfig config;
-        config.path = "../routes";
-        ImGuiFileDialog::Instance()->OpenDialog(
-            "select_route", "Select route", nullptr, config);
-        dialog_opened = true;
-    }
-
-    if (ImGuiFileDialog::Instance()->Display("select_route"))
-    {
-        if (ImGuiFileDialog::Instance()->IsOk())
-        {
-            context_.route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
-            context_.state = EditorState::LOAD_ROUTE;
-        }
-
-        ImGuiFileDialog::Instance()->Close();
-    }
-}
-
 void EditorGui::show_objects_ref() const
 {
+    if (!editor_context.gui_settings.show_objects_ref)
+    {
+        return;
+    }
+
     ImGui::Begin("objects_ref", nullptr, window_flags_);
 
-    if (!context_.route)
+    if (!editor_context.route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -242,7 +192,7 @@ void EditorGui::show_objects_ref() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, ref] : context_.objects_ref)
+        for (const auto& [label, ref] : editor_context.objects_ref)
         {
             std::string label_lower = label;
             std::transform(label_lower.begin(), label_lower.end(),
@@ -273,9 +223,14 @@ void EditorGui::show_objects_ref() const
 
 void EditorGui::show_route_map() const
 {
+    if (!editor_context.gui_settings.show_route_map)
+    {
+        return;
+    }
+
     ImGui::Begin("route1.map", nullptr, window_flags_);
 
-    if (!context_.route)
+    if (!editor_context.route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
@@ -286,7 +241,7 @@ void EditorGui::show_route_map() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, transforms] : context_.route_map)
+        for (const auto& [label, transforms] : editor_context.route_map)
         {
             for (const auto& transform : transforms)
             {
@@ -321,13 +276,20 @@ void EditorGui::show_route_map() const
 
 void EditorGui::show_stations_conf() const
 {
+    if (!editor_context.gui_settings.show_stations_conf)
+    {
+        return;
+    }
+
+    const auto& camera = editor_context.camera;
+
     ImGui::Begin("stations.conf", nullptr, window_flags_);
 
     if (ImGui::BeginTable("stations_conf_table", 4,
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, translation] : context_.stations_conf)
+        for (const auto& [label, translation] : editor_context.stations_conf)
         {
             constexpr const char* number_format = "%10.3f";
 
@@ -335,11 +297,12 @@ void EditorGui::show_stations_conf() const
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                context_.look_at->eye = translation +
+                camera->get_look_at()->eye = translation +
                     vsg::dvec3(0.0, 0.0, 50.0);
 
-                context_.look_at->center = context_.look_at->eye
-                    + context_.camera_handler->get_front();
+                camera->get_look_at()->center =
+                    camera->get_look_at()->eye +
+                    camera->get_front();
             }
             ImGui::TableNextColumn();
             ImGui::Text(number_format, translation.x);
@@ -358,10 +321,18 @@ void EditorGui::show_stations_conf() const
 // TODO: Сделать, чтобы реальные позиции грузились один раз?
 void EditorGui::show_waypoints_conf() const
 {
-    if (!context_.topology_loaded)
+    if (!editor_context.gui_settings.show_waypoints_conf)
     {
         return;
     }
+
+    if (!editor_context.topology_loaded.load())
+    {
+        return;
+    }
+
+    auto topology_guard = editor_context.topology.lock();
+    auto& topology = *topology_guard;
 
     ImGui::Begin("waypoints.conf", nullptr, window_flags_);
 
@@ -369,14 +340,13 @@ void EditorGui::show_waypoints_conf() const
         ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
         ImGuiTableFlags_RowBg))
     {
-        for (const auto& [label, data] : context_.waypoints_conf)
+        for (const auto& [label, data] : editor_context.waypoints_conf)
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             if (ImGui::Button(label.c_str()))
             {
-                const traj_list_t* const traj_list =
-                    context_.topology->getTrajectoriesList();
+                const traj_list_t* const traj_list = topology->getTrajectoriesList();
 
                 const QString traj_name = QString::fromStdString(
                     data.trajectory_name);
@@ -397,12 +367,16 @@ void EditorGui::show_waypoints_conf() const
 
                     double h = 5.0;
 
-                    context_.look_at->eye = vsg::dvec3(pos.x + pd.up.x * h,
-                                                      pos.y + pd.up.y * h,
-                                                      pos.z + pd.up.z * h);
+                    const auto& camera = editor_context.camera;
 
-                    context_.look_at->center = context_.look_at->eye
-                        + context_.camera_handler->get_front();
+                    camera->get_look_at()->eye =
+                        vsg::dvec3(pos.x + pd.up.x * h,
+                            pos.y + pd.up.y * h,
+                            pos.z + pd.up.z * h);
+
+                    camera->get_look_at()->center =
+                        camera->get_look_at()->eye +
+                        camera->get_front();
                 }
             }
             ImGui::TableNextColumn();
@@ -423,6 +397,11 @@ void EditorGui::show_waypoints_conf() const
 
 void EditorGui::show_key_bindings() const
 {
+    if (!editor_context.gui_settings.show_key_bindings)
+    {
+        return;
+    }
+
     ImGui::Begin("Key Bindings", nullptr, window_flags_);
 
     if (ImGui::BeginTable("key_bindings_table", 2,
@@ -446,14 +425,14 @@ void EditorGui::show_key_bindings() const
 
             for (const auto& [modifier, name] : test_map)
             {
-                if (context_.settings.key_bindings[i].modifiers & modifier)
+                if (editor_context.key_bindings.modifiers[i] & modifier)
                 {
                     label += name;
                     label += " + ";
                 }
             }
 
-            label += std::toupper(context_.settings.key_bindings[i].key);
+            label += std::toupper(editor_context.key_bindings.keys[i]);
             ImGui::Text("%s", label.c_str());
         }
 
@@ -465,26 +444,33 @@ void EditorGui::show_key_bindings() const
 
 void EditorGui::show_camera_settings() const
 {
+    if (!editor_context.gui_settings.show_camera_settings)
+    {
+        return;
+    }
+
     ImGui::Begin("Camera Settings", nullptr, window_flags_);
 
     constexpr double min = 0.0;
 
     ImGui::Text("Move speed:");
-    drag_double("##move_speed", &context_.settings.camera_settings.move_speed, &min);
+    drag_double("##move_speed", &editor_context.camera_settings.move_speed, &min);
 
     ImGui::Text("Rotate speed:");
-    drag_double("##rotate_speed", &context_.settings.camera_settings.rotate_speed, &min);
+    drag_double("##rotate_speed", &editor_context.camera_settings.rotate_speed, &min);
 
     ImGui::Text("Zoom power:");
-    drag_double("##zoom_power", &context_.settings.camera_settings.zoom_power, &min);
+    drag_double("##zoom_power", &editor_context.camera_settings.zoom_power, &min);
 
     ImGui::Text("FovY:");
 
-    settings_t& settings = context_.settings;
-    if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double, &settings.camera_settings.fovy,
-        &settings.camera_settings.fovy_min, &settings.camera_settings.fovy_max, "%.3f"))
+    const auto& camera = editor_context.camera;
+
+    if (ImGui::SliderScalar("##fovy", ImGuiDataType_Double,
+        &editor_context.camera_settings.fovy, &editor_context.camera_settings.fovy_min,
+        &editor_context.camera_settings.fovy_max, "%.3f"))
     {
-        context_.perspective->fieldOfViewY = settings.camera_settings.fovy;
+        camera->get_perspective()->fieldOfViewY = editor_context.camera_settings.fovy;
     }
 
     ImGui::End();
@@ -492,30 +478,36 @@ void EditorGui::show_camera_settings() const
 
 void EditorGui::show_topology() const
 {
+    if (!editor_context.gui_settings.show_topology)
+    {
+        return;
+    }
+
     ImGui::Begin("Topology", nullptr, window_flags_);
 
-    const auto route = context_.route;
-    if (!route)
+    if (!editor_context.route)
     {
         ImGui::Text("There is no route yet");
         ImGui::End();
         return;
     }
 
-    std::lock_guard<std::mutex> lock_guard(context_.topology_mutex);
-    if (!context_.topology)
+    auto topology_guard = editor_context.topology.lock();
+    auto& topology = *topology_guard;
+
+    if (!topology)
     {
-        ImGui::Text("There is no topology yet");
+        ImGui::Text("Topology not yet loaded");
         ImGui::End();
         return;
     }
 
-    const auto route_name = context_.topology->getRouteName().toStdString();
+    const auto route_name = topology->getRouteName().toStdString();
     ImGui::Text("Route name: %s", route_name.c_str());
 
     if (ImGui::CollapsingHeader("Trajectories"))
     {
-        const auto* trajectories = context_.topology->getTrajectoriesList();
+        const auto* trajectories = topology->getTrajectoriesList();
         for (const Trajectory* trajectory : *trajectories)
         {
             if (ImGui::TreeNode(trajectory->getName().toStdString().c_str()))
@@ -580,7 +572,7 @@ void EditorGui::show_topology() const
             }
         };
 
-        const sw_list_t* const connectors = context_.topology->getConnectorsList();
+        const sw_list_t* const connectors = topology->getConnectorsList();
         for (auto it = connectors->constBegin(); it != connectors->constEnd(); ++it)
         {
             const Switch* const switch_ = dynamic_cast<Switch*>(*it);
@@ -609,12 +601,17 @@ void EditorGui::show_topology() const
 
 void EditorGui::show_selected_objects_properties() const
 {
-    if (!context_.object_selector)
+    if (!editor_context.gui_settings.show_selected_objects_properties)
     {
         return;
     }
 
-    const auto& selected_objects = context_.selected_objects;
+    if (!editor_context.object_selector)
+    {
+        return;
+    }
+
+    const auto& selected_objects = editor_context.selected_objects;
     if (selected_objects.empty())
     {
         return;
@@ -642,42 +639,47 @@ void EditorGui::show_selected_objects_properties() const
 
 void EditorGui::show_commands() const
 {
-    ImGui::Begin("Commands");
-    auto active = context_.commands.get_active();
-    auto curr = context_.commands.get_tail();
-    while (curr)
+    if (!editor_context.gui_settings.show_commands)
     {
-        if (curr == active)
-        {
-            ImGui::TextColored(ImVec4{0.2f, 1.0f, 0.3f, 1.0f}, "%s",
-                curr->command->get_description());
-            ImGui::Separator();
-        }
-        else
-        {
-            ImGui::Text("%s", curr->command->get_description());
-            ImGui::Separator();
-        }
-
-        curr = curr->prev;
+        return;
     }
+
+    ImGui::Begin("Commands");
+
+    const auto& command_manager = editor_context.command_manager;
+
+    command_manager->for_each_command([](const std::unique_ptr<::Command>& command) -> void {
+        ImGui::Text("%s", command->get_description());
+        ImGui::Separator();
+    });
+
+    command_manager->for_each_undone([](const std::unique_ptr<::Command>& command) -> void {
+        ImGui::TextColored(ImVec4{0.3f, 0.3f, 0.3f, 1.0f}, "%s",
+            command->get_description());
+        ImGui::Separator();
+    });
+
     ImGui::End();
 }
 
 void EditorGui::add_object(
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod,
+    const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
     const std::string& label
 ) const
 {
-    const auto object = RouteObject::create(context_, paged_lod, label,
-        context_.look_at->eye + context_.camera_handler->get_front() * 20.0);
+    const auto& camera = editor_context.camera;
 
-    context_.commands.push(new AddObject(context_, object), true);
+    const auto object = RouteObject::create(editor_context, paged_lod, label,
+        camera->get_look_at()->eye + camera->get_front() * 20.0);
+
+    auto command = std::make_unique<AddObjectCommand>(editor_context, object);
+    command->execute();
+    editor_context.command_manager->push(std::move(command));
 }
 
 void EditorGui::save_objects_matrixes() const
 {
-    for (const auto& object : context_.selected_objects)
+    for (const auto& object : editor_context.selected_objects)
     {
         object->save_matrix();
     }
@@ -685,7 +687,7 @@ void EditorGui::save_objects_matrixes() const
 
 void EditorGui::handle_translation_drag(
     size_t index,
-    vsg::ref_ptr<RouteObject> object,
+    const vsg::ref_ptr<RouteObject>& object,
     bool& dragging
 ) const
 {
@@ -707,15 +709,17 @@ void EditorGui::handle_translation_drag(
 
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
-        context_.commands.push(new TranslateObjects(context_, {object},
-            total_translation), false);
+        auto command = std::make_unique<TranslateObjectsCommand>(editor_context,
+            RouteObjects{object}, total_translation);
+        editor_context.command_manager->push(std::move(command));
+
         dragging = false;
     }
 }
 
 void EditorGui::handle_rotation_drag(
     std::size_t index,
-    vsg::ref_ptr<RouteObject> object,
+    const vsg::ref_ptr<RouteObject>& object,
     bool& dragging
 ) const
 {
@@ -759,15 +763,17 @@ void EditorGui::handle_rotation_drag(
             radians = vsg::radians(total_rotation_deg.z);
         }
 
-        context_.commands.push(new RotateObjects(context_, {object},
-            context_.gizmo->get_curr_pos(), axis, radians), false);
+        auto command = std::make_unique<RotateObjectsCommand>(editor_context,
+            RouteObjects{object}, editor_context.gizmo->get_curr_pos(), axis, radians);
+        editor_context.command_manager->push(std::move(command));
+
         dragging = false;
     }
 }
 
 void EditorGui::handle_scale_drag(
     size_t index,
-    vsg::ref_ptr<RouteObject> object,
+    const vsg::ref_ptr<RouteObject>& object,
     bool& dragging
 ) const
 {
@@ -794,8 +800,98 @@ void EditorGui::handle_scale_drag(
 
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
-        context_.commands.push(new ScaleObjects(context_, {object},
-            context_.gizmo->get_curr_pos(), total_scale), false);
+        auto command = std::make_unique<ScaleObjectsCommand>(editor_context,
+            RouteObjects{object}, editor_context.gizmo->get_curr_pos(), total_scale);
+        editor_context.command_manager->push(std::move(command));
+
         dragging = false;
+    }
+}
+
+void EditorGui::add_ttf_font(
+    const char* filename,
+    float size_pixels,
+    const ImFontConfig* font_cfg,
+    const ImWchar* glyph_ranges
+)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    const FileSystem& fs = FileSystem::getInstance();
+    const std::string font_path = fs.combinePath(fs.getFontsDir(), filename);
+    io.Fonts->AddFontFromFileTTF(font_path.c_str(), size_pixels, font_cfg,
+        glyph_ranges);
+}
+
+void EditorGui::draw_main_menu_bar() const
+{
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("New route"))
+            {
+                // TODO
+            }
+
+            if (ImGui::MenuItem("Load route"))
+            {
+                IGFD::FileDialogConfig config;
+                config.path = FileSystem::getInstance().getRouteRootDir();
+                ImGuiFileDialog::Instance()->OpenDialog("LoadRouteKey",
+                    "Load route", nullptr, config);
+            }
+
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+}
+
+void EditorGui::draw_status_bar() const
+{
+    ImGui::SetNextWindowPos(ImVec2(
+        viewport->Pos.x,
+        viewport->Pos.y + viewport->Size.y - ImGui::GetFrameHeight() * 1.5
+    ));
+    ImGui::SetNextWindowSize(ImVec2(
+        viewport->Size.x,
+        ImGui::GetFrameHeight() * 1.5
+    ));
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
+    // ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs |
+    // ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse |
+    // ImGuiWindowFlags_NoSavedSettings |
+    // ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoBackground;
+    // ImGuiWindowFlags_MenuBar;
+
+    if (ImGui::Begin("StatusBar", nullptr, flags))
+    {
+        editor_context.state_manager->get_current_editor_state()->fill_status_bar();
+        ImGui::End();
+    }
+}
+
+void EditorGui::draw_invalid_route_popup() const
+{
+    if (ImGui::BeginPopupModal("InvalidRoute", nullptr,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
+    {
+        ImGui::Text(
+            "Invalid route!\n"
+            "Route must contain:\n"
+            "models/\n"
+            "textures/\n"
+            "topology/\n"
+            "objects.ref"
+        );
+
+        if (ImGui::Button("OK", ImVec2(-FLT_MIN, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
     }
 }

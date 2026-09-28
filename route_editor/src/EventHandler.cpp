@@ -1,44 +1,47 @@
-#include "EventHandler.h"
+#include "editor/EventHandler.h"
 
-#include "Keyboard.h"
-#include "states/CameraNavigationState.h"
-#include "states/GizmoRotateState.h"
-#include "states/GizmoScaleState.h"
-#include "states/GizmoTranslateState.h"
-#include "states/InitialState.h"
-#include "states/KeyboardRotateState.h"
-#include "states/KeyboardScaleState.h"
-#include "states/KeyboardTranslateState.h"
-#include "states/SelectRouteState.h"
-#include "states/State.h"
+#include "editor/EditorContext.h"
+#include "editor/StateManager.h"
+#include "editor/states/State.h"
 
-#include <memory>
-
-EventHandler::EventHandler(Keyboard* keyboard)
-    : keyboard_(keyboard)
-    , select_route_state_(std::make_unique<SelectRouteState>())
-    , initial_state_(std::make_unique<InitialState>())
-    , camera_navigation_state_(std::make_unique<CameraNavigationState>())
-    , keyboard_translate_state_(std::make_unique<KeyboardTranslateState>())
-    , keyboard_rotate_state_(std::make_unique<KeyboardRotateState>())
-    , keyboard_scale_state_(std::make_unique<KeyboardScaleState>())
-    , gizmo_translate_state_(std::make_unique<GizmoTranslateState>())
-    , gizmo_rotate_state_(std::make_unique<GizmoRotateState>())
-    , gizmo_scale_state_(std::make_unique<GizmoScaleState>())
+EventHandler::EventHandler(EditorContext& editor_context)
+    : editor_context(editor_context)
 {
-    state_ = &select_route_state_;
 }
 
 EventHandler::~EventHandler() = default;
 
-void EventHandler::apply(vsg::KeyPressEvent& keyPress)
+void EventHandler::apply([[maybe_unused]] vsg::KeyPressEvent& keyPress)
 {
-    keyboard_->handle_key_press(keyPress);
-    (*state_)->handle_key_press(keyPress);
+    editor_context.state_manager->get_current_editor_state()->handle_key_press();
 }
 
-void EventHandler::apply(vsg::KeyReleaseEvent& keyRelease)
+void EventHandler::apply([[maybe_unused]] vsg::KeyReleaseEvent& keyRelease)
 {
-    keyboard_->handle_key_release(keyRelease);
-    (*state_)->handle_key_release(keyRelease);
+    editor_context.state_manager->get_current_editor_state()->handle_key_release();
+}
+
+void EventHandler::apply([[maybe_unused]] vsg::ButtonPressEvent& buttonPress)
+{
+    editor_context.state_manager->get_current_editor_state()->handle_button_press();
+}
+
+void EventHandler::apply([[maybe_unused]] vsg::ButtonReleaseEvent& buttonRelease)
+{
+    editor_context.state_manager->get_current_editor_state()->handle_button_release();
+}
+
+void EventHandler::apply([[maybe_unused]] vsg::MoveEvent& moveEvent)
+{
+    editor_context.state_manager->get_current_editor_state()->handle_mouse_move();
+}
+
+void EventHandler::apply([[maybe_unused]] vsg::ScrollWheelEvent& scrollWheel)
+{
+    editor_context.state_manager->get_current_editor_state()->handle_mouse_scroll();
+}
+
+void EventHandler::update(double delta_time)
+{
+    editor_context.state_manager->get_current_editor_state()->update(delta_time);
 }
