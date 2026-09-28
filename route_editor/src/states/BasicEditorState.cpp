@@ -33,10 +33,10 @@ BasicEditorState::~BasicEditorState() = default;
 void BasicEditorState::handle_key_press()
 {
     const auto& keyboard = editor_context.keyboard;
-    const auto& command_manager = editor_context.command_manager;
     const auto& camera = editor_context.camera;
-    auto& copied_objects = editor_context.copied_objects;
+    const auto& command_manager = editor_context.command_manager;
     const auto& selected_objects = editor_context.selected_objects;
+    auto& copied_objects = editor_context.copied_objects;
     const auto& state_manager = editor_context.state_manager;
 
     if (keyboard->pressed_once(ACTION_UNDO_COMMAND))
@@ -104,14 +104,14 @@ void BasicEditorState::handle_key_press()
 
 void BasicEditorState::handle_button_press()
 {
-    const auto& mouse = editor_context.mouse;
-    const auto& gizmo = editor_context.gizmo;
-    const auto& camera = editor_context.camera;
-    const auto& route = editor_context.route;
-    const auto& selected_objects = editor_context.selected_objects;
     const auto& keyboard = editor_context.keyboard;
-    const auto& command_manager = editor_context.command_manager;
+    const auto& mouse = editor_context.mouse;
+    const auto& camera = editor_context.camera;
     const auto& state_manager = editor_context.state_manager;
+    const auto& route = editor_context.route;
+    const auto& gizmo = editor_context.gizmo;
+    const auto& selected_objects = editor_context.selected_objects;
+    const auto& command_manager = editor_context.command_manager;
 
     switch (mouse->get_button_mask())
     {

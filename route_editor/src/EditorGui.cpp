@@ -5,6 +5,7 @@
 #include "editor/EditorContext.h"
 #include "editor/EditorState.h"
 #include "editor/Gizmo.h"
+#include "editor/KeyBindings.h"
 #include "editor/ObjectSelector.h"
 #include "editor/Route.h"
 #include "editor/RouteObject.h"
@@ -411,7 +412,7 @@ void EditorGui::show_key_bindings() const
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
-            ImGui::Text("%s", editor_context.actions.descriptions[i].c_str());
+            ImGui::Text("%s", to_c_string(static_cast<Action>(i)));
             ImGui::TableNextColumn();
 
             std::string label;
@@ -424,14 +425,14 @@ void EditorGui::show_key_bindings() const
 
             for (const auto& [modifier, name] : test_map)
             {
-                if (editor_context.actions.modifiers[i] & modifier)
+                if (editor_context.key_bindings.modifiers[i] & modifier)
                 {
                     label += name;
                     label += " + ";
                 }
             }
 
-            label += std::toupper(editor_context.actions.keys[i]);
+            label += std::toupper(editor_context.key_bindings.keys[i]);
             ImGui::Text("%s", label.c_str());
         }
 

@@ -1,7 +1,8 @@
-#ifndef EDITOR_KEYBOARD_H
-#define EDITOR_KEYBOARD_H
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
 
 #include "editor/Action.h"
+#include "editor/KeyBindings.h"
 
 #include <vsg/core/Inherit.h>
 #include <vsg/ui/KeyEvent.h>
@@ -9,12 +10,10 @@
 
 #include <cstdint>
 
-struct EditorContext;
-
 class Keyboard : public vsg::Inherit<vsg::Keyboard, Keyboard>
 {
 public:
-    explicit Keyboard(EditorContext& editor_context);
+    explicit Keyboard(const KeyBindings& key_bindings);
     virtual ~Keyboard() = default;
 
     virtual void apply(vsg::KeyPressEvent& keyPress) override;
@@ -29,8 +28,8 @@ public:
     bool pressed_once(Action action, bool ignore_handled_keys = true) const;
 
 private:
-    EditorContext& editor_context;
+    const KeyBindings& key_bindings_;
     std::uint16_t modifiers = 0;
 };
 
-#endif // EDITOR_KEYBOARD_H
+#endif // KEYBOARD_H
