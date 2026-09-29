@@ -150,10 +150,12 @@ bool IOController::load_config(CfgReader &cfg)
         QString type = "";
         cfg.getString(secNode, "Type", type);
 
+        double value = 0.0;
+
         double value1 = 0.0;
-        cfg.getDouble(secNode, "value1", value1);
+
         double value2 = 0.0;
-        cfg.getDouble(secNode, "value2", value2);
+
 
         QString object_name_cab1 = "";
         cfg.getString(secNode, "ObjectNameCab1", object_name_cab1);
@@ -164,13 +166,13 @@ bool IOController::load_config(CfgReader &cfg)
         QString object_name = "";
         cfg.getString(secNode, "ObjectName", object_name);
 
-        if (!object_name.isEmpty())
+        if (cfg.getDouble(secNode, "value", value))
         {
             auto &ctrl_handlers = *(control_handlers.end() - 1);
             ControlHandler *ctrl_handler = create_handler(type, secNode, cfg);
             ctrl_handler->cabine_idx = control_handlers.size() - 1;
             ctrl_handler->contolledObjectName = object_name;
-            ctrl_handler->value = value1;
+            ctrl_handler->value = value;
             ctrl_handler->setAnimationSignalsMap(&animation_signals_map);
             ctrl_handlers.insert(ctrl_handler->id, object_name, ctrl_handler);
 
@@ -178,7 +180,7 @@ bool IOController::load_config(CfgReader &cfg)
                     this, &IOController::sigSendVehicleControlCommand);
         }
 
-        if (!object_name_cab1.isEmpty() && cabs_num > 0)
+        if (cfg.getDouble(secNode, "value1", value1) && cabs_num > 0)
         {
             ControlHandler *ctrl_handler = create_handler(type, secNode, cfg);
             ctrl_handler->cabine_idx = 0;
@@ -191,7 +193,7 @@ bool IOController::load_config(CfgReader &cfg)
                     this, &IOController::sigSendVehicleControlCommand);
         }
 
-        if (!object_name_cab2.isEmpty() && cabs_num > 1)
+        if (cfg.getDouble(secNode, "value2", value2) && cabs_num > 1)
         {
             ControlHandler *ctrl_handler = create_handler(type, secNode, cfg);
             ctrl_handler->cabine_idx = 1;
