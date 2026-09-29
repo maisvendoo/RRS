@@ -21,7 +21,8 @@
 void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
 {
     // Песочница
-    sand_system->setControl(&pressed_keys);
+    // Управление через IOController (stepControls)
+    //sand_system->setControl(&pressed_keys);
 
     // Не допускаем двух рукояток в устройствах блокировки тормозов
     brake_lock[CAB2]->allowLockHandle(!(brake_lock[CAB1]->isLockHandle()));
@@ -73,7 +74,8 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         }*/
 
         // Тифон и свисток
-        horn[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
+        // Управление через IOController (stepControls)
+        //horn[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
     }
 
     // Автозапуск

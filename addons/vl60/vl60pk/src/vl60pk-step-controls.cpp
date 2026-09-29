@@ -108,5 +108,10 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         // Кран 254
         loco_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KVT_254].value);
+
+        // Кнопки песочницы, свистка, тифона
+        sand_system->setSandDeliveryOn(control_inputs[cab_idx][CTRL_SAND_BUTTON].toBool());
+        horn[cab_idx]->setSvistokOn(control_inputs[cab_idx][CTRL_WHISTLE_BUTTON].toBool());
+        horn[cab_idx]->setTifonOn(control_inputs[cab_idx][CTRL_TIFON_BUTTON].toBool());
     }
 }

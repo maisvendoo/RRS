@@ -547,4 +547,46 @@
 
 	</Control>
 
+	<!-- Кнопка песочницы -->
+	<Control>
+		<ID>133</ID>
+		<Name>Кнопка песочницы</Name>
+		<Description>Подача песка под колёса</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Delete</KeyName>
+		<ObjectNameCab1>Cab1_Knopki_button_sand</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopki_button_sand</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Кнопка свистка -->
+	<Control>
+		<ID>134</ID>
+		<Name>Кнопка свистка</Name>
+		<Description>Звуковой сигнал свистком</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Space</KeyName>
+		<ObjectNameCab1>Cab1_Knopki_button_svistok</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopki_button_svistok</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Кнопка тифона -->
+	<Control>
+		<ID>135</ID>
+		<Name>Кнопка тифона</Name>
+		<Description>Звуковой сигнал тифоном</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_B</KeyName>
+		<ObjectNameCab1>Cab1_Knopki_button_tifon</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopki_button_tifon</ObjectNameCab2>
+
+	</Control>
+
 </Config>
