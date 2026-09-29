@@ -115,17 +115,19 @@ public:
         return static_cast<int>(value);
     }
 
-    void sendControlSignal();
+
+    /// Слать значение по его изменению - экономим трафик
+    bool setValueIfChanged(float new_value, float epsilon = 1e-6f);
 
 signals:
 
     void sigSendControlCommand(const QByteArray &data);
 
-protected:    
+protected:
 
     const std::vector<float> *feedback_signals = nullptr;
 
-    const QMap<QString, uint16_t> *animation_signals_map = nullptr;    
+    const QMap<QString, uint16_t> *animation_signals_map = nullptr;
 
     /// Проверка нажатого модификатора
     bool isKeyModifier(const std::set<uint16_t>& keys, const QString& modName);
@@ -182,16 +184,8 @@ protected:
         return 0;
     }
 
-    /// Слать значение по его изменению - экономим трафик
-    bool setValueIfChanged(float new_value, float epsilon = 1e-6f)
-    {
-        if (qFabs(new_value - value) <= epsilon)
-            return false;
 
-        value = new_value;
-        sendControlSignal();
-        return true;
-    }
+    void sendControlSignal();
 };
 
 #endif

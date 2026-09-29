@@ -74,11 +74,13 @@ void MouseControlHandler::apply(vsg::ButtonPressEvent &buttonPress)
             return;
         }
 
+        // Запомнили активный обработчик
+        active_handler = handler;
         // Передаем в данные обработчику нажатия кнопки мыши
         handler->processMouseInput(buttonPress.button, true);
 
         // Помечаем нажатие как обработанное
-        buttonPress.handled = true;
+        buttonPress.handled = false;
     }
 }
 
@@ -89,6 +91,15 @@ void MouseControlHandler::apply(vsg::ButtonReleaseEvent &buttonRelease)
 {
     if (buttonRelease.handled)
     {
+        return;
+    }
+
+    // Обработка отпускания на обработчике, ранее вызванном нажатием
+    if (active_handler != nullptr)
+    {
+        active_handler->processMouseInput(buttonRelease.button, false);
+        buttonRelease.handled = false;
+        active_handler = nullptr;
         return;
     }
 
@@ -111,7 +122,7 @@ void MouseControlHandler::apply(vsg::ButtonReleaseEvent &buttonRelease)
 
         handler->processMouseInput(buttonRelease.button, false);
 
-        buttonRelease.handled = true;
+        buttonRelease.handled = false;
     }
 }
 
