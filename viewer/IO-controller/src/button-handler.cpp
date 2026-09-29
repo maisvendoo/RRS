@@ -13,20 +13,18 @@ ButtonHandler::ButtonHandler(QObject *parent) : ControlHandler(parent)
 //------------------------------------------------------------------------------
 void ButtonHandler::processKeyInput(const std::set<uint16_t> &pressed_keys)
 {
+    float new_value = 0.0f;
+
     if (getKeyState(pressed_keys, keyCode))
     {
         if (isKeyModifier(pressed_keys, keyModOnName) ||
             keyModOnName.isEmpty())
         {
-            value = 1.0f;
+            new_value = 1.0f;
         }
     }
-    else
-    {
-        value = 0.0f;
-    }
 
-    sendControlSignal();
+    setValueIfChanged(new_value);
 }
 
 //------------------------------------------------------------------------------
@@ -34,16 +32,17 @@ void ButtonHandler::processKeyInput(const std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 void ButtonHandler::processMouseInput(uint32_t button, bool is_pressed)
 {
+    float new_value = 0.0f;
 
     if (is_pressed && button == CTRL_LEFT_MOUSE_BUTTON)
     {
-        value = 1.0f;
-        sendControlSignal();
+        new_value = 1.0f;
+        setValueIfChanged(new_value);
     }
     else if (!is_pressed && button == CTRL_LEFT_MOUSE_BUTTON)
     {
-        value = 0.0f;
-        sendControlSignal();
+        new_value = 0.0f;
+        setValueIfChanged(new_value);
     }
 }
 

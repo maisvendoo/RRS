@@ -75,8 +75,8 @@ void SwitcherHandler::sendNextPosition(int direction)
                              static_cast<int>(numPositions) - 1);
     if (new_idx == idx) return;  // уже в крайнем положении
 
-    value = minValue + static_cast<float>(new_idx) * val_step;
-    sendControlSignal();
+    float new_value = minValue + static_cast<float>(new_idx) * val_step;
+    setValueIfChanged(new_value);
 }
 
 //------------------------------------------------------------------------------
