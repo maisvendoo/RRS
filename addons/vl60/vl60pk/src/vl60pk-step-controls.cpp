@@ -5,6 +5,8 @@
 #include    <pneumo-brake-lock.h>
 #include    <brake-crane.h>
 #include    <loco-crane.h>
+#include    <sanding-system.h>
+#include    <train-horn.h>
 
 //------------------------------------------------------------------------------
 //
@@ -109,9 +111,11 @@ void VL60pk::stepControls(const double &t, const double &dt)
         // Кран 254
         loco_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KVT_254].value);
 
-        // Кнопки песочницы, свистка, тифона
-        sand_system->setSandDeliveryOn(control_inputs[cab_idx][CTRL_SAND_BUTTON].toBool());
+        // Кнопки свистка, тифона
         horn[cab_idx]->setSvistokOn(control_inputs[cab_idx][CTRL_WHISTLE_BUTTON].toBool());
         horn[cab_idx]->setTifonOn(control_inputs[cab_idx][CTRL_TIFON_BUTTON].toBool());
     }
+
+    // Кнопки песочницы
+    sand_system->setSandDeliveryOn(control_inputs[CAB1][CTRL_SAND_BUTTON].toBool() || control_inputs[CAB2][CTRL_SAND_BUTTON].toBool());
 }
