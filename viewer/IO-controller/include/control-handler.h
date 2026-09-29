@@ -181,6 +181,17 @@ protected:
 
         return 0;
     }
+
+    /// Слать значение по его изменению - экономим трафик
+    bool setValueIfChanged(float new_value, float epsilon = 1e-6f)
+    {
+        if (qFabs(new_value - value) <= epsilon)
+            return false;
+
+        value = new_value;
+        sendControlSignal();
+        return true;
+    }
 };
 
 #endif
