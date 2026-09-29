@@ -16,16 +16,18 @@
 \section{Нормализация координат мыши}
 В VSG диапазон координат мыши:
 
-x: [0; ширинаОкна]
+$x:[0;windowWidth]$
 
-y: [0; высотаОкна]\\
+$y:[0;windowHeight]$\\
 
-Чтобы сконвертировать их к нормализованным координатам [-1.0; 1.0], проводим
+Чтобы сконвертировать их к нормализованным координатам $[-1.0;1.0]$, проводим
 следующие трансформации:
-\begin{align}
-xNorm=\frac{x}{windowWidth}*2.0-1.0\\
-yNorm=\frac{y}{windowHeight}*2.0-1.0
-\end{align}
+\begin{equation}
+\begin{split}
+	xNorm=\frac{x}{windowWidth}*2.0-1.0\\
+	yNorm=\frac{y}{windowHeight}*2.0-1.0
+\end{split}
+\end{equation}
 \section{Мировые координаты мыши}
 Чтобы математически определить точку пересечения мыши с объектами сцены, нам
 необходимо получить луч, исходящий из мировых координат мыши вглубь сцены.
@@ -66,12 +68,14 @@ n_x*(x-G_x)+n_y*(y-G_y)+n_z*(z-G_z)=0
 
 Подставим в это уравнение наши $x$, $y$ и $z$ из параметрического уравнения
 прямой, сократим и выразим $t$:
-\begin{align}
+\begin{equation}
+\begin{split}
 &n_x*(x_0+a_xt-G_x)+n_y*(y_0+a_yt-G_y)+n_z*(z_0+a_zt-G_z)=0\\
 &n_xa_xt+n_ya_yt+n_za_zt=-n_xx_0+n_xG_x-n_yy_0+n_yG_y-n_zz_0+n_zG_z\\
 &t(\vec{n}\cdot\vec{a})=\vec{n}\cdot\vec{G}-\vec{n}\cdot\vec{M}\\
 &t=\frac{\vec{n}\cdot\vec{G}-\vec{n}\cdot\vec{M}}{\vec{n}\cdot\vec{a}}
-\end{align}
+\end{split}
+\end{equation}
 
 Подставляем $t$ в параметрическое уравнение и получаем необходимую нам точку
 пересечения.
@@ -82,7 +86,18 @@ n_x*(x-G_x)+n_y*(y-G_y)+n_z*(z-G_z)=0
 формулами:
 \begin{equation}
 \begin{cases}
-(y-C_y)^2+(z-C_z)^2=R^2
+(y-C_y)^2+(z-C_z)^2=R^2\\
+C_x\leq{}x\leq{}C_x+H
 \end{cases}
+\end{equation}
+Назовём начало луча точкой $M(x_0, y_0, z_0)$.
+
+Подставим в это уравнение наши $x$, $y$ и $z$ из параметрического уравнения
+прямой, сократим и выразим $t$:
+\begin{equation}
+\begin{split}
+&(y_0+a_yt-C_y)^2+(z_0+a_zt-C_z)^2=R^2\\
+&y_0^2+a_y^2t^2+C_y^2+2y_0a_yt-2y_0C_y-2a_ytC_y
+\end{split}
 \end{equation}
 \end{document}
