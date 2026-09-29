@@ -71,15 +71,13 @@ void VL60IOController::lockReversHandle(int cab_idx)
     {
         if (revers_pos == REVERS_BACKWARD)
         {
-            revers_handle[cab_idx]->value = revers_pos;
-            revers_handle[cab_idx]->sendControlSignal();
+            revers_handle[cab_idx]->setValueIfChanged(revers_pos);
             return;
         }
 
         if ((revers_pos >= REVERS_FORWARD) && (ref_pos < REVERS_FORWARD))
         {
-            revers_handle[cab_idx]->value = revers_pos;
-            revers_handle[cab_idx]->sendControlSignal();
+            revers_handle[cab_idx]->setValueIfChanged(revers_pos);
             return;
         }
     }
@@ -94,8 +92,7 @@ void VL60IOController::lockMainHandle(int cab_idx)
 
     if (revers_pos == REVERS_ZERO)
     {
-        main_handle[cab_idx]->value = POS_ZERO;
-        main_handle[cab_idx]->sendControlSignal();
+        main_handle[cab_idx]->setValueIfChanged(POS_ZERO);
         return;
     }
 }

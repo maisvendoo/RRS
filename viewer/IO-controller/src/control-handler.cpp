@@ -81,6 +81,19 @@ float ControlHandler::getSignalValue() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+bool ControlHandler::setValueIfChanged(float new_value, float epsilon)
+{
+    if (qFabs(new_value - value) <= epsilon)
+        return false;
+
+    value = new_value;
+    sendControlSignal();
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool ControlHandler::isKeyModifier(const std::set<uint16_t> &keys,
                                    const QString &modName)
 {
