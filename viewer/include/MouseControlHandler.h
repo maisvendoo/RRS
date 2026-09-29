@@ -72,6 +72,8 @@ private:
 
     std::string _last_hit_object = "";
 
+    ControlHandler *active_handler = nullptr;
+
     bool pickControl(int x, int y, ControlHandler *&handler);
 
     void updateTooltip();
