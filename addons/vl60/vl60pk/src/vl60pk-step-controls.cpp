@@ -114,6 +114,11 @@ void VL60pk::stepControls(const double &t, const double &dt)
         // Кнопки свистка, тифона
         horn[cab_idx]->setSvistokOn(control_inputs[cab_idx][CTRL_WHISTLE_BUTTON].toBool());
         horn[cab_idx]->setTifonOn(control_inputs[cab_idx][CTRL_TIFON_BUTTON].toBool());
+
+        // Рукоятки бдительности
+        control_inputs[cab_idx][CTRL_RBS_BUTTON].toBool() ? rb[cab_idx][RBS].set() : rb[cab_idx][RBS].reset();
+        control_inputs[cab_idx][CTRL_RB_BUTTON].toBool()  ? rb[cab_idx][RB_1].set() : rb[cab_idx][RB_1].reset();
+        control_inputs[cab_idx][CTRL_RBP_BUTTON].toBool() ? rb[cab_idx][RBP].set() : rb[cab_idx][RBP].reset();
     }
 
     // Кнопки песочницы

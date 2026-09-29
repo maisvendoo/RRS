@@ -322,23 +322,24 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
 
 
         // Триггеры рукояток бдительности
-        rb[cab_idx][RBS].setKeySymbolOn(KEY_M);
-        rb[cab_idx][RBS].setKeyModifierOn(ANY_MODIFIERS);
-        rb[cab_idx][RBS].setKeySymbolOff(KEY_Undefined);
-        rb[cab_idx][RBS].setKeyModifierOff(KEY_Undefined);
-        rb[cab_idx][RBS].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //rb[cab_idx][RBS].setKeySymbolOn(KEY_M);
+        //rb[cab_idx][RBS].setKeyModifierOn(ANY_MODIFIERS);
+        //rb[cab_idx][RBS].setKeySymbolOff(KEY_Undefined);
+        //rb[cab_idx][RBS].setKeyModifierOff(KEY_Undefined);
+        //rb[cab_idx][RBS].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        rb[cab_idx][RB_1].setKeySymbolOn(KEY_Z);
-        rb[cab_idx][RB_1].setKeyModifierOn(ANY_MODIFIERS);
-        rb[cab_idx][RB_1].setKeySymbolOff(KEY_Undefined);
-        rb[cab_idx][RB_1].setKeyModifierOff(KEY_Undefined);
-        rb[cab_idx][RB_1].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //rb[cab_idx][RB_1].setKeySymbolOn(KEY_Z);
+        //rb[cab_idx][RB_1].setKeyModifierOn(ANY_MODIFIERS);
+        //rb[cab_idx][RB_1].setKeySymbolOff(KEY_Undefined);
+        //rb[cab_idx][RB_1].setKeyModifierOff(KEY_Undefined);
+        //rb[cab_idx][RB_1].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        rb[cab_idx][RBP].setKeySymbolOn(KEY_Tilde);
-        rb[cab_idx][RBP].setKeyModifierOn(ANY_MODIFIERS);
-        rb[cab_idx][RBP].setKeySymbolOff(KEY_Undefined);
-        rb[cab_idx][RBP].setKeyModifierOff(KEY_Undefined);
-        rb[cab_idx][RBP].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //rb[cab_idx][RBP].setKeySymbolOn(KEY_Tilde);
+        //rb[cab_idx][RBP].setKeyModifierOn(ANY_MODIFIERS);
+        //rb[cab_idx][RBP].setKeySymbolOff(KEY_Undefined);
+        //rb[cab_idx][RBP].setKeyModifierOff(KEY_Undefined);
+        //rb[cab_idx][RBP].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Тумблер ЭПТ
         // Управление через IOController (stepControls)

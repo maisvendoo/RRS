@@ -172,10 +172,9 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         P_buffercolor_R_toogle[cab_idx].step();
 
         // Нажатие РБС
-        // Если активна РБС на внешнем пульте
-        // TODO // перенести freejoy во вьювер, его команды передавать по сети,
-        // TODO // и также указывая индекс кабины
-        if (control_signals.analogSignal[CS_RBS].is_active)
+        // Управление через IOController (stepControls)
+        // Ветка freejoy (CS_RBS) закомментирована
+        /*if (control_signals.analogSignal[CS_RBS].is_active)
         {
             // реагируем на состояние РБС на внешнем пульте
             if (static_cast<bool>(control_signals.analogSignal[CS_RBS].cur_value))
@@ -189,7 +188,7 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
             rb[cab_idx][RBS].step();
         }
         rb[cab_idx][RB_1].step();
-        rb[cab_idx][RBP].step();
+        rb[cab_idx][RBP].step();*/
         epb_switch[cab_idx].step();
 
         autopilot_switcher[cab_idx].step();
