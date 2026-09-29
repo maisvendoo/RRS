@@ -27,11 +27,12 @@ void VL60pk::initAutopilot(const QString& modules_dir,
             autopilot->setVehicleIndex(model_idx);
             autopilot->read_config(autopilot_config_name, custom_cfg_dir);
             autopilot->initAutoBrakeControl(autopilot_config_name, custom_cfg_dir);
-            autopilot_switcher[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
-            autopilot_switcher[cab_idx].setKeySymbolOn(KEY_F);
-            autopilot_switcher[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
-            autopilot_switcher[cab_idx].setKeySymbolOff(KEY_F);
-            autopilot_switcher[cab_idx].setControl(&pressed_keys);
+            // Управление через IOController (stepControls)
+            //autopilot_switcher[cab_idx].setKeyModifierOn(MODIFIER_OnlyAlt);
+            //autopilot_switcher[cab_idx].setKeySymbolOn(KEY_F);
+            //autopilot_switcher[cab_idx].setKeyModifierOff(MODIFIER_OnlyAlt);
+            //autopilot_switcher[cab_idx].setKeySymbolOff(KEY_F);
+            //autopilot_switcher[cab_idx].setControl(&pressed_keys);
 
             auto_feedback[cab_idx] = new vl60_feedback_t();
             autopilot->setFeedback(auto_feedback[cab_idx]);

@@ -45,6 +45,8 @@ enum
     CTRL_RBS_BUTTON = 136,
     CTRL_RB_BUTTON = 137,
     CTRL_RBP_BUTTON = 138,
+    CTRL_AUTOPILOT = 139,
+    CTRL_SHUNTING_MODE = 140,
 };
 
 #endif

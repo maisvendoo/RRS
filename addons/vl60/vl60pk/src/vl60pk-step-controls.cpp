@@ -119,6 +119,10 @@ void VL60pk::stepControls(const double &t, const double &dt)
         control_inputs[cab_idx][CTRL_RBS_BUTTON].toBool() ? rb[cab_idx][RBS].set() : rb[cab_idx][RBS].reset();
         control_inputs[cab_idx][CTRL_RB_BUTTON].toBool()  ? rb[cab_idx][RB_1].set() : rb[cab_idx][RB_1].reset();
         control_inputs[cab_idx][CTRL_RBP_BUTTON].toBool() ? rb[cab_idx][RBP].set() : rb[cab_idx][RBP].reset();
+
+        // Автоведение и маневровый режим
+        control_inputs[cab_idx][CTRL_AUTOPILOT].toBool() ? autopilot_switcher[cab_idx].set() : autopilot_switcher[cab_idx].reset();
+        control_inputs[cab_idx][CTRL_SHUNTING_MODE].toBool() ? tumbler_shunting_mode[cab_idx].set() : tumbler_shunting_mode[cab_idx].reset();
     }
 
     // Кнопки песочницы

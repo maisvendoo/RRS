@@ -631,4 +631,32 @@
 
 	</Control>
 
+	<!-- Автоведение -->
+	<Control>
+		<ID>139</ID>
+		<Name>Автоведение</Name>
+		<Description>Включение автоведения</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_F</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+		<KeyModOffName>Alt</KeyModOffName>
+
+	</Control>
+
+	<!-- Маневровый режим -->
+	<Control>
+		<ID>140</ID>
+		<Name>Маневровый режим</Name>
+		<Description>Маневровый/поездной режим УКБМ</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Tilde</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
 </Config>
