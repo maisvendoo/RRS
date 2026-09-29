@@ -352,6 +352,11 @@ void IOController::keyboardInputProcess(std::set<uint16_t> &pressed_keys)
         handler->processKeyInput(pressed_keys);
     }
 
+    for (const auto &[id, name, handler] : (*(control_handlers.end()-1)).getAll())
+    {
+        handler->processKeyInput(pressed_keys);
+    }
+
     processKeyboardInput(pressed_keys);
 }
 
