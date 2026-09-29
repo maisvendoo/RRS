@@ -81,7 +81,7 @@ void Actions::read(CfgReader& cfg)
         if (!cfg.getString("Keys", setting_name.c_str(), line))
         {
             Journal::instance()->error(QString("Failed to find key binding %1")
-                .arg(setting_name));
+                                           .arg(setting_name.c_str()));
             continue;
         }
 

@@ -48,8 +48,8 @@ void StateManager::update(double delta_time)
     if (current_state != deferred_state)
     {
         Journal::instance()->info(QString("'%1' -> '%2'")
-            .arg((*current_state)->get_name())
-            .arg((*deferred_state)->get_name()));
+                            .arg((*current_state)->get_name().c_str())
+                            .arg((*deferred_state)->get_name().c_str()));
 
         (*current_state)->on_deactivate();
         current_state = deferred_state;
