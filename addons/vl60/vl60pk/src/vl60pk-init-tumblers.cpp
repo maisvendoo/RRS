@@ -112,10 +112,12 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         //controller[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Устройство блокировки тормозов усл.№ 367
-        brake_lock[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //brake_lock[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Электропневматический клапан автостопа
-        epk[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //epk[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
 /*
         // Дальний ряд тумблеров приборной панели машиниста
         shield223[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
