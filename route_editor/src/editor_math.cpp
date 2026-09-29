@@ -76,7 +76,7 @@ bool calculate_intersection_line_and_plane(
         return false;
     }
 
-    const double t = -(vsg::dot(norm, orig) - vsg::dot(norm, point)) / denom;
+    const double t = (vsg::dot(norm, point) - vsg::dot(norm, orig)) / denom;
     out = orig + dir * t;
 
     return true;
