@@ -15,31 +15,27 @@ void normalize_mouse_coordinates(int x, int y, VkExtent2D extent,
     norm_y = static_cast<double>(y) / extent.height * 2.0 - 1.0;
 }
 
-void calculate_mouse_world_coordinates(
-    int x, int y, double z, VkExtent2D extent,
-    const vsg::dmat4& inv_view_mat, const vsg::dmat4& inv_proj_mat,
-    vsg::dvec3& out
-)
+void calculate_mouse_world_coordinates(int x, int y, double z,
+    VkExtent2D extent, const vsg::dmat4& inv_view_mat,
+    const vsg::dmat4& inv_proj_mat, vsg::dvec3& out)
 {
     double norm_x, norm_y;
     normalize_mouse_coordinates(x, y, extent, norm_x, norm_y);
-    calculate_mouse_world_coordinates(norm_x, norm_y, z,
-        inv_view_mat, inv_proj_mat, out);
+    calculate_mouse_world_coordinates(norm_x, norm_y, z, inv_view_mat,
+        inv_proj_mat, out);
 }
 
-void calculate_mouse_world_coordinates(
-    double norm_x, double norm_y, double z,
+void calculate_mouse_world_coordinates(double norm_x, double norm_y, double z,
     const vsg::dmat4& inv_view_mat, const vsg::dmat4& inv_proj_mat,
-    vsg::dvec3& out
-)
+    vsg::dvec3& out)
 {
     out = inv_view_mat * inv_proj_mat * vsg::dvec3(norm_x, norm_y, z);
 }
 
-bool solve_quadratic_equation(double a, double b, double c,
-    double& x1, double& x2)
+bool solve_quadratic_equation(double a, double b, double c, double& x1,
+    double& x2)
 {
-    if (a < 1.0e-6)
+    if (std::abs(a) < 1.0e-6)
     {
         return false;
     }
@@ -59,11 +55,9 @@ bool solve_quadratic_equation(double a, double b, double c,
     return true;
 }
 
-bool calculate_intersection_line_and_plane(
-    vsg::dvec3 line_orig, vsg::dvec3 line_dir,
-    vsg::dvec3 plane_point, vsg::dvec3 plane_norm,
-    vsg::dvec3& out
-)
+bool calculate_intersection_line_and_plane(vsg::dvec3 line_orig,
+    vsg::dvec3 line_dir, vsg::dvec3 plane_point, vsg::dvec3 plane_norm,
+    vsg::dvec3& out)
 {
     const vsg::dvec3 orig = line_orig;
     const vsg::dvec3 dir = line_dir;
@@ -82,33 +76,26 @@ bool calculate_intersection_line_and_plane(
     return true;
 }
 
-bool calculate_intersection_mouse_and_plane(
-    int x, int y, VkExtent2D extent,
+bool calculate_intersection_mouse_and_plane(int x, int y, VkExtent2D extent,
     const vsg::dmat4& inv_view_mat, const vsg::dmat4& inv_proj_mat,
-    vsg::dvec3 plane_point, vsg::dvec3 plane_norm,
-    vsg::dvec3& out
-)
+    vsg::dvec3 plane_point, vsg::dvec3 plane_norm, vsg::dvec3& out)
 {
     double norm_x, norm_y;
     normalize_mouse_coordinates(x, y, extent, norm_x, norm_y);
 
     vsg::dvec3 mouse_world1, mouse_world2;
-    calculate_mouse_world_coordinates(norm_x, norm_y, 0.0,
-        inv_view_mat, inv_proj_mat, mouse_world1);
-    calculate_mouse_world_coordinates(norm_x, norm_y, 1.0,
-        inv_view_mat, inv_proj_mat, mouse_world2);
+    calculate_mouse_world_coordinates(norm_x, norm_y, 0.0, inv_view_mat,
+        inv_proj_mat, mouse_world1);
+    calculate_mouse_world_coordinates(norm_x, norm_y, 1.0, inv_view_mat,
+        inv_proj_mat, mouse_world2);
 
     return calculate_intersection_line_and_plane(mouse_world1,
         mouse_world2 - mouse_world1, plane_point, plane_norm, out);
 }
 
-bool calculate_closest_intersection_line_and_cylinder(
-    int axis_index,
-    vsg::dvec3 line_orig, vsg::dvec3 line_dir,
-    vsg::dvec3 cylinder_base_center, double cylinder_radius,
-    double cylinder_height,
-    vsg::dvec3& out
-)
+bool calculate_closest_intersection_line_and_cylinder(int axis_index,
+    vsg::dvec3 line_orig, vsg::dvec3 line_dir, vsg::dvec3 cylinder_base_center,
+    double cylinder_radius, double cylinder_height, vsg::dvec3& out)
 {
     int axis1, axis2;
     switch (axis_index)
@@ -142,12 +129,12 @@ bool calculate_closest_intersection_line_and_cylinder(
     const vsg::dvec3 center = cylinder_base_center;
     const double R = cylinder_radius;
     const double H = cylinder_height;
+    const double V1 = orig[axis1] - center[axis1];
+    const double V2 = orig[axis2] - center[axis2];
 
     const double A = dir[axis1] * dir[axis1] + dir[axis2] * dir[axis2];
-    const double B = 2.0 * (orig[axis1] * dir[axis1] - dir[axis1] * center[axis1] +
-        orig[axis2] * dir[axis2] - dir[axis2] * center[axis2]);
-    const double C = (orig[axis1] - center[axis1]) * (orig[axis1] - center[axis1]) +
-        (orig[axis2] - center[axis2]) * (orig[axis2] - center[axis2]) - R * R;
+    const double B = 2.0 * (dir[axis1] * V1 + dir[axis2] * V2);
+    const double C = V1 * V1 + V2 * V2 - R * R;
 
     double t1, t2;
     if (!solve_quadratic_equation(A, B, C, t1, t2))
@@ -158,12 +145,14 @@ bool calculate_closest_intersection_line_and_cylinder(
     const vsg::dvec3 p1 = orig + dir * t1;
     const vsg::dvec3 p2 = orig + dir * t2;
 
-    if (p1[axis_index] < center[axis_index] || p1[axis_index] > center[axis_index] + H)
+    if (p1[axis_index] < center[axis_index] ||
+        p1[axis_index] > center[axis_index] + H)
     {
         t1 = -1.0;
     }
 
-    if (p2[axis_index] < center[axis_index] || p2[axis_index] > center[axis_index] + H)
+    if (p2[axis_index] < center[axis_index] ||
+        p2[axis_index] > center[axis_index] + H)
     {
         t2 = -1.0;
     }
