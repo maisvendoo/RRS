@@ -658,4 +658,32 @@
 
 	</Control>
 
+	<!-- Концевой кран тормозной магистрали вперёд -->
+	<Control>
+		<ID>141</ID>
+		<Name>Концевой кран ТМ вперёд</Name>
+		<Description>Открытие/закрытие концевого крана тормозной магистрали с передней стороны</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_F2</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Концевой кран тормозной магистрали назад -->
+	<Control>
+		<ID>142</ID>
+		<Name>Концевой кран ТМ назад</Name>
+		<Description>Открытие/закрытие концевого крана тормозной магистрали с задней стороны</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_F3</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
 </Config>

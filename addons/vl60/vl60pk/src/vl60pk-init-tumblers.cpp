@@ -79,6 +79,8 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
     hose_fl_bwd->setControl(&pressed_keys);
 
     // Концевые краны тормозной магистрали
+    // Управление через IOController (stepControls)
+    /*
     anglecock_bp_fwd->setKeySymbolOpen(KEY_F2);
     anglecock_bp_fwd->setKeyModifierOpen(MODIFIER_OnlyShift);
     anglecock_bp_fwd->setKeySymbolClose(KEY_F2);
@@ -90,6 +92,7 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
     anglecock_bp_bwd->setKeySymbolClose(KEY_F3);
     anglecock_bp_bwd->setKeyModifierClose(MODIFIER_OnlyControl);
     anglecock_bp_bwd->setControl(&pressed_keys);
+    */
 
     // Рукава тормозной магистрали
     hose_bp_fwd->setKeySymbolConnect(KEY_F1);

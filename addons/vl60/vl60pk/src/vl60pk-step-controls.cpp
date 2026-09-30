@@ -7,6 +7,7 @@
 #include    <loco-crane.h>
 #include    <sanding-system.h>
 #include    <train-horn.h>
+#include    <pneumo-anglecock.h>
 
 //------------------------------------------------------------------------------
 //
@@ -123,6 +124,10 @@ void VL60pk::stepControls(const double &t, const double &dt)
         // Автоведение и маневровый режим
         control_inputs[cab_idx][CTRL_AUTOPILOT].toBool() ? autopilot_switcher[cab_idx].set() : autopilot_switcher[cab_idx].reset();
         control_inputs[cab_idx][CTRL_SHUNTING_MODE].toBool() ? tumbler_shunting_mode[cab_idx].set() : tumbler_shunting_mode[cab_idx].reset();
+
+        // Концевые краны тормозной магистрали
+        control_inputs[cab_idx][CTRL_ANGLECOCK_BP_FWD].toBool() ? anglecock_bp_fwd->open() : anglecock_bp_fwd->close();
+        control_inputs[cab_idx][CTRL_ANGLECOCK_BP_BWD].toBool() ? anglecock_bp_bwd->open() : anglecock_bp_bwd->close();
     }
 
     // Кнопки песочницы

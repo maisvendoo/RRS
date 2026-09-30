@@ -47,6 +47,10 @@ enum
     CTRL_RBP_BUTTON = 138,
     CTRL_AUTOPILOT = 139,
     CTRL_SHUNTING_MODE = 140,
+
+    // Концевые краны тормозной магистрали
+    CTRL_ANGLECOCK_BP_FWD = 141,
+    CTRL_ANGLECOCK_BP_BWD = 142,
 };
 
 #endif
