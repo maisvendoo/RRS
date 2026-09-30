@@ -9,40 +9,49 @@
 void normalize_mouse_coordinates(int x, int y, VkExtent2D extent,
     double& norm_x, double& norm_y);
 
-void calculate_mouse_world_coordinates(
-    int x, int y, double z, VkExtent2D extent,
+bool calculate_mouse_world_coordinates(double norm_x, double norm_y, double z,
     const vsg::dmat4& inv_view_mat, const vsg::dmat4& inv_proj_mat,
-    vsg::dvec3& out
-);
+    vsg::dvec3& out);
 
-void calculate_mouse_world_coordinates(
-    double norm_x, double norm_y, double z,
+bool calculate_mouse_world_coordinates(int x, int y, double z,
+    VkExtent2D extent, const vsg::dmat4& inv_view_mat,
+    const vsg::dmat4& inv_proj_mat, vsg::dvec3& out);
+
+bool calculate_mouse_ray(double norm_x, double norm_y,
     const vsg::dmat4& inv_view_mat, const vsg::dmat4& inv_proj_mat,
-    vsg::dvec3& out
-);
+    vsg::dvec3& origin, vsg::dvec3& dir);
 
-bool solve_quadratic_equation(double a, double b, double c,
-    double& x1, double& x2);
-
-bool calculate_intersection_line_and_plane(
-    vsg::dvec3 line_orig, vsg::dvec3 line_dir,
-    vsg::dvec3 plane_point, vsg::dvec3 plane_norm,
-    vsg::dvec3& out
-);
-
-bool calculate_intersection_mouse_and_plane(
-    int x, int y, VkExtent2D extent,
+bool calculate_mouse_ray(int x, int y, VkExtent2D extent,
     const vsg::dmat4& inv_view_mat, const vsg::dmat4& inv_proj_mat,
-    vsg::dvec3 plane_point, vsg::dvec3 plane_norm,
-    vsg::dvec3& out
-);
+    vsg::dvec3& origin, vsg::dvec3& dir);
 
-bool calculate_closest_intersection_line_and_cylinder(
-    int axis_index,
-    vsg::dvec3 line_orig, vsg::dvec3 line_dir,
-    vsg::dvec3 cylinder_base_center, double cylinder_radius,
-    double cylinder_height,
-    vsg::dvec3& out
-);
+bool solve_quadratic_equation(double a, double b, double c, double& x1,
+    double& x2);
+
+bool calculate_intersection_line_and_plane(vsg::dvec3 line_orig,
+    vsg::dvec3 line_dir, vsg::dvec3 plane_point, vsg::dvec3 plane_norm,
+    vsg::dvec3& out);
+
+bool calculate_intersection_mouse_and_plane(int x, int y, VkExtent2D extent,
+    const vsg::dmat4& inv_view_mat, const vsg::dmat4& inv_proj_mat,
+    vsg::dvec3 plane_point, vsg::dvec3 plane_norm, vsg::dvec3& out);
+
+bool calculate_closest_intersection_line_and_cylinder(int axis_index,
+    vsg::dvec3 line_orig, vsg::dvec3 line_dir, vsg::dvec3 cylinder_base_center,
+    double cylinder_radius, double cylinder_height, vsg::dvec3& out);
+
+bool calculate_closest_intersection_mouse_and_cylinder(int axis_index, int x,
+    int y, VkExtent2D extent, const vsg::dmat4& inv_view_mat,
+    const vsg::dmat4& inv_proj_mat, vsg::dvec3 cylinder_base_center,
+    double cylinder_radius, double cylinder_height, vsg::dvec3& out);
+
+bool calculate_closest_intersection_line_and_cone(int axis_index,
+    vsg::dvec3 line_orig, vsg::dvec3 line_dir, vsg::dvec3 cone_base_center,
+    double cone_radius, double cone_height, vsg::dvec3& out);
+
+bool calculate_closest_intersection_mouse_and_cone(int axis_index, int x,
+    int y, VkExtent2D extent, const vsg::dmat4& inv_view_mat,
+    const vsg::dmat4& inv_proj_mat, vsg::dvec3 cone_base_center,
+    double cone_radius, double cone_height, vsg::dvec3& out);
 
 #endif // EDITOR_MATH_H
