@@ -119,6 +119,13 @@ public:
     /// Слать значение по его изменению - экономим трафик
     bool setValueIfChanged(float new_value, float epsilon = 1e-6f);
 
+    /// Безусловно слать значение
+    void setValue(float new_value)
+    {
+        value = new_value;
+        sendControlSignal();
+    }
+
 signals:
 
     void sigSendControlCommand(const QByteArray &data);
