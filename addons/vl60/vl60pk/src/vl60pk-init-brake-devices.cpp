@@ -2,6 +2,8 @@
 
 #include    "filesystem.h"
 
+#include    <vl60-controls.h>
+
 #include "airdistributor.h"
 #include "brake-crane.h"
 #include "electro-airdistributor.h"
@@ -120,4 +122,10 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
     {
         anglecock_bp_bwd->close();
     }
+
+    // Синхронизируем control_inputs с реальным состоянием концевых кранов ТМ
+    // — чтобы stepControls() не перезаписал их начальное состояние
+    auto &shared = control_inputs[control_inputs.size() - 1];
+    shared[CTRL_ANGLECOCK_BP_FWD].value = anglecock_bp_fwd->isOpened() ? 1.0f : 0.0f;
+    shared[CTRL_ANGLECOCK_BP_BWD].value = anglecock_bp_bwd->isOpened() ? 1.0f : 0.0f;
 }
