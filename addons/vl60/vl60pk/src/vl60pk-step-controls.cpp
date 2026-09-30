@@ -130,7 +130,6 @@ void VL60pk::stepControls(const double &t, const double &dt)
     auto &shared_inputs = control_inputs[control_inputs.size() - 1];
     shared_inputs[CTRL_ANGLECOCK_BP_FWD].toBool() ? anglecock_bp_fwd->open() : anglecock_bp_fwd->close();
     shared_inputs[CTRL_ANGLECOCK_BP_BWD].toBool() ? anglecock_bp_bwd->open() : anglecock_bp_bwd->close();
-}
 
     // Кнопки песочницы
     sand_system->setSandDeliveryOn(control_inputs[CAB1][CTRL_SAND_BUTTON].toBool() || control_inputs[CAB2][CTRL_SAND_BUTTON].toBool());
