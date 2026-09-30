@@ -547,4 +547,115 @@
 
 	</Control>
 
+	<!-- Кнопка песочницы -->
+	<Control>
+		<ID>133</ID>
+		<Name>Кнопка песочницы</Name>
+		<Description>Подача песка под колёса</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Delete</KeyName>
+		<ObjectNameCab1>Cab1_Knopki_button_sand</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopki_button_sand</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Кнопка свистка -->
+	<Control>
+		<ID>134</ID>
+		<Name>Кнопка свистка</Name>
+		<Description>Звуковой сигнал свистком</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Space</KeyName>
+		<ObjectNameCab1>Cab1_Knopki_button_svistok</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopki_button_svistok</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Кнопка тифона -->
+	<Control>
+		<ID>135</ID>
+		<Name>Кнопка тифона</Name>
+		<Description>Звуковой сигнал тифоном</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_B</KeyName>
+		<ObjectNameCab1>Cab1_Knopki_button_tifon</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopki_button_tifon</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Рукоятка бдительности специальная -->
+	<Control>
+		<ID>136</ID>
+		<Name>Рукоятка бдительности специальная</Name>
+		<Description>Подтверждение бдительности при срабатывании УКБМ</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_M</KeyName>
+		<ObjectNameCab1>Cab1_Knopka-RBS</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopka-RBS</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Рукоятка бдительности -->
+	<Control>
+		<ID>137</ID>
+		<Name>Рукоятка бдительности</Name>
+		<Description>Подтверждение бдительности</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Z</KeyName>
+		<ObjectNameCab1>Cab1_Knopka-RB-1</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopka-RB-1</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Рукоятка бдительности помощника -->
+	<Control>
+		<ID>138</ID>
+		<Name>Рукоятка бдительности помощника</Name>
+		<Description>Подтверждение бдительности помощником</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Knopka-RBP</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopka-RBP</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Автоведение -->
+	<Control>
+		<ID>139</ID>
+		<Name>Автоведение</Name>
+		<Description>Включение автоведения</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_F</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+		<KeyModOffName>Alt</KeyModOffName>
+
+	</Control>
+
+	<!-- Маневровый режим -->
+	<Control>
+		<ID>140</ID>
+		<Name>Маневровый режим</Name>
+		<Description>Маневровый/поездной режим УКБМ</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Tilde</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
 </Config>

@@ -5,6 +5,8 @@
 #include    <pneumo-brake-lock.h>
 #include    <brake-crane.h>
 #include    <loco-crane.h>
+#include    <sanding-system.h>
+#include    <train-horn.h>
 
 //------------------------------------------------------------------------------
 //
@@ -108,5 +110,21 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         // Кран 254
         loco_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KVT_254].value);
+
+        // Кнопки свистка, тифона
+        horn[cab_idx]->setSvistokOn(control_inputs[cab_idx][CTRL_WHISTLE_BUTTON].toBool());
+        horn[cab_idx]->setTifonOn(control_inputs[cab_idx][CTRL_TIFON_BUTTON].toBool());
+
+        // Рукоятки бдительности
+        control_inputs[cab_idx][CTRL_RBS_BUTTON].toBool() ? rb[cab_idx][RBS].set() : rb[cab_idx][RBS].reset();
+        control_inputs[cab_idx][CTRL_RB_BUTTON].toBool()  ? rb[cab_idx][RB_1].set() : rb[cab_idx][RB_1].reset();
+        control_inputs[cab_idx][CTRL_RBP_BUTTON].toBool() ? rb[cab_idx][RBP].set() : rb[cab_idx][RBP].reset();
+
+        // Автоведение и маневровый режим
+        control_inputs[cab_idx][CTRL_AUTOPILOT].toBool() ? autopilot_switcher[cab_idx].set() : autopilot_switcher[cab_idx].reset();
+        control_inputs[cab_idx][CTRL_SHUNTING_MODE].toBool() ? tumbler_shunting_mode[cab_idx].set() : tumbler_shunting_mode[cab_idx].reset();
     }
+
+    // Кнопки песочницы
+    sand_system->setSandDeliveryOn(control_inputs[CAB1][CTRL_SAND_BUTTON].toBool() || control_inputs[CAB2][CTRL_SAND_BUTTON].toBool());
 }

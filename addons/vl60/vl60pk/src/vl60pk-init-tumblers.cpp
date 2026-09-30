@@ -112,10 +112,12 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         //controller[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Устройство блокировки тормозов усл.№ 367
-        brake_lock[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //brake_lock[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Электропневматический клапан автостопа
-        epk[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //epk[cab_idx]->setControl(&pressed_keys_by_cabine[cab_idx]);
 /*
         // Дальний ряд тумблеров приборной панели машиниста
         shield223[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
@@ -322,23 +324,24 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
 
 
         // Триггеры рукояток бдительности
-        rb[cab_idx][RBS].setKeySymbolOn(KEY_M);
-        rb[cab_idx][RBS].setKeyModifierOn(ANY_MODIFIERS);
-        rb[cab_idx][RBS].setKeySymbolOff(KEY_Undefined);
-        rb[cab_idx][RBS].setKeyModifierOff(KEY_Undefined);
-        rb[cab_idx][RBS].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //rb[cab_idx][RBS].setKeySymbolOn(KEY_M);
+        //rb[cab_idx][RBS].setKeyModifierOn(ANY_MODIFIERS);
+        //rb[cab_idx][RBS].setKeySymbolOff(KEY_Undefined);
+        //rb[cab_idx][RBS].setKeyModifierOff(KEY_Undefined);
+        //rb[cab_idx][RBS].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        rb[cab_idx][RB_1].setKeySymbolOn(KEY_Z);
-        rb[cab_idx][RB_1].setKeyModifierOn(ANY_MODIFIERS);
-        rb[cab_idx][RB_1].setKeySymbolOff(KEY_Undefined);
-        rb[cab_idx][RB_1].setKeyModifierOff(KEY_Undefined);
-        rb[cab_idx][RB_1].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //rb[cab_idx][RB_1].setKeySymbolOn(KEY_Z);
+        //rb[cab_idx][RB_1].setKeyModifierOn(ANY_MODIFIERS);
+        //rb[cab_idx][RB_1].setKeySymbolOff(KEY_Undefined);
+        //rb[cab_idx][RB_1].setKeyModifierOff(KEY_Undefined);
+        //rb[cab_idx][RB_1].setControl(&pressed_keys_by_cabine[cab_idx]);
 
-        rb[cab_idx][RBP].setKeySymbolOn(KEY_Tilde);
-        rb[cab_idx][RBP].setKeyModifierOn(ANY_MODIFIERS);
-        rb[cab_idx][RBP].setKeySymbolOff(KEY_Undefined);
-        rb[cab_idx][RBP].setKeyModifierOff(KEY_Undefined);
-        rb[cab_idx][RBP].setControl(&pressed_keys_by_cabine[cab_idx]);
+        //rb[cab_idx][RBP].setKeySymbolOn(KEY_Tilde);
+        //rb[cab_idx][RBP].setKeyModifierOn(ANY_MODIFIERS);
+        //rb[cab_idx][RBP].setKeySymbolOff(KEY_Undefined);
+        //rb[cab_idx][RBP].setKeyModifierOff(KEY_Undefined);
+        //rb[cab_idx][RBP].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Тумблер ЭПТ
         // Управление через IOController (stepControls)
@@ -349,10 +352,11 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
         //epb_switch[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
 
         // Тумблер "Маневровый/Поездной"
-        tumbler_shunting_mode[cab_idx].setKeySymbolOn(KEY_Tilde);
-        tumbler_shunting_mode[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
-        tumbler_shunting_mode[cab_idx].setKeySymbolOff(KEY_Tilde);
-        tumbler_shunting_mode[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
-        tumbler_shunting_mode[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
+        // Управление через IOController (stepControls)
+        //tumbler_shunting_mode[cab_idx].setKeySymbolOn(KEY_Tilde);
+        //tumbler_shunting_mode[cab_idx].setKeyModifierOn(MODIFIER_OnlyShift);
+        //tumbler_shunting_mode[cab_idx].setKeySymbolOff(KEY_Tilde);
+        //tumbler_shunting_mode[cab_idx].setKeyModifierOff(MODIFIER_OnlyControl);
+        //tumbler_shunting_mode[cab_idx].setControl(&pressed_keys_by_cabine[cab_idx]);
     }
 }
