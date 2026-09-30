@@ -124,11 +124,13 @@ void VL60pk::stepControls(const double &t, const double &dt)
         // Автоведение и маневровый режим
         control_inputs[cab_idx][CTRL_AUTOPILOT].toBool() ? autopilot_switcher[cab_idx].set() : autopilot_switcher[cab_idx].reset();
         control_inputs[cab_idx][CTRL_SHUNTING_MODE].toBool() ? tumbler_shunting_mode[cab_idx].set() : tumbler_shunting_mode[cab_idx].reset();
-
-        // Концевые краны тормозной магистрали
-        control_inputs[cab_idx][CTRL_ANGLECOCK_BP_FWD].toBool() ? anglecock_bp_fwd->open() : anglecock_bp_fwd->close();
-        control_inputs[cab_idx][CTRL_ANGLECOCK_BP_BWD].toBool() ? anglecock_bp_bwd->open() : anglecock_bp_bwd->close();
     }
+
+    // Концевые краны тормозной магистрали (общие, не привязаны к кабинам)
+    auto &shared_inputs = control_inputs[control_inputs.size() - 1];
+    shared_inputs[CTRL_ANGLECOCK_BP_FWD].toBool() ? anglecock_bp_fwd->open() : anglecock_bp_fwd->close();
+    shared_inputs[CTRL_ANGLECOCK_BP_BWD].toBool() ? anglecock_bp_bwd->open() : anglecock_bp_bwd->close();
+}
 
     // Кнопки песочницы
     sand_system->setSandDeliveryOn(control_inputs[CAB1][CTRL_SAND_BUTTON].toBool() || control_inputs[CAB2][CTRL_SAND_BUTTON].toBool());

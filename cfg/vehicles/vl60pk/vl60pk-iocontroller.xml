@@ -664,8 +664,7 @@
 		<Name>Концевой кран ТМ вперёд</Name>
 		<Description>Открытие/закрытие концевого крана тормозной магистрали с передней стороны</Description>
 		<Type>Toggle</Type>
-		<value1>0.0</value1>
-		<value2>0.0</value2>
+		<value>0.0</value>
 		<KeyName>KEY_F2</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
@@ -678,8 +677,7 @@
 		<Name>Концевой кран ТМ назад</Name>
 		<Description>Открытие/закрытие концевого крана тормозной магистрали с задней стороны</Description>
 		<Type>Toggle</Type>
-		<value1>0.0</value1>
-		<value2>0.0</value2>
+		<value>0.0</value>
 		<KeyName>KEY_F3</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
