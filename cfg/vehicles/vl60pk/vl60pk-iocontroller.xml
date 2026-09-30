@@ -684,4 +684,56 @@
 
 	</Control>
 
+	<!-- Концевой кран питательной магистрали вперёд -->
+	<Control>
+		<ID>143</ID>
+		<Name>Концевой кран ПМ вперёд</Name>
+		<Description>Открытие/закрытие концевого крана питательной магистрали с передней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F6</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Концевой кран питательной магистрали назад -->
+	<Control>
+		<ID>144</ID>
+		<Name>Концевой кран ПМ назад</Name>
+		<Description>Открытие/закрытие концевого крана питательной магистрали с задней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F7</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Концевой кран тормозных цилиндров вперёд -->
+	<Control>
+		<ID>145</ID>
+		<Name>Концевой кран ТЦ вперёд</Name>
+		<Description>Открытие/закрытие концевого крана тормозных цилиндров с передней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F10</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Концевой кран тормозных цилиндров назад -->
+	<Control>
+		<ID>146</ID>
+		<Name>Концевой кран ТЦ назад</Name>
+		<Description>Открытие/закрытие концевого крана тормозных цилиндров с задней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F11</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
 </Config>

@@ -123,10 +123,14 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
         anglecock_bp_bwd->close();
     }
 
-    // Синхронизируем control_inputs с реальным состоянием концевых кранов ТМ
+    // Синхронизируем control_inputs с состоянием концевых кранов
     // — чтобы stepControls() не перезаписал их начальное состояние.
     // Используем isLinked(), а не isOpened() — is_opened меняется только в preStep()
     auto &shared = control_inputs[control_inputs.size() - 1];
     shared[CTRL_ANGLECOCK_BP_FWD].value = (hose_bp_fwd->isLinked()) ? 1.0f : 0.0f;
     shared[CTRL_ANGLECOCK_BP_BWD].value = (hose_bp_bwd->isLinked()) ? 1.0f : 0.0f;
+    shared[CTRL_ANGLECOCK_FL_FWD].value = (hose_fl_fwd->isLinked()) ? 1.0f : 0.0f;
+    shared[CTRL_ANGLECOCK_FL_BWD].value = (hose_fl_bwd->isLinked()) ? 1.0f : 0.0f;
+    shared[CTRL_ANGLECOCK_BC_FWD].value = (hose_bc_fwd->isLinked()) ? 1.0f : 0.0f;
+    shared[CTRL_ANGLECOCK_BC_BWD].value = (hose_bc_bwd->isLinked()) ? 1.0f : 0.0f;
 }
