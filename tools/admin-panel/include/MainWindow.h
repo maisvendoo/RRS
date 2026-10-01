@@ -11,8 +11,7 @@
 #include    <QMainWindow>
 #include    <QListWidgetItem>
 
-class ClientCore;
-class RouteData;
+#include    "ClientCore.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

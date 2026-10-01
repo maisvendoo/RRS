@@ -8,9 +8,7 @@
 #include    "ProtocolHandler.h"
 #include    <QDebug>
 #include    <QDateTime>
-#include    <QTcpSocket>
 #include    <QThread>
-#include    <QTimer>
 
 //-----------------------------------------------------------------------------
 ProtocolHandler::ProtocolHandler(QObject* parent)
@@ -104,10 +102,10 @@ void ProtocolHandler::sendMessage(const QJsonObject& message)
     QJsonDocument doc(message);
     QByteArray data = doc.toJson(QJsonDocument::Compact);
     data.append('\n');
-
+    
     // Отладочный вывод
     qDebug() << "Sending:" << data;
-
+    
     // Отправляем
     qint64 written = m_socket->write(data);
     if (written != data.size())
@@ -205,7 +203,7 @@ void ProtocolHandler::onReadyRead()
 
         QJsonParseError parseError;
         QJsonDocument doc = QJsonDocument::fromJson(messageData, &parseError);
-
+        
         if (parseError.error != QJsonParseError::NoError)
         {
             qWarning() << "JSON parse error:" << parseError.errorString() << "Data:" << messageData;

@@ -9,12 +9,11 @@
 #define     PROTOCOLHANDLER_H
 
 #include    <QObject>
+#include    <QTcpSocket>
 #include    <QJsonDocument>
 #include    <QJsonObject>
 #include    <QJsonArray>
-
-class QTcpSocket;
-class QTimer;
+#include    <QTimer>
 
 class ProtocolHandler : public QObject
 {

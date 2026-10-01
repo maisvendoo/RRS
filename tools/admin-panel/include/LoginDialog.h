@@ -9,8 +9,7 @@
 #define     LOGINDIALOG_H
 
 #include    <QDialog>
-
-class QLineEdit;
+#include    <QLineEdit>
 
 //-----------------------------------------------------------------------------
 class LoginDialog : public QDialog

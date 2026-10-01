@@ -7,7 +7,6 @@
 
 #include    "LoginDialog.h"
 
-#include    <QLineEdit>
 #include    <QVBoxLayout>
 #include    <QHBoxLayout>
 #include    <QFormLayout>

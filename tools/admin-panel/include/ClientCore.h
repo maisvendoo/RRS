@@ -19,7 +19,7 @@
 #include    <QVector>
 #include    <QMap>
 
-class ProtocolHandler;
+#include    "ProtocolHandler.h"
 
 //-----------------------------------------------------------------------------
 //
