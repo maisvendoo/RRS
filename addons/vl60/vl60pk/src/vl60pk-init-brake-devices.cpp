@@ -2,6 +2,8 @@
 
 #include    "filesystem.h"
 
+#include    <vl60-controls.h>
+
 #include "airdistributor.h"
 #include "brake-crane.h"
 #include "electro-airdistributor.h"
@@ -58,25 +60,31 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
 
     supply_reservoir->setY(0, pBP);
 
+    auto &shared = control_inputs[control_inputs.size() - 1];
+
     // Состояние рукавов и концевых кранов магистрали тормозных цилиндров
     if (hose_bc_fwd->isLinked())
     {
         hose_bc_fwd->connect();
         anglecock_bc_fwd->open();
+        shared[CTRL_ANGLECOCK_BC_FWD].value = 1.0f;
     }
     else
     {
         anglecock_bc_fwd->close();
+        shared[CTRL_ANGLECOCK_BC_FWD].value = 0.0f;
     }
 
     if (hose_bc_bwd->isLinked())
     {
         hose_bc_bwd->connect();
         anglecock_bc_bwd->open();
+        shared[CTRL_ANGLECOCK_BC_BWD].value = 1.0f;
     }
     else
     {
         anglecock_bc_bwd->close();
+        shared[CTRL_ANGLECOCK_BC_BWD].value = 0.0f;
     }
 
     // Состояние рукавов и концевых кранов питательной магистрали
@@ -84,20 +92,24 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
     {
         hose_fl_fwd->connect();
         anglecock_fl_fwd->open();
+        shared[CTRL_ANGLECOCK_FL_FWD].value = 1.0f;
     }
     else
     {
         anglecock_fl_fwd->close();
+        shared[CTRL_ANGLECOCK_FL_FWD].value = 0.0f;
     }
 
     if (hose_fl_bwd->isLinked())
     {
         hose_fl_bwd->connect();
         anglecock_fl_bwd->open();
+        shared[CTRL_ANGLECOCK_FL_BWD].value = 1.0f;
     }
     else
     {
         anglecock_fl_bwd->close();
+        shared[CTRL_ANGLECOCK_FL_BWD].value = 0.0f;
     }
 
     // Состояние рукавов и концевых кранов тормозной магистрали
@@ -105,19 +117,23 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
     {
         hose_bp_fwd->connect();
         anglecock_bp_fwd->open();
+        shared[CTRL_ANGLECOCK_BP_FWD].value = 1.0f;
     }
     else
     {
         anglecock_bp_fwd->close();
+        shared[CTRL_ANGLECOCK_BP_FWD].value = 0.0f;
     }
 
     if (hose_bp_bwd->isLinked())
     {
         hose_bp_bwd->connect();
         anglecock_bp_bwd->open();
+        shared[CTRL_ANGLECOCK_BP_BWD].value = 1.0f;
     }
     else
     {
         anglecock_bp_bwd->close();
-    }
+        shared[CTRL_ANGLECOCK_BP_BWD].value = 0.0f;
+    }    
 }
