@@ -12,6 +12,7 @@
  */
 
 #include    "ClientCore.h"
+#include    "ProtocolHandler.h"
 #include    <QDebug>
 
 //-----------------------------------------------------------------------------

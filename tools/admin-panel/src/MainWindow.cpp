@@ -8,6 +8,7 @@
 #include    "MainWindow.h"
 #include    "ui_mainwindow.h"
 #include    "CfgReader.h"
+#include    "ClientCore.h"
 #include    "LoginDialog.h"
 #include    <QMessageBox>
 #include    <QCloseEvent>
@@ -82,27 +83,27 @@ void MainWindow::loadConfig()
     QDir baseDir(basePath);
     baseDir.cdUp();
     QString configPath = baseDir.absolutePath() + "/cfg/admin-panel.xml";
-    
+
     if (!QFile::exists(configPath))
     {
         qWarning() << "Config not found:" << configPath;
         return;
     }
-    
+
     CfgReader cfg;
     if (!cfg.load(configPath))
     {
         qWarning() << "Failed to load config:" << configPath;
         return;
     }
-    
+
     QDomNode clientNode = cfg.getFirstSection("Client");
     if (clientNode.isNull())
     {
         qWarning() << "Client section not found in config";
         return;
     }
-    
+
     QString host;
     if (cfg.getString(clientNode, "DefaultHost", host))
     {
@@ -111,7 +112,7 @@ void MainWindow::loadConfig()
             ui->editHost->setText(host);
         }
     }
-    
+
     int port;
     if (cfg.getInt(clientNode, "DefaultPort", port))
     {
@@ -230,7 +231,7 @@ void MainWindow::onStartButtonClicked()
     {
         return;
     }
-    
+
     QString scenarioDirName = ui->comboScenarios->itemData(index, Qt::UserRole + 1).toString();
     if (scenarioDirName.isEmpty())
     {
@@ -239,7 +240,7 @@ void MainWindow::onStartButtonClicked()
 
     ui->btnStart->setEnabled(false);
     ui->btnStart->setText("Starting...");
-    
+
     m_client->startSimulation(m_currentRoute, scenarioDirName);
 }
 
@@ -430,7 +431,7 @@ void MainWindow::onSimulationStarted()
     ui->btnStart->setText("Stop Simulation");
     ui->btnStart->setEnabled(true);
     updateUI();
-    
+
     m_client->getStatus();
 }
 
