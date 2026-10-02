@@ -48,13 +48,15 @@ void KeyboardRotateState::handle_mouse_move()
     double begin_acos = std::acos(vsg::dot(begin_vec, camera_up));
     double curr_acos = std::acos(vsg::dot(curr_vec, camera_up));
 
-    if (begin_vec != camera_up && begin_vec != -camera_up &&
+    if (begin_vec != camera_up &&
+        begin_vec != -camera_up &&
         vsg::dot(vsg::cross(begin_vec, camera_up), camera_front) < 0.0)
     {
         begin_acos = 2 * vsg::PI - begin_acos;
     }
 
-    if (curr_vec != camera_up && curr_vec != -camera_up &&
+    if (curr_vec != camera_up &&
+        curr_vec != -camera_up &&
         vsg::dot(vsg::cross(curr_vec, camera_up), camera_front) < 0.0)
     {
         curr_acos = 2 * vsg::PI - curr_acos;
