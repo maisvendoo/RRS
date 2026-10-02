@@ -1,5 +1,5 @@
-#ifndef EDITOR_MATH_H
-#define EDITOR_MATH_H
+#ifndef EDITOR_EDITOR_MATH_H
+#define EDITOR_EDITOR_MATH_H
 
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
@@ -54,4 +54,4 @@ bool calculate_closest_intersection_mouse_and_cone(int axis_index, int x,
     const vsg::dmat4& inv_proj_mat, vsg::dvec3 cone_base_center,
     double cone_radius, double cone_height, vsg::dvec3& out);
 
-#endif // EDITOR_MATH_H
+#endif // EDITOR_EDITOR_MATH_H

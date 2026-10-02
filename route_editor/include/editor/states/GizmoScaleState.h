@@ -1,5 +1,5 @@
-#ifndef GIZMO_SCALE_STATE_H
-#define GIZMO_SCALE_STATE_H
+#ifndef EDITOR_STATES_GIZMO_SCALE_STATE_H
+#define EDITOR_STATES_GIZMO_SCALE_STATE_H
 
 #include "editor/states/State.h"
 
@@ -12,4 +12,4 @@ public:
     virtual void handle_key_press() override;
 };
 
-#endif // GIZMO_SCALE_STATE_H
+#endif // EDITOR_STATES_GIZMO_SCALE_STATE_H

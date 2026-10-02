@@ -7,12 +7,12 @@
 #include "editor/RouteObject.h"
 #include "editor/StateManager.h"
 #include "editor/commands/RotateObjectsCommand.h"
-#include "editor/states/KeyboardTransformState.h"
+#include "editor/states/TransformState.h"
 
 #include <vsg/maths/vec3.h>
 
 KeyboardRotateState::KeyboardRotateState(EditorContext& editor_context)
-    : KeyboardTransformState(editor_context)
+    : TransformState(editor_context)
 {
     name = "KeyboardRotateState";
 }
@@ -24,7 +24,7 @@ void KeyboardRotateState::on_activate()
     const auto& gizmo = editor_context.gizmo;
     const auto& camera = editor_context.camera;
 
-    KeyboardTransformState::on_activate();
+    TransformState::on_activate();
     rotation_rad = 0.0;
     gizmo_pos = gizmo->get_curr_pos();
     camera_front = camera->get_front();

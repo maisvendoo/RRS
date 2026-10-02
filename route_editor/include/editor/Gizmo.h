@@ -1,5 +1,5 @@
-#ifndef GIZMO_H
-#define GIZMO_H
+#ifndef EDITOR_GIZMO_H
+#define EDITOR_GIZMO_H
 
 #include "SingleSwitch.h"
 
@@ -53,4 +53,4 @@ private:
     int active_plain_index = -1;
 };
 
-#endif // GIZMO_H
+#endif // EDITOR_GIZMO_H

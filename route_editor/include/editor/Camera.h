@@ -1,5 +1,5 @@
-#ifndef CAMERA_HANDLER_H
-#define CAMERA_HANDLER_H
+#ifndef EDITOR_CAMERA_H
+#define EDITOR_CAMERA_H
 
 #include <vsg/app/Camera.h>
 #include <vsg/core/Inherit.h>
@@ -86,4 +86,4 @@ private:
     vsg::dvec3 move_direction = {0.0, 0.0, 0.0};
 };
 
-#endif // CAMERA_HANDLER_H
+#endif // EDITOR_CAMERA_H

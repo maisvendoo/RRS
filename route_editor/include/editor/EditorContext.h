@@ -1,5 +1,5 @@
-#ifndef EDITOR_CONTEXT_H
-#define EDITOR_CONTEXT_H
+#ifndef EDITOR_EDITOR_CONTEXT_H
+#define EDITOR_EDITOR_CONTEXT_H
 
 #include "editor/EditorState.h"
 #include "editor/KeyBindings.h"
@@ -19,7 +19,6 @@
 #include <atomic>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -123,4 +122,4 @@ struct EditorContext
     std::atomic_bool finish_topology_thread;
 };
 
-#endif // EDITOR_CONTEXT_H
+#endif // EDITOR_EDITOR_CONTEXT_H

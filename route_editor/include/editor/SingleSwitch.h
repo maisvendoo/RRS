@@ -1,5 +1,5 @@
-#ifndef SINGLE_SWITCH_H
-#define SINGLE_SWITCH_H
+#ifndef EDITOR_SINGLE_SWITCH_H
+#define EDITOR_SINGLE_SWITCH_H
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Mask.h>
@@ -54,4 +54,4 @@ public:
     }
 };
 
-#endif // SINGLE_SWITCH_H
+#endif // EDITOR_SINGLE_SWITCH_H

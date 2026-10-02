@@ -1,5 +1,5 @@
-#ifndef NAVIGATION_STATE_H
-#define NAVIGATION_STATE_H
+#ifndef EDITOR_STATES_NAVIGATION_STATE_H
+#define EDITOR_STATES_NAVIGATION_STATE_H
 
 #include "editor/states/State.h"
 
@@ -20,4 +20,4 @@ public:
     virtual void update(double delta_time) override;
 };
 
-#endif // NAVIGATION_STATE_H
+#endif // EDITOR_STATES_NAVIGATION_STATE_H

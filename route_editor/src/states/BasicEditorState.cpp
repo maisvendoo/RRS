@@ -119,6 +119,7 @@ void BasicEditorState::handle_button_press()
         {
             if (gizmo->handle_intersections())
             {
+                state_manager->defer_switch_to(STATE_GIZMO_TRANSLATE);
                 return;
             }
 

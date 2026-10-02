@@ -1,5 +1,5 @@
-#ifndef EDITOR_GUI_H
-#define EDITOR_GUI_H
+#ifndef EDITOR_EDITOR_GUI_H
+#define EDITOR_EDITOR_GUI_H
 
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
@@ -87,4 +87,4 @@ private:
     void draw_invalid_route_popup() const;
 };
 
-#endif // EDITOR_GUI_H
+#endif // EDITOR_EDITOR_GUI_H

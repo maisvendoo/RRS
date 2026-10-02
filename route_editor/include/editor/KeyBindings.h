@@ -1,5 +1,5 @@
-#ifndef KEY_BINDINGS_H
-#define KEY_BINDINGS_H
+#ifndef EDITOR_KEY_BINDINGS_H
+#define EDITOR_KEY_BINDINGS_H
 
 #include "Action.h"
 
@@ -19,4 +19,4 @@ struct KeyBindings
     void read(CfgReader& cfg);
 };
 
-#endif // KEY_BINDINGS_H
+#endif // EDITOR_KEY_BINDINGS_H

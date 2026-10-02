@@ -1,5 +1,5 @@
-// #ifndef EDITOR_BOX_SELECTION_STATE_H
-// #define EDITOR_BOX_SELECTION_STATE_H
+// #ifndef EDITOR_STATES_BOX_SELECTION_STATE_H
+// #define EDITOR_STATES_BOX_SELECTION_STATE_H
 
 // #include "editor/states/EditorState.h"
 
@@ -76,4 +76,4 @@
 //     void update_selection();
 // };
 
-// #endif // EDITOR_BOX_SELECTION_STATE_H
+// #endif // EDITOR_STATES_BOX_SELECTION_STATE_H

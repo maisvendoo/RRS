@@ -1,5 +1,5 @@
-#ifndef EDITOR_STATE_H2
-#define EDITOR_STATE_H2
+#ifndef EDITOR_STATES_STATE_H
+#define EDITOR_STATES_STATE_H
 
 #include <string>
 
@@ -34,4 +34,4 @@ protected:
     std::string name;
 };
 
-#endif // EDITOR_STATE_H2
+#endif // EDITOR_STATES_STATE_H

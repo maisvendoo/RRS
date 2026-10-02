@@ -1,5 +1,5 @@
-#ifndef KEYBOARD_H
-#define KEYBOARD_H
+#ifndef EDITOR_KEYBOARD_H
+#define EDITOR_KEYBOARD_H
 
 #include "editor/Action.h"
 #include "editor/KeyBindings.h"
@@ -32,4 +32,4 @@ private:
     std::uint16_t modifiers = 0;
 };
 
-#endif // KEYBOARD_H
+#endif // EDITOR_KEYBOARD_H

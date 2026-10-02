@@ -8,12 +8,12 @@
 #include "editor/StateManager.h"
 #include "editor/commands/RotateObjectsCommand.h"
 #include "editor/commands/ScaleObjectsCommand.h"
-#include "editor/states/KeyboardTransformState.h"
+#include "editor/states/TransformState.h"
 
 #include <vsg/maths/vec3.h>
 
 KeyboardScaleState::KeyboardScaleState(EditorContext& editor_context)
-    : KeyboardTransformState(editor_context)
+    : TransformState(editor_context)
 {
     name = "KeyboardScaleState";
 }
@@ -24,7 +24,7 @@ void KeyboardScaleState::on_activate()
 {
     const auto& gizmo = editor_context.gizmo;
 
-    KeyboardTransformState::on_activate();
+    TransformState::on_activate();
     scale = {1.0, 1.0, 1.0};
     gizmo_pos = gizmo->get_curr_pos();
 }
