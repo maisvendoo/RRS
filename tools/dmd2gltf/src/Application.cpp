@@ -628,6 +628,12 @@ bool Application::convert_model(std::string &in_dmd_model_path,
     }
 
     fs::path model_path = out_gltf_model_path;
+    if (   model_path.has_filename()
+        && model_path.has_extension()
+        && (model_path.extension().string() == ".gltf"))
+    {
+        model_data.model_file_name = model_path.filename().stem().string();
+    }
     std::string gltf_directory_path = model_path.parent_path().string();
     fs::create_directories(gltf_directory_path);
 
@@ -636,8 +642,9 @@ bool Application::convert_model(std::string &in_dmd_model_path,
     {
         out_relative_bin_path = model_path.stem().string() + ".bin";
     }
-    fs::path bin_path = out_relative_bin_path;
-    fs::create_directories(bin_path);
+    fs::path bin_path = gltf_directory_path;
+    bin_path /= out_relative_bin_path;
+    fs::create_directories(bin_path.parent_path());
     if (bin_path.extension() != ".bin")
     {
         out_relative_bin_path = out_relative_bin_path + ".bin";
@@ -655,8 +662,9 @@ bool Application::convert_model(std::string &in_dmd_model_path,
             out_relative_texture_path = fs::path(in_texture_path).filename().string();
         }
     }
-    fs::path texture_path = out_relative_texture_path;
-    fs::create_directories(texture_path);
+    fs::path texture_path = gltf_directory_path;
+    texture_path /= out_relative_texture_path;
+    fs::create_directories(texture_path.parent_path());
     if (texture_path.extension() != texture_ext)
     {
         out_relative_texture_path = out_relative_texture_path + texture_ext;
