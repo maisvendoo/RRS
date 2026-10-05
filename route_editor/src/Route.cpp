@@ -25,6 +25,7 @@
 #include <vsg/core/Array.h>
 #include <vsg/core/Data.h>
 #include <vsg/core/Mask.h>
+#include <vsg/core/Value.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Path.h>
 #include <vsg/io/read.h>
@@ -46,6 +47,8 @@
 #include <vsg/state/PipelineLayout.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/VertexInputState.h>
+#include <vsg/text/StandardLayout.h>
+#include <vsg/text/Text.h>
 #include <vsg/utils/Builder.h>
 
 #include <QString>
@@ -463,7 +466,7 @@ bool Route::load_topology()
 
     const auto rasterization_state = vsg::RasterizationState::create();
     rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
-    rasterization_state->lineWidth = 3.0f;
+    rasterization_state->lineWidth = 1.6f;
 
     const auto state_group = create_state_group_with_custom_pipeline(
         shaders_dir_path.c_str(),
@@ -488,6 +491,10 @@ bool Route::load_topology()
     );
 
     srand(time(NULL));
+
+    auto font_path = fs.combinePath(fs.getFontsDir(), "JetBrainsMono-Regular.ttf");
+    auto font = vsg::read_cast<vsg::Font>(font_path, vsg_options);
+    auto text_shader_set = vsg_options->shaderSets["text"] = vsg::createTextShaderSet(vsg_options);
 
     const traj_list_t* traj_list = topology->getTrajectoriesList();
     for (const Trajectory* trajectory : *traj_list)
@@ -522,12 +529,15 @@ bool Route::load_topology()
         color.g = (float)rand() / (float)RAND_MAX;
         color.b = (float)rand() / (float)RAND_MAX;
 
+        vsg::dvec3 pos = {0.0, 0.0, 0.0};
         for (std::size_t i = 0; i < points_size; ++i)
         {
             vertices->at(i) = points[i];
+            pos += points[i];
             colors->at(i) = color;
             indices->at(i) = i;
         }
+        pos /= points_size;
 
         const auto geometry = vsg::Geometry::create();
         geometry->assignArrays(vsg::DataList{vertices, colors});
@@ -537,6 +547,20 @@ bool Route::load_topology()
         ));
 
         state_group->addChild(geometry);
+
+        auto layout = vsg::StandardLayout::create();
+        layout->position = pos;
+        layout->position += {0.0, 0.0, (float)rand() / (float)RAND_MAX * 2.0f + 1.0f};
+        layout->horizontal = vsg::vec3(1.0, 0.0, 0.0);
+        layout->vertical = vsg::vec3(0.0, 1.0, 0.0);
+        layout->color = {color, 1.0f};
+        layout->billboard = true;
+        auto text = vsg::Text::create();
+        text->font = font;
+        text->layout = layout;
+        text->text = vsg::stringValue::create(trajectory->getName().toStdString().c_str());
+        text->setup(0, vsg_options);
+        group->addChild(text);
     }
 
     group->addChild(state_group);
