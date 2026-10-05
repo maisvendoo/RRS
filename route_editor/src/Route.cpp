@@ -10,6 +10,8 @@
 
 #include <CfgReader.h>
 #include <Journal.h>
+#include <cstdlib>
+#include <ctime>
 #include <filesystem.h>
 #include <graphics/pipeline_funcs.h>
 #include <rail-signal.h>
@@ -461,6 +463,7 @@ bool Route::load_topology()
 
     const auto rasterization_state = vsg::RasterizationState::create();
     rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
+    rasterization_state->lineWidth = 3.0f;
 
     const auto state_group = create_state_group_with_custom_pipeline(
         shaders_dir_path.c_str(),
@@ -483,6 +486,8 @@ bool Route::load_topology()
         vsg::ColorBlendState::create(),
         vsg::DepthStencilState::create()
     );
+
+    srand(time(NULL));
 
     const traj_list_t* traj_list = topology->getTrajectoriesList();
     for (const Trajectory* trajectory : *traj_list)
@@ -512,10 +517,15 @@ bool Route::load_topology()
         const auto colors = vsg::vec3Array::create(points_size);
         const auto indices = vsg::ushortArray::create(points_size);
 
+        vsg::vec3 color;
+        color.r = (float)rand() / (float)RAND_MAX;
+        color.g = (float)rand() / (float)RAND_MAX;
+        color.b = (float)rand() / (float)RAND_MAX;
+
         for (std::size_t i = 0; i < points_size; ++i)
         {
             vertices->at(i) = points[i];
-            colors->at(i) = {1.0f, 1.0f, 0.0f};
+            colors->at(i) = color;
             indices->at(i) = i;
         }
 
