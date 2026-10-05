@@ -462,11 +462,11 @@ bool Route::load_topology()
     const std::string shaders_dir_path = fs.combinePath(fs.getDataDir(), "shaders");
 
     const auto input_assembly_state = vsg::InputAssemblyState::create();
-    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 
     const auto rasterization_state = vsg::RasterizationState::create();
     rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
-    rasterization_state->lineWidth = 1.6f;
+    rasterization_state->lineWidth = 2.0f;
 
     const auto state_group = create_state_group_with_custom_pipeline(
         shaders_dir_path.c_str(),
@@ -520,9 +520,9 @@ bool Route::load_topology()
         const dvec3& p = tracks.back().end_point;
         points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
 
-        const auto vertices = vsg::vec3Array::create(points_size);
-        const auto colors = vsg::vec3Array::create(points_size);
-        const auto indices = vsg::ushortArray::create(points_size);
+        const auto vertices = vsg::vec3Array::create(points_size * 2);
+        const auto colors = vsg::vec3Array::create(points_size * 2);
+        const auto indices = vsg::ushortArray::create(points_size * 4 - 2);
 
         vsg::vec3 color;
         color.r = (float)rand() / (float)RAND_MAX;
@@ -530,12 +530,23 @@ bool Route::load_topology()
         color.b = (float)rand() / (float)RAND_MAX;
 
         vsg::dvec3 pos = {0.0, 0.0, 0.0};
+        std::size_t vertex_index = 0;
+        std::size_t color_index = 0;
+        std::size_t index_index = 0;
         for (std::size_t i = 0; i < points_size; ++i)
         {
-            vertices->at(i) = points[i];
+            vertices->at(vertex_index++) = points[i];
+            vertices->at(vertex_index++) = points[i] + vsg::dvec3(0.0, 0.0, 10.0);
+            colors->at(color_index++) = color;
+            colors->at(color_index++) = color;
+            indices->at(index_index++) = i * 2;
+            indices->at(index_index++) = i * 2 + 1;
+            if (i > 0)
+            {
+                indices->at(index_index++) = i * 2;
+                indices->at(index_index++) = (i - 1) * 2;
+            }
             pos += points[i];
-            colors->at(i) = color;
-            indices->at(i) = i;
         }
         pos /= points_size;
 
@@ -543,16 +554,19 @@ bool Route::load_topology()
         geometry->assignArrays(vsg::DataList{vertices, colors});
         geometry->assignIndices(indices);
         geometry->commands.push_back(vsg::DrawIndexed::create(
-            points_size, 1, 0, 0, 0
+            indices->size(), 1, 0, 0, 0
         ));
 
         state_group->addChild(geometry);
 
         auto layout = vsg::StandardLayout::create();
+        layout->billboardAutoScaleDistance = true;
+        layout->horizontalAlignment = vsg::StandardLayout::CENTER_ALIGNMENT;
+        layout->verticalAlignment = vsg::StandardLayout::CENTER_ALIGNMENT;
         layout->position = pos;
-        layout->position += {0.0, 0.0, (float)rand() / (float)RAND_MAX * 2.0f + 1.0f};
-        layout->horizontal = vsg::vec3(1.0, 0.0, 0.0);
-        layout->vertical = vsg::vec3(0.0, 1.0, 0.0);
+        layout->position += {0.0, 0.0, (float)rand() / (float)RAND_MAX * 4.0f + 1.0f};
+        layout->horizontal = vsg::vec3(3.0, 0.0, 0.0);
+        layout->vertical = vsg::vec3(0.0, 3.0, 0.0);
         layout->color = {color, 1.0f};
         layout->billboard = true;
         auto text = vsg::Text::create();
