@@ -19,6 +19,7 @@
 #include    <QObject>
 #include    <QtGlobal>
 #include    <mutex>
+#include    <set>
 
 #include    "datetime.h"
 #include    "control-signals.h"
@@ -235,7 +236,7 @@ protected:
     size_t  model_idx = 0;
 
     /// Инициализированные сигналы управления (для повторного испускания после connect)
-    QSet<QPair<int, int>> _init_signals;
+    std::set<std::pair<int, int>> _init_signals;
     /// Train index
     size_t  train_idx = 0;
     /// Vehicle ODE system index

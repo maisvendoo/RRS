@@ -953,7 +953,7 @@ void Vehicle::initClientInputSignal(int cab_idx, int signal_id, float value)
     if (input != control_inputs[cab_idx].end())
     {
         control_inputs[cab_idx][signal_id].value = value;
-        _init_signals.insert(QPair<int, int>(cab_idx, signal_id));
+        _init_signals.insert(std::pair<int, int>(cab_idx, signal_id));
         emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
     }
 }
