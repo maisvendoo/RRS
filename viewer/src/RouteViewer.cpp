@@ -1006,6 +1006,9 @@ void RouteViewer::initTcpClient()
         is_connection_abandoned = true;
     });
 
+    connect(tcp_client.get(), &TcpClient::sigVehicleControlInputInit,
+            vehicles_handler.get(), &VehiclesHandler::slotVehicleControlInputInit);
+
     tcp_client->init(settings.tcp_config);
 
     GUIparams->tcp_client = tcp_client.get();
@@ -1257,9 +1260,6 @@ void RouteViewer::slotGetVehicleInfoData(QByteArray &data)
 
     connect(tcp_client.get(), &TcpClient::setTrainProfile,
             vehicles_handler.get(), &VehiclesHandler::slotGetTrainProfileData, Qt::DirectConnection);
-
-    connect(tcp_client.get(), &TcpClient::sigVehicleControlInputInit,
-            vehicles_handler.get(), &VehiclesHandler::slotVehicleControlInputInit);
 
     connect(vehicles_handler.get(), &VehiclesHandler::updated,
             this, &RouteViewer::slotUpdated);
