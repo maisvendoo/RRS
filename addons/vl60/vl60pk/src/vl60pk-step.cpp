@@ -1,4 +1,5 @@
 #include    <vl60pk.h>
+#include    <vl60-controls.h>
 #include    <Journal.h>
 
 #include "automatic-train-stop.h"
@@ -77,8 +78,12 @@ void VL60pk::slotAutoStart()
         initClientInputSignal(cab, CTRL_RETURN_PROTECTION, gv_return_tumbler[cab].getState() ? 1.0f : 0.0f);
         initClientInputSignal(cab, CTRL_TUMBLER_FR, fr_tumbler[cab].getState() ? 1.0f : 0.0f);
         initClientInputSignal(cab, CTRL_TUMBLER_MK, mk_tumbler[cab].getState() ? 1.0f : 0.0f);
+
         for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
+        {
             initClientInputSignal(cab, static_cast<int>(CTRL_TUMBLER_MV1 + i), mv_tumblers[cab][i].getState() ? 1.0f : 0.0f);
+        }
+
         initClientInputSignal(cab, CTRL_TUMBLER_CU, cu_tumbler[cab].getState() ? 1.0f : 0.0f);
         if (!epk[cab]->isKeyOn())
             initClientInputSignal(cab, CTRL_RBS_BUTTON, rb[cab][RBS].getState() ? 1.0f : 0.0f);
