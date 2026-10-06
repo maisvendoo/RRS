@@ -216,6 +216,8 @@ signals:
 
     void sigGetTrainParams(int train_idx, double &train_len, double &train_mass);
 
+    void sigInitClientInputSignal(int vehicle_idx, int cab_idx, int signal_id, float value);
+
 protected:
 
     /// Vehicle configuration file directory
@@ -396,6 +398,8 @@ protected:
     bool isAlt(int cab_num = -1) const;
 
     bool getKeyState(uint16_t key, int cab_num = -1) const;
+
+    void initClientInputSignal(int cab_idx, int signal_id, float value);
 
 private:
 

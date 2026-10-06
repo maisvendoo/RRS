@@ -927,6 +927,25 @@ bool Vehicle::getKeyState(uint16_t key, int cab_num) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Vehicle::initClientInputSignal(int cab_idx, int signal_id, float value)
+{
+    if (cab_idx >= control_inputs.size())
+    {
+        return;
+    }
+
+    auto input = control_inputs[cab_idx].find(signal_id);
+
+    if (input != control_inputs[cab_idx].end())
+    {
+        control_inputs[cab_idx][signal_id].value = value;
+        emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Vehicle::loadConfiguration(QString cfg_path)
 {
     CfgReader cfg;
