@@ -29,6 +29,8 @@ void VL60pk::slotAutoStart()
     if (autostart_mode != AUTOSTART_ON)
         return;
 
+    Journal::instance()->info(QString("DBG: AutoStart step cnt=%1/%2").arg(start_count).arg(triggers.size()));
+
     if (start_count < triggers.size())
     {
         if ((triggers[start_count] == &gv_tumbler[autostart_cab]) &&
