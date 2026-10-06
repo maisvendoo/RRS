@@ -62,12 +62,12 @@ void VL60pk::slotAutoStart()
         autostart_mode = AUTOSTART_IDLE;
         controller[autostart_cab]->setReversHandlePos(REVERS_FORWARD);
 
-        controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        /*controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
         controller[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
         brake_lock[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
         brake_lock[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
         epk[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
-        epk[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
+        epk[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);*/
 
         // Синхронизируем control_inputs с текущим состоянием тумблеров,
         // чтобы stepControls не сбросил их после завершения автозапуска
@@ -120,12 +120,12 @@ void VL60pk::slotAutoStop()
         // Отключаем ЭПК, ключ остаётся в замке
         epk[autostart_cab]->setKeyOn(false);
 
-        controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
+        /*controller[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
         controller[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
         brake_lock[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
         brake_lock[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
         epk[CAB1]->setControl(&pressed_keys_by_cabine[CAB1]);
-        epk[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
+        epk[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);*/
 
         autopilot_switcher[autostart_cab].reset();
 
