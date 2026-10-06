@@ -128,6 +128,7 @@ void VL60pk::stepControls(const double &t, const double &dt)
         // Автозапуск по нажатию кнопки (Alt+R)
         if (control_inputs[cab_idx][CTRL_AUTOSTART_PROGRAM].toBool())
         {
+            printf("DBG: stepControls autostart cab=%d val=%.1f\n", cab_idx, control_inputs[cab_idx][CTRL_AUTOSTART_PROGRAM].value);
             if (initAutostartProgram(cab_idx))
                 autoStartTimer->start();
             control_inputs[cab_idx][CTRL_AUTOSTART_PROGRAM].value = 0.0f;
@@ -137,6 +138,7 @@ void VL60pk::stepControls(const double &t, const double &dt)
         // Автоостанов по нажатию кнопки (Alt+T)
         if (control_inputs[cab_idx][CTRL_AUTOSTOP_PROGRAM].toBool())
         {
+            printf("DBG: stepControls autostop cab=%d val=%.1f\n", cab_idx, control_inputs[cab_idx][CTRL_AUTOSTOP_PROGRAM].value);
             if (initAutostopProgram(cab_idx))
                 autoStartTimer->start();
             control_inputs[cab_idx][CTRL_AUTOSTOP_PROGRAM].value = 0.0f;
