@@ -234,9 +234,6 @@ protected:
 
     /// Vehicle index
     size_t  model_idx = 0;
-
-    /// Инициализированные сигналы управления (для повторного испускания после connect)
-    std::set<std::pair<int, int>> _init_signals;
     /// Train index
     size_t  train_idx = 0;
     /// Vehicle ODE system index
@@ -406,6 +403,9 @@ protected:
     void initClientInputSignal(int cab_idx, int signal_id, float value);
 
     void replayInitSignals();
+
+    /// Инициализированные сигналы управления (для повторного испускания после connect)
+    std::set<std::pair<int, int>> _init_signals;
 
 private:
 
