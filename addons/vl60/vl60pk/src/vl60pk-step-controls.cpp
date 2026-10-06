@@ -124,6 +124,22 @@ void VL60pk::stepControls(const double &t, const double &dt)
         // Автоведение и маневровый режим
         control_inputs[cab_idx][CTRL_AUTOPILOT].toBool() ? autopilot_switcher[cab_idx].set() : autopilot_switcher[cab_idx].reset();
         control_inputs[cab_idx][CTRL_SHUNTING_MODE].toBool() ? tumbler_shunting_mode[cab_idx].set() : tumbler_shunting_mode[cab_idx].reset();
+
+        // Автозапуск по нажатию кнопки (Alt+R)
+        if (control_inputs[cab_idx][CTRL_AUTOSTART_PROGRAM].toBool())
+        {
+            if (initAutostartProgram(cab_idx))
+                autoStartTimer->start();
+            control_inputs[cab_idx][CTRL_AUTOSTART_PROGRAM].value = 0.0f;
+        }
+
+        // Автоостанов по нажатию кнопки (Alt+T)
+        if (control_inputs[cab_idx][CTRL_AUTOSTOP_PROGRAM].toBool())
+        {
+            if (initAutostopProgram(cab_idx))
+                autoStartTimer->start();
+            control_inputs[cab_idx][CTRL_AUTOSTOP_PROGRAM].value = 0.0f;
+        }
     }
 
     // Концевые краны тормозной магистрали (общие, не привязаны к кабинам)

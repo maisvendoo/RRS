@@ -736,4 +736,26 @@
 
 	</Control>
 
+	<!-- Автозапуск -->
+	<Control>
+		<ID>147</ID>
+		<Name>Автозапуск</Name>
+		<Description>Запуск программы автоведения</Description>
+		<Type>Button</Type>
+		<value>0.0</value>
+		<KeyName>KEY_R</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+	</Control>
+
+	<!-- Автоостанов -->
+	<Control>
+		<ID>148</ID>
+		<Name>Автоостанов</Name>
+		<Description>Запуск программы автоматической остановки</Description>
+		<Type>Button</Type>
+		<value>0.0</value>
+		<KeyName>KEY_T</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+	</Control>
+
 </Config>

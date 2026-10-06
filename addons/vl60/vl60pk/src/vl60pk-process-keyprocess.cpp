@@ -78,37 +78,6 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         //horn[cabine_idx]->setControl(&pressed_keys_by_cabine[cabine_idx]);
     }
 
-    // Автозапуск
-    if (autoStartTimer->isStarted())
-    {
-        return;
-    }
-
-    if (getKeyState(KEY_R, CAB1) && isAlt(CAB1) && initAutostartProgram(CAB1))
-    {
-        autoStartTimer->start();
-        return;
-    }
-
-    if (getKeyState(KEY_R, CAB2) && isAlt(CAB2) && initAutostartProgram(CAB2))
-    {
-        autoStartTimer->start();
-        return;
-    }
-
-    // Автоостанов
-    if (getKeyState(KEY_T, CAB1) && isAlt(CAB1) && initAutostopProgram(CAB1))
-    {
-        autoStartTimer->start();
-        return;
-    }
-
-    if (getKeyState(KEY_T, CAB2) && isAlt(CAB2) && initAutostopProgram(CAB2))
-    {
-        autoStartTimer->start();
-        return;
-    }
-
     // Контроллер машиниста обрабатываем уже после проверки на невмешательство программы автозапуска
     // Не допускаем двух реверсивных рукояток в контроллерах машиниста
     controller[CAB2]->allowReversHandle(!(controller[CAB1]->isReversHandle()));

@@ -59,6 +59,10 @@ enum
     // Концевые краны тормозных цилиндров
     CTRL_ANGLECOCK_BC_FWD = 145,
     CTRL_ANGLECOCK_BC_BWD = 146,
+
+    // Автозапуск и автоостанов
+    CTRL_AUTOSTART_PROGRAM = 147,
+    CTRL_AUTOSTOP_PROGRAM = 148,
 };
 
 #endif
