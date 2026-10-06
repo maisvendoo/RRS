@@ -19,20 +19,20 @@ void ToggleHandler::processKeyInput(const std::set<uint16_t> &pressed_keys)
         {
             if (isKeyModifier(pressed_keys, keyModOnName))
             {
-                setValueIfChanged(1.0f - value);
+                setValue(1.0f - value);
                 return;
             }
         }
 
         if (isKeyModifier(pressed_keys, keyModOnName))
         {
-            setValueIfChanged(1.0f);
+            setValue(1.0f);
             return;
         }
 
         if (isKeyModifier(pressed_keys, keyModOffName))
         {
-            setValueIfChanged(0.0f);
+            setValue(0.0f);
             return;
         }
     }
@@ -50,13 +50,13 @@ void ToggleHandler::processMouseInput(uint32_t button, bool is_pressed)
 
     if (button == CTRL_LEFT_MOUSE_BUTTON && !toBool())
     {
-        setValueIfChanged(1.0f);
+        setValue(1.0f);
         return;
     }
 
     if (button == CTRL_RIGHT_MOUSE_BUTTON && toBool())
     {
-        setValueIfChanged(0.0f);
+        setValue(0.0f);
         return;
     }
 }
