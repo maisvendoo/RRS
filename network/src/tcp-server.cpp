@@ -753,6 +753,9 @@ void TcpServer::slotUpdateSignal(QByteArray signal_data)
 //------------------------------------------------------------------------------
 void TcpServer::slotInitClientInputSignal(int vehicle_idx, int cab_idx, int signal_id, float value)
 {
+    Journal::instance()->info(QString("DBG: InitSignal v=%1 cab=%2 sig=%3 val=%4")
+                                  .arg(vehicle_idx).arg(cab_idx).arg(signal_id).arg(value));
+
     // Сохраняем в кеш для будущих клиентов (замена по составному ключу)
     bool found = false;
     for (auto& init : pending_input_inits)
