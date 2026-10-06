@@ -927,6 +927,20 @@ bool Vehicle::getKeyState(uint16_t key, int cab_num) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Vehicle::replayInitSignals()
+{
+    for (const auto& pair : _init_signals)
+    {
+        int cab_idx = pair.first;
+        int signal_id = pair.second;
+        float value = control_inputs[cab_idx][signal_id].value;
+        emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Vehicle::initClientInputSignal(int cab_idx, int signal_id, float value)
 {
     if (cab_idx >= control_inputs.size())
@@ -939,6 +953,7 @@ void Vehicle::initClientInputSignal(int cab_idx, int signal_id, float value)
     if (input != control_inputs[cab_idx].end())
     {
         control_inputs[cab_idx][signal_id].value = value;
+        _init_signals.insert(QPair<int, int>(cab_idx, signal_id));
         emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
     }
 }

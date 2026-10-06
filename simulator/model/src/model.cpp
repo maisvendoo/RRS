@@ -159,6 +159,8 @@ bool Model::init(const simulator_command_line_t &command_line)
         connect(*it, &Vehicle::sigInitClientInputSignal,
                 tcp_server, &TcpServer::slotInitClientInputSignal);
 
+        (*it)->replayInitSignals();
+
         ++i;
     }
     tcp_server->setVehiclesInfo(vehicles_info.serialize());

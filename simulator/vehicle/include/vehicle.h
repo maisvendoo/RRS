@@ -233,6 +233,9 @@ protected:
 
     /// Vehicle index
     size_t  model_idx = 0;
+
+    /// Инициализированные сигналы управления (для повторного испускания после connect)
+    QSet<QPair<int, int>> _init_signals;
     /// Train index
     size_t  train_idx = 0;
     /// Vehicle ODE system index
@@ -400,6 +403,8 @@ protected:
     bool getKeyState(uint16_t key, int cab_num = -1) const;
 
     void initClientInputSignal(int cab_idx, int signal_id, float value);
+
+    void replayInitSignals();
 
 private:
 
