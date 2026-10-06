@@ -1,5 +1,5 @@
-#ifndef ROUTE_NOT_LOADED_STATE_H
-#define ROUTE_NOT_LOADED_STATE_H
+#ifndef EDITOR_STATES_ROUTE_NOT_LOADED_STATE_H
+#define EDITOR_STATES_ROUTE_NOT_LOADED_STATE_H
 
 #include "editor/states/State.h"
 
@@ -14,4 +14,4 @@ public:
     virtual void fill_status_bar() const override;
 };
 
-#endif // ROUTE_NOT_LOADED_STATE_H
+#endif // EDITOR_STATES_ROUTE_NOT_LOADED_STATE_H

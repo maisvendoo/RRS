@@ -1,11 +1,11 @@
 #ifndef EDITOR_STATES_KEYBOARD_ROTATE_STATE_H
 #define EDITOR_STATES_KEYBOARD_ROTATE_STATE_H
 
-#include "editor/states/KeyboardTransformState.h"
+#include "editor/states/TransformState.h"
 
 #include <vsg/maths/vec3.h>
 
-class KeyboardRotateState : public KeyboardTransformState
+class KeyboardRotateState : public TransformState
 {
 public:
     KeyboardRotateState(EditorContext& editor_context);

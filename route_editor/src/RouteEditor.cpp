@@ -78,7 +78,7 @@ bool RouteEditor::initialize()
     }
 
     editor_context.mouse = Mouse::create();
-    editor_context.keyboard = Keyboard::create(editor_context);
+    editor_context.keyboard = Keyboard::create(editor_context.key_bindings);
     editor_context.command_manager = std::make_unique<CommandManager>();
     editor_context.camera = Camera::create(editor_context);
     editor_context.object_manager = std::make_unique<ObjectManager>(1000000);
@@ -249,7 +249,7 @@ void RouteEditor::read_settings()
     editor_context.gui_settings.read(cfg);
     editor_context.scene_settings.read(cfg);
     editor_context.window_settings.read(cfg);
-    editor_context.actions.read(cfg);
+    editor_context.key_bindings.read(cfg);
 }
 
 void RouteEditor::create_vsg_options()

@@ -1,4 +1,4 @@
-#include "editor/states/KeyboardTransformState.h"
+#include "editor/states/TransformState.h"
 
 #include "editor/Camera.h"
 #include "editor/EditorContext.h"
@@ -15,19 +15,19 @@
 #include <vsg/ui/KeyEvent.h>
 #include <vsg/ui/PointerEvent.h>
 
-KeyboardTransformState::KeyboardTransformState(EditorContext& editor_context)
+TransformState::TransformState(EditorContext& editor_context)
     : State(editor_context)
 {
 }
 
-KeyboardTransformState::~KeyboardTransformState() = default;
+TransformState::~TransformState() = default;
 
-void KeyboardTransformState::on_activate()
+void TransformState::on_activate()
 {
     begin_intersection = calculate_world_intersection();
 }
 
-void KeyboardTransformState::handle_key_press()
+void TransformState::handle_key_press()
 {
     const auto& keyboard = editor_context.keyboard;
 
@@ -41,7 +41,7 @@ void KeyboardTransformState::handle_key_press()
     }
 }
 
-void KeyboardTransformState::handle_button_press()
+void TransformState::handle_button_press()
 {
     const auto& mouse = editor_context.mouse;
 
@@ -64,15 +64,7 @@ void KeyboardTransformState::handle_button_press()
     }
 }
 
-void KeyboardTransformState::handle_mouse_move()
-{
-}
-
-void KeyboardTransformState::confirm_transform() const
-{
-}
-
-void KeyboardTransformState::cancel_transform() const
+void TransformState::cancel_transform() const
 {
     const auto& selected_objects = editor_context.selected_objects;
     const auto& state_manager = editor_context.state_manager;
@@ -85,7 +77,7 @@ void KeyboardTransformState::cancel_transform() const
     state_manager->defer_switch_to(STATE_BASIC);
 }
 
-vsg::dvec3 KeyboardTransformState::calculate_world_intersection() const
+vsg::dvec3 TransformState::calculate_world_intersection() const
 {
     const auto& mouse = editor_context.mouse;
     const auto& window = editor_context.window;

@@ -1,5 +1,5 @@
-#ifndef EVENT_HANDLER_H
-#define EVENT_HANDLER_H
+#ifndef EDITOR_EVENT_HANDLER_H
+#define EDITOR_EVENT_HANDLER_H
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Visitor.h>
@@ -42,4 +42,4 @@ private:
     EditorContext& editor_context;
 };
 
-#endif // EVENT_HANDLER_H
+#endif // EDITOR_EVENT_HANDLER_H

@@ -48,3 +48,5 @@ if(MSVC)
 else()
     target_compile_options(route_editor PRIVATE -Wall -Wextra -Wpedantic)
 endif()
+
+# add_subdirectory(tests)

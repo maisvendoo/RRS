@@ -1,8 +1,8 @@
-#ifndef EDITOR_CONTEXT_H
-#define EDITOR_CONTEXT_H
+#ifndef EDITOR_EDITOR_CONTEXT_H
+#define EDITOR_EDITOR_CONTEXT_H
 
-#include "editor/Action.h"
 #include "editor/EditorState.h"
+#include "editor/KeyBindings.h"
 #include "editor/RouteMap.h"
 #include "editor/RouteObjects.h"
 #include "editor/settings/CameraSettings.h"
@@ -77,7 +77,7 @@ struct EditorContext
     scene_settings_t scene_settings;
     gizmo_settings_t gizmo_settings;
     gui_settings_t gui_settings;
-    Actions actions;
+    KeyBindings key_bindings;
 
     vsg::ref_ptr<Keyboard> keyboard;
     vsg::ref_ptr<Mouse> mouse;
@@ -122,4 +122,4 @@ struct EditorContext
     std::atomic_bool finish_topology_thread;
 };
 
-#endif // EDITOR_CONTEXT_H
+#endif // EDITOR_EDITOR_CONTEXT_H

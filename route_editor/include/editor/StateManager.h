@@ -1,5 +1,5 @@
-#ifndef STATE_MANAGER_H
-#define STATE_MANAGER_H
+#ifndef EDITOR_STATE_MANAGER_H
+#define EDITOR_STATE_MANAGER_H
 
 #include <vsg/core/ref_ptr.h>
 
@@ -60,4 +60,4 @@ private:
     std::unique_ptr<State>* deferred_state;
 };
 
-#endif // STATE_MANAGER_H
+#endif // EDITOR_STATE_MANAGER_H

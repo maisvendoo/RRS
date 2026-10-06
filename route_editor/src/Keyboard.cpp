@@ -1,12 +1,12 @@
 #include "editor/Keyboard.h"
 
 #include "editor/Action.h"
-#include "editor/EditorContext.h"
+#include "editor/KeyBindings.h"
 
 #include <vsg/ui/KeyEvent.h>
 
-Keyboard::Keyboard(EditorContext& editor_context)
-    : editor_context(editor_context)
+Keyboard::Keyboard(const KeyBindings& key_bindings)
+    : key_bindings_{key_bindings}
 {
 }
 
@@ -16,17 +16,6 @@ void Keyboard::apply(vsg::KeyPressEvent& keyPress)
     modifiers = keyPress.keyModifier & (
         vsg::MODKEY_Alt | vsg::MODKEY_Control | vsg::MODKEY_Shift
     );
-
-    auto& actions = editor_context.actions;
-    actions.active_action = -1;
-    for (int i = 0; i < TOTAL_ACTIONS; ++i)
-    {
-        if (pressed_once(static_cast<Action>(i)))
-        {
-            actions.active_action = i;
-            break;
-        }
-    }
 }
 
 void Keyboard::apply(vsg::KeyReleaseEvent& keyRelease)
@@ -35,8 +24,6 @@ void Keyboard::apply(vsg::KeyReleaseEvent& keyRelease)
     modifiers = keyRelease.keyModifier & (
         vsg::MODKEY_Alt | vsg::MODKEY_Control | vsg::MODKEY_Shift
     );
-
-    editor_context.actions.active_action = -1;
 }
 
 bool Keyboard::get_shift_state() const
@@ -71,16 +58,12 @@ bool Keyboard::pressed_once(vsg::KeySymbol key, bool ignore_handled_keys) const
 
 bool Keyboard::pressed(Action action, bool ignore_handled_keys) const
 {
-    const auto& actions = editor_context.actions;
-
-    return (actions.modifiers[action] == modifiers) &&
-        vsg::Keyboard::pressed(actions.keys[action], ignore_handled_keys);
+    return (key_bindings_.modifiers[action] == modifiers) &&
+        vsg::Keyboard::pressed(key_bindings_.keys[action], ignore_handled_keys);
 }
 
 bool Keyboard::pressed_once(Action action, bool ignore_handled_keys) const
 {
-    const auto& actions = editor_context.actions;
-
-    return (actions.modifiers[action] == modifiers) &&
-        pressed_once(actions.keys[action], ignore_handled_keys);
+    return (key_bindings_.modifiers[action] == modifiers) &&
+        pressed_once(key_bindings_.keys[action], ignore_handled_keys);
 }

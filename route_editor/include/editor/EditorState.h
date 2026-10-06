@@ -1,5 +1,5 @@
-#ifndef EDITOR_STATE_H
-#define EDITOR_STATE_H
+#ifndef EDITOR_EDITOR_STATE_H
+#define EDITOR_EDITOR_STATE_H
 
 enum class EditorState
 {
@@ -8,4 +8,4 @@ enum class EditorState
     EDIT_ROUTE
 };
 
-#endif // EDITOR_STATE_H
+#endif // EDITOR_EDITOR_STATE_H

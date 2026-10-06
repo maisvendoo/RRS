@@ -1,11 +1,11 @@
 #ifndef EDITOR_STATES_KEYBOARD_SCALE_STATE_H
 #define EDITOR_STATES_KEYBOARD_SCALE_STATE_H
 
-#include "editor/states/KeyboardTransformState.h"
+#include "editor/states/TransformState.h"
 
 #include <vsg/maths/vec3.h>
 
-class KeyboardScaleState : public KeyboardTransformState
+class KeyboardScaleState : public TransformState
 {
 public:
     KeyboardScaleState(EditorContext& editor_context);

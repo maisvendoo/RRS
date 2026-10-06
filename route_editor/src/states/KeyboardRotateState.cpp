@@ -7,12 +7,12 @@
 #include "editor/RouteObject.h"
 #include "editor/StateManager.h"
 #include "editor/commands/RotateObjectsCommand.h"
-#include "editor/states/KeyboardTransformState.h"
+#include "editor/states/TransformState.h"
 
 #include <vsg/maths/vec3.h>
 
 KeyboardRotateState::KeyboardRotateState(EditorContext& editor_context)
-    : KeyboardTransformState(editor_context)
+    : TransformState(editor_context)
 {
     name = "KeyboardRotateState";
 }
@@ -24,7 +24,7 @@ void KeyboardRotateState::on_activate()
     const auto& gizmo = editor_context.gizmo;
     const auto& camera = editor_context.camera;
 
-    KeyboardTransformState::on_activate();
+    TransformState::on_activate();
     rotation_rad = 0.0;
     gizmo_pos = gizmo->get_curr_pos();
     camera_front = camera->get_front();
@@ -48,13 +48,15 @@ void KeyboardRotateState::handle_mouse_move()
     double begin_acos = std::acos(vsg::dot(begin_vec, camera_up));
     double curr_acos = std::acos(vsg::dot(curr_vec, camera_up));
 
-    if (begin_vec != camera_up && begin_vec != -camera_up &&
+    if (begin_vec != camera_up &&
+        begin_vec != -camera_up &&
         vsg::dot(vsg::cross(begin_vec, camera_up), camera_front) < 0.0)
     {
         begin_acos = 2 * vsg::PI - begin_acos;
     }
 
-    if (curr_vec != camera_up && curr_vec != -camera_up &&
+    if (curr_vec != camera_up &&
+        curr_vec != -camera_up &&
         vsg::dot(vsg::cross(curr_vec, camera_up), camera_front) < 0.0)
     {
         curr_acos = 2 * vsg::PI - curr_acos;

@@ -7,7 +7,7 @@
 #include "editor/RouteObject.h"
 #include "editor/StateManager.h"
 #include "editor/commands/TranslateObjectsCommand.h"
-#include "editor/states/KeyboardTransformState.h"
+#include "editor/states/TransformState.h"
 
 #include <vsg/maths/vec3.h>
 #include <vsg/ui/KeyEvent.h>
@@ -17,7 +17,7 @@
 #include <utility>
 
 KeyboardTranslateState::KeyboardTranslateState(EditorContext& editor_context)
-    : KeyboardTransformState(editor_context)
+    : TransformState(editor_context)
 {
     name = "KeyboardTranslateState";
 }
@@ -26,7 +26,7 @@ KeyboardTranslateState::~KeyboardTranslateState() = default;
 
 void KeyboardTranslateState::on_activate()
 {
-    KeyboardTransformState::on_activate();
+    TransformState::on_activate();
     prev_intersection = begin_intersection;
 }
 

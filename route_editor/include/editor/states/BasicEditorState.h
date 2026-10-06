@@ -1,5 +1,5 @@
-#ifndef BASIC_EDITOR_STATE_H
-#define BASIC_EDITOR_STATE_H
+#ifndef EDITOR_STATES_BASIC_EDITOR_STATE_H
+#define EDITOR_STATES_BASIC_EDITOR_STATE_H
 
 #include "editor/states/State.h"
 
@@ -24,4 +24,4 @@ private:
     void select_object(const vsg::ref_ptr<RouteObject>& object);
 };
 
-#endif // BASIC_EDITOR_STATE_H
+#endif // EDITOR_STATES_BASIC_EDITOR_STATE_H

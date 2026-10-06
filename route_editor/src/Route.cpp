@@ -10,6 +10,8 @@
 
 #include <CfgReader.h>
 #include <Journal.h>
+#include <cstdlib>
+#include <ctime>
 #include <filesystem.h>
 #include <graphics/pipeline_funcs.h>
 #include <rail-signal.h>
@@ -23,6 +25,7 @@
 #include <vsg/core/Array.h>
 #include <vsg/core/Data.h>
 #include <vsg/core/Mask.h>
+#include <vsg/core/Value.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Path.h>
 #include <vsg/io/read.h>
@@ -44,6 +47,8 @@
 #include <vsg/state/PipelineLayout.h>
 #include <vsg/state/RasterizationState.h>
 #include <vsg/state/VertexInputState.h>
+#include <vsg/text/StandardLayout.h>
+#include <vsg/text/Text.h>
 #include <vsg/utils/Builder.h>
 
 #include <QString>
@@ -457,10 +462,11 @@ bool Route::load_topology()
     const std::string shaders_dir_path = fs.combinePath(fs.getDataDir(), "shaders");
 
     const auto input_assembly_state = vsg::InputAssemblyState::create();
-    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+    input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 
     const auto rasterization_state = vsg::RasterizationState::create();
     rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
+    rasterization_state->lineWidth = 2.0f;
 
     const auto state_group = create_state_group_with_custom_pipeline(
         shaders_dir_path.c_str(),
@@ -483,6 +489,12 @@ bool Route::load_topology()
         vsg::ColorBlendState::create(),
         vsg::DepthStencilState::create()
     );
+
+    srand(time(NULL));
+
+    auto font_path = fs.combinePath(fs.getFontsDir(), "JetBrainsMono-Regular.ttf");
+    auto font = vsg::read_cast<vsg::Font>(font_path, vsg_options);
+    auto text_shader_set = vsg_options->shaderSets["text"] = vsg::createTextShaderSet(vsg_options);
 
     const traj_list_t* traj_list = topology->getTrajectoriesList();
     for (const Trajectory* trajectory : *traj_list)
@@ -508,25 +520,61 @@ bool Route::load_topology()
         const dvec3& p = tracks.back().end_point;
         points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
 
-        const auto vertices = vsg::vec3Array::create(points_size);
-        const auto colors = vsg::vec3Array::create(points_size);
-        const auto indices = vsg::ushortArray::create(points_size);
+        const auto vertices = vsg::vec3Array::create(points_size * 2);
+        const auto colors = vsg::vec3Array::create(points_size * 2);
+        const auto indices = vsg::ushortArray::create(points_size * 4 - 2);
 
+        vsg::vec3 color;
+        color.r = (float)rand() / (float)RAND_MAX;
+        color.g = (float)rand() / (float)RAND_MAX;
+        color.b = (float)rand() / (float)RAND_MAX;
+
+        vsg::dvec3 pos = {0.0, 0.0, 0.0};
+        std::size_t vertex_index = 0;
+        std::size_t color_index = 0;
+        std::size_t index_index = 0;
         for (std::size_t i = 0; i < points_size; ++i)
         {
-            vertices->at(i) = points[i];
-            colors->at(i) = {1.0f, 1.0f, 0.0f};
-            indices->at(i) = i;
+            vertices->at(vertex_index++) = points[i];
+            vertices->at(vertex_index++) = points[i] + vsg::dvec3(0.0, 0.0, 10.0);
+            colors->at(color_index++) = color;
+            colors->at(color_index++) = color;
+            indices->at(index_index++) = i * 2;
+            indices->at(index_index++) = i * 2 + 1;
+            if (i > 0)
+            {
+                indices->at(index_index++) = i * 2;
+                indices->at(index_index++) = (i - 1) * 2;
+            }
+            pos += points[i];
         }
+        pos /= points_size;
 
         const auto geometry = vsg::Geometry::create();
         geometry->assignArrays(vsg::DataList{vertices, colors});
         geometry->assignIndices(indices);
         geometry->commands.push_back(vsg::DrawIndexed::create(
-            points_size, 1, 0, 0, 0
+            indices->size(), 1, 0, 0, 0
         ));
 
         state_group->addChild(geometry);
+
+        auto layout = vsg::StandardLayout::create();
+        layout->billboardAutoScaleDistance = true;
+        layout->horizontalAlignment = vsg::StandardLayout::CENTER_ALIGNMENT;
+        layout->verticalAlignment = vsg::StandardLayout::CENTER_ALIGNMENT;
+        layout->position = pos;
+        layout->position += {0.0, 0.0, (float)rand() / (float)RAND_MAX * 4.0f + 1.0f};
+        layout->horizontal = vsg::vec3(3.0, 0.0, 0.0);
+        layout->vertical = vsg::vec3(0.0, 3.0, 0.0);
+        layout->color = {color, 1.0f};
+        layout->billboard = true;
+        auto text = vsg::Text::create();
+        text->font = font;
+        text->layout = layout;
+        text->text = vsg::stringValue::create(trajectory->getName().toStdString().c_str());
+        text->setup(0, vsg_options);
+        group->addChild(text);
     }
 
     group->addChild(state_group);

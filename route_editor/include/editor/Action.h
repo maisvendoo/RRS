@@ -1,13 +1,5 @@
-#ifndef EDITOR_ACTION_H
-#define EDITOR_ACTION_H
-
-#include <array>
-#include <vsg/ui/KeyEvent.h>
-
-#include <cstdint>
-#include <string>
-
-class CfgReader;
+#ifndef ACTION_H
+#define ACTION_H
 
 enum Action
 {
@@ -30,18 +22,6 @@ enum Action
     TOTAL_ACTIONS
 };
 
-struct Actions
-{
-    std::array<std::string, TOTAL_ACTIONS> descriptions;
-    std::array<std::string, TOTAL_ACTIONS> setting_names;
-    std::array<vsg::KeySymbol, TOTAL_ACTIONS> keys;
-    std::array<std::uint16_t, TOTAL_ACTIONS> modifiers;
+const char* to_c_string(Action action);
 
-    int active_action = -1;
-
-    Actions();
-
-    void read(CfgReader& cfg);
-};
-
-#endif // EDITOR_ACTION_H
+#endif // ACTION_H
