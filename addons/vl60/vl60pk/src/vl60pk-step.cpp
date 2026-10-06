@@ -71,30 +71,17 @@ void VL60pk::slotAutoStart()
         // Синхронизируем control_inputs с текущим состоянием тумблеров,
         // чтобы stepControls не сбросил их после завершения автозапуска
         int cab = autostart_cab;
-        control_inputs[cab][CTRL_TUMBLER_PNT].value = pants_tumbler[cab].getState() ? 1.0f : 0.0f;
-        control_inputs[cab][CTRL_TUMBLER_PNT2].value = pant2_tumbler[cab].getState() ? 1.0f : 0.0f;
-        control_inputs[cab][CTRL_MAIN_SWITCH_ON].value = gv_tumbler[cab].getState() ? 1.0f : 0.0f;
-        control_inputs[cab][CTRL_RETURN_PROTECTION].value = gv_return_tumbler[cab].getState() ? 1.0f : 0.0f;
-        control_inputs[cab][CTRL_TUMBLER_FR].value = fr_tumbler[cab].getState() ? 1.0f : 0.0f;
-        control_inputs[cab][CTRL_TUMBLER_MK].value = mk_tumbler[cab].getState() ? 1.0f : 0.0f;
+        initClientInputSignal(cab, CTRL_TUMBLER_PNT, pants_tumbler[cab].getState() ? 1.0f : 0.0f);
+        initClientInputSignal(cab, CTRL_TUMBLER_PNT2, pant2_tumbler[cab].getState() ? 1.0f : 0.0f);
+        initClientInputSignal(cab, CTRL_MAIN_SWITCH_ON, gv_tumbler[cab].getState() ? 1.0f : 0.0f);
+        initClientInputSignal(cab, CTRL_RETURN_PROTECTION, gv_return_tumbler[cab].getState() ? 1.0f : 0.0f);
+        initClientInputSignal(cab, CTRL_TUMBLER_FR, fr_tumbler[cab].getState() ? 1.0f : 0.0f);
+        initClientInputSignal(cab, CTRL_TUMBLER_MK, mk_tumbler[cab].getState() ? 1.0f : 0.0f);
         for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
-            control_inputs[cab][CTRL_TUMBLER_MV1 + i].value = mv_tumblers[cab][i].getState() ? 1.0f : 0.0f;
-        control_inputs[cab][CTRL_TUMBLER_CU].value = cu_tumbler[cab].getState() ? 1.0f : 0.0f;
+            initClientInputSignal(cab, static_cast<int>(CTRL_TUMBLER_MV1 + i), mv_tumblers[cab][i].getState() ? 1.0f : 0.0f);
+        initClientInputSignal(cab, CTRL_TUMBLER_CU, cu_tumbler[cab].getState() ? 1.0f : 0.0f);
         if (!epk[cab]->isKeyOn())
-            control_inputs[cab][CTRL_RBS_BUTTON].value = rb[cab][RBS].getState() ? 1.0f : 0.0f;
-
-        // Уведомляем клиента об изменении состояний
-        initClientInputSignal(cab, CTRL_TUMBLER_PNT, control_inputs[cab][CTRL_TUMBLER_PNT].value);
-        initClientInputSignal(cab, CTRL_TUMBLER_PNT2, control_inputs[cab][CTRL_TUMBLER_PNT2].value);
-        initClientInputSignal(cab, CTRL_MAIN_SWITCH_ON, control_inputs[cab][CTRL_MAIN_SWITCH_ON].value);
-        initClientInputSignal(cab, CTRL_RETURN_PROTECTION, control_inputs[cab][CTRL_RETURN_PROTECTION].value);
-        initClientInputSignal(cab, CTRL_TUMBLER_FR, control_inputs[cab][CTRL_TUMBLER_FR].value);
-        initClientInputSignal(cab, CTRL_TUMBLER_MK, control_inputs[cab][CTRL_TUMBLER_MK].value);
-        for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
-            initClientInputSignal(cab, CTRL_TUMBLER_MV1 + i, control_inputs[cab][CTRL_TUMBLER_MV1 + i].value);
-        initClientInputSignal(cab, CTRL_TUMBLER_CU, control_inputs[cab][CTRL_TUMBLER_CU].value);
-        if (!epk[cab]->isKeyOn())
-            initClientInputSignal(cab, CTRL_RBS_BUTTON, control_inputs[cab][CTRL_RBS_BUTTON].value);
+            initClientInputSignal(cab, CTRL_RBS_BUTTON, rb[cab][RBS].getState() ? 1.0f : 0.0f);
 
         if (auto_start_autopilot)
         {
