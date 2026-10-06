@@ -131,6 +131,7 @@ void VL60pk::stepControls(const double &t, const double &dt)
             if (initAutostartProgram(cab_idx))
                 autoStartTimer->start();
             control_inputs[cab_idx][CTRL_AUTOSTART_PROGRAM].value = 0.0f;
+            initClientInputSignal(cab_idx, CTRL_AUTOSTART_PROGRAM, 0.0f);
         }
 
         // Автоостанов по нажатию кнопки (Alt+T)
@@ -139,6 +140,7 @@ void VL60pk::stepControls(const double &t, const double &dt)
             if (initAutostopProgram(cab_idx))
                 autoStartTimer->start();
             control_inputs[cab_idx][CTRL_AUTOSTOP_PROGRAM].value = 0.0f;
+            initClientInputSignal(cab_idx, CTRL_AUTOSTOP_PROGRAM, 0.0f);
         }
     }
 
