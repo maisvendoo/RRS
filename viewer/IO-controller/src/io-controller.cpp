@@ -312,31 +312,20 @@ void IOController::create_animations_map(const QStringList &anim_dirs)
 void IOController::initClientInputSignal(int cab_idx, int signal_id, float value)
 {
     if (control_handlers.empty())
-    {
-        printf("DBG: IOController handlers empty\n");
         return;
-    }
 
     int idx = (cab_idx >= 0 && cab_idx < static_cast<int>(control_handlers.size()) - 1)
                   ? cab_idx
                   : static_cast<int>(control_handlers.size()) - 1;
 
-    printf("DBG: IOController search cab_idx=%d idx=%d handlers.size=%d sig=%d val=%.1f\n",
-           cab_idx, idx, control_handlers.size(), signal_id, value);
-
     for (const auto &[id, name, handler] : control_handlers[idx].getAll())
     {
         if (id == static_cast<uint16_t>(signal_id))
         {
-            printf("DBG: IOController FOUND id=%d val %.1f -> %.1f\n",
-                   id, handler->value, value);
             handler->value = value;
             return;
         }
     }
-
-    printf("DBG: IOController NOT FOUND sig=%d in idx=%d (size=%d)\n",
-           signal_id, idx, control_handlers[idx].size());
 }
 
 //------------------------------------------------------------------------------

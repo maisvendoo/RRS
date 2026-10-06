@@ -477,7 +477,6 @@ bool VehiclesHandler::load(
     }
 
     // Применяем накопленные init-сигналы
-    LOG_INFO("DBG: Flushing %d buffered init signals", pending_input_inits.size());
     for (const auto& init : pending_input_inits)
     {
         if (static_cast<size_t>(init.vehicle_idx) >= vehicles.size())
@@ -772,27 +771,16 @@ void VehiclesHandler::slotVehicleControlInputInit(QByteArray& data)
     // Если vehicles ещё не загружены — буферизируем
     if (vehicles.empty())
     {
-        LOG_INFO("DBG: InitSignal buffered v=%d cab=%d sig=%d val=%.1f",
-                 vehicle_idx, cab_idx, signal_id, value);
         pending_input_inits.push_back({vehicle_idx, cab_idx, signal_id, value});
         return;
     }
 
     if (static_cast<size_t>(vehicle_idx) >= vehicles.size())
-    {
-        LOG_WARN("DBG: InitSignal dropped — v=%d >= size=%d",
-                 vehicle_idx, vehicles.size());
         return;
-    }
 
     VehicleExterior& veh = vehicles[vehicle_idx];
     if (veh.io_controller == nullptr)
-    {
-        LOG_WARN("DBG: InitSignal dropped — no io_controller for v=%d", vehicle_idx);
         return;
-    }
 
-    LOG_INFO("DBG: InitSignal apply v=%d cab=%d sig=%d val=%.1f",
-             vehicle_idx, cab_idx, signal_id, value);
     veh.io_controller->initClientInputSignal(cab_idx, signal_id, value);
 }
