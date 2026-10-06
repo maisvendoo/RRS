@@ -102,6 +102,8 @@ signals:
 
     void setTopologyModuleUpdate(QByteArray &module_update);
 
+    void sigVehicleControlInputInit(QByteArray &data);
+
     void sendLogMessage(QString msg);
 
     void connectionAbandoned();

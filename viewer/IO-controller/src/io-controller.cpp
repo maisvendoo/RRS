@@ -306,6 +306,31 @@ void IOController::create_animations_map(const QStringList &anim_dirs)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void IOController::initClientInputSignal(int cab_idx, int signal_id, float value)
+{
+    if (control_handlers.empty())
+        return;
+
+    int idx = (cab_idx >= 0 && cab_idx < static_cast<int>(control_handlers.size()) - 1)
+                  ? cab_idx
+                  : static_cast<int>(control_handlers.size()) - 1;
+
+    for (const auto &[id, name, handler] : control_handlers[idx].getAll())
+    {
+        if (id == static_cast<uint16_t>(signal_id))
+        {
+            handler->value = value;
+            return;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void IOController::setVehicleIndex(int vehicle_idx)
 {
     this->vehicle_idx = vehicle_idx;

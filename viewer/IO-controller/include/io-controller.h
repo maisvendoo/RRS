@@ -54,6 +54,9 @@ public:
         cabine_idx = cab_idx;
     }
 
+    /// Инициализация сигнала управления со стороны сервера
+    void initClientInputSignal(int cab_idx, int signal_id, float value);
+
     /// Поиск обработчика по имени объекта
     bool findControlHandler(const std::string &node_name, ControlHandler *&handler) const;
 

@@ -734,3 +734,32 @@ void VehiclesHandler::updateDebugString()
         debug_message += QString("\nУправляемая ПЕ: не выбрана\nНажмите Enter, чтобы управлять данной ПЕ");
     }
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void VehiclesHandler::slotVehicleControlInputInit(QByteArray& data)
+{
+    QDataStream stream(&data, QIODevice::ReadOnly);
+
+    int vehicle_idx = 0;
+    stream >> vehicle_idx;
+
+    int cab_idx = 0;
+    stream >> cab_idx;
+
+    int signal_id = 0;
+    stream >> signal_id;
+
+    float value = 0.0f;
+    stream >> value;
+
+    if (static_cast<size_t>(vehicle_idx) >= vehicles.size())
+        return;
+
+    VehicleExterior& veh = vehicles[vehicle_idx];
+    if (veh.io_controller == nullptr)
+        return;
+
+    veh.io_controller->initClientInputSignal(cab_idx, signal_id, value);
+}

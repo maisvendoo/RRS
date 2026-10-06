@@ -738,6 +738,27 @@ void TcpServer::slotUpdateSignal(QByteArray signal_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpServer::slotInitClientInputSignal(int vehicle_idx, int cab_idx, int signal_id, float value)
+{
+    if (clients_for_vehicles_updates.empty())
+        return;
+
+    network_data_t net_data;
+    net_data.stype = STYPE_VEHICLE_CONTROL_INPUT_INIT;
+
+    QDataStream stream(&net_data.data, QIODevice::WriteOnly);
+    stream << vehicle_idx;
+    stream << cab_idx;
+    stream << signal_id;
+    stream << value;
+
+    for (auto client_socket : clients_for_vehicles_updates)
+        send_data(client_socket, net_data);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpServer::updatePlayers(QByteArray players_data, double t)
 {
     if (clients_for_players_info_updates.empty())

@@ -70,7 +70,9 @@ enum StructureType : uint8_t
     STYPE_TOPOLOGY_MODULE_UPDATE,
 
     STYPE_REQUEST_STATIONS_DATA,
-    STYPE_STATIONS_DATA
+    STYPE_STATIONS_DATA,
+
+    STYPE_VEHICLE_CONTROL_INPUT_INIT
 };
 
 //------------------------------------------------------------------------------

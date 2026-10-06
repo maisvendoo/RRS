@@ -124,6 +124,7 @@ public slots:
     void slotGetVehiclesStateData(QByteArray& data);
     void slotGetVehicleControlled(QByteArray& data);
     void slotGetTrainProfileData(QByteArray& data);
+    void slotVehicleControlInputInit(QByteArray& data);
 
 signals:
     void updated();

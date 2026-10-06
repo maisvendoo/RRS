@@ -189,6 +189,8 @@ public slots:
     void slotSendTopologyModuleState(QByteArray module_state);
 
     void slotUpdateSignal(QByteArray signal_data);
+
+    void slotInitClientInputSignal(int vehicle_idx, int cab_idx, int signal_id, float value);
 };
 
 #endif

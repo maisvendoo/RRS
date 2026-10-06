@@ -355,6 +355,10 @@ void TcpClient::process_received_data(network_data_t &net_data)
         emit setTopologyModuleUpdate(net_data.data);
         break;
 
+    case STYPE_VEHICLE_CONTROL_INPUT_INIT:
+        emit sigVehicleControlInputInit(net_data.data);
+        break;
+
     default:
 
         break;
