@@ -400,6 +400,8 @@ protected:
 
     bool getKeyState(uint16_t key, int cab_num = -1) const;
 
+public:
+
     void initClientInputSignal(int cab_idx, int signal_id, float value);
 
     void replayInitSignals();
