@@ -128,6 +128,19 @@ void VL60pk::slotAutoStop()
         epk[CAB2]->setControl(&pressed_keys_by_cabine[CAB2]);
 
         autopilot_switcher[autostart_cab].reset();
+
+        // Синхронизируем control_inputs — все тумблеры выключены
+        int cab = autostart_cab;
+        initClientInputSignal(cab, CTRL_TUMBLER_PNT, 0.0f);
+        initClientInputSignal(cab, CTRL_TUMBLER_PNT2, 0.0f);
+        initClientInputSignal(cab, CTRL_MAIN_SWITCH_ON, 0.0f);
+        initClientInputSignal(cab, CTRL_RETURN_PROTECTION, 0.0f);
+        initClientInputSignal(cab, CTRL_TUMBLER_FR, 0.0f);
+        initClientInputSignal(cab, CTRL_TUMBLER_MK, 0.0f);
+        for (size_t i = 0; i < NUM_MOTOR_FANS; ++i)
+            initClientInputSignal(cab, static_cast<int>(CTRL_TUMBLER_MV1 + i), 0.0f);
+        initClientInputSignal(cab, CTRL_TUMBLER_CU, 0.0f);
+        initClientInputSignal(cab, CTRL_RBS_BUTTON, 0.0f);
     }
 }
 
