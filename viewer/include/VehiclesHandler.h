@@ -190,6 +190,15 @@ private:
     /// Train exterior scene group
     vsg::ref_ptr<vsg::Group> vehicles_node = vsg::Group::create();
 
+    struct pending_input_init_t
+    {
+        int vehicle_idx;
+        int cab_idx;
+        int signal_id;
+        float value;
+    };
+    QVector<pending_input_init_t> pending_input_inits;
+
     /// Info about vehicles exterior
     std::vector<VehicleExterior> vehicles;
 

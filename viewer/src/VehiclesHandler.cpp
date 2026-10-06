@@ -476,6 +476,20 @@ bool VehiclesHandler::load(
         }
     }
 
+    // Применяем накопленные init-сигналы
+    for (const auto& init : pending_input_inits)
+    {
+        if (static_cast<size_t>(init.vehicle_idx) >= vehicles.size())
+            continue;
+
+        VehicleExterior& veh = vehicles[init.vehicle_idx];
+        if (veh.io_controller == nullptr)
+            continue;
+
+        veh.io_controller->initClientInputSignal(init.cab_idx, init.signal_id, init.value);
+    }
+    pending_input_inits.clear();
+
     return true;
 }
 
@@ -753,6 +767,13 @@ void VehiclesHandler::slotVehicleControlInputInit(QByteArray& data)
 
     float value = 0.0f;
     stream >> value;
+
+    // Если vehicles ещё не загружены — буферизируем
+    if (vehicles.empty())
+    {
+        pending_input_inits.push_back({vehicle_idx, cab_idx, signal_id, value});
+        return;
+    }
 
     if (static_cast<size_t>(vehicle_idx) >= vehicles.size())
         return;
