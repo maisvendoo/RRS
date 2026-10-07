@@ -63,6 +63,18 @@ enum
     // Автозапуск и автоостанов
     CTRL_AUTOSTART_PROGRAM = 147,
     CTRL_AUTOSTOP_PROGRAM = 148,
+
+    // Рукава тормозной магистрали
+    CTRL_HOSE_BP_FWD = 149,
+    CTRL_HOSE_BP_BWD = 150,
+
+    // Рукава питательной магистрали
+    CTRL_HOSE_FL_FWD = 151,
+    CTRL_HOSE_FL_BWD = 152,
+
+    // Рукава магистрали тормозных цилиндров
+    CTRL_HOSE_BC_FWD = 153,
+    CTRL_HOSE_BC_BWD = 154,
 };
 
 #endif

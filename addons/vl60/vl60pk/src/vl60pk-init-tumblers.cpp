@@ -42,6 +42,8 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
     anglecock_bc_bwd->setControl(&pressed_keys);
     */
 
+    // Управление через IOController (stepControls)
+    /*
     // Рукава магистрали тормозных цилиндров
     hose_bc_fwd->setKeySymbolConnect(KEY_F9);
     hose_bc_fwd->setKeyModifierConnect(MODIFIER_OnlyShift);
@@ -54,6 +56,7 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
     hose_bc_bwd->setKeySymbolDisconnect(KEY_F12);
     hose_bc_bwd->setKeyModifierDisconnect(MODIFIER_OnlyControl);
     hose_bc_bwd->setControl(&pressed_keys);
+    */
 
     // Концевые краны питательной магистрали
     // Управление через IOController (stepControls)
@@ -71,6 +74,8 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
     anglecock_fl_bwd->setControl(&pressed_keys);
     */
 
+    // Управление через IOController (stepControls)
+    /*
     // Рукава питательной магистрали
     hose_fl_fwd->setKeySymbolConnect(KEY_F5);
     hose_fl_fwd->setKeyModifierConnect(MODIFIER_OnlyShift);
@@ -83,6 +88,7 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
     hose_fl_bwd->setKeySymbolDisconnect(KEY_F8);
     hose_fl_bwd->setKeyModifierDisconnect(MODIFIER_OnlyControl);
     hose_fl_bwd->setControl(&pressed_keys);
+    */
 
     // Концевые краны тормозной магистрали
     // Управление через IOController (stepControls)
@@ -100,6 +106,8 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
     anglecock_bp_bwd->setControl(&pressed_keys);
     */
 
+    // Управление через IOController (stepControls)
+    /*
     // Рукава тормозной магистрали
     hose_bp_fwd->setKeySymbolConnect(KEY_F1);
     hose_bp_fwd->setKeyModifierConnect(MODIFIER_OnlyShift);
@@ -112,6 +120,7 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
     hose_bp_bwd->setKeySymbolDisconnect(KEY_F4);
     hose_bp_bwd->setKeyModifierDisconnect(MODIFIER_OnlyControl);
     hose_bp_bwd->setControl(&pressed_keys);
+    */
 
 
     for (auto cab_idx : {CAB1, CAB2})
