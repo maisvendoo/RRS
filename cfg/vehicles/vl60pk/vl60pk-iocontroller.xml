@@ -765,11 +765,17 @@
 		<ID>149</ID>
 		<Name>Рукав ТМ вперёд</Name>
 		<Description>Соединение/разъединение рукава тормозной магистрали с передней стороны</Description>
-		<Type>Toggle</Type>
-		<value>0.0</value>
-		<KeyName>KEY_F1</KeyName>
-		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Ctrl</KeyModOffName>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F1</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F1</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
 	</Control>
 
 	<!-- Рукав тормозной магистрали назад -->
@@ -777,11 +783,17 @@
 		<ID>150</ID>
 		<Name>Рукав ТМ назад</Name>
 		<Description>Соединение/разъединение рукава тормозной магистрали с задней стороны</Description>
-		<Type>Toggle</Type>
-		<value>0.0</value>
-		<KeyName>KEY_F4</KeyName>
-		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Ctrl</KeyModOffName>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F4</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F4</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
 	</Control>
 
 	<!-- Рукав питательной магистрали вперёд -->
@@ -789,11 +801,17 @@
 		<ID>151</ID>
 		<Name>Рукав ПМ вперёд</Name>
 		<Description>Соединение/разъединение рукава питательной магистрали с передней стороны</Description>
-		<Type>Toggle</Type>
-		<value>0.0</value>
-		<KeyName>KEY_F5</KeyName>
-		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Ctrl</KeyModOffName>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F5</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F5</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
 	</Control>
 
 	<!-- Рукав питательной магистрали назад -->
@@ -801,11 +819,17 @@
 		<ID>152</ID>
 		<Name>Рукав ПМ назад</Name>
 		<Description>Соединение/разъединение рукава питательной магистрали с задней стороны</Description>
-		<Type>Toggle</Type>
-		<value>0.0</value>
-		<KeyName>KEY_F8</KeyName>
-		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Ctrl</KeyModOffName>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F8</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F8</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
 	</Control>
 
 	<!-- Рукав магистрали тормозных цилиндров вперёд -->
@@ -813,11 +837,17 @@
 		<ID>153</ID>
 		<Name>Рукав ТЦ вперёд</Name>
 		<Description>Соединение/разъединение рукава тормозных цилиндров с передней стороны</Description>
-		<Type>Toggle</Type>
-		<value>0.0</value>
-		<KeyName>KEY_F9</KeyName>
-		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Ctrl</KeyModOffName>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F9</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F9</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
 	</Control>
 
 	<!-- Рукав магистрали тормозных цилиндров назад -->
@@ -825,11 +855,17 @@
 		<ID>154</ID>
 		<Name>Рукав ТЦ назад</Name>
 		<Description>Соединение/разъединение рукава тормозных цилиндров с задней стороны</Description>
-		<Type>Toggle</Type>
-		<value>0.0</value>
-		<KeyName>KEY_F12</KeyName>
-		<KeyModOnName>Shift</KeyModOnName>
-		<KeyModOffName>Ctrl</KeyModOffName>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F12</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F12</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
 	</Control>
 
 </Config>

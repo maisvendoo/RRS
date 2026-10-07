@@ -231,7 +231,7 @@ void VL60pk::stepControls(const double &t, const double &dt)
     shared_inputs[CTRL_ANGLECOCK_BC_BWD].toBool() ? anglecock_bc_bwd->open() : anglecock_bc_bwd->close();
 
     // Синхронизация: отслеживание самопроизвольного рассоединения рукавов
-    {
+    /*{
         static std::map<int, bool> prev_connected;
         int last_cab = control_inputs.size() - 1;
 
@@ -251,22 +251,15 @@ void VL60pk::stepControls(const double &t, const double &dt)
         check_hose(CTRL_HOSE_FL_BWD, hose_fl_bwd);
         check_hose(CTRL_HOSE_BC_FWD, hose_bc_fwd);
         check_hose(CTRL_HOSE_BC_BWD, hose_bc_bwd);
-    }
+    }*/
 
     // Рукава магистралей (общие, не привязаны к кабинам)
-    Journal::instance()->info(QString("DBG: Hose BP_FWD ctrl=%1").arg(shared_inputs[CTRL_HOSE_BP_FWD].value));
-    shared_inputs[CTRL_HOSE_BP_FWD].toBool() ? hose_bp_fwd->connect() : hose_bp_fwd->disconnect();
-    Journal::instance()->info(QString("DBG: Hose BP_BWD ctrl=%1").arg(shared_inputs[CTRL_HOSE_BP_BWD].value));
-    shared_inputs[CTRL_HOSE_BP_BWD].toBool() ? hose_bp_bwd->connect() : hose_bp_bwd->disconnect();
-    shared_inputs[CTRL_HOSE_FL_FWD].toBool() ? hose_fl_fwd->connect() : hose_fl_fwd->disconnect();
-    shared_inputs[CTRL_HOSE_FL_BWD].toBool() ? hose_fl_bwd->connect() : hose_fl_bwd->disconnect();
-    shared_inputs[CTRL_HOSE_BC_FWD].toBool() ? hose_bc_fwd->connect() : hose_bc_fwd->disconnect();
-    shared_inputs[CTRL_HOSE_BC_BWD].toBool() ? hose_bc_bwd->connect() : hose_bc_bwd->disconnect();
-    shared_inputs[CTRL_HOSE_BP_BWD].toBool() ? hose_bp_bwd->connect() : hose_bp_bwd->disconnect();
-    shared_inputs[CTRL_HOSE_FL_FWD].toBool() ? hose_fl_fwd->connect() : hose_fl_fwd->disconnect();
-    shared_inputs[CTRL_HOSE_FL_BWD].toBool() ? hose_fl_bwd->connect() : hose_fl_bwd->disconnect();
-    shared_inputs[CTRL_HOSE_BC_FWD].toBool() ? hose_bc_fwd->connect() : hose_bc_fwd->disconnect();
-    shared_inputs[CTRL_HOSE_BC_BWD].toBool() ? hose_bc_bwd->connect() : hose_bc_bwd->disconnect();
+    hose_bp_fwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_BP_FWD].value)));
+    hose_bp_bwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_BP_BWD].value)));
+    hose_fl_fwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_FL_FWD].value)));
+    hose_fl_bwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_FL_BWD].value)));
+    hose_bc_fwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_BC_FWD].value)));
+    hose_bc_bwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_BC_BWD].value)));
 
     // Кнопки песочницы
     sand_system->setSandDeliveryOn(control_inputs[CAB1][CTRL_SAND_BUTTON].toBool() || control_inputs[CAB2][CTRL_SAND_BUTTON].toBool());
