@@ -256,6 +256,12 @@ void VL60pk::stepControls(const double &t, const double &dt)
     // Рукава магистралей (общие, не привязаны к кабинам)
     Journal::instance()->info(QString("DBG: Hose BP_FWD ctrl=%1").arg(shared_inputs[CTRL_HOSE_BP_FWD].value));
     shared_inputs[CTRL_HOSE_BP_FWD].toBool() ? hose_bp_fwd->connect() : hose_bp_fwd->disconnect();
+    Journal::instance()->info(QString("DBG: Hose BP_BWD ctrl=%1").arg(shared_inputs[CTRL_HOSE_BP_BWD].value));
+    shared_inputs[CTRL_HOSE_BP_BWD].toBool() ? hose_bp_bwd->connect() : hose_bp_bwd->disconnect();
+    shared_inputs[CTRL_HOSE_FL_FWD].toBool() ? hose_fl_fwd->connect() : hose_fl_fwd->disconnect();
+    shared_inputs[CTRL_HOSE_FL_BWD].toBool() ? hose_fl_bwd->connect() : hose_fl_bwd->disconnect();
+    shared_inputs[CTRL_HOSE_BC_FWD].toBool() ? hose_bc_fwd->connect() : hose_bc_fwd->disconnect();
+    shared_inputs[CTRL_HOSE_BC_BWD].toBool() ? hose_bc_bwd->connect() : hose_bc_bwd->disconnect();
     shared_inputs[CTRL_HOSE_BP_BWD].toBool() ? hose_bp_bwd->connect() : hose_bp_bwd->disconnect();
     shared_inputs[CTRL_HOSE_FL_FWD].toBool() ? hose_fl_fwd->connect() : hose_fl_fwd->disconnect();
     shared_inputs[CTRL_HOSE_FL_BWD].toBool() ? hose_fl_bwd->connect() : hose_fl_bwd->disconnect();
