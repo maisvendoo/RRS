@@ -201,7 +201,12 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
                 {
                     // Явное задание индекса активной кабины для IOController текущей ПЕ
                     auto cab_idx = _vehicles_handler->getCurrentVehicle()->controlled_cabine_idx;
-                    _vehicles_handler->getCurrentVehicle()->io_controller->setActiveCabineIndex(cab_idx);
+                    auto *io_ctrl = _vehicles_handler->getCurrentVehicle()->io_controller;
+
+                    if (io_ctrl != nullptr)
+                    {
+                        io_ctrl->setActiveCabineIndex(cab_idx);
+                    }
 
                     _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
                                                               _vehicles_handler->getControlledVehicleIndex(),

@@ -237,25 +237,6 @@ void VL60pk::stepControls(const double &t, const double &dt)
     shared_inputs[CTRL_HOSE_BC_FWD].toBool() ? hose_bc_fwd->connect() : hose_bc_fwd->disconnect();
     shared_inputs[CTRL_HOSE_BC_BWD].toBool() ? hose_bc_bwd->connect() : hose_bc_bwd->disconnect();
 
-    // Синхронизация: если физическое состояние рукава разошлось с control_inputs
-    int last_cab = control_inputs.size() - 1;
-    auto sync_hose = [&](int id, PneumoHose* hose) {
-        bool ctrl = shared_inputs[id].toBool();
-        bool phys = hose->isConnected();
-        if (ctrl != phys)
-        {
-            float val = phys ? 1.0f : 0.0f;
-            shared_inputs[id].value = val;
-            initClientInputSignal(last_cab, id, val);
-        }
-    };
-    sync_hose(CTRL_HOSE_BP_FWD, hose_bp_fwd);
-    sync_hose(CTRL_HOSE_BP_BWD, hose_bp_bwd);
-    sync_hose(CTRL_HOSE_FL_FWD, hose_fl_fwd);
-    sync_hose(CTRL_HOSE_FL_BWD, hose_fl_bwd);
-    sync_hose(CTRL_HOSE_BC_FWD, hose_bc_fwd);
-    sync_hose(CTRL_HOSE_BC_BWD, hose_bc_bwd);
-
     // Кнопки песочницы
     sand_system->setSandDeliveryOn(control_inputs[CAB1][CTRL_SAND_BUTTON].toBool() || control_inputs[CAB2][CTRL_SAND_BUTTON].toBool());
 }
