@@ -163,9 +163,9 @@ bool VL60pk::initAutostartProgram(int cab_autostart_request)
         return false;
 
     autostart_cab = cab_autostart_request;
-    controller[autostart_cab]->insertReversHandle(true);
+    /*controller[autostart_cab]->insertReversHandle(true);
     brake_lock[autostart_cab]->setStateOn(true);
-    epk[autostart_cab]->insertKey(true);
+    epk[autostart_cab]->insertKey(true);*/
 
     /*controller[CAB1]->setControl();
     controller[CAB2]->setControl();

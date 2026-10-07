@@ -65,7 +65,7 @@ void VL60pk::slotAutoStart()
         // Синхронизируем control_inputs с текущим состоянием тумблеров,
         // чтобы stepControls не сбросил их после завершения автозапуска
         int cab = autostart_cab;
-        initClientInputSignal(cab, CTRL_REVERS_POSITION, REVERS_FORWARD);
+        initClientInputSignal(cab, CTRL_REVERS_POSITION, controller[cab]->getReversHandlePos());
         initClientInputSignal(cab, CTRL_TUMBLER_PNT, pants_tumbler[cab].getState() ? 1.0f : 0.0f);
         initClientInputSignal(cab, CTRL_TUMBLER_PNT2, pant2_tumbler[cab].getState() ? 1.0f : 0.0f);
         initClientInputSignal(cab, CTRL_MAIN_SWITCH_ON, gv_tumbler[cab].getState() ? 1.0f : 0.0f);
@@ -79,8 +79,11 @@ void VL60pk::slotAutoStart()
         }
 
         initClientInputSignal(cab, CTRL_TUMBLER_CU, cu_tumbler[cab].getState() ? 1.0f : 0.0f);
-        if (!epk[cab]->isKeyOn())
+
+        /*if (!epk[cab]->isKeyOn())
+        {
             initClientInputSignal(cab, CTRL_RBS_BUTTON, rb[cab][RBS].getState() ? 1.0f : 0.0f);
+        }*/
 
         if (auto_start_autopilot)
         {

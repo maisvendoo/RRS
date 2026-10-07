@@ -10,6 +10,7 @@
 #include "TrafficLightsHandler.h"
 #include "TrainLabelsHandler.h"
 #include "VehiclesHandler.h"
+#include "io-controller.h"
 #include "settings.h"
 
 #include <vsg/ui/KeyEvent.h>
@@ -197,9 +198,16 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             case vsg::KEY_Return:
             {
                 if (_vehicles_handler->selectControlVehicle())
+                {
+                    // Явное задание индекса активной кабины для IOController текущей ПЕ
+                    auto cab_idx = _vehicles_handler->getCurrentVehicle()->controlled_cabine_idx;
+                    _vehicles_handler->getCurrentVehicle()->io_controller->setActiveCabineIndex(cab_idx);
+
                     _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
                                                               _vehicles_handler->getControlledVehicleIndex(),
                                                               _vehicles_handler->getCurrentVehicle()->controlled_cabine_idx);
+                }
+
                 return;
             }
 
@@ -626,7 +634,7 @@ void UpdateViewerHandler::changeCurrentCabine()
     if (vehicle->current_cabine_idx == cabs_num)
     {
         vehicle->current_cabine_idx = 0;
-    }
+    }    
 }
 
 //------------------------------------------------------------------------------

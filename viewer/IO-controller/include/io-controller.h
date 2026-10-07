@@ -49,7 +49,7 @@ public:
     void setVehicleIndex(int vehicle_idx);
 
     /// Установить индекс активной кабины
-    void setActirveCabineIndex(int cab_idx)
+    void setActiveCabineIndex(int cab_idx)
     {
         cabine_idx = cab_idx;
     }
