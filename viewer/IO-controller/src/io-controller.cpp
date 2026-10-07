@@ -23,6 +23,7 @@ void IOController::setPressedKey(uint16_t keyBase)
 {
     if (KeySymbolsRRS.count(normalizeKey(keyBase)))
     {
+        printf("DBG: IOController setPressedKey 0x%04X\n", keyBase);
         auto result = _pressed_keys.insert(keyBase);
         if (result.second)
         {

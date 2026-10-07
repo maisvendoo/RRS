@@ -8,6 +8,7 @@
 #include    <sanding-system.h>
 #include    <train-horn.h>
 #include    <pneumo-anglecock.h>
+#include    <pneumo-hose-epb.h>
 #include    <Journal.h>
 
 //------------------------------------------------------------------------------
@@ -228,6 +229,29 @@ void VL60pk::stepControls(const double &t, const double &dt)
     shared_inputs[CTRL_ANGLECOCK_FL_BWD].toBool() ? anglecock_fl_bwd->open() : anglecock_fl_bwd->close();
     shared_inputs[CTRL_ANGLECOCK_BC_FWD].toBool() ? anglecock_bc_fwd->open() : anglecock_bc_fwd->close();
     shared_inputs[CTRL_ANGLECOCK_BC_BWD].toBool() ? anglecock_bc_bwd->open() : anglecock_bc_bwd->close();
+
+    // Синхронизация: отслеживание самопроизвольного рассоединения рукавов
+    {
+        static std::map<int, bool> prev_connected;
+        int last_cab = control_inputs.size() - 1;
+
+        auto check_hose = [&](int id, PneumoHose* hose) {
+            bool now = hose->isConnected();
+            if (prev_connected[id] && !now && shared_inputs[id].toBool())
+            {
+                shared_inputs[id].value = 0.0f;
+                initClientInputSignal(last_cab, id, 0.0f);
+            }
+            prev_connected[id] = now;
+        };
+
+        check_hose(CTRL_HOSE_BP_FWD, hose_bp_fwd);
+        check_hose(CTRL_HOSE_BP_BWD, hose_bp_bwd);
+        check_hose(CTRL_HOSE_FL_FWD, hose_fl_fwd);
+        check_hose(CTRL_HOSE_FL_BWD, hose_fl_bwd);
+        check_hose(CTRL_HOSE_BC_FWD, hose_bc_fwd);
+        check_hose(CTRL_HOSE_BC_BWD, hose_bc_bwd);
+    }
 
     // Рукава магистралей (общие, не привязаны к кабинам)
     shared_inputs[CTRL_HOSE_BP_FWD].toBool() ? hose_bp_fwd->connect() : hose_bp_fwd->disconnect();
