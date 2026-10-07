@@ -339,9 +339,6 @@ void TcpServer::process_client_request(client_data_t &client_data)
         std::int8_t prioriry = 0;
         stream >> prioriry;
 
-        Journal::instance()->info(QString("DBG: CtrlCmd v=%1 cab=%2 id=%3 val=%4 pr=%5")
-                                      .arg(vehicle_idx).arg(cab_idx).arg(id).arg(value).arg(prioriry));
-
         emit sigSetVehicleControlCommand(vehicle_idx, cab_idx, id, value, prioriry);
 
         break;

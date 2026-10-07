@@ -427,8 +427,6 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx,
                             vehicle->control_inputs[cab_idx][id].server_priority = static_cast<ControlPriority>(prioriry);
                         }
 
-                        Journal::instance()->info(QString("DBG: SetCtrl v=%1 cab=%2 id=%3 val=%4")
-                                                      .arg(vehicle_idx).arg(cab_idx).arg(id).arg(value));
                         vehicle->control_inputs[cab_idx][id].value = value;
                     }
                 }
