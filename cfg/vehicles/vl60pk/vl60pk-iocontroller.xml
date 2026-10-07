@@ -477,7 +477,7 @@
 		<Description>Рукоятка крана. Управление тормозами поезда</Description>
 		<Type>Switcher</Type>
 		<value1>1</value1>
-		<value2>1</value2>
+		<value2>6</value2>
 		<KeyNameDec>KEY_Semicolon</KeyNameDec>
 		<KeyNameInc>KEY_Quote</KeyNameInc>
 		<NumPositions>7</NumPositions>

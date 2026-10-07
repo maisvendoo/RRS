@@ -167,12 +167,12 @@ bool VL60pk::initAutostartProgram(int cab_autostart_request)
     brake_lock[autostart_cab]->setStateOn(true);
     epk[autostart_cab]->insertKey(true);
 
-    controller[CAB1]->setControl();
+    /*controller[CAB1]->setControl();
     controller[CAB2]->setControl();
     brake_lock[CAB1]->setControl();
     brake_lock[CAB2]->setControl();
     epk[CAB1]->setControl();
-    epk[CAB2]->setControl();
+    epk[CAB2]->setControl();*/
 
     start_count = 0;
     buildAutostartTriggers(autostart_cab);
@@ -226,12 +226,12 @@ bool VL60pk::initAutostopProgram(int cab_autostop_request)
 
     autostart_cab = cab_autostop_request;
 
-    controller[CAB1]->setControl();
+    /*controller[CAB1]->setControl();
     controller[CAB2]->setControl();
     brake_lock[CAB1]->setControl();
     brake_lock[CAB2]->setControl();
     epk[CAB1]->setControl();
-    epk[CAB2]->setControl();
+    epk[CAB2]->setControl();*/
 
     start_count = 0;
     buildAutostartTriggers(autostart_cab);

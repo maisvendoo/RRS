@@ -25,12 +25,12 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
     //sand_system->setControl(&pressed_keys);
 
     // Не допускаем двух рукояток в устройствах блокировки тормозов
-    brake_lock[CAB2]->allowLockHandle(!(brake_lock[CAB1]->isLockHandle()));
+    /*brake_lock[CAB2]->allowLockHandle(!(brake_lock[CAB1]->isLockHandle()));
     brake_lock[CAB1]->allowLockHandle(!(brake_lock[CAB2]->isLockHandle()));
 
     // Не допускаем двух ключей в электропневматических клапанах автостопа
     epk[CAB2]->allowKey(!(epk[CAB1]->isKey()));
-    epk[CAB1]->allowKey(!(epk[CAB2]->isKey()));
+    epk[CAB1]->allowKey(!(epk[CAB2]->isKey()));*/
 
     // Управление тормозным оборудованием в кабинах
     for (auto cabine_idx : {CAB1, CAB2})
@@ -80,8 +80,8 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
 
     // Контроллер машиниста обрабатываем уже после проверки на невмешательство программы автозапуска
     // Не допускаем двух реверсивных рукояток в контроллерах машиниста
-    controller[CAB2]->allowReversHandle(!(controller[CAB1]->isReversHandle()));
-    controller[CAB1]->allowReversHandle(!(controller[CAB2]->isReversHandle()));
+    /*controller[CAB2]->allowReversHandle(!(controller[CAB1]->isReversHandle()));
+    controller[CAB1]->allowReversHandle(!(controller[CAB2]->isReversHandle()));*/
 /*
     // Не допускаем двух ключей в панелях тумблеров
     shield223[CAB2].allowKey(!(shield223[CAB1].isKey()));
@@ -93,7 +93,7 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
     for (auto cab_idx : {CAB1, CAB2})
     {
         // Шаг контроллера (физика + анимация; клавиатура отключена через setControl(nullptr))
-        controller[cab_idx]->step(t.simulation_seconds, dt);
+        //controller[cab_idx]->step(t.simulation_seconds, dt);
 /*
         // Дальний ряд тумблеров приборной панели машиниста
         shield223[cab_idx].step(t.simulation_seconds, dt);
@@ -103,7 +103,7 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         shield229[cab_idx].step(t.simulation_seconds, dt);
 */
         // Дальний ряд тумблеров приборной панели машиниста
-        spotlight_high_tumbler[cab_idx].step();
+        /*spotlight_high_tumbler[cab_idx].step();
         spotlight_low_tumbler[cab_idx].step();
         radio_tumbler[cab_idx].step();
         cu_tumbler[cab_idx].step();
@@ -138,7 +138,7 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         P_reserv2_tumbler[cab_idx].step();
         P_ALSN_check_tumbler[cab_idx].step();
         P_buffercolor_L_toogle[cab_idx].step();
-        P_buffercolor_R_toogle[cab_idx].step();
+        P_buffercolor_R_toogle[cab_idx].step();*/
 
         // Нажатие РБС
         // Управление через IOController (stepControls)
@@ -158,11 +158,11 @@ void VL60pk::keyProcess(const simulator_time_t& t, const double& dt)
         }
         rb[cab_idx][RB_1].step();
         rb[cab_idx][RBP].step();*/
-        epb_switch[cab_idx].step();
+        /*epb_switch[cab_idx].step();
 
         // Управление через IOController (stepControls)
         autopilot_switcher[cab_idx].step();
 
-        tumbler_shunting_mode[cab_idx].step();
+        tumbler_shunting_mode[cab_idx].step();*/
     }    
 }
