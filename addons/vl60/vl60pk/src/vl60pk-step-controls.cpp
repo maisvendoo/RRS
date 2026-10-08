@@ -9,6 +9,7 @@
 #include    <train-horn.h>
 #include    <pneumo-anglecock.h>
 #include    <pneumo-hose-epb.h>
+#include    <coupling-operating-rod.h>
 #include    <Journal.h>
 
 //------------------------------------------------------------------------------
@@ -283,6 +284,19 @@ void VL60pk::stepControls(const double &t, const double &dt)
     hose_fl_bwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_FL_BWD].value)));
     hose_bc_fwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_BC_FWD].value)));
     hose_bc_bwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_BC_BWD].value)));
+
+    // Расцепные рычаги сцепных устройств (общие, не привязаны к кабинам)
+    // Передняя сцепка
+    if (shared_inputs[CTRL_OPER_ROD_FIX_FWD].toBool())
+        oper_rod_fwd->setExternalState(-1.0);
+    else
+        oper_rod_fwd->setExternalState(shared_inputs[CTRL_OPER_ROD_FWD].value);
+
+    // Задняя сцепка
+    if (shared_inputs[CTRL_OPER_ROD_FIX_BWD].toBool())
+        oper_rod_bwd->setExternalState(-1.0);
+    else
+        oper_rod_bwd->setExternalState(shared_inputs[CTRL_OPER_ROD_BWD].value);
 
     // Кнопки песочницы
     sand_system->setSandDeliveryOn(control_inputs[CAB1][CTRL_SAND_BUTTON].toBool() || control_inputs[CAB2][CTRL_SAND_BUTTON].toBool());
