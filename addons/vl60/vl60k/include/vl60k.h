@@ -23,6 +23,7 @@
 #include <array>
 
 #include <vl60-autopilot-types.h>
+#include <vl60-controls.h>
 
 class ACMotorCompressor;
 class ACMotorFan;
@@ -549,6 +550,9 @@ private:
 
     /// Моделирование приборов безопасности
     void stepSafetyDevices(const double& t, const double& dt);
+
+    /// Управление через IOController
+    void stepControls(const double &t, const double &dt);
 
     void stepAutopilot(double t, double dt);
 
