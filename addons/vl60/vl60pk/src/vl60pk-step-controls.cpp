@@ -183,6 +183,29 @@ void VL60pk::stepControls(const double &t, const double &dt)
         bool is_epb = control_inputs[cab_idx][CTRL_TUMBLER_EPB].toBool();
         is_epb ? epb_switch[cab_idx].set() : epb_switch[cab_idx].reset();
 
+        // Радиостанция
+        control_inputs[cab_idx][CTRL_TUMBLER_RADIO].toBool() ? radio_tumbler[cab_idx].set() : radio_tumbler[cab_idx].reset();
+
+        // Автоматическая подача песка
+        control_inputs[cab_idx][CTRL_TUMBLER_AUTOSAND].toBool() ? autosand_tumbler[cab_idx].set() : autosand_tumbler[cab_idx].reset();
+
+        // Тифон и свисток (кнопки с самовозвратом)
+        control_inputs[cab_idx][CTRL_TUMBLER_P_TIFON].toBool() ? P_tifon_tumbler[cab_idx].set() : P_tifon_tumbler[cab_idx].reset();
+        control_inputs[cab_idx][CTRL_TUMBLER_P_WHISTLE].toBool() ? P_whistle_tumbler[cab_idx].set() : P_whistle_tumbler[cab_idx].reset();
+
+        // Обогрев кабины
+        control_inputs[cab_idx][CTRL_TUMBLER_P_CAB_HEAT].toBool() ? P_cab_heat_tumbler[cab_idx].set() : P_cab_heat_tumbler[cab_idx].reset();
+
+        // Освещение ходовой
+        control_inputs[cab_idx][CTRL_TUMBLER_P_SHASSIS_LIGHT].toBool() ? P_light_chassis_tumbler[cab_idx].set() : P_light_chassis_tumbler[cab_idx].reset();
+
+        // Проверка АЛСН
+        control_inputs[cab_idx][CTRL_TUMBLER_P_ALSN_CHECK].toBool() ? P_ALSN_check_tumbler[cab_idx].set() : P_ALSN_check_tumbler[cab_idx].reset();
+
+        // Резервные
+        control_inputs[cab_idx][CTRL_TUMBLER_P_RESERVE1].toBool() ? P_reserv1_tumbler[cab_idx].set() : P_reserv1_tumbler[cab_idx].reset();
+        control_inputs[cab_idx][CTRL_TUMBLER_P_RESERVE2].toBool() ? P_reserv2_tumbler[cab_idx].set() : P_reserv2_tumbler[cab_idx].reset();
+
         // Управление контроллером машиниста
         controller[cab_idx]->insertReversHandle(control_inputs[cab_idx][CTRL_REVERS_INSERTION].toBool());
         controller[cab_idx]->setReversHandlePos(control_inputs[cab_idx][CTRL_REVERS_POSITION].value);
