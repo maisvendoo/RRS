@@ -976,4 +976,62 @@
 		<ObjectNameCab2>Cab2_Tumbler_x5</ObjectNameCab2>
 	</Control>
 
+	<!-- Расцепной рычаг передней сцепки -->
+	<Control>
+		<ID>164</ID>
+		<Name>Расцепной рычаг передней сцепки</Name>
+		<Description>Shift+X — расцепить, X — вернуть. Пружинный возврат из расцепления</Description>
+		<Type>Switcher</Type>
+		<NumPositions>2</NumPositions>
+		<MinValue>-1.0</MinValue>   <!-- расцепление -->
+		<MaxValue>1.0</MaxValue>    <!-- нормальное положение -->
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>   <!-- пружинный возврат из расцепления -->
+		<KeyNameInc>KEY_X</KeyNameInc>
+		<KeyModIncName></KeyModIncName>
+		<KeyNameDec>KEY_X</KeyNameDec>
+		<KeyModDecName>Shift</KeyModDecName>
+	</Control>
+
+	<!-- Фиксация расцепного рычага передней сцепки -->
+	<Control>
+		<ID>166</ID>
+		<Name>Фиксация расцепного рычага передней сцепки</Name>
+		<Description>Alt+Shift+X — зафиксировать/снять фиксацию в расцепленном положении</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_X</KeyName>
+		<KeyModOnName>Alt+Shift</KeyModOnName>
+		<KeyModOffName>Alt+Shift</KeyModOffName>
+	</Control>
+
+	<!-- Расцепной рычаг задней сцепки -->
+	<Control>
+		<ID>165</ID>
+		<Name>Расцепной рычаг задней сцепки</Name>
+		<Description>Shift+C — расцепить, C — вернуть. Пружинный возврат из расцепления</Description>
+		<Type>Switcher</Type>
+		<NumPositions>2</NumPositions>
+		<MinValue>-1.0</MinValue>   <!-- расцепление -->
+		<MaxValue>1.0</MaxValue>    <!-- нормальное положение -->
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>   <!-- пружинный возврат из расцепления -->
+		<KeyNameInc>KEY_C</KeyNameInc>
+		<KeyModIncName></KeyModIncName>
+		<KeyNameDec>KEY_C</KeyNameDec>
+		<KeyModDecName>Shift</KeyModDecName>
+	</Control>
+
+	<!-- Фиксация расцепного рычага задней сцепки -->
+	<Control>
+		<ID>167</ID>
+		<Name>Фиксация расцепного рычага задней сцепки</Name>
+		<Description>Alt+Shift+C — зафиксировать/снять фиксацию в расцепленном положении</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_C</KeyName>
+		<KeyModOnName>Alt+Shift</KeyModOnName>
+		<KeyModOffName>Alt+Shift</KeyModOffName>
+	</Control>
+
 </Config>
