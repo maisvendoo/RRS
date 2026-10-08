@@ -88,8 +88,6 @@ void VL60k::process(const simulator_time_t& t, const double& dt)
     if (needDebugMsg)
         debugPrint(t, dt);
 
-    keyProcess(t, dt);
-
     stepControls(t.simulation_seconds, dt);
 
     signalsOutput(t, dt);
