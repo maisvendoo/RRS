@@ -20,11 +20,12 @@ void VL60pk::initControl(const QString& modules_dir, const QString& custom_cfg_d
     (void) custom_cfg_dir;
 
     // Расцепные рычаги
-    oper_rod_fwd->setKeySymbol(KEY_X);
-    oper_rod_fwd->setControl(&pressed_keys);
+    // Управление через IOController (stepControls)
+    //oper_rod_fwd->setKeySymbol(KEY_X);
+    //oper_rod_fwd->setControl(&pressed_keys);
 
-    oper_rod_bwd->setKeySymbol(KEY_C);
-    oper_rod_bwd->setControl(&pressed_keys);
+    //oper_rod_bwd->setKeySymbol(KEY_C);
+    //oper_rod_bwd->setControl(&pressed_keys);
 
     // Концевые краны магистрали тормозных цилиндров
     // Управление через IOController (stepControls)
