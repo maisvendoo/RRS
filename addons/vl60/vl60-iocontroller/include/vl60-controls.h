@@ -75,6 +75,17 @@ enum
     // Рукава магистрали тормозных цилиндров
     CTRL_HOSE_BC_FWD = 153,
     CTRL_HOSE_BC_BWD = 154,
+
+    // Незадействованные ранее тумблеры (управление только мышью)
+    CTRL_TUMBLER_RADIO = 155,
+    CTRL_TUMBLER_AUTOSAND = 156,
+    CTRL_TUMBLER_P_TIFON = 157,        // кнопка
+    CTRL_TUMBLER_P_WHISTLE = 158,      // кнопка
+    CTRL_TUMBLER_P_CAB_HEAT = 159,
+    CTRL_TUMBLER_P_SHASSIS_LIGHT = 160,
+    CTRL_TUMBLER_P_ALSN_CHECK = 161,
+    CTRL_TUMBLER_P_RESERVE1 = 162,
+    CTRL_TUMBLER_P_RESERVE2 = 163,
 };
 
 #endif
