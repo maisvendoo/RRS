@@ -868,4 +868,112 @@
 		<KeyModDecName>Ctrl</KeyModDecName>
 	</Control>
 
+	<!-- Радиостанция -->
+	<Control>
+		<ID>155</ID>
+		<Name>Радиостанция</Name>
+		<Description>Включение радиостанции</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_Radio</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_Radio</ObjectNameCab2>
+	</Control>
+
+	<!-- Автоматическая подача песка -->
+	<Control>
+		<ID>156</ID>
+		<Name>Автоматическая подача песка</Name>
+		<Description>Включение автоподачи песка</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_APP</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_APP</ObjectNameCab2>
+	</Control>
+
+	<!-- Тифон (переключатель) -->
+	<Control>
+		<ID>157</ID>
+		<Name>Тифон (переключатель)</Name>
+		<Description>Включение тифона на приборной панели</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_tifon</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_tifon</ObjectNameCab2>
+	</Control>
+
+	<!-- Свисток (переключатель) -->
+	<Control>
+		<ID>158</ID>
+		<Name>Свисток (переключатель)</Name>
+		<Description>Включение свистка на приборной панели</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_svistok</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_svistok</ObjectNameCab2>
+	</Control>
+
+	<!-- Обогрев кабины -->
+	<Control>
+		<ID>159</ID>
+		<Name>Обогрев кабины</Name>
+		<Description>Включение обогрева кабины</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_pechi1</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_pechi1</ObjectNameCab2>
+	</Control>
+
+	<!-- Освещение ходовой -->
+	<Control>
+		<ID>160</ID>
+		<Name>Освещение ходовой части</Name>
+		<Description>Включение освещения ходовой части</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_svetHod</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_svetHod</ObjectNameCab2>
+	</Control>
+
+	<!-- Проверка АЛСН -->
+	<Control>
+		<ID>161</ID>
+		<Name>Проверка АЛСН</Name>
+		<Description>Тумблер проверки АЛСН</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_alsn</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_alsn</ObjectNameCab2>
+	</Control>
+
+	<!-- Резервный тумблер 1 -->
+	<Control>
+		<ID>162</ID>
+		<Name>Резервный тумблер 1</Name>
+		<Description>Резервный тумблер на приборной панели помощника</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_x4</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_x4</ObjectNameCab2>
+	</Control>
+
+	<!-- Резервный тумблер 2 -->
+	<Control>
+		<ID>163</ID>
+		<Name>Резервный тумблер 2</Name>
+		<Description>Резервный тумблер на приборной панели помощника</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_x5</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_x5</ObjectNameCab2>
+	</Control>
+
 </Config>
