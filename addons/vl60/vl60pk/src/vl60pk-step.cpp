@@ -21,6 +21,7 @@
 #include "trac-transformer.h"
 #include "train-horn.h"
 #include "spotlight.h"
+#include "automatic-train-stop.h"
 
 //------------------------------------------------------------------------------
 //
@@ -79,7 +80,7 @@ void VL60pk::slotAutoStart()
         }
 
         initClientInputSignal(cab, CTRL_TUMBLER_CU, cu_tumbler[cab].getState() ? 1.0f : 0.0f);        
-        initClientInputSignal(cab, CTRL_EPK_INSERTION, epk[cab]->isKeyInserted() ? 1.0f : 0.0f);
+        initClientInputSignal(cab, CTRL_EPK_INSERTION, epk[cab]->isKey() ? 1.0f : 0.0f);
         initClientInputSignal(cab, CTRL_KEY_EPK, epk[cab]->isKeyOn() ? 1.0f : 0.0f);
         initClientInputSignal(cab, CTRL_KM_MAIN_POSITION, controller[cab]->getMainPos());
 
