@@ -19,6 +19,11 @@ public:
     /// Задать управляющую клавишу
     void setKeySymbol(std::uint16_t key_symbol);
 
+    /// Установить внешнее целевое положение расцепного рычага через IOController.
+    /// Значения: 1.0 — нормальное положение, -1.0 — расцепление,
+    /// 0.0 — «натянутая цепочка». Идемпотентный, вызывается каждый шаг.
+    void setExternalState(double ref_state);
+
     /// Задать усилия в сцепке, Н
     void setCouplingForce(double force);
 
