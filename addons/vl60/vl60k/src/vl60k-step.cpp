@@ -82,6 +82,7 @@ void VL60k::slotAutoStart()
         {
             autopilot_switcher[CAB1].set();
             autopilot_switcher[CAB2].set();
+            initClientInputSignal(cab, CTRL_AUTOPILOT, 1.0f);
         }
     }
 }
