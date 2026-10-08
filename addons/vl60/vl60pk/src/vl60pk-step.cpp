@@ -79,6 +79,9 @@ void VL60pk::slotAutoStart()
         }
 
         initClientInputSignal(cab, CTRL_TUMBLER_CU, cu_tumbler[cab].getState() ? 1.0f : 0.0f);        
+        initClientInputSignal(cab, CTRL_EPK_INSERTION, epk[cab]->isKeyInserted() ? 1.0f : 0.0f);
+        initClientInputSignal(cab, CTRL_KEY_EPK, epk[cab]->isKeyOn() ? 1.0f : 0.0f);
+        initClientInputSignal(cab, CTRL_KM_MAIN_POSITION, controller[cab]->getMainPos());
 
         if (auto_start_autopilot)
         {
@@ -129,6 +132,8 @@ void VL60pk::slotAutoStop()
 
         initClientInputSignal(cab, CTRL_TUMBLER_CU, 0.0f);
         initClientInputSignal(cab, CTRL_RBS_BUTTON, 0.0f);
+        initClientInputSignal(cab, CTRL_REVERS_POSITION, controller[cab]->getReversHandlePos());
+        initClientInputSignal(cab, CTRL_KEY_EPK, epk[cab]->isKeyOn() ? 1.0f : 0.0f);
     }
 }
 
