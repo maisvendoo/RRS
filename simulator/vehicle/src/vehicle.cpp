@@ -952,9 +952,13 @@ void Vehicle::initClientInputSignal(int cab_idx, int signal_id, float value)
 
     if (input != control_inputs[cab_idx].end())
     {
-        control_inputs[cab_idx][signal_id].value = value;
-        _init_signals.insert(std::pair<int, int>(cab_idx, signal_id));
-        emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
+        bool first = _init_signals.insert(std::pair<int, int>(cab_idx, signal_id)).second;
+
+        if (first || fabs(control_inputs[cab_idx][signal_id].value - value) > 1e-6f)
+        {
+            control_inputs[cab_idx][signal_id].value = value;
+            emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
+        }
     }
 }
 

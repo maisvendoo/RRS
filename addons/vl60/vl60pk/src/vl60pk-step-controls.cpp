@@ -209,8 +209,21 @@ void VL60pk::stepControls(const double &t, const double &dt)
 
         // Управление контроллером машиниста
         controller[cab_idx]->insertReversHandle(control_inputs[cab_idx][CTRL_REVERS_INSERTION].toBool());
-        controller[cab_idx]->setReversHandlePos(control_inputs[cab_idx][CTRL_REVERS_POSITION].value);
-        controller[cab_idx]->setMainHandlePos(control_inputs[cab_idx][CTRL_KM_MAIN_POSITION].value);
+
+        if (!autopilot_switcher[cab_idx].getState())
+        {
+            controller[cab_idx]->setReversHandlePos(control_inputs[cab_idx][CTRL_REVERS_POSITION].value);
+            controller[cab_idx]->setMainHandlePos(control_inputs[cab_idx][CTRL_KM_MAIN_POSITION].value);
+            brake_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KRM_395].value);
+            loco_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KVT_254].value);
+        }
+        else
+        {
+            initClientInputSignal(cab_idx, CTRL_REVERS_POSITION, controller[cab_idx]->getReversHandlePos());
+            initClientInputSignal(cab_idx, CTRL_KM_MAIN_POSITION, controller[cab_idx]->getMainPos());
+            initClientInputSignal(cab_idx, CTRL_KRM_395, brake_crane[cab_idx]->getHandlePosition());
+            initClientInputSignal(cab_idx, CTRL_KVT_254, loco_crane[cab_idx]->getHandlePosition());
+        }
 
         // Управление ЭПК
         bool is_epk_insert = control_inputs[cab_idx][CTRL_EPK_INSERTION].toBool();
@@ -224,12 +237,6 @@ void VL60pk::stepControls(const double &t, const double &dt)
         brake_lock[cab_idx]->setStateOn(is_lock367_insert);
         brake_lock[cab_idx]->insertLockHandle(is_lock367_insert);
         brake_lock[cab_idx]->setCombineCranePosition(control_inputs[cab_idx][CTRL_COMBINE_KRAN].value);
-
-        // Кран 395
-        brake_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KRM_395].value);
-
-        // Кран 254
-        loco_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KVT_254].value);
 
         // Кнопки свистка, тифона
         horn[cab_idx]->setSvistokOn(control_inputs[cab_idx][CTRL_WHISTLE_BUTTON].toBool() || control_inputs[cab_idx][CTRL_TUMBLER_P_WHISTLE].toBool());
