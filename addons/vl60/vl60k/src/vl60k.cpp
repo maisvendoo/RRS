@@ -90,6 +90,8 @@ void VL60k::process(const simulator_time_t& t, const double& dt)
 
     keyProcess(t, dt);
 
+    stepControls(t.simulation_seconds, dt);
+
     signalsOutput(t, dt);
 
     soundsOutput(t, dt);
