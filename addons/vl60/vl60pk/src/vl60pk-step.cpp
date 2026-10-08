@@ -21,7 +21,6 @@
 #include "trac-transformer.h"
 #include "train-horn.h"
 #include "spotlight.h"
-#include "automatic-train-stop.h"
 
 //------------------------------------------------------------------------------
 //
