@@ -86,6 +86,12 @@ enum
     CTRL_TUMBLER_P_ALSN_CHECK = 161,
     CTRL_TUMBLER_P_RESERVE1 = 162,
     CTRL_TUMBLER_P_RESERVE2 = 163,
+
+    // Расцепные рычаги автосцепки (управление через IOController)
+    CTRL_OPER_ROD_FWD = 164,
+    CTRL_OPER_ROD_BWD = 165,
+    CTRL_OPER_ROD_FIX_FWD = 166,   // фиксация в расцепленном положении
+    CTRL_OPER_ROD_FIX_BWD = 167,
 };
 
 #endif
