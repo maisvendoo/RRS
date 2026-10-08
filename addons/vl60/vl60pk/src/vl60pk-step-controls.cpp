@@ -81,7 +81,7 @@ void VL60pk::stepControls(const double &t, const double &dt)
         rb[cab_idx][RBP].step();
 
         // Отсекаем управление при автозапуске или автоостанове
-        if (autoStartTimer->isStarted())
+        if (autoStartTimer->isStarted() || autostart_mode != AUTOSTART_IDLE)
         {
             continue;
         }
