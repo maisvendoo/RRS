@@ -980,7 +980,7 @@
 	<Control>
 		<ID>164</ID>
 		<Name>Расцепной рычаг передней сцепки</Name>
-		<Description>Shift+X — расцепить, X — вернуть. Пружинный возврат из расцепления</Description>
+		<Description>Расцепление/сцепление переднего сцепного устройства. Пружинный возврат из расцепления</Description>
 		<Type>Switcher</Type>
 		<NumPositions>2</NumPositions>
 		<MinValue>-1.0</MinValue>   <!-- расцепление -->
@@ -997,7 +997,7 @@
 	<Control>
 		<ID>166</ID>
 		<Name>Фиксация расцепного рычага передней сцепки</Name>
-		<Description>Alt+Shift+X — зафиксировать/снять фиксацию в расцепленном положении</Description>
+		<Description>Зафиксировать/снять фиксацию рычага в расцепленном положении</Description>
 		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_X</KeyName>
@@ -1009,7 +1009,7 @@
 	<Control>
 		<ID>165</ID>
 		<Name>Расцепной рычаг задней сцепки</Name>
-		<Description>Shift+C — расцепить, C — вернуть. Пружинный возврат из расцепления</Description>
+		<Description>Расцепление/сцепление заднего сцепного устройства. Пружинный возврат из расцепления</Description>
 		<Type>Switcher</Type>
 		<NumPositions>2</NumPositions>
 		<MinValue>-1.0</MinValue>   <!-- расцепление -->
@@ -1026,7 +1026,7 @@
 	<Control>
 		<ID>167</ID>
 		<Name>Фиксация расцепного рычага задней сцепки</Name>
-		<Description>Alt+Shift+C — зафиксировать/снять фиксацию в расцепленном положении</Description>
+		<Description>Зафиксировать/снять фиксацию рычага в расцепленном положении</Description>
 		<Type>Toggle</Type>
 		<value>0.0</value>
 		<KeyName>KEY_C</KeyName>
