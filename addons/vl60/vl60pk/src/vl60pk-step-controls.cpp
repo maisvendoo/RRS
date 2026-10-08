@@ -231,8 +231,8 @@ void VL60pk::stepControls(const double &t, const double &dt)
         loco_crane[cab_idx]->setHandlePosition(control_inputs[cab_idx][CTRL_KVT_254].value);
 
         // Кнопки свистка, тифона
-        horn[cab_idx]->setSvistokOn(control_inputs[cab_idx][CTRL_WHISTLE_BUTTON].toBool());
-        horn[cab_idx]->setTifonOn(control_inputs[cab_idx][CTRL_TIFON_BUTTON].toBool());
+        horn[cab_idx]->setSvistokOn(control_inputs[cab_idx][CTRL_WHISTLE_BUTTON].toBool() || control_inputs[cab_idx][CTRL_TUMBLER_P_WHISTLE].toBool());
+        horn[cab_idx]->setTifonOn(control_inputs[cab_idx][CTRL_TIFON_BUTTON].toBool() || control_inputs[cab_idx][CTRL_TUMBLER_P_TIFON].toBool());
 
         // Рукоятки бдительности
         control_inputs[cab_idx][CTRL_RBS_BUTTON].toBool() ? rb[cab_idx][RBS].set() : rb[cab_idx][RBS].reset();
