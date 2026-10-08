@@ -26,6 +26,8 @@
 		<AirDistConfig>vr483</AirDistConfig>
 
 		<CustomModulesDir>vl60</CustomModulesDir>
+		<IOControllerModule>vl60-iocontroller</IOControllerModule>
+		<IOControllerConfig>vl60k-iocontroller</IOControllerConfig>
 
 		<AutopilotModule>vl60-autopilot</AutopilotModule>
 		<AutopilotConfig>vl60k-autopilot</AutopilotConfig>
