@@ -1,0 +1,1022 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<Common>
+		<CabinesNum>2</CabinesNum>
+	</Common>
+
+	<!-- Токоприемники -->
+	<Control>
+		<ID>100</ID>
+		<Name>Токоприемники</Name>
+		<Description>Включение цепей управления токоприемниками</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_U</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_Pnt</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_Pnt</ObjectNameCab2>
+	</Control>
+
+	<!-- Токоприемник передний -->
+	<Control>
+		<ID>101</ID>
+		<Name>Токоприемник передний</Name>
+		<Description>Поднять передний токоприемник</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_I</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_Pnt1</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_Pnt1</ObjectNameCab2>
+	</Control>
+
+	<!-- Токоприемник задний -->
+	<Control>
+		<ID>102</ID>
+		<Name>Токоприемник задний</Name>
+		<Description>Поднять задний токоприемник</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_O</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_Pnt2</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_Pnt2</ObjectNameCab2>
+	</Control>	
+
+	<!-- Включение ГВ -->
+	<Control>
+		<ID>103</ID>
+		<Name>Включение ГВ</Name>
+		<Description>Включить цепи управление ГВ</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_P</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_GVonoff</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_GVonoff</ObjectNameCab2>
+	</Control>
+
+	<!-- Возврат защиты ГВ -->
+	<Control>
+		<ID>104</ID>
+		<Name>Возврат защиты ГВ</Name>
+		<Description>Восстановление защиты</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_P</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>		
+		<ObjectNameCab1>Cab1_Tumbler_GVon</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_GVon</ObjectNameCab2>
+	</Control>
+
+	<!-- Фазорасщепитель -->
+	<Control>
+		<ID>105</ID>
+		<Name>Фазорасщепитель</Name>
+		<Description>Запуск ращепителя фаз</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_T</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_FR</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_FR</ObjectNameCab2>
+	</Control>
+
+	<!-- Компрессор -->
+	<Control>
+		<ID>106</ID>
+		<Name>Компрессор</Name>
+		<Description>Запуск мотор-компрессора</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_7</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_MK</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_MK</ObjectNameCab2>
+	</Control>
+
+	<!-- Вентилятор 1 -->
+	<Control>
+		<ID>107</ID>
+		<Name>Вентилятор 1</Name>
+		<Description>Запуск мотор-вентилятора 1</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_1</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_MV1</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_MV1</ObjectNameCab2>
+	</Control>
+
+	<!-- Вентилятор 2 -->
+	<Control>
+		<ID>108</ID>
+		<Name>Вентилятор 2</Name>
+		<Description>Запуск мотор-вентилятора 2</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_2</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_MV2</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_MV2</ObjectNameCab2>
+	</Control>
+
+	<!-- Вентилятор 3 -->
+	<Control>
+		<ID>109</ID>
+		<Name>Вентилятор 3</Name>
+		<Description>Запуск мотор-вентилятора 3</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_3</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_MV3</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_MV3</ObjectNameCab2>
+	</Control>
+
+	<!-- Вентилятор 4 -->
+	<Control>
+		<ID>110</ID>
+		<Name>Вентилятор 4</Name>
+		<Description>Запуск мотор-вентилятора 4</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_4</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_MV4</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_MV4</ObjectNameCab2>
+	</Control>
+
+	<!-- Вентилятор 5 -->
+	<Control>
+		<ID>111</ID>
+		<Name>Вентилятор 5</Name>
+		<Description>Запуск мотор-вентилятора 5</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_5</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_MV5</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_MV5</ObjectNameCab2>
+	</Control>
+
+	<!-- Вентилятор 6 -->
+	<Control>
+		<ID>112</ID>
+		<Name>Вентилятор 6</Name>
+		<Description>Запуск мотор-вентилятора 6</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_6</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_MV6</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_MV6</ObjectNameCab2>
+	</Control>
+
+	<!-- Цепи управления -->
+	<Control>
+		<ID>113</ID>
+		<Name>Цепи управления</Name>
+		<Description>Включение цепей управления КМ</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Y</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_CU</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_CU</ObjectNameCab2>
+	</Control>
+
+	<!-- Прожектор яркий -->
+	<Control>
+		<ID>114</ID>
+		<Name>Прожектор яркий</Name>
+		<Description>Включение яркого света прожектора</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_H</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>		
+		<ObjectNameCab1>Cab1_Tumbler_PRG2</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_PRG2</ObjectNameCab2>
+	</Control>
+
+	<!-- Прожектор тусклый -->
+	<Control>
+		<ID>115</ID>
+		<Name>Прожектор тусклый</Name>
+		<Description>Включение прожектора (тускло)</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_H</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_PRG1</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_PRG1</ObjectNameCab2>
+	</Control>
+
+	<!-- Освещение кабины тусклое -->
+	<Control>
+		<ID>116</ID>
+		<Name>Освещение кабины тусклое</Name>
+		<Description>Включение освещения кабины</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_K</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_svet1</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_svet1</ObjectNameCab2>
+	</Control>
+
+	<!-- Освещение кабины яркое -->
+	<Control>
+		<ID>117</ID>
+		<Name>Освещение кабины яркое</Name>
+		<Description>Включение яркого освещения в кабине</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_K</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+		<KeyModOffName>Alt</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_svet2</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_svet2</ObjectNameCab2>
+	</Control>
+
+	<!-- Освещение приборов -->
+	<Control>
+		<ID>118</ID>
+		<Name>Освещение приборов</Name>
+		<Description>Включение подсветки приборов</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_L</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_svetPribor</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_svetPribor</ObjectNameCab2>
+	</Control>
+
+	<!-- Фонарь буферный левый -->
+	<Control>
+		<ID>119</ID>
+		<Name>Фонарь буферный левый</Name>
+		<Description>Включение левого буферного фонаря (БФ)</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_G</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_buferL</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_buferL</ObjectNameCab2>
+	</Control>
+
+	<!-- Фонарь буферный правый -->
+	<Control>
+		<ID>120</ID>
+		<Name>Фонарь буферный правый</Name>
+		<Description>Включение правого буферного фонаря (БФ)</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_J</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Tumbler_buferR</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_buferR</ObjectNameCab2>
+	</Control>
+
+	<!-- Цвет буфера левый -->
+	<Control>
+		<ID>121</ID>
+		<Name>Цвет буфера левый</Name>
+		<Description>Переключение красного/белого цвета левого БФ</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_G</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>		
+		<ObjectNameCab1>Cab1_Tumbl_BF-color_L</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbl_BF-color_L</ObjectNameCab2>
+	</Control>
+
+	<!-- Цвет буфера правый -->
+	<Control>
+		<ID>122</ID>
+		<Name>Цвет буфера правый</Name>
+		<Description>Переключение красного/белого цвета правого БФ</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_J</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>		
+		<ObjectNameCab1>Cab1_Tumbl_BF-color_R</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbl_BF-color_R</ObjectNameCab2>
+	</Control>
+
+	<!-- Реверсивный вал -->
+	<Control>
+		<ID>124</ID>
+		<Name>Реверсивный вал</Name>
+		<Description>Извлечь/вставить реверсивную рукоятку</Description>
+		<Type>Toggle</Type>
+		<value1>1.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_W</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectNameCab1>Cab1_Pult_Revers_Holder</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Pult_Revers_Holder</ObjectNameCab2>
+	</Control>
+
+	<!-- ЭПК-150 -->
+	<Control>
+		<ID>125</ID>
+		<Name>ЭПК-150</Name>
+		<Description>Извлечь/Вставить ключ</Description>
+		<Type>Toggle</Type>
+		<value1>1.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_N</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>		
+		<ObjectNameCab1>Cab1_EPK-150_Holder</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_EPK-150_Holder</ObjectNameCab2>
+	</Control>
+
+	<!-- Блокировка 367 -->
+	<Control>
+		<ID>126</ID>
+		<Name>Блокировка 367</Name>
+		<Description>Извлечь/Вставить рукоятку</Description>
+		<Type>Toggle</Type>
+		<value1>1.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_BackSpace</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>		
+		<ObjectNameCab1>Cab1_Bl_367_Holder</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Bl_367_Holder</ObjectNameCab2>
+	</Control>
+
+	<!-- Ключ ЭПК -->
+	<Control>
+		<ID>127</ID>
+		<Name>Ключ ЭПК</Name>
+		<Description>Включение ЭПК автостопа</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_N</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>		
+		<ObjectNameCab1>Cab1_Kluch_EPK</ObjectNameCab1>
+		<ObjectNameCab2>Cab1_Kluch_EPK</ObjectNameCab2>
+	</Control>
+
+	<!-- Реверсивная рукоятка (положение) -->
+	<Control>
+		<ID>128</ID>
+		<Name>Положение реверсора</Name>
+		<Description>Переключение позиций реверсивного вала</Description>
+		<Type>Switcher</Type>
+		<value1>1</value1>
+		<value2>1</value2>
+		<KeyNameInc>KEY_W</KeyNameInc>
+		<KeyNameDec>KEY_S</KeyNameDec>
+		<NumPositions>6</NumPositions>
+		<MinValue>0.0</MinValue>
+		<MaxValue>5.0</MaxValue>
+		<PositionsNames>Назад (ПП),0,Вперед (ПП),ОП1,ОП2,ОП3</PositionsNames>
+		<ObjectNameCab1>Cab1_revers_axis</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_revers_axis</ObjectNameCab2>
+	</Control>
+
+	<!-- Контроллер машиниста -->
+	<Control>
+		<ID>129</ID>
+		<Name>Контроллер машиниста</Name>
+		<Description>Главная рукоятка контроллера КМЭ-60-044</Description>
+		<Type>Switcher</Type>
+		<value1>1</value1>
+		<value2>1</value2>
+		<KeyNameInc>KEY_A</KeyNameInc>
+		<KeyNameDec>KEY_D</KeyNameDec>
+		<NumPositions>8</NumPositions>
+		<MinValue>0.0</MinValue>
+		<MaxValue>7.0</MaxValue>
+		<PositionsNames>БВ,0,АВ,РВ,ФВ,ФП,РП,АП</PositionsNames>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>7</SpringReturnHigh>
+
+		<!-- Настройки сброса до заданной позиции -->
+		<ResetKey>KEY_D</ResetKey>
+		<ResetModkey>Ctrl</ResetModkey>
+		<PositionForReset>1</PositionForReset>
+
+		<!-- Тест установки заданной позиции по комбинации -->
+		<!--
+		<PositionModkey>Alt</PositionModkey>
+		<PositionKeys>KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7,KEY_8</PositionKeys>
+		-->
+		
+		<ObjectNameCab1>Cab1_Kontroller</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Kontroller</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Поездной кран машиниста -->
+	<Control>
+		<ID>130</ID>
+		<Name>Поездной кран машиниста 395</Name>
+		<Description>Рукоятка крана. Управление тормозами поезда</Description>
+		<Type>Switcher</Type>
+		<value1>1</value1>
+		<value2>6</value2>
+		<KeyNameDec>KEY_Semicolon</KeyNameDec>
+		<KeyNameInc>KEY_Quote</KeyNameInc>
+		<NumPositions>7</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>6</MaxValue>
+		<PositionsNames>I,II,III,IV,IVa,IV,VI,</PositionsNames>	
+
+		<IncButtonName>RIGHT_BUTTON</IncButtonName>
+		<DecButtonName>LEFT_BUTTON</DecButtonName>		
+
+		<!-- Установки заданной позиции по комбинации -->
+		<PositionModkey>Alt</PositionModkey>
+		<PositionKeys>(KEY_1;0),(KEY_2;1),(KEY_3;2),(KEY_4;3),(KEY_5;4),(KEY_6;5),(KEY_7;6)</PositionKeys>
+				
+		<ObjectNameCab1>Cab1_Kran395-ruk</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Kran395-ruk</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Кран вспомогательного тормоза -->
+	<Control>
+	    <ID>131</ID>
+	    <Type>Axis</Type>
+	    <Name>Кран вспомогательного тормоза 254</Name>
+		<Description>Рукоятка крана. Управление тормозами локомотива</Description>
+	    <MinValue>-0.03</MinValue>
+	    <MaxValue>1.0</MaxValue>
+	    <Speed>1.0</Speed>
+	    <value1>1.0</value1>
+		<value2>1.0</value2>
+	    <KeyNameInc>KEY_Rightbracket</KeyNameInc>
+	    <KeyNameDec>KEY_Leftbracket</KeyNameDec>
+	    <IncButtonName>RIGHT_BUTTON</IncButtonName>
+	    <DecButtonName>LEFT_BUTTON</DecButtonName>
+	    <SpringReturnLow>0.0</SpringReturnLow>
+	    <ObjectNameCab1>Cab1_Kran254-ruk</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Kran254-ruk</ObjectNameCab2>
+
+		<!-- Установки заданной позиции по комбинации -->
+		<PositionModkey>Alt</PositionModkey>
+		<PositionKeys>(KEY_8;0),(KEY_9;0.25),(KEY_0;0.5),(KEY_Minus;0.75),(KEY_Equals;1.0)</PositionKeys>
+
+	</Control>
+
+	<!-- Комбинированный кран -->
+	<Control>
+		<ID>132</ID>
+		<Name>Комбинированный кран</Name>
+		<Description>Управление комбинированным краном</Description>
+		<Type>Switcher</Type>
+		<value1>0</value1>
+		<value2>0</value2>
+		<KeyNameDec>KEY_BackSpace</KeyNameDec>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameInc>KEY_BackSpace</KeyNameInc>
+		<KeyModDecName>Ctrl</KeyModDecName>
+		<NumPositions>3</NumPositions>
+		<MinValue>-1</MinValue>
+		<MaxValue>1</MaxValue>
+		<PositionsNames>Двойная тяга,Открыт,ЭТ</PositionsNames>	
+
+		<IncButtonName>RIGHT_BUTTON</IncButtonName>
+		<DecButtonName>LEFT_BUTTON</DecButtonName>				
+				
+		<ObjectNameCab1>Cab1_Kran_kombin</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Kran_kombin</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Кнопка песочницы -->
+	<Control>
+		<ID>133</ID>
+		<Name>Кнопка песочницы</Name>
+		<Description>Подача песка под колёса</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Delete</KeyName>
+		<ObjectNameCab1>Cab1_Knopki_button_sand</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopki_button_sand</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Кнопка свистка -->
+	<Control>
+		<ID>134</ID>
+		<Name>Кнопка свистка</Name>
+		<Description>Звуковой сигнал свистком</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Space</KeyName>
+		<ObjectNameCab1>Cab1_Knopki_button_svistok</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopki_button_svistok</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Кнопка тифона -->
+	<Control>
+		<ID>135</ID>
+		<Name>Кнопка тифона</Name>
+		<Description>Звуковой сигнал тифоном</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_B</KeyName>
+		<ObjectNameCab1>Cab1_Knopki_button_tifon</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopki_button_tifon</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Рукоятка бдительности специальная -->
+	<Control>
+		<ID>136</ID>
+		<Name>Рукоятка бдительности специальная</Name>
+		<Description>Подтверждение бдительности при срабатывании УКБМ</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_M</KeyName>
+		<ObjectNameCab1>Cab1_Knopka-RBS</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopka-RBS</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Рукоятка бдительности -->
+	<Control>
+		<ID>137</ID>
+		<Name>Рукоятка бдительности</Name>
+		<Description>Подтверждение бдительности</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Z</KeyName>
+		<ObjectNameCab1>Cab1_Knopka-RB-1</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopka-RB-1</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Рукоятка бдительности помощника -->
+	<Control>
+		<ID>138</ID>
+		<Name>Рукоятка бдительности помощника</Name>
+		<Description>Подтверждение бдительности помощником</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Knopka-RBP</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Knopka-RBP</ObjectNameCab2>
+
+	</Control>
+
+	<!-- Автоведение -->
+	<Control>
+		<ID>139</ID>
+		<Name>Автоведение</Name>
+		<Description>Включение автоведения</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_F</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+		<KeyModOffName>Alt</KeyModOffName>
+
+	</Control>
+
+	<!-- Маневровый режим -->
+	<Control>
+		<ID>140</ID>
+		<Name>Маневровый режим</Name>
+		<Description>Маневровый/поездной режим УКБМ</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_Tilde</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Концевой кран тормозной магистрали вперёд -->
+	<Control>
+		<ID>141</ID>
+		<Name>Концевой кран ТМ вперёд</Name>
+		<Description>Открытие/закрытие концевого крана тормозной магистрали с передней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F2</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Концевой кран тормозной магистрали назад -->
+	<Control>
+		<ID>142</ID>
+		<Name>Концевой кран ТМ назад</Name>
+		<Description>Открытие/закрытие концевого крана тормозной магистрали с задней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F3</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Концевой кран питательной магистрали вперёд -->
+	<Control>
+		<ID>143</ID>
+		<Name>Концевой кран ПМ вперёд</Name>
+		<Description>Открытие/закрытие концевого крана питательной магистрали с передней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F6</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Концевой кран питательной магистрали назад -->
+	<Control>
+		<ID>144</ID>
+		<Name>Концевой кран ПМ назад</Name>
+		<Description>Открытие/закрытие концевого крана питательной магистрали с задней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F7</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Концевой кран тормозных цилиндров вперёд -->
+	<Control>
+		<ID>145</ID>
+		<Name>Концевой кран ТЦ вперёд</Name>
+		<Description>Открытие/закрытие концевого крана тормозных цилиндров с передней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F10</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Концевой кран тормозных цилиндров назад -->
+	<Control>
+		<ID>146</ID>
+		<Name>Концевой кран ТЦ назад</Name>
+		<Description>Открытие/закрытие концевого крана тормозных цилиндров с задней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F11</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+
+	</Control>
+
+	<!-- Автозапуск -->
+	<Control>
+		<ID>147</ID>
+		<Name>Автозапуск</Name>
+		<Description>Запуск программы автоведения</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_R</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+	</Control>
+
+	<!-- Автоостанов -->
+	<Control>
+		<ID>148</ID>
+		<Name>Автоостанов</Name>
+		<Description>Запуск программы автоматической остановки</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<KeyName>KEY_T</KeyName>
+		<KeyModOnName>Alt</KeyModOnName>
+	</Control>
+
+	<!-- Рукав тормозной магистрали вперёд -->
+	<Control>
+		<ID>149</ID>
+		<Name>Рукав ТМ вперёд</Name>
+		<Description>Соединение/разъединение рукава тормозной магистрали с передней стороны</Description>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F1</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F1</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
+	</Control>
+
+	<!-- Рукав тормозной магистрали назад -->
+	<Control>
+		<ID>150</ID>
+		<Name>Рукав ТМ назад</Name>
+		<Description>Соединение/разъединение рукава тормозной магистрали с задней стороны</Description>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F4</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F4</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
+	</Control>
+
+	<!-- Рукав питательной магистрали вперёд -->
+	<Control>
+		<ID>151</ID>
+		<Name>Рукав ПМ вперёд</Name>
+		<Description>Соединение/разъединение рукава питательной магистрали с передней стороны</Description>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F5</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F5</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
+	</Control>
+
+	<!-- Рукав питательной магистрали назад -->
+	<Control>
+		<ID>152</ID>
+		<Name>Рукав ПМ назад</Name>
+		<Description>Соединение/разъединение рукава питательной магистрали с задней стороны</Description>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F8</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F8</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
+	</Control>
+
+	<!-- Рукав магистрали тормозных цилиндров вперёд -->
+	<Control>
+		<ID>153</ID>
+		<Name>Рукав ТЦ вперёд</Name>
+		<Description>Соединение/разъединение рукава тормозных цилиндров с передней стороны</Description>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F9</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F9</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
+	</Control>
+
+	<!-- Рукав магистрали тормозных цилиндров назад -->
+	<Control>
+		<ID>154</ID>
+		<Name>Рукав ТЦ назад</Name>
+		<Description>Соединение/разъединение рукава тормозных цилиндров с задней стороны</Description>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F12</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F12</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
+	</Control>
+
+	<!-- Радиостанция -->
+	<Control>
+		<ID>155</ID>
+		<Name>Радиостанция</Name>
+		<Description>Включение радиостанции</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_Radio</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_Radio</ObjectNameCab2>
+	</Control>
+
+	<!-- Автоматическая подача песка -->
+	<Control>
+		<ID>156</ID>
+		<Name>Автоматическая подача песка</Name>
+		<Description>Включение автоподачи песка</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_APP</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_APP</ObjectNameCab2>
+	</Control>
+
+	<!-- Тифон (переключатель) -->
+	<Control>
+		<ID>157</ID>
+		<Name>Тифон (переключатель)</Name>
+		<Description>Включение тифона на приборной панели</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_tifon</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_tifon</ObjectNameCab2>
+	</Control>
+
+	<!-- Свисток (переключатель) -->
+	<Control>
+		<ID>158</ID>
+		<Name>Свисток (переключатель)</Name>
+		<Description>Включение свистка на приборной панели</Description>
+		<Type>Button</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_svistok</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_svistok</ObjectNameCab2>
+	</Control>
+
+	<!-- Обогрев кабины -->
+	<Control>
+		<ID>159</ID>
+		<Name>Обогрев кабины</Name>
+		<Description>Включение обогрева кабины</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_pechi1</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_pechi1</ObjectNameCab2>
+	</Control>
+
+	<!-- Освещение ходовой -->
+	<Control>
+		<ID>160</ID>
+		<Name>Освещение ходовой части</Name>
+		<Description>Включение освещения ходовой части</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_svetHod</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_svetHod</ObjectNameCab2>
+	</Control>
+
+	<!-- Проверка АЛСН -->
+	<Control>
+		<ID>161</ID>
+		<Name>Проверка АЛСН</Name>
+		<Description>Тумблер проверки АЛСН</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_alsn</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_alsn</ObjectNameCab2>
+	</Control>
+
+	<!-- Резервный тумблер 1 -->
+	<Control>
+		<ID>162</ID>
+		<Name>Резервный тумблер 1</Name>
+		<Description>Резервный тумблер на приборной панели помощника</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_x4</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_x4</ObjectNameCab2>
+	</Control>
+
+	<!-- Резервный тумблер 2 -->
+	<Control>
+		<ID>163</ID>
+		<Name>Резервный тумблер 2</Name>
+		<Description>Резервный тумблер на приборной панели помощника</Description>
+		<Type>Toggle</Type>
+		<value1>0.0</value1>
+		<value2>0.0</value2>
+		<ObjectNameCab1>Cab1_Tumbler_x5</ObjectNameCab1>
+		<ObjectNameCab2>Cab2_Tumbler_x5</ObjectNameCab2>
+	</Control>
+
+	<!-- Расцепной рычаг передней сцепки -->
+	<Control>
+		<ID>164</ID>
+		<Name>Расцепной рычаг передней сцепки</Name>
+		<Description>Расцепление/сцепление переднего сцепного устройства. Пружинный возврат из расцепления</Description>
+		<Type>Switcher</Type>
+		<NumPositions>2</NumPositions>
+		<MinValue>-1.0</MinValue>   <!-- расцепление -->
+		<MaxValue>1.0</MaxValue>    <!-- нормальное положение -->
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>   <!-- пружинный возврат из расцепления -->
+		<KeyNameInc>KEY_X</KeyNameInc>
+		<KeyModIncName></KeyModIncName>
+		<KeyNameDec>KEY_X</KeyNameDec>
+		<KeyModDecName>Shift</KeyModDecName>
+	</Control>
+
+	<!-- Фиксация расцепного рычага передней сцепки -->
+	<Control>
+		<ID>166</ID>
+		<Name>Фиксация расцепного рычага передней сцепки</Name>
+		<Description>Зафиксировать/снять фиксацию рычага в расцепленном положении</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_X</KeyName>
+		<KeyModOnName>Alt+Shift</KeyModOnName>
+		<KeyModOffName>Alt+Shift</KeyModOffName>
+	</Control>
+
+	<!-- Расцепной рычаг задней сцепки -->
+	<Control>
+		<ID>165</ID>
+		<Name>Расцепной рычаг задней сцепки</Name>
+		<Description>Расцепление/сцепление заднего сцепного устройства. Пружинный возврат из расцепления</Description>
+		<Type>Switcher</Type>
+		<NumPositions>2</NumPositions>
+		<MinValue>-1.0</MinValue>   <!-- расцепление -->
+		<MaxValue>1.0</MaxValue>    <!-- нормальное положение -->
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>   <!-- пружинный возврат из расцепления -->
+		<KeyNameInc>KEY_C</KeyNameInc>
+		<KeyModIncName></KeyModIncName>
+		<KeyNameDec>KEY_C</KeyNameDec>
+		<KeyModDecName>Shift</KeyModDecName>
+	</Control>
+
+	<!-- Фиксация расцепного рычага задней сцепки -->
+	<Control>
+		<ID>167</ID>
+		<Name>Фиксация расцепного рычага задней сцепки</Name>
+		<Description>Зафиксировать/снять фиксацию рычага в расцепленном положении</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_C</KeyName>
+		<KeyModOnName>Alt+Shift</KeyModOnName>
+		<KeyModOffName>Alt+Shift</KeyModOffName>
+	</Control>
+
+</Config>
