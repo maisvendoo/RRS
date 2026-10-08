@@ -503,7 +503,7 @@ private:
     /// Инициализация прочего оборудования
     void initOtherEquipment(const QString& modules_dir, const QString& custom_cfg_dir);
 
-    /// Инициализация управления
+    /// Инициализация органов управления управления
     void initControl(const QString& modules_dir, const QString& custom_cfg_dir);
 
     bool initAutostartProgram(int cab_autostart_request);
@@ -517,10 +517,7 @@ private:
     void prepareCabineForAutopilot(int my_cab_idx, int other_cab_idx);
 
     /// Процесс симуляции
-    void process(const simulator_time_t& t, const double& dt) override;
-
-    /// Управление
-    void keyProcess(const simulator_time_t& t, const double& dt);
+    void process(const simulator_time_t& t, const double& dt) override;        
 
     /// Отладочная строка
     void debugPrint(const simulator_time_t& t, const double& dt);
@@ -530,7 +527,6 @@ private:
 
     /// Сигналы для озвучки
     void soundsOutput(const simulator_time_t& t, const double& dt);
-
 
     /// Предварительные расчёты перед симуляцией
     void preStep(const double& t) override;
@@ -576,6 +572,7 @@ private:
     /// Моделирование приборов безопасности
     void stepSafetyDevices(const double& t, const double& dt);
 
+    /// Управление
     void stepControls(const double &t, const double &dt);
 
     /// Автоведение

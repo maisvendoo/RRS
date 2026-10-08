@@ -1,24 +1,24 @@
 #include    "vl60pk.h"
 
-#include "automatic-train-stop.h"
-#include "dc-motor.h"
-#include "ekg-8g.h"
-#include "kme-60-044.h"
-#include "motor-fan-ac.h"
-#include "oscillator.h"
-#include "overload-relay.h"
-#include "pantograph.h"
-#include "phase-splitter.h"
-#include "pneumo-brake-lock.h"
-#include "protective-device.h"
-#include "rectifier.h"
-#include "relay.h"
-#include "sanding-system.h"
-#include "spotlight.h"
-#include "trac-transformer.h"
-#include "train-horn.h"
+#include    "automatic-train-stop.h"
+#include    "dc-motor.h"
+#include    "ekg-8g.h"
+#include    "kme-60-044.h"
+#include    "motor-fan-ac.h"
+#include    "oscillator.h"
+#include    "overload-relay.h"
+#include    "pantograph.h"
+#include    "phase-splitter.h"
+#include    "pneumo-brake-lock.h"
+#include    "protective-device.h"
+#include    "rectifier.h"
+#include    "relay.h"
+#include    "sanding-system.h"
+#include    "spotlight.h"
+#include    "trac-transformer.h"
+#include    "train-horn.h"
 
-#include <QDir>
+#include    <QDir>
 
 //------------------------------------------------------------------------------
 //
@@ -162,17 +162,7 @@ bool VL60pk::initAutostartProgram(int cab_autostart_request)
     if (!epk[cab_autostart_request]->isKeyAllowed())
         return false;
 
-    autostart_cab = cab_autostart_request;
-    /*controller[autostart_cab]->insertReversHandle(true);
-    brake_lock[autostart_cab]->setStateOn(true);
-    epk[autostart_cab]->insertKey(true);*/
-
-    /*controller[CAB1]->setControl();
-    controller[CAB2]->setControl();
-    brake_lock[CAB1]->setControl();
-    brake_lock[CAB2]->setControl();
-    epk[CAB1]->setControl();
-    epk[CAB2]->setControl();*/
+    autostart_cab = cab_autostart_request;    
 
     start_count = 0;
     buildAutostartTriggers(autostart_cab);
@@ -224,14 +214,7 @@ bool VL60pk::initAutostopProgram(int cab_autostop_request)
     if (!controller[cab_autostop_request]->isReversHandle())
         return false;
 
-    autostart_cab = cab_autostop_request;
-
-    /*controller[CAB1]->setControl();
-    controller[CAB2]->setControl();
-    brake_lock[CAB1]->setControl();
-    brake_lock[CAB2]->setControl();
-    epk[CAB1]->setControl();
-    epk[CAB2]->setControl();*/
+    autostart_cab = cab_autostop_request;    
 
     start_count = 0;
     buildAutostartTriggers(autostart_cab);
