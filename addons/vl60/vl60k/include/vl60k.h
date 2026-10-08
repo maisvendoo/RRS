@@ -497,9 +497,6 @@ private:
     /// Процесс симуляции
     void process(const simulator_time_t& t, const double& dt) override;
 
-    /// Управление
-    void keyProcess(const simulator_time_t& t, const double& dt);
-
     /// Отладочная строка
     void debugPrint(const simulator_time_t& t, const double& dt);
 
