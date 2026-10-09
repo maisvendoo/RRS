@@ -86,6 +86,34 @@ void SwitcherHandler::processKeyInput(const std::set<uint16_t> &pk)
 {
     RangeHandler::processKeyInput(pk);
 
+    // Защита от «хвоста» клавиши сброса: после комбинации (например, Ctrl+D)
+    // удерживаемая клавиша D не должна при отпускании Ctrl сработать как декремент
+    if (resetKey != KEY_Undefined)
+    {
+        bool reset_pressed = getKeyState(pk, resetKey) && isKeyModifier(pk, resetModkey);
+
+        if (reset_pressed)
+        {
+            prev_reset_key = true;
+            // сброс уже применён — не обрабатываем inc/dec в этом кадре
+            hold_direction = 0;
+            hold_time = 0.0f;
+            return;
+        }
+
+        if (prev_reset_key)
+        {
+            prev_reset_key = false;
+            if (getKeyState(pk, resetKey))
+            {
+                // reset-клавиша ещё удерживается без модификатора — подавляем inc/dec
+                hold_direction = 0;
+                hold_time = 0.0f;
+                return;
+            }
+        }
+    }
+
     // Клавиша увеличения нажата?
     if (getKeyState(pk, keyCodeInc) && isKeyModifier(pk, keyModIncName))
     {

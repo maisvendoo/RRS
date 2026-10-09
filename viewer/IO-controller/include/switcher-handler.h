@@ -45,6 +45,7 @@ private:
     float  hold_time = 0.0f;          // время удержания для автоповтора
     bool   spring_low_triggered = false;   // флаг: возврат с нижней уже был
     bool   spring_high_triggered = false;  // флаг: возврат с верхней уже был
+    bool   prev_reset_key = false;    // защита: клавиша сброса не срабатывает как inc/dec
 
     /// Имена позиций, для отображения в статусе
     QStringList positionNames;     
