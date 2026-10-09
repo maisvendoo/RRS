@@ -73,9 +73,7 @@ void PassCar::initialization()
 
     initBrakesEquipment(modules_dir, custom_cfg_dir);
 
-    initEPB(modules_dir, custom_cfg_dir);
-
-    initControl(modules_dir, custom_cfg_dir);
+    initEPB(modules_dir, custom_cfg_dir);    
 
     if (is_Registrator_on)
         initRegistrator(modules_dir, custom_cfg_dir);
