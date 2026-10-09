@@ -237,6 +237,23 @@ void TcpClient::sendSimSpeedCommand(int speed_factor)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendRequestVehicleSignals(int vehicle_idx)
+{
+    if (!canSend()) return;
+
+    network_data_t request;
+    request.stype = STYPE_GET_VEHICLE_SIGNALS;
+
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
+    stream << vehicle_idx;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool TcpClient::isConnected() const
 {
     if (socket == nullptr)
@@ -357,6 +374,10 @@ void TcpClient::process_received_data(network_data_t &net_data)
 
     case STYPE_VEHICLE_CONTROL_INPUT_INIT:
         emit sigVehicleControlInputInit(net_data.data);
+        break;
+
+    case STYPE_VEHICLE_SIGNALS:
+        emit sigVehicleSignalsReceived(net_data.data);
         break;
 
     default:

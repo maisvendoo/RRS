@@ -56,6 +56,8 @@ public:
 
     void sendSimSpeedCommand(int speed_factor);
 
+    void sendRequestVehicleSignals(int vehicle_idx);
+
     bool isConnected() const;
 
 signals:
@@ -103,6 +105,8 @@ signals:
     void setTopologyModuleUpdate(QByteArray &module_update);
 
     void sigVehicleControlInputInit(QByteArray &data);
+
+    void sigVehicleSignalsReceived(QByteArray &data);
 
     void sendLogMessage(QString msg);
 
