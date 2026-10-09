@@ -65,7 +65,9 @@ void VL60pk::slotAutoStart()
         // Синхронизируем control_inputs с текущим состоянием тумблеров,
         // чтобы stepControls не сбросил их после завершения автозапуска
         int cab = autostart_cab;
-        initClientInputSignal(cab, CTRL_REVERS_POSITION, controller[cab]->getReversHandlePos());
+        // Явно задаём целевое положение реверсора: кэш getReversHandlePos()
+        // обновляется только в preStep() контроллера и мог ещё не актуализироваться
+        initClientInputSignal(cab, CTRL_REVERS_POSITION, REVERS_FORWARD);
         initClientInputSignal(cab, CTRL_TUMBLER_PNT, pants_tumbler[cab].getState() ? 1.0f : 0.0f);
         initClientInputSignal(cab, CTRL_TUMBLER_PNT2, pant2_tumbler[cab].getState() ? 1.0f : 0.0f);
         initClientInputSignal(cab, CTRL_MAIN_SWITCH_ON, gv_tumbler[cab].getState() ? 1.0f : 0.0f);
@@ -133,7 +135,9 @@ void VL60pk::slotAutoStop()
 
         initClientInputSignal(cab, CTRL_TUMBLER_CU, 0.0f);
         initClientInputSignal(cab, CTRL_RBS_BUTTON, 0.0f);
-        initClientInputSignal(cab, CTRL_REVERS_POSITION, controller[cab]->getReversHandlePos());
+        // Явно задаём целевое положение реверсора: кэш getReversHandlePos()
+        // обновляется только в preStep() контроллера и мог ещё не актуализироваться
+        initClientInputSignal(cab, CTRL_REVERS_POSITION, REVERS_ZERO);
         initClientInputSignal(cab, CTRL_KEY_EPK, epk[cab]->isKeyOn() ? 1.0f : 0.0f);
     }
 }
