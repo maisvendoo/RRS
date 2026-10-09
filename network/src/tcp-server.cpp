@@ -344,6 +344,25 @@ void TcpServer::process_client_request(client_data_t &client_data)
         break;
     }
 
+    case STYPE_GET_VEHICLE_SIGNALS:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        int vehicle_idx = 0;
+        stream >> vehicle_idx;
+
+        QByteArray response_data;
+        emit sigRequestVehicleSignals(vehicle_idx, response_data);
+
+        network_data_t net_data;
+        net_data.stype = STYPE_VEHICLE_SIGNALS;
+        net_data.data = response_data;
+
+        client_data.socket->write(net_data.serialize());
+        client_data.socket->flush();
+        break;
+    }
+
     case STYPE_EMPTY_DATA:
     default:
 

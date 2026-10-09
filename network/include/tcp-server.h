@@ -106,6 +106,8 @@ signals:
                                      float value,
                                      std::int8_t priority);
 
+    void sigRequestVehicleSignals(int vehicle_idx, QByteArray &response_data);
+
 private:
 
     quint16 port = 1992;
