@@ -13,6 +13,8 @@ void PassCar::initControl(const QString& modules_dir, const QString& custom_cfg_
     (void) modules_dir;
     (void) custom_cfg_dir;
 
+    // Управление через IOController (stepControls)
+    /*
     // Включение освещения в вагоне
     interior_light.setKeySymbolOn(KEY_H);
     interior_light.setKeyModifierOn(MODIFIER_OnlyShift);
@@ -73,4 +75,5 @@ void PassCar::initControl(const QString& modules_dir, const QString& custom_cfg_
     brake_shoes_set.setKeySymbolOff(KEY_Insert);
     brake_shoes_set.setKeyModifierOff(MODIFIER_OnlyControl);
     brake_shoes_set.setControl(&pressed_keys);
+    */
 }
