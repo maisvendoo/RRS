@@ -13,6 +13,8 @@ void FreightCar::initControl(const QString& modules_dir, const QString& custom_c
     (void) modules_dir;
     (void) custom_cfg_dir;
 
+    // Управление через IOController (stepControls)
+    /*
     // Сигнальный диск "Хвост грузового поезда" на переднем буферном брусе
     disk_end_of_train_fwd.setKeySymbolOn(KEY_G);
     disk_end_of_train_fwd.setKeyModifierOn(MODIFIER_OnlyShift);
@@ -66,4 +68,5 @@ void FreightCar::initControl(const QString& modules_dir, const QString& custom_c
     brake_shoes_set.setKeySymbolOff(KEY_Insert);
     brake_shoes_set.setKeyModifierOff(MODIFIER_OnlyControl);
     brake_shoes_set.setControl(&pressed_keys);
+    */
 }
