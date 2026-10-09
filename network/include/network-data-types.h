@@ -72,7 +72,10 @@ enum StructureType : uint8_t
     STYPE_REQUEST_STATIONS_DATA,
     STYPE_STATIONS_DATA,
 
-    STYPE_VEHICLE_CONTROL_INPUT_INIT
+    STYPE_VEHICLE_CONTROL_INPUT_INIT,
+
+    STYPE_GET_VEHICLE_SIGNALS,
+    STYPE_VEHICLE_SIGNALS
 };
 
 //------------------------------------------------------------------------------
