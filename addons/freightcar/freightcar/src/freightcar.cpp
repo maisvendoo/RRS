@@ -89,6 +89,8 @@ void FreightCar::initialization()
 //------------------------------------------------------------------------------
 void FreightCar::process(const simulator_time_t& t, const double& dt)
 {
+    stepControls(t.simulation_seconds, dt);
+
     disk_end_of_train_fwd.step();
     disk_end_of_train_bwd.step();
 

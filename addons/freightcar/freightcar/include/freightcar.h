@@ -151,6 +151,9 @@ private:
     /// Шаг моделирования
     void step(const double& t, const double& dt) override;
 
+    /// Применение управляющих сигналов от IOController
+    void stepControls(const double &t, const double &dt);
+
     /// Моделирование сцепных устройств
     void stepCouplings(const double& t, const double& dt);
 
