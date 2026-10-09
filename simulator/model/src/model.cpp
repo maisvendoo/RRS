@@ -445,12 +445,12 @@ void Model::slotGetVehicleSignals(int vehicle_idx, QByteArray &response_data)
     if (vehicle_idx < 0 || vehicle_idx >= static_cast<int>(vehicles.size()))
         return;
 
-    std::vector<float> *signals = vehicles[vehicle_idx]->getAnalogSignals();
+    std::vector<float> *analog_signals = vehicles[vehicle_idx]->getAnalogSignals();
 
     QDataStream stream(&response_data, QIODevice::WriteOnly);
     stream << vehicle_idx;
-    stream << static_cast<uint32_t>(signals->size());
-    for (float v : *signals)
+    stream << static_cast<uint32_t>(analog_signals->size());
+    for (float v : *analog_signals)
         stream << v;
 }
 
