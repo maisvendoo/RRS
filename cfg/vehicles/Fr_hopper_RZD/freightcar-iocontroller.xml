@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+	<Common>
+		<CabinesNum>0</CabinesNum>
+	</Common>
+
+	<!-- Сигнальный диск "Хвост поезда" передний -->
+	<Control>
+		<ID>100</ID>
+		<Name>Сигнальный диск передний</Name>
+		<Description>Включение сигнального диска "Хвост поезда" на переднем буферном брусе</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_G</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+	</Control>
+
+	<!-- Сигнальный диск "Хвост поезда" задний -->
+	<Control>
+		<ID>101</ID>
+		<Name>Сигнальный диск задний</Name>
+		<Description>Включение сигнального диска "Хвост поезда" на заднем буферном брусе</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_J</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+	</Control>
+
+	<!-- Расцепной рычаг передней сцепки -->
+	<Control>
+		<ID>102</ID>
+		<Name>Расцепной рычаг передней сцепки</Name>
+		<Description>Расцепление/сцепление переднего сцепного устройства. Пружинный возврат из расцепления</Description>
+		<Type>Switcher</Type>
+		<NumPositions>2</NumPositions>
+		<MinValue>-1.0</MinValue>   <!-- расцепление -->
+		<MaxValue>1.0</MaxValue>    <!-- нормальное положение -->
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>   <!-- пружинный возврат из расцепления -->
+		<KeyNameInc>KEY_X</KeyNameInc>
+		<KeyModIncName></KeyModIncName>
+		<KeyNameDec>KEY_X</KeyNameDec>
+		<KeyModDecName>Shift</KeyModDecName>
+	</Control>
+
+	<!-- Фиксация расцепного рычага передней сцепки -->
+	<Control>
+		<ID>104</ID>
+		<Name>Фиксация расцепного рычага передней сцепки</Name>
+		<Description>Зафиксировать/снять фиксацию рычага в расцепленном положении</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_X</KeyName>
+		<KeyModOnName>Alt+Shift</KeyModOnName>
+		<KeyModOffName>Alt+Shift</KeyModOffName>
+	</Control>
+
+	<!-- Расцепной рычаг задней сцепки -->
+	<Control>
+		<ID>103</ID>
+		<Name>Расцепной рычаг задней сцепки</Name>
+		<Description>Расцепление/сцепление заднего сцепного устройства. Пружинный возврат из расцепления</Description>
+		<Type>Switcher</Type>
+		<NumPositions>2</NumPositions>
+		<MinValue>-1.0</MinValue>   <!-- расцепление -->
+		<MaxValue>1.0</MaxValue>    <!-- нормальное положение -->
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>   <!-- пружинный возврат из расцепления -->
+		<KeyNameInc>KEY_C</KeyNameInc>
+		<KeyModIncName></KeyModIncName>
+		<KeyNameDec>KEY_C</KeyNameDec>
+		<KeyModDecName>Shift</KeyModDecName>
+	</Control>
+
+	<!-- Фиксация расцепного рычага задней сцепки -->
+	<Control>
+		<ID>105</ID>
+		<Name>Фиксация расцепного рычага задней сцепки</Name>
+		<Description>Зафиксировать/снять фиксацию рычага в расцепленном положении</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_C</KeyName>
+		<KeyModOnName>Alt+Shift</KeyModOnName>
+		<KeyModOffName>Alt+Shift</KeyModOffName>
+	</Control>
+
+	<!-- Концевой кран тормозной магистрали передний -->
+	<Control>
+		<ID>106</ID>
+		<Name>Концевой кран ТМ передний</Name>
+		<Description>Открытие/закрытие концевого крана тормозной магистрали с передней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F2</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+	</Control>
+
+	<!-- Концевой кран тормозной магистрали задний -->
+	<Control>
+		<ID>107</ID>
+		<Name>Концевой кран ТМ задний</Name>
+		<Description>Открытие/закрытие концевого крана тормозной магистрали с задней стороны</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_F3</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+	</Control>
+
+	<!-- Рукав тормозной магистрали передний -->
+	<Control>
+		<ID>108</ID>
+		<Name>Рукав ТМ передний</Name>
+		<Description>Соединение/разъединение рукава тормозной магистрали с передней стороны</Description>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F1</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F1</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
+	</Control>
+
+	<!-- Рукав тормозной магистрали задний -->
+	<Control>
+		<ID>109</ID>
+		<Name>Рукав ТМ задний</Name>
+		<Description>Соединение/разъединение рукава тормозной магистрали с задней стороны</Description>
+		<Type>Switcher</Type>
+		<NumPositions>3</NumPositions>
+		<MinValue>0</MinValue>
+		<MaxValue>2</MaxValue>
+		<value>1.0</value>
+		<SpringReturnLow>0</SpringReturnLow>
+		<SpringReturnHigh>2</SpringReturnHigh>
+		<KeyNameInc>KEY_F4</KeyNameInc>
+		<KeyModIncName>Shift</KeyModIncName>
+		<KeyNameDec>KEY_F4</KeyNameDec>
+		<KeyModDecName>Ctrl</KeyModDecName>
+	</Control>
+
+	<!-- Тормозные башмаки -->
+	<Control>
+		<ID>110</ID>
+		<Name>Тормозные башмаки</Name>
+		<Description>Установка/снятие тормозных башмаков под колёса</Description>
+		<Type>Toggle</Type>
+		<value>0.0</value>
+		<KeyName>KEY_Insert</KeyName>
+		<KeyModOnName>Shift</KeyModOnName>
+		<KeyModOffName>Ctrl</KeyModOffName>
+	</Control>
+
+</Config>
