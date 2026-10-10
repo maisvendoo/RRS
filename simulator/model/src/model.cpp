@@ -405,33 +405,34 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx,
                                          float value,
                                          int8_t prioriry)
 {
-    for (auto *train : trains)
+    if (vehicle_idx >= vehicles.size())
     {
-        for (auto *vehicle : *(train->getVehicles()))
+        return;
+    }
+
+    auto *vehicle = vehicles[vehicle_idx];
+
+    if (vehicle != nullptr)
+    {
+        if (!vehicle->control_inputs.empty())
         {
-            if (vehicle_idx == vehicle->getModelIndex())
+            if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())
             {
-                if (!vehicle->control_inputs.empty())
+                // Если приоритет пришедшего сигнала
+                // менее привелигированый - выходим ничего не меняя
+                if (prioriry > vehicle->control_inputs[cab_idx][id].server_priority)
                 {
-                    if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())
-                    {
-                        // Если приоритет пришедшего сигнала
-                        // менее привелигированый - выходим ничего не меняя
-                        if (prioriry > vehicle->control_inputs[cab_idx][id].server_priority)
-                        {
-                            return;
-                        }
-
-                        // Если приоритет пришедшего сигнала
-                        // более привелигированый - перехват управления
-                        if (prioriry < vehicle->control_inputs[cab_idx][id].server_priority)
-                        {
-                            vehicle->control_inputs[cab_idx][id].server_priority = static_cast<ControlPriority>(prioriry);
-                        }
-
-                        vehicle->control_inputs[cab_idx][id].value = value;
-                    }
+                    return;
                 }
+
+                // Если приоритет пришедшего сигнала
+                // более привелигированый - перехват управления
+                if (prioriry < vehicle->control_inputs[cab_idx][id].server_priority)
+                {
+                    vehicle->control_inputs[cab_idx][id].server_priority = static_cast<ControlPriority>(prioriry);
+                }
+
+                vehicle->control_inputs[cab_idx][id].value = value;
             }
         }
     }
