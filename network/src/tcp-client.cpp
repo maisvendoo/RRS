@@ -255,7 +255,7 @@ void TcpClient::sendSimSpeedCommand(int speed_factor)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TcpClient::sendRequestVehicleSignals(int vehicle_idx)
+void TcpClient::sendRequestVehicleSignals(int vehicle_idx, bool compression_allowed)
 {
     if (!canSend()) return;
 
@@ -264,6 +264,7 @@ void TcpClient::sendRequestVehicleSignals(int vehicle_idx)
 
     QDataStream stream(&request.data, QIODevice::WriteOnly);
     stream << vehicle_idx;
+    stream << static_cast<qint8>(compression_allowed ? 1 : 0);
 
     socket->write(request.serialize());
     socket->flush();

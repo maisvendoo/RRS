@@ -100,7 +100,7 @@ struct network_data_t
     QByteArray data;
 
     /// Сериализуем, подготоваливая кадр, передаваемый по сети
-    QByteArray serialize(bool is_copression_allowed = true);
+    QByteArray serialize(bool is_compression_allowed = true);
 
     void deserialize(QByteArray& data);
 };

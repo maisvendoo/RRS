@@ -56,7 +56,7 @@ public:
 
     void sendSimSpeedCommand(int speed_factor);
 
-    void sendRequestVehicleSignals(int vehicle_idx);
+    void sendRequestVehicleSignals(int vehicle_idx, bool compression_allowed = true);
 
     void sendSetVehicleControlPriority(int vehicle_idx, std::int8_t priority);
 
