@@ -75,7 +75,9 @@ enum StructureType : uint8_t
     STYPE_VEHICLE_CONTROL_INPUT_INIT,
 
     STYPE_GET_VEHICLE_SIGNALS,
-    STYPE_VEHICLE_SIGNALS
+    STYPE_VEHICLE_SIGNALS,
+
+    STYPE_SET_VEHICLE_CONTROL_PRIORITY
 };
 
 //------------------------------------------------------------------------------
