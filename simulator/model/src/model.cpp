@@ -457,6 +457,30 @@ void Model::slotGetVehicleSignals(int vehicle_idx, QByteArray &response_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::slotSetVehicleControlPriority(int vehicle_idx, std::int8_t priority)
+{
+    for (auto *train : trains)
+    {
+        for (auto *vehicle : *(train->getVehicles()))
+        {
+            if (vehicle_idx == vehicle->getModelIndex())
+            {
+                for (auto &cab_inputs : vehicle->control_inputs)
+                {
+                    for (auto it = cab_inputs.begin(); it != cab_inputs.end(); ++it)
+                    {
+                        it.value().server_priority = static_cast<ControlPriority>(priority);
+                    }
+                }
+                return;
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::processAutostartQueue()
 {
     if (vehicles_for_autostart.empty())
@@ -1090,6 +1114,8 @@ void Model::initTcpServer()
     connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
 
     connect(tcp_server, &TcpServer::sigSetVehicleControlCommand, this, &Model::slotSetVehicleControlCommand);
+
+    connect(tcp_server, &TcpServer::sigSetVehicleControlPriority, this, &Model::slotSetVehicleControlPriority);
 
     connect(tcp_server, &TcpServer::sigRequestVehicleSignals, this, &Model::slotGetVehicleSignals);
 
