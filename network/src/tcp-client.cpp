@@ -219,6 +219,24 @@ void TcpClient::sendReverseTrain(int train_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendSetVehicleControlPriority(int vehicle_idx, std::int8_t priority)
+{
+    if (!canSend()) return;
+
+    network_data_t request;
+    request.stype = STYPE_SET_VEHICLE_CONTROL_PRIORITY;
+
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
+    stream << vehicle_idx;
+    stream << priority;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpClient::sendSimSpeedCommand(int speed_factor)
 {
     if (!canSend()) return;

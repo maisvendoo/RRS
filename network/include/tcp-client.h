@@ -58,6 +58,8 @@ public:
 
     void sendRequestVehicleSignals(int vehicle_idx);
 
+    void sendSetVehicleControlPriority(int vehicle_idx, std::int8_t priority);
+
     bool isConnected() const;
 
 signals:
