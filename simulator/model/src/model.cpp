@@ -460,22 +460,23 @@ void Model::slotGetVehicleSignals(int vehicle_idx, QByteArray &response_data)
 //------------------------------------------------------------------------------
 void Model::slotSetVehicleControlPriority(int vehicle_idx, std::int8_t priority)
 {
-    for (auto *train : trains)
+    if (vehicle_idx >= vehicles.size())
     {
-        for (auto *vehicle : *(train->getVehicles()))
+        return;
+    }
+
+    auto *vehicle = vehicles[vehicle_idx];
+
+    if (vehicle != nullptr)
+    {
+        for (auto &cab_inputs : vehicle->control_inputs)
         {
-            if (vehicle_idx == vehicle->getModelIndex())
+            for (auto it = cab_inputs.begin(); it != cab_inputs.end(); ++it)
             {
-                for (auto &cab_inputs : vehicle->control_inputs)
-                {
-                    for (auto it = cab_inputs.begin(); it != cab_inputs.end(); ++it)
-                    {
-                        it.value().server_priority = static_cast<ControlPriority>(priority);
-                    }
-                }
-                return;
+                it.value().server_priority = static_cast<ControlPriority>(priority);
             }
         }
+        return;
     }
 }
 
