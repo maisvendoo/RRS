@@ -20,12 +20,12 @@ network_data_t::network_data_t()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-QByteArray network_data_t::serialize()
+QByteArray network_data_t::serialize(bool is_copression_allowed)
 {
     QByteArray tmp_data;
     QDataStream stream(&tmp_data, QIODevice::WriteOnly);
 
-    is_compression = (data.size() > 250);
+    is_compression = (data.size() > 250) && is_copression_allowed;
     while (is_compression)
     {
         QByteArray compressed_data(data.size(), Qt::Uninitialized);
