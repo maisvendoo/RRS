@@ -106,6 +106,8 @@ signals:
                                      float value,
                                      std::int8_t priority);
 
+    void sigSetVehicleControlPriority(int vehicle_idx, std::int8_t priority);
+
     void sigRequestVehicleSignals(int vehicle_idx, QByteArray &response_data);
 
 private:
