@@ -363,6 +363,20 @@ void TcpServer::process_client_request(client_data_t &client_data)
         break;
     }
 
+    case STYPE_SET_VEHICLE_CONTROL_PRIORITY:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        int vehicle_idx = 0;
+        stream >> vehicle_idx;
+
+        std::int8_t priority = 0;
+        stream >> priority;
+
+        emit sigSetVehicleControlPriority(vehicle_idx, priority);
+        break;
+    }
+
     case STYPE_EMPTY_DATA:
     default:
 
