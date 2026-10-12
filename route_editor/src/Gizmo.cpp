@@ -176,16 +176,16 @@ bool Gizmo::handle_intersections()
 
     // Normalized mouse coordinates [-1.0; 1.0]
     double norm_mouse_x, norm_mouse_y;
-    normalize_mouse_coordinates(mouse->get_x(), mouse->get_y(), window_extent,
+    norm_mouse_coords(mouse->get_x(), mouse->get_y(), window_extent,
         norm_mouse_x, norm_mouse_y);
 
     const vsg::dmat4& inv_view_mat = camera->get_inverse_view_matrix();
     const vsg::dmat4& inv_proj_mat = camera->get_inverse_projection_matrix();
 
     vsg::dvec3 ray_origin, ray_end;
-    calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 0.0,
+    calc_mouse_world_coords(norm_mouse_x, norm_mouse_y, 0.0,
         inv_view_mat, inv_proj_mat, ray_origin);
-    calculate_mouse_world_coordinates(norm_mouse_x, norm_mouse_y, 1.0,
+    calc_mouse_world_coords(norm_mouse_x, norm_mouse_y, 1.0,
         inv_view_mat, inv_proj_mat, ray_end);
 
     const vsg::dvec3 ray_dir = ray_end - ray_origin;
@@ -249,7 +249,7 @@ bool Gizmo::handle_intersections()
             const double C_cyl = local_origin.y * local_origin.y + local_origin.z * local_origin.z - R_cyl * R_cyl;
 
             double ts[2];
-            if (solve_quadratic_equation(A_cyl, B_cyl, C_cyl, ts[0], ts[1]))
+            if (solve_quad_eq(A_cyl, B_cyl, C_cyl, ts[0], ts[1]))
             {
                 for (double t : ts)
                 {
@@ -308,7 +308,7 @@ bool Gizmo::handle_intersections()
         if (std::abs(A_cone) > EPSILON)
         {
             double ts[2];
-            if (solve_quadratic_equation(A_cone, B_cone, C_cone, ts[0], ts[1]))
+            if (solve_quad_eq(A_cone, B_cone, C_cone, ts[0], ts[1]))
             {
                 for (double t : ts)
                 {
