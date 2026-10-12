@@ -24,6 +24,8 @@
 
 #include    <QFile>
 #include    <QTextStream>
+#include    <QDataStream>
+#include    <QIODevice>
 
 //------------------------------------------------------------------------------
 //
@@ -403,35 +405,78 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx,
                                          float value,
                                          int8_t prioriry)
 {
-    for (auto *train : trains)
+    if (vehicle_idx >= vehicles.size())
     {
-        for (auto *vehicle : *(train->getVehicles()))
+        return;
+    }
+
+    auto *vehicle = vehicles[vehicle_idx];
+
+    if (vehicle != nullptr)
+    {
+        if (!vehicle->control_inputs.empty())
         {
-            if (vehicle_idx == vehicle->getModelIndex())
+            if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())
             {
-                if (!vehicle->control_inputs.empty())
+                // Если приоритет пришедшего сигнала
+                // менее привелигированый - выходим ничего не меняя
+                if (prioriry > vehicle->control_inputs[cab_idx][id].server_priority)
                 {
-                    if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())
-                    {
-                        // Если приоритет пришедшего сигнала
-                        // менее привелигированый - выходим ничего не меняя
-                        if (prioriry > vehicle->control_inputs[cab_idx][id].server_priority)
-                        {
-                            return;
-                        }
-
-                        // Если приоритет пришедшего сигнала
-                        // более привелигированый - перехват управления
-                        if (prioriry < vehicle->control_inputs[cab_idx][id].server_priority)
-                        {
-                            vehicle->control_inputs[cab_idx][id].server_priority = static_cast<ControlPriority>(prioriry);
-                        }
-
-                        vehicle->control_inputs[cab_idx][id].value = value;
-                    }
+                    return;
                 }
+
+                // Если приоритет пришедшего сигнала
+                // более привелигированый - перехват управления
+                if (prioriry < vehicle->control_inputs[cab_idx][id].server_priority)
+                {
+                    vehicle->control_inputs[cab_idx][id].server_priority = static_cast<ControlPriority>(prioriry);
+                }
+
+                vehicle->control_inputs[cab_idx][id].value = value;
             }
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotGetVehicleSignals(int vehicle_idx, QByteArray &response_data)
+{
+    if (vehicle_idx < 0 || vehicle_idx >= static_cast<int>(vehicles.size()))
+        return;
+
+    std::vector<float> *analog_signals = vehicles[vehicle_idx]->getAnalogSignals();
+
+    QDataStream stream(&response_data, QIODevice::WriteOnly);
+    stream << vehicle_idx;
+    stream << static_cast<uint32_t>(analog_signals->size());
+    for (float v : *analog_signals)
+        stream << v;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotSetVehicleControlPriority(int vehicle_idx, std::int8_t priority)
+{
+    if (vehicle_idx >= vehicles.size())
+    {
+        return;
+    }
+
+    auto *vehicle = vehicles[vehicle_idx];
+
+    if (vehicle != nullptr)
+    {
+        for (auto &cab_inputs : vehicle->control_inputs)
+        {
+            for (auto it = cab_inputs.begin(); it != cab_inputs.end(); ++it)
+            {
+                it.value().server_priority = static_cast<ControlPriority>(priority);
+            }
+        }
+        return;
     }
 }
 
@@ -1071,6 +1116,10 @@ void Model::initTcpServer()
     connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
 
     connect(tcp_server, &TcpServer::sigSetVehicleControlCommand, this, &Model::slotSetVehicleControlCommand);
+
+    connect(tcp_server, &TcpServer::sigSetVehicleControlPriority, this, &Model::slotSetVehicleControlPriority);
+
+    connect(tcp_server, &TcpServer::sigRequestVehicleSignals, this, &Model::slotGetVehicleSignals);
 
     Journal::instance()->info("TCP server is initialized successfully");
 }

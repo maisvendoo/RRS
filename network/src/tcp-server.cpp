@@ -344,6 +344,43 @@ void TcpServer::process_client_request(client_data_t &client_data)
         break;
     }
 
+    case STYPE_GET_VEHICLE_SIGNALS:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        int vehicle_idx = 0;
+        stream >> vehicle_idx;
+
+        qint8 compression_allowed = 1;
+        if (!stream.atEnd())
+            stream >> compression_allowed;
+
+        QByteArray response_data;
+        emit sigRequestVehicleSignals(vehicle_idx, response_data);
+
+        network_data_t net_data;
+        net_data.stype = STYPE_VEHICLE_SIGNALS;
+        net_data.data = response_data;
+
+        client_data.socket->write(net_data.serialize(compression_allowed == 0));
+        client_data.socket->flush();
+        break;
+    }
+
+    case STYPE_SET_VEHICLE_CONTROL_PRIORITY:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        int vehicle_idx = 0;
+        stream >> vehicle_idx;
+
+        std::int8_t priority = 0;
+        stream >> priority;
+
+        emit sigSetVehicleControlPriority(vehicle_idx, priority);
+        break;
+    }
+
     case STYPE_EMPTY_DATA:
     default:
 

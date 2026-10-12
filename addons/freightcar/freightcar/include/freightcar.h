@@ -124,10 +124,6 @@ private:
     /// Инициализация регистратора параметров в лог-файл
     void initRegistrator(const QString& modules_dir, const QString& custom_cfg_dir);
 
-    /// Инициализация управления
-    void initControl(const QString& modules_dir, const QString& custom_cfg_dir);
-
-
     /// Процесс симуляции
     void process(const simulator_time_t& t, const double& dt) override;
 
@@ -150,6 +146,9 @@ private:
 
     /// Шаг моделирования
     void step(const double& t, const double& dt) override;
+
+    /// Применение управляющих сигналов от IOController
+    void stepControls(const double &t, const double &dt);
 
     /// Моделирование сцепных устройств
     void stepCouplings(const double& t, const double& dt);

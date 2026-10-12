@@ -259,6 +259,10 @@ private slots:
     void slotUpdateTrainTimetable(int train_idx);
 
     void slotSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t id, float value, std::int8_t prioriry);
+
+    void slotGetVehicleSignals(int vehicle_idx, QByteArray &response_data);
+
+    void slotSetVehicleControlPriority(int vehicle_idx, std::int8_t priority);
 };
 
 #endif // MODEL_H

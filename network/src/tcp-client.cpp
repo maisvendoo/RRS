@@ -219,6 +219,24 @@ void TcpClient::sendReverseTrain(int train_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TcpClient::sendSetVehicleControlPriority(int vehicle_idx, std::int8_t priority)
+{
+    if (!canSend()) return;
+
+    network_data_t request;
+    request.stype = STYPE_SET_VEHICLE_CONTROL_PRIORITY;
+
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
+    stream << vehicle_idx;
+    stream << priority;
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TcpClient::sendSimSpeedCommand(int speed_factor)
 {
     if (!canSend()) return;
@@ -229,6 +247,24 @@ void TcpClient::sendSimSpeedCommand(int speed_factor)
     simspeed_command_t sc;
     sc.speed_factor = speed_factor;
     request.data = sc.serialize();
+
+    socket->write(request.serialize());
+    socket->flush();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpClient::sendRequestVehicleSignals(int vehicle_idx, bool compression_allowed)
+{
+    if (!canSend()) return;
+
+    network_data_t request;
+    request.stype = STYPE_GET_VEHICLE_SIGNALS;
+
+    QDataStream stream(&request.data, QIODevice::WriteOnly);
+    stream << vehicle_idx;
+    stream << static_cast<qint8>(compression_allowed ? 1 : 0);
 
     socket->write(request.serialize());
     socket->flush();
@@ -357,6 +393,10 @@ void TcpClient::process_received_data(network_data_t &net_data)
 
     case STYPE_VEHICLE_CONTROL_INPUT_INIT:
         emit sigVehicleControlInputInit(net_data.data);
+        break;
+
+    case STYPE_VEHICLE_SIGNALS:
+        emit sigVehicleSignalsReceived(net_data.data);
         break;
 
     default:

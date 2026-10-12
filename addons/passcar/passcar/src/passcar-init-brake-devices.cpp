@@ -1,5 +1,7 @@
 #include    "passcar.h"
 
+#include <passcar-controls.h>
+
 #include "airdistributor.h"
 #include "electro-airdistributor.h"
 #include "pneumo-anglecock.h"
@@ -36,29 +38,46 @@ void PassCar::initBrakeDevices(double p0, double pBP, double pFL)
     hose_bp_fwd->setPressure(pBP);
     hose_bp_bwd->setPressure(pBP);
 
+    int shared_idx = control_inputs.size() - 1;
+
     // Включение трёх красных огней на торцевых стенках
     red_lamps_end_of_train_fwd.setInitState(prev_vehicle == nullptr);
     red_lamps_end_of_train_bwd.setInitState(next_vehicle == nullptr);
+
+    // Синхронизируем control_inputs со стартовым состоянием огней,
+    // чтобы stepControls не сбросил их после инициализации
+    initClientInputSignal(shared_idx, CTRL_RED_LAMPS_END_OF_TRAIN_FWD,
+                          prev_vehicle == nullptr ? 1.0f : 0.0f);
+    initClientInputSignal(shared_idx, CTRL_RED_LAMPS_END_OF_TRAIN_BWD,
+                          next_vehicle == nullptr ? 1.0f : 0.0f);
 
     // Состояние рукавов и концевых кранов тормозной магистрали
     if (hose_bp_fwd->isLinked())
     {
         hose_bp_fwd->connect();
         anglecock_bp_fwd->open();
+        initClientInputSignal(shared_idx, CTRL_HOSE_BP_FWD, 2.0f);
+        initClientInputSignal(shared_idx, CTRL_ANGLECOCK_BP_FWD, 1.0f);
     }
     else
     {
         anglecock_bp_fwd->close();
+        initClientInputSignal(shared_idx, CTRL_HOSE_BP_FWD, 0.0f);
+        initClientInputSignal(shared_idx, CTRL_ANGLECOCK_BP_FWD, 0.0f);
     }
 
     if (hose_bp_bwd->isLinked())
     {
         hose_bp_bwd->connect();
         anglecock_bp_bwd->open();
+        initClientInputSignal(shared_idx, CTRL_HOSE_BP_BWD, 2.0f);
+        initClientInputSignal(shared_idx, CTRL_ANGLECOCK_BP_BWD, 1.0f);
     }
     else
     {
         anglecock_bp_bwd->close();
+        initClientInputSignal(shared_idx, CTRL_HOSE_BP_BWD, 0.0f);
+        initClientInputSignal(shared_idx, CTRL_ANGLECOCK_BP_BWD, 0.0f);
     }
 
     // Инициализация тормозных башмаков
