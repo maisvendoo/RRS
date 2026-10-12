@@ -59,7 +59,7 @@ void StateManager::update(double delta_time)
     (*current_state)->update(delta_time);
 }
 
-const std::unique_ptr<State>& StateManager::get_current_editor_state() const
+const std::unique_ptr<State>& StateManager::get_curr_state() const
 {
     return *current_state;
 }

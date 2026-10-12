@@ -121,7 +121,7 @@ void EditorGui::record([[maybe_unused]] vsg::CommandBuffer& command_buffer) cons
     draw_invalid_route_popup();
 
     const auto& state_manager = editor_context.state_manager;
-    state_manager->get_current_editor_state()->draw_gui();
+    state_manager->get_curr_state()->draw_gui();
 
     auto& gui_settings = editor_context.gui_settings;
 
@@ -844,7 +844,7 @@ void EditorGui::draw_status_bar() const
 
     if (ImGui::Begin("StatusBar", nullptr, flags))
     {
-        state_manager->get_current_editor_state()->fill_status_bar();
+        state_manager->get_curr_state()->fill_status_bar();
         ImGui::End();
     }
 }

@@ -17,36 +17,36 @@ EventHandler::~EventHandler() = default;
 
 void EventHandler::apply([[maybe_unused]] vsg::KeyPressEvent& keyPress)
 {
-    state_manager->get_current_editor_state()->handle_key_press();
+    state_manager->get_curr_state()->handle_key_press();
 }
 
 void EventHandler::apply([[maybe_unused]] vsg::KeyReleaseEvent& keyRelease)
 {
-    state_manager->get_current_editor_state()->handle_key_release();
+    state_manager->get_curr_state()->handle_key_release();
 }
 
 void EventHandler::apply([[maybe_unused]] vsg::ButtonPressEvent& buttonPress)
 {
-    state_manager->get_current_editor_state()->handle_button_press();
+    state_manager->get_curr_state()->handle_button_press();
 }
 
 void EventHandler::apply(
     [[maybe_unused]] vsg::ButtonReleaseEvent& buttonRelease)
 {
-    state_manager->get_current_editor_state()->handle_button_release();
+    state_manager->get_curr_state()->handle_button_release();
 }
 
 void EventHandler::apply([[maybe_unused]] vsg::MoveEvent& moveEvent)
 {
-    state_manager->get_current_editor_state()->handle_mouse_move();
+    state_manager->get_curr_state()->handle_mouse_move();
 }
 
 void EventHandler::apply([[maybe_unused]] vsg::ScrollWheelEvent& scrollWheel)
 {
-    state_manager->get_current_editor_state()->handle_mouse_scroll();
+    state_manager->get_curr_state()->handle_mouse_scroll();
 }
 
 void EventHandler::update(double delta_time)
 {
-    state_manager->get_current_editor_state()->update(delta_time);
+    state_manager->get_curr_state()->update(delta_time);
 }
