@@ -10,13 +10,10 @@ class SelectObjectsCommand : public Command
 {
 public:
     explicit SelectObjectsCommand(EditorContext& context);
-
     virtual ~SelectObjectsCommand() override = default;
 
     virtual void execute() override;
-
     virtual void undo() override;
-
     virtual void update_description() override;
 
 public:

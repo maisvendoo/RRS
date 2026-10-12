@@ -16,31 +16,27 @@ PasteObjectsCommand::PasteObjectsCommand(
     EditorContext& context
 )
     : Command(context)
-    , objects_to_paste_(context.copied_objects)
-    , objects_to_deselect_(context.selected_objects)
+    , objects_to_paste(context.copied_objects)
+    , objects_to_deselect(context.selected_objects)
 {
     update_description();
 }
 
 void PasteObjectsCommand::execute()
 {
-    for (const auto& object : objects_to_deselect_)
-    {
+    for (const auto& object : objects_to_deselect)
         object->deselect();
-    }
 
-    if (pasted_objects_.empty())
+    if (pasted_objects.empty())
     {
-        for (const auto& object : objects_to_paste_)
-        {
-            pasted_objects_.emplace_back(object->copy());
-        }
+        for (const auto& object : objects_to_paste)
+            pasted_objects.emplace_back(object->copy());
     }
 
     auto compile_infos = editor_context.compile_infos.lock();
     auto static_objects = editor_context.static_objects.lock();
 
-    for (const auto& pasted_object : pasted_objects_)
+    for (const auto& pasted_object : pasted_objects)
     {
         compile_infos->emplace_back(CompileInfo{
             editor_context.route, pasted_object, vsg::MASK_ALL});
@@ -55,7 +51,7 @@ void PasteObjectsCommand::execute()
 
 void PasteObjectsCommand::undo()
 {
-    for (const auto& pasted_object : pasted_objects_)
+    for (const auto& pasted_object : pasted_objects)
     {
         pasted_object->deselect();
 
@@ -73,10 +69,8 @@ void PasteObjectsCommand::undo()
         );
     }
 
-    for (const auto& object : objects_to_deselect_)
-    {
+    for (const auto& object : objects_to_deselect)
         object->select();
-    }
 
     editor_context.compile_infos.lock()->emplace_back(CompileInfo{
         nullptr, editor_context.route});
@@ -87,7 +81,5 @@ void PasteObjectsCommand::undo()
 void PasteObjectsCommand::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
-        "Paste objects: to paste: %zu objects",
-        objects_to_paste_.size()
-    );
+        "Paste objects: to paste: %zu objects", objects_to_paste.size());
 }

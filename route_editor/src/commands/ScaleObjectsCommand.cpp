@@ -12,18 +12,16 @@
 ScaleObjectsCommand::ScaleObjectsCommand(EditorContext& context, const RouteObjects& objects,
     const vsg::dvec3& pivot, const vsg::dvec3& scale)
     : TransformObjectsCommand(context, objects)
-    , pivot_(pivot)
-    , scale_(scale)
+    , pivot(pivot)
+    , scale(scale)
 {
     update_description();
 }
 
 void ScaleObjectsCommand::execute()
 {
-    for (const auto& object : objects_)
-    {
-        object->scale_relative_to_pivot(pivot_, scale_, object->matrix);
-    }
+    for (const auto& object : objects)
+        object->scale_relative_to_pivot(pivot, scale, object->matrix);
 }
 
 void ScaleObjectsCommand::update_description()
@@ -31,6 +29,5 @@ void ScaleObjectsCommand::update_description()
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Scale objects: pivot = { %.3f, %.3f, %.3f }\n"
         "               scale = { %.3f, %.3f, %.3f }",
-        pivot_.x, pivot_.y, pivot_.z, scale_.x, scale_.y, scale_.z
-    );
+        pivot.x, pivot.y, pivot.z, scale.x, scale.y, scale.z);
 }

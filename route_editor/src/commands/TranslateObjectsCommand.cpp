@@ -22,16 +22,13 @@ TranslateObjectsCommand::TranslateObjectsCommand(
 
 void TranslateObjectsCommand::execute()
 {
-    for (const auto& object : objects_)
-    {
+    for (const auto& object : objects)
         object->move(translation_);
-    }
 }
 
 void TranslateObjectsCommand::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
         "Translate objects: { %.3f, %.3f, %.3f }",
-        translation_.x, translation_.y, translation_.z
-    );
+        translation_.x, translation_.y, translation_.z);
 }

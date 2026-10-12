@@ -17,19 +17,17 @@ RotateObjectsCommand::RotateObjectsCommand(
     double radians
 )
     : TransformObjectsCommand(context, objects)
-    , pivot_(pivot)
-    , axis_(axis)
-    , radians_(radians)
+    , pivot(pivot)
+    , axis(axis)
+    , radians(radians)
 {
     update_description();
 }
 
 void RotateObjectsCommand::execute()
 {
-    for (const auto& object : objects_)
-    {
-        object->rotate_around_pivot(pivot_, axis_, radians_, object->matrix);
-    }
+    for (const auto& object : objects)
+        object->rotate_around_pivot(pivot, axis, radians, object->matrix);
 }
 
 void RotateObjectsCommand::update_description()
@@ -38,6 +36,5 @@ void RotateObjectsCommand::update_description()
         "Rotate objects: pivot = { %.3f, %.3f, %.3f }\n"
         "                 axis = { %.3f, %.3f, %.3f }\n"
         "              radians = %.3f",
-        pivot_.x, pivot_.y, pivot_.z, axis_.x, axis_.y, axis_.z, radians_
-    );
+        pivot.x, pivot.y, pivot.z, axis.x, axis.y, axis.z, radians);
 }

@@ -16,13 +16,12 @@ public:
     virtual ~RotateObjectsCommand() override = default;
 
     virtual void execute() override;
-
     virtual void update_description() override;
 
 private:
-    vsg::dvec3 pivot_;
-    vsg::dvec3 axis_;
-    double radians_;
+    vsg::dvec3 pivot;
+    vsg::dvec3 axis;
+    double radians;
 };
 
 #endif // EDITOR_COMMANDS_ROTATE_OBJECTS_COMMAND_H

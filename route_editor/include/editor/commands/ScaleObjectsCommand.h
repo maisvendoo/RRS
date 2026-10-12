@@ -16,12 +16,11 @@ public:
     virtual ~ScaleObjectsCommand() override = default;
 
     virtual void execute() override;
-
     virtual void update_description() override;
 
 private:
-    vsg::dvec3 pivot_;
-    vsg::dvec3 scale_;
+    vsg::dvec3 pivot;
+    vsg::dvec3 scale;
 };
 
 #endif // EDITOR_COMMANDS_SCALE_OBJECTS_COMMAND_H

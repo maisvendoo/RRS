@@ -11,21 +11,20 @@ TransformObjectsCommand::TransformObjectsCommand(
     const RouteObjects& objects
 )
     : Command(context)
-    , objects_(objects)
+    , objects(objects)
 {
-    initial_matrices_.reserve(objects.size());
+    initial_matrices.reserve(objects.size());
+
     for (const auto& object : objects)
-    {
-        initial_matrices_.emplace_back(object->get_initial_matrix());
-    }
+        initial_matrices.emplace_back(object->get_initial_matrix());
 }
 
 void TransformObjectsCommand::undo()
 {
     std::size_t index = 0;
-    for (const auto& object : objects_)
+    for (const auto& object : objects)
     {
-        object->set_matrix(initial_matrices_[index]);
+        object->set_matrix(initial_matrices[index]);
         ++index;
     }
 }

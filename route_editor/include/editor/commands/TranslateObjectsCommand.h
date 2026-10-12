@@ -16,7 +16,6 @@ public:
     virtual ~TranslateObjectsCommand() override = default;
 
     virtual void execute() override;
-
     virtual void update_description() override;
 
 private:

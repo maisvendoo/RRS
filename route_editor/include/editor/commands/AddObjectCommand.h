@@ -24,8 +24,8 @@ public:
     virtual void update_description() override;
 
 private:
-    const vsg::ref_ptr<RouteObject> object_to_add_;
-    const RouteObjects objects_to_deselect_;
+    const vsg::ref_ptr<RouteObject> object_to_add;
+    const RouteObjects objects_to_deselect;
 };
 
 #endif // EDITOR_COMMANDS_ADD_OBJECT_COMMAND_H

@@ -14,14 +14,14 @@
 
 DeleteObjectsCommand::DeleteObjectsCommand(EditorContext& editor_context)
     : Command(editor_context)
-    , objects_(editor_context.selected_objects)
+    , objects(editor_context.selected_objects)
 {
     update_description();
 }
 
 void DeleteObjectsCommand::execute()
 {
-    for (const auto& object : objects_)
+    for (const auto& object : objects)
     {
         object->deselect();
 
@@ -50,7 +50,7 @@ void DeleteObjectsCommand::undo()
     auto compile_infos = editor_context.compile_infos.lock();
     auto static_objects = editor_context.static_objects.lock();
 
-    for (const auto& object : objects_)
+    for (const auto& object : objects)
     {
         compile_infos->emplace_back(CompileInfo{
             editor_context.route, object, vsg::MASK_ALL});
@@ -66,7 +66,5 @@ void DeleteObjectsCommand::undo()
 void DeleteObjectsCommand::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
-        "Delete objects: to delete: %zu objects",
-        objects_.size()
-    );
+        "Delete objects: to delete: %zu objects", objects.size());
 }

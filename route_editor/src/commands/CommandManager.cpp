@@ -19,9 +19,7 @@ void CommandManager::push(std::unique_ptr<Command>&& command)
     undone_commands.clear();
 
     while (commands.size() >= MAX_COMMAND_COUNT)
-    {
         commands.pop_front();
-    }
 
     commands.push_back(std::move(command));
 }
@@ -29,9 +27,7 @@ void CommandManager::push(std::unique_ptr<Command>&& command)
 void CommandManager::undo()
 {
     if (commands.empty())
-    {
         return;
-    }
 
     auto command = std::move(commands.back());
     commands.pop_back();
@@ -42,9 +38,7 @@ void CommandManager::undo()
 void CommandManager::redo()
 {
     if (undone_commands.empty())
-    {
         return;
-    }
 
     auto command = std::move(undone_commands.front());
     undone_commands.pop_front();
