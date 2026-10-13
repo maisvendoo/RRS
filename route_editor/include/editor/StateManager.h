@@ -41,22 +41,22 @@ public:
     void defer_switch_to(StateEnum state);
     void update(double delta_time);
 
-    const std::unique_ptr<State>& get_curr_state() const;
+    State *get_curr_state() const;
 
-    RouteNotLoadedState* get_route_not_loaded_state() const;
-    BasicEditorState* get_basic_editor_state() const;
-    NavigationState* get_navigation_state() const;
-    KeyboardTranslateState* get_keyboard_translate_state() const;
-    KeyboardRotateState* get_keyboard_rotate_state() const;
-    KeyboardScaleState* get_keyboard_scale_state() const;
-    GizmoTranslateState* get_gizmo_translate_state() const;
-    GizmoRotateState* get_gizmo_rotate_state() const;
-    GizmoScaleState* get_gizmo_scale_state() const;
+    RouteNotLoadedState *get_route_not_loaded_state() const;
+    BasicEditorState *get_basic_editor_state() const;
+    NavigationState *get_navigation_state() const;
+    KeyboardTranslateState *get_keyboard_translate_state() const;
+    KeyboardRotateState *get_keyboard_rotate_state() const;
+    KeyboardScaleState *get_keyboard_scale_state() const;
+    GizmoTranslateState *get_gizmo_translate_state() const;
+    GizmoRotateState *get_gizmo_rotate_state() const;
+    GizmoScaleState *get_gizmo_scale_state() const;
 
 private:
     std::array<std::unique_ptr<State>, TOTAL_STATE_COUNT> states;
-    std::unique_ptr<State>* current_state;
-    std::unique_ptr<State>* deferred_state;
+    State *current_state;
+    State *deferred_state;
 };
 
 #endif // EDITOR_STATE_MANAGER_H
