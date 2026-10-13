@@ -86,8 +86,8 @@ vsg::dvec3 TransformState::calculate_world_intersection() const
 
     vsg::dvec3 world_intersection;
     calc_intersection_mouse_plane(mouse->get_x(), mouse->get_y(),
-        window->extent2D(), camera->get_inverse_view_matrix(),
-        camera->get_inverse_projection_matrix(), gizmo->get_curr_pos(),
+        window->extent2D(), camera->get_inv_view_mat(),
+        camera->get_inv_proj_mat(), gizmo->get_curr_pos(),
         camera->get_front(), world_intersection);
 
     return world_intersection;

@@ -53,7 +53,7 @@ void BasicEditorState::handle_key_press()
     }
     else if (keyboard->pressed_once(ACTION_SWAP_PROJECTION_MATRIX))
     {
-        camera->swap_projection_matrix();
+        camera->swap_proj_mat();
     }
     else if (keyboard->pressed_once(ACTION_COPY_OBJECTS))
     {

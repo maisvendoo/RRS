@@ -17,17 +17,17 @@ NavigationState::~NavigationState() = default;
 
 void NavigationState::on_activate()
 {
-    editor_context.camera->update_move_direction();
+    editor_context.camera->update_move_dir();
 }
 
 void NavigationState::handle_key_press()
 {
-    editor_context.camera->update_move_direction();
+    editor_context.camera->update_move_dir();
 }
 
 void NavigationState::handle_key_release()
 {
-    editor_context.camera->update_move_direction();
+    editor_context.camera->update_move_dir();
 }
 
 void NavigationState::handle_button_release()

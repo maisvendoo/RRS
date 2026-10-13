@@ -26,9 +26,9 @@ public:
 
     virtual ~Camera() = default;
 
-    void swap_projection_matrix();
+    void swap_proj_mat();
 
-    void update_move_direction();
+    void update_move_dir();
 
     void handle_mouse_move();
 
@@ -48,24 +48,24 @@ public:
 
     const vsg::ref_ptr<vsg::LookAt>& get_look_at() const;
 
-    const vsg::dmat4& get_inverse_projection_matrix() const;
+    const vsg::dmat4& get_inv_proj_mat() const;
 
-    const vsg::dmat4& get_inverse_view_matrix() const;
+    const vsg::dmat4& get_inv_view_mat() const;
 
     void look_on(const vsg::dvec3& pos, double distance = 50.0);
 
 private:
     void create_orthographic_projection(double aspect_ratio);
 
-    void calculate_front();
+    void calc_front();
 
-    void calculate_right();
+    void calc_right();
 
-    void calculate_up();
+    void calc_up();
 
-    void calculate_inverse_projection_matrix();
+    void calc_inv_proj_mat();
 
-    void calculate_inverse_view_matrix();
+    void calc_inv_view_mat();
 
 private:
     EditorContext& editor_context;
@@ -75,17 +75,17 @@ private:
     vsg::ref_ptr<vsg::Orthographic> orthographic;
     vsg::ref_ptr<vsg::LookAt> look_at;
 
-    vsg::dmat4 inverse_projection_matrix;
-    vsg::dmat4 inverse_view_matrix;
+    vsg::dmat4 inv_proj_mat;
+    vsg::dmat4 inv_view_mat;
 
-    double yaw_degrees = 0.0;
-    double pitch_degrees = 0.0;
+    double yaw_deg = 0.0;
+    double pitch_deg = 0.0;
 
     vsg::dvec3 front;
     vsg::dvec3 right;
     vsg::dvec3 up;
 
-    vsg::dvec3 move_direction = {0.0, 0.0, 0.0};
+    vsg::dvec3 move_dir = {0.0, 0.0, 0.0};
 };
 
 #endif // EDITOR_CAMERA_H

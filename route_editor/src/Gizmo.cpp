@@ -46,6 +46,8 @@ static void rotate_geometry_info(
 Gizmo::Gizmo(EditorContext& context)
     : editor_context(context)
 {
+    const auto& gizmo_settings = editor_context.gizmo_settings;
+
     builder_.shaderSet = vsg::createFlatShadedShaderSet();
 
     const float plane_width = 1.0e6f;
@@ -58,9 +60,9 @@ Gizmo::Gizmo(EditorContext& context)
     const auto create_arrow = [&](vsg::vec3 direction,
         vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
     {
-        float thickness = editor_context.gizmo_settings.arrow_thickness;
-        const float length = editor_context.gizmo_settings.arrow_length;
-        const float opacity = editor_context.gizmo_settings.opacity;
+        float thickness = gizmo_settings.arrow_thickness;
+        const float length = gizmo_settings.arrow_length;
+        const float opacity = gizmo_settings.opacity;
 
         vsg::box box = {
             vsg::vec3(-thickness, -thickness, 0.0f),
@@ -109,7 +111,7 @@ Gizmo::Gizmo(EditorContext& context)
     {
         const float width = plane_width;
         const float thickness = line_thickness;
-        const float opacity = editor_context.gizmo_settings.opacity;
+        const float opacity = gizmo_settings.opacity;
 
         const vsg::box box = {
             vsg::vec3(-thickness, -thickness, -width),
@@ -132,9 +134,9 @@ Gizmo::Gizmo(EditorContext& context)
     };
 
     const vsg::vec3 arrow_colors[3] = {
-        editor_context.gizmo_settings.arrow_x_color,
-        editor_context.gizmo_settings.arrow_y_color,
-        editor_context.gizmo_settings.arrow_z_color
+        gizmo_settings.arrow_x_color,
+        gizmo_settings.arrow_y_color,
+        gizmo_settings.arrow_z_color
     };
 
     for (int i = 0; i < 3; ++i)
@@ -156,6 +158,8 @@ Gizmo::Gizmo(EditorContext& context)
 
 bool Gizmo::handle_intersections()
 {
+    const auto& camera = editor_context.camera;
+    const auto& gizmo_settings = editor_context.gizmo_settings;
     const auto& mouse = editor_context.mouse;
     const auto& window_extent = editor_context.window->extent2D();
 
@@ -164,8 +168,6 @@ bool Gizmo::handle_intersections()
         vsg::dvec3(0.0, 1.0, 0.0),
         vsg::dvec3(0.0, 0.0, 1.0)
     };
-
-    const auto& camera = editor_context.camera;
 
     double arrow_dots[3];
     for (int i = 0; i < 3; ++i)
@@ -179,8 +181,8 @@ bool Gizmo::handle_intersections()
     norm_mouse_coords(mouse->get_x(), mouse->get_y(), window_extent,
         norm_mouse_x, norm_mouse_y);
 
-    const vsg::dmat4& inv_view_mat = camera->get_inverse_view_matrix();
-    const vsg::dmat4& inv_proj_mat = camera->get_inverse_projection_matrix();
+    const vsg::dmat4& inv_view_mat = camera->get_inv_view_mat();
+    const vsg::dmat4& inv_proj_mat = camera->get_inv_proj_mat();
 
     vsg::dvec3 ray_origin, ray_end;
     calc_mouse_world_coords(norm_mouse_x, norm_mouse_y, 0.0,
@@ -190,10 +192,10 @@ bool Gizmo::handle_intersections()
 
     const vsg::dvec3 ray_dir = ray_end - ray_origin;
 
-    const double R_cyl = editor_context.gizmo_settings.arrow_thickness * scale_;
-    const double R_cone = editor_context.gizmo_settings.arrow_thickness * 3.0 * scale_;
-    const double H_cyl = editor_context.gizmo_settings.arrow_length * scale_;
-    const double H_cone = editor_context.gizmo_settings.arrow_thickness * 15.0 * scale_;
+    const double R_cyl = gizmo_settings.arrow_thickness * scale_;
+    const double R_cone = gizmo_settings.arrow_thickness * 3.0 * scale_;
+    const double H_cyl = gizmo_settings.arrow_length * scale_;
+    const double H_cone = gizmo_settings.arrow_thickness * 15.0 * scale_;
 
     constexpr double EPSILON = 1e-9;
     double closest_t = std::numeric_limits<double>::max();
@@ -485,7 +487,7 @@ void Gizmo::update_visibility()
     matrix_transform_->matrix = vsg::translate(curr_pos_) * vsg::scale(scale_);
 }
 
-static vsg::dvec3 calculate_position_pivot(
+static vsg::dvec3 calc_position_pivot(
     const RouteObjects& selected_objects
 )
 {
@@ -498,7 +500,7 @@ static vsg::dvec3 calculate_position_pivot(
     return pos;
 }
 
-static vsg::dvec3 calculate_position_center(
+static vsg::dvec3 calc_position_center(
     const RouteObjects& selected_objects
 )
 {
@@ -514,9 +516,12 @@ static vsg::dvec3 calculate_position_center(
 
 void Gizmo::update_position()
 {
-    curr_pos_ = editor_context.gizmo_settings.to_center
-        ? calculate_position_center(editor_context.selected_objects)
-        : calculate_position_pivot(editor_context.selected_objects);
+    const auto& gizmo_settings = editor_context.gizmo_settings;
+    const auto& selected_objects = editor_context.selected_objects;
+
+    curr_pos_ = gizmo_settings.to_center
+        ? calc_position_center(selected_objects)
+        : calc_position_pivot(selected_objects);
 
     matrix_transform_->matrix = vsg::translate(curr_pos_) * vsg::scale(scale_);
 }
