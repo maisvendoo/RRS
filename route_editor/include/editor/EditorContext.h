@@ -28,7 +28,7 @@ class CommandManager;
 class Gizmo;
 class Keyboard;
 class Mouse;
-class ObjectManager;
+class StaticObjectManager;
 class ObjectSelector;
 class OutlineBuilder;
 class Route;
@@ -88,7 +88,7 @@ struct EditorContext
     vsg::ref_ptr<vsg::Switch> scene_graph;
     vsg::ref_ptr<Route> route;
     vsg::ref_ptr<Gizmo> gizmo;
-    std::unique_ptr<ObjectManager> object_manager;
+    std::unique_ptr<StaticObjectManager> object_manager;
     vsg::ref_ptr<WorldCulling> world_culling;
 
     EditorState editor_state = EditorState::SELECT_ROUTE;

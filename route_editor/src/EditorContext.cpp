@@ -4,7 +4,7 @@
 #include "editor/Gizmo.h"
 #include "editor/Keyboard.h"
 #include "editor/Mouse.h"
-#include "editor/ObjectManager.h"
+#include "editor/StaticObjectManager.h"
 #include "editor/ObjectSelector.h"
 #include "editor/Outline.h"
 #include "editor/Route.h"

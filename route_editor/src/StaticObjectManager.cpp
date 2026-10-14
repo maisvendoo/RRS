@@ -1,10 +1,10 @@
-#include "editor/ObjectManager.h"
+#include "editor/StaticObjectManager.h"
 
 #include <vsg/nodes/MatrixTransform.h>
 
 #include <cstddef>
 
-ObjectManager::ObjectManager(std::size_t max_object_count)
+StaticObjectManager::StaticObjectManager(std::size_t max_object_count)
 {
     labels.reserve(max_object_count);
     relative_paths.reserve(max_object_count);

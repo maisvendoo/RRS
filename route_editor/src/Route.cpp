@@ -2,7 +2,7 @@
 
 #include "editor/EditorContext.h"
 #include "editor/Mask.h"
-#include "editor/ObjectManager.h"
+#include "editor/StaticObjectManager.h"
 #include "editor/PagedLodMap.h"
 #include "editor/RouteMap.h"
 #include "editor/RouteObject.h"

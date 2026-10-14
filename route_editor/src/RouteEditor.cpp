@@ -9,7 +9,7 @@
 #include "editor/Keyboard.h"
 #include "editor/Mask.h"
 #include "editor/Mouse.h"
-#include "editor/ObjectManager.h"
+#include "editor/StaticObjectManager.h"
 #include "editor/ObjectSelector.h"
 #include "editor/Outline.h"
 #include "editor/Route.h"
@@ -79,7 +79,7 @@ bool RouteEditor::initialize()
     editor_context.keyboard = Keyboard::create(editor_context.key_bindings);
     editor_context.command_manager = std::make_unique<CommandManager>();
     editor_context.camera = Camera::create(editor_context);
-    editor_context.object_manager = std::make_unique<ObjectManager>(1000000);
+    editor_context.object_manager = std::make_unique<StaticObjectManager>(1000000);
     editor_context.route = Route::create(editor_context);
     editor_context.outline_builder = OutlineBuilder::create();
 

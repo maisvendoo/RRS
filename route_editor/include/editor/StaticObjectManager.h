@@ -15,7 +15,7 @@ class MatrixTransform;
 
 }
 
-class ObjectManager
+class StaticObjectManager
 {
 public:
     std::vector<std::string> labels;
@@ -25,7 +25,7 @@ public:
     std::vector<bool> is_selected;
 
 public:
-    ObjectManager(std::size_t max_object_count);
+    StaticObjectManager(std::size_t max_object_count);
 };
 
 #endif // EDITOR_OBJECT_MANAGER_H
