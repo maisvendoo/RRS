@@ -644,7 +644,9 @@ void EditorGui::show_topology() const
 
 void EditorGui::show_selected_objects_properties() const
 {
-    if (!editor_context.gui_settings.show_selected_objects_properties)
+    auto& gui_settings = editor_context.gui_settings;
+
+    if (!gui_settings.show_selected_objects_properties)
     {
         return;
     }
@@ -661,8 +663,7 @@ void EditorGui::show_selected_objects_properties() const
     }
 
     ImGui::Begin("Selected objects",
-                 &editor_context.gui_settings.show_selected_objects_properties,
-                 window_flags_);
+                 &gui_settings.show_selected_objects_properties, window_flags_);
 
     static bool dragging = false;
 
@@ -683,15 +684,15 @@ void EditorGui::show_selected_objects_properties() const
 
 void EditorGui::show_commands() const
 {
-    if (!editor_context.gui_settings.show_commands)
+    const auto& command_manager = editor_context.command_manager;
+    auto& gui_settings = editor_context.gui_settings;
+
+    if (!gui_settings.show_commands)
     {
         return;
     }
 
-    ImGui::Begin("Commands", &editor_context.gui_settings.show_commands,
-                 window_flags_);
-
-    const auto& command_manager = editor_context.command_manager;
+    ImGui::Begin("Commands", &gui_settings.show_commands, window_flags_);
 
     command_manager->for_each_command(
         [](const std::unique_ptr<::Command>& command) -> void

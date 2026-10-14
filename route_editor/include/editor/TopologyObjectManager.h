@@ -1,0 +1,9 @@
+#ifndef EDITOR_TOPOLOGY_OBJECT_MANAGER_H
+#define EDITOR_TOPOLOGY_OBJECT_MANAGER_H
+
+class TopologyObjectManager
+{
+
+};
+
+#endif // EDITOR_TOPOLOGY_OBJECT_MANAGER_H

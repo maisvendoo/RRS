@@ -323,15 +323,15 @@ void Route::load_static_objects()
                   * vsg::rotate(vsg::radians(transform.rotation_deg.y), Y_AXIS)
                   * vsg::rotate(vsg::radians(transform.rotation_deg.x), X_AXIS);
 
-            auto& object_manager = editor_context.object_manager;
+            // auto& object_manager = editor_context.object_manager;
 
-            object_manager->labels.push_back(label);
-            object_manager->relative_paths.push_back(
-                ref_it->second.relative_path);
-            object_manager->matrix_transforms.push_back(matrix_transform);
-            object_manager->initial_matrixes.push_back(
-                matrix_transform->matrix);
-            object_manager->is_selected.push_back(false);
+            // object_manager->labels.push_back(label);
+            // object_manager->rel_paths.push_back(
+            //     ref_it->second.relative_path);
+            // object_manager->mat_transforms.push_back(matrix_transform);
+            // object_manager->init_mats.push_back(
+            //     matrix_transform->matrix);
+            // object_manager->is_selected.push_back(false);
         }
     }
 }

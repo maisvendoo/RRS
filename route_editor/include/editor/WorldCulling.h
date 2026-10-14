@@ -1,12 +1,13 @@
 #ifndef WORLD_CULLING_H
 #define WORLD_CULLING_H
 
-#include <map>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/sphere.h>
 #include <vsg/maths/vec3.h>
+
+#include <map>
 
 namespace vsg
 {
