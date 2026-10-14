@@ -11,7 +11,7 @@ class ScaleObjectsCommand : public TransformObjectsCommand
 {
 public:
     ScaleObjectsCommand(EditorContext& context, const RouteObjects& objects,
-        const vsg::dvec3& pivot, const vsg::dvec3& scale);
+                        const vsg::dvec3& pivot, const vsg::dvec3& scale);
 
     virtual ~ScaleObjectsCommand() override = default;
 

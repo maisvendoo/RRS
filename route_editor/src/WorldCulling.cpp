@@ -1,8 +1,8 @@
 #include "editor/WorldCulling.h"
 
-#include <vsg/nodes/Node.h>
-#include <vsg/nodes/Group.h>
 #include <vsg/nodes/CullGroup.h>
+#include <vsg/nodes/Group.h>
+#include <vsg/nodes/Node.h>
 
 //------------------------------------------------------------------------------
 //
@@ -14,8 +14,10 @@ WorldCulling::WorldCulling(double in_tile_size_0, double in_tile_size_1)
     // Размер крупномасштабных тайлов обязательно больше нуля
     tile_size_0 = (in_tile_size_0 > 0.0) ? in_tile_size_0 : 4000.0;
 
-    // Размер мелкомасштабных тайлов обязательно больше крупномасштабных в целое число раз
-    tile_size_1 = tile_size_0 * std::max(2.0, std::ceil(in_tile_size_1 / tile_size_0));
+    // Размер мелкомасштабных тайлов обязательно больше крупномасштабных в целое
+    // число раз
+    tile_size_1
+        = tile_size_0 * std::max(2.0, std::ceil(in_tile_size_1 / tile_size_0));
 }
 
 //------------------------------------------------------------------------------
@@ -37,7 +39,8 @@ void WorldCulling::add(const vsg::dvec3 point, vsg::ref_ptr<vsg::Node> node)
         world_root->addChild(tile);
 
         // Добавляем созданный тайл в хранилище
-        itr_1 = tiles.emplace(index_1, std::make_pair(tile, tile_map_0_t{})).first;
+        itr_1 = tiles.emplace(index_1, std::make_pair(tile, tile_map_0_t{}))
+                    .first;
     }
 
     // Хранилище крупномасштабных тайлов в найденном мелкомасштабном
@@ -67,26 +70,24 @@ void WorldCulling::add(const vsg::dvec3 point, vsg::ref_ptr<vsg::Node> node)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-WorldCulling::tile_index_t WorldCulling::get_index(const double tile_size, const vsg::dvec3 point) const
+WorldCulling::tile_index_t WorldCulling::get_index(const double tile_size,
+                                                   const vsg::dvec3 point) const
 {
-    return {
-        static_cast<int>(std::round(point.x / tile_size)),
-        static_cast<int>(std::round(point.y / tile_size)),
-        static_cast<int>(std::round(point.z / tile_size))
-    };
+    return {static_cast<int>(std::round(point.x / tile_size)),
+            static_cast<int>(std::round(point.y / tile_size)),
+            static_cast<int>(std::round(point.z / tile_size))};
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-vsg::dsphere WorldCulling::get_bound(const double tile_size, const tile_index_t index) const
+vsg::dsphere WorldCulling::get_bound(const double tile_size,
+                                     const tile_index_t index) const
 {
     int x, y, z;
     std::tie(x, y, z) = index;
     return {
-        x * tile_size,
-        y * tile_size,
-        z * tile_size,
+        x * tile_size, y * tile_size, z * tile_size,
         0.875 * tile_size // 0,875 - чуть больше половины диагонали куба
     };
 }

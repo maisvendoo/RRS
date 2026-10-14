@@ -8,20 +8,24 @@
 #include <algorithm>
 #include <cmath>
 
-void norm_mouse_coords(int x, int y, VkExtent2D extent, double &norm_x, double &norm_y)
+void norm_mouse_coords(int x, int y, VkExtent2D extent, double& norm_x,
+                       double& norm_y)
 {
     norm_x = static_cast<double>(x) / extent.width * 2.0 - 1.0;
     norm_y = static_cast<double>(y) / extent.height * 2.0 - 1.0;
 }
 
 bool calc_mouse_world_coords(double norm_x, double norm_y, double z,
-    const vsg::dmat4 &inv_view, const vsg::dmat4 &inv_proj, vsg::dvec3 &out)
+                             const vsg::dmat4& inv_view,
+                             const vsg::dmat4& inv_proj, vsg::dvec3& out)
 {
     vsg::dvec4 clip(norm_x, norm_y, z, 1.0);
 
     vsg::dvec4 world = inv_view * inv_proj * clip;
     if (std::abs(world.w) < 1.0e-6)
+    {
         return false;
+    }
 
     out = vsg::dvec3(world.x, world.y, world.z) / world.w;
 
@@ -29,23 +33,31 @@ bool calc_mouse_world_coords(double norm_x, double norm_y, double z,
 }
 
 bool calc_mouse_world_coords(int x, int y, double z, VkExtent2D extent,
-    const vsg::dmat4 &inv_view, const vsg::dmat4 &inv_proj, vsg::dvec3 &out)
+                             const vsg::dmat4& inv_view,
+                             const vsg::dmat4& inv_proj, vsg::dvec3& out)
 {
     double norm_x, norm_y;
     norm_mouse_coords(x, y, extent, norm_x, norm_y);
     return calc_mouse_world_coords(norm_x, norm_y, z, inv_view, inv_proj, out);
 }
 
-bool calc_mouse_ray(double norm_x, double norm_y, const vsg::dmat4 &inv_view,
-    const vsg::dmat4 &inv_proj, vsg::dvec3 &orig, vsg::dvec3 &dir)
+bool calc_mouse_ray(double norm_x, double norm_y, const vsg::dmat4& inv_view,
+                    const vsg::dmat4& inv_proj, vsg::dvec3& orig,
+                    vsg::dvec3& dir)
 {
     vsg::dvec3 mouse_world1, mouse_world2;
 
-    if (!calc_mouse_world_coords(norm_x, norm_y, 0.0, inv_view, inv_proj, mouse_world1))
+    if (!calc_mouse_world_coords(norm_x, norm_y, 0.0, inv_view, inv_proj,
+                                 mouse_world1))
+    {
         return false;
+    }
 
-    if (!calc_mouse_world_coords(norm_x, norm_y, 1.0, inv_view, inv_proj, mouse_world2))
+    if (!calc_mouse_world_coords(norm_x, norm_y, 1.0, inv_view, inv_proj,
+                                 mouse_world2))
+    {
         return false;
+    }
 
     orig = mouse_world1;
     dir = vsg::normalize(mouse_world2 - mouse_world1);
@@ -53,22 +65,27 @@ bool calc_mouse_ray(double norm_x, double norm_y, const vsg::dmat4 &inv_view,
     return true;
 }
 
-bool calc_mouse_ray(int x, int y, VkExtent2D extent, const vsg::dmat4 &inv_view,
-    const vsg::dmat4 &inv_proj, vsg::dvec3 &orig, vsg::dvec3 &dir)
+bool calc_mouse_ray(int x, int y, VkExtent2D extent, const vsg::dmat4& inv_view,
+                    const vsg::dmat4& inv_proj, vsg::dvec3& orig,
+                    vsg::dvec3& dir)
 {
     double norm_x, norm_y;
     norm_mouse_coords(x, y, extent, norm_x, norm_y);
     return calc_mouse_ray(norm_x, norm_y, inv_view, inv_proj, orig, dir);
 }
 
-bool solve_quad_eq(double a, double b, double c, double &x1, double &x2)
+bool solve_quad_eq(double a, double b, double c, double& x1, double& x2)
 {
     if (std::abs(a) < 1.0e-6)
+    {
         return false;
+    }
 
     const double D = b * b - 4 * a * c;
     if (D < 0.0)
+    {
         return false;
+    }
 
     const double sqrt_D = std::sqrt(D);
     const double inv_2a = 1.0 / (2.0 * a);
@@ -80,7 +97,8 @@ bool solve_quad_eq(double a, double b, double c, double &x1, double &x2)
 }
 
 bool calc_intersection_line_plane(vsg::dvec3 line_orig, vsg::dvec3 line_dir,
-    vsg::dvec3 plane_point, vsg::dvec3 plane_norm, vsg::dvec3 &out)
+                                  vsg::dvec3 plane_point, vsg::dvec3 plane_norm,
+                                  vsg::dvec3& out)
 {
     const vsg::dvec3 orig = line_orig;
     const vsg::dvec3 dir = line_dir;
@@ -89,7 +107,9 @@ bool calc_intersection_line_plane(vsg::dvec3 line_orig, vsg::dvec3 line_dir,
 
     const double denom = vsg::dot(norm, dir);
     if (std::abs(denom) < 1.0e-6)
+    {
         return false;
+    }
 
     const double t = (vsg::dot(norm, point) - vsg::dot(norm, orig)) / denom;
     out = orig + dir * t;
@@ -98,24 +118,32 @@ bool calc_intersection_line_plane(vsg::dvec3 line_orig, vsg::dvec3 line_dir,
 }
 
 bool calc_intersection_mouse_plane(int x, int y, VkExtent2D extent,
-    const vsg::dmat4 &inv_view, const vsg::dmat4 &inv_proj,
-    vsg::dvec3 plane_point, vsg::dvec3 plane_norm, vsg::dvec3 &out)
+                                   const vsg::dmat4& inv_view,
+                                   const vsg::dmat4& inv_proj,
+                                   vsg::dvec3 plane_point,
+                                   vsg::dvec3 plane_norm, vsg::dvec3& out)
 {
     vsg::dvec3 line_orig, line_dir;
 
     if (!calc_mouse_ray(x, y, extent, inv_view, inv_proj, line_orig, line_dir))
+    {
         return false;
+    }
 
     return calc_intersection_line_plane(line_orig, line_dir, plane_point,
-        plane_norm, out);
+                                        plane_norm, out);
 }
 
-bool calc_near_intersection_line_cylinder(int axis_index,
-    vsg::dvec3 line_orig, vsg::dvec3 line_dir, vsg::dvec3 cyl_base_center,
-    double cyl_radius, double cyl_height, vsg::dvec3 &out)
+bool calc_near_intersection_line_cylinder(int axis_index, vsg::dvec3 line_orig,
+                                          vsg::dvec3 line_dir,
+                                          vsg::dvec3 cyl_base_center,
+                                          double cyl_radius, double cyl_height,
+                                          vsg::dvec3& out)
 {
     if (axis_index < 0 || axis_index > 2)
+    {
         return false;
+    }
 
     const int axis1 = (axis_index + 1) % 3;
     const int axis2 = (axis_index + 2) % 3;
@@ -135,25 +163,29 @@ bool calc_near_intersection_line_cylinder(int axis_index,
     double t1, t2;
 
     if (!solve_quad_eq(A, B, C, t1, t2))
+    {
         return false;
+    }
 
     const vsg::dvec3 p1 = orig + dir * t1;
     const vsg::dvec3 p2 = orig + dir * t2;
 
-    if (p1[axis_index] < center[axis_index] ||
-        p1[axis_index] > center[axis_index] + H)
+    if (p1[axis_index] < center[axis_index]
+        || p1[axis_index] > center[axis_index] + H)
     {
         t1 = -1.0;
     }
 
-    if (p2[axis_index] < center[axis_index] ||
-        p2[axis_index] > center[axis_index] + H)
+    if (p2[axis_index] < center[axis_index]
+        || p2[axis_index] > center[axis_index] + H)
     {
         t2 = -1.0;
     }
 
     if (t1 < 0.0 && t2 < 0.0)
+    {
         return false;
+    }
 
     double t = std::min(t1, t2);
     t = (t < 0.0) ? std::max(t1, t2) : t;
@@ -163,26 +195,33 @@ bool calc_near_intersection_line_cylinder(int axis_index,
     return true;
 }
 
-bool calc_near_intersection_mouse_cylinder(int axis_index, int x, int y,
-    VkExtent2D extent, const vsg::dmat4 &inv_view, const vsg::dmat4 &inv_proj,
-    vsg::dvec3 cyl_base_center, double cyl_radius, double cyl_height,
-    vsg::dvec3 &out)
+bool calc_near_intersection_mouse_cylinder(
+    int axis_index, int x, int y, VkExtent2D extent, const vsg::dmat4& inv_view,
+    const vsg::dmat4& inv_proj, vsg::dvec3 cyl_base_center, double cyl_radius,
+    double cyl_height, vsg::dvec3& out)
 {
     vsg::dvec3 line_orig, line_dir;
 
     if (!calc_mouse_ray(x, y, extent, inv_view, inv_proj, line_orig, line_dir))
+    {
         return false;
+    }
 
     return calc_near_intersection_line_cylinder(axis_index, line_orig, line_dir,
-        cyl_base_center, cyl_radius, cyl_height, out);
+                                                cyl_base_center, cyl_radius,
+                                                cyl_height, out);
 }
 
-bool calc_near_intersection_line_cone(int axis_index,
-    vsg::dvec3 line_orig, vsg::dvec3 line_dir, vsg::dvec3 cone_base_center,
-    double cone_radius, double cone_height, vsg::dvec3 &out)
+bool calc_near_intersection_line_cone(int axis_index, vsg::dvec3 line_orig,
+                                      vsg::dvec3 line_dir,
+                                      vsg::dvec3 cone_base_center,
+                                      double cone_radius, double cone_height,
+                                      vsg::dvec3& out)
 {
     if (axis_index < 0 || axis_index > 2)
+    {
         return false;
+    }
 
     const int axis1 = (axis_index + 1) % 3;
     const int axis2 = (axis_index + 2) % 3;
@@ -197,34 +236,38 @@ bool calc_near_intersection_line_cone(int axis_index,
     const double V1 = orig[axis1] - center[axis1];
     const double V2 = orig[axis2] - center[axis2];
 
-    const double A = dir[axis1] * dir[axis1] + dir[axis2] * dir[axis2] -
-        U * dir[axis_index] * dir[axis_index];
-    const double B = 2.0 * (dir[axis1] * V1 + dir[axis2] * V2 +
-        U * dir[axis_index] * V0);
+    const double A = dir[axis1] * dir[axis1] + dir[axis2] * dir[axis2]
+                     - U * dir[axis_index] * dir[axis_index];
+    const double B
+        = 2.0 * (dir[axis1] * V1 + dir[axis2] * V2 + U * dir[axis_index] * V0);
     const double C = V1 * V1 + V2 * V2 - U * V0 * V0;
 
     double t1, t2;
 
     if (!solve_quad_eq(A, B, C, t1, t2))
+    {
         return false;
+    }
 
     const vsg::dvec3 p1 = orig + dir * t1;
     const vsg::dvec3 p2 = orig + dir * t2;
 
-    if (p1[axis_index] < center[axis_index] ||
-        p1[axis_index] > center[axis_index] + H)
+    if (p1[axis_index] < center[axis_index]
+        || p1[axis_index] > center[axis_index] + H)
     {
         t1 = -1.0;
     }
 
-    if (p2[axis_index] < center[axis_index] ||
-        p2[axis_index] > center[axis_index] + H)
+    if (p2[axis_index] < center[axis_index]
+        || p2[axis_index] > center[axis_index] + H)
     {
         t2 = -1.0;
     }
 
     if (t1 < 0.0 && t2 < 0.0)
+    {
         return false;
+    }
 
     double t = std::min(t1, t2);
     t = (t < 0.0) ? std::max(t1, t2) : t;
@@ -234,16 +277,19 @@ bool calc_near_intersection_line_cone(int axis_index,
     return true;
 }
 
-bool calc_near_intersection_mouse_cone(int axis_index, int x, int y,
-    VkExtent2D extent, const vsg::dmat4 &inv_view, const vsg::dmat4 &inv_proj,
-    vsg::dvec3 cone_base_center, double cone_radius, double cone_height,
-    vsg::dvec3 &out)
+bool calc_near_intersection_mouse_cone(
+    int axis_index, int x, int y, VkExtent2D extent, const vsg::dmat4& inv_view,
+    const vsg::dmat4& inv_proj, vsg::dvec3 cone_base_center, double cone_radius,
+    double cone_height, vsg::dvec3& out)
 {
     vsg::dvec3 line_orig, line_dir;
 
     if (!calc_mouse_ray(x, y, extent, inv_view, inv_proj, line_orig, line_dir))
+    {
         return false;
+    }
 
     return calc_near_intersection_line_cone(axis_index, line_orig, line_dir,
-        cone_base_center, cone_radius, cone_height, out);
+                                            cone_base_center, cone_radius,
+                                            cone_height, out);
 }

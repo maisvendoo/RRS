@@ -18,7 +18,7 @@ class MatrixTransform;
 class MoveEvent;
 class Node;
 
-}
+} // namespace vsg
 
 class Gizmo : public vsg::Inherit<SingleSwitch, Gizmo>
 {

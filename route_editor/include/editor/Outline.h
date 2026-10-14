@@ -14,15 +14,15 @@ class Node;
 class Options;
 class PagedLOD;
 
-}
+} // namespace vsg
 
 class OutlineBuilder : public vsg::Inherit<vsg::Object, OutlineBuilder>
 {
 public:
     OutlineBuilder();
 
-    vsg::ref_ptr<vsg::Node> create_outline(
-        const vsg::ref_ptr<vsg::PagedLOD>& paged_lod);
+    vsg::ref_ptr<vsg::Node>
+    create_outline(const vsg::ref_ptr<vsg::PagedLOD>& paged_lod);
 
 private:
     vsg::ref_ptr<vsg::Options> vsg_options;

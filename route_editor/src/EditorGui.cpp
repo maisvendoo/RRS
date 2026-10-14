@@ -24,8 +24,8 @@
 #include <filesystem.h>
 #include <rail-signal.h>
 #include <switch.h>
-#include <topology.h>
 #include <topology-defines.h>
+#include <topology.h>
 #include <track.h>
 #include <trajectory.h>
 #include <vec3.h>
@@ -69,11 +69,12 @@
 #define DECOMPOSE_VEC3(vec) vec.x, vec.y, vec.z
 
 static bool drag_double3(const char* label, double* data, float speed = 1.0f,
-    const double* min = nullptr, const double* max = nullptr,
-    ImGuiSliderFlags flags = 0)
+                         const double* min = nullptr,
+                         const double* max = nullptr,
+                         ImGuiSliderFlags flags = 0)
 {
-    return ImGui::DragScalarN(label, ImGuiDataType_Double, data, 3,
-        speed, min, max, "%.3f", flags);
+    return ImGui::DragScalarN(label, ImGuiDataType_Double, data, 3, speed, min,
+                              max, "%.3f", flags);
 }
 
 EditorGui::EditorGui(EditorContext& context)
@@ -85,14 +86,16 @@ EditorGui::EditorGui(EditorContext& context)
 
     const auto& gui_settings = context.gui_settings;
 
-    add_ttf_font("JetBrainsMono-Regular.ttf", gui_settings.font_size,
-        nullptr, io.Fonts->GetGlyphRangesCyrillic());
+    add_ttf_font("JetBrainsMono-Regular.ttf", gui_settings.font_size, nullptr,
+                 io.Fonts->GetGlyphRangesCyrillic());
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     if (!gui_settings.is_editable)
+    {
         window_flags_ |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    }
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.FrameBorderSize = 1.0f;
@@ -103,8 +106,8 @@ EditorGui::EditorGui(EditorContext& context)
 
     viewport = ImGui::GetMainViewport();
 
-    camera_settings_window = std::make_unique<CameraSettingsWindow>(
-        editor_context, window_flags_);
+    camera_settings_window
+        = std::make_unique<CameraSettingsWindow>(editor_context, window_flags_);
 }
 
 EditorGui::~EditorGui()
@@ -112,7 +115,8 @@ EditorGui::~EditorGui()
     // ImGui::DestroyContext();
 }
 
-void EditorGui::record([[maybe_unused]] vsg::CommandBuffer& command_buffer) const
+void EditorGui::record(
+    [[maybe_unused]] vsg::CommandBuffer& command_buffer) const
 {
     // ImGui::DockSpaceOverViewport(0, viewport);
 
@@ -137,9 +141,11 @@ void EditorGui::record([[maybe_unused]] vsg::CommandBuffer& command_buffer) cons
         ImGui::Checkbox("Show stations", &gui_settings.show_stations_conf);
         ImGui::Checkbox("Show waypoints", &gui_settings.show_waypoints_conf);
         ImGui::Checkbox("Show key bindings", &gui_settings.show_key_bindings);
-        ImGui::Checkbox("Show camera settings", &gui_settings.show_camera_settings);
+        ImGui::Checkbox("Show camera settings",
+                        &gui_settings.show_camera_settings);
         ImGui::Checkbox("Show topology", &gui_settings.show_topology);
-        ImGui::Checkbox("Show selected objects properties", &gui_settings.show_selected_objects_properties);
+        ImGui::Checkbox("Show selected objects properties",
+                        &gui_settings.show_selected_objects_properties);
         ImGui::Checkbox("Show commands", &gui_settings.show_commands);
         ImGui::End();
 
@@ -165,7 +171,9 @@ void EditorGui::show_objects_ref() const
     const auto& objects_ref = editor_context.objects_ref;
 
     if (!gui_settings.show_objects_ref)
+    {
         return;
+    }
 
     ImGui::Begin("objects_ref", &gui_settings.show_objects_ref, window_flags_);
 
@@ -174,20 +182,21 @@ void EditorGui::show_objects_ref() const
 
     std::string search_lower = search_buffer;
     std::transform(search_lower.begin(), search_lower.end(),
-        search_lower.begin(), ::tolower);
+                   search_lower.begin(), ::tolower);
 
     if (ImGui::BeginTable("objects_ref_table", 2,
-        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
-        ImGuiTableFlags_RowBg))
+                          ImGuiTableFlags_SizingFixedFit
+                              | ImGuiTableFlags_Borders
+                              | ImGuiTableFlags_RowBg))
     {
         for (const auto& [label, ref] : objects_ref)
         {
             std::string label_lower = label;
             std::transform(label_lower.begin(), label_lower.end(),
-                label_lower.begin(), ::tolower);
+                           label_lower.begin(), ::tolower);
 
-            if (search_buffer[0] != '\0' &&
-                label_lower.find(search_lower) == std::string::npos)
+            if (search_buffer[0] != '\0'
+                && label_lower.find(search_lower) == std::string::npos)
             {
                 continue;
             }
@@ -196,7 +205,9 @@ void EditorGui::show_objects_ref() const
             ImGui::TableNextColumn();
 
             if (ImGui::Button(label.c_str()))
+            {
                 add_object(ref.paged_lod, label);
+            }
 
             ImGui::TableNextColumn();
             ImGui::Text("%s", ref.relative_path.c_str());
@@ -214,13 +225,16 @@ void EditorGui::show_route_map() const
     const auto& route_map = editor_context.route_map;
 
     if (!gui_settings.show_route_map)
+    {
         return;
+    }
 
     ImGui::Begin("route1.map", &gui_settings.show_route_map, window_flags_);
 
     if (ImGui::BeginTable("route_map_table", 7,
-        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
-        ImGuiTableFlags_RowBg))
+                          ImGuiTableFlags_SizingFixedFit
+                              | ImGuiTableFlags_Borders
+                              | ImGuiTableFlags_RowBg))
     {
         for (const auto& [label, transforms] : route_map)
         {
@@ -262,29 +276,33 @@ void EditorGui::show_stations_conf() const
     const auto& stations_conf = editor_context.stations_conf;
 
     if (!gui_settings.show_stations_conf)
+    {
         return;
+    }
 
-    ImGui::Begin("stations.conf", &gui_settings.show_stations_conf, window_flags_);
+    ImGui::Begin("stations.conf", &gui_settings.show_stations_conf,
+                 window_flags_);
 
     static char search_buffer[256] = "";
     ImGui::InputText("label", search_buffer, 256);
 
     std::string search_lower = search_buffer;
     std::transform(search_lower.begin(), search_lower.end(),
-        search_lower.begin(), ::tolower);
+                   search_lower.begin(), ::tolower);
 
     if (ImGui::BeginTable("stations_conf_table", 4,
-        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
-        ImGuiTableFlags_RowBg))
+                          ImGuiTableFlags_SizingFixedFit
+                              | ImGuiTableFlags_Borders
+                              | ImGuiTableFlags_RowBg))
     {
         for (const auto& [label, translation] : stations_conf)
         {
             std::string label_lower = label;
             std::transform(label_lower.begin(), label_lower.end(),
-                label_lower.begin(), ::tolower);
+                           label_lower.begin(), ::tolower);
 
-            if (search_buffer[0] != '\0' &&
-                label_lower.find(search_lower) == std::string::npos)
+            if (search_buffer[0] != '\0'
+                && label_lower.find(search_lower) == std::string::npos)
             {
                 continue;
             }
@@ -295,7 +313,9 @@ void EditorGui::show_stations_conf() const
             ImGui::TableNextColumn();
 
             if (ImGui::Button(label.c_str()))
+            {
                 camera->look_on(translation);
+            }
 
             ImGui::TableNextColumn();
             ImGui::Text(number_format, translation.x);
@@ -320,32 +340,36 @@ void EditorGui::show_waypoints_conf() const
     const auto& waypoints_conf = editor_context.waypoints_conf;
 
     if (!gui_settings.show_waypoints_conf || !topology_loaded.load())
+    {
         return;
+    }
 
     const auto topology_guard = editor_context.topology.lock();
     const auto& topology = *topology_guard;
 
-    ImGui::Begin("waypoints.conf", &gui_settings.show_waypoints_conf, window_flags_);
+    ImGui::Begin("waypoints.conf", &gui_settings.show_waypoints_conf,
+                 window_flags_);
 
     static char search_buffer[256] = "";
     ImGui::InputText("label", search_buffer, 256);
 
     std::string search_lower = search_buffer;
     std::transform(search_lower.begin(), search_lower.end(),
-        search_lower.begin(), ::tolower);
+                   search_lower.begin(), ::tolower);
 
     if (ImGui::BeginTable("waypoints_conf_table", 5,
-        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
-        ImGuiTableFlags_RowBg))
+                          ImGuiTableFlags_SizingFixedFit
+                              | ImGuiTableFlags_Borders
+                              | ImGuiTableFlags_RowBg))
     {
         for (const auto& [label, data] : waypoints_conf)
         {
             std::string label_lower = label;
             std::transform(label_lower.begin(), label_lower.end(),
-                label_lower.begin(), ::tolower);
+                           label_lower.begin(), ::tolower);
 
-            if (search_buffer[0] != '\0' &&
-                label_lower.find(search_lower) == std::string::npos)
+            if (search_buffer[0] != '\0'
+                && label_lower.find(search_lower) == std::string::npos)
             {
                 continue;
             }
@@ -353,11 +377,13 @@ void EditorGui::show_waypoints_conf() const
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
 
-            const QString traj_name = QString::fromStdString(data.trajectory_name);
+            const QString traj_name
+                = QString::fromStdString(data.trajectory_name);
 
             if (ImGui::Button(label.c_str()))
             {
-                const traj_list_t* const traj_list = topology->getTrajectoriesList();
+                const traj_list_t* const traj_list
+                    = topology->getTrajectoriesList();
 
                 const auto found_it = traj_list->find(traj_name);
                 if (found_it == traj_list->cend())
@@ -368,7 +394,8 @@ void EditorGui::show_waypoints_conf() const
                 }
 
                 const Trajectory* const trajectory = *found_it;
-                const auto traj_pos = trajectory->getPosition(data.coord, data.direction);
+                const auto traj_pos
+                    = trajectory->getPosition(data.coord, data.direction);
                 const dvec3 pos = traj_pos.position;
                 camera->look_on(vsg::dvec3(DECOMPOSE_VEC3(pos)));
             }
@@ -395,13 +422,17 @@ void EditorGui::show_key_bindings() const
     const auto& key_bindings = editor_context.key_bindings;
 
     if (!gui_settings.show_key_bindings)
+    {
         return;
+    }
 
-    ImGui::Begin("Key Bindings", &gui_settings.show_key_bindings, window_flags_);
+    ImGui::Begin("Key Bindings", &gui_settings.show_key_bindings,
+                 window_flags_);
 
     if (ImGui::BeginTable("key_bindings_table", 2,
-        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Borders |
-        ImGuiTableFlags_RowBg))
+                          ImGuiTableFlags_SizingFixedFit
+                              | ImGuiTableFlags_Borders
+                              | ImGuiTableFlags_RowBg))
     {
         for (int i = 0; i < TOTAL_ACTIONS; ++i)
         {
@@ -412,16 +443,17 @@ void EditorGui::show_key_bindings() const
 
             std::string label;
 
-            static const std::map<vsg::KeyModifier, std::string> test_map = {
-                {vsg::MODKEY_Shift, "Shift"},
-                {vsg::MODKEY_Control, "Ctrl"},
-                {vsg::MODKEY_Alt, "Alt"}
-            };
+            static const std::map<vsg::KeyModifier, std::string> test_map
+                = {{vsg::MODKEY_Shift, "Shift"},
+                   {vsg::MODKEY_Control, "Ctrl"},
+                   {vsg::MODKEY_Alt, "Alt"}};
 
             for (const auto& [modifier, name] : test_map)
             {
                 if (key_bindings.modifiers[i] & modifier)
+                {
                     label += name + " + ";
+                }
             }
 
             label += std::toupper(key_bindings.keys[i]);
@@ -439,7 +471,9 @@ void EditorGui::show_topology() const
     auto& gui_settings = editor_context.gui_settings;
 
     if (!gui_settings.show_topology)
+    {
         return;
+    }
 
     ImGui::Begin("Topology", &gui_settings.show_topology, window_flags_);
 
@@ -463,18 +497,19 @@ void EditorGui::show_topology() const
 
         std::string search_lower = search_buffer;
         std::transform(search_lower.begin(), search_lower.end(),
-            search_lower.begin(), ::tolower);
+                       search_lower.begin(), ::tolower);
 
         const auto* trajectories = topology->getTrajectoriesList();
         for (const Trajectory* trajectory : *trajectories)
         {
-            const std::string trajectory_name = trajectory->getName().toStdString();
+            const std::string trajectory_name
+                = trajectory->getName().toStdString();
             std::string label_lower = trajectory_name;
             std::transform(label_lower.begin(), label_lower.end(),
-                label_lower.begin(), ::tolower);
+                           label_lower.begin(), ::tolower);
 
-            if (search_buffer[0] != '\0' &&
-                label_lower.find(search_lower) == std::string::npos)
+            if (search_buffer[0] != '\0'
+                && label_lower.find(search_lower) == std::string::npos)
             {
                 continue;
             }
@@ -495,7 +530,8 @@ void EditorGui::show_topology() const
                         std::string label = "Jump##" + trajectory_name;
                         if (ImGui::Button(label.c_str()))
                         {
-                            editor_context.camera->look_on(vsg::dvec3(DECOMPOSE_VEC3(p1)));
+                            editor_context.camera->look_on(
+                                vsg::dvec3(DECOMPOSE_VEC3(p1)));
                         }
                     }
 
@@ -507,34 +543,35 @@ void EditorGui::show_topology() const
                     char format[format_size];
 
                     std::snprintf(outer_format1, format_size, "%%%ds: %%s",
-                        alignment);
+                                  alignment);
 
-                    std::string label = "[" + std::to_string(i) + "]##" +
-                        trajectory_name;
+                    std::string label
+                        = "[" + std::to_string(i) + "]##" + trajectory_name;
                     ImGui::SeparatorText(label.c_str());
 
                     std::snprintf(outer_format2, format_size, outer_format1,
-                        "begin", "%s %s %s");
+                                  "begin", "%s %s %s");
                     std::snprintf(format, format_size, outer_format2,
-                        float_format, float_format, float_format);
+                                  float_format, float_format, float_format);
                     ImGui::Text(format, DECOMPOSE_VEC3(p1));
 
                     std::snprintf(outer_format2, format_size, outer_format1,
-                        "end", "%s %s %s");
+                                  "end", "%s %s %s");
                     std::snprintf(format, format_size, outer_format2,
-                        float_format, float_format, float_format);
+                                  float_format, float_format, float_format);
                     ImGui::Text(format, DECOMPOSE_VEC3(p2));
 
                     std::snprintf(outer_format2, format_size, outer_format1,
-                        "railway_coords", "%s %s");
+                                  "railway_coords", "%s %s");
                     std::snprintf(format, format_size, outer_format2,
-                        float_format, float_format);
-                    ImGui::Text(format, track.railway_coord0, track.railway_coord1);
+                                  float_format, float_format);
+                    ImGui::Text(format, track.railway_coord0,
+                                track.railway_coord1);
 
                     std::snprintf(outer_format2, format_size, outer_format1,
-                        "traj_coord", "%s");
+                                  "traj_coord", "%s");
                     std::snprintf(format, format_size, outer_format2,
-                        float_format);
+                                  float_format);
                     ImGui::Text(format, track.traj_coord);
                 }
 
@@ -545,42 +582,47 @@ void EditorGui::show_topology() const
 
     if (ImGui::CollapsingHeader("Switches"))
     {
-        const auto print_traj = [](const char* type,
-            const Trajectory* trajectory) -> void
+        const auto print_traj
+            = [](const char* type, const Trajectory* trajectory) -> void
         {
-            ImGui::Text("%s: %s", type, trajectory
-                ? trajectory->getName().toStdString().c_str()
-                : "nullptr");
+            ImGui::Text("%s: %s", type,
+                        trajectory ? trajectory->getName().toStdString().c_str()
+                                   : "nullptr");
         };
 
-        const auto print_signal = [](const char* type,
-            const Signal* signal) -> void
+        const auto print_signal
+            = [](const char* type, const Signal* signal) -> void
         {
             if (!signal)
+            {
                 return;
+            }
 
             ImGui::Text("SignalLiter%s: %s", type,
-                signal->getLetter().toStdString().c_str());
+                        signal->getLetter().toStdString().c_str());
 
             ImGui::Text("SignalModel%s: %s", type,
-                signal->getSignalModel().toStdString().c_str());
+                        signal->getSignalModel().toStdString().c_str());
 
             const dvec3& rel_pos = signal->getRelPos();
             const dvec3& rel_rot = signal->getRelRot();
 
             ImGui::Text("RelPos%s: %8.3f %8.3f %8.3f", type,
-                DECOMPOSE_VEC3(rel_pos));
+                        DECOMPOSE_VEC3(rel_pos));
 
             ImGui::Text("RelRot%s: %8.3f %8.3f %8.3f", type,
-                DECOMPOSE_VEC3(rel_rot));
+                        DECOMPOSE_VEC3(rel_rot));
         };
 
         const sw_list_t* const connectors = topology->getConnectorsList();
-        for (auto it = connectors->constBegin(); it != connectors->constEnd(); ++it)
+        for (auto it = connectors->constBegin(); it != connectors->constEnd();
+             ++it)
         {
             const Switch* const switch_ = dynamic_cast<const Switch*>(*it);
             if (!switch_)
+            {
                 continue;
+            }
 
             if (ImGui::TreeNode(switch_->getName().toStdString().c_str()))
             {
@@ -603,16 +645,24 @@ void EditorGui::show_topology() const
 void EditorGui::show_selected_objects_properties() const
 {
     if (!editor_context.gui_settings.show_selected_objects_properties)
+    {
         return;
+    }
 
     if (!editor_context.object_selector)
+    {
         return;
+    }
 
     const auto& selected_objects = editor_context.selected_objects;
     if (selected_objects.empty())
+    {
         return;
+    }
 
-    ImGui::Begin("Selected objects", &editor_context.gui_settings.show_selected_objects_properties, window_flags_);
+    ImGui::Begin("Selected objects",
+                 &editor_context.gui_settings.show_selected_objects_properties,
+                 window_flags_);
 
     static bool dragging = false;
 
@@ -634,38 +684,42 @@ void EditorGui::show_selected_objects_properties() const
 void EditorGui::show_commands() const
 {
     if (!editor_context.gui_settings.show_commands)
+    {
         return;
+    }
 
-    ImGui::Begin("Commands", &editor_context.gui_settings.show_commands, window_flags_);
+    ImGui::Begin("Commands", &editor_context.gui_settings.show_commands,
+                 window_flags_);
 
     const auto& command_manager = editor_context.command_manager;
 
     command_manager->for_each_command(
-        [](const std::unique_ptr<::Command>& command) -> void {
+        [](const std::unique_ptr<::Command>& command) -> void
+        {
             ImGui::Text("%s", command->get_description());
             ImGui::Separator();
-        }
-    );
+        });
 
     command_manager->for_each_undone(
-        [](const std::unique_ptr<::Command>& command) -> void {
+        [](const std::unique_ptr<::Command>& command) -> void
+        {
             const ImVec4 text_color = {0.3f, 0.3f, 0.3f, 1.0f};
             ImGui::TextColored(text_color, "%s", command->get_description());
             ImGui::Separator();
-        }
-    );
+        });
 
     ImGui::End();
 }
 
 void EditorGui::add_object(const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
-    const std::string& label) const
+                           const std::string& label) const
 {
     const auto& camera = editor_context.camera;
     const auto& command_manager = editor_context.command_manager;
 
     const auto object = RouteObject::create(editor_context, paged_lod, label,
-        camera->get_look_at()->eye + camera->get_front() * 20.0);
+                                            camera->get_look_at()->eye
+                                                + camera->get_front() * 20.0);
 
     auto command = std::make_unique<AddObjectCommand>(editor_context, object);
     command->execute();
@@ -681,7 +735,8 @@ void EditorGui::save_objects_matrixes() const
 }
 
 void EditorGui::handle_translation_drag(std::size_t index,
-    const vsg::ref_ptr<RouteObject>& object, bool& dragging) const
+                                        const vsg::ref_ptr<RouteObject>& object,
+                                        bool& dragging) const
 {
     std::string label = "translation##" + std::to_string(index);
     static vsg::dvec3 total_translation = {0.0, 0.0, 0.0};
@@ -700,17 +755,20 @@ void EditorGui::handle_translation_drag(std::size_t index,
     }
 
     if (!ImGui::IsItemDeactivatedAfterEdit())
+    {
         return;
+    }
 
-    auto command = std::make_unique<TranslateObjectsCommand>(editor_context,
-        RouteObjects{object}, total_translation);
+    auto command = std::make_unique<TranslateObjectsCommand>(
+        editor_context, RouteObjects{object}, total_translation);
     editor_context.command_manager->push(std::move(command));
 
     dragging = false;
 }
 
 void EditorGui::handle_rotation_drag(std::size_t index,
-    const vsg::ref_ptr<RouteObject>& object, bool& dragging) const
+                                     const vsg::ref_ptr<RouteObject>& object,
+                                     bool& dragging) const
 {
     std::string label = "rotation##" + std::to_string(index);
     static vsg::dvec3 total_rotation_deg = {0.0, 0.0, 0.0};
@@ -718,8 +776,8 @@ void EditorGui::handle_rotation_drag(std::size_t index,
     constexpr double min_rot_deg = -360.0;
     constexpr double max_rot_deg = 360.0;
     vsg::dvec3 rotation_deg = object->get_rotation_deg();
-    if (drag_double3(label.c_str(), rotation_deg.data(), 1.0f,
-        &min_rot_deg, &max_rot_deg, ImGuiSliderFlags_WrapAround))
+    if (drag_double3(label.c_str(), rotation_deg.data(), 1.0f, &min_rot_deg,
+                     &max_rot_deg, ImGuiSliderFlags_WrapAround))
     {
         if (!dragging)
         {
@@ -732,7 +790,9 @@ void EditorGui::handle_rotation_drag(std::size_t index,
     }
 
     if (!ImGui::IsItemDeactivatedAfterEdit())
+    {
         return;
+    }
 
     vsg::dvec3 axis = {0.0, 0.0, 0.0};
     double radians;
@@ -740,7 +800,9 @@ void EditorGui::handle_rotation_drag(std::size_t index,
     for (int axis_index = 0; axis_index < 3; ++axis_index)
     {
         if (std::abs(total_rotation_deg[axis_index]) < 1.0e-6)
+        {
             continue;
+        }
 
         axis[axis_index] = 1.0;
         radians = vsg::radians(total_rotation_deg[axis_index]);
@@ -750,15 +812,17 @@ void EditorGui::handle_rotation_drag(std::size_t index,
     const auto& command_manager = editor_context.command_manager;
     const auto& gizmo = editor_context.gizmo;
 
-    auto command = std::make_unique<RotateObjectsCommand>(editor_context,
-        RouteObjects{object}, gizmo->get_curr_pos(), axis, radians);
+    auto command = std::make_unique<RotateObjectsCommand>(
+        editor_context, RouteObjects{object}, gizmo->get_curr_pos(), axis,
+        radians);
     command_manager->push(std::move(command));
 
     dragging = false;
 }
 
 void EditorGui::handle_scale_drag(std::size_t index,
-    const vsg::ref_ptr<RouteObject>& object, bool& dragging) const
+                                  const vsg::ref_ptr<RouteObject>& object,
+                                  bool& dragging) const
 {
     std::string label = "scale##" + std::to_string(index);
     static vsg::dvec3 total_scale = {1.0, 1.0, 1.0};
@@ -768,7 +832,9 @@ void EditorGui::handle_scale_drag(std::size_t index,
     if (drag_double3(label.c_str(), scale.data(), 0.01f))
     {
         if (vsg::length(scale) < 1.0e-6)
+        {
             return;
+        }
 
         if (!dragging)
         {
@@ -777,31 +843,35 @@ void EditorGui::handle_scale_drag(std::size_t index,
             dragging = true;
         }
         total_scale *= {scale.x / prev_scale.x, scale.y / prev_scale.y,
-            scale.z / prev_scale.z};
+                        scale.z / prev_scale.z};
         object->set_scale(scale);
     }
 
     if (!ImGui::IsItemDeactivatedAfterEdit())
+    {
         return;
+    }
 
     const auto& command_manager = editor_context.command_manager;
     const auto& gizmo = editor_context.gizmo;
 
-    auto command = std::make_unique<ScaleObjectsCommand>(editor_context,
-        RouteObjects{object}, gizmo->get_curr_pos(), total_scale);
+    auto command = std::make_unique<ScaleObjectsCommand>(
+        editor_context, RouteObjects{object}, gizmo->get_curr_pos(),
+        total_scale);
     command_manager->push(std::move(command));
 
     dragging = false;
 }
 
 void EditorGui::add_ttf_font(const char* filename, float size_pixels,
-    const ImFontConfig* font_cfg, const ImWchar* glyph_ranges)
+                             const ImFontConfig* font_cfg,
+                             const ImWchar* glyph_ranges)
 {
     ImGuiIO& io = ImGui::GetIO();
     const FileSystem& fs = FileSystem::getInstance();
     const std::string font_path = fs.combinePath(fs.getFontsDir(), filename);
     io.Fonts->AddFontFromFileTTF(font_path.c_str(), size_pixels, font_cfg,
-        glyph_ranges);
+                                 glyph_ranges);
 }
 
 void EditorGui::draw_main_menu_bar() const
@@ -819,8 +889,8 @@ void EditorGui::draw_main_menu_bar() const
             {
                 IGFD::FileDialogConfig config;
                 config.path = FileSystem::getInstance().getRouteRootDir();
-                ImGuiFileDialog::Instance()->OpenDialog("LoadRouteKey",
-                    "Load route", nullptr, config);
+                ImGuiFileDialog::Instance()->OpenDialog(
+                    "LoadRouteKey", "Load route", nullptr, config);
             }
 
             ImGui::EndMenu();
@@ -831,14 +901,16 @@ void EditorGui::draw_main_menu_bar() const
 
 void EditorGui::draw_status_bar() const
 {
-    ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y +
-        viewport->Size.y - ImGui::GetFrameHeight() * 1.5));
+    ImGui::SetNextWindowPos(
+        ImVec2(viewport->Pos.x, viewport->Pos.y + viewport->Size.y
+                                    - ImGui::GetFrameHeight() * 1.5));
 
-    ImGui::SetNextWindowSize(ImVec2(viewport->Size.x,
-        ImGui::GetFrameHeight() * 1.5));
+    ImGui::SetNextWindowSize(
+        ImVec2(viewport->Size.x, ImGui::GetFrameHeight() * 1.5));
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
-        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar
+                             | ImGuiWindowFlags_NoScrollbar
+                             | ImGuiWindowFlags_NoResize;
 
     const auto& state_manager = editor_context.state_manager;
 
@@ -852,14 +924,15 @@ void EditorGui::draw_status_bar() const
 void EditorGui::draw_invalid_route_popup() const
 {
     if (ImGui::BeginPopupModal("InvalidRoute", nullptr,
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
+                               ImGuiWindowFlags_NoTitleBar
+                                   | ImGuiWindowFlags_NoResize))
     {
         ImGui::Text("Invalid route!\n"
-            "Route must contain:\n"
-            "models/\n"
-            "textures/\n"
-            "topology/\n"
-            "objects.ref");
+                    "Route must contain:\n"
+                    "models/\n"
+                    "textures/\n"
+                    "topology/\n"
+                    "objects.ref");
 
         if (ImGui::Button("OK", ImVec2(-FLT_MIN, 0)))
         {

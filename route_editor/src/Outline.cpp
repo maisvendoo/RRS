@@ -35,9 +35,11 @@ OutlineBuilder::OutlineBuilder()
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
-    const auto vert_shader = read_shader(shaders_dir.c_str(), "standard.vert", vsg_options);
+    const auto vert_shader
+        = read_shader(shaders_dir.c_str(), "standard.vert", vsg_options);
 
-    const auto frag_shader = read_shader(shaders_dir.c_str(), "outline.frag", vsg_options);
+    const auto frag_shader
+        = read_shader(shaders_dir.c_str(), "outline.frag", vsg_options);
 
     configure_shader_set(vert_shader, frag_shader, "flat", flat_shader);
 
@@ -46,26 +48,27 @@ OutlineBuilder::OutlineBuilder()
     rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
     rasterization_state->lineWidth = 1.2f;
 
-    const vsg::GraphicsPipelineStates default_graphics_pipeline_states = {
-        vsg::VertexInputState::create(),
-        vsg::InputAssemblyState::create(),
-        rasterization_state,
-        vsg::ColorBlendState::create(),
-        vsg::DepthStencilState::create(),
-        vsg::MultisampleState::create()
-    };
+    const vsg::GraphicsPipelineStates default_graphics_pipeline_states
+        = {vsg::VertexInputState::create(),
+           vsg::InputAssemblyState::create(),
+           rasterization_state,
+           vsg::ColorBlendState::create(),
+           vsg::DepthStencilState::create(),
+           vsg::MultisampleState::create()};
 
-    flat_shader->defaultGraphicsPipelineStates =
-        default_graphics_pipeline_states;
+    flat_shader->defaultGraphicsPipelineStates
+        = default_graphics_pipeline_states;
 
     builder_.shaderSet = flat_shader;
 }
 
-vsg::ref_ptr<vsg::Node> OutlineBuilder::create_outline(
-    const vsg::ref_ptr<vsg::PagedLOD>& paged_lod)
+vsg::ref_ptr<vsg::Node>
+OutlineBuilder::create_outline(const vsg::ref_ptr<vsg::PagedLOD>& paged_lod)
 {
     if (!paged_lod->pending)
+    {
         return nullptr;
+    }
 
     vsg::ComputeBounds compute_bounds;
     compute_bounds.useNodeBounds = false;

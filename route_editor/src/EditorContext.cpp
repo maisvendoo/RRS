@@ -4,12 +4,12 @@
 #include "editor/Gizmo.h"
 #include "editor/Keyboard.h"
 #include "editor/Mouse.h"
-#include "editor/StaticObjectManager.h"
 #include "editor/ObjectSelector.h"
 #include "editor/Outline.h"
 #include "editor/Route.h"
 #include "editor/RouteObject.h"
 #include "editor/StateManager.h"
+#include "editor/StaticObjectManager.h"
 #include "editor/WorldCulling.h"
 #include "editor/commands/CommandManager.h"
 

@@ -14,7 +14,7 @@ class TransformObjectsCommand : public Command
 {
 public:
     TransformObjectsCommand(EditorContext& context,
-        const RouteObjects& objects);
+                            const RouteObjects& objects);
 
     virtual ~TransformObjectsCommand() override = default;
 

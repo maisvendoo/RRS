@@ -25,14 +25,11 @@ class PagedLOD;
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 {
 public:
-    RouteObject(
-        EditorContext& editor_context,
-        const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
-        const std::string& label,
-        const vsg::dvec3& translation,
-        const vsg::dvec3& rotation_deg = {0.0, 0.0, 0.0},
-        const vsg::dvec3& scale = {1.0, 1.0, 1.0}
-    );
+    RouteObject(EditorContext& editor_context,
+                const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
+                const std::string& label, const vsg::dvec3& translation,
+                const vsg::dvec3& rotation_deg = {0.0, 0.0, 0.0},
+                const vsg::dvec3& scale = {1.0, 1.0, 1.0});
 
     const vsg::dvec3& get_translation() const;
     const vsg::dvec3& get_rotation_deg() const;
@@ -51,10 +48,11 @@ public:
     void move(const vsg::dvec3& translation);
 
     void rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3& axis,
-        double radians, const vsg::dmat4& matrix);
+                             double radians, const vsg::dmat4& matrix);
 
-    void scale_relative_to_pivot(const vsg::dvec3& pivot, const vsg::dvec3& scale,
-        const vsg::dmat4& matrix);
+    void scale_relative_to_pivot(const vsg::dvec3& pivot,
+                                 const vsg::dvec3& scale,
+                                 const vsg::dmat4& matrix);
 
     void hide();
     RouteObjectsIterator show();

@@ -21,5 +21,4 @@ public:
     const RouteObjects objects_to_show;
 };
 
-
 #endif // EDITOR_COMMAND_HIDE_OBJECTS_COMMAND_H

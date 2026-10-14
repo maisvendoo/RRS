@@ -25,21 +25,18 @@ static vsg::dvec3 to_euler_deg(const vsg::dquat& q)
 {
     return vsg::dvec3{
         vsg::degrees(std::atan2(2.0 * (q.w * q.x + q.y * q.z),
-            1.0 - 2.0 * (q.x * q.x + q.y * q.y))),
+                                1.0 - 2.0 * (q.x * q.x + q.y * q.y))),
         vsg::degrees(std::asin(2.0 * (q.w * q.y - q.z * q.x))),
         vsg::degrees(std::atan2(2.0 * (q.w * q.z + q.x * q.y),
-            1.0 - 2.0 * (q.y * q.y + q.z * q.z)))
-    };
+                                1.0 - 2.0 * (q.y * q.y + q.z * q.z)))};
 }
 
-RouteObject::RouteObject(
-    EditorContext& editor_context,
-    const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
-    const std::string& label,
-    const vsg::dvec3& translation,
-    const vsg::dvec3& rotation_deg,
-    const vsg::dvec3& scale
-)
+RouteObject::RouteObject(EditorContext& editor_context,
+                         const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
+                         const std::string& label,
+                         const vsg::dvec3& translation,
+                         const vsg::dvec3& rotation_deg,
+                         const vsg::dvec3& scale)
     : label(label)
     , editor_context(editor_context)
     , translation_(translation)
@@ -122,23 +119,23 @@ void RouteObject::move(const vsg::dvec3& translation)
 }
 
 void RouteObject::rotate_around_pivot(const vsg::dvec3& pivot,
-    const vsg::dvec3& axis, double radians, const vsg::dmat4& matrix)
+                                      const vsg::dvec3& axis, double radians,
+                                      const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(pivot) *
-                   vsg::rotate(vsg::dquat(radians, axis)) *
-                   vsg::translate(-pivot) * matrix;
+    this->matrix = vsg::translate(pivot)
+                   * vsg::rotate(vsg::dquat(radians, axis))
+                   * vsg::translate(-pivot) * matrix;
 
     decompose_matrix();
     update_bounds();
 }
 
 void RouteObject::scale_relative_to_pivot(const vsg::dvec3& pivot,
-    const vsg::dvec3& scale, const vsg::dmat4& matrix)
+                                          const vsg::dvec3& scale,
+                                          const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(pivot) *
-                   vsg::scale(scale) *
-                   vsg::translate(-pivot) *
-                   matrix;
+    this->matrix = vsg::translate(pivot) * vsg::scale(scale)
+                   * vsg::translate(-pivot) * matrix;
 
     decompose_matrix();
     update_bounds();
@@ -162,20 +159,23 @@ RouteObjectsIterator RouteObject::show()
 
     RouteObjects& hidden_objects = editor_context.hidden_objects;
 
-    return hidden_objects.erase(std::find(hidden_objects.begin(),
-        hidden_objects.end(), vsg::ref_ptr(this)));
+    return hidden_objects.erase(std::find(
+        hidden_objects.begin(), hidden_objects.end(), vsg::ref_ptr(this)));
 }
 
 bool RouteObject::select()
 {
     if (!outline_switch_->node)
     {
-        auto outline = editor_context.outline_builder->create_outline(paged_lod_);
+        auto outline
+            = editor_context.outline_builder->create_outline(paged_lod_);
         if (!outline)
+        {
             return false;
+        }
 
-        editor_context.compile_infos.lock()->emplace_back(CompileInfo{
-            outline_switch_, outline});
+        editor_context.compile_infos.lock()->emplace_back(
+            CompileInfo{outline_switch_, outline});
     }
 
     outline_switch_->mask = MASK_GUI2;
@@ -196,8 +196,8 @@ RouteObjectsIterator RouteObject::deselect()
 
     auto& selected_objects = editor_context.selected_objects;
 
-    const auto it = selected_objects.erase(std::find(selected_objects.begin(),
-        selected_objects.end(), vsg::ref_ptr(this)));
+    const auto it = selected_objects.erase(std::find(
+        selected_objects.begin(), selected_objects.end(), vsg::ref_ptr(this)));
 
     editor_context.gizmo->update_position();
 
@@ -206,8 +206,8 @@ RouteObjectsIterator RouteObject::deselect()
 
 vsg::ref_ptr<RouteObject> RouteObject::copy() const
 {
-    return RouteObject::create(editor_context, paged_lod_, label,
-        translation_, rotation_deg_, scale_);
+    return RouteObject::create(editor_context, paged_lod_, label, translation_,
+                               rotation_deg_, scale_);
 }
 
 void RouteObject::save_matrix()
@@ -229,11 +229,11 @@ void RouteObject::update_matrix()
     constexpr vsg::dvec3 Y_AXIS = {0.0, 1.0, 0.0};
     constexpr vsg::dvec3 Z_AXIS = {0.0, 0.0, 1.0};
 
-    matrix = vsg::translate(translation_) *
-             vsg::rotate(vsg::radians(rotation_deg_.z), Z_AXIS) *
-             vsg::rotate(vsg::radians(rotation_deg_.y), Y_AXIS) *
-             vsg::rotate(vsg::radians(rotation_deg_.x), X_AXIS) *
-             vsg::scale(scale_);
+    matrix = vsg::translate(translation_)
+             * vsg::rotate(vsg::radians(rotation_deg_.z), Z_AXIS)
+             * vsg::rotate(vsg::radians(rotation_deg_.y), Y_AXIS)
+             * vsg::rotate(vsg::radians(rotation_deg_.x), X_AXIS)
+             * vsg::scale(scale_);
 
     update_bounds();
 }

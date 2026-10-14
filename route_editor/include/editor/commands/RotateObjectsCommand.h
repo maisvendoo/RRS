@@ -11,7 +11,8 @@ class RotateObjectsCommand : public TransformObjectsCommand
 {
 public:
     RotateObjectsCommand(EditorContext& context, const RouteObjects& objects,
-        const vsg::dvec3& pivot, const vsg::dvec3& axis, double radians);
+                         const vsg::dvec3& pivot, const vsg::dvec3& axis,
+                         double radians);
 
     virtual ~RotateObjectsCommand() override = default;
 

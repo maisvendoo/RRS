@@ -29,14 +29,14 @@
 #include <limits>
 #include <memory>
 
-static void rotate_geometry_info(
-    vsg::GeometryInfo& geometry_info,
-    vsg::vec3 direction
-)
+static void rotate_geometry_info(vsg::GeometryInfo& geometry_info,
+                                 vsg::vec3 direction)
 {
     constexpr vsg::vec3 Z_AXIS = {0.0f, 0.0f, 1.0f};
     if (vsg::length(vsg::cross(Z_AXIS, direction)) < 1.0e-6f)
+    {
         return;
+    }
 
     const vsg::vec3 axis = vsg::cross(Z_AXIS, direction);
     const float angle = std::acos(vsg::dot(Z_AXIS, direction));
@@ -57,28 +57,27 @@ Gizmo::Gizmo(EditorContext& context)
     state_info.two_sided = true;
     state_info.blending = true;
 
-    const auto create_arrow = [&](vsg::vec3 direction,
-        vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
+    const auto create_arrow
+        = [&](vsg::vec3 direction, vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
     {
         float thickness = gizmo_settings.arrow_thickness;
         const float length = gizmo_settings.arrow_length;
         const float opacity = gizmo_settings.opacity;
 
-        vsg::box box = {
-            vsg::vec3(-thickness, -thickness, 0.0f),
-            vsg::vec3( thickness,  thickness, length)
-        };
+        vsg::box box = {vsg::vec3(-thickness, -thickness, 0.0f),
+                        vsg::vec3(thickness, thickness, length)};
 
         vsg::GeometryInfo geometry_info(box);
         rotate_geometry_info(geometry_info, direction);
         geometry_info.color = {color, opacity};
 
-        const auto cylinder = builder_.createCylinder(geometry_info, state_info);
+        const auto cylinder
+            = builder_.createCylinder(geometry_info, state_info);
 
         thickness *= 3.0f;
 
         box.min = {-thickness, -thickness, length};
-        box.max = { thickness,  thickness, length + thickness * 5.0f};
+        box.max = {thickness, thickness, length + thickness * 5.0f};
 
         geometry_info.set(box);
 
@@ -95,10 +94,8 @@ Gizmo::Gizmo(EditorContext& context)
     {
         const float width = plane_width;
 
-        const vsg::box box = {
-            vsg::vec3(-width, -width, 0.0f),
-            vsg::vec3( width,  width, 0.0f)
-        };
+        const vsg::box box
+            = {vsg::vec3(-width, -width, 0.0f), vsg::vec3(width, width, 0.0f)};
 
         vsg::GeometryInfo geometry_info(box);
         rotate_geometry_info(geometry_info, normal);
@@ -106,17 +103,15 @@ Gizmo::Gizmo(EditorContext& context)
         return builder_.createQuad(geometry_info, state_info);
     };
 
-    const auto create_line = [&](vsg::vec3 direction,
-        vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
+    const auto create_line
+        = [&](vsg::vec3 direction, vsg::vec3 color) -> vsg::ref_ptr<vsg::Node>
     {
         const float width = plane_width;
         const float thickness = line_thickness;
         const float opacity = gizmo_settings.opacity;
 
-        const vsg::box box = {
-            vsg::vec3(-thickness, -thickness, -width),
-            vsg::vec3( thickness,  thickness,  width)
-        };
+        const vsg::box box = {vsg::vec3(-thickness, -thickness, -width),
+                              vsg::vec3(thickness, thickness, width)};
 
         vsg::GeometryInfo geometry_info(box);
         rotate_geometry_info(geometry_info, direction);
@@ -127,25 +122,21 @@ Gizmo::Gizmo(EditorContext& context)
 
     matrix_transform_ = vsg::MatrixTransform::create();
 
-    constexpr vsg::vec3 arrow_directions[3] = {
-        vsg::vec3(1.0f, 0.0f, 0.0f),
-        vsg::vec3(0.0f, 1.0f, 0.0f),
-        vsg::vec3(0.0f, 0.0f, 1.0f)
-    };
+    constexpr vsg::vec3 arrow_directions[3]
+        = {vsg::vec3(1.0f, 0.0f, 0.0f), vsg::vec3(0.0f, 1.0f, 0.0f),
+           vsg::vec3(0.0f, 0.0f, 1.0f)};
 
-    const vsg::vec3 arrow_colors[3] = {
-        gizmo_settings.arrow_x_color,
-        gizmo_settings.arrow_y_color,
-        gizmo_settings.arrow_z_color
-    };
+    const vsg::vec3 arrow_colors[3]
+        = {gizmo_settings.arrow_x_color, gizmo_settings.arrow_y_color,
+           gizmo_settings.arrow_z_color};
 
     for (int i = 0; i < 3; ++i)
     {
         arrows[i] = create_arrow(arrow_directions[i], arrow_colors[i]);
-        plane_switches[i] = SingleSwitch::create(vsg::MASK_OFF,
-            create_plane(arrow_directions[i]));
-        line_switches[i] = SingleSwitch::create(vsg::MASK_OFF, create_line(
-            arrow_directions[i], arrow_colors[i]));
+        plane_switches[i] = SingleSwitch::create(
+            vsg::MASK_OFF, create_plane(arrow_directions[i]));
+        line_switches[i] = SingleSwitch::create(
+            vsg::MASK_OFF, create_line(arrow_directions[i], arrow_colors[i]));
         matrix_transform_->addChild(arrows[i]);
         matrix_transform_->addChild(plane_switches[i]);
         matrix_transform_->addChild(line_switches[i]);
@@ -163,32 +154,30 @@ bool Gizmo::handle_intersections()
     const auto& mouse = editor_context.mouse;
     const auto& window_extent = editor_context.window->extent2D();
 
-    constexpr vsg::dvec3 arrow_directions[] = {
-        vsg::dvec3(1.0, 0.0, 0.0),
-        vsg::dvec3(0.0, 1.0, 0.0),
-        vsg::dvec3(0.0, 0.0, 1.0)
-    };
+    constexpr vsg::dvec3 arrow_directions[]
+        = {vsg::dvec3(1.0, 0.0, 0.0), vsg::dvec3(0.0, 1.0, 0.0),
+           vsg::dvec3(0.0, 0.0, 1.0)};
 
     double arrow_dots[3];
     for (int i = 0; i < 3; ++i)
     {
-        arrow_dots[i] = std::abs(vsg::dot(camera->get_front(),
-            arrow_directions[i]));
+        arrow_dots[i]
+            = std::abs(vsg::dot(camera->get_front(), arrow_directions[i]));
     }
 
     // Normalized mouse coordinates [-1.0; 1.0]
     double norm_mouse_x, norm_mouse_y;
     norm_mouse_coords(mouse->get_x(), mouse->get_y(), window_extent,
-        norm_mouse_x, norm_mouse_y);
+                      norm_mouse_x, norm_mouse_y);
 
     const vsg::dmat4& inv_view_mat = camera->get_inv_view_mat();
     const vsg::dmat4& inv_proj_mat = camera->get_inv_proj_mat();
 
     vsg::dvec3 ray_origin, ray_end;
-    calc_mouse_world_coords(norm_mouse_x, norm_mouse_y, 0.0,
-        inv_view_mat, inv_proj_mat, ray_origin);
-    calc_mouse_world_coords(norm_mouse_x, norm_mouse_y, 1.0,
-        inv_view_mat, inv_proj_mat, ray_end);
+    calc_mouse_world_coords(norm_mouse_x, norm_mouse_y, 0.0, inv_view_mat,
+                            inv_proj_mat, ray_origin);
+    calc_mouse_world_coords(norm_mouse_x, norm_mouse_y, 1.0, inv_view_mat,
+                            inv_proj_mat, ray_end);
 
     const vsg::dvec3 ray_dir = ray_end - ray_origin;
 
@@ -226,29 +215,30 @@ bool Gizmo::handle_intersections()
         }
         else if (axis == 1)
         {
-            local_origin = vsg::dvec3(
-                ray_origin.y - axis_start.y,
-                ray_origin.x - axis_start.x,
-                ray_origin.z - axis_start.z
-            );
+            local_origin = vsg::dvec3(ray_origin.y - axis_start.y,
+                                      ray_origin.x - axis_start.x,
+                                      ray_origin.z - axis_start.z);
             local_dir = vsg::dvec3(ray_dir.y, ray_dir.x, ray_dir.z);
         }
         else
         {
-            local_origin = vsg::dvec3(
-                ray_origin.z - axis_start.z,
-                ray_origin.y - axis_start.y,
-                ray_origin.x - axis_start.x
-            );
+            local_origin = vsg::dvec3(ray_origin.z - axis_start.z,
+                                      ray_origin.y - axis_start.y,
+                                      ray_origin.x - axis_start.x);
             local_dir = vsg::dvec3(ray_dir.z, ray_dir.y, ray_dir.x);
         }
 
-        const double A_cyl = local_dir.y * local_dir.y + local_dir.z * local_dir.z;
+        const double A_cyl
+            = local_dir.y * local_dir.y + local_dir.z * local_dir.z;
 
         if (std::abs(A_cyl) > EPSILON)
         {
-            const double B_cyl = 2.0 * (local_origin.y * local_dir.y + local_origin.z * local_dir.z);
-            const double C_cyl = local_origin.y * local_origin.y + local_origin.z * local_origin.z - R_cyl * R_cyl;
+            const double B_cyl = 2.0
+                                 * (local_origin.y * local_dir.y
+                                    + local_origin.z * local_dir.z);
+            const double C_cyl = local_origin.y * local_origin.y
+                                 + local_origin.z * local_origin.z
+                                 - R_cyl * R_cyl;
 
             double ts[2];
             if (solve_quad_eq(A_cyl, B_cyl, C_cyl, ts[0], ts[1]))
@@ -298,14 +288,22 @@ bool Gizmo::handle_intersections()
             }
         }
 
-        const vsg::dvec3 cone_origin = local_origin - vsg::dvec3(H_cyl, 0.0, 0.0);
+        const vsg::dvec3 cone_origin
+            = local_origin - vsg::dvec3(H_cyl, 0.0, 0.0);
 
-        const double A_cone = local_dir.y * local_dir.y + local_dir.z * local_dir.z -
-                             (R_cone / H_cone) * (R_cone / H_cone) * local_dir.x * local_dir.x;
-        const double B_cone = 2.0 * (cone_origin.y * local_dir.y + cone_origin.z * local_dir.z -
-                             (R_cone / H_cone) * (R_cone / H_cone) * cone_origin.x * local_dir.x);
-        const double C_cone = cone_origin.y * cone_origin.y + cone_origin.z * cone_origin.z -
-                             (R_cone / H_cone) * (R_cone / H_cone) * cone_origin.x * cone_origin.x;
+        const double A_cone = local_dir.y * local_dir.y
+                              + local_dir.z * local_dir.z
+                              - (R_cone / H_cone) * (R_cone / H_cone)
+                                    * local_dir.x * local_dir.x;
+        const double B_cone
+            = 2.0
+              * (cone_origin.y * local_dir.y + cone_origin.z * local_dir.z
+                 - (R_cone / H_cone) * (R_cone / H_cone) * cone_origin.x
+                       * local_dir.x);
+        const double C_cone = cone_origin.y * cone_origin.y
+                              + cone_origin.z * cone_origin.z
+                              - (R_cone / H_cone) * (R_cone / H_cone)
+                                    * cone_origin.x * cone_origin.x;
 
         if (std::abs(A_cone) > EPSILON)
         {
@@ -366,8 +364,8 @@ bool Gizmo::handle_intersections()
         int axis_1 = (hit_arrow_index + 1) % 3;
         int axis_2 = (hit_arrow_index + 2) % 3;
 
-        active_plain_index = (arrow_dots[axis_1] > arrow_dots[axis_2])
-            ? axis_1 : axis_2;
+        active_plain_index
+            = (arrow_dots[axis_1] > arrow_dots[axis_2]) ? axis_1 : axis_2;
 
         vsg::dvec3 click_pos = curr_pos_;
         click_pos[active_arrow_index] = hit_point[active_arrow_index];
@@ -392,10 +390,12 @@ bool Gizmo::handle_intersections()
 void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
 {
     if (buttonRelease.handled || active_arrow_index < 0)
+    {
         return;
+    }
 
-    auto command = std::make_unique<TranslateObjectsCommand>(editor_context,
-        editor_context.selected_objects, total_translation_);
+    auto command = std::make_unique<TranslateObjectsCommand>(
+        editor_context, editor_context.selected_objects, total_translation_);
     editor_context.command_manager->push(std::move(command));
 
     plane_switches[active_plain_index]->mask = vsg::MASK_OFF;
@@ -408,15 +408,19 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
 void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 {
     if (moveEvent.handled || active_plain_index < 0)
+    {
         return;
+    }
 
     const auto& camera = editor_context.camera;
 
-    const auto intersector = vsg::LineSegmentIntersector::create(*camera,
-        moveEvent.x, moveEvent.y);
+    const auto intersector = vsg::LineSegmentIntersector::create(
+        *camera, moveEvent.x, moveEvent.y);
 
     if (!intersector)
+    {
         return;
+    }
 
     intersector->traversalMask = MASK_CLICKABLE;
 
@@ -424,13 +428,13 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
     auto& intersections = intersector->intersections;
     if (intersections.empty())
+    {
         return;
+    }
 
     std::sort(intersections.begin(), intersections.end(),
-        [](const auto& lhs, const auto& rhs) -> bool {
-            return (lhs->ratio) < (rhs->ratio);
-        }
-    );
+              [](const auto& lhs, const auto& rhs) -> bool
+              { return (lhs->ratio) < (rhs->ratio); });
 
     const auto& intersection = intersections.front();
 
@@ -438,20 +442,20 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
     for (const vsg::Node* const node : intersection->nodePath)
     {
-        if ((node != plane_switches[active_plain_index]) ||
-            (active_arrow_index < 0))
+        if ((node != plane_switches[active_plain_index])
+            || (active_arrow_index < 0))
         {
             continue;
         }
 
         vsg::dvec3 translation = {0.0, 0.0, 0.0};
 
-        translation[active_arrow_index] =
-            world_intersection[active_arrow_index] -
-            prev_intersect_pos_[active_arrow_index];
+        translation[active_arrow_index]
+            = world_intersection[active_arrow_index]
+              - prev_intersect_pos_[active_arrow_index];
 
-        prev_intersect_pos_[active_arrow_index] =
-            world_intersection[active_arrow_index];
+        prev_intersect_pos_[active_arrow_index]
+            = world_intersection[active_arrow_index];
 
         total_translation_ += translation;
 
@@ -472,13 +476,14 @@ const vsg::dvec3& Gizmo::get_curr_pos() const
 void Gizmo::update_visibility()
 {
     this->mask = editor_context.selected_objects.empty()
-        ? vsg::MASK_OFF
-        : MASK_GUI1 | MASK_CLICKABLE;
+                     ? vsg::MASK_OFF
+                     : MASK_GUI1 | MASK_CLICKABLE;
 
     const auto& camera = editor_context.camera;
 
     const vsg::dvec3& camera_pos = camera->get_look_at()->eye;
-    const double fov_rad = vsg::radians(camera->get_perspective()->fieldOfViewY);
+    const double fov_rad
+        = vsg::radians(camera->get_perspective()->fieldOfViewY);
 
     const double distance_to_camera = vsg::length(curr_pos_ - camera_pos);
     const double tan_half_fov = std::tan(fov_rad * 0.5);
@@ -487,9 +492,7 @@ void Gizmo::update_visibility()
     matrix_transform_->matrix = vsg::translate(curr_pos_) * vsg::scale(scale_);
 }
 
-static vsg::dvec3 calc_position_pivot(
-    const RouteObjects& selected_objects
-)
+static vsg::dvec3 calc_position_pivot(const RouteObjects& selected_objects)
 {
     vsg::dvec3 pos = {0.0, 0.0, 0.0};
     for (const auto& object : selected_objects)
@@ -500,9 +503,7 @@ static vsg::dvec3 calc_position_pivot(
     return pos;
 }
 
-static vsg::dvec3 calc_position_center(
-    const RouteObjects& selected_objects
-)
+static vsg::dvec3 calc_position_center(const RouteObjects& selected_objects)
 {
     vsg::dvec3 pos = {0.0, 0.0, 0.0};
     for (const auto& object : selected_objects)
@@ -520,8 +521,8 @@ void Gizmo::update_position()
     const auto& selected_objects = editor_context.selected_objects;
 
     curr_pos_ = gizmo_settings.to_center
-        ? calc_position_center(selected_objects)
-        : calc_position_pivot(selected_objects);
+                    ? calc_position_center(selected_objects)
+                    : calc_position_pivot(selected_objects);
 
     matrix_transform_->matrix = vsg::translate(curr_pos_) * vsg::scale(scale_);
 }

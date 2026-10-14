@@ -42,30 +42,22 @@ public:
     void show_commands() const;
 
 private:
-    void add_object(
-        const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
-        const std::string& label
-    ) const;
+    void add_object(const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
+                    const std::string& label) const;
 
     void save_objects_matrixes() const;
 
-    void handle_translation_drag(
-        std::size_t index,
-        const vsg::ref_ptr<RouteObject>& object,
-        bool& dragging
-    ) const;
+    void handle_translation_drag(std::size_t index,
+                                 const vsg::ref_ptr<RouteObject>& object,
+                                 bool& dragging) const;
 
-    void handle_rotation_drag(
-        std::size_t index,
-        const vsg::ref_ptr<RouteObject>& object,
-        bool& dragging
-    ) const;
+    void handle_rotation_drag(std::size_t index,
+                              const vsg::ref_ptr<RouteObject>& object,
+                              bool& dragging) const;
 
-    void handle_scale_drag(
-        std::size_t index,
-        const vsg::ref_ptr<RouteObject>& object,
-        bool& dragging
-    ) const;
+    void handle_scale_drag(std::size_t index,
+                           const vsg::ref_ptr<RouteObject>& object,
+                           bool& dragging) const;
 
 private:
     EditorContext& editor_context;
@@ -75,12 +67,9 @@ private:
     std::unique_ptr<CameraSettingsWindow> camera_settings_window;
 
 private:
-    void add_ttf_font(
-        const char* filename,
-        float size_pixels,
-        const ImFontConfig* font_cfg = nullptr,
-        const ImWchar* glyph_ranges = nullptr
-    );
+    void add_ttf_font(const char* filename, float size_pixels,
+                      const ImFontConfig* font_cfg = nullptr,
+                      const ImWchar* glyph_ranges = nullptr);
 
     void draw_main_menu_bar() const;
 

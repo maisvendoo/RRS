@@ -13,7 +13,7 @@ namespace vsg
 class ConfigureWindowEvent;
 class Perspective;
 
-}
+} // namespace vsg
 
 class WindowHandler : public vsg::Inherit<vsg::Visitor, WindowHandler>
 {

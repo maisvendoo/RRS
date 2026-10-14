@@ -20,31 +20,31 @@ static std::array<std::string, TOTAL_ACTIONS> get_action_setting_names()
 {
     std::array<std::string, TOTAL_ACTIONS> action_setting_names;
 
-    action_setting_names[ACTION_MOVE_CAMERA_FORWARD]      = "MoveCameraForward";
-    action_setting_names[ACTION_MOVE_CAMERA_BACKWARD]     = "MoveCameraBackward";
-    action_setting_names[ACTION_MOVE_CAMERA_LEFT]         = "MoveCameraLeft";
-    action_setting_names[ACTION_MOVE_CAMERA_RIGHT]        = "MoveCameraRight";
-    action_setting_names[ACTION_TRANSLATE_OBJECTS]        = "MoveObjects";
-    action_setting_names[ACTION_ROTATE_OBJECTS]           = "RotateObjects";
-    action_setting_names[ACTION_SCALE_OBJECTS]            = "ScaleObjects";
-    action_setting_names[ACTION_COPY_OBJECTS]             = "CopyObjects";
-    action_setting_names[ACTION_PASTE_OBJECTS]            = "PasteObjects";
-    action_setting_names[ACTION_HIDE_OBJECTS]             = "HideObjectsCommand";
-    action_setting_names[ACTION_SHOW_OBJECTS]             = "ShowObjects";
-    action_setting_names[ACTION_DELETE_OBJECTS]           = "DeleteObjects";
-    action_setting_names[ACTION_UNDO_COMMAND]             = "UndoCommand";
-    action_setting_names[ACTION_REDO_COMMAND]             = "RedoCommand";
-    action_setting_names[ACTION_SAVE_ROUTE]               = "SaveRoute";
-    action_setting_names[ACTION_SWAP_PROJECTION_MATRIX] = "ChangeProjectionMatrix";
+    action_setting_names[ACTION_MOVE_CAMERA_FORWARD] = "MoveCameraForward";
+    action_setting_names[ACTION_MOVE_CAMERA_BACKWARD] = "MoveCameraBackward";
+    action_setting_names[ACTION_MOVE_CAMERA_LEFT] = "MoveCameraLeft";
+    action_setting_names[ACTION_MOVE_CAMERA_RIGHT] = "MoveCameraRight";
+    action_setting_names[ACTION_TRANSLATE_OBJECTS] = "MoveObjects";
+    action_setting_names[ACTION_ROTATE_OBJECTS] = "RotateObjects";
+    action_setting_names[ACTION_SCALE_OBJECTS] = "ScaleObjects";
+    action_setting_names[ACTION_COPY_OBJECTS] = "CopyObjects";
+    action_setting_names[ACTION_PASTE_OBJECTS] = "PasteObjects";
+    action_setting_names[ACTION_HIDE_OBJECTS] = "HideObjectsCommand";
+    action_setting_names[ACTION_SHOW_OBJECTS] = "ShowObjects";
+    action_setting_names[ACTION_DELETE_OBJECTS] = "DeleteObjects";
+    action_setting_names[ACTION_UNDO_COMMAND] = "UndoCommand";
+    action_setting_names[ACTION_REDO_COMMAND] = "RedoCommand";
+    action_setting_names[ACTION_SAVE_ROUTE] = "SaveRoute";
+    action_setting_names[ACTION_SWAP_PROJECTION_MATRIX]
+        = "ChangeProjectionMatrix";
 
     return action_setting_names;
 };
 
-static const std::map<std::string, vsg::KeyModifier> modifier_map = {
-    {"alt", vsg::MODKEY_Alt},
-    {"ctrl", vsg::MODKEY_Control},
-    {"shift", vsg::MODKEY_Shift}
-};
+static const std::map<std::string, vsg::KeyModifier> modifier_map
+    = {{"alt", vsg::MODKEY_Alt},
+       {"ctrl", vsg::MODKEY_Control},
+       {"shift", vsg::MODKEY_Shift}};
 
 KeyBindings::KeyBindings()
 {
@@ -67,19 +67,22 @@ void KeyBindings::read(CfgReader& cfg)
         if (!cfg.getString("Keys", action_setting_name, line))
         {
             Journal::instance()->error(QString("Failed to find key binding %1")
-                .arg(action_setting_name));
+                                           .arg(action_setting_name));
             continue;
         }
 
         line = line.toLower();
 
-        const QStringList strings = line.split(QRegularExpression("[ +]"),
-            Qt::SkipEmptyParts);
+        const QStringList strings
+            = line.split(QRegularExpression("[ +]"), Qt::SkipEmptyParts);
 
         if (strings.size() <= 0)
+        {
             continue;
+        }
 
-        keys[i] = static_cast<vsg::KeySymbol>(strings.back().front().toLatin1());
+        keys[i]
+            = static_cast<vsg::KeySymbol>(strings.back().front().toLatin1());
 
         for (const auto& qstr : strings)
         {

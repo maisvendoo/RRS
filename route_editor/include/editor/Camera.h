@@ -17,7 +17,7 @@ class Orthographic;
 class Perspective;
 class ProjectionMatrix;
 
-}
+} // namespace vsg
 
 class Camera : public vsg::Inherit<vsg::Camera, Camera>
 {
@@ -70,7 +70,7 @@ private:
 private:
     EditorContext& editor_context;
 
-    vsg::ref_ptr<vsg::ProjectionMatrix> another_projection_matrix;
+    vsg::ref_ptr<vsg::ProjectionMatrix> another_proj_mat;
     vsg::ref_ptr<vsg::Perspective> perspective;
     vsg::ref_ptr<vsg::Orthographic> orthographic;
     vsg::ref_ptr<vsg::LookAt> look_at;

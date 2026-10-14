@@ -13,7 +13,7 @@ class ConstVisitor;
 class RecordTraversal;
 class Visitor;
 
-}
+} // namespace vsg
 
 class SingleSwitch : public vsg::Inherit<vsg::Node, SingleSwitch>
 {
@@ -21,18 +21,19 @@ public:
     SingleSwitch() = default;
 
     SingleSwitch(vsg::Mask mask, vsg::ref_ptr<vsg::Node> node)
-        : mask(mask), node(node)
+        : mask(mask)
+        , node(node)
     {
     }
 
     vsg::Mask mask = vsg::MASK_ALL;
     vsg::ref_ptr<vsg::Node> node;
 
-    template <class N, class V>
-    static void t_traverse(N& node, V& visitor)
+    template <class N, class V> static void t_traverse(N& node, V& visitor)
     {
-        if (node.node && (visitor.traversalMask &
-            (visitor.overrideMask | node.mask)) != vsg::MASK_OFF)
+        if (node.node
+            && (visitor.traversalMask & (visitor.overrideMask | node.mask))
+                   != vsg::MASK_OFF)
         {
             node.node->accept(visitor);
         }

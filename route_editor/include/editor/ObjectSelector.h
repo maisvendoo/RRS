@@ -12,7 +12,7 @@ namespace vsg
 class ButtonReleaseEvent;
 class MoveEvent;
 
-}
+} // namespace vsg
 
 class ObjectSelector : public vsg::Inherit<vsg::Visitor, ObjectSelector>
 {

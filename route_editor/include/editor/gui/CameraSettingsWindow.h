@@ -13,7 +13,7 @@ class CameraSettingsWindow
 {
 public:
     CameraSettingsWindow(EditorContext& editor_context,
-        ImGuiWindowFlags window_flags = 0);
+                         ImGuiWindowFlags window_flags = 0);
     void show() const;
 
 private:

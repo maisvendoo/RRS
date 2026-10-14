@@ -44,7 +44,7 @@ class Node;
 class PagedLOD;
 class Window;
 
-}
+} // namespace vsg
 
 struct ObjectRef
 {

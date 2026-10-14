@@ -21,7 +21,8 @@ static std::array<std::string, TOTAL_ACTIONS> get_action_names()
     action_names[ACTION_UNDO_COMMAND] = "Undo command";
     action_names[ACTION_REDO_COMMAND] = "Redo command";
     action_names[ACTION_SAVE_ROUTE] = "Save route";
-    action_names[ACTION_SWAP_PROJECTION_MATRIX] = "Camera: change projection matrix";
+    action_names[ACTION_SWAP_PROJECTION_MATRIX]
+        = "Camera: change projection matrix";
     return action_names;
 }
 

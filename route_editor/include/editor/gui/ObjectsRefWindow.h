@@ -10,7 +10,7 @@ class ObjectsRefWindow
 {
 public:
     ObjectsRefWindow(EditorContext& editor_context,
-        ImGuiWindowFlags window_flags = 0);
+                     ImGuiWindowFlags window_flags = 0);
     void show() const;
 
 private:

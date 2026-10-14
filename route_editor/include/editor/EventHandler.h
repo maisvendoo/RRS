@@ -18,7 +18,7 @@ class KeyReleaseEvent;
 class MoveEvent;
 class ScrollWheelEvent;
 
-}
+} // namespace vsg
 
 class EventHandler : public vsg::Inherit<vsg::Visitor, EventHandler>
 {

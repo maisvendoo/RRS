@@ -9,8 +9,8 @@
 EventHandler::EventHandler(const std::unique_ptr<StateManager>& state_manager)
     : state_manager(state_manager)
 {
-    assert(state_manager &&
-        "StateManager must be initialized before EventHandler");
+    assert(state_manager
+           && "StateManager must be initialized before EventHandler");
 }
 
 EventHandler::~EventHandler() = default;
