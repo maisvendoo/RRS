@@ -1,15 +1,24 @@
 #include "editor/StaticObjectManager.h"
 
+#include <vsg/core/ref_ptr.h>
+#include <vsg/maths/vec3.h>
 #include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/Switch.h>
 
 #include <cstddef>
+#include <string>
 #include <utility>
 
-StaticObjectManager::StaticObjectManager(std::size_t max_object_count)
-    : ids(max_object_count)
+StaticObjectManager::StaticObjectManager(EditorContext& editor_ctx,
+                                         std::size_t max_object_count)
+    : editor_ctx(editor_ctx)
+    , ids(max_object_count)
     , labels(max_object_count)
     , rel_paths(max_object_count)
+    , paged_lods(max_object_count)
     , mat_transforms(max_object_count)
+    , object_switches(max_object_count)
     , init_mats(max_object_count)
     , is_selected(max_object_count)
     , is_hidden(max_object_count)
@@ -20,7 +29,8 @@ StaticObjectManager::StaticObjectManager(std::size_t max_object_count)
 
 bool StaticObjectManager::add_object(
     const std::string& label, const std::string& rel_path,
-    const vsg::ref_ptr<vsg::MatrixTransform>& mat_transform, bool is_selected,
+    const vsg::ref_ptr<vsg::PagedLOD>& paged_lod, const vsg::dvec3& pos,
+    const vsg::dvec3& rot_deg, const vsg::dvec3& scale, bool is_selected,
     bool is_hidden)
 {
     if (object_count >= max_object_count)
@@ -31,7 +41,11 @@ bool StaticObjectManager::add_object(
     ids.at(object_count) = object_count;
     labels.at(object_count) = label;
     rel_paths.at(object_count) = rel_path;
-    mat_transforms.at(object_count) = mat_transform;
+    paged_lods.at(object_count) = paged_lod;
+
+    // const auto outline =
+
+    // mat_transforms.at(object_count) = mat_transform;
     this->is_selected.at(object_count) = is_selected;
     this->is_hidden.at(object_count) = is_hidden;
     ++object_count;
