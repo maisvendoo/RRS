@@ -1,5 +1,5 @@
-#ifndef EDITOR_OBJECT_MANAGER_H
-#define EDITOR_OBJECT_MANAGER_H
+#ifndef EDITOR_STATIC_OBJECT_MANAGER_H
+#define EDITOR_STATIC_OBJECT_MANAGER_H
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/mat4.h>
@@ -24,9 +24,10 @@ public:
                     const vsg::ref_ptr<vsg::MatrixTransform>& mat_transform,
                     bool is_selected = false, bool is_hidden = false);
 
-    bool remove_object(std::size_t idx);
+    bool remove_object(std::size_t id);
 
 private:
+    std::vector<std::size_t> ids;
     std::vector<std::string> labels;
     std::vector<std::string> rel_paths;
     std::vector<vsg::ref_ptr<vsg::MatrixTransform>> mat_transforms;
@@ -37,4 +38,4 @@ private:
     const std::size_t max_object_count;
 };
 
-#endif // EDITOR_OBJECT_MANAGER_H
+#endif // EDITOR_STATIC_OBJECT_MANAGER_H

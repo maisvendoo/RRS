@@ -3,17 +3,19 @@
 #include <vsg/nodes/MatrixTransform.h>
 
 #include <cstddef>
+#include <utility>
 
 StaticObjectManager::StaticObjectManager(std::size_t max_object_count)
-    : object_count(0)
+    : ids(max_object_count)
+    , labels(max_object_count)
+    , rel_paths(max_object_count)
+    , mat_transforms(max_object_count)
+    , init_mats(max_object_count)
+    , is_selected(max_object_count)
+    , is_hidden(max_object_count)
+    , object_count(0)
     , max_object_count(max_object_count)
 {
-    labels.reserve(max_object_count);
-    rel_paths.reserve(max_object_count);
-    mat_transforms.reserve(max_object_count);
-    init_mats.reserve(max_object_count);
-    is_selected.reserve(max_object_count);
-    is_hidden.reserve(max_object_count);
 }
 
 bool StaticObjectManager::add_object(
@@ -26,17 +28,37 @@ bool StaticObjectManager::add_object(
         return false;
     }
 
-    labels.emplace_back(label);
-    rel_paths.emplace_back(rel_path);
-    mat_transforms.emplace_back(mat_transform);
-    this->is_selected.emplace_back(is_selected);
-    this->is_hidden.emplace_back(is_hidden);
+    ids.at(object_count) = object_count;
+    labels.at(object_count) = label;
+    rel_paths.at(object_count) = rel_path;
+    mat_transforms.at(object_count) = mat_transform;
+    this->is_selected.at(object_count) = is_selected;
+    this->is_hidden.at(object_count) = is_hidden;
     ++object_count;
 
     return true;
 }
 
-bool StaticObjectManager::remove_object(std::size_t idx)
+bool StaticObjectManager::remove_object(std::size_t id)
 {
+    if (id >= object_count)
+    {
+        return false;
+    }
+
+    const std::size_t last_object_id = object_count - 1;
+    if (id == last_object_id)
+    {
+        --object_count;
+        return true;
+    }
+
+    labels.at(id) = std::move(labels.at(last_object_id));
+    rel_paths.at(id) = std::move(rel_paths.at(last_object_id));
+    mat_transforms.at(id) = std::move(mat_transforms.at(last_object_id));
+    is_selected.at(id) = is_selected.at(last_object_id);
+    is_hidden.at(id) = is_hidden.at(last_object_id);
+    --object_count;
+
     return true;
 }
