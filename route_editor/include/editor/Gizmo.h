@@ -23,7 +23,7 @@ class Node;
 class Gizmo : public vsg::Inherit<SingleSwitch, Gizmo>
 {
 public:
-    Gizmo(EditorContext& editor_context);
+    Gizmo(EditorContext& editor_ctx);
 
     bool handle_intersections();
 
@@ -36,18 +36,18 @@ public:
     void update_position();
 
 private:
-    EditorContext& editor_context;
+    EditorContext& editor_ctx;
 
-    vsg::Builder builder_;
-    vsg::ref_ptr<vsg::MatrixTransform> matrix_transform_;
+    vsg::Builder builder;
+    vsg::ref_ptr<vsg::MatrixTransform> matrix_transform;
     vsg::ref_ptr<vsg::Node> arrows[3];
     vsg::ref_ptr<SingleSwitch> plane_switches[3];
     vsg::ref_ptr<SingleSwitch> line_switches[3];
 
-    vsg::dvec3 curr_pos_;
-    vsg::dvec3 prev_intersect_pos_;
-    vsg::dvec3 total_translation_;
-    double scale_;
+    vsg::dvec3 curr_pos;
+    vsg::dvec3 prev_intersect_pos;
+    vsg::dvec3 total_translation;
+    double scale;
 
     int active_arrow_index = -1;
     int active_plain_index = -1;

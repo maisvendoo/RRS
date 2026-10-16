@@ -5,6 +5,7 @@
 #include "editor/KeyBindings.h"
 #include "editor/RouteMap.h"
 #include "editor/RouteObjects.h"
+#include "editor/SingleSwitch.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/GizmoSettings.h"
 #include "editor/settings/GuiSettings.h"
@@ -22,6 +23,8 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <vsg/nodes/Group.h>
+#include <vsg/nodes/Switch.h>
 
 class Camera;
 class CommandManager;
@@ -57,6 +60,29 @@ struct CompileInfo
     vsg::ref_ptr<vsg::Node> group_node;
     vsg::ref_ptr<vsg::Node> node;
     vsg::Mask mask = vsg::MASK_OFF;
+};
+
+struct CompileInfoNode
+{
+    vsg::ref_ptr<vsg::Node> node;
+};
+
+struct CompileInfoGroupNode
+{
+    vsg::ref_ptr<vsg::Group> group;
+    vsg::ref_ptr<vsg::Node> node;
+};
+
+struct CompileInfoSwitchNode
+{
+    vsg::ref_ptr<vsg::Switch> vsg_switch;
+    vsg::ref_ptr<vsg::Node> node;
+};
+
+struct CompileInfoSingleSwitchNode
+{
+    vsg::ref_ptr<SingleSwitch> single_switch;
+    vsg::ref_ptr<vsg::Node> node;
 };
 
 struct WaypointData
@@ -102,6 +128,10 @@ struct EditorContext
     RouteObjects hidden_objects;
 
     ThreadSafe<std::vector<CompileInfo>> compile_infos;
+    ThreadSafe<std::vector<CompileInfoNode>> compile_info_nodes;
+    ThreadSafe<std::vector<CompileInfoGroupNode>> compile_info_group_nodes;
+    ThreadSafe<std::vector<CompileInfoSwitchNode>> compile_info_switch_nodes;
+    ThreadSafe<std::vector<CompileInfoSingleSwitchNode>> compile_info_single_switch_nodes;
 
     ThreadSafe<std::unique_ptr<Topology>> topology;
     std::atomic_bool topology_loaded = false;

@@ -332,6 +332,12 @@ void RouteEditor::compile_models()
 
     vsg::CompileResult compile_result;
 
+    auto compile_info_nodes = editor_context.compile_info_nodes.lock();
+    for (auto& compile_info_node : *compile_info_nodes)
+    {
+
+    }
+
     std::for_each(
         compile_infos->begin(), compile_infos->end(),
         [&](const CompileInfo& compile_info)
