@@ -13,7 +13,6 @@
 StaticObjectManager::StaticObjectManager(EditorContext& editor_ctx,
                                          std::size_t max_object_count)
     : editor_ctx(editor_ctx)
-    , ids(max_object_count)
     , labels(max_object_count)
     , rel_paths(max_object_count)
     , paged_lods(max_object_count)
@@ -38,7 +37,6 @@ bool StaticObjectManager::add_object(
         return false;
     }
 
-    ids.at(object_count) = object_count;
     labels.at(object_count) = label;
     rel_paths.at(object_count) = rel_path;
     paged_lods.at(object_count) = paged_lod;

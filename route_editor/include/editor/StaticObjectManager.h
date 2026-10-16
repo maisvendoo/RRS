@@ -36,7 +36,6 @@ public:
 
 private:
     EditorContext& editor_ctx;
-    std::vector<std::size_t> ids;
     std::vector<std::string> labels;
     std::vector<std::string> rel_paths;
     std::vector<vsg::ref_ptr<vsg::PagedLOD>> paged_lods;
