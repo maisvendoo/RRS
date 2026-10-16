@@ -31,100 +31,98 @@ static vsg::dvec3 to_euler_deg(const vsg::dquat& q)
                                 1.0 - 2.0 * (q.y * q.y + q.z * q.z)))};
 }
 
-RouteObject::RouteObject(EditorContext& editor_context,
+RouteObject::RouteObject(EditorContext& editor_ctx,
                          const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
-                         const std::string& label,
-                         const vsg::dvec3& translation,
-                         const vsg::dvec3& rotation_deg,
-                         const vsg::dvec3& scale)
+                         const std::string& label, const vsg::dvec3& position,
+                         const vsg::dvec3& rot_deg, const vsg::dvec3& scale)
     : label(label)
-    , editor_context(editor_context)
-    , translation_(translation)
-    , rotation_deg_(rotation_deg)
-    , scale_(scale)
-    , paged_lod_(paged_lod)
+    , editor_ctx(editor_ctx)
+    , position(position)
+    , rot_deg(rot_deg)
+    , scale(scale)
+    , paged_lod(paged_lod)
 {
-    paged_lod_switch_ = SingleSwitch::create(
+    paged_lod_switch = SingleSwitch::create(
         vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
 
-    outline_switch_ = SingleSwitch::create(vsg::MASK_OFF, nullptr);
+    outline_switch = SingleSwitch::create(vsg::MASK_OFF, nullptr);
 
-    this->addChild(paged_lod_switch_);
-    this->addChild(outline_switch_);
+    this->addChild(paged_lod_switch);
+    this->addChild(outline_switch);
 
     update_matrix();
 }
 
-const vsg::dvec3& RouteObject::get_translation() const
+const vsg::dvec3& RouteObject::get_position() const
 {
-    return translation_;
+    return position;
 }
 
-const vsg::dvec3& RouteObject::get_rotation_deg() const
+const vsg::dvec3& RouteObject::get_rot_deg() const
 {
-    return rotation_deg_;
+    return rot_deg;
 }
 
 const vsg::dvec3& RouteObject::get_scale() const
 {
-    return scale_;
+    return scale;
 }
 
 const vsg::dmat4& RouteObject::get_initial_matrix() const
 {
-    return initial_matrix_;
+    return initial_matrix;
 }
 
 const vsg::dbox& RouteObject::get_bounds() const
 {
-    return bounds_;
+    return bounds;
 }
 
 bool RouteObject::get_is_selected() const
 {
-    return is_selected_;
+    return is_selected;
 }
 
 bool RouteObject::get_is_hidden() const
 {
-    return is_hidden_;
+    return is_hidden;
 }
 
-void RouteObject::set_translation(const vsg::dvec3& translation)
+void RouteObject::set_position(const vsg::dvec3& position)
 {
-    translation_ = translation;
+    this->position = position;
 
-    matrix[3][0] = translation.x;
-    matrix[3][1] = translation.y;
-    matrix[3][2] = translation.z;
+    matrix[3][0] = position.x;
+    matrix[3][1] = position.y;
+    matrix[3][2] = position.z;
 
     update_bounds();
 }
 
-void RouteObject::set_rotation_deg(const vsg::dvec3& rotation_deg)
+void RouteObject::set_rot_deg(const vsg::dvec3& rot_deg)
 {
-    rotation_deg_ = rotation_deg;
+    this->rot_deg = rot_deg;
     update_matrix();
 }
 
 void RouteObject::set_scale(const vsg::dvec3& scale)
 {
-    scale_ = scale;
+    this->scale = scale;
     update_matrix();
 }
 
-void RouteObject::move(const vsg::dvec3& translation)
+void RouteObject::move(const vsg::dvec3& delta_position)
 {
-    set_translation(translation_ + translation);
+    set_position(position + delta_position);
 }
 
 void RouteObject::rotate_around_pivot(const vsg::dvec3& pivot,
                                       const vsg::dvec3& axis, double radians,
                                       const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(pivot)
-                   * vsg::rotate(vsg::dquat(radians, axis))
-                   * vsg::translate(-pivot) * matrix;
+    this->matrix = vsg::translate(pivot) *
+                   vsg::rotate(vsg::dquat(radians, axis)) *
+                   vsg::translate(-pivot) * matrix;
 
     decompose_matrix();
     update_bounds();
@@ -143,21 +141,21 @@ void RouteObject::scale_relative_to_pivot(const vsg::dvec3& pivot,
 
 void RouteObject::hide()
 {
-    paged_lod_switch_->mask = vsg::MASK_OFF;
-    outline_switch_->mask = vsg::MASK_OFF;
+    paged_lod_switch->mask = vsg::MASK_OFF;
+    outline_switch->mask = vsg::MASK_OFF;
 
-    is_hidden_ = true;
+    is_hidden = true;
 
-    editor_context.hidden_objects.emplace_back(this);
+    editor_ctx.hidden_objects.emplace_back(this);
 }
 
 RouteObjectsIterator RouteObject::show()
 {
-    paged_lod_switch_->mask = MASK_SCENE | MASK_CLICKABLE;
+    paged_lod_switch->mask = MASK_SCENE | MASK_CLICKABLE;
 
-    is_hidden_ = false;
+    is_hidden = false;
 
-    RouteObjects& hidden_objects = editor_context.hidden_objects;
+    RouteObjects& hidden_objects = editor_ctx.hidden_objects;
 
     return hidden_objects.erase(std::find(
         hidden_objects.begin(), hidden_objects.end(), vsg::ref_ptr(this)));
@@ -165,54 +163,54 @@ RouteObjectsIterator RouteObject::show()
 
 bool RouteObject::select()
 {
-    if (!outline_switch_->node)
+    if (!outline_switch->node)
     {
         auto outline
-            = editor_context.outline_builder->create_outline(paged_lod_);
+            = editor_ctx.outline_builder->create_outline(paged_lod);
         if (!outline)
         {
             return false;
         }
 
-        editor_context.compile_infos.lock()->emplace_back(
-            CompileInfo{outline_switch_, outline});
+        editor_ctx.compile_infos.lock()->emplace_back(
+            CompileInfo{outline_switch, outline});
     }
 
-    outline_switch_->mask = MASK_GUI2;
+    outline_switch->mask = MASK_GUI2;
 
-    is_selected_ = true;
+    is_selected = true;
 
-    editor_context.selected_objects.emplace_back(this);
-    editor_context.gizmo->update_position();
+    editor_ctx.selected_objects.emplace_back(this);
+    editor_ctx.gizmo->update_position();
 
     return true;
 }
 
 RouteObjectsIterator RouteObject::deselect()
 {
-    outline_switch_->mask = vsg::MASK_OFF;
+    outline_switch->mask = vsg::MASK_OFF;
 
-    is_selected_ = false;
+    is_selected = false;
 
-    auto& selected_objects = editor_context.selected_objects;
+    auto& selected_objects = editor_ctx.selected_objects;
 
     const auto it = selected_objects.erase(std::find(
         selected_objects.begin(), selected_objects.end(), vsg::ref_ptr(this)));
 
-    editor_context.gizmo->update_position();
+    editor_ctx.gizmo->update_position();
 
     return it;
 }
 
 vsg::ref_ptr<RouteObject> RouteObject::copy() const
 {
-    return RouteObject::create(editor_context, paged_lod_, label, translation_,
-                               rotation_deg_, scale_);
+    return RouteObject::create(editor_ctx, paged_lod, label, position, rot_deg,
+                               scale);
 }
 
 void RouteObject::save_matrix()
 {
-    initial_matrix_ = matrix;
+    initial_matrix = matrix;
 }
 
 void RouteObject::set_matrix(const vsg::dmat4& matrix)
@@ -229,11 +227,11 @@ void RouteObject::update_matrix()
     constexpr vsg::dvec3 Y_AXIS = {0.0, 1.0, 0.0};
     constexpr vsg::dvec3 Z_AXIS = {0.0, 0.0, 1.0};
 
-    matrix = vsg::translate(translation_)
-             * vsg::rotate(vsg::radians(rotation_deg_.z), Z_AXIS)
-             * vsg::rotate(vsg::radians(rotation_deg_.y), Y_AXIS)
-             * vsg::rotate(vsg::radians(rotation_deg_.x), X_AXIS)
-             * vsg::scale(scale_);
+    matrix = vsg::translate(position) *
+             vsg::rotate(vsg::radians(rot_deg.z), Z_AXIS) *
+             vsg::rotate(vsg::radians(rot_deg.y), Y_AXIS) *
+             vsg::rotate(vsg::radians(rot_deg.x), X_AXIS) *
+             vsg::scale(scale);
 
     update_bounds();
 }
@@ -243,14 +241,14 @@ void RouteObject::update_bounds()
     vsg::ComputeBounds compute_bounds;
     compute_bounds.useNodeBounds = false;
     this->accept(compute_bounds);
-    bounds_ = compute_bounds.bounds;
+    bounds = compute_bounds.bounds;
 
-    editor_context.gizmo->update_position();
+    editor_ctx.gizmo->update_position();
 }
 
 void RouteObject::decompose_matrix()
 {
     vsg::dquat temp_quat;
-    vsg::decompose(matrix, translation_, temp_quat, scale_);
-    rotation_deg_ = to_euler_deg(temp_quat);
+    vsg::decompose(matrix, position, temp_quat, scale);
+    rot_deg = to_euler_deg(temp_quat);
 }

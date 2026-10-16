@@ -497,7 +497,7 @@ static vsg::dvec3 calc_position_pivot(const RouteObjects& selected_objects)
     vsg::dvec3 pos = {0.0, 0.0, 0.0};
     for (const auto& object : selected_objects)
     {
-        pos += object->get_translation();
+        pos += object->get_position();
     }
     pos /= selected_objects.size();
     return pos;

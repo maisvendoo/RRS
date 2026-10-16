@@ -25,14 +25,14 @@ class PagedLOD;
 class RouteObject : public vsg::Inherit<vsg::MatrixTransform, RouteObject>
 {
 public:
-    RouteObject(EditorContext& editor_context,
+    RouteObject(EditorContext& editor_ctx,
                 const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
-                const std::string& label, const vsg::dvec3& translation,
-                const vsg::dvec3& rotation_deg = {0.0, 0.0, 0.0},
+                const std::string& label, const vsg::dvec3& position,
+                const vsg::dvec3& rot_deg = {0.0, 0.0, 0.0},
                 const vsg::dvec3& scale = {1.0, 1.0, 1.0});
 
-    const vsg::dvec3& get_translation() const;
-    const vsg::dvec3& get_rotation_deg() const;
+    const vsg::dvec3& get_position() const;
+    const vsg::dvec3& get_rot_deg() const;
     const vsg::dvec3& get_scale() const;
 
     const vsg::dmat4& get_initial_matrix() const;
@@ -41,11 +41,11 @@ public:
     bool get_is_selected() const;
     bool get_is_hidden() const;
 
-    void set_translation(const vsg::dvec3& translation);
-    void set_rotation_deg(const vsg::dvec3& rotation_deg);
+    void set_position(const vsg::dvec3& position);
+    void set_rot_deg(const vsg::dvec3& rot_deg);
     void set_scale(const vsg::dvec3& scale);
 
-    void move(const vsg::dvec3& translation);
+    void move(const vsg::dvec3& delta_position);
 
     void rotate_around_pivot(const vsg::dvec3& pivot, const vsg::dvec3& axis,
                              double radians, const vsg::dmat4& matrix);
@@ -74,21 +74,21 @@ private:
     void decompose_matrix();
 
 private:
-    EditorContext& editor_context;
+    EditorContext& editor_ctx;
 
-    vsg::dvec3 translation_;
-    vsg::dvec3 rotation_deg_;
-    vsg::dvec3 scale_;
+    vsg::dvec3 position;
+    vsg::dvec3 rot_deg;
+    vsg::dvec3 scale;
 
-    vsg::dmat4 initial_matrix_;
-    vsg::dbox bounds_;
+    vsg::dmat4 initial_matrix;
+    vsg::dbox bounds;
 
-    bool is_selected_ = false;
-    bool is_hidden_ = false;
+    bool is_selected = false;
+    bool is_hidden = false;
 
-    vsg::ref_ptr<SingleSwitch> paged_lod_switch_;
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod_;
-    vsg::ref_ptr<SingleSwitch> outline_switch_;
+    vsg::ref_ptr<SingleSwitch> paged_lod_switch;
+    vsg::ref_ptr<vsg::PagedLOD> paged_lod;
+    vsg::ref_ptr<SingleSwitch> outline_switch;
 };
 
 #endif // ROUTE_OBJECT_H

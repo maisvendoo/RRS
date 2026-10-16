@@ -200,8 +200,8 @@ void BasicEditorState::save_route()
     auto static_objects = editor_context.static_objects.lock();
     for (const auto& object : *static_objects)
     {
-        const vsg::dvec3& translation{object->get_translation()};
-        const vsg::dvec3 rotation_deg{-object->get_rotation_deg()};
+        const vsg::dvec3& translation{object->get_position()};
+        const vsg::dvec3 rotation_deg{-object->get_rot_deg()};
 
         route_map_file << object->label << "," <<
             translation.x << "," << translation.y << "," << translation.z << "," <<
