@@ -156,6 +156,16 @@ protected:
         stream << cabine_idx;
         stream << id;
         stream << value;
+
+        quint32 size = static_cast<quint32>(params.size());
+
+        stream << size;
+
+        for (auto param : params)
+        {
+            stream << param;
+        }
+
         stream << client_priority;
 
         return data;
@@ -169,6 +179,19 @@ protected:
         stream >> cabine_idx;
         stream >> id;
         stream >> value;
+
+        quint32 size;
+
+        stream >> size;
+
+        if (size != 0 && size <= params.size())
+        {
+            for (quint32 i = 0; i < size; ++i)
+            {
+                stream >> params[i];
+            }
+        }
+
         stream >> client_priority;
     }
 
