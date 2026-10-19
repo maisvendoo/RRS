@@ -52,7 +52,7 @@ bool SwitcherHandler::load_config(CfgReader &cfg, QDomNode secNode)
 
     QString tmp = "";
     cfg.getString(secNode, "PositionsNames", tmp);
-    positionNames = tmp.split(',');            
+    positionNames = tmp.isEmpty() ? QStringList() : tmp.split(',');
 
     return true;
 }
@@ -254,7 +254,7 @@ QString SwitcherHandler::getState() const
 {
     int idx = currentIndex();
 
-    if (positionNames.empty() || idx >= positionNames.size() || positionNames[idx].isEmpty())
+    if (positionNames.empty() || idx >= positionNames.size())
     {
         return QString("%1").arg(idx, 2);
     }
