@@ -132,6 +132,10 @@ signals:
 
 protected:
 
+    /// Вектор дополнительных, зависимых от value параметров, инициализируемых
+    /// внутри конкретной реализации контрола (разного рода контакторы на валах и пр.)
+    std::vector<float> params;
+
     const std::vector<float> *feedback_signals = nullptr;
 
     const QMap<QString, uint16_t> *animation_signals_map = nullptr;

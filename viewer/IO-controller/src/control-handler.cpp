@@ -44,6 +44,19 @@ bool ControlHandler::load_config(CfgReader &cfg, QDomNode secNode)
         hot_keys = QString();
     }
 
+    int numParams = 0;
+
+    // Если прочли число дополнительных параметров
+    if (cfg.getInt(secNode, "NumParams", numParams))
+    {
+        // Выделяем под него память и чистим ее
+        if (numParams > 0)
+        {
+            params.resize(numParams);
+            std::fill(params.begin(), params.end(), 0.0f);
+        }
+    }
+
     return true;
 }
 
