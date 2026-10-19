@@ -254,7 +254,7 @@ QString SwitcherHandler::getState() const
 {
     int idx = currentIndex();
 
-    if (positionNames.empty() || idx >= positionNames.size())
+    if (positionNames.empty() || idx >= positionNames.size() || positionNames[idx].isEmpty())
     {
         return QString("%1").arg(idx, 2);
     }
