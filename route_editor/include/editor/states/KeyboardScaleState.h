@@ -8,7 +8,7 @@
 class KeyboardScaleState : public TransformState
 {
 public:
-    KeyboardScaleState(EditorContext& editor_context);
+    KeyboardScaleState(EditorContext& editor_ctx);
     virtual ~KeyboardScaleState() override;
 
     virtual void on_activate() override;

@@ -6,7 +6,7 @@
 class GizmoScaleState : public State
 {
 public:
-    GizmoScaleState(EditorContext& editor_context);
+    GizmoScaleState(EditorContext& editor_ctx);
     virtual ~GizmoScaleState() override;
 
     virtual void handle_key_press() override;

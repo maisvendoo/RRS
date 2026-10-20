@@ -8,7 +8,7 @@ struct EditorContext;
 class State
 {
 public:
-    explicit State(EditorContext& editor_context);
+    explicit State(EditorContext& editor_ctx);
     virtual ~State();
 
     virtual void on_activate();
@@ -30,7 +30,7 @@ public:
     const std::string& get_name() const;
 
 protected:
-    EditorContext& editor_context;
+    EditorContext& editor_ctx;
     std::string name;
 };
 

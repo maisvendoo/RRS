@@ -33,20 +33,20 @@ void PasteObjectsCommand::execute()
             pasted_objects.emplace_back(object->copy());
     }
 
-    auto compile_infos = editor_context.compile_infos.lock();
-    auto static_objects = editor_context.static_objects.lock();
+    auto compile_infos = editor_ctx.compile_infos.lock();
+    auto static_objects = editor_ctx.static_objects.lock();
 
     for (const auto& pasted_object : pasted_objects)
     {
         compile_infos->emplace_back(CompileInfo{
-            editor_context.route, pasted_object, vsg::MASK_ALL});
+            editor_ctx.route, pasted_object, vsg::MASK_ALL});
 
         static_objects->emplace_back(pasted_object);
 
         pasted_object->select();
     }
 
-    editor_context.gizmo->update_visibility();
+    editor_ctx.gizmo->update_visibility();
 }
 
 void PasteObjectsCommand::undo()
@@ -55,9 +55,9 @@ void PasteObjectsCommand::undo()
     {
         pasted_object->deselect();
 
-        editor_context.static_objects.lock()->remove(pasted_object);
+        editor_ctx.static_objects.lock()->remove(pasted_object);
 
-        auto& route_children = editor_context.route->children;
+        auto& route_children = editor_ctx.route->children;
 
         route_children.erase(
             std::remove_if(route_children.begin(), route_children.end(),
@@ -72,10 +72,10 @@ void PasteObjectsCommand::undo()
     for (const auto& object : objects_to_deselect)
         object->select();
 
-    editor_context.compile_infos.lock()->emplace_back(CompileInfo{
-        nullptr, editor_context.route});
+    editor_ctx.compile_infos.lock()->emplace_back(CompileInfo{
+        nullptr, editor_ctx.route});
 
-    editor_context.gizmo->update_visibility();
+    editor_ctx.gizmo->update_visibility();
 }
 
 void PasteObjectsCommand::update_description()

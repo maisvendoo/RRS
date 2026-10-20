@@ -8,7 +8,7 @@
 class KeyboardRotateState : public TransformState
 {
 public:
-    KeyboardRotateState(EditorContext& editor_context);
+    KeyboardRotateState(EditorContext& editor_ctx);
     virtual ~KeyboardRotateState() override;
 
     virtual void on_activate() override;

@@ -12,9 +12,9 @@
 #include <algorithm>
 #include <cstdio>
 
-DeleteObjectsCommand::DeleteObjectsCommand(EditorContext& editor_context)
-    : Command(editor_context)
-    , objects(editor_context.selected_objects)
+DeleteObjectsCommand::DeleteObjectsCommand(EditorContext& editor_ctx)
+    : Command(editor_ctx)
+    , objects(editor_ctx.selected_objects)
 {
     update_description();
 }
@@ -25,9 +25,9 @@ void DeleteObjectsCommand::execute()
     {
         object->deselect();
 
-        editor_context.static_objects.lock()->remove(object);
+        editor_ctx.static_objects.lock()->remove(object);
 
-        auto& route_children = editor_context.route->children;
+        auto& route_children = editor_ctx.route->children;
 
         route_children.erase(
             std::remove_if(route_children.begin(), route_children.end(),
@@ -39,28 +39,28 @@ void DeleteObjectsCommand::execute()
         );
     }
 
-    editor_context.compile_infos.lock()->emplace_back(CompileInfo{
-        nullptr, editor_context.route});
+    editor_ctx.compile_infos.lock()->emplace_back(CompileInfo{
+        nullptr, editor_ctx.route});
 
-    editor_context.gizmo->update_visibility();
+    editor_ctx.gizmo->update_visibility();
 }
 
 void DeleteObjectsCommand::undo()
 {
-    auto compile_infos = editor_context.compile_infos.lock();
-    auto static_objects = editor_context.static_objects.lock();
+    auto compile_infos = editor_ctx.compile_infos.lock();
+    auto static_objects = editor_ctx.static_objects.lock();
 
     for (const auto& object : objects)
     {
         compile_infos->emplace_back(CompileInfo{
-            editor_context.route, object, vsg::MASK_ALL});
+            editor_ctx.route, object, vsg::MASK_ALL});
 
         static_objects->emplace_back(object);
 
         object->select();
     }
 
-    editor_context.gizmo->update_visibility();
+    editor_ctx.gizmo->update_visibility();
 }
 
 void DeleteObjectsCommand::update_description()

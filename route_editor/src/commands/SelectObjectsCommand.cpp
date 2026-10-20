@@ -20,7 +20,7 @@ void SelectObjectsCommand::execute()
     for (const auto& object : objects_to_deselect)
         object->deselect();
 
-    editor_context.gizmo->update_visibility();
+    editor_ctx.gizmo->update_visibility();
 }
 
 void SelectObjectsCommand::undo()
@@ -31,7 +31,7 @@ void SelectObjectsCommand::undo()
     for (const auto& object : objects_to_deselect)
         object->select();
 
-    editor_context.gizmo->update_visibility();
+    editor_ctx.gizmo->update_visibility();
 }
 
 void SelectObjectsCommand::update_description()

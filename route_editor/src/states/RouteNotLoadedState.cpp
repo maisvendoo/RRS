@@ -12,8 +12,8 @@
 
 #include <filesystem>
 
-RouteNotLoadedState::RouteNotLoadedState(EditorContext& editor_context)
-    : State(editor_context)
+RouteNotLoadedState::RouteNotLoadedState(EditorContext& editor_ctx)
+    : State(editor_ctx)
 {
     name = "RouteNotLoadedState";
 }
@@ -26,7 +26,7 @@ void RouteNotLoadedState::draw_gui() const
     {
         if (ImGuiFileDialog::Instance()->IsOk())
         {
-            auto& route_dir = editor_context.route->route_dir;
+            auto& route_dir = editor_ctx.route->route_dir;
             route_dir = ImGuiFileDialog::Instance()->GetCurrentPath();
             if (!std::filesystem::exists(route_dir + "/models") ||
                 !std::filesystem::exists(route_dir + "/textures") ||
@@ -37,8 +37,8 @@ void RouteNotLoadedState::draw_gui() const
             }
             else
             {
-                editor_context.state_manager->defer_switch_to(STATE_BASIC);
-                editor_context.editor_state = EditorState::LOAD_ROUTE;
+                editor_ctx.state_manager->defer_switch_to(STATE_BASIC);
+                editor_ctx.editor_state = EditorState::LOAD_ROUTE;
                 ImGuiFileDialog::Instance()->Close();
             }
         }

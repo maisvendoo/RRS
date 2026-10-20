@@ -9,7 +9,7 @@ struct gui_settings_t;
 class ObjectsRefWindow
 {
 public:
-    ObjectsRefWindow(EditorContext& editor_context,
+    ObjectsRefWindow(EditorContext& editor_ctx,
                      ImGuiWindowFlags window_flags = 0);
     void show() const;
 

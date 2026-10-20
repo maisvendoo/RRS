@@ -20,25 +20,25 @@
 
 #include <memory>
 
-StateManager::StateManager(EditorContext& editor_context)
+StateManager::StateManager(EditorContext& editor_ctx)
 {
     states.at(STATE_ROUTE_NOT_LOADED)
-        = std::make_unique<RouteNotLoadedState>(editor_context);
-    states.at(STATE_BASIC) = std::make_unique<BasicEditorState>(editor_context);
+        = std::make_unique<RouteNotLoadedState>(editor_ctx);
+    states.at(STATE_BASIC) = std::make_unique<BasicEditorState>(editor_ctx);
     states.at(STATE_NAVIGATION)
-        = std::make_unique<NavigationState>(editor_context);
+        = std::make_unique<NavigationState>(editor_ctx);
     states.at(STATE_KEYBOARD_TRANSLATE)
-        = std::make_unique<KeyboardTranslateState>(editor_context);
+        = std::make_unique<KeyboardTranslateState>(editor_ctx);
     states.at(STATE_KEYBOARD_ROTATE)
-        = std::make_unique<KeyboardRotateState>(editor_context);
+        = std::make_unique<KeyboardRotateState>(editor_ctx);
     states.at(STATE_KEYBOARD_SCALE)
-        = std::make_unique<KeyboardScaleState>(editor_context);
+        = std::make_unique<KeyboardScaleState>(editor_ctx);
     states.at(STATE_GIZMO_TRANSLATE)
-        = std::make_unique<GizmoTranslateState>(editor_context);
+        = std::make_unique<GizmoTranslateState>(editor_ctx);
     states.at(STATE_GIZMO_ROTATE)
-        = std::make_unique<GizmoRotateState>(editor_context);
+        = std::make_unique<GizmoRotateState>(editor_ctx);
     states.at(STATE_GIZMO_SCALE)
-        = std::make_unique<GizmoScaleState>(editor_context);
+        = std::make_unique<GizmoScaleState>(editor_ctx);
 
     current_state = states.at(STATE_ROUTE_NOT_LOADED).get();
     deferred_state = states.at(STATE_ROUTE_NOT_LOADED).get();

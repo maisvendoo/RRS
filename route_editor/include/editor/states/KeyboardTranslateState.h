@@ -8,7 +8,7 @@
 class KeyboardTranslateState : public TransformState
 {
 public:
-    KeyboardTranslateState(EditorContext& editor_context);
+    KeyboardTranslateState(EditorContext& editor_ctx);
     virtual ~KeyboardTranslateState() override;
 
     virtual void on_activate() override;

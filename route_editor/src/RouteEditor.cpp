@@ -71,39 +71,39 @@ bool RouteEditor::initialize()
     create_vsg_options();
     configure_shaders();
 
-    window_handler_ = WindowHandler::create(editor_context);
-    if (!editor_context.window)
+    window_handler_ = WindowHandler::create(editor_ctx);
+    if (!editor_ctx.window)
     {
         return false;
     }
 
-    editor_context.mouse = Mouse::create();
-    editor_context.keyboard = Keyboard::create(editor_context.key_bindings);
-    editor_context.command_manager = std::make_unique<CommandManager>();
-    editor_context.camera = Camera::create(editor_context);
-    editor_context.object_manager =
-        std::make_unique<StaticObjectManager>(editor_context, 1000000);
-    editor_context.route = Route::create(editor_context);
-    editor_context.outline_builder = OutlineBuilder::create();
+    editor_ctx.mouse = Mouse::create();
+    editor_ctx.keyboard = Keyboard::create(editor_ctx.key_bindings);
+    editor_ctx.command_manager = std::make_unique<CommandManager>();
+    editor_ctx.camera = Camera::create(editor_ctx);
+    editor_ctx.object_manager =
+        std::make_unique<StaticObjectManager>(editor_ctx, 1000000);
+    editor_ctx.route = Route::create(editor_ctx);
+    editor_ctx.outline_builder = OutlineBuilder::create();
 
     const auto ambient_light = vsg::AmbientLight::create();
 
-    const auto& scene_settings = editor_context.scene_settings;
-    editor_context.world_culling
+    const auto& scene_settings = editor_ctx.scene_settings;
+    editor_ctx.world_culling
         = WorldCulling::create(scene_settings.culling_tiles_size_0,
                                scene_settings.culling_tiles_size_1);
-    editor_context.scene_graph = vsg::Switch::create();
-    editor_context.scene_graph->addChild(vsg::Mask{MASK_SCENE}, ambient_light);
-    editor_context.scene_graph->addChild(vsg::MASK_ALL, editor_context.route);
+    editor_ctx.scene_graph = vsg::Switch::create();
+    editor_ctx.scene_graph->addChild(vsg::Mask{MASK_SCENE}, ambient_light);
+    editor_ctx.scene_graph->addChild(vsg::MASK_ALL, editor_ctx.route);
 
     const auto scene_view
-        = vsg::View::create(editor_context.camera, editor_context.scene_graph);
+        = vsg::View::create(editor_ctx.camera, editor_ctx.scene_graph);
     scene_view->mask = MASK_SCENE;
 
     VkClearValue clear_value{};
     clear_value.depthStencil = {0.0f, 0};
     VkClearAttachment attachment{VK_IMAGE_ASPECT_DEPTH_BIT, 1, clear_value};
-    const VkExtent2D& extent = editor_context.window->extent2D();
+    const VkExtent2D& extent = editor_ctx.window->extent2D();
     VkClearRect rect{VkRect2D{VkOffset2D{0, 0}, extent}, 0, 1};
 
     const auto clear_attachments_ = vsg::ClearAttachments::create(
@@ -111,21 +111,21 @@ bool RouteEditor::initialize()
         vsg::ClearAttachments::Rects{rect});
 
     const auto gui_view1
-        = vsg::View::create(editor_context.camera, editor_context.scene_graph);
+        = vsg::View::create(editor_ctx.camera, editor_ctx.scene_graph);
     gui_view1->mask = MASK_GUI1;
 
     const auto gui_view2
-        = vsg::View::create(editor_context.camera, editor_context.scene_graph);
+        = vsg::View::create(editor_ctx.camera, editor_ctx.scene_graph);
     gui_view2->mask = MASK_GUI2;
 
-    editor_context.state_manager
-        = std::make_unique<StateManager>(editor_context);
-    const auto editor_gui = EditorGui::create(editor_context);
+    editor_ctx.state_manager
+        = std::make_unique<StateManager>(editor_ctx);
+    const auto editor_gui = EditorGui::create(editor_ctx);
 
     const auto render_gui
-        = vsgImGui::RenderImGui::create(editor_context.window, editor_gui);
+        = vsgImGui::RenderImGui::create(editor_ctx.window, editor_gui);
 
-    const auto render_graph_ = vsg::RenderGraph::create(editor_context.window);
+    const auto render_graph_ = vsg::RenderGraph::create(editor_ctx.window);
     render_graph_->addChild(scene_view);
     render_graph_->addChild(clear_attachments_);
     render_graph_->addChild(gui_view1);
@@ -135,35 +135,35 @@ bool RouteEditor::initialize()
     render_graph_->addChild(render_gui);
 
     const auto command_graph
-        = vsg::CommandGraph::create(editor_context.window, render_graph_);
+        = vsg::CommandGraph::create(editor_ctx.window, render_graph_);
 
     viewer_ = vsg::Viewer::create();
 
-    editor_context.gizmo = Gizmo::create(editor_context);
-    editor_context.scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE},
-                                         editor_context.gizmo);
+    editor_ctx.gizmo = Gizmo::create(editor_ctx);
+    editor_ctx.scene_graph->addChild(vsg::Mask{MASK_GUI1 | MASK_CLICKABLE},
+                                         editor_ctx.gizmo);
 
-    editor_context.object_selector = ObjectSelector::create(editor_context);
+    editor_ctx.object_selector = ObjectSelector::create(editor_ctx);
 
-    viewer_->addWindow(editor_context.window);
+    viewer_->addWindow(editor_ctx.window);
 
-    viewer_->addEventHandler(editor_context.keyboard);
+    viewer_->addEventHandler(editor_ctx.keyboard);
     viewer_->addEventHandler(vsgImGui::SendEventsToImGui::create());
     auto close_handler = vsg::CloseHandler::create(viewer_);
     close_handler->closeKey = vsg::KEY_P;
     viewer_->addEventHandler(close_handler);
     viewer_->addEventHandler(window_handler_);
-    viewer_->addEventHandler(editor_context.mouse);
+    viewer_->addEventHandler(editor_ctx.mouse);
 
     viewer_->addEventHandler(
-        EventHandler::create(editor_context.state_manager));
+        EventHandler::create(editor_ctx.state_manager));
 
-    viewer_->addEventHandler(editor_context.object_selector);
+    viewer_->addEventHandler(editor_ctx.object_selector);
 
     viewer_->assignRecordAndSubmitTaskAndPresentation({command_graph});
 
     const uint32_t num_lights
-        = static_cast<uint32_t>(editor_context.scene_settings.num_lights);
+        = static_cast<uint32_t>(editor_ctx.scene_settings.num_lights);
 
     auto resource_hints = vsg::ResourceHints::create();
     resource_hints->numLightsRange = {num_lights, num_lights + 1};
@@ -182,14 +182,14 @@ void RouteEditor::run()
         const double delta_time = curr_time - prev_time;
         prev_time = curr_time;
 
-        if (editor_context.editor_state == EditorState::LOAD_ROUTE)
+        if (editor_ctx.editor_state == EditorState::LOAD_ROUTE)
         {
-            editor_context.route->load();
+            editor_ctx.route->load();
 
-            editor_context.compile_infos.lock()->emplace_back(
-                CompileInfo{nullptr, editor_context.route, vsg::MASK_ALL});
+            editor_ctx.compile_infos.lock()->emplace_back(
+                CompileInfo{nullptr, editor_ctx.route, vsg::MASK_ALL});
 
-            editor_context.editor_state = EditorState::EDIT_ROUTE;
+            editor_ctx.editor_state = EditorState::EDIT_ROUTE;
         }
 
         viewer_->handleEvents();
@@ -197,22 +197,22 @@ void RouteEditor::run()
         viewer_->recordAndSubmit();
         viewer_->present();
 
-        editor_context.state_manager->update(delta_time);
+        editor_ctx.state_manager->update(delta_time);
 
         compile_models();
         handle_deferred_selection();
     }
 
-    editor_context.finish_topology_thread.store(true);
+    editor_ctx.finish_topology_thread.store(true);
 
-    if (editor_context.load_static_objects_thread.joinable())
+    if (editor_ctx.load_static_objects_thread.joinable())
     {
-        editor_context.load_static_objects_thread.join();
+        editor_ctx.load_static_objects_thread.join();
     }
 
-    if (editor_context.load_topology_thread.joinable())
+    if (editor_ctx.load_topology_thread.joinable())
     {
-        editor_context.load_topology_thread.join();
+        editor_ctx.load_topology_thread.join();
     }
 }
 
@@ -253,47 +253,47 @@ void RouteEditor::read_settings()
         return;
     }
 
-    editor_context.camera_settings.read(cfg);
-    editor_context.gizmo_settings.read(cfg);
-    editor_context.gui_settings.read(cfg);
-    editor_context.scene_settings.read(cfg);
-    editor_context.window_settings.read(cfg);
-    editor_context.key_bindings.read(cfg);
+    editor_ctx.camera_settings.read(cfg);
+    editor_ctx.gizmo_settings.read(cfg);
+    editor_ctx.gui_settings.read(cfg);
+    editor_ctx.scene_settings.read(cfg);
+    editor_ctx.window_settings.read(cfg);
+    editor_ctx.key_bindings.read(cfg);
 }
 
 void RouteEditor::create_vsg_options()
 {
-    editor_context.vsg_options = vsg::Options::create();
-    editor_context.vsg_options->sharedObjects = vsg::SharedObjects::create();
-    editor_context.vsg_options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
-    editor_context.vsg_options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
-    editor_context.vsg_options->add(vsgXchange::all::create());
+    editor_ctx.vsg_options = vsg::Options::create();
+    editor_ctx.vsg_options->sharedObjects = vsg::SharedObjects::create();
+    editor_ctx.vsg_options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
+    editor_ctx.vsg_options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
+    editor_ctx.vsg_options->add(vsgXchange::all::create());
 }
 
 void RouteEditor::configure_shaders()
 {
     const auto flat_shader
-        = vsg::createFlatShadedShaderSet(editor_context.vsg_options);
+        = vsg::createFlatShadedShaderSet(editor_ctx.vsg_options);
     const auto pbr_shader
-        = vsg::createPhysicsBasedRenderingShaderSet(editor_context.vsg_options);
+        = vsg::createPhysicsBasedRenderingShaderSet(editor_ctx.vsg_options);
     const auto phong_shader
-        = vsg::createPhongShaderSet(editor_context.vsg_options);
+        = vsg::createPhongShaderSet(editor_ctx.vsg_options);
 
     const FileSystem& fs = FileSystem::getInstance();
     const auto shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
     const auto vert_shader = read_shader(shaders_dir.c_str(), "standard.vert",
-                                         editor_context.vsg_options);
+                                         editor_ctx.vsg_options);
 
     configure_shader_set(shaders_dir.c_str(), vert_shader,
                          "standard_flat_shaded.frag",
-                         editor_context.vsg_options, "flat", flat_shader);
+                         editor_ctx.vsg_options, "flat", flat_shader);
 
     configure_shader_set(shaders_dir.c_str(), vert_shader, "standard_pbr.frag",
-                         editor_context.vsg_options, "pbr", pbr_shader);
+                         editor_ctx.vsg_options, "pbr", pbr_shader);
 
     configure_shader_set(shaders_dir.c_str(), vert_shader,
-                         "standard_phong.frag", editor_context.vsg_options,
+                         "standard_phong.frag", editor_ctx.vsg_options,
                          "phong", phong_shader);
 
     const auto rasterization_state = vsg::RasterizationState::create();
@@ -316,15 +316,15 @@ void RouteEditor::configure_shaders()
     phong_shader->defaultGraphicsPipelineStates
         = default_graphics_pipeline_states;
 
-    editor_context.vsg_options->shaderSets.clear();
-    editor_context.vsg_options->shaderSets["flat"] = flat_shader;
-    editor_context.vsg_options->shaderSets["pbr"] = pbr_shader;
-    editor_context.vsg_options->shaderSets["phong"] = phong_shader;
+    editor_ctx.vsg_options->shaderSets.clear();
+    editor_ctx.vsg_options->shaderSets["flat"] = flat_shader;
+    editor_ctx.vsg_options->shaderSets["pbr"] = pbr_shader;
+    editor_ctx.vsg_options->shaderSets["phong"] = phong_shader;
 }
 
 void RouteEditor::compile_models()
 {
-    auto compile_infos = editor_context.compile_infos.lock();
+    auto compile_infos = editor_ctx.compile_infos.lock();
     if (compile_infos->empty())
     {
         return;
@@ -332,7 +332,7 @@ void RouteEditor::compile_models()
 
     vsg::CompileResult compile_result;
 
-    auto compile_info_nodes = editor_context.compile_info_nodes.lock();
+    auto compile_info_nodes = editor_ctx.compile_info_nodes.lock();
     for (auto& compile_info_node : *compile_info_nodes)
     {
 
@@ -371,14 +371,14 @@ void RouteEditor::compile_models()
 
 void RouteEditor::handle_deferred_selection()
 {
-    const auto size = editor_context.deferred_selection.size();
+    const auto size = editor_ctx.deferred_selection.size();
 
-    editor_context.deferred_selection.remove_if(
+    editor_ctx.deferred_selection.remove_if(
         [](const vsg::ref_ptr<RouteObject>& object)
         { return object->select(); });
 
-    if (editor_context.deferred_selection.size() != size)
+    if (editor_ctx.deferred_selection.size() != size)
     {
-        editor_context.gizmo->update_visibility();
+        editor_ctx.gizmo->update_visibility();
     }
 }

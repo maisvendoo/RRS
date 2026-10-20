@@ -6,16 +6,16 @@
 #include <vsg/ui/PointerEvent.h>
 
 ObjectSelector::ObjectSelector(EditorContext& context)
-    : editor_context(context)
+    : editor_ctx(context)
 {
 }
 
 void ObjectSelector::apply(vsg::ButtonReleaseEvent& buttonRelease)
 {
-    editor_context.gizmo->apply(buttonRelease);
+    editor_ctx.gizmo->apply(buttonRelease);
 }
 
 void ObjectSelector::apply(vsg::MoveEvent& moveEvent)
 {
-    editor_context.gizmo->apply(moveEvent);
+    editor_ctx.gizmo->apply(moveEvent);
 }

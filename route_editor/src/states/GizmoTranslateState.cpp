@@ -1,7 +1,7 @@
 #include "editor/states/GizmoTranslateState.h"
 
-GizmoTranslateState::GizmoTranslateState(EditorContext& editor_context)
-    : State(editor_context)
+GizmoTranslateState::GizmoTranslateState(EditorContext& editor_ctx)
+    : State(editor_ctx)
 {
     name = "GizmoTranslateState";
 }

@@ -9,7 +9,7 @@ struct EditorContext;
 class DeleteObjectsCommand : public Command
 {
 public:
-    explicit DeleteObjectsCommand(EditorContext& editor_context);
+    explicit DeleteObjectsCommand(EditorContext& editor_ctx);
     virtual ~DeleteObjectsCommand() override = default;
 
     virtual void execute() override;

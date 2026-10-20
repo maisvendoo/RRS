@@ -17,11 +17,11 @@
 
 static VkSampleCountFlags samples_bit_flag(int samples);
 
-WindowHandler::WindowHandler(EditorContext& editor_context)
-    : editor_context(editor_context)
+WindowHandler::WindowHandler(EditorContext& editor_ctx)
+    : editor_ctx(editor_ctx)
 {
-    const auto& window_settings = editor_context.window_settings;
-    auto& window = editor_context.window;
+    const auto& window_settings = editor_ctx.window_settings;
+    auto& window = editor_ctx.window;
 
     const auto window_traits = vsg::WindowTraits::create();
     window_traits->x = window_settings.pos_x;
@@ -47,7 +47,7 @@ WindowHandler::WindowHandler(EditorContext& editor_context)
 
 void WindowHandler::apply(vsg::ConfigureWindowEvent& configureWindow)
 {
-    const auto& camera = editor_context.camera;
+    const auto& camera = editor_ctx.camera;
     if (!camera)
     {
         return;

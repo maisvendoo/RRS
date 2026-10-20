@@ -11,7 +11,7 @@ class RouteObject;
 class BasicEditorState : public State
 {
 public:
-    BasicEditorState(EditorContext& editor_context);
+    BasicEditorState(EditorContext& editor_ctx);
     virtual ~BasicEditorState() override;
 
     virtual void handle_key_press() override;

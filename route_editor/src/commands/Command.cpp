@@ -1,7 +1,7 @@
 #include "editor/commands/Command.h"
 
-Command::Command(EditorContext& editor_context)
-    : editor_context(editor_context)
+Command::Command(EditorContext& editor_ctx)
+    : editor_ctx(editor_ctx)
 {
 }
 

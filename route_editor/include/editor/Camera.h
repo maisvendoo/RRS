@@ -22,7 +22,7 @@ class ProjectionMatrix;
 class Camera : public vsg::Inherit<vsg::Camera, Camera>
 {
 public:
-    Camera(EditorContext& editor_context);
+    Camera(EditorContext& editor_ctx);
 
     virtual ~Camera() = default;
 
@@ -68,7 +68,7 @@ private:
     void calc_inv_view_mat();
 
 private:
-    EditorContext& editor_context;
+    EditorContext& editor_ctx;
 
     vsg::ref_ptr<vsg::ProjectionMatrix> another_proj_mat;
     vsg::ref_ptr<vsg::Perspective> perspective;

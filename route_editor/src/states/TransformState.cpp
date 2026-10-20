@@ -15,8 +15,8 @@
 #include <vsg/ui/KeyEvent.h>
 #include <vsg/ui/PointerEvent.h>
 
-TransformState::TransformState(EditorContext& editor_context)
-    : State(editor_context)
+TransformState::TransformState(EditorContext& editor_ctx)
+    : State(editor_ctx)
 {
 }
 
@@ -29,7 +29,7 @@ void TransformState::on_activate()
 
 void TransformState::handle_key_press()
 {
-    const auto& keyboard = editor_context.keyboard;
+    const auto& keyboard = editor_ctx.keyboard;
 
     if (keyboard->pressed_once(vsg::KEY_Return))
     {
@@ -43,7 +43,7 @@ void TransformState::handle_key_press()
 
 void TransformState::handle_button_press()
 {
-    const auto& mouse = editor_context.mouse;
+    const auto& mouse = editor_ctx.mouse;
 
     switch (mouse->get_button_mask())
     {
@@ -66,8 +66,8 @@ void TransformState::handle_button_press()
 
 void TransformState::cancel_transform() const
 {
-    const auto& selected_objects = editor_context.selected_objects;
-    const auto& state_manager = editor_context.state_manager;
+    const auto& selected_objects = editor_ctx.selected_objects;
+    const auto& state_manager = editor_ctx.state_manager;
 
     for (const auto& object : selected_objects)
     {
@@ -79,10 +79,10 @@ void TransformState::cancel_transform() const
 
 vsg::dvec3 TransformState::calculate_world_intersection() const
 {
-    const auto& mouse = editor_context.mouse;
-    const auto& window = editor_context.window;
-    const auto& camera = editor_context.camera;
-    const auto& gizmo = editor_context.gizmo;
+    const auto& mouse = editor_ctx.mouse;
+    const auto& window = editor_ctx.window;
+    const auto& camera = editor_ctx.camera;
+    const auto& gizmo = editor_ctx.gizmo;
 
     vsg::dvec3 world_intersection;
     calc_intersection_mouse_plane(mouse->get_x(), mouse->get_y(),

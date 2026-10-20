@@ -22,8 +22,8 @@
 #include <vsg/utils/LineSegmentIntersector.h>
 #include <vsgImGui/imgui.h>
 
-BasicEditorState::BasicEditorState(EditorContext& editor_context)
-    : State(editor_context)
+BasicEditorState::BasicEditorState(EditorContext& editor_ctx)
+    : State(editor_ctx)
 {
     name = "BasicEditorState";
 }
@@ -32,12 +32,12 @@ BasicEditorState::~BasicEditorState() = default;
 
 void BasicEditorState::handle_key_press()
 {
-    const auto& keyboard = editor_context.keyboard;
-    const auto& camera = editor_context.camera;
-    const auto& command_manager = editor_context.command_manager;
-    const auto& selected_objects = editor_context.selected_objects;
-    auto& copied_objects = editor_context.copied_objects;
-    const auto& state_manager = editor_context.state_manager;
+    const auto& keyboard = editor_ctx.keyboard;
+    const auto& camera = editor_ctx.camera;
+    const auto& command_manager = editor_ctx.command_manager;
+    const auto& selected_objects = editor_ctx.selected_objects;
+    auto& copied_objects = editor_ctx.copied_objects;
+    const auto& state_manager = editor_ctx.state_manager;
 
     if (keyboard->pressed_once(ACTION_UNDO_COMMAND))
     {
@@ -61,13 +61,13 @@ void BasicEditorState::handle_key_press()
     }
     else if (keyboard->pressed_once(ACTION_PASTE_OBJECTS))
     {
-        auto command = std::make_unique<PasteObjectsCommand>(editor_context);
+        auto command = std::make_unique<PasteObjectsCommand>(editor_ctx);
         command->execute();
         command_manager->push(std::move(command));
     }
     else if (keyboard->pressed(ACTION_DELETE_OBJECTS))
     {
-        auto command = std::make_unique<DeleteObjectsCommand>(editor_context);
+        auto command = std::make_unique<DeleteObjectsCommand>(editor_ctx);
         command->execute();
         command_manager->push(std::move(command));
     }
@@ -104,14 +104,14 @@ void BasicEditorState::handle_key_press()
 
 void BasicEditorState::handle_button_press()
 {
-    const auto& keyboard = editor_context.keyboard;
-    const auto& mouse = editor_context.mouse;
-    const auto& camera = editor_context.camera;
-    const auto& state_manager = editor_context.state_manager;
-    const auto& route = editor_context.route;
-    const auto& gizmo = editor_context.gizmo;
-    const auto& selected_objects = editor_context.selected_objects;
-    const auto& command_manager = editor_context.command_manager;
+    const auto& keyboard = editor_ctx.keyboard;
+    const auto& mouse = editor_ctx.mouse;
+    const auto& camera = editor_ctx.camera;
+    const auto& state_manager = editor_ctx.state_manager;
+    const auto& route = editor_ctx.route;
+    const auto& gizmo = editor_ctx.gizmo;
+    const auto& selected_objects = editor_ctx.selected_objects;
+    const auto& command_manager = editor_ctx.command_manager;
 
     switch (mouse->get_button_mask())
     {
@@ -136,7 +136,7 @@ void BasicEditorState::handle_button_press()
                     return;
                 }
 
-                auto command = std::make_unique<SelectObjectsCommand>(editor_context);
+                auto command = std::make_unique<SelectObjectsCommand>(editor_ctx);
                 command->objects_to_deselect = selected_objects;
                 command->update_description();
                 command->execute();
@@ -169,14 +169,14 @@ void BasicEditorState::handle_button_press()
 
 void BasicEditorState::handle_mouse_scroll()
 {
-    const auto& camera = editor_context.camera;
+    const auto& camera = editor_ctx.camera;
 
     camera->handle_mouse_scroll();
 }
 
 void BasicEditorState::save_route()
 {
-    const auto& route = editor_context.route;
+    const auto& route = editor_ctx.route;
 
     const auto& fs = FileSystem::getInstance();
     const std::string save_dir = fs.combinePath(route->route_dir,
@@ -197,7 +197,7 @@ void BasicEditorState::save_route()
     // Перезаписываем рабочую копию
     std::ofstream route_map_file{fs.combinePath(save_dir, "route1.map")};
 
-    auto static_objects = editor_context.static_objects.lock();
+    auto static_objects = editor_ctx.static_objects.lock();
     for (const auto& object : *static_objects)
     {
         const vsg::dvec3& translation{object->get_position()};
@@ -211,11 +211,11 @@ void BasicEditorState::save_route()
 
 void BasicEditorState::select_object(const vsg::ref_ptr<RouteObject>& object)
 {
-    const auto& keyboard = editor_context.keyboard;
-    const auto& selected_objects = editor_context.selected_objects;
-    const auto& command_manager = editor_context.command_manager;
+    const auto& keyboard = editor_ctx.keyboard;
+    const auto& selected_objects = editor_ctx.selected_objects;
+    const auto& command_manager = editor_ctx.command_manager;
 
-    auto command = std::make_unique<SelectObjectsCommand>(editor_context);
+    auto command = std::make_unique<SelectObjectsCommand>(editor_ctx);
 
     if (keyboard->get_shift_state())
     {

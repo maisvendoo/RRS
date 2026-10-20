@@ -83,7 +83,7 @@ construct_paged_lod(const vsg::Path& filename, double radius,
 }
 
 Route::Route(EditorContext& context)
-    : editor_context(context)
+    : editor_ctx(context)
 {
 }
 
@@ -110,12 +110,12 @@ void Route::load()
     }
 
     const auto& fs = FileSystem::getInstance();
-    const auto& camera_settings = editor_context.camera_settings;
-    const auto& vsg_options = editor_context.vsg_options;
-    auto& objects_ref = editor_context.objects_ref;
+    const auto& camera_settings = editor_ctx.camera_settings;
+    const auto& vsg_options = editor_ctx.vsg_options;
+    auto& objects_ref = editor_ctx.objects_ref;
     auto& load_static_objects_thread
-        = editor_context.load_static_objects_thread;
-    auto& load_topology_thread = editor_context.load_topology_thread;
+        = editor_ctx.load_static_objects_thread;
+    auto& load_topology_thread = editor_ctx.load_topology_thread;
 
     for (auto& [label, ref] : objects_ref)
     {
@@ -152,7 +152,7 @@ bool Route::load_objects_ref()
 
         if (iss >> label >> relative_path)
         {
-            editor_context.objects_ref.emplace(
+            editor_ctx.objects_ref.emplace(
                 std::move(label), ObjectRef{std::move(relative_path), nullptr});
         }
     }
@@ -197,7 +197,7 @@ bool Route::load_route_map()
 
         if (iss >> label >> translation >> rotation)
         {
-            editor_context.route_map[label].emplace_back(
+            editor_ctx.route_map[label].emplace_back(
                 RouteMapTransformation{translation, rotation});
         }
     }
@@ -235,7 +235,7 @@ bool Route::load_stations_conf()
 
         if (iss >> label >> translation)
         {
-            editor_context.stations_conf[label] = translation;
+            editor_ctx.stations_conf[label] = translation;
         }
     }
 
@@ -283,7 +283,7 @@ bool Route::load_waypoints_conf()
             data.coord = stod(coord_string);
             data.length = stod(length_string);
 
-            editor_context.waypoints_conf[label] = data;
+            editor_ctx.waypoints_conf[label] = data;
         }
     }
 
@@ -292,10 +292,10 @@ bool Route::load_waypoints_conf()
 
 void Route::load_static_objects()
 {
-    for (const auto& [label, transforms] : editor_context.route_map)
+    for (const auto& [label, transforms] : editor_ctx.route_map)
     {
-        const auto ref_it = editor_context.objects_ref.find(label);
-        if (ref_it == editor_context.objects_ref.cend())
+        const auto ref_it = editor_ctx.objects_ref.find(label);
+        if (ref_it == editor_ctx.objects_ref.cend())
         {
             continue;
         }
@@ -303,13 +303,13 @@ void Route::load_static_objects()
         for (const auto& transform : transforms)
         {
             const auto object = RouteObject::create(
-                editor_context, ref_it->second.paged_lod, label,
+                editor_ctx, ref_it->second.paged_lod, label,
                 transform.translation, -transform.rotation_deg);
 
-            editor_context.compile_infos.lock()->emplace_back(
+            editor_ctx.compile_infos.lock()->emplace_back(
                 CompileInfo{vsg::ref_ptr(this), object, vsg::MASK_ALL});
 
-            editor_context.static_objects.lock()->emplace_back(object);
+            editor_ctx.static_objects.lock()->emplace_back(object);
 
             constexpr vsg::dvec3 X_AXIS = {1.0, 0.0, 0.0};
             constexpr vsg::dvec3 Y_AXIS = {0.0, 1.0, 0.0};
@@ -323,7 +323,7 @@ void Route::load_static_objects()
                   * vsg::rotate(vsg::radians(transform.rotation_deg.y), Y_AXIS)
                   * vsg::rotate(vsg::radians(transform.rotation_deg.x), X_AXIS);
 
-            // auto& object_manager = editor_context.object_manager;
+            // auto& object_manager = editor_ctx.object_manager;
 
             // object_manager->labels.push_back(label);
             // object_manager->rel_paths.push_back(
@@ -376,21 +376,21 @@ bool Route::load_topology()
 
     const signals_data_t* signals_data = nullptr;
 
-    auto topology_guard = editor_context.topology.lock();
+    auto topology_guard = editor_ctx.topology.lock();
     auto& topology = *topology_guard;
 
     topology = std::make_unique<Topology>();
 
     const auto directory_name = std::filesystem::path(route_dir).filename();
 
-    editor_context.finish_topology_thread.store(false);
+    editor_ctx.finish_topology_thread.store(false);
     if (!topology->load(directory_name.string().c_str(), true,
-                        &editor_context.finish_topology_thread))
+                        &editor_ctx.finish_topology_thread))
     {
         Journal::instance()->error("Failed to load topology");
         return false;
     }
-    editor_context.topology_loaded.store(true);
+    editor_ctx.topology_loaded.store(true);
 
     signals_data = topology->getSignalsData();
     if (!signals_data)
@@ -400,8 +400,8 @@ bool Route::load_topology()
 
     PagedLodMap paged_lods;
 
-    const auto& camera_settings = editor_context.camera_settings;
-    const auto& vsg_options = editor_context.vsg_options;
+    const auto& camera_settings = editor_ctx.camera_settings;
+    const auto& vsg_options = editor_ctx.vsg_options;
 
     const auto load_signals = [&](const std::vector<Signal*>& signals_) -> void
     {
@@ -455,13 +455,13 @@ bool Route::load_topology()
                    vsg::degrees(atan2(-right.y, right.x))};
 
             const auto object
-                = RouteObject::create(editor_context, paged_lod,
+                = RouteObject::create(editor_ctx, paged_lod,
                                       signal_model_name, pos, -rotation_deg);
 
-            editor_context.compile_infos.lock()->emplace_back(
+            editor_ctx.compile_infos.lock()->emplace_back(
                 CompileInfo{vsg::ref_ptr(this), object, vsg::MASK_ALL});
 
-            editor_context.static_objects.lock()->emplace_back(object);
+            editor_ctx.static_objects.lock()->emplace_back(object);
         }
     };
 
@@ -592,7 +592,7 @@ bool Route::load_topology()
 
     group->addChild(state_group);
 
-    editor_context.compile_infos.lock()->emplace_back(
+    editor_ctx.compile_infos.lock()->emplace_back(
         CompileInfo{vsg::ref_ptr(this), group, vsg::Mask{MASK_GUI2}});
 
     return true;

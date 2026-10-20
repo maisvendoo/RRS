@@ -9,11 +9,11 @@
 
 #include <cfloat>
 
-CameraSettingsWindow::CameraSettingsWindow(EditorContext& editor_context,
+CameraSettingsWindow::CameraSettingsWindow(EditorContext& editor_ctx,
     ImGuiWindowFlags window_flags)
-    : camera(editor_context.camera)
-    , camera_settings(editor_context.camera_settings)
-    , gui_settings(editor_context.gui_settings)
+    : camera(editor_ctx.camera)
+    , camera_settings(editor_ctx.camera_settings)
+    , gui_settings(editor_ctx.gui_settings)
     , window_flags(window_flags)
 {
 }

@@ -18,7 +18,7 @@ public:
     const char* get_description() const;
 
 protected:
-    EditorContext& editor_context;
+    EditorContext& editor_ctx;
     char description[COMMAND_DESCRIPTION_BUFFER_SIZE];
 };
 

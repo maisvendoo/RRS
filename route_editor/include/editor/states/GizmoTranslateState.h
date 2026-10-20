@@ -6,7 +6,7 @@
 class GizmoTranslateState : public State
 {
 public:
-    GizmoTranslateState(EditorContext& editor_context);
+    GizmoTranslateState(EditorContext& editor_ctx);
     virtual ~GizmoTranslateState() override;
 
     virtual void handle_key_press() override;

@@ -1,7 +1,7 @@
 #include "editor/states/GizmoScaleState.h"
 
-GizmoScaleState::GizmoScaleState(EditorContext& editor_context)
-    : State(editor_context)
+GizmoScaleState::GizmoScaleState(EditorContext& editor_ctx)
+    : State(editor_ctx)
 {
     name = "GizmoScaleState";
 }
