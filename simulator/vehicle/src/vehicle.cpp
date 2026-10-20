@@ -1143,8 +1143,20 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
 
     while (!secNode.isNull())
     {
+        vehicle_control_signal_t input;
+
         int id = 0;
         cfg.getInt(secNode, "ID", id);
+
+        int numParams = 0;
+        if (cfg.getInt(secNode, "NumParams", numParams))
+        {
+            if (numParams > 0)
+            {
+                input.params.resize(numParams);
+                std::fill(input.params.begin(), input.params.end(), 0.0f);
+            }
+        }
 
         double value = 0.0;
 
@@ -1153,8 +1165,7 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
         double value2 = 0.0;
 
         if (cfg.getDouble(secNode, "value", value))
-        {
-            vehicle_control_signal_t input;
+        {            
             input.value = value;
             auto &inputs = *(control_inputs.end() - 1);
             inputs.insert(id, input);
@@ -1162,7 +1173,6 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
 
         if (cfg.getDouble(secNode, "value1", value1) && cabs_num > 0)
         {
-            vehicle_control_signal_t input;
             input.value = value1;
             control_inputs[0].insert(id, input);
         }
