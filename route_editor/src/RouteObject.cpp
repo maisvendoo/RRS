@@ -132,8 +132,8 @@ void RouteObject::scale_relative_to_pivot(const vsg::dvec3& pivot,
                                           const vsg::dvec3& scale,
                                           const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(pivot) * vsg::scale(scale)
-                   * vsg::translate(-pivot) * matrix;
+    this->matrix = vsg::translate(pivot) * vsg::scale(scale) *
+                   vsg::translate(-pivot) * matrix;
 
     decompose_matrix();
     update_bounds();
@@ -157,8 +157,9 @@ RouteObjectsIterator RouteObject::show()
 
     RouteObjects& hidden_objects = editor_ctx.hidden_objects;
 
-    return hidden_objects.erase(std::find(
-        hidden_objects.begin(), hidden_objects.end(), vsg::ref_ptr(this)));
+    return hidden_objects.erase(std::find(hidden_objects.begin(),
+                                hidden_objects.end(),
+                                vsg::ref_ptr(this)));
 }
 
 bool RouteObject::select()

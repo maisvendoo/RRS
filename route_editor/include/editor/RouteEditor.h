@@ -31,7 +31,7 @@ private:
 
 private:
     EditorContext editor_ctx;
-    vsg::ref_ptr<vsg::Viewer> viewer_;
+    vsg::ref_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<WindowHandler> window_handler_;
 };
 
