@@ -20,7 +20,7 @@
 #include "UpdateStatisticsHandler.h"
 #include "UpdateViewerHandler.h"
 #include "VehiclesHandler.h"
-#include "WorldCulling.h"
+#include "graphics/WorldCulling.h"
 #include "filesystem.h"
 #include "graphics/common.h"
 #include "sound-manager.h"

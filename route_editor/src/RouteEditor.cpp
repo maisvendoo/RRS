@@ -17,7 +17,6 @@
 #include "editor/StateManager.h"
 #include "editor/StaticObjectManager.h"
 #include "editor/WindowHandler.h"
-#include "editor/WorldCulling.h"
 #include "editor/commands/CommandManager.h"
 
 #include <CfgReader.h>
@@ -25,6 +24,7 @@
 #include <JournalFile.h>
 #include <core/string_funcs.h>
 #include <filesystem.h>
+#include <graphics/WorldCulling.h>
 #include <graphics/common.h>
 #include <graphics/shader_funcs.h>
 
