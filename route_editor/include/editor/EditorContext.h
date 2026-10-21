@@ -117,6 +117,7 @@ struct EditorContext
     std::unique_ptr<CommandManager> command_manager;
 
     ThreadSafe<RouteObjects> static_objects;
+    ThreadSafe<RouteObjects> topology_objects;
 
     RouteObjects selected_objects;
     RouteObjects copied_objects;
