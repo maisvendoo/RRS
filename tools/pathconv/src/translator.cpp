@@ -5,7 +5,7 @@
 #include    <QStringConverter>
 #include    <QTextStream>
 
-#include    <Logger.h>
+#include    <core/Logger.h>
 
 //------------------------------------------------------------------------------
 //

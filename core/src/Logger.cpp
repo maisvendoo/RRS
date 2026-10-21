@@ -1,4 +1,4 @@
-#include "Logger.h"
+#include "core/Logger.h"
 
 #include <cstdarg>
 #include <cstdio>
@@ -19,7 +19,7 @@ Logger::~Logger() noexcept
 {
     if (streams[1])
     {
-        fclose(streams[1]);
+        std::fclose(streams[1]);
     }
 }
 
@@ -33,14 +33,20 @@ void Logger::openFile(const char* path, const char* backup_path)
     streams[1] = std::fopen(path, "w");
 
     if (streams[1])
+    {
         streams_count = 2;
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Logger::log_message(LogLevel level, const char* file, int line, const char* format, ...) const
+void Logger::log_message(LogLevel level, const char* file, int line,
+                         const char* format, ...) const
 {
+    (void)file;
+    (void)line;
+
     if (this->level > level)
     {
         return;
@@ -52,12 +58,12 @@ void Logger::log_message(LogLevel level, const char* file, int line, const char*
         va_start(args, format);
         std::vfprintf(streams[i], format, args);
         va_end(args);
-/*
-        if (level > LOG_LEVEL_INFO)
-        {
-            std::fprintf(streams[i], " | %s (%d)", file, line);
-        }
-*/
+
+        // if (level > LOG_LEVEL_INFO)
+        // {
+        //     std::fprintf(streams[i], " | %s (%d)", file, line);
+        // }
+
         std::fputs("\n", streams[i]);
         std::fflush(streams[i]);
     }

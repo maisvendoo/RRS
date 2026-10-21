@@ -1,5 +1,5 @@
-#ifndef PROFCONV_LOGGER_H
-#define PROFCONV_LOGGER_H
+#ifndef CORE_LOGGER_H
+#define CORE_LOGGER_H
 
 #include <cstdio>
 
@@ -9,7 +9,8 @@
 #define LOG_ERROR(...) LOG_MESSAGE(LOG_LEVEL_ERROR, __VA_ARGS__)
 #define LOG_FATAL(...) LOG_MESSAGE(LOG_LEVEL_FATAL, __VA_ARGS__)
 
-#define LOG_MESSAGE(log_level, ...) Logger::instance().log_message(log_level, __FILE__, __LINE__, __VA_ARGS__)
+#define LOG_MESSAGE(log_level, ...)                                            \
+    Logger::instance().log_message(log_level, __FILE__, __LINE__, __VA_ARGS__)
 
 enum LogLevel
 {
@@ -29,7 +30,8 @@ public:
 
     void openFile(const char* path, const char* backup_path);
 
-    void log_message(LogLevel level, const char* file, int line, const char* format, ...) const;
+    void log_message(LogLevel level, const char* file, int line,
+                     const char* format, ...) const;
 
     LogLevel level = LOG_LEVEL_INFO;
 
@@ -40,4 +42,4 @@ private:
     std::FILE* streams[2] = {stderr, nullptr};
 };
 
-#endif // PROFCONV_LOGGER_H
+#endif // CORE_LOGGER_H
