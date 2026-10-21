@@ -186,8 +186,8 @@ void RouteEditor::run()
         {
             editor_ctx.route->load();
 
-            editor_ctx.compile_infos.lock()->emplace_back(
-                CompileInfo{nullptr, editor_ctx.route, vsg::MASK_ALL});
+            editor_ctx.compile_info_nodes.lock()->emplace_back(
+                CompileInfoNode{editor_ctx.route});
 
             editor_ctx.editor_state = EditorState::EDIT_ROUTE;
         }
@@ -324,49 +324,55 @@ void RouteEditor::configure_shaders()
 
 void RouteEditor::compile_models()
 {
-    auto compile_infos = editor_ctx.compile_infos.lock();
-    if (compile_infos->empty())
-    {
-        return;
-    }
+    auto& compile_manager = viewer_->compileManager;
 
     vsg::CompileResult compile_result;
 
-    auto compile_info_nodes = editor_ctx.compile_info_nodes.lock();
-    for (auto& compile_info_node : *compile_info_nodes)
     {
-
+        auto compile_infos = editor_ctx.compile_info_nodes.lock();
+        for (auto& compile_info : *compile_infos)
+        {
+            compile_result.add(compile_manager->compile(compile_info.node));
+        }
+        compile_infos->clear();
     }
 
-    std::for_each(
-        compile_infos->begin(), compile_infos->end(),
-        [&](const CompileInfo& compile_info)
+    {
+        auto compile_infos = editor_ctx.compile_info_group_nodes.lock();
+        for (auto& compile_info : *compile_infos)
         {
-            const auto& group_node = compile_info.group_node;
-            const vsg::Mask mask = compile_info.mask;
-            const auto& node = compile_info.node;
+            auto& node = compile_info.node;
+            compile_info.group->addChild(node);
+            compile_result.add(compile_manager->compile(node));
+        }
+        compile_infos->clear();
+    }
 
-            if (group_node)
-            {
-                if (auto group = group_node.cast<vsg::Group>())
-                {
-                    group->addChild(node);
-                }
-                else if (auto switch_ = group_node.cast<vsg::Switch>())
-                {
-                    switch_->addChild(mask, node);
-                }
-                else if (auto single_switch = group_node.cast<SingleSwitch>())
-                {
-                    single_switch->node = node;
-                }
-            }
+    {
+        auto compile_infos = editor_ctx.compile_info_switch_nodes.lock();
+        for (auto& compile_info : *compile_infos)
+        {
+            auto& node = compile_info.node;
+            compile_info.vsg_switch->addChild(compile_info.mask, node);
+            compile_result.add(compile_manager->compile(node));
+        }
+        compile_infos->clear();
+    }
 
-            compile_result.add(viewer_->compileManager->compile(node));
-        });
+    {
+        auto compile_infos = editor_ctx.compile_info_single_switch_nodes.lock();
+
+        for (auto& compile_info : *compile_infos)
+        {
+            auto& node = compile_info.node;
+            compile_info.single_switch->mask = compile_info.mask;
+            compile_info.single_switch->node = node;
+            compile_result.add(compile_manager->compile(node));
+        }
+        compile_infos->clear();
+    }
 
     vsg::updateViewer(*viewer_, compile_result);
-    compile_infos->clear();
 }
 
 void RouteEditor::handle_deferred_selection()

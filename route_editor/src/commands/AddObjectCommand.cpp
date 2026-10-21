@@ -28,8 +28,8 @@ void AddObjectCommand::execute()
         object->deselect();
     }
 
-    editor_ctx.compile_infos.lock()->emplace_back(
-        CompileInfo{editor_ctx.route, object_to_add, vsg::MASK_ALL});
+    editor_ctx.compile_info_switch_nodes.lock()->emplace_back(
+        CompileInfoSwitchNode{editor_ctx.route, object_to_add, vsg::MASK_ALL});
 
     editor_ctx.static_objects.lock()->emplace_back(object_to_add);
 
@@ -55,8 +55,8 @@ void AddObjectCommand::undo()
         object->select();
     }
 
-    editor_ctx.compile_infos.lock()->emplace_back(
-        CompileInfo{nullptr, editor_ctx.route});
+    editor_ctx.compile_info_nodes.lock()->emplace_back(
+        CompileInfoNode{editor_ctx.route});
 
     editor_ctx.gizmo->update_visibility();
 }

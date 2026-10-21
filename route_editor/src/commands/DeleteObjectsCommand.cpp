@@ -39,21 +39,22 @@ void DeleteObjectsCommand::execute()
         );
     }
 
-    editor_ctx.compile_infos.lock()->emplace_back(CompileInfo{
-        nullptr, editor_ctx.route});
+    editor_ctx.compile_info_nodes.lock()->emplace_back(
+        CompileInfoNode{editor_ctx.route});
 
     editor_ctx.gizmo->update_visibility();
 }
 
 void DeleteObjectsCommand::undo()
 {
-    auto compile_infos = editor_ctx.compile_infos.lock();
+    auto compile_infos = editor_ctx.compile_info_switch_nodes.lock();
     auto static_objects = editor_ctx.static_objects.lock();
 
     for (const auto& object : objects)
     {
-        compile_infos->emplace_back(CompileInfo{
-            editor_ctx.route, object, vsg::MASK_ALL});
+        compile_infos->emplace_back(CompileInfoSwitchNode{editor_ctx.route,
+                                                          object,
+                                                          vsg::MASK_ALL});
 
         static_objects->emplace_back(object);
 

@@ -306,8 +306,9 @@ void Route::load_static_objects()
                 editor_ctx, ref_it->second.paged_lod, label,
                 transform.translation, -transform.rotation_deg);
 
-            editor_ctx.compile_infos.lock()->emplace_back(
-                CompileInfo{vsg::ref_ptr(this), object, vsg::MASK_ALL});
+            editor_ctx.compile_info_switch_nodes.lock()->emplace_back(
+                CompileInfoSwitchNode{vsg::ref_ptr(this), object,
+                                      vsg::MASK_ALL});
 
             editor_ctx.static_objects.lock()->emplace_back(object);
 
@@ -458,8 +459,9 @@ bool Route::load_topology()
                 = RouteObject::create(editor_ctx, paged_lod,
                                       signal_model_name, pos, -rotation_deg);
 
-            editor_ctx.compile_infos.lock()->emplace_back(
-                CompileInfo{vsg::ref_ptr(this), object, vsg::MASK_ALL});
+            editor_ctx.compile_info_switch_nodes.lock()->emplace_back(
+                CompileInfoSwitchNode{vsg::ref_ptr(this), object,
+                                      vsg::MASK_ALL});
 
             editor_ctx.static_objects.lock()->emplace_back(object);
         }
@@ -592,8 +594,8 @@ bool Route::load_topology()
 
     group->addChild(state_group);
 
-    editor_ctx.compile_infos.lock()->emplace_back(
-        CompileInfo{vsg::ref_ptr(this), group, vsg::Mask{MASK_GUI2}});
+    editor_ctx.compile_info_switch_nodes.lock()->emplace_back(
+        CompileInfoSwitchNode{vsg::ref_ptr(this), group, vsg::Mask{MASK_GUI2}});
 
     return true;
 }

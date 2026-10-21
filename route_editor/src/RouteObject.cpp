@@ -172,11 +172,10 @@ bool RouteObject::select()
             return false;
         }
 
-        editor_ctx.compile_infos.lock()->emplace_back(
-            CompileInfo{outline_switch, outline});
+        editor_ctx.compile_info_single_switch_nodes.lock()->emplace_back(
+            CompileInfoSingleSwitchNode{outline_switch, outline,
+                                        vsg::Mask{MASK_GUI2}});
     }
-
-    outline_switch->mask = MASK_GUI2;
 
     is_selected = true;
 
@@ -194,8 +193,9 @@ RouteObjectsIterator RouteObject::deselect()
 
     auto& selected_objects = editor_ctx.selected_objects;
 
-    const auto it = selected_objects.erase(std::find(
-        selected_objects.begin(), selected_objects.end(), vsg::ref_ptr(this)));
+    const auto it = selected_objects.erase(std::find(selected_objects.begin(),
+                                                     selected_objects.end(),
+                                                     vsg::ref_ptr(this)));
 
     editor_ctx.gizmo->update_position();
 
