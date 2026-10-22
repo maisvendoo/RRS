@@ -28,9 +28,9 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
     hblLine1 = new QHBoxLayout();
     hblLine2 = new QHBoxLayout();
 
-    vblTrain = new QVBoxLayout(this);
-    vblWaypoint = new QVBoxLayout(this);
-    vblTrajpoint = new QVBoxLayout(this);
+    vblTrain = new QVBoxLayout();
+    vblWaypoint = new QVBoxLayout();
+    vblTrajpoint = new QVBoxLayout();
 
     hblTrainHeader = new QHBoxLayout();
     hblTrainConfig = new QHBoxLayout();
