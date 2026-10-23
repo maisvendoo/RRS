@@ -13,6 +13,7 @@
 #include    <QJsonObject>
 #include    <QJsonArray>
 #include    <QTimer>
+#include    <QJsonDocument>
 
 //-----------------------------------------------------------------------------
 ProtocolHandler::ProtocolHandler(QObject* parent)
