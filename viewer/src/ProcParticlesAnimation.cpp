@@ -142,7 +142,7 @@ void ProcParticlesAnimation::initStateGroup()
         vsg::PushConstantRanges{}
     );
 
-    auto pipeline = vsg::GraphicsPipeline::create(layout, {vert, frag}, pipe_states);
+    auto pipeline = vsg::GraphicsPipeline::create(layout, vsg::ShaderStages{vert, frag}, pipe_states);
     auto bind_pipeline = vsg::BindGraphicsPipeline::create(pipeline);
 
     state_group = vsg::StateGroup::create();
