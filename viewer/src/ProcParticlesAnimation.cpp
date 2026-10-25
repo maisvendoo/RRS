@@ -11,8 +11,13 @@
 #include <vsg/state/BufferInfo.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
+#include <vsg/state/DescriptorSetLayout.h>
 #include <vsg/state/GraphicsPipeline.h>
+#include <vsg/state/MultisampleState.h>
+#include <vsg/state/PipelineLayout.h>
 #include <vsg/state/RasterizationState.h>
+#include <vsg/state/ShaderStage.h>
+#include <vsg/state/VertexInputState.h>
 #include <vsg/nodes/StateGroup.h>
 
 #include <algorithm>
@@ -66,7 +71,8 @@ bool ProcParticlesAnimation::load_config(CfgReader& cfg)
         is_fixed_signal = true;
     }
 
-    cfg.getInt(sec_name, "SpeedSignalID", params.speed_signal_id, -1);
+    params.speed_signal_id = -1;
+    cfg.getInt(sec_name, "SpeedSignalID", params.speed_signal_id);
 
     QString tmp_qstr;
     if (cfg.getString(sec_name, "Texture", tmp_qstr))
@@ -121,21 +127,26 @@ void ProcParticlesAnimation::initStateGroup()
     auto vert = vsg::read(vert_path);
     auto frag = vsg::read(frag_path);
 
-    auto pipeline = vsg::GraphicsPipeline::create();
-    pipeline->vertexShader = vert;
-    pipeline->fragmentShader = frag;
-
     auto cbs = vsg::ColorBlendState::create();
     cbs->configureAttachments(true);
 
     auto dss = vsg::DepthStencilState::create();
     dss->depthWriteEnable = VK_FALSE;
 
+    auto rs = vsg::RasterizationState::create();
+
+    vsg::GraphicsPipelineStates pipe_states = { cbs, dss, rs };
+
+    auto layout = vsg::PipelineLayout::create(
+        vsg::DescriptorSetLayouts{},
+        vsg::PushConstantRanges{}
+    );
+
+    auto pipeline = vsg::GraphicsPipeline::create(layout, {vert, frag}, pipe_states);
+    auto bind_pipeline = vsg::BindGraphicsPipeline::create(pipeline);
+
     state_group = vsg::StateGroup::create();
-    state_group->add(pipeline);
-    state_group->add(cbs);
-    state_group->add(dss);
-    state_group->add(vsg::RasterizationState::create());
+    state_group->add(bind_pipeline);
 
     // Три arrays: vec3 (позиция), vec3 (size, alpha, 0), vec2 (uv)
     uint32_t max_v = static_cast<uint32_t>(MAX_PARTICLES) * 4;
@@ -162,7 +173,7 @@ void ProcParticlesAnimation::initStateGroup()
     vertex_index_draw->assignIndices(index_array);
     vertex_index_draw->indexCount = 0;
 
-    state_group->add(vertex_index_draw);
+    state_group->addChild(vertex_index_draw);
 
     // Добавляем StateGroup как child к ноде эмиттера
     if (transform_node != nullptr)
@@ -201,15 +212,8 @@ void ProcParticlesAnimation::update_particles(float t, float dt)
         wind_velocity.x = -speed_kmh * 0.28f;
     }
 
-    // Позиция эмиттера в мировой системе координат
+    // Позиция эмиттера — локальная (StateGroup дочерний эмиттера)
     vsg::vec3 emitter_pos = {0.0f, 0.0f, 0.0f};
-    if (transform_node != nullptr)
-    {
-        vsg::dmat4 world = transform_node->getWorldMatrix();
-        emitter_pos.x = static_cast<float>(world[3]);
-        emitter_pos.y = static_cast<float>(world[7]);
-        emitter_pos.z = static_cast<float>(world[11]);
-    }
 
     // Спавним новые частицы
     accumulator += emission_rate * dt;
