@@ -82,7 +82,7 @@ private:
     vsg::ref_ptr<vsg::MatrixTransform> transform_node = nullptr;
     vsg::dmat4 matrix;
 
-    void load_config(CfgReader &cfg) override;
+    bool load_config(CfgReader &cfg) override;
 
     void update(float current_signal) override;
 

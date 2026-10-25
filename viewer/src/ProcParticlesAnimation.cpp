@@ -43,7 +43,7 @@ void ProcParticlesAnimation::setTransform(vsg::ref_ptr<vsg::MatrixTransform> tra
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcParticlesAnimation::load_config(CfgReader& cfg)
+bool ProcParticlesAnimation::load_config(CfgReader& cfg)
 {
     QString sec_name = "ParticlesAnimation";
 
@@ -100,6 +100,8 @@ void ProcParticlesAnimation::load_config(CfgReader& cfg)
 
     cfg.getDouble(sec_name, "Drag", tmp_dbl);
     params.drag = static_cast<float>(tmp_dbl);
+
+    return true;
 }
 
 //------------------------------------------------------------------------------
