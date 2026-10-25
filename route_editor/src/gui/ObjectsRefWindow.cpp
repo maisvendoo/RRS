@@ -9,9 +9,9 @@
 
 #define SEARCH_BUF_SIZE 256
 
-ObjectsRefWindow::ObjectsRefWindow(EditorContext& editor_context,
+ObjectsRefWindow::ObjectsRefWindow(EditorContext& editor_ctx,
     ImGuiWindowFlags window_flags)
-    : gui_settings(editor_context.gui_settings)
+    : gui_settings(editor_ctx.gui_settings)
     , window_flags(window_flags)
 {
 }

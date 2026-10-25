@@ -16,8 +16,8 @@
 #include <memory>
 #include <utility>
 
-KeyboardTranslateState::KeyboardTranslateState(EditorContext& editor_context)
-    : TransformState(editor_context)
+KeyboardTranslateState::KeyboardTranslateState(EditorContext& editor_ctx)
+    : TransformState(editor_ctx)
 {
     name = "KeyboardTranslateState";
 }
@@ -32,7 +32,7 @@ void KeyboardTranslateState::on_activate()
 
 void KeyboardTranslateState::handle_mouse_move()
 {
-    const auto& selected_objects = editor_context.selected_objects;
+    const auto& selected_objects = editor_ctx.selected_objects;
 
     const vsg::dvec3 world_intersection = calculate_world_intersection();
     const vsg::dvec3 translation = world_intersection - prev_intersection;
@@ -46,11 +46,11 @@ void KeyboardTranslateState::handle_mouse_move()
 
 void KeyboardTranslateState::confirm_transform() const
 {
-    const auto& selected_objects = editor_context.selected_objects;
-    const auto& command_manager = editor_context.command_manager;
-    const auto& state_manager = editor_context.state_manager;
+    const auto& selected_objects = editor_ctx.selected_objects;
+    const auto& command_manager = editor_ctx.command_manager;
+    const auto& state_manager = editor_ctx.state_manager;
 
-    auto command = std::make_unique<TranslateObjectsCommand>(editor_context,
+    auto command = std::make_unique<TranslateObjectsCommand>(editor_ctx,
         selected_objects, prev_intersection - begin_intersection);
     command_manager->push(std::move(command));
     state_manager->defer_switch_to(STATE_BASIC);

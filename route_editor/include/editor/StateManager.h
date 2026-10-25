@@ -35,7 +35,7 @@ enum StateEnum
 class StateManager
 {
 public:
-    StateManager(EditorContext& editor_context);
+    StateManager(EditorContext& editor_ctx);
     ~StateManager();
 
     void defer_switch_to(StateEnum state);

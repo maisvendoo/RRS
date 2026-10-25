@@ -28,9 +28,9 @@ TrainWaypointWidget::TrainWaypointWidget(std::vector<train_info_t>       *trains
     hblLine1 = new QHBoxLayout();
     hblLine2 = new QHBoxLayout();
 
-    vblTrain = new QVBoxLayout(this);
-    vblWaypoint = new QVBoxLayout(this);
-    vblTrajpoint = new QVBoxLayout(this);
+    vblTrain = new QVBoxLayout();
+    vblWaypoint = new QVBoxLayout();
+    vblTrajpoint = new QVBoxLayout();
 
     hblTrainHeader = new QHBoxLayout();
     hblTrainConfig = new QHBoxLayout();
@@ -255,10 +255,8 @@ void TrainWaypointWidget::slotTrainConfigChange(int train_idx)
     {
         is_train_config_selected = is_selected;
 
-        if (is_train_config_selected)
-            lTrainHeaderIcon->setPixmap(icon_ok->pixmap(16));
-        else
-            lTrainHeaderIcon->setPixmap(icon_cancel->pixmap(16));
+        QIcon* icon = is_train_config_selected ? icon_ok : icon_cancel;
+        lTrainHeaderIcon->setPixmap(icon->pixmap(16));
     }
 
     emit activeTrainChanged();
@@ -297,10 +295,8 @@ void TrainWaypointWidget::slotTrajectoryNameChange(int traj_idx)
     {
         is_trajectory_selected = is_selected;
 
-        if (is_trajectory_selected)
-            lTrajectoryHeaderIcon->setPixmap(icon_ok->pixmap(16));
-        else
-            lTrajectoryHeaderIcon->setPixmap(icon_cancel->pixmap(16));
+        QIcon* icon = is_trajectory_selected ? icon_ok : icon_cancel;
+        lTrajectoryHeaderIcon->setPixmap(icon->pixmap(16));
     }
 
     emit activeTrainChanged();
@@ -384,7 +380,7 @@ void TrainWaypointWidget::setTrainSelectWidget()
 {
     cbTrainConfigSelect->clear();
     cbTrainConfigSelect->addItem(tr("<Not selected>"));
-    for (auto train : (*trains_info))
+    for (const auto& train : (*trains_info))
     {
         cbTrainConfigSelect->addItem(train.train_title);
     }
@@ -408,14 +404,14 @@ void TrainWaypointWidget::setWaypointSelectWidget()
 
     if (cbWaypointDirectionSelect->currentIndex() == 0)
     {
-        for (auto waypoint : (*fwd_train_positions))
+        for (const auto& waypoint : (*fwd_train_positions))
         {
             cbWaypointSelect->addItem(waypoint.name);
         }
     }
     else
     {
-        for (auto waypoint : (*bwd_train_positions))
+        for (const auto& waypoint : (*bwd_train_positions))
         {
             cbWaypointSelect->addItem(waypoint.name);
         }
@@ -432,7 +428,7 @@ void TrainWaypointWidget::setTrajectorySelectWidget()
     cbTrajectoryNameSelect->clear();
     cbTrajectoryNameSelect->addItem(tr("<Not selected>"));
 
-    for (auto traj : (*trajectrories))
+    for (const auto& traj : (*trajectrories))
     {
         cbTrajectoryNameSelect->addItem(traj.name);
     }

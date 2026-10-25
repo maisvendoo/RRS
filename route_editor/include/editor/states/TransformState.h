@@ -10,7 +10,7 @@ struct EditorContext;
 class TransformState : public State
 {
 public:
-    TransformState(EditorContext& editor_context);
+    TransformState(EditorContext& editor_ctx);
     virtual ~TransformState() override;
 
     virtual void on_activate() override;

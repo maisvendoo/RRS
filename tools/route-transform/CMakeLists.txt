@@ -20,3 +20,4 @@ target_include_directories(${TARGET} PRIVATE ./include)
 
 # Компонуемся с библиотеками
 target_link_libraries (${TARGET} filesystem)
+target_link_libraries (${TARGET} core)

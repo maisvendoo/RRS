@@ -18,12 +18,12 @@ class Perspective;
 class WindowHandler : public vsg::Inherit<vsg::Visitor, WindowHandler>
 {
 public:
-    WindowHandler(EditorContext& editor_context);
+    WindowHandler(EditorContext& editor_ctx);
 
     virtual void apply(vsg::ConfigureWindowEvent& configureWindow) override;
 
 private:
-    EditorContext& editor_context;
+    EditorContext& editor_ctx;
 };
 
 #endif // EDITOR_WINDOW_HANDLER_H

@@ -6,7 +6,7 @@
 class NavigationState : public State
 {
 public:
-    NavigationState(EditorContext& editor_context);
+    NavigationState(EditorContext& editor_ctx);
     virtual ~NavigationState() override;
 
     virtual void on_activate() override;

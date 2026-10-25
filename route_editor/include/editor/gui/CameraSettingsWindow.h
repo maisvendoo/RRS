@@ -12,7 +12,7 @@ struct gui_settings_t;
 class CameraSettingsWindow
 {
 public:
-    CameraSettingsWindow(EditorContext& editor_context,
+    CameraSettingsWindow(EditorContext& editor_ctx,
                          ImGuiWindowFlags window_flags = 0);
     void show() const;
 

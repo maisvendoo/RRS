@@ -132,8 +132,8 @@ void RouteObject::scale_relative_to_pivot(const vsg::dvec3& pivot,
                                           const vsg::dvec3& scale,
                                           const vsg::dmat4& matrix)
 {
-    this->matrix = vsg::translate(pivot) * vsg::scale(scale)
-                   * vsg::translate(-pivot) * matrix;
+    this->matrix = vsg::translate(pivot) * vsg::scale(scale) *
+                   vsg::translate(-pivot) * matrix;
 
     decompose_matrix();
     update_bounds();
@@ -157,8 +157,9 @@ RouteObjectsIterator RouteObject::show()
 
     RouteObjects& hidden_objects = editor_ctx.hidden_objects;
 
-    return hidden_objects.erase(std::find(
-        hidden_objects.begin(), hidden_objects.end(), vsg::ref_ptr(this)));
+    return hidden_objects.erase(std::find(hidden_objects.begin(),
+                                hidden_objects.end(),
+                                vsg::ref_ptr(this)));
 }
 
 bool RouteObject::select()
@@ -172,11 +173,10 @@ bool RouteObject::select()
             return false;
         }
 
-        editor_ctx.compile_infos.lock()->emplace_back(
-            CompileInfo{outline_switch, outline});
+        editor_ctx.compile_info_single_switch_nodes.lock()->emplace_back(
+            CompileInfoSingleSwitchNode{outline_switch, outline,
+                                        vsg::Mask{MASK_GUI2}});
     }
-
-    outline_switch->mask = MASK_GUI2;
 
     is_selected = true;
 
@@ -194,8 +194,9 @@ RouteObjectsIterator RouteObject::deselect()
 
     auto& selected_objects = editor_ctx.selected_objects;
 
-    const auto it = selected_objects.erase(std::find(
-        selected_objects.begin(), selected_objects.end(), vsg::ref_ptr(this)));
+    const auto it = selected_objects.erase(std::find(selected_objects.begin(),
+                                                     selected_objects.end(),
+                                                     vsg::ref_ptr(this)));
 
     editor_ctx.gizmo->update_position();
 

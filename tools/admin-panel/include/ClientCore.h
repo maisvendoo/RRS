@@ -17,9 +17,9 @@
 #include    <QObject>
 #include    <QString>
 #include    <QVector>
-#include    <QMap>
+// #include    <QMap>
 
-#include    "ProtocolHandler.h"
+class ProtocolHandler;
 
 //-----------------------------------------------------------------------------
 //

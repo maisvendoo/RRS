@@ -55,13 +55,6 @@ struct ObjectRef
     vsg::ref_ptr<vsg::PagedLOD> paged_lod;
 };
 
-struct CompileInfo
-{
-    vsg::ref_ptr<vsg::Node> group_node;
-    vsg::ref_ptr<vsg::Node> node;
-    vsg::Mask mask = vsg::MASK_OFF;
-};
-
 struct CompileInfoNode
 {
     vsg::ref_ptr<vsg::Node> node;
@@ -77,12 +70,14 @@ struct CompileInfoSwitchNode
 {
     vsg::ref_ptr<vsg::Switch> vsg_switch;
     vsg::ref_ptr<vsg::Node> node;
+    vsg::Mask mask = vsg::MASK_OFF;
 };
 
 struct CompileInfoSingleSwitchNode
 {
     vsg::ref_ptr<SingleSwitch> single_switch;
     vsg::ref_ptr<vsg::Node> node;
+    vsg::Mask mask = vsg::MASK_OFF;
 };
 
 struct WaypointData
@@ -122,12 +117,12 @@ struct EditorContext
     std::unique_ptr<CommandManager> command_manager;
 
     ThreadSafe<RouteObjects> static_objects;
+    ThreadSafe<RouteObjects> topology_objects;
 
     RouteObjects selected_objects;
     RouteObjects copied_objects;
     RouteObjects hidden_objects;
 
-    ThreadSafe<std::vector<CompileInfo>> compile_infos;
     ThreadSafe<std::vector<CompileInfoNode>> compile_info_nodes;
     ThreadSafe<std::vector<CompileInfoGroupNode>> compile_info_group_nodes;
     ThreadSafe<std::vector<CompileInfoSwitchNode>> compile_info_switch_nodes;

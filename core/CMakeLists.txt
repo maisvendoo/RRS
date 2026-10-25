@@ -8,7 +8,9 @@ add_library(core STATIC)
 
 target_sources(core
     PRIVATE
+        src/ISerializable.cpp
         src/load_module.cpp
+        src/Logger.cpp
         src/string_funcs.cpp
 
     PUBLIC
@@ -17,9 +19,13 @@ target_sources(core
             include
         FILES
             include/core/get_module.h
+            include/core/ISerializable.h
             include/core/load_module.h
+            include/core/Logger.h
             include/core/module_export.h
+            include/core/Option.h
             include/core/string_funcs.h
+            include/core/ThreadSafe.h
 )
 
 target_link_libraries(core PRIVATE

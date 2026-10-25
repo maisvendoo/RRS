@@ -17,13 +17,13 @@ class MoveEvent;
 class ObjectSelector : public vsg::Inherit<vsg::Visitor, ObjectSelector>
 {
 public:
-    ObjectSelector(EditorContext& editor_context);
+    ObjectSelector(EditorContext& editor_ctx);
 
     void apply(vsg::ButtonReleaseEvent& buttonRelease) override;
     void apply(vsg::MoveEvent& moveEvent) override;
 
 private:
-    EditorContext& editor_context;
+    EditorContext& editor_ctx;
 };
 
 #endif // OBJECT_SELECTOR_H

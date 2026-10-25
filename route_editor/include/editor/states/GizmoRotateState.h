@@ -6,7 +6,7 @@
 class GizmoRotateState : public State
 {
 public:
-    explicit GizmoRotateState(EditorContext& editor_context);
+    explicit GizmoRotateState(EditorContext& editor_ctx);
     virtual ~GizmoRotateState() override;
 
     virtual void handle_key_press() override;

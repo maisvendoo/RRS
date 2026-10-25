@@ -12,7 +12,7 @@ class RouteObject;
 class AddObjectCommand : public Command
 {
 public:
-    AddObjectCommand(EditorContext& editor_context,
+    AddObjectCommand(EditorContext& editor_ctx,
                      const vsg::ref_ptr<RouteObject>& object);
 
     virtual ~AddObjectCommand() override = default;

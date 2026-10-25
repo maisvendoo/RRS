@@ -12,7 +12,10 @@
  */
 
 #include    "ClientCore.h"
+#include    "ProtocolHandler.h"
 #include    <QDebug>
+#include    <QJsonObject>
+#include    <QJsonArray>
 
 //-----------------------------------------------------------------------------
 //

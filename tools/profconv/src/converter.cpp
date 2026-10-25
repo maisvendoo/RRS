@@ -1,7 +1,7 @@
 #include    "converter.h"
 #include    "command-line.h"
 #include    "path-utils.h"
-#include    "Logger.h"
+#include    "core/Logger.h"
 
 #include    <cstdlib>
 

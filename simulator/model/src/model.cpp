@@ -402,7 +402,7 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 void Model::slotSetVehicleControlCommand(int vehicle_idx,
                                          int cab_idx,
                                          uint16_t id,
-                                         float value,
+                                         float value, std::vector<float> params,
                                          int8_t prioriry)
 {
     if (vehicle_idx >= vehicles.size())
@@ -433,6 +433,14 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx,
                 }
 
                 vehicle->control_inputs[cab_idx][id].value = value;
+
+                if (params.size() <= vehicle->control_inputs[cab_idx][id].params.size())
+                {
+                    for (size_t i = 0; i < params.size(); ++i)
+                    {
+                        vehicle->control_inputs[cab_idx][id].params[i] = params[i];
+                    }
+                }
             }
         }
     }

@@ -6,7 +6,7 @@
 class RouteNotLoadedState : public State
 {
 public:
-    RouteNotLoadedState(EditorContext& editor_context);
+    RouteNotLoadedState(EditorContext& editor_ctx);
     virtual ~RouteNotLoadedState() override;
 
     virtual void draw_gui() const override;

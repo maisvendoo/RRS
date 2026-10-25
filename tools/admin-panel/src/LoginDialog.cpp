@@ -11,6 +11,7 @@
 #include    <QHBoxLayout>
 #include    <QFormLayout>
 #include    <QPushButton>
+#include    <QLineEdit>
 
 //-----------------------------------------------------------------------------
 LoginDialog::LoginDialog(QWidget* parent)

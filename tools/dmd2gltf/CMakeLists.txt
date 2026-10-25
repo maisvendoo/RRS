@@ -43,5 +43,6 @@ target_include_directories(${TARGET} PRIVATE ./include)
 
 # Компонуемся с библиотеками
 target_link_libraries (${TARGET} filesystem)
+target_link_libraries (${TARGET} core)
 target_link_libraries (${TARGET} ${KTX_TARGET})
 target_link_libraries (${TARGET} Vulkan::Vulkan)

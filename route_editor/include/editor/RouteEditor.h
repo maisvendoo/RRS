@@ -30,8 +30,8 @@ private:
     void handle_deferred_selection();
 
 private:
-    EditorContext editor_context;
-    vsg::ref_ptr<vsg::Viewer> viewer_;
+    EditorContext editor_ctx;
+    vsg::ref_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<WindowHandler> window_handler_;
 };
 

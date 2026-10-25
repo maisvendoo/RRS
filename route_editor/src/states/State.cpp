@@ -3,8 +3,8 @@
 #include <vsg/core/ref_ptr.h>
 #include <vsgImGui/imgui.h>
 
-State::State(EditorContext& editor_context)
-    : editor_context(editor_context)
+State::State(EditorContext& editor_ctx)
+    : editor_ctx(editor_ctx)
 {
 }
 

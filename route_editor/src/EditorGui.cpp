@@ -60,6 +60,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <cstdio>
 #include <functional>
 #include <memory>
@@ -232,30 +233,73 @@ void EditorGui::show_route_map() const
                           ImGuiTableFlags_SizingFixedFit |
                           ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
     {
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("label", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("tx", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("ty", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("tz", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("rx", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("ry", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("rz", ImGuiTableColumnFlags_None);
+        ImGui::TableHeadersRow();
+
+        std::size_t object_count = 0;
         for (const auto& [label, transforms] : route_map)
         {
-            for (const auto& transform : transforms)
+            object_count += transforms.size();
+        }
+
+        ImGuiListClipper clipper;
+        clipper.Begin(object_count);
+        while (clipper.Step())
+        {
+            int curr_row = 0;
+            int row = clipper.DisplayStart;
+
+            for (const auto& [label, transforms] : route_map)
             {
-                const vsg::dvec3& translation = transform.translation;
-                const vsg::dvec3& rotation_deg = transform.rotation_deg;
+                if (row >= clipper.DisplayEnd)
+                {
+                    break;
+                }
 
-                constexpr const char* number_format = "%10.3f";
+                for (const auto& transform : transforms)
+                {
+                    if (curr_row < row)
+                    {
+                        ++curr_row;
+                        continue;
+                    }
 
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", label.c_str());
-                ImGui::TableNextColumn();
-                ImGui::Text(number_format, translation.x);
-                ImGui::TableNextColumn();
-                ImGui::Text(number_format, translation.y);
-                ImGui::TableNextColumn();
-                ImGui::Text(number_format, translation.z);
-                ImGui::TableNextColumn();
-                ImGui::Text(number_format, rotation_deg.x);
-                ImGui::TableNextColumn();
-                ImGui::Text(number_format, rotation_deg.y);
-                ImGui::TableNextColumn();
-                ImGui::Text(number_format, rotation_deg.z);
+                    if (row >= clipper.DisplayEnd)
+                    {
+                        break;
+                    }
+
+                    const vsg::dvec3& pos = transform.translation;
+                    const vsg::dvec3& rot_deg = transform.rotation_deg;
+
+                    constexpr const char* float_format = "%10.3f";
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", label.c_str());
+                    ImGui::TableNextColumn();
+                    ImGui::Text(float_format, pos.x);
+                    ImGui::TableNextColumn();
+                    ImGui::Text(float_format, pos.y);
+                    ImGui::TableNextColumn();
+                    ImGui::Text(float_format, pos.z);
+                    ImGui::TableNextColumn();
+                    ImGui::Text(float_format, rot_deg.x);
+                    ImGui::TableNextColumn();
+                    ImGui::Text(float_format, rot_deg.y);
+                    ImGui::TableNextColumn();
+                    ImGui::Text(float_format, rot_deg.z);
+
+                    ++curr_row;
+                    ++row;
+                }
             }
         }
 

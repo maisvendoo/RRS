@@ -12,8 +12,8 @@
 
 #include <vsg/maths/vec3.h>
 
-KeyboardScaleState::KeyboardScaleState(EditorContext& editor_context)
-    : TransformState(editor_context)
+KeyboardScaleState::KeyboardScaleState(EditorContext& editor_ctx)
+    : TransformState(editor_ctx)
 {
     name = "KeyboardScaleState";
 }
@@ -22,7 +22,7 @@ KeyboardScaleState::~KeyboardScaleState() = default;
 
 void KeyboardScaleState::on_activate()
 {
-    const auto& gizmo = editor_context.gizmo;
+    const auto& gizmo = editor_ctx.gizmo;
 
     TransformState::on_activate();
     scale = {1.0, 1.0, 1.0};
@@ -31,7 +31,7 @@ void KeyboardScaleState::on_activate()
 
 void KeyboardScaleState::handle_mouse_move()
 {
-    const auto& selected_objects = editor_context.selected_objects;
+    const auto& selected_objects = editor_ctx.selected_objects;
 
     const vsg::dvec3 world_intersection = calculate_world_intersection();
     if (vsg::length(world_intersection - gizmo_pos) < 1.0e-6f)
@@ -54,12 +54,12 @@ void KeyboardScaleState::handle_mouse_move()
 
 void KeyboardScaleState::confirm_transform() const
 {
-    const auto& selected_objects = editor_context.selected_objects;
-    const auto& gizmo = editor_context.gizmo;
-    const auto& command_manager = editor_context.command_manager;
-    const auto& state_manager = editor_context.state_manager;
+    const auto& selected_objects = editor_ctx.selected_objects;
+    const auto& gizmo = editor_ctx.gizmo;
+    const auto& command_manager = editor_ctx.command_manager;
+    const auto& state_manager = editor_ctx.state_manager;
 
-    auto command = std::make_unique<ScaleObjectsCommand>(editor_context,
+    auto command = std::make_unique<ScaleObjectsCommand>(editor_ctx,
         selected_objects, gizmo->get_curr_pos(), scale);
     command_manager->push(std::move(command));
     state_manager->defer_switch_to(STATE_BASIC);
