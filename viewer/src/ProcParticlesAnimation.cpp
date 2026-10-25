@@ -124,8 +124,8 @@ void ProcParticlesAnimation::initStateGroup()
     std::string vert_path = shaders_dir + "particle.vert";
     std::string frag_path = shaders_dir + "particle.frag";
 
-    auto vert = vsg::read(vert_path);
-    auto frag = vsg::read(frag_path);
+    auto vert = vsg::read_cast<vsg::ShaderStage>(vert_path);
+    auto frag = vsg::read_cast<vsg::ShaderStage>(frag_path);
 
     auto cbs = vsg::ColorBlendState::create();
     cbs->configureAttachments(true);
