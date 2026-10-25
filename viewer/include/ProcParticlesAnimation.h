@@ -4,18 +4,16 @@
 
 #include "ProcAnimation.h"
 
+#include <vsg/core/Array.h>
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/StateGroup.h>
+#include <vsg/nodes/VertexIndexDraw.h>
 
 class CfgReader;
 
 namespace vsg
 {
-    class Group;
-    class StateGroup;
-    class VertexIndexDraw;
-    class VertexBuffer;
     class MatrixTransform;
 }
 
