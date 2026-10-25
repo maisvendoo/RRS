@@ -97,6 +97,16 @@ void PneumoHose::disconnect()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void PneumoHose::setExternalState(int state)
+{
+    ref_state.setSpringFirst(state != 0);
+    ref_state.setSpringLast(state != 2);
+    ref_state.setPosition(state);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 bool PneumoHose::isConnected() const
 {
     return is_linked && (input_signals[HOSE_INPUT_IS_CONNECTED] == 1.0);

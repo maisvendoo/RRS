@@ -14,7 +14,7 @@
 #include "MyGui.h"
 #include "TrainLabelsHandler.h"
 #include "VehiclesHandler.h"
-#include <vsg/utils/LineSegmentIntersector.h>
+#include "io-controller.h"
 #include "settings.h"
 
 #include <collision-world-loader.h>
@@ -446,177 +446,22 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             case vsg::KEY_KP_Enter:
             case vsg::KEY_Return:
             {
-                if (isCtrl())
+                if (_vehicles_handler->selectControlVehicle())
                 {
-                    break;
+                    // Явное задание индекса активной кабины для IOController текущей ПЕ
+                    auto cab_idx = _vehicles_handler->getCurrentVehicle()->controlled_cabine_idx;
+                    auto *io_ctrl = _vehicles_handler->getCurrentVehicle()->io_controller;
+
+                    if (io_ctrl != nullptr)
+                    {
+                        io_ctrl->setActiveCabineIndex(cab_idx);
+                    }
+
+                    _upd_server_control->changeCurrentVehicle(_vehicles_handler->getCurrentVehicleIndex(),
+                                                              _vehicles_handler->getControlledVehicleIndex(),
+                                                              _vehicles_handler->getCurrentVehicle()->controlled_cabine_idx);
                 }
 
-                _vehicles_handler->selectControlVehicle();
-
-                _upd_server_control->changeCurrentVehicle(
-                            _vehicles_handler->getCurrentVehicleIndex(),
-                            _vehicles_handler->getControlledVehicleIndex(),
-                            _vehicles_handler->getCurrentVehicle()->controlled_cabine_idx);
-                return;
-            }
-
-            default:
-            {
-                break;
-            }
-        }
-    }
-
-    // Во время подъёма по ступеням ввод ходьбы игнорируется
-    if (_boarding_pending)
-    {
-        return;
-    }
-
-    // E - сесть на сиденье / встать (ТЗ ходьба): в пешем режиме при
-    // наведении на сиденье машиниста (или помощника); сидя - встать
-    // Win32 присылает строчные KeySym - принимаем оба регистра
-    if (!isCtrl() && !isShift() &&
-        (keyPress.keyBase == vsg::KEY_e || keyPress.keyBase == vsg::KEY_E) &&
-        _current_manipulator == _walk_manipulator)
-    {
-        if (_walk_manipulator->isSeated())
-        {
-            // Встать: к двери кабины, где сидим
-            auto& vehicles = _vehicles_handler->vehicles;
-
-            if (seated_vehicle >= 0 &&
-                static_cast<size_t>(seated_vehicle) < vehicles.size())
-            {
-                const VehicleExterior& veh =
-                        vehicles[static_cast<size_t>(seated_vehicle)];
-
-                size_t cab = std::min(seated_cab,
-                                      veh.exit_pos.size() - 1);
-
-                _walk_manipulator->standUp(
-                            veh.worldFromLocal(veh.exit_pos[cab]));
-            }
-
-            if (gui_params != nullptr)
-                gui_params->walk_hint.clear();
-
-            return;
-        }
-
-        if (hint_vehicle >= 0)
-        {
-            auto& vehicles = _vehicles_handler->vehicles;
-
-            if (static_cast<size_t>(hint_vehicle) < vehicles.size())
-            {
-                const VehicleExterior& veh =
-                        vehicles[static_cast<size_t>(hint_vehicle)];
-
-                if (hint_driver)
-                {
-                    // Место машиниста = рабочее место: кабина с
-                    // управлением (как вход через дверь)
-                    _vehicles_handler->selectVehicle(hint_vehicle);
-
-                    VehicleExterior* v =
-                            _vehicles_handler->getCurrentVehicle();
-
-                    if (v != nullptr)
-                        v->current_cabine_idx = hint_cab;
-
-                    // Мы "внутри" этой ПЕ: F7 встанет пешком в кабину
-                    _inside_vehicle = hint_vehicle;
-                    _inside_cab = hint_cab;
-
-                    _prev_manipulator = nullptr;
-                    _upd_server_control->setControlSuppressed(false);
-                    _current_manipulator = _cabine_manipulator;
-                    _current_manipulator->setCurrentVehicle(v);
-                    _current_manipulator->resetView();
-                }
-                else
-                {
-                    // Место помощника: фиксированная камера на сиденье,
-                    // управление НЕ берётся
-                    seated_vehicle = hint_vehicle;
-                    seated_cab = hint_cab;
-                    seated_driver = false;
-
-                    if (hint_cab < veh.assistant_pos.size())
-                        _walk_manipulator->sitDown(
-                                    veh.worldFromLocal(
-                                        veh.assistant_pos[hint_cab]),
-                                    1.15);
-                }
-            }
-
-            if (gui_params != nullptr)
-                gui_params->walk_hint.clear();
-
-            return;
-        }
-    }
-
-    // Ctrl+Enter - вход/выход из локомотива (ТЗ "walking"):
-    // из кабины - выход через дверь в пешей режим (спавн у ExitPos);
-    // в пешем режиме - вход в кабину ПЕ, на чью дверь наведён взгляд
-    if (isCtrl() && !isShift() &&
-        (keyPress.keyBase == vsg::KEY_Return ||
-         keyPress.keyBase == vsg::KEY_KP_Enter))
-    {
-        if (_current_manipulator == _walk_manipulator)
-        {
-            int vehicle_idx = -1;
-            int cab_idx = -1;
-
-            if (findNearestCabineDoor(vehicle_idx, cab_idx))
-            {
-                startBoardingAnimation(vehicle_idx, cab_idx);
-            }
-        }
-        else if (_current_manipulator == _cabine_manipulator)
-        {
-            enterWalkMode();
-        }
-
-        return;
-    }
-
-    // Внешняя и свободная камеры перенесены на Shift+F3/Shift+F4:
-    // F3/F4 без модификаторов заняты окном диагностики составов
-    // (ТЗ "Промт статистики вагонов")
-    if (isShift() && !isCtrl())
-    {
-        switch (keyPress.keyBase)
-        {
-            // Shift+F3 - внешняя камера текущей ПЕ
-            case vsg::KEY_F3:
-            {
-                if (_current_manipulator == _vehicle_manipulator)
-                {
-                    _current_manipulator->returnView();
-                    return;
-                }
-
-                _current_manipulator = _vehicle_manipulator;
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->resetView();
-                return;
-            }
-
-            // Shift+F4 - свободная камера
-            case vsg::KEY_F4:
-            {
-                if (_current_manipulator == _free_manipulator)
-                {
-                    _current_manipulator->returnView();
-                    return;
-                }
-
-                _current_manipulator = _free_manipulator;
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->resetView();
                 return;
             }
 
@@ -1061,7 +906,7 @@ void UpdateViewerHandler::changeCurrentCabine()
     if (vehicle->current_cabine_idx == cabs_num)
     {
         vehicle->current_cabine_idx = 0;
-    }
+    }    
 }
 
 //------------------------------------------------------------------------------

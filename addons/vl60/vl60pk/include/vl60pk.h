@@ -504,7 +504,7 @@ private:
     /// ╨Ш╨╜╨╕╤Ж╨╕╨░╨╗╨╕╨╖╨░╤Ж╨╕╤П ╨┐╤А╨╛╤З╨╡╨│╨╛ ╨╛╨▒╨╛╤А╤Г╨┤╨╛╨▓╨░╨╜╨╕╤П
     void initOtherEquipment(const QString& modules_dir, const QString& custom_cfg_dir);
 
-    /// ╨Ш╨╜╨╕╤Ж╨╕╨░╨╗╨╕╨╖╨░╤Ж╨╕╤П ╤Г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П
+    /// Инициализация органов управления управления
     void initControl(const QString& modules_dir, const QString& custom_cfg_dir);
 
     bool initAutostartProgram(int cab_autostart_request);
@@ -517,11 +517,8 @@ private:
 
     void prepareCabineForAutopilot(int my_cab_idx, int other_cab_idx);
 
-    /// ╨Я╤А╨╛╤Ж╨╡╤Б╤Б ╤Б╨╕╨╝╤Г╨╗╤П╤Ж╨╕╨╕
-    void process(const simulator_time_t& t, const double& dt) override;
-
-    /// ╨г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╨╡
-    void keyProcess(const simulator_time_t& t, const double& dt);
+    /// Процесс симуляции
+    void process(const simulator_time_t& t, const double& dt) override;        
 
     /// ╨Ю╤В╨╗╨░╨┤╨╛╤З╨╜╨░╤П ╤Б╤В╤А╨╛╨║╨░
     void debugPrint(const simulator_time_t& t, const double& dt);
@@ -532,8 +529,7 @@ private:
     /// ╨б╨╕╨│╨╜╨░╨╗╤Л ╨┤╨╗╤П ╨╛╨╖╨▓╤Г╤З╨║╨╕
     void soundsOutput(const simulator_time_t& t, const double& dt);
 
-
-    /// ╨Я╤А╨╡╨┤╨▓╨░╤А╨╕╤В╨╡╨╗╤М╨╜╤Л╨╡ ╤А╨░╤Б╤З╤С╤В╤Л ╨┐╨╡╤А╨╡╨┤ ╤Б╨╕╨╝╤Г╨╗╤П╤Ж╨╕╨╡╨╣
+    /// Предварительные расчёты перед симуляцией
     void preStep(const double& t) override;
 
     /// ╨Я╤А╨╡╨┤╨▓╨░╤А╨╕╤В╨╡╨╗╤М╨╜╤Л╨╣ ╤А╨░╤Б╤З╤С╤В ╨║╨╛╨╛╤А╨┤╨╕╨╜╨░╤В ╤Б╤Ж╨╡╨┐╨╜╤Л╤Е ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓
@@ -577,6 +573,7 @@ private:
     /// ╨Ь╨╛╨┤╨╡╨╗╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╨┐╤А╨╕╨▒╨╛╤А╨╛╨▓ ╨▒╨╡╨╖╨╛╨┐╨░╤Б╨╜╨╛╤Б╤В╨╕
     void stepSafetyDevices(const double& t, const double& dt);
 
+    /// Управление
     void stepControls(const double &t, const double &dt);
 
     /// ╨Я╤А╨╕╨╝╨╡╨╜╨╡╨╜╨╕╨╡ ╨╛╨┤╨╜╨╛╨╣ ╨║╨╛╨╝╨░╨╜╨┤╤Л ╤Г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П ╨║ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░╨╝

@@ -1,10 +1,10 @@
 #include    "topologycheck.h"
 #include    "command-line.h"
-#include    "Logger.h"
+#include    "core/Logger.h"
 
 #include    <QString>
 #include    <QDir>
-#include <algorithm>
+#include    <algorithm>
 
 //------------------------------------------------------------------------------
 //

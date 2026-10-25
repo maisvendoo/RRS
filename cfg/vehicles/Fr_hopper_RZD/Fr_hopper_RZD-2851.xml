@@ -35,6 +35,10 @@
 
 		<BrakeMechConfig>carbrakes-mech-composite</BrakeMechConfig>
 
+		<CustomModulesDir>freightcar</CustomModulesDir>
+		<IOControllerModule>freightcar-iocontroller</IOControllerModule>
+		<IOControllerConfig>freightcar-iocontroller</IOControllerConfig>
+
 	</Vehicle>
 
 

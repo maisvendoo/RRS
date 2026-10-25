@@ -1,0 +1,27 @@
+#ifndef EDITOR_STATES_KEYBOARD_ROTATE_STATE_H
+#define EDITOR_STATES_KEYBOARD_ROTATE_STATE_H
+
+#include "editor/states/TransformState.h"
+
+#include <vsg/maths/vec3.h>
+
+class KeyboardRotateState : public TransformState
+{
+public:
+    KeyboardRotateState(EditorContext& editor_ctx);
+    virtual ~KeyboardRotateState() override;
+
+    virtual void on_activate() override;
+
+    virtual void handle_mouse_move() override;
+
+private:
+    double rotation_rad;
+    vsg::dvec3 gizmo_pos;
+    vsg::dvec3 camera_front;
+
+private:
+    virtual void confirm_transform() const override;
+};
+
+#endif // EDITOR_STATES_KEYBOARD_ROTATE_STATE_H

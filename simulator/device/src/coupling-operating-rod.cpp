@@ -27,6 +27,37 @@ void OperatingRod::setKeySymbol(std::uint16_t key_symbol)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void OperatingRod::setExternalState(double ref_state)
+{
+    ref_state = std::clamp(ref_state, -1.0, 1.0);
+
+    // Расцепление заблокировано при натяжении сцепок
+    if ((ref_state <= -1.0 + Physics::ZERO) && (coupling_force > max_operating_force))
+    {
+        ref_operating_state = std::min(0.0, getY(0));
+        is_fixed_uncoupling = false;
+        return;
+    }
+
+    ref_operating_state = ref_state;
+
+    // Фиксация — по существующей семантике: только по достижении рычагом -1
+    if (ref_state <= -1.0 + Physics::ZERO)
+    {
+        if ((getY(0) + 1.0) <= Physics::ZERO)
+        {
+            is_fixed_uncoupling = true;
+        }
+    }
+    else
+    {
+        is_fixed_uncoupling = false;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void OperatingRod::setCouplingForce(double force)
 {
     coupling_force = force;
@@ -76,8 +107,15 @@ void OperatingRod::stepKeysControl(double t, double dt)
     (void) t;
     (void) dt;
 
+    // Если управляющие клавиши не заданы (внешнее управление через IOController),
+    // клавишная логика отключается и не вмешивается в работу рычага
+    if (!pressed_keys)
+    {
+        return;
+    }
+
     // Проверяем управляющий сигнал от заданной клавиши
-    if (pressed_keys && getKeyState(*pressed_keys, key_symbol_operate))
+    if (getKeyState(*pressed_keys, key_symbol_operate))
     {
         // Проверяем фиксацию расцепляющего положения
         if (is_fixed_uncoupling)

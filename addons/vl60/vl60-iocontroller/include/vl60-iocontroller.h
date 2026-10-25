@@ -14,13 +14,30 @@ public:
 
     ~VL60IOController() = default;
 
+    void init() override;
+
+    void step(float t, float dt, const std::vector<float> *server_signals) override;
+
 private:
 
-    void keysProcess(std::set<uint16_t> &pressed_keys) override;    
+    enum
+    {
+        CAB1 = 0,
+        CAB2 = 1,
+        CABS_NUM
+    };
 
-    void processMouseInput(io_control_input_t input, uint32_t button, bool is_pressed) override;
+    ControlHandler *revers_handle_holder[CABS_NUM] = {nullptr, nullptr};
 
-    int kmPosBySignal(float signal) const;
+    ControlHandler *revers_handle[CABS_NUM] = {nullptr, nullptr};
+
+    ControlHandler *main_handle[CABS_NUM] = {nullptr, nullptr};
+
+    void processKeyboardInput(std::set<uint16_t> &pressed_keys) override;
+
+    void lockReversHandle(int cab_idx);
+
+    void lockMainHandle(int cab_idx);
 };
 
 #endif

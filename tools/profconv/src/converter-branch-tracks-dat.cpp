@@ -1,5 +1,5 @@
 #include    "converter.h"
-#include    "Logger.h"
+#include    "core/Logger.h"
 
 #include    <QFile>
 

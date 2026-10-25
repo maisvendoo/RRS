@@ -23,6 +23,7 @@
 #include <array>
 
 #include <vl60-autopilot-types.h>
+#include <vl60-controls.h>
 
 class ACMotorCompressor;
 class ACMotorFan;
@@ -496,9 +497,6 @@ private:
     /// Процесс симуляции
     void process(const simulator_time_t& t, const double& dt) override;
 
-    /// Управление
-    void keyProcess(const simulator_time_t& t, const double& dt);
-
     /// Отладочная строка
     void debugPrint(const simulator_time_t& t, const double& dt);
 
@@ -549,6 +547,9 @@ private:
 
     /// Моделирование приборов безопасности
     void stepSafetyDevices(const double& t, const double& dt);
+
+    /// Управление через IOController
+    void stepControls(const double &t, const double &dt);
 
     void stepAutopilot(double t, double dt);
 

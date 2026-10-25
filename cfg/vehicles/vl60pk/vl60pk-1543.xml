@@ -31,7 +31,7 @@
 		<CustomModulesDir>vl60</CustomModulesDir>
 
 		<AutopilotModule>vl60-autopilot</AutopilotModule>
-		<AutopilotConfig>vl60pk-autopilot</AutopilotConfig>		
+		<AutopilotConfig>vl60pk-autopilot</AutopilotConfig>
 
 		<IOControllerModule>vl60-iocontroller</IOControllerModule>
 		<IOControllerConfig>vl60pk-iocontroller</IOControllerConfig>
@@ -41,12 +41,12 @@
 
 	<Cabine>
 		<DriverPos>0.8 8.4 3.2</DriverPos>
-		<DriverDir>0.0</DriverDir>		
+		<DriverDir>0.0</DriverDir>
 	</Cabine>
 
 	<Cabine>
 		<DriverPos>-0.8 -8.4 3.2</DriverPos>
-		<DriverDir>180.0</DriverDir>		
+		<DriverDir>180.0</DriverDir>
 	</Cabine>
 
 

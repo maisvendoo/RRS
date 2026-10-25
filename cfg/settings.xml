@@ -86,7 +86,7 @@
         <HUDButtonOn>0.75 1.0 0.75 0.8</HUDButtonOn>
         <!-- Цвет кнопок интерфейса при наведении курсора (RGBA, 0.0 - 1.0) -->
         <HUDButtonHovered>1.0 1.0 0.75 0.8</HUDButtonHovered>
-         <!-- Цвет неактивных кнопок интерфейса (RGBA, 0.0 - 1.0) -->
+        <!-- Цвет неактивных кнопок интерфейса (RGBA, 0.0 - 1.0) -->
         <HUDButtonInactive>0.3 0.3 0.3 0.8</HUDButtonInactive>
         <!-- Цвет текста неактивных кнопок интерфейса (RGBA, 0.0 - 1.0) -->
         <HUDButtonInactiveText>0.5 0.5 0.5 1.0</HUDButtonInactiveText>

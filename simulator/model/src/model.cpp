@@ -41,6 +41,8 @@ static void Model_releaseHangingEmergency(std::vector<Train*>& trains, Vehicle* 
 
 #include    <QFile>
 #include    <QTextStream>
+#include    <QDataStream>
+#include    <QIODevice>
 
 //------------------------------------------------------------------------------
 //
@@ -281,6 +283,11 @@ bool Model::init(const simulator_command_line_t &command_line)
         vehicles_info.vehicles[i].vehicle_config_file = (*it)->getConfigName();
 
         connect(*it, &Vehicle::sigGetTrainParams, this, &Model::slotGetTrainParams);
+
+        connect(*it, &Vehicle::sigInitClientInputSignal,
+                tcp_server, &TcpServer::slotInitClientInputSignal);
+
+        (*it)->replayInitSignals();
 
         ++i;
     }
@@ -591,23 +598,92 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Model::slotSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t id, float value)
+void Model::slotSetVehicleControlCommand(int vehicle_idx,
+                                         int cab_idx,
+                                         uint16_t id,
+                                         float value, std::vector<float> params,
+                                         int8_t prioriry)
 {
-    for (auto *train : trains)
+    if (vehicle_idx >= vehicles.size())
     {
-        for (auto *vehicle : *(train->getVehicles()))
+        return;
+    }
+
+    auto *vehicle = vehicles[vehicle_idx];
+
+    if (vehicle != nullptr)
+    {
+        if (!vehicle->control_inputs.empty())
         {
-            if (vehicle_idx == vehicle->getModelIndex())
+            if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())
             {
-                if (!vehicle->control_inputs.empty())
+                // Если приоритет пришедшего сигнала
+                // менее привелигированый - выходим ничего не меняя
+                if (prioriry > vehicle->control_inputs[cab_idx][id].server_priority)
                 {
-                    if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())
+                    return;
+                }
+
+                // Если приоритет пришедшего сигнала
+                // более привелигированый - перехват управления
+                if (prioriry < vehicle->control_inputs[cab_idx][id].server_priority)
+                {
+                    vehicle->control_inputs[cab_idx][id].server_priority = static_cast<ControlPriority>(prioriry);
+                }
+
+                vehicle->control_inputs[cab_idx][id].value = value;
+
+                if (params.size() <= vehicle->control_inputs[cab_idx][id].params.size())
+                {
+                    for (size_t i = 0; i < params.size(); ++i)
                     {
-                        vehicle->control_inputs[cab_idx][id] = value;
+                        vehicle->control_inputs[cab_idx][id].params[i] = params[i];
                     }
                 }
             }
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotGetVehicleSignals(int vehicle_idx, QByteArray &response_data)
+{
+    if (vehicle_idx < 0 || vehicle_idx >= static_cast<int>(vehicles.size()))
+        return;
+
+    std::vector<float> *analog_signals = vehicles[vehicle_idx]->getAnalogSignals();
+
+    QDataStream stream(&response_data, QIODevice::WriteOnly);
+    stream << vehicle_idx;
+    stream << static_cast<uint32_t>(analog_signals->size());
+    for (float v : *analog_signals)
+        stream << v;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::slotSetVehicleControlPriority(int vehicle_idx, std::int8_t priority)
+{
+    if (vehicle_idx >= vehicles.size())
+    {
+        return;
+    }
+
+    auto *vehicle = vehicles[vehicle_idx];
+
+    if (vehicle != nullptr)
+    {
+        for (auto &cab_inputs : vehicle->control_inputs)
+        {
+            for (auto it = cab_inputs.begin(); it != cab_inputs.end(); ++it)
+            {
+                it.value().server_priority = static_cast<ControlPriority>(priority);
+            }
+        }
+        return;
     }
 }
 
@@ -2000,34 +2076,16 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::sigSetVehicleControlCommand, this, &Model::slotSetVehicleControlCommand);
 
-    // Табельные номера: автоназначение и восстановление "зависших"
-    // поездов
+    connect(tcp_server, &TcpServer::sigSetVehicleControlPriority, this, &Model::slotSetVehicleControlPriority);
+
+    connect(tcp_server, &TcpServer::sigRequestVehicleSignals, this, &Model::slotGetVehicleSignals);
+
+    // Табельные номера: автоназначение и восстановление "зависших" поездов
     connect(tcp_server, &TcpServer::sigClientTabNumber, this, &Model::slotClientTabNumber);
 
     connect(tcp_server, &TcpServer::sigSetTrainTab, this, &Model::slotSetTrainTab);
 
     connect(tcp_server, &TcpServer::sigLoadSession, this, &Model::slotLoadSession);
-
-    // Рассылка клиентам: модель (поток физики) отдаёт данные сигналами,
-    // запись в сокеты выполняет сетевой поток
-    connect(this, &Model::sigTcpUpdateTrainsInfo, tcp_server, &TcpServer::updateTrainsInfo);
-
-    connect(this, &Model::sigTcpUpdateVehiclesPos, tcp_server, &TcpServer::updateVehiclesPos);
-
-    connect(this, &Model::sigTcpUpdateVehiclesState, tcp_server, &TcpServer::updateVehiclesState);
-
-    connect(this, &Model::sigTcpUpdatePlayers, tcp_server, &TcpServer::updatePlayers);
-
-    connect(this, &Model::sigTcpUpdateVehicleControlled, tcp_server, &TcpServer::updateVehicleControlled);
-
-    connect(this, &Model::sigTcpUpdateDiagnostics, tcp_server, &TcpServer::updateDiagnostics);
-
-    // Периодическое обновление кэша топологии/сигналов для новых клиентов
-    connect(this, &Model::sigTcpTopologyData, tcp_server, &TcpServer::updateTopologyData);
-
-    connect(this, &Model::sigTcpSignalsData, tcp_server, &TcpServer::updateSignalsData);
-
-    Journal::instance()->info(QString("TCP server moved to network thread (HighPriority, TZ p.7)"));
 
     Journal::instance()->info("TCP server is initialized successfully");
 }

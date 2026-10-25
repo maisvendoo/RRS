@@ -98,7 +98,7 @@ QString BrakeCrane395::getPositionName() const
 //------------------------------------------------------------------------------
 double BrakeCrane395::getHandlePosition() const
 {
-    return static_cast<double>(handle_pos) / 6.0;
+    return handle_pos; //static_cast<double>(handle_pos) / 6.0;
 }
 
 //------------------------------------------------------------------------------

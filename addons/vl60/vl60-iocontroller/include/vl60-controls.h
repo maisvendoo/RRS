@@ -34,12 +34,64 @@ enum
     CTRL_EPK_INSERTION = 125,
     CTRL_LOCK_367_INSERTION = 126,
     CTRL_KEY_EPK = 127,
-    CTRL_CRANE_395 = 142,
-    CTRL_CRANE_254 = 143,
-    CTRL_KM_MAIN = 144,
-    CTRL_KM_REVERS = 145,
-    CTRL_LOCK_367_TURN = 146,
-    CTRL_CRANE_COMBINE = 147
+    CTRL_REVERS_POSITION = 128,
+    CTRL_KM_MAIN_POSITION = 129,
+    CTRL_KRM_395 = 130,
+    CTRL_KVT_254 = 131,
+    CTRL_COMBINE_KRAN = 132,
+    CTRL_SAND_BUTTON = 133,
+    CTRL_WHISTLE_BUTTON = 134,
+    CTRL_TIFON_BUTTON = 135,
+    CTRL_RBS_BUTTON = 136,
+    CTRL_RB_BUTTON = 137,
+    CTRL_RBP_BUTTON = 138,
+    CTRL_AUTOPILOT = 139,
+    CTRL_SHUNTING_MODE = 140,
+
+    // Концевые краны тормозной магистрали
+    CTRL_ANGLECOCK_BP_FWD = 141,
+    CTRL_ANGLECOCK_BP_BWD = 142,
+
+    // Концевые краны питательной магистрали
+    CTRL_ANGLECOCK_FL_FWD = 143,
+    CTRL_ANGLECOCK_FL_BWD = 144,
+
+    // Концевые краны тормозных цилиндров
+    CTRL_ANGLECOCK_BC_FWD = 145,
+    CTRL_ANGLECOCK_BC_BWD = 146,
+
+    // Автозапуск и автоостанов
+    CTRL_AUTOSTART_PROGRAM = 147,
+    CTRL_AUTOSTOP_PROGRAM = 148,
+
+    // Рукава тормозной магистрали
+    CTRL_HOSE_BP_FWD = 149,
+    CTRL_HOSE_BP_BWD = 150,
+
+    // Рукава питательной магистрали
+    CTRL_HOSE_FL_FWD = 151,
+    CTRL_HOSE_FL_BWD = 152,
+
+    // Рукава магистрали тормозных цилиндров
+    CTRL_HOSE_BC_FWD = 153,
+    CTRL_HOSE_BC_BWD = 154,
+
+    // Незадействованные ранее тумблеры (управление только мышью)
+    CTRL_TUMBLER_RADIO = 155,
+    CTRL_TUMBLER_AUTOSAND = 156,
+    CTRL_TUMBLER_P_TIFON = 157,        // кнопка
+    CTRL_TUMBLER_P_WHISTLE = 158,      // кнопка
+    CTRL_TUMBLER_P_CAB_HEAT = 159,
+    CTRL_TUMBLER_P_SHASSIS_LIGHT = 160,
+    CTRL_TUMBLER_P_ALSN_CHECK = 161,
+    CTRL_TUMBLER_P_RESERVE1 = 162,
+    CTRL_TUMBLER_P_RESERVE2 = 163,
+
+    // Расцепные рычаги автосцепки (управление через IOController)
+    CTRL_OPER_ROD_FWD = 164,
+    CTRL_OPER_ROD_BWD = 165,
+    CTRL_OPER_ROD_FIX_FWD = 166,   // фиксация в расцепленном положении
+    CTRL_OPER_ROD_FIX_BWD = 167,
 };
 
 #endif

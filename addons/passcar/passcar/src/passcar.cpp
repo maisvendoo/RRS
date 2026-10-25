@@ -73,9 +73,7 @@ void PassCar::initialization()
 
     initBrakesEquipment(modules_dir, custom_cfg_dir);
 
-    initEPB(modules_dir, custom_cfg_dir);
-
-    initControl(modules_dir, custom_cfg_dir);
+    initEPB(modules_dir, custom_cfg_dir);    
 
     if (is_Registrator_on)
         initRegistrator(modules_dir, custom_cfg_dir);
@@ -86,6 +84,8 @@ void PassCar::initialization()
 //------------------------------------------------------------------------------
 void PassCar::process(const simulator_time_t& t, const double& dt)
 {
+    stepControls(t.simulation_seconds, dt);
+
     interior_light.step();
 
     red_lamps_end_of_train_fwd.step();

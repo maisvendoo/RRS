@@ -20,7 +20,7 @@
 #include "UpdateStatisticsHandler.h"
 #include "UpdateViewerHandler.h"
 #include "VehiclesHandler.h"
-#include "WorldCulling.h"
+#include "graphics/WorldCulling.h"
 #include "filesystem.h"
 #include "graphics/common.h"
 #include "sound-manager.h"
@@ -2034,6 +2034,9 @@ void RouteViewer::initTcpClient()
         is_connection_abandoned = true;
     });
 
+    connect(tcp_client.get(), &TcpClient::sigVehicleControlInputInit,
+            vehicles_handler.get(), &VehiclesHandler::slotVehicleControlInputInit);
+
     tcp_client->init(settings.tcp_config);
 
     GUIparams->tcp_client = tcp_client.get();
@@ -2390,7 +2393,7 @@ void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
     if (!vehicle)
     {
         input_route_handler->clearActiveController();
-        LOG_INFO("RouteViewer: No vehicle at index %d", newIndex);        
+        LOG_INFO("RouteViewer: No vehicle at index %d", newIndex);
         return;
     }
 
@@ -2399,7 +2402,7 @@ void RouteViewer::slotOnCurrentVehicleChanged(int newIndex, int oldIndex)
     if (vehicle->io_controller != nullptr)
     {
         input_route_handler->setActiveController(vehicle->io_controller);
-        vehicle->io_controller->setActirveCabineIndex(static_cast<int>(cab_idx));
+        vehicle->io_controller->setActiveCabineIndex(cab_idx);
         LOG_INFO("RouteViewer: Activated IOController for vehicle %d (index %d)",
                  newIndex, newIndex);
     } else

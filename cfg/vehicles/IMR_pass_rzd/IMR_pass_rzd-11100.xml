@@ -34,6 +34,10 @@
 
 		<GenReductorCoeff>2.96</GenReductorCoeff>
 
+		<CustomModulesDir>passcar</CustomModulesDir>
+		<IOControllerModule>passcar-iocontroller</IOControllerModule>
+		<IOControllerConfig>passcar-iocontroller</IOControllerConfig>
+
 	</Vehicle>
 
 

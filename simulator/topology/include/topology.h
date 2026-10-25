@@ -2,6 +2,7 @@
 #define     TOPOLOGY_H
 
 #include    <QObject>
+#include    <atomic>
 #include    <unordered_map>
 #include    <vector>
 #include    <string>
@@ -35,7 +36,7 @@ public:
     ~Topology();
 
     /// Загрузка топологии ж/д полигона
-    bool load(QString route_dir, bool solve_errors = true);
+    bool load(QString route_dir, bool solve_errors = true, std::atomic_bool* finish_thread = nullptr);
 
     /// Инициализация поезда
     bool addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicles);

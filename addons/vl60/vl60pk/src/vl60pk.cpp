@@ -89,7 +89,7 @@ void VL60pk::process(const simulator_time_t& t, const double& dt)
     if (needDebugMsg)
         debugPrint(t, dt);
 
-    keyProcess(t, dt);
+    stepControls(t.simulation_seconds, dt);
 
     signalsOutput(t, dt);
 
@@ -137,9 +137,7 @@ void VL60pk::step(const double &t, const double &dt)
 
     stepOtherEquipment(t, dt);
 
-    stepSafetyDevices(t, dt);
-
-    stepControls(t, dt);
+    stepSafetyDevices(t, dt);    
 
     autoStartTimer->step(t, dt);
 }

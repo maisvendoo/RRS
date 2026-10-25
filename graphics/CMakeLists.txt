@@ -21,6 +21,7 @@ target_sources(graphics
         src/pipeline_funcs.cpp
         src/postprocess.cpp
         src/shader_funcs.cpp
+        src/WorldCulling.cpp
 
     PUBLIC
         FILE_SET HEADERS
@@ -32,6 +33,7 @@ target_sources(graphics
             include/graphics/pipeline_funcs.h
             include/graphics/postprocess.h
             include/graphics/shader_funcs.h
+            include/graphics/WorldCulling.h
 )
 
 target_link_libraries(graphics PRIVATE

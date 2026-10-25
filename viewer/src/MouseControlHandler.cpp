@@ -55,27 +55,32 @@ void MouseControlHandler::apply(vsg::ButtonPressEvent &buttonPress)
         return;
     }
 
-    io_control_input_t input;
-    IOController *io_controller = nullptr;
+    ControlHandler *handler = nullptr;
 
     // Определяем что мы попали в какой-то орган управления,
     // возвращаем I/O-контроллер его обрабатываниющий и описатель сигнала
     if (pickControl(static_cast<int>(buttonPress.x),
-                    static_cast<int>(buttonPress.y),
-                    io_controller,
-                    input))
+                    static_cast<int>(buttonPress.y),                    
+                    handler))
     {
-        // Если сигнал или контроллер невалидны - уходим
-        if (input.id == 0 || io_controller == nullptr)
+        if (handler == nullptr)
         {
             return;
         }
 
+        // Если сигнал или контроллер невалидны - уходим
+        if (handler->id == 0)
+        {
+            return;
+        }
+
+        // Запомнили активный обработчик
+        active_handler = handler;
         // Передаем в данные обработчику нажатия кнопки мыши
-        io_controller->mouseInputProcess(input, buttonPress.button, true);
+        handler->processMouseInput(buttonPress.button, true);
 
         // Помечаем нажатие как обработанное
-        buttonPress.handled = true;
+        buttonPress.handled = false;
     }
 }
 
@@ -89,22 +94,35 @@ void MouseControlHandler::apply(vsg::ButtonReleaseEvent &buttonRelease)
         return;
     }
 
-    io_control_input_t input;
-    IOController *io_controller = nullptr;
+    // Обработка отпускания на обработчике, ранее вызванном нажатием
+    if (active_handler != nullptr)
+    {
+        active_handler->processMouseInput(buttonRelease.button, false);
+        buttonRelease.handled = false;
+        active_handler = nullptr;
+        return;
+    }
+
+    ControlHandler *handler = nullptr;
 
     if (pickControl(static_cast<int>(buttonRelease.x),
-                    static_cast<int>(buttonRelease.y),
-                    io_controller,
-                    input))
+                    static_cast<int>(buttonRelease.y),                    
+                    handler))
     {
-        if (input.id == 0 || io_controller == nullptr)
+        if (handler == nullptr)
         {
             return;
         }
 
-        io_controller->mouseInputProcess(input, buttonRelease.button, false);
+        // Если сигнал или контроллер невалидны - уходим
+        if (handler->id == 0)
+        {
+            return;
+        }
 
-        buttonRelease.handled = true;
+        handler->processMouseInput(buttonRelease.button, false);
+
+        buttonRelease.handled = false;
     }
 }
 
@@ -147,10 +165,7 @@ void MouseControlHandler::apply(vsg::KeyReleaseEvent &keyRelease)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-bool MouseControlHandler::pickControl(int x,
-                                      int y,
-                                      IOController* &io_ctrl,
-                                      io_control_input_t &input)
+bool MouseControlHandler::pickControl(int x, int y, ControlHandler *&handler)
 {
     VehicleExterior *vehicle = _vehicles_handler->getCurrentVehicle();
 
@@ -192,18 +207,15 @@ bool MouseControlHandler::pickControl(int x,
                     continue;
                 }
 
-                if (!vehicle->io_controller->findControl(node_name, input))
+                if (!vehicle->io_controller->findControlHandler(node_name, handler))
                 {
                     continue;
                 }
 
-                if (input.id == 0)
+                if (handler->id == 0)
                 {
                     continue;
-                }
-
-                // Сохраняем актуальный контроллер ввода
-                io_ctrl = vehicle->io_controller;
+                }                
 
                 if (_last_hit_object != node_name)
                 {
@@ -227,17 +239,16 @@ void MouseControlHandler::updateTooltip()
 {
     ControlTooltip &tip = getControlTooltip();
 
-    IOController *io_controller = nullptr;
-    io_control_input_t input;
+    ControlHandler *handler = nullptr;
 
-    tip.is_active = pickControl(static_cast<int>(_pointer_x), static_cast<int>(_pointer_y), io_controller, input);
+    tip.is_active = pickControl(static_cast<int>(_pointer_x), static_cast<int>(_pointer_y), handler);
 
     if (!tip.is_active)
     {
         return;
     }
 
-    if (io_controller == nullptr)
+    if (handler == nullptr)
     {
         return;
     }
@@ -245,14 +256,11 @@ void MouseControlHandler::updateTooltip()
     tip.x = _pointer_x;
     tip.y = _pointer_y;
 
-    tip.title = input.name;
-    tip.description = input.description;
-    tip.usage = input.usage;
-    tip.hot_keys = input.hot_keys;
-
-    QString state = QString("Статус: %1").arg(io_controller->getSignalValueByID(input.id, input.cabine_idx), 3, 'f', 1);
-
-    tip.state = state;
+    tip.title = handler->name;
+    tip.description = handler->description;
+    tip.usage = handler->getUsage();
+    tip.hot_keys = handler->hot_keys;
+    tip.state = QString("Статус: %1").arg(handler->getState());
 }
 
 //------------------------------------------------------------------------------

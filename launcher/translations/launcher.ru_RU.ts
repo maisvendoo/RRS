@@ -209,7 +209,7 @@
     <message>
         <location filename="../forms/mainwindow.ui" line="244"/>
         <source>Start date</source>
-        <translation>Дата страта</translation>
+        <translation>Дата старта</translation>
     </message>
     <message>
         <location filename="../forms/mainwindow.ui" line="260"/>

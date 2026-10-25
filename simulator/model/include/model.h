@@ -248,7 +248,7 @@ private:
     /// Виртуальное устройство для сопряжения с внешним пультом
     VirtualInterfaceDevice  *control_panel = nullptr;
 
-    Vehicle* vehicle_controlled_by_panel = nullptr;    
+    Vehicle* vehicle_controlled_by_panel = nullptr;
 
     /// Топология
     Topology *topology = new Topology();
@@ -416,7 +416,7 @@ private:
     std::queue<Vehicle *> vehicles_for_autostart;
 
     /// Построение очереди автозапуска
-    void buildAutostartQueue(Train *train);    
+    void buildAutostartQueue(Train *train);
 
     /// Обработка очереди автозапуска
     void processAutostartQueue();
@@ -439,7 +439,7 @@ private:
     void initControlPanel(QString cfg_path);
 
     /// Инициализация поезда
-    Train *addTrain(const init_data_t &init_data);    
+    Train *addTrain(const init_data_t &init_data);
 
     /// Инициализация топологии
     void initTopology(const init_data_t &init_data);
@@ -527,7 +527,16 @@ private slots:
     /// Связывание сигналов и слотов для загрузки сценария в модули автоведения
     void slotUpdateTrainTimetable(int train_idx);
 
-    void slotSetVehicleControlCommand(int vehicle_idx, int cab_idx, uint16_t id, float value);
+    void slotSetVehicleControlCommand(int vehicle_idx,
+                                      int cab_idx,
+                                      uint16_t id,
+                                      float value,
+                                      std::vector<float> params,
+                                      std::int8_t prioriry);
+
+    void slotGetVehicleSignals(int vehicle_idx, QByteArray &response_data);
+
+    void slotSetVehicleControlPriority(int vehicle_idx, std::int8_t priority);
 
     /// Табельный номер клиента при подключении:
     /// автоназначение поезда / восстановление "зависшего" (п.6)

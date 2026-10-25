@@ -36,6 +36,9 @@ public:
     /// Соединить рукава
     void connect();
 
+    /// Установить состояние рукава через IOController (0 — разъединить, 1 — нейтраль, 2 — соединить)
+    void setExternalState(int state);
+
     /// Разъединить рукава
     void disconnect();
 

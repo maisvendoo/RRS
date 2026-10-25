@@ -26,9 +26,7 @@ public:
 
     void apply(vsg::KeyPressEvent& keyPress) override;
 
-    void apply(vsg::KeyReleaseEvent& keyRelease) override;
-
-    void apply(vsg::FrameEvent &frame) override;
+    void apply(vsg::KeyReleaseEvent& keyRelease) override;    
 
     void setKeyboard(vsg::ref_ptr<vsg::Keyboard> keyboard);
 
@@ -52,9 +50,7 @@ private:
 
     bool isControlKey(uint16_t key);
 
-    void processKeyForController(uint16_t keyBase, bool pressed);
-
-    void updateController(float dt);
+    void processKeyForController(uint16_t keyBase, bool pressed);    
 
     void resetControllerState();
 };

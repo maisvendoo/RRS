@@ -352,8 +352,64 @@ void TcpServer::process_client_request(client_data_t &client_data)
         float value = 0.0f;
         stream >> value;
 
-        emit sigSetVehicleControlCommand(vehicle_idx, cab_idx, id, value);
+        quint32 size;
 
+        stream >> size;
+
+        std::vector<float> params;
+
+        if (size != 0)
+        {
+            for (quint32 i = 0; i < size; ++i)
+            {
+                float param;
+                stream >> param;
+                params.push_back(param);
+            }
+        }
+
+        std::int8_t prioriry = 0;
+        stream >> prioriry;
+
+        emit sigSetVehicleControlCommand(vehicle_idx, cab_idx, id, value, params, prioriry);
+
+        break;
+    }
+
+    case STYPE_GET_VEHICLE_SIGNALS:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        int vehicle_idx = 0;
+        stream >> vehicle_idx;
+
+        qint8 compression_allowed = 1;
+        if (!stream.atEnd())
+            stream >> compression_allowed;
+
+        QByteArray response_data;
+        emit sigRequestVehicleSignals(vehicle_idx, response_data);
+
+        network_data_t net_data;
+        net_data.stype = STYPE_VEHICLE_SIGNALS;
+        net_data.data = response_data;
+
+        client_data.socket->write(net_data.serialize(compression_allowed == 0));
+        client_data.socket->flush();
+        break;
+    }
+
+    case STYPE_SET_VEHICLE_CONTROL_PRIORITY:
+    {
+        QDataStream stream(&client_data.received_data.data, QIODevice::ReadOnly);
+
+        int vehicle_idx = 0;
+        stream >> vehicle_idx;
+
+        std::int8_t priority = 0;
+        stream >> priority;
+
+        emit sigSetVehicleControlPriority(vehicle_idx, priority);
         break;
     }
 
@@ -636,6 +692,19 @@ void TcpServer::slotNewConnection()
 
     ++clients_last_id;
 
+    // Отправляем новому клиенту накопленные init-сигналы
+    for (const auto& init : pending_input_inits)
+    {
+        network_data_t nd;
+        nd.stype = STYPE_VEHICLE_CONTROL_INPUT_INIT;
+
+        QDataStream s(&nd.data, QIODevice::WriteOnly);
+        s << init.vehicle_idx << init.cab_idx << init.signal_id << init.value;
+
+        client_data.socket->write(nd.serialize());
+    }
+    client_data.socket->flush();
+
     connect(client_data.socket, &QTcpSocket::disconnected,
             this, &TcpServer::slotClientDisconnected);
 
@@ -872,6 +941,41 @@ void TcpServer::slotUpdateSignal(QByteArray signal_data)
     {
         send_data(client_socket, net_data);
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TcpServer::slotInitClientInputSignal(int vehicle_idx, int cab_idx, int signal_id, float value)
+{
+    // Сохраняем в кеш для будущих клиентов (замена по составному ключу)
+    bool found = false;
+    for (auto& init : pending_input_inits)
+    {
+        if (init.match(vehicle_idx, cab_idx, signal_id))
+        {
+            init.value = value;
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+        pending_input_inits.push_back({vehicle_idx, cab_idx, signal_id, value});
+
+    if (clients_for_vehicles_updates.empty())
+        return;
+
+    network_data_t net_data;
+    net_data.stype = STYPE_VEHICLE_CONTROL_INPUT_INIT;
+
+    QDataStream stream(&net_data.data, QIODevice::WriteOnly);
+    stream << vehicle_idx;
+    stream << cab_idx;
+    stream << signal_id;
+    stream << value;
+
+    for (auto client_socket : clients_for_vehicles_updates)
+        send_data(client_socket, net_data);
 }
 
 //------------------------------------------------------------------------------

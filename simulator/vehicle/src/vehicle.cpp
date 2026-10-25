@@ -2267,6 +2267,44 @@ bool Vehicle::getKeyState(uint16_t key, int cab_num) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Vehicle::replayInitSignals()
+{
+    for (const auto& pair : _init_signals)
+    {
+        int cab_idx = pair.first;
+        int signal_id = pair.second;
+        float value = control_inputs[cab_idx][signal_id].value;
+        emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Vehicle::initClientInputSignal(int cab_idx, int signal_id, float value)
+{
+    if (cab_idx >= control_inputs.size())
+    {
+        return;
+    }
+
+    auto input = control_inputs[cab_idx].find(signal_id);
+
+    if (input != control_inputs[cab_idx].end())
+    {
+        bool first = _init_signals.insert(std::pair<int, int>(cab_idx, signal_id)).second;
+
+        if (first || fabs(control_inputs[cab_idx][signal_id].value - value) > 1e-6f)
+        {
+            control_inputs[cab_idx][signal_id].value = value;
+            emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Vehicle::loadConfiguration(QString cfg_path)
 {
     CfgReader cfg;
@@ -2602,7 +2640,7 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
 
     for (int i = 0; i < cabs_num + 1; ++i)
     {
-        QMap<int, float> inputs;
+        QMap<int, vehicle_control_signal_t> inputs;
         control_inputs.push_back(inputs);
     }
 
@@ -2610,38 +2648,45 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
 
     while (!secNode.isNull())
     {
+        vehicle_control_signal_t input;
+
         int id = 0;
         cfg.getInt(secNode, "ID", id);
 
+        int numParams = 0;
+        if (cfg.getInt(secNode, "NumParams", numParams))
+        {
+            if (numParams > 0)
+            {
+                input.params.resize(numParams);
+                std::fill(input.params.begin(), input.params.end(), 0.0f);
+            }
+        }
+
+        double value = 0.0;
+
         double value1 = 0.0;
-        cfg.getDouble(secNode, "value1", value1);
 
         double value2 = 0.0;
-        cfg.getDouble(secNode, "value2", value2);
 
-        QString object_name = "";
-        cfg.getString(secNode, "ObjectName", object_name);
-
-        QString object_name_cab1 = "";
-        cfg.getString(secNode, "ObjectNameCab1", object_name_cab1);
-
-        QString object_name_cab2 = "";
-        cfg.getString(secNode, "ObjectNameCab2", object_name_cab2);
-
-        if (!object_name.isEmpty())
-        {
+        if (cfg.getDouble(secNode, "value", value))
+        {            
+            input.value = value;
             auto &inputs = *(control_inputs.end() - 1);
-            inputs.insert(id, value1);
+            inputs.insert(id, input);
         }
 
-        if (!object_name_cab1.isEmpty() && cabs_num > 0)
+        if (cfg.getDouble(secNode, "value1", value1) && cabs_num > 0)
         {
-            control_inputs[0].insert(id, value1);
+            input.value = value1;
+            control_inputs[0].insert(id, input);
         }
 
-        if (!object_name_cab2.isEmpty() && cabs_num > 1)
+        if (cfg.getDouble(secNode, "value2", value2) && cabs_num > 1)
         {
-            control_inputs[1].insert(id, value2);
+            vehicle_control_signal_t input;
+            input.value = value2;
+            control_inputs[1].insert(id, input);
         }
 
         secNode = cfg.getNextSection();

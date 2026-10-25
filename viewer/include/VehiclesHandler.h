@@ -179,6 +179,7 @@ public slots:
     void slotGetVehicleControlled(QByteArray& data);
     void slotGetDiagnosticsData(QByteArray& data);
     void slotGetTrainProfileData(QByteArray& data);
+    void slotVehicleControlInputInit(QByteArray& data);
 
 signals:
     void updated();
@@ -291,14 +292,24 @@ private:
     /// Debug message for current and controlled vehicles from server
     QString debug_message;
 
+    /// Train exterior scene group
+    vsg::ref_ptr<vsg::Group> vehicles_node = vsg::Group::create();
+
 public:
     /// Info about vehicles exterior
     std::vector<VehicleExterior> vehicles;
 
 private:
-    /// Train exterior scene group
-    vsg::ref_ptr<vsg::Group> vehicles_node = vsg::Group::create();
+    struct pending_input_init_t
+    {
+        int vehicle_idx;
+        int cab_idx;
+        int signal_id;
+        float value;
+    };
+    QVector<pending_input_init_t> pending_input_inits;
 
+private:
     int m_prevVehicleIndex = -1;
 
     void notifyVehicleChanged();

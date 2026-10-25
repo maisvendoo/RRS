@@ -1,8 +1,8 @@
-#include "Outline.h"
+#include "editor/Outline.h"
 
-#include "filesystem.h"
-#include "graphics/common.h"
-#include "graphics/shader_funcs.h"
+#include <filesystem.h>
+#include <graphics/common.h>
+#include <graphics/shader_funcs.h>
 
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/FileSystem.h>
@@ -28,16 +28,18 @@
 
 OutlineBuilder::OutlineBuilder()
 {
-    options_ = create_default_vsg_options();
+    vsg_options = create_default_vsg_options();
 
-    const auto flat_shader = vsg::createFlatShadedShaderSet(options_);
+    const auto flat_shader = vsg::createFlatShadedShaderSet(vsg_options);
 
     const FileSystem& fs = FileSystem::getInstance();
     const std::string shaders_dir = fs.combinePath(fs.getDataDir(), "shaders");
 
-    const auto vert_shader = read_shader(shaders_dir.c_str(), "standard.vert", options_);
+    const auto vert_shader
+        = read_shader(shaders_dir.c_str(), "standard.vert", vsg_options);
 
-    const auto frag_shader = read_shader(shaders_dir.c_str(), "outline.frag", options_);
+    const auto frag_shader
+        = read_shader(shaders_dir.c_str(), "outline.frag", vsg_options);
 
     configure_shader_set(vert_shader, frag_shader, "flat", flat_shader);
 
@@ -46,23 +48,22 @@ OutlineBuilder::OutlineBuilder()
     rasterization_state->polygonMode = VK_POLYGON_MODE_LINE;
     rasterization_state->lineWidth = 1.2f;
 
-    const vsg::GraphicsPipelineStates default_graphics_pipeline_states = {
-        vsg::VertexInputState::create(),
-        vsg::InputAssemblyState::create(),
-        rasterization_state,
-        vsg::ColorBlendState::create(),
-        vsg::DepthStencilState::create(),
-        vsg::MultisampleState::create()
-    };
+    const vsg::GraphicsPipelineStates default_graphics_pipeline_states
+        = {vsg::VertexInputState::create(),
+           vsg::InputAssemblyState::create(),
+           rasterization_state,
+           vsg::ColorBlendState::create(),
+           vsg::DepthStencilState::create(),
+           vsg::MultisampleState::create()};
 
-    flat_shader->defaultGraphicsPipelineStates =
-        default_graphics_pipeline_states;
+    flat_shader->defaultGraphicsPipelineStates
+        = default_graphics_pipeline_states;
 
     builder_.shaderSet = flat_shader;
 }
 
-vsg::ref_ptr<vsg::Node> OutlineBuilder::create_outline(
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod)
+vsg::ref_ptr<vsg::Node>
+OutlineBuilder::create_outline(const vsg::ref_ptr<vsg::PagedLOD>& paged_lod)
 {
     if (!paged_lod->pending)
     {

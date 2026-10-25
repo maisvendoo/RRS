@@ -26,6 +26,11 @@
 //------------------------------------------------------------------------------
 void VehicleExterior::step(float t, float dt)
 {
+    if (io_controller != nullptr)
+    {
+        io_controller->step(t, dt);
+    }
+
     for (const auto& animated_pagedLOD : animated_nodes)
     {
         if (animated_pagedLOD->children[0].node)
@@ -45,7 +50,7 @@ void VehicleExterior::step(float t, float dt, std::vector<float>* server_signals
 {
     if (io_controller != nullptr)
     {
-        io_controller->setFeedbackSignals(server_signals);
+        io_controller->step(t, dt, server_signals);
     }
 
     for (const auto& animated_pagedLOD : animated_nodes)
@@ -413,7 +418,7 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
                                             + custom_modules_dir.toStdString() + fs.separator()
                                             + module_name.toStdString());
 
-    // Ищем все имена каталогов анимаций
+    // Ищем все имена каталогов анимаций (технически - свой для каждой модели)
     QStringList animations_dirs;
 
     auto modelNode = cfg.getFirstSection("Model");
@@ -423,6 +428,7 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
         QString anim_dir = "";
         cfg.getString(modelNode, "AnimationsConfigDir", anim_dir);
 
+        // Имя каталога не пустое, и еще не содержится в списке
         if (!animations_dirs.contains(anim_dir) && !anim_dir.isEmpty())
         {
             animations_dirs << anim_dir;
@@ -430,7 +436,6 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
 
         modelNode = cfg.getNextSection();
     }
-
 
     io_controller = LOAD_MODULE(IOController, module_path.c_str());
 
@@ -453,8 +458,14 @@ bool VehicleExterior::load_io_controller_module(const std::string &cfg_path, Cfg
             }
             else
             {
+                // Конфиг модуля с описанием всего что управляется
                 io_controller->load_config(module_cfg);
+                // Строим карту анимационных сигналов по их конфигам,
+                // не дожидаясь загрузки анимаций при рендеренге
                 io_controller->create_animations_map(animations_dirs);
+                // Выполняем инициализацию
+                io_controller->init();
+
                 LOG_INFO("IOController config %s is loaded successfully", module_config_path.c_str());
             }
         }

@@ -19,7 +19,7 @@
 #include    <QObject>
 #include    <QtGlobal>
 #include    <mutex>
-#include    <functional>
+#include    <set>
 
 #include    "datetime.h"
 #include    "control-signals.h"
@@ -61,6 +61,8 @@
 #include    "solver-types.h"
 
 #include    <autopilot.h>
+
+#include    <vehicle-control-signal.h>
 
 namespace collision
 {
@@ -438,11 +440,13 @@ public:
         auto_start_autopilot = false;
     }
 
-    std::vector<QMap<int, float>> control_inputs;
+    std::vector<QMap<int, vehicle_control_signal_t>> control_inputs;
 
 signals:
 
     void sigGetTrainParams(int train_idx, double &train_len, double &train_mass);
+
+    void sigInitClientInputSignal(int vehicle_idx, int cab_idx, int signal_id, float value);
 
 protected:
 
@@ -814,6 +818,15 @@ protected:
     bool isAlt(int cab_num = -1) const;
 
     bool getKeyState(uint16_t key, int cab_num = -1) const;
+
+public:
+
+    void initClientInputSignal(int cab_idx, int signal_id, float value);
+
+    void replayInitSignals();
+
+    /// Инициализированные сигналы управления (для повторного испускания после connect)
+    std::set<std::pair<int, int>> _init_signals;
 
 private:
 
