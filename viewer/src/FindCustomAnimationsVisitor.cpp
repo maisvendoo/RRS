@@ -9,6 +9,7 @@
 #include "ProcTranslationAnimation.h"
 #include "ProcVisibleAnimation.h"
 #include "ProcLightAnimation.h"
+#include "ProcParticlesAnimation.h"
 
 #include <vsg/core/Object.h>
 #include <vsg/core/ref_ptr.h>
@@ -146,6 +147,14 @@ void FindCustomAnimationsVisitor::reconfigure_animations()
             light_anim->setLight(new_light);
             continue;
         }
+
+        if (vsg::ref_ptr<ProcParticlesAnimation> particles = animation.cast<ProcParticlesAnimation>())
+        {
+            vsg::ref_ptr<vsg::MatrixTransform> new_transform = new_object.cast<vsg::MatrixTransform>();
+            particles->setTransform(new_transform);
+            particles->initStateGroup();
+            continue;
+        }
     }
 }
 
@@ -184,6 +193,12 @@ vsg::ref_ptr<ProcAnimation> FindCustomAnimationsVisitor::create_animation(const 
         }
 
         animation = create_material_animation<FindDisplayAnimationVisitor>("Display", cfg, &group, name);
+        if (animation)
+        {
+            return animation;
+        }
+
+        animation = create_transform_animation<ProcParticlesAnimation>("ParticlesAnimation", cfg, &group);
         if (animation)
         {
             return animation;
