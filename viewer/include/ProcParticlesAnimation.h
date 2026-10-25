@@ -86,7 +86,7 @@ private:
 
     void update(float current_signal) override;
 
-    void step(float t, float dt) override;
+    void anim_step(float t, float dt) override;
 
     void update_particles(float t, float dt);
 

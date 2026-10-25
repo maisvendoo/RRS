@@ -182,7 +182,7 @@ void ProcParticlesAnimation::update(float current_signal)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void ProcParticlesAnimation::step(float t, float dt)
+void ProcParticlesAnimation::anim_step(float t, float dt)
 {
     update_particles(t, dt);
     update_vertex_buffer();
