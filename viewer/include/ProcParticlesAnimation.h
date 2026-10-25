@@ -6,6 +6,7 @@
 
 #include <vsg/maths/mat4.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/StateGroup.h>
 
 class CfgReader;
 
