@@ -3,16 +3,17 @@
 #include "CfgReader.h"
 #include "filesystem.h"
 
+#include <vsg/core/Array.h>
 #include <vsg/io/read.h>
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/VertexIndexDraw.h>
+#include <vsg/state/BufferInfo.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
 #include <vsg/state/GraphicsPipeline.h>
 #include <vsg/state/RasterizationState.h>
-#include <vsg/state/StateGroup.h>
-#include <vsg/state/VertexBuffer.h>
+#include <vsg/nodes/StateGroup.h>
 
 #include <algorithm>
 #include <cmath>
@@ -134,10 +135,30 @@ void ProcParticlesAnimation::initStateGroup()
     state_group->add(dss);
     state_group->add(vsg::RasterizationState::create());
 
-    vertex_buffer = vsg::VertexBuffer::create();
+    // Три arrays: vec3 (позиция), vec3 (size, alpha, 0), vec2 (uv)
+    uint32_t max_v = static_cast<uint32_t>(MAX_PARTICLES) * 4;
+    positions_array = vsg::vec3Array::create(max_v);
+    normal_array = vsg::vec3Array::create(max_v);
+    texcoord_array = vsg::vec2Array::create(max_v);
+    index_array = vsg::ushortArray::create(static_cast<uint32_t>(MAX_PARTICLES) * 6);
+
+    // Индексы — один раз
+    for (int i = 0; i < MAX_PARTICLES; ++i)
+    {
+        int base = i * 4;
+        int ibase = i * 6;
+        (*index_array)[ibase + 0] = static_cast<uint16_t>(base + 0);
+        (*index_array)[ibase + 1] = static_cast<uint16_t>(base + 1);
+        (*index_array)[ibase + 2] = static_cast<uint16_t>(base + 2);
+        (*index_array)[ibase + 3] = static_cast<uint16_t>(base + 2);
+        (*index_array)[ibase + 4] = static_cast<uint16_t>(base + 3);
+        (*index_array)[ibase + 5] = static_cast<uint16_t>(base + 0);
+    }
 
     vertex_index_draw = vsg::VertexIndexDraw::create();
-    vertex_index_draw->buffer = vertex_buffer;
+    vertex_index_draw->assignArrays({positions_array, normal_array, texcoord_array});
+    vertex_index_draw->assignIndices(index_array);
+    vertex_index_draw->indexCount = 0;
 
     state_group->add(vertex_index_draw);
 
@@ -154,6 +175,15 @@ void ProcParticlesAnimation::initStateGroup()
 void ProcParticlesAnimation::update(float current_signal)
 {
     emission_rate = params.spawn_rate * current_signal;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProcParticlesAnimation::step(float t, float dt)
+{
+    update_particles(t, dt);
+    update_vertex_buffer();
 }
 
 //------------------------------------------------------------------------------
@@ -226,37 +256,28 @@ void ProcParticlesAnimation::update_particles(float t, float dt)
 //------------------------------------------------------------------------------
 void ProcParticlesAnimation::update_vertex_buffer()
 {
-    if (vertex_buffer == nullptr || vertex_index_draw == nullptr)
+    if (vertex_index_draw == nullptr || positions_array == nullptr)
         return;
 
-    // 4 вершины на частицу (квад)
-    size_t num_vertices = particles.size() * 4;
-    vertex_buffer->resize(num_vertices);
+    uint32_t count = static_cast<uint32_t>(particles.size());
+    uint32_t num_vertices = count * 4;
 
-    auto map = vertex_buffer->map();
-    if (!map)
-        return;
-
-    for (size_t i = 0; i < particles.size(); ++i)
+    for (uint32_t i = 0; i < count; ++i)
     {
         const auto& p = particles[i];
-        size_t base = i * 4;
+        uint32_t base = i * 4;
 
-        for (int j = 0; j < 4; ++j)
+        for (uint32_t j = 0; j < 4; ++j)
         {
-            size_t idx = base + j;
+            uint32_t idx = base + j;
             float uv_x = (j == 1 || j == 2) ? 1.0f : 0.0f;
             float uv_y = (j == 2 || j == 3) ? 1.0f : 0.0f;
 
-            map->set(idx, 0, p.position.x);
-            map->set(idx, 1, p.position.y);
-            map->set(idx, 2, p.position.z);
-            map->set(idx, 3, p.size);
-            map->set(idx, 4, p.alpha);
-            map->set(idx, 5, uv_x);
-            map->set(idx, 6, uv_y);
+            (*positions_array)[idx] = vsg::vec3(p.position.x, p.position.y, p.position.z);
+            (*normal_array)[idx] = vsg::vec3(p.size, p.alpha, 0.0f);
+            (*texcoord_array)[idx] = vsg::vec2(uv_x, uv_y);
         }
     }
 
-    map->unmap();
+    vertex_index_draw->indexCount = num_vertices / 4 * 6;
 }

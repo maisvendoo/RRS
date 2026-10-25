@@ -72,7 +72,11 @@ private:
     // VSG-объекты для рендера
     vsg::ref_ptr<vsg::StateGroup> state_group = nullptr;
     vsg::ref_ptr<vsg::VertexIndexDraw> vertex_index_draw = nullptr;
-    vsg::ref_ptr<vsg::VertexBuffer> vertex_buffer = nullptr;
+
+    vsg::ref_ptr<vsg::vec3Array> positions_array = nullptr;
+    vsg::ref_ptr<vsg::vec3Array> normal_array = nullptr;
+    vsg::ref_ptr<vsg::vec2Array> texcoord_array = nullptr;
+    vsg::ref_ptr<vsg::ushortArray> index_array = nullptr;
 
     // 3D-нода эмиттера (Empty в модели)
     vsg::ref_ptr<vsg::MatrixTransform> transform_node = nullptr;
@@ -81,6 +85,8 @@ private:
     void load_config(CfgReader &cfg) override;
 
     void update(float current_signal) override;
+
+    void step(float t, float dt) override;
 
     void update_particles(float t, float dt);
 
