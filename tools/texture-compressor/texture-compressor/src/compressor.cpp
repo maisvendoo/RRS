@@ -180,10 +180,22 @@ bool compress_to_ktx2(const fs::path& src_img,
     } else
     {
         params.normalMap = KTX_FALSE;
-        params.endpointRDOThreshold = 1.25f;
-        params.selectorRDOThreshold = 1.25f;
-        params.noEndpointRDO = KTX_FALSE;
-        params.noSelectorRDO = KTX_FALSE;
+
+        // Карты металличности/шероховатости и occlusion несут данные,
+        // чувствительные к RDO-оптимизации, поэтому её отключаем
+        if ((cfg.role == PBRTextureRole::METALLIC_ROUGHNESS) ||
+            (cfg.role == PBRTextureRole::OCCLUSION))
+        {
+            params.noEndpointRDO = KTX_TRUE;
+            params.noSelectorRDO = KTX_TRUE;
+        }
+        else
+        {
+            params.endpointRDOThreshold = 1.25f;
+            params.selectorRDOThreshold = 1.25f;
+            params.noEndpointRDO = KTX_FALSE;
+            params.noSelectorRDO = KTX_FALSE;
+        }
     }
 
     params.verbose = KTX_FALSE;
