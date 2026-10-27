@@ -223,6 +223,23 @@ protected:
         return 0;
     }
 
+    QString getButtonTooltip(uint32_t buttonCode) const
+    {
+        QString tooltip = "";
+
+        switch (buttonCode)
+        {
+        case CTRL_LEFT_MOUSE_BUTTON: tooltip = "ЛКМ"; break;
+        case CTRL_RIGHT_MOUSE_BUTTON: tooltip = "ПКМ"; break;
+        case CTRL_MIDDLE_MOUSE_BUTTON: tooltip = "СКМ"; break;
+        default:
+
+            tooltip = "Не назначено";
+            break;
+        }
+
+        return tooltip;
+    }
 
     void sendControlSignal();
 };

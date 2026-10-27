@@ -47,7 +47,7 @@ void ButtonHandler::processMouseInput(uint32_t button, bool is_pressed)
         if (!is_holded)
         {
             // Включить и держать (ПКМ)
-            if (is_pressed && button == CTRL_RIGHT_MOUSE_BUTTON)
+            if (is_pressed && button == getButtonCode(holdButton))
             {
                 is_holded = true;
                 new_value = 1.0f;
@@ -56,13 +56,13 @@ void ButtonHandler::processMouseInput(uint32_t button, bool is_pressed)
         }
     }
 
-    if (is_pressed && button == CTRL_LEFT_MOUSE_BUTTON)
+    if (is_pressed && button == getButtonCode(pressButton))
     {
         is_holded = false;
         new_value = 1.0f;
         setValueIfChanged(new_value);
     }
-    else if (!is_pressed && button == CTRL_LEFT_MOUSE_BUTTON)
+    else if (!is_pressed && button == getButtonCode(pressButton))
     {
         is_holded = false;
         new_value = 0.0f;
@@ -75,11 +75,14 @@ void ButtonHandler::processMouseInput(uint32_t button, bool is_pressed)
 //------------------------------------------------------------------------------
 QString ButtonHandler::getUsage() const
 {
-    QString usage_msg = QString("Нажать: ЛКМ | Отпустить: ЛКМ");
+    QString pressButtonName = getButtonTooltip(getButtonCode(pressButton));
+    QString holdButtonName = getButtonTooltip(getButtonCode(holdButton));
+
+    QString usage_msg = QString("Нажать: %1 | Отпустить: %1").arg(pressButtonName);
 
     if (allow_hold)
     {
-        usage_msg += " | Удерживать: ПКМ";
+        usage_msg += QString(" | Удерживать: %1").arg(holdButtonName);
     }
 
     return usage_msg;
@@ -111,6 +114,8 @@ bool ButtonHandler::load_config(CfgReader &cfg, QDomNode secNode)
     ControlHandler::load_config(cfg, secNode);
 
     cfg.getBool(secNode, "AllowHold", allow_hold);
+    cfg.getString(secNode, "PressButton", pressButton);
+    cfg.getString(secNode, "HoldButton", holdButton);
 
     return true;
 }

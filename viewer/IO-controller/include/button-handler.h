@@ -31,6 +31,9 @@ private:
 
     /// Флаг того, что кнопка в режиме удержания
     bool is_holded = false;
+
+    QString pressButton = "LEFT_BUTTON";
+    QString holdButton = "RGIHT+BUTTON";
 };
 
 #endif
