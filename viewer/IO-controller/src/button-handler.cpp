@@ -20,8 +20,14 @@ void ButtonHandler::processKeyInput(const std::set<uint16_t> &pressed_keys)
         if (isKeyModifier(pressed_keys, keyModOnName) ||
             keyModOnName.isEmpty())
         {
+            is_holded = false;
             new_value = 1.0f;
         }
+    }
+
+    if (allow_hold && is_holded)
+    {
+        return;
     }
 
     setValueIfChanged(new_value);
