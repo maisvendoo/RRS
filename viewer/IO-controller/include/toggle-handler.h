@@ -1,12 +1,12 @@
 #ifndef     TOGGLE_HANDLER_H
 #define     TOGGLE_HANDLER_H
 
-#include    <control-handler.h>
+#include    <bistate-handler.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ToggleHandler : public ControlHandler
+class ToggleHandler : public BiStateHandler
 {
 public:
 

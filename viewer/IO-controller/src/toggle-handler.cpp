@@ -3,9 +3,10 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ToggleHandler::ToggleHandler(QObject *parent) : ControlHandler(parent)
+ToggleHandler::ToggleHandler(QObject *parent) : BiStateHandler(parent)
 {
-
+    positionNames = {"ВЫКЛ", "ВКЛ"};
+    actionNames = {"Выкл.", "Вкл."};
 }
 
 //------------------------------------------------------------------------------
@@ -69,7 +70,11 @@ QString ToggleHandler::getUsage() const
     QString onButtonName = getButtonTooltip(getButtonCode(onButton));
     QString offButtonName = getButtonTooltip(getButtonCode(offButton));
 
-    return QString("Вкл.: %1 | Выкл.: %2").arg(onButtonName).arg(offButtonName);
+    return QString("%3: %1 | %4: %2")
+        .arg(onButtonName)
+        .arg(offButtonName)
+        .arg(getActionName(1))
+        .arg(getActionName(0));
 }
 
 //------------------------------------------------------------------------------
@@ -79,7 +84,7 @@ QString ToggleHandler::getState() const
 {
     bool state = static_cast<bool>(getSignalValue());
 
-    return state ? QString("ВКЛ") : QString("ВЫКЛ");
+    return state ? QString(getPositionName(1)) : QString(getPositionName(0));
 }
 
 //------------------------------------------------------------------------------
@@ -87,7 +92,7 @@ QString ToggleHandler::getState() const
 //------------------------------------------------------------------------------
 bool ToggleHandler::load_config(CfgReader &cfg, QDomNode secNode)
 {
-    ControlHandler::load_config(cfg, secNode);
+    BiStateHandler::load_config(cfg, secNode);
 
     cfg.getString(secNode, "OnButton", onButton);
     cfg.getString(secNode, "OffButton", offButton);

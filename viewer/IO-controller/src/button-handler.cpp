@@ -3,9 +3,10 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-ButtonHandler::ButtonHandler(QObject *parent) : ControlHandler(parent)
+ButtonHandler::ButtonHandler(QObject *parent) : BiStateHandler(parent)
 {
-
+    positionNames = {"Отпущено", "Нажато"};
+    actionNames = {"Отпустить", "Нажать"};
 }
 
 //------------------------------------------------------------------------------
@@ -78,7 +79,11 @@ QString ButtonHandler::getUsage() const
     QString pressButtonName = getButtonTooltip(getButtonCode(pressButton));
     QString holdButtonName = getButtonTooltip(getButtonCode(holdButton));
 
-    QString usage_msg = QString("Нажать: %1 | Отпустить: %2").arg(pressButtonName).arg(pressButtonName);
+    QString usage_msg = QString("%3: %1 | %4: %2")
+                            .arg(pressButtonName)
+                            .arg(pressButtonName)
+                            .arg(getActionName(1))
+                            .arg(getActionName(0));
 
     if (allow_hold)
     {
@@ -96,14 +101,14 @@ QString ButtonHandler::getState() const
 {
     bool state = static_cast<bool>(getSignalValue());
 
-    QString press_msg = QString("Нажато");
+    QString press_msg = QString(getPositionName(1));
 
     if (is_holded)
     {
         press_msg += " и удерживается";
     }
 
-    return state ? press_msg : QString("Отпущено");
+    return state ? press_msg : QString(getPositionName(0));
 }
 
 //------------------------------------------------------------------------------
@@ -111,7 +116,7 @@ QString ButtonHandler::getState() const
 //------------------------------------------------------------------------------
 bool ButtonHandler::load_config(CfgReader &cfg, QDomNode secNode)
 {
-    ControlHandler::load_config(cfg, secNode);
+    BiStateHandler::load_config(cfg, secNode);
 
     cfg.getBool(secNode, "AllowHold", allow_hold);
     cfg.getString(secNode, "PressButton", pressButton);

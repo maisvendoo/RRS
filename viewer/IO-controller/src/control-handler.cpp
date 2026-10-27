@@ -67,12 +67,12 @@ float ControlHandler::getSignalValue() const
 {
     if (!animation_signals_map)
     {
-        return 0.0f;
+        return value;
     }
 
     if (contolledObjectName.isEmpty() || feedback_signals == nullptr)
     {
-        return 0.0f;
+        return value;
     }
 
     auto it = animation_signals_map->find(contolledObjectName);
@@ -85,10 +85,12 @@ float ControlHandler::getSignalValue() const
         {
             float state = (*feedback_signals)[signal_id];
             return state;
-        }
+        }        
     }
 
-    return 0.0f;
+    // Контролу может и несоотвествовать анимация, тогда возвращаем его собственное
+    // состояние, раз нет обратной связи
+    return value;
 }
 
 //------------------------------------------------------------------------------

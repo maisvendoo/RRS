@@ -1,12 +1,12 @@
 #ifndef     BUTTON_HANDLER_H
 #define     BUTTON_HANDLER_H
 
-#include    <control-handler.h>
+#include    <bistate-handler.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ButtonHandler : public ControlHandler
+class ButtonHandler : public BiStateHandler
 {
 public:
 
