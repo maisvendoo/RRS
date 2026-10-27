@@ -29,6 +29,9 @@ public:
 
     virtual std::size_t getSignalID() const;
 
+    /// Текущее значение сигнала (состояние органа для подсказки Alt)
+    float getCurSignal() const { return cur_signal; }
+
 public:
     std::string name = "";
 

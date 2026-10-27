@@ -1508,7 +1508,7 @@ void Topology::slotGetSwitchState(QByteArray &switch_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotSwitchCommand(QByteArray& switch_command)
+void Topology::slotSwitchCommand(QByteArray  switch_command)
 {
     switch_command_t sc;
     sc.deserialize(switch_command);
@@ -1537,7 +1537,7 @@ void Topology::slotSwitchCommand(QByteArray& switch_command)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotSignalCommand(QByteArray& signal_data)
+void Topology::slotSignalCommand(QByteArray  signal_data)
 {
     signal_command_t sc;
     sc.deserialize(signal_data);
@@ -1649,7 +1649,7 @@ void Topology::slotSignalCommand(QByteArray& signal_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotBuildRouteCommand(QByteArray &route_data)
+void Topology::slotBuildRouteCommand(QByteArray route_data)
 {
     route_command_t rc;
     rc.deserialize(route_data);
@@ -1672,7 +1672,7 @@ void Topology::slotBuildRouteCommand(QByteArray &route_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotTrainRouteCommand(QByteArray &route_data)
+void Topology::slotTrainRouteCommand(QByteArray route_data)
 {
     route_command_t rc;
     rc.deserialize(route_data);
@@ -1701,7 +1701,7 @@ void Topology::slotTrainRouteCommand(QByteArray &route_data)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Topology::slotShuntingRouteCommand(QByteArray &route_data)
+void Topology::slotShuntingRouteCommand(QByteArray route_data)
 {
     route_command_t rc;
     rc.deserialize(route_data);

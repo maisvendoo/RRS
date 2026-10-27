@@ -32,6 +32,21 @@ public:
     /// Simulation step
     virtual void step(double t, double dt);
 
+    /// Сцепки соединены (диагностика продольной динамики)
+    virtual bool isConnected() const { return false; }
+
+    /// Соединение разрушено перегрузкой
+    virtual bool isBroken() const { return false; }
+
+    /// Текущее усилие в соединении, Н (положительное - растяжение)
+    virtual double getForce() const { return 0.0; }
+
+    /// Текущая относительная скорость элементов соединения, м/с
+    virtual double getRelVelocity() const { return 0.0; }
+
+    /// Повреждение соединения (0 - целое, 1 - разрушено)
+    virtual double getDamage() const { return 0.0; }
+
 protected:
 
     /// List of linked devices

@@ -59,6 +59,9 @@ target_link_libraries (${TARGET} PUBLIC CfgReader)
 target_link_libraries (${TARGET} PUBLIC device)
 target_link_libraries (${TARGET} PUBLIC Journal)
 target_link_libraries (${TARGET} PUBLIC physics)
+target_link_libraries (${TARGET} PUBLIC collision)
+target_link_libraries (${TARGET} PUBLIC catenary)
+target_link_libraries (${TARGET} PUBLIC perf)
 
 #if (WIN32)
 

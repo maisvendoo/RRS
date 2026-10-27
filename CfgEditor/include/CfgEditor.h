@@ -68,6 +68,8 @@ private:
     QFile file_;
     /// Обеспечивает запись XML файла
     QXmlStreamWriter xmlWriter_;
+    /// Файл открыт успешно (иначе записи пропускаются)
+    bool opened_ = false;
 
     //
     FieldsDataList fields_data_;

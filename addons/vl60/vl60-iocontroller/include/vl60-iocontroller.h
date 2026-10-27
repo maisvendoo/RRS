@@ -1,4 +1,4 @@
-#ifndef     VL60_IO_CONTROLLER_H
+﻿#ifndef     VL60_IO_CONTROLLER_H
 #define     VL60_IO_CONTROLLER_H
 
 #include    <io-controller.h>

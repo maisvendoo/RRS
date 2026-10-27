@@ -1,4 +1,7 @@
 #include    "vl60k.h"
+#include "vehicle-telemetry.h"
+#include "brake-mech.h"
+#include "dc-motor.h"
 
 #include    <QDir>
 
@@ -34,6 +37,40 @@ void VL60k::initBrakesControl(const QString& modules_dir, const QString& custom_
             modules_dir + QDir::separator() + loco_crane_module_name);
         loco_crane[cab_idx]->read_config(loco_crane_config_name);
     }
+
+    // Телеметрия для кассеты регистрации и сессий (ТЗ "Кассеты",
+    // п.2): адресация приборов живёт в VehicleTelemetry, а не в
+    // Vehicle. УР общий на локомотив - кран I кабины, ТМ/ГР из
+    // резервуаров, ТЦ - среднее по тележкам, ток - средний Ia моторов
+    VehicleTelemetry::Sources telemetry;
+    telemetry.equalizing_reservoir = [this]() -> double
+    {
+        return (brake_crane[CAB1] != nullptr)
+                ? brake_crane[CAB1]->getERpressure()
+                : -1.0;
+    };
+    telemetry.brake_pipe = [this]() -> double { return brakepipe->getPressure(); };
+    telemetry.brake_cylinder = [this]() -> double
+    {
+        return 0.5 * (brake_mech[TROLLEY_FWD]->getBCpressure() +
+                      brake_mech[TROLLEY_BWD]->getBCpressure());
+    };
+    telemetry.main_reservoir = [this]() -> double { return main_reservoir->getPressure(); };
+    telemetry.traction_current = [this]() -> double
+    {
+        double sum = 0.0;
+        int n = 0;
+        for (const auto& m : motor)
+        {
+            if (m != nullptr)
+            {
+                sum += m->getIa();
+                ++n;
+            }
+        }
+        return (n > 0) ? sum / n : -1.0;
+    };
+    VehicleTelemetry::instance().bind(this, std::move(telemetry));
 
     // Импульсная магистраль с ложным тормозным цилиндром
     impulse_line = new Reservoir(0.005 + 0.007);

@@ -1,4 +1,4 @@
-#ifndef     VL60_CONTROLS_H
+﻿#ifndef     VL60_CONTROLS_H
 #define     VL60_CONTROLS_H
 
 //------------------------------------------------------------------------------

@@ -15,6 +15,19 @@ CameraCabineManipulator::CameraCabineManipulator(
 {
     _pitch_min = vsg::radians(_settings.pitch_min);
     _pitch_max = vsg::radians(_settings.pitch_max);
+
+    // Параметры раскачки кабины в движении - из settings.xml
+    CabSway::Params sway_params;
+    sway_params.enabled = _settings.cabine_sway_enabled;
+    sway_params.ref_speed = _settings.cabine_sway_ref_speed;
+    sway_params.min_speed = _settings.cabine_sway_min_speed;
+    sway_params.max_offset = _settings.cabine_sway_max_offset;
+    sway_params.bounce_amp = _settings.cabine_sway_bounce_amp;
+    sway_params.gallop_amp = _settings.cabine_sway_gallop_amp;
+    sway_params.hunt_amp = _settings.cabine_sway_hunt_amp;
+    sway_params.roll_amp = _settings.cabine_sway_roll_amp;
+    sway_params.pitch_amp = _settings.cabine_sway_pitch_amp;
+    _sway.setParams(sway_params);
 }
 
 //------------------------------------------------------------------------------
@@ -128,6 +141,14 @@ void CameraCabineManipulator::touchZoomEvent(double zoomLevel)
 //------------------------------------------------------------------------------
 void CameraCabineManipulator::frameEvent(double dt)
 {
+    // Раскачка кабины в движении: шаг при любом раскладе клавиш -
+    // покачивание не должно замирать во время обзора/перемещения
+    if (_current_vehicle != nullptr)
+    {
+        const double sway_speed = vsg::length(_current_vehicle->velocity);
+        _sway.step(dt, sway_speed);
+    }
+
     auto times2speed = [](std::pair<double, double> duration) -> double {
         if (duration.first <= 0.0) return 0.0;
         double speed = duration.first >= 0.5 ? 1.0 : duration.first * 2.0;
@@ -264,7 +285,21 @@ void CameraCabineManipulator::calc_view()
     if (!_current_vehicle)
         return;
 
-    const vsg::dvec3 local_eye_pos = _current_vehicle->driver_pos[_current_vehicle->current_cabine_idx] + _position_shift;
+    // Реакция камеры от физики (ТЗ "Физическая реакция машиниста"):
+    // смещение головы в локальных осях ПЕ: X - продольное (по ходу),
+    // Y - поперечное, Z - вертикальное. Складывается с пользовательским
+    // смещением (позиция машиниста + сдвиг игрока мышью/клавиатурой)
+    const vsg::dvec3& cam_motion = _current_vehicle->cam_motion_offset;
+
+    // Раскачка кабины в движении: уже в локальных осях
+    // (x - поперечное, y - продольное, z - вертикальное)
+    const vsg::dvec3 sway_offset = _sway.offset();
+
+    const vsg::dvec3 local_eye_pos =
+            _current_vehicle->driver_pos[_current_vehicle->current_cabine_idx] +
+            _position_shift +
+            vsg::dvec3(cam_motion.y, cam_motion.x, cam_motion.z) +
+            sway_offset;
 
     _lookAt->eye = _current_vehicle->position +
                    _current_vehicle->right * local_eye_pos.x +
@@ -275,11 +310,20 @@ void CameraCabineManipulator::calc_view()
     _lookAt->up = _current_vehicle->up;
 
     const double angle_r = _current_vehicle->driver_dir[_current_vehicle->current_cabine_idx] + _angle_right;
-    if ((abs(angle_r) > 1e-5) || (abs(_angle_up) > 1e-5))
+
+    // Наклоны от физики (крен вокруг оси взгляда, тангаж вокруг
+    // поперечной оси) поверх пользовательских углов обзора,
+    // плюс углы раскачки кузова на ходу
+    const double phys_pitch = _current_vehicle->cam_motion_pitch + _sway.pitch();
+    const double phys_roll = _current_vehicle->cam_motion_roll + _sway.roll();
+
+    if ((abs(angle_r) > 1e-5) || (abs(_angle_up) > 1e-5) ||
+        (abs(phys_pitch) > 1e-6) || (abs(phys_roll) > 1e-6))
     {
         vsg::dmat4 matrix = vsg::translate(_lookAt->eye) *
                             vsg::rotate(angle_r, _current_vehicle->up) *
-                            vsg::rotate(_angle_up, _current_vehicle->right) *
+                            vsg::rotate(_angle_up + phys_pitch, _current_vehicle->right) *
+                            vsg::rotate(phys_roll, _current_vehicle->orth) *
                             vsg::translate(-_lookAt->eye);
 
         _lookAt->up = vsg::normalize(matrix * (_lookAt->eye + _lookAt->up) - matrix * _lookAt->eye);
@@ -306,6 +350,9 @@ void CameraCabineManipulator::currentVehicleChanged()
     if (_current_vehicle)
     {
         _prev_current_vehicle = _current_vehicle;
+
+        // Фазы раскачки новой ПЕ: соседние ПЕ не качаются синхронно
+        _sway.setVehicle(_current_vehicle);
 
         is_reset = true;
         returnView();

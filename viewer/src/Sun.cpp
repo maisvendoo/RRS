@@ -5,6 +5,7 @@
 #include <vsg/maths/common.h>
 #include <vsg/maths/vec3.h>
 
+#include <algorithm>
 #include <cmath>
 
 using Meters = double;
@@ -41,6 +42,27 @@ Sun::Sun(const vsg::dvec3& camera_pos, double ambient_intensity, double sun_inte
 }
 
 //------------------------------------------------------------------------------
+// Тени от облаков (ТЗ "Частицы", High/Ultra/Extreme): детерминированный
+// плавный шум из суммы синусов с периодами 30-60 с (текстура не нужна).
+// Результат в [0..1]: облака то наползают на солнце, то уходят.
+// Итоговая модуляция ambient: intensity *= 0.8 + 0.2 * noise(t)
+//------------------------------------------------------------------------------
+static float cloud_shadow_noise(double t)
+{
+    constexpr double PI_2 = 2.0 * 3.14159265358979323846;
+
+    // Периоды 47/31/53 с и разные фазы: сумма не повторяется заметно
+    const double s1 = std::sin(PI_2 * t / 47.0 + 0.0);
+    const double s2 = std::sin(PI_2 * t / 31.0 + 1.7);
+    const double s3 = std::sin(PI_2 * t / 53.0 + 4.2);
+
+    // Взвешенная сумма в [-1..1] -> [0..1]
+    const double noise = 0.5 + 0.5 * (0.5 * s1 + 0.3 * s2 + 0.2 * s3);
+
+    return static_cast<float>(std::clamp(noise, 0.0, 1.0));
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void Sun::update(simulator_time_t time, double timezone, double latitude, double longitude)
@@ -52,7 +74,23 @@ void Sun::update(simulator_time_t time, double timezone, double latitude, double
         constexpr double altitude_coeff = (90.0 - deg_under_horizont) / 90.0;
         const double ambient_altitude_deg = deg_under_horizont + altitude_coeff * altitude_deg;
 
-        ambient->intensity = std::fmax(0.01f, calc_intensity(ambient_altitude_deg, ambient_max_intensity));
+        const float base_ambient = std::fmax(0.01f, calc_intensity(ambient_altitude_deg, ambient_max_intensity));
+
+        // Тени от облаков (High+): лёгкая модуляция ambient, Legacy/Low
+        // не затрагиваются (cloud_shadows по умолчанию выключен)
+        if (cloud_shadows)
+        {
+            const double t = static_cast<double>(time.time.hour()) * 3600.0 +
+                             static_cast<double>(time.time.minute()) * 60.0 +
+                             static_cast<double>(time.time.sec()) +
+                             static_cast<double>(time.time.msec()) / 1000.0;
+
+            ambient->intensity = base_ambient * (0.8f + 0.2f * cloud_shadow_noise(t));
+        }
+        else
+        {
+            ambient->intensity = base_ambient;
+        }
     }
 
     if (!use_gui_sun_intensity)

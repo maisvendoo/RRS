@@ -70,6 +70,11 @@ public:
 
     void setRefStateBwd(Switch_state_t state);
 
+    /// Требуемое состояние стрелки (для сейвов сессии, ТЗ "RP-сервер", п.5)
+    Switch_state_t getRefStateFwd() const;
+
+    Switch_state_t getRefStateBwd() const;
+
     /// Светофор, включающий данный стрелочный перевод вперёд в маршрут ДЦ
     Signal* getRouteBySignalFwd() const;
     void setRouteBySignalFwd(Signal* signal);

@@ -35,8 +35,11 @@ CfgEditor::CfgEditor()
 void CfgEditor::openFileForWrite(QString fileName)
 {
     file_.setFileName(fileName);
-    // TODO: Не проверяется
-    file_.open(QIODevice::WriteOnly);
+
+    opened_ = file_.open(QIODevice::WriteOnly);
+
+    if (!opened_)
+        return;
 
     xmlWriter_.setDevice(&file_);
     xmlWriter_.setAutoFormatting(true);
@@ -49,6 +52,9 @@ void CfgEditor::openFileForWrite(QString fileName)
 //-----------------------------------------------------------------------------
 void CfgEditor::writeFile(FieldsDataList fields_data)
 {
+    if (!opened_)
+        return;
+
     for (int i = 0, n = fields_data.size(); i < n; ++i)
     {
         xmlWriter_.writeStartElement(fields_data[i].first);
@@ -74,9 +80,14 @@ void CfgEditor::writeFile(QString sectionName, FieldsDataList fields_data)
 //-----------------------------------------------------------------------------
 void CfgEditor::closeFileAfterWrite()
 {
-    xmlWriter_.writeEndElement();
-    xmlWriter_.writeEndDocument();
+    if (opened_)
+    {
+        xmlWriter_.writeEndElement();
+        xmlWriter_.writeEndDocument();
+    }
+
     file_.close();
+    opened_ = false;
 }
 
 //-----------------------------------------------------------------------------

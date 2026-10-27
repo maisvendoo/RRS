@@ -29,6 +29,7 @@ struct settings_t final
     std::string route_dir_full_path;   ///< Route directory path
 
     std::string notify_level = "INFO";      ///< Notify level
+    bool sound_enabled = true;              ///< Звук (0 - тишина: иначе отвлекает при отладке)
     uint32_t targetPagedLODs = 64000;       ///< Set number of maximum PagedLOD with loaded high-resolution subgraphs
     uint32_t read_threads = 1;              ///< Number of background threads for loading 3d-models
     uint32_t operation_threads = 0;         ///< Number of background threads for loading textures of 3d-models
@@ -59,6 +60,33 @@ struct settings_t final
     bool fullscreen = false;    ///< Fullscreen flag
     bool vsync = true;          ///< Vertical sync flag
     bool window_decoration = true;  ///< Set/unset window decorations
+
+    /// Графический пресет: Auto/Legacy/Low/High/Ultra/
+    /// Extreme/Custom. Auto — автоопределение по возможностям GPU при
+    /// первом запуске
+    std::string graphics_preset = "Auto";
+
+    /// Масштаб пост-процесса (только пресет Extreme): разрешение
+    /// offscreen-буфера сцены цепочки, 0.4-1.0 от размера окна
+    /// (0.4 — минимум адаптивного качества; вручную — от 0.5).
+    /// Все проходы эффектов считаются на half/quarter от него
+    double postprocess_scale = 0.75;
+
+    /// Эффекты пост-процесса Extreme (переопределяют включённые по
+    /// умолчанию флаги пресета, сохраняются в settings.xml)
+    bool postprocess_bloom = true;
+    bool postprocess_ssao = true;
+    bool postprocess_fog = true;
+
+    /// SSR (Screen Space Reflections, только Extreme; ключ Ssr,
+    /// по умолчанию включён — как и флаг пресета)
+    bool postprocess_ssr = true;
+
+    /// Фары локомотива (пресеты High/Ultra/Extreme, динамический свет):
+    /// динамический vsg::SpotLight у управляемой ПЕ. На Legacy/Low
+    /// источник света не создаётся вовсе (флаг не потребляется).
+    /// TODO: мост к реальному тумблеру фар конкретной ПЕ
+    bool headlights = true;
 
     bool double_buffer = true;  ///< Set/unset double buffering
     int samples = 1;            ///< Set number of antialiasing samples
@@ -105,6 +133,19 @@ struct settings_t final
     double cabine_z_min = -1.0;                     ///< Cabine camera relative vertical shift limit
     double cabine_z_max = 0.5;                      ///< Cabine camera relative vertical shift limit
 
+    /// Раскачка кабины в движении (покачивание кузова на рессорах):
+    /// дополняет реакцию камеры от физики (cam_motion); на стоянке
+    /// и ниже CabineSwayMinSpeed - полный покой
+    bool   cabine_sway_enabled = true;      ///< Раскачка включена
+    double cabine_sway_ref_speed = 25.0;    ///< Скорость полной амплитуды, м/с
+    double cabine_sway_min_speed = 0.3;     ///< Ниже - покой, м/с
+    double cabine_sway_max_offset = 0.025;  ///< Лимит смещения, м
+    double cabine_sway_bounce_amp = 0.006;  ///< Подпрыгивание, м
+    double cabine_sway_gallop_amp = 0.008;  ///< Галопирование, м
+    double cabine_sway_hunt_amp = 0.005;    ///< Виляние (поперёк), м
+    double cabine_sway_roll_amp = 0.005;    ///< Покачивание (крен), рад
+    double cabine_sway_pitch_amp = 0.003;   ///< Клевки (тангаж), рад
+
     vsg::dvec3 ext_cam_init_pos = {0.0, 0.0, 1.75};         ///< External camera initial position
     double ext_cam_init_angle_H = -45.0;                    ///< External camera initial horizontal angle
     double ext_cam_init_angle_V = 10.0;                     ///< External camera initial vertical angle
@@ -127,6 +168,20 @@ struct settings_t final
     double follow_cam_speed_coeff = std::sqrt(2.0); ///< Follow camera speed coeff
     double follow_cam_height_step = 0.1;            ///< Follow camera vertical shift
     double follow_cam_fovy_coeff = std::cbrt(2.0);  ///< Follow camera FovY coeff
+
+    /// Пешая камера от 1-го лица.
+    /// Физика игрока (скорости/прыжок/гравитация) - в секции [Player]
+    double walk_fov_boost = 8.0;            ///< Прирост FOV при беге, град
+    double walk_fov_speed = 6.0;            ///< Скорость смены FOV, 1/с
+    double walk_bob_amplitude = 0.045;      ///< Покачивание головы при ходьбе, м
+    double walk_bob_amplitude_run = 0.050;  ///< Покачивание при беге, м (близко к ходьбе)
+    double walk_bob_frequency = 9.0;        ///< Частота шагов при ходьбе, Гц
+    double walk_bob_frequency_run = 6.0;    ///< Частота шагов при беге, Гц
+    double walk_landing_max = 0.25;         ///< Макс. проседание при приземлении, м
+    double walk_landing_coeff = 0.04;       ///< Проседание на 1 м/с скорости падения, м
+    double walk_landing_recovery = 6.0;     ///< Скорость восстановления после приземления, 1/с
+    double walk_mouse_sensitivity = 1.5;    ///< Чувствительность обзора мышью, рад/ед. NDC (свайп через экран ~170 град)
+    double walk_interact_distance = 10.0;    ///< Дистанция до двери при входе по наведению (Ctrl+Enter), м
 
     bool enableDebugLayer = false;
     bool enableDebugUtils = false;
