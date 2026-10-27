@@ -33,7 +33,7 @@ private:
     bool is_holded = false;
 
     QString pressButton = "LEFT_BUTTON";
-    QString holdButton = "RGIHT+BUTTON";
+    QString holdButton = "RIGHT_BUTTON";
 };
 
 #endif
