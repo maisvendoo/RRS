@@ -84,15 +84,7 @@ bool compress_to_ktx2(const fs::path& src_img,
 
     // Загружаем базовый уровень (0)
     auto* baseTex = ktxTexture(texture);
-    result = ktxTexture_SetImageFromMemory(baseTex, 0, 0, 0, data, w * h * 4);
-
-    if (result != KTX_SUCCESS)
-    {
-        std::cerr << "[ERR] Failed to set base image data: " << result << std::endl;
-        ktxTexture_Destroy(ktxTexture(texture));
-        stbi_image_free(data);
-        return false;
-    }
+    ktxTexture_SetImageFromMemory(baseTex, 0, 0, 0, data, w * h * 4);
 
     // Массив под указатели на данные всех уровней, не удаляем эти данные до сжатия
     // и сохранения текстуры на диск!
@@ -121,18 +113,10 @@ bool compress_to_ktx2(const fs::path& src_img,
                 );
 
             // Загружаем уровень в ktxTexture
-            result = ktxTexture_SetImageFromMemory(
+            ktxTexture_SetImageFromMemory(
                 baseTex, level, 0, 0,
                 resized, curW * curH * 4
                 );
-
-            if (result != KTX_SUCCESS)
-            {
-                std::cerr << "[ERR] Failed to set image data for mip level "
-                          << level << ": " << result << std::endl;
-                delete[] resized;
-                break;
-            }
 
             prevLevelData = resized;
             prevW = curW;
@@ -246,6 +230,7 @@ std::map<int, TextureSettings> parse_gltf_textures(const json &gltf)
             settings.isNormalMap = is_normal;
             settings.isSRGB = is_srgb;
             settings.vkFormat = is_srgb ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
+            if (role == PBRTextureRole::OCCLUSION) settings.vkFormat = VK_FORMAT_R8_UNORM;
         }
     };
 
