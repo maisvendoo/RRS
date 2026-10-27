@@ -78,7 +78,7 @@ QString ButtonHandler::getUsage() const
     QString pressButtonName = getButtonTooltip(getButtonCode(pressButton));
     QString holdButtonName = getButtonTooltip(getButtonCode(holdButton));
 
-    QString usage_msg = QString("Нажать: %1 | Отпустить: %1").arg(pressButtonName);
+    QString usage_msg = QString("Нажать: %1 | Отпустить: %2").arg(pressButtonName).arg(pressButtonName);
 
     if (allow_hold)
     {

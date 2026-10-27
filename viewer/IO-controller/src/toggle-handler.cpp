@@ -87,6 +87,8 @@ QString ToggleHandler::getState() const
 //------------------------------------------------------------------------------
 bool ToggleHandler::load_config(CfgReader &cfg, QDomNode secNode)
 {
+    ControlHandler::load_config(cfg, secNode);
+
     cfg.getString(secNode, "OnButton", onButton);
     cfg.getString(secNode, "OffButton", offButton);
 
