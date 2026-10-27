@@ -100,7 +100,11 @@ bool ControlHandler::setValueIfChanged(float new_value, float epsilon)
         return false;
 
     value = new_value;
+
     sendControlSignal();
+
+    emit sigOnValueChanged(value);
+
     return true;
 }
 

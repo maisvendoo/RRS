@@ -22,6 +22,8 @@ public:
 
     bool load_config(CfgReader &cfg, QDomNode secNode) override;
 
+    void reset() override;
+
 private:
 
     /// Разрешать удержание кнопки

@@ -126,9 +126,14 @@ public:
         sendControlSignal();
     }
 
+    // Сброс контрола, что бы это не значило для конкретного типа
+    virtual void reset() {}
+
 signals:
 
     void sigSendControlCommand(const QByteArray &data);
+
+    void sigOnValueChanged(const float &value);
 
 protected:
 

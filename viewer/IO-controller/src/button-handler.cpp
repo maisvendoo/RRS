@@ -104,8 +104,18 @@ bool ButtonHandler::load_config(CfgReader &cfg, QDomNode secNode)
 {
     ControlHandler::load_config(cfg, secNode);
 
-    cfg.getBool(secNode, "AllowedHold", allow_hold);
+    cfg.getBool(secNode, "AllowHold", allow_hold);
 
     return true;
+}
+
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ButtonHandler::reset()
+{
+    is_holded = false;
+    setValueIfChanged(0.0f);
 }
 
