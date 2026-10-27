@@ -19,6 +19,16 @@ public:
     QString getUsage() const override;
 
     QString getState() const override;
+
+    bool load_config(CfgReader &cfg, QDomNode secNode) override;
+
+private:
+
+    /// Разрешать удержание кнопки
+    bool allow_hold = false;
+
+    /// Флаг того, что кнопка в режиме удержания
+    bool is_holded = false;
 };
 
 #endif
