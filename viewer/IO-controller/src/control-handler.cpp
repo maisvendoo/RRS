@@ -70,12 +70,12 @@ float ControlHandler::getSignalValue() const
         return value;
     }
 
-    if (contolledObjectName.isEmpty() || feedback_signals == nullptr)
+    if (animatedObjectName.isEmpty() || feedback_signals == nullptr)
     {
         return value;
     }
 
-    auto it = animation_signals_map->find(contolledObjectName);
+    auto it = animation_signals_map->find(animatedObjectName);
 
     if (it != animation_signals_map->end())
     {

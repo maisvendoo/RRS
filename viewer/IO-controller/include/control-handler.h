@@ -48,8 +48,10 @@ public:
     QString keyModOnName = "";
     /// Имя модификатора выключения
     QString keyModOffName = "";
-    /// Имя объекта в 3D-модели
+    /// Имя кликабельного объекта в 3D-модели
     QString contolledObjectName = "";
+    /// Имя анимированного объекта в 3D-модели
+    QString animatedObjectName = "";
     /// Имя контрола
     QString name = "";
     /// Тип контрола
