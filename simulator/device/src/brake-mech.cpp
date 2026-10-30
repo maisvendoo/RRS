@@ -239,6 +239,8 @@ void BrakeMech::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "InitPressure", p_cyl_begin);
 
     setY(0, p_cyl_begin);
+
+    cfg.getDouble(secName, "HandBrakeShoeForceMax", K_hb_max);
 }
 
 //------------------------------------------------------------------------------
