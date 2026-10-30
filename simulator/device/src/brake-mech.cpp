@@ -34,12 +34,14 @@ BrakeMech::BrakeMech(size_t num, QObject *parent) : Device(parent)
   , p_end(0.04)
   , p_max(0.4)
   , Kmax(3.0)
+  , K_hb_max(3.0)
   , Kcoef(0.0)
   , K(0.0)
   , shoes_per_axis(2)
   , wheel_r(0.475)
   , eff_r(0.475)
   , shoeType("iron")
+  , hb_level(0.0)
 {
     setAxisNum(num);
 }
@@ -175,7 +177,9 @@ void BrakeMech::preStep(state_vector_t &Y, double t)
     {
         // Вычисляем нажатие на одну колодку (тс)
         Kcoef = (Y[0] - p_end) / (p_max - p_end);
-        K = Kcoef * Kmax;
+
+        // с учетом ручного тормоза, выбираем наибольшую силу
+        K = max(Kcoef * Kmax, hb_level * K_hb_max);
 
         for (size_t i = 0; i < axis_num; ++i)
         {

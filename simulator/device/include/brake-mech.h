@@ -71,6 +71,12 @@ public:
     /// Момент тормозных сил на оси № idx, Н * м
     double getBrakeTorque(size_t idx) const;
 
+    /// Задать степерь зажатия ручного тормоза (привод - внешнее устройство!)
+    void setHandBrakeForceLevel(double level)
+    {
+        hb_level = cut(level, 0.0, 1.0);
+    }
+
 protected:
 
     /// Число осей в тормозной рычажной передаче
@@ -118,6 +124,9 @@ protected:
     /// Максимальное нажатие на колодку (при максимальном давлении), тс
     double  Kmax;
 
+    /// Максимальное нажатие на колодку от ручного тормоза
+    double  K_hb_max;
+
     /// Текущая относительная сила нажатия на колодку
     double  Kcoef;
 
@@ -134,13 +143,16 @@ protected:
     double wheel_r;
 
     /// Эффективный радиус тормозной поверхности
-    double eff_r;
+    double eff_r;    
 
     /// Тормозной момент на осях
     std::vector<double>  brake_torque;
 
     /// Материал колодок: iron/iron-ph/composite (чугун/фосфористый чугун/композит)
     QString shoeType;
+
+    /// Степень прижатия колодок приводом ручного тормоза
+    double hb_level;
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
