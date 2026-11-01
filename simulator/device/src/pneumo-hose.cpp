@@ -519,7 +519,60 @@ void PneumoHose::load_config(CfgReader &cfg)
 
     cfg.getString(secName, "Name", name);
 
-
-
     cfg.getDouble(secName, "K_sound", K_sound);
+
+    // Углы задаются в конфигурационном файле в градусах, пересчитываем в радианы
+    double tmp = 0.0;
+
+    // Существующее конструктивное отклонение рукава от продольной оси
+    if (cfg.getDouble(secName, "ExistingSideAngle", tmp))
+        existing_side_angle = tmp / 180.0 * Physics::PI;
+
+    // Отклонение рукава от продольной оси в свободном состоянии
+    if (cfg.getDouble(secName, "FreeSideAngle", tmp))
+        free_side_angle = tmp / 180.0 * Physics::PI;
+
+    // Отклонение рукава от продольной оси в закреплённом на подвесе состоянии
+    if (cfg.getDouble(secName, "FixedSideAngle", tmp))
+        fixed_side_angle = tmp / 180.0 * Physics::PI;
+
+    // Несовпадение поверхности смыкания соединительной головки с осью рукава, м
+    cfg.getDouble(secName, "SideGap", side_gap);
+
+    // Существующее конструктивное свешивание рукава вниз от продольной оси
+    if (cfg.getDouble(secName, "ExistingDownAngle", tmp))
+        existing_down_angle = tmp / 180.0 * Physics::PI;
+
+    // Свешивание рукава вниз от продольной оси в свободном состоянии
+    if (cfg.getDouble(secName, "FreeDownAngle", tmp))
+        free_down_angle = tmp / 180.0 * Physics::PI;
+
+    // Свешивание рукава вниз от продольной оси в закреплённом на подвесе состоянии
+    if (cfg.getDouble(secName, "FixedDownAngle", tmp))
+        fixed_down_angle = tmp / 180.0 * Physics::PI;
+
+    // Существующий конструктивный изгиб вверх соединительной головки рукава
+    if (cfg.getDouble(secName, "ExistingHeadUpAngle", tmp))
+        existing_head_up_angle = tmp / 180.0 * Physics::PI;
+
+    // Изгиб рукава вверх перед соединительной головкой в свободном состоянии
+    if (cfg.getDouble(secName, "FreeHeadUpAngle", tmp))
+        free_head_up_angle = tmp / 180.0 * Physics::PI;
+
+    // Изгиб рукава вверх перед соединительной головкой в закреплённом на подвесе состоянии
+    if (cfg.getDouble(secName, "FixedHeadUpAngle", tmp))
+        fixed_head_up_angle = tmp / 180.0 * Physics::PI;
+
+    // Изгиб рукава вверх перед соединительной головкой в состоянии готовности к соединению
+    if (cfg.getDouble(secName, "ReadyToConnectHeadUpAngle", tmp))
+        ready_to_connect_head_up_angle = tmp / 180.0 * Physics::PI;
+
+    // Коэффициент к скорости поворотов рукава
+    cfg.getDouble(secName, "AngleOmega", angle_omega);
+
+    // Коэффициент к скорости колебаний свешивания рукава в свободном состоянии
+    cfg.getDouble(secName, "DownAngleOmega", down_angle_omega);
+
+    // Коэффициент затухания колебаний свешивания рукава в свободном состоянии
+    cfg.getDouble(secName, "DownAngleBeta", down_angle_beta);
 }
