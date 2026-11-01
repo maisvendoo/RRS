@@ -48,11 +48,15 @@ void VL60k::initBrakesEquipment(const QString& modules_dir, const QString& custo
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 
     // Рукава тормозной магистрали
+    dvec3 hose_bp_root_coord = {-0.3, length / 2.0 - 0.3, 0.8};
+
     hose_bp_fwd = new PneumoHose();
     hose_bp_fwd->read_config("pneumo-hose-BP");
+    hose_bp_fwd->setRootPosition(hose_bp_root_coord);
     forward_connectors.push_back(hose_bp_fwd);
 
     hose_bp_bwd = new PneumoHose();
     hose_bp_bwd->read_config("pneumo-hose-BP");
+    hose_bp_bwd->setRootPosition(hose_bp_root_coord);
     backward_connectors.push_back(hose_bp_bwd);
 }

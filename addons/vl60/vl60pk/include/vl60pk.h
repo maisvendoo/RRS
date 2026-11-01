@@ -528,11 +528,15 @@ private:
     /// Сигналы для озвучки
     void soundsOutput(const simulator_time_t& t, const double& dt);
 
+
     /// Предварительные расчёты перед симуляцией
     void preStep(const double& t) override;
 
     /// Предварительный расчёт координат сцепных устройств
     void preStepCouplings(const double& t);
+
+    /// Предварительный расчёт координат рукавов пневмомагистралей
+    void preStepHoses(const double& t);
 
 
     /// Шаг симуляции всех систем электровоза

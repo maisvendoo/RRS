@@ -143,6 +143,9 @@ private:
     /// Предварительный расчёт координат сцепных устройств
     void preStepCouplings(const double& t);
 
+    /// Предварительный расчёт координат рукавов пневмомагистралей
+    void preStepHoses(const double& t);
+
 
     /// Шаг моделирования
     void step(const double& t, const double& dt) override;

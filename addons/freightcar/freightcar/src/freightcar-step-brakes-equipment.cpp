@@ -13,6 +13,23 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
+void FreightCar::preStepHoses(const double& t)
+{
+    (void) t;
+
+    hose_bp_fwd->setVehiclePosition(profile_point_data.position,
+                                    profile_point_data.right,
+                                    profile_point_data.orth,
+                                    profile_point_data.up);
+    hose_bp_bwd->setVehiclePosition(profile_point_data.position,
+                                    -profile_point_data.right,
+                                    -profile_point_data.orth,
+                                    profile_point_data.up);
+}
+
+//------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------
 void FreightCar::stepBrakesEquipment(const double& t, const double& dt)
 {
     // Тормозная магистраль
@@ -114,22 +131,8 @@ void FreightCar::stepBrakesEquipment(const double& t, const double& dt)
     // Рукава тормозной магистрали
     hose_bp_fwd->setPressure(anglecock_bp_fwd->getPressureToHose());
     hose_bp_fwd->setFlowCoeff(anglecock_bp_fwd->getFlowCoeff());
-    hose_bp_fwd->setRootCoord(  profile_point_data.position
-                              + profile_point_data.right * anglecock_bp_fwd->getHoseCoord().x
-                              + profile_point_data.orth * anglecock_bp_fwd->getHoseCoord().y
-                              + profile_point_data.up * anglecock_bp_fwd->getHoseCoord().z);
-    hose_bp_fwd->setOrth(profile_point_data.orth);
-    hose_bp_fwd->setRight(profile_point_data.right);
-    hose_bp_fwd->setUp(profile_point_data.up);
     hose_bp_fwd->step(t, dt);
     hose_bp_bwd->setPressure(anglecock_bp_bwd->getPressureToHose());
     hose_bp_bwd->setFlowCoeff(anglecock_bp_bwd->getFlowCoeff());
-    hose_bp_bwd->setRootCoord(  profile_point_data.position
-                              - profile_point_data.right * anglecock_bp_bwd->getHoseCoord().x
-                              - profile_point_data.orth * anglecock_bp_bwd->getHoseCoord().y
-                              + profile_point_data.up * anglecock_bp_bwd->getHoseCoord().z);
-    hose_bp_bwd->setOrth(-profile_point_data.orth);
-    hose_bp_bwd->setRight(-profile_point_data.right);
-    hose_bp_bwd->setUp(profile_point_data.up);
     hose_bp_bwd->step(t, dt);
 }

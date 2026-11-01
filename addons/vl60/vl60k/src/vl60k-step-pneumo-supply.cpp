@@ -55,22 +55,8 @@ void VL60k::stepPneumoSupply(const double& t, const double& dt)
     // Рукава питательной магистрали
     hose_fl_fwd->setPressure(anglecock_fl_fwd->getPressureToHose());
     hose_fl_fwd->setFlowCoeff(anglecock_fl_fwd->getFlowCoeff());
-    hose_fl_fwd->setRootCoord(  profile_point_data.position
-                              + profile_point_data.right * anglecock_fl_fwd->getHoseCoord().x
-                              + profile_point_data.orth * (length / 2.0 - 0.3)
-                              + profile_point_data.up * anglecock_fl_fwd->getHoseCoord().z);
-    hose_fl_fwd->setOrth(profile_point_data.orth);
-    hose_fl_fwd->setRight(profile_point_data.right);
-    hose_fl_fwd->setUp(profile_point_data.up);
     hose_fl_fwd->step(t, dt);
     hose_fl_bwd->setPressure(anglecock_fl_bwd->getPressureToHose());
     hose_fl_bwd->setFlowCoeff(anglecock_fl_bwd->getFlowCoeff());
-    hose_fl_bwd->setRootCoord(  profile_point_data.position
-                              + profile_point_data.right * anglecock_fl_bwd->getHoseCoord().x
-                              + profile_point_data.orth * (length / 2.0 - 0.3)
-                              + profile_point_data.up * anglecock_fl_bwd->getHoseCoord().z);
-    hose_fl_bwd->setOrth(-profile_point_data.orth);
-    hose_fl_bwd->setRight(-profile_point_data.right);
-    hose_fl_bwd->setUp(profile_point_data.up);
     hose_fl_bwd->step(t, dt);
 }
