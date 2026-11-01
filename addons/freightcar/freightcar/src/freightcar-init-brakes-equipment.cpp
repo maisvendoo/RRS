@@ -58,11 +58,18 @@ void FreightCar::initBrakesEquipment(const QString& modules_dir, const QString& 
     anglecock_bp_bwd->setPipeVolume(volume_bp);
 
     // Рукава тормозной магистрали
+    dvec3 hose_bp_root_coord = {-0.3, length / 2.0 - 0.3, 0.8};
+    double side_angle_45_60 = 40.894 / 180.0 * Physics::PI;
+    double down_angle_45_60 = -20.704 / 180.0 * Physics::PI;
+
     hose_bp_fwd = LOAD_MODULE(PneumoHoseEPB,
         modules_dir + QDir::separator() + hose_bp_module);
     if (hose_bp_fwd == nullptr)
         hose_bp_fwd = new PneumoHoseEPB();
     hose_bp_fwd->read_config(hose_bp_config);
+    hose_bp_fwd->setRootPosition(hose_bp_root_coord);
+    hose_bp_fwd->setSideAngles(side_angle_45_60, side_angle_45_60, 60 / 180.0 * Physics::PI);
+    hose_bp_fwd->setDownAngles(down_angle_45_60, -75 / 180.0 * Physics::PI, 0.0);
     forward_connectors.push_back(hose_bp_fwd);
 
     hose_bp_bwd = LOAD_MODULE(PneumoHoseEPB,
@@ -70,5 +77,8 @@ void FreightCar::initBrakesEquipment(const QString& modules_dir, const QString& 
     if (hose_bp_bwd == nullptr)
         hose_bp_bwd = new PneumoHoseEPB();
     hose_bp_bwd->read_config(hose_bp_config);
+    hose_bp_bwd->setRootPosition(hose_bp_root_coord);
+    hose_bp_bwd->setSideAngles(side_angle_45_60, side_angle_45_60, 60 / 180.0 * Physics::PI);
+    hose_bp_bwd->setDownAngles(down_angle_45_60, -75 / 180.0 * Physics::PI, 0.0);
     backward_connectors.push_back(hose_bp_bwd);
 }

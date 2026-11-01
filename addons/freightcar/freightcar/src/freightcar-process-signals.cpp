@@ -27,27 +27,19 @@ void FreightCar::signalsOutput(const simulator_time_t& t, const double& dt)
     // Рукав закреплён на концевом кране с отростком вниз под 45 градусов,
     // и концевой крепится на трубу ТМ с поворотом на 60 градусов внутрь,
     // из суммы этих вращений, у рукава изначально уже есть поворот на:
-    // 67.793 по продольной оси рукава (устранено внутри модели)
     // 40.894 градуса вправо, вокруг вертикальной оси
     // 20.704 градуса вниз, вокруг поперечной оси
-    analogSignal[HOSE_BP_FWD_ANGLE_SIDE] = hose_bp_fwd->getSideAngle() - hose_bp_fwd->isConnected() * Physics::PI * 40.894 / 180.0 + 1.0;
-    analogSignal[HOSE_BP_FWD_ANGLE_DOWN] = hose_bp_fwd->getDownAngle() + Physics::PI * 20.704 / 180.0 + 1.0;
-    analogSignal[HOSE_BP_FWD_ANGLE_HEAD_UP] = hose_bp_fwd->getHeadUpAngle() - Physics::PI * 24.0 / 180.0 + 1.0;
+    analogSignal[HOSE_BP_FWD_ANGLE_SIDE] = hose_bp_fwd->getSideAngle() + 1.0;
+    analogSignal[HOSE_BP_FWD_ANGLE_DOWN] = hose_bp_fwd->getDownAngle() + 1.0;
+    analogSignal[HOSE_BP_FWD_ANGLE_HEAD_UP] = hose_bp_fwd->getHeadUpAngle() + 1.0;
 
-    analogSignal[HOSE_BP_BWD_ANGLE_SIDE] = hose_bp_bwd->getSideAngle() - hose_bp_bwd->isConnected() * Physics::PI * 40.894 / 180.0 + 1.0;
-    analogSignal[HOSE_BP_BWD_ANGLE_DOWN] = hose_bp_bwd->getDownAngle() + Physics::PI * 20.704 / 180.0 + 1.0;
-    analogSignal[HOSE_BP_BWD_ANGLE_HEAD_UP] = hose_bp_bwd->getHeadUpAngle() - Physics::PI * 24.0 / 180.0 + 1.0;
+    analogSignal[HOSE_BP_BWD_ANGLE_SIDE] = hose_bp_bwd->getSideAngle() + 1.0;
+    analogSignal[HOSE_BP_BWD_ANGLE_DOWN] = hose_bp_bwd->getDownAngle() + 1.0;
+    analogSignal[HOSE_BP_BWD_ANGLE_HEAD_UP] = hose_bp_bwd->getHeadUpAngle() + 1.0;
 
     // Рукоятка переднего концевого крана тормозной магистрали
     analogSignal[ANGLECOCK_BP_FWD_STATE] = anglecock_bp_fwd->getHandlePosition();
 
     // Рукоятка заднего концевого крана тормозной магистрали
     analogSignal[ANGLECOCK_BP_BWD_STATE] = anglecock_bp_bwd->getHandlePosition();
-
-    analogSignal[HOSE_FWD_X] = anglecock_bp_fwd->getHoseCoord().x + hose_bp_fwd->getConnectionPoint().x;
-    analogSignal[HOSE_FWD_Y] = anglecock_bp_fwd->getHoseCoord().y + hose_bp_fwd->getConnectionPoint().y;
-    analogSignal[HOSE_FWD_Z] = anglecock_bp_fwd->getHoseCoord().z + hose_bp_fwd->getConnectionPoint().z;
-    analogSignal[HOSE_BWD_X] = anglecock_bp_bwd->getHoseCoord().x + hose_bp_bwd->getConnectionPoint().x;
-    analogSignal[HOSE_BWD_Y] = anglecock_bp_bwd->getHoseCoord().y + hose_bp_bwd->getConnectionPoint().y;
-    analogSignal[HOSE_BWD_Z] = anglecock_bp_bwd->getHoseCoord().z + hose_bp_bwd->getConnectionPoint().z;
 }

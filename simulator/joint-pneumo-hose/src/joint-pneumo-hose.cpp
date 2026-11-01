@@ -28,8 +28,8 @@ JointPneumoHose::~JointPneumoHose()
 //------------------------------------------------------------------------------
 void JointPneumoHose::step(double t, double dt)
 {
-    Q_UNUSED(t)
-    Q_UNUSED(dt)
+    (void) t;
+    (void) dt;
 
     stepConnectionCheck();
     stepFlowCalc();
@@ -41,29 +41,26 @@ void JointPneumoHose::step(double t, double dt)
 void JointPneumoHose::stepConnectionCheck()
 {
     // Управление соединением рукавов
-    if (   (devices[FWD]->getOutputSignal(HOSE_OUTPUT_REF_STATE) == 1.0)
-        || (devices[BWD]->getOutputSignal(HOSE_OUTPUT_REF_STATE) == 1.0) )
+    const double sum_command =   devices[FWD]->getOutputSignal(HOSE_OUTPUT_REF_STATE)
+                               + devices[BWD]->getOutputSignal(HOSE_OUTPUT_REF_STATE);
+    if (sum_command >= 0.0)
     {
-        is_connected = true;
+        ref_connected = true;
+        if (sum_command >= 2.0)
+        {
+            is_connected = true;
+        }
+    }
+    else
+    {
+        ref_connected = false;
     }
 
-    // Управление разъединением рукавов
-    if (   (devices[FWD]->getOutputSignal(HOSE_OUTPUT_REF_STATE) == -1.0)
-        || (devices[BWD]->getOutputSignal(HOSE_OUTPUT_REF_STATE) == -1.0) )
+    // Если не соединены - то разъединены
+    if (!ref_connected)
     {
-        is_connected = false;
-    }
-
-    if (!is_connected)
-    {
-        devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_X, 0.0);
-        devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Y, 0.0);
-        devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Z, 0.0);
-        devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_ANGLE_UP, 0.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_X, 0.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Y, 0.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Z, 0.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_ANGLE_UP, 0.0);
+        reset();
+        apply();
         return;
     }
 
@@ -76,6 +73,8 @@ void JointPneumoHose::stepConnectionCheck()
                              devices[BWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_Z) };
     if ((length2(coord_fwd - new_coord_fwd) < Physics::ZERO) && (length2(coord_bwd - new_coord_bwd) < Physics::ZERO))
     {
+        // Ничего не изменилось, пересчитывать углы не надо
+        apply();
         return;
     }
     coord_fwd = new_coord_fwd;
@@ -91,20 +90,13 @@ void JointPneumoHose::stepConnectionCheck()
     // сразу вычитаем из расстояния их суммарную длину
     const double len = length(coord_delta) - len_head_fwd - len_head_bwd;
 
-    // Неравенства треугольника
+    // Неравенства треугольника - если рукава не дотягиваются, разъединяем
     if (   ((len_fwd + len_bwd - len) < Physics::ZERO)
         || ((len + len_fwd - len_bwd) < Physics::ZERO)
         || ((len_bwd + len - len_fwd) < Physics::ZERO))
     {
-        is_connected = false;
-        devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_X, 0.0);
-        devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Y, 0.0);
-        devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Z, 0.0);
-        devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_ANGLE_UP, 0.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_X, 0.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Y, 0.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Z, 0.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_ANGLE_UP, 0.0);
+        reset();
+        apply();
         return;
     }
 
@@ -121,23 +113,16 @@ void JointPneumoHose::stepConnectionCheck()
     const double bwd_proj =   (len * len + len_bwd * len_bwd - len_fwd * len_fwd)
                             / (2.0 * len);
     // Углы свешивания рукавов, они же углы поворота соединительной головки обратно вверх
-    const double fwd_angle = std::acos(fwd_proj / len_fwd);
-    const double bwd_angle = std::acos(bwd_proj / len_bwd);
+    fwd_angle = std::acos(fwd_proj / len_fwd);
+    bwd_angle = std::acos(bwd_proj / len_bwd);
 
     // Высота треугольника, по проекции одного из рукавов
     const double h = std::sqrt(len_fwd * len_fwd - fwd_proj * fwd_proj);
     // Рассчитываем точки крепления соединительных головок, куда будут стремится рукава
-    const dvec3 point_fwd = coord_fwd + v_unit * fwd_proj + v_h * h;
-    const dvec3 point_bwd = coord_bwd - v_unit * bwd_proj + v_h * h;
+    point_fwd = coord_fwd + v_unit * fwd_proj + v_h * h;
+    point_bwd = coord_bwd - v_unit * bwd_proj + v_h * h;
 
-    devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_X, point_fwd.x);
-    devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Y, point_fwd.y);
-    devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Z, point_fwd.z);
-    devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_ANGLE_UP, fwd_angle);
-    devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_X, point_bwd.x);
-    devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Y, point_bwd.y);
-    devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Z, point_bwd.z);
-    devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_ANGLE_UP, bwd_angle);
+    apply();
 }
 
 //------------------------------------------------------------------------------
@@ -154,9 +139,6 @@ void JointPneumoHose::stepFlowCalc()
 
     if (is_connected)
     {
-        devices[FWD]->setInputSignal(HOSE_INPUT_IS_CONNECTED, 1.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_IS_CONNECTED, 1.0);
-
         // Поток через соединённые рукава
         double flow_coeff = min(flow_coeff_fwd, flow_coeff_bwd);
         double flow = flow_coeff * (p_fwd - p_bwd);
@@ -166,9 +148,6 @@ void JointPneumoHose::stepFlowCalc()
     }
     else
     {
-        devices[FWD]->setInputSignal(HOSE_INPUT_IS_CONNECTED, 0.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_IS_CONNECTED, 0.0);
-
         // Поток из разъединённых рукавов в атмосферу
         double flow = flow_coeff_fwd * p_fwd;
         devices[FWD]->setInputSignal(HOSE_INPUT_FLOW_TO_PIPE, -flow);
@@ -181,10 +160,44 @@ void JointPneumoHose::stepFlowCalc()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void JointPneumoHose::reset()
+{
+    is_connected = false;
+    ref_connected = false;
+    coord_fwd = {0.0, 0.0, 0.0};
+    coord_bwd = {0.0, 0.0, 0.0};
+    fwd_angle = 0.0;
+    bwd_angle = 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void JointPneumoHose::apply()
+{
+    devices[FWD]->setInputSignal(HOSE_INPUT_IS_CONNECTED, static_cast<double>(is_connected));
+    devices[FWD]->setInputSignal(HOSE_INPUT_REF_CONNECTED, static_cast<double>(ref_connected));
+    devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_X, point_fwd.x);
+    devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Y, point_fwd.y);
+    devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Z, point_fwd.z);
+    devices[FWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_ANGLE_UP, fwd_angle);
+
+    devices[BWD]->setInputSignal(HOSE_INPUT_IS_CONNECTED, static_cast<double>(is_connected));
+    devices[BWD]->setInputSignal(HOSE_INPUT_REF_CONNECTED, static_cast<double>(ref_connected));
+    devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_X, point_bwd.x);
+    devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Y, point_bwd.y);
+    devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_COORD_Z, point_bwd.z);
+    devices[BWD]->setInputSignal(HOSE_INPUT_HEAD_ROOT_ANGLE_UP, bwd_angle);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void JointPneumoHose::load_config(CfgReader &cfg)
 {
     QString secName = "Joint";
     cfg.getBool(secName, "initConnectionState", is_connected);
+    ref_connected = is_connected;
 }
 
 GET_MODULE(JointPneumoHose)

@@ -43,8 +43,6 @@ public:
     /// Потребляемый ток из линии idx
     double getCurrent(size_t idx);
 
-    virtual void step(double t, double dt);
-
 protected:
 
     /// Число линий управления ЭПТ

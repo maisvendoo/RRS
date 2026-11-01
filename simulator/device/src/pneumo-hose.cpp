@@ -16,10 +16,6 @@ PneumoHose::PneumoHose(QObject *parent) : Device(parent)
 
     output_signals.resize(HOSE_SIZE_OF_OUTPUTS);
     output_signals = {0.0, 0.0, 1.0, 0.435, 0.160, 0.0, 0.0, 0.0};
-
-    ref_state.setSpringFirst();
-    ref_state.setSpringLast();
-    ref_state.setInitPosition(1);
 }
 
 //------------------------------------------------------------------------------
@@ -31,45 +27,44 @@ PneumoHose::~PneumoHose()
 }
 
 //------------------------------------------------------------------------------
-//
+// Legacy
 //------------------------------------------------------------------------------
 void PneumoHose::setKeySymbolConnect(std::uint16_t key_symbol)
 {
-    ref_state.setKeySymbolIncrease(key_symbol);
+    key_symbol_inc = key_symbol;
 }
 
 //------------------------------------------------------------------------------
-//
+// Legacy
 //------------------------------------------------------------------------------
 void PneumoHose::setKeyModifierConnect(std::uint16_t key_modifier)
 {
-    ref_state.setKeyModifierIncrease(key_modifier);
+    key_modifier_inc = key_modifier;
 }
 
 //------------------------------------------------------------------------------
-//
+// Legacy
 //------------------------------------------------------------------------------
 void PneumoHose::setKeySymbolDisconnect(std::uint16_t key_symbol)
 {
-    ref_state.setKeySymbolDecrease(key_symbol);
+    key_symbol_dec = key_symbol;
 }
 
 //------------------------------------------------------------------------------
-//
+// Legacy
 //------------------------------------------------------------------------------
 void PneumoHose::setKeyModifierDisconnect(std::uint16_t key_modifier)
 {
-    ref_state.setKeyModifierDecrease(key_modifier);
+    key_modifier_dec = key_modifier;
 }
 
 //------------------------------------------------------------------------------
-//
+// Legacy
 //------------------------------------------------------------------------------
 void PneumoHose::setControl(std::set<uint16_t>* keys,
-                                 control_signals_t* control_signals)
+                            control_signals_t* control_signals)
 {
     Device::setControl(keys, control_signals);
-    ref_state.setControl(pressed_keys);
 }
 
 //------------------------------------------------------------------------------
@@ -77,10 +72,9 @@ void PneumoHose::setControl(std::set<uint16_t>* keys,
 //------------------------------------------------------------------------------
 void PneumoHose::connect()
 {
-    ref_state.setPosition(2);
-
-    // После вызова команды напрямую на один шаг отключаем управление с клавиатуры
-    ref_state.setControl();
+    // Команда соединить рукава
+    if (is_linked && (state == FREE))
+        state = DO_CONNECT;
 }
 
 //------------------------------------------------------------------------------
@@ -88,20 +82,83 @@ void PneumoHose::connect()
 //------------------------------------------------------------------------------
 void PneumoHose::disconnect()
 {
-    ref_state.setPosition(0);
-
-    // После вызова команды напрямую на один шаг отключаем управление с клавиатуры
-    ref_state.setControl();
+    // Команда разъединить рукава
+    if (state > FREE)
+    {
+        if (state == CONNECTED)
+        {
+            // Для разъединения соединительные головки нужно повернуть вверх
+            const double new_head_up_angle = getY(HEAD_UP_ANGLE) + ready_to_connect_head_up_angle;
+            setY(HEAD_UP_ANGLE, new_head_up_angle);
+        }
+        state = FREE;
+    }
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::setExternalState(int state)
+void PneumoHose::fix()
 {
-    ref_state.setSpringFirst(state != 0);
-    ref_state.setSpringLast(state != 2);
-    ref_state.setPosition(state);
+    // Команда закрепить рукав на подвесе
+    if (state == FREE)
+        state = DO_FIX;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::unfix()
+{
+    // Команда снять рукав с подвеса
+    if (state < FREE)
+        state = FREE;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::setExternalState(int command)
+{
+    // Воспроизводим логику Switcher для прямого управления с клавиатуры
+    // Legacy
+    if (pressed_keys && !pressed_keys->empty())
+    {
+        if ((getKeyState(*pressed_keys, key_symbol_dec) && isModifier(*pressed_keys, key_modifier_dec)))
+        {
+            command = 0;
+        }
+        else
+        {
+            if ((getKeyState(*pressed_keys, key_symbol_inc) && isModifier(*pressed_keys, key_modifier_inc)))
+            {
+                command = 2;
+            }
+        }
+    }
+
+    // Сохраняем команду разъединить рукава, а если уже свободный - закрепить на подвесе
+    if (command == 0)
+    {
+        command_disconnect_fix = true;
+
+        command_unfix_connect = false;
+        prev_command_unfix_connect = false;
+        return;
+    }
+
+    // Сохраняем команду снять рукав с подвеса, а если уже свободный - соединить
+    if (command == 2)
+    {
+        command_unfix_connect = true;
+
+        command_disconnect_fix = false;
+        prev_command_disconnect_fix = false;
+        return;
+    }
+
+    prev_command_disconnect_fix = false;
+    prev_command_unfix_connect = false;
 }
 
 //------------------------------------------------------------------------------
@@ -109,7 +166,15 @@ void PneumoHose::setExternalState(int state)
 //------------------------------------------------------------------------------
 bool PneumoHose::isConnected() const
 {
-    return is_linked && (input_signals[HOSE_INPUT_IS_CONNECTED] == 1.0);
+    return (state == CONNECTED);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool PneumoHose::isFixed() const
+{
+    return (state == FIXED);
 }
 
 //------------------------------------------------------------------------------
@@ -147,35 +212,60 @@ void PneumoHose::setHeadLength(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::setRootCoord(dvec3 coord)
+void PneumoHose::setRootPosition(dvec3 position)
 {
-    output_signals[HOSE_OUTPUT_ROOT_COORD_X] = coord.x;
-    output_signals[HOSE_OUTPUT_ROOT_COORD_Y] = coord.y;
-    output_signals[HOSE_OUTPUT_ROOT_COORD_Z] = coord.z;
+    root_pos = position;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::setOrth(dvec3 vector)
+void PneumoHose::setSideAngles(double existing, double free, double fixed)
 {
-    v_orth = vector;
+    existing_side_angle = existing;
+    free_side_angle = free;
+    fixed_side_angle = fixed;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::setRight(dvec3 vector)
+void PneumoHose::setDownAngles(double existing, double free, double fixed)
 {
-    v_right = vector;
+    existing_down_angle = existing;
+    free_down_angle = free;
+    fixed_down_angle = fixed;
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::setUp(dvec3 vector)
+void PneumoHose::setHeadUpAngles(double existing, double free, double fixed, double ready_to_connect)
 {
-    v_up = vector;
+    existing_head_up_angle = existing;
+    free_head_up_angle = free;
+    fixed_head_up_angle = fixed;
+    ready_to_connect_head_up_angle = ready_to_connect;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::setVehiclePosition(const dvec3 position,
+                                    const dvec3 vector_right,
+                                    const dvec3 vector_orth,
+                                    const dvec3 vector_up)
+{
+    v_right = vector_right;
+    v_orth = vector_orth;
+    v_up = vector_up;
+    const dvec3 root_global_position =    position
+                                        + v_right * root_pos.x
+                                        + v_orth * root_pos.y
+                                        + v_up * root_pos.z;
+    output_signals[HOSE_OUTPUT_ROOT_COORD_X] = root_global_position.x;
+    output_signals[HOSE_OUTPUT_ROOT_COORD_Y] = root_global_position.y;
+    output_signals[HOSE_OUTPUT_ROOT_COORD_Z] = root_global_position.z;
 }
 
 //------------------------------------------------------------------------------
@@ -196,7 +286,7 @@ double PneumoHose::getFlow() const
 //------------------------------------------------------------------------------
 double PneumoHose::getSideAngle() const
 {
-    return side_angle;
+    return getY(SIDE_ANGLE) - existing_side_angle;
 }
 
 //------------------------------------------------------------------------------
@@ -204,7 +294,7 @@ double PneumoHose::getSideAngle() const
 //------------------------------------------------------------------------------
 double PneumoHose::getDownAngle() const
 {
-    return down_angle;
+    return getY(DOWN_ANGLE) - existing_down_angle;
 }
 
 //------------------------------------------------------------------------------
@@ -212,7 +302,7 @@ double PneumoHose::getDownAngle() const
 //------------------------------------------------------------------------------
 double PneumoHose::getHeadUpAngle() const
 {
-    return head_up_angle;
+    return getY(HEAD_UP_ANGLE) - existing_head_up_angle;
 }
 
 //------------------------------------------------------------------------------
@@ -254,28 +344,106 @@ float PneumoHose::getSoundSignal(size_t idx) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoHose::step(double t, double dt)
+void PneumoHose::preStep(state_vector_t& Y, double t)
 {
-    ref_state.step(t, dt);
-    output_signals[HOSE_OUTPUT_REF_STATE] = static_cast<double>(ref_state.getPosition()) - 1.0;
-
-    // Возвращаем управление с клавиатуры, на случай если
-    // оно было отключено прямыми вызовами connect()/disconnect()
-    ref_state.setControl(pressed_keys);
-
-    atm_flow_sound.state = !isConnected();
-    atm_flow_sound.volume = K_sound * cbrt(getFlow());
-
-
-    if (!isConnected())
+    // Выполняем команды управления
+    if ((state == CONNECTED) && (input_signals[HOSE_INPUT_REF_CONNECTED] == 0.0))
     {
-        // Если не соединены с соседним рукавом, считать углы не надо
-        side_angle = 0.0;
-        down_angle = 0.0;
-        head_up_angle = 0.0;
+        disconnect();
+    }
+
+    if (command_disconnect_fix)
+    {
+        if (!prev_command_disconnect_fix)
+        {
+            prev_command_disconnect_fix = true;
+            (state > FREE) ? disconnect() : fix();
+        }
+    }
+    else
+    {
+        if (   (input_signals[HOSE_INPUT_REF_CONNECTED] == 1.0)
+            || (command_unfix_connect && !prev_command_unfix_connect))
+        {
+            prev_command_unfix_connect = true;
+            (state < FREE) ? unfix() : connect();
+        }
+    }
+
+    command_disconnect_fix = false;
+    command_unfix_connect = false;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool PneumoHose::check_angles_ready(double ref_side_angle,
+                                    double ref_down_angle,
+                                    double ref_head_up_angle)
+{
+    return (   (std::abs(ref_side_angle - getY(SIDE_ANGLE)) < 0.01)
+            && (std::abs(ref_down_angle - getY(DOWN_ANGLE)) < 0.01)
+            && (std::abs(ref_head_up_angle - getY(HEAD_UP_ANGLE)) < 0.01) );
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void PneumoHose::ode_system(const state_vector_t &Y,
+                           state_vector_t &dYdt,
+                           double t)
+{
+    if (state <= FREE)
+    {
+        // Если рукав свободен, отправляем команду разъединить
+        output_signals[HOSE_OUTPUT_REF_STATE] = -1.0;
+
+        // Состояние никак не связано с соседним рукавом, а воздух свистит в атмосферу
+        atm_flow_sound.state = true;
+        atm_flow_sound.volume = K_sound * cbrt(getFlow());
+
+        if (state == FREE)
+        {
+            // Рукав стремится к своим углам свободного состояния,
+            // а угол свешивания считаем с инерцией, для раскачивания
+            dYdt[SIDE_ANGLE] = (free_side_angle - Y[SIDE_ANGLE]) * angle_omega;
+            dYdt[DOWN_ANGLE] = dYdt[DOWN_ANGLE_VELOCITY];
+            dYdt[HEAD_UP_ANGLE] = (free_head_up_angle - Y[HEAD_UP_ANGLE]) * angle_omega;
+            dYdt[DOWN_ANGLE_VELOCITY] = down_angle_omega * (free_down_angle - Y[DOWN_ANGLE])
+                                        - down_angle_beta * Y[DOWN_ANGLE_VELOCITY];
+            return;
+        }
+
+        if (state == DO_FIX)
+        {
+            // Проверяем, что рукав повернулся к подвесу
+            if (check_angles_ready(fixed_side_angle, fixed_down_angle, fixed_head_up_angle))
+            {
+                // Закрепляем на подвесе
+                state = FIXED;
+                setY(SIDE_ANGLE, fixed_side_angle);
+                setY(DOWN_ANGLE, fixed_down_angle);
+                setY(HEAD_UP_ANGLE, fixed_head_up_angle);
+                setY(DOWN_ANGLE_VELOCITY, 0.0);
+
+                dYdt[SIDE_ANGLE] = 0.0;
+                dYdt[DOWN_ANGLE] = 0.0;
+                dYdt[HEAD_UP_ANGLE] = 0.0;
+                dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
+            }
+            else
+            {
+                // Рукав стремится к своим углам для закрепления на подвесе
+                dYdt[SIDE_ANGLE] = (fixed_side_angle - Y[SIDE_ANGLE]) * angle_omega;
+                dYdt[DOWN_ANGLE] = (fixed_down_angle - Y[DOWN_ANGLE]) * angle_omega;
+                dYdt[HEAD_UP_ANGLE] = (fixed_head_up_angle - Y[HEAD_UP_ANGLE]) * angle_omega;
+                dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
+            }
+        }
         return;
     }
 
+    // Если должны быть соединены с соседним рукавом, считаем углы к точке соединения
     // Вектор к точке соединения
     dvec3 v = { input_signals[HOSE_INPUT_HEAD_ROOT_COORD_X] - output_signals[HOSE_OUTPUT_ROOT_COORD_X],
                 input_signals[HOSE_INPUT_HEAD_ROOT_COORD_Y] - output_signals[HOSE_OUTPUT_ROOT_COORD_Y],
@@ -286,21 +454,60 @@ void PneumoHose::step(double t, double dt)
                 v_orth.x  * v.x + v_orth.y  * v.y + v_orth.z  * v.z,
                 v_up.x    * v.x + v_up.y    * v.y + v_up.z    * v.z };
     const dvec3 v_unit = normalize(v_hose);
-    side_angle = std::atan2(v_unit.x, v_unit.y);
-    down_angle = std::asin(v_unit.z);
-    head_up_angle = input_signals[HOSE_INPUT_HEAD_ROOT_ANGLE_UP];
-}
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void PneumoHose::ode_system(const state_vector_t &Y,
-                           state_vector_t &dYdt,
-                           double t)
-{
-    (void) Y;
-    (void) dYdt;
-    (void) t;
+    // Угол изгиба соединительной головки считается в модуле соединения
+    double ref_head_up_angle = input_signals[HOSE_INPUT_HEAD_ROOT_ANGLE_UP];
+    // Соединительные головки смыкаются не по оси рукава, нужно чуть развести их
+    // Длина изогнутой части рукава в проекции на линию соединения
+    const double len_mid = std::cos(ref_head_up_angle) * output_signals[HOSE_OUTPUT_LENGTH_MIDDLE];
+    // Добавка к углу, чтобы развести головки на 1 сантиметр влево
+    const double gap_angle = std::asin(side_gap / (len_mid + output_signals[HOSE_OUTPUT_LENGTH_HEAD]));
+    // Углы к точке соединения
+    const double ref_side_angle = std::atan2(v_unit.x, v_unit.y) + gap_angle;
+    const double ref_down_angle = std::asin(v_unit.z);
+
+    if (state == DO_CONNECT)
+    {
+        if (input_signals[HOSE_INPUT_IS_CONNECTED] == 1.0)
+        {
+            // Модуль соединения сообщил об успешном соединении рукавов
+            state = CONNECTED;
+
+            // Сбрасываем управляющий сигнал
+            output_signals[HOSE_OUTPUT_REF_STATE] = 0.0;
+        }
+        else
+        {
+            // Соединительные головки нужно повернуть вверх чтобы соединить
+            ref_head_up_angle += ready_to_connect_head_up_angle;
+
+            if (check_angles_ready(ref_side_angle, ref_down_angle, ref_head_up_angle))
+            {
+                // Все углы повернулись, отправляем команду соединить
+                output_signals[HOSE_OUTPUT_REF_STATE] = 1.0;
+            }
+            else
+            {
+                // Рукав стремится к своим углам для соединения с соседним
+                dYdt[SIDE_ANGLE] = (ref_side_angle - Y[SIDE_ANGLE]) * angle_omega;
+                dYdt[DOWN_ANGLE] = (ref_down_angle - Y[DOWN_ANGLE]) * angle_omega;
+                dYdt[HEAD_UP_ANGLE] = (ref_head_up_angle - Y[HEAD_UP_ANGLE]) * angle_omega;
+                dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
+                return;
+            }
+        }
+    }
+
+    // Рукав следит за точкой соединения с соседним
+    setY(SIDE_ANGLE, ref_side_angle);
+    setY(DOWN_ANGLE, ref_down_angle);
+    setY(HEAD_UP_ANGLE, ref_head_up_angle);
+    setY(DOWN_ANGLE_VELOCITY, 0.0);
+
+    dYdt[SIDE_ANGLE] = 0.0;
+    dYdt[DOWN_ANGLE] = 0.0;
+    dYdt[HEAD_UP_ANGLE] = 0.0;
+    dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -312,14 +519,7 @@ void PneumoHose::load_config(CfgReader &cfg)
 
     cfg.getString(secName, "Name", name);
 
-    double tmp = 1.0;
-    cfg.getDouble(secName, "FlowCoefficient", tmp);
-    output_signals[HOSE_OUTPUT_FLOW_COEFF] = tmp;
+
 
     cfg.getDouble(secName, "K_sound", K_sound);
-/*
-    tmp = 0.71;
-    cfg.getDouble(secName, "Length", tmp);
-    if (tmp > Physics::ZERO)
-        output_signals[HOSE_OUTPUT_LENGTH] = tmp;*/
 }

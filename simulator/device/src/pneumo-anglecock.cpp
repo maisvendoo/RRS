@@ -117,30 +117,6 @@ void PneumoAngleCock::setHoseFlow(double value)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void PneumoAngleCock::setHoseCoord(dvec3 coord)
-{
-    hose_coord = coord;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void PneumoAngleCock::setHoseAngleDown(double value)
-{
-    hose_angle_down = value;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void PneumoAngleCock::setHoseAngleSide(double value)
-{
-    hose_angle_side = value;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 double PneumoAngleCock::getFlowCoeff() const
 {
     if (is_opened)
@@ -166,30 +142,6 @@ double PneumoAngleCock::getPressureToHose() const
     if (is_opened)
         return p;
     return 0.0;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-dvec3 PneumoAngleCock::getHoseCoord() const
-{
-    return hose_coord;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double PneumoAngleCock::getHoseAngleDown() const
-{
-    return hose_angle_down;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-double PneumoAngleCock::getHoseAngleSide() const
-{
-    return hose_angle_side;
 }
 
 //------------------------------------------------------------------------------
@@ -284,15 +236,4 @@ void PneumoAngleCock::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "K_sound", K_sound);
 
     k_max_by_pipe_volume = k_pipe;
-
-    QString coord = "0.0 0.0 0.0";
-    if (cfg.getString(secName, "HoseCoord", coord))
-    {
-        std::istringstream stream(coord.toStdString());
-        stream  >> hose_coord.x
-                >> hose_coord.y
-                >> hose_coord.z;
-    }
-    cfg.getDouble(secName, "HoseAngleDown", hose_angle_down);
-    cfg.getDouble(secName, "HoseAngleSide", hose_angle_side);
 }

@@ -2,7 +2,7 @@
 <Config>
 	<Device>
 		<Name>FL</Name>
-		<Order>0</Order>
+		<Order>4</Order>
 
 		<!-- Коэффициент громкости озвучки к потоку опорожнения магистрали через рукав -->
 		<K_sound>1.5</K_sound>

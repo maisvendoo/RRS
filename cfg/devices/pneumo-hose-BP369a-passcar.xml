@@ -2,7 +2,7 @@
 <Config>
 	<Device>
 		<Name>BPepb</Name>
-		<Order>0</Order>
+		<Order>4</Order>
 
 		<!-- Количество линий управления ЭПТ -->
 		<LinesNum>2</LinesNum>
