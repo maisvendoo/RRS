@@ -67,15 +67,15 @@ float ControlHandler::getSignalValue() const
 {
     if (!animation_signals_map)
     {
-        return 0.0f;
+        return value;
     }
 
-    if (contolledObjectName.isEmpty() || feedback_signals == nullptr)
+    if (animatedObjectName.isEmpty() || feedback_signals == nullptr)
     {
-        return 0.0f;
+        return value;
     }
 
-    auto it = animation_signals_map->find(contolledObjectName);
+    auto it = animation_signals_map->find(animatedObjectName);
 
     if (it != animation_signals_map->end())
     {
@@ -85,10 +85,12 @@ float ControlHandler::getSignalValue() const
         {
             float state = (*feedback_signals)[signal_id];
             return state;
-        }
+        }        
     }
 
-    return 0.0f;
+    // Контролу может и несоотвествовать анимация, тогда возвращаем его собственное
+    // состояние, раз нет обратной связи
+    return value;
 }
 
 //------------------------------------------------------------------------------
@@ -100,7 +102,11 @@ bool ControlHandler::setValueIfChanged(float new_value, float epsilon)
         return false;
 
     value = new_value;
+
     sendControlSignal();
+
+    emit sigOnValueChanged(value);
+
     return true;
 }
 

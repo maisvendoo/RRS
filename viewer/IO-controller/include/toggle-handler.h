@@ -1,12 +1,12 @@
 #ifndef     TOGGLE_HANDLER_H
 #define     TOGGLE_HANDLER_H
 
-#include    <control-handler.h>
+#include    <bistate-handler.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ToggleHandler : public ControlHandler
+class ToggleHandler : public BiStateHandler
 {
 public:
 
@@ -20,6 +20,8 @@ public:
 
     QString getState() const override;
 
+    bool load_config(CfgReader &cfg, QDomNode secNode) override;
+
 private:
 
     void processTumbler(size_t cab_idx, uint16_t control_id,
@@ -27,6 +29,9 @@ private:
 
     void processButton(size_t cab_idx, uint16_t control_id,
                        const std::set<uint16_t>& pressed_keys);
+
+    QString onButton = "LEFT_BUTTON";
+    QString offButton = "RIGHT_BUTTON";
 };
 
 #endif

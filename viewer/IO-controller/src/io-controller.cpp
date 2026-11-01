@@ -166,6 +166,15 @@ bool IOController::load_config(CfgReader &cfg)
         QString object_name = "";
         cfg.getString(secNode, "ObjectName", object_name);
 
+        QString animation_name_cab1 = "";
+        cfg.getString(secNode, "AnimationNameCab1", animation_name_cab1);
+
+        QString animation_name_cab2 = "";
+        cfg.getString(secNode, "AnimationNameCab2", animation_name_cab2);
+
+        QString animation_name = "";
+        cfg.getString(secNode, "AnimationName", animation_name);
+
         if (cfg.getDouble(secNode, "value", value))
         {
             auto &ctrl_handlers = *(control_handlers.end() - 1);
@@ -179,6 +188,15 @@ bool IOController::load_config(CfgReader &cfg)
             else
             {
                 ctrl_handler->contolledObjectName = QString("Empty_Mesh_ID%1").arg(ctrl_handler->id);
+            }
+
+            if (!animation_name.isEmpty())
+            {
+                ctrl_handler->animatedObjectName = animation_name;
+            }
+            else
+            {
+                ctrl_handler->animatedObjectName = ctrl_handler->contolledObjectName;
             }
 
             ctrl_handler->value = value;
@@ -203,6 +221,15 @@ bool IOController::load_config(CfgReader &cfg)
                 ctrl_handler->contolledObjectName = QString("Cab1_Empty_Mesh_ID%1").arg(ctrl_handler->id);
             }
 
+            if (!animation_name_cab1.isEmpty())
+            {
+                ctrl_handler->animatedObjectName = animation_name_cab1;
+            }
+            else
+            {
+                ctrl_handler->animatedObjectName = ctrl_handler->contolledObjectName;
+            }
+
             ctrl_handler->value = value1;
             ctrl_handler->setAnimationSignalsMap(&animation_signals_map);
             control_handlers[0].insert(ctrl_handler->id, ctrl_handler->contolledObjectName, ctrl_handler);
@@ -223,6 +250,15 @@ bool IOController::load_config(CfgReader &cfg)
             else
             {
                 ctrl_handler->contolledObjectName = QString("Cab2_Empty_Mesh_ID%1").arg(ctrl_handler->id);
+            }
+
+            if (!animation_name_cab2.isEmpty())
+            {
+                ctrl_handler->animatedObjectName = animation_name_cab2;
+            }
+            else
+            {
+                ctrl_handler->animatedObjectName = ctrl_handler->contolledObjectName;
             }
 
             ctrl_handler->value = value2;

@@ -48,8 +48,10 @@ public:
     QString keyModOnName = "";
     /// Имя модификатора выключения
     QString keyModOffName = "";
-    /// Имя объекта в 3D-модели
+    /// Имя кликабельного объекта в 3D-модели
     QString contolledObjectName = "";
+    /// Имя анимированного объекта в 3D-модели
+    QString animatedObjectName = "";
     /// Имя контрола
     QString name = "";
     /// Тип контрола
@@ -126,9 +128,14 @@ public:
         sendControlSignal();
     }
 
+    // Сброс контрола, что бы это не значило для конкретного типа
+    virtual void reset() {}
+
 signals:
 
     void sigSendControlCommand(const QByteArray &data);
+
+    void sigOnValueChanged(const float &value);
 
 protected:
 
@@ -218,6 +225,23 @@ protected:
         return 0;
     }
 
+    QString getButtonTooltip(uint32_t buttonCode) const
+    {
+        QString tooltip = "";
+
+        switch (buttonCode)
+        {
+        case CTRL_LEFT_MOUSE_BUTTON: tooltip = "ЛКМ"; break;
+        case CTRL_RIGHT_MOUSE_BUTTON: tooltip = "ПКМ"; break;
+        case CTRL_MIDDLE_MOUSE_BUTTON: tooltip = "СКМ"; break;
+        default:
+
+            tooltip = "Не назначено";
+            break;
+        }
+
+        return tooltip;
+    }
 
     void sendControlSignal();
 };

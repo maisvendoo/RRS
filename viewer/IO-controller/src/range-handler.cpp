@@ -118,30 +118,8 @@ bool RangeHandler::load_config(CfgReader &cfg, QDomNode secNode)
 //------------------------------------------------------------------------------
 QString RangeHandler::getUsage() const
 {
-    QString inc;
-    QString dec;
-
-    switch (getButtonCode(incButtonName))
-    {
-    case CTRL_LEFT_MOUSE_BUTTON: inc = "ЛКМ"; break;
-    case CTRL_RIGHT_MOUSE_BUTTON: inc = "ПКМ"; break;
-    case CTRL_MIDDLE_MOUSE_BUTTON: inc = "СКМ"; break;
-    default:
-
-        inc = "Не назначено";
-        break;
-    }
-
-    switch (getButtonCode(decButtonName))
-    {
-    case CTRL_LEFT_MOUSE_BUTTON: dec = "ЛКМ"; break;
-    case CTRL_RIGHT_MOUSE_BUTTON: dec = "ПКМ"; break;
-    case CTRL_MIDDLE_MOUSE_BUTTON: dec = "СКМ"; break;
-    default:
-
-        dec = "Не назначено";
-        break;
-    }
+    QString inc = getButtonTooltip(getButtonCode(incButtonName));
+    QString dec = getButtonTooltip(getButtonCode(decButtonName));
 
     return QString("Позиция: %1 — увеличение | %2 — уменьшение").arg(inc).arg(dec);
 }
