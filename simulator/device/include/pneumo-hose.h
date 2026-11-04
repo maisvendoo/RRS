@@ -31,7 +31,7 @@ public:
     /// Legacy
     void setKeyModifierDisconnect(std::uint16_t key_modifier);
 
-    /// LegacyLegacy
+    /// Legacy
     void setControl(std::set<uint16_t>* keys = nullptr,
                     control_signals_t* control_signals = nullptr) override;
 
@@ -65,7 +65,7 @@ public:
     /// Задать длину средней части рукава (от точки изгиба в начале до точки изгиба перед соединительной головкой), м
     void setMiddleLength(double value);
 
-    /// Длина жёсткого окончания рукава с соединительной головкой, м
+    /// Задать длину жёсткого окончания рукава с соединительной головкой, м
     void setHeadLength(double value);
 
     /// Задать точку изгиба в начале рукава, в локальных координатах подвижной единицы, м
@@ -143,16 +143,16 @@ protected:
         DOWN_ANGLE,
         HEAD_UP_ANGLE,
         DOWN_ANGLE_VELOCITY,
+        HEAD_UP_ANGLE_ANGLE_VELOCITY,
         NUM_ANGLES
     };
 
     enum State {
-        DO_FIX = 0,
-        FIXED,
-        FREE,
-        CONNECTED,
-        DO_CONNECT,
-        NUM_STATES
+        DO_FIX = 0, ///< Рукав выполняет поворот к подвесу
+        FIXED,      ///< Рукав закреплён на подвесе
+        FREE,       ///< Рукав свободно висит
+        CONNECTED,  ///< Рукав соединён с соседним
+        DO_CONNECT  ///< Рукав выполняет поворот для соединения с соседним
     } state = FREE;
 
     /// Команда разъединить рукава / закрепить рукав на подвесе
@@ -164,7 +164,7 @@ protected:
     bool prev_command_unfix_connect = false;
 
     /// Вектор от точки крепления рукава к точке соединения с соседним рукавом
-    /// // Сохраняем значения для отладки, в релизе можно будет убрать
+    // Сохраняем значения для отладки, в релизе можно будет убрать
     dvec3 v_hose = {0.0, 0.0, 0.0};
 
     /// Вектор поперечной оси подвижной единицы

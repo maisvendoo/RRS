@@ -48,6 +48,7 @@ void JointPneumoHose::stepConnectionCheck()
         ref_connected = true;
         if (sum_command >= 2.0)
         {
+            // Оба рукава готовы соединиться
             is_connected = true;
         }
     }

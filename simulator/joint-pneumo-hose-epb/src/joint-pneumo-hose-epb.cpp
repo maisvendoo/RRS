@@ -48,6 +48,7 @@ void JointPneumoHoseEPB::stepConnectionCheck()
         ref_connected = true;
         if (sum_command >= 2.0)
         {
+            // Оба рукава готовы соединиться
             is_connected = true;
         }
     }
@@ -147,9 +148,6 @@ void JointPneumoHoseEPB::stepFlowEPBCalc()
 
     if (is_connected)
     {
-        devices[FWD]->setInputSignal(HOSE_INPUT_IS_CONNECTED, 1.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_IS_CONNECTED, 1.0);
-
         // Поток через соединённые рукава
         double flow_coeff = min(flow_coeff_fwd, flow_coeff_bwd);
         double flow = flow_coeff * (p_fwd - p_bwd);
@@ -188,9 +186,6 @@ void JointPneumoHoseEPB::stepFlowEPBCalc()
     }
     else
     {
-        devices[FWD]->setInputSignal(HOSE_INPUT_IS_CONNECTED, 0.0);
-        devices[BWD]->setInputSignal(HOSE_INPUT_IS_CONNECTED, 0.0);
-
         // Поток из разъединённых рукавов в атмосферу
         double flow = flow_coeff_fwd * p_fwd;
         devices[FWD]->setInputSignal(HOSE_INPUT_FLOW_TO_PIPE, -flow);

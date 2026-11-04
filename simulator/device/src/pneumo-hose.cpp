@@ -15,7 +15,7 @@ PneumoHose::PneumoHose(QObject *parent) : Device(parent)
     std::fill(input_signals.begin(), input_signals.end(), 0.0);
 
     output_signals.resize(HOSE_SIZE_OF_OUTPUTS);
-    output_signals = {0.0, 0.0, 1.0, 0.435, 0.160, 0.0, 0.0, 0.0};
+    output_signals = {0.0, 0.0, 1.0, 0.435, 0.157, 0.0, 0.0, 0.0};
 }
 
 //------------------------------------------------------------------------------
@@ -90,6 +90,10 @@ void PneumoHose::disconnect()
             // Для разъединения соединительные головки нужно повернуть вверх
             const double new_head_up_angle = getY(HEAD_UP_ANGLE) + ready_to_connect_head_up_angle;
             setY(HEAD_UP_ANGLE, new_head_up_angle);
+
+            // И дополнительный импульс на ещё поворот вверх
+            setY(DOWN_ANGLE_VELOCITY, 0.25);
+            setY(HEAD_UP_ANGLE_ANGLE_VELOCITY, 0.5);
         }
         state = FREE;
     }
@@ -407,10 +411,12 @@ void PneumoHose::ode_system(const state_vector_t &Y,
             // Рукав стремится к своим углам свободного состояния,
             // а угол свешивания считаем с инерцией, для раскачивания
             dYdt[SIDE_ANGLE] = (free_side_angle - Y[SIDE_ANGLE]) * angle_omega;
-            dYdt[DOWN_ANGLE] = dYdt[DOWN_ANGLE_VELOCITY];
-            dYdt[HEAD_UP_ANGLE] = (free_head_up_angle - Y[HEAD_UP_ANGLE]) * angle_omega;
+            dYdt[DOWN_ANGLE] = Y[DOWN_ANGLE_VELOCITY];
+            dYdt[HEAD_UP_ANGLE] = Y[HEAD_UP_ANGLE_ANGLE_VELOCITY];
             dYdt[DOWN_ANGLE_VELOCITY] = down_angle_omega * (free_down_angle - Y[DOWN_ANGLE])
                                         - down_angle_beta * Y[DOWN_ANGLE_VELOCITY];
+            dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = down_angle_omega * (free_head_up_angle - Y[HEAD_UP_ANGLE])
+                                        - down_angle_beta * Y[HEAD_UP_ANGLE_ANGLE_VELOCITY];
             return;
         }
 
@@ -425,11 +431,13 @@ void PneumoHose::ode_system(const state_vector_t &Y,
                 setY(DOWN_ANGLE, fixed_down_angle);
                 setY(HEAD_UP_ANGLE, fixed_head_up_angle);
                 setY(DOWN_ANGLE_VELOCITY, 0.0);
+                setY(HEAD_UP_ANGLE_ANGLE_VELOCITY, 0.0);
 
                 dYdt[SIDE_ANGLE] = 0.0;
                 dYdt[DOWN_ANGLE] = 0.0;
                 dYdt[HEAD_UP_ANGLE] = 0.0;
                 dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
+                dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = 0.0;
             }
             else
             {
@@ -438,6 +446,7 @@ void PneumoHose::ode_system(const state_vector_t &Y,
                 dYdt[DOWN_ANGLE] = (fixed_down_angle - Y[DOWN_ANGLE]) * angle_omega;
                 dYdt[HEAD_UP_ANGLE] = (fixed_head_up_angle - Y[HEAD_UP_ANGLE]) * angle_omega;
                 dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
+                dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = 0.0;
             }
         }
         return;
@@ -493,6 +502,7 @@ void PneumoHose::ode_system(const state_vector_t &Y,
                 dYdt[DOWN_ANGLE] = (ref_down_angle - Y[DOWN_ANGLE]) * angle_omega;
                 dYdt[HEAD_UP_ANGLE] = (ref_head_up_angle - Y[HEAD_UP_ANGLE]) * angle_omega;
                 dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
+                dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = 0.0;
                 return;
             }
         }
@@ -503,11 +513,13 @@ void PneumoHose::ode_system(const state_vector_t &Y,
     setY(DOWN_ANGLE, ref_down_angle);
     setY(HEAD_UP_ANGLE, ref_head_up_angle);
     setY(DOWN_ANGLE_VELOCITY, 0.0);
+    setY(HEAD_UP_ANGLE_ANGLE_VELOCITY, 0.0);
 
     dYdt[SIDE_ANGLE] = 0.0;
     dYdt[DOWN_ANGLE] = 0.0;
     dYdt[HEAD_UP_ANGLE] = 0.0;
     dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
+    dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -521,8 +533,32 @@ void PneumoHose::load_config(CfgReader &cfg)
 
     cfg.getDouble(secName, "K_sound", K_sound);
 
+
+    QString pos = "0.0 0.0 0.0";
+    if (cfg.getString(secName, "StationsTextShift", pos))
+    {
+        std::istringstream stream(pos.toStdString());
+        stream  >> root_pos.x
+                >> root_pos.y
+                >> root_pos.z;
+    }
+
     // Углы задаются в конфигурационном файле в градусах, пересчитываем в радианы
-    double tmp = 0.0;
+    double tmp;
+
+    // Длина средней части рукава (от точки изгиба в начале
+    // до точки изгиба перед соединительной головкой), м
+    if (cfg.getDouble(secName, "MiddleLength", tmp))
+        setMiddleLength(tmp);
+
+    // Несовпадение поверхности смыкания соединительной головки с осью рукава, м
+    if (cfg.getDouble(secName, "HeadLength", tmp))
+        setHeadLength(tmp);
+
+
+    // Существующее конструктивное отклонение рукава от продольной оси
+    if (cfg.getDouble(secName, "ExistingSideAngle", tmp))
+        existing_side_angle = tmp / 180.0 * Physics::PI;
 
     // Существующее конструктивное отклонение рукава от продольной оси
     if (cfg.getDouble(secName, "ExistingSideAngle", tmp))
@@ -539,6 +575,7 @@ void PneumoHose::load_config(CfgReader &cfg)
     // Несовпадение поверхности смыкания соединительной головки с осью рукава, м
     cfg.getDouble(secName, "SideGap", side_gap);
 
+
     // Существующее конструктивное свешивание рукава вниз от продольной оси
     if (cfg.getDouble(secName, "ExistingDownAngle", tmp))
         existing_down_angle = tmp / 180.0 * Physics::PI;
@@ -550,6 +587,7 @@ void PneumoHose::load_config(CfgReader &cfg)
     // Свешивание рукава вниз от продольной оси в закреплённом на подвесе состоянии
     if (cfg.getDouble(secName, "FixedDownAngle", tmp))
         fixed_down_angle = tmp / 180.0 * Physics::PI;
+
 
     // Существующий конструктивный изгиб вверх соединительной головки рукава
     if (cfg.getDouble(secName, "ExistingHeadUpAngle", tmp))
@@ -566,6 +604,7 @@ void PneumoHose::load_config(CfgReader &cfg)
     // Изгиб рукава вверх перед соединительной головкой в состоянии готовности к соединению
     if (cfg.getDouble(secName, "ReadyToConnectHeadUpAngle", tmp))
         ready_to_connect_head_up_angle = tmp / 180.0 * Physics::PI;
+
 
     // Коэффициент к скорости поворотов рукава
     cfg.getDouble(secName, "AngleOmega", angle_omega);
