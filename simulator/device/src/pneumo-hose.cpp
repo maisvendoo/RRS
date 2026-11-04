@@ -409,14 +409,14 @@ void PneumoHose::ode_system(const state_vector_t &Y,
         if (state == FREE)
         {
             // Рукав стремится к своим углам свободного состояния,
-            // а угол свешивания считаем с инерцией, для раскачивания
+            // а углы свешивания считаем с инерцией, для раскачивания
             dYdt[SIDE_ANGLE] = (free_side_angle - Y[SIDE_ANGLE]) * angle_omega;
             dYdt[DOWN_ANGLE] = Y[DOWN_ANGLE_VELOCITY];
             dYdt[HEAD_UP_ANGLE] = Y[HEAD_UP_ANGLE_ANGLE_VELOCITY];
-            dYdt[DOWN_ANGLE_VELOCITY] = down_angle_omega * (free_down_angle - Y[DOWN_ANGLE])
-                                        - down_angle_beta * Y[DOWN_ANGLE_VELOCITY];
-            dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = down_angle_omega * (free_head_up_angle - Y[HEAD_UP_ANGLE])
-                                        - down_angle_beta * Y[HEAD_UP_ANGLE_ANGLE_VELOCITY];
+            dYdt[DOWN_ANGLE_VELOCITY] = free_angle_omega * (free_down_angle - Y[DOWN_ANGLE])
+                                        - free_angle_beta * Y[DOWN_ANGLE_VELOCITY];
+            dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = free_angle_omega * (free_head_up_angle - Y[HEAD_UP_ANGLE])
+                                        - free_angle_beta * Y[HEAD_UP_ANGLE_ANGLE_VELOCITY];
             return;
         }
 
@@ -610,8 +610,8 @@ void PneumoHose::load_config(CfgReader &cfg)
     cfg.getDouble(secName, "AngleOmega", angle_omega);
 
     // Коэффициент к скорости колебаний свешивания рукава в свободном состоянии
-    cfg.getDouble(secName, "DownAngleOmega", down_angle_omega);
+    cfg.getDouble(secName, "FreeAngleOmega", free_angle_omega);
 
     // Коэффициент затухания колебаний свешивания рукава в свободном состоянии
-    cfg.getDouble(secName, "DownAngleBeta", down_angle_beta);
+    cfg.getDouble(secName, "FreeAngleBeta", free_angle_beta);
 }

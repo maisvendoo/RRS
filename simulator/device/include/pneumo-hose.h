@@ -209,9 +209,9 @@ protected:
     /// Коэффициент к скорости поворотов рукава
     double angle_omega = 8.0;
     /// Коэффициент к скорости колебаний свешивания рукава в свободном состоянии
-    double down_angle_omega = 2.0;
+    double free_angle_omega = 8.0;
     /// Коэффициент затухания колебаний свешивания рукава в свободном состоянии
-    double down_angle_beta = 0.5;
+    double free_angle_beta = 1.0;
 
     bool check_angles_ready(double ref_side_angle,
                             double ref_down_angle,
