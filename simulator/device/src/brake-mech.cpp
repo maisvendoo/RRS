@@ -179,24 +179,25 @@ void BrakeMech::preStep(state_vector_t &Y, double t)
         Kcoef = (Y[0] - p_end) / (p_max - p_end);
 
         // с учетом ручного тормоза, выбираем наибольшую силу
-        K = max(Kcoef * Kmax, hb_level * K_hb_max);
-
-        for (size_t i = 0; i < axis_num; ++i)
-        {
-            double v = axis_omega[i] * wheel_r;
-
-            // Вычисляем тормозную силу, получаемую от одной колодки (Н)
-            double shoe_brake_force = K * phi(K, v) * Physics::g * 1000.0;
-
-            // Вычисляем момент на оси колесной пары (Н * м)
-            brake_torque[i] = shoes_per_axis * shoe_brake_force * eff_r;
-        }
+        K = Kcoef * Kmax;
     }
     else
     {
         Kcoef = 0.0;
-        K = 0.0;
-        std::fill(brake_torque.begin(), brake_torque.end(), 0.0);
+        K = 0.0;        
+    }
+
+    for (size_t i = 0; i < axis_num; ++i)
+    {
+        K = max(K, hb_level * K_hb_max);
+
+        double v = axis_omega[i] * wheel_r;
+
+        // Вычисляем тормозную силу, получаемую от одной колодки (Н)
+        double shoe_brake_force = K * phi(K, v) * Physics::g * 1000.0;
+
+        // Вычисляем момент на оси колесной пары (Н * м)
+        brake_torque[i] = shoes_per_axis * shoe_brake_force * eff_r;
     }
 }
 
