@@ -16,6 +16,7 @@
 #include    "model.h"
 #include "rail-signal.h"
 #include "key-symbols.h"
+#include "vehicle-service-command.h"
 
 #include    <algorithm>
 #include    <cmath>
@@ -598,6 +599,72 @@ void Model::slotUpdateTrainTimetable(int train_idx)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Применение сервисной команды меню вагона.
+// Команды приходят по существующему каналу управления с зарезервированными
+// ID (см. common-headers/vehicle-service-command.h), поэтому протокол
+// и интерфейсы SDK не изменяются.
+//------------------------------------------------------------------------------
+static void applyVehicleServiceCommand(Vehicle* vehicle,
+                                       uint16_t id,
+                                       float value)
+{
+    if (vehicle == nullptr)
+    {
+        return;
+    }
+
+    CouplingInteraction& coupling = vehicle->getCouplingInteraction();
+    const bool on = (value > 0.5f);
+
+    switch (static_cast<vehicle_service::Action>(id))
+    {
+    case vehicle_service::ParkingBrake:
+        vehicle->setHandbrake(on);
+        break;
+
+    case vehicle_service::HoseConnectFwd:
+        coupling.connectHose(CouplingInteraction::Fwd);
+        break;
+
+    case vehicle_service::HoseHangFwd:
+        coupling.hangHose(CouplingInteraction::Fwd);
+        break;
+
+    case vehicle_service::HoseConnectBwd:
+        coupling.connectHose(CouplingInteraction::Bwd);
+        break;
+
+    case vehicle_service::HoseHangBwd:
+        coupling.hangHose(CouplingInteraction::Bwd);
+        break;
+
+    case vehicle_service::EndValveFwd:
+        coupling.setEndValve(CouplingInteraction::Fwd, on);
+        break;
+
+    case vehicle_service::EndValveBwd:
+        coupling.setEndValve(CouplingInteraction::Bwd, on);
+        break;
+
+    case vehicle_service::UncoupleFwd:
+        coupling.pullUncoupleLever(CouplingInteraction::Fwd,
+                                   std::abs(vehicle->getVelocity()));
+        break;
+
+    case vehicle_service::UncoupleBwd:
+        coupling.pullUncoupleLever(CouplingInteraction::Bwd,
+                                   std::abs(vehicle->getVelocity()));
+        break;
+
+    default:
+        break;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::slotSetVehicleControlCommand(int vehicle_idx,
                                          int cab_idx,
                                          uint16_t id,
@@ -613,6 +680,14 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx,
 
     if (vehicle != nullptr)
     {
+        // Сервисные команды меню вагона обрабатываются отдельно
+        // и не попадают в карту органов управления кабины
+        if (vehicle_service::isServiceCommand(id))
+        {
+            applyVehicleServiceCommand(vehicle, id, value);
+            return;
+        }
+
         if (!vehicle->control_inputs.empty())
         {
             if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())

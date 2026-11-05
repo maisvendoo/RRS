@@ -1923,6 +1923,21 @@ void Vehicle::integrationPreStep(state_vector_t& Y, const double& t)
     F_fwd = 0.0;
     F_bwd = 0.0;
 
+    // Ручной (стояночный) тормоз: удерживает вагон на месте.
+    // Сила трения направлена против движения, а вблизи нуля
+    // добавляется демпфирование, чтобы вагон не "дрожал".
+    if (handbrake_applied)
+    {
+        const double hold_force = 0.35 * full_mass * Physics::g;
+
+        if (std::abs(velocity) > Physics::ZERO)
+        {
+            F_fwd -= sign(velocity) * hold_force;
+        }
+
+        F_fwd -= velocity * full_mass * 2.0;
+    }
+
     // Аварийное торможение после столкновения с препятствием:
     // тормозящая сила с постоянной времени ~0.5 с
     if (is_collided)
@@ -2070,6 +2085,22 @@ feedback_signals_t& Vehicle::getFeedBackSignals()
 void Vehicle::setBrakeShoesState(bool state)
 {
     is_brake_shoes = state;
+}
+
+//------------------------------------------------------------------------------
+// Ручной (стояночный) тормоз: удерживает вагон на месте
+//------------------------------------------------------------------------------
+void Vehicle::setHandbrake(bool applied)
+{
+    handbrake_applied = applied;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::isHandbrakeApplied() const
+{
+    return handbrake_applied;
 }
 
 //------------------------------------------------------------------------------

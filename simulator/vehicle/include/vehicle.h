@@ -425,6 +425,12 @@ public:
 
     void setBrakeShoesState(bool state);
 
+    /// Управление ручным (стояночным) тормозом
+    void setHandbrake(bool applied);
+
+    /// Состояние ручного (стояночного) тормоза
+    bool isHandbrakeApplied() const;
+
     const std::vector<Autopilot *>& getAutopilot() const
     {
         return autopilot;
@@ -729,6 +735,9 @@ protected:
 
     /// Brake shoes state
     bool is_brake_shoes = false;
+
+    /// Ручной (стояночный) тормоз включён
+    bool handbrake_applied = false;
 
     /// Start autopilot after autostart
     bool auto_start_autopilot = false;

@@ -104,6 +104,14 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool prev_F4 = false;
     bool diagnostics_full_mode = false;
 
+    /// Меню вагона (Num3): сервисные команды текущего вагона
+    bool prev_Num3 = false;
+    bool is_show_car_menu = false;
+    int car_menu_vehicle = -1;
+    bool car_menu_handbrake = false;
+    bool car_menu_end_valve_fwd = false;
+    bool car_menu_end_valve_bwd = false;
+
     bool hud_show_profile = true;
     bool hud_show_timetable = true;
     bool hud_show_trains_list = true;
@@ -201,6 +209,13 @@ private:
 
     /// Диагностика составов (F3/F4)
     void showDiagnostics() const;
+
+    /// Меню вагона (Num3): ручной тормоз, рукава, концевые краны,
+    /// расцепка. Команды уходят на сервер по каналу управления.
+    void showCarMenu() const;
+
+    /// Отправка сервисной команды вагона на сервер
+    void sendCarServiceCommand(std::uint16_t action, float value) const;
 
     /// Предупреждение кассеты регистрации: всплывает
     /// при вставке/извлечении по Ctrl+R ("Запись параметров движения

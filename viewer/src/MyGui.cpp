@@ -16,6 +16,10 @@
 #include "MouseControlHandler.h"
 #include <tcp-client.h>
 
+#include "vehicle-service-command.h"
+
+#include <QDataStream>
+
 #include <vsg/io/Options.h>
 #include <vsg/maths/common.h>
 #include <vsg/maths/vec3.h>
@@ -199,6 +203,18 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     if (params->is_show_diagnostics)
     {
         showDiagnostics();
+    }
+
+    // Меню вагона: Num3 - открыть/закрыть окно сервисных команд
+    if (ImGui::IsKeyPressed(ImGuiKey_Keypad3) && !params->prev_Num3 && !is_modified_key)
+    {
+        params->is_show_car_menu = !params->is_show_car_menu;
+    }
+    params->prev_Num3 = ImGui::IsKeyPressed(ImGuiKey_Keypad3);
+
+    if (params->is_show_car_menu)
+    {
+        showCarMenu();
     }
 
     if (params->vehicles_handler)
@@ -1645,4 +1661,154 @@ float MyGui::hudTopOffset() const
     }
 
     return (top > 0.0f) ? top + 2.0f : 8.0f;
+}
+
+//------------------------------------------------------------------------------
+// Отправка сервисной команды текущего вагона на сервер.
+// Используется существующий канал управления, протокол не меняется.
+//------------------------------------------------------------------------------
+void MyGui::sendCarServiceCommand(uint16_t action, float value) const
+{
+    if ((params->tcp_client == nullptr) || (params->vehicles_handler == nullptr))
+    {
+        return;
+    }
+
+    const int vehicle_idx = params->vehicles_handler->getCurrentVehicleIndex();
+
+    if (vehicle_idx < 0)
+    {
+        return;
+    }
+
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+
+    stream << vehicle_idx;                      // индекс вагона
+    stream << 0;                                // номер кабины
+    stream << action;                           // ID сервисной команды
+    stream << value;                            // 0/1 или величина
+    stream << static_cast<quint32>(0);          // доп. параметров нет
+    stream << static_cast<qint8>(0);            // приоритет
+
+    params->tcp_client->slotSendVehicleControlCommand(data);
+}
+
+//------------------------------------------------------------------------------
+// Меню вагона (Num3): ручной тормоз, рукава, концевые краны, расцепка
+//------------------------------------------------------------------------------
+void MyGui::showCarMenu() const
+{
+    if ((params->vehicles_handler == nullptr) || (params->tcp_client == nullptr))
+    {
+        return;
+    }
+
+    const int count = params->vehicles_handler->getVehiclesCount();
+    const int idx = params->vehicles_handler->getCurrentVehicleIndex();
+
+    ImGui::SetNextWindowSize(ImVec2(380, 360), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Меню вагона", &params->is_show_car_menu))
+    {
+        ImGui::End();
+        return;
+    }
+
+    if ((idx < 0) || (idx >= count))
+    {
+        ImGui::TextUnformatted("Нет выбранного вагона");
+        ImGui::End();
+        return;
+    }
+
+    // При смене вагона сбрасываем локальные отметки состояния
+    if (params->car_menu_vehicle != idx)
+    {
+        params->car_menu_vehicle = idx;
+        params->car_menu_handbrake = false;
+        params->car_menu_end_valve_fwd = false;
+        params->car_menu_end_valve_bwd = false;
+    }
+
+    ImGui::Text("Вагон %d из %d", idx + 1, count);
+    ImGui::Separator();
+
+    // Ручной (стояночный) тормоз
+    if (params->car_menu_handbrake)
+    {
+        if (ImGui::Button("Отпустить ручной тормоз", ImVec2(-1.0f, 0.0f)))
+        {
+            params->car_menu_handbrake = false;
+            sendCarServiceCommand(vehicle_service::ParkingBrake, 0.0f);
+        }
+    }
+    else
+    {
+        if (ImGui::Button("Затормозить вручную", ImVec2(-1.0f, 0.0f)))
+        {
+            params->car_menu_handbrake = true;
+            sendCarServiceCommand(vehicle_service::ParkingBrake, 1.0f);
+        }
+    }
+
+    ImGui::Separator();
+    ImGui::TextUnformatted("Рукава тормозной магистрали");
+
+    if (ImGui::Button("Спереди: соединить"))
+    {
+        sendCarServiceCommand(vehicle_service::HoseConnectFwd, 1.0f);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Спереди: на крюк"))
+    {
+        sendCarServiceCommand(vehicle_service::HoseHangFwd, 1.0f);
+    }
+
+    if (ImGui::Button("Сзади: соединить"))
+    {
+        sendCarServiceCommand(vehicle_service::HoseConnectBwd, 1.0f);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Сзади: на крюк"))
+    {
+        sendCarServiceCommand(vehicle_service::HoseHangBwd, 1.0f);
+    }
+
+    ImGui::Separator();
+    ImGui::TextUnformatted("Концевые краны");
+
+    if (ImGui::Checkbox("Передний кран открыт", &params->car_menu_end_valve_fwd))
+    {
+        sendCarServiceCommand(vehicle_service::EndValveFwd,
+                              params->car_menu_end_valve_fwd ? 1.0f : 0.0f);
+    }
+
+    if (ImGui::Checkbox("Задний кран открыт", &params->car_menu_end_valve_bwd))
+    {
+        sendCarServiceCommand(vehicle_service::EndValveBwd,
+                              params->car_menu_end_valve_bwd ? 1.0f : 0.0f);
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::Button("Расцепить спереди", ImVec2(-1.0f, 0.0f)))
+    {
+        sendCarServiceCommand(vehicle_service::UncoupleFwd, 1.0f);
+    }
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::SetTooltip("Рычаг расцепки срабатывает на малой скорости");
+    }
+
+    if (ImGui::Button("Расцепить сзади", ImVec2(-1.0f, 0.0f)))
+    {
+        sendCarServiceCommand(vehicle_service::UncoupleBwd, 1.0f);
+    }
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::SetTooltip("Рычаг расцепки срабатывает на малой скорости");
+    }
+
+    ImGui::End();
 }
