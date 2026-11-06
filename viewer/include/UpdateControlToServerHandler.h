@@ -26,6 +26,9 @@ public:
 
     void setSpeedFactor(int speed_factor);
 
+    /// Отправить сервисную команду составу (двери и т.п.)
+    void sendServiceCommand(int vehicle_idx, std::uint16_t action, float value);
+
     /// Подавить пересылку управляющих клавиш на сервер (пешая ходьба,
     /// ТЗ "walking": WASD/Space/E управляют игроком, а не поездом).
     /// Включение сбрасывает накопленные нажатия и шлёт пустое управление

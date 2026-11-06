@@ -684,7 +684,17 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx,
         // и не попадают в карту органов управления кабины
         if (vehicle_service::isServiceCommand(id))
         {
-            applyVehicleServiceCommand(vehicle, id, value);
+            // Двери управляются составом целиком, по кнопкам кабины
+            if (vehicle_service::isTrainDoorCommand(id))
+            {
+                applyTrainDoorCommand(vehicle->getTrainIndex(),
+                                      id == vehicle_service::DoorsOpen);
+            }
+            else
+            {
+                applyVehicleServiceCommand(vehicle, id, value);
+            }
+
             return;
         }
 
@@ -1737,6 +1747,20 @@ void Model::stepLoadingOperations(double dt)
         if (!conductors.isEnabled() || !conductors.hasConductors())
             continue;
 
+        // Ручное управление дверями из кабины: проводник не вмешивается
+        if (train->isDoorsManual())
+        {
+            // Состав тронулся - ручной режим дверей отключается
+            if (std::abs(train->getVelocity()) > 0.5)
+            {
+                train->setDoorsManual(false);
+            }
+            else
+            {
+                continue;
+            }
+        }
+
         const bool stopped = std::abs(train->getVelocity()) <= 0.3;
 
         // Зона станции: любой пассажирский вагон состава стоит в зоне
@@ -1852,6 +1876,82 @@ void Model::stepLoadingOperations(double dt)
         }
     }
 
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Model::applyTrainDoorCommand(int train_idx, bool open)
+{
+    // Сервисные звуковые события дверей (продолжение диапазона
+    // SoundEventType, чтобы не менять установленный заголовок SDK)
+    static constexpr quint8 SoundDoorOpen  = 10;
+    static constexpr quint8 SoundDoorClose = 11;
+
+    if ((train_idx < 0) || (train_idx >= static_cast<int>(trains.size())))
+    {
+        return;
+    }
+
+    Train* train = trains[static_cast<size_t>(train_idx)];
+
+    if (train == nullptr)
+    {
+        return;
+    }
+
+    // Открывать двери можно только у остановившегося состава
+    const double train_velocity = train->getVelocity();
+
+    if (open && (std::abs(train_velocity) > 0.3))
+    {
+        Journal::instance()->error(QString(
+            "[DOORS] Train #%1: doors open command rejected - "
+            "train is moving (%2 km/h)")
+            .arg(train->getTrainIndex())
+            .arg(std::abs(train_velocity) * 3.6, 0, 'f', 1));
+
+        return;
+    }
+
+    // Ручное управление дверями отключает проводника
+    train->setDoorsManual(true);
+
+    for (Vehicle* vehicle : *(train->getVehicles()))
+    {
+        if (vehicle == nullptr)
+        {
+            continue;
+        }
+
+        // Двери есть только у пассажирских вагонов
+        if (!vehicle->getPassengers().isConfigured())
+        {
+            continue;
+        }
+
+        vehicle->getPassengers().setDoorsOpen(open);
+
+        // Звуковое событие у каждой пассажирской ПЕ
+        const dvec3& pos = vehicle->getProfilePoint()->position;
+
+        SoundEvent ev;
+        ev.type = static_cast<SoundEventType>(open ? SoundDoorOpen
+                                                   : SoundDoorClose);
+        ev.x = pos.x;
+        ev.y = pos.y;
+        ev.z = pos.z;
+        ev.intensity = 0.6;
+        ev.rate_hz = 0.0;
+        ev.vehicle_idx = vehicle->getModelIndex();
+
+        sound_events.push_back(ev);
+    }
+
+    Journal::instance()->info(QString(
+        "[DOORS] Train #%1: doors %2 by cab button")
+        .arg(train->getTrainIndex())
+        .arg(open ? "opened" : "closed"));
 }
 
 //------------------------------------------------------------------------------

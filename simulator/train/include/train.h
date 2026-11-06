@@ -120,6 +120,10 @@ public:
     /// Текущая сводка продольной динамики
     LongitudinalStats getLongitudinalStats() const;
 
+    /// Ручное управление дверями из кабины (проводник не управляет)
+    void setDoorsManual(bool manual);
+    bool isDoorsManual() const;
+
     /// Снимок диагностики для экранов машиниста: данные из реальных физических систем
     struct VehicleDiagnostics
     {
@@ -228,6 +232,9 @@ private:
 
     /// No air flag (for empty air system on start)
     bool        no_air = false;
+
+    /// Ручное управление дверями из кабины (проводник не управляет)
+    bool        doors_manual = false;
 
     /// Initial main reservoir pressure
     double      init_main_res_pressure = 0.0;

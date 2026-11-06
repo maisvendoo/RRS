@@ -18,6 +18,7 @@
 #include "settings.h"
 
 #include <collision-world-loader.h>
+#include <vehicle-service-command.h>
 
 #include <filesystem.h>
 #include <Logger.h>
@@ -336,6 +337,22 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
     if (keyPress.keyBase == vsg::KEY_Pause)
     {
         setPause();
+        return;
+    }
+
+    // Y/U - открыть/закрыть пассажирские двери состава по горячей клавише
+    if (!isCtrl() && !isShift() && !isAlt() &&
+        ((keyPress.keyBase == vsg::KEY_Y) ||
+         (keyPress.keyBase == vsg::KEY_U)))
+    {
+        const int vehicle_idx = _vehicles_handler->getCurrentVehicleIndex();
+
+        _upd_server_control->sendServiceCommand(
+            vehicle_idx,
+            (keyPress.keyBase == vsg::KEY_Y) ? vehicle_service::DoorsOpen
+                                             : vehicle_service::DoorsClose,
+            1.0f);
+
         return;
     }
 

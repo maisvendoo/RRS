@@ -5,6 +5,9 @@
 #include <Logger.h>
 //#include "Logger.h"
 #include "tcp-client.h"
+
+#include <QByteArray>
+#include <QDataStream>
 #include "key-symbols.h"
 #include "controlled-struct.h"
 #include <cstddef>
@@ -107,6 +110,31 @@ void UpdateControlToServerHandler::setNeedDebugMsg(bool is_needed)
 void UpdateControlToServerHandler::setSpeedFactor(int speed_factor)
 {
     _tcp_client->sendSimSpeedCommand(speed_factor);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateControlToServerHandler::sendServiceCommand(int vehicle_idx,
+                                                      std::uint16_t action,
+                                                      float value)
+{
+    if ((_tcp_client == nullptr) || (vehicle_idx < 0))
+    {
+        return;
+    }
+
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+
+    stream << vehicle_idx;                      // индекс вагона
+    stream << 0;                                // индекс кабины
+    stream << action;                           // ID сервисной команды
+    stream << value;                            // значение
+    stream << static_cast<quint32>(0);          // число параметров
+    stream << static_cast<qint8>(0);            // приоритет
+
+    _tcp_client->slotSendVehicleControlCommand(data);
 }
 
 //------------------------------------------------------------------------------

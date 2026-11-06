@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 // Число типов физических звуковых событий (SoundEventType)
 //------------------------------------------------------------------------------
-static constexpr size_t SOUND_EVENT_TYPES_COUNT = 10;
+static constexpr size_t SOUND_EVENT_TYPES_COUNT = 12;
 
 //------------------------------------------------------------------------------
 // Имена секций конфигурации sound-events.conf по типу события
@@ -25,7 +25,9 @@ static const char* sound_event_type_names[SOUND_EVENT_TYPES_COUNT] =
     "SandFlow",         // Поток песка
     "WheelSlip",        // Боксование/юз
     "JointImpact",      // Стук на стыке
-    "BrakeSqueal"       // Свист колодок
+    "BrakeSqueal",      // Свист колодок
+    "DoorOpen",         // Открытие пассажирских дверей
+    "DoorClose"         // Закрытие пассажирских дверей
 };
 
 //------------------------------------------------------------------------------
@@ -43,7 +45,9 @@ static const char* sound_event_default_files[SOUND_EVENT_TYPES_COUNT] =
     "vl60/compr.wav",         // SandFlow - шипение
     "vl60/brake_scr.wav",     // WheelSlip - визг
     "vl60/254-chelk.wav",     // JointImpact - стук стыка
-    "vl60/brake_scr.wav"      // BrakeSqueal - свист
+    "vl60/brake_scr.wav",     // BrakeSqueal - свист
+    "pass/door_open.wav",     // DoorOpen - открытие дверей
+    "pass/door_close.wav"     // DoorClose - закрытие дверей
 };
 
 //------------------------------------------------------------------------------
