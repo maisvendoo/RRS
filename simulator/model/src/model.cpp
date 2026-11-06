@@ -680,6 +680,13 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx,
 
     if (vehicle != nullptr)
     {
+        // Любая команда управления будит статичный состав
+        const size_t train_idx = vehicle->getTrainIndex();
+        if ((train_idx < trains.size()) && (trains[train_idx] != nullptr))
+        {
+            trains[train_idx]->wakeUp();
+        }
+
         // Сервисные команды меню вагона обрабатываются отдельно
         // и не попадают в карту органов управления кабины
         if (vehicle_service::isServiceCommand(id))
@@ -871,8 +878,21 @@ void Model::findNearestVehicles()
                                               .arg(fd.from_head ? "head" : "tail")
                                               .arg(train_idx)
                                               .arg(is_train_head ? "head" : "tail"));
+                // Скорость сближения до сцепки: медленная сцепка делает состав
+                // управляемым (Player), толчок на скорости - свободным (Loose)
+                const double relative_speed =
+                        std::abs(trains[fd.train_idx]->getVelocity() - train->getVelocity());
+                const bool is_push = relative_speed > 0.5;
+
                 // Новый сцеп
                 trains[fd.train_idx]->couple(current_distance, fd.from_head, is_train_head, train);
+                trains[fd.train_idx]->setState(is_push ? Train::State::Loose
+                                                       : Train::State::Player);
+                Journal::instance()->info(QString(
+                    "[STATIC] Train #%1 after coupling: %2 (relative speed %3 m/s)")
+                    .arg(trains[fd.train_idx]->getTrainIndex())
+                    .arg(is_push ? "LOOSE" : "PLAYER")
+                    .arg(relative_speed, 0, 'f', 2));
                 // Сбрасываем имя поезда
                 trains[fd.train_idx]->setName("");
 
@@ -1899,6 +1919,9 @@ void Model::applyTrainDoorCommand(int train_idx, bool open)
     {
         return;
     }
+
+    // Команда дверей будит статичный состав
+    train->wakeUp();
 
     // Открывать двери можно только у остановившегося состава
     const double train_velocity = train->getVelocity();
@@ -3200,12 +3223,42 @@ void Model::slotGetVehicleControlByKeyboard(QByteArray control_data, int client_
     // пришёл при подключении - переживает перезагрузки управления
     c.tab_number = client_tabs.value(client_id, -1);
 
+    int prev_train_idx = -1;
+
     if (controlled_clients.contains(client_id))
     {
         c.prev_vehicle_controlled = controlled_clients[client_id].vehicle_control_by_keyboard.controlled_vehicle;
         c.prev_cab_controlled = controlled_clients[client_id].vehicle_control_by_keyboard.controlled_cabine_idx;
+
+        const int prev_veh = c.prev_vehicle_controlled;
+        if ((prev_veh >= 0) && (prev_veh < static_cast<int>(vehicles.size())) &&
+            (vehicles[prev_veh] != nullptr))
+        {
+            prev_train_idx = static_cast<int>(vehicles[prev_veh]->getTrainIndex());
+        }
     }
     controlled_clients.insert(client_id, c);
+
+    // Игрок у пульта удерживает состав активным, даже если он долго стоит
+    const int new_veh = c.vehicle_control_by_keyboard.controlled_vehicle;
+    if ((new_veh >= 0) && (new_veh < static_cast<int>(vehicles.size())) &&
+        (vehicles[new_veh] != nullptr))
+    {
+        const int new_train_idx = static_cast<int>(vehicles[new_veh]->getTrainIndex());
+
+        if ((prev_train_idx >= 0) && (prev_train_idx != new_train_idx) &&
+            (prev_train_idx < static_cast<int>(trains.size())) &&
+            (trains[prev_train_idx] != nullptr))
+        {
+            trains[prev_train_idx]->setPlayerControlled(false);
+        }
+
+        if ((new_train_idx >= 0) && (new_train_idx < static_cast<int>(trains.size())) &&
+            (trains[new_train_idx] != nullptr))
+        {
+            trains[new_train_idx]->setPlayerControlled(true);
+        }
+    }
 
     QString keys_str = "";
     for (auto k : c.vehicle_control_by_keyboard.pressed_keys)
@@ -3285,6 +3338,13 @@ void Model::slotResetVehicleControlByKeyboard(int client_id)
             hanging.emergency = false;
 
             hanging_clients.insert(client_id, hanging);
+
+            // Клиент больше не управляет составом - разрешаем ему заснуть
+            const size_t train_idx = vehicles[veh_idx]->getTrainIndex();
+            if ((train_idx < trains.size()) && (trains[train_idx] != nullptr))
+            {
+                trains[train_idx]->setPlayerControlled(false);
+            }
 
             Journal::instance()->warning(QString("Client #%1 (tab %2) lost connection: vehicle #%3 is frozen, emergency brake in %4 s")
                                              .arg(client_id)

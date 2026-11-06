@@ -487,6 +487,10 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
 
     // Состав изменился: пересоздаём проводников по новым вагонам
     attachConductors();
+
+    // После сцепки состав снова активен: сцепка "будит" статичный поезд
+    state.store(State::Player);
+    standstill_time = 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -586,6 +590,10 @@ Train* Train::uncouple(double uncoupling_distance)
             // Параметры проводников (секция [Conductor]) переносим
             // в отделившийся состав
             new_train->getConductors().copyConfig(conductors);
+
+            // Отцепленный состав свободен (LOOSE), пока его не возьмут под управление
+            new_train->state.store(State::Loose);
+            new_train->player_controlled.store(false);
             return new_train;
         }
 
@@ -783,6 +791,68 @@ bool Train::isDoorsManual() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+Train::State Train::getState() const
+{
+    return state.load();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::setState(State new_state)
+{
+    state.store(new_state);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::isStatic() const
+{
+    return state.load() == State::Static;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::isLoose() const
+{
+    return state.load() == State::Loose;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::setPlayerControlled(bool controlled)
+{
+    player_controlled.store(controlled);
+
+    if (controlled)
+    {
+        wakeUp();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::isPlayerControlled() const
+{
+    return player_controlled.load();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::wakeUp()
+{
+    state.store(State::Player);
+    standstill_time = 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double Train::getVelocity() const
 {
     if (vehicles.size() == 2)
@@ -873,6 +943,57 @@ void Train::setTopology(Topology* topology)
 //------------------------------------------------------------------------------
 void Train::slotStep(const simulator_time_t& current_time, const double& integration_time)
 {
+    // Статичный состав не участвует в симуляции, но должен сообщить о завершении шага
+    if (state.load() == State::Static)
+    {
+        emit stepDone(train_idx);
+        return;
+    }
+
+    // Стоящий состав без машиниста засыпает через 30 с непрерывного стояния
+    if (!player_controlled.load() && (std::abs(getVelocity()) < 0.3))
+    {
+        const double idle_time = standstill_time.load() + integration_time;
+        standstill_time.store(idle_time);
+
+        if (idle_time >= 30.0)
+        {
+            // Обнуляем скорости, чтобы состав не дрейфовал после пробуждения
+            for (Vehicle* vehicle : vehicles)
+            {
+                size_t idx = vehicle->getStateIndex();
+                size_t s = vehicle->getDegressOfFreedom();
+
+                for (size_t j = 0; j < s; ++j)
+                {
+                    if (idx + s + j < y.size())
+                    {
+                        y[idx + s + j] = 0.0;
+                    }
+
+                    if (idx + s + j < dydt.size())
+                    {
+                        dydt[idx + s + j] = 0.0;
+                    }
+                }
+            }
+
+            lod_step_accum = 0.0;
+            state.store(State::Static);
+
+            Journal::instance()->info(QString("Train #%1 is STATIC after %2 s standstill")
+                                          .arg(train_idx)
+                                          .arg(standstill_time.load(), 0, 'f', 1));
+
+            emit stepDone(train_idx);
+            return;
+        }
+    }
+    else
+    {
+        standstill_time = 0.0;
+    }
+
     auto begin = vehicles.begin();
     auto end = vehicles.end();
     Vehicle* first = *begin;

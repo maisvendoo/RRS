@@ -31,6 +31,7 @@
 
 #include    <QByteArray>
 
+#include    <atomic>
 #include    <deque>
 
 #if defined(TRAIN_LIB)
@@ -123,6 +124,26 @@ public:
     /// Ручное управление дверями из кабины (проводник не управляет)
     void setDoorsManual(bool manual);
     bool isDoorsManual() const;
+
+    /// Состояние состава: управляемый, статичный (спит) или свободный
+    enum class State
+    {
+        Player,
+        Static,
+        Loose
+    };
+
+    State getState() const;
+    void setState(State state);
+    bool isStatic() const;
+    bool isLoose() const;
+
+    /// Признак того, что составом управляет игрок (не засыпает)
+    void setPlayerControlled(bool controlled);
+    bool isPlayerControlled() const;
+
+    /// Разбудить состав и вернуть его в управляемое состояние
+    void wakeUp();
 
     /// Снимок диагностики для экранов машиниста: данные из реальных физических систем
     struct VehicleDiagnostics
@@ -235,6 +256,15 @@ private:
 
     /// Ручное управление дверями из кабины (проводник не управляет)
     bool        doors_manual = false;
+
+    /// Текущее состояние состава (Player/Static/Loose)
+    std::atomic<State> state{State::Player};
+
+    /// Признак управления составом игроком
+    std::atomic<bool>  player_controlled{false};
+
+    /// Время непрерывного стояния без управления, с
+    std::atomic<double> standstill_time{0.0};
 
     /// Initial main reservoir pressure
     double      init_main_res_pressure = 0.0;
