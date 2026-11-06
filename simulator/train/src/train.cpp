@@ -1162,6 +1162,24 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
                 *(vehicle->getProfilePoint()) = vc.getPosition();
                 vehicle->syncCollisionPose();
 
+                // Удар в тупик: координата вышла за конец топологии.
+                // Учитываем только движение в сторону упора.
+                if (vc.isAtDeadEnd() && !vehicle->isDerailed())
+                {
+                    const double v = vehicle->getVelocity();
+                    const double traj_v = (vc.getOrientation() == BWD) ? -v : v;
+                    const double overflow = vc.getDeadEndOverflow();
+                    const bool into_buffer =
+                        (overflow > 0.0 && traj_v > 0.0) ||
+                        (overflow < 0.0 && traj_v < 0.0);
+
+                    if (into_buffer && std::abs(v) > 0.5)
+                    {
+                        const double energy = 0.5 * vehicle->getMass() * v * v;
+                        vehicle->getDerailment().applyDeadEndImpact(energy);
+                    }
+                }
+
                 // Накопление тоннажа на путь (износ рельсов):
                 // пропущенная масса медленно растит неровности участка
                 if (std::abs(vehicle->getVelocity()) > 0.05)

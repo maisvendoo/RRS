@@ -3,6 +3,8 @@
 
 #include    <QObject>
 
+#include    <cmath>
+
 #include    <topology-defines.h>
 #include    <topology-export.h>
 #include    <profile-point.h>
@@ -51,6 +53,18 @@ public:
 
     /// Вернуть структуру, определяющую положение ПЕ в пространстве
     profile_point_t getPosition();
+
+    /// ПЕ упёрлась в тупик (координата вышла за конец топологии)
+    bool isAtDeadEnd() const
+    {
+        return std::abs(x_off) > 1.0e-3;
+    }
+
+    /// Величина выхода за тупик, м (знак - сторона)
+    double getDeadEndOverflow() const
+    {
+        return x_off;
+    }
 
     /// Вертикальное смещение рельса от неровностей пути в точке
     /// абсолютной траекторной координаты path_coord (0 - начало текущей

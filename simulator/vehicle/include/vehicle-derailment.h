@@ -131,6 +131,9 @@ public:
                             double ox, double oy, double oz,
                             double o_len);
 
+    /// Удар в тупиковый упор: сход при достаточной энергии
+    void applyDeadEndImpact(double energy);
+
     /// Дополнительное удельное сопротивление после схода (доля от веса)
     double getResistanceCoefficient() const;
 

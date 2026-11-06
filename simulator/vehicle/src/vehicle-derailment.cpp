@@ -370,6 +370,37 @@ double VehicleDerailment::getRollAngle() const
 }
 
 //------------------------------------------------------------------------------
+// Удар в тупиковый упор: продольная энергия переходит в сход.
+// Порог отсекает медленное подталкивание к упору.
+//------------------------------------------------------------------------------
+void VehicleDerailment::applyDeadEndImpact(double energy)
+{
+    if (state == State::VehicleDerailed)
+        return;
+
+    constexpr double ENERGY_THRESHOLD = 50.0e3; // Дж
+
+    if (energy < ENERGY_THRESHOLD)
+        return;
+
+    state = State::VehicleDerailed;
+
+    // При сильном ударе кузов валится на бок; визуальный крен
+    // раскручивается в stepRollover, чтобы не было телепорта
+    if (rollover_state < RolloverState::Partial)
+    {
+        rollover_state = (energy > 500.0e3) ? RolloverState::Full
+                                            : RolloverState::Partial;
+        roll_direction = 1.0;
+    }
+
+    Journal::instance()->critical(QString(
+        "[DERAILMENT] Vehicle #%1 hit dead-end buffer, energy %2 kJ")
+        .arg(static_cast<int>(vehicle_idx))
+        .arg(energy / 1000.0, 0, 'f', 1));
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 VehicleDerailment::SurfaceType VehicleDerailment::getSurfaceType() const
