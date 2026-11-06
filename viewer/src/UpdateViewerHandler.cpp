@@ -134,7 +134,7 @@ UpdateViewerHandler::UpdateViewerHandler(
     _follow_manipulator = new CameraFollowManipulator(_keyboard, _camera, _settings);
 
     // Пешая камера: физика игрока (параметры [Player] из settings.xml),
-    // мир коллизий подгружается лениво при первом входе (F7)
+    // мир коллизий подгружается лениво при первом входе (F8)
     _walk_world = std::make_unique<collision::CollisionWorld>();
     _walk_manipulator = new CameraWalkManipulator(_keyboard, _camera, _settings,
                                                   _player, _walk_world.get());
@@ -489,21 +489,41 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         }
     }
 
-    // Управление F-клавишами только без Shift и Ctrl
-    if (!isCtrl() && !isShift())
+    // Shift+F5/F6 - следящие камеры (F5/F6 отданы панелям РТС)
+    if (isShift() && !isCtrl() && !isAlt())
+    {
+        if (keyPress.keyBase == vsg::KEY_F5)
+        {
+            _current_manipulator = _follow_manipulator;
+            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+            _current_manipulator->resetView();
+            return;
+        }
+
+        if (keyPress.keyBase == vsg::KEY_F6)
+        {
+            _current_manipulator = _follow_manipulator;
+            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+            _current_manipulator->returnView();
+            return;
+        }
+    }
+
+    // Управление F-клавишами только без Shift, Ctrl и Alt
+    if (!isCtrl() && !isShift() && !isAlt())
     {
         switch (keyPress.keyBase)
         {
-            // F7 - пешая камера: включить пешей режим (1-е лицо) /
+            // F8 - пешая камера: включить пешей режим (1-е лицо) /
             // вернуть прежнюю камеру. Вход/выход из локомотива -
             // Ctrl+Enter (из кабины - к двери; в пешем - наведением
             // на дверь). 3-е лицо доступно только с места машиниста
-            // (F1/Shift+F3/F5/F6)
-            case vsg::KEY_F7:
+            // (F1/Shift+F3/Shift+F5/Shift+F6)
+            case vsg::KEY_F8:
             {
                 if (_current_manipulator == _walk_manipulator)
                 {
-                    // Внутри локомотива F7 не выбрасывает: выход -
+                    // Внутри локомотива F8 не выбрасывает: выход -
                     // спрыгнуть у двери или Ctrl+Enter из кабины
                     if (_inside_vehicle >= 0)
                     {
@@ -553,24 +573,6 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
                 _current_manipulator = _cabine_manipulator;
                 _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
                 _current_manipulator->resetView();
-                return;
-            }
-
-            // F5 - следящая камера справа по ходу поезда
-            case vsg::KEY_F5:
-            {
-                _current_manipulator = _follow_manipulator;
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->resetView(); // Камера справа инициализируется в resetView
-                return;
-            }
-
-            // F6 - следящая камера слева по ходу поезда
-            case vsg::KEY_F6:
-            {
-                _current_manipulator = _follow_manipulator;
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->returnView(); // Камера слева инициализируется в returnView
                 return;
             }
 
@@ -1528,7 +1530,7 @@ void UpdateViewerHandler::exitInterior()
 
 
 //------------------------------------------------------------------------------
-// F7 из кабины: встать с кресла пешком внутрь кабины (ходьба по ПЕ)
+// F8 из кабины: встать с кресла пешком внутрь кабины (ходьба по ПЕ)
 //------------------------------------------------------------------------------
 void UpdateViewerHandler::standUpInsideCabine()
 {
@@ -1576,7 +1578,7 @@ void UpdateViewerHandler::standUpInsideCabine()
 }
 
 //------------------------------------------------------------------------------
-// Подсказка вместо действия (F7 внутри локомотива)
+// Подсказка вместо действия (F8 внутри локомотива)
 //------------------------------------------------------------------------------
 void UpdateViewerHandler::context_hint_walk()
 {

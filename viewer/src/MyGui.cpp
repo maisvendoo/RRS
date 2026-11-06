@@ -13,6 +13,8 @@
 #include "UpdateViewerHandler.h"
 #include "StationsHandler.h"
 #include "TrainLabelsHandler.h"
+#include "TrafficLightsHandler.h"
+#include "TrafficLight.h"
 #include "MouseControlHandler.h"
 #include <tcp-client.h>
 
@@ -31,6 +33,7 @@
 #include <vsgImGui/imgui.h>
 
 #include <algorithm>
+#include <cmath>
 
 #define IMGUI_ENABLE_STD_STRING
 
@@ -104,6 +107,8 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
                            ImGui::IsKeyPressed(ImGuiKey_LeftAlt) ||
                            ImGui::IsKeyPressed(ImGuiKey_RightAlt);
 
+    ImGuiIO &io = ImGui::GetIO();
+
     // Статус вьювера
     if (!params->status.isEmpty())
     {
@@ -146,42 +151,97 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         showSettings();
     }
 
-    // Отображение диалога переименования поезда
-    if (ImGui::IsKeyPressed(ImGuiKey_F8) && !params->prev_F8 && !is_modified_key)
+    // F8: Ctrl+F8 - переименование поезда, Alt+F8 - HUD.
+    // Обычный F8 - режим машиниста пешком (обрабатывает UpdateViewerHandler).
+    const bool f8_pressed = ImGui::IsKeyPressed(ImGuiKey_F8);
+    if (f8_pressed && !params->prev_F8)
     {
-        params->is_show_trane_rename_dialog = !params->is_show_trane_rename_dialog;
+        if (io.KeyCtrl)
+        {
+            params->is_show_trane_rename_dialog = !params->is_show_trane_rename_dialog;
+        }
+        else if (io.KeyAlt)
+        {
+            params->is_show_HUD = !params->is_show_HUD;
+        }
     }
-    params->prev_F8 = ImGui::IsKeyPressed(ImGuiKey_F8);
+    params->prev_F8 = f8_pressed;
 
     if (params->is_show_trane_rename_dialog)
     {
         showTrainRenameDialog();
     }
 
-    // Отображение HUD
-    if (ImGui::IsKeyPressed(ImGuiKey_F7) && !params->prev_F7 && !is_modified_key)
+    // F5 - информация о вагоне (листание по составу),
+    // Ctrl+F5 - ограничения скорости
+    const bool f5_pressed = ImGui::IsKeyPressed(ImGuiKey_F5);
+    if (f5_pressed && !params->prev_F5)
     {
-        params->is_show_HUD = !params->is_show_HUD;
-
-        // При глобальном скрытии HUD прячем подписи станций вне зависимости
-        // от состояния кнопки; при показе возвращаем согласно кнопке
-        if (params->stations_handler)
+        if (io.KeyCtrl)
         {
-            params->stations_handler->setVisible(
-                params->is_show_HUD && params->hud_show_stations);
+            params->is_show_speed_limits = !params->is_show_speed_limits;
         }
-        if (params->train_labels_handler)
+        else if (!io.KeyShift && !io.KeyAlt)
         {
-            params->train_labels_handler->setVisible(
-                params->is_show_HUD && params->hud_show_train_labels);
+            if (!params->is_show_car_info)
+            {
+                params->is_show_car_info = true;
+                params->car_info_page = 0;
+            }
+            else
+            {
+                ++params->car_info_page;
+            }
         }
     }
-    params->prev_F7 = ImGui::IsKeyPressed(ImGuiKey_F7);
+    params->prev_F5 = f5_pressed;
+
+    // F6 - станции впереди
+    const bool f6_pressed = ImGui::IsKeyPressed(ImGuiKey_F6);
+    if (f6_pressed && !params->prev_F6 && !io.KeyCtrl && !io.KeyShift && !io.KeyAlt)
+    {
+        params->is_show_stations_panel = !params->is_show_stations_panel;
+    }
+    params->prev_F6 = f6_pressed;
+
+    // F7 - подписи станций/поездов, Ctrl+F7 - светофоры
+    const bool f7_pressed = ImGui::IsKeyPressed(ImGuiKey_F7);
+    if (f7_pressed && !params->prev_F7)
+    {
+        if (io.KeyCtrl)
+        {
+            params->is_show_signal_panel = !params->is_show_signal_panel;
+        }
+        else if (!is_modified_key)
+        {
+            params->is_show_labels = !params->is_show_labels;
+        }
+    }
+    params->prev_F7 = f7_pressed;
 
     if (params->is_show_HUD)
     {
         showHUD();
     }
+
+    if (params->is_show_car_info)
+    {
+        showCarInfoPanel();
+    }
+    if (params->is_show_speed_limits)
+    {
+        showSpeedLimitsPanel();
+    }
+    if (params->is_show_stations_panel)
+    {
+        showStationsPanel();
+    }
+    if (params->is_show_signal_panel)
+    {
+        showSignalsPanel();
+    }
+
+    applyWorldLabels();
 
     // Подсказка органа кабины под курсором (Alt удерживается)
 
@@ -236,13 +296,21 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
             check_date_time();
         }
 
-        // Отображение дебаг-строки подвижного состава
-        if (ImGui::IsKeyPressed(ImGuiKey_F9) && !params->prev_F9)
+        // F9 - дебаг-строка подвижного состава, Ctrl+F9 - язык интерфейса
+        const bool f9_pressed = ImGui::IsKeyPressed(ImGuiKey_F9);
+        if (f9_pressed && !params->prev_F9)
         {
-            params->is_show_debug_msg = !params->is_show_debug_msg;
-            params->controls_handler->setNeedDebugMsg(params->is_show_debug_msg);
+            if (io.KeyCtrl)
+            {
+                params->use_english = !params->use_english;
+            }
+            else if (!is_modified_key)
+            {
+                params->is_show_debug_msg = !params->is_show_debug_msg;
+                params->controls_handler->setNeedDebugMsg(params->is_show_debug_msg);
+            }
         }
-        params->prev_F9 = ImGui::IsKeyPressed(ImGuiKey_F9);
+        params->prev_F9 = f9_pressed;
 
         // Строка нажмите Enter для управления
         if (params->vehicles_handler)
@@ -433,6 +501,21 @@ void MyGui::showStatistics() const
 void MyGui::showSettings() const
 {
     ImGui::Begin("Light settings");
+
+    int language = params->use_english ? 1 : 0;
+    const char* language_items[] = { u8"Русский", "English" };
+    if (ImGui::Combo(u8"Язык / Language", &language, language_items, 2))
+    {
+        params->use_english = (language == 1);
+    }
+
+    ImGui::TextWrapped("%s", tr(u8"F5 - вагон, Ctrl+F5 - ограничения, F6 - станции, "
+                                 u8"F7 - подписи, Ctrl+F7 - светофоры, F8 - пешком, "
+                                 u8"Alt+F8 - HUD, Ctrl+F8 - переименование",
+                                 "F5 - car, Ctrl+F5 - limits, F6 - stations, "
+                                 "F7 - labels, Ctrl+F7 - signals, F8 - walk, "
+                                 "Alt+F8 - HUD, Ctrl+F8 - rename").toUtf8().constData());
+    ImGui::Separator();
 
     if (params->sim_time)
     {
@@ -1117,9 +1200,495 @@ void MyGui::showTrainRenameDialog() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QString MyGui::tr(const char* ru, const char* en) const
+{
+    return QString::fromUtf8(params->use_english ? en : ru);
+}
+
+//------------------------------------------------------------------------------
+// Информация о вагоне (F5), листается по составу
+//------------------------------------------------------------------------------
+void MyGui::showCarInfoPanel() const
+{
+    bool open = params->is_show_car_info;
+    QByteArray title = tr(u8"Информация о вагоне", "Car information").toUtf8();
+
+    ImGui::SetNextWindowSize(ImVec2(460, 380), ImGuiCond_FirstUseEver);
+
+    if (ImGui::Begin(title.constData(), &open))
+    {
+        if (params->vehicles_handler == nullptr)
+        {
+            ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+        }
+        else
+        {
+            const auto& trains = params->vehicles_handler->getTrainsInfo();
+            const int train_idx = params->vehicles_handler->getCurrentTrainIndex();
+            const auto diag = params->vehicles_handler->getDiagnostics();
+
+            if (train_idx < 0 || train_idx >= static_cast<int>(trains.size()))
+            {
+                ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+            }
+            else
+            {
+                const int lo = std::min(trains[train_idx].first_vehicle_id,
+                                        trains[train_idx].last_vehicle_id);
+                const int hi = std::max(trains[train_idx].first_vehicle_id,
+                                        trains[train_idx].last_vehicle_id);
+
+                std::vector<const simulator_vehicle_diagnostics_t*> cars;
+                for (const auto& v : diag.vehicles)
+                {
+                    if (v.vehicle_idx >= lo && v.vehicle_idx <= hi)
+                    {
+                        cars.push_back(&v);
+                    }
+                }
+
+                std::sort(cars.begin(), cars.end(),
+                          [](const auto* a, const auto* b)
+                {
+                    return a->vehicle_idx < b->vehicle_idx;
+                });
+
+                if (cars.empty())
+                {
+                    ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+                }
+                else
+                {
+                    int page = params->car_info_page % static_cast<int>(cars.size());
+                    if (page < 0)
+                    {
+                        page += static_cast<int>(cars.size());
+                    }
+
+                    const auto* car = cars[page];
+
+                    ImGui::Text("%s: %s",
+                                tr(u8"Поезд", "Train").toUtf8().constData(),
+                                trains[train_idx].train_name.toUtf8().constData());
+                    ImGui::Text("%s: %d / %d",
+                                tr(u8"Вагон", "Car").toUtf8().constData(),
+                                page + 1,
+                                static_cast<int>(cars.size()));
+
+                    QString cfg_name;
+                    const auto& info = params->vehicles_handler->getVehiclesInfo().vehicles;
+                    if (car->vehicle_idx >= 0
+                        && car->vehicle_idx < static_cast<int>(info.size()))
+                    {
+                        cfg_name = info[car->vehicle_idx].vehicle_config_file;
+                        cfg_name = cfg_name.section('/', -1).section('\\', -1);
+                        if (cfg_name.endsWith(".xml", Qt::CaseInsensitive))
+                        {
+                            cfg_name.chop(4);
+                        }
+                    }
+
+                    if (!cfg_name.isEmpty())
+                    {
+                        ImGui::Text("%s: %s",
+                                    tr(u8"Модель", "Model").toUtf8().constData(),
+                                    cfg_name.toUtf8().constData());
+                    }
+
+                    ImGui::Separator();
+                    ImGui::Text("%s: %.2f %s",
+                                tr(u8"Масса", "Mass").toUtf8().constData(),
+                                car->mass_t,
+                                tr(u8"т", "t").toUtf8().constData());
+                    ImGui::Text("%s: %.1f %s",
+                                tr(u8"Скорость", "Speed").toUtf8().constData(),
+                                car->speed_kmh,
+                                tr(u8"км/ч", "km/h").toUtf8().constData());
+                    ImGui::Text("%s: %.0f %s",
+                                tr(u8"Пикетаж", "Railway coordinate").toUtf8().constData(),
+                                car->rail_coord_m,
+                                tr(u8"м", "m").toUtf8().constData());
+                    ImGui::Text("%s: %.1f %s",
+                                tr(u8"Уклон", "Gradient").toUtf8().constData(),
+                                car->inclination,
+                                tr(u8"тыс.", "thousandths").toUtf8().constData());
+
+                    ImGui::Separator();
+                    ImGui::Text("%s: %s",
+                                tr(u8"Сход", "Derailed").toUtf8().constData(),
+                                car->derailed ? tr(u8"да", "yes").toUtf8().constData()
+                                              : tr(u8"нет", "no").toUtf8().constData());
+                    ImGui::Text("%s: %s / %s",
+                                tr(u8"Сцеплен", "Coupled").toUtf8().constData(),
+                                car->coupled_fwd ? tr(u8"спереди", "front").toUtf8().constData()
+                                                 : tr(u8"нет", "no").toUtf8().constData(),
+                                car->coupled_bwd ? tr(u8"сзади", "rear").toUtf8().constData()
+                                                 : tr(u8"нет", "no").toUtf8().constData());
+                    ImGui::Text("%s: %.0f%% / %.0f%%",
+                                tr(u8"Кузов/тележка", "Body/bogie").toUtf8().constData(),
+                                car->body_damage * 100.0f,
+                                car->bogie_damage * 100.0f);
+                    ImGui::Text("%s: %.0f%%",
+                                tr(u8"Тормоза", "Brakes").toUtf8().constData(),
+                                car->brake_efficiency * 100.0f);
+                    ImGui::Text("%s: %.0f C",
+                                tr(u8"Температура колодок", "Shoe temperature").toUtf8().constData(),
+                                car->shoe_temperature);
+
+                    ImGui::Separator();
+                    if (ImGui::Button("<<"))
+                    {
+                        --params->car_info_page;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(">>"))
+                    {
+                        ++params->car_info_page;
+                    }
+                    ImGui::SameLine();
+                    ImGui::TextUnformatted(tr(u8"F5 - следующий вагон",
+                                              "F5 - next car").toUtf8().constData());
+                }
+            }
+        }
+    }
+
+    ImGui::End();
+    params->is_show_car_info = open;
+}
+
+//------------------------------------------------------------------------------
+// Ограничения скорости (Ctrl+F5)
+//------------------------------------------------------------------------------
+void MyGui::showSpeedLimitsPanel() const
+{
+    bool open = params->is_show_speed_limits;
+    QByteArray title = tr(u8"Ограничения скорости", "Speed limits").toUtf8();
+
+    ImGui::SetNextWindowSize(ImVec2(430, 360), ImGuiCond_FirstUseEver);
+
+    if (ImGui::Begin(title.constData(), &open))
+    {
+        if (params->vehicles_handler == nullptr)
+        {
+            ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+        }
+        else
+        {
+            simulator_train_profile_update_t profile;
+            const int train_idx = params->vehicles_handler->getCurrentTrainIndex();
+
+            if (!params->vehicles_handler->getTrainProfile(train_idx, profile))
+            {
+                ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+            }
+            else
+            {
+                const float dir = (profile.direction < 0) ? -1.0f : 1.0f;
+
+                float nearest_point = 1.0e9f;
+                float railway_coord = 0.0f;
+                for (const auto& point : profile.profile)
+                {
+                    const float d = std::fabs(point.distance);
+                    if (d < nearest_point)
+                    {
+                        nearest_point = d;
+                        railway_coord = point.railway_coord;
+                    }
+                }
+
+                bool has_limit = false;
+                float current_limit = 0.0f;
+                for (const auto& limit : profile.speed_limits)
+                {
+                    const bool covers_train =
+                        (limit.distance <= 0.0f && limit.end_distance >= 0.0f) ||
+                        (limit.end_distance <= 0.0f && limit.distance >= 0.0f);
+
+                    if (covers_train)
+                    {
+                        if (!has_limit || limit.speed_kmh < current_limit)
+                        {
+                            current_limit = limit.speed_kmh;
+                            has_limit = true;
+                        }
+                    }
+                }
+
+                if (!has_limit)
+                {
+                    float next_distance = 1.0e9f;
+                    for (const auto& limit : profile.speed_limits)
+                    {
+                        const float d = limit.distance * dir;
+                        if (d >= -1.0f && d < next_distance)
+                        {
+                            next_distance = d;
+                            current_limit = limit.speed_kmh;
+                            has_limit = true;
+                        }
+                    }
+                }
+
+                ImGui::Text("%s: %.1f %s",
+                            tr(u8"Скорость", "Speed").toUtf8().constData(),
+                            profile.speed * 3.6f,
+                            tr(u8"км/ч", "km/h").toUtf8().constData());
+                ImGui::Text("%s: %.0f %s",
+                            tr(u8"Пикетаж", "Railway coordinate").toUtf8().constData(),
+                            railway_coord,
+                            tr(u8"м", "m").toUtf8().constData());
+                ImGui::Text("%s: %s",
+                            tr(u8"Текущее ограничение", "Current limit").toUtf8().constData(),
+                            has_limit ? QString::number(current_limit, 'f', 1).toUtf8().constData()
+                                      : tr(u8"нет данных", "no data").toUtf8().constData());
+
+                ImGui::Separator();
+                ImGui::TextUnformatted(tr(u8"Впереди:", "Ahead:").toUtf8().constData());
+
+                std::vector<const simulator_train_profile_speed_limit_t*> ahead;
+                for (const auto& limit : profile.speed_limits)
+                {
+                    const float d = limit.distance * dir;
+                    if (d > 1.0f)
+                    {
+                        ahead.push_back(&limit);
+                    }
+                }
+
+                std::sort(ahead.begin(), ahead.end(),
+                          [dir](const auto* a, const auto* b)
+                {
+                    return a->distance * dir < b->distance * dir;
+                });
+
+                if (ahead.empty())
+                {
+                    ImGui::TextUnformatted(tr(u8"нет данных", "no data").toUtf8().constData());
+                }
+                else
+                {
+                    const size_t count = std::min<size_t>(ahead.size(), 8);
+                    for (size_t i = 0; i < count; ++i)
+                    {
+                        const float d = ahead[i]->distance * dir;
+                        ImGui::Text("+%.0f %s  %.0f %s",
+                                    d,
+                                    tr(u8"м", "m").toUtf8().constData(),
+                                    ahead[i]->speed_kmh,
+                                    tr(u8"км/ч", "km/h").toUtf8().constData());
+                    }
+                }
+            }
+        }
+    }
+
+    ImGui::End();
+    params->is_show_speed_limits = open;
+}
+
+//------------------------------------------------------------------------------
+// Станции впереди (F6)
+//------------------------------------------------------------------------------
+void MyGui::showStationsPanel() const
+{
+    bool open = params->is_show_stations_panel;
+    QByteArray title = tr(u8"Станции впереди", "Stations ahead").toUtf8();
+
+    ImGui::SetNextWindowSize(ImVec2(420, 320), ImGuiCond_FirstUseEver);
+
+    if (ImGui::Begin(title.constData(), &open))
+    {
+        if (params->vehicles_handler == nullptr)
+        {
+            ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+        }
+        else
+        {
+            simulator_train_profile_update_t profile;
+            const int train_idx = params->vehicles_handler->getCurrentTrainIndex();
+
+            if (!params->vehicles_handler->getTrainProfile(train_idx, profile))
+            {
+                ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+            }
+            else
+            {
+                const float dir = (profile.direction < 0) ? -1.0f : 1.0f;
+
+                std::vector<const simulator_train_profile_station_t*> ahead;
+                for (const auto& station : profile.stations)
+                {
+                    if (station.distance * dir >= -1.0f)
+                    {
+                        ahead.push_back(&station);
+                    }
+                }
+
+                std::sort(ahead.begin(), ahead.end(),
+                          [dir](const auto* a, const auto* b)
+                {
+                    return a->distance * dir < b->distance * dir;
+                });
+
+                if (ahead.empty())
+                {
+                    ImGui::TextUnformatted(tr(u8"нет данных", "no data").toUtf8().constData());
+                }
+                else
+                {
+                    const size_t count = std::min<size_t>(ahead.size(), 12);
+                    for (size_t i = 0; i < count; ++i)
+                    {
+                        const float d = ahead[i]->distance * dir;
+                        if (d < 1.0f)
+                        {
+                            ImGui::Text("%s: %s",
+                                        tr(u8"Сейчас", "Now").toUtf8().constData(),
+                                        ahead[i]->name.toUtf8().constData());
+                        }
+                        else
+                        {
+                            ImGui::Text("+%.0f %s  %s",
+                                        d,
+                                        tr(u8"м", "m").toUtf8().constData(),
+                                        ahead[i]->name.toUtf8().constData());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    ImGui::End();
+    params->is_show_stations_panel = open;
+}
+
+//------------------------------------------------------------------------------
+// Светофоры впереди (Ctrl+F7)
+//------------------------------------------------------------------------------
+void MyGui::showSignalsPanel() const
+{
+    bool open = params->is_show_signal_panel;
+    QByteArray title = tr(u8"Светофоры впереди", "Signals ahead").toUtf8();
+
+    ImGui::SetNextWindowSize(ImVec2(440, 320), ImGuiCond_FirstUseEver);
+
+    if (ImGui::Begin(title.constData(), &open))
+    {
+        if (params->vehicles_handler == nullptr)
+        {
+            ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+        }
+        else
+        {
+            simulator_train_profile_update_t profile;
+            const int train_idx = params->vehicles_handler->getCurrentTrainIndex();
+
+            if (!params->vehicles_handler->getTrainProfile(train_idx, profile))
+            {
+                ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+            }
+            else
+            {
+                const float dir = (profile.direction < 0) ? -1.0f : 1.0f;
+
+                std::vector<const simulator_train_profile_signal_t*> ahead;
+                for (const auto& signal : profile.signal_list)
+                {
+                    if (signal.distance * dir >= -1.0f)
+                    {
+                        ahead.push_back(&signal);
+                    }
+                }
+
+                std::sort(ahead.begin(), ahead.end(),
+                          [dir](const auto* a, const auto* b)
+                {
+                    return a->distance * dir < b->distance * dir;
+                });
+
+                if (ahead.empty())
+                {
+                    ImGui::TextUnformatted(tr(u8"нет данных", "no data").toUtf8().constData());
+                }
+                else
+                {
+                    const size_t count = std::min<size_t>(ahead.size(), 12);
+                    for (size_t i = 0; i < count; ++i)
+                    {
+                        const auto* signal = ahead[i];
+                        const float d = signal->distance * dir;
+
+                        QString name = signal->connector_name;
+                        if (params->traffic_lights_handler != nullptr)
+                        {
+                            const TrafficLight* light =
+                                params->traffic_lights_handler->findSignal(
+                                    signal->connector_name, signal->signal_dir);
+                            if (light != nullptr && !light->getLetter().isEmpty())
+                            {
+                                name = light->getLetter();
+                            }
+                        }
+
+                        const QByteArray name_utf8 = name.toUtf8();
+                        if (d < 1.0f)
+                        {
+                            ImGui::Text("%s: %s%s",
+                                        tr(u8"Сейчас", "Now").toUtf8().constData(),
+                                        name_utf8.constData(),
+                                        signal->is_oncoming
+                                            ? tr(u8" (встречный)", " (oncoming)").toUtf8().constData()
+                                            : "");
+                        }
+                        else
+                        {
+                            ImGui::Text("+%.0f %s  %s%s",
+                                        d,
+                                        tr(u8"м", "m").toUtf8().constData(),
+                                        name_utf8.constData(),
+                                        signal->is_oncoming
+                                            ? tr(u8" (встречный)", " (oncoming)").toUtf8().constData()
+                                            : "");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    ImGui::End();
+    params->is_show_signal_panel = open;
+}
+
+//------------------------------------------------------------------------------
+// Подписи станций и поездов (F7)
+//------------------------------------------------------------------------------
+void MyGui::applyWorldLabels() const
+{
+    if (params->stations_handler)
+    {
+        params->stations_handler->setVisible(
+            params->is_show_labels && params->hud_show_stations);
+    }
+
+    if (params->train_labels_handler)
+    {
+        params->train_labels_handler->setVisible(
+            params->is_show_labels && params->hud_show_train_labels);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MyGui::showPauseState() const
 {
-    QString text = QString("ПAУЗА\nДля возобновления игры нажмите Pause");
+    QString text = params->use_english
+        ? QString::fromUtf8(u8"PAUSED\nPress Pause to resume")
+        : QString::fromUtf8(u8"ПАУЗА\nДля возобновления игры нажмите Pause");
 
     ImGuiIO &io = ImGui::GetIO();
     ImVec2 content_size = io.DisplaySize;
@@ -1207,7 +1776,7 @@ void MyGui::showHUD() const
     ImGui::PushID("hud_profile");
     if (params->hud_show_profile)
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
-    if (ImGui::Button(u8"Профиль", ImVec2(btn_w, btn_h)))
+    if (ImGui::Button(tr(u8"Профиль", "Profile").toUtf8().constData(), ImVec2(btn_w, btn_h)))
         params->hud_show_profile = !params->hud_show_profile;
     if (params->hud_show_profile)
         ImGui::PopStyleColor();
@@ -1229,7 +1798,7 @@ void MyGui::showHUD() const
     {
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
     }
-    if (ImGui::Button(u8"График", ImVec2(btn_w, btn_h)) && has_timetable)
+    if (ImGui::Button(tr(u8"График", "Timetable").toUtf8().constData(), ImVec2(btn_w, btn_h)) && has_timetable)
         params->hud_show_timetable = !params->hud_show_timetable;
     if (!has_timetable)
     {
@@ -1249,7 +1818,7 @@ void MyGui::showHUD() const
     ImGui::PushID("hud_list");
     if (params->hud_show_trains_list)
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
-    if (ImGui::Button(u8"Поезда", ImVec2(btn_w, btn_h)))
+    if (ImGui::Button(tr(u8"Поезда", "Trains").toUtf8().constData(), ImVec2(btn_w, btn_h)))
         params->hud_show_trains_list = !params->hud_show_trains_list;
     if (params->hud_show_trains_list)
         ImGui::PopStyleColor();
@@ -1271,10 +1840,9 @@ void MyGui::showHUD() const
     {
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
     }
-    if (ImGui::Button(u8"Станции", ImVec2(btn_w, btn_h)) && has_stations)
+    if (ImGui::Button(tr(u8"Станции", "Stations").toUtf8().constData(), ImVec2(btn_w, btn_h)) && has_stations)
     {
         params->hud_show_stations = !params->hud_show_stations;
-        params->stations_handler->setVisible(params->hud_show_stations);
     }
     if (!has_stations)
     {
@@ -1304,10 +1872,9 @@ void MyGui::showHUD() const
     {
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
     }
-    if (ImGui::Button(u8"Номера поездов", ImVec2(last_btn_w, btn_h)) && has_train_labels)
+    if (ImGui::Button(tr(u8"Номера поездов", "Train labels").toUtf8().constData(), ImVec2(last_btn_w, btn_h)) && has_train_labels)
     {
         params->hud_show_train_labels = !params->hud_show_train_labels;
-        params->train_labels_handler->setVisible(params->hud_show_train_labels);
     }
     if (!has_train_labels)
     {

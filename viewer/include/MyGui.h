@@ -97,6 +97,18 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool prev_F7 = false;
     bool is_show_HUD = false;
 
+    /// Панели РТС: F5 - вагон, Ctrl+F5 - ограничения,
+    /// F6 - станции, F7 - подписи, Ctrl+F7 - светофоры
+    bool prev_F5 = false;
+    bool prev_F6 = false;
+    bool is_show_car_info = false;
+    bool is_show_speed_limits = false;
+    bool is_show_stations_panel = false;
+    bool is_show_signal_panel = false;
+    bool is_show_labels = false;
+    int car_info_page = 0;
+    bool use_english = false;
+
     /// Флаги видимости виджетов HUD
     /// Окно диагностики составов: F3 - вкл/выкл, F4 - свёрнутый/полный режим
     bool prev_F3 = false;
@@ -241,6 +253,18 @@ private:
     void showTrainRenameDialog() const;
 
     void showPauseState() const;
+
+    /// Информационные панели в духе РТС
+    void showCarInfoPanel() const;
+    void showSpeedLimitsPanel() const;
+    void showStationsPanel() const;
+    void showSignalsPanel() const;
+
+    /// Показ подписей станций и поездов по F7
+    void applyWorldLabels() const;
+
+    /// Строка интерфейса на русском или английском
+    QString tr(const char* ru, const char* en) const;
 
     void showHUD() const;
 
