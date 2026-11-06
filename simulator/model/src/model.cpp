@@ -2317,15 +2317,34 @@ void Model::prepareFeedBack(bool need_trains_feedback)
     {
         profile_point_t *pp = vehicle->getProfilePoint();
 
-        update_pos_data.vehicles[i].position_x = pp->position.x;
-        update_pos_data.vehicles[i].position_y = pp->position.y;
-        update_pos_data.vehicles[i].position_z = pp->position.z;
+        dvec3 pos = pp->position;
+        dvec3 up = pp->up;
+
+        // Визуальный крен кузова после схода: поворот вектора "вверх"
+        // вокруг продольной оси пути и смещение центра кузова
+        const double roll_angle = vehicle->getDerailment().getRollAngle();
+        if (std::abs(roll_angle) > 1.0e-4)
+        {
+            const dvec3 axis = normalize(pp->orth);
+            const double c = std::cos(roll_angle);
+            const double s = std::sin(roll_angle);
+
+            up = normalize(up * c + cross(axis, up) * s +
+                           axis * dot(axis, up) * (1.0 - c));
+
+            const dvec3 right = normalize(pp->right);
+            pos += right * (0.9 * s) + pp->up * (0.9 * (1.0 - c));
+        }
+
+        update_pos_data.vehicles[i].position_x = pos.x;
+        update_pos_data.vehicles[i].position_y = pos.y;
+        update_pos_data.vehicles[i].position_z = pos.z;
         update_pos_data.vehicles[i].orth_x = pp->orth.x;
         update_pos_data.vehicles[i].orth_y = pp->orth.y;
         update_pos_data.vehicles[i].orth_z = pp->orth.z;
-        update_pos_data.vehicles[i].up_x = pp->up.x;
-        update_pos_data.vehicles[i].up_y = pp->up.y;
-        update_pos_data.vehicles[i].up_z = pp->up.z;
+        update_pos_data.vehicles[i].up_x = up.x;
+        update_pos_data.vehicles[i].up_y = up.y;
+        update_pos_data.vehicles[i].up_z = up.z;
 
         // Реакция камеры от физики:
         // смещение/наклон головы машиниста для кабельной камеры клиента

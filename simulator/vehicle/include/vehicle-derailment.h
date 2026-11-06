@@ -100,6 +100,9 @@ public:
     /// Полное опрокидывание
     bool isRollover() const;
 
+    /// Угол визуального крена кузова, рад (0 - на рельсах)
+    double getRollAngle() const;
+
     /// Тип поверхности движения после схода
     SurfaceType getSurfaceType() const;
     void setSurfaceType(SurfaceType surface);
@@ -173,6 +176,12 @@ private:
 
     /// Время устойчивого превышения предела опрокидывания, с
     double rollover_timer = 0.0;
+
+    /// Визуальный крен кузова, рад (знак - сторона опрокидывания)
+    double roll_angle = 0.0;
+
+    /// Направление крена: +1 или -1
+    double roll_direction = 1.0;
 
     /// Тип поверхности после схода
     SurfaceType surface = SurfaceType::Sleepers;

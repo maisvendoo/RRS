@@ -251,9 +251,6 @@ void VehicleDerailment::stepRollover(double dt, double velocity,
 {
     last_velocity = velocity;
 
-    // Частота ударов о шпалы при движении после схода (для звука/VFX)
-    // рассчитывается из шага шпал и скорости
-
     // Физический критерий опрокидывания: боковое ускорение на плече
     // центра масс против силы тяжести на плече колеи (ТЗ, п.10):
     // опрокидывание при a_lat * h_cm > g * arm
@@ -263,12 +260,36 @@ void VehicleDerailment::stepRollover(double dt, double velocity,
 
     const double margin = (capacity - demand) / capacity;
 
+    // Кузов валится в сторону, противоположную боковому ускорению
+    // (центростремительное ускорение - внутрь кривой)
+    if (std::abs(roll_angle) < 1.0e-4 && std::abs(lateral_accel) > 0.05)
+    {
+        roll_direction = (lateral_accel >= 0.0) ? -1.0 : 1.0;
+    }
+
+    auto move_roll = [this, dt](double target)
+    {
+        constexpr double rate = 0.6; // рад/с
+        const double signed_target = target * roll_direction;
+        const double step = rate * dt;
+
+        if (roll_angle < signed_target)
+        {
+            roll_angle = std::min(roll_angle + step, signed_target);
+        }
+        else
+        {
+            roll_angle = std::max(roll_angle - step, signed_target);
+        }
+    };
+
     if (!isDerailed() && rollover_state < RolloverState::Partial)
     {
         // На рельсах оцениваем только предупреждение
         rollover_state = (margin < 0.15) ? RolloverState::Warning
                                          : RolloverState::None;
         rollover_timer = 0.0;
+        move_roll(0.0);
         return;
     }
 
@@ -287,24 +308,39 @@ void VehicleDerailment::stepRollover(double dt, double velocity,
                     "[DERAILMENT] Vehicle #%1 ROLLED OVER")
                     .arg(static_cast<int>(vehicle_idx)));
             }
+
+            move_roll(1.45);
         }
         else
         {
             rollover_state = RolloverState::Partial;
+            move_roll(0.35);
         }
     }
     else if (margin < 0.15)
     {
         rollover_state = RolloverState::Warning;
         rollover_timer = 0.0;
+        move_roll(0.0);
     }
     else
     {
-        // Частичное опрокидывание обратимо до полного
+        // Частичное опрокидывание необратимо до полного, если ПЕ
+        // уже сошла с рельсов; на рельсах сбрасываем только предупреждение
         if (rollover_state == RolloverState::Warning)
         {
             rollover_state = RolloverState::None;
+            move_roll(0.0);
         }
+        else if (rollover_state == RolloverState::Partial)
+        {
+            move_roll(0.35);
+        }
+        else if (rollover_state == RolloverState::Full)
+        {
+            move_roll(1.45);
+        }
+
         rollover_timer = 0.0;
     }
 }
@@ -323,6 +359,14 @@ VehicleDerailment::RolloverState VehicleDerailment::getRolloverState() const
 bool VehicleDerailment::isRollover() const
 {
     return rollover_state == RolloverState::Full;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double VehicleDerailment::getRollAngle() const
+{
+    return roll_angle;
 }
 
 //------------------------------------------------------------------------------
@@ -398,6 +442,8 @@ void VehicleDerailment::reset()
     forced_unload_timer = 0.0;
     rollover_state = RolloverState::None;
     rollover_timer = 0.0;
+    roll_angle = 0.0;
+    roll_direction = 1.0;
     surface = SurfaceType::Sleepers;
     std::fill(axle_overload_timer.begin(), axle_overload_timer.end(), 0.0);
     std::fill(derailed_axles.begin(), derailed_axles.end(), false);
