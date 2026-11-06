@@ -2909,9 +2909,19 @@ void Model::stepCassette(double dt)
     const double mr = telemetry.mainReservoirPressure(controlled);
     frame.main_reservoir_pressure = (mr > 0.0) ? mr * MPA_TO_KGS_CM2 : 0.0;
 
-    // Электрические каналы
-    frame.overhead_voltage = controlled->isPantographRaised()
-            ? 25000.0 : 0.0;
+    // Электрические каналы: реальное напряжение КС под током
+    // (провал от нагрузки секции и расстояния до подстанции)
+    frame.overhead_voltage = 0.0;
+
+    if (controlled->isPantographRaised() &&
+        controlled->isPantographContactOk() &&
+        controlled->getCatenaryFeedActive())
+    {
+        const auto feed = controlled->getOverheadFeed(
+                    controlled->getEnergy().getCurrent());
+
+        frame.overhead_voltage = feed.powered ? feed.voltage : 0.0;
+    }
 
     // Ток ТЭД: реальный Ia моторов от аддона; без источника -
     // линейный ток из энергомера (P/U)
@@ -2985,6 +2995,30 @@ void Model::process()
     count_trains_done_its_step = 0;
 
     double integration_time = static_cast<double>(integration_time_interval) / 1000.0;
+
+    // Нагрузки КС по секциям и подстанциям: собираем токи всех ПЕ,
+    // затем тепловая модель провода решает, пережигать ли провод
+    {
+        catenary_system.beginLoadFrame();
+
+        for (auto vehicle : vehicles)
+        {
+            if (!vehicle->isPantographRaised() ||
+                !vehicle->isPantographContactOk() ||
+                !vehicle->getCatenaryFeedActive())
+            {
+                continue;
+            }
+
+            const double current =
+                std::max(0.0, vehicle->getEnergy().getCurrent());
+            const double coord = vehicle->getProfilePoint()->railway_coord;
+
+            catenary_system.addSectionLoad(coord, current);
+        }
+
+        catenary_system.step(integration_time);
+    }
 
     topology->step(sim_time.simulation_seconds, integration_time);
 

@@ -175,8 +175,17 @@ void VL60pk::stepPantographsControl(const double& t, const double& dt)
     {
         const auto feed = getOverheadFeed(getEnergy().getCurrent());
 
+        // Род тока под этим электровозом определяется секцией КС
+        const int kind = (feed.type == catenary::SystemType::DC3kV) ? 0 : 1;
+        setCurrentKind(kind);
+
+        for (auto pant : pantographs)
+        {
+            pant->setCurrentKindIn(kind);
+        }
+
         Uks = feed.powered ? feed.voltage : 0.0;
-        setPantographContactOk(true);
+        setPantographContactOk(feed.powered);
     }
     else
     {

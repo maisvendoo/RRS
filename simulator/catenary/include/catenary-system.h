@@ -22,7 +22,8 @@
 #include    <QString>
 
 #include    <cstddef>
-#include <vector>
+#include    <mutex>
+#include    <vector>
 
 namespace catenary
 {
@@ -56,6 +57,9 @@ struct Substation
     /// Приём рекуперации (обратная энергия в сеть/смежных потребителей)
     bool regen_reception = false;
     double max_regen_power = 0.0;   ///< Вт, приём подстанцией
+
+    /// Суммарный ток потребителей подстанции на текущем шаге, А
+    double load_current = 0.0;
 };
 
 /// Секция контактной сети
@@ -67,6 +71,15 @@ struct Section
     Phase phase = Phase::None;
     QString substation_id = "";
     bool switched_on = true;
+
+    /// Суммарный ток потребителей секции на текущем шаге, А
+    double load_current = 0.0;
+
+    /// Накопленный перегруз провода, А*с
+    double overload_heat = 0.0;
+
+    /// Провод пережжён: секция отключена до восстановления
+    bool burned = false;
 };
 
 /// Нейтральная вставка
@@ -106,6 +119,15 @@ public:
     /// Предел тока подстанции, питающей точку, А
     double getCurrentLimit(double railway_coord) const;
 
+    /// Начать кадр сбора нагрузок (обнулить токи секций)
+    void beginLoadFrame();
+
+    /// Добавить ток потребителя в секцию по пикетажу, А
+    void addSectionLoad(double railway_coord, double current_a);
+
+    /// Шаг тепловой модели провода и подстанций
+    void step(double dt);
+
     /// Отключить/включить секцию (диспетчер, повреждение)
     void setSectionSwitched(double railway_coord, bool on);
 
@@ -123,6 +145,16 @@ private:
 
     /// Удельное сопротивление тяговой сети, Ом/км (усреднённо)
     double network_resistance = 0.12;
+
+    /// Порог пережога провода, А*с (перегруз * время)
+    double burn_heat_threshold = 90000.0;
+
+    /// Скорость охлаждения провода, А*с/с
+    double cooling_rate = 100.0;
+
+    /// Защита данных: getFeedState вызывается из потоков поездов,
+    /// а нагрузки и тепловой шаг считает поток модели
+    mutable std::mutex mutex_;
 };
 
 } // namespace catenary

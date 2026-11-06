@@ -7,6 +7,7 @@
 #include    "catenary-system.h"
 
 #include    <CfgReader.h>
+#include    <Journal.h>
 
 #include    <algorithm>
 #include    <cmath>
@@ -48,6 +49,8 @@ Phase phaseFromString(const QString& text)
 //------------------------------------------------------------------------------
 void CatenarySystem::load(const QString& route_dir)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
+
     sections_.clear();
     substations_.clear();
     neutrals_.clear();
@@ -125,6 +128,12 @@ void CatenarySystem::load(const QString& route_dir)
     double value = 0.0;
     if (cfg.getDouble("Catenary", "NetworkResistance", value))
         network_resistance = std::min(std::max(value, 0.01), 1.0);
+
+    if (cfg.getDouble("Catenary", "BurnHeat", value))
+        burn_heat_threshold = std::max(value, 1000.0);
+
+    if (cfg.getDouble("Catenary", "CoolingRate", value))
+        cooling_rate = std::max(value, 0.0);
 }
 
 //------------------------------------------------------------------------------
@@ -175,6 +184,8 @@ const NeutralInsert* CatenarySystem::findNeutral(double railway_coord) const
 FeedState CatenarySystem::getFeedState(double railway_coord,
                                        double current_a) const
 {
+    std::lock_guard<std::mutex> lock(mutex_);
+
     FeedState state;
 
     const NeutralInsert* neutral = findNeutral(railway_coord);
@@ -190,7 +201,7 @@ FeedState CatenarySystem::getFeedState(double railway_coord,
 
     const Section* section = findSection(railway_coord);
 
-    if (section == nullptr || !section->switched_on)
+    if (section == nullptr || !section->switched_on || section->burned)
         return state;
 
     if (section->type == SystemType::NotElectrified)
@@ -205,6 +216,12 @@ FeedState CatenarySystem::getFeedState(double railway_coord,
     if (substation == nullptr || !substation->switched_on)
         return state;
 
+    // Ток секции и подстанции учитывает все ПЕ, а не только эту:
+    // тяжёлый состав просаживает напряжение сильнее
+    const double effective_current = std::max(
+        current_a,
+        std::max(section->load_current, substation->load_current));
+
     // Провал напряжения: dU = I * r * d (п.6 - реальные расстояния)
     const double distance_km =
             std::abs(railway_coord - substation->railway_coord) / 1000.0;
@@ -213,16 +230,16 @@ FeedState CatenarySystem::getFeedState(double railway_coord,
 
     double voltage = nominal;
 
-    if (current_a > 0.0)
+    if (effective_current > 0.0)
     {
-        const double drop = current_a * network_resistance * distance_km;
+        const double drop = effective_current * network_resistance * distance_km;
 
         // Провал ограничен 30% номинала
         voltage -= std::min(drop, 0.3 * nominal);
     }
 
     // Ограничение мощности подстанции (п.5)
-    const double power = voltage * current_a;
+    const double power = voltage * effective_current;
 
     if (power > substation->max_power)
     {
@@ -246,9 +263,11 @@ FeedState CatenarySystem::getFeedState(double railway_coord,
 //------------------------------------------------------------------------------
 double CatenarySystem::getCurrentLimit(double railway_coord) const
 {
+    std::lock_guard<std::mutex> lock(mutex_);
+
     const Section* section = findSection(railway_coord);
 
-    if (section == nullptr)
+    if (section == nullptr || section->burned)
         return 0.0;
 
     const Substation* substation = findSubstation(section->substation_id);
@@ -264,10 +283,122 @@ double CatenarySystem::getCurrentLimit(double railway_coord) const
 //------------------------------------------------------------------------------
 void CatenarySystem::setSectionSwitched(double railway_coord, bool on)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
+
     for (Section& section : sections_)
     {
         if (railway_coord >= section.begin && railway_coord <= section.end)
+        {
             section.switched_on = on;
+
+            // Восстановление провода после ремонта
+            if (on)
+            {
+                section.burned = false;
+                section.overload_heat = 0.0;
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+// Сбор нагрузок: вызывается из потока модели перед обходом ПЕ
+//------------------------------------------------------------------------------
+void CatenarySystem::beginLoadFrame()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    for (Section& section : sections_)
+    {
+        section.load_current = 0.0;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CatenarySystem::addSectionLoad(double railway_coord, double current_a)
+{
+    if (current_a <= 0.0)
+        return;
+
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    for (Section& section : sections_)
+    {
+        if (railway_coord >= section.begin && railway_coord <= section.end)
+        {
+            section.load_current += current_a;
+            return;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+// Тепловая модель провода: перегруз копит А*с, при превышении
+// порога провод пережигается и секция отключается
+//------------------------------------------------------------------------------
+void CatenarySystem::step(double dt)
+{
+    if (dt <= 0.0)
+        return;
+
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    for (Substation& substation : substations_)
+    {
+        substation.load_current = 0.0;
+    }
+
+    for (Section& section : sections_)
+    {
+        const double limit = [&]()
+        {
+            const Substation* substation = findSubstation(section.substation_id);
+            if (substation == nullptr)
+                return 0.0;
+
+            return substation->max_power /
+                   std::max(substation->nominal_voltage, 1.0);
+        }();
+
+        for (Substation& substation : substations_)
+        {
+            if (substation.id == section.substation_id)
+            {
+                substation.load_current += section.load_current;
+            }
+        }
+
+        if (!section.switched_on || section.burned || limit <= 0.0)
+            continue;
+
+        const double overload = std::max(0.0, section.load_current - limit);
+
+        if (overload > 0.0)
+        {
+            section.overload_heat += overload * dt;
+
+            if (section.overload_heat >= burn_heat_threshold)
+            {
+                section.burned = true;
+                section.switched_on = false;
+
+                Journal::instance()->critical(
+                    QString("[CATENARY] Contact wire burned at %1 m "
+                            "(section %2..%3, load %4 A, limit %5 A)")
+                    .arg(static_cast<int>(section.begin))
+                    .arg(static_cast<int>(section.begin))
+                    .arg(static_cast<int>(section.end))
+                    .arg(static_cast<int>(section.load_current))
+                    .arg(static_cast<int>(limit)));
+            }
+        }
+        else
+        {
+            section.overload_heat = std::max(
+                0.0, section.overload_heat - cooling_rate * dt);
+        }
     }
 }
 
