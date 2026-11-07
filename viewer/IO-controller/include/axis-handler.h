@@ -11,23 +11,23 @@
 // SpringReturnLow / SpringReturnHigh — пороги: при отпускании,
 // если значение пересекло порог, оно возвращается к нему.
 //------------------------------------------------------------------------------
-class AxisHandler : public RangeHandler
+class IO_CONTROLLER_EXPORT AxisHandler : public RangeHandler
 {
 public:
 
-    explicit AxisHandler(QObject *parent = nullptr);
+    AxisHandler(QObject *parent = nullptr);
 
-    bool load_config(CfgReader &cfg, QDomNode secNode) override;
+    virtual bool load_config(CfgReader &cfg, QDomNode secNode) override;
 
-    void processKeyInput(const std::set<uint16_t> &pressed_keys) override;
+    virtual void processKeyInput(const std::set<uint16_t> &pressed_keys) override;
 
-    void processMouseInput(uint32_t button, bool is_pressed) override;
+    virtual void processMouseInput(uint32_t button, bool is_pressed) override;
 
-    void step(float t, float dt) override;    
+    virtual void step(float t, float dt) override;
 
-    QString getState() const override;    
+    virtual QString getState() const override;
 
-private:
+protected:
 
     float minValue = 0.0f;            // минимальное значение сигнала
     float maxValue = 1.0f;            // максимальное значение сигнала

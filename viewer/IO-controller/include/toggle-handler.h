@@ -6,23 +6,23 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ToggleHandler : public BiStateHandler
+class IO_CONTROLLER_EXPORT ToggleHandler : public BiStateHandler
 {
 public:
 
-    explicit ToggleHandler(QObject *parent = nullptr);
+    ToggleHandler(QObject *parent = nullptr);
 
-    void processKeyInput(const std::set<uint16_t>& pressed_keys) override;
+    virtual void processKeyInput(const std::set<uint16_t>& pressed_keys) override;
 
-    void processMouseInput(uint32_t button, bool is_pressed) override;
+    virtual void processMouseInput(uint32_t button, bool is_pressed) override;
 
-    QString getUsage() const override;
+    virtual QString getUsage() const override;
 
-    QString getState() const override;
+    virtual QString getState() const override;
 
-    bool load_config(CfgReader &cfg, QDomNode secNode) override;
+    virtual bool load_config(CfgReader &cfg, QDomNode secNode) override;
 
-private:
+protected:
 
     void processTumbler(size_t cab_idx, uint16_t control_id,
                        const std::set<uint16_t>& pressed_keys);

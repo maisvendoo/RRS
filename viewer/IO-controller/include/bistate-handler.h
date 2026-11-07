@@ -6,11 +6,11 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class BiStateHandler : public ControlHandler
+class IO_CONTROLLER_EXPORT BiStateHandler : public ControlHandler
 {
 public:
 
-    explicit BiStateHandler(QObject *parent = nullptr) : ControlHandler(parent)
+    BiStateHandler(QObject *parent = nullptr) : ControlHandler(parent)
     {
 
     }
