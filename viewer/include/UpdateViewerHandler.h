@@ -125,8 +125,7 @@ private:
     void startBoardingAnimation(int vehicle_idx, int cab_idx);
 
     /// Добавить статический пол кабины в мир коллизий (один раз)
-    void addInteriorFloor(int vehicle_idx, const vsg::dvec3& inward,
-                          const vsg::dvec3& door);
+    void addInteriorFloor(int vehicle_idx);
 
     /// Выход из состояния "внутри ПЕ" (вернуть бокс кузова)
     void exitInterior();
@@ -136,6 +135,9 @@ private:
 
     /// F8 из кабины: встать пешком внутрь кабины
     void standUpInsideCabine();
+
+    /// Ctrl+Enter из кабины: выйти на землю у ближайшей двери
+    void exitInteriorToGround();
 
     /// Подсказка (вместо действия внутри ПЕ)
     void context_hint_walk();

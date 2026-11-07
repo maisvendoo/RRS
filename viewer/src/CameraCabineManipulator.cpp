@@ -31,6 +31,35 @@ CameraCabineManipulator::CameraCabineManipulator(
 }
 
 //------------------------------------------------------------------------------
+// Боковое окно кабины: открыть/закрыть. При закрытии машинист
+// автоматически возвращается внутрь кабины.
+//------------------------------------------------------------------------------
+void CameraCabineManipulator::toggleWindow()
+{
+    _window_open = !_window_open;
+
+    if (!_window_open)
+    {
+        _lean_out_target = false;
+    }
+}
+
+//------------------------------------------------------------------------------
+// Высунуться в открытое окно / вернуться обратно.
+// Возвращает false, если окно закрыто - выглядывать некуда.
+//------------------------------------------------------------------------------
+bool CameraCabineManipulator::toggleLeanOut()
+{
+    if (!_window_open)
+    {
+        return false;
+    }
+
+    _lean_out_target = !_lean_out_target;
+    return true;
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void CameraCabineManipulator::resetView()
@@ -49,6 +78,10 @@ void CameraCabineManipulator::resetView()
     _angle_right =  0.0;
     _angle_up = 0.0;
     _perspective->fieldOfViewY = _settings.fovy;
+
+    // Сброс взгляда возвращает машиниста внутрь кабины
+    _lean_out_target = false;
+    _lean_out = 0.0;
 
     calc_view();
 }
@@ -147,6 +180,19 @@ void CameraCabineManipulator::frameEvent(double dt)
     {
         const double sway_speed = vsg::length(_current_vehicle->velocity);
         _sway.step(dt, sway_speed);
+    }
+
+    // Плавное высовывание/возврат в окно (~0.5 с на полный ход)
+    const double lean_target = _lean_out_target ? 1.0 : 0.0;
+    const double lean_step = 2.0 * dt;
+
+    if (_lean_out < lean_target)
+    {
+        _lean_out = std::min(lean_target, _lean_out + lean_step);
+    }
+    else if (_lean_out > lean_target)
+    {
+        _lean_out = std::max(lean_target, _lean_out - lean_step);
     }
 
     auto times2speed = [](std::pair<double, double> duration) -> double {
@@ -295,11 +341,20 @@ void CameraCabineManipulator::calc_view()
     // (x - поперечное, y - продольное, z - вертикальное)
     const vsg::dvec3 sway_offset = _sway.offset();
 
-    const vsg::dvec3 local_eye_pos =
+    vsg::dvec3 local_eye_pos =
             _current_vehicle->driver_pos[_current_vehicle->current_cabine_idx] +
             _position_shift +
             vsg::dvec3(cam_motion.y, cam_motion.x, cam_motion.z) +
             sway_offset;
+
+    // Высунувшийся в окно машинист: глаз уходит вбок (к окну) и чуть
+    // вверх. Сторона окна - по знаку смещения места машиниста от оси.
+    const double cab_x =
+            _current_vehicle->driver_pos[_current_vehicle->current_cabine_idx].x;
+    const double window_side = (cab_x < 0.0) ? -1.0 : 1.0;
+
+    local_eye_pos.x += window_side * 0.55 * _lean_out;
+    local_eye_pos.z += 0.15 * _lean_out;
 
     _lookAt->eye = _current_vehicle->position +
                    _current_vehicle->right * local_eye_pos.x +
@@ -309,7 +364,9 @@ void CameraCabineManipulator::calc_view()
     _lookAt->center = _lookAt->eye + _current_vehicle->orth;
     _lookAt->up = _current_vehicle->up;
 
-    const double angle_r = _current_vehicle->driver_dir[_current_vehicle->current_cabine_idx] + _angle_right;
+    // Из окна машинист смотрит вбок, по направлению к своей стороне
+    const double angle_r = _current_vehicle->driver_dir[_current_vehicle->current_cabine_idx] +
+            _angle_right - window_side * 0.55 * _lean_out;
 
     // Наклоны от физики (крен вокруг оси взгляда, тангаж вокруг
     // поперечной оси) поверх пользовательских углов обзора,
@@ -338,6 +395,11 @@ void CameraCabineManipulator::currentVehicleChanged()
 {
     if (_prev_current_vehicle == _current_vehicle)
         return;
+
+    // Другая ПЕ/кабина - окно и высунувшийся машинист сбрасываются
+    _window_open = false;
+    _lean_out_target = false;
+    _lean_out = 0.0;
 
     if (_prev_current_vehicle)
     {

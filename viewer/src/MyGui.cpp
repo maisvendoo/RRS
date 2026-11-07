@@ -515,6 +515,13 @@ void MyGui::showSettings() const
                                  "F5 - car, Ctrl+F5 - limits, F6 - stations, "
                                  "F7 - labels, Ctrl+F7 - signals, F8 - walk, "
                                  "Alt+F8 - HUD, Ctrl+F8 - rename").toUtf8().constData());
+
+    ImGui::TextWrapped("%s", tr(u8"В кабине: F8 - встать, Enter - сесть, "
+                                 u8"Ctrl+Enter - выйти на землю, Num0 - окно, "
+                                 u8"Num1 - высунуться",
+                                 "In cab: F8 - stand up, Enter - sit down, "
+                                 "Ctrl+Enter - step outside, Num0 - window, "
+                                 "Num1 - lean out").toUtf8().constData());
     ImGui::Separator();
 
     if (params->sim_time)
