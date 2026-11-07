@@ -163,6 +163,20 @@ public:
         bool derailed = false;
         bool coupled_fwd = true;
         bool coupled_bwd = true;
+        bool handbrake = false;
+        bool chock_fwd = false;
+        bool chock_bwd = false;
+        int hose_fwd = 1;                   ///< 0 - соединён, 1 - на крюке, 2 - болтается
+        int hose_bwd = 1;
+        bool valve_fwd = false;
+        bool valve_bwd = false;
+        bool cargo_configured = false;
+        double cargo_mass_kg = 0.0;
+        double cargo_fill = 0.0;
+        QString cargo_type = "";
+        bool passengers_configured = false;
+        int passenger_count = 0;
+        int passenger_capacity = 0;
     };
 
     /// Построить снимок диагностики всех ПЕ (реальные данные систем)

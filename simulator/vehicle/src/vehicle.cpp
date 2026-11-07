@@ -1938,6 +1938,20 @@ void Vehicle::integrationPreStep(state_vector_t& Y, const double& t)
         F_fwd -= velocity * full_mass * 2.0;
     }
 
+    // Тормозные башмаки: по 10 кН на закреплённую тележку (как в openRTS)
+    if (chock_fwd || chock_bwd)
+    {
+        const int chocks = (chock_fwd ? 1 : 0) + (chock_bwd ? 1 : 0);
+        const double hold_force = 10.0e3 * chocks;
+
+        if (std::abs(velocity) > Physics::ZERO)
+        {
+            F_fwd -= sign(velocity) * hold_force;
+        }
+
+        F_fwd -= velocity * full_mass * 2.0;
+    }
+
     // Аварийное торможение после столкновения с препятствием:
     // тормозящая сила с постоянной времени ~0.5 с
     if (is_collided)
@@ -2101,6 +2115,37 @@ void Vehicle::setHandbrake(bool applied)
 bool Vehicle::isHandbrakeApplied() const
 {
     return handbrake_applied;
+}
+
+//------------------------------------------------------------------------------
+// Тормозные башмаки под тележками
+//------------------------------------------------------------------------------
+void Vehicle::setChock(bool fwd, bool applied)
+{
+    if (fwd)
+    {
+        chock_fwd = applied;
+    }
+    else
+    {
+        chock_bwd = applied;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::isChockFwd() const
+{
+    return chock_fwd;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Vehicle::isChockBwd() const
+{
+    return chock_bwd;
 }
 
 //------------------------------------------------------------------------------

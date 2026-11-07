@@ -431,6 +431,11 @@ public:
     /// Состояние ручного (стояночного) тормоза
     bool isHandbrakeApplied() const;
 
+    /// Тормозные башмаки под передней/задней тележкой
+    void setChock(bool fwd, bool applied);
+    bool isChockFwd() const;
+    bool isChockBwd() const;
+
     const std::vector<Autopilot *>& getAutopilot() const
     {
         return autopilot;
@@ -738,6 +743,10 @@ protected:
 
     /// Ручной (стояночный) тормоз включён
     bool handbrake_applied = false;
+
+    /// Тормозные башмаки под тележками
+    bool chock_fwd = false;
+    bool chock_bwd = false;
 
     /// Start autopilot after autostart
     bool auto_start_autopilot = false;

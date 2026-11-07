@@ -120,9 +120,12 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool prev_Num3 = false;
     bool is_show_car_menu = false;
     int car_menu_vehicle = -1;
+    int car_menu_page = 0;              ///< 0 - сцепка, 1 - тележка
     bool car_menu_handbrake = false;
     bool car_menu_end_valve_fwd = false;
     bool car_menu_end_valve_bwd = false;
+    bool car_menu_chock_fwd = false;
+    bool car_menu_chock_bwd = false;
 
     bool hud_show_profile = true;
     bool hud_show_timetable = true;

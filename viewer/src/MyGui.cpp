@@ -269,6 +269,12 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     if (ImGui::IsKeyPressed(ImGuiKey_Keypad3) && !params->prev_Num3 && !is_modified_key)
     {
         params->is_show_car_menu = !params->is_show_car_menu;
+
+        if (params->is_show_car_menu)
+        {
+            // При открытии заново перечитываем состояние вагона
+            params->car_menu_vehicle = -1;
+        }
     }
     params->prev_Num3 = ImGui::IsKeyPressed(ImGuiKey_Keypad3);
 
@@ -2269,7 +2275,7 @@ void MyGui::sendCarServiceCommand(uint16_t action, float value) const
 }
 
 //------------------------------------------------------------------------------
-// Меню вагона (Num3): ручной тормоз, рукава, концевые краны, расцепка
+// Меню вагона (Num3): сцепка и тележка, как в openRTS
 //------------------------------------------------------------------------------
 void MyGui::showCarMenu() const
 {
@@ -2281,9 +2287,10 @@ void MyGui::showCarMenu() const
     const int count = params->vehicles_handler->getVehiclesCount();
     const int idx = params->vehicles_handler->getCurrentVehicleIndex();
 
-    ImGui::SetNextWindowSize(ImVec2(380, 360), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(440, 470), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Меню вагона", &params->is_show_car_menu))
+    if (!ImGui::Begin(tr(u8"Меню вагона", "Car menu").toUtf8().constData(),
+                      &params->is_show_car_menu))
     {
         ImGui::End();
         return;
@@ -2291,97 +2298,239 @@ void MyGui::showCarMenu() const
 
     if ((idx < 0) || (idx >= count))
     {
-        ImGui::TextUnformatted("Нет выбранного вагона");
+        ImGui::TextUnformatted(tr(u8"Нет выбранного вагона",
+                                  "No car selected").toUtf8().constData());
         ImGui::End();
         return;
     }
 
-    // При смене вагона сбрасываем локальные отметки состояния
+    // Текущее состояние вагона из диагностики сервера
+    const simulator_diagnostics_update_t diagnostics =
+            params->vehicles_handler->getDiagnostics();
+
+    const simulator_vehicle_diagnostics_t* vd = nullptr;
+    for (const auto& vehicle : diagnostics.vehicles)
+    {
+        if (vehicle.vehicle_idx == idx)
+        {
+            vd = &vehicle;
+            break;
+        }
+    }
+
+    // При смене вагона синхронизируем локальные отметки состояния
     if (params->car_menu_vehicle != idx)
     {
         params->car_menu_vehicle = idx;
-        params->car_menu_handbrake = false;
-        params->car_menu_end_valve_fwd = false;
-        params->car_menu_end_valve_bwd = false;
+        params->car_menu_handbrake = (vd != nullptr) && (vd->handbrake != 0);
+        params->car_menu_end_valve_fwd = (vd != nullptr) && (vd->valve_fwd != 0);
+        params->car_menu_end_valve_bwd = (vd != nullptr) && (vd->valve_bwd != 0);
+        params->car_menu_chock_fwd = (vd != nullptr) && (vd->chock_fwd != 0);
+        params->car_menu_chock_bwd = (vd != nullptr) && (vd->chock_bwd != 0);
     }
 
-    ImGui::Text("Вагон %d из %d", idx + 1, count);
+    ImGui::Text("%s %d %s %d",
+                tr(u8"Вагон", "Car").toUtf8().constData(),
+                idx + 1,
+                tr(u8"из", "of").toUtf8().constData(),
+                count);
+
+    if (vd != nullptr)
+    {
+        ImGui::SameLine();
+        ImGui::TextDisabled("(%.1f %s)", vd->speed_kmh,
+                            tr(u8"км/ч", "km/h").toUtf8().constData());
+    }
+
     ImGui::Separator();
 
-    // Ручной (стояночный) тормоз
-    if (params->car_menu_handbrake)
+    if (ImGui::BeginTabBar("##car_menu_tabs"))
     {
-        if (ImGui::Button("Отпустить ручной тормоз", ImVec2(-1.0f, 0.0f)))
+        if (ImGui::BeginTabItem(tr(u8"Сцепка", "Coupling").toUtf8().constData()))
         {
-            params->car_menu_handbrake = false;
-            sendCarServiceCommand(vehicle_service::ParkingBrake, 0.0f);
+            params->car_menu_page = 0;
+
+            const bool moving = (vd != nullptr)
+                    && (std::abs(vd->speed_kmh) > 1.8f);
+
+            // Один конец вагона: расцепка, концевой кран и тормозной рукав
+            auto draw_end = [&](bool fwd)
+            {
+                const char* end_name = fwd
+                        ? tr(u8"Передний конец", "Front end").toUtf8().constData()
+                        : tr(u8"Задний конец", "Rear end").toUtf8().constData();
+
+                ImGui::TextUnformatted(end_name);
+                ImGui::Separator();
+
+                const bool coupled = (vd == nullptr)
+                        || (fwd ? (vd->coupled_fwd != 0) : (vd->coupled_bwd != 0));
+
+                ImGui::BeginDisabled(!coupled || moving);
+                if (ImGui::Button(fwd
+                                  ? tr(u8"Расцепить спереди", "Uncouple front").toUtf8().constData()
+                                  : tr(u8"Расцепить сзади", "Uncouple rear").toUtf8().constData(),
+                                  ImVec2(-1.0f, 0.0f)))
+                {
+                    sendCarServiceCommand(fwd ? vehicle_service::UncoupleFwd
+                                              : vehicle_service::UncoupleBwd, 1.0f);
+                }
+                ImGui::EndDisabled();
+
+                if (!coupled)
+                {
+                    ImGui::TextDisabled(tr(u8"Свободный конец",
+                                           "Free end").toUtf8().constData());
+                }
+                else if (moving)
+                {
+                    ImGui::TextDisabled(tr(u8"Расцепка только на остановке",
+                                           "Uncouple only at standstill").toUtf8().constData());
+                }
+
+                bool& valve = fwd ? params->car_menu_end_valve_fwd
+                                  : params->car_menu_end_valve_bwd;
+                if (ImGui::Checkbox(fwd
+                                    ? tr(u8"Передний кран открыт", "Front valve open").toUtf8().constData()
+                                    : tr(u8"Задний кран открыт", "Rear valve open").toUtf8().constData(),
+                                    &valve))
+                {
+                    sendCarServiceCommand(fwd ? vehicle_service::EndValveFwd
+                                              : vehicle_service::EndValveBwd,
+                                          valve ? 1.0f : 0.0f);
+                }
+
+                const int hose = (vd == nullptr)
+                        ? 1
+                        : (fwd ? vd->hose_fwd : vd->hose_bwd);
+
+                QByteArray hose_text = tr(u8"на крюке", "on holder").toUtf8();
+                if (hose == 0)
+                {
+                    hose_text = tr(u8"соединён", "connected").toUtf8();
+                }
+                else if (hose == 2)
+                {
+                    hose_text = tr(u8"оборван", "torn").toUtf8();
+                }
+
+                ImGui::Text("%s: %s",
+                            tr(u8"Тормозной рукав", "Brake hose").toUtf8().constData(),
+                            hose_text.constData());
+
+                if (hose != 0)
+                {
+                    ImGui::BeginDisabled(hose == 2);
+                    if (ImGui::Button(fwd
+                                      ? tr(u8"Соединить рукав спереди", "Connect front hose").toUtf8().constData()
+                                      : tr(u8"Соединить рукав сзади", "Connect rear hose").toUtf8().constData(),
+                                      ImVec2(-1.0f, 0.0f)))
+                    {
+                        sendCarServiceCommand(fwd ? vehicle_service::HoseConnectFwd
+                                                  : vehicle_service::HoseConnectBwd, 1.0f);
+                    }
+                    ImGui::EndDisabled();
+                }
+                else
+                {
+                    if (ImGui::Button(fwd
+                                      ? tr(u8"Повесить рукав спереди", "Hang front hose").toUtf8().constData()
+                                      : tr(u8"Повесить рукав сзади", "Hang rear hose").toUtf8().constData(),
+                                      ImVec2(-1.0f, 0.0f)))
+                    {
+                        sendCarServiceCommand(fwd ? vehicle_service::HoseHangFwd
+                                                  : vehicle_service::HoseHangBwd, 1.0f);
+                    }
+                }
+
+                ImGui::Spacing();
+            };
+
+            draw_end(true);
+            draw_end(false);
+
+            ImGui::Separator();
+            ImGui::TextWrapped(tr(u8"Сцепка выполняется автоматически при сближении составов до 10 м.",
+                                  "Coupling is automatic when trains come within 10 m.").toUtf8().constData());
+
+            ImGui::EndTabItem();
         }
-    }
-    else
-    {
-        if (ImGui::Button("Затормозить вручную", ImVec2(-1.0f, 0.0f)))
+
+        if (ImGui::BeginTabItem(tr(u8"Тележка", "Bogie").toUtf8().constData()))
         {
-            params->car_menu_handbrake = true;
-            sendCarServiceCommand(vehicle_service::ParkingBrake, 1.0f);
+            params->car_menu_page = 1;
+
+            // Ручной (стояночный) тормоз
+            if (ImGui::Checkbox(tr(u8"Ручной тормоз", "Handbrake").toUtf8().constData(),
+                                &params->car_menu_handbrake))
+            {
+                sendCarServiceCommand(vehicle_service::ParkingBrake,
+                                      params->car_menu_handbrake ? 1.0f : 0.0f);
+            }
+
+            ImGui::Separator();
+            ImGui::TextUnformatted(tr(u8"Тормозные башмаки",
+                                      "Wheel chocks").toUtf8().constData());
+
+            if (ImGui::Checkbox(tr(u8"Передняя тележка", "Front bogie").toUtf8().constData(),
+                                &params->car_menu_chock_fwd))
+            {
+                sendCarServiceCommand(vehicle_service::ChockFwd,
+                                      params->car_menu_chock_fwd ? 1.0f : 0.0f);
+            }
+
+            if (ImGui::Checkbox(tr(u8"Задняя тележка", "Rear bogie").toUtf8().constData(),
+                                &params->car_menu_chock_bwd))
+            {
+                sendCarServiceCommand(vehicle_service::ChockBwd,
+                                      params->car_menu_chock_bwd ? 1.0f : 0.0f);
+            }
+
+            ImGui::Separator();
+            ImGui::TextUnformatted(tr(u8"Груз", "Cargo").toUtf8().constData());
+
+            if ((vd != nullptr) && (vd->cargo_configured != 0))
+            {
+                ImGui::Text("%s: %s",
+                            tr(u8"Тип", "Type").toUtf8().constData(),
+                            vd->cargo_type.isEmpty()
+                            ? tr(u8"нет", "none").toUtf8().constData()
+                            : vd->cargo_type.toUtf8().constData());
+                ImGui::Text("%s: %.1f %s",
+                            tr(u8"Масса", "Mass").toUtf8().constData(),
+                            vd->cargo_mass_t,
+                            tr(u8"т", "t").toUtf8().constData());
+                ImGui::ProgressBar(vd->cargo_fill, ImVec2(-1.0f, 0.0f));
+            }
+            else
+            {
+                ImGui::TextDisabled(tr(u8"Секция [CargoWagon] не настроена",
+                                       "[CargoWagon] is not configured").toUtf8().constData());
+            }
+
+            ImGui::Separator();
+            ImGui::TextUnformatted(tr(u8"Пассажиры", "Passengers").toUtf8().constData());
+
+            if ((vd != nullptr) && (vd->passengers_configured != 0))
+            {
+                ImGui::Text("%d / %d",
+                            vd->passenger_count,
+                            vd->passenger_capacity);
+            }
+            else
+            {
+                ImGui::TextDisabled(tr(u8"Секция [PassengerCar] не настроена",
+                                       "[PassengerCar] is not configured").toUtf8().constData());
+            }
+
+            ImGui::Separator();
+            ImGui::TextDisabled(tr(u8"ЭПТ, СМЕ, ВВ-шина, отпускной и стоп-кран в RRS пока не моделируются.",
+                                   "EPB, MU, HV bus, release and stop valves are not simulated in RRS yet.").toUtf8().constData());
+
+            ImGui::EndTabItem();
         }
-    }
 
-    ImGui::Separator();
-    ImGui::TextUnformatted("Рукава тормозной магистрали");
-
-    if (ImGui::Button("Спереди: соединить"))
-    {
-        sendCarServiceCommand(vehicle_service::HoseConnectFwd, 1.0f);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Спереди: на крюк"))
-    {
-        sendCarServiceCommand(vehicle_service::HoseHangFwd, 1.0f);
-    }
-
-    if (ImGui::Button("Сзади: соединить"))
-    {
-        sendCarServiceCommand(vehicle_service::HoseConnectBwd, 1.0f);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Сзади: на крюк"))
-    {
-        sendCarServiceCommand(vehicle_service::HoseHangBwd, 1.0f);
-    }
-
-    ImGui::Separator();
-    ImGui::TextUnformatted("Концевые краны");
-
-    if (ImGui::Checkbox("Передний кран открыт", &params->car_menu_end_valve_fwd))
-    {
-        sendCarServiceCommand(vehicle_service::EndValveFwd,
-                              params->car_menu_end_valve_fwd ? 1.0f : 0.0f);
-    }
-
-    if (ImGui::Checkbox("Задний кран открыт", &params->car_menu_end_valve_bwd))
-    {
-        sendCarServiceCommand(vehicle_service::EndValveBwd,
-                              params->car_menu_end_valve_bwd ? 1.0f : 0.0f);
-    }
-
-    ImGui::Separator();
-
-    if (ImGui::Button("Расцепить спереди", ImVec2(-1.0f, 0.0f)))
-    {
-        sendCarServiceCommand(vehicle_service::UncoupleFwd, 1.0f);
-    }
-    if (ImGui::IsItemHovered())
-    {
-        ImGui::SetTooltip("Рычаг расцепки срабатывает на малой скорости");
-    }
-
-    if (ImGui::Button("Расцепить сзади", ImVec2(-1.0f, 0.0f)))
-    {
-        sendCarServiceCommand(vehicle_service::UncoupleBwd, 1.0f);
-    }
-    if (ImGui::IsItemHovered())
-    {
-        ImGui::SetTooltip("Рычаг расцепки срабатывает на малой скорости");
+        ImGui::EndTabBar();
     }
 
     ImGui::End();

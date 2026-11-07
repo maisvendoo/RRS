@@ -1547,6 +1547,29 @@ std::vector<Train::VehicleDiagnostics> Train::buildDiagnosticsSnapshot() const
         d.brake_efficiency = vehicle->getBrakeShoes().getAverageEfficiency();
         d.shoe_temperature = vehicle->getBrakeShoes().getMaxTemperature();
 
+        // Состояние ручного тормоза, башмаков и сцепных рукавов/кранов
+        d.handbrake = vehicle->isHandbrakeApplied();
+        d.chock_fwd = vehicle->isChockFwd();
+        d.chock_bwd = vehicle->isChockBwd();
+
+        CouplingInteraction& coupling = vehicle->getCouplingInteraction();
+        d.hose_fwd = static_cast<int>(coupling.getHoseState(CouplingInteraction::Fwd));
+        d.hose_bwd = static_cast<int>(coupling.getHoseState(CouplingInteraction::Bwd));
+        d.valve_fwd = coupling.isEndValveOpen(CouplingInteraction::Fwd);
+        d.valve_bwd = coupling.isEndValveOpen(CouplingInteraction::Bwd);
+
+        // Груз и пассажиры для меню вагона
+        CargoSystem& cargo = vehicle->getCargo();
+        d.cargo_configured = cargo.isConfigured();
+        d.cargo_mass_kg = cargo.getCargoMass();
+        d.cargo_fill = cargo.getFillLevel();
+        d.cargo_type = cargo.getCargoType();
+
+        PassengerSystem& passengers = vehicle->getPassengers();
+        d.passengers_configured = passengers.isConfigured();
+        d.passenger_count = passengers.getPassengerCount();
+        d.passenger_capacity = passengers.getCapacity();
+
         snapshot.push_back(d);
     }
 

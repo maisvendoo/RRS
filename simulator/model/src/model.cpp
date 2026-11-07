@@ -657,6 +657,14 @@ static void applyVehicleServiceCommand(Vehicle* vehicle,
                                    std::abs(vehicle->getVelocity()));
         break;
 
+    case vehicle_service::ChockFwd:
+        vehicle->setChock(true, on);
+        break;
+
+    case vehicle_service::ChockBwd:
+        vehicle->setChock(false, on);
+        break;
+
     default:
         break;
     }
@@ -2524,6 +2532,20 @@ void Model::prepareDiagnostics()
             diag.derailed = vd.derailed ? 1 : 0;
             diag.coupled_fwd = vd.coupled_fwd ? 1 : 0;
             diag.coupled_bwd = vd.coupled_bwd ? 1 : 0;
+            diag.handbrake = vd.handbrake ? 1 : 0;
+            diag.chock_fwd = vd.chock_fwd ? 1 : 0;
+            diag.chock_bwd = vd.chock_bwd ? 1 : 0;
+            diag.hose_fwd = static_cast<quint8>(vd.hose_fwd);
+            diag.hose_bwd = static_cast<quint8>(vd.hose_bwd);
+            diag.valve_fwd = vd.valve_fwd ? 1 : 0;
+            diag.valve_bwd = vd.valve_bwd ? 1 : 0;
+            diag.cargo_configured = vd.cargo_configured ? 1 : 0;
+            diag.cargo_mass_t = static_cast<float>(vd.cargo_mass_kg / 1000.0);
+            diag.cargo_fill = static_cast<float>(vd.cargo_fill);
+            diag.cargo_type = vd.cargo_type;
+            diag.passengers_configured = vd.passengers_configured ? 1 : 0;
+            diag.passenger_count = vd.passenger_count;
+            diag.passenger_capacity = vd.passenger_capacity;
 
             update_diagnostics.vehicles.push_back(diag);
         }

@@ -829,6 +829,21 @@ struct simulator_vehicle_diagnostics_t final
     quint8  derailed = 0;              ///< ╨б╤Е╨╛╨┤
     quint8  coupled_fwd = 1;           ///< ╨б╤Ж╨╡╨┐╨╗╨╡╨╜╨░ ╤Б╨┐╨╡╤А╨╡╨┤╨╕
     quint8  coupled_bwd = 1;           ///< ╨б╤Ж╨╡╨┐╨╗╨╡╨╜╨░ ╤Б╨╖╨░╨┤╨╕
+    // Меню вагона: ручной тормоз, башмаки, рукава, краны, груз и пассажиры
+    quint8  handbrake = 0;             ///< Ручной тормоз
+    quint8  chock_fwd = 0;             ///< Башмак под передней тележкой
+    quint8  chock_bwd = 0;             ///< Башмак под задней тележкой
+    quint8  hose_fwd = 1;              ///< Рукав спереди: 0 соединён, 1 на крюке, 2 оборван
+    quint8  hose_bwd = 1;              ///< Рукав сзади
+    quint8  valve_fwd = 0;             ///< Концевой кран спереди открыт
+    quint8  valve_bwd = 0;             ///< Концевой кран сзади открыт
+    quint8  cargo_configured = 0;      ///< Настроена секция [CargoWagon]
+    float   cargo_mass_t = 0.0f;       ///< Масса груза, т
+    float   cargo_fill = 0.0f;         ///< Заполнение 0..1
+    QString cargo_type = "";           ///< Тип груза
+    quint8  passengers_configured = 0; ///< Настроена секция [PassengerCar]
+    qint32  passenger_count = 0;       ///< Пассажиров в вагоне
+    qint32  passenger_capacity = 0;    ///< Вместимость
 
     QByteArray serialize() const
     {
@@ -850,6 +865,20 @@ struct simulator_vehicle_diagnostics_t final
         stream << derailed;
         stream << coupled_fwd;
         stream << coupled_bwd;
+        stream << handbrake;
+        stream << chock_fwd;
+        stream << chock_bwd;
+        stream << hose_fwd;
+        stream << hose_bwd;
+        stream << valve_fwd;
+        stream << valve_bwd;
+        stream << cargo_configured;
+        stream << cargo_mass_t;
+        stream << cargo_fill;
+        stream << cargo_type;
+        stream << passengers_configured;
+        stream << passenger_count;
+        stream << passenger_capacity;
 
         return data;
     }
@@ -873,6 +902,20 @@ struct simulator_vehicle_diagnostics_t final
         stream >> derailed;
         stream >> coupled_fwd;
         stream >> coupled_bwd;
+        stream >> handbrake;
+        stream >> chock_fwd;
+        stream >> chock_bwd;
+        stream >> hose_fwd;
+        stream >> hose_bwd;
+        stream >> valve_fwd;
+        stream >> valve_bwd;
+        stream >> cargo_configured;
+        stream >> cargo_mass_t;
+        stream >> cargo_fill;
+        stream >> cargo_type;
+        stream >> passengers_configured;
+        stream >> passenger_count;
+        stream >> passenger_capacity;
     }
 };
 
