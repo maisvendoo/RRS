@@ -708,6 +708,17 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx,
             else
             {
                 applyVehicleServiceCommand(vehicle, id, value);
+
+                // Расцепка по конкретному концу вагона: рычаг только
+                // взводит сцепку, сам состав разделяем здесь
+                if ((id == vehicle_service::UncoupleFwd)
+                    || (id == vehicle_service::UncoupleBwd))
+                {
+                    Train* uncoupled_train =
+                            trains[train_idx]->uncoupleAtVehicle(
+                                vehicle, id == vehicle_service::UncoupleFwd);
+                    registerUncoupledTrain(uncoupled_train);
+                }
             }
 
             return;
@@ -969,35 +980,45 @@ void Model::findNearestVehicles()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Model::registerUncoupledTrain(Train* uncoupled_train)
+{
+    if (uncoupled_train == nullptr)
+        return;
+
+    Journal::instance()->info(QString("Uncoupled new train #%1 ")
+                                  .arg(trains.size(), 3));
+    uncoupled_train->setTrainIndex(trains.size());
+    trains.push_back(uncoupled_train);
+
+    // Добавляем наш новый поезд в контекст менеджера сценариев
+    scenario_train_data_t scn_train;
+    scn_train.setIndex(uncoupled_train->getTrainIndex());
+    scnmgr->addNewTrain(scn_train);
+
+    QThread *thread = new QThread();
+    train_threads.push_back(thread);
+    uncoupled_train->moveToThread(thread);
+    Journal::instance()->info(QString("Created new thread for train at address: 0x%1")
+                                  .arg(reinterpret_cast<quint64>(thread), 0, 16));
+
+    connect(this, &Model::step, uncoupled_train, &Train::slotStep);
+    connect(uncoupled_train, &Train::stepDone, this, &Model::slotTrainStepDone);
+    thread->start();
+
+    is_trains_changed = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Model::findFarthestVehicles()
 {
-    for (auto train : trains)
+    // Новые составы добавляются в конец trains, поэтому обходим
+    // только исходное количество поездов
+    const size_t trains_count = trains.size();
+    for (size_t i = 0; i < trains_count; ++i)
     {
-        Train *uncoupled_train = train->uncouple(DISTANCE_TO_UNCOUPLE_TRAINS);
-        if (uncoupled_train != nullptr)
-        {
-            Journal::instance()->info(QString("Uncoupled new train #%1 ")
-                                          .arg(trains.size(), 3));
-            uncoupled_train->setTrainIndex(trains.size());
-            trains.push_back(uncoupled_train);
-
-            // Добавляем наш новый поезд в контекст менеджера сценариев
-            scenario_train_data_t scn_train;
-            scn_train.setIndex(uncoupled_train->getTrainIndex());
-            scnmgr->addNewTrain(scn_train);
-
-            QThread *thread = new QThread();
-            train_threads.push_back(thread);
-            uncoupled_train->moveToThread(thread);
-            Journal::instance()->info(QString("Created new thread for train at address: 0x%1")
-                                          .arg(reinterpret_cast<quint64>(thread), 0, 16));
-
-            connect(this, &Model::step, uncoupled_train, &Train::slotStep);
-            connect(uncoupled_train, &Train::stepDone, this, &Model::slotTrainStepDone);
-            thread->start();
-
-            is_trains_changed = true;
-        }
+        registerUncoupledTrain(trains[i]->uncouple(DISTANCE_TO_UNCOUPLE_TRAINS));
     }
 }
 

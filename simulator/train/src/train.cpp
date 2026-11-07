@@ -515,93 +515,134 @@ Train* Train::uncouple(double uncoupling_distance)
         if (distance < uncoupling_distance)
             continue;
 
-        Journal::instance()->info(QString("Train #%1 will be uncoupled between its vehicles %2 (#%3) and %4 (#%5) at distance %6 m")
-                                      .arg(train_idx, 3)
-                                      .arg(i - 1, 3)
-                                      .arg(vehicles[i - 1]->getModelIndex(), 4)
-                                      .arg(i, 3)
-                                      .arg(vehicles[i]->getModelIndex(), 4)
-                                      .arg(distance, 7, 'f', 3));
-
-        Train* new_train = new Train();
-        new_train->setTopology(topology);
-
-        (vehicles[i - 1]->getDirection() == -1) ?
-            vehicles[i - 1]->setPrevVehicle(nullptr) :
-            vehicles[i - 1]->setNextVehicle(nullptr);
-        (vehicles[i]->getDirection() == -1) ?
-            vehicles[i]->setNextVehicle(nullptr) :
-            vehicles[i]->setPrevVehicle(nullptr);
-
-        std::vector<Vehicle*> new_vehicles;
-        for (size_t j = i; j < vehicles.size(); ++j)
-        {
-            new_vehicles.push_back(vehicles[j]);
-        }
-
-        state_vector_t new_y;
-        for (size_t j = idx; j < y.size(); ++j)
-        {
-            new_y.push_back(y[j]);
-        }
-
-        std::vector<std::vector<Joint*>> new_joints_list;
-        if (i < vehicles.size() - 1)
-        {
-            for (size_t j = i; j < joints_list.size(); ++j)
-            {
-                new_joints_list.push_back(joints_list[j]);
-            }
-        }
-
-        vehicles.resize(i);
-
-        trainMass = 0.0;
-        trainLength = 0.0;
-        for (auto vehicle : vehicles)
-        {
-            trainMass += vehicle->getMass();
-            trainLength += vehicle->getLength();
-        }
-
-        ode_order = idx;
-        y.resize(ode_order);
-        dydt.resize(ode_order);
-        train_motion_solver->setODEsize(ode_order);
-
-        for (auto joint : joints_list[i - 1])
-        {
-            delete joint;
-        }
-        joints_list.resize(i - 1);
-
-        // Состав изменился: пересоздаём проводников этого поезда
-        attachConductors();
-
-        // ОТЛАДКА
-        Journal::instance()->info(QString("Trains uncoupled! Train #%1: new size of vehicles %2, joints %3, state_vector %4")
-                                      .arg(train_idx, 3)
-                                      .arg(vehicles.size(), 4)
-                                      .arg(joints_list.size(), 4)
-                                      .arg(y.size(), 4));
-
-        if (new_train->init(solver_config, new_vehicles, new_y, new_joints_list))
-        {
-            // Параметры проводников (секция [Conductor]) переносим
-            // в отделившийся состав
-            new_train->getConductors().copyConfig(conductors);
-
-            // Отцепленный состав свободен (LOOSE), пока его не возьмут под управление
-            new_train->state.store(State::Loose);
-            new_train->player_controlled.store(false);
-            return new_train;
-        }
-
-        // Не удалось инициализировать новый поезд - не оставляем
-        // утёкший объект
-        delete new_train;
-        return nullptr;
+        return uncoupleAt(i);
     }
+    return nullptr;
+}
+
+//------------------------------------------------------------------------------
+// Расцепить состав по конкретному концу вагона
+//------------------------------------------------------------------------------
+Train* Train::uncoupleAtVehicle(Vehicle* vehicle, bool front)
+{
+    if (vehicle == nullptr)
+        return nullptr;
+
+    for (size_t pos = 0; pos < vehicles.size(); ++pos)
+    {
+        if (vehicles[pos] != vehicle)
+            continue;
+
+        // Передний конец вагона - граница перед ним, задний - после него
+        const size_t boundary = front ? pos : (pos + 1);
+        return uncoupleAt(boundary);
+    }
+
+    return nullptr;
+}
+
+//------------------------------------------------------------------------------
+// Расцепить состав по границе между вагонами boundary-1 и boundary
+//------------------------------------------------------------------------------
+Train* Train::uncoupleAt(size_t boundary)
+{
+    if ((boundary == 0) || (boundary >= vehicles.size()) || (vehicles.size() < 2))
+        return nullptr;
+
+    const size_t i = boundary;
+    const size_t idx = vehicles[i]->getStateIndex();
+
+    const double prev_coord = y[vehicles[i - 1]->getStateIndex()];
+    const double prev_length_half = vehicles[i - 1]->getLength() / 2.0;
+    const double coord = y[idx];
+    const double length_half = vehicles[i]->getLength() / 2.0;
+    const double distance = abs(prev_coord - coord) - length_half - prev_length_half;
+
+    Journal::instance()->info(QString("Train #%1 will be uncoupled between its vehicles %2 (#%3) and %4 (#%5) at distance %6 m")
+                                  .arg(train_idx, 3)
+                                  .arg(i - 1, 3)
+                                  .arg(vehicles[i - 1]->getModelIndex(), 4)
+                                  .arg(i, 3)
+                                  .arg(vehicles[i]->getModelIndex(), 4)
+                                  .arg(distance, 7, 'f', 3));
+
+    Train* new_train = new Train();
+    new_train->setTopology(topology);
+
+    (vehicles[i - 1]->getDirection() == -1) ?
+        vehicles[i - 1]->setPrevVehicle(nullptr) :
+        vehicles[i - 1]->setNextVehicle(nullptr);
+    (vehicles[i]->getDirection() == -1) ?
+        vehicles[i]->setNextVehicle(nullptr) :
+        vehicles[i]->setPrevVehicle(nullptr);
+
+    std::vector<Vehicle*> new_vehicles;
+    for (size_t j = i; j < vehicles.size(); ++j)
+    {
+        new_vehicles.push_back(vehicles[j]);
+    }
+
+    state_vector_t new_y;
+    for (size_t j = idx; j < y.size(); ++j)
+    {
+        new_y.push_back(y[j]);
+    }
+
+    std::vector<std::vector<Joint*>> new_joints_list;
+    if (i < vehicles.size() - 1)
+    {
+        for (size_t j = i; j < joints_list.size(); ++j)
+        {
+            new_joints_list.push_back(joints_list[j]);
+        }
+    }
+
+    vehicles.resize(i);
+
+    trainMass = 0.0;
+    trainLength = 0.0;
+    for (auto vehicle : vehicles)
+    {
+        trainMass += vehicle->getMass();
+        trainLength += vehicle->getLength();
+    }
+
+    ode_order = idx;
+    y.resize(ode_order);
+    dydt.resize(ode_order);
+    train_motion_solver->setODEsize(ode_order);
+
+    for (auto joint : joints_list[i - 1])
+    {
+        delete joint;
+    }
+    joints_list.resize(i - 1);
+
+    // Состав изменился: пересоздаём проводников этого поезда
+    attachConductors();
+
+    // ОТЛАДКА
+    Journal::instance()->info(QString("Trains uncoupled! Train #%1: new size of vehicles %2, joints %3, state_vector %4")
+                                  .arg(train_idx, 3)
+                                  .arg(vehicles.size(), 4)
+                                  .arg(joints_list.size(), 4)
+                                  .arg(y.size(), 4));
+
+    if (new_train->init(solver_config, new_vehicles, new_y, new_joints_list))
+    {
+        // Параметры проводников (секция [Conductor]) переносим
+        // в отделившийся состав
+        new_train->getConductors().copyConfig(conductors);
+
+        // Отцепленный состав свободен (LOOSE), пока его не возьмут под управление
+        new_train->state.store(State::Loose);
+        new_train->player_controlled.store(false);
+        return new_train;
+    }
+
+    // Не удалось инициализировать новый поезд - не оставляем
+    // утёкший объект
+    delete new_train;
     return nullptr;
 }
 

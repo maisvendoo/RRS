@@ -431,6 +431,9 @@ private:
     /// Find trains which have distances between its vehicles and uncouple them
     void findFarthestVehicles();
 
+    /// Зарегистрировать отцепленный состав: индекс, сценарий, поток, связи
+    void registerUncoupledTrain(Train* uncoupled_train);
+
     /// Initial data loading
     void loadInitData(init_data_t &init_data);
 

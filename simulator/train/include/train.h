@@ -70,6 +70,13 @@ public:
     /// Train uncoupling
     Train* uncouple(double uncoupling_distance);
 
+    /// Расцепить состав по конкретному концу вагона
+    /// (front - передний конец в порядке состава)
+    Train* uncoupleAtVehicle(Vehicle* vehicle, bool front);
+
+    /// Расцепить состав по границе между вагонами boundary-1 и boundary
+    Train* uncoupleAt(size_t boundary);
+
     /// Swap the head and the tail of Train
     void reverse();
 
