@@ -1,9 +1,10 @@
-#include "MyGui.h"
+﻿#include "MyGui.h"
 
 #include "filesystem.h"
 #include "datetime.h"
 
 #include "NewSkybox.h"
+#include "RouteViewer.h"
 // #include "Skybox.h"
 #include "Sun.h"
 #include "UpdateStatisticsHandler.h"
@@ -12,8 +13,14 @@
 #include "UpdateViewerHandler.h"
 #include "StationsHandler.h"
 #include "TrainLabelsHandler.h"
+#include "TrafficLightsHandler.h"
+#include "TrafficLight.h"
 #include "MouseControlHandler.h"
 #include <tcp-client.h>
+
+#include "vehicle-service-command.h"
+
+#include <QDataStream>
 
 #include <vsg/io/Options.h>
 #include <vsg/maths/common.h>
@@ -24,6 +31,9 @@
 #include <vsg/vk/CommandBuffer.h>
 #include <vsg/app/Viewer.h>
 #include <vsgImGui/imgui.h>
+
+#include <algorithm>
+#include <cmath>
 
 #define IMGUI_ENABLE_STD_STRING
 
@@ -97,6 +107,8 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
                            ImGui::IsKeyPressed(ImGuiKey_LeftAlt) ||
                            ImGui::IsKeyPressed(ImGuiKey_RightAlt);
 
+    ImGuiIO &io = ImGui::GetIO();
+
     // Статус вьювера
     if (!params->status.isEmpty())
     {
@@ -139,41 +151,136 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
         showSettings();
     }
 
-    // Отображение диалога переименования поезда
-    if (ImGui::IsKeyPressed(ImGuiKey_F8) && !params->prev_F8 && !is_modified_key)
+    // F8: Ctrl+F8 - переименование поезда, Alt+F8 - HUD.
+    // Обычный F8 - режим машиниста пешком (обрабатывает UpdateViewerHandler).
+    const bool f8_pressed = ImGui::IsKeyPressed(ImGuiKey_F8);
+    if (f8_pressed && !params->prev_F8)
     {
-        params->is_show_trane_rename_dialog = !params->is_show_trane_rename_dialog;
+        if (io.KeyCtrl)
+        {
+            params->is_show_trane_rename_dialog = !params->is_show_trane_rename_dialog;
+        }
+        else if (io.KeyAlt)
+        {
+            params->is_show_HUD = !params->is_show_HUD;
+        }
     }
-    params->prev_F8 = ImGui::IsKeyPressed(ImGuiKey_F8);
+    params->prev_F8 = f8_pressed;
 
     if (params->is_show_trane_rename_dialog)
     {
         showTrainRenameDialog();
     }
 
-    // Отображение HUD
-    if (ImGui::IsKeyPressed(ImGuiKey_F7) && !params->prev_F7 && !is_modified_key)
+    // F5 - информация о вагоне (листание по составу),
+    // Ctrl+F5 - ограничения скорости
+    const bool f5_pressed = ImGui::IsKeyPressed(ImGuiKey_F5);
+    if (f5_pressed && !params->prev_F5)
     {
-        params->is_show_HUD = !params->is_show_HUD;
-
-        // При глобальном скрытии HUD прячем подписи станций вне зависимости
-        // от состояния кнопки; при показе возвращаем согласно кнопке
-        if (params->stations_handler)
+        if (io.KeyCtrl)
         {
-            params->stations_handler->setVisible(
-                params->is_show_HUD && params->hud_show_stations);
+            params->is_show_speed_limits = !params->is_show_speed_limits;
         }
-        if (params->train_labels_handler)
+        else if (!io.KeyShift && !io.KeyAlt)
         {
-            params->train_labels_handler->setVisible(
-                params->is_show_HUD && params->hud_show_train_labels);
+            if (!params->is_show_car_info)
+            {
+                params->is_show_car_info = true;
+                params->car_info_page = 0;
+            }
+            else
+            {
+                ++params->car_info_page;
+            }
         }
     }
-    params->prev_F7 = ImGui::IsKeyPressed(ImGuiKey_F7);
+    params->prev_F5 = f5_pressed;
+
+    // F6 - станции впереди
+    const bool f6_pressed = ImGui::IsKeyPressed(ImGuiKey_F6);
+    if (f6_pressed && !params->prev_F6 && !io.KeyCtrl && !io.KeyShift && !io.KeyAlt)
+    {
+        params->is_show_stations_panel = !params->is_show_stations_panel;
+    }
+    params->prev_F6 = f6_pressed;
+
+    // F7 - подписи станций/поездов, Ctrl+F7 - светофоры
+    const bool f7_pressed = ImGui::IsKeyPressed(ImGuiKey_F7);
+    if (f7_pressed && !params->prev_F7)
+    {
+        if (io.KeyCtrl)
+        {
+            params->is_show_signal_panel = !params->is_show_signal_panel;
+        }
+        else if (!is_modified_key)
+        {
+            params->is_show_labels = !params->is_show_labels;
+        }
+    }
+    params->prev_F7 = f7_pressed;
 
     if (params->is_show_HUD)
     {
         showHUD();
+    }
+
+    if (params->is_show_car_info)
+    {
+        showCarInfoPanel();
+    }
+    if (params->is_show_speed_limits)
+    {
+        showSpeedLimitsPanel();
+    }
+    if (params->is_show_stations_panel)
+    {
+        showStationsPanel();
+    }
+    if (params->is_show_signal_panel)
+    {
+        showSignalsPanel();
+    }
+
+    applyWorldLabels();
+
+    // Подсказка органа кабины под курсором (Alt удерживается)
+
+    // Диагностика составов:
+    // F3 - вкл/выкл окна, F4 - свёрнутый/полный режим.
+    // Камеры внешняя/свободная перенесены на Shift+F3/Shift+F4
+    if (ImGui::IsKeyPressed(ImGuiKey_F3) && !params->prev_F3 && !is_modified_key)
+    {
+        params->is_show_diagnostics = !params->is_show_diagnostics;
+    }
+    params->prev_F3 = ImGui::IsKeyPressed(ImGuiKey_F3);
+
+    if (ImGui::IsKeyPressed(ImGuiKey_F4) && !params->prev_F4 && !is_modified_key)
+    {
+        params->diagnostics_full_mode = !params->diagnostics_full_mode;
+    }
+    params->prev_F4 = ImGui::IsKeyPressed(ImGuiKey_F4);
+
+    if (params->is_show_diagnostics)
+    {
+        showDiagnostics();
+    }
+
+    // Меню вагона: Num3 - открыть/закрыть окно сервисных команд
+    if (ImGui::IsKeyPressed(ImGuiKey_Keypad3) && !params->prev_Num3 && !is_modified_key)
+    {
+        params->is_show_car_menu = !params->is_show_car_menu;
+
+        if (params->is_show_car_menu)
+        {
+            // При открытии заново перечитываем состояние вагона
+            params->car_menu_vehicle = -1;
+        }
+    }
+    params->prev_Num3 = ImGui::IsKeyPressed(ImGuiKey_Keypad3);
+
+    if (params->is_show_car_menu)
+    {
+        showCarMenu();
     }
 
     if (params->vehicles_handler)
@@ -195,13 +302,21 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
             check_date_time();
         }
 
-        // Отображение дебаг-строки подвижного состава
-        if (ImGui::IsKeyPressed(ImGuiKey_F9) && !params->prev_F9)
+        // F9 - дебаг-строка подвижного состава, Ctrl+F9 - язык интерфейса
+        const bool f9_pressed = ImGui::IsKeyPressed(ImGuiKey_F9);
+        if (f9_pressed && !params->prev_F9)
         {
-            params->is_show_debug_msg = !params->is_show_debug_msg;
-            params->controls_handler->setNeedDebugMsg(params->is_show_debug_msg);
+            if (io.KeyCtrl)
+            {
+                params->use_english = !params->use_english;
+            }
+            else if (!is_modified_key)
+            {
+                params->is_show_debug_msg = !params->is_show_debug_msg;
+                params->controls_handler->setNeedDebugMsg(params->is_show_debug_msg);
+            }
         }
-        params->prev_F9 = ImGui::IsKeyPressed(ImGuiKey_F9);
+        params->prev_F9 = f9_pressed;
 
         // Строка нажмите Enter для управления
         if (params->vehicles_handler)
@@ -246,6 +361,13 @@ void MyGui::record([[maybe_unused]] vsg::CommandBuffer& cb) const
     {
         showDebugMsg();
     }
+
+    // Предупреждение кассеты регистрации: всплывает
+    // по центру экрана на ~5 с при вставке/извлечении (Ctrl+R)
+    showCassetteNotice();
+
+    // Автоподсказка посадки на сиденье (E)
+    drawWalkHint();
 
     if (params->is_no_controlled)
     {
@@ -386,6 +508,28 @@ void MyGui::showSettings() const
 {
     ImGui::Begin("Light settings");
 
+    int language = params->use_english ? 1 : 0;
+    const char* language_items[] = { u8"Русский", "English" };
+    if (ImGui::Combo(u8"Язык / Language", &language, language_items, 2))
+    {
+        params->use_english = (language == 1);
+    }
+
+    ImGui::TextWrapped("%s", tr(u8"F5 - вагон, Ctrl+F5 - ограничения, F6 - станции, "
+                                 u8"F7 - подписи, Ctrl+F7 - светофоры, F8 - пешком, "
+                                 u8"Alt+F8 - HUD, Ctrl+F8 - переименование",
+                                 "F5 - car, Ctrl+F5 - limits, F6 - stations, "
+                                 "F7 - labels, Ctrl+F7 - signals, F8 - walk, "
+                                 "Alt+F8 - HUD, Ctrl+F8 - rename").toUtf8().constData());
+
+    ImGui::TextWrapped("%s", tr(u8"В кабине: F8 - встать, Enter - сесть, "
+                                 u8"Ctrl+Enter - выйти на землю, Num0 - окно, "
+                                 u8"Num1 - высунуться",
+                                 "In cab: F8 - stand up, Enter - sit down, "
+                                 "Ctrl+Enter - step outside, Num0 - window, "
+                                 "Num1 - lean out").toUtf8().constData());
+    ImGui::Separator();
+
     if (params->sim_time)
     {
         ImGui::RadioButton("Время сервера: ", &(params->use_server_time), 1);
@@ -444,7 +588,9 @@ void MyGui::showSettings() const
         ImGui::Checkbox("Set sun intensity manually", &(params->sun->use_gui_sun_intensity));
         if (params->sun->use_gui_sun_intensity)
         {
-            ImGui::SliderFloat("Sun intensity", &(params->sun->sun->intensity), 0.0f, 10.0f, "%.3f");
+            // Диапазон до 15: HDR-пресеты High/Ultra задают 10-12
+            // (ACES-тонмаппинг сжимает значения в LDR)
+            ImGui::SliderFloat("Sun intensity", &(params->sun->sun->intensity), 0.0f, 15.0f, "%.3f");
         }
         else
         {
@@ -464,7 +610,172 @@ void MyGui::showSettings() const
         }
     }
 
+    showGraphicsSettings();
+
     ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+// Выбор пресета графики: применяется на лету всё, что
+// применимо без пересоздания окна; остальное — после перезапуска
+//------------------------------------------------------------------------------
+void MyGui::showGraphicsSettings() const
+{
+    if (!ImGui::CollapsingHeader(u8"Настройки графики"))
+    {
+        return;
+    }
+
+    // Индексы совпадают со значениями gfx::Preset
+    constexpr const char* preset_names[] =
+    {
+        "Legacy",
+        "Low",
+        "High",
+        "Ultra",
+        "Extreme",
+        "Custom"
+    };
+
+    int current_preset = params->graphics_preset_index;
+
+    if (ImGui::Combo(u8"Пресет графики", &current_preset,
+                     preset_names, IM_ARRAYSIZE(preset_names)))
+    {
+        // Диапазон придерживаем на всякий случай
+        current_preset = std::clamp(current_preset, 0, 5);
+        params->graphics_preset_index = current_preset;
+
+        if (params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPreset(
+                static_cast<gfx::Preset>(current_preset), true);
+
+            // Что не применилось без пересоздания окна — сообщаем
+            params->graphics_needs_restart =
+                params->route_viewer->isGraphicsRestartRequired();
+        }
+    }
+
+    // Статусы тиров нового качества: PBR и ACES-тонмаппинг
+    // определяются пресетом и «запекаются» в шейдер-сеты при старте —
+    // в GUI только чтение
+    ImGui::Text(u8"PBR-материалы: %s", params->graphics_use_pbr ? u8"вкл" : u8"выкл");
+    ImGui::Text(u8"ACES-тонмаппинг: %s", params->graphics_use_aces_tonemap ? u8"вкл" : u8"выкл");
+
+    // SSAO: флаг доступен только в Ultra. Сам пасс пост-обработки SSAO
+    // в VSG 1.1.x отсутствует и находится в разработке (см.
+    // graphics-settings.h), на картинку пока не влияет
+    const bool is_ultra =
+            (params->graphics_preset_index == static_cast<int>(gfx::Preset::Ultra));
+
+    bool ssao_enabled = params->graphics_use_ssao;
+
+    if (is_ultra)
+    {
+        if (ImGui::Checkbox(u8"SSAO (в разработке)", &ssao_enabled))
+        {
+            if (params->route_viewer)
+            {
+                params->route_viewer->setGraphicsSsaoEnabled(ssao_enabled);
+            }
+        }
+    }
+    else
+    {
+        ImGui::BeginDisabled(true);
+        ImGui::Checkbox(u8"SSAO", &ssao_enabled);
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+        ImGui::TextDisabled(u8"(только Ultra, в разработке)");
+    }
+
+    // Пост-процесс пресета Extreme: Bloom/SSAO/SSR/Туман —
+    // реальные проходы цепочки, активны только на Extreme (образец
+    // блокировки — BeginDisabled, как у SSAO-чекбокса выше). Изменения
+    // применяются после перезапуска (цепочка собирается при старте)
+    const bool is_extreme =
+            (params->graphics_preset_index == static_cast<int>(gfx::Preset::Extreme));
+
+    bool bloom_enabled = params->graphics_use_bloom;
+    bool ssao_pass_enabled = params->graphics_use_ssao_pass;
+    bool fog_enabled = params->graphics_use_volumetric_fog;
+    bool ssr_enabled = params->graphics_use_ssr;
+    float postprocess_scale = params->graphics_postprocess_scale;
+
+    if (is_extreme)
+    {
+        if (ImGui::Checkbox(u8"Bloom", &bloom_enabled) && params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPostprocessFlag("use_bloom",
+                                                             bloom_enabled);
+        }
+
+        if (ImGui::Checkbox(u8"SSAO (пост-процесс)", &ssao_pass_enabled) && params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPostprocessFlag("use_ssao_pass",
+                                                             ssao_pass_enabled);
+        }
+
+        if (ImGui::Checkbox(u8"SSR (отражения)", &ssr_enabled) && params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPostprocessFlag("use_ssr",
+                                                             ssr_enabled);
+        }
+
+        if (ImGui::Checkbox(u8"Туман", &fog_enabled) && params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPostprocessFlag("use_volumetric_fog",
+                                                             fog_enabled);
+        }
+
+        if (ImGui::SliderFloat(u8"Масштаб пост-процесса", &postprocess_scale,
+                               0.5f, 1.0f, "%.2f") && params->route_viewer)
+        {
+            params->route_viewer->setGraphicsPostprocessScale(postprocess_scale);
+        }
+    }
+    else
+    {
+        ImGui::BeginDisabled(true);
+        ImGui::Checkbox(u8"Bloom", &bloom_enabled);
+        ImGui::Checkbox(u8"SSAO (пост-процесс)", &ssao_pass_enabled);
+        ImGui::Checkbox(u8"SSR (отражения)", &ssr_enabled);
+        ImGui::Checkbox(u8"Туман", &fog_enabled);
+        ImGui::SliderFloat(u8"Масштаб пост-процесса", &postprocess_scale,
+                           0.5f, 1.0f, "%.2f");
+        ImGui::EndDisabled();
+        ImGui::TextDisabled(u8"(только Extreme)");
+    }
+
+    if (params->graphics_needs_restart)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.3f, 1.0f));
+        ImGui::TextWrapped(u8"Сглаживание и настройки теней применятся после перезапуска");
+        ImGui::PopStyleColor();
+    }
+
+    // PBR/ACES запекаются в пайплайн при старте: если смена пресета
+    // затронула HDR-тир, перезапуск обязателен (текст — по образцу
+    // сообщения про MSAA/тени выше)
+    if (params->graphics_needs_restart &&
+        ((params->graphics_preset_index == static_cast<int>(gfx::Preset::High)) ||
+         (params->graphics_preset_index == static_cast<int>(gfx::Preset::Ultra)) ||
+         (params->graphics_preset_index == static_cast<int>(gfx::Preset::Extreme)) ||
+         params->graphics_use_pbr || params->graphics_use_aces_tonemap))
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.3f, 1.0f));
+        ImGui::TextWrapped(u8"PBR и ACES-тонмаппинг применятся после перезапуска");
+        ImGui::PopStyleColor();
+    }
+
+    // Пост-процесс собирается в командный граф при старте
+    if (params->graphics_needs_restart && params->graphics_use_postprocess)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.3f, 1.0f));
+        ImGui::TextWrapped(u8"Пост-процесс применится после перезапуска");
+        ImGui::PopStyleColor();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -498,12 +809,298 @@ void MyGui::showDebugMsg() const
 }
 
 //------------------------------------------------------------------------------
+// Диагностика составов:
+// свёрнутый режим - сводка по составам (F4 переключает режимы)
+//------------------------------------------------------------------------------
+void MyGui::showDiagnostics() const
+{
+    if (!params->vehicles_handler)
+    {
+        return;
+    }
+
+    const simulator_diagnostics_update_t diag =
+            params->vehicles_handler->getDiagnostics();
+
+    ImGuiIO &io = ImGui::GetIO();
+    ImVec2 content_size = io.DisplaySize;
+
+    // Свёрнутый режим: только сводка составов
+    const int rows = static_cast<int>(diag.trains.size()) +
+            (params->diagnostics_full_mode ? 2 : 1);
+
+    const float h = std::min(font_size * (rows + 8),
+                             content_size.y * 0.8f);
+    const float w = params->diagnostics_full_mode ? 980.0f : 640.0f;
+
+    ImGui::SetNextWindowSize(ImVec2(w, h));
+    ImGui::SetNextWindowPos(ImVec2(content_size.x - w, 0));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.8f));
+    ImGui::Begin(params->diagnostics_full_mode
+                     ? u8"Диагностика вагонов (F3 - закрыть, F4 - сводка)"
+                     : u8"Сводка составов (F3 - закрыть, F4 - вагоны)",
+                 &open_ptr, window_flags);
+    ImGui::PopStyleColor();
+
+    // --- Сводка составов ---
+    if (diag.trains.empty())
+    {
+        ImGui::TextUnformatted(u8"Нет данных (симулятор не подключён)");
+        ImGui::End();
+        return;
+    }
+
+    QString header = QString("%1 %2 %3 %4 %5 %6 %7")
+            .arg(u8"Поезд", 16)
+            .arg(u8"ПЕ", 9)
+            .arg(u8"Масса,т", 9)
+            .arg(u8"Длина,м", 8)
+            .arg(u8"Растяж,кН", 10)
+            .arg(u8"Сжатие,кН", 10)
+            .arg(u8"Сцепки:-/+");
+    ImGui::TextUnformatted(header.toStdString().c_str());
+
+    for (const auto& train : diag.trains)
+    {
+        QString name = train.train_name.isEmpty()
+                ? QString::number(train.first_vehicle_id) : train.train_name;
+        if (name.length() > 15)
+        {
+            name = name.left(14) + ".";
+        }
+
+        QString line = QString("%1 %2 %3 %4 %5 %6 %7/%8")
+                .arg(name, 16)
+                .arg(QString("%1-%2").arg(train.first_vehicle_id)
+                                        .arg(train.last_vehicle_id), 9)
+                .arg(train.train_mass_t, 9, 'f', 0)
+                .arg(train.train_length_m, 8, 'f', 0)
+                .arg(train.max_tension_kn, 10, 'f', 0)
+                .arg(train.max_compression_kn, 10, 'f', 0)
+                .arg(train.overloaded_joints)
+                .arg(train.broken_joints);
+
+        // Разрушенные сцепки - красным, перегруженные - жёлтым
+        ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+        if (train.broken_joints > 0)
+        {
+            color = ImVec4(1.0f, 0.3f, 0.3f, 1.0f);
+        }
+        else if (train.overloaded_joints > 0)
+        {
+            color = ImVec4(1.0f, 0.8f, 0.3f, 1.0f);
+        }
+
+        ImGui::PushStyleColor(ImGuiCol_Text, color);
+        ImGui::TextUnformatted(line.toStdString().c_str());
+        ImGui::PopStyleColor();
+    }
+
+    // --- Полный режим: по каждому вагону ---
+    if (params->diagnostics_full_mode)
+    {
+        ImGui::Spacing();
+
+        QString veh_header = QString("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11")
+                .arg(u8"ПЕ", 4)
+                .arg(u8"Масса,т", 8)
+                .arg(u8"V,км/ч", 8)
+                .arg(u8"Пикет,м", 9)
+                .arg(u8"Уклон", 6)
+                .arg(u8"F,кН", 7)
+                .arg(u8"Кузов", 6)
+                .arg(u8"Тележ.", 7)
+                .arg(u8"Колодки", 8)
+                .arg(u8"Уск.в/п", 9)
+                .arg(u8"Прочее");
+        ImGui::TextUnformatted(veh_header.toStdString().c_str());
+
+        // Прокручиваемая область для длинных составов
+        ImGui::BeginChild("vehicles", ImVec2(0.0f, 0.0f), false);
+
+        for (const auto& vehicle : diag.vehicles)
+        {
+            QString flags = "";
+            if (vehicle.derailed != 0)
+            {
+                flags += u8"СХОД ";
+            }
+            if (vehicle.coupled_fwd == 0)
+            {
+                flags += u8"| перед ";
+            }
+            if (vehicle.coupled_bwd == 0)
+            {
+                flags += u8"| зад ";
+            }
+            if (flags.isEmpty())
+            {
+                flags = u8"ок";
+            }
+
+            const QString line = QString("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11")
+                    .arg(vehicle.vehicle_idx, 4)
+                    .arg(vehicle.mass_t, 8, 'f', 1)
+                    .arg(vehicle.speed_kmh, 8, 'f', 1)
+                    .arg(vehicle.rail_coord_m, 9, 'f', 0)
+                    .arg(vehicle.inclination, 6, 'f', 1)
+                    .arg(vehicle.force_kn, 7, 'f', 0)
+                    .arg(vehicle.body_damage, 6, 'f', 2)
+                    .arg(vehicle.bogie_damage, 7, 'f', 2)
+                    .arg(QString::number(static_cast<int>(vehicle.shoe_temperature)) +
+                         u8"°/" + QString::number(vehicle.brake_efficiency, 'f', 2), 8)
+                    .arg(QString("%1/%2").arg(vehicle.vertical_accel, 0, 'f', 1)
+                                           .arg(vehicle.lateral_accel, 0, 'f', 1), 9)
+                    .arg(flags);
+
+            // Сход - красным, повреждения - жёлтым
+            ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+            if (vehicle.derailed != 0)
+            {
+                color = ImVec4(1.0f, 0.3f, 0.3f, 1.0f);
+            }
+            else if ((vehicle.body_damage > 0.05f) || (vehicle.bogie_damage > 0.05f))
+            {
+                color = ImVec4(1.0f, 0.8f, 0.3f, 1.0f);
+            }
+
+            ImGui::PushStyleColor(ImGuiCol_Text, color);
+            ImGui::TextUnformatted(line.toStdString().c_str());
+            ImGui::PopStyleColor();
+        }
+
+        ImGui::EndChild();
+    }
+
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::drawWalkHint() const
+{
+    if (params->walk_hint.isEmpty())
+        return;
+
+    const std::string text = params->walk_hint.toStdString();
+    const char* c_text = text.c_str();
+
+    ImVec2 text_size = ImGui::CalcTextSize(c_text);
+
+    ImGuiIO& io = ImGui::GetIO();
+    const float w = text_size.x + 30.0f;
+    const float h = text_size.y + 14.0f;
+
+    ImGui::SetNextWindowPos(ImVec2((io.DisplaySize.x - w) / 2.0f,
+                                   io.DisplaySize.y * 0.62f));
+    ImGui::SetNextWindowSize(ImVec2(w, h));
+
+    ImGuiWindowFlags flags = 0;
+    flags |= ImGuiWindowFlags_NoTitleBar;
+    flags |= ImGuiWindowFlags_NoResize;
+    flags |= ImGuiWindowFlags_NoCollapse;
+    flags |= ImGuiWindowFlags_NoInputs;
+    flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg,
+                          ImVec4(0.05f, 0.25f, 0.10f, 0.85f));
+    ImGui::Begin(u8"Подсказка", &open_ptr, flags);
+    ImGui::PopStyleColor();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 1.0f, 0.9f, 1.0f));
+    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - text_size.x) * 0.5f);
+    ImGui::TextUnformatted(c_text);
+    ImGui::PopStyleColor();
+    ImGui::End();
+}
+
+void MyGui::showCassetteNotice() const
+{
+    if (!params->vehicles_handler)
+    {
+        return;
+    }
+
+    const quint32 notice_id = params->vehicles_handler->getCassetteNoticeId();
+
+    if (notice_id == 0 || notice_id == prev_cassette_notice_id)
+    {
+        // Показ ещё активного предупреждения (таймер затухания)
+        if (notice_shown_until > ImGui::GetTime() && !cassette_notice_text.isEmpty())
+        {
+            drawCassetteNotice(cassette_notice_text);
+        }
+        return;
+    }
+
+    // Новое предупреждение от симулятора
+    prev_cassette_notice_id = notice_id;
+    cassette_notice_text = params->vehicles_handler->getCassetteNotice();
+    notice_shown_until = ImGui::GetTime() + 5.0;
+
+    if (!cassette_notice_text.isEmpty())
+    {
+        drawCassetteNotice(cassette_notice_text);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MyGui::drawCassetteNotice(const QString& text) const
+{
+    const std::string std_text = text.toStdString();
+    const char* c_text = std_text.c_str();
+
+    ImVec2 text_size = ImGui::CalcTextSize(c_text);
+
+    ImGuiIO& io = ImGui::GetIO();
+    const float w = text_size.x + 40.0f;
+    const float h = text_size.y + 24.0f;
+
+    ImGui::SetNextWindowPos(ImVec2((io.DisplaySize.x - w) / 2.0f,
+                                   io.DisplaySize.y * 0.22f));
+    ImGui::SetNextWindowSize(ImVec2(w, h));
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoInputs;
+    window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+
+    bool open_ptr = true;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.55f, 0.05f, 0.05f, 0.85f));
+    ImGui::Begin(u8"Предупреждение", &open_ptr, window_flags);
+    ImGui::PopStyleColor();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    // Текст по центру строки
+    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - text_size.x) * 0.5f);
+    ImGui::TextUnformatted(c_text);
+
+    ImGui::PopStyleColor();
+    ImGui::End();
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void MyGui::showNoControlled() const
 {
-    const char *text = "Нажмите Enter для управления данной ПЕ";
-    ImVec2 text_size = ImGui::CalcTextSize(text);
+    const char *text = "Нажмите Enter для управления данной ПЕ";    ImVec2 text_size = ImGui::CalcTextSize(text);
 
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(text_size.x + 20, text_size.y + 20));
@@ -616,9 +1213,495 @@ void MyGui::showTrainRenameDialog() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+QString MyGui::tr(const char* ru, const char* en) const
+{
+    return QString::fromUtf8(params->use_english ? en : ru);
+}
+
+//------------------------------------------------------------------------------
+// Информация о вагоне (F5), листается по составу
+//------------------------------------------------------------------------------
+void MyGui::showCarInfoPanel() const
+{
+    bool open = params->is_show_car_info;
+    QByteArray title = tr(u8"Информация о вагоне", "Car information").toUtf8();
+
+    ImGui::SetNextWindowSize(ImVec2(460, 380), ImGuiCond_FirstUseEver);
+
+    if (ImGui::Begin(title.constData(), &open))
+    {
+        if (params->vehicles_handler == nullptr)
+        {
+            ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+        }
+        else
+        {
+            const auto& trains = params->vehicles_handler->getTrainsInfo();
+            const int train_idx = params->vehicles_handler->getCurrentTrainIndex();
+            const auto diag = params->vehicles_handler->getDiagnostics();
+
+            if (train_idx < 0 || train_idx >= static_cast<int>(trains.size()))
+            {
+                ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+            }
+            else
+            {
+                const int lo = std::min(trains[train_idx].first_vehicle_id,
+                                        trains[train_idx].last_vehicle_id);
+                const int hi = std::max(trains[train_idx].first_vehicle_id,
+                                        trains[train_idx].last_vehicle_id);
+
+                std::vector<const simulator_vehicle_diagnostics_t*> cars;
+                for (const auto& v : diag.vehicles)
+                {
+                    if (v.vehicle_idx >= lo && v.vehicle_idx <= hi)
+                    {
+                        cars.push_back(&v);
+                    }
+                }
+
+                std::sort(cars.begin(), cars.end(),
+                          [](const auto* a, const auto* b)
+                {
+                    return a->vehicle_idx < b->vehicle_idx;
+                });
+
+                if (cars.empty())
+                {
+                    ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+                }
+                else
+                {
+                    int page = params->car_info_page % static_cast<int>(cars.size());
+                    if (page < 0)
+                    {
+                        page += static_cast<int>(cars.size());
+                    }
+
+                    const auto* car = cars[page];
+
+                    ImGui::Text("%s: %s",
+                                tr(u8"Поезд", "Train").toUtf8().constData(),
+                                trains[train_idx].train_name.toUtf8().constData());
+                    ImGui::Text("%s: %d / %d",
+                                tr(u8"Вагон", "Car").toUtf8().constData(),
+                                page + 1,
+                                static_cast<int>(cars.size()));
+
+                    QString cfg_name;
+                    const auto& info = params->vehicles_handler->getVehiclesInfo().vehicles;
+                    if (car->vehicle_idx >= 0
+                        && car->vehicle_idx < static_cast<int>(info.size()))
+                    {
+                        cfg_name = info[car->vehicle_idx].vehicle_config_file;
+                        cfg_name = cfg_name.section('/', -1).section('\\', -1);
+                        if (cfg_name.endsWith(".xml", Qt::CaseInsensitive))
+                        {
+                            cfg_name.chop(4);
+                        }
+                    }
+
+                    if (!cfg_name.isEmpty())
+                    {
+                        ImGui::Text("%s: %s",
+                                    tr(u8"Модель", "Model").toUtf8().constData(),
+                                    cfg_name.toUtf8().constData());
+                    }
+
+                    ImGui::Separator();
+                    ImGui::Text("%s: %.2f %s",
+                                tr(u8"Масса", "Mass").toUtf8().constData(),
+                                car->mass_t,
+                                tr(u8"т", "t").toUtf8().constData());
+                    ImGui::Text("%s: %.1f %s",
+                                tr(u8"Скорость", "Speed").toUtf8().constData(),
+                                car->speed_kmh,
+                                tr(u8"км/ч", "km/h").toUtf8().constData());
+                    ImGui::Text("%s: %.0f %s",
+                                tr(u8"Пикетаж", "Railway coordinate").toUtf8().constData(),
+                                car->rail_coord_m,
+                                tr(u8"м", "m").toUtf8().constData());
+                    ImGui::Text("%s: %.1f %s",
+                                tr(u8"Уклон", "Gradient").toUtf8().constData(),
+                                car->inclination,
+                                tr(u8"тыс.", "thousandths").toUtf8().constData());
+
+                    ImGui::Separator();
+                    ImGui::Text("%s: %s",
+                                tr(u8"Сход", "Derailed").toUtf8().constData(),
+                                car->derailed ? tr(u8"да", "yes").toUtf8().constData()
+                                              : tr(u8"нет", "no").toUtf8().constData());
+                    ImGui::Text("%s: %s / %s",
+                                tr(u8"Сцеплен", "Coupled").toUtf8().constData(),
+                                car->coupled_fwd ? tr(u8"спереди", "front").toUtf8().constData()
+                                                 : tr(u8"нет", "no").toUtf8().constData(),
+                                car->coupled_bwd ? tr(u8"сзади", "rear").toUtf8().constData()
+                                                 : tr(u8"нет", "no").toUtf8().constData());
+                    ImGui::Text("%s: %.0f%% / %.0f%%",
+                                tr(u8"Кузов/тележка", "Body/bogie").toUtf8().constData(),
+                                car->body_damage * 100.0f,
+                                car->bogie_damage * 100.0f);
+                    ImGui::Text("%s: %.0f%%",
+                                tr(u8"Тормоза", "Brakes").toUtf8().constData(),
+                                car->brake_efficiency * 100.0f);
+                    ImGui::Text("%s: %.0f C",
+                                tr(u8"Температура колодок", "Shoe temperature").toUtf8().constData(),
+                                car->shoe_temperature);
+
+                    ImGui::Separator();
+                    if (ImGui::Button("<<"))
+                    {
+                        --params->car_info_page;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(">>"))
+                    {
+                        ++params->car_info_page;
+                    }
+                    ImGui::SameLine();
+                    ImGui::TextUnformatted(tr(u8"F5 - следующий вагон",
+                                              "F5 - next car").toUtf8().constData());
+                }
+            }
+        }
+    }
+
+    ImGui::End();
+    params->is_show_car_info = open;
+}
+
+//------------------------------------------------------------------------------
+// Ограничения скорости (Ctrl+F5)
+//------------------------------------------------------------------------------
+void MyGui::showSpeedLimitsPanel() const
+{
+    bool open = params->is_show_speed_limits;
+    QByteArray title = tr(u8"Ограничения скорости", "Speed limits").toUtf8();
+
+    ImGui::SetNextWindowSize(ImVec2(430, 360), ImGuiCond_FirstUseEver);
+
+    if (ImGui::Begin(title.constData(), &open))
+    {
+        if (params->vehicles_handler == nullptr)
+        {
+            ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+        }
+        else
+        {
+            simulator_train_profile_update_t profile;
+            const int train_idx = params->vehicles_handler->getCurrentTrainIndex();
+
+            if (!params->vehicles_handler->getTrainProfile(train_idx, profile))
+            {
+                ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+            }
+            else
+            {
+                const float dir = (profile.direction < 0) ? -1.0f : 1.0f;
+
+                float nearest_point = 1.0e9f;
+                float railway_coord = 0.0f;
+                for (const auto& point : profile.profile)
+                {
+                    const float d = std::fabs(point.distance);
+                    if (d < nearest_point)
+                    {
+                        nearest_point = d;
+                        railway_coord = point.railway_coord;
+                    }
+                }
+
+                bool has_limit = false;
+                float current_limit = 0.0f;
+                for (const auto& limit : profile.speed_limits)
+                {
+                    const bool covers_train =
+                        (limit.distance <= 0.0f && limit.end_distance >= 0.0f) ||
+                        (limit.end_distance <= 0.0f && limit.distance >= 0.0f);
+
+                    if (covers_train)
+                    {
+                        if (!has_limit || limit.speed_kmh < current_limit)
+                        {
+                            current_limit = limit.speed_kmh;
+                            has_limit = true;
+                        }
+                    }
+                }
+
+                if (!has_limit)
+                {
+                    float next_distance = 1.0e9f;
+                    for (const auto& limit : profile.speed_limits)
+                    {
+                        const float d = limit.distance * dir;
+                        if (d >= -1.0f && d < next_distance)
+                        {
+                            next_distance = d;
+                            current_limit = limit.speed_kmh;
+                            has_limit = true;
+                        }
+                    }
+                }
+
+                ImGui::Text("%s: %.1f %s",
+                            tr(u8"Скорость", "Speed").toUtf8().constData(),
+                            profile.speed * 3.6f,
+                            tr(u8"км/ч", "km/h").toUtf8().constData());
+                ImGui::Text("%s: %.0f %s",
+                            tr(u8"Пикетаж", "Railway coordinate").toUtf8().constData(),
+                            railway_coord,
+                            tr(u8"м", "m").toUtf8().constData());
+                ImGui::Text("%s: %s",
+                            tr(u8"Текущее ограничение", "Current limit").toUtf8().constData(),
+                            has_limit ? QString::number(current_limit, 'f', 1).toUtf8().constData()
+                                      : tr(u8"нет данных", "no data").toUtf8().constData());
+
+                ImGui::Separator();
+                ImGui::TextUnformatted(tr(u8"Впереди:", "Ahead:").toUtf8().constData());
+
+                std::vector<const simulator_train_profile_speed_limit_t*> ahead;
+                for (const auto& limit : profile.speed_limits)
+                {
+                    const float d = limit.distance * dir;
+                    if (d > 1.0f)
+                    {
+                        ahead.push_back(&limit);
+                    }
+                }
+
+                std::sort(ahead.begin(), ahead.end(),
+                          [dir](const auto* a, const auto* b)
+                {
+                    return a->distance * dir < b->distance * dir;
+                });
+
+                if (ahead.empty())
+                {
+                    ImGui::TextUnformatted(tr(u8"нет данных", "no data").toUtf8().constData());
+                }
+                else
+                {
+                    const size_t count = std::min<size_t>(ahead.size(), 8);
+                    for (size_t i = 0; i < count; ++i)
+                    {
+                        const float d = ahead[i]->distance * dir;
+                        ImGui::Text("+%.0f %s  %.0f %s",
+                                    d,
+                                    tr(u8"м", "m").toUtf8().constData(),
+                                    ahead[i]->speed_kmh,
+                                    tr(u8"км/ч", "km/h").toUtf8().constData());
+                    }
+                }
+            }
+        }
+    }
+
+    ImGui::End();
+    params->is_show_speed_limits = open;
+}
+
+//------------------------------------------------------------------------------
+// Станции впереди (F6)
+//------------------------------------------------------------------------------
+void MyGui::showStationsPanel() const
+{
+    bool open = params->is_show_stations_panel;
+    QByteArray title = tr(u8"Станции впереди", "Stations ahead").toUtf8();
+
+    ImGui::SetNextWindowSize(ImVec2(420, 320), ImGuiCond_FirstUseEver);
+
+    if (ImGui::Begin(title.constData(), &open))
+    {
+        if (params->vehicles_handler == nullptr)
+        {
+            ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+        }
+        else
+        {
+            simulator_train_profile_update_t profile;
+            const int train_idx = params->vehicles_handler->getCurrentTrainIndex();
+
+            if (!params->vehicles_handler->getTrainProfile(train_idx, profile))
+            {
+                ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+            }
+            else
+            {
+                const float dir = (profile.direction < 0) ? -1.0f : 1.0f;
+
+                std::vector<const simulator_train_profile_station_t*> ahead;
+                for (const auto& station : profile.stations)
+                {
+                    if (station.distance * dir >= -1.0f)
+                    {
+                        ahead.push_back(&station);
+                    }
+                }
+
+                std::sort(ahead.begin(), ahead.end(),
+                          [dir](const auto* a, const auto* b)
+                {
+                    return a->distance * dir < b->distance * dir;
+                });
+
+                if (ahead.empty())
+                {
+                    ImGui::TextUnformatted(tr(u8"нет данных", "no data").toUtf8().constData());
+                }
+                else
+                {
+                    const size_t count = std::min<size_t>(ahead.size(), 12);
+                    for (size_t i = 0; i < count; ++i)
+                    {
+                        const float d = ahead[i]->distance * dir;
+                        if (d < 1.0f)
+                        {
+                            ImGui::Text("%s: %s",
+                                        tr(u8"Сейчас", "Now").toUtf8().constData(),
+                                        ahead[i]->name.toUtf8().constData());
+                        }
+                        else
+                        {
+                            ImGui::Text("+%.0f %s  %s",
+                                        d,
+                                        tr(u8"м", "m").toUtf8().constData(),
+                                        ahead[i]->name.toUtf8().constData());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    ImGui::End();
+    params->is_show_stations_panel = open;
+}
+
+//------------------------------------------------------------------------------
+// Светофоры впереди (Ctrl+F7)
+//------------------------------------------------------------------------------
+void MyGui::showSignalsPanel() const
+{
+    bool open = params->is_show_signal_panel;
+    QByteArray title = tr(u8"Светофоры впереди", "Signals ahead").toUtf8();
+
+    ImGui::SetNextWindowSize(ImVec2(440, 320), ImGuiCond_FirstUseEver);
+
+    if (ImGui::Begin(title.constData(), &open))
+    {
+        if (params->vehicles_handler == nullptr)
+        {
+            ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+        }
+        else
+        {
+            simulator_train_profile_update_t profile;
+            const int train_idx = params->vehicles_handler->getCurrentTrainIndex();
+
+            if (!params->vehicles_handler->getTrainProfile(train_idx, profile))
+            {
+                ImGui::TextUnformatted(tr(u8"Нет данных", "No data").toUtf8().constData());
+            }
+            else
+            {
+                const float dir = (profile.direction < 0) ? -1.0f : 1.0f;
+
+                std::vector<const simulator_train_profile_signal_t*> ahead;
+                for (const auto& signal : profile.signal_list)
+                {
+                    if (signal.distance * dir >= -1.0f)
+                    {
+                        ahead.push_back(&signal);
+                    }
+                }
+
+                std::sort(ahead.begin(), ahead.end(),
+                          [dir](const auto* a, const auto* b)
+                {
+                    return a->distance * dir < b->distance * dir;
+                });
+
+                if (ahead.empty())
+                {
+                    ImGui::TextUnformatted(tr(u8"нет данных", "no data").toUtf8().constData());
+                }
+                else
+                {
+                    const size_t count = std::min<size_t>(ahead.size(), 12);
+                    for (size_t i = 0; i < count; ++i)
+                    {
+                        const auto* signal = ahead[i];
+                        const float d = signal->distance * dir;
+
+                        QString name = signal->connector_name;
+                        if (params->traffic_lights_handler != nullptr)
+                        {
+                            const TrafficLight* light =
+                                params->traffic_lights_handler->findSignal(
+                                    signal->connector_name, signal->signal_dir);
+                            if (light != nullptr && !light->getLetter().isEmpty())
+                            {
+                                name = light->getLetter();
+                            }
+                        }
+
+                        const QByteArray name_utf8 = name.toUtf8();
+                        if (d < 1.0f)
+                        {
+                            ImGui::Text("%s: %s%s",
+                                        tr(u8"Сейчас", "Now").toUtf8().constData(),
+                                        name_utf8.constData(),
+                                        signal->is_oncoming
+                                            ? tr(u8" (встречный)", " (oncoming)").toUtf8().constData()
+                                            : "");
+                        }
+                        else
+                        {
+                            ImGui::Text("+%.0f %s  %s%s",
+                                        d,
+                                        tr(u8"м", "m").toUtf8().constData(),
+                                        name_utf8.constData(),
+                                        signal->is_oncoming
+                                            ? tr(u8" (встречный)", " (oncoming)").toUtf8().constData()
+                                            : "");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    ImGui::End();
+    params->is_show_signal_panel = open;
+}
+
+//------------------------------------------------------------------------------
+// Подписи станций и поездов (F7)
+//------------------------------------------------------------------------------
+void MyGui::applyWorldLabels() const
+{
+    if (params->stations_handler)
+    {
+        params->stations_handler->setVisible(
+            params->is_show_labels && params->hud_show_stations);
+    }
+
+    if (params->train_labels_handler)
+    {
+        params->train_labels_handler->setVisible(
+            params->is_show_labels && params->hud_show_train_labels);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void MyGui::showPauseState() const
 {
-    QString text = QString("ПAУЗА\nДля возобновления игры нажмите Pause");
+    QString text = params->use_english
+        ? QString::fromUtf8(u8"PAUSED\nPress Pause to resume")
+        : QString::fromUtf8(u8"ПАУЗА\nДля возобновления игры нажмите Pause");
 
     ImGuiIO &io = ImGui::GetIO();
     ImVec2 content_size = io.DisplaySize;
@@ -706,7 +1789,7 @@ void MyGui::showHUD() const
     ImGui::PushID("hud_profile");
     if (params->hud_show_profile)
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
-    if (ImGui::Button(u8"Профиль", ImVec2(btn_w, btn_h)))
+    if (ImGui::Button(tr(u8"Профиль", "Profile").toUtf8().constData(), ImVec2(btn_w, btn_h)))
         params->hud_show_profile = !params->hud_show_profile;
     if (params->hud_show_profile)
         ImGui::PopStyleColor();
@@ -728,7 +1811,7 @@ void MyGui::showHUD() const
     {
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
     }
-    if (ImGui::Button(u8"График", ImVec2(btn_w, btn_h)) && has_timetable)
+    if (ImGui::Button(tr(u8"График", "Timetable").toUtf8().constData(), ImVec2(btn_w, btn_h)) && has_timetable)
         params->hud_show_timetable = !params->hud_show_timetable;
     if (!has_timetable)
     {
@@ -748,7 +1831,7 @@ void MyGui::showHUD() const
     ImGui::PushID("hud_list");
     if (params->hud_show_trains_list)
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
-    if (ImGui::Button(u8"Поезда", ImVec2(btn_w, btn_h)))
+    if (ImGui::Button(tr(u8"Поезда", "Trains").toUtf8().constData(), ImVec2(btn_w, btn_h)))
         params->hud_show_trains_list = !params->hud_show_trains_list;
     if (params->hud_show_trains_list)
         ImGui::PopStyleColor();
@@ -770,10 +1853,9 @@ void MyGui::showHUD() const
     {
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
     }
-    if (ImGui::Button(u8"Станции", ImVec2(btn_w, btn_h)) && has_stations)
+    if (ImGui::Button(tr(u8"Станции", "Stations").toUtf8().constData(), ImVec2(btn_w, btn_h)) && has_stations)
     {
         params->hud_show_stations = !params->hud_show_stations;
-        params->stations_handler->setVisible(params->hud_show_stations);
     }
     if (!has_stations)
     {
@@ -803,10 +1885,9 @@ void MyGui::showHUD() const
     {
         ImGui::PushStyleColor(ImGuiCol_Button, params->hud_button_on);
     }
-    if (ImGui::Button(u8"Номера поездов", ImVec2(last_btn_w, btn_h)) && has_train_labels)
+    if (ImGui::Button(tr(u8"Номера поездов", "Train labels").toUtf8().constData(), ImVec2(last_btn_w, btn_h)) && has_train_labels)
     {
         params->hud_show_train_labels = !params->hud_show_train_labels;
-        params->train_labels_handler->setVisible(params->hud_show_train_labels);
     }
     if (!has_train_labels)
     {
@@ -1076,7 +2157,7 @@ void MyGui::showControlTooltip() const
 
     if (ImGui::Begin("##cab_tooltip", nullptr, flags))
     {
-        // Заголовок выравнивается по центру окна подсказки
+        // ╨Ч╨░╨│╨╛╨╗╨╛╨▓╨╛╨║ ╨▓╤Л╤А╨░╨▓╨╜╨╕╨▓╨░╨╡╤В╤Б╤П ╨┐╨╛ ╤Ж╨╡╨╜╤В╤А╤Г ╨╛╨║╨╜╨░ ╨┐╨╛╨┤╤Б╨║╨░╨╖╨║╨╕
         const std::string title = tip.title.toStdString();
         const float title_w = ImGui::CalcTextSize(title.c_str()).x;
         const float avail_w = ImGui::GetContentRegionAvail().x;
@@ -1126,11 +2207,11 @@ void MyGui::showControlTooltip() const
 //------------------------------------------------------------------------------
 float MyGui::hudTopOffset() const
 {
-    // Отступ постоянный: резервируем место под баннеры статуса управления и
-    // статистику, даже если они сейчас не отображаются
+    // ╨Ю╤В╤Б╤В╤Г╨┐ ╨┐╨╛╤Б╤В╨╛╤П╨╜╨╜╤Л╨╣: ╤А╨╡╨╖╨╡╤А╨▓╨╕╤А╤Г╨╡╨╝ ╨╝╨╡╤Б╤В╨╛ ╨┐╨╛╨┤ ╨▒╨░╨╜╨╜╨╡╤А╤Л ╤Б╤В╨░╤В╤Г╤Б╨░ ╤Г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П ╨╕
+    // ╤Б╤В╨░╤В╨╕╤Б╤В╨╕╨║╤Г, ╨┤╨░╨╢╨╡ ╨╡╤Б╨╗╨╕ ╨╛╨╜╨╕ ╤Б╨╡╨╣╤З╨░╤Б ╨╜╨╡ ╨╛╤В╨╛╨▒╤А╨░╨╢╨░╤О╤В╤Б╤П
     float top = 0.0f;
 
-    const char *text_no_controlled = "Нажмите Enter для управления данной ПЕ";
+    const char *text_no_controlled = "╨Э╨░╨╢╨╝╨╕╤В╨╡ Enter ╨┤╨╗╤П ╤Г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П ╨┤╨░╨╜╨╜╨╛╨╣ ╨Я╨Х";
     const float h_no_controlled = ImGui::CalcTextSize(text_no_controlled).y + 20.0f;
     if (h_no_controlled > top)
         top = h_no_controlled;
@@ -1140,7 +2221,7 @@ float MyGui::hudTopOffset() const
         VehicleExterior* cur = params->vehicles_handler->getCurrentVehicle();
         if (cur)
         {
-            std::string msg = QString("Нажмите Enter для управления из кабины %1")
+            std::string msg = QString("╨Э╨░╨╢╨╝╨╕╤В╨╡ Enter ╨┤╨╗╤П ╤Г╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П ╨╕╨╖ ╨║╨░╨▒╨╕╨╜╤Л %1")
                                   .arg(cur->current_cabine_idx + 1).toStdString();
             const float h_cabine = ImGui::CalcTextSize(msg.c_str()).y + 20.0f;
             if (h_cabine > top)
@@ -1160,4 +2241,297 @@ float MyGui::hudTopOffset() const
     }
 
     return (top > 0.0f) ? top + 2.0f : 8.0f;
+}
+
+//------------------------------------------------------------------------------
+// Отправка сервисной команды текущего вагона на сервер.
+// Используется существующий канал управления, протокол не меняется.
+//------------------------------------------------------------------------------
+void MyGui::sendCarServiceCommand(uint16_t action, float value) const
+{
+    if ((params->tcp_client == nullptr) || (params->vehicles_handler == nullptr))
+    {
+        return;
+    }
+
+    const int vehicle_idx = params->vehicles_handler->getCurrentVehicleIndex();
+
+    if (vehicle_idx < 0)
+    {
+        return;
+    }
+
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+
+    stream << vehicle_idx;                      // индекс вагона
+    stream << 0;                                // номер кабины
+    stream << action;                           // ID сервисной команды
+    stream << value;                            // 0/1 или величина
+    stream << static_cast<quint32>(0);          // доп. параметров нет
+    stream << static_cast<qint8>(0);            // приоритет
+
+    params->tcp_client->slotSendVehicleControlCommand(data);
+}
+
+//------------------------------------------------------------------------------
+// Меню вагона (Num3): сцепка и тележка, как в openRTS
+//------------------------------------------------------------------------------
+void MyGui::showCarMenu() const
+{
+    if ((params->vehicles_handler == nullptr) || (params->tcp_client == nullptr))
+    {
+        return;
+    }
+
+    const int count = params->vehicles_handler->getVehiclesCount();
+    const int idx = params->vehicles_handler->getCurrentVehicleIndex();
+
+    ImGui::SetNextWindowSize(ImVec2(440, 470), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin(tr(u8"Меню вагона", "Car menu").toUtf8().constData(),
+                      &params->is_show_car_menu))
+    {
+        ImGui::End();
+        return;
+    }
+
+    if ((idx < 0) || (idx >= count))
+    {
+        ImGui::TextUnformatted(tr(u8"Нет выбранного вагона",
+                                  "No car selected").toUtf8().constData());
+        ImGui::End();
+        return;
+    }
+
+    // Текущее состояние вагона из диагностики сервера
+    const simulator_diagnostics_update_t diagnostics =
+            params->vehicles_handler->getDiagnostics();
+
+    const simulator_vehicle_diagnostics_t* vd = nullptr;
+    for (const auto& vehicle : diagnostics.vehicles)
+    {
+        if (vehicle.vehicle_idx == idx)
+        {
+            vd = &vehicle;
+            break;
+        }
+    }
+
+    // При смене вагона синхронизируем локальные отметки состояния
+    if (params->car_menu_vehicle != idx)
+    {
+        params->car_menu_vehicle = idx;
+        params->car_menu_handbrake = (vd != nullptr) && (vd->handbrake != 0);
+        params->car_menu_end_valve_fwd = (vd != nullptr) && (vd->valve_fwd != 0);
+        params->car_menu_end_valve_bwd = (vd != nullptr) && (vd->valve_bwd != 0);
+        params->car_menu_chock_fwd = (vd != nullptr) && (vd->chock_fwd != 0);
+        params->car_menu_chock_bwd = (vd != nullptr) && (vd->chock_bwd != 0);
+    }
+
+    ImGui::Text("%s %d %s %d",
+                tr(u8"Вагон", "Car").toUtf8().constData(),
+                idx + 1,
+                tr(u8"из", "of").toUtf8().constData(),
+                count);
+
+    if (vd != nullptr)
+    {
+        ImGui::SameLine();
+        ImGui::TextDisabled("(%.1f %s)", vd->speed_kmh,
+                            tr(u8"км/ч", "km/h").toUtf8().constData());
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::BeginTabBar("##car_menu_tabs"))
+    {
+        if (ImGui::BeginTabItem(tr(u8"Сцепка", "Coupling").toUtf8().constData()))
+        {
+            params->car_menu_page = 0;
+
+            const bool moving = (vd != nullptr)
+                    && (std::abs(vd->speed_kmh) > 1.8f);
+
+            // Один конец вагона: расцепка, концевой кран и тормозной рукав
+            auto draw_end = [&](bool fwd)
+            {
+                const char* end_name = fwd
+                        ? tr(u8"Передний конец", "Front end").toUtf8().constData()
+                        : tr(u8"Задний конец", "Rear end").toUtf8().constData();
+
+                ImGui::TextUnformatted(end_name);
+                ImGui::Separator();
+
+                const bool coupled = (vd == nullptr)
+                        || (fwd ? (vd->coupled_fwd != 0) : (vd->coupled_bwd != 0));
+
+                ImGui::BeginDisabled(!coupled || moving);
+                if (ImGui::Button(fwd
+                                  ? tr(u8"Расцепить спереди", "Uncouple front").toUtf8().constData()
+                                  : tr(u8"Расцепить сзади", "Uncouple rear").toUtf8().constData(),
+                                  ImVec2(-1.0f, 0.0f)))
+                {
+                    sendCarServiceCommand(fwd ? vehicle_service::UncoupleFwd
+                                              : vehicle_service::UncoupleBwd, 1.0f);
+                }
+                ImGui::EndDisabled();
+
+                if (!coupled)
+                {
+                    ImGui::TextDisabled(tr(u8"Свободный конец",
+                                           "Free end").toUtf8().constData());
+                }
+                else if (moving)
+                {
+                    ImGui::TextDisabled(tr(u8"Расцепка только на остановке",
+                                           "Uncouple only at standstill").toUtf8().constData());
+                }
+
+                bool& valve = fwd ? params->car_menu_end_valve_fwd
+                                  : params->car_menu_end_valve_bwd;
+                if (ImGui::Checkbox(fwd
+                                    ? tr(u8"Передний кран открыт", "Front valve open").toUtf8().constData()
+                                    : tr(u8"Задний кран открыт", "Rear valve open").toUtf8().constData(),
+                                    &valve))
+                {
+                    sendCarServiceCommand(fwd ? vehicle_service::EndValveFwd
+                                              : vehicle_service::EndValveBwd,
+                                          valve ? 1.0f : 0.0f);
+                }
+
+                const int hose = (vd == nullptr)
+                        ? 1
+                        : (fwd ? vd->hose_fwd : vd->hose_bwd);
+
+                QByteArray hose_text = tr(u8"на крюке", "on holder").toUtf8();
+                if (hose == 0)
+                {
+                    hose_text = tr(u8"соединён", "connected").toUtf8();
+                }
+                else if (hose == 2)
+                {
+                    hose_text = tr(u8"оборван", "torn").toUtf8();
+                }
+
+                ImGui::Text("%s: %s",
+                            tr(u8"Тормозной рукав", "Brake hose").toUtf8().constData(),
+                            hose_text.constData());
+
+                if (hose != 0)
+                {
+                    ImGui::BeginDisabled(hose == 2);
+                    if (ImGui::Button(fwd
+                                      ? tr(u8"Соединить рукав спереди", "Connect front hose").toUtf8().constData()
+                                      : tr(u8"Соединить рукав сзади", "Connect rear hose").toUtf8().constData(),
+                                      ImVec2(-1.0f, 0.0f)))
+                    {
+                        sendCarServiceCommand(fwd ? vehicle_service::HoseConnectFwd
+                                                  : vehicle_service::HoseConnectBwd, 1.0f);
+                    }
+                    ImGui::EndDisabled();
+                }
+                else
+                {
+                    if (ImGui::Button(fwd
+                                      ? tr(u8"Повесить рукав спереди", "Hang front hose").toUtf8().constData()
+                                      : tr(u8"Повесить рукав сзади", "Hang rear hose").toUtf8().constData(),
+                                      ImVec2(-1.0f, 0.0f)))
+                    {
+                        sendCarServiceCommand(fwd ? vehicle_service::HoseHangFwd
+                                                  : vehicle_service::HoseHangBwd, 1.0f);
+                    }
+                }
+
+                ImGui::Spacing();
+            };
+
+            draw_end(true);
+            draw_end(false);
+
+            ImGui::Separator();
+            ImGui::TextWrapped(tr(u8"Сцепка выполняется автоматически при сближении составов до 10 м.",
+                                  "Coupling is automatic when trains come within 10 m.").toUtf8().constData());
+
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem(tr(u8"Тележка", "Bogie").toUtf8().constData()))
+        {
+            params->car_menu_page = 1;
+
+            // Ручной (стояночный) тормоз
+            if (ImGui::Checkbox(tr(u8"Ручной тормоз", "Handbrake").toUtf8().constData(),
+                                &params->car_menu_handbrake))
+            {
+                sendCarServiceCommand(vehicle_service::ParkingBrake,
+                                      params->car_menu_handbrake ? 1.0f : 0.0f);
+            }
+
+            ImGui::Separator();
+            ImGui::TextUnformatted(tr(u8"Тормозные башмаки",
+                                      "Wheel chocks").toUtf8().constData());
+
+            if (ImGui::Checkbox(tr(u8"Передняя тележка", "Front bogie").toUtf8().constData(),
+                                &params->car_menu_chock_fwd))
+            {
+                sendCarServiceCommand(vehicle_service::ChockFwd,
+                                      params->car_menu_chock_fwd ? 1.0f : 0.0f);
+            }
+
+            if (ImGui::Checkbox(tr(u8"Задняя тележка", "Rear bogie").toUtf8().constData(),
+                                &params->car_menu_chock_bwd))
+            {
+                sendCarServiceCommand(vehicle_service::ChockBwd,
+                                      params->car_menu_chock_bwd ? 1.0f : 0.0f);
+            }
+
+            ImGui::Separator();
+            ImGui::TextUnformatted(tr(u8"Груз", "Cargo").toUtf8().constData());
+
+            if ((vd != nullptr) && (vd->cargo_configured != 0))
+            {
+                ImGui::Text("%s: %s",
+                            tr(u8"Тип", "Type").toUtf8().constData(),
+                            vd->cargo_type.isEmpty()
+                            ? tr(u8"нет", "none").toUtf8().constData()
+                            : vd->cargo_type.toUtf8().constData());
+                ImGui::Text("%s: %.1f %s",
+                            tr(u8"Масса", "Mass").toUtf8().constData(),
+                            vd->cargo_mass_t,
+                            tr(u8"т", "t").toUtf8().constData());
+                ImGui::ProgressBar(vd->cargo_fill, ImVec2(-1.0f, 0.0f));
+            }
+            else
+            {
+                ImGui::TextDisabled(tr(u8"Секция [CargoWagon] не настроена",
+                                       "[CargoWagon] is not configured").toUtf8().constData());
+            }
+
+            ImGui::Separator();
+            ImGui::TextUnformatted(tr(u8"Пассажиры", "Passengers").toUtf8().constData());
+
+            if ((vd != nullptr) && (vd->passengers_configured != 0))
+            {
+                ImGui::Text("%d / %d",
+                            vd->passenger_count,
+                            vd->passenger_capacity);
+            }
+            else
+            {
+                ImGui::TextDisabled(tr(u8"Секция [PassengerCar] не настроена",
+                                       "[PassengerCar] is not configured").toUtf8().constData());
+            }
+
+            ImGui::Separator();
+            ImGui::TextDisabled(tr(u8"ЭПТ, СМЕ, ВВ-шина, отпускной и стоп-кран в RRS пока не моделируются.",
+                                   "EPB, MU, HV bus, release and stop valves are not simulated in RRS yet.").toUtf8().constData());
+
+            ImGui::EndTabItem();
+        }
+
+        ImGui::EndTabBar();
+    }
+
+    ImGui::End();
 }

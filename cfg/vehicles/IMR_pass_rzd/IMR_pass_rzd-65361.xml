@@ -40,6 +40,14 @@
 
 	</Vehicle>
 
+	<PassengerCar>
+		<Capacity>54</Capacity>
+		<CurrentPassengers>0</CurrentPassengers>
+		<Doors>4</Doors>
+		<DoorWidth>1.2</DoorWidth>
+		<PassRate>1.0</PassRate>
+		<HasStairs>0</HasStairs>
+	</PassengerCar>
 
 	<Cabine>
 		<DriverPos>2.0 12.0 2.2</DriverPos>

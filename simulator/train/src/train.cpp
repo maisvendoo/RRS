@@ -1,5 +1,8 @@
 #include    "train.h"
 
+#include    <algorithm>
+#include    <cmath>
+
 #include    "filesystem.h"
 #include    "CfgReader.h"
 #include    "physics.h"
@@ -130,6 +133,10 @@ bool Train::init(const solver_config_t& solver_config, std::vector<Vehicle*>& ve
         ode_order += 2 * vehicle->getDegressOfFreedom();
     }
     dydt.resize(ode_order);
+
+    // Проводники пассажирских вагонов нового состава (расцепка).
+    // Параметры перенесёт uncouple() через copyConfig
+    attachConductors();
 
     Journal::instance()->info(QString("New uncoupled train! Address: 0x%1; size of vehicles %2, joints %3, state_vector %4")
                                   .arg(reinterpret_cast<quint64>(this), 0, 16)
@@ -477,6 +484,13 @@ void Train::couple(double current_distance, bool is_coupling_to_head, bool is_ot
     ode_order = y.size();
     train_motion_solver->setODEsize(ode_order);
     dydt.resize(ode_order);
+
+    // Состав изменился: пересоздаём проводников по новым вагонам
+    attachConductors();
+
+    // После сцепки состав снова активен: сцепка "будит" статичный поезд
+    state.store(State::Player);
+    standstill_time = 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -501,77 +515,134 @@ Train* Train::uncouple(double uncoupling_distance)
         if (distance < uncoupling_distance)
             continue;
 
-        Journal::instance()->info(QString("Train #%1 will be uncoupled between its vehicles %2 (#%3) and %4 (#%5) at distance %6 m")
-                                      .arg(train_idx, 3)
-                                      .arg(i - 1, 3)
-                                      .arg(vehicles[i - 1]->getModelIndex(), 4)
-                                      .arg(i, 3)
-                                      .arg(vehicles[i]->getModelIndex(), 4)
-                                      .arg(distance, 7, 'f', 3));
-
-        Train* new_train = new Train();
-        new_train->setTopology(topology);
-
-        (vehicles[i - 1]->getDirection() == -1) ?
-            vehicles[i - 1]->setPrevVehicle(nullptr) :
-            vehicles[i - 1]->setNextVehicle(nullptr);
-        (vehicles[i]->getDirection() == -1) ?
-            vehicles[i]->setNextVehicle(nullptr) :
-            vehicles[i]->setPrevVehicle(nullptr);
-
-        std::vector<Vehicle*> new_vehicles;
-        for (size_t j = i; j < vehicles.size(); ++j)
-        {
-            new_vehicles.push_back(vehicles[j]);
-        }
-
-        state_vector_t new_y;
-        for (size_t j = idx; j < y.size(); ++j)
-        {
-            new_y.push_back(y[j]);
-        }
-
-        std::vector<std::vector<Joint*>> new_joints_list;
-        if (i < vehicles.size() - 1)
-        {
-            for (size_t j = i; j < joints_list.size(); ++j)
-            {
-                new_joints_list.push_back(joints_list[j]);
-            }
-        }
-
-        vehicles.resize(i);
-
-        trainMass = 0.0;
-        trainLength = 0.0;
-        for (auto vehicle : vehicles)
-        {
-            trainMass += vehicle->getMass();
-            trainLength += vehicle->getLength();
-        }
-
-        ode_order = idx;
-        y.resize(ode_order);
-        dydt.resize(ode_order);
-        train_motion_solver->setODEsize(ode_order);
-
-        for (auto joint : joints_list[i - 1])
-        {
-            delete joint;
-        }
-        joints_list.resize(i - 1);
-
-        // ОТЛАДКА
-        Journal::instance()->info(QString("Trains uncoupled! Train #%1: new size of vehicles %2, joints %3, state_vector %4")
-                                      .arg(train_idx, 3)
-                                      .arg(vehicles.size(), 4)
-                                      .arg(joints_list.size(), 4)
-                                      .arg(y.size(), 4));
-
-        if (new_train->init(solver_config, new_vehicles, new_y, new_joints_list))
-            return new_train;
-        return nullptr;
+        return uncoupleAt(i);
     }
+    return nullptr;
+}
+
+//------------------------------------------------------------------------------
+// Расцепить состав по конкретному концу вагона
+//------------------------------------------------------------------------------
+Train* Train::uncoupleAtVehicle(Vehicle* vehicle, bool front)
+{
+    if (vehicle == nullptr)
+        return nullptr;
+
+    for (size_t pos = 0; pos < vehicles.size(); ++pos)
+    {
+        if (vehicles[pos] != vehicle)
+            continue;
+
+        // Передний конец вагона - граница перед ним, задний - после него
+        const size_t boundary = front ? pos : (pos + 1);
+        return uncoupleAt(boundary);
+    }
+
+    return nullptr;
+}
+
+//------------------------------------------------------------------------------
+// Расцепить состав по границе между вагонами boundary-1 и boundary
+//------------------------------------------------------------------------------
+Train* Train::uncoupleAt(size_t boundary)
+{
+    if ((boundary == 0) || (boundary >= vehicles.size()) || (vehicles.size() < 2))
+        return nullptr;
+
+    const size_t i = boundary;
+    const size_t idx = vehicles[i]->getStateIndex();
+
+    const double prev_coord = y[vehicles[i - 1]->getStateIndex()];
+    const double prev_length_half = vehicles[i - 1]->getLength() / 2.0;
+    const double coord = y[idx];
+    const double length_half = vehicles[i]->getLength() / 2.0;
+    const double distance = abs(prev_coord - coord) - length_half - prev_length_half;
+
+    Journal::instance()->info(QString("Train #%1 will be uncoupled between its vehicles %2 (#%3) and %4 (#%5) at distance %6 m")
+                                  .arg(train_idx, 3)
+                                  .arg(i - 1, 3)
+                                  .arg(vehicles[i - 1]->getModelIndex(), 4)
+                                  .arg(i, 3)
+                                  .arg(vehicles[i]->getModelIndex(), 4)
+                                  .arg(distance, 7, 'f', 3));
+
+    Train* new_train = new Train();
+    new_train->setTopology(topology);
+
+    (vehicles[i - 1]->getDirection() == -1) ?
+        vehicles[i - 1]->setPrevVehicle(nullptr) :
+        vehicles[i - 1]->setNextVehicle(nullptr);
+    (vehicles[i]->getDirection() == -1) ?
+        vehicles[i]->setNextVehicle(nullptr) :
+        vehicles[i]->setPrevVehicle(nullptr);
+
+    std::vector<Vehicle*> new_vehicles;
+    for (size_t j = i; j < vehicles.size(); ++j)
+    {
+        new_vehicles.push_back(vehicles[j]);
+    }
+
+    state_vector_t new_y;
+    for (size_t j = idx; j < y.size(); ++j)
+    {
+        new_y.push_back(y[j]);
+    }
+
+    std::vector<std::vector<Joint*>> new_joints_list;
+    if (i < vehicles.size() - 1)
+    {
+        for (size_t j = i; j < joints_list.size(); ++j)
+        {
+            new_joints_list.push_back(joints_list[j]);
+        }
+    }
+
+    vehicles.resize(i);
+
+    trainMass = 0.0;
+    trainLength = 0.0;
+    for (auto vehicle : vehicles)
+    {
+        trainMass += vehicle->getMass();
+        trainLength += vehicle->getLength();
+    }
+
+    ode_order = idx;
+    y.resize(ode_order);
+    dydt.resize(ode_order);
+    train_motion_solver->setODEsize(ode_order);
+
+    for (auto joint : joints_list[i - 1])
+    {
+        delete joint;
+    }
+    joints_list.resize(i - 1);
+
+    // Состав изменился: пересоздаём проводников этого поезда
+    attachConductors();
+
+    // ОТЛАДКА
+    Journal::instance()->info(QString("Trains uncoupled! Train #%1: new size of vehicles %2, joints %3, state_vector %4")
+                                  .arg(train_idx, 3)
+                                  .arg(vehicles.size(), 4)
+                                  .arg(joints_list.size(), 4)
+                                  .arg(y.size(), 4));
+
+    if (new_train->init(solver_config, new_vehicles, new_y, new_joints_list))
+    {
+        // Параметры проводников (секция [Conductor]) переносим
+        // в отделившийся состав
+        new_train->getConductors().copyConfig(conductors);
+
+        // Отцепленный состав свободен (LOOSE), пока его не возьмут под управление
+        new_train->state.store(State::Loose);
+        new_train->player_controlled.store(false);
+        return new_train;
+    }
+
+    // Не удалось инициализировать новый поезд - не оставляем
+    // утёкший объект
+    delete new_train;
     return nullptr;
 }
 
@@ -653,6 +724,10 @@ void Train::setDistanceToEndOfTrajectory(bool is_train_head, double distance)
 void Train::setTrainIndex(size_t idx)
 {
     train_idx = idx;
+
+    // Метка поезда для сообщений проводников в журнале
+    conductors.setLabel(QString("поезд #%1").arg(idx));
+
     for (auto vehicle : vehicles)
     {
         vehicle->setTrainIndex(idx);
@@ -741,6 +816,84 @@ double Train::getVelocity(size_t i) const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void Train::setDoorsManual(bool manual)
+{
+    doors_manual = manual;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::isDoorsManual() const
+{
+    return doors_manual;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Train::State Train::getState() const
+{
+    return state.load();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::setState(State new_state)
+{
+    state.store(new_state);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::isStatic() const
+{
+    return state.load() == State::Static;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::isLoose() const
+{
+    return state.load() == State::Loose;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::setPlayerControlled(bool controlled)
+{
+    player_controlled.store(controlled);
+
+    if (controlled)
+    {
+        wakeUp();
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::isPlayerControlled() const
+{
+    return player_controlled.load();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::wakeUp()
+{
+    state.store(State::Player);
+    standstill_time = 0.0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 double Train::getVelocity() const
 {
     if (vehicles.size() == 2)
@@ -795,6 +948,32 @@ std::vector<Vehicle*>* Train::getVehicles()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+conductor::ConductorSystem& Train::getConductors()
+{
+    return conductors;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+const conductor::ConductorSystem& Train::getConductors() const
+{
+    return conductors;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool Train::isDepartureAllowed() const
+{
+    // Готовность проводников (агрегат поезда, п.11 ТЗ):
+    // система выключена или проводников нет - true
+    return conductors.isTrainReady();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void Train::setTopology(Topology* topology)
 {
     this->topology = topology;
@@ -805,15 +984,124 @@ void Train::setTopology(Topology* topology)
 //------------------------------------------------------------------------------
 void Train::slotStep(const simulator_time_t& current_time, const double& integration_time)
 {
+    // Статичный состав не участвует в симуляции, но должен сообщить о завершении шага
+    if (state.load() == State::Static)
+    {
+        emit stepDone(train_idx);
+        return;
+    }
+
+    // Стоящий состав без машиниста засыпает через 30 с непрерывного стояния
+    if (!player_controlled.load() && (std::abs(getVelocity()) < 0.3))
+    {
+        const double idle_time = standstill_time.load() + integration_time;
+        standstill_time.store(idle_time);
+
+        if (idle_time >= 30.0)
+        {
+            // Обнуляем скорости, чтобы состав не дрейфовал после пробуждения
+            for (Vehicle* vehicle : vehicles)
+            {
+                size_t idx = vehicle->getStateIndex();
+                size_t s = vehicle->getDegressOfFreedom();
+
+                for (size_t j = 0; j < s; ++j)
+                {
+                    if (idx + s + j < y.size())
+                    {
+                        y[idx + s + j] = 0.0;
+                    }
+
+                    if (idx + s + j < dydt.size())
+                    {
+                        dydt[idx + s + j] = 0.0;
+                    }
+                }
+            }
+
+            lod_step_accum = 0.0;
+            state.store(State::Static);
+
+            Journal::instance()->info(QString("Train #%1 is STATIC after %2 s standstill")
+                                          .arg(train_idx)
+                                          .arg(standstill_time.load(), 0, 'f', 1));
+
+            emit stepDone(train_idx);
+            return;
+        }
+    }
+    else
+    {
+        standstill_time = 0.0;
+    }
+
     auto begin = vehicles.begin();
     auto end = vehicles.end();
     Vehicle* first = *begin;
     Vehicle* last = *(end - 1);
 
     double t = current_time.simulation_seconds;
-    double num_sub_step = ceil(integration_time / solver_config.step);
-    double dt = integration_time / num_sub_step;
+
+    //=== Агрегированная модель L2/L3 ===
+    // Если ВСЕ ПЕ поезда LOD >= L2, интегрируем с пониженной частотой:
+    // ОДИН шаг за N мс с пропорционально большим интервалом (внутренние
+    // подшаги решателя сохраняются - передаём накопленный интервал).
+    // L2 - шаг раз в 100 мс; L3 - раз в 500 мс и "заморозка": стоячий
+    // состав без смены команд не шагается вовсе. Возврат L2->L0 без
+    // скачков: состояния непрерывны. Поезд игрока всегда L0 (модель)
+    double step_interval = integration_time;
+    bool run_integration = true;
+
+    perf::SimLOD train_lod = perf::SimLOD::L0_Full;
+
+    for (const Vehicle* vehicle : vehicles)
+        train_lod = std::max(train_lod, vehicle->getSimulationLOD());
+
+    if (train_lod >= perf::SimLOD::L2_Aggregated)
+    {
+        lod_step_accum += integration_time;
+
+        const bool frozen = (train_lod == perf::SimLOD::L3_Frozen);
+        const double required = frozen ? 0.5 : 0.1;
+
+        bool do_step = lod_step_accum >= required;
+
+        if (frozen)
+        {
+            // Условия пробуждения из заморозки: движение или новые
+            // команды (кран, контроллер, тормоза)
+            const bool moving = std::abs(getVelocity()) > 0.05;
+            const bool commands_changed = lodCommandsChanged();
+
+            if (!moving && !commands_changed)
+            {
+                // Накопитель ограничен: после пробуждения интервал
+                // шага не разгоняется до гигантского
+                lod_step_accum = std::min(lod_step_accum, 1.0);
+                do_step = false;
+            }
+        }
+
+        if (do_step)
+        {
+            step_interval = lod_step_accum;
+            lod_step_accum = 0.0;
+        }
+        else
+        {
+            run_integration = false;
+        }
+    }
+
+    double num_sub_step = ceil(step_interval / solver_config.step);
+    double dt = step_interval / num_sub_step;
     size_t num_step = static_cast<size_t>(num_sub_step);
+
+    // Кадр пропущен (L2/L3-прореживание или заморозка): цикл
+    // интегрирования не выполняется, периферийные системы поезда
+    // (СМЕ, диагностика, проводники) ниже шагаются с кадровым dt
+    if (!run_integration)
+        num_step = 0;
 
     double head_stop_coord;
     double tail_stop_coord;
@@ -837,7 +1125,9 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
 
             if (i == 0)
             {
-                vehicle->integrationProcess(current_time, integration_time);
+                // При L2/L3-прореживании передаём накопленный интервал:
+                // эволюция устройств идёт реальному времени
+                vehicle->integrationProcess(current_time, step_interval);
             }
 
             vehicle->setFrictionCoeff(coeff_to_wheel_rail_friction);
@@ -911,10 +1201,458 @@ void Train::slotStep(const simulator_time_t& current_time, const double& integra
                 VehicleController& vc = topology->getVehicleController(model_idx);
                 vc.setPathCoord(vehicle->getDirection() * y[idx]);
                 *(vehicle->getProfilePoint()) = vc.getPosition();
+                vehicle->syncCollisionPose();
+
+                // Удар в тупик: координата вышла за конец топологии.
+                // Учитываем только движение в сторону упора.
+                if (vc.isAtDeadEnd() && !vehicle->isDerailed())
+                {
+                    const double v = vehicle->getVelocity();
+                    const double traj_v = (vc.getOrientation() == BWD) ? -v : v;
+                    const double overflow = vc.getDeadEndOverflow();
+                    const bool into_buffer =
+                        (overflow > 0.0 && traj_v > 0.0) ||
+                        (overflow < 0.0 && traj_v < 0.0);
+
+                    if (into_buffer && std::abs(v) > 0.5)
+                    {
+                        const double energy = 0.5 * vehicle->getMass() * v * v;
+                        vehicle->getDerailment().applyDeadEndImpact(energy);
+                    }
+                }
+
+                // Накопление тоннажа на путь (износ рельсов):
+                // пропущенная масса медленно растит неровности участка
+                if (std::abs(vehicle->getVelocity()) > 0.05)
+                {
+                    vc.addTonnage(y[idx],
+                                  vehicle->getMass() / 1000.0,
+                                  std::abs(vehicle->getVelocity()) * dt);
+                }
+
+                // Разовая привязка источника неровностей пути к текущей
+                // траектории ПЕ (контроллеры живут в топологии всё время
+                // симуляции, сами отслеживают смену траектории)
+                if (!vehicle->hasRailHeightSource())
+                {
+                    VehicleController* vc_ptr = &vc;
+                    vehicle->setRailHeightSource(
+                        [vc_ptr](double path_coord, int side) -> double
+                    {
+                        return vc_ptr->getRailHeightAt(path_coord, side);
+                    });
+                }
+
+                // Источник боковых неровностей плана линии (поперечная
+                // динамика ПС)
+                if (!vehicle->hasLateralOffsetSource())
+                {
+                    VehicleController* vc_ptr = &vc;
+                    vehicle->setLateralOffsetSource(
+                        [vc_ptr](double path_coord) -> double
+                    {
+                        return vc_ptr->getLateralOffsetAt(path_coord);
+                    });
+                }
+
+                // Источник возвышения наружного рельса (Б16): тот же
+                // паттерн, что высота рельса - топология через
+                // контроллер ПЕ
+                if (!vehicle->hasCantSource())
+                {
+                    VehicleController* vc_ptr = &vc;
+                    vehicle->setLateralCantSource(
+                        [vc_ptr](double path_coord) -> double
+                    {
+                        return vc_ptr->getCantAt(path_coord);
+                    });
+                }
             }
         }
     }
+
+    // Система многих единиц: передача команд с задержкой
+    stepMultipleUnit(integration_time);
+
+    // Диагностика продольной динамики (раз в шаг модели)
+    stepLongitudinalDiagnostics();
+
+    // Проводники пассажирских вагонов (ТЗ "Система проводников"):
+    // шаг автоматов в потоке поезда; контекст станции (зона остановки,
+    // платформа, потоки пассажиров) задаёт модель до выдачи шага
+    conductors.setTrainMoving(std::abs(getVelocity()) > 0.3);
+    conductors.step(integration_time);
+
     emit stepDone(train_idx);
+}
+
+//------------------------------------------------------------------------------
+/// Безопасное состояние команд СМЕ при потере связи (#19):
+/// тяга/контроллер обнуляются, тормозные команды держат последнее
+/// положение (кран машиниста, вспомогательный тормоз, отпускной клапан),
+/// флаг готовности пульта сохраняется
+//------------------------------------------------------------------------------
+static control_signals_t smeSafeState(const control_signals_t& last)
+{
+    control_signals_t safe = last;
+
+    for (size_t i = 0; i < safe.analogSignal.size(); ++i)
+    {
+        const bool is_hold =
+                (i == static_cast<size_t>(CS_BRAKE_CRANE)) ||
+                (i == static_cast<size_t>(CS_LOCO_CRANE)) ||
+                (i == static_cast<size_t>(CS_RELEASE_VALVE)) ||
+                (i == static_cast<size_t>(CS_READY));
+
+        if (!is_hold)
+            safe.analogSignal[i].setValue(0.0f);
+    }
+
+    return safe;
+}
+
+//------------------------------------------------------------------------------
+/// Изменились ли команды поезда: лёгкая контрольная сумма активных
+/// аналоговых сигналов всех ПЕ (кран, контроллер, тормоза). Условие
+/// пробуждения из L3-заморозки
+//------------------------------------------------------------------------------
+bool Train::lodCommandsChanged()
+{
+    float checksum = 0.0f;
+
+    for (const Vehicle* vehicle : vehicles)
+    {
+        const auto& analog = vehicle->getControlSignalsRef().analogSignal;
+
+        for (const signal_t& signal : analog)
+        {
+            if (signal.is_active)
+                checksum += signal.cur_value;
+        }
+    }
+
+    if (lod_checksum_valid && checksum == lod_command_checksum)
+        return false;
+
+    lod_command_checksum = checksum;
+    lod_checksum_valid = true;
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::stepMultipleUnit(double dt)
+{
+    (void) dt;
+
+    // Головной локомотив СМЕ в составе
+    Vehicle* lead = nullptr;
+
+    for (Vehicle* vehicle : vehicles)
+    {
+        if (vehicle->getSMEGroup() > 0 && vehicle->isSMELead())
+        {
+            lead = vehicle;
+            break;
+        }
+    }
+
+    if (lead == nullptr)
+        return;
+
+    // Команды головного ставятся в очередь с меткой времени
+    const double now = t_sme;
+    t_sme += dt;
+
+    sme_queue.emplace_back(now, lead->getControlSignalsRef());
+
+    // Устаревшие команды отбрасываются
+    const double horizon = now - sme_command_delay;
+
+    while (!sme_queue.empty() && sme_queue.front().first < horizon - 1.0)
+    {
+        sme_queue.pop_front();
+    }
+
+    // Целостность связи: обрыв сцепки между ПЕ группы СМЕ.
+    // Проверяются ВСЕ стыки МЕЖДУ локомотивами группы - как до головного,
+    // так и после него (типовая схема: головной - первый в составе,
+    // стык головной(0)-ведомый раньше не проверялся вовсе)
+    const int sme_group = lead->getSMEGroup();
+
+    bool link_ok = true;
+
+    for (size_t i = 0; (i < joints_list.size()) && (i + 1 < vehicles.size()); ++i)
+    {
+        // Стык i соединяет vehicles[i] и vehicles[i+1]: связь рвётся,
+        // только если обе ПЕ из группы СМЕ головного
+        if (vehicles[i]->getSMEGroup() != sme_group ||
+            vehicles[i + 1]->getSMEGroup() != sme_group)
+        {
+            continue;
+        }
+
+        bool joint_alive = false;
+
+        for (Joint* joint : joints_list[i])
+        {
+            if (!joint->isBroken())
+                joint_alive = true;
+        }
+
+        if (joints_list[i].empty())
+            joint_alive = true;
+
+        if (!joint_alive)
+            link_ok = false;
+    }
+
+    if (!link_ok && !sme_link_lost)
+    {
+        sme_link_lost = true;
+        Journal::instance()->critical(QString(
+            "[SME] Train %1: command link LOST (coupler broken), "
+            "trailers: traction zeroed, brake holds last position")
+            .arg(train_idx));
+    }
+    else if (link_ok && sme_link_lost)
+    {
+        sme_link_lost = false;
+    }
+
+    // Ведомые применяют задержанные команды головного
+    for (Vehicle* vehicle : vehicles)
+    {
+        if (vehicle == lead)
+            continue;
+
+        if (vehicle->getSMEGroup() != lead->getSMEGroup() ||
+            vehicle->getSMEGroup() == 0)
+        {
+            continue;
+        }
+
+        // При потере связи - безопасное состояние (#19):
+        // тяга/контроллер в ноль, тормоз держит последнее положение
+        if (sme_link_lost)
+        {
+            vehicle->setControlSignals(smeSafeState(vehicle->getControlSignalsRef()));
+            continue;
+        }
+
+        // Самая старая команда старше задержки
+        const control_signals_t* delayed = nullptr;
+
+        for (const auto& entry : sme_queue)
+        {
+            if (entry.first <= now - sme_command_delay)
+                delayed = &entry.second;
+            else
+                break;
+        }
+
+        if (delayed != nullptr)
+        {
+            vehicle->setControlSignals(*delayed);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::stepLongitudinalDiagnostics()
+{
+    longitudinal_stats = LongitudinalStats();
+    longitudinal_stats.train_mass = trainMass;
+    longitudinal_stats.train_length = trainLength;
+
+    if (overload_reported.size() != joints_list.size())
+    {
+        overload_reported.assign(joints_list.size(), false);
+        break_reported.assign(joints_list.size(), false);
+    }
+
+    for (size_t i = 0; i < joints_list.size(); ++i)
+    {
+        for (Joint* joint : joints_list[i])
+        {
+            const double force = joint->getForce();
+            const double damage = joint->getDamage();
+
+            if (force > 0.0)
+                longitudinal_stats.max_tension = std::max(longitudinal_stats.max_tension, force);
+            else
+                longitudinal_stats.max_compression = std::max(longitudinal_stats.max_compression, -force);
+
+            longitudinal_stats.max_abs_force = std::max(longitudinal_stats.max_abs_force, abs(force));
+
+            if (joint->isBroken())
+            {
+                ++longitudinal_stats.broken_joints;
+
+                if (!break_reported[i])
+                {
+                    break_reported[i] = true;
+                    Journal::instance()->critical(QString(
+                        "[COUPLER] Train %1: vehicle %2 / vehicle %3 coupling BROKEN")
+                        .arg(train_idx)
+                        .arg(i)
+                        .arg(i + 1));
+                }
+            }
+            else if (damage > 0.0)
+            {
+                ++longitudinal_stats.overloaded_joints;
+
+                if (!overload_reported[i])
+                {
+                    overload_reported[i] = true;
+                    Journal::instance()->warning(QString(
+                        "[COUPLER] Train %1: vehicle %2 / vehicle %3 overload: %4 kN, damage %5%")
+                        .arg(train_idx)
+                        .arg(i)
+                        .arg(i + 1)
+                        .arg(abs(force) / 1000.0, 0, 'f', 1)
+                        .arg(damage * 100.0, 0, 'f', 1));
+                }
+            }
+            else if (overload_reported[i])
+            {
+                // Повреждение сброшено (ремонт) - разрешаем новое сообщение
+                overload_reported[i] = false;
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::vector<Train::VehicleDiagnostics> Train::buildDiagnosticsSnapshot() const
+{
+    std::vector<VehicleDiagnostics> snapshot;
+
+    snapshot.reserve(vehicles.size());
+
+    for (size_t idx = 0; idx < vehicles.size(); ++idx)
+    {
+        Vehicle* vehicle = vehicles[idx];
+
+        VehicleDiagnostics d;
+
+        d.vehicle_idx = vehicle->getModelIndex();
+        d.mass_kg = vehicle->getMass();
+        d.speed_kmh = vehicle->getVelocity() * 3.6;
+        d.rail_coord_m = vehicle->getProfilePoint()->railway_coord;
+        d.inclination = vehicle->getProfilePoint()->inclination;
+        d.derailed = vehicle->isDerailed();
+
+        // Продольные усилия из сцепок (передняя/задняя)
+        if (!joints_list.empty())
+        {
+            // Стык i соединяет vehicles[i] и vehicles[i+1]
+
+            // Стык с ПЕРЕДНЕЙ ПЕ: joints_list[idx-1], его усилие тянет
+            // ПЕ вперёд (положительный вклад в результирующую)
+            if (idx > 0 && idx - 1 < joints_list.size())
+            {
+                for (Joint* joint : joints_list[idx - 1])
+                {
+                    d.longitudinal_force_n += joint->getForce();
+                    d.coupled_fwd = joint->isConnected();
+                }
+            }
+
+            // Стык с ЗАДНЕЙ ПЕ: joints_list[idx], его усилие направлено
+            // назад (вычитается). Результирующая: +F_перед - F_зад
+            if (idx < joints_list.size())
+            {
+                for (Joint* joint : joints_list[idx])
+                {
+                    d.longitudinal_force_n -= joint->getForce();
+                    d.coupled_bwd = joint->isConnected();
+                }
+            }
+        }
+
+        // Ускорения кузова и повреждения из систем ПЕ
+        d.vertical_accel = vehicle->getVerticalDynamics().getBodyAcceleration();
+        d.lateral_accel = vehicle->getLateralDynamics().getBodyLateralAcceleration();
+        d.body_damage = vehicle->getDamageSystem().getDamage(
+                    VehicleDamageSystem::Component::Body);
+        d.bogie_damage = vehicle->getDamageSystem().getDamage(
+                    VehicleDamageSystem::Component::Bogie);
+        d.brake_efficiency = vehicle->getBrakeShoes().getAverageEfficiency();
+        d.shoe_temperature = vehicle->getBrakeShoes().getMaxTemperature();
+
+        // Состояние ручного тормоза, башмаков и сцепных рукавов/кранов
+        d.handbrake = vehicle->isHandbrakeApplied();
+        d.chock_fwd = vehicle->isChockFwd();
+        d.chock_bwd = vehicle->isChockBwd();
+
+        CouplingInteraction& coupling = vehicle->getCouplingInteraction();
+        d.hose_fwd = static_cast<int>(coupling.getHoseState(CouplingInteraction::Fwd));
+        d.hose_bwd = static_cast<int>(coupling.getHoseState(CouplingInteraction::Bwd));
+        d.valve_fwd = coupling.isEndValveOpen(CouplingInteraction::Fwd);
+        d.valve_bwd = coupling.isEndValveOpen(CouplingInteraction::Bwd);
+
+        // Груз и пассажиры для меню вагона
+        CargoSystem& cargo = vehicle->getCargo();
+        d.cargo_configured = cargo.isConfigured();
+        d.cargo_mass_kg = cargo.getCargoMass();
+        d.cargo_fill = cargo.getFillLevel();
+        d.cargo_type = cargo.getCargoType();
+
+        PassengerSystem& passengers = vehicle->getPassengers();
+        d.passengers_configured = passengers.isConfigured();
+        d.passenger_count = passengers.getPassengerCount();
+        d.passenger_capacity = passengers.getCapacity();
+
+        snapshot.push_back(d);
+    }
+
+    return snapshot;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+Train::LongitudinalStats Train::getLongitudinalStats() const
+{
+    return longitudinal_stats;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+QString Train::getLongitudinalDebugMsg() const
+{
+    QString msg = QString("[TRAIN_PHYSICS] Train %1 mass: %2 t length: %3 m\n")
+            .arg(train_idx)
+            .arg(trainMass / 1000.0, 0, 'f', 1)
+            .arg(trainLength, 0, 'f', 1);
+
+    for (size_t i = 0; i < joints_list.size(); ++i)
+    {
+        for (Joint* joint : joints_list[i])
+        {
+            const double force = joint->getForce();
+            const QString state = joint->isBroken() ? QString("BROKEN") :
+                    (force > 0.0 ? QString("TENSION") : QString("COMPRESSION"));
+
+            msg += QString("[COUPLER] vehicle %1 / vehicle %2 %3: %4 kN damage: %5%\n")
+                    .arg(i)
+                    .arg(i + 1)
+                    .arg(state)
+                    .arg(force / 1000.0, 0, 'f', 1)
+                    .arg(joint->getDamage() * 100.0, 0, 'f', 1);
+        }
+    }
+
+    return msg;
 }
 
 //------------------------------------------------------------------------------
@@ -944,6 +1682,23 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
         {
             no_air = false;
         }
+
+        if (!cfg.getString("Common", "ClientName", client_name))
+        {
+            client_name = "";
+        }
+
+        if (!cfg.getString("Common", "TrainID", train_id))
+        {
+            train_id = "";
+        }
+
+        // Задержка передачи команд СМЕ, с
+        if (!cfg.getDouble("SME", "CommandDelay", sme_command_delay))
+        {
+            sme_command_delay = 0.15;
+        }
+        sme_command_delay = std::max(sme_command_delay, 0.0);
 
         QDomNode vehicle_node = cfg.getFirstSection("Vehicle");
 
@@ -1094,9 +1849,50 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
     {
         Journal::instance()->error("File " + cfg_path + " is't found");
     }
+    // Проводники пассажирских вагонов (ТЗ "Система проводников"):
+    // секция [Conductor] + создание по признаку пассажирского вагона
+    conductors.loadConfig(cfg_path);
+    attachConductors();
 
     // Check train is't empty and return
     return vehicles.size() != 0;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void Train::attachConductors()
+{
+    // Пассажирские вагоны = ПЕ с настроенной секцией [PassengerCar].
+    // Геометрия (DoorSocket/купе) по умолчанию - от длины ПЕ: систему
+    // можно применять к разным моделям вагонов (п.3 ТЗ), модели зададут
+    // свои розетки позже
+    std::vector<conductor::WagonInfo> wagons;
+
+    for (auto vehicle : vehicles)
+    {
+        conductor::WagonInfo wagon;
+
+        wagon.vehicle_idx = vehicle->getModelIndex();
+        wagon.passenger = vehicle->getPassengers().isConfigured();
+        wagon.has_stairs = vehicle->getPassengers().hasStairs();
+        wagon.length = vehicle->getLength();
+        wagon.width = 3.1; ///< габарит пассажирского вагона, м
+
+        // Дверь: у хвостового торца вагона, борт со стороны платформы
+        wagon.door_socket.x = -(wagon.length / 2.0 - 2.0);
+        wagon.door_socket.y = wagon.width / 2.0;
+        wagon.door_socket.z = 1.2; ///< уровень пола над головкой рельса
+
+        // Служебное купе: рядом с дверью, внутри кузова
+        wagon.coupe_offset.x = wagon.door_socket.x + 3.0;
+        wagon.coupe_offset.y = 0.0;
+        wagon.coupe_offset.z = wagon.door_socket.z;
+
+        wagons.push_back(wagon);
+    }
+
+    conductors.attachTrain(wagons);
 }
 
 //------------------------------------------------------------------------------

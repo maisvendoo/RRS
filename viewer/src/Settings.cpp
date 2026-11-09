@@ -2,6 +2,7 @@
 
 #include "CfgReader.h"
 
+#include <algorithm>
 #include <iostream>
 #include <vsg/utils/CommandLine.h>
 
@@ -247,6 +248,40 @@ void RouteViewer::loadWindowSettings(CfgReader& cfg, const QString& section)
 }
 
 //------------------------------------------------------------------------------
+// Пресет графики: Auto/Legacy/Low/High/Ultra/Extreme/Custom.
+// Auto — автоопределение по возможностям GPU при первом запуске
+//------------------------------------------------------------------------------
+void RouteViewer::loadGraphicsSettings(CfgReader& cfg, const QString& section)
+{
+    QString preset = "Auto";
+    if (cfg.getString(section, "GraphicsPreset", preset))
+    {
+        settings.graphics_preset = preset.toStdString();
+    }
+
+    // Масштаб пост-процесса (только Extreme): offscreen-буфер сцены.
+    // Нижняя граница 0.4 — минимум адаптивного качества (см.
+    // RouteViewer::adaptPostProcessScale)
+    double postprocessScale = settings.postprocess_scale;
+    if (cfg.getDouble(section, "PostprocessScale", postprocessScale))
+    {
+        settings.postprocess_scale = std::clamp(postprocessScale, 0.4, 1.0);
+    }
+
+    // Эффекты пост-процесса Extreme: читаются только при наличии ключа
+    cfg.getBool(section, "PostprocessBloom", settings.postprocess_bloom);
+    cfg.getBool(section, "PostprocessSsao", settings.postprocess_ssao);
+    cfg.getBool(section, "PostprocessFog", settings.postprocess_fog);
+
+    // SSR (ключ Ssr, по умолчанию включён на Extreme)
+    cfg.getBool(section, "Ssr", settings.postprocess_ssr);
+
+    // Фары локомотива (High/Ultra/Extreme): динамический SpotLight.
+    // По умолчанию включены; на Legacy/Low ключ не потребляется
+    cfg.getBool(section, "Headlights", settings.headlights);
+}
+
+//------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 void RouteViewer::loadLightSettings(CfgReader& cfg, const QString& section)
@@ -388,6 +423,38 @@ void RouteViewer::loadCabineCameraSettings(CfgReader& cfg, const QString& sectio
 
     cfg.getDouble(section, "CabineCamVerticalShiftMin", settings.cabine_z_min);
     cfg.getDouble(section, "CabineCamVerticalShiftMax", settings.cabine_z_max);
+
+    // Раскачка кабины в движении (0/1, амплитуды при полной скорости)
+    int cabineSwayEnabled = 1;
+    cfg.getInt(section, "CabineSwayEnabled", cabineSwayEnabled);
+    settings.cabine_sway_enabled = (cabineSwayEnabled != 0);
+
+    cfg.getDouble(section, "CabineSwayRefSpeed", settings.cabine_sway_ref_speed);
+    cfg.getDouble(section, "CabineSwayMinSpeed", settings.cabine_sway_min_speed);
+    cfg.getDouble(section, "CabineSwayMaxOffset", settings.cabine_sway_max_offset);
+    cfg.getDouble(section, "CabineSwayBounceAmp", settings.cabine_sway_bounce_amp);
+    cfg.getDouble(section, "CabineSwayGallopAmp", settings.cabine_sway_gallop_amp);
+    cfg.getDouble(section, "CabineSwayHuntAmp", settings.cabine_sway_hunt_amp);
+    cfg.getDouble(section, "CabineSwayRollAmp", settings.cabine_sway_roll_amp);
+    cfg.getDouble(section, "CabineSwayPitchAmp", settings.cabine_sway_pitch_amp);
+}
+
+//------------------------------------------------------------------------------
+// Настройки пешей камеры
+//------------------------------------------------------------------------------
+void RouteViewer::loadWalkCameraSettings(CfgReader& cfg, const QString& section)
+{
+    cfg.getDouble(section, "WalkFovBoost", settings.walk_fov_boost);
+    cfg.getDouble(section, "WalkFovSpeed", settings.walk_fov_speed);
+    cfg.getDouble(section, "WalkBobAmplitude", settings.walk_bob_amplitude);
+    cfg.getDouble(section, "WalkBobAmplitudeRun", settings.walk_bob_amplitude_run);
+    cfg.getDouble(section, "WalkBobFrequency", settings.walk_bob_frequency);
+    cfg.getDouble(section, "WalkBobFrequencyRun", settings.walk_bob_frequency_run);
+    cfg.getDouble(section, "WalkLandingMax", settings.walk_landing_max);
+    cfg.getDouble(section, "WalkLandingCoeff", settings.walk_landing_coeff);
+    cfg.getDouble(section, "WalkLandingRecovery", settings.walk_landing_recovery);
+    cfg.getDouble(section, "WalkMouseSensitivity", settings.walk_mouse_sensitivity);
+    cfg.getDouble(section, "WalkInteractDistance", settings.walk_interact_distance);
 }
 
 //------------------------------------------------------------------------------

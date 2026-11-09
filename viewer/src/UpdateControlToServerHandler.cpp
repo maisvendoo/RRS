@@ -1,6 +1,13 @@
 #include "UpdateControlToServerHandler.h"
+
+#include <vsg/ui/ApplicationEvent.h>
+
+#include <Logger.h>
 //#include "Logger.h"
 #include "tcp-client.h"
+
+#include <QByteArray>
+#include <QDataStream>
 #include "key-symbols.h"
 #include "controlled-struct.h"
 #include <cstddef>
@@ -17,9 +24,33 @@ UpdateControlToServerHandler::UpdateControlToServerHandler(TcpClient* tc)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+namespace
+{
+
+/// Сервисные клавиши деповского питания (ТЗ "Деповское питание"):
+/// проходят на сервер даже в пешом режиме (подключение кабеля игроком
+/// у розетки ПЕ: K - кабель, L - питание колонки, O - вводной аппарат)
+const std::set<std::uint16_t>& serviceKeys()
+{
+    static const std::set<std::uint16_t> keys = {KEY_K, KEY_L, KEY_O};
+    return keys;
+}
+
+} // namespace
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void UpdateControlToServerHandler::apply(vsg::KeyPressEvent& keyPress)
 {
-//    LOG_INFO("press %u", keyPress.keyBase);
+//    LOG_INFO("KeyProbe press %u", keyPress.keyBase);
+    // Пешая ходьба: клавиши управляют игроком, на сервер не уходят
+    // (кроме сервисных клавиш деповского питания)
+    if (_is_control_suppressed && !serviceKeys().count(keyPress.keyBase))
+    {
+        return;
+    }
+
     // Массив нажатых клавиш для сервера
     if (KeySymbolsRRS.count(keyPress.keyBase))
     {
@@ -37,6 +68,11 @@ void UpdateControlToServerHandler::apply(vsg::KeyPressEvent& keyPress)
 void UpdateControlToServerHandler::apply(vsg::KeyReleaseEvent& keyRelease)
 {
 //    LOG_INFO("release %u", keyRelease.keyBase);
+    if (_is_control_suppressed && !serviceKeys().count(keyRelease.keyBase))
+    {
+        return;
+    }
+
     if (_pressed_keys.erase(keyRelease.keyBase))
     {
         sendControlToServer();
@@ -74,6 +110,47 @@ void UpdateControlToServerHandler::setNeedDebugMsg(bool is_needed)
 void UpdateControlToServerHandler::setSpeedFactor(int speed_factor)
 {
     _tcp_client->sendSimSpeedCommand(speed_factor);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateControlToServerHandler::sendServiceCommand(int vehicle_idx,
+                                                      std::uint16_t action,
+                                                      float value)
+{
+    if ((_tcp_client == nullptr) || (vehicle_idx < 0))
+    {
+        return;
+    }
+
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+
+    stream << vehicle_idx;                      // индекс вагона
+    stream << 0;                                // индекс кабины
+    stream << action;                           // ID сервисной команды
+    stream << value;                            // значение
+    stream << static_cast<quint32>(0);          // число параметров
+    stream << static_cast<qint8>(0);            // приоритет
+
+    _tcp_client->slotSendVehicleControlCommand(data);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateControlToServerHandler::setControlSuppressed(bool suppressed)
+{
+    if (_is_control_suppressed == suppressed)
+        return;
+
+    _is_control_suppressed = suppressed;
+
+    // Сброс накопленных нажатий: поезд не должен "держать клавиши",
+    // зажатые до входа в пешей режим
+    _pressed_keys.clear();
+    sendEmptyControlToServer();
 }
 
 //------------------------------------------------------------------------------
@@ -158,4 +235,29 @@ void UpdateControlToServerHandler::sendEmptyControlToServer()
     controlled.pressed_keys.clear();
 
     _tcp_client->sendVehicleControl(controlled.serialize());
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateControlToServerHandler::apply(vsg::FrameEvent& frame)
+{
+    // Переотправка удержанных клавиш раз в 0.5 с: серверная сторона
+    // кранов непрерывна (пока нажато - ручка идёт), а разовые пустые
+    // пакеты (фокус-события, подтверждения Enter) могли сбивать
+    // удержание
+    if (!_pressed_keys.empty() && !_is_control_suppressed)
+    {
+        const double t = frame.frameStamp->simulationTime;
+
+        if (t - _last_resend_time >= 0.5)
+        {
+            _last_resend_time = t;
+            sendControlToServer();
+        }
+    }
 }

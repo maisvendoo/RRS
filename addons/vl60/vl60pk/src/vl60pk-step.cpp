@@ -158,12 +158,46 @@ void VL60pk::stepPantographsControl(const double& t, const double& dt)
     pantographs[0]->setState(is_PANT1_ON);
     pantographs[1]->setState(is_PANT2_ON);
 
+    // Данные полоза для телеметрии/кассеты/рекуперации
+    setPantographRaised(is_PANT1_ON || is_PANT2_ON);
+
     for (auto pant : pantographs)
     {
-        // Задаем текущее напряжение КС (пока что через константу)
-        pant->setUks(Uks);
         // Моделируем работу токоприемников
         pant->step(t, dt);
+    }
+
+    // Напряжение КС в точке ПЕ (провалы от тока/подстанции, нейтральные
+    // вставки) - контекст инфраструктуры через Vehicle
+    const bool is_raised = pantographs[0]->isUp() || pantographs[1]->isUp();
+
+    if (is_raised && getCatenaryFeedActive())
+    {
+        const auto feed = getOverheadFeed(getEnergy().getCurrent());
+
+        // Род тока под этим электровозом определяется секцией КС
+        const int kind = (feed.type == catenary::SystemType::DC3kV) ? 0 : 1;
+        setCurrentKind(kind);
+
+        for (auto pant : pantographs)
+        {
+            pant->setCurrentKindIn(kind);
+        }
+
+        Uks = feed.powered ? feed.voltage : 0.0;
+        setPantographContactOk(feed.powered);
+    }
+    else
+    {
+        Uks = 0.0;
+        setPantographContactOk(false);
+    }
+
+    setUks(Uks);
+
+    for (auto pant : pantographs)
+    {
+        pant->setUks(Uks);
     }
 }
 

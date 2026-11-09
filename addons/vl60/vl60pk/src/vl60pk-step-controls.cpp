@@ -1,5 +1,8 @@
+﻿#include    <cmath>
 #include    <vl60pk.h>
 #include    <vl60-controls.h>
+#include    <brake-crane.h>
+#include    <loco-crane.h>
 #include    <kme-60-044.h>
 #include    <automatic-train-stop.h>
 #include    <pneumo-brake-lock.h>

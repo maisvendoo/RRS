@@ -1,22 +1,202 @@
 #include "UpdateViewerHandler.h"
 
+#include <collision-route.h>
+
 #include "UpdateControlToServerHandler.h"
 
 #include "CameraCabineManipulator.h"
 #include "CameraFollowManipulator.h"
 #include "CameraFreeManipulator.h"
 #include "CameraVehicleManipulator.h"
+#include "CameraWalkManipulator.h"
 #include "ScreenshotWriter.h"
 #include "TrafficLightsHandler.h"
+#include "MyGui.h"
 #include "TrainLabelsHandler.h"
 #include "VehiclesHandler.h"
 #include "io-controller.h"
 #include "settings.h"
 
+#include <collision-world-loader.h>
+#include <vehicle-service-command.h>
+
+#include <filesystem.h>
+#include <Logger.h>
+
 #include <vsg/ui/KeyEvent.h>
 #include <vsg/ui/ScrollWheelEvent.h>
 #include <vsg/ui/TouchEvent.h>
 #include <vsg/nodes/RegionOfInterest.h>
+
+#include <PlatformInput.h>
+
+#include <algorithm>
+#include <cmath>
+
+namespace
+{
+
+//------------------------------------------------------------------------------
+/// Кватернион из базиса ПЕ (столбцы - образы локальных осей X/Y/Z).
+/// Как в VehicleCollision::syncPose: тройка (orth, right, up) в RRS
+/// левосторонняя, локальная ось Y тела - влево (-right)
+//------------------------------------------------------------------------------
+collision::Quatf quatFromBasis(const vsg::dvec3& o,
+                               const vsg::dvec3& r,
+                               const vsg::dvec3& u)
+{
+    const vsg::dvec3 left(-r.x, -r.y, -r.z);
+
+    const double m00 = o.x, m01 = left.x, m02 = u.x;
+    const double m10 = o.y, m11 = left.y, m12 = u.y;
+    const double m20 = o.z, m21 = left.z, m22 = u.z;
+
+    collision::Quatf q;
+
+    const double trace = m00 + m11 + m22;
+    if (trace > 0.0)
+    {
+        const double s = std::sqrt(trace + 1.0) * 2.0;
+        q.w = static_cast<float>(0.25 * s);
+        q.x = static_cast<float>((m21 - m12) / s);
+        q.y = static_cast<float>((m02 - m20) / s);
+        q.z = static_cast<float>((m10 - m01) / s);
+    }
+    else if (m00 > m11 && m00 > m22)
+    {
+        const double s = std::sqrt(1.0 + m00 - m11 - m22) * 2.0;
+        q.w = static_cast<float>((m21 - m12) / s);
+        q.x = static_cast<float>(0.25 * s);
+        q.y = static_cast<float>((m01 + m10) / s);
+        q.z = static_cast<float>((m02 + m20) / s);
+    }
+    else if (m11 > m22)
+    {
+        const double s = std::sqrt(1.0 + m11 - m00 - m22) * 2.0;
+        q.w = static_cast<float>((m02 - m20) / s);
+        q.x = static_cast<float>((m01 + m10) / s);
+        q.y = static_cast<float>(0.25 * s);
+        q.z = static_cast<float>((m12 + m21) / s);
+    }
+    else
+    {
+        const double s = std::sqrt(1.0 + m22 - m00 - m11) * 2.0;
+        q.w = static_cast<float>((m10 - m01) / s);
+        q.x = static_cast<float>((m02 + m20) / s);
+        q.y = static_cast<float>((m12 + m21) / s);
+        q.z = static_cast<float>(0.25 * s);
+    }
+
+    const float n = std::sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
+    if (n > 1e-6f)
+    {
+        q.x /= n;
+        q.y /= n;
+        q.z /= n;
+        q.w /= n;
+    }
+
+    return q;
+}
+
+//------------------------------------------------------------------------------
+/// Поза общего пола кабины/секции: один длинный бокс от двери одной
+/// кабины до двери другой. Локальная ось X бокса - вдоль кузова.
+//------------------------------------------------------------------------------
+bool interiorFloorPose(const VehicleExterior& vehicle,
+                       collision::Vec3f& position,
+                       collision::Quatf& rotation,
+                       float& half_length)
+{
+    if (vehicle.exit_pos.empty())
+    {
+        return false;
+    }
+
+    double min_y = vehicle.exit_pos[0].y;
+    double max_y = vehicle.exit_pos[0].y;
+    double min_z = vehicle.exit_pos[0].z;
+
+    for (const vsg::dvec3& door : vehicle.exit_pos)
+    {
+        min_y = std::min(min_y, door.y);
+        max_y = std::max(max_y, door.y);
+        min_z = std::min(min_z, door.z);
+    }
+
+    // Пол длиннее расстояния между дверями на метр с каждой стороны,
+    // чтобы не провалиться на пороге. Минимум - 4 м.
+    half_length = static_cast<float>(
+                std::max(2.0, (max_y - min_y) * 0.5 + 1.0));
+
+    const double center_y = (min_y + max_y) * 0.5;
+    const double center_z = min_z - 0.1;
+
+    const vsg::dvec3 center = vehicle.position +
+            vehicle.orth * center_y +
+            vehicle.up * center_z;
+
+    position = collision::Vec3f(static_cast<float>(center.x),
+                                static_cast<float>(center.y),
+                                static_cast<float>(center.z));
+
+    rotation = quatFromBasis(vehicle.orth, vehicle.right, vehicle.up);
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+/// Точка на земле снаружи двери, гарантированно за габаритным боксом
+/// ПЕ (полудлина 15 м, полуширина 1.6 м), чтобы физика не вытолкнула
+/// игрока обратно в кузов.
+//------------------------------------------------------------------------------
+vsg::dvec3 outsideDoorPoint(const VehicleExterior& vehicle,
+                            size_t cab,
+                            double clearance)
+{
+    const vsg::dvec3 door =
+            vehicle.worldFromLocal(vehicle.exit_pos[cab]);
+
+    vsg::dvec3 outward = vehicle.right;
+
+    if (!vehicle.driver_pos.empty())
+    {
+        const size_t seat_idx = std::min(cab,
+                                         vehicle.driver_pos.size() - 1);
+        outward = door - vehicle.worldFromLocal(vehicle.driver_pos[seat_idx]);
+    }
+
+    outward.z = 0.0;
+    const double outward_len = vsg::length(outward);
+    outward = (outward_len > 1.0e-6) ?
+                (outward / outward_len) : vehicle.right;
+
+    const vsg::dvec3 rel = door - vehicle.position;
+
+    const double along = std::abs(vsg::dot(rel, vehicle.orth));
+    const double side = std::abs(vsg::dot(rel, vehicle.right));
+
+    double distance = 2.2;
+
+    if (std::abs(vsg::dot(outward, vehicle.orth)) >
+        std::abs(vsg::dot(outward, vehicle.right)))
+    {
+        // Дверь в торце: выходим за полу длину 15 м
+        distance = std::max(distance, 15.0 + clearance - along);
+    }
+    else
+    {
+        // Боковая дверь: выходим за полуширину 1.6 м
+        distance = std::max(distance, 1.6 + clearance - side);
+    }
+
+    vsg::dvec3 point = door + outward * distance;
+    point.z = door.z + 0.1;
+
+    return point;
+}
+
+} // namespace
 
 //------------------------------------------------------------------------------
 //
@@ -30,9 +210,11 @@ UpdateViewerHandler::UpdateViewerHandler(
     TrafficLightsHandler* sig_handler,
     TrainLabelsHandler* train_labels_handler,
     VehiclesHandler* veh_handler,
-    settings_t& settings
+    settings_t& settings,
+    GUIParams* gui_params
 )
     : Inherit()
+    , gui_params(gui_params)
     , _settings(settings)
     , _keyboard(keyboard)
     , _upd_server_control(upd_server_control)
@@ -48,6 +230,17 @@ UpdateViewerHandler::UpdateViewerHandler(
     _cabine_manipulator = new CameraCabineManipulator(_keyboard, _camera, _settings);
     _follow_manipulator = new CameraFollowManipulator(_keyboard, _camera, _settings);
 
+    // Пешая камера: физика игрока (параметры [Player] из settings.xml),
+    // мир коллизий подгружается лениво при первом входе (F8)
+    _walk_world = std::make_unique<collision::CollisionWorld>();
+    _walk_manipulator = new CameraWalkManipulator(_keyboard, _camera, _settings,
+                                                  _player, _walk_world.get());
+
+    const FileSystem& fs = FileSystem::getInstance();
+    const std::string settings_path =
+            fs.getConfigDir() + fs.separator() + "settings.xml";
+    _player.loadConfig(settings_path.c_str());
+
     _current_manipulator = _free_manipulator;
     _current_manipulator->resetView();
 }
@@ -57,10 +250,14 @@ UpdateViewerHandler::UpdateViewerHandler(
 //------------------------------------------------------------------------------
 UpdateViewerHandler::~UpdateViewerHandler() noexcept
 {
+    delete _walk_manipulator;
     delete _follow_manipulator;
     delete _cabine_manipulator;
     delete _vehicle_manipulator;
     delete _free_manipulator;
+
+    if (_walk_world && _walk_world->isInitialized())
+        _walk_world->shutdown();
 }
 
 //------------------------------------------------------------------------------
@@ -68,6 +265,8 @@ UpdateViewerHandler::~UpdateViewerHandler() noexcept
 //------------------------------------------------------------------------------
 void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
 {
+    enforceLatinKeyboardLayout();
+
     if (frame.frameStamp->frameCount)
     {
         const double t = frame.frameStamp->simulationTime;
@@ -78,6 +277,25 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
 
         _vehicles_handler->step(t, dt);
 
+        // Alt-подсказки и клики по органам кабины
+
+        // Кинематические тела ПС в мире игрока - до шага физики игрока
+        if (_current_manipulator == _walk_manipulator)
+        {
+            syncWalkVehicleBodies();
+        }
+
+        // Прицел на сиденье + автоподсказка "E - Сесть..." (ТЗ ходьба)
+        if (_current_manipulator == _walk_manipulator)
+        {
+            updateSeatHint();
+        }
+        else if ((gui_params != nullptr) &&
+                 (_current_manipulator != _cabine_manipulator))
+        {
+            gui_params->walk_hint.clear();
+        }
+
         // Обновляем позиции подписей поездов вслед за первыми вагонами
         if (_train_labels_handler)
         {
@@ -86,6 +304,90 @@ void UpdateViewerHandler::apply(vsg::FrameEvent& frame)
         }
 
         _current_manipulator->frameEvent(dt);
+
+        // Пол кабины следует за ПЕ + игрок "едет" вместе с ПЕ:
+        // прикладываем дельту позиции ПЕ к игроку, иначе пол уезжает
+        // из-под ног и бокс возвращается на едущего в нём игрока
+        if (_inside_vehicle >= 0)
+        {
+            auto& vehicles = _vehicles_handler->vehicles;
+
+            if (_inside_vehicle < static_cast<int>(vehicles.size()))
+            {
+                const vsg::dvec3 vpos =
+                        vehicles[static_cast<size_t>(_inside_vehicle)].position;
+
+                if (_inside_prev_vehicle_valid)
+                {
+                    const vsg::dvec3 delta = vpos - _inside_prev_vehicle_pos;
+
+                    const double d = vsg::length(delta);
+
+                    if ((d > 1.0e-6) && (d < 5.0))
+                    {
+                        _walk_manipulator->shiftPlayer(delta);
+                    }
+                }
+
+                _inside_prev_vehicle_pos = vpos;
+                _inside_prev_vehicle_valid = true;
+            }
+
+            updateInteriorFloor();
+        }
+        else
+        {
+            _inside_prev_vehicle_valid = false;
+        }
+
+        // Подъём по ступеням завершён - игрок стоит внутри кабины
+        // (ходит по полу), камера остаётся пеший режим
+        if (_boarding_pending && !_walk_manipulator->isBoarding())
+        {
+            _boarding_pending = false;
+
+            if (auto look_at = _camera->viewMatrix.cast<vsg::LookAt>())
+            {
+                (void)look_at;
+            }
+
+            _walk_manipulator->teleportPlayer(_inside_stand_point);
+
+            _inside_vehicle = _boarding_vehicle;
+            _inside_cab = _boarding_cab;
+        }
+
+        // Игрок сошёл с пола кабины и отошёл от локомотива - вернуть
+        // бокс кузова (раньше возвращали сразу: физика выбрасывала
+        // игрока из кузова, отсюда "прыгание")
+        if (_inside_vehicle >= 0 && !_boarding_pending)
+        {
+            const collision::Vec3f& pp =
+                    _walk_manipulator->getPlayerPosition();
+
+            auto& vehicles = _vehicles_handler->vehicles;
+
+            if (_inside_vehicle < static_cast<int>(vehicles.size()))
+            {
+                const VehicleExterior& veh =
+                        vehicles[static_cast<size_t>(_inside_vehicle)];
+
+                const double dx = pp.x - veh.position.x;
+                const double dy = pp.y - veh.position.y;
+
+                // Габаритный бокс ПЕ - 30 м (полудлина 15): возвращаем
+                // его только когда игрок ЗА габаритом, иначе бокс
+                // материализуется вокруг игрока и "замуровывает" его
+                if (std::sqrt(dx * dx + dy * dy) > 18.0)
+                {
+                    exitInterior();
+                }
+            }
+            else
+            {
+                exitInterior();
+            }
+        }
 
         updateShadowRegion();
     }
@@ -116,7 +418,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
     if (_keyboard)
     {
         keyPress.accept(*_keyboard);
-    }    
+    }
 
     _current_manipulator->keyboardPressEvent(keyPress.keyBase, true);
 
@@ -136,8 +438,116 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         return;
     }
 
-    // Запрещаем управление выбором текущего вагона со свободной камеры
-    if (_current_manipulator != _free_manipulator)
+    // Num0/Num1 - боковое окно кабины и высунуться в него (как в РТС)
+    if ((_current_manipulator == _cabine_manipulator) &&
+        !isCtrl() && !isShift() && !isAlt())
+    {
+        auto* cabine = dynamic_cast<CameraCabineManipulator*>(_cabine_manipulator);
+
+        if (cabine != nullptr)
+        {
+            if (keyPress.keyBase == vsg::KEY_KP_0)
+            {
+                cabine->toggleWindow();
+
+                if (gui_params != nullptr)
+                    gui_params->walk_hint.clear();
+
+                return;
+            }
+
+            if (keyPress.keyBase == vsg::KEY_KP_1)
+            {
+                if (cabine->toggleLeanOut())
+                {
+                    if (gui_params != nullptr)
+                        gui_params->walk_hint.clear();
+                }
+                else if (gui_params != nullptr)
+                {
+                    gui_params->walk_hint = QString::fromUtf8(
+                                u8"Сначала откройте окно (Num0)");
+                }
+
+                return;
+            }
+        }
+    }
+
+    // Y/U - открыть/закрыть пассажирские двери состава по горячей клавише
+    if (!isCtrl() && !isShift() && !isAlt() &&
+        ((keyPress.keyBase == vsg::KEY_Y) ||
+         (keyPress.keyBase == vsg::KEY_U)))
+    {
+        const int vehicle_idx = _vehicles_handler->getCurrentVehicleIndex();
+
+        _upd_server_control->sendServiceCommand(
+            vehicle_idx,
+            (keyPress.keyBase == vsg::KEY_Y) ? vehicle_service::DoorsOpen
+                                             : vehicle_service::DoorsClose,
+            1.0f);
+
+        return;
+    }
+
+    // Ctrl+Enter - выйти из кабины/локомотива на землю у двери
+    if (isCtrl() && !isShift() && !isAlt() &&
+        (keyPress.keyBase == vsg::KEY_Return ||
+         keyPress.keyBase == vsg::KEY_KP_Enter) &&
+        ((_current_manipulator == _walk_manipulator && _inside_vehicle >= 0) ||
+         (_current_manipulator == _cabine_manipulator)))
+    {
+        exitInteriorToGround();
+        return;
+    }
+
+    // Enter - контекстно: в пешем режиме - вход в кабину ближайшей
+    // ПЕ (если рядом есть дверь, порог тот же, что у Ctrl+Enter);
+    // двери нет - выход из walk и взятие управления. Из свободной
+    // камеры - сразу взятие управления
+    if (!isCtrl() && !isShift() &&
+        (keyPress.keyBase == vsg::KEY_Return ||
+         keyPress.keyBase == vsg::KEY_KP_Enter) &&
+        (_current_manipulator == _walk_manipulator ||
+         _current_manipulator == _free_manipulator) &&
+        _vehicles_handler->isUpdated())
+    {
+        if (_current_manipulator == _walk_manipulator)
+        {
+            // Уже внутри локомотива: Enter садит за пульт (камера
+            // кабины), управление - как обычно Enter ещё раз
+            if (_inside_vehicle >= 0)
+            {
+                exitInterior();
+                enterCabineAt(_inside_vehicle, _inside_cab);
+                return;
+            }
+
+            int vehicle_idx = -1;
+            int cab_idx = -1;
+
+            if (findNearestCabineDoor(vehicle_idx, cab_idx))
+            {
+                // Реалистичный подъём по ступеням, затем ходьба внутри
+                startBoardingAnimation(vehicle_idx, cab_idx);
+                return;
+            }
+
+            // Рядом нет двери: выходим из walk и берём управление
+        }
+
+        exitWalkMode();
+        _vehicles_handler->selectControlVehicle();
+        changeCurrentVehicle();
+        _current_manipulator->resetView();
+
+        return;
+    }
+
+    // Запрещаем управление выбором текущего вагона со свободной и
+    // пешей камеры (в пешем режиме ПС выбирается клавишей E у кабины)
+    if (_current_manipulator != _free_manipulator &&
+        _current_manipulator != _walk_manipulator)
     {
         switch (keyPress.keyBase)
         {
@@ -194,6 +604,7 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
             }
 
             // Enter - взять управление текущим вагоном и кабиной
+            // (Ctrl+Enter занят входом/выходом из локомотива - ниже)
             case vsg::KEY_KP_Enter:
             case vsg::KEY_Return:
             {
@@ -223,11 +634,62 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
         }
     }
 
-    // Управление F-клавишами только без Shift и Ctrl
-    if (!isCtrl() && !isShift())
+    // Shift+F5/F6 - следящие камеры (F5/F6 отданы панелям РТС)
+    if (isShift() && !isCtrl() && !isAlt())
+    {
+        if (keyPress.keyBase == vsg::KEY_F5)
+        {
+            _current_manipulator = _follow_manipulator;
+            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+            _current_manipulator->resetView();
+            return;
+        }
+
+        if (keyPress.keyBase == vsg::KEY_F6)
+        {
+            _current_manipulator = _follow_manipulator;
+            _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+            _current_manipulator->returnView();
+            return;
+        }
+    }
+
+    // Управление F-клавишами только без Shift, Ctrl и Alt
+    if (!isCtrl() && !isShift() && !isAlt())
     {
         switch (keyPress.keyBase)
         {
+            // F8 - пешая камера: включить пешей режим (1-е лицо) /
+            // вернуть прежнюю камеру. Вход/выход из локомотива -
+            // Ctrl+Enter (из кабины - к двери; в пешем - наведением
+            // на дверь). 3-е лицо доступно только с места машиниста
+            // (F1/Shift+F3/Shift+F5/Shift+F6)
+            case vsg::KEY_F8:
+            {
+                if (_current_manipulator == _walk_manipulator)
+                {
+                    // Внутри локомотива F8 не выбрасывает: выход -
+                    // спрыгнуть у двери или Ctrl+Enter из кабины
+                    if (_inside_vehicle >= 0)
+                    {
+                        context_hint_walk();
+                        return;
+                    }
+
+                    exitWalkMode();
+                }
+                else if (_current_manipulator == _cabine_manipulator)
+                {
+                    // Встать с кресла внутрь кабины (ходьба по ПЕ)
+                    standUpInsideCabine();
+                }
+                else
+                {
+                    enterWalkMode();
+                }
+                return;
+            }
+
             // F1 - камера из кабины управляемой ПЕ
             case vsg::KEY_F1:
             {
@@ -255,54 +717,6 @@ void UpdateViewerHandler::apply(vsg::KeyPressEvent& keyPress)
                 _current_manipulator = _cabine_manipulator;
                 _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
                 _current_manipulator->resetView();
-                return;
-            }
-
-            // F3 - внешняя камера текущей ПЕ
-            case vsg::KEY_F3:
-            {
-                if (_current_manipulator == _vehicle_manipulator)
-                {
-                    _current_manipulator->returnView();
-                    return;
-                }
-
-                _current_manipulator = _vehicle_manipulator;
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->resetView();
-                return;
-            }
-
-            // F4 - свободная камера
-            case vsg::KEY_F4:
-            {
-                if (_current_manipulator == _free_manipulator)
-                {
-                    _current_manipulator->returnView();
-                    return;
-                }
-
-                _current_manipulator = _free_manipulator;
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->resetView();
-                return;
-            }
-
-            // F5 - следящая камера справа по ходу поезда
-            case vsg::KEY_F5:
-            {
-                _current_manipulator = _follow_manipulator;
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->resetView(); // Камера справа инициализируется в resetView
-                return;
-            }
-
-            // F6 - следящая камера слева по ходу поезда
-            case vsg::KEY_F6:
-            {
-                _current_manipulator = _follow_manipulator;
-                _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
-                _current_manipulator->returnView(); // Камера слева инициализируется в returnView
                 return;
             }
 
@@ -343,6 +757,8 @@ void UpdateViewerHandler::apply(vsg::FocusInEvent& focusIn)
     {
         focusIn.accept(*_keyboard);
     }
+
+    enforceLatinKeyboardLayout();
 }
 
 //------------------------------------------------------------------------------
@@ -353,6 +769,13 @@ void UpdateViewerHandler::apply(vsg::FocusOutEvent& focusOut)
     if (_keyboard)
     {
         focusOut.accept(*_keyboard);
+    }
+
+    // Потеря фокуса окна: отпускания клавиш не придёт - чистим
+    // собственный набор пешей камеры, чтобы не залипали WASD
+    if (_walk_manipulator != nullptr)
+    {
+        _walk_manipulator->clearKeys();
     }
 }
 
@@ -403,9 +826,16 @@ void UpdateViewerHandler::apply(vsg::ButtonReleaseEvent& buttonRelease)
 //------------------------------------------------------------------------------
 void UpdateViewerHandler::apply(vsg::MoveEvent& moveEvent)
 {
+
     _lastPointerEventWithinRenderArea = withinRenderArea(moveEvent);
 
-    if (moveEvent.handled || !_hasPointerFocus)
+    // Пешая камера: обзор мышью при зажатой ПКМ (как в редакторе).
+    // Если GUI (ImGui) захватил мышь - moveEvent.handled, обзор не крутим
+    const bool walk_free_look = (_current_manipulator == _walk_manipulator) &&
+                                _lastPointerEventWithinRenderArea &&
+                                ((moveEvent.mask & vsg::BUTTON_MASK_3) != 0);
+
+    if (moveEvent.handled || (!_hasPointerFocus && !walk_free_look))
     {
         return;
     }
@@ -645,6 +1075,557 @@ void UpdateViewerHandler::changeCurrentCabine()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void UpdateViewerHandler::initWalkWorld()
+{
+    if (_walk_world_loaded)
+        return;
+
+    _walk_world_loaded = true;
+
+    collision::WorldSettings world_settings;
+    // Пешему миру не нужны события контактов и большие лимиты: только
+    // лучи (земля/стены/ступеньки) и кинематические боксы ПС
+    world_settings.max_bodies = 8192;
+    world_settings.max_body_pairs = 4096;
+    world_settings.max_contact_constraints = 2048;
+    world_settings.temp_allocator_size = 4 * 1024 * 1024;
+    world_settings.worker_threads = 1;
+
+    if (!_walk_world->init(world_settings))
+    {
+        LOG_WARN("Walk mode: collision world init failed");
+        return;
+    }
+
+    // Статическая геометрия маршрута (objects.ref + route1.map +
+    // colliders.conf). Без неё игрок ходит по бесконечному полу z = 0
+    collision::WorldLoadStats stats;
+    std::string error;
+
+    const std::string route_dir = _settings.route_dir_full_path;
+
+    if (!collision::loadRouteIntoWorld(*_walk_world, route_dir, stats, &error))
+    {
+        LOG_WARN("Walk mode: route collision geometry not loaded "
+                 "(player walks on flat ground): %s", error.c_str());
+    }
+    else
+    {
+        LOG_INFO("Walk mode: loaded %u collision bodies from route",
+                 static_cast<unsigned int>(stats.objects_created));
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::syncWalkVehicleBodies()
+{
+    if (!_walk_world->isInitialized())
+        return;
+
+    auto& vehicles = _vehicles_handler->vehicles;
+    const size_t count = vehicles.size();
+
+    // Новые ПС появились на сервере - добавляем тела
+    while (_walk_vehicle_bodies.size() < count)
+    {
+        // Габаритный бокс ПС: длина до 15 м (полудлина), ширина ~3.2 м,
+        // высота 4 м от уровня головки рельса (позиция ПЕ - на уровне
+        // рельса в центре кузова)
+        collision::ObjectDesc desc;
+        desc.shape = collision::CollisionShape::box(
+                    collision::Vec3f(15.0f, 1.6f, 2.0f));
+        desc.layer = collision::Layer::Train;
+        desc.motion = collision::MotionType::Kinematic;
+        desc.position = collision::Vec3f(0.0f, 0.0f, -100.0f);
+
+        _walk_vehicle_bodies.push_back(_walk_world->createObject(desc));
+    }
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        collision::CollisionObject& object = _walk_vehicle_bodies[i];
+
+        if (!object.isValid())
+            continue;
+
+        // Игрок внутри этой ПЕ: бокс кузова УБИРАЕТСЯ из мира
+        // (иначе коллизии выталкивают игрока, бесконечные прыжки)
+        if (static_cast<int>(i) == _inside_vehicle)
+        {
+            object.setPositionRotation(
+                        collision::Vec3f(0.0f, -10000.0f, -10000.0f),
+                        collision::quatFromRouteEuler(
+                            collision::Vec3f(0.0f, 0.0f, 0.0f)));
+            continue;
+        }
+
+        const VehicleExterior& vehicle = vehicles[i];
+
+        const vsg::dvec3 center = vehicle.position +
+                vehicle.up * 2.0;
+
+        const collision::Vec3f pos(
+                    static_cast<float>(center.x),
+                    static_cast<float>(center.y),
+                    static_cast<float>(center.z));
+
+        object.setPositionRotation(
+                    pos,
+                    quatFromBasis(vehicle.orth,
+                                  vehicle.right,
+                                  vehicle.up));
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::enterWalkMode()
+{
+    initWalkWorld();
+
+    _prev_manipulator = _current_manipulator;
+
+    // Клавиши управляют игроком, а не поездом (в т.ч. зажатые до входа)
+    _upd_server_control->setControlSuppressed(true);
+
+    // Спавн: из кабины - у точки выхода текущей кабины; иначе - рядом
+    // с текущей ПЕ (или у свободной камеры, если ПС ещё нет)
+    vsg::dvec3 spawn = _lookAt_of_camera_eye();
+
+    VehicleExterior* vehicle = _vehicles_handler->getCurrentVehicle();
+
+    if (vehicle && (_current_manipulator == _cabine_manipulator) &&
+        !vehicle->exit_pos.empty())
+    {
+        const size_t cab = std::min(vehicle->current_cabine_idx,
+                                    vehicle->exit_pos.size() - 1);
+
+        spawn = outsideDoorPoint(*vehicle, cab, 0.5);
+    }
+    else if (vehicle)
+    {
+        spawn = vehicle->position + vehicle->right * 3.0 +
+                vehicle->up * 1.0;
+    }
+
+    _current_manipulator = _walk_manipulator;
+    _walk_manipulator->clearKeys();
+    _walk_manipulator->activate(spawn);
+    _walk_manipulator->resetView();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::exitWalkMode()
+{
+    if (_current_manipulator != _walk_manipulator)
+        return;
+
+    if (_inside_vehicle >= 0)
+    {
+        exitInterior();
+    }
+
+    // Возврат к камере, из которой вошли (кабина/свободная)
+    CameraAbstract* target = _prev_manipulator;
+
+    if (target == nullptr)
+        target = _free_manipulator;
+
+    // Управление поездом снова на клавишах
+    _upd_server_control->setControlSuppressed(false);
+
+    _current_manipulator = target;
+    _prev_manipulator = nullptr;
+
+    _current_manipulator->setCurrentVehicle(_vehicles_handler->getCurrentVehicle());
+    _current_manipulator->resetView();
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::updateSeatHint()
+{
+    hint_vehicle = -1;
+
+    if (gui_params != nullptr)
+        gui_params->walk_hint.clear();
+
+    if (_walk_manipulator->isSeated())
+    {
+        // Сидим: подсказку не показываем (встать - просто E)
+        return;
+    }
+
+    auto& vehicles = _vehicles_handler->vehicles;
+
+    if (vehicles.empty())
+        return;
+
+    vsg::ref_ptr<vsg::LookAt> lookAt =
+            _camera->viewMatrix.cast<vsg::LookAt>();
+
+    if (!lookAt)
+        return;
+
+    const vsg::dvec3 eye = lookAt->eye;
+    const vsg::dvec3 aim =
+            vsg::normalize(lookAt->center - lookAt->eye);
+
+    // Сиденье в конусе взгляда (~20 град) и ближе 3 м
+    const double max_cos = std::cos(vsg::radians(35.0));
+    const double max_dist = 3.0;
+
+    double best_cos = max_cos;
+
+    for (size_t i = 0; i < vehicles.size(); ++i)
+    {
+        const VehicleExterior& vehicle = vehicles[i];
+
+        for (size_t cab = 0; cab < vehicle.driver_pos.size(); ++cab)
+        {
+            const vsg::dvec3 seat =
+                    vehicle.worldFromLocal(vehicle.driver_pos[cab]);
+            const vsg::dvec3 to_seat = seat - eye;
+            const double dist = vsg::length(to_seat);
+
+            if (dist > max_dist || dist < 0.3)
+                continue;
+
+            const double cos_a = vsg::dot(aim, to_seat / dist);
+
+            if (cos_a > best_cos)
+            {
+                best_cos = cos_a;
+                hint_vehicle = static_cast<int>(i);
+                hint_cab = cab;
+                hint_driver = true;
+            }
+        }
+
+        for (size_t cab = 0; cab < vehicle.assistant_pos.size(); ++cab)
+        {
+            const vsg::dvec3 seat =
+                    vehicle.worldFromLocal(vehicle.assistant_pos[cab]);
+            const vsg::dvec3 to_seat = seat - eye;
+            const double dist = vsg::length(to_seat);
+
+            if (dist > max_dist || dist < 0.3)
+                continue;
+
+            const double cos_a = vsg::dot(aim, to_seat / dist);
+
+            if (cos_a > best_cos)
+            {
+                best_cos = cos_a;
+                hint_vehicle = static_cast<int>(i);
+                hint_cab = cab;
+                hint_driver = false;
+            }
+        }
+    }
+
+    if (hint_vehicle >= 0 && gui_params != nullptr)
+    {
+        gui_params->walk_hint = (hint_driver) ?
+                QString("E — Сесть на место машиниста") :
+                QString("E — Сесть на место помощника");
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::tryEnterNearestCabine()
+{
+    int vehicle_idx = -1;
+    int cab_idx = -1;
+
+    if (findNearestCabineDoor(vehicle_idx, cab_idx))
+    {
+        enterCabineAt(vehicle_idx, cab_idx);
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool UpdateViewerHandler::findNearestCabineDoor(int& vehicle_idx, int& cab_idx)
+{
+    auto& vehicles = _vehicles_handler->vehicles;
+
+    if (vehicles.empty())
+        return false;
+
+    // Наведение на дверь: направление взгляда игрока (камера 1-го лица)
+    vsg::ref_ptr<vsg::LookAt> lookAt = _camera->viewMatrix.cast<vsg::LookAt>();
+
+    if (!lookAt)
+        return false;
+
+    const vsg::dvec3 eye = lookAt->eye;
+    const vsg::dvec3 aim = vsg::normalize(lookAt->center - lookAt->eye);
+
+    // Дверь должна быть в конусе взгляда (~40 град) и рядом
+    const double max_cos = std::cos(vsg::radians(40.0));
+    const double max_dist = _settings.walk_interact_distance;
+
+    int best_vehicle = -1;
+    size_t best_cab = 0;
+    double best_cos = max_cos;
+
+    // Fallback: если конус взгляда не поймал дверь, берём ближайшую
+    // в радиусе взаимодействия (без ограничения по углу) - чтобы
+    // не требовать от игрока точного прицеливания
+    int near_vehicle = -1;
+    size_t near_cab = 0;
+    double near_dist = max_dist;
+
+    for (size_t i = 0; i < vehicles.size(); ++i)
+    {
+        const VehicleExterior& vehicle = vehicles[i];
+
+        for (size_t cab = 0; cab < vehicle.exit_pos.size(); ++cab)
+        {
+            // Мировая позиция двери кабины (ExitPos; дверь - она же
+            // точка выхода/входа игрока)
+            const vsg::dvec3 door =
+                    vehicle.worldFromLocal(vehicle.exit_pos[cab]);
+
+            const vsg::dvec3 to_door = door - eye;
+
+            const double dist = vsg::length(to_door);
+
+            if (dist > max_dist || dist < 0.2)
+                continue;
+
+            if (dist < near_dist)
+            {
+                near_dist = dist;
+                near_vehicle = static_cast<int>(i);
+                near_cab = cab;
+            }
+
+            const double cos_angle =
+                    vsg::dot(aim, to_door / dist);
+
+            if (cos_angle > best_cos)
+            {
+                best_cos = cos_angle;
+                best_vehicle = static_cast<int>(i);
+                best_cab = cab;
+            }
+        }
+    }
+
+    if (best_vehicle < 0)
+    {
+        best_vehicle = near_vehicle;
+        best_cab = near_cab;
+    }
+
+    if (best_vehicle < 0)
+        return false;
+
+    vehicle_idx = best_vehicle;
+    cab_idx = best_cab;
+    return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::enterCabineAt(int vehicle_idx, int cab_idx)
+{
+    auto& vehicles = _vehicles_handler->vehicles;
+
+    if (vehicle_idx < 0 ||
+        vehicle_idx >= static_cast<int>(vehicles.size()))
+    {
+        return;
+    }
+
+    _vehicles_handler->selectVehicle(vehicle_idx);
+
+    VehicleExterior* vehicle = _vehicles_handler->getCurrentVehicle();
+
+    if (vehicle != nullptr)
+        vehicle->current_cabine_idx = cab_idx;
+
+    // Выход из пешего режима в кабину: клавиши снова управляют поездом
+    exitInterior();
+    _prev_manipulator = nullptr;
+    _upd_server_control->setControlSuppressed(false);
+    _current_manipulator = _cabine_manipulator;
+    _current_manipulator->setCurrentVehicle(vehicle);
+    _current_manipulator->resetView();
+}
+
+//------------------------------------------------------------------------------
+// Подъём по ступеням: путь глаза игрока -> подход -> ступени -> порог
+// -> внутрь -> место машиниста; анимирует пешая камера, по завершении
+// FrameEvent переключает камеру в кабину
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::startBoardingAnimation(int vehicle_idx, int cab_idx)
+{
+    auto& vehicles = _vehicles_handler->vehicles;
+
+    if (vehicle_idx < 0 ||
+        vehicle_idx >= static_cast<int>(vehicles.size()))
+    {
+        return;
+    }
+
+    const VehicleExterior& vehicle = vehicles[static_cast<size_t>(vehicle_idx)];
+
+    if (cab_idx >= static_cast<int>(vehicle.exit_pos.size()) ||
+        cab_idx >= static_cast<int>(vehicle.driver_pos.size()))
+    {
+        return;
+    }
+
+    vsg::ref_ptr<vsg::LookAt> lookAt = _camera->viewMatrix.cast<vsg::LookAt>();
+
+    if (!lookAt)
+        return;
+
+    const vsg::dvec3 eye0 = lookAt->eye;
+
+    const vsg::dvec3 door = vehicle.worldFromLocal(vehicle.exit_pos[cab_idx]);
+
+    // Уровень земли у двери: глаза выше неё на высоту глаз игрока
+    const double ground_z = eye0.z - _walk_manipulator->playerEyeHeight();
+
+    // Горизонтальное направление "игрок -> дверь" (наружу)
+    vsg::dvec3 out = door - eye0;
+    out.z = 0.0;
+    const double out_len = vsg::length(out);
+    out = (out_len > 1.0e-6) ? (out / out_len) : vsg::dvec3(0.0, 0.0, 0.0);
+
+    const vsg::dvec3 seat_local = vehicle.driver_pos[cab_idx];
+    const vsg::dvec3 seat_world = vehicle.position +
+            vehicle.right * seat_local.x +
+            vehicle.orth * seat_local.y +
+            vehicle.up * seat_local.z;
+
+    // Горизонтальное направление "дверь -> внутрь"
+    vsg::dvec3 inward = seat_world - door;
+    inward.z = 0.0;
+    const double inward_len = vsg::length(inward);
+    inward = (inward_len > 1.0e-6) ? (inward / inward_len) : -out;
+
+    std::vector<vsg::dvec3> path;
+    path.reserve(6);
+
+    // Пол кабины на уровне порога двери: стоим и ходим внутри
+    const double floor_z = door.z;
+    const double eye_h = _walk_manipulator->playerEyeHeight();
+
+    const vsg::dvec3 stand_point = door + inward * 1.3 +
+            vsg::dvec3(0.0, 0.0, 0.0);
+
+    path.push_back(eye0);
+    path.push_back(door + out * 0.9 +
+                   vsg::dvec3(0.0, 0.0, ground_z - eye0.z + 0.15));
+    path.push_back(door + out * 0.25 +
+                   vsg::dvec3(0.0, 0.0, (floor_z - eye0.z) * 0.6));
+    path.push_back(door + vsg::dvec3(0.0, 0.0, eye_h - ground_z));
+    path.push_back(stand_point +
+                   vsg::dvec3(0.0, 0.0, eye_h - ground_z));
+
+    addInteriorFloor(vehicle_idx);
+
+    _inside_stand_point = stand_point +
+            vsg::dvec3(0.0, 0.0, 0.45);
+    _inside_floor_z = floor_z;
+
+    _boarding_vehicle = vehicle_idx;
+    _boarding_cab = cab_idx;
+    _boarding_pending = true;
+
+    _walk_manipulator->startBoarding(path, 1.6);
+}
+
+//------------------------------------------------------------------------------
+// Статический пол кабины/секции: один длинный бокс от двери одной
+// кабины до двери другой, верх на уровне порога двери
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::addInteriorFloor(int vehicle_idx)
+{
+    if (vehicle_idx < 0)
+    {
+        return;
+    }
+
+    if (static_cast<int>(_interior_floor_added.size()) <= vehicle_idx)
+    {
+        _interior_floor_added.resize(vehicle_idx + 1, false);
+        _interior_floor_bodies.resize(vehicle_idx + 1);
+    }
+
+    if (_interior_floor_added[vehicle_idx])
+    {
+        return;
+    }
+
+    // Пол создаётся в мире игрока: при входе из кабины (F8) мир ещё
+    // может быть не инициализирован
+    initWalkWorld();
+
+    if (!_walk_world->isInitialized())
+    {
+        return;
+    }
+
+    auto& vehicles = _vehicles_handler->vehicles;
+
+    if (vehicle_idx >= static_cast<int>(vehicles.size()))
+    {
+        return;
+    }
+
+    const VehicleExterior& vehicle = vehicles[static_cast<size_t>(vehicle_idx)];
+
+    collision::Vec3f position;
+    collision::Quatf rotation;
+    float half_length = 0.0f;
+
+    if (!interiorFloorPose(vehicle, position, rotation, half_length))
+    {
+        return;
+    }
+
+    collision::ObjectDesc desc;
+    desc.shape = collision::CollisionShape::box(
+                collision::Vec3f(half_length, 1.2f, 0.1f));
+    desc.layer = collision::Layer::Infrastructure;
+    desc.motion = collision::MotionType::Kinematic;
+    desc.position = position;
+    desc.rotation = rotation;
+
+    _interior_floor_bodies[vehicle_idx] =
+            _walk_world->createObject(desc);
+
+    _interior_floor_added[vehicle_idx] = true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+vsg::dvec3 UpdateViewerHandler::_lookAt_of_camera_eye()
+{
+    vsg::ref_ptr<vsg::LookAt> lookAt = _camera->viewMatrix.cast<vsg::LookAt>();
+    return lookAt ? lookAt->eye : vsg::dvec3(0.0, 0.0, 2.0);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void UpdateViewerHandler::updateShadowRegion()
 {
     // Текущий вид из камеры
@@ -668,4 +1649,236 @@ void UpdateViewerHandler::updateShadowRegion()
     _shadow_region->points[2] = orth + up - right;
     _shadow_region->points[3] = orth - up + right;
     _shadow_region->points[4] = orth - up - right;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::exitInterior()
+{
+    _inside_vehicle = -1;
+    _inside_cab = -1;
+}
+
+
+//------------------------------------------------------------------------------
+// F8 из кабины: встать с кресла пешком внутрь кабины (ходьба по ПЕ)
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::standUpInsideCabine()
+{
+    auto& vehicles = _vehicles_handler->vehicles;
+    const int vehicle_idx = _vehicles_handler->getCurrentVehicleIndex();
+
+    if (vehicle_idx < 0 ||
+        vehicle_idx >= static_cast<int>(vehicles.size()))
+    {
+        enterWalkMode();
+        return;
+    }
+
+    VehicleExterior* vehicle = &vehicles[static_cast<size_t>(vehicle_idx)];
+
+    if (vehicle->exit_pos.empty() || vehicle->driver_pos.empty())
+    {
+        enterWalkMode();
+        return;
+    }
+
+    const size_t cab = std::min(vehicle->current_cabine_idx,
+                                vehicle->exit_pos.size() - 1);
+
+    const size_t seat_idx = std::min(cab,
+                                     vehicle->driver_pos.size() - 1);
+
+    const vsg::dvec3 door = vehicle->worldFromLocal(vehicle->exit_pos[cab]);
+
+    const vsg::dvec3 seat_world = vehicle->worldFromLocal(
+                vehicle->driver_pos[seat_idx]);
+
+    // Направление взгляда машиниста в этой кабине: в передней кабине
+    // +orth, в задней -orth (driver_dir = 180)
+    const double driver_dir = (seat_idx < vehicle->driver_dir.size()) ?
+                vehicle->driver_dir[seat_idx] : 0.0;
+    const double dir_rad = vsg::radians(driver_dir);
+    const vsg::dvec3 facing = vehicle->orth * std::cos(dir_rad) -
+            vehicle->right * std::sin(dir_rad);
+
+    // Встаём у пульта: перед креслом, ногами на полу кабины
+    vsg::dvec3 stand = seat_world + facing * 0.35;
+    stand.z = door.z + 0.45;
+
+    _inside_vehicle = vehicle_idx;
+    _inside_cab = static_cast<int>(cab);
+    _inside_prev_vehicle_valid = false;
+
+    addInteriorFloor(vehicle_idx);
+
+    _inside_floor_z = door.z;
+    _inside_stand_point = stand;
+
+    // Возврат из пешего режима - в эту же кабину
+    _prev_manipulator = _cabine_manipulator;
+    _upd_server_control->setControlSuppressed(true);
+    _current_manipulator = _walk_manipulator;
+    _current_manipulator->setCurrentVehicle(vehicle);
+
+    // activate сохраняет направление взгляда из кабины и ставит игрока
+    // на точку у пульта
+    _walk_manipulator->activate(_inside_stand_point);
+
+    if (gui_params != nullptr)
+        gui_params->walk_hint.clear();
+}
+
+//------------------------------------------------------------------------------
+// Ctrl+Enter: выйти на землю у ближайшей двери. Работает и из кабины,
+// и изнутри локомотива, когда игрок уже ходит по полу.
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::exitInteriorToGround()
+{
+    auto& vehicles = _vehicles_handler->vehicles;
+
+    int vehicle_idx = _inside_vehicle;
+
+    if (vehicle_idx < 0)
+    {
+        if (_current_manipulator != _cabine_manipulator)
+            return;
+
+        vehicle_idx = _vehicles_handler->getCurrentVehicleIndex();
+    }
+
+    if (vehicle_idx < 0 ||
+        vehicle_idx >= static_cast<int>(vehicles.size()))
+    {
+        return;
+    }
+
+    VehicleExterior& vehicle = vehicles[static_cast<size_t>(vehicle_idx)];
+
+    if (vehicle.exit_pos.empty())
+    {
+        return;
+    }
+
+    // Ближайшая к игроку дверь (изнутри можно уйти к другой секции)
+    size_t door_idx = 0;
+
+    if (_inside_vehicle >= 0)
+    {
+        const collision::Vec3f& pp = _walk_manipulator->getPlayerPosition();
+
+        double best_dist2 = 1.0e30;
+
+        for (size_t i = 0; i < vehicle.exit_pos.size(); ++i)
+        {
+            const vsg::dvec3 door =
+                    vehicle.worldFromLocal(vehicle.exit_pos[i]);
+
+            const double dx = door.x - static_cast<double>(pp.x);
+            const double dy = door.y - static_cast<double>(pp.y);
+            const double dist2 = dx * dx + dy * dy;
+
+            if (dist2 < best_dist2)
+            {
+                best_dist2 = dist2;
+                door_idx = i;
+            }
+        }
+    }
+    else
+    {
+        door_idx = std::min(vehicle.current_cabine_idx,
+                            vehicle.exit_pos.size() - 1);
+    }
+
+    const vsg::dvec3 spawn = outsideDoorPoint(vehicle, door_idx, 0.5);
+
+    _inside_vehicle = -1;
+    _inside_cab = -1;
+    _inside_prev_vehicle_valid = false;
+
+    if (!_walk_world_loaded)
+        initWalkWorld();
+
+    _prev_manipulator = _cabine_manipulator;
+    _upd_server_control->setControlSuppressed(true);
+    _current_manipulator = _walk_manipulator;
+    _current_manipulator->setCurrentVehicle(&vehicle);
+
+    _walk_manipulator->activate(spawn);
+
+    if (gui_params != nullptr)
+        gui_params->walk_hint.clear();
+}
+
+//------------------------------------------------------------------------------
+// Подсказка вместо действия (F8 внутри локомотива)
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::context_hint_walk()
+{
+    if (gui_params != nullptr)
+    {
+        gui_params->walk_hint = QString::fromUtf8(
+                    u8"Ctrl+Enter — выйти на землю, Enter — сесть за пульт");
+    }
+}
+
+//------------------------------------------------------------------------------
+// Пол кабины следует за ПЕ (кинематика): пересчёт позиции плиты по
+// текущей позе двери. Также обновляет точку стояния и высоту пола
+//------------------------------------------------------------------------------
+void UpdateViewerHandler::updateInteriorFloor()
+{
+    if (_inside_vehicle < 0)
+        return;
+
+    auto& vehicles = _vehicles_handler->vehicles;
+
+    if (_inside_vehicle >= static_cast<int>(vehicles.size()))
+        return;
+
+    const VehicleExterior& vehicle = vehicles[static_cast<size_t>(_inside_vehicle)];
+
+    if (vehicle.exit_pos.empty() || vehicle.driver_pos.empty())
+        return;
+
+    const size_t cab = std::min(static_cast<size_t>(_inside_cab),
+                                vehicle.exit_pos.size() - 1);
+
+    const vsg::dvec3 door = vehicle.worldFromLocal(vehicle.exit_pos[cab]);
+
+    const vsg::dvec3 seat_world = vehicle.worldFromLocal(
+                vehicle.driver_pos[std::min(cab,
+                    vehicle.driver_pos.size() - 1)]);
+
+    vsg::dvec3 inward = seat_world - door;
+    inward.z = 0.0;
+    const double inward_len = vsg::length(inward);
+    inward = (inward_len > 1.0e-6) ?
+                (inward / inward_len) : vsg::dvec3(0.0, 0.0, 0.0);
+
+    collision::Vec3f floor_position;
+    collision::Quatf floor_rotation;
+    float floor_half_length = 0.0f;
+
+    if (interiorFloorPose(vehicle, floor_position, floor_rotation,
+                          floor_half_length))
+    {
+        if (static_cast<int>(_interior_floor_bodies.size()) > _inside_vehicle)
+        {
+            collision::CollisionObject& floor_object =
+                    _interior_floor_bodies[static_cast<size_t>(_inside_vehicle)];
+
+            if (floor_object.isValid())
+            {
+                floor_object.setPositionRotation(floor_position,
+                                                 floor_rotation);
+            }
+        }
+    }
+
+    _inside_floor_z = door.z;
+    _inside_stand_point = door + inward * 1.3 +
+            vsg::dvec3(0.0, 0.0, 0.45);
 }

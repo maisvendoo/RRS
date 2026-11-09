@@ -87,4 +87,6 @@
 		<AnimationsConfigDir>freight</AnimationsConfigDir>
 	</Model>
 -->
+	<!-- Интерактивные органы кабины (клик мышью при Alt): мост к штатным
+	     клавишам управления; SignalID - анимационный сигнал состояния -->
 </Config>

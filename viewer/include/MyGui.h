@@ -1,6 +1,7 @@
-#ifndef MY_GUI_H
+﻿#ifndef MY_GUI_H
 #define MY_GUI_H
 
+#include "Sun.h"
 #include <vsg/commands/Command.h>
 #include <vsg/core/Inherit.h>
 #include <vsg/core/Object.h>
@@ -13,8 +14,8 @@
 
 struct simulator_time_t;
 class NewSkybox;
+class RouteViewer;
 class Skybox;
-class Sun;
 class VehiclesHandler;
 class UpdateViewerHandler;
 class UpdateStatisticsHandler;
@@ -42,6 +43,27 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     StationsHandler *stations_handler = nullptr;
     TrainLabelsHandler *train_labels_handler = nullptr;
     TcpClient *tcp_client = nullptr;
+
+    // Владелец — применяется пресет графики из GUI
+    RouteViewer* route_viewer = nullptr;
+    int graphics_preset_index = 1;        ///< Текущий пресет: 0-Legacy...5-Custom
+    bool graphics_needs_restart = false;  ///< Полное применение после перезапуска
+
+    // Статусы тиров нового качества High/Ultra/Extreme:
+    // PBR/ACES определяются пресетом и запекаются при старте (только
+    // чтение в GUI); SSAO — флаг Ultra (пасс в разработке)
+    bool graphics_use_pbr = false;
+    bool graphics_use_aces_tonemap = false;
+    bool graphics_use_ssao = false;
+
+    // Пост-процесс пресета Extreme: чекбоксы эффектов и масштаб
+    // (активны только на Extreme, изменения — после перезапуска)
+    bool graphics_use_postprocess = false;
+    bool graphics_use_bloom = false;
+    bool graphics_use_ssao_pass = false;
+    bool graphics_use_volumetric_fog = false;
+    bool graphics_use_ssr = false;
+    float graphics_postprocess_scale = 0.75f;
 
     vsg::ref_ptr<Sun> sun;
 
@@ -75,7 +97,36 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     bool prev_F7 = false;
     bool is_show_HUD = false;
 
+    /// Панели РТС: F5 - вагон, Ctrl+F5 - ограничения,
+    /// F6 - станции, F7 - подписи, Ctrl+F7 - светофоры
+    bool prev_F5 = false;
+    bool prev_F6 = false;
+    bool is_show_car_info = false;
+    bool is_show_speed_limits = false;
+    bool is_show_stations_panel = false;
+    bool is_show_signal_panel = false;
+    bool is_show_labels = false;
+    int car_info_page = 0;
+    bool use_english = false;
+
     /// Флаги видимости виджетов HUD
+    /// Окно диагностики составов: F3 - вкл/выкл, F4 - свёрнутый/полный режим
+    bool prev_F3 = false;
+    bool is_show_diagnostics = false;
+    bool prev_F4 = false;
+    bool diagnostics_full_mode = false;
+
+    /// Меню вагона (Num3): сервисные команды текущего вагона
+    bool prev_Num3 = false;
+    bool is_show_car_menu = false;
+    int car_menu_vehicle = -1;
+    int car_menu_page = 0;              ///< 0 - сцепка, 1 - тележка
+    bool car_menu_handbrake = false;
+    bool car_menu_end_valve_fwd = false;
+    bool car_menu_end_valve_bwd = false;
+    bool car_menu_chock_fwd = false;
+    bool car_menu_chock_bwd = false;
+
     bool hud_show_profile = true;
     bool hud_show_timetable = true;
     bool hud_show_trains_list = true;
@@ -127,6 +178,10 @@ struct GUIParams final : public vsg::Inherit<vsg::Object, GUIParams>
     ImVec4 hud_train_profile_speed_limit_bg = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
     QString status = "";
+
+    /// Автоподсказка пешего режима ("E — Сесть на место машиниста"):
+    /// заполняется UpdateViewerHandler каждый кадр, рисуется MyGui
+    QString walk_hint = "";
     QString physicalDeviceName = "";
 };
 
@@ -163,7 +218,36 @@ private:
 
     void showSettings() const;
 
+    void showGraphicsSettings() const;
+
     void showDebugMsg() const;
+
+    /// Диагностика составов (F3/F4)
+    void showDiagnostics() const;
+
+    /// Меню вагона (Num3): ручной тормоз, рукава, концевые краны,
+    /// расцепка. Команды уходят на сервер по каналу управления.
+    void showCarMenu() const;
+
+    /// Отправка сервисной команды вагона на сервер
+    void sendCarServiceCommand(std::uint16_t action, float value) const;
+
+    /// Предупреждение кассеты регистрации: всплывает
+    /// при вставке/извлечении по Ctrl+R ("Запись параметров движения
+    /// начата/окончена"), живёт ~5 с
+    void showCassetteNotice() const;
+
+    /// Автоподсказка посадки на сиденье (прицел в пешем режиме)
+    void drawWalkHint() const;
+
+    /// Подсказка органа кабины при наведении (Alt, /// "Взаимодействие с элементами кабины"): имя, назначение,
+    /// состояние и клавиши мыши
+    void drawCassetteNotice(const QString& text) const;
+
+    // record() константный (vsg::Command) - состояние вывода mutable
+    mutable quint32 prev_cassette_notice_id = 0;
+    mutable QString cassette_notice_text = "";
+    mutable double notice_shown_until = 0.0;
 
     void showNoControlled() const;
 
@@ -172,6 +256,18 @@ private:
     void showTrainRenameDialog() const;
 
     void showPauseState() const;
+
+    /// Информационные панели в духе РТС
+    void showCarInfoPanel() const;
+    void showSpeedLimitsPanel() const;
+    void showStationsPanel() const;
+    void showSignalsPanel() const;
+
+    /// Показ подписей станций и поездов по F7
+    void applyWorldLabels() const;
+
+    /// Строка интерфейса на русском или английском
+    QString tr(const char* ru, const char* en) const;
 
     void showHUD() const;
 

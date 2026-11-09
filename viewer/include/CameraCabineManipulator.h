@@ -2,6 +2,7 @@
 #define CAMERA_CABINE_MANIPULATOR_H
 
 #include "CameraAbstract.h"
+#include "CabSway.h"
 
 class CameraCabineManipulator final : public CameraAbstract
 {
@@ -16,6 +17,15 @@ public:
     void mouseMoveEvent(vsg::ButtonMask button_mask, vsg::dvec2 delta) override;
     void touchZoomEvent(double zoomLevel) override;
     void frameEvent(double dt) override;
+
+    /// Открыть/закрыть боковое окно кабины (Num0)
+    void toggleWindow();
+
+    /// Высунуться/вернуться (Num1). false - окно ещё закрыто
+    bool toggleLeanOut();
+
+    bool isWindowOpen() const noexcept { return _window_open; }
+    bool isLeanOut() const noexcept { return _lean_out_target; }
 
     /// Key that turns the view left around the eye points
     vsg::KeySymbol turnLeftKey = vsg::KEY_Left;
@@ -75,7 +85,17 @@ private:
     bool is_reset = true;
     VehicleExterior *_prev_current_vehicle = nullptr;
 
+    /// Раскачка кабины в движении (покачивание кузова на рессорах):
+    /// дополняет физическую реакцию cam_motion, чисто визуальная
+    CabSway _sway;
+
     bool is_shift = false;
+
+    /// Боковое окно кабины и высунувшийся машинист:
+    /// _lean_out плавно едет к _lean_out_target (0..1)
+    bool _window_open = false;
+    bool _lean_out_target = false;
+    double _lean_out = 0.0;
 };
 
 #endif // CAMERA_CABINE_MANIPULATOR_H
