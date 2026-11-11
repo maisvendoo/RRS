@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class RangeHandler : public ControlHandler
+class IO_CONTROLLER_EXPORT RangeHandler : public ControlHandler
 {
 public:
 
@@ -20,7 +20,7 @@ public:
 
     virtual bool load_config(CfgReader &cfg, QDomNode secNode) override;
 
-    QString getUsage() const override;
+    virtual QString getUsage() const override;
 
 protected:
 

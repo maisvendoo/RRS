@@ -1179,7 +1179,6 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
 
         if (cfg.getDouble(secNode, "value2", value2) && cabs_num > 1)
         {
-            vehicle_control_signal_t input;
             input.value = value2;
             control_inputs[1].insert(id, input);
         }

@@ -6,25 +6,25 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-class ButtonHandler : public BiStateHandler
+class IO_CONTROLLER_EXPORT ButtonHandler : public BiStateHandler
 {
 public:
 
-    explicit ButtonHandler(QObject *parent = nullptr);
+    ButtonHandler(QObject *parent = nullptr);
 
-    void processKeyInput(const std::set<uint16_t>& pressed_keys) override;
+    virtual void processKeyInput(const std::set<uint16_t>& pressed_keys) override;
 
-    void processMouseInput(uint32_t button, bool is_pressed) override;
+    virtual void processMouseInput(uint32_t button, bool is_pressed) override;
 
-    QString getUsage() const override;
+    virtual QString getUsage() const override;
 
-    QString getState() const override;
+    virtual QString getState() const override;
 
-    bool load_config(CfgReader &cfg, QDomNode secNode) override;
+    virtual bool load_config(CfgReader &cfg, QDomNode secNode) override;
 
-    void reset() override;
+    virtual void reset() override;
 
-private:
+protected:
 
     /// Разрешать удержание кнопки
     bool allow_hold = false;

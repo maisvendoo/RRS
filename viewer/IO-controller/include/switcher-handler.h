@@ -13,23 +13,23 @@
 // SpringReturnLow / SpringReturnHigh — номера позиций, с которых делать
 // автоматический возврат при отпускании клавиши/кнопки.
 //------------------------------------------------------------------------------
-class SwitcherHandler : public RangeHandler
+class IO_CONTROLLER_EXPORT SwitcherHandler : public RangeHandler
 {
 public:
 
-    explicit SwitcherHandler(QObject *parent = nullptr);
+    SwitcherHandler(QObject *parent = nullptr);
 
-    bool load_config(CfgReader &cfg, QDomNode secNode) override;
+    virtual bool load_config(CfgReader &cfg, QDomNode secNode) override;
 
-    void processKeyInput(const std::set<uint16_t> &pressed_keys) override;
+    virtual void processKeyInput(const std::set<uint16_t> &pressed_keys) override;
 
-    void processMouseInput(uint32_t button, bool is_pressed) override;
+    virtual void processMouseInput(uint32_t button, bool is_pressed) override;
 
-    void step(float t, float dt) override;    
+    virtual void step(float t, float dt) override;
 
-    QString getState() const override;        
+    virtual QString getState() const override;
 
-private:
+protected:
 
     uint16_t numPositions = 2;        // количество позиций
     float minValue = 0.0f;            // минимальное значение сигнала
