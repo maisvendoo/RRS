@@ -75,6 +75,7 @@ void JointPneumoHoseEPB::stepConnectionCheck()
     if ((length2(coord_fwd - new_coord_fwd) < Physics::ZERO) && (length2(coord_bwd - new_coord_bwd) < Physics::ZERO))
     {
         // Ничего не изменилось, пересчитывать углы не надо
+        apply();
         return;
     }
     coord_fwd = new_coord_fwd;

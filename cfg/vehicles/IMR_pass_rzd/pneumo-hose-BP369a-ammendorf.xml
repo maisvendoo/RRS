@@ -37,7 +37,7 @@
 		<FreeSideAngle>26.565</FreeSideAngle>
 
 		<!-- Отклонение рукава от продольной оси в закреплённом на подвесе состоянии, градусы -->
-		<FixedSideAngle>18.0</FixedSideAngle>
+		<FixedSideAngle>8.0</FixedSideAngle>
 
 		<!-- Несовпадение поверхности смыкания стандартной соединительной головки с осью рукава, -->
 		<!-- требующее развести их влево на один сантиметр, м -->
@@ -63,7 +63,7 @@
 		<FreeHeadUpAngle>12.0</FreeHeadUpAngle>
 
 		<!-- Изгиб рукава вверх перед соединительной головкой в закреплённом на подвесе состоянии, градусы -->
-		<FixedHeadUpAngle>-33.0</FixedHeadUpAngle>
+		<FixedHeadUpAngle>-33.13</FixedHeadUpAngle>
 
 		<!-- Изгиб рукава вверх перед соединительной головкой в состоянии готовности к соединению, градусы -->
 		<ReadyToConnectHeadUpAngle>36.0</ReadyToConnectHeadUpAngle>

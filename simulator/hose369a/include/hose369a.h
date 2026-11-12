@@ -21,7 +21,7 @@ public:
 
     ~Hose369A();
 
-    virtual void step(double t, double dt);
+    void preStep(state_vector_t& Y, double t) override;
 
 private:
 
@@ -29,7 +29,7 @@ private:
     /// (на локомотивах у рукавов, закреплённых на подвесе, линии ЭПТ размыкаются)
     bool is_hose_at_loco;
 
-    void load_config(CfgReader &cfg);
+    void load_config(CfgReader& cfg) override;
 };
 
 #endif // HOSE369A_H
