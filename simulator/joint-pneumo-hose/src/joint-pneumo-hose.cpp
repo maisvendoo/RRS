@@ -48,7 +48,7 @@ void JointPneumoHose::stepConnectionCheck()
         ref_connected = true;
         if (sum_command >= 2.0)
         {
-            // Оба рукава готовы соединиться
+            // Оба рукава готовы соединиться, соединяем
             is_connected = true;
         }
     }
@@ -167,6 +167,15 @@ void JointPneumoHose::reset()
     ref_connected = false;
     coord_fwd = {0.0, 0.0, 0.0};
     coord_bwd = {0.0, 0.0, 0.0};
+    point_fwd.x = point_bwd.x = (   devices[FWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_X)
+                                  + devices[BWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_X) )
+                                / 2.0;
+    point_fwd.y = point_bwd.y = (   devices[FWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_Y)
+                                  + devices[BWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_Y) )
+                                / 2.0;
+    point_fwd.z = point_bwd.z = (   devices[FWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_Z)
+                                  + devices[BWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_Z) )
+                                / 2.0;
     fwd_angle = 0.0;
     bwd_angle = 0.0;
 }

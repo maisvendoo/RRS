@@ -73,7 +73,7 @@ void PneumoHose::setControl(std::set<uint16_t>* keys,
 void PneumoHose::connect()
 {
     // Команда соединить рукава
-    if (is_linked && (state == FREE))
+    if (state == FREE)
         state = DO_CONNECT;
 }
 
@@ -141,7 +141,7 @@ void PneumoHose::setExternalState(int command)
         }
     }
 
-    // Сохраняем команду разъединить рукава, а если уже свободный - закрепить на подвесе
+    // Сохраняем команду: разъединить рукава, а если уже свободный - закрепить на подвесе
     if (command == 0)
     {
         command_disconnect_fix = true;
@@ -151,7 +151,7 @@ void PneumoHose::setExternalState(int command)
         return;
     }
 
-    // Сохраняем команду снять рукав с подвеса, а если уже свободный - соединить
+    // Сохраняем команду: снять рукав с подвеса, а если уже свободный - соединить
     if (command == 2)
     {
         command_unfix_connect = true;
@@ -312,6 +312,14 @@ double PneumoHose::getHeadUpAngle() const
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+dvec3 PneumoHose::getRootPosition() const
+{
+    return root_pos;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 dvec3 PneumoHose::getConnectionPoint() const
 {
     return v_hose;
@@ -351,13 +359,26 @@ float PneumoHose::getSoundSignal(size_t idx) const
 void PneumoHose::preStep(state_vector_t& Y, double t)
 {
     // Выполняем команды управления
-    if ((state == CONNECTED) && (input_signals[HOSE_INPUT_REF_CONNECTED] == 0.0))
+
+    if (    (input_signals[HOSE_INPUT_REF_CONNECTED] == 0.0)
+         && (state == CONNECTED))
     {
+        // Команда рассоединить рукава от модуля соединения
+        disconnect();
+    }
+
+    if (    (input_signals[HOSE_INPUT_REF_CONNECTED] == 0.0)
+         && (state == DO_CONNECT)
+         && (output_signals[HOSE_OUTPUT_REF_STATE] == 1.0) )
+    {
+        // Модуль соединения не подтвердил возможность сцепить рукава,
+        // отменяем команду на соединение
         disconnect();
     }
 
     if (command_disconnect_fix)
     {
+        // Команда рассоединить рукава от пользователя
         if (!prev_command_disconnect_fix)
         {
             prev_command_disconnect_fix = true;
@@ -366,6 +387,7 @@ void PneumoHose::preStep(state_vector_t& Y, double t)
     }
     else
     {
+        // Команда соединить рукава из модуля соединения или от пользователя
         if (   (input_signals[HOSE_INPUT_REF_CONNECTED] == 1.0)
             || (command_unfix_connect && !prev_command_unfix_connect))
         {
@@ -374,6 +396,7 @@ void PneumoHose::preStep(state_vector_t& Y, double t)
         }
     }
 
+    // Сбрасываем пользовательские команды управления
     command_disconnect_fix = false;
     command_unfix_connect = false;
 }
@@ -452,16 +475,28 @@ void PneumoHose::ode_system(const state_vector_t &Y,
         return;
     }
 
-    // Если должны быть соединены с соседним рукавом, считаем углы к точке соединения
-    // Вектор к точке соединения
-    dvec3 v = { input_signals[HOSE_INPUT_HEAD_ROOT_COORD_X] - output_signals[HOSE_OUTPUT_ROOT_COORD_X],
-                input_signals[HOSE_INPUT_HEAD_ROOT_COORD_Y] - output_signals[HOSE_OUTPUT_ROOT_COORD_Y],
-                input_signals[HOSE_INPUT_HEAD_ROOT_COORD_Z] - output_signals[HOSE_OUTPUT_ROOT_COORD_Z] };
+    if (is_linked)
+    {
+        // Если должны быть соединены с соседним рукавом, считаем углы к точке соединения
+        // Вектор к точке соединения
+        dvec3 v = { input_signals[HOSE_INPUT_HEAD_ROOT_COORD_X] - output_signals[HOSE_OUTPUT_ROOT_COORD_X],
+                    input_signals[HOSE_INPUT_HEAD_ROOT_COORD_Y] - output_signals[HOSE_OUTPUT_ROOT_COORD_Y],
+                    input_signals[HOSE_INPUT_HEAD_ROOT_COORD_Z] - output_signals[HOSE_OUTPUT_ROOT_COORD_Z] };
 
-    // Пересчитываем в локальные оси подвижной единицы
-    v_hose =  { v_right.x * v.x + v_right.y * v.y + v_right.z * v.z,
-                v_orth.x  * v.x + v_orth.y  * v.y + v_orth.z  * v.z,
-                v_up.x    * v.x + v_up.y    * v.y + v_up.z    * v.z };
+        // Пересчитываем в локальные оси подвижной единицы
+        v_hose =  { v_right.x * v.x + v_right.y * v.y + v_right.z * v.z,
+                    v_orth.x  * v.x + v_orth.y  * v.y + v_orth.z  * v.z,
+                    v_up.x    * v.x + v_up.y    * v.y + v_up.z    * v.z };
+    }
+    else
+    {
+        // Если мы получили команду соединить в отсутствие соседнего рукава,
+        // просто поднимаем рукав в горизонталь, потом его всё равно сбросит
+        // в свободное состояние
+        v_hose = {output_signals[HOSE_OUTPUT_LENGTH_MIDDLE] * std::sin(existing_side_angle),
+                  output_signals[HOSE_OUTPUT_LENGTH_MIDDLE] * std::cos(existing_side_angle),
+                  0.0};
+    }
     const dvec3 v_unit = normalize(v_hose);
 
     // Угол изгиба соединительной головки считается в модуле соединения
@@ -535,7 +570,7 @@ void PneumoHose::load_config(CfgReader &cfg)
 
 
     QString pos = "0.0 0.0 0.0";
-    if (cfg.getString(secName, "StationsTextShift", pos))
+    if (cfg.getString(secName, "RootPosition", pos))
     {
         std::istringstream stream(pos.toStdString());
         stream  >> root_pos.x
