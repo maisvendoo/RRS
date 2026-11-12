@@ -3,7 +3,7 @@
 
 	<!-- Перестуки -->
 	<Sound>
-		<SignalID>14</SignalID>
+		<SignalID>22</SignalID>
 		<Filename>5-10.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -14,7 +14,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>15</SignalID>
+		<SignalID>23</SignalID>
 		<Filename>10-15.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -25,7 +25,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>16</SignalID>
+		<SignalID>24</SignalID>
 		<Filename>15-20.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -36,7 +36,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>17</SignalID>
+		<SignalID>25</SignalID>
 		<Filename>20-30.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -47,7 +47,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>18</SignalID>
+		<SignalID>26</SignalID>
 		<Filename>30-40.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -58,7 +58,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>19</SignalID>
+		<SignalID>27</SignalID>
 		<Filename>40-50.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -69,7 +69,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>20</SignalID>
+		<SignalID>28</SignalID>
 		<Filename>50-60.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -80,7 +80,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>21</SignalID>
+		<SignalID>29</SignalID>
 		<Filename>60-70.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -91,7 +91,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>22</SignalID>
+		<SignalID>30</SignalID>
 		<Filename>70-80.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -102,7 +102,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>23</SignalID>
+		<SignalID>31</SignalID>
 		<Filename>80-90.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -113,7 +113,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>24</SignalID>
+		<SignalID>32</SignalID>
 		<Filename>90-100.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -124,7 +124,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>25</SignalID>
+		<SignalID>33</SignalID>
 		<Filename>100-120.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
@@ -135,7 +135,7 @@
 	</Sound>
 
 	<Sound>
-		<SignalID>26</SignalID>
+		<SignalID>34</SignalID>
 		<Filename>120-140.wav</Filename>
 		<InitVolume>1.0</InitVolume>
 		<MaxVolume>1.0</MaxVolume>
