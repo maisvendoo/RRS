@@ -57,7 +57,7 @@
 		<FreeHeadUpAngle>12.0</FreeHeadUpAngle>
 
 		<!-- Изгиб рукава вверх перед соединительной головкой в закреплённом на подвесе состоянии, градусы -->
-		<FixedHeadUpAngle>18.0</FixedHeadUpAngle>
+		<FixedHeadUpAngle>12.0</FixedHeadUpAngle>
 
 		<!-- Изгиб рукава вверх перед соединительной головкой в состоянии готовности к соединению, градусы -->
 		<ReadyToConnectHeadUpAngle>36.0</ReadyToConnectHeadUpAngle>
