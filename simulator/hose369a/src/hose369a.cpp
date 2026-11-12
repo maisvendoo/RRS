@@ -36,7 +36,7 @@ void Hose369A::step(double t, double dt)
     }
 
     // Если рукав подвешен на локомотиве - больше ничего не делаем
-    if (is_hose_at_loco && (input_signals[HOSE_INPUT_IS_CONNECTED] == 0.0))
+    if (is_hose_at_loco && isFixed())
     {
         return;
     }
