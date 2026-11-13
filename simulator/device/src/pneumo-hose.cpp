@@ -255,6 +255,14 @@ void PneumoHose::setHeadUpAngles(double existing, double free, double fixed, dou
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void PneumoHose::setSlopeState(bool side_slope_needed)
+{
+    is_side_slope_needed_to_fix = side_slope_needed;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void PneumoHose::setVehiclePosition(const dvec3 position,
                                     const dvec3 vector_right,
                                     const dvec3 vector_orth,
@@ -307,6 +315,14 @@ double PneumoHose::getDownAngle() const
 double PneumoHose::getHeadUpAngle() const
 {
     return getY(HEAD_UP_ANGLE) - existing_head_up_angle;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+double PneumoHose::getSlopeState() const
+{
+    return getY(SIDE_SLOPE);
 }
 
 //------------------------------------------------------------------------------
@@ -406,11 +422,13 @@ void PneumoHose::preStep(state_vector_t& Y, double t)
 //------------------------------------------------------------------------------
 bool PneumoHose::check_angles_ready(double ref_side_angle,
                                     double ref_down_angle,
-                                    double ref_head_up_angle)
+                                    double ref_head_up_angle,
+                                    double ref_side_slope)
 {
     return (   (std::abs(ref_side_angle - getY(SIDE_ANGLE)) < 0.01)
             && (std::abs(ref_down_angle - getY(DOWN_ANGLE)) < 0.01)
-            && (std::abs(ref_head_up_angle - getY(HEAD_UP_ANGLE)) < 0.01) );
+            && (std::abs(ref_head_up_angle - getY(HEAD_UP_ANGLE)) < 0.01)
+            && (std::abs(ref_side_slope - getY(SIDE_SLOPE)) < 0.01) );
 }
 
 //------------------------------------------------------------------------------
@@ -440,13 +458,15 @@ void PneumoHose::ode_system(const state_vector_t &Y,
                                         - free_angle_beta * Y[DOWN_ANGLE_VELOCITY];
             dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = free_angle_omega * (free_head_up_angle - Y[HEAD_UP_ANGLE])
                                         - free_angle_beta * Y[HEAD_UP_ANGLE_ANGLE_VELOCITY];
+            dYdt[SIDE_SLOPE] = -Y[SIDE_SLOPE] * angle_omega;
             return;
         }
 
         if (state == DO_FIX)
         {
             // Проверяем, что рукав повернулся к подвесу
-            if (check_angles_ready(fixed_side_angle, fixed_down_angle, fixed_head_up_angle))
+            if (check_angles_ready(fixed_side_angle, fixed_down_angle, fixed_head_up_angle,
+                                   static_cast<double>(is_side_slope_needed_to_fix)))
             {
                 // Закрепляем на подвесе
                 state = FIXED;
@@ -455,12 +475,14 @@ void PneumoHose::ode_system(const state_vector_t &Y,
                 setY(HEAD_UP_ANGLE, fixed_head_up_angle);
                 setY(DOWN_ANGLE_VELOCITY, 0.0);
                 setY(HEAD_UP_ANGLE_ANGLE_VELOCITY, 0.0);
+                setY(SIDE_SLOPE, static_cast<double>(is_side_slope_needed_to_fix));
 
                 dYdt[SIDE_ANGLE] = 0.0;
                 dYdt[DOWN_ANGLE] = 0.0;
                 dYdt[HEAD_UP_ANGLE] = 0.0;
                 dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
                 dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = 0.0;
+                dYdt[SIDE_SLOPE] = 0.0;
             }
             else
             {
@@ -470,6 +492,7 @@ void PneumoHose::ode_system(const state_vector_t &Y,
                 dYdt[HEAD_UP_ANGLE] = (fixed_head_up_angle - Y[HEAD_UP_ANGLE]) * angle_omega;
                 dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
                 dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = 0.0;
+                dYdt[SIDE_SLOPE] = (static_cast<double>(is_side_slope_needed_to_fix) - Y[SIDE_SLOPE]) * angle_omega;
             }
         }
         return;
@@ -538,6 +561,7 @@ void PneumoHose::ode_system(const state_vector_t &Y,
                 dYdt[HEAD_UP_ANGLE] = (ref_head_up_angle - Y[HEAD_UP_ANGLE]) * angle_omega;
                 dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
                 dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = 0.0;
+                dYdt[SIDE_SLOPE] = 0.0;
                 return;
             }
         }
@@ -549,12 +573,14 @@ void PneumoHose::ode_system(const state_vector_t &Y,
     setY(HEAD_UP_ANGLE, ref_head_up_angle);
     setY(DOWN_ANGLE_VELOCITY, 0.0);
     setY(HEAD_UP_ANGLE_ANGLE_VELOCITY, 0.0);
+    setY(SIDE_SLOPE, 0.0);
 
     dYdt[SIDE_ANGLE] = 0.0;
     dYdt[DOWN_ANGLE] = 0.0;
     dYdt[HEAD_UP_ANGLE] = 0.0;
     dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
     dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = 0.0;
+    dYdt[SIDE_SLOPE] = 0.0;
 }
 
 //------------------------------------------------------------------------------

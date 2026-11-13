@@ -83,6 +83,9 @@ public:
     /// (конструктивный, в свободном и в закреплённом на подвесе состоянии, для соединения/разъединения), радиан
     void setHeadUpAngles(double existing, double free, double fixed, double ready_to_connect = 36.0 / 180.0 * Physics::PI);
 
+    /// Задать необходимость изгибать рукав вбок для фиксации на подвесе
+    void setSlopeState(bool side_slope_needed);
+
     /// Задать положение подвижной единицы и векторы её локальных координат в мировом пространстве
     /// (для рукава сзади следует задать векторы влево и назад, т.е. right и orth со знаком минус), м
     void setVehiclePosition(const dvec3 position,
@@ -105,6 +108,9 @@ public:
     /// Получить угол поворота соединительной головки вверх,
     /// за вычетом конструктивного, для анимации, радиан
     double getHeadUpAngle() const;
+
+    /// Получить изгиб рукава вбок для фиксации на подвесе, 0..1
+    double getSlopeState() const;
 
     /// Точка изгиба в начале рукава, в локальных координатах подвижной единицы, м
     dvec3 getRootPosition() const;
@@ -148,16 +154,20 @@ protected:
         HEAD_UP_ANGLE,
         DOWN_ANGLE_VELOCITY,
         HEAD_UP_ANGLE_ANGLE_VELOCITY,
+        SIDE_SLOPE,
         NUM_ANGLES
     };
 
-    enum State {
+    enum State : std::uint8_t {
         DO_FIX = 0, ///< Рукав выполняет поворот к подвесу
         FIXED,      ///< Рукав закреплён на подвесе
         FREE,       ///< Рукав свободно висит
         CONNECTED,  ///< Рукав соединён с соседним
         DO_CONNECT  ///< Рукав выполняет поворот для соединения с соседним
     } state = FREE;
+
+    /// Необходимость изгибать рукав вбок для фиксации на подвесе
+    bool is_side_slope_needed_to_fix = false;
 
     /// Команда разъединить рукава / закрепить рукав на подвесе
     bool command_disconnect_fix = false;
@@ -218,7 +228,8 @@ protected:
 
     bool check_angles_ready(double ref_side_angle,
                             double ref_down_angle,
-                            double ref_head_up_angle);
+                            double ref_head_up_angle,
+                            double ref_side_slope = 0.0);
 
     virtual void ode_system(const state_vector_t &Y,
                             state_vector_t &dYdt,
