@@ -131,14 +131,6 @@ void VL60pk::debugPrint(const simulator_time_t& t, const double& dt)
                     .arg(anglecock_fl_bwd->isOpened() ? "\\" : "|")
                     .arg(hose_fl_bwd->isConnected() ? "_" : " ")
                     .arg(hose_fl_bwd->isLinked() ? "/" : " ");
-    DebugMsg += QString("  |  ");
-    DebugMsg += QString("%1%2/=%3==BC==%4=\\%5%6")
-                    .arg(hose_bc_fwd->isLinked() ? "\\" : " ")
-                    .arg(hose_bc_fwd->isConnected() ? "_" : " ")
-                    .arg(anglecock_bc_fwd->isOpened() ? "/" : "|")
-                    .arg(anglecock_bc_bwd->isOpened() ? "\\" : "|")
-                    .arg(hose_bc_bwd->isConnected() ? "_" : " ")
-                    .arg(hose_bc_bwd->isLinked() ? "/" : " ");
 
     DebugMsg += QString("\n");
     DebugMsg += QString("CABINE 2|");

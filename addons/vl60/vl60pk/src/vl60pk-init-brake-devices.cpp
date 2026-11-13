@@ -60,37 +60,6 @@ void VL60pk::initBrakeDevices(double p0, double pBP, double pFL)
 
     supply_reservoir->setY(0, pBP);
 
-    // Состояние рукавов и концевых кранов магистрали тормозных цилиндров
-    if (hose_bc_fwd->isLinked())
-    {
-        hose_bc_fwd->connect();
-        anglecock_bc_fwd->open();
-        initClientInputSignal(CABS_NUM, CTRL_HOSE_BC_FWD, 2.0f);
-        initClientInputSignal(CABS_NUM, CTRL_ANGLECOCK_BC_FWD, 1.0f);
-    }
-    else
-    {
-        hose_bc_fwd->fix();
-        anglecock_bc_fwd->close();
-        initClientInputSignal(CABS_NUM, CTRL_HOSE_BC_FWD, 0.0f);
-        initClientInputSignal(CABS_NUM, CTRL_ANGLECOCK_BC_FWD, 0.0f);
-    }
-
-    if (hose_bc_bwd->isLinked())
-    {
-        hose_bc_bwd->connect();
-        anglecock_bc_bwd->open();
-        initClientInputSignal(CABS_NUM, CTRL_HOSE_BC_BWD, 2.0f);
-        initClientInputSignal(CABS_NUM, CTRL_ANGLECOCK_BC_BWD, 1.0f);
-    }
-    else
-    {
-        hose_bc_bwd->fix();
-        anglecock_bc_bwd->close();
-        initClientInputSignal(CABS_NUM, CTRL_HOSE_BC_BWD, 0.0f);
-        initClientInputSignal(CABS_NUM, CTRL_ANGLECOCK_BC_BWD, 0.0f);
-    }
-
     // Состояние рукавов и концевых кранов питательной магистрали
     if (hose_fl_fwd->isLinked())
     {

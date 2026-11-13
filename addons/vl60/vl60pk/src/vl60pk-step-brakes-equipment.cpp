@@ -35,15 +35,6 @@ void VL60pk::preStepHoses(const double& t)
                                     -profile_point_data.right,
                                     -profile_point_data.orth,
                                     profile_point_data.up);
-
-    hose_bc_fwd->setVehiclePosition(profile_point_data.position,
-                                    profile_point_data.right,
-                                    profile_point_data.orth,
-                                    profile_point_data.up);
-    hose_bc_bwd->setVehiclePosition(profile_point_data.position,
-                                    -profile_point_data.right,
-                                    -profile_point_data.orth,
-                                    profile_point_data.up);
 }
 
 //------------------------------------------------------------------------

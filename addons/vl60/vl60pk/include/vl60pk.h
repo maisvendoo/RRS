@@ -343,18 +343,6 @@ private:
     /// Тормозные механизмы тележек
     std::array<BrakeMech *, NUM_TROLLEYS> brake_mech;
 
-    /// Концевой кран магистрали тормозных цилиндров спереди
-    PneumoAngleCock  *anglecock_bc_fwd = nullptr;
-
-    /// Концевой кран магистрали тормозных цилиндров сзади
-    PneumoAngleCock  *anglecock_bc_bwd = nullptr;
-
-    /// Рукав магистрали тормозных цилиндров спереди
-    PneumoHose  *hose_bc_fwd = nullptr;
-
-    /// Рукав магистрали тормозных цилиндров сзади
-    PneumoHose  *hose_bc_bwd = nullptr;
-
     /// Источник питания ЭПТ
     EPBConverter    *epb_converter = nullptr;
 
