@@ -56,6 +56,7 @@ void PassCar::initBrakesEquipment(const QString& modules_dir, const QString& cus
         modules_dir + QDir::separator() + hose_bp_module);
     if (hose_bp_fwd == nullptr)
         hose_bp_fwd = new PneumoHoseEPB();
+    hose_bp_fwd->setCustomConfigDir(config_dir);
     hose_bp_fwd->read_config(hose_bp_config);
     forward_connectors.push_back(hose_bp_fwd);
 
@@ -63,6 +64,7 @@ void PassCar::initBrakesEquipment(const QString& modules_dir, const QString& cus
         modules_dir + QDir::separator() + hose_bp_module);
     if (hose_bp_bwd == nullptr)
         hose_bp_bwd = new PneumoHoseEPB();
+    hose_bp_bwd->setCustomConfigDir(config_dir);
     hose_bp_bwd->read_config(hose_bp_config);
     backward_connectors.push_back(hose_bp_bwd);
 }

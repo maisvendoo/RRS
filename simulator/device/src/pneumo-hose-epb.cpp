@@ -6,7 +6,6 @@
 //
 //------------------------------------------------------------------------------
 PneumoHoseEPB::PneumoHoseEPB(QObject *parent) : PneumoHose(parent)
-  , lines_num(1)
 {
     name = QString("BPepb");
 }
@@ -145,14 +144,6 @@ double PneumoHoseEPB::getCurrent(size_t idx)
         return input_signals[i];
     else
         return 0.0;
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void PneumoHoseEPB::step(double t, double dt)
-{
-    PneumoHose::step(t, dt);
 }
 
 //------------------------------------------------------------------------------

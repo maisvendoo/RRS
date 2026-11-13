@@ -14,6 +14,32 @@
 //------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------
+void VL60pk::preStepHoses(const double& t)
+{
+    (void) t;
+
+    hose_fl_fwd->setVehiclePosition(profile_point_data.position,
+                                    profile_point_data.right,
+                                    profile_point_data.orth,
+                                    profile_point_data.up);
+    hose_fl_bwd->setVehiclePosition(profile_point_data.position,
+                                    -profile_point_data.right,
+                                    -profile_point_data.orth,
+                                    profile_point_data.up);
+
+    hose_bp_fwd->setVehiclePosition(profile_point_data.position,
+                                    profile_point_data.right,
+                                    profile_point_data.orth,
+                                    profile_point_data.up);
+    hose_bp_bwd->setVehiclePosition(profile_point_data.position,
+                                    -profile_point_data.right,
+                                    -profile_point_data.orth,
+                                    profile_point_data.up);
+}
+
+//------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------
 void VL60pk::stepBrakesEquipment(const double& t, const double& dt)
 {
     // Тормозная магистраль
@@ -83,12 +109,8 @@ void VL60pk::stepBrakesEquipment(const double& t, const double& dt)
     // Рукава тормозной магистрали
     hose_bp_fwd->setPressure(anglecock_bp_fwd->getPressureToHose());
     hose_bp_fwd->setFlowCoeff(anglecock_bp_fwd->getFlowCoeff());
-    hose_bp_fwd->setCoord(train_coord + dir * (length / 2.0 - anglecock_bp_fwd->getShiftCoord()));
-    hose_bp_fwd->setShiftSide(anglecock_bp_fwd->getShiftSide());
     hose_bp_fwd->step(t, dt);
     hose_bp_bwd->setPressure(anglecock_bp_bwd->getPressureToHose());
     hose_bp_bwd->setFlowCoeff(anglecock_bp_bwd->getFlowCoeff());
-    hose_bp_bwd->setCoord(train_coord - dir * (length / 2.0 - anglecock_bp_bwd->getShiftCoord()));
-    hose_bp_bwd->setShiftSide(anglecock_bp_bwd->getShiftSide());
     hose_bp_bwd->step(t, dt);
 }

@@ -24,10 +24,10 @@ Hose369A::~Hose369A()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Hose369A::step(double t, double dt)
+void Hose369A::preStep(state_vector_t& Y, double t)
 {
     // Стандартная работа рукава
-    PneumoHoseEPB::step(t, dt);
+    PneumoHoseEPB::preStep(Y, t);
 
     // Если линии ЭПТ соединены - больше ничего не делаем
     if (input_signals[HOSE_INPUT_EPB_CONNECTED_NUM] > 0.0)
@@ -36,7 +36,7 @@ void Hose369A::step(double t, double dt)
     }
 
     // Если рукав подвешен на локомотиве - больше ничего не делаем
-    if (is_hose_at_loco && (input_signals[HOSE_INPUT_IS_CONNECTED] == 0.0))
+    if (is_hose_at_loco && isFixed())
     {
         return;
     }
@@ -59,7 +59,7 @@ void Hose369A::step(double t, double dt)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void Hose369A::load_config(CfgReader &cfg)
+void Hose369A::load_config(CfgReader& cfg)
 {
     QString secName = "Device";
 

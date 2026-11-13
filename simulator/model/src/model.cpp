@@ -1046,6 +1046,7 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     // Проверяем, есть ли вообще сценарий для исполнения
     if (!command_line.scenario.is_present)
     {
+        Journal::instance()->error("No scenario is present");
         return false;
     }
 
@@ -1053,6 +1054,9 @@ bool Model::initScenarioManager(const init_data_t &init_data,
     if (!scnmgr->run(init_data.route_dir_name.toStdString(),
                      command_line.scenario.value.toStdString()))
     {
+        Journal::instance()->error(QString("Fail to run scenario %1/scenarios/%2")
+                                       .arg(init_data.route_dir_name)
+                                       .arg(command_line.scenario.value));
         return false;
     }
 

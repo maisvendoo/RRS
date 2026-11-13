@@ -52,7 +52,7 @@ void ScenarioManager::init(const init_data_t &init_data)
     }
     catch (const sol::error &error)
     {
-        Journal::instance()->error(QString(error.what()));
+        Journal::instance()->error(QString("LUA init error: %1").arg(error.what()));
     }
 }
 
@@ -89,7 +89,7 @@ bool ScenarioManager::run(const std::string &route_dir,
     }
     catch (const sol::error &error)
     {
-        Journal::instance()->error(QString(error.what()));
+        Journal::instance()->error(QString("LUA script file error: %1").arg(error.what()));
         return false;
     }
 
@@ -162,7 +162,7 @@ void ScenarioManager::processTimeTriggers(const simulator_time_t &sim_time)
         }
         catch (const sol::error &error)
         {
-            Journal::instance()->error(QString("LUA: %1").arg(error.what()));
+            Journal::instance()->error(QString("LUA trigger error: %1").arg(error.what()));
         }
 
         ++it;
@@ -1059,14 +1059,14 @@ void ScenarioManager::process_pos_triggers(std::string train_name,
                     }
                     catch (const sol::error &error)
                     {
-                        Journal::instance()->error(QString("LUA: %1").arg(error.what()));
+                        Journal::instance()->error(QString("LUA trigger error: %1").arg(error.what()));
                     }
                 }
             }
         }
         catch (const sol::error &error)
         {
-            Journal::instance()->error(QString("LUA: %1").arg(error.what()));
+            Journal::instance()->error(QString("LUA trigger error: %1").arg(error.what()));
         }
 
         ++it; // инкрементируем только если не удаляли

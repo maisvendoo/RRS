@@ -463,9 +463,8 @@ bool Application::convert_route(std::string &in_dmd_route_path,
             std::string out_gltf_model_dir =
                 _out_gltf_route_path + model_path.parent_path().string();
 
-            // Относительный путь к файлу с информацией о модели в формате bin
+            // Папка для файлов с информацией о модели в формате bin
             fs::create_directories(_out_gltf_route_path + model_path.parent_path().string() + "/bin");
-            std::string out_relative_bin_path = "bin/"s + model_path.stem().string() + ".bin";
 
             // Создаём модели для всех вариантов текстур
             bool add_texture_name = (_labels_textures_smooth.size() > 1);
@@ -491,6 +490,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
                     out_gltf_model_name += '_' + texture_path.stem().string();
                 }
                 model_data.model_file_name = out_gltf_model_name;
+                std::string out_relative_bin_path = "bin/" + out_gltf_model_name + ".bin";
 
                 std::string out_texture_path = out_gltf_route_path + '/' + out_relative_texture;
                 const int slash_count = std::count(_relative_model_path.begin(), _relative_model_path.end(), '/');

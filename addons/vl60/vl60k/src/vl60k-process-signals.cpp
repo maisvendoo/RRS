@@ -13,7 +13,9 @@
 #include "oscillator.h"
 #include "pantograph.h"
 #include "phase-splitter.h"
+#include "pneumo-anglecock.h"
 #include "pneumo-brake-lock.h"
+#include "pneumo-hose.h"
 #include "pneumo-splitter.h"
 #include "protective-device.h"
 #include "reservoir.h"
@@ -262,4 +264,48 @@ void VL60k::signalsOutput(const simulator_time_t& t, const double& dt)
         analogSignal[CAB1_WHISTLE + d] = static_cast<float>(horn[cab_idx]->isSvistok());
         analogSignal[CAB1_SAND + d] = static_cast<float>(sand_system->isSandDelivery());
     }
+
+    // Углы переднего рукава питательной магистрали
+    analogSignal[HOSE_FL_FWD_ANGLE_SIDE] = hose_fl_fwd->getSideAngle() + 1.0;
+    analogSignal[HOSE_FL_FWD_ANGLE_DOWN] = hose_fl_fwd->getDownAngle() + 1.0;
+    analogSignal[HOSE_FL_FWD_ANGLE_HEAD_UP] = hose_fl_fwd->getHeadUpAngle() + 1.0;
+    // Рукоятка переднего концевого крана питательной магистрали
+    analogSignal[ANGLECOCK_FL_FWD_STATE] = anglecock_fl_fwd->getHandlePosition();
+
+    // Углы заднего рукава питательной магистрали
+    analogSignal[HOSE_FL_BWD_ANGLE_SIDE] = hose_fl_bwd->getSideAngle() + 1.0;
+    analogSignal[HOSE_FL_BWD_ANGLE_DOWN] = hose_fl_bwd->getDownAngle() + 1.0;
+    analogSignal[HOSE_FL_BWD_ANGLE_HEAD_UP] = hose_fl_bwd->getHeadUpAngle() + 1.0;
+    // Рукоятка заднего концевого крана питательной магистрали
+    analogSignal[ANGLECOCK_FL_BWD_STATE] = anglecock_fl_bwd->getHandlePosition();
+
+
+    // Углы переднего рукава тормозной магистрали
+    analogSignal[HOSE_BP_FWD_ANGLE_SIDE] = hose_bp_fwd->getSideAngle() + 1.0;
+    analogSignal[HOSE_BP_FWD_ANGLE_DOWN] = hose_bp_fwd->getDownAngle() + 1.0;
+    analogSignal[HOSE_BP_FWD_ANGLE_HEAD_UP] = hose_bp_fwd->getHeadUpAngle() + 1.0;
+    // Рукоятка переднего концевого крана тормозной магистрали
+    analogSignal[ANGLECOCK_BP_FWD_STATE] = anglecock_bp_fwd->getHandlePosition();
+
+    // Углы заднего рукава тормозной магистрали
+    analogSignal[HOSE_BP_BWD_ANGLE_SIDE] = hose_bp_bwd->getSideAngle() + 1.0;
+    analogSignal[HOSE_BP_BWD_ANGLE_DOWN] = hose_bp_bwd->getDownAngle() + 1.0;
+    analogSignal[HOSE_BP_BWD_ANGLE_HEAD_UP] = hose_bp_bwd->getHeadUpAngle() + 1.0;
+    // Рукоятка заднего концевого крана тормозной магистрали
+    analogSignal[ANGLECOCK_BP_BWD_STATE] = anglecock_bp_bwd->getHandlePosition();
+
+
+    // Углы переднего рукава магистрали тормозных цилиндров
+    analogSignal[HOSE_BC_FWD_ANGLE_SIDE] = hose_bc_fwd->getSideAngle() + 1.0;
+    analogSignal[HOSE_BC_FWD_ANGLE_DOWN] = hose_bc_fwd->getDownAngle() + 1.0;
+    analogSignal[HOSE_BC_FWD_ANGLE_HEAD_UP] = hose_bc_fwd->getHeadUpAngle() + 1.0;
+    // Рукоятка переднего концевого крана магистрали тормозных цилиндров
+    analogSignal[ANGLECOCK_BC_FWD_STATE] = anglecock_bc_fwd->getHandlePosition();
+
+    // Углы заднего рукава магистрали тормозных цилиндров
+    analogSignal[HOSE_BC_BWD_ANGLE_SIDE] = hose_bc_bwd->getSideAngle() + 1.0;
+    analogSignal[HOSE_BC_BWD_ANGLE_DOWN] = hose_bc_bwd->getDownAngle() + 1.0;
+    analogSignal[HOSE_BC_BWD_ANGLE_HEAD_UP] = hose_bc_bwd->getHeadUpAngle() + 1.0;
+    // Рукоятка заднего концевого крана магистрали тормозных цилиндров
+    analogSignal[ANGLECOCK_BC_BWD_STATE] = anglecock_bc_bwd->getHandlePosition();
 }

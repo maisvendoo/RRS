@@ -371,6 +371,7 @@ bool Topology::addTrain(const topology_pos_t &tp, std::vector<Vehicle *> *vehicl
             vc->setVehicleRailwayConnectors(curr_vehicle->getRailwayConnectors());
             vc->setInitCurrentTraj(cur_traj, traj_coord, veh_dir);
             vc->setInitPathCoord(curr_vehicle->getDirection() * curr_vehicle->getTrainCoord());
+            *(curr_vehicle->getProfilePoint()) = vc->getPosition();
 
             vehicle_control.push_back(vc);
 
