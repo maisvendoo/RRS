@@ -97,6 +97,7 @@
 		<KeyName>KEY_F2</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectName>BP_fwd_Anglecock_handle</ObjectName>
 	</Control>
 
 	<!-- Концевой кран тормозной магистрали задний -->
@@ -109,6 +110,7 @@
 		<KeyName>KEY_F3</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
+		<ObjectName>BP_bwd_Anglecock_handle</ObjectName>
 	</Control>
 
 	<!-- Рукав тормозной магистрали передний -->
@@ -127,6 +129,7 @@
 		<KeyModIncName>Shift</KeyModIncName>
 		<KeyNameDec>KEY_F1</KeyNameDec>
 		<KeyModDecName>Ctrl</KeyModDecName>
+		<ObjectName>BP_fwd_Head_R1</ObjectName>
 	</Control>
 
 	<!-- Рукав тормозной магистрали задний -->
@@ -145,6 +148,7 @@
 		<KeyModIncName>Shift</KeyModIncName>
 		<KeyNameDec>KEY_F4</KeyNameDec>
 		<KeyModDecName>Ctrl</KeyModDecName>
+		<ObjectName>BP_bwd_Head_R1</ObjectName>
 	</Control>
 
 	<!-- Тормозные башмаки -->
