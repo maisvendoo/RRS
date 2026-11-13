@@ -41,7 +41,7 @@ void VL60pk::initPneumoSupply(const QString& modules_dir, const QString& custom_
     forward_connectors.push_back(hose_fl_fwd);
 
     hose_fl_bwd = new PneumoHose();
-    hose_fl_fwd->setCustomConfigDir(config_dir);
+    hose_fl_bwd->setCustomConfigDir(config_dir);
     hose_fl_bwd->read_config("pneumo-hose-FL");
     backward_connectors.push_back(hose_fl_bwd);
 }

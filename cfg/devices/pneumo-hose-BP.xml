@@ -2,7 +2,7 @@
 <Config>
 	<Device>
 		<Name>BP</Name>
-		<Order>5</Order>
+		<Order>6</Order>
 		<LinesNum>0</LinesNum>
 
 
@@ -61,6 +61,10 @@
 
 		<!-- Изгиб рукава вверх перед соединительной головкой в состоянии готовности к соединению, градусы -->
 		<ReadyToConnectHeadUpAngle>36.0</ReadyToConnectHeadUpAngle>
+
+
+		<!-- Необходимость изгибать рукав вбок для фиксации на подвесе: 0 - нет, 1 - да -->
+		<SideSlope>0</SideSlope>
 
 
 		<!-- Коэффициент к скорости поворотов рукава -->

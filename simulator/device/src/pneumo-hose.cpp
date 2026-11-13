@@ -561,7 +561,7 @@ void PneumoHose::ode_system(const state_vector_t &Y,
                 dYdt[HEAD_UP_ANGLE] = (ref_head_up_angle - Y[HEAD_UP_ANGLE]) * angle_omega;
                 dYdt[DOWN_ANGLE_VELOCITY] = 0.0;
                 dYdt[HEAD_UP_ANGLE_ANGLE_VELOCITY] = 0.0;
-                dYdt[SIDE_SLOPE] = 0.0;
+                dYdt[SIDE_SLOPE] = -Y[SIDE_SLOPE] * angle_omega;
                 return;
             }
         }
@@ -665,6 +665,10 @@ void PneumoHose::load_config(CfgReader &cfg)
     // Изгиб рукава вверх перед соединительной головкой в состоянии готовности к соединению
     if (cfg.getDouble(secName, "ReadyToConnectHeadUpAngle", tmp))
         ready_to_connect_head_up_angle = tmp / 180.0 * Physics::PI;
+
+
+    // Необходимость изгибать рукав вбок для фиксации на подвесе
+    cfg.getBool(secName, "SideSlope", is_side_slope_needed_to_fix);
 
 
     // Коэффициент к скорости поворотов рукава
