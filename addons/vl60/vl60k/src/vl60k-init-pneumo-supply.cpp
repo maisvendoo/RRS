@@ -35,15 +35,13 @@ void VL60k::initPneumoSupply(const QString& modules_dir, const QString& custom_c
     anglecock_fl_bwd->read_config("pneumo-anglecock-FL");
 
     // Рукава питательной магистрали
-    dvec3 hose_fl_root_coord = {0.3, length / 2.0 - 0.3, 0.8};
-
     hose_fl_fwd = new PneumoHose();
+    hose_fl_fwd->setCustomConfigDir(config_dir);
     hose_fl_fwd->read_config("pneumo-hose-FL");
-    hose_fl_fwd->setRootPosition(hose_fl_root_coord);
     forward_connectors.push_back(hose_fl_fwd);
 
     hose_fl_bwd = new PneumoHose();
+    hose_fl_bwd->setCustomConfigDir(config_dir);
     hose_fl_bwd->read_config("pneumo-hose-FL");
-    hose_fl_bwd->setRootPosition(hose_fl_root_coord);
     backward_connectors.push_back(hose_fl_bwd);
 }

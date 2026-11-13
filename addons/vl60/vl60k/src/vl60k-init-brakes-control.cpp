@@ -50,15 +50,13 @@ void VL60k::initBrakesControl(const QString& modules_dir, const QString& custom_
     anglecock_bc_bwd->read_config("pneumo-anglecock-BC");
 
     // Рукава магистрали тормозных цилиндров
-    dvec3 hose_bc_root_coord = {0.0, length / 2.0 - 0.3, 0.8};
-
     hose_bc_fwd = new PneumoHose();
+    hose_bc_fwd->setCustomConfigDir(config_dir);
     hose_bc_fwd->read_config("pneumo-hose-BC");
-    hose_bc_fwd->setRootPosition(hose_bc_root_coord);
     forward_connectors.push_back(hose_bc_fwd);
 
     hose_bc_bwd = new PneumoHose();
+    hose_bc_bwd->setCustomConfigDir(config_dir);
     hose_bc_bwd->read_config("pneumo-hose-BC");
-    hose_bc_bwd->setRootPosition(hose_bc_root_coord);
     backward_connectors.push_back(hose_bc_bwd);
 }
