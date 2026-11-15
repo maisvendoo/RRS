@@ -544,7 +544,7 @@ void main()
             int shadowMapCount = int(lightData.values[lightDataIndex].r);
             if (shadowMapCount > 0)
             {
-                if (lightDirection_cosOuterAngle.w > dot_lightdirection)
+                if (lightDirection_cosOuterAngle.w < dot_lightdirection)
                     intensity *= (1.0-calculateShadowCoverageForSpotLight(lightDataIndex, shadowMapIndex, T, B, dist, color));
 
                 lightDataIndex += 1 + 8 * shadowMapCount;
