@@ -66,6 +66,7 @@ void VL60k::initBrakeDevices(double p0, double pBP, double pFL)
     }
     else
     {
+        hose_bc_fwd->fix();
         anglecock_bc_fwd->close();
         initClientInputSignal(CABS_NUM, CTRL_HOSE_BC_FWD, 0.0f);
         initClientInputSignal(CABS_NUM, CTRL_ANGLECOCK_BC_FWD, 0.0f);
@@ -80,6 +81,7 @@ void VL60k::initBrakeDevices(double p0, double pBP, double pFL)
     }
     else
     {
+        hose_bc_bwd->fix();
         anglecock_bc_bwd->close();
         initClientInputSignal(CABS_NUM, CTRL_HOSE_BC_BWD, 0.0f);
         initClientInputSignal(CABS_NUM, CTRL_ANGLECOCK_BC_BWD, 0.0f);
@@ -95,6 +97,7 @@ void VL60k::initBrakeDevices(double p0, double pBP, double pFL)
     }
     else
     {
+        hose_fl_fwd->fix();
         anglecock_fl_fwd->close();
         initClientInputSignal(CABS_NUM, CTRL_HOSE_FL_FWD, 0.0f);
         initClientInputSignal(CABS_NUM, CTRL_ANGLECOCK_FL_FWD, 0.0f);
@@ -109,6 +112,7 @@ void VL60k::initBrakeDevices(double p0, double pBP, double pFL)
     }
     else
     {
+        hose_fl_bwd->fix();
         anglecock_fl_bwd->close();
         initClientInputSignal(CABS_NUM, CTRL_HOSE_FL_BWD, 0.0f);
         initClientInputSignal(CABS_NUM, CTRL_ANGLECOCK_FL_BWD, 0.0f);
@@ -124,6 +128,7 @@ void VL60k::initBrakeDevices(double p0, double pBP, double pFL)
     }
     else
     {
+        hose_bp_fwd->fix();
         anglecock_bp_fwd->close();
         initClientInputSignal(CABS_NUM, CTRL_HOSE_BP_FWD, 0.0f);
         initClientInputSignal(CABS_NUM, CTRL_ANGLECOCK_BP_FWD, 0.0f);
@@ -138,6 +143,7 @@ void VL60k::initBrakeDevices(double p0, double pBP, double pFL)
     }
     else
     {
+        hose_bp_bwd->fix();
         anglecock_bp_bwd->close();
         initClientInputSignal(CABS_NUM, CTRL_HOSE_BP_BWD, 0.0f);
         initClientInputSignal(CABS_NUM, CTRL_ANGLECOCK_BP_BWD, 0.0f);

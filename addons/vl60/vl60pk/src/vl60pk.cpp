@@ -104,6 +104,8 @@ void VL60pk::process(const simulator_time_t& t, const double& dt)
 void VL60pk::preStep(const double& t)
 {
     preStepCouplings(t);
+
+    preStepHoses(t);
 }
 
 //------------------------------------------------------------------------------

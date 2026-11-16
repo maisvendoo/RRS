@@ -49,10 +49,12 @@ void VL60k::initBrakesEquipment(const QString& modules_dir, const QString& custo
 
     // Рукава тормозной магистрали
     hose_bp_fwd = new PneumoHose();
+    hose_bp_fwd->setCustomConfigDir(config_dir);
     hose_bp_fwd->read_config("pneumo-hose-BP");
     forward_connectors.push_back(hose_bp_fwd);
 
     hose_bp_bwd = new PneumoHose();
+    hose_bp_bwd->setCustomConfigDir(config_dir);
     hose_bp_bwd->read_config("pneumo-hose-BP");
     backward_connectors.push_back(hose_bp_bwd);
 }

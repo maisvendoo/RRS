@@ -2,7 +2,6 @@
 #include    "freightcar-signals.h"
 #include    "filesystem.h"
 
-#include    <brake-shoes.h>
 #include    <core/get_module.h>
 
 #include "CfgReader.h"
@@ -106,12 +105,14 @@ void FreightCar::process(const simulator_time_t& t, const double& dt)
 void FreightCar::preStep(const double& t)
 {
     preStepCouplings(t);
+
+    preStepHoses(t);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void FreightCar::step(const double &t, const double &dt)
+void FreightCar::step(const double& t, const double& dt)
 {
     stepCouplings(t, dt);
 

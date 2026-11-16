@@ -394,6 +394,15 @@ bool VehiclesHandler::selectControlVehicle() noexcept
             (vehicle->controlled_cabine_idx != prev_contr_cabine))
         {
             notifyVehicleChanged();
+
+            // Если controlled_vehicle изменился, но cur_vehicle не менялся —
+            // сигнал sigCurrentVehicleChanged не был отправлен (newIndex == oldIndex).
+            // Принудительно отправляем, чтобы RouteViewer активировал IOController.
+            if (cur_vehicle == m_prevVehicleIndex)
+            {
+                emit sigCurrentVehicleChanged(cur_vehicle, prev_contr_vehicle);
+            }
+
             return true;
         }
     }

@@ -258,16 +258,12 @@ void VL60pk::stepControls(const double &t, const double &dt)
     shared_inputs[CTRL_ANGLECOCK_BP_BWD].toBool() ? anglecock_bp_bwd->open() : anglecock_bp_bwd->close();
     shared_inputs[CTRL_ANGLECOCK_FL_FWD].toBool() ? anglecock_fl_fwd->open() : anglecock_fl_fwd->close();
     shared_inputs[CTRL_ANGLECOCK_FL_BWD].toBool() ? anglecock_fl_bwd->open() : anglecock_fl_bwd->close();
-    shared_inputs[CTRL_ANGLECOCK_BC_FWD].toBool() ? anglecock_bc_fwd->open() : anglecock_bc_fwd->close();
-    shared_inputs[CTRL_ANGLECOCK_BC_BWD].toBool() ? anglecock_bc_bwd->open() : anglecock_bc_bwd->close();    
 
     // Рукава магистралей (общие, не привязаны к кабинам)
     hose_bp_fwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_BP_FWD].value)));
     hose_bp_bwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_BP_BWD].value)));
     hose_fl_fwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_FL_FWD].value)));
     hose_fl_bwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_FL_BWD].value)));
-    hose_bc_fwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_BC_FWD].value)));
-    hose_bc_bwd->setExternalState(static_cast<int>(std::round(shared_inputs[CTRL_HOSE_BC_BWD].value)));
 
     // Расцепные рычаги сцепных устройств (общие, не привязаны к кабинам)
     // Передняя сцепка

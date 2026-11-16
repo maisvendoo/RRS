@@ -668,7 +668,9 @@
 		<KeyName>KEY_F2</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
-
+		<ObjectName>BP_fwd_Anglecock_handle</ObjectName>
+		<PositionsNames>Закрыто,Отрыто</PositionsNames>
+		<ActionNames>Закрыть,Открыть</ActionNames>
 	</Control>
 
 	<!-- Концевой кран тормозной магистрали назад -->
@@ -681,7 +683,9 @@
 		<KeyName>KEY_F3</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
-
+		<ObjectName>BP_bwd_Anglecock_handle</ObjectName>
+		<PositionsNames>Закрыто,Отрыто</PositionsNames>
+		<ActionNames>Закрыть,Открыть</ActionNames>
 	</Control>
 
 	<!-- Концевой кран питательной магистрали вперёд -->
@@ -694,7 +698,9 @@
 		<KeyName>KEY_F6</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
-
+		<ObjectName>FL_fwd_Anglecock_handle</ObjectName>
+		<PositionsNames>Закрыто,Отрыто</PositionsNames>
+		<ActionNames>Закрыть,Открыть</ActionNames>
 	</Control>
 
 	<!-- Концевой кран питательной магистрали назад -->
@@ -707,7 +713,9 @@
 		<KeyName>KEY_F7</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
-
+		<ObjectName>FL_bwd_Anglecock_handle</ObjectName>
+		<PositionsNames>Закрыто,Отрыто</PositionsNames>
+		<ActionNames>Закрыть,Открыть</ActionNames>
 	</Control>
 
 	<!-- Концевой кран тормозных цилиндров вперёд -->
@@ -720,7 +728,6 @@
 		<KeyName>KEY_F10</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
-
 	</Control>
 
 	<!-- Концевой кран тормозных цилиндров назад -->
@@ -733,7 +740,6 @@
 		<KeyName>KEY_F11</KeyName>
 		<KeyModOnName>Shift</KeyModOnName>
 		<KeyModOffName>Ctrl</KeyModOffName>
-
 	</Control>
 
 	<!-- Автозапуск -->
@@ -776,6 +782,9 @@
 		<KeyModIncName>Shift</KeyModIncName>
 		<KeyNameDec>KEY_F1</KeyNameDec>
 		<KeyModDecName>Ctrl</KeyModDecName>
+		<ObjectName>BP_fwd_Head_369A</ObjectName>
+		<DecAction>Разъединить/Подвесить</DecAction>
+		<IncAction>Соединить/Снять</IncAction>
 	</Control>
 
 	<!-- Рукав тормозной магистрали назад -->
@@ -794,6 +803,9 @@
 		<KeyModIncName>Shift</KeyModIncName>
 		<KeyNameDec>KEY_F4</KeyNameDec>
 		<KeyModDecName>Ctrl</KeyModDecName>
+		<ObjectName>BP_bwd_Head_369A</ObjectName>
+		<DecAction>Разъединить/Подвесить</DecAction>
+		<IncAction>Соединить/Снять</IncAction>
 	</Control>
 
 	<!-- Рукав питательной магистрали вперёд -->
@@ -812,6 +824,9 @@
 		<KeyModIncName>Shift</KeyModIncName>
 		<KeyNameDec>KEY_F5</KeyNameDec>
 		<KeyModDecName>Ctrl</KeyModDecName>
+		<ObjectName>FL_fwd_Head_R1</ObjectName>
+		<DecAction>Разъединить/Подвесить</DecAction>
+		<IncAction>Соединить/Снять</IncAction>
 	</Control>
 
 	<!-- Рукав питательной магистрали назад -->
@@ -830,6 +845,9 @@
 		<KeyModIncName>Shift</KeyModIncName>
 		<KeyNameDec>KEY_F8</KeyNameDec>
 		<KeyModDecName>Ctrl</KeyModDecName>
+		<ObjectName>FL_bwd_Head_R1</ObjectName>
+		<DecAction>Разъединить/Подвесить</DecAction>
+		<IncAction>Соединить/Снять</IncAction>
 	</Control>
 
 	<!-- Рукав магистрали тормозных цилиндров вперёд -->
@@ -848,6 +866,8 @@
 		<KeyModIncName>Shift</KeyModIncName>
 		<KeyNameDec>KEY_F9</KeyNameDec>
 		<KeyModDecName>Ctrl</KeyModDecName>
+		<DecAction>Разъединить/Подвесить</DecAction>
+		<IncAction>Соединить/Снять</IncAction>
 	</Control>
 
 	<!-- Рукав магистрали тормозных цилиндров назад -->
@@ -866,6 +886,8 @@
 		<KeyModIncName>Shift</KeyModIncName>
 		<KeyNameDec>KEY_F12</KeyNameDec>
 		<KeyModDecName>Ctrl</KeyModDecName>
+		<DecAction>Разъединить/Подвесить</DecAction>
+		<IncAction>Соединить/Снять</IncAction>
 	</Control>
 
 	<!-- Радиостанция -->

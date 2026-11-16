@@ -1,3 +1,4 @@
+#include "freightcar-signals.h"
 #include    "freightcar.h"
 
 #include "brake-auto-mode.h"

@@ -105,6 +105,8 @@ void PassCar::process(const simulator_time_t& t, const double& dt)
 void PassCar::preStep(const double& t)
 {
     preStepCouplings(t);
+
+    preStepHoses(t);
 }
 
 //------------------------------------------------------------------------------

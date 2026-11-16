@@ -18,8 +18,8 @@ struct profile_point_t
         , inclination(0.0)
         , curvature(0.0)
         , position(dvec3(0.0, 0.0, 0.0))
-        , orth(dvec3(0.0, 0.0, 0.0))
-        , right(dvec3(0.0, 0.0, 0.0))
+        , orth(dvec3(0.0, 1.0, 0.0))
+        , right(dvec3(1.0, 0.0, 0.0))
         , up(dvec3(0.0, 0.0, 1.0))
     {
 

@@ -53,6 +53,10 @@ protected:
     QString incButtonName = "LEFT_BUTTON";
     /// Клавиша мыши уменьшения позиции
     QString decButtonName = "RIGHT_BUTTON";
+
+    /// Действие при увеличении позиции
+    QString incAction = "увеличение";
+    QString decAction = "уменьшение";
 };
 
 #endif

@@ -43,12 +43,10 @@ public:
     /// Потребляемый ток из линии idx
     double getCurrent(size_t idx);
 
-    virtual void step(double t, double dt);
-
 protected:
 
     /// Число линий управления ЭПТ
-    size_t lines_num;
+    size_t lines_num = 1;
 
     /// Загрузка параметров из конфигурационного файла
     virtual void load_config(CfgReader &cfg);

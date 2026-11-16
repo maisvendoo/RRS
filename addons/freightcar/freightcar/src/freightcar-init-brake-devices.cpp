@@ -62,6 +62,7 @@ void FreightCar::initBrakeDevices(double p0, double pBP, double pFL)
     }
     else
     {
+        hose_bp_fwd->fix();
         anglecock_bp_fwd->close();
         initClientInputSignal(shared_idx, CTRL_HOSE_BP_FWD, 0.0f);
         initClientInputSignal(shared_idx, CTRL_ANGLECOCK_BP_FWD, 0.0f);
@@ -76,6 +77,7 @@ void FreightCar::initBrakeDevices(double p0, double pBP, double pFL)
     }
     else
     {
+        hose_bp_bwd->fix();
         anglecock_bp_bwd->close();
         initClientInputSignal(shared_idx, CTRL_HOSE_BP_BWD, 0.0f);
         initClientInputSignal(shared_idx, CTRL_ANGLECOCK_BP_BWD, 0.0f);

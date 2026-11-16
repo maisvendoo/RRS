@@ -79,6 +79,9 @@ bool RangeHandler::load_config(CfgReader &cfg, QDomNode secNode)
     cfg.getString(secNode, "IncButtonName", incButtonName);
     cfg.getString(secNode, "DecButtonName", decButtonName);
 
+    cfg.getString(secNode, "IncAction", incAction);
+    cfg.getString(secNode, "DecAction", decAction);
+
     cfg.getString(secNode, "PositionModkey", positionModkey);
     QString tmp = "";
     cfg.getString(secNode, "PositionKeys", tmp);
@@ -121,5 +124,9 @@ QString RangeHandler::getUsage() const
     QString inc = getButtonTooltip(getButtonCode(incButtonName));
     QString dec = getButtonTooltip(getButtonCode(decButtonName));
 
-    return QString("Позиция: %1 — увеличение | %2 — уменьшение").arg(inc).arg(dec);
+    return QString("Позиция: %1 — %3 | %2 — %4")
+        .arg(inc)
+        .arg(dec)
+        .arg(incAction)
+        .arg(decAction);
 }

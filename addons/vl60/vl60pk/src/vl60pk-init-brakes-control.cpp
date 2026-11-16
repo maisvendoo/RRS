@@ -5,8 +5,6 @@
 #include "brake-crane.h"
 #include "loco-crane.h"
 #include "pneumo-brake-lock.h"
-#include "pneumo-anglecock.h"
-#include "pneumo-hose.h"
 #include "pneumo-relay.h"
 #include "pneumo-switching-valve.h"
 #include "core/load_module.h"
@@ -40,20 +38,4 @@ void VL60pk::initBrakesControl(const QString& modules_dir, const QString& custom
     // Повторительное реле давления
     bc_pressure_relay = new PneumoRelay();
     bc_pressure_relay->read_config("rd304");
-
-    // Концевые краны магистрали тормозных цилиндров
-    anglecock_bc_fwd = new PneumoAngleCock();
-    anglecock_bc_fwd->read_config("pneumo-anglecock-BC");
-
-    anglecock_bc_bwd = new PneumoAngleCock();
-    anglecock_bc_bwd->read_config("pneumo-anglecock-BC");
-
-    // Рукава магистрали тормозных цилиндров
-    hose_bc_fwd = new PneumoHose();
-    hose_bc_fwd->read_config("pneumo-hose-BC");
-    forward_connectors.push_back(hose_bc_fwd);
-
-    hose_bc_bwd = new PneumoHose();
-    hose_bc_bwd->read_config("pneumo-hose-BC");
-    backward_connectors.push_back(hose_bc_bwd);
 }

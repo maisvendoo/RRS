@@ -167,64 +167,60 @@ void MouseControlHandler::apply(vsg::KeyReleaseEvent &keyRelease)
 //------------------------------------------------------------------------------
 bool MouseControlHandler::pickControl(int x, int y, ControlHandler *&handler)
 {
-    VehicleExterior *vehicle = _vehicles_handler->getCurrentVehicle();
-
-    if (vehicle == nullptr || vehicle->io_controller == nullptr || (_camera == nullptr))
-    {
-        return false;
-    }
-
     static const int offsets[5][2] = {
         {0, 0}, {9, 0}, {-9, 0}, {0, -9}, {0, 9}
     };
 
     vsg::ref_ptr<vsg::LineSegmentIntersector> intersector;
 
-    for (auto &off : offsets)
+    for (auto vehicle : _vehicles_handler->getVehicles())
     {
-        intersector = vsg::LineSegmentIntersector::create(*_camera, x + off[0], y + off[1]);
-        vehicle->transform->accept(*intersector);
-
-        for (const auto &hit : intersector->intersections)
+        for (auto &off : offsets)
         {
-            for (auto node_it = hit->nodePath.rbegin(); node_it != hit->nodePath.rend(); ++node_it)
+            intersector = vsg::LineSegmentIntersector::create(*_camera, x + off[0], y + off[1]);
+            vehicle.transform->accept(*intersector);
+
+            for (const auto &hit : intersector->intersections)
             {
-                std::string node_name = "";
-                (*node_it)->getValue("name", node_name);
-
-                if (node_name.empty())
+                for (auto node_it = hit->nodePath.rbegin(); node_it != hit->nodePath.rend(); ++node_it)
                 {
-                    (*node_it)->getValue("Name", node_name);
+                    std::string node_name = "";
+                    (*node_it)->getValue("name", node_name);
+
+                    if (node_name.empty())
+                    {
+                        (*node_it)->getValue("Name", node_name);
+                    }
+
+                    if (node_name.empty())
+                    {
+                        continue;
+                    }
+
+                    if (vehicle.io_controller == nullptr)
+                    {
+                        continue;
+                    }
+
+                    if (!vehicle.io_controller->findControlHandler(node_name, handler))
+                    {
+                        continue;
+                    }
+
+                    if (handler->id == 0)
+                    {
+                        continue;
+                    }
+
+                    if (_last_hit_object != node_name)
+                    {
+                        _last_hit_object = node_name;
+                        //LOG_INFO("Clicked: %s state: %3.1f", node_name.c_str(), input.value);
+                    }
+
+                    return true;
+
                 }
-
-                if (node_name.empty())
-                {
-                    continue;
-                }
-
-                if (vehicle->io_controller == nullptr)
-                {
-                    continue;
-                }
-
-                if (!vehicle->io_controller->findControlHandler(node_name, handler))
-                {
-                    continue;
-                }
-
-                if (handler->id == 0)
-                {
-                    continue;
-                }                
-
-                if (_last_hit_object != node_name)
-                {
-                    _last_hit_object = node_name;
-                    //LOG_INFO("Clicked: %s state: %3.1f", node_name.c_str(), input.value);
-                }
-
-                return true;
-
             }
         }
     }
