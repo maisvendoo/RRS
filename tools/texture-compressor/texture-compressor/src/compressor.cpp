@@ -150,33 +150,16 @@ bool compress_to_ktx2(const fs::path& src_img,
     ktxBasisParams params = {};
     params.structSize = sizeof(ktxBasisParams);
 
-    // Карты данных (ORM, metallic/roughness, occlusion, normal) должны сжиматься
-    // так, чтобы KTX2 гарантированно оставался 4-канальным (RGBA): только тогда
-    // vsgXchange транскодирует его в BC7_RGBA. Для 3-канальных ETC1S он выбирает
-    // BC1_RGB (цветовой кодек), который искажает карты данных (розовый оттенок).
-    // UASTC LDR 4x4 всегда кодирует RGBA, поэтому используем его для этих карт.
-    const bool is_data_map =
-        cfg.isNormalMap ||
-        cfg.isORM ||
-        cfg.role == PBRTextureRole::METALLIC_ROUGHNESS ||
-        cfg.role == PBRTextureRole::OCCLUSION;
+    // --encode basis-lz (ETC1S) для всех карт
+    params.codec = KTX_BASIS_CODEC_ETC1S;
 
-    params.codec = is_data_map ? KTX_BASIS_CODEC_UASTC_LDR_4x4
-                               : KTX_BASIS_CODEC_ETC1S;
-
-    // Параметры ETC1S (только для цветовых карт)
-    params.etc1sCompressionLevel = 2; // KTX_ETC1S_DEFAULT_COMPRESSION_LEVEL = 2
+    // Параметры ETC1S
+    // Уровень 1 (не 2): уровень 2 на больших однотонных текстурах (стены салона)
+    // смещает хроматику к красному (розовый оттенок). Проверено на libktx.
+    params.etc1sCompressionLevel = 1;
 
     // --qlevel (по умолчанию 128)
     params.qualityLevel = cfg.qualityLevel;
-
-    // Параметры UASTC (для карт данных)
-    if (is_data_map)
-    {
-        // Уровень качества UASTC: DEFAULT (2) - хороший баланс скорость/качество
-        params.uastcFlags = KTX_PACK_UASTC_LEVEL_DEFAULT;
-        params.uastcRDO = KTX_FALSE;
-    }
 
     // Потоки - ЯВНО указываем количество наших ядер
     unsigned int numThreads = std::thread::hardware_concurrency();
