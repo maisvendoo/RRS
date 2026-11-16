@@ -13,6 +13,7 @@
 #include    <split-by-comma.h>
 
 #include    <filesystem>
+#include    <set>
 #include    <vulkan/vulkan.h>
 #include    <nlohmann/json.hpp>
 
@@ -210,28 +211,24 @@ std::map<int, TextureSettings> parse_gltf_textures(const json &gltf)
     std::map<int, TextureSettings> image_settings;
 
     if (!gltf.contains("textures") || !gltf["textures"].is_array() ||
-        !gltf.contains("materials") || !gltf["materials"].is_array())
+        !gltf.contains("materials") || !gltf["materials"].is_array() ||
+        !gltf.contains("images") || !gltf["images"].is_array())
     {
         return image_settings;
     }
 
-    auto set_role = [&](int tex_idx, PBRTextureRole role, uint32_t quality, bool is_srgb, bool is_normal) {
-        if (tex_idx < 0 || tex_idx >= gltf["textures"].size()) return;
-        int img_idx = gltf["textures"][tex_idx].value("source", -1);
-        if (img_idx < 0 || img_idx >= gltf["images"].size()) return;
+    // Собираем множество image-индексов по каждой роли из структуры материалов.
+    // Это позволяет однозначно определить совмещённую ORM-карту: один и тот же
+    // image подключён и как metallicRoughnessTexture, и как occlusionTexture.
+    std::set<int> used_mr;
+    std::set<int> used_occ;
+    std::set<int> used_base;
+    std::set<int> used_emis;
+    std::set<int> used_norm;
 
-        auto& settings = image_settings[img_idx];
-
-        // Приоритет: Normal > BaseColor > остальные. Не перезаписываем, если роль уже определена.
-        if (settings.role == PBRTextureRole::UNKNOWN || role == PBRTextureRole::NORMAL)
-        {
-            settings.role = role;
-            settings.qualityLevel = quality;
-            settings.isNormalMap = is_normal;
-            settings.isSRGB = is_srgb;
-            settings.vkFormat = is_srgb ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
-            if (role == PBRTextureRole::OCCLUSION) settings.vkFormat = VK_FORMAT_R8_UNORM;
-        }
+    auto src_of = [&](int tex_idx) -> int {
+        if (tex_idx < 0 || tex_idx >= gltf["textures"].size()) return -1;
+        return gltf["textures"][tex_idx].value("source", -1);
     };
 
     for (const auto& mat : gltf["materials"])
@@ -240,20 +237,90 @@ std::map<int, TextureSettings> parse_gltf_textures(const json &gltf)
         {
             auto& pbr = mat["pbrMetallicRoughness"];
             if (pbr.contains("baseColorTexture"))
-                set_role(pbr["baseColorTexture"]["index"], PBRTextureRole::BASE_COLOR, 160, true, false);
-
+                used_base.insert(src_of(pbr["baseColorTexture"]["index"]));
             if (pbr.contains("metallicRoughnessTexture"))
-                set_role(pbr["metallicRoughnessTexture"]["index"], PBRTextureRole::METALLIC_ROUGHNESS, 128, false, false);
+                used_mr.insert(src_of(pbr["metallicRoughnessTexture"]["index"]));
         }
 
         if (mat.contains("normalTexture"))
-            set_role(mat["normalTexture"]["index"], PBRTextureRole::NORMAL, 192, false, true);
+            used_norm.insert(src_of(mat["normalTexture"]["index"]));
 
         if (mat.contains("emissiveTexture"))
-            set_role(mat["emissiveTexture"]["index"], PBRTextureRole::EMISSIVE, 128, true, false);
+            used_emis.insert(src_of(mat["emissiveTexture"]["index"]));
 
         if (mat.contains("occlusionTexture"))
-            set_role(mat["occlusionTexture"]["index"], PBRTextureRole::OCCLUSION, 96, false, false);
+            used_occ.insert(src_of(mat["occlusionTexture"]["index"]));
+    }
+
+    const int images_count = gltf["images"].size();
+
+    for (int img = 0; img < images_count; ++img)
+    {
+        const bool is_mr   = used_mr.count(img)   > 0;
+        const bool is_occ  = used_occ.count(img)  > 0;
+        const bool is_base = used_base.count(img) > 0;
+        const bool is_emis = used_emis.count(img) > 0;
+        const bool is_norm = used_norm.count(img) > 0;
+
+        auto& s = image_settings[img];
+
+        // Нормаль — самостоятельная роль, перекрывает остальные.
+        if (is_norm)
+        {
+            s.role = PBRTextureRole::NORMAL;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_UNORM;
+            s.qualityLevel = 192;
+            s.isNormalMap = true;
+            continue;
+        }
+
+        // Совмещённая ORM-карта: R - occlusion, G - roughness, B - metallic.
+        if (is_mr && is_occ)
+        {
+            s.role = PBRTextureRole::ORM;
+            s.isORM = true;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_UNORM;
+            s.qualityLevel = 128;
+            continue;
+        }
+
+        if (is_mr)
+        {
+            s.role = PBRTextureRole::METALLIC_ROUGHNESS;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_UNORM;
+            s.qualityLevel = 128;
+            continue;
+        }
+
+        // Отдельная AO-карта: не форсируем R8, чтобы объём данных RGBA
+        // (w*h*4) совпадал с форматом.
+        if (is_occ)
+        {
+            s.role = PBRTextureRole::OCCLUSION;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_UNORM;
+            s.qualityLevel = 96;
+            continue;
+        }
+
+        if (is_base)
+        {
+            s.role = PBRTextureRole::BASE_COLOR;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_SRGB;
+            s.qualityLevel = 160;
+            s.isSRGB = true;
+            continue;
+        }
+
+        if (is_emis)
+        {
+            s.role = PBRTextureRole::EMISSIVE;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_SRGB;
+            s.qualityLevel = 128;
+            s.isSRGB = true;
+            continue;
+        }
+
+        s.role = PBRTextureRole::UNKNOWN;
     }
 
     return image_settings;
