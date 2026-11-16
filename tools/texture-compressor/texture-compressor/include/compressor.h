@@ -11,6 +11,7 @@ enum class PBRTextureRole
     METALLIC_ROUGHNESS,
     NORMAL,
     OCCLUSION,
+    ORM,        ///< Совмещённая карта: R - occlusion, G - roughness, B - metallic
     UNKNOWN
 };
 
@@ -21,6 +22,7 @@ struct TextureSettings
     uint32_t qualityLevel = 128;
     bool isNormalMap = false;
     bool isSRGB = false;
+    bool isORM = false;
 };
 
 int compress_model_textures(const command_line_t &cmd_line);
