@@ -24,6 +24,11 @@ struct vehicle_control_signal_t
     {
         return static_cast<bool>(value);
     }
+
+    int toInt() const
+    {
+        return static_cast<int>(value);
+    }
 };
 
 #endif
