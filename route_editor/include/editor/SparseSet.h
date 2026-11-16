@@ -20,6 +20,8 @@ public:
     void for_each(std::function<void (std::size_t id)> func);
 
     const std::vector<std::size_t>& get_ids() const;
+    std::vector<std::size_t> copy_shrinked_ids() const;
+
     std::size_t get_size() const;
 
 private:

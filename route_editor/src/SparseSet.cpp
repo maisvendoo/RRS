@@ -59,6 +59,11 @@ const std::vector<std::size_t>& SparseSet::get_ids() const
     return ids;
 }
 
+std::vector<std::size_t> SparseSet::copy_shrinked_ids() const
+{
+    return std::vector<std::size_t>(ids.begin(), ids.begin() + size);
+}
+
 std::size_t SparseSet::get_size() const
 {
     return size;
