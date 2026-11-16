@@ -83,16 +83,26 @@ bool compress_to_ktx2(const fs::path& src_img,
         return false;
     }
 
-    // Загружаем базовый уровень (0)
+    // Загружаем базовый уровень (0). Данные всегда RGBA (w*h*4), формат
+    // ci.vkFormat выбран RGBA-совместимым (см. parse_gltf_textures),
+    // поэтому объём данных совпадает с форматом.
     auto* baseTex = ktxTexture(texture);
-    ktxTexture_SetImageFromMemory(baseTex, 0, 0, 0, data, w * h * 4);
+    result = ktxTexture_SetImageFromMemory(baseTex, 0, 0, 0, data, w * h * 4);
 
-    // Массив под указатели на данные всех уровней, не удаляем эти данные до сжатия
-    // и сохранения текстуры на диск!
-    std::vector<stbi_uc *> levels_data;
+    if (result != KTX_SUCCESS)
+    {
+        std::cerr << "[ERR] Failed to set base image data: " << result << std::endl;
+        ktxTexture_Destroy(ktxTexture(texture));
+        stbi_image_free(data);
+        return false;
+    }
 
-    // Если нужны мипы — генерируем их вручную, последовательно уменашая
-    // рзмеры текструы в два раза на каждом уровне
+    // Буферы мип-уровней выделяются через new[] и освобождаются через delete[].
+    // Исходные данные (data) приходят из stbi_load и освобождаются stbi_image_free.
+    std::vector<stbi_uc *> mip_buffers;
+
+    // Если нужны мипы — генерируем их вручную, последовательно уменьшая
+    // размеры текстуры в два раза на каждом уровне
     if (generate_mipmaps && ci.numLevels > 1)
     {
         stbi_uc* prevLevelData = data;
@@ -100,8 +110,6 @@ bool compress_to_ktx2(const fs::path& src_img,
 
         for (uint32_t level = 1; level < ci.numLevels; ++level)
         {
-            levels_data.push_back(prevLevelData);
-
             uint32_t curW = std::max(1u, prevW >> 1);
             uint32_t curH = std::max(1u, prevH >> 1);
 
@@ -114,11 +122,24 @@ bool compress_to_ktx2(const fs::path& src_img,
                 );
 
             // Загружаем уровень в ktxTexture
-            ktxTexture_SetImageFromMemory(
+            result = ktxTexture_SetImageFromMemory(
                 baseTex, level, 0, 0,
                 resized, curW * curH * 4
                 );
 
+            if (result != KTX_SUCCESS)
+            {
+                std::cerr << "[ERR] Failed to set image data for mip level "
+                          << level << ": " << result << std::endl;
+                delete[] resized;
+                for (auto* b : mip_buffers)
+                    delete[] b;
+                ktxTexture_Destroy(ktxTexture(texture));
+                stbi_image_free(data);
+                return false;
+            }
+
+            mip_buffers.push_back(resized);
             prevLevelData = resized;
             prevW = curW;
             prevH = curH;
@@ -179,6 +200,10 @@ bool compress_to_ktx2(const fs::path& src_img,
     if (result != KTX_SUCCESS)
     {
         std::cerr << "[ERR] Failed to compress texture: " << result << std::endl;
+        ktxTexture_Destroy(ktxTexture(texture));
+        for (auto* b : mip_buffers)
+            delete[] b;
+        stbi_image_free(data);
         return false;
     }
 
@@ -187,19 +212,25 @@ bool compress_to_ktx2(const fs::path& src_img,
     if (result != KTX_SUCCESS)
     {
         std::cerr << "[ERR] Failed to write file: " << result << std::endl;
+        ktxTexture_Destroy(ktxTexture(texture));
+        for (auto* b : mip_buffers)
+            delete[] b;
+        stbi_image_free(data);
         return false;
     }
 
     // Уничтожаем текстуру в памяти
     ktxTexture_Destroy(ktxTexture(texture));
 
-    // Освобождаем память всех мипмап-уровней
-    for (auto d : levels_data)
+    // Освобождаем буферы мип-уровней (new[] → delete[])
+    for (auto* b : mip_buffers)
     {
-        stbi_image_free(d);
+        delete[] b;
     }
 
-    // Уходим довольные, как слон, проделанной работой
+    // Освобождаем исходные данные, загруженные stbi_load
+    stbi_image_free(data);
+
     return true;
 }
 
