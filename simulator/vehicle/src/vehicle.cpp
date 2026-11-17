@@ -933,7 +933,7 @@ void Vehicle::replayInitSignals()
     {
         int cab_idx = pair.first;
         int signal_id = pair.second;
-        float value = control_inputs[cab_idx][signal_id].value;
+        float value = vc_inputs[cab_idx][signal_id].value;
         emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
     }
 }
@@ -943,20 +943,20 @@ void Vehicle::replayInitSignals()
 //------------------------------------------------------------------------------
 void Vehicle::initClientInputSignal(int cab_idx, int signal_id, float value)
 {
-    if (cab_idx >= control_inputs.size())
+    if (cab_idx >= vc_inputs.size())
     {
         return;
     }
 
-    auto input = control_inputs[cab_idx].find(signal_id);
+    auto input = vc_inputs[cab_idx].find(signal_id);
 
-    if (input != control_inputs[cab_idx].end())
+    if (input != vc_inputs[cab_idx].end())
     {
         bool first = _init_signals.insert(std::pair<int, int>(cab_idx, signal_id)).second;
 
-        if (first || fabs(control_inputs[cab_idx][signal_id].value - value) > 1e-6f)
+        if (first || fabs(vc_inputs[cab_idx][signal_id].value - value) > 1e-6f)
         {
-            control_inputs[cab_idx][signal_id].value = value;
+            vc_inputs[cab_idx][signal_id].value = value;
             emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
         }
     }
@@ -1133,11 +1133,8 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
     int cabs_num = 0;
     cfg.getInt("Common", "CabinesNum", cabs_num);
 
-    for (int i = 0; i < cabs_num + 1; ++i)
-    {
-        QMap<int, vehicle_control_signal_t> inputs;
-        control_inputs.push_back(inputs);
-    }
+    // Последняя (общая) кабина - для сигналов, не привязанных к конкретной кабине
+    vc_inputs.setCabinesNumber(cabs_num + 1);
 
     auto secNode = cfg.getFirstSection("Control");
 
@@ -1167,20 +1164,19 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
         if (cfg.getDouble(secNode, "value", value))
         {            
             input.value = value;
-            auto &inputs = *(control_inputs.end() - 1);
-            inputs.insert(id, input);
+            vc_inputs[vc_inputs.size() - 1].insert(id, input);
         }
 
         if (cfg.getDouble(secNode, "value1", value1) && cabs_num > 0)
         {
             input.value = value1;
-            control_inputs[0].insert(id, input);
+            vc_inputs[0].insert(id, input);
         }
 
         if (cfg.getDouble(secNode, "value2", value2) && cabs_num > 1)
         {
             input.value = value2;
-            control_inputs[1].insert(id, input);
+            vc_inputs[1].insert(id, input);
         }
 
         secNode = cfg.getNextSection();
