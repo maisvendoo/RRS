@@ -933,7 +933,7 @@ void Vehicle::replayInitSignals()
     {
         int cab_idx = pair.first;
         int signal_id = pair.second;
-        float value = vc_inputs[cab_idx][signal_id].value;
+        float value = vc_inputs.getValue(cab_idx, signal_id);
         emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
     }
 }
@@ -948,17 +948,17 @@ void Vehicle::initClientInputSignal(int cab_idx, int signal_id, float value)
         return;
     }
 
-    auto input = vc_inputs[cab_idx].find(signal_id);
-
-    if (input != vc_inputs[cab_idx].end())
+    if (!vc_inputs.contains(cab_idx, signal_id))
     {
-        bool first = _init_signals.insert(std::pair<int, int>(cab_idx, signal_id)).second;
+        return;
+    }
 
-        if (first || fabs(vc_inputs[cab_idx][signal_id].value - value) > 1e-6f)
-        {
-            vc_inputs[cab_idx][signal_id].value = value;
-            emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
-        }
+    bool first = _init_signals.insert(std::pair<int, int>(cab_idx, signal_id)).second;
+
+    if (first || fabs(vc_inputs.getValue(cab_idx, signal_id) - value) > 1e-6f)
+    {
+        vc_inputs.setValue(cab_idx, signal_id, value);
+        emit sigInitClientInputSignal(model_idx, cab_idx, signal_id, value);
     }
 }
 
@@ -1164,19 +1164,19 @@ void Vehicle::initControlInputs(const QString &сfg_path, const QString &io_ctrl
         if (cfg.getDouble(secNode, "value", value))
         {            
             input.value = value;
-            vc_inputs[vc_inputs.size() - 1].insert(id, input);
+            vc_inputs.addInput(vc_inputs.size() - 1, id, input);
         }
 
         if (cfg.getDouble(secNode, "value1", value1) && cabs_num > 0)
         {
             input.value = value1;
-            vc_inputs[0].insert(id, input);
+            vc_inputs.addInput(0, id, input);
         }
 
         if (cfg.getDouble(secNode, "value2", value2) && cabs_num > 1)
         {
             input.value = value2;
-            vc_inputs[1].insert(id, input);
+            vc_inputs.addInput(1, id, input);
         }
 
         secNode = cfg.getNextSection();
