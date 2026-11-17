@@ -155,6 +155,29 @@ public:
         return it.value().params.size();
     }
 
+    // Значение параметра сигнала указанной кабины
+    float getParam(const size_t &cab_idx, const int &id, const size_t &index) const
+    {
+        if (cab_idx >= control_inputs.size())
+        {
+            return 0.0f;
+        }
+
+        auto it = control_inputs[cab_idx].find(id);
+
+        if (it == control_inputs[cab_idx].end())
+        {
+            return 0.0f;
+        }
+
+        if (index >= it.value().params.size())
+        {
+            return 0.0f;
+        }
+
+        return it.value().params[index];
+    }
+
     // Устанавливает параметр сигнала указанной кабины
     void setParam(const size_t &cab_idx, const int &id, const size_t &index, const float &value)
     {
