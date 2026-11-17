@@ -15,7 +15,7 @@ bool RouteMap::read(std::string_view path)
     std::ifstream file{std::string{path}};
     if (!file)
     {
-        Journal::instance()->error(QString{"Failed to open %1"}.arg(path));
+        Journal::instance()->error(QString{"Failed to open %1"}.arg(std::string{path}.c_str()));
         return false;
     }
 
