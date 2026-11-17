@@ -1,5 +1,7 @@
 #include "filesystem.h"
 
+#include <QCoreApplication>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -14,7 +16,26 @@ FileSystem& FileSystem::getInstance()
 //------------------------------------------------------------------------------
 FileSystem::FileSystem()
 {
-    const std::string workDir = QDir::currentPath().toStdString();
+    QString app_dir;
+
+    auto* const q_core_application = QCoreApplication::instance();
+    if (q_core_application == nullptr)
+    {
+        // Если не создавали снаружи QCoreApplication или QApplication,
+        // создаём временный QCoreApplication для получения пути папки
+        // с исполняемым файлом
+        // (можем передать пустые int и char*[] вместо argc и argv)
+        int tmp_int = 0;
+        char* tmp_cstr_arr[] = {};
+        QCoreApplication tmp_app{tmp_int, tmp_cstr_arr};
+        app_dir = tmp_app.applicationDirPath();
+    }
+    else
+    {
+        app_dir = q_core_application->applicationDirPath();
+    }
+
+    const std::string workDir = app_dir.toStdString();
     const std::string tmp = getLevelUpDirectory(workDir, 1);
 
     setDir(binDir, workDir);

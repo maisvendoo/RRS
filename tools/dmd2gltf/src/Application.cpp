@@ -1,7 +1,7 @@
 #include    <Application.h>
 #include    <Geometry.h>
 #include    <filesystem-utils.h>
-#include    <core/Logger.h>
+#include    "Logger.h"
 
 #include    <algorithm>
 #include    <chrono>

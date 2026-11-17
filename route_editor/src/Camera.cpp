@@ -25,12 +25,15 @@
 #include <cmath>
 
 Camera::Camera(EditorContext& editor_ctx)
-    : editor_ctx(editor_ctx)
+    : camera_settings(editor_ctx.camera_settings)
+    , keyboard(*editor_ctx.keyboard)
+    , mouse(*editor_ctx.mouse)
 {
-    assert(editor_ctx.window && "Window must be created before camera");
+    const auto& window = editor_ctx.window;
 
-    const auto& camera_settings = editor_ctx.camera_settings;
-    const auto& window_extent = editor_ctx.window->extent2D();
+    assert(window && "Window must be created before camera");
+
+    const VkExtent2D window_extent = window->extent2D();
 
     const double window_width = static_cast<double>(window_extent.width);
     const double window_height = static_cast<double>(window_extent.height);
@@ -69,15 +72,13 @@ void Camera::swap_proj_mat()
 
 void Camera::update_move_dir()
 {
-    const auto& keyboard = editor_ctx.keyboard;
+    const int forward_move_dir =
+        static_cast<int>(keyboard.pressed(ACTION_MOVE_CAMERA_FORWARD)) -
+        static_cast<int>(keyboard.pressed(ACTION_MOVE_CAMERA_BACKWARD));
 
-    const int forward_move_dir
-        = static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_FORWARD))
-          - static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_BACKWARD));
-
-    const int right_move_dir
-        = static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_RIGHT))
-          - static_cast<int>(keyboard->pressed(ACTION_MOVE_CAMERA_LEFT));
+    const int right_move_dir =
+        static_cast<int>(keyboard.pressed(ACTION_MOVE_CAMERA_RIGHT)) -
+        static_cast<int>(keyboard.pressed(ACTION_MOVE_CAMERA_LEFT));
 
     if ((forward_move_dir == 0) && (right_move_dir == 0))
     {
@@ -97,13 +98,10 @@ void Camera::update_move_dir()
 
 void Camera::handle_mouse_move()
 {
-    const auto& camera_settings = editor_ctx.camera_settings;
-    const auto& mouse = editor_ctx.mouse;
-
     const double rotate_speed = camera_settings.rotate_speed;
 
-    yaw_deg += mouse->get_delta_x() * rotate_speed;
-    pitch_deg -= mouse->get_delta_y() * rotate_speed;
+    yaw_deg += mouse.get_delta_x() * rotate_speed;
+    pitch_deg -= mouse.get_delta_y() * rotate_speed;
     pitch_deg = std::clamp(pitch_deg, -89.0, 89.0);
 
     calc_front();
@@ -115,19 +113,14 @@ void Camera::handle_mouse_move()
 
 void Camera::handle_mouse_scroll()
 {
-    const auto& camera_settings = editor_ctx.camera_settings;
-    const auto& mouse = editor_ctx.mouse;
-
     double& fovy = perspective->fieldOfViewY;
-    fovy -= mouse->get_scroll() * camera_settings.zoom_power;
+    fovy -= mouse.get_scroll() * camera_settings.zoom_power;
     fovy = std::clamp(fovy, camera_settings.fovy_min, camera_settings.fovy_max);
     calc_inv_proj_mat();
 }
 
 void Camera::update(double delta_time)
 {
-    const auto& camera_settings = editor_ctx.camera_settings;
-
     look_at->eye += camera_settings.move_speed * delta_time * move_dir;
     look_at->center = look_at->eye + front;
     calc_inv_view_mat();
@@ -181,8 +174,6 @@ void Camera::look_on(const vsg::dvec3& pos, double distance)
 
 void Camera::create_orthographic_projection(double aspect_ratio)
 {
-    const auto& camera_settings = editor_ctx.camera_settings;
-
     const double radius = camera_settings.view_distance;
 
     const double halfDim = 100.0;

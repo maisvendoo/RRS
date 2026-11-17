@@ -8,6 +8,9 @@
 #include <vsg/maths/vec3.h>
 
 struct EditorContext;
+class Keyboard;
+class Mouse;
+struct camera_settings_t;
 
 namespace vsg
 {
@@ -68,7 +71,9 @@ private:
     void calc_inv_view_mat();
 
 private:
-    EditorContext& editor_ctx;
+    const camera_settings_t& camera_settings;
+    const Keyboard& keyboard;
+    const Mouse& mouse;
 
     vsg::ref_ptr<vsg::ProjectionMatrix> another_proj_mat;
     vsg::ref_ptr<vsg::Perspective> perspective;

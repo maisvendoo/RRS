@@ -2,9 +2,13 @@
 #define ROUTE_H
 
 #include <vsg/core/Inherit.h>
+#include <vsg/core/ref_ptr.h>
+#include <vsg/nodes/PagedLOD.h>
 #include <vsg/nodes/Switch.h>
 
+#include <map>
 #include <string>
+#include <string_view>
 
 struct EditorContext;
 
@@ -18,9 +22,12 @@ public:
 
     void load();
 
+    std::map<std::string_view, vsg::ref_ptr<vsg::PagedLOD>>& get_paged_lods()
+    {
+        return paged_lods;
+    }
+
 private:
-    bool load_objects_ref();
-    bool load_route_map();
     bool load_stations_conf();
     bool load_waypoints_conf();
 
@@ -29,6 +36,7 @@ private:
 
 private:
     EditorContext& editor_ctx;
+    std::map<std::string_view, vsg::ref_ptr<vsg::PagedLOD>> paged_lods;
 };
 
 #endif // ROUTE_H

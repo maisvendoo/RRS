@@ -1,14 +1,15 @@
 #ifndef EDITOR_GIZMO_H
 #define EDITOR_GIZMO_H
 
-#include "SingleSwitch.h"
-
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/vec3.h>
+#include <vsg/nodes/Switch.h>
 #include <vsg/utils/Builder.h>
 
+class Camera;
 struct EditorContext;
+struct gizmo_settings_t;
 
 namespace vsg
 {
@@ -20,7 +21,7 @@ class Node;
 
 } // namespace vsg
 
-class Gizmo : public vsg::Inherit<SingleSwitch, Gizmo>
+class Gizmo : public vsg::Inherit<vsg::Switch, Gizmo>
 {
 public:
     Gizmo(EditorContext& editor_ctx);
@@ -37,12 +38,14 @@ public:
 
 private:
     EditorContext& editor_ctx;
+    const Camera& camera;
+    const gizmo_settings_t& gizmo_settings;
 
     vsg::Builder builder;
     vsg::ref_ptr<vsg::MatrixTransform> matrix_transform;
     vsg::ref_ptr<vsg::Node> arrows[3];
-    vsg::ref_ptr<SingleSwitch> plane_switches[3];
-    vsg::ref_ptr<SingleSwitch> line_switches[3];
+    vsg::ref_ptr<vsg::Switch> planes_switch;
+    vsg::ref_ptr<vsg::Switch> lines_switch;
 
     vsg::dvec3 curr_pos;
     vsg::dvec3 prev_intersect_pos;

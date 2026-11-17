@@ -166,8 +166,8 @@ bool RouteObject::select()
 {
     if (!outline_switch->node)
     {
-        auto outline
-            = editor_ctx.outline_builder->create_outline(paged_lod);
+        const auto& outline_builder = editor_ctx.outline_builder;
+        auto outline = outline_builder->create_outline(paged_lod);
         if (!outline)
         {
             return false;
@@ -179,6 +179,8 @@ bool RouteObject::select()
     }
 
     is_selected = true;
+
+    outline_switch->mask = vsg::Mask{MASK_GUI2};
 
     editor_ctx.selected_objects.emplace_back(this);
     editor_ctx.gizmo->update_position();

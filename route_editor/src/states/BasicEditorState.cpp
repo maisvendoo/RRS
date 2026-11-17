@@ -15,6 +15,8 @@
 #include "editor/commands/PasteObjectsCommand.h"
 #include "editor/commands/SelectObjectsCommand.h"
 
+// #include "editor/StaticObjectManager.h"
+
 #include <Journal.h>
 #include <filesystem.h>
 

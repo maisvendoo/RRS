@@ -3,15 +3,15 @@
 
 #include "editor/EditorState.h"
 #include "editor/KeyBindings.h"
-#include "editor/RouteMap.h"
 #include "editor/RouteObjects.h"
-#include "editor/SingleSwitch.h"
 #include "editor/settings/CameraSettings.h"
 #include "editor/settings/GizmoSettings.h"
 #include "editor/settings/GuiSettings.h"
 #include "editor/settings/SceneSettings.h"
 #include "editor/settings/WindowSettings.h"
 
+#include <RouteReader/ObjectsRef.h>
+#include <RouteReader/RouteMap.h>
 #include <core/ThreadSafe.h>
 
 #include <vsg/core/Mask.h>
@@ -23,14 +23,13 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include <vsg/nodes/Group.h>
-#include <vsg/nodes/Switch.h>
 
 class Camera;
 class CommandManager;
 class Gizmo;
 class Keyboard;
 class Mouse;
+class SingleSwitch;
 class StaticObjectManager;
 class ObjectSelector;
 class OutlineBuilder;
@@ -40,37 +39,22 @@ class StateManager;
 class Topology;
 class WorldCulling;
 
+#include "editor/SingleSwitch.h"
+
 namespace vsg
 {
 
+class Group;
 class Node;
 class PagedLOD;
+class Switch;
 class Window;
 
 } // namespace vsg
 
-struct ObjectRef
-{
-    std::string relative_path;
-    vsg::ref_ptr<vsg::PagedLOD> paged_lod;
-};
-
 struct CompileInfoNode
 {
     vsg::ref_ptr<vsg::Node> node;
-};
-
-struct CompileInfoGroupNode
-{
-    vsg::ref_ptr<vsg::Group> group;
-    vsg::ref_ptr<vsg::Node> node;
-};
-
-struct CompileInfoSwitchNode
-{
-    vsg::ref_ptr<vsg::Switch> vsg_switch;
-    vsg::ref_ptr<vsg::Node> node;
-    vsg::Mask mask = vsg::MASK_OFF;
 };
 
 struct CompileInfoSingleSwitchNode
@@ -111,6 +95,7 @@ struct EditorContext
     vsg::ref_ptr<Gizmo> gizmo;
     std::unique_ptr<StaticObjectManager> object_manager;
     vsg::ref_ptr<WorldCulling> world_culling;
+    vsg::ref_ptr<vsg::Viewer> viewer;
 
     EditorState editor_state = EditorState::SELECT_ROUTE;
     std::unique_ptr<StateManager> state_manager;
@@ -124,8 +109,6 @@ struct EditorContext
     RouteObjects hidden_objects;
 
     ThreadSafe<std::vector<CompileInfoNode>> compile_info_nodes;
-    ThreadSafe<std::vector<CompileInfoGroupNode>> compile_info_group_nodes;
-    ThreadSafe<std::vector<CompileInfoSwitchNode>> compile_info_switch_nodes;
     ThreadSafe<std::vector<CompileInfoSingleSwitchNode>> compile_info_single_switch_nodes;
 
     ThreadSafe<std::unique_ptr<Topology>> topology;
@@ -137,7 +120,7 @@ struct EditorContext
     vsg::ref_ptr<ObjectSelector> object_selector;
     vsg::ref_ptr<OutlineBuilder> outline_builder;
 
-    std::map<std::string, ObjectRef> objects_ref;
+    ObjectsRef objects_ref;
     RouteMap route_map;
     std::map<std::string, vsg::dvec3> stations_conf;
     std::map<std::string, WaypointData> waypoints_conf;

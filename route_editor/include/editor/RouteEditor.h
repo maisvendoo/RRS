@@ -17,11 +17,7 @@ public:
     void run();
 
 private:
-    void initialize_journal(const char* filename = "editor.log") const;
-
-    void read_settings();
-
-    void create_vsg_options();
+    void read_settings(const char* filename);
 
     void configure_shaders();
 
@@ -31,7 +27,6 @@ private:
 
 private:
     EditorContext editor_ctx;
-    vsg::ref_ptr<vsg::Viewer> viewer;
     vsg::ref_ptr<WindowHandler> window_handler_;
 };
 

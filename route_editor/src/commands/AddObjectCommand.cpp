@@ -2,10 +2,12 @@
 
 #include "editor/EditorContext.h"
 #include "editor/Gizmo.h"
+#include "editor/MergeSwitch.h"
 #include "editor/Route.h"
 #include "editor/RouteObject.h"
 #include "editor/commands/Command.h"
 
+#include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 
@@ -28,8 +30,14 @@ void AddObjectCommand::execute()
         object->deselect();
     }
 
-    editor_ctx.compile_info_switch_nodes.lock()->emplace_back(
-        CompileInfoSwitchNode{editor_ctx.route, object_to_add, vsg::MASK_ALL});
+    auto& viewer = editor_ctx.viewer;
+    vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
+    auto compile_result = viewer->compileManager->compile(object_to_add);
+
+    viewer->addUpdateOperation(MergeSwitch::create(observer_viewer,
+                                                editor_ctx.route,
+                                                vsg::MASK_ALL, object_to_add,
+                                                compile_result));
 
     editor_ctx.static_objects.lock()->emplace_back(object_to_add);
 

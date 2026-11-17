@@ -1,5 +1,11 @@
 #pragma once
 
+#ifdef vsg_FOUND
+#include <vsg/maths/vec3.h>
+using vec3 = vsg::vec3;
+using dvec3 = vsg::dvec3;
+#else
+
 /* <editor-fold desc="MIT License">
 
 Copyright(c) 2018 Robert Osfield
@@ -267,4 +273,6 @@ namespace vsg
 #endif
 #if defined(__GNUC__)
 #    pragma GCC diagnostic pop
-#endif
+#endif // defined(__clang__)
+
+#endif // vsg_FOUND

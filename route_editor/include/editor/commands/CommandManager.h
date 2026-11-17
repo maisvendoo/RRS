@@ -9,6 +9,9 @@ class Command;
 
 class CommandManager
 {
+private:
+    using Func = std::function<void(const std::unique_ptr<Command>&)>;
+
 public:
     CommandManager();
     ~CommandManager();
@@ -17,11 +20,8 @@ public:
     void undo();
     void redo();
 
-    void for_each_command(
-        const std::function<void(const std::unique_ptr<Command>&)>& func);
-
-    void for_each_undone(
-        const std::function<void(const std::unique_ptr<Command>&)>& func);
+    void for_each_command(const Func& func);
+    void for_each_undone(const Func& func);
 
 private:
     std::deque<std::unique_ptr<Command>> commands;

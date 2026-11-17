@@ -2,16 +2,13 @@
 
 #include "editor/EditorContext.h"
 #include "editor/Mask.h"
-#include "editor/PagedLodMap.h"
-#include "editor/RouteMap.h"
+#include "editor/MergeSwitch.h"
 #include "editor/RouteObject.h"
 #include "editor/StaticObjectManager.h"
 #include "editor/settings/CameraSettings.h"
 
 #include <CfgReader.h>
 #include <Journal.h>
-#include <cstdlib>
-#include <ctime>
 #include <filesystem.h>
 #include <graphics/pipeline_funcs.h>
 #include <rail-signal.h>
@@ -20,12 +17,15 @@
 #include <trajectory.h>
 #include <vec3.h>
 
+#include <vsg/app/CompileManager.h>
 #include <vsg/app/RecordTraversal.h>
+#include <vsg/app/Viewer.h>
 #include <vsg/commands/DrawIndexed.h>
 #include <vsg/core/Array.h>
 #include <vsg/core/Data.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/Value.h>
+#include <vsg/core/observer_ptr.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/io/Path.h>
 #include <vsg/io/read.h>
@@ -34,6 +34,7 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/Geometry.h>
 #include <vsg/nodes/MatrixTransform.h>
+#include <vsg/nodes/Node.h>
 #include <vsg/nodes/PagedLOD.h>
 #include <vsg/nodes/StateGroup.h>
 #include <vsg/nodes/VertexDraw.h>
@@ -57,17 +58,17 @@
 
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
+#include <ctime>
 #include <filesystem>
 #include <fstream>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <thread>
 
-static vsg::dvec3 to_vsg_vec3(dvec3 vec)
-{
-    return vsg::dvec3{vec.x, vec.y, vec.z};
-}
+using PagedLodMap = std::map<std::string, vsg::ref_ptr<vsg::PagedLOD>>;
 
 static vsg::ref_ptr<vsg::PagedLOD>
 construct_paged_lod(const vsg::Path& filename, double radius,
@@ -89,12 +90,18 @@ Route::Route(EditorContext& context)
 
 void Route::load()
 {
-    if (!load_objects_ref())
+    const FileSystem& fs = FileSystem::getInstance();
+    const std::string objects_ref_path = fs.combinePath(route_dir,
+                                                        "objects.ref");
+    const std::string route_map_path = fs.combinePath(route_dir, "topology",
+                                                      "map", "route1.map");
+
+    if (!editor_ctx.objects_ref.read(objects_ref_path))
     {
         return;
     }
 
-    if (!load_route_map())
+    if (!editor_ctx.route_map.read(route_map_path))
     {
         return;
     }
@@ -109,99 +116,22 @@ void Route::load()
         return;
     }
 
-    const auto& fs = FileSystem::getInstance();
     const auto& camera_settings = editor_ctx.camera_settings;
     const auto& vsg_options = editor_ctx.vsg_options;
     auto& objects_ref = editor_ctx.objects_ref;
     auto& load_static_objects_thread = editor_ctx.load_static_objects_thread;
     auto& load_topology_thread = editor_ctx.load_topology_thread;
 
-    for (auto& [label, ref] : objects_ref)
+    for (auto& [label, rel_path] : objects_ref)
     {
-        ref.paged_lod = construct_paged_lod(
-            fs.combinePath(route_dir, ref.relative_path),
-            camera_settings.view_distance, vsg_options);
+        paged_lods.emplace(label, construct_paged_lod(
+                                      fs.combinePath(route_dir, rel_path),
+                                      camera_settings.view_distance,
+                                      vsg_options));
     }
 
     load_static_objects_thread = std::thread(&Route::load_static_objects, this);
     load_topology_thread = std::thread(&Route::load_topology, this);
-}
-
-bool Route::load_objects_ref()
-{
-    const FileSystem& fs = FileSystem::getInstance();
-    const std::string objects_ref_path =
-        fs.combinePath(route_dir, "objects.ref");
-
-    std::ifstream objects_ref_file(objects_ref_path);
-    if (!objects_ref_file)
-    {
-        Journal::instance()->error(
-            QString("Failed to open %1").arg(objects_ref_path.c_str()));
-
-        return false;
-    }
-
-    std::string line;
-    while (std::getline(objects_ref_file, line))
-    {
-        std::istringstream iss(line);
-        std::string label, relative_path;
-
-        if (iss >> label >> relative_path)
-        {
-            editor_ctx.objects_ref.emplace(std::move(label),
-                                           ObjectRef{std::move(relative_path),
-                                           nullptr});
-        }
-    }
-
-    return true;
-}
-
-bool Route::load_route_map()
-{
-    const FileSystem& fs = FileSystem::getInstance();
-
-    const std::string route_map_path =
-        fs.combinePath(route_dir, "topology", "map", "route1.map");
-
-    std::ifstream route_map_file(route_map_path);
-    if (!route_map_file)
-    {
-        Journal::instance()->error(QString("Failed to open %1")
-                                       .arg(route_map_path.c_str()));
-
-        return false;
-    }
-
-    std::string line;
-    while (std::getline(route_map_file, line))
-    {
-        if (line.empty())
-        {
-            continue;
-        }
-
-        if (line.back() == ';')
-        {
-            line.pop_back();
-        }
-
-        std::replace(line.begin(), line.end(), ',', ' ');
-
-        std::istringstream iss(line);
-        std::string label;
-        vsg::dvec3 translation, rotation;
-
-        if (iss >> label >> translation >> rotation)
-        {
-            editor_ctx.route_map[label].emplace_back(
-                RouteMapTransformation{translation, rotation});
-        }
-    }
-
-    return true;
 }
 
 bool Route::load_stations_conf()
@@ -293,52 +223,37 @@ void Route::load_static_objects()
 {
     for (const auto& [label, transforms] : editor_ctx.route_map)
     {
-        const auto ref_it = editor_ctx.objects_ref.find(label);
-        if (ref_it == editor_ctx.objects_ref.cend())
+        const auto found_it = editor_ctx.objects_ref.find(label);
+        if (found_it == editor_ctx.objects_ref.cend())
         {
             continue;
         }
 
+        const std::string& rel_path = found_it->second;
+        const auto& paged_lod = paged_lods[label];
+
         for (const auto& transform : transforms)
         {
-            const auto object = RouteObject::create(editor_ctx,
-                                                    ref_it->second.paged_lod,
-                                                    label,
-                                                    transform.translation,
-                                                    -transform.rotation_deg);
+            const vsg::dvec3& pos = transform.pos;
+            const vsg::dvec3& rot_deg = transform.rot_deg;
 
-            editor_ctx.compile_info_switch_nodes.lock()->emplace_back(
-                CompileInfoSwitchNode{vsg::ref_ptr(this), object,
-                                      vsg::MASK_ALL});
+            const auto object = RouteObject::create(editor_ctx, paged_lod,
+                                                    label, pos, -rot_deg);
+
+            auto& viewer = editor_ctx.viewer;
+            vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
+            auto compile_result = viewer->compileManager->compile(object);
+
+            viewer->addUpdateOperation(MergeSwitch::create(observer_viewer,
+                                                     vsg::ref_ptr(this),
+                                                     vsg::MASK_ALL, object,
+                                                     compile_result));
 
             editor_ctx.static_objects.lock()->emplace_back(object);
 
-            constexpr vsg::dvec3 X_AXIS = {1.0, 0.0, 0.0};
-            constexpr vsg::dvec3 Y_AXIS = {0.0, 1.0, 0.0};
-            constexpr vsg::dvec3 Z_AXIS = {0.0, 0.0, 1.0};
-
-            const vsg::dvec3 rot_deg = transform.rotation_deg;
-            const vsg::dvec3 rot_rad = {vsg::radians(rot_deg.x),
-                                        vsg::radians(rot_deg.y),
-                                        vsg::radians(rot_deg.z)};
-
-            auto matrix_transform = vsg::MatrixTransform::create();
-            matrix_transform->children = {ref_it->second.paged_lod};
-            matrix_transform->matrix =
-                vsg::translate(transform.translation) *
-                vsg::rotate(rot_rad.z, Z_AXIS) *
-                vsg::rotate(rot_rad.y, Y_AXIS) *
-                vsg::rotate(rot_rad.x, X_AXIS);
-
             // auto& object_manager = editor_ctx.object_manager;
-
-            // object_manager->labels.push_back(label);
-            // object_manager->rel_paths.push_back(
-            //     ref_it->second.relative_path);
-            // object_manager->mat_transforms.push_back(matrix_transform);
-            // object_manager->init_mats.push_back(
-            //     matrix_transform->matrix);
-            // object_manager->is_selected.push_back(false);
+            // object_manager->add_object(label, rel_path, paged_lod, pos, rot_deg,
+            //     vsg::dvec3{1.0, 1.0, 1.0});
         }
     }
 }
@@ -347,15 +262,14 @@ bool Route::load_topology()
 {
     const FileSystem& fs = FileSystem::getInstance();
 
-    const std::string cfg_path =
-        fs.combinePath(route_dir, "topology", "models-config.xml");
+    const std::string cfg_path = fs.combinePath(route_dir, "topology",
+                                                "models-config.xml");
 
     CfgReader cfg;
     if (!cfg.load(QString::fromStdString(cfg_path)))
     {
-        Journal::instance()->error(
-            QString("Failed to load %1").arg(cfg_path.c_str()));
-
+        Journal::instance()->error(QString("Failed to load %1")
+                                       .arg(cfg_path.c_str()));
         return false;
     }
 
@@ -365,8 +279,8 @@ bool Route::load_topology()
     if (!cfg.getString(section_name, "SignalModelsDir", signal_models_dir))
     {
         Journal::instance()->error(
-            QString("Failed to find field "
-                    "\"SignalModelsDir\" in section %1 in %2")
+            QString("Failed to find field \"SignalModelsDir\" "
+                    "in section %1 in %2")
                 .arg(section_name)
                 .arg(cfg_path.c_str()));
 
@@ -375,11 +289,11 @@ bool Route::load_topology()
 
     const std::string models_dir_name = signal_models_dir.toStdString();
 
-    const std::string models_dir
-        = fs.combinePath(fs.getDataDir(), "models", models_dir_name);
+    const std::string models_dir = fs.combinePath(fs.getDataDir(), "models",
+                                                  models_dir_name);
 
-    Journal::instance()->info(
-        QString("Signals directory %1").arg(models_dir.c_str()));
+    Journal::instance()->info(QString("Signals directory %1")
+                                  .arg(models_dir.c_str()));
 
     const signals_data_t* signals_data = nullptr;
 
@@ -424,16 +338,16 @@ bool Route::load_topology()
             }
             signal->calcPosition();
 
-            const std::string signal_model_name
-                = signal->getSignalModel().toStdString();
+            const std::string signal_model_name =
+                signal->getSignalModel().toStdString();
 
             if (signal_model_name.empty() || signal_model_name == "empty_line")
             {
                 continue;
             }
 
-            const std::string signal_model_path
-                = fs.combinePath(models_dir, signal_model_name) + ".gltf";
+            const std::string signal_model_path =
+                fs.combinePath(models_dir, signal_model_name) + ".gltf";
 
             vsg::ref_ptr<vsg::PagedLOD> paged_lod;
 
@@ -444,30 +358,36 @@ bool Route::load_topology()
                     signal_model_path, camera_settings.view_distance,
                     vsg_options);
 
-                paged_lod_it
-                    = paged_lods.emplace(signal_model_path, new_paged_lod)
-                          .first;
+                paged_lod_it = paged_lods.emplace(signal_model_path,
+                                                  new_paged_lod).first;
             }
 
             paged_lod = paged_lod_it->second;
 
-            const vsg::dvec3 pos = to_vsg_vec3(signal->getPos());
-            const vsg::dvec3 right = to_vsg_vec3(signal->getRight());
-            const vsg::dvec3 orth = to_vsg_vec3(signal->getOrth());
-            const vsg::dvec3 up = to_vsg_vec3(signal->getUp());
+            const vsg::dvec3 pos = signal->getPos();
+            const vsg::dvec3 right = signal->getRight();
+            const vsg::dvec3 orth = signal->getOrth();
+            const vsg::dvec3 up = signal->getUp();
 
-            const vsg::dvec3 rotation_deg
-                = {vsg::degrees(atan2(orth.z, up.z)),
-                   vsg::degrees(atan2(-right.z, hypot(orth.z, up.z))),
-                   vsg::degrees(atan2(-right.y, right.x))};
+            const vsg::dvec3 rotation_deg = {
+                vsg::degrees(std::atan2(orth.z, up.z)),
+                vsg::degrees(std::atan2(-right.z, std::hypot(orth.z, up.z))),
+                vsg::degrees(std::atan2(-right.y, right.x))
+            };
 
-            const auto object
-                = RouteObject::create(editor_ctx, paged_lod,
-                                      signal_model_name, pos, -rotation_deg);
+            const auto object = RouteObject::create(editor_ctx, paged_lod,
+                                                    signal_model_name, pos,
+                                                    -rotation_deg);
 
-            editor_ctx.compile_info_switch_nodes.lock()->emplace_back(
-                CompileInfoSwitchNode{vsg::ref_ptr(this), object,
-                                      vsg::MASK_ALL});
+            auto& viewer = editor_ctx.viewer;
+            vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
+            auto compile_result = viewer->compileManager->compile(object);
+
+            viewer->addUpdateOperation(MergeSwitch::create(observer_viewer,
+                                                           vsg::ref_ptr(this),
+                                                           vsg::MASK_ALL,
+                                                           object,
+                                                           compile_result));
 
             editor_ctx.static_objects.lock()->emplace_back(object);
         }
@@ -479,8 +399,8 @@ bool Route::load_topology()
 
     const auto group = vsg::Group::create();
 
-    const std::string shaders_dir_path
-        = fs.combinePath(fs.getDataDir(), "shaders");
+    const std::string shaders_dir_path = fs.combinePath(fs.getDataDir(),
+                                                        "shaders");
 
     const auto input_assembly_state = vsg::InputAssemblyState::create();
     input_assembly_state->topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
@@ -496,12 +416,14 @@ bool Route::load_topology()
             VkVertexInputBindingDescription{0, sizeof(vsg::vec3),
                                             VK_VERTEX_INPUT_RATE_VERTEX},
             VkVertexInputBindingDescription{1, sizeof(vsg::vec3),
-                                            VK_VERTEX_INPUT_RATE_VERTEX}},
+                                            VK_VERTEX_INPUT_RATE_VERTEX}
+        },
         vsg::VertexInputState::Attributes{
             VkVertexInputAttributeDescription{0, 0, VK_FORMAT_R32G32B32_SFLOAT,
                                               0},
             VkVertexInputAttributeDescription{1, 1, VK_FORMAT_R32G32B32_SFLOAT,
-                                              0}},
+                                              0}
+        },
         vsg::DescriptorSetLayoutBindings{}, vsg::Descriptors{},
         input_assembly_state, rasterization_state,
         vsg::MultisampleState::create(), vsg::ColorBlendState::create(),
@@ -509,11 +431,11 @@ bool Route::load_topology()
 
     srand(time(NULL));
 
-    auto font_path
-        = fs.combinePath(fs.getFontsDir(), "JetBrainsMono-Regular.ttf");
+    auto font_path = fs.combinePath(fs.getFontsDir(),
+                                    "JetBrainsMono-Regular.ttf");
     auto font = vsg::read_cast<vsg::Font>(font_path, vsg_options);
-    auto text_shader_set = vsg_options->shaderSets["text"]
-        = vsg::createTextShaderSet(vsg_options);
+    auto text_shader_set = vsg_options->shaderSets["text"] =
+        vsg::createTextShaderSet(vsg_options);
 
     const traj_list_t* traj_list = topology->getTrajectoriesList();
     for (const Trajectory* trajectory : *traj_list)
@@ -532,12 +454,10 @@ bool Route::load_topology()
 
         for (const track_t& track : tracks)
         {
-            const dvec3& p = track.begin_point;
-            points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
+            points.emplace_back(track.begin_point);
         }
 
-        const dvec3& p = tracks.back().end_point;
-        points.emplace_back(vsg::dvec3{p.x, p.y, p.z});
+        points.emplace_back(tracks.back().end_point);
 
         const auto vertices = vsg::vec3Array::create(points_size * 2);
         const auto colors = vsg::vec3Array::create(points_size * 2);
@@ -555,8 +475,8 @@ bool Route::load_topology()
         for (std::size_t i = 0; i < points_size; ++i)
         {
             vertices->at(vertex_index++) = points[i];
-            vertices->at(vertex_index++)
-                = points[i] + vsg::dvec3(0.0, 0.0, 10.0);
+            vertices->at(vertex_index++) = points[i] +
+                                           vsg::dvec3(0.0, 0.0, 10.0);
             colors->at(color_index++) = color;
             colors->at(color_index++) = color;
             indices->at(index_index++) = i * 2;
@@ -592,16 +512,22 @@ bool Route::load_topology()
         auto text = vsg::Text::create();
         text->font = font;
         text->layout = layout;
-        text->text = vsg::stringValue::create(
-            trajectory->getName().toStdString().c_str());
+        text->text = vsg::stringValue::create(trajectory->getName()
+                                                  .toStdString().c_str());
         text->setup(0, vsg_options);
         group->addChild(text);
     }
 
     group->addChild(state_group);
 
-    editor_ctx.compile_info_switch_nodes.lock()->emplace_back(
-        CompileInfoSwitchNode{vsg::ref_ptr(this), group, vsg::Mask{MASK_GUI2}});
+    auto& viewer = editor_ctx.viewer;
+    vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
+    auto compile_result = viewer->compileManager->compile(group);
+
+    viewer->addUpdateOperation(MergeSwitch::create(observer_viewer,
+                                                   vsg::ref_ptr(this),
+                                                   vsg::Mask{MASK_GUI2}, group,
+                                                   compile_result));
 
     return true;
 }

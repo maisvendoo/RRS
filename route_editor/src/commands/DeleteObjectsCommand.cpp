@@ -1,12 +1,15 @@
 #include "editor/commands/DeleteObjectsCommand.h"
 
+#include "editor/MergeSwitch.h"
 #include "editor/commands/Command.h"
 #include "editor/EditorContext.h"
 #include "editor/Gizmo.h"
 #include "editor/Route.h"
 #include "editor/RouteObject.h"
 
+#include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
+#include <vsg/core/observer_ptr.h>
 #include <vsg/nodes/Switch.h>
 
 #include <algorithm>
@@ -47,14 +50,18 @@ void DeleteObjectsCommand::execute()
 
 void DeleteObjectsCommand::undo()
 {
-    auto compile_infos = editor_ctx.compile_info_switch_nodes.lock();
     auto static_objects = editor_ctx.static_objects.lock();
+
+    auto& viewer = editor_ctx.viewer;
+    vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
 
     for (const auto& object : objects)
     {
-        compile_infos->emplace_back(CompileInfoSwitchNode{editor_ctx.route,
-                                                          object,
-                                                          vsg::MASK_ALL});
+        auto compile_result = viewer->compileManager->compile(object);
+        viewer->addUpdateOperation(MergeSwitch::create(observer_viewer,
+                                                       editor_ctx.route,
+                                                       vsg::MASK_ALL, object,
+                                                       compile_result));
 
         static_objects->emplace_back(object);
 

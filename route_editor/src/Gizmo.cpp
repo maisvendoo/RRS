@@ -5,7 +5,6 @@
 #include "editor/Mask.h"
 #include "editor/Mouse.h"
 #include "editor/RouteObject.h"
-#include "editor/SingleSwitch.h"
 #include "editor/commands/CommandManager.h"
 #include "editor/commands/TranslateObjectsCommand.h"
 #include "editor/editor_math.h"
@@ -19,6 +18,7 @@
 #include <vsg/nodes/Group.h>
 #include <vsg/nodes/MatrixTransform.h>
 #include <vsg/nodes/Node.h>
+#include <vsg/nodes/Switch.h>
 #include <vsg/ui/PointerEvent.h>
 #include <vsg/utils/Builder.h>
 #include <vsg/utils/LineSegmentIntersector.h>
@@ -52,9 +52,9 @@ static void rotate_geometry_info(vsg::GeometryInfo& geom_info,
 
 Gizmo::Gizmo(EditorContext& editor_ctx)
     : editor_ctx(editor_ctx)
+    , camera(*editor_ctx.camera)
+    , gizmo_settings(editor_ctx.gizmo_settings)
 {
-    const auto& gizmo_settings = editor_ctx.gizmo_settings;
-
     builder.shaderSet = vsg::createFlatShadedShaderSet();
 
     const float plane_width = 1.0e6f;
@@ -135,27 +135,27 @@ Gizmo::Gizmo(EditorContext& editor_ctx)
         = {gizmo_settings.arrow_x_color, gizmo_settings.arrow_y_color,
            gizmo_settings.arrow_z_color};
 
+    planes_switch = vsg::Switch::create();
+    lines_switch = vsg::Switch::create();
+
     for (int i = 0; i < 3; ++i)
     {
         arrows[i] = create_arrow(arrow_directions[i], arrow_colors[i]);
-        plane_switches[i] = SingleSwitch::create(
-            vsg::MASK_OFF, create_plane(arrow_directions[i]));
-        line_switches[i] = SingleSwitch::create(
-            vsg::MASK_OFF, create_line(arrow_directions[i], arrow_colors[i]));
+        planes_switch->addChild(vsg::MASK_OFF, create_plane(arrow_directions[i]));
+        lines_switch->addChild(vsg::MASK_OFF, create_line(arrow_directions[i], arrow_colors[i]));
         matrix_transform->addChild(arrows[i]);
-        matrix_transform->addChild(plane_switches[i]);
-        matrix_transform->addChild(line_switches[i]);
     }
 
-    this->node = matrix_transform;
+    matrix_transform->addChild(planes_switch);
+    matrix_transform->addChild(lines_switch);
+
+    this->addChild(vsg::MASK_OFF, matrix_transform);
 
     update_visibility();
 }
 
 bool Gizmo::handle_intersections()
 {
-    const auto& camera = editor_ctx.camera;
-    const auto& gizmo_settings = editor_ctx.gizmo_settings;
     const auto& mouse = editor_ctx.mouse;
     const auto& window_extent = editor_ctx.window->extent2D();
 
@@ -164,8 +164,7 @@ bool Gizmo::handle_intersections()
     double arrow_dots[3];
     for (int i = 0; i < 3; ++i)
     {
-        arrow_dots[i] = std::abs(vsg::dot(camera->get_front(),
-                                          arrow_directions[i]));
+        arrow_dots[i] = std::abs(vsg::dot(camera.get_front(), arrow_directions[i]));
     }
 
     // Normalized mouse coordinates [-1.0; 1.0]
@@ -173,8 +172,8 @@ bool Gizmo::handle_intersections()
     norm_mouse_coords(mouse->get_x(), mouse->get_y(), window_extent,
                       norm_mouse_x, norm_mouse_y);
 
-    const vsg::dmat4& inv_view_mat = camera->get_inv_view_mat();
-    const vsg::dmat4& inv_proj_mat = camera->get_inv_proj_mat();
+    const vsg::dmat4& inv_view_mat = camera.get_inv_view_mat();
+    const vsg::dmat4& inv_proj_mat = camera.get_inv_proj_mat();
 
     vsg::dvec3 ray_origin, ray_end;
     calc_mouse_world_coords(norm_mouse_x, norm_mouse_y, 0.0, inv_view_mat,
@@ -376,8 +375,8 @@ bool Gizmo::handle_intersections()
         prev_intersect_pos = click_pos;
         total_translation.set(0.0, 0.0, 0.0);
 
-        plane_switches[active_plain_index]->mask = MASK_CLICKABLE;
-        line_switches[active_arrow_index]->mask = MASK_GUI1;
+        planes_switch->children[active_plain_index].mask = MASK_CLICKABLE;
+        lines_switch->children[active_arrow_index].mask = MASK_GUI1;
 
         for (const auto& object : editor_ctx.selected_objects)
         {
@@ -401,8 +400,8 @@ void Gizmo::apply(const vsg::ButtonReleaseEvent& buttonRelease)
         editor_ctx, editor_ctx.selected_objects, total_translation);
     editor_ctx.command_manager->push(std::move(command));
 
-    plane_switches[active_plain_index]->mask = vsg::MASK_OFF;
-    line_switches[active_arrow_index]->mask = vsg::MASK_OFF;
+    planes_switch->children[active_plain_index].mask = vsg::MASK_OFF;
+    lines_switch->children[active_arrow_index].mask = vsg::MASK_OFF;
 
     active_arrow_index = -1;
     active_plain_index = -1;
@@ -415,11 +414,8 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
         return;
     }
 
-    const auto& camera = editor_ctx.camera;
-
-    const auto intersector = vsg::LineSegmentIntersector::create(*camera,
-                                                                 moveEvent.x,
-                                                                 moveEvent.y);
+    const auto intersector = vsg::LineSegmentIntersector::create(
+        camera, moveEvent.x, moveEvent.y);
 
     if (!intersector)
     {
@@ -447,7 +443,7 @@ void Gizmo::apply(const vsg::MoveEvent& moveEvent)
 
     for (const vsg::Node* const node : intersection->nodePath)
     {
-        if ((node != plane_switches[active_plain_index]) ||
+        if ((node != planes_switch->children[active_plain_index].node) ||
             (active_arrow_index < 0))
         {
             continue;
@@ -480,14 +476,12 @@ const vsg::dvec3& Gizmo::get_curr_pos() const
 
 void Gizmo::update_visibility()
 {
-    this->mask = editor_ctx.selected_objects.empty()
-                    ? vsg::MASK_OFF
-                    : MASK_GUI1 | MASK_CLICKABLE;
+    this->children[0].mask = editor_ctx.selected_objects.empty()
+                                 ? vsg::MASK_OFF
+                                 : MASK_GUI1 | MASK_CLICKABLE;
 
-    const auto& camera = editor_ctx.camera;
-
-    const vsg::dvec3& camera_pos = camera->get_look_at()->eye;
-    const double fov_rad = vsg::radians(camera->get_perspective()->fieldOfViewY);
+    const vsg::dvec3& camera_pos = camera.get_look_at()->eye;
+    const double fov_rad = vsg::radians(camera.get_perspective()->fieldOfViewY);
 
     const double dist_to_camera = vsg::length(curr_pos - camera_pos);
     const double tan_half_fov = std::tan(fov_rad * 0.5);
@@ -521,7 +515,6 @@ static vsg::dvec3 calc_position_center(const RouteObjects& selected_objects)
 
 void Gizmo::update_position()
 {
-    const auto& gizmo_settings = editor_ctx.gizmo_settings;
     const auto& selected_objects = editor_ctx.selected_objects;
 
     curr_pos = gizmo_settings.to_center ? calc_position_center(selected_objects)

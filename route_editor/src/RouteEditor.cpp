@@ -13,15 +13,14 @@
 #include "editor/Outline.h"
 #include "editor/Route.h"
 #include "editor/RouteObject.h"
-#include "editor/SingleSwitch.h"
 #include "editor/StateManager.h"
 #include "editor/StaticObjectManager.h"
 #include "editor/WindowHandler.h"
 #include "editor/commands/CommandManager.h"
+#include "editor/SingleSwitch.h"
 
 #include <CfgReader.h>
 #include <Journal.h>
-#include <JournalFile.h>
 #include <core/string_funcs.h>
 #include <filesystem.h>
 #include <graphics/WorldCulling.h>
@@ -37,8 +36,6 @@
 #include <vsg/commands/ClearAttachments.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
-#include <vsg/io/FileSystem.h>
-#include <vsg/io/Options.h>
 #include <vsg/lighting/AmbientLight.h>
 #include <vsg/state/ColorBlendState.h>
 #include <vsg/state/DepthStencilState.h>
@@ -53,14 +50,17 @@
 #include <vsg/utils/SharedObjects.h>
 #include <vsgImGui/RenderImGui.h>
 #include <vsgImGui/SendEventsToImGui.h>
-#include <vsgXchange/all.h>
 
 #include <vulkan/vulkan_core.h>
 
 #include <memory>
 #include <string>
 
-RouteEditor::RouteEditor() = default;
+RouteEditor::RouteEditor()
+{
+    read_settings("editor-settings.xml");
+}
+
 RouteEditor::~RouteEditor() = default;
 
 bool RouteEditor::initialize()
@@ -78,10 +78,9 @@ bool RouteEditor::initialize()
     const auto& scene_settings = editor_ctx.scene_settings;
     auto& state_manager = editor_ctx.state_manager;
     auto& window = editor_ctx.window;
+    auto& viewer = editor_ctx.viewer;
 
-    initialize_journal();
-    read_settings();
-    create_vsg_options();
+    editor_ctx.vsg_options = create_default_vsg_options();
     configure_shaders();
 
     window_handler_ = WindowHandler::create(editor_ctx);
@@ -156,7 +155,7 @@ bool RouteEditor::initialize()
     viewer->addEventHandler(close_handler);
     viewer->addEventHandler(window_handler_);
     viewer->addEventHandler(mouse);
-    viewer->addEventHandler(EventHandler::create(state_manager));
+    viewer->addEventHandler(EventHandler::create(*state_manager));
     viewer->addEventHandler(object_selector);
 
     viewer->assignRecordAndSubmitTaskAndPresentation({command_graph});
@@ -173,6 +172,8 @@ bool RouteEditor::initialize()
 
 void RouteEditor::run()
 {
+    const auto& viewer = editor_ctx.viewer;
+
     while (viewer->advanceToNextFrame())
     {
         static double prev_time = viewer->getFrameStamp()->simulationTime;
@@ -217,39 +218,17 @@ void RouteEditor::run()
     }
 }
 
-void RouteEditor::initialize_journal(const char* filename) const
+void RouteEditor::read_settings(const char* filename)
 {
     const FileSystem& fs = FileSystem::getInstance();
+    const std::string cfg_path = fs.combinePath(fs.getConfigDir(), filename);
 
-    JournalFile* const journal_file = new (std::nothrow)
-        JournalFile(to_qstring(fs.combinePath(fs.getLogsDir(), filename)),
-                    JournalLevel::All);
-
-    if (!journal_file)
-    {
-        std::fputs("Failed to allocate memory for JournalFile\n", stderr);
-        std::exit(EXIT_FAILURE);
-    }
-
-    Journal::instance()->addStorage(journal_file);
-
-    const QString dash_line = QString('=').repeated(80);
-
-    Journal::instance()->message(dash_line);
-    Journal::instance()->message("Started new session");
-    Journal::instance()->message("Journal subsystem is initialized successfully");
-    Journal::instance()->message(dash_line);
-}
-
-void RouteEditor::read_settings()
-{
-    const FileSystem& fs = FileSystem::getInstance();
-    const std::string cfg_path = fs.combinePath(fs.getConfigDir(),
-                                                "editor-settings.xml");
-
-    CfgReader cfg;
+    CfgReader cfg{};
     if (!cfg.load(cfg_path.c_str()))
     {
+        Journal::instance()->warning(
+            QString{"Failed to read settings from \"%1\"\n"
+                    "Using default settings"}.arg(cfg_path.c_str()));
         return;
     }
 
@@ -259,17 +238,6 @@ void RouteEditor::read_settings()
     editor_ctx.scene_settings.read(cfg);
     editor_ctx.window_settings.read(cfg);
     editor_ctx.key_bindings.read(cfg);
-}
-
-void RouteEditor::create_vsg_options()
-{
-    auto& vsg_options = editor_ctx.vsg_options;
-
-    vsg_options = vsg::Options::create();
-    vsg_options->sharedObjects = vsg::SharedObjects::create();
-    vsg_options->fileCache = vsg::getEnv("VSG_FILE_CACHE");
-    vsg_options->paths = vsg::getEnvPaths("VSG_FILE_PATH");
-    vsg_options->add(vsgXchange::all::create());
 }
 
 void RouteEditor::configure_shaders()
@@ -321,6 +289,8 @@ void RouteEditor::configure_shaders()
 
 void RouteEditor::compile_models()
 {
+    const auto& viewer = editor_ctx.viewer;
+
     auto& compile_manager = viewer->compileManager;
 
     vsg::CompileResult compile_result;
@@ -330,28 +300,6 @@ void RouteEditor::compile_models()
         for (auto& compile_info : *compile_infos)
         {
             compile_result.add(compile_manager->compile(compile_info.node));
-        }
-        compile_infos->clear();
-    }
-
-    {
-        auto compile_infos = editor_ctx.compile_info_group_nodes.lock();
-        for (auto& compile_info : *compile_infos)
-        {
-            auto& node = compile_info.node;
-            compile_info.group->addChild(node);
-            compile_result.add(compile_manager->compile(node));
-        }
-        compile_infos->clear();
-    }
-
-    {
-        auto compile_infos = editor_ctx.compile_info_switch_nodes.lock();
-        for (auto& compile_info : *compile_infos)
-        {
-            auto& node = compile_info.node;
-            compile_info.vsg_switch->addChild(compile_info.mask, node);
-            compile_result.add(compile_manager->compile(node));
         }
         compile_infos->clear();
     }

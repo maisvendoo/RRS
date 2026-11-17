@@ -12,6 +12,7 @@
  * \date 17/12/2018
  */
 
+#include    <filesystem.h>
 #include    "mainwindow.h"
 #include    <QApplication>
 #include    <QTranslator>
@@ -26,7 +27,10 @@
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-    setup_crash_handler("../logs/launcher-crash.log");
+    const FileSystem& fs = FileSystem::getInstance();
+    const std::string log_path = fs.combinePath(fs.getLogsDir(),
+                                                "launcher-crash.log");
+    setup_crash_handler(log_path.c_str());
 
     QApplication a(argc, argv);
     QTranslator translator;

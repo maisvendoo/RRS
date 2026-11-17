@@ -1,5 +1,5 @@
-#ifndef OUTLINE_H
-#define OUTLINE_H
+#ifndef EDITOR_OUTLINE_H
+#define EDITOR_OUTLINE_H
 
 #include <vsg/core/Inherit.h>
 #include <vsg/core/ref_ptr.h>
@@ -11,7 +11,6 @@ namespace vsg
 {
 
 class Node;
-class Options;
 class PagedLOD;
 
 } // namespace vsg
@@ -21,12 +20,11 @@ class OutlineBuilder : public vsg::Inherit<vsg::Object, OutlineBuilder>
 public:
     OutlineBuilder();
 
-    vsg::ref_ptr<vsg::Node>
-    create_outline(const vsg::ref_ptr<vsg::PagedLOD>& paged_lod);
+    vsg::ref_ptr<vsg::Node> create_outline(
+        const vsg::ref_ptr<vsg::PagedLOD>& paged_lod);
 
 private:
-    vsg::ref_ptr<vsg::Options> vsg_options;
-    vsg::Builder builder_;
+    vsg::Builder builder;
 };
 
-#endif // OUTLINE_H
+#endif // EDITOR_OUTLINE_H

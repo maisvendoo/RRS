@@ -1,6 +1,6 @@
 #include    <Application.h>
 #include    <filesystem.h>
-#include    <core/Logger.h>
+#include    "Logger.h"
 
 #include    <chrono>
 

@@ -33,6 +33,7 @@ add_subdirectory (libJournal)
 add_subdirectory (network)
 add_subdirectory (parsing)
 add_subdirectory (core)
+add_subdirectory (RouteReader)
 
 add_subdirectory (simulator)
 
