@@ -47,6 +47,9 @@ private:
     bool ref_connected = false;
     bool is_connected = false;
 
+    /// Резерв длины до рассоединения
+    double length_reserve = 0.0;
+
     /// Расчёт соединения рукавов
     void stepConnectionCheck();
 

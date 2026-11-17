@@ -50,6 +50,9 @@ private:
     /// Количество соединений линий ЭПТ
     size_t epb_connected_num;
 
+    /// Резерв длины до рассоединения
+    double length_reserve = 0.0;
+
     /// Расчёт соединения рукавов
     void stepConnectionCheck();
 

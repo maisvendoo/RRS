@@ -96,7 +96,27 @@ void JointPneumoHoseEPB::stepConnectionCheck()
         || ((len + len_fwd - len_bwd) < Physics::ZERO)
         || ((len_bwd + len - len_fwd) < Physics::ZERO))
     {
-        reset();
+        if ((length_reserve + len_fwd + len_bwd - len) < 0.0)
+        {
+            // Допускаем небольшой запас на случай неудачного вписывания в кривые
+            // Тянем рукава друг к другу, не разъединяем
+            point_fwd.x = point_bwd.x = (   devices[FWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_X)
+                                         + devices[BWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_X) )
+                                        / 2.0;
+            point_fwd.y = point_bwd.y = (   devices[FWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_Y)
+                                         + devices[BWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_Y) )
+                                        / 2.0;
+            point_fwd.z = point_bwd.z = (   devices[FWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_Z)
+                                         + devices[BWD]->getOutputSignal(HOSE_OUTPUT_ROOT_COORD_Z) )
+                                        / 2.0;
+            fwd_angle = 0.0;
+            bwd_angle = 0.0;
+        }
+        else
+        {
+            // Не дотянулись и с учётом запаса, разъединяем
+            reset();
+        }
         apply();
         return;
     }
@@ -262,6 +282,8 @@ void JointPneumoHoseEPB::load_config(CfgReader &cfg)
     QString secName = "Joint";
     cfg.getBool(secName, "initConnectionState", is_connected);
     ref_connected = is_connected;
+
+    cfg.getDouble(secName, "LengthReserve", length_reserve);
 }
 
 GET_MODULE(JointPneumoHoseEPB)
