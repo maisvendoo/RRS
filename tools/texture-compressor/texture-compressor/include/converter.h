@@ -31,6 +31,7 @@ private:
         METALLIC_ROUGHNESS,
         NORMAL,
         OCCLUSION,
+        ORM,        ///< Совмещённая карта: R - occlusion, G - roughness, B - metallic
         UNKNOWN
     };
 
@@ -41,6 +42,7 @@ private:
         uint32_t qualityLevel = 128;
         bool isNormalMap = false;
         bool isSRGB = false;
+        bool isORM = false;
     };
 
     bool compress_to_ktx2(const fs::path& src_img,

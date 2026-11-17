@@ -41,7 +41,7 @@ public:
     /// Kilometers per hour coefficient
     static constexpr double kmh = 3.6;
     /// PI number
-    static constexpr double PI = 3.1415926;
+    static constexpr double PI = 3.1415926535898;
     /// Megapascales coefficient
     static constexpr double MPa = 1.0e6;
     /// Universal gas constant

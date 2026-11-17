@@ -557,7 +557,7 @@
     {
       "bufferView": 64,
       "componentType": 5126,
-      "count": 3240,
+      "count": 3272,
       "max": [
         1.6371300220489502,
         5.0069499015808105,
@@ -573,19 +573,19 @@
     {
       "bufferView": 65,
       "componentType": 5126,
-      "count": 3240,
+      "count": 3272,
       "type": "VEC3"
     },
     {
       "bufferView": 66,
       "componentType": 5126,
-      "count": 3240,
+      "count": 3272,
       "type": "VEC2"
     },
     {
       "bufferView": 67,
       "componentType": 5123,
-      "count": 3240,
+      "count": 3324,
       "type": "SCALAR"
     },
     {
@@ -1098,110 +1098,110 @@
     },
     {
       "buffer": 0,
-      "byteLength": 38880,
+      "byteLength": 39264,
       "byteOffset": 167744,
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteLength": 38880,
-      "byteOffset": 206624,
+      "byteLength": 39264,
+      "byteOffset": 207008,
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteLength": 25920,
-      "byteOffset": 245504,
+      "byteLength": 26176,
+      "byteOffset": 246272,
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteLength": 6480,
-      "byteOffset": 271424,
+      "byteLength": 6648,
+      "byteOffset": 272448,
       "target": 34963
     },
     {
       "buffer": 0,
       "byteLength": 8784,
-      "byteOffset": 277904,
+      "byteOffset": 279096,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 8784,
-      "byteOffset": 286688,
+      "byteOffset": 287880,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 5856,
-      "byteOffset": 295472,
+      "byteOffset": 296664,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 1464,
-      "byteOffset": 301328,
+      "byteOffset": 302520,
       "target": 34963
     },
     {
       "buffer": 0,
       "byteLength": 8784,
-      "byteOffset": 302792,
+      "byteOffset": 303984,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 8784,
-      "byteOffset": 311576,
+      "byteOffset": 312768,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 5856,
-      "byteOffset": 320360,
+      "byteOffset": 321552,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 8784,
-      "byteOffset": 326216,
+      "byteOffset": 327408,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 8784,
-      "byteOffset": 335000,
+      "byteOffset": 336192,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 5856,
-      "byteOffset": 343784,
+      "byteOffset": 344976,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 8784,
-      "byteOffset": 349640,
+      "byteOffset": 350832,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 8784,
-      "byteOffset": 358424,
+      "byteOffset": 359616,
       "target": 34962
     },
     {
       "buffer": 0,
       "byteLength": 5856,
-      "byteOffset": 367208,
+      "byteOffset": 368400,
       "target": 34962
     }
   ],
   "buffers": [
     {
-      "byteLength": 373064,
+      "byteLength": 374256,
       "uri": "Fr_hopper-1.bin"
     }
   ],
@@ -1248,7 +1248,7 @@
     },
     {
       "doubleSided": true,
-      "name": "Red",
+      "name": "Red.001",
       "pbrMetallicRoughness": {
         "baseColorFactor": [
           0.8000074625015259,
@@ -1262,7 +1262,7 @@
     },
     {
       "doubleSided": true,
-      "name": "Rubber",
+      "name": "Rubber.001",
       "pbrMetallicRoughness": {
         "baseColorFactor": [
           0,
@@ -1318,7 +1318,7 @@
       ]
     },
     {
-      "name": "Anglecock_handle",
+      "name": "BP_Anglecock_handle_R",
       "primitives": [
         {
           "attributes": {
@@ -1332,7 +1332,7 @@
       ]
     },
     {
-      "name": "Anglecock_body",
+      "name": "BP_Anglecock_body_R",
       "primitives": [
         {
           "attributes": {
@@ -1346,7 +1346,7 @@
       ]
     },
     {
-      "name": "Hose_40mm",
+      "name": "BP_Hose_40mm_begin",
       "primitives": [
         {
           "attributes": {
@@ -1360,7 +1360,7 @@
       ]
     },
     {
-      "name": "Hose_67.5mm",
+      "name": "BP_Hose_67.5mm_begin",
       "primitives": [
         {
           "attributes": {
@@ -1374,7 +1374,7 @@
       ]
     },
     {
-      "name": "Hose_67.5mm_end",
+      "name": "BP_Hose_67.5mm_end",
       "primitives": [
         {
           "attributes": {
@@ -1388,7 +1388,7 @@
       ]
     },
     {
-      "name": "Hose_clip_end",
+      "name": "BP_Hose_clip_end",
       "primitives": [
         {
           "attributes": {
@@ -1402,7 +1402,7 @@
       ]
     },
     {
-      "name": "Hose_lapped_end",
+      "name": "BP_Hose_lapped_end",
       "primitives": [
         {
           "attributes": {
@@ -1416,7 +1416,7 @@
       ]
     },
     {
-      "name": "Rubber_seal",
+      "name": "BP_Rubber_seal",
       "primitives": [
         {
           "attributes": {
@@ -1430,7 +1430,7 @@
       ]
     },
     {
-      "name": "Head_R1",
+      "name": "BP_Head_R1",
       "primitives": [
         {
           "attributes": {
@@ -1444,7 +1444,7 @@
       ]
     },
     {
-      "name": "Hose_40mm_end",
+      "name": "BP_Hose_40mm_end",
       "primitives": [
         {
           "attributes": {
@@ -1458,7 +1458,7 @@
       ]
     },
     {
-      "name": "Hose_300mm",
+      "name": "BP_Hose_300mm",
       "primitives": [
         {
           "attributes": {
@@ -1472,7 +1472,7 @@
       ]
     },
     {
-      "name": "Hose_clip_begin",
+      "name": "BP_Hose_clip_begin",
       "primitives": [
         {
           "attributes": {
@@ -1486,7 +1486,7 @@
       ]
     },
     {
-      "name": "Hose_lapped_begin",
+      "name": "BP_Hose_lapped_begin",
       "primitives": [
         {
           "attributes": {
@@ -1500,7 +1500,7 @@
       ]
     },
     {
-      "name": "Root_screw",
+      "name": "BP_Root_screw",
       "primitives": [
         {
           "attributes": {
@@ -1601,8 +1601,8 @@
       "mesh": 3,
       "name": "BP_bwd_Anglecock_handle",
       "translation": [
-        0.04600003361701965,
-        -0.00700001185759902,
+        0.04600004106760025,
+        -0.007000023499131203,
         0
       ]
     },
@@ -1614,8 +1614,8 @@
       "name": "BP_bwd_Anglecock_body",
       "translation": [
         0,
-        0.1509619802236557,
-        0.0399608239531517
+        0.1509619653224945,
+        0.039961300790309906
       ]
     },
     {
@@ -1676,7 +1676,7 @@
       "translation": [
         -0.010000646114349365,
         0.0125478096306324,
-        0.09108278155326843
+        0.09108230471611023
       ]
     },
     {
@@ -1698,8 +1698,8 @@
       ],
       "translation": [
         0.01000022329390049,
-        0.025584308430552483,
-        -0.16000081598758698
+        0.02558407001197338,
+        -0.16000033915042877
       ]
     },
     {
@@ -1763,7 +1763,7 @@
       "translation": [
         0,
         0,
-        -0.04400031268596649
+        -0.04399983584880829
       ]
     },
     {
@@ -1807,7 +1807,7 @@
       "translation": [
         0.30000001192092896,
         0.800000011920929,
-        6.900000095367432
+        7.050000190734863
       ]
     },
     {
@@ -1828,7 +1828,7 @@
       "translation": [
         0,
         0.15096187591552734,
-        0.03996086120605469
+        0.03996133804321289
       ]
     },
     {
@@ -1887,8 +1887,8 @@
         6.168335175971151e-08
       ],
       "translation": [
-        -0.010000621899962425,
-        0.012547837570309639,
+        -0.010001098737120628,
+        0.012547867372632027,
         0.09108319878578186
       ]
     },
@@ -1912,7 +1912,7 @@
       "translation": [
         0.009999759495258331,
         0.025583842769265175,
-        -0.16000036895275116
+        -0.16000084578990936
       ]
     },
     {
@@ -1921,7 +1921,7 @@
       "translation": [
         0,
         0,
-        -0.04500053822994232
+        -0.045001015067100525
       ]
     },
     {
@@ -1933,7 +1933,7 @@
       "translation": [
         0,
         0,
-        -0.4349997639656067
+        -0.4350002408027649
       ]
     },
     {
@@ -1988,7 +1988,7 @@
       "translation": [
         0,
         0,
-        0.11499994993209839
+        0.11500042676925659
       ]
     },
     {
@@ -2014,7 +2014,7 @@
       "translation": [
         -0.30000001192092896,
         0.800000011920929,
-        -6.900000095367432
+        -7.050000190734863
       ]
     },
     {

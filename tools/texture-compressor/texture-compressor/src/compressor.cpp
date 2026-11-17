@@ -13,6 +13,7 @@
 #include    <split-by-comma.h>
 
 #include    <filesystem>
+#include    <set>
 #include    <vulkan/vulkan.h>
 #include    <nlohmann/json.hpp>
 
@@ -82,16 +83,26 @@ bool compress_to_ktx2(const fs::path& src_img,
         return false;
     }
 
-    // Загружаем базовый уровень (0)
+    // Загружаем базовый уровень (0). Данные всегда RGBA (w*h*4), формат
+    // ci.vkFormat выбран RGBA-совместимым (см. parse_gltf_textures),
+    // поэтому объём данных совпадает с форматом.
     auto* baseTex = ktxTexture(texture);
-    ktxTexture_SetImageFromMemory(baseTex, 0, 0, 0, data, w * h * 4);
+    result = ktxTexture_SetImageFromMemory(baseTex, 0, 0, 0, data, w * h * 4);
 
-    // Массив под указатели на данные всех уровней, не удаляем эти данные до сжатия
-    // и сохранения текстуры на диск!
-    std::vector<stbi_uc *> levels_data;
+    if (result != KTX_SUCCESS)
+    {
+        std::cerr << "[ERR] Failed to set base image data: " << result << std::endl;
+        ktxTexture_Destroy(ktxTexture(texture));
+        stbi_image_free(data);
+        return false;
+    }
 
-    // Если нужны мипы — генерируем их вручную, последовательно уменашая
-    // рзмеры текструы в два раза на каждом уровне
+    // Буферы мип-уровней выделяются через new[] и освобождаются через delete[].
+    // Исходные данные (data) приходят из stbi_load и освобождаются stbi_image_free.
+    std::vector<stbi_uc *> mip_buffers;
+
+    // Если нужны мипы — генерируем их вручную, последовательно уменьшая
+    // размеры текстуры в два раза на каждом уровне
     if (generate_mipmaps && ci.numLevels > 1)
     {
         stbi_uc* prevLevelData = data;
@@ -99,8 +110,6 @@ bool compress_to_ktx2(const fs::path& src_img,
 
         for (uint32_t level = 1; level < ci.numLevels; ++level)
         {
-            levels_data.push_back(prevLevelData);
-
             uint32_t curW = std::max(1u, prevW >> 1);
             uint32_t curH = std::max(1u, prevH >> 1);
 
@@ -113,11 +122,24 @@ bool compress_to_ktx2(const fs::path& src_img,
                 );
 
             // Загружаем уровень в ktxTexture
-            ktxTexture_SetImageFromMemory(
+            result = ktxTexture_SetImageFromMemory(
                 baseTex, level, 0, 0,
                 resized, curW * curH * 4
                 );
 
+            if (result != KTX_SUCCESS)
+            {
+                std::cerr << "[ERR] Failed to set image data for mip level "
+                          << level << ": " << result << std::endl;
+                delete[] resized;
+                for (auto* b : mip_buffers)
+                    delete[] b;
+                ktxTexture_Destroy(ktxTexture(texture));
+                stbi_image_free(data);
+                return false;
+            }
+
+            mip_buffers.push_back(resized);
             prevLevelData = resized;
             prevW = curW;
             prevH = curH;
@@ -128,12 +150,13 @@ bool compress_to_ktx2(const fs::path& src_img,
     ktxBasisParams params = {};
     params.structSize = sizeof(ktxBasisParams);
 
-    // КРИТИЧНО: Обязательно устанавливаем уровень сжатия ETC1S
-    // Ваше значение 1 - допустимо, но используйте константу для ясности
-    params.etc1sCompressionLevel = 2; // KTX_ETC1S_DEFAULT_COMPRESSION_LEVEL = 2
-
-    // --encode basis-lz
+    // --encode basis-lz (ETC1S) для всех карт
     params.codec = KTX_BASIS_CODEC_ETC1S;
+
+    // Параметры ETC1S
+    // Уровень 1 (не 2): уровень 2 на больших однотонных текстурах (стены салона)
+    // смещает хроматику к красному (розовый оттенок). Проверено на libktx.
+    params.etc1sCompressionLevel = 1;
 
     // --qlevel (по умолчанию 128)
     params.qualityLevel = cfg.qualityLevel;
@@ -164,10 +187,26 @@ bool compress_to_ktx2(const fs::path& src_img,
     } else
     {
         params.normalMap = KTX_FALSE;
-        params.endpointRDOThreshold = 1.25f;
-        params.selectorRDOThreshold = 1.25f;
-        params.noEndpointRDO = KTX_FALSE;
-        params.noSelectorRDO = KTX_FALSE;
+
+        // Карты с данными roughness/metallic/AO чувствительны к RDO-оптимизации —
+        // отключаем её, чтобы не искажать каналы.
+        const bool is_data_map =
+            cfg.isORM ||
+            cfg.role == PBRTextureRole::METALLIC_ROUGHNESS ||
+            cfg.role == PBRTextureRole::OCCLUSION;
+
+        if (is_data_map)
+        {
+            params.noEndpointRDO = KTX_TRUE;
+            params.noSelectorRDO = KTX_TRUE;
+        }
+        else
+        {
+            params.endpointRDOThreshold = 1.25f;
+            params.selectorRDOThreshold = 1.25f;
+            params.noEndpointRDO = KTX_FALSE;
+            params.noSelectorRDO = KTX_FALSE;
+        }
     }
 
     params.verbose = KTX_FALSE;
@@ -178,6 +217,10 @@ bool compress_to_ktx2(const fs::path& src_img,
     if (result != KTX_SUCCESS)
     {
         std::cerr << "[ERR] Failed to compress texture: " << result << std::endl;
+        ktxTexture_Destroy(ktxTexture(texture));
+        for (auto* b : mip_buffers)
+            delete[] b;
+        stbi_image_free(data);
         return false;
     }
 
@@ -186,19 +229,25 @@ bool compress_to_ktx2(const fs::path& src_img,
     if (result != KTX_SUCCESS)
     {
         std::cerr << "[ERR] Failed to write file: " << result << std::endl;
+        ktxTexture_Destroy(ktxTexture(texture));
+        for (auto* b : mip_buffers)
+            delete[] b;
+        stbi_image_free(data);
         return false;
     }
 
     // Уничтожаем текстуру в памяти
     ktxTexture_Destroy(ktxTexture(texture));
 
-    // Освобождаем память всех мипмап-уровней
-    for (auto d : levels_data)
+    // Освобождаем буферы мип-уровней (new[] → delete[])
+    for (auto* b : mip_buffers)
     {
-        stbi_image_free(d);
+        delete[] b;
     }
 
-    // Уходим довольные, как слон, проделанной работой
+    // Освобождаем исходные данные, загруженные stbi_load
+    stbi_image_free(data);
+
     return true;
 }
 
@@ -210,28 +259,24 @@ std::map<int, TextureSettings> parse_gltf_textures(const json &gltf)
     std::map<int, TextureSettings> image_settings;
 
     if (!gltf.contains("textures") || !gltf["textures"].is_array() ||
-        !gltf.contains("materials") || !gltf["materials"].is_array())
+        !gltf.contains("materials") || !gltf["materials"].is_array() ||
+        !gltf.contains("images") || !gltf["images"].is_array())
     {
         return image_settings;
     }
 
-    auto set_role = [&](int tex_idx, PBRTextureRole role, uint32_t quality, bool is_srgb, bool is_normal) {
-        if (tex_idx < 0 || tex_idx >= gltf["textures"].size()) return;
-        int img_idx = gltf["textures"][tex_idx].value("source", -1);
-        if (img_idx < 0 || img_idx >= gltf["images"].size()) return;
+    // Собираем множество image-индексов по каждой роли из структуры материалов.
+    // Это позволяет однозначно определить совмещённую ORM-карту: один и тот же
+    // image подключён и как metallicRoughnessTexture, и как occlusionTexture.
+    std::set<int> used_mr;
+    std::set<int> used_occ;
+    std::set<int> used_base;
+    std::set<int> used_emis;
+    std::set<int> used_norm;
 
-        auto& settings = image_settings[img_idx];
-
-        // Приоритет: Normal > BaseColor > остальные. Не перезаписываем, если роль уже определена.
-        if (settings.role == PBRTextureRole::UNKNOWN || role == PBRTextureRole::NORMAL)
-        {
-            settings.role = role;
-            settings.qualityLevel = quality;
-            settings.isNormalMap = is_normal;
-            settings.isSRGB = is_srgb;
-            settings.vkFormat = is_srgb ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
-            if (role == PBRTextureRole::OCCLUSION) settings.vkFormat = VK_FORMAT_R8_UNORM;
-        }
+    auto src_of = [&](int tex_idx) -> int {
+        if (tex_idx < 0 || tex_idx >= gltf["textures"].size()) return -1;
+        return gltf["textures"][tex_idx].value("source", -1);
     };
 
     for (const auto& mat : gltf["materials"])
@@ -240,20 +285,90 @@ std::map<int, TextureSettings> parse_gltf_textures(const json &gltf)
         {
             auto& pbr = mat["pbrMetallicRoughness"];
             if (pbr.contains("baseColorTexture"))
-                set_role(pbr["baseColorTexture"]["index"], PBRTextureRole::BASE_COLOR, 160, true, false);
-
+                used_base.insert(src_of(pbr["baseColorTexture"]["index"]));
             if (pbr.contains("metallicRoughnessTexture"))
-                set_role(pbr["metallicRoughnessTexture"]["index"], PBRTextureRole::METALLIC_ROUGHNESS, 128, false, false);
+                used_mr.insert(src_of(pbr["metallicRoughnessTexture"]["index"]));
         }
 
         if (mat.contains("normalTexture"))
-            set_role(mat["normalTexture"]["index"], PBRTextureRole::NORMAL, 192, false, true);
+            used_norm.insert(src_of(mat["normalTexture"]["index"]));
 
         if (mat.contains("emissiveTexture"))
-            set_role(mat["emissiveTexture"]["index"], PBRTextureRole::EMISSIVE, 128, true, false);
+            used_emis.insert(src_of(mat["emissiveTexture"]["index"]));
 
         if (mat.contains("occlusionTexture"))
-            set_role(mat["occlusionTexture"]["index"], PBRTextureRole::OCCLUSION, 96, false, false);
+            used_occ.insert(src_of(mat["occlusionTexture"]["index"]));
+    }
+
+    const int images_count = gltf["images"].size();
+
+    for (int img = 0; img < images_count; ++img)
+    {
+        const bool is_mr   = used_mr.count(img)   > 0;
+        const bool is_occ  = used_occ.count(img)  > 0;
+        const bool is_base = used_base.count(img) > 0;
+        const bool is_emis = used_emis.count(img) > 0;
+        const bool is_norm = used_norm.count(img) > 0;
+
+        auto& s = image_settings[img];
+
+        // Нормаль — самостоятельная роль, перекрывает остальные.
+        if (is_norm)
+        {
+            s.role = PBRTextureRole::NORMAL;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_UNORM;
+            s.qualityLevel = 192;
+            s.isNormalMap = true;
+            continue;
+        }
+
+        // Совмещённая ORM-карта: R - occlusion, G - roughness, B - metallic.
+        if (is_mr && is_occ)
+        {
+            s.role = PBRTextureRole::ORM;
+            s.isORM = true;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_UNORM;
+            s.qualityLevel = 128;
+            continue;
+        }
+
+        if (is_mr)
+        {
+            s.role = PBRTextureRole::METALLIC_ROUGHNESS;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_UNORM;
+            s.qualityLevel = 128;
+            continue;
+        }
+
+        // Отдельная AO-карта: не форсируем R8, чтобы объём данных RGBA
+        // (w*h*4) совпадал с форматом.
+        if (is_occ)
+        {
+            s.role = PBRTextureRole::OCCLUSION;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_UNORM;
+            s.qualityLevel = 96;
+            continue;
+        }
+
+        if (is_base)
+        {
+            s.role = PBRTextureRole::BASE_COLOR;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_SRGB;
+            s.qualityLevel = 160;
+            s.isSRGB = true;
+            continue;
+        }
+
+        if (is_emis)
+        {
+            s.role = PBRTextureRole::EMISSIVE;
+            s.vkFormat = VK_FORMAT_R8G8B8A8_SRGB;
+            s.qualityLevel = 128;
+            s.isSRGB = true;
+            continue;
+        }
+
+        s.role = PBRTextureRole::UNKNOWN;
     }
 
     return image_settings;

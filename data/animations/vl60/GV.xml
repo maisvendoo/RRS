@@ -3,7 +3,7 @@
 	<AnalogRotation>
 		<SignalID>100</SignalID>
 		<Duration>10.0</Duration>
-		<Axis>0.0 0.0 1.0</Axis>
+		<Axis>1.0 0.0 0.0</Axis>
 	</AnalogRotation>
 
 	<KeyPoint>
@@ -13,7 +13,7 @@
 
 	<KeyPoint>
 		<Param>1.0</Param>
-		<Value>60.0</Value>
+		<Value>58.0</Value>
 	</KeyPoint>
 
 </Config>

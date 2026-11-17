@@ -530,8 +530,8 @@ void PneumoHose::ode_system(const state_vector_t &Y,
     // Добавка к углу, чтобы развести головки на 1 сантиметр влево
     const double gap_angle = std::asin(side_gap / (len_mid + output_signals[HOSE_OUTPUT_LENGTH_HEAD]));
     // Углы к точке соединения
-    const double ref_side_angle = std::atan2(v_unit.x, v_unit.y) + gap_angle;
-    const double ref_down_angle = std::asin(v_unit.z);
+    const double ref_side_angle = gap_angle + ((v_unit.y < 0) ? (Physics::PI + std::atan2(v_unit.x, v_unit.y)) : (std::atan2(v_unit.x, v_unit.y)));
+    const double ref_down_angle = (v_unit.y < 0) ? (- Physics::PI - std::asin(v_unit.z)) : (std::asin(v_unit.z));
 
     if (state == DO_CONNECT)
     {
