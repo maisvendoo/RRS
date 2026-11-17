@@ -39,13 +39,13 @@ void FreightCar::initBrakeDevices(double p0, double pBP, double pFL)
     hose_bp_fwd->setPressure(pBP);
     hose_bp_bwd->setPressure(pBP);
 
-    int shared_idx = control_inputs.size() - 1;
+    int shared_idx = vc_inputs.size() - 1;
 
     // Сигнальные диски "Хвост грузового поезда"
     disk_end_of_train_fwd.setInitState(prev_vehicle == nullptr);
     disk_end_of_train_bwd.setInitState(next_vehicle == nullptr);
 
-    // Синхронизируем control_inputs со стартовым состоянием дисков,
+    // Синхронизируем vc_inputs со стартовым состоянием дисков,
     // чтобы stepControls не сбросил их после инициализации
     initClientInputSignal(shared_idx, CTRL_DISK_END_OF_TRAIN_FWD,
                           prev_vehicle == nullptr ? 1.0f : 0.0f);
