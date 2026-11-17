@@ -414,31 +414,31 @@ void Model::slotSetVehicleControlCommand(int vehicle_idx,
 
     if (vehicle != nullptr)
     {
-        if (!vehicle->control_inputs.empty())
+        if (!vehicle->vc_inputs.empty())
         {
-            if (cab_idx >= 0 && cab_idx < vehicle->control_inputs.size())
+            if (cab_idx >= 0 && cab_idx < static_cast<int>(vehicle->vc_inputs.size()))
             {
                 // Если приоритет пришедшего сигнала
                 // менее привелигированый - выходим ничего не меняя
-                if (prioriry > vehicle->control_inputs[cab_idx][id].server_priority)
+                if (prioriry > vehicle->vc_inputs.getPriority(cab_idx, id))
                 {
                     return;
                 }
 
                 // Если приоритет пришедшего сигнала
                 // более привелигированый - перехват управления
-                if (prioriry < vehicle->control_inputs[cab_idx][id].server_priority)
+                if (prioriry < vehicle->vc_inputs.getPriority(cab_idx, id))
                 {
-                    vehicle->control_inputs[cab_idx][id].server_priority = static_cast<ControlPriority>(prioriry);
+                    vehicle->vc_inputs.setPriority(cab_idx, id, static_cast<ControlPriority>(prioriry));
                 }
 
-                vehicle->control_inputs[cab_idx][id].value = value;
+                vehicle->vc_inputs.setValue(cab_idx, id, value);
 
-                if (params.size() <= vehicle->control_inputs[cab_idx][id].params.size())
+                if (params.size() <= vehicle->vc_inputs.getParamsSize(cab_idx, id))
                 {
                     for (size_t i = 0; i < params.size(); ++i)
                     {
-                        vehicle->control_inputs[cab_idx][id].params[i] = params[i];
+                        vehicle->vc_inputs.setParam(cab_idx, id, i, params[i]);
                     }
                 }
             }
@@ -482,13 +482,7 @@ void Model::slotSetVehicleControlPriority(int vehicle_idx, std::int8_t priority)
 
     if (vehicle != nullptr)
     {
-        for (auto &cab_inputs : vehicle->control_inputs)
-        {
-            for (auto it = cab_inputs.begin(); it != cab_inputs.end(); ++it)
-            {
-                it.value().server_priority = static_cast<ControlPriority>(priority);
-            }
-        }
+        vehicle->vc_inputs.setAllPriority(static_cast<ControlPriority>(priority));
         return;
     }
 }
