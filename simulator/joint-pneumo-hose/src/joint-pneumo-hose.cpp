@@ -96,7 +96,7 @@ void JointPneumoHose::stepConnectionCheck()
         || ((len + len_fwd - len_bwd) < 0.0)
         || ((len_bwd + len - len_fwd) < 0.0))
     {
-        if ((length_reserve + len_fwd + len_bwd - len) < 0.0)
+        if ((length_reserve + len_fwd + len_bwd - len) > 0.0)
         {
             // Допускаем небольшой запас на случай неудачного вписывания в кривые
             // Тянем рукава друг к другу, не разъединяем

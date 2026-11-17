@@ -92,11 +92,11 @@ void JointPneumoHoseEPB::stepConnectionCheck()
     const double len = length(coord_delta) - len_head_fwd - len_head_bwd;
 
     // Неравенства треугольника - если рукава не дотягиваются, разъединяем
-    if (   ((len_fwd + len_bwd - len) < Physics::ZERO)
-        || ((len + len_fwd - len_bwd) < Physics::ZERO)
-        || ((len_bwd + len - len_fwd) < Physics::ZERO))
+    if (   ((len_fwd + len_bwd - len) < 0.0)
+        || ((len + len_fwd - len_bwd) < 0.0)
+        || ((len_bwd + len - len_fwd) < 0.0))
     {
-        if ((length_reserve + len_fwd + len_bwd - len) < 0.0)
+        if (length_reserve + len_fwd + len_bwd - len > 0.0)
         {
             // Допускаем небольшой запас на случай неудачного вписывания в кривые
             // Тянем рукава друг к другу, не разъединяем

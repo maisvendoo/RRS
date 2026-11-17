@@ -7,6 +7,6 @@
 		<initConnectionState>1</initConnectionState>
 
 		<!-- Небольшой запас длины до разъединения рукавов, на случай неудачного вписывания в кривые -->
-		<LengthReserve>0.1</LengthReserve>
+		<LengthReserve>0.6</LengthReserve>
 	</Joint>
 </Config>
