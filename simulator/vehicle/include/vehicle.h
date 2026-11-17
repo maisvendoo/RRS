@@ -213,8 +213,6 @@ public:
 
     VehiclesControlSignalsContainer vc_inputs;
 
-    //std::vector<QMap<int, vehicle_control_signal_t>> control_inputs;
-
 signals:
 
     void sigGetTrainParams(int train_idx, double &train_len, double &train_mass);
