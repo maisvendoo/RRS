@@ -237,23 +237,23 @@ void Route::load_static_objects()
             const vsg::dvec3& pos = transform.pos;
             const vsg::dvec3& rot_deg = transform.rot_deg;
 
-            const auto object = RouteObject::create(editor_ctx, paged_lod,
-                                                    label, pos, -rot_deg);
+            // const auto object = RouteObject::create(editor_ctx, paged_lod,
+            //                                         label, pos, -rot_deg);
 
-            auto& viewer = editor_ctx.viewer;
-            vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
-            auto compile_result = viewer->compileManager->compile(object);
+            // auto& viewer = editor_ctx.viewer;
+            // vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
+            // auto compile_result = viewer->compileManager->compile(object);
 
-            viewer->addUpdateOperation(MergeSwitch::create(observer_viewer,
-                                                     vsg::ref_ptr(this),
-                                                     vsg::MASK_ALL, object,
-                                                     compile_result));
+            // viewer->addUpdateOperation(MergeSwitch::create(observer_viewer,
+            //                                          vsg::ref_ptr(this),
+            //                                          vsg::MASK_ALL, object,
+            //                                          compile_result));
 
-            editor_ctx.static_objects.lock()->emplace_back(object);
+            // editor_ctx.static_objects.lock()->emplace_back(object);
 
-            // auto& object_manager = editor_ctx.object_manager;
-            // object_manager->add_object(label, rel_path, paged_lod, pos, rot_deg,
-            //     vsg::dvec3{1.0, 1.0, 1.0});
+            auto& object_manager = editor_ctx.object_manager;
+            object_manager->add_object(label, rel_path, paged_lod, pos, rot_deg,
+                vsg::dvec3{1.0, 1.0, 1.0});
         }
     }
 }

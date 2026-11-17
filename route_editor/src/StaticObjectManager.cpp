@@ -234,9 +234,29 @@ void StaticObjectManager::move_object(std::size_t id,
     matrix[3][2] += delta_pos.z;
 }
 
+SparseSet& StaticObjectManager::get_selected_objects()
+{
+    return selected_objects;
+}
+
 const SparseSet& StaticObjectManager::get_selected_objects() const
 {
     return selected_objects;
+}
+
+bool StaticObjectManager::get_mat_transform_id(
+    const vsg::MatrixTransform* mat_transform, std::size_t& id)
+{
+    const auto found_it = mat_transform_to_id.find(mat_transform);
+    if (found_it == mat_transform_to_id.cend())
+    {
+        return false;
+    }
+    else
+    {
+        id = found_it->second;
+        return true;
+    }
 }
 
 std::size_t StaticObjectManager::get_object_count() const
