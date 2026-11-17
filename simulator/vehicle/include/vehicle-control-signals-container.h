@@ -3,35 +3,33 @@
 
 #include    <QMap>
 #include    <vector>
+#include    <control-priority.h>
 #include    <vehicle-control-signal.h>
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
 // Контейнер управляющих сигналов, принимаемых от IOController.
-// Обеспечивает безопасную работу с сигналами каждого транспортного средства,
-// хранящимися по кабинам. Последняя (общая) кабина предназначена для сигналов,
+// Инкапсулирует хранилище и предоставляет безопасный (с проверкой границ)
+// доступ к сигналам каждого транспортного средства, хранящимся по кабинам.
+// Последняя (общая) кабина (индекс size()-1) предназначена для сигналов,
 // не привязанных к конкретной кабине.
 //------------------------------------------------------------------------------
 class VehiclesControlSignalsContainer
 {
 public:
 
-    typedef std::vector<QMap<int, vehicle_control_signal_t>>  CabineInputs;
-    typedef CabineInputs::iterator                            iterator;
-    typedef CabineInputs::const_iterator                      const_iterator;
-
     VehiclesControlSignalsContainer() = default;
 
     ~VehiclesControlSignalsContainer() = default;
 
-    // Задаёт количество кабин (создаёт записи для каждой, включая общую)
+    // Задаёт количество кабин (создаёт запись для каждой, включая общую)
     void setCabinesNumber(const size_t &cabs_num)
     {
         control_inputs.resize(cabs_num);
     }
 
-    // Добавляет сигнал в указанную кабину
+    // Добавляет сигнал в указанную кабину (дополняет существующую запись)
     void addInput(const size_t &cab_idx, const int &id, const vehicle_control_signal_t &input)
     {
         if (cab_idx >= control_inputs.size())
@@ -42,19 +40,55 @@ public:
         control_inputs[cab_idx].insert(id, input);
     }
 
-    // Возвращает копию сигнала по индексу кабины и идентификатору
-    vehicle_control_signal_t getInput(const size_t &cab_idx, const int &id)
+    // Признак существования сигнала в указанной кабине
+    bool contains(const size_t &cab_idx, const int &id) const
     {
         if (cab_idx >= control_inputs.size())
         {
-            return vehicle_control_signal_t();
+            return false;
         }
 
-        return control_inputs[cab_idx].value(id, vehicle_control_signal_t());
+        return control_inputs[cab_idx].contains(id);
     }
 
-    // Изменяет значение существующего сигнала в указанной кабине
-    void setInput(const size_t &cab_idx, const int &id, const vehicle_control_signal_t &value)
+    // Значение сигнала как флаг (value != 0)
+    bool getBool(const size_t &cab_idx, const int &id) const
+    {
+        if (cab_idx >= control_inputs.size())
+        {
+            return false;
+        }
+
+        auto it = control_inputs[cab_idx].find(id);
+
+        if (it == control_inputs[cab_idx].end())
+        {
+            return false;
+        }
+
+        return it.value().value != 0.0f;
+    }
+
+    // Числовое значение сигнала
+    float getValue(const size_t &cab_idx, const int &id) const
+    {
+        if (cab_idx >= control_inputs.size())
+        {
+            return 0.0f;
+        }
+
+        auto it = control_inputs[cab_idx].find(id);
+
+        if (it == control_inputs[cab_idx].end())
+        {
+            return 0.0f;
+        }
+
+        return it.value().value;
+    }
+
+    // Устанавливает числовое значение сигнала в указанной кабине
+    void setValue(const size_t &cab_idx, const int &id, const float &value)
     {
         if (cab_idx >= control_inputs.size())
         {
@@ -65,20 +99,88 @@ public:
 
         if (it != control_inputs[cab_idx].end())
         {
-            it.value() = value;
+            it.value().value = value;
         }
     }
 
-    // Доступ к карте сигналов указанной кабины (для оператора[] сигнала)
-    QMap<int, vehicle_control_signal_t>& operator[](const size_t &cab_idx)
+    // Приоритет сервера для сигнала указанной кабины
+    int getPriority(const size_t &cab_idx, const int &id) const
     {
-        return control_inputs[cab_idx];
+        if (cab_idx >= control_inputs.size())
+        {
+            return static_cast<int>(CTRL_PRIORITY_FULL);
+        }
+
+        auto it = control_inputs[cab_idx].find(id);
+
+        if (it == control_inputs[cab_idx].end())
+        {
+            return static_cast<int>(CTRL_PRIORITY_FULL);
+        }
+
+        return static_cast<int>(it.value().server_priority);
     }
 
-    // Константный доступ к карте сигналов указанной кабины
-    const QMap<int, vehicle_control_signal_t>& operator[](const size_t &cab_idx) const
+    // Устанавливает приоритет сервера для сигнала указанной кабины
+    void setPriority(const size_t &cab_idx, const int &id, const ControlPriority &priority)
     {
-        return control_inputs[cab_idx];
+        if (cab_idx >= control_inputs.size())
+        {
+            return;
+        }
+
+        auto it = control_inputs[cab_idx].find(id);
+
+        if (it != control_inputs[cab_idx].end())
+        {
+            it.value().server_priority = priority;
+        }
+    }
+
+    // Количество параметров сигнала указанной кабины
+    size_t getParamsSize(const size_t &cab_idx, const int &id) const
+    {
+        if (cab_idx >= control_inputs.size())
+        {
+            return 0;
+        }
+
+        auto it = control_inputs[cab_idx].find(id);
+
+        if (it == control_inputs[cab_idx].end())
+        {
+            return 0;
+        }
+
+        return it.value().params.size();
+    }
+
+    // Устанавливает параметр сигнала указанной кабины
+    void setParam(const size_t &cab_idx, const int &id, const size_t &index, const float &value)
+    {
+        if (cab_idx >= control_inputs.size())
+        {
+            return;
+        }
+
+        auto it = control_inputs[cab_idx].find(id);
+
+        if (it != control_inputs[cab_idx].end() && index < it.value().params.size())
+        {
+            it.value().params[index] = value;
+        }
+    }
+
+    // Устанавливает приоритет сервера для всех сигналов всех кабин
+    void setAllPriority(const ControlPriority &priority)
+    {
+        for (auto &cab : control_inputs)
+        {
+            for (auto it = cab.begin(); it != cab.end(); ++it)
+            {
+                it.value().server_priority = priority;
+            }
+        }
     }
 
     // Количество кабин
@@ -93,30 +195,10 @@ public:
         return control_inputs.empty();
     }
 
-    iterator begin()
-    {
-        return control_inputs.begin();
-    }
-
-    iterator end()
-    {
-        return control_inputs.end();
-    }
-
-    const_iterator begin() const
-    {
-        return control_inputs.begin();
-    }
-
-    const_iterator end() const
-    {
-        return control_inputs.end();
-    }
-
 private:
 
     // Хранилище сигналов по кабинам
-    CabineInputs control_inputs;
+    std::vector<QMap<int, vehicle_control_signal_t>> control_inputs;
 };
 
 #endif
