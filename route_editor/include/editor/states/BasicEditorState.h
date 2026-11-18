@@ -5,8 +5,11 @@
 
 #include <vsg/core/ref_ptr.h>
 
+class Camera;
+class CommandManager;
 struct EditorContext;
 class Keyboard;
+class Mouse;
 class RouteObject;
 
 namespace vsg
@@ -28,7 +31,10 @@ public:
     virtual void handle_mouse_scroll() override;
 
 private:
-    Keyboard& keyboard;
+    const Keyboard& keyboard;
+    const Mouse& mouse;
+    Camera& camera;
+    CommandManager& command_manager;
 
 private:
     void save_route();

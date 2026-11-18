@@ -27,6 +27,9 @@
 BasicEditorState::BasicEditorState(EditorContext& editor_ctx)
     : State(editor_ctx)
     , keyboard(*editor_ctx.keyboard)
+    , mouse(*editor_ctx.mouse)
+    , camera(*editor_ctx.camera)
+    , command_manager(*editor_ctx.command_manager)
 {
     name = "BasicEditorState";
 }
@@ -35,19 +38,17 @@ BasicEditorState::~BasicEditorState() = default;
 
 void BasicEditorState::handle_key_press()
 {
-    const auto& camera = editor_ctx.camera;
-    const auto& command_manager = editor_ctx.command_manager;
     const auto& selected_objects = editor_ctx.selected_objects;
     auto& copied_objects = editor_ctx.copied_objects;
     const auto& state_manager = editor_ctx.state_manager;
 
     if (keyboard.pressed_once(ACTION_UNDO_COMMAND))
     {
-        command_manager->undo();
+        command_manager.undo();
     }
     else if (keyboard.pressed_once(ACTION_REDO_COMMAND))
     {
-        command_manager->redo();
+        command_manager.redo();
     }
     else if(keyboard.pressed_once(ACTION_SAVE_ROUTE))
     {
@@ -55,7 +56,7 @@ void BasicEditorState::handle_key_press()
     }
     else if (keyboard.pressed_once(ACTION_SWAP_PROJECTION_MATRIX))
     {
-        camera->swap_proj_mat();
+        camera.swap_proj_mat();
     }
     else if (keyboard.pressed_once(ACTION_COPY_OBJECTS))
     {
@@ -65,13 +66,13 @@ void BasicEditorState::handle_key_press()
     {
         auto command = std::make_unique<PasteObjectsCommand>(editor_ctx);
         command->execute();
-        command_manager->push(std::move(command));
+        command_manager.push(std::move(command));
     }
     else if (keyboard.pressed(ACTION_DELETE_OBJECTS))
     {
         auto command = std::make_unique<DeleteObjectsCommand>(editor_ctx);
         command->execute();
-        command_manager->push(std::move(command));
+        command_manager.push(std::move(command));
     }
     else
     {
@@ -106,15 +107,12 @@ void BasicEditorState::handle_key_press()
 
 void BasicEditorState::handle_button_press()
 {
-    const auto& mouse = editor_ctx.mouse;
-    const auto& camera = editor_ctx.camera;
     const auto& state_manager = editor_ctx.state_manager;
     const auto& route = editor_ctx.route;
     const auto& gizmo = editor_ctx.gizmo;
     const auto& selected_objects = editor_ctx.selected_objects;
-    const auto& command_manager = editor_ctx.command_manager;
 
-    switch (mouse->get_button_mask())
+    switch (mouse.get_button_mask())
     {
         case vsg::BUTTON_MASK_1:
         {
@@ -125,7 +123,7 @@ void BasicEditorState::handle_button_press()
             }
 
             const auto intersector = vsg::LineSegmentIntersector::create(
-                *camera, mouse->get_x(), mouse->get_y());
+                camera, mouse.get_x(), mouse.get_y());
             intersector->traversalMask = MASK_CLICKABLE;
 
             route->accept(*intersector);
@@ -141,7 +139,7 @@ void BasicEditorState::handle_button_press()
                 command->ids_to_deselect = editor_ctx.object_manager->get_selected_objects().copy_shrinked_ids();
                 command->update_description();
                 command->execute();
-                command_manager->push(std::move(command));
+                command_manager.push(std::move(command));
                 return;
             }
 
@@ -170,9 +168,7 @@ void BasicEditorState::handle_button_press()
 
 void BasicEditorState::handle_mouse_scroll()
 {
-    const auto& camera = editor_ctx.camera;
-
-    camera->handle_mouse_scroll();
+    camera.handle_mouse_scroll();
 }
 
 void BasicEditorState::save_route()
@@ -212,7 +208,6 @@ void BasicEditorState::save_route()
 
 void BasicEditorState::select_object(const vsg::MatrixTransform* mat_transform)
 {
-    const auto& command_manager = editor_ctx.command_manager;
     const auto& static_object_manager = editor_ctx.object_manager;
     auto& selected_objects = static_object_manager->get_selected_objects();
 
@@ -265,5 +260,5 @@ void BasicEditorState::select_object(const vsg::MatrixTransform* mat_transform)
     command->update_description();
     command->execute();
 
-    command_manager->push(std::move(command));
+    command_manager.push(std::move(command));
 }
