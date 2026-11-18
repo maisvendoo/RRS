@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-    <Joint>
-        <ModuleName>joint-pneumo-hose</ModuleName>
+	<Joint>
+		<ModuleName>joint-pneumo-hose</ModuleName>
 
-        <!-- Начальное состояние соединения рукавов: 0 - разъединены, 1 - соединены -->
-        <initConnectionState>1</initConnectionState>
-    </Joint>
+		<!-- Начальное состояние соединения рукавов: 0 - разъединены, 1 - соединены -->
+		<initConnectionState>1</initConnectionState>
+
+		<!-- Небольшой запас длины до разъединения рукавов, на случай неудачного вписывания в кривые -->
+		<LengthReserve>0.6</LengthReserve>
+	</Joint>
 </Config>
