@@ -30,6 +30,7 @@ BasicEditorState::BasicEditorState(EditorContext& editor_ctx)
     , mouse(*editor_ctx.mouse)
     , camera(*editor_ctx.camera)
     , command_manager(*editor_ctx.command_manager)
+    , static_object_manager(*editor_ctx.object_manager)
 {
     name = "BasicEditorState";
 }
@@ -136,7 +137,7 @@ void BasicEditorState::handle_button_press()
                 }
 
                 auto command = std::make_unique<SelectObjectsCommand>(editor_ctx);
-                command->ids_to_deselect = editor_ctx.object_manager->get_selected_objects().copy_shrinked_ids();
+                command->ids_to_deselect = static_object_manager.get_selected_objects().copy_shrinked_ids();
                 command->update_description();
                 command->execute();
                 command_manager.push(std::move(command));
@@ -208,11 +209,11 @@ void BasicEditorState::save_route()
 
 void BasicEditorState::select_object(const vsg::MatrixTransform* mat_transform)
 {
-    const auto& static_object_manager = editor_ctx.object_manager;
-    auto& selected_objects = static_object_manager->get_selected_objects();
+    auto& selected_objects = static_object_manager.get_selected_objects();
+    const std::size_t selected_objects_size = selected_objects.get_size();
 
     std::size_t object_id;
-    static_object_manager->get_mat_transform_id(mat_transform, object_id);
+    static_object_manager.get_mat_transform_id(mat_transform, object_id);
     const bool is_selected = selected_objects.contains(object_id);
 
     auto command = std::make_unique<SelectObjectsCommand>(editor_ctx);
@@ -230,13 +231,13 @@ void BasicEditorState::select_object(const vsg::MatrixTransform* mat_transform)
     }
     else
     {
-        if (selected_objects.get_size() == 0)
+        if (selected_objects_size == 0)
         {
             command->ids_to_select.emplace_back(object_id);
         }
         else if (is_selected)
         {
-            if (selected_objects.get_size() == 1)
+            if (selected_objects_size == 1)
             {
                 command->ids_to_deselect.emplace_back(object_id);
             }

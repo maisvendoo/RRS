@@ -11,6 +11,7 @@ struct EditorContext;
 class Keyboard;
 class Mouse;
 class RouteObject;
+class StaticObjectManager;
 
 namespace vsg
 {
@@ -35,6 +36,7 @@ private:
     const Mouse& mouse;
     Camera& camera;
     CommandManager& command_manager;
+    StaticObjectManager& static_object_manager;
 
 private:
     void save_route();
