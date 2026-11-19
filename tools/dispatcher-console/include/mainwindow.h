@@ -20,20 +20,15 @@ public:
 
 private:
     TcpClient *tcp_client = nullptr;
-
     tcp_config_t tcp_config;
-
     StationModel station_model;
+    dispatcher_data_t m_disp_data;
     MnemonicWidget *mnemonic = nullptr;
-
     QPlainTextEdit *ptLog = nullptr;
-
     QLabel *lblStatus = nullptr;
 
     void loadSettingsGUI();
-
     void loadConfig(const QString &cfg_name);
-
     void updateStatus(const QString &text);
 
 private slots:

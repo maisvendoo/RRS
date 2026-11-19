@@ -1,8 +1,6 @@
 #include    <mainwindow.h>
-
 #include    <CfgReader.h>
 #include    <filesystem.h>
-
 #include    <QApplication>
 #include    <QStatusBar>
 #include    <QVBoxLayout>
@@ -10,210 +8,146 @@
 #include    <QDataStream>
 #include    <QSplitter>
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
-    this->setWindowTitle(tr("Dispatcher Console"));
-
+    setWindowTitle(tr("Dispatcher Console"));
     resize(1400, 900);
 
-    QSplitter *splitter = new QSplitter(Qt::Vertical, this);
-
+    QSplitter *sp = new QSplitter(Qt::Vertical, this);
     mnemonic = new MnemonicWidget(this);
-    splitter->addWidget(mnemonic);
+    sp->addWidget(mnemonic);
 
     ptLog = new QPlainTextEdit(this);
-    ptLog->setReadOnly(true);
-    ptLog->setMaximumBlockCount(1000);
-    ptLog->setMaximumHeight(200);
-    splitter->addWidget(ptLog);
-
-    setCentralWidget(splitter);
+    ptLog->setReadOnly(true); ptLog->setMaximumBlockCount(1000); ptLog->setMaximumHeight(200);
+    sp->addWidget(ptLog);
+    setCentralWidget(sp);
 
     lblStatus = new QLabel(tr("Disconnected"));
     statusBar()->addPermanentWidget(lblStatus);
 
     tcp_client = new TcpClient(this);
 
-    connect(tcp_client, &TcpClient::connected,
-            this, &MainWindow::slotConnected);
+    connect(tcp_client, &TcpClient::connected, this, &MainWindow::slotConnected);
+    connect(tcp_client, &TcpClient::disconnected, this, &MainWindow::slotDisconnected);
+    connect(tcp_client, &TcpClient::sendLogMessage, this, &MainWindow::slotRecvLogMessage);
+    connect(tcp_client, &TcpClient::setStationsData, this, &MainWindow::slotStationsData);
 
-    connect(tcp_client, &TcpClient::disconnected,
-            this, &MainWindow::slotDisconnected);
+    connect(tcp_client, &TcpClient::setSignalsData, this, [this](QByteArray &d)
+    {
+        dispatcher_data_t::deserializeSignals(d, m_disp_data);
+        mnemonic->setDispatcherData(&m_disp_data);
+        ptLog->appendPlainText(tr("Signals updated"));
+    });
 
-    connect(tcp_client, &TcpClient::sendLogMessage,
-            this, &MainWindow::slotRecvLogMessage);
+    connect(tcp_client, &TcpClient::setSwitchState, this, [this](QByteArray &d)
+    {
+        switch_view_t sw;
+        if (dispatcher_data_t::deserializeSwitch(d, sw))
+            m_disp_data.switches[sw.name] = sw;
+        mnemonic->update();
+    });
 
-    connect(tcp_client, &TcpClient::setStationsData,
-            this, &MainWindow::slotStationsData);
+    connect(tcp_client, &TcpClient::setTrajBusyState, this, [this](QByteArray &d)
+    {
+        traj_busy_view_t tb;
+        if (dispatcher_data_t::deserializeTrajBusy(d, tb))
+            m_disp_data.trajectory_states[tb.name] = tb;
+        mnemonic->update();
+    });
+
+    connect(tcp_client, &TcpClient::setTrainInfo, this, [this](QByteArray &d)
+    {
+        dispatcher_data_t::deserializeTrains(d, m_disp_data.trains);
+        mnemonic->update();
+    });
+
+    connect(tcp_client, &TcpClient::setVehiclesPositions, this, [this](QByteArray &d)
+    {
+        dispatcher_data_t::deserializePos(d, m_disp_data.pos_update);
+        mnemonic->update();
+    });
 
     loadSettingsGUI();
-
     loadConfig("../cfg/dispatcher-console-tcp.xml");
-
     QTimer::singleShot(100, tcp_client, &TcpClient::slotConnect);
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
-    if (tcp_client != nullptr)
+    if (tcp_client)
     {
         disconnect(tcp_client, nullptr, this, nullptr);
         tcp_client->slotDisconnect();
     }
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void MainWindow::loadSettingsGUI()
 {
     FileSystem &fs = FileSystem::getInstance();
-    std::string cfg_dir = fs.getConfigDir();
-    std::string cfg_path = fs.combinePath(cfg_dir, "gui-settings.xml");
-
+    std::string cp = fs.combinePath(fs.getConfigDir(), "gui-settings.xml");
     CfgReader cfg;
-
-    if ( cfg.load(QString(cfg_path.c_str())) )
+    if (cfg.load(QString(cp.c_str())))
     {
-        QString secName = "GUISettings";
-        QString theme_name = "";
-
-        if (!cfg.getString(secName, "Theme", theme_name))
+        QString tn = "";
+        if (!cfg.getString("GUISettings", "Theme", tn)) tn = "dark-jedy";
+        std::string tp = fs.combinePath(fs.getThemeDir(), tn.toStdString() + ".qss");
+        QFile f(QString(tp.c_str()));
+        if (f.open(QIODevice::ReadOnly | QIODevice::Text))
         {
-            theme_name = "dark-jedy";
-        }
-
-        std::string theme_dir = fs.getThemeDir();
-        std::string theme_path = fs.combinePath(theme_dir, theme_name.toStdString() + ".qss");
-        QString style_sheet;
-
-        QFile file(QString(theme_path.c_str()));
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            style_sheet = file.readAll();
-            file.close();
-        }
-
-        if (!style_sheet.isEmpty())
-        {
-            this->setStyleSheet(style_sheet);
+            setStyleSheet(f.readAll());
+            f.close();
         }
     }
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::loadConfig(const QString &cfg_name)
+void MainWindow::loadConfig(const QString &fn)
 {
     CfgReader cfg;
-
-    if (!cfg.load(cfg_name))
-    {
-        ptLog->appendPlainText(tr("Config not found, use defaults"));
-        return;
-    }
-
-    QString secName = "Client";
-    cfg.getString(secName, "HostAddr", tcp_config.host_addr);
-
+    if (!cfg.load(fn)) { ptLog->appendPlainText(tr("Config not found")); return; }
+    QString sec = "Client";
+    cfg.getString(sec, "HostAddr", tcp_config.host_addr);
     int tmp = 0;
-    if (cfg.getInt(secName, "port", tmp))
-    {
-        tcp_config.port = static_cast<quint16>(tmp);
-    }
-
-    cfg.getBool(secName, "ShowServerAddr", tcp_config.show_server_addr);
-
-    cfg.getInt(secName, "ReconnectInteval", tcp_config.reconnect_interval);
-
-    ptLog->appendPlainText(tr("Config loaded: %1:%2")
-                               .arg(tcp_config.host_addr)
-                               .arg(tcp_config.port));
+    if (cfg.getInt(sec, "port", tmp)) tcp_config.port = (quint16)tmp;
+    cfg.getBool(sec, "ShowServerAddr", tcp_config.show_server_addr);
+    cfg.getInt(sec, "ReconnectInteval", tcp_config.reconnect_interval);
+    ptLog->appendPlainText(tr("Config: %1:%2").arg(tcp_config.host_addr).arg(tcp_config.port));
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::updateStatus(const QString &text)
-{
-    if (lblStatus != nullptr)
-    {
-        lblStatus->setText(text);
-    }
-}
+void MainWindow::updateStatus(const QString &t) { if (lblStatus) lblStatus->setText(t); }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void MainWindow::slotConnected()
 {
-    ptLog->appendPlainText(tr("Connected to simulator"));
+    ptLog->appendPlainText(tr("Connected"));
     updateStatus(tr("Connected"));
-
     tcp_client->sendRequest(STYPE_REQUEST_STATIONS_DATA);
+    tcp_client->sendRequest(STYPE_REQUEST_TOPOLOGY_DATA);
+    tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
+    tcp_client->sendRequest(STYPE_REQUEST_TRAINS_UPDATE);
+    tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, 0.07);
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void MainWindow::slotDisconnected()
 {
-    ptLog->appendPlainText(tr("Disconnected from simulator"));
+    ptLog->appendPlainText(tr("Disconnected"));
     updateStatus(tr("Disconnected"));
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 void MainWindow::slotStationsData(QByteArray &data)
 {
-    QDataStream stream(&data, QIODevice::ReadOnly);
-    stream.setByteOrder(QDataStream::BigEndian);
-    stream.setVersion(QDataStream::Qt_4_0);
-
-    quint32 count = 0;
-    stream >> count;
-
-    QVector<station_info_t> stations;
-    stations.reserve(count);
-
-    for (quint32 i = 0; i < count; ++i)
+    QDataStream st(&data, QIODevice::ReadOnly);
+    st.setByteOrder(QDataStream::BigEndian); st.setVersion(QDataStream::Qt_4_0);
+    quint32 c; st >> c;
+    QVector<station_info_t> sv; sv.reserve(c);
+    for (quint32 i = 0; i < c; ++i)
     {
-        QString name;
-        double pos_x, pos_y, pos_z;
-        stream >> name >> pos_x >> pos_y >> pos_z;
-
-        station_info_t si;
-        si.name = name;
-        si.pos_x = pos_x;
-        si.pos_y = pos_y;
-        stations.append(si);
+        QString n; double x, y, z; st >> n >> x >> y >> z;
+        sv.append({n, x, y});
     }
-
-    station_model.loadStations(stations);
+    station_model.loadStations(sv);
     mnemonic->setStationModel(&station_model);
-
-    ptLog->appendPlainText(
-        tr("Loaded %1 stations").arg(station_model.stations().size()));
-
-    for (const auto &s : station_model.stations())
-    {
-        ptLog->appendPlainText(
-            tr("  %1").arg(s.name));
-    }
+    ptLog->appendPlainText(tr("Stations: %1").arg(sv.size()));
+    for (const auto &s : sv) ptLog->appendPlainText(tr("  %1").arg(s.name));
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void MainWindow::slotRecvLogMessage(QString msg)
-{
-    ptLog->appendPlainText(msg);
-}
+void MainWindow::slotRecvLogMessage(QString msg) { ptLog->appendPlainText(msg); }
