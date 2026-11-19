@@ -47,6 +47,18 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     loadSettingsGUI();
     loadConfig("../cfg/dispatcher-console-tcp.xml");
 
+    // Подключение через отдельный одноразовый таймер
+    QTimer *connectTimer = new QTimer(this);
+    connectTimer->setSingleShot(true);
+    connectTimer->setInterval(100);
+    connect(connectTimer, &QTimer::timeout, this, [this]{
+        if (tcp_client)
+        {
+            tcp_client->slotConnect();
+        }
+    });
+    connectTimer->start();
+
     // Переподключение при дисконнекте
     connect(tcp_client, &TcpClient::disconnected, this, [this]{
         QTimer::singleShot(5000, this, [this]{
@@ -54,8 +66,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
                 tcp_client->slotConnect();
         });
     });
-
-    QTimer::singleShot(100, tcp_client, &TcpClient::slotConnect);
 }
 
 void MainWindow::slotConnectedSetup()
