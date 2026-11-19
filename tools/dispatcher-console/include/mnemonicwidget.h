@@ -12,6 +12,13 @@
 
 #include <stationmodel.h>
 
+struct signal_hit_t
+{
+    QPointF screen_pos;
+    int signal_type = 0; // 0-line, 1-enter, 2-route, 3-exit, 4-shunt
+    int signal_index = 0;
+};
+
 struct signal_view_t
 {
     QString conn_name;
@@ -105,6 +112,13 @@ public:
     void setOffset(double offset);
     double offset() const;
 
+    // Для управления: поиск объекта под курсором
+    signal_hit_t hitTestSignal(const QPoint &screen_pos) const;
+
+signals:
+    void signalRightClicked(signal_hit_t hit);
+    void trajectoryRightClicked(const QString &traj_name);
+
 protected:
     void paintEvent(QPaintEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
@@ -128,8 +142,12 @@ private:
     QPointF stationCenter(int idx) const;
     void drawStation(QPainter &p, const station_info_t &s, QPointF c);
     void drawBlock(QPainter &p, QPointF from, QPointF to);
-    void drawSignals(QPainter &p, const QVector<signal_view_t> &sv, QPointF sp, bool ab);
+    void drawSignals(QPainter &p, const QVector<signal_view_t> &sv, QPointF sp, bool ab,
+                     int sig_type, QVector<signal_hit_t> &hits);
     void drawTrain(QPainter &p, const vehicle_view_t &v);
+
+    QVector<signal_hit_t> m_signal_hits;
+    QVector<QPointF> m_traj_hits;
 };
 
 #endif

@@ -6,6 +6,7 @@
 #include    <QDataStream>
 #include    <QIODevice>
 #include    <QtMath>
+#include    <QLineF>
 
 QColor signal_view_t::lensColor() const
 {
@@ -111,6 +112,17 @@ double MnemonicWidget::scale() const { return m_scale; }
 void MnemonicWidget::setOffset(double o) { m_offset = o; update(); }
 double MnemonicWidget::offset() const { return m_offset; }
 
+signal_hit_t MnemonicWidget::hitTestSignal(const QPoint &sp) const
+{
+    signal_hit_t h;
+    for (const auto &sh : m_signal_hits)
+    {
+        double d = QLineF(QPointF(sp), sh.screen_pos).length();
+        if (d < 15 * m_scale) return sh;
+    }
+    return h;
+}
+
 QPointF MnemonicWidget::stationCenter(int idx) const
 {
     if (!m_model) return {};
@@ -129,6 +141,10 @@ void MnemonicWidget::paintEvent(QPaintEvent *)
         pt.setPen(Qt::white); pt.drawText(rect(), Qt::AlignCenter, tr("No data"));
         return;
     }
+
+    m_signal_hits.clear();
+    m_traj_hits.clear();
+
     const auto &ss = m_model->stations();
     for (int i = 0; i < ss.size() - 1; ++i)
     {
@@ -143,10 +159,10 @@ void MnemonicWidget::paintEvent(QPaintEvent *)
         drawStation(pt, ss[i], c);
         if (m_data)
         {
-            drawSignals(pt, m_data->enter_signals, c, true);
-            drawSignals(pt, m_data->exit_signals, c, false);
-            drawSignals(pt, m_data->route_signals, c, true);
-            drawSignals(pt, m_data->shunt_signals, c, false);
+            drawSignals(pt, m_data->enter_signals, c, true, 1, m_signal_hits);
+            drawSignals(pt, m_data->exit_signals, c, false, 3, m_signal_hits);
+            drawSignals(pt, m_data->route_signals, c, true, 2, m_signal_hits);
+            drawSignals(pt, m_data->shunt_signals, c, false, 4, m_signal_hits);
         }
     }
     if (m_data)
@@ -157,13 +173,25 @@ void MnemonicWidget::paintEvent(QPaintEvent *)
             double r = (double)(i + 1) / (m_data->line_signals.size() + 1);
             double x = stationCenter(0).x() + (a.x() - stationCenter(0).x()) * r;
             const auto &s = m_data->line_signals[i];
+            QPointF sp(x, VCENTER * m_scale - 30 * m_scale);
             pt.setBrush(s.lensColor()); pt.setPen(Qt::white);
             int rr = qMax(4, (int)(6 * m_scale));
-            pt.drawEllipse(QPointF(x, VCENTER * m_scale - 30 * m_scale), rr, rr);
+            pt.drawEllipse(sp, rr, rr);
             pt.drawText(QPointF(x + rr + 3, VCENTER * m_scale - 30 * m_scale + 4), s.letter);
+            m_signal_hits.append({sp, 0, i});
         }
         for (const auto &v : m_data->pos_update.vehicles)
             drawTrain(pt, v);
+
+        // Время симуляции
+        QString t = m_data->pos_update.sim_time.getString();
+        if (!t.isEmpty())
+        {
+            pt.setPen(QColor(200, 200, 200));
+            QFont f("Consolas", 20);
+            pt.setFont(f);
+            pt.drawText(rect().adjusted(-10, 10, 0, 0), Qt::AlignRight | Qt::AlignTop, t);
+        }
     }
 }
 
@@ -186,7 +214,8 @@ void MnemonicWidget::drawBlock(QPainter &p, QPointF from, QPointF to)
     p.drawLine(from, to);
 }
 
-void MnemonicWidget::drawSignals(QPainter &p, const QVector<signal_view_t> &sv, QPointF sp, bool ab)
+void MnemonicWidget::drawSignals(QPainter &p, const QVector<signal_view_t> &sv, QPointF sp, bool ab,
+                                 int sig_type, QVector<signal_hit_t> &hits)
 {
     double yo = ab ? -40 * m_scale : 40 * m_scale;
     for (int i = 0; i < sv.size(); ++i)
@@ -198,6 +227,7 @@ void MnemonicWidget::drawSignals(QPainter &p, const QVector<signal_view_t> &sv, 
         int r = qMax(3, (int)(5 * m_scale));
         p.drawEllipse(sp2, r, r);
         p.drawText(QPointF(sp2.x() + r + 2, sp2.y() + 3), s.letter);
+        hits.append({sp2, sig_type, i});
     }
 }
 
@@ -227,6 +257,14 @@ void MnemonicWidget::wheelEvent(QWheelEvent *e)
 void MnemonicWidget::mousePressEvent(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton) { m_dragging = true; m_last_mouse_pos = e->pos(); }
+    if (e->button() == Qt::RightButton)
+    {
+        signal_hit_t hit = hitTestSignal(e->pos());
+        if (hit.signal_index >= 0)
+            emit signalRightClicked(hit);
+        else
+            emit trajectoryRightClicked(QString());
+    }
 }
 
 void MnemonicWidget::mouseMoveEvent(QMouseEvent *e)

@@ -5,6 +5,9 @@
 #include <QPlainTextEdit>
 #include <QLabel>
 #include <QSplitter>
+#include <QMenu>
+#include <QMenuBar>
+#include <QToolBar>
 
 #include <tcp-client.h>
 #include <stationmodel.h>
@@ -26,6 +29,9 @@ private:
     MnemonicWidget *mnemonic = nullptr;
     QPlainTextEdit *ptLog = nullptr;
     QLabel *lblStatus = nullptr;
+    QMenu *mStations = nullptr;
+    QAction *actFollowTrain = nullptr;
+    int follow_vehicle = -1;
 
     void loadSettingsGUI();
     void loadConfig(const QString &cfg_name);
