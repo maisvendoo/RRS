@@ -4,9 +4,11 @@
 #include <QMainWindow>
 #include <QPlainTextEdit>
 #include <QLabel>
+#include <QSplitter>
 
 #include <tcp-client.h>
 #include <stationmodel.h>
+#include <mnemonicwidget.h>
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +24,7 @@ private:
     tcp_config_t tcp_config;
 
     StationModel station_model;
+    MnemonicWidget *mnemonic = nullptr;
 
     QPlainTextEdit *ptLog = nullptr;
 

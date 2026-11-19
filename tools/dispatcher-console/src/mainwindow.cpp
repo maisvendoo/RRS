@@ -8,6 +8,7 @@
 #include    <QVBoxLayout>
 #include    <QTimer>
 #include    <QDataStream>
+#include    <QSplitter>
 
 //------------------------------------------------------------------------------
 //
@@ -16,18 +17,20 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
     this->setWindowTitle(tr("Dispatcher Console"));
 
-    resize(1280, 800);
+    resize(1400, 900);
 
-    QWidget *central = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(central);
+    QSplitter *splitter = new QSplitter(Qt::Vertical, this);
+
+    mnemonic = new MnemonicWidget(this);
+    splitter->addWidget(mnemonic);
 
     ptLog = new QPlainTextEdit(this);
     ptLog->setReadOnly(true);
     ptLog->setMaximumBlockCount(1000);
+    ptLog->setMaximumHeight(200);
+    splitter->addWidget(ptLog);
 
-    layout->addWidget(ptLog);
-
-    setCentralWidget(central);
+    setCentralWidget(splitter);
 
     lblStatus = new QLabel(tr("Disconnected"));
     statusBar()->addPermanentWidget(lblStatus);
@@ -195,6 +198,7 @@ void MainWindow::slotStationsData(QByteArray &data)
     }
 
     station_model.loadStations(stations);
+    mnemonic->setStationModel(&station_model);
 
     ptLog->appendPlainText(
         tr("Loaded %1 stations").arg(station_model.stations().size()));
