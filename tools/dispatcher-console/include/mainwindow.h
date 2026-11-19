@@ -32,6 +32,7 @@ private:
     QMenu *mStations = nullptr;
     QAction *actFollowTrain = nullptr;
     int follow_vehicle = -1;
+    bool m_ready = false;
 
     void loadSettingsGUI();
     void loadConfig(const QString &cfg_name);

@@ -43,46 +43,52 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(tcp_client, &TcpClient::sendLogMessage, this, &MainWindow::slotRecvLogMessage);
     connect(tcp_client, &TcpClient::setStationsData, this, &MainWindow::slotStationsData);
 
-    auto onSigData = [this](QByteArray &d)
+    // Таймер для кoалесцирования обновлений мнемосхемы
+    QTimer *updateTimer = new QTimer(this);
+    updateTimer->setSingleShot(true);
+    updateTimer->setInterval(0);
+    connect(updateTimer, &QTimer::timeout, mnemonic, [this]{ mnemonic->update(); });
+
+    auto queueUpdate = [updateTimer]{
+        if (!updateTimer->isActive())
+            updateTimer->start();
+    };
+
+    connect(tcp_client, &TcpClient::setSignalsData, this, [this, queueUpdate](QByteArray &d)
     {
         dispatcher_data_t::deserializeSignals(d, m_disp_data);
-        mnemonic->setDispatcherData(&m_disp_data);
-        ptLog->appendPlainText(tr("Signals: %1 line, %2 enter, %3 route, %4 exit, %5 shunt")
-                                   .arg(m_disp_data.line_signals.size())
-                                   .arg(m_disp_data.enter_signals.size())
-                                   .arg(m_disp_data.route_signals.size())
-                                   .arg(m_disp_data.exit_signals.size())
-                                   .arg(m_disp_data.shunt_signals.size()));
-    };
-    connect(tcp_client, &TcpClient::setSignalsData, this, onSigData);
-
-    connect(tcp_client, &TcpClient::setSwitchState, this, [this](QByteArray &d)
-    {
-        switch_view_t sw;
-        if (dispatcher_data_t::deserializeSwitch(d, sw))
-        {
-            m_disp_data.switches[sw.name] = sw;
-            ptLog->appendPlainText(tr("Switch %1: state %2/%3").arg(sw.name).arg(sw.state_fwd).arg(sw.state_bwd));
-        }
-        mnemonic->update();
+        if (m_ready) mnemonic->setDispatcherData(&m_disp_data);
+        queueUpdate();
     });
 
-    connect(tcp_client, &TcpClient::setTrajBusyState, this, [this](QByteArray &d)
+    connect(tcp_client, &TcpClient::setSwitchState, this, [this, queueUpdate](QByteArray &d)
     {
+        if (!m_ready) return;
+        switch_view_t sw;
+        if (dispatcher_data_t::deserializeSwitch(d, sw))
+            m_disp_data.switches[sw.name] = sw;
+        queueUpdate();
+    });
+
+    connect(tcp_client, &TcpClient::setTrajBusyState, this, [this, queueUpdate](QByteArray &d)
+    {
+        if (!m_ready) return;
         traj_busy_view_t tb;
         if (dispatcher_data_t::deserializeTrajBusy(d, tb))
             m_disp_data.trajectory_states[tb.name] = tb;
-        mnemonic->update();
+        queueUpdate();
     });
 
-    connect(tcp_client, &TcpClient::setTrainInfo, this, [this](QByteArray &d)
+    connect(tcp_client, &TcpClient::setTrainInfo, this, [this, queueUpdate](QByteArray &d)
     {
+        if (!m_ready) return;
         dispatcher_data_t::deserializeTrains(d, m_disp_data.trains);
-        mnemonic->update();
+        queueUpdate();
     });
 
-    connect(tcp_client, &TcpClient::setVehiclesPositions, this, [this](QByteArray &d)
+    connect(tcp_client, &TcpClient::setVehiclesPositions, this, [this, queueUpdate](QByteArray &d)
     {
+        if (!m_ready) return;
         dispatcher_data_t::deserializePos(d, m_disp_data.pos_update);
         if (actFollowTrain->isChecked() && follow_vehicle >= 0 &&
             follow_vehicle < m_disp_data.pos_update.vehicles.size())
@@ -285,6 +291,7 @@ void MainWindow::updateStatus(const QString &t) { if (lblStatus) lblStatus->setT
 
 void MainWindow::slotConnected()
 {
+    m_ready = false;
     ptLog->appendPlainText(tr("=== Connected ==="));
     updateStatus(tr("Connected"));
     tcp_client->sendRequest(STYPE_REQUEST_STATIONS_DATA);
@@ -292,6 +299,9 @@ void MainWindow::slotConnected()
     tcp_client->sendRequest(STYPE_REQUEST_SIGNALS_DATA);
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_INFO);
     tcp_client->sendRequest(STYPE_REQUEST_TRAINS_UPDATE);
+    QTimer::singleShot(100, this, [this]{
+        m_ready = true;
+    });
     tcp_client->sendRequest(STYPE_REQUEST_VEHICLES_POS_UPDATE, 0.07);
 }
 
