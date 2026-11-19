@@ -6,6 +6,7 @@
 #include <QLabel>
 
 #include <tcp-client.h>
+#include <stationmodel.h>
 
 class MainWindow : public QMainWindow
 {
@@ -19,6 +20,8 @@ private:
     TcpClient *tcp_client = nullptr;
 
     tcp_config_t tcp_config;
+
+    StationModel station_model;
 
     QPlainTextEdit *ptLog = nullptr;
 
@@ -34,6 +37,7 @@ private slots:
     void slotConnected();
     void slotDisconnected();
     void slotRecvLogMessage(QString msg);
+    void slotStationsData(QByteArray &data);
 };
 
 #endif

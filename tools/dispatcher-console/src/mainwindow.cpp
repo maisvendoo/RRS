@@ -7,6 +7,7 @@
 #include    <QStatusBar>
 #include    <QVBoxLayout>
 #include    <QTimer>
+#include    <QDataStream>
 
 //------------------------------------------------------------------------------
 //
@@ -41,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     connect(tcp_client, &TcpClient::sendLogMessage,
             this, &MainWindow::slotRecvLogMessage);
+
+    connect(tcp_client, &TcpClient::setStationsData,
+            this, &MainWindow::slotStationsData);
 
     loadSettingsGUI();
 
@@ -149,6 +153,8 @@ void MainWindow::slotConnected()
 {
     ptLog->appendPlainText(tr("Connected to simulator"));
     updateStatus(tr("Connected"));
+
+    tcp_client->sendRequest(STYPE_REQUEST_STATIONS_DATA);
 }
 
 //------------------------------------------------------------------------------
@@ -158,6 +164,46 @@ void MainWindow::slotDisconnected()
 {
     ptLog->appendPlainText(tr("Disconnected from simulator"));
     updateStatus(tr("Disconnected"));
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void MainWindow::slotStationsData(QByteArray &data)
+{
+    QDataStream stream(&data, QIODevice::ReadOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream.setVersion(QDataStream::Qt_4_0);
+
+    quint32 count = 0;
+    stream >> count;
+
+    QVector<station_info_t> stations;
+    stations.reserve(count);
+
+    for (quint32 i = 0; i < count; ++i)
+    {
+        QString name;
+        double pos_x, pos_y, pos_z;
+        stream >> name >> pos_x >> pos_y >> pos_z;
+
+        station_info_t si;
+        si.name = name;
+        si.pos_x = pos_x;
+        si.pos_y = pos_y;
+        stations.append(si);
+    }
+
+    station_model.loadStations(stations);
+
+    ptLog->appendPlainText(
+        tr("Loaded %1 stations").arg(station_model.stations().size()));
+
+    for (const auto &s : station_model.stations())
+    {
+        ptLog->appendPlainText(
+            tr("  %1").arg(s.name));
+    }
 }
 
 //------------------------------------------------------------------------------
