@@ -47,12 +47,13 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     loadSettingsGUI();
     loadConfig("../cfg/dispatcher-console-tcp.xml");
 
-    QTimer *reconnectTimer = new QTimer(this);
-    connect(reconnectTimer, &QTimer::timeout, this, [this]{
-        if (tcp_client && !tcp_client->isConnected())
-            tcp_client->slotConnect();
+    // Переподключение при дисконнекте
+    connect(tcp_client, &TcpClient::disconnected, this, [this]{
+        QTimer::singleShot(5000, this, [this]{
+            if (tcp_client && !tcp_client->isConnected())
+                tcp_client->slotConnect();
+        });
     });
-    reconnectTimer->start(5000);
 
     QTimer::singleShot(100, tcp_client, &TcpClient::slotConnect);
 }
