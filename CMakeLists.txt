@@ -131,3 +131,22 @@ install(
         ${CMAKE_CURRENT_BINARY_DIR}/RRSConfigVersion.cmake
     DESTINATION sdk/lib/cmake
 )
+
+# Lua-модули сценариев: scenario-manager добавляет в package.path
+# путь ../modules/lua/?.lua (simulator/scenario-manager/src/scenario-manager.cpp),
+# поэтому lua/ ставится в <префикс>/modules/lua.
+install(
+    DIRECTORY lua/
+    DESTINATION modules/lua
+    FILES_MATCHING PATTERN "*.lua"
+)
+
+# Сборочное дерево тоже должно быть запускаемым (бинарники в <сборка>/bin
+# ищут модули по пути ../modules/lua/?.lua), поэтому копируем lua/ и туда.
+add_custom_target(rrs_lua ALL
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/lua"
+            "${CMAKE_BINARY_DIR}/../modules/lua"
+    COMMENT "Копирование lua/ в modules/lua сборочного дерева"
+    VERBATIM
+)

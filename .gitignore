@@ -14,6 +14,7 @@
 build/
 build-debug/
 build-release/
+bin/
 lib/
 logs/
 modules/
@@ -21,3 +22,10 @@ plugins/
 
 *.cache*
 *.vs*
+
+# Каталоги сборки (scripts/build_linux.sh, scripts/build_docker.sh)
+.deps/
+dist/
+
+# Служебные скрипты и логи проверки запуска в контейнере
+.verify/
