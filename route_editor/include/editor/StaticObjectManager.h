@@ -44,6 +44,9 @@ public:
     void set_position(std::size_t id, const vsg::dvec3& pos);
     void move_object(std::size_t id, const vsg::dvec3& delta_pos);
 
+    void save_matrix(std::size_t id);
+    void load_matrix(std::size_t id);
+
     SparseSet& get_selected_objects();
     const SparseSet& get_selected_objects() const;
 

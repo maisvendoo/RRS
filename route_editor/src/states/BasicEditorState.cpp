@@ -39,7 +39,6 @@ BasicEditorState::~BasicEditorState() = default;
 
 void BasicEditorState::handle_key_press()
 {
-    const auto& selected_objects = editor_ctx.selected_objects;
     auto& copied_objects = editor_ctx.copied_objects;
     const auto& state_manager = editor_ctx.state_manager;
 
@@ -61,7 +60,7 @@ void BasicEditorState::handle_key_press()
     }
     else if (keyboard.pressed_once(ACTION_COPY_OBJECTS))
     {
-        copied_objects = selected_objects;
+        copied_objects = editor_ctx.selected_objects;
     }
     else if (keyboard.pressed_once(ACTION_PASTE_OBJECTS))
     {
@@ -86,10 +85,12 @@ void BasicEditorState::handle_key_press()
             return;
         }
 
-        for (const auto& object : selected_objects)
-        {
-            object->save_matrix();
-        }
+        const auto& static_object_manager = editor_ctx.object_manager;
+        auto& selected_objects = static_object_manager->get_selected_objects();
+
+        selected_objects.for_each([&](std::size_t id) -> void {
+            static_object_manager->save_matrix(id);
+        });
 
         if (pressed_action_move)
         {

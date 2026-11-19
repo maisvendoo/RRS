@@ -234,6 +234,24 @@ void StaticObjectManager::move_object(std::size_t id,
     matrix[3][2] += delta_pos.z;
 }
 
+void StaticObjectManager::save_matrix(std::size_t id)
+{
+    assert((object_count > 0) && "Could not call save_matrix() when "
+                                 "object count is 0");
+    assert((id < object_count) && "id must be lower than object count");
+
+    init_mats[id] = mat_transforms[id]->matrix;
+}
+
+void StaticObjectManager::load_matrix(std::size_t id)
+{
+    assert((object_count > 0) && "Could not call load_matrix() when "
+                                 "object count is 0");
+    assert((id < object_count) && "id must be lower than object count");
+
+    mat_transforms[id]->matrix = init_mats[id];
+}
+
 SparseSet& StaticObjectManager::get_selected_objects()
 {
     return selected_objects;
