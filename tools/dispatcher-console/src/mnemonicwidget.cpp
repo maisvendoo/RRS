@@ -257,8 +257,10 @@ void MnemonicWidget::paintEvent(QPaintEvent *)
     for (const auto &tv : m_data->trains)
     {
         QString name = tv.name.isEmpty() ? tr("Train") : tv.name;
+        if (tv.first_vehicle < 0) continue;
         for (int vi = tv.first_vehicle; vi <= tv.last_vehicle && vi < m_data->pos_update.vehicles.size(); ++vi)
         {
+            if (vi < 0) continue;
             const auto &v = m_data->pos_update.vehicles[vi];
             // Находим ближайшую станцию
             int ni = 0; double md = 1e9;
