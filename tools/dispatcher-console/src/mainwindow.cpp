@@ -317,17 +317,15 @@ void MainWindow::slotStationsData(QByteArray &data)
     ptLog->appendPlainText(tr("Stations (%1):").arg(sv.size()));
 
     mStations->clear();
-    for (const auto &s : sv)
+    for (int si = 0; si < sv.size(); ++si)
     {
+        const auto &s = sv[si];
         ptLog->appendPlainText(tr("  %1").arg(s.name));
         QAction *a = mStations->addAction(s.name);
-        connect(a, &QAction::triggered, this, [this, name = s.name]{
-            for (int i = 0; i < station_model.stations().size(); ++i)
-                if (station_model.stations()[i].name == name)
-                {
-                    mnemonic->setOffset(-i * 300.0 * mnemonic->scale());
-                    break;
-                }
+        int idx = si;
+        connect(a, &QAction::triggered, this, [this, idx]{
+            double to = -idx * 300.0 * mnemonic->scale();
+            mnemonic->setOffset(to);
         });
     }
 }

@@ -216,10 +216,8 @@ void MnemonicWidget::paintEvent(QPaintEvent *)
         if (!m_data) continue;
 
         // Станционные сигналы
-        drawSignalAt(p, {}, c, 1, -1, m_signal_hits); // заглушка - вместо перебора типов
-
-        auto drawSigVec = [&](const QVector<signal_view_t> &vec, int base_type) {
-            double yo = (base_type == 1 || base_type == 2) ? -45 * m_scale : 45 * m_scale;
+        auto drawSigVec = [&](const QVector<signal_view_t> &vec, int base_type, bool above) {
+            double yo = above ? -45 * m_scale : 45 * m_scale;
             for (int j = 0; j < vec.size(); ++j)
             {
                 double x = c.x() + (j - (double)(vec.size() - 1) / 2.0) * 20 * m_scale;
@@ -227,10 +225,10 @@ void MnemonicWidget::paintEvent(QPaintEvent *)
                 drawSignalAt(p, vec[j], sp, base_type, j, m_signal_hits);
             }
         };
-        drawSigVec(m_data->enter_signals, 1);
-        drawSigVec(m_data->route_signals, 2);
-        drawSigVec(m_data->exit_signals, 3);
-        drawSigVec(m_data->shunt_signals, 4);
+        drawSigVec(m_data->enter_signals, 1, true);
+        drawSigVec(m_data->route_signals, 2, true);
+        drawSigVec(m_data->exit_signals, 3, false);
+        drawSigVec(m_data->shunt_signals, 4, false);
     }
 
     if (!m_data) return;
