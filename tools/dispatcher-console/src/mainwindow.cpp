@@ -8,27 +8,28 @@
 #include    <QDataStream>
 #include    <QSplitter>
 #include    <QMessageBox>
+#include    <QInputDialog>
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
     setWindowTitle(tr("Dispatcher Console"));
     resize(1400, 900);
 
-    // Меню станций
     mStations = menuBar()->addMenu(tr("Stations"));
+    menuBar()->addAction(tr("Center all"), this, [this]{ mnemonic->setOffset(0); });
+    menuBar()->addAction(tr("Zoom 100%"), this, [this]{ mnemonic->setScale(1.0); });
 
-    // Панель инструментов
     QToolBar *tb = addToolBar(tr("Tools"));
-    actFollowTrain = tb->addAction(tr("Follow train"));
-    actFollowTrain->setCheckable(true);
-    actFollowTrain->setChecked(false);
+    actFollowTrain = tb->addAction(tr("Follow"));
+    actFollowTrain->setCheckable(true); actFollowTrain->setChecked(false);
+    tb->addAction(tr("Center"), this, [this]{ mnemonic->setOffset(0); });
 
     QSplitter *sp = new QSplitter(Qt::Vertical, this);
     mnemonic = new MnemonicWidget(this);
     sp->addWidget(mnemonic);
 
     ptLog = new QPlainTextEdit(this);
-    ptLog->setReadOnly(true); ptLog->setMaximumBlockCount(1000); ptLog->setMaximumHeight(150);
+    ptLog->setReadOnly(true); ptLog->setMaximumBlockCount(2000); ptLog->setMaximumHeight(150);
     sp->addWidget(ptLog);
     setCentralWidget(sp);
 
@@ -42,12 +43,18 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(tcp_client, &TcpClient::sendLogMessage, this, &MainWindow::slotRecvLogMessage);
     connect(tcp_client, &TcpClient::setStationsData, this, &MainWindow::slotStationsData);
 
-    connect(tcp_client, &TcpClient::setSignalsData, this, [this](QByteArray &d)
+    auto onSigData = [this](QByteArray &d)
     {
         dispatcher_data_t::deserializeSignals(d, m_disp_data);
         mnemonic->setDispatcherData(&m_disp_data);
-        ptLog->appendPlainText(tr("Signals updated"));
-    });
+        ptLog->appendPlainText(tr("Signals: %1 line, %2 enter, %3 route, %4 exit, %5 shunt")
+                                   .arg(m_disp_data.line_signals.size())
+                                   .arg(m_disp_data.enter_signals.size())
+                                   .arg(m_disp_data.route_signals.size())
+                                   .arg(m_disp_data.exit_signals.size())
+                                   .arg(m_disp_data.shunt_signals.size()));
+    };
+    connect(tcp_client, &TcpClient::setSignalsData, this, onSigData);
 
     connect(tcp_client, &TcpClient::setSwitchState, this, [this](QByteArray &d)
     {
@@ -55,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
         if (dispatcher_data_t::deserializeSwitch(d, sw))
         {
             m_disp_data.switches[sw.name] = sw;
-            ptLog->appendPlainText(tr("Switch %1: fwd=%2 bwd=%3").arg(sw.name).arg(sw.state_fwd).arg(sw.state_bwd));
+            ptLog->appendPlainText(tr("Switch %1: state %2/%3").arg(sw.name).arg(sw.state_fwd).arg(sw.state_bwd));
         }
         mnemonic->update();
     });
@@ -83,7 +90,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
             const auto &v = m_disp_data.pos_update.vehicles[follow_vehicle];
             if (!station_model.stations().empty())
             {
-                // Центрируем на поезде
                 const auto &ss = station_model.stations();
                 int ni = 0; double md = 1e9;
                 for (int i = 0; i < ss.size(); ++i)
@@ -91,71 +97,147 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
                     double dd = qAbs(ss[i].pos_y - v.pos_y) + qAbs(ss[i].pos_x - v.pos_x);
                     if (dd < md) { md = dd; ni = i; }
                 }
-                double target_off = -(ni * 300.0 * mnemonic->scale())
-                                   + (v.pos_x - ss[ni].pos_x) * 0.5 * mnemonic->scale();
-                mnemonic->setOffset(target_off);
+                double to = -(ni * 300.0 * mnemonic->scale()) + (v.pos_x - ss[ni].pos_x) * 0.5 * mnemonic->scale();
+                mnemonic->setOffset(to);
             }
         }
         mnemonic->update();
     });
 
-    // Управление: контекстное меню сигналов
-    connect(mnemonic, &MnemonicWidget::signalRightClicked, this, [this](signal_hit_t hit)
+    // Правый клик по сигналу — открыть/закрыть
+    connect(mnemonic, &MnemonicWidget::signalRightClicked, this, [this](const signal_view_t *sig)
     {
-        const signal_view_t *sig = nullptr;
-        if (hit.signal_type == 0 && hit.signal_index < m_disp_data.line_signals.size())
-            sig = &m_disp_data.line_signals[hit.signal_index];
-        else if (hit.signal_type == 1 && hit.signal_index < m_disp_data.enter_signals.size())
-            sig = &m_disp_data.enter_signals[hit.signal_index];
-        else if (hit.signal_type == 2 && hit.signal_index < m_disp_data.route_signals.size())
-            sig = &m_disp_data.route_signals[hit.signal_index];
-        else if (hit.signal_type == 3 && hit.signal_index < m_disp_data.exit_signals.size())
-            sig = &m_disp_data.exit_signals[hit.signal_index];
-        else if (hit.signal_type == 4 && hit.signal_index < m_disp_data.shunt_signals.size())
-            sig = &m_disp_data.shunt_signals[hit.signal_index];
-
         if (!sig) return;
-
         QMenu menu(this);
-        QAction *open = menu.addAction(tr("Open"));
-        QAction *close = menu.addAction(tr("Close"));
+        QAction *actOpen = menu.addAction(tr("Open signal"));
+        QAction *actClose = menu.addAction(tr("Close signal"));
         QAction *chosen = menu.exec(QCursor::pos());
         if (!chosen) return;
 
-        // Формируем команду сигналу
-        QByteArray cmd_data;
-        QDataStream cmd_st(&cmd_data, QIODevice::WriteOnly);
-        cmd_st.setByteOrder(QDataStream::BigEndian);
-        cmd_st.setVersion(QDataStream::Qt_4_0);
-        cmd_st << sig->conn_name << sig->signal_dir
-               << (chosen == open)  // open_train
-               << false            // open_shunting
-               << false            // open_call
-               << (chosen == close); // close
-        tcp_client->sendSignalCommand(cmd_data);
-        ptLog->appendPlainText(tr("Signal %1: %2").arg(sig->letter).arg(chosen == open ? tr("open") : tr("close")));
+        QByteArray cmd;
+        QDataStream st(&cmd, QIODevice::WriteOnly);
+        st.setByteOrder(QDataStream::BigEndian); st.setVersion(QDataStream::Qt_4_0);
+        st << sig->conn_name << sig->signal_dir
+           << (chosen == actOpen) // open_train
+           << false // open_shunting
+           << false // open_call
+           << (chosen == actClose); // close
+        tcp_client->sendSignalCommand(cmd);
+        ptLog->appendPlainText(tr("Signal %1: %2").arg(sig->letter).arg(chosen == actOpen ? tr("OPEN") : tr("CLOSE")));
     });
 
-    connect(mnemonic, &MnemonicWidget::trajectoryRightClicked, this, [this](const QString &)
+    // Правый клик по коннектору (стрелке) — перевести
+    connect(mnemonic, &MnemonicWidget::connectorRightClicked, this, [this](const QString &name)
     {
         QMenu menu(this);
-        QAction *center = menu.addAction(tr("Center on first station"));
-        if (menu.exec(QCursor::pos()) == center)
-            mnemonic->setOffset(0);
+        QAction *actPlus = menu.addAction(tr("Set + (straight)"));
+        QAction *actMinus = menu.addAction(tr("Set - (diverging)"));
+        QAction *chosen = menu.exec(QCursor::pos());
+        if (!chosen) return;
+
+        int8_t dir = 1; // FWD
+        int8_t state = (chosen == actPlus) ? 2 : -2; // STATE_PLUS or STATE_MINUS
+
+        QByteArray cmd;
+        QDataStream st(&cmd, QIODevice::WriteOnly);
+        st.setByteOrder(QDataStream::BigEndian); st.setVersion(QDataStream::Qt_4_0);
+        st << name << dir << state;
+        tcp_client->sendSwitchCommand(cmd);
+        ptLog->appendPlainText(tr("Switch %1: %2").arg(name).arg(chosen == actPlus ? tr("STRAIGHT") : tr("DIVERGING")));
     });
 
-    // Слежение за поездом
+    // Правый клик по поезду — переименовать/развернуть
+    connect(mnemonic, &MnemonicWidget::trainRightClicked, this, [this](int vehicle_id)
+    {
+        // Ищем поезд, содержащий эту ПЕ
+        int train_idx = -1;
+        for (int i = 0; i < m_disp_data.trains.size(); ++i)
+        {
+            const auto &t = m_disp_data.trains[i];
+            if (vehicle_id >= t.first_vehicle && vehicle_id <= t.last_vehicle)
+            { train_idx = i; break; }
+        }
+        if (train_idx < 0) return;
+
+        QMenu menu(this);
+        QAction *actFollow = menu.addAction(tr("Follow this train"));
+        QAction *actRename = menu.addAction(tr("Rename"));
+        QAction *actReverse = menu.addAction(tr("Reverse"));
+        QAction *actCenter = menu.addAction(tr("Center on train"));
+        QAction *chosen = menu.exec(QCursor::pos());
+        if (!chosen) return;
+
+        if (chosen == actFollow)
+        {
+            actFollowTrain->setChecked(true);
+            follow_vehicle = vehicle_id;
+            ptLog->appendPlainText(tr("Following train #%1").arg(train_idx));
+        }
+        else if (chosen == actCenter)
+        {
+            const auto &v = m_disp_data.pos_update.vehicles[vehicle_id];
+            if (!station_model.stations().empty())
+            {
+                const auto &ss = station_model.stations();
+                int ni = 0; double md = 1e9;
+                for (int i = 0; i < ss.size(); ++i)
+                {
+                    double dd = qAbs(ss[i].pos_y - v.pos_y) + qAbs(ss[i].pos_x - v.pos_x);
+                    if (dd < md) { md = dd; ni = i; }
+                }
+                double to = -(ni * 300.0 * mnemonic->scale()) + (v.pos_x - ss[ni].pos_x) * 0.5 * mnemonic->scale();
+                mnemonic->setOffset(to);
+            }
+        }
+        else if (chosen == actRename)
+        {
+            bool ok;
+            QString newName = QInputDialog::getText(this, tr("Rename train"),
+                                                     tr("New name:"), QLineEdit::Normal,
+                                                     m_disp_data.trains[train_idx].name, &ok);
+            if (ok && !newName.isEmpty())
+                tcp_client->sendNewTrainName(train_idx, newName);
+        }
+        else if (chosen == actReverse)
+        {
+            tcp_client->sendReverseTrain(train_idx);
+        }
+    });
+
+    // Клик по станции — центрировать
+    connect(mnemonic, &MnemonicWidget::stationLeftClicked, this, [this](const QString &name)
+    {
+        for (int i = 0; i < station_model.stations().size(); ++i)
+        {
+            if (station_model.stations()[i].name == name)
+            {
+                double to = -i * 300.0 * mnemonic->scale() + (width() - 600) / 4.0;
+                mnemonic->setOffset(to);
+                ptLog->appendPlainText(tr("Centered on %1").arg(name));
+                return;
+            }
+        }
+    });
+
     connect(actFollowTrain, &QAction::toggled, this, [this](bool checked)
     {
         if (checked && !m_disp_data.pos_update.vehicles.empty())
             follow_vehicle = 0;
         else
             follow_vehicle = -1;
-        ptLog->appendPlainText(checked ? tr("Follow mode on") : tr("Follow mode off"));
     });
 
     loadSettingsGUI();
     loadConfig("../cfg/dispatcher-console-tcp.xml");
+
+    // Таймер переподключения
+    QTimer *reconnectTimer = new QTimer(this);
+    connect(reconnectTimer, &QTimer::timeout, this, [this]{
+        if (tcp_client && !tcp_client->isConnected())
+            tcp_client->slotConnect();
+    });
+    reconnectTimer->start(5000);
+
     QTimer::singleShot(100, tcp_client, &TcpClient::slotConnect);
 }
 
@@ -175,14 +257,13 @@ void MainWindow::loadSettingsGUI()
     CfgReader cfg;
     if (cfg.load(QString(cp.c_str())))
     {
-        QString tn = "";
+        QString tn;
         if (!cfg.getString("GUISettings", "Theme", tn)) tn = "dark-jedy";
         std::string tp = fs.combinePath(fs.getThemeDir(), tn.toStdString() + ".qss");
         QFile f(QString(tp.c_str()));
         if (f.open(QIODevice::ReadOnly | QIODevice::Text))
         {
-            setStyleSheet(f.readAll());
-            f.close();
+            setStyleSheet(f.readAll()); f.close();
         }
     }
 }
@@ -204,7 +285,7 @@ void MainWindow::updateStatus(const QString &t) { if (lblStatus) lblStatus->setT
 
 void MainWindow::slotConnected()
 {
-    ptLog->appendPlainText(tr("Connected"));
+    ptLog->appendPlainText(tr("=== Connected ==="));
     updateStatus(tr("Connected"));
     tcp_client->sendRequest(STYPE_REQUEST_STATIONS_DATA);
     tcp_client->sendRequest(STYPE_REQUEST_TOPOLOGY_DATA);
@@ -216,7 +297,7 @@ void MainWindow::slotConnected()
 
 void MainWindow::slotDisconnected()
 {
-    ptLog->appendPlainText(tr("Disconnected"));
+    ptLog->appendPlainText(tr("=== Disconnected ==="));
     updateStatus(tr("Disconnected"));
 }
 
@@ -233,20 +314,20 @@ void MainWindow::slotStationsData(QByteArray &data)
     }
     station_model.loadStations(sv);
     mnemonic->setStationModel(&station_model);
-    ptLog->appendPlainText(tr("Stations: %1").arg(sv.size()));
+    ptLog->appendPlainText(tr("Stations (%1):").arg(sv.size()));
+
+    mStations->clear();
     for (const auto &s : sv)
     {
         ptLog->appendPlainText(tr("  %1").arg(s.name));
         QAction *a = mStations->addAction(s.name);
-        connect(a, &QAction::triggered, this, [this, &s]{
+        connect(a, &QAction::triggered, this, [this, name = s.name]{
             for (int i = 0; i < station_model.stations().size(); ++i)
-            {
-                if (station_model.stations()[i].name == s.name)
+                if (station_model.stations()[i].name == name)
                 {
                     mnemonic->setOffset(-i * 300.0 * mnemonic->scale());
                     break;
                 }
-            }
         });
     }
 }

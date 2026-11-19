@@ -12,10 +12,19 @@
 
 #include <stationmodel.h>
 
+struct hit_result_t
+{
+    enum Type { NONE, SIGNAL, CONNECTOR, STATION, TRAIN };
+    Type type = NONE;
+    int index = -1;
+    QString name;
+    QPointF screen_pos;
+};
+
 struct signal_hit_t
 {
     QPointF screen_pos;
-    int signal_type = 0; // 0-line, 1-enter, 2-route, 3-exit, 4-shunt
+    int signal_type = 0;
     int signal_index = 0;
 };
 
@@ -25,12 +34,8 @@ struct signal_view_t
     int8_t signal_dir = 0;
     QString letter;
     QString signal_model;
-    bool lens_red = false;
-    bool lens_yellow = false;
-    bool lens_green = false;
-    bool lens_white = false;
-    bool lens_blue = false;
-    bool lens_bot_yellow = false;
+    bool lens_red = false, lens_yellow = false, lens_green = false;
+    bool lens_white = false, lens_blue = false, lens_bot_yellow = false;
     double pos_x = 0.0, pos_y = 0.0;
     QColor lensColor() const;
 };
@@ -38,31 +43,27 @@ struct signal_view_t
 struct switch_view_t
 {
     QString name;
-    int8_t state_fwd = 0;
-    int8_t state_bwd = 0;
+    int8_t state_fwd = 0, state_bwd = 0;
+    double pos_x = 0.0, pos_y = 0.0;
 };
 
 struct traj_busy_view_t
 {
     QString name;
-    bool is_busy = false;
-    bool in_route = false;
+    bool is_busy = false, in_route = false;
 };
 
 struct vehicle_view_t
 {
     int vehicle_id = -1;
-    double pos_x = 0.0;
-    double pos_y = 0.0;
-    double orth_x = 0.0;
-    double orth_y = 0.0;
+    double pos_x = 0.0, pos_y = 0.0;
+    double orth_x = 0.0, orth_y = 0.0;
     double length = 0.0;
 };
 
 struct train_view_t
 {
-    int first_vehicle = -1;
-    int last_vehicle = -1;
+    int first_vehicle = -1, last_vehicle = -1;
     QString name;
 };
 
@@ -81,11 +82,7 @@ struct train_pos_update_t
 
 struct dispatcher_data_t
 {
-    QVector<signal_view_t> line_signals;
-    QVector<signal_view_t> enter_signals;
-    QVector<signal_view_t> route_signals;
-    QVector<signal_view_t> exit_signals;
-    QVector<signal_view_t> shunt_signals;
+    QVector<signal_view_t> line_signals, enter_signals, route_signals, exit_signals, shunt_signals;
     QMap<QString, switch_view_t> switches;
     QMap<QString, traj_busy_view_t> trajectory_states;
     QVector<train_view_t> trains;
@@ -107,17 +104,22 @@ public:
 
     void setStationModel(const StationModel *model);
     void setDispatcherData(const dispatcher_data_t *data);
-    void setScale(double scale);
+    void setScale(double s);
     double scale() const;
-    void setOffset(double offset);
+    void setOffset(double o);
     double offset() const;
 
-    // Для управления: поиск объекта под курсором
-    signal_hit_t hitTestSignal(const QPoint &screen_pos) const;
+    // Поиск объектов под курсором
+    hit_result_t hitTest(const QPoint &screen_pos) const;
+
+    // Получить данные о сигнале по hit-результату
+    const signal_view_t *signalByHit(const hit_result_t &h) const;
 
 signals:
-    void signalRightClicked(signal_hit_t hit);
-    void trajectoryRightClicked(const QString &traj_name);
+    void signalRightClicked(const signal_view_t *sig);
+    void connectorRightClicked(const QString &name);
+    void trainRightClicked(int vehicle_id);
+    void stationLeftClicked(const QString &name);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -129,25 +131,27 @@ protected:
 private:
     const StationModel *m_model = nullptr;
     const dispatcher_data_t *m_data = nullptr;
-    double m_scale = 1.0;
-    double m_offset = 0.0;
+    double m_scale = 1.0, m_offset = 0.0;
     bool m_dragging = false;
     QPoint m_last_mouse_pos;
+    int m_hovered_station = -1;
 
-    static constexpr double STATION_W = 120.0;
-    static constexpr double STATION_H = 60.0;
-    static constexpr double STATION_GAP = 300.0;
-    static constexpr double VCENTER = 300.0;
+    static constexpr double STATION_W = 120.0, STATION_H = 60.0;
+    static constexpr double STATION_GAP = 300.0, VCENTER = 300.0;
+    static constexpr double HIT_RADIUS = 12.0;
 
     QPointF stationCenter(int idx) const;
     void drawStation(QPainter &p, const station_info_t &s, QPointF c);
-    void drawBlock(QPainter &p, QPointF from, QPointF to);
-    void drawSignals(QPainter &p, const QVector<signal_view_t> &sv, QPointF sp, bool ab,
-                     int sig_type, QVector<signal_hit_t> &hits);
-    void drawTrain(QPainter &p, const vehicle_view_t &v);
+    void drawBlockSection(QPainter &p, QPointF from, QPointF to, bool busy, bool in_route);
+    void drawSignalAt(QPainter &p, const signal_view_t &sig, QPointF pos,
+                      int sig_type, int sig_idx, QVector<signal_hit_t> &hits);
+    void drawConnectorAt(QPainter &p, const switch_view_t &sw, QPointF pos);
+    void drawTrain(QPainter &p, const vehicle_view_t &v, const QString &name);
 
     QVector<signal_hit_t> m_signal_hits;
-    QVector<QPointF> m_traj_hits;
+    QVector<QPair<QPointF, QString>> m_connector_hits;
+    QVector<QPair<QPointF, int>> m_train_hits;
+    QVector<QPointF> m_station_hits;
 };
 
 #endif
