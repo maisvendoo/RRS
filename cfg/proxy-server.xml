@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Proxy>
+		<!-- Внешний порт, на котором прокси принимает подключения клиентов -->
+		<listen_port>1993</listen_port>
+
+		<!-- Адрес локального сервера симулятора -->
+		<target_host>127.0.0.1</target_host>
+
+		<!-- Порт локального сервера симулятора -->
+		<target_port>1992</target_port>
+
+		<!-- Максимальное число одновременных соединений -->
+		<max_connections>100</max_connections>
+
+		<!-- Максимальное число новых подключений в секунду -->
+		<rate_limit_per_sec>20</rate_limit_per_sec>
+
+		<!-- Таймаут простоя соединения, мс -->
+		<idle_timeout_ms>60000</idle_timeout_ms>
+
+		<!-- Максимальный размер кадра, байт -->
+		<max_frame_size>1048576</max_frame_size>
+	</Proxy>
+</Config>
