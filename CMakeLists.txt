@@ -63,6 +63,7 @@ if (CLIENT_BUILD)
     add_subdirectory (tools/route-transform)
     add_subdirectory (tools/texture-compressor)
     add_subdirectory (tools/admin-panel)
+    add_subdirectory (tools/proxy-server)
 endif()
 
 include(CMakePackageConfigHelpers)
