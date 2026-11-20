@@ -47,19 +47,25 @@ bool TcpServer::init(QString cfg_path)
         port = static_cast<quint16>(tmp);
     }
 
+    // Адрес прослушивания. По умолчанию 0.0.0.0 - все интерфейсы
+    // (прежнее поведение). Для прослушивания только локальной машины
+    // следует указать 127.0.0.1
+    QString host = "0.0.0.0";
+    cfg.getString(secName, "listen_host", host);
+
     server = new QTcpServer(this);
 
     connect(server, &QTcpServer::newConnection, this, &TcpServer::slotNewConnection);
 
     if (!server->isListening())
     {
-        if (server->listen(QHostAddress::Any, port))
+        if (server->listen(QHostAddress(host), port))
         {
-            Journal::instance()->info(QString("TCP-server listen at port %1").arg(port));
+            Journal::instance()->info(QString("TCP-server listen at %1:%2").arg(host).arg(port));
         }
         else
         {
-            Journal::instance()->error(QString("Failed start TCP-server at port %1").arg(port));
+            Journal::instance()->error(QString("Failed start TCP-server at %1:%2").arg(host).arg(port));
         }
     }
 
