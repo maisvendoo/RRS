@@ -120,44 +120,51 @@ void StaticObjectManager::remove_object(std::size_t id)
                                  "object count is 0");
     assert((id < object_count) && "id must be lower than object count");
 
-    const std::size_t last_object_id = object_count - 1;
-    if (id == last_object_id)
-    {
-        mat_transform_to_id.erase(
-            mat_transform_to_id.find(mat_transforms[id].get()));
-        --object_count;
-        return;
-    }
-
-    labels[id] = std::move(labels[last_object_id]);
-    rel_paths[id] = std::move(rel_paths[last_object_id]);
-
-    mat_transforms[id] = mat_transforms[last_object_id];
-    vsg_switches[id] = vsg_switches[last_object_id];
-    paged_lod_switches[id] = paged_lod_switches[last_object_id];
-    outline_switches[id] = outline_switches[last_object_id];
-    paged_lods[id] = paged_lods[last_object_id];
-
     mat_transform_to_id.erase(
         mat_transform_to_id.find(mat_transforms[id].get()));
-    mat_transform_to_id[mat_transforms[last_object_id].get()] = id;
 
     selected_objects.remove_if_contains(id);
     hidden_objects.remove_if_contains(id);
 
-    if (selected_objects.contains(last_object_id))
-    {
-        selected_objects.remove(last_object_id);
-        selected_objects.add(id);
-    }
-
-    if (hidden_objects.contains(last_object_id))
-    {
-        hidden_objects.remove(last_object_id);
-        hidden_objects.add(id);
-    }
-
     --object_count;
+
+    const std::size_t last_object_id = object_count - 1;
+    if (id == last_object_id)
+    {
+        labels[last_object_id] = "";
+        rel_paths[last_object_id] = "";
+        mat_transforms[last_object_id] = nullptr;
+        vsg_switches[last_object_id] = nullptr;
+        paged_lods[last_object_id] = nullptr;
+    }
+    else
+    {
+        labels[id] = labels[last_object_id];
+        rel_paths[id] = rel_paths[last_object_id];
+        mat_transforms[id] = mat_transforms[last_object_id];
+        vsg_switches[id] = vsg_switches[last_object_id];
+        paged_lod_switches[id] = paged_lod_switches[last_object_id];
+        outline_switches[id] = outline_switches[last_object_id];
+        paged_lods[id] = paged_lods[last_object_id];
+
+        labels[last_object_id] = "";
+        rel_paths[last_object_id] = "";
+        mat_transforms[last_object_id] = nullptr;
+        vsg_switches[last_object_id] = nullptr;
+        paged_lods[last_object_id] = nullptr;
+
+        if (selected_objects.contains(last_object_id))
+        {
+            selected_objects.remove(last_object_id);
+            selected_objects.add(id);
+        }
+
+        if (hidden_objects.contains(last_object_id))
+        {
+            hidden_objects.remove(last_object_id);
+            hidden_objects.add(id);
+        }
+    }
 }
 
 bool StaticObjectManager::select_object(std::size_t id)
