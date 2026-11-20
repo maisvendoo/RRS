@@ -552,7 +552,7 @@ void Model::findNearestVehicles()
         scnmgr->setTrainIndex(train_idx);
     }
 
-    is_trains_changed = true;
+    is_trains_changed++;
 }
 
 //------------------------------------------------------------------------------
@@ -585,7 +585,7 @@ void Model::findFarthestVehicles()
             connect(uncoupled_train, &Train::stepDone, this, &Model::slotTrainStepDone);
             thread->start();
 
-            is_trains_changed = true;
+            is_trains_changed++;
         }
     }
 }
@@ -1018,8 +1018,6 @@ void Model::initTcpServer()
 
     connect(tcp_server, &TcpServer::sigResetVehicleControl, this, &Model::slotResetVehicleControlByKeyboard);
 
-    connect(tcp_server, &TcpServer::sigRenameTrain, this, &Model::slotRenameTrainInModel);
-
     connect(tcp_server, &TcpServer::sigReverseTrain, this, &Model::slotReverseTrain);
 
     connect(tcp_server, &TcpServer::sigSetSimSpeed, this, &Model::slotSetSimSpeed);
@@ -1371,8 +1369,8 @@ void Model::process()
 
     findFarthestVehicles();
 
-    bool need_trains_feedback = is_trains_changed;
-    is_trains_changed = false;
+    bool need_trains_feedback = is_trains_changed > 0;
+    is_trains_changed = 0;
 
     prepareFeedBack(need_trains_feedback);
 
@@ -1532,11 +1530,17 @@ void Model::slotRenameTrainInModel(int train_idx, QString new_name)
         return;
     }
 
+    if (trains[t_idx] == nullptr)
+    {
+        Journal::instance()->error(QString("Rename train: Train #%1 is nullptr").arg(t_idx));
+        return;
+    }
+
     trains[t_idx]->setName(new_name.toStdString());
 
     Journal::instance()->info(QString("Rename train: Train #%1 has new name %2").arg(t_idx).arg(new_name));
 
-    is_trains_changed = true;
+    is_trains_changed++;
 }
 
 //------------------------------------------------------------------------------
@@ -1556,7 +1560,7 @@ void Model::slotReverseTrain(int train_idx)
 
     Journal::instance()->info(QString("Reverse train #%1").arg(t_idx));
 
-    is_trains_changed = true;
+    is_trains_changed++;
 }
 
 //------------------------------------------------------------------------------

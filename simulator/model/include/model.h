@@ -114,8 +114,8 @@ private:
     bool        is_step_correct = true;
     /// Flag is simulation thread started
     bool        is_simulation_started = false;
-    /// Flag is trains changed since previous tcpFeedBack
-    bool        is_trains_changed = true;
+    /// Счётчик изменений поездов с предыдущего tcpFeedBack
+    int         is_trains_changed = 1;
     /// Minimal intergation interval
     int         integration_time_interval = 100;
 
