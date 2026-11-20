@@ -3,6 +3,8 @@
 #include    <CfgReader.h>
 #include    <Journal.h>
 
+#include    <QDateTime>
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -49,6 +51,27 @@ bool ProxyServer::init(QString cfg_path)
         target_port = static_cast<quint16>(tmp);
     }
 
+    if (cfg.getInt(secName, "max_connections", tmp))
+    {
+        max_connections = tmp;
+    }
+
+    if (cfg.getInt(secName, "rate_limit_per_sec", tmp))
+    {
+        rate_limit_per_sec = tmp;
+    }
+
+    if (cfg.getInt(secName, "idle_timeout_ms", tmp))
+    {
+        idle_timeout_ms = tmp;
+    }
+
+    tmp = 0;
+    if (cfg.getInt(secName, "max_frame_size", tmp))
+    {
+        max_frame_size = static_cast<quint32>(tmp);
+    }
+
     server = new QTcpServer(this);
 
     connect(server, &QTcpServer::newConnection, this, &ProxyServer::slotNewConnection);
@@ -66,7 +89,36 @@ bool ProxyServer::init(QString cfg_path)
         return false;
     }
 
+    Journal::instance()->info(QString("Limits: max_connections=%1, "
+                                      "rate_limit_per_sec=%2, "
+                                      "idle_timeout_ms=%3, max_frame_size=%4")
+                              .arg(max_connections).arg(rate_limit_per_sec)
+                              .arg(idle_timeout_ms).arg(max_frame_size));
+
     return true;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+bool ProxyServer::isRateLimited()
+{
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+
+    // Удаляем устаревшие отметки (старше 1 секунды)
+    while (!connection_times.isEmpty() && (now - connection_times.first()) > 1000)
+    {
+        connection_times.removeFirst();
+    }
+
+    if (connection_times.size() >= rate_limit_per_sec)
+    {
+        return true;
+    }
+
+    connection_times.append(now);
+
+    return false;
 }
 
 //------------------------------------------------------------------------------
@@ -76,6 +128,22 @@ void ProxyServer::slotNewConnection()
 {
     QTcpSocket *client_socket = server->nextPendingConnection();
 
+    // Проверка лимита одновременных соединений
+    if (connections.size() >= max_connections)
+    {
+        Journal::instance()->warning("Proxy: limit of concurrent connections reached");
+        client_socket->abort();
+        return;
+    }
+
+    // Проверка ограничения скорости новых подключений
+    if (isRateLimited())
+    {
+        Journal::instance()->warning("Proxy: connection rate limit reached");
+        client_socket->abort();
+        return;
+    }
+
     Journal::instance()->info(QString("Proxy: new connection from %1:%2")
                                 .arg(client_socket->peerAddress().toString())
                                 .arg(client_socket->peerPort()));
@@ -83,6 +151,14 @@ void ProxyServer::slotNewConnection()
     QTcpSocket *target_socket = new QTcpSocket(this);
 
     connections.insert(client_socket, target_socket);
+
+    // Таймер простоя соединения
+    QTimer *idle_timer = new QTimer(this);
+    idle_timer->setInterval(idle_timeout_ms);
+    idle_timer->setSingleShot(true);
+    connect(idle_timer, &QTimer::timeout, this, &ProxyServer::slotIdleTimeout);
+    idle_timers.insert(client_socket, idle_timer);
+    idle_timer->start();
 
     // Приём данных от внешнего клиента и передача их целевому серверу
     connect(client_socket, &QTcpSocket::readyRead,
@@ -102,7 +178,7 @@ void ProxyServer::slotNewConnection()
     connect(target_socket, &QTcpSocket::errorOccurred,
             this, [this, client_socket](QAbstractSocket::SocketError)
     {
-        client_socket->disconnectFromHost();
+        closeConnection(client_socket);
     });
 
     target_socket->connectToHost(QHostAddress(target_host), target_port);
@@ -117,6 +193,14 @@ void ProxyServer::slotForwardToTarget()
 
     if (!client_socket)
     {
+        return;
+    }
+
+    // Проверка размера кадра (защита от половинной атаки)
+    if (client_socket->bytesAvailable() > max_frame_size)
+    {
+        Journal::instance()->warning("Proxy: frame size limit exceeded, closing connection");
+        closeConnection(client_socket);
         return;
     }
 
@@ -135,6 +219,8 @@ void ProxyServer::slotForwardToTarget()
     }
 
     target_socket->write(client_socket->readAll());
+
+    resetIdleTimer(client_socket);
 }
 
 //------------------------------------------------------------------------------
@@ -158,15 +244,37 @@ void ProxyServer::slotForwardToClient()
         {
             QTcpSocket *client_socket = it.key();
 
+            // Проверка размера кадра
+            if (target_socket->bytesAvailable() > max_frame_size)
+            {
+                Journal::instance()->warning("Proxy: frame size limit exceeded, closing connection");
+                closeConnection(client_socket);
+                return;
+            }
+
             if (client_socket->state() == QAbstractSocket::ConnectedState)
             {
                 client_socket->write(target_socket->readAll());
+                resetIdleTimer(client_socket);
             }
 
             return;
         }
 
         ++it;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProxyServer::resetIdleTimer(QTcpSocket *client_socket)
+{
+    auto it = idle_timers.find(client_socket);
+
+    if (it != idle_timers.end())
+    {
+        it.value()->start();
     }
 }
 
@@ -184,14 +292,10 @@ void ProxyServer::slotDisconnected()
 
     // Выясняем пару (клиент, целевой сервер) и закрываем обе стороны
     QTcpSocket *client_socket = nullptr;
-    QTcpSocket *target_socket = nullptr;
 
-    auto it = connections.find(socket);
-
-    if (it != connections.end())
+    if (connections.contains(socket))
     {
-        client_socket = it.key();
-        target_socket = it.value();
+        client_socket = socket;
     }
     else
     {
@@ -201,31 +305,93 @@ void ProxyServer::slotDisconnected()
             if (mit.value() == socket)
             {
                 client_socket = mit.key();
-                target_socket = mit.value();
                 break;
             }
         }
     }
 
-    if (client_socket == nullptr || target_socket == nullptr)
+    if (client_socket == nullptr)
     {
         return;
     }
 
+    closeConnection(client_socket);
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProxyServer::slotIdleTimeout()
+{
+    QTimer *timer = qobject_cast<QTimer *>(sender());
+
+    if (!timer)
+    {
+        return;
+    }
+
+    // Находим сокет, которому принадлежит таймер
+    auto it = idle_timers.begin();
+
+    while (it != idle_timers.end())
+    {
+        if (it.value() == timer)
+        {
+            Journal::instance()->warning("Proxy: connection closed by idle timeout");
+            closeConnection(it.key());
+            return;
+        }
+
+        ++it;
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProxyServer::closeConnection(QTcpSocket *client_socket)
+{
+    if (client_socket == nullptr)
+    {
+        return;
+    }
+
+    auto it = connections.find(client_socket);
+
+    if (it == connections.end())
+    {
+        // Соединение уже удалено - возможен повторный вызов
+        return;
+    }
+
+    QTcpSocket *target_socket = it.value();
+
     connections.remove(client_socket);
 
     Journal::instance()->info("Proxy: connection closed");
+
+    if (target_socket && target_socket->isOpen())
+    {
+        target_socket->disconnectFromHost();
+    }
 
     if (client_socket->isOpen())
     {
         client_socket->disconnectFromHost();
     }
 
-    if (target_socket->isOpen())
+    // Остановка и удаление таймера простоя
+    auto tit = idle_timers.find(client_socket);
+    if (tit != idle_timers.end())
     {
-        target_socket->disconnectFromHost();
+        tit.value()->stop();
+        tit.value()->deleteLater();
+        idle_timers.remove(client_socket);
     }
 
     client_socket->deleteLater();
-    target_socket->deleteLater();
+    if (target_socket)
+    {
+        target_socket->deleteLater();
+    }
 }
