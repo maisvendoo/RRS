@@ -93,7 +93,7 @@ struct EditorContext
     vsg::ref_ptr<vsg::Switch> scene_graph;
     vsg::ref_ptr<Route> route;
     vsg::ref_ptr<Gizmo> gizmo;
-    std::unique_ptr<StaticObjectManager> object_manager;
+    std::unique_ptr<StaticObjectManager> static_object_manager;
     vsg::ref_ptr<WorldCulling> world_culling;
     vsg::ref_ptr<vsg::Viewer> viewer;
 

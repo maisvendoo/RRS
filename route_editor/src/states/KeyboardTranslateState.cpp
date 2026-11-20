@@ -33,7 +33,7 @@ void KeyboardTranslateState::on_activate()
 
 void KeyboardTranslateState::handle_mouse_move()
 {
-    const auto& static_object_manager = editor_ctx.object_manager;
+    const auto& static_object_manager = editor_ctx.static_object_manager;
     auto& selected_objects = static_object_manager->get_selected_objects();
 
     const vsg::dvec3 world_intersection = calculate_world_intersection();

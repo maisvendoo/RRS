@@ -251,9 +251,9 @@ void Route::load_static_objects()
 
             // editor_ctx.static_objects.lock()->emplace_back(object);
 
-            auto& object_manager = editor_ctx.object_manager;
-            object_manager->add_object(label, rel_path, paged_lod, pos, rot_deg,
-                vsg::dvec3{1.0, 1.0, 1.0});
+            auto& static_object_manager = editor_ctx.static_object_manager;
+            static_object_manager->add_object(label, rel_path, paged_lod, pos,
+                rot_deg, vsg::dvec3{1.0, 1.0, 1.0});
         }
     }
 }

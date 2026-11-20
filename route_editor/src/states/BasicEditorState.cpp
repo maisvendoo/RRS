@@ -30,7 +30,7 @@ BasicEditorState::BasicEditorState(EditorContext& editor_ctx)
     , mouse(*editor_ctx.mouse)
     , camera(*editor_ctx.camera)
     , command_manager(*editor_ctx.command_manager)
-    , static_object_manager(*editor_ctx.object_manager)
+    , static_object_manager(*editor_ctx.static_object_manager)
 {
     name = "BasicEditorState";
 }
@@ -85,7 +85,7 @@ void BasicEditorState::handle_key_press()
             return;
         }
 
-        const auto& static_object_manager = editor_ctx.object_manager;
+        const auto& static_object_manager = editor_ctx.static_object_manager;
         auto& selected_objects = static_object_manager->get_selected_objects();
 
         selected_objects.for_each([&](std::size_t id) -> void {

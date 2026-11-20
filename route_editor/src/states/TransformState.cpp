@@ -69,7 +69,7 @@ void TransformState::handle_button_press()
 
 void TransformState::cancel_transform() const
 {
-    const auto& static_object_manager = editor_ctx.object_manager;
+    const auto& static_object_manager = editor_ctx.static_object_manager;
     auto& selected_objects = static_object_manager->get_selected_objects();
     const auto& state_manager = editor_ctx.state_manager;
 

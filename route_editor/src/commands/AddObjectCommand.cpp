@@ -53,10 +53,14 @@ void AddObjectCommand::undo()
     auto& route_children = editor_ctx.route->children;
 
     route_children.erase(
-        std::remove_if(route_children.begin(), route_children.end(),
-                       [this](const vsg::Switch::Child& child)
-                       { return child.node == object_to_add; }),
-        route_children.end());
+        std::remove_if(
+            route_children.begin(), route_children.end(),
+            [this](const vsg::Switch::Child& child) -> bool {
+                return child.node == object_to_add;
+            }
+        ),
+        route_children.end()
+    );
 
     for (const auto& object : objects_to_deselect)
     {

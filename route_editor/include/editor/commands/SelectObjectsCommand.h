@@ -7,6 +7,8 @@
 #include <vector>
 
 struct EditorContext;
+class Gizmo;
+class StaticObjectManager;
 
 class SelectObjectsCommand : public Command
 {
@@ -21,6 +23,10 @@ public:
     virtual void execute() override;
     virtual void undo() override;
     virtual void update_description() override;
+
+private:
+    StaticObjectManager& static_object_manager;
+    Gizmo& gizmo;
 };
 
 #endif // EDITOR_COMMANDS_SELECT_OBJECTS_COMMAND_H

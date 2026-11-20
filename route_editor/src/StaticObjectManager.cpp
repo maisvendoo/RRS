@@ -224,7 +224,7 @@ void StaticObjectManager::set_position(std::size_t id, const vsg::dvec3& pos)
 void StaticObjectManager::move_object(std::size_t id,
                                       const vsg::dvec3& delta_pos)
 {
-    assert((object_count > 0) && "Could not call move() when "
+    assert((object_count > 0) && "Could not call move_object() when "
                                  "object count is 0");
     assert((id < object_count) && "id must be lower than object count");
 

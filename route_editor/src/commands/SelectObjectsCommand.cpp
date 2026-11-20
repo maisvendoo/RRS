@@ -10,41 +10,39 @@
 
 SelectObjectsCommand::SelectObjectsCommand(EditorContext& context)
     : Command(context)
+    , static_object_manager(*editor_ctx.static_object_manager)
+    , gizmo(*editor_ctx.gizmo)
 {
 }
 
 void SelectObjectsCommand::execute()
 {
-    const auto& static_object_manager = editor_ctx.object_manager;
-
     for (const std::size_t id : ids_to_deselect)
     {
-        static_object_manager->deselect_object(id);
+        static_object_manager.deselect_object(id);
     }
 
     for (const std::size_t id : ids_to_select)
     {
-        static_object_manager->select_object(id);
+        static_object_manager.select_object(id);
     }
 
-    editor_ctx.gizmo->update_visibility();
+    gizmo.update_visibility();
 }
 
 void SelectObjectsCommand::undo()
 {
-    const auto& static_object_manager = editor_ctx.object_manager;
-
     for (const std::size_t id : ids_to_select)
     {
-        static_object_manager->deselect_object(id);
+        static_object_manager.deselect_object(id);
     }
 
     for (const std::size_t id : ids_to_deselect)
     {
-        static_object_manager->select_object(id);
+        static_object_manager.select_object(id);
     }
 
-    editor_ctx.gizmo->update_visibility();
+    gizmo.update_visibility();
 }
 
 void SelectObjectsCommand::update_description()
