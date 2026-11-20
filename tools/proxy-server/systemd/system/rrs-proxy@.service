@@ -1,0 +1,22 @@
+[Unit]
+Description=RRS Railway Simulator Network Proxy for %I
+After=network.target
+
+[Service]
+Type=simple
+User=%I
+Group=%I
+WorkingDirectory=/home/%I/RRS/RRS-sources/bin
+ExecStart=/home/%I/RRS/RRS-sources/bin/proxy-server --config /home/%I/RRS/RRS-sources/cfg/proxy-server.xml
+ExecStop=/bin/kill -TERM $MAINPID
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=rrs-proxy
+
+Environment="QT_QPA_PLATFORM=offscreen"
+Environment="LD_LIBRARY_PATH=/home/%I/RRS/RRS-sources/lib"
+
+[Install]
+WantedBy=multi-user.target
