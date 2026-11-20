@@ -24,7 +24,6 @@
 #include <cassert>
 #include <cstddef>
 #include <string>
-#include <utility>
 
 // static constexpr vsg::vec3 X_AXISf = {1.0f, 0.0f, 0.0f};
 // static constexpr vsg::vec3 Y_AXISf = {0.0f, 1.0f, 0.0f};
@@ -56,7 +55,8 @@ StaticObjectManager::StaticObjectManager(EditorContext& editor_ctx,
 bool StaticObjectManager::add_object(
     const std::string& label, const std::string& rel_path,
     const vsg::ref_ptr<vsg::PagedLOD>& paged_lod, const vsg::dvec3& pos,
-    const vsg::dvec3& rot_deg, const vsg::dvec3& scale)
+    const vsg::dvec3& rot_deg, const vsg::dvec3& scale, bool is_selected,
+    bool is_hidden)
 {
     if (object_count >= max_object_count)
     {
@@ -99,6 +99,16 @@ bool StaticObjectManager::add_object(
 
     mat_transform_to_id[mat_transform.get()] = object_count;
 
+    if (is_selected)
+    {
+        selected_objects.add(object_count);
+    }
+
+    if (is_hidden)
+    {
+        hidden_objects.add(object_count);
+    }
+
     ++object_count;
 
     return true;
@@ -134,6 +144,18 @@ void StaticObjectManager::remove_object(std::size_t id)
 
     selected_objects.remove_if_contains(id);
     hidden_objects.remove_if_contains(id);
+
+    if (selected_objects.contains(last_object_id))
+    {
+        selected_objects.remove(last_object_id);
+        selected_objects.add(id);
+    }
+
+    if (hidden_objects.contains(last_object_id))
+    {
+        hidden_objects.remove(last_object_id);
+        hidden_objects.add(id);
+    }
 
     --object_count;
 }

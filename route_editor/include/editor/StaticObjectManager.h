@@ -32,7 +32,8 @@ public:
     bool add_object(const std::string& label, const std::string& rel_path,
                     const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
                     const vsg::dvec3& pos, const vsg::dvec3& rot_deg,
-                    const vsg::dvec3& scale);
+                    const vsg::dvec3& scale, bool is_selected = false,
+                    bool is_hidden = false);
 
     void remove_object(std::size_t id);
 
