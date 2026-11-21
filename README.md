@@ -24,3 +24,23 @@ Dependencies:
 * [KTX-Software](https://github.com/khronosgroup/ktx-software) - libraries and soft for a work with Khronos Textures (KTX)
 
 For more information, you can visit our [official website](https://rusrailsim.ru) as well as our group on the [VK social network](https://vk.com/rusrailsim) (both in Russian). They also contain a [detailed guide for building the game on Windows](https://www.rusrailsim.ru/support/developer_guide/#windows_10/11_64-bit) and include add-ons that extend the game's functionality.
+
+## Add-ons
+
+The following add-on modules extend the game with additional locomotive and rolling stock models. Each repository contains the complete source code, configuration files, and 3D models for the respective vehicle, and can be built using the RRS SDK.
+
+### Locomotives
+
+| Vehicle | Repository | Description |
+|---------|-----------|-------------|
+| **TEP70** | [maisvendoo/tep70](https://github.com/maisvendoo/tep70) | Mainline diesel locomotive with AC/AC power transmission, 3000 hp |
+| **EP1M** | [maisvendoo/ep1m](https://github.com/maisvendoo/ep1m) | AC mainline electric locomotive, 8200 kW (twin-unit) |
+| **ChS2T** | [RRS-dev/chs2t](https://codeberg.org/RRS-dev/chs2t) | DC mainline electric locomotive, 4590 kW |
+| **TEM15** | [RRS-dev/tem15](https://codeberg.org/RRS-dev/tem15) | Shunting diesel locomotive with hydraulic transmission, 1350 hp |
+
+### Railcars
+
+| Vehicle | Repository | Description |
+|---------|-----------|-------------|
+| **RA3** | [codeberg.org/RRS-dev/ra3](https://codeberg.org/RRS-dev/ra3) | Diesel rail bus for suburban passenger service |
+| **Cisterns Pack** | [codeberg.org/RRS-dev/cisterns_pack](https://codeberg.org/RRS-dev/cisterns_pack) | Set of tank car variants for liquid cargo transportation |
