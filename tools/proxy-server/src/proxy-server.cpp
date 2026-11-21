@@ -235,9 +235,18 @@ void ProxyServer::slotForwardToTarget()
         return;
     }
 
-    // Если таргет ещё не подключился — буферизируем данные
+    // Если таргет ещё не подключился
     if (target_socket->state() != QAbstractSocket::ConnectedState)
     {
+        // Если соединение когда-то было, но оборвалось — закрываем клиента
+        if (target_socket->state() == QAbstractSocket::UnconnectedState &&
+            !pending_buffers[client_socket].isEmpty())
+        {
+            Journal::instance()->warning("Proxy: target disconnected, closing client");
+            closeConnection(client_socket);
+            return;
+        }
+
         auto bit = pending_buffers.find(client_socket);
         if (bit != pending_buffers.end())
         {
@@ -245,8 +254,6 @@ void ProxyServer::slotForwardToTarget()
             if (bit.value().size() + data.size() <= max_frame_size)
             {
                 bit.value().append(data);
-                qInfo() << QString("Proxy: buffered %1 bytes (pending %2)")
-                                .arg(data.size()).arg(bit.value().size());
             }
             else
             {
@@ -254,7 +261,6 @@ void ProxyServer::slotForwardToTarget()
                 closeConnection(client_socket);
             }
         }
-        qInfo() << "Proxy: target not connected yet, data buffered";
         return;
     }
 
