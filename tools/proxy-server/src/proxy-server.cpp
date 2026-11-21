@@ -258,7 +258,7 @@ void ProxyServer::slotForwardToTarget()
         return;
     }
 
-    qInfo() << "Proxy: forwarding %1 bytes to target"
+    qInfo() << QString("Proxy: forwarding %1 bytes to target")
                     .arg(client_socket->bytesAvailable());
     target_socket->write(client_socket->readAll());
 
