@@ -296,7 +296,9 @@ void ProxyServer::slotForwardToClient()
 
             if (client_socket->state() == QAbstractSocket::ConnectedState)
             {
-                client_socket->write(target_socket->readAll());
+                QByteArray data = target_socket->readAll();
+                qInfo() << QString("Proxy: forwarding %1 bytes to client").arg(data.size());
+                client_socket->write(data);
                 resetIdleTimer(client_socket);
             }
 
