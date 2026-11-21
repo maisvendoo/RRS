@@ -245,11 +245,8 @@ void ProxyServer::slotForwardToTarget()
             if (bit.value().size() + data.size() <= max_frame_size)
             {
                 bit.value().append(data);
-            }
-            else
-            {
                 qInfo() << QString("Proxy: buffered %1 bytes (pending %2)")
-                                .arg(data.size()).arg(bit.value().size() + data.size());
+                                .arg(data.size()).arg(bit.value().size());
             }
             else
             {
