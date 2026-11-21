@@ -67,6 +67,9 @@ private:
     /// Отметки времени приёма новых соединений (для rate limit)
     QVector<qint64> connection_times;
 
+    /// Буфер данных, поступивших от клиента до завершения соединения с таргетом
+    QMap<QTcpSocket*, QByteArray> pending_buffers;
+
     /// Сброс таймера простоя соединения
     void resetIdleTimer(QTcpSocket *client_socket);
 
@@ -75,6 +78,9 @@ private:
 
     /// Проверка ограничения скорости новых подключений
     bool isRateLimited();
+
+    /// Отправка накопленного буфера данных таргету после установки соединения
+    void flushPendingBuffer(QTcpSocket *client_socket);
 
 private slots:
 
