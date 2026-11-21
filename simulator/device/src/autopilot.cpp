@@ -53,13 +53,18 @@ QString Autopilot::getDbgMsg()
 
     if (is_timetable_ready)
     {
+        if (timetable.stations.empty())
+        {
+            return msg;
+        }
+
         msg += QString(" | Цель: %1 | дист.: %2")
-                   .arg(timetable.stations[target_station_idx].name)
+                   .arg(timetable.getStation(target_station_idx).name)
                    .arg(target_station_dist, 7, 'f', 1);
-        if (timetable.stations[target_station_idx].is_arrival && (timetable.stations[target_station_idx].dep_time != "-"))
+        if (timetable.getStation(target_station_idx).is_arrival && (timetable.getStation(target_station_idx).dep_time != "-"))
         {
             msg += QString(" | Стоянка: %1")
-                       .arg(timetable.stations[target_station_idx].dep_time_sec - time, 8, 'f', 1);
+                       .arg(timetable.getStation(target_station_idx).dep_time_sec - time, 8, 'f', 1);
         }
         else
         {

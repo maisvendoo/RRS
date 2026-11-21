@@ -192,6 +192,13 @@ struct autopilot_timetable_t
 
     autopilot_station_t &getStation(int idx)
     {
+        static autopilot_station_t empty;
+
+        if (stations.empty())
+        {
+            return empty;
+        }
+
         if (idx < 0)
         {
             idx = 0;
@@ -199,7 +206,7 @@ struct autopilot_timetable_t
 
         if (static_cast<size_t>(idx) >= stations.size())
         {
-            idx = stations.size() - 1;
+            idx = static_cast<int>(stations.size()) - 1;
         }
 
         return stations[idx];
