@@ -1,0 +1,201 @@
+# Убунту 26.04 LTS — базовый образ для сборки RRS.
+# Слои с зависимостями кешируются: при изменении только кода RRS
+# пересобирается лишь последняя стадия.
+
+# ---------------------------------------------------------------------------
+# Стадия 1: системные пакеты и зависимости, собранные из исходников
+# ---------------------------------------------------------------------------
+FROM ubuntu:26.04 AS deps
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Префикс, куда складываются зависимости, собранные из исходников
+ARG RRS_DEPS_PREFIX=/opt/rrs-deps
+
+# Версии зависимостей, которых нет в репозиториях Убунту 26.04
+# (можно переопределить при сборке образа)
+ARG VSG_VERSION=v1.1.16
+ARG VSGXCHANGE_VERSION=v1.1.14
+ARG VSGIMGUI_REPO=https://github.com/maisvendoo/vsgImGui.git
+ARG VSGIMGUI_VERSION=master-RRS
+ARG KTX_REPO=https://github.com/KhronosGroup/KTX-Software.git
+# KTX: в Убунту 26.04 пакета libktx нет вообще, а код RRS
+# (tools/dmd2gltf, tools/texture-compressor) использует поля
+# ktxBasisParams::codec (KTX_BASIS_CODEC_ETC1S) и ::etc1sCompressionLevel,
+# которых нет ни в одном релизе 4.x (в 4.4.2 они переименованы в
+# compressionLevel, поля codec нет). Эти поля есть только в master,
+# поэтому фиксируем конкретный коммит master.
+ARG KTX_VERSION=983695c105618462b8e96458b378222e99faec98
+
+# Базовые инструменты сборки и загрузки исходников
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        bash \
+        build-essential \
+        ninja-build \
+        pkg-config \
+        ca-certificates \
+        curl \
+        git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Зависимости, доступные пакетами Убунту 26.04:
+#   CMake 4.2 и Ninja — штатно (репозиторий Kitware больше не нужен);
+#   Qt 6.10 (Core, Gui, Widgets, Xml, Network, OpenGL, Pdf, SerialBus, LinguistTools);
+#   SFML 3.0 — заменил сборку SFML из исходников;
+#   sol2 3.5 — заменил сборку sol2 из исходников;
+#   Vulkan + glslang, OpenAL, Lua 5.4, assimp, freetype, zlib, libpng;
+#   X11/xcb/xkbcommon/wayland (нужны vsg и SFML для оконного ввода-вывода).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        cmake \
+        qt6-base-dev \
+        qt6-pdf-dev \
+        qt6-serialbus-dev \
+        qt6-l10n-tools \
+        qt6-tools-dev \
+        libsfml-dev \
+        sol2-dev \
+        libgl1-mesa-dev \
+        libglu1-mesa-dev \
+        libvulkan-dev \
+        vulkan-tools \
+        glslang-tools \
+        glslang-dev \
+        libopenal-dev \
+        liblua5.4-dev \
+        libassimp-dev \
+        libfreetype-dev \
+        zlib1g-dev \
+        libpng-dev \
+        libx11-dev \
+        libxcb1-dev \
+        libxkbcommon-x11-dev \
+        libxrandr-dev \
+        libxcursor-dev \
+        libxi-dev \
+        libudev-dev \
+        libwayland-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---------------------------------------------------------------------------
+# VulkanSceneGraph (vsg) — нет в репозиториях Убунту, собираем из исходников
+# ---------------------------------------------------------------------------
+RUN git clone --depth 1 --branch "${VSG_VERSION}" \
+        https://github.com/vsg-dev/VulkanSceneGraph.git /src/vsg \
+    && cmake -S /src/vsg -B /src/vsg/build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="${RRS_DEPS_PREFIX}" \
+        -DCMAKE_PREFIX_PATH="${RRS_DEPS_PREFIX}" \
+        -DBUILD_SHARED_LIBS=ON \
+        -DVSG_SUPPORTS_ShaderCompiler=ON \
+        -DVSG_SUPPORTS_ShaderOptimizer=OFF \
+        -DVSG_SUPPORTS_Windowing=ON \
+    && cmake --build /src/vsg/build -j "$(nproc)" \
+    && cmake --install /src/vsg/build \
+    # Без glslang vsg молча выключает ShaderCompiler, и viewer падает в
+    # vsg::BindGraphicsPipeline с "FATAL: ... not compiled with GLSLang".
+    && grep -q "glslang" /src/vsg/build/build.ninja \
+    && echo "vsg: ShaderCompiler собран с glslang" \
+    && rm -rf /src/vsg
+
+# ---------------------------------------------------------------------------
+# vsgXchange — загрузка моделей/изображений для vsg
+# ---------------------------------------------------------------------------
+RUN git clone --depth 1 --branch "${VSGXCHANGE_VERSION}" \
+        https://github.com/vsg-dev/vsgXchange.git /src/vsgXchange \
+    && cmake -S /src/vsgXchange -B /src/vsgXchange/build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="${RRS_DEPS_PREFIX}" \
+        -DCMAKE_PREFIX_PATH="${RRS_DEPS_PREFIX}" \
+        -DBUILD_SHARED_LIBS=ON \
+    && cmake --build /src/vsgXchange/build -j "$(nproc)" \
+    && cmake --install /src/vsgXchange/build \
+    && rm -rf /src/vsgXchange
+
+# ---------------------------------------------------------------------------
+# vsgImGui — форк maisvendoo (ветка master-RRS), в-tree submodules обязательны
+# ---------------------------------------------------------------------------
+RUN git clone --recursive --shallow-submodules --branch "${VSGIMGUI_VERSION}" \
+        "${VSGIMGUI_REPO}" /src/vsgImGui \
+    && cmake -S /src/vsgImGui -B /src/vsgImGui/build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="${RRS_DEPS_PREFIX}" \
+        -DCMAKE_PREFIX_PATH="${RRS_DEPS_PREFIX}" \
+        -DBUILD_SHARED_LIBS=ON \
+        -DVSGIMGUI_WITH_VULKAN=ON \
+    && cmake --build /src/vsgImGui/build -j "$(nproc)" \
+    && cmake --install /src/vsgImGui/build \
+    && rm -rf /src/vsgImGui
+
+# ---------------------------------------------------------------------------
+# KTX (Khronos Texture) — в Убунту 26.04 пакета нет, собираем из исходников.
+# Код RRS требует API ktxBasisParams::codec, который есть только в master,
+# поэтому версия задаётся коммитом (см. ARG KTX_VERSION выше).
+# ---------------------------------------------------------------------------
+RUN git clone "${KTX_REPO}" /src/ktx \
+    && git -C /src/ktx checkout "${KTX_VERSION}" \
+    && cmake -S /src/ktx -B /src/ktx/build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="${RRS_DEPS_PREFIX}" \
+        -DCMAKE_PREFIX_PATH="${RRS_DEPS_PREFIX}" \
+        -DKTX_FEATURE_TESTS=OFF \
+        -DKTX_FEATURE_TOOLS=OFF \
+        -DKTX_FEATURE_DOC=OFF \
+        -DKTX_FEATURE_JNI=OFF \
+        -DKTX_FEATURE_PY=OFF \
+        -DKTX_FEATURE_VK_UPLOAD=ON \
+        -DKTX_FEATURE_GL_UPLOAD=OFF \
+    && cmake --build /src/ktx/build -j "$(nproc)" \
+    && cmake --install /src/ktx/build \
+    && echo "KTX собран: $(git -C /src/ktx rev-parse --short HEAD)" \
+    # Проверяем, что установлен именно master-овский API (ktxBasisParams::codec),
+    # иначе dmd2gltf и texcompr не соберутся с неочевидными ошибками.
+    && grep -q "ktx_basis_codec codec;" "${RRS_DEPS_PREFIX}/include/ktx.h" \
+    && rm -rf /src/ktx
+
+# ---------------------------------------------------------------------------
+# Стадия 2: сборка RRS. Зависимости берутся из deps-стадии, поэтому
+# изменение исходников RRS не приводит к пересборке vsg и прочих тяжёлых
+# зависимостей — кеш docker переиспользует готовый слой.
+# ---------------------------------------------------------------------------
+FROM deps AS build
+
+ARG RRS_DEPS_PREFIX=/opt/rrs-deps
+ARG BUILD_TYPE=Release
+# --build-arg JOBS=16 || -j 16
+ARG JOBS
+ARG CLIENT_BUILD=ON
+# Каталог, куда складываются артефакты (cmake --install + бинарники)
+ARG RRS_ARTIFACT_PREFIX=/opt/rrs-dist
+
+COPY . /src/rrs
+
+# Каталог сборки лежит внутри исходников не случайно: проект задаёт
+# EXECUTABLE_OUTPUT_PATH/LIBRARY_OUTPUT_PATH относительными путями
+# ("../../bin", "../../lib"), которые CMake разрешает относительно каталога
+# сборки. При -B /build артефакты уехали бы в /bin и /lib корня контейнера.
+RUN cmake -S /src/rrs -B /src/rrs/build -G Ninja \
+        -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
+        -DCMAKE_INSTALL_PREFIX="${RRS_ARTIFACT_PREFIX}" \
+        -DCMAKE_PREFIX_PATH="${RRS_DEPS_PREFIX}" \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+        -DCLIENT_BUILD="${CLIENT_BUILD}" \
+        -DBUILD_TESTING=OFF \
+    && cmake --build /src/rrs/build -j "${JOBS:-$(nproc)}" \
+    && cmake --install /src/rrs/build \
+    && for d in bin lib modules plugins cfg data fonts themes; do \
+         if [ -d "/src/rrs/${d}" ]; then \
+             cp -a "/src/rrs/${d}" "${RRS_ARTIFACT_PREFIX}/"; \
+         fi; \
+       done \
+    && mkdir -p "${RRS_ARTIFACT_PREFIX}/logs" "${RRS_ARTIFACT_PREFIX}/screenshots" \
+    && if [ -f /src/rrs/docs/DIST_LINUX_README.md ]; then \
+         cp -a /src/rrs/docs/DIST_LINUX_README.md "${RRS_ARTIFACT_PREFIX}/README.md"; \
+       fi
+
+# Сборочное дерево тоже должно быть запускаемым: бинарники в /src/rrs/bin
+# ищут зависимости через $ORIGIN/../lib, поэтому копируем туда библиотеки
+# из deps-стадии (vsg, vsgXchange, vsgImGui, ktx).
+RUN cp -a "${RRS_DEPS_PREFIX}/lib/." "/src/rrs/lib/" \
+    && cp -a "${RRS_DEPS_PREFIX}/lib/." "${RRS_ARTIFACT_PREFIX}/lib/"
