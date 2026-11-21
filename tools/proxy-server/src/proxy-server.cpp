@@ -308,15 +308,7 @@ void ProxyServer::slotForwardToClient()
                 if (!data.isEmpty())
                 {
                     client_socket->write(data);
-                    updateActivity(client_socket);
                     resetIdleTimer(client_socket);
-                }
-                else if (!last_activity.contains(client_socket) ||
-                         (QDateTime::currentMSecsSinceEpoch() - last_activity[client_socket] > idle_timeout_ms))
-                {
-                    Journal::instance()->warning("Proxy: target silent timeout, closing client");
-                    closeConnection(client_socket);
-                    return;
                 }
             }
 
