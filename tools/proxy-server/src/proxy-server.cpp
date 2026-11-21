@@ -3,7 +3,9 @@
 #include    <CfgReader.h>
 #include    <Journal.h>
 
+#include    <QByteArray>
 #include    <QDateTime>
+#include    <QMap>
 
 //------------------------------------------------------------------------------
 //
@@ -174,6 +176,16 @@ void ProxyServer::slotNewConnection()
     connect(target_socket, &QTcpSocket::disconnected,
             this, &ProxyServer::slotDisconnected);
 
+    // Буфер данных на время соединения с таргетом
+    pending_buffers.insert(client_socket, QByteArray());
+
+    // Соединение с таргетом установлено — отправляем накопленные данные
+    connect(target_socket, &QTcpSocket::connected,
+            this, [this, client_socket]()
+    {
+        flushPendingBuffer(client_socket);
+    });
+
     // Отказ соединения с целевым сервером
     connect(target_socket, &QTcpSocket::errorOccurred,
             this, [this, client_socket](QAbstractSocket::SocketError)
@@ -213,8 +225,28 @@ void ProxyServer::slotForwardToTarget()
 
     QTcpSocket *target_socket = it.value();
 
-    if (target_socket == nullptr || target_socket->state() != QAbstractSocket::ConnectedState)
+    if (target_socket == nullptr)
     {
+        return;
+    }
+
+    // Если таргет ещё не подключился — буферизируем данные
+    if (target_socket->state() != QAbstractSocket::ConnectedState)
+    {
+        auto bit = pending_buffers.find(client_socket);
+        if (bit != pending_buffers.end())
+        {
+            QByteArray data = client_socket->readAll();
+            if (bit.value().size() + data.size() <= max_frame_size)
+            {
+                bit.value().append(data);
+            }
+            else
+            {
+                Journal::instance()->warning("Proxy: pending buffer overflow, closing connection");
+                closeConnection(client_socket);
+            }
+        }
         return;
     }
 
@@ -263,6 +295,27 @@ void ProxyServer::slotForwardToClient()
 
         ++it;
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProxyServer::flushPendingBuffer(QTcpSocket *client_socket)
+{
+    auto bit = pending_buffers.find(client_socket);
+    if (bit == pending_buffers.end() || bit.value().isEmpty())
+    {
+        return;
+    }
+
+    auto cit = connections.find(client_socket);
+    if (cit == connections.end() || cit.value() == nullptr)
+    {
+        return;
+    }
+
+    cit.value()->write(bit.value());
+    bit.value().clear();
 }
 
 //------------------------------------------------------------------------------
@@ -367,6 +420,9 @@ void ProxyServer::closeConnection(QTcpSocket *client_socket)
     QTcpSocket *target_socket = it.value();
 
     connections.remove(client_socket);
+
+    // Очистка буфера отложенных данных
+    pending_buffers.remove(client_socket);
 
     Journal::instance()->info("Proxy: connection closed");
 
