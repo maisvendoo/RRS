@@ -221,9 +221,11 @@ double Autopilot::calcBrakeCurveSpeed(double v_target, double dist)
         return v_target;
     }
 
-    double vt = v_target / Physics::kmh;
+    const double vt = v_target / Physics::kmh;
 
-    a_brake = a_brake_ref * ref_mass * train_length / train_mass / ref_length;
+    const double length_coeff = std::clamp(train_length / ref_length, 0.8, 1.25);
+    const double mass_coeff = std::clamp(train_mass / ref_mass, 0.8, 1.25);
+    a_brake = a_brake_ref * length_coeff / mass_coeff;
 
     return sqrt(vt * vt + 2 * a_brake * dist) * Physics::kmh;
 }
@@ -243,7 +245,7 @@ double Autopilot::calcAlsnSpeed(ALSN alsn_code, double signal_dist, double &v_ta
 
         v_target = 0.0;
 
-        v_lim = cut(calcBrakeCurveSpeed(v_target, signal_dist - lead_dist_RY), 0.0, v_lim_RY);
+        v_lim = std::clamp(calcBrakeCurveSpeed(v_target, signal_dist - lead_dist_RY), 0.0, v_lim_RY);
 
         // Запрещаем отпускать тормоза - остановка
         if (feedback->v_cur <= v_disable_release)
