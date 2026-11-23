@@ -17,7 +17,6 @@
 #include "editor/StaticObjectManager.h"
 #include "editor/WindowHandler.h"
 #include "editor/commands/CommandManager.h"
-#include "editor/SingleSwitch.h"
 
 #include <CfgReader.h>
 #include <Journal.h>
@@ -301,19 +300,6 @@ void RouteEditor::compile_models()
         for (auto& compile_info : *compile_infos)
         {
             compile_result.add(compile_manager->compile(compile_info.node));
-        }
-        compile_infos->clear();
-    }
-
-    {
-        auto compile_infos = editor_ctx.compile_info_single_switch_nodes.lock();
-
-        for (auto& compile_info : *compile_infos)
-        {
-            auto& node = compile_info.node;
-            compile_info.single_switch->mask = compile_info.mask;
-            compile_info.single_switch->node = node;
-            compile_result.add(compile_manager->compile(node));
         }
         compile_infos->clear();
     }

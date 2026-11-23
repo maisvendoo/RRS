@@ -5,14 +5,15 @@
 
 #include <vsg/ui/KeyEvent.h>
 
+#include <array>
 #include <cstdint>
 
 class CfgReader;
 
 struct KeyBindings
 {
-    vsg::KeySymbol keys[TOTAL_ACTIONS];
-    std::uint16_t modifiers[TOTAL_ACTIONS];
+    std::array<vsg::KeySymbol, NUM_ACTIONS> keys;
+    std::array<std::uint16_t, NUM_ACTIONS> modifiers;
 
     KeyBindings();
 

@@ -29,7 +29,6 @@ class CommandManager;
 class Gizmo;
 class Keyboard;
 class Mouse;
-class SingleSwitch;
 class StaticObjectManager;
 class ObjectSelector;
 class OutlineBuilder;
@@ -38,8 +37,6 @@ class SceneGraph;
 class StateManager;
 class Topology;
 class WorldCulling;
-
-#include "editor/SingleSwitch.h"
 
 namespace vsg
 {
@@ -55,13 +52,6 @@ class Window;
 struct CompileInfoNode
 {
     vsg::ref_ptr<vsg::Node> node;
-};
-
-struct CompileInfoSingleSwitchNode
-{
-    vsg::ref_ptr<SingleSwitch> single_switch;
-    vsg::ref_ptr<vsg::Node> node;
-    vsg::Mask mask = vsg::MASK_OFF;
 };
 
 struct WaypointData
@@ -109,7 +99,6 @@ struct EditorContext
     RouteObjects hidden_objects;
 
     ThreadSafe<std::vector<CompileInfoNode>> compile_info_nodes;
-    ThreadSafe<std::vector<CompileInfoSingleSwitchNode>> compile_info_single_switch_nodes;
 
     ThreadSafe<std::unique_ptr<Topology>> topology;
     std::atomic_bool topology_loaded = false;

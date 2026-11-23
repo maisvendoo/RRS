@@ -11,9 +11,9 @@
 #include <vsg/nodes/MatrixTransform.h>
 
 #include <string>
+#include <vsg/nodes/Switch.h>
 
 struct EditorContext;
-class SingleSwitch;
 
 namespace vsg
 {
@@ -86,9 +86,10 @@ private:
     bool is_selected = false;
     bool is_hidden = false;
 
-    vsg::ref_ptr<SingleSwitch> paged_lod_switch;
+    vsg::ref_ptr<vsg::Switch> vsg_switch;
+    vsg::Switch::Child* paged_lod_switch = nullptr;
+    vsg::Switch::Child* outline_switch = nullptr;
     vsg::ref_ptr<vsg::PagedLOD> paged_lod;
-    vsg::ref_ptr<SingleSwitch> outline_switch;
 };
 
 #endif // ROUTE_OBJECT_H

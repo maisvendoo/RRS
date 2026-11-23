@@ -3,9 +3,10 @@
 #include "editor/EditorContext.h"
 #include "editor/Gizmo.h"
 #include "editor/Mask.h"
+#include "editor/MergeSwitch.h"
 #include "editor/Outline.h"
-#include "editor/SingleSwitch.h"
 
+#include <vsg/app/Viewer.h>
 #include <vsg/core/Mask.h>
 #include <vsg/core/ref_ptr.h>
 #include <vsg/maths/box.h>
@@ -15,6 +16,7 @@
 #include <vsg/maths/transform.h>
 #include <vsg/maths/vec3.h>
 #include <vsg/nodes/PagedLOD.h>
+#include <vsg/nodes/Switch.h>
 #include <vsg/utils/ComputeBounds.h>
 
 #include <algorithm>
@@ -42,13 +44,11 @@ RouteObject::RouteObject(EditorContext& editor_ctx,
     , scale(scale)
     , paged_lod(paged_lod)
 {
-    paged_lod_switch = SingleSwitch::create(
-        vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
+    vsg_switch = vsg::Switch::create();
+    vsg_switch->addChild(vsg::Mask{MASK_SCENE | MASK_CLICKABLE}, paged_lod);
+    paged_lod_switch = &vsg_switch->children[0];
 
-    outline_switch = SingleSwitch::create(vsg::MASK_OFF, nullptr);
-
-    this->addChild(paged_lod_switch);
-    this->addChild(outline_switch);
+    this->addChild(vsg_switch);
 
     update_matrix();
 }
@@ -142,7 +142,11 @@ void RouteObject::scale_relative_to_pivot(const vsg::dvec3& pivot,
 void RouteObject::hide()
 {
     paged_lod_switch->mask = vsg::MASK_OFF;
-    outline_switch->mask = vsg::MASK_OFF;
+
+    if (outline_switch)
+    {
+        outline_switch->mask = vsg::MASK_OFF;
+    }
 
     is_hidden = true;
 
@@ -164,7 +168,7 @@ RouteObjectsIterator RouteObject::show()
 
 bool RouteObject::select()
 {
-    if (!outline_switch->node)
+    if (!outline_switch)
     {
         const auto& outline_builder = editor_ctx.outline_builder;
         auto outline = outline_builder->create_outline(paged_lod);
@@ -173,24 +177,37 @@ bool RouteObject::select()
             return false;
         }
 
-        editor_ctx.compile_info_single_switch_nodes.lock()->emplace_back(
-            CompileInfoSingleSwitchNode{outline_switch, outline,
-                                        vsg::Mask{MASK_GUI2}});
+        const auto& viewer = editor_ctx.viewer;
+        vsg::observer_ptr<vsg::Viewer> observer_viewer(viewer);
+        const auto compile_result = viewer->compileManager->compile(outline);
+
+        viewer->addUpdateOperation(MergeSwitch::create(
+            observer_viewer, vsg_switch, vsg::Mask{MASK_GUI2}, outline,
+            compile_result, [&]() -> void {
+                outline_switch = &vsg_switch->children[1];
+                is_selected = true;
+                editor_ctx.selected_objects.emplace_back(this);
+                editor_ctx.gizmo->update_position();
+            }
+        ));
     }
-
-    is_selected = true;
-
-    outline_switch->mask = vsg::Mask{MASK_GUI2};
-
-    editor_ctx.selected_objects.emplace_back(this);
-    editor_ctx.gizmo->update_position();
+    else
+    {
+        outline_switch->mask = MASK_GUI2;
+        is_selected = true;
+        editor_ctx.selected_objects.emplace_back(this);
+        editor_ctx.gizmo->update_position();
+    }
 
     return true;
 }
 
 RouteObjectsIterator RouteObject::deselect()
 {
-    outline_switch->mask = vsg::MASK_OFF;
+    if (outline_switch)
+    {
+        outline_switch->mask = vsg::MASK_OFF;
+    }
 
     is_selected = false;
 

@@ -472,7 +472,7 @@ void EditorGui::show_key_bindings() const
                               | ImGuiTableFlags_Borders
                               | ImGuiTableFlags_RowBg))
     {
-        for (int i = 0; i < TOTAL_ACTIONS; ++i)
+        for (int i = 0; i < NUM_ACTIONS; ++i)
         {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();

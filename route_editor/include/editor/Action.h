@@ -1,5 +1,5 @@
-#ifndef ACTION_H
-#define ACTION_H
+#ifndef EDITOR_ACTION_H
+#define EDITOR_ACTION_H
 
 #include <string>
 
@@ -9,6 +9,7 @@ enum Action
     ACTION_MOVE_CAMERA_BACKWARD,
     ACTION_MOVE_CAMERA_LEFT,
     ACTION_MOVE_CAMERA_RIGHT,
+    ACTION_SWAP_PROJECTION_MATRIX,
     ACTION_TRANSLATE_OBJECTS,
     ACTION_ROTATE_OBJECTS,
     ACTION_SCALE_OBJECTS,
@@ -20,10 +21,9 @@ enum Action
     ACTION_UNDO_COMMAND,
     ACTION_REDO_COMMAND,
     ACTION_SAVE_ROUTE,
-    ACTION_SWAP_PROJECTION_MATRIX,
-    TOTAL_ACTIONS
+    NUM_ACTIONS
 };
 
-const std::string &to_string(Action action);
+const std::string& to_string(Action action);
 
-#endif // ACTION_H
+#endif // EDITOR_ACTION_H
