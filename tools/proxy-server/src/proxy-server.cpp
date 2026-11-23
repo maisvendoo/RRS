@@ -156,6 +156,7 @@ void ProxyServer::slotNewConnection()
                     .arg(target_host).arg(target_port);
 
     connections.insert(client_socket, target_socket);
+    last_activity.insert(client_socket, QDateTime::currentMSecsSinceEpoch());
 
     // Таймер простоя соединения
     QTimer *idle_timer = new QTimer(this);
@@ -235,7 +236,7 @@ void ProxyServer::slotForwardToTarget()
         return;
     }
 
-    // Если таргет ещё не подключился — буферизируем данные
+    // Если таргет не подключён — буферизируем
     if (target_socket->state() != QAbstractSocket::ConnectedState)
     {
         auto bit = pending_buffers.find(client_socket);
@@ -248,23 +249,16 @@ void ProxyServer::slotForwardToTarget()
             }
             else
             {
-                qInfo() << QString("Proxy: buffered %1 bytes (pending %2)")
-                                .arg(data.size()).arg(bit.value().size() + data.size());
-            }
-            else
-            {
                 Journal::instance()->warning("Proxy: pending buffer overflow, closing connection");
                 closeConnection(client_socket);
             }
         }
-        qInfo() << "Proxy: target not connected yet, data buffered";
         return;
     }
 
-    qInfo() << "Proxy: forwarding %1 bytes to target"
+    qInfo() << QString("Proxy: forwarding %1 bytes to target")
                     .arg(client_socket->bytesAvailable());
     target_socket->write(client_socket->readAll());
-
     resetIdleTimer(client_socket);
 }
 
@@ -299,8 +293,13 @@ void ProxyServer::slotForwardToClient()
 
             if (client_socket->state() == QAbstractSocket::ConnectedState)
             {
-                client_socket->write(target_socket->readAll());
-                resetIdleTimer(client_socket);
+                QByteArray data = target_socket->readAll();
+                qInfo() << QString("Proxy: forwarding %1 bytes to client").arg(data.size());
+                if (!data.isEmpty())
+                {
+                    client_socket->write(data);
+                    resetIdleTimer(client_socket);
+                }
             }
 
             return;
@@ -348,6 +347,14 @@ void ProxyServer::resetIdleTimer(QTcpSocket *client_socket)
     {
         it.value()->start();
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void ProxyServer::updateActivity(QTcpSocket *client_socket)
+{
+    last_activity[client_socket] = QDateTime::currentMSecsSinceEpoch();
 }
 
 //------------------------------------------------------------------------------
@@ -443,16 +450,21 @@ void ProxyServer::closeConnection(QTcpSocket *client_socket)
     // Очистка буфера отложенных данных
     pending_buffers.remove(client_socket);
 
+    // Очистка времени последней активности
+    last_activity.remove(client_socket);
+
     qInfo() << "Proxy: connection closed";
 
+    // Принудительно закрываем оба сокета, чтобы клиент
+    // немедленно получил RST и переподключился
     if (target_socket && target_socket->isOpen())
     {
-        target_socket->disconnectFromHost();
+        target_socket->abort();
     }
 
     if (client_socket->isOpen())
     {
-        client_socket->disconnectFromHost();
+        client_socket->abort();
     }
 
     // Остановка и удаление таймера простоя

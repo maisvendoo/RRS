@@ -50,7 +50,7 @@ private:
     int rate_limit_per_sec = 20;
 
     /// Таймаут простоя соединения, мс
-    int idle_timeout_ms = 60000;
+    int idle_timeout_ms = 30000; // 30 секунд
 
     /// Максимальный размер кадра, байт
     quint32 max_frame_size = 1048576;
@@ -67,6 +67,9 @@ private:
     /// Отметки времени приёма новых соединений (для rate limit)
     QVector<qint64> connection_times;
 
+    /// Время последней активности по каждому соединению
+    QMap<QTcpSocket*, qint64> last_activity;
+
     /// Буфер данных, поступивших от клиента до завершения соединения с таргетом
     QMap<QTcpSocket*, QByteArray> pending_buffers;
 
@@ -81,6 +84,9 @@ private:
 
     /// Отправка накопленного буфера данных таргету после установки соединения
     void flushPendingBuffer(QTcpSocket *client_socket);
+
+    /// Обновление времени последней активности соединения
+    void updateActivity(QTcpSocket *client_socket);
 
 private slots:
 
