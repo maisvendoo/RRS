@@ -6,7 +6,6 @@
 #include "editor/Gizmo.h"
 #include "editor/RouteObject.h"
 #include "editor/StateManager.h"
-#include "editor/StaticObjectManager.h"
 #include "editor/commands/TranslateObjectsCommand.h"
 #include "editor/states/TransformState.h"
 
@@ -33,16 +32,16 @@ void KeyboardTranslateState::on_activate()
 
 void KeyboardTranslateState::handle_mouse_move()
 {
-    const auto& static_object_manager = editor_ctx.static_object_manager;
-    auto& selected_objects = static_object_manager->get_selected_objects();
+    const auto& selected_objects = editor_ctx.selected_objects;
 
     const vsg::dvec3 world_intersection = calculate_world_intersection();
     const vsg::dvec3 translation = world_intersection - prev_intersection;
     prev_intersection = world_intersection;
 
-    selected_objects.for_each([&](std::size_t id) -> void {
-        static_object_manager->move_object(id, translation);
-    });
+    for (const auto& object : selected_objects)
+    {
+        object->move(translation);
+    }
 }
 
 void KeyboardTranslateState::confirm_transform() const

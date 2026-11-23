@@ -7,7 +7,6 @@
 #include "editor/Mouse.h"
 #include "editor/RouteObject.h"
 #include "editor/StateManager.h"
-#include "editor/StaticObjectManager.h"
 #include "editor/editor_math.h"
 #include "editor/states/State.h"
 
@@ -15,8 +14,6 @@
 #include <vsg/maths/vec3.h>
 #include <vsg/ui/KeyEvent.h>
 #include <vsg/ui/PointerEvent.h>
-
-#include <cstddef>
 
 TransformState::TransformState(EditorContext& editor_ctx)
     : State(editor_ctx)
@@ -69,13 +66,13 @@ void TransformState::handle_button_press()
 
 void TransformState::cancel_transform() const
 {
-    const auto& static_object_manager = editor_ctx.static_object_manager;
-    auto& selected_objects = static_object_manager->get_selected_objects();
+    const auto& selected_objects = editor_ctx.selected_objects;
     const auto& state_manager = editor_ctx.state_manager;
 
-    selected_objects.for_each([&](std::size_t id) -> void {
-        static_object_manager->load_matrix(id);
-    });
+    for (const auto& object : selected_objects)
+    {
+        object->set_matrix(object->get_initial_matrix());
+    }
 
     state_manager->defer_switch_to(STATE_BASIC);
 }

@@ -15,7 +15,7 @@
 #include "editor/commands/PasteObjectsCommand.h"
 #include "editor/commands/SelectObjectsCommand.h"
 
-#include "editor/StaticObjectManager.h"
+// #include "editor/StaticObjectManager.h"
 
 #include <Journal.h>
 #include <filesystem.h>
@@ -30,7 +30,6 @@ BasicEditorState::BasicEditorState(EditorContext& editor_ctx)
     , mouse(*editor_ctx.mouse)
     , camera(*editor_ctx.camera)
     , command_manager(*editor_ctx.command_manager)
-    , static_object_manager(*editor_ctx.static_object_manager)
 {
     name = "BasicEditorState";
 }
@@ -39,6 +38,7 @@ BasicEditorState::~BasicEditorState() = default;
 
 void BasicEditorState::handle_key_press()
 {
+    auto& selected_objects = editor_ctx.selected_objects;
     auto& copied_objects = editor_ctx.copied_objects;
     const auto& state_manager = editor_ctx.state_manager;
 
@@ -85,12 +85,10 @@ void BasicEditorState::handle_key_press()
             return;
         }
 
-        const auto& static_object_manager = editor_ctx.static_object_manager;
-        auto& selected_objects = static_object_manager->get_selected_objects();
-
-        selected_objects.for_each([&](std::size_t id) -> void {
-            static_object_manager->save_matrix(id);
-        });
+        for (const auto& object : selected_objects)
+        {
+            object->save_matrix();
+        }
 
         if (pressed_action_move)
         {
@@ -138,7 +136,7 @@ void BasicEditorState::handle_button_press()
                 }
 
                 auto command = std::make_unique<SelectObjectsCommand>(editor_ctx);
-                command->ids_to_deselect = static_object_manager.get_selected_objects().copy_shrinked_ids();
+                command->objects_to_deselect = selected_objects;
                 command->update_description();
                 command->execute();
                 command_manager.push(std::move(command));
@@ -147,9 +145,9 @@ void BasicEditorState::handle_button_press()
 
             for (const vsg::Node* const node : intersections.front()->nodePath)
             {
-                if (const auto* mat_transform = dynamic_cast<const vsg::MatrixTransform*>(node))
+                if (const RouteObject* const object = node->cast<RouteObject>())
                 {
-                    select_object(mat_transform);
+                    select_object(vsg::ref_ptr(const_cast<RouteObject*>(object)));
                     return;
                 }
             }
@@ -208,54 +206,50 @@ void BasicEditorState::save_route()
     }
 }
 
-void BasicEditorState::select_object(const vsg::MatrixTransform* mat_transform)
+void BasicEditorState::select_object(const vsg::ref_ptr<RouteObject>& object)
 {
-    auto& selected_objects = static_object_manager.get_selected_objects();
-    const std::size_t selected_objects_size = selected_objects.get_size();
-
-    std::size_t object_id;
-    static_object_manager.get_mat_transform_id(mat_transform, object_id);
-    const bool is_selected = selected_objects.contains(object_id);
+    const auto& selected_objects = editor_ctx.selected_objects;
 
     auto command = std::make_unique<SelectObjectsCommand>(editor_ctx);
 
     if (keyboard.get_shift_state())
     {
-        if (is_selected)
+        if (object->get_is_selected())
         {
-            command->ids_to_deselect.emplace_back(object_id);
+            command->objects_to_deselect.emplace_back(object);
         }
         else
         {
-            command->ids_to_select.emplace_back(object_id);
+            command->objects_to_select.emplace_back(object);
         }
     }
     else
     {
-        if (selected_objects_size == 0)
+        if (selected_objects.empty())
         {
-            command->ids_to_select.emplace_back(object_id);
+            command->objects_to_select.emplace_back(object);
         }
-        else if (is_selected)
+        else if (object->get_is_selected())
         {
-            if (selected_objects_size == 1)
+            if (selected_objects.size() == 1)
             {
-                command->ids_to_deselect.emplace_back(object_id);
+                command->objects_to_deselect.emplace_back(object);
             }
             else
             {
-                selected_objects.for_each([&](std::size_t id) -> void {
-                    if (id != object_id)
+                for (const auto& selected_object : selected_objects)
+                {
+                    if (selected_object != object)
                     {
-                        command->ids_to_deselect.emplace_back(id);
+                        command->objects_to_deselect.emplace_back(selected_object);
                     }
-                });
+                }
             }
         }
         else
         {
-            command->ids_to_select.emplace_back(object_id);
-            command->ids_to_deselect = selected_objects.copy_shrinked_ids();
+            command->objects_to_select.emplace_back(object);
+            command->objects_to_deselect = selected_objects;
         }
     }
 
