@@ -15,7 +15,7 @@
 #include "editor/commands/PasteObjectsCommand.h"
 #include "editor/commands/SelectObjectsCommand.h"
 
-// #include "editor/StaticObjectManager.h"
+#include "editor/StaticObjectManager.h"
 
 #include <Journal.h>
 #include <filesystem.h>
@@ -26,6 +26,11 @@
 
 BasicEditorState::BasicEditorState(EditorContext& editor_ctx)
     : State(editor_ctx)
+    , keyboard(*editor_ctx.keyboard)
+    , mouse(*editor_ctx.mouse)
+    , camera(*editor_ctx.camera)
+    , command_manager(*editor_ctx.command_manager)
+    , static_object_manager(*editor_ctx.static_object_manager)
 {
     name = "BasicEditorState";
 }
@@ -34,60 +39,58 @@ BasicEditorState::~BasicEditorState() = default;
 
 void BasicEditorState::handle_key_press()
 {
-    const auto& keyboard = editor_ctx.keyboard;
-    const auto& camera = editor_ctx.camera;
-    const auto& command_manager = editor_ctx.command_manager;
-    const auto& selected_objects = editor_ctx.selected_objects;
     auto& copied_objects = editor_ctx.copied_objects;
     const auto& state_manager = editor_ctx.state_manager;
 
-    if (keyboard->pressed_once(ACTION_UNDO_COMMAND))
+    if (keyboard.pressed_once(ACTION_UNDO_COMMAND))
     {
-        command_manager->undo();
+        command_manager.undo();
     }
-    else if (keyboard->pressed_once(ACTION_REDO_COMMAND))
+    else if (keyboard.pressed_once(ACTION_REDO_COMMAND))
     {
-        command_manager->redo();
+        command_manager.redo();
     }
-    else if(keyboard->pressed_once(ACTION_SAVE_ROUTE))
+    else if(keyboard.pressed_once(ACTION_SAVE_ROUTE))
     {
         save_route();
     }
-    else if (keyboard->pressed_once(ACTION_SWAP_PROJECTION_MATRIX))
+    else if (keyboard.pressed_once(ACTION_SWAP_PROJECTION_MATRIX))
     {
-        camera->swap_proj_mat();
+        camera.swap_proj_mat();
     }
-    else if (keyboard->pressed_once(ACTION_COPY_OBJECTS))
+    else if (keyboard.pressed_once(ACTION_COPY_OBJECTS))
     {
-        copied_objects = selected_objects;
+        copied_objects = editor_ctx.selected_objects;
     }
-    else if (keyboard->pressed_once(ACTION_PASTE_OBJECTS))
+    else if (keyboard.pressed_once(ACTION_PASTE_OBJECTS))
     {
         auto command = std::make_unique<PasteObjectsCommand>(editor_ctx);
         command->execute();
-        command_manager->push(std::move(command));
+        command_manager.push(std::move(command));
     }
-    else if (keyboard->pressed(ACTION_DELETE_OBJECTS))
+    else if (keyboard.pressed(ACTION_DELETE_OBJECTS))
     {
         auto command = std::make_unique<DeleteObjectsCommand>(editor_ctx);
         command->execute();
-        command_manager->push(std::move(command));
+        command_manager.push(std::move(command));
     }
     else
     {
-        const bool pressed_action_move = keyboard->pressed_once(ACTION_TRANSLATE_OBJECTS);
-        const bool pressed_action_rotate = keyboard->pressed_once(ACTION_ROTATE_OBJECTS);
-        const bool pressed_action_scale = keyboard->pressed_once(ACTION_SCALE_OBJECTS);
+        const bool pressed_action_move = keyboard.pressed_once(ACTION_TRANSLATE_OBJECTS);
+        const bool pressed_action_rotate = keyboard.pressed_once(ACTION_ROTATE_OBJECTS);
+        const bool pressed_action_scale = keyboard.pressed_once(ACTION_SCALE_OBJECTS);
 
         if (!pressed_action_move && !pressed_action_rotate && !pressed_action_scale)
         {
             return;
         }
 
-        for (const auto& object : selected_objects)
-        {
-            object->save_matrix();
-        }
+        const auto& static_object_manager = editor_ctx.static_object_manager;
+        auto& selected_objects = static_object_manager->get_selected_objects();
+
+        selected_objects.for_each([&](std::size_t id) -> void {
+            static_object_manager->save_matrix(id);
+        });
 
         if (pressed_action_move)
         {
@@ -106,16 +109,12 @@ void BasicEditorState::handle_key_press()
 
 void BasicEditorState::handle_button_press()
 {
-    const auto& keyboard = editor_ctx.keyboard;
-    const auto& mouse = editor_ctx.mouse;
-    const auto& camera = editor_ctx.camera;
     const auto& state_manager = editor_ctx.state_manager;
     const auto& route = editor_ctx.route;
     const auto& gizmo = editor_ctx.gizmo;
     const auto& selected_objects = editor_ctx.selected_objects;
-    const auto& command_manager = editor_ctx.command_manager;
 
-    switch (mouse->get_button_mask())
+    switch (mouse.get_button_mask())
     {
         case vsg::BUTTON_MASK_1:
         {
@@ -126,31 +125,31 @@ void BasicEditorState::handle_button_press()
             }
 
             const auto intersector = vsg::LineSegmentIntersector::create(
-                *camera, mouse->get_x(), mouse->get_y());
+                camera, mouse.get_x(), mouse.get_y());
             intersector->traversalMask = MASK_CLICKABLE;
 
             route->accept(*intersector);
             auto& intersections = intersector->intersections;
             if (intersections.empty())
             {
-                if (selected_objects.empty() || keyboard->get_shift_state())
+                if (selected_objects.empty() || keyboard.get_shift_state())
                 {
                     return;
                 }
 
                 auto command = std::make_unique<SelectObjectsCommand>(editor_ctx);
-                command->objects_to_deselect = selected_objects;
+                command->ids_to_deselect = static_object_manager.get_selected_objects().copy_shrinked_ids();
                 command->update_description();
                 command->execute();
-                command_manager->push(std::move(command));
+                command_manager.push(std::move(command));
                 return;
             }
 
             for (const vsg::Node* const node : intersections.front()->nodePath)
             {
-                if (const RouteObject* const object = node->cast<RouteObject>())
+                if (const auto* mat_transform = dynamic_cast<const vsg::MatrixTransform*>(node))
                 {
-                    select_object(vsg::ref_ptr(const_cast<RouteObject*>(object)));
+                    select_object(mat_transform);
                     return;
                 }
             }
@@ -171,9 +170,7 @@ void BasicEditorState::handle_button_press()
 
 void BasicEditorState::handle_mouse_scroll()
 {
-    const auto& camera = editor_ctx.camera;
-
-    camera->handle_mouse_scroll();
+    camera.handle_mouse_scroll();
 }
 
 void BasicEditorState::save_route()
@@ -211,57 +208,59 @@ void BasicEditorState::save_route()
     }
 }
 
-void BasicEditorState::select_object(const vsg::ref_ptr<RouteObject>& object)
+void BasicEditorState::select_object(const vsg::MatrixTransform* mat_transform)
 {
-    const auto& keyboard = editor_ctx.keyboard;
-    const auto& selected_objects = editor_ctx.selected_objects;
-    const auto& command_manager = editor_ctx.command_manager;
+    auto& selected_objects = static_object_manager.get_selected_objects();
+    const std::size_t selected_objects_size = selected_objects.get_size();
+
+    std::size_t object_id;
+    static_object_manager.get_mat_transform_id(mat_transform, object_id);
+    const bool is_selected = selected_objects.contains(object_id);
 
     auto command = std::make_unique<SelectObjectsCommand>(editor_ctx);
 
-    if (keyboard->get_shift_state())
+    if (keyboard.get_shift_state())
     {
-        if (object->get_is_selected())
+        if (is_selected)
         {
-            command->objects_to_deselect.emplace_back(object);
+            command->ids_to_deselect.emplace_back(object_id);
         }
         else
         {
-            command->objects_to_select.emplace_back(object);
+            command->ids_to_select.emplace_back(object_id);
         }
     }
     else
     {
-        if (selected_objects.empty())
+        if (selected_objects_size == 0)
         {
-            command->objects_to_select.emplace_back(object);
+            command->ids_to_select.emplace_back(object_id);
         }
-        else if (object->get_is_selected())
+        else if (is_selected)
         {
-            if (selected_objects.size() == 1)
+            if (selected_objects_size == 1)
             {
-                command->objects_to_deselect.emplace_back(object);
+                command->ids_to_deselect.emplace_back(object_id);
             }
             else
             {
-                for (const auto& selected_object : selected_objects)
-                {
-                    if (selected_object != object)
+                selected_objects.for_each([&](std::size_t id) -> void {
+                    if (id != object_id)
                     {
-                        command->objects_to_deselect.emplace_back(selected_object);
+                        command->ids_to_deselect.emplace_back(id);
                     }
-                }
+                });
             }
         }
         else
         {
-            command->objects_to_select.emplace_back(object);
-            command->objects_to_deselect = selected_objects;
+            command->ids_to_select.emplace_back(object_id);
+            command->ids_to_deselect = selected_objects.copy_shrinked_ids();
         }
     }
 
     command->update_description();
     command->execute();
 
-    command_manager->push(std::move(command));
+    command_manager.push(std::move(command));
 }

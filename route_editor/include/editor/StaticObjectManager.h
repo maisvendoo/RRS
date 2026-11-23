@@ -32,7 +32,8 @@ public:
     bool add_object(const std::string& label, const std::string& rel_path,
                     const vsg::ref_ptr<vsg::PagedLOD>& paged_lod,
                     const vsg::dvec3& pos, const vsg::dvec3& rot_deg,
-                    const vsg::dvec3& scale);
+                    const vsg::dvec3& scale, bool is_selected = false,
+                    bool is_hidden = false);
 
     void remove_object(std::size_t id);
 
@@ -44,7 +45,14 @@ public:
     void set_position(std::size_t id, const vsg::dvec3& pos);
     void move_object(std::size_t id, const vsg::dvec3& delta_pos);
 
+    void save_matrix(std::size_t id);
+    void load_matrix(std::size_t id);
+
+    SparseSet& get_selected_objects();
     const SparseSet& get_selected_objects() const;
+
+    bool get_mat_transform_id(const vsg::MatrixTransform* mat_transform,
+                              std::size_t& id);
 
     std::size_t get_object_count() const;
 

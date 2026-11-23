@@ -5,8 +5,20 @@
 
 #include <vsg/core/ref_ptr.h>
 
+class Camera;
+class CommandManager;
 struct EditorContext;
+class Keyboard;
+class Mouse;
 class RouteObject;
+class StaticObjectManager;
+
+namespace vsg
+{
+
+class MatrixTransform;
+
+}
 
 class BasicEditorState : public State
 {
@@ -20,8 +32,15 @@ public:
     virtual void handle_mouse_scroll() override;
 
 private:
+    const Keyboard& keyboard;
+    const Mouse& mouse;
+    Camera& camera;
+    CommandManager& command_manager;
+    StaticObjectManager& static_object_manager;
+
+private:
     void save_route();
-    void select_object(const vsg::ref_ptr<RouteObject>& object);
+    void select_object(const vsg::MatrixTransform* mat_transform);
 };
 
 #endif // EDITOR_STATES_BASIC_EDITOR_STATE_H

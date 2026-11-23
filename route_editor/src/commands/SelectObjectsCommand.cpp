@@ -2,42 +2,53 @@
 
 #include "editor/EditorContext.h"
 #include "editor/Gizmo.h"
-#include "editor/RouteObject.h"
+#include "editor/StaticObjectManager.h"
 #include "editor/commands/Command.h"
 
+#include <cstddef>
 #include <cstdio>
 
 SelectObjectsCommand::SelectObjectsCommand(EditorContext& context)
     : Command(context)
+    , static_object_manager(*editor_ctx.static_object_manager)
+    , gizmo(*editor_ctx.gizmo)
 {
 }
 
 void SelectObjectsCommand::execute()
 {
-    for (const auto& object : objects_to_select)
-        object->select();
+    for (const std::size_t id : ids_to_deselect)
+    {
+        static_object_manager.deselect_object(id);
+    }
 
-    for (const auto& object : objects_to_deselect)
-        object->deselect();
+    for (const std::size_t id : ids_to_select)
+    {
+        static_object_manager.select_object(id);
+    }
 
-    editor_ctx.gizmo->update_visibility();
+    gizmo.update_visibility();
 }
 
 void SelectObjectsCommand::undo()
 {
-    for (const auto& object : objects_to_select)
-        object->deselect();
+    for (const std::size_t id : ids_to_select)
+    {
+        static_object_manager.deselect_object(id);
+    }
 
-    for (const auto& object : objects_to_deselect)
-        object->select();
+    for (const std::size_t id : ids_to_deselect)
+    {
+        static_object_manager.select_object(id);
+    }
 
-    editor_ctx.gizmo->update_visibility();
+    gizmo.update_visibility();
 }
 
 void SelectObjectsCommand::update_description()
 {
     std::snprintf(description, COMMAND_DESCRIPTION_BUFFER_SIZE,
-        "Select objects: to select: %zu objects\n"
-        "              to deselect: %zu objects",
-        objects_to_select.size(), objects_to_deselect.size());
+                  "Select objects: to select: %zu objects\n"
+                  "              to deselect: %zu objects",
+                  ids_to_select.size(), ids_to_deselect.size());
 }

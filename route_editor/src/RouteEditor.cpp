@@ -70,7 +70,7 @@ bool RouteEditor::initialize()
     auto& gizmo = editor_ctx.gizmo;
     auto& keyboard = editor_ctx.keyboard;
     auto& mouse = editor_ctx.mouse;
-    auto& object_manager = editor_ctx.object_manager;
+    auto& static_object_manager = editor_ctx.static_object_manager;
     auto& object_selector = editor_ctx.object_selector;
     auto& outline_builder = editor_ctx.outline_builder;
     auto& route = editor_ctx.route;
@@ -93,7 +93,8 @@ bool RouteEditor::initialize()
     keyboard = Keyboard::create(editor_ctx.key_bindings);
     command_manager = std::make_unique<CommandManager>();
     camera = Camera::create(editor_ctx);
-    object_manager = std::make_unique<StaticObjectManager>(editor_ctx, 1000000);
+    static_object_manager = std::make_unique<StaticObjectManager>(editor_ctx,
+                                                                  1000000);
     route = Route::create(editor_ctx);
     outline_builder = OutlineBuilder::create();
 

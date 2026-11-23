@@ -24,7 +24,6 @@
 #include <cassert>
 #include <cstddef>
 #include <string>
-#include <utility>
 
 // static constexpr vsg::vec3 X_AXISf = {1.0f, 0.0f, 0.0f};
 // static constexpr vsg::vec3 Y_AXISf = {0.0f, 1.0f, 0.0f};
@@ -56,7 +55,8 @@ StaticObjectManager::StaticObjectManager(EditorContext& editor_ctx,
 bool StaticObjectManager::add_object(
     const std::string& label, const std::string& rel_path,
     const vsg::ref_ptr<vsg::PagedLOD>& paged_lod, const vsg::dvec3& pos,
-    const vsg::dvec3& rot_deg, const vsg::dvec3& scale)
+    const vsg::dvec3& rot_deg, const vsg::dvec3& scale, bool is_selected,
+    bool is_hidden)
 {
     if (object_count >= max_object_count)
     {
@@ -99,6 +99,16 @@ bool StaticObjectManager::add_object(
 
     mat_transform_to_id[mat_transform.get()] = object_count;
 
+    if (is_selected)
+    {
+        selected_objects.add(object_count);
+    }
+
+    if (is_hidden)
+    {
+        hidden_objects.add(object_count);
+    }
+
     ++object_count;
 
     return true;
@@ -110,32 +120,51 @@ void StaticObjectManager::remove_object(std::size_t id)
                                  "object count is 0");
     assert((id < object_count) && "id must be lower than object count");
 
-    const std::size_t last_object_id = object_count - 1;
-    if (id == last_object_id)
-    {
-        mat_transform_to_id.erase(
-            mat_transform_to_id.find(mat_transforms[id].get()));
-        --object_count;
-        return;
-    }
-
-    labels[id] = std::move(labels[last_object_id]);
-    rel_paths[id] = std::move(rel_paths[last_object_id]);
-
-    mat_transforms[id] = mat_transforms[last_object_id];
-    vsg_switches[id] = vsg_switches[last_object_id];
-    paged_lod_switches[id] = paged_lod_switches[last_object_id];
-    outline_switches[id] = outline_switches[last_object_id];
-    paged_lods[id] = paged_lods[last_object_id];
-
     mat_transform_to_id.erase(
         mat_transform_to_id.find(mat_transforms[id].get()));
-    mat_transform_to_id[mat_transforms[last_object_id].get()] = id;
 
     selected_objects.remove_if_contains(id);
     hidden_objects.remove_if_contains(id);
 
     --object_count;
+
+    const std::size_t last_object_id = object_count - 1;
+    if (id == last_object_id)
+    {
+        labels[last_object_id] = "";
+        rel_paths[last_object_id] = "";
+        mat_transforms[last_object_id] = nullptr;
+        vsg_switches[last_object_id] = nullptr;
+        paged_lods[last_object_id] = nullptr;
+    }
+    else
+    {
+        labels[id] = labels[last_object_id];
+        rel_paths[id] = rel_paths[last_object_id];
+        mat_transforms[id] = mat_transforms[last_object_id];
+        vsg_switches[id] = vsg_switches[last_object_id];
+        paged_lod_switches[id] = paged_lod_switches[last_object_id];
+        outline_switches[id] = outline_switches[last_object_id];
+        paged_lods[id] = paged_lods[last_object_id];
+
+        labels[last_object_id] = "";
+        rel_paths[last_object_id] = "";
+        mat_transforms[last_object_id] = nullptr;
+        vsg_switches[last_object_id] = nullptr;
+        paged_lods[last_object_id] = nullptr;
+
+        if (selected_objects.contains(last_object_id))
+        {
+            selected_objects.remove(last_object_id);
+            selected_objects.add(id);
+        }
+
+        if (hidden_objects.contains(last_object_id))
+        {
+            hidden_objects.remove(last_object_id);
+            hidden_objects.add(id);
+        }
+    }
 }
 
 bool StaticObjectManager::select_object(std::size_t id)
@@ -224,7 +253,7 @@ void StaticObjectManager::set_position(std::size_t id, const vsg::dvec3& pos)
 void StaticObjectManager::move_object(std::size_t id,
                                       const vsg::dvec3& delta_pos)
 {
-    assert((object_count > 0) && "Could not call move() when "
+    assert((object_count > 0) && "Could not call move_object() when "
                                  "object count is 0");
     assert((id < object_count) && "id must be lower than object count");
 
@@ -234,9 +263,47 @@ void StaticObjectManager::move_object(std::size_t id,
     matrix[3][2] += delta_pos.z;
 }
 
+void StaticObjectManager::save_matrix(std::size_t id)
+{
+    assert((object_count > 0) && "Could not call save_matrix() when "
+                                 "object count is 0");
+    assert((id < object_count) && "id must be lower than object count");
+
+    init_mats[id] = mat_transforms[id]->matrix;
+}
+
+void StaticObjectManager::load_matrix(std::size_t id)
+{
+    assert((object_count > 0) && "Could not call load_matrix() when "
+                                 "object count is 0");
+    assert((id < object_count) && "id must be lower than object count");
+
+    mat_transforms[id]->matrix = init_mats[id];
+}
+
+SparseSet& StaticObjectManager::get_selected_objects()
+{
+    return selected_objects;
+}
+
 const SparseSet& StaticObjectManager::get_selected_objects() const
 {
     return selected_objects;
+}
+
+bool StaticObjectManager::get_mat_transform_id(
+    const vsg::MatrixTransform* mat_transform, std::size_t& id)
+{
+    const auto found_it = mat_transform_to_id.find(mat_transform);
+    if (found_it == mat_transform_to_id.cend())
+    {
+        return false;
+    }
+    else
+    {
+        id = found_it->second;
+        return true;
+    }
 }
 
 std::size_t StaticObjectManager::get_object_count() const
