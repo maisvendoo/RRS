@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Vehicle>
+		<ModuleDir>passcar</ModuleDir>
+		<Module>passcar</Module>
 
 		<EmptyMass>56500</EmptyMass>
 		<PayloadMass>4000</PayloadMass>
