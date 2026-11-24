@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
 	<Vehicle>
+		<ModuleDir>vl60</ModuleDir>
+		<Module>vl60k</Module>
 		<EmptyMass>136000</EmptyMass>
 		<PayloadMass>2000</PayloadMass>
 		<Length>21.0</Length>
