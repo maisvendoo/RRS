@@ -250,19 +250,12 @@ void ProxyServer::slotForwardToTarget()
             {
                 qInfo() << QString("Proxy: buffered %1 bytes (pending %2)")
                                 .arg(data.size()).arg(bit.value().size() + data.size());
-            }
-            else
-            {
-                Journal::instance()->warning("Proxy: pending buffer overflow, closing connection");
-                closeConnection(client_socket);
-            }
+            }            
         }
         qInfo() << "Proxy: target not connected yet, data buffered";
         return;
     }
 
-    qInfo() << "Proxy: forwarding %1 bytes to target"
-                    .arg(client_socket->bytesAvailable());
     target_socket->write(client_socket->readAll());
 
     resetIdleTimer(client_socket);
