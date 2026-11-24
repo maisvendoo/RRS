@@ -27,8 +27,6 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>freightcar</ModuleDir>
-		<Module>freightcar</Module>
 		<ModuleConfigDir>Fr_hopper_RZD</ModuleConfigDir>
 		<ModuleConfig>Fr_hopper_RZD-2851</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>

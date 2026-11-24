@@ -13,8 +13,6 @@
 	</Common>
 
 	<Vehicle>
-		<ModuleDir>vl60</ModuleDir>
-		<Module>vl60pk</Module>
 		<ModuleConfigDir>vl60pk</ModuleConfigDir>
 		<ModuleConfig>vl60pk-1543</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>

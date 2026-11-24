@@ -8,8 +8,6 @@
 	</Common>
 
 	<Vehicle>
-		<ModuleDir>vl60pk</ModuleDir>
-		<Module>vl60pk</Module>
 		<ModuleConfigDir>vl60pk</ModuleConfigDir>
 		<ModuleConfig>vl60pk-1543</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
@@ -17,7 +15,7 @@
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
-	<!-- Купейные (К) -->
+	<!-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅ) -->
 	<Vehicle>
 		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
@@ -87,7 +85,7 @@
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
-	<!-- Вагон-буфет -->
+	<!-- пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅ -->
 	<Vehicle>
 		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
@@ -108,7 +106,7 @@
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
-	<!-- Плацкартные (ПЛ) -->
+	<!-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅ) -->
 	<Vehicle>
 		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
@@ -119,7 +117,7 @@
 		<PayloadCoeff>1</PayloadCoeff>
 	</Vehicle>
 
-	<!-- Купейные -->
+	<!-- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ -->
 	<Vehicle>
 		<ModuleDir>passcar</ModuleDir>
 		<Module>passcar</Module>
