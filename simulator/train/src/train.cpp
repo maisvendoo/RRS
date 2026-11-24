@@ -7,6 +7,45 @@
 #include    <vehicle-controller.h>
 #include    <core/load_module.h>
 
+namespace
+{
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+// Читает имя модуля ПЕ из конфига ПЕ (секция Vehicle).
+// Возвращает true, если в конфиге ПЕ задан тег <Module> (новый механизм).
+// Параметры module_dir/module_name заполняются только при наличии тегов,
+// иначе остаются без изменений.
+//------------------------------------------------------------------------------
+bool readVehicleModuleFromConfig(const QString &relConfigPath,
+                                 QString &module_dir,
+                                 QString &module_name)
+{
+    FileSystem &fs = FileSystem::getInstance();
+
+    QString path = QString(fs.getVehiclesDir().c_str()) +
+                   fs.separator() + relConfigPath + ".xml";
+
+    CfgReader cfg;
+
+    if (!cfg.load(path))
+    {
+        return false;
+    }
+
+    if (!cfg.getString("Vehicle", "Module", module_name))
+    {
+        return false;
+    }
+
+    cfg.getString("Vehicle", "ModuleDir", module_dir);
+
+    return true;
+}
+
+} // namespace
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
