@@ -995,23 +995,7 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
         {
             Journal::instance()->info("==== Vehicle's group loading ====");
 
-            QString module_lib_name = "";
-            if (!cfg.getString(vehicle_node, "Module", module_lib_name))
-            {
-                Journal::instance()->error("Section with Module library name is not found");
-                break;
-            }
-
-            QString module_lib_dir = module_lib_name;
-            if (!cfg.getString(vehicle_node, "ModuleDir", module_lib_dir))
-            {
-                Journal::instance()->error("Section with Module directory is not found, using directory with the same name as Module library");
-                module_lib_dir = module_lib_name;
-            }
-
-            // Calculate module library path
-            QString relModulePath = QString(fs.combinePath(module_lib_dir.toStdString(), module_lib_name.toStdString()).c_str());
-
+            // Путь к конфигу ПЕ всегда задаётся в конфиге поезда
             QString module_cfg_name = "";
             if (!cfg.getString(vehicle_node, "ModuleConfig", module_cfg_name))
             {
@@ -1028,6 +1012,40 @@ bool Train::loadTrain(QString cfg_path, const init_data_t& init_data, int model_
 
             // Calculate config file path
             QString relConfigPath = QString(fs.combinePath(module_cfg_dir.toStdString(), module_cfg_name.toStdString()).c_str());
+
+            // Имя модуля ПЕ: приоритетно берём из конфига ПЕ (новый механизм).
+            // Если в конфиге ПЕ <Module> не задан - используем имя модуля
+            // из конфига поезда (старый механизм, обратная совместимость).
+            QString module_lib_name = "";
+            QString module_lib_dir  = "";
+
+            if (!readVehicleModuleFromConfig(relConfigPath, module_lib_dir, module_lib_name))
+            {
+                module_lib_name = "";
+                if (!cfg.getString(vehicle_node, "Module", module_lib_name))
+                {
+                    Journal::instance()->error("Section with Module library name is not found");
+                    break;
+                }
+
+                module_lib_dir = module_lib_name;
+                if (!cfg.getString(vehicle_node, "ModuleDir", module_lib_dir))
+                {
+                    Journal::instance()->error("Section with Module directory is not found, using directory with the same name as Module library");
+                    module_lib_dir = module_lib_name;
+                }
+            }
+
+            if (module_lib_dir.isEmpty())
+            {
+                module_lib_dir = module_lib_name;
+            }
+
+            // Calculate module library path
+            QString relModulePath = QString(fs.combinePath(module_lib_dir.toStdString(), module_lib_name.toStdString()).c_str());
+
+            Journal::instance()->info(QString("Vehicle module: %1 (dir %2), config: %3")
+                                      .arg(module_lib_name).arg(module_lib_dir).arg(relConfigPath));
 
             // Vehicles count
             int n_vehicles = 0;
