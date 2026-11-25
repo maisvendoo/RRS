@@ -10,50 +10,50 @@
 
 #include <cfloat>
 
-CameraSettingsWindow::CameraSettingsWindow(EditorContext& editor_ctx,
+#define FLOAT_FORMAT "%.3f"
+
+static bool drag_scalar(const char *label, void *data, const char *format)
+{
+    static constexpr double min = 0.0;
+    return ImGui::DragScalar(label, ImGuiDataType_Double, data, 1.0f, &min,
+                             nullptr, format);
+}
+
+CameraSettingsWindow::CameraSettingsWindow(EditorContext &editor_ctx,
                                            ImGuiWindowFlags window_flags)
     : camera(*editor_ctx.camera)
     , camera_settings(editor_ctx.camera_settings)
-    , gui_settings(editor_ctx.gui_settings)
+    , show_camera_settings(editor_ctx.gui_settings.show_camera_settings)
     , window_flags(window_flags)
 {
 }
 
 void CameraSettingsWindow::show() const
 {
-    bool& show_camera_settings = gui_settings.show_camera_settings;
-
     if (!show_camera_settings)
     {
         return;
     }
 
-    constexpr double min_drag_value = 0.0;
-
     ImGui::Begin("Camera settings", &show_camera_settings, window_flags);
-
     ImGui::PushItemWidth(-FLT_MIN);
 
-    ImGui::DragScalar("##CameraMoveSpeed", ImGuiDataType_Double,
-                      &camera_settings.move_speed, 1.0f, &min_drag_value,
-                      nullptr, "Move speed: %.3f");
+    drag_scalar("##CameraMoveSpeed", &camera_settings.move_speed,
+                "Move speed: " FLOAT_FORMAT);
 
-    ImGui::DragScalar("##CameraRotateSpeed", ImGuiDataType_Double,
-                      &camera_settings.rotate_speed, 1.0f, &min_drag_value,
-                      nullptr, "Rotate speed: %.3f");
+    drag_scalar("##CameraRotateSpeed", &camera_settings.rotate_speed,
+                "Rotate speed: " FLOAT_FORMAT);
 
-    ImGui::DragScalar("##CameraZoomPower", ImGuiDataType_Double,
-                      &camera_settings.zoom_power, 1.0f, &min_drag_value,
-                      nullptr, "Zoom power: %.3f");
+    drag_scalar("##CameraZoomPower", &camera_settings.zoom_power,
+                "Zoom power: " FLOAT_FORMAT);
 
     if (ImGui::SliderScalar("##CameraFovY", ImGuiDataType_Double,
                             &camera_settings.fovy, &camera_settings.fovy_min,
-                            &camera_settings.fovy_max, "FovY: %.3f"))
+                            &camera_settings.fovy_max, "FovY: " FLOAT_FORMAT))
     {
         camera.get_perspective()->fieldOfViewY = camera_settings.fovy;
     }
 
     ImGui::PopItemWidth();
-
     ImGui::End();
 }
