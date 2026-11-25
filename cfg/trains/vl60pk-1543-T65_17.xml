@@ -13,8 +13,6 @@
 	</Common>
 
 	<Vehicle>
-		<ModuleDir>vl60</ModuleDir>
-		<Module>vl60pk</Module>
 		<ModuleConfigDir>vl60pk</ModuleConfigDir>
 		<ModuleConfig>vl60pk-1543</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
@@ -23,8 +21,6 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>passcar</ModuleDir>
-		<Module>passcar</Module>
 		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
@@ -34,8 +30,6 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>passcar</ModuleDir>
-		<Module>passcar</Module>
 		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
@@ -45,8 +39,6 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>passcar</ModuleDir>
-		<Module>passcar</Module>
 		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
@@ -56,8 +48,6 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>passcar</ModuleDir>
-		<Module>passcar</Module>
 		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-16733</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
@@ -67,8 +57,6 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>passcar</ModuleDir>
-		<Module>passcar</Module>
 		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-17669</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
@@ -78,8 +66,6 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>passcar</ModuleDir>
-		<Module>passcar</Module>
 		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-13819</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
@@ -89,8 +75,6 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>passcar</ModuleDir>
-		<Module>passcar</Module>
 		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-11100</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
@@ -100,8 +84,6 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>passcar</ModuleDir>
-		<Module>passcar</Module>
 		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-25924</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>
@@ -111,8 +93,6 @@
 	</Vehicle>
 
 	<Vehicle>
-		<ModuleDir>passcar</ModuleDir>
-		<Module>passcar</Module>
 		<ModuleConfigDir>IMR_pass_rzd</ModuleConfigDir>
 		<ModuleConfig>IMR_pass_rzd-21071</ModuleConfig>
 		<IsOrientationForward>1</IsOrientationForward>

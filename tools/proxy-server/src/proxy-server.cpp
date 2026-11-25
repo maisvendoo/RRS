@@ -249,15 +249,13 @@ void ProxyServer::slotForwardToTarget()
             }
             else
             {
-                Journal::instance()->warning("Proxy: pending buffer overflow, closing connection");
-                closeConnection(client_socket);
+                qInfo() << QString("Proxy: buffered %1 bytes (pending %2)")
+                                .arg(data.size()).arg(bit.value().size() + data.size());
             }
         }
         return;
     }
 
-    qInfo() << QString("Proxy: forwarding %1 bytes to target")
-                    .arg(client_socket->bytesAvailable());
     target_socket->write(client_socket->readAll());
     resetIdleTimer(client_socket);
 }
