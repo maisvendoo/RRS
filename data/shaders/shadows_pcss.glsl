@@ -1,4 +1,4 @@
-float calculateShadowCoverageForDirectionalLightPCSS(int lightDataIndex, int shadowMapIndex, vec3 T, vec3 B, inout vec3 color)
+float calculateShadowCoverageForDirectionalLightPCSS(vec3 shadowEyePos, int lightDataIndex, int shadowMapIndex, vec3 T, vec3 B, inout vec3 color)
 {
     vec4 shadowMapSettings = lightData.values[lightDataIndex++];
     int shadowMapCount = int(shadowMapSettings.r);
@@ -27,7 +27,7 @@ float calculateShadowCoverageForDirectionalLightPCSS(int lightDataIndex, int sha
         int blockerCount = 0;
         int viableSamples = 0;
         // always sample the original coordinates as otherwise blockers smaller than the search radius may be missed with small sample counts
-        vec4 sm_tc = sm_matrix * vec4(eyePos, 1.0);
+        vec4 sm_tc = sm_matrix * vec4(shadowEyePos, 1.0);
         sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
         if (sm_tc.x >= 0.0 && sm_tc.x <= 1.0 && sm_tc.y >= 0.0 && sm_tc.y <= 1.0 && sm_tc.z >= 0.0 && sm_tc.z <= 1.0)
         {
@@ -41,7 +41,7 @@ float calculateShadowCoverageForDirectionalLightPCSS(int lightDataIndex, int sha
         for (int i = 0; i < POISSON_DISK_SAMPLE_COUNT; i += POISSON_DISK_SAMPLE_COUNT / min(shadowSamples / 2, POISSON_DISK_SAMPLE_COUNT))
         {
             vec2 rotatedDisk = blockerSearchRadius * diskRotationMatrix * POISSON_DISK[i];
-            sm_tc = sm_matrix * vec4(eyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
+            sm_tc = sm_matrix * vec4(shadowEyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
             sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
             if (sm_tc.x >= 0.0 && sm_tc.x <= 1.0 && sm_tc.y >= 0.0 && sm_tc.y <= 1.0 && sm_tc.z >= 0.0 && sm_tc.z <= 1.0)
             {
@@ -67,11 +67,11 @@ float calculateShadowCoverageForDirectionalLightPCSS(int lightDataIndex, int sha
                                       lightData.values[lightDataIndex+5],
                                       lightData.values[lightDataIndex+6],
                                       lightData.values[lightDataIndex+7]);
-            vec4 sm_tc = sm_matrix * vec4(eyePos, 1.0);
+            vec4 sm_tc = sm_matrix * vec4(shadowEyePos, 1.0);
             sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
             vec4 averageBlockerEuclidean = sm_matrix_inv * vec4(sm_tc.xy, blockerDistances, sm_tc.w);
             averageBlockerEuclidean.xyz /= averageBlockerEuclidean.w;
-            float dist = distance(averageBlockerEuclidean.xyz, eyePos);
+            float dist = distance(averageBlockerEuclidean.xyz, shadowEyePos);
 
             overallBlockerCount += blockerCount;
             overallBlockerDistances = mix(overallBlockerDistances, dist, blockerCount / overallBlockerCount);
@@ -107,7 +107,7 @@ float calculateShadowCoverageForDirectionalLightPCSS(int lightDataIndex, int sha
             for (int i = 0; i < POISSON_DISK_SAMPLE_COUNT; i += POISSON_DISK_SAMPLE_COUNT / min(shadowSamples, POISSON_DISK_SAMPLE_COUNT))
             {
                 vec2 rotatedDisk = penumbraRadius * diskRotationMatrix * POISSON_DISK[i];
-                vec4 sm_tc = sm_matrix * vec4(eyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
+                vec4 sm_tc = sm_matrix * vec4(shadowEyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
                 sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
                 if (sm_tc.x >= 0.0 && sm_tc.x <= 1.0 && sm_tc.y >= 0.0 && sm_tc.y <= 1.0 && sm_tc.z >= 0.0 && sm_tc.z <= 1.0)
                 {
@@ -142,7 +142,7 @@ float calculateShadowCoverageForDirectionalLightPCSS(int lightDataIndex, int sha
     return 0.0;
 }
 
-float calculateShadowCoverageForSpotLightPCSS(int lightDataIndex, int shadowMapIndex, vec3 T, vec3 B, float lightDist, inout vec3 color)
+float calculateShadowCoverageForSpotLightPCSS(vec3 shadowEyePos, int lightDataIndex, int shadowMapIndex, vec3 T, vec3 B, float lightDist, inout vec3 color)
 {
     vec4 shadowMapSettings = lightData.values[lightDataIndex++];
     int shadowMapCount = int(shadowMapSettings.r);
@@ -171,7 +171,7 @@ float calculateShadowCoverageForSpotLightPCSS(int lightDataIndex, int shadowMapI
         int blockerCount = 0;
         int viableSamples = 0;
         // always sample the original coordinates as otherwise blockers smaller than the search radius may be missed with small sample counts
-        vec4 sm_tc = sm_matrix * vec4(eyePos, 1.0);
+        vec4 sm_tc = sm_matrix * vec4(shadowEyePos, 1.0);
         sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
         if (sm_tc.x >= 0.0 && sm_tc.x <= 1.0 && sm_tc.y >= 0.0 && sm_tc.y <= 1.0 && sm_tc.z >= 0.0 && sm_tc.z <= 1.0)
         {
@@ -185,7 +185,7 @@ float calculateShadowCoverageForSpotLightPCSS(int lightDataIndex, int shadowMapI
         for (int i = 0; i < POISSON_DISK_SAMPLE_COUNT; i += POISSON_DISK_SAMPLE_COUNT / min(shadowSamples / 2, POISSON_DISK_SAMPLE_COUNT))
         {
             vec2 rotatedDisk = blockerSearchRadius * diskRotationMatrix * POISSON_DISK[i];
-            sm_tc = sm_matrix * vec4(eyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
+            sm_tc = sm_matrix * vec4(shadowEyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
             sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
             if (sm_tc.x >= 0.0 && sm_tc.x <= 1.0 && sm_tc.y >= 0.0 && sm_tc.y <= 1.0 && sm_tc.z >= 0.0 && sm_tc.z <= 1.0)
             {
@@ -211,11 +211,11 @@ float calculateShadowCoverageForSpotLightPCSS(int lightDataIndex, int shadowMapI
                                       lightData.values[lightDataIndex+5],
                                       lightData.values[lightDataIndex+6],
                                       lightData.values[lightDataIndex+7]);
-            vec4 sm_tc = sm_matrix * vec4(eyePos, 1.0);
+            vec4 sm_tc = sm_matrix * vec4(shadowEyePos, 1.0);
             sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
             vec4 averageBlockerEuclidean = sm_matrix_inv * vec4(sm_tc.xy, blockerDistances, sm_tc.w);
             averageBlockerEuclidean.xyz /= averageBlockerEuclidean.w;
-            float dist = distance(averageBlockerEuclidean.xyz, eyePos);
+            float dist = distance(averageBlockerEuclidean.xyz, shadowEyePos);
 
             overallBlockerCount += blockerCount;
             overallBlockerDistances = mix(overallBlockerDistances, dist, blockerCount / overallBlockerCount);
@@ -251,7 +251,7 @@ float calculateShadowCoverageForSpotLightPCSS(int lightDataIndex, int shadowMapI
             for (int i = 0; i < POISSON_DISK_SAMPLE_COUNT; i += POISSON_DISK_SAMPLE_COUNT / min(shadowSamples, POISSON_DISK_SAMPLE_COUNT))
             {
                 vec2 rotatedDisk = penumbraRadius * diskRotationMatrix * POISSON_DISK[i];
-                vec4 sm_tc = sm_matrix * vec4(eyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
+                vec4 sm_tc = sm_matrix * vec4(shadowEyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
                 sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
                 if (sm_tc.x >= 0.0 && sm_tc.x <= 1.0 && sm_tc.y >= 0.0 && sm_tc.y <= 1.0 && sm_tc.z >= 0.0 && sm_tc.z <= 1.0)
                 {

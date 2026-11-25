@@ -1,4 +1,4 @@
-float calculateShadowCoverageForDirectionalLightSoft(int lightDataIndex, int shadowMapIndex, vec3 T, vec3 B, inout vec3 color)
+float calculateShadowCoverageForDirectionalLightSoft(vec3 shadowEyePos, int lightDataIndex, int shadowMapIndex, vec3 T, vec3 B, inout vec3 color)
 {
     vec4 shadowMapSettings = lightData.values[lightDataIndex++];
     int shadowMapCount = int(shadowMapSettings.r);
@@ -24,7 +24,7 @@ float calculateShadowCoverageForDirectionalLightSoft(int lightDataIndex, int sha
         {
             float penumbraRadius = shadowMapSettings.g;
             vec2 rotatedDisk = penumbraRadius * diskRotationMatrix * POISSON_DISK[i];
-            vec4 sm_tc = sm_matrix * vec4(eyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
+            vec4 sm_tc = sm_matrix * vec4(shadowEyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
             sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
             if (sm_tc.x >= 0.0 && sm_tc.x <= 1.0 && sm_tc.y >= 0.0 && sm_tc.y <= 1.0 && sm_tc.z >= 0.0 && sm_tc.z <= 1.0)
             {
@@ -58,7 +58,7 @@ float calculateShadowCoverageForDirectionalLightSoft(int lightDataIndex, int sha
     return 0.0;
 }
 
-float calculateShadowCoverageForSpotLightSoft(int lightDataIndex, int shadowMapIndex, vec3 T, vec3 B, inout vec3 color)
+float calculateShadowCoverageForSpotLightSoft(vec3 shadowEyePos, int lightDataIndex, int shadowMapIndex, vec3 T, vec3 B, inout vec3 color)
 {
     // identical to directional lights
     vec4 shadowMapSettings = lightData.values[lightDataIndex++];
@@ -85,7 +85,7 @@ float calculateShadowCoverageForSpotLightSoft(int lightDataIndex, int shadowMapI
         {
             float penumbraRadius = shadowMapSettings.g;
             vec2 rotatedDisk = penumbraRadius * diskRotationMatrix * POISSON_DISK[i];
-            vec4 sm_tc = sm_matrix * vec4(eyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
+            vec4 sm_tc = sm_matrix * vec4(shadowEyePos + rotatedDisk.x * T + rotatedDisk.y * B, 1.0);
             sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
             if (sm_tc.x >= 0.0 && sm_tc.x <= 1.0 && sm_tc.y >= 0.0 && sm_tc.y <= 1.0 && sm_tc.z >= 0.0 && sm_tc.z <= 1.0)
             {

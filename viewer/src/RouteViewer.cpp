@@ -854,18 +854,13 @@ void RouteViewer::configureShaders()
 void RouteViewer::initView()
 {
     constexpr double maxShadowDistance = 1e8;
-    constexpr double shadowMapBias = 0.005;
     constexpr double lambda = 0.25;
 
     view = vsg::View::create();
     view->camera = camera;
     view->viewDependentState->maxShadowDistance = maxShadowDistance;
-    {
-        vsg::ShadowMapBias smb;
-        smb.normalOffset = 0.005f;
-        view->viewDependentState->shadowMapBias = vsg::ShadowMapBiasValue::create(smb);
-    }
     view->viewDependentState->lambda = lambda;
+    view->viewDependentState->shadowMapBias = vsg::ShadowMapBiasValue::create();
     view->addChild(root);
 }
 

@@ -1,4 +1,4 @@
-float calculateShadowCoverageForDirectionalLightHard(int lightDataIndex, int shadowMapIndex, inout vec3 color)
+float calculateShadowCoverageForDirectionalLightHard(vec3 shadowEyePos, int lightDataIndex, int shadowMapIndex, inout vec3 color)
 {
     vec4 shadowMapSettings = lightData.values[lightDataIndex++];
     int shadowMapCount = int(shadowMapSettings.r);
@@ -11,7 +11,7 @@ float calculateShadowCoverageForDirectionalLightHard(int lightDataIndex, int sha
                               lightData.values[lightDataIndex+2],
                               lightData.values[lightDataIndex+3]);
 
-        vec4 sm_tc = sm_matrix * vec4(eyePos, 1.0);
+        vec4 sm_tc = sm_matrix * vec4(shadowEyePos, 1.0);
         sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
 
         if (sm_tc.x >= 0.0 && sm_tc.x <= 1.0 && sm_tc.y >= 0.0 && sm_tc.y <= 1.0 && sm_tc.z >= 0.0 && sm_tc.z <= 1.0)
@@ -38,7 +38,7 @@ float calculateShadowCoverageForDirectionalLightHard(int lightDataIndex, int sha
     return 0.0;
 }
 
-float calculateShadowCoverageForSpotLightHard(int lightDataIndex, int shadowMapIndex, inout vec3 color)
+float calculateShadowCoverageForSpotLightHard(vec3 shadowEyePos, int lightDataIndex, int shadowMapIndex, inout vec3 color)
 {
     // identical to directional lights
     vec4 shadowMapSettings = lightData.values[lightDataIndex++];
@@ -52,7 +52,7 @@ float calculateShadowCoverageForSpotLightHard(int lightDataIndex, int shadowMapI
                               lightData.values[lightDataIndex+2],
                               lightData.values[lightDataIndex+3]);
 
-        vec4 sm_tc = sm_matrix * vec4(eyePos, 1.0);
+        vec4 sm_tc = sm_matrix * vec4(shadowEyePos, 1.0);
         sm_tc = vec4(sm_tc.xyz / sm_tc.w, 1.0);
 
         if (sm_tc.x >= 0.0 && sm_tc.x <= 1.0 && sm_tc.y >= 0.0 && sm_tc.y <= 1.0 && sm_tc.z >= 0.0 && sm_tc.z <= 1.0)
