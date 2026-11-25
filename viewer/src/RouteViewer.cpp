@@ -856,7 +856,11 @@ void RouteViewer::initView()
     view = vsg::View::create();
     view->camera = camera;
     view->viewDependentState->maxShadowDistance = maxShadowDistance;
-    view->viewDependentState->shadowMapBias = shadowMapBias;
+    {
+        vsg::ShadowMapBias smb;
+        smb.normalOffset = 0.005f;
+        view->viewDependentState->shadowMapBias = vsg::ShadowMapBiasValue::create(smb);
+    }
     view->viewDependentState->lambda = lambda;
     view->addChild(root);
 }
