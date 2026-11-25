@@ -12,13 +12,12 @@ struct gui_settings_t;
 class CameraSettingsWindow
 {
 public:
-    CameraSettingsWindow(EditorContext& editor_ctx,
-                         ImGuiWindowFlags window_flags = 0);
-
+    explicit CameraSettingsWindow(EditorContext& editor_ctx,
+                                  ImGuiWindowFlags window_flags = 0);
     void show() const;
 
 private:
-    const vsg::ref_ptr<Camera> camera;
+    const Camera& camera;
     camera_settings_t& camera_settings;
     gui_settings_t& gui_settings;
     const ImGuiWindowFlags window_flags;

@@ -116,6 +116,7 @@ void Camera::handle_mouse_scroll()
     double& fovy = perspective->fieldOfViewY;
     fovy -= mouse.get_scroll() * camera_settings.zoom_power;
     fovy = std::clamp(fovy, camera_settings.fovy_min, camera_settings.fovy_max);
+    camera_settings.fovy = fovy;
     calc_inv_proj_mat();
 }
 

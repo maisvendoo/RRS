@@ -105,8 +105,8 @@ EditorGui::EditorGui(EditorContext& context)
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.FrameBorderSize = 1.0f;
-    style.FrameRounding = 3.0f;
-    style.WindowRounding = 3.0f;
+    // style.FrameRounding = 3.0f;
+    // style.WindowRounding = 3.0f;
     style.ScrollbarSize = 16.0f;
     style.GrabMinSize = 16.0f;
 

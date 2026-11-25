@@ -43,6 +43,8 @@ WindowHandler::WindowHandler(EditorContext& editor_ctx)
     {
         Journal::instance()->error("Failed to create window");
     }
+
+    window->clearColor().set(0.03f, 0.03f, 0.08f, 1.0f);
 }
 
 void WindowHandler::apply(vsg::ConfigureWindowEvent& configureWindow)

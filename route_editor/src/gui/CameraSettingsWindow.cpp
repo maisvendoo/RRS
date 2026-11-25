@@ -12,7 +12,7 @@
 
 CameraSettingsWindow::CameraSettingsWindow(EditorContext& editor_ctx,
                                            ImGuiWindowFlags window_flags)
-    : camera(editor_ctx.camera)
+    : camera(*editor_ctx.camera)
     , camera_settings(editor_ctx.camera_settings)
     , gui_settings(editor_ctx.gui_settings)
     , window_flags(window_flags)
@@ -50,7 +50,7 @@ void CameraSettingsWindow::show() const
                             &camera_settings.fovy, &camera_settings.fovy_min,
                             &camera_settings.fovy_max, "FovY: %.3f"))
     {
-        camera->get_perspective()->fieldOfViewY = camera_settings.fovy;
+        camera.get_perspective()->fieldOfViewY = camera_settings.fovy;
     }
 
     ImGui::PopItemWidth();

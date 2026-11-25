@@ -71,7 +71,7 @@ private:
     void calc_inv_view_mat();
 
 private:
-    const camera_settings_t& camera_settings;
+    camera_settings_t& camera_settings;
     const Keyboard& keyboard;
     const Mouse& mouse;
 
