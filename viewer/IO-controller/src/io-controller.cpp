@@ -435,7 +435,20 @@ void IOController::processKeyboardInput(std::set<uint16_t> &pressed_keys)
 //------------------------------------------------------------------------------
 void IOController::keyboardInputProcess(std::set<uint16_t> &pressed_keys)
 {
-    for (const auto &[id, name, handler] : control_handlers[cabine_idx].getAll())
+    // Нормируем индекс активной кабины к допустимому диапазону.
+    // Для вагонов (CabinesNum=0) в control_handlers есть только общая кабина,
+    // поэтому выход за границы предотвращается (см. initClientInputSignal).
+    int cab_idx = cabine_idx;
+    if (control_handlers.empty())
+    {
+        return;
+    }
+    if (cab_idx >= static_cast<int>(control_handlers.size()) - 1)
+    {
+        cab_idx = static_cast<int>(control_handlers.size()) - 1;
+    }
+
+    for (const auto &[id, name, handler] : control_handlers[cab_idx].getAll())
     {
         handler->processKeyInput(pressed_keys);
     }

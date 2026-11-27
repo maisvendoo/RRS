@@ -51,7 +51,17 @@ public:
     /// Установить индекс активной кабины
     void setActiveCabineIndex(int cab_idx)
     {
-        cabine_idx = cab_idx;
+        if (control_handlers.empty())
+        {
+            return;
+        }
+
+        // Нормируем индекс к допустимому диапазону.
+        // Последний слот зарезервирован под общие (некабинные) контролы.
+        cabine_idx = (cab_idx >= 0 &&
+                      cab_idx < static_cast<int>(control_handlers.size()) - 1)
+                         ? cab_idx
+                         : static_cast<int>(control_handlers.size()) - 1;
     }
 
     /// Инициализация сигнала управления со стороны сервера
