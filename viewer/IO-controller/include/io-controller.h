@@ -64,6 +64,12 @@ public:
                          : static_cast<int>(control_handlers.size()) - 1;
     }
 
+    /// Число кабин (0 - ПЕ без кабин, напр. вагон)
+    int getCabsNum() const
+    {
+        return cabs_num;
+    }
+
     /// Инициализация сигнала управления со стороны сервера
     void initClientInputSignal(int cab_idx, int signal_id, float value);
 

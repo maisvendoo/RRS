@@ -13,6 +13,7 @@
 #include "StationsHandler.h"
 #include "TrainLabelsHandler.h"
 #include "MouseControlHandler.h"
+#include <io-controller.h>
 #include <tcp-client.h>
 
 #include <vsg/io/Options.h>
@@ -535,9 +536,18 @@ void MyGui::showNoCabineControl() const
                            : nullptr;
     if (!cur) return;
 
-    std::string msg = QString("Нажмите Enter для управления из кабины %1")
-                            .arg(cur->current_cabine_idx + 1)
-                            .toStdString();
+    std::string msg;
+    if (cur->io_controller && cur->io_controller->getCabsNum() == 0)
+    {
+        // ПЕ без кабин (например вагон) - не называем "кабиной"
+        msg = QString("Нажмите Enter для управления вагоном").toStdString();
+    }
+    else
+    {
+        msg = QString("Нажмите Enter для управления из кабины %1")
+                        .arg(cur->current_cabine_idx + 1)
+                        .toStdString();
+    }
     const char *text = msg.c_str();
     ImVec2 text_size = ImGui::CalcTextSize(text);
 
@@ -1140,8 +1150,17 @@ float MyGui::hudTopOffset() const
         VehicleExterior* cur = params->vehicles_handler->getCurrentVehicle();
         if (cur)
         {
-            std::string msg = QString("Нажмите Enter для управления из кабины %1")
+            std::string msg;
+            if (cur->io_controller && cur->io_controller->getCabsNum() == 0)
+            {
+                // ПЕ без кабин (например вагон) - не называем "кабиной"
+                msg = QString("Нажмите Enter для управления вагоном").toStdString();
+            }
+            else
+            {
+                msg = QString("Нажмите Enter для управления из кабины %1")
                                   .arg(cur->current_cabine_idx + 1).toStdString();
+            }
             const float h_cabine = ImGui::CalcTextSize(msg.c_str()).y + 20.0f;
             if (h_cabine > top)
                 top = h_cabine;
