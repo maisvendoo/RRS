@@ -143,12 +143,12 @@ int extract_models_textures(const command_line_t &cmd_line)
             fs::path png_path = src_path;
             png_path.replace_extension(".png");
             std::cout << "[INF] Converting: " << uri << " -> "
-                      << fs::relative(png_path, base_dir).string()
+                      << fs::relative(png_path, base_dir).generic_string()
                       << std::endl;
 
             if (extract_to_png(src_path, png_path))
             {
-                img["uri"] = fs::relative(png_path, base_dir).string();
+                img["uri"] = fs::relative(png_path, base_dir).generic_string();
 
                 // Удаляем исходную текстуру, если это требуется
                 if (cmd_line.delete_src)
