@@ -12,13 +12,13 @@
       "componentType": 5126,
       "count": 6428,
       "max": [
-        0.25911498,
+        0.259114981,
         0.92159,
-        1.0632204
+        1.06322038
       ],
       "min": [
-        -3.8048868,
-        -0.31048977,
+        -3.80488682,
+        -0.310489774,
         -1.3671571
       ],
       "name": "accessorPositions",
@@ -53,14 +53,14 @@
       "componentType": 5126,
       "count": 7440,
       "max": [
-        0.29902458,
-        3.0871663,
-        1.2601353
+        0.299024582,
+        3.08716631,
+        1.26013529
       ],
       "min": [
-        -0.30097556,
-        -3.5734258,
-        -0.57684416
+        -0.300975561,
+        -3.57342577,
+        -0.576844156
       ],
       "name": "accessorPositions",
       "type": "VEC3"
@@ -101,7 +101,7 @@
       ],
       "min": [
         -0.106532976,
-        -4.9883965e-08,
+        -4.98839654e-08,
         -0.106532976
       ],
       "name": "accessorPositions",
@@ -143,7 +143,7 @@
       ],
       "min": [
         -0.106532976,
-        -4.9883965e-08,
+        -4.98839654e-08,
         -0.106532976
       ],
       "name": "accessorPositions",
@@ -185,7 +185,7 @@
       ],
       "min": [
         -0.106532976,
-        -4.9883965e-08,
+        -4.98839654e-08,
         -0.106532976
       ],
       "name": "accessorPositions",
@@ -209,7 +209,7 @@
     }
   ],
   "asset": {
-    "generator": "babylon.js glTF exporter for 3dsmax 2026 v4",
+    "generator": "babylon.js glTF exporter for 3dsmax 2024 v20251021.2",
     "version": "2.0"
   },
   "bufferViews": [
@@ -241,22 +241,22 @@
   ],
   "images": [
     {
-      "uri": "textures\\RM_izostyk_N.ktx2"
+      "uri": "textures/RM_izostyk_N.ktx2"
     },
     {
-      "uri": "textures\\RM_izostyk_ORM.ktx2"
+      "uri": "textures/RM_izostyk_ORM.ktx2"
     },
     {
-      "uri": "textures\\RM_izostyk_RGBA.ktx2"
+      "uri": "textures/RM_izostyk_RGBA.ktx2"
     },
     {
-      "uri": "textures\\RM_MM1-2_N.ktx2"
+      "uri": "textures/RM_MM1-2_N.jpg"
     },
     {
-      "uri": "textures\\RM_MM1-2_ORM.ktx2"
+      "uri": "textures/RM_MM1-2_ORM.ktx2"
     },
     {
-      "uri": "textures\\RM_MM1-2_RGBA.ktx2"
+      "uri": "textures/RM_MM1-2_RGBA.ktx2"
     }
   ],
   "materials": [
@@ -369,18 +369,18 @@
       "mesh": 0,
       "name": "Изостык",
       "translation": [
-        2.5,
+        0.0,
         -0.073162064,
-        -0.0
+        0.0
       ]
     },
     {
       "mesh": 1,
       "name": "Светофор 3",
       "translation": [
-        2.4997776,
-        2.8908334,
-        0.5767671
+        -0.000222444534,
+        2.89083338,
+        1.92134869
       ]
     },
     {
@@ -393,9 +393,9 @@
         0.7071067
       ],
       "translation": [
-        2.4988027,
-        5.0726027,
-        1.1469026
+        -0.00119721889,
+        5.07260275,
+        2.49148417
       ]
     },
     {
@@ -408,9 +408,9 @@
         0.7071067
       ],
       "translation": [
-        2.4988027,
+        -0.00119721889,
         5.376552,
-        1.1469026
+        2.49148417
       ]
     },
     {
@@ -423,9 +423,9 @@
         0.7071067
       ],
       "translation": [
-        2.4988027,
-        4.7677035,
-        1.1469026
+        -0.00119721889,
+        4.76770353,
+        2.49148417
       ]
     }
   ],

@@ -13458,31 +13458,31 @@
   "images": [
     {
       "name": "alsn",
-      "uri": "textures\\alsn.ktx2"
+      "uri": "textures/alsn.ktx2"
     },
     {
       "name": "kab",
-      "uri": "textures\\kab.ktx2"
+      "uri": "textures/kab.ktx2"
     },
     {
       "name": "_367",
-      "uri": "textures\\_367.ktx2"
+      "uri": "textures/_367.ktx2"
     },
     {
       "name": "_epk",
-      "uri": "textures\\_epk.ktx2"
+      "uri": "textures/_epk.ktx2"
     },
     {
       "name": "pult",
-      "uri": "textures\\pult.ktx2"
+      "uri": "textures/pult.ktx2"
     },
     {
       "name": "_254_395",
-      "uri": "textures\\_254_395.ktx2"
+      "uri": "textures/_254_395.ktx2"
     },
     {
       "name": "Skor_SL2m",
-      "uri": "textures\\Skor_SL2m.ktx2"
+      "uri": "textures/Skor_SL2m.ktx2"
     }
   ],
   "materials": [

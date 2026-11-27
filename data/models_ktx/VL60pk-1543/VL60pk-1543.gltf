@@ -8717,15 +8717,15 @@
   "images": [
     {
       "name": "kuzov_emis",
-      "uri": "textures\\kuzov_emis.ktx2"
+      "uri": "textures/kuzov_emis.ktx2"
     },
     {
       "name": "kuzov",
-      "uri": "textures\\kuzov.ktx2"
+      "uri": "textures/kuzov.ktx2"
     },
     {
       "name": "okna",
-      "uri": "textures\\okna.ktx2"
+      "uri": "textures/okna.ktx2"
     }
   ],
   "materials": [

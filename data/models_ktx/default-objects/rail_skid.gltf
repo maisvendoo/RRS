@@ -74,11 +74,11 @@
   "images": [
     {
       "name": "rail_skid_ao",
-      "uri": "textures\\rail_skid_ao.ktx2"
+      "uri": "textures/rail_skid_ao.ktx2"
     },
     {
       "name": "rail_skid",
-      "uri": "textures\\rail_skid.ktx2"
+      "uri": "textures/rail_skid.ktx2"
     }
   ],
   "materials": [
