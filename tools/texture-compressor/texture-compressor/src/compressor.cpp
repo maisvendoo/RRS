@@ -462,7 +462,7 @@ int compress_model_textures(const command_line_t &cmd_line)
             fs::path ktx_path = src_path;
             ktx_path.replace_extension(".ktx2");
             std::cout << "[INF] Converting: " << uri << " -> "
-                      << fs::relative(ktx_path, base_dir).string()
+                      << fs::relative(ktx_path, base_dir).generic_string()
                       << std::endl;
 
             auto it = img_settings.find(img_idx);
@@ -472,7 +472,7 @@ int compress_model_textures(const command_line_t &cmd_line)
 
             if (compress_to_ktx2(src_path, ktx_path, cfg, cmd_line.generate_mipmaps, cmd_line.ignore_existed))
             {
-                img["uri"] = fs::relative(ktx_path, base_dir).string();
+                img["uri"] = fs::relative(ktx_path, base_dir).generic_string();
                 img.erase("mimeType");
 
                 if (img.contains("bufferView"))
