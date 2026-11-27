@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "../textures/pole3.tga"
+      "uri": "../textures/pole3.ktx2"
     }
   ],
   "materials": [

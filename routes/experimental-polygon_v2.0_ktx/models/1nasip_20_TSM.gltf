@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "../textures/nasip_TSM.bmp"
+      "uri": "../textures/nasip_TSM.ktx2"
     }
   ],
   "materials": [
