@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "..\\textures\\IMR.ktx2"
+      "uri": "../textures/IMR.ktx2"
     }
   ],
   "materials": [

@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "..\\textures\\platform_plita.ktx2"
+      "uri": "../textures/platform_plita.ktx2"
     }
   ],
   "materials": [

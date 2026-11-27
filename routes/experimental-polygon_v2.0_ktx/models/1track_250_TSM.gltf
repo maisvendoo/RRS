@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "..\\textures\\TBB_Rails.ktx2"
+      "uri": "../textures/TBB_Rails.tga"
     }
   ],
   "materials": [

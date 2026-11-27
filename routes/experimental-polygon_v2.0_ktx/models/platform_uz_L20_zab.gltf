@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "..\\textures\\platform_uz.ktx2"
+      "uri": "../textures/platform_uz.ktx2"
     }
   ],
   "materials": [

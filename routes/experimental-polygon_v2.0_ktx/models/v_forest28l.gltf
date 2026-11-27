@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "..\\textures\\v_forest444.ktx2"
+      "uri": "../textures/v_forest444.ktx2"
     }
   ],
   "materials": [

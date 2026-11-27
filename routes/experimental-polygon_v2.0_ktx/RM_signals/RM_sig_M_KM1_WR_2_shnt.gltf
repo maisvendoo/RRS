@@ -199,22 +199,22 @@
   ],
   "images": [
     {
-      "uri": "textures\\RM_izostyk_N.ktx2"
+      "uri": "textures/RM_izostyk_N.ktx2"
     },
     {
-      "uri": "textures\\RM_izostyk_ORM.ktx2"
+      "uri": "textures/RM_izostyk_ORM.jpg"
     },
     {
-      "uri": "textures\\RM_izostyk_RGBA.ktx2"
+      "uri": "textures/RM_izostyk_RGBA.ktx2"
     },
     {
-      "uri": "textures\\RM_KM1_N.ktx2"
+      "uri": "textures/RM_KM1_N.ktx2"
     },
     {
-      "uri": "textures\\RM_KM1_ORM.ktx2"
+      "uri": "textures/RM_KM1_ORM.ktx2"
     },
     {
-      "uri": "textures\\RM_KM1_RGBA.ktx2"
+      "uri": "textures/RM_KM1_RGBA.ktx2"
     }
   ],
   "materials": [

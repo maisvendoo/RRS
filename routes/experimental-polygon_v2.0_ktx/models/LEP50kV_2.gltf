@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "..\\textures\\IMR_LEP.ktx2"
+      "uri": "../textures/IMR_LEP.ktx2"
     }
   ],
   "materials": [

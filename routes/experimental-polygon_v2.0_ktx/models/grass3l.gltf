@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "..\\textures\\grass2.ktx2"
+      "uri": "../textures/grass2.ktx2"
     }
   ],
   "materials": [

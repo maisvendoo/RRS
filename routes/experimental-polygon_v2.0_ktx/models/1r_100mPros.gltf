@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "..\\textures\\RoadSections.ktx2"
+      "uri": "../textures/RoadSections.ktx2"
     }
   ],
   "materials": [

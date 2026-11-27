@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "..\\textures\\sky_day.ktx2"
+      "uri": "../textures/sky_day.ktx2"
     }
   ],
   "materials": [
