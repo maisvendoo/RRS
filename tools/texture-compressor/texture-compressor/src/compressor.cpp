@@ -434,8 +434,29 @@ int compress_model_textures(const command_line_t &cmd_line)
             std::string uri = img["uri"];
             fs::path src_path = fs::weakly_canonical(base_dir / uri);
 
+            fs::path ktx_path = src_path;
+            ktx_path.replace_extension(".ktx2");
+
             if (!fs::exists(src_path))
             {
+                // Исходной текстуры нет (например, удалена при предыдущей
+                // конвертации с -d). Если готовый .ktx2 уже существует -
+                // обновляем ссылку в glTF, чтобы повторная конвертация была
+                // идемпотентной и не оставляла ссылки на растровые файлы.
+                if (fs::exists(ktx_path))
+                {
+                    img["uri"] = fs::relative(ktx_path, base_dir).generic_string();
+                    img.erase("mimeType");
+
+                    if (img.contains("bufferView"))
+                    {
+                        img.erase("bufferView");
+                    }
+
+                    processed++;
+                    continue;
+                }
+
                 std::cerr << "[ERR] Texture not found: " << src_path << std::endl;
                 continue;
             }
@@ -459,8 +480,6 @@ int compress_model_textures(const command_line_t &cmd_line)
                 continue;
             }
 
-            fs::path ktx_path = src_path;
-            ktx_path.replace_extension(".ktx2");
             std::cout << "[INF] Converting: " << uri << " -> "
                       << fs::relative(ktx_path, base_dir).generic_string()
                       << std::endl;
