@@ -544,7 +544,7 @@ bool Application::convert_route(std::string &in_dmd_route_path,
                                         change_vertices_Z))
                 {
                     // Записываем новые модели
-                    _new_objects.add_object(label, model_path.parent_path().string() + '/' + out_gltf_model_name + ".gltf");
+                    _new_objects.add_object(label, model_path.parent_path().generic_string() + '/' + out_gltf_model_name + ".gltf");
                 }
             }
 
