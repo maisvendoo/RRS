@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <algorithm>
 
 static bool is_slash(char ch)
 {
@@ -41,6 +42,9 @@ void ObjectsRef::parse_line(const std::string& line)
     iss >> label >> rel_path;
     if (!rel_path.empty() && is_slash(rel_path.front()))
     {
+        // Приводим разделители пути к прямому слэшу (кроссплатформенно,
+        // независимо от того, чем создан objects.ref)
+        std::replace(rel_path.begin(), rel_path.end(), '\\', '/');
         this->emplace(std::move(label), std::move(rel_path));
     }
 }
