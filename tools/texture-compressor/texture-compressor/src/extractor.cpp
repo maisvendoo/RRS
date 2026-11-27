@@ -134,14 +134,26 @@ int extract_models_textures(const command_line_t &cmd_line)
             std::string uri = img["uri"];
             fs::path src_path = fs::weakly_canonical(base_dir / uri);
 
+            fs::path png_path = src_path;
+            png_path.replace_extension(".png");
+
             if (!fs::exists(src_path))
             {
+                // Исходной текстуры нет (например, удалена при предыдущем
+                // извлечении с -d). Если готовый .png уже существует -
+                // обновляем ссылку в glTF, чтобы повторное извлечение было
+                // идемпотентным и не оставляло ссылки на исходный формат.
+                if (fs::exists(png_path))
+                {
+                    img["uri"] = fs::relative(png_path, base_dir).generic_string();
+                    processed++;
+                    continue;
+                }
+
                 std::cerr << "[ERR] Texture not found: " << src_path << std::endl;
                 continue;
             }
 
-            fs::path png_path = src_path;
-            png_path.replace_extension(".png");
             std::cout << "[INF] Converting: " << uri << " -> "
                       << fs::relative(png_path, base_dir).generic_string()
                       << std::endl;
