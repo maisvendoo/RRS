@@ -31,6 +31,8 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 # Копирование маршрутов в дерево результата
 # shellcheck source=routes-copy.sh
 . "${SCRIPT_DIR}/routes-copy.sh"
+# shellcheck source=versions.env
+. "${SCRIPT_DIR}/versions.env"
 
 # --- Значения по умолчанию (переопределяются переменными окружения) --------
 IMAGE="${RRS_DOCKER_IMAGE:-rrs-build:ubuntu-26.04}"
@@ -43,13 +45,13 @@ ROUTES_SRC="${RRS_ROUTES_SRC:-${ROOT_DIR}/routes}"
 ROUTES="${RRS_ROUTES:-all}"
 
 # Версии зависимостей, собираемых из исходников внутри образа
-VSG_VERSION="${VSG_VERSION:-v1.1.16}"
-VSGXCHANGE_VERSION="${VSGXCHANGE_VERSION:-v1.1.14}"
-VSGIMGUI_REPO="${VSGIMGUI_REPO:-https://github.com/maisvendoo/vsgImGui.git}"
-VSGIMGUI_VERSION="${VSGIMGUI_VERSION:-master-RRS}"
+#VSG_VERSION="${VSG_VERSION:-v1.1.16}"
+#VSGXCHANGE_VERSION="${VSGXCHANGE_VERSION:-v1.1.14}"
+#VSGIMGUI_REPO="${VSGIMGUI_REPO:-https://github.com/maisvendoo/vsgImGui.git}"
+#VSGIMGUI_VERSION="${VSGIMGUI_VERSION:-master-RRS}"
 # KTX: пакета нет в Убунту 26.04, а релизы KTX не содержат ktxBasisParams::codec,
 # который нужен коду RRS. Поэтому собираем конкретный коммит ветки main.
-KTX_VERSION="${KTX_VERSION:-983695c105618462b8e96458b378222e99faec98}"
+#KTX_VERSION="${KTX_VERSION:-983695c105618462b8e96458b378222e99faec98}"
 
 DOCKER_BIN="${DOCKER:-docker}"
 
@@ -90,21 +92,21 @@ EOF
 
 # --- Разбор аргументов ----------------------------------------------------
 while [[ $# -gt 0 ]]; do
-    case "$1" in
-        -i|--image)        IMAGE="$2"; shift 2 ;;
-        -o|--output)       OUTPUT_DIR="$2"; shift 2 ;;
-        -t|--build-type)   BUILD_TYPE="$2"; shift 2 ;;
-        -j|--jobs)         JOBS="$2"; shift 2 ;;
-        --build-only)      DO_BUILD=1; EXPORT=0; shift ;;
-        --no-build)        DO_BUILD=0; shift ;;
-        --deps-only)       DEPS_ONLY=1; shift ;;
-        --no-cache)        NO_CACHE=1; shift ;;
-        --pull)            PULL=1; shift ;;
-        --routes)          ROUTES="$2"; shift 2 ;;
-        --no-routes)       ROUTES="none"; shift ;;
-        -h|--help)         usage; exit 0 ;;
-        *) echo "Неизвестный параметр: $1" >&2; usage >&2; exit 2 ;;
-    esac
+  case "$1" in
+      -i | --image)        IMAGE="$2"; shift 2 ;;
+      -o | --output)       OUTPUT_DIR="$2"; shift 2 ;;
+      -t | --build-type)   BUILD_TYPE="$2"; shift 2 ;;
+      -j | --jobs)         JOBS="$2"; shift 2 ;;
+      --build-only)        DO_BUILD=1; EXPORT=0; shift ;;
+      --no-build)          DO_BUILD=0; shift ;;
+      --deps-only)         DEPS_ONLY=1; shift ;;
+      --no-cache)          NO_CACHE=1; shift ;;
+      --pull)              PULL=1; shift ;;
+      --routes)            ROUTES="$2"; shift 2 ;;
+      --no-routes)         ROUTES="none"; shift ;;
+      -h | --help)         usage; exit 0 ;;
+      *) echo "Неизвестный параметр: $1" >&2; usage >&2; exit 2 ;;
+  esac
 done
 
 # --- Проверки -------------------------------------------------------------
@@ -141,15 +143,18 @@ if [[ "$DO_BUILD" -eq 1 ]]; then
     echo "==> Сборка образа '${IMAGE}' (тип сборки: ${BUILD_TYPE}, задач: ${JOBS})"
 
     BUILD_ARGS=(
-        --file "${DOCKERFILE}"
-        --build-arg "BUILD_TYPE=${BUILD_TYPE}"
-        --build-arg "JOBS=${JOBS}"
-        --build-arg "VSG_VERSION=${VSG_VERSION}"
-        --build-arg "VSGXCHANGE_VERSION=${VSGXCHANGE_VERSION}"
-        --build-arg "VSGIMGUI_REPO=${VSGIMGUI_REPO}"
-        --build-arg "VSGIMGUI_VERSION=${VSGIMGUI_VERSION}"
-        --build-arg "KTX_VERSION=${KTX_VERSION}"
-        --build-arg "RRS_ARTIFACT_PREFIX=${INSTALL_PREFIX}"
+      --file "${DOCKERFILE}"
+      --build-arg "BUILD_TYPE=${BUILD_TYPE}"
+      --build-arg "JOBS=${JOBS}"
+      --build-arg "VSG_REPO=${VSG_REPO}"
+      --build-arg "VSG_VERSION=${VSG_VERSION}"
+      --build-arg "VSGXCHANGE_REPO=${VSGXCHANGE_REPO}"
+      --build-arg "VSGXCHANGE_VERSION=${VSGXCHANGE_VERSION}"
+      --build-arg "VSGIMGUI_REPO=${VSGIMGUI_REPO}"
+      --build-arg "VSGIMGUI_VERSION=${VSGIMGUI_VERSION}"
+      --build-arg "KTX_REPO=${KTX_REPO}"
+      --build-arg "KTX_VERSION=${KTX_VERSION}"
+      --build-arg "RRS_ARTIFACT_PREFIX=${INSTALL_PREFIX}"
     )
 
     # В режиме --deps-only собирается только стадия deps, и складывать её
@@ -186,47 +191,47 @@ fi
 # --- Выгрузка артефактов --------------------------------------------------
 if [[ "$EXPORT" -eq 1 ]]; then
 
-mkdir -p "${OUTPUT_DIR}"
-OUTPUT_DIR="$(cd "${OUTPUT_DIR}" && pwd)"
+    mkdir -p "${OUTPUT_DIR}"
+    OUTPUT_DIR="$(cd "${OUTPUT_DIR}" && pwd)"
 
-# Если в каталоге результата остались файлы прошлых запусков, созданные
-# контейнером (root), текущий пользователь не сможет ни перезаписать их,
-# ни сменить им владельца. Исправляем владельца через одноразовый контейнер.
-if find "${OUTPUT_DIR}" ! -user "$(id -u)" -print -quit 2>/dev/null | grep -q .; then
-    echo "==> В ${OUTPUT_DIR} есть файлы не текущего пользователя, исправляю владельца"
-    "${DOCKER_BIN}" run --rm --volume "${OUTPUT_DIR}:/out" "${IMAGE}" \
-        sh -c "chown -R $(id -u):$(id -g) /out" || true
-fi
+    # Если в каталоге результата остались файлы прошлых запусков, созданные
+    # контейнером (root), текущий пользователь не сможет ни перезаписать их,
+    # ни сменить им владельца. Исправляем владельца через одноразовый контейнер.
+    if find "${OUTPUT_DIR}" ! -user "$(id -u)" -print -quit 2>/dev/null | grep -q .; then
+        echo "==> В ${OUTPUT_DIR} есть файлы не текущего пользователя, исправляю владельца"
+        "${DOCKER_BIN}" run --rm --volume "${OUTPUT_DIR}:/out" "${IMAGE}" \
+          sh -c "chown -R $(id -u):$(id -g) /out" || true
+    fi
 
-echo "==> Копирование артефактов из образа в ${OUTPUT_DIR}"
+    echo "==> Копирование артефактов из образа в ${OUTPUT_DIR}"
 
-# docker create + docker cp + docker rm: контейнер не запускается, копирование
-# делает демон (файлы сразу принадлежат текущему пользователю), а контейнер
-# гарантированно удаляется после завершения.
-CONTAINER_ID="$("${DOCKER_BIN}" create "${IMAGE}")"
-if [[ -z "${CONTAINER_ID}" ]]; then
-    echo "Ошибка: не удалось создать контейнер из образа ${IMAGE}." >&2
-    exit 1
-fi
+    # docker create + docker cp + docker rm: контейнер не запускается, копирование
+    # делает демон (файлы сразу принадлежат текущему пользователю), а контейнер
+    # гарантированно удаляется после завершения.
+    CONTAINER_ID="$("${DOCKER_BIN}" create "${IMAGE}")"
+    if [[ -z "${CONTAINER_ID}" ]]; then
+        echo "Ошибка: не удалось создать контейнер из образа ${IMAGE}." >&2
+        exit 1
+    fi
 
-if ! "${DOCKER_BIN}" cp "${CONTAINER_ID}:${INSTALL_PREFIX}/." "${OUTPUT_DIR}/"; then
-    "${DOCKER_BIN}" rm -f "${CONTAINER_ID}" >/dev/null 2>&1 || true
-    echo "Ошибка: не удалось скопировать артефакты из контейнера." >&2
-    exit 1
-fi
+    if ! "${DOCKER_BIN}" cp "${CONTAINER_ID}:${INSTALL_PREFIX}/." "${OUTPUT_DIR}/"; then
+        "${DOCKER_BIN}" rm -f "${CONTAINER_ID}" >/dev/null 2>&1 || true
+        echo "Ошибка: не удалось скопировать артефакты из контейнера." >&2
+        exit 1
+    fi
 
-"${DOCKER_BIN}" rm "${CONTAINER_ID}" >/dev/null
+    "${DOCKER_BIN}" rm "${CONTAINER_ID}" >/dev/null
 
-# --- Маршруты -------------------------------------------------------------
-# В образе их нет (сотни мегабайт, для сборки не нужны), поэтому копируем
-# каталоги маршрутов из исходного дерева в <результат>/routes.
-rrs_copy_routes "${ROUTES_SRC}" "${OUTPUT_DIR}/routes" "${ROUTES}"
+    # --- Маршруты -------------------------------------------------------------
+    # В образе их нет (сотни мегабайт, для сборки не нужны), поэтому копируем
+    # каталоги маршрутов из исходного дерева в <результат>/routes.
+    rrs_copy_routes "${ROUTES_SRC}" "${OUTPUT_DIR}/routes" "${ROUTES}"
 
-echo
-echo "==> Готово. Результат сборки: ${OUTPUT_DIR}"
-echo "    Содержимое: $(ls "${OUTPUT_DIR}" | sort | tr '\n' ' ')"
-echo "    Пример: ${OUTPUT_DIR}/bin/launcher (или иной исполняемый файл из bin)"
+    echo
+    echo "==> Готово. Результат сборки: ${OUTPUT_DIR}"
+    echo "    Содержимое: $(ls "${OUTPUT_DIR}" | sort | tr '\n' ' ')"
+    echo "    Пример: ${OUTPUT_DIR}/bin/launcher (или иной исполняемый файл из bin)"
 
 else
-    echo "==> Выгрузка артефактов пропущена (--build-only)"
+  echo "==> Выгрузка артефактов пропущена (--build-only)"
 fi

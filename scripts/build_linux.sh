@@ -34,6 +34,8 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 # Копирование маршрутов в каталог установки
 # shellcheck source=routes-copy.sh
 . "${SCRIPT_DIR}/routes-copy.sh"
+# shellcheck source=versions.env
+. "${SCRIPT_DIR}/versions.env"
 
 # Копирование артефактов сборки в каталог установки.
 #
@@ -94,20 +96,20 @@ EXTRA_PREFIX_PATH="${RRS_EXTRA_PREFIX_PATH:-}"
 ROUTES_SRC="${RRS_ROUTES_SRC:-${ROOT_DIR}/routes}"
 ROUTES="${RRS_ROUTES:-all}"
 
-# Версии зависимостей, собираемых из исходников
-VSG_VERSION="${VSG_VERSION:-v1.1.16}"
-VSGXCHANGE_VERSION="${VSGXCHANGE_VERSION:-v1.1.14}"
-VSGIMGUI_REPO="${VSGIMGUI_REPO:-https://github.com/maisvendoo/vsgImGui.git}"
-VSGIMGUI_VERSION="${VSGIMGUI_VERSION:-master-RRS}"
-SOL2_REPO="${SOL2_REPO:-https://github.com/maisvendoo/sol2.git}"
-SOL2_VERSION="${SOL2_VERSION:-c1f95a773c6f8f4fde8ca3efe872e7286afe4444}"
-# KTX: код RRS (tools/dmd2gltf, tools/texture-compressor) использует поля
-# ktxBasisParams::codec и ::etc1sCompressionLevel — их нет ни в одном релизе
-# 4.x (в 4.4.2 они переименованы), поэтому берём конкретный коммит master.
-KTX_VERSION="${KTX_VERSION:-983695c105618462b8e96458b378222e99faec98}"
-# SFML: в Убунту 26.04 есть пакет libsfml-dev 3.0, он и используется;
-# из исходников SFML собирается только если системного конфига нет.
-SFML_VERSION="${SFML_VERSION:-3.1.0}"
+# # Версии зависимостей, собираемых из исходников
+# VSG_VERSION="${VSG_VERSION:-v1.1.16}"
+# VSGXCHANGE_VERSION="${VSGXCHANGE_VERSION:-v1.1.14}"
+# VSGIMGUI_REPO="${VSGIMGUI_REPO:-https://github.com/maisvendoo/vsgImGui.git}"
+# VSGIMGUI_VERSION="${VSGIMGUI_VERSION:-master-RRS}"
+# SOL2_REPO="${SOL2_REPO:-https://github.com/maisvendoo/sol2.git}"
+# SOL2_VERSION="${SOL2_VERSION:-c1f95a773c6f8f4fde8ca3efe872e7286afe4444}"
+# # KTX: код RRS (tools/dmd2gltf, tools/texture-compressor) использует поля
+# # ktxBasisParams::codec и ::etc1sCompressionLevel — их нет ни в одном релизе
+# # 4.x (в 4.4.2 они переименованы), поэтому берём конкретный коммит master.
+# KTX_VERSION="${KTX_VERSION:-983695c105618462b8e96458b378222e99faec98}"
+# # SFML: в Убунту 26.04 есть пакет libsfml-dev 3.0, он и используется;
+# # из исходников SFML собирается только если системного конфига нет.
+# SFML_VERSION="${SFML_VERSION:-3.1.0}"
 
 DO_DEPS=1
 DEPS_ONLY=0
@@ -137,6 +139,7 @@ rrs_remove_path() {
         warn "${label}: отказ удалять '${abs}'"
         return 0
     fi
+
     if [[ ! -e "$abs" ]]; then
         echo "  [НЕТ   ] ${label}: ${abs}"
         return 0
@@ -158,15 +161,15 @@ clean_all() {
     echo "  Корень репозитория: ${ROOT_DIR}"
 
     # Порядок важен: сначала вложенные каталоги зависимостей, затем .deps
-    rrs_remove_path "${BUILD_DIR}"     "каталог сборки"
-    rrs_remove_path "${ROOT_DIR}/bin"      "исполняемые файлы"
-    rrs_remove_path "${ROOT_DIR}/lib"      "библиотеки"
-    rrs_remove_path "${ROOT_DIR}/modules"  "подключаемые модули"
-    rrs_remove_path "${ROOT_DIR}/plugins"  "плагины"
-    rrs_remove_path "${dist_dir}"          "каталог установки"
-    rrs_remove_path "${DEPS_SRC_DIR}"      "исходники зависимостей"
-    rrs_remove_path "${DEPS_PREFIX}"       "установленные зависимости"
-    rrs_remove_path "${ROOT_DIR}/.deps"    "каталог зависимостей"
+    rrs_remove_path "${BUILD_DIR}" "каталог сборки"
+    rrs_remove_path "${ROOT_DIR}/bin" "исполняемые файлы"
+    rrs_remove_path "${ROOT_DIR}/lib" "библиотеки"
+    rrs_remove_path "${ROOT_DIR}/modules" "подключаемые модули"
+    rrs_remove_path "${ROOT_DIR}/plugins" "плагины"
+    rrs_remove_path "${dist_dir}" "каталог установки"
+    rrs_remove_path "${DEPS_SRC_DIR}" "исходники зависимостей"
+    rrs_remove_path "${DEPS_PREFIX}" "установленные зависимости"
+    rrs_remove_path "${ROOT_DIR}/.deps" "каталог зависимостей"
 
     log "Очистка завершена"
     echo "  Для повторной сборки: ${0} --install \"\$PWD/dist\""
@@ -216,22 +219,22 @@ die()  { echo "Ошибка: $*" >&2; exit 1; }
 # --- Разбор аргументов ----------------------------------------------------
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -t|--build-type) BUILD_TYPE="$2"; shift 2 ;;
-        -j|--jobs)       JOBS="$2"; shift 2 ;;
-        -b|--build-dir)  BUILD_DIR="$2"; shift 2 ;;
-        --deps-prefix)   DEPS_PREFIX="$2"; shift 2 ;;
-        --install)       INSTALL_DIR="$2"; DO_INSTALL=1; shift 2 ;;
-        --deps-only)     DEPS_ONLY=1; DO_INSTALL=0; shift ;;
-        --skip-deps)     DO_DEPS=0; shift ;;
-        --rebuild-deps)  REBUILD_DEPS=1; shift ;;
-        --clean)         DO_CLEAN=1; shift ;;
-        clean)           CLEAN_ALL=1; shift ;;
-        --generator)     GENERATOR="$2"; shift 2 ;;
-        --check-only)    CHECK_ONLY=1; shift ;;
-        --routes)        ROUTES="$2"; shift 2 ;;
-        --no-routes)     ROUTES="none"; shift ;;
-        -h|--help)       usage; exit 0 ;;
-        --)              shift; EXTRA_CMAKE_ARGS=("$@"); break ;;
+        -t | --build-type) BUILD_TYPE="$2"; shift 2 ;;
+        -j | --jobs)       JOBS="$2"; shift 2 ;;
+        -b | --build-dir)  BUILD_DIR="$2"; shift 2 ;;
+        --deps-prefix)     DEPS_PREFIX="$2"; shift 2 ;;
+        --install)         INSTALL_DIR="$2"; DO_INSTALL=1; shift 2 ;;
+        --deps-only)       DEPS_ONLY=1; DO_INSTALL=0; shift ;;
+        --skip-deps)       DO_DEPS=0; shift ;;
+        --rebuild-deps)    REBUILD_DEPS=1; shift ;;
+        --clean)           DO_CLEAN=1; shift ;;
+        clean)             CLEAN_ALL=1; shift ;;
+        --generator)       GENERATOR="$2"; shift 2 ;;
+        --check-only)      CHECK_ONLY=1; shift ;;
+        --routes)          ROUTES="$2"; shift 2 ;;
+        --no-routes)       ROUTES="none"; shift ;;
+        -h | --help)       usage; exit 0 ;;
+        --)                shift; EXTRA_CMAKE_ARGS=("$@"); break ;;
         *) die "неизвестный параметр: $1 (см. --help)" ;;
     esac
 done
@@ -244,7 +247,7 @@ fi
 
 if [[ "$CHECK_ONLY" -eq 0 ]]; then
     case "$BUILD_TYPE" in
-        Release|RelWithDebInfo|Debug|MinSizeRel) ;;
+        Release | RelWithDebInfo | Debug | MinSizeRel) ;;
         *) die "неверный тип сборки '${BUILD_TYPE}'" ;;
     esac
 fi
@@ -347,20 +350,36 @@ check_environment() {
     # SFML 3.x: в Убунту 26.04 есть пакет libsfml-dev 3.0; если конфигурации
     # нет, скрипт собирает SFML из исходников.
     if have_cmake_config "SFML/SFMLConfig.cmake"; then
-        echo "  [  OK  ] SFML >= 3"
+        if [[ -f "${DEPS_PREFIX}/lib/cmake/SFML/SFMLConfig.cmake" ]]; then
+            if dep_up_to_date "${DEPS_SRC_DIR}/SFML" "$SFML_VERSION" "$SFML_REPO"; then
+                echo "  [  OK  ] SFML (${SFML_VERSION})"
+            else
+                echo "  [ВЕРСИЯ] SFML (будет обновлён до ${SFML_VERSION})"
+            fi
+        else
+            echo "  [  OK  ] SFML >= 3 (системный)"
+        fi
     else
         echo "  [НЕТ   ] SFML >= 3 (будет собран из исходников: ${SFML_VERSION})"
     fi
 
     local cfg
-    for spec in "vsg/vsgConfig.cmake:VulkanSceneGraph" \
-                "vsgXchange/vsgXchangeConfig.cmake:vsgXchange" \
-                "vsgImGui/vsgImGuiConfig.cmake:vsgImGui" \
-                "sol2/sol2-config.cmake:sol2" \
-                "ktx/KtxConfig.cmake:KTX"; do
-        cfg="${spec%%:*}"
+    for spec in "vsg/vsgConfig.cmake|VulkanSceneGraph|${DEPS_SRC_DIR}/vsg|${VSG_VERSION}|${VSG_REPO}" \
+                "vsgXchange/vsgXchangeConfig.cmake|vsgXchange|${DEPS_SRC_DIR}/vsgXchange|${VSGXCHANGE_VERSION}|${VSGXCHANGE_REPO}" \
+                "vsgImGui/vsgImGuiConfig.cmake|vsgImGui|${DEPS_SRC_DIR}/vsgImGui|${VSGIMGUI_VERSION}|${VSGIMGUI_REPO}" \
+                "sol2/sol2-config.cmake|sol2|${DEPS_SRC_DIR}/sol2|${SOL2_VERSION}|${SOL2_REPO}" \
+                "ktx/KtxConfig.cmake|KTX|${DEPS_SRC_DIR}/KTX-Software|${KTX_VERSION}|${KTX_REPO}"; do
+        IFS='|' read -r cfg label src version repo <<<"$spec"
         if have_cmake_config "$cfg"; then
-            echo "  [  OK  ] ${spec#*:}"
+            if [[ -f "${DEPS_PREFIX}/lib/cmake/${cfg}" ]]; then
+                if dep_up_to_date "$src" "$version" "$repo"; then
+                    echo "  [  OK  ] ${label} (${version})"
+                else
+                    echo "  [ВЕРСИЯ] ${label} (будет обновлён до ${version})"
+                fi
+            else
+                echo "  [  ОК  ] ${label} (системный)"
+            fi
         else
             echo "  [НЕТ   ] ${spec#*:} (можно собрать: --deps-only)"
         fi
@@ -389,18 +408,52 @@ HINT
 }
 
 # --- Сборка зависимостей --------------------------------------------------
+dep_up_to_date() {
+    local dir="$1" ref="$2" repo="$3"
+    [[ -d "${dir}/.git" ]] || return 1
+
+    local local_sha
+    local_sha="$(git -C "${dir}" rev-parse HEAD 2>/dev/null || true)"
+    [[ -n "$local_sha" ]] || return 1
+
+    if [[ "$ref" =~ ^[0-9a-fA-F]{40}$ ]]; then
+        [[ "$local_sha" == "$ref" ]]
+        return $?
+    fi
+
+    local remote_out remote_sha
+    remote_out="$(git ls-remote "$repo" "refs/heads/${ref}" "refs/tags/${ref}" "refs/tags/${ref}^{}" 2>/dev/null || true)"
+
+    if [[ -n "$remote_out" ]]; then
+        remote_sha="$(printf '%s\n' "$remote_out" | awk '/\^\{\}$/ {print $1; found=1} END {if (!found) exit 1}' || printf '%s\n' "$remote_out" | awk 'NR==1 {print $1}')"
+        [[ "$local_sha" == "$remote_sha" ]]
+        return $?
+    fi
+
+    local local_tag local_branch
+    local_tag="$(git -C "$dir" describe --tags --exact-match 2>/dev/null || true)"
+    local_branch="$(git -C "$dir" branch --show-current 2>/dev/null || true)"
+    [[ -n "$local_tag" && "$local_tag" == "$ref" || -n "$local_branch" && "$ref" ]]
+}
+
 dep_ready() {
-    # $1 — путь к CMake-конфигу зависимости
-    [[ "$REBUILD_DEPS" -eq 0 && -f "$1" ]]
+    # $1 - путь к CMake-конфигу зависимости
+    # $2 - путь к скачанному репозиторию зависимости
+    # $3 - необходимая версия зависимости
+    # $4 - репозиторий зависимости
+    local cfg="$1" src_dir="${2:-}" version="${3:-}" repo="${4:-}"
+
+    [[ "$REBUILD_DEPS" -eq 0 && -f "$cfg" ]] || return 1
+    dep_up_to_date "$src_dir" "$version" "$repo"
 }
 
 dep_clone() {
     # $1 — каталог, $2 — репозиторий, остальное — аргументы git clone
-    local dir="$1" repo="$2"; shift 2
-    if [[ -d "${dir}/.git" ]]; then
-        return 0
-    fi
-    rm -rf "$dir"
+    local dir="$1" repo="$2"
+    shift 2
+    #if [[ -d "${dir}/.git" ]]; then
+    #    return 0
+    #fi
 
     # --branch не принимает SHA-1: git завершается с ошибкой
     # «Remote branch <sha> not found in upstream origin». Поэтому
@@ -415,13 +468,19 @@ dep_clone() {
         esac
     done
 
+    if [[ -n "$ref" ]] && dep_up_to_date "$dir" "$ref" "$repo"; then
+        return 0
+    fi
+
+    rm -rf "$dir"
+
     if [[ "${ref}" =~ ^[0-9a-fA-F]{40}$ ]]; then
         local -a clone_args=()
         local arg
         for arg in ${args[@]+"${args[@]}"}; do
             # Подмодули закреплённого коммита подтягиваем после checkout
             case "${arg}" in
-                --recurse-submodules|--shallow-submodules) ;;
+                --recurse-submodules | --shallow-submodules) ;;
                 *) clone_args+=("${arg}") ;;
             esac
         done
@@ -456,12 +515,12 @@ cmake_dep() {
 }
 
 build_vsg() {
-    if dep_ready "${DEPS_PREFIX}/lib/cmake/vsg/vsgConfig.cmake"; then
+    local src="${DEPS_SRC_DIR}/vsg"
+    if dep_ready "${DEPS_PREFIX}/lib/cmake/vsg/vsgConfig.cmake" "$src" "${VSG_VERSION}" "$VSG_REPO"; then
         log "vsg уже установлен — пропуск"
         return 0
     fi
-    local src="${DEPS_SRC_DIR}/vsg"
-    dep_clone "$src" https://github.com/vsg-dev/VulkanSceneGraph.git \
+    dep_clone "$src" "$VSG_REPO" \
         --depth 1 --branch "${VSG_VERSION}"
     log "Сборка vsg (${VSG_VERSION})"
     cmake -S "$src" -B "$src/build" -G "${GENERATOR_EFFECTIVE}" \
@@ -477,23 +536,23 @@ build_vsg() {
 }
 
 build_vsgxchange() {
-    if dep_ready "${DEPS_PREFIX}/lib/cmake/vsgXchange/vsgXchangeConfig.cmake"; then
+    local src="${DEPS_SRC_DIR}/vsgXchange"
+    if dep_ready "${DEPS_PREFIX}/lib/cmake/vsgXchange/vsgXchangeConfig.cmake" "$src" "$VSGXCHANGE_VERSION" "$VSGXCHANGE_REPO"; then
         log "vsgXchange уже установлен — пропуск"
         return 0
     fi
-    local src="${DEPS_SRC_DIR}/vsgXchange"
-    dep_clone "$src" https://github.com/vsg-dev/vsgXchange.git \
+    dep_clone "$src" "$VSGXCHANGE_REPO" \
         --depth 1 --branch "${VSGXCHANGE_VERSION}"
     log "Сборка vsgXchange (${VSGXCHANGE_VERSION})"
     cmake_dep "$src"
 }
 
 build_vsgimgui() {
-    if dep_ready "${DEPS_PREFIX}/lib/cmake/vsgImGui/vsgImGuiConfig.cmake"; then
-        log "vsgImGui уже установлен — пропуск"
-        return 0
-    fi
     local src="${DEPS_SRC_DIR}/vsgImGui"
+    if dep_ready "${DEPS_PREFIX}/lib/cmake/vsgImGui/vsgImGuiConfig.cmake" "$src" "$VSGIMGUI_VERSION" "$VSGIMGUI_REPO"; then
+      log "vsgImGui уже установлен — пропуск"
+      return 0
+    fi
     dep_clone "$src" "${VSGIMGUI_REPO}" \
         --depth 1 --recursive --shallow-submodules --branch "${VSGIMGUI_VERSION}"
     log "Сборка vsgImGui (${VSGIMGUI_VERSION})"
@@ -505,11 +564,11 @@ build_sol2() {
         log "sol2 есть в системе — сборка из исходников не нужна"
         return 0
     fi
-    if dep_ready "${DEPS_PREFIX}/share/cmake/sol2/sol2-config.cmake"; then
+    local src="${DEPS_SRC_DIR}/sol2"
+    if dep_ready "${DEPS_PREFIX}/share/cmake/sol2/sol2-config.cmake" "$src" "$SOL2_VERSION" "$SOL2_REPO"; then
         log "sol2 уже установлен — пропуск"
         return 0
     fi
-    local src="${DEPS_SRC_DIR}/sol2"
     dep_clone "$src" "${SOL2_REPO}"
     if [[ -n "${SOL2_VERSION}" ]]; then
         git -C "$src" checkout "${SOL2_VERSION}"
@@ -529,12 +588,12 @@ build_sfml() {
         log "SFML >= 3 есть в системе — сборка из исходников не нужна"
         return 0
     fi
-    if dep_ready "${DEPS_PREFIX}/lib/cmake/SFML/SFMLConfig.cmake"; then
+    local src="${DEPS_SRC_DIR}/SFML"
+    if dep_ready "${DEPS_PREFIX}/lib/cmake/SFML/SFMLConfig.cmake" "$src" "$SFML_VERSION" "$SFML_REPO"; then
         log "SFML уже установлен — пропуск"
         return 0
     fi
-    local src="${DEPS_SRC_DIR}/SFML"
-    dep_clone "$src" https://github.com/SFML/SFML.git \
+    dep_clone "$src" "$SFML_REPO" \
         --depth 1 --branch "${SFML_VERSION}"
     log "Сборка SFML (${SFML_VERSION}, модули System и Window)"
     cmake -S "$src" -B "$src/build" -G "${GENERATOR_EFFECTIVE}" \
@@ -549,7 +608,7 @@ build_sfml() {
         -DSFML_BUILD_NETWORK=OFF \
         -DSFML_BUILD_EXAMPLES=OFF \
         -DSFML_BUILD_TEST_SUITE=OFF \
-        -DSFML_BUILD_DOC=OFF
+      -DSFML_BUILD_DOC=OFF
     cmake --build "$src/build" -j "$JOBS"
     cmake --install "$src/build"
 }
@@ -557,12 +616,12 @@ build_sfml() {
 build_ktx() {
     # KTX ставит конфиг в lib/cmake/ktx/KtxConfig.cmake (именно такое
     # написание, поэтому проверку делаем по фактическому пути)
-    if dep_ready "${DEPS_PREFIX}/lib/cmake/ktx/KtxConfig.cmake"; then
+    local src="${DEPS_SRC_DIR}/KTX-Software"
+    if dep_ready "${DEPS_PREFIX}/lib/cmake/ktx/KtxConfig.cmake" "$src" "$KTX_VERSION" "$KTX_REPO"; then
         log "KTX уже установлен — пропуск"
         return 0
     fi
-    local src="${DEPS_SRC_DIR}/KTX-Software"
-    dep_clone "$src" https://github.com/KhronosGroup/KTX-Software.git \
+    dep_clone "$src" "$KTX_REPO" \
         --depth 1 --recurse-submodules --shallow-submodules --branch "${KTX_VERSION}"
     log "Сборка KTX (${KTX_VERSION})"
     cmake -S "$src" -B "$src/build" -G "${GENERATOR_EFFECTIVE}" \

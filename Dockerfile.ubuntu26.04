@@ -14,7 +14,9 @@ ARG RRS_DEPS_PREFIX=/opt/rrs-deps
 
 # Версии зависимостей, которых нет в репозиториях Убунту 26.04
 # (можно переопределить при сборке образа)
-ARG VSG_VERSION=v1.1.16
+ARG VSG_REPO=https://github.com/vsg-dev/VulkanSceneGraph.git
+ARG VSG_VERSION=v1.1.17
+ARG VSGXCHANGE_REPO=https://github.com/vsg-dev/vsgXchange.git
 ARG VSGXCHANGE_VERSION=v1.1.14
 ARG VSGIMGUI_REPO=https://github.com/maisvendoo/vsgImGui.git
 ARG VSGIMGUI_VERSION=master-RRS
@@ -82,7 +84,7 @@ RUN apt-get update \
 # VulkanSceneGraph (vsg) — нет в репозиториях Убунту, собираем из исходников
 # ---------------------------------------------------------------------------
 RUN git clone --depth 1 --branch "${VSG_VERSION}" \
-        https://github.com/vsg-dev/VulkanSceneGraph.git /src/vsg \
+        "${VSG_REPO}" /src/vsg \
     && cmake -S /src/vsg -B /src/vsg/build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX="${RRS_DEPS_PREFIX}" \
@@ -103,7 +105,7 @@ RUN git clone --depth 1 --branch "${VSG_VERSION}" \
 # vsgXchange — загрузка моделей/изображений для vsg
 # ---------------------------------------------------------------------------
 RUN git clone --depth 1 --branch "${VSGXCHANGE_VERSION}" \
-        https://github.com/vsg-dev/vsgXchange.git /src/vsgXchange \
+        "${VSGXCHANGE_REPO}" /src/vsgXchange \
     && cmake -S /src/vsgXchange -B /src/vsgXchange/build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX="${RRS_DEPS_PREFIX}" \
