@@ -62,7 +62,7 @@ EXPORT=1
 DEPS_ONLY=0
 
 usage() {
-  cat <<EOF
+    cat <<EOF
 Использование: $(basename "$0") [параметры]
 
 Параметры:
@@ -93,185 +93,144 @@ EOF
 # --- Разбор аргументов ----------------------------------------------------
 while [[ $# -gt 0 ]]; do
   case "$1" in
-  -i | --image)
-    IMAGE="$2"
-    shift 2
-    ;;
-  -o | --output)
-    OUTPUT_DIR="$2"
-    shift 2
-    ;;
-  -t | --build-type)
-    BUILD_TYPE="$2"
-    shift 2
-    ;;
-  -j | --jobs)
-    JOBS="$2"
-    shift 2
-    ;;
-  --build-only)
-    DO_BUILD=1
-    EXPORT=0
-    shift
-    ;;
-  --no-build)
-    DO_BUILD=0
-    shift
-    ;;
-  --deps-only)
-    DEPS_ONLY=1
-    shift
-    ;;
-  --no-cache)
-    NO_CACHE=1
-    shift
-    ;;
-  --pull)
-    PULL=1
-    shift
-    ;;
-  --routes)
-    ROUTES="$2"
-    shift 2
-    ;;
-  --no-routes)
-    ROUTES="none"
-    shift
-    ;;
-  -h | --help)
-    usage
-    exit 0
-    ;;
-  *)
-    echo "Неизвестный параметр: $1" >&2
-    usage >&2
-    exit 2
-    ;;
+      -i | --image)        IMAGE="$2"; shift 2 ;;
+      -o | --output)       OUTPUT_DIR="$2"; shift 2 ;;
+      -t | --build-type)   BUILD_TYPE="$2"; shift 2 ;;
+      -j | --jobs)         JOBS="$2"; shift 2 ;;
+      --build-only)        DO_BUILD=1; EXPORT=0; shift ;;
+      --no-build)          DO_BUILD=0; shift ;;
+      --deps-only)         DEPS_ONLY=1; shift ;;
+      --no-cache)          NO_CACHE=1; shift ;;
+      --pull)              PULL=1; shift ;;
+      --routes)            ROUTES="$2"; shift 2 ;;
+      --no-routes)         ROUTES="none"; shift ;;
+      -h | --help)         usage; exit 0 ;;
+      *) echo "Неизвестный параметр: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
 
 # --- Проверки -------------------------------------------------------------
 if ! command -v "${DOCKER_BIN}" >/dev/null 2>&1; then
-  echo "Ошибка: не найден docker (${DOCKER_BIN}). Установите Docker и повторите." >&2
-  exit 1
+    echo "Ошибка: не найден docker (${DOCKER_BIN}). Установите Docker и повторите." >&2
+    exit 1
 fi
 
 if ! "${DOCKER_BIN}" info >/dev/null 2>&1; then
-  echo "Ошибка: демон Docker недоступен (нет прав или не запущен)." >&2
-  exit 1
+    echo "Ошибка: демон Docker недоступен (нет прав или не запущен)." >&2
+    exit 1
 fi
 
 # Имя файла сборки образа; версия Убунту указана в самом имени
 DOCKERFILE="${RRS_DOCKERFILE:-${ROOT_DIR}/Dockerfile.ubuntu26.04}"
 
 if [[ ! -f "${DOCKERFILE}" ]]; then
-  echo "Ошибка: не найден ${DOCKERFILE}" >&2
-  exit 1
+    echo "Ошибка: не найден ${DOCKERFILE}" >&2
+    exit 1
 fi
 
 if [[ ! "$BUILD_TYPE" =~ ^(Release|RelWithDebInfo|Debug|MinSizeRel)$ ]]; then
-  echo "Ошибка: неверный тип сборки '${BUILD_TYPE}'" >&2
-  exit 2
+    echo "Ошибка: неверный тип сборки '${BUILD_TYPE}'" >&2
+    exit 2
 fi
 
 if [[ "$DO_BUILD" -eq 0 && "$EXPORT" -eq 0 ]]; then
-  echo "Ошибка: указаны --no-build и --build-only одновременно — делать нечего." >&2
-  exit 2
+    echo "Ошибка: указаны --no-build и --build-only одновременно — делать нечего." >&2
+    exit 2
 fi
 
 # --- Сборка образа --------------------------------------------------------
 if [[ "$DO_BUILD" -eq 1 ]]; then
-  echo "==> Сборка образа '${IMAGE}' (тип сборки: ${BUILD_TYPE}, задач: ${JOBS})"
+    echo "==> Сборка образа '${IMAGE}' (тип сборки: ${BUILD_TYPE}, задач: ${JOBS})"
 
-  BUILD_ARGS=(
-    --file "${DOCKERFILE}"
-    --build-arg "BUILD_TYPE=${BUILD_TYPE}"
-    --build-arg "JOBS=${JOBS}"
-    --build-arg "VSG_REPO=${VSG_REPO}"
-    --build-arg "VSG_VERSION=${VSG_VERSION}"
-    --build-arg "VSGXCHANGE_REPO=${VSGXCHANGE_REPO}"
-    --build-arg "VSGXCHANGE_VERSION=${VSGXCHANGE_VERSION}"
-    --build-arg "VSGIMGUI_REPO=${VSGIMGUI_REPO}"
-    --build-arg "VSGIMGUI_VERSION=${VSGIMGUI_VERSION}"
-    --build-arg "KTX_REPO=${KTX_REPO}"
-    --build-arg "KTX_VERSION=${KTX_VERSION}"
-    --build-arg "RRS_ARTIFACT_PREFIX=${INSTALL_PREFIX}"
-  )
+    BUILD_ARGS=(
+      --file "${DOCKERFILE}"
+      --build-arg "BUILD_TYPE=${BUILD_TYPE}"
+      --build-arg "JOBS=${JOBS}"
+      --build-arg "VSG_REPO=${VSG_REPO}"
+      --build-arg "VSG_VERSION=${VSG_VERSION}"
+      --build-arg "VSGXCHANGE_REPO=${VSGXCHANGE_REPO}"
+      --build-arg "VSGXCHANGE_VERSION=${VSGXCHANGE_VERSION}"
+      --build-arg "VSGIMGUI_REPO=${VSGIMGUI_REPO}"
+      --build-arg "VSGIMGUI_VERSION=${VSGIMGUI_VERSION}"
+      --build-arg "KTX_REPO=${KTX_REPO}"
+      --build-arg "KTX_VERSION=${KTX_VERSION}"
+      --build-arg "RRS_ARTIFACT_PREFIX=${INSTALL_PREFIX}"
+    )
 
-  # В режиме --deps-only собирается только стадия deps, и складывать её
-  # в основной тег нельзя: иначе --no-build ниже полез бы за артефактами в
-  # образ без собранного RRS. Поэтому используем отдельный тег с суффиксом.
-  BUILD_TAG="${IMAGE}"
-  if [[ "$DEPS_ONLY" -eq 1 ]]; then
-    BUILD_TAG="${IMAGE}-deps"
-    BUILD_ARGS+=(--target deps)
-  fi
+    # В режиме --deps-only собирается только стадия deps, и складывать её
+    # в основной тег нельзя: иначе --no-build ниже полез бы за артефактами в
+    # образ без собранного RRS. Поэтому используем отдельный тег с суффиксом.
+    BUILD_TAG="${IMAGE}"
+    if [[ "$DEPS_ONLY" -eq 1 ]]; then
+        BUILD_TAG="${IMAGE}-deps"
+        BUILD_ARGS+=(--target deps)
+    fi
 
-  [[ "$NO_CACHE" -eq 1 ]] && BUILD_ARGS+=(--no-cache)
-  [[ "$PULL" -eq 1 ]] && BUILD_ARGS+=(--pull)
+    [[ "$NO_CACHE" -eq 1 ]] && BUILD_ARGS+=(--no-cache)
+    [[ "$PULL" -eq 1 ]] && BUILD_ARGS+=(--pull)
 
-  BUILD_ARGS=(--tag "${BUILD_TAG}" "${BUILD_ARGS[@]}")
+    BUILD_ARGS=(--tag "${BUILD_TAG}" "${BUILD_ARGS[@]}")
 
-  "${DOCKER_BIN}" build "${BUILD_ARGS[@]}" "${ROOT_DIR}"
-  echo "==> Образ собран: ${BUILD_TAG}"
+    "${DOCKER_BIN}" build "${BUILD_ARGS[@]}" "${ROOT_DIR}"
+    echo "==> Образ собран: ${BUILD_TAG}"
 else
-  echo "==> Пропуск сборки образа (--no-build), используется '${IMAGE}'"
-  if ! "${DOCKER_BIN}" image inspect "${IMAGE}" >/dev/null 2>&1; then
-    echo "Ошибка: образ '${IMAGE}' не найден." >&2
-    exit 1
-  fi
+    echo "==> Пропуск сборки образа (--no-build), используется '${IMAGE}'"
+    if ! "${DOCKER_BIN}" image inspect "${IMAGE}" >/dev/null 2>&1; then
+        echo "Ошибка: образ '${IMAGE}' не найден." >&2
+        exit 1
+    fi
 fi
 
 if [[ "$DEPS_ONLY" -eq 1 ]]; then
-  echo
-  echo "==> Готово: собрана только стадия зависимостей (${BUILD_TAG})."
-  echo "    Полная сборка: ${0}"
-  exit 0
+    echo
+    echo "==> Готово: собрана только стадия зависимостей (${BUILD_TAG})."
+    echo "    Полная сборка: ${0}"
+    exit 0
 fi
 
 # --- Выгрузка артефактов --------------------------------------------------
 if [[ "$EXPORT" -eq 1 ]]; then
 
-  mkdir -p "${OUTPUT_DIR}"
-  OUTPUT_DIR="$(cd "${OUTPUT_DIR}" && pwd)"
+    mkdir -p "${OUTPUT_DIR}"
+    OUTPUT_DIR="$(cd "${OUTPUT_DIR}" && pwd)"
 
-  # Если в каталоге результата остались файлы прошлых запусков, созданные
-  # контейнером (root), текущий пользователь не сможет ни перезаписать их,
-  # ни сменить им владельца. Исправляем владельца через одноразовый контейнер.
-  if find "${OUTPUT_DIR}" ! -user "$(id -u)" -print -quit 2>/dev/null | grep -q .; then
-    echo "==> В ${OUTPUT_DIR} есть файлы не текущего пользователя, исправляю владельца"
-    "${DOCKER_BIN}" run --rm --volume "${OUTPUT_DIR}:/out" "${IMAGE}" \
-      sh -c "chown -R $(id -u):$(id -g) /out" || true
-  fi
+    # Если в каталоге результата остались файлы прошлых запусков, созданные
+    # контейнером (root), текущий пользователь не сможет ни перезаписать их,
+    # ни сменить им владельца. Исправляем владельца через одноразовый контейнер.
+    if find "${OUTPUT_DIR}" ! -user "$(id -u)" -print -quit 2>/dev/null | grep -q .; then
+        echo "==> В ${OUTPUT_DIR} есть файлы не текущего пользователя, исправляю владельца"
+        "${DOCKER_BIN}" run --rm --volume "${OUTPUT_DIR}:/out" "${IMAGE}" \
+          sh -c "chown -R $(id -u):$(id -g) /out" || true
+    fi
 
-  echo "==> Копирование артефактов из образа в ${OUTPUT_DIR}"
+    echo "==> Копирование артефактов из образа в ${OUTPUT_DIR}"
 
-  # docker create + docker cp + docker rm: контейнер не запускается, копирование
-  # делает демон (файлы сразу принадлежат текущему пользователю), а контейнер
-  # гарантированно удаляется после завершения.
-  CONTAINER_ID="$("${DOCKER_BIN}" create "${IMAGE}")"
-  if [[ -z "${CONTAINER_ID}" ]]; then
-    echo "Ошибка: не удалось создать контейнер из образа ${IMAGE}." >&2
-    exit 1
-  fi
+    # docker create + docker cp + docker rm: контейнер не запускается, копирование
+    # делает демон (файлы сразу принадлежат текущему пользователю), а контейнер
+    # гарантированно удаляется после завершения.
+    CONTAINER_ID="$("${DOCKER_BIN}" create "${IMAGE}")"
+    if [[ -z "${CONTAINER_ID}" ]]; then
+        echo "Ошибка: не удалось создать контейнер из образа ${IMAGE}." >&2
+        exit 1
+    fi
 
-  if ! "${DOCKER_BIN}" cp "${CONTAINER_ID}:${INSTALL_PREFIX}/." "${OUTPUT_DIR}/"; then
-    "${DOCKER_BIN}" rm -f "${CONTAINER_ID}" >/dev/null 2>&1 || true
-    echo "Ошибка: не удалось скопировать артефакты из контейнера." >&2
-    exit 1
-  fi
+    if ! "${DOCKER_BIN}" cp "${CONTAINER_ID}:${INSTALL_PREFIX}/." "${OUTPUT_DIR}/"; then
+        "${DOCKER_BIN}" rm -f "${CONTAINER_ID}" >/dev/null 2>&1 || true
+        echo "Ошибка: не удалось скопировать артефакты из контейнера." >&2
+        exit 1
+    fi
 
-  "${DOCKER_BIN}" rm "${CONTAINER_ID}" >/dev/null
+    "${DOCKER_BIN}" rm "${CONTAINER_ID}" >/dev/null
 
-  # --- Маршруты -------------------------------------------------------------
-  # В образе их нет (сотни мегабайт, для сборки не нужны), поэтому копируем
-  # каталоги маршрутов из исходного дерева в <результат>/routes.
-  rrs_copy_routes "${ROUTES_SRC}" "${OUTPUT_DIR}/routes" "${ROUTES}"
+    # --- Маршруты -------------------------------------------------------------
+    # В образе их нет (сотни мегабайт, для сборки не нужны), поэтому копируем
+    # каталоги маршрутов из исходного дерева в <результат>/routes.
+    rrs_copy_routes "${ROUTES_SRC}" "${OUTPUT_DIR}/routes" "${ROUTES}"
 
-  echo
-  echo "==> Готово. Результат сборки: ${OUTPUT_DIR}"
-  echo "    Содержимое: $(ls "${OUTPUT_DIR}" | sort | tr '\n' ' ')"
-  echo "    Пример: ${OUTPUT_DIR}/bin/launcher (или иной исполняемый файл из bin)"
+    echo
+    echo "==> Готово. Результат сборки: ${OUTPUT_DIR}"
+    echo "    Содержимое: $(ls "${OUTPUT_DIR}" | sort | tr '\n' ' ')"
+    echo "    Пример: ${OUTPUT_DIR}/bin/launcher (или иной исполняемый файл из bin)"
 
 else
   echo "==> Выгрузка артефактов пропущена (--build-only)"
